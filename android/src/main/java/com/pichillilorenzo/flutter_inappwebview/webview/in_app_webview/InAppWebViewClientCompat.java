@@ -14,19 +14,19 @@ import android.webkit.CookieManager;
 import android.webkit.CookieSyncManager;
 import android.webkit.HttpAuthHandler;
 import android.webkit.RenderProcessGoneDetail;
-import android.webkit.SafeBrowsingResponse;
 import android.webkit.SslErrorHandler;
 import android.webkit.ValueCallback;
-import android.webkit.WebResourceError;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebResourceResponse;
 import android.webkit.WebView;
-import android.webkit.WebViewClient;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
+import androidx.webkit.SafeBrowsingResponseCompat;
+import androidx.webkit.WebResourceErrorCompat;
 import androidx.webkit.WebResourceRequestCompat;
+import androidx.webkit.WebViewClientCompat;
 import androidx.webkit.WebViewFeature;
 
 import com.pichillilorenzo.flutter_inappwebview.Util;
@@ -57,21 +57,21 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 
-public class InAppWebViewClient extends WebViewClient {
+public class InAppWebViewClientCompat extends WebViewClientCompat {
 
-  protected static final String LOG_TAG = "IAWebViewClient";
+  protected static final String LOG_TAG = "IAWebViewClientCompat";
   private InAppBrowserDelegate inAppBrowserDelegate;
   private static int previousAuthRequestFailureCount = 0;
   private static List<URLCredential> credentialsProposed = null;
 
-  public InAppWebViewClient(InAppBrowserDelegate inAppBrowserDelegate) {
+  public InAppWebViewClientCompat(InAppBrowserDelegate inAppBrowserDelegate) {
     super();
     this.inAppBrowserDelegate = inAppBrowserDelegate;
   }
 
   @TargetApi(Build.VERSION_CODES.LOLLIPOP)
   @Override
-  public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
+  public boolean shouldOverrideUrlLoading(@NonNull WebView view, @NonNull WebResourceRequest request) {
     InAppWebView webView = (InAppWebView) view;
     if (webView.customSettings.useShouldOverrideUrlLoading) {
       boolean isRedirect = false;
@@ -269,7 +269,9 @@ public class InAppWebViewClient extends WebViewClient {
   
   @RequiresApi(api = Build.VERSION_CODES.M)
   @Override
-  public void onReceivedError(WebView view, @NonNull WebResourceRequest request, @NonNull WebResourceError error) {
+  public void onReceivedError(@NonNull WebView view,
+                              @NonNull WebResourceRequest request,
+                              @NonNull WebResourceErrorCompat error) {
     final InAppWebView webView = (InAppWebView) view;
 
     if (request.isForMainFrame()) {
@@ -283,7 +285,15 @@ public class InAppWebViewClient extends WebViewClient {
       credentialsProposed = null;
 
       if (inAppBrowserDelegate != null) {
-        inAppBrowserDelegate.didFailNavigation(request.getUrl().toString(), error.getErrorCode(), error.getDescription().toString());
+        int type = -1;
+        if (WebViewFeature.isFeatureSupported(WebViewFeature.WEB_RESOURCE_ERROR_GET_CODE)) {
+          type = error.getErrorCode();
+        }
+        String description = "";
+        if (WebViewFeature.isFeatureSupported(WebViewFeature.WEB_RESOURCE_ERROR_GET_DESCRIPTION)) {
+          description = error.getDescription().toString();
+        }
+        inAppBrowserDelegate.didFailNavigation(request.getUrl().toString(), type, description);
       }
     }
 
@@ -337,7 +347,9 @@ public class InAppWebViewClient extends WebViewClient {
 
   @RequiresApi(api = Build.VERSION_CODES.M)
   @Override
-  public void onReceivedHttpError(WebView view, WebResourceRequest request, WebResourceResponse errorResponse) {
+  public void onReceivedHttpError(@NonNull WebView view,
+                                  @NonNull WebResourceRequest request,
+                                  @NonNull WebResourceResponse errorResponse) {
     super.onReceivedHttpError(view, request, errorResponse);
 
     final InAppWebView webView = (InAppWebView) view;
@@ -421,7 +433,7 @@ public class InAppWebViewClient extends WebViewClient {
 
       @Override
       public void defaultBehaviour(@Nullable HttpAuthResponse result) {
-        InAppWebViewClient.super.onReceivedHttpAuthRequest(view, handler, host, realm);
+        InAppWebViewClientCompat.super.onReceivedHttpAuthRequest(view, handler, host, realm);
       }
 
       @Override
@@ -480,7 +492,7 @@ public class InAppWebViewClient extends WebViewClient {
 
       @Override
       public void defaultBehaviour(@Nullable ServerTrustAuthResponse result) {
-        InAppWebViewClient.super.onReceivedSslError(view, handler, sslError);
+        InAppWebViewClientCompat.super.onReceivedSslError(view, handler, sslError);
       }
 
       @Override
@@ -554,7 +566,7 @@ public class InAppWebViewClient extends WebViewClient {
 
       @Override
       public void defaultBehaviour(@Nullable ClientCertResponse result) {
-        InAppWebViewClient.super.onReceivedClientCertRequest(view, request);
+        InAppWebViewClientCompat.super.onReceivedClientCertRequest(view, request);
       }
 
       @Override
@@ -584,7 +596,10 @@ public class InAppWebViewClient extends WebViewClient {
 
   @RequiresApi(api = Build.VERSION_CODES.O_MR1)
   @Override
-  public void onSafeBrowsingHit(final WebView view, final WebResourceRequest request, final int threatType, final SafeBrowsingResponse callback) {
+  public void onSafeBrowsingHit(@NonNull final WebView view,
+                                @NonNull final WebResourceRequest request,
+                                final int threatType,
+                                @NonNull final SafeBrowsingResponseCompat callback) {
     final InAppWebView webView = (InAppWebView) view;
     final WebViewChannelDelegate.SafeBrowsingHitCallback resultCallback = new WebViewChannelDelegate.SafeBrowsingHitCallback() {
       @Override
@@ -594,14 +609,26 @@ public class InAppWebViewClient extends WebViewClient {
           boolean report = response.isReport();
           switch (action) {
             case 0:
-              callback.backToSafety(report);
+              if (WebViewFeature.isFeatureSupported(WebViewFeature.SAFE_BROWSING_RESPONSE_BACK_TO_SAFETY)) {
+                callback.backToSafety(report);
+              } else {
+                return true;
+              }
               break;
             case 1:
-              callback.proceed(report);
+              if (WebViewFeature.isFeatureSupported(WebViewFeature.SAFE_BROWSING_RESPONSE_PROCEED)) {
+                callback.proceed(report);
+              } else {
+                return true;
+              }
               break;
             case 2:
             default:
-              callback.showInterstitial(report);
+              if (WebViewFeature.isFeatureSupported(WebViewFeature.SAFE_BROWSING_RESPONSE_SHOW_INTERSTITIAL)) {
+                callback.showInterstitial(report);
+              } else {
+                return true;
+              }
           }
 
           return false;
@@ -612,7 +639,7 @@ public class InAppWebViewClient extends WebViewClient {
 
       @Override
       public void defaultBehaviour(@Nullable com.pichillilorenzo.flutter_inappwebview.types.SafeBrowsingResponse result) {
-        InAppWebViewClient.super.onSafeBrowsingHit(view, request, threatType, callback);
+        InAppWebViewClientCompat.super.onSafeBrowsingHit(view, request, threatType, callback);
       }
 
       @Override
@@ -753,7 +780,7 @@ public class InAppWebViewClient extends WebViewClient {
 
       @Override
       public void defaultBehaviour(@Nullable Integer result) {
-        InAppWebViewClient.super.onFormResubmission(view, dontResend, resend);
+        InAppWebViewClientCompat.super.onFormResubmission(view, dontResend, resend);
       }
 
       @Override
@@ -771,7 +798,7 @@ public class InAppWebViewClient extends WebViewClient {
   }
 
   @Override
-  public void onPageCommitVisible(WebView view, String url) {
+  public void onPageCommitVisible(@NonNull WebView view, @NonNull String url) {
     super.onPageCommitVisible(view, url);
 
     final InAppWebView webView = (InAppWebView) view;

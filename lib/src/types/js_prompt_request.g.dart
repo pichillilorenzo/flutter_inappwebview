@@ -8,12 +8,6 @@ part of 'js_prompt_request.dart';
 
 ///Class that represents the request of the [WebView.onJsPrompt] event.
 class JsPromptRequest {
-  ///The url of the page requesting the dialog.
-  WebUri? url;
-
-  ///Message to be displayed in the window.
-  String? message;
-
   ///The default value displayed in the prompt dialog.
   String? defaultValue;
 
@@ -27,12 +21,18 @@ class JsPromptRequest {
   ///- iOS
   ///- MacOS
   bool? isMainFrame;
+
+  ///Message to be displayed in the window.
+  String? message;
+
+  ///The url of the page requesting the dialog.
+  WebUri? url;
   JsPromptRequest(
-      {this.url,
-      this.message,
-      this.defaultValue,
+      {this.defaultValue,
       @Deprecated('Use isMainFrame instead') this.iosIsMainFrame,
-      this.isMainFrame}) {
+      this.isMainFrame,
+      this.message,
+      this.url}) {
     isMainFrame = isMainFrame ?? iosIsMainFrame;
   }
 
@@ -42,11 +42,11 @@ class JsPromptRequest {
       return null;
     }
     final instance = JsPromptRequest(
-      url: map['url'] != null ? WebUri(map['url']) : null,
-      message: map['message'],
       defaultValue: map['defaultValue'],
       iosIsMainFrame: map['isMainFrame'],
       isMainFrame: map['isMainFrame'],
+      message: map['message'],
+      url: map['url'] != null ? WebUri(map['url']) : null,
     );
     return instance;
   }
@@ -54,10 +54,10 @@ class JsPromptRequest {
   ///Converts instance to a map.
   Map<String, dynamic> toMap() {
     return {
-      "url": url?.toString(),
-      "message": message,
       "defaultValue": defaultValue,
       "isMainFrame": isMainFrame,
+      "message": message,
+      "url": url?.toString(),
     };
   }
 
@@ -68,6 +68,6 @@ class JsPromptRequest {
 
   @override
   String toString() {
-    return 'JsPromptRequest{url: $url, message: $message, defaultValue: $defaultValue, isMainFrame: $isMainFrame}';
+    return 'JsPromptRequest{defaultValue: $defaultValue, isMainFrame: $isMainFrame, message: $message, url: $url}';
   }
 }

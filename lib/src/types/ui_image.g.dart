@@ -13,6 +13,9 @@ part of 'ui_image.dart';
 ///**Supported Platforms/Implementations**:
 ///- iOS
 class UIImage {
+  ///The data object containing the image data.
+  Uint8List? data;
+
   ///The name of the image asset or file.
   String? name;
 
@@ -20,9 +23,6 @@ class UIImage {
   ///
   ///**NOTE**: available on iOS 13.0+.
   String? systemName;
-
-  ///The data object containing the image data.
-  Uint8List? data;
   UIImage({this.name, this.systemName, this.data}) {
     assert(this.name != null || this.systemName != null || this.data != null);
   }
@@ -33,9 +33,9 @@ class UIImage {
       return null;
     }
     final instance = UIImage(
+      data: map['data'],
       name: map['name'],
       systemName: map['systemName'],
-      data: map['data'],
     );
     return instance;
   }
@@ -43,9 +43,9 @@ class UIImage {
   ///Converts instance to a map.
   Map<String, dynamic> toMap() {
     return {
+      "data": data,
       "name": name,
       "systemName": systemName,
-      "data": data,
     };
   }
 
@@ -56,6 +56,6 @@ class UIImage {
 
   @override
   String toString() {
-    return 'UIImage{name: $name, systemName: $systemName, data: $data}';
+    return 'UIImage{data: $data, name: $name, systemName: $systemName}';
   }
 }

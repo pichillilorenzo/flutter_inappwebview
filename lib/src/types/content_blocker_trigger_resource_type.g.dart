@@ -18,32 +18,32 @@ class ContentBlockerTriggerResourceType {
       ContentBlockerTriggerResourceType._internal(value, nativeValue());
   static const DOCUMENT =
       ContentBlockerTriggerResourceType._internal('document', 'document');
-  static const IMAGE =
-      ContentBlockerTriggerResourceType._internal('image', 'image');
-  static const STYLE_SHEET =
-      ContentBlockerTriggerResourceType._internal('style-sheet', 'style-sheet');
-  static const SCRIPT =
-      ContentBlockerTriggerResourceType._internal('script', 'script');
   static const FONT =
       ContentBlockerTriggerResourceType._internal('font', 'font');
+  static const IMAGE =
+      ContentBlockerTriggerResourceType._internal('image', 'image');
   static const MEDIA =
       ContentBlockerTriggerResourceType._internal('media', 'media');
-  static const SVG_DOCUMENT = ContentBlockerTriggerResourceType._internal(
-      'svg-document', 'svg-document');
 
   ///Any untyped load
   static const RAW = ContentBlockerTriggerResourceType._internal('raw', 'raw');
+  static const SCRIPT =
+      ContentBlockerTriggerResourceType._internal('script', 'script');
+  static const STYLE_SHEET =
+      ContentBlockerTriggerResourceType._internal('style-sheet', 'style-sheet');
+  static const SVG_DOCUMENT = ContentBlockerTriggerResourceType._internal(
+      'svg-document', 'svg-document');
 
   ///Set of all values of [ContentBlockerTriggerResourceType].
   static final Set<ContentBlockerTriggerResourceType> values = [
     ContentBlockerTriggerResourceType.DOCUMENT,
-    ContentBlockerTriggerResourceType.IMAGE,
-    ContentBlockerTriggerResourceType.STYLE_SHEET,
-    ContentBlockerTriggerResourceType.SCRIPT,
     ContentBlockerTriggerResourceType.FONT,
+    ContentBlockerTriggerResourceType.IMAGE,
     ContentBlockerTriggerResourceType.MEDIA,
-    ContentBlockerTriggerResourceType.SVG_DOCUMENT,
     ContentBlockerTriggerResourceType.RAW,
+    ContentBlockerTriggerResourceType.SCRIPT,
+    ContentBlockerTriggerResourceType.STYLE_SHEET,
+    ContentBlockerTriggerResourceType.SVG_DOCUMENT,
   ].toSet();
 
   ///Gets a possible [ContentBlockerTriggerResourceType] instance from [String] value.

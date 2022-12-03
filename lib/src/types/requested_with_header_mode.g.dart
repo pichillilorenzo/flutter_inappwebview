@@ -16,18 +16,18 @@ class RequestedWithHeaderMode {
           int value, Function nativeValue) =>
       RequestedWithHeaderMode._internal(value, nativeValue());
 
-  ///In this mode the WebView will not add an `X-Requested-With` header on HTTP requests automatically.
-  static const NO_HEADER = RequestedWithHeaderMode._internal(0, 0);
-
   ///In this mode the WebView automatically add an `X-Requested-With` header to outgoing requests,
   ///if the application or the loaded webpage has not already set a header value.
   ///The value of this automatically added header will be the package name of the app. This is the default mode.
   static const APP_PACKAGE_NAME = RequestedWithHeaderMode._internal(1, 1);
 
+  ///In this mode the WebView will not add an `X-Requested-With` header on HTTP requests automatically.
+  static const NO_HEADER = RequestedWithHeaderMode._internal(0, 0);
+
   ///Set of all values of [RequestedWithHeaderMode].
   static final Set<RequestedWithHeaderMode> values = [
-    RequestedWithHeaderMode.NO_HEADER,
     RequestedWithHeaderMode.APP_PACKAGE_NAME,
+    RequestedWithHeaderMode.NO_HEADER,
   ].toSet();
 
   ///Gets a possible [RequestedWithHeaderMode] instance from [int] value.
@@ -71,10 +71,10 @@ class RequestedWithHeaderMode {
   @override
   String toString() {
     switch (_value) {
-      case 0:
-        return 'NO_HEADER';
       case 1:
         return 'APP_PACKAGE_NAME';
+      case 0:
+        return 'NO_HEADER';
     }
     return _value.toString();
   }

@@ -15,20 +15,20 @@ class ForceDark {
   factory ForceDark._internalMultiPlatform(int value, Function nativeValue) =>
       ForceDark._internal(value, nativeValue());
 
+  ///Enable force dark dependent on the state of the WebView parent view.
+  static const AUTO = ForceDark._internal(1, 1);
+
   ///Disable force dark, irrespective of the force dark mode of the WebView parent.
   ///In this mode, WebView content will always be rendered as-is, regardless of whether native views are being automatically darkened.
   static const OFF = ForceDark._internal(0, 0);
-
-  ///Enable force dark dependent on the state of the WebView parent view.
-  static const AUTO = ForceDark._internal(1, 1);
 
   ///Unconditionally enable force dark. In this mode WebView content will always be rendered so as to emulate a dark theme.
   static const ON = ForceDark._internal(2, 2);
 
   ///Set of all values of [ForceDark].
   static final Set<ForceDark> values = [
-    ForceDark.OFF,
     ForceDark.AUTO,
+    ForceDark.OFF,
     ForceDark.ON,
   ].toSet();
 
@@ -73,10 +73,10 @@ class ForceDark {
   @override
   String toString() {
     switch (_value) {
-      case 0:
-        return 'OFF';
       case 1:
         return 'AUTO';
+      case 0:
+        return 'OFF';
       case 2:
         return 'ON';
     }
@@ -99,20 +99,20 @@ class AndroidForceDark {
           int value, Function nativeValue) =>
       AndroidForceDark._internal(value, nativeValue());
 
+  ///Enable force dark dependent on the state of the WebView parent view.
+  static const FORCE_DARK_AUTO = AndroidForceDark._internal(1, 1);
+
   ///Disable force dark, irrespective of the force dark mode of the WebView parent.
   ///In this mode, WebView content will always be rendered as-is, regardless of whether native views are being automatically darkened.
   static const FORCE_DARK_OFF = AndroidForceDark._internal(0, 0);
-
-  ///Enable force dark dependent on the state of the WebView parent view.
-  static const FORCE_DARK_AUTO = AndroidForceDark._internal(1, 1);
 
   ///Unconditionally enable force dark. In this mode WebView content will always be rendered so as to emulate a dark theme.
   static const FORCE_DARK_ON = AndroidForceDark._internal(2, 2);
 
   ///Set of all values of [AndroidForceDark].
   static final Set<AndroidForceDark> values = [
-    AndroidForceDark.FORCE_DARK_OFF,
     AndroidForceDark.FORCE_DARK_AUTO,
+    AndroidForceDark.FORCE_DARK_OFF,
     AndroidForceDark.FORCE_DARK_ON,
   ].toSet();
 
@@ -157,10 +157,10 @@ class AndroidForceDark {
   @override
   String toString() {
     switch (_value) {
-      case 0:
-        return 'FORCE_DARK_OFF';
       case 1:
         return 'FORCE_DARK_AUTO';
+      case 0:
+        return 'FORCE_DARK_OFF';
       case 2:
         return 'FORCE_DARK_ON';
     }

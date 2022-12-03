@@ -19,17 +19,17 @@ class ClientCertResponseAction {
   ///Cancel this request.
   static const CANCEL = ClientCertResponseAction._internal(0, 0);
 
-  ///Proceed with the specified certificate.
-  static const PROCEED = ClientCertResponseAction._internal(1, 1);
-
   ///Ignore the request for now.
   static const IGNORE = ClientCertResponseAction._internal(2, 2);
+
+  ///Proceed with the specified certificate.
+  static const PROCEED = ClientCertResponseAction._internal(1, 1);
 
   ///Set of all values of [ClientCertResponseAction].
   static final Set<ClientCertResponseAction> values = [
     ClientCertResponseAction.CANCEL,
-    ClientCertResponseAction.PROCEED,
     ClientCertResponseAction.IGNORE,
+    ClientCertResponseAction.PROCEED,
   ].toSet();
 
   ///Gets a possible [ClientCertResponseAction] instance from [int] value.
@@ -75,10 +75,10 @@ class ClientCertResponseAction {
     switch (_value) {
       case 0:
         return 'CANCEL';
-      case 1:
-        return 'PROCEED';
       case 2:
         return 'IGNORE';
+      case 1:
+        return 'PROCEED';
     }
     return _value.toString();
   }

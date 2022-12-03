@@ -8,15 +8,15 @@ part of 'request_focus_node_href_result.dart';
 
 ///Class that represents the result used by the [InAppWebViewController.requestFocusNodeHref] method.
 class RequestFocusNodeHrefResult {
-  ///The anchor's href attribute.
-  WebUri? url;
+  ///The image's src attribute.
+  String? src;
 
   ///The anchor's text.
   String? title;
 
-  ///The image's src attribute.
-  String? src;
-  RequestFocusNodeHrefResult({this.url, this.title, this.src});
+  ///The anchor's href attribute.
+  WebUri? url;
+  RequestFocusNodeHrefResult({this.src, this.title, this.url});
 
   ///Gets a possible [RequestFocusNodeHrefResult] instance from a [Map] value.
   static RequestFocusNodeHrefResult? fromMap(Map<String, dynamic>? map) {
@@ -24,9 +24,9 @@ class RequestFocusNodeHrefResult {
       return null;
     }
     final instance = RequestFocusNodeHrefResult(
-      url: map['url'] != null ? WebUri(map['url']) : null,
-      title: map['title'],
       src: map['src'],
+      title: map['title'],
+      url: map['url'] != null ? WebUri(map['url']) : null,
     );
     return instance;
   }
@@ -34,9 +34,9 @@ class RequestFocusNodeHrefResult {
   ///Converts instance to a map.
   Map<String, dynamic> toMap() {
     return {
-      "url": url?.toString(),
-      "title": title,
       "src": src,
+      "title": title,
+      "url": url?.toString(),
     };
   }
 
@@ -47,6 +47,6 @@ class RequestFocusNodeHrefResult {
 
   @override
   String toString() {
-    return 'RequestFocusNodeHrefResult{url: $url, title: $title, src: $src}';
+    return 'RequestFocusNodeHrefResult{src: $src, title: $title, url: $url}';
   }
 }

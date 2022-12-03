@@ -8,12 +8,12 @@ part of 'webview_package_info.dart';
 
 ///Class that represents a [WebView] package info.
 class WebViewPackageInfo {
-  ///The version name of this WebView package.
-  String? versionName;
-
   ///The name of this WebView package.
   String? packageName;
-  WebViewPackageInfo({this.versionName, this.packageName});
+
+  ///The version name of this WebView package.
+  String? versionName;
+  WebViewPackageInfo({this.packageName, this.versionName});
 
   ///Gets a possible [WebViewPackageInfo] instance from a [Map] value.
   static WebViewPackageInfo? fromMap(Map<String, dynamic>? map) {
@@ -21,8 +21,8 @@ class WebViewPackageInfo {
       return null;
     }
     final instance = WebViewPackageInfo(
-      versionName: map['versionName'],
       packageName: map['packageName'],
+      versionName: map['versionName'],
     );
     return instance;
   }
@@ -30,8 +30,8 @@ class WebViewPackageInfo {
   ///Converts instance to a map.
   Map<String, dynamic> toMap() {
     return {
-      "versionName": versionName,
       "packageName": packageName,
+      "versionName": versionName,
     };
   }
 
@@ -42,7 +42,7 @@ class WebViewPackageInfo {
 
   @override
   String toString() {
-    return 'WebViewPackageInfo{versionName: $versionName, packageName: $packageName}';
+    return 'WebViewPackageInfo{packageName: $packageName, versionName: $versionName}';
   }
 }
 
@@ -50,12 +50,12 @@ class WebViewPackageInfo {
 ///Use [WebViewPackageInfo] instead.
 @Deprecated('Use WebViewPackageInfo instead')
 class AndroidWebViewPackageInfo {
-  ///The version name of this WebView package.
-  String? versionName;
-
   ///The name of this WebView package.
   String? packageName;
-  AndroidWebViewPackageInfo({this.versionName, this.packageName});
+
+  ///The version name of this WebView package.
+  String? versionName;
+  AndroidWebViewPackageInfo({this.packageName, this.versionName});
 
   ///Gets a possible [AndroidWebViewPackageInfo] instance from a [Map] value.
   static AndroidWebViewPackageInfo? fromMap(Map<String, dynamic>? map) {
@@ -63,8 +63,8 @@ class AndroidWebViewPackageInfo {
       return null;
     }
     final instance = AndroidWebViewPackageInfo(
-      versionName: map['versionName'],
       packageName: map['packageName'],
+      versionName: map['versionName'],
     );
     return instance;
   }
@@ -72,8 +72,8 @@ class AndroidWebViewPackageInfo {
   ///Converts instance to a map.
   Map<String, dynamic> toMap() {
     return {
-      "versionName": versionName,
       "packageName": packageName,
+      "versionName": versionName,
     };
   }
 
@@ -84,6 +84,6 @@ class AndroidWebViewPackageInfo {
 
   @override
   String toString() {
-    return 'AndroidWebViewPackageInfo{versionName: $versionName, packageName: $packageName}';
+    return 'AndroidWebViewPackageInfo{packageName: $packageName, versionName: $versionName}';
   }
 }

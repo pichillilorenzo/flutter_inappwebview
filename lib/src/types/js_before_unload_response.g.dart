@@ -8,26 +8,26 @@ part of 'js_before_unload_response.dart';
 
 ///Class that represents the response used by the [WebView.onJsBeforeUnload] event to control a JavaScript alert dialog.
 class JsBeforeUnloadResponse {
-  ///Message to be displayed in the window.
-  String message;
-
-  ///Title of the confirm button.
-  String confirmButtonTitle;
+  ///Action used to confirm that the user hit confirm or cancel button.
+  JsBeforeUnloadResponseAction? action;
 
   ///Title of the cancel button.
   String cancelButtonTitle;
 
+  ///Title of the confirm button.
+  String confirmButtonTitle;
+
   ///Whether the client will handle the alert dialog.
   bool handledByClient;
 
-  ///Action used to confirm that the user hit confirm or cancel button.
-  JsBeforeUnloadResponseAction? action;
+  ///Message to be displayed in the window.
+  String message;
   JsBeforeUnloadResponse(
-      {this.message = "",
-      this.confirmButtonTitle = "",
+      {this.action = JsBeforeUnloadResponseAction.CONFIRM,
       this.cancelButtonTitle = "",
+      this.confirmButtonTitle = "",
       this.handledByClient = false,
-      this.action = JsBeforeUnloadResponseAction.CONFIRM});
+      this.message = ""});
 
   ///Gets a possible [JsBeforeUnloadResponse] instance from a [Map] value.
   static JsBeforeUnloadResponse? fromMap(Map<String, dynamic>? map) {
@@ -35,23 +35,23 @@ class JsBeforeUnloadResponse {
       return null;
     }
     final instance = JsBeforeUnloadResponse();
-    instance.message = map['message'];
-    instance.confirmButtonTitle = map['confirmButtonTitle'];
-    instance.cancelButtonTitle = map['cancelButtonTitle'];
-    instance.handledByClient = map['handledByClient'];
     instance.action =
         JsBeforeUnloadResponseAction.fromNativeValue(map['action']);
+    instance.cancelButtonTitle = map['cancelButtonTitle'];
+    instance.confirmButtonTitle = map['confirmButtonTitle'];
+    instance.handledByClient = map['handledByClient'];
+    instance.message = map['message'];
     return instance;
   }
 
   ///Converts instance to a map.
   Map<String, dynamic> toMap() {
     return {
-      "message": message,
-      "confirmButtonTitle": confirmButtonTitle,
-      "cancelButtonTitle": cancelButtonTitle,
-      "handledByClient": handledByClient,
       "action": action?.toNativeValue(),
+      "cancelButtonTitle": cancelButtonTitle,
+      "confirmButtonTitle": confirmButtonTitle,
+      "handledByClient": handledByClient,
+      "message": message,
     };
   }
 
@@ -62,6 +62,6 @@ class JsBeforeUnloadResponse {
 
   @override
   String toString() {
-    return 'JsBeforeUnloadResponse{message: $message, confirmButtonTitle: $confirmButtonTitle, cancelButtonTitle: $cancelButtonTitle, handledByClient: $handledByClient, action: $action}';
+    return 'JsBeforeUnloadResponse{action: $action, cancelButtonTitle: $cancelButtonTitle, confirmButtonTitle: $confirmButtonTitle, handledByClient: $handledByClient, message: $message}';
   }
 }

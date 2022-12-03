@@ -33,6 +33,8 @@ public class WebMessageListener implements Disposable {
   protected static final String LOG_TAG = "WebMessageListener";
   public static final String METHOD_CHANNEL_NAME_PREFIX = "com.pichillilorenzo/flutter_inappwebview_web_message_listener_";
 
+  @NonNull
+  public String id;
   public String jsObjectName;
   public Set<String> allowedOriginRules;
   public WebViewCompat.WebMessageListener listener;
@@ -42,12 +44,14 @@ public class WebMessageListener implements Disposable {
   @Nullable
   public WebMessageListenerChannelDelegate channelDelegate;
 
-  public WebMessageListener(@NonNull InAppWebViewInterface webView, @NonNull BinaryMessenger messenger,
+  public WebMessageListener(@NonNull String id,
+                            @NonNull InAppWebViewInterface webView, @NonNull BinaryMessenger messenger,
                             @NonNull String jsObjectName, @NonNull Set<String> allowedOriginRules) {
+    this.id = id;
     this.webView = webView;
     this.jsObjectName = jsObjectName;
     this.allowedOriginRules = allowedOriginRules;
-    final MethodChannel channel = new MethodChannel(messenger, METHOD_CHANNEL_NAME_PREFIX + this.jsObjectName);
+    final MethodChannel channel = new MethodChannel(messenger, METHOD_CHANNEL_NAME_PREFIX + this.id + "_" + this.jsObjectName);
     this.channelDelegate = new WebMessageListenerChannelDelegate(this, channel);
 
     if (this.webView instanceof InAppWebView) {
@@ -107,12 +111,13 @@ public class WebMessageListener implements Disposable {
     if (map == null) {
       return null;
     }
+    String id = (String) map.get("id");
     String jsObjectName = (String) map.get("jsObjectName");
     assert jsObjectName != null;
     List<String> allowedOriginRuleList = (List<String>) map.get("allowedOriginRules");
     assert allowedOriginRuleList != null;
     Set<String> allowedOriginRules = new HashSet<>(allowedOriginRuleList);
-    return new WebMessageListener(webView, messenger, jsObjectName, allowedOriginRules);
+    return new WebMessageListener(id, webView, messenger, jsObjectName, allowedOriginRules);
   }
 
   public void assertOriginRulesValid() throws Exception {

@@ -16,26 +16,6 @@ class PrintJobDuplexMode {
           String value, Function nativeValue) =>
       PrintJobDuplexMode._internal(value, nativeValue());
 
-  ///No double-sided (duplex) printing; single-sided printing only.
-  ///
-  ///**Supported Platforms/Implementations**:
-  ///- Android native WebView
-  ///- iOS
-  ///- MacOS
-  static final NONE = PrintJobDuplexMode._internalMultiPlatform('NONE', () {
-    switch (defaultTargetPlatform) {
-      case TargetPlatform.android:
-        return 1;
-      case TargetPlatform.iOS:
-        return 0;
-      case TargetPlatform.macOS:
-        return 1;
-      default:
-        break;
-    }
-    return null;
-  });
-
   ///Duplex printing that flips the back page along the long edge of the paper.
   ///Pages are turned sideways along the long edge - like a book.
   ///
@@ -52,6 +32,26 @@ class PrintJobDuplexMode {
         return 1;
       case TargetPlatform.macOS:
         return 2;
+      default:
+        break;
+    }
+    return null;
+  });
+
+  ///No double-sided (duplex) printing; single-sided printing only.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- Android native WebView
+  ///- iOS
+  ///- MacOS
+  static final NONE = PrintJobDuplexMode._internalMultiPlatform('NONE', () {
+    switch (defaultTargetPlatform) {
+      case TargetPlatform.android:
+        return 1;
+      case TargetPlatform.iOS:
+        return 0;
+      case TargetPlatform.macOS:
+        return 1;
       default:
         break;
     }
@@ -82,8 +82,8 @@ class PrintJobDuplexMode {
 
   ///Set of all values of [PrintJobDuplexMode].
   static final Set<PrintJobDuplexMode> values = [
-    PrintJobDuplexMode.NONE,
     PrintJobDuplexMode.LONG_EDGE,
+    PrintJobDuplexMode.NONE,
     PrintJobDuplexMode.SHORT_EDGE,
   ].toSet();
 

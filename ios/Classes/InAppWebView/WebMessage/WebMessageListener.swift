@@ -10,16 +10,18 @@ import WebKit
 
 public class WebMessageListener : FlutterMethodCallDelegate {
     static var METHOD_CHANNEL_NAME_PREFIX = "com.pichillilorenzo/flutter_inappwebview_web_message_listener_"
+    var id: String
     var jsObjectName: String
     var allowedOriginRules: Set<String>
     var channelDelegate: WebMessageListenerChannelDelegate?
     weak var webView: InAppWebView?
     
-    public init(jsObjectName: String, allowedOriginRules: Set<String>) {
+    public init(id: String, jsObjectName: String, allowedOriginRules: Set<String>) {
+        self.id = id
         self.jsObjectName = jsObjectName
         self.allowedOriginRules = allowedOriginRules
         super.init()
-        let channel = FlutterMethodChannel(name: WebMessageListener.METHOD_CHANNEL_NAME_PREFIX + self.jsObjectName,
+        let channel = FlutterMethodChannel(name: WebMessageListener.METHOD_CHANNEL_NAME_PREFIX + self.id + "_" + self.jsObjectName,
                                        binaryMessenger: SwiftFlutterPlugin.instance!.registrar!.messenger())
         self.channelDelegate = WebMessageListenerChannelDelegate(webMessageListener: self, channel: channel)
     }
@@ -101,7 +103,7 @@ public class WebMessageListener : FlutterMethodCallDelegate {
             })();
             """
             webView.configuration.userContentController.addPluginScript(PluginScript(
-                groupName: "WebMessageListener-" + jsObjectName,
+                groupName: "WebMessageListener-" + id + "-" + jsObjectName,
                 source: source,
                 injectionTime: .atDocumentStart,
                 forMainFrameOnly: false,
@@ -117,6 +119,7 @@ public class WebMessageListener : FlutterMethodCallDelegate {
             return nil
         }
         return WebMessageListener(
+            id: map["id"] as! String,
             jsObjectName: map["jsObjectName"] as! String,
             allowedOriginRules: Set(map["allowedOriginRules"] as! [String])
         )

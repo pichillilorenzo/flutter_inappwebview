@@ -14,14 +14,9 @@ class Sandbox {
 // ignore: unused_element
   factory Sandbox._internalMultiPlatform(String? value, Function nativeValue) =>
       Sandbox._internal(value, nativeValue());
-  static const _ALL = Sandbox._internal(null, null);
-  static const _NONE = Sandbox._internal('', '');
 
   ///Allow all.
   static const ALLOW_ALL = const [_ALL];
-
-  ///Allow none.
-  static const ALLOW_NONE = const [_NONE];
 
   ///Allows for downloads to occur with a gesture from the user.
   static const ALLOW_DOWNLOADS =
@@ -32,6 +27,9 @@ class Sandbox {
 
   ///Lets the resource open modal windows.
   static const ALLOW_MODALS = Sandbox._internal('allow-modals', 'allow-modals');
+
+  ///Allow none.
+  static const ALLOW_NONE = const [_NONE];
 
   ///Lets the resource lock the screen orientation.
   static const ALLOW_ORIENTATION_LOCK =
@@ -71,6 +69,8 @@ class Sandbox {
   static const ALLOW_TOP_NAVIGATION_BY_USER_ACTIVATION = Sandbox._internal(
       'allow-top-navigation-by-user-activation',
       'allow-top-navigation-by-user-activation');
+  static const _ALL = Sandbox._internal(null, null);
+  static const _NONE = Sandbox._internal('', '');
 
   ///Set of all values of [Sandbox].
   static final Set<Sandbox> values = [

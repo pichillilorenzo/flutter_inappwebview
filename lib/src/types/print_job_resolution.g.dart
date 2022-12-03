@@ -12,6 +12,9 @@ part of 'print_job_resolution.dart';
 ///For example, a printer with 600 DPI can produce higher quality images
 ///the one with 300 DPI resolution.
 class PrintJobResolution {
+  ///The horizontal resolution in DPI (dots per inch).
+  final int horizontalDpi;
+
   ///The unique resolution id.
   ///
   ///It is unique amongst other resolutions supported by the printer.
@@ -24,14 +27,11 @@ class PrintJobResolution {
 
   ///The vertical resolution in DPI (dots per inch).
   final int verticalDpi;
-
-  ///The horizontal resolution in DPI (dots per inch).
-  final int horizontalDpi;
   const PrintJobResolution(
-      {required this.id,
+      {required this.horizontalDpi,
+      required this.id,
       required this.label,
-      required this.verticalDpi,
-      required this.horizontalDpi});
+      required this.verticalDpi});
 
   ///Gets a possible [PrintJobResolution] instance from a [Map] value.
   static PrintJobResolution? fromMap(Map<String, dynamic>? map) {
@@ -39,10 +39,10 @@ class PrintJobResolution {
       return null;
     }
     final instance = PrintJobResolution(
+      horizontalDpi: map['horizontalDpi'],
       id: map['id'],
       label: map['label'],
       verticalDpi: map['verticalDpi'],
-      horizontalDpi: map['horizontalDpi'],
     );
     return instance;
   }
@@ -50,10 +50,10 @@ class PrintJobResolution {
   ///Converts instance to a map.
   Map<String, dynamic> toMap() {
     return {
+      "horizontalDpi": horizontalDpi,
       "id": id,
       "label": label,
       "verticalDpi": verticalDpi,
-      "horizontalDpi": horizontalDpi,
     };
   }
 
@@ -64,6 +64,6 @@ class PrintJobResolution {
 
   @override
   String toString() {
-    return 'PrintJobResolution{id: $id, label: $label, verticalDpi: $verticalDpi, horizontalDpi: $horizontalDpi}';
+    return 'PrintJobResolution{horizontalDpi: $horizontalDpi, id: $id, label: $label, verticalDpi: $verticalDpi}';
   }
 }

@@ -8,18 +8,18 @@ part of 'favicon.dart';
 
 ///Class that represents a favicon of a website. It is used by [InAppWebViewController.getFavicons] method.
 class Favicon {
-  ///The url of the favicon image.
-  WebUri url;
+  ///The height of the favicon image.
+  int? height;
 
   ///The relationship between the current web page and the favicon image.
   String? rel;
 
+  ///The url of the favicon image.
+  WebUri url;
+
   ///The width of the favicon image.
   int? width;
-
-  ///The height of the favicon image.
-  int? height;
-  Favicon({required this.url, this.rel, this.width, this.height});
+  Favicon({this.height, this.rel, required this.url, this.width});
 
   ///Gets a possible [Favicon] instance from a [Map] value.
   static Favicon? fromMap(Map<String, dynamic>? map) {
@@ -27,10 +27,10 @@ class Favicon {
       return null;
     }
     final instance = Favicon(
-      url: WebUri(map['url']),
-      rel: map['rel'],
-      width: map['width'],
       height: map['height'],
+      rel: map['rel'],
+      url: WebUri(map['url']),
+      width: map['width'],
     );
     return instance;
   }
@@ -38,10 +38,10 @@ class Favicon {
   ///Converts instance to a map.
   Map<String, dynamic> toMap() {
     return {
-      "url": url.toString(),
-      "rel": rel,
-      "width": width,
       "height": height,
+      "rel": rel,
+      "url": url.toString(),
+      "width": width,
     };
   }
 
@@ -52,6 +52,6 @@ class Favicon {
 
   @override
   String toString() {
-    return 'Favicon{url: $url, rel: $rel, width: $width, height: $height}';
+    return 'Favicon{height: $height, rel: $rel, url: $url, width: $width}';
   }
 }

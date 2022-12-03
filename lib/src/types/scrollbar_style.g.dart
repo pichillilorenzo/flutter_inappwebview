@@ -22,31 +22,31 @@ class ScrollBarStyle {
           int value, Function nativeValue) =>
       ScrollBarStyle._internal(value, nativeValue());
 
-  ///The scrollbar style to display the scrollbars inside the content area, without increasing the padding.
-  ///The scrollbars will be overlaid with translucency on the view's content.
-  static const SCROLLBARS_INSIDE_OVERLAY = ScrollBarStyle._internal(0, 0);
-
   ///The scrollbar style to display the scrollbars inside the padded area, increasing the padding of the view.
   ///The scrollbars will not overlap the content area of the view.
   static const SCROLLBARS_INSIDE_INSET =
       ScrollBarStyle._internal(16777216, 16777216);
 
-  ///The scrollbar style to display the scrollbars at the edge of the view, without increasing the padding.
-  ///The scrollbars will be overlaid with translucency.
-  static const SCROLLBARS_OUTSIDE_OVERLAY =
-      ScrollBarStyle._internal(33554432, 33554432);
+  ///The scrollbar style to display the scrollbars inside the content area, without increasing the padding.
+  ///The scrollbars will be overlaid with translucency on the view's content.
+  static const SCROLLBARS_INSIDE_OVERLAY = ScrollBarStyle._internal(0, 0);
 
   ///The scrollbar style to display the scrollbars at the edge of the view, increasing the padding of the view.
   ///The scrollbars will only overlap the background, if any.
   static const SCROLLBARS_OUTSIDE_INSET =
       ScrollBarStyle._internal(50331648, 50331648);
 
+  ///The scrollbar style to display the scrollbars at the edge of the view, without increasing the padding.
+  ///The scrollbars will be overlaid with translucency.
+  static const SCROLLBARS_OUTSIDE_OVERLAY =
+      ScrollBarStyle._internal(33554432, 33554432);
+
   ///Set of all values of [ScrollBarStyle].
   static final Set<ScrollBarStyle> values = [
-    ScrollBarStyle.SCROLLBARS_INSIDE_OVERLAY,
     ScrollBarStyle.SCROLLBARS_INSIDE_INSET,
-    ScrollBarStyle.SCROLLBARS_OUTSIDE_OVERLAY,
+    ScrollBarStyle.SCROLLBARS_INSIDE_OVERLAY,
     ScrollBarStyle.SCROLLBARS_OUTSIDE_INSET,
+    ScrollBarStyle.SCROLLBARS_OUTSIDE_OVERLAY,
   ].toSet();
 
   ///Gets a possible [ScrollBarStyle] instance from [int] value.
@@ -90,14 +90,14 @@ class ScrollBarStyle {
   @override
   String toString() {
     switch (_value) {
-      case 0:
-        return 'SCROLLBARS_INSIDE_OVERLAY';
       case 16777216:
         return 'SCROLLBARS_INSIDE_INSET';
-      case 33554432:
-        return 'SCROLLBARS_OUTSIDE_OVERLAY';
+      case 0:
+        return 'SCROLLBARS_INSIDE_OVERLAY';
       case 50331648:
         return 'SCROLLBARS_OUTSIDE_INSET';
+      case 33554432:
+        return 'SCROLLBARS_OUTSIDE_OVERLAY';
     }
     return _value.toString();
   }
@@ -122,32 +122,32 @@ class AndroidScrollBarStyle {
           int value, Function nativeValue) =>
       AndroidScrollBarStyle._internal(value, nativeValue());
 
-  ///The scrollbar style to display the scrollbars inside the content area, without increasing the padding.
-  ///The scrollbars will be overlaid with translucency on the view's content.
-  static const SCROLLBARS_INSIDE_OVERLAY =
-      AndroidScrollBarStyle._internal(0, 0);
-
   ///The scrollbar style to display the scrollbars inside the padded area, increasing the padding of the view.
   ///The scrollbars will not overlap the content area of the view.
   static const SCROLLBARS_INSIDE_INSET =
       AndroidScrollBarStyle._internal(16777216, 16777216);
 
-  ///The scrollbar style to display the scrollbars at the edge of the view, without increasing the padding.
-  ///The scrollbars will be overlaid with translucency.
-  static const SCROLLBARS_OUTSIDE_OVERLAY =
-      AndroidScrollBarStyle._internal(33554432, 33554432);
+  ///The scrollbar style to display the scrollbars inside the content area, without increasing the padding.
+  ///The scrollbars will be overlaid with translucency on the view's content.
+  static const SCROLLBARS_INSIDE_OVERLAY =
+      AndroidScrollBarStyle._internal(0, 0);
 
   ///The scrollbar style to display the scrollbars at the edge of the view, increasing the padding of the view.
   ///The scrollbars will only overlap the background, if any.
   static const SCROLLBARS_OUTSIDE_INSET =
       AndroidScrollBarStyle._internal(50331648, 50331648);
 
+  ///The scrollbar style to display the scrollbars at the edge of the view, without increasing the padding.
+  ///The scrollbars will be overlaid with translucency.
+  static const SCROLLBARS_OUTSIDE_OVERLAY =
+      AndroidScrollBarStyle._internal(33554432, 33554432);
+
   ///Set of all values of [AndroidScrollBarStyle].
   static final Set<AndroidScrollBarStyle> values = [
-    AndroidScrollBarStyle.SCROLLBARS_INSIDE_OVERLAY,
     AndroidScrollBarStyle.SCROLLBARS_INSIDE_INSET,
-    AndroidScrollBarStyle.SCROLLBARS_OUTSIDE_OVERLAY,
+    AndroidScrollBarStyle.SCROLLBARS_INSIDE_OVERLAY,
     AndroidScrollBarStyle.SCROLLBARS_OUTSIDE_INSET,
+    AndroidScrollBarStyle.SCROLLBARS_OUTSIDE_OVERLAY,
   ].toSet();
 
   ///Gets a possible [AndroidScrollBarStyle] instance from [int] value.
@@ -191,14 +191,14 @@ class AndroidScrollBarStyle {
   @override
   String toString() {
     switch (_value) {
-      case 0:
-        return 'SCROLLBARS_INSIDE_OVERLAY';
       case 16777216:
         return 'SCROLLBARS_INSIDE_INSET';
-      case 33554432:
-        return 'SCROLLBARS_OUTSIDE_OVERLAY';
+      case 0:
+        return 'SCROLLBARS_INSIDE_OVERLAY';
       case 50331648:
         return 'SCROLLBARS_OUTSIDE_INSET';
+      case 33554432:
+        return 'SCROLLBARS_OUTSIDE_OVERLAY';
     }
     return _value.toString();
   }

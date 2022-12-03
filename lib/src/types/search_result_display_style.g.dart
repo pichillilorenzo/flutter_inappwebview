@@ -19,17 +19,17 @@ class SearchResultDisplayStyle {
   ///The find panel includes the total number of results the session reports and the index of the target result.
   static const CURRENT_AND_TOTAL = SearchResultDisplayStyle._internal(0, 0);
 
-  ///The find panel includes the total number of results the session reports.
-  static const TOTAL = SearchResultDisplayStyle._internal(1, 1);
-
   ///The find panel doesn’t include the number of results the session reports.
   static const NONE = SearchResultDisplayStyle._internal(2, 2);
+
+  ///The find panel includes the total number of results the session reports.
+  static const TOTAL = SearchResultDisplayStyle._internal(1, 1);
 
   ///Set of all values of [SearchResultDisplayStyle].
   static final Set<SearchResultDisplayStyle> values = [
     SearchResultDisplayStyle.CURRENT_AND_TOTAL,
-    SearchResultDisplayStyle.TOTAL,
     SearchResultDisplayStyle.NONE,
+    SearchResultDisplayStyle.TOTAL,
   ].toSet();
 
   ///Gets a possible [SearchResultDisplayStyle] instance from [int] value.
@@ -75,10 +75,10 @@ class SearchResultDisplayStyle {
     switch (_value) {
       case 0:
         return 'CURRENT_AND_TOTAL';
-      case 1:
-        return 'TOTAL';
       case 2:
         return 'NONE';
+      case 1:
+        return 'TOTAL';
     }
     return _value.toString();
   }

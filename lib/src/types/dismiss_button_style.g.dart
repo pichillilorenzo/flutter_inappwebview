@@ -16,20 +16,20 @@ class DismissButtonStyle {
           int value, Function nativeValue) =>
       DismissButtonStyle._internal(value, nativeValue());
 
-  ///Makes the button title the localized string "Done".
-  static const DONE = DismissButtonStyle._internal(0, 0);
+  ///Makes the button title the localized string "Cancel".
+  static const CANCEL = DismissButtonStyle._internal(2, 2);
 
   ///Makes the button title the localized string "Close".
   static const CLOSE = DismissButtonStyle._internal(1, 1);
 
-  ///Makes the button title the localized string "Cancel".
-  static const CANCEL = DismissButtonStyle._internal(2, 2);
+  ///Makes the button title the localized string "Done".
+  static const DONE = DismissButtonStyle._internal(0, 0);
 
   ///Set of all values of [DismissButtonStyle].
   static final Set<DismissButtonStyle> values = [
-    DismissButtonStyle.DONE,
-    DismissButtonStyle.CLOSE,
     DismissButtonStyle.CANCEL,
+    DismissButtonStyle.CLOSE,
+    DismissButtonStyle.DONE,
   ].toSet();
 
   ///Gets a possible [DismissButtonStyle] instance from [int] value.
@@ -73,12 +73,12 @@ class DismissButtonStyle {
   @override
   String toString() {
     switch (_value) {
-      case 0:
-        return 'DONE';
-      case 1:
-        return 'CLOSE';
       case 2:
         return 'CANCEL';
+      case 1:
+        return 'CLOSE';
+      case 0:
+        return 'DONE';
     }
     return _value.toString();
   }
@@ -99,20 +99,20 @@ class IOSSafariDismissButtonStyle {
           int value, Function nativeValue) =>
       IOSSafariDismissButtonStyle._internal(value, nativeValue());
 
-  ///Makes the button title the localized string "Done".
-  static const DONE = IOSSafariDismissButtonStyle._internal(0, 0);
+  ///Makes the button title the localized string "Cancel".
+  static const CANCEL = IOSSafariDismissButtonStyle._internal(2, 2);
 
   ///Makes the button title the localized string "Close".
   static const CLOSE = IOSSafariDismissButtonStyle._internal(1, 1);
 
-  ///Makes the button title the localized string "Cancel".
-  static const CANCEL = IOSSafariDismissButtonStyle._internal(2, 2);
+  ///Makes the button title the localized string "Done".
+  static const DONE = IOSSafariDismissButtonStyle._internal(0, 0);
 
   ///Set of all values of [IOSSafariDismissButtonStyle].
   static final Set<IOSSafariDismissButtonStyle> values = [
-    IOSSafariDismissButtonStyle.DONE,
-    IOSSafariDismissButtonStyle.CLOSE,
     IOSSafariDismissButtonStyle.CANCEL,
+    IOSSafariDismissButtonStyle.CLOSE,
+    IOSSafariDismissButtonStyle.DONE,
   ].toSet();
 
   ///Gets a possible [IOSSafariDismissButtonStyle] instance from [int] value.
@@ -156,12 +156,12 @@ class IOSSafariDismissButtonStyle {
   @override
   String toString() {
     switch (_value) {
-      case 0:
-        return 'DONE';
-      case 1:
-        return 'CLOSE';
       case 2:
         return 'CANCEL';
+      case 1:
+        return 'CLOSE';
+      case 0:
+        return 'DONE';
     }
     return _value.toString();
   }

@@ -8,24 +8,24 @@ part of 'client_cert_response.dart';
 
 ///Class that represents the response used by the [WebView.onReceivedClientCertRequest] event.
 class ClientCertResponse {
-  ///The file path of the certificate to use.
-  String certificatePath;
-
-  ///The certificate password.
-  String? certificatePassword;
+  ///Indicate the [ClientCertResponseAction] to take in response of the client certificate challenge.
+  ClientCertResponseAction? action;
 
   ///Use [keyStoreType] instead.
   @Deprecated('Use keyStoreType instead')
   String? androidKeyStoreType;
+
+  ///The certificate password.
+  String? certificatePassword;
+
+  ///The file path of the certificate to use.
+  String certificatePath;
 
   ///An Android-specific property used by Java [KeyStore](https://developer.android.com/reference/java/security/KeyStore) class to get the instance.
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
   String? keyStoreType;
-
-  ///Indicate the [ClientCertResponseAction] to take in response of the client certificate challenge.
-  ClientCertResponseAction? action;
   ClientCertResponse(
       {required this.certificatePath,
       this.certificatePassword = "",
@@ -47,20 +47,20 @@ class ClientCertResponse {
     final instance = ClientCertResponse(
       certificatePath: map['certificatePath'],
     );
-    instance.certificatePassword = map['certificatePassword'];
-    instance.androidKeyStoreType = map['keyStoreType'];
-    instance.keyStoreType = map['keyStoreType'];
     instance.action = ClientCertResponseAction.fromNativeValue(map['action']);
+    instance.androidKeyStoreType = map['keyStoreType'];
+    instance.certificatePassword = map['certificatePassword'];
+    instance.keyStoreType = map['keyStoreType'];
     return instance;
   }
 
   ///Converts instance to a map.
   Map<String, dynamic> toMap() {
     return {
-      "certificatePath": certificatePath,
-      "certificatePassword": certificatePassword,
-      "keyStoreType": keyStoreType,
       "action": action?.toNativeValue(),
+      "certificatePassword": certificatePassword,
+      "certificatePath": certificatePath,
+      "keyStoreType": keyStoreType,
     };
   }
 
@@ -71,6 +71,6 @@ class ClientCertResponse {
 
   @override
   String toString() {
-    return 'ClientCertResponse{certificatePath: $certificatePath, certificatePassword: $certificatePassword, keyStoreType: $keyStoreType, action: $action}';
+    return 'ClientCertResponse{action: $action, certificatePassword: $certificatePassword, certificatePath: $certificatePath, keyStoreType: $keyStoreType}';
   }
 }

@@ -16,20 +16,20 @@ class UserPreferredContentMode {
           int value, Function nativeValue) =>
       UserPreferredContentMode._internal(value, nativeValue());
 
-  ///The recommended content mode for the current platform.
-  static const RECOMMENDED = UserPreferredContentMode._internal(0, 0);
+  ///Represents content targeting desktop browsers.
+  static const DESKTOP = UserPreferredContentMode._internal(2, 2);
 
   ///Represents content targeting mobile browsers.
   static const MOBILE = UserPreferredContentMode._internal(1, 1);
 
-  ///Represents content targeting desktop browsers.
-  static const DESKTOP = UserPreferredContentMode._internal(2, 2);
+  ///The recommended content mode for the current platform.
+  static const RECOMMENDED = UserPreferredContentMode._internal(0, 0);
 
   ///Set of all values of [UserPreferredContentMode].
   static final Set<UserPreferredContentMode> values = [
-    UserPreferredContentMode.RECOMMENDED,
-    UserPreferredContentMode.MOBILE,
     UserPreferredContentMode.DESKTOP,
+    UserPreferredContentMode.MOBILE,
+    UserPreferredContentMode.RECOMMENDED,
   ].toSet();
 
   ///Gets a possible [UserPreferredContentMode] instance from [int] value.
@@ -73,12 +73,12 @@ class UserPreferredContentMode {
   @override
   String toString() {
     switch (_value) {
-      case 0:
-        return 'RECOMMENDED';
-      case 1:
-        return 'MOBILE';
       case 2:
         return 'DESKTOP';
+      case 1:
+        return 'MOBILE';
+      case 0:
+        return 'RECOMMENDED';
     }
     return _value.toString();
   }

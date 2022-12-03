@@ -18,16 +18,16 @@ class ShouldAllowDeprecatedTLSAction {
           int value, Function nativeValue) =>
       ShouldAllowDeprecatedTLSAction._internal(value, nativeValue());
 
-  ///Cancel the navigation.
-  static const CANCEL = ShouldAllowDeprecatedTLSAction._internal(0, 0);
-
   ///Allow the navigation to continue.
   static const ALLOW = ShouldAllowDeprecatedTLSAction._internal(1, 1);
 
+  ///Cancel the navigation.
+  static const CANCEL = ShouldAllowDeprecatedTLSAction._internal(0, 0);
+
   ///Set of all values of [ShouldAllowDeprecatedTLSAction].
   static final Set<ShouldAllowDeprecatedTLSAction> values = [
-    ShouldAllowDeprecatedTLSAction.CANCEL,
     ShouldAllowDeprecatedTLSAction.ALLOW,
+    ShouldAllowDeprecatedTLSAction.CANCEL,
   ].toSet();
 
   ///Gets a possible [ShouldAllowDeprecatedTLSAction] instance from [int] value.
@@ -71,10 +71,10 @@ class ShouldAllowDeprecatedTLSAction {
   @override
   String toString() {
     switch (_value) {
-      case 0:
-        return 'CANCEL';
       case 1:
         return 'ALLOW';
+      case 0:
+        return 'CANCEL';
     }
     return _value.toString();
   }
@@ -94,16 +94,16 @@ class IOSShouldAllowDeprecatedTLSAction {
           int value, Function nativeValue) =>
       IOSShouldAllowDeprecatedTLSAction._internal(value, nativeValue());
 
-  ///Cancel the navigation.
-  static const CANCEL = IOSShouldAllowDeprecatedTLSAction._internal(0, 0);
-
   ///Allow the navigation to continue.
   static const ALLOW = IOSShouldAllowDeprecatedTLSAction._internal(1, 1);
 
+  ///Cancel the navigation.
+  static const CANCEL = IOSShouldAllowDeprecatedTLSAction._internal(0, 0);
+
   ///Set of all values of [IOSShouldAllowDeprecatedTLSAction].
   static final Set<IOSShouldAllowDeprecatedTLSAction> values = [
-    IOSShouldAllowDeprecatedTLSAction.CANCEL,
     IOSShouldAllowDeprecatedTLSAction.ALLOW,
+    IOSShouldAllowDeprecatedTLSAction.CANCEL,
   ].toSet();
 
   ///Gets a possible [IOSShouldAllowDeprecatedTLSAction] instance from [int] value.
@@ -147,10 +147,10 @@ class IOSShouldAllowDeprecatedTLSAction {
   @override
   String toString() {
     switch (_value) {
-      case 0:
-        return 'CANCEL';
       case 1:
         return 'ALLOW';
+      case 0:
+        return 'CANCEL';
     }
     return _value.toString();
   }

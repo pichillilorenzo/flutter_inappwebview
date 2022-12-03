@@ -17,27 +17,27 @@ class ScrollViewContentInsetAdjustmentBehavior {
           int value, Function nativeValue) =>
       ScrollViewContentInsetAdjustmentBehavior._internal(value, nativeValue());
 
+  ///Always include the safe area insets in the content adjustment.
+  static const ALWAYS =
+      ScrollViewContentInsetAdjustmentBehavior._internal(3, 3);
+
   ///Automatically adjust the scroll view insets.
   static const AUTOMATIC =
       ScrollViewContentInsetAdjustmentBehavior._internal(0, 0);
+
+  ///Do not adjust the scroll view insets.
+  static const NEVER = ScrollViewContentInsetAdjustmentBehavior._internal(2, 2);
 
   ///Adjust the insets only in the scrollable directions.
   static const SCROLLABLE_AXES =
       ScrollViewContentInsetAdjustmentBehavior._internal(1, 1);
 
-  ///Do not adjust the scroll view insets.
-  static const NEVER = ScrollViewContentInsetAdjustmentBehavior._internal(2, 2);
-
-  ///Always include the safe area insets in the content adjustment.
-  static const ALWAYS =
-      ScrollViewContentInsetAdjustmentBehavior._internal(3, 3);
-
   ///Set of all values of [ScrollViewContentInsetAdjustmentBehavior].
   static final Set<ScrollViewContentInsetAdjustmentBehavior> values = [
-    ScrollViewContentInsetAdjustmentBehavior.AUTOMATIC,
-    ScrollViewContentInsetAdjustmentBehavior.SCROLLABLE_AXES,
-    ScrollViewContentInsetAdjustmentBehavior.NEVER,
     ScrollViewContentInsetAdjustmentBehavior.ALWAYS,
+    ScrollViewContentInsetAdjustmentBehavior.AUTOMATIC,
+    ScrollViewContentInsetAdjustmentBehavior.NEVER,
+    ScrollViewContentInsetAdjustmentBehavior.SCROLLABLE_AXES,
   ].toSet();
 
   ///Gets a possible [ScrollViewContentInsetAdjustmentBehavior] instance from [int] value.
@@ -81,14 +81,14 @@ class ScrollViewContentInsetAdjustmentBehavior {
   @override
   String toString() {
     switch (_value) {
-      case 0:
-        return 'AUTOMATIC';
-      case 1:
-        return 'SCROLLABLE_AXES';
-      case 2:
-        return 'NEVER';
       case 3:
         return 'ALWAYS';
+      case 0:
+        return 'AUTOMATIC';
+      case 2:
+        return 'NEVER';
+      case 1:
+        return 'SCROLLABLE_AXES';
     }
     return _value.toString();
   }
@@ -111,28 +111,28 @@ class IOSUIScrollViewContentInsetAdjustmentBehavior {
       IOSUIScrollViewContentInsetAdjustmentBehavior._internal(
           value, nativeValue());
 
+  ///Always include the safe area insets in the content adjustment.
+  static const ALWAYS =
+      IOSUIScrollViewContentInsetAdjustmentBehavior._internal(3, 3);
+
   ///Automatically adjust the scroll view insets.
   static const AUTOMATIC =
       IOSUIScrollViewContentInsetAdjustmentBehavior._internal(0, 0);
-
-  ///Adjust the insets only in the scrollable directions.
-  static const SCROLLABLE_AXES =
-      IOSUIScrollViewContentInsetAdjustmentBehavior._internal(1, 1);
 
   ///Do not adjust the scroll view insets.
   static const NEVER =
       IOSUIScrollViewContentInsetAdjustmentBehavior._internal(2, 2);
 
-  ///Always include the safe area insets in the content adjustment.
-  static const ALWAYS =
-      IOSUIScrollViewContentInsetAdjustmentBehavior._internal(3, 3);
+  ///Adjust the insets only in the scrollable directions.
+  static const SCROLLABLE_AXES =
+      IOSUIScrollViewContentInsetAdjustmentBehavior._internal(1, 1);
 
   ///Set of all values of [IOSUIScrollViewContentInsetAdjustmentBehavior].
   static final Set<IOSUIScrollViewContentInsetAdjustmentBehavior> values = [
-    IOSUIScrollViewContentInsetAdjustmentBehavior.AUTOMATIC,
-    IOSUIScrollViewContentInsetAdjustmentBehavior.SCROLLABLE_AXES,
-    IOSUIScrollViewContentInsetAdjustmentBehavior.NEVER,
     IOSUIScrollViewContentInsetAdjustmentBehavior.ALWAYS,
+    IOSUIScrollViewContentInsetAdjustmentBehavior.AUTOMATIC,
+    IOSUIScrollViewContentInsetAdjustmentBehavior.NEVER,
+    IOSUIScrollViewContentInsetAdjustmentBehavior.SCROLLABLE_AXES,
   ].toSet();
 
   ///Gets a possible [IOSUIScrollViewContentInsetAdjustmentBehavior] instance from [int] value.
@@ -177,14 +177,14 @@ class IOSUIScrollViewContentInsetAdjustmentBehavior {
   @override
   String toString() {
     switch (_value) {
-      case 0:
-        return 'AUTOMATIC';
-      case 1:
-        return 'SCROLLABLE_AXES';
-      case 2:
-        return 'NEVER';
       case 3:
         return 'ALWAYS';
+      case 0:
+        return 'AUTOMATIC';
+      case 2:
+        return 'NEVER';
+      case 1:
+        return 'SCROLLABLE_AXES';
     }
     return _value.toString();
   }

@@ -9,9 +9,6 @@ part of 'attributed_string.dart';
 ///Class that represents a string with associated attributes
 ///used by the [PullToRefreshController] and [PullToRefreshSettings] classes.
 class AttributedString {
-  ///The characters for the new object.
-  String string;
-
   ///The color of the background behind the text.
   ///
   ///The value of this attribute is a [Color] object.
@@ -72,6 +69,9 @@ class AttributedString {
   ///The default value for this attribute is [UnderlineStyle.STYLE_NONE].
   UnderlineStyle? strikethroughStyle;
 
+  ///The characters for the new object.
+  String string;
+
   ///The color of the stroke.
   ///
   ///The value of this parameter is a [Color] object.
@@ -107,8 +107,7 @@ class AttributedString {
   ///The default value for this attribute is [UnderlineStyle.STYLE_NONE].
   UnderlineStyle? underlineStyle;
   AttributedString(
-      {required this.string,
-      this.backgroundColor,
+      {this.backgroundColor,
       this.baselineOffset,
       this.expansion,
       this.foregroundColor,
@@ -117,6 +116,7 @@ class AttributedString {
       this.obliqueness,
       this.strikethroughColor,
       this.strikethroughStyle,
+      required this.string,
       this.strokeColor,
       this.strokeWidth,
       this.textEffect,
@@ -129,7 +129,6 @@ class AttributedString {
       return null;
     }
     final instance = AttributedString(
-      string: map['string'],
       backgroundColor: map['backgroundColor'] != null
           ? UtilColor.fromStringRepresentation(map['backgroundColor'])
           : null,
@@ -146,6 +145,7 @@ class AttributedString {
           : null,
       strikethroughStyle:
           UnderlineStyle.fromNativeValue(map['strikethroughStyle']),
+      string: map['string'],
       strokeColor: map['strokeColor'] != null
           ? UtilColor.fromStringRepresentation(map['strokeColor'])
           : null,
@@ -163,7 +163,6 @@ class AttributedString {
   ///Converts instance to a map.
   Map<String, dynamic> toMap() {
     return {
-      "string": string,
       "backgroundColor": backgroundColor?.toHex(),
       "baselineOffset": baselineOffset,
       "expansion": expansion,
@@ -173,6 +172,7 @@ class AttributedString {
       "obliqueness": obliqueness,
       "strikethroughColor": strikethroughColor?.toHex(),
       "strikethroughStyle": strikethroughStyle?.toNativeValue(),
+      "string": string,
       "strokeColor": strokeColor?.toHex(),
       "strokeWidth": strokeWidth,
       "textEffect": textEffect?.toNativeValue(),
@@ -188,7 +188,7 @@ class AttributedString {
 
   @override
   String toString() {
-    return 'AttributedString{string: $string, backgroundColor: $backgroundColor, baselineOffset: $baselineOffset, expansion: $expansion, foregroundColor: $foregroundColor, kern: $kern, ligature: $ligature, obliqueness: $obliqueness, strikethroughColor: $strikethroughColor, strikethroughStyle: $strikethroughStyle, strokeColor: $strokeColor, strokeWidth: $strokeWidth, textEffect: $textEffect, underlineColor: $underlineColor, underlineStyle: $underlineStyle}';
+    return 'AttributedString{backgroundColor: $backgroundColor, baselineOffset: $baselineOffset, expansion: $expansion, foregroundColor: $foregroundColor, kern: $kern, ligature: $ligature, obliqueness: $obliqueness, strikethroughColor: $strikethroughColor, strikethroughStyle: $strikethroughStyle, string: $string, strokeColor: $strokeColor, strokeWidth: $strokeWidth, textEffect: $textEffect, underlineColor: $underlineColor, underlineStyle: $underlineStyle}';
   }
 }
 
@@ -197,9 +197,6 @@ class AttributedString {
 ///Use [AttributedString] instead.
 @Deprecated('Use AttributedString instead')
 class IOSNSAttributedString {
-  ///The characters for the new object.
-  String string;
-
   ///The color of the background behind the text.
   ///
   ///The value of this attribute is a [Color] object.
@@ -260,6 +257,9 @@ class IOSNSAttributedString {
   ///The default value for this attribute is [IOSNSUnderlineStyle.STYLE_NONE].
   IOSNSUnderlineStyle? strikethroughStyle;
 
+  ///The characters for the new object.
+  String string;
+
   ///The color of the stroke.
   ///
   ///The value of this parameter is a [Color] object.
@@ -295,8 +295,7 @@ class IOSNSAttributedString {
   ///The default value for this attribute is [IOSNSUnderlineStyle.STYLE_NONE].
   IOSNSUnderlineStyle? underlineStyle;
   IOSNSAttributedString(
-      {required this.string,
-      this.backgroundColor,
+      {this.backgroundColor,
       this.baselineOffset,
       this.expansion,
       this.foregroundColor,
@@ -305,6 +304,7 @@ class IOSNSAttributedString {
       this.obliqueness,
       this.strikethroughColor,
       this.strikethroughStyle,
+      required this.string,
       this.strokeColor,
       this.strokeWidth,
       this.textEffect,
@@ -317,7 +317,6 @@ class IOSNSAttributedString {
       return null;
     }
     final instance = IOSNSAttributedString(
-      string: map['string'],
       backgroundColor: map['backgroundColor'] != null
           ? UtilColor.fromStringRepresentation(map['backgroundColor'])
           : null,
@@ -334,6 +333,7 @@ class IOSNSAttributedString {
           : null,
       strikethroughStyle:
           IOSNSUnderlineStyle.fromNativeValue(map['strikethroughStyle']),
+      string: map['string'],
       strokeColor: map['strokeColor'] != null
           ? UtilColor.fromStringRepresentation(map['strokeColor'])
           : null,
@@ -352,7 +352,6 @@ class IOSNSAttributedString {
   ///Converts instance to a map.
   Map<String, dynamic> toMap() {
     return {
-      "string": string,
       "backgroundColor": backgroundColor?.toHex(),
       "baselineOffset": baselineOffset,
       "expansion": expansion,
@@ -362,6 +361,7 @@ class IOSNSAttributedString {
       "obliqueness": obliqueness,
       "strikethroughColor": strikethroughColor?.toHex(),
       "strikethroughStyle": strikethroughStyle?.toNativeValue(),
+      "string": string,
       "strokeColor": strokeColor?.toHex(),
       "strokeWidth": strokeWidth,
       "textEffect": textEffect?.toNativeValue(),
@@ -377,6 +377,6 @@ class IOSNSAttributedString {
 
   @override
   String toString() {
-    return 'IOSNSAttributedString{string: $string, backgroundColor: $backgroundColor, baselineOffset: $baselineOffset, expansion: $expansion, foregroundColor: $foregroundColor, kern: $kern, ligature: $ligature, obliqueness: $obliqueness, strikethroughColor: $strikethroughColor, strikethroughStyle: $strikethroughStyle, strokeColor: $strokeColor, strokeWidth: $strokeWidth, textEffect: $textEffect, underlineColor: $underlineColor, underlineStyle: $underlineStyle}';
+    return 'IOSNSAttributedString{backgroundColor: $backgroundColor, baselineOffset: $baselineOffset, expansion: $expansion, foregroundColor: $foregroundColor, kern: $kern, ligature: $ligature, obliqueness: $obliqueness, strikethroughColor: $strikethroughColor, strikethroughStyle: $strikethroughStyle, string: $string, strokeColor: $strokeColor, strokeWidth: $strokeWidth, textEffect: $textEffect, underlineColor: $underlineColor, underlineStyle: $underlineStyle}';
   }
 }

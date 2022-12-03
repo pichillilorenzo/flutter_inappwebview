@@ -16,28 +16,28 @@ class ConsoleMessageLevel {
           int value, Function nativeValue) =>
       ConsoleMessageLevel._internal(value, nativeValue());
 
-  ///Console TIP level
-  static const TIP = ConsoleMessageLevel._internal(0, 0);
-
-  ///Console LOG level
-  static const LOG = ConsoleMessageLevel._internal(1, 1);
-
-  ///Console WARNING level
-  static const WARNING = ConsoleMessageLevel._internal(2, 2);
+  ///Console DEBUG level
+  static const DEBUG = ConsoleMessageLevel._internal(4, 4);
 
   ///Console ERROR level
   static const ERROR = ConsoleMessageLevel._internal(3, 3);
 
-  ///Console DEBUG level
-  static const DEBUG = ConsoleMessageLevel._internal(4, 4);
+  ///Console LOG level
+  static const LOG = ConsoleMessageLevel._internal(1, 1);
+
+  ///Console TIP level
+  static const TIP = ConsoleMessageLevel._internal(0, 0);
+
+  ///Console WARNING level
+  static const WARNING = ConsoleMessageLevel._internal(2, 2);
 
   ///Set of all values of [ConsoleMessageLevel].
   static final Set<ConsoleMessageLevel> values = [
-    ConsoleMessageLevel.TIP,
-    ConsoleMessageLevel.LOG,
-    ConsoleMessageLevel.WARNING,
-    ConsoleMessageLevel.ERROR,
     ConsoleMessageLevel.DEBUG,
+    ConsoleMessageLevel.ERROR,
+    ConsoleMessageLevel.LOG,
+    ConsoleMessageLevel.TIP,
+    ConsoleMessageLevel.WARNING,
   ].toSet();
 
   ///Gets a possible [ConsoleMessageLevel] instance from [int] value.
@@ -81,16 +81,16 @@ class ConsoleMessageLevel {
   @override
   String toString() {
     switch (_value) {
-      case 0:
-        return 'TIP';
-      case 1:
-        return 'LOG';
-      case 2:
-        return 'WARNING';
-      case 3:
-        return 'ERROR';
       case 4:
         return 'DEBUG';
+      case 3:
+        return 'ERROR';
+      case 1:
+        return 'LOG';
+      case 0:
+        return 'TIP';
+      case 2:
+        return 'WARNING';
     }
     return _value.toString();
   }

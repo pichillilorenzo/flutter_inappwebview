@@ -15,11 +15,11 @@ part of 'activity_button.dart';
 ///**Supported Platforms/Implementations**:
 ///- iOS
 class ActivityButton {
-  ///The name of the image asset or file.
-  UIImage templateImage;
-
   ///The name of the App or Share Extension to be called.
   String extensionIdentifier;
+
+  ///The name of the image asset or file.
+  UIImage templateImage;
   ActivityButton(
       {required this.templateImage, required this.extensionIdentifier});
 
@@ -29,9 +29,9 @@ class ActivityButton {
       return null;
     }
     final instance = ActivityButton(
+      extensionIdentifier: map['extensionIdentifier'],
       templateImage:
           UIImage.fromMap(map['templateImage']?.cast<String, dynamic>())!,
-      extensionIdentifier: map['extensionIdentifier'],
     );
     return instance;
   }
@@ -39,8 +39,8 @@ class ActivityButton {
   ///Converts instance to a map.
   Map<String, dynamic> toMap() {
     return {
-      "templateImage": templateImage.toMap(),
       "extensionIdentifier": extensionIdentifier,
+      "templateImage": templateImage.toMap(),
     };
   }
 
@@ -51,6 +51,6 @@ class ActivityButton {
 
   @override
   String toString() {
-    return 'ActivityButton{templateImage: $templateImage, extensionIdentifier: $extensionIdentifier}';
+    return 'ActivityButton{extensionIdentifier: $extensionIdentifier, templateImage: $templateImage}';
   }
 }

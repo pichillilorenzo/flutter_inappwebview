@@ -16,32 +16,32 @@ class LayoutInDisplayCutoutMode {
           int value, Function nativeValue) =>
       LayoutInDisplayCutoutMode._internal(value, nativeValue());
 
+  ///The window is always allowed to extend into the DisplayCutout areas on the all edges of the screen.
+  ///
+  ///**NOTE**: available on Android 30+.
+  static const ALWAYS = LayoutInDisplayCutoutMode._internal(3, 3);
+
   ///With this default setting, content renders into the cutout area when displayed in portrait mode, but content is letterboxed when displayed in landscape mode.
   ///
   ///**NOTE**: available on Android 28+.
   static const DEFAULT = LayoutInDisplayCutoutMode._internal(0, 0);
-
-  ///Content renders into the cutout area in both portrait and landscape modes.
-  ///
-  ///**NOTE**: available on Android 28+.
-  static const SHORT_EDGES = LayoutInDisplayCutoutMode._internal(1, 1);
 
   ///Content never renders into the cutout area.
   ///
   ///**NOTE**: available on Android 28+.
   static const NEVER = LayoutInDisplayCutoutMode._internal(2, 2);
 
-  ///The window is always allowed to extend into the DisplayCutout areas on the all edges of the screen.
+  ///Content renders into the cutout area in both portrait and landscape modes.
   ///
-  ///**NOTE**: available on Android 30+.
-  static const ALWAYS = LayoutInDisplayCutoutMode._internal(3, 3);
+  ///**NOTE**: available on Android 28+.
+  static const SHORT_EDGES = LayoutInDisplayCutoutMode._internal(1, 1);
 
   ///Set of all values of [LayoutInDisplayCutoutMode].
   static final Set<LayoutInDisplayCutoutMode> values = [
-    LayoutInDisplayCutoutMode.DEFAULT,
-    LayoutInDisplayCutoutMode.SHORT_EDGES,
-    LayoutInDisplayCutoutMode.NEVER,
     LayoutInDisplayCutoutMode.ALWAYS,
+    LayoutInDisplayCutoutMode.DEFAULT,
+    LayoutInDisplayCutoutMode.NEVER,
+    LayoutInDisplayCutoutMode.SHORT_EDGES,
   ].toSet();
 
   ///Gets a possible [LayoutInDisplayCutoutMode] instance from [int] value.
@@ -85,14 +85,14 @@ class LayoutInDisplayCutoutMode {
   @override
   String toString() {
     switch (_value) {
-      case 0:
-        return 'DEFAULT';
-      case 1:
-        return 'SHORT_EDGES';
-      case 2:
-        return 'NEVER';
       case 3:
         return 'ALWAYS';
+      case 0:
+        return 'DEFAULT';
+      case 2:
+        return 'NEVER';
+      case 1:
+        return 'SHORT_EDGES';
     }
     return _value.toString();
   }
@@ -114,32 +114,32 @@ class AndroidLayoutInDisplayCutoutMode {
           int value, Function nativeValue) =>
       AndroidLayoutInDisplayCutoutMode._internal(value, nativeValue());
 
+  ///The window is always allowed to extend into the DisplayCutout areas on the all edges of the screen.
+  ///
+  ///**NOTE**: available on Android 30+.
+  static const ALWAYS = AndroidLayoutInDisplayCutoutMode._internal(3, 3);
+
   ///With this default setting, content renders into the cutout area when displayed in portrait mode, but content is letterboxed when displayed in landscape mode.
   ///
   ///**NOTE**: available on Android 28+.
   static const DEFAULT = AndroidLayoutInDisplayCutoutMode._internal(0, 0);
-
-  ///Content renders into the cutout area in both portrait and landscape modes.
-  ///
-  ///**NOTE**: available on Android 28+.
-  static const SHORT_EDGES = AndroidLayoutInDisplayCutoutMode._internal(1, 1);
 
   ///Content never renders into the cutout area.
   ///
   ///**NOTE**: available on Android 28+.
   static const NEVER = AndroidLayoutInDisplayCutoutMode._internal(2, 2);
 
-  ///The window is always allowed to extend into the DisplayCutout areas on the all edges of the screen.
+  ///Content renders into the cutout area in both portrait and landscape modes.
   ///
-  ///**NOTE**: available on Android 30+.
-  static const ALWAYS = AndroidLayoutInDisplayCutoutMode._internal(3, 3);
+  ///**NOTE**: available on Android 28+.
+  static const SHORT_EDGES = AndroidLayoutInDisplayCutoutMode._internal(1, 1);
 
   ///Set of all values of [AndroidLayoutInDisplayCutoutMode].
   static final Set<AndroidLayoutInDisplayCutoutMode> values = [
-    AndroidLayoutInDisplayCutoutMode.DEFAULT,
-    AndroidLayoutInDisplayCutoutMode.SHORT_EDGES,
-    AndroidLayoutInDisplayCutoutMode.NEVER,
     AndroidLayoutInDisplayCutoutMode.ALWAYS,
+    AndroidLayoutInDisplayCutoutMode.DEFAULT,
+    AndroidLayoutInDisplayCutoutMode.NEVER,
+    AndroidLayoutInDisplayCutoutMode.SHORT_EDGES,
   ].toSet();
 
   ///Gets a possible [AndroidLayoutInDisplayCutoutMode] instance from [int] value.
@@ -183,14 +183,14 @@ class AndroidLayoutInDisplayCutoutMode {
   @override
   String toString() {
     switch (_value) {
-      case 0:
-        return 'DEFAULT';
-      case 1:
-        return 'SHORT_EDGES';
-      case 2:
-        return 'NEVER';
       case 3:
         return 'ALWAYS';
+      case 0:
+        return 'DEFAULT';
+      case 2:
+        return 'NEVER';
+      case 1:
+        return 'SHORT_EDGES';
     }
     return _value.toString();
   }

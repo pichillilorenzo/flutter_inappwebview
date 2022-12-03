@@ -16,16 +16,16 @@ class JsPromptResponseAction {
           int value, Function nativeValue) =>
       JsPromptResponseAction._internal(value, nativeValue());
 
-  ///Confirm that the user hit confirm button.
-  static const CONFIRM = JsPromptResponseAction._internal(0, 0);
-
   ///Confirm that the user hit cancel button.
   static const CANCEL = JsPromptResponseAction._internal(1, 1);
 
+  ///Confirm that the user hit confirm button.
+  static const CONFIRM = JsPromptResponseAction._internal(0, 0);
+
   ///Set of all values of [JsPromptResponseAction].
   static final Set<JsPromptResponseAction> values = [
-    JsPromptResponseAction.CONFIRM,
     JsPromptResponseAction.CANCEL,
+    JsPromptResponseAction.CONFIRM,
   ].toSet();
 
   ///Gets a possible [JsPromptResponseAction] instance from [int] value.
@@ -69,10 +69,10 @@ class JsPromptResponseAction {
   @override
   String toString() {
     switch (_value) {
-      case 0:
-        return 'CONFIRM';
       case 1:
         return 'CANCEL';
+      case 0:
+        return 'CONFIRM';
     }
     return _value.toString();
   }

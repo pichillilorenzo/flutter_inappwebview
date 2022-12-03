@@ -24,12 +24,14 @@ import 'in_app_webview_controller.dart';
 import 'in_app_webview_settings.dart';
 import '../pull_to_refresh/main.dart';
 
+///{@template flutter_inappwebview.InAppWebView}
 ///Flutter Widget for adding an **inline native WebView** integrated in the flutter widget tree.
 ///
 ///**Supported Platforms/Implementations**:
 ///- Android native WebView
 ///- iOS
 ///- Web
+///{@endtemplate}
 class InAppWebView extends StatefulWidget implements WebView {
   /// `gestureRecognizers` specifies which gestures should be consumed by the WebView.
   /// It is possible for other gesture recognizers to be competing with the web view on pointer
@@ -40,11 +42,7 @@ class InAppWebView extends StatefulWidget implements WebView {
   /// were not claimed by any other gesture recognizer.
   final Set<Factory<OneSequenceGestureRecognizer>>? gestureRecognizers;
 
-  ///The window id of a [CreateWindowAction.windowId].
-  ///
-  ///**Supported Platforms/Implementations**:
-  ///- Android native WebView
-  ///- iOS
+  ///{@macro flutter_inappwebview.WebView.windowId}
   @override
   final int? windowId;
 
@@ -56,6 +54,7 @@ class InAppWebView extends StatefulWidget implements WebView {
   ///- Web
   final HeadlessInAppWebView? headlessWebView;
 
+  ///{@macro flutter_inappwebview.InAppWebView}
   const InAppWebView({
     Key? key,
     this.windowId,
@@ -202,9 +201,11 @@ class InAppWebView extends StatefulWidget implements WebView {
       Uri url,
       SafeBrowsingThreat? threatType)? androidOnSafeBrowsingHit;
 
+  ///{@macro flutter_inappwebview.WebView.initialData}
   @override
   final InAppWebViewInitialData? initialData;
 
+  ///{@macro flutter_inappwebview.WebView.initialFile}
   @override
   final String? initialFile;
 
@@ -213,31 +214,40 @@ class InAppWebView extends StatefulWidget implements WebView {
   @Deprecated('Use initialSettings instead')
   final InAppWebViewGroupOptions? initialOptions;
 
+  ///{@macro flutter_inappwebview.WebView.initialSettings}
   @override
   final InAppWebViewSettings? initialSettings;
 
+  ///{@macro flutter_inappwebview.WebView.initialUrlRequest}
   @override
   final URLRequest? initialUrlRequest;
 
+  ///{@macro flutter_inappwebview.WebView.implementation}
   @override
   final WebViewImplementation implementation;
 
+  ///{@macro flutter_inappwebview.WebView.initialUserScripts}
   @override
   final UnmodifiableListView<UserScript>? initialUserScripts;
 
+  ///{@macro flutter_inappwebview.WebView.pullToRefreshController}
   @override
   final PullToRefreshController? pullToRefreshController;
 
+  ///{@macro flutter_inappwebview.WebView.findInteractionController}
   @override
   final FindInteractionController? findInteractionController;
 
+  ///{@macro flutter_inappwebview.WebView.contextMenu}
   @override
   final ContextMenu? contextMenu;
 
+  ///{@macro flutter_inappwebview.WebView.onPageCommitVisible}
   @override
   final void Function(InAppWebViewController controller, WebUri? url)?
       onPageCommitVisible;
 
+  ///{@macro flutter_inappwebview.WebView.onTitleChanged}
   @override
   final void Function(InAppWebViewController controller, String? title)?
       onTitleChanged;
@@ -268,31 +278,38 @@ class InAppWebView extends StatefulWidget implements WebView {
       InAppWebViewController controller,
       URLAuthenticationChallenge challenge)? iosShouldAllowDeprecatedTLS;
 
+  ///{@macro flutter_inappwebview.WebView.onAjaxProgress}
   @override
   final Future<AjaxRequestAction> Function(
           InAppWebViewController controller, AjaxRequest ajaxRequest)?
       onAjaxProgress;
 
+  ///{@macro flutter_inappwebview.WebView.onAjaxReadyStateChange}
   @override
   final Future<AjaxRequestAction?> Function(
           InAppWebViewController controller, AjaxRequest ajaxRequest)?
       onAjaxReadyStateChange;
 
+  ///{@macro flutter_inappwebview.WebView.onConsoleMessage}
   @override
   final void Function(
           InAppWebViewController controller, ConsoleMessage consoleMessage)?
       onConsoleMessage;
 
+  ///{@macro flutter_inappwebview.WebView.onCreateWindow}
   @override
   final Future<bool?> Function(InAppWebViewController controller,
       CreateWindowAction createWindowAction)? onCreateWindow;
 
+  ///{@macro flutter_inappwebview.WebView.onCloseWindow}
   @override
   final void Function(InAppWebViewController controller)? onCloseWindow;
 
+  ///{@macro flutter_inappwebview.WebView.onWindowFocus}
   @override
   final void Function(InAppWebViewController controller)? onWindowFocus;
 
+  ///{@macro flutter_inappwebview.WebView.onWindowBlur}
   @override
   final void Function(InAppWebViewController controller)? onWindowBlur;
 
@@ -315,6 +332,7 @@ class InAppWebView extends StatefulWidget implements WebView {
   final void Function(InAppWebViewController controller, Uri url)?
       onDownloadStart;
 
+  ///{@macro flutter_inappwebview.WebView.onDownloadStartRequest}
   @override
   final void Function(InAppWebViewController controller,
       DownloadStartRequest downloadStartRequest)? onDownloadStartRequest;
@@ -325,16 +343,19 @@ class InAppWebView extends StatefulWidget implements WebView {
   final void Function(InAppWebViewController controller, int activeMatchOrdinal,
       int numberOfMatches, bool isDoneCounting)? onFindResultReceived;
 
+  ///{@macro flutter_inappwebview.WebView.onJsAlert}
   @override
   final Future<JsAlertResponse?> Function(
           InAppWebViewController controller, JsAlertRequest jsAlertRequest)?
       onJsAlert;
 
+  ///{@macro flutter_inappwebview.WebView.onJsConfirm}
   @override
   final Future<JsConfirmResponse?> Function(
           InAppWebViewController controller, JsConfirmRequest jsConfirmRequest)?
       onJsConfirm;
 
+  ///{@macro flutter_inappwebview.WebView.onJsPrompt}
   @override
   final Future<JsPromptResponse?> Function(
           InAppWebViewController controller, JsPromptRequest jsPromptRequest)?
@@ -346,6 +367,7 @@ class InAppWebView extends StatefulWidget implements WebView {
   final void Function(InAppWebViewController controller, Uri? url, int code,
       String message)? onLoadError;
 
+  ///{@macro flutter_inappwebview.WebView.onReceivedError}
   @override
   final void Function(InAppWebViewController controller,
       WebResourceRequest request, WebResourceError error)? onReceivedError;
@@ -356,12 +378,14 @@ class InAppWebView extends StatefulWidget implements WebView {
   final void Function(InAppWebViewController controller, Uri? url,
       int statusCode, String description)? onLoadHttpError;
 
+  ///{@macro flutter_inappwebview.WebView.onReceivedHttpError}
   @override
   final void Function(
       InAppWebViewController controller,
       WebResourceRequest request,
       WebResourceResponse errorResponse)? onReceivedHttpError;
 
+  ///{@macro flutter_inappwebview.WebView.onLoadResource}
   @override
   final void Function(
           InAppWebViewController controller, LoadedResource resource)?
@@ -373,19 +397,23 @@ class InAppWebView extends StatefulWidget implements WebView {
   final Future<CustomSchemeResponse?> Function(
       InAppWebViewController controller, Uri url)? onLoadResourceCustomScheme;
 
+  ///{@macro flutter_inappwebview.WebView.onLoadResourceWithCustomScheme}
   @override
   final Future<CustomSchemeResponse?> Function(
           InAppWebViewController controller, WebResourceRequest request)?
       onLoadResourceWithCustomScheme;
 
+  ///{@macro flutter_inappwebview.WebView.onLoadStart}
   @override
   final void Function(InAppWebViewController controller, WebUri? url)?
       onLoadStart;
 
+  ///{@macro flutter_inappwebview.WebView.onLoadStop}
   @override
   final void Function(InAppWebViewController controller, WebUri? url)?
       onLoadStop;
 
+  ///{@macro flutter_inappwebview.WebView.onLongPressHitTestResult}
   @override
   final void Function(InAppWebViewController controller,
       InAppWebViewHitTestResult hitTestResult)? onLongPressHitTestResult;
@@ -395,64 +423,79 @@ class InAppWebView extends StatefulWidget implements WebView {
   @override
   final void Function(InAppWebViewController controller, Uri? url)? onPrint;
 
+  ///{@macro flutter_inappwebview.WebView.onPrintRequest}
   @override
   final Future<bool?> Function(InAppWebViewController controller, WebUri? url,
       PrintJobController? printJobController)? onPrintRequest;
 
+  ///{@macro flutter_inappwebview.WebView.onProgressChanged}
   @override
   final void Function(InAppWebViewController controller, int progress)?
       onProgressChanged;
 
+  ///{@macro flutter_inappwebview.WebView.onReceivedClientCertRequest}
   @override
   final Future<ClientCertResponse?> Function(InAppWebViewController controller,
       URLAuthenticationChallenge challenge)? onReceivedClientCertRequest;
 
+  ///{@macro flutter_inappwebview.WebView.onReceivedHttpAuthRequest}
   @override
   final Future<HttpAuthResponse?> Function(InAppWebViewController controller,
       URLAuthenticationChallenge challenge)? onReceivedHttpAuthRequest;
 
+  ///{@macro flutter_inappwebview.WebView.onReceivedServerTrustAuthRequest}
   @override
   final Future<ServerTrustAuthResponse?> Function(
       InAppWebViewController controller,
       URLAuthenticationChallenge challenge)? onReceivedServerTrustAuthRequest;
 
+  ///{@macro flutter_inappwebview.WebView.onScrollChanged}
   @override
   final void Function(InAppWebViewController controller, int x, int y)?
       onScrollChanged;
 
+  ///{@macro flutter_inappwebview.WebView.onUpdateVisitedHistory}
   @override
   final void Function(
           InAppWebViewController controller, WebUri? url, bool? isReload)?
       onUpdateVisitedHistory;
 
+  ///{@macro flutter_inappwebview.WebView.onWebViewCreated}
   @override
   final void Function(InAppWebViewController controller)? onWebViewCreated;
 
+  ///{@macro flutter_inappwebview.WebView.shouldInterceptAjaxRequest}
   @override
   final Future<AjaxRequest?> Function(
           InAppWebViewController controller, AjaxRequest ajaxRequest)?
       shouldInterceptAjaxRequest;
 
+  ///{@macro flutter_inappwebview.WebView.shouldInterceptFetchRequest}
   @override
   final Future<FetchRequest?> Function(
           InAppWebViewController controller, FetchRequest fetchRequest)?
       shouldInterceptFetchRequest;
 
+  ///{@macro flutter_inappwebview.WebView.shouldOverrideUrlLoading}
   @override
   final Future<NavigationActionPolicy?> Function(
           InAppWebViewController controller, NavigationAction navigationAction)?
       shouldOverrideUrlLoading;
 
+  ///{@macro flutter_inappwebview.WebView.onEnterFullscreen}
   @override
   final void Function(InAppWebViewController controller)? onEnterFullscreen;
 
+  ///{@macro flutter_inappwebview.WebView.onExitFullscreen}
   @override
   final void Function(InAppWebViewController controller)? onExitFullscreen;
 
+  ///{@macro flutter_inappwebview.WebView.onOverScrolled}
   @override
   final void Function(InAppWebViewController controller, int x, int y,
       bool clampedX, bool clampedY)? onOverScrolled;
 
+  ///{@macro flutter_inappwebview.WebView.onZoomScaleChanged}
   @override
   final void Function(
           InAppWebViewController controller, double oldScale, double newScale)?
@@ -513,93 +556,113 @@ class InAppWebView extends StatefulWidget implements WebView {
           InAppWebViewController controller, LoginRequest loginRequest)?
       androidOnReceivedLoginRequest;
 
+  ///{@macro flutter_inappwebview.WebView.onDidReceiveServerRedirectForProvisionalNavigation}
   @override
   final void Function(InAppWebViewController controller)?
       onDidReceiveServerRedirectForProvisionalNavigation;
 
+  ///{@macro flutter_inappwebview.WebView.onFormResubmission}
   @override
   final Future<FormResubmissionAction?> Function(
       InAppWebViewController controller, WebUri? url)? onFormResubmission;
 
+  ///{@macro flutter_inappwebview.WebView.onGeolocationPermissionsHidePrompt}
   @override
   final void Function(InAppWebViewController controller)?
       onGeolocationPermissionsHidePrompt;
 
+  ///{@macro flutter_inappwebview.WebView.onGeolocationPermissionsShowPrompt}
   @override
   final Future<GeolocationPermissionShowPromptResponse?> Function(
           InAppWebViewController controller, String origin)?
       onGeolocationPermissionsShowPrompt;
 
+  ///{@macro flutter_inappwebview.WebView.onJsBeforeUnload}
   @override
   final Future<JsBeforeUnloadResponse?> Function(
       InAppWebViewController controller,
       JsBeforeUnloadRequest jsBeforeUnloadRequest)? onJsBeforeUnload;
 
+  ///{@macro flutter_inappwebview.WebView.onNavigationResponse}
   @override
   final Future<NavigationResponseAction?> Function(
       InAppWebViewController controller,
       NavigationResponse navigationResponse)? onNavigationResponse;
 
+  ///{@macro flutter_inappwebview.WebView.onPermissionRequest}
   @override
   final Future<PermissionResponse?> Function(InAppWebViewController controller,
       PermissionRequest permissionRequest)? onPermissionRequest;
 
+  ///{@macro flutter_inappwebview.WebView.onReceivedIcon}
   @override
   final void Function(InAppWebViewController controller, Uint8List icon)?
       onReceivedIcon;
 
+  ///{@macro flutter_inappwebview.WebView.onReceivedLoginRequest}
   @override
   final void Function(
           InAppWebViewController controller, LoginRequest loginRequest)?
       onReceivedLoginRequest;
 
+  ///{@macro flutter_inappwebview.WebView.onPermissionRequestCanceled}
   @override
   final void Function(InAppWebViewController controller,
       PermissionRequest permissionRequest)? onPermissionRequestCanceled;
 
+  ///{@macro flutter_inappwebview.WebView.onRequestFocus}
   @override
   final void Function(InAppWebViewController controller)? onRequestFocus;
 
+  ///{@macro flutter_inappwebview.WebView.onReceivedTouchIconUrl}
   @override
   final void Function(
           InAppWebViewController controller, WebUri url, bool precomposed)?
       onReceivedTouchIconUrl;
 
+  ///{@macro flutter_inappwebview.WebView.onRenderProcessGone}
   @override
   final void Function(
           InAppWebViewController controller, RenderProcessGoneDetail detail)?
       onRenderProcessGone;
 
+  ///{@macro flutter_inappwebview.WebView.onRenderProcessResponsive}
   @override
   final Future<WebViewRenderProcessAction?> Function(
           InAppWebViewController controller, WebUri? url)?
       onRenderProcessResponsive;
 
+  ///{@macro flutter_inappwebview.WebView.onRenderProcessUnresponsive}
   @override
   final Future<WebViewRenderProcessAction?> Function(
           InAppWebViewController controller, WebUri? url)?
       onRenderProcessUnresponsive;
 
+  ///{@macro flutter_inappwebview.WebView.onSafeBrowsingHit}
   @override
   final Future<SafeBrowsingResponse?> Function(
       InAppWebViewController controller,
       WebUri url,
       SafeBrowsingThreat? threatType)? onSafeBrowsingHit;
 
+  ///{@macro flutter_inappwebview.WebView.onWebContentProcessDidTerminate}
   @override
   final void Function(InAppWebViewController controller)?
       onWebContentProcessDidTerminate;
 
+  ///{@macro flutter_inappwebview.WebView.shouldAllowDeprecatedTLS}
   @override
   final Future<ShouldAllowDeprecatedTLSAction?> Function(
       InAppWebViewController controller,
       URLAuthenticationChallenge challenge)? shouldAllowDeprecatedTLS;
 
+  ///{@macro flutter_inappwebview.WebView.shouldInterceptRequest}
   @override
   final Future<WebResourceResponse?> Function(
           InAppWebViewController controller, WebResourceRequest request)?
       shouldInterceptRequest;
 
+  ///{@macro flutter_inappwebview.WebView.onCameraCaptureStateChanged}
   @override
   final Future<void> Function(
     InAppWebViewController controller,
@@ -607,6 +670,7 @@ class InAppWebView extends StatefulWidget implements WebView {
     MediaCaptureState? newState,
   )? onCameraCaptureStateChanged;
 
+  ///{@macro flutter_inappwebview.WebView.onMicrophoneCaptureStateChanged}
   @override
   final Future<void> Function(
     InAppWebViewController controller,
@@ -614,6 +678,7 @@ class InAppWebView extends StatefulWidget implements WebView {
     MediaCaptureState? newState,
   )? onMicrophoneCaptureStateChanged;
 
+  ///{@macro flutter_inappwebview.WebView.onContentSizeChanged}
   @override
   final void Function(InAppWebViewController controller, Size oldContentSize,
       Size newContentSize)? onContentSizeChanged;

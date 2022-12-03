@@ -19,17 +19,17 @@ class CustomTabsShareState {
   ///Applies the default share settings depending on the browser.
   static const SHARE_STATE_DEFAULT = CustomTabsShareState._internal(0, 0);
 
-  ///Shows a share option in the tab.
-  static const SHARE_STATE_ON = CustomTabsShareState._internal(1, 1);
-
   ///Explicitly does not show a share option in the tab.
   static const SHARE_STATE_OFF = CustomTabsShareState._internal(2, 2);
+
+  ///Shows a share option in the tab.
+  static const SHARE_STATE_ON = CustomTabsShareState._internal(1, 1);
 
   ///Set of all values of [CustomTabsShareState].
   static final Set<CustomTabsShareState> values = [
     CustomTabsShareState.SHARE_STATE_DEFAULT,
-    CustomTabsShareState.SHARE_STATE_ON,
     CustomTabsShareState.SHARE_STATE_OFF,
+    CustomTabsShareState.SHARE_STATE_ON,
   ].toSet();
 
   ///Gets a possible [CustomTabsShareState] instance from [int] value.
@@ -75,10 +75,10 @@ class CustomTabsShareState {
     switch (_value) {
       case 0:
         return 'SHARE_STATE_DEFAULT';
-      case 1:
-        return 'SHARE_STATE_ON';
       case 2:
         return 'SHARE_STATE_OFF';
+      case 1:
+        return 'SHARE_STATE_ON';
     }
     return _value.toString();
   }

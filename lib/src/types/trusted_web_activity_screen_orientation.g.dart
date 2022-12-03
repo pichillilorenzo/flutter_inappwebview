@@ -18,21 +18,18 @@ class TrustedWebActivityScreenOrientation {
           int value, Function nativeValue) =>
       TrustedWebActivityScreenOrientation._internal(value, nativeValue());
 
+  /// Any is an orientation that means the screen can be locked to any one of portrait-primary,
+  /// portrait-secondary, landscape-primary and landscape-secondary.
+  static const ANY = TrustedWebActivityScreenOrientation._internal(5, 5);
+
   /// The default screen orientation is the set of orientations to which the screen is locked when
   /// there is no current orientation lock.
   static const DEFAULT = TrustedWebActivityScreenOrientation._internal(0, 0);
 
-  ///  Portrait-primary is an orientation where the screen width is less than or equal to the
-  ///  screen height. If the device's natural orientation is portrait, then it is in
-  ///  portrait-primary when held in that position.
-  static const PORTRAIT_PRIMARY =
-      TrustedWebActivityScreenOrientation._internal(1, 1);
-
-  /// Portrait-secondary is an orientation where the screen width is less than or equal to the
-  /// screen height. If the device's natural orientation is portrait, then it is in
-  /// portrait-secondary when rotated 180° from its natural position.
-  static const PORTRAIT_SECONDARY =
-      TrustedWebActivityScreenOrientation._internal(2, 2);
+  /// Landscape is an orientation where the screen width is greater than the screen height and
+  /// depending on platform convention locking the screen to landscape can represent
+  /// landscape-primary, landscape-secondary or both.
+  static const LANDSCAPE = TrustedWebActivityScreenOrientation._internal(6, 6);
 
   /// Landscape-primary is an orientation where the screen width is greater than the screen height.
   /// If the device's natural orientation is landscape, then it is in landscape-primary when held
@@ -46,36 +43,39 @@ class TrustedWebActivityScreenOrientation {
   static const LANDSCAPE_SECONDARY =
       TrustedWebActivityScreenOrientation._internal(4, 4);
 
-  /// Any is an orientation that means the screen can be locked to any one of portrait-primary,
-  /// portrait-secondary, landscape-primary and landscape-secondary.
-  static const ANY = TrustedWebActivityScreenOrientation._internal(5, 5);
-
-  /// Landscape is an orientation where the screen width is greater than the screen height and
-  /// depending on platform convention locking the screen to landscape can represent
-  /// landscape-primary, landscape-secondary or both.
-  static const LANDSCAPE = TrustedWebActivityScreenOrientation._internal(6, 6);
+  /// Natural is an orientation that refers to either portrait-primary or landscape-primary
+  /// depending on the device's usual orientation. This orientation is usually provided by
+  /// the underlying operating system.
+  static const NATURAL = TrustedWebActivityScreenOrientation._internal(8, 8);
 
   /// Portrait is an orientation where the screen width is less than or equal to the screen height
   /// and depending on platform convention locking the screen to portrait can represent
   /// portrait-primary, portrait-secondary or both.
   static const PORTRAIT = TrustedWebActivityScreenOrientation._internal(7, 7);
 
-  /// Natural is an orientation that refers to either portrait-primary or landscape-primary
-  /// depending on the device's usual orientation. This orientation is usually provided by
-  /// the underlying operating system.
-  static const NATURAL = TrustedWebActivityScreenOrientation._internal(8, 8);
+  ///  Portrait-primary is an orientation where the screen width is less than or equal to the
+  ///  screen height. If the device's natural orientation is portrait, then it is in
+  ///  portrait-primary when held in that position.
+  static const PORTRAIT_PRIMARY =
+      TrustedWebActivityScreenOrientation._internal(1, 1);
+
+  /// Portrait-secondary is an orientation where the screen width is less than or equal to the
+  /// screen height. If the device's natural orientation is portrait, then it is in
+  /// portrait-secondary when rotated 180° from its natural position.
+  static const PORTRAIT_SECONDARY =
+      TrustedWebActivityScreenOrientation._internal(2, 2);
 
   ///Set of all values of [TrustedWebActivityScreenOrientation].
   static final Set<TrustedWebActivityScreenOrientation> values = [
+    TrustedWebActivityScreenOrientation.ANY,
     TrustedWebActivityScreenOrientation.DEFAULT,
-    TrustedWebActivityScreenOrientation.PORTRAIT_PRIMARY,
-    TrustedWebActivityScreenOrientation.PORTRAIT_SECONDARY,
+    TrustedWebActivityScreenOrientation.LANDSCAPE,
     TrustedWebActivityScreenOrientation.LANDSCAPE_PRIMARY,
     TrustedWebActivityScreenOrientation.LANDSCAPE_SECONDARY,
-    TrustedWebActivityScreenOrientation.ANY,
-    TrustedWebActivityScreenOrientation.LANDSCAPE,
-    TrustedWebActivityScreenOrientation.PORTRAIT,
     TrustedWebActivityScreenOrientation.NATURAL,
+    TrustedWebActivityScreenOrientation.PORTRAIT,
+    TrustedWebActivityScreenOrientation.PORTRAIT_PRIMARY,
+    TrustedWebActivityScreenOrientation.PORTRAIT_SECONDARY,
   ].toSet();
 
   ///Gets a possible [TrustedWebActivityScreenOrientation] instance from [int] value.
@@ -119,24 +119,24 @@ class TrustedWebActivityScreenOrientation {
   @override
   String toString() {
     switch (_value) {
+      case 5:
+        return 'ANY';
       case 0:
         return 'DEFAULT';
-      case 1:
-        return 'PORTRAIT_PRIMARY';
-      case 2:
-        return 'PORTRAIT_SECONDARY';
+      case 6:
+        return 'LANDSCAPE';
       case 3:
         return 'LANDSCAPE_PRIMARY';
       case 4:
         return 'LANDSCAPE_SECONDARY';
-      case 5:
-        return 'ANY';
-      case 6:
-        return 'LANDSCAPE';
-      case 7:
-        return 'PORTRAIT';
       case 8:
         return 'NATURAL';
+      case 7:
+        return 'PORTRAIT';
+      case 1:
+        return 'PORTRAIT_PRIMARY';
+      case 2:
+        return 'PORTRAIT_SECONDARY';
     }
     return _value.toString();
   }

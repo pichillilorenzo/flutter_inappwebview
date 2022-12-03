@@ -16,14 +16,14 @@ class CompressFormat {
           String value, Function nativeValue) =>
       CompressFormat._internal(value, nativeValue());
 
-  ///Compress to the `PNG` format.
-  ///PNG is lossless, so `quality` is ignored.
-  static const PNG = CompressFormat._internal('PNG', 'PNG');
-
   ///Compress to the `JPEG` format.
   ///Quality of `0` means compress for the smallest size.
   ///`100` means compress for max visual quality.
   static const JPEG = CompressFormat._internal('JPEG', 'JPEG');
+
+  ///Compress to the `PNG` format.
+  ///PNG is lossless, so `quality` is ignored.
+  static const PNG = CompressFormat._internal('PNG', 'PNG');
 
   ///Compress to the `WEBP` lossy format.
   ///Quality of `0` means compress for the smallest size.
@@ -31,16 +31,6 @@ class CompressFormat {
   ///
   ///**NOTE**: available only on Android.
   static const WEBP = CompressFormat._internal('WEBP', 'WEBP');
-
-  ///Compress to the `WEBP` lossy format.
-  ///Quality of `0` means compress for the smallest size.
-  ///`100` means compress for max visual quality.
-  ///
-  ///**NOTE**: available only on Android.
-  ///
-  ///**NOTE for Android**: available on Android 30+.
-  static const WEBP_LOSSY =
-      CompressFormat._internal('WEBP_LOSSY', 'WEBP_LOSSY');
 
   ///Compress to the `WEBP` lossless format.
   ///Quality refers to how much effort to put into compression.
@@ -53,13 +43,23 @@ class CompressFormat {
   static const WEBP_LOSSLESS =
       CompressFormat._internal('WEBP_LOSSLESS', 'WEBP_LOSSLESS');
 
+  ///Compress to the `WEBP` lossy format.
+  ///Quality of `0` means compress for the smallest size.
+  ///`100` means compress for max visual quality.
+  ///
+  ///**NOTE**: available only on Android.
+  ///
+  ///**NOTE for Android**: available on Android 30+.
+  static const WEBP_LOSSY =
+      CompressFormat._internal('WEBP_LOSSY', 'WEBP_LOSSY');
+
   ///Set of all values of [CompressFormat].
   static final Set<CompressFormat> values = [
-    CompressFormat.PNG,
     CompressFormat.JPEG,
+    CompressFormat.PNG,
     CompressFormat.WEBP,
-    CompressFormat.WEBP_LOSSY,
     CompressFormat.WEBP_LOSSLESS,
+    CompressFormat.WEBP_LOSSY,
   ].toSet();
 
   ///Gets a possible [CompressFormat] instance from [String] value.

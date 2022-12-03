@@ -16,6 +16,20 @@ class PrintJobPageOrder {
           int value, Function nativeValue) =>
       PrintJobPageOrder._internal(value, nativeValue());
 
+  ///Ascending (back to front) page order.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- MacOS
+  static final ASCENDING = PrintJobPageOrder._internalMultiPlatform(1, () {
+    switch (defaultTargetPlatform) {
+      case TargetPlatform.macOS:
+        return 1;
+      default:
+        break;
+    }
+    return null;
+  });
+
   ///Descending (front to back) page order.
   ///
   ///**Supported Platforms/Implementations**:
@@ -44,20 +58,6 @@ class PrintJobPageOrder {
     return null;
   });
 
-  ///Ascending (back to front) page order.
-  ///
-  ///**Supported Platforms/Implementations**:
-  ///- MacOS
-  static final ASCENDING = PrintJobPageOrder._internalMultiPlatform(1, () {
-    switch (defaultTargetPlatform) {
-      case TargetPlatform.macOS:
-        return 1;
-      default:
-        break;
-    }
-    return null;
-  });
-
   ///No page order specified.
   ///
   ///**Supported Platforms/Implementations**:
@@ -74,9 +74,9 @@ class PrintJobPageOrder {
 
   ///Set of all values of [PrintJobPageOrder].
   static final Set<PrintJobPageOrder> values = [
+    PrintJobPageOrder.ASCENDING,
     PrintJobPageOrder.DESCENDING,
     PrintJobPageOrder.SPECIAL,
-    PrintJobPageOrder.ASCENDING,
     PrintJobPageOrder.UNKNOWN,
   ].toSet();
 
@@ -121,12 +121,12 @@ class PrintJobPageOrder {
   @override
   String toString() {
     switch (_value) {
+      case 1:
+        return 'ASCENDING';
       case -1:
         return 'DESCENDING';
       case 0:
         return 'SPECIAL';
-      case 1:
-        return 'ASCENDING';
       case 2:
         return 'UNKNOWN';
     }

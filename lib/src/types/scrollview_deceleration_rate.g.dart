@@ -16,17 +16,17 @@ class ScrollViewDecelerationRate {
           String value, Function nativeValue) =>
       ScrollViewDecelerationRate._internal(value, nativeValue());
 
+  ///A fast deceleration rate for a scroll view: `0.99`.
+  static const FAST = ScrollViewDecelerationRate._internal('FAST', 'FAST');
+
   ///The default deceleration rate for a scroll view: `0.998`.
   static const NORMAL =
       ScrollViewDecelerationRate._internal('NORMAL', 'NORMAL');
 
-  ///A fast deceleration rate for a scroll view: `0.99`.
-  static const FAST = ScrollViewDecelerationRate._internal('FAST', 'FAST');
-
   ///Set of all values of [ScrollViewDecelerationRate].
   static final Set<ScrollViewDecelerationRate> values = [
-    ScrollViewDecelerationRate.NORMAL,
     ScrollViewDecelerationRate.FAST,
+    ScrollViewDecelerationRate.NORMAL,
   ].toSet();
 
   ///Gets a possible [ScrollViewDecelerationRate] instance from [String] value.
@@ -86,17 +86,17 @@ class IOSUIScrollViewDecelerationRate {
           String value, Function nativeValue) =>
       IOSUIScrollViewDecelerationRate._internal(value, nativeValue());
 
+  ///A fast deceleration rate for a scroll view: `0.99`.
+  static const FAST = IOSUIScrollViewDecelerationRate._internal('FAST', 'FAST');
+
   ///The default deceleration rate for a scroll view: `0.998`.
   static const NORMAL =
       IOSUIScrollViewDecelerationRate._internal('NORMAL', 'NORMAL');
 
-  ///A fast deceleration rate for a scroll view: `0.99`.
-  static const FAST = IOSUIScrollViewDecelerationRate._internal('FAST', 'FAST');
-
   ///Set of all values of [IOSUIScrollViewDecelerationRate].
   static final Set<IOSUIScrollViewDecelerationRate> values = [
-    IOSUIScrollViewDecelerationRate.NORMAL,
     IOSUIScrollViewDecelerationRate.FAST,
+    IOSUIScrollViewDecelerationRate.NORMAL,
   ].toSet();
 
   ///Gets a possible [IOSUIScrollViewDecelerationRate] instance from [String] value.

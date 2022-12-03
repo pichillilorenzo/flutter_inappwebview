@@ -45,10 +45,16 @@ class ExchangeableEnumGenerator
     }
     classBuffer.writeln('class $extClassName {');
 
-    final FieldElement enumValue = visitor.fields.entries
+    final fieldEntriesSorted = visitor.fields.entries.toList();
+    fieldEntriesSorted.sort((a, b) => a.key.compareTo(b.key));
+
+    final methodEntriesSorted = visitor.methods.entries.toList();
+    fieldEntriesSorted.sort((a, b) => a.key.compareTo(b.key));
+
+    final FieldElement enumValue = fieldEntriesSorted
         .firstWhere((element) => element.key == "_value")
         .value;
-    final FieldElement enumNativeValue = visitor.fields.entries
+    final FieldElement enumNativeValue = fieldEntriesSorted
         .firstWhere((element) => element.key == "_nativeValue",
             orElse: () => MapEntry("_nativeValue", enumValue))
         .value;
@@ -62,7 +68,7 @@ class ExchangeableEnumGenerator
     classBuffer.writeln(
         "factory $extClassName._internalMultiPlatform(${enumValue.type} value, Function nativeValue) => $extClassName._internal(value, nativeValue());");
 
-    for (final entry in visitor.fields.entries) {
+    for (final entry in fieldEntriesSorted) {
       final fieldName = entry.key;
       final fieldElement = entry.value;
       if (fieldName == "_value" || fieldName == "_nativeValue") {
@@ -176,7 +182,7 @@ class ExchangeableEnumGenerator
     if (annotation.read("valuesProperty").boolValue) {
       classBuffer.writeln('///Set of all values of [$extClassName].');
       classBuffer.writeln('static final Set<$extClassName> values = [');
-      for (final entry in visitor.fields.entries) {
+      for (final entry in fieldEntriesSorted) {
         final fieldName = entry.key;
         final fieldElement = entry.value;
         final isEnumCustomValue = _coreCheckerEnumCustomValue
@@ -228,7 +234,7 @@ class ExchangeableEnumGenerator
       """);
     }
 
-    for (final entry in visitor.methods.entries) {
+    for (final entry in methodEntriesSorted) {
       final methodElement = entry.value;
       if (Util.methodHasIgnore(methodElement)) {
         continue;
@@ -301,7 +307,7 @@ class ExchangeableEnumGenerator
         classBuffer.writeln('return _value;');
       } else {
         classBuffer.writeln('switch(_value) {');
-        for (final entry in visitor.fields.entries) {
+        for (final entry in fieldEntriesSorted) {
           final fieldName = entry.key;
           final fieldElement = entry.value;
           if (!fieldElement.isPrivate && fieldElement.isStatic) {

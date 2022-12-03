@@ -37,6 +37,26 @@ class ContentBlockerActionType {
     return null;
   });
 
+  ///Strips cookies from the header before sending it to the server.
+  ///This only blocks cookies otherwise acceptable to WebView's privacy policy.
+  ///Combining with [IGNORE_PREVIOUS_RULES] doesn't override the browser’s privacy settings.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- iOS
+  ///- MacOS
+  static final BLOCK_COOKIES =
+      ContentBlockerActionType._internalMultiPlatform('block-cookies', () {
+    switch (defaultTargetPlatform) {
+      case TargetPlatform.iOS:
+        return 'block-cookies';
+      case TargetPlatform.macOS:
+        return 'block-cookies';
+      default:
+        break;
+    }
+    return null;
+  });
+
   ///Hides elements of the page based on a CSS selector.
   ///A selector field contains the selector list.
   ///Any matching element has its display property set to none, which hides it.
@@ -56,6 +76,25 @@ class ContentBlockerActionType {
         return 'css-display-none';
       case TargetPlatform.macOS:
         return 'css-display-none';
+      default:
+        break;
+    }
+    return null;
+  });
+
+  ///Ignores previously triggered actions.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- iOS
+  ///- MacOS
+  static final IGNORE_PREVIOUS_RULES =
+      ContentBlockerActionType._internalMultiPlatform('ignore-previous-rules',
+          () {
+    switch (defaultTargetPlatform) {
+      case TargetPlatform.iOS:
+        return 'ignore-previous-rules';
+      case TargetPlatform.macOS:
+        return 'ignore-previous-rules';
       default:
         break;
     }
@@ -84,52 +123,13 @@ class ContentBlockerActionType {
     return null;
   });
 
-  ///Strips cookies from the header before sending it to the server.
-  ///This only blocks cookies otherwise acceptable to WebView's privacy policy.
-  ///Combining with [IGNORE_PREVIOUS_RULES] doesn't override the browser’s privacy settings.
-  ///
-  ///**Supported Platforms/Implementations**:
-  ///- iOS
-  ///- MacOS
-  static final BLOCK_COOKIES =
-      ContentBlockerActionType._internalMultiPlatform('block-cookies', () {
-    switch (defaultTargetPlatform) {
-      case TargetPlatform.iOS:
-        return 'block-cookies';
-      case TargetPlatform.macOS:
-        return 'block-cookies';
-      default:
-        break;
-    }
-    return null;
-  });
-
-  ///Ignores previously triggered actions.
-  ///
-  ///**Supported Platforms/Implementations**:
-  ///- iOS
-  ///- MacOS
-  static final IGNORE_PREVIOUS_RULES =
-      ContentBlockerActionType._internalMultiPlatform('ignore-previous-rules',
-          () {
-    switch (defaultTargetPlatform) {
-      case TargetPlatform.iOS:
-        return 'ignore-previous-rules';
-      case TargetPlatform.macOS:
-        return 'ignore-previous-rules';
-      default:
-        break;
-    }
-    return null;
-  });
-
   ///Set of all values of [ContentBlockerActionType].
   static final Set<ContentBlockerActionType> values = [
     ContentBlockerActionType.BLOCK,
-    ContentBlockerActionType.CSS_DISPLAY_NONE,
-    ContentBlockerActionType.MAKE_HTTPS,
     ContentBlockerActionType.BLOCK_COOKIES,
+    ContentBlockerActionType.CSS_DISPLAY_NONE,
     ContentBlockerActionType.IGNORE_PREVIOUS_RULES,
+    ContentBlockerActionType.MAKE_HTTPS,
   ].toSet();
 
   ///Gets a possible [ContentBlockerActionType] instance from [String] value.

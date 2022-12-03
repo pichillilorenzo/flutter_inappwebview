@@ -9,16 +9,6 @@ part of 'url_credential.dart';
 ///Class that represents an authentication credential consisting of information
 ///specific to the type of credential and the type of persistent storage to use, if any.
 class URLCredential {
-  ///The credential’s user name.
-  String? username;
-
-  ///The credential’s password.
-  String? password;
-
-  ///Use [certificates] instead.
-  @Deprecated('Use certificates instead')
-  List<X509Certificate>? iosCertificates;
-
   ///The intermediate certificates of the credential, if it is a client certificate credential.
   ///
   ///**Supported Platforms/Implementations**:
@@ -26,9 +16,16 @@ class URLCredential {
   ///- MacOS
   List<X509Certificate>? certificates;
 
+  ///Use [certificates] instead.
+  @Deprecated('Use certificates instead')
+  List<X509Certificate>? iosCertificates;
+
   ///Use [persistence] instead.
   @Deprecated('Use persistence instead')
   IOSURLCredentialPersistence? iosPersistence;
+
+  ///The credential’s password.
+  String? password;
 
   ///The credential’s persistence setting.
   ///
@@ -36,13 +33,16 @@ class URLCredential {
   ///- iOS
   ///- MacOS
   URLCredentialPersistence? persistence;
+
+  ///The credential’s user name.
+  String? username;
   URLCredential(
-      {this.username,
-      this.password,
+      {this.certificates,
       @Deprecated('Use certificates instead') this.iosCertificates,
-      this.certificates,
       @Deprecated('Use persistence instead') this.iosPersistence,
-      this.persistence}) {
+      this.password,
+      this.persistence,
+      this.username}) {
     certificates = certificates ?? iosCertificates;
     persistence = persistence ??
         URLCredentialPersistence.fromNativeValue(
@@ -55,13 +55,13 @@ class URLCredential {
       return null;
     }
     final instance = URLCredential(
-      username: map['username'],
-      password: map['password'],
-      iosCertificates: _certificatesDeserializer(map['certificates']),
       certificates: _certificatesDeserializer(map['certificates']),
+      iosCertificates: _certificatesDeserializer(map['certificates']),
       iosPersistence:
           IOSURLCredentialPersistence.fromNativeValue(map['persistence']),
+      password: map['password'],
       persistence: URLCredentialPersistence.fromNativeValue(map['persistence']),
+      username: map['username'],
     );
     return instance;
   }
@@ -69,10 +69,10 @@ class URLCredential {
   ///Converts instance to a map.
   Map<String, dynamic> toMap() {
     return {
-      "username": username,
-      "password": password,
       "certificates": certificates?.map((e) => e.toMap()).toList(),
+      "password": password,
       "persistence": persistence?.toNativeValue(),
+      "username": username,
     };
   }
 
@@ -83,6 +83,6 @@ class URLCredential {
 
   @override
   String toString() {
-    return 'URLCredential{username: $username, password: $password, certificates: $certificates, persistence: $persistence}';
+    return 'URLCredential{certificates: $certificates, password: $password, persistence: $persistence, username: $username}';
   }
 }

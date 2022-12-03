@@ -16,16 +16,94 @@ class WebResourceErrorType {
           String value, Function nativeValue) =>
       WebResourceErrorType._internal(value, nativeValue());
 
-  ///User authentication failed on server.
+  ///App Transport Security disallowed a connection because there is no secure network connection.
   ///
   ///**Supported Platforms/Implementations**:
-  ///- Android native WebView ([Official API - WebViewClient.ERROR_AUTHENTICATION](https://developer.android.com/reference/android/webkit/WebViewClient#ERROR_AUTHENTICATION))
-  static final USER_AUTHENTICATION_FAILED =
-      WebResourceErrorType._internalMultiPlatform('USER_AUTHENTICATION_FAILED',
-          () {
+  ///- iOS ([Official API - URLError.appTransportSecurityRequiresSecureConnection](https://developer.apple.com/documentation/foundation/urlerror/code/2882980-apptransportsecurityrequiressecu))
+  ///- MacOS ([Official API - URLError.appTransportSecurityRequiresSecureConnection](https://developer.apple.com/documentation/foundation/urlerror/code/2882980-apptransportsecurityrequiressecu))
+  static final APP_TRANSPORT_SECURITY_REQUIRES_SECURE_CONNECTION =
+      WebResourceErrorType._internalMultiPlatform(
+          'APP_TRANSPORT_SECURITY_REQUIRES_SECURE_CONNECTION', () {
     switch (defaultTargetPlatform) {
-      case TargetPlatform.android:
-        return -4;
+      case TargetPlatform.iOS:
+        return -1022;
+      case TargetPlatform.macOS:
+        return -1022;
+      default:
+        break;
+    }
+    return null;
+  });
+
+  ///An app or app extension attempted to connect to a background session that is already connected to a process.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- iOS ([Official API - URLError.backgroundSessionInUseByAnotherProcess](https://developer.apple.com/documentation/foundation/urlerror/code/2882923-backgroundsessioninusebyanotherp))
+  ///- MacOS ([Official API - URLError.backgroundSessionInUseByAnotherProcess](https://developer.apple.com/documentation/foundation/urlerror/code/2882923-backgroundsessioninusebyanotherp))
+  static final BACKGROUND_SESSION_IN_USE_BY_ANOTHER_PROCESS =
+      WebResourceErrorType._internalMultiPlatform(
+          'BACKGROUND_SESSION_IN_USE_BY_ANOTHER_PROCESS', () {
+    switch (defaultTargetPlatform) {
+      case TargetPlatform.iOS:
+        return -996;
+      case TargetPlatform.macOS:
+        return -996;
+      default:
+        break;
+    }
+    return null;
+  });
+
+  ///The shared container identifier of the URL session configuration is needed but has not been set.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- iOS ([Official API - URLError.backgroundSessionRequiresSharedContainer](https://developer.apple.com/documentation/foundation/urlerror/code/2883169-backgroundsessionrequiressharedc))
+  ///- MacOS ([Official API - URLError.backgroundSessionRequiresSharedContainer](https://developer.apple.com/documentation/foundation/urlerror/code/2883169-backgroundsessionrequiressharedc))
+  static final BACKGROUND_SESSION_REQUIRES_SHARED_CONTAINER =
+      WebResourceErrorType._internalMultiPlatform(
+          'BACKGROUND_SESSION_REQUIRES_SHARED_CONTAINER', () {
+    switch (defaultTargetPlatform) {
+      case TargetPlatform.iOS:
+        return -995;
+      case TargetPlatform.macOS:
+        return -995;
+      default:
+        break;
+    }
+    return null;
+  });
+
+  ///The app is suspended or exits while a background data task is processing.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- iOS ([Official API - URLError.backgroundSessionWasDisconnected](https://developer.apple.com/documentation/foundation/urlerror/code/2883075-backgroundsessionwasdisconnected))
+  ///- MacOS ([Official API - URLError.backgroundSessionWasDisconnected](https://developer.apple.com/documentation/foundation/urlerror/code/2883075-backgroundsessionwasdisconnected))
+  static final BACKGROUND_SESSION_WAS_DISCONNECTED =
+      WebResourceErrorType._internalMultiPlatform(
+          'BACKGROUND_SESSION_WAS_DISCONNECTED', () {
+    switch (defaultTargetPlatform) {
+      case TargetPlatform.iOS:
+        return -997;
+      case TargetPlatform.macOS:
+        return -997;
+      default:
+        break;
+    }
+    return null;
+  });
+
+  ///The URL Loading System received bad data from the server.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- iOS ([Official API - URLError.badServerResponse](https://developer.apple.com/documentation/foundation/urlerror/2293606-badserverresponse))
+  ///- MacOS ([Official API - URLError.badServerResponse](https://developer.apple.com/documentation/foundation/urlerror/2293606-badserverresponse))
+  static final BAD_SERVER_RESPONSE =
+      WebResourceErrorType._internalMultiPlatform('BAD_SERVER_RESPONSE', () {
+    switch (defaultTargetPlatform) {
+      case TargetPlatform.iOS:
+        return -1011;
+      case TargetPlatform.macOS:
+        return -1011;
       default:
         break;
     }
@@ -53,6 +131,60 @@ class WebResourceErrorType {
     return null;
   });
 
+  ///A connection was attempted while a phone call is active on a network that does not support simultaneous phone and data communication (EDGE or GPRS).
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- iOS ([Official API - URLError.callIsActive](https://developer.apple.com/documentation/foundation/urlerror/code/2883170-callisactive))
+  ///- MacOS ([Official API - URLError.callIsActive](https://developer.apple.com/documentation/foundation/urlerror/code/2883170-callisactive))
+  static final CALL_IS_ACTIVE =
+      WebResourceErrorType._internalMultiPlatform('CALL_IS_ACTIVE', () {
+    switch (defaultTargetPlatform) {
+      case TargetPlatform.iOS:
+        return -1019;
+      case TargetPlatform.macOS:
+        return -1019;
+      default:
+        break;
+    }
+    return null;
+  });
+
+  ///An asynchronous load has been canceled.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- iOS ([Official API - URLError.cancelled](https://developer.apple.com/documentation/foundation/urlerror/code/2883178-cancelled))
+  ///- MacOS ([Official API - URLError.cancelled](https://developer.apple.com/documentation/foundation/urlerror/code/2883178-cancelled))
+  static final CANCELLED =
+      WebResourceErrorType._internalMultiPlatform('CANCELLED', () {
+    switch (defaultTargetPlatform) {
+      case TargetPlatform.iOS:
+        return -999;
+      case TargetPlatform.macOS:
+        return -999;
+      default:
+        break;
+    }
+    return null;
+  });
+
+  ///A download task couldn’t close the downloaded file on disk.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- iOS ([Official API - URLError.cannotCloseFile](https://developer.apple.com/documentation/foundation/urlerror/code/2883215-cannotclosefile))
+  ///- MacOS ([Official API - URLError.cannotCloseFile](https://developer.apple.com/documentation/foundation/urlerror/code/2883215-cannotclosefile))
+  static final CANNOT_CLOSE_FILE =
+      WebResourceErrorType._internalMultiPlatform('CANNOT_CLOSE_FILE', () {
+    switch (defaultTargetPlatform) {
+      case TargetPlatform.iOS:
+        return -3002;
+      case TargetPlatform.macOS:
+        return -3002;
+      default:
+        break;
+    }
+    return null;
+  });
+
   ///Failed to connect to the server.
   ///
   ///**Supported Platforms/Implementations**:
@@ -74,6 +206,283 @@ class WebResourceErrorType {
     return null;
   });
 
+  ///A download task couldn’t create the downloaded file on disk because of an I/O failure.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- iOS ([Official API - URLError.cannotCreateFile](https://developer.apple.com/documentation/foundation/urlerror/code/2883204-cannotcreatefile))
+  ///- MacOS ([Official API - URLError.cannotCreateFile](https://developer.apple.com/documentation/foundation/urlerror/code/2883204-cannotcreatefile))
+  static final CANNOT_CREATE_FILE =
+      WebResourceErrorType._internalMultiPlatform('CANNOT_CREATE_FILE', () {
+    switch (defaultTargetPlatform) {
+      case TargetPlatform.iOS:
+        return -3000;
+      case TargetPlatform.macOS:
+        return -3000;
+      default:
+        break;
+    }
+    return null;
+  });
+
+  ///Content data received during a connection request couldn’t be decoded for a known content encoding.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- iOS ([Official API - URLError.cannotDecodeContentData](https://developer.apple.com/documentation/foundation/urlerror/2292983-cannotdecodecontentdata))
+  ///- MacOS ([Official API - URLError.cannotDecodeContentData](https://developer.apple.com/documentation/foundation/urlerror/2292983-cannotdecodecontentdata))
+  static final CANNOT_DECODE_CONTENT_DATA =
+      WebResourceErrorType._internalMultiPlatform('CANNOT_DECODE_CONTENT_DATA',
+          () {
+    switch (defaultTargetPlatform) {
+      case TargetPlatform.iOS:
+        return -1016;
+      case TargetPlatform.macOS:
+        return -1016;
+      default:
+        break;
+    }
+    return null;
+  });
+
+  ///Content data received during a connection request couldn’t be decoded for a known content encoding.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- iOS ([Official API - URLError.cannotDecodeRawData](https://developer.apple.com/documentation/foundation/urlerror/2293573-cannotdecoderawdata))
+  ///- MacOS ([Official API - URLError.cannotDecodeRawData](https://developer.apple.com/documentation/foundation/urlerror/2293573-cannotdecoderawdata))
+  static final CANNOT_DECODE_RAW_DATA =
+      WebResourceErrorType._internalMultiPlatform('CANNOT_DECODE_RAW_DATA', () {
+    switch (defaultTargetPlatform) {
+      case TargetPlatform.iOS:
+        return -1015;
+      case TargetPlatform.macOS:
+        return -1015;
+      default:
+        break;
+    }
+    return null;
+  });
+
+  ///A request to load an item only from the cache could not be satisfied.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- iOS ([Official API - URLError.cannotLoadFromNetwork](https://developer.apple.com/documentation/foundation/urlerror/code/2882968-cannotloadfromnetwork))
+  ///- MacOS ([Official API - URLError.cannotLoadFromNetwork](https://developer.apple.com/documentation/foundation/urlerror/code/2882968-cannotloadfromnetwork))
+  static final CANNOT_LOAD_FROM_NETWORK =
+      WebResourceErrorType._internalMultiPlatform('CANNOT_LOAD_FROM_NETWORK',
+          () {
+    switch (defaultTargetPlatform) {
+      case TargetPlatform.iOS:
+        return -2000;
+      case TargetPlatform.macOS:
+        return -2000;
+      default:
+        break;
+    }
+    return null;
+  });
+
+  ///A download task was unable to move a downloaded file on disk.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- iOS ([Official API - URLError.cannotMoveFile](https://developer.apple.com/documentation/foundation/urlerror/code/2883180-cannotmovefile))
+  ///- MacOS ([Official API - URLError.cannotMoveFile](https://developer.apple.com/documentation/foundation/urlerror/code/2883180-cannotmovefile))
+  static final CANNOT_MOVE_FILE =
+      WebResourceErrorType._internalMultiPlatform('CANNOT_MOVE_FILE', () {
+    switch (defaultTargetPlatform) {
+      case TargetPlatform.iOS:
+        return -3005;
+      case TargetPlatform.macOS:
+        return -3005;
+      default:
+        break;
+    }
+    return null;
+  });
+
+  ///A download task was unable to open the downloaded file on disk.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- iOS ([Official API - URLError.cannotOpenFile](https://developer.apple.com/documentation/foundation/urlerror/code/2883034-cannotopenfile))
+  ///- MacOS ([Official API - URLError.cannotOpenFile](https://developer.apple.com/documentation/foundation/urlerror/code/2883034-cannotopenfile))
+  static final CANNOT_OPEN_FILE =
+      WebResourceErrorType._internalMultiPlatform('CANNOT_OPEN_FILE', () {
+    switch (defaultTargetPlatform) {
+      case TargetPlatform.iOS:
+        return -3001;
+      case TargetPlatform.macOS:
+        return -3001;
+      default:
+        break;
+    }
+    return null;
+  });
+
+  ///A task could not parse a response.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- iOS ([Official API - URLError.cannotParseResponse](https://developer.apple.com/documentation/foundation/urlerror/code/2882919-cannotparseresponse))
+  ///- MacOS ([Official API - URLError.cannotParseResponse](https://developer.apple.com/documentation/foundation/urlerror/code/2882919-cannotparseresponse))
+  static final CANNOT_PARSE_RESPONSE =
+      WebResourceErrorType._internalMultiPlatform('CANNOT_PARSE_RESPONSE', () {
+    switch (defaultTargetPlatform) {
+      case TargetPlatform.iOS:
+        return -1017;
+      case TargetPlatform.macOS:
+        return -1017;
+      default:
+        break;
+    }
+    return null;
+  });
+
+  ///A download task was unable to remove a downloaded file from disk.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- iOS ([Official API - URLError.cannotRemoveFile](https://developer.apple.com/documentation/foundation/urlerror/code/2883202-cannotremovefile))
+  ///- MacOS ([Official API - URLError.cannotRemoveFile](https://developer.apple.com/documentation/foundation/urlerror/code/2883202-cannotremovefile))
+  static final CANNOT_REMOVE_FILE =
+      WebResourceErrorType._internalMultiPlatform('CANNOT_REMOVE_FILE', () {
+    switch (defaultTargetPlatform) {
+      case TargetPlatform.iOS:
+        return -3004;
+      case TargetPlatform.macOS:
+        return -3004;
+      default:
+        break;
+    }
+    return null;
+  });
+
+  ///A download task was unable to write to the downloaded file on disk.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- iOS ([Official API - URLError.cannotWriteToFile](https://developer.apple.com/documentation/foundation/urlerror/code/2883098-cannotwritetofile))
+  ///- MacOS ([Official API - URLError.cannotWriteToFile](https://developer.apple.com/documentation/foundation/urlerror/code/2883098-cannotwritetofile))
+  static final CANNOT_WRITE_TO_FILE =
+      WebResourceErrorType._internalMultiPlatform('CANNOT_WRITE_TO_FILE', () {
+    switch (defaultTargetPlatform) {
+      case TargetPlatform.iOS:
+        return -3003;
+      case TargetPlatform.macOS:
+        return -3003;
+      default:
+        break;
+    }
+    return null;
+  });
+
+  ///A server certificate was rejected.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- iOS ([Official API - URLError.clientCertificateRejected](https://developer.apple.com/documentation/foundation/urlerror/code/2883091-clientcertificaterejected))
+  ///- MacOS ([Official API - URLError.clientCertificateRejected](https://developer.apple.com/documentation/foundation/urlerror/code/2883091-clientcertificaterejected))
+  static final CLIENT_CERTIFICATE_REJECTED =
+      WebResourceErrorType._internalMultiPlatform('CLIENT_CERTIFICATE_REJECTED',
+          () {
+    switch (defaultTargetPlatform) {
+      case TargetPlatform.iOS:
+        return -1205;
+      case TargetPlatform.macOS:
+        return -1205;
+      default:
+        break;
+    }
+    return null;
+  });
+
+  ///A client certificate was required to authenticate an SSL connection during a request.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- iOS ([Official API - URLError.clientCertificateRequired](https://developer.apple.com/documentation/foundation/urlerror/code/2883199-clientcertificaterequired))
+  ///- MacOS ([Official API - URLError.clientCertificateRequired](https://developer.apple.com/documentation/foundation/urlerror/code/2883199-clientcertificaterequired))
+  static final CLIENT_CERTIFICATE_REQUIRED =
+      WebResourceErrorType._internalMultiPlatform('CLIENT_CERTIFICATE_REQUIRED',
+          () {
+    switch (defaultTargetPlatform) {
+      case TargetPlatform.iOS:
+        return -1206;
+      case TargetPlatform.macOS:
+        return -1206;
+      default:
+        break;
+    }
+    return null;
+  });
+
+  ///The length of the resource data exceeds the maximum allowed.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- iOS ([Official API - URLError.dataLengthExceedsMaximum](https://developer.apple.com/documentation/foundation/urlerror/code/2882930-datalengthexceedsmaximum))
+  ///- MacOS ([Official API - URLError.dataLengthExceedsMaximum](https://developer.apple.com/documentation/foundation/urlerror/code/2882930-datalengthexceedsmaximum))
+  static final DATA_LENGTH_EXCEEDS_MAXIMUM =
+      WebResourceErrorType._internalMultiPlatform('DATA_LENGTH_EXCEEDS_MAXIMUM',
+          () {
+    switch (defaultTargetPlatform) {
+      case TargetPlatform.iOS:
+        return -1103;
+      case TargetPlatform.macOS:
+        return -1103;
+      default:
+        break;
+    }
+    return null;
+  });
+
+  ///The cellular network disallowed a connection.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- iOS ([Official API - URLError.dataNotAllowed](https://developer.apple.com/documentation/foundation/urlerror/code/2883217-datanotallowed))
+  ///- MacOS ([Official API - URLError.dataNotAllowed](https://developer.apple.com/documentation/foundation/urlerror/code/2883217-datanotallowed))
+  static final DATA_NOT_ALLOWED =
+      WebResourceErrorType._internalMultiPlatform('DATA_NOT_ALLOWED', () {
+    switch (defaultTargetPlatform) {
+      case TargetPlatform.iOS:
+        return -1020;
+      case TargetPlatform.macOS:
+        return -1020;
+      default:
+        break;
+    }
+    return null;
+  });
+
+  ///A download task failed to decode an encoded file during the download.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- iOS ([Official API - URLError.downloadDecodingFailedMidStream](https://developer.apple.com/documentation/foundation/urlerror/code/2883224-downloaddecodingfailedmidstream))
+  ///- MacOS ([Official API - URLError.downloadDecodingFailedMidStream](https://developer.apple.com/documentation/foundation/urlerror/code/2883224-downloaddecodingfailedmidstream))
+  static final DOWNLOAD_DECODING_FAILED_MID_STREAM =
+      WebResourceErrorType._internalMultiPlatform(
+          'DOWNLOAD_DECODING_FAILED_MID_STREAM', () {
+    switch (defaultTargetPlatform) {
+      case TargetPlatform.iOS:
+        return -3006;
+      case TargetPlatform.macOS:
+        return -3006;
+      default:
+        break;
+    }
+    return null;
+  });
+
+  ///A download task failed to decode an encoded file after downloading.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- iOS ([Official API - URLError.downloadDecodingFailedToComplete](https://developer.apple.com/documentation/foundation/urlerror/code/2882936-downloaddecodingfailedtocomplete))
+  ///- MacOS ([Official API - URLError.downloadDecodingFailedToComplete](https://developer.apple.com/documentation/foundation/urlerror/code/2882936-downloaddecodingfailedtocomplete))
+  static final DOWNLOAD_DECODING_FAILED_TO_COMPLETE =
+      WebResourceErrorType._internalMultiPlatform(
+          'DOWNLOAD_DECODING_FAILED_TO_COMPLETE', () {
+    switch (defaultTargetPlatform) {
+      case TargetPlatform.iOS:
+        return -3007;
+      case TargetPlatform.macOS:
+        return -3007;
+      default:
+        break;
+    }
+    return null;
+  });
+
   ///Failed to perform SSL handshake.
   ///
   ///**Supported Platforms/Implementations**:
@@ -89,15 +498,18 @@ class WebResourceErrorType {
     return null;
   });
 
-  ///Generic file error.
+  ///A request for an FTP file resulted in the server responding that the file is not a plain file, but a directory.
   ///
   ///**Supported Platforms/Implementations**:
-  ///- Android native WebView ([Official API - WebViewClient.ERROR_FILE](https://developer.android.com/reference/android/webkit/WebViewClient#ERROR_FILE))
-  static final GENERIC_FILE_ERROR =
-      WebResourceErrorType._internalMultiPlatform('GENERIC_FILE_ERROR', () {
+  ///- iOS ([Official API - URLError.fileIsDirectory](https://developer.apple.com/documentation/foundation/urlerror/code/2883220-fileisdirectory))
+  ///- MacOS ([Official API - URLError.fileIsDirectory](https://developer.apple.com/documentation/foundation/urlerror/code/2883220-fileisdirectory))
+  static final FILE_IS_DIRECTORY =
+      WebResourceErrorType._internalMultiPlatform('FILE_IS_DIRECTORY', () {
     switch (defaultTargetPlatform) {
-      case TargetPlatform.android:
-        return -13;
+      case TargetPlatform.iOS:
+        return -1101;
+      case TargetPlatform.macOS:
+        return -1101;
       default:
         break;
     }
@@ -125,6 +537,21 @@ class WebResourceErrorType {
     return null;
   });
 
+  ///Generic file error.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- Android native WebView ([Official API - WebViewClient.ERROR_FILE](https://developer.android.com/reference/android/webkit/WebViewClient#ERROR_FILE))
+  static final GENERIC_FILE_ERROR =
+      WebResourceErrorType._internalMultiPlatform('GENERIC_FILE_ERROR', () {
+    switch (defaultTargetPlatform) {
+      case TargetPlatform.android:
+        return -13;
+      default:
+        break;
+    }
+    return null;
+  });
+
   ///Server or proxy hostname lookup failed.
   ///
   ///**Supported Platforms/Implementations**:
@@ -146,6 +573,25 @@ class WebResourceErrorType {
     return null;
   });
 
+  ///The attempted connection required activating a data context while roaming, but international roaming is disabled.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- iOS ([Official API - URLError.internationalRoamingOff](https://developer.apple.com/documentation/foundation/urlerror/code/2883134-internationalroamingoff))
+  ///- MacOS ([Official API - URLError.internationalRoamingOff](https://developer.apple.com/documentation/foundation/urlerror/code/2883134-internationalroamingoff))
+  static final INTERNATIONAL_ROAMING_OFF =
+      WebResourceErrorType._internalMultiPlatform('INTERNATIONAL_ROAMING_OFF',
+          () {
+    switch (defaultTargetPlatform) {
+      case TargetPlatform.iOS:
+        return -1018;
+      case TargetPlatform.macOS:
+        return -1018;
+      default:
+        break;
+    }
+    return null;
+  });
+
   ///Failed to read or write to the server.
   ///
   ///**Supported Platforms/Implementations**:
@@ -154,6 +600,63 @@ class WebResourceErrorType {
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
         return -7;
+      default:
+        break;
+    }
+    return null;
+  });
+
+  ///A client or server connection was severed in the middle of an in-progress load.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- iOS ([Official API - URLError.networkConnectionLost](https://developer.apple.com/documentation/foundation/urlerror/2293759-networkconnectionlost))
+  ///- MacOS ([Official API - URLError.networkConnectionLost](https://developer.apple.com/documentation/foundation/urlerror/2293759-networkconnectionlost))
+  static final NETWORK_CONNECTION_LOST =
+      WebResourceErrorType._internalMultiPlatform('NETWORK_CONNECTION_LOST',
+          () {
+    switch (defaultTargetPlatform) {
+      case TargetPlatform.iOS:
+        return -1005;
+      case TargetPlatform.macOS:
+        return -1005;
+      default:
+        break;
+    }
+    return null;
+  });
+
+  ///A network resource was requested, but an internet connection hasn’t been established and can’t be established automatically.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- iOS ([Official API - URLError.notConnectedToInternet](https://developer.apple.com/documentation/foundation/urlerror/2293104-notconnectedtointernet))
+  ///- MacOS ([Official API - URLError.notConnectedToInternet](https://developer.apple.com/documentation/foundation/urlerror/2293104-notconnectedtointernet))
+  static final NOT_CONNECTED_TO_INTERNET =
+      WebResourceErrorType._internalMultiPlatform('NOT_CONNECTED_TO_INTERNET',
+          () {
+    switch (defaultTargetPlatform) {
+      case TargetPlatform.iOS:
+        return -1009;
+      case TargetPlatform.macOS:
+        return -1009;
+      default:
+        break;
+    }
+    return null;
+  });
+
+  ///A resource couldn’t be read because of insufficient permissions.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- iOS ([Official API - URLError.noPermissionsToReadFile](https://developer.apple.com/documentation/foundation/urlerror/code/2882941-nopermissionstoreadfile))
+  ///- MacOS ([Official API - URLError.noPermissionsToReadFile](https://developer.apple.com/documentation/foundation/urlerror/code/2882941-nopermissionstoreadfile))
+  static final NO_PERMISSIONS_TO_READ_FILE =
+      WebResourceErrorType._internalMultiPlatform('NO_PERMISSIONS_TO_READ_FILE',
+          () {
+    switch (defaultTargetPlatform) {
+      case TargetPlatform.iOS:
+        return -1102;
+      case TargetPlatform.macOS:
+        return -1102;
       default:
         break;
     }
@@ -175,21 +678,152 @@ class WebResourceErrorType {
     return null;
   });
 
-  ///A redirect loop has been detected or the threshold for number of allowable redirects has been exceeded (currently `16` on iOS).
+  ///A redirect was specified by way of server response code, but the server didn’t accompany this code with a redirect URL.
   ///
   ///**Supported Platforms/Implementations**:
-  ///- Android native WebView ([Official API - WebViewClient.ERROR_REDIRECT_LOOP](https://developer.android.com/reference/android/webkit/WebViewClient#ERROR_REDIRECT_LOOP))
-  ///- iOS ([Official API - URLError.httpTooManyRedirects](https://developer.apple.com/documentation/foundation/urlerror/code/2883099-httptoomanyredirects))
-  ///- MacOS ([Official API - URLError.httpTooManyRedirects](https://developer.apple.com/documentation/foundation/urlerror/code/2883099-httptoomanyredirects))
-  static final TOO_MANY_REDIRECTS =
-      WebResourceErrorType._internalMultiPlatform('TOO_MANY_REDIRECTS', () {
+  ///- iOS ([Official API - URLError.redirectToNonExistentLocation](https://developer.apple.com/documentation/foundation/urlerror/2293066-redirecttononexistentlocation))
+  ///- MacOS ([Official API - URLError.redirectToNonExistentLocation](https://developer.apple.com/documentation/foundation/urlerror/2293066-redirecttononexistentlocation))
+  static final REDIRECT_TO_NON_EXISTENT_LOCATION =
+      WebResourceErrorType._internalMultiPlatform(
+          'REDIRECT_TO_NON_EXISTENT_LOCATION', () {
     switch (defaultTargetPlatform) {
-      case TargetPlatform.android:
-        return -9;
       case TargetPlatform.iOS:
-        return -1007;
+        return -1010;
       case TargetPlatform.macOS:
-        return -1007;
+        return -1010;
+      default:
+        break;
+    }
+    return null;
+  });
+
+  ///A body stream is needed but the client did not provide one.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- iOS ([Official API - URLError.requestBodyStreamExhausted](https://developer.apple.com/documentation/foundation/urlerror/code/2883176-requestbodystreamexhausted))
+  ///- MacOS ([Official API - URLError.requestBodyStreamExhausted](https://developer.apple.com/documentation/foundation/urlerror/code/2883176-requestbodystreamexhausted))
+  static final REQUEST_BODY_STREAM_EXHAUSTED =
+      WebResourceErrorType._internalMultiPlatform(
+          'REQUEST_BODY_STREAM_EXHAUSTED', () {
+    switch (defaultTargetPlatform) {
+      case TargetPlatform.iOS:
+        return -1021;
+      case TargetPlatform.macOS:
+        return -1021;
+      default:
+        break;
+    }
+    return null;
+  });
+
+  ///A requested resource couldn't be retrieved.
+  ///This error can indicate a file-not-found situation, or decoding problems that prevent data from being processed correctly.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- iOS ([Official API - URLError.resourceUnavailable](https://developer.apple.com/documentation/foundation/urlerror/2293555-resourceunavailable))
+  ///- MacOS ([Official API - URLError.resourceUnavailable](https://developer.apple.com/documentation/foundation/urlerror/2293555-resourceunavailable))
+  static final RESOURCE_UNAVAILABLE =
+      WebResourceErrorType._internalMultiPlatform('RESOURCE_UNAVAILABLE', () {
+    switch (defaultTargetPlatform) {
+      case TargetPlatform.iOS:
+        return -1008;
+      case TargetPlatform.macOS:
+        return -1008;
+      default:
+        break;
+    }
+    return null;
+  });
+
+  ///An attempt to establish a secure connection failed for reasons that can’t be expressed more specifically.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- iOS ([Official API - URLError.secureConnectionFailed](https://developer.apple.com/documentation/foundation/urlerror/code/2883122-secureconnectionfailed))
+  ///- MacOS ([Official API - URLError.secureConnectionFailed](https://developer.apple.com/documentation/foundation/urlerror/code/2883122-secureconnectionfailed))
+  static final SECURE_CONNECTION_FAILED =
+      WebResourceErrorType._internalMultiPlatform('SECURE_CONNECTION_FAILED',
+          () {
+    switch (defaultTargetPlatform) {
+      case TargetPlatform.iOS:
+        return -1200;
+      case TargetPlatform.macOS:
+        return -1200;
+      default:
+        break;
+    }
+    return null;
+  });
+
+  ///A server certificate had a date which indicates it has expired, or is not yet valid.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- iOS ([Official API - URLError.serverCertificateHasBadDate](https://developer.apple.com/documentation/foundation/urlerror/code/2883088-servercertificatehasbaddate))
+  ///- MacOS ([Official API - URLError.serverCertificateHasBadDate](https://developer.apple.com/documentation/foundation/urlerror/code/2883088-servercertificatehasbaddate))
+  static final SERVER_CERTIFICATE_HAS_BAD_DATE =
+      WebResourceErrorType._internalMultiPlatform(
+          'SERVER_CERTIFICATE_HAS_BAD_DATE', () {
+    switch (defaultTargetPlatform) {
+      case TargetPlatform.iOS:
+        return -1201;
+      case TargetPlatform.macOS:
+        return -1201;
+      default:
+        break;
+    }
+    return null;
+  });
+
+  ///A server certificate was not signed by any root server.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- iOS ([Official API - URLError.serverCertificateHasUnknownRoot](https://developer.apple.com/documentation/foundation/urlerror/code/2883085-servercertificatehasunknownroot))
+  ///- MacOS ([Official API - URLError.serverCertificateHasUnknownRoot](https://developer.apple.com/documentation/foundation/urlerror/code/2883085-servercertificatehasunknownroot))
+  static final SERVER_CERTIFICATE_HAS_UNKNOWN_ROOT =
+      WebResourceErrorType._internalMultiPlatform(
+          'SERVER_CERTIFICATE_HAS_UNKNOWN_ROOT', () {
+    switch (defaultTargetPlatform) {
+      case TargetPlatform.iOS:
+        return -1203;
+      case TargetPlatform.macOS:
+        return -1203;
+      default:
+        break;
+    }
+    return null;
+  });
+
+  ///A server certificate is not yet valid.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- iOS ([Official API - URLError.serverCertificateNotYetValid](https://developer.apple.com/documentation/foundation/urlerror/code/2882991-servercertificatenotyetvalid))
+  ///- MacOS ([Official API - URLError.serverCertificateNotYetValid](https://developer.apple.com/documentation/foundation/urlerror/code/2882991-servercertificatenotyetvalid))
+  static final SERVER_CERTIFICATE_NOT_YET_VALID =
+      WebResourceErrorType._internalMultiPlatform(
+          'SERVER_CERTIFICATE_NOT_YET_VALID', () {
+    switch (defaultTargetPlatform) {
+      case TargetPlatform.iOS:
+        return -1204;
+      case TargetPlatform.macOS:
+        return -1204;
+      default:
+        break;
+    }
+    return null;
+  });
+
+  ///A server certificate was signed by a root server that isn’t trusted.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- iOS ([Official API - URLError.serverCertificateUntrusted](https://developer.apple.com/documentation/foundation/urlerror/code/2882976-servercertificateuntrusted))
+  ///- MacOS ([Official API - URLError.serverCertificateUntrusted](https://developer.apple.com/documentation/foundation/urlerror/code/2882976-servercertificateuntrusted))
+  static final SERVER_CERTIFICATE_UNTRUSTED =
+      WebResourceErrorType._internalMultiPlatform(
+          'SERVER_CERTIFICATE_UNTRUSTED', () {
+    switch (defaultTargetPlatform) {
+      case TargetPlatform.iOS:
+        return -1202;
+      case TargetPlatform.macOS:
+        return -1202;
       default:
         break;
     }
@@ -211,6 +845,27 @@ class WebResourceErrorType {
         return -1001;
       case TargetPlatform.macOS:
         return -1001;
+      default:
+        break;
+    }
+    return null;
+  });
+
+  ///A redirect loop has been detected or the threshold for number of allowable redirects has been exceeded (currently `16` on iOS).
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- Android native WebView ([Official API - WebViewClient.ERROR_REDIRECT_LOOP](https://developer.android.com/reference/android/webkit/WebViewClient#ERROR_REDIRECT_LOOP))
+  ///- iOS ([Official API - URLError.httpTooManyRedirects](https://developer.apple.com/documentation/foundation/urlerror/code/2883099-httptoomanyredirects))
+  ///- MacOS ([Official API - URLError.httpTooManyRedirects](https://developer.apple.com/documentation/foundation/urlerror/code/2883099-httptoomanyredirects))
+  static final TOO_MANY_REDIRECTS =
+      WebResourceErrorType._internalMultiPlatform('TOO_MANY_REDIRECTS', () {
+    switch (defaultTargetPlatform) {
+      case TargetPlatform.android:
+        return -9;
+      case TargetPlatform.iOS:
+        return -1007;
+      case TargetPlatform.macOS:
+        return -1007;
       default:
         break;
     }
@@ -306,112 +961,35 @@ class WebResourceErrorType {
     return null;
   });
 
-  ///An asynchronous load has been canceled.
+  ///User authentication failed on server.
   ///
   ///**Supported Platforms/Implementations**:
-  ///- iOS ([Official API - URLError.cancelled](https://developer.apple.com/documentation/foundation/urlerror/code/2883178-cancelled))
-  ///- MacOS ([Official API - URLError.cancelled](https://developer.apple.com/documentation/foundation/urlerror/code/2883178-cancelled))
-  static final CANCELLED =
-      WebResourceErrorType._internalMultiPlatform('CANCELLED', () {
-    switch (defaultTargetPlatform) {
-      case TargetPlatform.iOS:
-        return -999;
-      case TargetPlatform.macOS:
-        return -999;
-      default:
-        break;
-    }
-    return null;
-  });
-
-  ///A client or server connection was severed in the middle of an in-progress load.
-  ///
-  ///**Supported Platforms/Implementations**:
-  ///- iOS ([Official API - URLError.networkConnectionLost](https://developer.apple.com/documentation/foundation/urlerror/2293759-networkconnectionlost))
-  ///- MacOS ([Official API - URLError.networkConnectionLost](https://developer.apple.com/documentation/foundation/urlerror/2293759-networkconnectionlost))
-  static final NETWORK_CONNECTION_LOST =
-      WebResourceErrorType._internalMultiPlatform('NETWORK_CONNECTION_LOST',
+  ///- Android native WebView ([Official API - WebViewClient.ERROR_AUTHENTICATION](https://developer.android.com/reference/android/webkit/WebViewClient#ERROR_AUTHENTICATION))
+  static final USER_AUTHENTICATION_FAILED =
+      WebResourceErrorType._internalMultiPlatform('USER_AUTHENTICATION_FAILED',
           () {
     switch (defaultTargetPlatform) {
-      case TargetPlatform.iOS:
-        return -1005;
-      case TargetPlatform.macOS:
-        return -1005;
+      case TargetPlatform.android:
+        return -4;
       default:
         break;
     }
     return null;
   });
 
-  ///A requested resource couldn't be retrieved.
-  ///This error can indicate a file-not-found situation, or decoding problems that prevent data from being processed correctly.
+  ///Authentication is required to access a resource.
   ///
   ///**Supported Platforms/Implementations**:
-  ///- iOS ([Official API - URLError.resourceUnavailable](https://developer.apple.com/documentation/foundation/urlerror/2293555-resourceunavailable))
-  ///- MacOS ([Official API - URLError.resourceUnavailable](https://developer.apple.com/documentation/foundation/urlerror/2293555-resourceunavailable))
-  static final RESOURCE_UNAVAILABLE =
-      WebResourceErrorType._internalMultiPlatform('RESOURCE_UNAVAILABLE', () {
-    switch (defaultTargetPlatform) {
-      case TargetPlatform.iOS:
-        return -1008;
-      case TargetPlatform.macOS:
-        return -1008;
-      default:
-        break;
-    }
-    return null;
-  });
-
-  ///A network resource was requested, but an internet connection hasn’t been established and can’t be established automatically.
-  ///
-  ///**Supported Platforms/Implementations**:
-  ///- iOS ([Official API - URLError.notConnectedToInternet](https://developer.apple.com/documentation/foundation/urlerror/2293104-notconnectedtointernet))
-  ///- MacOS ([Official API - URLError.notConnectedToInternet](https://developer.apple.com/documentation/foundation/urlerror/2293104-notconnectedtointernet))
-  static final NOT_CONNECTED_TO_INTERNET =
-      WebResourceErrorType._internalMultiPlatform('NOT_CONNECTED_TO_INTERNET',
-          () {
-    switch (defaultTargetPlatform) {
-      case TargetPlatform.iOS:
-        return -1009;
-      case TargetPlatform.macOS:
-        return -1009;
-      default:
-        break;
-    }
-    return null;
-  });
-
-  ///A redirect was specified by way of server response code, but the server didn’t accompany this code with a redirect URL.
-  ///
-  ///**Supported Platforms/Implementations**:
-  ///- iOS ([Official API - URLError.redirectToNonExistentLocation](https://developer.apple.com/documentation/foundation/urlerror/2293066-redirecttononexistentlocation))
-  ///- MacOS ([Official API - URLError.redirectToNonExistentLocation](https://developer.apple.com/documentation/foundation/urlerror/2293066-redirecttononexistentlocation))
-  static final REDIRECT_TO_NON_EXISTENT_LOCATION =
+  ///- iOS ([Official API - URLError.userAuthenticationRequired](https://developer.apple.com/documentation/foundation/urlerror/2293560-userauthenticationrequired))
+  ///- MacOS ([Official API - URLError.userAuthenticationRequired](https://developer.apple.com/documentation/foundation/urlerror/2293560-userauthenticationrequired))
+  static final USER_AUTHENTICATION_REQUIRED =
       WebResourceErrorType._internalMultiPlatform(
-          'REDIRECT_TO_NON_EXISTENT_LOCATION', () {
+          'USER_AUTHENTICATION_REQUIRED', () {
     switch (defaultTargetPlatform) {
       case TargetPlatform.iOS:
-        return -1010;
+        return -1013;
       case TargetPlatform.macOS:
-        return -1010;
-      default:
-        break;
-    }
-    return null;
-  });
-
-  ///The URL Loading System received bad data from the server.
-  ///
-  ///**Supported Platforms/Implementations**:
-  ///- iOS ([Official API - URLError.badServerResponse](https://developer.apple.com/documentation/foundation/urlerror/2293606-badserverresponse))
-  ///- MacOS ([Official API - URLError.badServerResponse](https://developer.apple.com/documentation/foundation/urlerror/2293606-badserverresponse))
-  static final BAD_SERVER_RESPONSE =
-      WebResourceErrorType._internalMultiPlatform('BAD_SERVER_RESPONSE', () {
-    switch (defaultTargetPlatform) {
-      case TargetPlatform.iOS:
-        return -1011;
-      case TargetPlatform.macOS:
-        return -1011;
+        return -1013;
       default:
         break;
     }
@@ -438,25 +1016,6 @@ class WebResourceErrorType {
     return null;
   });
 
-  ///Authentication is required to access a resource.
-  ///
-  ///**Supported Platforms/Implementations**:
-  ///- iOS ([Official API - URLError.userAuthenticationRequired](https://developer.apple.com/documentation/foundation/urlerror/2293560-userauthenticationrequired))
-  ///- MacOS ([Official API - URLError.userAuthenticationRequired](https://developer.apple.com/documentation/foundation/urlerror/2293560-userauthenticationrequired))
-  static final USER_AUTHENTICATION_REQUIRED =
-      WebResourceErrorType._internalMultiPlatform(
-          'USER_AUTHENTICATION_REQUIRED', () {
-    switch (defaultTargetPlatform) {
-      case TargetPlatform.iOS:
-        return -1013;
-      case TargetPlatform.macOS:
-        return -1013;
-      default:
-        break;
-    }
-    return null;
-  });
-
   ///A server reported that a URL has a non-zero content length, but terminated the network connection gracefully without sending any data.
   ///
   ///**Supported Platforms/Implementations**:
@@ -475,622 +1034,63 @@ class WebResourceErrorType {
     return null;
   });
 
-  ///Content data received during a connection request couldn’t be decoded for a known content encoding.
-  ///
-  ///**Supported Platforms/Implementations**:
-  ///- iOS ([Official API - URLError.cannotDecodeRawData](https://developer.apple.com/documentation/foundation/urlerror/2293573-cannotdecoderawdata))
-  ///- MacOS ([Official API - URLError.cannotDecodeRawData](https://developer.apple.com/documentation/foundation/urlerror/2293573-cannotdecoderawdata))
-  static final CANNOT_DECODE_RAW_DATA =
-      WebResourceErrorType._internalMultiPlatform('CANNOT_DECODE_RAW_DATA', () {
-    switch (defaultTargetPlatform) {
-      case TargetPlatform.iOS:
-        return -1015;
-      case TargetPlatform.macOS:
-        return -1015;
-      default:
-        break;
-    }
-    return null;
-  });
-
-  ///Content data received during a connection request couldn’t be decoded for a known content encoding.
-  ///
-  ///**Supported Platforms/Implementations**:
-  ///- iOS ([Official API - URLError.cannotDecodeContentData](https://developer.apple.com/documentation/foundation/urlerror/2292983-cannotdecodecontentdata))
-  ///- MacOS ([Official API - URLError.cannotDecodeContentData](https://developer.apple.com/documentation/foundation/urlerror/2292983-cannotdecodecontentdata))
-  static final CANNOT_DECODE_CONTENT_DATA =
-      WebResourceErrorType._internalMultiPlatform('CANNOT_DECODE_CONTENT_DATA',
-          () {
-    switch (defaultTargetPlatform) {
-      case TargetPlatform.iOS:
-        return -1016;
-      case TargetPlatform.macOS:
-        return -1016;
-      default:
-        break;
-    }
-    return null;
-  });
-
-  ///A task could not parse a response.
-  ///
-  ///**Supported Platforms/Implementations**:
-  ///- iOS ([Official API - URLError.cannotParseResponse](https://developer.apple.com/documentation/foundation/urlerror/code/2882919-cannotparseresponse))
-  ///- MacOS ([Official API - URLError.cannotParseResponse](https://developer.apple.com/documentation/foundation/urlerror/code/2882919-cannotparseresponse))
-  static final CANNOT_PARSE_RESPONSE =
-      WebResourceErrorType._internalMultiPlatform('CANNOT_PARSE_RESPONSE', () {
-    switch (defaultTargetPlatform) {
-      case TargetPlatform.iOS:
-        return -1017;
-      case TargetPlatform.macOS:
-        return -1017;
-      default:
-        break;
-    }
-    return null;
-  });
-
-  ///App Transport Security disallowed a connection because there is no secure network connection.
-  ///
-  ///**Supported Platforms/Implementations**:
-  ///- iOS ([Official API - URLError.appTransportSecurityRequiresSecureConnection](https://developer.apple.com/documentation/foundation/urlerror/code/2882980-apptransportsecurityrequiressecu))
-  ///- MacOS ([Official API - URLError.appTransportSecurityRequiresSecureConnection](https://developer.apple.com/documentation/foundation/urlerror/code/2882980-apptransportsecurityrequiressecu))
-  static final APP_TRANSPORT_SECURITY_REQUIRES_SECURE_CONNECTION =
-      WebResourceErrorType._internalMultiPlatform(
-          'APP_TRANSPORT_SECURITY_REQUIRES_SECURE_CONNECTION', () {
-    switch (defaultTargetPlatform) {
-      case TargetPlatform.iOS:
-        return -1022;
-      case TargetPlatform.macOS:
-        return -1022;
-      default:
-        break;
-    }
-    return null;
-  });
-
-  ///A request for an FTP file resulted in the server responding that the file is not a plain file, but a directory.
-  ///
-  ///**Supported Platforms/Implementations**:
-  ///- iOS ([Official API - URLError.fileIsDirectory](https://developer.apple.com/documentation/foundation/urlerror/code/2883220-fileisdirectory))
-  ///- MacOS ([Official API - URLError.fileIsDirectory](https://developer.apple.com/documentation/foundation/urlerror/code/2883220-fileisdirectory))
-  static final FILE_IS_DIRECTORY =
-      WebResourceErrorType._internalMultiPlatform('FILE_IS_DIRECTORY', () {
-    switch (defaultTargetPlatform) {
-      case TargetPlatform.iOS:
-        return -1101;
-      case TargetPlatform.macOS:
-        return -1101;
-      default:
-        break;
-    }
-    return null;
-  });
-
-  ///A resource couldn’t be read because of insufficient permissions.
-  ///
-  ///**Supported Platforms/Implementations**:
-  ///- iOS ([Official API - URLError.noPermissionsToReadFile](https://developer.apple.com/documentation/foundation/urlerror/code/2882941-nopermissionstoreadfile))
-  ///- MacOS ([Official API - URLError.noPermissionsToReadFile](https://developer.apple.com/documentation/foundation/urlerror/code/2882941-nopermissionstoreadfile))
-  static final NO_PERMISSIONS_TO_READ_FILE =
-      WebResourceErrorType._internalMultiPlatform('NO_PERMISSIONS_TO_READ_FILE',
-          () {
-    switch (defaultTargetPlatform) {
-      case TargetPlatform.iOS:
-        return -1102;
-      case TargetPlatform.macOS:
-        return -1102;
-      default:
-        break;
-    }
-    return null;
-  });
-
-  ///The length of the resource data exceeds the maximum allowed.
-  ///
-  ///**Supported Platforms/Implementations**:
-  ///- iOS ([Official API - URLError.dataLengthExceedsMaximum](https://developer.apple.com/documentation/foundation/urlerror/code/2882930-datalengthexceedsmaximum))
-  ///- MacOS ([Official API - URLError.dataLengthExceedsMaximum](https://developer.apple.com/documentation/foundation/urlerror/code/2882930-datalengthexceedsmaximum))
-  static final DATA_LENGTH_EXCEEDS_MAXIMUM =
-      WebResourceErrorType._internalMultiPlatform('DATA_LENGTH_EXCEEDS_MAXIMUM',
-          () {
-    switch (defaultTargetPlatform) {
-      case TargetPlatform.iOS:
-        return -1103;
-      case TargetPlatform.macOS:
-        return -1103;
-      default:
-        break;
-    }
-    return null;
-  });
-
-  ///An attempt to establish a secure connection failed for reasons that can’t be expressed more specifically.
-  ///
-  ///**Supported Platforms/Implementations**:
-  ///- iOS ([Official API - URLError.secureConnectionFailed](https://developer.apple.com/documentation/foundation/urlerror/code/2883122-secureconnectionfailed))
-  ///- MacOS ([Official API - URLError.secureConnectionFailed](https://developer.apple.com/documentation/foundation/urlerror/code/2883122-secureconnectionfailed))
-  static final SECURE_CONNECTION_FAILED =
-      WebResourceErrorType._internalMultiPlatform('SECURE_CONNECTION_FAILED',
-          () {
-    switch (defaultTargetPlatform) {
-      case TargetPlatform.iOS:
-        return -1200;
-      case TargetPlatform.macOS:
-        return -1200;
-      default:
-        break;
-    }
-    return null;
-  });
-
-  ///A server certificate had a date which indicates it has expired, or is not yet valid.
-  ///
-  ///**Supported Platforms/Implementations**:
-  ///- iOS ([Official API - URLError.serverCertificateHasBadDate](https://developer.apple.com/documentation/foundation/urlerror/code/2883088-servercertificatehasbaddate))
-  ///- MacOS ([Official API - URLError.serverCertificateHasBadDate](https://developer.apple.com/documentation/foundation/urlerror/code/2883088-servercertificatehasbaddate))
-  static final SERVER_CERTIFICATE_HAS_BAD_DATE =
-      WebResourceErrorType._internalMultiPlatform(
-          'SERVER_CERTIFICATE_HAS_BAD_DATE', () {
-    switch (defaultTargetPlatform) {
-      case TargetPlatform.iOS:
-        return -1201;
-      case TargetPlatform.macOS:
-        return -1201;
-      default:
-        break;
-    }
-    return null;
-  });
-
-  ///A server certificate was signed by a root server that isn’t trusted.
-  ///
-  ///**Supported Platforms/Implementations**:
-  ///- iOS ([Official API - URLError.serverCertificateUntrusted](https://developer.apple.com/documentation/foundation/urlerror/code/2882976-servercertificateuntrusted))
-  ///- MacOS ([Official API - URLError.serverCertificateUntrusted](https://developer.apple.com/documentation/foundation/urlerror/code/2882976-servercertificateuntrusted))
-  static final SERVER_CERTIFICATE_UNTRUSTED =
-      WebResourceErrorType._internalMultiPlatform(
-          'SERVER_CERTIFICATE_UNTRUSTED', () {
-    switch (defaultTargetPlatform) {
-      case TargetPlatform.iOS:
-        return -1202;
-      case TargetPlatform.macOS:
-        return -1202;
-      default:
-        break;
-    }
-    return null;
-  });
-
-  ///A server certificate was not signed by any root server.
-  ///
-  ///**Supported Platforms/Implementations**:
-  ///- iOS ([Official API - URLError.serverCertificateHasUnknownRoot](https://developer.apple.com/documentation/foundation/urlerror/code/2883085-servercertificatehasunknownroot))
-  ///- MacOS ([Official API - URLError.serverCertificateHasUnknownRoot](https://developer.apple.com/documentation/foundation/urlerror/code/2883085-servercertificatehasunknownroot))
-  static final SERVER_CERTIFICATE_HAS_UNKNOWN_ROOT =
-      WebResourceErrorType._internalMultiPlatform(
-          'SERVER_CERTIFICATE_HAS_UNKNOWN_ROOT', () {
-    switch (defaultTargetPlatform) {
-      case TargetPlatform.iOS:
-        return -1203;
-      case TargetPlatform.macOS:
-        return -1203;
-      default:
-        break;
-    }
-    return null;
-  });
-
-  ///A server certificate is not yet valid.
-  ///
-  ///**Supported Platforms/Implementations**:
-  ///- iOS ([Official API - URLError.serverCertificateNotYetValid](https://developer.apple.com/documentation/foundation/urlerror/code/2882991-servercertificatenotyetvalid))
-  ///- MacOS ([Official API - URLError.serverCertificateNotYetValid](https://developer.apple.com/documentation/foundation/urlerror/code/2882991-servercertificatenotyetvalid))
-  static final SERVER_CERTIFICATE_NOT_YET_VALID =
-      WebResourceErrorType._internalMultiPlatform(
-          'SERVER_CERTIFICATE_NOT_YET_VALID', () {
-    switch (defaultTargetPlatform) {
-      case TargetPlatform.iOS:
-        return -1204;
-      case TargetPlatform.macOS:
-        return -1204;
-      default:
-        break;
-    }
-    return null;
-  });
-
-  ///A server certificate was rejected.
-  ///
-  ///**Supported Platforms/Implementations**:
-  ///- iOS ([Official API - URLError.clientCertificateRejected](https://developer.apple.com/documentation/foundation/urlerror/code/2883091-clientcertificaterejected))
-  ///- MacOS ([Official API - URLError.clientCertificateRejected](https://developer.apple.com/documentation/foundation/urlerror/code/2883091-clientcertificaterejected))
-  static final CLIENT_CERTIFICATE_REJECTED =
-      WebResourceErrorType._internalMultiPlatform('CLIENT_CERTIFICATE_REJECTED',
-          () {
-    switch (defaultTargetPlatform) {
-      case TargetPlatform.iOS:
-        return -1205;
-      case TargetPlatform.macOS:
-        return -1205;
-      default:
-        break;
-    }
-    return null;
-  });
-
-  ///A client certificate was required to authenticate an SSL connection during a request.
-  ///
-  ///**Supported Platforms/Implementations**:
-  ///- iOS ([Official API - URLError.clientCertificateRequired](https://developer.apple.com/documentation/foundation/urlerror/code/2883199-clientcertificaterequired))
-  ///- MacOS ([Official API - URLError.clientCertificateRequired](https://developer.apple.com/documentation/foundation/urlerror/code/2883199-clientcertificaterequired))
-  static final CLIENT_CERTIFICATE_REQUIRED =
-      WebResourceErrorType._internalMultiPlatform('CLIENT_CERTIFICATE_REQUIRED',
-          () {
-    switch (defaultTargetPlatform) {
-      case TargetPlatform.iOS:
-        return -1206;
-      case TargetPlatform.macOS:
-        return -1206;
-      default:
-        break;
-    }
-    return null;
-  });
-
-  ///A request to load an item only from the cache could not be satisfied.
-  ///
-  ///**Supported Platforms/Implementations**:
-  ///- iOS ([Official API - URLError.cannotLoadFromNetwork](https://developer.apple.com/documentation/foundation/urlerror/code/2882968-cannotloadfromnetwork))
-  ///- MacOS ([Official API - URLError.cannotLoadFromNetwork](https://developer.apple.com/documentation/foundation/urlerror/code/2882968-cannotloadfromnetwork))
-  static final CANNOT_LOAD_FROM_NETWORK =
-      WebResourceErrorType._internalMultiPlatform('CANNOT_LOAD_FROM_NETWORK',
-          () {
-    switch (defaultTargetPlatform) {
-      case TargetPlatform.iOS:
-        return -2000;
-      case TargetPlatform.macOS:
-        return -2000;
-      default:
-        break;
-    }
-    return null;
-  });
-
-  ///A download task couldn’t create the downloaded file on disk because of an I/O failure.
-  ///
-  ///**Supported Platforms/Implementations**:
-  ///- iOS ([Official API - URLError.cannotCreateFile](https://developer.apple.com/documentation/foundation/urlerror/code/2883204-cannotcreatefile))
-  ///- MacOS ([Official API - URLError.cannotCreateFile](https://developer.apple.com/documentation/foundation/urlerror/code/2883204-cannotcreatefile))
-  static final CANNOT_CREATE_FILE =
-      WebResourceErrorType._internalMultiPlatform('CANNOT_CREATE_FILE', () {
-    switch (defaultTargetPlatform) {
-      case TargetPlatform.iOS:
-        return -3000;
-      case TargetPlatform.macOS:
-        return -3000;
-      default:
-        break;
-    }
-    return null;
-  });
-
-  ///A download task was unable to open the downloaded file on disk.
-  ///
-  ///**Supported Platforms/Implementations**:
-  ///- iOS ([Official API - URLError.cannotOpenFile](https://developer.apple.com/documentation/foundation/urlerror/code/2883034-cannotopenfile))
-  ///- MacOS ([Official API - URLError.cannotOpenFile](https://developer.apple.com/documentation/foundation/urlerror/code/2883034-cannotopenfile))
-  static final CANNOT_OPEN_FILE =
-      WebResourceErrorType._internalMultiPlatform('CANNOT_OPEN_FILE', () {
-    switch (defaultTargetPlatform) {
-      case TargetPlatform.iOS:
-        return -3001;
-      case TargetPlatform.macOS:
-        return -3001;
-      default:
-        break;
-    }
-    return null;
-  });
-
-  ///A download task couldn’t close the downloaded file on disk.
-  ///
-  ///**Supported Platforms/Implementations**:
-  ///- iOS ([Official API - URLError.cannotCloseFile](https://developer.apple.com/documentation/foundation/urlerror/code/2883215-cannotclosefile))
-  ///- MacOS ([Official API - URLError.cannotCloseFile](https://developer.apple.com/documentation/foundation/urlerror/code/2883215-cannotclosefile))
-  static final CANNOT_CLOSE_FILE =
-      WebResourceErrorType._internalMultiPlatform('CANNOT_CLOSE_FILE', () {
-    switch (defaultTargetPlatform) {
-      case TargetPlatform.iOS:
-        return -3002;
-      case TargetPlatform.macOS:
-        return -3002;
-      default:
-        break;
-    }
-    return null;
-  });
-
-  ///A download task was unable to write to the downloaded file on disk.
-  ///
-  ///**Supported Platforms/Implementations**:
-  ///- iOS ([Official API - URLError.cannotWriteToFile](https://developer.apple.com/documentation/foundation/urlerror/code/2883098-cannotwritetofile))
-  ///- MacOS ([Official API - URLError.cannotWriteToFile](https://developer.apple.com/documentation/foundation/urlerror/code/2883098-cannotwritetofile))
-  static final CANNOT_WRITE_TO_FILE =
-      WebResourceErrorType._internalMultiPlatform('CANNOT_WRITE_TO_FILE', () {
-    switch (defaultTargetPlatform) {
-      case TargetPlatform.iOS:
-        return -3003;
-      case TargetPlatform.macOS:
-        return -3003;
-      default:
-        break;
-    }
-    return null;
-  });
-
-  ///A download task was unable to remove a downloaded file from disk.
-  ///
-  ///**Supported Platforms/Implementations**:
-  ///- iOS ([Official API - URLError.cannotRemoveFile](https://developer.apple.com/documentation/foundation/urlerror/code/2883202-cannotremovefile))
-  ///- MacOS ([Official API - URLError.cannotRemoveFile](https://developer.apple.com/documentation/foundation/urlerror/code/2883202-cannotremovefile))
-  static final CANNOT_REMOVE_FILE =
-      WebResourceErrorType._internalMultiPlatform('CANNOT_REMOVE_FILE', () {
-    switch (defaultTargetPlatform) {
-      case TargetPlatform.iOS:
-        return -3004;
-      case TargetPlatform.macOS:
-        return -3004;
-      default:
-        break;
-    }
-    return null;
-  });
-
-  ///A download task was unable to move a downloaded file on disk.
-  ///
-  ///**Supported Platforms/Implementations**:
-  ///- iOS ([Official API - URLError.cannotMoveFile](https://developer.apple.com/documentation/foundation/urlerror/code/2883180-cannotmovefile))
-  ///- MacOS ([Official API - URLError.cannotMoveFile](https://developer.apple.com/documentation/foundation/urlerror/code/2883180-cannotmovefile))
-  static final CANNOT_MOVE_FILE =
-      WebResourceErrorType._internalMultiPlatform('CANNOT_MOVE_FILE', () {
-    switch (defaultTargetPlatform) {
-      case TargetPlatform.iOS:
-        return -3005;
-      case TargetPlatform.macOS:
-        return -3005;
-      default:
-        break;
-    }
-    return null;
-  });
-
-  ///A download task failed to decode an encoded file during the download.
-  ///
-  ///**Supported Platforms/Implementations**:
-  ///- iOS ([Official API - URLError.downloadDecodingFailedMidStream](https://developer.apple.com/documentation/foundation/urlerror/code/2883224-downloaddecodingfailedmidstream))
-  ///- MacOS ([Official API - URLError.downloadDecodingFailedMidStream](https://developer.apple.com/documentation/foundation/urlerror/code/2883224-downloaddecodingfailedmidstream))
-  static final DOWNLOAD_DECODING_FAILED_MID_STREAM =
-      WebResourceErrorType._internalMultiPlatform(
-          'DOWNLOAD_DECODING_FAILED_MID_STREAM', () {
-    switch (defaultTargetPlatform) {
-      case TargetPlatform.iOS:
-        return -3006;
-      case TargetPlatform.macOS:
-        return -3006;
-      default:
-        break;
-    }
-    return null;
-  });
-
-  ///A download task failed to decode an encoded file after downloading.
-  ///
-  ///**Supported Platforms/Implementations**:
-  ///- iOS ([Official API - URLError.downloadDecodingFailedToComplete](https://developer.apple.com/documentation/foundation/urlerror/code/2882936-downloaddecodingfailedtocomplete))
-  ///- MacOS ([Official API - URLError.downloadDecodingFailedToComplete](https://developer.apple.com/documentation/foundation/urlerror/code/2882936-downloaddecodingfailedtocomplete))
-  static final DOWNLOAD_DECODING_FAILED_TO_COMPLETE =
-      WebResourceErrorType._internalMultiPlatform(
-          'DOWNLOAD_DECODING_FAILED_TO_COMPLETE', () {
-    switch (defaultTargetPlatform) {
-      case TargetPlatform.iOS:
-        return -3007;
-      case TargetPlatform.macOS:
-        return -3007;
-      default:
-        break;
-    }
-    return null;
-  });
-
-  ///The attempted connection required activating a data context while roaming, but international roaming is disabled.
-  ///
-  ///**Supported Platforms/Implementations**:
-  ///- iOS ([Official API - URLError.internationalRoamingOff](https://developer.apple.com/documentation/foundation/urlerror/code/2883134-internationalroamingoff))
-  ///- MacOS ([Official API - URLError.internationalRoamingOff](https://developer.apple.com/documentation/foundation/urlerror/code/2883134-internationalroamingoff))
-  static final INTERNATIONAL_ROAMING_OFF =
-      WebResourceErrorType._internalMultiPlatform('INTERNATIONAL_ROAMING_OFF',
-          () {
-    switch (defaultTargetPlatform) {
-      case TargetPlatform.iOS:
-        return -1018;
-      case TargetPlatform.macOS:
-        return -1018;
-      default:
-        break;
-    }
-    return null;
-  });
-
-  ///A connection was attempted while a phone call is active on a network that does not support simultaneous phone and data communication (EDGE or GPRS).
-  ///
-  ///**Supported Platforms/Implementations**:
-  ///- iOS ([Official API - URLError.callIsActive](https://developer.apple.com/documentation/foundation/urlerror/code/2883170-callisactive))
-  ///- MacOS ([Official API - URLError.callIsActive](https://developer.apple.com/documentation/foundation/urlerror/code/2883170-callisactive))
-  static final CALL_IS_ACTIVE =
-      WebResourceErrorType._internalMultiPlatform('CALL_IS_ACTIVE', () {
-    switch (defaultTargetPlatform) {
-      case TargetPlatform.iOS:
-        return -1019;
-      case TargetPlatform.macOS:
-        return -1019;
-      default:
-        break;
-    }
-    return null;
-  });
-
-  ///The cellular network disallowed a connection.
-  ///
-  ///**Supported Platforms/Implementations**:
-  ///- iOS ([Official API - URLError.dataNotAllowed](https://developer.apple.com/documentation/foundation/urlerror/code/2883217-datanotallowed))
-  ///- MacOS ([Official API - URLError.dataNotAllowed](https://developer.apple.com/documentation/foundation/urlerror/code/2883217-datanotallowed))
-  static final DATA_NOT_ALLOWED =
-      WebResourceErrorType._internalMultiPlatform('DATA_NOT_ALLOWED', () {
-    switch (defaultTargetPlatform) {
-      case TargetPlatform.iOS:
-        return -1020;
-      case TargetPlatform.macOS:
-        return -1020;
-      default:
-        break;
-    }
-    return null;
-  });
-
-  ///A body stream is needed but the client did not provide one.
-  ///
-  ///**Supported Platforms/Implementations**:
-  ///- iOS ([Official API - URLError.requestBodyStreamExhausted](https://developer.apple.com/documentation/foundation/urlerror/code/2883176-requestbodystreamexhausted))
-  ///- MacOS ([Official API - URLError.requestBodyStreamExhausted](https://developer.apple.com/documentation/foundation/urlerror/code/2883176-requestbodystreamexhausted))
-  static final REQUEST_BODY_STREAM_EXHAUSTED =
-      WebResourceErrorType._internalMultiPlatform(
-          'REQUEST_BODY_STREAM_EXHAUSTED', () {
-    switch (defaultTargetPlatform) {
-      case TargetPlatform.iOS:
-        return -1021;
-      case TargetPlatform.macOS:
-        return -1021;
-      default:
-        break;
-    }
-    return null;
-  });
-
-  ///The shared container identifier of the URL session configuration is needed but has not been set.
-  ///
-  ///**Supported Platforms/Implementations**:
-  ///- iOS ([Official API - URLError.backgroundSessionRequiresSharedContainer](https://developer.apple.com/documentation/foundation/urlerror/code/2883169-backgroundsessionrequiressharedc))
-  ///- MacOS ([Official API - URLError.backgroundSessionRequiresSharedContainer](https://developer.apple.com/documentation/foundation/urlerror/code/2883169-backgroundsessionrequiressharedc))
-  static final BACKGROUND_SESSION_REQUIRES_SHARED_CONTAINER =
-      WebResourceErrorType._internalMultiPlatform(
-          'BACKGROUND_SESSION_REQUIRES_SHARED_CONTAINER', () {
-    switch (defaultTargetPlatform) {
-      case TargetPlatform.iOS:
-        return -995;
-      case TargetPlatform.macOS:
-        return -995;
-      default:
-        break;
-    }
-    return null;
-  });
-
-  ///An app or app extension attempted to connect to a background session that is already connected to a process.
-  ///
-  ///**Supported Platforms/Implementations**:
-  ///- iOS ([Official API - URLError.backgroundSessionInUseByAnotherProcess](https://developer.apple.com/documentation/foundation/urlerror/code/2882923-backgroundsessioninusebyanotherp))
-  ///- MacOS ([Official API - URLError.backgroundSessionInUseByAnotherProcess](https://developer.apple.com/documentation/foundation/urlerror/code/2882923-backgroundsessioninusebyanotherp))
-  static final BACKGROUND_SESSION_IN_USE_BY_ANOTHER_PROCESS =
-      WebResourceErrorType._internalMultiPlatform(
-          'BACKGROUND_SESSION_IN_USE_BY_ANOTHER_PROCESS', () {
-    switch (defaultTargetPlatform) {
-      case TargetPlatform.iOS:
-        return -996;
-      case TargetPlatform.macOS:
-        return -996;
-      default:
-        break;
-    }
-    return null;
-  });
-
-  ///The app is suspended or exits while a background data task is processing.
-  ///
-  ///**Supported Platforms/Implementations**:
-  ///- iOS ([Official API - URLError.backgroundSessionWasDisconnected](https://developer.apple.com/documentation/foundation/urlerror/code/2883075-backgroundsessionwasdisconnected))
-  ///- MacOS ([Official API - URLError.backgroundSessionWasDisconnected](https://developer.apple.com/documentation/foundation/urlerror/code/2883075-backgroundsessionwasdisconnected))
-  static final BACKGROUND_SESSION_WAS_DISCONNECTED =
-      WebResourceErrorType._internalMultiPlatform(
-          'BACKGROUND_SESSION_WAS_DISCONNECTED', () {
-    switch (defaultTargetPlatform) {
-      case TargetPlatform.iOS:
-        return -997;
-      case TargetPlatform.macOS:
-        return -997;
-      default:
-        break;
-    }
-    return null;
-  });
-
   ///Set of all values of [WebResourceErrorType].
   static final Set<WebResourceErrorType> values = [
-    WebResourceErrorType.USER_AUTHENTICATION_FAILED,
+    WebResourceErrorType.APP_TRANSPORT_SECURITY_REQUIRES_SECURE_CONNECTION,
+    WebResourceErrorType.BACKGROUND_SESSION_IN_USE_BY_ANOTHER_PROCESS,
+    WebResourceErrorType.BACKGROUND_SESSION_REQUIRES_SHARED_CONTAINER,
+    WebResourceErrorType.BACKGROUND_SESSION_WAS_DISCONNECTED,
+    WebResourceErrorType.BAD_SERVER_RESPONSE,
     WebResourceErrorType.BAD_URL,
+    WebResourceErrorType.CALL_IS_ACTIVE,
+    WebResourceErrorType.CANCELLED,
+    WebResourceErrorType.CANNOT_CLOSE_FILE,
     WebResourceErrorType.CANNOT_CONNECT_TO_HOST,
+    WebResourceErrorType.CANNOT_CREATE_FILE,
+    WebResourceErrorType.CANNOT_DECODE_CONTENT_DATA,
+    WebResourceErrorType.CANNOT_DECODE_RAW_DATA,
+    WebResourceErrorType.CANNOT_LOAD_FROM_NETWORK,
+    WebResourceErrorType.CANNOT_MOVE_FILE,
+    WebResourceErrorType.CANNOT_OPEN_FILE,
+    WebResourceErrorType.CANNOT_PARSE_RESPONSE,
+    WebResourceErrorType.CANNOT_REMOVE_FILE,
+    WebResourceErrorType.CANNOT_WRITE_TO_FILE,
+    WebResourceErrorType.CLIENT_CERTIFICATE_REJECTED,
+    WebResourceErrorType.CLIENT_CERTIFICATE_REQUIRED,
+    WebResourceErrorType.DATA_LENGTH_EXCEEDS_MAXIMUM,
+    WebResourceErrorType.DATA_NOT_ALLOWED,
+    WebResourceErrorType.DOWNLOAD_DECODING_FAILED_MID_STREAM,
+    WebResourceErrorType.DOWNLOAD_DECODING_FAILED_TO_COMPLETE,
     WebResourceErrorType.FAILED_SSL_HANDSHAKE,
-    WebResourceErrorType.GENERIC_FILE_ERROR,
+    WebResourceErrorType.FILE_IS_DIRECTORY,
     WebResourceErrorType.FILE_NOT_FOUND,
+    WebResourceErrorType.GENERIC_FILE_ERROR,
     WebResourceErrorType.HOST_LOOKUP,
+    WebResourceErrorType.INTERNATIONAL_ROAMING_OFF,
     WebResourceErrorType.IO,
+    WebResourceErrorType.NETWORK_CONNECTION_LOST,
+    WebResourceErrorType.NOT_CONNECTED_TO_INTERNET,
+    WebResourceErrorType.NO_PERMISSIONS_TO_READ_FILE,
     WebResourceErrorType.PROXY_AUTHENTICATION,
-    WebResourceErrorType.TOO_MANY_REDIRECTS,
+    WebResourceErrorType.REDIRECT_TO_NON_EXISTENT_LOCATION,
+    WebResourceErrorType.REQUEST_BODY_STREAM_EXHAUSTED,
+    WebResourceErrorType.RESOURCE_UNAVAILABLE,
+    WebResourceErrorType.SECURE_CONNECTION_FAILED,
+    WebResourceErrorType.SERVER_CERTIFICATE_HAS_BAD_DATE,
+    WebResourceErrorType.SERVER_CERTIFICATE_HAS_UNKNOWN_ROOT,
+    WebResourceErrorType.SERVER_CERTIFICATE_NOT_YET_VALID,
+    WebResourceErrorType.SERVER_CERTIFICATE_UNTRUSTED,
     WebResourceErrorType.TIMEOUT,
+    WebResourceErrorType.TOO_MANY_REDIRECTS,
     WebResourceErrorType.TOO_MANY_REQUESTS,
     WebResourceErrorType.UNKNOWN,
     WebResourceErrorType.UNSAFE_RESOURCE,
     WebResourceErrorType.UNSUPPORTED_AUTH_SCHEME,
     WebResourceErrorType.UNSUPPORTED_SCHEME,
-    WebResourceErrorType.CANCELLED,
-    WebResourceErrorType.NETWORK_CONNECTION_LOST,
-    WebResourceErrorType.RESOURCE_UNAVAILABLE,
-    WebResourceErrorType.NOT_CONNECTED_TO_INTERNET,
-    WebResourceErrorType.REDIRECT_TO_NON_EXISTENT_LOCATION,
-    WebResourceErrorType.BAD_SERVER_RESPONSE,
-    WebResourceErrorType.USER_CANCELLED_AUTHENTICATION,
+    WebResourceErrorType.USER_AUTHENTICATION_FAILED,
     WebResourceErrorType.USER_AUTHENTICATION_REQUIRED,
+    WebResourceErrorType.USER_CANCELLED_AUTHENTICATION,
     WebResourceErrorType.ZERO_BYTE_RESOURCE,
-    WebResourceErrorType.CANNOT_DECODE_RAW_DATA,
-    WebResourceErrorType.CANNOT_DECODE_CONTENT_DATA,
-    WebResourceErrorType.CANNOT_PARSE_RESPONSE,
-    WebResourceErrorType.APP_TRANSPORT_SECURITY_REQUIRES_SECURE_CONNECTION,
-    WebResourceErrorType.FILE_IS_DIRECTORY,
-    WebResourceErrorType.NO_PERMISSIONS_TO_READ_FILE,
-    WebResourceErrorType.DATA_LENGTH_EXCEEDS_MAXIMUM,
-    WebResourceErrorType.SECURE_CONNECTION_FAILED,
-    WebResourceErrorType.SERVER_CERTIFICATE_HAS_BAD_DATE,
-    WebResourceErrorType.SERVER_CERTIFICATE_UNTRUSTED,
-    WebResourceErrorType.SERVER_CERTIFICATE_HAS_UNKNOWN_ROOT,
-    WebResourceErrorType.SERVER_CERTIFICATE_NOT_YET_VALID,
-    WebResourceErrorType.CLIENT_CERTIFICATE_REJECTED,
-    WebResourceErrorType.CLIENT_CERTIFICATE_REQUIRED,
-    WebResourceErrorType.CANNOT_LOAD_FROM_NETWORK,
-    WebResourceErrorType.CANNOT_CREATE_FILE,
-    WebResourceErrorType.CANNOT_OPEN_FILE,
-    WebResourceErrorType.CANNOT_CLOSE_FILE,
-    WebResourceErrorType.CANNOT_WRITE_TO_FILE,
-    WebResourceErrorType.CANNOT_REMOVE_FILE,
-    WebResourceErrorType.CANNOT_MOVE_FILE,
-    WebResourceErrorType.DOWNLOAD_DECODING_FAILED_MID_STREAM,
-    WebResourceErrorType.DOWNLOAD_DECODING_FAILED_TO_COMPLETE,
-    WebResourceErrorType.INTERNATIONAL_ROAMING_OFF,
-    WebResourceErrorType.CALL_IS_ACTIVE,
-    WebResourceErrorType.DATA_NOT_ALLOWED,
-    WebResourceErrorType.REQUEST_BODY_STREAM_EXHAUSTED,
-    WebResourceErrorType.BACKGROUND_SESSION_REQUIRES_SHARED_CONTAINER,
-    WebResourceErrorType.BACKGROUND_SESSION_IN_USE_BY_ANOTHER_PROCESS,
-    WebResourceErrorType.BACKGROUND_SESSION_WAS_DISCONNECTED,
   ].toSet();
 
   ///Gets a possible [WebResourceErrorType] instance from [String] value.

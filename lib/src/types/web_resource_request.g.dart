@@ -8,19 +8,6 @@ part of 'web_resource_request.dart';
 
 ///Class representing a resource request of the [WebView].
 class WebResourceRequest {
-  ///The URL for which the resource request was made.
-  WebUri url;
-
-  ///The headers associated with the request.
-  ///
-  ///**NOTE**: available on Android 21+. For Android < 21 it will be always `null`.
-  Map<String, String>? headers;
-
-  ///The method associated with the request, for example `GET`.
-  ///
-  ///**NOTE**: available on Android 21+. For Android < 21 it will be always "GET".
-  String? method;
-
   ///Gets whether a gesture (such as a click) was associated with the request.
   ///For security reasons in certain situations this method may return `false` even though
   ///the sequence of events which caused the request to be created was initiated by a user
@@ -28,6 +15,11 @@ class WebResourceRequest {
   ///
   ///**NOTE**: available on Android 21+. For Android < 21 it will be always `false`.
   bool? hasGesture;
+
+  ///The headers associated with the request.
+  ///
+  ///**NOTE**: available on Android 21+. For Android < 21 it will be always `null`.
+  Map<String, String>? headers;
 
   ///Whether the request was made in order to fetch the main frame's document.
   ///
@@ -38,13 +30,21 @@ class WebResourceRequest {
   ///
   ///**NOTE**: available on Android 21+. For Android < 21 it will be always `false`.
   bool? isRedirect;
+
+  ///The method associated with the request, for example `GET`.
+  ///
+  ///**NOTE**: available on Android 21+. For Android < 21 it will be always "GET".
+  String? method;
+
+  ///The URL for which the resource request was made.
+  WebUri url;
   WebResourceRequest(
-      {required this.url,
+      {this.hasGesture,
       this.headers,
-      this.method,
-      this.hasGesture,
       this.isForMainFrame,
-      this.isRedirect});
+      this.isRedirect,
+      this.method,
+      required this.url});
 
   ///Gets a possible [WebResourceRequest] instance from a [Map] value.
   static WebResourceRequest? fromMap(Map<String, dynamic>? map) {
@@ -52,12 +52,12 @@ class WebResourceRequest {
       return null;
     }
     final instance = WebResourceRequest(
-      url: WebUri(map['url']),
-      headers: map['headers']?.cast<String, String>(),
-      method: map['method'],
       hasGesture: map['hasGesture'],
+      headers: map['headers']?.cast<String, String>(),
       isForMainFrame: map['isForMainFrame'],
       isRedirect: map['isRedirect'],
+      method: map['method'],
+      url: WebUri(map['url']),
     );
     return instance;
   }
@@ -65,12 +65,12 @@ class WebResourceRequest {
   ///Converts instance to a map.
   Map<String, dynamic> toMap() {
     return {
-      "url": url.toString(),
-      "headers": headers,
-      "method": method,
       "hasGesture": hasGesture,
+      "headers": headers,
       "isForMainFrame": isForMainFrame,
       "isRedirect": isRedirect,
+      "method": method,
+      "url": url.toString(),
     };
   }
 
@@ -81,6 +81,6 @@ class WebResourceRequest {
 
   @override
   String toString() {
-    return 'WebResourceRequest{url: $url, headers: $headers, method: $method, hasGesture: $hasGesture, isForMainFrame: $isForMainFrame, isRedirect: $isRedirect}';
+    return 'WebResourceRequest{hasGesture: $hasGesture, headers: $headers, isForMainFrame: $isForMainFrame, isRedirect: $isRedirect, method: $method, url: $url}';
   }
 }

@@ -8,12 +8,12 @@ part of 'web_history.dart';
 
 ///This class contains a snapshot of the current back/forward list for a [WebView].
 class WebHistory {
-  ///List of all [WebHistoryItem]s.
-  List<WebHistoryItem>? list;
-
   ///Index of the current [WebHistoryItem].
   int? currentIndex;
-  WebHistory({this.list, this.currentIndex});
+
+  ///List of all [WebHistoryItem]s.
+  List<WebHistoryItem>? list;
+  WebHistory({this.currentIndex, this.list});
 
   ///Gets a possible [WebHistory] instance from a [Map] value.
   static WebHistory? fromMap(Map<String, dynamic>? map) {
@@ -21,11 +21,11 @@ class WebHistory {
       return null;
     }
     final instance = WebHistory(
+      currentIndex: map['currentIndex'],
       list: map['list'] != null
           ? List<WebHistoryItem>.from(map['list']
               .map((e) => WebHistoryItem.fromMap(e?.cast<String, dynamic>())!))
           : null,
-      currentIndex: map['currentIndex'],
     );
     return instance;
   }
@@ -33,8 +33,8 @@ class WebHistory {
   ///Converts instance to a map.
   Map<String, dynamic> toMap() {
     return {
-      "list": list?.map((e) => e.toMap()).toList(),
       "currentIndex": currentIndex,
+      "list": list?.map((e) => e.toMap()).toList(),
     };
   }
 
@@ -45,6 +45,6 @@ class WebHistory {
 
   @override
   String toString() {
-    return 'WebHistory{list: $list, currentIndex: $currentIndex}';
+    return 'WebHistory{currentIndex: $currentIndex, list: $list}';
   }
 }

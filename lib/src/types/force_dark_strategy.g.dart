@@ -16,6 +16,15 @@ class ForceDarkStrategy {
           int value, Function nativeValue) =>
       ForceDarkStrategy._internal(value, nativeValue());
 
+  ///In this mode [WebView] content will be darkened by a user agent unless web page supports dark theme.
+  ///[WebView] determines whether web pages supports dark theme by the presence of `color-scheme` metadata containing `"dark"` value.
+  ///For example, `<meta name="color-scheme" content="dark light">`.
+  ///If the metadata is not presented [WebView] content will be darkened by a user agent and `prefers-color-scheme` media query will evaluate to light.
+  ///
+  ///See [specification](https://drafts.csswg.org/css-color-adjust-1/) for more information.
+  static const PREFER_WEB_THEME_OVER_USER_AGENT_DARKENING =
+      ForceDarkStrategy._internal(2, 2);
+
   ///In this mode [WebView] content will be darkened by a user agent and it will ignore the web page's dark theme if it exists.
   ///To avoid mixing two different darkening strategies, the `prefers-color-scheme` media query will evaluate to light.
   ///
@@ -28,20 +37,11 @@ class ForceDarkStrategy {
   ///See [specification](https://drafts.csswg.org/css-color-adjust-1/) for more information.
   static const WEB_THEME_DARKENING_ONLY = ForceDarkStrategy._internal(1, 1);
 
-  ///In this mode [WebView] content will be darkened by a user agent unless web page supports dark theme.
-  ///[WebView] determines whether web pages supports dark theme by the presence of `color-scheme` metadata containing `"dark"` value.
-  ///For example, `<meta name="color-scheme" content="dark light">`.
-  ///If the metadata is not presented [WebView] content will be darkened by a user agent and `prefers-color-scheme` media query will evaluate to light.
-  ///
-  ///See [specification](https://drafts.csswg.org/css-color-adjust-1/) for more information.
-  static const PREFER_WEB_THEME_OVER_USER_AGENT_DARKENING =
-      ForceDarkStrategy._internal(2, 2);
-
   ///Set of all values of [ForceDarkStrategy].
   static final Set<ForceDarkStrategy> values = [
+    ForceDarkStrategy.PREFER_WEB_THEME_OVER_USER_AGENT_DARKENING,
     ForceDarkStrategy.USER_AGENT_DARKENING_ONLY,
     ForceDarkStrategy.WEB_THEME_DARKENING_ONLY,
-    ForceDarkStrategy.PREFER_WEB_THEME_OVER_USER_AGENT_DARKENING,
   ].toSet();
 
   ///Gets a possible [ForceDarkStrategy] instance from [int] value.
@@ -85,12 +85,12 @@ class ForceDarkStrategy {
   @override
   String toString() {
     switch (_value) {
+      case 2:
+        return 'PREFER_WEB_THEME_OVER_USER_AGENT_DARKENING';
       case 0:
         return 'USER_AGENT_DARKENING_ONLY';
       case 1:
         return 'WEB_THEME_DARKENING_ONLY';
-      case 2:
-        return 'PREFER_WEB_THEME_OVER_USER_AGENT_DARKENING';
     }
     return _value.toString();
   }

@@ -17,11 +17,11 @@ class NavigationActionPolicy {
           int value, Function nativeValue) =>
       NavigationActionPolicy._internal(value, nativeValue());
 
-  ///Cancel the navigation.
-  static const CANCEL = NavigationActionPolicy._internal(0, 0);
-
   ///Allow the navigation to continue.
   static const ALLOW = NavigationActionPolicy._internal(1, 1);
+
+  ///Cancel the navigation.
+  static const CANCEL = NavigationActionPolicy._internal(0, 0);
 
   ///Turn the navigation into a download.
   ///
@@ -30,8 +30,8 @@ class NavigationActionPolicy {
 
   ///Set of all values of [NavigationActionPolicy].
   static final Set<NavigationActionPolicy> values = [
-    NavigationActionPolicy.CANCEL,
     NavigationActionPolicy.ALLOW,
+    NavigationActionPolicy.CANCEL,
     NavigationActionPolicy.DOWNLOAD,
   ].toSet();
 
@@ -76,10 +76,10 @@ class NavigationActionPolicy {
   @override
   String toString() {
     switch (_value) {
-      case 0:
-        return 'CANCEL';
       case 1:
         return 'ALLOW';
+      case 0:
+        return 'CANCEL';
       case 2:
         return 'DOWNLOAD';
     }

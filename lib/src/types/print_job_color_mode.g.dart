@@ -16,23 +16,6 @@ class PrintJobColorMode {
           int value, Function nativeValue) =>
       PrintJobColorMode._internal(value, nativeValue());
 
-  ///Monochrome color scheme, for example one color is used.
-  ///
-  ///**Supported Platforms/Implementations**:
-  ///- Android native WebView
-  ///- MacOS
-  static final MONOCHROME = PrintJobColorMode._internalMultiPlatform(1, () {
-    switch (defaultTargetPlatform) {
-      case TargetPlatform.android:
-        return 1;
-      case TargetPlatform.macOS:
-        return 'Gray';
-      default:
-        break;
-    }
-    return null;
-  });
-
   ///Color color scheme, for example many colors are used.
   ///
   ///**Supported Platforms/Implementations**:
@@ -50,10 +33,27 @@ class PrintJobColorMode {
     return null;
   });
 
+  ///Monochrome color scheme, for example one color is used.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- Android native WebView
+  ///- MacOS
+  static final MONOCHROME = PrintJobColorMode._internalMultiPlatform(1, () {
+    switch (defaultTargetPlatform) {
+      case TargetPlatform.android:
+        return 1;
+      case TargetPlatform.macOS:
+        return 'Gray';
+      default:
+        break;
+    }
+    return null;
+  });
+
   ///Set of all values of [PrintJobColorMode].
   static final Set<PrintJobColorMode> values = [
-    PrintJobColorMode.MONOCHROME,
     PrintJobColorMode.COLOR,
+    PrintJobColorMode.MONOCHROME,
   ].toSet();
 
   ///Gets a possible [PrintJobColorMode] instance from [int] value.
@@ -97,10 +97,10 @@ class PrintJobColorMode {
   @override
   String toString() {
     switch (_value) {
-      case 1:
-        return 'MONOCHROME';
       case 2:
         return 'COLOR';
+      case 1:
+        return 'MONOCHROME';
     }
     return _value.toString();
   }

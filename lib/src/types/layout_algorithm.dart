@@ -1,7 +1,6 @@
 import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_internal_annotations.dart';
 
 import '../in_app_webview/in_app_webview_settings.dart';
-import '../in_app_webview/android/in_app_webview_options.dart';
 
 part 'layout_algorithm.g.dart';
 
@@ -40,7 +39,7 @@ class AndroidLayoutAlgorithm_ {
   static const NORMAL = const AndroidLayoutAlgorithm_._internal("NORMAL");
 
   ///TEXT_AUTOSIZING boosts font size of paragraphs based on heuristics to make the text readable when viewing a wide-viewport layout in the overview mode.
-  ///It is recommended to enable zoom support [AndroidInAppWebViewOptions.supportZoom] when using this mode.
+  ///It is recommended to enable zoom support [InAppWebViewOptions.supportZoom] when using this mode.
   ///
   ///**NOTE**: available on Android 19+.
   static const TEXT_AUTOSIZING =

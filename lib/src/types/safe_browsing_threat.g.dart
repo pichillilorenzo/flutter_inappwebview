@@ -16,9 +16,12 @@ class SafeBrowsingThreat {
           int value, Function nativeValue) =>
       SafeBrowsingThreat._internal(value, nativeValue());
 
-  ///The resource was blocked for an unknown reason.
-  static const SAFE_BROWSING_THREAT_UNKNOWN =
-      SafeBrowsingThreat._internal(0, 0);
+  ///The resource was blocked because it may trick the user into a billing agreement.
+  ///
+  ///This constant is only used when `targetSdkVersion` is at least Android 29.
+  ///Otherwise, [SAFE_BROWSING_THREAT_UNKNOWN] is used instead.
+  static const SAFE_BROWSING_THREAT_BILLING =
+      SafeBrowsingThreat._internal(4, 4);
 
   ///The resource was blocked because it contains malware.
   static const SAFE_BROWSING_THREAT_MALWARE =
@@ -28,24 +31,21 @@ class SafeBrowsingThreat {
   static const SAFE_BROWSING_THREAT_PHISHING =
       SafeBrowsingThreat._internal(2, 2);
 
+  ///The resource was blocked for an unknown reason.
+  static const SAFE_BROWSING_THREAT_UNKNOWN =
+      SafeBrowsingThreat._internal(0, 0);
+
   ///The resource was blocked because it contains unwanted software.
   static const SAFE_BROWSING_THREAT_UNWANTED_SOFTWARE =
       SafeBrowsingThreat._internal(3, 3);
 
-  ///The resource was blocked because it may trick the user into a billing agreement.
-  ///
-  ///This constant is only used when `targetSdkVersion` is at least Android 29.
-  ///Otherwise, [SAFE_BROWSING_THREAT_UNKNOWN] is used instead.
-  static const SAFE_BROWSING_THREAT_BILLING =
-      SafeBrowsingThreat._internal(4, 4);
-
   ///Set of all values of [SafeBrowsingThreat].
   static final Set<SafeBrowsingThreat> values = [
-    SafeBrowsingThreat.SAFE_BROWSING_THREAT_UNKNOWN,
+    SafeBrowsingThreat.SAFE_BROWSING_THREAT_BILLING,
     SafeBrowsingThreat.SAFE_BROWSING_THREAT_MALWARE,
     SafeBrowsingThreat.SAFE_BROWSING_THREAT_PHISHING,
+    SafeBrowsingThreat.SAFE_BROWSING_THREAT_UNKNOWN,
     SafeBrowsingThreat.SAFE_BROWSING_THREAT_UNWANTED_SOFTWARE,
-    SafeBrowsingThreat.SAFE_BROWSING_THREAT_BILLING,
   ].toSet();
 
   ///Gets a possible [SafeBrowsingThreat] instance from [int] value.
@@ -89,16 +89,16 @@ class SafeBrowsingThreat {
   @override
   String toString() {
     switch (_value) {
-      case 0:
-        return 'SAFE_BROWSING_THREAT_UNKNOWN';
+      case 4:
+        return 'SAFE_BROWSING_THREAT_BILLING';
       case 1:
         return 'SAFE_BROWSING_THREAT_MALWARE';
       case 2:
         return 'SAFE_BROWSING_THREAT_PHISHING';
+      case 0:
+        return 'SAFE_BROWSING_THREAT_UNKNOWN';
       case 3:
         return 'SAFE_BROWSING_THREAT_UNWANTED_SOFTWARE';
-      case 4:
-        return 'SAFE_BROWSING_THREAT_BILLING';
     }
     return _value.toString();
   }

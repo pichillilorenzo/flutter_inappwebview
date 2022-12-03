@@ -9,20 +9,11 @@ part of 'http_authentication_challenge.dart';
 ///Class that represents the challenge of the [WebView.onReceivedHttpAuthRequest] event.
 ///It provides all the information about the challenge.
 class HttpAuthenticationChallenge extends URLAuthenticationChallenge {
-  ///A count of previous failed authentication attempts.
-  int previousFailureCount;
-
-  ///The proposed credential for this challenge.
-  ///This method returns `null` if there is no default credential for this challenge.
-  ///If you have previously attempted to authenticate and failed, this method returns the most recent failed credential.
-  ///If the proposed credential is not nil and returns true when you call its hasPassword method, then the credential is ready to use as-is.
-  ///If the proposed credential’s hasPassword method returns false, then the credential provides a default user name,
-  ///and the client must prompt the user for a corresponding password.
-  URLCredential? proposedCredential;
-
-  ///Use [failureResponse] instead.
-  @Deprecated('Use failureResponse instead')
-  IOSURLResponse? iosFailureResponse;
+  ///The error object representing the last authentication failure.
+  ///This value is `null` if the protocol doesn’t use errors to indicate an authentication failure.
+  ///
+  ///**NOTE**: available only on iOS.
+  String? error;
 
   ///The URL response object representing the last authentication failure.
   ///This value is `null` if the protocol doesn’t use responses to indicate an authentication failure.
@@ -34,23 +25,32 @@ class HttpAuthenticationChallenge extends URLAuthenticationChallenge {
   @Deprecated('Use error instead')
   String? iosError;
 
-  ///The error object representing the last authentication failure.
-  ///This value is `null` if the protocol doesn’t use errors to indicate an authentication failure.
-  ///
-  ///**NOTE**: available only on iOS.
-  String? error;
+  ///Use [failureResponse] instead.
+  @Deprecated('Use failureResponse instead')
+  IOSURLResponse? iosFailureResponse;
+
+  ///A count of previous failed authentication attempts.
+  int previousFailureCount;
+
+  ///The proposed credential for this challenge.
+  ///This method returns `null` if there is no default credential for this challenge.
+  ///If you have previously attempted to authenticate and failed, this method returns the most recent failed credential.
+  ///If the proposed credential is not nil and returns true when you call its hasPassword method, then the credential is ready to use as-is.
+  ///If the proposed credential’s hasPassword method returns false, then the credential provides a default user name,
+  ///and the client must prompt the user for a corresponding password.
+  URLCredential? proposedCredential;
   HttpAuthenticationChallenge(
-      {required this.previousFailureCount,
-      this.proposedCredential,
-      @Deprecated('Use failureResponse instead') this.iosFailureResponse,
+      {this.error,
       this.failureResponse,
       @Deprecated('Use error instead') this.iosError,
-      this.error,
+      @Deprecated('Use failureResponse instead') this.iosFailureResponse,
+      required this.previousFailureCount,
+      this.proposedCredential,
       required URLProtectionSpace protectionSpace})
       : super(protectionSpace: protectionSpace) {
+    error = error ?? iosError;
     failureResponse =
         failureResponse ?? URLResponse.fromMap(iosFailureResponse?.toMap());
-    error = error ?? iosError;
   }
 
   ///Gets a possible [HttpAuthenticationChallenge] instance from a [Map] value.
@@ -61,15 +61,15 @@ class HttpAuthenticationChallenge extends URLAuthenticationChallenge {
     final instance = HttpAuthenticationChallenge(
       protectionSpace: URLProtectionSpace.fromMap(
           map['protectionSpace']?.cast<String, dynamic>())!,
-      previousFailureCount: map['previousFailureCount'],
-      proposedCredential: URLCredential.fromMap(
-          map['proposedCredential']?.cast<String, dynamic>()),
-      iosFailureResponse: IOSURLResponse.fromMap(
-          map['failureResponse']?.cast<String, dynamic>()),
+      error: map['error'],
       failureResponse:
           URLResponse.fromMap(map['failureResponse']?.cast<String, dynamic>()),
       iosError: map['error'],
-      error: map['error'],
+      iosFailureResponse: IOSURLResponse.fromMap(
+          map['failureResponse']?.cast<String, dynamic>()),
+      previousFailureCount: map['previousFailureCount'],
+      proposedCredential: URLCredential.fromMap(
+          map['proposedCredential']?.cast<String, dynamic>()),
     );
     return instance;
   }
@@ -78,10 +78,10 @@ class HttpAuthenticationChallenge extends URLAuthenticationChallenge {
   Map<String, dynamic> toMap() {
     return {
       "protectionSpace": protectionSpace.toMap(),
+      "error": error,
+      "failureResponse": failureResponse?.toMap(),
       "previousFailureCount": previousFailureCount,
       "proposedCredential": proposedCredential?.toMap(),
-      "failureResponse": failureResponse?.toMap(),
-      "error": error,
     };
   }
 
@@ -92,6 +92,6 @@ class HttpAuthenticationChallenge extends URLAuthenticationChallenge {
 
   @override
   String toString() {
-    return 'HttpAuthenticationChallenge{protectionSpace: $protectionSpace, previousFailureCount: $previousFailureCount, proposedCredential: $proposedCredential, failureResponse: $failureResponse, error: $error}';
+    return 'HttpAuthenticationChallenge{protectionSpace: $protectionSpace, error: $error, failureResponse: $failureResponse, previousFailureCount: $previousFailureCount, proposedCredential: $proposedCredential}';
   }
 }

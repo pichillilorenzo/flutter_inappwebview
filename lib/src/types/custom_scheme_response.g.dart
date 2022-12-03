@@ -9,18 +9,18 @@ part of 'custom_scheme_response.dart';
 ///Class representing the response returned by the [WebView.onLoadResourceWithCustomScheme] event.
 ///It allows to load a specific resource. The resource data must be encoded to `base64`.
 class CustomSchemeResponse {
-  ///Data enconded to 'base64'.
-  Uint8List data;
+  ///Content-Encoding of the data, such as `utf-8`.
+  String contentEncoding;
 
   ///Content-Type of the data, such as `image/png`.
   String contentType;
 
-  ///Content-Encoding of the data, such as `utf-8`.
-  String contentEncoding;
+  ///Data enconded to 'base64'.
+  Uint8List data;
   CustomSchemeResponse(
-      {required this.data,
+      {this.contentEncoding = 'utf-8',
       required this.contentType,
-      this.contentEncoding = 'utf-8'});
+      required this.data});
 
   ///Gets a possible [CustomSchemeResponse] instance from a [Map] value.
   static CustomSchemeResponse? fromMap(Map<String, dynamic>? map) {
@@ -28,8 +28,8 @@ class CustomSchemeResponse {
       return null;
     }
     final instance = CustomSchemeResponse(
-      data: map['data'],
       contentType: map['contentType'],
+      data: map['data'],
     );
     instance.contentEncoding = map['contentEncoding'];
     return instance;
@@ -38,9 +38,9 @@ class CustomSchemeResponse {
   ///Converts instance to a map.
   Map<String, dynamic> toMap() {
     return {
-      "data": data,
-      "contentType": contentType,
       "contentEncoding": contentEncoding,
+      "contentType": contentType,
+      "data": data,
     };
   }
 
@@ -51,6 +51,6 @@ class CustomSchemeResponse {
 
   @override
   String toString() {
-    return 'CustomSchemeResponse{data: $data, contentType: $contentType, contentEncoding: $contentEncoding}';
+    return 'CustomSchemeResponse{contentEncoding: $contentEncoding, contentType: $contentType, data: $data}';
   }
 }

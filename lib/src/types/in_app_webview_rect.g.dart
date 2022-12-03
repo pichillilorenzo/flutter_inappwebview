@@ -8,17 +8,17 @@ part of 'in_app_webview_rect.dart';
 
 ///A class that represents a structure that contains the location and dimensions of a rectangle.
 class InAppWebViewRect {
+  ///rect height
+  double height;
+
+  ///rect width
+  double width;
+
   ///x position
   double x;
 
   ///y position
   double y;
-
-  ///rect width
-  double width;
-
-  ///rect height
-  double height;
   InAppWebViewRect(
       {required this.x,
       required this.y,
@@ -33,10 +33,10 @@ class InAppWebViewRect {
       return null;
     }
     final instance = InAppWebViewRect(
+      height: map['height'],
+      width: map['width'],
       x: map['x'],
       y: map['y'],
-      width: map['width'],
-      height: map['height'],
     );
     return instance;
   }
@@ -44,10 +44,10 @@ class InAppWebViewRect {
   ///Converts instance to a map.
   Map<String, dynamic> toMap() {
     return {
+      "height": height,
+      "width": width,
       "x": x,
       "y": y,
-      "width": width,
-      "height": height,
     };
   }
 
@@ -58,6 +58,6 @@ class InAppWebViewRect {
 
   @override
   String toString() {
-    return 'InAppWebViewRect{x: $x, y: $y, width: $width, height: $height}';
+    return 'InAppWebViewRect{height: $height, width: $width, x: $x, y: $y}';
   }
 }

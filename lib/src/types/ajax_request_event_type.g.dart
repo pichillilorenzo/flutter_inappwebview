@@ -16,9 +16,11 @@ class AjaxRequestEventType {
           String value, Function nativeValue) =>
       AjaxRequestEventType._internal(value, nativeValue());
 
-  ///The LOADSTART event is fired when a request has started to load data.
-  static const LOADSTART =
-      AjaxRequestEventType._internal('loadstart', 'loadstart');
+  ///The ABORT event is fired when a request has been aborted.
+  static const ABORT = AjaxRequestEventType._internal('abort', 'abort');
+
+  ///The ERROR event is fired when the request encountered an error.
+  static const ERROR = AjaxRequestEventType._internal('error', 'error');
 
   ///The LOAD event is fired when an `XMLHttpRequest` transaction completes successfully.
   static const LOAD = AjaxRequestEventType._internal('load', 'load');
@@ -27,27 +29,25 @@ class AjaxRequestEventType {
   ///unsuccessfully (after [AjaxRequestEventType.ABORT] or [AjaxRequestEventType.ERROR]).
   static const LOADEND = AjaxRequestEventType._internal('loadend', 'loadend');
 
+  ///The LOADSTART event is fired when a request has started to load data.
+  static const LOADSTART =
+      AjaxRequestEventType._internal('loadstart', 'loadstart');
+
   ///The PROGRESS event is fired periodically when a request receives more data.
   static const PROGRESS =
       AjaxRequestEventType._internal('progress', 'progress');
-
-  ///The ERROR event is fired when the request encountered an error.
-  static const ERROR = AjaxRequestEventType._internal('error', 'error');
-
-  ///The ABORT event is fired when a request has been aborted.
-  static const ABORT = AjaxRequestEventType._internal('abort', 'abort');
 
   ///The TIMEOUT event is fired when progression is terminated due to preset time expiring.
   static const TIMEOUT = AjaxRequestEventType._internal('timeout', 'timeout');
 
   ///Set of all values of [AjaxRequestEventType].
   static final Set<AjaxRequestEventType> values = [
-    AjaxRequestEventType.LOADSTART,
+    AjaxRequestEventType.ABORT,
+    AjaxRequestEventType.ERROR,
     AjaxRequestEventType.LOAD,
     AjaxRequestEventType.LOADEND,
+    AjaxRequestEventType.LOADSTART,
     AjaxRequestEventType.PROGRESS,
-    AjaxRequestEventType.ERROR,
-    AjaxRequestEventType.ABORT,
     AjaxRequestEventType.TIMEOUT,
   ].toSet();
 

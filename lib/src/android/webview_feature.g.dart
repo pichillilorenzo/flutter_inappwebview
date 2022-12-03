@@ -18,8 +18,10 @@ class WebViewFeature {
   factory WebViewFeature._internalMultiPlatform(
           String value, Function nativeValue) =>
       WebViewFeature._internal(value, nativeValue());
-  static const _channel = const MethodChannel(
-      'com.pichillilorenzo/flutter_inappwebview_webviewfeature');
+
+  ///This feature covers [InAppWebViewSettings.algorithmicDarkeningAllowed].
+  static const ALGORITHMIC_DARKENING = WebViewFeature._internal(
+      'ALGORITHMIC_DARKENING', 'ALGORITHMIC_DARKENING');
 
   ///This feature covers [InAppWebViewController.createWebMessageChannel].
   static const CREATE_WEB_MESSAGE_CHANNEL = WebViewFeature._internal(
@@ -29,6 +31,15 @@ class WebViewFeature {
   static const DISABLED_ACTION_MODE_MENU_ITEMS = WebViewFeature._internal(
       'DISABLED_ACTION_MODE_MENU_ITEMS', 'DISABLED_ACTION_MODE_MENU_ITEMS');
 
+  ///This feature covers [UserScriptInjectionTime.AT_DOCUMENT_START].
+  static const DOCUMENT_START_SCRIPT = WebViewFeature._internal(
+      'DOCUMENT_START_SCRIPT', 'DOCUMENT_START_SCRIPT');
+
+  ///This feature covers [InAppWebViewSettings.enterpriseAuthenticationAppLinkPolicyEnabled].
+  static const ENTERPRISE_AUTHENTICATION_APP_LINK_POLICY =
+      WebViewFeature._internal('ENTERPRISE_AUTHENTICATION_APP_LINK_POLICY',
+          'ENTERPRISE_AUTHENTICATION_APP_LINK_POLICY');
+
   ///This feature covers [InAppWebViewSettings.forceDark].
   static const FORCE_DARK =
       WebViewFeature._internal('FORCE_DARK', 'FORCE_DARK');
@@ -36,6 +47,10 @@ class WebViewFeature {
   ///This feature covers [InAppWebViewSettings.forceDarkStrategy].
   static const FORCE_DARK_STRATEGY =
       WebViewFeature._internal('FORCE_DARK_STRATEGY', 'FORCE_DARK_STRATEGY');
+
+  ///This feature covers [InAppWebViewController.getVariationsHeader].
+  static const GET_VARIATIONS_HEADER = WebViewFeature._internal(
+      'GET_VARIATIONS_HEADER', 'GET_VARIATIONS_HEADER');
 
   ///
   static const GET_WEB_CHROME_CLIENT = WebViewFeature._internal(
@@ -76,6 +91,10 @@ class WebViewFeature {
   ///
   static const RECEIVE_WEB_RESOURCE_ERROR = WebViewFeature._internal(
       'RECEIVE_WEB_RESOURCE_ERROR', 'RECEIVE_WEB_RESOURCE_ERROR');
+
+  ///This feature covers [InAppWebViewSettings.requestedWithHeaderMode].
+  static const REQUESTED_WITH_HEADER_CONTROL = WebViewFeature._internal(
+      'REQUESTED_WITH_HEADER_CONTROL', 'REQUESTED_WITH_HEADER_CONTROL');
 
   ///This feature covers [InAppWebViewController.setSafeBrowsingAllowlist].
   static const SAFE_BROWSING_ALLOWLIST = WebViewFeature._internal(
@@ -145,6 +164,10 @@ class WebViewFeature {
   static const START_SAFE_BROWSING =
       WebViewFeature._internal('START_SAFE_BROWSING', 'START_SAFE_BROWSING');
 
+  ///This feature covers [InAppWebViewSettings.willSuppressErrorPage].
+  static const SUPPRESS_ERROR_PAGE =
+      WebViewFeature._internal('SUPPRESS_ERROR_PAGE', 'SUPPRESS_ERROR_PAGE');
+
   ///
   static const TRACING_CONTROLLER_BASIC_USAGE = WebViewFeature._internal(
       'TRACING_CONTROLLER_BASIC_USAGE', 'TRACING_CONTROLLER_BASIC_USAGE');
@@ -195,38 +218,19 @@ class WebViewFeature {
   ///
   static const WEB_VIEW_RENDERER_TERMINATE = WebViewFeature._internal(
       'WEB_VIEW_RENDERER_TERMINATE', 'WEB_VIEW_RENDERER_TERMINATE');
-
-  ///This feature covers [UserScriptInjectionTime.AT_DOCUMENT_START].
-  static const DOCUMENT_START_SCRIPT = WebViewFeature._internal(
-      'DOCUMENT_START_SCRIPT', 'DOCUMENT_START_SCRIPT');
-
-  ///This feature covers [InAppWebViewSettings.willSuppressErrorPage].
-  static const SUPPRESS_ERROR_PAGE =
-      WebViewFeature._internal('SUPPRESS_ERROR_PAGE', 'SUPPRESS_ERROR_PAGE');
-
-  ///This feature covers [InAppWebViewSettings.algorithmicDarkeningAllowed].
-  static const ALGORITHMIC_DARKENING = WebViewFeature._internal(
-      'ALGORITHMIC_DARKENING', 'ALGORITHMIC_DARKENING');
-
-  ///This feature covers [InAppWebViewSettings.requestedWithHeaderMode].
-  static const REQUESTED_WITH_HEADER_CONTROL = WebViewFeature._internal(
-      'REQUESTED_WITH_HEADER_CONTROL', 'REQUESTED_WITH_HEADER_CONTROL');
-
-  ///This feature covers [InAppWebViewSettings.enterpriseAuthenticationAppLinkPolicyEnabled].
-  static const ENTERPRISE_AUTHENTICATION_APP_LINK_POLICY =
-      WebViewFeature._internal('ENTERPRISE_AUTHENTICATION_APP_LINK_POLICY',
-          'ENTERPRISE_AUTHENTICATION_APP_LINK_POLICY');
-
-  ///This feature covers [InAppWebViewController.getVariationsHeader].
-  static const GET_VARIATIONS_HEADER = WebViewFeature._internal(
-      'GET_VARIATIONS_HEADER', 'GET_VARIATIONS_HEADER');
+  static const _channel = const MethodChannel(
+      'com.pichillilorenzo/flutter_inappwebview_webviewfeature');
 
   ///Set of all values of [WebViewFeature].
   static final Set<WebViewFeature> values = [
+    WebViewFeature.ALGORITHMIC_DARKENING,
     WebViewFeature.CREATE_WEB_MESSAGE_CHANNEL,
     WebViewFeature.DISABLED_ACTION_MODE_MENU_ITEMS,
+    WebViewFeature.DOCUMENT_START_SCRIPT,
+    WebViewFeature.ENTERPRISE_AUTHENTICATION_APP_LINK_POLICY,
     WebViewFeature.FORCE_DARK,
     WebViewFeature.FORCE_DARK_STRATEGY,
+    WebViewFeature.GET_VARIATIONS_HEADER,
     WebViewFeature.GET_WEB_CHROME_CLIENT,
     WebViewFeature.GET_WEB_VIEW_CLIENT,
     WebViewFeature.GET_WEB_VIEW_RENDERER,
@@ -237,6 +241,7 @@ class WebViewFeature {
     WebViewFeature.PROXY_OVERRIDE_REVERSE_BYPASS,
     WebViewFeature.RECEIVE_HTTP_ERROR,
     WebViewFeature.RECEIVE_WEB_RESOURCE_ERROR,
+    WebViewFeature.REQUESTED_WITH_HEADER_CONTROL,
     WebViewFeature.SAFE_BROWSING_ALLOWLIST,
     WebViewFeature.SAFE_BROWSING_ENABLE,
     WebViewFeature.SAFE_BROWSING_HIT,
@@ -253,6 +258,7 @@ class WebViewFeature {
     WebViewFeature.SERVICE_WORKER_SHOULD_INTERCEPT_REQUEST,
     WebViewFeature.SHOULD_OVERRIDE_WITH_REDIRECTS,
     WebViewFeature.START_SAFE_BROWSING,
+    WebViewFeature.SUPPRESS_ERROR_PAGE,
     WebViewFeature.TRACING_CONTROLLER_BASIC_USAGE,
     WebViewFeature.VISUAL_STATE_CALLBACK,
     WebViewFeature.WEB_MESSAGE_CALLBACK_ON_MESSAGE,
@@ -265,12 +271,6 @@ class WebViewFeature {
     WebViewFeature.WEB_RESOURCE_REQUEST_IS_REDIRECT,
     WebViewFeature.WEB_VIEW_RENDERER_CLIENT_BASIC_USAGE,
     WebViewFeature.WEB_VIEW_RENDERER_TERMINATE,
-    WebViewFeature.DOCUMENT_START_SCRIPT,
-    WebViewFeature.SUPPRESS_ERROR_PAGE,
-    WebViewFeature.ALGORITHMIC_DARKENING,
-    WebViewFeature.REQUESTED_WITH_HEADER_CONTROL,
-    WebViewFeature.ENTERPRISE_AUTHENTICATION_APP_LINK_POLICY,
-    WebViewFeature.GET_VARIATIONS_HEADER,
   ].toSet();
 
   ///Gets a possible [WebViewFeature] instance from [String] value.
@@ -339,8 +339,10 @@ class AndroidWebViewFeature {
   factory AndroidWebViewFeature._internalMultiPlatform(
           String value, Function nativeValue) =>
       AndroidWebViewFeature._internal(value, nativeValue());
-  static const _channel = const MethodChannel(
-      'com.pichillilorenzo/flutter_inappwebview_webviewfeature');
+
+  ///This feature covers [InAppWebViewSettings.algorithmicDarkeningAllowed].
+  static const ALGORITHMIC_DARKENING = AndroidWebViewFeature._internal(
+      'ALGORITHMIC_DARKENING', 'ALGORITHMIC_DARKENING');
 
   ///
   static const CREATE_WEB_MESSAGE_CHANNEL = AndroidWebViewFeature._internal(
@@ -350,6 +352,16 @@ class AndroidWebViewFeature {
   static const DISABLED_ACTION_MODE_MENU_ITEMS =
       AndroidWebViewFeature._internal(
           'DISABLED_ACTION_MODE_MENU_ITEMS', 'DISABLED_ACTION_MODE_MENU_ITEMS');
+
+  ///This feature covers [UserScriptInjectionTime.AT_DOCUMENT_START].
+  static const DOCUMENT_START_SCRIPT = AndroidWebViewFeature._internal(
+      'DOCUMENT_START_SCRIPT', 'DOCUMENT_START_SCRIPT');
+
+  ///This feature covers [InAppWebViewSettings.enterpriseAuthenticationAppLinkPolicyEnabled].
+  static const ENTERPRISE_AUTHENTICATION_APP_LINK_POLICY =
+      AndroidWebViewFeature._internal(
+          'ENTERPRISE_AUTHENTICATION_APP_LINK_POLICY',
+          'ENTERPRISE_AUTHENTICATION_APP_LINK_POLICY');
 
   ///
   static const FORCE_DARK =
@@ -394,6 +406,10 @@ class AndroidWebViewFeature {
   ///
   static const RECEIVE_WEB_RESOURCE_ERROR = AndroidWebViewFeature._internal(
       'RECEIVE_WEB_RESOURCE_ERROR', 'RECEIVE_WEB_RESOURCE_ERROR');
+
+  ///This feature covers [InAppWebViewSettings.requestedWithHeaderMode].
+  static const REQUESTED_WITH_HEADER_CONTROL = AndroidWebViewFeature._internal(
+      'REQUESTED_WITH_HEADER_CONTROL', 'REQUESTED_WITH_HEADER_CONTROL');
 
   ///
   static const SAFE_BROWSING_ALLOWLIST = AndroidWebViewFeature._internal(
@@ -465,6 +481,10 @@ class AndroidWebViewFeature {
   static const START_SAFE_BROWSING = AndroidWebViewFeature._internal(
       'START_SAFE_BROWSING', 'START_SAFE_BROWSING');
 
+  ///This feature covers [InAppWebViewSettings.willSuppressErrorPage].
+  static const SUPPRESS_ERROR_PAGE = AndroidWebViewFeature._internal(
+      'SUPPRESS_ERROR_PAGE', 'SUPPRESS_ERROR_PAGE');
+
   ///
   static const TRACING_CONTROLLER_BASIC_USAGE = AndroidWebViewFeature._internal(
       'TRACING_CONTROLLER_BASIC_USAGE', 'TRACING_CONTROLLER_BASIC_USAGE');
@@ -517,33 +537,16 @@ class AndroidWebViewFeature {
   ///
   static const WEB_VIEW_RENDERER_TERMINATE = AndroidWebViewFeature._internal(
       'WEB_VIEW_RENDERER_TERMINATE', 'WEB_VIEW_RENDERER_TERMINATE');
-
-  ///This feature covers [UserScriptInjectionTime.AT_DOCUMENT_START].
-  static const DOCUMENT_START_SCRIPT = AndroidWebViewFeature._internal(
-      'DOCUMENT_START_SCRIPT', 'DOCUMENT_START_SCRIPT');
-
-  ///This feature covers [InAppWebViewSettings.willSuppressErrorPage].
-  static const SUPPRESS_ERROR_PAGE = AndroidWebViewFeature._internal(
-      'SUPPRESS_ERROR_PAGE', 'SUPPRESS_ERROR_PAGE');
-
-  ///This feature covers [InAppWebViewSettings.algorithmicDarkeningAllowed].
-  static const ALGORITHMIC_DARKENING = AndroidWebViewFeature._internal(
-      'ALGORITHMIC_DARKENING', 'ALGORITHMIC_DARKENING');
-
-  ///This feature covers [InAppWebViewSettings.requestedWithHeaderMode].
-  static const REQUESTED_WITH_HEADER_CONTROL = AndroidWebViewFeature._internal(
-      'REQUESTED_WITH_HEADER_CONTROL', 'REQUESTED_WITH_HEADER_CONTROL');
-
-  ///This feature covers [InAppWebViewSettings.enterpriseAuthenticationAppLinkPolicyEnabled].
-  static const ENTERPRISE_AUTHENTICATION_APP_LINK_POLICY =
-      AndroidWebViewFeature._internal(
-          'ENTERPRISE_AUTHENTICATION_APP_LINK_POLICY',
-          'ENTERPRISE_AUTHENTICATION_APP_LINK_POLICY');
+  static const _channel = const MethodChannel(
+      'com.pichillilorenzo/flutter_inappwebview_webviewfeature');
 
   ///Set of all values of [AndroidWebViewFeature].
   static final Set<AndroidWebViewFeature> values = [
+    AndroidWebViewFeature.ALGORITHMIC_DARKENING,
     AndroidWebViewFeature.CREATE_WEB_MESSAGE_CHANNEL,
     AndroidWebViewFeature.DISABLED_ACTION_MODE_MENU_ITEMS,
+    AndroidWebViewFeature.DOCUMENT_START_SCRIPT,
+    AndroidWebViewFeature.ENTERPRISE_AUTHENTICATION_APP_LINK_POLICY,
     AndroidWebViewFeature.FORCE_DARK,
     AndroidWebViewFeature.FORCE_DARK_STRATEGY,
     AndroidWebViewFeature.GET_WEB_CHROME_CLIENT,
@@ -555,6 +558,7 @@ class AndroidWebViewFeature {
     AndroidWebViewFeature.PROXY_OVERRIDE,
     AndroidWebViewFeature.RECEIVE_HTTP_ERROR,
     AndroidWebViewFeature.RECEIVE_WEB_RESOURCE_ERROR,
+    AndroidWebViewFeature.REQUESTED_WITH_HEADER_CONTROL,
     AndroidWebViewFeature.SAFE_BROWSING_ALLOWLIST,
     AndroidWebViewFeature.SAFE_BROWSING_ENABLE,
     AndroidWebViewFeature.SAFE_BROWSING_HIT,
@@ -571,6 +575,7 @@ class AndroidWebViewFeature {
     AndroidWebViewFeature.SERVICE_WORKER_SHOULD_INTERCEPT_REQUEST,
     AndroidWebViewFeature.SHOULD_OVERRIDE_WITH_REDIRECTS,
     AndroidWebViewFeature.START_SAFE_BROWSING,
+    AndroidWebViewFeature.SUPPRESS_ERROR_PAGE,
     AndroidWebViewFeature.TRACING_CONTROLLER_BASIC_USAGE,
     AndroidWebViewFeature.VISUAL_STATE_CALLBACK,
     AndroidWebViewFeature.WEB_MESSAGE_CALLBACK_ON_MESSAGE,
@@ -583,11 +588,6 @@ class AndroidWebViewFeature {
     AndroidWebViewFeature.WEB_RESOURCE_REQUEST_IS_REDIRECT,
     AndroidWebViewFeature.WEB_VIEW_RENDERER_CLIENT_BASIC_USAGE,
     AndroidWebViewFeature.WEB_VIEW_RENDERER_TERMINATE,
-    AndroidWebViewFeature.DOCUMENT_START_SCRIPT,
-    AndroidWebViewFeature.SUPPRESS_ERROR_PAGE,
-    AndroidWebViewFeature.ALGORITHMIC_DARKENING,
-    AndroidWebViewFeature.REQUESTED_WITH_HEADER_CONTROL,
-    AndroidWebViewFeature.ENTERPRISE_AUTHENTICATION_APP_LINK_POLICY,
   ].toSet();
 
   ///Gets a possible [AndroidWebViewFeature] instance from [String] value.

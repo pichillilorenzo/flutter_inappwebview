@@ -16,20 +16,20 @@ class InAppWebViewHitTestResultType {
           int value, Function nativeValue) =>
       InAppWebViewHitTestResultType._internal(value, nativeValue());
 
-  ///Default [InAppWebViewHitTestResult], where the target is unknown.
-  static const UNKNOWN_TYPE = InAppWebViewHitTestResultType._internal(0, 0);
-
-  ///[InAppWebViewHitTestResult] for hitting a phone number.
-  static const PHONE_TYPE = InAppWebViewHitTestResultType._internal(2, 2);
-
-  ///[InAppWebViewHitTestResult] for hitting a map address.
-  static const GEO_TYPE = InAppWebViewHitTestResultType._internal(3, 3);
+  ///[InAppWebViewHitTestResult] for hitting an edit text area.
+  static const EDIT_TEXT_TYPE = InAppWebViewHitTestResultType._internal(9, 9);
 
   ///[InAppWebViewHitTestResult] for hitting an email address.
   static const EMAIL_TYPE = InAppWebViewHitTestResultType._internal(4, 4);
 
+  ///[InAppWebViewHitTestResult] for hitting a map address.
+  static const GEO_TYPE = InAppWebViewHitTestResultType._internal(3, 3);
+
   ///[InAppWebViewHitTestResult] for hitting an HTML::img tag.
   static const IMAGE_TYPE = InAppWebViewHitTestResultType._internal(5, 5);
+
+  ///[InAppWebViewHitTestResult] for hitting a phone number.
+  static const PHONE_TYPE = InAppWebViewHitTestResultType._internal(2, 2);
 
   ///[InAppWebViewHitTestResult] for hitting a HTML::a tag with src=http.
   static const SRC_ANCHOR_TYPE = InAppWebViewHitTestResultType._internal(7, 7);
@@ -38,19 +38,19 @@ class InAppWebViewHitTestResultType {
   static const SRC_IMAGE_ANCHOR_TYPE =
       InAppWebViewHitTestResultType._internal(8, 8);
 
-  ///[InAppWebViewHitTestResult] for hitting an edit text area.
-  static const EDIT_TEXT_TYPE = InAppWebViewHitTestResultType._internal(9, 9);
+  ///Default [InAppWebViewHitTestResult], where the target is unknown.
+  static const UNKNOWN_TYPE = InAppWebViewHitTestResultType._internal(0, 0);
 
   ///Set of all values of [InAppWebViewHitTestResultType].
   static final Set<InAppWebViewHitTestResultType> values = [
-    InAppWebViewHitTestResultType.UNKNOWN_TYPE,
-    InAppWebViewHitTestResultType.PHONE_TYPE,
-    InAppWebViewHitTestResultType.GEO_TYPE,
+    InAppWebViewHitTestResultType.EDIT_TEXT_TYPE,
     InAppWebViewHitTestResultType.EMAIL_TYPE,
+    InAppWebViewHitTestResultType.GEO_TYPE,
     InAppWebViewHitTestResultType.IMAGE_TYPE,
+    InAppWebViewHitTestResultType.PHONE_TYPE,
     InAppWebViewHitTestResultType.SRC_ANCHOR_TYPE,
     InAppWebViewHitTestResultType.SRC_IMAGE_ANCHOR_TYPE,
-    InAppWebViewHitTestResultType.EDIT_TEXT_TYPE,
+    InAppWebViewHitTestResultType.UNKNOWN_TYPE,
   ].toSet();
 
   ///Gets a possible [InAppWebViewHitTestResultType] instance from [int] value.
@@ -94,22 +94,22 @@ class InAppWebViewHitTestResultType {
   @override
   String toString() {
     switch (_value) {
-      case 0:
-        return 'UNKNOWN_TYPE';
-      case 2:
-        return 'PHONE_TYPE';
-      case 3:
-        return 'GEO_TYPE';
+      case 9:
+        return 'EDIT_TEXT_TYPE';
       case 4:
         return 'EMAIL_TYPE';
+      case 3:
+        return 'GEO_TYPE';
       case 5:
         return 'IMAGE_TYPE';
+      case 2:
+        return 'PHONE_TYPE';
       case 7:
         return 'SRC_ANCHOR_TYPE';
       case 8:
         return 'SRC_IMAGE_ANCHOR_TYPE';
-      case 9:
-        return 'EDIT_TEXT_TYPE';
+      case 0:
+        return 'UNKNOWN_TYPE';
     }
     return _value.toString();
   }

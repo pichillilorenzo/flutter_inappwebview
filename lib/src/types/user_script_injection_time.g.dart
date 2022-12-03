@@ -16,20 +16,20 @@ class UserScriptInjectionTime {
           int value, Function nativeValue) =>
       UserScriptInjectionTime._internal(value, nativeValue());
 
-  ///**NOTE for iOS**: A constant to inject the script after the creation of the webpage’s document element, but before loading any other content.
-  ///
-  ///**NOTE for Android**: A constant to try to inject the script as soon as the page starts loading.
-  static const AT_DOCUMENT_START = UserScriptInjectionTime._internal(0, 0);
-
   ///**NOTE for iOS**: A constant to inject the script after the document finishes loading, but before loading any other subresources.
   ///
   ///**NOTE for Android**: A constant to inject the script as soon as the page finishes loading.
   static const AT_DOCUMENT_END = UserScriptInjectionTime._internal(1, 1);
 
+  ///**NOTE for iOS**: A constant to inject the script after the creation of the webpage’s document element, but before loading any other content.
+  ///
+  ///**NOTE for Android**: A constant to try to inject the script as soon as the page starts loading.
+  static const AT_DOCUMENT_START = UserScriptInjectionTime._internal(0, 0);
+
   ///Set of all values of [UserScriptInjectionTime].
   static final Set<UserScriptInjectionTime> values = [
-    UserScriptInjectionTime.AT_DOCUMENT_START,
     UserScriptInjectionTime.AT_DOCUMENT_END,
+    UserScriptInjectionTime.AT_DOCUMENT_START,
   ].toSet();
 
   ///Gets a possible [UserScriptInjectionTime] instance from [int] value.
@@ -73,10 +73,10 @@ class UserScriptInjectionTime {
   @override
   String toString() {
     switch (_value) {
-      case 0:
-        return 'AT_DOCUMENT_START';
       case 1:
         return 'AT_DOCUMENT_END';
+      case 0:
+        return 'AT_DOCUMENT_START';
     }
     return _value.toString();
   }

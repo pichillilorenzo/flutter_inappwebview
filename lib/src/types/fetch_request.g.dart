@@ -8,26 +8,32 @@ part of 'fetch_request.dart';
 
 ///Class that represents a HTTP request created with JavaScript using the [Fetch API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch).
 class FetchRequest {
-  ///The URL of the request.
-  WebUri? url;
-
-  ///The HTTP request method used of the request.
-  String? method;
-
-  ///The HTTP request headers.
-  Map<String, dynamic>? headers;
+  ///Indicates the [FetchRequestAction] that can be used to control the request.
+  FetchRequestAction? action;
 
   ///Body of the request.
   dynamic body;
 
-  ///The mode used by the request.
-  String? mode;
+  ///The cache mode used by the request.
+  String? cache;
 
   ///The request credentials used by the request.
   FetchRequestCredential? credentials;
 
-  ///The cache mode used by the request.
-  String? cache;
+  ///The HTTP request headers.
+  Map<String, dynamic>? headers;
+
+  ///Contains the subresource integrity value of the request.
+  String? integrity;
+
+  ///The keepalive option used to allow the request to outlive the page.
+  bool? keepalive;
+
+  ///The HTTP request method used of the request.
+  String? method;
+
+  ///The mode used by the request.
+  String? mode;
 
   ///The redirect mode used by the request.
   String? redirect;
@@ -38,28 +44,22 @@ class FetchRequest {
   ///The value of the referer HTTP header.
   ReferrerPolicy? referrerPolicy;
 
-  ///Contains the subresource integrity value of the request.
-  String? integrity;
-
-  ///The keepalive option used to allow the request to outlive the page.
-  bool? keepalive;
-
-  ///Indicates the [FetchRequestAction] that can be used to control the request.
-  FetchRequestAction? action;
+  ///The URL of the request.
+  WebUri? url;
   FetchRequest(
-      {this.url,
-      this.method,
-      this.headers,
+      {this.action = FetchRequestAction.PROCEED,
       this.body,
-      this.mode,
-      this.credentials,
       this.cache,
+      this.credentials,
+      this.headers,
+      this.integrity,
+      this.keepalive,
+      this.method,
+      this.mode,
       this.redirect,
       this.referrer,
       this.referrerPolicy,
-      this.integrity,
-      this.keepalive,
-      this.action = FetchRequestAction.PROCEED});
+      this.url});
 
   ///Gets a possible [FetchRequest] instance from a [Map] value.
   static FetchRequest? fromMap(Map<String, dynamic>? map) {
@@ -67,18 +67,18 @@ class FetchRequest {
       return null;
     }
     final instance = FetchRequest(
-      url: map['url'] != null ? WebUri(map['url']) : null,
-      method: map['method'],
-      headers: map['headers']?.cast<String, dynamic>(),
       body: map['body'],
-      mode: map['mode'],
-      credentials: _fetchRequestCredentialDeserializer(map['credentials']),
       cache: map['cache'],
+      credentials: _fetchRequestCredentialDeserializer(map['credentials']),
+      headers: map['headers']?.cast<String, dynamic>(),
+      integrity: map['integrity'],
+      keepalive: map['keepalive'],
+      method: map['method'],
+      mode: map['mode'],
       redirect: map['redirect'],
       referrer: map['referrer'],
       referrerPolicy: ReferrerPolicy.fromNativeValue(map['referrerPolicy']),
-      integrity: map['integrity'],
-      keepalive: map['keepalive'],
+      url: map['url'] != null ? WebUri(map['url']) : null,
     );
     instance.action = FetchRequestAction.fromNativeValue(map['action']);
     return instance;
@@ -87,19 +87,19 @@ class FetchRequest {
   ///Converts instance to a map.
   Map<String, dynamic> toMap() {
     return {
-      "url": url?.toString(),
-      "method": method,
-      "headers": headers,
+      "action": action?.toNativeValue(),
       "body": body,
-      "mode": mode,
-      "credentials": credentials?.toMap(),
       "cache": cache,
+      "credentials": credentials?.toMap(),
+      "headers": headers,
+      "integrity": integrity,
+      "keepalive": keepalive,
+      "method": method,
+      "mode": mode,
       "redirect": redirect,
       "referrer": referrer,
       "referrerPolicy": referrerPolicy?.toNativeValue(),
-      "integrity": integrity,
-      "keepalive": keepalive,
-      "action": action?.toNativeValue(),
+      "url": url?.toString(),
     };
   }
 
@@ -110,6 +110,6 @@ class FetchRequest {
 
   @override
   String toString() {
-    return 'FetchRequest{url: $url, method: $method, headers: $headers, body: $body, mode: $mode, credentials: $credentials, cache: $cache, redirect: $redirect, referrer: $referrer, referrerPolicy: $referrerPolicy, integrity: $integrity, keepalive: $keepalive, action: $action}';
+    return 'FetchRequest{action: $action, body: $body, cache: $cache, credentials: $credentials, headers: $headers, integrity: $integrity, keepalive: $keepalive, method: $method, mode: $mode, redirect: $redirect, referrer: $referrer, referrerPolicy: $referrerPolicy, url: $url}';
   }
 }

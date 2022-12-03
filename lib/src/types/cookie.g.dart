@@ -8,56 +8,56 @@ part of 'cookie.dart';
 
 ///Class that represents a cookie returned by the [CookieManager].
 class Cookie {
-  ///The cookie name.
-  String name;
-
-  ///The cookie value.
-  dynamic value;
+  ///The cookie domain.
+  ///
+  ///**NOTE**: on Android it will be always `null`.
+  String? domain;
 
   ///The cookie expiration date in milliseconds.
   ///
   ///**NOTE**: on Android it will be always `null`.
   int? expiresDate;
 
-  ///Indicates if the cookie is a session only cookie.
+  ///Indicates if the cookie is a http only cookie.
   ///
   ///**NOTE**: on Android it will be always `null`.
-  bool? isSessionOnly;
-
-  ///The cookie domain.
-  ///
-  ///**NOTE**: on Android it will be always `null`.
-  String? domain;
-
-  ///The cookie same site policy.
-  ///
-  ///**NOTE**: on Android it will be always `null`.
-  HTTPCookieSameSitePolicy? sameSite;
+  bool? isHttpOnly;
 
   ///Indicates if the cookie is secure or not.
   ///
   ///**NOTE**: on Android it will be always `null`.
   bool? isSecure;
 
-  ///Indicates if the cookie is a http only cookie.
+  ///Indicates if the cookie is a session only cookie.
   ///
   ///**NOTE**: on Android it will be always `null`.
-  bool? isHttpOnly;
+  bool? isSessionOnly;
+
+  ///The cookie name.
+  String name;
 
   ///The cookie path.
   ///
   ///**NOTE**: on Android it will be always `null`.
   String? path;
+
+  ///The cookie same site policy.
+  ///
+  ///**NOTE**: on Android it will be always `null`.
+  HTTPCookieSameSitePolicy? sameSite;
+
+  ///The cookie value.
+  dynamic value;
   Cookie(
-      {required this.name,
-      this.value,
+      {this.domain,
       this.expiresDate,
-      this.isSessionOnly,
-      this.domain,
-      this.sameSite,
-      this.isSecure,
       this.isHttpOnly,
-      this.path});
+      this.isSecure,
+      this.isSessionOnly,
+      required this.name,
+      this.path,
+      this.sameSite,
+      this.value});
 
   ///Gets a possible [Cookie] instance from a [Map] value.
   static Cookie? fromMap(Map<String, dynamic>? map) {
@@ -65,15 +65,15 @@ class Cookie {
       return null;
     }
     final instance = Cookie(
-      name: map['name'],
-      value: map['value'],
-      expiresDate: map['expiresDate'],
-      isSessionOnly: map['isSessionOnly'],
       domain: map['domain'],
-      sameSite: HTTPCookieSameSitePolicy.fromNativeValue(map['sameSite']),
-      isSecure: map['isSecure'],
+      expiresDate: map['expiresDate'],
       isHttpOnly: map['isHttpOnly'],
+      isSecure: map['isSecure'],
+      isSessionOnly: map['isSessionOnly'],
+      name: map['name'],
       path: map['path'],
+      sameSite: HTTPCookieSameSitePolicy.fromNativeValue(map['sameSite']),
+      value: map['value'],
     );
     return instance;
   }
@@ -81,15 +81,15 @@ class Cookie {
   ///Converts instance to a map.
   Map<String, dynamic> toMap() {
     return {
-      "name": name,
-      "value": value,
-      "expiresDate": expiresDate,
-      "isSessionOnly": isSessionOnly,
       "domain": domain,
-      "sameSite": sameSite?.toNativeValue(),
-      "isSecure": isSecure,
+      "expiresDate": expiresDate,
       "isHttpOnly": isHttpOnly,
+      "isSecure": isSecure,
+      "isSessionOnly": isSessionOnly,
+      "name": name,
       "path": path,
+      "sameSite": sameSite?.toNativeValue(),
+      "value": value,
     };
   }
 
@@ -100,6 +100,6 @@ class Cookie {
 
   @override
   String toString() {
-    return 'Cookie{name: $name, value: $value, expiresDate: $expiresDate, isSessionOnly: $isSessionOnly, domain: $domain, sameSite: $sameSite, isSecure: $isSecure, isHttpOnly: $isHttpOnly, path: $path}';
+    return 'Cookie{domain: $domain, expiresDate: $expiresDate, isHttpOnly: $isHttpOnly, isSecure: $isSecure, isSessionOnly: $isSessionOnly, name: $name, path: $path, sameSite: $sameSite, value: $value}';
   }
 }

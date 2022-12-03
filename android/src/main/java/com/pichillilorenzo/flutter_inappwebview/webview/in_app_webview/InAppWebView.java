@@ -8,6 +8,7 @@ import android.animation.PropertyValuesHolder;
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.content.Context;
+import android.content.pm.PackageInfo;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -47,6 +48,7 @@ import android.webkit.WebBackForwardList;
 import android.webkit.WebHistoryItem;
 import android.webkit.WebSettings;
 import android.webkit.WebStorage;
+import android.webkit.WebViewClient;
 import android.widget.HorizontalScrollView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -59,6 +61,7 @@ import androidx.webkit.WebViewCompat;
 import androidx.webkit.WebViewFeature;
 
 import com.pichillilorenzo.flutter_inappwebview.InAppWebViewFlutterPlugin;
+import com.pichillilorenzo.flutter_inappwebview.InAppWebViewStatic;
 import com.pichillilorenzo.flutter_inappwebview.R;
 import com.pichillilorenzo.flutter_inappwebview.Util;
 import com.pichillilorenzo.flutter_inappwebview.content_blocker.ContentBlocker;
@@ -123,6 +126,8 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
   public Integer windowId;
   @Nullable
   public InAppWebViewClient inAppWebViewClient;
+  @Nullable
+  public InAppWebViewClientCompat inAppWebViewClientCompat;
   @Nullable
   public InAppWebViewChromeClient inAppWebViewChromeClient;
   @Nullable
@@ -199,6 +204,36 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
     }
   }
 
+  public WebViewClient createWebViewClient(InAppBrowserDelegate inAppBrowserDelegate) {
+    // bug https://bugs.chromium.org/p/chromium/issues/detail?id=925887
+    PackageInfo packageInfo = WebViewCompat.getCurrentWebViewPackage(getContext());
+    if (packageInfo == null) {
+      Log.d(LOG_TAG, "Using InAppWebViewClient implementation");
+      return new InAppWebViewClient(inAppBrowserDelegate);
+    }
+
+    boolean isChromiumWebView = "com.android.webview".equals(packageInfo.packageName) ||
+                                "com.google.android.webview".equals(packageInfo.packageName) ||
+                                "com.android.chrome".equals(packageInfo.packageName);
+    boolean isChromiumWebViewBugFixed = false;
+    if (isChromiumWebView) {
+      String versionName = packageInfo.versionName != null ? packageInfo.versionName : "";
+      try {
+        int majorVersion = versionName.contains(".") ?
+                Integer.parseInt(versionName.split("\\.")[0]) : 0;
+        isChromiumWebViewBugFixed = majorVersion >= 73;
+      } catch (NumberFormatException ignored) {}
+    }
+
+    if (isChromiumWebViewBugFixed || !isChromiumWebView) {
+      Log.d(LOG_TAG, "Using InAppWebViewClientCompat implementation");
+      return new InAppWebViewClientCompat(inAppBrowserDelegate);
+    } else {
+      Log.d(LOG_TAG, "Using InAppWebViewClient implementation");
+      return new InAppWebViewClient(inAppBrowserDelegate);
+    }
+  }
+
   @SuppressLint("RestrictedApi")
   public void prepare() {
     if (plugin != null) {
@@ -211,8 +246,14 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
     inAppWebViewChromeClient = new InAppWebViewChromeClient(plugin, this, inAppBrowserDelegate);
     setWebChromeClient(inAppWebViewChromeClient);
 
-    inAppWebViewClient = new InAppWebViewClient(inAppBrowserDelegate);
-    setWebViewClient(inAppWebViewClient);
+    WebViewClient webViewClient = createWebViewClient(inAppBrowserDelegate);
+    if (webViewClient instanceof InAppWebViewClientCompat) {
+      inAppWebViewClientCompat = (InAppWebViewClientCompat) webViewClient;
+      setWebViewClient(inAppWebViewClientCompat);
+    } else if (webViewClient instanceof InAppWebViewClient) {
+      inAppWebViewClient = (InAppWebViewClient) webViewClient;
+      setWebViewClient(inAppWebViewClient);
+    }
 
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && WebViewFeature.isFeatureSupported(WebViewFeature.WEB_VIEW_RENDERER_CLIENT_BASIC_USAGE)) {
       inAppWebViewRenderProcessClient = new InAppWebViewRenderProcessClient();
@@ -1982,6 +2023,7 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
     evaluateJavaScriptContentWorldCallbacks.clear();
     inAppBrowserDelegate = null;
     inAppWebViewChromeClient = null;
+    inAppWebViewClientCompat = null;
     inAppWebViewClient = null;
     javaScriptBridgeInterface = null;
     inAppWebViewRenderProcessClient = null;

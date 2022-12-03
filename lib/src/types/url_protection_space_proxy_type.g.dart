@@ -16,20 +16,20 @@ class URLProtectionSpaceProxyType {
           String value, Function nativeValue) =>
       URLProtectionSpaceProxyType._internal(value, nativeValue());
 
-  ///The proxy type for HTTP proxies.
-  static const URL_PROTECTION_SPACE_HTTP_PROXY =
+  ///The proxy type for FTP proxies.
+  static const URL_PROTECTION_SPACE_FTP_PROXY =
       URLProtectionSpaceProxyType._internal(
-          'NSURLProtectionSpaceHTTPProxy', 'NSURLProtectionSpaceHTTPProxy');
+          'NSURLProtectionSpaceFTPProxy', 'NSURLProtectionSpaceFTPProxy');
 
   ///The proxy type for HTTPS proxies.
   static const URL_PROTECTION_SPACE_HTTPS_PROXY =
       URLProtectionSpaceProxyType._internal(
           'NSURLProtectionSpaceHTTPSProxy', 'NSURLProtectionSpaceHTTPSProxy');
 
-  ///The proxy type for FTP proxies.
-  static const URL_PROTECTION_SPACE_FTP_PROXY =
+  ///The proxy type for HTTP proxies.
+  static const URL_PROTECTION_SPACE_HTTP_PROXY =
       URLProtectionSpaceProxyType._internal(
-          'NSURLProtectionSpaceFTPProxy', 'NSURLProtectionSpaceFTPProxy');
+          'NSURLProtectionSpaceHTTPProxy', 'NSURLProtectionSpaceHTTPProxy');
 
   ///The proxy type for SOCKS proxies.
   static const URL_PROTECTION_SPACE_SOCKS_PROXY =
@@ -38,9 +38,9 @@ class URLProtectionSpaceProxyType {
 
   ///Set of all values of [URLProtectionSpaceProxyType].
   static final Set<URLProtectionSpaceProxyType> values = [
-    URLProtectionSpaceProxyType.URL_PROTECTION_SPACE_HTTP_PROXY,
-    URLProtectionSpaceProxyType.URL_PROTECTION_SPACE_HTTPS_PROXY,
     URLProtectionSpaceProxyType.URL_PROTECTION_SPACE_FTP_PROXY,
+    URLProtectionSpaceProxyType.URL_PROTECTION_SPACE_HTTPS_PROXY,
+    URLProtectionSpaceProxyType.URL_PROTECTION_SPACE_HTTP_PROXY,
     URLProtectionSpaceProxyType.URL_PROTECTION_SPACE_SOCKS_PROXY,
   ].toSet();
 
@@ -101,32 +101,32 @@ class IOSNSURLProtectionSpaceProxyType {
           String value, Function nativeValue) =>
       IOSNSURLProtectionSpaceProxyType._internal(value, nativeValue());
 
-  ///The proxy type for HTTP proxies.
-  static const NSUR_PROTECTION_SPACE_HTTP_PROXY =
+  ///The proxy type for FTP proxies.
+  static const NSURL_PROTECTION_SPACE_FTP_PROXY =
       IOSNSURLProtectionSpaceProxyType._internal(
-          'NSURLProtectionSpaceHTTPProxy', 'NSURLProtectionSpaceHTTPProxy');
+          'NSURLProtectionSpaceFTPProxy', 'NSURLProtectionSpaceFTPProxy');
 
   ///The proxy type for HTTPS proxies.
   static const NSURL_PROTECTION_SPACE_HTTPS_PROXY =
       IOSNSURLProtectionSpaceProxyType._internal(
           'NSURLProtectionSpaceHTTPSProxy', 'NSURLProtectionSpaceHTTPSProxy');
 
-  ///The proxy type for FTP proxies.
-  static const NSURL_PROTECTION_SPACE_FTP_PROXY =
-      IOSNSURLProtectionSpaceProxyType._internal(
-          'NSURLProtectionSpaceFTPProxy', 'NSURLProtectionSpaceFTPProxy');
-
   ///The proxy type for SOCKS proxies.
   static const NSURL_PROTECTION_SPACE_SOCKS_PROXY =
       IOSNSURLProtectionSpaceProxyType._internal(
           'NSURLProtectionSpaceSOCKSProxy', 'NSURLProtectionSpaceSOCKSProxy');
 
+  ///The proxy type for HTTP proxies.
+  static const NSUR_PROTECTION_SPACE_HTTP_PROXY =
+      IOSNSURLProtectionSpaceProxyType._internal(
+          'NSURLProtectionSpaceHTTPProxy', 'NSURLProtectionSpaceHTTPProxy');
+
   ///Set of all values of [IOSNSURLProtectionSpaceProxyType].
   static final Set<IOSNSURLProtectionSpaceProxyType> values = [
-    IOSNSURLProtectionSpaceProxyType.NSUR_PROTECTION_SPACE_HTTP_PROXY,
-    IOSNSURLProtectionSpaceProxyType.NSURL_PROTECTION_SPACE_HTTPS_PROXY,
     IOSNSURLProtectionSpaceProxyType.NSURL_PROTECTION_SPACE_FTP_PROXY,
+    IOSNSURLProtectionSpaceProxyType.NSURL_PROTECTION_SPACE_HTTPS_PROXY,
     IOSNSURLProtectionSpaceProxyType.NSURL_PROTECTION_SPACE_SOCKS_PROXY,
+    IOSNSURLProtectionSpaceProxyType.NSUR_PROTECTION_SPACE_HTTP_PROXY,
   ].toSet();
 
   ///Gets a possible [IOSNSURLProtectionSpaceProxyType] instance from [String] value.

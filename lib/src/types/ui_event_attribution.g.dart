@@ -17,17 +17,17 @@ part of 'ui_event_attribution.dart';
 ///**Supported Platforms/Implementations**:
 ///- iOS
 class UIEventAttribution {
-  ///An 8-bit number that identifies the source of the click for attribution. Value must be between 0 and 255.
-  int sourceIdentifier;
-
   ///The destination URL of the attribution.
   WebUri destinationURL;
+
+  ///A string that describes the entity that purchased the attributed content.
+  String purchaser;
 
   ///A description of the source of the attribution.
   String sourceDescription;
 
-  ///A string that describes the entity that purchased the attributed content.
-  String purchaser;
+  ///An 8-bit number that identifies the source of the click for attribution. Value must be between 0 and 255.
+  int sourceIdentifier;
   UIEventAttribution(
       {required this.sourceIdentifier,
       required this.destinationURL,
@@ -40,10 +40,10 @@ class UIEventAttribution {
       return null;
     }
     final instance = UIEventAttribution(
-      sourceIdentifier: map['sourceIdentifier'],
       destinationURL: WebUri(map['destinationURL']),
-      sourceDescription: map['sourceDescription'],
       purchaser: map['purchaser'],
+      sourceDescription: map['sourceDescription'],
+      sourceIdentifier: map['sourceIdentifier'],
     );
     return instance;
   }
@@ -51,10 +51,10 @@ class UIEventAttribution {
   ///Converts instance to a map.
   Map<String, dynamic> toMap() {
     return {
-      "sourceIdentifier": sourceIdentifier,
       "destinationURL": destinationURL.toString(),
-      "sourceDescription": sourceDescription,
       "purchaser": purchaser,
+      "sourceDescription": sourceDescription,
+      "sourceIdentifier": sourceIdentifier,
     };
   }
 
@@ -65,6 +65,6 @@ class UIEventAttribution {
 
   @override
   String toString() {
-    return 'UIEventAttribution{sourceIdentifier: $sourceIdentifier, destinationURL: $destinationURL, sourceDescription: $sourceDescription, purchaser: $purchaser}';
+    return 'UIEventAttribution{destinationURL: $destinationURL, purchaser: $purchaser, sourceDescription: $sourceDescription, sourceIdentifier: $sourceIdentifier}';
   }
 }

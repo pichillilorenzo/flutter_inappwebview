@@ -17,11 +17,11 @@ class NavigationResponseAction {
           int value, Function nativeValue) =>
       NavigationResponseAction._internal(value, nativeValue());
 
-  ///Cancel the navigation.
-  static const CANCEL = NavigationResponseAction._internal(0, 0);
-
   ///Allow the navigation to continue.
   static const ALLOW = NavigationResponseAction._internal(1, 1);
+
+  ///Cancel the navigation.
+  static const CANCEL = NavigationResponseAction._internal(0, 0);
 
   ///Turn the navigation into a download.
   ///
@@ -30,8 +30,8 @@ class NavigationResponseAction {
 
   ///Set of all values of [NavigationResponseAction].
   static final Set<NavigationResponseAction> values = [
-    NavigationResponseAction.CANCEL,
     NavigationResponseAction.ALLOW,
+    NavigationResponseAction.CANCEL,
     NavigationResponseAction.DOWNLOAD,
   ].toSet();
 
@@ -76,10 +76,10 @@ class NavigationResponseAction {
   @override
   String toString() {
     switch (_value) {
-      case 0:
-        return 'CANCEL';
       case 1:
         return 'ALLOW';
+      case 0:
+        return 'CANCEL';
       case 2:
         return 'DOWNLOAD';
     }
@@ -100,16 +100,16 @@ class IOSNavigationResponseAction {
           int value, Function nativeValue) =>
       IOSNavigationResponseAction._internal(value, nativeValue());
 
-  ///Cancel the navigation.
-  static const CANCEL = IOSNavigationResponseAction._internal(0, 0);
-
   ///Allow the navigation to continue.
   static const ALLOW = IOSNavigationResponseAction._internal(1, 1);
 
+  ///Cancel the navigation.
+  static const CANCEL = IOSNavigationResponseAction._internal(0, 0);
+
   ///Set of all values of [IOSNavigationResponseAction].
   static final Set<IOSNavigationResponseAction> values = [
-    IOSNavigationResponseAction.CANCEL,
     IOSNavigationResponseAction.ALLOW,
+    IOSNavigationResponseAction.CANCEL,
   ].toSet();
 
   ///Gets a possible [IOSNavigationResponseAction] instance from [int] value.
@@ -153,10 +153,10 @@ class IOSNavigationResponseAction {
   @override
   String toString() {
     switch (_value) {
-      case 0:
-        return 'CANCEL';
       case 1:
         return 'ALLOW';
+      case 0:
+        return 'CANCEL';
     }
     return _value.toString();
   }

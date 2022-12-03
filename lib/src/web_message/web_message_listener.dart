@@ -1,6 +1,7 @@
 import 'package:flutter/services.dart';
 import '../in_app_webview/in_app_webview_controller.dart';
 import '../types/main.dart';
+import '../util.dart';
 import '../web_uri.dart';
 
 ///This listener receives messages sent on the JavaScript object which was injected by [InAppWebViewController.addWebMessageListener].
@@ -10,6 +11,9 @@ import '../web_uri.dart';
 ///- iOS
 ///- MacOS
 class WebMessageListener {
+  ///Message Listener ID used internally.
+  late final String id;
+
   ///The name for the injected JavaScript object.
   final String jsObjectName;
 
@@ -36,12 +40,13 @@ class WebMessageListener {
       {required this.jsObjectName,
       Set<String>? allowedOriginRules,
       this.onPostMessage}) {
+    this.id = IdGenerator.generate();
     this.allowedOriginRules =
         allowedOriginRules != null ? allowedOriginRules : Set.from(["*"]);
     assert(!this.allowedOriginRules.contains(""),
         "allowedOriginRules cannot contain empty strings");
     this._channel = MethodChannel(
-        'com.pichillilorenzo/flutter_inappwebview_web_message_listener_$jsObjectName');
+        'com.pichillilorenzo/flutter_inappwebview_web_message_listener_${id}_$jsObjectName');
     this._channel.setMethodCallHandler((call) async {
       try {
         return await _handleMethod(call);
@@ -75,6 +80,7 @@ class WebMessageListener {
 
   Map<String, dynamic> toMap() {
     return {
+      "id": id,
       "jsObjectName": jsObjectName,
       "allowedOriginRules": allowedOriginRules.toList(),
     };
@@ -86,7 +92,7 @@ class WebMessageListener {
 
   @override
   String toString() {
-    return toMap().toString();
+    return 'WebMessageListener{id: $id, jsObjectName: $jsObjectName, allowedOriginRules: $allowedOriginRules}';
   }
 }
 

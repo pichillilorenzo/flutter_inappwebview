@@ -17,64 +17,6 @@ class SslErrorType {
           String value, Function nativeValue) =>
       SslErrorType._internal(value, nativeValue());
 
-  ///The certificate is not yet valid.
-  ///
-  ///**Supported Platforms/Implementations**:
-  ///- Android native WebView ([Official API - SslError.SSL_NOTYETVALID](https://developer.android.com/reference/android/net/http/SslError#SSL_NOTYETVALID))
-  static final NOT_YET_VALID =
-      SslErrorType._internalMultiPlatform('NOT_YET_VALID', () {
-    switch (defaultTargetPlatform) {
-      case TargetPlatform.android:
-        return 0;
-      default:
-        break;
-    }
-    return null;
-  });
-
-  ///The certificate has expired.
-  ///
-  ///**Supported Platforms/Implementations**:
-  ///- Android native WebView ([Official API - SslError.SSL_EXPIRED](https://developer.android.com/reference/android/net/http/SslError#SSL_EXPIRED))
-  static final EXPIRED = SslErrorType._internalMultiPlatform('EXPIRED', () {
-    switch (defaultTargetPlatform) {
-      case TargetPlatform.android:
-        return 1;
-      default:
-        break;
-    }
-    return null;
-  });
-
-  ///Hostname mismatch.
-  ///
-  ///**Supported Platforms/Implementations**:
-  ///- Android native WebView ([Official API - SslError.SSL_IDMISMATCH](https://developer.android.com/reference/android/net/http/SslError#SSL_IDMISMATCH))
-  static final IDMISMATCH =
-      SslErrorType._internalMultiPlatform('IDMISMATCH', () {
-    switch (defaultTargetPlatform) {
-      case TargetPlatform.android:
-        return 2;
-      default:
-        break;
-    }
-    return null;
-  });
-
-  ///The certificate authority is not trusted.
-  ///
-  ///**Supported Platforms/Implementations**:
-  ///- Android native WebView ([Official API - SslError.SSL_UNTRUSTED](https://developer.android.com/reference/android/net/http/SslError#SSL_UNTRUSTED))
-  static final UNTRUSTED = SslErrorType._internalMultiPlatform('UNTRUSTED', () {
-    switch (defaultTargetPlatform) {
-      case TargetPlatform.android:
-        return 3;
-      default:
-        break;
-    }
-    return null;
-  });
-
   ///The date of the certificate is invalid.
   ///
   ///**Supported Platforms/Implementations**:
@@ -84,26 +26,6 @@ class SslErrorType {
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
         return 4;
-      default:
-        break;
-    }
-    return null;
-  });
-
-  ///Indicates an invalid setting or result. A generic error occurred.
-  ///
-  ///**Supported Platforms/Implementations**:
-  ///- Android native WebView ([Official API - SslError.SSL_INVALID](https://developer.android.com/reference/android/net/http/SslError#SSL_INVALID))
-  ///- iOS ([Official API - SecTrustResultType.invalid](https://developer.apple.com/documentation/security/sectrustresulttype/invalid))
-  ///- MacOS ([Official API - SecTrustResultType.invalid](https://developer.apple.com/documentation/security/sectrustresulttype/invalid))
-  static final INVALID = SslErrorType._internalMultiPlatform('INVALID', () {
-    switch (defaultTargetPlatform) {
-      case TargetPlatform.android:
-        return 5;
-      case TargetPlatform.iOS:
-        return 0;
-      case TargetPlatform.macOS:
-        return 0;
       default:
         break;
     }
@@ -132,25 +54,108 @@ class SslErrorType {
     return null;
   });
 
-  ///Indicates the evaluation succeeded and the certificate is implicitly trusted, but user intent was not explicitly specified.
-  ///
-  ///This value indicates that evaluation reached an (implicitly trusted) anchor certificate without any evaluation failures,
-  ///but never encountered any explicitly stated user-trust preference.
-  ///This is the most common return value.
-  ///The Keychain Access utility refers to this value as the “Use System Policy,” which is the default user setting.
-  ///
-  ///When receiving this value, most apps should trust the chain.
+  ///The certificate has expired.
   ///
   ///**Supported Platforms/Implementations**:
-  ///- iOS ([Official API - SecTrustResultType.unspecified](https://developer.apple.com/documentation/security/sectrustresulttype/unspecified))
-  ///- MacOS ([Official API - SecTrustResultType.unspecified](https://developer.apple.com/documentation/security/sectrustresulttype/unspecified))
-  static final UNSPECIFIED =
-      SslErrorType._internalMultiPlatform('UNSPECIFIED', () {
+  ///- Android native WebView ([Official API - SslError.SSL_EXPIRED](https://developer.android.com/reference/android/net/http/SslError#SSL_EXPIRED))
+  static final EXPIRED = SslErrorType._internalMultiPlatform('EXPIRED', () {
+    switch (defaultTargetPlatform) {
+      case TargetPlatform.android:
+        return 1;
+      default:
+        break;
+    }
+    return null;
+  });
+
+  ///Trust is denied and no simple fix is available.
+  ///
+  ///This value indicates that evaluation failed because a certificate in the chain is defective.
+  ///This usually represents a fundamental defect in the certificate data, such as an invalid encoding for a critical subjectAltName extension,
+  ///an unsupported critical extension, or some other critical portion of the certificate that couldn’t be interpreted.
+  ///Changing parameter values and reevaluating is unlikely to succeed unless you provide different certificates.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- iOS ([Official API - SecTrustResultType.fatalTrustFailure](https://developer.apple.com/documentation/security/sectrustresulttype/fataltrustfailure))
+  ///- MacOS ([Official API - SecTrustResultType.fatalTrustFailure](https://developer.apple.com/documentation/security/sectrustresulttype/fataltrustfailure))
+  static final FATAL_TRUST_FAILURE =
+      SslErrorType._internalMultiPlatform('FATAL_TRUST_FAILURE', () {
     switch (defaultTargetPlatform) {
       case TargetPlatform.iOS:
-        return 4;
+        return 6;
       case TargetPlatform.macOS:
-        return 4;
+        return 6;
+      default:
+        break;
+    }
+    return null;
+  });
+
+  ///Hostname mismatch.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- Android native WebView ([Official API - SslError.SSL_IDMISMATCH](https://developer.android.com/reference/android/net/http/SslError#SSL_IDMISMATCH))
+  static final IDMISMATCH =
+      SslErrorType._internalMultiPlatform('IDMISMATCH', () {
+    switch (defaultTargetPlatform) {
+      case TargetPlatform.android:
+        return 2;
+      default:
+        break;
+    }
+    return null;
+  });
+
+  ///Indicates an invalid setting or result. A generic error occurred.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- Android native WebView ([Official API - SslError.SSL_INVALID](https://developer.android.com/reference/android/net/http/SslError#SSL_INVALID))
+  ///- iOS ([Official API - SecTrustResultType.invalid](https://developer.apple.com/documentation/security/sectrustresulttype/invalid))
+  ///- MacOS ([Official API - SecTrustResultType.invalid](https://developer.apple.com/documentation/security/sectrustresulttype/invalid))
+  static final INVALID = SslErrorType._internalMultiPlatform('INVALID', () {
+    switch (defaultTargetPlatform) {
+      case TargetPlatform.android:
+        return 5;
+      case TargetPlatform.iOS:
+        return 0;
+      case TargetPlatform.macOS:
+        return 0;
+      default:
+        break;
+    }
+    return null;
+  });
+
+  ///The certificate is not yet valid.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- Android native WebView ([Official API - SslError.SSL_NOTYETVALID](https://developer.android.com/reference/android/net/http/SslError#SSL_NOTYETVALID))
+  static final NOT_YET_VALID =
+      SslErrorType._internalMultiPlatform('NOT_YET_VALID', () {
+    switch (defaultTargetPlatform) {
+      case TargetPlatform.android:
+        return 0;
+      default:
+        break;
+    }
+    return null;
+  });
+
+  ///Indicates a failure other than that of trust evaluation.
+  ///
+  ///This value indicates that evaluation failed for some other reason.
+  ///This can be caused by either a revoked certificate or by OS-level errors that are unrelated to the certificates themselves.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- iOS ([Official API - SecTrustResultType.otherError](https://developer.apple.com/documentation/security/sectrustresulttype/othererror))
+  ///- MacOS ([Official API - SecTrustResultType.otherError](https://developer.apple.com/documentation/security/sectrustresulttype/othererror))
+  static final OTHER_ERROR =
+      SslErrorType._internalMultiPlatform('OTHER_ERROR', () {
+    switch (defaultTargetPlatform) {
+      case TargetPlatform.iOS:
+        return 7;
+      case TargetPlatform.macOS:
+        return 7;
       default:
         break;
     }
@@ -183,44 +188,39 @@ class SslErrorType {
     return null;
   });
 
-  ///Trust is denied and no simple fix is available.
+  ///Indicates the evaluation succeeded and the certificate is implicitly trusted, but user intent was not explicitly specified.
   ///
-  ///This value indicates that evaluation failed because a certificate in the chain is defective.
-  ///This usually represents a fundamental defect in the certificate data, such as an invalid encoding for a critical subjectAltName extension,
-  ///an unsupported critical extension, or some other critical portion of the certificate that couldn’t be interpreted.
-  ///Changing parameter values and reevaluating is unlikely to succeed unless you provide different certificates.
+  ///This value indicates that evaluation reached an (implicitly trusted) anchor certificate without any evaluation failures,
+  ///but never encountered any explicitly stated user-trust preference.
+  ///This is the most common return value.
+  ///The Keychain Access utility refers to this value as the “Use System Policy,” which is the default user setting.
+  ///
+  ///When receiving this value, most apps should trust the chain.
   ///
   ///**Supported Platforms/Implementations**:
-  ///- iOS ([Official API - SecTrustResultType.fatalTrustFailure](https://developer.apple.com/documentation/security/sectrustresulttype/fataltrustfailure))
-  ///- MacOS ([Official API - SecTrustResultType.fatalTrustFailure](https://developer.apple.com/documentation/security/sectrustresulttype/fataltrustfailure))
-  static final FATAL_TRUST_FAILURE =
-      SslErrorType._internalMultiPlatform('FATAL_TRUST_FAILURE', () {
+  ///- iOS ([Official API - SecTrustResultType.unspecified](https://developer.apple.com/documentation/security/sectrustresulttype/unspecified))
+  ///- MacOS ([Official API - SecTrustResultType.unspecified](https://developer.apple.com/documentation/security/sectrustresulttype/unspecified))
+  static final UNSPECIFIED =
+      SslErrorType._internalMultiPlatform('UNSPECIFIED', () {
     switch (defaultTargetPlatform) {
       case TargetPlatform.iOS:
-        return 6;
+        return 4;
       case TargetPlatform.macOS:
-        return 6;
+        return 4;
       default:
         break;
     }
     return null;
   });
 
-  ///Indicates a failure other than that of trust evaluation.
-  ///
-  ///This value indicates that evaluation failed for some other reason.
-  ///This can be caused by either a revoked certificate or by OS-level errors that are unrelated to the certificates themselves.
+  ///The certificate authority is not trusted.
   ///
   ///**Supported Platforms/Implementations**:
-  ///- iOS ([Official API - SecTrustResultType.otherError](https://developer.apple.com/documentation/security/sectrustresulttype/othererror))
-  ///- MacOS ([Official API - SecTrustResultType.otherError](https://developer.apple.com/documentation/security/sectrustresulttype/othererror))
-  static final OTHER_ERROR =
-      SslErrorType._internalMultiPlatform('OTHER_ERROR', () {
+  ///- Android native WebView ([Official API - SslError.SSL_UNTRUSTED](https://developer.android.com/reference/android/net/http/SslError#SSL_UNTRUSTED))
+  static final UNTRUSTED = SslErrorType._internalMultiPlatform('UNTRUSTED', () {
     switch (defaultTargetPlatform) {
-      case TargetPlatform.iOS:
-        return 7;
-      case TargetPlatform.macOS:
-        return 7;
+      case TargetPlatform.android:
+        return 3;
       default:
         break;
     }
@@ -229,17 +229,17 @@ class SslErrorType {
 
   ///Set of all values of [SslErrorType].
   static final Set<SslErrorType> values = [
-    SslErrorType.NOT_YET_VALID,
-    SslErrorType.EXPIRED,
-    SslErrorType.IDMISMATCH,
-    SslErrorType.UNTRUSTED,
     SslErrorType.DATE_INVALID,
-    SslErrorType.INVALID,
     SslErrorType.DENY,
-    SslErrorType.UNSPECIFIED,
-    SslErrorType.RECOVERABLE_TRUST_FAILURE,
+    SslErrorType.EXPIRED,
     SslErrorType.FATAL_TRUST_FAILURE,
+    SslErrorType.IDMISMATCH,
+    SslErrorType.INVALID,
+    SslErrorType.NOT_YET_VALID,
     SslErrorType.OTHER_ERROR,
+    SslErrorType.RECOVERABLE_TRUST_FAILURE,
+    SslErrorType.UNSPECIFIED,
+    SslErrorType.UNTRUSTED,
   ].toSet();
 
   ///Gets a possible [SslErrorType] instance from [String] value.
@@ -299,8 +299,8 @@ class AndroidSslError {
           int value, Function nativeValue) =>
       AndroidSslError._internal(value, nativeValue());
 
-  ///The certificate is not yet valid
-  static const SSL_NOTYETVALID = AndroidSslError._internal(0, 0);
+  ///The date of the certificate is invalid
+  static const SSL_DATE_INVALID = AndroidSslError._internal(4, 4);
 
   ///The certificate has expired
   static const SSL_EXPIRED = AndroidSslError._internal(1, 1);
@@ -308,23 +308,23 @@ class AndroidSslError {
   ///Hostname mismatch
   static const SSL_IDMISMATCH = AndroidSslError._internal(2, 2);
 
-  ///The certificate authority is not trusted
-  static const SSL_UNTRUSTED = AndroidSslError._internal(3, 3);
-
-  ///The date of the certificate is invalid
-  static const SSL_DATE_INVALID = AndroidSslError._internal(4, 4);
-
   ///A generic error occurred
   static const SSL_INVALID = AndroidSslError._internal(5, 5);
 
+  ///The certificate is not yet valid
+  static const SSL_NOTYETVALID = AndroidSslError._internal(0, 0);
+
+  ///The certificate authority is not trusted
+  static const SSL_UNTRUSTED = AndroidSslError._internal(3, 3);
+
   ///Set of all values of [AndroidSslError].
   static final Set<AndroidSslError> values = [
-    AndroidSslError.SSL_NOTYETVALID,
+    AndroidSslError.SSL_DATE_INVALID,
     AndroidSslError.SSL_EXPIRED,
     AndroidSslError.SSL_IDMISMATCH,
-    AndroidSslError.SSL_UNTRUSTED,
-    AndroidSslError.SSL_DATE_INVALID,
     AndroidSslError.SSL_INVALID,
+    AndroidSslError.SSL_NOTYETVALID,
+    AndroidSslError.SSL_UNTRUSTED,
   ].toSet();
 
   ///Gets a possible [AndroidSslError] instance from [int] value.
@@ -368,18 +368,18 @@ class AndroidSslError {
   @override
   String toString() {
     switch (_value) {
-      case 0:
-        return 'SSL_NOTYETVALID';
+      case 4:
+        return 'SSL_DATE_INVALID';
       case 1:
         return 'SSL_EXPIRED';
       case 2:
         return 'SSL_IDMISMATCH';
-      case 3:
-        return 'SSL_UNTRUSTED';
-      case 4:
-        return 'SSL_DATE_INVALID';
       case 5:
         return 'SSL_INVALID';
+      case 0:
+        return 'SSL_NOTYETVALID';
+      case 3:
+        return 'SSL_UNTRUSTED';
     }
     return _value.toString();
   }
@@ -397,32 +397,32 @@ class IOSSslError {
   factory IOSSslError._internalMultiPlatform(int value, Function nativeValue) =>
       IOSSslError._internal(value, nativeValue());
 
-  ///Indicates an invalid setting or result.
-  static const INVALID = IOSSslError._internal(0, 0);
-
   ///Indicates a user-configured deny; do not proceed.
   static const DENY = IOSSslError._internal(3, 3);
-
-  ///Indicates the evaluation succeeded and the certificate is implicitly trusted, but user intent was not explicitly specified.
-  static const UNSPECIFIED = IOSSslError._internal(4, 4);
-
-  ///Indicates a trust policy failure which can be overridden by the user.
-  static const RECOVERABLE_TRUST_FAILURE = IOSSslError._internal(5, 5);
 
   ///Indicates a trust failure which cannot be overridden by the user.
   static const FATAL_TRUST_FAILURE = IOSSslError._internal(6, 6);
 
+  ///Indicates an invalid setting or result.
+  static const INVALID = IOSSslError._internal(0, 0);
+
   ///Indicates a failure other than that of trust evaluation.
   static const OTHER_ERROR = IOSSslError._internal(7, 7);
 
+  ///Indicates a trust policy failure which can be overridden by the user.
+  static const RECOVERABLE_TRUST_FAILURE = IOSSslError._internal(5, 5);
+
+  ///Indicates the evaluation succeeded and the certificate is implicitly trusted, but user intent was not explicitly specified.
+  static const UNSPECIFIED = IOSSslError._internal(4, 4);
+
   ///Set of all values of [IOSSslError].
   static final Set<IOSSslError> values = [
-    IOSSslError.INVALID,
     IOSSslError.DENY,
-    IOSSslError.UNSPECIFIED,
-    IOSSslError.RECOVERABLE_TRUST_FAILURE,
     IOSSslError.FATAL_TRUST_FAILURE,
+    IOSSslError.INVALID,
     IOSSslError.OTHER_ERROR,
+    IOSSslError.RECOVERABLE_TRUST_FAILURE,
+    IOSSslError.UNSPECIFIED,
   ].toSet();
 
   ///Gets a possible [IOSSslError] instance from [int] value.
@@ -466,18 +466,18 @@ class IOSSslError {
   @override
   String toString() {
     switch (_value) {
-      case 0:
-        return 'INVALID';
       case 3:
         return 'DENY';
-      case 4:
-        return 'UNSPECIFIED';
-      case 5:
-        return 'RECOVERABLE_TRUST_FAILURE';
       case 6:
         return 'FATAL_TRUST_FAILURE';
+      case 0:
+        return 'INVALID';
       case 7:
         return 'OTHER_ERROR';
+      case 5:
+        return 'RECOVERABLE_TRUST_FAILURE';
+      case 4:
+        return 'UNSPECIFIED';
     }
     return _value.toString();
   }

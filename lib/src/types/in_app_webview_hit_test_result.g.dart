@@ -8,12 +8,12 @@ part of 'in_app_webview_hit_test_result.dart';
 
 ///Class that represents the hit result for hitting an HTML elements.
 class InAppWebViewHitTestResult {
-  ///The type of the hit test result.
-  InAppWebViewHitTestResultType? type;
-
   ///Additional type-dependant information about the result.
   String? extra;
-  InAppWebViewHitTestResult({this.type, this.extra});
+
+  ///The type of the hit test result.
+  InAppWebViewHitTestResultType? type;
+  InAppWebViewHitTestResult({this.extra, this.type});
 
   ///Gets a possible [InAppWebViewHitTestResult] instance from a [Map] value.
   static InAppWebViewHitTestResult? fromMap(Map<String, dynamic>? map) {
@@ -21,8 +21,8 @@ class InAppWebViewHitTestResult {
       return null;
     }
     final instance = InAppWebViewHitTestResult(
-      type: InAppWebViewHitTestResultType.fromNativeValue(map['type']),
       extra: map['extra'],
+      type: InAppWebViewHitTestResultType.fromNativeValue(map['type']),
     );
     return instance;
   }
@@ -30,8 +30,8 @@ class InAppWebViewHitTestResult {
   ///Converts instance to a map.
   Map<String, dynamic> toMap() {
     return {
-      "type": type?.toNativeValue(),
       "extra": extra,
+      "type": type?.toNativeValue(),
     };
   }
 
@@ -42,6 +42,6 @@ class InAppWebViewHitTestResult {
 
   @override
   String toString() {
-    return 'InAppWebViewHitTestResult{type: $type, extra: $extra}';
+    return 'InAppWebViewHitTestResult{extra: $extra, type: $type}';
   }
 }

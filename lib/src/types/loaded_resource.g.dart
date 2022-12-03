@@ -9,18 +9,18 @@ part of 'loaded_resource.dart';
 ///Class representing a resource response of the [WebView].
 ///It is used by the method [WebView.onLoadResource].
 class LoadedResource {
+  ///Returns the [DOMHighResTimeStamp](https://developer.mozilla.org/en-US/docs/Web/API/DOMHighResTimeStamp) duration to fetch a resource.
+  double? duration;
+
   ///A string representing the type of resource.
   String? initiatorType;
-
-  ///Resource URL.
-  WebUri? url;
 
   ///Returns the [DOMHighResTimeStamp](https://developer.mozilla.org/en-US/docs/Web/API/DOMHighResTimeStamp) for the time a resource fetch started.
   double? startTime;
 
-  ///Returns the [DOMHighResTimeStamp](https://developer.mozilla.org/en-US/docs/Web/API/DOMHighResTimeStamp) duration to fetch a resource.
-  double? duration;
-  LoadedResource({this.initiatorType, this.url, this.startTime, this.duration});
+  ///Resource URL.
+  WebUri? url;
+  LoadedResource({this.duration, this.initiatorType, this.startTime, this.url});
 
   ///Gets a possible [LoadedResource] instance from a [Map] value.
   static LoadedResource? fromMap(Map<String, dynamic>? map) {
@@ -28,10 +28,10 @@ class LoadedResource {
       return null;
     }
     final instance = LoadedResource(
-      initiatorType: map['initiatorType'],
-      url: map['url'] != null ? WebUri(map['url']) : null,
-      startTime: map['startTime'],
       duration: map['duration'],
+      initiatorType: map['initiatorType'],
+      startTime: map['startTime'],
+      url: map['url'] != null ? WebUri(map['url']) : null,
     );
     return instance;
   }
@@ -39,10 +39,10 @@ class LoadedResource {
   ///Converts instance to a map.
   Map<String, dynamic> toMap() {
     return {
-      "initiatorType": initiatorType,
-      "url": url?.toString(),
-      "startTime": startTime,
       "duration": duration,
+      "initiatorType": initiatorType,
+      "startTime": startTime,
+      "url": url?.toString(),
     };
   }
 
@@ -53,6 +53,6 @@ class LoadedResource {
 
   @override
   String toString() {
-    return 'LoadedResource{initiatorType: $initiatorType, url: $url, startTime: $startTime, duration: $duration}';
+    return 'LoadedResource{duration: $duration, initiatorType: $initiatorType, startTime: $startTime, url: $url}';
   }
 }

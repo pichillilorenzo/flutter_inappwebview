@@ -8,26 +8,26 @@ part of 'js_confirm_response.dart';
 
 ///Class that represents the response used by the [WebView.onJsConfirm] event to control a JavaScript confirm dialog.
 class JsConfirmResponse {
-  ///Message to be displayed in the window.
-  String message;
-
-  ///Title of the confirm button.
-  String confirmButtonTitle;
+  ///Action used to confirm that the user hit confirm or cancel button.
+  JsConfirmResponseAction? action;
 
   ///Title of the cancel button.
   String cancelButtonTitle;
 
+  ///Title of the confirm button.
+  String confirmButtonTitle;
+
   ///Whether the client will handle the confirm dialog.
   bool handledByClient;
 
-  ///Action used to confirm that the user hit confirm or cancel button.
-  JsConfirmResponseAction? action;
+  ///Message to be displayed in the window.
+  String message;
   JsConfirmResponse(
-      {this.message = "",
-      this.confirmButtonTitle = "",
+      {this.action = JsConfirmResponseAction.CANCEL,
       this.cancelButtonTitle = "",
+      this.confirmButtonTitle = "",
       this.handledByClient = false,
-      this.action = JsConfirmResponseAction.CANCEL});
+      this.message = ""});
 
   ///Gets a possible [JsConfirmResponse] instance from a [Map] value.
   static JsConfirmResponse? fromMap(Map<String, dynamic>? map) {
@@ -35,22 +35,22 @@ class JsConfirmResponse {
       return null;
     }
     final instance = JsConfirmResponse();
-    instance.message = map['message'];
-    instance.confirmButtonTitle = map['confirmButtonTitle'];
-    instance.cancelButtonTitle = map['cancelButtonTitle'];
-    instance.handledByClient = map['handledByClient'];
     instance.action = JsConfirmResponseAction.fromNativeValue(map['action']);
+    instance.cancelButtonTitle = map['cancelButtonTitle'];
+    instance.confirmButtonTitle = map['confirmButtonTitle'];
+    instance.handledByClient = map['handledByClient'];
+    instance.message = map['message'];
     return instance;
   }
 
   ///Converts instance to a map.
   Map<String, dynamic> toMap() {
     return {
-      "message": message,
-      "confirmButtonTitle": confirmButtonTitle,
-      "cancelButtonTitle": cancelButtonTitle,
-      "handledByClient": handledByClient,
       "action": action?.toNativeValue(),
+      "cancelButtonTitle": cancelButtonTitle,
+      "confirmButtonTitle": confirmButtonTitle,
+      "handledByClient": handledByClient,
+      "message": message,
     };
   }
 
@@ -61,6 +61,6 @@ class JsConfirmResponse {
 
   @override
   String toString() {
-    return 'JsConfirmResponse{message: $message, confirmButtonTitle: $confirmButtonTitle, cancelButtonTitle: $cancelButtonTitle, handledByClient: $handledByClient, action: $action}';
+    return 'JsConfirmResponse{action: $action, cancelButtonTitle: $cancelButtonTitle, confirmButtonTitle: $confirmButtonTitle, handledByClient: $handledByClient, message: $message}';
   }
 }

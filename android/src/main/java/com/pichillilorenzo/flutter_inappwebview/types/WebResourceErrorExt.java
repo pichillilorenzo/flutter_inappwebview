@@ -2,9 +2,12 @@ package com.pichillilorenzo.flutter_inappwebview.types;
 
 import android.os.Build;
 import android.webkit.WebResourceError;
+import android.webkit.WebView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
+import androidx.webkit.WebResourceErrorCompat;
+import androidx.webkit.WebViewFeature;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -22,6 +25,19 @@ public class WebResourceErrorExt {
   @RequiresApi(Build.VERSION_CODES.M)
   static public WebResourceErrorExt fromWebResourceError(@NonNull WebResourceError error) {
     return new WebResourceErrorExt(error.getErrorCode(), error.getDescription().toString());
+  }
+
+  @RequiresApi(Build.VERSION_CODES.M)
+  static public WebResourceErrorExt fromWebResourceError(@NonNull WebResourceErrorCompat error) {
+    int type = -1;
+    if (WebViewFeature.isFeatureSupported(WebViewFeature.WEB_RESOURCE_ERROR_GET_CODE)) {
+      type = error.getErrorCode();
+    }
+    String description = "";
+    if (WebViewFeature.isFeatureSupported(WebViewFeature.WEB_RESOURCE_ERROR_GET_DESCRIPTION)) {
+      description = error.getDescription().toString();
+    }
+    return new WebResourceErrorExt(type, description);
   }
 
   public Map<String, Object> toMap() {

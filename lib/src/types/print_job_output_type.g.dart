@@ -21,16 +21,16 @@ class PrintJobOutputType {
   ///Output is normal quality, duplex.
   static const GENERAL = PrintJobOutputType._internal(0, 0);
 
-  ///Specifies that the printed content consists of black-and-white or color images.
-  ///The default paper is 4x6, A6, or similar locale-specific designation.
-  ///Output is high quality, simplex.
-  static const PHOTO = PrintJobOutputType._internal(1, 1);
-
   ///Specifies that the printed content is grayscale.
   ///Set the output type to this value when your printable content contains no color—for example, it’s black text only.
   ///The default paper is Letter/A4. Output is grayscale quality, duplex.
   ///This content type can produce a performance improvement in some cases.
   static const GRAYSCALE = PrintJobOutputType._internal(2, 2);
+
+  ///Specifies that the printed content consists of black-and-white or color images.
+  ///The default paper is 4x6, A6, or similar locale-specific designation.
+  ///Output is high quality, simplex.
+  static const PHOTO = PrintJobOutputType._internal(1, 1);
 
   ///Specifies that the printed content is a grayscale image.
   ///Set the output type to this value when your printable content contains no color—for example, it’s black text only.
@@ -41,8 +41,8 @@ class PrintJobOutputType {
   ///Set of all values of [PrintJobOutputType].
   static final Set<PrintJobOutputType> values = [
     PrintJobOutputType.GENERAL,
-    PrintJobOutputType.PHOTO,
     PrintJobOutputType.GRAYSCALE,
+    PrintJobOutputType.PHOTO,
     PrintJobOutputType.PHOTO_GRAYSCALE,
   ].toSet();
 
@@ -89,10 +89,10 @@ class PrintJobOutputType {
     switch (_value) {
       case 0:
         return 'GENERAL';
-      case 1:
-        return 'PHOTO';
       case 2:
         return 'GRAYSCALE';
+      case 1:
+        return 'PHOTO';
       case 3:
         return 'PHOTO_GRAYSCALE';
     }

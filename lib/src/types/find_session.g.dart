@@ -7,18 +7,18 @@ part of 'find_session.dart';
 // **************************************************************************
 
 class FindSession {
-  ///Returns the total number of results.
-  int resultCount;
-
   ///Returns the index of the currently highlighted result.
   ///If no result is currently highlighted.
   int highlightedResultIndex;
 
+  ///Returns the total number of results.
+  int resultCount;
+
   /// Defines how results are reported through the find panel's UI.
   SearchResultDisplayStyle searchResultDisplayStyle;
   FindSession(
-      {required this.resultCount,
-      required this.highlightedResultIndex,
+      {required this.highlightedResultIndex,
+      required this.resultCount,
       required this.searchResultDisplayStyle});
 
   ///Gets a possible [FindSession] instance from a [Map] value.
@@ -27,8 +27,8 @@ class FindSession {
       return null;
     }
     final instance = FindSession(
-      resultCount: map['resultCount'],
       highlightedResultIndex: map['highlightedResultIndex'],
+      resultCount: map['resultCount'],
       searchResultDisplayStyle: SearchResultDisplayStyle.fromNativeValue(
           map['searchResultDisplayStyle'])!,
     );
@@ -38,8 +38,8 @@ class FindSession {
   ///Converts instance to a map.
   Map<String, dynamic> toMap() {
     return {
-      "resultCount": resultCount,
       "highlightedResultIndex": highlightedResultIndex,
+      "resultCount": resultCount,
       "searchResultDisplayStyle": searchResultDisplayStyle.toNativeValue(),
     };
   }
@@ -51,6 +51,6 @@ class FindSession {
 
   @override
   String toString() {
-    return 'FindSession{resultCount: $resultCount, highlightedResultIndex: $highlightedResultIndex, searchResultDisplayStyle: $searchResultDisplayStyle}';
+    return 'FindSession{highlightedResultIndex: $highlightedResultIndex, resultCount: $resultCount, searchResultDisplayStyle: $searchResultDisplayStyle}';
   }
 }

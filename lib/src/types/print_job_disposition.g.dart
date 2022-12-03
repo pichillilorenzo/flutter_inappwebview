@@ -16,14 +16,15 @@ class PrintJobDisposition {
           String value, Function nativeValue) =>
       PrintJobDisposition._internal(value, nativeValue());
 
-  ///Normal print job.
+  ///Cancel print job.
   ///
   ///**Supported Platforms/Implementations**:
   ///- MacOS
-  static final SPOOL = PrintJobDisposition._internalMultiPlatform('SPOOL', () {
+  static final CANCEL =
+      PrintJobDisposition._internalMultiPlatform('CANCEL', () {
     switch (defaultTargetPlatform) {
       case TargetPlatform.macOS:
-        return 'spool';
+        return 'cancel';
       default:
         break;
     }
@@ -59,15 +60,14 @@ class PrintJobDisposition {
     return null;
   });
 
-  ///Cancel print job.
+  ///Normal print job.
   ///
   ///**Supported Platforms/Implementations**:
   ///- MacOS
-  static final CANCEL =
-      PrintJobDisposition._internalMultiPlatform('CANCEL', () {
+  static final SPOOL = PrintJobDisposition._internalMultiPlatform('SPOOL', () {
     switch (defaultTargetPlatform) {
       case TargetPlatform.macOS:
-        return 'cancel';
+        return 'spool';
       default:
         break;
     }
@@ -76,10 +76,10 @@ class PrintJobDisposition {
 
   ///Set of all values of [PrintJobDisposition].
   static final Set<PrintJobDisposition> values = [
-    PrintJobDisposition.SPOOL,
+    PrintJobDisposition.CANCEL,
     PrintJobDisposition.PREVIEW,
     PrintJobDisposition.SAVE,
-    PrintJobDisposition.CANCEL,
+    PrintJobDisposition.SPOOL,
   ].toSet();
 
   ///Gets a possible [PrintJobDisposition] instance from [String] value.

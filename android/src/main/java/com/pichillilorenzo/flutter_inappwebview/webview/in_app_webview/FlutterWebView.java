@@ -146,6 +146,9 @@ public class FlutterWebView implements PlatformWebView {
           if (webView.inAppWebViewChromeClient != null) {
             webView.inAppWebViewChromeClient.dispose();
           }
+          if (webView.inAppWebViewClientCompat != null) {
+            webView.inAppWebViewClientCompat.dispose();
+          }
           if (webView.inAppWebViewClient != null) {
             webView.inAppWebViewClient.dispose();
           }

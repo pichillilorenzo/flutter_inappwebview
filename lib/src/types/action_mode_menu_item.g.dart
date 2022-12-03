@@ -19,21 +19,21 @@ class ActionModeMenuItem {
   ///No menu items should be disabled.
   static const MENU_ITEM_NONE = ActionModeMenuItem._internal(0, 0);
 
+  ///Disable all the action mode menu items for text processing.
+  static const MENU_ITEM_PROCESS_TEXT = ActionModeMenuItem._internal(4, 4);
+
   ///Disable menu item "Share".
   static const MENU_ITEM_SHARE = ActionModeMenuItem._internal(1, 1);
 
   ///Disable menu item "Web Search".
   static const MENU_ITEM_WEB_SEARCH = ActionModeMenuItem._internal(2, 2);
 
-  ///Disable all the action mode menu items for text processing.
-  static const MENU_ITEM_PROCESS_TEXT = ActionModeMenuItem._internal(4, 4);
-
   ///Set of all values of [ActionModeMenuItem].
   static final Set<ActionModeMenuItem> values = [
     ActionModeMenuItem.MENU_ITEM_NONE,
+    ActionModeMenuItem.MENU_ITEM_PROCESS_TEXT,
     ActionModeMenuItem.MENU_ITEM_SHARE,
     ActionModeMenuItem.MENU_ITEM_WEB_SEARCH,
-    ActionModeMenuItem.MENU_ITEM_PROCESS_TEXT,
   ].toSet();
 
   ///Gets a possible [ActionModeMenuItem] instance from [int] value.
@@ -82,12 +82,12 @@ class ActionModeMenuItem {
     switch (_value) {
       case 0:
         return 'MENU_ITEM_NONE';
+      case 4:
+        return 'MENU_ITEM_PROCESS_TEXT';
       case 1:
         return 'MENU_ITEM_SHARE';
       case 2:
         return 'MENU_ITEM_WEB_SEARCH';
-      case 4:
-        return 'MENU_ITEM_PROCESS_TEXT';
     }
     return _value.toString();
   }
@@ -111,22 +111,22 @@ class AndroidActionModeMenuItem {
   ///No menu items should be disabled.
   static const MENU_ITEM_NONE = AndroidActionModeMenuItem._internal(0, 0);
 
+  ///Disable all the action mode menu items for text processing.
+  static const MENU_ITEM_PROCESS_TEXT =
+      AndroidActionModeMenuItem._internal(4, 4);
+
   ///Disable menu item "Share".
   static const MENU_ITEM_SHARE = AndroidActionModeMenuItem._internal(1, 1);
 
   ///Disable menu item "Web Search".
   static const MENU_ITEM_WEB_SEARCH = AndroidActionModeMenuItem._internal(2, 2);
 
-  ///Disable all the action mode menu items for text processing.
-  static const MENU_ITEM_PROCESS_TEXT =
-      AndroidActionModeMenuItem._internal(4, 4);
-
   ///Set of all values of [AndroidActionModeMenuItem].
   static final Set<AndroidActionModeMenuItem> values = [
     AndroidActionModeMenuItem.MENU_ITEM_NONE,
+    AndroidActionModeMenuItem.MENU_ITEM_PROCESS_TEXT,
     AndroidActionModeMenuItem.MENU_ITEM_SHARE,
     AndroidActionModeMenuItem.MENU_ITEM_WEB_SEARCH,
-    AndroidActionModeMenuItem.MENU_ITEM_PROCESS_TEXT,
   ].toSet();
 
   ///Gets a possible [AndroidActionModeMenuItem] instance from [int] value.
@@ -175,12 +175,12 @@ class AndroidActionModeMenuItem {
     switch (_value) {
       case 0:
         return 'MENU_ITEM_NONE';
+      case 4:
+        return 'MENU_ITEM_PROCESS_TEXT';
       case 1:
         return 'MENU_ITEM_SHARE';
       case 2:
         return 'MENU_ITEM_WEB_SEARCH';
-      case 4:
-        return 'MENU_ITEM_PROCESS_TEXT';
     }
     return _value.toString();
   }

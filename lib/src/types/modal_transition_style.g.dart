@@ -20,14 +20,14 @@ class ModalTransitionStyle {
   ///On dismissal, the view slides back down. This is the default transition style.
   static const COVER_VERTICAL = ModalTransitionStyle._internal(0, 0);
 
+  ///When the view controller is presented, the current view fades out while the new view fades in at the same time.
+  ///On dismissal, a similar type of cross-fade is used to return to the original view.
+  static const CROSS_DISSOLVE = ModalTransitionStyle._internal(2, 2);
+
   ///When the view controller is presented, the current view initiates a horizontal 3D flip from right-to-left,
   ///resulting in the revealing of the new view as if it were on the back of the previous view.
   ///On dismissal, the flip occurs from left-to-right, returning to the original view.
   static const FLIP_HORIZONTAL = ModalTransitionStyle._internal(1, 1);
-
-  ///When the view controller is presented, the current view fades out while the new view fades in at the same time.
-  ///On dismissal, a similar type of cross-fade is used to return to the original view.
-  static const CROSS_DISSOLVE = ModalTransitionStyle._internal(2, 2);
 
   ///When the view controller is presented, one corner of the current view curls up to reveal the presented view underneath.
   ///On dismissal, the curled up page unfurls itself back on top of the presented view.
@@ -37,8 +37,8 @@ class ModalTransitionStyle {
   ///Set of all values of [ModalTransitionStyle].
   static final Set<ModalTransitionStyle> values = [
     ModalTransitionStyle.COVER_VERTICAL,
-    ModalTransitionStyle.FLIP_HORIZONTAL,
     ModalTransitionStyle.CROSS_DISSOLVE,
+    ModalTransitionStyle.FLIP_HORIZONTAL,
     ModalTransitionStyle.PARTIAL_CURL,
   ].toSet();
 
@@ -85,10 +85,10 @@ class ModalTransitionStyle {
     switch (_value) {
       case 0:
         return 'COVER_VERTICAL';
-      case 1:
-        return 'FLIP_HORIZONTAL';
       case 2:
         return 'CROSS_DISSOLVE';
+      case 1:
+        return 'FLIP_HORIZONTAL';
       case 3:
         return 'PARTIAL_CURL';
     }
@@ -112,14 +112,14 @@ class IOSUIModalTransitionStyle {
   ///On dismissal, the view slides back down. This is the default transition style.
   static const COVER_VERTICAL = IOSUIModalTransitionStyle._internal(0, 0);
 
+  ///When the view controller is presented, the current view fades out while the new view fades in at the same time.
+  ///On dismissal, a similar type of cross-fade is used to return to the original view.
+  static const CROSS_DISSOLVE = IOSUIModalTransitionStyle._internal(2, 2);
+
   ///When the view controller is presented, the current view initiates a horizontal 3D flip from right-to-left,
   ///resulting in the revealing of the new view as if it were on the back of the previous view.
   ///On dismissal, the flip occurs from left-to-right, returning to the original view.
   static const FLIP_HORIZONTAL = IOSUIModalTransitionStyle._internal(1, 1);
-
-  ///When the view controller is presented, the current view fades out while the new view fades in at the same time.
-  ///On dismissal, a similar type of cross-fade is used to return to the original view.
-  static const CROSS_DISSOLVE = IOSUIModalTransitionStyle._internal(2, 2);
 
   ///When the view controller is presented, one corner of the current view curls up to reveal the presented view underneath.
   ///On dismissal, the curled up page unfurls itself back on top of the presented view.
@@ -129,8 +129,8 @@ class IOSUIModalTransitionStyle {
   ///Set of all values of [IOSUIModalTransitionStyle].
   static final Set<IOSUIModalTransitionStyle> values = [
     IOSUIModalTransitionStyle.COVER_VERTICAL,
-    IOSUIModalTransitionStyle.FLIP_HORIZONTAL,
     IOSUIModalTransitionStyle.CROSS_DISSOLVE,
+    IOSUIModalTransitionStyle.FLIP_HORIZONTAL,
     IOSUIModalTransitionStyle.PARTIAL_CURL,
   ].toSet();
 
@@ -177,10 +177,10 @@ class IOSUIModalTransitionStyle {
     switch (_value) {
       case 0:
         return 'COVER_VERTICAL';
-      case 1:
-        return 'FLIP_HORIZONTAL';
       case 2:
         return 'CROSS_DISSOLVE';
+      case 1:
+        return 'FLIP_HORIZONTAL';
       case 3:
         return 'PARTIAL_CURL';
     }

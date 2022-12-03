@@ -16,10 +16,11 @@ class URLRequestCachePolicy {
           int value, Function nativeValue) =>
       URLRequestCachePolicy._internal(value, nativeValue());
 
-  ///Use the caching logic defined in the protocol implementation, if any, for a particular URL load request.
-  ///This is the default policy for URL load requests.
-  static const USE_PROTOCOL_CACHE_POLICY =
-      URLRequestCachePolicy._internal(0, 0);
+  ///Ignore local cache data, and instruct proxies and other intermediates to disregard their caches so far as the protocol allows.
+  ///
+  ///**NOTE**: Versions earlier than macOS 15, iOS 13, watchOS 6, and tvOS 13 don’t implement this constant.
+  static const RELOAD_IGNORING_LOCAL_AND_REMOTE_CACHE_DATA =
+      URLRequestCachePolicy._internal(4, 4);
 
   ///The URL load should be loaded only from the originating source.
   ///This policy specifies that no existing cache data should be used to satisfy a URL load request.
@@ -28,9 +29,11 @@ class URLRequestCachePolicy {
   static const RELOAD_IGNORING_LOCAL_CACHE_DATA =
       URLRequestCachePolicy._internal(1, 1);
 
-  ///Use existing cache data, regardless or age or expiration date, loading from originating source only if there is no cached data.
-  static const RETURN_CACHE_DATA_ELSE_LOAD =
-      URLRequestCachePolicy._internal(2, 2);
+  ///Use cache data if the origin source can validate it; otherwise, load from the origin.
+  ///
+  ///**NOTE**: Versions earlier than macOS 15, iOS 13, watchOS 6, and tvOS 13 don’t implement this constant.
+  static const RELOAD_REVALIDATING_CACHE_DATA =
+      URLRequestCachePolicy._internal(5, 5);
 
   ///Use existing cache data, regardless or age or expiration date, and fail if no cached data is available.
   ///
@@ -40,26 +43,23 @@ class URLRequestCachePolicy {
   static const RETURN_CACHE_DATA_DONT_LOAD =
       URLRequestCachePolicy._internal(3, 3);
 
-  ///Ignore local cache data, and instruct proxies and other intermediates to disregard their caches so far as the protocol allows.
-  ///
-  ///**NOTE**: Versions earlier than macOS 15, iOS 13, watchOS 6, and tvOS 13 don’t implement this constant.
-  static const RELOAD_IGNORING_LOCAL_AND_REMOTE_CACHE_DATA =
-      URLRequestCachePolicy._internal(4, 4);
+  ///Use existing cache data, regardless or age or expiration date, loading from originating source only if there is no cached data.
+  static const RETURN_CACHE_DATA_ELSE_LOAD =
+      URLRequestCachePolicy._internal(2, 2);
 
-  ///Use cache data if the origin source can validate it; otherwise, load from the origin.
-  ///
-  ///**NOTE**: Versions earlier than macOS 15, iOS 13, watchOS 6, and tvOS 13 don’t implement this constant.
-  static const RELOAD_REVALIDATING_CACHE_DATA =
-      URLRequestCachePolicy._internal(5, 5);
+  ///Use the caching logic defined in the protocol implementation, if any, for a particular URL load request.
+  ///This is the default policy for URL load requests.
+  static const USE_PROTOCOL_CACHE_POLICY =
+      URLRequestCachePolicy._internal(0, 0);
 
   ///Set of all values of [URLRequestCachePolicy].
   static final Set<URLRequestCachePolicy> values = [
-    URLRequestCachePolicy.USE_PROTOCOL_CACHE_POLICY,
-    URLRequestCachePolicy.RELOAD_IGNORING_LOCAL_CACHE_DATA,
-    URLRequestCachePolicy.RETURN_CACHE_DATA_ELSE_LOAD,
-    URLRequestCachePolicy.RETURN_CACHE_DATA_DONT_LOAD,
     URLRequestCachePolicy.RELOAD_IGNORING_LOCAL_AND_REMOTE_CACHE_DATA,
+    URLRequestCachePolicy.RELOAD_IGNORING_LOCAL_CACHE_DATA,
     URLRequestCachePolicy.RELOAD_REVALIDATING_CACHE_DATA,
+    URLRequestCachePolicy.RETURN_CACHE_DATA_DONT_LOAD,
+    URLRequestCachePolicy.RETURN_CACHE_DATA_ELSE_LOAD,
+    URLRequestCachePolicy.USE_PROTOCOL_CACHE_POLICY,
   ].toSet();
 
   ///Gets a possible [URLRequestCachePolicy] instance from [int] value.
@@ -103,18 +103,18 @@ class URLRequestCachePolicy {
   @override
   String toString() {
     switch (_value) {
-      case 0:
-        return 'USE_PROTOCOL_CACHE_POLICY';
-      case 1:
-        return 'RELOAD_IGNORING_LOCAL_CACHE_DATA';
-      case 2:
-        return 'RETURN_CACHE_DATA_ELSE_LOAD';
-      case 3:
-        return 'RETURN_CACHE_DATA_DONT_LOAD';
       case 4:
         return 'RELOAD_IGNORING_LOCAL_AND_REMOTE_CACHE_DATA';
+      case 1:
+        return 'RELOAD_IGNORING_LOCAL_CACHE_DATA';
       case 5:
         return 'RELOAD_REVALIDATING_CACHE_DATA';
+      case 3:
+        return 'RETURN_CACHE_DATA_DONT_LOAD';
+      case 2:
+        return 'RETURN_CACHE_DATA_ELSE_LOAD';
+      case 0:
+        return 'USE_PROTOCOL_CACHE_POLICY';
     }
     return _value.toString();
   }
@@ -132,10 +132,11 @@ class IOSURLRequestCachePolicy {
           int value, Function nativeValue) =>
       IOSURLRequestCachePolicy._internal(value, nativeValue());
 
-  ///Use the caching logic defined in the protocol implementation, if any, for a particular URL load request.
-  ///This is the default policy for URL load requests.
-  static const USE_PROTOCOL_CACHE_POLICY =
-      IOSURLRequestCachePolicy._internal(0, 0);
+  ///Ignore local cache data, and instruct proxies and other intermediates to disregard their caches so far as the protocol allows.
+  ///
+  ///**NOTE**: Versions earlier than macOS 15, iOS 13, watchOS 6, and tvOS 13 don’t implement this constant.
+  static const RELOAD_IGNORING_LOCAL_AND_REMOTE_CACHE_DATA =
+      IOSURLRequestCachePolicy._internal(4, 4);
 
   ///The URL load should be loaded only from the originating source.
   ///This policy specifies that no existing cache data should be used to satisfy a URL load request.
@@ -144,9 +145,11 @@ class IOSURLRequestCachePolicy {
   static const RELOAD_IGNORING_LOCAL_CACHE_DATA =
       IOSURLRequestCachePolicy._internal(1, 1);
 
-  ///Use existing cache data, regardless or age or expiration date, loading from originating source only if there is no cached data.
-  static const RETURN_CACHE_DATA_ELSE_LOAD =
-      IOSURLRequestCachePolicy._internal(2, 2);
+  ///Use cache data if the origin source can validate it; otherwise, load from the origin.
+  ///
+  ///**NOTE**: Versions earlier than macOS 15, iOS 13, watchOS 6, and tvOS 13 don’t implement this constant.
+  static const RELOAD_REVALIDATING_CACHE_DATA =
+      IOSURLRequestCachePolicy._internal(5, 5);
 
   ///Use existing cache data, regardless or age or expiration date, and fail if no cached data is available.
   ///
@@ -156,26 +159,23 @@ class IOSURLRequestCachePolicy {
   static const RETURN_CACHE_DATA_DONT_LOAD =
       IOSURLRequestCachePolicy._internal(3, 3);
 
-  ///Ignore local cache data, and instruct proxies and other intermediates to disregard their caches so far as the protocol allows.
-  ///
-  ///**NOTE**: Versions earlier than macOS 15, iOS 13, watchOS 6, and tvOS 13 don’t implement this constant.
-  static const RELOAD_IGNORING_LOCAL_AND_REMOTE_CACHE_DATA =
-      IOSURLRequestCachePolicy._internal(4, 4);
+  ///Use existing cache data, regardless or age or expiration date, loading from originating source only if there is no cached data.
+  static const RETURN_CACHE_DATA_ELSE_LOAD =
+      IOSURLRequestCachePolicy._internal(2, 2);
 
-  ///Use cache data if the origin source can validate it; otherwise, load from the origin.
-  ///
-  ///**NOTE**: Versions earlier than macOS 15, iOS 13, watchOS 6, and tvOS 13 don’t implement this constant.
-  static const RELOAD_REVALIDATING_CACHE_DATA =
-      IOSURLRequestCachePolicy._internal(5, 5);
+  ///Use the caching logic defined in the protocol implementation, if any, for a particular URL load request.
+  ///This is the default policy for URL load requests.
+  static const USE_PROTOCOL_CACHE_POLICY =
+      IOSURLRequestCachePolicy._internal(0, 0);
 
   ///Set of all values of [IOSURLRequestCachePolicy].
   static final Set<IOSURLRequestCachePolicy> values = [
-    IOSURLRequestCachePolicy.USE_PROTOCOL_CACHE_POLICY,
-    IOSURLRequestCachePolicy.RELOAD_IGNORING_LOCAL_CACHE_DATA,
-    IOSURLRequestCachePolicy.RETURN_CACHE_DATA_ELSE_LOAD,
-    IOSURLRequestCachePolicy.RETURN_CACHE_DATA_DONT_LOAD,
     IOSURLRequestCachePolicy.RELOAD_IGNORING_LOCAL_AND_REMOTE_CACHE_DATA,
+    IOSURLRequestCachePolicy.RELOAD_IGNORING_LOCAL_CACHE_DATA,
     IOSURLRequestCachePolicy.RELOAD_REVALIDATING_CACHE_DATA,
+    IOSURLRequestCachePolicy.RETURN_CACHE_DATA_DONT_LOAD,
+    IOSURLRequestCachePolicy.RETURN_CACHE_DATA_ELSE_LOAD,
+    IOSURLRequestCachePolicy.USE_PROTOCOL_CACHE_POLICY,
   ].toSet();
 
   ///Gets a possible [IOSURLRequestCachePolicy] instance from [int] value.
@@ -219,18 +219,18 @@ class IOSURLRequestCachePolicy {
   @override
   String toString() {
     switch (_value) {
-      case 0:
-        return 'USE_PROTOCOL_CACHE_POLICY';
-      case 1:
-        return 'RELOAD_IGNORING_LOCAL_CACHE_DATA';
-      case 2:
-        return 'RETURN_CACHE_DATA_ELSE_LOAD';
-      case 3:
-        return 'RETURN_CACHE_DATA_DONT_LOAD';
       case 4:
         return 'RELOAD_IGNORING_LOCAL_AND_REMOTE_CACHE_DATA';
+      case 1:
+        return 'RELOAD_IGNORING_LOCAL_CACHE_DATA';
       case 5:
         return 'RELOAD_REVALIDATING_CACHE_DATA';
+      case 3:
+        return 'RETURN_CACHE_DATA_DONT_LOAD';
+      case 2:
+        return 'RETURN_CACHE_DATA_ELSE_LOAD';
+      case 0:
+        return 'USE_PROTOCOL_CACHE_POLICY';
     }
     return _value.toString();
   }

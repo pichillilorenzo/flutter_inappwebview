@@ -20,10 +20,6 @@ class MixedContentMode {
   ///This is the least secure mode of operation for the WebView, and where possible apps should not set this mode.
   static const MIXED_CONTENT_ALWAYS_ALLOW = MixedContentMode._internal(0, 0);
 
-  ///In this mode, the WebView will not allow a secure origin to load content from an insecure origin.
-  ///This is the preferred and most secure mode of operation for the WebView and apps are strongly advised to use this mode.
-  static const MIXED_CONTENT_NEVER_ALLOW = MixedContentMode._internal(1, 1);
-
   ///In this mode, the WebView will attempt to be compatible with the approach of a modern web browser with regard to mixed content.
   ///Some insecure content may be allowed to be loaded by a secure origin and other types of content will be blocked.
   ///The types of content are allowed or blocked may change release to release and are not explicitly defined.
@@ -32,11 +28,15 @@ class MixedContentMode {
   static const MIXED_CONTENT_COMPATIBILITY_MODE =
       MixedContentMode._internal(2, 2);
 
+  ///In this mode, the WebView will not allow a secure origin to load content from an insecure origin.
+  ///This is the preferred and most secure mode of operation for the WebView and apps are strongly advised to use this mode.
+  static const MIXED_CONTENT_NEVER_ALLOW = MixedContentMode._internal(1, 1);
+
   ///Set of all values of [MixedContentMode].
   static final Set<MixedContentMode> values = [
     MixedContentMode.MIXED_CONTENT_ALWAYS_ALLOW,
-    MixedContentMode.MIXED_CONTENT_NEVER_ALLOW,
     MixedContentMode.MIXED_CONTENT_COMPATIBILITY_MODE,
+    MixedContentMode.MIXED_CONTENT_NEVER_ALLOW,
   ].toSet();
 
   ///Gets a possible [MixedContentMode] instance from [int] value.
@@ -82,10 +82,10 @@ class MixedContentMode {
     switch (_value) {
       case 0:
         return 'MIXED_CONTENT_ALWAYS_ALLOW';
-      case 1:
-        return 'MIXED_CONTENT_NEVER_ALLOW';
       case 2:
         return 'MIXED_CONTENT_COMPATIBILITY_MODE';
+      case 1:
+        return 'MIXED_CONTENT_NEVER_ALLOW';
     }
     return _value.toString();
   }
@@ -111,11 +111,6 @@ class AndroidMixedContentMode {
   static const MIXED_CONTENT_ALWAYS_ALLOW =
       AndroidMixedContentMode._internal(0, 0);
 
-  ///In this mode, the WebView will not allow a secure origin to load content from an insecure origin.
-  ///This is the preferred and most secure mode of operation for the WebView and apps are strongly advised to use this mode.
-  static const MIXED_CONTENT_NEVER_ALLOW =
-      AndroidMixedContentMode._internal(1, 1);
-
   ///In this mode, the WebView will attempt to be compatible with the approach of a modern web browser with regard to mixed content.
   ///Some insecure content may be allowed to be loaded by a secure origin and other types of content will be blocked.
   ///The types of content are allowed or blocked may change release to release and are not explicitly defined.
@@ -124,11 +119,16 @@ class AndroidMixedContentMode {
   static const MIXED_CONTENT_COMPATIBILITY_MODE =
       AndroidMixedContentMode._internal(2, 2);
 
+  ///In this mode, the WebView will not allow a secure origin to load content from an insecure origin.
+  ///This is the preferred and most secure mode of operation for the WebView and apps are strongly advised to use this mode.
+  static const MIXED_CONTENT_NEVER_ALLOW =
+      AndroidMixedContentMode._internal(1, 1);
+
   ///Set of all values of [AndroidMixedContentMode].
   static final Set<AndroidMixedContentMode> values = [
     AndroidMixedContentMode.MIXED_CONTENT_ALWAYS_ALLOW,
-    AndroidMixedContentMode.MIXED_CONTENT_NEVER_ALLOW,
     AndroidMixedContentMode.MIXED_CONTENT_COMPATIBILITY_MODE,
+    AndroidMixedContentMode.MIXED_CONTENT_NEVER_ALLOW,
   ].toSet();
 
   ///Gets a possible [AndroidMixedContentMode] instance from [int] value.
@@ -174,10 +174,10 @@ class AndroidMixedContentMode {
     switch (_value) {
       case 0:
         return 'MIXED_CONTENT_ALWAYS_ALLOW';
-      case 1:
-        return 'MIXED_CONTENT_NEVER_ALLOW';
       case 2:
         return 'MIXED_CONTENT_COMPATIBILITY_MODE';
+      case 1:
+        return 'MIXED_CONTENT_NEVER_ALLOW';
     }
     return _value.toString();
   }

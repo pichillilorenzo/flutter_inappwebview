@@ -17,18 +17,18 @@ class ContentBlockerTriggerLoadContext {
           String value, Function nativeValue) =>
       ContentBlockerTriggerLoadContext._internal(value, nativeValue());
 
-  ///Top frame load context
-  static const TOP_FRAME =
-      ContentBlockerTriggerLoadContext._internal('top-frame', 'top-frame');
-
   ///Child frame load context
   static const CHILD_FRAME =
       ContentBlockerTriggerLoadContext._internal('child-frame', 'child-frame');
 
+  ///Top frame load context
+  static const TOP_FRAME =
+      ContentBlockerTriggerLoadContext._internal('top-frame', 'top-frame');
+
   ///Set of all values of [ContentBlockerTriggerLoadContext].
   static final Set<ContentBlockerTriggerLoadContext> values = [
-    ContentBlockerTriggerLoadContext.TOP_FRAME,
     ContentBlockerTriggerLoadContext.CHILD_FRAME,
+    ContentBlockerTriggerLoadContext.TOP_FRAME,
   ].toSet();
 
   ///Gets a possible [ContentBlockerTriggerLoadContext] instance from [String] value.

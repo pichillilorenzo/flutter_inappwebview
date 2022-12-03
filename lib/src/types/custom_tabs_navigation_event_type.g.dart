@@ -16,30 +16,15 @@ class CustomTabsNavigationEventType {
           int value, Function nativeValue) =>
       CustomTabsNavigationEventType._internal(value, nativeValue());
 
-  ///Sent when the tab has started loading a page.
+  ///Sent when loading was aborted by a user action before it finishes like clicking on a link or refreshing the page.
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
-  static final STARTED =
-      CustomTabsNavigationEventType._internalMultiPlatform(1, () {
+  static final ABORTED =
+      CustomTabsNavigationEventType._internalMultiPlatform(4, () {
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
-        return 1;
-      default:
-        break;
-    }
-    return null;
-  });
-
-  ///Sent when the tab has finished loading a page.
-  ///
-  ///**Supported Platforms/Implementations**:
-  ///- Android native WebView
-  static final FINISHED =
-      CustomTabsNavigationEventType._internalMultiPlatform(2, () {
-    switch (defaultTargetPlatform) {
-      case TargetPlatform.android:
-        return 2;
+        return 4;
       default:
         break;
     }
@@ -61,30 +46,30 @@ class CustomTabsNavigationEventType {
     return null;
   });
 
-  ///Sent when loading was aborted by a user action before it finishes like clicking on a link or refreshing the page.
+  ///Sent when the tab has finished loading a page.
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
-  static final ABORTED =
-      CustomTabsNavigationEventType._internalMultiPlatform(4, () {
+  static final FINISHED =
+      CustomTabsNavigationEventType._internalMultiPlatform(2, () {
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
-        return 4;
+        return 2;
       default:
         break;
     }
     return null;
   });
 
-  ///Sent when the tab becomes visible.
+  ///Sent when the tab has started loading a page.
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
-  static final TAB_SHOWN =
-      CustomTabsNavigationEventType._internalMultiPlatform(5, () {
+  static final STARTED =
+      CustomTabsNavigationEventType._internalMultiPlatform(1, () {
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
-        return 5;
+        return 1;
       default:
         break;
     }
@@ -106,14 +91,29 @@ class CustomTabsNavigationEventType {
     return null;
   });
 
+  ///Sent when the tab becomes visible.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- Android native WebView
+  static final TAB_SHOWN =
+      CustomTabsNavigationEventType._internalMultiPlatform(5, () {
+    switch (defaultTargetPlatform) {
+      case TargetPlatform.android:
+        return 5;
+      default:
+        break;
+    }
+    return null;
+  });
+
   ///Set of all values of [CustomTabsNavigationEventType].
   static final Set<CustomTabsNavigationEventType> values = [
-    CustomTabsNavigationEventType.STARTED,
-    CustomTabsNavigationEventType.FINISHED,
-    CustomTabsNavigationEventType.FAILED,
     CustomTabsNavigationEventType.ABORTED,
-    CustomTabsNavigationEventType.TAB_SHOWN,
+    CustomTabsNavigationEventType.FAILED,
+    CustomTabsNavigationEventType.FINISHED,
+    CustomTabsNavigationEventType.STARTED,
     CustomTabsNavigationEventType.TAB_HIDDEN,
+    CustomTabsNavigationEventType.TAB_SHOWN,
   ].toSet();
 
   ///Gets a possible [CustomTabsNavigationEventType] instance from [int] value.
@@ -157,18 +157,18 @@ class CustomTabsNavigationEventType {
   @override
   String toString() {
     switch (_value) {
-      case 1:
-        return 'STARTED';
-      case 2:
-        return 'FINISHED';
-      case 3:
-        return 'FAILED';
       case 4:
         return 'ABORTED';
-      case 5:
-        return 'TAB_SHOWN';
+      case 3:
+        return 'FAILED';
+      case 2:
+        return 'FINISHED';
+      case 1:
+        return 'STARTED';
       case 6:
         return 'TAB_HIDDEN';
+      case 5:
+        return 'TAB_SHOWN';
     }
     return _value.toString();
   }

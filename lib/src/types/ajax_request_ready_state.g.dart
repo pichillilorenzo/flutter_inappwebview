@@ -16,11 +16,8 @@ class AjaxRequestReadyState {
           int value, Function nativeValue) =>
       AjaxRequestReadyState._internal(value, nativeValue());
 
-  ///Client has been created. `XMLHttpRequest.open()` not called yet.
-  static const UNSENT = AjaxRequestReadyState._internal(0, 0);
-
-  ///`XMLHttpRequest.open()` has been called.
-  static const OPENED = AjaxRequestReadyState._internal(1, 1);
+  ///The operation is complete.
+  static const DONE = AjaxRequestReadyState._internal(4, 4);
 
   ///`XMLHttpRequest.send()` has been called, and [AjaxRequest.headers] and [AjaxRequest.status] are available.
   static const HEADERS_RECEIVED = AjaxRequestReadyState._internal(2, 2);
@@ -28,16 +25,19 @@ class AjaxRequestReadyState {
   ///Downloading; [AjaxRequest.responseText] holds partial data.
   static const LOADING = AjaxRequestReadyState._internal(3, 3);
 
-  ///The operation is complete.
-  static const DONE = AjaxRequestReadyState._internal(4, 4);
+  ///`XMLHttpRequest.open()` has been called.
+  static const OPENED = AjaxRequestReadyState._internal(1, 1);
+
+  ///Client has been created. `XMLHttpRequest.open()` not called yet.
+  static const UNSENT = AjaxRequestReadyState._internal(0, 0);
 
   ///Set of all values of [AjaxRequestReadyState].
   static final Set<AjaxRequestReadyState> values = [
-    AjaxRequestReadyState.UNSENT,
-    AjaxRequestReadyState.OPENED,
+    AjaxRequestReadyState.DONE,
     AjaxRequestReadyState.HEADERS_RECEIVED,
     AjaxRequestReadyState.LOADING,
-    AjaxRequestReadyState.DONE,
+    AjaxRequestReadyState.OPENED,
+    AjaxRequestReadyState.UNSENT,
   ].toSet();
 
   ///Gets a possible [AjaxRequestReadyState] instance from [int] value.
@@ -81,16 +81,16 @@ class AjaxRequestReadyState {
   @override
   String toString() {
     switch (_value) {
-      case 0:
-        return 'UNSENT';
-      case 1:
-        return 'OPENED';
+      case 4:
+        return 'DONE';
       case 2:
         return 'HEADERS_RECEIVED';
       case 3:
         return 'LOADING';
-      case 4:
-        return 'DONE';
+      case 1:
+        return 'OPENED';
+      case 0:
+        return 'UNSENT';
     }
     return _value.toString();
   }

@@ -19,19 +19,19 @@ class WebAuthenticationSessionError {
   ///The login has been canceled.
   static const CANCELED_LOGIN = WebAuthenticationSessionError._internal(1, 1);
 
-  ///A context wasn’t provided.
-  static const PRESENTATION_CONTEXT_NOT_PROVIDED =
-      WebAuthenticationSessionError._internal(2, 2);
-
   ///The context was invalid.
   static const PRESENTATION_CONTEXT_INVALID =
       WebAuthenticationSessionError._internal(3, 3);
 
+  ///A context wasn’t provided.
+  static const PRESENTATION_CONTEXT_NOT_PROVIDED =
+      WebAuthenticationSessionError._internal(2, 2);
+
   ///Set of all values of [WebAuthenticationSessionError].
   static final Set<WebAuthenticationSessionError> values = [
     WebAuthenticationSessionError.CANCELED_LOGIN,
-    WebAuthenticationSessionError.PRESENTATION_CONTEXT_NOT_PROVIDED,
     WebAuthenticationSessionError.PRESENTATION_CONTEXT_INVALID,
+    WebAuthenticationSessionError.PRESENTATION_CONTEXT_NOT_PROVIDED,
   ].toSet();
 
   ///Gets a possible [WebAuthenticationSessionError] instance from [int] value.
@@ -77,10 +77,10 @@ class WebAuthenticationSessionError {
     switch (_value) {
       case 1:
         return 'CANCELED_LOGIN';
-      case 2:
-        return 'PRESENTATION_CONTEXT_NOT_PROVIDED';
       case 3:
         return 'PRESENTATION_CONTEXT_INVALID';
+      case 2:
+        return 'PRESENTATION_CONTEXT_NOT_PROVIDED';
     }
     return _value.toString();
   }

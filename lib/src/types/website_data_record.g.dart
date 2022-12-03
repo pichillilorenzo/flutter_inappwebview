@@ -8,12 +8,12 @@ part of 'website_data_record.dart';
 
 ///Class that represents website data, grouped by domain name using the public suffix list.
 class WebsiteDataRecord {
-  ///The display name for the data record. This is usually the domain name.
-  String? displayName;
-
   ///The various types of website data that exist for this data record.
   Set<WebsiteDataType>? dataTypes;
-  WebsiteDataRecord({this.displayName, this.dataTypes});
+
+  ///The display name for the data record. This is usually the domain name.
+  String? displayName;
+  WebsiteDataRecord({this.dataTypes, this.displayName});
 
   ///Gets a possible [WebsiteDataRecord] instance from a [Map] value.
   static WebsiteDataRecord? fromMap(Map<String, dynamic>? map) {
@@ -21,11 +21,11 @@ class WebsiteDataRecord {
       return null;
     }
     final instance = WebsiteDataRecord(
-      displayName: map['displayName'],
       dataTypes: map['dataTypes'] != null
           ? Set<WebsiteDataType>.from(
               map['dataTypes'].map((e) => WebsiteDataType.fromNativeValue(e)!))
           : null,
+      displayName: map['displayName'],
     );
     return instance;
   }
@@ -33,8 +33,8 @@ class WebsiteDataRecord {
   ///Converts instance to a map.
   Map<String, dynamic> toMap() {
     return {
-      "displayName": displayName,
       "dataTypes": dataTypes?.map((e) => e.toNativeValue()).toList(),
+      "displayName": displayName,
     };
   }
 
@@ -45,7 +45,7 @@ class WebsiteDataRecord {
 
   @override
   String toString() {
-    return 'WebsiteDataRecord{displayName: $displayName, dataTypes: $dataTypes}';
+    return 'WebsiteDataRecord{dataTypes: $dataTypes, displayName: $displayName}';
   }
 }
 
@@ -56,12 +56,12 @@ class WebsiteDataRecord {
 ///Use [WebsiteDataRecord] instead.
 @Deprecated('Use WebsiteDataRecord instead')
 class IOSWKWebsiteDataRecord {
-  ///The display name for the data record. This is usually the domain name.
-  String? displayName;
-
   ///The various types of website data that exist for this data record.
   Set<IOSWKWebsiteDataType>? dataTypes;
-  IOSWKWebsiteDataRecord({this.displayName, this.dataTypes});
+
+  ///The display name for the data record. This is usually the domain name.
+  String? displayName;
+  IOSWKWebsiteDataRecord({this.dataTypes, this.displayName});
 
   ///Gets a possible [IOSWKWebsiteDataRecord] instance from a [Map] value.
   static IOSWKWebsiteDataRecord? fromMap(Map<String, dynamic>? map) {
@@ -69,11 +69,11 @@ class IOSWKWebsiteDataRecord {
       return null;
     }
     final instance = IOSWKWebsiteDataRecord(
-      displayName: map['displayName'],
       dataTypes: map['dataTypes'] != null
           ? Set<IOSWKWebsiteDataType>.from(map['dataTypes']
               .map((e) => IOSWKWebsiteDataType.fromNativeValue(e)!))
           : null,
+      displayName: map['displayName'],
     );
     return instance;
   }
@@ -81,8 +81,8 @@ class IOSWKWebsiteDataRecord {
   ///Converts instance to a map.
   Map<String, dynamic> toMap() {
     return {
-      "displayName": displayName,
       "dataTypes": dataTypes?.map((e) => e.toNativeValue()).toList(),
+      "displayName": displayName,
     };
   }
 
@@ -93,6 +93,6 @@ class IOSWKWebsiteDataRecord {
 
   @override
   String toString() {
-    return 'IOSWKWebsiteDataRecord{displayName: $displayName, dataTypes: $dataTypes}';
+    return 'IOSWKWebsiteDataRecord{dataTypes: $dataTypes, displayName: $displayName}';
   }
 }

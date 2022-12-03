@@ -12,20 +12,20 @@ class SslError {
   @Deprecated('Use code instead')
   AndroidSslError? androidError;
 
-  ///Use [code] instead.
-  @Deprecated('Use code instead')
-  IOSSslError? iosError;
-
   ///Primary code error associated to the server SSL certificate.
   ///It represents the most severe SSL error.
   SslErrorType? code;
+
+  ///Use [code] instead.
+  @Deprecated('Use code instead')
+  IOSSslError? iosError;
 
   ///The message associated to the [code].
   String? message;
   SslError(
       {@Deprecated('Use code instead') this.androidError,
-      @Deprecated('Use code instead') this.iosError,
       this.code,
+      @Deprecated('Use code instead') this.iosError,
       this.message}) {
     code = code ?? SslErrorType.fromNativeValue(androidError?.toNativeValue());
     code = code ?? SslErrorType.fromNativeValue(iosError?.toNativeValue());
@@ -38,8 +38,8 @@ class SslError {
     }
     final instance = SslError(
       androidError: AndroidSslError.fromNativeValue(map['code']),
-      iosError: IOSSslError.fromNativeValue(map['code']),
       code: SslErrorType.fromNativeValue(map['code']),
+      iosError: IOSSslError.fromNativeValue(map['code']),
       message: map['message'],
     );
     return instance;

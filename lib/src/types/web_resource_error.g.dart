@@ -8,12 +8,12 @@ part of 'web_resource_error.dart';
 
 ///Encapsulates information about errors occurred during loading of web resources.
 class WebResourceError {
-  ///The type of the error.
-  WebResourceErrorType type;
-
   ///The string describing the error.
   String description;
-  WebResourceError({required this.type, required this.description});
+
+  ///The type of the error.
+  WebResourceErrorType type;
+  WebResourceError({required this.description, required this.type});
 
   ///Gets a possible [WebResourceError] instance from a [Map] value.
   static WebResourceError? fromMap(Map<String, dynamic>? map) {
@@ -21,8 +21,8 @@ class WebResourceError {
       return null;
     }
     final instance = WebResourceError(
-      type: WebResourceErrorType.fromNativeValue(map['type'])!,
       description: map['description'],
+      type: WebResourceErrorType.fromNativeValue(map['type'])!,
     );
     return instance;
   }
@@ -30,8 +30,8 @@ class WebResourceError {
   ///Converts instance to a map.
   Map<String, dynamic> toMap() {
     return {
-      "type": type.toNativeValue(),
       "description": description,
+      "type": type.toNativeValue(),
     };
   }
 
@@ -42,6 +42,6 @@ class WebResourceError {
 
   @override
   String toString() {
-    return 'WebResourceError{type: $type, description: $description}';
+    return 'WebResourceError{description: $description, type: $type}';
   }
 }

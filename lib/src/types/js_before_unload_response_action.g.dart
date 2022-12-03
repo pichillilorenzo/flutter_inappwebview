@@ -16,16 +16,16 @@ class JsBeforeUnloadResponseAction {
           int value, Function nativeValue) =>
       JsBeforeUnloadResponseAction._internal(value, nativeValue());
 
-  ///Confirm that the user hit confirm button.
-  static const CONFIRM = JsBeforeUnloadResponseAction._internal(0, 0);
-
   ///Confirm that the user hit cancel button.
   static const CANCEL = JsBeforeUnloadResponseAction._internal(1, 1);
 
+  ///Confirm that the user hit confirm button.
+  static const CONFIRM = JsBeforeUnloadResponseAction._internal(0, 0);
+
   ///Set of all values of [JsBeforeUnloadResponseAction].
   static final Set<JsBeforeUnloadResponseAction> values = [
-    JsBeforeUnloadResponseAction.CONFIRM,
     JsBeforeUnloadResponseAction.CANCEL,
+    JsBeforeUnloadResponseAction.CONFIRM,
   ].toSet();
 
   ///Gets a possible [JsBeforeUnloadResponseAction] instance from [int] value.
@@ -69,10 +69,10 @@ class JsBeforeUnloadResponseAction {
   @override
   String toString() {
     switch (_value) {
-      case 0:
-        return 'CONFIRM';
       case 1:
         return 'CANCEL';
+      case 0:
+        return 'CONFIRM';
     }
     return _value.toString();
   }

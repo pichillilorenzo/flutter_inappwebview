@@ -8,8 +8,8 @@ part of 'http_auth_response.dart';
 
 ///Class that represents the response used by the [WebView.onReceivedHttpAuthRequest] event.
 class HttpAuthResponse {
-  ///Represents the username used for the authentication if the [action] corresponds to [HttpAuthResponseAction.PROCEED]
-  String username;
+  ///Indicate the [HttpAuthResponseAction] to take in response of the authentication challenge.
+  HttpAuthResponseAction? action;
 
   ///Represents the password used for the authentication if the [action] corresponds to [HttpAuthResponseAction.PROCEED]
   String password;
@@ -17,13 +17,13 @@ class HttpAuthResponse {
   ///Indicate if the given credentials need to be saved permanently.
   bool permanentPersistence;
 
-  ///Indicate the [HttpAuthResponseAction] to take in response of the authentication challenge.
-  HttpAuthResponseAction? action;
+  ///Represents the username used for the authentication if the [action] corresponds to [HttpAuthResponseAction.PROCEED]
+  String username;
   HttpAuthResponse(
-      {this.username = "",
+      {this.action = HttpAuthResponseAction.CANCEL,
       this.password = "",
       this.permanentPersistence = false,
-      this.action = HttpAuthResponseAction.CANCEL});
+      this.username = ""});
 
   ///Gets a possible [HttpAuthResponse] instance from a [Map] value.
   static HttpAuthResponse? fromMap(Map<String, dynamic>? map) {
@@ -31,20 +31,20 @@ class HttpAuthResponse {
       return null;
     }
     final instance = HttpAuthResponse();
-    instance.username = map['username'];
+    instance.action = HttpAuthResponseAction.fromNativeValue(map['action']);
     instance.password = map['password'];
     instance.permanentPersistence = map['permanentPersistence'];
-    instance.action = HttpAuthResponseAction.fromNativeValue(map['action']);
+    instance.username = map['username'];
     return instance;
   }
 
   ///Converts instance to a map.
   Map<String, dynamic> toMap() {
     return {
-      "username": username,
+      "action": action?.toNativeValue(),
       "password": password,
       "permanentPersistence": permanentPersistence,
-      "action": action?.toNativeValue(),
+      "username": username,
     };
   }
 
@@ -55,6 +55,6 @@ class HttpAuthResponse {
 
   @override
   String toString() {
-    return 'HttpAuthResponse{username: $username, password: $password, permanentPersistence: $permanentPersistence, action: $action}';
+    return 'HttpAuthResponse{action: $action, password: $password, permanentPersistence: $permanentPersistence, username: $username}';
   }
 }

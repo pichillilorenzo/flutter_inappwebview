@@ -8,9 +8,6 @@ part of 'ajax_request_event.dart';
 
 ///Class used by [AjaxRequest] class. It represents events measuring progress of an [AjaxRequest].
 class AjaxRequestEvent {
-  ///Event type.
-  AjaxRequestEventType? type;
-
   ///Is a Boolean flag indicating if the total work to be done, and the amount of work already done, by the underlying process is calculable.
   ///In other words, it tells if the progress is measurable or not.
   bool? lengthComputable;
@@ -23,7 +20,10 @@ class AjaxRequestEvent {
   ///Is an integer representing the total amount of work that the underlying process is in the progress of performing.
   ///When downloading a resource using HTTP, this only represent the content itself, not headers and other overhead.
   int? total;
-  AjaxRequestEvent({this.type, this.lengthComputable, this.loaded, this.total});
+
+  ///Event type.
+  AjaxRequestEventType? type;
+  AjaxRequestEvent({this.lengthComputable, this.loaded, this.total, this.type});
 
   ///Gets a possible [AjaxRequestEvent] instance from a [Map] value.
   static AjaxRequestEvent? fromMap(Map<String, dynamic>? map) {
@@ -31,10 +31,10 @@ class AjaxRequestEvent {
       return null;
     }
     final instance = AjaxRequestEvent(
-      type: AjaxRequestEventType.fromNativeValue(map['type']),
       lengthComputable: map['lengthComputable'],
       loaded: map['loaded'],
       total: map['total'],
+      type: AjaxRequestEventType.fromNativeValue(map['type']),
     );
     return instance;
   }
@@ -42,10 +42,10 @@ class AjaxRequestEvent {
   ///Converts instance to a map.
   Map<String, dynamic> toMap() {
     return {
-      "type": type?.toNativeValue(),
       "lengthComputable": lengthComputable,
       "loaded": loaded,
       "total": total,
+      "type": type?.toNativeValue(),
     };
   }
 
@@ -56,6 +56,6 @@ class AjaxRequestEvent {
 
   @override
   String toString() {
-    return 'AjaxRequestEvent{type: $type, lengthComputable: $lengthComputable, loaded: $loaded, total: $total}';
+    return 'AjaxRequestEvent{lengthComputable: $lengthComputable, loaded: $loaded, total: $total, type: $type}';
   }
 }

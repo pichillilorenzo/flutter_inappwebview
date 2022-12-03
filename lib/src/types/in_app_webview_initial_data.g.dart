@@ -8,34 +8,34 @@ part of 'in_app_webview_initial_data.dart';
 
 ///Initial [data] as a content for an [WebView] instance, using [baseUrl] as the base URL for it.
 class InAppWebViewInitialData {
-  ///A String of data in the given encoding.
-  String data;
-
-  ///The MIME type of the data, e.g. "text/html". The default value is `"text/html"`.
-  String mimeType;
-
-  ///The encoding of the data. The default value is `"utf8"`.
-  String encoding;
+  ///Use [historyUrl] instead.
+  @Deprecated('Use historyUrl instead')
+  Uri? androidHistoryUrl;
 
   ///The URL to use as the page's base URL. If `null` defaults to `about:blank`.
   WebUri? baseUrl;
 
-  ///Use [historyUrl] instead.
-  @Deprecated('Use historyUrl instead')
-  Uri? androidHistoryUrl;
+  ///A String of data in the given encoding.
+  String data;
+
+  ///The encoding of the data. The default value is `"utf8"`.
+  String encoding;
 
   ///The URL to use as the history entry. If `null` defaults to `about:blank`. If non-null, this must be a valid URL.
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
   WebUri? historyUrl;
+
+  ///The MIME type of the data, e.g. "text/html". The default value is `"text/html"`.
+  String mimeType;
   InAppWebViewInitialData(
-      {required this.data,
-      this.mimeType = "text/html",
-      this.encoding = "utf8",
+      {@Deprecated('Use historyUrl instead') this.androidHistoryUrl,
       this.baseUrl,
-      @Deprecated('Use historyUrl instead') this.androidHistoryUrl,
-      this.historyUrl}) {
+      required this.data,
+      this.encoding = "utf8",
+      this.historyUrl,
+      this.mimeType = "text/html"}) {
     historyUrl = historyUrl ??
         (androidHistoryUrl != null ? WebUri.uri(androidHistoryUrl!) : null);
   }
@@ -46,25 +46,25 @@ class InAppWebViewInitialData {
       return null;
     }
     final instance = InAppWebViewInitialData(
-      data: map['data'],
-      baseUrl: map['baseUrl'] != null ? WebUri(map['baseUrl']) : null,
       androidHistoryUrl:
           map['historyUrl'] != null ? Uri.tryParse(map['historyUrl']) : null,
+      baseUrl: map['baseUrl'] != null ? WebUri(map['baseUrl']) : null,
+      data: map['data'],
       historyUrl: map['historyUrl'] != null ? WebUri(map['historyUrl']) : null,
     );
-    instance.mimeType = map['mimeType'];
     instance.encoding = map['encoding'];
+    instance.mimeType = map['mimeType'];
     return instance;
   }
 
   ///Converts instance to a map.
   Map<String, dynamic> toMap() {
     return {
-      "data": data,
-      "mimeType": mimeType,
-      "encoding": encoding,
       "baseUrl": baseUrl?.toString(),
+      "data": data,
+      "encoding": encoding,
       "historyUrl": historyUrl?.toString(),
+      "mimeType": mimeType,
     };
   }
 
@@ -75,6 +75,6 @@ class InAppWebViewInitialData {
 
   @override
   String toString() {
-    return 'InAppWebViewInitialData{data: $data, mimeType: $mimeType, encoding: $encoding, baseUrl: $baseUrl, historyUrl: $historyUrl}';
+    return 'InAppWebViewInitialData{baseUrl: $baseUrl, data: $data, encoding: $encoding, historyUrl: $historyUrl, mimeType: $mimeType}';
   }
 }

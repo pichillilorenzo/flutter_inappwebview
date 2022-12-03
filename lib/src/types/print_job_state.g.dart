@@ -16,6 +16,66 @@ class PrintJobState {
           int value, Function nativeValue) =>
       PrintJobState._internal(value, nativeValue());
 
+  ///Print job state: The print job is blocked.
+  ///
+  ///Next valid states: [FAILED], [CANCELED], [STARTED].
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- Android native WebView ([Official API - PrintJobInfo.STATE_BLOCKED](https://developer.android.com/reference/android/print/PrintJobInfo#STATE_BLOCKED))
+  static final BLOCKED = PrintJobState._internalMultiPlatform(4, () {
+    switch (defaultTargetPlatform) {
+      case TargetPlatform.android:
+        return 4;
+      default:
+        break;
+    }
+    return null;
+  });
+
+  ///Print job state: The print job is canceled. This is a terminal state.
+  ///
+  ///Next valid states: None.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- Android native WebView ([Official API - PrintJobInfo.STATE_CANCELED](https://developer.android.com/reference/android/print/PrintJobInfo#STATE_CANCELED))
+  ///- iOS
+  ///- MacOS
+  static final CANCELED = PrintJobState._internalMultiPlatform(7, () {
+    switch (defaultTargetPlatform) {
+      case TargetPlatform.android:
+        return 7;
+      case TargetPlatform.iOS:
+        return 7;
+      case TargetPlatform.macOS:
+        return 7;
+      default:
+        break;
+    }
+    return null;
+  });
+
+  ///Print job state: The print job is successfully printed. This is a terminal state.
+  ///
+  ///Next valid states: None.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- Android native WebView ([Official API - PrintJobInfo.STATE_COMPLETED](https://developer.android.com/reference/android/print/PrintJobInfo#STATE_COMPLETED))
+  ///- iOS
+  ///- MacOS
+  static final COMPLETED = PrintJobState._internalMultiPlatform(5, () {
+    switch (defaultTargetPlatform) {
+      case TargetPlatform.android:
+        return 5;
+      case TargetPlatform.iOS:
+        return 5;
+      case TargetPlatform.macOS:
+        return 5;
+      default:
+        break;
+    }
+    return null;
+  });
+
   ///Print job state: The print job is being created but not yet ready to be printed.
   ///
   ///Next valid states: [QUEUED].
@@ -32,6 +92,25 @@ class PrintJobState {
         return 1;
       case TargetPlatform.macOS:
         return 1;
+      default:
+        break;
+    }
+    return null;
+  });
+
+  ///Print job state: The print job was printing but printing failed.
+  ///
+  ///Next valid states: None.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- Android native WebView ([Official API - PrintJobInfo.STATE_FAILED](https://developer.android.com/reference/android/print/PrintJobInfo#STATE_FAILED))
+  ///- iOS
+  static final FAILED = PrintJobState._internalMultiPlatform(6, () {
+    switch (defaultTargetPlatform) {
+      case TargetPlatform.android:
+        return 6;
+      case TargetPlatform.iOS:
+        return 6;
       default:
         break;
     }
@@ -76,94 +155,15 @@ class PrintJobState {
     return null;
   });
 
-  ///Print job state: The print job is blocked.
-  ///
-  ///Next valid states: [FAILED], [CANCELED], [STARTED].
-  ///
-  ///**Supported Platforms/Implementations**:
-  ///- Android native WebView ([Official API - PrintJobInfo.STATE_BLOCKED](https://developer.android.com/reference/android/print/PrintJobInfo#STATE_BLOCKED))
-  static final BLOCKED = PrintJobState._internalMultiPlatform(4, () {
-    switch (defaultTargetPlatform) {
-      case TargetPlatform.android:
-        return 4;
-      default:
-        break;
-    }
-    return null;
-  });
-
-  ///Print job state: The print job is successfully printed. This is a terminal state.
-  ///
-  ///Next valid states: None.
-  ///
-  ///**Supported Platforms/Implementations**:
-  ///- Android native WebView ([Official API - PrintJobInfo.STATE_COMPLETED](https://developer.android.com/reference/android/print/PrintJobInfo#STATE_COMPLETED))
-  ///- iOS
-  ///- MacOS
-  static final COMPLETED = PrintJobState._internalMultiPlatform(5, () {
-    switch (defaultTargetPlatform) {
-      case TargetPlatform.android:
-        return 5;
-      case TargetPlatform.iOS:
-        return 5;
-      case TargetPlatform.macOS:
-        return 5;
-      default:
-        break;
-    }
-    return null;
-  });
-
-  ///Print job state: The print job was printing but printing failed.
-  ///
-  ///Next valid states: None.
-  ///
-  ///**Supported Platforms/Implementations**:
-  ///- Android native WebView ([Official API - PrintJobInfo.STATE_FAILED](https://developer.android.com/reference/android/print/PrintJobInfo#STATE_FAILED))
-  ///- iOS
-  static final FAILED = PrintJobState._internalMultiPlatform(6, () {
-    switch (defaultTargetPlatform) {
-      case TargetPlatform.android:
-        return 6;
-      case TargetPlatform.iOS:
-        return 6;
-      default:
-        break;
-    }
-    return null;
-  });
-
-  ///Print job state: The print job is canceled. This is a terminal state.
-  ///
-  ///Next valid states: None.
-  ///
-  ///**Supported Platforms/Implementations**:
-  ///- Android native WebView ([Official API - PrintJobInfo.STATE_CANCELED](https://developer.android.com/reference/android/print/PrintJobInfo#STATE_CANCELED))
-  ///- iOS
-  ///- MacOS
-  static final CANCELED = PrintJobState._internalMultiPlatform(7, () {
-    switch (defaultTargetPlatform) {
-      case TargetPlatform.android:
-        return 7;
-      case TargetPlatform.iOS:
-        return 7;
-      case TargetPlatform.macOS:
-        return 7;
-      default:
-        break;
-    }
-    return null;
-  });
-
   ///Set of all values of [PrintJobState].
   static final Set<PrintJobState> values = [
+    PrintJobState.BLOCKED,
+    PrintJobState.CANCELED,
+    PrintJobState.COMPLETED,
     PrintJobState.CREATED,
+    PrintJobState.FAILED,
     PrintJobState.QUEUED,
     PrintJobState.STARTED,
-    PrintJobState.BLOCKED,
-    PrintJobState.COMPLETED,
-    PrintJobState.FAILED,
-    PrintJobState.CANCELED,
   ].toSet();
 
   ///Gets a possible [PrintJobState] instance from [int] value.
@@ -207,20 +207,20 @@ class PrintJobState {
   @override
   String toString() {
     switch (_value) {
+      case 4:
+        return 'BLOCKED';
+      case 7:
+        return 'CANCELED';
+      case 5:
+        return 'COMPLETED';
       case 1:
         return 'CREATED';
+      case 6:
+        return 'FAILED';
       case 2:
         return 'QUEUED';
       case 3:
         return 'STARTED';
-      case 4:
-        return 'BLOCKED';
-      case 5:
-        return 'COMPLETED';
-      case 6:
-        return 'FAILED';
-      case 7:
-        return 'CANCELED';
     }
     return _value.toString();
   }

@@ -16,6 +16,27 @@ class DataDetectorTypes {
           String value, Function nativeValue) =>
       DataDetectorTypes._internal(value, nativeValue());
 
+  ///Addresses are detected and turned into links.
+  static const ADDRESS = DataDetectorTypes._internal('ADDRESS', 'ADDRESS');
+
+  ///All of the above data types are turned into links when detected. Choosing this value will automatically include any new detection type that is added.
+  static const ALL = DataDetectorTypes._internal('ALL', 'ALL');
+
+  ///Dates and times that are in the future are detected and turned into links.
+  static const CALENDAR_EVENT =
+      DataDetectorTypes._internal('CALENDAR_EVENT', 'CALENDAR_EVENT');
+
+  ///Flight numbers are detected and turned into links.
+  static const FLIGHT_NUMBER =
+      DataDetectorTypes._internal('FLIGHT_NUMBER', 'FLIGHT_NUMBER');
+
+  ///URLs in text are detected and turned into links.
+  static const LINK = DataDetectorTypes._internal('LINK', 'LINK');
+
+  ///Lookup suggestions are detected and turned into links.
+  static const LOOKUP_SUGGESTION =
+      DataDetectorTypes._internal('LOOKUP_SUGGESTION', 'LOOKUP_SUGGESTION');
+
   ///No detection is performed.
   static const NONE = DataDetectorTypes._internal('NONE', 'NONE');
 
@@ -23,47 +44,26 @@ class DataDetectorTypes {
   static const PHONE_NUMBER =
       DataDetectorTypes._internal('PHONE_NUMBER', 'PHONE_NUMBER');
 
-  ///URLs in text are detected and turned into links.
-  static const LINK = DataDetectorTypes._internal('LINK', 'LINK');
-
-  ///Addresses are detected and turned into links.
-  static const ADDRESS = DataDetectorTypes._internal('ADDRESS', 'ADDRESS');
-
-  ///Dates and times that are in the future are detected and turned into links.
-  static const CALENDAR_EVENT =
-      DataDetectorTypes._internal('CALENDAR_EVENT', 'CALENDAR_EVENT');
+  ///Spotlight suggestions are detected and turned into links.
+  static const SPOTLIGHT_SUGGESTION = DataDetectorTypes._internal(
+      'SPOTLIGHT_SUGGESTION', 'SPOTLIGHT_SUGGESTION');
 
   ///Tracking numbers are detected and turned into links.
   static const TRACKING_NUMBER =
       DataDetectorTypes._internal('TRACKING_NUMBER', 'TRACKING_NUMBER');
 
-  ///Flight numbers are detected and turned into links.
-  static const FLIGHT_NUMBER =
-      DataDetectorTypes._internal('FLIGHT_NUMBER', 'FLIGHT_NUMBER');
-
-  ///Lookup suggestions are detected and turned into links.
-  static const LOOKUP_SUGGESTION =
-      DataDetectorTypes._internal('LOOKUP_SUGGESTION', 'LOOKUP_SUGGESTION');
-
-  ///Spotlight suggestions are detected and turned into links.
-  static const SPOTLIGHT_SUGGESTION = DataDetectorTypes._internal(
-      'SPOTLIGHT_SUGGESTION', 'SPOTLIGHT_SUGGESTION');
-
-  ///All of the above data types are turned into links when detected. Choosing this value will automatically include any new detection type that is added.
-  static const ALL = DataDetectorTypes._internal('ALL', 'ALL');
-
   ///Set of all values of [DataDetectorTypes].
   static final Set<DataDetectorTypes> values = [
+    DataDetectorTypes.ADDRESS,
+    DataDetectorTypes.ALL,
+    DataDetectorTypes.CALENDAR_EVENT,
+    DataDetectorTypes.FLIGHT_NUMBER,
+    DataDetectorTypes.LINK,
+    DataDetectorTypes.LOOKUP_SUGGESTION,
     DataDetectorTypes.NONE,
     DataDetectorTypes.PHONE_NUMBER,
-    DataDetectorTypes.LINK,
-    DataDetectorTypes.ADDRESS,
-    DataDetectorTypes.CALENDAR_EVENT,
-    DataDetectorTypes.TRACKING_NUMBER,
-    DataDetectorTypes.FLIGHT_NUMBER,
-    DataDetectorTypes.LOOKUP_SUGGESTION,
     DataDetectorTypes.SPOTLIGHT_SUGGESTION,
-    DataDetectorTypes.ALL,
+    DataDetectorTypes.TRACKING_NUMBER,
   ].toSet();
 
   ///Gets a possible [DataDetectorTypes] instance from [String] value.
@@ -125,6 +125,27 @@ class IOSWKDataDetectorTypes {
           String value, Function nativeValue) =>
       IOSWKDataDetectorTypes._internal(value, nativeValue());
 
+  ///Addresses are detected and turned into links.
+  static const ADDRESS = IOSWKDataDetectorTypes._internal('ADDRESS', 'ADDRESS');
+
+  ///All of the above data types are turned into links when detected. Choosing this value will automatically include any new detection type that is added.
+  static const ALL = IOSWKDataDetectorTypes._internal('ALL', 'ALL');
+
+  ///Dates and times that are in the future are detected and turned into links.
+  static const CALENDAR_EVENT =
+      IOSWKDataDetectorTypes._internal('CALENDAR_EVENT', 'CALENDAR_EVENT');
+
+  ///Flight numbers are detected and turned into links.
+  static const FLIGHT_NUMBER =
+      IOSWKDataDetectorTypes._internal('FLIGHT_NUMBER', 'FLIGHT_NUMBER');
+
+  ///URLs in text are detected and turned into links.
+  static const LINK = IOSWKDataDetectorTypes._internal('LINK', 'LINK');
+
+  ///Lookup suggestions are detected and turned into links.
+  static const LOOKUP_SUGGESTION = IOSWKDataDetectorTypes._internal(
+      'LOOKUP_SUGGESTION', 'LOOKUP_SUGGESTION');
+
   ///No detection is performed.
   static const NONE = IOSWKDataDetectorTypes._internal('NONE', 'NONE');
 
@@ -132,47 +153,26 @@ class IOSWKDataDetectorTypes {
   static const PHONE_NUMBER =
       IOSWKDataDetectorTypes._internal('PHONE_NUMBER', 'PHONE_NUMBER');
 
-  ///URLs in text are detected and turned into links.
-  static const LINK = IOSWKDataDetectorTypes._internal('LINK', 'LINK');
-
-  ///Addresses are detected and turned into links.
-  static const ADDRESS = IOSWKDataDetectorTypes._internal('ADDRESS', 'ADDRESS');
-
-  ///Dates and times that are in the future are detected and turned into links.
-  static const CALENDAR_EVENT =
-      IOSWKDataDetectorTypes._internal('CALENDAR_EVENT', 'CALENDAR_EVENT');
+  ///Spotlight suggestions are detected and turned into links.
+  static const SPOTLIGHT_SUGGESTION = IOSWKDataDetectorTypes._internal(
+      'SPOTLIGHT_SUGGESTION', 'SPOTLIGHT_SUGGESTION');
 
   ///Tracking numbers are detected and turned into links.
   static const TRACKING_NUMBER =
       IOSWKDataDetectorTypes._internal('TRACKING_NUMBER', 'TRACKING_NUMBER');
 
-  ///Flight numbers are detected and turned into links.
-  static const FLIGHT_NUMBER =
-      IOSWKDataDetectorTypes._internal('FLIGHT_NUMBER', 'FLIGHT_NUMBER');
-
-  ///Lookup suggestions are detected and turned into links.
-  static const LOOKUP_SUGGESTION = IOSWKDataDetectorTypes._internal(
-      'LOOKUP_SUGGESTION', 'LOOKUP_SUGGESTION');
-
-  ///Spotlight suggestions are detected and turned into links.
-  static const SPOTLIGHT_SUGGESTION = IOSWKDataDetectorTypes._internal(
-      'SPOTLIGHT_SUGGESTION', 'SPOTLIGHT_SUGGESTION');
-
-  ///All of the above data types are turned into links when detected. Choosing this value will automatically include any new detection type that is added.
-  static const ALL = IOSWKDataDetectorTypes._internal('ALL', 'ALL');
-
   ///Set of all values of [IOSWKDataDetectorTypes].
   static final Set<IOSWKDataDetectorTypes> values = [
+    IOSWKDataDetectorTypes.ADDRESS,
+    IOSWKDataDetectorTypes.ALL,
+    IOSWKDataDetectorTypes.CALENDAR_EVENT,
+    IOSWKDataDetectorTypes.FLIGHT_NUMBER,
+    IOSWKDataDetectorTypes.LINK,
+    IOSWKDataDetectorTypes.LOOKUP_SUGGESTION,
     IOSWKDataDetectorTypes.NONE,
     IOSWKDataDetectorTypes.PHONE_NUMBER,
-    IOSWKDataDetectorTypes.LINK,
-    IOSWKDataDetectorTypes.ADDRESS,
-    IOSWKDataDetectorTypes.CALENDAR_EVENT,
-    IOSWKDataDetectorTypes.TRACKING_NUMBER,
-    IOSWKDataDetectorTypes.FLIGHT_NUMBER,
-    IOSWKDataDetectorTypes.LOOKUP_SUGGESTION,
     IOSWKDataDetectorTypes.SPOTLIGHT_SUGGESTION,
-    IOSWKDataDetectorTypes.ALL,
+    IOSWKDataDetectorTypes.TRACKING_NUMBER,
   ].toSet();
 
   ///Gets a possible [IOSWKDataDetectorTypes] instance from [String] value.

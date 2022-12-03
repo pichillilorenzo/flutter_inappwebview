@@ -8,8 +8,8 @@ part of 'js_alert_response.dart';
 
 ///Class that represents the response used by the [WebView.onJsAlert] event to control a JavaScript alert dialog.
 class JsAlertResponse {
-  ///Message to be displayed in the window.
-  String message;
+  ///Action used to confirm that the user hit confirm button.
+  JsAlertResponseAction? action;
 
   ///Title of the confirm button.
   String confirmButtonTitle;
@@ -17,13 +17,13 @@ class JsAlertResponse {
   ///Whether the client will handle the alert dialog.
   bool handledByClient;
 
-  ///Action used to confirm that the user hit confirm button.
-  JsAlertResponseAction? action;
+  ///Message to be displayed in the window.
+  String message;
   JsAlertResponse(
-      {this.message = "",
+      {this.action = JsAlertResponseAction.CONFIRM,
       this.confirmButtonTitle = "",
       this.handledByClient = false,
-      this.action = JsAlertResponseAction.CONFIRM});
+      this.message = ""});
 
   ///Gets a possible [JsAlertResponse] instance from a [Map] value.
   static JsAlertResponse? fromMap(Map<String, dynamic>? map) {
@@ -31,20 +31,20 @@ class JsAlertResponse {
       return null;
     }
     final instance = JsAlertResponse();
-    instance.message = map['message'];
+    instance.action = JsAlertResponseAction.fromNativeValue(map['action']);
     instance.confirmButtonTitle = map['confirmButtonTitle'];
     instance.handledByClient = map['handledByClient'];
-    instance.action = JsAlertResponseAction.fromNativeValue(map['action']);
+    instance.message = map['message'];
     return instance;
   }
 
   ///Converts instance to a map.
   Map<String, dynamic> toMap() {
     return {
-      "message": message,
+      "action": action?.toNativeValue(),
       "confirmButtonTitle": confirmButtonTitle,
       "handledByClient": handledByClient,
-      "action": action?.toNativeValue(),
+      "message": message,
     };
   }
 
@@ -55,6 +55,6 @@ class JsAlertResponse {
 
   @override
   String toString() {
-    return 'JsAlertResponse{message: $message, confirmButtonTitle: $confirmButtonTitle, handledByClient: $handledByClient, action: $action}';
+    return 'JsAlertResponse{action: $action, confirmButtonTitle: $confirmButtonTitle, handledByClient: $handledByClient, message: $message}';
   }
 }

@@ -1,3 +1,9 @@
+## 6.0.0-beta.20
+
+- Using Android `WebViewClientCompat` for Chromium-based WebView if the WebView package major version is >= 73 (https://bugs.chromium.org/p/chromium/issues/detail?id=925887)
+- Updated code docs
+- Fixed "Unexpected addWebMessageListener behaviour" [#1422](https://github.com/pichillilorenzo/flutter_inappwebview/issues/1422)
+
 ## 6.0.0-beta.19
 
 - Updated code docs
@@ -163,6 +169,10 @@
 - All properties of `GeolocationPermissionShowPromptResponse` cannot be `null`
 - Removed `URLProtectionSpace.iosIsProxy` property
 - `historyUrl` and `baseUrl` of `InAppWebViewInitialData` can be `null`
+
+## 5.7.2+2
+
+- Fixed "Unexpected addWebMessageListener behaviour" [#1422](https://github.com/pichillilorenzo/flutter_inappwebview/issues/1422)
 
 ## 5.7.2+1
 

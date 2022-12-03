@@ -81,9 +81,9 @@ class WebViewAssetLoader {
 ///
 ///Implement this interface to handle other use-cases according to your app's needs.
 abstract class PathHandler {
-  late final String _type;
-  late final String _id;
   late final MethodChannel _channel;
+  late final String _id;
+  late final String _type;
 
   ///The suffix path to be handled.
   ///

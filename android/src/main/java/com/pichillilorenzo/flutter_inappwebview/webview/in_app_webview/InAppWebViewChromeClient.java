@@ -731,7 +731,9 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
 
     InAppWebView webView = (InAppWebView) view;
 
-    if (webView.inAppWebViewClient != null) {
+    if (webView.inAppWebViewClientCompat != null) {
+      webView.inAppWebViewClientCompat.loadCustomJavaScriptOnPageStarted(view);
+    } else if (webView.inAppWebViewClient != null) {
       webView.inAppWebViewClient.loadCustomJavaScriptOnPageStarted(view);
     }
 

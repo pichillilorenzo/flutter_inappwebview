@@ -22,22 +22,22 @@ class HTTPCookieSameSitePolicy {
   ///request initiated by third party website. This is the default value in modern browsers.
   static const LAX = HTTPCookieSameSitePolicy._internal('Lax', 'Lax');
 
-  ///SameSite=Strict;
-  ///
-  ///Cookies will only be sent in a first-party context and not be sent along with requests initiated by third party websites.
-  static const STRICT = HTTPCookieSameSitePolicy._internal('Strict', 'Strict');
-
   ///SameSite=None;
   ///
   ///Cookies will be sent in all contexts, i.e sending cross-origin is allowed.
   ///`None` requires the `Secure` attribute in latest browser versions.
   static const NONE = HTTPCookieSameSitePolicy._internal('None', 'None');
 
+  ///SameSite=Strict;
+  ///
+  ///Cookies will only be sent in a first-party context and not be sent along with requests initiated by third party websites.
+  static const STRICT = HTTPCookieSameSitePolicy._internal('Strict', 'Strict');
+
   ///Set of all values of [HTTPCookieSameSitePolicy].
   static final Set<HTTPCookieSameSitePolicy> values = [
     HTTPCookieSameSitePolicy.LAX,
-    HTTPCookieSameSitePolicy.STRICT,
     HTTPCookieSameSitePolicy.NONE,
+    HTTPCookieSameSitePolicy.STRICT,
   ].toSet();
 
   ///Gets a possible [HTTPCookieSameSitePolicy] instance from [String] value.

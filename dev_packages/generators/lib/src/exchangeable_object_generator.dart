@@ -67,7 +67,17 @@ class ExchangeableObjectGenerator
     final deprecatedFields = <VariableElement>[];
     final constructorFields = <String>[];
     final superConstructorFields = <String>[];
-    for (final entry in visitor.fields.entries) {
+
+    final fieldEntriesSorted = visitor.fields.entries.toList();
+    fieldEntriesSorted.sort((a, b) => a.key.compareTo(b.key));
+
+    final fieldValuesSorted = visitor.fields.values.toList();
+    fieldValuesSorted.sort((a, b) => a.name.compareTo(b.name));
+
+    final methodEntriesSorted = visitor.methods.entries.toList();
+    fieldEntriesSorted.sort((a, b) => a.key.compareTo(b.key));
+
+    for (final entry in fieldEntriesSorted) {
       final fieldName = entry.key;
       final fieldElement = entry.value;
       if (!fieldElement.isPrivate) {
@@ -295,7 +305,7 @@ class ExchangeableObjectGenerator
       if (superClass != null) {
         fieldElements.addAll(superClass.element2.fields);
       }
-      fieldElements.addAll(visitor.fields.values);
+      fieldElements.addAll(fieldValuesSorted);
       final nonRequiredFields = <String>[];
       final requiredFields = <String>[];
       for (final fieldElement in fieldElements) {
@@ -353,7 +363,7 @@ class ExchangeableObjectGenerator
       classBuffer.writeln('}');
     }
 
-    for (final entry in visitor.methods.entries) {
+    for (final entry in methodEntriesSorted) {
       final methodElement = entry.value;
       if (Util.methodHasIgnore(methodElement)) {
         continue;
@@ -382,7 +392,7 @@ class ExchangeableObjectGenerator
       classBuffer.writeln('///Converts instance to a map.');
       classBuffer.writeln('Map<String, dynamic> toMap() {');
       classBuffer.writeln('return {');
-      for (final entry in visitor.methods.entries) {
+      for (final entry in methodEntriesSorted) {
         final methodElement = entry.value;
         final toMapMergeWith = _coreCheckerObjectMethod
             .firstAnnotationOf(methodElement)
@@ -403,7 +413,7 @@ class ExchangeableObjectGenerator
           }
         }
       }
-      for (final entry in visitor.fields.entries) {
+      for (final entry in fieldEntriesSorted) {
         final fieldElement = entry.value;
         if (!fieldElement.isPrivate &&
             !fieldElement.hasDeprecated &&
@@ -475,7 +485,7 @@ class ExchangeableObjectGenerator
           }
         }
       }
-      for (final entry in visitor.fields.entries) {
+      for (final entry in fieldEntriesSorted) {
         final fieldName = entry.key;
         final fieldElement = entry.value;
         if (!fieldElement.isPrivate &&

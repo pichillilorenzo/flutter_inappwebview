@@ -16,16 +16,16 @@ class FormResubmissionAction {
           int value, Function nativeValue) =>
       FormResubmissionAction._internal(value, nativeValue());
 
-  ///Resend data
-  static const RESEND = FormResubmissionAction._internal(0, 0);
-
   ///Don't resend data
   static const DONT_RESEND = FormResubmissionAction._internal(1, 1);
 
+  ///Resend data
+  static const RESEND = FormResubmissionAction._internal(0, 0);
+
   ///Set of all values of [FormResubmissionAction].
   static final Set<FormResubmissionAction> values = [
-    FormResubmissionAction.RESEND,
     FormResubmissionAction.DONT_RESEND,
+    FormResubmissionAction.RESEND,
   ].toSet();
 
   ///Gets a possible [FormResubmissionAction] instance from [int] value.
@@ -69,10 +69,10 @@ class FormResubmissionAction {
   @override
   String toString() {
     switch (_value) {
-      case 0:
-        return 'RESEND';
       case 1:
         return 'DONT_RESEND';
+      case 0:
+        return 'RESEND';
     }
     return _value.toString();
   }

@@ -35,20 +35,6 @@ class PrintJobPaginationMode {
   ///
   ///**Supported Platforms/Implementations**:
   ///- MacOS
-  static final FIT = PrintJobPaginationMode._internalMultiPlatform('FIT', () {
-    switch (defaultTargetPlatform) {
-      case TargetPlatform.macOS:
-        return 1;
-      default:
-        break;
-    }
-    return null;
-  });
-
-  ///
-  ///
-  ///**Supported Platforms/Implementations**:
-  ///- MacOS
   static final CLIP = PrintJobPaginationMode._internalMultiPlatform('CLIP', () {
     switch (defaultTargetPlatform) {
       case TargetPlatform.macOS:
@@ -59,11 +45,25 @@ class PrintJobPaginationMode {
     return null;
   });
 
+  ///
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- MacOS
+  static final FIT = PrintJobPaginationMode._internalMultiPlatform('FIT', () {
+    switch (defaultTargetPlatform) {
+      case TargetPlatform.macOS:
+        return 1;
+      default:
+        break;
+    }
+    return null;
+  });
+
   ///Set of all values of [PrintJobPaginationMode].
   static final Set<PrintJobPaginationMode> values = [
     PrintJobPaginationMode.AUTOMATIC,
-    PrintJobPaginationMode.FIT,
     PrintJobPaginationMode.CLIP,
+    PrintJobPaginationMode.FIT,
   ].toSet();
 
   ///Gets a possible [PrintJobPaginationMode] instance from [String] value.

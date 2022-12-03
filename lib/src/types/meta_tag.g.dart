@@ -8,15 +8,15 @@ part of 'meta_tag.dart';
 
 ///Class that represents a `<meta>` HTML tag. It is used by the [InAppWebViewController.getMetaTags] method.
 class MetaTag {
-  ///The meta tag name value.
-  String? name;
+  ///The meta tag attributes list.
+  List<MetaTagAttribute>? attrs;
 
   ///The meta tag content value.
   String? content;
 
-  ///The meta tag attributes list.
-  List<MetaTagAttribute>? attrs;
-  MetaTag({this.name, this.content, this.attrs});
+  ///The meta tag name value.
+  String? name;
+  MetaTag({this.attrs, this.content, this.name});
 
   ///Gets a possible [MetaTag] instance from a [Map] value.
   static MetaTag? fromMap(Map<String, dynamic>? map) {
@@ -24,12 +24,12 @@ class MetaTag {
       return null;
     }
     final instance = MetaTag(
-      name: map['name'],
-      content: map['content'],
       attrs: map['attrs'] != null
           ? List<MetaTagAttribute>.from(map['attrs'].map(
               (e) => MetaTagAttribute.fromMap(e?.cast<String, dynamic>())!))
           : null,
+      content: map['content'],
+      name: map['name'],
     );
     return instance;
   }
@@ -37,9 +37,9 @@ class MetaTag {
   ///Converts instance to a map.
   Map<String, dynamic> toMap() {
     return {
-      "name": name,
-      "content": content,
       "attrs": attrs?.map((e) => e.toMap()).toList(),
+      "content": content,
+      "name": name,
     };
   }
 
@@ -50,6 +50,6 @@ class MetaTag {
 
   @override
   String toString() {
-    return 'MetaTag{name: $name, content: $content, attrs: $attrs}';
+    return 'MetaTag{attrs: $attrs, content: $content, name: $name}';
   }
 }

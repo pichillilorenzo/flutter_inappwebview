@@ -8,6 +8,9 @@ part of 'fetch_request_password_credential.dart';
 
 ///Class that represents a [PasswordCredential](https://developer.mozilla.org/en-US/docs/Web/API/PasswordCredential) type of credentials.
 class FetchRequestPasswordCredential extends FetchRequestCredential {
+  ///URL pointing to an image for an icon. This image is intended for display in a credential chooser. The URL must be accessible without authentication.
+  WebUri? iconURL;
+
   ///Credential's identifier.
   dynamic id;
 
@@ -16,11 +19,8 @@ class FetchRequestPasswordCredential extends FetchRequestCredential {
 
   ///The password of the credential.
   String? password;
-
-  ///URL pointing to an image for an icon. This image is intended for display in a credential chooser. The URL must be accessible without authentication.
-  WebUri? iconURL;
   FetchRequestPasswordCredential(
-      {this.id, this.name, this.password, this.iconURL, String? type})
+      {this.iconURL, this.id, this.name, this.password, String? type})
       : super(type: type);
 
   ///Gets a possible [FetchRequestPasswordCredential] instance from a [Map] value.
@@ -29,10 +29,10 @@ class FetchRequestPasswordCredential extends FetchRequestCredential {
       return null;
     }
     final instance = FetchRequestPasswordCredential(
+      iconURL: map['iconURL'] != null ? WebUri(map['iconURL']) : null,
       id: map['id'],
       name: map['name'],
       password: map['password'],
-      iconURL: map['iconURL'] != null ? WebUri(map['iconURL']) : null,
     );
     instance.type = map['type'];
     return instance;
@@ -42,10 +42,10 @@ class FetchRequestPasswordCredential extends FetchRequestCredential {
   Map<String, dynamic> toMap() {
     return {
       "type": type,
+      "iconURL": iconURL?.toString(),
       "id": id,
       "name": name,
       "password": password,
-      "iconURL": iconURL?.toString(),
     };
   }
 
@@ -56,6 +56,6 @@ class FetchRequestPasswordCredential extends FetchRequestCredential {
 
   @override
   String toString() {
-    return 'FetchRequestPasswordCredential{type: $type, id: $id, name: $name, password: $password, iconURL: $iconURL}';
+    return 'FetchRequestPasswordCredential{type: $type, iconURL: $iconURL, id: $id, name: $name, password: $password}';
   }
 }

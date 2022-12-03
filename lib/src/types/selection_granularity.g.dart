@@ -16,16 +16,16 @@ class SelectionGranularity {
           int value, Function nativeValue) =>
       SelectionGranularity._internal(value, nativeValue());
 
-  ///Selection granularity varies automatically based on the selection.
-  static const DYNAMIC = SelectionGranularity._internal(0, 0);
-
   ///Selection endpoints can be placed at any character boundary.
   static const CHARACTER = SelectionGranularity._internal(1, 1);
 
+  ///Selection granularity varies automatically based on the selection.
+  static const DYNAMIC = SelectionGranularity._internal(0, 0);
+
   ///Set of all values of [SelectionGranularity].
   static final Set<SelectionGranularity> values = [
-    SelectionGranularity.DYNAMIC,
     SelectionGranularity.CHARACTER,
+    SelectionGranularity.DYNAMIC,
   ].toSet();
 
   ///Gets a possible [SelectionGranularity] instance from [int] value.
@@ -69,10 +69,10 @@ class SelectionGranularity {
   @override
   String toString() {
     switch (_value) {
-      case 0:
-        return 'DYNAMIC';
       case 1:
         return 'CHARACTER';
+      case 0:
+        return 'DYNAMIC';
     }
     return _value.toString();
   }
@@ -90,16 +90,16 @@ class IOSWKSelectionGranularity {
           int value, Function nativeValue) =>
       IOSWKSelectionGranularity._internal(value, nativeValue());
 
-  ///Selection granularity varies automatically based on the selection.
-  static const DYNAMIC = IOSWKSelectionGranularity._internal(0, 0);
-
   ///Selection endpoints can be placed at any character boundary.
   static const CHARACTER = IOSWKSelectionGranularity._internal(1, 1);
 
+  ///Selection granularity varies automatically based on the selection.
+  static const DYNAMIC = IOSWKSelectionGranularity._internal(0, 0);
+
   ///Set of all values of [IOSWKSelectionGranularity].
   static final Set<IOSWKSelectionGranularity> values = [
-    IOSWKSelectionGranularity.DYNAMIC,
     IOSWKSelectionGranularity.CHARACTER,
+    IOSWKSelectionGranularity.DYNAMIC,
   ].toSet();
 
   ///Gets a possible [IOSWKSelectionGranularity] instance from [int] value.
@@ -143,10 +143,10 @@ class IOSWKSelectionGranularity {
   @override
   String toString() {
     switch (_value) {
-      case 0:
-        return 'DYNAMIC';
       case 1:
         return 'CHARACTER';
+      case 0:
+        return 'DYNAMIC';
     }
     return _value.toString();
   }

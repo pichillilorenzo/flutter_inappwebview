@@ -54,7 +54,7 @@ class AjaxRequest_ {
   ///If an empty string is set as the value of responseType, the default value of text is used.
   String? responseType;
 
-  ///The response's body content. The content-type depends on the [AjaxRequest.reponseType].
+  ///The response's body content. The content-type depends on the [AjaxRequest.responseType].
   dynamic response;
 
   ///The text received from a server following a request being sent.

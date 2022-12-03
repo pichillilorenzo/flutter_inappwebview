@@ -16,20 +16,20 @@ class MediaCaptureState {
           int value, Function nativeValue) =>
       MediaCaptureState._internal(value, nativeValue());
 
-  ///The media device is off.
-  static const NONE = MediaCaptureState._internal(0, 0);
-
   ///The media device is actively capturing audio or video.
   static const ACTIVE = MediaCaptureState._internal(1, 1);
 
   ///The media device is muted, and not actively capturing audio or video.
   static const MUTED = MediaCaptureState._internal(2, 2);
 
+  ///The media device is off.
+  static const NONE = MediaCaptureState._internal(0, 0);
+
   ///Set of all values of [MediaCaptureState].
   static final Set<MediaCaptureState> values = [
-    MediaCaptureState.NONE,
     MediaCaptureState.ACTIVE,
     MediaCaptureState.MUTED,
+    MediaCaptureState.NONE,
   ].toSet();
 
   ///Gets a possible [MediaCaptureState] instance from [int] value.
@@ -73,12 +73,12 @@ class MediaCaptureState {
   @override
   String toString() {
     switch (_value) {
-      case 0:
-        return 'NONE';
       case 1:
         return 'ACTIVE';
       case 2:
         return 'MUTED';
+      case 0:
+        return 'NONE';
     }
     return _value.toString();
   }

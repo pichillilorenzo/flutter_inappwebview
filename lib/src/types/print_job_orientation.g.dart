@@ -16,23 +16,6 @@ class PrintJobOrientation {
           int value, Function nativeValue) =>
       PrintJobOrientation._internal(value, nativeValue());
 
-  ///Pages are printed in portrait orientation.
-  ///
-  ///**Supported Platforms/Implementations**:
-  ///- iOS
-  ///- MacOS
-  static final PORTRAIT = PrintJobOrientation._internalMultiPlatform(0, () {
-    switch (defaultTargetPlatform) {
-      case TargetPlatform.iOS:
-        return 0;
-      case TargetPlatform.macOS:
-        return 0;
-      default:
-        break;
-    }
-    return null;
-  });
-
   ///Pages are printed in landscape orientation.
   ///
   ///**Supported Platforms/Implementations**:
@@ -50,10 +33,27 @@ class PrintJobOrientation {
     return null;
   });
 
+  ///Pages are printed in portrait orientation.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- iOS
+  ///- MacOS
+  static final PORTRAIT = PrintJobOrientation._internalMultiPlatform(0, () {
+    switch (defaultTargetPlatform) {
+      case TargetPlatform.iOS:
+        return 0;
+      case TargetPlatform.macOS:
+        return 0;
+      default:
+        break;
+    }
+    return null;
+  });
+
   ///Set of all values of [PrintJobOrientation].
   static final Set<PrintJobOrientation> values = [
-    PrintJobOrientation.PORTRAIT,
     PrintJobOrientation.LANDSCAPE,
+    PrintJobOrientation.PORTRAIT,
   ].toSet();
 
   ///Gets a possible [PrintJobOrientation] instance from [int] value.
@@ -97,10 +97,10 @@ class PrintJobOrientation {
   @override
   String toString() {
     switch (_value) {
-      case 0:
-        return 'PORTRAIT';
       case 1:
         return 'LANDSCAPE';
+      case 0:
+        return 'PORTRAIT';
     }
     return _value.toString();
   }

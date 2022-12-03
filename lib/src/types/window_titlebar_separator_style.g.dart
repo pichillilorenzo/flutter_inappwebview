@@ -31,21 +31,6 @@ class WindowTitlebarSeparatorStyle {
     return null;
   });
 
-  ///A style indicating that the title bar separator is a line.
-  ///
-  ///**Supported Platforms/Implementations**:
-  ///- MacOS
-  static final NONE =
-      WindowTitlebarSeparatorStyle._internalMultiPlatform(1, () {
-    switch (defaultTargetPlatform) {
-      case TargetPlatform.macOS:
-        return 1;
-      default:
-        break;
-    }
-    return null;
-  });
-
   ///A style indicating that there’s no title bar separator.
   ///
   ///**Supported Platforms/Implementations**:
@@ -55,6 +40,21 @@ class WindowTitlebarSeparatorStyle {
     switch (defaultTargetPlatform) {
       case TargetPlatform.macOS:
         return 2;
+      default:
+        break;
+    }
+    return null;
+  });
+
+  ///A style indicating that the title bar separator is a line.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- MacOS
+  static final NONE =
+      WindowTitlebarSeparatorStyle._internalMultiPlatform(1, () {
+    switch (defaultTargetPlatform) {
+      case TargetPlatform.macOS:
+        return 1;
       default:
         break;
     }
@@ -79,8 +79,8 @@ class WindowTitlebarSeparatorStyle {
   ///Set of all values of [WindowTitlebarSeparatorStyle].
   static final Set<WindowTitlebarSeparatorStyle> values = [
     WindowTitlebarSeparatorStyle.AUTOMATIC,
-    WindowTitlebarSeparatorStyle.NONE,
     WindowTitlebarSeparatorStyle.LINE,
+    WindowTitlebarSeparatorStyle.NONE,
     WindowTitlebarSeparatorStyle.SHADOW,
   ].toSet();
 
@@ -127,10 +127,10 @@ class WindowTitlebarSeparatorStyle {
     switch (_value) {
       case 0:
         return 'AUTOMATIC';
-      case 1:
-        return 'NONE';
       case 2:
         return 'LINE';
+      case 1:
+        return 'NONE';
       case 3:
         return 'SHADOW';
     }

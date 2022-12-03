@@ -16,59 +16,6 @@ class PermissionResourceType {
           String value, Function nativeValue) =>
       PermissionResourceType._internal(value, nativeValue());
 
-  ///Resource belongs to audio capture device, like microphone.
-  ///
-  ///**Supported Platforms/Implementations**:
-  ///- Android native WebView ([Official API - PermissionRequest.RESOURCE_AUDIO_CAPTURE](https://developer.android.com/reference/android/webkit/PermissionRequest#RESOURCE_AUDIO_CAPTURE))
-  ///- iOS 15.0+ ([Official API - WKMediaCaptureType.microphone](https://developer.apple.com/documentation/webkit/wkmediacapturetype/microphone))
-  ///- MacOS 12.0+ ([Official API - WKMediaCaptureType.microphone](https://developer.apple.com/documentation/webkit/wkmediacapturetype/microphone))
-  static final MICROPHONE =
-      PermissionResourceType._internalMultiPlatform('MICROPHONE', () {
-    switch (defaultTargetPlatform) {
-      case TargetPlatform.android:
-        return 'android.webkit.resource.AUDIO_CAPTURE';
-      case TargetPlatform.iOS:
-        return 1;
-      case TargetPlatform.macOS:
-        return 1;
-      default:
-        break;
-    }
-    return null;
-  });
-
-  ///Resource will allow sysex messages to be sent to or received from MIDI devices.
-  ///These messages are privileged operations, e.g. modifying sound libraries and sampling data, or even updating the MIDI device's firmware.
-  ///Permission may be requested for this resource in API levels 21 and above, if the Android device has been updated to WebView 45 or above.
-  ///
-  ///**Supported Platforms/Implementations**:
-  ///- Android native WebView ([Official API - PermissionRequest.RESOURCE_MIDI_SYSEX](https://developer.android.com/reference/android/webkit/PermissionRequest#RESOURCE_MIDI_SYSEX))
-  static final MIDI_SYSEX =
-      PermissionResourceType._internalMultiPlatform('MIDI_SYSEX', () {
-    switch (defaultTargetPlatform) {
-      case TargetPlatform.android:
-        return 'android.webkit.resource.MIDI_SYSEX';
-      default:
-        break;
-    }
-    return null;
-  });
-
-  ///Resource belongs to protected media identifier. After the user grants this resource, the origin can use EME APIs to generate the license requests.
-  ///
-  ///**Supported Platforms/Implementations**:
-  ///- Android native WebView ([Official API - PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID](https://developer.android.com/reference/android/webkit/PermissionRequest#RESOURCE_PROTECTED_MEDIA_ID))
-  static final PROTECTED_MEDIA_ID =
-      PermissionResourceType._internalMultiPlatform('PROTECTED_MEDIA_ID', () {
-    switch (defaultTargetPlatform) {
-      case TargetPlatform.android:
-        return 'android.webkit.resource.PROTECTED_MEDIA_ID';
-      default:
-        break;
-    }
-    return null;
-  });
-
   ///Resource belongs to video capture device, like camera.
   ///
   ///**Supported Platforms/Implementations**:
@@ -128,14 +75,67 @@ class PermissionResourceType {
     return null;
   });
 
+  ///Resource belongs to audio capture device, like microphone.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- Android native WebView ([Official API - PermissionRequest.RESOURCE_AUDIO_CAPTURE](https://developer.android.com/reference/android/webkit/PermissionRequest#RESOURCE_AUDIO_CAPTURE))
+  ///- iOS 15.0+ ([Official API - WKMediaCaptureType.microphone](https://developer.apple.com/documentation/webkit/wkmediacapturetype/microphone))
+  ///- MacOS 12.0+ ([Official API - WKMediaCaptureType.microphone](https://developer.apple.com/documentation/webkit/wkmediacapturetype/microphone))
+  static final MICROPHONE =
+      PermissionResourceType._internalMultiPlatform('MICROPHONE', () {
+    switch (defaultTargetPlatform) {
+      case TargetPlatform.android:
+        return 'android.webkit.resource.AUDIO_CAPTURE';
+      case TargetPlatform.iOS:
+        return 1;
+      case TargetPlatform.macOS:
+        return 1;
+      default:
+        break;
+    }
+    return null;
+  });
+
+  ///Resource will allow sysex messages to be sent to or received from MIDI devices.
+  ///These messages are privileged operations, e.g. modifying sound libraries and sampling data, or even updating the MIDI device's firmware.
+  ///Permission may be requested for this resource in API levels 21 and above, if the Android device has been updated to WebView 45 or above.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- Android native WebView ([Official API - PermissionRequest.RESOURCE_MIDI_SYSEX](https://developer.android.com/reference/android/webkit/PermissionRequest#RESOURCE_MIDI_SYSEX))
+  static final MIDI_SYSEX =
+      PermissionResourceType._internalMultiPlatform('MIDI_SYSEX', () {
+    switch (defaultTargetPlatform) {
+      case TargetPlatform.android:
+        return 'android.webkit.resource.MIDI_SYSEX';
+      default:
+        break;
+    }
+    return null;
+  });
+
+  ///Resource belongs to protected media identifier. After the user grants this resource, the origin can use EME APIs to generate the license requests.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- Android native WebView ([Official API - PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID](https://developer.android.com/reference/android/webkit/PermissionRequest#RESOURCE_PROTECTED_MEDIA_ID))
+  static final PROTECTED_MEDIA_ID =
+      PermissionResourceType._internalMultiPlatform('PROTECTED_MEDIA_ID', () {
+    switch (defaultTargetPlatform) {
+      case TargetPlatform.android:
+        return 'android.webkit.resource.PROTECTED_MEDIA_ID';
+      default:
+        break;
+    }
+    return null;
+  });
+
   ///Set of all values of [PermissionResourceType].
   static final Set<PermissionResourceType> values = [
-    PermissionResourceType.MICROPHONE,
-    PermissionResourceType.MIDI_SYSEX,
-    PermissionResourceType.PROTECTED_MEDIA_ID,
     PermissionResourceType.CAMERA,
     PermissionResourceType.CAMERA_AND_MICROPHONE,
     PermissionResourceType.DEVICE_ORIENTATION_AND_MOTION,
+    PermissionResourceType.MICROPHONE,
+    PermissionResourceType.MIDI_SYSEX,
+    PermissionResourceType.PROTECTED_MEDIA_ID,
   ].toSet();
 
   ///Gets a possible [PermissionResourceType] instance from [String] value.

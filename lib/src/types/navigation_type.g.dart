@@ -16,32 +16,32 @@ class NavigationType {
           int value, Function nativeValue) =>
       NavigationType._internal(value, nativeValue());
 
-  ///A link with an href attribute was activated by the user.
-  static const LINK_ACTIVATED = NavigationType._internal(0, 0);
-
-  ///A form was submitted.
-  static const FORM_SUBMITTED = NavigationType._internal(1, 1);
-
   ///An item from the back-forward list was requested.
   static const BACK_FORWARD = NavigationType._internal(2, 2);
-
-  ///The webpage was reloaded.
-  static const RELOAD = NavigationType._internal(3, 3);
 
   ///A form was resubmitted (for example by going back, going forward, or reloading).
   static const FORM_RESUBMITTED = NavigationType._internal(4, 4);
 
+  ///A form was submitted.
+  static const FORM_SUBMITTED = NavigationType._internal(1, 1);
+
+  ///A link with an href attribute was activated by the user.
+  static const LINK_ACTIVATED = NavigationType._internal(0, 0);
+
   ///Navigation is taking place for some other reason.
   static const OTHER = NavigationType._internal(-1, -1);
 
+  ///The webpage was reloaded.
+  static const RELOAD = NavigationType._internal(3, 3);
+
   ///Set of all values of [NavigationType].
   static final Set<NavigationType> values = [
-    NavigationType.LINK_ACTIVATED,
-    NavigationType.FORM_SUBMITTED,
     NavigationType.BACK_FORWARD,
-    NavigationType.RELOAD,
     NavigationType.FORM_RESUBMITTED,
+    NavigationType.FORM_SUBMITTED,
+    NavigationType.LINK_ACTIVATED,
     NavigationType.OTHER,
+    NavigationType.RELOAD,
   ].toSet();
 
   ///Gets a possible [NavigationType] instance from [int] value.
@@ -85,18 +85,18 @@ class NavigationType {
   @override
   String toString() {
     switch (_value) {
-      case 0:
-        return 'LINK_ACTIVATED';
-      case 1:
-        return 'FORM_SUBMITTED';
       case 2:
         return 'BACK_FORWARD';
-      case 3:
-        return 'RELOAD';
       case 4:
         return 'FORM_RESUBMITTED';
+      case 1:
+        return 'FORM_SUBMITTED';
+      case 0:
+        return 'LINK_ACTIVATED';
       case -1:
         return 'OTHER';
+      case 3:
+        return 'RELOAD';
     }
     return _value.toString();
   }
@@ -114,32 +114,32 @@ class IOSWKNavigationType {
           int value, Function nativeValue) =>
       IOSWKNavigationType._internal(value, nativeValue());
 
-  ///A link with an href attribute was activated by the user.
-  static const LINK_ACTIVATED = IOSWKNavigationType._internal(0, 0);
-
-  ///A form was submitted.
-  static const FORM_SUBMITTED = IOSWKNavigationType._internal(1, 1);
-
   ///An item from the back-forward list was requested.
   static const BACK_FORWARD = IOSWKNavigationType._internal(2, 2);
-
-  ///The webpage was reloaded.
-  static const RELOAD = IOSWKNavigationType._internal(3, 3);
 
   ///A form was resubmitted (for example by going back, going forward, or reloading).
   static const FORM_RESUBMITTED = IOSWKNavigationType._internal(4, 4);
 
+  ///A form was submitted.
+  static const FORM_SUBMITTED = IOSWKNavigationType._internal(1, 1);
+
+  ///A link with an href attribute was activated by the user.
+  static const LINK_ACTIVATED = IOSWKNavigationType._internal(0, 0);
+
   ///Navigation is taking place for some other reason.
   static const OTHER = IOSWKNavigationType._internal(-1, -1);
 
+  ///The webpage was reloaded.
+  static const RELOAD = IOSWKNavigationType._internal(3, 3);
+
   ///Set of all values of [IOSWKNavigationType].
   static final Set<IOSWKNavigationType> values = [
-    IOSWKNavigationType.LINK_ACTIVATED,
-    IOSWKNavigationType.FORM_SUBMITTED,
     IOSWKNavigationType.BACK_FORWARD,
-    IOSWKNavigationType.RELOAD,
     IOSWKNavigationType.FORM_RESUBMITTED,
+    IOSWKNavigationType.FORM_SUBMITTED,
+    IOSWKNavigationType.LINK_ACTIVATED,
     IOSWKNavigationType.OTHER,
+    IOSWKNavigationType.RELOAD,
   ].toSet();
 
   ///Gets a possible [IOSWKNavigationType] instance from [int] value.
@@ -183,18 +183,18 @@ class IOSWKNavigationType {
   @override
   String toString() {
     switch (_value) {
-      case 0:
-        return 'LINK_ACTIVATED';
-      case 1:
-        return 'FORM_SUBMITTED';
       case 2:
         return 'BACK_FORWARD';
-      case 3:
-        return 'RELOAD';
       case 4:
         return 'FORM_RESUBMITTED';
+      case 1:
+        return 'FORM_SUBMITTED';
+      case 0:
+        return 'LINK_ACTIVATED';
       case -1:
         return 'OTHER';
+      case 3:
+        return 'RELOAD';
     }
     return _value.toString();
   }

@@ -8,6 +8,18 @@ part of 'android_resource.dart';
 
 ///Class that represents an Android resource file.
 class AndroidResource {
+  ///Optional default package to find, if "package:" is not included in the name.
+  ///Can be `null` to require an explicit package.
+  ///
+  ///Example: "android" if you want use resources from `android.R.`
+  String? defPackage;
+
+  ///Optional default resource type to find, if "type/" is not included in the name.
+  ///Can be `null` to require an explicit type.
+  ///
+  ///Example: "anim"
+  String? defType;
+
   ///Android resource name.
   ///
   ///A list of available `android.R.anim` can be found
@@ -18,19 +30,7 @@ class AndroidResource {
   ///(abc_*.xml files).
   ///In this case, [defPackage] must match your App Android package name.
   String name;
-
-  ///Optional default resource type to find, if "type/" is not included in the name.
-  ///Can be `null` to require an explicit type.
-  ///
-  ///Example: "anim"
-  String? defType;
-
-  ///Optional default package to find, if "package:" is not included in the name.
-  ///Can be `null` to require an explicit package.
-  ///
-  ///Example: "android" if you want use resources from `android.R.`
-  String? defPackage;
-  AndroidResource({required this.name, this.defType, this.defPackage});
+  AndroidResource({this.defPackage, this.defType, required this.name});
 
   ///Gets a possible [AndroidResource] instance from a [Map] value.
   static AndroidResource? fromMap(Map<String, dynamic>? map) {
@@ -38,9 +38,9 @@ class AndroidResource {
       return null;
     }
     final instance = AndroidResource(
-      name: map['name'],
-      defType: map['defType'],
       defPackage: map['defPackage'],
+      defType: map['defType'],
+      name: map['name'],
     );
     return instance;
   }
@@ -61,9 +61,9 @@ class AndroidResource {
   ///Converts instance to a map.
   Map<String, dynamic> toMap() {
     return {
-      "name": name,
-      "defType": defType,
       "defPackage": defPackage,
+      "defType": defType,
+      "name": name,
     };
   }
 
@@ -74,6 +74,6 @@ class AndroidResource {
 
   @override
   String toString() {
-    return 'AndroidResource{name: $name, defType: $defType, defPackage: $defPackage}';
+    return 'AndroidResource{defPackage: $defPackage, defType: $defType, name: $name}';
   }
 }

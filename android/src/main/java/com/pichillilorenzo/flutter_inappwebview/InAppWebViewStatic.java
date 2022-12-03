@@ -1,5 +1,6 @@
 package com.pichillilorenzo.flutter_inappwebview;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.os.Build;
@@ -82,28 +83,15 @@ public class InAppWebViewStatic extends ChannelDelegateImpl {
           result.success(false);
         break;
       case "getCurrentWebViewPackage":
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && plugin != null && (plugin.activity != null || plugin.applicationContext != null)) {
-          Context context = plugin.activity;
+        Context context = null;
+        if (plugin != null) {
+          context = plugin.activity;
           if (context == null) {
             context = plugin.applicationContext;
           }
-          result.success(convertWebViewPackageToMap(WebViewCompat.getCurrentWebViewPackage(context)));
-        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-          //with Android Lollipop (API 21) they started to update the WebView
-          //as a separate APK with the PlayStore and they added the
-          //getLoadedPackageInfo() method to the WebViewFactory class and this
-          //should handle the Android 7.0 behaviour changes too
-          try {
-            Class webViewFactory = Class.forName("android.webkit.WebViewFactory");
-            Method method = webViewFactory.getMethod("getLoadedPackageInfo");
-            PackageInfo pInfo = (PackageInfo) method.invoke(null);
-            result.success(convertWebViewPackageToMap(pInfo));
-          } catch (Exception e) {
-            result.success(null);
-          }
-        } else {
-          result.success(null);
         }
+        PackageInfo packageInfo = context != null ? WebViewCompat.getCurrentWebViewPackage(context) : null;
+        result.success(packageInfo != null ? convertWebViewPackageToMap(packageInfo) : null);
         break;
       case "setWebContentsDebuggingEnabled":
         {
@@ -135,10 +123,8 @@ public class InAppWebViewStatic extends ChannelDelegateImpl {
     }
   }
 
-  public Map<String, Object> convertWebViewPackageToMap(PackageInfo webViewPackageInfo) {
-    if (webViewPackageInfo == null) {
-      return null;
-    }
+  @NonNull
+  public Map<String, Object> convertWebViewPackageToMap(@NonNull PackageInfo webViewPackageInfo) {
     HashMap<String, Object> webViewPackageInfoMap = new HashMap<>();
 
     webViewPackageInfoMap.put("versionName", webViewPackageInfo.versionName);

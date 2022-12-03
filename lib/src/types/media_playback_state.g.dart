@@ -19,11 +19,11 @@ class MediaPlaybackState {
   ///There is no media to play back.
   static const NONE = MediaPlaybackState._internal(0, 0);
 
-  ///The media is playing.
-  static const PLAYING = MediaPlaybackState._internal(1, 1);
-
   ///The media playback is paused.
   static const PAUSED = MediaPlaybackState._internal(2, 2);
+
+  ///The media is playing.
+  static const PLAYING = MediaPlaybackState._internal(1, 1);
 
   ///The media is not playing, and cannot be resumed until the user revokes the suspension.
   static const SUSPENDED = MediaPlaybackState._internal(3, 3);
@@ -31,8 +31,8 @@ class MediaPlaybackState {
   ///Set of all values of [MediaPlaybackState].
   static final Set<MediaPlaybackState> values = [
     MediaPlaybackState.NONE,
-    MediaPlaybackState.PLAYING,
     MediaPlaybackState.PAUSED,
+    MediaPlaybackState.PLAYING,
     MediaPlaybackState.SUSPENDED,
   ].toSet();
 
@@ -79,10 +79,10 @@ class MediaPlaybackState {
     switch (_value) {
       case 0:
         return 'NONE';
-      case 1:
-        return 'PLAYING';
       case 2:
         return 'PAUSED';
+      case 1:
+        return 'PLAYING';
       case 3:
         return 'SUSPENDED';
     }

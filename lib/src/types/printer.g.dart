@@ -15,12 +15,6 @@ class Printer {
   ///- iOS
   String? id;
 
-  ///A description of the printer’s make and model.
-  ///
-  ///**Supported Platforms/Implementations**:
-  ///- MacOS
-  String? type;
-
   ///The PostScript language level recognized by the printer.
   ///
   ///**Supported Platforms/Implementations**:
@@ -32,7 +26,13 @@ class Printer {
   ///**Supported Platforms/Implementations**:
   ///- MacOS
   String? name;
-  Printer({this.id, this.type, this.languageLevel, this.name});
+
+  ///A description of the printer’s make and model.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- MacOS
+  String? type;
+  Printer({this.id, this.languageLevel, this.name, this.type});
 
   ///Gets a possible [Printer] instance from a [Map] value.
   static Printer? fromMap(Map<String, dynamic>? map) {
@@ -41,9 +41,9 @@ class Printer {
     }
     final instance = Printer(
       id: map['id'],
-      type: map['type'],
       languageLevel: map['languageLevel'],
       name: map['name'],
+      type: map['type'],
     );
     return instance;
   }
@@ -52,9 +52,9 @@ class Printer {
   Map<String, dynamic> toMap() {
     return {
       "id": id,
-      "type": type,
       "languageLevel": languageLevel,
       "name": name,
+      "type": type,
     };
   }
 
@@ -65,6 +65,6 @@ class Printer {
 
   @override
   String toString() {
-    return 'Printer{id: $id, type: $type, languageLevel: $languageLevel, name: $name}';
+    return 'Printer{id: $id, languageLevel: $languageLevel, name: $name, type: $type}';
   }
 }

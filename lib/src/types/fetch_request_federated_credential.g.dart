@@ -8,6 +8,9 @@ part of 'fetch_request_federated_credential.dart';
 
 ///Class that represents a [FederatedCredential](https://developer.mozilla.org/en-US/docs/Web/API/FederatedCredential) type of credentials.
 class FetchRequestFederatedCredential extends FetchRequestCredential {
+  ///URL pointing to an image for an icon. This image is intended for display in a credential chooser. The URL must be accessible without authentication.
+  WebUri? iconURL;
+
   ///Credential's identifier.
   dynamic id;
 
@@ -19,15 +22,12 @@ class FetchRequestFederatedCredential extends FetchRequestCredential {
 
   ///Credential's federated identity provider.
   String? provider;
-
-  ///URL pointing to an image for an icon. This image is intended for display in a credential chooser. The URL must be accessible without authentication.
-  WebUri? iconURL;
   FetchRequestFederatedCredential(
-      {this.id,
+      {this.iconURL,
+      this.id,
       this.name,
       this.protocol,
       this.provider,
-      this.iconURL,
       String? type})
       : super(type: type);
 
@@ -37,11 +37,11 @@ class FetchRequestFederatedCredential extends FetchRequestCredential {
       return null;
     }
     final instance = FetchRequestFederatedCredential(
+      iconURL: map['iconURL'] != null ? WebUri(map['iconURL']) : null,
       id: map['id'],
       name: map['name'],
       protocol: map['protocol'],
       provider: map['provider'],
-      iconURL: map['iconURL'] != null ? WebUri(map['iconURL']) : null,
     );
     instance.type = map['type'];
     return instance;
@@ -51,11 +51,11 @@ class FetchRequestFederatedCredential extends FetchRequestCredential {
   Map<String, dynamic> toMap() {
     return {
       "type": type,
+      "iconURL": iconURL?.toString(),
       "id": id,
       "name": name,
       "protocol": protocol,
       "provider": provider,
-      "iconURL": iconURL?.toString(),
     };
   }
 
@@ -66,6 +66,6 @@ class FetchRequestFederatedCredential extends FetchRequestCredential {
 
   @override
   String toString() {
-    return 'FetchRequestFederatedCredential{type: $type, id: $id, name: $name, protocol: $protocol, provider: $provider, iconURL: $iconURL}';
+    return 'FetchRequestFederatedCredential{type: $type, iconURL: $iconURL, id: $id, name: $name, protocol: $protocol, provider: $provider}';
   }
 }

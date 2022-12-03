@@ -9,14 +9,14 @@ part of 'safe_browsing_response.dart';
 ///Class that represents the response used by the [WebView.onSafeBrowsingHit] event.
 ///It is used to indicate an action to take when hitting a malicious URL.
 class SafeBrowsingResponse {
-  ///If reporting is enabled, all reports will be sent according to the privacy policy referenced by [InAppWebViewController.getSafeBrowsingPrivacyPolicyUrl].
-  bool report;
-
   ///Indicate the [SafeBrowsingResponseAction] to take when hitting a malicious URL.
   SafeBrowsingResponseAction? action;
+
+  ///If reporting is enabled, all reports will be sent according to the privacy policy referenced by [InAppWebViewController.getSafeBrowsingPrivacyPolicyUrl].
+  bool report;
   SafeBrowsingResponse(
-      {this.report = true,
-      this.action = SafeBrowsingResponseAction.SHOW_INTERSTITIAL});
+      {this.action = SafeBrowsingResponseAction.SHOW_INTERSTITIAL,
+      this.report = true});
 
   ///Gets a possible [SafeBrowsingResponse] instance from a [Map] value.
   static SafeBrowsingResponse? fromMap(Map<String, dynamic>? map) {
@@ -24,16 +24,16 @@ class SafeBrowsingResponse {
       return null;
     }
     final instance = SafeBrowsingResponse();
-    instance.report = map['report'];
     instance.action = SafeBrowsingResponseAction.fromNativeValue(map['action']);
+    instance.report = map['report'];
     return instance;
   }
 
   ///Converts instance to a map.
   Map<String, dynamic> toMap() {
     return {
-      "report": report,
       "action": action?.toNativeValue(),
+      "report": report,
     };
   }
 
@@ -44,6 +44,6 @@ class SafeBrowsingResponse {
 
   @override
   String toString() {
-    return 'SafeBrowsingResponse{report: $report, action: $action}';
+    return 'SafeBrowsingResponse{action: $action, report: $report}';
   }
 }

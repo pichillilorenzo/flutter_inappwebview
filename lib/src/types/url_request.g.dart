@@ -8,34 +8,12 @@ part of 'url_request.dart';
 
 ///A URL load request that is independent of protocol or URL scheme.
 class URLRequest {
-  ///The URL of the request. Setting this to `null` will load `about:blank`.
-  WebUri? url;
-
-  ///The HTTP request method.
-  ///
-  ///**NOTE for Android**: it supports only "GET" and "POST" methods.
-  String? method;
-
-  ///The data sent as the message body of a request, such as for an HTTP POST request.
-  Uint8List? body;
-
-  ///A dictionary containing all of the HTTP header fields for a request.
-  Map<String, String>? headers;
-
-  ///Use [allowsCellularAccess] instead.
-  @Deprecated('Use allowsCellularAccess instead')
-  bool? iosAllowsCellularAccess;
-
   ///A Boolean value indicating whether the request is allowed to use the built-in cellular radios to satisfy the request.
   ///
   ///**Supported Platforms/Implementations**:
   ///- iOS ([Official API - URLRequest.allowsCellularAccess](https://developer.apple.com/documentation/foundation/urlrequest/2011607-allowscellularaccess/))
   ///- MacOS ([Official API - URLRequest.allowsCellularAccess](https://developer.apple.com/documentation/foundation/urlrequest/2011607-allowscellularaccess/))
   bool? allowsCellularAccess;
-
-  ///Use [allowsConstrainedNetworkAccess] instead.
-  @Deprecated('Use allowsConstrainedNetworkAccess instead')
-  bool? iosAllowsConstrainedNetworkAccess;
 
   ///A Boolean value that indicates whether the request may use the network when the user has specified Low Data Mode.
   ///
@@ -44,83 +22,12 @@ class URLRequest {
   ///- MacOS 10.15+ ([Official API - URLRequest.allowsConstrainedNetworkAccess](https://developer.apple.com/documentation/foundation/urlrequest/3358304-allowsconstrainednetworkaccess))
   bool? allowsConstrainedNetworkAccess;
 
-  ///Use [allowsExpensiveNetworkAccess] instead.
-  @Deprecated('Use allowsExpensiveNetworkAccess instead')
-  bool? iosAllowsExpensiveNetworkAccess;
-
   ///A Boolean value that indicates whether connections may use a network interface that the system considers expensive.
   ///
   ///**Supported Platforms/Implementations**:
   ///- iOS 13.0+ ([Official API - URLRequest.allowsExpensiveNetworkAccess](https://developer.apple.com/documentation/foundation/urlrequest/3358305-allowsexpensivenetworkaccess))
   ///- MacOS 10.15+ ([Official API - URLRequest.allowsExpensiveNetworkAccess](https://developer.apple.com/documentation/foundation/urlrequest/3358305-allowsexpensivenetworkaccess))
   bool? allowsExpensiveNetworkAccess;
-
-  ///Use [cachePolicy] instead.
-  @Deprecated('Use cachePolicy instead')
-  IOSURLRequestCachePolicy? iosCachePolicy;
-
-  ///The request’s cache policy.
-  ///
-  ///**Supported Platforms/Implementations**:
-  ///- iOS ([Official API - URLRequest.cachePolicy](https://developer.apple.com/documentation/foundation/urlrequest/2011593-cachepolicy))
-  ///- MacOS ([Official API - URLRequest.cachePolicy](https://developer.apple.com/documentation/foundation/urlrequest/2011593-cachepolicy))
-  URLRequestCachePolicy? cachePolicy;
-
-  ///Use [httpShouldHandleCookies] instead.
-  @Deprecated('Use httpShouldHandleCookies instead')
-  bool? iosHttpShouldHandleCookies;
-
-  ///A Boolean value indicating whether cookies will be sent with and set for this request.
-  ///
-  ///**Supported Platforms/Implementations**:
-  ///- iOS ([Official API - URLRequest.httpShouldHandleCookies](https://developer.apple.com/documentation/foundation/urlrequest/2011548-httpshouldhandlecookies))
-  ///- MacOS ([Official API - URLRequest.httpShouldHandleCookies](https://developer.apple.com/documentation/foundation/urlrequest/2011548-httpshouldhandlecookies))
-  bool? httpShouldHandleCookies;
-
-  ///Use [httpShouldUsePipelining] instead.
-  @Deprecated('Use httpShouldUsePipelining instead')
-  bool? iosHttpShouldUsePipelining;
-
-  ///A Boolean value indicating whether the request should transmit before the previous response is received.
-  ///
-  ///**Supported Platforms/Implementations**:
-  ///- iOS ([Official API - URLRequest.httpShouldUsePipelining](https://developer.apple.com/documentation/foundation/urlrequest/2011508-httpshouldusepipelining))
-  ///- MacOS ([Official API - URLRequest.httpShouldUsePipelining](https://developer.apple.com/documentation/foundation/urlrequest/2011508-httpshouldusepipelining))
-  bool? httpShouldUsePipelining;
-
-  ///Use [networkServiceType] instead.
-  @Deprecated('Use networkServiceType instead')
-  IOSURLRequestNetworkServiceType? iosNetworkServiceType;
-
-  ///The service type associated with this request.
-  ///
-  ///**Supported Platforms/Implementations**:
-  ///- iOS ([Official API - URLRequest.networkServiceType](https://developer.apple.com/documentation/foundation/urlrequest/2011409-networkservicetype))
-  ///- MacOS ([Official API - URLRequest.networkServiceType](https://developer.apple.com/documentation/foundation/urlrequest/2011409-networkservicetype))
-  URLRequestNetworkServiceType? networkServiceType;
-
-  ///Use [timeoutInterval] instead.
-  @Deprecated('Use timeoutInterval instead')
-  double? iosTimeoutInterval;
-
-  ///The timeout interval of the request.
-  ///
-  ///**Supported Platforms/Implementations**:
-  ///- iOS ([Official API - URLRequest.timeoutInterval](https://developer.apple.com/documentation/foundation/urlrequest/2011509-timeoutinterval))
-  ///- MacOS ([Official API - URLRequest.timeoutInterval](https://developer.apple.com/documentation/foundation/urlrequest/2011509-timeoutinterval))
-  double? timeoutInterval;
-
-  ///Use [mainDocumentURL] instead.
-  @Deprecated('Use mainDocumentURL instead')
-  Uri? iosMainDocumentURL;
-
-  ///The main document URL associated with this request.
-  ///This URL is used for the cookie “same domain as main document” policy.
-  ///
-  ///**Supported Platforms/Implementations**:
-  ///- iOS ([Official API - URLRequest.mainDocumentURL](https://developer.apple.com/documentation/foundation/urlrequest/2011552-maindocumenturl))
-  ///- MacOS ([Official API - URLRequest.mainDocumentURL](https://developer.apple.com/documentation/foundation/urlrequest/2011552-maindocumenturl))
-  WebUri? mainDocumentURL;
 
   ///`true` if server endpoint is known to support HTTP/3. Enables QUIC racing
   ///without HTTP/3 service discovery. Defaults to `false`.
@@ -139,40 +46,133 @@ class URLRequest {
   ///- iOS 15.0+ ([Official API - URLRequest.attribution](https://developer.apple.com/documentation/foundation/urlrequest/3767318-attribution))
   ///- MacOS 12.0+ ([Official API - URLRequest.attribution](https://developer.apple.com/documentation/foundation/urlrequest/3767318-attribution))
   URLRequestAttribution? attribution;
+
+  ///The data sent as the message body of a request, such as for an HTTP POST request.
+  Uint8List? body;
+
+  ///The request’s cache policy.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- iOS ([Official API - URLRequest.cachePolicy](https://developer.apple.com/documentation/foundation/urlrequest/2011593-cachepolicy))
+  ///- MacOS ([Official API - URLRequest.cachePolicy](https://developer.apple.com/documentation/foundation/urlrequest/2011593-cachepolicy))
+  URLRequestCachePolicy? cachePolicy;
+
+  ///A dictionary containing all of the HTTP header fields for a request.
+  Map<String, String>? headers;
+
+  ///A Boolean value indicating whether cookies will be sent with and set for this request.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- iOS ([Official API - URLRequest.httpShouldHandleCookies](https://developer.apple.com/documentation/foundation/urlrequest/2011548-httpshouldhandlecookies))
+  ///- MacOS ([Official API - URLRequest.httpShouldHandleCookies](https://developer.apple.com/documentation/foundation/urlrequest/2011548-httpshouldhandlecookies))
+  bool? httpShouldHandleCookies;
+
+  ///A Boolean value indicating whether the request should transmit before the previous response is received.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- iOS ([Official API - URLRequest.httpShouldUsePipelining](https://developer.apple.com/documentation/foundation/urlrequest/2011508-httpshouldusepipelining))
+  ///- MacOS ([Official API - URLRequest.httpShouldUsePipelining](https://developer.apple.com/documentation/foundation/urlrequest/2011508-httpshouldusepipelining))
+  bool? httpShouldUsePipelining;
+
+  ///Use [allowsCellularAccess] instead.
+  @Deprecated('Use allowsCellularAccess instead')
+  bool? iosAllowsCellularAccess;
+
+  ///Use [allowsConstrainedNetworkAccess] instead.
+  @Deprecated('Use allowsConstrainedNetworkAccess instead')
+  bool? iosAllowsConstrainedNetworkAccess;
+
+  ///Use [allowsExpensiveNetworkAccess] instead.
+  @Deprecated('Use allowsExpensiveNetworkAccess instead')
+  bool? iosAllowsExpensiveNetworkAccess;
+
+  ///Use [cachePolicy] instead.
+  @Deprecated('Use cachePolicy instead')
+  IOSURLRequestCachePolicy? iosCachePolicy;
+
+  ///Use [httpShouldHandleCookies] instead.
+  @Deprecated('Use httpShouldHandleCookies instead')
+  bool? iosHttpShouldHandleCookies;
+
+  ///Use [httpShouldUsePipelining] instead.
+  @Deprecated('Use httpShouldUsePipelining instead')
+  bool? iosHttpShouldUsePipelining;
+
+  ///Use [mainDocumentURL] instead.
+  @Deprecated('Use mainDocumentURL instead')
+  Uri? iosMainDocumentURL;
+
+  ///Use [networkServiceType] instead.
+  @Deprecated('Use networkServiceType instead')
+  IOSURLRequestNetworkServiceType? iosNetworkServiceType;
+
+  ///Use [timeoutInterval] instead.
+  @Deprecated('Use timeoutInterval instead')
+  double? iosTimeoutInterval;
+
+  ///The main document URL associated with this request.
+  ///This URL is used for the cookie “same domain as main document” policy.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- iOS ([Official API - URLRequest.mainDocumentURL](https://developer.apple.com/documentation/foundation/urlrequest/2011552-maindocumenturl))
+  ///- MacOS ([Official API - URLRequest.mainDocumentURL](https://developer.apple.com/documentation/foundation/urlrequest/2011552-maindocumenturl))
+  WebUri? mainDocumentURL;
+
+  ///The HTTP request method.
+  ///
+  ///**NOTE for Android**: it supports only "GET" and "POST" methods.
+  String? method;
+
+  ///The service type associated with this request.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- iOS ([Official API - URLRequest.networkServiceType](https://developer.apple.com/documentation/foundation/urlrequest/2011409-networkservicetype))
+  ///- MacOS ([Official API - URLRequest.networkServiceType](https://developer.apple.com/documentation/foundation/urlrequest/2011409-networkservicetype))
+  URLRequestNetworkServiceType? networkServiceType;
+
+  ///The timeout interval of the request.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- iOS ([Official API - URLRequest.timeoutInterval](https://developer.apple.com/documentation/foundation/urlrequest/2011509-timeoutinterval))
+  ///- MacOS ([Official API - URLRequest.timeoutInterval](https://developer.apple.com/documentation/foundation/urlrequest/2011509-timeoutinterval))
+  double? timeoutInterval;
+
+  ///The URL of the request. Setting this to `null` will load `about:blank`.
+  WebUri? url;
   URLRequest(
-      {this.url,
-      this.method,
+      {this.allowsCellularAccess,
+      this.allowsConstrainedNetworkAccess,
+      this.allowsExpensiveNetworkAccess,
+      this.assumesHTTP3Capable,
+      this.attribution,
       this.body,
+      this.cachePolicy,
       this.headers,
+      this.httpShouldHandleCookies,
+      this.httpShouldUsePipelining,
       @Deprecated('Use allowsCellularAccess instead')
           this.iosAllowsCellularAccess,
-      this.allowsCellularAccess,
       @Deprecated('Use allowsConstrainedNetworkAccess instead')
           this.iosAllowsConstrainedNetworkAccess,
-      this.allowsConstrainedNetworkAccess,
       @Deprecated('Use allowsExpensiveNetworkAccess instead')
           this.iosAllowsExpensiveNetworkAccess,
-      this.allowsExpensiveNetworkAccess,
       @Deprecated('Use cachePolicy instead')
           this.iosCachePolicy,
-      this.cachePolicy,
       @Deprecated('Use httpShouldHandleCookies instead')
           this.iosHttpShouldHandleCookies,
-      this.httpShouldHandleCookies,
       @Deprecated('Use httpShouldUsePipelining instead')
           this.iosHttpShouldUsePipelining,
-      this.httpShouldUsePipelining,
-      @Deprecated('Use networkServiceType instead')
-          this.iosNetworkServiceType,
-      this.networkServiceType,
-      @Deprecated('Use timeoutInterval instead')
-          this.iosTimeoutInterval,
-      this.timeoutInterval,
       @Deprecated('Use mainDocumentURL instead')
           this.iosMainDocumentURL,
+      @Deprecated('Use networkServiceType instead')
+          this.iosNetworkServiceType,
+      @Deprecated('Use timeoutInterval instead')
+          this.iosTimeoutInterval,
       this.mainDocumentURL,
-      this.assumesHTTP3Capable,
-      this.attribution}) {
+      this.method,
+      this.networkServiceType,
+      this.timeoutInterval,
+      this.url}) {
     allowsCellularAccess = allowsCellularAccess ?? iosAllowsCellularAccess;
     allowsConstrainedNetworkAccess =
         allowsConstrainedNetworkAccess ?? iosAllowsConstrainedNetworkAccess;
@@ -184,12 +184,12 @@ class URLRequest {
         httpShouldHandleCookies ?? iosHttpShouldHandleCookies;
     httpShouldUsePipelining =
         httpShouldUsePipelining ?? iosHttpShouldUsePipelining;
+    mainDocumentURL = mainDocumentURL ??
+        (iosMainDocumentURL != null ? WebUri.uri(iosMainDocumentURL!) : null);
     networkServiceType = networkServiceType ??
         URLRequestNetworkServiceType.fromNativeValue(
             iosNetworkServiceType?.toNativeValue());
     timeoutInterval = timeoutInterval ?? iosTimeoutInterval;
-    mainDocumentURL = mainDocumentURL ??
-        (iosMainDocumentURL != null ? WebUri.uri(iosMainDocumentURL!) : null);
   }
 
   ///Gets a possible [URLRequest] instance from a [Map] value.
@@ -198,37 +198,37 @@ class URLRequest {
       return null;
     }
     final instance = URLRequest(
-      url: map['url'] != null ? WebUri(map['url']) : null,
-      method: map['method'],
-      body: map['body'],
-      headers: map['headers']?.cast<String, String>(),
-      iosAllowsCellularAccess: map['allowsCellularAccess'],
       allowsCellularAccess: map['allowsCellularAccess'],
-      iosAllowsConstrainedNetworkAccess: map['allowsConstrainedNetworkAccess'],
       allowsConstrainedNetworkAccess: map['allowsConstrainedNetworkAccess'],
-      iosAllowsExpensiveNetworkAccess: map['allowsExpensiveNetworkAccess'],
       allowsExpensiveNetworkAccess: map['allowsExpensiveNetworkAccess'],
+      assumesHTTP3Capable: map['assumesHTTP3Capable'],
+      attribution: URLRequestAttribution.fromNativeValue(map['attribution']),
+      body: map['body'],
+      cachePolicy: URLRequestCachePolicy.fromNativeValue(map['cachePolicy']),
+      headers: map['headers']?.cast<String, String>(),
+      httpShouldHandleCookies: map['httpShouldHandleCookies'],
+      httpShouldUsePipelining: map['httpShouldUsePipelining'],
+      iosAllowsCellularAccess: map['allowsCellularAccess'],
+      iosAllowsConstrainedNetworkAccess: map['allowsConstrainedNetworkAccess'],
+      iosAllowsExpensiveNetworkAccess: map['allowsExpensiveNetworkAccess'],
       iosCachePolicy:
           IOSURLRequestCachePolicy.fromNativeValue(map['cachePolicy']),
-      cachePolicy: URLRequestCachePolicy.fromNativeValue(map['cachePolicy']),
       iosHttpShouldHandleCookies: map['httpShouldHandleCookies'],
-      httpShouldHandleCookies: map['httpShouldHandleCookies'],
       iosHttpShouldUsePipelining: map['httpShouldUsePipelining'],
-      httpShouldUsePipelining: map['httpShouldUsePipelining'],
-      iosNetworkServiceType: IOSURLRequestNetworkServiceType.fromNativeValue(
-          map['networkServiceType']),
-      networkServiceType: URLRequestNetworkServiceType.fromNativeValue(
-          map['networkServiceType']),
-      iosTimeoutInterval: map['timeoutInterval'],
-      timeoutInterval: map['timeoutInterval'],
       iosMainDocumentURL: map['mainDocumentURL'] != null
           ? Uri.tryParse(map['mainDocumentURL'])
           : null,
+      iosNetworkServiceType: IOSURLRequestNetworkServiceType.fromNativeValue(
+          map['networkServiceType']),
+      iosTimeoutInterval: map['timeoutInterval'],
       mainDocumentURL: map['mainDocumentURL'] != null
           ? WebUri(map['mainDocumentURL'])
           : null,
-      assumesHTTP3Capable: map['assumesHTTP3Capable'],
-      attribution: URLRequestAttribution.fromNativeValue(map['attribution']),
+      method: map['method'],
+      networkServiceType: URLRequestNetworkServiceType.fromNativeValue(
+          map['networkServiceType']),
+      timeoutInterval: map['timeoutInterval'],
+      url: map['url'] != null ? WebUri(map['url']) : null,
     );
     return instance;
   }
@@ -236,21 +236,21 @@ class URLRequest {
   ///Converts instance to a map.
   Map<String, dynamic> toMap() {
     return {
-      "url": url?.toString(),
-      "method": method,
-      "body": body,
-      "headers": headers,
       "allowsCellularAccess": allowsCellularAccess,
       "allowsConstrainedNetworkAccess": allowsConstrainedNetworkAccess,
       "allowsExpensiveNetworkAccess": allowsExpensiveNetworkAccess,
-      "cachePolicy": cachePolicy?.toNativeValue(),
-      "httpShouldHandleCookies": httpShouldHandleCookies,
-      "httpShouldUsePipelining": httpShouldUsePipelining,
-      "networkServiceType": networkServiceType?.toNativeValue(),
-      "timeoutInterval": timeoutInterval,
-      "mainDocumentURL": mainDocumentURL?.toString(),
       "assumesHTTP3Capable": assumesHTTP3Capable,
       "attribution": attribution?.toNativeValue(),
+      "body": body,
+      "cachePolicy": cachePolicy?.toNativeValue(),
+      "headers": headers,
+      "httpShouldHandleCookies": httpShouldHandleCookies,
+      "httpShouldUsePipelining": httpShouldUsePipelining,
+      "mainDocumentURL": mainDocumentURL?.toString(),
+      "method": method,
+      "networkServiceType": networkServiceType?.toNativeValue(),
+      "timeoutInterval": timeoutInterval,
+      "url": url?.toString(),
     };
   }
 
@@ -261,6 +261,6 @@ class URLRequest {
 
   @override
   String toString() {
-    return 'URLRequest{url: $url, method: $method, body: $body, headers: $headers, allowsCellularAccess: $allowsCellularAccess, allowsConstrainedNetworkAccess: $allowsConstrainedNetworkAccess, allowsExpensiveNetworkAccess: $allowsExpensiveNetworkAccess, cachePolicy: $cachePolicy, httpShouldHandleCookies: $httpShouldHandleCookies, httpShouldUsePipelining: $httpShouldUsePipelining, networkServiceType: $networkServiceType, timeoutInterval: $timeoutInterval, mainDocumentURL: $mainDocumentURL, assumesHTTP3Capable: $assumesHTTP3Capable, attribution: $attribution}';
+    return 'URLRequest{allowsCellularAccess: $allowsCellularAccess, allowsConstrainedNetworkAccess: $allowsConstrainedNetworkAccess, allowsExpensiveNetworkAccess: $allowsExpensiveNetworkAccess, assumesHTTP3Capable: $assumesHTTP3Capable, attribution: $attribution, body: $body, cachePolicy: $cachePolicy, headers: $headers, httpShouldHandleCookies: $httpShouldHandleCookies, httpShouldUsePipelining: $httpShouldUsePipelining, mainDocumentURL: $mainDocumentURL, method: $method, networkServiceType: $networkServiceType, timeoutInterval: $timeoutInterval, url: $url}';
   }
 }

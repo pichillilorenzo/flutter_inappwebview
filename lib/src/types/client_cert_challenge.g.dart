@@ -9,34 +9,34 @@ part of 'client_cert_challenge.dart';
 ///Class that represents the challenge of the [WebView.onReceivedClientCertRequest] event.
 ///It provides all the information about the challenge.
 class ClientCertChallenge extends URLAuthenticationChallenge {
-  ///Use [principals] instead.
-  @Deprecated('Use principals instead')
-  List<String>? androidPrincipals;
-
-  ///The acceptable certificate issuers for the certificate matching the private key.
-  ///
-  ///**Supported Platforms/Implementations**:
-  ///- Android native WebView 21+ ([Official API - ClientCertRequest.getPrincipals](https://developer.android.com/reference/android/webkit/ClientCertRequest#getPrincipals()))
-  List<String>? principals;
-
   ///Use [keyTypes] instead.
   @Deprecated('Use keyTypes instead')
   List<String>? androidKeyTypes;
+
+  ///Use [principals] instead.
+  @Deprecated('Use principals instead')
+  List<String>? androidPrincipals;
 
   ///Returns the acceptable types of asymmetric keys.
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView 21+ ([Official API - ClientCertRequest.getKeyTypes](https://developer.android.com/reference/android/webkit/ClientCertRequest#getKeyTypes()))
   List<String>? keyTypes;
+
+  ///The acceptable certificate issuers for the certificate matching the private key.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- Android native WebView 21+ ([Official API - ClientCertRequest.getPrincipals](https://developer.android.com/reference/android/webkit/ClientCertRequest#getPrincipals()))
+  List<String>? principals;
   ClientCertChallenge(
-      {@Deprecated('Use principals instead') this.androidPrincipals,
-      this.principals,
-      @Deprecated('Use keyTypes instead') this.androidKeyTypes,
+      {@Deprecated('Use keyTypes instead') this.androidKeyTypes,
+      @Deprecated('Use principals instead') this.androidPrincipals,
       this.keyTypes,
+      this.principals,
       required URLProtectionSpace protectionSpace})
       : super(protectionSpace: protectionSpace) {
-    principals = principals ?? androidPrincipals;
     keyTypes = keyTypes ?? androidKeyTypes;
+    principals = principals ?? androidPrincipals;
   }
 
   ///Gets a possible [ClientCertChallenge] instance from a [Map] value.
@@ -47,10 +47,10 @@ class ClientCertChallenge extends URLAuthenticationChallenge {
     final instance = ClientCertChallenge(
       protectionSpace: URLProtectionSpace.fromMap(
           map['protectionSpace']?.cast<String, dynamic>())!,
-      androidPrincipals: map['principals']?.cast<String>(),
-      principals: map['principals']?.cast<String>(),
       androidKeyTypes: map['keyTypes']?.cast<String>(),
+      androidPrincipals: map['principals']?.cast<String>(),
       keyTypes: map['keyTypes']?.cast<String>(),
+      principals: map['principals']?.cast<String>(),
     );
     return instance;
   }
@@ -59,8 +59,8 @@ class ClientCertChallenge extends URLAuthenticationChallenge {
   Map<String, dynamic> toMap() {
     return {
       "protectionSpace": protectionSpace.toMap(),
-      "principals": principals,
       "keyTypes": keyTypes,
+      "principals": principals,
     };
   }
 
@@ -71,6 +71,6 @@ class ClientCertChallenge extends URLAuthenticationChallenge {
 
   @override
   String toString() {
-    return 'ClientCertChallenge{protectionSpace: $protectionSpace, principals: $principals, keyTypes: $keyTypes}';
+    return 'ClientCertChallenge{protectionSpace: $protectionSpace, keyTypes: $keyTypes, principals: $principals}';
   }
 }

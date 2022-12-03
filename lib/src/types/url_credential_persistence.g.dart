@@ -16,11 +16,11 @@ class URLCredentialPersistence {
           int value, Function nativeValue) =>
       URLCredentialPersistence._internal(value, nativeValue());
 
-  ///The credential should not be stored.
-  static const NONE = URLCredentialPersistence._internal(0, 0);
-
   ///The credential should be stored only for this session
   static const FOR_SESSION = URLCredentialPersistence._internal(1, 1);
+
+  ///The credential should not be stored.
+  static const NONE = URLCredentialPersistence._internal(0, 0);
 
   ///The credential should be stored in the keychain.
   static const PERMANENT = URLCredentialPersistence._internal(2, 2);
@@ -31,8 +31,8 @@ class URLCredentialPersistence {
 
   ///Set of all values of [URLCredentialPersistence].
   static final Set<URLCredentialPersistence> values = [
-    URLCredentialPersistence.NONE,
     URLCredentialPersistence.FOR_SESSION,
+    URLCredentialPersistence.NONE,
     URLCredentialPersistence.PERMANENT,
     URLCredentialPersistence.SYNCHRONIZABLE,
   ].toSet();
@@ -78,10 +78,10 @@ class URLCredentialPersistence {
   @override
   String toString() {
     switch (_value) {
-      case 0:
-        return 'NONE';
       case 1:
         return 'FOR_SESSION';
+      case 0:
+        return 'NONE';
       case 2:
         return 'PERMANENT';
       case 3:
@@ -103,11 +103,11 @@ class IOSURLCredentialPersistence {
           int value, Function nativeValue) =>
       IOSURLCredentialPersistence._internal(value, nativeValue());
 
-  ///The credential should not be stored.
-  static const NONE = IOSURLCredentialPersistence._internal(0, 0);
-
   ///The credential should be stored only for this session
   static const FOR_SESSION = IOSURLCredentialPersistence._internal(1, 1);
+
+  ///The credential should not be stored.
+  static const NONE = IOSURLCredentialPersistence._internal(0, 0);
 
   ///The credential should be stored in the keychain.
   static const PERMANENT = IOSURLCredentialPersistence._internal(2, 2);
@@ -118,8 +118,8 @@ class IOSURLCredentialPersistence {
 
   ///Set of all values of [IOSURLCredentialPersistence].
   static final Set<IOSURLCredentialPersistence> values = [
-    IOSURLCredentialPersistence.NONE,
     IOSURLCredentialPersistence.FOR_SESSION,
+    IOSURLCredentialPersistence.NONE,
     IOSURLCredentialPersistence.PERMANENT,
     IOSURLCredentialPersistence.SYNCHRONIZABLE,
   ].toSet();
@@ -165,10 +165,10 @@ class IOSURLCredentialPersistence {
   @override
   String toString() {
     switch (_value) {
-      case 0:
-        return 'NONE';
       case 1:
         return 'FOR_SESSION';
+      case 0:
+        return 'NONE';
       case 2:
         return 'PERMANENT';
       case 3:

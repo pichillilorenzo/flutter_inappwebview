@@ -16,21 +16,6 @@ class CustomTabsRelationType {
           int value, Function nativeValue) =>
       CustomTabsRelationType._internal(value, nativeValue());
 
-  ///For App -> Web transitions, requests the app to use the declared origin to be used as origin for the client app in the web APIs context.
-  ///
-  ///**Supported Platforms/Implementations**:
-  ///- Android native WebView
-  static final USE_AS_ORIGIN =
-      CustomTabsRelationType._internalMultiPlatform(1, () {
-    switch (defaultTargetPlatform) {
-      case TargetPlatform.android:
-        return 1;
-      default:
-        break;
-    }
-    return null;
-  });
-
   ///Requests the ability to handle all URLs from a given origin.
   ///
   ///**Supported Platforms/Implementations**:
@@ -46,10 +31,25 @@ class CustomTabsRelationType {
     return null;
   });
 
+  ///For App -> Web transitions, requests the app to use the declared origin to be used as origin for the client app in the web APIs context.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- Android native WebView
+  static final USE_AS_ORIGIN =
+      CustomTabsRelationType._internalMultiPlatform(1, () {
+    switch (defaultTargetPlatform) {
+      case TargetPlatform.android:
+        return 1;
+      default:
+        break;
+    }
+    return null;
+  });
+
   ///Set of all values of [CustomTabsRelationType].
   static final Set<CustomTabsRelationType> values = [
-    CustomTabsRelationType.USE_AS_ORIGIN,
     CustomTabsRelationType.HANDLE_ALL_URLS,
+    CustomTabsRelationType.USE_AS_ORIGIN,
   ].toSet();
 
   ///Gets a possible [CustomTabsRelationType] instance from [int] value.
@@ -93,10 +93,10 @@ class CustomTabsRelationType {
   @override
   String toString() {
     switch (_value) {
-      case 1:
-        return 'USE_AS_ORIGIN';
       case 2:
         return 'HANDLE_ALL_URLS';
+      case 1:
+        return 'USE_AS_ORIGIN';
     }
     return _value.toString();
   }

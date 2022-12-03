@@ -8,34 +8,34 @@ part of 'download_start_request.dart';
 
 ///Class representing a download request of the WebView used by the event [WebView.onDownloadStartRequest].
 class DownloadStartRequest {
-  ///The full url to the content that should be downloaded.
-  WebUri url;
-
-  ///the user agent to be used for the download.
-  String? userAgent;
-
   ///Content-disposition http header, if present.
   String? contentDisposition;
 
-  ///The mimetype of the content reported by the server.
-  String? mimeType;
-
   ///The file size reported by the server.
   int contentLength;
+
+  ///The mimetype of the content reported by the server.
+  String? mimeType;
 
   ///A suggested filename to use if saving the resource to disk.
   String? suggestedFilename;
 
   ///The name of the text encoding of the receiver, or `null` if no text encoding was specified.
   String? textEncodingName;
+
+  ///The full url to the content that should be downloaded.
+  WebUri url;
+
+  ///the user agent to be used for the download.
+  String? userAgent;
   DownloadStartRequest(
-      {required this.url,
-      this.userAgent,
-      this.contentDisposition,
-      this.mimeType,
+      {this.contentDisposition,
       required this.contentLength,
+      this.mimeType,
       this.suggestedFilename,
-      this.textEncodingName});
+      this.textEncodingName,
+      required this.url,
+      this.userAgent});
 
   ///Gets a possible [DownloadStartRequest] instance from a [Map] value.
   static DownloadStartRequest? fromMap(Map<String, dynamic>? map) {
@@ -43,13 +43,13 @@ class DownloadStartRequest {
       return null;
     }
     final instance = DownloadStartRequest(
-      url: WebUri(map['url']),
-      userAgent: map['userAgent'],
       contentDisposition: map['contentDisposition'],
-      mimeType: map['mimeType'],
       contentLength: map['contentLength'],
+      mimeType: map['mimeType'],
       suggestedFilename: map['suggestedFilename'],
       textEncodingName: map['textEncodingName'],
+      url: WebUri(map['url']),
+      userAgent: map['userAgent'],
     );
     return instance;
   }
@@ -57,13 +57,13 @@ class DownloadStartRequest {
   ///Converts instance to a map.
   Map<String, dynamic> toMap() {
     return {
-      "url": url.toString(),
-      "userAgent": userAgent,
       "contentDisposition": contentDisposition,
-      "mimeType": mimeType,
       "contentLength": contentLength,
+      "mimeType": mimeType,
       "suggestedFilename": suggestedFilename,
       "textEncodingName": textEncodingName,
+      "url": url.toString(),
+      "userAgent": userAgent,
     };
   }
 
@@ -74,6 +74,6 @@ class DownloadStartRequest {
 
   @override
   String toString() {
-    return 'DownloadStartRequest{url: $url, userAgent: $userAgent, contentDisposition: $contentDisposition, mimeType: $mimeType, contentLength: $contentLength, suggestedFilename: $suggestedFilename, textEncodingName: $textEncodingName}';
+    return 'DownloadStartRequest{contentDisposition: $contentDisposition, contentLength: $contentLength, mimeType: $mimeType, suggestedFilename: $suggestedFilename, textEncodingName: $textEncodingName, url: $url, userAgent: $userAgent}';
   }
 }

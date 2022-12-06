@@ -1,3 +1,7 @@
+## 6.0.0-beta.21
+
+- Fixed "Android plugin version 6 - UserScripts not executing on new tabs." [#1455](https://github.com/pichillilorenzo/flutter_inappwebview/issues/1455)
+
 ## 6.0.0-beta.20
 
 - Using Android `WebViewClientCompat` for Chromium-based WebView if the WebView package major version is >= 73 (https://bugs.chromium.org/p/chromium/issues/detail?id=925887)

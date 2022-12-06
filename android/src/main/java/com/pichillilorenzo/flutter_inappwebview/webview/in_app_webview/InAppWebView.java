@@ -61,7 +61,6 @@ import androidx.webkit.WebViewCompat;
 import androidx.webkit.WebViewFeature;
 
 import com.pichillilorenzo.flutter_inappwebview.InAppWebViewFlutterPlugin;
-import com.pichillilorenzo.flutter_inappwebview.InAppWebViewStatic;
 import com.pichillilorenzo.flutter_inappwebview.R;
 import com.pichillilorenzo.flutter_inappwebview.Util;
 import com.pichillilorenzo.flutter_inappwebview.content_blocker.ContentBlocker;
@@ -166,7 +165,7 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
   public Map<String, WebMessageChannel> webMessageChannels = new HashMap<>();
   public List<WebMessageListener> webMessageListeners = new ArrayList<>();
 
-  private List<UserScript> initialUserOnlyScript = new ArrayList<>();
+  private List<UserScript> initialUserOnlyScripts = new ArrayList<>();
 
   @Nullable
   public FindInteractionController findInteractionController;
@@ -198,7 +197,7 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
     this.windowId = windowId;
     this.customSettings = customSettings;
     this.contextMenu = contextMenu;
-    this.initialUserOnlyScript = userScripts;
+    this.initialUserOnlyScripts = userScripts;
     if (plugin != null && plugin.activity != null) {
       plugin.activity.registerForContextMenu(this);
     }
@@ -260,7 +259,13 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
       WebViewCompat.setWebViewRenderProcessClient(this, inAppWebViewRenderProcessClient);
     }
 
-    prepareAndAddUserScripts();
+    if (windowId == null || !WebViewFeature.isFeatureSupported(WebViewFeature.DOCUMENT_START_SCRIPT)) {
+      // for some reason, if a WebView is created using a window id,
+      // the initial plugin and user scripts injected
+      // with WebViewCompat.addDocumentStartJavaScript will not be added!
+      // https://github.com/pichillilorenzo/flutter_inappwebview/issues/1455
+      prepareAndAddUserScripts();
+    }
 
     if (customSettings.useOnDownloadStart)
       setDownloadListener(new DownloadStartListener());
@@ -552,7 +557,7 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
     });
   }
 
-  private void prepareAndAddUserScripts() {
+  public void prepareAndAddUserScripts() {
     userContentController.addPluginScript(PromisePolyfillJS.PROMISE_POLYFILL_JS_PLUGIN_SCRIPT);
     userContentController.addPluginScript(JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_JS_PLUGIN_SCRIPT);
     userContentController.addPluginScript(ConsoleLogJS.CONSOLE_LOG_JS_PLUGIN_SCRIPT);
@@ -571,7 +576,7 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
     if (!customSettings.useHybridComposition) {
       userContentController.addPluginScript(PluginScriptsUtil.CHECK_GLOBAL_KEY_DOWN_EVENT_TO_HIDE_CONTEXT_MENU_JS_PLUGIN_SCRIPT);
     }
-    this.userContentController.addUserOnlyScripts(this.initialUserOnlyScript);
+    this.userContentController.addUserOnlyScripts(this.initialUserOnlyScripts);
   }
 
   public void setIncognito(boolean enabled) {

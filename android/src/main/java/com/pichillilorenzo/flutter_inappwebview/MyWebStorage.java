@@ -25,20 +25,27 @@ public class MyWebStorage extends ChannelDelegateImpl {
   @Nullable
   public InAppWebViewFlutterPlugin plugin;
 
-  public MyWebStorage(final InAppWebViewFlutterPlugin plugin) {
+  public MyWebStorage(@NonNull final InAppWebViewFlutterPlugin plugin) {
     super(new MethodChannel(plugin.messenger, METHOD_CHANNEL_NAME));
     this.plugin = plugin;
-    webStorageManager = WebStorage.getInstance();
+  }
+
+  public static void init() {
+    if (webStorageManager == null) {
+      webStorageManager = WebStorage.getInstance();
+    }
   }
 
   @Override
   public void onMethodCall(@NonNull MethodCall call, @NonNull MethodChannel.Result result) {
+    init();
+
     switch (call.method) {
       case "getOrigins":
         getOrigins(result);
         break;
       case "deleteAllData":
-        if (webStorageManager == null) {
+        if (webStorageManager != null) {
           webStorageManager.deleteAllData();
           result.success(true);
         } else {
@@ -47,7 +54,7 @@ public class MyWebStorage extends ChannelDelegateImpl {
         break;
       case "deleteOrigin":
         {
-          if (webStorageManager == null) {
+          if (webStorageManager != null) {
             String origin = (String) call.argument("origin");
             webStorageManager.deleteOrigin(origin);
             result.success(true);

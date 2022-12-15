@@ -33,14 +33,16 @@ public class ServiceWorkerManager implements Disposable {
   @Nullable
   public InAppWebViewFlutterPlugin plugin;
 
-  public ServiceWorkerManager(final InAppWebViewFlutterPlugin plugin) {
+  public ServiceWorkerManager(@NonNull final InAppWebViewFlutterPlugin plugin) {
     this.plugin = plugin;
     final MethodChannel channel = new MethodChannel(plugin.messenger, METHOD_CHANNEL_NAME);
     this.channelDelegate = new ServiceWorkerChannelDelegate(this, channel);
-    if (WebViewFeature.isFeatureSupported(WebViewFeature.SERVICE_WORKER_BASIC_USAGE)) {
+  }
+
+  public static void init() {
+    if (serviceWorkerController == null &&
+            WebViewFeature.isFeatureSupported(WebViewFeature.SERVICE_WORKER_BASIC_USAGE)) {
       serviceWorkerController = ServiceWorkerControllerCompat.getInstance();
-    } else {
-      serviceWorkerController = null;
     }
   }
   

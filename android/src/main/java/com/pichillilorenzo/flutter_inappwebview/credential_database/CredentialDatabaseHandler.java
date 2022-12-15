@@ -30,14 +30,23 @@ public class CredentialDatabaseHandler extends ChannelDelegateImpl {
   @Nullable
   public InAppWebViewFlutterPlugin plugin;
 
-  public CredentialDatabaseHandler(final InAppWebViewFlutterPlugin plugin) {
+  public CredentialDatabaseHandler(@NonNull final InAppWebViewFlutterPlugin plugin) {
     super(new MethodChannel(plugin.messenger, METHOD_CHANNEL_NAME));
     this.plugin = plugin;
-    credentialDatabase = CredentialDatabase.getInstance(plugin.applicationContext);
+  }
+
+  public static void init(@NonNull InAppWebViewFlutterPlugin plugin) {
+    if (credentialDatabase == null) {
+      credentialDatabase = CredentialDatabase.getInstance(plugin.applicationContext);
+    }
   }
 
   @Override
   public void onMethodCall(@NonNull MethodCall call, @NonNull MethodChannel.Result result) {
+    if (plugin != null) {
+      init(plugin);
+    }
+
     switch (call.method) {
       case "getAllAuthCredentials":
         {

@@ -27,6 +27,7 @@ public class TracingControllerChannelDelegate extends ChannelDelegateImpl {
 
   @Override
   public void onMethodCall(@NonNull MethodCall call, @NonNull MethodChannel.Result result) {
+    TracingControllerManager.init();
     TracingController tracingController = TracingControllerManager.tracingController;
 
     switch (call.method) {

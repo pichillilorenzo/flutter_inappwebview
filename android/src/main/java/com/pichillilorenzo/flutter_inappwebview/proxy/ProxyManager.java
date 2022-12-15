@@ -25,18 +25,22 @@ public class ProxyManager extends ChannelDelegateImpl {
   @Nullable
   public InAppWebViewFlutterPlugin plugin;
 
-  public ProxyManager(final InAppWebViewFlutterPlugin plugin) {
+  public ProxyManager(@NonNull final InAppWebViewFlutterPlugin plugin) {
     super(new MethodChannel(plugin.messenger, METHOD_CHANNEL_NAME));
     this.plugin = plugin;
-    if (WebViewFeature.isFeatureSupported(WebViewFeature.PROXY_OVERRIDE)) {
+  }
+
+  public static void init() {
+    if (proxyController == null &&
+            WebViewFeature.isFeatureSupported(WebViewFeature.PROXY_OVERRIDE)) {
       proxyController = ProxyController.getInstance();
-    } else {
-      proxyController = null;
     }
   }
 
   @Override
   public void onMethodCall(@NonNull MethodCall call, @NonNull MethodChannel.Result result) {
+    init();
+
     switch (call.method) {
       case "setProxyOverride":
         if (proxyController != null) {

@@ -2738,13 +2738,21 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
                 
                 self.evaluateJavaScript("""
 if(window.\(JAVASCRIPT_BRIDGE_NAME)[\(_callHandlerID)] != null) {
-    window.\(JAVASCRIPT_BRIDGE_NAME)[\(_callHandlerID)](\(json));
+    window.\(JAVASCRIPT_BRIDGE_NAME)[\(_callHandlerID)].resolve(\(json));
     delete window.\(JAVASCRIPT_BRIDGE_NAME)[\(_callHandlerID)];
 }
 """, completionHandler: nil)
             }
             callback.error = { (code: String, message: String?, details: Any?) in
-                print(code + ", " + (message ?? ""))
+                let errorMessage = code + (message != nil ? ", " + (message ?? "") : "")
+                print(errorMessage)
+                
+                self.evaluateJavaScript("""
+if(window.\(JAVASCRIPT_BRIDGE_NAME)[\(_callHandlerID)] != null) {
+    window.\(JAVASCRIPT_BRIDGE_NAME)[\(_callHandlerID)].reject(new Error('\(errorMessage.replacingOccurrences(of: "\'", with: "\\'"))'));
+    delete window.\(JAVASCRIPT_BRIDGE_NAME)[\(_callHandlerID)];
+}
+""", completionHandler: nil)
             }
             
             if let channelDelegate = webView.channelDelegate {

@@ -1,6 +1,7 @@
 package com.pichillilorenzo.flutter_inappwebview.tracing;
 
 import androidx.annotation.Nullable;
+import androidx.webkit.ProxyController;
 import androidx.webkit.TracingConfig;
 import androidx.webkit.TracingController;
 import androidx.webkit.WebViewFeature;
@@ -25,10 +26,12 @@ public class TracingControllerManager implements Disposable {
     this.plugin = plugin;
     final MethodChannel channel = new MethodChannel(plugin.messenger, METHOD_CHANNEL_NAME);
     this.channelDelegate = new TracingControllerChannelDelegate(this, channel);
-    if (WebViewFeature.isFeatureSupported(WebViewFeature.TRACING_CONTROLLER_BASIC_USAGE)) {
+  }
+
+  public static void init() {
+    if (tracingController == null &&
+            WebViewFeature.isFeatureSupported(WebViewFeature.TRACING_CONTROLLER_BASIC_USAGE)) {
       tracingController = TracingController.getInstance();
-    } else {
-      tracingController = null;
     }
   }
 

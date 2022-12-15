@@ -130,7 +130,7 @@ public class JavaScriptBridgeInterface {
                 return;
               }
               String sourceCode = "if (window." + JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME + "[" + _callHandlerID + "] != null) { " +
-                "window." + JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME + "[" + _callHandlerID + "](" + json + "); " +
+                "window." + JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME + "[" + _callHandlerID + "].resolve(" + json + "); " +
                 "delete window." + JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME + "[" + _callHandlerID + "]; " +
               "}";
               if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
@@ -143,7 +143,24 @@ public class JavaScriptBridgeInterface {
 
             @Override
             public void error(String errorCode, @Nullable String errorMessage, @Nullable Object errorDetails) {
-              Log.e(LOG_TAG, errorCode + ", " + ((errorMessage != null) ? errorMessage : ""));
+              String message = errorCode + ((errorMessage != null) ? ", " + errorMessage : "");
+              Log.e(LOG_TAG, message);
+
+              if (inAppWebView == null) {
+                // The webview has already been disposed, ignore.
+                return;
+              }
+
+              String sourceCode = "if (window." + JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME + "[" + _callHandlerID + "] != null) { " +
+                      "window." + JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME + "[" + _callHandlerID + "].reject(new Error(" + JSONObject.quote(message) + ")); " +
+                      "delete window." + JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME + "[" + _callHandlerID + "]; " +
+                      "}";
+              if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                inAppWebView.evaluateJavascript(sourceCode, (ValueCallback<String>) null);
+              }
+              else {
+                inAppWebView.loadUrl("javascript:" + sourceCode);
+              }
             }
           });
         }

@@ -36,6 +36,7 @@ public class ServiceWorkerChannelDelegate extends ChannelDelegateImpl {
   @SuppressLint("RestrictedApi")
   @Override
   public void onMethodCall(@NonNull MethodCall call, @NonNull MethodChannel.Result result) {
+    ServiceWorkerManager.init();
     ServiceWorkerControllerCompat serviceWorkerController = ServiceWorkerManager.serviceWorkerController;
     ServiceWorkerWebSettingsCompat serviceWorkerWebSettings = (serviceWorkerController != null) ? 
             serviceWorkerController.getServiceWorkerWebSettings() : null;

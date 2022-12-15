@@ -30,14 +30,21 @@ public class MyCookieManager extends ChannelDelegateImpl {
   @Nullable
   public InAppWebViewFlutterPlugin plugin;
 
-  public MyCookieManager(final InAppWebViewFlutterPlugin plugin) {
+  public MyCookieManager(@NonNull final InAppWebViewFlutterPlugin plugin) {
     super(new MethodChannel(plugin.messenger, METHOD_CHANNEL_NAME));
     this.plugin = plugin;
-    cookieManager = getCookieManager();
+  }
+
+  public static void init() {
+    if (cookieManager == null) {
+      cookieManager = getCookieManager();
+    }
   }
 
   @Override
   public void onMethodCall(@NonNull MethodCall call, @NonNull MethodChannel.Result result) {
+    init();
+
     switch (call.method) {
       case "setCookie":
         {

@@ -1378,9 +1378,10 @@ class InAppWebViewController {
           // convert result to json
           try {
             return jsonEncode(await javaScriptHandlersMap[handlerName]!(args));
-          } catch (error) {
-            developer.log(error.toString(), name: this.runtimeType.toString());
-            return null;
+          } catch (error, stacktrace) {
+            developer.log(error.toString() + '\n' + stacktrace.toString(),
+                name: 'JavaScript Handler "$handlerName"');
+            throw Exception(error.toString().replaceFirst('Exception: ', ''));
           }
         }
         break;

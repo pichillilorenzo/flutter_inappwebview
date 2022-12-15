@@ -27,4 +27,4 @@ final TEST_SERVICE_WORKER_URL = WebUri(
     'https://mdn.github.io/dom-examples/service-worker/simple-service-worker/');
 final TEST_WEBVIEW_ASSET_LOADER_DOMAIN = 'my.custom.domain.com';
 final TEST_WEBVIEW_ASSET_LOADER_URL = WebUri(
-    'https://$TEST_WEBVIEW_ASSET_LOADER_DOMAIN/assets/flutter_assets/assets/website/index.html');
+    'https://$TEST_WEBVIEW_ASSET_LOADER_DOMAIN/assets/flutter_assets/test_assets/website/index.html');

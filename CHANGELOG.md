@@ -1,3 +1,24 @@
+## 6.0.0-beta.23
+
+- Updated `androidx.webkit:webkit` dependency to `1.6.1`
+- Updated `androidx.browser:browser` dependency to `1.5.0`
+- Updated `androidx.appcompat:appcompat` dependency to `1.6.1`
+- Added support for Android `WebViewFeature.GET_COOKIE_INFO`
+- Added `requestedWithHeaderOriginAllowList` WebView setting for Android
+- Added `isInspectable`, `shouldPrintBackgrounds` WebView settings for iOS and macOS
+- Removed `WebViewFeature.REQUESTED_WITH_HEADER_CONTROL`, `ServiceWorkerController.setRequestedWithHeaderMode()`, `ServiceWorkerController.getRequestedWithHeaderMode()`, `InAppWebViewSettings.requestedWithHeaderMode`
+- Fixed "Build fail with AGP 8.0" [#1643](https://github.com/pichillilorenzo/flutter_inappwebview/issues/1643)
+- Fixed "java.lang.RuntimeException: Unknown feature REQUESTED_WITH_HEADER_CONTROL" [#1611](https://github.com/pichillilorenzo/flutter_inappwebview/issues/1611)
+- Fixed "iOS 16.4 WebDebugging WKWebView.isInspectable" [#1629](https://github.com/pichillilorenzo/flutter_inappwebview/issues/1629)
+- Fixed some `@available` checks for macOS
+
+## 6.0.0-beta.22
+
+- Updated `window.flutter_inappwebview.callHandler` implementation: if there is an error/exception on Flutter/Dart side, the `callHandler` will reject the JavaScript promise with the error/exception message, so you can catch it also on JavaScript side
+- Fixed Android Web Storage Manager `deleteAllData` and `deleteOrigin` methods implementation
+- Fixed "Xiaomi store - Conflict of Privacy Permissions, android.permission.MY_READ_INSTALLED_PACKAGES" [#1462](https://github.com/pichillilorenzo/flutter_inappwebview/issues/1462)
+- Fixed "Flutter 3.0.5 compilation issue" [#1475](https://github.com/pichillilorenzo/flutter_inappwebview/issues/1475)
+
 ## 6.0.0-beta.21
 
 - Fixed "Android plugin version 6 - UserScripts not executing on new tabs." [#1455](https://github.com/pichillilorenzo/flutter_inappwebview/issues/1455)
@@ -173,6 +194,10 @@
 - All properties of `GeolocationPermissionShowPromptResponse` cannot be `null`
 - Removed `URLProtectionSpace.iosIsProxy` property
 - `historyUrl` and `baseUrl` of `InAppWebViewInitialData` can be `null`
+
+## 5.7.2+3
+
+- Fixed "Xiaomi store - Conflict of Privacy Permissions, android.permission.MY_READ_INSTALLED_PACKAGES" [#1462](https://github.com/pichillilorenzo/flutter_inappwebview/issues/1462)
 
 ## 5.7.2+2
 

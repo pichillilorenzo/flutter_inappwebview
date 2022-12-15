@@ -16,7 +16,7 @@ public class WebViewFeatureManager extends ChannelDelegateImpl {
   @Nullable
   public InAppWebViewFlutterPlugin plugin;
 
-  public WebViewFeatureManager(final InAppWebViewFlutterPlugin plugin) {
+  public WebViewFeatureManager(@NonNull final InAppWebViewFlutterPlugin plugin) {
     super(new MethodChannel(plugin.messenger, METHOD_CHANNEL_NAME));
     this.plugin = plugin;
   }

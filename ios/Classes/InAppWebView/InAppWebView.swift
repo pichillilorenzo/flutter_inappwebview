@@ -427,8 +427,9 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
                 isFindInteractionEnabled = settings.isFindInteractionEnabled
             }
             
-            // debugging is always enabled for iOS,
-            // there isn't any option to set about it such as on Android.
+            if #available(iOS 16.4, *) {
+                isInspectable = settings.isInspectable
+            }
             
             if settings.clearCache {
                 clearCache()
@@ -464,13 +465,15 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
                 configuration.defaultWebpagePreferences.allowsContentJavaScript = settings.javaScriptEnabled
             }
             
-            if #available(iOS 14.5, *) {
+            if #available(iOS 15.0, *) {
                 configuration.preferences.isTextInteractionEnabled = settings.isTextInteractionEnabled
             }
-            
             if #available(iOS 15.4, *) {
                 configuration.preferences.isSiteSpecificQuirksModeEnabled = settings.isSiteSpecificQuirksModeEnabled
                 configuration.preferences.isElementFullscreenEnabled = settings.isElementFullscreenEnabled
+            }
+            if #available(iOS 16.4, *) {
+                configuration.preferences.shouldPrintBackgrounds = settings.shouldPrintBackgrounds
             }
         }
     }
@@ -1187,16 +1190,13 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
             }
         }
         
-        if #available(iOS 14.5, *) {
+        if #available(iOS 15.0, *) {
             if newSettingsMap["upgradeKnownHostsToHTTPS"] != nil && settings?.upgradeKnownHostsToHTTPS != newSettings.upgradeKnownHostsToHTTPS {
                 configuration.upgradeKnownHostsToHTTPS = newSettings.upgradeKnownHostsToHTTPS
             }
             if newSettingsMap["isTextInteractionEnabled"] != nil && settings?.isTextInteractionEnabled != newSettings.isTextInteractionEnabled {
                 configuration.preferences.isTextInteractionEnabled = newSettings.isTextInteractionEnabled
             }
-        }
-        
-        if #available(iOS 15.0, *) {
             if newSettingsMap["underPageBackgroundColor"] != nil, settings?.underPageBackgroundColor != newSettings.underPageBackgroundColor,
                let underPageBackgroundColor = newSettings.underPageBackgroundColor, !underPageBackgroundColor.isEmpty {
                 self.underPageBackgroundColor = UIColor(hexString: underPageBackgroundColor)
@@ -1214,10 +1214,17 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
                 setMinimumViewportInset(minViewportInset, maximumViewportInset: maxViewportInset)
             }
         }
-        
         if #available(iOS 16.0, *) {
             if newSettingsMap["isFindInteractionEnabled"] != nil, settings?.isFindInteractionEnabled != newSettings.isFindInteractionEnabled {
                 isFindInteractionEnabled = newSettings.isFindInteractionEnabled
+            }
+        }
+        if #available(iOS 16.4, *) {
+            if newSettingsMap["isInspectable"] != nil, settings?.isInspectable != newSettings.isInspectable {
+                isInspectable = newSettings.isInspectable
+            }
+            if newSettingsMap["shouldPrintBackgrounds"] != nil, settings?.shouldPrintBackgrounds != newSettings.shouldPrintBackgrounds {
+                configuration.preferences.shouldPrintBackgrounds = newSettings.shouldPrintBackgrounds
             }
         }
         
@@ -2738,13 +2745,21 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
                 
                 self.evaluateJavaScript("""
 if(window.\(JAVASCRIPT_BRIDGE_NAME)[\(_callHandlerID)] != null) {
-    window.\(JAVASCRIPT_BRIDGE_NAME)[\(_callHandlerID)](\(json));
+    window.\(JAVASCRIPT_BRIDGE_NAME)[\(_callHandlerID)].resolve(\(json));
     delete window.\(JAVASCRIPT_BRIDGE_NAME)[\(_callHandlerID)];
 }
 """, completionHandler: nil)
             }
             callback.error = { (code: String, message: String?, details: Any?) in
-                print(code + ", " + (message ?? ""))
+                let errorMessage = code + (message != nil ? ", " + (message ?? "") : "")
+                print(errorMessage)
+                
+                self.evaluateJavaScript("""
+if(window.\(JAVASCRIPT_BRIDGE_NAME)[\(_callHandlerID)] != null) {
+    window.\(JAVASCRIPT_BRIDGE_NAME)[\(_callHandlerID)].reject(new Error('\(errorMessage.replacingOccurrences(of: "\'", with: "\\'"))'));
+    delete window.\(JAVASCRIPT_BRIDGE_NAME)[\(_callHandlerID)];
+}
+""", completionHandler: nil)
             }
             
             if let channelDelegate = webView.channelDelegate {

@@ -576,3 +576,9 @@ void debugLog(
     }
   }
 }
+
+// Class used only by the build_runner for @ExchangeableObject annotation.
+// For some strange reason, Color is not recognized anymore by the dart analyzer correctly.
+class Color_ extends Color {
+  Color_(int value) : super(value);
+}

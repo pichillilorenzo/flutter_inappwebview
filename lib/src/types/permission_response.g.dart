@@ -70,7 +70,7 @@ class PermissionRequestResponse {
     final instance = PermissionRequestResponse();
     instance.action =
         PermissionRequestResponseAction.fromNativeValue(map['action']);
-    instance.resources = map['resources'].cast<String>();
+    instance.resources = List<String>.from(map['resources']!.cast<String>());
     return instance;
   }
 

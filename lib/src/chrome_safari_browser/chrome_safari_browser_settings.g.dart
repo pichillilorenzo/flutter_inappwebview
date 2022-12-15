@@ -290,8 +290,9 @@ class ChromeSafariBrowserSettings implements ChromeSafariBrowserOptions {
           ? UtilColor.fromStringRepresentation(map['toolbarBackgroundColor'])
           : null,
     );
-    instance.additionalTrustedOrigins =
-        map['additionalTrustedOrigins']?.cast<String>();
+    instance.additionalTrustedOrigins = map['additionalTrustedOrigins'] != null
+        ? List<String>.from(map['additionalTrustedOrigins']!.cast<String>())
+        : null;
     instance.alwaysUseBrowserUI = map['alwaysUseBrowserUI'];
     instance.barCollapsingEnabled = map['barCollapsingEnabled'];
     instance.dismissButtonStyle =

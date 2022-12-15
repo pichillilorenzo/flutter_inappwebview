@@ -82,7 +82,7 @@ abstract class Util {
   }
 
   static bool canHaveGenerics(DartType type) {
-    final element = type.element2;
+    final element = type.element;
     if (element is ClassElement) {
       return element.typeParameters.isNotEmpty;
     }
@@ -104,6 +104,6 @@ abstract class Util {
         type.isDartCoreSet ||
         type.isDartCoreString ||
         type.isDartCoreSymbol ||
-        type.isDynamic;
+        type is DynamicType;
   }
 }

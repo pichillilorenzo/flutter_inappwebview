@@ -64,7 +64,8 @@ class UserScript {
       iosForMainFrameOnly: map['forMainFrameOnly'],
       source: map['source'],
     );
-    instance.allowedOriginRules = map['allowedOriginRules'].cast<String>();
+    instance.allowedOriginRules =
+        Set<String>.from(map['allowedOriginRules']!.cast<String>());
     instance.contentWorld = map['contentWorld'];
     instance.forMainFrameOnly = map['forMainFrameOnly'];
     return instance;

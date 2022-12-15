@@ -78,6 +78,8 @@ public class InAppWebViewSettings: ISettings<InAppWebView> {
     var isFindInteractionEnabled = false
     var minimumViewportInset: UIEdgeInsets? = nil
     var maximumViewportInset: UIEdgeInsets? = nil
+    var isInspectable = false
+    var shouldPrintBackgrounds = false
     
     override init(){
         super.init()
@@ -150,11 +152,9 @@ public class InAppWebViewSettings: ISettings<InAppWebView> {
                 realSettings["limitsNavigationsToAppBoundDomains"] = configuration.limitsNavigationsToAppBoundDomains
                 realSettings["javaScriptEnabled"] = configuration.defaultWebpagePreferences.allowsContentJavaScript
             }
-            if #available(iOS 14.5, *) {
+            if #available(iOS 15.0, *) {
                 realSettings["isTextInteractionEnabled"] = configuration.preferences.isTextInteractionEnabled
                 realSettings["upgradeKnownHostsToHTTPS"] = configuration.upgradeKnownHostsToHTTPS
-            }
-            if #available(iOS 15.0, *) {
                 realSettings["underPageBackgroundColor"] = webView.underPageBackgroundColor.hexString
             }
             if #available(iOS 15.4, *) {
@@ -167,6 +167,10 @@ public class InAppWebViewSettings: ISettings<InAppWebView> {
             }
             if #available(iOS 16.0, *) {
                 realSettings["isFindInteractionEnabled"] = webView.isFindInteractionEnabled
+            }
+            if #available(iOS 16.4, *) {
+                realSettings["isInspectable"] = webView.isInspectable
+                realSettings["shouldPrintBackgrounds"] = configuration.preferences.shouldPrintBackgrounds
             }
         }
         return realSettings

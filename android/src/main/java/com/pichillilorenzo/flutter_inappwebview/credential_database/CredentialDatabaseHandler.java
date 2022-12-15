@@ -33,11 +33,20 @@ public class CredentialDatabaseHandler implements MethodChannel.MethodCallHandle
     this.plugin = plugin;
     channel = new MethodChannel(plugin.messenger, "com.pichillilorenzo/flutter_inappwebview_credential_database");
     channel.setMethodCallHandler(this);
-    credentialDatabase = CredentialDatabase.getInstance(plugin.applicationContext);
+  }
+
+  public static void init(@NonNull InAppWebViewFlutterPlugin plugin) {
+    if (credentialDatabase == null) {
+      credentialDatabase = CredentialDatabase.getInstance(plugin.applicationContext);
+    }
   }
 
   @Override
   public void onMethodCall(MethodCall call, @NonNull MethodChannel.Result result) {
+    if (plugin != null) {
+      init(plugin);
+    }
+
     switch (call.method) {
       case "getAllAuthCredentials":
         {

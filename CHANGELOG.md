@@ -1,3 +1,7 @@
+## 5.7.2+3
+
+- Fixed "Xiaomi store - Conflict of Privacy Permissions, android.permission.MY_READ_INSTALLED_PACKAGES" [#1462](https://github.com/pichillilorenzo/flutter_inappwebview/issues/1462)
+
 ## 5.7.2+2
 
 - Fixed "Unexpected addWebMessageListener behaviour" [#1422](https://github.com/pichillilorenzo/flutter_inappwebview/issues/1422)

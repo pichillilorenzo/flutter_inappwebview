@@ -36,15 +36,18 @@ public class ServiceWorkerManager implements MethodChannel.MethodCallHandler {
     this.plugin = plugin;
     channel = new MethodChannel(plugin.messenger, "com.pichillilorenzo/flutter_inappwebview_android_serviceworkercontroller");
     channel.setMethodCallHandler(this);
-    if (WebViewFeature.isFeatureSupported(WebViewFeature.SERVICE_WORKER_BASIC_USAGE)) {
+  }
+
+  public static void init() {
+    if (serviceWorkerController == null &&
+            WebViewFeature.isFeatureSupported(WebViewFeature.SERVICE_WORKER_BASIC_USAGE)) {
       serviceWorkerController = ServiceWorkerControllerCompat.getInstance();
-    } else {
-      serviceWorkerController = null;
     }
   }
 
   @Override
   public void onMethodCall(MethodCall call, MethodChannel.Result result) {
+    init();
     ServiceWorkerWebSettingsCompat serviceWorkerWebSettings = (serviceWorkerController != null) ? serviceWorkerController.getServiceWorkerWebSettings() : null;
 
     switch (call.method) {

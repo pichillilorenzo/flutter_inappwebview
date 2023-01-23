@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_inappwebview/flutter_inappwebview.dart';
+import 'package:talkjs_flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../constants.dart';
@@ -168,7 +168,7 @@ void customTabs() {
                 }),
           ]));
       await chromeSafariBrowser.close();
-      await chromeSafariBrowser.closed.future;
+      await chromeSafariBrowser.browserClosed.future;
       expect(chromeSafariBrowser.isOpened(), false);
     });
 

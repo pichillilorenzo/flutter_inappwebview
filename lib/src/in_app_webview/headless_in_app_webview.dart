@@ -3,7 +3,7 @@ import 'dart:typed_data';
 import 'dart:ui';
 
 import 'package:flutter/services.dart';
-import 'package:flutter_inappwebview/src/util.dart';
+import 'package:talkjs_flutter_inappwebview/src/util.dart';
 
 import '../context_menu.dart';
 import '../find_interaction/find_interaction_controller.dart';

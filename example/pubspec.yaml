@@ -28,7 +28,7 @@ dependencies:
   url_launcher: 6.1.6
   pointer_interceptor: ^0.9.3+3
   # connectivity: ^0.4.5+6
-  flutter_inappwebview:
+  talkjs_flutter_inappwebview:
     path: ../
 
 dev_dependencies:

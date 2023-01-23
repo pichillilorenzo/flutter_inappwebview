@@ -1,4 +1,4 @@
-name: flutter_inappwebview
+name: talkjs_flutter_inappwebview
 description: A Flutter plugin that allows you to add an inline webview, to use an headless webview, and to open an in-app browser window.
 version: 6.0.0
 homepage: https://inappwebview.dev/
@@ -46,9 +46,9 @@ flutter:
         fileName: flutter_inappwebview.dart
 
   assets:
-    - packages/flutter_inappwebview/assets/t_rex_runner/t-rex.html
-    - packages/flutter_inappwebview/assets/t_rex_runner/t-rex.css
-    - packages/flutter_inappwebview/assets/web/web_support.js
+    - packages/talkjs_flutter_inappwebview/assets/t_rex_runner/t-rex.html
+    - packages/talkjs_flutter_inappwebview/assets/t_rex_runner/t-rex.css
+    - packages/talkjs_flutter_inappwebview/assets/web/web_support.js
   # To add assets to your plugin package, add an assets section, like this:
   # assets:
   #  - images/a_dot_burr.jpeg

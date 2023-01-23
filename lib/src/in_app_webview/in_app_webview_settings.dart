@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter_inappwebview/src/types/user_preferred_content_mode.dart';
+import 'package:talkjs_flutter_inappwebview/src/types/user_preferred_content_mode.dart';
 import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_internal_annotations.dart';
 import 'dart:typed_data';
 

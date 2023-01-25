@@ -139,7 +139,10 @@ public class FlutterWebViewController: NSObject, FlutterPlatformView, Disposable
             load(initialUrlRequest: initialUrlRequest, initialFile: initialFile, initialData: initialData)
         }
         else if let wId = windowId, let webViewTransport = webView.plugin?.inAppWebViewManager?.windowWebViews[wId] {
-            webView.load(webViewTransport.request)
+            // only load request if it's not a blank request.
+            if webViewTransport.request.url?.absoluteString != "" {
+                webView.load(webViewTransport.request)
+            }
         }
     }
     

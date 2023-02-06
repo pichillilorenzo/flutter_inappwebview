@@ -1,3 +1,9 @@
+## 6.0.1
+- (TalkJS): Update the podspec
+
+## 6.0.0
+- (TalkJS): Forked the library and published as an unlisted package
+
 ## 6.0.0-beta.22
 
 - Updated `window.flutter_inappwebview.callHandler` implementation: if there is an error/exception on Flutter/Dart side, the `callHandler` will reject the JavaScript promise with the error/exception message, so you can catch it also on JavaScript side

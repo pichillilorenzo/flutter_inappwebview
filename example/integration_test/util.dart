@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:collection';
 
-import 'package:talkjs_flutter_inappwebview/flutter_inappwebview.dart';
+import 'package:talkjs_flutter_inappwebview/talkjs_flutter_inappwebview.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 /// Returns a matcher that matches the isNullOrEmpty property.

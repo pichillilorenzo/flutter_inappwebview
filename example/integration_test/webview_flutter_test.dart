@@ -1,5 +1,5 @@
 import 'package:flutter/foundation.dart';
-import 'package:talkjs_flutter_inappwebview/flutter_inappwebview.dart';
+import 'package:talkjs_flutter_inappwebview/talkjs_flutter_inappwebview.dart';
 import 'package:integration_test/integration_test.dart';
 
 import 'in_app_webview/main.dart' as in_app_webview_tests;

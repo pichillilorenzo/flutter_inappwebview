@@ -1,3 +1,6 @@
+## 6.0.2
+- (TalkJS): Fix build issue on iOS
+
 ## 6.0.1
 - (TalkJS): Update the podspec
 

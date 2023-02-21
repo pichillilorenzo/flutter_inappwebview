@@ -72,6 +72,7 @@ class InAppWebView extends StatefulWidget implements WebView {
     this.onUpdateVisitedHistory,
     this.onPrint,
     this.onLongPressHitTestResult,
+    this.onLongPressCounterHitTestResult,
     this.onEnterFullscreen,
     this.onExitFullscreen,
     this.onPageCommitVisible,
@@ -267,6 +268,10 @@ class InAppWebView extends StatefulWidget implements WebView {
   @override
   final void Function(InAppWebViewController controller,
       InAppWebViewHitTestResult hitTestResult)? onLongPressHitTestResult;
+
+  @override
+  final void Function(InAppWebViewController controller,
+      InAppWebViewHitTestResult hitTestResult)? onLongPressCounterHitTestResult;
 
   @override
   final void Function(InAppWebViewController controller, Uri? url)? onPrint;

@@ -38,6 +38,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
     fileprivate var nativeHighlightLongPressRecognizer: UILongPressGestureRecognizer?
     fileprivate var nativeLoupeGesture: UILongPressGestureRecognizer?
     var longPressRecognizer: UILongPressGestureRecognizer!
+    var longPressCounterRecognizer: UILongPressGestureRecognizer?
     var recognizerForDisablingContextMenuOnLinks: UILongPressGestureRecognizer!
     var lastLongPressTouchPoint: CGPoint?
     
@@ -137,7 +138,34 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         })
         return result as? UILongPressGestureRecognizer
     }
-    
+
+    @objc func longPressCounterGestureDetected(_ sender: UIGestureRecognizer) {
+        guard sender.state == .began else {
+            return
+        }
+        
+        if let nativeHighlightLongPressRecognizer = nativeHighlightLongPressRecognizer,
+            nativeHighlightLongPressRecognizer.isEnabled {
+             nativeHighlightLongPressRecognizer.isEnabled = false
+             nativeHighlightLongPressRecognizer.isEnabled = true
+        }
+     
+        var touchLocation = sender.location(in: self)
+        touchLocation.x -= self.scrollView.contentInset.left
+        touchLocation.y -= self.scrollView.contentInset.top
+        touchLocation.x /= self.scrollView.zoomScale
+        touchLocation.y /= self.scrollView.zoomScale
+
+        self.evaluateJavaScript("window.\(JAVASCRIPT_BRIDGE_NAME)._findElementsAtPoint(\(touchLocation.x),\(touchLocation.y))", completionHandler: { (value, error) in
+            if let error = error {
+                print("Long press gesture recognizer error: \(error.localizedDescription)")
+            } else if let value = value as? [String: Any?] {
+                let hitTestResult = HitTestResult.fromMap(map: value)!
+                self.channel?.invokeMethod("onLongPressCounterHitTestResult", arguments: hitTestResult.toMap())
+            }
+        })
+    }
+
     @objc func longPressGestureDetected(_ sender: UIGestureRecognizer) {
         if sender.state == .cancelled {
             return
@@ -282,6 +310,12 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
 
     public func prepare() {
         scrollView.addGestureRecognizer(self.longPressRecognizer)
+        if #available(iOS 16.0, *) {
+            longPressCounterRecognizer = UILongPressGestureRecognizer()
+            longPressCounterRecognizer?.delegate = self
+            longPressCounterRecognizer?.addTarget(self, action: #selector(longPressCounterGestureDetected))
+            scrollView.addGestureRecognizer(self.longPressCounterRecognizer!)
+        }
         scrollView.addGestureRecognizer(self.recognizerForDisablingContextMenuOnLinks)
         scrollView.addGestureRecognizer(self.panGestureRecognizer)
         scrollView.addObserver(self, forKeyPath: #keyPath(UIScrollView.contentOffset), options: [.new, .old], context: nil)
@@ -3072,6 +3106,11 @@ if(window.\(JAVASCRIPT_BRIDGE_NAME)[\(_callHandlerID)] != null) {
         longPressRecognizer.removeTarget(self, action: #selector(longPressGestureDetected))
         longPressRecognizer.delegate = nil
         scrollView.removeGestureRecognizer(longPressRecognizer)
+        if let longPressCounterRecognizer = self.longPressCounterRecognizer {
+            longPressCounterRecognizer.removeTarget(self, action: #selector(longPressCounterGestureDetected))
+            longPressCounterRecognizer.delegate = nil
+            scrollView.removeGestureRecognizer(longPressCounterRecognizer)
+        }
         recognizerForDisablingContextMenuOnLinks.removeTarget(self, action: #selector(longPressGestureDetected))
         recognizerForDisablingContextMenuOnLinks.delegate = nil
         scrollView.removeGestureRecognizer(recognizerForDisablingContextMenuOnLinks)

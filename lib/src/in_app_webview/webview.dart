@@ -364,6 +364,9 @@ abstract class WebView {
   final void Function(InAppWebViewController controller,
       InAppWebViewHitTestResult hitTestResult)? onLongPressHitTestResult;
 
+  final void Function(InAppWebViewController controller,
+      InAppWebViewHitTestResult hitTestResult)? onLongPressCounterHitTestResult;
+
   ///Event fired when the current page has entered full screen mode.
   ///
   ///**Official Android API**: https://developer.android.com/reference/android/webkit/WebChromeClient#onShowCustomView(android.view.View,%20android.webkit.WebChromeClient.CustomViewCallback)
@@ -721,6 +724,7 @@ abstract class WebView {
       this.onUpdateVisitedHistory,
       this.onPrint,
       this.onLongPressHitTestResult,
+      this.onLongPressCounterHitTestResult,
       this.onEnterFullscreen,
       this.onExitFullscreen,
       this.onPageCommitVisible,

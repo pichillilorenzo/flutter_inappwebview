@@ -715,6 +715,22 @@ class InAppWebViewController {
             _inAppBrowser!.onLongPressHitTestResult(hitTestResult);
         }
         break;
+      case "onLongPressCounterHitTestResult":
+        if ((_webview != null &&
+                _webview!.onLongPressCounterHitTestResult != null) ||
+            _inAppBrowser != null) {
+          Map<String, dynamic> arguments =
+              call.arguments.cast<String, dynamic>();
+          InAppWebViewHitTestResult hitTestResult =
+              InAppWebViewHitTestResult.fromMap(arguments)!;
+
+          if (_webview != null &&
+              _webview!.onLongPressCounterHitTestResult != null)
+            _webview!.onLongPressCounterHitTestResult!(this, hitTestResult);
+          else
+            _inAppBrowser!.onLongPressCounterHitTestResult(hitTestResult);
+        }
+        break;
       case "onCreateContextMenu":
         ContextMenu? contextMenu;
         if (_webview != null && _webview!.contextMenu != null) {

@@ -621,6 +621,9 @@ class InAppBrowser {
   ///**Official iOS API**: https://developer.apple.com/documentation/uikit/uilongpressgesturerecognizer
   void onLongPressHitTestResult(InAppWebViewHitTestResult hitTestResult) {}
 
+  void onLongPressCounterHitTestResult(
+      InAppWebViewHitTestResult hitTestResult) {}
+
   ///Event fired when the current page has entered full screen mode.
   ///
   ///**Official Android API**: https://developer.android.com/reference/android/webkit/WebChromeClient#onShowCustomView(android.view.View,%20android.webkit.WebChromeClient.CustomViewCallback)

@@ -83,6 +83,7 @@ class HeadlessInAppWebView implements WebView {
       this.onUpdateVisitedHistory,
       this.onPrint,
       this.onLongPressHitTestResult,
+      this.onLongPressCounterHitTestResult,
       this.onEnterFullscreen,
       this.onExitFullscreen,
       this.onPageCommitVisible,
@@ -356,6 +357,10 @@ class HeadlessInAppWebView implements WebView {
   @override
   void Function(InAppWebViewController controller,
       InAppWebViewHitTestResult hitTestResult)? onLongPressHitTestResult;
+
+  @override
+  void Function(InAppWebViewController controller,
+      InAppWebViewHitTestResult hitTestResult)? onLongPressCounterHitTestResult;
 
   @override
   void Function(InAppWebViewController controller, Uri? url)? onPrint;

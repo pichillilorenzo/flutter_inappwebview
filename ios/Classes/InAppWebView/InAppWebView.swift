@@ -239,34 +239,50 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
         return super.hitTest(point, with: event)
     }
     
-    public override func canPerformAction(_ action: Selector, withSender sender: Any?) -> Bool {
-        if let _ = sender as? UIMenuController {
-            if self.settings?.disableContextMenu == true {
-                if !onCreateContextMenuEventTriggeredWhenMenuDisabled {
-                    // workaround to trigger onCreateContextMenu event as the same on Android
-                    self.onCreateContextMenu()
-                    onCreateContextMenuEventTriggeredWhenMenuDisabled = true
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                        self.onCreateContextMenuEventTriggeredWhenMenuDisabled = false
-                    }
-                }
-                return false
-            }
-            
+  
+    
+    @available(iOS 13.0, *)
+    public override func buildMenu(with builder: UIMenuBuilder) {
+        if #available(iOS 16.0, *) {
             if let menu = contextMenu {
                 let contextMenuSettings = ContextMenuSettings()
                 if let contextMenuSettingsMap = menu["settings"] as? [String: Any?] {
                     let _ = contextMenuSettings.parse(settings: contextMenuSettingsMap)
-                    if !action.description.starts(with: "onContextMenuActionItemClicked-") && contextMenuSettings.hideDefaultSystemContextMenuItems {
-                        return false
+                    if  contextMenuSettings.hideDefaultSystemContextMenuItems {
+                        builder.remove(menu: .lookup)
                     }
                 }
             }
-            
-            if contextMenuIsShowing, !action.description.starts(with: "onContextMenuActionItemClicked-") {
-                let id = action.description.compactMap({ $0.asciiValue?.description }).joined()
-                self.channelDelegate?.onContextMenuActionItemClicked(id: id, title: action.description)
+        }
+        super.buildMenu(with: builder)
+    }
+    
+    public override func canPerformAction(_ action: Selector, withSender sender: Any?) -> Bool {
+        if self.settings?.disableContextMenu == true {
+            if !onCreateContextMenuEventTriggeredWhenMenuDisabled {
+                // workaround to trigger onCreateContextMenu event as the same on Android
+                self.onCreateContextMenu()
+                onCreateContextMenuEventTriggeredWhenMenuDisabled = true
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                    self.onCreateContextMenuEventTriggeredWhenMenuDisabled = false
+                }
             }
+            return false
+        }
+        
+        if let menu = contextMenu {
+            let contextMenuSettings = ContextMenuSettings()
+            if let contextMenuSettingsMap = menu["settings"] as? [String: Any?] {
+                let _ = contextMenuSettings.parse(settings: contextMenuSettingsMap)
+                if !action.description.starts(with: "onContextMenuActionItemClicked-") && contextMenuSettings.hideDefaultSystemContextMenuItems {
+                    return false
+                }
+            }
+        }
+        
+        if contextMenuIsShowing, !action.description.starts(with: "onContextMenuActionItemClicked-") {
+            let id = action.description.compactMap({ $0.asciiValue?.description }).joined()
+            self.channelDelegate?.onContextMenuActionItemClicked(id: id, title: action.description)
         }
         
         return super.canPerformAction(action, withSender: sender)
@@ -612,7 +628,11 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
         contextMenuIsShowing = true
         
         let hitTestResult = HitTestResult(type: .unknownType, extra: nil)
-        
+
+
+
+
+
         if let lastLongPressTouhLocation = lastLongPressTouchPoint {
             if configuration.preferences.javaScriptEnabled {
                 self.evaluateJavaScript("window.\(JAVASCRIPT_BRIDGE_NAME)._findElementsAtPoint(\(lastLongPressTouhLocation.x),\(lastLongPressTouhLocation.y))", completionHandler: {(value, error) in

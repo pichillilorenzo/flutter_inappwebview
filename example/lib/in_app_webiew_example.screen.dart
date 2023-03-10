@@ -17,11 +17,10 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
 
   InAppWebViewController? webViewController;
   InAppWebViewSettings settings = InAppWebViewSettings(
-    mediaPlaybackRequiresUserGesture: false,
-    allowsInlineMediaPlayback: true,
-    iframeAllow: "camera; microphone",
-    iframeAllowFullscreen: true
-  );
+      mediaPlaybackRequiresUserGesture: false,
+      allowsInlineMediaPlayback: true,
+      iframeAllow: "camera; microphone",
+      iframeAllowFullscreen: true);
 
   PullToRefreshController? pullToRefreshController;
 
@@ -45,7 +44,7 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                 await webViewController?.clearFocus();
               })
         ],
-        settings: ContextMenuSettings(hideDefaultSystemContextMenuItems: false),
+        settings: ContextMenuSettings(hideDefaultSystemContextMenuItems: true),
         onCreateContextMenu: (hitTestResult) async {
           print("onCreateContextMenu");
           print(hitTestResult.extra);
@@ -62,7 +61,9 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
               contextMenuItemClicked.title);
         });
 
-    pullToRefreshController = kIsWeb || ![TargetPlatform.iOS, TargetPlatform.android].contains(defaultTargetPlatform)
+    pullToRefreshController = kIsWeb ||
+            ![TargetPlatform.iOS, TargetPlatform.android]
+                .contains(defaultTargetPlatform)
         ? null
         : PullToRefreshController(
             settings: PullToRefreshSettings(
@@ -120,7 +121,7 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                   // initialFile: "assets/index.html",
                   initialUserScripts: UnmodifiableListView<UserScript>([]),
                   initialSettings: settings,
-                  // contextMenu: contextMenu,
+                  contextMenu: contextMenu,
                   pullToRefreshController: pullToRefreshController,
                   onWebViewCreated: (controller) async {
                     webViewController = controller;

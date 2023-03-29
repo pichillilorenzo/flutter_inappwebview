@@ -228,12 +228,13 @@ public class InAppBrowserWindow : NSWindow, NSWindowDelegate, NSToolbarDelegate,
            !(NSApplication.shared.mainWindow?.tabbedWindows?.contains(self) ?? false),
            browserSettings?.windowType == .tabbed {
             NSApplication.shared.mainWindow?.addTabbedWindow(self, ordered: .above)
-        } else if !(NSApplication.shared.mainWindow?.childWindows?.contains(self) ?? false) {
+        } else if !(NSApplication.shared.mainWindow?.childWindows?.contains(self) ?? false),
+                browserSettings?.windowType == .child {
             NSApplication.shared.mainWindow?.addChildWindow(self, ordered: .above)
         } else {
             orderFront(self)
         }
-        NSApplication.shared.activate(ignoringOtherApps: true)
+        NSApplication.shared.activate(ignoringOtherApps: true)        
     }
     
     public func setSettings(newSettings: InAppBrowserSettings, newSettingsMap: [String: Any]) {

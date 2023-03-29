@@ -234,7 +234,7 @@ public class InAppBrowserWindow : NSWindow, NSWindowDelegate, NSToolbarDelegate,
         } else {
             orderFront(self)
         }
-        NSApplication.shared.activate(ignoringOtherApps: true)        
+        NSApplication.shared.activate(ignoringOtherApps: true)
     }
     
     public func setSettings(newSettings: InAppBrowserSettings, newSettingsMap: [String: Any]) {

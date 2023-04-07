@@ -544,7 +544,7 @@ public class InAppBrowserActivity extends AppCompatActivity implements InAppBrow
         // Modified view removal to try and fix a crash
         for (int i = 0; i < vg.getChildCount(); i++) {
           View v = vg.getChildAt(i);
-          v.visibility = View.GONE;
+          v.setVisibility(View.GONE);
         }
         // instead of using
 //        vg.removeView(webView);

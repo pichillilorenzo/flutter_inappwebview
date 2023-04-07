@@ -541,7 +541,9 @@ public class InAppBrowserActivity extends AppCompatActivity implements InAppBrow
       }
       ViewGroup vg = (ViewGroup) (webView.getParent());
       if (vg != null) {
-        vg.removeView(webView);
+        //Modified view removal to try and fix a crash
+        webView.visibility = View.GONE;
+//        vg.removeView(webView);
       }
       webView.setWebChromeClient(new WebChromeClient());
       webView.setWebViewClient(new WebViewClient() {

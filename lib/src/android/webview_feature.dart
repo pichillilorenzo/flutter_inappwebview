@@ -208,10 +208,6 @@ class WebViewFeature_ {
   static const ALGORITHMIC_DARKENING =
       const WebViewFeature_._internal("ALGORITHMIC_DARKENING");
 
-  ///This feature covers [InAppWebViewSettings.requestedWithHeaderMode].
-  static const REQUESTED_WITH_HEADER_CONTROL =
-      const WebViewFeature_._internal("REQUESTED_WITH_HEADER_CONTROL");
-
   ///This feature covers [InAppWebViewSettings.enterpriseAuthenticationAppLinkPolicyEnabled].
   static const ENTERPRISE_AUTHENTICATION_APP_LINK_POLICY =
       const WebViewFeature_._internal(
@@ -434,10 +430,6 @@ class AndroidWebViewFeature_ {
   ///This feature covers [InAppWebViewSettings.algorithmicDarkeningAllowed].
   static const ALGORITHMIC_DARKENING =
       const AndroidWebViewFeature_._internal("ALGORITHMIC_DARKENING");
-
-  ///This feature covers [InAppWebViewSettings.requestedWithHeaderMode].
-  static const REQUESTED_WITH_HEADER_CONTROL =
-      const AndroidWebViewFeature_._internal("REQUESTED_WITH_HEADER_CONTROL");
 
   ///This feature covers [InAppWebViewSettings.enterpriseAuthenticationAppLinkPolicyEnabled].
   static const ENTERPRISE_AUTHENTICATION_APP_LINK_POLICY =

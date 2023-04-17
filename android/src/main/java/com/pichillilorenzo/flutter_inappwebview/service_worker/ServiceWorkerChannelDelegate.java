@@ -1,6 +1,5 @@
 package com.pichillilorenzo.flutter_inappwebview.service_worker;
 
-import android.annotation.SuppressLint;
 import android.os.Build;
 
 import androidx.annotation.NonNull;
@@ -33,12 +32,11 @@ public class ServiceWorkerChannelDelegate extends ChannelDelegateImpl {
     this.serviceWorkerManager = serviceWorkerManager;
   }
 
-  @SuppressLint("RestrictedApi")
   @Override
   public void onMethodCall(@NonNull MethodCall call, @NonNull MethodChannel.Result result) {
     ServiceWorkerManager.init();
     ServiceWorkerControllerCompat serviceWorkerController = ServiceWorkerManager.serviceWorkerController;
-    ServiceWorkerWebSettingsCompat serviceWorkerWebSettings = (serviceWorkerController != null) ? 
+    ServiceWorkerWebSettingsCompat serviceWorkerWebSettings = (serviceWorkerController != null) ?
             serviceWorkerController.getServiceWorkerWebSettings() : null;
 
     switch (call.method) {
@@ -70,13 +68,6 @@ public class ServiceWorkerChannelDelegate extends ChannelDelegateImpl {
           result.success(serviceWorkerWebSettings.getBlockNetworkLoads());
         } else {
           result.success(false);
-        }
-        break;
-      case "getRequestedWithHeaderMode":
-        if (serviceWorkerWebSettings != null && WebViewFeature.isFeatureSupported(WebViewFeature.REQUESTED_WITH_HEADER_CONTROL)) {
-          result.success(serviceWorkerWebSettings.getRequestedWithHeaderMode());
-        } else {
-          result.success(null);
         }
         break;
       case "getCacheMode":
@@ -111,13 +102,6 @@ public class ServiceWorkerChannelDelegate extends ChannelDelegateImpl {
         if (serviceWorkerWebSettings != null && WebViewFeature.isFeatureSupported(WebViewFeature.SERVICE_WORKER_CACHE_MODE)) {
           Integer mode = (Integer) call.argument("mode");
           serviceWorkerWebSettings.setCacheMode(mode);
-        }
-        result.success(true);
-        break;
-      case "setRequestedWithHeaderMode":
-        if (serviceWorkerWebSettings != null && WebViewFeature.isFeatureSupported(WebViewFeature.REQUESTED_WITH_HEADER_CONTROL)) {
-          Integer mode = (Integer) call.argument("mode");
-          serviceWorkerWebSettings.setRequestedWithHeaderMode(mode);
         }
         result.success(true);
         break;

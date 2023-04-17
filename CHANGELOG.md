@@ -1,3 +1,6 @@
+## 6.0.3
+- (TalkJS): Revert the b889efe commit that introduced REQUESTED_WITH_HEADER_CONTROL, resulting in a crash when used in conjunction with webview_flutter
+
 ## 6.0.2
 - (TalkJS): Fix build issue on iOS
 
@@ -36,7 +39,7 @@
 
 ## 6.0.0-beta.17
 
-- Replaced `Uri.encodeFull` with `Uri.encodeComponent` to load html data correctly on Web platform 
+- Replaced `Uri.encodeFull` with `Uri.encodeComponent` to load html data correctly on Web platform
 
 ## 6.0.0-beta.16
 
@@ -158,7 +161,7 @@
 ## 6.0.0-beta.2
 
 - Fixed web example
-- Fixed export library 
+- Fixed export library
 
 ## 6.0.0-beta.1
 
@@ -364,7 +367,7 @@
 
 ## 5.4.1+1
 
-- Fixed Android default context menu over custom context menu on API Level 31+ 
+- Fixed Android default context menu over custom context menu on API Level 31+
 
 ## 5.4.1
 
@@ -808,7 +811,7 @@
 
 ### BREAKING CHANGES
 
-- Updated `shouldOverrideUrlLoading` event: 
+- Updated `shouldOverrideUrlLoading` event:
   - the `url` parameter has been moved inside an instance of `ShouldOverrideUrlLoadingRequest` class
   - it has a return type `ShouldOverrideUrlLoadingAction` to allow or cancel navigation instead of cancel every time the request
 - Renamed `onTargetBlank` to `onCreateWindow`
@@ -816,8 +819,8 @@
 - Making methods available only for the specific platform more explicit: moved all the webview's controller methods for Android inside `controller.android` and all the webview's controller methods for iOS inside `controller.ios`
 - Making events available only for the specific platform more explicit:
   - Renamed `onSafeBrowsingHit` to `androidOnSafeBrowsingHit`
-  - Renamed `onGeolocationPermissionsShowPrompt` to `androidOnGeolocationPermissionsShowPrompt` 
-  - Renamed `onPermissionRequest` to `androidOnPermissionRequest`  
+  - Renamed `onGeolocationPermissionsShowPrompt` to `androidOnGeolocationPermissionsShowPrompt`
+  - Renamed `onPermissionRequest` to `androidOnPermissionRequest`
 - Updated attribute names for `InAppWebViewWidgetOptions`, `InAppBrowserClassOptions` and `ChromeSafariBrowserClassOptions` classes
 - Renamed and updated `onNavigationStateChange` to `onUpdateVisitedHistory`
 - Renamed all iOS and Android webview options class
@@ -873,10 +876,10 @@
 - Added `clearCache`, `scrollTo`, `scrollBy`, `getHtml`, `injectJavascriptFileFromAsset` and `injectCSSFileFromAsset` methods method
 - Added `HttpAuthCredentialDatabase` class
 - Added `onReceivedServerTrustAuthRequest` and `onReceivedClientCertRequest` events to manage SSL requests
-- Added `onFindResultReceived` event, `findAllAsync`, `findNext` and `clearMatches` methods 
+- Added `onFindResultReceived` event, `findAllAsync`, `findNext` and `clearMatches` methods
 - Added `shouldInterceptAjaxRequest`, `onAjaxReadyStateChange`, `onAjaxProgress` and `shouldInterceptFetchRequest` events with `useShouldInterceptAjaxRequest` and `useShouldInterceptFetchRequest` webview options
 - Added `onNavigationStateChange` and `onLoadHttpError` events
-- Fun: added `getTRexRunnerHtml` and `getTRexRunnerCss` methods to get html (with javascript) and css to recreate the Chromium's t-rex runner game 
+- Fun: added `getTRexRunnerHtml` and `getTRexRunnerCss` methods to get html (with javascript) and css to recreate the Chromium's t-rex runner game
 
 ### BREAKING CHANGES
 - Deleted `WebResourceRequest` class
@@ -950,7 +953,7 @@ Breaking changes:
 
 - added support for **iOS** inline native WebView integrated in the flutter widget tree
 - updated example folder (thanks to [marquesinijatinha](https://github.com/marquesinijatinha))
-- Fixed bug where passing null to expiresDate failed (thanks to [Sense545](https://github.com/Sense545)) 
+- Fixed bug where passing null to expiresDate failed (thanks to [Sense545](https://github.com/Sense545))
 - Fixed iOS error: encode resourceURL (thanks to [igtm](https://github.com/igtm))
 - Fixed iOS error: Double value cannot be converted to Int because the result would be greater than Int.max in 32-bit devices (thanks to [huzhiren](https://github.com/huzhiren))
 - Fixed iOS error: problem in ChromeSafariBrowser (thanks to [marquesinijatinha](https://github.com/marquesinijatinha))

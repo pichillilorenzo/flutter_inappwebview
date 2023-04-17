@@ -115,8 +115,6 @@ public class InAppWebViewSettings implements ISettings<InAppWebViewInterface> {
   @Nullable
   public String horizontalScrollbarTrackColor;
   public Boolean algorithmicDarkeningAllowed = false;
-  @Nullable
-  public Integer requestedWithHeaderMode;
   public Boolean enterpriseAuthenticationAppLinkPolicyEnabled = true;
   @Nullable
   public Map<String, Object> webViewAssetLoader;
@@ -383,9 +381,6 @@ public class InAppWebViewSettings implements ISettings<InAppWebViewInterface> {
         case "algorithmicDarkeningAllowed":
           algorithmicDarkeningAllowed = (Boolean) value;
           break;
-        case "requestedWithHeaderMode":
-          requestedWithHeaderMode = (Integer) value;
-          break;
         case "enterpriseAuthenticationAppLinkPolicyEnabled":
           enterpriseAuthenticationAppLinkPolicyEnabled = (Boolean) value;
           break;
@@ -491,7 +486,6 @@ public class InAppWebViewSettings implements ISettings<InAppWebViewInterface> {
     settings.put("horizontalScrollbarThumbColor", horizontalScrollbarThumbColor);
     settings.put("horizontalScrollbarTrackColor", horizontalScrollbarTrackColor);
     settings.put("algorithmicDarkeningAllowed", algorithmicDarkeningAllowed);
-    settings.put("requestedWithHeaderMode", requestedWithHeaderMode);
     settings.put("enterpriseAuthenticationAppLinkPolicyEnabled", enterpriseAuthenticationAppLinkPolicyEnabled);
     settings.put("allowBackgroundAudioPlaying", allowBackgroundAudioPlaying);
     settings.put("defaultVideoPoster", defaultVideoPoster);
@@ -585,9 +579,6 @@ public class InAppWebViewSettings implements ISettings<InAppWebViewInterface> {
       }
       if (WebViewFeature.isFeatureSupported(WebViewFeature.ALGORITHMIC_DARKENING) && Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
         realSettings.put("algorithmicDarkeningAllowed", WebSettingsCompat.isAlgorithmicDarkeningAllowed(settings));
-      }
-      if (WebViewFeature.isFeatureSupported(WebViewFeature.REQUESTED_WITH_HEADER_CONTROL)) {
-        realSettings.put("requestedWithHeaderMode", WebSettingsCompat.getRequestedWithHeaderMode(settings));
       }
       if (WebViewFeature.isFeatureSupported(WebViewFeature.ENTERPRISE_AUTHENTICATION_APP_LINK_POLICY)) {
         realSettings.put("enterpriseAuthenticationAppLinkPolicyEnabled", WebSettingsCompat.getEnterpriseAuthenticationAppLinkPolicyEnabled(settings));

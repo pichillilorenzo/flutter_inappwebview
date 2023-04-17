@@ -15,7 +15,6 @@ import '../types/mixed_content_mode.dart';
 import '../types/over_scroll_mode.dart';
 import '../types/referrer_policy.dart';
 import '../types/renderer_priority_policy.dart';
-import '../types/requested_with_header_mode.dart';
 import '../types/sandbox.dart';
 import '../types/scrollbar_style.dart';
 import '../types/scrollview_content_inset_adjustment_behavior.dart';
@@ -276,7 +275,7 @@ class InAppWebViewSettings_ {
   @SupportedPlatforms(platforms: [
     AndroidPlatform(
         note:
-            """setting this to `true`, it will clear all the cookies of all WebView instances, 
+            """setting this to `true`, it will clear all the cookies of all WebView instances,
 because there isn't any way to make the website data store non-persistent for the specific WebView instance such as on iOS."""),
     IOSPlatform(),
     MacOSPlatform()
@@ -935,17 +934,6 @@ as it can cause framerate drops on animations in Android 9 and lower (see [Hybri
             "available on Android only if [WebViewFeature.ALGORITHMIC_DARKENING] feature is supported.")
   ])
   bool? algorithmicDarkeningAllowed;
-
-  ///Sets how the WebView will set the `X-Requested-With` header on requests.
-  ///If you are calling this method, you may also want to call [ServiceWorkerWebSettingsCompat.setRequestedWithHeaderMode]
-  ///with the same parameter value to configure ServiceWorker requests.
-  ///The default behavior may vary depending on the WebView implementation.
-  @SupportedPlatforms(platforms: [
-    AndroidPlatform(
-        note:
-            "available on Android only if [WebViewFeature.REQUESTED_WITH_HEADER_CONTROL] feature is supported.")
-  ])
-  RequestedWithHeaderMode_? requestedWithHeaderMode;
 
   ///Sets whether EnterpriseAuthenticationAppLinkPolicy if set by admin is allowed to have any
   ///effect on WebView.
@@ -1649,7 +1637,6 @@ as it can cause framerate drops on animations in Android 9 and lower (see [Hybri
     this.horizontalScrollbarThumbColor,
     this.horizontalScrollbarTrackColor,
     this.algorithmicDarkeningAllowed = false,
-    this.requestedWithHeaderMode,
     this.enterpriseAuthenticationAppLinkPolicyEnabled = true,
     this.defaultVideoPoster,
     this.disallowOverScroll = false,

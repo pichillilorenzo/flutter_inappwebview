@@ -433,10 +433,6 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
     if (WebViewFeature.isFeatureSupported(WebViewFeature.ALGORITHMIC_DARKENING) && Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
       WebSettingsCompat.setAlgorithmicDarkeningAllowed(settings, customSettings.algorithmicDarkeningAllowed);
     }
-    if (WebViewFeature.isFeatureSupported(WebViewFeature.REQUESTED_WITH_HEADER_CONTROL) &&
-            customSettings.requestedWithHeaderMode != null) {
-      WebSettingsCompat.setRequestedWithHeaderMode(settings, customSettings.requestedWithHeaderMode);
-    }
     if (WebViewFeature.isFeatureSupported(WebViewFeature.ENTERPRISE_AUTHENTICATION_APP_LINK_POLICY)) {
       WebSettingsCompat.setEnterpriseAuthenticationAppLinkPolicyEnabled(settings, customSettings.enterpriseAuthenticationAppLinkPolicyEnabled);
     }
@@ -658,7 +654,7 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
     if (plugin == null) {
       return;
     }
-    
+
     loadUrl(Util.getUrlAsset(plugin, assetFilePath));
   }
 
@@ -688,7 +684,7 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
 
   public void takeScreenshot(final @Nullable Map<String, Object> screenshotConfiguration, final MethodChannel.Result result) {
     final float pixelDensity = Util.getPixelDensity(getContext());
-    
+
     mainLooperHandler.post(new Runnable() {
       @Override
       public void run() {
@@ -1089,12 +1085,6 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
             WebViewFeature.isFeatureSupported(WebViewFeature.ALGORITHMIC_DARKENING) && Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
       WebSettingsCompat.setAlgorithmicDarkeningAllowed(settings, newCustomSettings.algorithmicDarkeningAllowed);
     }
-    if (newSettingsMap.get("requestedWithHeaderMode") != null &&
-            !Util.objEquals(customSettings.requestedWithHeaderMode, newCustomSettings.requestedWithHeaderMode) &&
-            WebViewFeature.isFeatureSupported(WebViewFeature.REQUESTED_WITH_HEADER_CONTROL) &&
-            newCustomSettings.requestedWithHeaderMode != null) {
-      WebSettingsCompat.setRequestedWithHeaderMode(settings, newCustomSettings.requestedWithHeaderMode);
-    }
     if (newSettingsMap.get("enterpriseAuthenticationAppLinkPolicyEnabled") != null &&
             !Util.objEquals(customSettings.enterpriseAuthenticationAppLinkPolicyEnabled, newCustomSettings.enterpriseAuthenticationAppLinkPolicyEnabled) &&
             WebViewFeature.isFeatureSupported(WebViewFeature.ENTERPRISE_AUTHENTICATION_APP_LINK_POLICY)) {
@@ -1391,9 +1381,9 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
 
       if (printManager != null) {
         PrintAttributes.Builder builder = new PrintAttributes.Builder();
-        
+
         String jobName = (getTitle() != null ? getTitle() : getUrl()) + " Document";
-        
+
         if (settings != null) {
           if (settings.jobName != null && !settings.jobName.isEmpty()) {
             jobName = settings.jobName;
@@ -1444,7 +1434,7 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
           String id = UUID.randomUUID().toString();
           PrintJobController printJobController = new PrintJobController(id, job, settings, plugin);
           PrintJobManager.jobs.put(printJobController.id, printJobController);
-          return id; 
+          return id;
         }
       } else {
         Log.e(LOG_TAG, "No PrintManager available");
@@ -1709,7 +1699,7 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
   public void hideContextMenu() {
     removeView(floatingContextMenu);
     floatingContextMenu = null;
-    
+
     if (channelDelegate != null) channelDelegate.onHideContextMenu();
   }
 
@@ -1995,7 +1985,7 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
   public WebViewChannelDelegate getChannelDelegate() {
     return channelDelegate;
   }
-  
+
   @Override
   public void setChannelDelegate(@Nullable WebViewChannelDelegate channelDelegate) {
     this.channelDelegate = channelDelegate;

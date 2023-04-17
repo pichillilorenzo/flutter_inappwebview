@@ -92,10 +92,6 @@ class WebViewFeature {
   static const RECEIVE_WEB_RESOURCE_ERROR = WebViewFeature._internal(
       'RECEIVE_WEB_RESOURCE_ERROR', 'RECEIVE_WEB_RESOURCE_ERROR');
 
-  ///This feature covers [InAppWebViewSettings.requestedWithHeaderMode].
-  static const REQUESTED_WITH_HEADER_CONTROL = WebViewFeature._internal(
-      'REQUESTED_WITH_HEADER_CONTROL', 'REQUESTED_WITH_HEADER_CONTROL');
-
   ///This feature covers [InAppWebViewController.setSafeBrowsingAllowlist].
   static const SAFE_BROWSING_ALLOWLIST = WebViewFeature._internal(
       'SAFE_BROWSING_ALLOWLIST', 'SAFE_BROWSING_ALLOWLIST');
@@ -241,7 +237,6 @@ class WebViewFeature {
     WebViewFeature.PROXY_OVERRIDE_REVERSE_BYPASS,
     WebViewFeature.RECEIVE_HTTP_ERROR,
     WebViewFeature.RECEIVE_WEB_RESOURCE_ERROR,
-    WebViewFeature.REQUESTED_WITH_HEADER_CONTROL,
     WebViewFeature.SAFE_BROWSING_ALLOWLIST,
     WebViewFeature.SAFE_BROWSING_ENABLE,
     WebViewFeature.SAFE_BROWSING_HIT,
@@ -407,10 +402,6 @@ class AndroidWebViewFeature {
   static const RECEIVE_WEB_RESOURCE_ERROR = AndroidWebViewFeature._internal(
       'RECEIVE_WEB_RESOURCE_ERROR', 'RECEIVE_WEB_RESOURCE_ERROR');
 
-  ///This feature covers [InAppWebViewSettings.requestedWithHeaderMode].
-  static const REQUESTED_WITH_HEADER_CONTROL = AndroidWebViewFeature._internal(
-      'REQUESTED_WITH_HEADER_CONTROL', 'REQUESTED_WITH_HEADER_CONTROL');
-
   ///
   static const SAFE_BROWSING_ALLOWLIST = AndroidWebViewFeature._internal(
       'SAFE_BROWSING_ALLOWLIST', 'SAFE_BROWSING_ALLOWLIST');
@@ -558,7 +549,6 @@ class AndroidWebViewFeature {
     AndroidWebViewFeature.PROXY_OVERRIDE,
     AndroidWebViewFeature.RECEIVE_HTTP_ERROR,
     AndroidWebViewFeature.RECEIVE_WEB_RESOURCE_ERROR,
-    AndroidWebViewFeature.REQUESTED_WITH_HEADER_CONTROL,
     AndroidWebViewFeature.SAFE_BROWSING_ALLOWLIST,
     AndroidWebViewFeature.SAFE_BROWSING_ENABLE,
     AndroidWebViewFeature.SAFE_BROWSING_HIT,

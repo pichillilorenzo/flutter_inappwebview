@@ -10,43 +10,87 @@ part of 'cookie.dart';
 class Cookie {
   ///The cookie domain.
   ///
-  ///**NOTE**: on Android it will be always `null`.
+  ///**NOTE for Android native WebView**: available on Android only if [WebViewFeature.GET_COOKIE_INFO] feature is supported.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- iOS
+  ///- MacOS
+  ///- Android native WebView
   String? domain;
 
   ///The cookie expiration date in milliseconds.
   ///
-  ///**NOTE**: on Android it will be always `null`.
+  ///**NOTE for Android native WebView**: available on Android only if [WebViewFeature.GET_COOKIE_INFO] feature is supported.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- iOS
+  ///- MacOS
+  ///- Android native WebView
   int? expiresDate;
 
   ///Indicates if the cookie is a http only cookie.
   ///
-  ///**NOTE**: on Android it will be always `null`.
+  ///**NOTE for Android native WebView**: available on Android only if [WebViewFeature.GET_COOKIE_INFO] feature is supported.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- iOS
+  ///- MacOS
+  ///- Android native WebView
   bool? isHttpOnly;
 
   ///Indicates if the cookie is secure or not.
   ///
-  ///**NOTE**: on Android it will be always `null`.
+  ///**NOTE for Android native WebView**: available on Android only if [WebViewFeature.GET_COOKIE_INFO] feature is supported.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- iOS
+  ///- MacOS
+  ///- Android native WebView
   bool? isSecure;
 
   ///Indicates if the cookie is a session only cookie.
   ///
-  ///**NOTE**: on Android it will be always `null`.
+  ///**Supported Platforms/Implementations**:
+  ///- iOS
+  ///- MacOS
   bool? isSessionOnly;
 
   ///The cookie name.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- iOS
+  ///- MacOS
+  ///- Android native WebView
+  ///- Web but iframe requires same origin
   String name;
 
   ///The cookie path.
   ///
-  ///**NOTE**: on Android it will be always `null`.
+  ///**NOTE for Android native WebView**: available on Android only if [WebViewFeature.GET_COOKIE_INFO] feature is supported.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- iOS
+  ///- MacOS
+  ///- Android native WebView
   String? path;
 
   ///The cookie same site policy.
   ///
-  ///**NOTE**: on Android it will be always `null`.
+  ///**NOTE for Android native WebView**: available on Android only if [WebViewFeature.GET_COOKIE_INFO] feature is supported.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- iOS
+  ///- MacOS
+  ///- Android native WebView
   HTTPCookieSameSitePolicy? sameSite;
 
   ///The cookie value.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- iOS
+  ///- MacOS
+  ///- Android native WebView
+  ///- Web but iframe requires same origin
   dynamic value;
   Cookie(
       {this.domain,

@@ -51,6 +51,8 @@ public class InAppWebViewSettings: ISettings<InAppWebView> {
     var isSiteSpecificQuirksModeEnabled = true
     var upgradeKnownHostsToHTTPS = true
     var isElementFullscreenEnabled = true
+    var isInspectable = false
+    var shouldPrintBackgrounds = false
     
     override init(){
         super.init()
@@ -58,7 +60,7 @@ public class InAppWebViewSettings: ISettings<InAppWebView> {
     
     override func parse(settings: [String: Any?]) -> InAppWebViewSettings {
         let _ = super.parse(settings: settings)
-        if #available(iOS 13.0, *) {} else {
+        if #available(macOS 10.15, *) {} else {
             applePayAPIEnabled = false
         }
         return self
@@ -68,12 +70,10 @@ public class InAppWebViewSettings: ISettings<InAppWebView> {
         var realSettings: [String: Any?] = toMap()
         if let webView = obj {
             let configuration = webView.configuration
-            if #available(iOS 9.0, *) {
-                realSettings["userAgent"] = webView.customUserAgent
-                realSettings["applicationNameForUserAgent"] = configuration.applicationNameForUserAgent
-                realSettings["allowsAirPlayForMediaPlayback"] = configuration.allowsAirPlayForMediaPlayback
-                realSettings["allowsLinkPreview"] = webView.allowsLinkPreview
-            }
+            realSettings["userAgent"] = webView.customUserAgent
+            realSettings["applicationNameForUserAgent"] = configuration.applicationNameForUserAgent
+            realSettings["allowsAirPlayForMediaPlayback"] = configuration.allowsAirPlayForMediaPlayback
+            realSettings["allowsLinkPreview"] = webView.allowsLinkPreview
             realSettings["javaScriptCanOpenWindowsAutomatically"] = configuration.preferences.javaScriptCanOpenWindowsAutomatically
             if #available(macOS 10.12, *) {
                 realSettings["mediaPlaybackRequiresUserGesture"] = configuration.mediaTypesRequiringUserActionForPlayback == .all
@@ -104,6 +104,10 @@ public class InAppWebViewSettings: ISettings<InAppWebView> {
             if #available(macOS 12.3, *) {
                 realSettings["isSiteSpecificQuirksModeEnabled"] = configuration.preferences.isSiteSpecificQuirksModeEnabled
                 realSettings["isElementFullscreenEnabled"] = configuration.preferences.isElementFullscreenEnabled
+            }
+            if #available(macOS 13.3, *) {
+                realSettings["isInspectable"] = webView.isInspectable
+                realSettings["shouldPrintBackgrounds"] = configuration.preferences.shouldPrintBackgrounds
             }
         }
         return realSettings

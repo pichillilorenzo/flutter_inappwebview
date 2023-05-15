@@ -29,35 +29,37 @@ class ExchangeableObjectGenerator
     // Visits all the children of element in no particular order.
     element.visitChildren(visitor);
 
-    final className = visitor.constructor.returnType.element2.name;
+    final className = visitor.constructor.returnType.element.name;
     final superClass =
-        visitor.constructor.returnType.superclass?.element2.name != 'Object'
+        visitor.constructor.returnType.superclass?.element.name != 'Object'
             ? visitor.constructor.returnType.superclass
             : null;
     final interfaces = visitor.constructor.returnType.interfaces;
-    final superClassName = superClass?.element2.name.replaceFirst("_", "");
+    final superClassName = superClass?.element.name.replaceFirst("_", "");
     // remove "_" to generate the correct class name
     final extClassName = className.replaceFirst("_", "");
 
     final classBuffer = StringBuffer();
     final classDocs =
-        visitor.constructor.returnType.element2.documentationComment;
+        visitor.constructor.returnType.element.documentationComment;
     if (classDocs != null) {
       classBuffer.writeln(classDocs);
     }
     final classSupportedDocs = Util.getSupportedDocs(
-        _coreCheckerSupportedPlatforms, visitor.constructor.returnType.element2);
+        _coreCheckerSupportedPlatforms, visitor.constructor.returnType.element);
     if (classSupportedDocs != null) {
       classBuffer.writeln(classSupportedDocs);
     }
-    if (visitor.constructor.returnType.element2.hasDeprecated) {
+    if (visitor.constructor.returnType.element.hasDeprecated) {
       classBuffer.writeln(
-          "@Deprecated('${_coreCheckerDeprecated.firstAnnotationOfExact(visitor.constructor.returnType.element2)?.getField("message")?.toStringValue()}')");
+          "@Deprecated('${_coreCheckerDeprecated.firstAnnotationOfExact(visitor.constructor.returnType.element)?.getField("message")?.toStringValue()}')");
     }
 
-    classBuffer.write('${(visitor.constructor.enclosingElement3 as ClassElement).isAbstract ? 'abstract ' : ''}class $extClassName');
+    classBuffer.write(
+        '${(visitor.constructor.enclosingElement as ClassElement).isAbstract ? 'abstract ' : ''}class $extClassName');
     if (interfaces.isNotEmpty) {
-      classBuffer.writeln(' implements ${interfaces.map((i) => i.element2.name.replaceFirst("_", "")).join(', ')}');
+      classBuffer.writeln(
+          ' implements ${interfaces.map((i) => i.element.name.replaceFirst("_", "")).join(', ')}');
     }
     if (superClass != null) {
       classBuffer.writeln(' extends ${superClassName}');
@@ -174,7 +176,7 @@ class ExchangeableObjectGenerator
     if (constructorSupportedDocs == null) {
       constructorSupportedDocs = Util.getSupportedDocs(
           _coreCheckerSupportedPlatforms,
-          visitor.constructor.returnType.element2);
+          visitor.constructor.returnType.element);
     }
     if (constructorSupportedDocs != null) {
       classBuffer.writeln(constructorSupportedDocs);
@@ -233,11 +235,13 @@ class ExchangeableObjectGenerator
             .trim();
         final fieldElement = visitor.fields[fieldName];
         if (fieldElement != null) {
-          final fieldTypeElement = fieldElement.type.element2;
-          final deprecatedFieldTypeElement = deprecatedField.type.element2;
+          final fieldTypeElement = fieldElement.type.element;
+          final deprecatedFieldTypeElement = deprecatedField.type.element;
 
           final isNullable = Util.typeIsNullable(fieldElement.type);
-          var hasDefaultValue = (fieldElement is ParameterElement) ? (fieldElement as ParameterElement).hasDefaultValue : false;
+          var hasDefaultValue = (fieldElement is ParameterElement)
+              ? (fieldElement as ParameterElement).hasDefaultValue
+              : false;
           if (!isNullable && hasDefaultValue) {
             continue;
           }
@@ -267,10 +271,14 @@ class ExchangeableObjectGenerator
             } else if (hasFromValue && deprecatedHasToValue) {
               classBuffer.write(fieldTypeElement.name!.replaceFirst("_", "") +
                   '.fromValue($deprecatedFieldName${deprecatedIsNullable ? '?' : ''}.toValue())${!isNullable ? '!' : ''}');
-            } else if (deprecatedField.type.getDisplayString(withNullability: false) == "Uri" &&
-                       fieldElement.type.getDisplayString(withNullability: false) == "WebUri") {
+            } else if (deprecatedField.type
+                        .getDisplayString(withNullability: false) ==
+                    "Uri" &&
+                fieldElement.type.getDisplayString(withNullability: false) ==
+                    "WebUri") {
               if (deprecatedIsNullable) {
-                classBuffer.write("($deprecatedFieldName != null ? WebUri.uri($deprecatedFieldName!) : ${isNullable ? "null" : "WebUri('')"})");
+                classBuffer.write(
+                    "($deprecatedFieldName != null ? WebUri.uri($deprecatedFieldName!) : ${isNullable ? "null" : "WebUri('')"})");
               } else {
                 classBuffer.write("WebUri.uri($deprecatedFieldName)");
               }
@@ -288,8 +296,9 @@ class ExchangeableObjectGenerator
       classBuffer.writeln(';');
     }
 
-    if (annotation.read("fromMapFactory").boolValue && (!visitor.methods.containsKey("fromMap") ||
-        Util.methodHasIgnore(visitor.methods['fromMap']!))) {
+    if (annotation.read("fromMapFactory").boolValue &&
+        (!visitor.methods.containsKey("fromMap") ||
+            Util.methodHasIgnore(visitor.methods['fromMap']!))) {
       classBuffer.writeln(
           '///Gets a possible [$extClassName] instance from a [Map] value.');
       final nullable = annotation.read("nullableFromMapFactory").boolValue;
@@ -303,7 +312,7 @@ class ExchangeableObjectGenerator
       classBuffer.writeln('final instance = $extClassName(');
       final fieldElements = <FieldElement>[];
       if (superClass != null) {
-        fieldElements.addAll(superClass.element2.fields);
+        fieldElements.addAll(superClass.element.fields);
       }
       fieldElements.addAll(fieldValuesSorted);
       final nonRequiredFields = <String>[];
@@ -332,7 +341,7 @@ class ExchangeableObjectGenerator
               ?.toFunctionValue();
           if (customDeserializer != null) {
             final deserializerClassName =
-                customDeserializer.enclosingElement3.name;
+                customDeserializer.enclosingElement.name;
             if (deserializerClassName != null) {
               value =
                   "$deserializerClassName.${customDeserializer.name}($value)";
@@ -387,8 +396,9 @@ class ExchangeableObjectGenerator
       }
     }
 
-    if (annotation.read("toMapMethod").boolValue && (!visitor.methods.containsKey("toMap") ||
-        Util.methodHasIgnore(visitor.methods['toMap']!))) {
+    if (annotation.read("toMapMethod").boolValue &&
+        (!visitor.methods.containsKey("toMap") ||
+            Util.methodHasIgnore(visitor.methods['toMap']!))) {
       classBuffer.writeln('///Converts instance to a map.');
       classBuffer.writeln('Map<String, dynamic> toMap() {');
       classBuffer.writeln('return {');
@@ -404,7 +414,7 @@ class ExchangeableObjectGenerator
       }
       final fieldElements = <FieldElement>[];
       if (superClass != null) {
-        for (final fieldElement in superClass.element2.fields) {
+        for (final fieldElement in superClass.element.fields) {
           if (!fieldElement.isPrivate &&
               !fieldElement.hasDeprecated &&
               !fieldElement.isStatic &&
@@ -434,7 +444,7 @@ class ExchangeableObjectGenerator
               ?.getField("serializer")
               ?.toFunctionValue();
           if (customSerializer != null) {
-            final serializerClassName = customSerializer.enclosingElement3.name;
+            final serializerClassName = customSerializer.enclosingElement.name;
             if (serializerClassName != null) {
               mapValue =
                   "$serializerClassName.${customSerializer.name}($mapValue)";
@@ -452,30 +462,34 @@ class ExchangeableObjectGenerator
       classBuffer.writeln('}');
     }
 
-    if (annotation.read("toJsonMethod").boolValue && (!visitor.methods.containsKey("toJson") ||
-        Util.methodHasIgnore(visitor.methods['toJson']!))) {
+    if (annotation.read("toJsonMethod").boolValue &&
+        (!visitor.methods.containsKey("toJson") ||
+            Util.methodHasIgnore(visitor.methods['toJson']!))) {
       classBuffer.writeln('///Converts instance to a map.');
       classBuffer.writeln('Map<String, dynamic> toJson() {');
       classBuffer.writeln('return toMap();');
       classBuffer.writeln('}');
     }
 
-    if (annotation.read("copyMethod").boolValue && (!visitor.methods.containsKey("copy") ||
-        Util.methodHasIgnore(visitor.methods['copy']!))) {
+    if (annotation.read("copyMethod").boolValue &&
+        (!visitor.methods.containsKey("copy") ||
+            Util.methodHasIgnore(visitor.methods['copy']!))) {
       classBuffer.writeln('///Returns a copy of $extClassName.');
       classBuffer.writeln('$extClassName copy() {');
-      classBuffer.writeln('return $extClassName.fromMap(toMap()) ?? $extClassName();');
+      classBuffer
+          .writeln('return $extClassName.fromMap(toMap()) ?? $extClassName();');
       classBuffer.writeln('}');
     }
 
-    if (annotation.read("toStringMethod").boolValue && (!visitor.methods.containsKey("toString") ||
-        Util.methodHasIgnore(visitor.methods['toString']!))) {
+    if (annotation.read("toStringMethod").boolValue &&
+        (!visitor.methods.containsKey("toString") ||
+            Util.methodHasIgnore(visitor.methods['toString']!))) {
       classBuffer.writeln('@override');
       classBuffer.writeln('String toString() {');
       classBuffer.write('return \'$extClassName{');
       final fieldNames = <String>[];
       if (superClass != null) {
-        for (final fieldElement in superClass.element2.fields) {
+        for (final fieldElement in superClass.element.fields) {
           final fieldName = fieldElement.name;
           if (!fieldElement.isPrivate &&
               !fieldElement.hasDeprecated &&
@@ -505,34 +519,32 @@ class ExchangeableObjectGenerator
   }
 
   String getFromMapValue(String value, DartType elementType) {
-    final fieldTypeElement = elementType.element2;
+    final fieldTypeElement = elementType.element;
     final isNullable = Util.typeIsNullable(elementType);
-    if (elementType.getDisplayString(withNullability: false) == "Uri") {
+    final displayString = elementType.getDisplayString(withNullability: false);
+    if (displayString == "Uri") {
       if (!isNullable) {
         return "(Uri.tryParse($value) ?? Uri())";
       } else {
         return "$value != null ? Uri.tryParse($value) : null";
       }
-    } else if (elementType.getDisplayString(withNullability: false) == "WebUri") {
+    } else if (displayString == "WebUri") {
       if (!isNullable) {
         return "WebUri($value)";
       } else {
         return "$value != null ? WebUri($value) : null";
       }
-    } else if (elementType.getDisplayString(withNullability: false) ==
-        "Color") {
+    } else if (displayString == "Color" || displayString == "Color_") {
       if (!isNullable) {
         return "UtilColor.fromStringRepresentation($value)!";
       } else {
         return "$value != null ? UtilColor.fromStringRepresentation($value) : null";
       }
-    } else if (elementType.getDisplayString(withNullability: false) ==
-        "EdgeInsets") {
+    } else if (displayString == "EdgeInsets") {
       return "MapEdgeInsets.fromMap($value?.cast<String, dynamic>())${!isNullable ? '!' : ''}";
-    } else if (elementType.getDisplayString(withNullability: false) == "Size") {
+    } else if (displayString == "Size") {
       return "MapSize.fromMap($value?.cast<String, dynamic>())${!isNullable ? '!' : ''}";
-    } else if (elementType.getDisplayString(withNullability: false) ==
-        "DateTime") {
+    } else if (displayString == "DateTime") {
       if (!isNullable) {
         return "DateTime.fromMillisecondsSinceEpoch($value)!";
       } else {
@@ -541,7 +553,9 @@ class ExchangeableObjectGenerator
     } else if (elementType.isDartCoreList || elementType.isDartCoreSet) {
       final genericTypes = Util.getGenericTypes(elementType);
       final genericType = genericTypes.isNotEmpty ? genericTypes.first : null;
-      final genericTypeReplaced = genericType != null ? genericType.toString().replaceAll("_", "") : null;
+      final genericTypeReplaced = genericType != null
+          ? genericType.toString().replaceAll("_", "")
+          : null;
       if (genericType != null && !Util.isDartCoreType(genericType)) {
         final genericTypeFieldName = 'e';
         return (isNullable ? '$value != null ? ' : '') +
@@ -553,7 +567,10 @@ class ExchangeableObjectGenerator
             (isNullable ? ' : null' : '');
       } else {
         if (genericType != null) {
-          return "$value${isNullable ? '?' : ''}.cast<${genericTypeReplaced}>()";
+          return (isNullable ? '$value != null ? ' : '') +
+              "${elementType.isDartCoreSet ? 'Set' : 'List'}<$genericTypeReplaced>.from(" +
+              "$value!.cast<${genericTypeReplaced}>())" +
+              (isNullable ? ' : null' : '');
         } else {
           return value;
         }
@@ -592,22 +609,20 @@ class ExchangeableObjectGenerator
   }
 
   String getToMapValue(String fieldName, DartType elementType) {
-    final fieldTypeElement = elementType.element2;
+    final fieldTypeElement = elementType.element;
     final isNullable = Util.typeIsNullable(elementType);
-    if (elementType.getDisplayString(withNullability: false) == "Uri") {
+    final displayString = elementType.getDisplayString(withNullability: false);
+    if (displayString == "Uri") {
       return fieldName + (isNullable ? '?' : '') + '.toString()';
-    } else if (elementType.getDisplayString(withNullability: false) == "WebUri") {
+    } else if (displayString == "WebUri") {
       return fieldName + (isNullable ? '?' : '') + '.toString()';
-    } else if (elementType.getDisplayString(withNullability: false) ==
-        "Color") {
+    } else if (displayString == "Color" || displayString == "Color_") {
       return fieldName + (isNullable ? '?' : '') + '.toHex()';
-    } else if (elementType.getDisplayString(withNullability: false) ==
-        "EdgeInsets") {
+    } else if (displayString == "EdgeInsets") {
       return fieldName + (isNullable ? '?' : '') + '.toMap()';
-    } else if (elementType.getDisplayString(withNullability: false) == "Size") {
+    } else if (displayString == "Size") {
       return fieldName + (isNullable ? '?' : '') + '.toMap()';
-    } else if (elementType.getDisplayString(withNullability: false) ==
-        "DateTime") {
+    } else if (displayString == "DateTime") {
       return fieldName + (isNullable ? '?' : '') + '.millisecondsSinceEpoch';
     } else if (elementType.isDartCoreList || elementType.isDartCoreSet) {
       final genericType = Util.getGenericTypes(elementType).first;
@@ -619,7 +634,9 @@ class ExchangeableObjectGenerator
             getToMapValue('$genericTypeFieldName', genericType) +
             ').toList()';
       } else {
-        return elementType.isDartCoreSet ? "$fieldName${(isNullable ? '?' : '')}.toList()" : fieldName;
+        return elementType.isDartCoreSet
+            ? "$fieldName${(isNullable ? '?' : '')}.toList()"
+            : fieldName;
       }
     } else if (fieldTypeElement != null && hasToMapMethod(fieldTypeElement)) {
       return fieldName +

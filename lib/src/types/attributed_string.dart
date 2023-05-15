@@ -21,7 +21,7 @@ class AttributedString_ {
   ///The value of this attribute is a [Color] object.
   ///Use this attribute to specify the color of the background area behind the text.
   ///If you do not specify this attribute, no background color is drawn.
-  Color? backgroundColor;
+  Color_? backgroundColor;
 
   ///The vertical offset for the position of the text.
   ///
@@ -40,7 +40,7 @@ class AttributedString_ {
   ///The value of this attribute is a [Color] object.
   ///Use this attribute to specify the color of the text during rendering.
   ///If you do not specify this attribute, the text is rendered in black.
-  Color? foregroundColor;
+  Color_? foregroundColor;
 
   ///The kerning of the text.
   ///
@@ -68,7 +68,7 @@ class AttributedString_ {
   ///The color of the strikethrough.
   ///
   ///The value of this attribute is a [Color] object. The default value is `null`, indicating same as foreground color.
-  Color? strikethroughColor;
+  Color_? strikethroughColor;
 
   ///The strikethrough style of the text.
   ///
@@ -81,7 +81,7 @@ class AttributedString_ {
   ///The value of this parameter is a [Color] object.
   ///If it is not defined (which is the case by default), it is assumed to be the same as the value of foregroundColor;
   ///otherwise, it describes the outline color.
-  Color? strokeColor;
+  Color_? strokeColor;
 
   ///The width of the stroke.
   ///
@@ -103,7 +103,7 @@ class AttributedString_ {
   ///
   ///The value of this attribute is a [Color] object.
   ///The default value is `null`, indicating same as foreground color.
-  Color? underlineColor;
+  Color_? underlineColor;
 
   ///The underline style of the text.
   ///
@@ -144,7 +144,7 @@ class IOSNSAttributedString_ {
   ///The value of this attribute is a [Color] object.
   ///Use this attribute to specify the color of the background area behind the text.
   ///If you do not specify this attribute, no background color is drawn.
-  Color? backgroundColor;
+  Color_? backgroundColor;
 
   ///The vertical offset for the position of the text.
   ///
@@ -163,7 +163,7 @@ class IOSNSAttributedString_ {
   ///The value of this attribute is a [Color] object.
   ///Use this attribute to specify the color of the text during rendering.
   ///If you do not specify this attribute, the text is rendered in black.
-  Color? foregroundColor;
+  Color_? foregroundColor;
 
   ///The kerning of the text.
   ///
@@ -191,7 +191,7 @@ class IOSNSAttributedString_ {
   ///The color of the strikethrough.
   ///
   ///The value of this attribute is a [Color] object. The default value is `null`, indicating same as foreground color.
-  Color? strikethroughColor;
+  Color_? strikethroughColor;
 
   ///The strikethrough style of the text.
   ///
@@ -204,7 +204,7 @@ class IOSNSAttributedString_ {
   ///The value of this parameter is a [Color] object.
   ///If it is not defined (which is the case by default), it is assumed to be the same as the value of foregroundColor;
   ///otherwise, it describes the outline color.
-  Color? strokeColor;
+  Color_? strokeColor;
 
   ///The width of the stroke.
   ///
@@ -226,7 +226,7 @@ class IOSNSAttributedString_ {
   ///
   ///The value of this attribute is a [Color] object.
   ///The default value is `null`, indicating same as foreground color.
-  Color? underlineColor;
+  Color_? underlineColor;
 
   ///The underline style of the text.
   ///

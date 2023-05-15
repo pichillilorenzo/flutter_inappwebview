@@ -8,7 +8,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:4.1.0'
+        classpath 'com.android.tools.build:gradle:8.0.1'
     }
 }
 
@@ -22,6 +22,10 @@ rootProject.allprojects {
 apply plugin: 'com.android.library'
 
 android {
+    // Conditional for compatibility with AGP <4.2.
+    if (project.android.hasProperty("namespace")) {
+        namespace 'com.pichillilorenzo.flutter_inappwebview'
+    }
     compileSdkVersion 33
 
     defaultConfig {
@@ -45,9 +49,9 @@ android {
         }
     }
     dependencies {
-        implementation 'androidx.webkit:webkit:1.5.0'
-        implementation 'androidx.browser:browser:1.4.0'
-        implementation 'androidx.appcompat:appcompat:1.5.1'
+        implementation 'androidx.webkit:webkit:1.6.1'
+        implementation 'androidx.browser:browser:1.5.0'
+        implementation 'androidx.appcompat:appcompat:1.6.1'
         implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'
     }
 }

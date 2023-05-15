@@ -24,14 +24,14 @@ class PullToRefreshSettings_ {
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
-  Color? color;
+  Color_? color;
 
   ///The background color of the refresh control.
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
-  Color? backgroundColor;
+  Color_? backgroundColor;
 
   ///The distance to trigger a sync in dips.
   ///

@@ -138,8 +138,9 @@ public class InAppWebView: WKWebView, WKUIDelegate,
                 }
             }
             
-            // debugging is always enabled for iOS,
-            // there isn't any option to set about it such as on Android.
+            if #available(macOS 13.3, *) {
+                isInspectable = settings.isInspectable
+            }
             
             if settings.clearCache {
                 clearCache()
@@ -170,14 +171,15 @@ public class InAppWebView: WKWebView, WKUIDelegate,
             if #available(macOS 11.0, *) {
                 configuration.defaultWebpagePreferences.allowsContentJavaScript = settings.javaScriptEnabled
             }
-            
             if #available(macOS 11.3, *) {
                 configuration.preferences.isTextInteractionEnabled = settings.isTextInteractionEnabled
             }
-            
             if #available(macOS 12.3, *) {
                 configuration.preferences.isSiteSpecificQuirksModeEnabled = settings.isSiteSpecificQuirksModeEnabled
                 configuration.preferences.isElementFullscreenEnabled = settings.isElementFullscreenEnabled
+            }
+            if #available(macOS 13.3, *) {
+                configuration.preferences.shouldPrintBackgrounds = settings.shouldPrintBackgrounds
             }
         }
     }
@@ -728,6 +730,14 @@ public class InAppWebView: WKWebView, WKUIDelegate,
         if #available(macOS 12.3, *) {
             if newSettingsMap["isSiteSpecificQuirksModeEnabled"] != nil, settings?.isSiteSpecificQuirksModeEnabled != newSettings.isSiteSpecificQuirksModeEnabled {
                 configuration.preferences.isSiteSpecificQuirksModeEnabled = newSettings.isSiteSpecificQuirksModeEnabled
+            }
+        }
+        if #available(macOS 13.3, *) {
+            if newSettingsMap["isInspectable"] != nil, settings?.isInspectable != newSettings.isInspectable {
+                isInspectable = newSettings.isInspectable
+            }
+            if newSettingsMap["shouldPrintBackgrounds"] != nil, settings?.shouldPrintBackgrounds != newSettings.shouldPrintBackgrounds {
+                configuration.preferences.shouldPrintBackgrounds = newSettings.shouldPrintBackgrounds
             }
         }
 

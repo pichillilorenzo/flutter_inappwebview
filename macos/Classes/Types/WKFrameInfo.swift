@@ -12,9 +12,7 @@ extension WKFrameInfo {
     
     public func toMap () -> [String:Any?] {
         var securityOrigin: [String:Any?]? = nil
-        if #available(iOS 9.0, *) {
-            securityOrigin = self.securityOrigin.toMap()
-        }
+        securityOrigin = self.securityOrigin.toMap()
         // fix: self.request throws EXC_BREAKPOINT when coming from WKNavigationAction.sourceFrame
         let request: URLRequest? = self.value(forKey: "request") as? URLRequest
         return [

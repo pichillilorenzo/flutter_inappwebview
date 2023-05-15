@@ -115,6 +115,7 @@ class _InAppBrowserExampleScreenState extends State<InAppBrowserExampleScreen> {
                             toolbarTopBackgroundColor: Colors.blue,
                             presentationStyle: ModalPresentationStyle.POPOVER),
                         webViewSettings: InAppWebViewSettings(
+                          isInspectable: kDebugMode,
                           useShouldOverrideUrlLoading: true,
                           useOnLoadResource: true,
                         ),

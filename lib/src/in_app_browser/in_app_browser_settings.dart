@@ -121,7 +121,7 @@ class InAppBrowserSettings_
   ///- Android native WebView
   ///- iOS
   ///- MacOS
-  Color? toolbarTopBackgroundColor;
+  Color_? toolbarTopBackgroundColor;
 
   ///Set to `true` to hide the url bar on the toolbar at the top. The default value is `false`.
   ///
@@ -180,13 +180,13 @@ class InAppBrowserSettings_
   ///
   ///**Supported Platforms/Implementations**:
   ///- iOS
-  Color? toolbarTopBarTintColor;
+  Color_? toolbarTopBarTintColor;
 
   ///Set the tint color to apply to the navigation items and bar button items.
   ///
   ///**Supported Platforms/Implementations**:
   ///- iOS
-  Color? toolbarTopTintColor;
+  Color_? toolbarTopTintColor;
 
   ///Set to `true` to hide the toolbar at the bottom of the WebView. The default value is `false`.
   ///
@@ -198,13 +198,13 @@ class InAppBrowserSettings_
   ///
   ///**Supported Platforms/Implementations**:
   ///- iOS
-  Color? toolbarBottomBackgroundColor;
+  Color_? toolbarBottomBackgroundColor;
 
   ///Set the tint color to apply to the bar button items.
   ///
   ///**Supported Platforms/Implementations**:
   ///- iOS
-  Color? toolbarBottomTintColor;
+  Color_? toolbarBottomTintColor;
 
   ///Set to `true` to set the toolbar at the bottom translucent. The default value is `true`.
   ///
@@ -222,7 +222,7 @@ class InAppBrowserSettings_
   ///
   ///**Supported Platforms/Implementations**:
   ///- iOS
-  Color? closeButtonColor;
+  Color_? closeButtonColor;
 
   ///Set the custom modal presentation style when presenting the WebView. The default value is [ModalPresentationStyle.FULL_SCREEN].
   ///

@@ -78,25 +78,25 @@ class ChromeSafariBrowserSettings_ implements ChromeSafariBrowserOptions {
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android
-  Color? toolbarBackgroundColor;
+  Color_? toolbarBackgroundColor;
 
   ///Sets the navigation bar color. Has no effect on Android API versions below L.
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android
-  Color? navigationBarColor;
+  Color_? navigationBarColor;
 
   ///Sets the navigation bar divider color. Has no effect on Android API versions below P.
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android
-  Color? navigationBarDividerColor;
+  Color_? navigationBarDividerColor;
 
   ///Sets the color of the secondary toolbar.
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android
-  Color? secondaryToolbarColor;
+  Color_? secondaryToolbarColor;
 
   ///Set to `true` to enable the url bar to hide as the user scrolls down on the page. The default value is `false`.
   ///
@@ -224,7 +224,7 @@ class ChromeSafariBrowserSettings_ implements ChromeSafariBrowserOptions {
   ///
   ///**Supported Platforms/Implementations**:
   ///- iOS
-  Color? preferredBarTintColor;
+  Color_? preferredBarTintColor;
 
   ///Set the custom color of the control buttons on the navigation bar and the toolbar.
   ///
@@ -232,7 +232,7 @@ class ChromeSafariBrowserSettings_ implements ChromeSafariBrowserOptions {
   ///
   ///**Supported Platforms/Implementations**:
   ///- iOS
-  Color? preferredControlTintColor;
+  Color_? preferredControlTintColor;
 
   ///Set the custom modal presentation style when presenting the WebView. The default value is [ModalPresentationStyle.FULL_SCREEN].
   ///

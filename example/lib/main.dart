@@ -24,7 +24,7 @@ Future main() async {
   // await Permission.storage.request();
 
   if (!kIsWeb && defaultTargetPlatform == TargetPlatform.android) {
-    await InAppWebViewController.setWebContentsDebuggingEnabled(true);
+    await InAppWebViewController.setWebContentsDebuggingEnabled(kDebugMode);
   }
 
   if (!kIsWeb) {

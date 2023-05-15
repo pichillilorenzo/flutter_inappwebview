@@ -15,7 +15,6 @@ import '../types/mixed_content_mode.dart';
 import '../types/over_scroll_mode.dart';
 import '../types/referrer_policy.dart';
 import '../types/renderer_priority_policy.dart';
-import '../types/requested_with_header_mode.dart';
 import '../types/sandbox.dart';
 import '../types/scrollbar_style.dart';
 import '../types/scrollview_content_inset_adjustment_behavior.dart';
@@ -882,7 +881,7 @@ as it can cause framerate drops on animations in Android 9 and lower (see [Hybri
         apiUrl:
             "https://developer.android.com/reference/android/view/View#setVerticalScrollbarThumbDrawable(android.graphics.drawable.Drawable)")
   ])
-  Color? verticalScrollbarThumbColor;
+  Color_? verticalScrollbarThumbColor;
 
   ///Sets the vertical scrollbar track color.
   @SupportedPlatforms(platforms: [
@@ -892,7 +891,7 @@ as it can cause framerate drops on animations in Android 9 and lower (see [Hybri
         apiUrl:
             "https://developer.android.com/reference/android/view/View#setVerticalScrollbarTrackDrawable(android.graphics.drawable.Drawable)")
   ])
-  Color? verticalScrollbarTrackColor;
+  Color_? verticalScrollbarTrackColor;
 
   ///Sets the horizontal scrollbar thumb color.
   @SupportedPlatforms(platforms: [
@@ -902,7 +901,7 @@ as it can cause framerate drops on animations in Android 9 and lower (see [Hybri
         apiUrl:
             "https://developer.android.com/reference/android/view/View#setHorizontalScrollbarThumbDrawable(android.graphics.drawable.Drawable)")
   ])
-  Color? horizontalScrollbarThumbColor;
+  Color_? horizontalScrollbarThumbColor;
 
   ///Sets the horizontal scrollbar track color.
   @SupportedPlatforms(platforms: [
@@ -912,7 +911,7 @@ as it can cause framerate drops on animations in Android 9 and lower (see [Hybri
         apiUrl:
             "https://developer.android.com/reference/android/view/View#setHorizontalScrollbarTrackDrawable(android.graphics.drawable.Drawable)")
   ])
-  Color? horizontalScrollbarTrackColor;
+  Color_? horizontalScrollbarTrackColor;
 
   ///Control whether algorithmic darkening is allowed.
   ///
@@ -936,17 +935,6 @@ as it can cause framerate drops on animations in Android 9 and lower (see [Hybri
   ])
   bool? algorithmicDarkeningAllowed;
 
-  ///Sets how the WebView will set the `X-Requested-With` header on requests.
-  ///If you are calling this method, you may also want to call [ServiceWorkerWebSettingsCompat.setRequestedWithHeaderMode]
-  ///with the same parameter value to configure ServiceWorker requests.
-  ///The default behavior may vary depending on the WebView implementation.
-  @SupportedPlatforms(platforms: [
-    AndroidPlatform(
-        note:
-            "available on Android only if [WebViewFeature.REQUESTED_WITH_HEADER_CONTROL] feature is supported.")
-  ])
-  RequestedWithHeaderMode_? requestedWithHeaderMode;
-
   ///Sets whether EnterpriseAuthenticationAppLinkPolicy if set by admin is allowed to have any
   ///effect on WebView.
   ///
@@ -968,6 +956,23 @@ as it can cause framerate drops on animations in Android 9 and lower (see [Hybri
   ///This property allows the WebView to provide that default image.
   @SupportedPlatforms(platforms: [AndroidPlatform()])
   Uint8List? defaultVideoPoster;
+
+  ///Set an allow-list of origins to receive the X-Requested-With HTTP header from the WebView owning the passed [InAppWebViewSettings].
+  ///
+  ///Historically, this header was sent on all requests from WebView, containing the app package name of the embedding app. Depending on the version of installed WebView, this may no longer be the case, as the header was deprecated in late 2022, and its use discontinued.
+  ///
+  ///Apps can use this method to restore the legacy behavior for servers that still rely on the deprecated header, but it should not be used to identify the webview to first-party servers under the control of the app developer.
+  ///
+  ///The format of the strings in the allow-list follows the origin rules of [InAppWebViewController.addWebMessageListener].
+  @SupportedPlatforms(platforms: [
+    AndroidPlatform(
+        apiName: "WebSettingsCompat.setRequestedWithHeaderOriginAllowList",
+        apiUrl:
+            "https://developer.android.com/reference/androidx/webkit/WebSettingsCompat#setRequestedWithHeaderOriginAllowList(android.webkit.WebSettings,java.util.Set%3Cjava.lang.String%3E)",
+        note:
+            "available on Android only if [WebViewFeature.REQUESTED_WITH_HEADER_ALLOW_LIST] feature is supported.")
+  ])
+  Set<String>? requestedWithHeaderOriginAllowList;
 
   ///Set to `true` to disable the bouncing of the WebView when the scrolling has reached an edge of the content. The default value is `false`.
   @SupportedPlatforms(platforms: [IOSPlatform()])
@@ -1358,8 +1363,10 @@ as it can cause framerate drops on animations in Android 9 and lower (see [Hybri
   ///
   ///Also, on MacOS:
   ///- [WebView.onScrollChanged]
-  @SupportedPlatforms(
-      platforms: [IOSPlatform(available: "13.0"), MacOSPlatform()])
+  @SupportedPlatforms(platforms: [
+    IOSPlatform(available: "13.0"),
+    MacOSPlatform(available: "10.15")
+  ])
   bool? applePayAPIEnabled;
 
   ///Used in combination with [WebView.initialUrlRequest] or [WebView.initialData] (using the `file://` scheme), it represents the URL from which to read the web content.
@@ -1398,13 +1405,13 @@ as it can cause framerate drops on animations in Android 9 and lower (see [Hybri
         apiUrl:
             "https://developer.apple.com/documentation/webkit/wkwebview/3850574-underpagebackgroundcolor")
   ])
-  Color? underPageBackgroundColor;
+  Color_? underPageBackgroundColor;
 
   ///A Boolean value indicating whether text interaction is enabled or not.
   ///The default value is `true`.
   @SupportedPlatforms(platforms: [
     IOSPlatform(
-        available: "14.5",
+        available: "15.0",
         apiName: "WKPreferences.isTextInteractionEnabled",
         apiUrl:
             "https://developer.apple.com/documentation/webkit/wkpreferences/3727362-istextinteractionenabled"),
@@ -1499,6 +1506,40 @@ as it can cause framerate drops on animations in Android 9 and lower (see [Hybri
             "https://developer.apple.com/documentation/webkit/wkwebview/3974127-setminimumviewportinset/")
   ])
   EdgeInsets? maximumViewportInset;
+
+  ///Controls whether this WebView is inspectable in Web Inspector.
+  ///
+  ///The default value is `false`.
+  @SupportedPlatforms(platforms: [
+    IOSPlatform(
+        available: "16.4",
+        apiName: "WKWebView.isInspectable",
+        apiUrl:
+            "https://developer.apple.com/documentation/webkit/wkwebview/4111163-isinspectable"),
+    MacOSPlatform(
+        available: "13.3",
+        apiName: "WKWebView.isInspectable",
+        apiUrl:
+            "https://developer.apple.com/documentation/webkit/wkwebview/4111163-isinspectable")
+  ])
+  bool? isInspectable;
+
+  ///A Boolean value that indicates whether to include any background color or graphics when printing content.
+  ///
+  ///The default value is `false`.
+  @SupportedPlatforms(platforms: [
+    IOSPlatform(
+        available: "16.4",
+        apiName: "WKWebView.shouldPrintBackgrounds",
+        apiUrl:
+            "https://developer.apple.com/documentation/webkit/wkpreferences/4104043-shouldprintbackgrounds"),
+    MacOSPlatform(
+        available: "13.3",
+        apiName: "WKWebView.shouldPrintBackgrounds",
+        apiUrl:
+            "https://developer.apple.com/documentation/webkit/wkpreferences/4104043-shouldprintbackgrounds")
+  ])
+  bool? shouldPrintBackgrounds;
 
   ///Specifies a feature policy for the `<iframe>`.
   ///The policy defines what features are available to the `<iframe>` based on the origin of the request
@@ -1649,9 +1690,9 @@ as it can cause framerate drops on animations in Android 9 and lower (see [Hybri
     this.horizontalScrollbarThumbColor,
     this.horizontalScrollbarTrackColor,
     this.algorithmicDarkeningAllowed = false,
-    this.requestedWithHeaderMode,
     this.enterpriseAuthenticationAppLinkPolicyEnabled = true,
     this.defaultVideoPoster,
+    this.requestedWithHeaderOriginAllowList,
     this.disallowOverScroll = false,
     this.enableViewportScale = false,
     this.suppressesIncrementalRendering = false,
@@ -1693,6 +1734,8 @@ as it can cause framerate drops on animations in Android 9 and lower (see [Hybri
     this.isFindInteractionEnabled = false,
     this.minimumViewportInset,
     this.maximumViewportInset,
+    this.isInspectable = false,
+    this.shouldPrintBackgrounds = false,
     this.allowBackgroundAudioPlaying = false,
     this.webViewAssetLoader,
     this.iframeAllow,

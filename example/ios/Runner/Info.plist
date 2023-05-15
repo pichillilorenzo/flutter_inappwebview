@@ -51,6 +51,8 @@
 	<string>Need location</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>InAppWebView requires access to mic.</string>
+	<key>UIApplicationSupportsIndirectInputEvents</key>
+	<true/>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>fetch</string>

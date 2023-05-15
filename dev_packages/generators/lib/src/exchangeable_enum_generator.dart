@@ -23,25 +23,25 @@ class ExchangeableEnumGenerator
     // Visits all the children of element in no particular order.
     element.visitChildren(visitor);
 
-    final className = visitor.constructor.returnType.element2.name;
+    final className = visitor.constructor.returnType.element.name;
     // remove "_" to generate the correct class name
     final extClassName = className.replaceFirst("_", "");
 
     final classBuffer = StringBuffer();
     final classDocs =
-        visitor.constructor.returnType.element2.documentationComment;
+        visitor.constructor.returnType.element.documentationComment;
     if (classDocs != null) {
       classBuffer.writeln(classDocs);
     }
     final classSupportedDocs = Util.getSupportedDocs(
         _coreCheckerEnumSupportedPlatforms,
-        visitor.constructor.returnType.element2);
+        visitor.constructor.returnType.element);
     if (classSupportedDocs != null) {
       classBuffer.writeln(classSupportedDocs);
     }
-    if (visitor.constructor.returnType.element2.hasDeprecated) {
+    if (visitor.constructor.returnType.element.hasDeprecated) {
       classBuffer.writeln(
-          "@Deprecated('${_coreCheckerDeprecated.firstAnnotationOfExact(visitor.constructor.returnType.element2)?.getField("message")?.toStringValue()}')");
+          "@Deprecated('${_coreCheckerDeprecated.firstAnnotationOfExact(visitor.constructor.returnType.element)?.getField("message")?.toStringValue()}')");
     }
     classBuffer.writeln('class $extClassName {');
 

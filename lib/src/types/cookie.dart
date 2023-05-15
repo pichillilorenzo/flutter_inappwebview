@@ -1,6 +1,7 @@
 import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_internal_annotations.dart';
 
 import '../cookie_manager.dart';
+import '../android/webview_feature.dart';
 import 'http_cookie_same_site_policy.dart';
 
 part 'cookie.g.dart';
@@ -9,44 +10,85 @@ part 'cookie.g.dart';
 @ExchangeableObject()
 class Cookie_ {
   ///The cookie name.
+  @SupportedPlatforms(platforms: [
+    IOSPlatform(),
+    MacOSPlatform(),
+    AndroidPlatform(),
+    WebPlatform()
+  ])
   String name;
 
   ///The cookie value.
+  @SupportedPlatforms(platforms: [
+    IOSPlatform(),
+    MacOSPlatform(),
+    AndroidPlatform(),
+    WebPlatform()
+  ])
   dynamic value;
 
   ///The cookie expiration date in milliseconds.
-  ///
-  ///**NOTE**: on Android it will be always `null`.
+  @SupportedPlatforms(platforms: [
+    IOSPlatform(),
+    MacOSPlatform(),
+    AndroidPlatform(
+        note:
+            "available on Android only if [WebViewFeature.GET_COOKIE_INFO] feature is supported.")
+  ])
   int? expiresDate;
 
   ///Indicates if the cookie is a session only cookie.
-  ///
-  ///**NOTE**: on Android it will be always `null`.
+  @SupportedPlatforms(platforms: [IOSPlatform(), MacOSPlatform()])
   bool? isSessionOnly;
 
   ///The cookie domain.
-  ///
-  ///**NOTE**: on Android it will be always `null`.
+  @SupportedPlatforms(platforms: [
+    IOSPlatform(),
+    MacOSPlatform(),
+    AndroidPlatform(
+        note:
+            "available on Android only if [WebViewFeature.GET_COOKIE_INFO] feature is supported.")
+  ])
   String? domain;
 
   ///The cookie same site policy.
-  ///
-  ///**NOTE**: on Android it will be always `null`.
+  @SupportedPlatforms(platforms: [
+    IOSPlatform(),
+    MacOSPlatform(),
+    AndroidPlatform(
+        note:
+            "available on Android only if [WebViewFeature.GET_COOKIE_INFO] feature is supported.")
+  ])
   HTTPCookieSameSitePolicy_? sameSite;
 
   ///Indicates if the cookie is secure or not.
-  ///
-  ///**NOTE**: on Android it will be always `null`.
+  @SupportedPlatforms(platforms: [
+    IOSPlatform(),
+    MacOSPlatform(),
+    AndroidPlatform(
+        note:
+            "available on Android only if [WebViewFeature.GET_COOKIE_INFO] feature is supported.")
+  ])
   bool? isSecure;
 
   ///Indicates if the cookie is a http only cookie.
-  ///
-  ///**NOTE**: on Android it will be always `null`.
+  @SupportedPlatforms(platforms: [
+    IOSPlatform(),
+    MacOSPlatform(),
+    AndroidPlatform(
+        note:
+            "available on Android only if [WebViewFeature.GET_COOKIE_INFO] feature is supported.")
+  ])
   bool? isHttpOnly;
 
   ///The cookie path.
-  ///
-  ///**NOTE**: on Android it will be always `null`.
+  @SupportedPlatforms(platforms: [
+    IOSPlatform(),
+    MacOSPlatform(),
+    AndroidPlatform(
+        note:
+            "available on Android only if [WebViewFeature.GET_COOKIE_INFO] feature is supported.")
+  ])
   String? path;
 
   Cookie_(

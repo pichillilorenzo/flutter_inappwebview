@@ -48,6 +48,10 @@ class WebViewFeature {
   static const FORCE_DARK_STRATEGY =
       WebViewFeature._internal('FORCE_DARK_STRATEGY', 'FORCE_DARK_STRATEGY');
 
+  ///This feature covers cookie attributes of [CookieManager.getCookie] and [CookieManager.getCookies] methods.
+  static const GET_COOKIE_INFO =
+      WebViewFeature._internal('GET_COOKIE_INFO', 'GET_COOKIE_INFO');
+
   ///This feature covers [InAppWebViewController.getVariationsHeader].
   static const GET_VARIATIONS_HEADER = WebViewFeature._internal(
       'GET_VARIATIONS_HEADER', 'GET_VARIATIONS_HEADER');
@@ -92,9 +96,9 @@ class WebViewFeature {
   static const RECEIVE_WEB_RESOURCE_ERROR = WebViewFeature._internal(
       'RECEIVE_WEB_RESOURCE_ERROR', 'RECEIVE_WEB_RESOURCE_ERROR');
 
-  ///This feature covers [InAppWebViewSettings.requestedWithHeaderMode].
-  static const REQUESTED_WITH_HEADER_CONTROL = WebViewFeature._internal(
-      'REQUESTED_WITH_HEADER_CONTROL', 'REQUESTED_WITH_HEADER_CONTROL');
+  ///This feature covers cookie attributes of [CookieManager.getCookie] and [CookieManager.getCookies] methods.
+  static const REQUESTED_WITH_HEADER_ALLOW_LIST = WebViewFeature._internal(
+      'REQUESTED_WITH_HEADER_ALLOW_LIST', 'REQUESTED_WITH_HEADER_ALLOW_LIST');
 
   ///This feature covers [InAppWebViewController.setSafeBrowsingAllowlist].
   static const SAFE_BROWSING_ALLOWLIST = WebViewFeature._internal(
@@ -230,6 +234,7 @@ class WebViewFeature {
     WebViewFeature.ENTERPRISE_AUTHENTICATION_APP_LINK_POLICY,
     WebViewFeature.FORCE_DARK,
     WebViewFeature.FORCE_DARK_STRATEGY,
+    WebViewFeature.GET_COOKIE_INFO,
     WebViewFeature.GET_VARIATIONS_HEADER,
     WebViewFeature.GET_WEB_CHROME_CLIENT,
     WebViewFeature.GET_WEB_VIEW_CLIENT,
@@ -241,7 +246,7 @@ class WebViewFeature {
     WebViewFeature.PROXY_OVERRIDE_REVERSE_BYPASS,
     WebViewFeature.RECEIVE_HTTP_ERROR,
     WebViewFeature.RECEIVE_WEB_RESOURCE_ERROR,
-    WebViewFeature.REQUESTED_WITH_HEADER_CONTROL,
+    WebViewFeature.REQUESTED_WITH_HEADER_ALLOW_LIST,
     WebViewFeature.SAFE_BROWSING_ALLOWLIST,
     WebViewFeature.SAFE_BROWSING_ENABLE,
     WebViewFeature.SAFE_BROWSING_HIT,

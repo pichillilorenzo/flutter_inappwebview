@@ -6,7 +6,6 @@ export 'android/main.dart';
 export 'apple/main.dart';
 export 'x509_certificate/main.dart';
 export 'web_storage/main.dart';
-export 'types/main.dart';
 export 'cookie_manager.dart';
 export 'in_app_localhost_server.dart';
 export 'content_blocker.dart';

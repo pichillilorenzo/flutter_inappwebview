@@ -47,10 +47,18 @@ class ClientCertChallenge extends URLAuthenticationChallenge {
     final instance = ClientCertChallenge(
       protectionSpace: URLProtectionSpace.fromMap(
           map['protectionSpace']?.cast<String, dynamic>())!,
-      androidKeyTypes: map['keyTypes']?.cast<String>(),
-      androidPrincipals: map['principals']?.cast<String>(),
-      keyTypes: map['keyTypes']?.cast<String>(),
-      principals: map['principals']?.cast<String>(),
+      androidKeyTypes: map['keyTypes'] != null
+          ? List<String>.from(map['keyTypes']!.cast<String>())
+          : null,
+      androidPrincipals: map['principals'] != null
+          ? List<String>.from(map['principals']!.cast<String>())
+          : null,
+      keyTypes: map['keyTypes'] != null
+          ? List<String>.from(map['keyTypes']!.cast<String>())
+          : null,
+      principals: map['principals'] != null
+          ? List<String>.from(map['principals']!.cast<String>())
+          : null,
     );
     return instance;
   }

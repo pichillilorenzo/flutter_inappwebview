@@ -19,8 +19,10 @@ import com.pichillilorenzo.flutter_inappwebview.webview.InAppWebViewInterface;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class InAppWebViewSettings implements ISettings<InAppWebViewInterface> {
 
@@ -115,13 +117,13 @@ public class InAppWebViewSettings implements ISettings<InAppWebViewInterface> {
   @Nullable
   public String horizontalScrollbarTrackColor;
   public Boolean algorithmicDarkeningAllowed = false;
-  @Nullable
-  public Integer requestedWithHeaderMode;
   public Boolean enterpriseAuthenticationAppLinkPolicyEnabled = true;
   @Nullable
   public Map<String, Object> webViewAssetLoader;
   @Nullable
   public byte[] defaultVideoPoster;
+  @Nullable
+  public Set<String> requestedWithHeaderOriginAllowList;
 
   @NonNull
   @Override
@@ -383,9 +385,6 @@ public class InAppWebViewSettings implements ISettings<InAppWebViewInterface> {
         case "algorithmicDarkeningAllowed":
           algorithmicDarkeningAllowed = (Boolean) value;
           break;
-        case "requestedWithHeaderMode":
-          requestedWithHeaderMode = (Integer) value;
-          break;
         case "enterpriseAuthenticationAppLinkPolicyEnabled":
           enterpriseAuthenticationAppLinkPolicyEnabled = (Boolean) value;
           break;
@@ -397,6 +396,9 @@ public class InAppWebViewSettings implements ISettings<InAppWebViewInterface> {
           break;
         case "defaultVideoPoster":
           defaultVideoPoster = (byte[]) value;
+          break;
+        case "requestedWithHeaderOriginAllowList":
+          requestedWithHeaderOriginAllowList = new HashSet<>((List<String>) value);
           break;
       }
     }
@@ -491,10 +493,11 @@ public class InAppWebViewSettings implements ISettings<InAppWebViewInterface> {
     settings.put("horizontalScrollbarThumbColor", horizontalScrollbarThumbColor);
     settings.put("horizontalScrollbarTrackColor", horizontalScrollbarTrackColor);
     settings.put("algorithmicDarkeningAllowed", algorithmicDarkeningAllowed);
-    settings.put("requestedWithHeaderMode", requestedWithHeaderMode);
     settings.put("enterpriseAuthenticationAppLinkPolicyEnabled", enterpriseAuthenticationAppLinkPolicyEnabled);
     settings.put("allowBackgroundAudioPlaying", allowBackgroundAudioPlaying);
     settings.put("defaultVideoPoster", defaultVideoPoster);
+    settings.put("requestedWithHeaderOriginAllowList",
+            requestedWithHeaderOriginAllowList != null ? new ArrayList<>(requestedWithHeaderOriginAllowList) : null);
     return settings;
   }
 
@@ -586,11 +589,11 @@ public class InAppWebViewSettings implements ISettings<InAppWebViewInterface> {
       if (WebViewFeature.isFeatureSupported(WebViewFeature.ALGORITHMIC_DARKENING) && Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
         realSettings.put("algorithmicDarkeningAllowed", WebSettingsCompat.isAlgorithmicDarkeningAllowed(settings));
       }
-      if (WebViewFeature.isFeatureSupported(WebViewFeature.REQUESTED_WITH_HEADER_CONTROL)) {
-        realSettings.put("requestedWithHeaderMode", WebSettingsCompat.getRequestedWithHeaderMode(settings));
-      }
       if (WebViewFeature.isFeatureSupported(WebViewFeature.ENTERPRISE_AUTHENTICATION_APP_LINK_POLICY)) {
         realSettings.put("enterpriseAuthenticationAppLinkPolicyEnabled", WebSettingsCompat.getEnterpriseAuthenticationAppLinkPolicyEnabled(settings));
+      }
+      if (WebViewFeature.isFeatureSupported(WebViewFeature.REQUESTED_WITH_HEADER_ALLOW_LIST)) {
+        realSettings.put("requestedWithHeaderOriginAllowList", new ArrayList<>(WebSettingsCompat.getRequestedWithHeaderOriginAllowList(settings)));
       }
     }
     return realSettings;

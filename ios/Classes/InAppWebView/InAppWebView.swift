@@ -224,6 +224,11 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
                     if !self.responds(to: Selector(targetMethodName)) {
                         let customAction: () -> Void = {
                             self.channelDelegate?.onContextMenuActionItemClicked(id: id, title: title)
+                            if #available(iOS 16.0, *) {
+                                if #unavailable(iOS 16.4) {
+                                    self.onHideContextMenu()
+                                }
+                            }
                         }
                         let castedCustomAction: AnyObject = unsafeBitCast(customAction as @convention(block) () -> Void, to: AnyObject.self)
                         let swizzledImplementation = imp_implementationWithBlock(castedCustomAction)
@@ -239,12 +244,50 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
         return super.hitTest(point, with: event)
     }
     
+    @available(iOS 13.0, *)
+    public override func buildMenu(with builder: UIMenuBuilder) {
+        if #available(iOS 16.0, *) {
+            if let menu = contextMenu {
+                let contextMenuSettings = ContextMenuSettings()
+                if let contextMenuSettingsMap = menu["settings"] as? [String: Any?] {
+                    let _ = contextMenuSettings.parse(settings: contextMenuSettingsMap)
+                    if contextMenuSettings.hideDefaultSystemContextMenuItems {
+                        builder.remove(menu: .lookup)
+                    }
+                }
+            }
+            
+            if #unavailable(iOS 16.4), settings?.disableContextMenu == false {
+                contextMenuIsShowing = false
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
+                    self.onCreateContextMenu()
+                }
+            }
+        }
+        super.buildMenu(with: builder)
+    }
+    
+    @available(iOS 16.4, *)
+    public func webView(_ webView: WKWebView, willPresentEditMenuWithAnimator animator: UIEditMenuInteractionAnimating) {
+        onCreateContextMenu()
+    }
+    
+    @available(iOS 16.4, *)
+    public func webView(_ webView: WKWebView, willDismissEditMenuWithAnimator animator: UIEditMenuInteractionAnimating) {
+        onHideContextMenu()
+    }
+    
     public override func canPerformAction(_ action: Selector, withSender sender: Any?) -> Bool {
-        if let _ = sender as? UIMenuController {
-            if self.settings?.disableContextMenu == true {
+        var needCheck = sender is UIMenuController
+        if #available(iOS 13.0, *) {
+            needCheck = sender is UIMenuElement || sender is UIMenuController
+        }
+        
+        if needCheck {
+            if settings?.disableContextMenu == true {
                 if !onCreateContextMenuEventTriggeredWhenMenuDisabled {
                     // workaround to trigger onCreateContextMenu event as the same on Android
-                    self.onCreateContextMenu()
+                    onCreateContextMenu()
                     onCreateContextMenuEventTriggeredWhenMenuDisabled = true
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                         self.onCreateContextMenuEventTriggeredWhenMenuDisabled = false
@@ -265,10 +308,14 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
             
             if contextMenuIsShowing, !action.description.starts(with: "onContextMenuActionItemClicked-") {
                 let id = action.description.compactMap({ $0.asciiValue?.description }).joined()
-                self.channelDelegate?.onContextMenuActionItemClicked(id: id, title: action.description)
+                channelDelegate?.onContextMenuActionItemClicked(id: id, title: action.description)
+                if #available(iOS 16.0, *) {
+                    if #unavailable(iOS 16.4) {
+                        onHideContextMenu()
+                    }
+                }
             }
         }
-        
         return super.canPerformAction(action, withSender: sender)
     }
     
@@ -320,17 +367,19 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
                 context: nil)
         }
         
-        NotificationCenter.default.addObserver(
-                        self,
-                        selector: #selector(onCreateContextMenu),
-                        name: UIMenuController.willShowMenuNotification,
-                        object: nil)
-        
-        NotificationCenter.default.addObserver(
-                        self,
-                        selector: #selector(onHideContextMenu),
-                        name: UIMenuController.didHideMenuNotification,
-                        object: nil)
+        if #unavailable(iOS 16.0) {
+            NotificationCenter.default.addObserver(
+                self,
+                selector: #selector(onCreateContextMenu),
+                name: UIMenuController.willShowMenuNotification,
+                object: nil)
+            
+            NotificationCenter.default.addObserver(
+                self,
+                selector: #selector(onHideContextMenu),
+                name: UIMenuController.didHideMenuNotification,
+                object: nil)
+        }
         
         // TODO: Still not working on iOS 16.0!
 //        if #available(iOS 16.0, *) {

@@ -17,12 +17,11 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
 
   InAppWebViewController? webViewController;
   InAppWebViewSettings settings = InAppWebViewSettings(
-    isInspectable: kDebugMode,
-    mediaPlaybackRequiresUserGesture: false,
-    allowsInlineMediaPlayback: true,
-    iframeAllow: "camera; microphone",
-    iframeAllowFullscreen: true
-  );
+      isInspectable: kDebugMode,
+      mediaPlaybackRequiresUserGesture: false,
+      allowsInlineMediaPlayback: true,
+      iframeAllow: "camera; microphone",
+      iframeAllowFullscreen: true);
 
   PullToRefreshController? pullToRefreshController;
 
@@ -63,7 +62,9 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
               contextMenuItemClicked.title);
         });
 
-    pullToRefreshController = kIsWeb || ![TargetPlatform.iOS, TargetPlatform.android].contains(defaultTargetPlatform)
+    pullToRefreshController = kIsWeb ||
+            ![TargetPlatform.iOS, TargetPlatform.android]
+                .contains(defaultTargetPlatform)
         ? null
         : PullToRefreshController(
             settings: PullToRefreshSettings(
@@ -121,7 +122,7 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                   // initialFile: "assets/index.html",
                   initialUserScripts: UnmodifiableListView<UserScript>([]),
                   initialSettings: settings,
-                  // contextMenu: contextMenu,
+                  contextMenu: contextMenu,
                   pullToRefreshController: pullToRefreshController,
                   onWebViewCreated: (controller) async {
                     webViewController = controller;

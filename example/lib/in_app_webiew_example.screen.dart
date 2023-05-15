@@ -17,6 +17,7 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
 
   InAppWebViewController? webViewController;
   InAppWebViewSettings settings = InAppWebViewSettings(
+      isInspectable: kDebugMode,
       mediaPlaybackRequiresUserGesture: false,
       allowsInlineMediaPlayback: true,
       iframeAllow: "camera; microphone",
@@ -44,7 +45,7 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                 await webViewController?.clearFocus();
               })
         ],
-        settings: ContextMenuSettings(hideDefaultSystemContextMenuItems: true),
+        settings: ContextMenuSettings(hideDefaultSystemContextMenuItems: false),
         onCreateContextMenu: (hitTestResult) async {
           print("onCreateContextMenu");
           print(hitTestResult.extra);

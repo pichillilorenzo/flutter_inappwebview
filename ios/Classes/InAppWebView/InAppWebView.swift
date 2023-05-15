@@ -224,6 +224,11 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
                     if !self.responds(to: Selector(targetMethodName)) {
                         let customAction: () -> Void = {
                             self.channelDelegate?.onContextMenuActionItemClicked(id: id, title: title)
+                            if #available(iOS 16.0, *) {
+                                if #unavailable(iOS 16.4) {
+                                    self.onHideContextMenu()
+                                }
+                            }
                         }
                         let castedCustomAction: AnyObject = unsafeBitCast(customAction as @convention(block) () -> Void, to: AnyObject.self)
                         let swizzledImplementation = imp_implementationWithBlock(castedCustomAction)
@@ -239,8 +244,6 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
         return super.hitTest(point, with: event)
     }
     
-  
-    
     @available(iOS 13.0, *)
     public override func buildMenu(with builder: UIMenuBuilder) {
         if #available(iOS 16.0, *) {
@@ -248,43 +251,71 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
                 let contextMenuSettings = ContextMenuSettings()
                 if let contextMenuSettingsMap = menu["settings"] as? [String: Any?] {
                     let _ = contextMenuSettings.parse(settings: contextMenuSettingsMap)
-                    if  contextMenuSettings.hideDefaultSystemContextMenuItems {
+                    if contextMenuSettings.hideDefaultSystemContextMenuItems {
                         builder.remove(menu: .lookup)
                     }
+                }
+            }
+            
+            if #unavailable(iOS 16.4), settings?.disableContextMenu == false {
+                contextMenuIsShowing = false
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
+                    self.onCreateContextMenu()
                 }
             }
         }
         super.buildMenu(with: builder)
     }
     
+    @available(iOS 16.4, *)
+    public func webView(_ webView: WKWebView, willPresentEditMenuWithAnimator animator: UIEditMenuInteractionAnimating) {
+        onCreateContextMenu()
+    }
+    
+    @available(iOS 16.4, *)
+    public func webView(_ webView: WKWebView, willDismissEditMenuWithAnimator animator: UIEditMenuInteractionAnimating) {
+        onHideContextMenu()
+    }
+    
     public override func canPerformAction(_ action: Selector, withSender sender: Any?) -> Bool {
-        if self.settings?.disableContextMenu == true {
-            if !onCreateContextMenuEventTriggeredWhenMenuDisabled {
-                // workaround to trigger onCreateContextMenu event as the same on Android
-                self.onCreateContextMenu()
-                onCreateContextMenuEventTriggeredWhenMenuDisabled = true
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                    self.onCreateContextMenuEventTriggeredWhenMenuDisabled = false
+        var needCheck = sender is UIMenuController
+        if #available(iOS 13.0, *) {
+            needCheck = sender is UIMenuElement || sender is UIMenuController
+        }
+        
+        if needCheck {
+            if settings?.disableContextMenu == true {
+                if !onCreateContextMenuEventTriggeredWhenMenuDisabled {
+                    // workaround to trigger onCreateContextMenu event as the same on Android
+                    onCreateContextMenu()
+                    onCreateContextMenuEventTriggeredWhenMenuDisabled = true
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                        self.onCreateContextMenuEventTriggeredWhenMenuDisabled = false
+                    }
+                }
+                return false
+            }
+            
+            if let menu = contextMenu {
+                let contextMenuSettings = ContextMenuSettings()
+                if let contextMenuSettingsMap = menu["settings"] as? [String: Any?] {
+                    let _ = contextMenuSettings.parse(settings: contextMenuSettingsMap)
+                    if !action.description.starts(with: "onContextMenuActionItemClicked-") && contextMenuSettings.hideDefaultSystemContextMenuItems {
+                        return false
+                    }
                 }
             }
-            return false
-        }
-        
-        if let menu = contextMenu {
-            let contextMenuSettings = ContextMenuSettings()
-            if let contextMenuSettingsMap = menu["settings"] as? [String: Any?] {
-                let _ = contextMenuSettings.parse(settings: contextMenuSettingsMap)
-                if !action.description.starts(with: "onContextMenuActionItemClicked-") && contextMenuSettings.hideDefaultSystemContextMenuItems {
-                    return false
+            
+            if contextMenuIsShowing, !action.description.starts(with: "onContextMenuActionItemClicked-") {
+                let id = action.description.compactMap({ $0.asciiValue?.description }).joined()
+                channelDelegate?.onContextMenuActionItemClicked(id: id, title: action.description)
+                if #available(iOS 16.0, *) {
+                    if #unavailable(iOS 16.4) {
+                        onHideContextMenu()
+                    }
                 }
             }
         }
-        
-        if contextMenuIsShowing, !action.description.starts(with: "onContextMenuActionItemClicked-") {
-            let id = action.description.compactMap({ $0.asciiValue?.description }).joined()
-            self.channelDelegate?.onContextMenuActionItemClicked(id: id, title: action.description)
-        }
-        
         return super.canPerformAction(action, withSender: sender)
     }
     
@@ -336,17 +367,19 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
                 context: nil)
         }
         
-        NotificationCenter.default.addObserver(
-                        self,
-                        selector: #selector(onCreateContextMenu),
-                        name: UIMenuController.willShowMenuNotification,
-                        object: nil)
-        
-        NotificationCenter.default.addObserver(
-                        self,
-                        selector: #selector(onHideContextMenu),
-                        name: UIMenuController.didHideMenuNotification,
-                        object: nil)
+        if #unavailable(iOS 16.0) {
+            NotificationCenter.default.addObserver(
+                self,
+                selector: #selector(onCreateContextMenu),
+                name: UIMenuController.willShowMenuNotification,
+                object: nil)
+            
+            NotificationCenter.default.addObserver(
+                self,
+                selector: #selector(onHideContextMenu),
+                name: UIMenuController.didHideMenuNotification,
+                object: nil)
+        }
         
         // TODO: Still not working on iOS 16.0!
 //        if #available(iOS 16.0, *) {
@@ -443,8 +476,9 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
                 isFindInteractionEnabled = settings.isFindInteractionEnabled
             }
             
-            // debugging is always enabled for iOS,
-            // there isn't any option to set about it such as on Android.
+            if #available(iOS 16.4, *) {
+                isInspectable = settings.isInspectable
+            }
             
             if settings.clearCache {
                 clearCache()
@@ -480,13 +514,15 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
                 configuration.defaultWebpagePreferences.allowsContentJavaScript = settings.javaScriptEnabled
             }
             
-            if #available(iOS 14.5, *) {
+            if #available(iOS 15.0, *) {
                 configuration.preferences.isTextInteractionEnabled = settings.isTextInteractionEnabled
             }
-            
             if #available(iOS 15.4, *) {
                 configuration.preferences.isSiteSpecificQuirksModeEnabled = settings.isSiteSpecificQuirksModeEnabled
                 configuration.preferences.isElementFullscreenEnabled = settings.isElementFullscreenEnabled
+            }
+            if #available(iOS 16.4, *) {
+                configuration.preferences.shouldPrintBackgrounds = settings.shouldPrintBackgrounds
             }
         }
     }
@@ -628,11 +664,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
         contextMenuIsShowing = true
         
         let hitTestResult = HitTestResult(type: .unknownType, extra: nil)
-
-
-
-
-
+        
         if let lastLongPressTouhLocation = lastLongPressTouchPoint {
             if configuration.preferences.javaScriptEnabled {
                 self.evaluateJavaScript("window.\(JAVASCRIPT_BRIDGE_NAME)._findElementsAtPoint(\(lastLongPressTouhLocation.x),\(lastLongPressTouhLocation.y))", completionHandler: {(value, error) in
@@ -1207,16 +1239,13 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
             }
         }
         
-        if #available(iOS 14.5, *) {
+        if #available(iOS 15.0, *) {
             if newSettingsMap["upgradeKnownHostsToHTTPS"] != nil && settings?.upgradeKnownHostsToHTTPS != newSettings.upgradeKnownHostsToHTTPS {
                 configuration.upgradeKnownHostsToHTTPS = newSettings.upgradeKnownHostsToHTTPS
             }
             if newSettingsMap["isTextInteractionEnabled"] != nil && settings?.isTextInteractionEnabled != newSettings.isTextInteractionEnabled {
                 configuration.preferences.isTextInteractionEnabled = newSettings.isTextInteractionEnabled
             }
-        }
-        
-        if #available(iOS 15.0, *) {
             if newSettingsMap["underPageBackgroundColor"] != nil, settings?.underPageBackgroundColor != newSettings.underPageBackgroundColor,
                let underPageBackgroundColor = newSettings.underPageBackgroundColor, !underPageBackgroundColor.isEmpty {
                 self.underPageBackgroundColor = UIColor(hexString: underPageBackgroundColor)
@@ -1234,10 +1263,17 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
                 setMinimumViewportInset(minViewportInset, maximumViewportInset: maxViewportInset)
             }
         }
-        
         if #available(iOS 16.0, *) {
             if newSettingsMap["isFindInteractionEnabled"] != nil, settings?.isFindInteractionEnabled != newSettings.isFindInteractionEnabled {
                 isFindInteractionEnabled = newSettings.isFindInteractionEnabled
+            }
+        }
+        if #available(iOS 16.4, *) {
+            if newSettingsMap["isInspectable"] != nil, settings?.isInspectable != newSettings.isInspectable {
+                isInspectable = newSettings.isInspectable
+            }
+            if newSettingsMap["shouldPrintBackgrounds"] != nil, settings?.shouldPrintBackgrounds != newSettings.shouldPrintBackgrounds {
+                configuration.preferences.shouldPrintBackgrounds = newSettings.shouldPrintBackgrounds
             }
         }
         

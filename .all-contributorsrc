@@ -603,6 +603,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "heralight",
+      "name": "Alexandre Richonnier",
+      "avatar_url": "https://avatars.githubusercontent.com/u/534840?v=4",
+      "profile": "https://www.hera.cc",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,

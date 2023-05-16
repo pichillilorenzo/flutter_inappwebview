@@ -1,3 +1,7 @@
+## 6.0.0-beta.24
+
+- Merged "fix #1389 #1315 contextMenu ios 13" [#1575](https://github.com/pichillilorenzo/flutter_inappwebview/pull/1575) (thanks to [heralight](https://github.com/heralight))
+
 ## 6.0.0-beta.23
 
 - Updated `androidx.webkit:webkit` dependency to `1.6.1`

@@ -228,7 +228,8 @@ public class InAppBrowserWindow : NSWindow, NSWindowDelegate, NSToolbarDelegate,
            !(NSApplication.shared.mainWindow?.tabbedWindows?.contains(self) ?? false),
            browserSettings?.windowType == .tabbed {
             NSApplication.shared.mainWindow?.addTabbedWindow(self, ordered: .above)
-        } else if !(NSApplication.shared.mainWindow?.childWindows?.contains(self) ?? false) {
+        } else if !(NSApplication.shared.mainWindow?.childWindows?.contains(self) ?? false),
+                browserSettings?.windowType == .child {
             NSApplication.shared.mainWindow?.addChildWindow(self, ordered: .above)
         } else {
             orderFront(self)

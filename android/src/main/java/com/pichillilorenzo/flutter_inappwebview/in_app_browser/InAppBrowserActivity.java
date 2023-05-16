@@ -539,16 +539,6 @@ public class InAppBrowserActivity extends AppCompatActivity implements InAppBrow
       if (webView.channelDelegate != null) {
         webView.channelDelegate.dispose();
       }
-      ViewGroup vg = (ViewGroup) (webView.getParent());
-      if (vg != null) {
-        // Modified view removal to try and fix a crash
-        for (int i = 0; i < vg.getChildCount(); i++) {
-          View v = vg.getChildAt(i);
-          v.setVisibility(View.GONE);
-        }
-        // instead of using
-//        vg.removeView(webView);
-      }
       webView.setWebChromeClient(new WebChromeClient());
       webView.setWebViewClient(new WebViewClient() {
         public void onPageFinished(WebView view, String url) {

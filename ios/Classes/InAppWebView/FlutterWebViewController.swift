@@ -63,7 +63,7 @@ public class FlutterWebViewController: NSObject, FlutterPlatformView, Disposable
         pullToRefreshControl.prepare()
         
         let findInteractionController = FindInteractionController(
-            registrar: SwiftFlutterPlugin.instance!.registrar!,
+            registrar: registrar,
             id: viewId, webView: webView!, settings: nil)
         webView!.findInteractionController = findInteractionController
         findInteractionController.prepare()

@@ -12,6 +12,7 @@ import SafariServices
 public class WebAuthenticationSession : NSObject, ASWebAuthenticationPresentationContextProviding, Disposable {
     static let METHOD_CHANNEL_NAME_PREFIX = "com.pichillilorenzo/flutter_webauthenticationsession_"
     var id: String
+    var plugin: SwiftFlutterPlugin?
     var url: URL
     var callbackURLScheme: String?
     var settings: WebAuthenticationSessionSettings
@@ -19,8 +20,9 @@ public class WebAuthenticationSession : NSObject, ASWebAuthenticationPresentatio
     var channelDelegate: WebAuthenticationSessionChannelDelegate?
     private var _canStart = true
     
-    public init(id: String, url: URL, callbackURLScheme: String?, settings: WebAuthenticationSessionSettings) {
+    public init(plugin: SwiftFlutterPlugin, id: String, url: URL, callbackURLScheme: String?, settings: WebAuthenticationSessionSettings) {
         self.id = id
+        self.plugin = plugin
         self.url = url
         self.settings = settings
         super.init()
@@ -35,7 +37,7 @@ public class WebAuthenticationSession : NSObject, ASWebAuthenticationPresentatio
             self.session = SFAuthenticationSession(url: self.url, callbackURLScheme: self.callbackURLScheme, completionHandler: self.completionHandler)
         }
         let channel = FlutterMethodChannel(name: WebAuthenticationSession.METHOD_CHANNEL_NAME_PREFIX + id,
-                                           binaryMessenger: SwiftFlutterPlugin.instance!.registrar!.messenger())
+                                           binaryMessenger: plugin.registrar!.messenger())
         self.channelDelegate = WebAuthenticationSessionChannelDelegate(webAuthenticationSession: self, channel: channel)
     }
     
@@ -97,6 +99,7 @@ public class WebAuthenticationSession : NSObject, ASWebAuthenticationPresentatio
         channelDelegate = nil
         session = nil
         WebAuthenticationSessionManager.sessions[id] = nil
+        plugin = nil
     }
     
     deinit {

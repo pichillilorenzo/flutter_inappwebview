@@ -24,7 +24,6 @@ import SafariServices
 
 public class SwiftFlutterPlugin: NSObject, FlutterPlugin {
     
-    static var instance: SwiftFlutterPlugin?
     var registrar: FlutterPluginRegistrar?
     var platformUtil: PlatformUtil?
     var inAppWebViewStatic: InAppWebViewStatic?
@@ -46,24 +45,24 @@ public class SwiftFlutterPlugin: NSObject, FlutterPlugin {
         self.registrar = registrar
         registrar.register(FlutterWebViewFactory(registrar: registrar) as FlutterPlatformViewFactory, withId: FlutterWebViewFactory.VIEW_TYPE_ID)
         
-        platformUtil = PlatformUtil(registrar: registrar)
-        inAppBrowserManager = InAppBrowserManager(registrar: registrar)
-        headlessInAppWebViewManager = HeadlessInAppWebViewManager(registrar: registrar)
-        chromeSafariBrowserManager = ChromeSafariBrowserManager(registrar: registrar)
-        inAppWebViewStatic = InAppWebViewStatic(registrar: registrar)
-        credentialDatabase = CredentialDatabase(registrar: registrar)
+        platformUtil = PlatformUtil(plugin: self)
+        inAppBrowserManager = InAppBrowserManager(plugin: self)
+        headlessInAppWebViewManager = HeadlessInAppWebViewManager(plugin: self)
+        chromeSafariBrowserManager = ChromeSafariBrowserManager(plugin: self)
+        inAppWebViewStatic = InAppWebViewStatic(plugin: self)
+        credentialDatabase = CredentialDatabase(plugin: self)
         if #available(iOS 11.0, *) {
-            myCookieManager = MyCookieManager(registrar: registrar)
+            myCookieManager = MyCookieManager(plugin: self)
         }
         if #available(iOS 9.0, *) {
-            myWebStorageManager = MyWebStorageManager(registrar: registrar)
+            myWebStorageManager = MyWebStorageManager(plugin: self)
         }
-        webAuthenticationSessionManager = WebAuthenticationSessionManager(registrar: registrar)
+        webAuthenticationSessionManager = WebAuthenticationSessionManager(plugin: self)
         printJobManager = PrintJobManager()
     }
     
     public static func register(with registrar: FlutterPluginRegistrar) {
-        SwiftFlutterPlugin.instance = SwiftFlutterPlugin(with: registrar)
+        let _ = SwiftFlutterPlugin(with: registrar)
     }
     
     public func detachFromEngine(for registrar: FlutterPluginRegistrar) {

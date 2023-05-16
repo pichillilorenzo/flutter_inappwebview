@@ -23,6 +23,7 @@ public class InAppBrowserWebViewController: UIViewController, InAppBrowserDelega
     
     var tmpWindow: UIWindow?
     var id: String = ""
+    var plugin: SwiftFlutterPlugin?
     var windowId: Int64?
     var webView: InAppWebView?
     var channelDelegate: InAppBrowserChannelDelegate?
@@ -41,7 +42,11 @@ public class InAppBrowserWebViewController: UIViewController, InAppBrowserDelega
     var isHidden = false
 
     public override func loadView() {
-        let channel = FlutterMethodChannel(name: InAppBrowserWebViewController.METHOD_CHANNEL_NAME_PREFIX + id, binaryMessenger: SwiftFlutterPlugin.instance!.registrar!.messenger())
+        guard let registrar = plugin?.registrar else {
+            return
+        }
+        
+        let channel = FlutterMethodChannel(name: InAppBrowserWebViewController.METHOD_CHANNEL_NAME_PREFIX + id, binaryMessenger: registrar.messenger())
         channelDelegate = InAppBrowserChannelDelegate(channel: channel)
         
         var userScripts: [UserScript] = []
@@ -73,13 +78,13 @@ public class InAppBrowserWebViewController: UIViewController, InAppBrowserDelega
         
         let pullToRefreshSettings = PullToRefreshSettings()
         let _ = pullToRefreshSettings.parse(settings: pullToRefreshInitialSettings)
-        let pullToRefreshControl = PullToRefreshControl(registrar: SwiftFlutterPlugin.instance!.registrar!, id: id, settings: pullToRefreshSettings)
+        let pullToRefreshControl = PullToRefreshControl(registrar: registrar, id: id, settings: pullToRefreshSettings)
         webView.pullToRefreshControl = pullToRefreshControl
         pullToRefreshControl.delegate = webView
         pullToRefreshControl.prepare()
         
         let findInteractionController = FindInteractionController(
-            registrar: SwiftFlutterPlugin.instance!.registrar!,
+            registrar: registrar,
             id: id, webView: webView, settings: nil)
         webView.findInteractionController = findInteractionController
         findInteractionController.prepare()
@@ -578,6 +583,7 @@ public class InAppBrowserWebViewController: UIViewController, InAppBrowserDelega
         backButton.target = nil
         reloadButton.target = nil
         shareButton.target = nil
+        plugin = nil
     }
     
     deinit {

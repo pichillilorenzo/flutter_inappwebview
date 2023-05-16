@@ -11,13 +11,12 @@ import FlutterMacOS
 
 public class MyWebStorageManager: ChannelDelegate {
     static let METHOD_CHANNEL_NAME = "com.pichillilorenzo/flutter_inappwebview_webstoragemanager"
-    static var registrar: FlutterPluginRegistrar?
-    static var websiteDataStore: WKWebsiteDataStore?
+    var plugin: InAppWebViewFlutterPlugin?
+    static var websiteDataStore = WKWebsiteDataStore.default()
     
-    init(registrar: FlutterPluginRegistrar) {
-        super.init(channel: FlutterMethodChannel(name: MyWebStorageManager.METHOD_CHANNEL_NAME, binaryMessenger: registrar.messenger))
-        MyWebStorageManager.registrar = registrar
-        MyWebStorageManager.websiteDataStore = WKWebsiteDataStore.default()
+    init(plugin: InAppWebViewFlutterPlugin) {
+        super.init(channel: FlutterMethodChannel(name: MyWebStorageManager.METHOD_CHANNEL_NAME, binaryMessenger: plugin.registrar!.messenger))
+        self.plugin = plugin
     }
     
     public override func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
@@ -46,12 +45,7 @@ public class MyWebStorageManager: ChannelDelegate {
     public static func fetchDataRecords(dataTypes: Set<String>, result: @escaping FlutterResult) {
         var recordList: [[String: Any?]] = []
         
-        guard let websiteDataStore = MyWebStorageManager.websiteDataStore else {
-            result(recordList)
-            return
-        }
-        
-        websiteDataStore.fetchDataRecords(ofTypes: dataTypes) { (data) in
+        MyWebStorageManager.websiteDataStore.fetchDataRecords(ofTypes: dataTypes) { (data) in
             for record in data {
                 recordList.append([
                     "displayName": record.displayName,
@@ -67,12 +61,7 @@ public class MyWebStorageManager: ChannelDelegate {
     public static func removeDataFor(dataTypes: Set<String>, recordList: [[String: Any?]], result: @escaping FlutterResult) {
         var records: [WKWebsiteDataRecord] = []
         
-        guard let websiteDataStore = MyWebStorageManager.websiteDataStore else {
-            result(false)
-            return
-        }
-        
-        websiteDataStore.fetchDataRecords(ofTypes: dataTypes) { (data) in
+        MyWebStorageManager.websiteDataStore.fetchDataRecords(ofTypes: dataTypes) { (data) in
             for record in data {
                 for r in recordList {
                     let displayName = r["displayName"] as! String
@@ -89,21 +78,15 @@ public class MyWebStorageManager: ChannelDelegate {
     }
     
     public static func removeDataModifiedSince(dataTypes: Set<String>, timestamp: Int64, result: @escaping FlutterResult) {
-        guard let websiteDataStore = MyWebStorageManager.websiteDataStore else {
-            result(false)
-            return
-        }
-        
         let date = NSDate(timeIntervalSince1970: TimeInterval(timestamp))
-        websiteDataStore.removeData(ofTypes: dataTypes, modifiedSince: date as Date) {
+        MyWebStorageManager.websiteDataStore.removeData(ofTypes: dataTypes, modifiedSince: date as Date) {
             result(true)
         }
     }
     
     public override func dispose() {
         super.dispose()
-        MyWebStorageManager.registrar = nil
-        MyWebStorageManager.websiteDataStore = nil
+        plugin = nil
     }
     
     deinit {

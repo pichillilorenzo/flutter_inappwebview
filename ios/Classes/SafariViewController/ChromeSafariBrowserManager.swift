@@ -14,14 +14,14 @@ import SafariServices
 
 public class ChromeSafariBrowserManager: ChannelDelegate {
     static let METHOD_CHANNEL_NAME = "com.pichillilorenzo/flutter_chromesafaribrowser"
-    static var registrar: FlutterPluginRegistrar?
+    var plugin: SwiftFlutterPlugin?
     static var browsers: [String: SafariViewController?] = [:]
     @available(iOS 15.0, *)
     static var prewarmingTokens: [String: SFSafariViewController.PrewarmingToken?] = [:]
     
-    init(registrar: FlutterPluginRegistrar) {
-        super.init(channel: FlutterMethodChannel(name: ChromeSafariBrowserManager.METHOD_CHANNEL_NAME, binaryMessenger: registrar.messenger()))
-        ChromeSafariBrowserManager.registrar = registrar
+    init(plugin: SwiftFlutterPlugin) {
+        super.init(channel: FlutterMethodChannel(name: ChromeSafariBrowserManager.METHOD_CHANNEL_NAME, binaryMessenger: plugin.registrar!.messenger()))
+        self.plugin = plugin
     }
     
     public override func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
@@ -89,7 +89,7 @@ public class ChromeSafariBrowserManager: ChannelDelegate {
     public func open(id: String, url: String, settings: [String: Any?], menuItemList: [[String: Any]], result: @escaping FlutterResult) {
         let absoluteUrl = URL(string: url)!.absoluteURL
         
-        if #available(iOS 9.0, *) {
+        if #available(iOS 9.0, *), let plugin = plugin {
             
             if let flutterViewController = UIApplication.shared.delegate?.window.unsafelyUnwrapped?.rootViewController {
                 // flutterViewController could be casted to FlutterViewController if needed
@@ -101,11 +101,11 @@ public class ChromeSafariBrowserManager: ChannelDelegate {
                 
                 if #available(iOS 11.0, *) {
                     let config = SFSafariViewController.Configuration()
-                    safari = SafariViewController(id: id, url: absoluteUrl, configuration: config,
+                    safari = SafariViewController(plugin: plugin, id: id, url: absoluteUrl, configuration: config,
                                                   menuItemList: menuItemList, safariSettings: safariSettings)
                 } else {
                     // Fallback on earlier versions
-                    safari = SafariViewController(id: id, url: absoluteUrl, entersReaderIfAvailable: safariSettings.entersReaderIfAvailable,
+                    safari = SafariViewController(plugin: plugin, id: id, url: absoluteUrl, entersReaderIfAvailable: safariSettings.entersReaderIfAvailable,
                                                   menuItemList: menuItemList, safariSettings: safariSettings)
                 }
                 
@@ -125,7 +125,6 @@ public class ChromeSafariBrowserManager: ChannelDelegate {
     
     public override func dispose() {
         super.dispose()
-        ChromeSafariBrowserManager.registrar = nil
         let browsers = ChromeSafariBrowserManager.browsers.values
         browsers.forEach { (browser: SafariViewController?) in
             browser?.close(result: nil)
@@ -138,6 +137,7 @@ public class ChromeSafariBrowserManager: ChannelDelegate {
             }
             ChromeSafariBrowserManager.prewarmingTokens.removeAll()
         }
+        plugin = nil
     }
     
     deinit {

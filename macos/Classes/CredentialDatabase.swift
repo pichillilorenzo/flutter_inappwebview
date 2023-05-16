@@ -10,13 +10,12 @@ import FlutterMacOS
 
 public class CredentialDatabase: ChannelDelegate {
     static let METHOD_CHANNEL_NAME = "com.pichillilorenzo/flutter_inappwebview_credential_database"
-    static var registrar: FlutterPluginRegistrar?
-    static var credentialStore: URLCredentialStorage?
+    var plugin: InAppWebViewFlutterPlugin?
+    static var credentialStore = URLCredentialStorage.shared
 
-    init(registrar: FlutterPluginRegistrar) {
-        super.init(channel: FlutterMethodChannel(name: CredentialDatabase.METHOD_CHANNEL_NAME, binaryMessenger: registrar.messenger))
-        CredentialDatabase.registrar = registrar
-        CredentialDatabase.credentialStore = URLCredentialStorage.shared
+    init(plugin: InAppWebViewFlutterPlugin) {
+        super.init(channel: FlutterMethodChannel(name: CredentialDatabase.METHOD_CHANNEL_NAME, binaryMessenger: plugin.registrar!.messenger))
+        self.plugin = plugin
     }
 
     public override func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
@@ -24,11 +23,8 @@ public class CredentialDatabase: ChannelDelegate {
         switch call.method {
             case "getAllAuthCredentials":
                 var allCredentials: [[String: Any?]] = []
-                guard let credentialStore = CredentialDatabase.credentialStore else {
-                    result(allCredentials)
-                    return
-                }
-                for (protectionSpace, credentials) in credentialStore.allCredentials {
+
+                for (protectionSpace, credentials) in CredentialDatabase.credentialStore.allCredentials {
                     var crendentials: [[String: Any?]] = []
                     for c in credentials {
                         let credential: [String: Any?] = c.value.toMap()
@@ -46,11 +42,7 @@ public class CredentialDatabase: ChannelDelegate {
                 break
             case "getHttpAuthCredentials":
                 var crendentials: [[String: Any?]] = []
-                guard let credentialStore = CredentialDatabase.credentialStore else {
-                    result(crendentials)
-                    return
-                }
-            
+
                 let host = arguments!["host"] as! String
                 let urlProtocol = arguments!["protocol"] as? String
                 let urlPort = arguments!["port"] as? Int ?? 0
@@ -59,7 +51,7 @@ public class CredentialDatabase: ChannelDelegate {
                     realm = nil
                 }
 
-                for (protectionSpace, credentials) in credentialStore.allCredentials {
+                for (protectionSpace, credentials) in CredentialDatabase.credentialStore.allCredentials {
                     if protectionSpace.host == host && protectionSpace.realm == realm &&
                     protectionSpace.protocol == urlProtocol && protectionSpace.port == urlPort {
                         for c in credentials {
@@ -71,11 +63,6 @@ public class CredentialDatabase: ChannelDelegate {
                 result(crendentials)
                 break
             case "setHttpAuthCredential":
-                guard let credentialStore = CredentialDatabase.credentialStore else {
-                    result(false)
-                    return
-                }
-            
                 let host = arguments!["host"] as! String
                 let urlProtocol = arguments!["protocol"] as? String
                 let urlPort = arguments!["port"] as? Int ?? 0
@@ -86,17 +73,12 @@ public class CredentialDatabase: ChannelDelegate {
                 let username = arguments!["username"] as! String
                 let password = arguments!["password"] as! String
                 let credential = URLCredential(user: username, password: password, persistence: .permanent)
-                credentialStore.set(credential,
+                CredentialDatabase.credentialStore.set(credential,
                                     for: URLProtectionSpace(host: host, port: urlPort, protocol: urlProtocol,
                                                             realm: realm, authenticationMethod: NSURLAuthenticationMethodHTTPBasic))
                 result(true)
                 break
             case "removeHttpAuthCredential":
-                guard let credentialStore = CredentialDatabase.credentialStore else {
-                    result(false)
-                    return
-                }
-            
                 let host = arguments!["host"] as! String
                 let urlProtocol = arguments!["protocol"] as? String
                 let urlPort = arguments!["port"] as? Int ?? 0
@@ -110,7 +92,7 @@ public class CredentialDatabase: ChannelDelegate {
                 var credential: URLCredential? = nil;
                 var protectionSpaceCredential: URLProtectionSpace? = nil
                 
-                for (protectionSpace, credentials) in credentialStore.allCredentials {
+                for (protectionSpace, credentials) in CredentialDatabase.credentialStore.allCredentials {
                     if protectionSpace.host == host && protectionSpace.realm == realm &&
                     protectionSpace.protocol == urlProtocol && protectionSpace.port == urlPort {
                         for c in credentials {
@@ -127,17 +109,12 @@ public class CredentialDatabase: ChannelDelegate {
                 }
                 
                 if let c = credential, let protectionSpace = protectionSpaceCredential {
-                    credentialStore.remove(c, for: protectionSpace)
+                    CredentialDatabase.credentialStore.remove(c, for: protectionSpace)
                 }
                 
                 result(true)
                 break
             case "removeHttpAuthCredentials":
-                guard let credentialStore = CredentialDatabase.credentialStore else {
-                    result(false)
-                    return
-                }
-            
                 let host = arguments!["host"] as! String
                 let urlProtocol = arguments!["protocol"] as? String
                 let urlPort = arguments!["port"] as? Int ?? 0
@@ -149,7 +126,7 @@ public class CredentialDatabase: ChannelDelegate {
                 var credentialsToRemove: [URLCredential] = [];
                 var protectionSpaceCredential: URLProtectionSpace? = nil
                 
-                for (protectionSpace, credentials) in credentialStore.allCredentials {
+                for (protectionSpace, credentials) in CredentialDatabase.credentialStore.allCredentials {
                     if protectionSpace.host == host && protectionSpace.realm == realm &&
                     protectionSpace.protocol == urlProtocol && protectionSpace.port == urlPort {
                         protectionSpaceCredential = protectionSpace
@@ -164,21 +141,16 @@ public class CredentialDatabase: ChannelDelegate {
                 
                 if let protectionSpace = protectionSpaceCredential {
                     for credential in credentialsToRemove {
-                        credentialStore.remove(credential, for: protectionSpace)
+                        CredentialDatabase.credentialStore.remove(credential, for: protectionSpace)
                     }
                 }
                 
                 result(true)
                 break
             case "clearAllAuthCredentials":
-                guard let credentialStore = CredentialDatabase.credentialStore else {
-                    result(false)
-                    return
-                }
-            
-                for (protectionSpace, credentials) in credentialStore.allCredentials {
+                for (protectionSpace, credentials) in CredentialDatabase.credentialStore.allCredentials {
                     for credential in credentials {
-                        credentialStore.remove(credential.value, for: protectionSpace)
+                        CredentialDatabase.credentialStore.remove(credential.value, for: protectionSpace)
                     }
                 }
                 result(true)
@@ -191,8 +163,7 @@ public class CredentialDatabase: ChannelDelegate {
     
     public override func dispose() {
         super.dispose()
-        CredentialDatabase.registrar = nil
-        CredentialDatabase.credentialStore = nil
+        plugin = nil
     }
     
     deinit {

@@ -16,6 +16,7 @@ public class InAppWebView: WKWebView, WKUIDelegate,
     static var METHOD_CHANNEL_NAME_PREFIX = "com.pichillilorenzo/flutter_inappwebview_"
 
     var id: Any? // viewId
+    var registrar: FlutterPluginRegistrar?
     var windowId: Int64?
     var windowCreated = false
     var inAppBrowserDelegate: InAppBrowserDelegate?
@@ -53,6 +54,7 @@ public class InAppWebView: WKWebView, WKUIDelegate,
          userScripts: [UserScript] = []) {
         super.init(frame: frame, configuration: configuration)
         self.id = id
+        self.registrar = registrar
         if let id = id, let registrar = registrar {
             let channel = FlutterMethodChannel(name: InAppWebView.METHOD_CHANNEL_NAME_PREFIX + String(describing: id),
                                            binaryMessenger: registrar.messenger)
@@ -1367,8 +1369,8 @@ public class InAppWebView: WKWebView, WKUIDelegate,
                             completionHandler(.useCredential, credential)
                             break
                         case 2:
-                            if InAppWebView.credentialsProposed.count == 0, let credentialStore = CredentialDatabase.credentialStore {
-                                for (protectionSpace, credentials) in credentialStore.allCredentials {
+                            if InAppWebView.credentialsProposed.count == 0 {
+                                for (protectionSpace, credentials) in CredentialDatabase.credentialStore.allCredentials {
                                     if protectionSpace.host == host && protectionSpace.realm == realm &&
                                     protectionSpace.protocol == prot && protectionSpace.port == port {
                                         for credential in credentials {
@@ -2356,8 +2358,8 @@ if(window.\(JAVASCRIPT_BRIDGE_NAME)[\(_callHandlerID)] != null) {
                 }
             }
             
-            if let id = printJobId {
-                let printJob = PrintJobController(id: id, job: printOperation, settings: settings)
+            if let id = printJobId, let registrar = registrar {
+                let printJob = PrintJobController(registrar: registrar, id: id, job: printOperation, settings: settings)
                 PrintJobManager.jobs[id] = printJob
                 printJob.present(parentWindow: window, completionHandler: completionHandler)
             } else if let window = window {
@@ -2455,9 +2457,13 @@ if(window.\(JAVASCRIPT_BRIDGE_NAME)[\(_callHandlerID)] != null) {
         }
     }
     
-    public func createWebMessageChannel(completionHandler: ((WebMessageChannel) -> Void)? = nil) -> WebMessageChannel {
+    public func createWebMessageChannel(completionHandler: ((WebMessageChannel?) -> Void)? = nil) -> WebMessageChannel? {
+        guard let registrar = registrar else {
+            completionHandler?(nil)
+            return nil
+        }
         let id = NSUUID().uuidString
-        let webMessageChannel = WebMessageChannel(id: id)
+        let webMessageChannel = WebMessageChannel(registrar: registrar, id: id)
         webMessageChannel.initJsInstance(webView: self, completionHandler: completionHandler)
         webMessageChannels[id] = webMessageChannel
         
@@ -2576,6 +2582,7 @@ if(window.\(JAVASCRIPT_BRIDGE_NAME)[\(_callHandlerID)] != null) {
         isPausedTimersCompletionHandler = nil
         callAsyncJavaScriptBelowIOS14Results.removeAll()
         super.removeFromSuperview()
+        registrar = nil
     }
     
     deinit {

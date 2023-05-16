@@ -220,19 +220,18 @@ public class InAppBrowserWindow : NSWindow, NSWindowDelegate, NSToolbarDelegate,
     
     public func hide() {
         orderOut(self)
-        
     }
     
     public func show() {
+        let mainWindow = parent ?? NSApplication.shared.mainWindow
         if #available(macOS 10.12, *),
-           !(NSApplication.shared.mainWindow?.tabbedWindows?.contains(self) ?? false),
+           !(mainWindow?.tabbedWindows?.contains(self) ?? false),
            browserSettings?.windowType == .tabbed {
-            NSApplication.shared.mainWindow?.addTabbedWindow(self, ordered: .above)
-        } else if !(NSApplication.shared.mainWindow?.childWindows?.contains(self) ?? false) {
-            NSApplication.shared.mainWindow?.addChildWindow(self, ordered: .above)
-        } else {
-            orderFront(self)
+            mainWindow?.addTabbedWindow(self, ordered: .above)
+        } else if !(mainWindow?.childWindows?.contains(self) ?? false) {
+            mainWindow?.addChildWindow(self, ordered: .above)
         }
+        makeKeyAndOrderFront(self)
         NSApplication.shared.activate(ignoringOtherApps: true)
     }
     
@@ -260,6 +259,19 @@ public class InAppBrowserWindow : NSWindow, NSWindowDelegate, NSToolbarDelegate,
             } else {
                 backgroundColor = nil
             }
+        }
+        if #available(macOS 11.0, *), newSettingsMap["windowTitlebarSeparatorStyle"] != nil,
+           browserSettings?.windowTitlebarSeparatorStyle != newSettings.windowTitlebarSeparatorStyle {
+            titlebarSeparatorStyle = newSettings.windowTitlebarSeparatorStyle!
+        }
+        if newSettingsMap["windowAlphaValue"] != nil, browserSettings?.windowAlphaValue != newSettings.windowAlphaValue {
+            alphaValue = newSettings.windowAlphaValue
+        }
+        if newSettingsMap["windowStyleMask"] != nil, browserSettings?.windowStyleMask != newSettings.windowStyleMask {
+            styleMask = newSettings.windowStyleMask!
+        }
+        if newSettingsMap["windowFrame"] != nil, browserSettings?.windowFrame != newSettings.windowFrame {
+            setFrame(newSettings.windowFrame!, display: true)
         }
         browserSettings = newSettings
     }

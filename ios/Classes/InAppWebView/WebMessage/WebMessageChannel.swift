@@ -13,12 +13,14 @@ public class WebMessageChannel : FlutterMethodCallDelegate {
     var channelDelegate: WebMessageChannelChannelDelegate?
     weak var webView: InAppWebView?
     var ports: [WebMessagePort] = []
+    var registrar: FlutterPluginRegistrar?
     
-    public init(id: String) {
+    public init(registrar: FlutterPluginRegistrar, id: String) {
         self.id = id
+        self.registrar = registrar
         super.init()
         let channel = FlutterMethodChannel(name: WebMessageChannel.METHOD_CHANNEL_NAME_PREFIX + id,
-                                       binaryMessenger: SwiftFlutterPlugin.instance!.registrar!.messenger())
+                                       binaryMessenger: registrar.messenger())
         self.channelDelegate = WebMessageChannelChannelDelegate(webMessageChannel: self, channel: channel)
         self.ports = [
             WebMessagePort(name: "port1", webMessageChannel: self),
@@ -26,7 +28,7 @@ public class WebMessageChannel : FlutterMethodCallDelegate {
         ]
     }
     
-    public func initJsInstance(webView: InAppWebView, completionHandler: ((WebMessageChannel) -> Void)? = nil) {
+    public func initJsInstance(webView: InAppWebView, completionHandler: ((WebMessageChannel?) -> Void)? = nil) {
         self.webView = webView
         if let webView = self.webView {
             webView.evaluateJavascript(source: """
@@ -37,7 +39,7 @@ public class WebMessageChannel : FlutterMethodCallDelegate {
                 completionHandler?(self)
             }
         } else {
-            completionHandler?(self)
+            completionHandler?(nil)
         }
     }
     
@@ -65,6 +67,7 @@ public class WebMessageChannel : FlutterMethodCallDelegate {
         })();
         """)
         webView = nil
+        registrar = nil
     }
     
     deinit {

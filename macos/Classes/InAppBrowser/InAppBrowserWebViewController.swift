@@ -17,6 +17,7 @@ public class InAppBrowserWebViewController: NSViewController, InAppBrowserDelega
     
     var window: InAppBrowserWindow?
     var id: String = ""
+    var plugin: InAppWebViewFlutterPlugin?
     var windowId: Int64?
     var webView: InAppWebView?
     var channelDelegate: InAppBrowserChannelDelegate?
@@ -32,7 +33,11 @@ public class InAppBrowserWebViewController: NSViewController, InAppBrowserDelega
     var isHidden = false
 
     public override func loadView() {
-        let channel = FlutterMethodChannel(name: InAppBrowserWebViewController.METHOD_CHANNEL_NAME_PREFIX + id, binaryMessenger: SwiftFlutterPlugin.instance!.registrar!.messenger)
+        guard let registrar = plugin?.registrar else {
+            return
+        }
+        
+        let channel = FlutterMethodChannel(name: InAppBrowserWebViewController.METHOD_CHANNEL_NAME_PREFIX + id, binaryMessenger: registrar.messenger)
         channelDelegate = InAppBrowserChannelDelegate(channel: channel)
         
         var userScripts: [UserScript] = []
@@ -61,7 +66,7 @@ public class InAppBrowserWebViewController: NSViewController, InAppBrowserDelega
         webView.channelDelegate = WebViewChannelDelegate(webView: webView, channel: channel)
         
         let findInteractionController = FindInteractionController(
-            registrar: SwiftFlutterPlugin.instance!.registrar!,
+            registrar: registrar,
             id: id, webView: webView, settings: nil)
         webView.findInteractionController = findInteractionController
         findInteractionController.prepare()
@@ -304,6 +309,7 @@ public class InAppBrowserWebViewController: NSViewController, InAppBrowserDelega
         webView?.dispose()
         webView = nil
         window = nil
+        plugin = nil
     }
     
     deinit {

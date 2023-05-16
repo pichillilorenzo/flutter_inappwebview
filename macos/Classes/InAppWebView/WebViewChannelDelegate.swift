@@ -468,6 +468,10 @@ public class WebViewChannelDelegate : ChannelDelegate {
         case .createWebMessageChannel:
             if let webView = webView {
                 let _ = webView.createWebMessageChannel { (webMessageChannel) in
+                    guard let webMessageChannel = webMessageChannel else {
+                        result(nil)
+                        return
+                    }
                     result(webMessageChannel.toMap())
                 }
             } else {
@@ -503,9 +507,9 @@ public class WebViewChannelDelegate : ChannelDelegate {
             }
             break
         case .addWebMessageListener:
-            if let webView = webView {
+            if let webView = webView, let registrar = webView.registrar  {
                 let webMessageListenerMap = arguments!["webMessageListener"] as! [String: Any?]
-                let webMessageListener = WebMessageListener.fromMap(map: webMessageListenerMap)!
+                let webMessageListener = WebMessageListener.fromMap(registrar: registrar, map: webMessageListenerMap)!
                 do {
                     try webView.addWebMessageListener(webMessageListener: webMessageListener)
                     result(false)

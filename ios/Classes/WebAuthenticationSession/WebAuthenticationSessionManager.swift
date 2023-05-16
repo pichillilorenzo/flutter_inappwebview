@@ -14,12 +14,12 @@ import SafariServices
 
 public class WebAuthenticationSessionManager: ChannelDelegate {
     static let METHOD_CHANNEL_NAME = "com.pichillilorenzo/flutter_webauthenticationsession"
-    static var registrar: FlutterPluginRegistrar?
+    var plugin: SwiftFlutterPlugin?
     static var sessions: [String: WebAuthenticationSession?] = [:]
     
-    init(registrar: FlutterPluginRegistrar) {
-        super.init(channel: FlutterMethodChannel(name: WebAuthenticationSessionManager.METHOD_CHANNEL_NAME, binaryMessenger: registrar.messenger()))
-        WebAuthenticationSessionManager.registrar = registrar
+    init(plugin: SwiftFlutterPlugin) {
+        super.init(channel: FlutterMethodChannel(name: WebAuthenticationSessionManager.METHOD_CHANNEL_NAME, binaryMessenger: plugin.registrar!.messenger()))
+        self.plugin = plugin
     }
     
     public override func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
@@ -47,11 +47,11 @@ public class WebAuthenticationSessionManager: ChannelDelegate {
     }
     
     public func create(id: String, url: String, callbackURLScheme: String?, settings: [String: Any?], result: @escaping FlutterResult) {
-        if #available(iOS 11.0, *) {
+        if #available(iOS 11.0, *), let plugin = plugin {
             let sessionUrl = URL(string: url) ?? URL(string: "about:blank")!
             let initialSettings = WebAuthenticationSessionSettings()
             let _ = initialSettings.parse(settings: settings)
-            let session = WebAuthenticationSession(id: id, url: sessionUrl, callbackURLScheme: callbackURLScheme, settings: initialSettings)
+            let session = WebAuthenticationSession(plugin: plugin, id: id, url: sessionUrl, callbackURLScheme: callbackURLScheme, settings: initialSettings)
             session.prepare()
             WebAuthenticationSessionManager.sessions[id] = session
             result(true)
@@ -63,13 +63,13 @@ public class WebAuthenticationSessionManager: ChannelDelegate {
     
     public override func dispose() {
         super.dispose()
-        WebAuthenticationSessionManager.registrar = nil
         let sessions = WebAuthenticationSessionManager.sessions.values
         sessions.forEach { (session: WebAuthenticationSession?) in
             session?.cancel()
             session?.dispose()
         }
         WebAuthenticationSessionManager.sessions.removeAll()
+        plugin = nil
     }
     
     deinit {

@@ -18,6 +18,7 @@ public enum PrintJobState: Int {
 public class PrintJobController : NSObject, Disposable {
     static let METHOD_CHANNEL_NAME_PREFIX = "com.pichillilorenzo/flutter_inappwebview_printjobcontroller_"
     var id: String
+    var registrar: FlutterPluginRegistrar?
     var job: NSPrintOperation?
     var settings: PrintJobSettings?
     var channelDelegate: PrintJobChannelDelegate?
@@ -29,13 +30,14 @@ public class PrintJobController : NSObject, Disposable {
                                           _ success: Bool,
                                           _ contextInfo: UnsafeMutableRawPointer?) -> Void
     
-    public init(id: String, job: NSPrintOperation? = nil, settings: PrintJobSettings? = nil) {
+    public init(registrar: FlutterPluginRegistrar, id: String, job: NSPrintOperation? = nil, settings: PrintJobSettings? = nil) {
         self.id = id
+        self.registrar = registrar
         super.init()
         self.job = job
         self.settings = settings
         let channel = FlutterMethodChannel(name: PrintJobController.METHOD_CHANNEL_NAME_PREFIX + id,
-                                           binaryMessenger: SwiftFlutterPlugin.instance!.registrar!.messenger)
+                                           binaryMessenger: registrar.messenger)
         self.channelDelegate = PrintJobChannelDelegate(printJobController: self, channel: channel)
     }
     
@@ -83,5 +85,6 @@ public class PrintJobController : NSObject, Disposable {
         completionHandler = nil
         job = nil
         PrintJobManager.jobs[id] = nil
+        registrar = nil
     }
 }

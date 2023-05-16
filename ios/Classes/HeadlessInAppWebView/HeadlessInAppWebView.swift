@@ -12,12 +12,14 @@ public class HeadlessInAppWebView : Disposable {
     var id: String
     var channelDelegate: HeadlessWebViewChannelDelegate?
     var flutterWebView: FlutterWebViewController?
+    var plugin: SwiftFlutterPlugin?
     
-    public init(id: String, flutterWebView: FlutterWebViewController) {
+    public init(plugin: SwiftFlutterPlugin, id: String, flutterWebView: FlutterWebViewController) {
         self.id = id
         self.flutterWebView = flutterWebView
+        self.plugin = plugin
         let channel = FlutterMethodChannel(name: HeadlessInAppWebView.METHOD_CHANNEL_NAME_PREFIX + id,
-                                       binaryMessenger: SwiftFlutterPlugin.instance!.registrar!.messenger())
+                                           binaryMessenger: plugin.registrar!.messenger())
         self.channelDelegate = HeadlessWebViewChannelDelegate(headlessWebView: self, channel: channel)
     }
     
@@ -79,6 +81,7 @@ public class HeadlessInAppWebView : Disposable {
         channelDelegate = nil
         HeadlessInAppWebViewManager.webViews[id] = nil
         flutterWebView = nil
+        plugin = nil
     }
     
     deinit {

@@ -10,11 +10,11 @@ import FlutterMacOS
 
 public class PlatformUtil: ChannelDelegate {
     static let METHOD_CHANNEL_NAME = "com.pichillilorenzo/flutter_inappwebview_platformutil"
-    static var registrar: FlutterPluginRegistrar?
+    var plugin: InAppWebViewFlutterPlugin?
     
-    init(registrar: FlutterPluginRegistrar) {
-        super.init(channel: FlutterMethodChannel(name: PlatformUtil.METHOD_CHANNEL_NAME, binaryMessenger: registrar.messenger))
-        InAppWebViewStatic.registrar = registrar
+    init(plugin: InAppWebViewFlutterPlugin) {
+        super.init(channel: FlutterMethodChannel(name: PlatformUtil.METHOD_CHANNEL_NAME, binaryMessenger: plugin.registrar!.messenger))
+        self.plugin = plugin
     }
     
     public override func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
@@ -58,7 +58,7 @@ public class PlatformUtil: ChannelDelegate {
     
     public override func dispose() {
         super.dispose()
-        PlatformUtil.registrar = nil
+        plugin = nil
     }
     
     deinit {

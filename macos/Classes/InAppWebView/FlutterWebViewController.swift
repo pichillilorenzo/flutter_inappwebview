@@ -52,7 +52,7 @@ public class FlutterWebViewController: NSObject, /*FlutterPlatformView,*/ Dispos
         }
 
         let findInteractionController = FindInteractionController(
-            registrar: SwiftFlutterPlugin.instance!.registrar!,
+            registrar: registrar,
             id: viewId, webView: webView!, settings: nil)
         webView!.findInteractionController = findInteractionController
         findInteractionController.prepare()

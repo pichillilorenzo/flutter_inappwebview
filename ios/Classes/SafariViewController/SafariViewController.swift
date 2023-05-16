@@ -14,28 +14,31 @@ public class SafariViewController: SFSafariViewController, SFSafariViewControlle
     var channelDelegate: SafariViewControllerChannelDelegate?
     var safariSettings: SafariBrowserSettings
     var id: String
+    var plugin: SwiftFlutterPlugin?
     var menuItemList: [[String: Any]] = []
     
     @available(iOS 11.0, *)
-    public init(id: String, url: URL, configuration: SFSafariViewController.Configuration, menuItemList: [[String: Any]] = [], safariSettings: SafariBrowserSettings) {
+    public init(plugin: SwiftFlutterPlugin, id: String, url: URL, configuration: SFSafariViewController.Configuration, menuItemList: [[String: Any]] = [], safariSettings: SafariBrowserSettings) {
         self.id = id
+        self.plugin = plugin
         self.menuItemList = menuItemList
         self.safariSettings = safariSettings
         SafariViewController.prepareConfig(configuration: configuration, safariSettings: safariSettings)
         super.init(url: url, configuration: configuration)
         let channel = FlutterMethodChannel(name: SafariViewController.METHOD_CHANNEL_NAME_PREFIX + id,
-                                           binaryMessenger: SwiftFlutterPlugin.instance!.registrar!.messenger())
+                                           binaryMessenger: plugin.registrar!.messenger())
         self.channelDelegate = SafariViewControllerChannelDelegate(safariViewController: self, channel: channel)
         self.delegate = self
     }
     
-    public init(id: String, url: URL, entersReaderIfAvailable: Bool, menuItemList: [[String: Any]] = [], safariSettings: SafariBrowserSettings) {
+    public init(plugin: SwiftFlutterPlugin, id: String, url: URL, entersReaderIfAvailable: Bool, menuItemList: [[String: Any]] = [], safariSettings: SafariBrowserSettings) {
         self.id = id
+        self.plugin = plugin
         self.menuItemList = menuItemList
         self.safariSettings = safariSettings
         super.init(url: url, entersReaderIfAvailable: entersReaderIfAvailable)
         let channel = FlutterMethodChannel(name: SafariViewController.METHOD_CHANNEL_NAME_PREFIX + id,
-                                           binaryMessenger: SwiftFlutterPlugin.instance!.registrar!.messenger())
+                                           binaryMessenger: plugin.registrar!.messenger())
         self.channelDelegate = SafariViewControllerChannelDelegate(safariViewController: self, channel: channel)
         self.delegate = self
     }
@@ -123,6 +126,7 @@ public class SafariViewController: SFSafariViewController, SFSafariViewControlle
         channelDelegate = nil
         delegate = nil
         ChromeSafariBrowserManager.browsers[id] = nil
+        plugin = nil
     }
     
     deinit {

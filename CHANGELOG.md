@@ -5,6 +5,9 @@
 - Merged "Fix AndroidX migration URL in README.md" [#1529](https://github.com/pichillilorenzo/flutter_inappwebview/pull/1529) (thanks to [cslee](https://github.com/cslee))
 - Merged "InAppBrowser Bugfix/viewgroup index crash" [#1618](https://github.com/pichillilorenzo/flutter_inappwebview/pull/1618) (thanks to [KhatibFX](https://github.com/KhatibFX))
 - Fixed old iOS versions crash "dyld: Library not loaded: /usr/lib/swift/libswiftCoreGraphics.dylib Reason: image not found" (thanks to [guide-flutter](https://github.com/guide-flutter))
+- Fixed `InAppBrowser.show()` possible crash on macOS
+- Fixed missing `windowTitlebarSeparatorStyle`, `windowAlphaValue`, `windowStyleMask`, `windowFrame` macOS settings updates when using `setSettings()`
+- Fixed "iOS and macOS flutter multiple engine" [#1632](https://github.com/pichillilorenzo/flutter_inappwebview/issues/1632)
 
 ## 6.0.0-beta.23
 

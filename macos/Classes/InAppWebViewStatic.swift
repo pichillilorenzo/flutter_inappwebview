@@ -11,13 +11,13 @@ import FlutterMacOS
 
 public class InAppWebViewStatic: ChannelDelegate {
     static let METHOD_CHANNEL_NAME = "com.pichillilorenzo/flutter_inappwebview_static"
-    static var registrar: FlutterPluginRegistrar?
-    static var webViewForUserAgent: WKWebView?
-    static var defaultUserAgent: String?
+    var plugin: InAppWebViewFlutterPlugin?
+    var webViewForUserAgent: WKWebView?
+    var defaultUserAgent: String?
     
-    init(registrar: FlutterPluginRegistrar) {
-        super.init(channel: FlutterMethodChannel(name: InAppWebViewStatic.METHOD_CHANNEL_NAME, binaryMessenger: registrar.messenger))
-        InAppWebViewStatic.registrar = registrar
+    init(plugin: InAppWebViewFlutterPlugin) {
+        super.init(channel: FlutterMethodChannel(name: InAppWebViewStatic.METHOD_CHANNEL_NAME, binaryMessenger: plugin.registrar!.messenger))
+        self.plugin = plugin
     }
     
     public override func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
@@ -25,7 +25,7 @@ public class InAppWebViewStatic: ChannelDelegate {
         
         switch call.method {
             case "getDefaultUserAgent":
-                InAppWebViewStatic.getDefaultUserAgent(completionHandler: { (value) in
+                getDefaultUserAgent(completionHandler: { (value) in
                     result(value)
                 })
                 break
@@ -43,10 +43,10 @@ public class InAppWebViewStatic: ChannelDelegate {
         }
     }
     
-    static public func getDefaultUserAgent(completionHandler: @escaping (_ value: String?) -> Void) {
+    public func getDefaultUserAgent(completionHandler: @escaping (_ value: String?) -> Void) {
         if defaultUserAgent == nil {
-            InAppWebViewStatic.webViewForUserAgent = WKWebView()
-            InAppWebViewStatic.webViewForUserAgent?.evaluateJavaScript("navigator.userAgent") { (value, error) in
+            webViewForUserAgent = WKWebView()
+            webViewForUserAgent?.evaluateJavaScript("navigator.userAgent") { (value, error) in
 
                 if error != nil {
                     print("Error occured to get userAgent")
@@ -56,8 +56,8 @@ public class InAppWebViewStatic: ChannelDelegate {
                 }
 
                 if let unwrappedUserAgent = value as? String {
-                    InAppWebViewStatic.defaultUserAgent = unwrappedUserAgent
-                    completionHandler(defaultUserAgent)
+                    self.defaultUserAgent = unwrappedUserAgent
+                    completionHandler(self.defaultUserAgent)
                 } else {
                     print("Failed to get userAgent")
                 }
@@ -70,9 +70,9 @@ public class InAppWebViewStatic: ChannelDelegate {
     
     public override func dispose() {
         super.dispose()
-        InAppWebViewStatic.registrar = nil
-        InAppWebViewStatic.webViewForUserAgent = nil
-        InAppWebViewStatic.defaultUserAgent = nil
+        plugin = nil
+        webViewForUserAgent = nil
+        defaultUserAgent = nil
     }
     
     deinit {

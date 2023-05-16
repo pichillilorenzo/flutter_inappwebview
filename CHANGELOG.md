@@ -1,6 +1,10 @@
 ## 6.0.0-beta.24
 
 - Merged "fix #1389 #1315 contextMenu ios 13" [#1575](https://github.com/pichillilorenzo/flutter_inappwebview/pull/1575) (thanks to [heralight](https://github.com/heralight))
+- Merged "fix: remove ignored flutter_export_environment.sh" [#1593](https://github.com/pichillilorenzo/flutter_inappwebview/pull/1593) (thanks to [Sunbreak](https://github.com/Sunbreak))
+- Merged "Fix AndroidX migration URL in README.md" [#1529](https://github.com/pichillilorenzo/flutter_inappwebview/pull/1529) (thanks to [cslee](https://github.com/cslee))
+- Merged "InAppBrowser Bugfix/viewgroup index crash" [#1618](https://github.com/pichillilorenzo/flutter_inappwebview/pull/1618) (thanks to [KhatibFX](https://github.com/KhatibFX))
+- Fixed old iOS versions crash "dyld: Library not loaded: /usr/lib/swift/libswiftCoreGraphics.dylib Reason: image not found" (thanks to [guide-flutter](https://github.com/guide-flutter))
 
 ## 6.0.0-beta.23
 

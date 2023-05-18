@@ -17,7 +17,7 @@ class PrintJobController implements Disposable {
   ///Print job ID.
   final String id;
 
-  late MethodChannel _channel;
+  MethodChannel? _channel;
 
   ///A completion handler used to handle the conclusion of the print job (for instance, to reset state) and to handle any errors encountered in printing.
   ///
@@ -29,7 +29,7 @@ class PrintJobController implements Disposable {
   PrintJobController({required this.id}) {
     this._channel = MethodChannel(
         'com.pichillilorenzo/flutter_inappwebview_printjobcontroller_$id');
-    this._channel.setMethodCallHandler((call) async {
+    this._channel?.setMethodCallHandler((call) async {
       try {
         return await _handleMethod(call);
       } on Error catch (e) {
@@ -60,7 +60,7 @@ class PrintJobController implements Disposable {
   ///- Android native WebView ([Official API - PrintJob.cancel](https://developer.android.com/reference/android/print/PrintJob#cancel()))
   Future<void> cancel() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    await _channel.invokeMethod('cancel', args);
+    await _channel?.invokeMethod('cancel', args);
   }
 
   ///Restarts this print job.
@@ -70,7 +70,7 @@ class PrintJobController implements Disposable {
   ///- Android native WebView ([Official API - PrintJob.restart](https://developer.android.com/reference/android/print/PrintJob#restart()))
   Future<void> restart() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    await _channel.invokeMethod('restart', args);
+    await _channel?.invokeMethod('restart', args);
   }
 
   ///Dismisses the printing-options sheet or popover.
@@ -85,7 +85,7 @@ class PrintJobController implements Disposable {
   Future<void> dismiss({bool animated: true}) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent("animated", () => animated);
-    await _channel.invokeMethod('dismiss', args);
+    await _channel?.invokeMethod('dismiss', args);
   }
 
   ///Gets the [PrintJobInfo] that describes this job.
@@ -101,7 +101,7 @@ class PrintJobController implements Disposable {
   Future<PrintJobInfo?> getInfo() async {
     Map<String, dynamic> args = <String, dynamic>{};
     Map<String, dynamic>? infoMap =
-        (await _channel.invokeMethod('getInfo', args))?.cast<String, dynamic>();
+        (await _channel?.invokeMethod('getInfo', args))?.cast<String, dynamic>();
     return PrintJobInfo.fromMap(infoMap);
   }
 
@@ -114,6 +114,8 @@ class PrintJobController implements Disposable {
   @override
   Future<void> dispose() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    await _channel.invokeMethod('dispose', args);
+    await _channel?.invokeMethod('dispose', args);
+    _channel?.setMethodCallHandler(null);
+    _channel = null;
   }
 }

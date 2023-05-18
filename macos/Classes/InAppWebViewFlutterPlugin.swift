@@ -27,14 +27,14 @@ public class InAppWebViewFlutterPlugin: NSObject, FlutterPlugin {
     
     var registrar: FlutterPluginRegistrar?
     var platformUtil: PlatformUtil?
-    var inAppWebViewStatic: InAppWebViewStatic?
+    var inAppWebViewManager: InAppWebViewManager?
     var myCookieManager: Any?
     var myWebStorageManager: MyWebStorageManager?
     var credentialDatabase: CredentialDatabase?
     var inAppBrowserManager: InAppBrowserManager?
     var headlessInAppWebViewManager: HeadlessInAppWebViewManager?
     var webAuthenticationSessionManager: WebAuthenticationSessionManager?
-//    var printJobManager: PrintJobManager?
+    var printJobManager: PrintJobManager?
     
     var webViewControllers: [String: InAppBrowserWebViewController?] = [:]
     var safariViewControllers: [String: Any?] = [:]
@@ -42,19 +42,19 @@ public class InAppWebViewFlutterPlugin: NSObject, FlutterPlugin {
     public init(with registrar: FlutterPluginRegistrar) {
         super.init()
         self.registrar = registrar
-        registrar.register(FlutterWebViewFactory(registrar: registrar) as FlutterPlatformViewFactory, withId: FlutterWebViewFactory.VIEW_TYPE_ID)
+        registrar.register(FlutterWebViewFactory(plugin: self) as FlutterPlatformViewFactory, withId: FlutterWebViewFactory.VIEW_TYPE_ID)
         
         platformUtil = PlatformUtil(plugin: self)
         inAppBrowserManager = InAppBrowserManager(plugin: self)
         headlessInAppWebViewManager = HeadlessInAppWebViewManager(plugin: self)
-        inAppWebViewStatic = InAppWebViewStatic(plugin: self)
+        inAppWebViewManager = InAppWebViewManager(plugin: self)
         credentialDatabase = CredentialDatabase(plugin: self)
         if #available(macOS 10.13, *) {
             myCookieManager = MyCookieManager(plugin: self)
         }
         myWebStorageManager = MyWebStorageManager(plugin: self)
         webAuthenticationSessionManager = WebAuthenticationSessionManager(plugin: self)
-//        printJobManager = PrintJobManager()
+        printJobManager = PrintJobManager(plugin: self)
     }
     
     public static func register(with registrar: FlutterPluginRegistrar) {
@@ -68,8 +68,8 @@ public class InAppWebViewFlutterPlugin: NSObject, FlutterPlugin {
         inAppBrowserManager = nil
         headlessInAppWebViewManager?.dispose()
         headlessInAppWebViewManager = nil
-        inAppWebViewStatic?.dispose()
-        inAppWebViewStatic = nil
+        inAppWebViewManager?.dispose()
+        inAppWebViewManager = nil
         credentialDatabase?.dispose()
         credentialDatabase = nil
         if #available(macOS 10.13, *) {
@@ -80,7 +80,7 @@ public class InAppWebViewFlutterPlugin: NSObject, FlutterPlugin {
         myWebStorageManager = nil
         webAuthenticationSessionManager?.dispose()
         webAuthenticationSessionManager = nil
-//        printJobManager?.dispose()
-//        printJobManager = nil
+        printJobManager?.dispose()
+        printJobManager = nil
     }
 }

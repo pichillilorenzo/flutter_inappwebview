@@ -82,7 +82,7 @@ public class ChromeCustomTabsActivity extends Activity implements Disposable {
     manager = ChromeSafariBrowserManager.shared.get(managerId);
     if (manager == null || manager.plugin == null || manager.plugin.messenger == null) return;
 
-    ChromeSafariBrowserManager.browsers.put(id, this);
+    manager.browsers.put(id, this);
 
     MethodChannel channel = new MethodChannel(manager.plugin.messenger, METHOD_CHANNEL_NAME_PREFIX + id);
     channelDelegate = new ChromeCustomTabsChannelDelegate(this, channel);
@@ -271,6 +271,7 @@ public class ChromeCustomTabsActivity extends Activity implements Disposable {
 
     Bundle extras = new Bundle();
     extras.putString(ActionBroadcastReceiver.KEY_ACTION_VIEW_ID, id);
+    extras.putString(ActionBroadcastReceiver.KEY_ACTION_MANAGER_ID, manager != null ? manager.id : null);
     broadcastIntent.putExtras(extras);
 
     if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
@@ -355,6 +356,7 @@ public class ChromeCustomTabsActivity extends Activity implements Disposable {
     Bundle extras = new Bundle();
     extras.putInt(ActionBroadcastReceiver.KEY_ACTION_ID, actionSourceId);
     extras.putString(ActionBroadcastReceiver.KEY_ACTION_VIEW_ID, id);
+    extras.putString(ActionBroadcastReceiver.KEY_ACTION_MANAGER_ID, manager != null ? manager.id : null);
     actionIntent.putExtras(extras);
 
     if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
@@ -374,8 +376,10 @@ public class ChromeCustomTabsActivity extends Activity implements Disposable {
       channelDelegate.dispose();
       channelDelegate = null;
     }
-    if (ChromeSafariBrowserManager.browsers.containsKey(id)) {
-      ChromeSafariBrowserManager.browsers.put(id, null);
+    if (manager != null) {
+      if (manager.browsers.containsKey(id)) {
+        manager.browsers.put(id, null);
+      }
     }
     manager = null;
   }

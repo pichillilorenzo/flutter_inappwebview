@@ -79,7 +79,7 @@ public class HeadlessInAppWebView : Disposable {
     public func dispose() {
         channelDelegate?.dispose()
         channelDelegate = nil
-        HeadlessInAppWebViewManager.webViews[id] = nil
+        plugin?.headlessInAppWebViewManager?.webViews[id] = nil
         flutterWebView = nil
         plugin = nil
     }

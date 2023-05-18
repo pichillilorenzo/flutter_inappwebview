@@ -134,6 +134,5 @@ public class MyWebStorage extends ChannelDelegateImpl {
   public void dispose() {
     super.dispose();
     plugin = null;
-    webStorageManager = null;
   }
 }

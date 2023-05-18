@@ -16,7 +16,7 @@ import AVFoundation
 public class HeadlessInAppWebViewManager: ChannelDelegate {
     static let METHOD_CHANNEL_NAME = "com.pichillilorenzo/flutter_headless_inappwebview"
     var plugin: SwiftFlutterPlugin?
-    static var webViews: [String: HeadlessInAppWebView?] = [:]
+    var webViews: [String: HeadlessInAppWebView?] = [:]
     
     init(plugin: SwiftFlutterPlugin) {
         super.init(channel: FlutterMethodChannel(name: HeadlessInAppWebViewManager.METHOD_CHANNEL_NAME, binaryMessenger: plugin.registrar!.messenger()))
@@ -40,15 +40,15 @@ public class HeadlessInAppWebViewManager: ChannelDelegate {
     }
     
     public func run(id: String, params: [String: Any?]) {
-        guard let plugin = plugin, let registrar = plugin.registrar else {
+        guard let plugin = plugin else {
             return
         }
-        let flutterWebView = FlutterWebViewController(registrar: registrar,
+        let flutterWebView = FlutterWebViewController(plugin: plugin,
             withFrame: CGRect.zero,
             viewIdentifier: id,
             params: params as NSDictionary)
         let headlessInAppWebView = HeadlessInAppWebView(plugin: plugin, id: id, flutterWebView: flutterWebView)
-        HeadlessInAppWebViewManager.webViews[id] = headlessInAppWebView
+        webViews[id] = headlessInAppWebView
         
         headlessInAppWebView.prepare(params: params as NSDictionary)
         headlessInAppWebView.onWebViewCreated()
@@ -57,11 +57,11 @@ public class HeadlessInAppWebViewManager: ChannelDelegate {
     
     public override func dispose() {
         super.dispose()
-        let headlessWebViews = HeadlessInAppWebViewManager.webViews.values
+        let headlessWebViews = webViews.values
         headlessWebViews.forEach { (headlessWebView: HeadlessInAppWebView?) in
             headlessWebView?.dispose()
         }
-        HeadlessInAppWebViewManager.webViews.removeAll()
+        webViews.removeAll()
         plugin = nil
     }
     

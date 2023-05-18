@@ -37,20 +37,6 @@ class FindInteractionController {
 
   FindInteractionController({this.onFindResultReceived}) {}
 
-  void initMethodChannel(dynamic id) {
-    this._channel = MethodChannel(
-        'com.pichillilorenzo/flutter_inappwebview_find_interaction_$id');
-
-    this._channel?.setMethodCallHandler((call) async {
-      try {
-        return await _handleMethod(call);
-      } on Error catch (e) {
-        print(e);
-        print(e.stackTrace);
-      }
-    });
-  }
-
   _debugLog(String method, dynamic args) {
     debugLog(
         className: this.runtimeType.toString(),
@@ -216,5 +202,30 @@ class FindInteractionController {
         (await _channel?.invokeMethod('getActiveFindSession', args))
             ?.cast<String, dynamic>();
     return FindSession.fromMap(result);
+  }
+
+  ///Disposes the controller.
+  void dispose({bool isKeepAlive = false}) {
+    if (!isKeepAlive) {
+      _channel?.setMethodCallHandler(null);
+    }
+    _channel = null;
+  }
+}
+
+extension InternalFindInteractionController on FindInteractionController {
+  void init(dynamic id) {
+    this._channel = MethodChannel(
+        'com.pichillilorenzo/flutter_inappwebview_find_interaction_$id');
+
+    this._channel?.setMethodCallHandler((call) async {
+      if (_channel == null) return null;
+      try {
+        return await _handleMethod(call);
+      } on Error catch (e) {
+        print(e);
+        print(e.stackTrace);
+      }
+    });
   }
 }

@@ -12,11 +12,14 @@ import FlutterMacOS
 public class FlutterWebViewController: NSObject, /*FlutterPlatformView,*/ Disposable {
     
     var myView: NSView?
+    var keepAliveId: String?
 
-    init(registrar: FlutterPluginRegistrar, withFrame frame: CGRect, viewIdentifier viewId: Any, params: NSDictionary) {
+    init(plugin: InAppWebViewFlutterPlugin, withFrame frame: CGRect, viewIdentifier viewId: Any, params: NSDictionary) {
         super.init()
         
         myView = NSView(frame: frame)
+        
+        keepAliveId = params["keepAliveId"] as? String
         
         let initialSettings = params["initialSettings"] as! [String: Any?]
         let windowId = params["windowId"] as? Int64
@@ -35,24 +38,27 @@ public class FlutterWebViewController: NSObject, /*FlutterPlatformView,*/ Dispos
         
         var webView: InAppWebView?
         
-        if let wId = windowId, let webViewTransport = InAppWebView.windowWebViews[wId] {
+        if let wId = windowId, let webViewTransport = plugin.inAppWebViewManager?.windowWebViews[wId] {
             webView = webViewTransport.webView
             webView!.id = viewId
-            let channel = FlutterMethodChannel(name: InAppWebView.METHOD_CHANNEL_NAME_PREFIX + String(describing: viewId),
-                                               binaryMessenger: registrar.messenger)
-            webView!.channelDelegate = WebViewChannelDelegate(webView: webView!, channel: channel)
+            webView!.plugin = plugin
+            if let registrar = plugin.registrar {
+                let channel = FlutterMethodChannel(name: InAppWebView.METHOD_CHANNEL_NAME_PREFIX + String(describing: viewId),
+                                                   binaryMessenger: registrar.messenger)
+                webView!.channelDelegate = WebViewChannelDelegate(webView: webView!, channel: channel)
+            }
             webView!.frame = myView!.bounds
             webView!.initialUserScripts = userScripts
         } else {
             webView = InAppWebView(id: viewId,
-                                   registrar: registrar,
+                                   plugin: plugin,
                                    frame: myView!.bounds,
                                    configuration: preWebviewConfiguration,
                                    userScripts: userScripts)
         }
 
         let findInteractionController = FindInteractionController(
-            registrar: registrar,
+            plugin: plugin,
             id: viewId, webView: webView!, settings: nil)
         webView!.findInteractionController = findInteractionController
         findInteractionController.prepare()
@@ -121,7 +127,7 @@ public class FlutterWebViewController: NSObject, /*FlutterPlatformView,*/ Dispos
             }
             load(initialUrlRequest: initialUrlRequest, initialFile: initialFile, initialData: initialData)
         }
-        else if let wId = windowId, let webViewTransport = InAppWebView.windowWebViews[wId] {
+        else if let wId = windowId, let webViewTransport = webView.plugin?.inAppWebViewManager?.windowWebViews[wId] {
             webView.load(webViewTransport.request)
         }
     }
@@ -169,10 +175,12 @@ public class FlutterWebViewController: NSObject, /*FlutterPlatformView,*/ Dispos
     }
     
     public func dispose() {
-        if let webView = webView() {
-            webView.dispose()
+        if keepAliveId == nil {
+            if let webView = webView() {
+                webView.dispose()
+            }
+            myView = nil
         }
-        myView = nil
     }
     
     deinit {

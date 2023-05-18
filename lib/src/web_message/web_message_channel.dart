@@ -18,13 +18,13 @@ class WebMessageChannel {
   ///The second [WebMessagePort] object of the channel.
   final WebMessagePort port2;
 
-  late MethodChannel _channel;
+  MethodChannel? _channel;
 
   WebMessageChannel(
       {required this.id, required this.port1, required this.port2}) {
     this._channel = MethodChannel(
         'com.pichillilorenzo/flutter_inappwebview_web_message_channel_$id');
-    this._channel.setMethodCallHandler((call) async {
+    this._channel?.setMethodCallHandler((call) async {
       try {
         return await _handleMethod(call);
       } on Error catch (e) {
@@ -97,7 +97,7 @@ class WebMessagePort {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('index', () => this._index);
     await _webMessageChannel._channel
-        .invokeMethod('setWebMessageCallback', args);
+        ?.invokeMethod('setWebMessageCallback', args);
     this._onMessage = onMessage;
   }
 
@@ -106,14 +106,14 @@ class WebMessagePort {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('index', () => this._index);
     args.putIfAbsent('message', () => message.toMap());
-    await _webMessageChannel._channel.invokeMethod('postMessage', args);
+    await _webMessageChannel._channel?.invokeMethod('postMessage', args);
   }
 
   ///Close the message port and free any resources associated with it.
   Future<void> close() async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('index', () => this._index);
-    await _webMessageChannel._channel.invokeMethod('close', args);
+    await _webMessageChannel._channel?.invokeMethod('close', args);
   }
 
   Map<String, dynamic> toMap() {

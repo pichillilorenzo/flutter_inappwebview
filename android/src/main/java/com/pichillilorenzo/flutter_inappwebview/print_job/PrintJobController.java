@@ -21,6 +21,8 @@ public class PrintJobController implements Disposable  {
   @NonNull
   public String id;
   @Nullable
+  public InAppWebViewFlutterPlugin plugin;
+  @Nullable
   public PrintJobChannelDelegate channelDelegate;
   @Nullable
   public android.print.PrintJob job;
@@ -30,6 +32,7 @@ public class PrintJobController implements Disposable  {
   public PrintJobController(@NonNull String id, @NonNull android.print.PrintJob job,
                             @Nullable PrintJobSettings settings, @NonNull InAppWebViewFlutterPlugin plugin) {
     this.id = id;
+    this.plugin = plugin;
     this.job = job;
     this.settings = settings;
     final MethodChannel channel = new MethodChannel(plugin.messenger, METHOD_CHANNEL_NAME_PREFIX + id);
@@ -61,12 +64,16 @@ public class PrintJobController implements Disposable  {
       channelDelegate.dispose();
       channelDelegate  = null;
     }
-    if (PrintJobManager.jobs.containsKey(id)) {
-      PrintJobManager.jobs.put(id, null);
+    if (plugin != null) {
+      PrintJobManager printJobManager = plugin.printJobManager;
+      if (printJobManager != null && printJobManager.jobs.containsKey(id)) {
+        printJobManager.jobs.put(id, null);
+      }
     }
     if (job != null) {
       job = null;
     }
+    plugin = null;
   }
   
   @Override
@@ -75,12 +82,16 @@ public class PrintJobController implements Disposable  {
       channelDelegate.dispose();
       channelDelegate  = null;
     }
-    if (PrintJobManager.jobs.containsKey(id)) {
-      PrintJobManager.jobs.put(id, null);
+    if (plugin != null) {
+      PrintJobManager printJobManager = plugin.printJobManager;
+      if (printJobManager != null && printJobManager.jobs.containsKey(id)) {
+        printJobManager.jobs.put(id, null);
+      }
     }
     if (job != null) {
       job.cancel();
       job = null;
     }
+    plugin = null;
   }
 }

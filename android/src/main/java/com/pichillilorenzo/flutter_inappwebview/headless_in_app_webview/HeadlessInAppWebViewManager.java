@@ -42,7 +42,7 @@ public class HeadlessInAppWebViewManager extends ChannelDelegateImpl {
   protected static final String LOG_TAG = "HeadlessInAppWebViewManager";
   public static final String METHOD_CHANNEL_NAME = "com.pichillilorenzo/flutter_headless_inappwebview";
   
-  public static final Map<String, HeadlessInAppWebView> webViews = new HashMap<>();
+  public final Map<String, HeadlessInAppWebView> webViews = new HashMap<>();
   @Nullable
   public InAppWebViewFlutterPlugin plugin;
 
@@ -76,7 +76,7 @@ public class HeadlessInAppWebViewManager extends ChannelDelegateImpl {
     }
     FlutterWebView flutterWebView = new FlutterWebView(plugin, context, id, params);
     HeadlessInAppWebView headlessInAppWebView = new HeadlessInAppWebView(plugin, id, flutterWebView);
-    HeadlessInAppWebViewManager.webViews.put(id, headlessInAppWebView);
+    webViews.put(id, headlessInAppWebView);
     
     headlessInAppWebView.prepare(params);
     headlessInAppWebView.onWebViewCreated();
@@ -93,5 +93,6 @@ public class HeadlessInAppWebViewManager extends ChannelDelegateImpl {
       }
     }
     webViews.clear();
+    plugin = null;
   }
 }

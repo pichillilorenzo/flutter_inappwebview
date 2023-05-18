@@ -23,8 +23,11 @@ package com.pichillilorenzo.flutter_inappwebview.print_job;
 
 import android.os.Build;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 
+import com.pichillilorenzo.flutter_inappwebview.InAppWebViewFlutterPlugin;
 import com.pichillilorenzo.flutter_inappwebview.types.Disposable;
 
 import java.util.Collection;
@@ -34,11 +37,13 @@ import java.util.Map;
 @RequiresApi(api = Build.VERSION_CODES.KITKAT)
 public class PrintJobManager implements Disposable {
   protected static final String LOG_TAG = "PrintJobManager";
-  
-  public static final Map<String, PrintJobController> jobs = new HashMap<>();
+  @Nullable
+  public InAppWebViewFlutterPlugin plugin;
+  public final Map<String, PrintJobController> jobs = new HashMap<>();
 
-  public PrintJobManager() {
+  public PrintJobManager(@NonNull final InAppWebViewFlutterPlugin plugin) {
     super();
+    this.plugin = plugin;
   }
 
   public void dispose() {
@@ -49,5 +54,6 @@ public class PrintJobManager implements Disposable {
       }
     }
     jobs.clear();
+    plugin = null;
   }
 }

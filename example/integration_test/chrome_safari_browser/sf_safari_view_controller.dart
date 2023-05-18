@@ -22,7 +22,7 @@ void sfSafariViewController() {
       expect(chromeSafariBrowser.isOpened(), true);
       expect(() async {
         await chromeSafariBrowser.open(url: TEST_CROSS_PLATFORM_URL_1);
-      }, throwsA(isInstanceOf<ChromeSafariBrowserAlreadyOpenedException>()));
+      }, throwsException);
 
       expect(await chromeSafariBrowser.firstPageLoaded.future, true);
       await chromeSafariBrowser.close();

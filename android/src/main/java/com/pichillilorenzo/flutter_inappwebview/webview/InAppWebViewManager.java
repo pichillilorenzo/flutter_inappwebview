@@ -1,9 +1,12 @@
-package com.pichillilorenzo.flutter_inappwebview;
+package com.pichillilorenzo.flutter_inappwebview.webview;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.pm.PackageInfo;
+import android.net.Uri;
 import android.os.Build;
+import android.os.Message;
+import android.view.View;
+import android.view.ViewGroup;
 import android.webkit.ValueCallback;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
@@ -13,9 +16,12 @@ import androidx.annotation.Nullable;
 import androidx.webkit.WebViewCompat;
 import androidx.webkit.WebViewFeature;
 
+import com.pichillilorenzo.flutter_inappwebview.InAppWebViewFlutterPlugin;
+import com.pichillilorenzo.flutter_inappwebview.headless_in_app_webview.HeadlessInAppWebView;
 import com.pichillilorenzo.flutter_inappwebview.types.ChannelDelegateImpl;
+import com.pichillilorenzo.flutter_inappwebview.webview.in_app_webview.FlutterWebView;
 
-import java.lang.reflect.Method;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -25,14 +31,19 @@ import java.util.Set;
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 
-public class InAppWebViewStatic extends ChannelDelegateImpl {
-  protected static final String LOG_TAG = "InAppWebViewStatic";
-  public static final String METHOD_CHANNEL_NAME = "com.pichillilorenzo/flutter_inappwebview_static";
+public class InAppWebViewManager extends ChannelDelegateImpl {
+  protected static final String LOG_TAG = "InAppWebViewManager";
+  public static final String METHOD_CHANNEL_NAME = "com.pichillilorenzo/flutter_inappwebview_manager";
   
   @Nullable
   public InAppWebViewFlutterPlugin plugin;
 
-  public InAppWebViewStatic(final InAppWebViewFlutterPlugin plugin) {
+  public final Map<String, FlutterWebView> keepAliveWebViews = new HashMap<>();
+
+  public final Map<Integer, Message> windowWebViewMessages = new HashMap<>();
+  public int windowAutoincrementId = 0;
+
+  public InAppWebViewManager(final InAppWebViewFlutterPlugin plugin) {
     super(new MethodChannel(plugin.messenger, METHOD_CHANNEL_NAME));
     this.plugin = plugin;
   }
@@ -41,7 +52,11 @@ public class InAppWebViewStatic extends ChannelDelegateImpl {
   public void onMethodCall(@NonNull MethodCall call, @NonNull final MethodChannel.Result result) {
     switch (call.method) {
       case "getDefaultUserAgent":
-        result.success(WebSettings.getDefaultUserAgent(plugin.applicationContext));
+        if (plugin != null) {
+          result.success(WebSettings.getDefaultUserAgent(plugin.applicationContext));
+        } else {
+          result.success(null);
+        }
         break;
       case "clearClientCertPreferences":
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -118,6 +133,13 @@ public class InAppWebViewStatic extends ChannelDelegateImpl {
           result.success(false);
         }
         break;
+      case "disposeKeepAlive":
+        final String keepAliveId = (String) call.argument("keepAliveId");
+        if (keepAliveId != null) {
+          disposeKeepAlive(keepAliveId);
+        }
+        result.success(true);
+        break;
       default:
         result.notImplemented();
     }
@@ -133,9 +155,37 @@ public class InAppWebViewStatic extends ChannelDelegateImpl {
     return webViewPackageInfoMap;
   }
 
+  public void disposeKeepAlive(@NonNull String keepAliveId) {
+    FlutterWebView flutterWebView = keepAliveWebViews.get(keepAliveId);
+    if (flutterWebView != null) {
+      flutterWebView.keepAliveId = null;
+      // be sure to remove the view from the previous parent.
+      View view = flutterWebView.getView();
+      if (view != null) {
+        ViewGroup parent = (ViewGroup) view.getParent();
+        if (parent != null) {
+          parent.removeView(view);
+        }
+      }
+      flutterWebView.dispose();
+    }
+    if (keepAliveWebViews.containsKey(keepAliveId)) {
+      keepAliveWebViews.put(keepAliveId, null);
+    }
+  }
+
   @Override
   public void dispose() {
     super.dispose();
+    Collection<FlutterWebView> flutterWebViews = keepAliveWebViews.values();
+    for (FlutterWebView flutterWebView : flutterWebViews) {
+      String keepAliveId = flutterWebView.keepAliveId;
+      if (keepAliveId != null) {
+        disposeKeepAlive(flutterWebView.keepAliveId);
+      }
+    }
+    keepAliveWebViews.clear();
+    windowWebViewMessages.clear();
     plugin = null;
   }
 }

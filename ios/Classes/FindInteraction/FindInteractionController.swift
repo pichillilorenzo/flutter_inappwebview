@@ -11,6 +11,7 @@ import Flutter
 public class FindInteractionController : NSObject, Disposable {
     
     static var METHOD_CHANNEL_NAME_PREFIX = "com.pichillilorenzo/flutter_inappwebview_find_interaction_";
+    var plugin: SwiftFlutterPlugin?
     var webView: InAppWebView?
     var channelDelegate: FindInteractionChannelDelegate?
     var settings: FindInteractionSettings?
@@ -48,13 +49,16 @@ public class FindInteractionController : NSObject, Disposable {
         }
     }
     
-    public init(registrar: FlutterPluginRegistrar, id: Any, webView: InAppWebView, settings: FindInteractionSettings?) {
+    public init(plugin: SwiftFlutterPlugin, id: Any, webView: InAppWebView, settings: FindInteractionSettings?) {
         super.init()
+        self.plugin = plugin
         self.webView = webView
         self.settings = settings
-        let channel = FlutterMethodChannel(name: FindInteractionController.METHOD_CHANNEL_NAME_PREFIX + String(describing: id),
-                                           binaryMessenger: registrar.messenger())
-        self.channelDelegate = FindInteractionChannelDelegate(findInteractionController: self, channel: channel)
+        if let registrar = plugin.registrar {
+            let channel = FlutterMethodChannel(name: FindInteractionController.METHOD_CHANNEL_NAME_PREFIX + String(describing: id),
+                                               binaryMessenger: registrar.messenger())
+            self.channelDelegate = FindInteractionChannelDelegate(findInteractionController: self, channel: channel)
+        }
     }
     
     public func prepare() {
@@ -148,6 +152,7 @@ public class FindInteractionController : NSObject, Disposable {
         channelDelegate = nil
         webView = nil
         activeFindSession = nil
+        plugin = nil
     }
     
     deinit {

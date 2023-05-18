@@ -76,9 +76,11 @@ public class JavaScriptBridgeInterface {
 
               @Override
               public void defaultBehaviour(@Nullable Boolean handledByClient) {
-                PrintJobController printJobController = PrintJobManager.jobs.get(printJobId);
-                if (printJobController != null) {
-                  printJobController.disposeNoCancel();
+                if (inAppWebView != null && inAppWebView.plugin != null && inAppWebView.plugin.printJobManager != null) {
+                  PrintJobController printJobController = inAppWebView.plugin.printJobManager.jobs.get(printJobId);
+                  if (printJobController != null) {
+                    printJobController.disposeNoCancel();
+                  }
                 }
               }
 

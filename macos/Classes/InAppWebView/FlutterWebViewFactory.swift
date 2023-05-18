@@ -12,11 +12,11 @@ import Foundation
 
 public class FlutterWebViewFactory: NSObject, FlutterPlatformViewFactory {
     static let VIEW_TYPE_ID = "com.pichillilorenzo/flutter_inappwebview"
-    private var registrar: FlutterPluginRegistrar?
+    private var plugin: InAppWebViewFlutterPlugin
     
-    init(registrar: FlutterPluginRegistrar?) {
+    init(plugin: InAppWebViewFlutterPlugin) {
+        self.plugin = plugin
         super.init()
-        self.registrar = registrar
     }
     
     public func createArgsCodec() -> (FlutterMessageCodec & NSObjectProtocol)? {
@@ -25,18 +25,48 @@ public class FlutterWebViewFactory: NSObject, FlutterPlatformViewFactory {
     
     public func create(withViewIdentifier viewId: Int64, arguments args: Any?) -> NSView {
         let arguments = args as? NSDictionary
+        var flutterWebView: FlutterWebViewController?
+        var id: Any = viewId
         
-        if let headlessWebViewId = arguments?["headlessWebViewId"] as? String,
-           let headlessWebView = HeadlessInAppWebViewManager.webViews[headlessWebViewId],
+        let keepAliveId = arguments?["keepAliveId"] as? String
+        let headlessWebViewId = arguments?["headlessWebViewId"] as? String
+        
+        if let headlessWebViewId = headlessWebViewId,
+           let headlessWebView = plugin.headlessInAppWebViewManager?.webViews[headlessWebViewId],
            let platformView = headlessWebView?.disposeAndGetFlutterWebView(withFrame: .zero) {
-            return platformView.view()
+            flutterWebView = platformView
+            flutterWebView?.keepAliveId = keepAliveId
         }
         
-        let webviewController = FlutterWebViewController(registrar: registrar!,
-                                                         withFrame: .zero,
-                                                         viewIdentifier: viewId,
-                                                         params: arguments!)
-        webviewController.makeInitialLoad(params: arguments!)
-        return webviewController.view()
+        if let keepAliveId = keepAliveId,
+           flutterWebView == nil,
+           let keepAliveWebView = plugin.inAppWebViewManager?.keepAliveWebViews[keepAliveId] {
+            flutterWebView = keepAliveWebView
+            if let view = flutterWebView?.view() {
+                // remove from parent
+                view.removeFromSuperview()
+            }
+        }
+        
+        let shouldMakeInitialLoad = flutterWebView == nil
+        if flutterWebView == nil {
+            if let keepAliveId = keepAliveId {
+                id = keepAliveId
+            }
+            flutterWebView = FlutterWebViewController(plugin: plugin,
+                                                      withFrame: .zero,
+                                                      viewIdentifier: id,
+                                                      params: arguments!)
+        }
+        
+        if let keepAliveId = keepAliveId {
+            plugin.inAppWebViewManager?.keepAliveWebViews[keepAliveId] = flutterWebView!
+        }
+        
+        if shouldMakeInitialLoad {
+            flutterWebView?.makeInitialLoad(params: arguments!)
+        }
+        
+        return flutterWebView!.view()
     }
 }

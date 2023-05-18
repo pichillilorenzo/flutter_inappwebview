@@ -198,7 +198,6 @@ export 'web_storage_type.dart' show WebStorageType;
 export 'website_data_record.dart'
     show WebsiteDataRecord, IOSWKWebsiteDataRecord;
 export 'website_data_type.dart' show WebsiteDataType, IOSWKWebsiteDataType;
-export 'webview_implementation.dart' show WebViewImplementation;
 export 'webview_package_info.dart'
     show WebViewPackageInfo, AndroidWebViewPackageInfo;
 export 'webview_render_process_action.dart' show WebViewRenderProcessAction;

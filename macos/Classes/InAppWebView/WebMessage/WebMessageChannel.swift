@@ -11,18 +11,20 @@ import FlutterMacOS
 public class WebMessageChannel : FlutterMethodCallDelegate {
     static var METHOD_CHANNEL_NAME_PREFIX = "com.pichillilorenzo/flutter_inappwebview_web_message_channel_"
     var id: String
+    var plugin: InAppWebViewFlutterPlugin?
     var channelDelegate: WebMessageChannelChannelDelegate?
     weak var webView: InAppWebView?
     var ports: [WebMessagePort] = []
-    var registrar: FlutterPluginRegistrar?
     
-    public init(registrar: FlutterPluginRegistrar, id: String) {
+    public init(plugin: InAppWebViewFlutterPlugin, id: String) {
         self.id = id
-        self.registrar = registrar
+        self.plugin = plugin
         super.init()
-        let channel = FlutterMethodChannel(name: WebMessageChannel.METHOD_CHANNEL_NAME_PREFIX + id,
-                                       binaryMessenger: registrar.messenger)
-        self.channelDelegate = WebMessageChannelChannelDelegate(webMessageChannel: self, channel: channel)
+        if let registrar = plugin.registrar {
+            let channel = FlutterMethodChannel(name: WebMessageChannel.METHOD_CHANNEL_NAME_PREFIX + id,
+                                               binaryMessenger: registrar.messenger)
+            self.channelDelegate = WebMessageChannelChannelDelegate(webMessageChannel: self, channel: channel)
+        }
         self.ports = [
             WebMessagePort(name: "port1", webMessageChannel: self),
             WebMessagePort(name: "port2", webMessageChannel: self)
@@ -68,7 +70,7 @@ public class WebMessageChannel : FlutterMethodCallDelegate {
         })();
         """)
         webView = nil
-        registrar = nil
+        plugin = nil
     }
     
     deinit {

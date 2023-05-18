@@ -1,6 +1,6 @@
 export 'service_worker_controller.dart';
 export 'webview_feature.dart' show WebViewFeature, AndroidWebViewFeature;
-export 'proxy_controller.dart';
+export 'proxy_controller.dart' show ProxyController, ProxySettings;
 export 'webview_asset_loader.dart'
     show
         WebViewAssetLoader,

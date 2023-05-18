@@ -57,7 +57,6 @@ public class TracingControllerManager implements Disposable {
       channelDelegate.dispose();
       channelDelegate = null;
     }
-    tracingController = null;
     plugin = null;
   }
 }

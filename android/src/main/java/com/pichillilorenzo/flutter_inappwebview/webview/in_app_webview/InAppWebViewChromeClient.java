@@ -77,14 +77,10 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
 
   protected static final String LOG_TAG = "IABWebChromeClient";
   private InAppBrowserDelegate inAppBrowserDelegate;
-  public static Map<Integer, Message> windowWebViewMessages = new HashMap<>();
-  private static int windowAutoincrementId = 0;
 
   private static final int PICKER = 1;
   private static final int PICKER_LEGACY = 3;
   final String DEFAULT_MIME_TYPES = "*/*";
-  private static Uri videoOutputFileUri;
-  private static Uri imageOutputFileUri;
 
   protected static final FrameLayout.LayoutParams FULLSCREEN_LAYOUT_PARAMS = new FrameLayout.LayoutParams(
           ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT, Gravity.CENTER);
@@ -114,6 +110,15 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
   public InAppWebViewFlutterPlugin plugin;
   @Nullable
   public InAppWebView inAppWebView;
+
+  @Nullable
+  private ValueCallback<Uri> filePathCallbackLegacy;
+  @Nullable
+  private ValueCallback<Uri[]> filePathCallback;
+  @Nullable
+  private Uri videoOutputFileUri;
+  @Nullable
+  private Uri imageOutputFileUri;
 
   public InAppWebViewChromeClient(@NonNull final InAppWebViewFlutterPlugin plugin,
                                   @NonNull InAppWebView inAppWebView, InAppBrowserDelegate inAppBrowserDelegate) {
@@ -610,8 +615,11 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
 
   @Override
   public boolean onCreateWindow(WebView view, boolean isDialog, boolean isUserGesture, final Message resultMsg) {
-    windowAutoincrementId++;
-    final int windowId = windowAutoincrementId;
+    int windowId = 0;
+    if (plugin != null && plugin.inAppWebViewManager != null) {
+      plugin.inAppWebViewManager.windowAutoincrementId++;
+      windowId = plugin.inAppWebViewManager.windowAutoincrementId;
+    }
 
     WebView.HitTestResult result = view.getHitTestResult();
     String url = result.getExtra();
@@ -639,9 +647,12 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
             isDialog
     );
 
-    windowWebViewMessages.put(windowId, resultMsg);
+    if (plugin != null && plugin.inAppWebViewManager != null) {
+      plugin.inAppWebViewManager.windowWebViewMessages.put(windowId, resultMsg);
+    }
 
     if (inAppWebView != null && inAppWebView.channelDelegate != null) {
+      int finalWindowId = windowId;
       inAppWebView.channelDelegate.onCreateWindow(createWindowAction, new WebViewChannelDelegate.CreateWindowCallback() {
         @Override
         public boolean nonNullSuccess(@NonNull Boolean handledByClient) {
@@ -650,7 +661,9 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
 
         @Override
         public void defaultBehaviour(@Nullable Boolean handledByClient) {
-          InAppWebViewChromeClient.windowWebViewMessages.remove(windowId);
+          if (plugin != null && plugin.inAppWebViewManager != null) {
+            plugin.inAppWebViewManager.windowWebViewMessages.remove(finalWindowId);
+          }
         }
 
         @Override
@@ -824,7 +837,7 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
 
   @Override
   public boolean onActivityResult(int requestCode, int resultCode, Intent data) {
-    if (InAppWebViewFlutterPlugin.filePathCallback == null && InAppWebViewFlutterPlugin.filePathCallbackLegacy == null) {
+    if (filePathCallback == null && filePathCallbackLegacy == null) {
       return true;
     }
 
@@ -838,8 +851,8 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
           results = getSelectedFiles(data, resultCode);
         }
 
-        if (InAppWebViewFlutterPlugin.filePathCallback != null) {
-          InAppWebViewFlutterPlugin.filePathCallback.onReceiveValue(results);
+        if (filePathCallback != null) {
+          filePathCallback.onReceiveValue(results);
         }
         break;
 
@@ -848,13 +861,14 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
         if (resultCode == RESULT_OK) {
           result = data != null ? data.getData() : getCapturedMediaFile();
         }
-
-        InAppWebViewFlutterPlugin.filePathCallbackLegacy.onReceiveValue(result);
+        if (filePathCallbackLegacy != null) {
+          filePathCallbackLegacy.onReceiveValue(result);
+        }
         break;
     }
 
-    InAppWebViewFlutterPlugin.filePathCallback = null;
-    InAppWebViewFlutterPlugin.filePathCallbackLegacy = null;
+    filePathCallback = null;
+    filePathCallbackLegacy = null;
     imageOutputFileUri = null;
     videoOutputFileUri = null;
 
@@ -921,7 +935,7 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
   }
 
   public void startPickerIntent(ValueCallback<Uri> filePathCallback, String acceptType, @Nullable String capture) {
-    InAppWebViewFlutterPlugin.filePathCallbackLegacy = filePathCallback;
+    filePathCallbackLegacy = filePathCallback;
 
     boolean images = acceptsImages(acceptType);
     boolean video = acceptsVideo(acceptType);
@@ -965,7 +979,7 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
   @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
   public boolean startPickerIntent(final ValueCallback<Uri[]> callback, final String[] acceptTypes,
                                    final boolean allowMultiple, final boolean captureEnabled) {
-    InAppWebViewFlutterPlugin.filePathCallback = callback;
+    filePathCallback = callback;
 
     boolean images = acceptsImages(acceptTypes);
     boolean video = acceptsVideo(acceptTypes);
@@ -1289,7 +1303,11 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
       inAppBrowserDelegate.getActivityResultListeners().clear();
       inAppBrowserDelegate = null;
     }
-    plugin = null;
+    filePathCallbackLegacy = null;
+    filePathCallback = null;
+    videoOutputFileUri = null;
+    imageOutputFileUri = null;
     inAppWebView = null;
+    plugin = null;
   }
 }

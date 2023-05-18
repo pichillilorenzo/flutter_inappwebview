@@ -10,17 +10,21 @@ import Flutter
 
 public class PullToRefreshControl : UIRefreshControl, Disposable {
     static var METHOD_CHANNEL_NAME_PREFIX = "com.pichillilorenzo/flutter_inappwebview_pull_to_refresh_";
+    var plugin: SwiftFlutterPlugin?
     var channelDelegate: PullToRefreshChannelDelegate?
     var settings: PullToRefreshSettings?
     var shouldCallOnRefresh = false
     var delegate: PullToRefreshDelegate?
     
-    public init(registrar: FlutterPluginRegistrar, id: Any, settings: PullToRefreshSettings?) {
+    public init(plugin: SwiftFlutterPlugin, id: Any, settings: PullToRefreshSettings?) {
         super.init()
+        self.plugin = plugin
         self.settings = settings
-        let channel = FlutterMethodChannel(name: PullToRefreshControl.METHOD_CHANNEL_NAME_PREFIX + String(describing: id),
-                                           binaryMessenger: registrar.messenger())
-        self.channelDelegate = PullToRefreshChannelDelegate(pullToRefreshControl: self, channel: channel)
+        if let registrar = plugin.registrar {
+            let channel = FlutterMethodChannel(name: PullToRefreshControl.METHOD_CHANNEL_NAME_PREFIX + String(describing: id),
+                                               binaryMessenger: registrar.messenger())
+            self.channelDelegate = PullToRefreshChannelDelegate(pullToRefreshControl: self, channel: channel)
+        }
     }
     
     required init?(coder: NSCoder) {
@@ -59,6 +63,7 @@ public class PullToRefreshControl : UIRefreshControl, Disposable {
         channelDelegate = nil
         removeTarget(self, action: #selector(updateShouldCallOnRefresh), for: .valueChanged)
         delegate = nil
+        plugin = nil
     }
     
     deinit {

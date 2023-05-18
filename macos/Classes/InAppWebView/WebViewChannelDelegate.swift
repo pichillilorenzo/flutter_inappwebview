@@ -507,9 +507,9 @@ public class WebViewChannelDelegate : ChannelDelegate {
             }
             break
         case .addWebMessageListener:
-            if let webView = webView, let registrar = webView.registrar  {
+            if let webView = webView, let plugin = webView.plugin  {
                 let webMessageListenerMap = arguments!["webMessageListener"] as! [String: Any?]
-                let webMessageListener = WebMessageListener.fromMap(registrar: registrar, map: webMessageListenerMap)!
+                let webMessageListener = WebMessageListener.fromMap(plugin: plugin, map: webMessageListenerMap)!
                 do {
                     try webView.addWebMessageListener(webMessageListener: webMessageListener)
                     result(false)

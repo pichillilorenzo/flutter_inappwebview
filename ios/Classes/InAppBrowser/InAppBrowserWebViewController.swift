@@ -42,7 +42,7 @@ public class InAppBrowserWebViewController: UIViewController, InAppBrowserDelega
     var isHidden = false
 
     public override func loadView() {
-        guard let registrar = plugin?.registrar else {
+        guard let plugin = plugin, let registrar = plugin.registrar else {
             return
         }
         
@@ -55,13 +55,13 @@ public class InAppBrowserWebViewController: UIViewController, InAppBrowserDelega
         }
         
         let preWebviewConfiguration = InAppWebView.preWKWebViewConfiguration(settings: webViewSettings)
-        if let wId = windowId, let webViewTransport = InAppWebView.windowWebViews[wId] {
+        if let wId = windowId, let webViewTransport = plugin.inAppWebViewManager?.windowWebViews[wId] {
             webView = webViewTransport.webView
             webView!.contextMenu = contextMenu
             webView!.initialUserScripts = userScripts
         } else {
             webView = InAppWebView(id: nil,
-                                   registrar: nil,
+                                   plugin: nil,
                                    frame: .zero,
                                    configuration: preWebviewConfiguration,
                                    contextMenu: contextMenu,
@@ -74,17 +74,18 @@ public class InAppBrowserWebViewController: UIViewController, InAppBrowserDelega
         
         webView.inAppBrowserDelegate = self
         webView.id = id
+        webView.plugin = plugin
         webView.channelDelegate = WebViewChannelDelegate(webView: webView, channel: channel)
         
         let pullToRefreshSettings = PullToRefreshSettings()
         let _ = pullToRefreshSettings.parse(settings: pullToRefreshInitialSettings)
-        let pullToRefreshControl = PullToRefreshControl(registrar: registrar, id: id, settings: pullToRefreshSettings)
+        let pullToRefreshControl = PullToRefreshControl(plugin: plugin, id: id, settings: pullToRefreshSettings)
         webView.pullToRefreshControl = pullToRefreshControl
         pullToRefreshControl.delegate = webView
         pullToRefreshControl.prepare()
         
         let findInteractionController = FindInteractionController(
-            registrar: registrar,
+            plugin: plugin,
             id: id, webView: webView, settings: nil)
         webView.findInteractionController = findInteractionController
         findInteractionController.prepare()
@@ -132,7 +133,7 @@ public class InAppBrowserWebViewController: UIViewController, InAppBrowserDelega
             }
         }
         
-        if let wId = windowId, let webViewTransport = InAppWebView.windowWebViews[wId] {
+        if let wId = windowId, let webViewTransport = plugin?.inAppWebViewManager?.windowWebViews[wId] {
             webView?.load(webViewTransport.request)
             channelDelegate?.onBrowserCreated()
         } else {

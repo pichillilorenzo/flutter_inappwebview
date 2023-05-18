@@ -8,8 +8,8 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter/gestures.dart';
-import 'package:flutter_inappwebview/src/in_app_webview/headless_in_app_webview.dart';
-import 'package:flutter_inappwebview/src/util.dart';
+import 'headless_in_app_webview.dart';
+import '../util.dart';
 
 import '../find_interaction/find_interaction_controller.dart';
 import '../web/web_platform_manager.dart';
@@ -23,6 +23,8 @@ import 'webview.dart';
 import 'in_app_webview_controller.dart';
 import 'in_app_webview_settings.dart';
 import '../pull_to_refresh/main.dart';
+import '../pull_to_refresh/pull_to_refresh_controller.dart';
+import 'in_app_webview_keep_alive.dart';
 
 ///{@template flutter_inappwebview.InAppWebView}
 ///Flutter Widget for adding an **inline native WebView** integrated in the flutter widget tree.
@@ -46,7 +48,7 @@ class InAppWebView extends StatefulWidget implements WebView {
   @override
   final int? windowId;
 
-  ///The [HeadlessInAppWebView] to use to initialize this widget
+  ///The [HeadlessInAppWebView] to use to initialize this widget.
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
@@ -54,33 +56,46 @@ class InAppWebView extends StatefulWidget implements WebView {
   ///- Web
   final HeadlessInAppWebView? headlessWebView;
 
+  ///Used to keep alive this WebView.
+  ///Remember to dispose the [InAppWebViewKeepAlive] instance
+  ///using [InAppWebViewController.disposeKeepAlive].
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- Android native WebView
+  ///- iOS
+  final InAppWebViewKeepAlive? keepAlive;
+
   ///{@macro flutter_inappwebview.InAppWebView}
   const InAppWebView({
     Key? key,
     this.windowId,
+    this.keepAlive,
     this.initialUrlRequest,
     this.initialFile,
     this.initialData,
-    @Deprecated('Use initialSettings instead') this.initialOptions,
+    @Deprecated('Use initialSettings instead')
+        this.initialOptions,
     this.initialSettings,
     this.initialUserScripts,
     this.pullToRefreshController,
     this.findInteractionController,
-    this.implementation = WebViewImplementation.NATIVE,
     this.contextMenu,
     this.onWebViewCreated,
     this.onLoadStart,
     this.onLoadStop,
-    @Deprecated("Use onReceivedError instead") this.onLoadError,
+    @Deprecated("Use onReceivedError instead")
+        this.onLoadError,
     this.onReceivedError,
-    @Deprecated("Use onReceivedHttpError instead") this.onLoadHttpError,
+    @Deprecated("Use onReceivedHttpError instead")
+        this.onLoadHttpError,
     this.onReceivedHttpError,
     this.onConsoleMessage,
     this.onProgressChanged,
     this.shouldOverrideUrlLoading,
     this.onLoadResource,
     this.onScrollChanged,
-    @Deprecated('Use onDownloadStartRequest instead') this.onDownloadStart,
+    @Deprecated('Use onDownloadStartRequest instead')
+        this.onDownloadStart,
     this.onDownloadStartRequest,
     @Deprecated('Use onLoadResourceWithCustomScheme instead')
         this.onLoadResourceCustomScheme,
@@ -100,7 +115,8 @@ class InAppWebView extends StatefulWidget implements WebView {
     this.onAjaxProgress,
     this.shouldInterceptFetchRequest,
     this.onUpdateVisitedHistory,
-    @Deprecated("Use onPrintRequest instead") this.onPrint,
+    @Deprecated("Use onPrintRequest instead")
+        this.onPrint,
     this.onPrintRequest,
     this.onLongPressHitTestResult,
     this.onEnterFullscreen,
@@ -111,7 +127,8 @@ class InAppWebView extends StatefulWidget implements WebView {
     this.onWindowBlur,
     this.onOverScrolled,
     this.onZoomScaleChanged,
-    @Deprecated('Use onSafeBrowsingHit instead') this.androidOnSafeBrowsingHit,
+    @Deprecated('Use onSafeBrowsingHit instead')
+        this.androidOnSafeBrowsingHit,
     this.onSafeBrowsingHit,
     @Deprecated('Use onPermissionRequest instead')
         this.androidOnPermissionRequest,
@@ -137,13 +154,16 @@ class InAppWebView extends StatefulWidget implements WebView {
     @Deprecated('Use onFormResubmission instead')
         this.androidOnFormResubmission,
     this.onFormResubmission,
-    @Deprecated('Use onZoomScaleChanged instead') this.androidOnScaleChanged,
-    @Deprecated('Use onReceivedIcon instead') this.androidOnReceivedIcon,
+    @Deprecated('Use onZoomScaleChanged instead')
+        this.androidOnScaleChanged,
+    @Deprecated('Use onReceivedIcon instead')
+        this.androidOnReceivedIcon,
     this.onReceivedIcon,
     @Deprecated('Use onReceivedTouchIconUrl instead')
         this.androidOnReceivedTouchIconUrl,
     this.onReceivedTouchIconUrl,
-    @Deprecated('Use onJsBeforeUnload instead') this.androidOnJsBeforeUnload,
+    @Deprecated('Use onJsBeforeUnload instead')
+        this.androidOnJsBeforeUnload,
     this.onJsBeforeUnload,
     @Deprecated('Use onReceivedLoginRequest instead')
         this.androidOnReceivedLoginRequest,
@@ -221,10 +241,6 @@ class InAppWebView extends StatefulWidget implements WebView {
   ///{@macro flutter_inappwebview.WebView.initialUrlRequest}
   @override
   final URLRequest? initialUrlRequest;
-
-  ///{@macro flutter_inappwebview.WebView.implementation}
-  @override
-  final WebViewImplementation implementation;
 
   ///{@macro flutter_inappwebview.WebView.initialUserScripts}
   @override
@@ -704,6 +720,15 @@ class _InAppWebViewState extends State<InAppWebView> {
             widget.pullToRefreshController?.options.toMap() ??
             PullToRefreshSettings(enabled: false).toMap();
 
+    if ((widget.headlessWebView?.isRunning() ?? false) &&
+        widget.keepAlive != null) {
+      final headlessId = widget.headlessWebView?.id;
+      if (headlessId != null) {
+        // force keep alive id to match headless webview id
+        widget.keepAlive?.id = headlessId;
+      }
+    }
+
     if (Util.isWeb) {
       return HtmlElementView(
         viewType: 'com.pichillilorenzo/flutter_inappwebview',
@@ -727,9 +752,7 @@ class _InAppWebViewState extends State<InAppWebView> {
     } else if (Util.isAndroid) {
       var useHybridComposition = (widget.initialSettings != null
               ? initialSettings.useHybridComposition
-              :
-              // ignore: deprecated_member_use_from_same_package
-              widget.initialOptions?.android.useHybridComposition) ??
+              : widget.initialOptions?.android.useHybridComposition) ??
           true;
 
       return PlatformViewLink(
@@ -762,11 +785,11 @@ class _InAppWebViewState extends State<InAppWebView> {
               'headlessWebViewId': widget.headlessWebView?.isRunning() ?? false
                   ? widget.headlessWebView?.id
                   : null,
-              'implementation': widget.implementation.toNativeValue(),
               'initialUserScripts':
                   widget.initialUserScripts?.map((e) => e.toMap()).toList() ??
                       [],
-              'pullToRefreshSettings': pullToRefreshSettings
+              'pullToRefreshSettings': pullToRefreshSettings,
+              'keepAliveId': widget.keepAlive?.id
             },
           )
             ..addOnPlatformViewCreatedListener(params.onPlatformViewCreated)
@@ -790,10 +813,10 @@ class _InAppWebViewState extends State<InAppWebView> {
           'headlessWebViewId': widget.headlessWebView?.isRunning() ?? false
               ? widget.headlessWebView?.id
               : null,
-          'implementation': widget.implementation.toNativeValue(),
           'initialUserScripts':
               widget.initialUserScripts?.map((e) => e.toMap()).toList() ?? [],
-          'pullToRefreshSettings': pullToRefreshSettings
+          'pullToRefreshSettings': pullToRefreshSettings,
+          'keepAliveId': widget.keepAlive?.id
         },
         creationParamsCodec: const StandardMessageCodec(),
       );
@@ -810,13 +833,24 @@ class _InAppWebViewState extends State<InAppWebView> {
   @override
   void dispose() {
     dynamic viewId = _controller?.getViewId();
+    debugLog(
+        className: "InAppWebView",
+        name: "WebView",
+        id: viewId?.toString(),
+        debugLoggingSettings: WebView.debugLoggingSettings,
+        method: "dispose",
+        args: []);
     if (viewId != null &&
         kIsWeb &&
         WebPlatformManager.webViews.containsKey(viewId)) {
       WebPlatformManager.webViews.remove(viewId);
     }
-    super.dispose();
+    final isKeepAlive = widget.keepAlive != null;
+    _controller?.dispose(isKeepAlive: isKeepAlive);
     _controller = null;
+    widget.pullToRefreshController?.dispose(isKeepAlive: isKeepAlive);
+    widget.findInteractionController?.dispose(isKeepAlive: isKeepAlive);
+    super.dispose();
   }
 
   AndroidViewController _createAndroidViewController({
@@ -845,21 +879,25 @@ class _InAppWebViewState extends State<InAppWebView> {
   }
 
   void _onPlatformViewCreated(int id) {
-    final viewId = (!kIsWeb && (widget.headlessWebView?.isRunning() ?? false))
-        ? widget.headlessWebView?.id
-        : id;
+    dynamic viewId = id;
+    if (!kIsWeb) {
+      if (widget.headlessWebView?.isRunning() ?? false) {
+        viewId = widget.headlessWebView?.id;
+      }
+      viewId = widget.keepAlive?.id ?? viewId ?? id;
+    }
     widget.headlessWebView?.internalDispose();
     _controller = InAppWebViewController(viewId, widget);
-    widget.pullToRefreshController?.initMethodChannel(viewId);
-    widget.findInteractionController?.initMethodChannel(viewId);
+    widget.pullToRefreshController?.init(viewId);
+    widget.findInteractionController?.init(viewId);
+    debugLog(
+        className: "InAppWebView",
+        name: "WebView",
+        id: viewId?.toString(),
+        debugLoggingSettings: WebView.debugLoggingSettings,
+        method: "onWebViewCreated",
+        args: []);
     if (widget.onWebViewCreated != null) {
-      debugLog(
-          className: "InAppWebView",
-          name: "WebView",
-          id: viewId?.toString(),
-          debugLoggingSettings: WebView.debugLoggingSettings,
-          method: "onWebViewCreated",
-          args: []);
       widget.onWebViewCreated!(_controller!);
     }
   }

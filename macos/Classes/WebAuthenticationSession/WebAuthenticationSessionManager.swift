@@ -15,7 +15,7 @@ import SafariServices
 public class WebAuthenticationSessionManager: ChannelDelegate {
     static let METHOD_CHANNEL_NAME = "com.pichillilorenzo/flutter_webauthenticationsession"
     var plugin: InAppWebViewFlutterPlugin?
-    static var sessions: [String: WebAuthenticationSession?] = [:]
+    var sessions: [String: WebAuthenticationSession?] = [:]
     
     init(plugin: InAppWebViewFlutterPlugin) {
         super.init(channel: FlutterMethodChannel(name: WebAuthenticationSessionManager.METHOD_CHANNEL_NAME, binaryMessenger: plugin.registrar!.messenger))
@@ -53,7 +53,7 @@ public class WebAuthenticationSessionManager: ChannelDelegate {
             let _ = initialSettings.parse(settings: settings)
             let session = WebAuthenticationSession(plugin: plugin, id: id, url: sessionUrl, callbackURLScheme: callbackURLScheme, settings: initialSettings)
             session.prepare()
-            WebAuthenticationSessionManager.sessions[id] = session
+            sessions[id] = session
             result(true)
             return
         }
@@ -63,12 +63,12 @@ public class WebAuthenticationSessionManager: ChannelDelegate {
     
     public override func dispose() {
         super.dispose()
-        let sessions = WebAuthenticationSessionManager.sessions.values
-        sessions.forEach { (session: WebAuthenticationSession?) in
+        let sessionValues = sessions.values
+        sessionValues.forEach { (session: WebAuthenticationSession?) in
             session?.cancel()
             session?.dispose()
         }
-        WebAuthenticationSessionManager.sessions.removeAll()
+        sessions.removeAll()
         plugin = nil
     }
     

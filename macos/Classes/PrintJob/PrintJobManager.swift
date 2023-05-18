@@ -8,18 +8,21 @@
 import Foundation
 
 public class PrintJobManager: NSObject, Disposable {
-    static var jobs: [String: PrintJobController?] = [:]
+    var plugin: InAppWebViewFlutterPlugin?
+    var jobs: [String: PrintJobController?] = [:]
     
-    public override init() {
+    public init(plugin: InAppWebViewFlutterPlugin?) {
         super.init()
+        self.plugin = plugin
     }
     
     public func dispose() {
-        let jobs = PrintJobManager.jobs.values
-        jobs.forEach { (job: PrintJobController?) in
+        let jobValues = jobs.values
+        jobValues.forEach { (job: PrintJobController?) in
             job?.dispose()
         }
-        PrintJobManager.jobs.removeAll()
+        jobs.removeAll()
+        plugin = nil
     }
     
     deinit {

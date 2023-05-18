@@ -3,7 +3,7 @@ import 'dart:typed_data';
 import 'dart:ui';
 
 import 'package:flutter/services.dart';
-import 'package:flutter_inappwebview/src/util.dart';
+import '../util.dart';
 
 import '../context_menu.dart';
 import '../find_interaction/find_interaction_controller.dart';
@@ -38,10 +38,12 @@ class HeadlessInAppWebView implements WebView, Disposable {
 
   static const MethodChannel _sharedChannel =
       const MethodChannel('com.pichillilorenzo/flutter_headless_inappwebview');
-  late MethodChannel _channel;
+  MethodChannel? _channel;
+
+  InAppWebViewController? _webViewController;
 
   ///WebView Controller that can be used to access the [InAppWebViewController] API.
-  late final InAppWebViewController webViewController;
+  InAppWebViewController? get webViewController => _webViewController;
 
   ///{@macro flutter_inappwebview.WebView.windowId}
   final int? windowId;
@@ -74,7 +76,6 @@ class HeadlessInAppWebView implements WebView, Disposable {
       this.initialUserScripts,
       this.pullToRefreshController,
       this.findInteractionController,
-      this.implementation = WebViewImplementation.NATIVE,
       this.onWebViewCreated,
       this.onLoadStart,
       this.onLoadStop,
@@ -180,10 +181,15 @@ class HeadlessInAppWebView implements WebView, Disposable {
       this.onMicrophoneCaptureStateChanged,
       this.onContentSizeChanged}) {
     id = IdGenerator.generate();
-    webViewController = new InAppWebViewController(id, this);
+  }
+
+  _init() {
+    _webViewController = InAppWebViewController(id, this);
+    pullToRefreshController?.init(id);
+    findInteractionController?.init(id);
     this._channel =
         MethodChannel('com.pichillilorenzo/flutter_headless_inappwebview_$id');
-    this._channel.setMethodCallHandler((call) async {
+    this._channel?.setMethodCallHandler((call) async {
       try {
         return await handleMethod(call);
       } on Error catch (e) {
@@ -196,10 +202,8 @@ class HeadlessInAppWebView implements WebView, Disposable {
   Future<dynamic> handleMethod(MethodCall call) async {
     switch (call.method) {
       case "onWebViewCreated":
-        pullToRefreshController?.initMethodChannel(id);
-        findInteractionController?.initMethodChannel(id);
-        if (onWebViewCreated != null) {
-          onWebViewCreated!(webViewController);
+        if (onWebViewCreated != null && _webViewController != null) {
+          onWebViewCreated!(_webViewController!);
         }
         break;
       default:
@@ -222,6 +226,7 @@ class HeadlessInAppWebView implements WebView, Disposable {
       return;
     }
     _started = true;
+    _init();
 
     final initialSettings = this.initialSettings ?? InAppWebViewSettings();
     _inferInitialSettings(initialSettings);
@@ -249,7 +254,6 @@ class HeadlessInAppWebView implements WebView, Disposable {
               'initialSettings': settingsMap,
               'contextMenu': this.contextMenu?.toMap() ?? {},
               'windowId': this.windowId,
-              'implementation': this.implementation.toNativeValue(),
               'initialUserScripts':
                   this.initialUserScripts?.map((e) => e.toMap()).toList() ?? [],
               'pullToRefreshSettings': pullToRefreshSettings,
@@ -306,9 +310,15 @@ class HeadlessInAppWebView implements WebView, Disposable {
       return;
     }
     Map<String, dynamic> args = <String, dynamic>{};
-    await _channel.invokeMethod('dispose', args);
+    await _channel?.invokeMethod('dispose', args);
+    _channel?.setMethodCallHandler(null);
+    _channel = null;
     _started = false;
     _running = false;
+    _webViewController?.dispose();
+    _webViewController = null;
+    pullToRefreshController?.dispose();
+    findInteractionController?.dispose();
   }
 
   ///Indicates if the headless WebView is running or not.
@@ -343,7 +353,7 @@ class HeadlessInAppWebView implements WebView, Disposable {
 
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('size', () => size.toMap());
-    await _channel.invokeMethod('setSize', args);
+    await _channel?.invokeMethod('setSize', args);
   }
 
   ///Gets the current size in pixels of the WebView.
@@ -362,7 +372,7 @@ class HeadlessInAppWebView implements WebView, Disposable {
 
     Map<String, dynamic> args = <String, dynamic>{};
     Map<String, dynamic> sizeMap =
-        (await _channel.invokeMethod('getSize', args))?.cast<String, dynamic>();
+        (await _channel?.invokeMethod('getSize', args))?.cast<String, dynamic>();
     return MapSize.fromMap(sizeMap);
   }
 
@@ -402,10 +412,6 @@ class HeadlessInAppWebView implements WebView, Disposable {
   ///{@macro flutter_inappwebview.WebView.findInteractionController}
   @override
   final FindInteractionController? findInteractionController;
-
-  ///{@macro flutter_inappwebview.WebView.implementation}
-  @override
-  final WebViewImplementation implementation;
 
   ///Use [onGeolocationPermissionsHidePrompt] instead.
   @override

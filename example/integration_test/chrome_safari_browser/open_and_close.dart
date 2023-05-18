@@ -50,7 +50,7 @@ void openAndClose() {
     expect(chromeSafariBrowser.isOpened(), true);
     expect(() async {
       await chromeSafariBrowser.open(url: TEST_CROSS_PLATFORM_URL_1);
-    }, throwsA(isInstanceOf<ChromeSafariBrowserAlreadyOpenedException>()));
+    }, throwsException);
 
     await expectLater(chromeSafariBrowser.firstPageLoaded.future, completes);
     await chromeSafariBrowser.close();

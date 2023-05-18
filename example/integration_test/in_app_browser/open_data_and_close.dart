@@ -19,7 +19,7 @@ void openDataAndClose() {
     expect(inAppBrowser.isOpened(), false);
     expect(() async {
       await inAppBrowser.show();
-    }, throwsA(isInstanceOf<InAppBrowserNotOpenedException>()));
+    }, throwsException);
 
     await inAppBrowser.openData(
         data: """
@@ -46,7 +46,7 @@ void openDataAndClose() {
     expect(() async {
       await inAppBrowser.openUrlRequest(
           urlRequest: URLRequest(url: TEST_URL_1));
-    }, throwsA(isInstanceOf<InAppBrowserAlreadyOpenedException>()));
+    }, throwsException);
 
     await inAppBrowser.firstPageLoaded.future;
     var controller = inAppBrowser.webViewController;

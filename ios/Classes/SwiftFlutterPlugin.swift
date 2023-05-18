@@ -26,7 +26,7 @@ public class SwiftFlutterPlugin: NSObject, FlutterPlugin {
     
     var registrar: FlutterPluginRegistrar?
     var platformUtil: PlatformUtil?
-    var inAppWebViewStatic: InAppWebViewStatic?
+    var inAppWebViewManager: InAppWebViewManager?
     var myCookieManager: Any?
     var myWebStorageManager: Any?
     var credentialDatabase: CredentialDatabase?
@@ -43,13 +43,13 @@ public class SwiftFlutterPlugin: NSObject, FlutterPlugin {
         super.init()
         
         self.registrar = registrar
-        registrar.register(FlutterWebViewFactory(registrar: registrar) as FlutterPlatformViewFactory, withId: FlutterWebViewFactory.VIEW_TYPE_ID)
+        registrar.register(FlutterWebViewFactory(plugin: self) as FlutterPlatformViewFactory, withId: FlutterWebViewFactory.VIEW_TYPE_ID)
         
         platformUtil = PlatformUtil(plugin: self)
         inAppBrowserManager = InAppBrowserManager(plugin: self)
         headlessInAppWebViewManager = HeadlessInAppWebViewManager(plugin: self)
         chromeSafariBrowserManager = ChromeSafariBrowserManager(plugin: self)
-        inAppWebViewStatic = InAppWebViewStatic(plugin: self)
+        inAppWebViewManager = InAppWebViewManager(plugin: self)
         credentialDatabase = CredentialDatabase(plugin: self)
         if #available(iOS 11.0, *) {
             myCookieManager = MyCookieManager(plugin: self)
@@ -58,7 +58,7 @@ public class SwiftFlutterPlugin: NSObject, FlutterPlugin {
             myWebStorageManager = MyWebStorageManager(plugin: self)
         }
         webAuthenticationSessionManager = WebAuthenticationSessionManager(plugin: self)
-        printJobManager = PrintJobManager()
+        printJobManager = PrintJobManager(plugin: self)
     }
     
     public static func register(with registrar: FlutterPluginRegistrar) {
@@ -74,8 +74,8 @@ public class SwiftFlutterPlugin: NSObject, FlutterPlugin {
         headlessInAppWebViewManager = nil
         chromeSafariBrowserManager?.dispose()
         chromeSafariBrowserManager = nil
-        inAppWebViewStatic?.dispose()
-        inAppWebViewStatic = nil
+        inAppWebViewManager?.dispose()
+        inAppWebViewManager = nil
         credentialDatabase?.dispose()
         credentialDatabase = nil
         if #available(iOS 11.0, *) {

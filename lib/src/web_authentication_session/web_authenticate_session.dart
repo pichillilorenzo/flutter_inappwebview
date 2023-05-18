@@ -56,7 +56,7 @@ class WebAuthenticationSession implements Disposable {
   ///A completion handler the session calls when it completes successfully, or when the user cancels the session.
   WebAuthenticationSessionCompletionHandler onComplete;
 
-  late MethodChannel _channel;
+  MethodChannel? _channel;
   static const MethodChannel _sharedChannel = const MethodChannel(
       'com.pichillilorenzo/flutter_webauthenticationsession');
 
@@ -104,7 +104,7 @@ class WebAuthenticationSession implements Disposable {
         initialSettings ?? WebAuthenticationSessionSettings();
     this._channel = MethodChannel(
         'com.pichillilorenzo/flutter_webauthenticationsession_$id');
-    this._channel.setMethodCallHandler((call) async {
+    this._channel?.setMethodCallHandler((call) async {
       try {
         return await _handleMethod(call);
       } on Error catch (e) {
@@ -147,10 +147,10 @@ class WebAuthenticationSession implements Disposable {
   ///- iOS ([Official API - ASWebAuthenticationSession.canStart](https://developer.apple.com/documentation/authenticationservices/aswebauthenticationsession/3516277-canstart))
   Future<bool> canStart() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    return await _channel.invokeMethod('canStart', args);
+    return await _channel?.invokeMethod('canStart', args);
   }
 
-  ///Starts a web authentication session.
+  ///Starts the web authentication session.
   ///
   ///Returns a boolean value indicating whether the web authentication session started successfully.
   ///
@@ -161,10 +161,10 @@ class WebAuthenticationSession implements Disposable {
   ///- iOS ([Official API - ASWebAuthenticationSession.start](https://developer.apple.com/documentation/authenticationservices/aswebauthenticationsession/2990953-start))
   Future<bool> start() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    return await _channel.invokeMethod('start', args);
+    return await _channel?.invokeMethod('start', args);
   }
 
-  ///Cancels a web authentication session.
+  ///Cancels the web authentication session.
   ///
   ///If the session has already presented a view with the authentication webpage, calling this method dismisses that view.
   ///Calling [cancel] on an already canceled session has no effect.
@@ -173,17 +173,19 @@ class WebAuthenticationSession implements Disposable {
   ///- iOS ([Official API - ASWebAuthenticationSession.cancel](https://developer.apple.com/documentation/authenticationservices/aswebauthenticationsession/2990951-cancel))
   Future<void> cancel() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    await _channel.invokeMethod("cancel", args);
+    await _channel?.invokeMethod("cancel", args);
   }
 
-  ///Disposes a web authentication session.
+  ///Disposes the web authentication session.
   ///
   ///**Supported Platforms/Implementations**:
   ///- iOS
   @override
   Future<void> dispose() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    await _channel.invokeMethod("dispose", args);
+    await _channel?.invokeMethod("dispose", args);
+    _channel?.setMethodCallHandler(null);
+    _channel = null;
   }
 
   ///Returns `true` if [ASWebAuthenticationSession](https://developer.apple.com/documentation/authenticationservices/aswebauthenticationsession)

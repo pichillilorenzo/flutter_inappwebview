@@ -19,7 +19,7 @@ void openUrlAndClose() {
     expect(inAppBrowser.isOpened(), false);
     expect(() async {
       await inAppBrowser.show();
-    }, throwsA(isInstanceOf<InAppBrowserNotOpenedException>()));
+    }, throwsException);
 
     await inAppBrowser.openUrlRequest(urlRequest: URLRequest(url: TEST_URL_1));
     await inAppBrowser.browserCreated.future;
@@ -27,7 +27,7 @@ void openUrlAndClose() {
     expect(() async {
       await inAppBrowser.openUrlRequest(
           urlRequest: URLRequest(url: TEST_CROSS_PLATFORM_URL_1));
-    }, throwsA(isInstanceOf<InAppBrowserAlreadyOpenedException>()));
+    }, throwsException);
 
     await inAppBrowser.firstPageLoaded.future;
     var controller = inAppBrowser.webViewController;

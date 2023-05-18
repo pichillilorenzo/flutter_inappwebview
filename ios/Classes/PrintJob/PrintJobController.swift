@@ -18,7 +18,7 @@ public enum PrintJobState: Int {
 public class PrintJobController : NSObject, Disposable, UIPrintInteractionControllerDelegate {
     static let METHOD_CHANNEL_NAME_PREFIX = "com.pichillilorenzo/flutter_inappwebview_printjobcontroller_"
     var id: String
-    var registrar: FlutterPluginRegistrar?
+    var plugin: SwiftFlutterPlugin?
     var job: UIPrintInteractionController?
     var settings: PrintJobSettings?
     var printFormatter: UIPrintFormatter?
@@ -27,18 +27,20 @@ public class PrintJobController : NSObject, Disposable, UIPrintInteractionContro
     var state = PrintJobState.created
     var creationTime = Int64(Date().timeIntervalSince1970 * 1000)
     
-    public init(registrar: FlutterPluginRegistrar, id: String, job: UIPrintInteractionController? = nil, settings: PrintJobSettings? = nil) {
+    public init(plugin: SwiftFlutterPlugin, id: String, job: UIPrintInteractionController? = nil, settings: PrintJobSettings? = nil) {
         self.id = id
-        self.registrar = registrar
+        self.plugin = plugin
         super.init()
         self.job = job
         self.settings = settings
         self.printFormatter = job?.printFormatter
         self.printPageRenderer = job?.printPageRenderer
         self.job?.delegate = self
-        let channel = FlutterMethodChannel(name: PrintJobController.METHOD_CHANNEL_NAME_PREFIX + id,
-                                           binaryMessenger: registrar.messenger())
-        self.channelDelegate = PrintJobChannelDelegate(printJobController: self, channel: channel)
+        if let registrar = plugin.registrar {
+            let channel = FlutterMethodChannel(name: PrintJobController.METHOD_CHANNEL_NAME_PREFIX + id,
+                                               binaryMessenger: registrar.messenger())
+            self.channelDelegate = PrintJobChannelDelegate(printJobController: self, channel: channel)
+        }
     }
     
     public func printInteractionControllerWillStartJob(_ printInteractionController: UIPrintInteractionController) {
@@ -82,7 +84,8 @@ public class PrintJobController : NSObject, Disposable, UIPrintInteractionContro
         printPageRenderer = nil
         job?.delegate = nil
         job = nil
-        PrintJobManager.jobs[id] = nil
+        plugin?.printJobManager?.jobs[id] = nil
+        plugin = nil
     }
     
     public func dispose() {
@@ -93,7 +96,7 @@ public class PrintJobController : NSObject, Disposable, UIPrintInteractionContro
         job?.delegate = nil
         job?.dismiss(animated: false)
         job = nil
-        PrintJobManager.jobs[id] = nil
-        registrar = nil
+        plugin?.printJobManager?.jobs[id] = nil
+        plugin = nil
     }
 }

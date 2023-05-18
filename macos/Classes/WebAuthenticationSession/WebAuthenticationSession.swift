@@ -91,7 +91,7 @@ public class WebAuthenticationSession : NSObject, ASWebAuthenticationPresentatio
         channelDelegate?.dispose()
         channelDelegate = nil
         session = nil
-        WebAuthenticationSessionManager.sessions[id] = nil
+        plugin?.webAuthenticationSessionManager?.sessions[id] = nil
         plugin = nil
     }
     

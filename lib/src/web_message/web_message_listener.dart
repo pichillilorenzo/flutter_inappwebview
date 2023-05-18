@@ -34,7 +34,7 @@ class WebMessageListener {
   ///**Official Android API**: https://developer.android.com/reference/androidx/webkit/WebViewCompat.WebMessageListener#onPostMessage(android.webkit.WebView,%20androidx.webkit.WebMessageCompat,%20android.net.Uri,%20boolean,%20androidx.webkit.JavaScriptReplyProxy)
   OnPostMessageCallback? onPostMessage;
 
-  late MethodChannel _channel;
+  MethodChannel? _channel;
 
   WebMessageListener(
       {required this.jsObjectName,
@@ -47,7 +47,7 @@ class WebMessageListener {
         "allowedOriginRules cannot contain empty strings");
     this._channel = MethodChannel(
         'com.pichillilorenzo/flutter_inappwebview_web_message_listener_${id}_$jsObjectName');
-    this._channel.setMethodCallHandler((call) async {
+    this._channel?.setMethodCallHandler((call) async {
       try {
         return await _handleMethod(call);
       } on Error catch (e) {
@@ -114,6 +114,6 @@ class JavaScriptReplyProxy {
   Future<void> postMessage(String message) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('message', () => message);
-    await _webMessageListener._channel.invokeMethod('postMessage', args);
+    await _webMessageListener._channel?.invokeMethod('postMessage', args);
   }
 }

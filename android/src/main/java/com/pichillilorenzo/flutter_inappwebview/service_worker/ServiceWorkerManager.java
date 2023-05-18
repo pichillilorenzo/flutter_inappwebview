@@ -99,10 +99,6 @@ public class ServiceWorkerManager implements Disposable {
       channelDelegate.dispose();
       channelDelegate = null;
     }
-    if (serviceWorkerController != null) {
-      serviceWorkerController.setServiceWorkerClient(dummyServiceWorkerClientCompat());
-      serviceWorkerController = null; 
-    }
     plugin = null;
   }
 

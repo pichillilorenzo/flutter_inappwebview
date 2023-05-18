@@ -1,8 +1,12 @@
 import 'dart:async';
 import 'package:flutter/services.dart';
+import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_internal_annotations.dart';
+import '../types/proxy_rule.dart';
 import 'webview_feature.dart';
 import '../in_app_webview/webview.dart';
 import '../types/main.dart';
+
+part 'proxy_controller.g.dart';
 
 ///Manages setting and clearing a process-specific override for the Android system-wide proxy settings that govern network requests made by [WebView].
 ///
@@ -78,7 +82,8 @@ class ProxyController {
 ///
 ///**Supported Platforms/Implementations**:
 ///- Android native WebView ([Official API - ProxyConfig](https://developer.android.com/reference/androidx/webkit/ProxyConfig))
-class ProxySettings {
+@ExchangeableObject(copyMethod: true)
+class ProxySettings_ {
   ///List of bypass rules.
   ///
   ///A bypass rule describes URLs that should skip proxy override settings and make a direct connection instead. These can be URLs or IP addresses. Wildcards are accepted.
@@ -99,7 +104,7 @@ class ProxySettings {
   ///Port number is optional and defaults to `80` for `HTTP`, `443` for `HTTPS` and `1080` for `SOCKS`.
   ///
   ///The correct syntax for hosts is defined by [RFC 3986](https://tools.ietf.org/html/rfc3986#section-3.2.2).
-  List<ProxyRule> proxyRules;
+  List<ProxyRule_> proxyRules;
 
   ///Hostnames without a period in them (and that are not IP literals) will skip proxy settings and be connected to directly instead. Examples: `"abc"`, `"local"`, `"some-domain"`.
   ///
@@ -128,7 +133,7 @@ class ProxySettings {
   ///**NOTE**: available only if [WebViewFeature.PROXY_OVERRIDE_REVERSE_BYPASS] feature is supported.
   bool reverseBypassEnabled;
 
-  ProxySettings(
+  ProxySettings_(
       {this.bypassRules = const [],
       this.directs = const [],
       this.proxyRules = const [],
@@ -136,40 +141,40 @@ class ProxySettings {
       this.removeImplicitRules,
       this.reverseBypassEnabled = false});
 
-  Map<String, dynamic> toMap() {
-    return {
-      "bypassRules": bypassRules,
-      "directs": directs,
-      "proxyRules": proxyRules.map((e) => e.toMap()).toList(),
-      "bypassSimpleHostnames": bypassSimpleHostnames,
-      "removeImplicitRules": removeImplicitRules,
-      "reverseBypassEnabled": reverseBypassEnabled
-    };
-  }
-
-  static ProxySettings fromMap(Map<String, dynamic> map) {
-    var settings = ProxySettings();
-    settings.bypassRules = map["bypassRules"];
-    settings.directs = map["directs"];
-    settings.proxyRules = (map["proxyRules"].cast<Map<String, dynamic>>()
-            as List<Map<String, dynamic>>)
-        .map((e) => ProxyRule.fromMap(e)) as List<ProxyRule>;
-    settings.bypassSimpleHostnames = map["bypassSimpleHostnames"];
-    settings.removeImplicitRules = map["removeImplicitRules"];
-    settings.reverseBypassEnabled = map["reverseBypassEnabled"];
-    return settings;
-  }
-
-  Map<String, dynamic> toJson() {
-    return this.toMap();
-  }
-
-  @override
-  String toString() {
-    return toMap().toString();
-  }
-
-  ProxySettings copy() {
-    return ProxySettings.fromMap(this.toMap());
-  }
+  // Map<String, dynamic> toMap() {
+  //   return {
+  //     "bypassRules": bypassRules,
+  //     "directs": directs,
+  //     "proxyRules": proxyRules.map((e) => e.toMap()).toList(),
+  //     "bypassSimpleHostnames": bypassSimpleHostnames,
+  //     "removeImplicitRules": removeImplicitRules,
+  //     "reverseBypassEnabled": reverseBypassEnabled
+  //   };
+  // }
+  //
+  // static ProxySettings fromMap(Map<String, dynamic> map) {
+  //   var settings = ProxySettings();
+  //   settings.bypassRules = map["bypassRules"];
+  //   settings.directs = map["directs"];
+  //   settings.proxyRules = (map["proxyRules"].cast<Map<String, dynamic>>()
+  //           as List<Map<String, dynamic>>)
+  //       .map((e) => ProxyRule.fromMap(e)) as List<ProxyRule>;
+  //   settings.bypassSimpleHostnames = map["bypassSimpleHostnames"];
+  //   settings.removeImplicitRules = map["removeImplicitRules"];
+  //   settings.reverseBypassEnabled = map["reverseBypassEnabled"];
+  //   return settings;
+  // }
+  //
+  // Map<String, dynamic> toJson() {
+  //   return this.toMap();
+  // }
+  //
+  // @override
+  // String toString() {
+  //   return 'ProxySettings{bypassRules: $bypassRules, directs: $directs, proxyRules: $proxyRules, bypassSimpleHostnames: $bypassSimpleHostnames, removeImplicitRules: $removeImplicitRules, reverseBypassEnabled: $reverseBypassEnabled}';
+  // }
+  //
+  // ProxySettings copy() {
+  //   return ProxySettings.fromMap(this.toMap());
+  // }
 }

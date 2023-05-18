@@ -393,6 +393,5 @@ public class MyCookieManager extends ChannelDelegateImpl {
   public void dispose() {
     super.dispose();
     plugin = null;
-    cookieManager = null;
   }
 }

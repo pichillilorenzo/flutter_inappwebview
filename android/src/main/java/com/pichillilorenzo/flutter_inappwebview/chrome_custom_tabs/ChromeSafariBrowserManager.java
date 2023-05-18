@@ -31,7 +31,7 @@ public class ChromeSafariBrowserManager extends ChannelDelegateImpl {
   public InAppWebViewFlutterPlugin plugin;
   public String id;
   public static final Map<String, ChromeSafariBrowserManager> shared = new HashMap<>();
-  public static final Map<String, ChromeCustomTabsActivity> browsers = new HashMap<>();
+  public final Map<String, ChromeCustomTabsActivity> browsers = new HashMap<>();
 
   public ChromeSafariBrowserManager(final InAppWebViewFlutterPlugin plugin) {
     super(new MethodChannel(plugin.messenger, METHOD_CHANNEL_NAME));

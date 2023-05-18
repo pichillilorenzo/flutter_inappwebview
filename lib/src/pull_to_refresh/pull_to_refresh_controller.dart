@@ -44,19 +44,6 @@ class PullToRefreshController {
     this.settings = settings ?? PullToRefreshSettings();
   }
 
-  void initMethodChannel(dynamic id) {
-    this._channel = MethodChannel(
-        'com.pichillilorenzo/flutter_inappwebview_pull_to_refresh_$id');
-    this._channel?.setMethodCallHandler((call) async {
-      try {
-        return await _handleMethod(call);
-      } on Error catch (e) {
-        print(e);
-        print(e.stackTrace);
-      }
-    });
-  }
-
   _debugLog(String method, dynamic args) {
     debugLog(
         className: this.runtimeType.toString(),
@@ -227,5 +214,29 @@ class PullToRefreshController {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('attributedTitle', () => attributedTitle.toMap());
     await _channel?.invokeMethod('setStyledTitle', args);
+  }
+
+  ///Disposes the controller.
+  void dispose({bool isKeepAlive = false}) {
+    if (!isKeepAlive) {
+      _channel?.setMethodCallHandler(null);
+    }
+    _channel = null;
+  }
+}
+
+extension InternalPullToRefreshController on PullToRefreshController {
+  void init(dynamic id) {
+    this._channel = MethodChannel(
+        'com.pichillilorenzo/flutter_inappwebview_pull_to_refresh_$id');
+    this._channel?.setMethodCallHandler((call) async {
+      if (_channel == null) return null;
+      try {
+        return await _handleMethod(call);
+      } on Error catch (e) {
+        print(e);
+        print(e.stackTrace);
+      }
+    });
   }
 }

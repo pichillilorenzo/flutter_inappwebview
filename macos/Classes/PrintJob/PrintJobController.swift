@@ -18,7 +18,7 @@ public enum PrintJobState: Int {
 public class PrintJobController : NSObject, Disposable {
     static let METHOD_CHANNEL_NAME_PREFIX = "com.pichillilorenzo/flutter_inappwebview_printjobcontroller_"
     var id: String
-    var registrar: FlutterPluginRegistrar?
+    var plugin: InAppWebViewFlutterPlugin?
     var job: NSPrintOperation?
     var settings: PrintJobSettings?
     var channelDelegate: PrintJobChannelDelegate?
@@ -30,15 +30,17 @@ public class PrintJobController : NSObject, Disposable {
                                           _ success: Bool,
                                           _ contextInfo: UnsafeMutableRawPointer?) -> Void
     
-    public init(registrar: FlutterPluginRegistrar, id: String, job: NSPrintOperation? = nil, settings: PrintJobSettings? = nil) {
+    public init(plugin: InAppWebViewFlutterPlugin, id: String, job: NSPrintOperation? = nil, settings: PrintJobSettings? = nil) {
         self.id = id
-        self.registrar = registrar
+        self.plugin = plugin
         super.init()
         self.job = job
         self.settings = settings
-        let channel = FlutterMethodChannel(name: PrintJobController.METHOD_CHANNEL_NAME_PREFIX + id,
-                                           binaryMessenger: registrar.messenger)
-        self.channelDelegate = PrintJobChannelDelegate(printJobController: self, channel: channel)
+        if let registrar = plugin.registrar {
+            let channel = FlutterMethodChannel(name: PrintJobController.METHOD_CHANNEL_NAME_PREFIX + id,
+                                               binaryMessenger: registrar.messenger)
+            self.channelDelegate = PrintJobChannelDelegate(printJobController: self, channel: channel)
+        }
     }
     
     public func present(parentWindow: NSWindow? = nil, completionHandler: PrintJobController.CompletionHandler? = nil) {
@@ -76,7 +78,8 @@ public class PrintJobController : NSObject, Disposable {
         channelDelegate = nil
         completionHandler = nil
         job = nil
-        PrintJobManager.jobs[id] = nil
+        plugin?.printJobManager?.jobs[id] = nil
+        plugin = nil
     }
     
     public func dispose() {
@@ -84,7 +87,7 @@ public class PrintJobController : NSObject, Disposable {
         channelDelegate = nil
         completionHandler = nil
         job = nil
-        PrintJobManager.jobs[id] = nil
-        registrar = nil
+        plugin?.printJobManager?.jobs[id] = nil
+        plugin = nil
     }
 }

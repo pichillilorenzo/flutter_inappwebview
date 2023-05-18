@@ -1,5 +1,6 @@
 package com.pichillilorenzo.flutter_inappwebview.headless_in_app_webview;
 
+import android.app.Activity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
@@ -130,17 +131,21 @@ public class HeadlessInAppWebView implements Disposable {
       channelDelegate.dispose();
       channelDelegate = null;
     }
-    if (HeadlessInAppWebViewManager.webViews.containsKey(id)) {
-      HeadlessInAppWebViewManager.webViews.put(id, null);
-    }
-    if (plugin != null && plugin.activity != null) {
-      ViewGroup contentView = plugin.activity.findViewById(android.R.id.content);
-      if (contentView != null) {
-        ViewGroup mainView = (ViewGroup) (contentView).getChildAt(0);
-        if (mainView != null && flutterWebView != null) {
-          View view = flutterWebView.getView();
-          if (view != null) {
-            mainView.removeView(flutterWebView.getView());
+    if (plugin != null) {
+      HeadlessInAppWebViewManager headlessInAppWebViewManager = plugin.headlessInAppWebViewManager;
+      if (headlessInAppWebViewManager != null && headlessInAppWebViewManager.webViews.containsKey(id)) {
+        headlessInAppWebViewManager.webViews.put(id, null);
+      }
+      Activity activity =  plugin.activity;
+      if (activity != null) {
+        ViewGroup contentView = plugin.activity.findViewById(android.R.id.content);
+        if (contentView != null) {
+          ViewGroup mainView = (ViewGroup) (contentView).getChildAt(0);
+          if (mainView != null && flutterWebView != null) {
+            View view = flutterWebView.getView();
+            if (view != null) {
+              mainView.removeView(flutterWebView.getView());
+            }
           }
         }
       }

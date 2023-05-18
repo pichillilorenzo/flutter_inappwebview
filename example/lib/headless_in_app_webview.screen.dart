@@ -86,7 +86,7 @@ class _HeadlessInAppWebViewExampleScreenState
             child: ElevatedButton(
                 onPressed: () async {
                   if (headlessWebView?.isRunning() ?? false) {
-                    await headlessWebView?.webViewController.evaluateJavascript(
+                    await headlessWebView?.webViewController?.evaluateJavascript(
                         source: """console.log('Here is the message!');""");
                   } else {
                     ScaffoldMessenger.of(context).showSnackBar(SnackBar(

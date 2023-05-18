@@ -1439,10 +1439,10 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
         // Create a printCurrentPage job with name and adapter instance
         android.print.PrintJob job = printManager.print(jobName, printAdapter, builder.build());
 
-        if (settings != null && settings.handledByClient) {
+        if (settings != null && settings.handledByClient && plugin.printJobManager != null) {
           String id = UUID.randomUUID().toString();
           PrintJobController printJobController = new PrintJobController(id, job, settings, plugin);
-          PrintJobManager.jobs.put(printJobController.id, printJobController);
+          plugin.printJobManager.jobs.put(printJobController.id, printJobController);
           return id; 
         }
       } else {
@@ -2011,8 +2011,8 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
       webViewAssetLoaderExt.dispose();
       webViewAssetLoaderExt = null;
     }
-    if (windowId != null) {
-      InAppWebViewChromeClient.windowWebViewMessages.remove(windowId);
+    if (windowId != null && plugin != null && plugin.inAppWebViewManager != null) {
+      plugin.inAppWebViewManager.windowWebViewMessages.remove(windowId);
     }
     mainLooperHandler.removeCallbacksAndMessages(null);
     mHandler.removeCallbacksAndMessages(null);

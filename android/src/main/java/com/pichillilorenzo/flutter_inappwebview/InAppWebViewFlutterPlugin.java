@@ -17,6 +17,8 @@ import com.pichillilorenzo.flutter_inappwebview.print_job.PrintJobManager;
 import com.pichillilorenzo.flutter_inappwebview.proxy.ProxyManager;
 import com.pichillilorenzo.flutter_inappwebview.service_worker.ServiceWorkerManager;
 import com.pichillilorenzo.flutter_inappwebview.tracing.TracingControllerManager;
+import com.pichillilorenzo.flutter_inappwebview.webview.FlutterWebViewFactory;
+import com.pichillilorenzo.flutter_inappwebview.webview.InAppWebViewManager;
 
 import io.flutter.embedding.engine.plugins.activity.ActivityAware;
 import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding;
@@ -39,7 +41,7 @@ public class InAppWebViewFlutterPlugin implements FlutterPlugin, ActivityAware {
   @Nullable
   public ChromeSafariBrowserManager chromeSafariBrowserManager;
   @Nullable
-  public InAppWebViewStatic inAppWebViewStatic;
+  public InAppWebViewManager inAppWebViewManager;
   @Nullable
   public MyCookieManager myCookieManager;
   @Nullable
@@ -56,11 +58,6 @@ public class InAppWebViewFlutterPlugin implements FlutterPlugin, ActivityAware {
   public PrintJobManager printJobManager;
   @Nullable
   public TracingControllerManager tracingControllerManager;
-  @Nullable
-  public static ValueCallback<Uri> filePathCallbackLegacy;
-  @Nullable
-  public static ValueCallback<Uri[]> filePathCallback;
-
   public FlutterWebViewFactory flutterWebViewFactory;
   public Context applicationContext;
   public PluginRegistry.Registrar registrar;
@@ -110,7 +107,7 @@ public class InAppWebViewFlutterPlugin implements FlutterPlugin, ActivityAware {
             FlutterWebViewFactory.VIEW_TYPE_ID, flutterWebViewFactory);
 
     platformUtil = new PlatformUtil(this);
-    inAppWebViewStatic = new InAppWebViewStatic(this);
+    inAppWebViewManager = new InAppWebViewManager(this);
     myCookieManager = new MyCookieManager(this);
     myWebStorage = new MyWebStorage(this);
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
@@ -122,7 +119,7 @@ public class InAppWebViewFlutterPlugin implements FlutterPlugin, ActivityAware {
     webViewFeatureManager = new WebViewFeatureManager(this);
     proxyManager = new ProxyManager(this);
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-      printJobManager = new PrintJobManager();
+      printJobManager = new PrintJobManager(this);
     }
     tracingControllerManager = new TracingControllerManager(this);
   }
@@ -157,9 +154,9 @@ public class InAppWebViewFlutterPlugin implements FlutterPlugin, ActivityAware {
       credentialDatabaseHandler.dispose();
       credentialDatabaseHandler = null;
     }
-    if (inAppWebViewStatic != null) {
-      inAppWebViewStatic.dispose();
-      inAppWebViewStatic = null;
+    if (inAppWebViewManager != null) {
+      inAppWebViewManager.dispose();
+      inAppWebViewManager = null;
     }
     if (serviceWorkerManager != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
       serviceWorkerManager.dispose();
@@ -181,8 +178,6 @@ public class InAppWebViewFlutterPlugin implements FlutterPlugin, ActivityAware {
       tracingControllerManager.dispose();
       tracingControllerManager = null;
     }
-    filePathCallbackLegacy = null;
-    filePathCallback = null;
   }
 
   @Override

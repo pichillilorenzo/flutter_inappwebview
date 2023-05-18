@@ -15,30 +15,6 @@ import '../debug_logging_settings.dart';
 import '../web_uri.dart';
 import 'chrome_safari_browser_settings.dart';
 
-class ChromeSafariBrowserAlreadyOpenedException implements Exception {
-  final dynamic message;
-
-  ChromeSafariBrowserAlreadyOpenedException([this.message]);
-
-  String toString() {
-    Object? message = this.message;
-    if (message == null) return "ChromeSafariBrowserAlreadyOpenedException";
-    return "ChromeSafariBrowserAlreadyOpenedException: $message";
-  }
-}
-
-class ChromeSafariBrowserNotOpenedException implements Exception {
-  final dynamic message;
-
-  ChromeSafariBrowserNotOpenedException([this.message]);
-
-  String toString() {
-    Object? message = this.message;
-    if (message == null) return "ChromeSafariBrowserNotOpenedException";
-    return "ChromeSafariBrowserNotOpenedException: $message";
-  }
-}
-
 ///This class uses native [Chrome Custom Tabs](https://developer.android.com/reference/android/support/customtabs/package-summary) on Android
 ///and [SFSafariViewController](https://developer.apple.com/documentation/safariservices/sfsafariviewcontroller) on iOS.
 ///
@@ -60,7 +36,7 @@ class ChromeSafariBrowser {
   Map<int, ChromeSafariBrowserMenuItem> _menuItems = new HashMap();
   ChromeSafariBrowserSecondaryToolbar? _secondaryToolbar;
   bool _isOpened = false;
-  late MethodChannel _channel;
+  MethodChannel? _channel;
   static const MethodChannel _sharedChannel =
       const MethodChannel('com.pichillilorenzo/flutter_chromesafaribrowser');
 
@@ -68,7 +44,7 @@ class ChromeSafariBrowser {
     id = IdGenerator.generate();
     this._channel =
         MethodChannel('com.pichillilorenzo/flutter_chromesafaribrowser_$id');
-    this._channel.setMethodCallHandler((call) async {
+    this._channel?.setMethodCallHandler((call) async {
       try {
         return await _handleMethod(call);
       } on Error catch (e) {
@@ -77,6 +53,19 @@ class ChromeSafariBrowser {
       }
     });
     _isOpened = false;
+  }
+
+  _init() {
+    this._channel =
+        MethodChannel('com.pichillilorenzo/flutter_chromesafaribrowser_$id');
+    this._channel?.setMethodCallHandler((call) async {
+      try {
+        return await _handleMethod(call);
+      } on Error catch (e) {
+        print(e);
+        print(e.stackTrace);
+      }
+    });
   }
 
   _debugLog(String method, dynamic args) {
@@ -125,8 +114,9 @@ class ChromeSafariBrowser {
         onWillOpenInBrowser();
         break;
       case "onClosed":
+        _isOpened = false;
+        _dispose();
         onClosed();
-        this._isOpened = false;
         break;
       case "onItemActionPerform":
         String url = call.arguments["url"];
@@ -208,6 +198,9 @@ class ChromeSafariBrowser {
           // ignore: deprecated_member_use_from_same_package
           ChromeSafariBrowserClassOptions? options,
       ChromeSafariBrowserSettings? settings}) async {
+    assert(!_isOpened, 'The browser is already opened.');
+    _isOpened = true;
+
     if (Util.isIOS) {
       assert(url != null, 'The specified URL must not be null on iOS.');
       assert(['http', 'https'].contains(url!.scheme),
@@ -216,9 +209,8 @@ class ChromeSafariBrowser {
     if (url != null) {
       assert(url.toString().isNotEmpty, 'The specified URL must not be empty.');
     }
-    this.throwIsAlreadyOpened(message: url != null ? 'Cannot open $url!' : '');
 
-    this._isOpened = true;
+    _init();
 
     List<Map<String, dynamic>> menuItemList = [];
     _menuItems.forEach((key, value) {
@@ -269,7 +261,7 @@ class ChromeSafariBrowser {
     args.putIfAbsent('otherLikelyURLs',
         () => otherLikelyURLs?.map((e) => e.toString()).toList());
     args.putIfAbsent('referrer', () => referrer?.toString());
-    await _channel.invokeMethod("launchUrl", args);
+    await _channel?.invokeMethod("launchUrl", args);
   }
 
   ///Tells the browser of a likely future navigation to a URL.
@@ -290,7 +282,7 @@ class ChromeSafariBrowser {
     args.putIfAbsent('url', () => url?.toString());
     args.putIfAbsent('otherLikelyURLs',
         () => otherLikelyURLs?.map((e) => e.toString()).toList());
-    return await _channel.invokeMethod("mayLaunchUrl", args);
+    return await _channel?.invokeMethod("mayLaunchUrl", args);
   }
 
   ///Requests to validate a relationship between the application and an origin.
@@ -315,7 +307,7 @@ class ChromeSafariBrowser {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('relation', () => relation.toNativeValue());
     args.putIfAbsent('origin', () => origin.toString());
-    return await _channel.invokeMethod("validateRelationship", args);
+    return await _channel?.invokeMethod("validateRelationship", args);
   }
 
   ///Closes the [ChromeSafariBrowser] instance.
@@ -325,7 +317,7 @@ class ChromeSafariBrowser {
   ///- iOS
   Future<void> close() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    await _channel.invokeMethod("close", args);
+    await _channel?.invokeMethod("close", args);
   }
 
   ///Set a custom action button.
@@ -349,7 +341,7 @@ class ChromeSafariBrowser {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('icon', () => icon);
     args.putIfAbsent('description', () => description);
-    await _channel.invokeMethod("updateActionButton", args);
+    await _channel?.invokeMethod("updateActionButton", args);
     _actionButton?.icon = icon;
     _actionButton?.description = description;
   }
@@ -375,7 +367,7 @@ class ChromeSafariBrowser {
       ChromeSafariBrowserSecondaryToolbar secondaryToolbar) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('secondaryToolbar', () => secondaryToolbar.toMap());
-    await _channel.invokeMethod("updateSecondaryToolbar", args);
+    await _channel?.invokeMethod("updateSecondaryToolbar", args);
     this._secondaryToolbar = secondaryToolbar;
   }
 
@@ -546,23 +538,13 @@ class ChromeSafariBrowser {
   ///- Android
   ///- iOS
   bool isOpened() {
-    return this._isOpened;
+    return _isOpened;
   }
 
-  void throwIsAlreadyOpened({String message = ''}) {
-    if (this.isOpened()) {
-      throw ChromeSafariBrowserAlreadyOpenedException([
-        'Error: ${(message.isEmpty) ? '' : message + ' '}The browser is already opened.'
-      ]);
-    }
-  }
-
-  void throwIsNotOpened({String message = ''}) {
-    if (!this.isOpened()) {
-      throw ChromeSafariBrowserNotOpenedException([
-        'Error: ${(message.isEmpty) ? '' : message + ' '}The browser is not opened.'
-      ]);
-    }
+  ///Disposes the channel.
+  void _dispose() {
+    _channel?.setMethodCallHandler(null);
+    _channel = null;
   }
 }
 

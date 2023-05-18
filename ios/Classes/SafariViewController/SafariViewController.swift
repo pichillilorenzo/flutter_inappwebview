@@ -105,9 +105,14 @@ public class SafariViewController: SFSafariViewController, SFSafariViewControlle
     }
     
     public func safariViewController(_ controller: SFSafariViewController, activityItemsFor URL: URL, title: String?) -> [UIActivity] {
+        guard let plugin = plugin else {
+            return []
+        }
         var uiActivities: [UIActivity] = []
         menuItemList.forEach { (menuItem) in
-            let activity = CustomUIActivity(viewId: id, id: menuItem["id"] as! Int64, url: URL, title: title, label: menuItem["label"] as? String, type: nil, image: .fromMap(map: menuItem["image"] as? [String:Any?]))
+            let activity = CustomUIActivity(plugin: plugin, viewId: id, id: menuItem["id"] as! Int64, url: URL,
+                                            title: title, label: menuItem["label"] as? String, type: nil,
+                                            image: .fromMap(map: menuItem["image"] as? [String:Any?]))
             uiActivities.append(activity)
         }
         return uiActivities
@@ -125,7 +130,7 @@ public class SafariViewController: SFSafariViewController, SFSafariViewControlle
         channelDelegate?.dispose()
         channelDelegate = nil
         delegate = nil
-        ChromeSafariBrowserManager.browsers[id] = nil
+        plugin?.chromeSafariBrowserManager?.browsers[id] = nil
         plugin = nil
     }
     

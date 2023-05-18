@@ -1,5 +1,5 @@
 //
-//  InAppWebViewStatic.swift
+//  InAppWebViewManager.swift
 //  flutter_inappwebview
 //
 //  Created by Lorenzo Pichilli on 08/12/2019.
@@ -7,16 +7,19 @@
 
 import Foundation
 import WebKit
-import FlutterMacOS
 
-public class InAppWebViewStatic: ChannelDelegate {
-    static let METHOD_CHANNEL_NAME = "com.pichillilorenzo/flutter_inappwebview_static"
-    var plugin: InAppWebViewFlutterPlugin?
+public class InAppWebViewManager: ChannelDelegate {
+    static let METHOD_CHANNEL_NAME = "com.pichillilorenzo/flutter_inappwebview_manager"
+    var plugin: SwiftFlutterPlugin?
     var webViewForUserAgent: WKWebView?
     var defaultUserAgent: String?
     
-    init(plugin: InAppWebViewFlutterPlugin) {
-        super.init(channel: FlutterMethodChannel(name: InAppWebViewStatic.METHOD_CHANNEL_NAME, binaryMessenger: plugin.registrar!.messenger))
+    var keepAliveWebViews: [String:FlutterWebViewController?] = [:]
+    var windowWebViews: [Int64:WebViewTransport] = [:]
+    var windowAutoincrementId: Int64 = 0
+    
+    init(plugin: SwiftFlutterPlugin) {
+        super.init(channel: FlutterMethodChannel(name: InAppWebViewManager.METHOD_CHANNEL_NAME, binaryMessenger: plugin.registrar!.messenger()))
         self.plugin = plugin
     }
     
@@ -31,11 +34,16 @@ public class InAppWebViewStatic: ChannelDelegate {
                 break
             case "handlesURLScheme":
                 let urlScheme = arguments!["urlScheme"] as! String
-                if #available(macOS 10.13, *) {
+                if #available(iOS 11.0, *) {
                     result(WKWebView.handlesURLScheme(urlScheme))
                 } else {
                     result(false)
                 }
+                break
+            case "disposeKeepAlive":
+                let keepAliveId = arguments!["keepAliveId"] as! String
+                disposeKeepAlive(keepAliveId: keepAliveId)
+                result(true)
                 break
             default:
                 result(FlutterMethodNotImplemented)
@@ -68,11 +76,27 @@ public class InAppWebViewStatic: ChannelDelegate {
         }
     }
     
+    public func disposeKeepAlive(keepAliveId: String) {
+        if let flutterWebView = keepAliveWebViews[keepAliveId] as? FlutterWebViewController {
+            flutterWebView.keepAliveId = nil
+            flutterWebView.dispose()
+            keepAliveWebViews[keepAliveId] = nil
+        }
+    }
+    
     public override func dispose() {
         super.dispose()
-        plugin = nil
+        let keepAliveWebViewValues = keepAliveWebViews.values
+        keepAliveWebViewValues.forEach {(keepAliveWebView: FlutterWebViewController?) in
+            if let keepAliveId = keepAliveWebView?.keepAliveId {
+                disposeKeepAlive(keepAliveId: keepAliveId)
+            }
+        }
+        keepAliveWebViews.removeAll()
+        windowWebViews.removeAll()
         webViewForUserAgent = nil
         defaultUserAgent = nil
+        plugin = nil
     }
     
     deinit {

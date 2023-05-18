@@ -126,7 +126,6 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                   pullToRefreshController: pullToRefreshController,
                   onWebViewCreated: (controller) async {
                     webViewController = controller;
-                    print(await controller.getUrl());
                   },
                   onLoadStart: (controller, url) async {
                     setState(() {

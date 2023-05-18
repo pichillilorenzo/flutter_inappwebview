@@ -9,7 +9,8 @@ import '../in_app_webview_controller.dart';
 ///Use [InAppWebViewController] instead.
 @Deprecated("Use InAppWebViewController instead")
 class IOSInAppWebViewController {
-  late MethodChannel _channel;
+  MethodChannel? _channel;
+
   IOSInAppWebViewController({required MethodChannel channel}) {
     this._channel = channel;
   }
@@ -18,7 +19,7 @@ class IOSInAppWebViewController {
   @Deprecated("Use InAppWebViewController.reloadFromOrigin instead")
   Future<void> reloadFromOrigin() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    await _channel.invokeMethod('reloadFromOrigin', args);
+    await _channel?.invokeMethod('reloadFromOrigin', args);
   }
 
   ///Use [InAppWebViewController.createPdf] instead.
@@ -31,26 +32,30 @@ class IOSInAppWebViewController {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('pdfConfiguration',
         () => pdfConfiguration?.toMap() ?? iosWKPdfConfiguration?.toMap());
-    return await _channel.invokeMethod('createPdf', args);
+    return await _channel?.invokeMethod('createPdf', args);
   }
 
   ///Use [InAppWebViewController.createWebArchiveData] instead.
   @Deprecated("Use InAppWebViewController.createWebArchiveData instead")
   Future<Uint8List?> createWebArchiveData() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    return await _channel.invokeMethod('createWebArchiveData', args);
+    return await _channel?.invokeMethod('createWebArchiveData', args);
   }
 
   ///Use [InAppWebViewController.hasOnlySecureContent] instead.
   @Deprecated("Use InAppWebViewController.hasOnlySecureContent instead")
   Future<bool> hasOnlySecureContent() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    return await _channel.invokeMethod('hasOnlySecureContent', args);
+    return await _channel?.invokeMethod('hasOnlySecureContent', args);
   }
 
   ///Use [InAppWebViewController.handlesURLScheme] instead.
   @Deprecated("Use InAppWebViewController.handlesURLScheme instead")
   static Future<bool> handlesURLScheme(String urlScheme) async {
     return await InAppWebViewController.handlesURLScheme(urlScheme);
+  }
+
+  void dispose() {
+    _channel = null;
   }
 }

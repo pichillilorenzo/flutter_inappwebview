@@ -124,21 +124,6 @@ public class ProxyManager extends ChannelDelegateImpl {
   @Override
   public void dispose() {
     super.dispose();
-    if (proxyController != null) {
-      // Clears the proxy settings
-      proxyController.clearProxyOverride(new Executor() {
-        @Override
-        public void execute(Runnable command) {
-
-        }
-      }, new Runnable() {
-        @Override
-        public void run() {
-
-        }
-      });
-      proxyController = null;
-    }
     plugin = null;
   }
 }

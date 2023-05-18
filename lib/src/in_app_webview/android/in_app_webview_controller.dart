@@ -8,7 +8,7 @@ import '../in_app_webview_controller.dart';
 ///Use [InAppWebViewController] instead.
 @Deprecated("Use InAppWebViewController instead")
 class AndroidInAppWebViewController {
-  late MethodChannel _channel;
+  MethodChannel? _channel;
 
   AndroidInAppWebViewController({required MethodChannel channel}) {
     this._channel = channel;
@@ -18,28 +18,28 @@ class AndroidInAppWebViewController {
   @Deprecated("Use InAppWebViewController.startSafeBrowsing instead")
   Future<bool> startSafeBrowsing() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    return await _channel.invokeMethod('startSafeBrowsing', args);
+    return await _channel?.invokeMethod('startSafeBrowsing', args);
   }
 
   ///Use [InAppWebViewController.clearSslPreferences] instead.
   @Deprecated("Use InAppWebViewController.clearSslPreferences instead")
   Future<void> clearSslPreferences() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    await _channel.invokeMethod('clearSslPreferences', args);
+    await _channel?.invokeMethod('clearSslPreferences', args);
   }
 
   ///Use [InAppWebViewController.pause] instead.
   @Deprecated("Use InAppWebViewController.pause instead")
   Future<void> pause() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    await _channel.invokeMethod('pause', args);
+    await _channel?.invokeMethod('pause', args);
   }
 
   ///Use [InAppWebViewController.resume] instead.
   @Deprecated("Use InAppWebViewController.resume instead")
   Future<void> resume() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    await _channel.invokeMethod('resume', args);
+    await _channel?.invokeMethod('resume', args);
   }
 
   ///Use [InAppWebViewController.pageDown] instead.
@@ -47,7 +47,7 @@ class AndroidInAppWebViewController {
   Future<bool> pageDown({required bool bottom}) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent("bottom", () => bottom);
-    return await _channel.invokeMethod('pageDown', args);
+    return await _channel?.invokeMethod('pageDown', args);
   }
 
   ///Use [InAppWebViewController.pageUp] instead.
@@ -55,28 +55,28 @@ class AndroidInAppWebViewController {
   Future<bool> pageUp({required bool top}) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent("top", () => top);
-    return await _channel.invokeMethod('pageUp', args);
+    return await _channel?.invokeMethod('pageUp', args);
   }
 
   ///Use [InAppWebViewController.zoomIn] instead.
   @Deprecated("Use InAppWebViewController.zoomIn instead")
   Future<bool> zoomIn() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    return await _channel.invokeMethod('zoomIn', args);
+    return await _channel?.invokeMethod('zoomIn', args);
   }
 
   ///Use [InAppWebViewController.zoomOut] instead.
   @Deprecated("Use InAppWebViewController.zoomOut instead")
   Future<bool> zoomOut() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    return await _channel.invokeMethod('zoomOut', args);
+    return await _channel?.invokeMethod('zoomOut', args);
   }
 
   ///Use [InAppWebViewController.clearHistory] instead.
   @Deprecated("Use InAppWebViewController.clearHistory instead")
   Future<void> clearHistory() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    return await _channel.invokeMethod('clearHistory', args);
+    return await _channel?.invokeMethod('clearHistory', args);
   }
 
   ///Use [InAppWebViewController.clearClientCertPreferences] instead.
@@ -120,7 +120,11 @@ class AndroidInAppWebViewController {
   @Deprecated('Use InAppWebViewController.getOriginalUrl instead')
   Future<Uri?> getOriginalUrl() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    String? url = await _channel.invokeMethod('getOriginalUrl', args);
+    String? url = await _channel?.invokeMethod('getOriginalUrl', args);
     return url != null ? Uri.tryParse(url) : null;
+  }
+
+  void dispose() {
+    _channel = null;
   }
 }

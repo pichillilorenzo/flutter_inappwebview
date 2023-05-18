@@ -141,10 +141,12 @@ public class InAppBrowserActivity extends AppCompatActivity implements InAppBrow
     prepareView();
 
     if (windowId != -1) {
-      Message resultMsg = InAppWebViewChromeClient.windowWebViewMessages.get(windowId);
-      if (resultMsg != null) {
-        ((WebView.WebViewTransport) resultMsg.obj).setWebView(webView);
-        resultMsg.sendToTarget();
+      if (webView.plugin != null && webView.plugin.inAppWebViewManager != null) {
+        Message resultMsg = webView.plugin.inAppWebViewManager.windowWebViewMessages.get(windowId);
+        if (resultMsg != null) {
+          ((WebView.WebViewTransport) resultMsg.obj).setWebView(webView);
+          resultMsg.sendToTarget();
+        }
       }
     } else {
       String initialFile = b.getString("initialFile");

@@ -11,12 +11,15 @@ import WebKit
 public class FlutterWebViewController: NSObject, FlutterPlatformView, Disposable {
     
     var myView: UIView?
+    var keepAliveId: String?
 
-    init(registrar: FlutterPluginRegistrar, withFrame frame: CGRect, viewIdentifier viewId: Any, params: NSDictionary) {
+    init(plugin: SwiftFlutterPlugin, withFrame frame: CGRect, viewIdentifier viewId: Any, params: NSDictionary) {
         super.init()
         
         myView = UIView(frame: frame)
         myView!.clipsToBounds = true
+        
+        keepAliveId = params["keepAliveId"] as? String
         
         let initialSettings = params["initialSettings"] as! [String: Any?]
         let contextMenu = params["contextMenu"] as? [String: Any]
@@ -37,18 +40,21 @@ public class FlutterWebViewController: NSObject, FlutterPlatformView, Disposable
         
         var webView: InAppWebView?
         
-        if let wId = windowId, let webViewTransport = InAppWebView.windowWebViews[wId] {
+        if let wId = windowId, let webViewTransport = plugin.inAppWebViewManager?.windowWebViews[wId] {
             webView = webViewTransport.webView
             webView!.id = viewId
-            let channel = FlutterMethodChannel(name: InAppWebView.METHOD_CHANNEL_NAME_PREFIX + String(describing: viewId),
-                                               binaryMessenger: registrar.messenger())
-            webView!.channelDelegate = WebViewChannelDelegate(webView: webView!, channel: channel)
+            webView!.plugin = plugin
+            if let registrar = plugin.registrar {
+                let channel = FlutterMethodChannel(name: InAppWebView.METHOD_CHANNEL_NAME_PREFIX + String(describing: viewId),
+                                                   binaryMessenger: registrar.messenger())
+                webView!.channelDelegate = WebViewChannelDelegate(webView: webView!, channel: channel)
+            }
             webView!.frame = myView!.bounds
             webView!.contextMenu = contextMenu
             webView!.initialUserScripts = userScripts
         } else {
             webView = InAppWebView(id: viewId,
-                                   registrar: registrar,
+                                   plugin: plugin,
                                    frame: myView!.bounds,
                                    configuration: preWebviewConfiguration,
                                    contextMenu: contextMenu,
@@ -57,13 +63,13 @@ public class FlutterWebViewController: NSObject, FlutterPlatformView, Disposable
         
         let pullToRefreshSettings = PullToRefreshSettings()
         let _ = pullToRefreshSettings.parse(settings: pullToRefreshInitialSettings)
-        let pullToRefreshControl = PullToRefreshControl(registrar: registrar, id: viewId, settings: pullToRefreshSettings)
+        let pullToRefreshControl = PullToRefreshControl(plugin: plugin, id: viewId, settings: pullToRefreshSettings)
         webView!.pullToRefreshControl = pullToRefreshControl
         pullToRefreshControl.delegate = webView!
         pullToRefreshControl.prepare()
         
         let findInteractionController = FindInteractionController(
-            registrar: registrar,
+            plugin: plugin,
             id: viewId, webView: webView!, settings: nil)
         webView!.findInteractionController = findInteractionController
         findInteractionController.prepare()
@@ -132,7 +138,7 @@ public class FlutterWebViewController: NSObject, FlutterPlatformView, Disposable
             }
             load(initialUrlRequest: initialUrlRequest, initialFile: initialFile, initialData: initialData)
         }
-        else if let wId = windowId, let webViewTransport = InAppWebView.windowWebViews[wId] {
+        else if let wId = windowId, let webViewTransport = webView.plugin?.inAppWebViewManager?.windowWebViews[wId] {
             webView.load(webViewTransport.request)
         }
     }
@@ -180,10 +186,12 @@ public class FlutterWebViewController: NSObject, FlutterPlatformView, Disposable
     }
     
     public func dispose() {
-        if let webView = webView() {
-            webView.dispose()
+        if keepAliveId == nil {
+            if let webView = webView() {
+                webView.dispose()
+            }
+            myView = nil
         }
-        myView = nil
     }
     
     deinit {

@@ -1,1 +1,1 @@
-export 'find_interaction_controller.dart';
+export 'find_interaction_controller.dart' show FindInteractionController;

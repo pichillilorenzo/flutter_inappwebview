@@ -548,10 +548,10 @@ public class InAppBrowserActivity extends AppCompatActivity implements InAppBrow
           webView.destroy();
           webView = null;
           manager = null;
+          finish();
         }
       });
       webView.loadUrl("about:blank");
-      finish();
     }
   }
 

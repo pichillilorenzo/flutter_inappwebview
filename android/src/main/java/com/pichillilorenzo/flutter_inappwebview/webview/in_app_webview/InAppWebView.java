@@ -45,9 +45,11 @@ import android.webkit.DownloadListener;
 import android.webkit.URLUtil;
 import android.webkit.ValueCallback;
 import android.webkit.WebBackForwardList;
+import android.webkit.WebChromeClient;
 import android.webkit.WebHistoryItem;
 import android.webkit.WebSettings;
 import android.webkit.WebStorage;
+import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.HorizontalScrollView;
 import android.widget.LinearLayout;
@@ -80,7 +82,6 @@ import com.pichillilorenzo.flutter_inappwebview.plugin_scripts_js.PluginScriptsU
 import com.pichillilorenzo.flutter_inappwebview.plugin_scripts_js.PrintJS;
 import com.pichillilorenzo.flutter_inappwebview.plugin_scripts_js.PromisePolyfillJS;
 import com.pichillilorenzo.flutter_inappwebview.print_job.PrintJobController;
-import com.pichillilorenzo.flutter_inappwebview.print_job.PrintJobManager;
 import com.pichillilorenzo.flutter_inappwebview.print_job.PrintJobSettings;
 import com.pichillilorenzo.flutter_inappwebview.pull_to_refresh.PullToRefreshLayout;
 import com.pichillilorenzo.flutter_inappwebview.types.ContentWorld;
@@ -107,6 +108,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.regex.Pattern;
 
@@ -2002,6 +2004,23 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
 
   @Override
   public void dispose() {
+    if (channelDelegate != null) {
+      channelDelegate.dispose();
+      channelDelegate = null;
+    }
+    super.dispose();
+    WebSettings settings = getSettings();
+    settings.setJavaScriptEnabled(false);
+    removeJavascriptInterface(JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME);
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && WebViewFeature.isFeatureSupported(WebViewFeature.WEB_VIEW_RENDERER_CLIENT_BASIC_USAGE)) {
+      WebViewCompat.setWebViewRenderProcessClient(this, null);
+    }
+    setWebChromeClient(new WebChromeClient());
+    setWebViewClient(new WebViewClient() {
+      public void onPageFinished(WebView view, String url) {
+        destroy();
+      }
+    });
     userContentController.dispose();
     if (findInteractionController != null) {
       findInteractionController.dispose();
@@ -2026,14 +2045,28 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
     callAsyncJavaScriptCallbacks.clear();
     evaluateJavaScriptContentWorldCallbacks.clear();
     inAppBrowserDelegate = null;
-    inAppWebViewChromeClient = null;
-    inAppWebViewClientCompat = null;
-    inAppWebViewClient = null;
-    javaScriptBridgeInterface = null;
-    inAppWebViewRenderProcessClient = null;
-    channelDelegate = null;
+    if (inAppWebViewRenderProcessClient != null) {
+      inAppWebViewRenderProcessClient.dispose();
+      inAppWebViewRenderProcessClient = null;
+    }
+    if (inAppWebViewChromeClient != null) {
+      inAppWebViewChromeClient.dispose();
+      inAppWebViewChromeClient = null;
+    }
+    if (inAppWebViewClientCompat != null) {
+      inAppWebViewClientCompat.dispose();
+      inAppWebViewClientCompat = null;
+    }
+    if (inAppWebViewClient != null) {
+      inAppWebViewClient.dispose();
+      inAppWebViewClient = null;
+    }
+    if (javaScriptBridgeInterface != null) {
+      javaScriptBridgeInterface.dispose();
+      javaScriptBridgeInterface = null;
+    }
     plugin = null;
-    super.dispose();
+    loadUrl("about:blank");
   }
 
   @Override

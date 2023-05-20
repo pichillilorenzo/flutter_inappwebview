@@ -13,30 +13,27 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
-import android.webkit.WebChromeClient;
 import android.webkit.WebView;
-import android.webkit.WebViewClient;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.SearchView;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.pichillilorenzo.flutter_inappwebview.find_interaction.FindInteractionController;
-import com.pichillilorenzo.flutter_inappwebview.types.Disposable;
 import com.pichillilorenzo.flutter_inappwebview.R;
 import com.pichillilorenzo.flutter_inappwebview.Util;
+import com.pichillilorenzo.flutter_inappwebview.find_interaction.FindInteractionController;
 import com.pichillilorenzo.flutter_inappwebview.pull_to_refresh.PullToRefreshChannelDelegate;
-import com.pichillilorenzo.flutter_inappwebview.webview.in_app_webview.InAppWebView;
-import com.pichillilorenzo.flutter_inappwebview.webview.in_app_webview.InAppWebViewChromeClient;
-import com.pichillilorenzo.flutter_inappwebview.webview.in_app_webview.InAppWebViewSettings;
-import com.pichillilorenzo.flutter_inappwebview.webview.WebViewChannelDelegate;
 import com.pichillilorenzo.flutter_inappwebview.pull_to_refresh.PullToRefreshLayout;
 import com.pichillilorenzo.flutter_inappwebview.pull_to_refresh.PullToRefreshSettings;
+import com.pichillilorenzo.flutter_inappwebview.types.Disposable;
 import com.pichillilorenzo.flutter_inappwebview.types.URLRequest;
 import com.pichillilorenzo.flutter_inappwebview.types.UserScript;
+import com.pichillilorenzo.flutter_inappwebview.webview.WebViewChannelDelegate;
+import com.pichillilorenzo.flutter_inappwebview.webview.in_app_webview.InAppWebView;
+import com.pichillilorenzo.flutter_inappwebview.webview.in_app_webview.InAppWebViewSettings;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -538,19 +535,12 @@ public class InAppBrowserActivity extends AppCompatActivity implements InAppBrow
               manager.plugin.activityPluginBinding != null && webView.inAppWebViewChromeClient != null) {
         manager.plugin.activityPluginBinding.removeActivityResultListener(webView.inAppWebViewChromeClient);
       }
-      if (webView.channelDelegate != null) {
-        webView.channelDelegate.dispose();
+      RelativeLayout containerView = (RelativeLayout) findViewById(R.id.container);
+      if (containerView != null) {
+        containerView.removeAllViews();
       }
-      webView.setWebChromeClient(new WebChromeClient());
-      webView.setWebViewClient(new WebViewClient() {
-        public void onPageFinished(WebView view, String url) {
-          webView.dispose();
-          webView.destroy();
-          webView = null;
-          manager = null;
-        }
-      });
-      webView.loadUrl("about:blank");
+      webView.dispose();
+      webView = null;
       finish();
     }
   }

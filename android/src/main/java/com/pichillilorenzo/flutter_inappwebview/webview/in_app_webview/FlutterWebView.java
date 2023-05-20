@@ -158,47 +158,13 @@ public class FlutterWebView implements PlatformWebView {
   @Override
   public void dispose() {
     if (keepAliveId == null && webView != null) {
-      if (webView.channelDelegate != null) {
-        webView.channelDelegate.dispose();
-      }
-      webView.removeJavascriptInterface(JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME);
-      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && WebViewFeature.isFeatureSupported(WebViewFeature.WEB_VIEW_RENDERER_CLIENT_BASIC_USAGE)) {
-        WebViewCompat.setWebViewRenderProcessClient(webView, null);
-      }
-      webView.setWebChromeClient(new WebChromeClient());
-      webView.setWebViewClient(new WebViewClient() {
-        @Override
-        public void onPageFinished(WebView view, String url) {
-          if (webView.inAppWebViewRenderProcessClient != null) {
-            webView.inAppWebViewRenderProcessClient.dispose();
-          }
-          if (webView.inAppWebViewChromeClient != null) {
-            webView.inAppWebViewChromeClient.dispose();
-          }
-          if (webView.inAppWebViewClientCompat != null) {
-            webView.inAppWebViewClientCompat.dispose();
-          }
-          if (webView.inAppWebViewClient != null) {
-            webView.inAppWebViewClient.dispose();
-          }
-          if (webView.javaScriptBridgeInterface != null) {
-            webView.javaScriptBridgeInterface.dispose();
-          }
-          if (webView != null) {
-            webView.dispose();
-            webView.destroy();
-            webView = null;
-          }
+      webView.dispose();
+      webView = null;
 
-          if (pullToRefreshLayout != null) {
-            pullToRefreshLayout.dispose();
-            pullToRefreshLayout = null;
-          }
-        }
-      });
-      WebSettings settings = webView.getSettings();
-      settings.setJavaScriptEnabled(false);
-      webView.loadUrl("about:blank");
+      if (pullToRefreshLayout != null) {
+        pullToRefreshLayout.dispose();
+        pullToRefreshLayout = null;
+      }
     }
   }
 

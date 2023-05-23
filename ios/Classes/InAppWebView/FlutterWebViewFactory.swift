@@ -10,6 +10,7 @@ import Foundation
 
 public class FlutterWebViewFactory: NSObject, FlutterPlatformViewFactory {
     static let VIEW_TYPE_ID = "com.pichillilorenzo/flutter_inappwebview"
+    static let NON_BLOCKING_VIEW_TYPE_ID = "com.pichillilorenzo/flutter_inappwebview_nonblocking"
     private var plugin: SwiftFlutterPlugin
     
     init(plugin: SwiftFlutterPlugin) {

@@ -65,6 +65,8 @@ class InAppWebView extends StatefulWidget implements WebView {
   ///- iOS
   final InAppWebViewKeepAlive? keepAlive;
 
+  final bool? preventGestureDelay;
+
   ///{@macro flutter_inappwebview.InAppWebView}
   const InAppWebView({
     Key? key,
@@ -187,6 +189,7 @@ class InAppWebView extends StatefulWidget implements WebView {
     this.onContentSizeChanged,
     this.gestureRecognizers,
     this.headlessWebView,
+    this.preventGestureDelay,
   }) : super(key: key);
 
   @override
@@ -799,8 +802,11 @@ class _InAppWebViewState extends State<InAppWebView> {
         },
       );
     } else if (Util.isIOS /* || Util.isMacOS*/) {
+      final viewType = widget.preventGestureDelay == true
+          ? 'com.pichillilorenzo/flutter_inappwebview_nonblocking'
+          : 'com.pichillilorenzo/flutter_inappwebview';
       return UiKitView(
-        viewType: 'com.pichillilorenzo/flutter_inappwebview',
+        viewType: viewType,
         onPlatformViewCreated: _onPlatformViewCreated,
         gestureRecognizers: widget.gestureRecognizers,
         creationParams: <String, dynamic>{

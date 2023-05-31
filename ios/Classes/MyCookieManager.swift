@@ -131,6 +131,12 @@ public class MyCookieManager: ChannelDelegate {
             }
         }
         
+        
+        if let cookie = HTTPCookie(properties: properties) {
+          httpCookieStore.setCookie(cookie, completionHandler: {() in
+             result(true)
+          })
+        }
         let cookie = HTTPCookie(properties: properties)!
         
         MyCookieManager.httpCookieStore.setCookie(cookie, completionHandler: {() in

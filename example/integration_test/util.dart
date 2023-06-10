@@ -19,6 +19,56 @@ class _NullOrEmpty extends Matcher {
       description.add('null or empty');
 }
 
+void skippableGroup(Object description, void Function() body,
+    {bool skip = false}) {
+  if (!skip) {
+    group(description.toString(), body, skip: skip);
+  }
+}
+
+void skippableTest(
+  Object description,
+  dynamic Function() body, {
+  String? testOn,
+  Timeout? timeout = const Timeout(Duration(seconds: 60)),
+  bool skip = false,
+  dynamic tags,
+  Map<String, dynamic>? onPlatform,
+  int? retry,
+}) {
+  if (!skip) {
+    test(
+      description.toString(),
+      body,
+      testOn: testOn,
+      timeout: timeout,
+      skip: skip,
+      onPlatform: onPlatform,
+      tags: tags,
+      retry: retry,
+    );
+  }
+}
+
+void skippableTestWidgets(
+  String description,
+  WidgetTesterCallback callback, {
+  bool skip = false,
+  Timeout? timeout = const Timeout(Duration(seconds: 60)),
+  bool semanticsEnabled = true,
+  TestVariant<Object?> variant = const DefaultTestVariant(),
+  dynamic tags,
+}) {
+  if (!skip) {
+    testWidgets(description, callback,
+        skip: skip,
+        timeout: timeout,
+        semanticsEnabled: semanticsEnabled,
+        variant: variant,
+        tags: tags);
+  }
+}
+
 class Foo {
   String? bar;
   String? baz;
@@ -33,6 +83,7 @@ class Foo {
 class MyInAppBrowser extends InAppBrowser {
   final Completer<void> browserCreated = Completer<void>();
   final Completer<void> firstPageLoaded = Completer<void>();
+  final Completer<void> browserClosed = Completer<void>();
 
   MyInAppBrowser(
       {int? windowId, UnmodifiableListView<UserScript>? initialUserScripts})
@@ -49,6 +100,13 @@ class MyInAppBrowser extends InAppBrowser {
 
     if (!firstPageLoaded.isCompleted) {
       firstPageLoaded.complete();
+    }
+  }
+
+  @override
+  void onExit() {
+    if (!browserClosed.isCompleted) {
+      browserClosed.complete();
     }
   }
 }

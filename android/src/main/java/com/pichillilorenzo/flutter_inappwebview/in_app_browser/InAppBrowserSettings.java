@@ -26,6 +26,7 @@ public class InAppBrowserSettings implements ISettings<InAppBrowserActivity> {
   public Boolean closeOnCannotGoBack = true;
   public Boolean allowGoBackWithBackButton = true;
   public Boolean shouldCloseOnBackButtonPressed = false;
+  public Boolean hideDefaultMenuItems = false;
 
   @NonNull
   @Override
@@ -68,6 +69,9 @@ public class InAppBrowserSettings implements ISettings<InAppBrowserActivity> {
         case "shouldCloseOnBackButtonPressed":
           shouldCloseOnBackButtonPressed = (Boolean) value;
           break;
+        case "hideDefaultMenuItems":
+          hideDefaultMenuItems = (Boolean) value;
+          break;
       }
     }
 
@@ -88,6 +92,7 @@ public class InAppBrowserSettings implements ISettings<InAppBrowserActivity> {
     settings.put("hideProgressBar", hideProgressBar);
     settings.put("allowGoBackWithBackButton", allowGoBackWithBackButton);
     settings.put("shouldCloseOnBackButtonPressed", shouldCloseOnBackButtonPressed);
+    settings.put("hideDefaultMenuItems", hideDefaultMenuItems);
     return settings;
   }
 

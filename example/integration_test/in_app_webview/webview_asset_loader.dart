@@ -1,11 +1,4 @@
-import 'dart:async';
-
-import 'package:flutter/foundation.dart';
-import 'package:flutter/widgets.dart';
-import 'package:flutter_inappwebview/flutter_inappwebview.dart';
-import 'package:flutter_test/flutter_test.dart';
-
-import '../constants.dart';
+part of 'main.dart';
 
 void webViewAssetLoader() {
   final shouldSkip = kIsWeb
@@ -14,7 +7,7 @@ void webViewAssetLoader() {
           TargetPlatform.android,
         ].contains(defaultTargetPlatform);
 
-  testWidgets('WebViewAssetLoader', (WidgetTester tester) async {
+  skippableTestWidgets('WebViewAssetLoader', (WidgetTester tester) async {
     final Completer<InAppWebViewController> controllerCompleter =
         Completer<InAppWebViewController>();
     final Completer<String> pageLoaded = Completer<String>();

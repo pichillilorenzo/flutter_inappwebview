@@ -1,12 +1,4 @@
-import 'dart:async';
-import 'dart:convert';
-
-import 'package:flutter/foundation.dart';
-import 'package:flutter/widgets.dart';
-import 'package:flutter_inappwebview/flutter_inappwebview.dart';
-import 'package:flutter_test/flutter_test.dart';
-
-import '../env.dart';
+part of 'main.dart';
 
 void interceptAjaxRequest() {
   final shouldSkip = kIsWeb
@@ -17,8 +9,8 @@ void interceptAjaxRequest() {
           TargetPlatform.macOS,
         ].contains(defaultTargetPlatform);
 
-  group('intercept ajax request', () {
-    testWidgets('send string data', (WidgetTester tester) async {
+  skippableGroup('intercept ajax request', () {
+    skippableTestWidgets('send string data', (WidgetTester tester) async {
       final Completer<InAppWebViewController> controllerCompleter =
           Completer<InAppWebViewController>();
       final Completer shouldInterceptAjaxPostRequestCompleter =
@@ -100,7 +92,7 @@ void interceptAjaxRequest() {
           true);
     });
 
-    testWidgets('send json data', (WidgetTester tester) async {
+    skippableTestWidgets('send json data', (WidgetTester tester) async {
       final Completer<InAppWebViewController> controllerCompleter =
           Completer<InAppWebViewController>();
       final Completer shouldInterceptAjaxPostRequestCompleter =
@@ -188,7 +180,8 @@ void interceptAjaxRequest() {
           true);
     });
 
-    testWidgets('send URLSearchParams data', (WidgetTester tester) async {
+    skippableTestWidgets('send URLSearchParams data',
+        (WidgetTester tester) async {
       final Completer<InAppWebViewController> controllerCompleter =
           Completer<InAppWebViewController>();
       final Completer shouldInterceptAjaxPostRequestCompleter =
@@ -272,7 +265,7 @@ void interceptAjaxRequest() {
           true);
     });
 
-    testWidgets('send FormData', (WidgetTester tester) async {
+    skippableTestWidgets('send FormData', (WidgetTester tester) async {
       final Completer<InAppWebViewController> controllerCompleter =
           Completer<InAppWebViewController>();
       final Completer shouldInterceptAjaxPostRequestCompleter =

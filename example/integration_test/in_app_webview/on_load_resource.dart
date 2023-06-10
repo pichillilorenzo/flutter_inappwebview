@@ -1,9 +1,4 @@
-import 'dart:async';
-
-import 'package:flutter/foundation.dart';
-import 'package:flutter/widgets.dart';
-import 'package:flutter_inappwebview/flutter_inappwebview.dart';
-import 'package:flutter_test/flutter_test.dart';
+part of 'main.dart';
 
 void onLoadResource() {
   final shouldSkip = kIsWeb
@@ -14,7 +9,7 @@ void onLoadResource() {
           TargetPlatform.macOS,
         ].contains(defaultTargetPlatform);
 
-  testWidgets('onLoadResource', (WidgetTester tester) async {
+  skippableTestWidgets('onLoadResource', (WidgetTester tester) async {
     List<String> resourceList = [
       "https://getbootstrap.com/docs/4.3/dist/css/bootstrap.min.css",
       "https://code.jquery.com/jquery-3.3.1.min.js",

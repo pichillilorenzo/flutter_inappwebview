@@ -1,12 +1,4 @@
-import 'dart:async';
-import 'dart:convert';
-
-import 'package:flutter/foundation.dart';
-import 'package:flutter/widgets.dart';
-import 'package:flutter_inappwebview/flutter_inappwebview.dart';
-import 'package:flutter_test/flutter_test.dart';
-
-import '../constants.dart';
+part of 'main.dart';
 
 void shouldOverrideUrlLoading() {
   final shouldSkip = kIsWeb
@@ -17,13 +9,13 @@ void shouldOverrideUrlLoading() {
           TargetPlatform.macOS,
         ].contains(defaultTargetPlatform);
 
-  group('shouldOverrideUrlLoading', () {
+  skippableGroup('shouldOverrideUrlLoading', () {
     final String page =
         '''<!DOCTYPE html><head></head><body><a id="link" href="$TEST_URL_3">flutter_inappwebview</a></body></html>''';
     final String pageEncoded = 'data:text/html;charset=utf-8;base64,' +
         base64Encode(const Utf8Encoder().convert(page));
 
-    testWidgets('can allow requests', (WidgetTester tester) async {
+    skippableTestWidgets('can allow requests', (WidgetTester tester) async {
       final Completer<InAppWebViewController> controllerCompleter =
           Completer<InAppWebViewController>();
       final StreamController<String> pageLoads =
@@ -127,7 +119,7 @@ void shouldOverrideUrlLoading() {
       pageLoads.close();
     }, skip: shouldSkipTest2);
 
-    testWidgets('can block requests', (WidgetTester tester) async {
+    skippableTestWidgets('can block requests', (WidgetTester tester) async {
       final Completer<InAppWebViewController> controllerCompleter =
           Completer<InAppWebViewController>();
       final StreamController<String> pageLoads =
@@ -175,7 +167,8 @@ void shouldOverrideUrlLoading() {
       pageLoads.close();
     });
 
-    testWidgets('supports asynchronous decisions', (WidgetTester tester) async {
+    skippableTestWidgets('supports asynchronous decisions',
+        (WidgetTester tester) async {
       final Completer<InAppWebViewController> controllerCompleter =
           Completer<InAppWebViewController>();
       final StreamController<String> pageLoads =

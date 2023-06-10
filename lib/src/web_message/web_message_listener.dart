@@ -92,7 +92,7 @@ class WebMessageListener {
 
   @override
   String toString() {
-    return 'WebMessageListener{id: $id, jsObjectName: $jsObjectName, allowedOriginRules: $allowedOriginRules}';
+    return 'WebMessageListener{id: $id, jsObjectName: $jsObjectName, allowedOriginRules: $allowedOriginRules, replyProxy: $_replyProxy}';
   }
 }
 
@@ -115,5 +115,10 @@ class JavaScriptReplyProxy {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('message', () => message);
     await _webMessageListener._channel?.invokeMethod('postMessage', args);
+  }
+
+  @override
+  String toString() {
+    return 'JavaScriptReplyProxy{}';
   }
 }

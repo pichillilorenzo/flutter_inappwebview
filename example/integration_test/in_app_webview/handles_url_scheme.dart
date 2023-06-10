@@ -1,6 +1,4 @@
-import 'package:flutter/foundation.dart';
-import 'package:flutter_inappwebview/flutter_inappwebview.dart';
-import 'package:flutter_test/flutter_test.dart';
+part of 'main.dart';
 
 void handlesURLScheme() {
   final shouldSkip = kIsWeb
@@ -10,7 +8,7 @@ void handlesURLScheme() {
           TargetPlatform.macOS,
         ].contains(defaultTargetPlatform);
 
-  test('handlesURLScheme', () async {
+  skippableTest('handlesURLScheme', () async {
     expect(await InAppWebViewController.handlesURLScheme("http"), true);
     expect(await InAppWebViewController.handlesURLScheme("https"), true);
   }, skip: shouldSkip);

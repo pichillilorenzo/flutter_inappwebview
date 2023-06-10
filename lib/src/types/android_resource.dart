@@ -7,6 +7,9 @@ part 'android_resource.g.dart';
 class AndroidResource_ {
   ///Android resource name.
   ///
+  ///A list of available `android.R.drawable` can be found
+  ///[here](https://developer.android.com/reference/android/R.drawable).
+  ///
   ///A list of available `android.R.anim` can be found
   ///[here](https://developer.android.com/reference/android/R.anim).
   ///
@@ -42,5 +45,10 @@ class AndroidResource_ {
 
   static AndroidResource_ id({required String name, String? defPackage}) {
     return AndroidResource_(name: name, defType: "id", defPackage: defPackage);
+  }
+
+  static AndroidResource_ drawable({required String name, String? defPackage}) {
+    return AndroidResource_(
+        name: name, defType: "drawable", defPackage: defPackage);
   }
 }

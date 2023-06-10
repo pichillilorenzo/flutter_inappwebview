@@ -1,13 +1,4 @@
-import 'dart:async';
-import 'dart:io';
-
-import 'package:flutter/foundation.dart';
-import 'package:flutter/widgets.dart';
-import 'package:flutter_inappwebview/flutter_inappwebview.dart';
-import 'package:flutter_test/flutter_test.dart';
-import 'package:path_provider/path_provider.dart';
-
-import '../constants.dart';
+part of 'main.dart';
 
 void webArchive() {
   final shouldSkip = kIsWeb
@@ -18,7 +9,7 @@ void webArchive() {
           TargetPlatform.macOS,
         ].contains(defaultTargetPlatform);
 
-  group('web archive', () {
+  skippableGroup('web archive', () {
     final shouldSkipTest1 = kIsWeb
         ? true
         : ![
@@ -26,7 +17,7 @@ void webArchive() {
             TargetPlatform.macOS,
           ].contains(defaultTargetPlatform);
 
-    testWidgets('create data', (WidgetTester tester) async {
+    skippableTestWidgets('create data', (WidgetTester tester) async {
       final Completer<InAppWebViewController> controllerCompleter =
           Completer<InAppWebViewController>();
       final Completer<void> pageLoaded = Completer<void>();
@@ -54,7 +45,7 @@ void webArchive() {
       expect(await controller.createWebArchiveData(), isNotNull);
     }, skip: shouldSkipTest1);
 
-    testWidgets('save', (WidgetTester tester) async {
+    skippableTestWidgets('save', (WidgetTester tester) async {
       final Completer<InAppWebViewController> controllerCompleter =
           Completer<InAppWebViewController>();
       final Completer<void> pageLoaded = Completer<void>();

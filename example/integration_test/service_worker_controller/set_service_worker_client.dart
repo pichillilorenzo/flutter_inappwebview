@@ -1,11 +1,4 @@
-import 'dart:async';
-
-import 'package:flutter/foundation.dart';
-import 'package:flutter/widgets.dart';
-import 'package:flutter_inappwebview/flutter_inappwebview.dart';
-import 'package:flutter_test/flutter_test.dart';
-
-import '../constants.dart';
+part of 'main.dart';
 
 void setServiceWorkerClient() {
   final shouldSkip = kIsWeb
@@ -14,7 +7,8 @@ void setServiceWorkerClient() {
           TargetPlatform.android,
         ].contains(defaultTargetPlatform);
 
-  testWidgets('setServiceWorkerClient to null', (WidgetTester tester) async {
+  skippableTestWidgets('setServiceWorkerClient to null',
+      (WidgetTester tester) async {
     final Completer<String> pageLoaded = Completer<String>();
 
     var swAvailable = await WebViewFeature.isFeatureSupported(

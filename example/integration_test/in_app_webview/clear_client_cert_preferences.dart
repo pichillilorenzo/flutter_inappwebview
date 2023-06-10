@@ -1,6 +1,4 @@
-import 'package:flutter/foundation.dart';
-import 'package:flutter_inappwebview/flutter_inappwebview.dart';
-import 'package:flutter_test/flutter_test.dart';
+part of 'main.dart';
 
 void clearClientCertPreferences() {
   final shouldSkip = kIsWeb
@@ -9,7 +7,7 @@ void clearClientCertPreferences() {
           TargetPlatform.android,
         ].contains(defaultTargetPlatform);
 
-  test('clearClientCertPreferences', () async {
+  skippableTest('clearClientCertPreferences', () async {
     await expectLater(
         InAppWebViewController.clearClientCertPreferences(), completes);
   }, skip: shouldSkip);

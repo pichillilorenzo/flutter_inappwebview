@@ -1,12 +1,4 @@
-import 'dart:async';
-import 'dart:convert';
-import 'dart:typed_data';
-
-import 'package:flutter/foundation.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter/widgets.dart';
-import 'package:flutter_inappwebview/flutter_inappwebview.dart';
-import 'package:flutter_test/flutter_test.dart';
+part of 'main.dart';
 
 void videoPlaybackPolicy() {
   final shouldSkip = kIsWeb
@@ -17,7 +9,7 @@ void videoPlaybackPolicy() {
           TargetPlatform.macOS,
         ].contains(defaultTargetPlatform);
 
-  group('Video playback policy', () {
+  skippableGroup('Video playback policy', () {
     String videoTestBase64 = "";
     setUpAll(() async {
       final ByteData videoData =
@@ -57,7 +49,7 @@ void videoPlaybackPolicy() {
       videoTestBase64 = base64Encode(const Utf8Encoder().convert(videoTest));
     });
 
-    testWidgets('Auto media playback', (WidgetTester tester) async {
+    skippableTestWidgets('Auto media playback', (WidgetTester tester) async {
       Completer<InAppWebViewController> controllerCompleter =
           Completer<InAppWebViewController>();
       Completer<void> pageLoaded = Completer<void>();
@@ -128,7 +120,8 @@ void videoPlaybackPolicy() {
             TargetPlatform.macOS,
           ].contains(defaultTargetPlatform);
 
-    testWidgets('Video plays inline when allowsInlineMediaPlayback is true',
+    skippableTestWidgets(
+        'Video plays inline when allowsInlineMediaPlayback is true',
         (WidgetTester tester) async {
       Completer<InAppWebViewController> controllerCompleter =
           Completer<InAppWebViewController>();
@@ -218,7 +211,7 @@ void videoPlaybackPolicy() {
             TargetPlatform.macOS,
           ].contains(defaultTargetPlatform);
     // on Android, entering fullscreen requires user interaction
-    testWidgets('exit fullscreen event', (WidgetTester tester) async {
+    skippableTestWidgets('exit fullscreen event', (WidgetTester tester) async {
       Completer<InAppWebViewController> controllerCompleter =
           Completer<InAppWebViewController>();
       Completer<void> pageLoaded = Completer<void>();

@@ -56,9 +56,9 @@ class TrustedWebActivityImmersiveDisplayMode
   ///Converts instance to a map.
   Map<String, dynamic> toMap() {
     return {
-      ..._toMapMergeWith(),
       "displayCutoutMode": displayCutoutMode.toNativeValue(),
       "isSticky": isSticky,
+      ..._toMapMergeWith(),
     };
   }
 

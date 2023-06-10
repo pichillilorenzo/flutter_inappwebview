@@ -321,7 +321,8 @@ class ExchangeableObjectGenerator
         final fieldName = fieldElement.name;
         if (!fieldElement.isPrivate &&
             !fieldElement.isStatic &&
-            !fieldElement.type.isDartCoreFunction) {
+            !(fieldElement.type.isDartCoreFunction ||
+                fieldElement.type is FunctionType)) {
           var value = "map['$fieldName']";
           final deprecationMessage = _coreCheckerDeprecated
               .firstAnnotationOfExact(fieldElement)
@@ -354,10 +355,10 @@ class ExchangeableObjectGenerator
           final constructorParameter = visitor.constructorParameters[fieldName];
           final isRequiredParameter = constructorParameter != null &&
               (constructorParameter.isRequiredNamed ||
-                  constructorParameter.isFinal ||
+                  constructorParameter.isFinal || fieldElement.isFinal ||
                   !Util.typeIsNullable(constructorParameter.type)) &&
               !constructorParameter.hasDefaultValue;
-          if (isRequiredParameter) {
+          if (isRequiredParameter || fieldElement.isFinal) {
             requiredFields.add('$fieldName: $value,');
           } else {
             nonRequiredFields.add("instance.$fieldName = $value;");
@@ -402,23 +403,14 @@ class ExchangeableObjectGenerator
       classBuffer.writeln('///Converts instance to a map.');
       classBuffer.writeln('Map<String, dynamic> toMap() {');
       classBuffer.writeln('return {');
-      for (final entry in methodEntriesSorted) {
-        final methodElement = entry.value;
-        final toMapMergeWith = _coreCheckerObjectMethod
-            .firstAnnotationOf(methodElement)
-            ?.getField("toMapMergeWith")
-            ?.toBoolValue();
-        if (toMapMergeWith == true) {
-          classBuffer.writeln('...${methodElement.name}(),');
-        }
-      }
       final fieldElements = <FieldElement>[];
       if (superClass != null) {
         for (final fieldElement in superClass.element.fields) {
           if (!fieldElement.isPrivate &&
               !fieldElement.hasDeprecated &&
               !fieldElement.isStatic &&
-              !fieldElement.type.isDartCoreFunction) {
+              !(fieldElement.type.isDartCoreFunction ||
+                  fieldElement.type is FunctionType)) {
             fieldElements.add(fieldElement);
           }
         }
@@ -428,7 +420,8 @@ class ExchangeableObjectGenerator
         if (!fieldElement.isPrivate &&
             !fieldElement.hasDeprecated &&
             !fieldElement.isStatic &&
-            !fieldElement.type.isDartCoreFunction) {
+            !(fieldElement.type.isDartCoreFunction ||
+                fieldElement.type is FunctionType)) {
           fieldElements.add(fieldElement);
         }
       }
@@ -436,7 +429,8 @@ class ExchangeableObjectGenerator
         if (!fieldElement.isPrivate &&
             !fieldElement.hasDeprecated &&
             !fieldElement.isStatic &&
-            !fieldElement.type.isDartCoreFunction) {
+            !(fieldElement.type.isDartCoreFunction ||
+                fieldElement.type is FunctionType)) {
           final fieldName = fieldElement.name;
           var mapValue = fieldName;
           final customSerializer = _coreCheckerObjectProperty
@@ -456,6 +450,16 @@ class ExchangeableObjectGenerator
           }
 
           classBuffer.writeln('"$fieldName": $mapValue,');
+        }
+      }
+      for (final entry in methodEntriesSorted) {
+        final methodElement = entry.value;
+        final toMapMergeWith = _coreCheckerObjectMethod
+            .firstAnnotationOf(methodElement)
+            ?.getField("toMapMergeWith")
+            ?.toBoolValue();
+        if (toMapMergeWith == true) {
+          classBuffer.writeln('...${methodElement.name}(),');
         }
       }
       classBuffer.writeln('};');
@@ -494,7 +498,8 @@ class ExchangeableObjectGenerator
           if (!fieldElement.isPrivate &&
               !fieldElement.hasDeprecated &&
               !fieldElement.isStatic &&
-              !fieldElement.type.isDartCoreFunction) {
+              !(fieldElement.type.isDartCoreFunction ||
+                  fieldElement.type is FunctionType)) {
             fieldNames.add('$fieldName: \$$fieldName');
           }
         }
@@ -505,7 +510,8 @@ class ExchangeableObjectGenerator
         if (!fieldElement.isPrivate &&
             !fieldElement.hasDeprecated &&
             !fieldElement.isStatic &&
-            !fieldElement.type.isDartCoreFunction) {
+            !(fieldElement.type.isDartCoreFunction ||
+                fieldElement.type is FunctionType)) {
           fieldNames.add('$fieldName: \$$fieldName');
         }
       }

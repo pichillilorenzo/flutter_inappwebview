@@ -1,11 +1,4 @@
-import 'dart:async';
-
-import 'package:flutter/foundation.dart';
-import 'package:flutter/widgets.dart';
-import 'package:flutter_inappwebview/flutter_inappwebview.dart';
-import 'package:flutter_test/flutter_test.dart';
-
-import '../constants.dart';
+part of 'main.dart';
 
 void onReceivedHttpError() {
   final shouldSkip = kIsWeb
@@ -16,7 +9,7 @@ void onReceivedHttpError() {
           TargetPlatform.macOS,
         ].contains(defaultTargetPlatform);
 
-  testWidgets('onReceivedHttpError', (WidgetTester tester) async {
+  skippableTestWidgets('onReceivedHttpError', (WidgetTester tester) async {
     final Completer<String> errorUrlCompleter = Completer<String>();
     final Completer<int> statusCodeCompleter = Completer<int>();
 

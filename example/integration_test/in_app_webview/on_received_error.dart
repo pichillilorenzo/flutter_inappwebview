@@ -1,11 +1,4 @@
-import 'dart:async';
-
-import 'package:flutter/foundation.dart';
-import 'package:flutter/widgets.dart';
-import 'package:flutter_inappwebview/flutter_inappwebview.dart';
-import 'package:flutter_test/flutter_test.dart';
-
-import '../constants.dart';
+part of 'main.dart';
 
 void onReceivedError() {
   final shouldSkip = kIsWeb
@@ -16,8 +9,8 @@ void onReceivedError() {
           TargetPlatform.macOS,
         ].contains(defaultTargetPlatform);
 
-  group('onReceivedError', () {
-    testWidgets('invalid url', (WidgetTester tester) async {
+  skippableGroup('onReceivedError', () {
+    skippableTestWidgets('invalid url', (WidgetTester tester) async {
       final Completer<String> errorUrlCompleter = Completer<String>();
       final Completer<WebResourceErrorType> errorCodeCompleter =
           Completer<WebResourceErrorType>();
@@ -43,7 +36,7 @@ void onReceivedError() {
       expect(url, TEST_NOT_A_WEBSITE_URL.toString());
     });
 
-    testWidgets('event is not called with valid url',
+    skippableTestWidgets('event is not called with valid url',
         (WidgetTester tester) async {
       final Completer<void> onReceivedErrorCompleter = Completer<void>();
 

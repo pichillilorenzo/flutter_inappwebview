@@ -1,12 +1,4 @@
-import 'dart:async';
-import 'dart:convert';
-import 'dart:typed_data';
-
-import 'package:flutter/foundation.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter/widgets.dart';
-import 'package:flutter_inappwebview/flutter_inappwebview.dart';
-import 'package:flutter_test/flutter_test.dart';
+part of 'main.dart';
 
 void audioPlaybackPolicy() {
   final shouldSkip = kIsWeb
@@ -17,7 +9,7 @@ void audioPlaybackPolicy() {
           TargetPlatform.macOS,
         ].contains(defaultTargetPlatform);
 
-  group('Audio playback policy', () {
+  skippableGroup('Audio playback policy', () {
     String audioTestBase64 = "";
     setUpAll(() async {
       final ByteData audioData =
@@ -48,7 +40,7 @@ void audioPlaybackPolicy() {
       audioTestBase64 = base64Encode(const Utf8Encoder().convert(audioTest));
     });
 
-    testWidgets('Auto media playback', (WidgetTester tester) async {
+    skippableTestWidgets('Auto media playback', (WidgetTester tester) async {
       Completer<InAppWebViewController> controllerCompleter =
           Completer<InAppWebViewController>();
       Completer<void> pageStarted = Completer<void>();

@@ -1,10 +1,4 @@
-import 'package:flutter/foundation.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter_inappwebview/flutter_inappwebview.dart';
-import 'package:flutter_test/flutter_test.dart';
-
-import '../constants.dart';
-import '../util.dart';
+part of 'main.dart';
 
 void customTabs() {
   final shouldSkip = kIsWeb
@@ -13,8 +7,8 @@ void customTabs() {
           TargetPlatform.android,
         ].contains(defaultTargetPlatform);
 
-  group('Custom Tabs', () {
-    test('custom referrer', () async {
+  skippableGroup('Custom Tabs', () {
+    skippableTest('custom referrer', () async {
       var chromeSafariBrowser = MyChromeSafariBrowser();
       expect(chromeSafariBrowser.isOpened(), false);
 
@@ -26,7 +20,7 @@ void customTabs() {
       expect(chromeSafariBrowser.isOpened(), true);
       expect(() async {
         await chromeSafariBrowser.open(url: TEST_CROSS_PLATFORM_URL_1);
-      }, throwsException);
+      }, throwsAssertionError);
 
       await expectLater(chromeSafariBrowser.firstPageLoaded.future, completes);
       await chromeSafariBrowser.close();
@@ -34,7 +28,7 @@ void customTabs() {
       expect(chromeSafariBrowser.isOpened(), false);
     });
 
-    test('single instance', () async {
+    skippableTest('single instance', () async {
       var chromeSafariBrowser = MyChromeSafariBrowser();
       expect(chromeSafariBrowser.isOpened(), false);
 
@@ -45,7 +39,7 @@ void customTabs() {
       expect(chromeSafariBrowser.isOpened(), true);
       expect(() async {
         await chromeSafariBrowser.open(url: TEST_CROSS_PLATFORM_URL_1);
-      }, throwsException);
+      }, throwsAssertionError);
 
       await expectLater(chromeSafariBrowser.firstPageLoaded.future, completes);
       await chromeSafariBrowser.close();
@@ -53,7 +47,7 @@ void customTabs() {
       expect(chromeSafariBrowser.isOpened(), false);
     });
 
-    test('add custom action button and update icon', () async {
+    skippableTest('add custom action button and update icon', () async {
       var chromeSafariBrowser = MyChromeSafariBrowser();
       var actionButtonIcon =
           await rootBundle.load('test_assets/images/flutter-logo.png');
@@ -71,7 +65,7 @@ void customTabs() {
       expect(chromeSafariBrowser.isOpened(), true);
       expect(() async {
         await chromeSafariBrowser.open(url: TEST_CROSS_PLATFORM_URL_1);
-      }, throwsException);
+      }, throwsAssertionError);
 
       await expectLater(chromeSafariBrowser.firstPageLoaded.future, completes);
       await chromeSafariBrowser.updateActionButton(
@@ -82,7 +76,7 @@ void customTabs() {
       expect(chromeSafariBrowser.isOpened(), false);
     }, skip: shouldSkip);
 
-    test('mayLaunchUrl and launchUrl', () async {
+    skippableTest('mayLaunchUrl and launchUrl', () async {
       var chromeSafariBrowser = MyChromeSafariBrowser();
       expect(chromeSafariBrowser.isOpened(), false);
 
@@ -104,7 +98,7 @@ void customTabs() {
       expect(chromeSafariBrowser.isOpened(), false);
     });
 
-    test('onNavigationEvent', () async {
+    skippableTest('onNavigationEvent', () async {
       var chromeSafariBrowser = MyChromeSafariBrowser();
       expect(chromeSafariBrowser.isOpened(), false);
 
@@ -118,7 +112,7 @@ void customTabs() {
       expect(chromeSafariBrowser.isOpened(), false);
     });
 
-    test('add and update secondary toolbar', () async {
+    skippableTest('add and update secondary toolbar', () async {
       var chromeSafariBrowser = MyChromeSafariBrowser();
       chromeSafariBrowser.setSecondaryToolbar(
           ChromeSafariBrowserSecondaryToolbar(
@@ -172,7 +166,7 @@ void customTabs() {
       expect(chromeSafariBrowser.isOpened(), false);
     });
 
-    test('getMaxToolbarItems', () async {
+    skippableTest('getMaxToolbarItems', () async {
       expect(await ChromeSafariBrowser.getMaxToolbarItems(),
           greaterThanOrEqualTo(0));
     });

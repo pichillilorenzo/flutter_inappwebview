@@ -1,11 +1,4 @@
-import 'dart:async';
-
-import 'package:flutter/foundation.dart';
-import 'package:flutter/widgets.dart';
-import 'package:flutter_inappwebview/flutter_inappwebview.dart';
-import 'package:flutter_test/flutter_test.dart';
-
-import '../constants.dart';
+part of 'main.dart';
 
 void shouldInterceptRequest() {
   final shouldSkip = kIsWeb
@@ -14,7 +7,7 @@ void shouldInterceptRequest() {
           TargetPlatform.android,
         ].contains(defaultTargetPlatform);
 
-  testWidgets('shouldInterceptRequest', (WidgetTester tester) async {
+  skippableTestWidgets('shouldInterceptRequest', (WidgetTester tester) async {
     final Completer completer = Completer();
 
     var swAvailable = await WebViewFeature.isFeatureSupported(

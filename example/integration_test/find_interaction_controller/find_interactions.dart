@@ -1,9 +1,4 @@
-import 'dart:async';
-
-import 'package:flutter/foundation.dart';
-import 'package:flutter/widgets.dart';
-import 'package:flutter_inappwebview/flutter_inappwebview.dart';
-import 'package:flutter_test/flutter_test.dart';
+part of 'main.dart';
 
 void findInteractions() {
   final shouldSkip = kIsWeb
@@ -14,7 +9,7 @@ void findInteractions() {
           TargetPlatform.macOS,
         ].contains(defaultTargetPlatform);
 
-  testWidgets('find interactions', (WidgetTester tester) async {
+  skippableTestWidgets('find interactions', (WidgetTester tester) async {
     final Completer<void> pageLoaded = Completer<void>();
     final findInteractionController = FindInteractionController();
 
@@ -71,7 +66,7 @@ void findInteractions() {
     }
   }, skip: shouldSkip);
 
-  testWidgets('onFindResultReceived', (WidgetTester tester) async {
+  skippableTestWidgets('onFindResultReceived', (WidgetTester tester) async {
     final Completer<void> pageLoaded = Completer<void>();
     final Completer<int> numberOfMatchesCompleter = Completer<int>();
     final findInteractionController = FindInteractionController(

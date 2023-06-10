@@ -50,6 +50,7 @@ public class InAppBrowserSettings: ISettings<InAppBrowserWebViewController> {
         }
     }
     var windowFrame: NSRect?
+    var hideDefaultMenuItems = false
     
     override init(){
         super.init()

@@ -18,6 +18,13 @@ public class InAppBrowserChannelDelegate : ChannelDelegate {
         channel?.invokeMethod("onBrowserCreated", arguments: arguments)
     }
     
+    public func onMenuItemClicked(menuItem: InAppBrowserMenuItem) {
+        let arguments: [String: Any?] = [
+            "id": menuItem.id
+        ]
+        channel?.invokeMethod("onMenuItemClicked", arguments: arguments)
+    }
+    
     public func onExit() {
         let arguments: [String: Any?] = [:]
         channel?.invokeMethod("onExit", arguments: arguments)

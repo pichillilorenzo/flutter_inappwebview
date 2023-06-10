@@ -1,11 +1,4 @@
-import 'dart:async';
-
-import 'package:flutter/foundation.dart';
-import 'package:flutter/widgets.dart';
-import 'package:flutter_inappwebview/flutter_inappwebview.dart';
-import 'package:flutter_test/flutter_test.dart';
-
-import '../constants.dart';
+part of 'main.dart';
 
 void reload() {
   final shouldSkip = kIsWeb
@@ -18,7 +11,7 @@ void reload() {
 
   var url = !kIsWeb ? TEST_URL_1 : TEST_WEB_PLATFORM_URL_1;
 
-  group('reload', () {
+  skippableGroup('reload', () {
     final shouldSkipTest1 = kIsWeb
         ? true
         : ![
@@ -26,7 +19,7 @@ void reload() {
             TargetPlatform.macOS,
           ].contains(defaultTargetPlatform);
 
-    testWidgets('from origin', (WidgetTester tester) async {
+    skippableTestWidgets('from origin', (WidgetTester tester) async {
       final Completer<InAppWebViewController> controllerCompleter =
           Completer<InAppWebViewController>();
       final Completer<void> pageLoaded = Completer<void>();
@@ -55,7 +48,7 @@ void reload() {
       await expectLater(controller.reloadFromOrigin(), completes);
     }, skip: shouldSkipTest1);
 
-    testWidgets('basic', (WidgetTester tester) async {
+    skippableTestWidgets('basic', (WidgetTester tester) async {
       final Completer<InAppWebViewController> controllerCompleter =
           Completer<InAppWebViewController>();
       final StreamController<String> pageLoads =

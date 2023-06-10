@@ -3,6 +3,7 @@ package com.pichillilorenzo.flutter_inappwebview.in_app_browser;
 import androidx.annotation.NonNull;
 
 import com.pichillilorenzo.flutter_inappwebview.types.ChannelDelegateImpl;
+import com.pichillilorenzo.flutter_inappwebview.types.InAppBrowserMenuItem;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -19,6 +20,14 @@ public class InAppBrowserChannelDelegate extends ChannelDelegateImpl {
     if (channel == null) return;
     Map<String, Object> obj = new HashMap<>();
     channel.invokeMethod("onBrowserCreated", obj);
+  }
+
+  public void onMenuItemClicked(InAppBrowserMenuItem menuItem) {
+    MethodChannel channel = getChannel();
+    if (channel == null) return;
+    Map<String, Object> obj = new HashMap<>();
+    obj.put("id", menuItem.getId());
+    channel.invokeMethod("onMenuItemClicked", obj);
   }
 
   public void onExit() {

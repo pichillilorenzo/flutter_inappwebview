@@ -1,12 +1,4 @@
-import 'dart:async';
-
-import 'package:flutter/foundation.dart';
-import 'package:flutter/widgets.dart';
-import 'package:flutter_inappwebview/flutter_inappwebview.dart';
-import 'package:flutter_test/flutter_test.dart';
-
-import '../constants.dart';
-import '../util.dart';
+part of 'main.dart';
 
 void stopLoading() {
   final shouldSkip = kIsWeb
@@ -17,7 +9,7 @@ void stopLoading() {
           TargetPlatform.macOS,
         ].contains(defaultTargetPlatform);
 
-  testWidgets('stopLoading', (WidgetTester tester) async {
+  skippableTestWidgets('stopLoading', (WidgetTester tester) async {
     final Completer<InAppWebViewController> controllerCompleter =
         Completer<InAppWebViewController>();
     final Completer<void> pageLoaded = Completer<void>();

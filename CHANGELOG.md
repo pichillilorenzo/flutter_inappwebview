@@ -1,7 +1,9 @@
 ## 6.0.0-beta.24
 
 - Added InAppWebView keep alive feature
+- Added InAppBrowser menu items feature
 - Added `hasJavaScriptHandler`, `hasUserScript`, `hasWebMessageListener` InAppWebViewController methods
+- Added `hideCloseButton`, `hideDefaultMenuItems`, `menuButtonColor` InAppBrowser settings
 - `HeadlessInAppWebView.webViewController` could be `null`
 - Removed `throwIfAlreadyOpened`, `throwIfNotOpened` InAppBrowser methods
 - Removed `throwIfAlreadyOpened`, `throwIfNotOpened` ChromeSafariBrowser methods

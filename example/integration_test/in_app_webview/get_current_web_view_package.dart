@@ -1,6 +1,4 @@
-import 'package:flutter/foundation.dart';
-import 'package:flutter_inappwebview/flutter_inappwebview.dart';
-import 'package:flutter_test/flutter_test.dart';
+part of 'main.dart';
 
 void getCurrentWebViewPackage() {
   final shouldSkip = kIsWeb
@@ -9,7 +7,7 @@ void getCurrentWebViewPackage() {
           TargetPlatform.android,
         ].contains(defaultTargetPlatform);
 
-  test('getCurrentWebViewPackage', () async {
+  skippableTest('getCurrentWebViewPackage', () async {
     expect(await InAppWebViewController.getCurrentWebViewPackage(), isNotNull);
   }, skip: shouldSkip);
 }

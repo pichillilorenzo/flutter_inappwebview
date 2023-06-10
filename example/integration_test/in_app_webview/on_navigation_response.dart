@@ -1,11 +1,4 @@
-import 'dart:async';
-
-import 'package:flutter/foundation.dart';
-import 'package:flutter/widgets.dart';
-import 'package:flutter_inappwebview/flutter_inappwebview.dart';
-import 'package:flutter_test/flutter_test.dart';
-
-import '../constants.dart';
+part of 'main.dart';
 
 void onNavigationResponse() {
   final shouldSkip = kIsWeb
@@ -15,8 +8,8 @@ void onNavigationResponse() {
           TargetPlatform.macOS,
         ].contains(defaultTargetPlatform);
 
-  group("onNavigationResponse", () {
-    testWidgets('allow navigation', (WidgetTester tester) async {
+  skippableGroup('onNavigationResponse', () {
+    skippableTestWidgets('allow navigation', (WidgetTester tester) async {
       final Completer<InAppWebViewController> controllerCompleter =
           Completer<InAppWebViewController>();
       final Completer<void> pageLoaded = Completer<void>();
@@ -49,7 +42,7 @@ void onNavigationResponse() {
       expect(url, TEST_URL_1.toString());
     });
 
-    testWidgets('cancel navigation', (WidgetTester tester) async {
+    skippableTestWidgets('cancel navigation', (WidgetTester tester) async {
       final Completer<InAppWebViewController> controllerCompleter =
           Completer<InAppWebViewController>();
       final Completer<void> pageLoaded = Completer<void>();

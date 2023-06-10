@@ -1,12 +1,4 @@
-import 'dart:async';
-import 'dart:convert';
-
-import 'package:flutter/foundation.dart';
-import 'package:flutter/widgets.dart';
-import 'package:flutter_inappwebview/flutter_inappwebview.dart';
-import 'package:flutter_test/flutter_test.dart';
-
-import '../constants.dart';
+part of 'main.dart';
 
 void programmaticScroll() {
   final shouldSkip = kIsWeb
@@ -17,7 +9,7 @@ void programmaticScroll() {
           TargetPlatform.macOS,
         ].contains(defaultTargetPlatform);
 
-  group('Programmatic Scroll', () {
+  skippableGroup('Programmatic Scroll', () {
     final shouldSkipTest1 = kIsWeb
         ? false
         : ![
@@ -26,7 +18,8 @@ void programmaticScroll() {
             TargetPlatform.macOS,
           ].contains(defaultTargetPlatform);
 
-    testWidgets('set and get scroll position', (WidgetTester tester) async {
+    skippableTestWidgets('set and get scroll position',
+        (WidgetTester tester) async {
       final String scrollTestPage = '''
         <!DOCTYPE html>
         <html>

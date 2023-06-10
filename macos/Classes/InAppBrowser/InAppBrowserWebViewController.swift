@@ -263,6 +263,24 @@ public class InAppBrowserWebViewController: NSViewController, InAppBrowserDelega
     @objc public func goBackOrForward(steps: Int) {
         webView?.goBackOrForward(steps: steps)
     }
+    
+    @objc public func onMenuItemClicked(sender: Any?) {
+        var identifier: String?
+        if let sender = sender as? NSMenuItem {
+            identifier = sender.identifier?.rawValue
+        }
+        if identifier == nil, let sender = sender as? NSButton {
+            identifier = sender.identifier?.rawValue
+        }
+        if let identifier = identifier, let window = window {
+            let menuItem = window.menuItems.first { item in
+                return item.id == Int64(identifier)
+            }
+            if let menuItem = menuItem {
+                channelDelegate?.onMenuItemClicked(menuItem: menuItem)
+            }
+        }
+    }
 
     public func setSettings(newSettings: InAppBrowserSettings, newSettingsMap: [String: Any]) {
         window?.setSettings(newSettings: newSettings, newSettingsMap: newSettingsMap)

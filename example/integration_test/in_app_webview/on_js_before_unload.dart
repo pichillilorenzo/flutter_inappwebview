@@ -1,8 +1,4 @@
-import 'dart:async';
-
-import 'package:flutter/widgets.dart';
-import 'package:flutter_inappwebview/flutter_inappwebview.dart';
-import 'package:flutter_test/flutter_test.dart';
+part of 'main.dart';
 
 void onJsBeforeUnload() {
   // final shouldSkip = kIsWeb
@@ -12,7 +8,7 @@ void onJsBeforeUnload() {
   //       ].contains(defaultTargetPlatform);
   final shouldSkip = true;
   // on Android, for some reason, it works on an example app but not in this test
-  testWidgets('onJsBeforeUnload', (WidgetTester tester) async {
+  skippableTestWidgets('onJsBeforeUnload', (WidgetTester tester) async {
     final Completer<InAppWebViewController> controllerCompleter =
         Completer<InAppWebViewController>();
     final Completer<String> onJsBeforeUnloadCompleter = Completer<String>();

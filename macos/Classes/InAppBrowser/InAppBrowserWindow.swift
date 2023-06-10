@@ -12,6 +12,7 @@ struct ToolbarIdentifiers {
     static let backButton = NSToolbarItem.Identifier(rawValue: "BackButton")
     static let forwardButton = NSToolbarItem.Identifier(rawValue: "ForwardButton")
     static let reloadButton = NSToolbarItem.Identifier(rawValue: "ReloadButton")
+    static let menuButton = NSToolbarItem.Identifier(rawValue: "MenuButton")
 }
 
 public class InAppBrowserWindow : NSWindow, NSWindowDelegate, NSToolbarDelegate, NSSearchFieldDelegate {
@@ -19,6 +20,8 @@ public class InAppBrowserWindow : NSWindow, NSWindowDelegate, NSToolbarDelegate,
     var backItem: NSToolbarItem?
     var forwardItem: NSToolbarItem?
     var reloadItem: NSToolbarItem?
+    var menuItem: NSToolbarItem?
+    var actionItems: [NSToolbarItem] = []
     
     var reloadButton: NSButton? {
         get {
@@ -44,8 +47,14 @@ public class InAppBrowserWindow : NSWindow, NSWindowDelegate, NSToolbarDelegate,
             }
         }
     }
+    var menuButton: NSPopUpButton? {
+        get {
+            return menuItem?.view as? NSPopUpButton
+        }
+    }
     
     var browserSettings: InAppBrowserSettings?
+    var menuItems: [InAppBrowserMenuItem] = []
     
     public func prepare() {
         title = ""
@@ -119,6 +128,45 @@ public class InAppBrowserWindow : NSWindow, NSWindowDelegate, NSToolbarDelegate,
                 }
             }
             
+            if #available(macOS 10.15, *), !menuItems.isEmpty {
+                menuItem = NSMenuToolbarItem(itemIdentifier: ToolbarIdentifiers.menuButton)
+                if let menuItem = menuItem as? NSMenuToolbarItem {
+                    menuItem.label = ""
+                    if #available(macOS 11.0, *) {
+                        menuItem.image = NSImage(systemSymbolName: "ellipsis.circle",
+                                                 accessibilityDescription: "Options")
+                        menuItem.showsIndicator = true
+                        menuItem.isBordered = true
+                    } else {
+                        menuItem.title = "Options"
+                    }
+                    let menu = NSMenu()
+                    menuItems = menuItems.sorted(by: {$0.order ?? 0 < $1.order ?? 0})
+                    for item in menuItems {
+                        if !item.showAsAction {
+                            let nsItem = NSMenuItem(title: item.title, action: #selector(InAppBrowserWebViewController.onMenuItemClicked), keyEquivalent: "")
+                            nsItem.identifier = NSUserInterfaceItemIdentifier.init(String(item.id))
+                            nsItem.image = item.icon
+                            menu.addItem(nsItem)
+                        } else {
+                            let actionItem = NSMenuToolbarItem(itemIdentifier: NSToolbarItem.Identifier(rawValue: String(item.id)))
+                            actionItem.label = ""
+                            if let webViewController = contentViewController as? InAppBrowserWebViewController {
+                                let actionButton = NSButton(title: item.title,
+                                                           target: webViewController,
+                                                           action: #selector(InAppBrowserWebViewController.onMenuItemClicked))
+                                actionButton.identifier = NSUserInterfaceItemIdentifier.init(String(item.id))
+                                actionButton.image = item.icon
+                                actionItem.view = actionButton
+                            }
+                            actionItems.append(actionItem)
+                        }
+                    }
+                    menuItem.menu = menu
+                }
+            }
+            
+            
             if #available(macOS 10.14, *) {
                 windowToolbar.centeredItemIdentifier = ToolbarIdentifiers.searchBar
             }
@@ -158,24 +206,34 @@ public class InAppBrowserWindow : NSWindow, NSWindowDelegate, NSToolbarDelegate,
             if let windowFrame = browserSettings.windowFrame {
                 setFrame(windowFrame, display: true)
             }
+            reloadItem?.view?.isHidden = browserSettings.hideDefaultMenuItems
+            backItem?.view?.isHidden = browserSettings.hideDefaultMenuItems
+            forwardItem?.view?.isHidden = browserSettings.hideDefaultMenuItems
         }
     }
     
     public func toolbarAllowedItemIdentifiers(_ toolbar: NSToolbar) -> [NSToolbarItem.Identifier] {
-        return [ ToolbarIdentifiers.searchBar,
+        return [[ ToolbarIdentifiers.menuButton,
+                 ToolbarIdentifiers.searchBar,
                  ToolbarIdentifiers.backButton,
                  ToolbarIdentifiers.forwardButton,
                  ToolbarIdentifiers.reloadButton,
-                 .flexibleSpace ]
+                 .flexibleSpace ], actionItems.compactMap({ item in
+                     return item.itemIdentifier
+                 })].flatMap { $0 }
     }
     
     public func toolbarDefaultItemIdentifiers(_ toolbar: NSToolbar) -> [NSToolbarItem.Identifier] {
-        return [.flexibleSpace,
+        return [[.flexibleSpace,
                 ToolbarIdentifiers.searchBar,
                 .flexibleSpace,
                 ToolbarIdentifiers.reloadButton,
                 ToolbarIdentifiers.backButton,
-                ToolbarIdentifiers.forwardButton]
+                ToolbarIdentifiers.forwardButton],
+                actionItems.compactMap({ item in
+                    return item.itemIdentifier
+                }),
+                [ToolbarIdentifiers.menuButton]].flatMap { $0 }
     }
     
     public func toolbar(_ toolbar: NSToolbar, itemForItemIdentifier itemIdentifier: NSToolbarItem.Identifier, willBeInsertedIntoToolbar flag: Bool) -> NSToolbarItem? {
@@ -188,8 +246,13 @@ public class InAppBrowserWindow : NSWindow, NSWindowDelegate, NSToolbarDelegate,
             return forwardItem
         case ToolbarIdentifiers.reloadButton:
             return reloadItem
+        case ToolbarIdentifiers.menuButton:
+            return menuItem
         default:
-            return nil
+            let actionItem = actionItems.first { item in
+                return item.itemIdentifier == itemIdentifier
+            }
+            return actionItem
         }
     }
     
@@ -272,6 +335,11 @@ public class InAppBrowserWindow : NSWindow, NSWindowDelegate, NSToolbarDelegate,
         }
         if newSettingsMap["windowFrame"] != nil, browserSettings?.windowFrame != newSettings.windowFrame {
             setFrame(newSettings.windowFrame!, display: true)
+        }
+        if newSettingsMap["hideDefaultMenuItems"] != nil, browserSettings?.hideDefaultMenuItems != newSettings.hideDefaultMenuItems {
+            reloadItem?.view?.isHidden = newSettings.hideDefaultMenuItems
+            backItem?.view?.isHidden = newSettings.hideDefaultMenuItems
+            forwardItem?.view?.isHidden = newSettings.hideDefaultMenuItems
         }
         browserSettings = newSettings
     }

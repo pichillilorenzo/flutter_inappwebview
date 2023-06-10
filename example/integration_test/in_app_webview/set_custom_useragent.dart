@@ -1,11 +1,4 @@
-import 'dart:async';
-
-import 'package:flutter/foundation.dart';
-import 'package:flutter/widgets.dart';
-import 'package:flutter_inappwebview/flutter_inappwebview.dart';
-import 'package:flutter_test/flutter_test.dart';
-
-import '../constants.dart';
+part of 'main.dart';
 
 void setCustomUserAgent() {
   final shouldSkip = kIsWeb
@@ -16,7 +9,7 @@ void setCustomUserAgent() {
           TargetPlatform.macOS,
         ].contains(defaultTargetPlatform);
 
-  testWidgets('set custom userAgent', (WidgetTester tester) async {
+  skippableTestWidgets('set custom userAgent', (WidgetTester tester) async {
     final Completer controllerCompleter1 = Completer<InAppWebViewController>();
     await tester.pumpWidget(
       Directionality(

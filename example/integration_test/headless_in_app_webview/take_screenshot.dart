@@ -1,12 +1,4 @@
-import 'dart:async';
-import 'dart:typed_data';
-
-import 'package:flutter/foundation.dart';
-import 'package:flutter/widgets.dart';
-import 'package:flutter_inappwebview/flutter_inappwebview.dart';
-import 'package:flutter_test/flutter_test.dart';
-
-import '../constants.dart';
+part of 'main.dart';
 
 void takeScreenshot() {
   final shouldSkip = kIsWeb ||
@@ -16,7 +8,7 @@ void takeScreenshot() {
         TargetPlatform.macOS,
       ].contains(defaultTargetPlatform);
 
-  test('take screenshot', () async {
+  skippableTest('take screenshot', () async {
     final Completer<InAppWebViewController> controllerCompleter =
         Completer<InAppWebViewController>();
     final Completer<void> pageLoaded = Completer<void>();

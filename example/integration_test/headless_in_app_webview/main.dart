@@ -1,13 +1,20 @@
-import 'package:flutter_test/flutter_test.dart';
+import 'dart:async';
 
-import 'convert_to_inappwebview.dart';
-import 'take_screenshot.dart';
-import 'custom_size.dart';
-import 'run_and_dispose.dart';
-import 'set_get_settings.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/widgets.dart';
+import 'package:flutter_inappwebview/flutter_inappwebview.dart';
+import 'package:flutter_test/flutter_test.dart';
+import '../constants.dart';
+import '../util.dart';
+
+part 'convert_to_inappwebview.dart';
+part 'take_screenshot.dart';
+part 'custom_size.dart';
+part 'run_and_dispose.dart';
+part 'set_get_settings.dart';
 
 void main() {
-  group('HeadlessInAppWebView', () {
+  skippableGroup('HeadlessInAppWebView', () {
     runAndDispose();
     takeScreenshot();
     customSize();

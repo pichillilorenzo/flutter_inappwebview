@@ -27,7 +27,7 @@ class InAppWebViewControllerKeepAliveProps {
 
   InAppWebViewControllerKeepAliveProps(
       {required this.javaScriptHandlersMap,
-        required this.userScripts,
-        required this.webMessageListenerObjNames,
-        required this.injectedScriptsFromURL});
+      required this.userScripts,
+      required this.webMessageListenerObjNames,
+      required this.injectedScriptsFromURL});
 }

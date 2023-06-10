@@ -27,6 +27,8 @@ public class InAppBrowserSettings: ISettings<InAppBrowserWebViewController> {
     var closeButtonColor: String?
     var presentationStyle = 0 //fullscreen
     var transitionStyle = 0 //crossDissolve
+    var hideCloseButton = false
+    var menuButtonColor: String?
     
     override init(){
         super.init()
@@ -40,6 +42,7 @@ public class InAppBrowserSettings: ISettings<InAppBrowserWebViewController> {
             realOptions["hideProgressBar"] = inAppBrowserWebViewController.progressBar.isHidden
             realOptions["closeButtonCaption"] = inAppBrowserWebViewController.closeButton.title
             realOptions["closeButtonColor"] = inAppBrowserWebViewController.closeButton.tintColor?.hexString
+            realOptions["menuButtonColor"] = inAppBrowserWebViewController.menuButton?.tintColor?.hexString
             if let navController = inAppBrowserWebViewController.navigationController {
                 realOptions["hideToolbarTop"] = navController.navigationBar.isHidden
                 realOptions["toolbarTopBackgroundColor"] = navController.navigationBar.backgroundColor?.hexString

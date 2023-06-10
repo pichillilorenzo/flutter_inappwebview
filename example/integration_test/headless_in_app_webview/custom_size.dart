@@ -1,11 +1,4 @@
-import 'dart:async';
-
-import 'package:flutter/foundation.dart';
-import 'package:flutter/widgets.dart';
-import 'package:flutter_inappwebview/flutter_inappwebview.dart';
-import 'package:flutter_test/flutter_test.dart';
-
-import '../constants.dart';
+part of 'main.dart';
 
 void customSize() {
   final shouldSkip = kIsWeb
@@ -16,7 +9,7 @@ void customSize() {
           TargetPlatform.macOS,
         ].contains(defaultTargetPlatform);
 
-  test('set and get custom size', () async {
+  skippableTest('set and get custom size', () async {
     final Completer<InAppWebViewController> controllerCompleter =
         Completer<InAppWebViewController>();
 

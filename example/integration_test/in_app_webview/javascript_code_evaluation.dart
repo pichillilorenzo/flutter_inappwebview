@@ -1,11 +1,4 @@
-import 'dart:async';
-
-import 'package:flutter/foundation.dart';
-import 'package:flutter/widgets.dart';
-import 'package:flutter_inappwebview/flutter_inappwebview.dart';
-import 'package:flutter_test/flutter_test.dart';
-
-import '../constants.dart';
+part of 'main.dart';
 
 void javascriptCodeEvaluation() {
   final shouldSkip = kIsWeb
@@ -16,7 +9,7 @@ void javascriptCodeEvaluation() {
           TargetPlatform.macOS,
         ].contains(defaultTargetPlatform);
 
-  group('javascript code evaluation', () {
+  skippableGroup('javascript code evaluation', () {
     final shouldSkipTest1 = kIsWeb
         ? false
         : ![
@@ -25,7 +18,7 @@ void javascriptCodeEvaluation() {
             TargetPlatform.macOS,
           ].contains(defaultTargetPlatform);
 
-    testWidgets('evaluateJavascript', (WidgetTester tester) async {
+    skippableTestWidgets('evaluateJavascript', (WidgetTester tester) async {
       final Completer<InAppWebViewController> controllerCompleter =
           Completer<InAppWebViewController>();
       final Completer<void> pageLoaded = Completer<void>();
@@ -68,7 +61,7 @@ void javascriptCodeEvaluation() {
             TargetPlatform.macOS,
           ].contains(defaultTargetPlatform);
 
-    testWidgets('evaluateJavascript with content world',
+    skippableTestWidgets('evaluateJavascript with content world',
         (WidgetTester tester) async {
       final Completer<InAppWebViewController> controllerCompleter =
           Completer<InAppWebViewController>();
@@ -113,7 +106,7 @@ void javascriptCodeEvaluation() {
             TargetPlatform.macOS,
           ].contains(defaultTargetPlatform);
 
-    testWidgets('callAsyncJavaScript', (WidgetTester tester) async {
+    skippableTestWidgets('callAsyncJavaScript', (WidgetTester tester) async {
       final Completer<InAppWebViewController> controllerCompleter =
           Completer<InAppWebViewController>();
       final Completer<void> pageLoaded = Completer<void>();
@@ -174,7 +167,7 @@ void javascriptCodeEvaluation() {
             TargetPlatform.macOS,
           ].contains(defaultTargetPlatform);
 
-    testWidgets('callAsyncJavaScript with content world',
+    skippableTestWidgets('callAsyncJavaScript with content world',
         (WidgetTester tester) async {
       final Completer<InAppWebViewController> controllerCompleter =
           Completer<InAppWebViewController>();

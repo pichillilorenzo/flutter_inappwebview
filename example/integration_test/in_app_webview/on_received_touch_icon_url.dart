@@ -1,9 +1,4 @@
-import 'dart:async';
-
-import 'package:flutter/foundation.dart';
-import 'package:flutter/widgets.dart';
-import 'package:flutter_inappwebview/flutter_inappwebview.dart';
-import 'package:flutter_test/flutter_test.dart';
+part of 'main.dart';
 
 void onReceivedTouchIconUrl() {
   final shouldSkip = kIsWeb
@@ -12,7 +7,7 @@ void onReceivedTouchIconUrl() {
           TargetPlatform.android,
         ].contains(defaultTargetPlatform);
 
-  testWidgets('onReceivedTouchIconUrl', (WidgetTester tester) async {
+  skippableTestWidgets('onReceivedTouchIconUrl', (WidgetTester tester) async {
     final Completer<InAppWebViewController> controllerCompleter =
         Completer<InAppWebViewController>();
     final Completer<String> onReceivedTouchIconUrlCompleter =

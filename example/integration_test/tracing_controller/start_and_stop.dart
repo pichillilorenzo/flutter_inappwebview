@@ -1,13 +1,4 @@
-import 'dart:async';
-import 'dart:io';
-
-import 'package:flutter/foundation.dart';
-import 'package:flutter/widgets.dart';
-import 'package:flutter_inappwebview/flutter_inappwebview.dart';
-import 'package:flutter_test/flutter_test.dart';
-import 'package:path_provider/path_provider.dart';
-
-import '../constants.dart';
+part of 'main.dart';
 
 void startAndStop() {
   final shouldSkip = kIsWeb
@@ -16,7 +7,7 @@ void startAndStop() {
           TargetPlatform.android,
         ].contains(defaultTargetPlatform);
 
-  testWidgets('start and stop', (WidgetTester tester) async {
+  skippableTestWidgets('start and stop', (WidgetTester tester) async {
     final Completer<void> pageLoaded = Completer<void>();
 
     final tracingAvailable = await WebViewFeature.isFeatureSupported(

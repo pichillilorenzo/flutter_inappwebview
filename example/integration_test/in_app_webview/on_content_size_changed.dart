@@ -1,11 +1,4 @@
-import 'dart:async';
-
-import 'package:flutter/foundation.dart';
-import 'package:flutter/widgets.dart';
-import 'package:flutter_inappwebview/flutter_inappwebview.dart';
-import 'package:flutter_test/flutter_test.dart';
-
-import '../constants.dart';
+part of 'main.dart';
 
 void onContentSizeChanged() {
   final shouldSkip = kIsWeb
@@ -15,7 +8,7 @@ void onContentSizeChanged() {
           TargetPlatform.macOS,
         ].contains(defaultTargetPlatform);
 
-  testWidgets('onContentSizeChanged', (WidgetTester tester) async {
+  skippableTestWidgets('onContentSizeChanged', (WidgetTester tester) async {
     final Completer<void> onContentSizeChangedCompleter = Completer<void>();
     await tester.pumpWidget(
       Directionality(

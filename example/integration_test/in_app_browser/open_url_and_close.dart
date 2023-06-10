@@ -1,9 +1,4 @@
-import 'package:flutter/foundation.dart';
-import 'package:flutter_inappwebview/flutter_inappwebview.dart';
-import 'package:flutter_test/flutter_test.dart';
-
-import '../constants.dart';
-import '../util.dart';
+part of 'main.dart';
 
 void openUrlAndClose() {
   final shouldSkip = kIsWeb
@@ -14,12 +9,12 @@ void openUrlAndClose() {
           TargetPlatform.macOS,
         ].contains(defaultTargetPlatform);
 
-  test('open url and close', () async {
+  skippableTest('open url and close', () async {
     var inAppBrowser = new MyInAppBrowser();
     expect(inAppBrowser.isOpened(), false);
     expect(() async {
       await inAppBrowser.show();
-    }, throwsException);
+    }, throwsAssertionError);
 
     await inAppBrowser.openUrlRequest(urlRequest: URLRequest(url: TEST_URL_1));
     await inAppBrowser.browserCreated.future;
@@ -27,7 +22,7 @@ void openUrlAndClose() {
     expect(() async {
       await inAppBrowser.openUrlRequest(
           urlRequest: URLRequest(url: TEST_CROSS_PLATFORM_URL_1));
-    }, throwsException);
+    }, throwsAssertionError);
 
     await inAppBrowser.firstPageLoaded.future;
     var controller = inAppBrowser.webViewController;
@@ -37,6 +32,7 @@ void openUrlAndClose() {
     expect(url, TEST_URL_1.toString());
 
     await inAppBrowser.close();
+    await inAppBrowser.browserClosed.future;
     expect(inAppBrowser.isOpened(), false);
     expect(inAppBrowser.webViewController, isNull);
   }, skip: shouldSkip);

@@ -1,11 +1,4 @@
-import 'dart:async';
-
-import 'package:flutter/foundation.dart';
-import 'package:flutter/widgets.dart';
-import 'package:flutter_inappwebview/flutter_inappwebview.dart';
-import 'package:flutter_test/flutter_test.dart';
-
-import '../env.dart';
+part of 'main.dart';
 
 void httpAuthCredentialDatabase() {
   final shouldSkip = kIsWeb
@@ -16,8 +9,8 @@ void httpAuthCredentialDatabase() {
           TargetPlatform.macOS,
         ].contains(defaultTargetPlatform);
 
-  group('Http Auth Credential Database', () {
-    testWidgets('use saved credentials', (WidgetTester tester) async {
+  skippableGroup('Http Auth Credential Database', () {
+    skippableTestWidgets('use saved credentials', (WidgetTester tester) async {
       HttpAuthCredentialDatabase httpAuthCredentialDatabase =
           HttpAuthCredentialDatabase.instance();
       final Completer<InAppWebViewController> controllerCompleter =
@@ -83,7 +76,7 @@ void httpAuthCredentialDatabase() {
       expect(credentials, isEmpty);
     });
 
-    testWidgets('save credentials', (WidgetTester tester) async {
+    skippableTestWidgets('save credentials', (WidgetTester tester) async {
       final Completer<InAppWebViewController> controllerCompleter =
           Completer<InAppWebViewController>();
       final Completer<void> pageLoaded = Completer<void>();

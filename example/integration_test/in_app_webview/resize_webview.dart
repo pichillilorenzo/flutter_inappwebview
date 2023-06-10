@@ -1,10 +1,4 @@
-import 'dart:async';
-import 'dart:convert';
-
-import 'package:flutter/foundation.dart';
-import 'package:flutter/widgets.dart';
-import 'package:flutter_inappwebview/flutter_inappwebview.dart';
-import 'package:flutter_test/flutter_test.dart';
+part of 'main.dart';
 
 void resizeWebView() {
   final shouldSkip = kIsWeb
@@ -15,7 +9,7 @@ void resizeWebView() {
           TargetPlatform.macOS,
         ].contains(defaultTargetPlatform);
 
-  testWidgets('resize webview', (WidgetTester tester) async {
+  skippableTestWidgets('resize webview', (WidgetTester tester) async {
     final String resizeTest = '''
         <!DOCTYPE html><html>
         <head><title>Resize test</title>

@@ -1,9 +1,4 @@
-import 'dart:async';
-
-import 'package:flutter/foundation.dart';
-import 'package:flutter/widgets.dart';
-import 'package:flutter_inappwebview/flutter_inappwebview.dart';
-import 'package:flutter_test/flutter_test.dart';
+part of 'main.dart';
 
 void loadAssetFile(InAppLocalhostServer localhostServer) {
   final shouldSkip = kIsWeb
@@ -14,7 +9,7 @@ void loadAssetFile(InAppLocalhostServer localhostServer) {
           TargetPlatform.macOS,
         ].contains(defaultTargetPlatform);
 
-  testWidgets('load asset file', (WidgetTester tester) async {
+  skippableTestWidgets('load asset file', (WidgetTester tester) async {
     expect(localhostServer.isRunning(), true);
 
     final Completer<InAppWebViewController> controllerCompleter =

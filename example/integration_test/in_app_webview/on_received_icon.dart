@@ -1,12 +1,4 @@
-import 'dart:async';
-import 'dart:typed_data';
-
-import 'package:flutter/foundation.dart';
-import 'package:flutter/widgets.dart';
-import 'package:flutter_inappwebview/flutter_inappwebview.dart';
-import 'package:flutter_test/flutter_test.dart';
-
-import '../constants.dart';
+part of 'main.dart';
 
 void onReceivedIcon() {
   final shouldSkip = kIsWeb
@@ -15,7 +7,7 @@ void onReceivedIcon() {
           TargetPlatform.android,
         ].contains(defaultTargetPlatform);
 
-  testWidgets('onReceivedIcon', (WidgetTester tester) async {
+  skippableTestWidgets('onReceivedIcon', (WidgetTester tester) async {
     final Completer<InAppWebViewController> controllerCompleter =
         Completer<InAppWebViewController>();
     final Completer<void> pageLoaded = Completer<void>();

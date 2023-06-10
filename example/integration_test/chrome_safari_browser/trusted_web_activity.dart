@@ -1,9 +1,4 @@
-import 'package:flutter/foundation.dart';
-import 'package:flutter_inappwebview/flutter_inappwebview.dart';
-import 'package:flutter_test/flutter_test.dart';
-
-import '../constants.dart';
-import '../util.dart';
+part of 'main.dart';
 
 void trustedWebActivity() {
   final shouldSkip = kIsWeb
@@ -12,8 +7,8 @@ void trustedWebActivity() {
           TargetPlatform.android,
         ].contains(defaultTargetPlatform);
 
-  group('Trusted Web Activity', () {
-    test('basic', () async {
+  skippableGroup('Trusted Web Activity', () {
+    skippableTest('basic', () async {
       var chromeSafariBrowser = MyChromeSafariBrowser();
       expect(chromeSafariBrowser.isOpened(), false);
 
@@ -24,7 +19,7 @@ void trustedWebActivity() {
       expect(chromeSafariBrowser.isOpened(), true);
       expect(() async {
         await chromeSafariBrowser.open(url: TEST_CROSS_PLATFORM_URL_1);
-      }, throwsException);
+      }, throwsAssertionError);
 
       await expectLater(chromeSafariBrowser.firstPageLoaded.future, completes);
       await chromeSafariBrowser.close();
@@ -32,7 +27,7 @@ void trustedWebActivity() {
       expect(chromeSafariBrowser.isOpened(), false);
     });
 
-    test('single instance', () async {
+    skippableTest('single instance', () async {
       var chromeSafariBrowser = MyChromeSafariBrowser();
       expect(chromeSafariBrowser.isOpened(), false);
 
@@ -44,7 +39,7 @@ void trustedWebActivity() {
       expect(chromeSafariBrowser.isOpened(), true);
       expect(() async {
         await chromeSafariBrowser.open(url: TEST_CROSS_PLATFORM_URL_1);
-      }, throwsException);
+      }, throwsAssertionError);
 
       await expectLater(chromeSafariBrowser.firstPageLoaded.future, completes);
       await chromeSafariBrowser.close();
@@ -52,7 +47,7 @@ void trustedWebActivity() {
       expect(chromeSafariBrowser.isOpened(), false);
     });
 
-    test('validate relationship', () async {
+    skippableTest('validate relationship', () async {
       var chromeSafariBrowser = MyChromeSafariBrowser();
       expect(chromeSafariBrowser.isOpened(), false);
 

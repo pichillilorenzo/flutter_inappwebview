@@ -1,13 +1,4 @@
-import 'dart:async';
-import 'dart:convert';
-import 'dart:typed_data';
-
-import 'package:flutter/foundation.dart';
-import 'package:flutter/widgets.dart';
-import 'package:flutter_inappwebview/flutter_inappwebview.dart';
-import 'package:flutter_test/flutter_test.dart';
-
-import '../constants.dart';
+part of 'main.dart';
 
 void loadUrl() {
   final shouldSkip1 = kIsWeb
@@ -20,7 +11,7 @@ void loadUrl() {
 
   var initialUrl = !kIsWeb ? TEST_URL_1 : TEST_WEB_PLATFORM_URL_1;
 
-  testWidgets('loadUrl', (WidgetTester tester) async {
+  skippableTestWidgets('loadUrl', (WidgetTester tester) async {
     final Completer<InAppWebViewController> controllerCompleter =
         Completer<InAppWebViewController>();
     final Completer<String> firstUrlLoad = Completer<String>();
@@ -62,7 +53,7 @@ void loadUrl() {
           TargetPlatform.macOS,
         ].contains(defaultTargetPlatform);
 
-  testWidgets('loadSimulatedRequest', (WidgetTester tester) async {
+  skippableTestWidgets('loadSimulatedRequest', (WidgetTester tester) async {
     final Completer<InAppWebViewController> controllerCompleter =
         Completer<InAppWebViewController>();
     final Completer<String> firstUrlLoad = Completer<String>();

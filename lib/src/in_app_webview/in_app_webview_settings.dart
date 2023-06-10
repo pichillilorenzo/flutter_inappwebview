@@ -31,7 +31,7 @@ import '../in_app_browser/in_app_browser_settings.dart';
 import 'webview.dart';
 import '../android/webview_feature.dart';
 import '../in_app_webview/in_app_webview_controller.dart';
-import '../context_menu.dart';
+import '../context_menu/context_menu.dart';
 import '../in_app_browser/in_app_browser.dart';
 
 part 'in_app_webview_settings.g.dart';

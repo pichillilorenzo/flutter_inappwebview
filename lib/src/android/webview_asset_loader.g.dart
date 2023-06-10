@@ -133,8 +133,8 @@ abstract class PathHandler {
   ///Converts instance to a map.
   Map<String, dynamic> toMap() {
     return {
-      ..._toMapMergeWith(),
       "path": path,
+      ..._toMapMergeWith(),
     };
   }
 
@@ -184,8 +184,8 @@ class AssetsPathHandler extends PathHandler {
   ///Converts instance to a map.
   Map<String, dynamic> toMap() {
     return {
-      ..._toMapMergeWith(),
       "path": path,
+      ..._toMapMergeWith(),
     };
   }
 
@@ -235,8 +235,8 @@ class ResourcesPathHandler extends PathHandler {
   ///Converts instance to a map.
   Map<String, dynamic> toMap() {
     return {
-      ..._toMapMergeWith(),
       "path": path,
+      ..._toMapMergeWith(),
     };
   }
 
@@ -294,9 +294,9 @@ class InternalStoragePathHandler extends PathHandler {
   ///Converts instance to a map.
   Map<String, dynamic> toMap() {
     return {
-      ..._toMapMergeWith(),
       "path": path,
       "directory": directory,
+      ..._toMapMergeWith(),
     };
   }
 

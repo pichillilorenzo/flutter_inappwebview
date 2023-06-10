@@ -1,12 +1,4 @@
-import 'dart:async';
-import 'dart:convert';
-
-import 'package:flutter/foundation.dart';
-import 'package:flutter/widgets.dart';
-import 'package:flutter_inappwebview/flutter_inappwebview.dart';
-import 'package:flutter_test/flutter_test.dart';
-
-import '../constants.dart';
+part of 'main.dart';
 
 void webViewWindows() {
   final shouldSkip = kIsWeb
@@ -17,7 +9,7 @@ void webViewWindows() {
           TargetPlatform.macOS,
         ].contains(defaultTargetPlatform);
 
-  group("WebView Windows", () {
+  skippableGroup('WebView Windows', () {
     final shouldSkipTest1 = kIsWeb
         ? true
         : ![
@@ -26,7 +18,8 @@ void webViewWindows() {
             TargetPlatform.macOS,
           ].contains(defaultTargetPlatform);
 
-    testWidgets('onCreateWindow return false', (WidgetTester tester) async {
+    skippableTestWidgets('onCreateWindow return false',
+        (WidgetTester tester) async {
       final Completer<InAppWebViewController> controllerCompleter =
           Completer<InAppWebViewController>();
       final Completer<void> pageLoaded = Completer<void>();
@@ -68,7 +61,8 @@ void webViewWindows() {
             TargetPlatform.macOS,
           ].contains(defaultTargetPlatform);
 
-    testWidgets('onCreateWindow return true', (WidgetTester tester) async {
+    skippableTestWidgets('onCreateWindow return true',
+        (WidgetTester tester) async {
       final Completer<InAppWebViewController> controllerCompleter =
           Completer<InAppWebViewController>();
       final Completer<int> onCreateWindowCompleter = Completer<int>();
@@ -140,7 +134,8 @@ void webViewWindows() {
             TargetPlatform.macOS,
           ].contains(defaultTargetPlatform);
 
-    testWidgets('window.open() with target _blank opens in same window',
+    skippableTestWidgets(
+        'window.open() with target _blank opens in same window',
         (WidgetTester tester) async {
       final Completer<InAppWebViewController> controllerCompleter =
           Completer<InAppWebViewController>();
@@ -184,7 +179,8 @@ void webViewWindows() {
             TargetPlatform.macOS,
           ].contains(defaultTargetPlatform);
     // on Android, for some reason, it works on an example app but not in this test
-    testWidgets('can open new window and go back', (WidgetTester tester) async {
+    skippableTestWidgets('can open new window and go back',
+        (WidgetTester tester) async {
       final Completer<InAppWebViewController> controllerCompleter =
           Completer<InAppWebViewController>();
       final StreamController<String> pageLoads =
@@ -236,7 +232,7 @@ void webViewWindows() {
             TargetPlatform.macOS,
           ].contains(defaultTargetPlatform);
 
-    testWidgets('javascript does not run in parent window',
+    skippableTestWidgets('javascript does not run in parent window',
         (WidgetTester tester) async {
       final String iframe = '''
         <!DOCTYPE html>
@@ -311,7 +307,8 @@ void webViewWindows() {
     // final shouldSkipTest6 = !kIsWeb;
     final shouldSkipTest6 = true;
     // on Web, opening a new window during tests makes crash
-    testWidgets('onCreateWindow called on Web', (WidgetTester tester) async {
+    skippableTestWidgets('onCreateWindow called on Web',
+        (WidgetTester tester) async {
       final Completer<InAppWebViewController> controllerCompleter =
           Completer<InAppWebViewController>();
       final Completer<String> onCreateWindowCalled = Completer<String>();

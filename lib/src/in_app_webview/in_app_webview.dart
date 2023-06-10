@@ -14,7 +14,7 @@ import '../util.dart';
 import '../find_interaction/find_interaction_controller.dart';
 import '../web/web_platform_manager.dart';
 
-import '../context_menu.dart';
+import '../context_menu/context_menu.dart';
 import '../types/main.dart';
 import '../print_job/main.dart';
 
@@ -73,8 +73,7 @@ class InAppWebView extends StatefulWidget implements WebView {
     this.initialUrlRequest,
     this.initialFile,
     this.initialData,
-    @Deprecated('Use initialSettings instead')
-        this.initialOptions,
+    @Deprecated('Use initialSettings instead') this.initialOptions,
     this.initialSettings,
     this.initialUserScripts,
     this.pullToRefreshController,
@@ -83,19 +82,16 @@ class InAppWebView extends StatefulWidget implements WebView {
     this.onWebViewCreated,
     this.onLoadStart,
     this.onLoadStop,
-    @Deprecated("Use onReceivedError instead")
-        this.onLoadError,
+    @Deprecated("Use onReceivedError instead") this.onLoadError,
     this.onReceivedError,
-    @Deprecated("Use onReceivedHttpError instead")
-        this.onLoadHttpError,
+    @Deprecated("Use onReceivedHttpError instead") this.onLoadHttpError,
     this.onReceivedHttpError,
     this.onConsoleMessage,
     this.onProgressChanged,
     this.shouldOverrideUrlLoading,
     this.onLoadResource,
     this.onScrollChanged,
-    @Deprecated('Use onDownloadStartRequest instead')
-        this.onDownloadStart,
+    @Deprecated('Use onDownloadStartRequest instead') this.onDownloadStart,
     this.onDownloadStartRequest,
     @Deprecated('Use onLoadResourceWithCustomScheme instead')
         this.onLoadResourceCustomScheme,
@@ -115,8 +111,7 @@ class InAppWebView extends StatefulWidget implements WebView {
     this.onAjaxProgress,
     this.shouldInterceptFetchRequest,
     this.onUpdateVisitedHistory,
-    @Deprecated("Use onPrintRequest instead")
-        this.onPrint,
+    @Deprecated("Use onPrintRequest instead") this.onPrint,
     this.onPrintRequest,
     this.onLongPressHitTestResult,
     this.onEnterFullscreen,
@@ -127,8 +122,7 @@ class InAppWebView extends StatefulWidget implements WebView {
     this.onWindowBlur,
     this.onOverScrolled,
     this.onZoomScaleChanged,
-    @Deprecated('Use onSafeBrowsingHit instead')
-        this.androidOnSafeBrowsingHit,
+    @Deprecated('Use onSafeBrowsingHit instead') this.androidOnSafeBrowsingHit,
     this.onSafeBrowsingHit,
     @Deprecated('Use onPermissionRequest instead')
         this.androidOnPermissionRequest,
@@ -154,16 +148,13 @@ class InAppWebView extends StatefulWidget implements WebView {
     @Deprecated('Use onFormResubmission instead')
         this.androidOnFormResubmission,
     this.onFormResubmission,
-    @Deprecated('Use onZoomScaleChanged instead')
-        this.androidOnScaleChanged,
-    @Deprecated('Use onReceivedIcon instead')
-        this.androidOnReceivedIcon,
+    @Deprecated('Use onZoomScaleChanged instead') this.androidOnScaleChanged,
+    @Deprecated('Use onReceivedIcon instead') this.androidOnReceivedIcon,
     this.onReceivedIcon,
     @Deprecated('Use onReceivedTouchIconUrl instead')
         this.androidOnReceivedTouchIconUrl,
     this.onReceivedTouchIconUrl,
-    @Deprecated('Use onJsBeforeUnload instead')
-        this.androidOnJsBeforeUnload,
+    @Deprecated('Use onJsBeforeUnload instead') this.androidOnJsBeforeUnload,
     this.onJsBeforeUnload,
     @Deprecated('Use onReceivedLoginRequest instead')
         this.androidOnReceivedLoginRequest,

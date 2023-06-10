@@ -1,11 +1,4 @@
-import 'dart:async';
-import 'dart:io';
-
-import 'package:flutter/foundation.dart';
-import 'package:flutter/widgets.dart';
-import 'package:flutter_inappwebview/flutter_inappwebview.dart';
-import 'package:flutter_test/flutter_test.dart';
-import 'package:path_provider/path_provider.dart';
+part of 'main.dart';
 
 void loadFileUrl() {
   final shouldSkip = kIsWeb
@@ -15,7 +8,7 @@ void loadFileUrl() {
           TargetPlatform.macOS,
         ].contains(defaultTargetPlatform);
 
-  group('load file URL', () {
+  skippableGroup('load file URL', () {
     late Directory appSupportDir;
     late File fileHtml;
     late File fileJs;
@@ -53,7 +46,8 @@ void loadFileUrl() {
       fileJs.writeAsStringSync(js);
     });
 
-    testWidgets('initialUrl with file:// scheme and allowingReadAccessTo',
+    skippableTestWidgets(
+        'initialUrl with file:// scheme and allowingReadAccessTo',
         (WidgetTester tester) async {
       final Completer<ConsoleMessage?> consoleMessageShouldNotComplete =
           Completer<ConsoleMessage?>();
@@ -97,7 +91,8 @@ void loadFileUrl() {
       expect(consoleMessage.message, 'message');
     });
 
-    testWidgets('loadUrl with file:// scheme and allowingReadAccessTo argument',
+    skippableTestWidgets(
+        'loadUrl with file:// scheme and allowingReadAccessTo argument',
         (WidgetTester tester) async {
       final Completer<ConsoleMessage?> consoleMessageShouldNotComplete =
           Completer<ConsoleMessage?>();

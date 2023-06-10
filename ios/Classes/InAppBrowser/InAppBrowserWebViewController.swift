@@ -20,6 +20,17 @@ public class InAppBrowserWebViewController: UIViewController, InAppBrowserDelega
     var shareButton: UIBarButtonItem!
     var searchBar: UISearchBar!
     var progressBar: UIProgressView!
+    var menuButton: UIBarButtonItem?
+    private var _menu: Any?
+    @available(iOS 13.0, *)
+    var menu: UIMenu? {
+        set {
+            _menu = newValue
+        }
+        get {
+            return _menu as? UIMenu
+        }
+    }
     
     var tmpWindow: UIWindow?
     var id: String = ""
@@ -40,6 +51,7 @@ public class InAppBrowserWebViewController: UIViewController, InAppBrowserDelega
     var initialUserScripts: [[String: Any]] = []
     var pullToRefreshInitialSettings: [String: Any?] = [:]
     var isHidden = false
+    var menuItems: [InAppBrowserMenuItem] = []
 
     public override func loadView() {
         guard let plugin = plugin, let registrar = plugin.registrar else {
@@ -235,6 +247,8 @@ public class InAppBrowserWebViewController: UIViewController, InAppBrowserDelega
         backButton = UIBarButtonItem(title: "\u{2039}", style: .plain, target: self, action: #selector(goBack))
         backButton.isEnabled = false
         
+        toolbarItems = [backButton, spacer, forwardButton, spacer, shareButton, spacer, reloadButton]
+        
         for state: UIControl.State in [.normal, .disabled, .highlighted, .selected] {
             forwardButton.setTitleTextAttributes([
                 NSAttributedString.Key.font: UIFont.systemFont(ofSize: 50.0),
@@ -246,35 +260,33 @@ public class InAppBrowserWebViewController: UIViewController, InAppBrowserDelega
             ], for: state)
         }
         
-        toolbarItems = [backButton, spacer, forwardButton, spacer, shareButton, spacer, reloadButton]
-        
-        if let browserOptions = browserSettings {
-            if !browserOptions.hideToolbarTop {
+        if let browserSettings = browserSettings {
+            if !browserSettings.hideToolbarTop {
                 navigationController?.navigationBar.isHidden = false
-                if browserOptions.hideUrlBar {
+                if browserSettings.hideUrlBar {
                     searchBar.isHidden = true
                 }
-                if let bgColor = browserOptions.toolbarTopBackgroundColor, !bgColor.isEmpty {
+                if let bgColor = browserSettings.toolbarTopBackgroundColor, !bgColor.isEmpty {
                     navigationController?.navigationBar.backgroundColor = UIColor(hexString: bgColor)
                 }
-                if let barTintColor = browserOptions.toolbarTopBarTintColor, !barTintColor.isEmpty {
+                if let barTintColor = browserSettings.toolbarTopBarTintColor, !barTintColor.isEmpty {
                     navigationController?.navigationBar.barTintColor = UIColor(hexString: barTintColor)
                 }
-                if let tintColor = browserOptions.toolbarTopTintColor, !tintColor.isEmpty {
+                if let tintColor = browserSettings.toolbarTopTintColor, !tintColor.isEmpty {
                     navigationController?.navigationBar.tintColor = UIColor(hexString: tintColor)
                 }
-                navigationController?.navigationBar.isTranslucent = browserOptions.toolbarTopTranslucent
+                navigationController?.navigationBar.isTranslucent = browserSettings.toolbarTopTranslucent
             }
             else {
                 navigationController?.navigationBar.isHidden = true
             }
             
-            if !browserOptions.hideToolbarBottom {
+            if !browserSettings.hideToolbarBottom {
                 navigationController?.isToolbarHidden = false
-                if let bgColor = browserOptions.toolbarBottomBackgroundColor, !bgColor.isEmpty {
+                if let bgColor = browserSettings.toolbarBottomBackgroundColor, !bgColor.isEmpty {
                     navigationController?.toolbar.barTintColor = UIColor(hexString: bgColor)
                 }
-                if let tintColor = browserOptions.toolbarBottomTintColor, !tintColor.isEmpty {
+                if let tintColor = browserSettings.toolbarBottomTintColor, !tintColor.isEmpty {
                     navigationController?.toolbar.tintColor = UIColor(hexString: tintColor)
                 }
                 navigationController?.toolbar.isTranslucent = false
@@ -283,22 +295,52 @@ public class InAppBrowserWebViewController: UIViewController, InAppBrowserDelega
                 navigationController?.isToolbarHidden = true
             }
             
-            if let closeButtonCaption = browserOptions.closeButtonCaption, !closeButtonCaption.isEmpty {
+            if let closeButtonCaption = browserSettings.closeButtonCaption, !closeButtonCaption.isEmpty {
                 closeButton = UIBarButtonItem(title: closeButtonCaption, style: .plain, target: self, action: #selector(close))
             } else {
                 setDefaultCloseButton()
             }
             
-            if let closeButtonColor = browserOptions.closeButtonColor, !closeButtonColor.isEmpty {
+            if let closeButtonColor = browserSettings.closeButtonColor, !closeButtonColor.isEmpty {
                 closeButton.tintColor = UIColor(hexString: closeButtonColor)
             }
             
-            if browserOptions.hideProgressBar {
+            if browserSettings.hideProgressBar {
                 progressBar.isHidden = true
             }
+            
+            navigationItem.rightBarButtonItems = []
+            
+            if !browserSettings.hideCloseButton {
+                navigationItem.rightBarButtonItems = [closeButton]
+            }
+            
+            if #available(iOS 14.0, *), !menuItems.isEmpty {
+                var uiActions: [UIAction] = []
+                menuItems = menuItems.sorted(by: {$0.order ?? 0 < $1.order ?? 0})
+                for menuItem in menuItems {
+                    let uiAction = UIAction(title: menuItem.title, image: menuItem.icon, handler: {_ in
+                        self.channelDelegate?.onMenuItemClicked(menuItem: menuItem)
+                    })
+                    if !menuItem.showAsAction {
+                        uiActions.append(uiAction)
+                    } else {
+                        navigationItem.rightBarButtonItems?.append(
+                            UIBarButtonItem(primaryAction: uiAction)
+                        )
+                    }
+                }
+                if !uiActions.isEmpty {
+                    menu = UIMenu(title: "", options: .displayInline, children: uiActions)
+                    menuButton = UIBarButtonItem(image: UIImage(systemName: "ellipsis.circle"), menu: menu)
+                    if let menuButtonColor = browserSettings.menuButtonColor, !menuButtonColor.isEmpty {
+                        menuButton?.tintColor = UIColor(hexString: menuButtonColor)
+                    }
+                    let index = browserSettings.hideCloseButton ? 0 : 1
+                    navigationItem.rightBarButtonItems?.insert(menuButton!, at: index)
+                }
+            }
         }
-        
-        navigationItem.rightBarButtonItem = closeButton
     }
     
     func setDefaultCloseButton() {
@@ -306,11 +348,11 @@ public class InAppBrowserWebViewController: UIViewController, InAppBrowserDelega
             closeButton.target = nil
             closeButton.action = nil
         }
+        var barButtonSystemItem = UIBarButtonItem.SystemItem.cancel
         if #available(iOS 13.0, *) {
-            closeButton = UIBarButtonItem(barButtonSystemItem: .close, target: self, action: #selector(close))
-        } else {
-            closeButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(close))
+            barButtonSystemItem = UIBarButtonItem.SystemItem.close
         }
+        closeButton = UIBarButtonItem(barButtonSystemItem: barButtonSystemItem, target: self, action: #selector(close))
     }
     
     public func didChangeTitle(title: String?) {
@@ -541,6 +583,14 @@ public class InAppBrowserWebViewController: UIViewController, InAppBrowserDelega
             }
         }
         
+        if newSettingsMap["hideCloseButton"] != nil, browserSettings?.hideCloseButton != newSettings.hideCloseButton {
+            if !newSettings.hideCloseButton {
+                navigationItem.rightBarButtonItems = [closeButton]
+            } else {
+                navigationItem.rightBarButtonItems = []
+            }
+        }
+        
         if newSettingsMap["presentationStyle"] != nil, browserSettings?.presentationStyle != newSettings.presentationStyle {
             navigationController?.modalPresentationStyle = UIModalPresentationStyle(rawValue: newSettings.presentationStyle)!
         }
@@ -551,6 +601,14 @@ public class InAppBrowserWebViewController: UIViewController, InAppBrowserDelega
         
         if newSettingsMap["hideProgressBar"] != nil, browserSettings?.hideProgressBar != newSettings.hideProgressBar {
             progressBar.isHidden = newSettings.hideProgressBar
+        }
+        
+        if newSettingsMap["menuButtonColor"] != nil, browserSettings?.menuButtonColor != newSettings.menuButtonColor {
+            if let tintColor = newSettings.menuButtonColor, !tintColor.isEmpty {
+                menuButton?.tintColor = UIColor(hexString: tintColor)
+            } else {
+                menuButton?.tintColor = nil
+            }
         }
         
         browserSettings = newSettings
@@ -584,6 +642,7 @@ public class InAppBrowserWebViewController: UIViewController, InAppBrowserDelega
         backButton.target = nil
         reloadButton.target = nil
         shareButton.target = nil
+        menuButton?.target = nil
         plugin = nil
     }
     

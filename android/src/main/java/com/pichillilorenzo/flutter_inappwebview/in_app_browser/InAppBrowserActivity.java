@@ -1,5 +1,6 @@
 package com.pichillilorenzo.flutter_inappwebview.in_app_browser;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Color;
@@ -18,9 +19,11 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.SearchView;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.view.menu.MenuBuilder;
 
 import com.pichillilorenzo.flutter_inappwebview.R;
 import com.pichillilorenzo.flutter_inappwebview.Util;
@@ -28,7 +31,9 @@ import com.pichillilorenzo.flutter_inappwebview.find_interaction.FindInteraction
 import com.pichillilorenzo.flutter_inappwebview.pull_to_refresh.PullToRefreshChannelDelegate;
 import com.pichillilorenzo.flutter_inappwebview.pull_to_refresh.PullToRefreshLayout;
 import com.pichillilorenzo.flutter_inappwebview.pull_to_refresh.PullToRefreshSettings;
+import com.pichillilorenzo.flutter_inappwebview.types.AndroidResource;
 import com.pichillilorenzo.flutter_inappwebview.types.Disposable;
+import com.pichillilorenzo.flutter_inappwebview.types.InAppBrowserMenuItem;
 import com.pichillilorenzo.flutter_inappwebview.types.URLRequest;
 import com.pichillilorenzo.flutter_inappwebview.types.UserScript;
 import com.pichillilorenzo.flutter_inappwebview.webview.WebViewChannelDelegate;
@@ -71,6 +76,7 @@ public class InAppBrowserActivity extends AppCompatActivity implements InAppBrow
   public InAppBrowserManager manager;
   @Nullable
   public InAppBrowserChannelDelegate channelDelegate;
+  public List<InAppBrowserMenuItem> menuItems = new ArrayList<>();
   
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -119,6 +125,10 @@ public class InAppBrowserActivity extends AppCompatActivity implements InAppBrow
 
     Map<String, Object> contextMenu = (Map<String, Object>) b.getSerializable("contextMenu");
     List<Map<String, Object>> initialUserScripts = (List<Map<String, Object>>) b.getSerializable("initialUserScripts");
+    List<Map<String, Object>> menuItemList = (List<Map<String, Object>>) b.getSerializable("menuItems");
+    for (Map<String, Object> menuItem : menuItemList) {
+      menuItems.add(InAppBrowserMenuItem.fromMap(menuItem));
+    }
 
     InAppWebViewSettings webViewSettings = new InAppWebViewSettings();
     webViewSettings.parse(settingsMap);
@@ -191,10 +201,12 @@ public class InAppBrowserActivity extends AppCompatActivity implements InAppBrow
 
     progressBar = findViewById(R.id.progressBar);
 
-    if (customSettings.hideProgressBar)
-      progressBar.setMax(0);
-    else
-      progressBar.setMax(100);
+    if (progressBar != null) {
+      if (customSettings.hideProgressBar)
+        progressBar.setMax(0);
+      else
+        progressBar.setMax(100);
+    }
 
     if (actionBar != null) {
       actionBar.setDisplayShowTitleEnabled(!customSettings.hideTitleBar);
@@ -210,6 +222,7 @@ public class InAppBrowserActivity extends AppCompatActivity implements InAppBrow
     }
   }
 
+  @SuppressLint("RestrictedApi")
   @Override
   public boolean onCreateOptionsMenu(Menu m) {
     menu = m;
@@ -220,16 +233,20 @@ public class InAppBrowserActivity extends AppCompatActivity implements InAppBrow
     if (menu == null)
       return super.onCreateOptionsMenu(m);
 
+    if (menu instanceof MenuBuilder) {
+      ((MenuBuilder) menu).setOptionalIconsVisible(true);
+    }
+
     MenuInflater inflater = getMenuInflater();
     // Inflate menu to add items to action bar if it is present.
     inflater.inflate(R.menu.menu_main, menu);
 
-    MenuItem menuItem = menu.findItem(R.id.menu_search);
-    if (menuItem != null) {
+    MenuItem menuSearchItem = menu.findItem(R.id.menu_search);
+    if (menuSearchItem != null) {
       if (customSettings.hideUrlBar)
-        menuItem.setVisible(false);
+        menuSearchItem.setVisible(false);
 
-      searchView = (SearchView) menuItem.getActionView();
+      searchView = (SearchView) menuSearchItem.getActionView();
       if (searchView != null) {
         searchView.setFocusable(true);
 
@@ -276,6 +293,58 @@ public class InAppBrowserActivity extends AppCompatActivity implements InAppBrow
           }
         });
       }
+    }
+
+    if (customSettings.hideDefaultMenuItems) {
+      MenuItem actionClose = menu.findItem(R.id.action_close);
+      if (actionClose != null) {
+        actionClose.setVisible(false);
+      }
+      MenuItem actionGoBack = menu.findItem(R.id.action_go_back);
+      if (actionGoBack != null) {
+        actionGoBack.setVisible(false);
+      }
+      MenuItem actionReload = menu.findItem(R.id.action_reload);
+      if (actionReload != null) {
+        actionReload.setVisible(false);
+      }
+      MenuItem actionGoForward = menu.findItem(R.id.action_go_forward);
+      if (actionGoForward != null) {
+        actionGoForward.setVisible(false);
+      }
+      MenuItem actionShare = menu.findItem(R.id.action_share);
+      if (actionShare != null) {
+        actionShare.setVisible(false);
+      }
+    }
+
+    for (final InAppBrowserMenuItem menuItem : menuItems) {
+      int order = menuItem.getOrder() != null ? menuItem.getOrder() : Menu.NONE;
+      MenuItem item = menu.add(Menu.NONE, menuItem.getId(), order, menuItem.getTitle());
+      if (menuItem.isShowAsAction()) {
+        item.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+      }
+      Object icon = menuItem.getIcon();
+      if (icon != null) {
+        if (icon instanceof AndroidResource) {
+          item.setIcon(((AndroidResource) icon).getIdentifier(this));
+        } else {
+          item.setIcon(Util.drawableFromBytes(this, (byte[]) icon));
+        }
+        String iconColor = menuItem.getIconColor();
+        if (iconColor != null && !iconColor.isEmpty() && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+          item.getIcon().setTint(Color.parseColor(iconColor));
+        }
+      }
+      item.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+        @Override
+        public boolean onMenuItemClick(@NonNull MenuItem item) {
+          if (channelDelegate != null) {
+            channelDelegate.onMenuItemClicked(menuItem);
+          }
+          return true;
+        }
+      });
     }
 
     return true;
@@ -427,10 +496,33 @@ public class InAppBrowserActivity extends AppCompatActivity implements InAppBrow
       actionBar.setTitle(newSettings.toolbarTopFixedTitle);
 
     if (menu != null && newSettingsMap.get("hideUrlBar") != null && customSettings.hideUrlBar != newSettings.hideUrlBar) {
-      if (newSettings.hideUrlBar)
-        menu.findItem(R.id.menu_search).setVisible(false);
-      else
-        menu.findItem(R.id.menu_search).setVisible(true);
+      MenuItem menuSearchItem = menu.findItem(R.id.menu_search);
+      if (menuSearchItem != null) {
+        menuSearchItem.setVisible(!newSettings.hideUrlBar);
+      }
+    }
+
+    if (menu != null && newSettingsMap.get("hideDefaultMenuItems") != null && customSettings.hideDefaultMenuItems != newSettings.hideDefaultMenuItems) {
+      MenuItem actionClose = menu.findItem(R.id.action_close);
+      if (actionClose != null) {
+        actionClose.setVisible(!newSettings.hideDefaultMenuItems);
+      }
+      MenuItem actionGoBack = menu.findItem(R.id.action_go_back);
+      if (actionGoBack != null) {
+        actionGoBack.setVisible(!newSettings.hideDefaultMenuItems);
+      }
+      MenuItem actionReload = menu.findItem(R.id.action_reload);
+      if (actionReload != null) {
+        actionReload.setVisible(!newSettings.hideDefaultMenuItems);
+      }
+      MenuItem actionGoForward = menu.findItem(R.id.action_go_forward);
+      if (actionGoForward != null) {
+        actionGoForward.setVisible(!newSettings.hideDefaultMenuItems);
+      }
+      MenuItem actionShare = menu.findItem(R.id.action_share);
+      if (actionShare != null) {
+        actionShare.setVisible(!newSettings.hideDefaultMenuItems);
+      }
     }
 
     customSettings = newSettings;

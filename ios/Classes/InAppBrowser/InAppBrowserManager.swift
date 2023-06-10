@@ -76,6 +76,7 @@ public class InAppBrowserManager: ChannelDelegate {
         let windowId = arguments["windowId"] as? Int64
         let initialUserScripts = arguments["initialUserScripts"] as? [[String: Any]]
         let pullToRefreshInitialSettings = arguments["pullToRefreshSettings"] as! [String: Any?]
+        let menuItems = arguments["menuItems"] as! [[String: Any?]]
         
         let webViewController = prepareInAppBrowserWebViewController(settings: settings)
         
@@ -90,6 +91,9 @@ public class InAppBrowserManager: ChannelDelegate {
         webViewController.windowId = windowId
         webViewController.initialUserScripts = initialUserScripts ?? []
         webViewController.pullToRefreshInitialSettings = pullToRefreshInitialSettings
+        for menuItem in menuItems {
+            webViewController.menuItems.append(InAppBrowserMenuItem.fromMap(map: menuItem)!)
+        }
         
         presentViewController(webViewController: webViewController)
     }

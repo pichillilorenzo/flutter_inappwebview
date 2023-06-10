@@ -274,8 +274,8 @@ class CookieManager {
     await headlessWebView.run();
     await pageLoaded.future;
 
-    List<String> documentCookies = (await headlessWebView.webViewController
-            !.evaluateJavascript(source: 'document.cookie') as String)
+    List<String> documentCookies = (await headlessWebView.webViewController!
+            .evaluateJavascript(source: 'document.cookie') as String)
         .split(';')
         .map((documentCookie) => documentCookie.trim())
         .toList();

@@ -1,9 +1,4 @@
-import 'package:flutter/foundation.dart';
-import 'package:flutter_inappwebview/flutter_inappwebview.dart';
-import 'package:flutter_test/flutter_test.dart';
-
-import '../constants.dart';
-import '../util.dart';
+part of 'main.dart';
 
 void customMenuItem() {
   final shouldSkip = kIsWeb
@@ -11,7 +6,7 @@ void customMenuItem() {
       : ![TargetPlatform.android, TargetPlatform.iOS]
           .contains(defaultTargetPlatform);
 
-  test('add custom menu item', () async {
+  skippableTest('add custom menu item', () async {
     var chromeSafariBrowser = MyChromeSafariBrowser();
     chromeSafariBrowser.addMenuItem(ChromeSafariBrowserMenuItem(
         id: 2,
@@ -25,7 +20,7 @@ void customMenuItem() {
     expect(chromeSafariBrowser.isOpened(), true);
     expect(() async {
       await chromeSafariBrowser.open(url: TEST_CROSS_PLATFORM_URL_1);
-    }, throwsException);
+    }, throwsAssertionError);
 
     await expectLater(chromeSafariBrowser.firstPageLoaded.future, completes);
     await chromeSafariBrowser.close();

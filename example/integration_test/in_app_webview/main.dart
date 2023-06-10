@@ -1,95 +1,199 @@
-import 'package:flutter/foundation.dart';
-import 'package:flutter_test/flutter_test.dart';
+import 'dart:async';
+import 'dart:convert';
+import 'dart:typed_data';
+import 'dart:io';
+import 'dart:collection';
 
-import 'apple_pay_api.dart';
-import 'audio_playback_policy.dart';
-import 'clear_cache.dart';
-import 'clear_client_cert_preferences.dart';
-import 'clear_focus.dart';
-import 'clear_ssl_preferences.dart';
-import 'content_blocker.dart';
-import 'create_pdf.dart';
-import 'get_certificate.dart';
-import 'get_content_height.dart';
-import 'get_current_web_view_package.dart';
-import 'get_default_user_agent.dart';
-import 'get_favicons.dart';
-import 'get_html.dart';
-import 'get_meta_tags.dart';
-import 'get_meta_theme_color.dart';
-import 'get_original_url.dart';
-import 'get_progress.dart';
-import 'get_title.dart';
-import 'handles_url_scheme.dart';
-import 'http_auth_credential_database.dart';
-import 'initial_url_request.dart';
-import 'inject_css.dart';
-import 'inject_javascript_file.dart';
-import 'intercept_ajax_request.dart';
-import 'intercept_fetch_request.dart';
-import 'is_loading.dart';
-import 'is_secure_context.dart';
-import 'javascript_code_evaluation.dart';
-import 'javascript_dialogs.dart';
-import 'javascript_handler.dart';
-import 'load_data.dart';
-import 'load_file.dart';
-import 'load_file_url.dart';
-import 'load_url.dart';
-import 'on_console_message.dart';
-import 'on_content_size_changed.dart';
-import 'on_download_start_request.dart';
-import 'on_js_before_unload.dart';
-import 'on_received_error.dart';
-import 'on_received_http_error.dart';
-import 'on_load_resource.dart';
-import 'on_load_resource_with_custom_scheme.dart';
-import 'on_navigation_response.dart';
-import 'on_page_commit_visible.dart';
-import 'on_permission_request.dart';
-import 'on_print.dart';
-import 'on_progress_changed.dart';
-import 'on_received_icon.dart';
-import 'on_received_touch_icon_url.dart';
-import 'safe_browsing.dart';
-import 'on_scroll_changed.dart';
-import 'on_title_changed.dart';
-import 'on_update_visited_history.dart';
-import 'on_window_blur.dart';
-import 'on_window_focus.dart';
-import 'page_down_up.dart';
-import 'pause_resume.dart';
-import 'programmatic_zoom_scale.dart';
-import 'pause_resume_timers.dart';
-import 'post_requests.dart';
-import 'print_current_page.dart';
-import 'programmatic_scroll.dart';
-import 'pull_to_refresh.dart';
-import 'reload.dart';
-import 'request_focus_node_href.dart';
-import 'request_image_ref.dart';
-import 'resize_webview.dart';
-import 'web_archive.dart';
-import 'set_custom_useragent.dart';
-import 'set_get_settings.dart';
-import 'set_web_contents_debugging_enabled.dart';
-import 'should_intercept_request.dart';
-import 'should_override_url_loading.dart';
-import 'ssl_request.dart';
-import 'stop_loading.dart';
-import 't_rex_runner_game.dart';
-import 'take_screenshot.dart';
-import 'user_scripts.dart';
-import 'video_playback_policy.dart';
-import 'web_history.dart';
-import 'web_message.dart';
-import 'webview_asset_loader.dart';
-import 'webview_windows.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter/widgets.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_inappwebview/flutter_inappwebview.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:path_provider/path_provider.dart';
+import '../util.dart';
+import '../constants.dart';
+import '../env.dart';
+
+part 'apple_pay_api.dart';
+
+part 'audio_playback_policy.dart';
+
+part 'clear_cache.dart';
+
+part 'clear_client_cert_preferences.dart';
+
+part 'clear_focus.dart';
+
+part 'clear_ssl_preferences.dart';
+
+part 'content_blocker.dart';
+
+part 'create_pdf.dart';
+
+part 'get_certificate.dart';
+
+part 'get_content_height.dart';
+
+part 'get_current_web_view_package.dart';
+
+part 'get_default_user_agent.dart';
+
+part 'get_favicons.dart';
+
+part 'get_html.dart';
+
+part 'get_meta_tags.dart';
+
+part 'get_meta_theme_color.dart';
+
+part 'get_original_url.dart';
+
+part 'get_progress.dart';
+
+part 'get_title.dart';
+
+part 'handles_url_scheme.dart';
+
+part 'http_auth_credential_database.dart';
+
+part 'initial_url_request.dart';
+
+part 'inject_css.dart';
+
+part 'inject_javascript_file.dart';
+
+part 'intercept_ajax_request.dart';
+
+part 'intercept_fetch_request.dart';
+
+part 'is_loading.dart';
+
+part 'is_secure_context.dart';
+
+part 'javascript_code_evaluation.dart';
+
+part 'javascript_dialogs.dart';
+
+part 'javascript_handler.dart';
+
+part 'load_data.dart';
+
+part 'load_file.dart';
+
+part 'load_file_url.dart';
+
+part 'load_url.dart';
+
+part 'on_console_message.dart';
+
+part 'on_content_size_changed.dart';
+
+part 'on_download_start_request.dart';
+
+part 'on_js_before_unload.dart';
+
+part 'on_received_error.dart';
+
+part 'on_received_http_error.dart';
+
+part 'on_load_resource.dart';
+
+part 'on_load_resource_with_custom_scheme.dart';
+
+part 'on_navigation_response.dart';
+
+part 'on_page_commit_visible.dart';
+
+part 'on_permission_request.dart';
+
+part 'on_print.dart';
+
+part 'on_progress_changed.dart';
+
+part 'on_received_icon.dart';
+
+part 'on_received_touch_icon_url.dart';
+
+part 'safe_browsing.dart';
+
+part 'on_scroll_changed.dart';
+
+part 'on_title_changed.dart';
+
+part 'on_update_visited_history.dart';
+
+part 'on_window_blur.dart';
+
+part 'on_window_focus.dart';
+
+part 'page_down_up.dart';
+
+part 'pause_resume.dart';
+
+part 'programmatic_zoom_scale.dart';
+
+part 'pause_resume_timers.dart';
+
+part 'post_requests.dart';
+
+part 'print_current_page.dart';
+
+part 'programmatic_scroll.dart';
+
+part 'pull_to_refresh.dart';
+
+part 'reload.dart';
+
+part 'request_focus_node_href.dart';
+
+part 'request_image_ref.dart';
+
+part 'resize_webview.dart';
+
+part 'web_archive.dart';
+
+part 'set_custom_useragent.dart';
+
+part 'set_get_settings.dart';
+
+part 'set_web_contents_debugging_enabled.dart';
+
+part 'should_intercept_request.dart';
+
+part 'should_override_url_loading.dart';
+
+part 'ssl_request.dart';
+
+part 'stop_loading.dart';
+
+part 't_rex_runner_game.dart';
+
+part 'take_screenshot.dart';
+
+part 'user_scripts.dart';
+
+part 'video_playback_policy.dart';
+
+part 'web_history.dart';
+
+part 'web_message.dart';
+
+part 'webview_asset_loader.dart';
+
+part 'webview_windows.dart';
+
+part 'keep_alive.dart';
 
 void main() {
-  final shouldSkip = [TargetPlatform.macOS].contains(defaultTargetPlatform);
+  final shouldSkip = kIsWeb
+      ? false
+      : ![
+          TargetPlatform.android,
+          TargetPlatform.iOS,
+        ].contains(defaultTargetPlatform);
 
-  group('InAppWebView', () {
+  skippableGroup('InAppWebView', () {
     initialUrlRequest();
     setGetSettings();
     javascriptCodeEvaluation();
@@ -174,5 +278,6 @@ void main() {
     handlesURLScheme();
     webViewAssetLoader();
     onContentSizeChanged();
+    keepAlive();
   }, skip: shouldSkip);
 }

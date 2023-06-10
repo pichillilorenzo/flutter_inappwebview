@@ -1,12 +1,4 @@
-import 'dart:async';
-import 'dart:convert';
-
-import 'package:flutter/foundation.dart';
-import 'package:flutter/widgets.dart';
-import 'package:flutter_inappwebview/flutter_inappwebview.dart';
-import 'package:flutter_test/flutter_test.dart';
-
-import '../constants.dart';
+part of 'main.dart';
 
 void getTitle() {
   final shouldSkip = kIsWeb
@@ -33,7 +25,7 @@ void getTitle() {
       : TEST_WEB_PLATFORM_URL_1;
   var expectedValue = !kIsWeb ? 'Some title' : 'page';
 
-  testWidgets('getTitle', (WidgetTester tester) async {
+  skippableTestWidgets('getTitle', (WidgetTester tester) async {
     final Completer<void> pageStarted = Completer<void>();
     final Completer<void> pageLoaded = Completer<void>();
     final Completer<InAppWebViewController> controllerCompleter =

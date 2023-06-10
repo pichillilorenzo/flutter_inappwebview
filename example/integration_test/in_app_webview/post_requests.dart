@@ -1,13 +1,4 @@
-import 'dart:async';
-import 'dart:convert';
-import 'dart:typed_data';
-
-import 'package:flutter/foundation.dart';
-import 'package:flutter/widgets.dart';
-import 'package:flutter_inappwebview/flutter_inappwebview.dart';
-import 'package:flutter_test/flutter_test.dart';
-
-import '../env.dart';
+part of 'main.dart';
 
 void postRequests() {
   final shouldSkip = kIsWeb
@@ -18,8 +9,8 @@ void postRequests() {
           TargetPlatform.macOS,
         ].contains(defaultTargetPlatform);
 
-  group('POST requests', () {
-    testWidgets('initialUrlRequest', (WidgetTester tester) async {
+  skippableGroup('POST requests', () {
+    skippableTestWidgets('initialUrlRequest', (WidgetTester tester) async {
       final Completer<InAppWebViewController> controllerCompleter =
           Completer<InAppWebViewController>();
       final Completer<void> postPageLoaded = Completer<void>();
@@ -58,7 +49,7 @@ void postRequests() {
       expect(pContent, "HELLO FooBar!");
     });
 
-    testWidgets('loadUrl', (WidgetTester tester) async {
+    skippableTestWidgets('loadUrl', (WidgetTester tester) async {
       final Completer<InAppWebViewController> controllerCompleter =
           Completer<InAppWebViewController>();
       final Completer<void> postPageLoaded = Completer<void>();
@@ -104,7 +95,7 @@ void postRequests() {
       expect(pContent, "HELLO FooBar!");
     });
 
-    testWidgets('postUrl', (WidgetTester tester) async {
+    skippableTestWidgets('postUrl', (WidgetTester tester) async {
       final Completer<InAppWebViewController> controllerCompleter =
           Completer<InAppWebViewController>();
       final Completer<void> postPageLoaded = Completer<void>();

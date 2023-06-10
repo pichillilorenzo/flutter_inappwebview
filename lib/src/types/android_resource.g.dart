@@ -22,6 +22,9 @@ class AndroidResource {
 
   ///Android resource name.
   ///
+  ///A list of available `android.R.drawable` can be found
+  ///[here](https://developer.android.com/reference/android/R.drawable).
+  ///
   ///A list of available `android.R.anim` can be found
   ///[here](https://developer.android.com/reference/android/R.anim).
   ///
@@ -56,6 +59,11 @@ class AndroidResource {
 
   static AndroidResource id({required String name, String? defPackage}) {
     return AndroidResource(name: name, defType: "id", defPackage: defPackage);
+  }
+
+  static AndroidResource drawable({required String name, String? defPackage}) {
+    return AndroidResource(
+        name: name, defType: "drawable", defPackage: defPackage);
   }
 
   ///Converts instance to a map.

@@ -1,11 +1,4 @@
-import 'dart:async';
-
-import 'package:flutter/foundation.dart';
-import 'package:flutter/widgets.dart';
-import 'package:flutter_inappwebview/flutter_inappwebview.dart';
-import 'package:flutter_test/flutter_test.dart';
-
-import '../constants.dart';
+part of 'main.dart';
 
 void injectJavascriptFile() {
   final shouldSkip = kIsWeb
@@ -18,8 +11,8 @@ void injectJavascriptFile() {
 
   var url = !kIsWeb ? TEST_URL_ABOUT_BLANK : TEST_WEB_PLATFORM_URL_1;
 
-  group('inject javascript file', () {
-    testWidgets('from url', (WidgetTester tester) async {
+  skippableGroup('inject javascript file', () {
+    skippableTestWidgets('from url', (WidgetTester tester) async {
       final Completer<InAppWebViewController> controllerCompleter =
           Completer<InAppWebViewController>();
       final Completer<void> pageLoaded = Completer<void>();
@@ -81,7 +74,7 @@ void injectJavascriptFile() {
           false);
     });
 
-    testWidgets('from asset', (WidgetTester tester) async {
+    skippableTestWidgets('from asset', (WidgetTester tester) async {
       final Completer<InAppWebViewController> controllerCompleter =
           Completer<InAppWebViewController>();
       final Completer<void> pageLoaded = Completer<void>();

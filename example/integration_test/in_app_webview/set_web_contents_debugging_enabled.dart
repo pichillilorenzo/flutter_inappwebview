@@ -1,6 +1,4 @@
-import 'package:flutter/foundation.dart';
-import 'package:flutter_inappwebview/flutter_inappwebview.dart';
-import 'package:flutter_test/flutter_test.dart';
+part of 'main.dart';
 
 void setWebContentsDebuggingEnabled() {
   final shouldSkip = kIsWeb
@@ -9,7 +7,7 @@ void setWebContentsDebuggingEnabled() {
           TargetPlatform.android,
         ].contains(defaultTargetPlatform);
 
-  test('setWebContentsDebuggingEnabled', () async {
+  skippableTest('setWebContentsDebuggingEnabled', () async {
     expect(
         InAppWebViewController.setWebContentsDebuggingEnabled(true), completes);
   }, skip: shouldSkip);

@@ -1,10 +1,4 @@
-import 'dart:async';
-
-import 'package:flutter/foundation.dart';
-import 'package:flutter_inappwebview/flutter_inappwebview.dart';
-import 'package:flutter_test/flutter_test.dart';
-
-import '../constants.dart';
+part of 'main.dart';
 
 void runAndDispose() {
   final shouldSkip = kIsWeb
@@ -15,7 +9,7 @@ void runAndDispose() {
           TargetPlatform.macOS,
         ].contains(defaultTargetPlatform);
 
-  test('run and dispose', () async {
+  skippableTest('run and dispose', () async {
     final Completer<InAppWebViewController> controllerCompleter =
         Completer<InAppWebViewController>();
     final Completer<void> pageLoaded = Completer<void>();

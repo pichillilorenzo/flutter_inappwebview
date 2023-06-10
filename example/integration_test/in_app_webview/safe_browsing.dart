@@ -1,11 +1,4 @@
-import 'dart:async';
-
-import 'package:flutter/foundation.dart';
-import 'package:flutter/widgets.dart';
-import 'package:flutter_inappwebview/flutter_inappwebview.dart';
-import 'package:flutter_test/flutter_test.dart';
-
-import '../constants.dart';
+part of 'main.dart';
 
 void safeBrowsing() {
   final shouldSkip = kIsWeb
@@ -14,8 +7,8 @@ void safeBrowsing() {
           TargetPlatform.android,
         ].contains(defaultTargetPlatform);
 
-  group('safe browsing', () {
-    testWidgets('onSafeBrowsingHit', (WidgetTester tester) async {
+  skippableGroup('safe browsing', () {
+    skippableTestWidgets('onSafeBrowsingHit', (WidgetTester tester) async {
       final Completer<String> pageLoaded = Completer<String>();
       await tester.pumpWidget(
         Directionality(
@@ -48,12 +41,12 @@ void safeBrowsing() {
       expect(url, TEST_CHROME_SAFE_BROWSING_MALWARE.toString());
     });
 
-    test('getSafeBrowsingPrivacyPolicyUrl', () async {
+    skippableTest('getSafeBrowsingPrivacyPolicyUrl', () async {
       expect(await InAppWebViewController.getSafeBrowsingPrivacyPolicyUrl(),
           isNotNull);
     });
 
-    test('setSafeBrowsingWhitelist', () async {
+    skippableTest('setSafeBrowsingWhitelist', () async {
       expect(
           await InAppWebViewController.setSafeBrowsingAllowlist(
               hosts: ["flutter.dev", "github.com"]),

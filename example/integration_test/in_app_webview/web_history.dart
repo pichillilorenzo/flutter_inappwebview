@@ -1,11 +1,4 @@
-import 'dart:async';
-
-import 'package:flutter/foundation.dart';
-import 'package:flutter/widgets.dart';
-import 'package:flutter_inappwebview/flutter_inappwebview.dart';
-import 'package:flutter_test/flutter_test.dart';
-
-import '../constants.dart';
+part of 'main.dart';
 
 void webHistory() {
   final shouldSkip = kIsWeb
@@ -16,7 +9,7 @@ void webHistory() {
           TargetPlatform.macOS,
         ].contains(defaultTargetPlatform);
 
-  group('web history', () {
+  skippableGroup('web history', () {
     final shouldSkipTest1 = kIsWeb
         ? true
         : ![
@@ -25,7 +18,7 @@ void webHistory() {
             TargetPlatform.macOS,
           ].contains(defaultTargetPlatform);
 
-    testWidgets('get history list and go back/forward',
+    skippableTestWidgets('get history list and go back/forward',
         (WidgetTester tester) async {
       final Completer<InAppWebViewController> controllerCompleter =
           Completer<InAppWebViewController>();
@@ -124,7 +117,8 @@ void webHistory() {
 
     final shouldSkipTest2 = !kIsWeb;
 
-    testWidgets('go back/forward on web platform', (WidgetTester tester) async {
+    skippableTestWidgets('go back/forward on web platform',
+        (WidgetTester tester) async {
       final Completer<InAppWebViewController> controllerCompleter =
           Completer<InAppWebViewController>();
       final StreamController<String> pageLoads =
@@ -183,7 +177,7 @@ void webHistory() {
             TargetPlatform.android,
           ].contains(defaultTargetPlatform);
 
-    testWidgets('clearHistory', (WidgetTester tester) async {
+    skippableTestWidgets('clearHistory', (WidgetTester tester) async {
       final Completer<InAppWebViewController> controllerCompleter =
           Completer<InAppWebViewController>();
       final StreamController<String> pageLoads =

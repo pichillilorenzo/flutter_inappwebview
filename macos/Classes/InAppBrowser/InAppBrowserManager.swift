@@ -52,6 +52,7 @@ public class InAppBrowserManager: ChannelDelegate {
         let settings = arguments["settings"] as! [String: Any?]
         let windowId = arguments["windowId"] as? Int64
         let initialUserScripts = arguments["initialUserScripts"] as? [[String: Any]]
+        let menuItems = arguments["menuItems"] as! [[String: Any?]]
         
         let browserSettings = InAppBrowserSettings()
         let _ = browserSettings.parse(settings: settings)
@@ -78,6 +79,9 @@ public class InAppBrowserManager: ChannelDelegate {
         let window = InAppBrowserWindow(contentViewController: webViewController)
         window.browserSettings = browserSettings
         window.contentViewController = webViewController
+        for menuItem in menuItems {
+            window.menuItems.append(InAppBrowserMenuItem.fromMap(map: menuItem)!)
+        }
         window.prepare()
         
         if #available(macOS 10.12, *), browserSettings.windowType == .tabbed {

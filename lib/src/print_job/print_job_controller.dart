@@ -101,7 +101,8 @@ class PrintJobController implements Disposable {
   Future<PrintJobInfo?> getInfo() async {
     Map<String, dynamic> args = <String, dynamic>{};
     Map<String, dynamic>? infoMap =
-        (await _channel?.invokeMethod('getInfo', args))?.cast<String, dynamic>();
+        (await _channel?.invokeMethod('getInfo', args))
+            ?.cast<String, dynamic>();
     return PrintJobInfo.fromMap(infoMap);
   }
 

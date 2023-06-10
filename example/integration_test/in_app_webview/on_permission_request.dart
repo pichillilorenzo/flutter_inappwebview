@@ -1,11 +1,4 @@
-import 'dart:async';
-
-import 'package:flutter/foundation.dart';
-import 'package:flutter/widgets.dart';
-import 'package:flutter_inappwebview/flutter_inappwebview.dart';
-import 'package:flutter_test/flutter_test.dart';
-
-import '../constants.dart';
+part of 'main.dart';
 
 void onPermissionRequest() {
   final shouldSkip = kIsWeb
@@ -18,7 +11,7 @@ void onPermissionRequest() {
 
   final expectedValue = [PermissionResourceType.CAMERA];
 
-  testWidgets('onPermissionRequest', (WidgetTester tester) async {
+  skippableTestWidgets('onPermissionRequest', (WidgetTester tester) async {
     final Completer<InAppWebViewController> controllerCompleter =
         Completer<InAppWebViewController>();
     final Completer<void> pageLoaded = Completer<void>();
@@ -66,7 +59,8 @@ void onPermissionRequest() {
   // TODO: this test is not working
   final shouldSkip2 = true;
 
-  testWidgets('onPermissionRequestCanceled', (WidgetTester tester) async {
+  skippableTestWidgets('onPermissionRequestCanceled',
+      (WidgetTester tester) async {
     final Completer<InAppWebViewController> controllerCompleter =
         Completer<InAppWebViewController>();
     final Completer<void> pageLoaded = Completer<void>();

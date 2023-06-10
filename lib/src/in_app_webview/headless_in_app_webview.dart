@@ -5,7 +5,7 @@ import 'dart:ui';
 import 'package:flutter/services.dart';
 import '../util.dart';
 
-import '../context_menu.dart';
+import '../context_menu/context_menu.dart';
 import '../find_interaction/find_interaction_controller.dart';
 import '../types/main.dart';
 import '../print_job/main.dart';
@@ -372,7 +372,8 @@ class HeadlessInAppWebView implements WebView, Disposable {
 
     Map<String, dynamic> args = <String, dynamic>{};
     Map<String, dynamic> sizeMap =
-        (await _channel?.invokeMethod('getSize', args))?.cast<String, dynamic>();
+        (await _channel?.invokeMethod('getSize', args))
+            ?.cast<String, dynamic>();
     return MapSize.fromMap(sizeMap);
   }
 

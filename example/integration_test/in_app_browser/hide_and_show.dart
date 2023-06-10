@@ -1,9 +1,4 @@
-import 'package:flutter/foundation.dart';
-import 'package:flutter_inappwebview/flutter_inappwebview.dart';
-import 'package:flutter_test/flutter_test.dart';
-
-import '../constants.dart';
-import '../util.dart';
+part of 'main.dart';
 
 void hideAndShow() {
   final shouldSkip = kIsWeb
@@ -14,7 +9,7 @@ void hideAndShow() {
           TargetPlatform.macOS,
         ].contains(defaultTargetPlatform);
 
-  test('hide and show', () async {
+  skippableTest('hide and show', () async {
     var inAppBrowser = new MyInAppBrowser();
     await inAppBrowser.openUrlRequest(
         urlRequest: URLRequest(url: TEST_URL_1),
@@ -28,5 +23,7 @@ void hideAndShow() {
     expect(await inAppBrowser.isHidden(), false);
     await expectLater(inAppBrowser.hide(), completes);
     expect(await inAppBrowser.isHidden(), true);
+
+    await expectLater(inAppBrowser.close(), completes);
   }, skip: shouldSkip);
 }

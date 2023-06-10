@@ -1,12 +1,4 @@
-import 'dart:async';
-import 'dart:collection';
-
-import 'package:flutter/foundation.dart';
-import 'package:flutter/widgets.dart';
-import 'package:flutter_inappwebview/flutter_inappwebview.dart';
-import 'package:flutter_test/flutter_test.dart';
-
-import '../constants.dart';
+part of 'main.dart';
 
 void userScripts() {
   final shouldSkip = kIsWeb
@@ -17,8 +9,8 @@ void userScripts() {
           TargetPlatform.macOS,
         ].contains(defaultTargetPlatform);
 
-  group('user scripts', () {
-    testWidgets('initialUserScripts', (WidgetTester tester) async {
+  skippableGroup('user scripts', () {
+    skippableTestWidgets('initialUserScripts', (WidgetTester tester) async {
       final Completer<InAppWebViewController> controllerCompleter =
           Completer<InAppWebViewController>();
       final Completer<void> pageLoaded = Completer<void>();
@@ -77,7 +69,8 @@ void userScripts() {
           12);
     });
 
-    testWidgets('add/remove user scripts', (WidgetTester tester) async {
+    skippableTestWidgets('add/remove user scripts',
+        (WidgetTester tester) async {
       final Completer<InAppWebViewController> controllerCompleter =
           Completer<InAppWebViewController>();
       final StreamController<String> pageLoads =

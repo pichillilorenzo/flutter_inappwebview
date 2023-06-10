@@ -181,6 +181,7 @@ public class InAppBrowserManager extends ChannelDelegateImpl {
     Integer windowId = (Integer) arguments.get("windowId");
     List<Map<String, Object>> initialUserScripts = (List<Map<String, Object>>) arguments.get("initialUserScripts");
     Map<String, Object> pullToRefreshInitialSettings = (Map<String, Object>) arguments.get("pullToRefreshSettings");
+    List<Map<String, Object>> menuItems = (List<Map<String, Object>>) arguments.get("menuItems");
 
     Bundle extras = new Bundle();
     extras.putString("fromActivity", activity.getClass().getName());
@@ -198,6 +199,7 @@ public class InAppBrowserManager extends ChannelDelegateImpl {
     extras.putInt("windowId", windowId != null ? windowId : -1);
     extras.putSerializable("initialUserScripts", (Serializable) initialUserScripts);
     extras.putSerializable("pullToRefreshInitialSettings", (Serializable) pullToRefreshInitialSettings);
+    extras.putSerializable("menuItems", (Serializable) menuItems);
     startInAppBrowserActivity(activity, extras);
   }
 

@@ -6,12 +6,14 @@ part of 'ui_image.dart';
 // ExchangeableObjectGenerator
 // **************************************************************************
 
-///Class that represents an object that manages iOS image data in your app.
+///Class that represents an object that manages iOS and MacOS image data in your app.
 ///
-///Check [UIKit.UIImage](https://developer.apple.com/documentation/uikit/uiimage) for more details.
+///Check iOS [UIKit.UIImage](https://developer.apple.com/documentation/uikit/uiimage) for more details.
+///Check MacOS [AppKit.NSImage](https://developer.apple.com/documentation/appkit/nsimage) for more details.
 ///
 ///**Supported Platforms/Implementations**:
 ///- iOS
+///- MacOS
 class UIImage {
   ///The data object containing the image data.
   Uint8List? data;
@@ -21,7 +23,9 @@ class UIImage {
 
   ///The name of the system symbol image.
   ///
-  ///**NOTE**: available on iOS 13.0+.
+  ///**Supported Platforms/Implementations**:
+  ///- iOS 13.0+
+  ///- MacOS 11.0+
   String? systemName;
   UIImage({this.name, this.systemName, this.data}) {
     assert(this.name != null || this.systemName != null || this.data != null);

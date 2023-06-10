@@ -4,16 +4,17 @@ import 'dart:typed_data';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
-import '../types/android_resource.dart';
 import '../types/custom_tabs_navigation_event_type.dart';
 import '../types/custom_tabs_relation_type.dart';
 import '../types/prewarming_token.dart';
-import '../types/ui_image.dart';
 import '../util.dart';
 import '../debug_logging_settings.dart';
 
 import '../web_uri.dart';
 import 'chrome_safari_browser_settings.dart';
+import 'chrome_safari_action_button.dart';
+import 'chrome_safari_browser_menu_item.dart';
+import 'chrome_safari_browser_secondary_toolbar.dart';
 
 ///This class uses native [Chrome Custom Tabs](https://developer.android.com/reference/android/support/customtabs/package-summary) on Android
 ///and [SFSafariViewController](https://developer.apple.com/documentation/safariservices/sfsafariviewcontroller) on iOS.
@@ -545,173 +546,5 @@ class ChromeSafariBrowser {
   void _dispose() {
     _channel?.setMethodCallHandler(null);
     _channel = null;
-  }
-}
-
-///Class that represents a custom action button for a [ChromeSafariBrowser] instance.
-///
-///**NOTE**: Not available in an Android Trusted Web Activity.
-///
-///**Supported Platforms/Implementations**:
-///- Android
-class ChromeSafariBrowserActionButton {
-  ///The action button id. It should be different from the [ChromeSafariBrowserMenuItem.id].
-  int id;
-
-  ///The icon byte data.
-  Uint8List icon;
-
-  ///The description for the button. To be used for accessibility.
-  String description;
-
-  ///Whether the action button should be tinted.
-  bool shouldTint;
-
-  ///Use onClick instead.
-  @Deprecated("Use onClick instead")
-  void Function(String url, String title)? action;
-
-  ///Callback function to be invoked when the action button is clicked
-  void Function(WebUri? url, String title)? onClick;
-
-  ChromeSafariBrowserActionButton(
-      {required this.id,
-      required this.icon,
-      required this.description,
-      @Deprecated("Use onClick instead") this.action,
-      this.onClick,
-      this.shouldTint = false});
-
-  Map<String, dynamic> toMap() {
-    return {
-      "id": id,
-      "icon": icon,
-      "description": description,
-      "shouldTint": shouldTint
-    };
-  }
-
-  Map<String, dynamic> toJson() {
-    return this.toMap();
-  }
-
-  @override
-  String toString() {
-    return toMap().toString();
-  }
-}
-
-///Class that represents a custom menu item for a [ChromeSafariBrowser] instance.
-///
-///**NOTE**: Not available in an Android Trusted Web Activity.
-///
-///**Supported Platforms/Implementations**:
-///- Android
-///- iOS
-class ChromeSafariBrowserMenuItem {
-  ///The menu item id. It should be different from [ChromeSafariBrowserActionButton.id].
-  int id;
-
-  ///The label of the menu item.
-  String label;
-
-  ///Item image.
-  UIImage? image;
-
-  ///Use onClick instead.
-  @Deprecated("Use onClick instead")
-  void Function(String url, String title)? action;
-
-  ///Callback function to be invoked when the menu item is clicked
-  void Function(WebUri? url, String title)? onClick;
-
-  ChromeSafariBrowserMenuItem(
-      {required this.id,
-      required this.label,
-      this.image,
-      @Deprecated("Use onClick instead") this.action,
-      this.onClick});
-
-  Map<String, dynamic> toMap() {
-    return {"id": id, "label": label, "image": image?.toMap()};
-  }
-
-  Map<String, dynamic> toJson() {
-    return this.toMap();
-  }
-
-  @override
-  String toString() {
-    return toMap().toString();
-  }
-}
-
-///Class that represents the [RemoteViews](https://developer.android.com/reference/android/widget/RemoteViews.html)
-///that will be shown on the secondary toolbar of a custom tab.
-///
-///This class describes a view hierarchy that can be displayed in another process.
-///The hierarchy is inflated from an Android layout resource file.
-///
-///RemoteViews has limited to support to Android layouts.
-///Check the [RemoteViews Official API](https://developer.android.com/reference/android/widget/RemoteViews.html) for more details.
-///
-///**NOTE**: Not available in an Android Trusted Web Activity.
-///
-///**Supported Platforms/Implementations**:
-///- Android
-class ChromeSafariBrowserSecondaryToolbar {
-  ///The android layout resource.
-  AndroidResource layout;
-
-  ///The IDs of clickable views. The `onClick` event of these views will be handled by custom tabs.
-  List<ChromeSafariBrowserSecondaryToolbarClickableID> clickableIDs;
-
-  ChromeSafariBrowserSecondaryToolbar(
-      {required this.layout, this.clickableIDs = const []});
-
-  Map<String, dynamic> toMap() {
-    return {
-      "layout": layout.toMap(),
-      "clickableIDs": clickableIDs.map((e) => e.toMap()).toList()
-    };
-  }
-
-  Map<String, dynamic> toJson() {
-    return this.toMap();
-  }
-
-  @override
-  String toString() {
-    return toMap().toString();
-  }
-}
-
-///Class that represents a clickable ID item of the secondary toolbar for a [ChromeSafariBrowser] instance.
-///
-///**NOTE**: Not available in an Android Trusted Web Activity.
-///
-///**Supported Platforms/Implementations**:
-///- Android
-class ChromeSafariBrowserSecondaryToolbarClickableID {
-  ///The android id resource
-  AndroidResource id;
-
-  ///Callback function to be invoked when the item is clicked
-  void Function(WebUri? url)? onClick;
-
-  ChromeSafariBrowserSecondaryToolbarClickableID(
-      {required this.id, this.onClick});
-
-  Map<String, dynamic> toMap() {
-    return {"id": id.toMap()};
-  }
-
-  Map<String, dynamic> toJson() {
-    return this.toMap();
-  }
-
-  @override
-  String toString() {
-    return toMap().toString();
   }
 }

@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import '../in_app_webview/in_app_webview_controller.dart';
 import '../types/main.dart';
+import 'web_storage_item.dart';
 
 ///Class that provides access to the JavaScript [Web Storage API](https://developer.mozilla.org/en-US/docs/Web/API/Web_Storage_API): `window.sessionStorage` and `window.localStorage`.
 ///It used by [InAppWebViewController.webStorage].
@@ -24,33 +25,6 @@ class WebStorage {
   void dispose() {
     localStorage.dispose();
     sessionStorage.dispose();
-  }
-}
-
-///Class that represents a single web storage item of the JavaScript `window.sessionStorage` and `window.localStorage` objects.
-class WebStorageItem {
-  ///Item key.
-  String? key;
-
-  ///Item value.
-  dynamic value;
-
-  WebStorageItem({this.key, this.value});
-
-  Map<String, dynamic> toMap() {
-    return {
-      "key": key,
-      "value": value,
-    };
-  }
-
-  Map<String, dynamic> toJson() {
-    return this.toMap();
-  }
-
-  @override
-  String toString() {
-    return toMap().toString();
   }
 }
 

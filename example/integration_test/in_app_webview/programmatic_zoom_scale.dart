@@ -1,11 +1,4 @@
-import 'dart:async';
-
-import 'package:flutter/foundation.dart';
-import 'package:flutter/widgets.dart';
-import 'package:flutter_inappwebview/flutter_inappwebview.dart';
-import 'package:flutter_test/flutter_test.dart';
-
-import '../constants.dart';
+part of 'main.dart';
 
 void programmaticZoomScale() {
   final shouldSkip = kIsWeb
@@ -16,14 +9,14 @@ void programmaticZoomScale() {
           TargetPlatform.macOS,
         ].contains(defaultTargetPlatform);
 
-  group('programmatic zoom scale', () {
+  skippableGroup('programmatic zoom scale', () {
     final shouldSkipTest1 = kIsWeb
         ? true
         : ![
             TargetPlatform.android,
           ].contains(defaultTargetPlatform);
 
-    testWidgets('zoomIn/zoomOut', (WidgetTester tester) async {
+    skippableTestWidgets('zoomIn/zoomOut', (WidgetTester tester) async {
       final Completer<InAppWebViewController> controllerCompleter =
           Completer<InAppWebViewController>();
       final Completer<void> pageLoaded = Completer<void>();
@@ -52,7 +45,7 @@ void programmaticZoomScale() {
       expect(await controller.zoomOut(), true);
     }, skip: shouldSkipTest1);
 
-    testWidgets('onZoomScaleChanged', (WidgetTester tester) async {
+    skippableTestWidgets('onZoomScaleChanged', (WidgetTester tester) async {
       final Completer<InAppWebViewController> controllerCompleter =
           Completer<InAppWebViewController>();
       final Completer<void> pageLoaded = Completer<void>();
@@ -93,7 +86,7 @@ void programmaticZoomScale() {
       await expectLater(onZoomScaleChangedCompleter.future, completes);
     });
 
-    testWidgets('zoomBy', (WidgetTester tester) async {
+    skippableTestWidgets('zoomBy', (WidgetTester tester) async {
       final Completer<InAppWebViewController> controllerCompleter =
           Completer<InAppWebViewController>();
       final Completer<void> pageLoaded = Completer<void>();
@@ -122,7 +115,7 @@ void programmaticZoomScale() {
           controller.zoomBy(zoomFactor: 3.0, animated: true), completes);
     });
 
-    testWidgets('getZoomScale', (WidgetTester tester) async {
+    skippableTestWidgets('getZoomScale', (WidgetTester tester) async {
       final Completer<InAppWebViewController> controllerCompleter =
           Completer<InAppWebViewController>();
       final Completer<void> pageLoaded = Completer<void>();

@@ -108,24 +108,13 @@ class _InAppBrowserExampleScreenState extends State<InAppBrowserExampleScreen> {
                 children: <Widget>[
               ElevatedButton(
                   onPressed: () async {
-                    widget.browser.addMenuItem(InAppBrowserMenuItem(
-                      id: 2,
-                      title: "Test 2",
-                      icon: AndroidResource(name: "ic_menu_edit", defType: "drawable", defPackage: "android"),
-                      iconColor: Colors.red,
-                      onClick: () {
-                        widget.browser.webViewController?.reload();
-                      },
-                    ));
                     await widget.browser.openUrlRequest(
                       urlRequest:
                           URLRequest(url: WebUri("https://flutter.dev")),
                       settings: InAppBrowserClassSettings(
                         browserSettings: InAppBrowserSettings(
                             toolbarTopBackgroundColor: Colors.blue,
-                            presentationStyle: ModalPresentationStyle.POPOVER,
-                            hideCloseButton: true,
-                            hideDefaultMenuItems: true),
+                            presentationStyle: ModalPresentationStyle.POPOVER),
                         webViewSettings: InAppWebViewSettings(
                           isInspectable: kDebugMode,
                           useShouldOverrideUrlLoading: true,

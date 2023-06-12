@@ -648,8 +648,18 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "Nirajn2311",
+      "name": "Niraj Nandish",
+      "avatar_url": "https://avatars.githubusercontent.com/u/36357875?v=4",
+      "profile": "https://github.com/Nirajn2311",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
-  "linkToUsage": false
+  "linkToUsage": false,
+  "commitType": "docs"
 }

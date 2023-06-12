@@ -1,3 +1,7 @@
+## 6.0.0-beta.24+1
+
+- Fixed "Can't compile on Android" [#1691](https://github.com/pichillilorenzo/flutter_inappwebview/issues/1691)
+
 ## 6.0.0-beta.24
 
 - Added InAppWebView keep alive feature

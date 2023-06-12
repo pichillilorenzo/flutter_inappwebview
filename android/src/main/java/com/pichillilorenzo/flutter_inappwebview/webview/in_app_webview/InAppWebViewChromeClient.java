@@ -670,7 +670,7 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
     }
 
     if (inAppWebView != null && inAppWebView.channelDelegate != null) {
-      int finalWindowId = windowId;
+      final int finalWindowId = windowId;
       inAppWebView.channelDelegate.onCreateWindow(createWindowAction, new WebViewChannelDelegate.CreateWindowCallback() {
         @Override
         public boolean nonNullSuccess(@NonNull Boolean handledByClient) {
@@ -1184,6 +1184,9 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
     } catch (IOException e) {
       Log.e(LOG_TAG, "Error occurred while creating the File", e);
       e.printStackTrace();
+    }
+    if (capturedFile == null) {
+      return null;
     }
 
     // for versions below 6.0 (23) we use the old File creation & permissions model

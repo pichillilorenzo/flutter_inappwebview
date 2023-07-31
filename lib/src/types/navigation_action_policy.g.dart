@@ -28,11 +28,17 @@ class NavigationActionPolicy {
   ///**NOTE**: available only on iOS 14.5+. It will fallback to [CANCEL].
   static const DOWNLOAD = NavigationActionPolicy._internal(2, 2);
 
+  ///Cancel the applink redirect navigation.
+  ///
+  ///**NOTE**: available only on iOS.
+  static const APPLINK_BLOCK = NavigationActionPolicy._internal(3, 3);
+
   ///Set of all values of [NavigationActionPolicy].
   static final Set<NavigationActionPolicy> values = [
     NavigationActionPolicy.ALLOW,
     NavigationActionPolicy.CANCEL,
     NavigationActionPolicy.DOWNLOAD,
+    NavigationActionPolicy.APPLINK_BLOCK,
   ].toSet();
 
   ///Gets a possible [NavigationActionPolicy] instance from [int] value.

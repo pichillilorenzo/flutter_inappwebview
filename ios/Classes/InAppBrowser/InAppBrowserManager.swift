@@ -98,27 +98,6 @@ public class InAppBrowserManager: ChannelDelegate {
         presentViewController(webViewController: webViewController)
     }
     
-    
-    private func visibleViewController() -> UIViewController? {
-        guard let rootViewController =  UIApplication.shared.keyWindow?.rootViewController else {
-            return nil
-        }
-        return getVisibleViewController(rootViewController)
-    }
-
-    private func getVisibleViewController(_ rootViewController: UIViewController) -> UIViewController? {
-        if let presentedViewController = rootViewController.presentedViewController {
-            return getVisibleViewController(presentedViewController)
-        }
-        if let navigationController = rootViewController as? UINavigationController {
-            return navigationController.visibleViewController
-        }
-        if let tabBarController = rootViewController as? UITabBarController {
-            return tabBarController.selectedViewController
-        }
-        return rootViewController
-    }
-    
     public func presentViewController(webViewController: InAppBrowserWebViewController) {
         let storyboard = UIStoryboard(name: InAppBrowserManager.WEBVIEW_STORYBOARD, bundle: Bundle(for: InAppWebViewFlutterPlugin.self))
         let navController = storyboard.instantiateViewController(withIdentifier: InAppBrowserManager.NAV_STORYBOARD_CONTROLLER_ID) as! InAppBrowserNavigationController
@@ -131,7 +110,7 @@ public class InAppBrowserManager: ChannelDelegate {
             animated = false
         }
         
-        guard let visibleViewController = visibleViewController() else {
+        guard let visibleViewController = UIApplication.shared.visibleViewController else {
             assertionFailure("Failure inet the visibleViewController!")
             return
         }

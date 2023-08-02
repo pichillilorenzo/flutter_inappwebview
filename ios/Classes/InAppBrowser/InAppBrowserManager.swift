@@ -98,6 +98,27 @@ public class InAppBrowserManager: ChannelDelegate {
         presentViewController(webViewController: webViewController)
     }
     
+    
+    private func visibleViewController() -> UIViewController? {
+        guard let rootViewController =  UIApplication.shared.keyWindow?.rootViewController else {
+            return nil
+        }
+        return getVisibleViewController(rootViewController)
+    }
+
+    private func getVisibleViewController(_ rootViewController: UIViewController) -> UIViewController? {
+        if let presentedViewController = rootViewController.presentedViewController {
+            return getVisibleViewController(presentedViewController)
+        }
+        if let navigationController = rootViewController as? UINavigationController {
+            return navigationController.visibleViewController
+        }
+        if let tabBarController = rootViewController as? UITabBarController {
+            return tabBarController.selectedViewController
+        }
+        return rootViewController
+    }
+    
     public func presentViewController(webViewController: InAppBrowserWebViewController) {
         let storyboard = UIStoryboard(name: InAppBrowserManager.WEBVIEW_STORYBOARD, bundle: Bundle(for: InAppWebViewFlutterPlugin.self))
         let navController = storyboard.instantiateViewController(withIdentifier: InAppBrowserManager.NAV_STORYBOARD_CONTROLLER_ID) as! InAppBrowserNavigationController
@@ -105,23 +126,17 @@ public class InAppBrowserManager: ChannelDelegate {
         navController.pushViewController(webViewController, animated: false)
         webViewController.prepareNavigationControllerBeforeViewWillAppear()
         
-        let frame: CGRect = UIScreen.main.bounds
-        let tmpWindow = UIWindow(frame: frame)
-        
-        let tmpController = UIViewController()
-        let baseWindowLevel = UIApplication.shared.keyWindow?.windowLevel
-        tmpWindow.rootViewController = tmpController
-        tmpWindow.windowLevel = UIWindow.Level(baseWindowLevel!.rawValue + 1.0)
-        tmpWindow.makeKeyAndVisible()
-        navController.tmpWindow = tmpWindow
-        
         var animated = true
         if let browserSettings = webViewController.browserSettings, browserSettings.hidden {
-            tmpWindow.isHidden = true
-            UIApplication.shared.delegate?.window??.makeKeyAndVisible()
             animated = false
         }
-        tmpWindow.rootViewController!.present(navController, animated: animated, completion: nil)
+        
+        guard let visibleViewController = visibleViewController() else {
+            assertionFailure("Failure inet the visibleViewController!")
+            return
+        }
+        
+        visibleViewController.present(navController, animated: animated)
     }
     
     public func openWithSystemBrowser(url: String, result: @escaping FlutterResult) {

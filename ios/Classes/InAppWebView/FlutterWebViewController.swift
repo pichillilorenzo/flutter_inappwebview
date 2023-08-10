@@ -23,6 +23,7 @@ public class FlutterWebViewController: NSObject, FlutterPlatformView, Disposable
         let windowId = params["windowId"] as? Int64
         let initialUserScripts = params["initialUserScripts"] as? [[String: Any]]
         let pullToRefreshInitialSettings = params["pullToRefreshSettings"] as! [String: Any?]
+        let keyboardAppearanceDark = params["keyboardAppearanceDark"] as! Bool
         
         var userScripts: [UserScript] = []
         if let initialUserScripts = initialUserScripts {
@@ -53,6 +54,10 @@ public class FlutterWebViewController: NSObject, FlutterPlatformView, Disposable
                                    configuration: preWebviewConfiguration,
                                    contextMenu: contextMenu,
                                    userScripts: userScripts)
+        }
+        
+        if (keyboardAppearanceDark) {
+            setKeyboardAppearanceDark()
         }
         
         let pullToRefreshSettings = PullToRefreshSettings()
@@ -189,5 +194,21 @@ public class FlutterWebViewController: NSObject, FlutterPlatformView, Disposable
     deinit {
         debugPrint("FlutterWebViewController - dealloc")
         dispose()
+    }
+    
+    private func setKeyboardAppearanceDark() {
+        let handler: @convention(block) (AnyObject) -> UIKeyboardAppearance = { (s:AnyObject) in
+            return UIKeyboardAppearance.dark
+        }
+        let darkImp:IMP = imp_implementationWithBlock(handler)
+        for classString:String? in ["WKContentView", "UITextInputTraits"] {
+            let cls:AnyClass? = NSClassFromString(classString!)
+            let method:Method? = class_getInstanceMethod(cls, Selector(("keyboardAppearance")))
+            if method != nil {
+                method_setImplementation(method!, darkImp)
+            } else {
+                class_addMethod(cls, Selector(("keyboardAppearance")), darkImp, "l@:")
+            }
+        }
     }
 }

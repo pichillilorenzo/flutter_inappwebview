@@ -787,7 +787,7 @@ class _InAppWebViewState extends State<InAppWebView> {
           'initialSettings': settingsMap,
           'contextMenu': widget.contextMenu?.toMap() ?? {},
           'windowId': widget.windowId,
-          'keyboardAppearanceDark': MediaQuery.platformBrightnessOf(context) == Brightness.dark,
+          'keyboardAppearanceDark': Theme.of(context).brightness == Brightness.dark,
           'headlessWebViewId': widget.headlessWebView?.isRunning() ?? false
               ? widget.headlessWebView?.id
               : null,

@@ -150,6 +150,11 @@ public class InputAwareWebView extends WebView {
   public void clearFocus() {
     super.clearFocus();
 
+    InputMethodManager inputManager = (InputMethodManager) this.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+    if (inputManager != null) {
+      inputManager.hideSoftInputFromWindow(this.getWindowToken(), 0);
+    }
+
     if (useHybridComposition) {
       return;
     }

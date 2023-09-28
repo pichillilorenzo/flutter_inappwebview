@@ -1322,6 +1322,7 @@ as it can cause framerate drops on animations in Android 9 and lower (see [Hybri
   ///- [InAppWebViewController.pauseTimers]
   ///- [InAppWebViewController.getSelectedText]
   ///- [InAppWebViewController.getHitTestResult]
+  ///- [InAppWebViewController.requestFocus]
   ///- [InAppWebViewController.requestFocusNodeHref]
   ///- [InAppWebViewController.requestImageRef]
   ///- [InAppWebViewController.postWebMessage]

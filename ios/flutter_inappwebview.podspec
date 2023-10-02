@@ -22,10 +22,11 @@ A new Flutter plugin.
   s.pod_target_xcconfig = { 'DEFINES_MODULE' => 'YES', 'VALID_ARCHS[sdk=iphonesimulator*]' => 'x86_64' }
   s.swift_version = '5.0'
 
+  s.platforms = { :ios => '11.0' }
   s.dependency 'OrderedSet', '~>5.0'
-  
+
   s.default_subspec = 'Core'
-  
+
   s.subspec 'Core' do |core|
     core.platform = :ios, '8.0'
   end

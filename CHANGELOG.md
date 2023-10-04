@@ -1,6 +1,9 @@
 ## 6.0.0-beta.25
 
+- Updated `androidx.webkit:webkit` dependency to `1.8.0`
+- Updated `androidx.browser:browser` dependency to `1.6.0`
 - Merged "feat: InAppLocalhostServer decode assets url when loading them" [#1657](https://github.com/pichillilorenzo/flutter_inappwebview/pull/1657) (thanks to [Nirajn2311](https://github.com/Nirajn2311))
+- Merged "fix: xcode 15 related bug" [#1801](https://github.com/pichillilorenzo/flutter_inappwebview/pull/1801) (thanks to [nesquikm](https://github.com/nesquikm))
 
 ## 6.0.0-beta.24+1
 
@@ -220,6 +223,10 @@
 - All properties of `GeolocationPermissionShowPromptResponse` cannot be `null`
 - Removed `URLProtectionSpace.iosIsProxy` property
 - `historyUrl` and `baseUrl` of `InAppWebViewInitialData` can be `null`
+
+## 5.8.0
+
+- Merged "fix: xcode 15 related bug" [#1790](https://github.com/pichillilorenzo/flutter_inappwebview/pull/1790) (thanks to [nesquikm](https://github.com/nesquikm))
 
 ## 5.7.2+3
 

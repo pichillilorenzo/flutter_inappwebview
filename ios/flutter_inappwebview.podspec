@@ -29,10 +29,11 @@ A new Flutter plugin.
 
   s.swift_version = '5.0'
 
+  s.platforms = { :ios => '11.0' }
   s.dependency 'OrderedSet', '~>5.0'
-  
+
   s.default_subspec = 'Core'
-  
+
   s.subspec 'Core' do |core|
     core.platform = :ios, '9.0'
   end

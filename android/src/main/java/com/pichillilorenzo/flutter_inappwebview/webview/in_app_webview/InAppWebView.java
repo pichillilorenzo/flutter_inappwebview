@@ -1528,6 +1528,7 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
                           boolean isAcceptingText = false;
                           try {
                             if (imm != null) {
+                              // imm.isAcceptingText() seems to sometimes crash on some devices
                               isAcceptingText = imm.isAcceptingText();
                             }
                           } catch (Exception ignored) {

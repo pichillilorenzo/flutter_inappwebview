@@ -1878,7 +1878,7 @@ class InAppWebViewController {
   ///- MacOS ([Official API - WKWebView.canGoBack](https://developer.apple.com/documentation/webkit/wkwebview/1414966-cangoback))
   Future<bool> canGoBack() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    return await _channel?.invokeMethod('canGoBack', args);
+    return await _channel?.invokeMethod<bool>('canGoBack', args) ?? false;
   }
 
   ///Goes forward in the history of the WebView.

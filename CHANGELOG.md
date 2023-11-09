@@ -1,3 +1,7 @@
+## 6.0.0-beta.26
+
+- Merged "feat(ios): optional tradeoff to fix ios input delay" [#1665](https://github.com/pichillilorenzo/flutter_inappwebview/pull/1665) (thanks to [andreasgangso](https://github.com/andreasgangso))
+
 ## 6.0.0-beta.25
 
 - Updated `androidx.webkit:webkit` dependency to `1.8.0`

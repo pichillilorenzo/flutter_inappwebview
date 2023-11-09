@@ -666,6 +666,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "andreasgangso",
+      "name": "Andreas Gangsø",
+      "avatar_url": "https://avatars.githubusercontent.com/u/727125?v=4",
+      "profile": "https://github.com/andreasgangso",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,

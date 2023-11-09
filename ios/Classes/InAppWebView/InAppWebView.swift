@@ -29,6 +29,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
     var webMessageListeners: [WebMessageListener] = []
     var currentOriginalUrl: URL?
     var inFullscreen = false
+    var preventGestureDelay = false
     
     static var sslCertificatesMap: [String: SslCertificate] = [:] // [URL host name : SslCertificate]
     static var credentialsProposed: [URLCredential] = []
@@ -236,6 +237,15 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
                     }
                     let item = UIMenuItem(title: title, action: Selector(targetMethodName))
                     UIMenuController.shared.menuItems!.append(item)
+                }
+            }
+        }
+        
+        // https://github.com/pichillilorenzo/flutter_inappwebview/pull/1665
+        if preventGestureDelay, let gestures = superview?.superview?.gestureRecognizers {
+            for gesture in gestures {
+                if NSStringFromClass(type(of: gesture)) == "DelayingGestureRecognizer" {
+                    gesture.isEnabled = false
                 }
             }
         }

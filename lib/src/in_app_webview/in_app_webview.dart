@@ -65,6 +65,13 @@ class InAppWebView extends StatefulWidget implements WebView {
   ///- iOS
   final InAppWebViewKeepAlive? keepAlive;
 
+  ///Used to prevent gesture delay on iOS caused by Flutter's gestures handling
+  ///between native/platform views.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- iOS
+  final bool? preventGestureDelay;
+
   ///{@macro flutter_inappwebview.InAppWebView}
   const InAppWebView({
     Key? key,
@@ -178,6 +185,7 @@ class InAppWebView extends StatefulWidget implements WebView {
     this.onContentSizeChanged,
     this.gestureRecognizers,
     this.headlessWebView,
+    this.preventGestureDelay,
   }) : super(key: key);
 
   @override
@@ -807,7 +815,8 @@ class _InAppWebViewState extends State<InAppWebView> {
           'initialUserScripts':
               widget.initialUserScripts?.map((e) => e.toMap()).toList() ?? [],
           'pullToRefreshSettings': pullToRefreshSettings,
-          'keepAliveId': widget.keepAlive?.id
+          'keepAliveId': widget.keepAlive?.id,
+          'preventGestureDelay': widget.preventGestureDelay
         },
         creationParamsCodec: const StandardMessageCodec(),
       );

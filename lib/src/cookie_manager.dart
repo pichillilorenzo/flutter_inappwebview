@@ -65,6 +65,9 @@ class CookieManager {
   ///[webViewController] could be used if you need to set a session-only cookie using JavaScript (so [isHttpOnly] cannot be set, see: https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies#restrict_access_to_cookies)
   ///on the current URL of the [WebView] managed by that controller when you need to target iOS below 11, MacOS below 10.13 and Web platform. In this case the [url] parameter is ignored.
   ///
+  ///The return value indicates whether the cookie was set successfully.
+  ///Note that it will return always `true` for Web platform, iOS below 11.0 and MacOS below 10.13.
+  ///
   ///**NOTE for iOS below 11.0 and MacOS below 10.13**: If [webViewController] is `null` or JavaScript is disabled for it, it will try to use a [HeadlessInAppWebView]
   ///to set the cookie (session-only cookie won't work! In that case, you should set also [expiresDate] or [maxAge]).
   ///
@@ -77,7 +80,7 @@ class CookieManager {
   ///- iOS ([Official API - WKHTTPCookieStore.setCookie](https://developer.apple.com/documentation/webkit/wkhttpcookiestore/2882007-setcookie))
   ///- MacOS ([Official API - WKHTTPCookieStore.setCookie](https://developer.apple.com/documentation/webkit/wkhttpcookiestore/2882007-setcookie))
   ///- Web
-  Future<void> setCookie(
+  Future<bool> setCookie(
       {required WebUri url,
       required String name,
       required String value,
@@ -110,7 +113,7 @@ class CookieManager {
           isSecure: isSecure,
           sameSite: sameSite,
           webViewController: webViewController);
-      return;
+      return true;
     }
 
     Map<String, dynamic> args = <String, dynamic>{};
@@ -125,7 +128,7 @@ class CookieManager {
     args.putIfAbsent('isHttpOnly', () => isHttpOnly);
     args.putIfAbsent('sameSite', () => sameSite?.toNativeValue());
 
-    await _channel.invokeMethod('setCookie', args);
+    return await _channel.invokeMethod('setCookie', args);
   }
 
   Future<void> _setCookieWithJavaScript(

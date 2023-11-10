@@ -1,5 +1,6 @@
 ## 6.0.0-beta.26
 
+- Updated return value for `CookieManager.setCookie` method to be `Future<bool>`. The return value indicates whether the cookie was set successfully.
 - Merged "feat(ios): optional tradeoff to fix ios input delay" [#1665](https://github.com/pichillilorenzo/flutter_inappwebview/pull/1665) (thanks to [andreasgangso](https://github.com/andreasgangso))
 - Merged "Fix ios multiple flutter presenting error" [#1736](https://github.com/pichillilorenzo/flutter_inappwebview/pull/1736) (thanks to [AlexT84](https://github.com/AlexT84))
 - Merged "fix cert parsing for ios 12" [#1822](https://github.com/pichillilorenzo/flutter_inappwebview/pull/1822) (thanks to [darkang3lz92](https://github.com/darkang3lz92))

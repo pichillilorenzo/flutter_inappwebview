@@ -180,8 +180,8 @@ public class MyCookieManager extends ChannelDelegateImpl {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
       cookieManager.setCookie(url, cookieValue, new ValueCallback<Boolean>() {
         @Override
-        public void onReceiveValue(Boolean aBoolean) {
-          result.success(true);
+        public void onReceiveValue(Boolean successful) {
+          result.success(successful);
         }
       });
       cookieManager.flush();
@@ -297,7 +297,7 @@ public class MyCookieManager extends ChannelDelegateImpl {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
       cookieManager.setCookie(url, cookieValue, new ValueCallback<Boolean>() {
         @Override
-        public void onReceiveValue(Boolean aBoolean) {
+        public void onReceiveValue(Boolean successful) {
           result.success(true);
         }
       });
@@ -364,7 +364,7 @@ public class MyCookieManager extends ChannelDelegateImpl {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
       cookieManager.removeAllCookies(new ValueCallback<Boolean>() {
         @Override
-        public void onReceiveValue(Boolean aBoolean) {
+        public void onReceiveValue(Boolean successful) {
           result.success(true);
         }
       });

@@ -136,6 +136,8 @@ public class MyCookieManager: ChannelDelegate {
             MyCookieManager.httpCookieStore.setCookie(cookie, completionHandler: {() in
                 result(true)
             })
+        } else {
+            result(false)
         }
     }
     

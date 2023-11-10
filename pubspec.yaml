@@ -4,6 +4,12 @@ version: 6.0.0-beta.26
 homepage: https://inappwebview.dev/
 repository: https://github.com/pichillilorenzo/flutter_inappwebview
 issue_tracker: https://github.com/pichillilorenzo/flutter_inappwebview/issues
+topics:
+  - html
+  - webview
+  - webview-flutter
+  - inappwebview
+  - browser
 
 environment:
   sdk: ">=2.15.0 <4.0.0"

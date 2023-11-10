@@ -132,11 +132,13 @@ public class MyCookieManager: ChannelDelegate {
             }
         }
         
-        let cookie = HTTPCookie(properties: properties)!
-        
-        MyCookieManager.httpCookieStore.setCookie(cookie, completionHandler: {() in
-            result(true)
-        })
+        if let cookie = HTTPCookie(properties: properties) {
+            MyCookieManager.httpCookieStore.setCookie(cookie, completionHandler: {() in
+                result(true)
+            })
+        } else {
+            result(false)
+        }
     }
     
     public static func getCookies(url: String, result: @escaping FlutterResult) {

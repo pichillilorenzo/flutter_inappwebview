@@ -111,7 +111,7 @@ public class InAppBrowserManager: ChannelDelegate {
         }
         
         guard let visibleViewController = UIApplication.shared.visibleViewController else {
-            assertionFailure("Failure inet the visibleViewController!")
+            assertionFailure("Failure init the visibleViewController!")
             return
         }
         

@@ -1,5 +1,5 @@
 //
-//  UIApplication+VisibleViewController.swift
+//  VisibleViewController.swift
 //  flutter_inappwebview
 //
 //  Created by Alexandru Terente on 02.08.2023.

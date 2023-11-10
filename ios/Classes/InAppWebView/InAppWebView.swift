@@ -20,6 +20,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
     var plugin: SwiftFlutterPlugin?
     var windowId: Int64?
     var windowCreated = false
+    var windowBeforeCreatedCallbacks: [() -> ()] = []
     var inAppBrowserDelegate: InAppBrowserDelegate?
     var channelDelegate: WebViewChannelDelegate?
     var settings: InAppWebViewSettings?
@@ -1774,12 +1775,6 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
     public func webView(_ webView: WKWebView,
                  decidePolicyFor navigationAction: WKNavigationAction,
                  decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
-        
-        if windowId != nil, !windowCreated {
-            decisionHandler(.cancel)
-            return
-        }
-        
         var decisionHandlerCalled = false
         let callback = WebViewChannelDelegate.ShouldOverrideUrlLoadingCallback()
         callback.nonNullSuccess = { (response: WKNavigationActionPolicy) in
@@ -1798,10 +1793,18 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
             callback?.defaultBehaviour(nil)
         }
 
-        if let useShouldOverrideUrlLoading = settings?.useShouldOverrideUrlLoading, useShouldOverrideUrlLoading, let channelDelegate = channelDelegate {
-            channelDelegate.shouldOverrideUrlLoading(navigationAction: navigationAction, callback: callback)
+        let runCallback = {
+            if let useShouldOverrideUrlLoading = self.settings?.useShouldOverrideUrlLoading, useShouldOverrideUrlLoading, let channelDelegate = self.channelDelegate {
+                channelDelegate.shouldOverrideUrlLoading(navigationAction: navigationAction, callback: callback)
+            } else {
+                callback.defaultBehaviour(nil)
+            }
+        }
+        
+        if windowId != nil, !windowCreated {
+            windowBeforeCreatedCallbacks.append(runCallback)
         } else {
-            callback.defaultBehaviour(nil)
+            runCallback()
         }
     }
     
@@ -1946,12 +1949,6 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
     }
     
     public func webView(_ webView: WKWebView, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
-        
-        if windowId != nil, !windowCreated {
-            completionHandler(.cancelAuthenticationChallenge, nil)
-            return
-        }
-        
         var completionHandlerCalled = false
         if challenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodHTTPBasic ||
             challenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodDefault ||
@@ -2025,10 +2022,18 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
                 callback?.defaultBehaviour(nil)
             }
             
-            if let channelDelegate = channelDelegate {
-                channelDelegate.onReceivedHttpAuthRequest(challenge: HttpAuthenticationChallenge(fromChallenge: challenge), callback: callback)
+            let runCallback = {
+                if let channelDelegate = self.channelDelegate {
+                    channelDelegate.onReceivedHttpAuthRequest(challenge: HttpAuthenticationChallenge(fromChallenge: challenge), callback: callback)
+                } else {
+                    callback.defaultBehaviour(nil)
+                }
+            }
+            
+            if windowId != nil, !windowCreated {
+                windowBeforeCreatedCallbacks.append(runCallback)
             } else {
-                callback.defaultBehaviour(nil)
+                runCallback()
             }
         }
         else if challenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodServerTrust {
@@ -2076,10 +2081,18 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
                 callback?.defaultBehaviour(nil)
             }
             
-            if let channelDelegate = channelDelegate {
-                channelDelegate.onReceivedServerTrustAuthRequest(challenge: ServerTrustChallenge(fromChallenge: challenge), callback: callback)
+            let runCallback = {
+                if let channelDelegate = self.channelDelegate {
+                    channelDelegate.onReceivedServerTrustAuthRequest(challenge: ServerTrustChallenge(fromChallenge: challenge), callback: callback)
+                } else {
+                    callback.defaultBehaviour(nil)
+                }
+            }
+            
+            if windowId != nil, !windowCreated {
+                windowBeforeCreatedCallbacks.append(runCallback)
             } else {
-                callback.defaultBehaviour(nil)
+                runCallback()
             }
         }
         else if challenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodClientCertificate {
@@ -2135,10 +2148,18 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
                 callback?.defaultBehaviour(nil)
             }
             
-            if let channelDelegate = channelDelegate {
-                channelDelegate.onReceivedClientCertRequest(challenge: ClientCertChallenge(fromChallenge: challenge), callback: callback)
+            let runCallback = {
+                if let channelDelegate = self.channelDelegate {
+                    channelDelegate.onReceivedClientCertRequest(challenge: ClientCertChallenge(fromChallenge: challenge), callback: callback)
+                } else {
+                    callback.defaultBehaviour(nil)
+                }
+            }
+            
+            if windowId != nil, !windowCreated {
+                windowBeforeCreatedCallbacks.append(runCallback)
             } else {
-                callback.defaultBehaviour(nil)
+                runCallback()
             }
         }
         else {
@@ -2471,6 +2492,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
                         createWebViewWith configuration: WKWebViewConfiguration,
                   for navigationAction: WKNavigationAction,
                   windowFeatures: WKWindowFeatures) -> WKWebView? {
+        
         var windowId: Int64 = 0
         let inAppWebViewManager = plugin?.inAppWebViewManager
         if let inAppWebViewManager = inAppWebViewManager {
@@ -2478,16 +2500,15 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
             windowId = inAppWebViewManager.windowAutoincrementId
         }
         
-        let windowWebView = InAppWebView(id: nil, plugin: nil, frame: CGRect.zero, configuration: configuration, contextMenu: nil)
+        let windowWebView = InAppWebView(id: nil, plugin: nil, frame: self.bounds, configuration: configuration, contextMenu: nil)
         windowWebView.windowId = windowId
-        
+
         let webViewTransport = WebViewTransport(
             webView: windowWebView,
             request: navigationAction.request
         )
 
         inAppWebViewManager?.windowWebViews[windowId] = webViewTransport
-        windowWebView.stopLoading()
         
         let createWindowAction = CreateWindowAction(navigationAction: navigationAction, windowId: windowId, windowFeatures: windowFeatures, isDialog: nil)
         
@@ -2518,11 +2539,6 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
     public func webView(_ webView: WKWebView,
                         authenticationChallenge challenge: URLAuthenticationChallenge,
                         shouldAllowDeprecatedTLS decisionHandler: @escaping (Bool) -> Void) {
-        if windowId != nil, !windowCreated {
-            decisionHandler(false)
-            return
-        }
-        
         var decisionHandlerCalled = false
         let callback = WebViewChannelDelegate.ShouldAllowDeprecatedTLSCallback()
         callback.nonNullSuccess = { (action: Bool) in
@@ -2541,10 +2557,18 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
             callback?.defaultBehaviour(nil)
         }
         
-        if let channelDelegate = channelDelegate {
-            channelDelegate.shouldAllowDeprecatedTLS(challenge: challenge, callback: callback)
+        let runCallback = {
+            if let channelDelegate = self.channelDelegate {
+                channelDelegate.shouldAllowDeprecatedTLS(challenge: challenge, callback: callback)
+            } else {
+                callback.defaultBehaviour(nil)
+            }
+        }
+        
+        if windowId != nil, !windowCreated {
+            windowBeforeCreatedCallbacks.append(runCallback)
         } else {
-            callback.defaultBehaviour(nil)
+            runCallback()
         }
     }
     
@@ -3194,9 +3218,18 @@ if(window.\(JAVASCRIPT_BRIDGE_NAME)[\(_callHandlerID)] != null) {
         return settings?.disableInputAccessoryView ?? false ? nil : super.inputAccessoryView
     }
     
+    public func runWindowBeforeCreatedCallbacks() {
+        let callbacks = windowBeforeCreatedCallbacks
+        callbacks.forEach { (callback) in
+            callback()
+        }
+        windowBeforeCreatedCallbacks.removeAll()
+    }
+    
     public func dispose() {
         channelDelegate?.dispose()
         channelDelegate = nil
+        runWindowBeforeCreatedCallbacks()
         removeObserver(self, forKeyPath: #keyPath(WKWebView.estimatedProgress))
         removeObserver(self, forKeyPath: #keyPath(WKWebView.url))
         removeObserver(self, forKeyPath: #keyPath(WKWebView.title))

@@ -100,9 +100,9 @@ public class InAppBrowserWebViewController: NSViewController, InAppBrowserDelega
         progressBar.leadingAnchor.constraint(equalTo: self.view.leadingAnchor, constant: 0.0).isActive = true
         progressBar.trailingAnchor.constraint(equalTo: self.view.trailingAnchor, constant: 0.0).isActive = true
         
-        if let wId = windowId, let webViewTransport = plugin?.inAppWebViewManager?.windowWebViews[wId] {
-            webView?.load(webViewTransport.request)
+        if let wId = windowId {
             channelDelegate?.onBrowserCreated()
+            webView?.runWindowBeforeCreatedCallbacks()
         } else {
             if #available(macOS 10.13, *) {
                 if let contentBlockers = webView?.settings?.contentBlockers, contentBlockers.count > 0 {

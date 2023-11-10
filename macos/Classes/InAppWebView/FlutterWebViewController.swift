@@ -127,8 +127,8 @@ public class FlutterWebViewController: NSObject, /*FlutterPlatformView,*/ Dispos
             }
             load(initialUrlRequest: initialUrlRequest, initialFile: initialFile, initialData: initialData)
         }
-        else if let wId = windowId, let webViewTransport = webView.plugin?.inAppWebViewManager?.windowWebViews[wId] {
-            webView.load(webViewTransport.request)
+        else if let wId = windowId {
+            webView.runWindowBeforeCreatedCallbacks()
         }
     }
     

@@ -145,9 +145,9 @@ public class InAppBrowserWebViewController: UIViewController, InAppBrowserDelega
             }
         }
         
-        if let wId = windowId, let webViewTransport = plugin?.inAppWebViewManager?.windowWebViews[wId] {
-            webView?.load(webViewTransport.request)
+        if let wId = windowId {
             channelDelegate?.onBrowserCreated()
+            webView?.runWindowBeforeCreatedCallbacks()
         } else {
             if #available(iOS 11.0, *) {
                 if let contentBlockers = webView?.settings?.contentBlockers, contentBlockers.count > 0 {

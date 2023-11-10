@@ -5,6 +5,7 @@
 - Merged "Fix ios multiple flutter presenting error" [#1736](https://github.com/pichillilorenzo/flutter_inappwebview/pull/1736) (thanks to [AlexT84](https://github.com/AlexT84))
 - Merged "fix cert parsing for ios 12" [#1822](https://github.com/pichillilorenzo/flutter_inappwebview/pull/1822) (thanks to [darkang3lz92](https://github.com/darkang3lz92))
 - Merged "Fix iOS and macOS Forced unwrap null value HTTPCookie for CookieManager.setCookie" [#1677](https://github.com/pichillilorenzo/flutter_inappwebview/pull/1677) (thanks to [maxmitz](https://github.com/maxmitz))
+- Fixed "iOS about:blank popup not loading page" [#1500](https://github.com/pichillilorenzo/flutter_inappwebview/issues/1500)
 
 ## 6.0.0-beta.25
 

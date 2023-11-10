@@ -105,23 +105,17 @@ public class InAppBrowserManager: ChannelDelegate {
         navController.pushViewController(webViewController, animated: false)
         webViewController.prepareNavigationControllerBeforeViewWillAppear()
         
-        let frame: CGRect = UIScreen.main.bounds
-        let tmpWindow = UIWindow(frame: frame)
-        
-        let tmpController = UIViewController()
-        let baseWindowLevel = UIApplication.shared.keyWindow?.windowLevel
-        tmpWindow.rootViewController = tmpController
-        tmpWindow.windowLevel = UIWindow.Level(baseWindowLevel!.rawValue + 1.0)
-        tmpWindow.makeKeyAndVisible()
-        navController.tmpWindow = tmpWindow
-        
         var animated = true
         if let browserSettings = webViewController.browserSettings, browserSettings.hidden {
-            tmpWindow.isHidden = true
-            UIApplication.shared.delegate?.window??.makeKeyAndVisible()
             animated = false
         }
-        tmpWindow.rootViewController!.present(navController, animated: animated, completion: nil)
+        
+        guard let visibleViewController = UIApplication.shared.visibleViewController else {
+            assertionFailure("Failure init the visibleViewController!")
+            return
+        }
+        
+        visibleViewController.present(navController, animated: animated)
     }
     
     public func openWithSystemBrowser(url: String, result: @escaping FlutterResult) {

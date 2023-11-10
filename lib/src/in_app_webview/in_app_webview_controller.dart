@@ -1878,7 +1878,7 @@ class InAppWebViewController {
   ///- MacOS ([Official API - WKWebView.canGoBack](https://developer.apple.com/documentation/webkit/wkwebview/1414966-cangoback))
   Future<bool> canGoBack() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    return await _channel?.invokeMethod<bool>('canGoBack', args) ?? false;
+    return await _channel?.invokeMethod('canGoBack', args);
   }
 
   ///Goes forward in the history of the WebView.
@@ -1903,7 +1903,7 @@ class InAppWebViewController {
   ///- MacOS ([Official API - WKWebView.canGoForward](https://developer.apple.com/documentation/webkit/wkwebview/1414962-cangoforward))
   Future<bool> canGoForward() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    return await _channel?.invokeMethod('canGoForward', args) ?? false;
+    return await _channel?.invokeMethod('canGoForward', args);
   }
 
   ///Goes to the history item that is the number of steps away from the current item. Steps is negative if backward and positive if forward.

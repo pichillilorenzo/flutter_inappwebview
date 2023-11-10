@@ -660,7 +660,7 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
     if (plugin == null) {
       return;
     }
-    
+
     loadUrl(Util.getUrlAsset(plugin, assetFilePath));
   }
 
@@ -690,7 +690,7 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
 
   public void takeScreenshot(final @Nullable Map<String, Object> screenshotConfiguration, final MethodChannel.Result result) {
     final float pixelDensity = Util.getPixelDensity(getContext());
-    
+
     mainLooperHandler.post(new Runnable() {
       @Override
       public void run() {
@@ -1392,9 +1392,9 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
 
       if (printManager != null) {
         PrintAttributes.Builder builder = new PrintAttributes.Builder();
-        
+
         String jobName = (getTitle() != null ? getTitle() : getUrl()) + " Document";
-        
+
         if (settings != null) {
           if (settings.jobName != null && !settings.jobName.isEmpty()) {
             jobName = settings.jobName;
@@ -1445,7 +1445,7 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
           String id = UUID.randomUUID().toString();
           PrintJobController printJobController = new PrintJobController(id, job, settings, plugin);
           plugin.printJobManager.jobs.put(printJobController.id, printJobController);
-          return id; 
+          return id;
         }
       } else {
         Log.e(LOG_TAG, "No PrintManager available");
@@ -1525,14 +1525,16 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
                         public void run() {
                           InputMethodManager imm =
                                   (InputMethodManager) getContext().getSystemService(INPUT_METHOD_SERVICE);
+
                           boolean isAcceptingText = false;
-                          try {
-                            if (imm != null) {
+                          if (imm != null) {
+                            try {
                               // imm.isAcceptingText() seems to sometimes crash on some devices
                               isAcceptingText = imm.isAcceptingText();
+                            } catch (Exception ignored) {
                             }
-                          } catch (Exception ignored) {
                           }
+
                           if (containerView != null && imm != null && !isAcceptingText) {
                             imm.hideSoftInputFromWindow(
                                     containerView.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
@@ -1718,7 +1720,7 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
   public void hideContextMenu() {
     removeView(floatingContextMenu);
     floatingContextMenu = null;
-    
+
     if (channelDelegate != null) channelDelegate.onHideContextMenu();
   }
 
@@ -2004,7 +2006,7 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
   public WebViewChannelDelegate getChannelDelegate() {
     return channelDelegate;
   }
-  
+
   @Override
   public void setChannelDelegate(@Nullable WebViewChannelDelegate channelDelegate) {
     this.channelDelegate = channelDelegate;

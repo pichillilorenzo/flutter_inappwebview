@@ -208,9 +208,9 @@
 				9740EEB61CF901F6004384FC /* Run Script */,
 				97C146EA1CF9000F007C117D /* Sources */,
 				97C146EB1CF9000F007C117D /* Frameworks */,
+				6174FE1725CEB74E00A5020C /* Embed Foundation Extensions */,
 				97C146EC1CF9000F007C117D /* Resources */,
 				3B06AD1E1E4923F5004D2608 /* Thin Binary */,
-				6174FE1725CEB74E00A5020C /* Embed Foundation Extensions */,
 				DFFD8453B8E169BF6BE74B49 /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
@@ -231,7 +231,7 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
 				LastSwiftUpdateCheck = 1400;
-				LastUpgradeCheck = 1300;
+				LastUpgradeCheck = 1430;
 				ORGANIZATIONNAME = "The Chromium Authors";
 				TargetAttributes = {
 					6143FF34290959650014A1FC = {
@@ -241,7 +241,6 @@
 					};
 					97C146ED1CF9000F007C117D = {
 						CreatedOnToolsVersion = 7.3.1;
-						DevelopmentTeam = PFP8UV45Y6;
 						LastSwiftMigration = 1020;
 						ProvisioningStyle = Automatic;
 						SystemCapabilities = {
@@ -461,7 +460,7 @@
 				MARKETING_VERSION = 1.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.pichillilorenzo.flutter-inappwebview-example7.test";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.pichillilorenzo.flutter-inappwebview-example1.test";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
@@ -498,7 +497,7 @@
 				);
 				MARKETING_VERSION = 1.0;
 				MTL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.pichillilorenzo.flutter-inappwebview-example7.test";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.pichillilorenzo.flutter-inappwebview-example1.test";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -647,7 +646,7 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/Flutter",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "com.pichillilorenzo.flutter-inappwebview-example7";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.pichillilorenzo.flutter-inappwebview-example1";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "Runner/Runner-Bridging-Header.h";
@@ -682,7 +681,7 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/Flutter",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "com.pichillilorenzo.flutter-inappwebview-example7";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.pichillilorenzo.flutter-inappwebview-example1";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "Runner/Runner-Bridging-Header.h";

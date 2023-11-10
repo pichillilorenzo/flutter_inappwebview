@@ -10,6 +10,7 @@ import Foundation
 
 public class FlutterWebViewFactory: NSObject, FlutterPlatformViewFactory {
     static let VIEW_TYPE_ID = "com.pichillilorenzo/flutter_inappwebview"
+    
     private var plugin: SwiftFlutterPlugin
     
     init(plugin: SwiftFlutterPlugin) {
@@ -28,6 +29,7 @@ public class FlutterWebViewFactory: NSObject, FlutterPlatformViewFactory {
         
         let keepAliveId = arguments?["keepAliveId"] as? String
         let headlessWebViewId = arguments?["headlessWebViewId"] as? String
+        let preventGestureDelay = arguments?["preventGestureDelay"] as? Bool ?? false
         
         if let headlessWebViewId = headlessWebViewId,
            let headlessWebView = plugin.headlessInAppWebViewManager?.webViews[headlessWebViewId],
@@ -60,6 +62,8 @@ public class FlutterWebViewFactory: NSObject, FlutterPlatformViewFactory {
         if let keepAliveId = keepAliveId {
             plugin.inAppWebViewManager?.keepAliveWebViews[keepAliveId] = flutterWebView!
         }
+        
+        flutterWebView?.webView()?.preventGestureDelay = preventGestureDelay
         
         if shouldMakeInitialLoad {
             flutterWebView?.makeInitialLoad(params: arguments!)

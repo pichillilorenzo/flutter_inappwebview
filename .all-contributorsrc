@@ -702,6 +702,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "AlexDochioiu",
+      "name": "Alexandru Dochioiu",
+      "avatar_url": "https://avatars.githubusercontent.com/u/38853913?v=4",
+      "profile": "https://www.linkedin.com/in/alexandru-dochioiu/",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,

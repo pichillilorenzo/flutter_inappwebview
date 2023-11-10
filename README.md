@@ -5,7 +5,7 @@
 ![InAppWebView-logo](https://user-images.githubusercontent.com/5956938/195422744-bdcfed16-73f0-4bc9-94ab-ecf10771a1c4.png)
 
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-76-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-77-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 [![Pub](https://img.shields.io/pub/v/flutter_inappwebview?include_prereleases)](https://pub.dartlang.org/packages/flutter_inappwebview)
@@ -179,6 +179,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/andreasgangso"><img src="https://avatars.githubusercontent.com/u/727125?v=4?s=100" width="100px;" alt="Andreas Gangsø"/><br /><sub><b>Andreas Gangsø</b></sub></a><br /><a href="https://github.com/pichillilorenzo/flutter_inappwebview/commits?author=andreasgangso" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/AlexT84"><img src="https://avatars.githubusercontent.com/u/80742383?v=4?s=100" width="100px;" alt="Alexandru Terente"/><br /><sub><b>Alexandru Terente</b></sub></a><br /><a href="https://github.com/pichillilorenzo/flutter_inappwebview/commits?author=AlexT84" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/darkang3lz92"><img src="https://avatars.githubusercontent.com/u/33158127?v=4?s=100" width="100px;" alt="Dango Mango"/><br /><sub><b>Dango Mango</b></sub></a><br /><a href="https://github.com/pichillilorenzo/flutter_inappwebview/commits?author=darkang3lz92" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://medium.com/@m-zimmermann1"><img src="https://avatars.githubusercontent.com/u/72440045?v=4?s=100" width="100px;" alt="Max Zimmermann"/><br /><sub><b>Max Zimmermann</b></sub></a><br /><a href="https://github.com/pichillilorenzo/flutter_inappwebview/commits?author=maxmitz" title="Code">💻</a></td>
     </tr>
   </tbody>
 </table>

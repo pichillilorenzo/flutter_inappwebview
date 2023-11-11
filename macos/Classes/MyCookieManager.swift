@@ -245,6 +245,7 @@ public class MyCookieManager: ChannelDelegate {
     
     public static func deleteCookies(url: String, path: String, domain: String?, result: @escaping FlutterResult) {
         var domain = domain
+        let dispatchGroup = DispatchGroup()
         MyCookieManager.httpCookieStore.getAllCookies { (cookies) in
             for cookie in cookies {
                 var originURL = url
@@ -258,10 +259,15 @@ public class MyCookieManager: ChannelDelegate {
                     domain = domainUrl.host
                 }
                 if let domain = domain, cookie.domain == domain, cookie.path == path {
-                    MyCookieManager.httpCookieStore.delete(cookie, completionHandler: nil)
+                    dispatchGroup.enter()
+                    MyCookieManager.httpCookieStore.delete(cookie) {
+                        dispatchGroup.leave()
+                    }
                 }
             }
-            result(true)
+            dispatchGroup.notify(queue: .main) {
+                result(true)
+            }
         }
     }
     

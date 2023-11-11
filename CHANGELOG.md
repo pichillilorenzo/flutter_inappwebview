@@ -1,6 +1,7 @@
 ## 6.0.0-beta.26
 
 - Throw an error if any controller is used after being disposed
+- `CookieManager.deleteCookies` wait for all delete cookie completion handler to be completed on iOS and macOS
 - Updated return value for `CookieManager.setCookie` method to be `Future<bool>`. The return value indicates whether the cookie was set successfully
 - Merged "feat(ios): optional tradeoff to fix ios input delay" [#1665](https://github.com/pichillilorenzo/flutter_inappwebview/pull/1665) (thanks to [andreasgangso](https://github.com/andreasgangso))
 - Merged "Fix ios multiple flutter presenting error" [#1736](https://github.com/pichillilorenzo/flutter_inappwebview/pull/1736) (thanks to [AlexT84](https://github.com/AlexT84))
@@ -10,6 +11,7 @@
 - Merged "fix: chrome tab open failed due to chrome process not running" [#1772](https://github.com/pichillilorenzo/flutter_inappwebview/pull/1772) (thanks to [YumengNevix](https://github.com/YumengNevix))
 - Merged "Android - Fix context menu position for pages with horizontal scroll" [#1504](https://github.com/pichillilorenzo/flutter_inappwebview/pull/1504) (thanks to [lrorpilla](https://github.com/lrorpilla))
 - Fixed "iOS about:blank popup not loading page" [#1500](https://github.com/pichillilorenzo/flutter_inappwebview/issues/1500)
+- Fixed "iOS macOS - This method should not be called on the main thread as it may lead to UI unresponsiveness" [#1678](https://github.com/pichillilorenzo/flutter_inappwebview/issues/1678)
 
 ## 6.0.0-beta.25
 

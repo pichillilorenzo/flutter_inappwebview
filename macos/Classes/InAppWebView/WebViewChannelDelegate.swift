@@ -849,7 +849,7 @@ public class WebViewChannelDelegate : ChannelDelegate {
             callback.defaultBehaviour(nil)
             return
         }
-        channel.invokeMethod("onPermissionRequest", arguments: request.toMap(), callback: callback);
+        channel.invokeMethod("onPermissionRequest", arguments: request.toMap(), callback: callback)
     }
     
     public class ShouldOverrideUrlLoadingCallback : BaseCallbackResult<WKNavigationActionPolicy> {
@@ -873,7 +873,7 @@ public class WebViewChannelDelegate : ChannelDelegate {
             callback.defaultBehaviour(nil)
             return
         }
-        channel.invokeMethod("shouldOverrideUrlLoading", arguments: navigationAction.toMap(), callback: callback);
+        channel.invokeMethod("shouldOverrideUrlLoading", arguments: navigationAction.toMap(), callback: callback)
     }
     
     public func onLoadStart(url: String?) {
@@ -928,7 +928,14 @@ public class WebViewChannelDelegate : ChannelDelegate {
             callback.defaultBehaviour(nil)
             return
         }
-        channel.invokeMethod("onReceivedHttpAuthRequest", arguments: challenge.toMap(), callback: callback)
+        // workaround for ProtectionSpace.toMap() SSL Certificate
+        // https://github.com/pichillilorenzo/flutter_inappwebview/issues/1678
+        DispatchQueue.global(qos: .background).async {
+            let arguments = challenge.toMap()
+            DispatchQueue.main.async {
+                channel.invokeMethod("onReceivedHttpAuthRequest", arguments: arguments, callback: callback)
+            }
+        }
     }
     
     public class ReceivedServerTrustAuthRequestCallback : BaseCallbackResult<ServerTrustAuthResponse> {
@@ -949,7 +956,14 @@ public class WebViewChannelDelegate : ChannelDelegate {
             callback.defaultBehaviour(nil)
             return
         }
-        channel.invokeMethod("onReceivedServerTrustAuthRequest", arguments: challenge.toMap(), callback: callback);
+        // workaround for ProtectionSpace.toMap() SSL Certificate
+        // https://github.com/pichillilorenzo/flutter_inappwebview/issues/1678
+        DispatchQueue.global(qos: .background).async {
+            let arguments = challenge.toMap()
+            DispatchQueue.main.async {
+                channel.invokeMethod("onReceivedServerTrustAuthRequest", arguments: arguments, callback: callback)
+            }
+        }
     }
     
     public class ReceivedClientCertRequestCallback : BaseCallbackResult<ClientCertResponse> {
@@ -970,7 +984,14 @@ public class WebViewChannelDelegate : ChannelDelegate {
             callback.defaultBehaviour(nil)
             return
         }
-        channel.invokeMethod("onReceivedClientCertRequest", arguments: challenge.toMap(), callback: callback);
+        // workaround for ProtectionSpace.toMap() SSL Certificate
+        // https://github.com/pichillilorenzo/flutter_inappwebview/issues/1678
+        DispatchQueue.global(qos: .background).async {
+            let arguments = challenge.toMap()
+            DispatchQueue.main.async {
+                channel.invokeMethod("onReceivedClientCertRequest", arguments: arguments, callback: callback)
+            }
+        }
     }
     
     public func onZoomScaleChanged(newScale: Float, oldScale: Float) {
@@ -1024,7 +1045,7 @@ public class WebViewChannelDelegate : ChannelDelegate {
             "handlerName": handlerName,
             "args": args
         ]
-        channel.invokeMethod("onCallJsHandler", arguments: arguments, callback: callback);
+        channel.invokeMethod("onCallJsHandler", arguments: arguments, callback: callback)
     }
     
     public class NavigationResponseCallback : BaseCallbackResult<WKNavigationResponsePolicy> {
@@ -1048,7 +1069,7 @@ public class WebViewChannelDelegate : ChannelDelegate {
             callback.defaultBehaviour(nil)
             return
         }
-        channel.invokeMethod("onNavigationResponse", arguments: navigationResponse.toMap(), callback: callback);
+        channel.invokeMethod("onNavigationResponse", arguments: navigationResponse.toMap(), callback: callback)
     }
     
     public class ShouldAllowDeprecatedTLSCallback : BaseCallbackResult<Bool> {
@@ -1072,7 +1093,14 @@ public class WebViewChannelDelegate : ChannelDelegate {
             callback.defaultBehaviour(nil)
             return
         }
-        channel.invokeMethod("shouldAllowDeprecatedTLS", arguments: challenge.toMap(), callback: callback)
+        // workaround for ProtectionSpace.toMap() SSL Certificate
+        // https://github.com/pichillilorenzo/flutter_inappwebview/issues/1678
+        DispatchQueue.global(qos: .background).async {
+            let arguments = challenge.toMap()
+            DispatchQueue.main.async {
+                channel.invokeMethod("shouldAllowDeprecatedTLS", arguments: arguments, callback: callback)
+            }
+        }
     }
     
     public func onWebContentProcessDidTerminate() {

@@ -165,8 +165,16 @@ public class ChromeCustomTabsActivity extends Activity implements Disposable {
                         @Nullable Map<String, String> headers,
                         @Nullable String referrer,
                         @Nullable List<String> otherLikelyURLs) {
+    launchUrlWithSession(customTabsSession, url, headers, referrer, otherLikelyURLs);
+  }
+
+  public void launchUrlWithSession(@Nullable CustomTabsSession session,
+                                   @NonNull String url,
+                                   @Nullable Map<String, String> headers,
+                                   @Nullable String referrer,
+                                   @Nullable List<String> otherLikelyURLs) {
     mayLaunchUrl(url, otherLikelyURLs);
-    builder = new CustomTabsIntent.Builder(customTabsSession);
+    builder = new CustomTabsIntent.Builder(session);
     prepareCustomTabs();
 
     CustomTabsIntent customTabsIntent = builder.build();
@@ -328,7 +336,17 @@ public class ChromeCustomTabsActivity extends Activity implements Disposable {
   @Override
   protected void onStart() {
     super.onStart();
-    customTabActivityHelper.bindCustomTabsService(this);
+    boolean isBindSuccess = customTabActivityHelper.bindCustomTabsService(this);
+
+    if (!isBindSuccess) {
+      // chrome process not running, start tab directly
+
+      if (initialUrl != null) {
+        launchUrlWithSession(null, initialUrl, initialHeaders, initialReferrer, initialOtherLikelyURLs);
+        //avoid webpage reopen: onServiceConnected->launchUrl
+        initialUrl = null;
+      }
+    }
   }
 
   @Override

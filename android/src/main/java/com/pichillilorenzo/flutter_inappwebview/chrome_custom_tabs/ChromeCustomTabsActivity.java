@@ -48,6 +48,7 @@ public class ChromeCustomTabsActivity extends Activity implements Disposable {
   protected final int CHROME_CUSTOM_TAB_REQUEST_CODE = 100;
   protected boolean onOpened = false;
   protected boolean onCompletedInitialLoad = false;
+  protected boolean isBindSuccess = false;
   @Nullable
   public ChromeSafariBrowserManager manager;
   @Nullable
@@ -165,8 +166,16 @@ public class ChromeCustomTabsActivity extends Activity implements Disposable {
                         @Nullable Map<String, String> headers,
                         @Nullable String referrer,
                         @Nullable List<String> otherLikelyURLs) {
+    launchUrlWithSession(customTabsSession, url, headers, referrer, otherLikelyURLs);
+  }
+
+  public void launchUrlWithSession(@Nullable CustomTabsSession session,
+                                   @NonNull String url,
+                                   @Nullable Map<String, String> headers,
+                                   @Nullable String referrer,
+                                   @Nullable List<String> otherLikelyURLs) {
     mayLaunchUrl(url, otherLikelyURLs);
-    builder = new CustomTabsIntent.Builder(customTabsSession);
+    builder = new CustomTabsIntent.Builder(session);
     prepareCustomTabs();
 
     CustomTabsIntent customTabsIntent = builder.build();
@@ -191,7 +200,8 @@ public class ChromeCustomTabsActivity extends Activity implements Disposable {
 
   public void customTabsConnected() {
     customTabsSession = customTabActivityHelper.getSession();
-    if (initialUrl != null) {
+    // avoid webpage reopen if isBindSuccess is false: onServiceConnected->launchUrl
+    if (isBindSuccess && initialUrl != null) {
       launchUrl(initialUrl, initialHeaders, initialReferrer, initialOtherLikelyURLs);
     }
   }
@@ -328,13 +338,19 @@ public class ChromeCustomTabsActivity extends Activity implements Disposable {
   @Override
   protected void onStart() {
     super.onStart();
-    customTabActivityHelper.bindCustomTabsService(this);
+    isBindSuccess = customTabActivityHelper.bindCustomTabsService(this);
+
+    if (!isBindSuccess && initialUrl != null) {
+      // chrome process not running, start tab directly
+      launchUrlWithSession(null, initialUrl, initialHeaders, initialReferrer, initialOtherLikelyURLs);
+    }
   }
 
   @Override
   protected void onStop() {
     super.onStop();
     customTabActivityHelper.unbindCustomTabsService(this);
+    isBindSuccess = false;
   }
 
   @Override

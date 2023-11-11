@@ -2256,12 +2256,12 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
             }
             return true
         }
-        callback.defaultBehaviour = { (response: JsAlertResponse?) in
+        callback.defaultBehaviour = { [weak self] (response: JsAlertResponse?) in
             if !completionHandlerCalled {
                 completionHandlerCalled = true
                 let responseMessage = response?.message
                 let confirmButtonTitle = response?.confirmButtonTitle
-                self.createAlertDialog(message: message, responseMessage: responseMessage,
+                self?.createAlertDialog(message: message, responseMessage: responseMessage,
                                        confirmButtonTitle: confirmButtonTitle, completionHandler: completionHandler)
             }
         }
@@ -2325,13 +2325,13 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
             }
             return true
         }
-        callback.defaultBehaviour = { (response: JsConfirmResponse?) in
+        callback.defaultBehaviour = { [weak self] (response: JsConfirmResponse?) in
             if !completionHandlerCalled {
                 completionHandlerCalled = true
                 let responseMessage = response?.message
                 let confirmButtonTitle = response?.confirmButtonTitle
                 let cancelButtonTitle = response?.cancelButtonTitle
-                self.createConfirmDialog(message: message, responseMessage: responseMessage, confirmButtonTitle: confirmButtonTitle, cancelButtonTitle: cancelButtonTitle, completionHandler: completionHandler)
+                self?.createConfirmDialog(message: message, responseMessage: responseMessage, confirmButtonTitle: confirmButtonTitle, cancelButtonTitle: cancelButtonTitle, completionHandler: completionHandler)
             }
         }
         callback.error = { (code: String, message: String?, details: Any?) in
@@ -2406,14 +2406,14 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
             }
             return true
         }
-        callback.defaultBehaviour = { (response: JsPromptResponse?) in
+        callback.defaultBehaviour = { [weak self] (response: JsPromptResponse?) in
             if !completionHandlerCalled {
                 completionHandlerCalled = true
                 let responseMessage = response?.message
                 let confirmButtonTitle = response?.confirmButtonTitle
                 let cancelButtonTitle = response?.cancelButtonTitle
                 let value = response?.value
-                self.createPromptDialog(message: message, defaultValue: defaultValue, responseMessage: responseMessage, confirmButtonTitle: confirmButtonTitle,
+                self?.createPromptDialog(message: message, defaultValue: defaultValue, responseMessage: responseMessage, confirmButtonTitle: confirmButtonTitle,
                                         cancelButtonTitle: cancelButtonTitle, value: value, completionHandler: completionHandler)
             }
         }
@@ -2520,11 +2520,11 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
         callback.nonNullSuccess = { (handledByClient: Bool) in
             return !handledByClient
         }
-        callback.defaultBehaviour = { (handledByClient: Bool?) in
+        callback.defaultBehaviour = { [weak self] (handledByClient: Bool?) in
             if inAppWebViewManager?.windowWebViews[windowId] != nil {
                 inAppWebViewManager?.windowWebViews.removeValue(forKey: windowId)
             }
-            self.loadUrl(urlRequest: navigationAction.request, allowingReadAccessTo: nil)
+            self?.loadUrl(urlRequest: navigationAction.request, allowingReadAccessTo: nil)
         }
         callback.error = { [weak callback] (code: String, message: String?, details: Any?) in
             print(code + ", " + (message ?? ""))
@@ -2807,8 +2807,8 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
                     callback.nonNullSuccess = { (handledByClient: Bool) in
                         return !handledByClient
                     }
-                    callback.defaultBehaviour = { (handledByClient: Bool?) in
-                        if let printJob = self.plugin?.printJobManager?.jobs[printJobId] {
+                    callback.defaultBehaviour = { [weak self] (handledByClient: Bool?) in
+                        if let printJob = self?.plugin?.printJobManager?.jobs[printJobId] {
                             printJob?.disposeNoDismiss()
                         }
                     }
@@ -2831,24 +2831,24 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
             }
             
             let callback = WebViewChannelDelegate.CallJsHandlerCallback()
-            callback.defaultBehaviour = { (response: Any?) in
+            callback.defaultBehaviour = { [weak self] (response: Any?) in
                 var json = "null"
                 if let r = response as? String {
                     json = r
                 }
                 
-                self.evaluateJavaScript("""
+                self?.evaluateJavaScript("""
 if(window.\(JAVASCRIPT_BRIDGE_NAME)[\(_callHandlerID)] != null) {
     window.\(JAVASCRIPT_BRIDGE_NAME)[\(_callHandlerID)].resolve(\(json));
     delete window.\(JAVASCRIPT_BRIDGE_NAME)[\(_callHandlerID)];
 }
 """, completionHandler: nil)
             }
-            callback.error = { (code: String, message: String?, details: Any?) in
+            callback.error = { [weak self] (code: String, message: String?, details: Any?) in
                 let errorMessage = code + (message != nil ? ", " + (message ?? "") : "")
                 print(errorMessage)
                 
-                self.evaluateJavaScript("""
+                self?.evaluateJavaScript("""
 if(window.\(JAVASCRIPT_BRIDGE_NAME)[\(_callHandlerID)] != null) {
     window.\(JAVASCRIPT_BRIDGE_NAME)[\(_callHandlerID)].reject(new Error('\(errorMessage.replacingOccurrences(of: "\'", with: "\\'"))'));
     delete window.\(JAVASCRIPT_BRIDGE_NAME)[\(_callHandlerID)];

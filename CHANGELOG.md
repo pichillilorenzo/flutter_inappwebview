@@ -12,6 +12,7 @@
 - Merged "Android - Fix context menu position for pages with horizontal scroll" [#1504](https://github.com/pichillilorenzo/flutter_inappwebview/pull/1504) (thanks to [lrorpilla](https://github.com/lrorpilla))
 - Fixed "iOS about:blank popup not loading page" [#1500](https://github.com/pichillilorenzo/flutter_inappwebview/issues/1500)
 - Fixed "iOS macOS - This method should not be called on the main thread as it may lead to UI unresponsiveness" [#1678](https://github.com/pichillilorenzo/flutter_inappwebview/issues/1678)
+- Fixed iOS and macOS InAppWebView memory leaks
 
 ## 6.0.0-beta.25
 

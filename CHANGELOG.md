@@ -8,6 +8,7 @@
 - Merged "Fix iOS and macOS Forced unwrap null value HTTPCookie for CookieManager.setCookie" [#1677](https://github.com/pichillilorenzo/flutter_inappwebview/pull/1677) (thanks to [maxmitz](https://github.com/maxmitz))
 - Merged "android imm.isAcceptingText() crash fix" [#1827](https://github.com/pichillilorenzo/flutter_inappwebview/pull/1827) (thanks to [AlexDochioiu](https://github.com/AlexDochioiu))
 - Merged "fix: chrome tab open failed due to chrome process not running" [#1772](https://github.com/pichillilorenzo/flutter_inappwebview/pull/1772) (thanks to [YumengNevix](https://github.com/YumengNevix))
+- Merged "Android - Fix context menu position for pages with horizontal scroll" [#1504](https://github.com/pichillilorenzo/flutter_inappwebview/pull/1504) (thanks to [lrorpilla](https://github.com/lrorpilla))
 - Fixed "iOS about:blank popup not loading page" [#1500](https://github.com/pichillilorenzo/flutter_inappwebview/issues/1500)
 
 ## 6.0.0-beta.25

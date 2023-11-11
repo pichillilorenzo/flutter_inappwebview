@@ -29,7 +29,7 @@ import '../types/disposable.dart';
 ///- Web
 ///- MacOS
 ///{@endtemplate}
-class HeadlessInAppWebView implements WebView, Disposable {
+class HeadlessInAppWebView extends ChannelController implements WebView, Disposable {
   ///View ID.
   late final String id;
 
@@ -38,7 +38,6 @@ class HeadlessInAppWebView implements WebView, Disposable {
 
   static const MethodChannel _sharedChannel =
       const MethodChannel('com.pichillilorenzo/flutter_headless_inappwebview');
-  MethodChannel? _channel;
 
   InAppWebViewController? _webViewController;
 
@@ -187,19 +186,13 @@ class HeadlessInAppWebView implements WebView, Disposable {
     _webViewController = InAppWebViewController(id, this);
     pullToRefreshController?.init(id);
     findInteractionController?.init(id);
-    this._channel =
+    channel =
         MethodChannel('com.pichillilorenzo/flutter_headless_inappwebview_$id');
-    this._channel?.setMethodCallHandler((call) async {
-      try {
-        return await handleMethod(call);
-      } on Error catch (e) {
-        print(e);
-        print(e.stackTrace);
-      }
-    });
+    handler = _handleMethod;
+    initMethodCallHandler();
   }
 
-  Future<dynamic> handleMethod(MethodCall call) async {
+  Future<dynamic> _handleMethod(MethodCall call) async {
     switch (call.method) {
       case "onWebViewCreated":
         if (onWebViewCreated != null && _webViewController != null) {
@@ -310,9 +303,8 @@ class HeadlessInAppWebView implements WebView, Disposable {
       return;
     }
     Map<String, dynamic> args = <String, dynamic>{};
-    await _channel?.invokeMethod('dispose', args);
-    _channel?.setMethodCallHandler(null);
-    _channel = null;
+    await channel?.invokeMethod('dispose', args);
+    disposeChannel();
     _started = false;
     _running = false;
     _webViewController?.dispose();
@@ -353,7 +345,7 @@ class HeadlessInAppWebView implements WebView, Disposable {
 
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('size', () => size.toMap());
-    await _channel?.invokeMethod('setSize', args);
+    await channel?.invokeMethod('setSize', args);
   }
 
   ///Gets the current size in pixels of the WebView.
@@ -372,7 +364,7 @@ class HeadlessInAppWebView implements WebView, Disposable {
 
     Map<String, dynamic> args = <String, dynamic>{};
     Map<String, dynamic> sizeMap =
-        (await _channel?.invokeMethod('getSize', args))
+        (await channel?.invokeMethod('getSize', args))
             ?.cast<String, dynamic>();
     return MapSize.fromMap(sizeMap);
   }

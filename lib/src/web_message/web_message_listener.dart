@@ -10,7 +10,7 @@ import '../web_uri.dart';
 ///- Android native WebView
 ///- iOS
 ///- MacOS
-class WebMessageListener {
+class WebMessageListener extends ChannelController {
   ///Message Listener ID used internally.
   late final String id;
 
@@ -34,8 +34,6 @@ class WebMessageListener {
   ///**Official Android API**: https://developer.android.com/reference/androidx/webkit/WebViewCompat.WebMessageListener#onPostMessage(android.webkit.WebView,%20androidx.webkit.WebMessageCompat,%20android.net.Uri,%20boolean,%20androidx.webkit.JavaScriptReplyProxy)
   OnPostMessageCallback? onPostMessage;
 
-  MethodChannel? _channel;
-
   WebMessageListener(
       {required this.jsObjectName,
       Set<String>? allowedOriginRules,
@@ -45,16 +43,10 @@ class WebMessageListener {
         allowedOriginRules != null ? allowedOriginRules : Set.from(["*"]);
     assert(!this.allowedOriginRules.contains(""),
         "allowedOriginRules cannot contain empty strings");
-    this._channel = MethodChannel(
+    channel= MethodChannel(
         'com.pichillilorenzo/flutter_inappwebview_web_message_listener_${id}_$jsObjectName');
-    this._channel?.setMethodCallHandler((call) async {
-      try {
-        return await _handleMethod(call);
-      } on Error catch (e) {
-        print(e);
-        print(e.stackTrace);
-      }
-    });
+    handler = _handleMethod;
+    initMethodCallHandler();
   }
 
   Future<dynamic> _handleMethod(MethodCall call) async {
@@ -76,6 +68,11 @@ class WebMessageListener {
         throw UnimplementedError("Unimplemented ${call.method} method");
     }
     return null;
+  }
+
+  @override
+  void dispose() {
+    disposeChannel();
   }
 
   Map<String, dynamic> toMap() {
@@ -114,7 +111,7 @@ class JavaScriptReplyProxy {
   Future<void> postMessage(String message) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('message', () => message);
-    await _webMessageListener._channel?.invokeMethod('postMessage', args);
+    await _webMessageListener.channel?.invokeMethod('postMessage', args);
   }
 
   @override

@@ -37,7 +37,7 @@ class WebMessagePort {
   Future<void> setWebMessageCallback(WebMessageCallback? onMessage) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('index', () => this._index);
-    await _webMessageChannel.channel
+    await _webMessageChannel.internalChannel
         ?.invokeMethod('setWebMessageCallback', args);
     this._onMessage = onMessage;
   }
@@ -47,14 +47,14 @@ class WebMessagePort {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('index', () => this._index);
     args.putIfAbsent('message', () => message.toMap());
-    await _webMessageChannel.channel?.invokeMethod('postMessage', args);
+    await _webMessageChannel.internalChannel?.invokeMethod('postMessage', args);
   }
 
   ///Close the message port and free any resources associated with it.
   Future<void> close() async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('index', () => this._index);
-    await _webMessageChannel.channel?.invokeMethod('close', args);
+    await _webMessageChannel.internalChannel?.invokeMethod('close', args);
   }
 
   @ExchangeableObjectMethod(toMapMergeWith: true)

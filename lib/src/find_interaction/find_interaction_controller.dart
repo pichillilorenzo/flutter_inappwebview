@@ -8,9 +8,7 @@ import '../util.dart';
 ///- Android native WebView
 ///- iOS
 ///- MacOS
-class FindInteractionController {
-  MethodChannel? _channel;
-
+class FindInteractionController extends ChannelController {
   ///Debug settings.
   static DebugLoggingSettings debugLoggingSettings = DebugLoggingSettings();
 
@@ -81,7 +79,7 @@ class FindInteractionController {
   Future<void> findAll({String? find}) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('find', () => find);
-    await _channel?.invokeMethod('findAll', args);
+    await channel?.invokeMethod('findAll', args);
   }
 
   ///Highlights and scrolls to the next match found by [findAll]. Notifies [FindInteractionController.onFindResultReceived] listener.
@@ -99,7 +97,7 @@ class FindInteractionController {
   Future<void> findNext({bool forward = true}) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('forward', () => forward);
-    await _channel?.invokeMethod('findNext', args);
+    await channel?.invokeMethod('findNext', args);
   }
 
   ///Clears the highlighting surrounding text matches created by [findAll].
@@ -114,7 +112,7 @@ class FindInteractionController {
   ///- MacOS
   Future<void> clearMatches() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    await _channel?.invokeMethod('clearMatches', args);
+    await channel?.invokeMethod('clearMatches', args);
   }
 
   ///Pre-populate the search text to be used.
@@ -129,7 +127,7 @@ class FindInteractionController {
   Future<void> setSearchText(String? searchText) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('searchText', () => searchText);
-    await _channel?.invokeMethod('setSearchText', args);
+    await channel?.invokeMethod('setSearchText', args);
   }
 
   ///Get the search text used.
@@ -143,7 +141,7 @@ class FindInteractionController {
   ///- MacOS
   Future<String?> getSearchText() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    return await _channel?.invokeMethod('getSearchText', args);
+    return await channel?.invokeMethod<String?>('getSearchText', args);
   }
 
   ///A Boolean value that indicates when the find panel displays onscreen.
@@ -154,7 +152,7 @@ class FindInteractionController {
   ///- iOS ([Official API - UIFindInteraction.isFindNavigatorVisible](https://developer.apple.com/documentation/uikit/uifindinteraction/3975828-isfindnavigatorvisible?changes=_2))
   Future<bool?> isFindNavigatorVisible() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    return await _channel?.invokeMethod('isFindNavigatorVisible', args);
+    return await channel?.invokeMethod<bool?>('isFindNavigatorVisible', args);
   }
 
   ///Updates the results the interface displays for the active search.
@@ -165,7 +163,7 @@ class FindInteractionController {
   ///- iOS ([Official API - UIFindInteraction.updateResultCount](https://developer.apple.com/documentation/uikit/uifindinteraction/3975835-updateresultcount?changes=_2))
   Future<void> updateResultCount() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    await _channel?.invokeMethod('updateResultCount', args);
+    await channel?.invokeMethod('updateResultCount', args);
   }
 
   ///Begins a search, displaying the find panel.
@@ -176,7 +174,7 @@ class FindInteractionController {
   ///- iOS ([Official API - UIFindInteraction.presentFindNavigator](https://developer.apple.com/documentation/uikit/uifindinteraction/3975832-presentfindnavigator?changes=_2))
   Future<void> presentFindNavigator() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    await _channel?.invokeMethod('presentFindNavigator', args);
+    await channel?.invokeMethod('presentFindNavigator', args);
   }
 
   ///Dismisses the find panel, if present.
@@ -187,7 +185,7 @@ class FindInteractionController {
   ///- iOS ([Official API - UIFindInteraction.dismissFindNavigator](https://developer.apple.com/documentation/uikit/uifindinteraction/3975827-dismissfindnavigator?changes=_2))
   Future<void> dismissFindNavigator() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    await _channel?.invokeMethod('dismissFindNavigator', args);
+    await channel?.invokeMethod('dismissFindNavigator', args);
   }
 
   ///If there's a currently active find session, returns the active find session.
@@ -199,33 +197,23 @@ class FindInteractionController {
   Future<FindSession?> getActiveFindSession() async {
     Map<String, dynamic> args = <String, dynamic>{};
     Map<String, dynamic>? result =
-        (await _channel?.invokeMethod('getActiveFindSession', args))
+        (await channel?.invokeMethod('getActiveFindSession', args))
             ?.cast<String, dynamic>();
     return FindSession.fromMap(result);
   }
 
   ///Disposes the controller.
+  @override
   void dispose({bool isKeepAlive = false}) {
-    if (!isKeepAlive) {
-      _channel?.setMethodCallHandler(null);
-    }
-    _channel = null;
+    disposeChannel(removeMethodCallHandler: !isKeepAlive);
   }
 }
 
 extension InternalFindInteractionController on FindInteractionController {
   void init(dynamic id) {
-    this._channel = MethodChannel(
+    channel = MethodChannel(
         'com.pichillilorenzo/flutter_inappwebview_find_interaction_$id');
-
-    this._channel?.setMethodCallHandler((call) async {
-      if (_channel == null) return null;
-      try {
-        return await _handleMethod(call);
-      } on Error catch (e) {
-        print(e);
-        print(e.stackTrace);
-      }
-    });
+    handler = _handleMethod;
+    initMethodCallHandler();
   }
 }

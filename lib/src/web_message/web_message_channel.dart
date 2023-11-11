@@ -1,4 +1,5 @@
 import 'package:flutter/services.dart';
+import 'package:flutter_inappwebview/src/util.dart';
 import 'web_message_port.dart';
 
 ///The representation of the [HTML5 message channels](https://html.spec.whatwg.org/multipage/web-messaging.html#message-channels).
@@ -7,7 +8,7 @@ import 'web_message_port.dart';
 ///- Android native WebView
 ///- iOS
 ///- MacOS
-class WebMessageChannel {
+class WebMessageChannel extends ChannelController {
   ///Message Channel ID used internally.
   final String id;
 
@@ -17,20 +18,12 @@ class WebMessageChannel {
   ///The second [WebMessagePort] object of the channel.
   final WebMessagePort port2;
 
-  MethodChannel? _channel;
-
   WebMessageChannel(
       {required this.id, required this.port1, required this.port2}) {
-    this._channel = MethodChannel(
+    channel = MethodChannel(
         'com.pichillilorenzo/flutter_inappwebview_web_message_channel_$id');
-    this._channel?.setMethodCallHandler((call) async {
-      try {
-        return await _handleMethod(call);
-      } on Error catch (e) {
-        print(e);
-        print(e.stackTrace);
-      }
-    });
+    handler = _handleMethod;
+    initMethodCallHandler();
   }
 
   static WebMessageChannel? fromMap(Map<String, dynamic>? map) {
@@ -62,6 +55,12 @@ class WebMessageChannel {
     return null;
   }
 
+  ///Disposes the web message channel.
+  @override
+  void dispose() {
+    disposeChannel();
+  }
+
   @override
   String toString() {
     return 'WebMessageChannel{id: $id, port1: $port1, port2: $port2}';
@@ -69,5 +68,5 @@ class WebMessageChannel {
 }
 
 extension InternalWebMessageChannel on WebMessageChannel {
-  MethodChannel? get channel => _channel;
+  MethodChannel? get internalChannel => channel;
 }

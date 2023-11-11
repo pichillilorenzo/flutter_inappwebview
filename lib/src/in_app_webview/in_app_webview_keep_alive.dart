@@ -1,5 +1,7 @@
 import '../types/main.dart';
 import '../util.dart';
+import '../web_message/web_message_channel.dart';
+import '../web_message/web_message_listener.dart';
 import 'in_app_webview.dart';
 import 'in_app_webview_controller.dart';
 
@@ -24,10 +26,14 @@ class InAppWebViewControllerKeepAliveProps {
   Map<UserScriptInjectionTime, List<UserScript>> userScripts;
   Set<String> webMessageListenerObjNames;
   Map<String, ScriptHtmlTagAttributes> injectedScriptsFromURL;
+  Set<WebMessageChannel> webMessageChannels = Set();
+  Set<WebMessageListener> webMessageListeners = Set();
 
   InAppWebViewControllerKeepAliveProps(
       {required this.javaScriptHandlersMap,
       required this.userScripts,
       required this.webMessageListenerObjNames,
-      required this.injectedScriptsFromURL});
+      required this.injectedScriptsFromURL,
+      required this.webMessageChannels,
+      required this.webMessageListeners});
 }

@@ -1,6 +1,6 @@
 export 'webview.dart';
 export 'in_app_webview.dart';
-export 'in_app_webview_controller.dart';
+export 'in_app_webview_controller.dart' hide InternalInAppWebViewController;
 export 'in_app_webview_settings.dart'
     show
         InAppWebViewSettings,

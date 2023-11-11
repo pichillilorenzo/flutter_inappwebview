@@ -50,12 +50,11 @@ final _JAVASCRIPT_HANDLER_FORBIDDEN_NAMES = UnmodifiableListView<String>([
 ///
 ///If you are using the [InAppWebView] widget, an [InAppWebViewController] instance can be obtained by setting the [InAppWebView.onWebViewCreated]
 ///callback. Instead, if you are using an [InAppBrowser] instance, you can get it through the [InAppBrowser.webViewController] attribute.
-class InAppWebViewController {
+class InAppWebViewController extends ChannelController {
   WebView? _webview;
-  MethodChannel? _channel;
   static final MethodChannel _staticChannel = IN_APP_WEBVIEW_STATIC_CHANNEL;
 
-  // properties to be saved and restored for keep alive feature
+  // List of properties to be saved and restored for keep alive feature
   Map<String, JavaScriptHandlerCallback> _javaScriptHandlersMap =
       HashMap<String, JavaScriptHandlerCallback>();
   Map<UserScriptInjectionTime, List<UserScript>> _userScripts = {
@@ -64,6 +63,8 @@ class InAppWebViewController {
   };
   Set<String> _webMessageListenerObjNames = Set();
   Map<String, ScriptHtmlTagAttributes> _injectedScriptsFromURL = {};
+  Set<WebMessageChannel> _webMessageChannels = Set();
+  Set<WebMessageListener> _webMessageListeners = Set();
 
   // static map that contains the properties to be saved and restored for keep alive feature
   static final Map<InAppWebViewKeepAlive, InAppWebViewControllerKeepAliveProps?>
@@ -86,17 +87,10 @@ class InAppWebViewController {
 
   InAppWebViewController(dynamic id, WebView webview) {
     this._id = id;
-    this._channel =
-        MethodChannel('com.pichillilorenzo/flutter_inappwebview_$id');
-    this._channel?.setMethodCallHandler((call) async {
-      if (_channel == null) return null;
-      try {
-        return await handleMethod(call);
-      } on Error catch (e) {
-        print(e);
-        print(e.stackTrace);
-      }
-    });
+    channel = MethodChannel('com.pichillilorenzo/flutter_inappwebview_$id');
+    handler = handleMethod;
+    initMethodCallHandler();
+
     this._webview = webview;
 
     final initialUserScripts = webview.initialUserScripts;
@@ -122,7 +116,7 @@ class InAppWebViewController {
       MethodChannel channel,
       InAppBrowser inAppBrowser,
       UnmodifiableListView<UserScript>? initialUserScripts) {
-    this._channel = channel;
+    this.channel = channel;
     this._inAppBrowser = inAppBrowser;
 
     if (initialUserScripts != null) {
@@ -143,8 +137,8 @@ class InAppWebViewController {
   }
 
   void _init() {
-    android = AndroidInAppWebViewController(channel: _channel!);
-    ios = IOSInAppWebViewController(channel: _channel!);
+    android = AndroidInAppWebViewController(channel: channel!);
+    ios = IOSInAppWebViewController(channel: channel!);
     webStorage = WebStorage(
         localStorage: LocalStorage(this), sessionStorage: SessionStorage(this));
 
@@ -158,13 +152,17 @@ class InAppWebViewController {
               injectedScriptsFromURL: _injectedScriptsFromURL,
               javaScriptHandlersMap: _javaScriptHandlersMap,
               userScripts: _userScripts,
-              webMessageListenerObjNames: _webMessageListenerObjNames);
+              webMessageListenerObjNames: _webMessageListenerObjNames,
+              webMessageChannels: _webMessageChannels,
+              webMessageListeners: _webMessageListeners);
         } else {
           // restore controller properties
           _injectedScriptsFromURL = props.injectedScriptsFromURL;
           _javaScriptHandlersMap = props.javaScriptHandlersMap;
           _userScripts = props.userScripts;
           _webMessageListenerObjNames = props.webMessageListenerObjNames;
+          _webMessageChannels = props.webMessageChannels;
+          _webMessageListeners = props.webMessageListeners;
         }
       }
     }
@@ -180,7 +178,7 @@ class InAppWebViewController {
         args: args);
   }
 
-  Future<dynamic> handleMethod(MethodCall call) async {
+  Future<dynamic> _handleMethod(MethodCall call) async {
     if (WebView.debugLoggingSettings.enabled &&
         call.method != "onCallJsHandler") {
       _debugLog(call.method, call.arguments);
@@ -1430,7 +1428,7 @@ class InAppWebViewController {
   ///- Web
   Future<WebUri?> getUrl() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    String? url = await _channel?.invokeMethod('getUrl', args);
+    String? url = await channel?.invokeMethod<String?>('getUrl', args);
     return url != null ? WebUri(url) : null;
   }
 
@@ -1445,7 +1443,7 @@ class InAppWebViewController {
   ///- Web
   Future<String?> getTitle() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    return await _channel?.invokeMethod('getTitle', args);
+    return await channel?.invokeMethod<String?>('getTitle', args);
   }
 
   ///Gets the progress for the current page. The progress value is between 0 and 100.
@@ -1456,7 +1454,7 @@ class InAppWebViewController {
   ///- MacOS ([Official API - WKWebView.estimatedProgress](https://developer.apple.com/documentation/webkit/wkwebview/1415007-estimatedprogress))
   Future<int?> getProgress() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    return await _channel?.invokeMethod('getProgress', args);
+    return await channel?.invokeMethod<int?>('getProgress', args);
   }
 
   ///Gets the content html of the page. It first tries to get the content through javascript.
@@ -1704,7 +1702,7 @@ class InAppWebViewController {
   Future<void> loadUrl(
       {required URLRequest urlRequest,
       @Deprecated('Use allowingReadAccessTo instead')
-          Uri? iosAllowingReadAccessTo,
+      Uri? iosAllowingReadAccessTo,
       WebUri? allowingReadAccessTo}) async {
     assert(urlRequest.url != null && urlRequest.url.toString().isNotEmpty);
     assert(
@@ -1719,7 +1717,7 @@ class InAppWebViewController {
         () =>
             allowingReadAccessTo?.toString() ??
             iosAllowingReadAccessTo?.toString());
-    await _channel?.invokeMethod('loadUrl', args);
+    await channel?.invokeMethod('loadUrl', args);
   }
 
   ///Loads the given [url] with [postData] (x-www-form-urlencoded) using `POST` method into this WebView.
@@ -1743,7 +1741,7 @@ class InAppWebViewController {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('url', () => url.toString());
     args.putIfAbsent('postData', () => postData);
-    await _channel?.invokeMethod('postUrl', args);
+    await channel?.invokeMethod('postUrl', args);
   }
 
   ///Loads the given [data] into this WebView, using [baseUrl] as the base URL for the content.
@@ -1770,11 +1768,10 @@ class InAppWebViewController {
       String mimeType = "text/html",
       String encoding = "utf8",
       WebUri? baseUrl,
-      @Deprecated('Use historyUrl instead')
-          Uri? androidHistoryUrl,
+      @Deprecated('Use historyUrl instead') Uri? androidHistoryUrl,
       WebUri? historyUrl,
       @Deprecated('Use allowingReadAccessTo instead')
-          Uri? iosAllowingReadAccessTo,
+      Uri? iosAllowingReadAccessTo,
       WebUri? allowingReadAccessTo}) async {
     assert(
         allowingReadAccessTo == null || allowingReadAccessTo.isScheme("file"));
@@ -1797,7 +1794,7 @@ class InAppWebViewController {
         () =>
             allowingReadAccessTo?.toString() ??
             iosAllowingReadAccessTo?.toString());
-    await _channel?.invokeMethod('loadData', args);
+    await channel?.invokeMethod('loadData', args);
   }
 
   ///Loads the given [assetFilePath].
@@ -1839,7 +1836,7 @@ class InAppWebViewController {
     assert(assetFilePath.isNotEmpty);
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('assetFilePath', () => assetFilePath);
-    await _channel?.invokeMethod('loadFile', args);
+    await channel?.invokeMethod('loadFile', args);
   }
 
   ///Reloads the WebView.
@@ -1853,7 +1850,7 @@ class InAppWebViewController {
   ///- Web ([Official API - Location.reload](https://developer.mozilla.org/en-US/docs/Web/API/Location/reload))
   Future<void> reload() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    await _channel?.invokeMethod('reload', args);
+    await channel?.invokeMethod('reload', args);
   }
 
   ///Goes back in the history of the WebView.
@@ -1867,7 +1864,7 @@ class InAppWebViewController {
   ///- Web ([Official API - History.back](https://developer.mozilla.org/en-US/docs/Web/API/History/back))
   Future<void> goBack() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    await _channel?.invokeMethod('goBack', args);
+    await channel?.invokeMethod('goBack', args);
   }
 
   ///Returns a boolean value indicating whether the WebView can move backward.
@@ -1878,7 +1875,7 @@ class InAppWebViewController {
   ///- MacOS ([Official API - WKWebView.canGoBack](https://developer.apple.com/documentation/webkit/wkwebview/1414966-cangoback))
   Future<bool> canGoBack() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    return await _channel?.invokeMethod('canGoBack', args);
+    return await channel?.invokeMethod<bool>('canGoBack', args) ?? false;
   }
 
   ///Goes forward in the history of the WebView.
@@ -1892,7 +1889,7 @@ class InAppWebViewController {
   ///- Web ([Official API - History.forward](https://developer.mozilla.org/en-US/docs/Web/API/History/forward))
   Future<void> goForward() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    await _channel?.invokeMethod('goForward', args);
+    await channel?.invokeMethod('goForward', args);
   }
 
   ///Returns a boolean value indicating whether the WebView can move forward.
@@ -1903,7 +1900,7 @@ class InAppWebViewController {
   ///- MacOS ([Official API - WKWebView.canGoForward](https://developer.apple.com/documentation/webkit/wkwebview/1414962-cangoforward))
   Future<bool> canGoForward() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    return await _channel?.invokeMethod('canGoForward', args);
+    return await channel?.invokeMethod<bool>('canGoForward', args) ?? false;
   }
 
   ///Goes to the history item that is the number of steps away from the current item. Steps is negative if backward and positive if forward.
@@ -1918,7 +1915,7 @@ class InAppWebViewController {
   Future<void> goBackOrForward({required int steps}) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('steps', () => steps);
-    await _channel?.invokeMethod('goBackOrForward', args);
+    await channel?.invokeMethod('goBackOrForward', args);
   }
 
   ///Returns a boolean value indicating whether the WebView can go back or forward the given number of steps. Steps is negative if backward and positive if forward.
@@ -1930,7 +1927,8 @@ class InAppWebViewController {
   Future<bool> canGoBackOrForward({required int steps}) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('steps', () => steps);
-    return await _channel?.invokeMethod('canGoBackOrForward', args);
+    return await channel?.invokeMethod<bool>('canGoBackOrForward', args) ??
+        false;
   }
 
   ///Navigates to a [WebHistoryItem] from the back-forward [WebHistory.list] and sets it as the current item.
@@ -1958,7 +1956,7 @@ class InAppWebViewController {
   ///- Web
   Future<bool> isLoading() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    return await _channel?.invokeMethod('isLoading', args);
+    return await channel?.invokeMethod<bool>('isLoading', args) ?? false;
   }
 
   ///Stops the WebView from loading.
@@ -1972,7 +1970,7 @@ class InAppWebViewController {
   ///- Web ([Official API - Window.stop](https://developer.mozilla.org/en-US/docs/Web/API/Window/stop))
   Future<void> stopLoading() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    await _channel?.invokeMethod('stopLoading', args);
+    await channel?.invokeMethod('stopLoading', args);
   }
 
   ///Evaluates JavaScript [source] code into the WebView and returns the result of the evaluation.
@@ -2002,7 +2000,7 @@ class InAppWebViewController {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('source', () => source);
     args.putIfAbsent('contentWorld', () => contentWorld?.toMap());
-    var data = await _channel?.invokeMethod('evaluateJavascript', args);
+    var data = await channel?.invokeMethod('evaluateJavascript', args);
     if (data != null && (Util.isAndroid || Util.isWeb)) {
       try {
         // try to json decode the data coming from JavaScript
@@ -2041,7 +2039,7 @@ class InAppWebViewController {
     args.putIfAbsent('urlFile', () => urlFile.toString());
     args.putIfAbsent(
         'scriptHtmlTagAttributes', () => scriptHtmlTagAttributes?.toMap());
-    await _channel?.invokeMethod('injectJavascriptFileFromUrl', args);
+    await channel?.invokeMethod('injectJavascriptFileFromUrl', args);
   }
 
   ///Evaluates the content of a JavaScript file into the WebView from the flutter assets directory.
@@ -2081,7 +2079,7 @@ class InAppWebViewController {
   Future<void> injectCSSCode({required String source}) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('source', () => source);
-    await _channel?.invokeMethod('injectCSSCode', args);
+    await channel?.invokeMethod('injectCSSCode', args);
   }
 
   ///Injects an external CSS file into the WebView from a defined url.
@@ -2108,7 +2106,7 @@ class InAppWebViewController {
     args.putIfAbsent('urlFile', () => urlFile.toString());
     args.putIfAbsent(
         'cssLinkHtmlTagAttributes', () => cssLinkHtmlTagAttributes?.toMap());
-    await _channel?.invokeMethod('injectCSSFileFromUrl', args);
+    await channel?.invokeMethod('injectCSSFileFromUrl', args);
   }
 
   ///Injects a CSS file into the WebView from the flutter assets directory.
@@ -2233,7 +2231,7 @@ class InAppWebViewController {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent(
         'screenshotConfiguration', () => screenshotConfiguration?.toMap());
-    return await _channel?.invokeMethod('takeScreenshot', args);
+    return await channel?.invokeMethod<Uint8List?>('takeScreenshot', args);
   }
 
   ///Use [setSettings] instead.
@@ -2269,7 +2267,7 @@ class InAppWebViewController {
     Map<String, dynamic> args = <String, dynamic>{};
 
     args.putIfAbsent('settings', () => settings.toMap());
-    await _channel?.invokeMethod('setSettings', args);
+    await channel?.invokeMethod('setSettings', args);
   }
 
   ///Gets the current WebView settings. Returns `null` if it wasn't able to get them.
@@ -2283,7 +2281,7 @@ class InAppWebViewController {
     Map<String, dynamic> args = <String, dynamic>{};
 
     Map<dynamic, dynamic>? settings =
-        await _channel?.invokeMethod('getSettings', args);
+        await channel?.invokeMethod('getSettings', args);
     if (settings != null) {
       settings = settings.cast<String, dynamic>();
       return InAppWebViewSettings.fromMap(settings as Map<String, dynamic>);
@@ -2304,7 +2302,7 @@ class InAppWebViewController {
   Future<WebHistory?> getCopyBackForwardList() async {
     Map<String, dynamic> args = <String, dynamic>{};
     Map<String, dynamic>? result =
-        (await _channel?.invokeMethod('getCopyBackForwardList', args))
+        (await channel?.invokeMethod('getCopyBackForwardList', args))
             ?.cast<String, dynamic>();
     return WebHistory.fromMap(result);
   }
@@ -2317,7 +2315,7 @@ class InAppWebViewController {
   ///- MacOS
   Future<void> clearCache() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    await _channel?.invokeMethod('clearCache', args);
+    await channel?.invokeMethod('clearCache', args);
   }
 
   ///Use [FindInteractionController.findAll] instead.
@@ -2325,7 +2323,7 @@ class InAppWebViewController {
   Future<void> findAllAsync({required String find}) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('find', () => find);
-    await _channel?.invokeMethod('findAll', args);
+    await channel?.invokeMethod('findAll', args);
   }
 
   ///Use [FindInteractionController.findNext] instead.
@@ -2333,14 +2331,14 @@ class InAppWebViewController {
   Future<void> findNext({required bool forward}) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('forward', () => forward);
-    await _channel?.invokeMethod('findNext', args);
+    await channel?.invokeMethod('findNext', args);
   }
 
   ///Use [FindInteractionController.clearMatches] instead.
   @Deprecated("Use FindInteractionController.clearMatches instead")
   Future<void> clearMatches() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    await _channel?.invokeMethod('clearMatches', args);
+    await channel?.invokeMethod('clearMatches', args);
   }
 
   ///Use [tRexRunnerHtml] instead.
@@ -2378,7 +2376,7 @@ class InAppWebViewController {
     args.putIfAbsent('x', () => x);
     args.putIfAbsent('y', () => y);
     args.putIfAbsent('animated', () => animated);
-    await _channel?.invokeMethod('scrollTo', args);
+    await channel?.invokeMethod('scrollTo', args);
   }
 
   ///Moves the scrolled position of the WebView.
@@ -2404,7 +2402,7 @@ class InAppWebViewController {
     args.putIfAbsent('x', () => x);
     args.putIfAbsent('y', () => y);
     args.putIfAbsent('animated', () => animated);
-    await _channel?.invokeMethod('scrollBy', args);
+    await channel?.invokeMethod('scrollBy', args);
   }
 
   ///On Android native WebView, it pauses all layout, parsing, and JavaScript timers for all WebViews.
@@ -2420,7 +2418,7 @@ class InAppWebViewController {
   ///- MacOS
   Future<void> pauseTimers() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    await _channel?.invokeMethod('pauseTimers', args);
+    await channel?.invokeMethod('pauseTimers', args);
   }
 
   ///On Android, it resumes all layout, parsing, and JavaScript timers for all WebViews. This will resume dispatching all timers.
@@ -2435,7 +2433,7 @@ class InAppWebViewController {
   ///- MacOS
   Future<void> resumeTimers() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    await _channel?.invokeMethod('resumeTimers', args);
+    await channel?.invokeMethod('resumeTimers', args);
   }
 
   ///Prints the current page.
@@ -2458,7 +2456,8 @@ class InAppWebViewController {
       {PrintJobSettings? settings}) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent("settings", () => settings?.toMap());
-    String? jobId = await _channel?.invokeMethod('printCurrentPage', args);
+    String? jobId =
+        await channel?.invokeMethod<String?>('printCurrentPage', args);
     if (jobId != null) {
       return PrintJobController(id: jobId);
     }
@@ -2478,7 +2477,7 @@ class InAppWebViewController {
   ///- Web ([Official API - Document.documentElement.scrollHeight](https://developer.mozilla.org/en-US/docs/Web/API/Element/scrollHeight))
   Future<int?> getContentHeight() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    var height = await _channel?.invokeMethod('getContentHeight', args);
+    var height = await channel?.invokeMethod('getContentHeight', args);
     if (height == null || height == 0) {
       // try to use javascript
       var scrollHeight = await evaluateJavascript(
@@ -2505,7 +2504,7 @@ class InAppWebViewController {
   ///- Web ([Official API - Document.documentElement.scrollWidth](https://developer.mozilla.org/en-US/docs/Web/API/Element/scrollWidth))
   Future<int?> getContentWidth() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    var height = await _channel?.invokeMethod('getContentWidth', args);
+    var height = await channel?.invokeMethod('getContentWidth', args);
     if (height == null || height == 0) {
       // try to use javascript
       var scrollHeight = await evaluateJavascript(
@@ -2539,7 +2538,7 @@ class InAppWebViewController {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('zoomFactor', () => zoomFactor);
     args.putIfAbsent('animated', () => iosAnimated ?? animated);
-    return await _channel?.invokeMethod('zoomBy', args);
+    return await channel?.invokeMethod('zoomBy', args);
   }
 
   ///Gets the URL that was originally requested for the current page.
@@ -2555,7 +2554,7 @@ class InAppWebViewController {
   ///- Web
   Future<WebUri?> getOriginalUrl() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    String? url = await _channel?.invokeMethod('getOriginalUrl', args);
+    String? url = await channel?.invokeMethod<String?>('getOriginalUrl', args);
     return url != null ? WebUri(url) : null;
   }
 
@@ -2566,7 +2565,7 @@ class InAppWebViewController {
   ///- iOS ([Official API - UIScrollView.zoomScale](https://developer.apple.com/documentation/uikit/uiscrollview/1619419-zoomscale))
   Future<double?> getZoomScale() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    return await _channel?.invokeMethod('getZoomScale', args);
+    return await channel?.invokeMethod<double?>('getZoomScale', args);
   }
 
   ///Use [getZoomScale] instead.
@@ -2590,7 +2589,7 @@ class InAppWebViewController {
   ///- Web
   Future<String?> getSelectedText() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    return await _channel?.invokeMethod('getSelectedText', args);
+    return await channel?.invokeMethod<String?>('getSelectedText', args);
   }
 
   ///Gets the hit result for hitting an HTML elements.
@@ -2603,7 +2602,7 @@ class InAppWebViewController {
   Future<InAppWebViewHitTestResult?> getHitTestResult() async {
     Map<String, dynamic> args = <String, dynamic>{};
     Map<dynamic, dynamic>? hitTestResultMap =
-        await _channel?.invokeMethod('getHitTestResult', args);
+        await channel?.invokeMethod('getHitTestResult', args);
 
     if (hitTestResultMap == null) {
       return null;
@@ -2625,7 +2624,7 @@ class InAppWebViewController {
   ///- iOS ([Official API - UIResponder.resignFirstResponder](https://developer.apple.com/documentation/uikit/uiresponder/1621097-resignfirstresponder))
   Future<void> clearFocus() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    return await _channel?.invokeMethod('clearFocus', args);
+    return await channel?.invokeMethod('clearFocus', args);
   }
 
   ///Sets or updates the WebView context menu to be used next time it will appear.
@@ -2636,7 +2635,7 @@ class InAppWebViewController {
   Future<void> setContextMenu(ContextMenu? contextMenu) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent("contextMenu", () => contextMenu?.toMap());
-    await _channel?.invokeMethod('setContextMenu', args);
+    await channel?.invokeMethod('setContextMenu', args);
     _inAppBrowser?.contextMenu = contextMenu;
   }
 
@@ -2650,7 +2649,7 @@ class InAppWebViewController {
   Future<RequestFocusNodeHrefResult?> requestFocusNodeHref() async {
     Map<String, dynamic> args = <String, dynamic>{};
     Map<dynamic, dynamic>? result =
-        await _channel?.invokeMethod('requestFocusNodeHref', args);
+        await channel?.invokeMethod('requestFocusNodeHref', args);
     return result != null
         ? RequestFocusNodeHrefResult(
             url: result['url'] != null ? WebUri(result['url']) : null,
@@ -2670,7 +2669,7 @@ class InAppWebViewController {
   Future<RequestImageRefResult?> requestImageRef() async {
     Map<String, dynamic> args = <String, dynamic>{};
     Map<dynamic, dynamic>? result =
-        await _channel?.invokeMethod('requestImageRef', args);
+        await channel?.invokeMethod('requestImageRef', args);
     return result != null
         ? RequestImageRefResult(
             url: result['url'] != null ? WebUri(result['url']) : null,
@@ -2766,7 +2765,7 @@ class InAppWebViewController {
     try {
       Map<String, dynamic> args = <String, dynamic>{};
       themeColor = UtilColor.fromStringRepresentation(
-          await _channel?.invokeMethod('getMetaThemeColor', args));
+          await channel?.invokeMethod('getMetaThemeColor', args));
       return themeColor;
     } catch (e) {
       // not implemented
@@ -2809,7 +2808,7 @@ class InAppWebViewController {
   ///- Web ([Official API - Window.scrollX](https://developer.mozilla.org/en-US/docs/Web/API/Window/scrollX))
   Future<int?> getScrollX() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    return await _channel?.invokeMethod('getScrollX', args);
+    return await channel?.invokeMethod<int?>('getScrollX', args);
   }
 
   ///Returns the scrolled top position of the current WebView.
@@ -2825,7 +2824,7 @@ class InAppWebViewController {
   ///- Web ([Official API - Window.scrollY](https://developer.mozilla.org/en-US/docs/Web/API/Window/scrollY))
   Future<int?> getScrollY() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    return await _channel?.invokeMethod('getScrollY', args);
+    return await channel?.invokeMethod<int?>('getScrollY', args);
   }
 
   ///Gets the SSL certificate for the main top-level page or null if there is no certificate (the site is not secure).
@@ -2837,7 +2836,7 @@ class InAppWebViewController {
   Future<SslCertificate?> getCertificate() async {
     Map<String, dynamic> args = <String, dynamic>{};
     Map<String, dynamic>? sslCertificateMap =
-        (await _channel?.invokeMethod('getCertificate', args))
+        (await channel?.invokeMethod('getCertificate', args))
             ?.cast<String, dynamic>();
     return SslCertificate.fromMap(sslCertificateMap);
   }
@@ -2860,7 +2859,7 @@ class InAppWebViewController {
     if (!(_userScripts[userScript.injectionTime]?.contains(userScript) ??
         false)) {
       _userScripts[userScript.injectionTime]?.add(userScript);
-      await _channel?.invokeMethod('addUserScript', args);
+      await channel?.invokeMethod('addUserScript', args);
     }
   }
 
@@ -2906,7 +2905,7 @@ class InAppWebViewController {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('userScript', () => userScript.toMap());
     args.putIfAbsent('index', () => index);
-    await _channel?.invokeMethod('removeUserScript', args);
+    await channel?.invokeMethod('removeUserScript', args);
 
     return true;
   }
@@ -2943,7 +2942,7 @@ class InAppWebViewController {
 
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('groupName', () => groupName);
-    await _channel?.invokeMethod('removeUserScriptsByGroupName', args);
+    await channel?.invokeMethod('removeUserScriptsByGroupName', args);
   }
 
   ///Removes the [userScripts] from the webpage’s content.
@@ -2983,7 +2982,7 @@ class InAppWebViewController {
     _userScripts[UserScriptInjectionTime.AT_DOCUMENT_END]?.clear();
 
     Map<String, dynamic> args = <String, dynamic>{};
-    await _channel?.invokeMethod('removeAllUserScripts', args);
+    await channel?.invokeMethod('removeAllUserScripts', args);
   }
 
   ///Returns `true` if the [userScript] has been already added, otherwise `false`.
@@ -3038,7 +3037,7 @@ class InAppWebViewController {
     args.putIfAbsent('functionBody', () => functionBody);
     args.putIfAbsent('arguments', () => arguments);
     args.putIfAbsent('contentWorld', () => contentWorld?.toMap());
-    var data = await _channel?.invokeMethod('callAsyncJavaScript', args);
+    var data = await channel?.invokeMethod('callAsyncJavaScript', args);
     if (data == null) {
       return null;
     }
@@ -3081,7 +3080,7 @@ class InAppWebViewController {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent("filePath", () => filePath);
     args.putIfAbsent("autoname", () => autoname);
-    return await _channel?.invokeMethod('saveWebArchive', args);
+    return await channel?.invokeMethod<String?>('saveWebArchive', args);
   }
 
   ///Indicates whether the webpage context is capable of using features that require [secure contexts](https://developer.mozilla.org/en-US/docs/Web/Security/Secure_Contexts).
@@ -3098,7 +3097,7 @@ class InAppWebViewController {
   ///- Web ([Official API - Window.isSecureContext](https://developer.mozilla.org/en-US/docs/Web/API/Window/isSecureContext))
   Future<bool> isSecureContext() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    return await _channel?.invokeMethod('isSecureContext', args);
+    return await channel?.invokeMethod<bool>('isSecureContext', args) ?? false;
   }
 
   ///Creates a message channel to communicate with JavaScript and returns the message channel with ports that represent the endpoints of this message channel.
@@ -3121,9 +3120,13 @@ class InAppWebViewController {
   Future<WebMessageChannel?> createWebMessageChannel() async {
     Map<String, dynamic> args = <String, dynamic>{};
     Map<String, dynamic>? result =
-        (await _channel?.invokeMethod('createWebMessageChannel', args))
+        (await channel?.invokeMethod('createWebMessageChannel', args))
             ?.cast<String, dynamic>();
-    return WebMessageChannel.fromMap(result);
+    final webMessageChannel = WebMessageChannel.fromMap(result);
+    if (webMessageChannel != null) {
+      _webMessageChannels.add(webMessageChannel);
+    }
+    return webMessageChannel;
   }
 
   ///Post a message to main frame. The embedded application can restrict the messages to a certain target origin.
@@ -3149,7 +3152,7 @@ class InAppWebViewController {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('message', () => message.toMap());
     args.putIfAbsent('targetOrigin', () => targetOrigin.toString());
-    await _channel?.invokeMethod('postWebMessage', args);
+    await channel?.invokeMethod('postWebMessage', args);
   }
 
   ///Adds a [WebMessageListener] to the WebView and injects a JavaScript object into each frame that the [WebMessageListener] will listen on.
@@ -3318,14 +3321,17 @@ class InAppWebViewController {
   ///- MacOS
   Future<void> addWebMessageListener(
       WebMessageListener webMessageListener) async {
+    assert(!_webMessageListeners.contains(webMessageListener),
+        "${webMessageListener} was already added.");
     assert(
         !_webMessageListenerObjNames.contains(webMessageListener.jsObjectName),
         "jsObjectName ${webMessageListener.jsObjectName} was already added.");
+    _webMessageListeners.add(webMessageListener);
     _webMessageListenerObjNames.add(webMessageListener.jsObjectName);
 
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('webMessageListener', () => webMessageListener.toMap());
-    await _channel?.invokeMethod('addWebMessageListener', args);
+    await channel?.invokeMethod('addWebMessageListener', args);
   }
 
   ///Returns `true` if the [webMessageListener] has been already added, otherwise `false`.
@@ -3335,8 +3341,8 @@ class InAppWebViewController {
   ///- iOS
   ///- MacOS
   bool hasWebMessageListener(WebMessageListener webMessageListener) {
-    return _webMessageListenerObjNames
-        .contains(webMessageListener.jsObjectName);
+    return _webMessageListeners.contains(webMessageListener) ||
+        _webMessageListenerObjNames.contains(webMessageListener.jsObjectName);
   }
 
   ///Returns `true` if the webpage can scroll vertically, otherwise `false`.
@@ -3352,7 +3358,8 @@ class InAppWebViewController {
   ///- Web
   Future<bool> canScrollVertically() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    return await _channel?.invokeMethod('canScrollVertically', args);
+    return await channel?.invokeMethod<bool>('canScrollVertically', args) ??
+        false;
   }
 
   ///Returns `true` if the webpage can scroll horizontally, otherwise `false`.
@@ -3368,7 +3375,8 @@ class InAppWebViewController {
   ///- Web
   Future<bool> canScrollHorizontally() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    return await _channel?.invokeMethod('canScrollHorizontally', args);
+    return await channel?.invokeMethod<bool>('canScrollHorizontally', args) ??
+        false;
   }
 
   ///Starts Safe Browsing initialization.
@@ -3385,7 +3393,8 @@ class InAppWebViewController {
   ///- Android native WebView ([Official API - WebView.startSafeBrowsing](https://developer.android.com/reference/android/webkit/WebView#startSafeBrowsing(android.content.Context,%20android.webkit.ValueCallback%3Cjava.lang.Boolean%3E)))
   Future<bool> startSafeBrowsing() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    return await _channel?.invokeMethod('startSafeBrowsing', args);
+    return await channel?.invokeMethod<bool>('startSafeBrowsing', args) ??
+        false;
   }
 
   ///Clears the SSL preferences table stored in response to proceeding with SSL certificate errors.
@@ -3394,7 +3403,7 @@ class InAppWebViewController {
   ///- Android native WebView ([Official API - WebView.clearSslPreferences](https://developer.android.com/reference/android/webkit/WebView#clearSslPreferences()))
   Future<void> clearSslPreferences() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    await _channel?.invokeMethod('clearSslPreferences', args);
+    await channel?.invokeMethod('clearSslPreferences', args);
   }
 
   ///Does a best-effort attempt to pause any processing that can be paused safely, such as animations and geolocation. Note that this call does not pause JavaScript.
@@ -3404,7 +3413,7 @@ class InAppWebViewController {
   ///- Android native WebView ([Official API - WebView.onPause](https://developer.android.com/reference/android/webkit/WebView#onPause()))
   Future<void> pause() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    await _channel?.invokeMethod('pause', args);
+    await channel?.invokeMethod('pause', args);
   }
 
   ///Resumes a WebView after a previous call to [pause].
@@ -3413,7 +3422,7 @@ class InAppWebViewController {
   ///- Android native WebView ([Official API - WebView.onResume](https://developer.android.com/reference/android/webkit/WebView#onResume()))
   Future<void> resume() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    await _channel?.invokeMethod('resume', args);
+    await channel?.invokeMethod('resume', args);
   }
 
   ///Scrolls the contents of this WebView down by half the page size.
@@ -3426,7 +3435,7 @@ class InAppWebViewController {
   Future<bool> pageDown({required bool bottom}) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent("bottom", () => bottom);
-    return await _channel?.invokeMethod('pageDown', args);
+    return await channel?.invokeMethod<bool>('pageDown', args) ?? false;
   }
 
   ///Scrolls the contents of this WebView up by half the view size.
@@ -3439,7 +3448,7 @@ class InAppWebViewController {
   Future<bool> pageUp({required bool top}) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent("top", () => top);
-    return await _channel?.invokeMethod('pageUp', args);
+    return await channel?.invokeMethod<bool>('pageUp', args) ?? false;
   }
 
   ///Performs zoom in in this WebView.
@@ -3449,7 +3458,7 @@ class InAppWebViewController {
   ///- Android native WebView ([Official API - WebView.zoomIn](https://developer.android.com/reference/android/webkit/WebView#zoomIn()))
   Future<bool> zoomIn() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    return await _channel?.invokeMethod('zoomIn', args);
+    return await channel?.invokeMethod<bool>('zoomIn', args) ?? false;
   }
 
   ///Performs zoom out in this WebView.
@@ -3459,7 +3468,7 @@ class InAppWebViewController {
   ///- Android native WebView ([Official API - WebView.zoomOut](https://developer.android.com/reference/android/webkit/WebView#zoomOut()))
   Future<bool> zoomOut() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    return await _channel?.invokeMethod('zoomOut', args);
+    return await channel?.invokeMethod<bool>('zoomOut', args) ?? false;
   }
 
   ///Clears the internal back/forward list.
@@ -3468,7 +3477,7 @@ class InAppWebViewController {
   ///- Android native WebView ([Official API - WebView.clearHistory](https://developer.android.com/reference/android/webkit/WebView#clearHistory()))
   Future<void> clearHistory() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    return await _channel?.invokeMethod('clearHistory', args);
+    return await channel?.invokeMethod('clearHistory', args);
   }
 
   ///Reloads the current page, performing end-to-end revalidation using cache-validating conditionals if possible.
@@ -3478,7 +3487,7 @@ class InAppWebViewController {
   ///- MacOS ([Official API - WKWebView.reloadFromOrigin](https://developer.apple.com/documentation/webkit/wkwebview/1414956-reloadfromorigin))
   Future<void> reloadFromOrigin() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    await _channel?.invokeMethod('reloadFromOrigin', args);
+    await channel?.invokeMethod('reloadFromOrigin', args);
   }
 
   ///Generates PDF data from the web view’s contents asynchronously.
@@ -3495,13 +3504,13 @@ class InAppWebViewController {
   ///- MacOS ([Official API - WKWebView.createPdf](https://developer.apple.com/documentation/webkit/wkwebview/3650490-createpdf))
   Future<Uint8List?> createPdf(
       {@Deprecated("Use pdfConfiguration instead")
-          // ignore: deprecated_member_use_from_same_package
-          IOSWKPDFConfiguration? iosWKPdfConfiguration,
+      // ignore: deprecated_member_use_from_same_package
+      IOSWKPDFConfiguration? iosWKPdfConfiguration,
       PDFConfiguration? pdfConfiguration}) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('pdfConfiguration',
         () => pdfConfiguration?.toMap() ?? iosWKPdfConfiguration?.toMap());
-    return await _channel?.invokeMethod('createPdf', args);
+    return await channel?.invokeMethod<Uint8List?>('createPdf', args);
   }
 
   ///Creates a web archive of the web view’s current contents asynchronously.
@@ -3516,7 +3525,7 @@ class InAppWebViewController {
   ///- MacOS ([Official API - WKWebView.createWebArchiveData](https://developer.apple.com/documentation/webkit/wkwebview/3650491-createwebarchivedata))
   Future<Uint8List?> createWebArchiveData() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    return await _channel?.invokeMethod('createWebArchiveData', args);
+    return await channel?.invokeMethod('createWebArchiveData', args);
   }
 
   ///A Boolean value indicating whether all resources on the page have been loaded over securely encrypted connections.
@@ -3526,7 +3535,8 @@ class InAppWebViewController {
   ///- MacOS ([Official API - WKWebView.hasOnlySecureContent](https://developer.apple.com/documentation/webkit/wkwebview/1415002-hasonlysecurecontent))
   Future<bool> hasOnlySecureContent() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    return await _channel?.invokeMethod('hasOnlySecureContent', args);
+    return await channel?.invokeMethod<bool>('hasOnlySecureContent', args) ??
+        false;
   }
 
   ///Pauses playback of all media in the web view.
@@ -3540,7 +3550,7 @@ class InAppWebViewController {
   ///- MacOS ([Official API - WKWebView.pauseAllMediaPlayback](https://developer.apple.com/documentation/webkit/wkwebview/3752240-pauseallmediaplayback)).
   Future<void> pauseAllMediaPlayback() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    return await _channel?.invokeMethod('pauseAllMediaPlayback', args);
+    return await channel?.invokeMethod('pauseAllMediaPlayback', args);
   }
 
   ///Changes whether the webpage is suspending playback of all media in the page.
@@ -3558,7 +3568,7 @@ class InAppWebViewController {
   Future<void> setAllMediaPlaybackSuspended({required bool suspended}) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent("suspended", () => suspended);
-    return await _channel?.invokeMethod('setAllMediaPlaybackSuspended', args);
+    return await channel?.invokeMethod('setAllMediaPlaybackSuspended', args);
   }
 
   ///Closes all media the web view is presenting, including picture-in-picture video and fullscreen video.
@@ -3572,7 +3582,7 @@ class InAppWebViewController {
   ///- MacOS ([Official API - WKWebView.closeAllMediaPresentations](https://developer.apple.com/documentation/webkit/wkwebview/3752235-closeallmediapresentations)).
   Future<void> closeAllMediaPresentations() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    return await _channel?.invokeMethod('closeAllMediaPresentations', args);
+    return await channel?.invokeMethod('closeAllMediaPresentations', args);
   }
 
   ///Requests the playback status of media in the web view.
@@ -3589,7 +3599,7 @@ class InAppWebViewController {
   Future<MediaPlaybackState?> requestMediaPlaybackState() async {
     Map<String, dynamic> args = <String, dynamic>{};
     return MediaPlaybackState.fromNativeValue(
-        await _channel?.invokeMethod('requestMediaPlaybackState', args));
+        await channel?.invokeMethod('requestMediaPlaybackState', args));
   }
 
   ///Returns `true` if the [WebView] is in fullscreen mode, otherwise `false`.
@@ -3600,7 +3610,7 @@ class InAppWebViewController {
   ///- MacOS
   Future<bool> isInFullscreen() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    return await _channel?.invokeMethod('isInFullscreen', args);
+    return await channel?.invokeMethod<bool>('isInFullscreen', args) ?? false;
   }
 
   ///Returns a [MediaCaptureState] that indicates whether the webpage is using the camera to capture images or video.
@@ -3615,7 +3625,7 @@ class InAppWebViewController {
   Future<MediaCaptureState?> getCameraCaptureState() async {
     Map<String, dynamic> args = <String, dynamic>{};
     return MediaCaptureState.fromNativeValue(
-        await _channel?.invokeMethod('getCameraCaptureState', args));
+        await channel?.invokeMethod('getCameraCaptureState', args));
   }
 
   ///Changes whether the webpage is using the camera to capture images or video.
@@ -3630,7 +3640,7 @@ class InAppWebViewController {
   Future<void> setCameraCaptureState({required MediaCaptureState state}) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('state', () => state.toNativeValue());
-    await _channel?.invokeMethod('setCameraCaptureState', args);
+    await channel?.invokeMethod('setCameraCaptureState', args);
   }
 
   ///Returns a [MediaCaptureState] that indicates whether the webpage is using the microphone to capture audio.
@@ -3645,7 +3655,7 @@ class InAppWebViewController {
   Future<MediaCaptureState?> getMicrophoneCaptureState() async {
     Map<String, dynamic> args = <String, dynamic>{};
     return MediaCaptureState.fromNativeValue(
-        await _channel?.invokeMethod('getMicrophoneCaptureState', args));
+        await channel?.invokeMethod('getMicrophoneCaptureState', args));
   }
 
   ///Changes whether the webpage is using the microphone to capture audio.
@@ -3661,7 +3671,7 @@ class InAppWebViewController {
       {required MediaCaptureState state}) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('state', () => state.toNativeValue());
-    await _channel?.invokeMethod('setMicrophoneCaptureState', args);
+    await channel?.invokeMethod('setMicrophoneCaptureState', args);
   }
 
   ///Loads the web content from the data you provide as if the data were the response to the request.
@@ -3697,7 +3707,7 @@ class InAppWebViewController {
     args.putIfAbsent('urlRequest', () => urlRequest.toMap());
     args.putIfAbsent('data', () => data);
     args.putIfAbsent('urlResponse', () => urlResponse?.toMap());
-    await _channel?.invokeMethod('loadSimulatedRequest', args);
+    await channel?.invokeMethod('loadSimulatedRequest', args);
   }
 
   ///Returns the iframe `id` attribute used on the Web platform.
@@ -3706,7 +3716,7 @@ class InAppWebViewController {
   ///- Web
   Future<String?> getIFrameId() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    return await _channel?.invokeMethod('getIFrameId', args);
+    return await channel?.invokeMethod<String?>('getIFrameId', args);
   }
 
   ///Gets the default user agent.
@@ -3717,7 +3727,9 @@ class InAppWebViewController {
   ///- MacOS
   static Future<String> getDefaultUserAgent() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    return await _staticChannel.invokeMethod('getDefaultUserAgent', args);
+    return await _staticChannel.invokeMethod<String>(
+            'getDefaultUserAgent', args) ??
+        '';
   }
 
   ///Clears the client certificate preferences stored in response to proceeding/cancelling client cert requests.
@@ -3777,7 +3789,9 @@ class InAppWebViewController {
       {required List<String> hosts}) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('hosts', () => hosts);
-    return await _staticChannel.invokeMethod('setSafeBrowsingAllowlist', args);
+    return await _staticChannel.invokeMethod<bool>(
+            'setSafeBrowsingAllowlist', args) ??
+        false;
   }
 
   ///If WebView has already been loaded into the current process this method will return the package that was used to load it.
@@ -3833,7 +3847,8 @@ class InAppWebViewController {
   ///- Android native WebView ([Official API - WebViewCompat.getVariationsHeader](https://developer.android.com/reference/androidx/webkit/WebViewCompat#getVariationsHeader()))
   static Future<String?> getVariationsHeader() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    return await _staticChannel.invokeMethod('getVariationsHeader', args);
+    return await _staticChannel.invokeMethod<String?>(
+        'getVariationsHeader', args);
   }
 
   ///Returns `true` if WebView is running in multi process mode.
@@ -3850,7 +3865,9 @@ class InAppWebViewController {
   ///- Android native WebView ([Official API - WebViewCompat.isMultiProcessEnabled](https://developer.android.com/reference/androidx/webkit/WebViewCompat#isMultiProcessEnabled()))
   static Future<bool> isMultiProcessEnabled() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    return await _staticChannel.invokeMethod('isMultiProcessEnabled', args);
+    return await _staticChannel.invokeMethod<bool>(
+            'isMultiProcessEnabled', args) ??
+        false;
   }
 
   ///Returns a Boolean value that indicates whether WebKit natively supports resources with the specified URL scheme.
@@ -3901,24 +3918,17 @@ class InAppWebViewController {
   static Future<String> get tRexRunnerCss async => await rootBundle.loadString(
       'packages/flutter_inappwebview/assets/t_rex_runner/t-rex.css');
 
-  ///Used internally.
-  MethodChannel? getChannel() {
-    return _channel;
-  }
-
-  ///Used internally.
+  ///View ID used internally.
   dynamic getViewId() {
     return _id;
   }
 
   ///Disposes the controller.
+  @override
   void dispose({bool isKeepAlive = false}) {
-    if (!isKeepAlive) {
-      _channel?.setMethodCallHandler(null);
-    }
+    disposeChannel(removeMethodCallHandler: !isKeepAlive);
     android.dispose();
     ios.dispose();
-    _channel = null;
     _webview = null;
     _inAppBrowser = null;
     webStorage.dispose();
@@ -3927,6 +3937,18 @@ class InAppWebViewController {
       _userScripts.clear();
       _webMessageListenerObjNames.clear();
       _injectedScriptsFromURL.clear();
+      for (final webMessageChannel in _webMessageChannels) {
+        webMessageChannel.dispose();
+      }
+      _webMessageChannels.clear();
+      for (final webMessageListener in _webMessageListeners) {
+        webMessageListener.dispose();
+      }
+      _webMessageListeners.clear();
     }
   }
+}
+
+extension InternalInAppWebViewController on InAppWebViewController {
+  get handleMethod => _handleMethod;
 }

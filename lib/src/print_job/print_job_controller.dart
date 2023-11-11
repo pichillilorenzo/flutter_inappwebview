@@ -1,7 +1,7 @@
 import 'package:flutter/services.dart';
+import 'package:flutter_inappwebview/src/util.dart';
 import '../types/print_job_info.dart';
 import '../in_app_webview/in_app_webview_controller.dart';
-import '../types/disposable.dart';
 
 ///A completion handler for the [PrintJobController].
 typedef PrintJobCompletionHandler = Future<void> Function(
@@ -13,11 +13,9 @@ typedef PrintJobCompletionHandler = Future<void> Function(
 ///- Android native WebView
 ///- iOS
 ///- MacOS
-class PrintJobController implements Disposable {
+class PrintJobController extends ChannelController {
   ///Print job ID.
   final String id;
-
-  MethodChannel? _channel;
 
   ///A completion handler used to handle the conclusion of the print job (for instance, to reset state) and to handle any errors encountered in printing.
   ///
@@ -27,16 +25,10 @@ class PrintJobController implements Disposable {
   PrintJobCompletionHandler onComplete;
 
   PrintJobController({required this.id}) {
-    this._channel = MethodChannel(
+    channel = MethodChannel(
         'com.pichillilorenzo/flutter_inappwebview_printjobcontroller_$id');
-    this._channel?.setMethodCallHandler((call) async {
-      try {
-        return await _handleMethod(call);
-      } on Error catch (e) {
-        print(e);
-        print(e.stackTrace);
-      }
-    });
+    handler = _handleMethod;
+    initMethodCallHandler();
   }
 
   Future<dynamic> _handleMethod(MethodCall call) async {
@@ -60,7 +52,7 @@ class PrintJobController implements Disposable {
   ///- Android native WebView ([Official API - PrintJob.cancel](https://developer.android.com/reference/android/print/PrintJob#cancel()))
   Future<void> cancel() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    await _channel?.invokeMethod('cancel', args);
+    await channel?.invokeMethod('cancel', args);
   }
 
   ///Restarts this print job.
@@ -70,7 +62,7 @@ class PrintJobController implements Disposable {
   ///- Android native WebView ([Official API - PrintJob.restart](https://developer.android.com/reference/android/print/PrintJob#restart()))
   Future<void> restart() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    await _channel?.invokeMethod('restart', args);
+    await channel?.invokeMethod('restart', args);
   }
 
   ///Dismisses the printing-options sheet or popover.
@@ -85,7 +77,7 @@ class PrintJobController implements Disposable {
   Future<void> dismiss({bool animated: true}) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent("animated", () => animated);
-    await _channel?.invokeMethod('dismiss', args);
+    await channel?.invokeMethod('dismiss', args);
   }
 
   ///Gets the [PrintJobInfo] that describes this job.
@@ -101,7 +93,7 @@ class PrintJobController implements Disposable {
   Future<PrintJobInfo?> getInfo() async {
     Map<String, dynamic> args = <String, dynamic>{};
     Map<String, dynamic>? infoMap =
-        (await _channel?.invokeMethod('getInfo', args))
+        (await channel?.invokeMethod('getInfo', args))
             ?.cast<String, dynamic>();
     return PrintJobInfo.fromMap(infoMap);
   }
@@ -115,8 +107,7 @@ class PrintJobController implements Disposable {
   @override
   Future<void> dispose() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    await _channel?.invokeMethod('dispose', args);
-    _channel?.setMethodCallHandler(null);
-    _channel = null;
+    await channel?.invokeMethod('dispose', args);
+    disposeChannel();
   }
 }

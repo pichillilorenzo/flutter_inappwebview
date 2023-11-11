@@ -3,6 +3,7 @@ import 'dart:collection';
 import 'dart:typed_data';
 import 'dart:ui';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 
 import '../context_menu/context_menu.dart';
@@ -28,7 +29,7 @@ import '../pull_to_refresh/pull_to_refresh_controller.dart';
 ///- Android native WebView
 ///- iOS
 ///- MacOS
-class InAppBrowser {
+class InAppBrowser extends ChannelController {
   ///Debug settings.
   static DebugLoggingSettings debugLoggingSettings = DebugLoggingSettings();
 
@@ -48,7 +49,6 @@ class InAppBrowser {
   final UnmodifiableListView<UserScript>? initialUserScripts;
 
   bool _isOpened = false;
-  MethodChannel? _channel;
   static const MethodChannel _sharedChannel =
       const MethodChannel('com.pichillilorenzo/flutter_inappbrowser');
 
@@ -70,18 +70,13 @@ class InAppBrowser {
   }
 
   _init() {
-    this._channel =
+    channel =
         MethodChannel('com.pichillilorenzo/flutter_inappbrowser_$id');
-    this._channel?.setMethodCallHandler((call) async {
-      try {
-        return await _handleMethod(call);
-      } on Error catch (e) {
-        print(e);
-        print(e.stackTrace);
-      }
-    });
+    handler = _handleMethod;
+    initMethodCallHandler();
+
     _webViewController = new InAppWebViewController.fromInAppBrowser(
-        this._channel!, this, this.initialUserScripts);
+        channel!, this, this.initialUserScripts);
     pullToRefreshController?.init(id);
     findInteractionController?.init(id);
   }
@@ -113,7 +108,7 @@ class InAppBrowser {
       case "onExit":
         _debugLog(call.method, call.arguments);
         _isOpened = false;
-        _dispose();
+        dispose();
         onExit();
         break;
       default:
@@ -366,7 +361,7 @@ class InAppBrowser {
     assert(_isOpened, 'The browser is not opened.');
 
     Map<String, dynamic> args = <String, dynamic>{};
-    await _channel?.invokeMethod('show', args);
+    await channel?.invokeMethod('show', args);
   }
 
   ///Hides the [InAppBrowser] window. Calling this has no effect if the [InAppBrowser] was already hidden.
@@ -379,7 +374,7 @@ class InAppBrowser {
     assert(_isOpened, 'The browser is not opened.');
 
     Map<String, dynamic> args = <String, dynamic>{};
-    await _channel?.invokeMethod('hide', args);
+    await channel?.invokeMethod('hide', args);
   }
 
   ///Closes the [InAppBrowser] window.
@@ -392,7 +387,7 @@ class InAppBrowser {
     assert(_isOpened, 'The browser is not opened.');
 
     Map<String, dynamic> args = <String, dynamic>{};
-    await _channel?.invokeMethod('close', args);
+    await channel?.invokeMethod('close', args);
   }
 
   ///Check if the Web View of the [InAppBrowser] instance is hidden.
@@ -405,7 +400,7 @@ class InAppBrowser {
     assert(_isOpened, 'The browser is not opened.');
 
     Map<String, dynamic> args = <String, dynamic>{};
-    return await _channel?.invokeMethod('isHidden', args);
+    return await channel?.invokeMethod<bool>('isHidden', args) ?? false;
   }
 
   ///Use [setSettings] instead.
@@ -415,7 +410,7 @@ class InAppBrowser {
 
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('settings', () => options.toMap());
-    await _channel?.invokeMethod('setSettings', args);
+    await channel?.invokeMethod('setSettings', args);
   }
 
   ///Use [getSettings] instead.
@@ -425,7 +420,7 @@ class InAppBrowser {
     Map<String, dynamic> args = <String, dynamic>{};
 
     Map<dynamic, dynamic>? options =
-        await _channel?.invokeMethod('getSettings', args);
+        await channel?.invokeMethod('getSettings', args);
     if (options != null) {
       options = options.cast<String, dynamic>();
       return InAppBrowserClassOptions.fromMap(options as Map<String, dynamic>);
@@ -446,7 +441,7 @@ class InAppBrowser {
 
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('settings', () => settings.toMap());
-    await _channel?.invokeMethod('setSettings', args);
+    await channel?.invokeMethod('setSettings', args);
   }
 
   ///Gets the current [InAppBrowser] settings. Returns `null` if it wasn't able to get them.
@@ -461,7 +456,7 @@ class InAppBrowser {
     Map<String, dynamic> args = <String, dynamic>{};
 
     Map<dynamic, dynamic>? settings =
-        await _channel?.invokeMethod('getSettings', args);
+        await channel?.invokeMethod('getSettings', args);
     if (settings != null) {
       settings = settings.cast<String, dynamic>();
       return InAppBrowserClassSettings.fromMap(
@@ -1361,9 +1356,10 @@ class InAppBrowser {
   void onContentSizeChanged(Size oldContentSize, Size newContentSize) {}
 
   ///Disposes the channel and controllers.
-  void _dispose() {
-    _channel?.setMethodCallHandler(null);
-    _channel = null;
+  @override
+  @mustCallSuper
+  void dispose() {
+    disposeChannel();
     _webViewController?.dispose();
     _webViewController = null;
     pullToRefreshController?.dispose();

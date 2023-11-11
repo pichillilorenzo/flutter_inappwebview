@@ -1,11 +1,9 @@
 import 'dart:async';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import '../util.dart';
 import '../debug_logging_settings.dart';
 import '../types/main.dart';
-import '../types/disposable.dart';
 
 import '../web_uri.dart';
 import 'web_authenticate_session_settings.dart';
@@ -37,7 +35,7 @@ typedef WebAuthenticationSessionCompletionHandler = Future<void> Function(
 ///**Supported Platforms/Implementations**:
 ///- iOS
 ///- MacOS
-class WebAuthenticationSession implements Disposable {
+class WebAuthenticationSession extends ChannelController {
   ///Debug settings.
   static DebugLoggingSettings debugLoggingSettings = DebugLoggingSettings();
 
@@ -56,7 +54,6 @@ class WebAuthenticationSession implements Disposable {
   ///A completion handler the session calls when it completes successfully, or when the user cancels the session.
   WebAuthenticationSessionCompletionHandler onComplete;
 
-  MethodChannel? _channel;
   static const MethodChannel _sharedChannel = const MethodChannel(
       'com.pichillilorenzo/flutter_webauthenticationsession');
 
@@ -102,16 +99,10 @@ class WebAuthenticationSession implements Disposable {
     id = IdGenerator.generate();
     this.initialSettings =
         initialSettings ?? WebAuthenticationSessionSettings();
-    this._channel = MethodChannel(
+    channel = MethodChannel(
         'com.pichillilorenzo/flutter_webauthenticationsession_$id');
-    this._channel?.setMethodCallHandler((call) async {
-      try {
-        return await _handleMethod(call);
-      } on Error catch (e) {
-        print(e);
-        print(e.stackTrace);
-      }
-    });
+    handler = _handleMethod;
+    initMethodCallHandler();
   }
 
   _debugLog(String method, dynamic args) {
@@ -147,7 +138,7 @@ class WebAuthenticationSession implements Disposable {
   ///- iOS ([Official API - ASWebAuthenticationSession.canStart](https://developer.apple.com/documentation/authenticationservices/aswebauthenticationsession/3516277-canstart))
   Future<bool> canStart() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    return await _channel?.invokeMethod('canStart', args);
+    return await channel?.invokeMethod<bool>('canStart', args) ?? false;
   }
 
   ///Starts the web authentication session.
@@ -161,7 +152,7 @@ class WebAuthenticationSession implements Disposable {
   ///- iOS ([Official API - ASWebAuthenticationSession.start](https://developer.apple.com/documentation/authenticationservices/aswebauthenticationsession/2990953-start))
   Future<bool> start() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    return await _channel?.invokeMethod('start', args);
+    return await channel?.invokeMethod<bool>('start', args) ?? false;
   }
 
   ///Cancels the web authentication session.
@@ -173,7 +164,7 @@ class WebAuthenticationSession implements Disposable {
   ///- iOS ([Official API - ASWebAuthenticationSession.cancel](https://developer.apple.com/documentation/authenticationservices/aswebauthenticationsession/2990951-cancel))
   Future<void> cancel() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    await _channel?.invokeMethod("cancel", args);
+    await channel?.invokeMethod("cancel", args);
   }
 
   ///Disposes the web authentication session.
@@ -183,9 +174,8 @@ class WebAuthenticationSession implements Disposable {
   @override
   Future<void> dispose() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    await _channel?.invokeMethod("dispose", args);
-    _channel?.setMethodCallHandler(null);
-    _channel = null;
+    await channel?.invokeMethod("dispose", args);
+    disposeChannel();
   }
 
   ///Returns `true` if [ASWebAuthenticationSession](https://developer.apple.com/documentation/authenticationservices/aswebauthenticationsession)
@@ -196,6 +186,6 @@ class WebAuthenticationSession implements Disposable {
   ///- iOS
   static Future<bool> isAvailable() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    return await _sharedChannel.invokeMethod("isAvailable", args);
+    return await _sharedChannel.invokeMethod<bool>("isAvailable", args) ?? false;
   }
 }

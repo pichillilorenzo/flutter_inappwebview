@@ -4,7 +4,6 @@ import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_i
 import '../types/proxy_rule.dart';
 import 'webview_feature.dart';
 import '../in_app_webview/webview.dart';
-import '../types/main.dart';
 
 part 'proxy_controller.g.dart';
 

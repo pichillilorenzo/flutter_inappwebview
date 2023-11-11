@@ -1,35 +1,27 @@
 import 'dart:async';
 import 'package:flutter/services.dart';
+import 'package:flutter_inappwebview/src/util.dart';
 
 import 'dart:js' as js;
 
 import 'web_platform_manager.dart';
-import '../types/disposable.dart';
 
-class PlatformUtil implements Disposable {
+class PlatformUtil extends ChannelController {
   late BinaryMessenger _messenger;
-  late MethodChannel? _channel;
 
   PlatformUtil({required BinaryMessenger messenger}) {
     this._messenger = messenger;
 
-    _channel = MethodChannel(
+    channel = MethodChannel(
       'com.pichillilorenzo/flutter_inappwebview_platformutil',
       const StandardMethodCodec(),
       _messenger,
     );
-
-    this._channel?.setMethodCallHandler((call) async {
-      try {
-        return await handleMethodCall(call);
-      } on Error catch (e) {
-        print(e);
-        print(e.stackTrace);
-      }
-    });
+    handler = _handleMethod;
+    initMethodCallHandler();
   }
 
-  Future<dynamic> handleMethodCall(MethodCall call) async {
+  Future<dynamic> _handleMethod(MethodCall call) async {
     switch (call.method) {
       case "getWebCookieExpirationDate":
         int timestamp = call.arguments['date'];
@@ -51,7 +43,6 @@ class PlatformUtil implements Disposable {
 
   @override
   void dispose() {
-    _channel?.setMethodCallHandler(null);
-    _channel = null;
+    disposeChannel();
   }
 }

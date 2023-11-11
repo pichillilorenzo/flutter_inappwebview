@@ -26,7 +26,7 @@ import 'chrome_safari_browser_secondary_toolbar.dart';
 ///**Supported Platforms/Implementations**:
 ///- Android
 ///- iOS
-class ChromeSafariBrowser {
+class ChromeSafariBrowser extends ChannelController {
   ///Debug settings.
   static DebugLoggingSettings debugLoggingSettings = DebugLoggingSettings();
 
@@ -37,36 +37,23 @@ class ChromeSafariBrowser {
   Map<int, ChromeSafariBrowserMenuItem> _menuItems = new HashMap();
   ChromeSafariBrowserSecondaryToolbar? _secondaryToolbar;
   bool _isOpened = false;
-  MethodChannel? _channel;
   static const MethodChannel _sharedChannel =
       const MethodChannel('com.pichillilorenzo/flutter_chromesafaribrowser');
 
   ChromeSafariBrowser() {
     id = IdGenerator.generate();
-    this._channel =
+    channel =
         MethodChannel('com.pichillilorenzo/flutter_chromesafaribrowser_$id');
-    this._channel?.setMethodCallHandler((call) async {
-      try {
-        return await _handleMethod(call);
-      } on Error catch (e) {
-        print(e);
-        print(e.stackTrace);
-      }
-    });
+    handler = _handleMethod;
+    initMethodCallHandler();
     _isOpened = false;
   }
 
   _init() {
-    this._channel =
+    channel =
         MethodChannel('com.pichillilorenzo/flutter_chromesafaribrowser_$id');
-    this._channel?.setMethodCallHandler((call) async {
-      try {
-        return await _handleMethod(call);
-      } on Error catch (e) {
-        print(e);
-        print(e.stackTrace);
-      }
-    });
+    handler = _handleMethod;
+    initMethodCallHandler();
   }
 
   _debugLog(String method, dynamic args) {
@@ -116,7 +103,7 @@ class ChromeSafariBrowser {
         break;
       case "onClosed":
         _isOpened = false;
-        _dispose();
+        dispose();
         onClosed();
         break;
       case "onItemActionPerform":
@@ -196,8 +183,8 @@ class ChromeSafariBrowser {
       List<WebUri>? otherLikelyURLs,
       WebUri? referrer,
       @Deprecated('Use settings instead')
-          // ignore: deprecated_member_use_from_same_package
-          ChromeSafariBrowserClassOptions? options,
+      // ignore: deprecated_member_use_from_same_package
+      ChromeSafariBrowserClassOptions? options,
       ChromeSafariBrowserSettings? settings}) async {
     assert(!_isOpened, 'The browser is already opened.');
     _isOpened = true;
@@ -262,7 +249,7 @@ class ChromeSafariBrowser {
     args.putIfAbsent('otherLikelyURLs',
         () => otherLikelyURLs?.map((e) => e.toString()).toList());
     args.putIfAbsent('referrer', () => referrer?.toString());
-    await _channel?.invokeMethod("launchUrl", args);
+    await channel?.invokeMethod("launchUrl", args);
   }
 
   ///Tells the browser of a likely future navigation to a URL.
@@ -283,7 +270,7 @@ class ChromeSafariBrowser {
     args.putIfAbsent('url', () => url?.toString());
     args.putIfAbsent('otherLikelyURLs',
         () => otherLikelyURLs?.map((e) => e.toString()).toList());
-    return await _channel?.invokeMethod("mayLaunchUrl", args);
+    return await channel?.invokeMethod<bool>("mayLaunchUrl", args) ?? false;
   }
 
   ///Requests to validate a relationship between the application and an origin.
@@ -308,7 +295,7 @@ class ChromeSafariBrowser {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('relation', () => relation.toNativeValue());
     args.putIfAbsent('origin', () => origin.toString());
-    return await _channel?.invokeMethod("validateRelationship", args);
+    return await channel?.invokeMethod<bool>("validateRelationship", args) ?? false;
   }
 
   ///Closes the [ChromeSafariBrowser] instance.
@@ -318,7 +305,7 @@ class ChromeSafariBrowser {
   ///- iOS
   Future<void> close() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    await _channel?.invokeMethod("close", args);
+    await channel?.invokeMethod("close", args);
   }
 
   ///Set a custom action button.
@@ -342,7 +329,7 @@ class ChromeSafariBrowser {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('icon', () => icon);
     args.putIfAbsent('description', () => description);
-    await _channel?.invokeMethod("updateActionButton", args);
+    await channel?.invokeMethod("updateActionButton", args);
     _actionButton?.icon = icon;
     _actionButton?.description = description;
   }
@@ -368,7 +355,7 @@ class ChromeSafariBrowser {
       ChromeSafariBrowserSecondaryToolbar secondaryToolbar) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('secondaryToolbar', () => secondaryToolbar.toMap());
-    await _channel?.invokeMethod("updateSecondaryToolbar", args);
+    await channel?.invokeMethod("updateSecondaryToolbar", args);
     this._secondaryToolbar = secondaryToolbar;
   }
 
@@ -414,7 +401,7 @@ class ChromeSafariBrowser {
   ///- Android
   static Future<int> getMaxToolbarItems() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    return await _sharedChannel.invokeMethod("getMaxToolbarItems", args);
+    return await _sharedChannel.invokeMethod<int>("getMaxToolbarItems", args) ?? 0;
   }
 
   ///Clear associated website data accrued from browsing activity within your app.
@@ -543,8 +530,9 @@ class ChromeSafariBrowser {
   }
 
   ///Disposes the channel.
-  void _dispose() {
-    _channel?.setMethodCallHandler(null);
-    _channel = null;
+  @override
+  @mustCallSuper
+  void dispose() {
+    disposeChannel();
   }
 }

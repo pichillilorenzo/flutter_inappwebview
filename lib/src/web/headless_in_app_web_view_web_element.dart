@@ -5,13 +5,11 @@ import 'package:flutter/services.dart';
 import 'headless_inappwebview_manager.dart';
 import 'in_app_web_view_web_element.dart';
 import '../util.dart';
-import '../types/disposable.dart';
 
-class HeadlessInAppWebViewWebElement implements Disposable {
+class HeadlessInAppWebViewWebElement extends ChannelController {
   String id;
   late BinaryMessenger _messenger;
   InAppWebViewWebElement? webView;
-  late MethodChannel? _channel;
 
   HeadlessInAppWebViewWebElement(
       {required this.id,
@@ -19,23 +17,16 @@ class HeadlessInAppWebViewWebElement implements Disposable {
       required this.webView}) {
     this._messenger = messenger;
 
-    _channel = MethodChannel(
+    channel = MethodChannel(
       'com.pichillilorenzo/flutter_headless_inappwebview_${this.id}',
       const StandardMethodCodec(),
       _messenger,
     );
-
-    this._channel?.setMethodCallHandler((call) async {
-      try {
-        return await handleMethodCall(call);
-      } on Error catch (e) {
-        print(e);
-        print(e.stackTrace);
-      }
-    });
+    handler = _handleMethod;
+    initMethodCallHandler();
   }
 
-  Future<dynamic> handleMethodCall(MethodCall call) async {
+  Future<dynamic> _handleMethod(MethodCall call) async {
     switch (call.method) {
       case "dispose":
         dispose();
@@ -57,7 +48,7 @@ class HeadlessInAppWebViewWebElement implements Disposable {
   }
 
   void onWebViewCreated() async {
-    await _channel?.invokeMethod("onWebViewCreated");
+    await channel?.invokeMethod("onWebViewCreated");
   }
 
   void setSize(Size size) {
@@ -73,8 +64,7 @@ class HeadlessInAppWebViewWebElement implements Disposable {
 
   @override
   void dispose() {
-    _channel?.setMethodCallHandler(null);
-    _channel = null;
+    disposeChannel();
     HeadlessInAppWebViewManager.webViews.putIfAbsent(id, () => null);
     webView?.dispose();
     webView = null;

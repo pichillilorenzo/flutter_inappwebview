@@ -20,12 +20,11 @@ import '../debug_logging_settings.dart';
 ///**Supported Platforms/Implementations**:
 ///- Android native WebView
 ///- iOS
-class PullToRefreshController {
+class PullToRefreshController extends ChannelController {
   @Deprecated("Use settings instead")
   // ignore: deprecated_member_use_from_same_package
   late PullToRefreshOptions options;
   late PullToRefreshSettings settings;
-  MethodChannel? _channel;
 
   ///Debug settings.
   static DebugLoggingSettings debugLoggingSettings = DebugLoggingSettings();
@@ -73,7 +72,7 @@ class PullToRefreshController {
   Future<void> setEnabled(bool enabled) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('enabled', () => enabled);
-    await _channel?.invokeMethod('setEnabled', args);
+    await channel?.invokeMethod('setEnabled', args);
   }
 
   ///Returns `true` is pull-to-refresh feature is enabled, otherwise `false`.
@@ -83,13 +82,13 @@ class PullToRefreshController {
   ///- iOS ([Official API - UIScrollView.refreshControl](https://developer.apple.com/documentation/uikit/uiscrollview/2127691-refreshcontrol))
   Future<bool> isEnabled() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    return await _channel?.invokeMethod('isEnabled', args);
+    return await channel?.invokeMethod<bool>('isEnabled', args) ?? false;
   }
 
   Future<void> _setRefreshing(bool refreshing) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('refreshing', () => refreshing);
-    await _channel?.invokeMethod('setRefreshing', args);
+    await channel?.invokeMethod('setRefreshing', args);
   }
 
   ///Tells the controller that a refresh operation was started programmatically.
@@ -126,7 +125,7 @@ class PullToRefreshController {
   ///- iOS ([Official API - UIRefreshControl.isRefreshing](https://developer.apple.com/documentation/uikit/uirefreshcontrol/1624844-isrefreshing))
   Future<bool> isRefreshing() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    return await _channel?.invokeMethod('isRefreshing', args);
+    return await channel?.invokeMethod<bool>('isRefreshing', args) ?? false;
   }
 
   ///Sets the color of the refresh control.
@@ -137,7 +136,7 @@ class PullToRefreshController {
   Future<void> setColor(Color color) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('color', () => color.toHex());
-    await _channel?.invokeMethod('setColor', args);
+    await channel?.invokeMethod('setColor', args);
   }
 
   ///Sets the background color of the refresh control.
@@ -148,7 +147,7 @@ class PullToRefreshController {
   Future<void> setBackgroundColor(Color color) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('color', () => color.toHex());
-    await _channel?.invokeMethod('setBackgroundColor', args);
+    await channel?.invokeMethod('setBackgroundColor', args);
   }
 
   ///Set the distance to trigger a sync in dips.
@@ -158,7 +157,7 @@ class PullToRefreshController {
   Future<void> setDistanceToTriggerSync(int distanceToTriggerSync) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('distanceToTriggerSync', () => distanceToTriggerSync);
-    await _channel?.invokeMethod('setDistanceToTriggerSync', args);
+    await channel?.invokeMethod('setDistanceToTriggerSync', args);
   }
 
   ///Sets the distance that the refresh indicator can be pulled beyond its resting position during a swipe gesture.
@@ -168,7 +167,7 @@ class PullToRefreshController {
   Future<void> setSlingshotDistance(int slingshotDistance) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('slingshotDistance', () => slingshotDistance);
-    await _channel?.invokeMethod('setSlingshotDistance', args);
+    await channel?.invokeMethod('setSlingshotDistance', args);
   }
 
   ///Gets the default distance that the refresh indicator can be pulled beyond its resting position during a swipe gesture.
@@ -177,7 +176,7 @@ class PullToRefreshController {
   ///- Android native WebView ([Official API - SwipeRefreshLayout.DEFAULT_SLINGSHOT_DISTANCE](https://developer.android.com/reference/androidx/swiperefreshlayout/widget/SwipeRefreshLayout#DEFAULT_SLINGSHOT_DISTANCE()))
   Future<int> getDefaultSlingshotDistance() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    return await _channel?.invokeMethod('getDefaultSlingshotDistance', args);
+    return await channel?.invokeMethod<int>('getDefaultSlingshotDistance', args) ?? 0;
   }
 
   ///Use [setIndicatorSize] instead.
@@ -185,7 +184,7 @@ class PullToRefreshController {
   Future<void> setSize(AndroidPullToRefreshSize size) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('size', () => size.toNativeValue());
-    await _channel?.invokeMethod('setSize', args);
+    await channel?.invokeMethod('setSize', args);
   }
 
   ///Sets the size of the refresh indicator. One of [PullToRefreshSize.DEFAULT], or [PullToRefreshSize.LARGE].
@@ -195,7 +194,7 @@ class PullToRefreshController {
   Future<void> setIndicatorSize(PullToRefreshSize size) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('size', () => size.toNativeValue());
-    await _channel?.invokeMethod('setSize', args);
+    await channel?.invokeMethod('setSize', args);
   }
 
   ///Use [setStyledTitle] instead.
@@ -203,7 +202,7 @@ class PullToRefreshController {
   Future<void> setAttributedTitle(IOSNSAttributedString attributedTitle) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('attributedTitle', () => attributedTitle.toMap());
-    await _channel?.invokeMethod('setStyledTitle', args);
+    await channel?.invokeMethod('setStyledTitle', args);
   }
 
   ///Sets the styled title text to display in the refresh control.
@@ -213,30 +212,21 @@ class PullToRefreshController {
   Future<void> setStyledTitle(AttributedString attributedTitle) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('attributedTitle', () => attributedTitle.toMap());
-    await _channel?.invokeMethod('setStyledTitle', args);
+    await channel?.invokeMethod('setStyledTitle', args);
   }
 
   ///Disposes the controller.
+  @override
   void dispose({bool isKeepAlive = false}) {
-    if (!isKeepAlive) {
-      _channel?.setMethodCallHandler(null);
-    }
-    _channel = null;
+    disposeChannel(removeMethodCallHandler: !isKeepAlive);
   }
 }
 
 extension InternalPullToRefreshController on PullToRefreshController {
   void init(dynamic id) {
-    this._channel = MethodChannel(
+    channel = MethodChannel(
         'com.pichillilorenzo/flutter_inappwebview_pull_to_refresh_$id');
-    this._channel?.setMethodCallHandler((call) async {
-      if (_channel == null) return null;
-      try {
-        return await _handleMethod(call);
-      } on Error catch (e) {
-        print(e);
-        print(e.stackTrace);
-      }
-    });
+    handler = _handleMethod;
+    initMethodCallHandler();
   }
 }

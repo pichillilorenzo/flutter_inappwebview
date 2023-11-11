@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import '../in_app_webview/in_app_webview_controller.dart';
+import '../types/disposable.dart';
 import '../types/main.dart';
 import 'web_storage_item.dart';
 
@@ -12,7 +13,7 @@ import 'web_storage_item.dart';
 ///- iOS
 ///- MacOS
 ///- Web
-class WebStorage {
+class WebStorage implements Disposable {
   ///Represents `window.localStorage`.
   LocalStorage localStorage;
 
@@ -22,6 +23,7 @@ class WebStorage {
   WebStorage({required this.localStorage, required this.sessionStorage});
 
   ///Disposes the web storage.
+  @override
   void dispose() {
     localStorage.dispose();
     sessionStorage.dispose();
@@ -30,7 +32,7 @@ class WebStorage {
 
 ///Class that provides methods to manage the JavaScript [Storage](https://developer.mozilla.org/en-US/docs/Web/API/Storage) object.
 ///It is used by [LocalStorage] and [SessionStorage].
-class Storage {
+class Storage implements Disposable {
   InAppWebViewController? _controller;
 
   ///The web storage type: `window.sessionStorage` or `window.localStorage`.
@@ -179,6 +181,7 @@ class Storage {
   }
 
   ///Disposes the storage.
+  @override
   void dispose() {
     _controller = null;
   }

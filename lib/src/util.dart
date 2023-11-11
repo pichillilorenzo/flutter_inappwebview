@@ -4,8 +4,10 @@ import 'dart:typed_data';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import 'debug_logging_settings.dart';
+import 'types/disposable.dart';
 
 class Util {
   static bool get isWeb => kIsWeb;
@@ -581,4 +583,61 @@ void debugLog(
 // For some strange reason, Color is not recognized anymore by the dart analyzer correctly.
 class Color_ extends Color {
   Color_(int value) : super(value);
+}
+
+abstract class ChannelController implements Disposable {
+  MethodChannel? _channel;
+  Future<dynamic> Function(MethodCall call)? _handler;
+
+  static bool debugAssertNotDisposed(ChannelController controller) {
+    assert(() {
+      if (controller.disposed) {
+        throw FlutterError(
+          'A ${controller.runtimeType} was used after being disposed.\n'
+              'Once the ${controller.runtimeType} has been disposed, it '
+              'can no longer be used.',
+        );
+      }
+      return true;
+    }());
+    return true;
+  }
+}
+
+extension InternalChannelController on ChannelController {
+  set channel (MethodChannel? channel) => _channel = channel;
+
+  MethodChannel? get channel {
+    assert(ChannelController.debugAssertNotDisposed(this));
+    return this._channel;
+  }
+
+  set handler (Future<dynamic> Function(MethodCall call)? handler) => _handler = handler;
+
+  Future<dynamic> Function(MethodCall call)? get handler => _handler;
+
+  bool get disposed => _channel == null;
+
+  initMethodCallHandler() {
+    assert(channel != null, 'Method Channel for ${runtimeType} not initialized!');
+    assert(handler != null, 'Method Call Handler for ${runtimeType} not initialized!');
+
+    channel?.setMethodCallHandler((call) async {
+      if (disposed) return null;
+      try {
+        return await handler!(call);
+      } on Error catch (e) {
+        print(e);
+        print(e.stackTrace);
+      }
+    });
+  }
+
+  disposeChannel({bool removeMethodCallHandler = true}) {
+    if (removeMethodCallHandler) {
+      channel?.setMethodCallHandler(null);
+    }
+    channel = null;
+    handler = null;
+  }
 }

@@ -151,23 +151,19 @@ class URLRequest {
       this.httpShouldHandleCookies,
       this.httpShouldUsePipelining,
       @Deprecated('Use allowsCellularAccess instead')
-          this.iosAllowsCellularAccess,
+      this.iosAllowsCellularAccess,
       @Deprecated('Use allowsConstrainedNetworkAccess instead')
-          this.iosAllowsConstrainedNetworkAccess,
+      this.iosAllowsConstrainedNetworkAccess,
       @Deprecated('Use allowsExpensiveNetworkAccess instead')
-          this.iosAllowsExpensiveNetworkAccess,
-      @Deprecated('Use cachePolicy instead')
-          this.iosCachePolicy,
+      this.iosAllowsExpensiveNetworkAccess,
+      @Deprecated('Use cachePolicy instead') this.iosCachePolicy,
       @Deprecated('Use httpShouldHandleCookies instead')
-          this.iosHttpShouldHandleCookies,
+      this.iosHttpShouldHandleCookies,
       @Deprecated('Use httpShouldUsePipelining instead')
-          this.iosHttpShouldUsePipelining,
-      @Deprecated('Use mainDocumentURL instead')
-          this.iosMainDocumentURL,
-      @Deprecated('Use networkServiceType instead')
-          this.iosNetworkServiceType,
-      @Deprecated('Use timeoutInterval instead')
-          this.iosTimeoutInterval,
+      this.iosHttpShouldUsePipelining,
+      @Deprecated('Use mainDocumentURL instead') this.iosMainDocumentURL,
+      @Deprecated('Use networkServiceType instead') this.iosNetworkServiceType,
+      @Deprecated('Use timeoutInterval instead') this.iosTimeoutInterval,
       this.mainDocumentURL,
       this.method,
       this.networkServiceType,

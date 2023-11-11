@@ -70,8 +70,7 @@ class InAppBrowser extends ChannelController {
   }
 
   _init() {
-    channel =
-        MethodChannel('com.pichillilorenzo/flutter_inappbrowser_$id');
+    channel = MethodChannel('com.pichillilorenzo/flutter_inappbrowser_$id');
     handler = _handleMethod;
     initMethodCallHandler();
 

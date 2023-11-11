@@ -29,7 +29,8 @@ import '../types/disposable.dart';
 ///- Web
 ///- MacOS
 ///{@endtemplate}
-class HeadlessInAppWebView extends ChannelController implements WebView, Disposable {
+class HeadlessInAppWebView extends ChannelController
+    implements WebView, Disposable {
   ///View ID.
   late final String id;
 
@@ -68,8 +69,7 @@ class HeadlessInAppWebView extends ChannelController implements WebView, Disposa
       this.initialUrlRequest,
       this.initialFile,
       this.initialData,
-      @Deprecated('Use initialSettings instead')
-          this.initialOptions,
+      @Deprecated('Use initialSettings instead') this.initialOptions,
       this.initialSettings,
       this.contextMenu,
       this.initialUserScripts,
@@ -78,22 +78,19 @@ class HeadlessInAppWebView extends ChannelController implements WebView, Disposa
       this.onWebViewCreated,
       this.onLoadStart,
       this.onLoadStop,
-      @Deprecated("Use onReceivedError instead")
-          this.onLoadError,
+      @Deprecated("Use onReceivedError instead") this.onLoadError,
       this.onReceivedError,
-      @Deprecated("Use onReceivedHttpError instead")
-          this.onLoadHttpError,
+      @Deprecated("Use onReceivedHttpError instead") this.onLoadHttpError,
       this.onReceivedHttpError,
       this.onProgressChanged,
       this.onConsoleMessage,
       this.shouldOverrideUrlLoading,
       this.onLoadResource,
       this.onScrollChanged,
-      @Deprecated('Use onDownloadStartRequest instead')
-          this.onDownloadStart,
+      @Deprecated('Use onDownloadStartRequest instead') this.onDownloadStart,
       this.onDownloadStartRequest,
       @Deprecated('Use onLoadResourceWithCustomScheme instead')
-          this.onLoadResourceCustomScheme,
+      this.onLoadResourceCustomScheme,
       this.onLoadResourceWithCustomScheme,
       this.onCreateWindow,
       this.onCloseWindow,
@@ -104,14 +101,13 @@ class HeadlessInAppWebView extends ChannelController implements WebView, Disposa
       this.onReceivedServerTrustAuthRequest,
       this.onReceivedClientCertRequest,
       @Deprecated('Use FindInteractionController.onFindResultReceived instead')
-          this.onFindResultReceived,
+      this.onFindResultReceived,
       this.shouldInterceptAjaxRequest,
       this.onAjaxReadyStateChange,
       this.onAjaxProgress,
       this.shouldInterceptFetchRequest,
       this.onUpdateVisitedHistory,
-      @Deprecated("Use onPrintRequest instead")
-          this.onPrint,
+      @Deprecated("Use onPrintRequest instead") this.onPrint,
       this.onPrintRequest,
       this.onLongPressHitTestResult,
       this.onEnterFullscreen,
@@ -122,59 +118,57 @@ class HeadlessInAppWebView extends ChannelController implements WebView, Disposa
       this.onWindowBlur,
       this.onOverScrolled,
       @Deprecated('Use onSafeBrowsingHit instead')
-          this.androidOnSafeBrowsingHit,
+      this.androidOnSafeBrowsingHit,
       this.onSafeBrowsingHit,
       @Deprecated('Use onPermissionRequest instead')
-          this.androidOnPermissionRequest,
+      this.androidOnPermissionRequest,
       this.onPermissionRequest,
       @Deprecated('Use onGeolocationPermissionsShowPrompt instead')
-          this.androidOnGeolocationPermissionsShowPrompt,
+      this.androidOnGeolocationPermissionsShowPrompt,
       this.onGeolocationPermissionsShowPrompt,
       @Deprecated('Use onGeolocationPermissionsHidePrompt instead')
-          this.androidOnGeolocationPermissionsHidePrompt,
+      this.androidOnGeolocationPermissionsHidePrompt,
       this.onGeolocationPermissionsHidePrompt,
       @Deprecated('Use shouldInterceptRequest instead')
-          this.androidShouldInterceptRequest,
+      this.androidShouldInterceptRequest,
       this.shouldInterceptRequest,
       @Deprecated('Use onRenderProcessGone instead')
-          this.androidOnRenderProcessGone,
+      this.androidOnRenderProcessGone,
       this.onRenderProcessGone,
       @Deprecated('Use onRenderProcessResponsive instead')
-          this.androidOnRenderProcessResponsive,
+      this.androidOnRenderProcessResponsive,
       this.onRenderProcessResponsive,
       @Deprecated('Use onRenderProcessUnresponsive instead')
-          this.androidOnRenderProcessUnresponsive,
+      this.androidOnRenderProcessUnresponsive,
       this.onRenderProcessUnresponsive,
       @Deprecated('Use onFormResubmission instead')
-          this.androidOnFormResubmission,
+      this.androidOnFormResubmission,
       this.onFormResubmission,
-      @Deprecated('Use onZoomScaleChanged instead')
-          this.androidOnScaleChanged,
-      @Deprecated('Use onReceivedIcon instead')
-          this.androidOnReceivedIcon,
+      @Deprecated('Use onZoomScaleChanged instead') this.androidOnScaleChanged,
+      @Deprecated('Use onReceivedIcon instead') this.androidOnReceivedIcon,
       this.onReceivedIcon,
       @Deprecated('Use onReceivedTouchIconUrl instead')
-          this.androidOnReceivedTouchIconUrl,
+      this.androidOnReceivedTouchIconUrl,
       this.onReceivedTouchIconUrl,
-      @Deprecated('Use onJsBeforeUnload instead')
-          this.androidOnJsBeforeUnload,
+      @Deprecated('Use onJsBeforeUnload instead') this.androidOnJsBeforeUnload,
       this.onJsBeforeUnload,
       @Deprecated('Use onReceivedLoginRequest instead')
-          this.androidOnReceivedLoginRequest,
+      this.androidOnReceivedLoginRequest,
       this.onReceivedLoginRequest,
       this.onPermissionRequestCanceled,
       this.onRequestFocus,
       @Deprecated('Use onWebContentProcessDidTerminate instead')
-          this.iosOnWebContentProcessDidTerminate,
+      this.iosOnWebContentProcessDidTerminate,
       this.onWebContentProcessDidTerminate,
-      @Deprecated('Use onDidReceiveServerRedirectForProvisionalNavigation instead')
-          this.iosOnDidReceiveServerRedirectForProvisionalNavigation,
+      @Deprecated(
+          'Use onDidReceiveServerRedirectForProvisionalNavigation instead')
+      this.iosOnDidReceiveServerRedirectForProvisionalNavigation,
       this.onDidReceiveServerRedirectForProvisionalNavigation,
       @Deprecated('Use onNavigationResponse instead')
-          this.iosOnNavigationResponse,
+      this.iosOnNavigationResponse,
       this.onNavigationResponse,
       @Deprecated('Use shouldAllowDeprecatedTLS instead')
-          this.iosShouldAllowDeprecatedTLS,
+      this.iosShouldAllowDeprecatedTLS,
       this.shouldAllowDeprecatedTLS,
       this.onCameraCaptureStateChanged,
       this.onMicrophoneCaptureStateChanged,
@@ -364,8 +358,7 @@ class HeadlessInAppWebView extends ChannelController implements WebView, Disposa
 
     Map<String, dynamic> args = <String, dynamic>{};
     Map<String, dynamic> sizeMap =
-        (await channel?.invokeMethod('getSize', args))
-            ?.cast<String, dynamic>();
+        (await channel?.invokeMethod('getSize', args))?.cast<String, dynamic>();
     return MapSize.fromMap(sizeMap);
   }
 

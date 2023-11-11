@@ -86,7 +86,9 @@ class InAppLocalhostServer {
           path = _documentRoot + path;
 
           try {
-            body = (await rootBundle.load(Uri.decodeFull(path))).buffer.asUint8List();
+            body = (await rootBundle.load(Uri.decodeFull(path)))
+                .buffer
+                .asUint8List();
           } catch (e) {
             print(e.toString());
             request.response.close();

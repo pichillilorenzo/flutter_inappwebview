@@ -101,7 +101,7 @@ class InAppWebView extends StatefulWidget implements WebView {
     @Deprecated('Use onDownloadStartRequest instead') this.onDownloadStart,
     this.onDownloadStartRequest,
     @Deprecated('Use onLoadResourceWithCustomScheme instead')
-        this.onLoadResourceCustomScheme,
+    this.onLoadResourceCustomScheme,
     this.onLoadResourceWithCustomScheme,
     this.onCreateWindow,
     this.onCloseWindow,
@@ -112,7 +112,7 @@ class InAppWebView extends StatefulWidget implements WebView {
     this.onReceivedServerTrustAuthRequest,
     this.onReceivedClientCertRequest,
     @Deprecated('Use FindInteractionController.onFindResultReceived instead')
-        this.onFindResultReceived,
+    this.onFindResultReceived,
     this.shouldInterceptAjaxRequest,
     this.onAjaxReadyStateChange,
     this.onAjaxProgress,
@@ -132,53 +132,54 @@ class InAppWebView extends StatefulWidget implements WebView {
     @Deprecated('Use onSafeBrowsingHit instead') this.androidOnSafeBrowsingHit,
     this.onSafeBrowsingHit,
     @Deprecated('Use onPermissionRequest instead')
-        this.androidOnPermissionRequest,
+    this.androidOnPermissionRequest,
     this.onPermissionRequest,
     @Deprecated('Use onGeolocationPermissionsShowPrompt instead')
-        this.androidOnGeolocationPermissionsShowPrompt,
+    this.androidOnGeolocationPermissionsShowPrompt,
     this.onGeolocationPermissionsShowPrompt,
     @Deprecated('Use onGeolocationPermissionsHidePrompt instead')
-        this.androidOnGeolocationPermissionsHidePrompt,
+    this.androidOnGeolocationPermissionsHidePrompt,
     this.onGeolocationPermissionsHidePrompt,
     @Deprecated('Use shouldInterceptRequest instead')
-        this.androidShouldInterceptRequest,
+    this.androidShouldInterceptRequest,
     this.shouldInterceptRequest,
     @Deprecated('Use onRenderProcessGone instead')
-        this.androidOnRenderProcessGone,
+    this.androidOnRenderProcessGone,
     this.onRenderProcessGone,
     @Deprecated('Use onRenderProcessResponsive instead')
-        this.androidOnRenderProcessResponsive,
+    this.androidOnRenderProcessResponsive,
     this.onRenderProcessResponsive,
     @Deprecated('Use onRenderProcessUnresponsive instead')
-        this.androidOnRenderProcessUnresponsive,
+    this.androidOnRenderProcessUnresponsive,
     this.onRenderProcessUnresponsive,
     @Deprecated('Use onFormResubmission instead')
-        this.androidOnFormResubmission,
+    this.androidOnFormResubmission,
     this.onFormResubmission,
     @Deprecated('Use onZoomScaleChanged instead') this.androidOnScaleChanged,
     @Deprecated('Use onReceivedIcon instead') this.androidOnReceivedIcon,
     this.onReceivedIcon,
     @Deprecated('Use onReceivedTouchIconUrl instead')
-        this.androidOnReceivedTouchIconUrl,
+    this.androidOnReceivedTouchIconUrl,
     this.onReceivedTouchIconUrl,
     @Deprecated('Use onJsBeforeUnload instead') this.androidOnJsBeforeUnload,
     this.onJsBeforeUnload,
     @Deprecated('Use onReceivedLoginRequest instead')
-        this.androidOnReceivedLoginRequest,
+    this.androidOnReceivedLoginRequest,
     this.onReceivedLoginRequest,
     this.onPermissionRequestCanceled,
     this.onRequestFocus,
     @Deprecated('Use onWebContentProcessDidTerminate instead')
-        this.iosOnWebContentProcessDidTerminate,
+    this.iosOnWebContentProcessDidTerminate,
     this.onWebContentProcessDidTerminate,
-    @Deprecated('Use onDidReceiveServerRedirectForProvisionalNavigation instead')
-        this.iosOnDidReceiveServerRedirectForProvisionalNavigation,
+    @Deprecated(
+        'Use onDidReceiveServerRedirectForProvisionalNavigation instead')
+    this.iosOnDidReceiveServerRedirectForProvisionalNavigation,
     this.onDidReceiveServerRedirectForProvisionalNavigation,
     @Deprecated('Use onNavigationResponse instead')
-        this.iosOnNavigationResponse,
+    this.iosOnNavigationResponse,
     this.onNavigationResponse,
     @Deprecated('Use shouldAllowDeprecatedTLS instead')
-        this.iosShouldAllowDeprecatedTLS,
+    this.iosShouldAllowDeprecatedTLS,
     this.shouldAllowDeprecatedTLS,
     this.onCameraCaptureStateChanged,
     this.onMicrophoneCaptureStateChanged,

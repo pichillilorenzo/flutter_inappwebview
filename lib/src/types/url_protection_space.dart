@@ -132,15 +132,13 @@ class URLProtectionSpace_ {
       this.sslCertificate,
       this.sslError,
       @Deprecated("Use authenticationMethod instead")
-          this.iosAuthenticationMethod,
+      this.iosAuthenticationMethod,
       this.authenticationMethod,
-      @Deprecated("Use distinguishedNames instead")
-          this.iosDistinguishedNames,
+      @Deprecated("Use distinguishedNames instead") this.iosDistinguishedNames,
       this.distinguishedNames,
       @Deprecated("Use receivesCredentialSecurely instead")
-          this.iosReceivesCredentialSecurely,
+      this.iosReceivesCredentialSecurely,
       this.receivesCredentialSecurely,
-      @Deprecated("Use proxyType instead")
-          this.iosProxyType,
+      @Deprecated("Use proxyType instead") this.iosProxyType,
       this.proxyType});
 }

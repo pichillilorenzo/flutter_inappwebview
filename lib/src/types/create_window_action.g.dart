@@ -32,29 +32,23 @@ class CreateWindowAction extends NavigationAction {
   ///The window id. Used by [WebView] to create a new WebView.
   int windowId;
   CreateWindowAction(
-      {@Deprecated('Use isDialog instead')
-          this.androidIsDialog,
-      @Deprecated('Use windowFeatures instead')
-          this.iosWindowFeatures,
+      {@Deprecated('Use isDialog instead') this.androidIsDialog,
+      @Deprecated('Use windowFeatures instead') this.iosWindowFeatures,
       this.isDialog,
       this.windowFeatures,
       required this.windowId,
       required URLRequest request,
       required bool isForMainFrame,
-      @Deprecated('Use hasGesture instead')
-          bool? androidHasGesture,
+      @Deprecated('Use hasGesture instead') bool? androidHasGesture,
       bool? hasGesture,
-      @Deprecated('Use isRedirect instead')
-          bool? androidIsRedirect,
+      @Deprecated('Use isRedirect instead') bool? androidIsRedirect,
       bool? isRedirect,
       @Deprecated('Use navigationType instead')
-          IOSWKNavigationType? iosWKNavigationType,
+      IOSWKNavigationType? iosWKNavigationType,
       NavigationType? navigationType,
-      @Deprecated('Use sourceFrame instead')
-          IOSWKFrameInfo? iosSourceFrame,
+      @Deprecated('Use sourceFrame instead') IOSWKFrameInfo? iosSourceFrame,
       FrameInfo? sourceFrame,
-      @Deprecated('Use targetFrame instead')
-          IOSWKFrameInfo? iosTargetFrame,
+      @Deprecated('Use targetFrame instead') IOSWKFrameInfo? iosTargetFrame,
       FrameInfo? targetFrame,
       bool? shouldPerformDownload})
       : super(

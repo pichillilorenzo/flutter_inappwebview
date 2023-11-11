@@ -30,7 +30,7 @@ class ClientCertResponse {
       {required this.certificatePath,
       this.certificatePassword = "",
       @Deprecated('Use keyStoreType instead')
-          this.androidKeyStoreType = "PKCS12",
+      this.androidKeyStoreType = "PKCS12",
       this.keyStoreType = "PKCS12",
       this.action = ClientCertResponseAction.CANCEL}) {
     if (this.action == ClientCertResponseAction.PROCEED)

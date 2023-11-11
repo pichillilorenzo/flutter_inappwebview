@@ -176,7 +176,9 @@ class PullToRefreshController extends ChannelController {
   ///- Android native WebView ([Official API - SwipeRefreshLayout.DEFAULT_SLINGSHOT_DISTANCE](https://developer.android.com/reference/androidx/swiperefreshlayout/widget/SwipeRefreshLayout#DEFAULT_SLINGSHOT_DISTANCE()))
   Future<int> getDefaultSlingshotDistance() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    return await channel?.invokeMethod<int>('getDefaultSlingshotDistance', args) ?? 0;
+    return await channel?.invokeMethod<int>(
+            'getDefaultSlingshotDistance', args) ??
+        0;
   }
 
   ///Use [setIndicatorSize] instead.

@@ -93,8 +93,7 @@ class PrintJobController extends ChannelController {
   Future<PrintJobInfo?> getInfo() async {
     Map<String, dynamic> args = <String, dynamic>{};
     Map<String, dynamic>? infoMap =
-        (await channel?.invokeMethod('getInfo', args))
-            ?.cast<String, dynamic>();
+        (await channel?.invokeMethod('getInfo', args))?.cast<String, dynamic>();
     return PrintJobInfo.fromMap(infoMap);
   }
 

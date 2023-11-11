@@ -223,31 +223,27 @@ class URLRequest_ {
       this.headers,
       this.body,
       @Deprecated("Use allowsCellularAccess instead")
-          this.iosAllowsCellularAccess,
+      this.iosAllowsCellularAccess,
       this.allowsCellularAccess,
       @Deprecated("Use allowsConstrainedNetworkAccess instead")
-          this.iosAllowsConstrainedNetworkAccess,
+      this.iosAllowsConstrainedNetworkAccess,
       this.allowsConstrainedNetworkAccess,
       @Deprecated("Use allowsExpensiveNetworkAccess instead")
-          this.iosAllowsExpensiveNetworkAccess,
+      this.iosAllowsExpensiveNetworkAccess,
       this.allowsExpensiveNetworkAccess,
-      @Deprecated("Use cachePolicy instead")
-          this.iosCachePolicy,
+      @Deprecated("Use cachePolicy instead") this.iosCachePolicy,
       this.cachePolicy,
       @Deprecated("Use httpShouldHandleCookies instead")
-          this.iosHttpShouldHandleCookies,
+      this.iosHttpShouldHandleCookies,
       this.httpShouldHandleCookies,
       @Deprecated("Use httpShouldUsePipelining instead")
-          this.iosHttpShouldUsePipelining,
+      this.iosHttpShouldUsePipelining,
       this.httpShouldUsePipelining,
-      @Deprecated("Use networkServiceType instead")
-          this.iosNetworkServiceType,
+      @Deprecated("Use networkServiceType instead") this.iosNetworkServiceType,
       this.networkServiceType,
-      @Deprecated("Use timeoutInterval instead")
-          this.iosTimeoutInterval,
+      @Deprecated("Use timeoutInterval instead") this.iosTimeoutInterval,
       this.timeoutInterval,
-      @Deprecated("Use mainDocumentURL instead")
-          this.iosMainDocumentURL,
+      @Deprecated("Use mainDocumentURL instead") this.iosMainDocumentURL,
       this.mainDocumentURL,
       this.assumesHTTP3Capable,
       this.attribution});

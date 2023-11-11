@@ -42,31 +42,27 @@ class CreateWindowAction_ extends NavigationAction_ {
 
   CreateWindowAction_(
       {required this.windowId,
-      @Deprecated('Use isDialog instead')
-          this.androidIsDialog,
+      @Deprecated('Use isDialog instead') this.androidIsDialog,
       this.isDialog,
-      @Deprecated('Use windowFeatures instead')
-          this.iosWindowFeatures,
+      @Deprecated('Use windowFeatures instead') this.iosWindowFeatures,
       this.windowFeatures,
       required URLRequest_ request,
       required bool isForMainFrame,
-      @Deprecated('Use hasGesture instead')
-          bool? androidHasGesture,
-      @Deprecated('Use isRedirect instead')
-          bool? androidIsRedirect,
+      @Deprecated('Use hasGesture instead') bool? androidHasGesture,
+      @Deprecated('Use isRedirect instead') bool? androidIsRedirect,
       bool? hasGesture,
       bool? isRedirect,
       @Deprecated('Use navigationType instead')
-          // ignore: deprecated_member_use_from_same_package
-          IOSWKNavigationType_? iosWKNavigationType,
+      // ignore: deprecated_member_use_from_same_package
+      IOSWKNavigationType_? iosWKNavigationType,
       NavigationType_? navigationType,
       @Deprecated('Use sourceFrame instead')
-          // ignore: deprecated_member_use_from_same_package
-          IOSWKFrameInfo_? iosSourceFrame,
+      // ignore: deprecated_member_use_from_same_package
+      IOSWKFrameInfo_? iosSourceFrame,
       FrameInfo_? sourceFrame,
       @Deprecated('Use targetFrame instead')
-          // ignore: deprecated_member_use_from_same_package
-          IOSWKFrameInfo_? iosTargetFrame,
+      // ignore: deprecated_member_use_from_same_package
+      IOSWKFrameInfo_? iosTargetFrame,
       FrameInfo_? targetFrame})
       : super(
             request: request,

@@ -81,13 +81,11 @@ class URLProtectionSpace {
       this.distinguishedNames,
       required this.host,
       @Deprecated('Use authenticationMethod instead')
-          this.iosAuthenticationMethod,
-      @Deprecated('Use distinguishedNames instead')
-          this.iosDistinguishedNames,
-      @Deprecated('Use proxyType instead')
-          this.iosProxyType,
+      this.iosAuthenticationMethod,
+      @Deprecated('Use distinguishedNames instead') this.iosDistinguishedNames,
+      @Deprecated('Use proxyType instead') this.iosProxyType,
       @Deprecated('Use receivesCredentialSecurely instead')
-          this.iosReceivesCredentialSecurely,
+      this.iosReceivesCredentialSecurely,
       this.port,
       this.protocol,
       this.proxyType,

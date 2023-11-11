@@ -92,7 +92,7 @@ class CookieManager {
       bool? isHttpOnly,
       HTTPCookieSameSitePolicy? sameSite,
       @Deprecated("Use webViewController instead")
-          InAppWebViewController? iosBelow11WebViewController,
+      InAppWebViewController? iosBelow11WebViewController,
       InAppWebViewController? webViewController}) async {
     webViewController = webViewController ?? iosBelow11WebViewController;
 
@@ -204,7 +204,7 @@ class CookieManager {
   Future<List<Cookie>> getCookies(
       {required WebUri url,
       @Deprecated("Use webViewController instead")
-          InAppWebViewController? iosBelow11WebViewController,
+      InAppWebViewController? iosBelow11WebViewController,
       InAppWebViewController? webViewController}) async {
     assert(url.toString().isNotEmpty);
 
@@ -318,7 +318,7 @@ class CookieManager {
       {required WebUri url,
       required String name,
       @Deprecated("Use webViewController instead")
-          InAppWebViewController? iosBelow11WebViewController,
+      InAppWebViewController? iosBelow11WebViewController,
       InAppWebViewController? webViewController}) async {
     assert(url.toString().isNotEmpty);
     assert(name.isNotEmpty);
@@ -381,7 +381,7 @@ class CookieManager {
       String path = "/",
       String? domain,
       @Deprecated("Use webViewController instead")
-          InAppWebViewController? iosBelow11WebViewController,
+      InAppWebViewController? iosBelow11WebViewController,
       InAppWebViewController? webViewController}) async {
     assert(url.toString().isNotEmpty);
     assert(name.isNotEmpty);
@@ -433,7 +433,7 @@ class CookieManager {
       String path = "/",
       String? domain,
       @Deprecated("Use webViewController instead")
-          InAppWebViewController? iosBelow11WebViewController,
+      InAppWebViewController? iosBelow11WebViewController,
       InAppWebViewController? webViewController}) async {
     assert(url.toString().isNotEmpty);
 

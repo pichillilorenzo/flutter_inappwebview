@@ -186,6 +186,7 @@ class WebAuthenticationSession extends ChannelController {
   ///- iOS
   static Future<bool> isAvailable() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    return await _sharedChannel.invokeMethod<bool>("isAvailable", args) ?? false;
+    return await _sharedChannel.invokeMethod<bool>("isAvailable", args) ??
+        false;
   }
 }

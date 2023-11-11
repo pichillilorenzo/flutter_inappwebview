@@ -594,8 +594,8 @@ abstract class ChannelController implements Disposable {
       if (controller.disposed) {
         throw FlutterError(
           'A ${controller.runtimeType} was used after being disposed.\n'
-              'Once the ${controller.runtimeType} has been disposed, it '
-              'can no longer be used.',
+          'Once the ${controller.runtimeType} has been disposed, it '
+          'can no longer be used.',
         );
       }
       return true;
@@ -605,22 +605,25 @@ abstract class ChannelController implements Disposable {
 }
 
 extension InternalChannelController on ChannelController {
-  set channel (MethodChannel? channel) => _channel = channel;
+  set channel(MethodChannel? channel) => _channel = channel;
 
   MethodChannel? get channel {
     assert(ChannelController.debugAssertNotDisposed(this));
     return this._channel;
   }
 
-  set handler (Future<dynamic> Function(MethodCall call)? handler) => _handler = handler;
+  set handler(Future<dynamic> Function(MethodCall call)? handler) =>
+      _handler = handler;
 
   Future<dynamic> Function(MethodCall call)? get handler => _handler;
 
   bool get disposed => _channel == null;
 
   initMethodCallHandler() {
-    assert(channel != null, 'Method Channel for ${runtimeType} not initialized!');
-    assert(handler != null, 'Method Call Handler for ${runtimeType} not initialized!');
+    assert(
+        channel != null, 'Method Channel for ${runtimeType} not initialized!');
+    assert(handler != null,
+        'Method Call Handler for ${runtimeType} not initialized!');
 
     channel?.setMethodCallHandler((call) async {
       if (disposed) return null;

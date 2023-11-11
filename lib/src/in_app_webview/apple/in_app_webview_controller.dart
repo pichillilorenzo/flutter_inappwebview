@@ -26,8 +26,8 @@ class IOSInAppWebViewController {
   @Deprecated("Use InAppWebViewController.createPdf instead")
   Future<Uint8List?> createPdf(
       {@Deprecated("Use pdfConfiguration instead")
-          // ignore: deprecated_member_use_from_same_package
-          IOSWKPDFConfiguration? iosWKPdfConfiguration,
+      // ignore: deprecated_member_use_from_same_package
+      IOSWKPDFConfiguration? iosWKPdfConfiguration,
       PDFConfiguration? pdfConfiguration}) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('pdfConfiguration',

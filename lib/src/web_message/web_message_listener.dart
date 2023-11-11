@@ -43,7 +43,7 @@ class WebMessageListener extends ChannelController {
         allowedOriginRules != null ? allowedOriginRules : Set.from(["*"]);
     assert(!this.allowedOriginRules.contains(""),
         "allowedOriginRules cannot contain empty strings");
-    channel= MethodChannel(
+    channel = MethodChannel(
         'com.pichillilorenzo/flutter_inappwebview_web_message_listener_${id}_$jsObjectName');
     handler = _handleMethod;
     initMethodCallHandler();

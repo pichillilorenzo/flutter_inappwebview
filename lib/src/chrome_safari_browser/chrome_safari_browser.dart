@@ -295,7 +295,8 @@ class ChromeSafariBrowser extends ChannelController {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('relation', () => relation.toNativeValue());
     args.putIfAbsent('origin', () => origin.toString());
-    return await channel?.invokeMethod<bool>("validateRelationship", args) ?? false;
+    return await channel?.invokeMethod<bool>("validateRelationship", args) ??
+        false;
   }
 
   ///Closes the [ChromeSafariBrowser] instance.
@@ -401,7 +402,8 @@ class ChromeSafariBrowser extends ChannelController {
   ///- Android
   static Future<int> getMaxToolbarItems() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    return await _sharedChannel.invokeMethod<int>("getMaxToolbarItems", args) ?? 0;
+    return await _sharedChannel.invokeMethod<int>("getMaxToolbarItems", args) ??
+        0;
   }
 
   ///Clear associated website data accrued from browsing activity within your app.

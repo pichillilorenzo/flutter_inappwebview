@@ -12,7 +12,7 @@ builders:
     # 2
     builder_factories: ["generateExchangeableObject", "generateExchangeableEnum"]
     # 3
-    build_extensions: { ".dart": [".g.dart"] }
+    build_extensions: { ".dart": [".g.part"] }
     auto_apply: dependents
     build_to: cache
     applies_builders: ["source_gen|combining_builder"]

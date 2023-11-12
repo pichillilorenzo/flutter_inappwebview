@@ -488,6 +488,29 @@ class ChromeSafariBrowser extends ChannelController {
         0;
   }
 
+  ///Returns the preferred package to use for Custom Tabs.
+  ///The preferred package name is the default VIEW intent handler as long as it supports Custom Tabs.
+  ///To modify this preferred behavior, set [ignoreDefault] to `true` and give a
+  ///non empty list of package names in packages.
+  ///This method queries the `PackageManager` to determine which packages support the Custom Tabs API.
+  ///On apps that target Android 11 and above, this requires adding the following
+  ///package visibility elements to your manifest.
+  ///
+  ///[packages] – Ordered list of packages to test for Custom Tabs support, in decreasing order of priority.
+  ///
+  ///[ignoreDefault] – If set, the default VIEW handler won't get priority over other browsers.
+  ///
+  ///Returns the preferred package name for handling Custom Tabs, or null.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- Android ([Official API - CustomTabsClient.getPackageName](https://developer.android.com/reference/androidx/browser/customtabs/CustomTabsClient#getPackageName(android.content.Context,java.util.List%3Cjava.lang.String%3E,boolean))))
+  static Future<String?> getPackageName({List<String>? packages, bool ignoreDefault = false}) async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    args.putIfAbsent("packages", () => packages);
+    args.putIfAbsent("ignoreDefault", () => ignoreDefault);
+    return await _sharedChannel.invokeMethod<String?>("getPackageName", args);
+  }
+
   ///Clear associated website data accrued from browsing activity within your app.
   ///This includes all local storage, cached resources, and cookies.
   ///

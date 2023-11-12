@@ -882,11 +882,11 @@ public class WebViewChannelDelegate : ChannelDelegate {
     }
     
     public func onPermissionRequest(request: PermissionRequest, callback: PermissionRequestCallback) {
-        guard let channel = channel else {
+        if channel == nil {
             callback.defaultBehaviour(nil)
             return
         }
-        channel.invokeMethod("onPermissionRequest", arguments: request.toMap(), callback: callback)
+        channel?.invokeMethod("onPermissionRequest", arguments: request.toMap(), callback: callback)
     }
     
     public class ShouldOverrideUrlLoadingCallback : BaseCallbackResult<WKNavigationActionPolicy> {
@@ -906,11 +906,11 @@ public class WebViewChannelDelegate : ChannelDelegate {
     }
     
     public func shouldOverrideUrlLoading(navigationAction: WKNavigationAction, callback: ShouldOverrideUrlLoadingCallback) {
-        guard let channel = channel else {
+        if channel == nil {
             callback.defaultBehaviour(nil)
             return
         }
-        channel.invokeMethod("shouldOverrideUrlLoading", arguments: navigationAction.toMap(), callback: callback)
+        channel?.invokeMethod("shouldOverrideUrlLoading", arguments: navigationAction.toMap(), callback: callback)
     }
     
     public func onLoadStart(url: String?) {
@@ -961,7 +961,7 @@ public class WebViewChannelDelegate : ChannelDelegate {
     }
     
     public func onReceivedHttpAuthRequest(challenge: HttpAuthenticationChallenge, callback: ReceivedHttpAuthRequestCallback) {
-        guard let channel = channel else {
+        if channel == nil {
             callback.defaultBehaviour(nil)
             return
         }
@@ -969,8 +969,12 @@ public class WebViewChannelDelegate : ChannelDelegate {
         // https://github.com/pichillilorenzo/flutter_inappwebview/issues/1678
         DispatchQueue.global(qos: .background).async {
             let arguments = challenge.toMap()
-            DispatchQueue.main.async {
-                channel.invokeMethod("onReceivedHttpAuthRequest", arguments: arguments, callback: callback)
+            DispatchQueue.main.async { [weak self] in
+                if self?.channel == nil {
+                    callback.defaultBehaviour(nil)
+                    return
+                }
+                self?.channel?.invokeMethod("onReceivedHttpAuthRequest", arguments: arguments, callback: callback)
             }
         }
     }
@@ -989,7 +993,7 @@ public class WebViewChannelDelegate : ChannelDelegate {
     }
     
     public func onReceivedServerTrustAuthRequest(challenge: ServerTrustChallenge, callback: ReceivedServerTrustAuthRequestCallback) {
-        guard let channel = channel else {
+        if channel == nil {
             callback.defaultBehaviour(nil)
             return
         }
@@ -997,8 +1001,12 @@ public class WebViewChannelDelegate : ChannelDelegate {
         // https://github.com/pichillilorenzo/flutter_inappwebview/issues/1678
         DispatchQueue.global(qos: .background).async {
             let arguments = challenge.toMap()
-            DispatchQueue.main.async {
-                channel.invokeMethod("onReceivedServerTrustAuthRequest", arguments: arguments, callback: callback)
+            DispatchQueue.main.async { [weak self] in
+                if self?.channel == nil {
+                    callback.defaultBehaviour(nil)
+                    return
+                }
+                self?.channel?.invokeMethod("onReceivedServerTrustAuthRequest", arguments: arguments, callback: callback)
             }
         }
     }
@@ -1017,7 +1025,7 @@ public class WebViewChannelDelegate : ChannelDelegate {
     }
     
     public func onReceivedClientCertRequest(challenge: ClientCertChallenge, callback: ReceivedClientCertRequestCallback) {
-        guard let channel = channel else {
+        if channel == nil {
             callback.defaultBehaviour(nil)
             return
         }
@@ -1025,8 +1033,12 @@ public class WebViewChannelDelegate : ChannelDelegate {
         // https://github.com/pichillilorenzo/flutter_inappwebview/issues/1678
         DispatchQueue.global(qos: .background).async {
             let arguments = challenge.toMap()
-            DispatchQueue.main.async {
-                channel.invokeMethod("onReceivedClientCertRequest", arguments: arguments, callback: callback)
+            DispatchQueue.main.async { [weak self] in
+                if self?.channel == nil {
+                    callback.defaultBehaviour(nil)
+                    return
+                }
+                self?.channel?.invokeMethod("onReceivedClientCertRequest", arguments: arguments, callback: callback)
             }
         }
     }
@@ -1056,12 +1068,12 @@ public class WebViewChannelDelegate : ChannelDelegate {
     }
     
     public func onLoadResourceWithCustomScheme(request: WebResourceRequest, callback: LoadResourceWithCustomSchemeCallback) {
-        guard let channel = channel else {
+        if channel == nil {
             callback.defaultBehaviour(nil)
             return
         }
         let arguments: [String: Any?] = ["request": request.toMap()]
-        channel.invokeMethod("onLoadResourceWithCustomScheme", arguments: arguments, callback: callback)
+        channel?.invokeMethod("onLoadResourceWithCustomScheme", arguments: arguments, callback: callback)
     }
     
     public class CallJsHandlerCallback : BaseCallbackResult<Any> {
@@ -1074,7 +1086,7 @@ public class WebViewChannelDelegate : ChannelDelegate {
     }
     
     public func onCallJsHandler(handlerName: String, args: String, callback: CallJsHandlerCallback) {
-        guard let channel = channel else {
+        if channel == nil {
             callback.defaultBehaviour(nil)
             return
         }
@@ -1082,7 +1094,7 @@ public class WebViewChannelDelegate : ChannelDelegate {
             "handlerName": handlerName,
             "args": args
         ]
-        channel.invokeMethod("onCallJsHandler", arguments: arguments, callback: callback)
+        channel?.invokeMethod("onCallJsHandler", arguments: arguments, callback: callback)
     }
     
     public class NavigationResponseCallback : BaseCallbackResult<WKNavigationResponsePolicy> {
@@ -1102,11 +1114,11 @@ public class WebViewChannelDelegate : ChannelDelegate {
     }
     
     public func onNavigationResponse(navigationResponse: WKNavigationResponse, callback: NavigationResponseCallback) {
-        guard let channel = channel else {
+        if channel == nil {
             callback.defaultBehaviour(nil)
             return
         }
-        channel.invokeMethod("onNavigationResponse", arguments: navigationResponse.toMap(), callback: callback)
+        channel?.invokeMethod("onNavigationResponse", arguments: navigationResponse.toMap(), callback: callback)
     }
     
     public class ShouldAllowDeprecatedTLSCallback : BaseCallbackResult<Bool> {
@@ -1126,7 +1138,7 @@ public class WebViewChannelDelegate : ChannelDelegate {
     }
     
     public func shouldAllowDeprecatedTLS(challenge: URLAuthenticationChallenge, callback: ShouldAllowDeprecatedTLSCallback) {
-        guard let channel = channel else {
+        if channel == nil {
             callback.defaultBehaviour(nil)
             return
         }
@@ -1134,8 +1146,12 @@ public class WebViewChannelDelegate : ChannelDelegate {
         // https://github.com/pichillilorenzo/flutter_inappwebview/issues/1678
         DispatchQueue.global(qos: .background).async {
             let arguments = challenge.toMap()
-            DispatchQueue.main.async {
-                channel.invokeMethod("shouldAllowDeprecatedTLS", arguments: arguments, callback: callback)
+            DispatchQueue.main.async { [weak self] in
+                if self?.channel == nil {
+                    callback.defaultBehaviour(nil)
+                    return
+                }
+                self?.channel?.invokeMethod("shouldAllowDeprecatedTLS", arguments: arguments, callback: callback)
             }
         }
     }
@@ -1178,7 +1194,7 @@ public class WebViewChannelDelegate : ChannelDelegate {
     }
     
     public func onPrintRequest(url: URL?, printJobId: String?, callback: PrintRequestCallback) {
-        guard let channel = channel else {
+        if channel == nil {
             callback.defaultBehaviour(nil)
             return
         }
@@ -1186,7 +1202,7 @@ public class WebViewChannelDelegate : ChannelDelegate {
             "url": url?.absoluteString,
             "printJobId": printJobId,
         ]
-        channel.invokeMethod("onPrintRequest", arguments: arguments, callback: callback)
+        channel?.invokeMethod("onPrintRequest", arguments: arguments, callback: callback)
     }
     
     public override func dispose() {

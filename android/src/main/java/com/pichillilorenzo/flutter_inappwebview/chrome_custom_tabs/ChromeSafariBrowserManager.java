@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.Nullable;
+import androidx.browser.customtabs.CustomTabsClient;
 import androidx.browser.customtabs.CustomTabsIntent;
 
 import com.pichillilorenzo.flutter_inappwebview.InAppWebViewFlutterPlugin;
@@ -69,6 +70,15 @@ public class ChromeSafariBrowserManager extends ChannelDelegateImpl {
         break;
       case "getMaxToolbarItems":
         result.success(CustomTabsIntent.getMaxToolbarItems());
+        break;
+      case "getPackageName":
+        if (plugin != null && plugin.activity != null) {
+          ArrayList<String> packages = (ArrayList<String>) call.argument("packages");
+          Boolean ignoreDefault = (Boolean) call.argument("ignoreDefault");
+          result.success(CustomTabsClient.getPackageName(plugin.activity, packages, ignoreDefault));
+        } else {
+          result.success(null);
+        }
         break;
       default:
         result.notImplemented();

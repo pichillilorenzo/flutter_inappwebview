@@ -19,21 +19,6 @@ class MyChromeSafariBrowser extends ChromeSafariBrowser {
   void onClosed() {
     print("ChromeSafari browser closed");
   }
-
-  @override
-  void onVerticalScrollEvent(bool isDirectionUp) {
-    print("onVerticalScrollEvent $isDirectionUp");
-  }
-
-  @override
-  void onGreatestScrollPercentageIncreased(int scrollPercentage) {
-    print("onGreatestScrollPercentageIncreased $scrollPercentage");
-  }
-
-  @override
-  void onSessionEnded(bool didUserInteract) {
-    print("onSessionEnded $didUserInteract");
-  }
 }
 
 class ChromeSafariBrowserExampleScreen extends StatefulWidget {
@@ -118,8 +103,7 @@ class _ChromeSafariBrowserExampleScreenState
                         dismissButtonStyle: DismissButtonStyle.CLOSE,
                         presentationStyle:
                             ModalPresentationStyle.OVER_FULL_SCREEN));
-                await Future.delayed(Duration(seconds: 5));
-                widget.browser.close();
+                print(await ChromeSafariBrowser.getPackageName());
               },
               child: Text("Open Chrome Safari Browser")),
         ));

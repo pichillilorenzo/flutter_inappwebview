@@ -2,6 +2,7 @@
 
 - Added `requestPostMessageChannel`, `postMessage`, `isEngagementSignalsApiAvailable` methods on `ChromeSafariBrowser` for Android
 - Added `onMessageChannelReady`, `onPostMessage`, `onVerticalScrollEvent`, `onGreatestScrollPercentageIncreased`, `onSessionEnded` events on `ChromeSafariBrowser` for Android
+- Added `getPackageName` static method on `ChromeSafariBrowser` for Android
 
 ## 6.0.0-beta.26
 

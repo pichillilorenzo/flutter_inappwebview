@@ -166,11 +166,6 @@ void customTabs() {
       expect(chromeSafariBrowser.isOpened(), false);
     });
 
-    skippableTest('getMaxToolbarItems', () async {
-      expect(await ChromeSafariBrowser.getMaxToolbarItems(),
-          greaterThanOrEqualTo(0));
-    });
-
     skippableTest('request and send post messages', () async {
       var chromeSafariBrowser = MyChromeSafariBrowser();
       expect(chromeSafariBrowser.isOpened(), false);
@@ -216,6 +211,15 @@ void customTabs() {
       await chromeSafariBrowser.close();
       await expectLater(chromeSafariBrowser.closed.future, completes);
       expect(chromeSafariBrowser.isOpened(), false);
+    });
+
+    skippableTest('getMaxToolbarItems', () async {
+      expect(await ChromeSafariBrowser.getMaxToolbarItems(),
+          greaterThanOrEqualTo(0));
+    });
+
+    skippableTest('getPackageName', () async {
+      expect(await ChromeSafariBrowser.getPackageName(), isNotNull);
     });
   }, skip: shouldSkip);
 }

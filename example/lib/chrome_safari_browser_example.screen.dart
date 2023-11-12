@@ -103,7 +103,6 @@ class _ChromeSafariBrowserExampleScreenState
                         dismissButtonStyle: DismissButtonStyle.CLOSE,
                         presentationStyle:
                             ModalPresentationStyle.OVER_FULL_SCREEN));
-                print(await ChromeSafariBrowser.getPackageName());
               },
               child: Text("Open Chrome Safari Browser")),
         ));

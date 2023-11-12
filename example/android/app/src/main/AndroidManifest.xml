@@ -93,6 +93,7 @@
             android:name="io.flutter.embedded_views_preview"
             android:value="true" />
 
-
+        <service android:name="androidx.browser.customtabs.PostMessageService"
+            android:exported="true"/>
     </application>
 </manifest>

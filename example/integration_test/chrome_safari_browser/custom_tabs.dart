@@ -170,5 +170,52 @@ void customTabs() {
       expect(await ChromeSafariBrowser.getMaxToolbarItems(),
           greaterThanOrEqualTo(0));
     });
+
+    skippableTest('request and send post messages', () async {
+      var chromeSafariBrowser = MyChromeSafariBrowser();
+      expect(chromeSafariBrowser.isOpened(), false);
+
+      await chromeSafariBrowser.open(
+          url: TEST_CUSTOM_TABS_POST_MESSAGE_URL,
+          settings: ChromeSafariBrowserSettings(isSingleInstance: true));
+      await expectLater(chromeSafariBrowser.opened.future, completes);
+      expect(chromeSafariBrowser.isOpened(), true);
+
+      await expectLater(
+          chromeSafariBrowser.navigationFinished.future, completes);
+      expect(
+          await chromeSafariBrowser.requestPostMessageChannel(
+              sourceOrigin: WebUri(TEST_CUSTOM_TABS_POST_MESSAGE_URL.origin)),
+          true);
+      await expectLater(
+          chromeSafariBrowser.messageChannelReady.future, completes);
+      expect(await chromeSafariBrowser.postMessage("Message from Flutter"),
+          CustomTabsPostMessageResultType.SUCCESS);
+      await expectLater(chromeSafariBrowser.postMessageReceived.future,
+          completion("Message from JavaScript"));
+
+      await expectLater(chromeSafariBrowser.firstPageLoaded.future, completes);
+      await chromeSafariBrowser.close();
+      await expectLater(chromeSafariBrowser.closed.future, completes);
+      expect(chromeSafariBrowser.isOpened(), false);
+    });
+
+    skippableTest('Engagement Signals Api', () async {
+      var chromeSafariBrowser = MyChromeSafariBrowser();
+      expect(chromeSafariBrowser.isOpened(), false);
+
+      await chromeSafariBrowser.open(
+          url: TEST_URL_1,
+          settings: ChromeSafariBrowserSettings(isSingleInstance: true));
+      await expectLater(chromeSafariBrowser.opened.future, completes);
+
+      await expectLater(
+          chromeSafariBrowser.isEngagementSignalsApiAvailable(), completes);
+
+      await expectLater(chromeSafariBrowser.firstPageLoaded.future, completes);
+      await chromeSafariBrowser.close();
+      await expectLater(chromeSafariBrowser.closed.future, completes);
+      expect(chromeSafariBrowser.isOpened(), false);
+    });
   }, skip: shouldSkip);
 }

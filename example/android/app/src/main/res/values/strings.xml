@@ -6,6 +6,12 @@
             \"target\": {
                 \"namespace\": \"web\",
                 \"site\": \"https://flutter.dev\"}
+        },
+        {
+            \"relation\": [\"delegate_permission/common.handle_all_urls\"],
+            \"target\": {
+                \"namespace\": \"web\",
+                \"site\": \"https://inappwebview.dev\"}
         }]
     </string>
 </resources>

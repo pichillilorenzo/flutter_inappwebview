@@ -9,6 +9,7 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.RemoteException;
 import android.widget.RemoteViews;
 
 import androidx.annotation.CallSuper;
@@ -19,6 +20,7 @@ import androidx.browser.customtabs.CustomTabsCallback;
 import androidx.browser.customtabs.CustomTabsIntent;
 import androidx.browser.customtabs.CustomTabsService;
 import androidx.browser.customtabs.CustomTabsSession;
+import androidx.browser.customtabs.EngagementSignalsCallback;
 
 import com.pichillilorenzo.flutter_inappwebview.R;
 import com.pichillilorenzo.flutter_inappwebview.types.AndroidResource;
@@ -32,12 +34,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import io.flutter.Log;
 import io.flutter.plugin.common.MethodChannel;
 
 public class ChromeCustomTabsActivity extends Activity implements Disposable {
   protected static final String LOG_TAG = "CustomTabsActivity";
   public static final String METHOD_CHANNEL_NAME_PREFIX = "com.pichillilorenzo/flutter_chromesafaribrowser_";
-  
+
   public String id;
   @Nullable
   public CustomTabsIntent.Builder builder;
@@ -76,7 +79,7 @@ public class ChromeCustomTabsActivity extends Activity implements Disposable {
 
     Bundle b = getIntent().getExtras();
     if (b == null) return;
-    
+
     id = b.getString("id");
 
     String managerId = b.getString("managerId");
@@ -143,13 +146,22 @@ public class ChromeCustomTabsActivity extends Activity implements Disposable {
       }
 
       @Override
-      public void extraCallback(@NonNull String callbackName, Bundle args) {}
+      public void extraCallback(@NonNull String callbackName, Bundle args) {
+      }
 
       @Override
-      public void onMessageChannelReady(Bundle extras) {}
+      public void onMessageChannelReady(Bundle extras) {
+        if (channelDelegate != null) {
+          channelDelegate.onMessageChannelReady();
+        }
+      }
 
       @Override
-      public void onPostMessage(@NonNull String message, Bundle extras) {}
+      public void onPostMessage(@NonNull String message, Bundle extras) {
+        if (channelDelegate != null) {
+          channelDelegate.onPostMessage(message);
+        }
+      }
 
       @Override
       public void onRelationshipValidationResult(@CustomTabsService.Relation int relation,
@@ -198,8 +210,41 @@ public class ChromeCustomTabsActivity extends Activity implements Disposable {
     return customTabActivityHelper.mayLaunchUrl(uri, null, bundleOtherLikelyURLs);
   }
 
+  @CallSuper
   public void customTabsConnected() {
     customTabsSession = customTabActivityHelper.getSession();
+
+    if (customTabsSession != null) {
+      try {
+        Bundle bundle = new Bundle();
+        if (customTabsSession.isEngagementSignalsApiAvailable(bundle)) {
+          customTabsSession.setEngagementSignalsCallback(new EngagementSignalsCallback() {
+            @Override
+            public void onVerticalScrollEvent(boolean isDirectionUp, @NonNull Bundle extras) {
+              if (channelDelegate != null) {
+                channelDelegate.onVerticalScrollEvent(isDirectionUp);
+              }
+            }
+
+            @Override
+            public void onGreatestScrollPercentageIncreased(int scrollPercentage, @NonNull Bundle extras) {
+              if (channelDelegate != null) {
+                channelDelegate.onGreatestScrollPercentageIncreased(scrollPercentage);
+              }
+            }
+
+            @Override
+            public void onSessionEnded(boolean didUserInteract, @NonNull Bundle extras) {
+              if (channelDelegate != null) {
+                channelDelegate.onSessionEnded(didUserInteract);
+              }
+            }
+          }, bundle);
+        }
+      } catch (Exception ignored) {
+      }
+    }
+
     // avoid webpage reopen if isBindSuccess is false: onServiceConnected->launchUrl
     if (isBindSuccess && initialUrl != null) {
       launchUrl(initialUrl, initialHeaders, initialReferrer, initialOtherLikelyURLs);
@@ -248,7 +293,7 @@ public class ChromeCustomTabsActivity extends Activity implements Disposable {
     }
 
     for (CustomTabsMenuItem menuItem : menuItems) {
-      builder.addMenuItem(menuItem.getLabel(), 
+      builder.addMenuItem(menuItem.getLabel(),
               createPendingIntent(menuItem.getId()));
     }
 

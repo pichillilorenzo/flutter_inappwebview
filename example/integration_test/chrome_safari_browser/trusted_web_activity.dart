@@ -13,12 +13,12 @@ void trustedWebActivity() {
       expect(chromeSafariBrowser.isOpened(), false);
 
       await chromeSafariBrowser.open(
-          url: TEST_URL_1,
+          url: TEST_TWA_URL,
           settings: ChromeSafariBrowserSettings(isTrustedWebActivity: true));
       await chromeSafariBrowser.opened.future;
       expect(chromeSafariBrowser.isOpened(), true);
       expect(() async {
-        await chromeSafariBrowser.open(url: TEST_CROSS_PLATFORM_URL_1);
+        await chromeSafariBrowser.open(url: TEST_TWA_URL);
       }, throwsAssertionError);
 
       await expectLater(chromeSafariBrowser.firstPageLoaded.future, completes);
@@ -32,13 +32,13 @@ void trustedWebActivity() {
       expect(chromeSafariBrowser.isOpened(), false);
 
       await chromeSafariBrowser.open(
-          url: TEST_URL_1,
+          url: TEST_TWA_URL,
           settings: ChromeSafariBrowserSettings(
               isTrustedWebActivity: true, isSingleInstance: true));
       await chromeSafariBrowser.opened.future;
       expect(chromeSafariBrowser.isOpened(), true);
       expect(() async {
-        await chromeSafariBrowser.open(url: TEST_CROSS_PLATFORM_URL_1);
+        await chromeSafariBrowser.open(url: TEST_TWA_URL);
       }, throwsAssertionError);
 
       await expectLater(chromeSafariBrowser.firstPageLoaded.future, completes);
@@ -57,11 +57,11 @@ void trustedWebActivity() {
       expect(
           await chromeSafariBrowser.validateRelationship(
               relation: CustomTabsRelationType.USE_AS_ORIGIN,
-              origin: TEST_CROSS_PLATFORM_URL_1),
+              origin: TEST_TWA_URL),
           true);
       expect(
           await chromeSafariBrowser.relationshipValidationResult.future, true);
-      await chromeSafariBrowser.launchUrl(url: TEST_CROSS_PLATFORM_URL_1);
+      await chromeSafariBrowser.launchUrl(url: TEST_TWA_URL);
       await chromeSafariBrowser.opened.future;
       expect(chromeSafariBrowser.isOpened(), true);
       await expectLater(chromeSafariBrowser.firstPageLoaded.future, completes);

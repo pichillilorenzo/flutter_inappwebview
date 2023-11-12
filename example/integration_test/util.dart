@@ -118,6 +118,9 @@ class MyChromeSafariBrowser extends ChromeSafariBrowser {
   final Completer<void> closed = Completer<void>();
   final Completer<CustomTabsNavigationEventType?> navigationEvent =
       Completer<CustomTabsNavigationEventType?>();
+  final Completer<void> navigationFinished = Completer<void>();
+  final Completer<void> messageChannelReady = Completer<void>();
+  final Completer<String> postMessageReceived = Completer<String>();
   final Completer<bool> relationshipValidationResult = Completer<bool>();
 
   @override
@@ -139,6 +142,24 @@ class MyChromeSafariBrowser extends ChromeSafariBrowser {
   void onNavigationEvent(CustomTabsNavigationEventType? type) {
     if (!navigationEvent.isCompleted) {
       navigationEvent.complete(type);
+    }
+    if (!navigationFinished.isCompleted &&
+        type == CustomTabsNavigationEventType.FINISHED) {
+      navigationFinished.complete();
+    }
+  }
+
+  @override
+  void onMessageChannelReady() async {
+    if (!messageChannelReady.isCompleted) {
+      messageChannelReady.complete();
+    }
+  }
+
+  @override
+  void onPostMessage(String message) {
+    if (!postMessageReceived.isCompleted) {
+      postMessageReceived.complete();
     }
   }
 

@@ -5,6 +5,7 @@ import 'dart:typed_data';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import '../types/custom_tabs_navigation_event_type.dart';
+import '../types/custom_tabs_post_message_result_type.dart';
 import '../types/custom_tabs_relation_type.dart';
 import '../types/prewarming_token.dart';
 import '../util.dart';
@@ -152,6 +153,25 @@ class ChromeSafariBrowser extends ChannelController {
             }
           }
         }
+        break;
+      case "onMessageChannelReady":
+        onMessageChannelReady();
+        break;
+      case "onPostMessage":
+        final String message = call.arguments["message"];
+        onPostMessage(message);
+        break;
+      case "onVerticalScrollEvent":
+        final bool isDirectionUp = call.arguments["isDirectionUp"];
+        onVerticalScrollEvent(isDirectionUp);
+        break;
+      case "onGreatestScrollPercentageIncreased":
+        final int scrollPercentage = call.arguments["scrollPercentage"];
+        onGreatestScrollPercentageIncreased(scrollPercentage);
+        break;
+      case "onSessionEnded":
+        final bool didUserInteract = call.arguments["didUserInteract"];
+        onSessionEnded(didUserInteract);
         break;
       default:
         throw UnimplementedError("Unimplemented ${call.method} method");
@@ -384,6 +404,67 @@ class ChromeSafariBrowser extends ChannelController {
     });
   }
 
+  ///Sends a request to create a two way postMessage channel between the client
+  ///and the browser.
+  ///If you want to specifying the target origin to communicate with, set the [targetOrigin].
+  ///
+  ///[sourceOrigin] - A origin that the client is requesting to be
+  ///identified as during the postMessage communication.
+  ///It has to either start with http or https.
+  ///
+  ///[targetOrigin] - The target Origin to establish the postMessage communication with.
+  ///This can be the app's package name, it has to either start with http or https.
+  ///
+  ///Returns whether the implementation accepted the request.
+  ///Note that returning true here doesn't mean an origin has already been
+  ///assigned as the validation is asynchronous.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- Android ([Official API - CustomTabsSession.requestPostMessageChannel](https://developer.android.com/reference/androidx/browser/customtabs/CustomTabsSession#requestPostMessageChannel(android.net.Uri,android.net.Uri,android.os.Bundle)))
+  Future<bool> requestPostMessageChannel(
+      {required WebUri sourceOrigin, WebUri? targetOrigin}) async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    args.putIfAbsent("sourceOrigin", () => sourceOrigin.toString());
+    args.putIfAbsent("targetOrigin", () => targetOrigin.toString());
+    return await channel?.invokeMethod<bool>(
+            "requestPostMessageChannel", args) ??
+        false;
+  }
+
+  ///Sends a postMessage request using the origin communicated via [requestPostMessageChannel].
+  ///Fails when called before [onMessageChannelReady] event.
+  ///
+  ///[message] – The message that is being sent.
+  ///
+  ///Returns an integer constant about the postMessage request result.
+  ///Will return CustomTabsService.RESULT_SUCCESS if successful.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- Android ([Official API - CustomTabsSession.postMessage](https://developer.android.com/reference/androidx/browser/customtabs/CustomTabsSession#postMessage(java.lang.String,android.os.Bundle)))
+  Future<CustomTabsPostMessageResultType> postMessage(String message) async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    args.putIfAbsent("message", () => message);
+    return CustomTabsPostMessageResultType.fromNativeValue(
+            await channel?.invokeMethod<int>("postMessage", args)) ??
+        CustomTabsPostMessageResultType.FAILURE_MESSAGING_ERROR;
+  }
+
+  ///Returns whether the Engagement Signals API is available.
+  ///The availability of the Engagement Signals API may change at runtime.
+  ///If an EngagementSignalsCallback has been set, an [onSessionEnded]
+  ///signal will be sent if the API becomes unavailable later.
+  ///
+  ///Returns whether the Engagement Signals API is available.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- Android ([Official API - CustomTabsSession.isEngagementSignalsApiAvailable](https://developer.android.com/reference/androidx/browser/customtabs/CustomTabsSession#isEngagementSignalsApiAvailable(android.os.Bundle)))
+  Future<bool> isEngagementSignalsApiAvailable() async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    return await channel?.invokeMethod<bool>(
+            "isEngagementSignalsApiAvailable", args) ??
+        false;
+  }
+
   ///On Android, returns `true` if Chrome Custom Tabs is available.
   ///On iOS, returns `true` if SFSafariViewController is available.
   ///Otherwise returns `false`.
@@ -393,7 +474,8 @@ class ChromeSafariBrowser extends ChannelController {
   ///- iOS
   static Future<bool> isAvailable() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    return await _sharedChannel.invokeMethod("isAvailable", args);
+    return await _sharedChannel.invokeMethod<bool>("isAvailable", args) ??
+        false;
   }
 
   ///The maximum number of allowed secondary toolbar items.
@@ -514,6 +596,57 @@ class ChromeSafariBrowser extends ChannelController {
   ///**Supported Platforms/Implementations**:
   ///- iOS ([Official API - SFSafariViewControllerDelegate.safariViewControllerWillOpenInBrowser](https://developer.apple.com/documentation/safariservices/sfsafariviewcontrollerdelegate/3650426-safariviewcontrollerwillopeninbr))
   void onWillOpenInBrowser() {}
+
+  ///Called when the [ChromeSafariBrowser] has requested a postMessage channel through
+  ///[requestPostMessageChannel] and the channel is ready for sending and receiving messages on both ends.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- Android ([Official API - CustomTabsCallback.onMessageChannelReady](https://developer.android.com/reference/androidx/browser/customtabs/CustomTabsCallback#onMessageChannelReady(android.os.Bundle)))
+  void onMessageChannelReady() {}
+
+  ///Called when a tab controlled by this [ChromeSafariBrowser] has sent a postMessage.
+  ///If [postMessage] is called from a single thread, then the messages will be posted in the same order.
+  ///When received on the client side, it is the client's responsibility to preserve the ordering further.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- Android ([Official API - CustomTabsCallback.onPostMessage](https://developer.android.com/reference/androidx/browser/customtabs/CustomTabsCallback#onPostMessage(java.lang.String,android.os.Bundle)))
+  void onPostMessage(String message) {}
+
+  ///Called when a user scrolls the tab.
+  ///
+  ///[isDirectionUp] - `false` when the user scrolls farther down the page,
+  ///and `true` when the user scrolls back up toward the top of the page.
+  ///
+  ///**NOTE**: available only if [isEngagementSignalsApiAvailable] returns `true`.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- Android ([Official API - EngagementSignalsCallback.onVerticalScrollEvent](https://developer.android.com/reference/androidx/browser/customtabs/EngagementSignalsCallback#onVerticalScrollEvent(boolean,android.os.Bundle)))
+  void onVerticalScrollEvent(bool isDirectionUp) {}
+
+  ///Called when a user has reached a greater scroll percentage on the page. The greatest scroll
+  ///percentage is reset if the user navigates to a different page. If the current page's total
+  ///height changes, this method will be called again only if the scroll progress reaches a
+  ///higher percentage based on the new and current height of the page.
+  ///
+  ///[scrollPercentage] - An integer indicating the percent of scrollable progress
+  ///the user hasmade down the current page.
+  ///
+  ///**NOTE**: available only if [isEngagementSignalsApiAvailable] returns `true`.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- Android ([Official API - EngagementSignalsCallback.onGreatestScrollPercentageIncreased](https://developer.android.com/reference/androidx/browser/customtabs/EngagementSignalsCallback#onGreatestScrollPercentageIncreased(int,android.os.Bundle)))
+  void onGreatestScrollPercentageIncreased(int scrollPercentage) {}
+
+  ///Called when a `CustomTabsSession` is ending or when no further Engagement Signals
+  ///callbacks are expected to report whether any user action has occurred during the session.
+  ///
+  ///[didUserInteract] - Whether the user has interacted with the page in any way, e.g. scrolling.
+  ///
+  ///**NOTE**: available only if [isEngagementSignalsApiAvailable] returns `true`.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- Android ([Official API - EngagementSignalsCallback.onSessionEnded](https://developer.android.com/reference/androidx/browser/customtabs/EngagementSignalsCallback#onSessionEnded(boolean,android.os.Bundle)))
+  void onSessionEnded(bool didUserInteract) {}
 
   ///Event fired when the [ChromeSafariBrowser] is closed.
   ///

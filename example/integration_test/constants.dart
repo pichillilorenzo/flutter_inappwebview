@@ -28,3 +28,7 @@ final TEST_SERVICE_WORKER_URL = WebUri(
 final TEST_WEBVIEW_ASSET_LOADER_DOMAIN = 'my.custom.domain.com';
 final TEST_WEBVIEW_ASSET_LOADER_URL = WebUri(
     'https://$TEST_WEBVIEW_ASSET_LOADER_DOMAIN/assets/flutter_assets/test_assets/website/index.html');
+final TEST_TWA_URL =
+    WebUri('https://inappwebview.dev/test-twa-postmessage.html');
+final TEST_CUSTOM_TABS_POST_MESSAGE_URL =
+    WebUri('https://inappwebview.dev/test-twa-postmessage.html');

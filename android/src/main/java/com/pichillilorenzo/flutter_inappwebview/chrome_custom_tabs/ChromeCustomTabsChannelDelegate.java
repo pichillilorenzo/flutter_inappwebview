@@ -3,9 +3,12 @@ package com.pichillilorenzo.flutter_inappwebview.chrome_custom_tabs;
 import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Bundle;
+import android.os.RemoteException;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.browser.customtabs.CustomTabsService;
 
 import com.pichillilorenzo.flutter_inappwebview.types.ChannelDelegateImpl;
 import com.pichillilorenzo.flutter_inappwebview.types.CustomTabsActionButton;
@@ -84,6 +87,35 @@ public class ChromeCustomTabsChannelDelegate extends ChannelDelegateImpl {
           result.success(false);
         }
         break;
+      case "requestPostMessageChannel":
+        if (chromeCustomTabsActivity != null && chromeCustomTabsActivity.customTabsSession != null) {
+          String sourceOrigin = (String) call.argument("sourceOrigin");
+          String targetOrigin = (String) call.argument("targetOrigin");
+          result.success(chromeCustomTabsActivity.customTabsSession.requestPostMessageChannel(Uri.parse(sourceOrigin),
+                  targetOrigin != null ? Uri.parse(targetOrigin) : null, new Bundle()));
+        } else {
+          result.success(false);
+        }
+        break;
+      case "postMessage":
+        if (chromeCustomTabsActivity != null && chromeCustomTabsActivity.customTabsSession != null) {
+          String message = (String) call.argument("message");
+          result.success(chromeCustomTabsActivity.customTabsSession.postMessage(message, new Bundle()));
+        } else {
+          result.success(CustomTabsService.RESULT_FAILURE_MESSAGING_ERROR);
+        }
+        break;
+      case "isEngagementSignalsApiAvailable":
+        if (chromeCustomTabsActivity != null && chromeCustomTabsActivity.customTabsSession != null) {
+          try {
+            result.success(chromeCustomTabsActivity.customTabsSession.isEngagementSignalsApiAvailable(new Bundle()));
+          } catch (Exception e) {
+            result.success(false);
+          }
+        } else {
+          result.success(false);
+        }
+        break;
       case "close":
         if (chromeCustomTabsActivity != null) {
           chromeCustomTabsActivity.onStop();
@@ -131,7 +163,7 @@ public class ChromeCustomTabsChannelDelegate extends ChannelDelegateImpl {
     channel.invokeMethod("onCompletedInitialLoad", obj);
   }
 
-  public void onNavigationEvent(int navigationEvent) {;
+  public void onNavigationEvent(int navigationEvent) {
     MethodChannel channel = getChannel();
     if (channel == null) return;
     Map<String, Object> obj = new HashMap<>();
@@ -173,6 +205,45 @@ public class ChromeCustomTabsChannelDelegate extends ChannelDelegateImpl {
     obj.put("requestedOrigin", requestedOrigin.toString());
     obj.put("result", result);
     channel.invokeMethod("onRelationshipValidationResult", obj);
+  }
+
+  public void onMessageChannelReady() {
+    MethodChannel channel = getChannel();
+    if (channel == null) return;
+    Map<String, Object> obj = new HashMap<>();
+    channel.invokeMethod("onMessageChannelReady", obj);
+  }
+
+  public void onPostMessage(@NonNull String message) {
+    MethodChannel channel = getChannel();
+    if (channel == null) return;
+    Map<String, Object> obj = new HashMap<>();
+    obj.put("message", message);
+    channel.invokeMethod("onPostMessage", obj);
+  }
+
+  public void onVerticalScrollEvent(boolean isDirectionUp) {
+    MethodChannel channel = getChannel();
+    if (channel == null) return;
+    Map<String, Object> obj = new HashMap<>();
+    obj.put("isDirectionUp", isDirectionUp);
+    channel.invokeMethod("onVerticalScrollEvent", obj);
+  }
+
+  public void onGreatestScrollPercentageIncreased(int scrollPercentage) {
+    MethodChannel channel = getChannel();
+    if (channel == null) return;
+    Map<String, Object> obj = new HashMap<>();
+    obj.put("scrollPercentage", scrollPercentage);
+    channel.invokeMethod("onGreatestScrollPercentageIncreased", obj);
+  }
+
+  public void onSessionEnded(boolean didUserInteract) {
+    MethodChannel channel = getChannel();
+    if (channel == null) return;
+    Map<String, Object> obj = new HashMap<>();
+    obj.put("didUserInteract", didUserInteract);
+    channel.invokeMethod("onSessionEnded", obj);
   }
 
   @Override

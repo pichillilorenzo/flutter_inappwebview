@@ -41,14 +41,6 @@ public class TrustedWebActivity extends ChromeCustomTabsActivity {
             referrer != null ? Uri.parse(referrer) : null, CHROME_CUSTOM_TAB_REQUEST_CODE);
   }
 
-  @Override
-  public void customTabsConnected() {
-    customTabsSession = customTabActivityHelper.getSession();
-    if (initialUrl != null) {
-      launchUrl(initialUrl, initialHeaders, initialReferrer, initialOtherLikelyURLs);
-    }
-  }
-
   private void prepareCustomTabs() {
     CustomTabColorSchemeParams.Builder defaultColorSchemeBuilder = new CustomTabColorSchemeParams.Builder();
     if (customSettings.toolbarBackgroundColor != null && !customSettings.toolbarBackgroundColor.isEmpty()) {

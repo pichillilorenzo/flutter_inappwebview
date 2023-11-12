@@ -159,7 +159,7 @@ class MyChromeSafariBrowser extends ChromeSafariBrowser {
   @override
   void onPostMessage(String message) {
     if (!postMessageReceived.isCompleted) {
-      postMessageReceived.complete();
+      postMessageReceived.complete(message);
     }
   }
 

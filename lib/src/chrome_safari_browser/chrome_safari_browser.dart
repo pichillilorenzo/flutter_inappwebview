@@ -504,7 +504,8 @@ class ChromeSafariBrowser extends ChannelController {
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android ([Official API - CustomTabsClient.getPackageName](https://developer.android.com/reference/androidx/browser/customtabs/CustomTabsClient#getPackageName(android.content.Context,java.util.List%3Cjava.lang.String%3E,boolean))))
-  static Future<String?> getPackageName({List<String>? packages, bool ignoreDefault = false}) async {
+  static Future<String?> getPackageName(
+      {List<String>? packages, bool ignoreDefault = false}) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent("packages", () => packages);
     args.putIfAbsent("ignoreDefault", () => ignoreDefault);

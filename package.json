@@ -10,9 +10,10 @@
   "scripts": {
     "build": "flutter pub run build_runner build --delete-conflicting-outputs",
     "watch": "flutter pub run build_runner watch --delete-conflicting-outputs",
-    "publish:dry": "npm run build && flutter pub publish --dry-run",
-    "publish": "npm run build && flutter pub publish",
+    "publish:dry": "flutter pub publish --dry-run",
+    "publish": "flutter pub publish",
     "format": "dart format lib example/integration_test",
+    "build:publish": "npm run format && npm run build && flutter pub publish",
     "docs:gen": "flutter pub global activate dartdoc && flutter pub global run dartdoc:dartdoc",
     "docs:serve": "flutter pub global activate dhttpd && flutter pub global run dhttpd:dhttpd --path doc/api"
   },

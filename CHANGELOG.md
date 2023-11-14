@@ -1,3 +1,16 @@
+## 6.0.0-beta.28
+
+- Added `ProcessGlobalConfig` for Android WebViews
+- Added `disableWebView` static method on `InAppWebViewController` for Android
+- Added support for Android `WebViewFeature.isStartupFeatureSupported`, `WebViewFeature.STARTUP_FEATURE_SET_DIRECTORY_BASE_PATHS`, `WebViewFeature.STARTUP_FEATURE_SET_DATA_DIRECTORY_SUFFIX`, `WebViewFeature.WEB_MESSAGE_ARRAY_BUFFER`
+- Added `WebMessage.type` property
+
+### BREAKING CHANGES
+
+- `WebMessage.data` property is of type `dynamic`
+- `JavaScriptReplyProxy.postMessage` is of type `WebMessage`
+- `WebMessageListener.onPostMessage` and `WebMessagePort.setWebMessageCallback` methods signature
+
 ## 6.0.0-beta.27
 
 - Added `requestPostMessageChannel`, `postMessage`, `isEngagementSignalsApiAvailable` methods on `ChromeSafariBrowser` for Android

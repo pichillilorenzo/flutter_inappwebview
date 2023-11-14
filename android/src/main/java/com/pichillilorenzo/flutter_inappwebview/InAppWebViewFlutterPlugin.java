@@ -2,29 +2,28 @@ package com.pichillilorenzo.flutter_inappwebview;
 
 import android.app.Activity;
 import android.content.Context;
-import android.net.Uri;
 import android.os.Build;
-import android.webkit.ValueCallback;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.pichillilorenzo.flutter_inappwebview.chrome_custom_tabs.ChromeSafariBrowserManager;
 import com.pichillilorenzo.flutter_inappwebview.credential_database.CredentialDatabaseHandler;
-import com.pichillilorenzo.flutter_inappwebview.in_app_browser.InAppBrowserManager;
 import com.pichillilorenzo.flutter_inappwebview.headless_in_app_webview.HeadlessInAppWebViewManager;
+import com.pichillilorenzo.flutter_inappwebview.in_app_browser.InAppBrowserManager;
 import com.pichillilorenzo.flutter_inappwebview.print_job.PrintJobManager;
+import com.pichillilorenzo.flutter_inappwebview.process_global_config.ProcessGlobalConfigManager;
 import com.pichillilorenzo.flutter_inappwebview.proxy.ProxyManager;
 import com.pichillilorenzo.flutter_inappwebview.service_worker.ServiceWorkerManager;
 import com.pichillilorenzo.flutter_inappwebview.tracing.TracingControllerManager;
 import com.pichillilorenzo.flutter_inappwebview.webview.FlutterWebViewFactory;
 import com.pichillilorenzo.flutter_inappwebview.webview.InAppWebViewManager;
 
+import io.flutter.embedding.engine.plugins.FlutterPlugin;
 import io.flutter.embedding.engine.plugins.activity.ActivityAware;
 import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding;
 import io.flutter.plugin.common.BinaryMessenger;
 import io.flutter.plugin.common.PluginRegistry;
-import io.flutter.embedding.engine.plugins.FlutterPlugin;
 import io.flutter.plugin.platform.PlatformViewRegistry;
 import io.flutter.view.FlutterView;
 
@@ -58,6 +57,8 @@ public class InAppWebViewFlutterPlugin implements FlutterPlugin, ActivityAware {
   public PrintJobManager printJobManager;
   @Nullable
   public TracingControllerManager tracingControllerManager;
+  @Nullable
+  public ProcessGlobalConfigManager processGlobalConfigManager;
   public FlutterWebViewFactory flutterWebViewFactory;
   public Context applicationContext;
   public PluginRegistry.Registrar registrar;
@@ -122,6 +123,7 @@ public class InAppWebViewFlutterPlugin implements FlutterPlugin, ActivityAware {
       printJobManager = new PrintJobManager(this);
     }
     tracingControllerManager = new TracingControllerManager(this);
+    processGlobalConfigManager = new ProcessGlobalConfigManager(this);
   }
 
   @Override
@@ -177,6 +179,10 @@ public class InAppWebViewFlutterPlugin implements FlutterPlugin, ActivityAware {
     if (tracingControllerManager != null) {
       tracingControllerManager.dispose();
       tracingControllerManager = null;
+    }
+    if (processGlobalConfigManager != null) {
+      processGlobalConfigManager.dispose();
+      processGlobalConfigManager = null;
     }
   }
 

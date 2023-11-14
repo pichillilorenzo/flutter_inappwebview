@@ -9,3 +9,8 @@ export 'webview_asset_loader.dart'
         ResourcesPathHandler,
         InternalStoragePathHandler;
 export 'tracing_controller.dart' show TracingController, TracingSettings;
+export 'process_global_config.dart'
+    show
+        ProcessGlobalConfig,
+        ProcessGlobalConfigSettings,
+        ProcessGlobalConfigDirectoryBasePaths;

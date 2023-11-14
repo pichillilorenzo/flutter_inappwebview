@@ -13,7 +13,11 @@ function FlutterInAppWebViewWebMessageListener(jsObjectName) {
     this.listeners = [];
     this.onmessage = null;
 }
-FlutterInAppWebViewWebMessageListener.prototype.postMessage = function(message) {
+FlutterInAppWebViewWebMessageListener.prototype.postMessage = function(data) {
+    var message = {
+        "data": window.ArrayBuffer != null && data instanceof ArrayBuffer ? Array.from(new Uint8Array(data)) : (data != null ? data.toString() : null),
+        "type": window.ArrayBuffer != null && data instanceof ArrayBuffer ? 1 : 0
+    };
     window.webkit.messageHandlers['onWebMessageListenerPostMessageReceived'].postMessage({jsObjectName: this.jsObjectName, message: message});
 };
 FlutterInAppWebViewWebMessageListener.prototype.addEventListener = function(type, listener) {

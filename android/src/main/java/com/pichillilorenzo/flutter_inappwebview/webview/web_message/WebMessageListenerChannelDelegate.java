@@ -2,10 +2,12 @@ package com.pichillilorenzo.flutter_inappwebview.webview.web_message;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.webkit.WebMessageCompat;
 
 import com.pichillilorenzo.flutter_inappwebview.headless_in_app_webview.HeadlessInAppWebView;
 import com.pichillilorenzo.flutter_inappwebview.types.ChannelDelegateImpl;
 import com.pichillilorenzo.flutter_inappwebview.types.Disposable;
+import com.pichillilorenzo.flutter_inappwebview.types.WebMessageCompatExt;
 import com.pichillilorenzo.flutter_inappwebview.webview.in_app_webview.InAppWebView;
 
 import java.util.HashMap;
@@ -28,7 +30,7 @@ public class WebMessageListenerChannelDelegate extends ChannelDelegateImpl {
     switch (call.method) {
       case "postMessage":
         if (webMessageListener != null && webMessageListener.webView instanceof InAppWebView) {
-          String message = (String) call.argument("message");
+          WebMessageCompatExt message = WebMessageCompatExt.fromMap((Map<String, Object>) call.argument("message"));
           webMessageListener.postMessageForInAppWebView(message, result);
         } else {
           result.success(false); 
@@ -39,11 +41,11 @@ public class WebMessageListenerChannelDelegate extends ChannelDelegateImpl {
     }
   }
 
-  public void onPostMessage(String message, String sourceOrigin, boolean isMainFrame) {
+  public void onPostMessage(@Nullable WebMessageCompatExt message, String sourceOrigin, boolean isMainFrame) {
     MethodChannel channel = getChannel();
     if (channel == null) return;
     Map<String, Object> obj = new HashMap<>();
-    obj.put("message", message);
+    obj.put("message", message != null ? message.toMap() : null);
     obj.put("sourceOrigin", sourceOrigin);
     obj.put("isMainFrame", isMainFrame);
     channel.invokeMethod("onPostMessage", obj);

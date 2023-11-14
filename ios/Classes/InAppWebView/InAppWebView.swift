@@ -2887,14 +2887,22 @@ if(window.\(JAVASCRIPT_BRIDGE_NAME)[\(_callHandlerID)] != null) {
             let body = message.body as! [String: Any?]
             let webMessageChannelId = body["webMessageChannelId"] as! String
             let index = body["index"] as! Int64
-            let webMessage = body["message"] as? String
+            var webMessage: WebMessage? = nil
+            if let webMessageMap = body["message"] as? [String : Any?] {
+                webMessage = WebMessage.fromMap(map: webMessageMap)
+            }
+            
             if let webMessageChannel = webMessageChannels[webMessageChannelId] {
                 webMessageChannel.channelDelegate?.onMessage(index: index, message: webMessage)
             }
         } else if message.name == "onWebMessageListenerPostMessageReceived" {
             let body = message.body as! [String: Any?]
             let jsObjectName = body["jsObjectName"] as! String
-            let messageData = body["message"] as? String
+            var webMessage: WebMessage? = nil
+            if let webMessageMap = body["message"] as? [String : Any?] {
+                webMessage = WebMessage.fromMap(map: webMessageMap)
+            }
+            
             if let webMessageListener = webMessageListeners.first(where: ({($0.jsObjectName == jsObjectName)})) {
                 let isMainFrame = message.frameInfo.isMainFrame
                 
@@ -2920,7 +2928,7 @@ if(window.\(JAVASCRIPT_BRIDGE_NAME)[\(_callHandlerID)] != null) {
                 if let scheme = scheme, !scheme.isEmpty, let host = host, !host.isEmpty {
                     sourceOrigin = URL(string: "\(scheme)://\(host)\(port != nil && port != 0 ? ":" + String(port!) : "")")
                 }
-                webMessageListener.channelDelegate?.onPostMessage(message: messageData, sourceOrigin: sourceOrigin, isMainFrame: isMainFrame)
+                webMessageListener.channelDelegate?.onPostMessage(message: webMessage, sourceOrigin: sourceOrigin, isMainFrame: isMainFrame)
             }
         }
     }
@@ -3190,11 +3198,11 @@ if(window.\(JAVASCRIPT_BRIDGE_NAME)[\(_callHandlerID)] != null) {
             }
             portsString = "[" + portArrayString.joined(separator: ", ") + "]"
         }
-        let data = message.data?.replacingOccurrences(of: "\'", with: "\\'") ?? "null"
+        
         let url = URL(string: targetOrigin)?.absoluteString ?? "*"
         let source = """
         (function() {
-            window.postMessage('\(data)', '\(url)', \(portsString));
+            window.postMessage(\(message.jsData), '\(url)', \(portsString));
         })();
         """
         evaluateJavascript(source: source, completionHandler: completionHandler)

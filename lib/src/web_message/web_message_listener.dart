@@ -3,6 +3,7 @@ import '../in_app_webview/in_app_webview_controller.dart';
 import '../types/main.dart';
 import '../util.dart';
 import '../web_uri.dart';
+import 'web_message.dart';
 
 ///This listener receives messages sent on the JavaScript object which was injected by [InAppWebViewController.addWebMessageListener].
 ///
@@ -56,7 +57,10 @@ class WebMessageListener extends ChannelController {
           _replyProxy = new JavaScriptReplyProxy(this);
         }
         if (onPostMessage != null) {
-          String? message = call.arguments["message"];
+          WebMessage? message = call.arguments["message"] != null
+              ? WebMessage.fromMap(
+                  call.arguments["message"].cast<String, dynamic>())
+              : null;
           WebUri? sourceOrigin = call.arguments["sourceOrigin"] != null
               ? WebUri(call.arguments["sourceOrigin"])
               : null;
@@ -107,10 +111,12 @@ class JavaScriptReplyProxy {
 
   ///Post a [message] to the injected JavaScript object which sent this [JavaScriptReplyProxy].
   ///
+  ///If [message] is of type [WebMessageType.ARRAY_BUFFER], be aware that large byte buffers can lead to out-of-memory crashes on low-end devices.
+  ///
   ///**Official Android API**: https://developer.android.com/reference/androidx/webkit/JavaScriptReplyProxy#postMessage(java.lang.String)
-  Future<void> postMessage(String message) async {
+  Future<void> postMessage(WebMessage message) async {
     Map<String, dynamic> args = <String, dynamic>{};
-    args.putIfAbsent('message', () => message);
+    args.putIfAbsent('message', () => message.toMap());
     await _webMessageListener.channel?.invokeMethod('postMessage', args);
   }
 

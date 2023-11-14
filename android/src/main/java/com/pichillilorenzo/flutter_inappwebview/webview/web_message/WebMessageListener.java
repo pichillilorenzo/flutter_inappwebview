@@ -14,6 +14,7 @@ import androidx.webkit.WebViewFeature;
 import com.pichillilorenzo.flutter_inappwebview.Util;
 import com.pichillilorenzo.flutter_inappwebview.plugin_scripts_js.JavaScriptBridgeJS;
 import com.pichillilorenzo.flutter_inappwebview.types.Disposable;
+import com.pichillilorenzo.flutter_inappwebview.types.WebMessageCompatExt;
 import com.pichillilorenzo.flutter_inappwebview.webview.InAppWebViewInterface;
 import com.pichillilorenzo.flutter_inappwebview.types.PluginScript;
 import com.pichillilorenzo.flutter_inappwebview.types.UserScriptInjectionTime;
@@ -61,7 +62,7 @@ public class WebMessageListener implements Disposable {
                                   boolean isMainFrame, @NonNull JavaScriptReplyProxy javaScriptReplyProxy) {
           replyProxy = javaScriptReplyProxy;
           if (channelDelegate != null) {
-            channelDelegate.onPostMessage(message.getData(),
+            channelDelegate.onPostMessage(WebMessageCompatExt.fromMapWebMessageCompat(message),
                     sourceOrigin.toString().equals("null") ? null : sourceOrigin.toString(),
                     isMainFrame);
           }
@@ -171,9 +172,16 @@ public class WebMessageListener implements Disposable {
     }
   }
 
-  public void postMessageForInAppWebView(String message, @NonNull MethodChannel.Result result) {
+  public void postMessageForInAppWebView(WebMessageCompatExt message, @NonNull MethodChannel.Result result) {
     if (replyProxy != null && WebViewFeature.isFeatureSupported(WebViewFeature.WEB_MESSAGE_LISTENER)) {
-      replyProxy.postMessage(message);
+      Object data = message.getData();
+      if (data != null) {
+        if (WebViewFeature.isFeatureSupported(WebViewFeature.WEB_MESSAGE_ARRAY_BUFFER) && message.getType() == WebMessageCompat.TYPE_ARRAY_BUFFER) {
+          replyProxy.postMessage((byte[]) data);
+        } else {
+          replyProxy.postMessage(data.toString());
+        }
+      }
     }
     result.success(true);
   }
@@ -196,12 +204,14 @@ public class WebMessageListener implements Disposable {
       if (rule.getHost() != null && rule.getHost().startsWith("[")) {
         try {
           IPv6 = Util.normalizeIPv6(rule.getHost().substring(1, rule.getHost().length() - 1));
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+        }
       }
       String hostIPv6 = null;
       try {
         hostIPv6 = Util.normalizeIPv6(host);
-      } catch (Exception ignored) {}
+      } catch (Exception ignored) {
+      }
 
       boolean schemeAllowed = rule.getScheme().equals(scheme);
 

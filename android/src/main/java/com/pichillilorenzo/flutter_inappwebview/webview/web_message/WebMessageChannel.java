@@ -11,6 +11,8 @@ import androidx.webkit.WebViewFeature;
 
 import com.pichillilorenzo.flutter_inappwebview.plugin_scripts_js.JavaScriptBridgeJS;
 import com.pichillilorenzo.flutter_inappwebview.types.Disposable;
+import com.pichillilorenzo.flutter_inappwebview.types.WebMessageCompatExt;
+import com.pichillilorenzo.flutter_inappwebview.types.WebMessagePortCompatExt;
 import com.pichillilorenzo.flutter_inappwebview.webview.InAppWebViewInterface;
 import com.pichillilorenzo.flutter_inappwebview.types.WebMessagePort;
 import com.pichillilorenzo.flutter_inappwebview.webview.in_app_webview.InAppWebView;
@@ -77,7 +79,7 @@ public class WebMessageChannel implements Disposable {
           @Override
           public void onMessage(@NonNull WebMessagePortCompat port, @Nullable WebMessageCompat message) {
             super.onMessage(port, message);
-            webMessageChannel.onMessage(index, message != null ? message.getData() : null);
+            webMessageChannel.onMessage(index, message != null ? WebMessageCompatExt.fromMapWebMessageCompat(message) : null);
           }
         });
         result.success(true);
@@ -89,25 +91,28 @@ public class WebMessageChannel implements Disposable {
     }
   }
 
-  public void postMessageForInAppWebView(final Integer index, Map<String, Object> message, @NonNull MethodChannel.Result result) {
+  public void postMessageForInAppWebView(final Integer index, @NonNull WebMessageCompatExt message, @NonNull MethodChannel.Result result) {
     if (webView != null && compatPorts.size() > 0 &&
             WebViewFeature.isFeatureSupported(WebViewFeature.WEB_MESSAGE_PORT_POST_MESSAGE)) {
       WebMessagePortCompat port = compatPorts.get(index);
       List<WebMessagePortCompat> webMessagePorts = new ArrayList<>();
-      List<Map<String, Object>> portsMap = (List<Map<String, Object>>) message.get("ports");
-      if (portsMap != null) {
-        for (Map<String, Object> portMap : portsMap) {
-          String webMessageChannelId = (String) portMap.get("webMessageChannelId");
-          Integer portIndex = (Integer) portMap.get("index");
-          WebMessageChannel webMessageChannel = webView.getWebMessageChannels().get(webMessageChannelId);
+      List<WebMessagePortCompatExt> portsExt = message.getPorts();
+      if (portsExt != null) {
+        for (WebMessagePortCompatExt portExt : portsExt) {
+          WebMessageChannel webMessageChannel = webView.getWebMessageChannels().get(portExt.getWebMessageChannelId());
           if (webMessageChannel != null) {
-            webMessagePorts.add(webMessageChannel.compatPorts.get(portIndex));
+            webMessagePorts.add(webMessageChannel.compatPorts.get(portExt.getIndex()));
           }
         }
       }
-      WebMessageCompat webMessage = new WebMessageCompat((String) message.get("data"), webMessagePorts.toArray(new WebMessagePortCompat[0]));
+      Object data = message.getData();
       try {
-        port.postMessage(webMessage);
+        if (WebViewFeature.isFeatureSupported(WebViewFeature.WEB_MESSAGE_ARRAY_BUFFER) && data != null &&
+                message.getType() == WebMessageCompat.TYPE_ARRAY_BUFFER) {
+          port.postMessage(new WebMessageCompat((byte[]) data, webMessagePorts.toArray(new WebMessagePortCompat[0])));
+        } else {
+          port.postMessage(new WebMessageCompat(data != null ? data.toString() : null, webMessagePorts.toArray(new WebMessagePortCompat[0])));
+        }
         result.success(true);
       } catch (Exception e) {
         result.error(LOG_TAG, e.getMessage(), null);
@@ -132,7 +137,7 @@ public class WebMessageChannel implements Disposable {
     }
   }
 
-  public void onMessage(int index, String message) {
+  public void onMessage(int index, @Nullable WebMessageCompatExt message) {
     if (channelDelegate != null) {
       channelDelegate.onMessage(index, message);
     }

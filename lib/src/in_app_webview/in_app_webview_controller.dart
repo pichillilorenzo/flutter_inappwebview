@@ -30,6 +30,7 @@ import 'in_app_webview_keep_alive.dart';
 
 import '../print_job/main.dart';
 import '../find_interaction/main.dart';
+import '../android/process_global_config.dart';
 
 ///List of forbidden names for JavaScript handlers.
 // ignore: non_constant_identifier_names
@@ -3868,6 +3869,24 @@ class InAppWebViewController extends ChannelController {
     return await _staticChannel.invokeMethod<bool>(
             'isMultiProcessEnabled', args) ??
         false;
+  }
+
+  ///Indicate that the current process does not intend to use WebView,
+  ///and that an exception should be thrown if a WebView is created or any other
+  ///methods in the `android.webkit` package are used.
+  ///
+  ///Applications with multiple processes may wish to call this in processes that
+  ///are not intended to use WebView to avoid accidentally incurring the memory usage
+  ///of initializing WebView in long-lived processes that have no need for it,
+  ///and to prevent potential data directory conflicts (see [ProcessGlobalConfigSettings.dataDirectorySuffix]).
+  ///
+  ///**NOTE for Android**: available only on Android 28+.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- Android native WebView ([Official API - WebView.disableWebView](https://developer.android.com/reference/android/webkit/WebView.html#disableWebView()))
+  static Future<void> disableWebView() async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    await _staticChannel.invokeMethod('disableWebView', args);
   }
 
   ///Returns a Boolean value that indicates whether WebKit natively supports resources with the specified URL scheme.

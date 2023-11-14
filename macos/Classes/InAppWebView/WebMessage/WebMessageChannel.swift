@@ -26,8 +26,8 @@ public class WebMessageChannel : FlutterMethodCallDelegate {
             self.channelDelegate = WebMessageChannelChannelDelegate(webMessageChannel: self, channel: channel)
         }
         self.ports = [
-            WebMessagePort(name: "port1", webMessageChannel: self),
-            WebMessagePort(name: "port2", webMessageChannel: self)
+            WebMessagePort(name: "port1", index: 0, webMessageChannelId: self.id, webMessageChannel: self),
+            WebMessagePort(name: "port2", index: 1, webMessageChannelId: self.id, webMessageChannel: self)
         ]
     }
     

@@ -28,6 +28,12 @@ public class WebViewFeatureManager extends ChannelDelegateImpl {
         String feature = (String) call.argument("feature");
         result.success(WebViewFeature.isFeatureSupported(feature));
         break;
+      case "isStartupFeatureSupported":
+        if (plugin != null && plugin.activity != null) {
+          String startupFeature = (String) call.argument("startupFeature");
+          result.success(WebViewFeature.isStartupFeatureSupported(plugin.activity, startupFeature));
+        }
+        break;
       default:
         result.notImplemented();
     }

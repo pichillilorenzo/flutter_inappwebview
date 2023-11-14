@@ -19,40 +19,40 @@ class WebViewFeature {
           String value, Function nativeValue) =>
       WebViewFeature._internal(value, nativeValue());
 
-  ///This feature covers [InAppWebViewSettings.algorithmicDarkeningAllowed].
+  ///Feature for [isFeatureSupported]. This feature covers [InAppWebViewSettings.algorithmicDarkeningAllowed].
   static const ALGORITHMIC_DARKENING = WebViewFeature._internal(
       'ALGORITHMIC_DARKENING', 'ALGORITHMIC_DARKENING');
 
-  ///This feature covers [InAppWebViewController.createWebMessageChannel].
+  ///Feature for [isFeatureSupported]. This feature covers [InAppWebViewController.createWebMessageChannel].
   static const CREATE_WEB_MESSAGE_CHANNEL = WebViewFeature._internal(
       'CREATE_WEB_MESSAGE_CHANNEL', 'CREATE_WEB_MESSAGE_CHANNEL');
 
-  ///This feature covers [InAppWebViewSettings.disabledActionModeMenuItems].
+  ///Feature for [isFeatureSupported]. This feature covers [InAppWebViewSettings.disabledActionModeMenuItems].
   static const DISABLED_ACTION_MODE_MENU_ITEMS = WebViewFeature._internal(
       'DISABLED_ACTION_MODE_MENU_ITEMS', 'DISABLED_ACTION_MODE_MENU_ITEMS');
 
-  ///This feature covers [UserScriptInjectionTime.AT_DOCUMENT_START].
+  ///Feature for [isFeatureSupported]. This feature covers [UserScriptInjectionTime.AT_DOCUMENT_START].
   static const DOCUMENT_START_SCRIPT = WebViewFeature._internal(
       'DOCUMENT_START_SCRIPT', 'DOCUMENT_START_SCRIPT');
 
-  ///This feature covers [InAppWebViewSettings.enterpriseAuthenticationAppLinkPolicyEnabled].
+  ///Feature for [isFeatureSupported]. This feature covers [InAppWebViewSettings.enterpriseAuthenticationAppLinkPolicyEnabled].
   static const ENTERPRISE_AUTHENTICATION_APP_LINK_POLICY =
       WebViewFeature._internal('ENTERPRISE_AUTHENTICATION_APP_LINK_POLICY',
           'ENTERPRISE_AUTHENTICATION_APP_LINK_POLICY');
 
-  ///This feature covers [InAppWebViewSettings.forceDark].
+  ///Feature for [isFeatureSupported]. This feature covers [InAppWebViewSettings.forceDark].
   static const FORCE_DARK =
       WebViewFeature._internal('FORCE_DARK', 'FORCE_DARK');
 
-  ///This feature covers [InAppWebViewSettings.forceDarkStrategy].
+  ///Feature for [isFeatureSupported]. This feature covers [InAppWebViewSettings.forceDarkStrategy].
   static const FORCE_DARK_STRATEGY =
       WebViewFeature._internal('FORCE_DARK_STRATEGY', 'FORCE_DARK_STRATEGY');
 
-  ///This feature covers cookie attributes of [CookieManager.getCookie] and [CookieManager.getCookies] methods.
+  ///Feature for [isFeatureSupported]. This feature covers cookie attributes of [CookieManager.getCookie] and [CookieManager.getCookies] methods.
   static const GET_COOKIE_INFO =
       WebViewFeature._internal('GET_COOKIE_INFO', 'GET_COOKIE_INFO');
 
-  ///This feature covers [InAppWebViewController.getVariationsHeader].
+  ///Feature for [isFeatureSupported]. This feature covers [InAppWebViewController.getVariationsHeader].
   static const GET_VARIATIONS_HEADER = WebViewFeature._internal(
       'GET_VARIATIONS_HEADER', 'GET_VARIATIONS_HEADER');
 
@@ -72,19 +72,19 @@ class WebViewFeature {
   static const MULTI_PROCESS =
       WebViewFeature._internal('MULTI_PROCESS', 'MULTI_PROCESS');
 
-  ///This feature covers [InAppWebViewSettings.offscreenPreRaster].
+  ///Feature for [isFeatureSupported]. This feature covers [InAppWebViewSettings.offscreenPreRaster].
   static const OFF_SCREEN_PRERASTER =
       WebViewFeature._internal('OFF_SCREEN_PRERASTER', 'OFF_SCREEN_PRERASTER');
 
-  ///This feature covers [InAppWebViewController.postWebMessage].
+  ///Feature for [isFeatureSupported]. This feature covers [InAppWebViewController.postWebMessage].
   static const POST_WEB_MESSAGE =
       WebViewFeature._internal('POST_WEB_MESSAGE', 'POST_WEB_MESSAGE');
 
-  ///This feature covers [ProxyController.setProxyOverride] and [ProxyController.clearProxyOverride].
+  ///Feature for [isFeatureSupported]. This feature covers [ProxyController.setProxyOverride] and [ProxyController.clearProxyOverride].
   static const PROXY_OVERRIDE =
       WebViewFeature._internal('PROXY_OVERRIDE', 'PROXY_OVERRIDE');
 
-  ///This feature covers [ProxySettings.reverseBypassEnabled].
+  ///Feature for [isFeatureSupported]. This feature covers [ProxySettings.reverseBypassEnabled].
   static const PROXY_OVERRIDE_REVERSE_BYPASS = WebViewFeature._internal(
       'PROXY_OVERRIDE_REVERSE_BYPASS', 'PROXY_OVERRIDE_REVERSE_BYPASS');
 
@@ -96,15 +96,15 @@ class WebViewFeature {
   static const RECEIVE_WEB_RESOURCE_ERROR = WebViewFeature._internal(
       'RECEIVE_WEB_RESOURCE_ERROR', 'RECEIVE_WEB_RESOURCE_ERROR');
 
-  ///This feature covers cookie attributes of [CookieManager.getCookie] and [CookieManager.getCookies] methods.
+  ///Feature for [isFeatureSupported]. This feature covers cookie attributes of [CookieManager.getCookie] and [CookieManager.getCookies] methods.
   static const REQUESTED_WITH_HEADER_ALLOW_LIST = WebViewFeature._internal(
       'REQUESTED_WITH_HEADER_ALLOW_LIST', 'REQUESTED_WITH_HEADER_ALLOW_LIST');
 
-  ///This feature covers [InAppWebViewController.setSafeBrowsingAllowlist].
+  ///Feature for [isFeatureSupported]. This feature covers [InAppWebViewController.setSafeBrowsingAllowlist].
   static const SAFE_BROWSING_ALLOWLIST = WebViewFeature._internal(
       'SAFE_BROWSING_ALLOWLIST', 'SAFE_BROWSING_ALLOWLIST');
 
-  ///This feature covers [InAppWebViewSettings.safeBrowsingEnabled].
+  ///Feature for [isFeatureSupported]. This feature covers [InAppWebViewSettings.safeBrowsingEnabled].
   static const SAFE_BROWSING_ENABLE =
       WebViewFeature._internal('SAFE_BROWSING_ENABLE', 'SAFE_BROWSING_ENABLE');
 
@@ -112,7 +112,7 @@ class WebViewFeature {
   static const SAFE_BROWSING_HIT =
       WebViewFeature._internal('SAFE_BROWSING_HIT', 'SAFE_BROWSING_HIT');
 
-  ///This feature covers [InAppWebViewController.getSafeBrowsingPrivacyPolicyUrl].
+  ///Feature for [isFeatureSupported]. This feature covers [InAppWebViewController.getSafeBrowsingPrivacyPolicyUrl].
   static const SAFE_BROWSING_PRIVACY_POLICY_URL = WebViewFeature._internal(
       'SAFE_BROWSING_PRIVACY_POLICY_URL', 'SAFE_BROWSING_PRIVACY_POLICY_URL');
 
@@ -134,28 +134,28 @@ class WebViewFeature {
   static const SAFE_BROWSING_WHITELIST = WebViewFeature._internal(
       'SAFE_BROWSING_WHITELIST', 'SAFE_BROWSING_WHITELIST');
 
-  ///This feature covers [ServiceWorkerController].
+  ///Feature for [isFeatureSupported]. This feature covers [ServiceWorkerController].
   static const SERVICE_WORKER_BASIC_USAGE = WebViewFeature._internal(
       'SERVICE_WORKER_BASIC_USAGE', 'SERVICE_WORKER_BASIC_USAGE');
 
-  ///This feature covers [ServiceWorkerController.setBlockNetworkLoads] and [ServiceWorkerController.getBlockNetworkLoads].
+  ///Feature for [isFeatureSupported]. This feature covers [ServiceWorkerController.setBlockNetworkLoads] and [ServiceWorkerController.getBlockNetworkLoads].
   static const SERVICE_WORKER_BLOCK_NETWORK_LOADS = WebViewFeature._internal(
       'SERVICE_WORKER_BLOCK_NETWORK_LOADS',
       'SERVICE_WORKER_BLOCK_NETWORK_LOADS');
 
-  ///This feature covers [ServiceWorkerController.setCacheMode] and [ServiceWorkerController.getCacheMode].
+  ///Feature for [isFeatureSupported]. This feature covers [ServiceWorkerController.setCacheMode] and [ServiceWorkerController.getCacheMode].
   static const SERVICE_WORKER_CACHE_MODE = WebViewFeature._internal(
       'SERVICE_WORKER_CACHE_MODE', 'SERVICE_WORKER_CACHE_MODE');
 
-  ///This feature covers [ServiceWorkerController.setAllowContentAccess] and [ServiceWorkerController.getAllowContentAccess].
+  ///Feature for [isFeatureSupported]. This feature covers [ServiceWorkerController.setAllowContentAccess] and [ServiceWorkerController.getAllowContentAccess].
   static const SERVICE_WORKER_CONTENT_ACCESS = WebViewFeature._internal(
       'SERVICE_WORKER_CONTENT_ACCESS', 'SERVICE_WORKER_CONTENT_ACCESS');
 
-  ///This feature covers [ServiceWorkerController.setAllowFileAccess] and [ServiceWorkerController.getAllowFileAccess].
+  ///Feature for [isFeatureSupported]. This feature covers [ServiceWorkerController.setAllowFileAccess] and [ServiceWorkerController.getAllowFileAccess].
   static const SERVICE_WORKER_FILE_ACCESS = WebViewFeature._internal(
       'SERVICE_WORKER_FILE_ACCESS', 'SERVICE_WORKER_FILE_ACCESS');
 
-  ///This feature covers [ServiceWorkerClient.shouldInterceptRequest].
+  ///Feature for [isFeatureSupported]. This feature covers [ServiceWorkerClient.shouldInterceptRequest].
   static const SERVICE_WORKER_SHOULD_INTERCEPT_REQUEST =
       WebViewFeature._internal('SERVICE_WORKER_SHOULD_INTERCEPT_REQUEST',
           'SERVICE_WORKER_SHOULD_INTERCEPT_REQUEST');
@@ -164,11 +164,21 @@ class WebViewFeature {
   static const SHOULD_OVERRIDE_WITH_REDIRECTS = WebViewFeature._internal(
       'SHOULD_OVERRIDE_WITH_REDIRECTS', 'SHOULD_OVERRIDE_WITH_REDIRECTS');
 
-  ///This feature covers [InAppWebViewController.startSafeBrowsing].
+  ///Feature for [isStartupFeatureSupported]. This feature covers [ProcessGlobalConfigSettings.dataDirectorySuffix].
+  static const STARTUP_FEATURE_SET_DATA_DIRECTORY_SUFFIX =
+      WebViewFeature._internal('STARTUP_FEATURE_SET_DATA_DIRECTORY_SUFFIX',
+          'STARTUP_FEATURE_SET_DATA_DIRECTORY_SUFFIX');
+
+  ///Feature for [isStartupFeatureSupported]. This feature covers [ProcessGlobalConfigSettings.directoryBasePaths].
+  static const STARTUP_FEATURE_SET_DIRECTORY_BASE_PATHS =
+      WebViewFeature._internal('STARTUP_FEATURE_SET_DIRECTORY_BASE_PATHS',
+          'STARTUP_FEATURE_SET_DIRECTORY_BASE_PATHS');
+
+  ///Feature for [isFeatureSupported]. This feature covers [InAppWebViewController.startSafeBrowsing].
   static const START_SAFE_BROWSING =
       WebViewFeature._internal('START_SAFE_BROWSING', 'START_SAFE_BROWSING');
 
-  ///This feature covers [InAppWebViewSettings.willSuppressErrorPage].
+  ///Feature for [isFeatureSupported]. This feature covers [InAppWebViewSettings.willSuppressErrorPage].
   static const SUPPRESS_ERROR_PAGE =
       WebViewFeature._internal('SUPPRESS_ERROR_PAGE', 'SUPPRESS_ERROR_PAGE');
 
@@ -180,11 +190,16 @@ class WebViewFeature {
   static const VISUAL_STATE_CALLBACK = WebViewFeature._internal(
       'VISUAL_STATE_CALLBACK', 'VISUAL_STATE_CALLBACK');
 
+  ///Feature for [isFeatureSupported]. This feature covers [WebMessagePort.postMessage] with `ArrayBuffer` type,
+  ///[InAppWebViewController.postWebMessage] with `ArrayBuffer` type, and [JavaScriptReplyProxy.postMessage] with `ArrayBuffer` type.
+  static const WEB_MESSAGE_ARRAY_BUFFER = WebViewFeature._internal(
+      'WEB_MESSAGE_ARRAY_BUFFER', 'WEB_MESSAGE_ARRAY_BUFFER');
+
   ///
   static const WEB_MESSAGE_CALLBACK_ON_MESSAGE = WebViewFeature._internal(
       'WEB_MESSAGE_CALLBACK_ON_MESSAGE', 'WEB_MESSAGE_CALLBACK_ON_MESSAGE');
 
-  ///This feature covers [WebMessageListener].
+  ///Feature for [isFeatureSupported]. This feature covers [WebMessageListener].
   static const WEB_MESSAGE_LISTENER =
       WebViewFeature._internal('WEB_MESSAGE_LISTENER', 'WEB_MESSAGE_LISTENER');
 
@@ -262,10 +277,13 @@ class WebViewFeature {
     WebViewFeature.SERVICE_WORKER_FILE_ACCESS,
     WebViewFeature.SERVICE_WORKER_SHOULD_INTERCEPT_REQUEST,
     WebViewFeature.SHOULD_OVERRIDE_WITH_REDIRECTS,
+    WebViewFeature.STARTUP_FEATURE_SET_DATA_DIRECTORY_SUFFIX,
+    WebViewFeature.STARTUP_FEATURE_SET_DIRECTORY_BASE_PATHS,
     WebViewFeature.START_SAFE_BROWSING,
     WebViewFeature.SUPPRESS_ERROR_PAGE,
     WebViewFeature.TRACING_CONTROLLER_BASIC_USAGE,
     WebViewFeature.VISUAL_STATE_CALLBACK,
+    WebViewFeature.WEB_MESSAGE_ARRAY_BUFFER,
     WebViewFeature.WEB_MESSAGE_CALLBACK_ON_MESSAGE,
     WebViewFeature.WEB_MESSAGE_LISTENER,
     WebViewFeature.WEB_MESSAGE_PORT_CLOSE,
@@ -308,11 +326,41 @@ class WebViewFeature {
   ///this will check whether a feature is supported, depending on the combination of the desired feature, the Android version of device,
   ///and the WebView APK on the device. If running on a device with a lower API level, this will always return `false`.
   ///
+  ///**Note**: This method is different from [isStartupFeatureSupported] and this
+  ///method only accepts certain features.
+  ///Please verify that the correct feature checking method is used for a particular feature.
+  ///
+  ///**Note**: If this method returns `false`, it is not safe to invoke the methods
+  ///requiring the desired feature.
+  ///Furthermore, if this method returns `false` for a particular feature, any callback guarded by that feature will not be invoked.
+  ///
   ///**Official Android API**: https://developer.android.com/reference/androidx/webkit/WebViewFeature#isFeatureSupported(java.lang.String)
   static Future<bool> isFeatureSupported(WebViewFeature feature) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent("feature", () => feature.toNativeValue());
     return await _channel.invokeMethod('isFeatureSupported', args);
+  }
+
+  ///Return whether a startup feature is supported at run-time.
+  ///On devices running Android version `Build.VERSION_CODES.LOLLIPOP` and higher,
+  ///this will check whether a startup feature is supported,
+  ///depending on the combination of the desired feature,
+  ///the Android version of device, and the WebView APK on the device.
+  ///If running on a device with a lower API level, this will always return `false`.
+  ///
+  ///**Note**: This method is different from [isFeatureSupported] and this method only accepts startup features.
+  ///Please verify that the correct feature checking method is used for a particular feature.
+  ///
+  ///**Note**: If this method returns `false`, it is not safe to invoke the methods requiring the desired feature.
+  ///Furthermore, if this method returns `false` for a particular feature,
+  ///any callback guarded by that feature will not be invoked.
+  ///
+  ///**Official Android API**: https://developer.android.com/reference/androidx/webkit/WebViewFeature#isFeatureSupported(java.lang.String)
+  static Future<bool> isStartupFeatureSupported(
+      WebViewFeature startupFeature) async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    args.putIfAbsent("startupFeature", () => startupFeature.toNativeValue());
+    return await _channel.invokeMethod('isStartupFeatureSupported', args);
   }
 
   ///Gets [String] value.
@@ -345,7 +393,7 @@ class AndroidWebViewFeature {
           String value, Function nativeValue) =>
       AndroidWebViewFeature._internal(value, nativeValue());
 
-  ///This feature covers [InAppWebViewSettings.algorithmicDarkeningAllowed].
+  ///Feature for [isFeatureSupported]. This feature covers [InAppWebViewSettings.algorithmicDarkeningAllowed].
   static const ALGORITHMIC_DARKENING = AndroidWebViewFeature._internal(
       'ALGORITHMIC_DARKENING', 'ALGORITHMIC_DARKENING');
 
@@ -358,11 +406,11 @@ class AndroidWebViewFeature {
       AndroidWebViewFeature._internal(
           'DISABLED_ACTION_MODE_MENU_ITEMS', 'DISABLED_ACTION_MODE_MENU_ITEMS');
 
-  ///This feature covers [UserScriptInjectionTime.AT_DOCUMENT_START].
+  ///Feature for [isFeatureSupported]. This feature covers [UserScriptInjectionTime.AT_DOCUMENT_START].
   static const DOCUMENT_START_SCRIPT = AndroidWebViewFeature._internal(
       'DOCUMENT_START_SCRIPT', 'DOCUMENT_START_SCRIPT');
 
-  ///This feature covers [InAppWebViewSettings.enterpriseAuthenticationAppLinkPolicyEnabled].
+  ///Feature for [isFeatureSupported]. This feature covers [InAppWebViewSettings.enterpriseAuthenticationAppLinkPolicyEnabled].
   static const ENTERPRISE_AUTHENTICATION_APP_LINK_POLICY =
       AndroidWebViewFeature._internal(
           'ENTERPRISE_AUTHENTICATION_APP_LINK_POLICY',
@@ -412,7 +460,7 @@ class AndroidWebViewFeature {
   static const RECEIVE_WEB_RESOURCE_ERROR = AndroidWebViewFeature._internal(
       'RECEIVE_WEB_RESOURCE_ERROR', 'RECEIVE_WEB_RESOURCE_ERROR');
 
-  ///This feature covers [InAppWebViewSettings.requestedWithHeaderMode].
+  ///Feature for [isFeatureSupported]. This feature covers [InAppWebViewSettings.requestedWithHeaderMode].
   static const REQUESTED_WITH_HEADER_CONTROL = AndroidWebViewFeature._internal(
       'REQUESTED_WITH_HEADER_CONTROL', 'REQUESTED_WITH_HEADER_CONTROL');
 
@@ -486,7 +534,7 @@ class AndroidWebViewFeature {
   static const START_SAFE_BROWSING = AndroidWebViewFeature._internal(
       'START_SAFE_BROWSING', 'START_SAFE_BROWSING');
 
-  ///This feature covers [InAppWebViewSettings.willSuppressErrorPage].
+  ///Feature for [isFeatureSupported]. This feature covers [InAppWebViewSettings.willSuppressErrorPage].
   static const SUPPRESS_ERROR_PAGE = AndroidWebViewFeature._internal(
       'SUPPRESS_ERROR_PAGE', 'SUPPRESS_ERROR_PAGE');
 

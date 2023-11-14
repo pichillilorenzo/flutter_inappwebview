@@ -5,6 +5,7 @@ import androidx.annotation.Nullable;
 
 import com.pichillilorenzo.flutter_inappwebview.types.ChannelDelegateImpl;
 import com.pichillilorenzo.flutter_inappwebview.types.Disposable;
+import com.pichillilorenzo.flutter_inappwebview.types.WebMessageCompatExt;
 import com.pichillilorenzo.flutter_inappwebview.webview.in_app_webview.InAppWebView;
 
 import java.util.HashMap;
@@ -36,7 +37,7 @@ public class WebMessageChannelChannelDelegate extends ChannelDelegateImpl {
       case "postMessage":
         if (webMessageChannel != null && webMessageChannel.webView instanceof InAppWebView) {
           final Integer index = (Integer) call.argument("index");
-          Map<String, Object> message = (Map<String, Object>) call.argument("message");
+          WebMessageCompatExt message = WebMessageCompatExt.fromMap((Map<String, Object>) call.argument("message"));
           webMessageChannel.postMessageForInAppWebView(index, message, result);
         } else {
           result.success(false);
@@ -55,12 +56,12 @@ public class WebMessageChannelChannelDelegate extends ChannelDelegateImpl {
     }
   }
 
-  public void onMessage(int index, String message) {
+  public void onMessage(int index, @Nullable WebMessageCompatExt message) {
     MethodChannel channel = getChannel();
     if (channel == null) return;
     Map<String, Object> obj = new HashMap<>();
     obj.put("index", index);
-    obj.put("message", message );
+    obj.put("message", message != null ? message.toMap() : null);
     channel.invokeMethod("onMessage", obj);
   }
 

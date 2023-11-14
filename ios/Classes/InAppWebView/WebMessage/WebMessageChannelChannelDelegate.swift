@@ -39,22 +39,20 @@ public class WebMessageChannelChannelDelegate : ChannelDelegate {
             if let webView = webMessageChannel?.webView, let ports = webMessageChannel?.ports, ports.count > 0 {
                 let index = arguments!["index"] as! Int
                 let port = ports[index]
-                let message = arguments!["message"] as! [String: Any?]
+                var message = WebMessage.fromMap(map: arguments!["message"] as! [String: Any?])
                 
-                var webMessagePorts: [WebMessagePort] = []
-                let portsMap = message["ports"] as? [[String: Any?]]
-                if let portsMap = portsMap {
-                    for portMap in portsMap {
-                        let webMessageChannelId = portMap["webMessageChannelId"] as! String
-                        let index = portMap["index"] as! Int
-                        if let webMessageChannel = webView.webMessageChannels[webMessageChannelId] {
-                            webMessagePorts.append(webMessageChannel.ports[index])
+                var ports: [WebMessagePort] = []
+                if let notConnectedPorts = message.ports {
+                    for notConnectedPort in notConnectedPorts {
+                        if let webMessageChannel = webView.webMessageChannels[notConnectedPort.webMessageChannelId] {
+                            ports.append(webMessageChannel.ports[Int(notConnectedPort.index)])
                         }
                     }
                 }
-                let webMessage = WebMessage(data: message["data"] as? String, ports: webMessagePorts)
+                message.ports = ports
+                
                 do {
-                    try port.postMessage(message: webMessage) { (_) in
+                    try port.postMessage(message: message) { (_) in
                         result(true)
                     }
                 } catch let error as NSError {
@@ -85,10 +83,10 @@ public class WebMessageChannelChannelDelegate : ChannelDelegate {
         }
     }
     
-    public func onMessage(index: Int64, message: String?) {
+    public func onMessage(index: Int64, message: WebMessage?) {
         let arguments: [String:Any?] = [
             "index": index,
-            "message": message
+            "message": message?.toMap()
         ]
         channel?.invokeMethod("onMessage", arguments: arguments)
     }

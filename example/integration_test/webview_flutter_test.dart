@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:integration_test/integration_test.dart';
 
+import 'process_global_config/main.dart' as process_global_config_tests;
 import 'in_app_webview/main.dart' as in_app_webview_tests;
 import 'find_interaction_controller/main.dart'
     as find_interaction_controller_tests;
@@ -34,6 +35,7 @@ void main() {
   FindInteractionController.debugLoggingSettings.usePrint = true;
   FindInteractionController.debugLoggingSettings.maxLogMessageLength = 7000;
 
+  process_global_config_tests.main();
   in_app_webview_tests.main();
   find_interaction_controller_tests.main();
   service_worker_controller_tests.main();

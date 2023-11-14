@@ -1,6 +1,7 @@
 import 'package:flutter/services.dart';
 import 'package:flutter_inappwebview/src/util.dart';
 import 'web_message_port.dart';
+import 'web_message.dart';
 
 ///The representation of the [HTML5 message channels](https://html.spec.whatwg.org/multipage/web-messaging.html#message-channels).
 ///
@@ -45,7 +46,10 @@ class WebMessageChannel extends ChannelController {
         int index = call.arguments["index"];
         var port = index == 0 ? this.port1 : this.port2;
         if (port.onMessage != null) {
-          String? message = call.arguments["message"];
+          WebMessage? message = call.arguments["message"] != null
+              ? WebMessage.fromMap(
+                  call.arguments["message"].cast<String, dynamic>())
+              : null;
           port.onMessage!(message);
         }
         break;

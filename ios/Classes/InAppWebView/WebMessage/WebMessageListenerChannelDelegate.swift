@@ -22,12 +22,13 @@ public class WebMessageListenerChannelDelegate : ChannelDelegate {
         case "postMessage":
             if let webView = webMessageListener?.webView, let jsObjectName = webMessageListener?.jsObjectName {
                 let jsObjectNameEscaped = jsObjectName.replacingOccurrences(of: "\'", with: "\\'")
-                let messageEscaped = (arguments!["message"] as! String).replacingOccurrences(of: "\'", with: "\\'")
+                let message = WebMessage.fromMap(map: arguments!["message"] as! [String: Any?])
+                
                 let source = """
                 (function() {
                     var webMessageListener = window['\(jsObjectNameEscaped)'];
                     if (webMessageListener != null) {
-                        var event = {data: '\(messageEscaped)'};
+                        var event = {data: \(message.jsData)};
                         if (webMessageListener.onmessage != null) {
                             webMessageListener.onmessage(event);
                         }
@@ -50,9 +51,9 @@ public class WebMessageListenerChannelDelegate : ChannelDelegate {
         }
     }
     
-    public func onPostMessage(message: String?, sourceOrigin: URL?, isMainFrame: Bool) {
+    public func onPostMessage(message: WebMessage?, sourceOrigin: URL?, isMainFrame: Bool) {
         let arguments: [String:Any?] = [
-            "message": message,
+            "message": message?.toMap(),
             "sourceOrigin": sourceOrigin?.absoluteString,
             "isMainFrame": isMainFrame
         ]

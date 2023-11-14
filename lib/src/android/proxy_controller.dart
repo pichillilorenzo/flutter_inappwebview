@@ -139,41 +139,4 @@ class ProxySettings_ {
       this.bypassSimpleHostnames,
       this.removeImplicitRules,
       this.reverseBypassEnabled = false});
-
-  // Map<String, dynamic> toMap() {
-  //   return {
-  //     "bypassRules": bypassRules,
-  //     "directs": directs,
-  //     "proxyRules": proxyRules.map((e) => e.toMap()).toList(),
-  //     "bypassSimpleHostnames": bypassSimpleHostnames,
-  //     "removeImplicitRules": removeImplicitRules,
-  //     "reverseBypassEnabled": reverseBypassEnabled
-  //   };
-  // }
-  //
-  // static ProxySettings fromMap(Map<String, dynamic> map) {
-  //   var settings = ProxySettings();
-  //   settings.bypassRules = map["bypassRules"];
-  //   settings.directs = map["directs"];
-  //   settings.proxyRules = (map["proxyRules"].cast<Map<String, dynamic>>()
-  //           as List<Map<String, dynamic>>)
-  //       .map((e) => ProxyRule.fromMap(e)) as List<ProxyRule>;
-  //   settings.bypassSimpleHostnames = map["bypassSimpleHostnames"];
-  //   settings.removeImplicitRules = map["removeImplicitRules"];
-  //   settings.reverseBypassEnabled = map["reverseBypassEnabled"];
-  //   return settings;
-  // }
-  //
-  // Map<String, dynamic> toJson() {
-  //   return this.toMap();
-  // }
-  //
-  // @override
-  // String toString() {
-  //   return 'ProxySettings{bypassRules: $bypassRules, directs: $directs, proxyRules: $proxyRules, bypassSimpleHostnames: $bypassSimpleHostnames, removeImplicitRules: $removeImplicitRules, reverseBypassEnabled: $reverseBypassEnabled}';
-  // }
-  //
-  // ProxySettings copy() {
-  //   return ProxySettings.fromMap(this.toMap());
-  // }
 }

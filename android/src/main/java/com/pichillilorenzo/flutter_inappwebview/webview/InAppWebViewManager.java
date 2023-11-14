@@ -133,6 +133,12 @@ public class InAppWebViewManager extends ChannelDelegateImpl {
           result.success(false);
         }
         break;
+      case "disableWebView":
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+          WebView.disableWebView();
+        }
+        result.success(true);
+        break;
       case "disposeKeepAlive":
         final String keepAliveId = (String) call.argument("keepAliveId");
         if (keepAliveId != null) {

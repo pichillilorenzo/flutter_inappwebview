@@ -43,7 +43,9 @@ import com.pichillilorenzo.flutter_inappwebview.types.SslCertificateExt;
 import com.pichillilorenzo.flutter_inappwebview.types.SyncBaseCallbackResultImpl;
 import com.pichillilorenzo.flutter_inappwebview.types.URLRequest;
 import com.pichillilorenzo.flutter_inappwebview.types.UserScript;
+import com.pichillilorenzo.flutter_inappwebview.types.WebMessageCompatExt;
 import com.pichillilorenzo.flutter_inappwebview.types.WebMessagePort;
+import com.pichillilorenzo.flutter_inappwebview.types.WebMessagePortCompatExt;
 import com.pichillilorenzo.flutter_inappwebview.types.WebResourceErrorExt;
 import com.pichillilorenzo.flutter_inappwebview.types.WebResourceRequestExt;
 import com.pichillilorenzo.flutter_inappwebview.types.WebResourceResponseExt;
@@ -63,10 +65,10 @@ import io.flutter.plugin.common.MethodChannel;
 
 public class WebViewChannelDelegate extends ChannelDelegateImpl {
   static final String LOG_TAG = "WebViewChannelDelegate";
-  
+
   @Nullable
   private InAppWebViewInterface webView;
-  
+
   public WebViewChannelDelegate(@NonNull InAppWebViewInterface webView, @NonNull MethodChannel channel) {
     super(channel);
     this.webView = webView;
@@ -141,8 +143,7 @@ public class WebViewChannelDelegate extends ChannelDelegateImpl {
               result.success(value);
             }
           });
-        }
-        else {
+        } else {
           result.success(null);
         }
         break;
@@ -210,8 +211,7 @@ public class WebViewChannelDelegate extends ChannelDelegateImpl {
         if (webView != null) {
           Map<String, Object> screenshotConfiguration = (Map<String, Object>) call.argument("screenshotConfiguration");
           webView.takeScreenshot(screenshotConfiguration, result);
-        }
-        else
+        } else
           result.success(null);
         break;
       case setSettings:
@@ -282,8 +282,7 @@ public class WebViewChannelDelegate extends ChannelDelegateImpl {
               result.success(success);
             }
           });
-        }
-        else {
+        } else {
           result.success(false);
         }
         break;
@@ -568,8 +567,7 @@ public class WebViewChannelDelegate extends ChannelDelegateImpl {
               result.success(value);
             }
           });
-        }
-        else {
+        } else {
           result.success(null);
         }
         break;
@@ -598,27 +596,33 @@ public class WebViewChannelDelegate extends ChannelDelegateImpl {
         break;
       case postWebMessage:
         if (webView != null && WebViewFeature.isFeatureSupported(WebViewFeature.POST_WEB_MESSAGE)) {
-          Map<String, Object> message = (Map<String, Object>) call.argument("message");
+          WebMessageCompatExt message = WebMessageCompatExt.fromMap((Map<String, Object>) call.argument("message"));
           String targetOrigin = (String) call.argument("targetOrigin");
           List<WebMessagePortCompat> compatPorts = new ArrayList<>();
-          List<WebMessagePort> ports = new ArrayList<>();
-          List<Map<String, Object>> portsMap = (List<Map<String, Object>>) message.get("ports");
-          if (portsMap != null) {
-            for (Map<String, Object> portMap : portsMap) {
-              String webMessageChannelId = (String) portMap.get("webMessageChannelId");
-              Integer index = (Integer) portMap.get("index");
-              WebMessageChannel webMessageChannel = webView.getWebMessageChannels().get(webMessageChannelId);
+          List<WebMessagePortCompatExt> portsExt = message.getPorts();
+          if (portsExt != null) {
+            for (WebMessagePortCompatExt portExt : portsExt) {
+              WebMessageChannel webMessageChannel = webView.getWebMessageChannels().get(portExt.getWebMessageChannelId());
               if (webMessageChannel != null) {
                 if (webView instanceof InAppWebView) {
-                  compatPorts.add(webMessageChannel.compatPorts.get(index));
+                  compatPorts.add(webMessageChannel.compatPorts.get(portExt.getIndex()));
                 }
               }
             }
           }
+          Object data = message.getData();
           if (webView instanceof InAppWebView) {
-            WebMessageCompat webMessage = new WebMessageCompat((String) message.get("data"), compatPorts.toArray(new WebMessagePortCompat[0]));
             try {
-              WebViewCompat.postWebMessage((WebView) webView, webMessage, Uri.parse(targetOrigin));
+              if (WebViewFeature.isFeatureSupported(WebViewFeature.WEB_MESSAGE_ARRAY_BUFFER) && data != null &&
+                      message.getType() == WebMessageCompat.TYPE_ARRAY_BUFFER) {
+                WebViewCompat.postWebMessage((WebView) webView,
+                        new WebMessageCompat((byte[]) data, compatPorts.toArray(new WebMessagePortCompat[0])),
+                        Uri.parse(targetOrigin));
+              } else {
+                WebViewCompat.postWebMessage((WebView) webView,
+                        new WebMessageCompat(data != null ? data.toString() : null, compatPorts.toArray(new WebMessagePortCompat[0])),
+                        Uri.parse(targetOrigin));
+              }
               result.success(true);
             } catch (Exception e) {
               result.error(LOG_TAG, e.getMessage(), null);
@@ -671,8 +675,7 @@ public class WebViewChannelDelegate extends ChannelDelegateImpl {
   }
 
   /**
-   * @deprecated
-   * Use {@link FindInteractionChannelDelegate#onFindResultReceived} instead.
+   * @deprecated Use {@link FindInteractionChannelDelegate#onFindResultReceived} instead.
    */
   @Deprecated
   public void onFindResultReceived(int activeMatchOrdinal, int numberOfMatches, boolean isDoneCounting) {
@@ -684,7 +687,7 @@ public class WebViewChannelDelegate extends ChannelDelegateImpl {
     obj.put("isDoneCounting", isDoneCounting);
     channel.invokeMethod("onFindResultReceived", obj);
   }
-  
+
   public void onLongPressHitTestResult(HitTestResult hitTestResult) {
     MethodChannel channel = getChannel();
     if (channel == null) return;
@@ -762,7 +765,7 @@ public class WebViewChannelDelegate extends ChannelDelegateImpl {
       return JsAlertResponse.fromMap((Map<String, Object>) obj);
     }
   }
-  
+
   public void onJsAlert(String url, String message, Boolean isMainFrame, @NonNull JsAlertCallback callback) {
     MethodChannel channel = getChannel();
     if (channel == null) {
@@ -1174,7 +1177,7 @@ public class WebViewChannelDelegate extends ChannelDelegateImpl {
       return (new LoadResourceWithCustomSchemeCallback()).decodeResult(obj);
     }
   }
-  
+
   @Nullable
   public CustomSchemeResponse onLoadResourceWithCustomScheme(WebResourceRequestExt request) throws InterruptedException {
     MethodChannel channel = getChannel();

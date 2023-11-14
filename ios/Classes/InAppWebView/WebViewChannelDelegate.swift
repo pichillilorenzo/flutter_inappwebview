@@ -509,23 +509,21 @@ public class WebViewChannelDelegate : ChannelDelegate {
             break
         case .postWebMessage:
             if let webView = webView {
-                let message = arguments!["message"] as! [String: Any?]
+                var message = WebMessage.fromMap(map: arguments!["message"] as! [String: Any?])
                 let targetOrigin = arguments!["targetOrigin"] as! String
                 
                 var ports: [WebMessagePort] = []
-                let portsMap = message["ports"] as? [[String: Any?]]
-                if let portsMap = portsMap {
-                    for portMap in portsMap {
-                        let webMessageChannelId = portMap["webMessageChannelId"] as! String
-                        let index = portMap["index"] as! Int
-                        if let webMessageChannel = webView.webMessageChannels[webMessageChannelId] {
-                            ports.append(webMessageChannel.ports[index])
+                if let notConnectedPorts = message.ports {
+                    for notConnectedPort in notConnectedPorts {
+                        if let webMessageChannel = webView.webMessageChannels[notConnectedPort.webMessageChannelId] {
+                            ports.append(webMessageChannel.ports[Int(notConnectedPort.index)])
                         }
                     }
                 }
-                let webMessage = WebMessage(data: message["data"] as? String, ports: ports)
+                message.ports = ports
+                
                 do {
-                    try webView.postWebMessage(message: webMessage, targetOrigin: targetOrigin) { (_) in
+                    try webView.postWebMessage(message: message, targetOrigin: targetOrigin) { (_) in
                         result(true)
                     }
                 } catch let error as NSError {

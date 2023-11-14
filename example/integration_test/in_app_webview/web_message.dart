@@ -121,7 +121,7 @@ void webMessage() {
               if (event.ports[0] != null) {
                   port = event.ports[0];
                   port.onmessage = function (event) {
-                      console.log(event.data);
+                      console.log(bufferToString(event.data));
                   };
               }
           }

@@ -194,6 +194,12 @@ void main() {
         ].contains(defaultTargetPlatform);
 
   skippableGroup('InAppWebView', () {
+    setUpAll(() async {
+      if (!kIsWeb && defaultTargetPlatform == TargetPlatform.android) {
+        await InAppWebViewController.setWebContentsDebuggingEnabled(true);
+      }
+    });
+
     initialUrlRequest();
     setGetSettings();
     javascriptCodeEvaluation();

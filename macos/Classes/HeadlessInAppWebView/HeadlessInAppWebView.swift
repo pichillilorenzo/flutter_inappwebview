@@ -72,19 +72,25 @@ public class HeadlessInAppWebView : Disposable {
             view.alphaValue = 1.0
             // remove from parent
             view.removeFromSuperview()
-            dispose()
+            dispose(disposeWebView: false)
         }
         return newFlutterWebView
     }
     
     
-    public func dispose() {
+    public func dispose(disposeWebView: Bool) {
         channelDelegate?.dispose()
         channelDelegate = nil
         plugin?.headlessInAppWebViewManager?.webViews[id] = nil
-        flutterWebView?.dispose(removeFromSuperview: true)
+        if disposeWebView {
+            flutterWebView?.dispose(removeFromSuperview: true)
+        }
         flutterWebView = nil
         plugin = nil
+    }
+    
+    public func dispose() {
+        dispose(disposeWebView: true)
     }
     
     deinit {

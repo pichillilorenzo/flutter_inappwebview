@@ -174,13 +174,25 @@ public class FlutterWebViewController: NSObject, /*FlutterPlatformView,*/ Dispos
         }
     }
     
-    public func dispose() {
+    // method added to fix:
+    // https://github.com/pichillilorenzo/flutter_inappwebview/issues/1837
+    public func dispose(removeFromSuperview: Bool) {
         if keepAliveId == nil {
             if let webView = webView() {
                 webView.dispose()
+                if removeFromSuperview {
+                    webView.removeFromSuperview()
+                }
+            }
+            if removeFromSuperview {
+                myView?.removeFromSuperview()
             }
             myView = nil
         }
+    }
+    
+    public func dispose() {
+        dispose(removeFromSuperview: false)
     }
     
     deinit {

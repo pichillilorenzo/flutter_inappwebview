@@ -326,6 +326,7 @@ public class InAppBrowserWebViewController: NSViewController, InAppBrowserDelega
         channelDelegate?.dispose()
         channelDelegate = nil
         webView?.dispose()
+        webView?.removeFromSuperview()
         webView = nil
         window = nil
         plugin = nil

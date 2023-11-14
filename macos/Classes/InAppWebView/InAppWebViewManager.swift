@@ -80,7 +80,7 @@ public class InAppWebViewManager: ChannelDelegate {
     public func disposeKeepAlive(keepAliveId: String) {
         if let flutterWebView = keepAliveWebViews[keepAliveId] as? FlutterWebViewController {
             flutterWebView.keepAliveId = nil
-            flutterWebView.dispose()
+            flutterWebView.dispose(removeFromSuperview: true)
             keepAliveWebViews[keepAliveId] = nil
         }
     }

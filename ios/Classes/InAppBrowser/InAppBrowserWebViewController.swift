@@ -630,6 +630,7 @@ public class InAppBrowserWebViewController: UIViewController, InAppBrowserDelega
         channelDelegate?.dispose()
         channelDelegate = nil
         webView?.dispose()
+        webView?.removeFromSuperview()
         webView = nil
         view = nil
         if previousStatusBarStyle != -1 {

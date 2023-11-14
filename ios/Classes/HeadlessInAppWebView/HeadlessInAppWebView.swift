@@ -80,6 +80,7 @@ public class HeadlessInAppWebView : Disposable {
         channelDelegate?.dispose()
         channelDelegate = nil
         plugin?.headlessInAppWebViewManager?.webViews[id] = nil
+        flutterWebView?.dispose(removeFromSuperview: true)
         flutterWebView = nil
         plugin = nil
     }

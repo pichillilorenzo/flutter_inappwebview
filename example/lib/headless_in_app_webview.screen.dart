@@ -25,7 +25,9 @@ class _HeadlessInAppWebViewExampleScreenState
 
     headlessWebView = new HeadlessInAppWebView(
       initialUrlRequest: URLRequest(url: url),
-      initialSettings: InAppWebViewSettings(),
+      initialSettings: InAppWebViewSettings(
+        isInspectable: kDebugMode,
+      ),
       onWebViewCreated: (controller) {
         print('HeadlessInAppWebView created!');
       },

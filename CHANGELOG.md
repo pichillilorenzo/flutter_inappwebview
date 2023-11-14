@@ -5,6 +5,7 @@
 - Added support for Android `WebViewFeature.isStartupFeatureSupported`, `WebViewFeature.STARTUP_FEATURE_SET_DIRECTORY_BASE_PATHS`, `WebViewFeature.STARTUP_FEATURE_SET_DATA_DIRECTORY_SUFFIX`, `WebViewFeature.WEB_MESSAGE_ARRAY_BUFFER`
 - Added `WebMessage.type` property
 - Fixed "iOS EXC_BAD_ACCESS crash on kill app with InAppWebView keyboard open" [#1837](https://github.com/pichillilorenzo/flutter_inappwebview/issues/1837)
+- Fixed "Flutter Web - TypeError: Failed to execute 'observe' on 'MutationObserver': parameter 1 is not of type 'Node'. error" [#1841](https://github.com/pichillilorenzo/flutter_inappwebview/issues/1841)
 
 ### BREAKING CHANGES
 

@@ -419,20 +419,33 @@ public class UserContentController implements Disposable {
           "    if (document.body == null) {return;}" +
           "    var contentWorldNames = [" + PluginScriptsUtil.VAR_CONTENT_WORLD_NAME_ARRAY + "];" +
           "    for (var contentWorldName of contentWorldNames) {" +
-          "      var iframeId = '" + JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME + "_' + contentWorldName;" +
-          "      var iframe = document.getElementById(iframeId);" +
-          "      if (iframe == null) {" +
-          "        iframe = document.createElement('iframe');" +
-          "        iframe.id = iframeId;" +
-          "        iframe.style = 'display: none; z-index: 0; position: absolute; width: 0px; height: 0px';" +
-          "        document.body.append(iframe);" +
-          "      }" +
-          "      if (iframe.contentWindow.document.getElementById('" + JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME + "_plugin_scripts') == null) {" +
-          "        var script = iframe.contentWindow.document.createElement('script');" +
-          "        script.id = '" + JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME + "_plugin_scripts';" +
-          "        script.innerHTML = " + PluginScriptsUtil.VAR_JSON_SOURCE_ENCODED + ";" +
-          "        iframe.contentWindow.document.body.append(script);" +
-          "      }" +
+          "       try {" +
+          "         var iframeId = '" + JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME + "_' + contentWorldName;" +
+          "         var iframe = document.getElementById(iframeId);" +
+          "         if (iframe == null) {" +
+          "           iframe = document.createElement('iframe');" +
+          "           iframe.id = iframeId;" +
+          "           iframe.style = 'display: none; z-index: 0; position: absolute; width: 0px; height: 0px';" +
+          "           document.body.append(iframe);" +
+          "         }" +
+          "         if (iframe.contentWindow.document.getElementById('" + JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME + "_plugin_scripts') == null) {" +
+          "           var script; debugger;" +
+          "           var innerHTML = " + PluginScriptsUtil.VAR_JSON_SOURCE_ENCODED + ";" +
+          "           if (window.trustedTypes && window.trustedTypes.createPolicy) {" +
+          "             policy = window.trustedTypes.createPolicy('flutter_inappwebview', {" +
+          "               createHTML: function(string) { return string; }," +
+          "               createScript: function(string) { return string; }," +
+          "             });" +
+          "             var innerHTML = policy.createHTML(innerHTML);" +
+          "             script = policy.createScript(innerHTML);" +
+          "           } else {" +
+          "             script = iframe.contentWindow.document.createElement('script');" +
+          "             script.innerHTML = innerHTML;" +
+          "           }" +
+          "           script.id = '" + JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME + "_plugin_scripts';" +
+          "           iframe.contentWindow.document.body.append(script);" +
+          "         }" +
+          "       } catch(e) { console.error(e); }" +
           "    }" +
           "    clearInterval(interval);" +
           "  });" +

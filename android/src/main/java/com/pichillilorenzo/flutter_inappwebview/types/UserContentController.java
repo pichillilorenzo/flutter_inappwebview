@@ -429,7 +429,7 @@ public class UserContentController implements Disposable {
           "           document.body.append(iframe);" +
           "         }" +
           "         if (iframe.contentWindow.document.getElementById('" + JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME + "_plugin_scripts') == null) {" +
-          "           var script; debugger;" +
+          "           var script;" +
           "           var innerHTML = " + PluginScriptsUtil.VAR_JSON_SOURCE_ENCODED + ";" +
           "           if (window.trustedTypes && window.trustedTypes.createPolicy) {" +
           "             policy = window.trustedTypes.createPolicy('flutter_inappwebview', {" +

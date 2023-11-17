@@ -32,10 +32,10 @@ void sfSafariViewController() {
 
     skippableTest('create and invalidate Prewarming Token', () async {
       final prewarmingToken =
-          await ChromeSafariBrowser.prewarmConnections([TEST_URL_1]);
+          await PlatformChromeSafariBrowser.prewarmConnections([TEST_URL_1]);
       expect(prewarmingToken, isNotNull);
       await expectLater(
-          ChromeSafariBrowser.invalidatePrewarmingToken(prewarmingToken!),
+          PlatformChromeSafariBrowser.invalidatePrewarmingToken(prewarmingToken!),
           completes);
     });
   }, skip: shouldSkip);

@@ -11,8 +11,13 @@ import 'main.dart';
 
 class MyInAppBrowser extends InAppBrowser {
   MyInAppBrowser(
-      {int? windowId, UnmodifiableListView<UserScript>? initialUserScripts})
-      : super(windowId: windowId, initialUserScripts: initialUserScripts);
+      {int? windowId,
+      UnmodifiableListView<UserScript>? initialUserScripts,
+      PullToRefreshController? pullToRefreshController})
+      : super(
+            windowId: windowId,
+            initialUserScripts: initialUserScripts,
+            pullToRefreshController: pullToRefreshController);
 
   @override
   Future onBrowserCreated() async {
@@ -59,21 +64,19 @@ class MyInAppBrowser extends InAppBrowser {
 }
 
 class InAppBrowserExampleScreen extends StatefulWidget {
-  final MyInAppBrowser browser = new MyInAppBrowser();
-
   @override
   _InAppBrowserExampleScreenState createState() =>
       new _InAppBrowserExampleScreenState();
 }
 
 class _InAppBrowserExampleScreenState extends State<InAppBrowserExampleScreen> {
-  PullToRefreshController? pullToRefreshController;
+  late final MyInAppBrowser browser;
 
   @override
   void initState() {
     super.initState();
 
-    pullToRefreshController = kIsWeb ||
+    PullToRefreshController? pullToRefreshController = kIsWeb ||
             ![TargetPlatform.iOS, TargetPlatform.android]
                 .contains(defaultTargetPlatform)
         ? null
@@ -83,15 +86,16 @@ class _InAppBrowserExampleScreenState extends State<InAppBrowserExampleScreen> {
             ),
             onRefresh: () async {
               if (Platform.isAndroid) {
-                widget.browser.webViewController?.reload();
+                browser.webViewController?.reload();
               } else if (Platform.isIOS) {
-                widget.browser.webViewController?.loadUrl(
+                browser.webViewController?.loadUrl(
                     urlRequest: URLRequest(
-                        url: await widget.browser.webViewController?.getUrl()));
+                        url: await browser.webViewController?.getUrl()));
               }
             },
           );
-    widget.browser.pullToRefreshController = pullToRefreshController;
+
+    browser = MyInAppBrowser(pullToRefreshController: pullToRefreshController);
   }
 
   @override
@@ -108,7 +112,7 @@ class _InAppBrowserExampleScreenState extends State<InAppBrowserExampleScreen> {
                 children: <Widget>[
               ElevatedButton(
                   onPressed: () async {
-                    await widget.browser.openUrlRequest(
+                    await browser.openUrlRequest(
                       urlRequest:
                           URLRequest(url: WebUri("https://flutter.dev")),
                       settings: InAppBrowserClassSettings(

@@ -1,16 +1,6 @@
 import 'dart:async';
 
-import 'package:flutter/services.dart';
-import '../util.dart';
-import '../debug_logging_settings.dart';
-import '../types/main.dart';
-
-import '../web_uri.dart';
-import 'web_authenticate_session_settings.dart';
-
-///A completion handler for the [WebAuthenticationSession].
-typedef WebAuthenticationSessionCompletionHandler = Future<void> Function(
-    WebUri? url, WebAuthenticationSessionError? error)?;
+import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_platform_interface.dart';
 
 ///A session that an app uses to authenticate a user through a web service.
 ///
@@ -35,27 +25,50 @@ typedef WebAuthenticationSessionCompletionHandler = Future<void> Function(
 ///**Supported Platforms/Implementations**:
 ///- iOS
 ///- MacOS
-class WebAuthenticationSession extends ChannelController {
+class WebAuthenticationSession {
   ///Debug settings.
   static DebugLoggingSettings debugLoggingSettings = DebugLoggingSettings();
 
-  ///ID used internally.
-  late final String id;
+  WebAuthenticationSession(
+      {required WebUri url,
+      String? callbackURLScheme,
+      WebAuthenticationSessionSettings? initialSettings,
+      WebAuthenticationSessionCompletionHandler onComplete})
+      : this.fromPlatformCreationParams(
+            params: PlatformWebAuthenticationSessionCreationParams(
+                url: url,
+                callbackURLScheme: callbackURLScheme,
+                initialSettings: initialSettings,
+                onComplete: onComplete));
 
-  ///A URL with the `http` or `https` scheme pointing to the authentication webpage.
-  final WebUri url;
+  /// Constructs a [WebAuthenticationSession].
+  ///
+  /// See [WebAuthenticationSession.fromPlatformCreationParams] for setting parameters for
+  /// a specific platform.
+  WebAuthenticationSession.fromPlatformCreationParams({
+    required PlatformWebAuthenticationSessionCreationParams params,
+  }) : this.fromPlatform(platform: PlatformWebAuthenticationSession(params));
 
-  ///The custom URL scheme that the app expects in the callback URL.
-  final String? callbackURLScheme;
+  /// Constructs a [WebAuthenticationSession] from a specific platform implementation.
+  WebAuthenticationSession.fromPlatform({required this.platform});
 
-  ///Initial settings.
-  late final WebAuthenticationSessionSettings? initialSettings;
+  /// Implementation of [PlatformWebAuthenticationSession] for the current platform.
+  final PlatformWebAuthenticationSession platform;
 
-  ///A completion handler the session calls when it completes successfully, or when the user cancels the session.
-  WebAuthenticationSessionCompletionHandler onComplete;
+  ///{@macro flutter_inappwebview_platform_interface.PlatformWebAuthenticationSession.id}
+  String get id => platform.id;
 
-  static const MethodChannel _sharedChannel = const MethodChannel(
-      'com.pichillilorenzo/flutter_webauthenticationsession');
+  ///{@macro flutter_inappwebview_platform_interface.PlatformWebAuthenticationSession.url}
+  WebUri get url => platform.url;
+
+  ///{@macro flutter_inappwebview_platform_interface.PlatformWebAuthenticationSession.callbackURLScheme}
+  String? get callbackURLScheme => platform.callbackURLScheme;
+
+  ///{@macro flutter_inappwebview_platform_interface.PlatformWebAuthenticationSession.initialSettings}
+  WebAuthenticationSessionSettings? get initialSettings => platform.initialSettings;
+
+  ///{@macro flutter_inappwebview_platform_interface.PlatformWebAuthenticationSession.onComplete}
+  WebAuthenticationSessionCompletionHandler get onComplete => platform.onComplete;
 
   ///Used to create and initialize a session.
   ///
@@ -64,82 +77,23 @@ class WebAuthenticationSession extends ChannelController {
   ///[callbackURLScheme] represents the custom URL scheme that the app expects in the callback URL.
   ///
   ///[onComplete] represents a completion handler the session calls when it completes successfully, or when the user cancels the session.
-  static Future<WebAuthenticationSession> create(
+  static Future<PlatformWebAuthenticationSession> create(
       {required WebUri url,
       String? callbackURLScheme,
       WebAuthenticationSessionCompletionHandler onComplete,
       WebAuthenticationSessionSettings? initialSettings}) async {
-    var session = WebAuthenticationSession._create(
+    return await PlatformWebAuthenticationSession.static().create(
         url: url,
         callbackURLScheme: callbackURLScheme,
         onComplete: onComplete,
         initialSettings: initialSettings);
-    initialSettings =
-        session.initialSettings ?? WebAuthenticationSessionSettings();
-    Map<String, dynamic> args = <String, dynamic>{};
-    args.putIfAbsent("id", () => session.id);
-    args.putIfAbsent("url", () => session.url.toString());
-    args.putIfAbsent("callbackURLScheme", () => session.callbackURLScheme);
-    args.putIfAbsent("initialSettings", () => initialSettings?.toMap());
-    await _sharedChannel.invokeMethod('create', args);
-    return session;
-  }
-
-  WebAuthenticationSession._create(
-      {required this.url,
-      this.callbackURLScheme,
-      this.onComplete,
-      WebAuthenticationSessionSettings? initialSettings}) {
-    assert(url.toString().isNotEmpty);
-    if (Util.isIOS || Util.isMacOS) {
-      assert(['http', 'https'].contains(url.scheme),
-          'The specified URL has an unsupported scheme. Only HTTP and HTTPS URLs are supported on iOS.');
-    }
-
-    id = IdGenerator.generate();
-    this.initialSettings =
-        initialSettings ?? WebAuthenticationSessionSettings();
-    channel = MethodChannel(
-        'com.pichillilorenzo/flutter_webauthenticationsession_$id');
-    handler = _handleMethod;
-    initMethodCallHandler();
-  }
-
-  _debugLog(String method, dynamic args) {
-    debugLog(
-        className: this.runtimeType.toString(),
-        debugLoggingSettings: WebAuthenticationSession.debugLoggingSettings,
-        id: id,
-        method: method,
-        args: args);
-  }
-
-  Future<dynamic> _handleMethod(MethodCall call) async {
-    _debugLog(call.method, call.arguments);
-
-    switch (call.method) {
-      case "onComplete":
-        String? url = call.arguments["url"];
-        WebUri? uri = url != null ? WebUri(url) : null;
-        var error = WebAuthenticationSessionError.fromNativeValue(
-            call.arguments["errorCode"]);
-        if (onComplete != null) {
-          onComplete!(uri, error);
-        }
-        break;
-      default:
-        throw UnimplementedError("Unimplemented ${call.method} method");
-    }
   }
 
   ///Indicates whether the session can begin.
   ///
   ///**Supported Platforms/Implementations**:
   ///- iOS ([Official API - ASWebAuthenticationSession.canStart](https://developer.apple.com/documentation/authenticationservices/aswebauthenticationsession/3516277-canstart))
-  Future<bool> canStart() async {
-    Map<String, dynamic> args = <String, dynamic>{};
-    return await channel?.invokeMethod<bool>('canStart', args) ?? false;
-  }
+  Future<bool> canStart() => platform.canStart();
 
   ///Starts the web authentication session.
   ///
@@ -150,10 +104,7 @@ class WebAuthenticationSession extends ChannelController {
   ///
   ///**Supported Platforms/Implementations**:
   ///- iOS ([Official API - ASWebAuthenticationSession.start](https://developer.apple.com/documentation/authenticationservices/aswebauthenticationsession/2990953-start))
-  Future<bool> start() async {
-    Map<String, dynamic> args = <String, dynamic>{};
-    return await channel?.invokeMethod<bool>('start', args) ?? false;
-  }
+  Future<bool> start() => platform.start();
 
   ///Cancels the web authentication session.
   ///
@@ -162,21 +113,13 @@ class WebAuthenticationSession extends ChannelController {
   ///
   ///**Supported Platforms/Implementations**:
   ///- iOS ([Official API - ASWebAuthenticationSession.cancel](https://developer.apple.com/documentation/authenticationservices/aswebauthenticationsession/2990951-cancel))
-  Future<void> cancel() async {
-    Map<String, dynamic> args = <String, dynamic>{};
-    await channel?.invokeMethod("cancel", args);
-  }
+  Future<void> cancel() => platform.cancel();
 
   ///Disposes the web authentication session.
   ///
   ///**Supported Platforms/Implementations**:
   ///- iOS
-  @override
-  Future<void> dispose() async {
-    Map<String, dynamic> args = <String, dynamic>{};
-    await channel?.invokeMethod("dispose", args);
-    disposeChannel();
-  }
+  Future<void> dispose() => platform.dispose();
 
   ///Returns `true` if [ASWebAuthenticationSession](https://developer.apple.com/documentation/authenticationservices/aswebauthenticationsession)
   ///or [SFAuthenticationSession](https://developer.apple.com/documentation/safariservices/sfauthenticationsession) is available.
@@ -185,8 +128,6 @@ class WebAuthenticationSession extends ChannelController {
   ///**Supported Platforms/Implementations**:
   ///- iOS
   static Future<bool> isAvailable() async {
-    Map<String, dynamic> args = <String, dynamic>{};
-    return await _sharedChannel.invokeMethod<bool>("isAvailable", args) ??
-        false;
+    return await PlatformWebAuthenticationSession.static().isAvailable();
   }
 }

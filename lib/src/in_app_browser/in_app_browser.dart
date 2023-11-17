@@ -5,22 +5,13 @@ import 'dart:ui';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_platform_interface.dart';
 
-import '../context_menu/context_menu.dart';
 import '../find_interaction/find_interaction_controller.dart';
 import '../pull_to_refresh/main.dart';
-import '../types/main.dart';
 
 import '../in_app_webview/in_app_webview_controller.dart';
-import '../in_app_webview/in_app_webview_settings.dart';
-
-import '../util.dart';
 import '../print_job/main.dart';
-import '../web_uri.dart';
-import 'in_app_browser_menu_item.dart';
-import 'in_app_browser_settings.dart';
-import '../debug_logging_settings.dart';
-import '../pull_to_refresh/pull_to_refresh_controller.dart';
 
 ///This class uses the native WebView of the platform.
 ///The [webViewController] field can be used to access the [InAppWebViewController] API.
@@ -29,126 +20,68 @@ import '../pull_to_refresh/pull_to_refresh_controller.dart';
 ///- Android native WebView
 ///- iOS
 ///- MacOS
-class InAppBrowser extends ChannelController {
+class InAppBrowser implements PlatformInAppBrowserEvents {
   ///Debug settings.
   static DebugLoggingSettings debugLoggingSettings = DebugLoggingSettings();
 
-  ///View ID used internally.
-  late final String id;
+  /// Constructs a [InAppBrowser].
+  ///
+  /// See [InAppBrowser.fromPlatformCreationParams] for setting
+  /// parameters for a specific platform.
+  InAppBrowser(
+      {ContextMenu? contextMenu,
+      PullToRefreshController? pullToRefreshController,
+      FindInteractionController? findInteractionController,
+      UnmodifiableListView<UserScript>? initialUserScripts,
+      int? windowId})
+      : this.fromPlatformCreationParams(
+          PlatformInAppBrowserCreationParams(
+              contextMenu: contextMenu,
+              pullToRefreshController: pullToRefreshController?.platform,
+              findInteractionController: findInteractionController?.platform,
+              initialUserScripts: initialUserScripts,
+              windowId: windowId),
+        );
 
-  ///Context menu used by the browser. It should be set before opening the browser.
-  ContextMenu? contextMenu;
+  /// Constructs a [InAppBrowser] from creation params for a specific
+  /// platform.
+  InAppBrowser.fromPlatformCreationParams(
+    PlatformInAppBrowserCreationParams params,
+  ) : this.fromPlatform(PlatformInAppBrowser(params));
 
-  ///Represents the pull-to-refresh feature controller.
-  PullToRefreshController? pullToRefreshController;
-
-  ///Represents the find interaction feature controller.
-  FindInteractionController? findInteractionController;
-
-  ///Initial list of user scripts to be loaded at start or end of a page loading.
-  final UnmodifiableListView<UserScript>? initialUserScripts;
-
-  bool _isOpened = false;
-  static const MethodChannel _sharedChannel =
-      const MethodChannel('com.pichillilorenzo/flutter_inappbrowser');
-
-  InAppWebViewController? _webViewController;
-
-  Map<int, InAppBrowserMenuItem> _menuItems = new HashMap();
-
-  ///WebView Controller that can be used to access the [InAppWebViewController] API.
-  ///When [onExit] is fired, this will be `null` and cannot be used anymore.
-  InAppWebViewController? get webViewController {
-    return _isOpened ? _webViewController : null;
+  /// Constructs a [InAppBrowser] from a specific platform
+  /// implementation.
+  InAppBrowser.fromPlatform(this.platform) {
+    this.platform.eventHandler = this;
   }
 
-  ///The window id of a [CreateWindowAction.windowId].
-  final int? windowId;
+  /// Implementation of [PlatformWebViewInAppBrowser] for the current platform.
+  final PlatformInAppBrowser platform;
 
-  InAppBrowser({this.windowId, this.initialUserScripts}) {
-    id = IdGenerator.generate();
-  }
+  ///{@macro flutter_inappwebview_platform_interface.PlatformInAppBrowser.id}
+  String get id => platform.id;
 
-  _init() {
-    channel = MethodChannel('com.pichillilorenzo/flutter_inappbrowser_$id');
-    handler = _handleMethod;
-    initMethodCallHandler();
+  ///{@macro flutter_inappwebview_platform_interface.PlatformInAppBrowser.contextMenu}
+  ContextMenu? get contextMenu => platform.contextMenu;
 
-    _webViewController = new InAppWebViewController.fromInAppBrowser(
-        channel!, this, this.initialUserScripts);
-    pullToRefreshController?.init(id);
-    findInteractionController?.init(id);
-  }
+  ///{@macro flutter_inappwebview_platform_interface.PlatformInAppBrowser.pullToRefreshController}
+  PlatformPullToRefreshController? get pullToRefreshController =>
+      platform.pullToRefreshController;
 
-  _debugLog(String method, dynamic args) {
-    debugLog(
-        className: this.runtimeType.toString(),
-        id: id,
-        debugLoggingSettings: InAppBrowser.debugLoggingSettings,
-        method: method,
-        args: args);
-  }
+  ///{@macro flutter_inappwebview_platform_interface.PlatformInAppBrowser.findInteractionController}
+  PlatformFindInteractionController? get findInteractionController =>
+      platform.findInteractionController;
 
-  Future<dynamic> _handleMethod(MethodCall call) async {
-    switch (call.method) {
-      case "onBrowserCreated":
-        _debugLog(call.method, call.arguments);
-        onBrowserCreated();
-        break;
-      case "onMenuItemClicked":
-        _debugLog(call.method, call.arguments);
-        int id = call.arguments["id"].toInt();
-        if (this._menuItems[id] != null) {
-          if (this._menuItems[id]?.onClick != null) {
-            this._menuItems[id]?.onClick!();
-          }
-        }
-        break;
-      case "onExit":
-        _debugLog(call.method, call.arguments);
-        _isOpened = false;
-        dispose();
-        onExit();
-        break;
-      default:
-        return _webViewController?.handleMethod(call);
-    }
-  }
+  ///{@macro flutter_inappwebview_platform_interface.PlatformInAppBrowser.initialUserScripts}
+  UnmodifiableListView<UserScript>? get initialUserScripts =>
+      platform.initialUserScripts;
 
-  Map<String, dynamic> _prepareOpenRequest(
-      { // ignore: deprecated_member_use_from_same_package
-      @Deprecated('Use settings instead') InAppBrowserClassOptions? options,
-      InAppBrowserClassSettings? settings}) {
-    assert(!_isOpened, 'The browser is already opened.');
-    _isOpened = true;
-    _init();
+  ///{@macro flutter_inappwebview_platform_interface.PlatformInAppBrowser.windowId}
+  int? get windowId => platform.windowId;
 
-    var initialSettings = settings?.toMap() ??
-        options?.toMap() ??
-        InAppBrowserClassSettings().toMap();
-
-    Map<String, dynamic> pullToRefreshSettings =
-        pullToRefreshController?.settings.toMap() ??
-            // ignore: deprecated_member_use_from_same_package
-            pullToRefreshController?.options.toMap() ??
-            PullToRefreshSettings(enabled: false).toMap();
-
-    List<Map<String, dynamic>> menuItemList = [];
-    _menuItems.forEach((key, value) {
-      menuItemList.add(value.toMap());
-    });
-
-    Map<String, dynamic> args = <String, dynamic>{};
-    args.putIfAbsent('id', () => id);
-    args.putIfAbsent('settings', () => initialSettings);
-    args.putIfAbsent('contextMenu', () => contextMenu?.toMap() ?? {});
-    args.putIfAbsent('windowId', () => windowId);
-    args.putIfAbsent('initialUserScripts',
-        () => initialUserScripts?.map((e) => e.toMap()).toList() ?? []);
-    args.putIfAbsent('pullToRefreshSettings', () => pullToRefreshSettings);
-    args.putIfAbsent('menuItems', () => menuItemList);
-    return args;
-  }
+  ///{@macro flutter_inappwebview_platform_interface.PlatformInAppBrowser.webViewController}
+  PlatformInAppWebViewController? get webViewController =>
+      platform.webViewController;
 
   ///Opens the [InAppBrowser] instance with an [urlRequest].
   ///
@@ -163,17 +96,11 @@ class InAppBrowser extends ChannelController {
   ///- iOS
   ///- MacOS
   Future<void> openUrlRequest(
-      {required URLRequest urlRequest,
-      // ignore: deprecated_member_use_from_same_package
-      @Deprecated('Use settings instead') InAppBrowserClassOptions? options,
-      InAppBrowserClassSettings? settings}) async {
-    assert(urlRequest.url != null && urlRequest.url.toString().isNotEmpty);
-
-    Map<String, dynamic> args =
-        _prepareOpenRequest(options: options, settings: settings);
-    args.putIfAbsent('urlRequest', () => urlRequest.toMap());
-    await _sharedChannel.invokeMethod('open', args);
-  }
+          {required URLRequest urlRequest,
+          @Deprecated('Use settings instead') InAppBrowserClassOptions? options,
+          InAppBrowserClassSettings? settings}) =>
+      platform.openUrlRequest(
+          urlRequest: urlRequest, options: options, settings: settings);
 
   ///Opens the [InAppBrowser] instance with the given [assetFilePath] file.
   ///
@@ -218,17 +145,11 @@ class InAppBrowser extends ChannelController {
   ///- iOS
   ///- MacOS
   Future<void> openFile(
-      {required String assetFilePath,
-      // ignore: deprecated_member_use_from_same_package
-      @Deprecated('Use settings instead') InAppBrowserClassOptions? options,
-      InAppBrowserClassSettings? settings}) async {
-    assert(assetFilePath.isNotEmpty);
-
-    Map<String, dynamic> args =
-        _prepareOpenRequest(options: options, settings: settings);
-    args.putIfAbsent('assetFilePath', () => assetFilePath);
-    await _sharedChannel.invokeMethod('open', args);
-  }
+          {required String assetFilePath,
+          @Deprecated('Use settings instead') InAppBrowserClassOptions? options,
+          InAppBrowserClassSettings? settings}) =>
+      platform.openFile(
+          assetFilePath: assetFilePath, options: options, settings: settings);
 
   ///Opens the [InAppBrowser] instance with [data] as a content, using [baseUrl] as the base URL for it.
   ///
@@ -247,25 +168,23 @@ class InAppBrowser extends ChannelController {
   ///- iOS
   ///- MacOS
   Future<void> openData(
-      {required String data,
-      String mimeType = "text/html",
-      String encoding = "utf8",
-      WebUri? baseUrl,
-      @Deprecated("Use historyUrl instead") Uri? androidHistoryUrl,
-      WebUri? historyUrl,
-      // ignore: deprecated_member_use_from_same_package
-      @Deprecated('Use settings instead') InAppBrowserClassOptions? options,
-      InAppBrowserClassSettings? settings}) async {
-    Map<String, dynamic> args =
-        _prepareOpenRequest(options: options, settings: settings);
-    args.putIfAbsent('data', () => data);
-    args.putIfAbsent('mimeType', () => mimeType);
-    args.putIfAbsent('encoding', () => encoding);
-    args.putIfAbsent('baseUrl', () => baseUrl?.toString() ?? "about:blank");
-    args.putIfAbsent('historyUrl',
-        () => (historyUrl ?? androidHistoryUrl)?.toString() ?? "about:blank");
-    await _sharedChannel.invokeMethod('open', args);
-  }
+          {required String data,
+          String mimeType = "text/html",
+          String encoding = "utf8",
+          WebUri? baseUrl,
+          @Deprecated("Use historyUrl instead") Uri? androidHistoryUrl,
+          WebUri? historyUrl,
+          @Deprecated('Use settings instead') InAppBrowserClassOptions? options,
+          InAppBrowserClassSettings? settings}) =>
+      platform.openData(
+          data: data,
+          mimeType: mimeType,
+          encoding: encoding,
+          baseUrl: baseUrl,
+          androidHistoryUrl: androidHistoryUrl,
+          historyUrl: historyUrl,
+          options: options,
+          settings: settings);
 
   ///This is a static method that opens an [url] in the system browser. You wont be able to use the [InAppBrowser] methods here!
   ///
@@ -273,13 +192,8 @@ class InAppBrowser extends ChannelController {
   ///- Android native WebView
   ///- iOS
   ///- MacOS
-  static Future<void> openWithSystemBrowser({required WebUri url}) async {
-    assert(url.toString().isNotEmpty);
-
-    Map<String, dynamic> args = <String, dynamic>{};
-    args.putIfAbsent('url', () => url.toString());
-    return await _sharedChannel.invokeMethod('openWithSystemBrowser', args);
-  }
+  static Future<void> openWithSystemBrowser({required WebUri url}) =>
+      PlatformInAppBrowser.static().openWithSystemBrowser(url: url);
 
   ///Adds a [InAppBrowserMenuItem] to the menu.
   ///If the browser is already open,
@@ -288,9 +202,8 @@ class InAppBrowser extends ChannelController {
   ///**Supported Platforms/Implementations**:
   ///- Android
   ///- iOS 14.0+
-  void addMenuItem(InAppBrowserMenuItem menuItem) {
-    _menuItems[menuItem.id] = menuItem;
-  }
+  void addMenuItem(InAppBrowserMenuItem menuItem) =>
+      platform.addMenuItem(menuItem);
 
   ///Adds a list of [InAppBrowserMenuItem] to the menu.
   ///If the browser is already open,
@@ -299,11 +212,8 @@ class InAppBrowser extends ChannelController {
   ///**Supported Platforms/Implementations**:
   ///- Android
   ///- iOS 14.0+
-  void addMenuItems(List<InAppBrowserMenuItem> menuItems) {
-    menuItems.forEach((menuItem) {
-      _menuItems[menuItem.id] = menuItem;
-    });
-  }
+  void addMenuItems(List<InAppBrowserMenuItem> menuItems) =>
+      platform.addMenuItems(menuItems);
 
   ///Removes the [menuItem] from the list.
   ///Returns `true` if it was in the list, `false` otherwise.
@@ -313,9 +223,8 @@ class InAppBrowser extends ChannelController {
   ///**Supported Platforms/Implementations**:
   ///- Android
   ///- iOS 14.0+
-  bool removeMenuItem(InAppBrowserMenuItem menuItem) {
-    return _menuItems.remove(menuItem.id) != null;
-  }
+  bool removeMenuItem(InAppBrowserMenuItem menuItem) =>
+      platform.removeMenuItem(menuItem);
 
   ///Removes a list of [menuItems] from the list.
   ///If the browser is already open,
@@ -324,11 +233,8 @@ class InAppBrowser extends ChannelController {
   ///**Supported Platforms/Implementations**:
   ///- Android
   ///- iOS 14.0+
-  void removeMenuItems(List<InAppBrowserMenuItem> menuItems) {
-    for (final menuItem in menuItems) {
-      removeMenuItem(menuItem);
-    }
-  }
+  void removeMenuItems(List<InAppBrowserMenuItem> menuItems) =>
+      platform.removeMenuItems(menuItems);
 
   ///Removes all the menu items from the list.
   ///If the browser is already open,
@@ -337,18 +243,15 @@ class InAppBrowser extends ChannelController {
   ///**Supported Platforms/Implementations**:
   ///- Android
   ///- iOS 14.0+
-  void removeAllMenuItem() {
-    _menuItems.clear();
-  }
+  void removeAllMenuItem() => platform.removeAllMenuItem();
 
   ///Returns `true` if the [menuItem] has been already added, otherwise `false`.
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS 14.0+
-  bool hasMenuItem(InAppBrowserMenuItem menuItem) {
-    return _menuItems.containsKey(menuItem.id);
-  }
+  bool hasMenuItem(InAppBrowserMenuItem menuItem) =>
+      platform.hasMenuItem(menuItem);
 
   ///Displays an [InAppBrowser] window that was opened hidden. Calling this has no effect if the [InAppBrowser] was already visible.
   ///
@@ -356,12 +259,7 @@ class InAppBrowser extends ChannelController {
   ///- Android native WebView
   ///- iOS
   ///- MacOS
-  Future<void> show() async {
-    assert(_isOpened, 'The browser is not opened.');
-
-    Map<String, dynamic> args = <String, dynamic>{};
-    await channel?.invokeMethod('show', args);
-  }
+  Future<void> show() => platform.show();
 
   ///Hides the [InAppBrowser] window. Calling this has no effect if the [InAppBrowser] was already hidden.
   ///
@@ -369,12 +267,7 @@ class InAppBrowser extends ChannelController {
   ///- Android native WebView
   ///- iOS
   ///- MacOS
-  Future<void> hide() async {
-    assert(_isOpened, 'The browser is not opened.');
-
-    Map<String, dynamic> args = <String, dynamic>{};
-    await channel?.invokeMethod('hide', args);
-  }
+  Future<void> hide() => platform.hide();
 
   ///Closes the [InAppBrowser] window.
   ///
@@ -382,12 +275,7 @@ class InAppBrowser extends ChannelController {
   ///- Android native WebView
   ///- iOS
   ///- MacOS
-  Future<void> close() async {
-    assert(_isOpened, 'The browser is not opened.');
-
-    Map<String, dynamic> args = <String, dynamic>{};
-    await channel?.invokeMethod('close', args);
-  }
+  Future<void> close() => platform.close();
 
   ///Check if the Web View of the [InAppBrowser] instance is hidden.
   ///
@@ -395,38 +283,16 @@ class InAppBrowser extends ChannelController {
   ///- Android native WebView
   ///- iOS
   ///- MacOS
-  Future<bool> isHidden() async {
-    assert(_isOpened, 'The browser is not opened.');
-
-    Map<String, dynamic> args = <String, dynamic>{};
-    return await channel?.invokeMethod<bool>('isHidden', args) ?? false;
-  }
+  Future<bool> isHidden() => platform.isHidden();
 
   ///Use [setSettings] instead.
   @Deprecated('Use setSettings instead')
-  Future<void> setOptions({required InAppBrowserClassOptions options}) async {
-    assert(_isOpened, 'The browser is not opened.');
-
-    Map<String, dynamic> args = <String, dynamic>{};
-    args.putIfAbsent('settings', () => options.toMap());
-    await channel?.invokeMethod('setSettings', args);
-  }
+  Future<void> setOptions({required InAppBrowserClassOptions options}) =>
+      platform.setOptions(options: options);
 
   ///Use [getSettings] instead.
   @Deprecated('Use getSettings instead')
-  Future<InAppBrowserClassOptions?> getOptions() async {
-    assert(_isOpened, 'The browser is not opened.');
-    Map<String, dynamic> args = <String, dynamic>{};
-
-    Map<dynamic, dynamic>? options =
-        await channel?.invokeMethod('getSettings', args);
-    if (options != null) {
-      options = options.cast<String, dynamic>();
-      return InAppBrowserClassOptions.fromMap(options as Map<String, dynamic>);
-    }
-
-    return null;
-  }
+  Future<InAppBrowserClassOptions?> getOptions() => platform.getOptions();
 
   ///Sets the [InAppBrowser] settings with the new [settings] and evaluates them.
   ///
@@ -434,14 +300,8 @@ class InAppBrowser extends ChannelController {
   ///- Android native WebView
   ///- iOS
   ///- MacOS
-  Future<void> setSettings(
-      {required InAppBrowserClassSettings settings}) async {
-    assert(_isOpened, 'The browser is not opened.');
-
-    Map<String, dynamic> args = <String, dynamic>{};
-    args.putIfAbsent('settings', () => settings.toMap());
-    await channel?.invokeMethod('setSettings', args);
-  }
+  Future<void> setSettings({required InAppBrowserClassSettings settings}) =>
+      platform.setSettings(settings: settings);
 
   ///Gets the current [InAppBrowser] settings. Returns `null` if it wasn't able to get them.
   ///
@@ -449,21 +309,7 @@ class InAppBrowser extends ChannelController {
   ///- Android native WebView
   ///- iOS
   ///- MacOS
-  Future<InAppBrowserClassSettings?> getSettings() async {
-    assert(_isOpened, 'The browser is not opened.');
-
-    Map<String, dynamic> args = <String, dynamic>{};
-
-    Map<dynamic, dynamic>? settings =
-        await channel?.invokeMethod('getSettings', args);
-    if (settings != null) {
-      settings = settings.cast<String, dynamic>();
-      return InAppBrowserClassSettings.fromMap(
-          settings as Map<String, dynamic>);
-    }
-
-    return null;
-  }
+  Future<InAppBrowserClassSettings?> getSettings() => platform.getSettings();
 
   ///Returns `true` if the [InAppBrowser] instance is opened, otherwise `false`.
   ///
@@ -471,9 +317,7 @@ class InAppBrowser extends ChannelController {
   ///- Android native WebView
   ///- iOS
   ///- MacOS
-  bool isOpened() {
-    return this._isOpened;
-  }
+  bool isOpened() => platform.isOpened();
 
   ///Event fired when the [InAppBrowser] is created.
   ///
@@ -893,7 +737,7 @@ class InAppBrowser extends ChannelController {
   ///- iOS
   ///- MacOS
   Future<bool?>? onPrintRequest(
-      WebUri? url, PrintJobController? printJobController) {
+      WebUri? url, PlatformPrintJobController? printJobController) {
     return null;
   }
 
@@ -1355,15 +1199,6 @@ class InAppBrowser extends ChannelController {
   void onContentSizeChanged(Size oldContentSize, Size newContentSize) {}
 
   ///Disposes the channel and controllers.
-  @override
   @mustCallSuper
-  void dispose() {
-    disposeChannel();
-    _webViewController?.dispose();
-    _webViewController = null;
-    pullToRefreshController?.dispose();
-    pullToRefreshController = null;
-    findInteractionController?.dispose();
-    findInteractionController = null;
-  }
+  void dispose() => platform.dispose();
 }

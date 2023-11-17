@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'package:flutter/services.dart';
-import 'package:flutter_inappwebview/src/util.dart';
+import '../../../flutter_inappwebview_platform_interface/lib/src/util.dart';
 
 import 'dart:js' as js;
 

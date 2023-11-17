@@ -4,18 +4,7 @@ import 'dart:typed_data';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
-import '../types/custom_tabs_navigation_event_type.dart';
-import '../types/custom_tabs_post_message_result_type.dart';
-import '../types/custom_tabs_relation_type.dart';
-import '../types/prewarming_token.dart';
-import '../util.dart';
-import '../debug_logging_settings.dart';
-
-import '../web_uri.dart';
-import 'chrome_safari_browser_settings.dart';
-import 'chrome_safari_action_button.dart';
-import 'chrome_safari_browser_menu_item.dart';
-import 'chrome_safari_browser_secondary_toolbar.dart';
+import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_platform_interface.dart';
 
 ///This class uses native [Chrome Custom Tabs](https://developer.android.com/reference/android/support/customtabs/package-summary) on Android
 ///and [SFSafariViewController](https://developer.apple.com/documentation/safariservices/sfsafariviewcontroller) on iOS.

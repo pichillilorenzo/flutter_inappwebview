@@ -22,8 +22,8 @@ void main() {
   WebView.debugLoggingSettings.maxLogMessageLength = 7000;
   InAppBrowser.debugLoggingSettings.usePrint = true;
   InAppBrowser.debugLoggingSettings.maxLogMessageLength = 7000;
-  ChromeSafariBrowser.debugLoggingSettings.usePrint = true;
-  ChromeSafariBrowser.debugLoggingSettings.maxLogMessageLength = 7000;
+  PlatformChromeSafariBrowser.debugLoggingSettings.usePrint = true;
+  PlatformChromeSafariBrowser.debugLoggingSettings.maxLogMessageLength = 7000;
   WebAuthenticationSession.debugLoggingSettings.usePrint = true;
   WebAuthenticationSession.debugLoggingSettings.maxLogMessageLength = 7000;
   PullToRefreshController.debugLoggingSettings.usePrint = true;

@@ -1,8 +1,4 @@
-import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_internal_annotations.dart';
-
-import '../types/web_message_callback.dart';
-import 'web_message.dart';
-import 'web_message_channel.dart';
+import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_platform_interface.dart';
 
 ///The representation of the [HTML5 message ports](https://html.spec.whatwg.org/multipage/comms.html#messageport).
 ///
@@ -23,68 +19,38 @@ import 'web_message_channel.dart';
 ///
 ///It is possible to transfer both ports of a channel to JavaScript, for example for communication between subframes.
 class WebMessagePort {
-  late final int _index;
+  WebMessagePort({required int index})
+      : this.fromPlatformCreationParams(
+            params: PlatformWebMessagePortCreationParams(index: index));
 
-  WebMessageCallback? _onMessage;
-  late WebMessageChannel _webMessageChannel;
+  /// Constructs a [WebMessagePort].
+  ///
+  /// See [WebMessagePort.fromPlatformCreationParams] for setting parameters for
+  /// a specific platform.
+  WebMessagePort.fromPlatformCreationParams({
+    required PlatformWebMessagePortCreationParams params,
+  }) : this.fromPlatform(platform: PlatformWebMessagePort(params));
 
-  @ExchangeableObjectConstructor()
-  WebMessagePort({required int index}) {
-    this._index = index;
-  }
+  /// Constructs a [WebMessagePort] from a specific platform implementation.
+  WebMessagePort.fromPlatform({required this.platform});
+
+  /// Implementation of [PlatformWebMessagePort] for the current platform.
+  final PlatformWebMessagePort platform;
 
   ///Sets a callback to receive message events on the main thread.
-  Future<void> setWebMessageCallback(WebMessageCallback? onMessage) async {
-    Map<String, dynamic> args = <String, dynamic>{};
-    args.putIfAbsent('index', () => this._index);
-    await _webMessageChannel.internalChannel
-        ?.invokeMethod('setWebMessageCallback', args);
-    this._onMessage = onMessage;
-  }
+  Future<void> setWebMessageCallback(WebMessageCallback? onMessage) =>
+      platform.setWebMessageCallback(onMessage);
 
   ///Post a WebMessage to the entangled port.
-  Future<void> postMessage(WebMessage message) async {
-    Map<String, dynamic> args = <String, dynamic>{};
-    args.putIfAbsent('index', () => this._index);
-    args.putIfAbsent('message', () => message.toMap());
-    await _webMessageChannel.internalChannel?.invokeMethod('postMessage', args);
-  }
+  Future<void> postMessage(WebMessage message) => platform.postMessage(message);
 
   ///Close the message port and free any resources associated with it.
-  Future<void> close() async {
-    Map<String, dynamic> args = <String, dynamic>{};
-    args.putIfAbsent('index', () => this._index);
-    await _webMessageChannel.internalChannel?.invokeMethod('close', args);
-  }
+  Future<void> close() => platform.close();
 
-  @ExchangeableObjectMethod(toMapMergeWith: true)
-  // ignore: unused_element
-  Map<String, dynamic> _toMapMergeWith() {
-    return {"index": _index, "webMessageChannelId": _webMessageChannel.id};
-  }
+  Map<String, dynamic> toMap() => platform.toMap();
 
-  Map<String, dynamic> toMap() {
-    return {
-      "index": this._index,
-      "webMessageChannelId": this._webMessageChannel.id
-    };
-  }
-
-  Map<String, dynamic> toJson() {
-    return toMap();
-  }
+  Map<String, dynamic> toJson() => platform.toJson();
 
   @override
-  String toString() {
-    return 'WebMessagePort{index: $_index}';
-  }
-}
-
-extension InternalWebMessagePort on WebMessagePort {
-  WebMessageCallback? get onMessage => _onMessage;
-  void set onMessage(WebMessageCallback? value) => _onMessage = value;
-
-  WebMessageChannel get webMessageChannel => _webMessageChannel;
-  void set webMessageChannel(WebMessageChannel value) =>
-      _webMessageChannel = value;
+  String toString() => platform.toString();
 }

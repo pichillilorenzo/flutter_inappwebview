@@ -15,7 +15,7 @@ class InAppWebViewExampleScreen extends StatefulWidget {
 class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
   final GlobalKey webViewKey = GlobalKey();
 
-  InAppWebViewController? webViewController;
+  PlatformInAppWebViewController? webViewController;
   InAppWebViewSettings settings = InAppWebViewSettings(
       isInspectable: kDebugMode,
       mediaPlaybackRequiresUserGesture: false,

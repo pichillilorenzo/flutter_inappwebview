@@ -17,7 +17,7 @@ void clearAndSetProxyOverride() {
         await WebViewFeature.isFeatureSupported(WebViewFeature.PROXY_OVERRIDE);
 
     if (proxyAvailable) {
-      ProxyController proxyController = ProxyController.instance();
+      PlatformProxyController proxyController = PlatformProxyController.instance();
 
       await proxyController.clearProxyOverride();
       await proxyController.setProxyOverride(

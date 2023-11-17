@@ -1,9 +1,5 @@
-import 'package:flutter/services.dart';
+import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_platform_interface.dart';
 import '../in_app_webview/in_app_webview_controller.dart';
-import '../types/main.dart';
-import '../util.dart';
-import '../web_uri.dart';
-import 'web_message.dart';
 
 ///This listener receives messages sent on the JavaScript object which was injected by [InAppWebViewController.addWebMessageListener].
 ///
@@ -11,90 +7,48 @@ import 'web_message.dart';
 ///- Android native WebView
 ///- iOS
 ///- MacOS
-class WebMessageListener extends ChannelController {
-  ///Message Listener ID used internally.
-  late final String id;
-
-  ///The name for the injected JavaScript object.
-  final String jsObjectName;
-
-  ///A set of matching rules for the allowed origins.
-  late Set<String> allowedOriginRules;
-
-  JavaScriptReplyProxy? _replyProxy;
-
-  ///Event that receives a message sent by a `postMessage()` on the injected JavaScript object.
-  ///
-  ///Note that when the frame is `file:` or `content:` origin, the value of [sourceOrigin] is `null`.
-  ///
-  ///- [message] represents the message from JavaScript.
-  ///- [sourceOrigin] represents the origin of the frame that the message is from.
-  ///- [isMainFrame] is `true` if the message is from the main frame.
-  ///- [replyProxy] is used to reply back to the JavaScript object.
-  ///
-  ///**Official Android API**: https://developer.android.com/reference/androidx/webkit/WebViewCompat.WebMessageListener#onPostMessage(android.webkit.WebView,%20androidx.webkit.WebMessageCompat,%20android.net.Uri,%20boolean,%20androidx.webkit.JavaScriptReplyProxy)
-  OnPostMessageCallback? onPostMessage;
-
+class WebMessageListener {
   WebMessageListener(
-      {required this.jsObjectName,
+      {required String jsObjectName,
       Set<String>? allowedOriginRules,
-      this.onPostMessage}) {
-    this.id = IdGenerator.generate();
-    this.allowedOriginRules =
-        allowedOriginRules != null ? allowedOriginRules : Set.from(["*"]);
-    assert(!this.allowedOriginRules.contains(""),
-        "allowedOriginRules cannot contain empty strings");
-    channel = MethodChannel(
-        'com.pichillilorenzo/flutter_inappwebview_web_message_listener_${id}_$jsObjectName');
-    handler = _handleMethod;
-    initMethodCallHandler();
-  }
+      OnPostMessageCallback? onPostMessage})
+      : this.fromPlatformCreationParams(
+            params: PlatformWebMessageListenerCreationParams(
+                jsObjectName: jsObjectName,
+                allowedOriginRules: allowedOriginRules,
+                onPostMessage: onPostMessage));
 
-  Future<dynamic> _handleMethod(MethodCall call) async {
-    switch (call.method) {
-      case "onPostMessage":
-        if (_replyProxy == null) {
-          _replyProxy = new JavaScriptReplyProxy(this);
-        }
-        if (onPostMessage != null) {
-          WebMessage? message = call.arguments["message"] != null
-              ? WebMessage.fromMap(
-                  call.arguments["message"].cast<String, dynamic>())
-              : null;
-          WebUri? sourceOrigin = call.arguments["sourceOrigin"] != null
-              ? WebUri(call.arguments["sourceOrigin"])
-              : null;
-          bool isMainFrame = call.arguments["isMainFrame"];
-          onPostMessage!(message, sourceOrigin, isMainFrame, _replyProxy!);
-        }
-        break;
-      default:
-        throw UnimplementedError("Unimplemented ${call.method} method");
-    }
-    return null;
-  }
+  /// Constructs a [WebMessageListener].
+  ///
+  /// See [WebMessageListener.fromPlatformCreationParams] for setting parameters for
+  /// a specific platform.
+  WebMessageListener.fromPlatformCreationParams({
+    required PlatformWebMessageListenerCreationParams params,
+  }) : this.fromPlatform(platform: PlatformWebMessageListener(params));
 
-  @override
-  void dispose() {
-    disposeChannel();
-  }
+  /// Constructs a [WebMessageListener] from a specific platform implementation.
+  WebMessageListener.fromPlatform({required this.platform});
 
-  Map<String, dynamic> toMap() {
-    return {
-      "id": id,
-      "jsObjectName": jsObjectName,
-      "allowedOriginRules": allowedOriginRules.toList(),
-    };
-  }
+  /// Implementation of [PlatformWebMessageListener] for the current platform.
+  final PlatformWebMessageListener platform;
 
-  Map<String, dynamic> toJson() {
-    return this.toMap();
-  }
+  ///{@macro flutter_inappwebview_platform_interface.PlatformWebMessageListener.jsObjectName}
+  String get jsObjectName => platform.jsObjectName;
+
+  ///{@macro flutter_inappwebview_platform_interface.PlatformWebMessageListener.allowedOriginRules}
+  Set<String>? get allowedOriginRules => platform.allowedOriginRules;
+
+  ///{@macro flutter_inappwebview_platform_interface.PlatformWebMessageListener.onPostMessage}
+  OnPostMessageCallback? get onPostMessage => platform.onPostMessage;
+
+  void dispose() => platform.dispose();
+
+  Map<String, dynamic> toMap() => platform.toMap();
+
+  Map<String, dynamic> toJson() => platform.toJson();
 
   @override
-  String toString() {
-    return 'WebMessageListener{id: $id, jsObjectName: $jsObjectName, allowedOriginRules: $allowedOriginRules, replyProxy: $_replyProxy}';
-  }
+  String toString() => platform.toString();
 }
 
 ///This class represents the JavaScript object injected by [InAppWebViewController.addWebMessageListener].
@@ -103,22 +57,31 @@ class WebMessageListener extends ChannelController {
 ///
 ///There is a 1:1 relationship between this object and the JavaScript object in a frame.
 class JavaScriptReplyProxy {
-  late WebMessageListener _webMessageListener;
+  JavaScriptReplyProxy({required PlatformWebMessageListener webMessageListener})
+      : this.fromPlatformCreationParams(
+            params: PlatformJavaScriptReplyProxyCreationParams(
+                webMessageListener: webMessageListener));
 
-  JavaScriptReplyProxy(WebMessageListener webMessageListener) {
-    this._webMessageListener = webMessageListener;
-  }
+  /// Constructs a [JavaScriptReplyProxy].
+  ///
+  /// See [JavaScriptReplyProxy.fromPlatformCreationParams] for setting parameters for
+  /// a specific platform.
+  JavaScriptReplyProxy.fromPlatformCreationParams({
+    required PlatformJavaScriptReplyProxyCreationParams params,
+  }) : this.fromPlatform(platform: PlatformJavaScriptReplyProxy(params));
+
+  /// Constructs a [JavaScriptReplyProxy] from a specific platform implementation.
+  JavaScriptReplyProxy.fromPlatform({required this.platform});
+
+  /// Implementation of [PlatformJavaScriptReplyProxy] for the current platform.
+  final PlatformJavaScriptReplyProxy platform;
 
   ///Post a [message] to the injected JavaScript object which sent this [JavaScriptReplyProxy].
   ///
   ///If [message] is of type [WebMessageType.ARRAY_BUFFER], be aware that large byte buffers can lead to out-of-memory crashes on low-end devices.
   ///
   ///**Official Android API**: https://developer.android.com/reference/androidx/webkit/JavaScriptReplyProxy#postMessage(java.lang.String)
-  Future<void> postMessage(WebMessage message) async {
-    Map<String, dynamic> args = <String, dynamic>{};
-    args.putIfAbsent('message', () => message.toMap());
-    await _webMessageListener.channel?.invokeMethod('postMessage', args);
-  }
+  Future<void> postMessage(WebMessage message) => platform.postMessage(message);
 
   @override
   String toString() {

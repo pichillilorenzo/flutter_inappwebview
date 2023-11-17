@@ -1,82 +1,70 @@
 import 'dart:core';
 
-import 'package:flutter/services.dart';
+import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_platform_interface.dart';
 
-import '../../types/main.dart';
 import '../in_app_webview_controller.dart';
 
 ///Use [InAppWebViewController] instead.
 @Deprecated("Use InAppWebViewController instead")
 class AndroidInAppWebViewController {
-  MethodChannel? _channel;
+  PlatformInAppWebViewController? _controller;
 
-  AndroidInAppWebViewController({required MethodChannel channel}) {
-    this._channel = channel;
+  AndroidInAppWebViewController({required PlatformInAppWebViewController controller}) {
+    this._controller = controller;
   }
 
   ///Use [InAppWebViewController.startSafeBrowsing] instead.
   @Deprecated("Use InAppWebViewController.startSafeBrowsing instead")
   Future<bool> startSafeBrowsing() async {
-    Map<String, dynamic> args = <String, dynamic>{};
-    return await _channel?.invokeMethod('startSafeBrowsing', args);
+    return await _controller?.startSafeBrowsing() ?? false;
   }
 
   ///Use [InAppWebViewController.clearSslPreferences] instead.
   @Deprecated("Use InAppWebViewController.clearSslPreferences instead")
   Future<void> clearSslPreferences() async {
-    Map<String, dynamic> args = <String, dynamic>{};
-    await _channel?.invokeMethod('clearSslPreferences', args);
+    await _controller?.clearSslPreferences();
   }
 
   ///Use [InAppWebViewController.pause] instead.
   @Deprecated("Use InAppWebViewController.pause instead")
   Future<void> pause() async {
-    Map<String, dynamic> args = <String, dynamic>{};
-    await _channel?.invokeMethod('pause', args);
+    await _controller?.pause();
   }
 
   ///Use [InAppWebViewController.resume] instead.
   @Deprecated("Use InAppWebViewController.resume instead")
   Future<void> resume() async {
-    Map<String, dynamic> args = <String, dynamic>{};
-    await _channel?.invokeMethod('resume', args);
+    await _controller?.resume();
   }
 
   ///Use [InAppWebViewController.pageDown] instead.
   @Deprecated("Use InAppWebViewController.pageDown instead")
   Future<bool> pageDown({required bool bottom}) async {
-    Map<String, dynamic> args = <String, dynamic>{};
-    args.putIfAbsent("bottom", () => bottom);
-    return await _channel?.invokeMethod('pageDown', args);
+    return await _controller?.pageDown(bottom: bottom) ?? false;
   }
 
   ///Use [InAppWebViewController.pageUp] instead.
   @Deprecated("Use InAppWebViewController.pageUp instead")
   Future<bool> pageUp({required bool top}) async {
-    Map<String, dynamic> args = <String, dynamic>{};
-    args.putIfAbsent("top", () => top);
-    return await _channel?.invokeMethod('pageUp', args);
+    return await _controller?.pageUp(top: top) ?? false;
   }
 
   ///Use [InAppWebViewController.zoomIn] instead.
   @Deprecated("Use InAppWebViewController.zoomIn instead")
   Future<bool> zoomIn() async {
-    Map<String, dynamic> args = <String, dynamic>{};
-    return await _channel?.invokeMethod('zoomIn', args);
+    return await _controller?.zoomIn() ?? false;
   }
 
   ///Use [InAppWebViewController.zoomOut] instead.
   @Deprecated("Use InAppWebViewController.zoomOut instead")
   Future<bool> zoomOut() async {
-    Map<String, dynamic> args = <String, dynamic>{};
-    return await _channel?.invokeMethod('zoomOut', args);
+    return await _controller?.zoomOut() ?? false;
   }
 
   ///Use [InAppWebViewController.clearHistory] instead.
   @Deprecated("Use InAppWebViewController.clearHistory instead")
   Future<void> clearHistory() async {
-    Map<String, dynamic> args = <String, dynamic>{};
-    return await _channel?.invokeMethod('clearHistory', args);
+    await _controller?.clearHistory();
   }
 
   ///Use [InAppWebViewController.clearClientCertPreferences] instead.
@@ -119,12 +107,10 @@ class AndroidInAppWebViewController {
   ///Use [InAppWebViewController.getOriginalUrl] instead.
   @Deprecated('Use InAppWebViewController.getOriginalUrl instead')
   Future<Uri?> getOriginalUrl() async {
-    Map<String, dynamic> args = <String, dynamic>{};
-    String? url = await _channel?.invokeMethod('getOriginalUrl', args);
-    return url != null ? Uri.tryParse(url) : null;
+    return await _controller?.getOriginalUrl();
   }
 
   void dispose() {
-    _channel = null;
+    _controller = null;
   }
 }

@@ -53,7 +53,7 @@ class WebStorageOrigin {
 }
 
 ///Class that encapsulates information about the amount of storage currently used by an origin for the JavaScript storage APIs.
-///An origin comprises the host, scheme and port of a URI. See [AndroidWebStorageManager] for details.
+///An origin comprises the host, scheme and port of a URI. See `AndroidWebStorageManager` for details.
 ///Use [WebStorageOrigin] instead.
 @Deprecated('Use WebStorageOrigin instead')
 class AndroidWebStorageOrigin {

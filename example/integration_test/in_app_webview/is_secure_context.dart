@@ -12,8 +12,8 @@ void isSecureContext() {
   var url = !kIsWeb ? TEST_CROSS_PLATFORM_URL_1 : TEST_WEB_PLATFORM_URL_1;
 
   skippableTestWidgets('isSecureContext', (WidgetTester tester) async {
-    final Completer<InAppWebViewController> controllerCompleter =
-        Completer<InAppWebViewController>();
+    final Completer<PlatformInAppWebViewController> controllerCompleter =
+        Completer<PlatformInAppWebViewController>();
     final StreamController<String> pageLoads =
         StreamController<String>.broadcast();
 
@@ -33,7 +33,7 @@ void isSecureContext() {
       ),
     );
 
-    final InAppWebViewController controller = await controllerCompleter.future;
+    final PlatformInAppWebViewController controller = await controllerCompleter.future;
     await pageLoads.stream.first;
     expect(await controller.isSecureContext(), true);
 

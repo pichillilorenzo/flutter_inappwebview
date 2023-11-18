@@ -30,16 +30,25 @@ class WebMessageChannel {
   /// Implementation of [PlatformWebMessageChannel] for the current platform.
   final PlatformWebMessageChannel platform;
 
-  static PlatformWebMessageChannel? fromMap(Map<String, dynamic>? map) => PlatformWebMessageChannel.static().fromMap(map);
+  static WebMessageChannel? fromMap(Map<String, dynamic>? map) {
+    PlatformWebMessageChannel? platform =
+        PlatformWebMessageChannel.static().fromMap(map);
+    if (platform == null) {
+      return null;
+    }
+    return WebMessageChannel.fromPlatform(platform: platform);
+  }
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebMessageChannel.id}
   String get id => platform.id;
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebMessageChannel.port1}
-  PlatformWebMessagePort get port1 => platform.port1;
+  WebMessagePort get port1 =>
+      WebMessagePort.fromPlatform(platform: platform.port1);
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebMessageChannel.port2}
-  PlatformWebMessagePort get port2 => platform.port2;
+  WebMessagePort get port2 =>
+      WebMessagePort.fromPlatform(platform: platform.port2);
 
   ///Disposes the web message channel.
   void dispose() => platform.dispose();

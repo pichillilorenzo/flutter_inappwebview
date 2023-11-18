@@ -11,8 +11,8 @@ void setGetDelete() {
 
   skippableTestWidgets('set, get, delete', (WidgetTester tester) async {
     CookieManager cookieManager = CookieManager.instance();
-    final Completer<InAppWebViewController> controllerCompleter =
-        Completer<InAppWebViewController>();
+    final Completer<PlatformInAppWebViewController> controllerCompleter =
+        Completer<PlatformInAppWebViewController>();
     final Completer<String> pageLoaded = Completer<String>();
 
     var headlessWebView = new HeadlessInAppWebView(
@@ -20,12 +20,12 @@ void setGetDelete() {
       onWebViewCreated: (controller) {
         controllerCompleter.complete(controller);
       },
+      onLoadStop: (controller, url) async {
+        pageLoaded.complete(url!.toString());
+      }
     );
 
     if (defaultTargetPlatform == TargetPlatform.macOS) {
-      headlessWebView.onLoadStop = (controller, url) async {
-        pageLoaded.complete(url!.toString());
-      };
       await headlessWebView.run();
     } else {
       await tester.pumpWidget(

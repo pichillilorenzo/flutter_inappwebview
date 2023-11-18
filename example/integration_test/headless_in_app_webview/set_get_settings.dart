@@ -10,8 +10,8 @@ void setGetSettings() {
         ].contains(defaultTargetPlatform);
 
   skippableTest('set/get settings', () async {
-    final Completer<InAppWebViewController> controllerCompleter =
-        Completer<InAppWebViewController>();
+    final Completer<PlatformInAppWebViewController> controllerCompleter =
+        Completer<PlatformInAppWebViewController>();
     final Completer<void> pageLoaded = Completer<void>();
 
     var headlessWebView = new HeadlessInAppWebView(
@@ -26,7 +26,7 @@ void setGetSettings() {
     );
 
     await headlessWebView.run();
-    final InAppWebViewController controller = await controllerCompleter.future;
+    final PlatformInAppWebViewController controller = await controllerCompleter.future;
     await pageLoaded.future;
 
     var settings = await controller.getSettings();

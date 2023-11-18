@@ -12,8 +12,8 @@ void loadAssetFile(InAppLocalhostServer localhostServer) {
   skippableTestWidgets('load asset file', (WidgetTester tester) async {
     expect(localhostServer.isRunning(), true);
 
-    final Completer<InAppWebViewController> controllerCompleter =
-        Completer<InAppWebViewController>();
+    final Completer<PlatformInAppWebViewController> controllerCompleter =
+        Completer<PlatformInAppWebViewController>();
 
     var headlessWebView = new HeadlessInAppWebView(
       initialUrlRequest: URLRequest(
@@ -40,7 +40,7 @@ void loadAssetFile(InAppLocalhostServer localhostServer) {
         ),
       );
     }
-    final InAppWebViewController controller = await controllerCompleter.future;
+    final PlatformInAppWebViewController controller = await controllerCompleter.future;
     final String? currentUrl = (await controller.getUrl())?.toString();
     expect(currentUrl, 'http://localhost:8080/test_assets/index.html');
 

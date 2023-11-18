@@ -11,8 +11,8 @@ void pullToRefresh() {
 
   skippableTestWidgets('launches with pull-to-refresh feature',
       (WidgetTester tester) async {
-    final Completer<InAppWebViewController> controllerCompleter =
-        Completer<InAppWebViewController>();
+    final Completer<PlatformInAppWebViewController> controllerCompleter =
+        Completer<PlatformInAppWebViewController>();
     final pullToRefreshController = PullToRefreshController(
       settings: PullToRefreshSettings(
           color: Colors.blue,
@@ -38,7 +38,7 @@ void pullToRefresh() {
         ),
       ),
     );
-    final InAppWebViewController controller = await controllerCompleter.future;
+    final PlatformInAppWebViewController controller = await controllerCompleter.future;
     final String? currentUrl = (await controller.getUrl())?.toString();
     expect(currentUrl, TEST_URL_1.toString());
   }, skip: shouldSkip);

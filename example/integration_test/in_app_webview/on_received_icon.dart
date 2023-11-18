@@ -8,8 +8,8 @@ void onReceivedIcon() {
         ].contains(defaultTargetPlatform);
 
   skippableTestWidgets('onReceivedIcon', (WidgetTester tester) async {
-    final Completer<InAppWebViewController> controllerCompleter =
-        Completer<InAppWebViewController>();
+    final Completer<PlatformInAppWebViewController> controllerCompleter =
+        Completer<PlatformInAppWebViewController>();
     final Completer<void> pageLoaded = Completer<void>();
     final Completer<Uint8List> onReceivedIconCompleter = Completer<Uint8List>();
 

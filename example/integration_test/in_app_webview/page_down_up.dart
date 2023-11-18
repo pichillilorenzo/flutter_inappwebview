@@ -8,8 +8,8 @@ void pageDownUp() {
         ].contains(defaultTargetPlatform);
 
   skippableTestWidgets('pageDown/pageUp', (WidgetTester tester) async {
-    final Completer<InAppWebViewController> controllerCompleter =
-        Completer<InAppWebViewController>();
+    final Completer<PlatformInAppWebViewController> controllerCompleter =
+        Completer<PlatformInAppWebViewController>();
     final Completer<void> pageLoaded = Completer<void>();
 
     await tester.pumpWidget(
@@ -28,7 +28,7 @@ void pageDownUp() {
       ),
     );
 
-    final InAppWebViewController controller = await controllerCompleter.future;
+    final PlatformInAppWebViewController controller = await controllerCompleter.future;
     await pageLoaded.future;
     await tester.pump();
     await Future.delayed(Duration(seconds: 1));

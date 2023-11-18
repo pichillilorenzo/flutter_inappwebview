@@ -8,8 +8,8 @@ void clearSslPreferences() {
         ].contains(defaultTargetPlatform);
 
   skippableTestWidgets('clearSslPreferences', (WidgetTester tester) async {
-    final Completer<InAppWebViewController> controllerCompleter =
-        Completer<InAppWebViewController>();
+    final Completer<PlatformInAppWebViewController> controllerCompleter =
+        Completer<PlatformInAppWebViewController>();
     final Completer<void> pageLoaded = Completer<void>();
 
     await tester.pumpWidget(
@@ -28,7 +28,7 @@ void clearSslPreferences() {
       ),
     );
 
-    final InAppWebViewController controller = await controllerCompleter.future;
+    final PlatformInAppWebViewController controller = await controllerCompleter.future;
     await pageLoaded.future;
     await expectLater(controller.clearSslPreferences(), completes);
   }, skip: shouldSkip);

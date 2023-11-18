@@ -66,7 +66,7 @@ class MyInAppBrowser extends InAppBrowser {
 class InAppBrowserExampleScreen extends StatefulWidget {
   @override
   _InAppBrowserExampleScreenState createState() =>
-      new _InAppBrowserExampleScreenState();
+      _InAppBrowserExampleScreenState();
 }
 
 class _InAppBrowserExampleScreenState extends State<InAppBrowserExampleScreen> {

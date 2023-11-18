@@ -65,12 +65,25 @@ class InAppBrowser implements PlatformInAppBrowserEvents {
   ContextMenu? get contextMenu => platform.contextMenu;
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformInAppBrowser.pullToRefreshController}
-  PlatformPullToRefreshController? get pullToRefreshController =>
-      platform.pullToRefreshController;
+  PullToRefreshController? get pullToRefreshController {
+    final pullToRefreshControllerPlatform = platform.pullToRefreshController;
+    if (pullToRefreshControllerPlatform == null) {
+      return null;
+    }
+    return PullToRefreshController.fromPlatform(
+        platform: pullToRefreshControllerPlatform);
+  }
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformInAppBrowser.findInteractionController}
-  PlatformFindInteractionController? get findInteractionController =>
-      platform.findInteractionController;
+  FindInteractionController? get findInteractionController {
+    final findInteractionControllerPlatform =
+        platform.findInteractionController;
+    if (findInteractionControllerPlatform == null) {
+      return null;
+    }
+    return FindInteractionController.fromPlatform(
+        platform: findInteractionControllerPlatform);
+  }
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformInAppBrowser.initialUserScripts}
   UnmodifiableListView<UserScript>? get initialUserScripts =>
@@ -80,8 +93,14 @@ class InAppBrowser implements PlatformInAppBrowserEvents {
   int? get windowId => platform.windowId;
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformInAppBrowser.webViewController}
-  PlatformInAppWebViewController? get webViewController =>
-      platform.webViewController;
+  InAppWebViewController? get webViewController {
+    final webViewControllerPlatform = platform.webViewController;
+    if (webViewControllerPlatform == null) {
+      return null;
+    }
+    return InAppWebViewController.fromPlatform(
+        platform: webViewControllerPlatform);
+  }
 
   ///Opens the [InAppBrowser] instance with an [urlRequest].
   ///

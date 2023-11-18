@@ -48,6 +48,16 @@ List<ContentBlocker> _deserializeContentBlockers(
   return contentBlockers;
 }
 
+Map<String, dynamic>? _serializeWebViewAssetLoader(
+    PlatformWebViewAssetLoader? webViewAssetLoader) {
+  return webViewAssetLoader?.toMap();
+}
+
+PlatformWebViewAssetLoader? _deserializeWebViewAssetLoader(
+    Map<String, dynamic>? map) {
+  return PlatformWebViewAssetLoader.static().fromMap(map);
+}
+
 ///This class represents all the WebView settings available.
 @ExchangeableObject(copyMethod: true)
 class InAppWebViewSettings_ {
@@ -371,6 +381,9 @@ because there isn't any way to make the website data store non-persistent for th
   ///Use a [WebViewAssetLoader] instance to load local files including application's static assets and resources using http(s):// URLs.
   ///Loading local files using web-like URLs instead of `file://` is desirable as it is compatible with the Same-Origin policy.
   @SupportedPlatforms(platforms: [AndroidPlatform()])
+  @ExchangeableObjectProperty(
+      serializer: _serializeWebViewAssetLoader,
+      deserializer: _deserializeWebViewAssetLoader)
   PlatformWebViewAssetLoader? webViewAssetLoader;
 
   ///Sets the text zoom of the page in percent. The default value is `100`.

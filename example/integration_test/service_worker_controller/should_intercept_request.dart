@@ -16,8 +16,8 @@ void shouldInterceptRequest() {
         WebViewFeature.SERVICE_WORKER_SHOULD_INTERCEPT_REQUEST);
 
     if (swAvailable && swInterceptAvailable) {
-      PlatformServiceWorkerController serviceWorkerController =
-          PlatformServiceWorkerController.instance();
+      ServiceWorkerController serviceWorkerController =
+          ServiceWorkerController.instance();
 
       await serviceWorkerController.setServiceWorkerClient(ServiceWorkerClient(
         shouldInterceptRequest: (request) async {

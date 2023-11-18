@@ -7,7 +7,7 @@ part of 'web_storage_type.dart';
 // **************************************************************************
 
 ///Class that represents the type of Web Storage: `localStorage` or `sessionStorage`.
-///Used by the [Storage] class.
+///Used by the [PlatformStorage] class.
 class WebStorageType {
   final String _value;
   final String _nativeValue;

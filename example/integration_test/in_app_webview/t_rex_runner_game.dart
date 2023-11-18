@@ -10,8 +10,8 @@ void tRexRunnerGame() {
         ].contains(defaultTargetPlatform);
 
   skippableTestWidgets('T-Rex Runner game', (WidgetTester tester) async {
-    final Completer<InAppWebViewController> controllerCompleter =
-        Completer<InAppWebViewController>();
+    final Completer<PlatformInAppWebViewController> controllerCompleter =
+        Completer<PlatformInAppWebViewController>();
     final Completer<void> pageLoaded = Completer<void>();
 
     await tester.pumpWidget(

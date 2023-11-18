@@ -50,8 +50,8 @@ void videoPlaybackPolicy() {
     });
 
     skippableTestWidgets('Auto media playback', (WidgetTester tester) async {
-      Completer<InAppWebViewController> controllerCompleter =
-          Completer<InAppWebViewController>();
+      Completer<PlatformInAppWebViewController> controllerCompleter =
+          Completer<PlatformInAppWebViewController>();
       Completer<void> pageLoaded = Completer<void>();
 
       await tester.pumpWidget(
@@ -74,14 +74,14 @@ void videoPlaybackPolicy() {
           ),
         ),
       );
-      InAppWebViewController controller = await controllerCompleter.future;
+      PlatformInAppWebViewController controller = await controllerCompleter.future;
       await pageLoaded.future;
 
       bool isPaused =
           await controller.evaluateJavascript(source: 'isPaused();');
       expect(isPaused, false);
 
-      controllerCompleter = Completer<InAppWebViewController>();
+      controllerCompleter = Completer<PlatformInAppWebViewController>();
       pageLoaded = Completer<void>();
 
       // We change the key to re-create a new webview as we change the mediaPlaybackRequiresUserGesture
@@ -123,8 +123,8 @@ void videoPlaybackPolicy() {
     skippableTestWidgets(
         'Video plays inline when allowsInlineMediaPlayback is true',
         (WidgetTester tester) async {
-      Completer<InAppWebViewController> controllerCompleter =
-          Completer<InAppWebViewController>();
+      Completer<PlatformInAppWebViewController> controllerCompleter =
+          Completer<PlatformInAppWebViewController>();
       Completer<void> pageLoaded = Completer<void>();
       Completer<void> onEnterFullscreenCompleter = Completer<void>();
 
@@ -167,8 +167,8 @@ void videoPlaybackPolicy() {
     testWidgets(
         'Video plays fullscreen when allowsInlineMediaPlayback is false',
         (WidgetTester tester) async {
-      Completer<InAppWebViewController> controllerCompleter =
-          Completer<InAppWebViewController>();
+      Completer<PlatformInAppWebViewController> controllerCompleter =
+          Completer<PlatformInAppWebViewController>();
       Completer<void> pageLoaded = Completer<void>();
       Completer<void> onEnterFullscreenCompleter = Completer<void>();
 
@@ -212,8 +212,8 @@ void videoPlaybackPolicy() {
           ].contains(defaultTargetPlatform);
     // on Android, entering fullscreen requires user interaction
     skippableTestWidgets('exit fullscreen event', (WidgetTester tester) async {
-      Completer<InAppWebViewController> controllerCompleter =
-          Completer<InAppWebViewController>();
+      Completer<PlatformInAppWebViewController> controllerCompleter =
+          Completer<PlatformInAppWebViewController>();
       Completer<void> pageLoaded = Completer<void>();
       Completer<void> onExitFullscreenCompleter = Completer<void>();
 
@@ -242,7 +242,7 @@ void videoPlaybackPolicy() {
         ),
       );
 
-      InAppWebViewController controller = await controllerCompleter.future;
+      PlatformInAppWebViewController controller = await controllerCompleter.future;
       await pageLoaded.future;
 
       await Future.delayed(Duration(seconds: 2));

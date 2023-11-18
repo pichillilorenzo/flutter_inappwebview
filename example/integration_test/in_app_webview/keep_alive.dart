@@ -15,10 +15,10 @@ void keepAlive() {
   skippableTestWidgets('Keep Alive', (WidgetTester tester) async {
     final keepAlive = InAppWebViewKeepAlive();
 
-    final Completer<InAppWebViewController> controllerCompleter =
-        Completer<InAppWebViewController>();
-    final Completer<InAppWebViewController> controllerCompleter2 =
-        Completer<InAppWebViewController>();
+    final Completer<PlatformInAppWebViewController> controllerCompleter =
+        Completer<PlatformInAppWebViewController>();
+    final Completer<PlatformInAppWebViewController> controllerCompleter2 =
+        Completer<PlatformInAppWebViewController>();
     final Completer<void> pageLoaded = Completer<void>();
     final Completer<void> pageLoaded2 = Completer<void>();
 
@@ -46,7 +46,7 @@ void keepAlive() {
       ),
     );
 
-    final InAppWebViewController controller = await controllerCompleter.future;
+    final PlatformInAppWebViewController controller = await controllerCompleter.future;
     await pageLoaded.future;
 
     await controller.loadUrl(
@@ -64,7 +64,7 @@ void keepAlive() {
             },
           )),
     );
-    final InAppWebViewController controller2 =
+    final PlatformInAppWebViewController controller2 =
         await controllerCompleter2.future;
 
     final String? currentUrl = (await controller2.getUrl())?.toString();

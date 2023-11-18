@@ -18,8 +18,8 @@ void webArchive() {
           ].contains(defaultTargetPlatform);
 
     skippableTestWidgets('create data', (WidgetTester tester) async {
-      final Completer<InAppWebViewController> controllerCompleter =
-          Completer<InAppWebViewController>();
+      final Completer<PlatformInAppWebViewController> controllerCompleter =
+          Completer<PlatformInAppWebViewController>();
       final Completer<void> pageLoaded = Completer<void>();
 
       await tester.pumpWidget(
@@ -38,7 +38,7 @@ void webArchive() {
         ),
       );
 
-      final InAppWebViewController controller =
+      final PlatformInAppWebViewController controller =
           await controllerCompleter.future;
       await pageLoaded.future;
 
@@ -46,8 +46,8 @@ void webArchive() {
     }, skip: shouldSkipTest1);
 
     skippableTestWidgets('save', (WidgetTester tester) async {
-      final Completer<InAppWebViewController> controllerCompleter =
-          Completer<InAppWebViewController>();
+      final Completer<PlatformInAppWebViewController> controllerCompleter =
+          Completer<PlatformInAppWebViewController>();
       final Completer<void> pageLoaded = Completer<void>();
 
       await tester.pumpWidget(
@@ -66,7 +66,7 @@ void webArchive() {
         ),
       );
 
-      final InAppWebViewController controller =
+      final PlatformInAppWebViewController controller =
           await controllerCompleter.future;
       await pageLoaded.future;
 

@@ -8,8 +8,8 @@ void onReceivedTouchIconUrl() {
         ].contains(defaultTargetPlatform);
 
   skippableTestWidgets('onReceivedTouchIconUrl', (WidgetTester tester) async {
-    final Completer<InAppWebViewController> controllerCompleter =
-        Completer<InAppWebViewController>();
+    final Completer<PlatformInAppWebViewController> controllerCompleter =
+        Completer<PlatformInAppWebViewController>();
     final Completer<String> onReceivedTouchIconUrlCompleter =
         Completer<String>();
 

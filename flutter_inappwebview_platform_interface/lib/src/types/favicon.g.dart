@@ -6,7 +6,7 @@ part of 'favicon.dart';
 // ExchangeableObjectGenerator
 // **************************************************************************
 
-///Class that represents a favicon of a website. It is used by [InAppWebViewController.getFavicons] method.
+///Class that represents a favicon of a website. It is used by [PlatformInAppWebViewController.getFavicons] method.
 class Favicon {
   ///The height of the favicon image.
   int? height;

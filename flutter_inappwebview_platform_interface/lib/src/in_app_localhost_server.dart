@@ -2,9 +2,33 @@ import 'dart:io';
 import 'dart:async';
 import 'dart:typed_data';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart' show rootBundle;
 
 import 'mime_type_resolver.dart';
+import 'platform_in_app_localhost_server.dart';
+
+/// Object specifying creation parameters for creating a [DefaultInAppLocalhostServer].
+///
+/// When adding additional fields make sure they can be null or have a default
+/// value to avoid breaking changes. See [PlatformInAppLocalhostServerCreationParams] for
+/// more information.
+@immutable
+class DefaultInAppLocalhostServerCreationParams
+    extends PlatformInAppLocalhostServerCreationParams {
+  /// Creates a new [DefaultInAppLocalhostServerCreationParams] instance.
+  const DefaultInAppLocalhostServerCreationParams(
+    // This parameter prevents breaking changes later.
+    // ignore: avoid_unused_constructor_parameters
+    PlatformInAppLocalhostServerCreationParams params,
+  ) : super();
+
+  /// Creates a [DefaultInAppLocalhostServerCreationParams] instance based on [PlatformInAppLocalhostServerCreationParams].
+  factory DefaultInAppLocalhostServerCreationParams.fromPlatformInAppLocalhostServerCreationParams(
+      PlatformInAppLocalhostServerCreationParams params) {
+    return DefaultInAppLocalhostServerCreationParams(params);
+  }
+}
 
 ///This class allows you to create a simple server on `http://localhost:[port]/`
 ///in order to be able to load your assets file on a local server.
@@ -14,7 +38,7 @@ import 'mime_type_resolver.dart';
 ///- Android native WebView
 ///- iOS
 ///- MacOS
-class InAppLocalhostServer {
+class DefaultInAppLocalhostServer extends PlatformInAppLocalhostServer {
   bool _started = false;
   HttpServer? _server;
   int _port = 8080;
@@ -22,30 +46,32 @@ class InAppLocalhostServer {
   String _directoryIndex = 'index.html';
   String _documentRoot = './';
 
-  ///- [port] represents the port of the server. The default value is `8080`.
-  ///
-  ///- [directoryIndex] represents the index file to use. The default value is `index.html`.
-  ///
-  ///- [documentRoot] represents the document root path to serve. The default value is `./`.
-  ///
-  ///- The optional argument [shared] specifies whether additional `HttpServer`
-  /// objects can bind to the same combination of `address`, `port` and `v6Only`.
-  /// If `shared` is `true` and more `HttpServer`s from this isolate or other
-  /// isolates are bound to the port, then the incoming connections will be
-  /// distributed among all the bound `HttpServer`s. Connections can be
-  /// distributed over multiple isolates this way.
-  InAppLocalhostServer({
-    int port = 8080,
-    String directoryIndex = 'index.html',
-    String documentRoot = './',
-    bool shared = false,
-  }) {
+  /// Creates a new [DefaultInAppLocalhostServer].
+  DefaultInAppLocalhostServer(PlatformInAppLocalhostServerCreationParams params)
+      : super.implementation(
+          params is DefaultInAppLocalhostServerCreationParams
+              ? params
+              : DefaultInAppLocalhostServerCreationParams
+                  .fromPlatformInAppLocalhostServerCreationParams(params),
+        ) {
     this._port = port;
     this._directoryIndex = directoryIndex;
     this._documentRoot =
         (documentRoot.endsWith('/')) ? documentRoot : '$documentRoot/';
     this._shared = shared;
   }
+
+  ///{@macro flutter_inappwebview_platform_interface.PlatformInAppLocalhostServer.port}
+  int get port => _port;
+
+  ///{@macro flutter_inappwebview_platform_interface.PlatformInAppLocalhostServer.directoryIndex}
+  String get directoryIndex => _directoryIndex;
+
+  ///{@macro flutter_inappwebview_platform_interface.PlatformInAppLocalhostServer.documentRoot}
+  String get documentRoot => _documentRoot;
+
+  ///{@macro flutter_inappwebview_platform_interface.PlatformInAppLocalhostServer.shared}
+  bool get shared => _shared;
 
   ///Starts the server on `http://localhost:[port]/`.
   ///

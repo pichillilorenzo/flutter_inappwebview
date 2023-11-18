@@ -12,7 +12,7 @@ class SafeBrowsingResponse {
   ///Indicate the [SafeBrowsingResponseAction] to take when hitting a malicious URL.
   SafeBrowsingResponseAction? action;
 
-  ///If reporting is enabled, all reports will be sent according to the privacy policy referenced by [InAppWebViewController.getSafeBrowsingPrivacyPolicyUrl].
+  ///If reporting is enabled, all reports will be sent according to the privacy policy referenced by [PlatformInAppWebViewController.getSafeBrowsingPrivacyPolicyUrl].
   bool report;
   SafeBrowsingResponse(
       {this.action = SafeBrowsingResponseAction.SHOW_INTERSTITIAL,

@@ -41,8 +41,8 @@ void audioPlaybackPolicy() {
     });
 
     skippableTestWidgets('Auto media playback', (WidgetTester tester) async {
-      Completer<InAppWebViewController> controllerCompleter =
-          Completer<InAppWebViewController>();
+      Completer<PlatformInAppWebViewController> controllerCompleter =
+          Completer<PlatformInAppWebViewController>();
       Completer<void> pageStarted = Completer<void>();
       Completer<void> pageLoaded = Completer<void>();
 
@@ -69,7 +69,7 @@ void audioPlaybackPolicy() {
           ),
         ),
       );
-      InAppWebViewController controller = await controllerCompleter.future;
+      PlatformInAppWebViewController controller = await controllerCompleter.future;
       await pageStarted.future;
       await pageLoaded.future;
 
@@ -77,7 +77,7 @@ void audioPlaybackPolicy() {
           await controller.evaluateJavascript(source: 'isPaused();');
       expect(isPaused, false);
 
-      controllerCompleter = Completer<InAppWebViewController>();
+      controllerCompleter = Completer<PlatformInAppWebViewController>();
       pageStarted = Completer<void>();
       pageLoaded = Completer<void>();
 

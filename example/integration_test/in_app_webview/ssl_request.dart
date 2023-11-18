@@ -10,8 +10,8 @@ void sslRequest() {
         ].contains(defaultTargetPlatform);
 
   skippableTestWidgets('SSL request', (WidgetTester tester) async {
-    final Completer<InAppWebViewController> controllerCompleter =
-        Completer<InAppWebViewController>();
+    final Completer<PlatformInAppWebViewController> controllerCompleter =
+        Completer<PlatformInAppWebViewController>();
     final Completer<void> pageLoaded = Completer<void>();
     await tester.pumpWidget(
       Directionality(
@@ -40,7 +40,7 @@ void sslRequest() {
         ),
       ),
     );
-    final InAppWebViewController controller = await controllerCompleter.future;
+    final PlatformInAppWebViewController controller = await controllerCompleter.future;
     await pageLoaded.future;
 
     final String h1Content = await controller.evaluateJavascript(

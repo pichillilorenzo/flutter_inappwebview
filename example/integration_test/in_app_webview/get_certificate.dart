@@ -10,8 +10,8 @@ void getCertificate() {
         ].contains(defaultTargetPlatform);
 
   skippableTestWidgets('getCertificate', (WidgetTester tester) async {
-    final Completer<InAppWebViewController> controllerCompleter =
-        Completer<InAppWebViewController>();
+    final Completer<PlatformInAppWebViewController> controllerCompleter =
+        Completer<PlatformInAppWebViewController>();
     final Completer<void> pageLoaded = Completer<void>();
 
     await tester.pumpWidget(
@@ -30,7 +30,7 @@ void getCertificate() {
       ),
     );
 
-    final InAppWebViewController controller = await controllerCompleter.future;
+    final PlatformInAppWebViewController controller = await controllerCompleter.future;
     await pageLoaded.future;
 
     var sslCertificate = await controller.getCertificate();

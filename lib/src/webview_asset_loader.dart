@@ -55,7 +55,23 @@ class WebViewAssetLoader {
   ///
   ///[WebViewAssetLoader] will try Path Handlers in the order they're registered,
   ///and will use whichever is the first to return a non-null.
-  List<PlatformPathHandler>? get pathHandlers => platform.pathHandlers;
+  List<PathHandler>? get pathHandlers => platform.pathHandlers
+      ?.map((platform) {
+        switch (platform.runtimeType) {
+          case AssetsPathHandler:
+            return AssetsPathHandler.fromPlatform(
+                platform: platform as PlatformAssetsPathHandler);
+          case ResourcesPathHandler:
+            return ResourcesPathHandler.fromPlatform(
+                platform: platform as PlatformResourcesPathHandler);
+          case InternalStoragePathHandler:
+            return InternalStoragePathHandler.fromPlatform(
+                platform: platform as PlatformInternalStoragePathHandler);
+        }
+        return null;
+      })
+      .whereType<PathHandler>()
+      .toList();
 }
 
 ///A handler that produces responses for a registered path.
@@ -163,8 +179,8 @@ class ResourcesPathHandler extends PathHandler {
   /// parameters for a specific platform.
   ResourcesPathHandler({required String path})
       : this.fromPlatformCreationParams(
-      params: PlatformResourcesPathHandlerCreationParams(
-          PlatformPathHandlerCreationParams(path: path)));
+            params: PlatformResourcesPathHandlerCreationParams(
+                PlatformPathHandlerCreationParams(path: path)));
 
   /// Constructs a [ResourcesPathHandler].
   ///
@@ -207,8 +223,9 @@ class InternalStoragePathHandler extends PathHandler {
   /// parameters for a specific platform.
   InternalStoragePathHandler({required String path, required String directory})
       : this.fromPlatformCreationParams(
-      params: PlatformInternalStoragePathHandlerCreationParams(
-          PlatformPathHandlerCreationParams(path: path), directory: directory));
+            params: PlatformInternalStoragePathHandlerCreationParams(
+                PlatformPathHandlerCreationParams(path: path),
+                directory: directory));
 
   /// Constructs a [InternalStoragePathHandler].
   ///

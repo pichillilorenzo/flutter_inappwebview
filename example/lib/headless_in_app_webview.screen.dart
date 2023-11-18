@@ -7,7 +7,7 @@ import 'main.dart';
 class HeadlessInAppWebViewExampleScreen extends StatefulWidget {
   @override
   _HeadlessInAppWebViewExampleScreenState createState() =>
-      new _HeadlessInAppWebViewExampleScreenState();
+      _HeadlessInAppWebViewExampleScreenState();
 }
 
 class _HeadlessInAppWebViewExampleScreenState
@@ -23,7 +23,7 @@ class _HeadlessInAppWebViewExampleScreenState
         ? WebUri("https://flutter.dev")
         : WebUri("http://localhost:${Uri.base.port}/page.html");
 
-    headlessWebView = new HeadlessInAppWebView(
+    headlessWebView = HeadlessInAppWebView(
       initialUrlRequest: URLRequest(url: url),
       initialSettings: InAppWebViewSettings(
         isInspectable: kDebugMode,
@@ -88,8 +88,9 @@ class _HeadlessInAppWebViewExampleScreenState
             child: ElevatedButton(
                 onPressed: () async {
                   if (headlessWebView?.isRunning() ?? false) {
-                    await headlessWebView?.webViewController?.evaluateJavascript(
-                        source: """console.log('Here is the message!');""");
+                    await headlessWebView?.webViewController
+                        ?.evaluateJavascript(
+                            source: """console.log('Here is the message!');""");
                   } else {
                     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                       content: Text(

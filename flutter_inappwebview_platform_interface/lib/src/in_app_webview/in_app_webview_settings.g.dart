@@ -1404,7 +1404,8 @@ class InAppWebViewSettings {
           ? UtilColor.fromStringRepresentation(
               map['verticalScrollbarTrackColor'])
           : null,
-      webViewAssetLoader: map['webViewAssetLoader'],
+      webViewAssetLoader:
+          _deserializeWebViewAssetLoader(map['webViewAssetLoader']),
     );
     instance.accessibilityIgnoresInvertColors =
         map['accessibilityIgnoresInvertColors'];
@@ -1686,7 +1687,7 @@ class InAppWebViewSettings {
       "verticalScrollbarPosition": verticalScrollbarPosition?.toNativeValue(),
       "verticalScrollbarThumbColor": verticalScrollbarThumbColor?.toHex(),
       "verticalScrollbarTrackColor": verticalScrollbarTrackColor?.toHex(),
-      "webViewAssetLoader": webViewAssetLoader,
+      "webViewAssetLoader": _serializeWebViewAssetLoader(webViewAssetLoader),
     };
   }
 

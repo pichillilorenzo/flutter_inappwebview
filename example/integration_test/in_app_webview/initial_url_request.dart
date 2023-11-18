@@ -21,8 +21,8 @@ void initialUrlRequest() {
         'launches with allowsBackForwardNavigationGestures true',
         (WidgetTester tester) async {
       final Completer<void> pageLoaded = Completer<void>();
-      final Completer<InAppWebViewController> controllerCompleter =
-          Completer<InAppWebViewController>();
+      final Completer<PlatformInAppWebViewController> controllerCompleter =
+          Completer<PlatformInAppWebViewController>();
 
       await tester.pumpWidget(
         Directionality(
@@ -46,7 +46,7 @@ void initialUrlRequest() {
         ),
       );
       await pageLoaded.future;
-      final InAppWebViewController controller =
+      final PlatformInAppWebViewController controller =
           await controllerCompleter.future;
       final String? currentUrl = (await controller.getUrl())?.toString();
       expect(currentUrl, TEST_URL_1.toString());
@@ -62,8 +62,8 @@ void initialUrlRequest() {
 
     skippableTestWidgets('basic', (WidgetTester tester) async {
       final Completer<void> pageLoaded = Completer<void>();
-      final Completer<InAppWebViewController> controllerCompleter =
-          Completer<InAppWebViewController>();
+      final Completer<PlatformInAppWebViewController> controllerCompleter =
+          Completer<PlatformInAppWebViewController>();
 
       await tester.pumpWidget(
         Directionality(
@@ -82,7 +82,7 @@ void initialUrlRequest() {
       );
 
       await pageLoaded.future;
-      final InAppWebViewController controller =
+      final PlatformInAppWebViewController controller =
           await controllerCompleter.future;
       final String? currentUrl = (await controller.getUrl())?.toString();
 

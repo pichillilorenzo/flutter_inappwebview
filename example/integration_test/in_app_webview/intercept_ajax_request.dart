@@ -11,8 +11,8 @@ void interceptAjaxRequest() {
 
   skippableGroup('intercept ajax request', () {
     skippableTestWidgets('send string data', (WidgetTester tester) async {
-      final Completer<InAppWebViewController> controllerCompleter =
-          Completer<InAppWebViewController>();
+      final Completer<PlatformInAppWebViewController> controllerCompleter =
+          Completer<PlatformInAppWebViewController>();
       final Completer shouldInterceptAjaxPostRequestCompleter =
           Completer<void>();
       final Completer<Map<String, dynamic>> onAjaxReadyStateChangeCompleter =
@@ -93,8 +93,8 @@ void interceptAjaxRequest() {
     });
 
     skippableTestWidgets('send json data', (WidgetTester tester) async {
-      final Completer<InAppWebViewController> controllerCompleter =
-          Completer<InAppWebViewController>();
+      final Completer<PlatformInAppWebViewController> controllerCompleter =
+          Completer<PlatformInAppWebViewController>();
       final Completer shouldInterceptAjaxPostRequestCompleter =
           Completer<void>();
       final Completer<Map<String, dynamic>> onAjaxReadyStateChangeCompleter =
@@ -182,8 +182,8 @@ void interceptAjaxRequest() {
 
     skippableTestWidgets('send URLSearchParams data',
         (WidgetTester tester) async {
-      final Completer<InAppWebViewController> controllerCompleter =
-          Completer<InAppWebViewController>();
+      final Completer<PlatformInAppWebViewController> controllerCompleter =
+          Completer<PlatformInAppWebViewController>();
       final Completer shouldInterceptAjaxPostRequestCompleter =
           Completer<void>();
       final Completer<Map<String, dynamic>> onAjaxReadyStateChangeCompleter =
@@ -266,8 +266,8 @@ void interceptAjaxRequest() {
     });
 
     skippableTestWidgets('send FormData', (WidgetTester tester) async {
-      final Completer<InAppWebViewController> controllerCompleter =
-          Completer<InAppWebViewController>();
+      final Completer<PlatformInAppWebViewController> controllerCompleter =
+          Completer<PlatformInAppWebViewController>();
       final Completer shouldInterceptAjaxPostRequestCompleter =
           Completer<void>();
       final Completer<Map<String, dynamic>> onAjaxReadyStateChangeCompleter =

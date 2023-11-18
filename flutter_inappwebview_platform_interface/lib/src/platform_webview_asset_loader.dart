@@ -104,7 +104,7 @@ abstract class PlatformWebViewAssetLoader extends PlatformInterface {
   /// The parameters used to initialize the [PlatformWebViewAssetLoader].
   final PlatformWebViewAssetLoaderCreationParams params;
 
-  PlatformWebViewAssetLoader? fromMap(Map<String, dynamic> map) {
+  PlatformWebViewAssetLoader? fromMap(Map<String, dynamic>? map) {
     throw UnimplementedError(
         'fromMap is not implemented on the current platform');
   }

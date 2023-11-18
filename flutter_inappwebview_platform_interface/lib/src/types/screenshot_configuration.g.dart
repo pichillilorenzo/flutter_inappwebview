@@ -6,7 +6,7 @@ part of 'screenshot_configuration.dart';
 // ExchangeableObjectGenerator
 // **************************************************************************
 
-///Class that represents the configuration data to use when generating an image from a web view’s contents using [InAppWebViewController.takeScreenshot].
+///Class that represents the configuration data to use when generating an image from a web view’s contents using [PlatformInAppWebViewController.takeScreenshot].
 class ScreenshotConfiguration {
   ///A Boolean value that indicates whether to take the snapshot after incorporating any pending screen updates.
   ///The default value of this property is `true`, which causes the web view to incorporate any recent changes to the view’s content and then generate the snapshot.

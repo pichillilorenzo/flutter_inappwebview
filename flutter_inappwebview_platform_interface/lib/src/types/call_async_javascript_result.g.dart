@@ -6,7 +6,7 @@ part of 'call_async_javascript_result.dart';
 // ExchangeableObjectGenerator
 // **************************************************************************
 
-///Class that represents either a success or a failure, including an associated value in each case for [InAppWebViewController.callAsyncJavaScript].
+///Class that represents either a success or a failure, including an associated value in each case for [PlatformInAppWebViewController.callAsyncJavaScript].
 class CallAsyncJavaScriptResult {
   ///It contains the failure value.
   String? error;

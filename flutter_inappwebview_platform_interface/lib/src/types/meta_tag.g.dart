@@ -6,7 +6,7 @@ part of 'meta_tag.dart';
 // ExchangeableObjectGenerator
 // **************************************************************************
 
-///Class that represents a `<meta>` HTML tag. It is used by the [InAppWebViewController.getMetaTags] method.
+///Class that represents a `<meta>` HTML tag. It is used by the [PlatformInAppWebViewController.getMetaTags] method.
 class MetaTag {
   ///The meta tag attributes list.
   List<MetaTagAttribute>? attrs;

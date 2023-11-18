@@ -65,10 +65,12 @@ class WebAuthenticationSession {
   String? get callbackURLScheme => platform.callbackURLScheme;
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebAuthenticationSession.initialSettings}
-  WebAuthenticationSessionSettings? get initialSettings => platform.initialSettings;
+  WebAuthenticationSessionSettings? get initialSettings =>
+      platform.initialSettings;
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebAuthenticationSession.onComplete}
-  WebAuthenticationSessionCompletionHandler get onComplete => platform.onComplete;
+  WebAuthenticationSessionCompletionHandler get onComplete =>
+      platform.onComplete;
 
   ///Used to create and initialize a session.
   ///
@@ -77,16 +79,17 @@ class WebAuthenticationSession {
   ///[callbackURLScheme] represents the custom URL scheme that the app expects in the callback URL.
   ///
   ///[onComplete] represents a completion handler the session calls when it completes successfully, or when the user cancels the session.
-  static Future<PlatformWebAuthenticationSession> create(
+  static Future<WebAuthenticationSession> create(
       {required WebUri url,
       String? callbackURLScheme,
       WebAuthenticationSessionCompletionHandler onComplete,
       WebAuthenticationSessionSettings? initialSettings}) async {
-    return await PlatformWebAuthenticationSession.static().create(
-        url: url,
-        callbackURLScheme: callbackURLScheme,
-        onComplete: onComplete,
-        initialSettings: initialSettings);
+    return WebAuthenticationSession.fromPlatform(
+        platform: await PlatformWebAuthenticationSession.static().create(
+            url: url,
+            callbackURLScheme: callbackURLScheme,
+            onComplete: onComplete,
+            initialSettings: initialSettings));
   }
 
   ///Indicates whether the session can begin.

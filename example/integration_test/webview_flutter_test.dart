@@ -18,8 +18,8 @@ import 'tracing_controller/main.dart' as tracing_controller_tests;
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
-  WebView.debugLoggingSettings.usePrint = true;
-  WebView.debugLoggingSettings.maxLogMessageLength = 7000;
+  PlatformInAppWebViewController.debugLoggingSettings.usePrint = true;
+  PlatformInAppWebViewController.debugLoggingSettings.maxLogMessageLength = 7000;
   InAppBrowser.debugLoggingSettings.usePrint = true;
   InAppBrowser.debugLoggingSettings.maxLogMessageLength = 7000;
   PlatformChromeSafariBrowser.debugLoggingSettings.usePrint = true;

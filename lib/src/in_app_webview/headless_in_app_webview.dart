@@ -36,8 +36,14 @@ class HeadlessInAppWebView {
   final PlatformHeadlessInAppWebView platform;
 
   ///WebView Controller that can be used to access the [InAppWebViewController] API.
-  PlatformInAppWebViewController? get webViewController =>
-      platform.webViewController;
+  InAppWebViewController? get webViewController {
+    final webViewControllerPlatform = platform.webViewController;
+    if (webViewControllerPlatform == null) {
+      return null;
+    }
+    return InAppWebViewController.fromPlatform(
+        platform: webViewControllerPlatform);
+  }
 
   HeadlessInAppWebView({
     Size initialSize = const Size(-1, -1),

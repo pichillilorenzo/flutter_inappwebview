@@ -12,8 +12,8 @@ void webMessage() {
   skippableGroup('WebMessage', () {
     skippableTestWidgets('WebMessageChannel post String',
         (WidgetTester tester) async {
-      final Completer<InAppWebViewController> controllerCompleter =
-          Completer<InAppWebViewController>();
+      final Completer<PlatformInAppWebViewController> controllerCompleter =
+          Completer<PlatformInAppWebViewController>();
       final Completer webMessageCompleter = Completer<String>();
       await tester.pumpWidget(
         Directionality(
@@ -81,8 +81,8 @@ void webMessage() {
 
     skippableTestWidgets('WebMessageChannel post ArrayBuffer',
         (WidgetTester tester) async {
-      final Completer<InAppWebViewController> controllerCompleter =
-          Completer<InAppWebViewController>();
+      final Completer<PlatformInAppWebViewController> controllerCompleter =
+          Completer<PlatformInAppWebViewController>();
       final Completer webMessageCompleter = Completer<String>();
       await tester.pumpWidget(
         Directionality(
@@ -167,8 +167,8 @@ void webMessage() {
 
     skippableTestWidgets('WebMessageListener post String',
         (WidgetTester tester) async {
-      final Completer<InAppWebViewController> controllerCompleter =
-          Completer<InAppWebViewController>();
+      final Completer<PlatformInAppWebViewController> controllerCompleter =
+          Completer<PlatformInAppWebViewController>();
       final Completer<void> pageLoaded = Completer<void>();
       final Completer webMessageCompleter = Completer<String>();
       await tester.pumpWidget(
@@ -177,7 +177,7 @@ void webMessage() {
           child: InAppWebView(
             key: GlobalKey(),
             onWebViewCreated: (controller) async {
-              await controller.addWebMessageListener(WebMessageListener(
+              await InAppWebViewController.fromPlatform(platform: controller).addWebMessageListener(WebMessageListener(
                 jsObjectName: "myTestObj",
                 allowedOriginRules: Set.from(["https://*.example.com"]),
                 onPostMessage:
@@ -222,8 +222,8 @@ void webMessage() {
 
     skippableTestWidgets('WebMessageListener post ArrayBuffer',
         (WidgetTester tester) async {
-      final Completer<InAppWebViewController> controllerCompleter =
-          Completer<InAppWebViewController>();
+      final Completer<PlatformInAppWebViewController> controllerCompleter =
+          Completer<PlatformInAppWebViewController>();
       final Completer<void> pageLoaded = Completer<void>();
       final Completer webMessageCompleter = Completer<String>();
       await tester.pumpWidget(
@@ -232,7 +232,7 @@ void webMessage() {
           child: InAppWebView(
             key: GlobalKey(),
             onWebViewCreated: (controller) async {
-              await controller.addWebMessageListener(WebMessageListener(
+              await InAppWebViewController.fromPlatform(platform: controller).addWebMessageListener(WebMessageListener(
                 jsObjectName: "myTestObj",
                 allowedOriginRules: Set.from(["https://*.example.com"]),
                 onPostMessage:

@@ -10,8 +10,8 @@ void onPageCommitVisible() {
         ].contains(defaultTargetPlatform);
 
   skippableTestWidgets('onPageCommitVisible', (WidgetTester tester) async {
-    final Completer<InAppWebViewController> controllerCompleter =
-        Completer<InAppWebViewController>();
+    final Completer<PlatformInAppWebViewController> controllerCompleter =
+        Completer<PlatformInAppWebViewController>();
     final Completer<String> onPageCommitVisibleCompleter = Completer<String>();
 
     await tester.pumpWidget(

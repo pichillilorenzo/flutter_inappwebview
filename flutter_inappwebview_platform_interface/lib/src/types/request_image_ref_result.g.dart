@@ -6,7 +6,7 @@ part of 'request_image_ref_result.dart';
 // ExchangeableObjectGenerator
 // **************************************************************************
 
-///Class that represents the result used by the [InAppWebViewController.requestImageRef] method.
+///Class that represents the result used by the [PlatformInAppWebViewController.requestImageRef] method.
 class RequestImageRefResult {
   ///The image's url.
   WebUri? url;

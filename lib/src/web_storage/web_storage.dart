@@ -37,10 +37,12 @@ class WebStorage {
   final PlatformWebStorage platform;
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebStorage.localStorage}
-  PlatformLocalStorage get localStorage => platform.localStorage;
+  LocalStorage get localStorage =>
+      LocalStorage.fromPlatform(platform: platform.localStorage);
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebStorage.sessionStorage}
-  PlatformSessionStorage get sessionStorage => platform.sessionStorage;
+  SessionStorage get sessionStorage =>
+      SessionStorage.fromPlatform(platform: platform.sessionStorage);
 
   ///Disposes the web storage.
   void dispose() => platform.dispose();

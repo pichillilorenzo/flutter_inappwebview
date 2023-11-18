@@ -9,7 +9,7 @@ void apply() {
 
   skippableTestWidgets('apply', (WidgetTester tester) async {
     await expectLater(
-        PlatformProcessGlobalConfig.instance().apply(
+        ProcessGlobalConfig.instance().apply(
             settings: ProcessGlobalConfigSettings(
                 dataDirectorySuffix:
                     (await WebViewFeature.isStartupFeatureSupported(

@@ -10,8 +10,8 @@ void loadData() {
         ].contains(defaultTargetPlatform);
 
   skippableTestWidgets('loadData', (WidgetTester tester) async {
-    final Completer<InAppWebViewController> controllerCompleter =
-        Completer<InAppWebViewController>();
+    final Completer<PlatformInAppWebViewController> controllerCompleter =
+        Completer<PlatformInAppWebViewController>();
     final StreamController<String> pageLoads =
         StreamController<String>.broadcast();
 
@@ -31,7 +31,7 @@ void loadData() {
       ),
     );
 
-    final InAppWebViewController controller = await controllerCompleter.future;
+    final PlatformInAppWebViewController controller = await controllerCompleter.future;
     await pageLoads.stream.first;
 
     final data = """

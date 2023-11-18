@@ -6,7 +6,7 @@ part of 'css_link_html_tag_attributes.dart';
 // ExchangeableObjectGenerator
 // **************************************************************************
 
-///Class that represents the possible CSS stylesheet `<link>` HTML attributes to be set used by [InAppWebViewController.injectCSSFileFromUrl].
+///Class that represents the possible CSS stylesheet `<link>` HTML attributes to be set used by [PlatformInAppWebViewController.injectCSSFileFromUrl].
 class CSSLinkHtmlTagAttributes {
   ///Specify alternative style sheets.
   bool? alternate;

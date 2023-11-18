@@ -8,6 +8,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_platform_interface.dart';
 
 import '../web_message/main.dart';
+import '../web_storage/web_storage.dart';
 import 'android/in_app_webview_controller.dart';
 import 'apple/in_app_webview_controller.dart';
 
@@ -49,7 +50,8 @@ class InAppWebViewController {
   final PlatformInAppWebViewController platform;
 
   ///Provides access to the JavaScript [Web Storage API](https://developer.mozilla.org/en-US/docs/Web/API/Web_Storage_API): `window.sessionStorage` and `window.localStorage`.
-  PlatformWebStorage get webStorage => platform.webStorage;
+  WebStorage get webStorage =>
+      WebStorage.fromPlatform(platform: platform.webStorage);
 
   ///Gets the URL for the current page.
   ///This is not always the same as the URL passed to [WebView.onLoadStart] because although the load for that URL has begun, the current page may not have changed.
@@ -707,9 +709,16 @@ class InAppWebViewController {
   ///- iOS ([Official API - UIPrintInteractionController.present](https://developer.apple.com/documentation/uikit/uiprintinteractioncontroller/1618149-present))
   ///- MacOS (if 11.0+, [Official API - WKWebView.printOperation](https://developer.apple.com/documentation/webkit/wkwebview/3516861-printoperation), else [Official API - NSView.printView](https://developer.apple.com/documentation/appkit/nsview/1483705-printview))
   ///- Web ([Official API - Window.print](https://developer.mozilla.org/en-US/docs/Web/API/Window/print))
-  Future<PlatformPrintJobController?> printCurrentPage(
-          {PrintJobSettings? settings}) =>
-      platform.printCurrentPage(settings: settings);
+  Future<PrintJobController?> printCurrentPage(
+      {PrintJobSettings? settings}) async {
+    final printJobControllerPlatform =
+        await platform.printCurrentPage(settings: settings);
+    if (printJobControllerPlatform == null) {
+      return null;
+    }
+    return PrintJobController.fromPlatform(
+        platform: printJobControllerPlatform);
+  }
 
   ///Gets the height of the HTML content.
   ///
@@ -1088,8 +1097,13 @@ class InAppWebViewController {
   ///- Android native WebView ([Official API - WebViewCompat.createWebMessageChannel](https://developer.android.com/reference/androidx/webkit/WebViewCompat#createWebMessageChannel(android.webkit.WebView)))
   ///- iOS
   ///- MacOS
-  Future<PlatformWebMessageChannel?> createWebMessageChannel() =>
-      platform.createWebMessageChannel();
+  Future<WebMessageChannel?> createWebMessageChannel() async {
+    final webMessagePlatform = await platform.createWebMessageChannel();
+    if (webMessagePlatform == null) {
+      return null;
+    }
+    return WebMessageChannel.fromPlatform(platform: webMessagePlatform);
+  }
 
   ///Post a message to main frame. The embedded application can restrict the messages to a certain target origin.
   ///See [HTML5 spec](https://html.spec.whatwg.org/multipage/comms.html#posting-messages) for how target origin can be used.

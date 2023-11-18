@@ -6,7 +6,7 @@ part of 'script_html_tag_attributes.dart';
 // ExchangeableObjectGenerator
 // **************************************************************************
 
-///Class that represents the possible the `<script>` HTML attributes to be set used by [InAppWebViewController.injectJavascriptFileFromUrl].
+///Class that represents the possible the `<script>` HTML attributes to be set used by [PlatformInAppWebViewController.injectJavascriptFileFromUrl].
 class ScriptHtmlTagAttributes {
   ///For classic scripts, if the [async] attribute is present,
   ///then the classic script will be fetched in parallel to parsing and evaluated as soon as it is available.

@@ -13,8 +13,8 @@ void httpAuthCredentialDatabase() {
     skippableTestWidgets('use saved credentials', (WidgetTester tester) async {
       HttpAuthCredentialDatabase httpAuthCredentialDatabase =
           HttpAuthCredentialDatabase.instance();
-      final Completer<InAppWebViewController> controllerCompleter =
-          Completer<InAppWebViewController>();
+      final Completer<PlatformInAppWebViewController> controllerCompleter =
+          Completer<PlatformInAppWebViewController>();
       final Completer<void> pageLoaded = Completer<void>();
 
       httpAuthCredentialDatabase.setHttpAuthCredential(
@@ -50,7 +50,7 @@ void httpAuthCredentialDatabase() {
           ),
         ),
       );
-      final InAppWebViewController controller =
+      final PlatformInAppWebViewController controller =
           await controllerCompleter.future;
       await pageLoaded.future;
 
@@ -77,8 +77,8 @@ void httpAuthCredentialDatabase() {
     });
 
     skippableTestWidgets('save credentials', (WidgetTester tester) async {
-      final Completer<InAppWebViewController> controllerCompleter =
-          Completer<InAppWebViewController>();
+      final Completer<PlatformInAppWebViewController> controllerCompleter =
+          Completer<PlatformInAppWebViewController>();
       final Completer<void> pageLoaded = Completer<void>();
 
       await tester.pumpWidget(
@@ -107,7 +107,7 @@ void httpAuthCredentialDatabase() {
           ),
         ),
       );
-      final InAppWebViewController controller =
+      final PlatformInAppWebViewController controller =
           await controllerCompleter.future;
       await pageLoaded.future;
 

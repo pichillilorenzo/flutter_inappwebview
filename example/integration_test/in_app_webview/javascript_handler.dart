@@ -10,8 +10,8 @@ void javascriptHandler() {
         ].contains(defaultTargetPlatform);
 
   skippableTestWidgets('JavaScript Handler', (WidgetTester tester) async {
-    final Completer<InAppWebViewController> controllerCompleter =
-        Completer<InAppWebViewController>();
+    final Completer<PlatformInAppWebViewController> controllerCompleter =
+        Completer<PlatformInAppWebViewController>();
     final Completer<void> pageStarted = Completer<void>();
     final Completer<void> pageLoaded = Completer<void>();
     final Completer<void> handlerFoo = Completer<void>();

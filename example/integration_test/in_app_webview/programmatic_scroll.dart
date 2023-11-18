@@ -49,8 +49,8 @@ void programmaticScroll() {
           : TEST_WEB_PLATFORM_URL_1;
 
       final Completer<void> pageLoaded = Completer<void>();
-      final Completer<InAppWebViewController> controllerCompleter =
-          Completer<InAppWebViewController>();
+      final Completer<PlatformInAppWebViewController> controllerCompleter =
+          Completer<PlatformInAppWebViewController>();
 
       await tester.pumpWidget(
         Directionality(
@@ -67,7 +67,7 @@ void programmaticScroll() {
         ),
       );
 
-      final InAppWebViewController controller =
+      final PlatformInAppWebViewController controller =
           await controllerCompleter.future;
       await pageLoaded.future;
 
@@ -127,8 +127,8 @@ void programmaticScroll() {
           base64Encode(const Utf8Encoder().convert(scrollTestPage));
 
       final Completer<void> pageLoaded = Completer<void>();
-      final Completer<InAppWebViewController> controllerCompleter =
-          Completer<InAppWebViewController>();
+      final Completer<PlatformInAppWebViewController> controllerCompleter =
+          Completer<PlatformInAppWebViewController>();
 
       await tester.pumpWidget(
         Directionality(
@@ -148,7 +148,7 @@ void programmaticScroll() {
         ),
       );
 
-      final InAppWebViewController controller =
+      final PlatformInAppWebViewController controller =
           await controllerCompleter.future;
       await pageLoaded.future;
       await controller.scrollTo(x: 0, y: 0);

@@ -6,7 +6,7 @@ part of 'request_focus_node_href_result.dart';
 // ExchangeableObjectGenerator
 // **************************************************************************
 
-///Class that represents the result used by the [InAppWebViewController.requestFocusNodeHref] method.
+///Class that represents the result used by the [PlatformInAppWebViewController.requestFocusNodeHref] method.
 class RequestFocusNodeHrefResult {
   ///The image's src attribute.
   String? src;

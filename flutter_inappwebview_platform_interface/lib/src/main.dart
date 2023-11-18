@@ -6,7 +6,6 @@ export 'chrome_safari_browser/main.dart';
 export 'x509_certificate/main.dart';
 export 'web_storage/main.dart';
 export 'platform_cookie_manager.dart';
-export 'in_app_localhost_server.dart';
 export 'content_blocker.dart';
 export 'platform_http_auth_credentials_database.dart';
 export 'context_menu/main.dart';
@@ -22,13 +21,9 @@ export 'platform_service_worker_controller.dart';
 export 'platform_webview_feature.dart'
     hide WebViewFeature_, AndroidWebViewFeature_;
 export 'platform_proxy_controller.dart' hide ProxySettings_;
-export 'platform_webview_asset_loader.dart'
-    hide
-        PlatformWebViewAssetLoader_,
-        PlatformPathHandler_,
-        PlatformAssetsPathHandler_,
-        PlatformResourcesPathHandler_,
-        PlatformInternalStoragePathHandler_;
+export 'platform_webview_asset_loader.dart';
 export 'platform_tracing_controller.dart' hide TracingSettings_;
 export 'platform_process_global_config.dart'
     hide ProcessGlobalConfigSettings_, ProcessGlobalConfigDirectoryBasePaths_;
+export 'platform_in_app_localhost_server.dart';
+export 'in_app_localhost_server.dart';

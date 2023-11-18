@@ -12,8 +12,8 @@ void onTitleChanged() {
   var url = !kIsWeb ? TEST_URL_1 : TEST_WEB_PLATFORM_URL_1;
 
   skippableTestWidgets('onTitleChanged', (WidgetTester tester) async {
-    final Completer<InAppWebViewController> controllerCompleter =
-        Completer<InAppWebViewController>();
+    final Completer<PlatformInAppWebViewController> controllerCompleter =
+        Completer<PlatformInAppWebViewController>();
     final Completer<void> pageLoaded = Completer<void>();
     final Completer<void> onTitleChangedCompleter = Completer<void>();
 
@@ -40,7 +40,7 @@ void onTitleChanged() {
       ),
     );
 
-    final InAppWebViewController controller = await controllerCompleter.future;
+    final PlatformInAppWebViewController controller = await controllerCompleter.future;
     await pageLoaded.future;
     await tester.pump();
     await controller.evaluateJavascript(

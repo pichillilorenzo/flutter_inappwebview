@@ -20,8 +20,8 @@ void reload() {
           ].contains(defaultTargetPlatform);
 
     skippableTestWidgets('from origin', (WidgetTester tester) async {
-      final Completer<InAppWebViewController> controllerCompleter =
-          Completer<InAppWebViewController>();
+      final Completer<PlatformInAppWebViewController> controllerCompleter =
+          Completer<PlatformInAppWebViewController>();
       final Completer<void> pageLoaded = Completer<void>();
 
       await tester.pumpWidget(
@@ -42,15 +42,15 @@ void reload() {
         ),
       );
 
-      final InAppWebViewController controller =
+      final PlatformInAppWebViewController controller =
           await controllerCompleter.future;
       await pageLoaded.future;
       await expectLater(controller.reloadFromOrigin(), completes);
     }, skip: shouldSkipTest1);
 
     skippableTestWidgets('basic', (WidgetTester tester) async {
-      final Completer<InAppWebViewController> controllerCompleter =
-          Completer<InAppWebViewController>();
+      final Completer<PlatformInAppWebViewController> controllerCompleter =
+          Completer<PlatformInAppWebViewController>();
       final StreamController<String> pageLoads =
           StreamController<String>.broadcast();
 
@@ -69,7 +69,7 @@ void reload() {
           ),
         ),
       );
-      final InAppWebViewController controller =
+      final PlatformInAppWebViewController controller =
           await controllerCompleter.future;
       String? reloadUrl = await pageLoads.stream.first;
       expect(reloadUrl, url.toString());

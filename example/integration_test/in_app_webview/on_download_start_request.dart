@@ -10,8 +10,8 @@ void onDownloadStartRequest() {
         ].contains(defaultTargetPlatform);
 
   skippableTestWidgets('onDownloadStartRequest', (WidgetTester tester) async {
-    final Completer<InAppWebViewController> controllerCompleter =
-        Completer<InAppWebViewController>();
+    final Completer<PlatformInAppWebViewController> controllerCompleter =
+        Completer<PlatformInAppWebViewController>();
     final Completer<String> onDownloadStartCompleter = Completer<String>();
     await tester.pumpWidget(
       Directionality(

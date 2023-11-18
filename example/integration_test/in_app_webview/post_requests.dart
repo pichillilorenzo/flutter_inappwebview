@@ -11,8 +11,8 @@ void postRequests() {
 
   skippableGroup('POST requests', () {
     skippableTestWidgets('initialUrlRequest', (WidgetTester tester) async {
-      final Completer<InAppWebViewController> controllerCompleter =
-          Completer<InAppWebViewController>();
+      final Completer<PlatformInAppWebViewController> controllerCompleter =
+          Completer<PlatformInAppWebViewController>();
       final Completer<void> postPageLoaded = Completer<void>();
 
       await tester.pumpWidget(
@@ -36,7 +36,7 @@ void postRequests() {
         ),
       );
 
-      final InAppWebViewController controller =
+      final PlatformInAppWebViewController controller =
           await controllerCompleter.future;
       await postPageLoaded.future;
 
@@ -50,8 +50,8 @@ void postRequests() {
     });
 
     skippableTestWidgets('loadUrl', (WidgetTester tester) async {
-      final Completer<InAppWebViewController> controllerCompleter =
-          Completer<InAppWebViewController>();
+      final Completer<PlatformInAppWebViewController> controllerCompleter =
+          Completer<PlatformInAppWebViewController>();
       final Completer<void> postPageLoaded = Completer<void>();
 
       await tester.pumpWidget(
@@ -72,7 +72,7 @@ void postRequests() {
         ),
       );
 
-      final InAppWebViewController controller =
+      final PlatformInAppWebViewController controller =
           await controllerCompleter.future;
 
       var postData = Uint8List.fromList(utf8.encode("name=FooBar"));
@@ -96,8 +96,8 @@ void postRequests() {
     });
 
     skippableTestWidgets('postUrl', (WidgetTester tester) async {
-      final Completer<InAppWebViewController> controllerCompleter =
-          Completer<InAppWebViewController>();
+      final Completer<PlatformInAppWebViewController> controllerCompleter =
+          Completer<PlatformInAppWebViewController>();
       final Completer<void> postPageLoaded = Completer<void>();
 
       await tester.pumpWidget(
@@ -118,7 +118,7 @@ void postRequests() {
         ),
       );
 
-      final InAppWebViewController controller =
+      final PlatformInAppWebViewController controller =
           await controllerCompleter.future;
 
       var postData = Uint8List.fromList(utf8.encode("name=FooBar"));

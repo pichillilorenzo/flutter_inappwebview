@@ -12,7 +12,7 @@ class WebAuthenticationSessionExampleScreen extends StatefulWidget {
 
 class _WebAuthenticationSessionExampleScreenState
     extends State<WebAuthenticationSessionExampleScreen> {
-  PlatformWebAuthenticationSession? session;
+  WebAuthenticationSession? session;
   String? token;
 
   @override

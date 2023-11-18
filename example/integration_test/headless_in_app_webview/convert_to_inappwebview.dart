@@ -9,8 +9,8 @@ void convertToInAppWebView() {
         ].contains(defaultTargetPlatform);
 
   skippableTestWidgets('convert to InAppWebView', (WidgetTester tester) async {
-    final Completer<InAppWebViewController> controllerCompleter =
-        Completer<InAppWebViewController>();
+    final Completer<PlatformInAppWebViewController> controllerCompleter =
+        Completer<PlatformInAppWebViewController>();
     final Completer<void> pageLoaded = Completer<void>();
 
     var headlessWebView = new HeadlessInAppWebView(
@@ -18,22 +18,22 @@ void convertToInAppWebView() {
       onWebViewCreated: (controller) {
         controllerCompleter.complete(controller);
       },
+      onLoadStop: (controller, url) async {
+        pageLoaded.complete();
+      }
     );
-    headlessWebView.onLoadStop = (controller, url) async {
-      pageLoaded.complete();
-    };
 
     await headlessWebView.run();
     expect(headlessWebView.isRunning(), true);
 
-    final InAppWebViewController controller = await controllerCompleter.future;
+    final PlatformInAppWebViewController controller = await controllerCompleter.future;
     await pageLoaded.future;
 
     final String? url = (await controller.getUrl())?.toString();
     expect(url, TEST_CROSS_PLATFORM_URL_1.toString());
 
-    final Completer<InAppWebViewController> widgetControllerCompleter =
-        Completer<InAppWebViewController>();
+    final Completer<PlatformInAppWebViewController> widgetControllerCompleter =
+        Completer<PlatformInAppWebViewController>();
     final Completer<String> loadedUrl = Completer<String>();
 
     await tester.pumpWidget(
@@ -54,7 +54,7 @@ void convertToInAppWebView() {
         ),
       ),
     );
-    final InAppWebViewController widgetController =
+    final PlatformInAppWebViewController widgetController =
         await widgetControllerCompleter.future;
 
     expect(headlessWebView.isRunning(), false);

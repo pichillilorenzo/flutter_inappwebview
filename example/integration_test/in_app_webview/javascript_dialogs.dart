@@ -10,8 +10,8 @@ void javascriptDialogs() {
         ].contains(defaultTargetPlatform);
 
   skippableTestWidgets('javascript dialogs', (WidgetTester tester) async {
-    final Completer<PlatformInAppWebViewController> controllerCompleter =
-        Completer<PlatformInAppWebViewController>();
+    final Completer<InAppWebViewController> controllerCompleter =
+        Completer<InAppWebViewController>();
     final Completer<void> pageLoaded = Completer<void>();
     final Completer<JsAlertRequest> alertCompleter =
         Completer<JsAlertRequest>();

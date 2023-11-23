@@ -1,83 +1,9 @@
 import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_platform_interface.dart';
 
-///Helper class to load local files including application's static assets and resources using http(s):// URLs inside a [WebView] class.
-///Loading local files using web-like URLs instead of `file://` is desirable as it is compatible with the Same-Origin policy.
-///
-///For more context about application's assets and resources and how to normally access them please refer to
-///[Android Developer Docs: App resources overview](https://developer.android.com/guide/topics/resources/providing-resources).
-///
-///Using http(s):// URLs to access local resources may conflict with a real website.
-///This means that local files should only be hosted on domains your organization owns
-///(at paths reserved for this purpose) or the default domain reserved for this: `appassets.androidplatform.net`.
-///
-///**Supported Platforms/Implementations**:
-///- Android native WebView
-class WebViewAssetLoader {
-  /// Constructs a [WebViewAssetLoader].
-  ///
-  /// See [WebViewAssetLoader.fromPlatformCreationParams] for setting
-  /// parameters for a specific platform.
-  WebViewAssetLoader(
-      {String? domain, bool? httpAllowed, List<PathHandler>? pathHandlers})
-      : this.fromPlatformCreationParams(
-            params: PlatformWebViewAssetLoaderCreationParams(
-                domain: domain,
-                httpAllowed: httpAllowed,
-                pathHandlers: pathHandlers?.map((e) => e.platform).toList()));
-
-  /// Constructs a [WebViewAssetLoader].
-  ///
-  /// See [WebViewAssetLoader.fromPlatformCreationParams] for setting parameters for
-  /// a specific platform.
-  WebViewAssetLoader.fromPlatformCreationParams({
-    required PlatformWebViewAssetLoaderCreationParams params,
-  }) : this.fromPlatform(platform: PlatformWebViewAssetLoader(params));
-
-  /// Constructs a [WebViewAssetLoader] from a specific platform implementation.
-  WebViewAssetLoader.fromPlatform({required this.platform});
-
-  /// Implementation of [PlatformWebViewAssetLoader] for the current platform.
-  final PlatformWebViewAssetLoader platform;
-
-  ///An unused domain reserved for Android applications to intercept requests for app assets.
-  ///
-  ///It is used by default unless the user specified a different domain.
-  static final String DEFAULT_DOMAIN =
-      PlatformWebViewAssetLoader.DEFAULT_DOMAIN;
-
-  ///Set the domain under which app assets can be accessed. The default domain is `appassets.androidplatform.net`.
-  String? get domain => platform.domain;
-
-  ///Allow using the HTTP scheme in addition to HTTPS. The default is to not allow HTTP.
-  bool? get httpAllowed => platform.httpAllowed;
-
-  ///List of registered path handlers.
-  ///
-  ///[WebViewAssetLoader] will try Path Handlers in the order they're registered,
-  ///and will use whichever is the first to return a non-null.
-  List<PathHandler>? get pathHandlers => platform.pathHandlers
-      ?.map((platform) {
-        switch (platform.runtimeType) {
-          case AssetsPathHandler:
-            return AssetsPathHandler.fromPlatform(
-                platform: platform as PlatformAssetsPathHandler);
-          case ResourcesPathHandler:
-            return ResourcesPathHandler.fromPlatform(
-                platform: platform as PlatformResourcesPathHandler);
-          case InternalStoragePathHandler:
-            return InternalStoragePathHandler.fromPlatform(
-                platform: platform as PlatformInternalStoragePathHandler);
-        }
-        return null;
-      })
-      .whereType<PathHandler>()
-      .toList();
-}
-
 ///A handler that produces responses for a registered path.
 ///
 ///Implement this interface to handle other use-cases according to your app's needs.
-abstract class PathHandler implements PlatformPathHandlerEvents {
+abstract class PathHandler implements IPathHandler, PlatformPathHandlerEvents {
   /// Constructs a [PathHandler].
   ///
   /// See [PathHandler.fromPlatformCreationParams] for setting
@@ -118,6 +44,12 @@ abstract class PathHandler implements PlatformPathHandlerEvents {
   Future<WebResourceResponse?> handle(String path) async {
     return null;
   }
+
+  @override
+  Map<String, dynamic> toMap() => platform.toMap();
+
+  @override
+  Map<String, dynamic> toJson() => platform.toJson();
 }
 
 ///Handler class to open a file from assets directory in the application APK.

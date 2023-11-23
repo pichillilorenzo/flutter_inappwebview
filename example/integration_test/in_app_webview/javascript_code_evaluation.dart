@@ -19,8 +19,8 @@ void javascriptCodeEvaluation() {
           ].contains(defaultTargetPlatform);
 
     skippableTestWidgets('evaluateJavascript', (WidgetTester tester) async {
-      final Completer<PlatformInAppWebViewController> controllerCompleter =
-          Completer<PlatformInAppWebViewController>();
+      final Completer<InAppWebViewController> controllerCompleter =
+          Completer<InAppWebViewController>();
       final Completer<void> pageLoaded = Completer<void>();
 
       await tester.pumpWidget(
@@ -38,7 +38,7 @@ void javascriptCodeEvaluation() {
           ),
         ),
       );
-      final PlatformInAppWebViewController controller =
+      final InAppWebViewController controller =
           await controllerCompleter.future;
       await pageLoaded.future;
 
@@ -63,8 +63,8 @@ void javascriptCodeEvaluation() {
 
     skippableTestWidgets('evaluateJavascript with content world',
         (WidgetTester tester) async {
-      final Completer<PlatformInAppWebViewController> controllerCompleter =
-          Completer<PlatformInAppWebViewController>();
+      final Completer<InAppWebViewController> controllerCompleter =
+          Completer<InAppWebViewController>();
       final Completer<void> pageLoaded = Completer<void>();
 
       await tester.pumpWidget(
@@ -82,7 +82,7 @@ void javascriptCodeEvaluation() {
           ),
         ),
       );
-      final PlatformInAppWebViewController controller =
+      final InAppWebViewController controller =
           await controllerCompleter.future;
       await pageLoaded.future;
 
@@ -107,8 +107,8 @@ void javascriptCodeEvaluation() {
           ].contains(defaultTargetPlatform);
 
     skippableTestWidgets('callAsyncJavaScript', (WidgetTester tester) async {
-      final Completer<PlatformInAppWebViewController> controllerCompleter =
-          Completer<PlatformInAppWebViewController>();
+      final Completer<InAppWebViewController> controllerCompleter =
+          Completer<InAppWebViewController>();
       final Completer<void> pageLoaded = Completer<void>();
 
       await tester.pumpWidget(
@@ -126,7 +126,7 @@ void javascriptCodeEvaluation() {
           ),
         ),
       );
-      final PlatformInAppWebViewController controller =
+      final InAppWebViewController controller =
           await controllerCompleter.future;
       await pageLoaded.future;
 
@@ -169,8 +169,8 @@ void javascriptCodeEvaluation() {
 
     skippableTestWidgets('callAsyncJavaScript with content world',
         (WidgetTester tester) async {
-      final Completer<PlatformInAppWebViewController> controllerCompleter =
-          Completer<PlatformInAppWebViewController>();
+      final Completer<InAppWebViewController> controllerCompleter =
+          Completer<InAppWebViewController>();
       final Completer<void> pageLoaded = Completer<void>();
 
       await tester.pumpWidget(
@@ -188,7 +188,7 @@ void javascriptCodeEvaluation() {
           ),
         ),
       );
-      final PlatformInAppWebViewController controller =
+      final InAppWebViewController controller =
           await controllerCompleter.future;
       await pageLoaded.future;
 

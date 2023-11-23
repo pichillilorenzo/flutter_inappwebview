@@ -11,8 +11,8 @@ void userScripts() {
 
   skippableGroup('user scripts', () {
     skippableTestWidgets('initialUserScripts', (WidgetTester tester) async {
-      final Completer<PlatformInAppWebViewController> controllerCompleter =
-          Completer<PlatformInAppWebViewController>();
+      final Completer<InAppWebViewController> controllerCompleter =
+          Completer<InAppWebViewController>();
       final Completer<void> pageLoaded = Completer<void>();
 
       await tester.pumpWidget(
@@ -47,7 +47,7 @@ void userScripts() {
           ),
         ),
       );
-      final PlatformInAppWebViewController controller =
+      final InAppWebViewController controller =
           await controllerCompleter.future;
       await pageLoaded.future;
 
@@ -71,8 +71,8 @@ void userScripts() {
 
     skippableTestWidgets('add/remove user scripts',
         (WidgetTester tester) async {
-      final Completer<PlatformInAppWebViewController> controllerCompleter =
-          Completer<PlatformInAppWebViewController>();
+      final Completer<InAppWebViewController> controllerCompleter =
+          Completer<InAppWebViewController>();
       final StreamController<String> pageLoads =
           StreamController<String>.broadcast();
 
@@ -92,7 +92,7 @@ void userScripts() {
         ),
       );
 
-      final PlatformInAppWebViewController controller =
+      final InAppWebViewController controller =
           await controllerCompleter.future;
       await pageLoads.stream.first;
 

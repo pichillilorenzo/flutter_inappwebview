@@ -8,8 +8,8 @@ void webViewAssetLoader() {
         ].contains(defaultTargetPlatform);
 
   skippableTestWidgets('WebViewAssetLoader', (WidgetTester tester) async {
-    final Completer<PlatformInAppWebViewController> controllerCompleter =
-        Completer<PlatformInAppWebViewController>();
+    final Completer<InAppWebViewController> controllerCompleter =
+        Completer<InAppWebViewController>();
     final Completer<String> pageLoaded = Completer<String>();
 
     await tester.pumpWidget(
@@ -25,7 +25,7 @@ void webViewAssetLoader() {
               allowContentAccess: false,
               webViewAssetLoader: WebViewAssetLoader(
                   domain: TEST_WEBVIEW_ASSET_LOADER_DOMAIN,
-                  pathHandlers: [AssetsPathHandler(path: '/assets/')]).platform),
+                  pathHandlers: [AssetsPathHandler(path: '/assets/')])),
           onWebViewCreated: (controller) {
             controllerCompleter.complete(controller);
           },
@@ -36,7 +36,7 @@ void webViewAssetLoader() {
       ),
     );
 
-    final PlatformInAppWebViewController controller = await controllerCompleter.future;
+    final InAppWebViewController controller = await controllerCompleter.future;
     final url = await pageLoaded.future;
 
     expect(url, TEST_WEBVIEW_ASSET_LOADER_URL.toString());

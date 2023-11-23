@@ -10,8 +10,8 @@ void stopLoading() {
         ].contains(defaultTargetPlatform);
 
   skippableTestWidgets('stopLoading', (WidgetTester tester) async {
-    final Completer<PlatformInAppWebViewController> controllerCompleter =
-        Completer<PlatformInAppWebViewController>();
+    final Completer<InAppWebViewController> controllerCompleter =
+        Completer<InAppWebViewController>();
     final Completer<void> pageLoaded = Completer<void>();
 
     await tester.pumpWidget(
@@ -34,7 +34,7 @@ void stopLoading() {
       ),
     );
 
-    final PlatformInAppWebViewController controller = await controllerCompleter.future;
+    final InAppWebViewController controller = await controllerCompleter.future;
 
     if (defaultTargetPlatform == TargetPlatform.android) {
       await pageLoaded.future;

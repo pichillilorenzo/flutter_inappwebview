@@ -13,8 +13,8 @@ void injectJavascriptFile() {
 
   skippableGroup('inject javascript file', () {
     skippableTestWidgets('from url', (WidgetTester tester) async {
-      final Completer<PlatformInAppWebViewController> controllerCompleter =
-          Completer<PlatformInAppWebViewController>();
+      final Completer<InAppWebViewController> controllerCompleter =
+          Completer<InAppWebViewController>();
       final Completer<void> pageLoaded = Completer<void>();
       final Completer<void> jQueryLoaded = Completer<void>();
       final Completer<void> jQueryLoadError = Completer<void>();
@@ -35,7 +35,7 @@ void injectJavascriptFile() {
         ),
       );
 
-      final PlatformInAppWebViewController controller =
+      final InAppWebViewController controller =
           await controllerCompleter.future;
       await pageLoaded.future;
 
@@ -75,8 +75,8 @@ void injectJavascriptFile() {
     });
 
     skippableTestWidgets('from asset', (WidgetTester tester) async {
-      final Completer<PlatformInAppWebViewController> controllerCompleter =
-          Completer<PlatformInAppWebViewController>();
+      final Completer<InAppWebViewController> controllerCompleter =
+          Completer<InAppWebViewController>();
       final Completer<void> pageLoaded = Completer<void>();
 
       await tester.pumpWidget(
@@ -95,7 +95,7 @@ void injectJavascriptFile() {
         ),
       );
 
-      final PlatformInAppWebViewController controller =
+      final InAppWebViewController controller =
           await controllerCompleter.future;
       await pageLoaded.future;
 

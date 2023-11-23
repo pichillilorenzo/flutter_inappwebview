@@ -1,6 +1,7 @@
 import 'package:flutter_inappwebview_android/src/print_job/main.dart';
 import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_platform_interface.dart';
 
+import 'chrome_safari_browser/chrome_safari_browser.dart';
 import 'cookie_manager.dart';
 import 'http_auth_credentials_database.dart';
 import 'find_interaction/main.dart';
@@ -204,8 +205,8 @@ class AndroidInAppWebViewPlatform extends InAppWebViewPlatform {
   /// This function should only be called by the app-facing package.
   /// Look at using [InAppBrowser] in `flutter_inappwebview` instead.
   AndroidInAppBrowser createPlatformInAppBrowser(
-      PlatformInAppBrowserCreationParams params,
-      ) {
+    PlatformInAppBrowserCreationParams params,
+  ) {
     return AndroidInAppBrowser(params);
   }
 
@@ -222,8 +223,8 @@ class AndroidInAppWebViewPlatform extends InAppWebViewPlatform {
   /// This function should only be called by the app-facing package.
   /// Look at using [ProcessGlobalConfig] in `flutter_inappwebview` instead.
   AndroidProcessGlobalConfig createPlatformProcessGlobalConfig(
-      PlatformProcessGlobalConfigCreationParams params,
-      ) {
+    PlatformProcessGlobalConfigCreationParams params,
+  ) {
     return AndroidProcessGlobalConfig(params);
   }
 
@@ -232,8 +233,8 @@ class AndroidInAppWebViewPlatform extends InAppWebViewPlatform {
   /// This function should only be called by the app-facing package.
   /// Look at using [ProxyController] in `flutter_inappwebview` instead.
   AndroidProxyController createPlatformProxyController(
-      PlatformProxyControllerCreationParams params,
-      ) {
+    PlatformProxyControllerCreationParams params,
+  ) {
     return AndroidProxyController(params);
   }
 
@@ -242,8 +243,8 @@ class AndroidInAppWebViewPlatform extends InAppWebViewPlatform {
   /// This function should only be called by the app-facing package.
   /// Look at using [ServiceWorkerController] in `flutter_inappwebview` instead.
   AndroidServiceWorkerController createPlatformServiceWorkerController(
-      PlatformServiceWorkerControllerCreationParams params,
-      ) {
+    PlatformServiceWorkerControllerCreationParams params,
+  ) {
     return AndroidServiceWorkerController(params);
   }
 
@@ -260,27 +261,9 @@ class AndroidInAppWebViewPlatform extends InAppWebViewPlatform {
   /// This function should only be called by the app-facing package.
   /// Look at using [TracingController] in `flutter_inappwebview` instead.
   AndroidTracingController createPlatformTracingController(
-      PlatformTracingControllerCreationParams params,
-      ) {
+    PlatformTracingControllerCreationParams params,
+  ) {
     return AndroidTracingController(params);
-  }
-
-  /// Creates a new [AndroidWebViewAssetLoader].
-  ///
-  /// This function should only be called by the app-facing package.
-  /// Look at using [WebViewAssetLoader] in `flutter_inappwebview` instead.
-  AndroidWebViewAssetLoader createPlatformWebViewAssetLoader(
-      PlatformWebViewAssetLoaderCreationParams params,
-      ) {
-    return AndroidWebViewAssetLoader(params);
-  }
-
-  /// Creates a new empty [AndroidWebViewAssetLoader] to access static methods.
-  ///
-  /// This function should only be called by the app-facing package.
-  /// Look at using [WebViewAssetLoader] in `flutter_inappwebview` instead.
-  AndroidWebViewAssetLoader createAndroidWebViewAssetLoaderStatic() {
-    return AndroidWebViewAssetLoader.static();
   }
 
   /// Creates a new [AndroidPathHandler].
@@ -288,8 +271,8 @@ class AndroidInAppWebViewPlatform extends InAppWebViewPlatform {
   /// This function should only be called by the app-facing package.
   /// Look at using [PathHandler] in `flutter_inappwebview` instead.
   AndroidPathHandler createPlatformPathHandler(
-      PlatformPathHandlerCreationParams params,
-      ) {
+    PlatformPathHandlerCreationParams params,
+  ) {
     return AndroidPathHandler(params);
   }
 
@@ -298,8 +281,8 @@ class AndroidInAppWebViewPlatform extends InAppWebViewPlatform {
   /// This function should only be called by the app-facing package.
   /// Look at using [AssetsPathHandler] in `flutter_inappwebview` instead.
   AndroidAssetsPathHandler createPlatformAssetsPathHandler(
-      PlatformAssetsPathHandlerCreationParams params,
-      ) {
+    PlatformAssetsPathHandlerCreationParams params,
+  ) {
     return AndroidAssetsPathHandler(params);
   }
 
@@ -308,8 +291,8 @@ class AndroidInAppWebViewPlatform extends InAppWebViewPlatform {
   /// This function should only be called by the app-facing package.
   /// Look at using [ResourcesPathHandler] in `flutter_inappwebview` instead.
   AndroidResourcesPathHandler createPlatformResourcesPathHandler(
-      PlatformResourcesPathHandlerCreationParams params,
-      ) {
+    PlatformResourcesPathHandlerCreationParams params,
+  ) {
     return AndroidResourcesPathHandler(params);
   }
 
@@ -318,8 +301,8 @@ class AndroidInAppWebViewPlatform extends InAppWebViewPlatform {
   /// This function should only be called by the app-facing package.
   /// Look at using [InternalStoragePathHandler] in `flutter_inappwebview` instead.
   AndroidInternalStoragePathHandler createPlatformInternalStoragePathHandler(
-      PlatformInternalStoragePathHandlerCreationParams params,
-      ) {
+    PlatformInternalStoragePathHandlerCreationParams params,
+  ) {
     return AndroidInternalStoragePathHandler(params);
   }
 
@@ -328,8 +311,8 @@ class AndroidInAppWebViewPlatform extends InAppWebViewPlatform {
   /// This function should only be called by the app-facing package.
   /// Look at using [WebViewFeature] in `flutter_inappwebview` instead.
   wv.AndroidWebViewFeature createPlatformWebViewFeature(
-      PlatformWebViewFeatureCreationParams params,
-      ) {
+    PlatformWebViewFeatureCreationParams params,
+  ) {
     return wv.AndroidWebViewFeature(params);
   }
 
@@ -339,5 +322,32 @@ class AndroidInAppWebViewPlatform extends InAppWebViewPlatform {
   /// Look at using [WebViewFeature] in `flutter_inappwebview` instead.
   wv.AndroidWebViewFeature createPlatformWebViewFeatureStatic() {
     return wv.AndroidWebViewFeature.static();
+  }
+
+  /// Creates a new [AndroidChromeSafariBrowser].
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [ChromeSafariBrowser] in `flutter_inappwebview` instead.
+  AndroidChromeSafariBrowser createPlatformChromeSafariBrowser(
+    PlatformChromeSafariBrowserCreationParams params,
+  ) {
+    return AndroidChromeSafariBrowser(params);
+  }
+
+  /// Creates a new empty [AndroidChromeSafariBrowser] to access static methods.
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [ChromeSafariBrowser] in `flutter_inappwebview` instead.
+  AndroidChromeSafariBrowser createPlatformChromeSafariBrowserStatic() {
+    return AndroidChromeSafariBrowser.static();
+  }
+
+  /// Creates a new empty [AndroidWebStorageManager] to access static methods.
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [WebStorageManager] in `flutter_inappwebview` instead.
+  AndroidWebStorageManager createPlatformWebStorageManager(
+      PlatformWebStorageManagerCreationParams params) {
+    return AndroidWebStorageManager(params);
   }
 }

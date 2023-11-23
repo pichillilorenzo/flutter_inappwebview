@@ -111,7 +111,7 @@ class MyInAppBrowser extends InAppBrowser {
   }
 }
 
-class MyChromeSafariBrowser extends PlatformChromeSafariBrowser {
+class MyChromeSafariBrowser extends ChromeSafariBrowser {
   final Completer<void> serviceConnected = Completer<void>();
   final Completer<void> opened = Completer<void>();
   final Completer<bool?> firstPageLoaded = Completer<bool?>();

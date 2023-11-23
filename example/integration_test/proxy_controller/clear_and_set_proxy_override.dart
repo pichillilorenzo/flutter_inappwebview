@@ -9,8 +9,8 @@ void clearAndSetProxyOverride() {
 
   skippableTestWidgets('clear and set proxy override',
       (WidgetTester tester) async {
-    final Completer<PlatformInAppWebViewController> controllerCompleter =
-        Completer<PlatformInAppWebViewController>();
+    final Completer<InAppWebViewController> controllerCompleter =
+        Completer<InAppWebViewController>();
     final Completer<String> pageLoaded = Completer<String>();
 
     var proxyAvailable =
@@ -42,7 +42,7 @@ void clearAndSetProxyOverride() {
       ),
     );
 
-    final PlatformInAppWebViewController controller = await controllerCompleter.future;
+    final InAppWebViewController controller = await controllerCompleter.future;
 
     final String url = await pageLoaded.future;
     expect(url, TEST_URL_HTTP_EXAMPLE.toString());

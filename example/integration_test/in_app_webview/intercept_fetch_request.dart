@@ -11,8 +11,8 @@ void interceptFetchRequest() {
 
   skippableGroup('intercept fetch request', () {
     skippableTestWidgets('send string data', (WidgetTester tester) async {
-      final Completer<PlatformInAppWebViewController> controllerCompleter =
-          Completer<PlatformInAppWebViewController>();
+      final Completer<InAppWebViewController> controllerCompleter =
+          Completer<InAppWebViewController>();
       final Completer<Map<String, dynamic>> fetchPostCompleter =
           Completer<Map<String, dynamic>>();
       final Completer<void> shouldInterceptFetchPostRequestCompleter =
@@ -86,8 +86,8 @@ void interceptFetchRequest() {
     });
 
     skippableTestWidgets('send json data', (WidgetTester tester) async {
-      final Completer<PlatformInAppWebViewController> controllerCompleter =
-          Completer<PlatformInAppWebViewController>();
+      final Completer<InAppWebViewController> controllerCompleter =
+          Completer<InAppWebViewController>();
       final Completer<Map<String, dynamic>> fetchPostCompleter =
           Completer<Map<String, dynamic>>();
       final Completer<void> shouldInterceptFetchPostRequestCompleter =
@@ -168,8 +168,8 @@ void interceptFetchRequest() {
 
     skippableTestWidgets('send URLSearchParams data',
         (WidgetTester tester) async {
-      final Completer<PlatformInAppWebViewController> controllerCompleter =
-          Completer<PlatformInAppWebViewController>();
+      final Completer<InAppWebViewController> controllerCompleter =
+          Completer<InAppWebViewController>();
       final Completer<Map<String, dynamic>> fetchPostCompleter =
           Completer<Map<String, dynamic>>();
       final Completer<void> shouldInterceptFetchPostRequestCompleter =
@@ -245,8 +245,8 @@ void interceptFetchRequest() {
     });
 
     skippableTestWidgets('send FormData', (WidgetTester tester) async {
-      final Completer<PlatformInAppWebViewController> controllerCompleter =
-          Completer<PlatformInAppWebViewController>();
+      final Completer<InAppWebViewController> controllerCompleter =
+          Completer<InAppWebViewController>();
       final Completer<Map<String, dynamic>> fetchPostCompleter =
           Completer<Map<String, dynamic>>();
       final Completer<void> shouldInterceptFetchPostRequestCompleter =

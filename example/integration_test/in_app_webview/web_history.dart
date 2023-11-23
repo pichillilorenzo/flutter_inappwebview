@@ -20,8 +20,8 @@ void webHistory() {
 
     skippableTestWidgets('get history list and go back/forward',
         (WidgetTester tester) async {
-      final Completer<PlatformInAppWebViewController> controllerCompleter =
-          Completer<PlatformInAppWebViewController>();
+      final Completer<InAppWebViewController> controllerCompleter =
+          Completer<InAppWebViewController>();
 
       await tester.pumpWidget(
         Directionality(
@@ -39,7 +39,7 @@ void webHistory() {
         ),
       );
 
-      final PlatformInAppWebViewController controller =
+      final InAppWebViewController controller =
           await controllerCompleter.future;
 
       await Future.delayed(Duration(seconds: 1));
@@ -119,8 +119,8 @@ void webHistory() {
 
     skippableTestWidgets('go back/forward on web platform',
         (WidgetTester tester) async {
-      final Completer<PlatformInAppWebViewController> controllerCompleter =
-          Completer<PlatformInAppWebViewController>();
+      final Completer<InAppWebViewController> controllerCompleter =
+          Completer<InAppWebViewController>();
       final StreamController<String> pageLoads =
           StreamController<String>.broadcast();
 
@@ -140,7 +140,7 @@ void webHistory() {
         ),
       );
 
-      final PlatformInAppWebViewController controller =
+      final InAppWebViewController controller =
           await controllerCompleter.future;
 
       await tester.pump();
@@ -178,8 +178,8 @@ void webHistory() {
           ].contains(defaultTargetPlatform);
 
     skippableTestWidgets('clearHistory', (WidgetTester tester) async {
-      final Completer<PlatformInAppWebViewController> controllerCompleter =
-          Completer<PlatformInAppWebViewController>();
+      final Completer<InAppWebViewController> controllerCompleter =
+          Completer<InAppWebViewController>();
       final StreamController<String> pageLoads =
           StreamController<String>.broadcast();
 
@@ -199,7 +199,7 @@ void webHistory() {
         ),
       );
 
-      final PlatformInAppWebViewController controller =
+      final InAppWebViewController controller =
           await controllerCompleter.future;
       await pageLoads.stream.first;
       await controller.loadUrl(urlRequest: URLRequest(url: TEST_URL_1));

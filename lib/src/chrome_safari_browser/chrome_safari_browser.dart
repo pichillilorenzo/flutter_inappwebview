@@ -16,156 +16,36 @@ import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_pla
 ///**Supported Platforms/Implementations**:
 ///- Android
 ///- iOS
-class ChromeSafariBrowser extends ChannelController {
+class ChromeSafariBrowser implements PlatformChromeSafariBrowserEvents {
   ///Debug settings.
   static DebugLoggingSettings debugLoggingSettings = DebugLoggingSettings();
 
-  ///View ID used internally.
-  late final String id;
+  /// Constructs a [ChromeSafariBrowser].
+  ///
+  /// See [ChromeSafariBrowser.fromPlatformCreationParams] for setting
+  /// parameters for a specific platform.
+  ChromeSafariBrowser()
+      : this.fromPlatformCreationParams(
+          PlatformChromeSafariBrowserCreationParams(),
+        );
 
-  ChromeSafariBrowserActionButton? _actionButton;
-  Map<int, ChromeSafariBrowserMenuItem> _menuItems = new HashMap();
-  ChromeSafariBrowserSecondaryToolbar? _secondaryToolbar;
-  bool _isOpened = false;
-  static const MethodChannel _sharedChannel =
-      const MethodChannel('com.pichillilorenzo/flutter_chromesafaribrowser');
+  /// Constructs a [ChromeSafariBrowser] from creation params for a specific
+  /// platform.
+  ChromeSafariBrowser.fromPlatformCreationParams(
+    PlatformChromeSafariBrowserCreationParams params,
+  ) : this.fromPlatform(PlatformChromeSafariBrowser(params));
 
-  ChromeSafariBrowser() {
-    id = IdGenerator.generate();
-    channel =
-        MethodChannel('com.pichillilorenzo/flutter_chromesafaribrowser_$id');
-    handler = _handleMethod;
-    initMethodCallHandler();
-    _isOpened = false;
+  /// Constructs a [ChromeSafariBrowser] from a specific platform
+  /// implementation.
+  ChromeSafariBrowser.fromPlatform(this.platform) {
+    this.platform.eventHandler = this;
   }
 
-  _init() {
-    channel =
-        MethodChannel('com.pichillilorenzo/flutter_chromesafaribrowser_$id');
-    handler = _handleMethod;
-    initMethodCallHandler();
-  }
+  /// Implementation of [PlatformWebViewChromeSafariBrowser] for the current platform.
+  final PlatformChromeSafariBrowser platform;
 
-  _debugLog(String method, dynamic args) {
-    debugLog(
-        className: this.runtimeType.toString(),
-        id: id,
-        debugLoggingSettings: ChromeSafariBrowser.debugLoggingSettings,
-        method: method,
-        args: args);
-  }
-
-  Future<dynamic> _handleMethod(MethodCall call) async {
-    _debugLog(call.method, call.arguments);
-
-    switch (call.method) {
-      case "onServiceConnected":
-        onServiceConnected();
-        break;
-      case "onOpened":
-        onOpened();
-        break;
-      case "onCompletedInitialLoad":
-        final bool? didLoadSuccessfully = call.arguments["didLoadSuccessfully"];
-        onCompletedInitialLoad(didLoadSuccessfully);
-        break;
-      case "onInitialLoadDidRedirect":
-        final String? url = call.arguments["url"];
-        final WebUri? uri = url != null ? WebUri(url) : null;
-        onInitialLoadDidRedirect(uri);
-        break;
-      case "onNavigationEvent":
-        final navigationEvent = CustomTabsNavigationEventType.fromNativeValue(
-            call.arguments["navigationEvent"]);
-        onNavigationEvent(navigationEvent);
-        break;
-      case "onRelationshipValidationResult":
-        final relation =
-            CustomTabsRelationType.fromNativeValue(call.arguments["relation"]);
-        final requestedOrigin = call.arguments["requestedOrigin"] != null
-            ? WebUri(call.arguments["requestedOrigin"])
-            : null;
-        final bool result = call.arguments["result"];
-        onRelationshipValidationResult(relation, requestedOrigin, result);
-        break;
-      case "onWillOpenInBrowser":
-        onWillOpenInBrowser();
-        break;
-      case "onClosed":
-        _isOpened = false;
-        dispose();
-        onClosed();
-        break;
-      case "onItemActionPerform":
-        String url = call.arguments["url"];
-        String title = call.arguments["title"];
-        int id = call.arguments["id"].toInt();
-        if (this._actionButton?.id == id) {
-          if (this._actionButton?.action != null) {
-            this._actionButton?.action!(url, title);
-          }
-          if (this._actionButton?.onClick != null) {
-            this._actionButton?.onClick!(WebUri(url), title);
-          }
-        } else if (this._menuItems[id] != null) {
-          if (this._menuItems[id]?.action != null) {
-            this._menuItems[id]?.action!(url, title);
-          }
-          if (this._menuItems[id]?.onClick != null) {
-            this._menuItems[id]?.onClick!(WebUri(url), title);
-          }
-        }
-        break;
-      case "onSecondaryItemActionPerform":
-        final clickableIDs = this._secondaryToolbar?.clickableIDs;
-        if (clickableIDs != null) {
-          WebUri? url = call.arguments["url"] != null
-              ? WebUri(call.arguments["url"])
-              : null;
-          String name = call.arguments["name"];
-          for (final clickable in clickableIDs) {
-            var clickableFullname = clickable.id.name;
-            if (clickable.id.defType != null &&
-                !clickableFullname.contains("/")) {
-              clickableFullname = "${clickable.id.defType}/$clickableFullname";
-            }
-            if (clickable.id.defPackage != null &&
-                !clickableFullname.contains(":")) {
-              clickableFullname =
-                  "${clickable.id.defPackage}:$clickableFullname";
-            }
-            if (clickableFullname == name) {
-              if (clickable.onClick != null) {
-                clickable.onClick!(url);
-              }
-              break;
-            }
-          }
-        }
-        break;
-      case "onMessageChannelReady":
-        onMessageChannelReady();
-        break;
-      case "onPostMessage":
-        final String message = call.arguments["message"];
-        onPostMessage(message);
-        break;
-      case "onVerticalScrollEvent":
-        final bool isDirectionUp = call.arguments["isDirectionUp"];
-        onVerticalScrollEvent(isDirectionUp);
-        break;
-      case "onGreatestScrollPercentageIncreased":
-        final int scrollPercentage = call.arguments["scrollPercentage"];
-        onGreatestScrollPercentageIncreased(scrollPercentage);
-        break;
-      case "onSessionEnded":
-        final bool didUserInteract = call.arguments["didUserInteract"];
-        onSessionEnded(didUserInteract);
-        break;
-      default:
-        throw UnimplementedError("Unimplemented ${call.method} method");
-    }
-  }
+  ///{@macro flutter_inappwebview_platform_interface.PlatformChromeSafariBrowser.id}
+  String get id => platform.id;
 
   ///Opens the [ChromeSafariBrowser] instance with an [url].
   ///
@@ -187,50 +67,20 @@ class ChromeSafariBrowser extends ChannelController {
   ///- Android
   ///- iOS
   Future<void> open(
-      {WebUri? url,
-      Map<String, String>? headers,
-      List<WebUri>? otherLikelyURLs,
-      WebUri? referrer,
-      @Deprecated('Use settings instead')
-      // ignore: deprecated_member_use_from_same_package
-      ChromeSafariBrowserClassOptions? options,
-      ChromeSafariBrowserSettings? settings}) async {
-    assert(!_isOpened, 'The browser is already opened.');
-    _isOpened = true;
-
-    if (Util.isIOS) {
-      assert(url != null, 'The specified URL must not be null on iOS.');
-      assert(['http', 'https'].contains(url!.scheme),
-          'The specified URL has an unsupported scheme. Only HTTP and HTTPS URLs are supported on iOS.');
-    }
-    if (url != null) {
-      assert(url.toString().isNotEmpty, 'The specified URL must not be empty.');
-    }
-
-    _init();
-
-    List<Map<String, dynamic>> menuItemList = [];
-    _menuItems.forEach((key, value) {
-      menuItemList.add(value.toMap());
-    });
-
-    var initialSettings = settings?.toMap() ??
-        options?.toMap() ??
-        ChromeSafariBrowserSettings().toMap();
-
-    Map<String, dynamic> args = <String, dynamic>{};
-    args.putIfAbsent('id', () => id);
-    args.putIfAbsent('url', () => url?.toString());
-    args.putIfAbsent('headers', () => headers);
-    args.putIfAbsent('otherLikelyURLs',
-        () => otherLikelyURLs?.map((e) => e.toString()).toList());
-    args.putIfAbsent('referrer', () => referrer?.toString());
-    args.putIfAbsent('settings', () => initialSettings);
-    args.putIfAbsent('actionButton', () => _actionButton?.toMap());
-    args.putIfAbsent('secondaryToolbar', () => _secondaryToolbar?.toMap());
-    args.putIfAbsent('menuItemList', () => menuItemList);
-    await _sharedChannel.invokeMethod('open', args);
-  }
+          {WebUri? url,
+          Map<String, String>? headers,
+          List<WebUri>? otherLikelyURLs,
+          WebUri? referrer,
+          @Deprecated('Use settings instead')
+          // ignore: deprecated_member_use_from_same_package
+          ChromeSafariBrowserClassOptions? options,
+          ChromeSafariBrowserSettings? settings}) =>
+      platform.open(
+          url: url,
+          headers: headers,
+          otherLikelyURLs: otherLikelyURLs,
+          options: options,
+          settings: settings);
 
   ///Tells the browser to launch with [url].
   ///
@@ -251,15 +101,12 @@ class ChromeSafariBrowser extends ChannelController {
     Map<String, String>? headers,
     List<WebUri>? otherLikelyURLs,
     WebUri? referrer,
-  }) async {
-    Map<String, dynamic> args = <String, dynamic>{};
-    args.putIfAbsent('url', () => url.toString());
-    args.putIfAbsent('headers', () => headers);
-    args.putIfAbsent('otherLikelyURLs',
-        () => otherLikelyURLs?.map((e) => e.toString()).toList());
-    args.putIfAbsent('referrer', () => referrer?.toString());
-    await channel?.invokeMethod("launchUrl", args);
-  }
+  }) =>
+      platform.launchUrl(
+          url: url,
+          headers: headers,
+          otherLikelyURLs: otherLikelyURLs,
+          referrer: referrer);
 
   ///Tells the browser of a likely future navigation to a URL.
   ///The most likely URL has to be specified first.
@@ -273,14 +120,8 @@ class ChromeSafariBrowser extends ChannelController {
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android ([Official API - CustomTabsSession.mayLaunchUrl](https://developer.android.com/reference/androidx/browser/customtabs/CustomTabsSession#mayLaunchUrl(android.net.Uri,android.os.Bundle,java.util.List%3Candroid.os.Bundle%3E)))
-  Future<bool> mayLaunchUrl(
-      {WebUri? url, List<WebUri>? otherLikelyURLs}) async {
-    Map<String, dynamic> args = <String, dynamic>{};
-    args.putIfAbsent('url', () => url?.toString());
-    args.putIfAbsent('otherLikelyURLs',
-        () => otherLikelyURLs?.map((e) => e.toString()).toList());
-    return await channel?.invokeMethod<bool>("mayLaunchUrl", args) ?? false;
-  }
+  Future<bool> mayLaunchUrl({WebUri? url, List<WebUri>? otherLikelyURLs}) =>
+      platform.mayLaunchUrl(url: url, otherLikelyURLs: otherLikelyURLs);
 
   ///Requests to validate a relationship between the application and an origin.
   ///
@@ -299,24 +140,22 @@ class ChromeSafariBrowser extends ChannelController {
   ///**Supported Platforms/Implementations**:
   ///- Android ([Official API - CustomTabsSession.validateRelationship](https://developer.android.com/reference/androidx/browser/customtabs/CustomTabsSession#validateRelationship(int,android.net.Uri,android.os.Bundle)))
   Future<bool> validateRelationship(
-      {required CustomTabsRelationType relation,
-      required WebUri origin}) async {
-    Map<String, dynamic> args = <String, dynamic>{};
-    args.putIfAbsent('relation', () => relation.toNativeValue());
-    args.putIfAbsent('origin', () => origin.toString());
-    return await channel?.invokeMethod<bool>("validateRelationship", args) ??
-        false;
-  }
+          {required CustomTabsRelationType relation, required WebUri origin}) =>
+      platform.validateRelationship(relation: relation, origin: origin);
 
   ///Closes the [ChromeSafariBrowser] instance.
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android
   ///- iOS
-  Future<void> close() async {
-    Map<String, dynamic> args = <String, dynamic>{};
-    await channel?.invokeMethod("close", args);
-  }
+  Future<void> close() => platform.close();
+
+  ///Returns `true` if the [ChromeSafariBrowser] instance is opened, otherwise `false`.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- Android
+  ///- iOS
+  bool isOpened() => platform.isOpened();
 
   ///Set a custom action button.
   ///
@@ -324,9 +163,8 @@ class ChromeSafariBrowser extends ChannelController {
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android ([Official API - CustomTabsIntent.Builder.setActionButton](https://developer.android.com/reference/androidx/browser/customtabs/CustomTabsIntent.Builder#setActionButton(android.graphics.Bitmap,%20java.lang.String,%20android.app.PendingIntent,%20boolean)))
-  void setActionButton(ChromeSafariBrowserActionButton actionButton) {
-    this._actionButton = actionButton;
-  }
+  void setActionButton(ChromeSafariBrowserActionButton actionButton) =>
+      platform.setActionButton(actionButton);
 
   ///Updates the [ChromeSafariBrowserActionButton.icon] and [ChromeSafariBrowserActionButton.description].
   ///
@@ -335,14 +173,8 @@ class ChromeSafariBrowser extends ChannelController {
   ///**Supported Platforms/Implementations**:
   ///- Android ([Official API - CustomTabsSession.setActionButton](https://developer.android.com/reference/androidx/browser/customtabs/CustomTabsSession#setActionButton(android.graphics.Bitmap,java.lang.String)))
   Future<void> updateActionButton(
-      {required Uint8List icon, required String description}) async {
-    Map<String, dynamic> args = <String, dynamic>{};
-    args.putIfAbsent('icon', () => icon);
-    args.putIfAbsent('description', () => description);
-    await channel?.invokeMethod("updateActionButton", args);
-    _actionButton?.icon = icon;
-    _actionButton?.description = description;
-  }
+          {required Uint8List icon, required String description}) =>
+      platform.updateActionButton(icon: icon, description: description);
 
   ///Sets the remote views displayed in the secondary toolbar in a custom tab.
   ///
@@ -351,9 +183,8 @@ class ChromeSafariBrowser extends ChannelController {
   ///**Supported Platforms/Implementations**:
   ///- Android ([Official API - CustomTabsIntent.Builder.setSecondaryToolbarViews](https://developer.android.com/reference/androidx/browser/customtabs/CustomTabsIntent.Builder#setSecondaryToolbarViews(android.widget.RemoteViews,int[],android.app.PendingIntent)))
   void setSecondaryToolbar(
-      ChromeSafariBrowserSecondaryToolbar secondaryToolbar) {
-    this._secondaryToolbar = secondaryToolbar;
-  }
+          ChromeSafariBrowserSecondaryToolbar secondaryToolbar) =>
+      platform.setSecondaryToolbar(secondaryToolbar);
 
   ///Sets or updates (if already present) the Remote Views of the secondary toolbar in an existing custom tab session.
   ///
@@ -362,12 +193,8 @@ class ChromeSafariBrowser extends ChannelController {
   ///**Supported Platforms/Implementations**:
   ///- Android ([Official API - CustomTabsSession.setSecondaryToolbarViews](https://developer.android.com/reference/androidx/browser/customtabs/CustomTabsSession#setSecondaryToolbarViews(android.widget.RemoteViews,int[],android.app.PendingIntent)))
   Future<void> updateSecondaryToolbar(
-      ChromeSafariBrowserSecondaryToolbar secondaryToolbar) async {
-    Map<String, dynamic> args = <String, dynamic>{};
-    args.putIfAbsent('secondaryToolbar', () => secondaryToolbar.toMap());
-    await channel?.invokeMethod("updateSecondaryToolbar", args);
-    this._secondaryToolbar = secondaryToolbar;
-  }
+          ChromeSafariBrowserSecondaryToolbar secondaryToolbar) =>
+      platform.updateSecondaryToolbar(secondaryToolbar);
 
   ///Adds a [ChromeSafariBrowserMenuItem] to the menu.
   ///
@@ -376,9 +203,8 @@ class ChromeSafariBrowser extends ChannelController {
   ///**Supported Platforms/Implementations**:
   ///- Android
   ///- iOS
-  void addMenuItem(ChromeSafariBrowserMenuItem menuItem) {
-    this._menuItems[menuItem.id] = menuItem;
-  }
+  void addMenuItem(ChromeSafariBrowserMenuItem menuItem) =>
+      platform.addMenuItem(menuItem);
 
   ///Adds a list of [ChromeSafariBrowserMenuItem] to the menu.
   ///
@@ -387,11 +213,8 @@ class ChromeSafariBrowser extends ChannelController {
   ///**Supported Platforms/Implementations**:
   ///- Android
   ///- iOS
-  void addMenuItems(List<ChromeSafariBrowserMenuItem> menuItems) {
-    menuItems.forEach((menuItem) {
-      this._menuItems[menuItem.id] = menuItem;
-    });
-  }
+  void addMenuItems(List<ChromeSafariBrowserMenuItem> menuItems) =>
+      platform.addMenuItems(menuItems);
 
   ///Sends a request to create a two way postMessage channel between the client
   ///and the browser.
@@ -411,14 +234,9 @@ class ChromeSafariBrowser extends ChannelController {
   ///**Supported Platforms/Implementations**:
   ///- Android ([Official API - CustomTabsSession.requestPostMessageChannel](https://developer.android.com/reference/androidx/browser/customtabs/CustomTabsSession#requestPostMessageChannel(android.net.Uri,android.net.Uri,android.os.Bundle)))
   Future<bool> requestPostMessageChannel(
-      {required WebUri sourceOrigin, WebUri? targetOrigin}) async {
-    Map<String, dynamic> args = <String, dynamic>{};
-    args.putIfAbsent("sourceOrigin", () => sourceOrigin.toString());
-    args.putIfAbsent("targetOrigin", () => targetOrigin.toString());
-    return await channel?.invokeMethod<bool>(
-            "requestPostMessageChannel", args) ??
-        false;
-  }
+          {required WebUri sourceOrigin, WebUri? targetOrigin}) =>
+      platform.requestPostMessageChannel(
+          sourceOrigin: sourceOrigin, targetOrigin: targetOrigin);
 
   ///Sends a postMessage request using the origin communicated via [requestPostMessageChannel].
   ///Fails when called before [onMessageChannelReady] event.
@@ -430,13 +248,8 @@ class ChromeSafariBrowser extends ChannelController {
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android ([Official API - CustomTabsSession.postMessage](https://developer.android.com/reference/androidx/browser/customtabs/CustomTabsSession#postMessage(java.lang.String,android.os.Bundle)))
-  Future<CustomTabsPostMessageResultType> postMessage(String message) async {
-    Map<String, dynamic> args = <String, dynamic>{};
-    args.putIfAbsent("message", () => message);
-    return CustomTabsPostMessageResultType.fromNativeValue(
-            await channel?.invokeMethod<int>("postMessage", args)) ??
-        CustomTabsPostMessageResultType.FAILURE_MESSAGING_ERROR;
-  }
+  Future<CustomTabsPostMessageResultType> postMessage(String message) =>
+      platform.postMessage(message);
 
   ///Returns whether the Engagement Signals API is available.
   ///The availability of the Engagement Signals API may change at runtime.
@@ -447,12 +260,8 @@ class ChromeSafariBrowser extends ChannelController {
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android ([Official API - CustomTabsSession.isEngagementSignalsApiAvailable](https://developer.android.com/reference/androidx/browser/customtabs/CustomTabsSession#isEngagementSignalsApiAvailable(android.os.Bundle)))
-  Future<bool> isEngagementSignalsApiAvailable() async {
-    Map<String, dynamic> args = <String, dynamic>{};
-    return await channel?.invokeMethod<bool>(
-            "isEngagementSignalsApiAvailable", args) ??
-        false;
-  }
+  Future<bool> isEngagementSignalsApiAvailable() =>
+      platform.isEngagementSignalsApiAvailable();
 
   ///On Android, returns `true` if Chrome Custom Tabs is available.
   ///On iOS, returns `true` if SFSafariViewController is available.
@@ -461,21 +270,15 @@ class ChromeSafariBrowser extends ChannelController {
   ///**Supported Platforms/Implementations**:
   ///- Android
   ///- iOS
-  static Future<bool> isAvailable() async {
-    Map<String, dynamic> args = <String, dynamic>{};
-    return await _sharedChannel.invokeMethod<bool>("isAvailable", args) ??
-        false;
-  }
+  static Future<bool> isAvailable() =>
+      PlatformChromeSafariBrowser.static().isAvailable();
 
   ///The maximum number of allowed secondary toolbar items.
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android
-  static Future<int> getMaxToolbarItems() async {
-    Map<String, dynamic> args = <String, dynamic>{};
-    return await _sharedChannel.invokeMethod<int>("getMaxToolbarItems", args) ??
-        0;
-  }
+  static Future<int> getMaxToolbarItems() =>
+      PlatformChromeSafariBrowser.static().getMaxToolbarItems();
 
   ///Returns the preferred package to use for Custom Tabs.
   ///The preferred package name is the default VIEW intent handler as long as it supports Custom Tabs.
@@ -494,12 +297,9 @@ class ChromeSafariBrowser extends ChannelController {
   ///**Supported Platforms/Implementations**:
   ///- Android ([Official API - CustomTabsClient.getPackageName](https://developer.android.com/reference/androidx/browser/customtabs/CustomTabsClient#getPackageName(android.content.Context,java.util.List%3Cjava.lang.String%3E,boolean))))
   static Future<String?> getPackageName(
-      {List<String>? packages, bool ignoreDefault = false}) async {
-    Map<String, dynamic> args = <String, dynamic>{};
-    args.putIfAbsent("packages", () => packages);
-    args.putIfAbsent("ignoreDefault", () => ignoreDefault);
-    return await _sharedChannel.invokeMethod<String?>("getPackageName", args);
-  }
+          {List<String>? packages, bool ignoreDefault = false}) =>
+      PlatformChromeSafariBrowser.static()
+          .getPackageName(packages: packages, ignoreDefault: ignoreDefault);
 
   ///Clear associated website data accrued from browsing activity within your app.
   ///This includes all local storage, cached resources, and cookies.
@@ -508,10 +308,8 @@ class ChromeSafariBrowser extends ChannelController {
   ///
   ///**Supported Platforms/Implementations**:
   ///- iOS ([Official API - SFSafariViewController.DataStore.clearWebsiteData](https://developer.apple.com/documentation/safariservices/sfsafariviewcontroller/datastore/3981117-clearwebsitedata))
-  static Future<void> clearWebsiteData() async {
-    Map<String, dynamic> args = <String, dynamic>{};
-    await _sharedChannel.invokeMethod("clearWebsiteData", args);
-  }
+  static Future<void> clearWebsiteData() =>
+      PlatformChromeSafariBrowser.static().clearWebsiteData();
 
   ///Prewarms a connection to each URL. SFSafariViewController will automatically use a
   ///prewarmed connection if possible when loading its initial URL.
@@ -533,14 +331,8 @@ class ChromeSafariBrowser extends ChannelController {
   ///
   ///**Supported Platforms/Implementations**:
   ///- iOS ([Official API - SFSafariViewController.prewarmConnections](https://developer.apple.com/documentation/safariservices/sfsafariviewcontroller/3752133-prewarmconnections))
-  static Future<PrewarmingToken?> prewarmConnections(List<WebUri> URLs) async {
-    Map<String, dynamic> args = <String, dynamic>{};
-    args.putIfAbsent('URLs', () => URLs.map((e) => e.toString()).toList());
-    Map<String, dynamic>? result =
-        (await _sharedChannel.invokeMethod("prewarmConnections", args))
-            ?.cast<String, dynamic>();
-    return PrewarmingToken.fromMap(result);
-  }
+  static Future<PrewarmingToken?> prewarmConnections(List<WebUri> URLs) =>
+      PlatformChromeSafariBrowser.static().prewarmConnections(URLs);
 
   ///Ends all prewarmed connections associated with the token, except for connections that are also kept alive by other tokens.
   ///
@@ -549,11 +341,9 @@ class ChromeSafariBrowser extends ChannelController {
   ///**Supported Platforms/Implementations**:
   ///- iOS ([Official API - SFSafariViewController.prewarmConnections](https://developer.apple.com/documentation/safariservices/sfsafariviewcontroller/3752133-prewarmconnections))
   static Future<void> invalidatePrewarmingToken(
-      PrewarmingToken prewarmingToken) async {
-    Map<String, dynamic> args = <String, dynamic>{};
-    args.putIfAbsent('prewarmingToken', () => prewarmingToken.toMap());
-    await _sharedChannel.invokeMethod("invalidatePrewarmingToken", args);
-  }
+          PrewarmingToken prewarmingToken) =>
+      PlatformChromeSafariBrowser.static()
+          .invalidatePrewarmingToken(prewarmingToken);
 
   ///Event fired when the when connecting from Android Custom Tabs Service.
   ///
@@ -668,19 +458,7 @@ class ChromeSafariBrowser extends ChannelController {
   ///- iOS
   void onClosed() {}
 
-  ///Returns `true` if the [ChromeSafariBrowser] instance is opened, otherwise `false`.
-  ///
-  ///**Supported Platforms/Implementations**:
-  ///- Android
-  ///- iOS
-  bool isOpened() {
-    return _isOpened;
-  }
-
   ///Disposes the channel.
-  @override
   @mustCallSuper
-  void dispose() {
-    disposeChannel();
-  }
+  void dispose() => platform.dispose();
 }

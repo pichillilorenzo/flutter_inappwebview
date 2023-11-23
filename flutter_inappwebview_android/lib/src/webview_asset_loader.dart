@@ -2,125 +2,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_platform_interface.dart';
 
-/// Object specifying creation parameters for creating a [AndroidWebViewAssetLoader].
-///
-/// When adding additional fields make sure they can be null or have a default
-/// value to avoid breaking changes. See [PlatformWebViewAssetLoaderCreationParams] for
-/// more information.
-@immutable
-class AndroidWebViewAssetLoaderCreationParams
-    extends PlatformWebViewAssetLoaderCreationParams {
-  /// Creates a new [AndroidWebViewAssetLoaderCreationParams] instance.
-  const AndroidWebViewAssetLoaderCreationParams(
-    // This parameter prevents breaking changes later.
-    // ignore: avoid_unused_constructor_parameters
-    PlatformWebViewAssetLoaderCreationParams params,
-  ) : super();
-
-  /// Creates a [AndroidWebViewAssetLoaderCreationParams] instance based on [PlatformWebViewAssetLoaderCreationParams].
-  factory AndroidWebViewAssetLoaderCreationParams.fromPlatformWebViewAssetLoaderCreationParams(
-      PlatformWebViewAssetLoaderCreationParams params) {
-    return AndroidWebViewAssetLoaderCreationParams(params);
-  }
-}
-
-///Helper class to load local files including application's static assets and resources using http(s):// URLs inside a [WebView] class.
-///Loading local files using web-like URLs instead of `file://` is desirable as it is compatible with the Same-Origin policy.
-///
-///For more context about application's assets and resources and how to normally access them please refer to
-///[Android Developer Docs: App resources overview](https://developer.android.com/guide/topics/resources/providing-resources).
-///
-///Using http(s):// URLs to access local resources may conflict with a real website.
-///This means that local files should only be hosted on domains your organization owns
-///(at paths reserved for this purpose) or the default domain reserved for this: `appassets.androidplatform.net`.
-///
-///**Supported Platforms/Implementations**:
-///- Android native WebView
-class AndroidWebViewAssetLoader extends PlatformWebViewAssetLoader {
-  /// Creates a new [AndroidWebViewAssetLoader].
-  AndroidWebViewAssetLoader(PlatformWebViewAssetLoaderCreationParams params)
-      : super.implementation(
-          params is AndroidWebViewAssetLoaderCreationParams
-              ? params
-              : AndroidWebViewAssetLoaderCreationParams
-                  .fromPlatformWebViewAssetLoaderCreationParams(params),
-        );
-
-  factory AndroidWebViewAssetLoader.static() {
-    return instance();
-  }
-
-  static AndroidWebViewAssetLoader? _instance;
-
-  ///Gets the [AndroidWebViewAssetLoader] shared instance.
-  static AndroidWebViewAssetLoader instance() {
-    return (_instance != null) ? _instance! : _init();
-  }
-
-  static AndroidWebViewAssetLoader _init() {
-    _instance = AndroidWebViewAssetLoader(
-        AndroidWebViewAssetLoaderCreationParams(
-            const PlatformWebViewAssetLoaderCreationParams()));
-    return _instance!;
-  }
-
-  ///Set the domain under which app assets can be accessed. The default domain is `appassets.androidplatform.net`.
-  String? get domain => params.domain;
-
-  ///Allow using the HTTP scheme in addition to HTTPS. The default is to not allow HTTP.
-  bool? get httpAllowed => params.httpAllowed;
-
-  ///List of registered path handlers.
-  ///
-  ///[WebViewAssetLoader] will try Path Handlers in the order they're registered,
-  ///and will use whichever is the first to return a non-null.
-  List<AndroidPathHandler>? get pathHandlers =>
-      params.pathHandlers as List<AndroidPathHandler>?;
-
-  ///Gets a possible [AndroidWebViewAssetLoader] instance from a [Map] value.
-  AndroidWebViewAssetLoader? fromMap(Map<String, dynamic>? map) {
-    if (map == null) {
-      return null;
-    }
-    final instance = AndroidWebViewAssetLoader(
-        AndroidWebViewAssetLoaderCreationParams(
-            PlatformWebViewAssetLoaderCreationParams(
-      domain: map['domain'],
-      httpAllowed: map['httpAllowed'],
-      pathHandlers: map['pathHandlers'] != null
-          ? List<AndroidPathHandler>.from(map['pathHandlers'].map((e) => e))
-          : null,
-    )));
-    return instance;
-  }
-
-  ///Converts instance to a map.
-  Map<String, dynamic> toMap() {
-    return {
-      "domain": domain,
-      "httpAllowed": httpAllowed,
-      "pathHandlers": pathHandlers?.map((e) => e.toMap()).toList(),
-    };
-  }
-
-  ///Converts instance to a map.
-  Map<String, dynamic> toJson() {
-    return toMap();
-  }
-
-  ///Returns a copy of WebViewAssetLoader.
-  AndroidWebViewAssetLoader copy() {
-    return fromMap(toMap()) ??
-        AndroidWebViewAssetLoader(AndroidWebViewAssetLoaderCreationParams(
-            const PlatformWebViewAssetLoaderCreationParams()));
-  }
-
-  @override
-  String toString() {
-    return 'AndroidWebViewAssetLoader{domain: $domain, httpAllowed: $httpAllowed, pathHandlers: $pathHandlers}';
-  }
-}
-
 /// Object specifying creation parameters for creating a [AndroidPathHandler].
 ///
 /// When adding additional fields make sure they can be null or have a default
@@ -346,4 +227,12 @@ class AndroidInternalStoragePathHandler extends AndroidPathHandler implements Pl
 
   @override
   String get directory => _internalParams.directory;
+
+  @override
+  Map<String, dynamic> toMap() {
+    return {
+      ...toMap(),
+      'directory': directory
+    };
+  }
 }

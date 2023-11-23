@@ -10,8 +10,8 @@ void onNavigationResponse() {
 
   skippableGroup('onNavigationResponse', () {
     skippableTestWidgets('allow navigation', (WidgetTester tester) async {
-      final Completer<PlatformInAppWebViewController> controllerCompleter =
-          Completer<PlatformInAppWebViewController>();
+      final Completer<InAppWebViewController> controllerCompleter =
+          Completer<InAppWebViewController>();
       final Completer<void> pageLoaded = Completer<void>();
       final Completer<String> onNavigationResponseCompleter =
           Completer<String>();
@@ -43,8 +43,8 @@ void onNavigationResponse() {
     });
 
     skippableTestWidgets('cancel navigation', (WidgetTester tester) async {
-      final Completer<PlatformInAppWebViewController> controllerCompleter =
-          Completer<PlatformInAppWebViewController>();
+      final Completer<InAppWebViewController> controllerCompleter =
+          Completer<InAppWebViewController>();
       final Completer<void> pageLoaded = Completer<void>();
       final Completer<String> onNavigationResponseCompleter =
           Completer<String>();

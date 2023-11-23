@@ -12,8 +12,7 @@ import 'web_message.dart';
 @immutable
 class PlatformWebMessagePortCreationParams {
   /// Used by the platform implementation to create a new [PlatformWebMessagePort].
-  const PlatformWebMessagePortCreationParams(
-      {required this.index});
+  const PlatformWebMessagePortCreationParams({required this.index});
 
   ///Port index.
   final int index;
@@ -42,19 +41,19 @@ class PlatformWebMessagePortCreationParams {
 ///A transferred port cannot be closed by the application, since the ownership is also transferred.
 ///
 ///It is possible to transfer both ports of a channel to JavaScript, for example for communication between subframes.
-abstract class PlatformWebMessagePort extends PlatformInterface {
+abstract class PlatformWebMessagePort extends PlatformInterface
+    implements IWebMessagePort {
   /// Creates a new [PlatformWebMessagePort]
-  factory PlatformWebMessagePort(
-      PlatformWebMessagePortCreationParams params) {
+  factory PlatformWebMessagePort(PlatformWebMessagePortCreationParams params) {
     assert(
-    InAppWebViewPlatform.instance != null,
-    'A platform implementation for `flutter_inappwebview` has not been set. Please '
-        'ensure that an implementation of `InAppWebViewPlatform` has been set to '
-        '`InAppWebViewPlatform.instance` before use. For unit testing, '
-        '`InAppWebViewPlatform.instance` can be set with your own test implementation.',
+      InAppWebViewPlatform.instance != null,
+      'A platform implementation for `flutter_inappwebview` has not been set. Please '
+      'ensure that an implementation of `InAppWebViewPlatform` has been set to '
+      '`InAppWebViewPlatform.instance` before use. For unit testing, '
+      '`InAppWebViewPlatform.instance` can be set with your own test implementation.',
     );
     final PlatformWebMessagePort webMessagePort =
-    InAppWebViewPlatform.instance!.createPlatformWebMessagePort(params);
+        InAppWebViewPlatform.instance!.createPlatformWebMessagePort(params);
     PlatformInterface.verify(webMessagePort, _token);
     return webMessagePort;
   }
@@ -71,6 +70,13 @@ abstract class PlatformWebMessagePort extends PlatformInterface {
   /// The parameters used to initialize the [PlatformWebMessagePort].
   final PlatformWebMessagePortCreationParams params;
 
+  @override
+  String toString() {
+    return 'PlatformWebMessagePort{index: ${params.index}}';
+  }
+}
+
+abstract class IWebMessagePort {
   ///Sets a callback to receive message events on the main thread.
   Future<void> setWebMessageCallback(WebMessageCallback? onMessage) {
     throw UnimplementedError(
@@ -97,10 +103,5 @@ abstract class PlatformWebMessagePort extends PlatformInterface {
   Map<String, dynamic> toJson() {
     throw UnimplementedError(
         'toJson is not implemented on the current platform');
-  }
-
-  @override
-  String toString() {
-    return 'PlatformWebMessagePort{params: $params}';
   }
 }

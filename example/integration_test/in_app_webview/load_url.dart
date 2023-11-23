@@ -12,8 +12,8 @@ void loadUrl() {
   var initialUrl = !kIsWeb ? TEST_URL_1 : TEST_WEB_PLATFORM_URL_1;
 
   skippableTestWidgets('loadUrl', (WidgetTester tester) async {
-    final Completer<PlatformInAppWebViewController> controllerCompleter =
-        Completer<PlatformInAppWebViewController>();
+    final Completer<InAppWebViewController> controllerCompleter =
+        Completer<InAppWebViewController>();
     final Completer<String> firstUrlLoad = Completer<String>();
     final Completer<String> loadedUrl = Completer<String>();
 
@@ -38,7 +38,7 @@ void loadUrl() {
         ),
       ),
     );
-    final PlatformInAppWebViewController controller = await controllerCompleter.future;
+    final InAppWebViewController controller = await controllerCompleter.future;
     expect(await firstUrlLoad.future, initialUrl.toString());
 
     await controller.loadUrl(
@@ -54,8 +54,8 @@ void loadUrl() {
         ].contains(defaultTargetPlatform);
 
   skippableTestWidgets('loadSimulatedRequest', (WidgetTester tester) async {
-    final Completer<PlatformInAppWebViewController> controllerCompleter =
-        Completer<PlatformInAppWebViewController>();
+    final Completer<InAppWebViewController> controllerCompleter =
+        Completer<InAppWebViewController>();
     final Completer<String> firstUrlLoad = Completer<String>();
     final Completer<String> loadedUrl = Completer<String>();
 
@@ -80,7 +80,7 @@ void loadUrl() {
         ),
       ),
     );
-    final PlatformInAppWebViewController controller = await controllerCompleter.future;
+    final InAppWebViewController controller = await controllerCompleter.future;
     expect(await firstUrlLoad.future, initialUrl.toString());
 
     final htmlCode = "<h1>Hello</h1>";

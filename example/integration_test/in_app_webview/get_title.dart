@@ -28,8 +28,8 @@ void getTitle() {
   skippableTestWidgets('getTitle', (WidgetTester tester) async {
     final Completer<void> pageStarted = Completer<void>();
     final Completer<void> pageLoaded = Completer<void>();
-    final Completer<PlatformInAppWebViewController> controllerCompleter =
-        Completer<PlatformInAppWebViewController>();
+    final Completer<InAppWebViewController> controllerCompleter =
+        Completer<InAppWebViewController>();
 
     await tester.pumpWidget(
       Directionality(
@@ -49,7 +49,7 @@ void getTitle() {
       ),
     );
 
-    final PlatformInAppWebViewController controller = await controllerCompleter.future;
+    final InAppWebViewController controller = await controllerCompleter.future;
     await pageStarted.future;
     await pageLoaded.future;
 

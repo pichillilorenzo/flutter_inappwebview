@@ -19,7 +19,8 @@ import '../pull_to_refresh/pull_to_refresh_controller.dart';
 class AndroidInAppWebViewWidgetCreationParams
     extends PlatformInAppWebViewWidgetCreationParams {
   AndroidInAppWebViewWidgetCreationParams(
-      {super.key,
+      {super.controllerFromPlatform,
+      super.key,
       super.layoutDirection,
       super.gestureRecognizers,
       super.headlessWebView,
@@ -140,6 +141,7 @@ class AndroidInAppWebViewWidgetCreationParams
   AndroidInAppWebViewWidgetCreationParams.fromPlatformInAppWebViewWidgetCreationParams(
       PlatformInAppWebViewWidgetCreationParams params)
       : this(
+            controllerFromPlatform: params.controllerFromPlatform,
             key: params.key,
             layoutDirection: params.layoutDirection,
             gestureRecognizers: params.gestureRecognizers,
@@ -320,8 +322,6 @@ class AndroidInAppWebViewWidget extends PlatformInAppWebViewWidget {
         true;
 
     return PlatformViewLink(
-      // Setting a default key using `params` ensures the `PlatformViewLink`
-      // recreates the PlatformView when changes are made.
       key: _androidParams.key,
       viewType: 'com.pichillilorenzo/flutter_inappwebview',
       surfaceFactory: (
@@ -369,22 +369,6 @@ class AndroidInAppWebViewWidget extends PlatformInAppWebViewWidget {
     );
   }
 
-  @override
-  void dispose() {
-    dynamic viewId = _controller?.getViewId();
-    debugLog(
-        className: runtimeType.toString(),
-        id: viewId?.toString(),
-        debugLoggingSettings: PlatformInAppWebViewController.debugLoggingSettings,
-        method: "dispose",
-        args: []);
-    final isKeepAlive = _androidParams.keepAlive != null;
-    _controller?.dispose(isKeepAlive: isKeepAlive);
-    _controller = null;
-    _androidParams.pullToRefreshController?.dispose(isKeepAlive: isKeepAlive);
-    _androidParams.findInteractionController?.dispose(isKeepAlive: isKeepAlive);
-  }
-
   AndroidViewController _createAndroidViewController({
     required bool hybridComposition,
     required int id,
@@ -427,11 +411,12 @@ class AndroidInAppWebViewWidget extends PlatformInAppWebViewWidget {
     debugLog(
         className: runtimeType.toString(),
         id: viewId?.toString(),
-        debugLoggingSettings: PlatformInAppWebViewController.debugLoggingSettings,
+        debugLoggingSettings:
+            PlatformInAppWebViewController.debugLoggingSettings,
         method: "onWebViewCreated",
         args: []);
     if (_androidParams.onWebViewCreated != null) {
-      _androidParams.onWebViewCreated!(_controller!);
+      _androidParams.onWebViewCreated!(params.controllerFromPlatform?.call(_controller!) ?? _controller!);
     }
   }
 
@@ -468,5 +453,28 @@ class AndroidInAppWebViewWidget extends PlatformInAppWebViewWidget {
         settings.useOnNavigationResponse == null) {
       settings.useOnNavigationResponse = true;
     }
+  }
+
+  @override
+  void dispose() {
+    dynamic viewId = _controller?.getViewId();
+    debugLog(
+        className: runtimeType.toString(),
+        id: viewId?.toString(),
+        debugLoggingSettings:
+            PlatformInAppWebViewController.debugLoggingSettings,
+        method: "dispose",
+        args: []);
+    final isKeepAlive = _androidParams.keepAlive != null;
+    _controller?.dispose(isKeepAlive: isKeepAlive);
+    _controller = null;
+    _androidParams.pullToRefreshController?.dispose(isKeepAlive: isKeepAlive);
+    _androidParams.findInteractionController?.dispose(isKeepAlive: isKeepAlive);
+  }
+
+  @override
+  T controllerFromPlatform<T>(PlatformInAppWebViewController controller) {
+    // TODO: implement controllerFromPlatform
+    throw UnimplementedError();
   }
 }

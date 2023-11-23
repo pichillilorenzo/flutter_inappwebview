@@ -10,8 +10,8 @@ void contentBlocker() {
         ].contains(defaultTargetPlatform);
 
   skippableTestWidgets('Content Blocker', (WidgetTester tester) async {
-    final Completer<PlatformInAppWebViewController> controllerCompleter =
-        Completer<PlatformInAppWebViewController>();
+    final Completer<InAppWebViewController> controllerCompleter =
+        Completer<InAppWebViewController>();
     final Completer<void> pageLoaded = Completer<void>();
     await tester.pumpWidget(
       Directionality(

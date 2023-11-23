@@ -91,7 +91,7 @@ class WebMessage {
   dynamic data;
 
   ///The ports that are sent with the message.
-  List<PlatformWebMessagePort>? ports;
+  List<IWebMessagePort>? ports;
 
   ///The payload type of the message.
   WebMessageType type;
@@ -111,7 +111,7 @@ class WebMessage {
     final instance = WebMessage(
       data: map['data'],
       ports: map['ports'] != null
-          ? List<PlatformWebMessagePort>.from(map['ports'].map((e) => e))
+          ? List<IWebMessagePort>.from(map['ports'].map((e) => e))
           : null,
       type: WebMessageType.fromNativeValue(map['type'])!,
     );

@@ -1170,7 +1170,7 @@ class InAppWebViewSettings {
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
-  PlatformWebViewAssetLoader? webViewAssetLoader;
+  WebViewAssetLoader? webViewAssetLoader;
   InAppWebViewSettings(
       {this.useShouldOverrideUrlLoading,
       this.useOnLoadResource,
@@ -1404,8 +1404,8 @@ class InAppWebViewSettings {
           ? UtilColor.fromStringRepresentation(
               map['verticalScrollbarTrackColor'])
           : null,
-      webViewAssetLoader:
-          _deserializeWebViewAssetLoader(map['webViewAssetLoader']),
+      webViewAssetLoader: WebViewAssetLoader.fromMap(
+          map['webViewAssetLoader']?.cast<String, dynamic>()),
     );
     instance.accessibilityIgnoresInvertColors =
         map['accessibilityIgnoresInvertColors'];
@@ -1687,7 +1687,7 @@ class InAppWebViewSettings {
       "verticalScrollbarPosition": verticalScrollbarPosition?.toNativeValue(),
       "verticalScrollbarThumbColor": verticalScrollbarThumbColor?.toHex(),
       "verticalScrollbarTrackColor": verticalScrollbarTrackColor?.toHex(),
-      "webViewAssetLoader": _serializeWebViewAssetLoader(webViewAssetLoader),
+      "webViewAssetLoader": webViewAssetLoader?.toMap(),
     };
   }
 

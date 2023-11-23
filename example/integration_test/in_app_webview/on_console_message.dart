@@ -10,8 +10,8 @@ void onConsoleMessage() {
         ].contains(defaultTargetPlatform);
 
   skippableTestWidgets('onConsoleMessage', (WidgetTester tester) async {
-    final Completer<PlatformInAppWebViewController> controllerCompleter =
-        Completer<PlatformInAppWebViewController>();
+    final Completer<InAppWebViewController> controllerCompleter =
+        Completer<InAppWebViewController>();
     final Completer<ConsoleMessage> onConsoleMessageCompleter =
         Completer<ConsoleMessage>();
     await tester.pumpWidget(

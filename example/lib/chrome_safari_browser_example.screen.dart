@@ -4,7 +4,7 @@ import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 
 import 'main.dart';
 
-class MyChromeSafariBrowser extends PlatformChromeSafariBrowser {
+class MyChromeSafariBrowser extends ChromeSafariBrowser {
   @override
   void onOpened() {
     print("ChromeSafari browser opened");
@@ -22,7 +22,7 @@ class MyChromeSafariBrowser extends PlatformChromeSafariBrowser {
 }
 
 class ChromeSafariBrowserExampleScreen extends StatefulWidget {
-  final PlatformChromeSafariBrowser browser = MyChromeSafariBrowser();
+  final ChromeSafariBrowser browser = MyChromeSafariBrowser();
 
   @override
   _ChromeSafariBrowserExampleScreenState createState() =>

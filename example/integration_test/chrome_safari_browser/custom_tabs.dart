@@ -214,12 +214,12 @@ void customTabs() {
     });
 
     skippableTest('getMaxToolbarItems', () async {
-      expect(await PlatformChromeSafariBrowser.getMaxToolbarItems(),
+      expect(await ChromeSafariBrowser.getMaxToolbarItems(),
           greaterThanOrEqualTo(0));
     });
 
     skippableTest('getPackageName', () async {
-      expect(await PlatformChromeSafariBrowser.getPackageName(), isNotNull);
+      expect(await ChromeSafariBrowser.getPackageName(), isNotNull);
     });
   }, skip: shouldSkip);
 }

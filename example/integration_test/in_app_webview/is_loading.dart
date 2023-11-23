@@ -10,8 +10,8 @@ void isLoading() {
         ].contains(defaultTargetPlatform);
 
   skippableTestWidgets('isLoading', (WidgetTester tester) async {
-    final Completer<PlatformInAppWebViewController> controllerCompleter =
-        Completer<PlatformInAppWebViewController>();
+    final Completer<InAppWebViewController> controllerCompleter =
+        Completer<InAppWebViewController>();
     final Completer<void> pageStarted = Completer<void>();
     final Completer<void> pageLoaded = Completer<void>();
 
@@ -35,7 +35,7 @@ void isLoading() {
       ),
     );
 
-    final PlatformInAppWebViewController controller = await controllerCompleter.future;
+    final InAppWebViewController controller = await controllerCompleter.future;
     await pageStarted.future;
     expect(await controller.isLoading(), true);
 

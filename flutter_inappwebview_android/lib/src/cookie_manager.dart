@@ -194,7 +194,7 @@ class AndroidCookieManager extends PlatformCookieManager
         await controller.evaluateJavascript(
             source: 'document.cookie="$cookieValue"');
         setCookieCompleter.complete();
-      },
+      }
     ));
     await headlessWebView.run();
     await setCookieCompleter.future;

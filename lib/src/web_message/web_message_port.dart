@@ -18,7 +18,7 @@ import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_pla
 ///A transferred port cannot be closed by the application, since the ownership is also transferred.
 ///
 ///It is possible to transfer both ports of a channel to JavaScript, for example for communication between subframes.
-class WebMessagePort {
+class WebMessagePort implements IWebMessagePort {
   WebMessagePort({required int index})
       : this.fromPlatformCreationParams(
             params: PlatformWebMessagePortCreationParams(index: index));

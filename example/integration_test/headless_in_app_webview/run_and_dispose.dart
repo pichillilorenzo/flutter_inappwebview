@@ -10,8 +10,8 @@ void runAndDispose() {
         ].contains(defaultTargetPlatform);
 
   skippableTest('run and dispose', () async {
-    final Completer<PlatformInAppWebViewController> controllerCompleter =
-        Completer<PlatformInAppWebViewController>();
+    final Completer<InAppWebViewController> controllerCompleter =
+        Completer<InAppWebViewController>();
     final Completer<void> pageLoaded = Completer<void>();
 
     var headlessWebView = new HeadlessInAppWebView(
@@ -27,7 +27,7 @@ void runAndDispose() {
     await headlessWebView.run();
     expect(headlessWebView.isRunning(), true);
 
-    final PlatformInAppWebViewController controller = await controllerCompleter.future;
+    final InAppWebViewController controller = await controllerCompleter.future;
     await pageLoaded.future;
 
     final String? url = (await controller.getUrl())?.toString();

@@ -11,8 +11,8 @@ void onLoadResourceWithCustomScheme() {
 
   skippableTestWidgets('onLoadResourceWithCustomScheme',
       (WidgetTester tester) async {
-    final Completer<PlatformInAppWebViewController> controllerCompleter =
-        Completer<PlatformInAppWebViewController>();
+    final Completer<InAppWebViewController> controllerCompleter =
+        Completer<InAppWebViewController>();
     final Completer<void> imageLoaded = Completer<void>();
 
     await tester.pumpWidget(

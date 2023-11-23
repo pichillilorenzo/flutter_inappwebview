@@ -52,23 +52,21 @@ class HeadlessInAppWebView {
     InAppWebViewKeepAlive? keepAlive,
     bool? preventGestureDelay,
     @Deprecated('Use onGeolocationPermissionsHidePrompt instead')
-    void Function(PlatformInAppWebViewController controller)?
+    void Function(InAppWebViewController controller)?
         androidOnGeolocationPermissionsHidePrompt,
     @Deprecated('Use onGeolocationPermissionsShowPrompt instead')
     Future<GeolocationPermissionShowPromptResponse?> Function(
-            PlatformInAppWebViewController controller, String origin)?
+            InAppWebViewController controller, String origin)?
         androidOnGeolocationPermissionsShowPrompt,
     @Deprecated('Use onPermissionRequest instead')
     Future<PermissionRequestResponse?> Function(
-            PlatformInAppWebViewController controller,
+            InAppWebViewController controller,
             String origin,
             List<String> resources)?
         androidOnPermissionRequest,
     @Deprecated('Use onSafeBrowsingHit instead')
-    Future<SafeBrowsingResponse?> Function(
-            PlatformInAppWebViewController controller,
-            Uri url,
-            SafeBrowsingThreat? threatType)?
+    Future<SafeBrowsingResponse?> Function(InAppWebViewController controller,
+            Uri url, SafeBrowsingThreat? threatType)?
         androidOnSafeBrowsingHit,
     InAppWebViewInitialData? initialData,
     String? initialFile,
@@ -80,252 +78,233 @@ class HeadlessInAppWebView {
     PullToRefreshController? pullToRefreshController,
     FindInteractionController? findInteractionController,
     ContextMenu? contextMenu,
-    void Function(PlatformInAppWebViewController controller, WebUri? url)?
+    void Function(InAppWebViewController controller, WebUri? url)?
         onPageCommitVisible,
-    void Function(PlatformInAppWebViewController controller, String? title)?
+    void Function(InAppWebViewController controller, String? title)?
         onTitleChanged,
     @Deprecated(
         'Use onDidReceiveServerRedirectForProvisionalNavigation instead')
-    void Function(PlatformInAppWebViewController controller)?
+    void Function(InAppWebViewController controller)?
         iosOnDidReceiveServerRedirectForProvisionalNavigation,
     @Deprecated('Use onWebContentProcessDidTerminate instead')
-    void Function(PlatformInAppWebViewController controller)?
+    void Function(InAppWebViewController controller)?
         iosOnWebContentProcessDidTerminate,
     @Deprecated('Use onNavigationResponse instead')
     Future<IOSNavigationResponseAction?> Function(
-            PlatformInAppWebViewController controller,
+            InAppWebViewController controller,
             IOSWKNavigationResponse navigationResponse)?
         iosOnNavigationResponse,
     @Deprecated('Use shouldAllowDeprecatedTLS instead')
     Future<IOSShouldAllowDeprecatedTLSAction?> Function(
-            PlatformInAppWebViewController controller,
+            InAppWebViewController controller,
             URLAuthenticationChallenge challenge)?
         iosShouldAllowDeprecatedTLS,
     Future<AjaxRequestAction> Function(
-            PlatformInAppWebViewController controller, AjaxRequest ajaxRequest)?
+            InAppWebViewController controller, AjaxRequest ajaxRequest)?
         onAjaxProgress,
     Future<AjaxRequestAction?> Function(
-            PlatformInAppWebViewController controller, AjaxRequest ajaxRequest)?
+            InAppWebViewController controller, AjaxRequest ajaxRequest)?
         onAjaxReadyStateChange,
-    void Function(PlatformInAppWebViewController controller,
-            ConsoleMessage consoleMessage)?
+    void Function(
+            InAppWebViewController controller, ConsoleMessage consoleMessage)?
         onConsoleMessage,
-    Future<bool?> Function(PlatformInAppWebViewController controller,
+    Future<bool?> Function(InAppWebViewController controller,
             CreateWindowAction createWindowAction)?
         onCreateWindow,
-    void Function(PlatformInAppWebViewController controller)? onCloseWindow,
-    void Function(PlatformInAppWebViewController controller)? onWindowFocus,
-    void Function(PlatformInAppWebViewController controller)? onWindowBlur,
+    void Function(InAppWebViewController controller)? onCloseWindow,
+    void Function(InAppWebViewController controller)? onWindowFocus,
+    void Function(InAppWebViewController controller)? onWindowBlur,
     @Deprecated('Use onReceivedIcon instead')
-    void Function(PlatformInAppWebViewController controller, Uint8List icon)?
+    void Function(InAppWebViewController controller, Uint8List icon)?
         androidOnReceivedIcon,
     @Deprecated('Use onReceivedTouchIconUrl instead')
-    void Function(PlatformInAppWebViewController controller, Uri url,
-            bool precomposed)?
+    void Function(InAppWebViewController controller, Uri url, bool precomposed)?
         androidOnReceivedTouchIconUrl,
     @Deprecated('Use onDownloadStartRequest instead')
-    void Function(PlatformInAppWebViewController controller, Uri url)?
-        onDownloadStart,
-    void Function(PlatformInAppWebViewController controller,
+    void Function(InAppWebViewController controller, Uri url)? onDownloadStart,
+    void Function(InAppWebViewController controller,
             DownloadStartRequest downloadStartRequest)?
         onDownloadStartRequest,
     @Deprecated('Use FindInteractionController.onFindResultReceived instead')
-    void Function(PlatformInAppWebViewController controller,
-            int activeMatchOrdinal, int numberOfMatches, bool isDoneCounting)?
+    void Function(InAppWebViewController controller, int activeMatchOrdinal,
+            int numberOfMatches, bool isDoneCounting)?
         onFindResultReceived,
-    Future<JsAlertResponse?> Function(PlatformInAppWebViewController controller,
-            JsAlertRequest jsAlertRequest)?
+    Future<JsAlertResponse?> Function(
+            InAppWebViewController controller, JsAlertRequest jsAlertRequest)?
         onJsAlert,
-    Future<JsConfirmResponse?> Function(
-            PlatformInAppWebViewController controller,
+    Future<JsConfirmResponse?> Function(InAppWebViewController controller,
             JsConfirmRequest jsConfirmRequest)?
         onJsConfirm,
     Future<JsPromptResponse?> Function(
-            PlatformInAppWebViewController controller,
-            JsPromptRequest jsPromptRequest)?
+            InAppWebViewController controller, JsPromptRequest jsPromptRequest)?
         onJsPrompt,
     @Deprecated("Use onReceivedError instead")
-    void Function(PlatformInAppWebViewController controller, Uri? url, int code,
+    void Function(InAppWebViewController controller, Uri? url, int code,
             String message)?
         onLoadError,
-    void Function(PlatformInAppWebViewController controller,
-            WebResourceRequest request, WebResourceError error)?
+    void Function(InAppWebViewController controller, WebResourceRequest request,
+            WebResourceError error)?
         onReceivedError,
     @Deprecated("Use onReceivedHttpError instead")
-    void Function(PlatformInAppWebViewController controller, Uri? url,
-            int statusCode, String description)?
+    void Function(InAppWebViewController controller, Uri? url, int statusCode,
+            String description)?
         onLoadHttpError,
-    void Function(PlatformInAppWebViewController controller,
-            WebResourceRequest request, WebResourceResponse errorResponse)?
+    void Function(InAppWebViewController controller, WebResourceRequest request,
+            WebResourceResponse errorResponse)?
         onReceivedHttpError,
-    void Function(
-            PlatformInAppWebViewController controller, LoadedResource resource)?
+    void Function(InAppWebViewController controller, LoadedResource resource)?
         onLoadResource,
     @Deprecated('Use onLoadResourceWithCustomScheme instead')
     Future<CustomSchemeResponse?> Function(
-            PlatformInAppWebViewController controller, Uri url)?
+            InAppWebViewController controller, Uri url)?
         onLoadResourceCustomScheme,
     Future<CustomSchemeResponse?> Function(
-            PlatformInAppWebViewController controller,
-            WebResourceRequest request)?
+            InAppWebViewController controller, WebResourceRequest request)?
         onLoadResourceWithCustomScheme,
-    void Function(PlatformInAppWebViewController controller, WebUri? url)?
-        onLoadStart,
-    void Function(PlatformInAppWebViewController controller, WebUri? url)?
-        onLoadStop,
-    void Function(PlatformInAppWebViewController controller,
+    void Function(InAppWebViewController controller, WebUri? url)? onLoadStart,
+    void Function(InAppWebViewController controller, WebUri? url)? onLoadStop,
+    void Function(InAppWebViewController controller,
             InAppWebViewHitTestResult hitTestResult)?
         onLongPressHitTestResult,
     @Deprecated("Use onPrintRequest instead")
-    void Function(PlatformInAppWebViewController controller, Uri? url)? onPrint,
-    Future<bool?> Function(PlatformInAppWebViewController controller,
-            WebUri? url, PlatformPrintJobController? printJobController)?
+    void Function(InAppWebViewController controller, Uri? url)? onPrint,
+    Future<bool?> Function(InAppWebViewController controller, WebUri? url,
+            PlatformPrintJobController? printJobController)?
         onPrintRequest,
-    void Function(PlatformInAppWebViewController controller, int progress)?
+    void Function(InAppWebViewController controller, int progress)?
         onProgressChanged,
-    Future<ClientCertResponse?> Function(
-            PlatformInAppWebViewController controller,
+    Future<ClientCertResponse?> Function(InAppWebViewController controller,
             URLAuthenticationChallenge challenge)?
         onReceivedClientCertRequest,
-    Future<HttpAuthResponse?> Function(
-            PlatformInAppWebViewController controller,
+    Future<HttpAuthResponse?> Function(InAppWebViewController controller,
             URLAuthenticationChallenge challenge)?
         onReceivedHttpAuthRequest,
-    Future<ServerTrustAuthResponse?> Function(
-            PlatformInAppWebViewController controller,
+    Future<ServerTrustAuthResponse?> Function(InAppWebViewController controller,
             URLAuthenticationChallenge challenge)?
         onReceivedServerTrustAuthRequest,
-    void Function(PlatformInAppWebViewController controller, int x, int y)?
+    void Function(InAppWebViewController controller, int x, int y)?
         onScrollChanged,
-    void Function(PlatformInAppWebViewController controller, WebUri? url,
-            bool? isReload)?
+    void Function(
+            InAppWebViewController controller, WebUri? url, bool? isReload)?
         onUpdateVisitedHistory,
-    void Function(PlatformInAppWebViewController controller)? onWebViewCreated,
+    void Function(InAppWebViewController controller)? onWebViewCreated,
     Future<AjaxRequest?> Function(
-            PlatformInAppWebViewController controller, AjaxRequest ajaxRequest)?
+            InAppWebViewController controller, AjaxRequest ajaxRequest)?
         shouldInterceptAjaxRequest,
-    Future<FetchRequest?> Function(PlatformInAppWebViewController controller,
-            FetchRequest fetchRequest)?
+    Future<FetchRequest?> Function(
+            InAppWebViewController controller, FetchRequest fetchRequest)?
         shouldInterceptFetchRequest,
-    Future<NavigationActionPolicy?> Function(
-            PlatformInAppWebViewController controller,
+    Future<NavigationActionPolicy?> Function(InAppWebViewController controller,
             NavigationAction navigationAction)?
         shouldOverrideUrlLoading,
-    void Function(PlatformInAppWebViewController controller)? onEnterFullscreen,
-    void Function(PlatformInAppWebViewController controller)? onExitFullscreen,
-    void Function(PlatformInAppWebViewController controller, int x, int y,
+    void Function(InAppWebViewController controller)? onEnterFullscreen,
+    void Function(InAppWebViewController controller)? onExitFullscreen,
+    void Function(InAppWebViewController controller, int x, int y,
             bool clampedX, bool clampedY)?
         onOverScrolled,
-    void Function(PlatformInAppWebViewController controller, double oldScale,
+    void Function(InAppWebViewController controller, double oldScale,
             double newScale)?
         onZoomScaleChanged,
     @Deprecated('Use shouldInterceptRequest instead')
     Future<WebResourceResponse?> Function(
-            PlatformInAppWebViewController controller,
-            WebResourceRequest request)?
+            InAppWebViewController controller, WebResourceRequest request)?
         androidShouldInterceptRequest,
     @Deprecated('Use onRenderProcessUnresponsive instead')
     Future<WebViewRenderProcessAction?> Function(
-            PlatformInAppWebViewController controller, Uri? url)?
+            InAppWebViewController controller, Uri? url)?
         androidOnRenderProcessUnresponsive,
     @Deprecated('Use onRenderProcessResponsive instead')
     Future<WebViewRenderProcessAction?> Function(
-            PlatformInAppWebViewController controller, Uri? url)?
+            InAppWebViewController controller, Uri? url)?
         androidOnRenderProcessResponsive,
     @Deprecated('Use onRenderProcessGone instead')
-    void Function(PlatformInAppWebViewController controller,
-            RenderProcessGoneDetail detail)?
+    void Function(
+            InAppWebViewController controller, RenderProcessGoneDetail detail)?
         androidOnRenderProcessGone,
     @Deprecated('Use onFormResubmission instead')
     Future<FormResubmissionAction?> Function(
-            PlatformInAppWebViewController controller, Uri? url)?
+            InAppWebViewController controller, Uri? url)?
         androidOnFormResubmission,
     @Deprecated('Use onZoomScaleChanged instead')
-    void Function(PlatformInAppWebViewController controller, double oldScale,
+    void Function(InAppWebViewController controller, double oldScale,
             double newScale)?
         androidOnScaleChanged,
     @Deprecated('Use onJsBeforeUnload instead')
-    Future<JsBeforeUnloadResponse?> Function(
-            PlatformInAppWebViewController controller,
+    Future<JsBeforeUnloadResponse?> Function(InAppWebViewController controller,
             JsBeforeUnloadRequest jsBeforeUnloadRequest)?
         androidOnJsBeforeUnload,
     @Deprecated('Use onReceivedLoginRequest instead')
-    void Function(PlatformInAppWebViewController controller,
-            LoginRequest loginRequest)?
+    void Function(InAppWebViewController controller, LoginRequest loginRequest)?
         androidOnReceivedLoginRequest,
-    void Function(PlatformInAppWebViewController controller)?
+    void Function(InAppWebViewController controller)?
         onDidReceiveServerRedirectForProvisionalNavigation,
     Future<FormResubmissionAction?> Function(
-            PlatformInAppWebViewController controller, WebUri? url)?
+            InAppWebViewController controller, WebUri? url)?
         onFormResubmission,
-    void Function(PlatformInAppWebViewController controller)?
+    void Function(InAppWebViewController controller)?
         onGeolocationPermissionsHidePrompt,
     Future<GeolocationPermissionShowPromptResponse?> Function(
-            PlatformInAppWebViewController controller, String origin)?
+            InAppWebViewController controller, String origin)?
         onGeolocationPermissionsShowPrompt,
-    Future<JsBeforeUnloadResponse?> Function(
-            PlatformInAppWebViewController controller,
+    Future<JsBeforeUnloadResponse?> Function(InAppWebViewController controller,
             JsBeforeUnloadRequest jsBeforeUnloadRequest)?
         onJsBeforeUnload,
     Future<NavigationResponseAction?> Function(
-            PlatformInAppWebViewController controller,
+            InAppWebViewController controller,
             NavigationResponse navigationResponse)?
         onNavigationResponse,
-    Future<PermissionResponse?> Function(
-            PlatformInAppWebViewController controller,
+    Future<PermissionResponse?> Function(InAppWebViewController controller,
             PermissionRequest permissionRequest)?
         onPermissionRequest,
-    void Function(PlatformInAppWebViewController controller, Uint8List icon)?
+    void Function(InAppWebViewController controller, Uint8List icon)?
         onReceivedIcon,
-    void Function(PlatformInAppWebViewController controller,
-            LoginRequest loginRequest)?
+    void Function(InAppWebViewController controller, LoginRequest loginRequest)?
         onReceivedLoginRequest,
-    void Function(PlatformInAppWebViewController controller,
+    void Function(InAppWebViewController controller,
             PermissionRequest permissionRequest)?
         onPermissionRequestCanceled,
-    void Function(PlatformInAppWebViewController controller)? onRequestFocus,
-    void Function(PlatformInAppWebViewController controller, WebUri url,
-            bool precomposed)?
+    void Function(InAppWebViewController controller)? onRequestFocus,
+    void Function(
+            InAppWebViewController controller, WebUri url, bool precomposed)?
         onReceivedTouchIconUrl,
-    void Function(PlatformInAppWebViewController controller,
-            RenderProcessGoneDetail detail)?
+    void Function(
+            InAppWebViewController controller, RenderProcessGoneDetail detail)?
         onRenderProcessGone,
     Future<WebViewRenderProcessAction?> Function(
-            PlatformInAppWebViewController controller, WebUri? url)?
+            InAppWebViewController controller, WebUri? url)?
         onRenderProcessResponsive,
     Future<WebViewRenderProcessAction?> Function(
-            PlatformInAppWebViewController controller, WebUri? url)?
+            InAppWebViewController controller, WebUri? url)?
         onRenderProcessUnresponsive,
-    Future<SafeBrowsingResponse?> Function(
-            PlatformInAppWebViewController controller,
-            WebUri url,
-            SafeBrowsingThreat? threatType)?
+    Future<SafeBrowsingResponse?> Function(InAppWebViewController controller,
+            WebUri url, SafeBrowsingThreat? threatType)?
         onSafeBrowsingHit,
-    void Function(PlatformInAppWebViewController controller)?
+    void Function(InAppWebViewController controller)?
         onWebContentProcessDidTerminate,
     Future<ShouldAllowDeprecatedTLSAction?> Function(
-            PlatformInAppWebViewController controller,
+            InAppWebViewController controller,
             URLAuthenticationChallenge challenge)?
         shouldAllowDeprecatedTLS,
     Future<WebResourceResponse?> Function(
-            PlatformInAppWebViewController controller,
-            WebResourceRequest request)?
+            InAppWebViewController controller, WebResourceRequest request)?
         shouldInterceptRequest,
     Future<void> Function(
-      PlatformInAppWebViewController controller,
+      InAppWebViewController controller,
       MediaCaptureState? oldState,
       MediaCaptureState? newState,
     )? onCameraCaptureStateChanged,
     Future<void> Function(
-      PlatformInAppWebViewController controller,
+      InAppWebViewController controller,
       MediaCaptureState? oldState,
       MediaCaptureState? newState,
     )? onMicrophoneCaptureStateChanged,
-    void Function(PlatformInAppWebViewController controller,
-            Size oldContentSize, Size newContentSize)?
+    void Function(InAppWebViewController controller, Size oldContentSize,
+            Size newContentSize)?
         onContentSizeChanged,
   }) : this.fromPlatformCreationParams(
             params: PlatformHeadlessInAppWebViewCreationParams(
+          controllerFromPlatform: (PlatformInAppWebViewController controller) =>
+              InAppWebViewController.fromPlatform(platform: controller),
           initialSize: initialSize,
           windowId: windowId,
           initialUrlRequest: initialUrlRequest,
@@ -337,95 +316,332 @@ class HeadlessInAppWebView {
           pullToRefreshController: pullToRefreshController?.platform,
           findInteractionController: findInteractionController?.platform,
           contextMenu: contextMenu,
-          onWebViewCreated: onWebViewCreated,
-          onLoadStart: onLoadStart,
-          onLoadStop: onLoadStop,
-          onLoadError: onLoadError,
-          onReceivedError: onReceivedError,
-          onLoadHttpError: onLoadHttpError,
-          onReceivedHttpError: onReceivedHttpError,
-          onConsoleMessage: onConsoleMessage,
-          onProgressChanged: onProgressChanged,
-          shouldOverrideUrlLoading: shouldOverrideUrlLoading,
-          onLoadResource: onLoadResource,
-          onScrollChanged: onScrollChanged,
-          onDownloadStart: onDownloadStart,
-          onDownloadStartRequest: onDownloadStartRequest,
-          onLoadResourceCustomScheme: onLoadResourceCustomScheme,
-          onLoadResourceWithCustomScheme: onLoadResourceWithCustomScheme,
-          onCreateWindow: onCreateWindow,
-          onCloseWindow: onCloseWindow,
-          onJsAlert: onJsAlert,
-          onJsConfirm: onJsConfirm,
-          onJsPrompt: onJsPrompt,
-          onReceivedHttpAuthRequest: onReceivedHttpAuthRequest,
-          onReceivedServerTrustAuthRequest: onReceivedServerTrustAuthRequest,
-          onReceivedClientCertRequest: onReceivedClientCertRequest,
-          onFindResultReceived: onFindResultReceived,
-          shouldInterceptAjaxRequest: shouldInterceptAjaxRequest,
-          onAjaxReadyStateChange: onAjaxReadyStateChange,
-          onAjaxProgress: onAjaxProgress,
-          shouldInterceptFetchRequest: shouldInterceptFetchRequest,
-          onUpdateVisitedHistory: onUpdateVisitedHistory,
-          onPrint: onPrint,
-          onPrintRequest: onPrintRequest,
-          onLongPressHitTestResult: onLongPressHitTestResult,
-          onEnterFullscreen: onEnterFullscreen,
-          onExitFullscreen: onExitFullscreen,
-          onPageCommitVisible: onPageCommitVisible,
-          onTitleChanged: onTitleChanged,
-          onWindowFocus: onWindowFocus,
-          onWindowBlur: onWindowBlur,
-          onOverScrolled: onOverScrolled,
-          onZoomScaleChanged: onZoomScaleChanged,
-          androidOnSafeBrowsingHit: androidOnSafeBrowsingHit,
-          onSafeBrowsingHit: onSafeBrowsingHit,
-          androidOnPermissionRequest: androidOnPermissionRequest,
-          onPermissionRequest: onPermissionRequest,
+          onWebViewCreated: onWebViewCreated != null
+              ? (controller) => onWebViewCreated.call(controller)
+              : null,
+          onLoadStart: onLoadStart != null
+              ? (controller, url) => onLoadStart.call(controller, url)
+              : null,
+          onLoadStop: onLoadStop != null
+              ? (controller, url) => onLoadStop.call(controller, url)
+              : null,
+          onLoadError: onLoadError != null
+              ? (controller, url, code, message) =>
+                  onLoadError.call(controller, url, code, message)
+              : null,
+          onReceivedError: onReceivedError != null
+              ? (controller, request, error) =>
+                  onReceivedError.call(controller, request, error)
+              : null,
+          onLoadHttpError: onLoadHttpError != null
+              ? (controller, url, statusCode, description) =>
+                  onLoadHttpError.call(controller, url, statusCode, description)
+              : null,
+          onReceivedHttpError: onReceivedHttpError != null
+              ? (controller, request, errorResponse) =>
+                  onReceivedHttpError.call(controller, request, errorResponse)
+              : null,
+          onConsoleMessage: onConsoleMessage != null
+              ? (controller, consoleMessage) =>
+                  onConsoleMessage.call(controller, consoleMessage)
+              : null,
+          onProgressChanged: onProgressChanged != null
+              ? (controller, progress) =>
+                  onProgressChanged.call(controller, progress)
+              : null,
+          shouldOverrideUrlLoading: shouldOverrideUrlLoading != null
+              ? (controller, navigationAction) =>
+                  shouldOverrideUrlLoading(controller, navigationAction)
+              : null,
+          onLoadResource: onLoadResource != null
+              ? (controller, resource) =>
+                  onLoadResource.call(controller, resource)
+              : null,
+          onScrollChanged: onScrollChanged != null
+              ? (controller, x, y) => onScrollChanged.call(controller, x, y)
+              : null,
+          onDownloadStart: onDownloadStart != null
+              ? (controller, url) => onDownloadStart.call(controller, url)
+              : null,
+          onDownloadStartRequest: onDownloadStartRequest != null
+              ? (controller, downloadStartRequest) =>
+                  onDownloadStartRequest.call(controller, downloadStartRequest)
+              : null,
+          onLoadResourceCustomScheme: onLoadResourceCustomScheme != null
+              ? (controller, url) =>
+                  onLoadResourceCustomScheme.call(controller, url)
+              : null,
+          onLoadResourceWithCustomScheme: onLoadResourceWithCustomScheme != null
+              ? (controller, request) =>
+                  onLoadResourceWithCustomScheme.call(controller, request)
+              : null,
+          onCreateWindow: onCreateWindow != null
+              ? (controller, createWindowAction) =>
+                  onCreateWindow.call(controller, createWindowAction)
+              : null,
+          onCloseWindow: onCloseWindow != null
+              ? (controller) => onCloseWindow.call(controller)
+              : null,
+          onJsAlert: onJsAlert != null
+              ? (controller, jsAlertRequest) =>
+                  onJsAlert.call(controller, jsAlertRequest)
+              : null,
+          onJsConfirm: onJsConfirm != null
+              ? (controller, jsConfirmRequest) =>
+                  onJsConfirm.call(controller, jsConfirmRequest)
+              : null,
+          onJsPrompt: onJsPrompt != null
+              ? (controller, jsPromptRequest) =>
+                  onJsPrompt.call(controller, jsPromptRequest)
+              : null,
+          onReceivedHttpAuthRequest: onReceivedHttpAuthRequest != null
+              ? (controller, challenge) =>
+                  onReceivedHttpAuthRequest.call(controller, challenge)
+              : null,
+          onReceivedServerTrustAuthRequest: onReceivedServerTrustAuthRequest !=
+                  null
+              ? (controller, challenge) =>
+                  onReceivedServerTrustAuthRequest.call(controller, challenge)
+              : null,
+          onReceivedClientCertRequest: onReceivedClientCertRequest != null
+              ? (controller, challenge) =>
+                  onReceivedClientCertRequest.call(controller, challenge)
+              : null,
+          onFindResultReceived: onFindResultReceived != null
+              ? (controller, activeMatchOrdinal, numberOfMatches,
+                      isDoneCounting) =>
+                  onFindResultReceived.call(controller, activeMatchOrdinal,
+                      numberOfMatches, isDoneCounting)
+              : null,
+          shouldInterceptAjaxRequest: shouldInterceptAjaxRequest != null
+              ? (controller, ajaxRequest) =>
+                  shouldInterceptAjaxRequest.call(controller, ajaxRequest)
+              : null,
+          onAjaxReadyStateChange: onAjaxReadyStateChange != null
+              ? (controller, ajaxRequest) =>
+                  onAjaxReadyStateChange.call(controller, ajaxRequest)
+              : null,
+          onAjaxProgress: onAjaxProgress != null
+              ? (controller, ajaxRequest) =>
+                  onAjaxProgress.call(controller, ajaxRequest)
+              : null,
+          shouldInterceptFetchRequest: shouldInterceptFetchRequest != null
+              ? (controller, fetchRequest) =>
+                  shouldInterceptFetchRequest.call(controller, fetchRequest)
+              : null,
+          onUpdateVisitedHistory: onUpdateVisitedHistory != null
+              ? (controller, url, isReload) =>
+                  onUpdateVisitedHistory.call(controller, url, isReload)
+              : null,
+          onPrint: onPrint != null
+              ? (controller, url) => onPrint.call(controller, url)
+              : null,
+          onPrintRequest: onPrintRequest != null
+              ? (controller, url, printJobController) =>
+                  onPrintRequest.call(controller, url, printJobController)
+              : null,
+          onLongPressHitTestResult: onLongPressHitTestResult != null
+              ? (controller, hitTestResult) =>
+                  onLongPressHitTestResult.call(controller, hitTestResult)
+              : null,
+          onEnterFullscreen: onEnterFullscreen != null
+              ? (controller) => onEnterFullscreen.call(controller)
+              : null,
+          onExitFullscreen: onExitFullscreen != null
+              ? (controller) => onExitFullscreen.call(controller)
+              : null,
+          onPageCommitVisible: onPageCommitVisible != null
+              ? (controller, url) => onPageCommitVisible.call(controller, url)
+              : null,
+          onTitleChanged: onTitleChanged != null
+              ? (controller, title) => onTitleChanged.call(controller, title)
+              : null,
+          onWindowFocus: onWindowFocus != null
+              ? (controller) => onWindowFocus.call(controller)
+              : null,
+          onWindowBlur: onWindowBlur != null
+              ? (controller) => onWindowBlur.call(controller)
+              : null,
+          onOverScrolled: onOverScrolled != null
+              ? (controller, x, y, clampedX, clampedY) =>
+                  onOverScrolled.call(controller, x, y, clampedX, clampedY)
+              : null,
+          onZoomScaleChanged: onZoomScaleChanged != null
+              ? (controller, oldScale, newScale) =>
+                  onZoomScaleChanged.call(controller, oldScale, newScale)
+              : null,
+          androidOnSafeBrowsingHit: androidOnSafeBrowsingHit != null
+              ? (controller, url, threatType) =>
+                  androidOnSafeBrowsingHit.call(controller, url, threatType)
+              : null,
+          onSafeBrowsingHit: onSafeBrowsingHit != null
+              ? (controller, url, threatType) =>
+                  onSafeBrowsingHit.call(controller, url, threatType)
+              : null,
+          androidOnPermissionRequest: androidOnPermissionRequest != null
+              ? (controller, origin, resources) =>
+                  androidOnPermissionRequest.call(controller, origin, resources)
+              : null,
+          onPermissionRequest: onPermissionRequest != null
+              ? (controller, permissionRequest) =>
+                  onPermissionRequest.call(controller, permissionRequest)
+              : null,
           androidOnGeolocationPermissionsShowPrompt:
-              androidOnGeolocationPermissionsShowPrompt,
+              androidOnGeolocationPermissionsShowPrompt != null
+                  ? (controller, origin) =>
+                      androidOnGeolocationPermissionsShowPrompt.call(
+                          controller, origin)
+                  : null,
           onGeolocationPermissionsShowPrompt:
-              onGeolocationPermissionsShowPrompt,
+              onGeolocationPermissionsShowPrompt != null
+                  ? (controller, origin) => onGeolocationPermissionsShowPrompt
+                      .call(controller, origin)
+                  : null,
           androidOnGeolocationPermissionsHidePrompt:
-              androidOnGeolocationPermissionsHidePrompt,
+              androidOnGeolocationPermissionsHidePrompt != null
+                  ? (controller) =>
+                      androidOnGeolocationPermissionsHidePrompt.call(controller)
+                  : null,
           onGeolocationPermissionsHidePrompt:
-              onGeolocationPermissionsHidePrompt,
-          androidShouldInterceptRequest: androidShouldInterceptRequest,
-          shouldInterceptRequest: shouldInterceptRequest,
-          androidOnRenderProcessGone: androidOnRenderProcessGone,
-          onRenderProcessGone: onRenderProcessGone,
-          androidOnRenderProcessResponsive: androidOnRenderProcessResponsive,
-          onRenderProcessResponsive: onRenderProcessResponsive,
+              onGeolocationPermissionsHidePrompt != null
+                  ? (controller) =>
+                      onGeolocationPermissionsHidePrompt.call(controller)
+                  : null,
+          androidShouldInterceptRequest: androidShouldInterceptRequest != null
+              ? (controller, request) =>
+                  androidShouldInterceptRequest.call(controller, request)
+              : null,
+          shouldInterceptRequest: shouldInterceptRequest != null
+              ? (controller, request) =>
+                  shouldInterceptRequest.call(controller, request)
+              : null,
+          androidOnRenderProcessGone: androidOnRenderProcessGone != null
+              ? (controller, detail) =>
+                  androidOnRenderProcessGone.call(controller, detail)
+              : null,
+          onRenderProcessGone: onRenderProcessGone != null
+              ? (controller, detail) =>
+                  onRenderProcessGone.call(controller, detail)
+              : null,
+          androidOnRenderProcessResponsive:
+              androidOnRenderProcessResponsive != null
+                  ? (controller, url) =>
+                      androidOnRenderProcessResponsive.call(controller, url)
+                  : null,
+          onRenderProcessResponsive: onRenderProcessResponsive != null
+              ? (controller, url) =>
+                  onRenderProcessResponsive.call(controller, url)
+              : null,
           androidOnRenderProcessUnresponsive:
-              androidOnRenderProcessUnresponsive,
-          onRenderProcessUnresponsive: onRenderProcessUnresponsive,
-          androidOnFormResubmission: androidOnFormResubmission,
-          onFormResubmission: onFormResubmission,
-          androidOnScaleChanged: androidOnScaleChanged,
-          androidOnReceivedIcon: androidOnReceivedIcon,
-          onReceivedIcon: onReceivedIcon,
-          androidOnReceivedTouchIconUrl: androidOnReceivedTouchIconUrl,
-          onReceivedTouchIconUrl: onReceivedTouchIconUrl,
-          androidOnJsBeforeUnload: androidOnJsBeforeUnload,
-          onJsBeforeUnload: onJsBeforeUnload,
-          androidOnReceivedLoginRequest: androidOnReceivedLoginRequest,
-          onReceivedLoginRequest: onReceivedLoginRequest,
-          onPermissionRequestCanceled: onPermissionRequestCanceled,
-          onRequestFocus: onRequestFocus,
+              androidOnRenderProcessUnresponsive != null
+                  ? (controller, url) =>
+                      androidOnRenderProcessUnresponsive.call(controller, url)
+                  : null,
+          onRenderProcessUnresponsive: onRenderProcessUnresponsive != null
+              ? (controller, url) =>
+                  onRenderProcessUnresponsive.call(controller, url)
+              : null,
+          androidOnFormResubmission: androidOnFormResubmission != null
+              ? (controller, url) =>
+                  androidOnFormResubmission.call(controller, url)
+              : null,
+          onFormResubmission: onFormResubmission != null
+              ? (controller, url) => onFormResubmission.call(controller, url)
+              : null,
+          androidOnScaleChanged: androidOnScaleChanged != null
+              ? (controller, oldScale, newScale) =>
+                  androidOnScaleChanged.call(controller, oldScale, newScale)
+              : null,
+          androidOnReceivedIcon: androidOnReceivedIcon != null
+              ? (controller, icon) =>
+                  androidOnReceivedIcon.call(controller, icon)
+              : null,
+          onReceivedIcon: onReceivedIcon != null
+              ? (controller, icon) => onReceivedIcon.call(controller, icon)
+              : null,
+          androidOnReceivedTouchIconUrl: androidOnReceivedTouchIconUrl != null
+              ? (controller, url, precomposed) => androidOnReceivedTouchIconUrl
+                  .call(controller, url, precomposed)
+              : null,
+          onReceivedTouchIconUrl: onReceivedTouchIconUrl != null
+              ? (controller, url, precomposed) =>
+                  onReceivedTouchIconUrl.call(controller, url, precomposed)
+              : null,
+          androidOnJsBeforeUnload: androidOnJsBeforeUnload != null
+              ? (controller, jsBeforeUnloadRequest) => androidOnJsBeforeUnload
+                  .call(controller, jsBeforeUnloadRequest)
+              : null,
+          onJsBeforeUnload: onJsBeforeUnload != null
+              ? (controller, jsBeforeUnloadRequest) =>
+                  onJsBeforeUnload.call(controller, jsBeforeUnloadRequest)
+              : null,
+          androidOnReceivedLoginRequest: androidOnReceivedLoginRequest != null
+              ? (controller, loginRequest) =>
+                  androidOnReceivedLoginRequest.call(controller, loginRequest)
+              : null,
+          onReceivedLoginRequest: onReceivedLoginRequest != null
+              ? (controller, loginRequest) =>
+                  onReceivedLoginRequest.call(controller, loginRequest)
+              : null,
+          onPermissionRequestCanceled: onPermissionRequestCanceled != null
+              ? (controller, permissionRequest) => onPermissionRequestCanceled
+                  .call(controller, permissionRequest)
+              : null,
+          onRequestFocus: onRequestFocus != null
+              ? (controller) => onRequestFocus.call(controller)
+              : null,
           iosOnWebContentProcessDidTerminate:
-              iosOnWebContentProcessDidTerminate,
-          onWebContentProcessDidTerminate: onWebContentProcessDidTerminate,
+              iosOnWebContentProcessDidTerminate != null
+                  ? (controller) =>
+                      iosOnWebContentProcessDidTerminate.call(controller)
+                  : null,
+          onWebContentProcessDidTerminate: onWebContentProcessDidTerminate !=
+                  null
+              ? (controller) => onWebContentProcessDidTerminate.call(controller)
+              : null,
           iosOnDidReceiveServerRedirectForProvisionalNavigation:
-              iosOnDidReceiveServerRedirectForProvisionalNavigation,
+              iosOnDidReceiveServerRedirectForProvisionalNavigation != null
+                  ? (controller) =>
+                      iosOnDidReceiveServerRedirectForProvisionalNavigation
+                          .call(controller)
+                  : null,
           onDidReceiveServerRedirectForProvisionalNavigation:
-              onDidReceiveServerRedirectForProvisionalNavigation,
-          iosOnNavigationResponse: iosOnNavigationResponse,
-          onNavigationResponse: onNavigationResponse,
-          iosShouldAllowDeprecatedTLS: iosShouldAllowDeprecatedTLS,
-          shouldAllowDeprecatedTLS: shouldAllowDeprecatedTLS,
-          onCameraCaptureStateChanged: onCameraCaptureStateChanged,
-          onMicrophoneCaptureStateChanged: onMicrophoneCaptureStateChanged,
-          onContentSizeChanged: onContentSizeChanged,
+              onDidReceiveServerRedirectForProvisionalNavigation != null
+                  ? (controller) =>
+                      onDidReceiveServerRedirectForProvisionalNavigation
+                          .call(controller)
+                  : null,
+          iosOnNavigationResponse: iosOnNavigationResponse != null
+              ? (controller, navigationResponse) =>
+                  iosOnNavigationResponse.call(controller, navigationResponse)
+              : null,
+          onNavigationResponse: onNavigationResponse != null
+              ? (controller, navigationResponse) =>
+                  onNavigationResponse.call(controller, navigationResponse)
+              : null,
+          iosShouldAllowDeprecatedTLS: iosShouldAllowDeprecatedTLS != null
+              ? (controller, challenge) =>
+                  iosShouldAllowDeprecatedTLS.call(controller, challenge)
+              : null,
+          shouldAllowDeprecatedTLS: shouldAllowDeprecatedTLS != null
+              ? (controller, challenge) =>
+                  shouldAllowDeprecatedTLS.call(controller, challenge)
+              : null,
+          onCameraCaptureStateChanged: onCameraCaptureStateChanged != null
+              ? (controller, oldState, newState) => onCameraCaptureStateChanged
+                  .call(controller, oldState, newState)
+              : null,
+          onMicrophoneCaptureStateChanged:
+              onMicrophoneCaptureStateChanged != null
+                  ? (controller, oldState, newState) =>
+                      onMicrophoneCaptureStateChanged.call(
+                          controller, oldState, newState)
+                  : null,
+          onContentSizeChanged: onContentSizeChanged != null
+              ? (controller, oldContentSize, newContentSize) =>
+                  onContentSizeChanged.call(
+                      controller, oldContentSize, newContentSize)
+              : null,
         ));
 
   ///Runs the headless WebView.

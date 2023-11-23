@@ -10,7 +10,7 @@ void setCustomUserAgent() {
         ].contains(defaultTargetPlatform);
 
   skippableTestWidgets('set custom userAgent', (WidgetTester tester) async {
-    final Completer controllerCompleter1 = Completer<PlatformInAppWebViewController>();
+    final Completer controllerCompleter1 = Completer<InAppWebViewController>();
     await tester.pumpWidget(
       Directionality(
         textDirection: TextDirection.ltr,

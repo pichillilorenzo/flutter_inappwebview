@@ -31,8 +31,8 @@ void resizeWebView() {
     final Completer<void> resizeCompleter = Completer<void>();
     final Completer<void> pageStarted = Completer<void>();
     final Completer<void> pageLoaded = Completer<void>();
-    final Completer<PlatformInAppWebViewController> controllerCompleter =
-        Completer<PlatformInAppWebViewController>();
+    final Completer<InAppWebViewController> controllerCompleter =
+        Completer<InAppWebViewController>();
     final GlobalKey key = GlobalKey();
 
     final InAppWebView webView = InAppWebView(

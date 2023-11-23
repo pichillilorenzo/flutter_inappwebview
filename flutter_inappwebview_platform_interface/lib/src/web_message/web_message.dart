@@ -17,7 +17,7 @@ class WebMessage_ {
   WebMessageType_ type;
 
   ///The ports that are sent with the message.
-  List<PlatformWebMessagePort>? ports;
+  List<IWebMessagePort>? ports;
 
   @ExchangeableObjectConstructor()
   WebMessage_({this.data, this.type = WebMessageType_.STRING, this.ports}) {

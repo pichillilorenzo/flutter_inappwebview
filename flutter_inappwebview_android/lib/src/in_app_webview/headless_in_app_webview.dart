@@ -17,7 +17,8 @@ class AndroidHeadlessInAppWebViewCreationParams
     extends PlatformHeadlessInAppWebViewCreationParams {
   /// Creates a new [AndroidHeadlessInAppWebViewCreationParams] instance.
   AndroidHeadlessInAppWebViewCreationParams(
-      {super.initialSize,
+      {super.controllerFromPlatform,
+      super.initialSize,
       super.windowId,
       super.onWebViewCreated,
       super.onLoadStart,
@@ -132,6 +133,7 @@ class AndroidHeadlessInAppWebViewCreationParams
   AndroidHeadlessInAppWebViewCreationParams.fromPlatformHeadlessInAppWebViewCreationParams(
       PlatformHeadlessInAppWebViewCreationParams params)
       : this(
+            controllerFromPlatform: params.controllerFromPlatform,
             initialSize: params.initialSize,
             windowId: params.windowId,
             onWebViewCreated: params.onWebViewCreated,
@@ -288,6 +290,8 @@ class AndroidHeadlessInAppWebView extends PlatformHeadlessInAppWebView
   @override
   AndroidInAppWebViewController? get webViewController => _webViewController;
 
+  dynamic _controllerFromPlatform;
+
   AndroidHeadlessInAppWebViewCreationParams get _androidParams =>
       params as AndroidHeadlessInAppWebViewCreationParams;
 
@@ -296,6 +300,9 @@ class AndroidHeadlessInAppWebView extends PlatformHeadlessInAppWebView
       AndroidInAppWebViewControllerCreationParams(
           id: id, webviewParams: params),
     );
+    _controllerFromPlatform =
+        params.controllerFromPlatform?.call(_webViewController!) ??
+            _webViewController!;
     _androidParams.pullToRefreshController?.init(id);
     _androidParams.findInteractionController?.init(id);
     channel =
@@ -308,7 +315,7 @@ class AndroidHeadlessInAppWebView extends PlatformHeadlessInAppWebView
     switch (call.method) {
       case "onWebViewCreated":
         if (params.onWebViewCreated != null && _webViewController != null) {
-          params.onWebViewCreated!(_webViewController!);
+          params.onWebViewCreated!(_controllerFromPlatform);
         }
         break;
       default:
@@ -478,6 +485,7 @@ class AndroidHeadlessInAppWebView extends PlatformHeadlessInAppWebView
     _running = false;
     _webViewController?.dispose();
     _webViewController = null;
+    _controllerFromPlatform = null;
     _androidParams.pullToRefreshController?.dispose();
     _androidParams.findInteractionController?.dispose();
   }

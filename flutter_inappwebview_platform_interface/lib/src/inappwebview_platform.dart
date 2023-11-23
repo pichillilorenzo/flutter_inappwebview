@@ -1,5 +1,6 @@
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 
+import 'chrome_safari_browser/platform_chrome_safari_browser.dart';
 import 'find_interaction/platform_find_interaction_controller.dart';
 import 'in_app_browser/platform_in_app_browser.dart';
 import 'in_app_webview/platform_headless_in_app_webview.dart';
@@ -348,26 +349,6 @@ abstract class InAppWebViewPlatform extends PlatformInterface {
         'createPlatformTracingController is not implemented on the current platform.');
   }
 
-  /// Creates a new [PlatformWebViewAssetLoader].
-  ///
-  /// This function should only be called by the app-facing package.
-  /// Look at using [WebViewAssetLoader] in `flutter_inappwebview` instead.
-  PlatformWebViewAssetLoader createPlatformWebViewAssetLoader(
-    PlatformWebViewAssetLoaderCreationParams params,
-  ) {
-    throw UnimplementedError(
-        'createPlatformWebViewAssetLoader is not implemented on the current platform.');
-  }
-
-  /// Creates a new empty [PlatformWebViewAssetLoader] to access static methods.
-  ///
-  /// This function should only be called by the app-facing package.
-  /// Look at using [WebViewAssetLoader] in `flutter_inappwebview` instead.
-  PlatformWebViewAssetLoader createPlatformWebViewAssetLoaderStatic() {
-    throw UnimplementedError(
-        'createPlatformWebViewAssetLoaderStatic is not implemented on the current platform.');
-  }
-
   /// Creates a new [PlatformPathHandler].
   ///
   /// This function should only be called by the app-facing package.
@@ -439,5 +420,25 @@ abstract class InAppWebViewPlatform extends PlatformInterface {
   PlatformInAppLocalhostServer createPlatformInAppLocalhostServer(
       PlatformInAppLocalhostServerCreationParams params) {
     return DefaultInAppLocalhostServer(params);
+  }
+
+  /// Creates a new [PlatformChromeSafariBrowser].
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [ChromeSafariBrowser] in `flutter_inappwebview` instead.
+  PlatformChromeSafariBrowser createPlatformChromeSafariBrowser(
+      PlatformChromeSafariBrowserCreationParams params,
+      ) {
+    throw UnimplementedError(
+        'createPlatformChromeSafariBrowser is not implemented on the current platform.');
+  }
+
+  /// Creates a new empty [PlatformChromeSafariBrowser] to access static methods.
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [ChromeSafariBrowser] in `flutter_inappwebview` instead.
+  PlatformChromeSafariBrowser createPlatformChromeSafariBrowserStatic() {
+    throw UnimplementedError(
+        'createPlatformChromeSafariBrowserStatic is not implemented on the current platform.');
   }
 }

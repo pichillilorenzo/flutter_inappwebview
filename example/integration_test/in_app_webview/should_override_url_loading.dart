@@ -16,8 +16,8 @@ void shouldOverrideUrlLoading() {
         base64Encode(const Utf8Encoder().convert(page));
 
     skippableTestWidgets('can allow requests', (WidgetTester tester) async {
-      final Completer<PlatformInAppWebViewController> controllerCompleter =
-          Completer<PlatformInAppWebViewController>();
+      final Completer<InAppWebViewController> controllerCompleter =
+          Completer<InAppWebViewController>();
       final StreamController<String> pageLoads =
           StreamController<String>.broadcast();
       await tester.pumpWidget(
@@ -43,7 +43,7 @@ void shouldOverrideUrlLoading() {
       );
 
       await pageLoads.stream.first; // Wait for initial page load.
-      final PlatformInAppWebViewController controller =
+      final InAppWebViewController controller =
           await controllerCompleter.future;
       await controller.evaluateJavascript(
           source: 'location.href = "$TEST_URL_2"');
@@ -65,8 +65,8 @@ void shouldOverrideUrlLoading() {
     testWidgets(
         'allow requests on iOS only if navigationType == NavigationType.LINK_ACTIVATED',
         (WidgetTester tester) async {
-      final Completer<PlatformInAppWebViewController> controllerCompleter =
-          Completer<PlatformInAppWebViewController>();
+      final Completer<InAppWebViewController> controllerCompleter =
+          Completer<InAppWebViewController>();
       final StreamController<String> pageLoads =
           StreamController<String>.broadcast();
       await tester.pumpWidget(
@@ -94,7 +94,7 @@ void shouldOverrideUrlLoading() {
       );
 
       await pageLoads.stream.first; // Wait for initial page load.
-      final PlatformInAppWebViewController controller =
+      final InAppWebViewController controller =
           await controllerCompleter.future;
       await controller.evaluateJavascript(
           source: 'location.href = "$TEST_URL_2"');
@@ -120,8 +120,8 @@ void shouldOverrideUrlLoading() {
     }, skip: shouldSkipTest2);
 
     skippableTestWidgets('can block requests', (WidgetTester tester) async {
-      final Completer<PlatformInAppWebViewController> controllerCompleter =
-          Completer<PlatformInAppWebViewController>();
+      final Completer<InAppWebViewController> controllerCompleter =
+          Completer<InAppWebViewController>();
       final StreamController<String> pageLoads =
           StreamController<String>.broadcast();
       await tester.pumpWidget(
@@ -147,7 +147,7 @@ void shouldOverrideUrlLoading() {
       );
 
       await pageLoads.stream.first; // Wait for initial page load.
-      final PlatformInAppWebViewController controller =
+      final InAppWebViewController controller =
           await controllerCompleter.future;
       await controller.evaluateJavascript(
           source: 'location.href = "$TEST_URL_4"');
@@ -169,8 +169,8 @@ void shouldOverrideUrlLoading() {
 
     skippableTestWidgets('supports asynchronous decisions',
         (WidgetTester tester) async {
-      final Completer<PlatformInAppWebViewController> controllerCompleter =
-          Completer<PlatformInAppWebViewController>();
+      final Completer<InAppWebViewController> controllerCompleter =
+          Completer<InAppWebViewController>();
       final StreamController<String> pageLoads =
           StreamController<String>.broadcast();
       await tester.pumpWidget(
@@ -197,7 +197,7 @@ void shouldOverrideUrlLoading() {
       );
 
       await pageLoads.stream.first; // Wait for initial page load.
-      final PlatformInAppWebViewController controller =
+      final InAppWebViewController controller =
           await controllerCompleter.future;
       await controller.evaluateJavascript(
           source: 'location.href = "$TEST_URL_2"');

@@ -20,16 +20,16 @@ void main() {
 
   PlatformInAppWebViewController.debugLoggingSettings.usePrint = true;
   PlatformInAppWebViewController.debugLoggingSettings.maxLogMessageLength = 7000;
-  InAppBrowser.debugLoggingSettings.usePrint = true;
-  InAppBrowser.debugLoggingSettings.maxLogMessageLength = 7000;
+  PlatformInAppBrowser.debugLoggingSettings.usePrint = true;
+  PlatformInAppBrowser.debugLoggingSettings.maxLogMessageLength = 7000;
   PlatformChromeSafariBrowser.debugLoggingSettings.usePrint = true;
   PlatformChromeSafariBrowser.debugLoggingSettings.maxLogMessageLength = 7000;
-  WebAuthenticationSession.debugLoggingSettings.usePrint = true;
-  WebAuthenticationSession.debugLoggingSettings.maxLogMessageLength = 7000;
-  PullToRefreshController.debugLoggingSettings.usePrint = true;
-  PullToRefreshController.debugLoggingSettings.maxLogMessageLength = 7000;
-  FindInteractionController.debugLoggingSettings.usePrint = true;
-  FindInteractionController.debugLoggingSettings.maxLogMessageLength = 7000;
+  PlatformWebAuthenticationSession.debugLoggingSettings.usePrint = true;
+  PlatformWebAuthenticationSession.debugLoggingSettings.maxLogMessageLength = 7000;
+  PlatformPullToRefreshController.debugLoggingSettings.usePrint = true;
+  PlatformPullToRefreshController.debugLoggingSettings.maxLogMessageLength = 7000;
+  PlatformFindInteractionController.debugLoggingSettings.usePrint = true;
+  PlatformFindInteractionController.debugLoggingSettings.maxLogMessageLength = 7000;
 
   process_global_config_tests.main();
   in_app_webview_tests.main();

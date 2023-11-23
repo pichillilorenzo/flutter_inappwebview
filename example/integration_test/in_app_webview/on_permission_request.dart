@@ -12,8 +12,8 @@ void onPermissionRequest() {
   final expectedValue = [PermissionResourceType.CAMERA];
 
   skippableTestWidgets('onPermissionRequest', (WidgetTester tester) async {
-    final Completer<PlatformInAppWebViewController> controllerCompleter =
-        Completer<PlatformInAppWebViewController>();
+    final Completer<InAppWebViewController> controllerCompleter =
+        Completer<InAppWebViewController>();
     final Completer<void> pageLoaded = Completer<void>();
     final Completer<List<PermissionResourceType>> onPermissionRequestCompleter =
         Completer<List<PermissionResourceType>>();
@@ -40,7 +40,7 @@ void onPermissionRequest() {
       ),
     );
 
-    final PlatformInAppWebViewController controller = await controllerCompleter.future;
+    final InAppWebViewController controller = await controllerCompleter.future;
     await pageLoaded.future;
     await controller.evaluateJavascript(
         source: "document.querySelector('#camera').click();");
@@ -61,8 +61,8 @@ void onPermissionRequest() {
 
   skippableTestWidgets('onPermissionRequestCanceled',
       (WidgetTester tester) async {
-    final Completer<PlatformInAppWebViewController> controllerCompleter =
-        Completer<PlatformInAppWebViewController>();
+    final Completer<InAppWebViewController> controllerCompleter =
+        Completer<InAppWebViewController>();
     final Completer<void> pageLoaded = Completer<void>();
     final Completer<List<PermissionResourceType>> onPermissionRequestCompleter =
         Completer<List<PermissionResourceType>>();
@@ -99,7 +99,7 @@ void onPermissionRequest() {
       ),
     );
 
-    final PlatformInAppWebViewController controller = await controllerCompleter.future;
+    final InAppWebViewController controller = await controllerCompleter.future;
     await pageLoaded.future;
     await controller.evaluateJavascript(
         source: "document.querySelector('#camera').click();");

@@ -1,30 +1,13 @@
 import 'package:flutter/foundation.dart';
+import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_internal_annotations.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 
 import 'inappwebview_platform.dart';
 import 'types/web_resource_response.dart';
 
-/// Object specifying creation parameters for creating a [PlatformWebViewAssetLoader].
-///
-/// Platform specific implementations can add additional fields by extending
-/// this class.
-@immutable
-class PlatformWebViewAssetLoaderCreationParams {
-  /// Used by the platform implementation to create a new [PlatformWebViewAssetLoader].
-  const PlatformWebViewAssetLoaderCreationParams(
-      {this.domain, this.httpAllowed, this.pathHandlers});
+part 'platform_webview_asset_loader.g.dart';
 
-  ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewAssetLoader.domain}
-  final String? domain;
-
-  ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewAssetLoader.httpAllowed}
-  final bool? httpAllowed;
-
-  ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewAssetLoader.pathHandlers}
-  final List<PlatformPathHandler>? pathHandlers;
-}
-
-///Helper class to load local files including application's static assets and resources using http(s):// URLs inside a `WebView` class.
+///Helper class to load local files including application's static assets and resources using http(s):// URLs inside a [WebView] class.
 ///Loading local files using web-like URLs instead of `file://` is desirable as it is compatible with the Same-Origin policy.
 ///
 ///For more context about application's assets and resources and how to normally access them please refer to
@@ -36,77 +19,32 @@ class PlatformWebViewAssetLoaderCreationParams {
 ///
 ///**Supported Platforms/Implementations**:
 ///- Android native WebView
-abstract class PlatformWebViewAssetLoader extends PlatformInterface {
+@ExchangeableObject(copyMethod: true)
+class WebViewAssetLoader_ {
   ///An unused domain reserved for Android applications to intercept requests for app assets.
   ///
   ///It is used by default unless the user specified a different domain.
   static final String DEFAULT_DOMAIN = "appassets.androidplatform.net";
 
-  ///{@template flutter_inappwebview_platform_interface.PlatformWebViewAssetLoader.domain}
   ///Set the domain under which app assets can be accessed. The default domain is `appassets.androidplatform.net`.
-  ///{@endtemplate}
-  String? get domain => params.domain;
+  String? domain;
 
-  ///{@template flutter_inappwebview_platform_interface.PlatformWebViewAssetLoader.httpAllowed}
   ///Allow using the HTTP scheme in addition to HTTPS. The default is to not allow HTTP.
-  ///{@endtemplate}
-  bool? get httpAllowed => params.httpAllowed;
+  bool? httpAllowed;
 
-  ///{@template flutter_inappwebview_platform_interface.PlatformWebViewAssetLoader.pathHandlers}
   ///List of registered path handlers.
   ///
   ///[WebViewAssetLoader] will try Path Handlers in the order they're registered,
   ///and will use whichever is the first to return a non-null.
-  ///{@endtemplate}
-  List<PlatformPathHandler>? get pathHandlers => params.pathHandlers;
+  List<IPathHandler>? pathHandlers;
 
-  /// Creates a new [PlatformWebViewAssetLoader]
-  factory PlatformWebViewAssetLoader(
-      PlatformWebViewAssetLoaderCreationParams params) {
-    assert(
-      InAppWebViewPlatform.instance != null,
-      'A platform implementation for `flutter_inappwebview` has not been set. Please '
-      'ensure that an implementation of `InAppWebViewPlatform` has been set to '
-      '`WebViewPlatform.instance` before use. For unit testing, '
-      '`WebViewPlatform.instance` can be set with your own test implementation.',
-    );
-    final PlatformWebViewAssetLoader webViewAssetLoader =
-        InAppWebViewPlatform.instance!.createPlatformWebViewAssetLoader(params);
-    PlatformInterface.verify(webViewAssetLoader, _token);
-    return webViewAssetLoader;
-  }
+  WebViewAssetLoader_({this.domain, this.httpAllowed, this.pathHandlers});
+}
 
-  /// Creates a new [PlatformWebViewAssetLoader] to access static methods.
-  factory PlatformWebViewAssetLoader.static() {
-    assert(
-    InAppWebViewPlatform.instance != null,
-    'A platform implementation for `flutter_inappwebview` has not been set. Please '
-        'ensure that an implementation of `InAppWebViewPlatform` has been set to '
-        '`InAppWebViewPlatform.instance` before use. For unit testing, '
-        '`InAppWebViewPlatform.instance` can be set with your own test implementation.',
-    );
-    final PlatformWebViewAssetLoader webViewAssetLoader =
-    InAppWebViewPlatform.instance!.createPlatformWebViewAssetLoaderStatic();
-    PlatformInterface.verify(webViewAssetLoader, _token);
-    return webViewAssetLoader;
-  }
-
-  /// Used by the platform implementation to create a new
-  /// [PlatformWebViewAssetLoader].
-  ///
-  /// Should only be used by platform implementations because they can't extend
-  /// a class that only contains a factory constructor.
-  @protected
-  PlatformWebViewAssetLoader.implementation(this.params) : super(token: _token);
-
-  static final Object _token = Object();
-
-  /// The parameters used to initialize the [PlatformWebViewAssetLoader].
-  final PlatformWebViewAssetLoaderCreationParams params;
-
-  PlatformWebViewAssetLoader? fromMap(Map<String, dynamic>? map) {
+abstract class IPathHandler {
+  String get path {
     throw UnimplementedError(
-        'fromMap is not implemented on the current platform');
+        'path is not implemented on the current platform');
   }
 
   Map<String, dynamic> toMap() {
@@ -117,11 +55,6 @@ abstract class PlatformWebViewAssetLoader extends PlatformInterface {
   Map<String, dynamic> toJson() {
     throw UnimplementedError(
         'toJson is not implemented on the current platform');
-  }
-
-  PlatformWebViewAssetLoader copy() {
-    throw UnimplementedError(
-        'copy is not implemented on the current platform');
   }
 }
 
@@ -141,7 +74,7 @@ class PlatformPathHandlerCreationParams {
 ///A handler that produces responses for a registered path.
 ///
 ///Implement this interface to handle other use-cases according to your app's needs.
-abstract class PlatformPathHandler extends PlatformInterface {
+abstract class PlatformPathHandler extends PlatformInterface implements IPathHandler {
   /// Creates a new [PlatformWebViewAssetLoader]
   factory PlatformPathHandler(PlatformPathHandlerCreationParams params) {
     assert(
@@ -240,7 +173,7 @@ class PlatformAssetsPathHandlerCreationParams
 ///[guessContentTypeFromName](https://developer.android.com/reference/java/net/URLConnection.html#guessContentTypeFromName-java.lang.String-).
 ///Developers should ensure that asset files are named using standard file extensions.
 ///If the file does not have a recognised extension, `text/plain` will be used by default.
-class PlatformAssetsPathHandler extends PlatformPathHandler {
+abstract class PlatformAssetsPathHandler extends PlatformPathHandler {
   /// Creates a new [PlatformAssetsPathHandler]
   factory PlatformAssetsPathHandler(
       PlatformAssetsPathHandlerCreationParams params) {
@@ -308,7 +241,7 @@ class PlatformResourcesPathHandlerCreationParams
 ///[guessContentTypeFromName](https://developer.android.com/reference/java/net/URLConnection.html#guessContentTypeFromName-java.lang.String-).
 ///Developers should ensure that asset files are named using standard file extensions.
 ///If the file does not have a recognised extension, `text/plain` will be used by default.
-class PlatformResourcesPathHandler extends PlatformPathHandler {
+abstract class PlatformResourcesPathHandler extends PlatformPathHandler {
   /// Creates a new [PlatformResourcesPathHandler]
   factory PlatformResourcesPathHandler(
       PlatformResourcesPathHandlerCreationParams params) {
@@ -387,7 +320,7 @@ class PlatformInternalStoragePathHandlerCreationParams
 ///[guessContentTypeFromName](https://developer.android.com/reference/java/net/URLConnection.html#guessContentTypeFromName-java.lang.String-).
 ///Developers should ensure that asset files are named using standard file extensions.
 ///If the file does not have a recognised extension, `text/plain` will be used by default.
-class PlatformInternalStoragePathHandler extends PlatformPathHandler {
+abstract class PlatformInternalStoragePathHandler extends PlatformPathHandler {
   /// Creates a new [PlatformResourcesPathHandler]
   factory PlatformInternalStoragePathHandler(
       PlatformInternalStoragePathHandlerCreationParams params) {

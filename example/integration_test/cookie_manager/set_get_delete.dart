@@ -11,8 +11,8 @@ void setGetDelete() {
 
   skippableTestWidgets('set, get, delete', (WidgetTester tester) async {
     CookieManager cookieManager = CookieManager.instance();
-    final Completer<PlatformInAppWebViewController> controllerCompleter =
-        Completer<PlatformInAppWebViewController>();
+    final Completer<InAppWebViewController> controllerCompleter =
+        Completer<InAppWebViewController>();
     final Completer<String> pageLoaded = Completer<String>();
 
     var headlessWebView = new HeadlessInAppWebView(

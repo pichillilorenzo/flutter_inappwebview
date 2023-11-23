@@ -102,7 +102,10 @@ abstract class PlatformInAppBrowser extends PlatformInterface implements Disposa
   ///WebView Controller that can be used to access the [PlatformInAppWebViewController] API.
   ///When [onExit] is fired, this will be `null` and cannot be used anymore.
   ///@{endtemplate}
-  PlatformInAppWebViewController? get webViewController;
+  PlatformInAppWebViewController? get webViewController {
+    throw UnimplementedError(
+        'webViewController is not implemented on the current platform');
+  }
 
   /// Creates a new [PlatformInAppBrowser]
   factory PlatformInAppBrowser(PlatformInAppBrowserCreationParams params) {

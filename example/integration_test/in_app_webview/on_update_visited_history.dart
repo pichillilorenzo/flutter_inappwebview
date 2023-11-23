@@ -12,8 +12,8 @@ void onUpdateVisitedHistory() {
   var url = !kIsWeb ? TEST_CROSS_PLATFORM_URL_1 : TEST_WEB_PLATFORM_URL_1;
 
   skippableTestWidgets('onUpdateVisitedHistory', (WidgetTester tester) async {
-    final Completer<PlatformInAppWebViewController> controllerCompleter =
-        Completer<PlatformInAppWebViewController>();
+    final Completer<InAppWebViewController> controllerCompleter =
+        Completer<InAppWebViewController>();
     final Completer<String> firstPushCompleter = Completer<String>();
     final Completer<String> secondPushCompleter = Completer<String>();
     final Completer<void> pageLoaded = Completer<void>();
@@ -42,7 +42,7 @@ void onUpdateVisitedHistory() {
       ),
     );
 
-    final PlatformInAppWebViewController controller = await controllerCompleter.future;
+    final InAppWebViewController controller = await controllerCompleter.future;
     await pageLoaded.future;
 
     await controller.evaluateJavascript(source: """

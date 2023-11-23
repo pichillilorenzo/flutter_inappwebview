@@ -64,11 +64,9 @@ class AndroidWebMessageChannel extends PlatformWebMessageChannel
     return _staticValue;
   }
 
-  AndroidWebMessagePort get _androidPort1 =>
-      port1 as AndroidWebMessagePort;
+  AndroidWebMessagePort get _androidPort1 => port1 as AndroidWebMessagePort;
 
-  AndroidWebMessagePort get _androidPort2 =>
-      port2 as AndroidWebMessagePort;
+  AndroidWebMessagePort get _androidPort2 => port2 as AndroidWebMessagePort;
 
   static AndroidWebMessageChannel? _fromMap(Map<String, dynamic>? map) {
     if (map == null) {

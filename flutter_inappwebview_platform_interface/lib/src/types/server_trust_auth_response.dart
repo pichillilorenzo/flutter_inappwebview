@@ -1,7 +1,5 @@
 import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_internal_annotations.dart';
 
-
-
 import 'server_trust_auth_response_action.dart';
 
 part 'server_trust_auth_response.g.dart';

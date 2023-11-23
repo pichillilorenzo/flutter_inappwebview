@@ -42,16 +42,18 @@ class PlatformProcessGlobalConfigCreationParams {
 ///- Android native WebView ([Official API - ProcessGlobalConfig](https://developer.android.com/reference/androidx/webkit/ProcessGlobalConfig))
 abstract class PlatformProcessGlobalConfig extends PlatformInterface {
   /// Creates a new [PlatformProcessGlobalConfig]
-  factory PlatformProcessGlobalConfig(PlatformProcessGlobalConfigCreationParams params) {
+  factory PlatformProcessGlobalConfig(
+      PlatformProcessGlobalConfigCreationParams params) {
     assert(
-    InAppWebViewPlatform.instance != null,
-    'A platform implementation for `flutter_inappwebview` has not been set. Please '
-        'ensure that an implementation of `InAppWebViewPlatform` has been set to '
-        '`WebViewPlatform.instance` before use. For unit testing, '
-        '`WebViewPlatform.instance` can be set with your own test implementation.',
+      InAppWebViewPlatform.instance != null,
+      'A platform implementation for `flutter_inappwebview` has not been set. Please '
+      'ensure that an implementation of `InAppWebViewPlatform` has been set to '
+      '`WebViewPlatform.instance` before use. For unit testing, '
+      '`WebViewPlatform.instance` can be set with your own test implementation.',
     );
-    final PlatformProcessGlobalConfig processGlobalConfig =
-    InAppWebViewPlatform.instance!.createPlatformProcessGlobalConfig(params);
+    final PlatformProcessGlobalConfig processGlobalConfig = InAppWebViewPlatform
+        .instance!
+        .createPlatformProcessGlobalConfig(params);
     PlatformInterface.verify(processGlobalConfig, _token);
     return processGlobalConfig;
   }

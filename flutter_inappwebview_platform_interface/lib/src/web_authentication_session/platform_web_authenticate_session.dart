@@ -66,7 +66,8 @@ class PlatformWebAuthenticationSessionCreationParams {
 ///**Supported Platforms/Implementations**:
 ///- iOS
 ///- MacOS
-abstract class PlatformWebAuthenticationSession extends PlatformInterface implements Disposable {
+abstract class PlatformWebAuthenticationSession extends PlatformInterface
+    implements Disposable {
   ///Debug settings.
   static DebugLoggingSettings debugLoggingSettings = DebugLoggingSettings();
 
@@ -74,14 +75,15 @@ abstract class PlatformWebAuthenticationSession extends PlatformInterface implem
   factory PlatformWebAuthenticationSession(
       PlatformWebAuthenticationSessionCreationParams params) {
     assert(
-    InAppWebViewPlatform.instance != null,
-    'A platform implementation for `flutter_inappwebview` has not been set. Please '
-        'ensure that an implementation of `InAppWebViewPlatform` has been set to '
-        '`InAppWebViewPlatform.instance` before use. For unit testing, '
-        '`InAppWebViewPlatform.instance` can be set with your own test implementation.',
+      InAppWebViewPlatform.instance != null,
+      'A platform implementation for `flutter_inappwebview` has not been set. Please '
+      'ensure that an implementation of `InAppWebViewPlatform` has been set to '
+      '`InAppWebViewPlatform.instance` before use. For unit testing, '
+      '`InAppWebViewPlatform.instance` can be set with your own test implementation.',
     );
     final PlatformWebAuthenticationSession webAuthenticationSession =
-    InAppWebViewPlatform.instance!.createPlatformWebAuthenticationSession(params);
+        InAppWebViewPlatform.instance!
+            .createPlatformWebAuthenticationSession(params);
     PlatformInterface.verify(webAuthenticationSession, _token);
     return webAuthenticationSession;
   }
@@ -89,14 +91,15 @@ abstract class PlatformWebAuthenticationSession extends PlatformInterface implem
   /// Creates a new [PlatformWebAuthenticationSession] to access static methods.
   factory PlatformWebAuthenticationSession.static() {
     assert(
-    InAppWebViewPlatform.instance != null,
-    'A platform implementation for `flutter_inappwebview` has not been set. Please '
-        'ensure that an implementation of `InAppWebViewPlatform` has been set to '
-        '`InAppWebViewPlatform.instance` before use. For unit testing, '
-        '`InAppWebViewPlatform.instance` can be set with your own test implementation.',
+      InAppWebViewPlatform.instance != null,
+      'A platform implementation for `flutter_inappwebview` has not been set. Please '
+      'ensure that an implementation of `InAppWebViewPlatform` has been set to '
+      '`InAppWebViewPlatform.instance` before use. For unit testing, '
+      '`InAppWebViewPlatform.instance` can be set with your own test implementation.',
     );
     final PlatformWebAuthenticationSession webAuthenticationSessionStatic =
-    InAppWebViewPlatform.instance!.createPlatformWebAuthenticationSessionStatic();
+        InAppWebViewPlatform.instance!
+            .createPlatformWebAuthenticationSessionStatic();
     PlatformInterface.verify(webAuthenticationSessionStatic, _token);
     return webAuthenticationSessionStatic;
   }
@@ -106,7 +109,8 @@ abstract class PlatformWebAuthenticationSession extends PlatformInterface implem
   /// Should only be used by platform implementations because they can't extend
   /// a class that only contains a factory constructor.
   @protected
-  PlatformWebAuthenticationSession.implementation(this.params) : super(token: _token);
+  PlatformWebAuthenticationSession.implementation(this.params)
+      : super(token: _token);
 
   static final Object _token = Object();
 
@@ -131,7 +135,8 @@ abstract class PlatformWebAuthenticationSession extends PlatformInterface implem
   ///{@template flutter_inappwebview_platform_interface.PlatformWebAuthenticationSession.initialSettings}
   ///Initial settings.
   ///{@endtemplate}
-  WebAuthenticationSessionSettings? get initialSettings => params.initialSettings;
+  WebAuthenticationSessionSettings? get initialSettings =>
+      params.initialSettings;
 
   ///{@template flutter_inappwebview_platform_interface.PlatformWebAuthenticationSession.onComplete}
   ///A completion handler the session calls when it completes successfully, or when the user cancels the session.

@@ -1,7 +1,5 @@
 import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_internal_annotations.dart';
 
-
-
 part 'over_scroll_mode.g.dart';
 
 ///Class used to configure the `WebView`'s over-scroll mode.

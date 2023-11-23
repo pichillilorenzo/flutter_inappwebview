@@ -1,7 +1,5 @@
 import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_internal_annotations.dart';
 
-
-
 import 'console_message_level.dart';
 
 part 'console_message.g.dart';

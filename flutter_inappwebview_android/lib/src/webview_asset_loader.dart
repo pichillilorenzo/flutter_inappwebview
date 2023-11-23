@@ -27,8 +27,7 @@ class AndroidPathHandlerCreationParams
 ///A handler that produces responses for a registered path.
 ///
 ///Implement this interface to handle other use-cases according to your app's needs.
-class AndroidPathHandler extends PlatformPathHandler
-    with ChannelController {
+class AndroidPathHandler extends PlatformPathHandler with ChannelController {
   /// Creates a new [AndroidPathHandler].
   AndroidPathHandler(PlatformPathHandlerCreationParams params)
       : super.implementation(
@@ -90,10 +89,10 @@ class AndroidAssetsPathHandlerCreationParams
     extends PlatformAssetsPathHandlerCreationParams {
   /// Creates a new [AndroidAssetsPathHandlerCreationParams] instance.
   AndroidAssetsPathHandlerCreationParams(
-      // This parameter prevents breaking changes later.
-      // ignore: avoid_unused_constructor_parameters
-      PlatformAssetsPathHandlerCreationParams params,
-      ) : super(params);
+    // This parameter prevents breaking changes later.
+    // ignore: avoid_unused_constructor_parameters
+    PlatformAssetsPathHandlerCreationParams params,
+  ) : super(params);
 
   /// Creates a [AndroidAssetsPathHandlerCreationParams] instance based on [PlatformAssetsPathHandlerCreationParams].
   factory AndroidAssetsPathHandlerCreationParams.fromPlatformAssetsPathHandlerCreationParams(
@@ -115,15 +114,16 @@ class AndroidAssetsPathHandlerCreationParams
 ///[guessContentTypeFromName](https://developer.android.com/reference/java/net/URLConnection.html#guessContentTypeFromName-java.lang.String-).
 ///Developers should ensure that asset files are named using standard file extensions.
 ///If the file does not have a recognised extension, `text/plain` will be used by default.
-class AndroidAssetsPathHandler extends AndroidPathHandler implements PlatformAssetsPathHandler {
+class AndroidAssetsPathHandler extends AndroidPathHandler
+    implements PlatformAssetsPathHandler {
   /// Constructs a [AndroidAssetsPathHandler].
   AndroidAssetsPathHandler(PlatformAssetsPathHandlerCreationParams params)
       : super(
-    params is AndroidAssetsPathHandlerCreationParams
-        ? params
-        : AndroidAssetsPathHandlerCreationParams
-        .fromPlatformAssetsPathHandlerCreationParams(params),
-  );
+          params is AndroidAssetsPathHandlerCreationParams
+              ? params
+              : AndroidAssetsPathHandlerCreationParams
+                  .fromPlatformAssetsPathHandlerCreationParams(params),
+        );
 }
 
 /// Object specifying creation parameters for creating a [AndroidResourcesPathHandler].
@@ -136,10 +136,10 @@ class AndroidResourcesPathHandlerCreationParams
     extends PlatformResourcesPathHandlerCreationParams {
   /// Creates a new [AndroidResourcesPathHandlerCreationParams] instance.
   AndroidResourcesPathHandlerCreationParams(
-      // This parameter prevents breaking changes later.
-      // ignore: avoid_unused_constructor_parameters
-      PlatformResourcesPathHandlerCreationParams params,
-      ) : super(params);
+    // This parameter prevents breaking changes later.
+    // ignore: avoid_unused_constructor_parameters
+    PlatformResourcesPathHandlerCreationParams params,
+  ) : super(params);
 
   /// Creates a [AndroidResourcesPathHandlerCreationParams] instance based on [PlatformResourcesPathHandlerCreationParams].
   factory AndroidResourcesPathHandlerCreationParams.fromPlatformResourcesPathHandlerCreationParams(
@@ -161,15 +161,16 @@ class AndroidResourcesPathHandlerCreationParams
 ///[guessContentTypeFromName](https://developer.android.com/reference/java/net/URLConnection.html#guessContentTypeFromName-java.lang.String-).
 ///Developers should ensure that asset files are named using standard file extensions.
 ///If the file does not have a recognised extension, `text/plain` will be used by default.
-class AndroidResourcesPathHandler extends AndroidPathHandler implements PlatformResourcesPathHandler {
+class AndroidResourcesPathHandler extends AndroidPathHandler
+    implements PlatformResourcesPathHandler {
   /// Constructs a [AndroidResourcesPathHandler].
   AndroidResourcesPathHandler(PlatformResourcesPathHandlerCreationParams params)
       : super(
-    params is AndroidResourcesPathHandlerCreationParams
-        ? params
-        : AndroidResourcesPathHandlerCreationParams
-        .fromPlatformResourcesPathHandlerCreationParams(params),
-  );
+          params is AndroidResourcesPathHandlerCreationParams
+              ? params
+              : AndroidResourcesPathHandlerCreationParams
+                  .fromPlatformResourcesPathHandlerCreationParams(params),
+        );
 }
 
 /// Object specifying creation parameters for creating a [AndroidInternalStoragePathHandler].
@@ -182,10 +183,10 @@ class AndroidInternalStoragePathHandlerCreationParams
     extends PlatformInternalStoragePathHandlerCreationParams {
   /// Creates a new [AndroidInternalStoragePathHandlerCreationParams] instance.
   AndroidInternalStoragePathHandlerCreationParams(
-      // This parameter prevents breaking changes later.
-      // ignore: avoid_unused_constructor_parameters
-      PlatformInternalStoragePathHandlerCreationParams params,
-      ) : super(params, directory: params.directory);
+    // This parameter prevents breaking changes later.
+    // ignore: avoid_unused_constructor_parameters
+    PlatformInternalStoragePathHandlerCreationParams params,
+  ) : super(params, directory: params.directory);
 
   /// Creates a [AndroidInternalStoragePathHandlerCreationParams] instance based on [PlatformInternalStoragePathHandlerCreationParams].
   factory AndroidInternalStoragePathHandlerCreationParams.fromPlatformInternalStoragePathHandlerCreationParams(
@@ -212,15 +213,17 @@ class AndroidInternalStoragePathHandlerCreationParams
 ///[guessContentTypeFromName](https://developer.android.com/reference/java/net/URLConnection.html#guessContentTypeFromName-java.lang.String-).
 ///Developers should ensure that asset files are named using standard file extensions.
 ///If the file does not have a recognised extension, `text/plain` will be used by default.
-class AndroidInternalStoragePathHandler extends AndroidPathHandler implements PlatformInternalStoragePathHandler {
+class AndroidInternalStoragePathHandler extends AndroidPathHandler
+    implements PlatformInternalStoragePathHandler {
   /// Constructs a [AndroidInternalStoragePathHandler].
-  AndroidInternalStoragePathHandler(PlatformInternalStoragePathHandlerCreationParams params)
+  AndroidInternalStoragePathHandler(
+      PlatformInternalStoragePathHandlerCreationParams params)
       : super(
-    params is AndroidInternalStoragePathHandlerCreationParams
-        ? params
-        : AndroidInternalStoragePathHandlerCreationParams
-        .fromPlatformInternalStoragePathHandlerCreationParams(params),
-  );
+          params is AndroidInternalStoragePathHandlerCreationParams
+              ? params
+              : AndroidInternalStoragePathHandlerCreationParams
+                  .fromPlatformInternalStoragePathHandlerCreationParams(params),
+        );
 
   AndroidInternalStoragePathHandlerCreationParams get _internalParams =>
       params as AndroidInternalStoragePathHandlerCreationParams;
@@ -230,9 +233,6 @@ class AndroidInternalStoragePathHandler extends AndroidPathHandler implements Pl
 
   @override
   Map<String, dynamic> toMap() {
-    return {
-      ...toMap(),
-      'directory': directory
-    };
+    return {...toMap(), 'directory': directory};
   }
 }

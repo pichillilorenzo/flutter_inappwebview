@@ -56,14 +56,14 @@ abstract class PlatformWebMessageChannel extends PlatformInterface
   /// Creates a new [PlatformWebMessageChannel] to access static methods.
   factory PlatformWebMessageChannel.static() {
     assert(
-    InAppWebViewPlatform.instance != null,
-    'A platform implementation for `flutter_inappwebview` has not been set. Please '
-        'ensure that an implementation of `InAppWebViewPlatform` has been set to '
-        '`InAppWebViewPlatform.instance` before use. For unit testing, '
-        '`InAppWebViewPlatform.instance` can be set with your own test implementation.',
+      InAppWebViewPlatform.instance != null,
+      'A platform implementation for `flutter_inappwebview` has not been set. Please '
+      'ensure that an implementation of `InAppWebViewPlatform` has been set to '
+      '`InAppWebViewPlatform.instance` before use. For unit testing, '
+      '`InAppWebViewPlatform.instance` can be set with your own test implementation.',
     );
     final PlatformWebMessageChannel webMessageChannelStatic =
-    InAppWebViewPlatform.instance!.createPlatformWebMessageChannelStatic();
+        InAppWebViewPlatform.instance!.createPlatformWebMessageChannelStatic();
     PlatformInterface.verify(webMessageChannelStatic, _token);
     return webMessageChannelStatic;
   }
@@ -111,4 +111,3 @@ abstract class PlatformWebMessageChannel extends PlatformInterface
     return 'PlatformWebMessageChannel{id: $id, port1: $port1, port2: $port2}';
   }
 }
-

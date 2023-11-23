@@ -27,16 +27,18 @@ class PlatformHttpAuthCredentialDatabaseCreationParams {
 ///- MacOS
 abstract class PlatformHttpAuthCredentialDatabase extends PlatformInterface {
   /// Creates a new [PlatformHttpAuthCredentialDatabase]
-  factory PlatformHttpAuthCredentialDatabase(PlatformHttpAuthCredentialDatabaseCreationParams params) {
+  factory PlatformHttpAuthCredentialDatabase(
+      PlatformHttpAuthCredentialDatabaseCreationParams params) {
     assert(
-    InAppWebViewPlatform.instance != null,
-    'A platform implementation for `flutter_inappwebview` has not been set. Please '
-        'ensure that an implementation of `InAppWebViewPlatform` has been set to '
-        '`WebViewPlatform.instance` before use. For unit testing, '
-        '`WebViewPlatform.instance` can be set with your own test implementation.',
+      InAppWebViewPlatform.instance != null,
+      'A platform implementation for `flutter_inappwebview` has not been set. Please '
+      'ensure that an implementation of `InAppWebViewPlatform` has been set to '
+      '`WebViewPlatform.instance` before use. For unit testing, '
+      '`WebViewPlatform.instance` can be set with your own test implementation.',
     );
     final PlatformHttpAuthCredentialDatabase cookieManager =
-    InAppWebViewPlatform.instance!.createPlatformHttpAuthCredentialDatabase(params);
+        InAppWebViewPlatform.instance!
+            .createPlatformHttpAuthCredentialDatabase(params);
     PlatformInterface.verify(cookieManager, _token);
     return cookieManager;
   }
@@ -63,8 +65,7 @@ abstract class PlatformHttpAuthCredentialDatabase extends PlatformInterface {
   ///- Android native WebView
   ///- iOS ([Official API - URLCredentialStorage.allCredentials](https://developer.apple.com/documentation/foundation/urlcredentialstorage/1413859-allcredentials))
   ///- MacOS ([Official API - URLCredentialStorage.allCredentials](https://developer.apple.com/documentation/foundation/urlcredentialstorage/1413859-allcredentials))
-  Future<List<URLProtectionSpaceHttpAuthCredentials>>
-      getAllAuthCredentials() {
+  Future<List<URLProtectionSpaceHttpAuthCredentials>> getAllAuthCredentials() {
     throw UnimplementedError(
         'getAllAuthCredentials is not implemented on the current platform');
   }

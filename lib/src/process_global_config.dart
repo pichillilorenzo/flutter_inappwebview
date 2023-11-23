@@ -30,14 +30,14 @@ class ProcessGlobalConfig {
   /// parameters for a specific platform.
   ProcessGlobalConfig()
       : this.fromPlatformCreationParams(
-    const PlatformProcessGlobalConfigCreationParams(),
-  );
+          const PlatformProcessGlobalConfigCreationParams(),
+        );
 
   /// Constructs a [ProcessGlobalConfig] from creation params for a specific
   /// platform.
   ProcessGlobalConfig.fromPlatformCreationParams(
-      PlatformProcessGlobalConfigCreationParams params,
-      ) : this.fromPlatform(PlatformProcessGlobalConfig(params));
+    PlatformProcessGlobalConfigCreationParams params,
+  ) : this.fromPlatform(PlatformProcessGlobalConfig(params));
 
   /// Constructs a [ProcessGlobalConfig] from a specific platform
   /// implementation.
@@ -63,6 +63,6 @@ class ProcessGlobalConfig {
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - ProcessGlobalConfig.apply](https://developer.android.com/reference/androidx/webkit/ProcessGlobalConfig#apply(androidx.webkit.ProcessGlobalConfig)))
-  Future<void> apply({required ProcessGlobalConfigSettings settings}) => platform.apply(settings: settings);
+  Future<void> apply({required ProcessGlobalConfigSettings settings}) =>
+      platform.apply(settings: settings);
 }
-

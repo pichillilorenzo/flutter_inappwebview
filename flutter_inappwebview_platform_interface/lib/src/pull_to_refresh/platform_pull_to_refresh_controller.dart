@@ -15,10 +15,11 @@ import 'pull_to_refresh_settings.dart';
 /// this class.
 class PlatformPullToRefreshControllerCreationParams {
   /// Used by the platform implementation to create a new [PlatformPullToRefreshController].
-  PlatformPullToRefreshControllerCreationParams({
-    @Deprecated("Use settings instead") PullToRefreshOptions? options,
-    PullToRefreshSettings? settings,
-    this.onRefresh}) : this.options = options ?? PullToRefreshOptions(),
+  PlatformPullToRefreshControllerCreationParams(
+      {@Deprecated("Use settings instead") PullToRefreshOptions? options,
+      PullToRefreshSettings? settings,
+      this.onRefresh})
+      : this.options = options ?? PullToRefreshOptions(),
         this.settings = settings ?? PullToRefreshSettings();
 
   @Deprecated("Use settings instead")
@@ -40,7 +41,8 @@ class PlatformPullToRefreshControllerCreationParams {
 ///**Supported Platforms/Implementations**:
 ///- Android native WebView
 ///- iOS
-abstract class PlatformPullToRefreshController extends PlatformInterface implements Disposable {
+abstract class PlatformPullToRefreshController extends PlatformInterface
+    implements Disposable {
   ///Debug settings.
   static DebugLoggingSettings debugLoggingSettings = DebugLoggingSettings();
 
@@ -48,14 +50,15 @@ abstract class PlatformPullToRefreshController extends PlatformInterface impleme
   factory PlatformPullToRefreshController(
       PlatformPullToRefreshControllerCreationParams params) {
     assert(
-    InAppWebViewPlatform.instance != null,
-    'A platform implementation for `flutter_inappwebview` has not been set. Please '
-        'ensure that an implementation of `InAppWebViewPlatform` has been set to '
-        '`InAppWebViewPlatform.instance` before use. For unit testing, '
-        '`InAppWebViewPlatform.instance` can be set with your own test implementation.',
+      InAppWebViewPlatform.instance != null,
+      'A platform implementation for `flutter_inappwebview` has not been set. Please '
+      'ensure that an implementation of `InAppWebViewPlatform` has been set to '
+      '`InAppWebViewPlatform.instance` before use. For unit testing, '
+      '`InAppWebViewPlatform.instance` can be set with your own test implementation.',
     );
     final PlatformPullToRefreshController webViewControllerDelegate =
-    InAppWebViewPlatform.instance!.createPlatformPullToRefreshController(params);
+        InAppWebViewPlatform.instance!
+            .createPlatformPullToRefreshController(params);
     PlatformInterface.verify(webViewControllerDelegate, _token);
     return webViewControllerDelegate;
   }
@@ -65,7 +68,8 @@ abstract class PlatformPullToRefreshController extends PlatformInterface impleme
   /// Should only be used by platform implementations because they can't extend
   /// a class that only contains a factory constructor.
   @protected
-  PlatformPullToRefreshController.implementation(this.params) : super(token: _token);
+  PlatformPullToRefreshController.implementation(this.params)
+      : super(token: _token);
 
   static final Object _token = Object();
 

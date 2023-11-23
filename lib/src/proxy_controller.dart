@@ -18,14 +18,14 @@ class ProxyController {
   /// parameters for a specific platform.
   ProxyController()
       : this.fromPlatformCreationParams(
-    const PlatformProxyControllerCreationParams(),
-  );
+          const PlatformProxyControllerCreationParams(),
+        );
 
   /// Constructs a [ProxyController] from creation params for a specific
   /// platform.
   ProxyController.fromPlatformCreationParams(
-      PlatformProxyControllerCreationParams params,
-      ) : this.fromPlatform(PlatformProxyController(params));
+    PlatformProxyControllerCreationParams params,
+  ) : this.fromPlatform(PlatformProxyController(params));
 
   /// Constructs a [ProxyController] from a specific platform
   /// implementation.
@@ -51,7 +51,8 @@ class ProxyController {
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - ProxyController.setProxyOverride](https://developer.android.com/reference/androidx/webkit/ProxyController#setProxyOverride(androidx.webkit.ProxyConfig,%20java.util.concurrent.Executor,%20java.lang.Runnable)))
-  Future<void> setProxyOverride({required ProxySettings settings}) => platform.setProxyOverride(settings: settings);
+  Future<void> setProxyOverride({required ProxySettings settings}) =>
+      platform.setProxyOverride(settings: settings);
 
   ///Clears the proxy settings.
   ///Network connections are not guaranteed to immediately use the new proxy setting; wait for the method to return before loading a page.

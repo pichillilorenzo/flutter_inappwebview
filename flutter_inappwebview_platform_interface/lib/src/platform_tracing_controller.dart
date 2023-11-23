@@ -29,16 +29,17 @@ class PlatformTracingControllerCreationParams {
 ///- Android native WebView ([Official API - TracingController](https://developer.android.com/reference/androidx/webkit/TracingController))
 abstract class PlatformTracingController extends PlatformInterface {
   /// Creates a new [PlatformTracingController]
-  factory PlatformTracingController(PlatformTracingControllerCreationParams params) {
+  factory PlatformTracingController(
+      PlatformTracingControllerCreationParams params) {
     assert(
-    InAppWebViewPlatform.instance != null,
-    'A platform implementation for `flutter_inappwebview` has not been set. Please '
-        'ensure that an implementation of `InAppWebViewPlatform` has been set to '
-        '`WebViewPlatform.instance` before use. For unit testing, '
-        '`WebViewPlatform.instance` can be set with your own test implementation.',
+      InAppWebViewPlatform.instance != null,
+      'A platform implementation for `flutter_inappwebview` has not been set. Please '
+      'ensure that an implementation of `InAppWebViewPlatform` has been set to '
+      '`WebViewPlatform.instance` before use. For unit testing, '
+      '`WebViewPlatform.instance` can be set with your own test implementation.',
     );
     final PlatformTracingController tracingController =
-    InAppWebViewPlatform.instance!.createPlatformTracingController(params);
+        InAppWebViewPlatform.instance!.createPlatformTracingController(params);
     PlatformInterface.verify(tracingController, _token);
     return tracingController;
   }
@@ -49,8 +50,7 @@ abstract class PlatformTracingController extends PlatformInterface {
   /// Should only be used by platform implementations because they can't extend
   /// a class that only contains a factory constructor.
   @protected
-  PlatformTracingController.implementation(this.params)
-      : super(token: _token);
+  PlatformTracingController.implementation(this.params) : super(token: _token);
 
   static final Object _token = Object();
 
@@ -80,8 +80,7 @@ abstract class PlatformTracingController extends PlatformInterface {
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - TracingController.stop](https://developer.android.com/reference/android/webkit/TracingController#stop(java.io.OutputStream,%20java.util.concurrent.Executor)))
   Future<bool> stop({String? filePath}) {
-    throw UnimplementedError(
-        'stop is not implemented on the current platform');
+    throw UnimplementedError('stop is not implemented on the current platform');
   }
 
   ///Returns whether the WebView framework is tracing.

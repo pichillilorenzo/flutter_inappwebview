@@ -54,9 +54,6 @@ class AndroidInAppBrowserCreationParams
 ///- iOS
 ///- MacOS
 class AndroidInAppBrowser extends PlatformInAppBrowser with ChannelController {
-  ///Debug settings.
-  static DebugLoggingSettings debugLoggingSettings = DebugLoggingSettings();
-
   ///View ID used internally.
   final String id = IdGenerator.generate();
 

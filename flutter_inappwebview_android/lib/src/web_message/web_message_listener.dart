@@ -85,8 +85,7 @@ class AndroidWebMessageListener extends PlatformWebMessageListener
               ? WebUri(call.arguments["sourceOrigin"])
               : null;
           bool isMainFrame = call.arguments["isMainFrame"];
-          onPostMessage!(
-              message, sourceOrigin, isMainFrame, _replyProxy!);
+          onPostMessage!(message, sourceOrigin, isMainFrame, _replyProxy!);
         }
         break;
       default:

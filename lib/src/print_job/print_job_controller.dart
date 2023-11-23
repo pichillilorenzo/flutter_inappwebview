@@ -8,7 +8,6 @@ import '../in_app_webview/in_app_webview_controller.dart';
 ///- iOS
 ///- MacOS
 class PrintJobController {
-
   PrintJobController({required String id, PrintJobCompletionHandler onComplete})
       : this.fromPlatformCreationParams(
             params: PlatformPrintJobControllerCreationParams(
@@ -57,7 +56,8 @@ class PrintJobController {
   ///
   ///**Supported Platforms/Implementations**:
   ///- iOS
-  Future<void> dismiss({bool animated = true}) => platform.dismiss(animated: animated);
+  Future<void> dismiss({bool animated = true}) =>
+      platform.dismiss(animated: animated);
 
   ///Gets the [PrintJobInfo] that describes this job.
   ///

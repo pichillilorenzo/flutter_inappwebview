@@ -5,9 +5,6 @@ import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_pla
 ///- iOS
 ///- MacOS
 class FindInteractionController {
-  ///Debug settings.
-  static DebugLoggingSettings debugLoggingSettings = DebugLoggingSettings();
-
   FindInteractionController(
       {void Function(PlatformFindInteractionController controller,
               int activeMatchOrdinal, int numberOfMatches, bool isDoneCounting)?
@@ -31,11 +28,9 @@ class FindInteractionController {
   final PlatformFindInteractionController platform;
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformFindInteractionController.onFindResultReceived}
-  void Function(
-      PlatformFindInteractionController controller,
-      int activeMatchOrdinal,
-      int numberOfMatches,
-      bool isDoneCounting)? get onFindResultReceived => platform.onFindResultReceived;
+  void Function(PlatformFindInteractionController controller,
+          int activeMatchOrdinal, int numberOfMatches, bool isDoneCounting)?
+      get onFindResultReceived => platform.onFindResultReceived;
 
   ///Finds all instances of find on the page and highlights them. Notifies [FindInteractionController.onFindResultReceived] listener.
   ///

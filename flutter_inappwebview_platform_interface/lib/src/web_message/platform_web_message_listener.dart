@@ -15,8 +15,8 @@ class PlatformWebMessageListenerCreationParams {
   /// Used by the platform implementation to create a new [PlatformWebMessageListener].
   const PlatformWebMessageListenerCreationParams(
       {required this.jsObjectName,
-        this.allowedOriginRules,
-        this.onPostMessage});
+      this.allowedOriginRules,
+      this.onPostMessage});
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebMessageListener.jsObjectName}
   final String jsObjectName;
@@ -39,19 +39,20 @@ class PlatformWebMessageListenerCreationParams {
 ///- Android native WebView
 ///- iOS
 ///- MacOS
-abstract class PlatformWebMessageListener extends PlatformInterface implements Disposable {
+abstract class PlatformWebMessageListener extends PlatformInterface
+    implements Disposable {
   /// Creates a new [PlatformWebMessageListener]
   factory PlatformWebMessageListener(
       PlatformWebMessageListenerCreationParams params) {
     assert(
-    InAppWebViewPlatform.instance != null,
-    'A platform implementation for `flutter_inappwebview` has not been set. Please '
-        'ensure that an implementation of `InAppWebViewPlatform` has been set to '
-        '`InAppWebViewPlatform.instance` before use. For unit testing, '
-        '`InAppWebViewPlatform.instance` can be set with your own test implementation.',
+      InAppWebViewPlatform.instance != null,
+      'A platform implementation for `flutter_inappwebview` has not been set. Please '
+      'ensure that an implementation of `InAppWebViewPlatform` has been set to '
+      '`InAppWebViewPlatform.instance` before use. For unit testing, '
+      '`InAppWebViewPlatform.instance` can be set with your own test implementation.',
     );
     final PlatformWebMessageListener webMessageListener =
-    InAppWebViewPlatform.instance!.createPlatformWebMessageListener(params);
+        InAppWebViewPlatform.instance!.createPlatformWebMessageListener(params);
     PlatformInterface.verify(webMessageListener, _token);
     return webMessageListener;
   }
@@ -121,7 +122,8 @@ abstract class PlatformWebMessageListener extends PlatformInterface implements D
 @immutable
 class PlatformJavaScriptReplyProxyCreationParams {
   /// Used by the platform implementation to create a new [PlatformJavaScriptReplyProxy].
-  const PlatformJavaScriptReplyProxyCreationParams({required this.webMessageListener});
+  const PlatformJavaScriptReplyProxyCreationParams(
+      {required this.webMessageListener});
 
   final PlatformWebMessageListener webMessageListener;
 }
@@ -136,14 +138,15 @@ abstract class PlatformJavaScriptReplyProxy extends PlatformInterface {
   factory PlatformJavaScriptReplyProxy(
       PlatformJavaScriptReplyProxyCreationParams params) {
     assert(
-    InAppWebViewPlatform.instance != null,
-    'A platform implementation for `flutter_inappwebview` has not been set. Please '
-        'ensure that an implementation of `InAppWebViewPlatform` has been set to '
-        '`InAppWebViewPlatform.instance` before use. For unit testing, '
-        '`InAppWebViewPlatform.instance` can be set with your own test implementation.',
+      InAppWebViewPlatform.instance != null,
+      'A platform implementation for `flutter_inappwebview` has not been set. Please '
+      'ensure that an implementation of `InAppWebViewPlatform` has been set to '
+      '`InAppWebViewPlatform.instance` before use. For unit testing, '
+      '`InAppWebViewPlatform.instance` can be set with your own test implementation.',
     );
     final PlatformJavaScriptReplyProxy javaScriptReplyProxy =
-    InAppWebViewPlatform.instance!.createPlatformJavaScriptReplyProxy(params);
+        InAppWebViewPlatform.instance!
+            .createPlatformJavaScriptReplyProxy(params);
     PlatformInterface.verify(javaScriptReplyProxy, _token);
     return javaScriptReplyProxy;
   }
@@ -153,7 +156,8 @@ abstract class PlatformJavaScriptReplyProxy extends PlatformInterface {
   /// Should only be used by platform implementations because they can't extend
   /// a class that only contains a factory constructor.
   @protected
-  PlatformJavaScriptReplyProxy.implementation(this.params) : super(token: _token);
+  PlatformJavaScriptReplyProxy.implementation(this.params)
+      : super(token: _token);
 
   static final Object _token = Object();
 

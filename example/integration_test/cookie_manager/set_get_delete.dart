@@ -16,14 +16,13 @@ void setGetDelete() {
     final Completer<String> pageLoaded = Completer<String>();
 
     var headlessWebView = new HeadlessInAppWebView(
-      initialUrlRequest: URLRequest(url: TEST_CROSS_PLATFORM_URL_1),
-      onWebViewCreated: (controller) {
-        controllerCompleter.complete(controller);
-      },
-      onLoadStop: (controller, url) async {
-        pageLoaded.complete(url!.toString());
-      }
-    );
+        initialUrlRequest: URLRequest(url: TEST_CROSS_PLATFORM_URL_1),
+        onWebViewCreated: (controller) {
+          controllerCompleter.complete(controller);
+        },
+        onLoadStop: (controller, url) async {
+          pageLoaded.complete(url!.toString());
+        });
 
     if (defaultTargetPlatform == TargetPlatform.macOS) {
       await headlessWebView.run();

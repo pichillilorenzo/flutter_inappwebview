@@ -1,7 +1,5 @@
 import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_internal_annotations.dart';
 
-
-
 part 'force_dark_strategy.g.dart';
 
 ///Class used to indicate how `WebView` content should be darkened.

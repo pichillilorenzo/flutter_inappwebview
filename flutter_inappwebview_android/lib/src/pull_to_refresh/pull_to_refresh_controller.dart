@@ -39,9 +39,6 @@ class AndroidPullToRefreshControllerCreationParams
 ///- iOS
 class AndroidPullToRefreshController extends PlatformPullToRefreshController
     with ChannelController {
-  ///Debug settings.
-  static DebugLoggingSettings debugLoggingSettings = DebugLoggingSettings();
-
   /// Constructs a [AndroidPullToRefreshController].
   AndroidPullToRefreshController(
       PlatformPullToRefreshControllerCreationParams params)
@@ -56,7 +53,7 @@ class AndroidPullToRefreshController extends PlatformPullToRefreshController
     debugLog(
         className: this.runtimeType.toString(),
         debugLoggingSettings:
-            AndroidPullToRefreshController.debugLoggingSettings,
+            PlatformPullToRefreshController.debugLoggingSettings,
         method: method,
         args: args);
   }

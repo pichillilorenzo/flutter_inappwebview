@@ -30,9 +30,6 @@ class AndroidFindInteractionControllerCreationParams
 ///- MacOS
 class AndroidFindInteractionController extends PlatformFindInteractionController
     with ChannelController {
-  ///Debug settings.
-  static DebugLoggingSettings debugLoggingSettings = DebugLoggingSettings();
-
   /// Constructs a [AndroidFindInteractionController].
   AndroidFindInteractionController(
       PlatformFindInteractionControllerCreationParams params)
@@ -47,7 +44,7 @@ class AndroidFindInteractionController extends PlatformFindInteractionController
     debugLog(
         className: this.runtimeType.toString(),
         debugLoggingSettings:
-            AndroidFindInteractionController.debugLoggingSettings,
+            PlatformFindInteractionController.debugLoggingSettings,
         method: method,
         args: args);
   }

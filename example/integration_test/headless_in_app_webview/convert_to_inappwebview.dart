@@ -14,14 +14,13 @@ void convertToInAppWebView() {
     final Completer<void> pageLoaded = Completer<void>();
 
     var headlessWebView = new HeadlessInAppWebView(
-      initialUrlRequest: URLRequest(url: TEST_CROSS_PLATFORM_URL_1),
-      onWebViewCreated: (controller) {
-        controllerCompleter.complete(controller);
-      },
-      onLoadStop: (controller, url) async {
-        pageLoaded.complete();
-      }
-    );
+        initialUrlRequest: URLRequest(url: TEST_CROSS_PLATFORM_URL_1),
+        onWebViewCreated: (controller) {
+          controllerCompleter.complete(controller);
+        },
+        onLoadStop: (controller, url) async {
+          pageLoaded.complete();
+        });
 
     await headlessWebView.run();
     expect(headlessWebView.isRunning(), true);

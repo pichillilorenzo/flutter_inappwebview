@@ -17,14 +17,14 @@ class TracingController {
   /// parameters for a specific platform.
   TracingController()
       : this.fromPlatformCreationParams(
-    const PlatformTracingControllerCreationParams(),
-  );
+          const PlatformTracingControllerCreationParams(),
+        );
 
   /// Constructs a [TracingController] from creation params for a specific
   /// platform.
   TracingController.fromPlatformCreationParams(
-      PlatformTracingControllerCreationParams params,
-      ) : this.fromPlatform(PlatformTracingController(params));
+    PlatformTracingControllerCreationParams params,
+  ) : this.fromPlatform(PlatformTracingController(params));
 
   /// Constructs a [TracingController] from a specific platform
   /// implementation.
@@ -51,7 +51,8 @@ class TracingController {
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - TracingController.start](https://developer.android.com/reference/android/webkit/TracingController#start(android.webkit.TracingConfig)))
-  Future<void> start({required TracingSettings settings}) => platform.start(settings: settings);
+  Future<void> start({required TracingSettings settings}) =>
+      platform.start(settings: settings);
 
   ///Stops tracing and flushes tracing data to the specified output stream.
   ///The data is sent to the specified output stream in json format typically in

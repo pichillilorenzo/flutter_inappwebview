@@ -12,16 +12,14 @@ import 'web_message_channel.dart';
 class AndroidWebMessagePortCreationParams
     extends PlatformWebMessagePortCreationParams {
   /// Creates a new [AndroidWebMessagePortCreationParams] instance.
-  const AndroidWebMessagePortCreationParams(
-      {required super.index});
+  const AndroidWebMessagePortCreationParams({required super.index});
 
   /// Creates a [AndroidWebMessagePortCreationParams] instance based on [PlatformWebMessagePortCreationParams].
   factory AndroidWebMessagePortCreationParams.fromPlatformWebMessagePortCreationParams(
       // Recommended placeholder to prevent being broken by platform interface.
       // ignore: avoid_unused_constructor_parameters
       PlatformWebMessagePortCreationParams params) {
-    return AndroidWebMessagePortCreationParams(
-        index: params.index);
+    return AndroidWebMessagePortCreationParams(index: params.index);
   }
 
   @override
@@ -49,19 +47,17 @@ class AndroidWebMessagePortCreationParams
 ///
 ///It is possible to transfer both ports of a channel to JavaScript, for example for communication between subframes.
 class AndroidWebMessagePort extends PlatformWebMessagePort {
-
   WebMessageCallback? _onMessage;
   late AndroidWebMessageChannel _webMessageChannel;
 
   /// Constructs a [AndroidWebMessagePort].
-  AndroidWebMessagePort(
-      PlatformWebMessagePortCreationParams params)
+  AndroidWebMessagePort(PlatformWebMessagePortCreationParams params)
       : super.implementation(
-    params is AndroidWebMessagePortCreationParams
-        ? params
-        : AndroidWebMessagePortCreationParams
-        .fromPlatformWebMessagePortCreationParams(params),
-  );
+          params is AndroidWebMessagePortCreationParams
+              ? params
+              : AndroidWebMessagePortCreationParams
+                  .fromPlatformWebMessagePortCreationParams(params),
+        );
 
   ///Sets a callback to receive message events on the main thread.
   Future<void> setWebMessageCallback(WebMessageCallback? onMessage) async {

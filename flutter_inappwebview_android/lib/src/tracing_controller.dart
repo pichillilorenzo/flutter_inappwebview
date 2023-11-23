@@ -13,10 +13,10 @@ class AndroidTracingControllerCreationParams
     extends PlatformTracingControllerCreationParams {
   /// Creates a new [AndroidTracingControllerCreationParams] instance.
   const AndroidTracingControllerCreationParams(
-      // This parameter prevents breaking changes later.
-      // ignore: avoid_unused_constructor_parameters
-      PlatformTracingControllerCreationParams params,
-      ) : super();
+    // This parameter prevents breaking changes later.
+    // ignore: avoid_unused_constructor_parameters
+    PlatformTracingControllerCreationParams params,
+  ) : super();
 
   /// Creates a [AndroidTracingControllerCreationParams] instance based on [PlatformTracingControllerCreationParams].
   factory AndroidTracingControllerCreationParams.fromPlatformTracingControllerCreationParams(
@@ -34,15 +34,16 @@ class AndroidTracingControllerCreationParams
 ///
 ///**Supported Platforms/Implementations**:
 ///- Android native WebView ([Official API - TracingController](https://developer.android.com/reference/androidx/webkit/TracingController))
-class AndroidTracingController extends PlatformTracingController with ChannelController {
+class AndroidTracingController extends PlatformTracingController
+    with ChannelController {
   /// Creates a new [AndroidTracingController].
   AndroidTracingController(PlatformTracingControllerCreationParams params)
       : super.implementation(
-    params is AndroidTracingControllerCreationParams
-        ? params
-        : AndroidTracingControllerCreationParams
-        .fromPlatformTracingControllerCreationParams(params),
-  ) {
+          params is AndroidTracingControllerCreationParams
+              ? params
+              : AndroidTracingControllerCreationParams
+                  .fromPlatformTracingControllerCreationParams(params),
+        ) {
     channel = const MethodChannel(
         'com.pichillilorenzo/flutter_inappwebview_tracingcontroller');
     handler = handleMethod;

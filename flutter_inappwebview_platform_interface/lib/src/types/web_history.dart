@@ -1,7 +1,5 @@
 import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_internal_annotations.dart';
 
-
-
 import 'web_history_item.dart';
 
 part 'web_history.g.dart';

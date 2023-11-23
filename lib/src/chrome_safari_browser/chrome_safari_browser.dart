@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:collection';
 import 'dart:typed_data';
 
 import 'package:flutter/foundation.dart';
@@ -17,9 +16,6 @@ import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_pla
 ///- Android
 ///- iOS
 class ChromeSafariBrowser implements PlatformChromeSafariBrowserEvents {
-  ///Debug settings.
-  static DebugLoggingSettings debugLoggingSettings = DebugLoggingSettings();
-
   /// Constructs a [ChromeSafariBrowser].
   ///
   /// See [ChromeSafariBrowser.fromPlatformCreationParams] for setting

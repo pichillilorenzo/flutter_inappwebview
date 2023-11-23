@@ -416,7 +416,8 @@ class AndroidInAppWebViewWidget extends PlatformInAppWebViewWidget {
         method: "onWebViewCreated",
         args: []);
     if (_androidParams.onWebViewCreated != null) {
-      _androidParams.onWebViewCreated!(params.controllerFromPlatform?.call(_controller!) ?? _controller!);
+      _androidParams.onWebViewCreated!(
+          params.controllerFromPlatform?.call(_controller!) ?? _controller!);
     }
   }
 

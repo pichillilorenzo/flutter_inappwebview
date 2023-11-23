@@ -13,10 +13,10 @@ class AndroidProcessGlobalConfigCreationParams
     extends PlatformProcessGlobalConfigCreationParams {
   /// Creates a new [AndroidProcessGlobalConfigCreationParams] instance.
   const AndroidProcessGlobalConfigCreationParams(
-      // This parameter prevents breaking changes later.
-      // ignore: avoid_unused_constructor_parameters
-      PlatformProcessGlobalConfigCreationParams params,
-      ) : super();
+    // This parameter prevents breaking changes later.
+    // ignore: avoid_unused_constructor_parameters
+    PlatformProcessGlobalConfigCreationParams params,
+  ) : super();
 
   /// Creates a [AndroidProcessGlobalConfigCreationParams] instance based on [PlatformProcessGlobalConfigCreationParams].
   factory AndroidProcessGlobalConfigCreationParams.fromPlatformProcessGlobalConfigCreationParams(
@@ -47,15 +47,16 @@ class AndroidProcessGlobalConfigCreationParams
 ///
 ///**Supported Platforms/Implementations**:
 ///- Android native WebView ([Official API - ProcessGlobalConfig](https://developer.android.com/reference/androidx/webkit/ProcessGlobalConfig))
-class AndroidProcessGlobalConfig extends PlatformProcessGlobalConfig with ChannelController {
+class AndroidProcessGlobalConfig extends PlatformProcessGlobalConfig
+    with ChannelController {
   /// Creates a new [AndroidProcessGlobalConfig].
   AndroidProcessGlobalConfig(PlatformProcessGlobalConfigCreationParams params)
       : super.implementation(
-    params is AndroidProcessGlobalConfigCreationParams
-        ? params
-        : AndroidProcessGlobalConfigCreationParams
-        .fromPlatformProcessGlobalConfigCreationParams(params),
-  ) {
+          params is AndroidProcessGlobalConfigCreationParams
+              ? params
+              : AndroidProcessGlobalConfigCreationParams
+                  .fromPlatformProcessGlobalConfigCreationParams(params),
+        ) {
     channel = const MethodChannel(
         'com.pichillilorenzo/flutter_inappwebview_processglobalconfig');
     handler = handleMethod;
@@ -70,8 +71,9 @@ class AndroidProcessGlobalConfig extends PlatformProcessGlobalConfig with Channe
   }
 
   static AndroidProcessGlobalConfig _init() {
-    _instance = AndroidProcessGlobalConfig(AndroidProcessGlobalConfigCreationParams(
-        const PlatformProcessGlobalConfigCreationParams()));
+    _instance = AndroidProcessGlobalConfig(
+        AndroidProcessGlobalConfigCreationParams(
+            const PlatformProcessGlobalConfigCreationParams()));
     return _instance!;
   }
 
@@ -99,4 +101,3 @@ class AndroidProcessGlobalConfig extends PlatformProcessGlobalConfig with Channe
 extension InternalProcessGlobalConfig on AndroidProcessGlobalConfig {
   get handleMethod => _handleMethod;
 }
-

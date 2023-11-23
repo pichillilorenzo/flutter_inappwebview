@@ -114,7 +114,8 @@ class AndroidServiceWorkerController extends PlatformServiceWorkerController
   ///**Official Android API**: https://developer.android.com/reference/androidx/webkit/ServiceWorkerWebSettingsCompat#getAllowContentAccess()
   Future<bool> getAllowContentAccess() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    return await channel?.invokeMethod<bool>('getAllowContentAccess', args) ?? false;
+    return await channel?.invokeMethod<bool>('getAllowContentAccess', args) ??
+        false;
   }
 
   ///Gets whether Service Workers support file access.

@@ -26,9 +26,6 @@ import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_pla
 ///- iOS
 ///- MacOS
 class WebAuthenticationSession {
-  ///Debug settings.
-  static DebugLoggingSettings debugLoggingSettings = DebugLoggingSettings();
-
   WebAuthenticationSession(
       {required WebUri url,
       String? callbackURLScheme,

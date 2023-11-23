@@ -16,9 +16,6 @@ import '../in_app_browser/in_app_browser.dart';
 ///- Android native WebView
 ///- iOS
 class PullToRefreshController {
-  ///Debug settings.
-  static DebugLoggingSettings debugLoggingSettings = DebugLoggingSettings();
-
   PullToRefreshController(
       {void Function()? onRefresh,
       @Deprecated("Use settings instead") PullToRefreshOptions? options,

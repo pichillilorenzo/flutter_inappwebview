@@ -47,7 +47,8 @@ class PlatformInAppWebViewControllerCreationParams {
 ///
 ///If you are using the [InAppWebView] widget, an [PlatformInAppWebViewController] instance can be obtained by setting the [InAppWebView.onWebViewCreated]
 ///callback. Instead, if you are using an [PlatformInAppBrowser] instance, you can get it through the [PlatformInAppBrowser.webViewController] attribute.
-abstract class PlatformInAppWebViewController extends PlatformInterface implements Disposable {
+abstract class PlatformInAppWebViewController extends PlatformInterface
+    implements Disposable {
   ///Debug settings used by [PlatformInAppWebViewWidget], [PlatformHeadlessInAppWebView] and [PlatformInAppBrowser].
   ///The default value excludes the [WebView.onScrollChanged], [WebView.onOverScrolled] and [WebView.onReceivedIcon] events.
   static DebugLoggingSettings debugLoggingSettings = DebugLoggingSettings(
@@ -78,14 +79,15 @@ abstract class PlatformInAppWebViewController extends PlatformInterface implemen
   /// Creates a new [PlatformInAppWebViewController] to access static methods.
   factory PlatformInAppWebViewController.static() {
     assert(
-    InAppWebViewPlatform.instance != null,
-    'A platform implementation for `flutter_inappwebview` has not been set. Please '
-        'ensure that an implementation of `InAppWebViewPlatform` has been set to '
-        '`InAppWebViewPlatform.instance` before use. For unit testing, '
-        '`InAppWebViewPlatform.instance` can be set with your own test implementation.',
+      InAppWebViewPlatform.instance != null,
+      'A platform implementation for `flutter_inappwebview` has not been set. Please '
+      'ensure that an implementation of `InAppWebViewPlatform` has been set to '
+      '`InAppWebViewPlatform.instance` before use. For unit testing, '
+      '`InAppWebViewPlatform.instance` can be set with your own test implementation.',
     );
     final PlatformInAppWebViewController inAppWebViewControllerStatic =
-    InAppWebViewPlatform.instance!.createPlatformInAppWebViewControllerStatic();
+        InAppWebViewPlatform.instance!
+            .createPlatformInAppWebViewControllerStatic();
     PlatformInterface.verify(inAppWebViewControllerStatic, _token);
     return inAppWebViewControllerStatic;
   }

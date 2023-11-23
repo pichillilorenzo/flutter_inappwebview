@@ -253,7 +253,8 @@ class AndroidLocalStorageCreationParams
 
 ///Class that provides methods to manage the JavaScript `window.localStorage` object.
 ///It used by [AndroidWebStorage].
-class AndroidLocalStorage extends AndroidStorage implements PlatformLocalStorage {
+class AndroidLocalStorage extends AndroidStorage
+    implements PlatformLocalStorage {
   /// Constructs a [AndroidLocalStorage].
   AndroidLocalStorage(PlatformLocalStorageCreationParams params)
       : super(
@@ -292,7 +293,8 @@ class AndroidSessionStorageCreationParams
 
 ///Class that provides methods to manage the JavaScript `window.sessionStorage` object.
 ///It used by [AndroidWebStorage].
-class AndroidSessionStorage extends AndroidStorage implements PlatformSessionStorage {
+class AndroidSessionStorage extends AndroidStorage
+    implements PlatformSessionStorage {
   /// Constructs a [AndroidSessionStorage].
   AndroidSessionStorage(PlatformSessionStorageCreationParams params)
       : super(

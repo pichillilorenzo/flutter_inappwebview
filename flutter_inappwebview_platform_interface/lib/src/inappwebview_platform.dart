@@ -427,8 +427,8 @@ abstract class InAppWebViewPlatform extends PlatformInterface {
   /// This function should only be called by the app-facing package.
   /// Look at using [ChromeSafariBrowser] in `flutter_inappwebview` instead.
   PlatformChromeSafariBrowser createPlatformChromeSafariBrowser(
-      PlatformChromeSafariBrowserCreationParams params,
-      ) {
+    PlatformChromeSafariBrowserCreationParams params,
+  ) {
     throw UnimplementedError(
         'createPlatformChromeSafariBrowser is not implemented on the current platform.');
   }

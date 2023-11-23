@@ -1,6 +1,5 @@
 import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_internal_annotations.dart';
 
-
 import 'renderer_priority.dart';
 
 part 'renderer_priority_policy.g.dart';

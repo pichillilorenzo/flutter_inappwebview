@@ -125,4 +125,3 @@ class AndroidPrintJobController extends PlatformPrintJobController
     disposeChannel();
   }
 }
-

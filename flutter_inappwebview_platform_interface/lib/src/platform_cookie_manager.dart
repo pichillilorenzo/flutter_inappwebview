@@ -53,8 +53,7 @@ abstract class PlatformCookieManager extends PlatformInterface {
   /// Should only be used by platform implementations because they can't extend
   /// a class that only contains a factory constructor.
   @protected
-  PlatformCookieManager.implementation(this.params)
-      : super(token: _token);
+  PlatformCookieManager.implementation(this.params) : super(token: _token);
 
   static final Object _token = Object();
 

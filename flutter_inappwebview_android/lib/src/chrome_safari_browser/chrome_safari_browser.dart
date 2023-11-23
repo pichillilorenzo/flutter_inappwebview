@@ -36,24 +36,22 @@ class AndroidChromeSafariBrowserCreationParams
 ///**Supported Platforms/Implementations**:
 ///- Android
 ///- iOS
-class AndroidChromeSafariBrowser extends PlatformChromeSafariBrowser with ChannelController {
-  ///Debug settings.
-  static DebugLoggingSettings debugLoggingSettings = DebugLoggingSettings();
-
+class AndroidChromeSafariBrowser extends PlatformChromeSafariBrowser
+    with ChannelController {
   ///View ID used internally.
   final String id = IdGenerator.generate();
 
   /// Constructs a [AndroidChromeSafariBrowser].
   AndroidChromeSafariBrowser(PlatformChromeSafariBrowserCreationParams params)
       : super.implementation(
-    params is AndroidChromeSafariBrowserCreationParams
-        ? params
-        : AndroidChromeSafariBrowserCreationParams
-        .fromPlatformChromeSafariBrowserCreationParams(params),
-  );
+          params is AndroidChromeSafariBrowserCreationParams
+              ? params
+              : AndroidChromeSafariBrowserCreationParams
+                  .fromPlatformChromeSafariBrowserCreationParams(params),
+        );
 
   static final AndroidChromeSafariBrowser _staticValue =
-  AndroidChromeSafariBrowser(AndroidChromeSafariBrowserCreationParams());
+      AndroidChromeSafariBrowser(AndroidChromeSafariBrowserCreationParams());
 
   factory AndroidChromeSafariBrowser.static() {
     return _staticValue;
@@ -77,7 +75,7 @@ class AndroidChromeSafariBrowser extends PlatformChromeSafariBrowser with Channe
     debugLog(
         className: this.runtimeType.toString(),
         id: id,
-        debugLoggingSettings: AndroidChromeSafariBrowser.debugLoggingSettings,
+        debugLoggingSettings: PlatformChromeSafariBrowser.debugLoggingSettings,
         method: method,
         args: args);
   }
@@ -113,7 +111,8 @@ class AndroidChromeSafariBrowser extends PlatformChromeSafariBrowser with Channe
             ? WebUri(call.arguments["requestedOrigin"])
             : null;
         final bool result = call.arguments["result"];
-        eventHandler?.onRelationshipValidationResult(relation, requestedOrigin, result);
+        eventHandler?.onRelationshipValidationResult(
+            relation, requestedOrigin, result);
         break;
       case "onWillOpenInBrowser":
         eventHandler?.onWillOpenInBrowser();

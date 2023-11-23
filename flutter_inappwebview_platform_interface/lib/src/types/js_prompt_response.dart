@@ -1,7 +1,5 @@
 import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_internal_annotations.dart';
 
-
-
 import 'js_prompt_response_action.dart';
 
 part 'js_prompt_response.g.dart';

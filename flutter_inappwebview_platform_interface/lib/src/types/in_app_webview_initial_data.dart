@@ -1,6 +1,5 @@
 import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_internal_annotations.dart';
 
-
 import '../web_uri.dart';
 
 part 'in_app_webview_initial_data.g.dart';

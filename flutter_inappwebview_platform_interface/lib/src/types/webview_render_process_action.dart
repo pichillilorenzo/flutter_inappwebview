@@ -1,7 +1,5 @@
 import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_internal_annotations.dart';
 
-
-
 part 'webview_render_process_action.g.dart';
 
 ///Class that represents the action to take used by the [WebView.onRenderProcessUnresponsive] and [WebView.onRenderProcessResponsive] event

@@ -61,7 +61,8 @@ class PlatformInAppBrowserCreationParams {
 ///- Android native WebView
 ///- iOS
 ///- MacOS
-abstract class PlatformInAppBrowser extends PlatformInterface implements Disposable {
+abstract class PlatformInAppBrowser extends PlatformInterface
+    implements Disposable {
   ///Debug settings.
   static DebugLoggingSettings debugLoggingSettings = DebugLoggingSettings();
 
@@ -81,17 +82,20 @@ abstract class PlatformInAppBrowser extends PlatformInterface implements Disposa
   ///{@template flutter_inappwebview_platform_interface.PlatformInAppBrowser.pullToRefreshController}
   ///Represents the pull-to-refresh feature controller.
   ///@{endtemplate}
-  PlatformPullToRefreshController? get pullToRefreshController => params.pullToRefreshController;
+  PlatformPullToRefreshController? get pullToRefreshController =>
+      params.pullToRefreshController;
 
   ///{@template flutter_inappwebview_platform_interface.PlatformInAppBrowser.findInteractionController}
   ///Represents the find interaction feature controller.
   ///@{endtemplate}
-  PlatformFindInteractionController? get findInteractionController => params.findInteractionController;
+  PlatformFindInteractionController? get findInteractionController =>
+      params.findInteractionController;
 
   ///{@template flutter_inappwebview_platform_interface.PlatformInAppBrowser.initialUserScripts}
   ///Initial list of user scripts to be loaded at start or end of a page loading.
   ///@{endtemplate}
-  UnmodifiableListView<UserScript>? get initialUserScripts => params.initialUserScripts;
+  UnmodifiableListView<UserScript>? get initialUserScripts =>
+      params.initialUserScripts;
 
   ///{@template flutter_inappwebview_platform_interface.PlatformInAppBrowser.windowId}
   ///The window id of a [CreateWindowAction.windowId].
@@ -980,7 +984,7 @@ abstract class PlatformInAppBrowserEvents {
   ///Use [onGeolocationPermissionsShowPrompt] instead.
   @Deprecated("Use onGeolocationPermissionsShowPrompt instead")
   Future<GeolocationPermissionShowPromptResponse?>?
-  androidOnGeolocationPermissionsShowPrompt(String origin) {
+      androidOnGeolocationPermissionsShowPrompt(String origin) {
     return null;
   }
 
@@ -993,7 +997,7 @@ abstract class PlatformInAppBrowserEvents {
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebChromeClient.onGeolocationPermissionsShowPrompt](https://developer.android.com/reference/android/webkit/WebChromeClient#onGeolocationPermissionsShowPrompt(java.lang.String,%20android.webkit.GeolocationPermissions.Callback)))
   Future<GeolocationPermissionShowPromptResponse?>?
-  onGeolocationPermissionsShowPrompt(String origin) {
+      onGeolocationPermissionsShowPrompt(String origin) {
     return null;
   }
 
@@ -1281,9 +1285,9 @@ abstract class PlatformInAppBrowserEvents {
   ///- iOS
   ///- MacOS
   void onCameraCaptureStateChanged(
-      MediaCaptureState? oldState,
-      MediaCaptureState? newState,
-      ) {}
+    MediaCaptureState? oldState,
+    MediaCaptureState? newState,
+  ) {}
 
   ///Event fired when a change in the microphone capture state occurred.
   ///Event fired when a change in the microphone capture state occurred.
@@ -1296,9 +1300,9 @@ abstract class PlatformInAppBrowserEvents {
   ///- iOS
   ///- MacOS
   void onMicrophoneCaptureStateChanged(
-      MediaCaptureState? oldState,
-      MediaCaptureState? newState,
-      ) {}
+    MediaCaptureState? oldState,
+    MediaCaptureState? newState,
+  ) {}
 
   ///Event fired when the content size of the `WebView` changes.
   ///

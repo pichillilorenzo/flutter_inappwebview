@@ -2,8 +2,6 @@ import 'dart:typed_data';
 
 import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_internal_annotations.dart';
 
-
-
 part 'custom_scheme_response.g.dart';
 
 ///Class representing the response returned by the [WebView.onLoadResourceWithCustomScheme] event.

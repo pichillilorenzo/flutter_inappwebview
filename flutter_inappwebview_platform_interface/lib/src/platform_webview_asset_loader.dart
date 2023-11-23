@@ -43,8 +43,7 @@ class WebViewAssetLoader_ {
 
 abstract class IPathHandler {
   String get path {
-    throw UnimplementedError(
-        'path is not implemented on the current platform');
+    throw UnimplementedError('path is not implemented on the current platform');
   }
 
   Map<String, dynamic> toMap() {
@@ -74,7 +73,8 @@ class PlatformPathHandlerCreationParams {
 ///A handler that produces responses for a registered path.
 ///
 ///Implement this interface to handle other use-cases according to your app's needs.
-abstract class PlatformPathHandler extends PlatformInterface implements IPathHandler {
+abstract class PlatformPathHandler extends PlatformInterface
+    implements IPathHandler {
   /// Creates a new [PlatformWebViewAssetLoader]
   factory PlatformPathHandler(PlatformPathHandlerCreationParams params) {
     assert(

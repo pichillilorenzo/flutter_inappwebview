@@ -30,16 +30,17 @@ class PlatformProxyControllerCreationParams {
 ///- Android native WebView ([Official API - ProxyController](https://developer.android.com/reference/androidx/webkit/ProxyController))
 abstract class PlatformProxyController extends PlatformInterface {
   /// Creates a new [PlatformProxyController]
-  factory PlatformProxyController(PlatformProxyControllerCreationParams params) {
+  factory PlatformProxyController(
+      PlatformProxyControllerCreationParams params) {
     assert(
-    InAppWebViewPlatform.instance != null,
-    'A platform implementation for `flutter_inappwebview` has not been set. Please '
-        'ensure that an implementation of `InAppWebViewPlatform` has been set to '
-        '`WebViewPlatform.instance` before use. For unit testing, '
-        '`WebViewPlatform.instance` can be set with your own test implementation.',
+      InAppWebViewPlatform.instance != null,
+      'A platform implementation for `flutter_inappwebview` has not been set. Please '
+      'ensure that an implementation of `InAppWebViewPlatform` has been set to '
+      '`WebViewPlatform.instance` before use. For unit testing, '
+      '`WebViewPlatform.instance` can be set with your own test implementation.',
     );
     final PlatformProxyController proxyController =
-    InAppWebViewPlatform.instance!.createPlatformProxyController(params);
+        InAppWebViewPlatform.instance!.createPlatformProxyController(params);
     PlatformInterface.verify(proxyController, _token);
     return proxyController;
   }
@@ -50,8 +51,7 @@ abstract class PlatformProxyController extends PlatformInterface {
   /// Should only be used by platform implementations because they can't extend
   /// a class that only contains a factory constructor.
   @protected
-  PlatformProxyController.implementation(this.params)
-      : super(token: _token);
+  PlatformProxyController.implementation(this.params) : super(token: _token);
 
   static final Object _token = Object();
 

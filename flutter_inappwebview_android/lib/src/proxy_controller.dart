@@ -13,10 +13,10 @@ class AndroidProxyControllerCreationParams
     extends PlatformProxyControllerCreationParams {
   /// Creates a new [AndroidProxyControllerCreationParams] instance.
   const AndroidProxyControllerCreationParams(
-      // This parameter prevents breaking changes later.
-      // ignore: avoid_unused_constructor_parameters
-      PlatformProxyControllerCreationParams params,
-      ) : super();
+    // This parameter prevents breaking changes later.
+    // ignore: avoid_unused_constructor_parameters
+    PlatformProxyControllerCreationParams params,
+  ) : super();
 
   /// Creates a [AndroidProxyControllerCreationParams] instance based on [PlatformProxyControllerCreationParams].
   factory AndroidProxyControllerCreationParams.fromPlatformProxyControllerCreationParams(
@@ -35,15 +35,16 @@ class AndroidProxyControllerCreationParams
 ///
 ///**Supported Platforms/Implementations**:
 ///- Android native WebView ([Official API - ProxyController](https://developer.android.com/reference/androidx/webkit/ProxyController))
-class AndroidProxyController extends PlatformProxyController with ChannelController {
+class AndroidProxyController extends PlatformProxyController
+    with ChannelController {
   /// Creates a new [AndroidProxyController].
   AndroidProxyController(PlatformProxyControllerCreationParams params)
       : super.implementation(
-    params is AndroidProxyControllerCreationParams
-        ? params
-        : AndroidProxyControllerCreationParams
-        .fromPlatformProxyControllerCreationParams(params),
-  ) {
+          params is AndroidProxyControllerCreationParams
+              ? params
+              : AndroidProxyControllerCreationParams
+                  .fromPlatformProxyControllerCreationParams(params),
+        ) {
     channel = const MethodChannel(
         'com.pichillilorenzo/flutter_inappwebview_proxycontroller');
     handler = handleMethod;

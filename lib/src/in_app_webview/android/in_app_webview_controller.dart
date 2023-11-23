@@ -9,7 +9,8 @@ import '../in_app_webview_controller.dart';
 class AndroidInAppWebViewController {
   PlatformInAppWebViewController? _controller;
 
-  AndroidInAppWebViewController({required PlatformInAppWebViewController controller}) {
+  AndroidInAppWebViewController(
+      {required PlatformInAppWebViewController controller}) {
     this._controller = controller;
   }
 

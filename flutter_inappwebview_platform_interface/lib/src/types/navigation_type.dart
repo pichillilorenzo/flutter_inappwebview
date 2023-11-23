@@ -1,7 +1,5 @@
 import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_internal_annotations.dart';
 
-
-
 part 'navigation_type.g.dart';
 
 ///Class that represents the type of action triggering a navigation for the [WebView.shouldOverrideUrlLoading] event.

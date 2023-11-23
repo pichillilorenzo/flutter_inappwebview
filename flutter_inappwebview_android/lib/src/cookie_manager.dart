@@ -189,13 +189,12 @@ class AndroidCookieManager extends PlatformCookieManager
     final setCookieCompleter = Completer<void>();
     final headlessWebView =
         AndroidHeadlessInAppWebView(AndroidHeadlessInAppWebViewCreationParams(
-      initialUrlRequest: URLRequest(url: url),
-      onLoadStop: (controller, url) async {
-        await controller.evaluateJavascript(
-            source: 'document.cookie="$cookieValue"');
-        setCookieCompleter.complete();
-      }
-    ));
+            initialUrlRequest: URLRequest(url: url),
+            onLoadStop: (controller, url) async {
+              await controller.evaluateJavascript(
+                  source: 'document.cookie="$cookieValue"');
+              setCookieCompleter.complete();
+            }));
     await headlessWebView.run();
     await setCookieCompleter.future;
     await headlessWebView.dispose();

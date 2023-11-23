@@ -24,7 +24,8 @@ class PlatformChromeSafariBrowserCreationParams {
 ///**Supported Platforms/Implementations**:
 ///- Android
 ///- iOS
-abstract class PlatformChromeSafariBrowser extends PlatformInterface implements Disposable {
+abstract class PlatformChromeSafariBrowser extends PlatformInterface
+    implements Disposable {
   ///Debug settings.
   static DebugLoggingSettings debugLoggingSettings = DebugLoggingSettings();
 
@@ -35,21 +36,22 @@ abstract class PlatformChromeSafariBrowser extends PlatformInterface implements 
   ///View ID used internally.
   ///@{endtemplate}
   String get id {
-    throw UnimplementedError(
-        'id is not implemented on the current platform');
+    throw UnimplementedError('id is not implemented on the current platform');
   }
 
   /// Creates a new [PlatformChromeSafariBrowser]
-  factory PlatformChromeSafariBrowser(PlatformChromeSafariBrowserCreationParams params) {
+  factory PlatformChromeSafariBrowser(
+      PlatformChromeSafariBrowserCreationParams params) {
     assert(
-    InAppWebViewPlatform.instance != null,
-    'A platform implementation for `flutter_inappwebview` has not been set. Please '
-        'ensure that an implementation of `InAppWebViewPlatform` has been set to '
-        '`InAppWebViewPlatform.instance` before use. For unit testing, '
-        '`InAppWebViewPlatform.instance` can be set with your own test implementation.',
+      InAppWebViewPlatform.instance != null,
+      'A platform implementation for `flutter_inappwebview` has not been set. Please '
+      'ensure that an implementation of `InAppWebViewPlatform` has been set to '
+      '`InAppWebViewPlatform.instance` before use. For unit testing, '
+      '`InAppWebViewPlatform.instance` can be set with your own test implementation.',
     );
-    final PlatformChromeSafariBrowser chromeSafariBrowser =
-    InAppWebViewPlatform.instance!.createPlatformChromeSafariBrowser(params);
+    final PlatformChromeSafariBrowser chromeSafariBrowser = InAppWebViewPlatform
+        .instance!
+        .createPlatformChromeSafariBrowser(params);
     PlatformInterface.verify(chromeSafariBrowser, _token);
     return chromeSafariBrowser;
   }
@@ -57,14 +59,15 @@ abstract class PlatformChromeSafariBrowser extends PlatformInterface implements 
   /// Creates a new [PlatformChromeSafariBrowser] to access static methods.
   factory PlatformChromeSafariBrowser.static() {
     assert(
-    InAppWebViewPlatform.instance != null,
-    'A platform implementation for `flutter_inappwebview` has not been set. Please '
-        'ensure that an implementation of `InAppWebViewPlatform` has been set to '
-        '`InAppWebViewPlatform.instance` before use. For unit testing, '
-        '`InAppWebViewPlatform.instance` can be set with your own test implementation.',
+      InAppWebViewPlatform.instance != null,
+      'A platform implementation for `flutter_inappwebview` has not been set. Please '
+      'ensure that an implementation of `InAppWebViewPlatform` has been set to '
+      '`InAppWebViewPlatform.instance` before use. For unit testing, '
+      '`InAppWebViewPlatform.instance` can be set with your own test implementation.',
     );
     final PlatformChromeSafariBrowser chromeSafariBrowserStatic =
-    InAppWebViewPlatform.instance!.createPlatformChromeSafariBrowserStatic();
+        InAppWebViewPlatform.instance!
+            .createPlatformChromeSafariBrowserStatic();
     PlatformInterface.verify(chromeSafariBrowserStatic, _token);
     return chromeSafariBrowserStatic;
   }
@@ -74,7 +77,8 @@ abstract class PlatformChromeSafariBrowser extends PlatformInterface implements 
   /// Should only be used by platform implementations because they can't extend
   /// a class that only contains a factory constructor.
   @protected
-  PlatformChromeSafariBrowser.implementation(this.params) : super(token: _token);
+  PlatformChromeSafariBrowser.implementation(this.params)
+      : super(token: _token);
 
   static final Object _token = Object();
 
@@ -100,16 +104,16 @@ abstract class PlatformChromeSafariBrowser extends PlatformInterface implements 
   ///**Supported Platforms/Implementations**:
   ///- Android
   ///- iOS
-  Future<void> open({WebUri? url,
-    Map<String, String>? headers,
-    List<WebUri>? otherLikelyURLs,
-    WebUri? referrer,
-    @Deprecated('Use settings instead')
-    // ignore: deprecated_member_use_from_same_package
-    ChromeSafariBrowserClassOptions? options,
-    ChromeSafariBrowserSettings? settings}) {
-    throw UnimplementedError(
-        'open is not implemented on the current platform');
+  Future<void> open(
+      {WebUri? url,
+      Map<String, String>? headers,
+      List<WebUri>? otherLikelyURLs,
+      WebUri? referrer,
+      @Deprecated('Use settings instead')
+      // ignore: deprecated_member_use_from_same_package
+      ChromeSafariBrowserClassOptions? options,
+      ChromeSafariBrowserSettings? settings}) {
+    throw UnimplementedError('open is not implemented on the current platform');
   }
 
   ///Tells the browser to launch with [url].
@@ -148,8 +152,7 @@ abstract class PlatformChromeSafariBrowser extends PlatformInterface implements 
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android ([Official API - CustomTabsSession.mayLaunchUrl](https://developer.android.com/reference/androidx/browser/customtabs/CustomTabsSession#mayLaunchUrl(android.net.Uri,android.os.Bundle,java.util.List%3Candroid.os.Bundle%3E)))
-  Future<bool> mayLaunchUrl(
-      {WebUri? url, List<WebUri>? otherLikelyURLs}) {
+  Future<bool> mayLaunchUrl({WebUri? url, List<WebUri>? otherLikelyURLs}) {
     throw UnimplementedError(
         'mayLaunchUrl is not implemented on the current platform');
   }
@@ -170,8 +173,8 @@ abstract class PlatformChromeSafariBrowser extends PlatformInterface implements 
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android ([Official API - CustomTabsSession.validateRelationship](https://developer.android.com/reference/androidx/browser/customtabs/CustomTabsSession#validateRelationship(int,android.net.Uri,android.os.Bundle)))
-  Future<bool> validateRelationship({required CustomTabsRelationType relation,
-    required WebUri origin}) {
+  Future<bool> validateRelationship(
+      {required CustomTabsRelationType relation, required WebUri origin}) {
     throw UnimplementedError(
         'validateRelationship is not implemented on the current platform');
   }
@@ -405,8 +408,7 @@ abstract class PlatformChromeSafariBrowser extends PlatformInterface implements 
   ///
   ///**Supported Platforms/Implementations**:
   ///- iOS ([Official API - SFSafariViewController.prewarmConnections](https://developer.apple.com/documentation/safariservices/sfsafariviewcontroller/3752133-prewarmconnections))
-  Future<void> invalidatePrewarmingToken(
-      PrewarmingToken prewarmingToken) {
+  Future<void> invalidatePrewarmingToken(PrewarmingToken prewarmingToken) {
     throw UnimplementedError(
         'invalidatePrewarmingToken is not implemented on the current platform');
   }

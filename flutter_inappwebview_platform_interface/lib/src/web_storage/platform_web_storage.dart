@@ -32,7 +32,8 @@ class PlatformWebStorageCreationParams {
 ///- iOS
 ///- MacOS
 ///- Web
-abstract class PlatformWebStorage extends PlatformInterface implements Disposable {
+abstract class PlatformWebStorage extends PlatformInterface
+    implements Disposable {
   /// Creates a new [PlatformWebStorage]
   factory PlatformWebStorage(PlatformWebStorageCreationParams params) {
     assert(
@@ -217,7 +218,8 @@ abstract class PlatformStorage extends PlatformInterface implements Disposable {
 
   @override
   void dispose() {
-    throw UnimplementedError('dispose is not implemented on the current platform');
+    throw UnimplementedError(
+        'dispose is not implemented on the current platform');
   }
 }
 
@@ -280,13 +282,14 @@ abstract class PlatformLocalStorage extends PlatformStorage {
 /// Platform specific implementations can add additional fields by extending
 /// this class.
 @immutable
-class PlatformSessionStorageCreationParams extends PlatformStorageCreationParams {
+class PlatformSessionStorageCreationParams
+    extends PlatformStorageCreationParams {
   /// Used by the platform implementation to create a new [PlatformSessionStorage].
   const PlatformSessionStorageCreationParams(
-      // This parameter prevents breaking changes later.
-      // ignore: avoid_unused_constructor_parameters
-      PlatformStorageCreationParams params,
-      ) : super(webStorageType: WebStorageType.SESSION_STORAGE);
+    // This parameter prevents breaking changes later.
+    // ignore: avoid_unused_constructor_parameters
+    PlatformStorageCreationParams params,
+  ) : super(webStorageType: WebStorageType.SESSION_STORAGE);
 
   /// Creates a [AndroidCookieManagerCreationParams] instance based on [PlatformCookieManagerCreationParams].
   factory PlatformSessionStorageCreationParams.fromPlatformStorageCreationParams(
@@ -301,14 +304,14 @@ abstract class PlatformSessionStorage extends PlatformStorage {
   /// Creates a new [PlatformSessionStorage]
   factory PlatformSessionStorage(PlatformSessionStorageCreationParams params) {
     assert(
-    InAppWebViewPlatform.instance != null,
-    'A platform implementation for `flutter_inappwebview` has not been set. Please '
-        'ensure that an implementation of `InAppWebViewPlatform` has been set to '
-        '`InAppWebViewPlatform.instance` before use. For unit testing, '
-        '`InAppWebViewPlatform.instance` can be set with your own test implementation.',
+      InAppWebViewPlatform.instance != null,
+      'A platform implementation for `flutter_inappwebview` has not been set. Please '
+      'ensure that an implementation of `InAppWebViewPlatform` has been set to '
+      '`InAppWebViewPlatform.instance` before use. For unit testing, '
+      '`InAppWebViewPlatform.instance` can be set with your own test implementation.',
     );
     final PlatformSessionStorage sessionStorage =
-    InAppWebViewPlatform.instance!.createPlatformSessionStorage(params);
+        InAppWebViewPlatform.instance!.createPlatformSessionStorage(params);
     PlatformInterface.verify(sessionStorage, _token);
     return sessionStorage;
   }
@@ -320,11 +323,11 @@ abstract class PlatformSessionStorage extends PlatformStorage {
   @protected
   PlatformSessionStorage.implementation(PlatformStorageCreationParams params)
       : super.implementation(
-    params is PlatformSessionStorageCreationParams
-        ? params
-        : PlatformSessionStorageCreationParams
-        .fromPlatformStorageCreationParams(params),
-  );
+          params is PlatformSessionStorageCreationParams
+              ? params
+              : PlatformSessionStorageCreationParams
+                  .fromPlatformStorageCreationParams(params),
+        );
 
   static final Object _token = Object();
 }

@@ -1,6 +1,5 @@
 import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_internal_annotations.dart';
 
-
 import 'url_credential.dart';
 import 'url_response.dart';
 import 'url_authentication_challenge.dart';

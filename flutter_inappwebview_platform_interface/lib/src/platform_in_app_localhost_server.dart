@@ -41,16 +41,18 @@ class PlatformInAppLocalhostServerCreationParams {
 ///- MacOS
 abstract class PlatformInAppLocalhostServer extends PlatformInterface {
   /// Creates a new [PlatformInAppLocalhostServer]
-  factory PlatformInAppLocalhostServer(PlatformInAppLocalhostServerCreationParams params) {
+  factory PlatformInAppLocalhostServer(
+      PlatformInAppLocalhostServerCreationParams params) {
     assert(
-    InAppWebViewPlatform.instance != null,
-    'A platform implementation for `flutter_inappwebview` has not been set. Please '
-        'ensure that an implementation of `InAppWebViewPlatform` has been set to '
-        '`WebViewPlatform.instance` before use. For unit testing, '
-        '`WebViewPlatform.instance` can be set with your own test implementation.',
+      InAppWebViewPlatform.instance != null,
+      'A platform implementation for `flutter_inappwebview` has not been set. Please '
+      'ensure that an implementation of `InAppWebViewPlatform` has been set to '
+      '`WebViewPlatform.instance` before use. For unit testing, '
+      '`WebViewPlatform.instance` can be set with your own test implementation.',
     );
     final PlatformInAppLocalhostServer inAppLocalhostServer =
-    InAppWebViewPlatform.instance!.createPlatformInAppLocalhostServer(params);
+        InAppWebViewPlatform.instance!
+            .createPlatformInAppLocalhostServer(params);
     PlatformInterface.verify(inAppLocalhostServer, _token);
     return inAppLocalhostServer;
   }

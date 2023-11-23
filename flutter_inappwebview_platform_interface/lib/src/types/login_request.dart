@@ -1,7 +1,5 @@
 import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_internal_annotations.dart';
 
-
-
 part 'login_request.g.dart';
 
 ///Class used by [WebView.onReceivedLoginRequest] event.

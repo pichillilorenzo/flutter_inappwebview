@@ -28,7 +28,8 @@ class PlatformFindInteractionControllerCreationParams {
 ///- Android native WebView
 ///- iOS
 ///- MacOS
-abstract class PlatformFindInteractionController extends PlatformInterface implements Disposable {
+abstract class PlatformFindInteractionController extends PlatformInterface
+    implements Disposable {
   ///Debug settings.
   static DebugLoggingSettings debugLoggingSettings = DebugLoggingSettings();
 
@@ -36,14 +37,15 @@ abstract class PlatformFindInteractionController extends PlatformInterface imple
   factory PlatformFindInteractionController(
       PlatformFindInteractionControllerCreationParams params) {
     assert(
-    InAppWebViewPlatform.instance != null,
-    'A platform implementation for `flutter_inappwebview` has not been set. Please '
-        'ensure that an implementation of `InAppWebViewPlatform` has been set to '
-        '`InAppWebViewPlatform.instance` before use. For unit testing, '
-        '`InAppWebViewPlatform.instance` can be set with your own test implementation.',
+      InAppWebViewPlatform.instance != null,
+      'A platform implementation for `flutter_inappwebview` has not been set. Please '
+      'ensure that an implementation of `InAppWebViewPlatform` has been set to '
+      '`InAppWebViewPlatform.instance` before use. For unit testing, '
+      '`InAppWebViewPlatform.instance` can be set with your own test implementation.',
     );
     final PlatformFindInteractionController webViewControllerDelegate =
-    InAppWebViewPlatform.instance!.createPlatformFindInteractionController(params);
+        InAppWebViewPlatform.instance!
+            .createPlatformFindInteractionController(params);
     PlatformInterface.verify(webViewControllerDelegate, _token);
     return webViewControllerDelegate;
   }
@@ -53,7 +55,8 @@ abstract class PlatformFindInteractionController extends PlatformInterface imple
   /// Should only be used by platform implementations because they can't extend
   /// a class that only contains a factory constructor.
   @protected
-  PlatformFindInteractionController.implementation(this.params) : super(token: _token);
+  PlatformFindInteractionController.implementation(this.params)
+      : super(token: _token);
 
   static final Object _token = Object();
 
@@ -77,11 +80,9 @@ abstract class PlatformFindInteractionController extends PlatformInterface imple
   ///- iOS
   ///- MacOS
   ///{@endtemplate}
-  void Function(
-      PlatformFindInteractionController controller,
-      int activeMatchOrdinal,
-      int numberOfMatches,
-      bool isDoneCounting)? get onFindResultReceived => params.onFindResultReceived;
+  void Function(PlatformFindInteractionController controller,
+          int activeMatchOrdinal, int numberOfMatches, bool isDoneCounting)?
+      get onFindResultReceived => params.onFindResultReceived;
 
   ///Finds all instances of find on the page and highlights them. Notifies [PlatformFindInteractionController.onFindResultReceived] listener.
   ///

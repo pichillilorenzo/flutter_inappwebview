@@ -21,9 +21,6 @@ import '../print_job/main.dart';
 ///- iOS
 ///- MacOS
 class InAppBrowser implements PlatformInAppBrowserEvents {
-  ///Debug settings.
-  static DebugLoggingSettings debugLoggingSettings = DebugLoggingSettings();
-
   /// Constructs a [InAppBrowser].
   ///
   /// See [InAppBrowser.fromPlatformCreationParams] for setting

@@ -22,16 +22,18 @@ class PlatformServiceWorkerControllerCreationParams {
 ///- Android native WebView ([Official API - ServiceWorkerControllerCompat](https://developer.android.com/reference/androidx/webkit/ServiceWorkerControllerCompat))
 abstract class PlatformServiceWorkerController extends PlatformInterface {
   /// Creates a new [PlatformServiceWorkerController]
-  factory PlatformServiceWorkerController(PlatformServiceWorkerControllerCreationParams params) {
+  factory PlatformServiceWorkerController(
+      PlatformServiceWorkerControllerCreationParams params) {
     assert(
-    InAppWebViewPlatform.instance != null,
-    'A platform implementation for `flutter_inappwebview` has not been set. Please '
-        'ensure that an implementation of `InAppWebViewPlatform` has been set to '
-        '`WebViewPlatform.instance` before use. For unit testing, '
-        '`WebViewPlatform.instance` can be set with your own test implementation.',
+      InAppWebViewPlatform.instance != null,
+      'A platform implementation for `flutter_inappwebview` has not been set. Please '
+      'ensure that an implementation of `InAppWebViewPlatform` has been set to '
+      '`WebViewPlatform.instance` before use. For unit testing, '
+      '`WebViewPlatform.instance` can be set with your own test implementation.',
     );
     final PlatformServiceWorkerController serviceWorkerController =
-    InAppWebViewPlatform.instance!.createPlatformServiceWorkerController(params);
+        InAppWebViewPlatform.instance!
+            .createPlatformServiceWorkerController(params);
     PlatformInterface.verify(serviceWorkerController, _token);
     return serviceWorkerController;
   }
@@ -39,14 +41,15 @@ abstract class PlatformServiceWorkerController extends PlatformInterface {
   /// Creates a new [PlatformServiceWorkerController]
   factory PlatformServiceWorkerController.static() {
     assert(
-    InAppWebViewPlatform.instance != null,
-    'A platform implementation for `flutter_inappwebview` has not been set. Please '
-        'ensure that an implementation of `InAppWebViewPlatform` has been set to '
-        '`WebViewPlatform.instance` before use. For unit testing, '
-        '`WebViewPlatform.instance` can be set with your own test implementation.',
+      InAppWebViewPlatform.instance != null,
+      'A platform implementation for `flutter_inappwebview` has not been set. Please '
+      'ensure that an implementation of `InAppWebViewPlatform` has been set to '
+      '`WebViewPlatform.instance` before use. For unit testing, '
+      '`WebViewPlatform.instance` can be set with your own test implementation.',
     );
     final PlatformServiceWorkerController serviceWorkerControllerStatic =
-    InAppWebViewPlatform.instance!.createPlatformServiceWorkerControllerStatic();
+        InAppWebViewPlatform.instance!
+            .createPlatformServiceWorkerControllerStatic();
     PlatformInterface.verify(serviceWorkerControllerStatic, _token);
     return serviceWorkerControllerStatic;
   }
@@ -188,4 +191,3 @@ class ServiceWorkerClient {
 
   ServiceWorkerClient({this.shouldInterceptRequest});
 }
-

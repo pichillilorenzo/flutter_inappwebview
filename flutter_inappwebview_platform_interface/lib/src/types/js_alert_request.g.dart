@@ -6,7 +6,7 @@ part of 'js_alert_request.dart';
 // ExchangeableObjectGenerator
 // **************************************************************************
 
-///Class that represents the request of the [WebView.onJsAlert] event.
+///Class that represents the request of the [PlatformWebViewCreationParams.onJsAlert] event.
 class JsAlertRequest {
   ///Use [isMainFrame] instead.
   @Deprecated('Use isMainFrame instead')
@@ -14,7 +14,7 @@ class JsAlertRequest {
 
   ///Indicates whether the request was made for the main frame.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- iOS
   ///- MacOS
   bool? isMainFrame;

@@ -10,26 +10,26 @@ part of 'printer.dart';
 class Printer {
   ///The unique id of the printer.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
   String? id;
 
   ///The PostScript language level recognized by the printer.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- MacOS
   int? languageLevel;
 
   ///The printer’s name.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- MacOS
   String? name;
 
   ///A description of the printer’s make and model.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- MacOS
   String? type;
   Printer({this.id, this.languageLevel, this.name, this.type});

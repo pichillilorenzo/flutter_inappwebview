@@ -1,4 +1,4 @@
-import 'package:flutter/foundation.dart';
+import '../in_app_webview/platform_webview.dart';
 import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_internal_annotations.dart';
 
 import '../util.dart';
@@ -6,7 +6,7 @@ import 'client_cert_response_action.dart';
 
 part 'client_cert_response.g.dart';
 
-///Class that represents the response used by the [WebView.onReceivedClientCertRequest] event.
+///Class that represents the response used by the [PlatformWebViewCreationParams.onReceivedClientCertRequest] event.
 @ExchangeableObject()
 class ClientCertResponse_ {
   ///The file path of the certificate to use.

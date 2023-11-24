@@ -6,7 +6,7 @@ part of 'client_cert_response.dart';
 // ExchangeableObjectGenerator
 // **************************************************************************
 
-///Class that represents the response used by the [WebView.onReceivedClientCertRequest] event.
+///Class that represents the response used by the [PlatformWebViewCreationParams.onReceivedClientCertRequest] event.
 class ClientCertResponse {
   ///Indicate the [ClientCertResponseAction] to take in response of the client certificate challenge.
   ClientCertResponseAction? action;
@@ -23,7 +23,7 @@ class ClientCertResponse {
 
   ///An Android-specific property used by Java [KeyStore](https://developer.android.com/reference/java/security/KeyStore) class to get the instance.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView
   String? keyStoreType;
   ClientCertResponse(

@@ -1,10 +1,10 @@
 import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_internal_annotations.dart';
-
+import '../in_app_webview/platform_webview.dart';
 import 'js_confirm_response_action.dart';
 
 part 'js_confirm_response.g.dart';
 
-///Class that represents the response used by the [WebView.onJsConfirm] event to control a JavaScript confirm dialog.
+///Class that represents the response used by the [PlatformWebViewCreationParams.onJsConfirm] event to control a JavaScript confirm dialog.
 @ExchangeableObject()
 class JsConfirmResponse_ {
   ///Message to be displayed in the window.

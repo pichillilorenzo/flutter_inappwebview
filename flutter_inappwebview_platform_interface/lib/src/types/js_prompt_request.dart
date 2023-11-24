@@ -1,10 +1,10 @@
 import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_internal_annotations.dart';
-
+import '../in_app_webview/platform_webview.dart';
 import '../web_uri.dart';
 
 part 'js_prompt_request.g.dart';
 
-///Class that represents the request of the [WebView.onJsPrompt] event.
+///Class that represents the request of the [PlatformWebViewCreationParams.onJsPrompt] event.
 @ExchangeableObject()
 class JsPromptRequest_ {
   ///The url of the page requesting the dialog.

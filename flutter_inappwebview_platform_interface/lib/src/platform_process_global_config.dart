@@ -18,6 +18,7 @@ class PlatformProcessGlobalConfigCreationParams {
   const PlatformProcessGlobalConfigCreationParams();
 }
 
+///{@template flutter_inappwebview_platform_interface.PlatformProcessGlobalConfig}
 ///Process Global Configuration for `WebView`.
 ///WebView has some process-global configuration parameters
 ///that cannot be changed once WebView has been loaded.
@@ -38,8 +39,9 @@ class PlatformProcessGlobalConfigCreationParams {
 ///The configuration should be set up as early as possible during application startup,
 ///to ensure that it happens before any other thread can call a method that loads `WebView`.
 ///
-///**Supported Platforms/Implementations**:
+///**Officially Supported Platforms/Implementations**:
 ///- Android native WebView ([Official API - ProcessGlobalConfig](https://developer.android.com/reference/androidx/webkit/ProcessGlobalConfig))
+///{@endtemplate}
 abstract class PlatformProcessGlobalConfig extends PlatformInterface {
   /// Creates a new [PlatformProcessGlobalConfig]
   factory PlatformProcessGlobalConfig(
@@ -72,13 +74,15 @@ abstract class PlatformProcessGlobalConfig extends PlatformInterface {
   /// The parameters used to initialize the [PlatformProcessGlobalConfig].
   final PlatformProcessGlobalConfigCreationParams params;
 
+  ///{@template flutter_inappwebview_platform_interface.PlatformProcessGlobalConfig.apply}
   ///Applies the configuration to be used by `WebView` on loading.
   ///This method can only be called once.
   ///
   ///Calling this method will not cause `WebView` to be loaded and will not block the calling thread.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - ProcessGlobalConfig.apply](https://developer.android.com/reference/androidx/webkit/ProcessGlobalConfig#apply(androidx.webkit.ProcessGlobalConfig)))
+  ///{@endtemplate}
   Future<void> apply({required ProcessGlobalConfigSettings settings}) {
     throw UnimplementedError(
         'apply is not implemented on the current platform');
@@ -87,7 +91,7 @@ abstract class PlatformProcessGlobalConfig extends PlatformInterface {
 
 ///Class that represents the settings used to configure the [PlatformProcessGlobalConfig].
 ///
-///**Supported Platforms/Implementations**:
+///**Officially Supported Platforms/Implementations**:
 ///- Android native WebView
 @ExchangeableObject(copyMethod: true)
 class ProcessGlobalConfigSettings_ {
@@ -141,7 +145,7 @@ class ProcessGlobalConfigSettings_ {
 
 ///Class that represents the settings used to configure the [ProcessGlobalConfigSettings.directoryBasePaths].
 ///
-///**Supported Platforms/Implementations**:
+///**Officially Supported Platforms/Implementations**:
 ///- Android native WebView ([Official API - ProxyConfig](https://developer.android.com/reference/androidx/webkit/ProxyConfig))
 @ExchangeableObject()
 class ProcessGlobalConfigDirectoryBasePaths_ {

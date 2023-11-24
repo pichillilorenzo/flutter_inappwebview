@@ -1,10 +1,10 @@
 import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_internal_annotations.dart';
-
+import '../in_app_webview/platform_webview.dart';
 import 'js_alert_response_action.dart';
 
 part 'js_alert_response.g.dart';
 
-///Class that represents the response used by the [WebView.onJsAlert] event to control a JavaScript alert dialog.
+///Class that represents the response used by the [PlatformWebViewCreationParams.onJsAlert] event to control a JavaScript alert dialog.
 @ExchangeableObject()
 class JsAlertResponse_ {
   ///Message to be displayed in the window.

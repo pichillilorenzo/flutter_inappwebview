@@ -11,20 +11,20 @@ part of 'print_job_attributes.dart';
 class PrintJobAttributes {
   ///The color mode.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- MacOS
   PrintJobColorMode? colorMode;
 
   ///If `true`, produce detailed reports when an error occurs.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- MacOS
   bool? detailedErrorReporting;
 
   ///The duplex mode to use for the print job.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView 23+
   ///- iOS
   ///- MacOS
@@ -32,7 +32,7 @@ class PrintJobAttributes {
 
   ///A fax number.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- MacOS
   String? faxNumber;
 
@@ -41,13 +41,13 @@ class PrintJobAttributes {
   ///The footer is measured in points from the bottom of [printableRect] and is below the content area.
   ///The default footer height is `0.0`.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- iOS
   double? footerHeight;
 
   ///If `true`, a standard header and footer are added outside the margins of each page.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- MacOS
   bool? headerAndFooter;
 
@@ -56,49 +56,49 @@ class PrintJobAttributes {
   ///The header is measured in points from the top of [printableRect] and is above the content area.
   ///The default header height is `0.0`.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- iOS
   double? headerHeight;
 
   ///The horizontal pagination mode.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- MacOS
   PrintJobPaginationMode? horizontalPagination;
 
   ///Indicates whether the image is centered horizontally.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- MacOS
   bool? isHorizontallyCentered;
 
   ///Indicates whether only the currently selected contents should be printed.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- MacOS
   bool? isSelectionOnly;
 
   ///Indicates whether the image is centered vertically.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- MacOS
   bool? isVerticallyCentered;
 
   ///The action specified for the job.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- MacOS
   PrintJobDisposition? jobDisposition;
 
   ///An URL containing the location to which the job file will be saved when the [jobDisposition] is [PrintJobDisposition.SAVE].
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- MacOS
   WebUri? jobSavingURL;
 
   ///The human-readable name of the currently selected paper size, suitable for presentation in user interfaces.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- MacOS
   String? localizedPaperName;
 
@@ -106,7 +106,7 @@ class PrintJobAttributes {
   ///Margins define the white space around the content where the left margin defines
   ///the amount of white space on the left of the content and so on.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- iOS
   ///- MacOS
   EdgeInsets? margins;
@@ -118,7 +118,7 @@ class PrintJobAttributes {
   ///the top inset value; it uses the lower of the two values.
   ///The default value of this property is the maximum float value.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- iOS
   double? maximumContentHeight;
 
@@ -128,19 +128,19 @@ class PrintJobAttributes {
   ///It compares the value of this property with the printing rectangle’s width minus the left and right inset values and uses the lower of the two.
   ///The default value of this property is the maximum float value.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- iOS
   double? maximumContentWidth;
 
   ///The media size.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView
   PrintJobMediaSize? mediaSize;
 
   ///If `true`, collates output.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- MacOS
   bool? mustCollate;
 
@@ -149,19 +149,19 @@ class PrintJobAttributes {
 
   ///The number of logical pages to be tiled horizontally on a physical sheet of paper.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- MacOS
   int? pagesAcross;
 
   ///The number of logical pages to be tiled vertically on a physical sheet of paper.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- MacOS
   int? pagesDown;
 
   ///The name of the currently selected paper size.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- MacOS
   String? paperName;
 
@@ -170,7 +170,7 @@ class PrintJobAttributes {
   ///The value of this property is a rectangle that defines the size of paper chosen for the print job.
   ///The origin is always (0,0).
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- iOS
   ///- MacOS
   InAppWebViewRect? paperRect;
@@ -180,32 +180,32 @@ class PrintJobAttributes {
   ///The value of this property is a rectangle that defines the area in which the printer can print content.
   ///Sometimes this is referred to as the imageable area of the paper.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- iOS
   ///- MacOS
   InAppWebViewRect? printableRect;
 
   ///The supported resolution in DPI (dots per inch).
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView
   PrintJobResolution? resolution;
 
   ///The current scaling factor.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- MacOS
   double? scalingFactor;
 
   ///A timestamp that specifies the time at which printing should begin.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- MacOS
   int? time;
 
   ///The vertical pagination to the specified mode.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- MacOS
   PrintJobPaginationMode? verticalPagination;
   PrintJobAttributes(

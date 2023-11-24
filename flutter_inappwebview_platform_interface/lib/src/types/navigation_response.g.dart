@@ -6,7 +6,7 @@ part of 'navigation_response.dart';
 // ExchangeableObjectGenerator
 // **************************************************************************
 
-///Class that represents the navigation response used by the [WebView.onNavigationResponse] event.
+///Class that represents the navigation response used by the [PlatformWebViewCreationParams.onNavigationResponse] event.
 class NavigationResponse {
   ///A Boolean value that indicates whether WebKit is capable of displaying the response’s MIME type natively.
   bool canShowMIMEType;
@@ -54,7 +54,7 @@ class NavigationResponse {
   }
 }
 
-///An iOS-specific Class that represents the navigation response used by the [WebView.onNavigationResponse] event.
+///An iOS-specific Class that represents the navigation response used by the [PlatformWebViewCreationParams.onNavigationResponse] event.
 ///Use [NavigationResponse] instead.
 @Deprecated('Use NavigationResponse instead')
 class IOSWKNavigationResponse {

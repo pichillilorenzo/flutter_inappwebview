@@ -10,7 +10,7 @@ part of 'context_menu.dart';
 ///
 ///**NOTE for Android native WebView**: To make it work properly on Android, JavaScript should be enabled!
 ///
-///**Supported Platforms/Implementations**:
+///**Officially Supported Platforms/Implementations**:
 ///- Android native WebView
 ///- iOS
 class ContextMenu {
@@ -40,7 +40,7 @@ class ContextMenu {
   ///
   ///**NOTE for Android native WebView**: To make it work properly on Android, JavaScript should be enabled!
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
   ContextMenu(

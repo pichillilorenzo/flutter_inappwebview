@@ -24,9 +24,7 @@ class AndroidPathHandlerCreationParams
   }
 }
 
-///A handler that produces responses for a registered path.
-///
-///Implement this interface to handle other use-cases according to your app's needs.
+///{@macro flutter_inappwebview_platform_interface.PlatformPathHandler}
 class AndroidPathHandler extends PlatformPathHandler with ChannelController {
   /// Creates a new [AndroidPathHandler].
   AndroidPathHandler(PlatformPathHandlerCreationParams params)
@@ -57,12 +55,12 @@ class AndroidPathHandler extends PlatformPathHandler with ChannelController {
     }
   }
 
-  ///Converts instance to a map.
+  @override
   Map<String, dynamic> toMap() {
     return {"path": path, "type": _type, "id": _id};
   }
 
-  ///Converts instance to a map.
+  @override
   Map<String, dynamic> toJson() {
     return toMap();
   }
@@ -101,19 +99,7 @@ class AndroidAssetsPathHandlerCreationParams
   }
 }
 
-///Handler class to open a file from assets directory in the application APK.
-///
-///Opens the requested file from the application's assets directory.
-///
-///The matched prefix path used shouldn't be a prefix of a real web path.
-///Thus, if the requested file cannot be found a [WebResourceResponse] object with a `null` data will be returned instead of `null`.
-///This saves the time of falling back to network and trying to resolve a path that doesn't exist.
-///A [WebResourceResponse] with `null` data will be received as an HTTP response with status code `404` and no body.
-///
-///The MIME type for the file will be determined from the file's extension using
-///[guessContentTypeFromName](https://developer.android.com/reference/java/net/URLConnection.html#guessContentTypeFromName-java.lang.String-).
-///Developers should ensure that asset files are named using standard file extensions.
-///If the file does not have a recognised extension, `text/plain` will be used by default.
+///{@macro flutter_inappwebview_platform_interface.PlatformAssetsPathHandler}
 class AndroidAssetsPathHandler extends AndroidPathHandler
     implements PlatformAssetsPathHandler {
   /// Constructs a [AndroidAssetsPathHandler].
@@ -148,19 +134,7 @@ class AndroidResourcesPathHandlerCreationParams
   }
 }
 
-///Handler class to open a file from resources directory in the application APK.
-///
-///Opens the requested file from application's resources directory.
-///
-///The matched prefix path used shouldn't be a prefix of a real web path.
-///Thus, if the requested file cannot be found a [WebResourceResponse] object with a `null` data will be returned instead of `null`.
-///This saves the time of falling back to network and trying to resolve a path that doesn't exist.
-///A [WebResourceResponse] with `null` data will be received as an HTTP response with status code `404` and no body.
-///
-///The MIME type for the file will be determined from the file's extension using
-///[guessContentTypeFromName](https://developer.android.com/reference/java/net/URLConnection.html#guessContentTypeFromName-java.lang.String-).
-///Developers should ensure that asset files are named using standard file extensions.
-///If the file does not have a recognised extension, `text/plain` will be used by default.
+///{@macro flutter_inappwebview_platform_interface.PlatformResourcesPathHandler}
 class AndroidResourcesPathHandler extends AndroidPathHandler
     implements PlatformResourcesPathHandler {
   /// Constructs a [AndroidResourcesPathHandler].
@@ -195,24 +169,7 @@ class AndroidInternalStoragePathHandlerCreationParams
   }
 }
 
-///Handler class to open files from application internal storage.
-///For more information about android storage please refer to
-///[Android Developers Docs: Data and file storage overview](https://developer.android.com/guide/topics/data/data-storage).
-///
-///To avoid leaking user or app data to the web, make sure to choose [directory] carefully,
-///and assume any file under this directory could be accessed by any web page subject to same-origin rules.
-///
-///Opens the requested file from the exposed data directory.
-///
-///The matched prefix path used shouldn't be a prefix of a real web path.
-///Thus, if the requested file cannot be found a [WebResourceResponse] object with a `null` data will be returned instead of `null`.
-///This saves the time of falling back to network and trying to resolve a path that doesn't exist.
-///A [WebResourceResponse] with `null` data will be received as an HTTP response with status code `404` and no body.
-///
-///The MIME type for the file will be determined from the file's extension using
-///[guessContentTypeFromName](https://developer.android.com/reference/java/net/URLConnection.html#guessContentTypeFromName-java.lang.String-).
-///Developers should ensure that asset files are named using standard file extensions.
-///If the file does not have a recognised extension, `text/plain` will be used by default.
+///{@macro flutter_inappwebview_platform_interface.PlatformInternalStoragePathHandler}
 class AndroidInternalStoragePathHandler extends AndroidPathHandler
     implements PlatformInternalStoragePathHandler {
   /// Constructs a [AndroidInternalStoragePathHandler].

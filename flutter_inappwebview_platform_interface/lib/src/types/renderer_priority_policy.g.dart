@@ -10,7 +10,7 @@ part of 'renderer_priority_policy.dart';
 ///When a WebView is destroyed it will cease to be considerered when calculating the renderer priority.
 ///Once no WebViews remain associated with the renderer, the priority of the renderer will be reduced to [RendererPriority.RENDERER_PRIORITY_WAIVED].
 ///The default policy is to set the priority to [RendererPriority.RENDERER_PRIORITY_IMPORTANT] regardless of visibility,
-///and this should not be changed unless the caller also handles renderer crashes with [WebView.onRenderProcessGone].
+///and this should not be changed unless the caller also handles renderer crashes with [PlatformWebViewCreationParams.onRenderProcessGone].
 ///Any other setting will result in WebView renderers being killed by the system more aggressively than the application.
 class RendererPriorityPolicy {
   ///The minimum priority at which this WebView desires the renderer process to be bound.

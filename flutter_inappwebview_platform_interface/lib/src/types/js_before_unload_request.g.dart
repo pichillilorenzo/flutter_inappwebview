@@ -6,7 +6,7 @@ part of 'js_before_unload_request.dart';
 // ExchangeableObjectGenerator
 // **************************************************************************
 
-///Class that represents the request of the [WebView.onJsBeforeUnload] event.
+///Class that represents the request of the [PlatformWebViewCreationParams.onJsBeforeUnload] event.
 class JsBeforeUnloadRequest {
   ///Message to be displayed in the window.
   String? message;

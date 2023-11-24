@@ -25,16 +25,7 @@ class AndroidProxyControllerCreationParams
   }
 }
 
-///Manages setting and clearing a process-specific override for the Android system-wide proxy settings that govern network requests made by [WebView].
-///
-///[WebView] may make network requests in order to fetch content that is not otherwise read from the file system or provided directly by application code.
-///In this case by default the system-wide Android network proxy settings are used to redirect requests to appropriate proxy servers.
-///
-///In the rare case that it is necessary for an application to explicitly specify its proxy configuration,
-///this API may be used to explicitly specify the proxy rules that govern WebView initiated network requests.
-///
-///**Supported Platforms/Implementations**:
-///- Android native WebView ([Official API - ProxyController](https://developer.android.com/reference/androidx/webkit/ProxyController))
+///{@macro flutter_inappwebview_platform_interface.PlatformProxyController}
 class AndroidProxyController extends PlatformProxyController
     with ChannelController {
   /// Creates a new [AndroidProxyController].
@@ -66,24 +57,14 @@ class AndroidProxyController extends PlatformProxyController
 
   Future<dynamic> _handleMethod(MethodCall call) async {}
 
-  ///Sets [ProxySettings] which will be used by all [WebView]s in the app.
-  ///URLs that match patterns in the bypass list will not be directed to any proxy.
-  ///Instead, the request will be made directly to the origin specified by the URL.
-  ///Network connections are not guaranteed to immediately use the new proxy setting; wait for the method to return before loading a page.
-  ///
-  ///**Supported Platforms/Implementations**:
-  ///- Android native WebView ([Official API - ProxyController.setProxyOverride](https://developer.android.com/reference/androidx/webkit/ProxyController#setProxyOverride(androidx.webkit.ProxyConfig,%20java.util.concurrent.Executor,%20java.lang.Runnable)))
+  @override
   Future<void> setProxyOverride({required ProxySettings settings}) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent("settings", () => settings.toMap());
     await channel?.invokeMethod('setProxyOverride', args);
   }
 
-  ///Clears the proxy settings.
-  ///Network connections are not guaranteed to immediately use the new proxy setting; wait for the method to return before loading a page.
-  ///
-  ///**Supported Platforms/Implementations**:
-  ///- Android native WebView ([Official API - ProxyController.clearProxyOverride](https://developer.android.com/reference/androidx/webkit/ProxyController#clearProxyOverride(java.util.concurrent.Executor,%20java.lang.Runnable)))
+  @override
   Future<void> clearProxyOverride() async {
     Map<String, dynamic> args = <String, dynamic>{};
     await channel?.invokeMethod('clearProxyOverride', args);

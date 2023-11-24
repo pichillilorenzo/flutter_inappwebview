@@ -6,7 +6,7 @@ part of 'js_prompt_response.dart';
 // ExchangeableObjectGenerator
 // **************************************************************************
 
-///Class that represents the response used by the [WebView.onJsPrompt] event to control a JavaScript prompt dialog.
+///Class that represents the response used by the [PlatformWebViewCreationParams.onJsPrompt] event to control a JavaScript prompt dialog.
 class JsPromptResponse {
   ///Action used to confirm that the user hit confirm or cancel button.
   JsPromptResponseAction? action;

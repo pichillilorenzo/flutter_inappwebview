@@ -21,7 +21,7 @@ class WebAuthenticationSessionSettings_ {
   ///
   ///**NOTE for MacOS**: Available only on iOS 10.15+.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- iOS
   ///- MacOS
   bool? prefersEphemeralWebBrowserSession;

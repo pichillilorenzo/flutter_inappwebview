@@ -18,7 +18,7 @@ class WindowStyleMask {
 
   ///The window displays none of the usual peripheral elements. Useful only for display or caching purposes.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- MacOS ([Official API - NSWindow.StyleMask.borderless](https://developer.apple.com/documentation/appkit/nswindow/stylemask/1644698-borderless))
   static final BORDERLESS = WindowStyleMask._internalMultiPlatform(0, () {
     switch (defaultTargetPlatform) {
@@ -32,7 +32,7 @@ class WindowStyleMask {
 
   ///The window displays a close button.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- MacOS ([Official API - NSWindow.StyleMask.closable](https://developer.apple.com/documentation/appkit/nswindow/stylemask/1644610-closable))
   static final CLOSABLE = WindowStyleMask._internalMultiPlatform(2, () {
     switch (defaultTargetPlatform) {
@@ -46,7 +46,7 @@ class WindowStyleMask {
 
   ///The window is a document-modal panel.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- MacOS ([Official API - NSWindow.StyleMask.docModalWindow](https://developer.apple.com/documentation/appkit/nswindow/stylemask/1644253-docmodalwindow))
   static final DOC_MODAL_WINDOW =
       WindowStyleMask._internalMultiPlatform(64, () {
@@ -61,7 +61,7 @@ class WindowStyleMask {
 
   ///The window can appear full screen. A fullscreen window does not draw its title bar, and may have special handling for its toolbar.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- MacOS ([Official API - NSWindow.StyleMask.fullScreen](https://developer.apple.com/documentation/appkit/nswindow/stylemask/1644530-fullscreen))
   static final FULLSCREEN = WindowStyleMask._internalMultiPlatform(16384, () {
     switch (defaultTargetPlatform) {
@@ -77,7 +77,7 @@ class WindowStyleMask {
   ///Although you can combine this constant with other window style masks, it is respected only for windows with a title bar.
   ///Note that using this mask opts in to layer-backing.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- MacOS ([Official API - NSWindow.StyleMask.fullSizeContentView](https://developer.apple.com/documentation/appkit/nswindow/stylemask/1644646-fullsizecontentview))
   static final FULL_SIZE_CONTENT_VIEW =
       WindowStyleMask._internalMultiPlatform(32768, () {
@@ -92,7 +92,7 @@ class WindowStyleMask {
 
   ///The window is a HUD panel.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- MacOS ([Official API - NSWindow.StyleMask.hudWindow](https://developer.apple.com/documentation/appkit/nswindow/stylemask/1644653-hudwindow))
   static final HUD_WINDOW = WindowStyleMask._internalMultiPlatform(8192, () {
     switch (defaultTargetPlatform) {
@@ -106,7 +106,7 @@ class WindowStyleMask {
 
   ///The window displays a minimize button.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- MacOS ([Official API - NSWindow.StyleMask.miniaturizable](https://developer.apple.com/documentation/appkit/nswindow/stylemask/1644650-miniaturizable))
   static final MINIATURIZABLE = WindowStyleMask._internalMultiPlatform(4, () {
     switch (defaultTargetPlatform) {
@@ -120,7 +120,7 @@ class WindowStyleMask {
 
   ///The window is a panel that does not activate the owning app.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- MacOS ([Official API - NSWindow.StyleMask.nonactivatingPanel](https://developer.apple.com/documentation/appkit/nswindow/stylemask/1644696-nonactivatingpanel))
   static final NONACTIVATING_PANEL =
       WindowStyleMask._internalMultiPlatform(128, () {
@@ -135,7 +135,7 @@ class WindowStyleMask {
 
   ///The window can be resized by the user.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- MacOS ([Official API - NSWindow.StyleMask.miniaturizable](https://developer.apple.com/documentation/appkit/nswindow/stylemask/1644717-resizable))
   static final RESIZABLE = WindowStyleMask._internalMultiPlatform(8, () {
     switch (defaultTargetPlatform) {
@@ -149,7 +149,7 @@ class WindowStyleMask {
 
   ///The window displays a title bar.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- MacOS ([Official API - NSWindow.StyleMask.titled](https://developer.apple.com/documentation/appkit/nswindow/stylemask/1644724-titled))
   static final TITLED = WindowStyleMask._internalMultiPlatform(1, () {
     switch (defaultTargetPlatform) {
@@ -163,7 +163,7 @@ class WindowStyleMask {
 
   ///The window is a panel.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- MacOS ([Official API - NSWindow.StyleMask.utilityWindow](https://developer.apple.com/documentation/appkit/nswindow/stylemask/1644672-utilitywindow))
   static final UTILITY_WINDOW = WindowStyleMask._internalMultiPlatform(16, () {
     switch (defaultTargetPlatform) {

@@ -12,7 +12,7 @@ class Cookie {
   ///
   ///**NOTE for Android native WebView**: available on Android only if [WebViewFeature.GET_COOKIE_INFO] feature is supported.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- iOS
   ///- MacOS
   ///- Android native WebView
@@ -22,7 +22,7 @@ class Cookie {
   ///
   ///**NOTE for Android native WebView**: available on Android only if [WebViewFeature.GET_COOKIE_INFO] feature is supported.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- iOS
   ///- MacOS
   ///- Android native WebView
@@ -32,7 +32,7 @@ class Cookie {
   ///
   ///**NOTE for Android native WebView**: available on Android only if [WebViewFeature.GET_COOKIE_INFO] feature is supported.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- iOS
   ///- MacOS
   ///- Android native WebView
@@ -42,7 +42,7 @@ class Cookie {
   ///
   ///**NOTE for Android native WebView**: available on Android only if [WebViewFeature.GET_COOKIE_INFO] feature is supported.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- iOS
   ///- MacOS
   ///- Android native WebView
@@ -50,14 +50,14 @@ class Cookie {
 
   ///Indicates if the cookie is a session only cookie.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- iOS
   ///- MacOS
   bool? isSessionOnly;
 
   ///The cookie name.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- iOS
   ///- MacOS
   ///- Android native WebView
@@ -68,7 +68,7 @@ class Cookie {
   ///
   ///**NOTE for Android native WebView**: available on Android only if [WebViewFeature.GET_COOKIE_INFO] feature is supported.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- iOS
   ///- MacOS
   ///- Android native WebView
@@ -78,7 +78,7 @@ class Cookie {
   ///
   ///**NOTE for Android native WebView**: available on Android only if [WebViewFeature.GET_COOKIE_INFO] feature is supported.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- iOS
   ///- MacOS
   ///- Android native WebView
@@ -86,7 +86,7 @@ class Cookie {
 
   ///The cookie value.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- iOS
   ///- MacOS
   ///- Android native WebView

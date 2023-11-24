@@ -1,8 +1,8 @@
 import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_internal_annotations.dart';
-
+import '../in_app_webview/platform_webview.dart';
 part 'navigation_response_action.g.dart';
 
-///Class that is used by [WebView.onNavigationResponse] event.
+///Class that is used by [PlatformWebViewCreationParams.onNavigationResponse] event.
 ///It represents the policy to pass back to the decision handler.
 @ExchangeableEnum()
 class NavigationResponseAction_ {
@@ -22,7 +22,7 @@ class NavigationResponseAction_ {
   static const DOWNLOAD = const NavigationResponseAction_._internal(2);
 }
 
-///Class that is used by [WebView.onNavigationResponse] event.
+///Class that is used by [PlatformWebViewCreationParams.onNavigationResponse] event.
 ///It represents the policy to pass back to the decision handler.
 ///Use [NavigationResponseAction] instead.
 @Deprecated("Use NavigationResponseAction instead")

@@ -10,47 +10,47 @@ part of 'pull_to_refresh_settings.dart';
 class PullToRefreshSettings {
   ///The title text to display in the refresh control.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- iOS
   AttributedString? attributedTitle;
 
   ///The background color of the refresh control.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
   Color? backgroundColor;
 
   ///The color of the refresh control.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
   Color? color;
 
   ///The distance to trigger a sync in dips.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView
   int? distanceToTriggerSync;
 
   ///Sets whether the pull-to-refresh feature is enabled or not.
   ///The default value is `true`.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
   bool? enabled;
 
   ///The size of the refresh indicator.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView
   PullToRefreshSize? size;
 
   ///The distance in pixels that the refresh indicator can be pulled beyond its resting position.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView
   int? slingshotDistance;
   PullToRefreshSettings(

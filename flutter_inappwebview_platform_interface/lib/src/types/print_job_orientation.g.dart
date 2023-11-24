@@ -18,7 +18,7 @@ class PrintJobOrientation {
 
   ///Pages are printed in landscape orientation.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- iOS
   ///- MacOS
   static final LANDSCAPE = PrintJobOrientation._internalMultiPlatform(1, () {
@@ -35,7 +35,7 @@ class PrintJobOrientation {
 
   ///Pages are printed in portrait orientation.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- iOS
   ///- MacOS
   static final PORTRAIT = PrintJobOrientation._internalMultiPlatform(0, () {

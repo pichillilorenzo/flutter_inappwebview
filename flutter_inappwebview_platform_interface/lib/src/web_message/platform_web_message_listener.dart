@@ -33,12 +33,14 @@ class PlatformWebMessageListenerCreationParams {
   }
 }
 
+///{@template flutter_inappwebview_platform_interface.PlatformWebMessageListener}
 ///This listener receives messages sent on the JavaScript object which was injected by [PlatformInAppWebViewController.addWebMessageListener].
 ///
-///**Supported Platforms/Implementations**:
+///**Officially Supported Platforms/Implementations**:
 ///- Android native WebView
 ///- iOS
 ///- MacOS
+///{@endtemplate}
 abstract class PlatformWebMessageListener extends PlatformInterface
     implements Disposable {
   /// Creates a new [PlatformWebMessageListener]
@@ -103,6 +105,9 @@ abstract class PlatformWebMessageListener extends PlatformInterface
         'toJson is not implemented on the current platform.');
   }
 
+  ///{@template flutter_inappwebview_platform_interface.PlatformWebMessageListener.dispose}
+  ///Disposes the channel.
+  ///{@endtemplate}
   @override
   void dispose() {
     throw UnimplementedError(
@@ -128,11 +133,13 @@ class PlatformJavaScriptReplyProxyCreationParams {
   final PlatformWebMessageListener webMessageListener;
 }
 
+///{@template flutter_inappwebview_platform_interface.PlatformJavaScriptReplyProxy}
 ///This class represents the JavaScript object injected by [PlatformInAppWebViewController.addWebMessageListener].
 ///An instance will be given by [PlatformWebMessageListener.onPostMessage].
 ///The app can use `postMessage(String)` to talk to the JavaScript context.
 ///
 ///There is a 1:1 relationship between this object and the JavaScript object in a frame.
+///{@endtemplate}
 abstract class PlatformJavaScriptReplyProxy extends PlatformInterface {
   /// Creates a new [PlatformWebMessageListener]
   factory PlatformJavaScriptReplyProxy(
@@ -164,11 +171,13 @@ abstract class PlatformJavaScriptReplyProxy extends PlatformInterface {
   /// The parameters used to initialize the [PlatformJavaScriptReplyProxy].
   final PlatformJavaScriptReplyProxyCreationParams params;
 
+  ///{@template flutter_inappwebview_platform_interface.PlatformJavaScriptReplyProxy.postMessage}
   ///Post a [message] to the injected JavaScript object which sent this [PlatformJavaScriptReplyProxy].
   ///
   ///If [message] is of type [WebMessageType.ARRAY_BUFFER], be aware that large byte buffers can lead to out-of-memory crashes on low-end devices.
   ///
   ///**Official Android API**: https://developer.android.com/reference/androidx/webkit/JavaScriptReplyProxy#postMessage(java.lang.String)
+  ///{@endtemplate}
   Future<void> postMessage(WebMessage message) {
     throw UnimplementedError(
         'postMessage is not implemented on the current platform.');

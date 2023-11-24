@@ -18,7 +18,7 @@ class ContentBlockerActionType {
 
   ///Stops loading of the resource. If the resource was cached, the cache is ignored.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
   ///- MacOS
@@ -41,7 +41,7 @@ class ContentBlockerActionType {
   ///This only blocks cookies otherwise acceptable to WebView's privacy policy.
   ///Combining with [IGNORE_PREVIOUS_RULES] doesn't override the browser’s privacy settings.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- iOS
   ///- MacOS
   static final BLOCK_COOKIES =
@@ -63,7 +63,7 @@ class ContentBlockerActionType {
   ///
   ///**NOTE**: on Android, JavaScript must be enabled.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
   ///- MacOS
@@ -84,7 +84,7 @@ class ContentBlockerActionType {
 
   ///Ignores previously triggered actions.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- iOS
   ///- MacOS
   static final IGNORE_PREVIOUS_RULES =
@@ -104,7 +104,7 @@ class ContentBlockerActionType {
   ///Changes a URL from http to https.
   ///URLs with a specified (nondefault) port and links using other protocols are unaffected.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
   ///- MacOS

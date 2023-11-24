@@ -152,7 +152,7 @@ class IOSInAppWebViewOptions
   ///**NOTE**: available on iOS 14.0+.
   bool limitsNavigationsToAppBoundDomains;
 
-  ///Set to `true` to be able to listen to the [WebView.iosOnNavigationResponse] event. The default value is `false`.
+  ///Set to `true` to be able to listen to the [PlatformWebViewCreationParams.iosOnNavigationResponse] event. The default value is `false`.
   bool useOnNavigationResponse;
 
   ///Set to `true` to enable Apple Pay API for the `WebView` at its first page load or on the next page load (using [PlatformInAppWebViewController.setOptions]). The default value is `false`.
@@ -187,7 +187,7 @@ class IOSInAppWebViewOptions
   ///- [PlatformInAppWebViewController.addWebMessageListener]
   ///
   ///Options affected:
-  ///- [WebView.initialUserScripts]
+  ///- [PlatformWebViewCreationParams.initialUserScripts]
   ///- [InAppWebViewOptions.supportZoom]
   ///- [InAppWebViewOptions.useOnLoadResource]
   ///- [InAppWebViewOptions.useShouldInterceptAjaxRequest]
@@ -195,26 +195,26 @@ class IOSInAppWebViewOptions
   ///- [IOSInAppWebViewOptions.enableViewportScale]
   ///
   ///Events affected:
-  ///- the `hitTestResult` argument of [WebView.onLongPressHitTestResult] will be empty
+  ///- the `hitTestResult` argument of [PlatformWebViewCreationParams.onLongPressHitTestResult] will be empty
   ///- the `hitTestResult` argument of [ContextMenu.onCreateContextMenu] will be empty
-  ///- [WebView.onLoadResource]
-  ///- [WebView.shouldInterceptAjaxRequest]
-  ///- [WebView.onAjaxReadyStateChange]
-  ///- [WebView.onAjaxProgress]
-  ///- [WebView.shouldInterceptFetchRequest]
-  ///- [WebView.onConsoleMessage]
-  ///- [WebView.onPrint]
-  ///- [WebView.onWindowFocus]
-  ///- [WebView.onWindowBlur]
-  ///- [WebView.onFindResultReceived]
+  ///- [PlatformWebViewCreationParams.onLoadResource]
+  ///- [PlatformWebViewCreationParams.shouldInterceptAjaxRequest]
+  ///- [PlatformWebViewCreationParams.onAjaxReadyStateChange]
+  ///- [PlatformWebViewCreationParams.onAjaxProgress]
+  ///- [PlatformWebViewCreationParams.shouldInterceptFetchRequest]
+  ///- [PlatformWebViewCreationParams.onConsoleMessage]
+  ///- [PlatformWebViewCreationParams.onPrint]
+  ///- [PlatformWebViewCreationParams.onWindowFocus]
+  ///- [PlatformWebViewCreationParams.onWindowBlur]
+  ///- [PlatformWebViewCreationParams.onFindResultReceived]
   ///
   ///**NOTE**: available on iOS 13.0+.
   bool applePayAPIEnabled;
 
-  ///Used in combination with [WebView.initialUrlRequest] or [WebView.initialData] (using the `file://` scheme), it represents the URL from which to read the web content.
+  ///Used in combination with [PlatformWebViewCreationParams.initialUrlRequest] or [PlatformWebViewCreationParams.initialData] (using the `file://` scheme), it represents the URL from which to read the web content.
   ///This URL must be a file-based URL (using the `file://` scheme).
-  ///Specify the same value as the [URLRequest.url] if you are using it with the [WebView.initialUrlRequest] parameter or
-  ///the [InAppWebViewInitialData.baseUrl] if you are using it with the [WebView.initialData] parameter to prevent WebView from reading any other content.
+  ///Specify the same value as the [URLRequest.url] if you are using it with the [PlatformWebViewCreationParams.initialUrlRequest] parameter or
+  ///the [InAppWebViewInitialData.baseUrl] if you are using it with the [PlatformWebViewCreationParams.initialData] parameter to prevent WebView from reading any other content.
   ///Specify a directory to give WebView permission to read additional files in the specified directory.
   Uri? allowingReadAccessTo;
 

@@ -6,7 +6,7 @@ part of 'login_request.dart';
 // ExchangeableObjectGenerator
 // **************************************************************************
 
-///Class used by [WebView.onReceivedLoginRequest] event.
+///Class used by [PlatformWebViewCreationParams.onReceivedLoginRequest] event.
 class LoginRequest {
   ///An optional account. If not `null`, the account should be checked against accounts on the device.
   ///If it is a valid account, it should be used to log in the user. This value may be `null`.

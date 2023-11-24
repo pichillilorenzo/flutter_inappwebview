@@ -16,10 +16,12 @@ class PlatformWebViewFeatureCreationParams {
   const PlatformWebViewFeatureCreationParams();
 }
 
+///{@template flutter_inappwebview_platform_interface.PlatformWebViewFeature}
 ///Class that represents an Android-specific utility class for checking which WebView Support Library features are supported on the device.
 ///
-///**Supported Platforms/Implementations**:
+///**Officially Supported Platforms/Implementations**:
 ///- Android native WebView
+///{@endtemplate}
 abstract class PlatformWebViewFeature extends PlatformInterface {
   /// Creates a new [PlatformWebViewFeature]
   factory PlatformWebViewFeature(PlatformWebViewFeatureCreationParams params) {
@@ -64,6 +66,7 @@ abstract class PlatformWebViewFeature extends PlatformInterface {
   /// The parameters used to initialize the [PlatformWebViewFeature].
   final PlatformWebViewFeatureCreationParams params;
 
+  ///{@template flutter_inappwebview_platform_interface.PlatformWebViewFeature.isFeatureSupported}
   ///Return whether a feature is supported at run-time. On devices running Android version `Build.VERSION_CODES.LOLLIPOP` and higher,
   ///this will check whether a feature is supported, depending on the combination of the desired feature, the Android version of device,
   ///and the WebView APK on the device. If running on a device with a lower API level, this will always return `false`.
@@ -77,11 +80,13 @@ abstract class PlatformWebViewFeature extends PlatformInterface {
   ///Furthermore, if this method returns `false` for a particular feature, any callback guarded by that feature will not be invoked.
   ///
   ///**Official Android API**: https://developer.android.com/reference/androidx/webkit/WebViewFeature#isFeatureSupported(java.lang.String)
+  ///{@endtemplate}
   Future<bool> isFeatureSupported(WebViewFeature feature) {
     throw UnimplementedError(
         'isFeatureSupported is not implemented on the current platform');
   }
 
+  ///{@template flutter_inappwebview_platform_interface.PlatformWebViewFeature.isStartupFeatureSupported}
   ///Return whether a startup feature is supported at run-time.
   ///On devices running Android version `Build.VERSION_CODES.LOLLIPOP` and higher,
   ///this will check whether a startup feature is supported,
@@ -97,16 +102,14 @@ abstract class PlatformWebViewFeature extends PlatformInterface {
   ///any callback guarded by that feature will not be invoked.
   ///
   ///**Official Android API**: https://developer.android.com/reference/androidx/webkit/WebViewFeature#isFeatureSupported(java.lang.String)
+  ///{@endtemplate}
   Future<bool> isStartupFeatureSupported(WebViewFeature startupFeature) {
     throw UnimplementedError(
         'isStartupFeatureSupported is not implemented on the current platform');
   }
 }
 
-///Class that represents an Android-specific utility class for checking which WebView Support Library features are supported on the device.
-///
-///**Supported Platforms/Implementations**:
-///- Android native WebView
+///{@macro flutter_inappwebview_platform_interface.PlatformWebViewFeature}
 @ExchangeableEnum()
 class WebViewFeature_ {
   // ignore: unused_field
@@ -330,37 +333,11 @@ class WebViewFeature_ {
       const WebViewFeature_._internal(
           "STARTUP_FEATURE_SET_DIRECTORY_BASE_PATHS");
 
-  ///Return whether a feature is supported at run-time. On devices running Android version `Build.VERSION_CODES.LOLLIPOP` and higher,
-  ///this will check whether a feature is supported, depending on the combination of the desired feature, the Android version of device,
-  ///and the WebView APK on the device. If running on a device with a lower API level, this will always return `false`.
-  ///
-  ///**Note**: This method is different from [isStartupFeatureSupported] and this
-  ///method only accepts certain features.
-  ///Please verify that the correct feature checking method is used for a particular feature.
-  ///
-  ///**Note**: If this method returns `false`, it is not safe to invoke the methods
-  ///requiring the desired feature.
-  ///Furthermore, if this method returns `false` for a particular feature, any callback guarded by that feature will not be invoked.
-  ///
-  ///**Official Android API**: https://developer.android.com/reference/androidx/webkit/WebViewFeature#isFeatureSupported(java.lang.String)
+  ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewFeature.isFeatureSupported}
   static Future<bool> isFeatureSupported(WebViewFeature feature) =>
       PlatformWebViewFeature.static().isFeatureSupported(feature);
 
-  ///Return whether a startup feature is supported at run-time.
-  ///On devices running Android version `Build.VERSION_CODES.LOLLIPOP` and higher,
-  ///this will check whether a startup feature is supported,
-  ///depending on the combination of the desired feature,
-  ///the Android version of device, and the WebView APK on the device.
-  ///If running on a device with a lower API level, this will always return `false`.
-  ///
-  ///**Note**: This method is different from [isFeatureSupported] and this method only accepts startup features.
-  ///Please verify that the correct feature checking method is used for a particular feature.
-  ///
-  ///**Note**: If this method returns `false`, it is not safe to invoke the methods requiring the desired feature.
-  ///Furthermore, if this method returns `false` for a particular feature,
-  ///any callback guarded by that feature will not be invoked.
-  ///
-  ///**Official Android API**: https://developer.android.com/reference/androidx/webkit/WebViewFeature#isFeatureSupported(java.lang.String)
+  ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewFeature.isStartupFeatureSupported}
   static Future<bool> isStartupFeatureSupported(
           WebViewFeature startupFeature) =>
       PlatformWebViewFeature.static().isStartupFeatureSupported(startupFeature);

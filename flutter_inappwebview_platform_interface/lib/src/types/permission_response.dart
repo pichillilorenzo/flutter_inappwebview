@@ -1,11 +1,11 @@
 import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_internal_annotations.dart';
-
+import '../in_app_webview/platform_webview.dart';
 import 'permission_resource_type.dart';
 import 'permission_response_action.dart';
 
 part 'permission_response.g.dart';
 
-///Class that represents the response used by the [WebView.onPermissionRequest] event.
+///Class that represents the response used by the [PlatformWebViewCreationParams.onPermissionRequest] event.
 @ExchangeableObject()
 class PermissionResponse_ {
   ///Resources granted to be accessed by origin.
@@ -21,7 +21,7 @@ class PermissionResponse_ {
       this.action = PermissionResponseAction_.DENY});
 }
 
-///Class that represents the response used by the [WebView.androidOnPermissionRequest] event.
+///Class that represents the response used by the [PlatformWebViewCreationParams.androidOnPermissionRequest] event.
 ///Use [PermissionResponse] instead.
 @Deprecated("Use PermissionResponse instead")
 @ExchangeableObject()

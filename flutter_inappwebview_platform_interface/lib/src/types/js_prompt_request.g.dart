@@ -6,7 +6,7 @@ part of 'js_prompt_request.dart';
 // ExchangeableObjectGenerator
 // **************************************************************************
 
-///Class that represents the request of the [WebView.onJsPrompt] event.
+///Class that represents the request of the [PlatformWebViewCreationParams.onJsPrompt] event.
 class JsPromptRequest {
   ///The default value displayed in the prompt dialog.
   String? defaultValue;
@@ -17,7 +17,7 @@ class JsPromptRequest {
 
   ///Indicates whether the request was made for the main frame.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- iOS
   ///- MacOS
   bool? isMainFrame;

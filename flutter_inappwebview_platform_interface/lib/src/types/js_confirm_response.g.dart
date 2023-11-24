@@ -6,7 +6,7 @@ part of 'js_confirm_response.dart';
 // ExchangeableObjectGenerator
 // **************************************************************************
 
-///Class that represents the response used by the [WebView.onJsConfirm] event to control a JavaScript confirm dialog.
+///Class that represents the response used by the [PlatformWebViewCreationParams.onJsConfirm] event to control a JavaScript confirm dialog.
 class JsConfirmResponse {
   ///Action used to confirm that the user hit confirm or cancel button.
   JsConfirmResponseAction? action;

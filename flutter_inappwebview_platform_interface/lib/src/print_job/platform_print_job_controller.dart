@@ -26,12 +26,14 @@ class PlatformPrintJobControllerCreationParams {
   final PrintJobCompletionHandler? onComplete;
 }
 
+///{@template flutter_inappwebview_platform_interface.PlatformPrintJobController}
 ///Class representing a print job eventually returned by [PlatformInAppWebViewController.printCurrentPage].
 ///
-///**Supported Platforms/Implementations**:
+///**Officially Supported Platforms/Implementations**:
 ///- Android native WebView
 ///- iOS
 ///- MacOS
+///{@endtemplate}
 abstract class PlatformPrintJobController extends PlatformInterface
     implements Disposable {
   /// Creates a new [PlatformPrintJobController]
@@ -70,32 +72,37 @@ abstract class PlatformPrintJobController extends PlatformInterface
   ///{@template flutter_inappwebview_platform_interface.PlatformPrintJobController.onComplete}
   ///A completion handler used to handle the conclusion of the print job (for instance, to reset state) and to handle any errors encountered in printing.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- iOS ([Official API - UIPrintInteractionController.CompletionHandler](https://developer.apple.com/documentation/uikit/uiprintinteractioncontroller/completionhandler))
   ///- MacOS ([Official API - NSPrintOperation.runModal](https://developer.apple.com/documentation/appkit/nsprintoperation/1532065-runmodal))
   ///{@endtemplate}
   PrintJobCompletionHandler? get onComplete => params.onComplete;
 
+  ///{@template flutter_inappwebview_platform_interface.PlatformPrintJobController.cancel}
   ///Cancels this print job.
   ///You can request cancellation of a queued, started, blocked, or failed print job.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - PrintJob.cancel](https://developer.android.com/reference/android/print/PrintJob#cancel()))
+  ///{@endtemplate}
   Future<void> cancel() {
     throw UnimplementedError(
         'cancel is not implemented on the current platform');
   }
 
+  ///{@template flutter_inappwebview_platform_interface.PlatformPrintJobController.restart}
   ///Restarts this print job.
   ///You can request restart of a failed print job.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - PrintJob.restart](https://developer.android.com/reference/android/print/PrintJob#restart()))
+  ///{@endtemplate}
   Future<void> restart() {
     throw UnimplementedError(
         'restart is not implemented on the current platform');
   }
 
+  ///{@template flutter_inappwebview_platform_interface.PlatformPrintJobController.dismiss}
   ///Dismisses the printing-options sheet or popover.
   ///
   ///You should dismiss the printing options when they are presented in a sheet or
@@ -103,28 +110,39 @@ abstract class PlatformPrintJobController extends PlatformInterface
   ///(This, of course, assumes your application responds to orientation changes.)
   ///You should then present the printing options again once the new orientation takes effect.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- iOS
+  ///{@endtemplate}
   Future<void> dismiss({bool animated = true}) {
     throw UnimplementedError(
         'dismiss is not implemented on the current platform');
   }
 
+  ///{@template flutter_inappwebview_platform_interface.PlatformPrintJobController.getInfo}
   ///Gets the [PrintJobInfo] that describes this job.
   ///
   ///**NOTE**: The returned info object is a snapshot of the
   ///current print job state. Every call to this method returns a fresh
   ///info object that reflects the current print job state.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - PrintJob.getInfo](https://developer.android.com/reference/android/print/PrintJob#getInfo()))
   ///- iOS
   ///- MacOS
+  ///{@endtemplate}
   Future<PrintJobInfo?> getInfo() {
     throw UnimplementedError(
         'getInfo is not implemented on the current platform');
   }
 
+  ///{@template flutter_inappwebview_platform_interface.PlatformPrintJobController.dispose}
+  ///Disposes the print job.
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Android native WebView
+  ///- iOS
+  ///- MacOS
+  ///{@endtemplate}
   @override
   void dispose() {
     throw UnimplementedError(

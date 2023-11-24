@@ -14,7 +14,7 @@ part of 'ui_event_attribution.dart';
 ///
 ///Check [UIEventAttribution](https://developer.apple.com/documentation/uikit/uieventattribution) for details.
 ///
-///**Supported Platforms/Implementations**:
+///**Officially Supported Platforms/Implementations**:
 ///- iOS
 class UIEventAttribution {
   ///The destination URL of the attribution.

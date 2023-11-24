@@ -20,7 +20,7 @@ class PrintJobState {
   ///
   ///Next valid states: [FAILED], [CANCELED], [STARTED].
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - PrintJobInfo.STATE_BLOCKED](https://developer.android.com/reference/android/print/PrintJobInfo#STATE_BLOCKED))
   static final BLOCKED = PrintJobState._internalMultiPlatform(4, () {
     switch (defaultTargetPlatform) {
@@ -36,7 +36,7 @@ class PrintJobState {
   ///
   ///Next valid states: None.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - PrintJobInfo.STATE_CANCELED](https://developer.android.com/reference/android/print/PrintJobInfo#STATE_CANCELED))
   ///- iOS
   ///- MacOS
@@ -58,7 +58,7 @@ class PrintJobState {
   ///
   ///Next valid states: None.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - PrintJobInfo.STATE_COMPLETED](https://developer.android.com/reference/android/print/PrintJobInfo#STATE_COMPLETED))
   ///- iOS
   ///- MacOS
@@ -80,7 +80,7 @@ class PrintJobState {
   ///
   ///Next valid states: [QUEUED].
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - PrintJobInfo.STATE_CREATED](https://developer.android.com/reference/android/print/PrintJobInfo#STATE_CREATED))
   ///- iOS
   ///- MacOS
@@ -102,7 +102,7 @@ class PrintJobState {
   ///
   ///Next valid states: None.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - PrintJobInfo.STATE_FAILED](https://developer.android.com/reference/android/print/PrintJobInfo#STATE_FAILED))
   ///- iOS
   static final FAILED = PrintJobState._internalMultiPlatform(6, () {
@@ -121,7 +121,7 @@ class PrintJobState {
   ///
   ///Next valid states: [STARTED], [FAILED], [CANCELED].
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - PrintJobInfo.STATE_QUEUED](https://developer.android.com/reference/android/print/PrintJobInfo#STATE_QUEUED))
   static final QUEUED = PrintJobState._internalMultiPlatform(2, () {
     switch (defaultTargetPlatform) {
@@ -137,7 +137,7 @@ class PrintJobState {
   ///
   ///Next valid states: [COMPLETED], [FAILED], [CANCELED], [BLOCKED].
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - PrintJobInfo.STATE_STARTED](https://developer.android.com/reference/android/print/PrintJobInfo#STATE_STARTED))
   ///- iOS
   ///- MacOS

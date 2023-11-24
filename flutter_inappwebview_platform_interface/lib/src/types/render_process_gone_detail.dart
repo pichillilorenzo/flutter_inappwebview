@@ -1,11 +1,11 @@
 import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_internal_annotations.dart';
-
+import '../in_app_webview/platform_webview.dart';
 import 'renderer_priority.dart';
 
 part 'render_process_gone_detail.g.dart';
 
 ///Class that provides more specific information about why the render process exited.
-///It is used by the [WebView.onRenderProcessGone] event.
+///It is used by the [PlatformWebViewCreationParams.onRenderProcessGone] event.
 @ExchangeableObject()
 class RenderProcessGoneDetail_ {
   ///Indicates whether the render process was observed to crash, or whether it was killed by the system.

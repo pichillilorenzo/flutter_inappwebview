@@ -6,7 +6,7 @@ part of 'platform_webview_asset_loader.dart';
 // ExchangeableObjectGenerator
 // **************************************************************************
 
-///Helper class to load local files including application's static assets and resources using http(s):// URLs inside a [WebView] class.
+///Helper class to load local files including application's static assets and resources using http(s):// URLs inside a `WebView` class.
 ///Loading local files using web-like URLs instead of `file://` is desirable as it is compatible with the Same-Origin policy.
 ///
 ///For more context about application's assets and resources and how to normally access them please refer to
@@ -16,7 +16,7 @@ part of 'platform_webview_asset_loader.dart';
 ///This means that local files should only be hosted on domains your organization owns
 ///(at paths reserved for this purpose) or the default domain reserved for this: `appassets.androidplatform.net`.
 ///
-///**Supported Platforms/Implementations**:
+///**Officially Supported Platforms/Implementations**:
 ///- Android native WebView
 class WebViewAssetLoader {
   ///An unused domain reserved for Android applications to intercept requests for app assets.

@@ -1,10 +1,10 @@
 import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_internal_annotations.dart';
-
+import '../in_app_webview/platform_webview.dart';
 import 'url_response.dart';
 
 part 'navigation_response.g.dart';
 
-///Class that represents the navigation response used by the [WebView.onNavigationResponse] event.
+///Class that represents the navigation response used by the [PlatformWebViewCreationParams.onNavigationResponse] event.
 @ExchangeableObject()
 class NavigationResponse_ {
   ///The URL for the response.
@@ -22,7 +22,7 @@ class NavigationResponse_ {
       required this.canShowMIMEType});
 }
 
-///An iOS-specific Class that represents the navigation response used by the [WebView.onNavigationResponse] event.
+///An iOS-specific Class that represents the navigation response used by the [PlatformWebViewCreationParams.onNavigationResponse] event.
 ///Use [NavigationResponse] instead.
 @Deprecated("Use NavigationResponse instead")
 @ExchangeableObject()

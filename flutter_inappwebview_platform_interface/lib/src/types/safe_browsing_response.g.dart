@@ -6,7 +6,7 @@ part of 'safe_browsing_response.dart';
 // ExchangeableObjectGenerator
 // **************************************************************************
 
-///Class that represents the response used by the [WebView.onSafeBrowsingHit] event.
+///Class that represents the response used by the [PlatformWebViewCreationParams.onSafeBrowsingHit] event.
 ///It is used to indicate an action to take when hitting a malicious URL.
 class SafeBrowsingResponse {
   ///Indicate the [SafeBrowsingResponseAction] to take when hitting a malicious URL.

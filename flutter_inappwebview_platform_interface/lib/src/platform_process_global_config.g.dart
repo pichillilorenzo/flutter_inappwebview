@@ -8,7 +8,7 @@ part of 'platform_process_global_config.dart';
 
 ///Class that represents the settings used to configure the [PlatformProcessGlobalConfig].
 ///
-///**Supported Platforms/Implementations**:
+///**Officially Supported Platforms/Implementations**:
 ///- Android native WebView
 class ProcessGlobalConfigSettings {
   ///The directory name suffix to be used for the current process.
@@ -97,7 +97,7 @@ class ProcessGlobalConfigSettings {
 
 ///Class that represents the settings used to configure the [ProcessGlobalConfigSettings.directoryBasePaths].
 ///
-///**Supported Platforms/Implementations**:
+///**Officially Supported Platforms/Implementations**:
 ///- Android native WebView ([Official API - ProxyConfig](https://developer.android.com/reference/androidx/webkit/ProxyConfig))
 class ProcessGlobalConfigDirectoryBasePaths {
   ///The absolute base path for the WebView cache directory.

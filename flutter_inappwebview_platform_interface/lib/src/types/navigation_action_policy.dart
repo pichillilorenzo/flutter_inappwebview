@@ -1,8 +1,8 @@
 import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_internal_annotations.dart';
-
+import '../in_app_webview/platform_webview.dart';
 part 'navigation_action_policy.g.dart';
 
-///Class that is used by [WebView.shouldOverrideUrlLoading] event.
+///Class that is used by [PlatformWebViewCreationParams.shouldOverrideUrlLoading] event.
 ///It represents the policy to pass back to the decision handler.
 @ExchangeableEnum()
 class NavigationActionPolicy_ {

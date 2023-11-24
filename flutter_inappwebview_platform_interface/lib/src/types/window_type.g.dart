@@ -18,7 +18,7 @@ class WindowType {
 
   ///Adds the new browser window as a child window of the main window.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- MacOS
   static final CHILD = WindowType._internalMultiPlatform('CHILD', () {
     switch (defaultTargetPlatform) {
@@ -32,7 +32,7 @@ class WindowType {
 
   ///Adds the new browser window as a new tab in a tabbed window of the main window.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- MacOS 10.12++
   static final TABBED = WindowType._internalMultiPlatform('TABBED', () {
     switch (defaultTargetPlatform) {

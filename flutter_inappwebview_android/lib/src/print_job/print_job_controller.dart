@@ -24,12 +24,7 @@ class AndroidPrintJobControllerCreationParams
   }
 }
 
-///Class representing a print job eventually returned by [InAppWebViewController.printCurrentPage].
-///
-///**Supported Platforms/Implementations**:
-///- Android native WebView
-///- iOS
-///- MacOS
+///{@macro flutter_inappwebview_platform_interface.PlatformPrintJobController}
 class AndroidPrintJobController extends PlatformPrintJobController
     with ChannelController {
   /// Constructs a [AndroidPrintJobController].
@@ -60,51 +55,26 @@ class AndroidPrintJobController extends PlatformPrintJobController
     }
   }
 
-  ///Cancels this print job.
-  ///You can request cancellation of a queued, started, blocked, or failed print job.
-  ///
-  ///**Supported Platforms/Implementations**:
-  ///- Android native WebView ([Official API - PrintJob.cancel](https://developer.android.com/reference/android/print/PrintJob#cancel()))
+  @override
   Future<void> cancel() async {
     Map<String, dynamic> args = <String, dynamic>{};
     await channel?.invokeMethod('cancel', args);
   }
 
-  ///Restarts this print job.
-  ///You can request restart of a failed print job.
-  ///
-  ///**Supported Platforms/Implementations**:
-  ///- Android native WebView ([Official API - PrintJob.restart](https://developer.android.com/reference/android/print/PrintJob#restart()))
+  @override
   Future<void> restart() async {
     Map<String, dynamic> args = <String, dynamic>{};
     await channel?.invokeMethod('restart', args);
   }
 
-  ///Dismisses the printing-options sheet or popover.
-  ///
-  ///You should dismiss the printing options when they are presented in a sheet or
-  ///animated from a rectangle and the user changes the orientation of the device.
-  ///(This, of course, assumes your application responds to orientation changes.)
-  ///You should then present the printing options again once the new orientation takes effect.
-  ///
-  ///**Supported Platforms/Implementations**:
-  ///- iOS
+  @override
   Future<void> dismiss({bool animated: true}) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent("animated", () => animated);
     await channel?.invokeMethod('dismiss', args);
   }
 
-  ///Gets the [PrintJobInfo] that describes this job.
-  ///
-  ///**NOTE**: The returned info object is a snapshot of the
-  ///current print job state. Every call to this method returns a fresh
-  ///info object that reflects the current print job state.
-  ///
-  ///**Supported Platforms/Implementations**:
-  ///- Android native WebView ([Official API - PrintJob.getInfo](https://developer.android.com/reference/android/print/PrintJob#getInfo()))
-  ///- iOS
-  ///- MacOS
+  @override
   Future<PrintJobInfo?> getInfo() async {
     Map<String, dynamic> args = <String, dynamic>{};
     Map<String, dynamic>? infoMap =
@@ -112,12 +82,6 @@ class AndroidPrintJobController extends PlatformPrintJobController
     return PrintJobInfo.fromMap(infoMap);
   }
 
-  ///Disposes the print job.
-  ///
-  ///**Supported Platforms/Implementations**:
-  ///- Android native WebView
-  ///- iOS
-  ///- MacOS
   @override
   Future<void> dispose() async {
     Map<String, dynamic> args = <String, dynamic>{};

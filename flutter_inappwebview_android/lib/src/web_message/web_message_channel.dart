@@ -30,12 +30,7 @@ class AndroidWebMessageChannelCreationParams
   }
 }
 
-///The representation of the [HTML5 message channels](https://html.spec.whatwg.org/multipage/web-messaging.html#message-channels).
-///
-///**Supported Platforms/Implementations**:
-///- Android native WebView
-///- iOS
-///- MacOS
+///{@macro flutter_inappwebview_platform_interface.PlatformWebMessageChannel}
 class AndroidWebMessageChannel extends PlatformWebMessageChannel
     with ChannelController {
   /// Constructs a [AndroidWebMessageChannel].
@@ -60,6 +55,7 @@ class AndroidWebMessageChannel extends PlatformWebMessageChannel
           port2: AndroidWebMessagePort(
               AndroidWebMessagePortCreationParams(index: 1))));
 
+  /// Provide static access.
   factory AndroidWebMessageChannel.static() {
     return _staticValue;
   }
@@ -108,7 +104,6 @@ class AndroidWebMessageChannel extends PlatformWebMessageChannel
     return _fromMap(map);
   }
 
-  ///Disposes the web message channel.
   @override
   void dispose() {
     disposeChannel();

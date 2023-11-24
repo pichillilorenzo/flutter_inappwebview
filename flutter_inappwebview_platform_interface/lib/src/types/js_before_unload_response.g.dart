@@ -6,7 +6,7 @@ part of 'js_before_unload_response.dart';
 // ExchangeableObjectGenerator
 // **************************************************************************
 
-///Class that represents the response used by the [WebView.onJsBeforeUnload] event to control a JavaScript alert dialog.
+///Class that represents the response used by the [PlatformWebViewCreationParams.onJsBeforeUnload] event to control a JavaScript alert dialog.
 class JsBeforeUnloadResponse {
   ///Action used to confirm that the user hit confirm or cancel button.
   JsBeforeUnloadResponseAction? action;

@@ -1,13 +1,8 @@
 import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_platform_interface.dart';
-import '../in_app_webview/in_app_webview_controller.dart';
 
-///This listener receives messages sent on the JavaScript object which was injected by [InAppWebViewController.addWebMessageListener].
-///
-///**Supported Platforms/Implementations**:
-///- Android native WebView
-///- iOS
-///- MacOS
+///{@macro flutter_inappwebview_platform_interface.PlatformWebMessageListener}
 class WebMessageListener {
+  ///{@macro flutter_inappwebview_platform_interface.PlatformWebMessageListener}
   WebMessageListener(
       {required String jsObjectName,
       Set<String>? allowedOriginRules,
@@ -41,6 +36,7 @@ class WebMessageListener {
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebMessageListener.onPostMessage}
   OnPostMessageCallback? get onPostMessage => platform.onPostMessage;
 
+  ///{@macro flutter_inappwebview_platform_interface.PlatformWebMessageListener.dispose}
   void dispose() => platform.dispose();
 
   Map<String, dynamic> toMap() => platform.toMap();
@@ -51,12 +47,9 @@ class WebMessageListener {
   String toString() => platform.toString();
 }
 
-///This class represents the JavaScript object injected by [InAppWebViewController.addWebMessageListener].
-///An instance will be given by [WebMessageListener.onPostMessage].
-///The app can use `postMessage(String)` to talk to the JavaScript context.
-///
-///There is a 1:1 relationship between this object and the JavaScript object in a frame.
+///{@macro flutter_inappwebview_platform_interface.PlatformJavaScriptReplyProxy}
 class JavaScriptReplyProxy {
+  ///{@macro flutter_inappwebview_platform_interface.PlatformJavaScriptReplyProxy}
   JavaScriptReplyProxy({required PlatformWebMessageListener webMessageListener})
       : this.fromPlatformCreationParams(
             params: PlatformJavaScriptReplyProxyCreationParams(
@@ -76,11 +69,7 @@ class JavaScriptReplyProxy {
   /// Implementation of [PlatformJavaScriptReplyProxy] for the current platform.
   final PlatformJavaScriptReplyProxy platform;
 
-  ///Post a [message] to the injected JavaScript object which sent this [JavaScriptReplyProxy].
-  ///
-  ///If [message] is of type [WebMessageType.ARRAY_BUFFER], be aware that large byte buffers can lead to out-of-memory crashes on low-end devices.
-  ///
-  ///**Official Android API**: https://developer.android.com/reference/androidx/webkit/JavaScriptReplyProxy#postMessage(java.lang.String)
+  ///{@macro flutter_inappwebview_platform_interface.PlatformJavaScriptReplyProxy.postMessage}
   Future<void> postMessage(WebMessage message) => platform.postMessage(message);
 
   @override

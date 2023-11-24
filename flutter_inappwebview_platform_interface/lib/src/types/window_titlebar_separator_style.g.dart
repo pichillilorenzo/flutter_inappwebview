@@ -18,7 +18,7 @@ class WindowTitlebarSeparatorStyle {
 
   ///A style indicating that the system determines the type of separator.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- MacOS
   static final AUTOMATIC =
       WindowTitlebarSeparatorStyle._internalMultiPlatform(0, () {
@@ -33,7 +33,7 @@ class WindowTitlebarSeparatorStyle {
 
   ///A style indicating that there’s no title bar separator.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- MacOS
   static final LINE =
       WindowTitlebarSeparatorStyle._internalMultiPlatform(2, () {
@@ -48,7 +48,7 @@ class WindowTitlebarSeparatorStyle {
 
   ///A style indicating that the title bar separator is a line.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- MacOS
   static final NONE =
       WindowTitlebarSeparatorStyle._internalMultiPlatform(1, () {
@@ -63,7 +63,7 @@ class WindowTitlebarSeparatorStyle {
 
   ///A style indicating that the title bar separator is a shadow.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- MacOS
   static final SHADOW =
       WindowTitlebarSeparatorStyle._internalMultiPlatform(3, () {

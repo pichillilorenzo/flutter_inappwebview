@@ -8,23 +8,11 @@ import '../find_interaction/find_interaction_controller.dart';
 import 'in_app_webview_controller.dart';
 import '../pull_to_refresh/pull_to_refresh_controller.dart';
 
-///{@template flutter_inappwebview.HeadlessInAppWebView}
-///Class that represents a WebView in headless mode.
-///It can be used to run a WebView in background without attaching an `InAppWebView` to the widget tree.
-///
-///**NOTE**: Remember to dispose it when you don't need it anymore.
-///
-///**Supported Platforms/Implementations**:
-///- Android native WebView
-///- iOS
-///- Web
-///- MacOS
-///{@endtemplate}
+///{@macro flutter_inappwebview_platform_interface.PlatformHeadlessInAppWebView}
 class HeadlessInAppWebView {
   /// Constructs a [HeadlessInAppWebView].
   ///
-  /// See [HeadlessInAppWebView.fromPlatformCreationParams] for setting parameters for
-  /// a specific platform.
+  ///{@macro flutter_inappwebview_platform_interface.PlatformHeadlessInAppWebView}
   HeadlessInAppWebView.fromPlatformCreationParams({
     required PlatformHeadlessInAppWebViewCreationParams params,
   }) : this.fromPlatform(platform: PlatformHeadlessInAppWebView(params));
@@ -35,7 +23,10 @@ class HeadlessInAppWebView {
   /// Implementation of [PlatformHeadlessInAppWebView] for the current platform.
   final PlatformHeadlessInAppWebView platform;
 
-  ///WebView Controller that can be used to access the [InAppWebViewController] API.
+  ///{@macro flutter_inappwebview_platform_interface.PlatformHeadlessInAppWebView.id}
+  String get id => platform.id;
+
+  ///{@macro flutter_inappwebview_platform_interface.PlatformHeadlessInAppWebView.webViewController}
   InAppWebViewController? get webViewController {
     final webViewControllerPlatform = platform.webViewController;
     if (webViewControllerPlatform == null) {
@@ -644,59 +635,18 @@ class HeadlessInAppWebView {
               : null,
         ));
 
-  ///Runs the headless WebView.
-  ///
-  ///**NOTE for Web**: it will append a new `iframe` to the body.
-  ///
-  ///**Supported Platforms/Implementations**:
-  ///- Android native WebView
-  ///- iOS
-  ///- Web
-  ///- MacOS
+  ///{@macro flutter_inappwebview_platform_interface.PlatformHeadlessInAppWebView.run}
   Future<void> run() => platform.run();
 
-  ///Indicates if the headless WebView is running or not.
-  ///
-  ///**Supported Platforms/Implementations**:
-  ///- Android native WebView
-  ///- iOS
-  ///- Web
-  ///- MacOS
+  ///{@macro flutter_inappwebview_platform_interface.PlatformHeadlessInAppWebView.isRunning}
   bool isRunning() => platform.isRunning();
 
-  ///Set the size of the WebView in pixels.
-  ///
-  ///Set `-1` to match the corresponding width or height of the current device screen size.
-  ///`Size(-1, -1)` will match both width and height of the current device screen size.
-  ///
-  ///Note that if the [HeadlessInAppWebView] is not running, this method won't have effect.
-  ///
-  ///**NOTE for Android**: `Size` width and height values will be converted to `int` values because they cannot have `double` values.
-  ///
-  ///**Supported Platforms/Implementations**:
-  ///- Android native WebView
-  ///- iOS
-  ///- Web
-  ///- MacOS
+  ///{@macro flutter_inappwebview_platform_interface.PlatformHeadlessInAppWebView.setSize}
   Future<void> setSize(Size size) => platform.setSize(size);
 
-  ///Gets the current size in pixels of the WebView.
-  ///
-  ///Note that if the [HeadlessInAppWebView] is not running, this method will return `null`.
-  ///
-  ///**Supported Platforms/Implementations**:
-  ///- Android native WebView
-  ///- iOS
-  ///- Web
-  ///- MacOS
+  ///{@macro flutter_inappwebview_platform_interface.PlatformHeadlessInAppWebView.getSize}
   Future<Size?> getSize() => platform.getSize();
 
-  ///Disposes the headless WebView.
-  ///
-  ///**Supported Platforms/Implementations**:
-  ///- Android native WebView
-  ///- iOS
-  ///- Web
-  ///- MacOS
+  ///{@macro flutter_inappwebview_platform_interface.PlatformHeadlessInAppWebView.dispose}
   Future<void> dispose() => platform.dispose();
 }

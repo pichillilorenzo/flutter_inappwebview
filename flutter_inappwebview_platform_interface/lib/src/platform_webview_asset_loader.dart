@@ -7,7 +7,7 @@ import 'types/web_resource_response.dart';
 
 part 'platform_webview_asset_loader.g.dart';
 
-///Helper class to load local files including application's static assets and resources using http(s):// URLs inside a [WebView] class.
+///Helper class to load local files including application's static assets and resources using http(s):// URLs inside a `WebView` class.
 ///Loading local files using web-like URLs instead of `file://` is desirable as it is compatible with the Same-Origin policy.
 ///
 ///For more context about application's assets and resources and how to normally access them please refer to
@@ -17,7 +17,7 @@ part 'platform_webview_asset_loader.g.dart';
 ///This means that local files should only be hosted on domains your organization owns
 ///(at paths reserved for this purpose) or the default domain reserved for this: `appassets.androidplatform.net`.
 ///
-///**Supported Platforms/Implementations**:
+///**Officially Supported Platforms/Implementations**:
 ///- Android native WebView
 @ExchangeableObject(copyMethod: true)
 class WebViewAssetLoader_ {
@@ -41,6 +41,7 @@ class WebViewAssetLoader_ {
   WebViewAssetLoader_({this.domain, this.httpAllowed, this.pathHandlers});
 }
 
+///[PlatformPathHandler] interface.
 abstract class IPathHandler {
   String get path {
     throw UnimplementedError('path is not implemented on the current platform');
@@ -70,9 +71,11 @@ class PlatformPathHandlerCreationParams {
   final String path;
 }
 
+///{@template flutter_inappwebview_platform_interface.PlatformPathHandler}
 ///A handler that produces responses for a registered path.
 ///
 ///Implement this interface to handle other use-cases according to your app's needs.
+///{@endtemplate}
 abstract class PlatformPathHandler extends PlatformInterface
     implements IPathHandler {
   /// Creates a new [PlatformWebViewAssetLoader]
@@ -124,7 +127,9 @@ abstract class PlatformPathHandler extends PlatformInterface
   }
 }
 
+///Interface path handler events.
 abstract class PlatformPathHandlerEvents {
+  ///{@template flutter_inappwebview_platform_interface.PlatformPathHandler.handle}
   ///Handles the requested URL by returning the appropriate response.
   ///
   ///Returning a `null` value means that the handler decided not to handle this path.
@@ -133,6 +138,7 @@ abstract class PlatformPathHandlerEvents {
   ///However, if the handler wants to save unnecessary processing either by another handler or by falling back to network,
   ///in cases like a file cannot be found, it may return a `WebResourceResponse(data: null)`
   ///which is received as an HTTP response with status code `404` and no body.
+  ///{@endtemplate}
   Future<WebResourceResponse?> handle(String path) {
     throw UnimplementedError(
         'handle is not implemented on the current platform');
@@ -160,6 +166,7 @@ class PlatformAssetsPathHandlerCreationParams
   }
 }
 
+///{@template flutter_inappwebview_platform_interface.PlatformAssetsPathHandler}
 ///Handler class to open a file from assets directory in the application APK.
 ///
 ///Opens the requested file from the application's assets directory.
@@ -173,6 +180,7 @@ class PlatformAssetsPathHandlerCreationParams
 ///[guessContentTypeFromName](https://developer.android.com/reference/java/net/URLConnection.html#guessContentTypeFromName-java.lang.String-).
 ///Developers should ensure that asset files are named using standard file extensions.
 ///If the file does not have a recognised extension, `text/plain` will be used by default.
+///{@endtemplate}
 abstract class PlatformAssetsPathHandler extends PlatformPathHandler {
   /// Creates a new [PlatformAssetsPathHandler]
   factory PlatformAssetsPathHandler(
@@ -228,6 +236,7 @@ class PlatformResourcesPathHandlerCreationParams
   }
 }
 
+///{@template flutter_inappwebview_platform_interface.PlatformResourcesPathHandler}
 ///Handler class to open a file from resources directory in the application APK.
 ///
 ///Opens the requested file from application's resources directory.
@@ -241,6 +250,7 @@ class PlatformResourcesPathHandlerCreationParams
 ///[guessContentTypeFromName](https://developer.android.com/reference/java/net/URLConnection.html#guessContentTypeFromName-java.lang.String-).
 ///Developers should ensure that asset files are named using standard file extensions.
 ///If the file does not have a recognised extension, `text/plain` will be used by default.
+///{@endtemplate}
 abstract class PlatformResourcesPathHandler extends PlatformPathHandler {
   /// Creates a new [PlatformResourcesPathHandler]
   factory PlatformResourcesPathHandler(
@@ -302,6 +312,7 @@ class PlatformInternalStoragePathHandlerCreationParams
   final String directory;
 }
 
+///{@template flutter_inappwebview_platform_interface.PlatformInternalStoragePathHandler}
 ///Handler class to open files from application internal storage.
 ///For more information about android storage please refer to
 ///[Android Developers Docs: Data and file storage overview](https://developer.android.com/guide/topics/data/data-storage).
@@ -320,6 +331,7 @@ class PlatformInternalStoragePathHandlerCreationParams
 ///[guessContentTypeFromName](https://developer.android.com/reference/java/net/URLConnection.html#guessContentTypeFromName-java.lang.String-).
 ///Developers should ensure that asset files are named using standard file extensions.
 ///If the file does not have a recognised extension, `text/plain` will be used by default.
+///{@endtemplate}
 abstract class PlatformInternalStoragePathHandler extends PlatformPathHandler {
   /// Creates a new [PlatformResourcesPathHandler]
   factory PlatformInternalStoragePathHandler(

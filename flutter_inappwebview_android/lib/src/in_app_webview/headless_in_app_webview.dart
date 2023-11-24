@@ -249,21 +249,9 @@ class AndroidHeadlessInAppWebViewCreationParams
   final AndroidPullToRefreshController? pullToRefreshController;
 }
 
-///{@template flutter_inappwebview.HeadlessInAppWebView}
-///Class that represents a WebView in headless mode.
-///It can be used to run a WebView in background without attaching an `InAppWebView` to the widget tree.
-///
-///**NOTE**: Remember to dispose it when you don't need it anymore.
-///
-///**Supported Platforms/Implementations**:
-///- Android native WebView
-///- iOS
-///- Web
-///- MacOS
-///{@endtemplate}
+///{@macro flutter_inappwebview_platform_interface.PlatformHeadlessInAppWebView}
 class AndroidHeadlessInAppWebView extends PlatformHeadlessInAppWebView
     with ChannelController {
-  ///View ID.
   @override
   late final String id;
 
@@ -286,7 +274,6 @@ class AndroidHeadlessInAppWebView extends PlatformHeadlessInAppWebView
     id = IdGenerator.generate();
   }
 
-  ///WebView Controller that can be used to access the [InAppWebViewController] API.
   @override
   AndroidInAppWebViewController? get webViewController => _webViewController;
 
@@ -324,15 +311,6 @@ class AndroidHeadlessInAppWebView extends PlatformHeadlessInAppWebView
     return null;
   }
 
-  ///Runs the headless WebView.
-  ///
-  ///**NOTE for Web**: it will append a new `iframe` to the body.
-  ///
-  ///**Supported Platforms/Implementations**:
-  ///- Android native WebView
-  ///- iOS
-  ///- Web
-  ///- MacOS
   Future<void> run() async {
     if (_started) {
       return;
@@ -408,32 +386,11 @@ class AndroidHeadlessInAppWebView extends PlatformHeadlessInAppWebView
     }
   }
 
-  ///Indicates if the headless WebView is running or not.
-  ///
-  ///**Supported Platforms/Implementations**:
-  ///- Android native WebView
-  ///- iOS
-  ///- Web
-  ///- MacOS
   @override
   bool isRunning() {
     return _running;
   }
 
-  ///Set the size of the WebView in pixels.
-  ///
-  ///Set `-1` to match the corresponding width or height of the current device screen size.
-  ///`Size(-1, -1)` will match both width and height of the current device screen size.
-  ///
-  ///Note that if the [AndroidHeadlessInAppWebView] is not running, this method won't have effect.
-  ///
-  ///**NOTE for Android**: `Size` width and height values will be converted to `int` values because they cannot have `double` values.
-  ///
-  ///**Supported Platforms/Implementations**:
-  ///- Android native WebView
-  ///- iOS
-  ///- Web
-  ///- MacOS
   @override
   Future<void> setSize(Size size) async {
     if (!_running) {
@@ -445,15 +402,6 @@ class AndroidHeadlessInAppWebView extends PlatformHeadlessInAppWebView
     await channel?.invokeMethod('setSize', args);
   }
 
-  ///Gets the current size in pixels of the WebView.
-  ///
-  ///Note that if the [AndroidHeadlessInAppWebView] is not running, this method will return `null`.
-  ///
-  ///**Supported Platforms/Implementations**:
-  ///- Android native WebView
-  ///- iOS
-  ///- Web
-  ///- MacOS
   @override
   Future<Size?> getSize() async {
     if (!_running) {
@@ -466,13 +414,6 @@ class AndroidHeadlessInAppWebView extends PlatformHeadlessInAppWebView
     return MapSize.fromMap(sizeMap);
   }
 
-  ///Disposes the headless WebView.
-  ///
-  ///**Supported Platforms/Implementations**:
-  ///- Android native WebView
-  ///- iOS
-  ///- Web
-  ///- MacOS
   @override
   Future<void> dispose() async {
     if (!_running) {

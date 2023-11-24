@@ -19,7 +19,7 @@ class PrintJobDuplexMode {
   ///Duplex printing that flips the back page along the long edge of the paper.
   ///Pages are turned sideways along the long edge - like a book.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
   ///- MacOS
@@ -40,7 +40,7 @@ class PrintJobDuplexMode {
 
   ///No double-sided (duplex) printing; single-sided printing only.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
   ///- MacOS
@@ -61,7 +61,7 @@ class PrintJobDuplexMode {
   ///Duplex print that flips the back page along the short edge of the paper.
   ///Pages are turned upwards along the short edge - like a notepad.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
   ///- MacOS

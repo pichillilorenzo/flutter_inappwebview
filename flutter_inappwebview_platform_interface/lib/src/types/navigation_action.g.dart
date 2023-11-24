@@ -23,7 +23,7 @@ class NavigationAction {
   ///
   ///**NOTE for Android native WebView**: On Android < 21, this is always `false`
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView 21+ ([Official API - WebResourceRequest.hasGesture](https://developer.android.com/reference/android/webkit/WebResourceRequest#hasGesture()))
   bool? hasGesture;
 
@@ -41,29 +41,29 @@ class NavigationAction {
 
   ///Indicates whether the request was made for the main frame.
   ///
-  ///**NOTE for Android**: If the request is associated to the [WebView.onCreateWindow] event, this is always `true`.
+  ///**NOTE for Android**: If the request is associated to the [PlatformWebViewCreationParams.onCreateWindow] event, this is always `true`.
   ///Also, on Android < 21, this is always `true`.
   bool isForMainFrame;
 
   ///Gets whether the request was a result of a server-side redirect.
   ///
-  ///**NOTE**: If the request is associated to the [WebView.onCreateWindow] event, this is always `false`.
+  ///**NOTE**: If the request is associated to the [PlatformWebViewCreationParams.onCreateWindow] event, this is always `false`.
   ///Also, on Android < 21, this is always `false`.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView 21+ ([Official API - WebResourceRequest.isRedirect](https://developer.android.com/reference/android/webkit/WebResourceRequest#isRedirect()))
   bool? isRedirect;
 
   ///The type of action triggering the navigation.ì
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- iOS ([Official API - WKNavigationAction.navigationType](https://developer.apple.com/documentation/webkit/wknavigationaction/1401914-navigationtype))
   ///- MacOS ([Official API - WKNavigationAction.navigationType](https://developer.apple.com/documentation/webkit/wknavigationaction/1401914-navigationtype))
   NavigationType? navigationType;
 
   ///The URL request object associated with the navigation action.
   ///
-  ///**NOTE for Android**: If the request is associated to the [WebView.onCreateWindow] event
+  ///**NOTE for Android**: If the request is associated to the [PlatformWebViewCreationParams.onCreateWindow] event
   ///and the window has been created using JavaScript, [request.url] will be `null`,
   ///the [request.method] is always `GET`, and [request.headers] value is always `null`.
   ///Also, on Android < 21, the [request.method]  is always `GET` and [request.headers] value is always `null`.
@@ -71,21 +71,21 @@ class NavigationAction {
 
   ///A value indicating whether the web content used a download attribute to indicate that this should be downloaded.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- iOS 14.5+ ([Official API - WKNavigationAction.shouldPerformDownload](https://developer.apple.com/documentation/webkit/wknavigationaction/3727357-shouldperformdownload))
   ///- MacOS 11.3+ ([Official API - WKNavigationAction.shouldPerformDownload](https://developer.apple.com/documentation/webkit/wknavigationaction/3727357-shouldperformdownload))
   bool? shouldPerformDownload;
 
   ///The frame that requested the navigation.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- iOS ([Official API - WKNavigationAction.sourceFrame](https://developer.apple.com/documentation/webkit/wknavigationaction/1401926-sourceframe))
   ///- MacOS ([Official API - WKNavigationAction.sourceFrame](https://developer.apple.com/documentation/webkit/wknavigationaction/1401926-sourceframe))
   FrameInfo? sourceFrame;
 
   ///The frame in which to display the new content.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- iOS ([Official API - WKNavigationAction.targetFrame](https://developer.apple.com/documentation/webkit/wknavigationaction/1401918-targetframe))
   ///- MacOS ([Official API - WKNavigationAction.targetFrame](https://developer.apple.com/documentation/webkit/wknavigationaction/1401918-targetframe))
   FrameInfo? targetFrame;

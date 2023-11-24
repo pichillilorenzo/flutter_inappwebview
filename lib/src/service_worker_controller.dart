@@ -1,17 +1,9 @@
 import 'dart:async';
 import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_platform_interface.dart';
 
-///Class that manages Service Workers used by [WebView].
-///
-///**NOTE**: available on Android 24+.
-///
-///**Supported Platforms/Implementations**:
-///- Android native WebView ([Official API - ServiceWorkerControllerCompat](https://developer.android.com/reference/androidx/webkit/ServiceWorkerControllerCompat))
+///{@macro flutter_inappwebview_platform_interface.PlatformServiceWorkerController}
 class ServiceWorkerController {
-  /// Constructs a [ServiceWorkerController].
-  ///
-  /// See [ServiceWorkerController.fromPlatformCreationParams] for setting
-  /// parameters for a specific platform.
+  ///{@macro flutter_inappwebview_platform_interface.PlatformServiceWorkerController}
   ServiceWorkerController()
       : this.fromPlatformCreationParams(
           const PlatformServiceWorkerControllerCreationParams(),
@@ -27,7 +19,7 @@ class ServiceWorkerController {
   /// implementation.
   ServiceWorkerController.fromPlatform(this.platform);
 
-  /// Implementation of [PlatformWebViewServiceWorkerController] for the current platform.
+  /// Implementation of [PlatformServiceWorkerController] for the current platform.
   final PlatformServiceWorkerController platform;
 
   static ServiceWorkerController? _instance;
@@ -40,86 +32,47 @@ class ServiceWorkerController {
     return _instance!;
   }
 
+  ///{@macro flutter_inappwebview_platform_interface.PlatformServiceWorkerController.serviceWorkerClient}
   ServiceWorkerClient? get serviceWorkerClient => platform.serviceWorkerClient;
 
-  ///Sets the service worker client
+  ///{@macro flutter_inappwebview_platform_interface.PlatformServiceWorkerController.setServiceWorkerClient}
   setServiceWorkerClient(ServiceWorkerClient? value) =>
       platform.setServiceWorkerClient(value);
 
-  ///Gets whether Service Workers support content URL access.
-  ///This method should only be called if [WebViewFeature.isFeatureSupported] returns `true` for [WebViewFeature.SERVICE_WORKER_CONTENT_ACCESS].
-  ///
-  ///**NOTE**: available on Android 24+.
-  ///
-  ///**Official Android API**: https://developer.android.com/reference/androidx/webkit/ServiceWorkerWebSettingsCompat#getAllowContentAccess()
+  ///{@macro flutter_inappwebview_platform_interface.PlatformServiceWorkerController.getAllowContentAccess}
   static Future<bool> getAllowContentAccess() =>
       PlatformServiceWorkerController.static().getAllowContentAccess();
 
-  ///Gets whether Service Workers support file access.
-  ///This method should only be called if [WebViewFeature.isFeatureSupported] returns `true` for [WebViewFeature.SERVICE_WORKER_FILE_ACCESS].
-  ///
-  ///**NOTE**: available on Android 24+.
-  ///
-  ///**Official Android API**: https://developer.android.com/reference/androidx/webkit/ServiceWorkerWebSettingsCompat#getAllowFileAccess()
+  ///{@macro flutter_inappwebview_platform_interface.PlatformServiceWorkerController.getAllowFileAccess}
   static Future<bool> getAllowFileAccess() =>
       PlatformServiceWorkerController.static().getAllowFileAccess();
 
-  ///Gets whether Service Workers are prohibited from loading any resources from the network.
-  ///This method should only be called if [WebViewFeature.isFeatureSupported] returns `true` for [WebViewFeature.SERVICE_WORKER_BLOCK_NETWORK_LOADS].
-  ///
-  ///**NOTE**: available on Android 24+.
-  ///
-  ///**Official Android API**: https://developer.android.com/reference/androidx/webkit/ServiceWorkerWebSettingsCompat#getBlockNetworkLoads()
+  ///{@macro flutter_inappwebview_platform_interface.PlatformServiceWorkerController.getBlockNetworkLoads}
   static Future<bool> getBlockNetworkLoads() =>
       PlatformServiceWorkerController.static().getBlockNetworkLoads();
 
-  ///Gets the current setting for overriding the cache mode.
-  ///This method should only be called if [WebViewFeature.isFeatureSupported] returns `true` for [WebViewFeature.SERVICE_WORKER_CACHE_MODE].
-  ///
-  ///**NOTE**: available on Android 24+.
-  ///
-  ///**Official Android API**: https://developer.android.com/reference/androidx/webkit/ServiceWorkerWebSettingsCompat#getCacheMode()
+  ///{@macro flutter_inappwebview_platform_interface.PlatformServiceWorkerController.getCacheMode}
   static Future<CacheMode?> getCacheMode() =>
       PlatformServiceWorkerController.static().getCacheMode();
 
-  ///Enables or disables content URL access from Service Workers.
-  ///This method should only be called if [WebViewFeature.isFeatureSupported] returns `true` for [WebViewFeature.SERVICE_WORKER_CONTENT_ACCESS].
-  ///
-  ///**NOTE**: available on Android 24+.
-  ///
-  ///**Official Android API**: https://developer.android.com/reference/androidx/webkit/ServiceWorkerWebSettingsCompat#setAllowContentAccess(boolean)
+  ///{@macro flutter_inappwebview_platform_interface.PlatformServiceWorkerController.setAllowContentAccess}
   static Future<void> setAllowContentAccess(bool allow) =>
       PlatformServiceWorkerController.static().setAllowContentAccess(allow);
 
-  ///Enables or disables file access within Service Workers.
-  ///This method should only be called if [WebViewFeature.isFeatureSupported] returns `true` for [WebViewFeature.SERVICE_WORKER_FILE_ACCESS].
-  ///
-  ///**NOTE**: available on Android 24+.
-  ///
-  ///**Official Android API**: https://developer.android.com/reference/androidx/webkit/ServiceWorkerWebSettingsCompat#setAllowFileAccess(boolean)
+  ///{@macro flutter_inappwebview_platform_interface.PlatformServiceWorkerController.setAllowFileAccess}
   static Future<void> setAllowFileAccess(bool allow) =>
       PlatformServiceWorkerController.static().setAllowFileAccess(allow);
 
-  ///Sets whether Service Workers should not load resources from the network.
-  ///This method should only be called if [WebViewFeature.isFeatureSupported] returns `true` for [WebViewFeature.SERVICE_WORKER_BLOCK_NETWORK_LOADS].
-  ///
-  ///**NOTE**: available on Android 24+.
-  ///
-  ///**Official Android API**: https://developer.android.com/reference/androidx/webkit/ServiceWorkerWebSettingsCompat#setBlockNetworkLoads(boolean)
+  ///{@macro flutter_inappwebview_platform_interface.PlatformServiceWorkerController.setBlockNetworkLoads}
   static Future<void> setBlockNetworkLoads(bool flag) =>
       PlatformServiceWorkerController.static().setBlockNetworkLoads(flag);
 
-  ///Overrides the way the cache is used.
-  ///This method should only be called if [WebViewFeature.isFeatureSupported] returns `true` for [WebViewFeature.SERVICE_WORKER_CACHE_MODE].
-  ///
-  ///**NOTE**: available on Android 24+.
-  ///
-  ///**Official Android API**: https://developer.android.com/reference/androidx/webkit/ServiceWorkerWebSettingsCompat#setCacheMode(int)
+  ///{@macro flutter_inappwebview_platform_interface.PlatformServiceWorkerController.setCacheMode}
   static Future<void> setCacheMode(CacheMode mode) =>
       PlatformServiceWorkerController.static().setCacheMode(mode);
 }
 
-///Class that represents an Android-specific class that manages Service Workers used by [WebView].
+///Class that represents an Android-specific class that manages Service Workers used by `WebView`.
 ///
 ///**NOTE**: available on Android 24+.
 ///

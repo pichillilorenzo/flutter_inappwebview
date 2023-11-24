@@ -1,10 +1,11 @@
 import 'dart:typed_data';
 
 import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_internal_annotations.dart';
+import '../in_app_webview/platform_webview.dart';
 
 part 'custom_scheme_response.g.dart';
 
-///Class representing the response returned by the [WebView.onLoadResourceWithCustomScheme] event.
+///Class representing the response returned by the [PlatformWebViewCreationParams.onLoadResourceWithCustomScheme] event.
 ///It allows to load a specific resource. The resource data must be encoded to `base64`.
 @ExchangeableObject()
 class CustomSchemeResponse_ {

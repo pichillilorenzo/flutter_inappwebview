@@ -6,7 +6,7 @@ part of 'navigation_action_policy.dart';
 // ExchangeableEnumGenerator
 // **************************************************************************
 
-///Class that is used by [WebView.shouldOverrideUrlLoading] event.
+///Class that is used by [PlatformWebViewCreationParams.shouldOverrideUrlLoading] event.
 ///It represents the policy to pass back to the decision handler.
 class NavigationActionPolicy {
   final int _value;

@@ -5,10 +5,11 @@ import 'window_features.dart';
 import 'url_request.dart';
 import 'frame_info.dart';
 import 'navigation_type.dart';
+import '../in_app_webview/platform_webview.dart';
 
 part 'create_window_action.g.dart';
 
-///Class that represents the navigation request used by the [WebView.onCreateWindow] event.
+///Class that represents the navigation request used by the [PlatformWebViewCreationParams.onCreateWindow] event.
 @ExchangeableObject()
 class CreateWindowAction_ extends NavigationAction_ {
   ///The window id. Used by `WebView` to create a new WebView.

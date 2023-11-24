@@ -9,7 +9,7 @@ part of 'console_message.dart';
 ///Class representing a JavaScript console message from WebCore.
 ///This could be a issued by a call to one of the console logging functions (e.g. console.log('...')) or a JavaScript error on the page.
 ///
-///To receive notifications of these messages, use the [WebView.onConsoleMessage] event.
+///To receive notifications of these messages, use the [PlatformWebViewCreationParams.onConsoleMessage] event.
 class ConsoleMessage {
   ///Console message
   String message;

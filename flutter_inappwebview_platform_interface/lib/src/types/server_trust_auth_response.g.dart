@@ -6,7 +6,7 @@ part of 'server_trust_auth_response.dart';
 // ExchangeableObjectGenerator
 // **************************************************************************
 
-///Class that represents the response used by the [WebView.onReceivedServerTrustAuthRequest] event.
+///Class that represents the response used by the [PlatformWebViewCreationParams.onReceivedServerTrustAuthRequest] event.
 class ServerTrustAuthResponse {
   ///Indicate the [ServerTrustAuthResponseAction] to take in response of the server trust authentication challenge.
   ServerTrustAuthResponseAction? action;

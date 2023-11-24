@@ -6,7 +6,7 @@ part of 'js_alert_response.dart';
 // ExchangeableObjectGenerator
 // **************************************************************************
 
-///Class that represents the response used by the [WebView.onJsAlert] event to control a JavaScript alert dialog.
+///Class that represents the response used by the [PlatformWebViewCreationParams.onJsAlert] event to control a JavaScript alert dialog.
 class JsAlertResponse {
   ///Action used to confirm that the user hit confirm button.
   JsAlertResponseAction? action;

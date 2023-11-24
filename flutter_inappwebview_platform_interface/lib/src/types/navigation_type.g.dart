@@ -6,7 +6,7 @@ part of 'navigation_type.dart';
 // ExchangeableEnumGenerator
 // **************************************************************************
 
-///Class that represents the type of action triggering a navigation for the [WebView.shouldOverrideUrlLoading] event.
+///Class that represents the type of action triggering a navigation for the [PlatformWebViewCreationParams.shouldOverrideUrlLoading] event.
 class NavigationType {
   final int _value;
   final int _nativeValue;
@@ -102,7 +102,7 @@ class NavigationType {
   }
 }
 
-///Class that represents the type of action triggering a navigation on iOS for the [WebView.shouldOverrideUrlLoading] event.
+///Class that represents the type of action triggering a navigation on iOS for the [PlatformWebViewCreationParams.shouldOverrideUrlLoading] event.
 ///Use [NavigationType] instead.
 @Deprecated('Use NavigationType instead')
 class IOSWKNavigationType {

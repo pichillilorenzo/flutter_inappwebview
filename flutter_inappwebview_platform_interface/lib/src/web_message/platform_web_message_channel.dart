@@ -29,12 +29,14 @@ class PlatformWebMessageChannelCreationParams {
   }
 }
 
+///{@template flutter_inappwebview_platform_interface.PlatformWebMessageChannel}
 ///The representation of the [HTML5 message channels](https://html.spec.whatwg.org/multipage/web-messaging.html#message-channels).
 ///
-///**Supported Platforms/Implementations**:
+///**Officially Supported Platforms/Implementations**:
 ///- Android native WebView
 ///- iOS
 ///- MacOS
+///{@endtemplate}
 abstract class PlatformWebMessageChannel extends PlatformInterface
     implements Disposable {
   /// Creates a new [PlatformWebMessageChannel]
@@ -100,6 +102,9 @@ abstract class PlatformWebMessageChannel extends PlatformInterface
         'fromMap is not implemented on the current platform');
   }
 
+  ///{@template flutter_inappwebview_platform_interface.PlatformWebMessageChannel}
+  ///Disposes the web message channel.
+  ///{@endtemplate}
   @override
   void dispose() {
     throw UnimplementedError(

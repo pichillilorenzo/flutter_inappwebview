@@ -1,10 +1,10 @@
 import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_internal_annotations.dart';
-
+import '../in_app_webview/platform_webview.dart';
 import 'http_auth_response_action.dart';
 
 part 'http_auth_response.g.dart';
 
-///Class that represents the response used by the [WebView.onReceivedHttpAuthRequest] event.
+///Class that represents the response used by the [PlatformWebViewCreationParams.onReceivedHttpAuthRequest] event.
 @ExchangeableObject()
 class HttpAuthResponse_ {
   ///Represents the username used for the authentication if the [action] corresponds to [HttpAuthResponseAction.PROCEED]

@@ -6,7 +6,7 @@ part of 'http_auth_response.dart';
 // ExchangeableObjectGenerator
 // **************************************************************************
 
-///Class that represents the response used by the [WebView.onReceivedHttpAuthRequest] event.
+///Class that represents the response used by the [PlatformWebViewCreationParams.onReceivedHttpAuthRequest] event.
 class HttpAuthResponse {
   ///Indicate the [HttpAuthResponseAction] to take in response of the authentication challenge.
   HttpAuthResponseAction? action;

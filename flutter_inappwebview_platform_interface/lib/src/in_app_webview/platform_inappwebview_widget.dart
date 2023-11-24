@@ -160,7 +160,7 @@ class PlatformInAppWebViewWidgetCreationParams
 
   ///The [PlatformHeadlessInAppWebView] to use to initialize this widget.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
   ///- Web
@@ -170,7 +170,7 @@ class PlatformInAppWebViewWidgetCreationParams
   ///Remember to dispose the [InAppWebViewKeepAlive] instance
   ///using [InAppWebViewController.disposeKeepAlive].
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
   final InAppWebViewKeepAlive? keepAlive;
@@ -178,12 +178,21 @@ class PlatformInAppWebViewWidgetCreationParams
   ///Used to prevent gesture delay on iOS caused by Flutter's gestures handling
   ///between native/platform views.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- iOS
   final bool? preventGestureDelay;
 }
 
 /// Interface for a platform implementation of a web view widget.
+///
+///{@template flutter_inappwebview_platform_interface.PlatformInAppWebViewWidget}
+///Flutter Widget for adding an **inline native WebView** integrated in the flutter widget tree.
+///
+///**Officially Supported Platforms/Implementations**:
+///- Android native WebView
+///- iOS
+///- Web
+///{@endtemplate}
 abstract class PlatformInAppWebViewWidget extends PlatformInterface
     implements Disposable {
   /// Creates a new [PlatformInAppWebViewWidget]
@@ -220,6 +229,7 @@ abstract class PlatformInAppWebViewWidget extends PlatformInterface
   /// Returns a Widget tree that embeds the created web view.
   Widget build(BuildContext context);
 
+  /// Gets the `InAppWebViewController` instance controller
   T controllerFromPlatform<T>(PlatformInAppWebViewController controller);
 
   @override

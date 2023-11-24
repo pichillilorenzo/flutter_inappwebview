@@ -10,7 +10,7 @@ part of 'chrome_safari_action_button.dart';
 ///
 ///**NOTE for Android native WebView**: Not available in an Android Trusted Web Activity.
 ///
-///**Supported Platforms/Implementations**:
+///**Officially Supported Platforms/Implementations**:
 ///- Android native WebView
 class ChromeSafariBrowserActionButton {
   ///Use onClick instead.
@@ -35,7 +35,7 @@ class ChromeSafariBrowserActionButton {
   ///
   ///**NOTE for Android native WebView**: Not available in an Android Trusted Web Activity.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView
   ChromeSafariBrowserActionButton(
       {required this.id,

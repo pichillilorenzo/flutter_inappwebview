@@ -44,7 +44,7 @@ class ContentBlockerTrigger {
 
   ///A list of regular expressions to match iframes URL against.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- iOS
   ///- MacOS
   List<String> ifFrameUrl;
@@ -52,7 +52,7 @@ class ContentBlockerTrigger {
   ///A Boolean value indicating if the URL matching should be case-sensitive.
   ///The default value is `false`.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
   ///- MacOS
@@ -62,7 +62,7 @@ class ContentBlockerTrigger {
   ///(how the browser intends to use the resource) that the rule should match.
   ///If not specified, the rule matches all resource types.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
   ///- MacOS
@@ -72,7 +72,7 @@ class ContentBlockerTrigger {
   ///Values must be lowercase ASCII, or punycode for non-ASCII.
   ///Add * in front to match domain and subdomains. Can't be used with [ContentBlockerTrigger.unlessDomain].
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
   ///- MacOS
@@ -82,7 +82,7 @@ class ContentBlockerTrigger {
   ///Values must be lowercase ASCII, or punycode for non-ASCII.
   ///Add * in front to match domain and subdomains. Can't be used with [ContentBlockerTrigger.ifDomain].
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
   ///- MacOS
@@ -91,7 +91,7 @@ class ContentBlockerTrigger {
   ///A list of [ContentBlockerTriggerLoadType] that can include one of two mutually exclusive values.
   ///If not specified, the rule matches all load types.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
   ///- MacOS
@@ -100,7 +100,7 @@ class ContentBlockerTrigger {
   ///A list of strings matched to the entire main document URL; limits the action to a specific list of URL patterns.
   ///Values must be lowercase ASCII, or punycode for non-ASCII. Can't be used with [ContentBlockerTrigger.unlessTopUrl].
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
   ///- MacOS
@@ -109,7 +109,7 @@ class ContentBlockerTrigger {
   ///An array of strings matched to the entire main document URL; acts on any site except URL patterns in provided list.
   ///Values must be lowercase ASCII, or punycode for non-ASCII. Can't be used with [ContentBlockerTrigger.ifTopUrl].
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
   ///- MacOS
@@ -117,7 +117,7 @@ class ContentBlockerTrigger {
 
   ///An array of strings that specify loading contexts.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- iOS
   ///- MacOS
   List<ContentBlockerTriggerLoadContext> loadContext;

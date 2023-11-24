@@ -8,7 +8,7 @@ part of 'platform_proxy_controller.dart';
 
 ///Class that represents the settings used to configure the [PlatformProxyController].
 ///
-///**Supported Platforms/Implementations**:
+///**Officially Supported Platforms/Implementations**:
 ///- Android native WebView ([Official API - ProxyConfig](https://developer.android.com/reference/androidx/webkit/ProxyConfig))
 class ProxySettings {
   ///List of bypass rules.

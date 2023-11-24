@@ -1,8 +1,8 @@
 import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_internal_annotations.dart';
-
+import '../in_app_webview/platform_webview.dart';
 part 'navigation_type.g.dart';
 
-///Class that represents the type of action triggering a navigation for the [WebView.shouldOverrideUrlLoading] event.
+///Class that represents the type of action triggering a navigation for the [PlatformWebViewCreationParams.shouldOverrideUrlLoading] event.
 @ExchangeableEnum()
 class NavigationType_ {
   // ignore: unused_field
@@ -28,7 +28,7 @@ class NavigationType_ {
   static const OTHER = const NavigationType_._internal(-1);
 }
 
-///Class that represents the type of action triggering a navigation on iOS for the [WebView.shouldOverrideUrlLoading] event.
+///Class that represents the type of action triggering a navigation on iOS for the [PlatformWebViewCreationParams.shouldOverrideUrlLoading] event.
 ///Use [NavigationType] instead.
 @Deprecated("Use NavigationType instead")
 @ExchangeableEnum()

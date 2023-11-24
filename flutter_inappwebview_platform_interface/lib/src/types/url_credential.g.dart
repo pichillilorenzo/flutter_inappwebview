@@ -11,7 +11,7 @@ part of 'url_credential.dart';
 class URLCredential {
   ///The intermediate certificates of the credential, if it is a client certificate credential.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- iOS
   ///- MacOS
   List<X509Certificate>? certificates;
@@ -29,7 +29,7 @@ class URLCredential {
 
   ///The credential’s persistence setting.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- iOS
   ///- MacOS
   URLCredentialPersistence? persistence;

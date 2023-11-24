@@ -10,7 +10,7 @@ import 'package:js/js.dart';
 
 /// Builds an iframe based WebView.
 ///
-/// This is used as the default implementation for [WebView] on web.
+/// This is used as the default implementation for `WebView` on web.
 class FlutterInAppWebViewWebPlatform {
   /// Constructs a new instance of [FlutterInAppWebViewWebPlatform].
   FlutterInAppWebViewWebPlatform(Registrar registrar) {

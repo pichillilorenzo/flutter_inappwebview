@@ -54,13 +54,17 @@ class PlatformInAppBrowserCreationParams {
   final int? windowId;
 }
 
-///This class uses the native WebView of the platform.
+///{@template flutter_inappwebview_platform_interface.PlatformInAppBrowser}
+///This class represents a native WebView displayed on top of the Flutter App,
+///so it's not integrated into the Flutter widget tree.
+///It uses the native WebView of the platform.
 ///The [webViewController] field can be used to access the [PlatformInAppWebViewController] API.
 ///
-///**Supported Platforms/Implementations**:
+///**Officially Supported Platforms/Implementations**:
 ///- Android native WebView
 ///- iOS
 ///- MacOS
+///@{endtemplate}
 abstract class PlatformInAppBrowser extends PlatformInterface
     implements Disposable {
   ///Debug settings.
@@ -72,7 +76,9 @@ abstract class PlatformInAppBrowser extends PlatformInterface
   ///{@template flutter_inappwebview_platform_interface.PlatformInAppBrowser.id}
   ///View ID used internally.
   ///@{endtemplate}
-  String get id;
+  String get id {
+    throw UnimplementedError('id is not implemented on the current platform');
+  }
 
   ///{@template flutter_inappwebview_platform_interface.PlatformInAppBrowser.contextMenu}
   ///Context menu used by the browser. It should be set before opening the browser.
@@ -153,6 +159,7 @@ abstract class PlatformInAppBrowser extends PlatformInterface
   /// The parameters used to initialize the [PlatformInAppBrowser].
   final PlatformInAppBrowserCreationParams params;
 
+  ///{@template flutter_inappwebview_platform_interface.PlatformInAppBrowser.openUrlRequest}
   ///Opens the [PlatformInAppBrowser] instance with an [urlRequest].
   ///
   ///[urlRequest]: The [urlRequest] to load.
@@ -161,10 +168,11 @@ abstract class PlatformInAppBrowser extends PlatformInterface
   ///
   ///[settings]: Settings for the [PlatformInAppBrowser].
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
   ///- MacOS
+  ///{@endtemplate}
   Future<void> openUrlRequest(
       {required URLRequest urlRequest,
       // ignore: deprecated_member_use_from_same_package
@@ -174,6 +182,7 @@ abstract class PlatformInAppBrowser extends PlatformInterface
         'openUrlRequest is not implemented on the current platform');
   }
 
+  ///{@template flutter_inappwebview_platform_interface.PlatformInAppBrowser.openFile}
   ///Opens the [PlatformInAppBrowser] instance with the given [assetFilePath] file.
   ///
   ///[options]: Options for the [PlatformInAppBrowser].
@@ -212,10 +221,11 @@ abstract class PlatformInAppBrowser extends PlatformInterface
   ///
   ///[settings]: Settings for the [PlatformInAppBrowser].
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
   ///- MacOS
+  ///{@endtemplate}
   Future<void> openFile(
       {required String assetFilePath,
       // ignore: deprecated_member_use_from_same_package
@@ -225,6 +235,7 @@ abstract class PlatformInAppBrowser extends PlatformInterface
         'openFile is not implemented on the current platform');
   }
 
+  ///{@template flutter_inappwebview_platform_interface.PlatformInAppBrowser.openData}
   ///Opens the [PlatformInAppBrowser] instance with [data] as a content, using [baseUrl] as the base URL for it.
   ///
   ///The [mimeType] parameter specifies the format of the data. The default value is `"text/html"`.
@@ -237,10 +248,11 @@ abstract class PlatformInAppBrowser extends PlatformInterface
   ///
   ///[settings]: Settings for the [PlatformInAppBrowser].
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
   ///- MacOS
+  ///{@endtemplate}
   Future<void> openData(
       {required String data,
       String mimeType = "text/html",
@@ -255,178 +267,212 @@ abstract class PlatformInAppBrowser extends PlatformInterface
         'openData is not implemented on the current platform');
   }
 
+  ///{@template flutter_inappwebview_platform_interface.PlatformInAppBrowser.openWithSystemBrowser}
   ///This is a static method that opens an [url] in the system browser. You wont be able to use the [PlatformInAppBrowser] methods here!
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
   ///- MacOS
+  ///{@endtemplate}
   Future<void> openWithSystemBrowser({required WebUri url}) {
     throw UnimplementedError(
         'openWithSystemBrowser is not implemented on the current platform');
   }
 
+  ///{@template flutter_inappwebview_platform_interface.PlatformInAppBrowser.addMenuItem}
   ///Adds a [InAppBrowserMenuItem] to the menu.
   ///If the browser is already open,
   ///it will take effect the next time it is opened.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android
   ///- iOS 14.0+
+  ///{@endtemplate}
   void addMenuItem(InAppBrowserMenuItem menuItem) {
     throw UnimplementedError(
         'addMenuItem is not implemented on the current platform');
   }
 
+  ///{@template flutter_inappwebview_platform_interface.PlatformInAppBrowser.addMenuItems}
   ///Adds a list of [InAppBrowserMenuItem] to the menu.
   ///If the browser is already open,
   ///it will take effect the next time it is opened.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android
   ///- iOS 14.0+
+  ///{@endtemplate}
   void addMenuItems(List<InAppBrowserMenuItem> menuItems) {
     throw UnimplementedError(
         'addMenuItems is not implemented on the current platform');
   }
 
+  ///{@template flutter_inappwebview_platform_interface.PlatformInAppBrowser.removeMenuItem}
   ///Removes the [menuItem] from the list.
   ///Returns `true` if it was in the list, `false` otherwise.
   ///If the browser is already open,
   ///it will take effect the next time it is opened.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android
   ///- iOS 14.0+
+  ///{@endtemplate}
   bool removeMenuItem(InAppBrowserMenuItem menuItem) {
     throw UnimplementedError(
         'removeMenuItem is not implemented on the current platform');
   }
 
+  ///{@template flutter_inappwebview_platform_interface.PlatformInAppBrowser.removeMenuItems}
   ///Removes a list of [menuItems] from the list.
   ///If the browser is already open,
   ///it will take effect the next time it is opened.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android
   ///- iOS 14.0+
+  ///{@endtemplate}
   void removeMenuItems(List<InAppBrowserMenuItem> menuItems) {
     throw UnimplementedError(
         'removeMenuItems is not implemented on the current platform');
   }
 
+  ///{@template flutter_inappwebview_platform_interface.PlatformInAppBrowser.removeAllMenuItem}
   ///Removes all the menu items from the list.
   ///If the browser is already open,
   ///it will take effect the next time it is opened.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android
   ///- iOS 14.0+
+  ///{@endtemplate}
   void removeAllMenuItem() {
     throw UnimplementedError(
         'removeAllMenuItem is not implemented on the current platform');
   }
 
+  ///{@template flutter_inappwebview_platform_interface.PlatformInAppBrowser.hasMenuItem}
   ///Returns `true` if the [menuItem] has been already added, otherwise `false`.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS 14.0+
+  ///{@endtemplate}
   bool hasMenuItem(InAppBrowserMenuItem menuItem) {
     throw UnimplementedError(
         'hasMenuItem is not implemented on the current platform');
   }
 
-  ///Displays an [PlatformInAppBrowser] window that was opened hidden. Calling this has no effect if the [PlatformInAppBrowser] was already visible.
+  ///{@template flutter_inappwebview_platform_interface.PlatformInAppBrowser.show}
+  ///Displays a [PlatformInAppBrowser] window that was opened hidden. Calling this has no effect if the [PlatformInAppBrowser] was already visible.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
   ///- MacOS
+  ///{@endtemplate}
   Future<void> show() {
     throw UnimplementedError('show is not implemented on the current platform');
   }
 
+  ///{@template flutter_inappwebview_platform_interface.PlatformInAppBrowser.hide}
   ///Hides the [PlatformInAppBrowser] window. Calling this has no effect if the [PlatformInAppBrowser] was already hidden.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
   ///- MacOS
+  ///{@endtemplate}
   Future<void> hide() {
     throw UnimplementedError('hide is not implemented on the current platform');
   }
 
+  ///{@template flutter_inappwebview_platform_interface.PlatformInAppBrowser.close}
   ///Closes the [PlatformInAppBrowser] window.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
   ///- MacOS
+  ///{@endtemplate}
   Future<void> close() {
     throw UnimplementedError(
         'close is not implemented on the current platform');
   }
 
+  ///{@template flutter_inappwebview_platform_interface.PlatformInAppBrowser.isHidden}
   ///Check if the Web View of the [PlatformInAppBrowser] instance is hidden.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
   ///- MacOS
+  ///{@endtemplate}
   Future<bool> isHidden() {
     throw UnimplementedError(
         'isHidden is not implemented on the current platform');
   }
 
+  ///{@template flutter_inappwebview_platform_interface.PlatformInAppBrowser.setOptions}
   ///Use [setSettings] instead.
+  ///{@endtemplate}
   @Deprecated('Use setSettings instead')
   Future<void> setOptions({required InAppBrowserClassOptions options}) {
     throw UnimplementedError(
         'setOptions is not implemented on the current platform');
   }
 
+  ///{@template flutter_inappwebview_platform_interface.PlatformInAppBrowser.getOptions}
   ///Use [getSettings] instead.
+  ///{@endtemplate}
   @Deprecated('Use getSettings instead')
   Future<InAppBrowserClassOptions?> getOptions() {
     throw UnimplementedError(
         'getOptions is not implemented on the current platform');
   }
 
+  ///{@template flutter_inappwebview_platform_interface.PlatformInAppBrowser.setSettings}
   ///Sets the [PlatformInAppBrowser] settings with the new [settings] and evaluates them.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
   ///- MacOS
+  ///{@endtemplate}
   Future<void> setSettings({required InAppBrowserClassSettings settings}) {
     throw UnimplementedError(
         'setSettings is not implemented on the current platform');
   }
 
+  ///{@template flutter_inappwebview_platform_interface.PlatformInAppBrowser.getSettings}
   ///Gets the current [PlatformInAppBrowser] settings. Returns `null` if it wasn't able to get them.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
   ///- MacOS
+  ///{@endtemplate}
   Future<InAppBrowserClassSettings?> getSettings() {
     throw UnimplementedError(
         'getSettings is not implemented on the current platform');
   }
 
+  ///{@template flutter_inappwebview_platform_interface.PlatformInAppBrowser.isOpened}
   ///Returns `true` if the [PlatformInAppBrowser] instance is opened, otherwise `false`.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
   ///- MacOS
+  ///{@endtemplate}
   bool isOpened() {
     throw UnimplementedError(
         'isOpened is not implemented on the current platform');
   }
 
+  ///{@template flutter_inappwebview_platform_interface.PlatformInAppBrowser.dispose}
   ///Disposes the channel and controllers.
+  ///{@endtemplate}
   @override
   void dispose() {
     throw UnimplementedError(
@@ -437,7 +483,7 @@ abstract class PlatformInAppBrowser extends PlatformInterface
 abstract class PlatformInAppBrowserEvents {
   ///Event fired when the [PlatformInAppBrowser] is created.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
   ///- MacOS
@@ -445,7 +491,7 @@ abstract class PlatformInAppBrowserEvents {
 
   ///Event fired when the [PlatformInAppBrowser] window is closed.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
   ///- MacOS
@@ -453,7 +499,7 @@ abstract class PlatformInAppBrowserEvents {
 
   ///Event fired when the [PlatformInAppBrowser] starts to load an [url].
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebViewClient.onPageStarted](https://developer.android.com/reference/android/webkit/WebViewClient#onPageStarted(android.webkit.WebView,%20java.lang.String,%20android.graphics.Bitmap)))
   ///- iOS ([Official API - WKNavigationDelegate.webView](https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455621-webview))
   ///- MacOS ([Official API - WKNavigationDelegate.webView](https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455621-webview))
@@ -461,7 +507,7 @@ abstract class PlatformInAppBrowserEvents {
 
   ///Event fired when the [PlatformInAppBrowser] finishes loading an [url].
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebViewClient.onPageFinished](https://developer.android.com/reference/android/webkit/WebViewClient#onPageFinished(android.webkit.WebView,%20java.lang.String)))
   ///- iOS ([Official API - WKNavigationDelegate.webView](https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455629-webview))
   ///- MacOS ([Official API - WKNavigationDelegate.webView](https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455629-webview))
@@ -473,7 +519,7 @@ abstract class PlatformInAppBrowserEvents {
 
   ///Event fired when the [PlatformInAppBrowser] encounters an [error] loading a [request].
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebViewClient.onReceivedError](https://developer.android.com/reference/android/webkit/WebViewClient#onReceivedError(android.webkit.WebView,%20android.webkit.WebResourceRequest,%20android.webkit.WebResourceError)))
   ///- iOS ([Official API - WKNavigationDelegate.webView](https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455623-webview))
   ///- MacOS ([Official API - WKNavigationDelegate.webView](https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455623-webview))
@@ -491,7 +537,7 @@ abstract class PlatformInAppBrowserEvents {
   ///
   ///**NOTE**: available on Android 23+.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebViewClient.onReceivedHttpError](https://developer.android.com/reference/android/webkit/WebViewClient#onReceivedHttpError(android.webkit.WebView,%20android.webkit.WebResourceRequest,%20android.webkit.WebResourceResponse)))
   ///- iOS ([Official API - WKNavigationDelegate.webView](https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455643-webview))
   ///- MacOS ([Official API - WKNavigationDelegate.webView](https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455643-webview))
@@ -500,7 +546,7 @@ abstract class PlatformInAppBrowserEvents {
 
   ///Event fired when the current [progress] (range 0-100) of loading a page is changed.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebChromeClient.onProgressChanged](https://developer.android.com/reference/android/webkit/WebChromeClient#onProgressChanged(android.webkit.WebView,%20int)))
   ///- iOS
   ///- MacOS
@@ -508,7 +554,7 @@ abstract class PlatformInAppBrowserEvents {
 
   ///Event fired when the [PlatformInAppBrowser] webview receives a [ConsoleMessage].
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebChromeClient.onConsoleMessage](https://developer.android.com/reference/android/webkit/WebChromeClient#onConsoleMessage(android.webkit.ConsoleMessage)))
   ///- iOS
   ///- MacOS
@@ -526,7 +572,7 @@ abstract class PlatformInAppBrowserEvents {
   ///
   ///**NOTE**: In order to be able to listen this event, you need to set [InAppWebViewSettings.useShouldOverrideUrlLoading] setting to `true`.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebViewClient.shouldOverrideUrlLoading](https://developer.android.com/reference/android/webkit/WebViewClient#shouldOverrideUrlLoading(android.webkit.WebView,%20java.lang.String)))
   ///- iOS ([Official API - WKNavigationDelegate.webView](https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455641-webview))
   ///- MacOS ([Official API - WKNavigationDelegate.webView](https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455641-webview))
@@ -539,7 +585,7 @@ abstract class PlatformInAppBrowserEvents {
   ///
   ///**NOTE**: In order to be able to listen this event, you need to set [InAppWebViewSettings.useOnLoadResource] and [InAppWebViewSettings.javaScriptEnabled] setting to `true`.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
   ///- MacOS
@@ -553,7 +599,7 @@ abstract class PlatformInAppBrowserEvents {
   ///
   ///**NOTE for MacOS**: this method is implemented with using JavaScript.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebView.onScrollChanged](https://developer.android.com/reference/android/webkit/WebView#onScrollChanged(int,%20int,%20int,%20int)))
   ///- iOS ([Official API - UIScrollViewDelegate.scrollViewDidScroll](https://developer.apple.com/documentation/uikit/uiscrollviewdelegate/1619392-scrollviewdidscroll))
   ///- MacOS
@@ -570,7 +616,7 @@ abstract class PlatformInAppBrowserEvents {
   ///
   ///**NOTE**: In order to be able to listen this event, you need to set [InAppWebViewSettings.useOnDownloadStart] setting to `true`.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebView.setDownloadListener](https://developer.android.com/reference/android/webkit/WebView#setDownloadListener(android.webkit.DownloadListener)))
   ///- iOS
   ///- MacOS
@@ -585,7 +631,7 @@ abstract class PlatformInAppBrowserEvents {
   ///Event fired when the [PlatformInAppBrowser] webview finds the `custom-scheme` while loading a resource.
   ///Here you can handle the url [request] and return a [CustomSchemeResponse] to load a specific resource encoded to `base64`.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS ([Official API - WKURLSchemeHandler](https://developer.apple.com/documentation/webkit/wkurlschemehandler))
   ///- MacOS ([Official API - WKURLSchemeHandler](https://developer.apple.com/documentation/webkit/wkurlschemehandler))
@@ -622,7 +668,7 @@ abstract class PlatformInAppBrowserEvents {
   ///Also, note that calling [PlatformInAppWebViewController.setSettings] method using the controller of the new created WebView,
   ///it will update also the WebView options of the caller WebView.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebChromeClient.onCreateWindow](https://developer.android.com/reference/android/webkit/WebChromeClient#onCreateWindow(android.webkit.WebView,%20boolean,%20boolean,%20android.os.Message)))
   ///- iOS ([Official API - WKUIDelegate.webView](https://developer.apple.com/documentation/webkit/wkuidelegate/1536907-webview))
   ///- MacOS ([Official API - WKUIDelegate.webView](https://developer.apple.com/documentation/webkit/wkuidelegate/1536907-webview))
@@ -633,7 +679,7 @@ abstract class PlatformInAppBrowserEvents {
   ///Event fired when the host application should close the given WebView and remove it from the view system if necessary.
   ///At this point, WebCore has stopped any loading in this window and has removed any cross-scripting ability in javascript.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebChromeClient.onCloseWindow](https://developer.android.com/reference/android/webkit/WebChromeClient#onCloseWindow(android.webkit.WebView)))
   ///- iOS ([Official API - WKUIDelegate.webViewDidClose](https://developer.apple.com/documentation/webkit/wkuidelegate/1537390-webviewdidclose))
   ///- MacOS ([Official API - WKUIDelegate.webViewDidClose](https://developer.apple.com/documentation/webkit/wkuidelegate/1537390-webviewdidclose))
@@ -642,7 +688,7 @@ abstract class PlatformInAppBrowserEvents {
   ///Event fired when the JavaScript `window` object of the WebView has received focus.
   ///This is the result of the `focus` javascript event applied to the `window` object.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
   ///- MacOS
@@ -651,7 +697,7 @@ abstract class PlatformInAppBrowserEvents {
   ///Event fired when the JavaScript `window` object of the WebView has lost focus.
   ///This is the result of the `blur` javascript event applied to the `window` object.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
   ///- MacOS
@@ -662,7 +708,7 @@ abstract class PlatformInAppBrowserEvents {
   ///
   ///[jsAlertRequest] contains the message to be displayed in the alert dialog and the of the page requesting the dialog.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebChromeClient.onJsAlert](https://developer.android.com/reference/android/webkit/WebChromeClient#onJsAlert(android.webkit.WebView,%20java.lang.String,%20java.lang.String,%20android.webkit.JsResult)))
   ///- iOS ([Official API - WKUIDelegate.webView](https://developer.apple.com/documentation/webkit/wkuidelegate/1537406-webview))
   ///- MacOS ([Official API - WKUIDelegate.webView](https://developer.apple.com/documentation/webkit/wkuidelegate/1537406-webview))
@@ -675,7 +721,7 @@ abstract class PlatformInAppBrowserEvents {
   ///
   ///[jsConfirmRequest] contains the message to be displayed in the confirm dialog and the of the page requesting the dialog.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebChromeClient.onJsConfirm](https://developer.android.com/reference/android/webkit/WebChromeClient#onJsConfirm(android.webkit.WebView,%20java.lang.String,%20java.lang.String,%20android.webkit.JsResult)))
   ///- iOS ([Official API - WKUIDelegate.webView](https://developer.apple.com/documentation/webkit/wkuidelegate/1536489-webview))
   ///- MacOS ([Official API - WKUIDelegate.webView](https://developer.apple.com/documentation/webkit/wkuidelegate/1536489-webview))
@@ -688,7 +734,7 @@ abstract class PlatformInAppBrowserEvents {
   ///
   ///[jsPromptRequest] contains the message to be displayed in the prompt dialog, the default value displayed in the prompt dialog, and the of the page requesting the dialog.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebChromeClient.onJsPrompt](https://developer.android.com/reference/android/webkit/WebChromeClient#onJsPrompt(android.webkit.WebView,%20java.lang.String,%20java.lang.String,%20java.lang.String,%20android.webkit.JsPromptResult)))
   ///- iOS ([Official API - WKUIDelegate.webView](https://developer.apple.com/documentation/webkit/wkuidelegate/1538086-webview))
   ///- MacOS ([Official API - WKUIDelegate.webView](https://developer.apple.com/documentation/webkit/wkuidelegate/1538086-webview))
@@ -700,7 +746,7 @@ abstract class PlatformInAppBrowserEvents {
   ///
   ///[challenge] contains data about host, port, protocol, realm, etc. as specified in the [URLAuthenticationChallenge].
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebViewClient.onReceivedHttpAuthRequest](https://developer.android.com/reference/android/webkit/WebViewClient#onReceivedHttpAuthRequest(android.webkit.WebView,%20android.webkit.HttpAuthHandler,%20java.lang.String,%20java.lang.String)))
   ///- iOS ([Official API - WKNavigationDelegate.webView](https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455638-webview))
   ///- MacOS ([Official API - WKNavigationDelegate.webView](https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455638-webview))
@@ -714,7 +760,7 @@ abstract class PlatformInAppBrowserEvents {
   ///
   ///[challenge] contains data about host, port, protocol, realm, etc. as specified in the [ServerTrustChallenge].
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebViewClient.onReceivedSslError](https://developer.android.com/reference/android/webkit/WebViewClient#onReceivedSslError(android.webkit.WebView,%20android.webkit.SslErrorHandler,%20android.net.http.SslError)))
   ///- iOS ([Official API - WKNavigationDelegate.webView](https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455638-webview))
   ///- MacOS ([Official API - WKNavigationDelegate.webView](https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455638-webview))
@@ -730,7 +776,7 @@ abstract class PlatformInAppBrowserEvents {
   ///
   ///[challenge] contains data about host, port, protocol, realm, etc. as specified in the [ClientCertChallenge].
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebViewClient.onReceivedClientCertRequest](https://developer.android.com/reference/android/webkit/WebViewClient#onReceivedClientCertRequest(android.webkit.WebView,%20android.webkit.ClientCertRequest)))
   ///- iOS ([Official API - WKNavigationDelegate.webView](https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455638-webview))
   ///- MacOS ([Official API - WKNavigationDelegate.webView](https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455638-webview))
@@ -755,7 +801,7 @@ abstract class PlatformInAppBrowserEvents {
   ///used to intercept ajax requests is loaded as soon as possible so it won't be instantaneous as iOS but just after some milliseconds (< ~100ms).
   ///Inside the `window.addEventListener("flutterInAppWebViewPlatformReady")` event, the ajax requests will be intercept for sure.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
   ///- MacOS
@@ -774,7 +820,7 @@ abstract class PlatformInAppBrowserEvents {
   ///used to intercept ajax requests is loaded as soon as possible so it won't be instantaneous as iOS but just after some milliseconds (< ~100ms).
   ///Inside the `window.addEventListener("flutterInAppWebViewPlatformReady")` event, the ajax requests will be intercept for sure.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
   ///- MacOS
@@ -793,7 +839,7 @@ abstract class PlatformInAppBrowserEvents {
   ///used to intercept ajax requests is loaded as soon as possible so it won't be instantaneous as iOS but just after some milliseconds (< ~100ms).
   ///Inside the `window.addEventListener("flutterInAppWebViewPlatformReady")` event, the ajax requests will be intercept for sure.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
   ///- MacOS
@@ -812,7 +858,7 @@ abstract class PlatformInAppBrowserEvents {
   ///used to intercept fetch requests is loaded as soon as possible so it won't be instantaneous as iOS but just after some milliseconds (< ~100ms).
   ///Inside the `window.addEventListener("flutterInAppWebViewPlatformReady")` event, the fetch requests will be intercept for sure.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
   ///- MacOS
@@ -830,7 +876,7 @@ abstract class PlatformInAppBrowserEvents {
   ///
   ///[isReload] indicates if this url is being reloaded. Available only on Android.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebViewClient.doUpdateVisitedHistory](https://developer.android.com/reference/android/webkit/WebViewClient#doUpdateVisitedHistory(android.webkit.WebView,%20java.lang.String,%20boolean)))
   ///- iOS
   ///- MacOS
@@ -848,7 +894,7 @@ abstract class PlatformInAppBrowserEvents {
   ///
   ///[printJobController] represents the controller of the print job created.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
   ///- MacOS
@@ -861,14 +907,14 @@ abstract class PlatformInAppBrowserEvents {
   ///
   ///[hitTestResult] represents the hit result for hitting an HTML elements.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - View.setOnLongClickListener](https://developer.android.com/reference/android/view/View#setOnLongClickListener(android.view.View.OnLongClickListener)))
   ///- iOS ([Official API - UILongPressGestureRecognizer](https://developer.apple.com/documentation/uikit/uilongpressgesturerecognizer))
   void onLongPressHitTestResult(InAppWebViewHitTestResult hitTestResult) {}
 
   ///Event fired when the current page has entered full screen mode.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebChromeClient.onShowCustomView](https://developer.android.com/reference/android/webkit/WebChromeClient#onShowCustomView(android.view.View,%20android.webkit.WebChromeClient.CustomViewCallback)))
   ///- iOS ([Official API - UIWindow.didBecomeVisibleNotification](https://developer.apple.com/documentation/uikit/uiwindow/1621621-didbecomevisiblenotification))
   ///- MacOS ([Official API - NSWindow.didEnterFullScreenNotification](https://developer.apple.com/documentation/appkit/nswindow/1419651-didenterfullscreennotification))
@@ -876,7 +922,7 @@ abstract class PlatformInAppBrowserEvents {
 
   ///Event fired when the current page has exited full screen mode.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebChromeClient.onHideCustomView](https://developer.android.com/reference/android/webkit/WebChromeClient#onHideCustomView()))
   ///- iOS ([Official API - UIWindow.didBecomeHiddenNotification](https://developer.apple.com/documentation/uikit/uiwindow/1621617-didbecomehiddennotification))
   ///- MacOS ([Official API - NSWindow.didExitFullScreenNotification](https://developer.apple.com/documentation/appkit/nswindow/1419177-didexitfullscreennotification))
@@ -889,7 +935,7 @@ abstract class PlatformInAppBrowserEvents {
   ///
   ///[url] represents the URL corresponding to the page navigation that triggered this callback.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebViewClient.onPageCommitVisible](https://developer.android.com/reference/android/webkit/WebViewClient#onPageCommitVisible(android.webkit.WebView,%20java.lang.String)))
   ///- iOS ([Official API - WKNavigationDelegate.webView](https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455635-webview))
   ///- MacOS ([Official API - WKNavigationDelegate.webView](https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455635-webview))
@@ -899,7 +945,7 @@ abstract class PlatformInAppBrowserEvents {
   ///
   ///[title] represents the string containing the new title of the document.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebChromeClient.onReceivedTitle](https://developer.android.com/reference/android/webkit/WebChromeClient#onReceivedTitle(android.webkit.WebView,%20java.lang.String)))
   ///- iOS
   ///- MacOS
@@ -915,7 +961,7 @@ abstract class PlatformInAppBrowserEvents {
   ///
   ///[clampedY] is `true` if [y] was clamped to an over-scroll boundary.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebView.onOverScrolled](https://developer.android.com/reference/android/webkit/WebView#onOverScrolled(int,%20int,%20boolean,%20boolean)))
   ///- iOS
   void onOverScrolled(int x, int y, bool clampedX, bool clampedY) {}
@@ -926,7 +972,7 @@ abstract class PlatformInAppBrowserEvents {
   ///
   ///[newScale] The new zoom scale factor.ì
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebViewClient.onScaleChanged](https://developer.android.com/reference/android/webkit/WebViewClient#onScaleChanged(android.webkit.WebView,%20float,%20float)))
   ///- iOS ([Official API - UIScrollViewDelegate.scrollViewDidZoom](https://developer.apple.com/documentation/uikit/uiscrollviewdelegate/1619409-scrollviewdidzoom))
   void onZoomScaleChanged(double oldScale, double newScale) {}
@@ -947,7 +993,7 @@ abstract class PlatformInAppBrowserEvents {
   ///
   ///**NOTE**: available only on Android 27+.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebViewClient.onSafeBrowsingHit](https://developer.android.com/reference/android/webkit/WebViewClient#onSafeBrowsingHit(android.webkit.WebView,%20android.webkit.WebResourceRequest,%20int,%20android.webkit.SafeBrowsingResponse)))
   Future<SafeBrowsingResponse?>? onSafeBrowsingHit(
       WebUri url, SafeBrowsingThreat? threatType) {
@@ -972,7 +1018,7 @@ abstract class PlatformInAppBrowserEvents {
   ///
   ///**NOTE for MacOS**: available only on iOS 12.0+. The default [PermissionResponse.action] is [PermissionResponseAction.PROMPT].
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebChromeClient.onPermissionRequest](https://developer.android.com/reference/android/webkit/WebChromeClient#onPermissionRequest(android.webkit.PermissionRequest)))
   ///- iOS
   ///- MacOS
@@ -994,7 +1040,7 @@ abstract class PlatformInAppBrowserEvents {
   ///
   ///[origin] represents the origin of the web content attempting to use the Geolocation API.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebChromeClient.onGeolocationPermissionsShowPrompt](https://developer.android.com/reference/android/webkit/WebChromeClient#onGeolocationPermissionsShowPrompt(java.lang.String,%20android.webkit.GeolocationPermissions.Callback)))
   Future<GeolocationPermissionShowPromptResponse?>?
       onGeolocationPermissionsShowPrompt(String origin) {
@@ -1008,7 +1054,7 @@ abstract class PlatformInAppBrowserEvents {
   ///Notify the host application that a request for Geolocation permissions, made with a previous call to [onGeolocationPermissionsShowPrompt] has been canceled.
   ///Any related UI should therefore be hidden.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebChromeClient.onGeolocationPermissionsHidePrompt](https://developer.android.com/reference/android/webkit/WebChromeClient#onGeolocationPermissionsHidePrompt()))
   void onGeolocationPermissionsHidePrompt() {}
 
@@ -1033,7 +1079,7 @@ abstract class PlatformInAppBrowserEvents {
   ///
   ///**NOTE**: In order to be able to listen this event, you need to set [InAppWebViewSettings.useShouldInterceptRequest] option to `true`.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebViewClient.shouldInterceptRequest](https://developer.android.com/reference/android/webkit/WebViewClient#shouldInterceptRequest(android.webkit.WebView,%20android.webkit.WebResourceRequest)))
   Future<WebResourceResponse?>? shouldInterceptRequest(
       WebResourceRequest request) {
@@ -1064,7 +1110,7 @@ abstract class PlatformInAppBrowserEvents {
   ///
   ///**NOTE**: available only on Android 29+.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebViewRenderProcessClient.onRenderProcessUnresponsive](https://developer.android.com/reference/android/webkit/WebViewRenderProcessClient#onRenderProcessUnresponsive(android.webkit.WebView,%20android.webkit.WebViewRenderProcess)))
   Future<WebViewRenderProcessAction?>? onRenderProcessUnresponsive(
       WebUri? url) {
@@ -1088,7 +1134,7 @@ abstract class PlatformInAppBrowserEvents {
   ///
   ///**NOTE**: available only on Android 29+.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebViewRenderProcessClient.onRenderProcessResponsive](https://developer.android.com/reference/android/webkit/WebViewRenderProcessClient#onRenderProcessResponsive(android.webkit.WebView,%20android.webkit.WebViewRenderProcess)))
   Future<WebViewRenderProcessAction?>? onRenderProcessResponsive(WebUri? url) {
     return null;
@@ -1106,7 +1152,7 @@ abstract class PlatformInAppBrowserEvents {
   ///
   ///**NOTE**: available only on Android 26+.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebViewClient.onRenderProcessGone](https://developer.android.com/reference/android/webkit/WebViewClient#onRenderProcessGone(android.webkit.WebView,%20android.webkit.RenderProcessGoneDetail)))
   void onRenderProcessGone(RenderProcessGoneDetail detail) {}
 
@@ -1118,7 +1164,7 @@ abstract class PlatformInAppBrowserEvents {
 
   ///As the host application if the browser should resend data as the requested page was a result of a POST. The default is to not resend the data.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebViewClient.onFormResubmission](https://developer.android.com/reference/android/webkit/WebViewClient#onFormResubmission(android.webkit.WebView,%20android.os.Message,%20android.os.Message)))
   Future<FormResubmissionAction?>? onFormResubmission(WebUri? url) {
     return null;
@@ -1136,7 +1182,7 @@ abstract class PlatformInAppBrowserEvents {
   ///
   ///[icon] represents the favicon for the current page.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebChromeClient.onReceivedIcon](https://developer.android.com/reference/android/webkit/WebChromeClient#onReceivedIcon(android.webkit.WebView,%20android.graphics.Bitmap)))
   void onReceivedIcon(Uint8List icon) {}
 
@@ -1150,7 +1196,7 @@ abstract class PlatformInAppBrowserEvents {
   ///
   ///[precomposed] is `true` if the url is for a precomposed touch icon.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebChromeClient.onReceivedTouchIconUrl](https://developer.android.com/reference/android/webkit/WebChromeClient#onReceivedTouchIconUrl(android.webkit.WebView,%20java.lang.String,%20boolean)))
   void onReceivedTouchIconUrl(WebUri url, bool precomposed) {}
 
@@ -1171,7 +1217,7 @@ abstract class PlatformInAppBrowserEvents {
   ///
   ///[jsBeforeUnloadRequest] contains the message to be displayed in the alert dialog and the of the page requesting the dialog.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebChromeClient.onJsBeforeUnload](https://developer.android.com/reference/android/webkit/WebChromeClient#onJsBeforeUnload(android.webkit.WebView,%20java.lang.String,%20java.lang.String,%20android.webkit.JsResult)))
   Future<JsBeforeUnloadResponse?>? onJsBeforeUnload(
       JsBeforeUnloadRequest jsBeforeUnloadRequest) {
@@ -1186,7 +1232,7 @@ abstract class PlatformInAppBrowserEvents {
   ///
   ///[loginRequest] contains the realm, account and args of the login request.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebViewClient.onReceivedLoginRequest](https://developer.android.com/reference/android/webkit/WebViewClient#onReceivedLoginRequest(android.webkit.WebView,%20java.lang.String,%20java.lang.String,%20java.lang.String)))
   void onReceivedLoginRequest(LoginRequest loginRequest) {}
 
@@ -1198,14 +1244,14 @@ abstract class PlatformInAppBrowserEvents {
   ///
   ///**NOTE for Android**: available only on Android 21+.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebChromeClient.onPermissionRequestCanceled](https://developer.android.com/reference/android/webkit/WebChromeClient#onPermissionRequestCanceled(android.webkit.PermissionRequest)))
   void onPermissionRequestCanceled(PermissionRequest permissionRequest) {}
 
   ///Request display and focus for this WebView.
   ///This may happen due to another WebView opening a link in this WebView and requesting that this WebView be displayed.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebChromeClient.onRequestFocus](https://developer.android.com/reference/android/webkit/WebChromeClient#onRequestFocus(android.webkit.WebView)))
   void onRequestFocus() {}
 
@@ -1215,7 +1261,7 @@ abstract class PlatformInAppBrowserEvents {
 
   ///Invoked when the web view's web content process is terminated.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- iOS ([Official API - WKNavigationDelegate.webViewWebContentProcessDidTerminate](https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455639-webviewwebcontentprocessdidtermi))
   ///- MacOS ([Official API - WKNavigationDelegate.webViewWebContentProcessDidTerminate](https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455639-webviewwebcontentprocessdidtermi))
   void onWebContentProcessDidTerminate() {}
@@ -1226,7 +1272,7 @@ abstract class PlatformInAppBrowserEvents {
 
   ///Called when a web view receives a server redirect.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- iOS ([Official API - WKNavigationDelegate.webView](https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455627-webview))
   ///- MacOS ([Official API - WKNavigationDelegate.webView](https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455627-webview))
   void onDidReceiveServerRedirectForProvisionalNavigation() {}
@@ -1244,7 +1290,7 @@ abstract class PlatformInAppBrowserEvents {
   ///
   ///**NOTE**: In order to be able to listen this event, you need to set [InAppWebViewSettings.useOnNavigationResponse] setting to `true`.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- iOS ([Official API - WKNavigationDelegate.webView](https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455643-webview))
   ///- MacOS ([Official API - WKNavigationDelegate.webView](https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455643-webview))
   Future<NavigationResponseAction?>? onNavigationResponse(
@@ -1267,7 +1313,7 @@ abstract class PlatformInAppBrowserEvents {
   ///
   ///**NOTE for MacOS**: available only on MacOS 11.0+.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- iOS ([Official API - WKNavigationDelegate.webView](https://developer.apple.com/documentation/webkit/wknavigationdelegate/3601237-webview))
   ///- MacOS ([Official API - WKNavigationDelegate.webView](https://developer.apple.com/documentation/webkit/wknavigationdelegate/3601237-webview))
   Future<ShouldAllowDeprecatedTLSAction?>? shouldAllowDeprecatedTLS(
@@ -1281,7 +1327,7 @@ abstract class PlatformInAppBrowserEvents {
   ///
   ///**NOTE for MacOS**: available only on MacOS 12.0+.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- iOS
   ///- MacOS
   void onCameraCaptureStateChanged(
@@ -1296,7 +1342,7 @@ abstract class PlatformInAppBrowserEvents {
   ///
   ///**NOTE for MacOS**: available only on MacOS 12.0+.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- iOS
   ///- MacOS
   void onMicrophoneCaptureStateChanged(
@@ -1310,7 +1356,7 @@ abstract class PlatformInAppBrowserEvents {
   ///
   ///[newContentSize] represents the new content size value.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- iOS
   void onContentSizeChanged(Size oldContentSize, Size newContentSize) {}
 }

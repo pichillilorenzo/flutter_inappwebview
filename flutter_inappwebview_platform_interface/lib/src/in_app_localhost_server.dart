@@ -30,14 +30,7 @@ class DefaultInAppLocalhostServerCreationParams
   }
 }
 
-///This class allows you to create a simple server on `http://localhost:[port]/`
-///in order to be able to load your assets file on a local server.
-///The default `port` value is `8080`.
-///
-///**Supported Platforms/Implementations**:
-///- Android native WebView
-///- iOS
-///- MacOS
+///{@macro flutter_inappwebview_platform_interface.PlatformInAppLocalhostServer}
 class DefaultInAppLocalhostServer extends PlatformInAppLocalhostServer {
   bool _started = false;
   HttpServer? _server;
@@ -61,30 +54,19 @@ class DefaultInAppLocalhostServer extends PlatformInAppLocalhostServer {
     this._shared = shared;
   }
 
-  ///{@macro flutter_inappwebview_platform_interface.PlatformInAppLocalhostServer.port}
+  @override
   int get port => _port;
 
-  ///{@macro flutter_inappwebview_platform_interface.PlatformInAppLocalhostServer.directoryIndex}
+  @override
   String get directoryIndex => _directoryIndex;
 
-  ///{@macro flutter_inappwebview_platform_interface.PlatformInAppLocalhostServer.documentRoot}
+  @override
   String get documentRoot => _documentRoot;
 
-  ///{@macro flutter_inappwebview_platform_interface.PlatformInAppLocalhostServer.shared}
+  @override
   bool get shared => _shared;
 
-  ///Starts the server on `http://localhost:[port]/`.
-  ///
-  ///**NOTE for iOS**: For the iOS Platform, you need to add the `NSAllowsLocalNetworking` key with `true` in the `Info.plist` file
-  ///(See [ATS Configuration Basics](https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CocoaKeys.html#//apple_ref/doc/uid/TP40009251-SW35)):
-  ///```xml
-  ///<key>NSAppTransportSecurity</key>
-  ///<dict>
-  ///    <key>NSAllowsLocalNetworking</key>
-  ///    <true/>
-  ///</dict>
-  ///```
-  ///The `NSAllowsLocalNetworking` key is available since **iOS 10**.
+  @override
   Future<void> start() async {
     if (this._started) {
       throw Exception('Server already started on http://localhost:$_port');
@@ -142,7 +124,7 @@ class DefaultInAppLocalhostServer extends PlatformInAppLocalhostServer {
     return completer.future;
   }
 
-  ///Closes the server.
+  @override
   Future<void> close() async {
     if (this._server == null) {
       return;
@@ -153,7 +135,7 @@ class DefaultInAppLocalhostServer extends PlatformInAppLocalhostServer {
     this._server = null;
   }
 
-  ///Indicates if the server is running or not.
+  @override
   bool isRunning() {
     return this._server != null;
   }

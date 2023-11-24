@@ -11,7 +11,7 @@ part 'navigation_action.g.dart';
 class NavigationAction_ {
   ///The URL request object associated with the navigation action.
   ///
-  ///**NOTE for Android**: If the request is associated to the [WebView.onCreateWindow] event
+  ///**NOTE for Android**: If the request is associated to the [PlatformWebViewCreationParams.onCreateWindow] event
   ///and the window has been created using JavaScript, [request.url] will be `null`,
   ///the [request.method] is always `GET`, and [request.headers] value is always `null`.
   ///Also, on Android < 21, the [request.method]  is always `GET` and [request.headers] value is always `null`.
@@ -19,7 +19,7 @@ class NavigationAction_ {
 
   ///Indicates whether the request was made for the main frame.
   ///
-  ///**NOTE for Android**: If the request is associated to the [WebView.onCreateWindow] event, this is always `true`.
+  ///**NOTE for Android**: If the request is associated to the [PlatformWebViewCreationParams.onCreateWindow] event, this is always `true`.
   ///Also, on Android < 21, this is always `true`.
   bool isForMainFrame;
 
@@ -47,7 +47,7 @@ class NavigationAction_ {
 
   ///Gets whether the request was a result of a server-side redirect.
   ///
-  ///**NOTE**: If the request is associated to the [WebView.onCreateWindow] event, this is always `false`.
+  ///**NOTE**: If the request is associated to the [PlatformWebViewCreationParams.onCreateWindow] event, this is always `false`.
   ///Also, on Android < 21, this is always `false`.
   @SupportedPlatforms(platforms: [
     AndroidPlatform(

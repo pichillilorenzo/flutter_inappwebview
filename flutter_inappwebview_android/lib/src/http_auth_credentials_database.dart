@@ -25,16 +25,7 @@ class AndroidHttpAuthCredentialDatabaseCreationParams
   }
 }
 
-///Class that implements a singleton object (shared instance) which manages the shared HTTP auth credentials cache.
-///On iOS and MacOS, this class uses the [URLCredentialStorage](https://developer.apple.com/documentation/foundation/urlcredentialstorage) class.
-///On Android, this class has a custom implementation using `android.database.sqlite.SQLiteDatabase` because
-///[WebViewDatabase](https://developer.android.com/reference/android/webkit/WebViewDatabase)
-///doesn't offer the same functionalities as iOS `URLCredentialStorage`.
-///
-///**Supported Platforms/Implementations**:
-///- Android native WebView
-///- iOS
-///- MacOS
+///{@macro flutter_inappwebview_platform_interface.PlatformHttpAuthCredentialDatabase}
 class AndroidHttpAuthCredentialDatabase
     extends PlatformHttpAuthCredentialDatabase with ChannelController {
   /// Creates a new [AndroidHttpAuthCredentialDatabase].
@@ -68,14 +59,7 @@ class AndroidHttpAuthCredentialDatabase
 
   Future<dynamic> _handleMethod(MethodCall call) async {}
 
-  ///Gets a map list of all HTTP auth credentials saved.
-  ///Each map contains the key `protectionSpace` of type [URLProtectionSpace]
-  ///and the key `credentials` of type List<[URLCredential]> that contains all the HTTP auth credentials saved for that `protectionSpace`.
-  ///
-  ///**Supported Platforms/Implementations**:
-  ///- Android native WebView
-  ///- iOS ([Official API - URLCredentialStorage.allCredentials](https://developer.apple.com/documentation/foundation/urlcredentialstorage/1413859-allcredentials))
-  ///- MacOS ([Official API - URLCredentialStorage.allCredentials](https://developer.apple.com/documentation/foundation/urlcredentialstorage/1413859-allcredentials))
+  @override
   Future<List<URLProtectionSpaceHttpAuthCredentials>>
       getAllAuthCredentials() async {
     Map<String, dynamic> args = <String, dynamic>{};
@@ -94,12 +78,7 @@ class AndroidHttpAuthCredentialDatabase
     return result;
   }
 
-  ///Gets all the HTTP auth credentials saved for that [protectionSpace].
-  ///
-  ///**Supported Platforms/Implementations**:
-  ///- Android native WebView
-  ///- iOS
-  ///- MacOS
+  @override
   Future<List<URLCredential>> getHttpAuthCredentials(
       {required URLProtectionSpace protectionSpace}) async {
     Map<String, dynamic> args = <String, dynamic>{};
@@ -119,12 +98,7 @@ class AndroidHttpAuthCredentialDatabase
     return credentials;
   }
 
-  ///Saves an HTTP auth [credential] for that [protectionSpace].
-  ///
-  ///**Supported Platforms/Implementations**:
-  ///- Android native WebView
-  ///- iOS ([Official API - URLCredentialStorage.set](https://developer.apple.com/documentation/foundation/urlcredentialstorage/1407227-set))
-  ///- MacOS ([Official API - URLCredentialStorage.set](https://developer.apple.com/documentation/foundation/urlcredentialstorage/1407227-set))
+  @override
   Future<void> setHttpAuthCredential(
       {required URLProtectionSpace protectionSpace,
       required URLCredential credential}) async {
@@ -138,12 +112,7 @@ class AndroidHttpAuthCredentialDatabase
     await channel?.invokeMethod('setHttpAuthCredential', args);
   }
 
-  ///Removes an HTTP auth [credential] for that [protectionSpace].
-  ///
-  ///**Supported Platforms/Implementations**:
-  ///- Android native WebView
-  ///- iOS ([Official API - URLCredentialStorage.remove](https://developer.apple.com/documentation/foundation/urlcredentialstorage/1408664-remove))
-  ///- MacOS ([Official API - URLCredentialStorage.remove](https://developer.apple.com/documentation/foundation/urlcredentialstorage/1408664-remove))
+  @override
   Future<void> removeHttpAuthCredential(
       {required URLProtectionSpace protectionSpace,
       required URLCredential credential}) async {
@@ -157,12 +126,7 @@ class AndroidHttpAuthCredentialDatabase
     await channel?.invokeMethod('removeHttpAuthCredential', args);
   }
 
-  ///Removes all the HTTP auth credentials saved for that [protectionSpace].
-  ///
-  ///**Supported Platforms/Implementations**:
-  ///- Android native WebView
-  ///- iOS
-  ///- MacOS
+  @override
   Future<void> removeHttpAuthCredentials(
       {required URLProtectionSpace protectionSpace}) async {
     Map<String, dynamic> args = <String, dynamic>{};
@@ -173,12 +137,7 @@ class AndroidHttpAuthCredentialDatabase
     await channel?.invokeMethod('removeHttpAuthCredentials', args);
   }
 
-  ///Removes all the HTTP auth credentials saved in the database.
-  ///
-  ///**Supported Platforms/Implementations**:
-  ///- Android native WebView
-  ///- iOS
-  ///- MacOS
+  @override
   Future<void> clearAllAuthCredentials() async {
     Map<String, dynamic> args = <String, dynamic>{};
     await channel?.invokeMethod('clearAllAuthCredentials', args);

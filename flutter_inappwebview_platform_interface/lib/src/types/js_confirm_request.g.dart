@@ -6,7 +6,7 @@ part of 'js_confirm_request.dart';
 // ExchangeableObjectGenerator
 // **************************************************************************
 
-///Class that represents the request of the [WebView.onJsConfirm] event.
+///Class that represents the request of the [PlatformWebViewCreationParams.onJsConfirm] event.
 class JsConfirmRequest {
   ///Use [isMainFrame] instead.
   @Deprecated('Use isMainFrame instead')
@@ -14,7 +14,7 @@ class JsConfirmRequest {
 
   ///Indicates whether the request was made for the main frame.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- iOS
   ///- MacOS
   bool? isMainFrame;

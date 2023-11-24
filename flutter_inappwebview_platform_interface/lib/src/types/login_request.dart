@@ -1,8 +1,8 @@
 import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_internal_annotations.dart';
-
+import '../in_app_webview/platform_webview.dart';
 part 'login_request.g.dart';
 
-///Class used by [WebView.onReceivedLoginRequest] event.
+///Class used by [PlatformWebViewCreationParams.onReceivedLoginRequest] event.
 @ExchangeableObject()
 class LoginRequest_ {
   ///The account realm used to look up accounts.

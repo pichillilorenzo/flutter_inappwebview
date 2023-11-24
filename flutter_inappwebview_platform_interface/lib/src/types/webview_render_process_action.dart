@@ -1,8 +1,8 @@
 import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_internal_annotations.dart';
-
+import '../in_app_webview/platform_webview.dart';
 part 'webview_render_process_action.g.dart';
 
-///Class that represents the action to take used by the [WebView.onRenderProcessUnresponsive] and [WebView.onRenderProcessResponsive] event
+///Class that represents the action to take used by the [PlatformWebViewCreationParams.onRenderProcessUnresponsive] and [PlatformWebViewCreationParams.onRenderProcessResponsive] event
 ///to terminate the Android [WebViewRenderProcess](https://developer.android.com/reference/android/webkit/WebViewRenderProcess).
 @ExchangeableEnum()
 class WebViewRenderProcessAction_ {

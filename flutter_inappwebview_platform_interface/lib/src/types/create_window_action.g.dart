@@ -6,7 +6,7 @@ part of 'create_window_action.dart';
 // ExchangeableObjectGenerator
 // **************************************************************************
 
-///Class that represents the navigation request used by the [WebView.onCreateWindow] event.
+///Class that represents the navigation request used by the [PlatformWebViewCreationParams.onCreateWindow] event.
 class CreateWindowAction extends NavigationAction {
   ///Use [isDialog] instead.
   @Deprecated('Use isDialog instead')
@@ -18,13 +18,13 @@ class CreateWindowAction extends NavigationAction {
 
   ///Indicates if the new window should be a dialog, rather than a full-size window.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView
   bool? isDialog;
 
   ///Window features requested by the webpage.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- iOS ([Official API - WKWindowFeatures](https://developer.apple.com/documentation/webkit/wkwindowfeatures))
   ///- MacOS ([Official API - WKWindowFeatures](https://developer.apple.com/documentation/webkit/wkwindowfeatures))
   WindowFeatures? windowFeatures;

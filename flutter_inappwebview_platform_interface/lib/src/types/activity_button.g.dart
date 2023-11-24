@@ -12,7 +12,7 @@ part of 'activity_button.dart';
 ///
 ///Check [Official Apple App Extensions](https://developer.apple.com/app-extensions/) for more details.
 ///
-///**Supported Platforms/Implementations**:
+///**Officially Supported Platforms/Implementations**:
 ///- iOS
 class ActivityButton {
   ///The name of the App or Share Extension to be called.

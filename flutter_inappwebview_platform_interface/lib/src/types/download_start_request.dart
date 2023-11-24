@@ -1,10 +1,11 @@
 import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_internal_annotations.dart';
 
 import '../web_uri.dart';
+import '../in_app_webview/platform_webview.dart';
 
 part 'download_start_request.g.dart';
 
-///Class representing a download request of the WebView used by the event [WebView.onDownloadStartRequest].
+///Class representing a download request of the WebView used by the event [PlatformWebViewCreationParams.onDownloadStartRequest].
 @ExchangeableObject()
 class DownloadStartRequest_ {
   ///The full url to the content that should be downloaded.

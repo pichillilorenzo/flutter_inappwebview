@@ -17,7 +17,7 @@ part of 'chrome_safari_browser_secondary_toolbar.dart';
 ///
 ///**NOTE for Android native WebView**: Not available in an Android Trusted Web Activity.
 ///
-///**Supported Platforms/Implementations**:
+///**Officially Supported Platforms/Implementations**:
 ///- Android native WebView
 class ChromeSafariBrowserSecondaryToolbar {
   ///The IDs of clickable views. The `onClick` event of these views will be handled by custom tabs.
@@ -29,7 +29,7 @@ class ChromeSafariBrowserSecondaryToolbar {
   ///
   ///**NOTE for Android native WebView**: Not available in an Android Trusted Web Activity.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView
   ChromeSafariBrowserSecondaryToolbar(
       {this.clickableIDs = const [], required this.layout});
@@ -74,7 +74,7 @@ class ChromeSafariBrowserSecondaryToolbar {
 ///
 ///**NOTE for Android native WebView**: Not available in an Android Trusted Web Activity.
 ///
-///**Supported Platforms/Implementations**:
+///**Officially Supported Platforms/Implementations**:
 ///- Android native WebView
 class ChromeSafariBrowserSecondaryToolbarClickableID {
   ///The android id resource
@@ -86,7 +86,7 @@ class ChromeSafariBrowserSecondaryToolbarClickableID {
   ///
   ///**NOTE for Android native WebView**: Not available in an Android Trusted Web Activity.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView
   ChromeSafariBrowserSecondaryToolbarClickableID(
       {required this.id, this.onClick});

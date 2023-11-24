@@ -10,7 +10,7 @@ part of 'chrome_safari_browser_menu_item.dart';
 ///
 ///**NOTE for Android native WebView**: Not available in an Android Trusted Web Activity.
 ///
-///**Supported Platforms/Implementations**:
+///**Officially Supported Platforms/Implementations**:
 ///- Android native WebView
 ///- iOS
 class ChromeSafariBrowserMenuItem {
@@ -33,7 +33,7 @@ class ChromeSafariBrowserMenuItem {
   ///
   ///**NOTE for Android native WebView**: Not available in an Android Trusted Web Activity.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
   ChromeSafariBrowserMenuItem(

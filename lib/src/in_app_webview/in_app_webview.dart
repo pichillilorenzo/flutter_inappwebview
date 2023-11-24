@@ -15,14 +15,7 @@ import '../find_interaction/find_interaction_controller.dart';
 import '../pull_to_refresh/main.dart';
 import '../pull_to_refresh/pull_to_refresh_controller.dart';
 
-///{@template flutter_inappwebview.InAppWebView}
-///Flutter Widget for adding an **inline native WebView** integrated in the flutter widget tree.
-///
-///**Supported Platforms/Implementations**:
-///- Android native WebView
-///- iOS
-///- Web
-///{@endtemplate}
+///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewWidget}
 class InAppWebView extends StatefulWidget {
   /// Constructs a [InAppWebView].
   ///
@@ -40,7 +33,7 @@ class InAppWebView extends StatefulWidget {
   /// Implementation of [PlatformInAppWebView] for the current platform.
   final PlatformInAppWebViewWidget platform;
 
-  ///{@macro flutter_inappwebview.InAppWebView}
+  ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewWidget}
   InAppWebView({
     Key? key,
     Set<Factory<OneSequenceGestureRecognizer>>? gestureRecognizers,

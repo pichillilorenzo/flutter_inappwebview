@@ -10,7 +10,7 @@ part 'activity_button.g.dart';
 ///
 ///Check [Official Apple App Extensions](https://developer.apple.com/app-extensions/) for more details.
 ///
-///**Supported Platforms/Implementations**:
+///**Officially Supported Platforms/Implementations**:
 ///- iOS
 @ExchangeableObject()
 class ActivityButton_ {

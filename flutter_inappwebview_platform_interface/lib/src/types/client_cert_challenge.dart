@@ -2,10 +2,11 @@ import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_i
 
 import 'url_authentication_challenge.dart';
 import 'url_protection_space.dart';
+import '../in_app_webview/platform_webview.dart';
 
 part 'client_cert_challenge.g.dart';
 
-///Class that represents the challenge of the [WebView.onReceivedClientCertRequest] event.
+///Class that represents the challenge of the [PlatformWebViewCreationParams.onReceivedClientCertRequest] event.
 ///It provides all the information about the challenge.
 @ExchangeableObject()
 class ClientCertChallenge_ extends URLAuthenticationChallenge_ {

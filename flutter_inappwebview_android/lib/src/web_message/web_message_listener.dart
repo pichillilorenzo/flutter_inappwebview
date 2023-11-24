@@ -36,12 +36,7 @@ class AndroidWebMessageListenerCreationParams
   }
 }
 
-///This listener receives messages sent on the JavaScript object which was injected by [InAppWebViewController.addWebMessageListener].
-///
-///**Supported Platforms/Implementations**:
-///- Android native WebView
-///- iOS
-///- MacOS
+///{@macro flutter_inappwebview_platform_interface.PlatformWebMessageListener}
 class AndroidWebMessageListener extends PlatformWebMessageListener
     with ChannelController {
   /// Constructs a [AndroidWebMessageListener].
@@ -99,6 +94,7 @@ class AndroidWebMessageListener extends PlatformWebMessageListener
     disposeChannel();
   }
 
+  @override
   Map<String, dynamic> toMap() {
     return {
       "id": _id,
@@ -107,6 +103,7 @@ class AndroidWebMessageListener extends PlatformWebMessageListener
     };
   }
 
+  @override
   Map<String, dynamic> toJson() {
     return this.toMap();
   }
@@ -139,11 +136,7 @@ class AndroidJavaScriptReplyProxyCreationParams
   }
 }
 
-///This class represents the JavaScript object injected by [InAppWebViewController.addWebMessageListener].
-///An instance will be given by [AndroidWebMessageListener.onPostMessage].
-///The app can use `postMessage(String)` to talk to the JavaScript context.
-///
-///There is a 1:1 relationship between this object and the JavaScript object in a frame.
+///{@macro flutter_inappwebview_platform_interface.JavaScriptReplyProxy}
 class AndroidJavaScriptReplyProxy extends PlatformJavaScriptReplyProxy {
   /// Constructs a [AndroidWebMessageListener].
   AndroidJavaScriptReplyProxy(PlatformJavaScriptReplyProxyCreationParams params)
@@ -157,11 +150,7 @@ class AndroidJavaScriptReplyProxy extends PlatformJavaScriptReplyProxy {
   AndroidWebMessageListener get _androidWebMessageListener =>
       params.webMessageListener as AndroidWebMessageListener;
 
-  ///Post a [message] to the injected JavaScript object which sent this [AndroidJavaScriptReplyProxy].
-  ///
-  ///If [message] is of type [WebMessageType.ARRAY_BUFFER], be aware that large byte buffers can lead to out-of-memory crashes on low-end devices.
-  ///
-  ///**Official Android API**: https://developer.android.com/reference/androidx/webkit/JavaScriptReplyProxy#postMessage(java.lang.String)
+  @override
   Future<void> postMessage(WebMessage message) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('message', () => message.toMap());

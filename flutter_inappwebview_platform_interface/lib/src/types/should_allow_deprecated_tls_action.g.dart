@@ -6,7 +6,7 @@ part of 'should_allow_deprecated_tls_action.dart';
 // ExchangeableEnumGenerator
 // **************************************************************************
 
-///Class that is used by [WebView.shouldAllowDeprecatedTLS] event.
+///Class that is used by [PlatformWebViewCreationParams.shouldAllowDeprecatedTLS] event.
 ///It represents the policy to pass back to the decision handler.
 class ShouldAllowDeprecatedTLSAction {
   final int _value;
@@ -80,7 +80,7 @@ class ShouldAllowDeprecatedTLSAction {
   }
 }
 
-///Class that is used by [WebView.shouldAllowDeprecatedTLS] event.
+///Class that is used by [PlatformWebViewCreationParams.shouldAllowDeprecatedTLS] event.
 ///It represents the policy to pass back to the decision handler.
 ///Use [ShouldAllowDeprecatedTLSAction] instead.
 @Deprecated('Use ShouldAllowDeprecatedTLSAction instead')

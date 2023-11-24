@@ -6,7 +6,7 @@ part of 'permission_response.dart';
 // ExchangeableObjectGenerator
 // **************************************************************************
 
-///Class that represents the response used by the [WebView.onPermissionRequest] event.
+///Class that represents the response used by the [PlatformWebViewCreationParams.onPermissionRequest] event.
 class PermissionResponse {
   ///Indicate the [PermissionResponseAction] to take in response of a permission request.
   PermissionResponseAction? action;
@@ -49,7 +49,7 @@ class PermissionResponse {
   }
 }
 
-///Class that represents the response used by the [WebView.androidOnPermissionRequest] event.
+///Class that represents the response used by the [PlatformWebViewCreationParams.androidOnPermissionRequest] event.
 ///Use [PermissionResponse] instead.
 @Deprecated('Use PermissionResponse instead')
 class PermissionRequestResponse {

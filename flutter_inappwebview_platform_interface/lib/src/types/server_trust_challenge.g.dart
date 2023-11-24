@@ -6,7 +6,7 @@ part of 'server_trust_challenge.dart';
 // ExchangeableObjectGenerator
 // **************************************************************************
 
-///Class that represents the challenge of the [WebView.onReceivedServerTrustAuthRequest] event.
+///Class that represents the challenge of the [PlatformWebViewCreationParams.onReceivedServerTrustAuthRequest] event.
 ///It provides all the information about the challenge.
 class ServerTrustChallenge extends URLAuthenticationChallenge {
   ServerTrustChallenge({required URLProtectionSpace protectionSpace})

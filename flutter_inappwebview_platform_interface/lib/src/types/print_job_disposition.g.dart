@@ -18,7 +18,7 @@ class PrintJobDisposition {
 
   ///Cancel print job.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- MacOS
   static final CANCEL =
       PrintJobDisposition._internalMultiPlatform('CANCEL', () {
@@ -33,7 +33,7 @@ class PrintJobDisposition {
 
   ///Send to Preview application.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- MacOS
   static final PREVIEW =
       PrintJobDisposition._internalMultiPlatform('PREVIEW', () {
@@ -48,7 +48,7 @@ class PrintJobDisposition {
 
   ///Save to a file.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- MacOS
   static final SAVE = PrintJobDisposition._internalMultiPlatform('SAVE', () {
     switch (defaultTargetPlatform) {
@@ -62,7 +62,7 @@ class PrintJobDisposition {
 
   ///Normal print job.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- MacOS
   static final SPOOL = PrintJobDisposition._internalMultiPlatform('SPOOL', () {
     switch (defaultTargetPlatform) {

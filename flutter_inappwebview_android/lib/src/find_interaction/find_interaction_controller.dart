@@ -24,10 +24,7 @@ class AndroidFindInteractionControllerCreationParams
   }
 }
 
-///**Supported Platforms/Implementations**:
-///- Android native WebView
-///- iOS
-///- MacOS
+///{@macro flutter_inappwebview_platform_interface.PlatformFindInteractionController}
 class AndroidFindInteractionController extends PlatformFindInteractionController
     with ChannelController {
   /// Constructs a [AndroidFindInteractionController].
@@ -68,138 +65,64 @@ class AndroidFindInteractionController extends PlatformFindInteractionController
     return null;
   }
 
-  ///Finds all instances of find on the page and highlights them. Notifies [AndroidFindInteractionController.onFindResultReceived] listener.
-  ///
-  ///[find] represents the string to find.
-  ///
-  ///**NOTE**: on Android native WebView, it finds all instances asynchronously. Successive calls to this will cancel any pending searches.
-  ///
-  ///**NOTE**: on iOS, if [InAppWebViewSettings.isFindInteractionEnabled] is `true`,
-  ///it uses the built-in find interaction native UI,
-  ///otherwise this is implemented using CSS and Javascript.
-  ///
-  ///**Supported Platforms/Implementations**:
-  ///- Android native WebView ([Official API - WebView.findAllAsync](https://developer.android.com/reference/android/webkit/WebView#findAllAsync(java.lang.String)))
-  ///- iOS (if [InAppWebViewSettings.isFindInteractionEnabled] is `true`: [Official API - UIFindInteraction.presentFindNavigator](https://developer.apple.com/documentation/uikit/uifindinteraction/3975832-presentfindnavigator?changes=_2) with [Official API - UIFindInteraction.searchText](https://developer.apple.com/documentation/uikit/uifindinteraction/3975834-searchtext?changes=_2))
-  ///- MacOS
+  ///{@macro flutter_inappwebview_platform_interface.PlatformFindInteractionController.findAll}
   Future<void> findAll({String? find}) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('find', () => find);
     await channel?.invokeMethod('findAll', args);
   }
 
-  ///Highlights and scrolls to the next match found by [findAll]. Notifies [AndroidFindInteractionController.onFindResultReceived] listener.
-  ///
-  ///[forward] represents the direction to search. The default value is `true`, meaning forward.
-  ///
-  ///**NOTE**: on iOS, if [InAppWebViewSettings.isFindInteractionEnabled] is `true`,
-  ///it uses the built-in find interaction native UI,
-  ///otherwise this is implemented using CSS and Javascript.
-  ///
-  ///**Supported Platforms/Implementations**:
-  ///- Android native WebView ([Official API - WebView.findNext](https://developer.android.com/reference/android/webkit/WebView#findNext(boolean)))
-  ///- iOS (if [InAppWebViewSettings.isFindInteractionEnabled] is `true`: [Official API - UIFindInteraction.findNext](https://developer.apple.com/documentation/uikit/uifindinteraction/3975829-findnext?changes=_2) and ([Official API - UIFindInteraction.findPrevious](https://developer.apple.com/documentation/uikit/uifindinteraction/3975830-findprevious?changes=_2)))
-  ///- MacOS
+  ///{@macro flutter_inappwebview_platform_interface.PlatformFindInteractionController.findNext}
   Future<void> findNext({bool forward = true}) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('forward', () => forward);
     await channel?.invokeMethod('findNext', args);
   }
 
-  ///Clears the highlighting surrounding text matches created by [findAll].
-  ///
-  ///**NOTE**: on iOS, if [InAppWebViewSettings.isFindInteractionEnabled] is `true`,
-  ///it uses the built-in find interaction native UI,
-  ///otherwise this is implemented using CSS and Javascript.
-  ///
-  ///**Supported Platforms/Implementations**:
-  ///- Android native WebView ([Official API - WebView.clearMatches](https://developer.android.com/reference/android/webkit/WebView#clearMatches()))
-  ///- iOS (if [InAppWebViewSettings.isFindInteractionEnabled] is `true`: [Official API - UIFindInteraction.dismissFindNavigator](https://developer.apple.com/documentation/uikit/uifindinteraction/3975827-dismissfindnavigator?changes=_2))
-  ///- MacOS
+  ///{@macro flutter_inappwebview_platform_interface.PlatformFindInteractionController.clearMatches}
   Future<void> clearMatches() async {
     Map<String, dynamic> args = <String, dynamic>{};
     await channel?.invokeMethod('clearMatches', args);
   }
 
-  ///Pre-populate the search text to be used.
-  ///
-  ///On iOS, if [InAppWebViewSettings.isFindInteractionEnabled] is `true,
-  ///it will pre-populate the system find panel's search text field with a search query.
-  ///
-  ///**Supported Platforms/Implementations**:
-  ///- Android native WebView
-  ///- iOS ([Official API - UIFindInteraction.searchText](https://developer.apple.com/documentation/uikit/uifindinteraction/3975834-searchtext?changes=_2))
-  ///- MacOS
+  ///{@macro flutter_inappwebview_platform_interface.PlatformFindInteractionController.setSearchText}
   Future<void> setSearchText(String? searchText) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('searchText', () => searchText);
     await channel?.invokeMethod('setSearchText', args);
   }
 
-  ///Get the search text used.
-  ///
-  ///On iOS, if [InAppWebViewSettings.isFindInteractionEnabled] is `true,
-  ///it will get the system find panel's search text field value.
-  ///
-  ///**Supported Platforms/Implementations**:
-  ///- Android native WebView
-  ///- iOS ([Official API - UIFindInteraction.searchText](https://developer.apple.com/documentation/uikit/uifindinteraction/3975834-searchtext?changes=_2))
-  ///- MacOS
+  ///{@macro flutter_inappwebview_platform_interface.PlatformFindInteractionController.getSearchText}
   Future<String?> getSearchText() async {
     Map<String, dynamic> args = <String, dynamic>{};
     return await channel?.invokeMethod<String?>('getSearchText', args);
   }
 
-  ///A Boolean value that indicates when the find panel displays onscreen.
-  ///
-  ///**NOTE**: available only on iOS and only if [InAppWebViewSettings.isFindInteractionEnabled] is `true`.
-  ///
-  ///**Supported Platforms/Implementations**:
-  ///- iOS ([Official API - UIFindInteraction.isFindNavigatorVisible](https://developer.apple.com/documentation/uikit/uifindinteraction/3975828-isfindnavigatorvisible?changes=_2))
+  ///{@macro flutter_inappwebview_platform_interface.PlatformFindInteractionController.isFindNavigatorVisible}
   Future<bool?> isFindNavigatorVisible() async {
     Map<String, dynamic> args = <String, dynamic>{};
     return await channel?.invokeMethod<bool?>('isFindNavigatorVisible', args);
   }
 
-  ///Updates the results the interface displays for the active search.
-  ///
-  ///**NOTE**: available only on iOS and only if [InAppWebViewSettings.isFindInteractionEnabled] is `true`.
-  ///
-  ///**Supported Platforms/Implementations**:
-  ///- iOS ([Official API - UIFindInteraction.updateResultCount](https://developer.apple.com/documentation/uikit/uifindinteraction/3975835-updateresultcount?changes=_2))
+  ///{@macro flutter_inappwebview_platform_interface.PlatformFindInteractionController.updateResultCount}
   Future<void> updateResultCount() async {
     Map<String, dynamic> args = <String, dynamic>{};
     await channel?.invokeMethod('updateResultCount', args);
   }
 
-  ///Begins a search, displaying the find panel.
-  ///
-  ///**NOTE**: available only on iOS and only if [InAppWebViewSettings.isFindInteractionEnabled] is `true`.
-  ///
-  ///**Supported Platforms/Implementations**:
-  ///- iOS ([Official API - UIFindInteraction.presentFindNavigator](https://developer.apple.com/documentation/uikit/uifindinteraction/3975832-presentfindnavigator?changes=_2))
+  ///{@macro flutter_inappwebview_platform_interface.PlatformFindInteractionController.presentFindNavigator}
   Future<void> presentFindNavigator() async {
     Map<String, dynamic> args = <String, dynamic>{};
     await channel?.invokeMethod('presentFindNavigator', args);
   }
 
-  ///Dismisses the find panel, if present.
-  ///
-  ///**NOTE**: available only on iOS and only if [InAppWebViewSettings.isFindInteractionEnabled] is `true`.
-  ///
-  ///**Supported Platforms/Implementations**:
-  ///- iOS ([Official API - UIFindInteraction.dismissFindNavigator](https://developer.apple.com/documentation/uikit/uifindinteraction/3975827-dismissfindnavigator?changes=_2))
+  ///{@macro flutter_inappwebview_platform_interface.PlatformFindInteractionController.dismissFindNavigator}
   Future<void> dismissFindNavigator() async {
     Map<String, dynamic> args = <String, dynamic>{};
     await channel?.invokeMethod('dismissFindNavigator', args);
   }
 
-  ///If there's a currently active find session, returns the active find session.
-  ///
-  ///**Supported Platforms/Implementations**:
-  ///- Android native WebView
-  ///- iOS ([Official API - UIFindInteraction.activeFindSession](https://developer.apple.com/documentation/uikit/uifindinteraction/3975825-activefindsession?changes=_7____4_8&language=objc))
-  ///- MacOS
+  ///{@macro flutter_inappwebview_platform_interface.PlatformFindInteractionController.getActiveFindSession}
   Future<FindSession?> getActiveFindSession() async {
     Map<String, dynamic> args = <String, dynamic>{};
     Map<String, dynamic>? result =
@@ -208,7 +131,7 @@ class AndroidFindInteractionController extends PlatformFindInteractionController
     return FindSession.fromMap(result);
   }
 
-  ///Disposes the controller.
+  ///{@macro flutter_inappwebview_platform_interface.PlatformFindInteractionController.dispose}
   @override
   void dispose({bool isKeepAlive = false}) {
     disposeChannel(removeMethodCallHandler: !isKeepAlive);

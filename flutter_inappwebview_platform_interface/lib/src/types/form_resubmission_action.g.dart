@@ -6,7 +6,7 @@ part of 'form_resubmission_action.dart';
 // ExchangeableEnumGenerator
 // **************************************************************************
 
-///Class that represents the action to take used by the [WebView.onFormResubmission] event.
+///Class that represents the action to take used by the [PlatformWebViewCreationParams.onFormResubmission] event.
 class FormResubmissionAction {
   final int _value;
   final int _nativeValue;

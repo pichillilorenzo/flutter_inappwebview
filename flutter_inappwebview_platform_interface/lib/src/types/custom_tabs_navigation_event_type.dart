@@ -4,7 +4,7 @@ import '../chrome_safari_browser/platform_chrome_safari_browser.dart';
 
 part 'custom_tabs_navigation_event_type.g.dart';
 
-///The type corresponding to the navigation event of [PlatformChromeSafariBrowser.onNavigationEvent].
+///The type corresponding to the navigation event of [PlatformChromeSafariBrowserEvents.onNavigationEvent].
 @ExchangeableEnum()
 class CustomTabsNavigationEventType_ {
   // ignore: unused_field

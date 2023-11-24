@@ -10,21 +10,21 @@ part of 'url_request.dart';
 class URLRequest {
   ///A Boolean value indicating whether the request is allowed to use the built-in cellular radios to satisfy the request.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- iOS ([Official API - URLRequest.allowsCellularAccess](https://developer.apple.com/documentation/foundation/urlrequest/2011607-allowscellularaccess/))
   ///- MacOS ([Official API - URLRequest.allowsCellularAccess](https://developer.apple.com/documentation/foundation/urlrequest/2011607-allowscellularaccess/))
   bool? allowsCellularAccess;
 
   ///A Boolean value that indicates whether the request may use the network when the user has specified Low Data Mode.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- iOS 13.0+ ([Official API - URLRequest.allowsConstrainedNetworkAccess](https://developer.apple.com/documentation/foundation/urlrequest/3358304-allowsconstrainednetworkaccess))
   ///- MacOS 10.15+ ([Official API - URLRequest.allowsConstrainedNetworkAccess](https://developer.apple.com/documentation/foundation/urlrequest/3358304-allowsconstrainednetworkaccess))
   bool? allowsConstrainedNetworkAccess;
 
   ///A Boolean value that indicates whether connections may use a network interface that the system considers expensive.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- iOS 13.0+ ([Official API - URLRequest.allowsExpensiveNetworkAccess](https://developer.apple.com/documentation/foundation/urlrequest/3358305-allowsexpensivenetworkaccess))
   ///- MacOS 10.15+ ([Official API - URLRequest.allowsExpensiveNetworkAccess](https://developer.apple.com/documentation/foundation/urlrequest/3358305-allowsexpensivenetworkaccess))
   bool? allowsExpensiveNetworkAccess;
@@ -33,7 +33,7 @@ class URLRequest {
   ///without HTTP/3 service discovery. Defaults to `false`.
   ///The default may be `true` in a future OS update.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- iOS 14.5+ ([Official API - URLRequest.assumesHTTP3Capable](https://developer.apple.com/documentation/foundation/urlrequest/3738175-assumeshttp3capable))
   ///- MacOS 11.3+ ([Official API - URLRequest.assumesHTTP3Capable](https://developer.apple.com/documentation/foundation/urlrequest/3738175-assumeshttp3capable))
   bool? assumesHTTP3Capable;
@@ -42,7 +42,7 @@ class URLRequest {
   ///
   ///If you don’t set a value, the system assumes [URLRequestAttribution.DEVELOPER].
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- iOS 15.0+ ([Official API - URLRequest.attribution](https://developer.apple.com/documentation/foundation/urlrequest/3767318-attribution))
   ///- MacOS 12.0+ ([Official API - URLRequest.attribution](https://developer.apple.com/documentation/foundation/urlrequest/3767318-attribution))
   URLRequestAttribution? attribution;
@@ -52,7 +52,7 @@ class URLRequest {
 
   ///The request’s cache policy.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- iOS ([Official API - URLRequest.cachePolicy](https://developer.apple.com/documentation/foundation/urlrequest/2011593-cachepolicy))
   ///- MacOS ([Official API - URLRequest.cachePolicy](https://developer.apple.com/documentation/foundation/urlrequest/2011593-cachepolicy))
   URLRequestCachePolicy? cachePolicy;
@@ -62,14 +62,14 @@ class URLRequest {
 
   ///A Boolean value indicating whether cookies will be sent with and set for this request.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- iOS ([Official API - URLRequest.httpShouldHandleCookies](https://developer.apple.com/documentation/foundation/urlrequest/2011548-httpshouldhandlecookies))
   ///- MacOS ([Official API - URLRequest.httpShouldHandleCookies](https://developer.apple.com/documentation/foundation/urlrequest/2011548-httpshouldhandlecookies))
   bool? httpShouldHandleCookies;
 
   ///A Boolean value indicating whether the request should transmit before the previous response is received.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- iOS ([Official API - URLRequest.httpShouldUsePipelining](https://developer.apple.com/documentation/foundation/urlrequest/2011508-httpshouldusepipelining))
   ///- MacOS ([Official API - URLRequest.httpShouldUsePipelining](https://developer.apple.com/documentation/foundation/urlrequest/2011508-httpshouldusepipelining))
   bool? httpShouldUsePipelining;
@@ -113,7 +113,7 @@ class URLRequest {
   ///The main document URL associated with this request.
   ///This URL is used for the cookie “same domain as main document” policy.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- iOS ([Official API - URLRequest.mainDocumentURL](https://developer.apple.com/documentation/foundation/urlrequest/2011552-maindocumenturl))
   ///- MacOS ([Official API - URLRequest.mainDocumentURL](https://developer.apple.com/documentation/foundation/urlrequest/2011552-maindocumenturl))
   WebUri? mainDocumentURL;
@@ -125,14 +125,14 @@ class URLRequest {
 
   ///The service type associated with this request.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- iOS ([Official API - URLRequest.networkServiceType](https://developer.apple.com/documentation/foundation/urlrequest/2011409-networkservicetype))
   ///- MacOS ([Official API - URLRequest.networkServiceType](https://developer.apple.com/documentation/foundation/urlrequest/2011409-networkservicetype))
   URLRequestNetworkServiceType? networkServiceType;
 
   ///The timeout interval of the request.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- iOS ([Official API - URLRequest.timeoutInterval](https://developer.apple.com/documentation/foundation/urlrequest/2011509-timeoutinterval))
   ///- MacOS ([Official API - URLRequest.timeoutInterval](https://developer.apple.com/documentation/foundation/urlrequest/2011509-timeoutinterval))
   double? timeoutInterval;

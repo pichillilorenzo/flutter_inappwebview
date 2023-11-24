@@ -9,7 +9,7 @@ part 'ui_image.g.dart';
 ///Check iOS [UIKit.UIImage](https://developer.apple.com/documentation/uikit/uiimage) for more details.
 ///Check MacOS [AppKit.NSImage](https://developer.apple.com/documentation/appkit/nsimage) for more details.
 ///
-///**Supported Platforms/Implementations**:
+///**Officially Supported Platforms/Implementations**:
 ///- iOS
 ///- MacOS
 @ExchangeableObject()

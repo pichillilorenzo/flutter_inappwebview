@@ -18,7 +18,7 @@ class PrintJobPageOrder {
 
   ///Ascending (back to front) page order.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- MacOS
   static final ASCENDING = PrintJobPageOrder._internalMultiPlatform(1, () {
     switch (defaultTargetPlatform) {
@@ -32,7 +32,7 @@ class PrintJobPageOrder {
 
   ///Descending (front to back) page order.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- MacOS
   static final DESCENDING = PrintJobPageOrder._internalMultiPlatform(-1, () {
     switch (defaultTargetPlatform) {
@@ -46,7 +46,7 @@ class PrintJobPageOrder {
 
   ///The spooler does not rearrange pages—they are printed in the order received by the spooler.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- MacOS
   static final SPECIAL = PrintJobPageOrder._internalMultiPlatform(0, () {
     switch (defaultTargetPlatform) {
@@ -60,7 +60,7 @@ class PrintJobPageOrder {
 
   ///No page order specified.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- MacOS
   static final UNKNOWN = PrintJobPageOrder._internalMultiPlatform(2, () {
     switch (defaultTargetPlatform) {

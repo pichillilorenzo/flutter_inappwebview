@@ -1,13 +1,9 @@
 import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_platform_interface.dart';
 import 'web_message_port.dart';
 
-///The representation of the [HTML5 message channels](https://html.spec.whatwg.org/multipage/web-messaging.html#message-channels).
-///
-///**Supported Platforms/Implementations**:
-///- Android native WebView
-///- iOS
-///- MacOS
+///{@macro flutter_inappwebview_platform_interface.PlatformWebMessageChannel}
 class WebMessageChannel {
+  ///{@macro flutter_inappwebview_platform_interface.PlatformWebMessageChannel}
   WebMessageChannel(
       {required String id,
       required WebMessagePort port1,
@@ -50,7 +46,7 @@ class WebMessageChannel {
   WebMessagePort get port2 =>
       WebMessagePort.fromPlatform(platform: platform.port2);
 
-  ///Disposes the web message channel.
+  ///{@macro flutter_inappwebview_platform_interface.PlatformWebMessageChannel.dispose}
   void dispose() => platform.dispose();
 
   @override

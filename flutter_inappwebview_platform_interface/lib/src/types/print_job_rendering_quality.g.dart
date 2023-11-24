@@ -18,7 +18,7 @@ class PrintJobRenderingQuality {
 
   ///Renders the printing at the best possible quality, regardless of speed.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- iOS
   ///- MacOS
   static final BEST = PrintJobRenderingQuality._internalMultiPlatform(0, () {
@@ -36,7 +36,7 @@ class PrintJobRenderingQuality {
   ///Sacrifices the least possible amount of rendering quality for speed to maintain a responsive user interface.
   ///This option should be used only after establishing that best quality rendering does indeed make the user interface unresponsive.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- iOS
   ///- MacOS
   static final RESPONSIVE =

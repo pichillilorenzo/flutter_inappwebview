@@ -25,12 +25,7 @@ class AndroidServiceWorkerControllerCreationParams
   }
 }
 
-///Class that manages Service Workers used by [WebView].
-///
-///**NOTE**: available on Android 24+.
-///
-///**Supported Platforms/Implementations**:
-///- Android native WebView ([Official API - ServiceWorkerControllerCompat](https://developer.android.com/reference/androidx/webkit/ServiceWorkerControllerCompat))
+///{@macro flutter_inappwebview_platform_interface.PlatformServiceWorkerController}
 class AndroidServiceWorkerController extends PlatformServiceWorkerController
     with ChannelController {
   /// Creates a new [AndroidServiceWorkerController].
@@ -68,13 +63,10 @@ class AndroidServiceWorkerController extends PlatformServiceWorkerController
 
   ServiceWorkerClient? _serviceWorkerClient;
 
+  @override
   ServiceWorkerClient? get serviceWorkerClient => _serviceWorkerClient;
 
-  ///Sets the client to capture service worker related callbacks.
-  ///A [ServiceWorkerClient] should be set before any service workers are active, e.g. a safe place is before any WebView instances are created or pages loaded.
-  ///
-  ///**Supported Platforms/Implementations**:
-  ///- Android native WebView ([Official API - ServiceWorkerControllerCompat.setServiceWorkerClient](https://developer.android.com/reference/androidx/webkit/ServiceWorkerControllerCompat#setServiceWorkerClient(androidx.webkit.ServiceWorkerClientCompat)))
+  @override
   Future<void> setServiceWorkerClient(ServiceWorkerClient? value) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('isNull', () => value == null);
@@ -106,96 +98,56 @@ class AndroidServiceWorkerController extends PlatformServiceWorkerController
     return null;
   }
 
-  ///Gets whether Service Workers support content URL access.
-  ///This method should only be called if [WebViewFeature.isFeatureSupported] returns `true` for [WebViewFeature.SERVICE_WORKER_CONTENT_ACCESS].
-  ///
-  ///**NOTE**: available on Android 24+.
-  ///
-  ///**Official Android API**: https://developer.android.com/reference/androidx/webkit/ServiceWorkerWebSettingsCompat#getAllowContentAccess()
+  @override
   Future<bool> getAllowContentAccess() async {
     Map<String, dynamic> args = <String, dynamic>{};
     return await channel?.invokeMethod<bool>('getAllowContentAccess', args) ??
         false;
   }
 
-  ///Gets whether Service Workers support file access.
-  ///This method should only be called if [WebViewFeature.isFeatureSupported] returns `true` for [WebViewFeature.SERVICE_WORKER_FILE_ACCESS].
-  ///
-  ///**NOTE**: available on Android 24+.
-  ///
-  ///**Official Android API**: https://developer.android.com/reference/androidx/webkit/ServiceWorkerWebSettingsCompat#getAllowFileAccess()
+  @override
   Future<bool> getAllowFileAccess() async {
     Map<String, dynamic> args = <String, dynamic>{};
     return await channel?.invokeMethod<bool>('getAllowFileAccess', args) ??
         false;
   }
 
-  ///Gets whether Service Workers are prohibited from loading any resources from the network.
-  ///This method should only be called if [WebViewFeature.isFeatureSupported] returns `true` for [WebViewFeature.SERVICE_WORKER_BLOCK_NETWORK_LOADS].
-  ///
-  ///**NOTE**: available on Android 24+.
-  ///
-  ///**Official Android API**: https://developer.android.com/reference/androidx/webkit/ServiceWorkerWebSettingsCompat#getBlockNetworkLoads()
+  @override
   Future<bool> getBlockNetworkLoads() async {
     Map<String, dynamic> args = <String, dynamic>{};
     return await channel?.invokeMethod<bool>('getBlockNetworkLoads', args) ??
         false;
   }
 
-  ///Gets the current setting for overriding the cache mode.
-  ///This method should only be called if [WebViewFeature.isFeatureSupported] returns `true` for [WebViewFeature.SERVICE_WORKER_CACHE_MODE].
-  ///
-  ///**NOTE**: available on Android 24+.
-  ///
-  ///**Official Android API**: https://developer.android.com/reference/androidx/webkit/ServiceWorkerWebSettingsCompat#getCacheMode()
+  @override
   Future<CacheMode?> getCacheMode() async {
     Map<String, dynamic> args = <String, dynamic>{};
     return CacheMode.fromNativeValue(
         await channel?.invokeMethod<int?>('getCacheMode', args));
   }
 
-  ///Enables or disables content URL access from Service Workers.
-  ///This method should only be called if [WebViewFeature.isFeatureSupported] returns `true` for [WebViewFeature.SERVICE_WORKER_CONTENT_ACCESS].
-  ///
-  ///**NOTE**: available on Android 24+.
-  ///
-  ///**Official Android API**: https://developer.android.com/reference/androidx/webkit/ServiceWorkerWebSettingsCompat#setAllowContentAccess(boolean)
+  @override
   Future<void> setAllowContentAccess(bool allow) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent("allow", () => allow);
     await channel?.invokeMethod('setAllowContentAccess', args);
   }
 
-  ///Enables or disables file access within Service Workers.
-  ///This method should only be called if [WebViewFeature.isFeatureSupported] returns `true` for [WebViewFeature.SERVICE_WORKER_FILE_ACCESS].
-  ///
-  ///**NOTE**: available on Android 24+.
-  ///
-  ///**Official Android API**: https://developer.android.com/reference/androidx/webkit/ServiceWorkerWebSettingsCompat#setAllowFileAccess(boolean)
+  @override
   Future<void> setAllowFileAccess(bool allow) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent("allow", () => allow);
     await channel?.invokeMethod('setAllowFileAccess', args);
   }
 
-  ///Sets whether Service Workers should not load resources from the network.
-  ///This method should only be called if [WebViewFeature.isFeatureSupported] returns `true` for [WebViewFeature.SERVICE_WORKER_BLOCK_NETWORK_LOADS].
-  ///
-  ///**NOTE**: available on Android 24+.
-  ///
-  ///**Official Android API**: https://developer.android.com/reference/androidx/webkit/ServiceWorkerWebSettingsCompat#setBlockNetworkLoads(boolean)
+  @override
   Future<void> setBlockNetworkLoads(bool flag) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent("flag", () => flag);
     await channel?.invokeMethod('setBlockNetworkLoads', args);
   }
 
-  ///Overrides the way the cache is used.
-  ///This method should only be called if [WebViewFeature.isFeatureSupported] returns `true` for [WebViewFeature.SERVICE_WORKER_CACHE_MODE].
-  ///
-  ///**NOTE**: available on Android 24+.
-  ///
-  ///**Official Android API**: https://developer.android.com/reference/androidx/webkit/ServiceWorkerWebSettingsCompat#setCacheMode(int)
+  @override
   Future<void> setCacheMode(CacheMode mode) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent("mode", () => mode.toNativeValue());

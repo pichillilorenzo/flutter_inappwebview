@@ -24,14 +24,16 @@ class PlatformWebStorageCreationParams {
   final PlatformSessionStorage sessionStorage;
 }
 
+///{@template flutter_inappwebview_platform_interface.PlatformWebStorage}
 ///Class that provides access to the JavaScript [Web Storage API](https://developer.mozilla.org/en-US/docs/Web/API/Web_Storage_API): `window.sessionStorage` and `window.localStorage`.
 ///It used by [PlatformInAppWebViewController.webStorage].
 ///
-///**Supported Platforms/Implementations**:
+///**Officially Supported Platforms/Implementations**:
 ///- Android native WebView
 ///- iOS
 ///- MacOS
 ///- Web
+///{@endtemplate}
 abstract class PlatformWebStorage extends PlatformInterface
     implements Disposable {
   /// Creates a new [PlatformWebStorage]
@@ -71,6 +73,9 @@ abstract class PlatformWebStorage extends PlatformInterface
   ///{@endtemplate}
   PlatformSessionStorage get sessionStorage => params.sessionStorage;
 
+  ///{@template flutter_inappwebview_platform_interface.PlatformWebStorage.dispose}
+  ///Disposes the web storage.
+  ///{@endtemplate}
   void dispose() {
     throw UnimplementedError(
         'dispose is not implemented on the current platform');
@@ -90,8 +95,10 @@ class PlatformStorageCreationParams {
   final WebStorageType webStorageType;
 }
 
+///{@template flutter_inappwebview_platform_interface.PlatformStorage}
 ///Class that provides methods to manage the JavaScript [Storage](https://developer.mozilla.org/en-US/docs/Web/API/Storage) object.
 ///It is used by [PlatformLocalStorage] and [PlatformSessionStorage].
+///{@endtemplate}
 abstract class PlatformStorage extends PlatformInterface implements Disposable {
   /// Creates a new [PlatformStorage]
   factory PlatformStorage(PlatformStorageCreationParams params) {
@@ -125,93 +132,107 @@ abstract class PlatformStorage extends PlatformInterface implements Disposable {
   ///{@endtemplate}
   WebStorageType get webStorageType => params.webStorageType;
 
+  ///{@template flutter_inappwebview_platform_interface.PlatformStorage.length}
   ///Returns an integer representing the number of data items stored in the Storage object.
   ///
   ///**NOTE for Web**: this method will have effect only if the iframe has the same origin.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
   ///- Web
+  ///{@endtemplate}
   Future<int?> length() {
     throw UnimplementedError(
         'length is not implemented on the current platform');
   }
 
+  ///{@template flutter_inappwebview_platform_interface.PlatformStorage.setItem}
   ///When passed a [key] name and [value], will add that key to the storage, or update that key's value if it already exists.
   ///
   ///**NOTE for Web**: this method will have effect only if the iframe has the same origin.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
   ///- Web
+  ///{@endtemplate}
   Future<void> setItem({required String key, required dynamic value}) {
     throw UnimplementedError(
         'setItem is not implemented on the current platform');
   }
 
+  ///{@template flutter_inappwebview_platform_interface.PlatformStorage.getItem}
   ///When passed a [key] name, will return that key's value, or `null` if the key does not exist, in the given Storage object.
   ///
   ///**NOTE for Web**: this method will have effect only if the iframe has the same origin.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
   ///- Web
+  ///{@endtemplate}
   Future<dynamic> getItem({required String key}) {
     throw UnimplementedError(
         'getItem is not implemented on the current platform');
   }
 
+  ///{@template flutter_inappwebview_platform_interface.PlatformStorage.removeItem}
   ///When passed a [key] name, will remove that key from the given Storage object if it exists.
   ///
   ///**NOTE for Web**: this method will have effect only if the iframe has the same origin.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
   ///- Web
+  ///{@endtemplate}
   Future<void> removeItem({required String key}) {
     throw UnimplementedError(
         'removeItem is not implemented on the current platform');
   }
 
+  ///{@template flutter_inappwebview_platform_interface.PlatformStorage.getItems}
   ///Returns the list of all items from the given Storage object.
   ///
   ///**NOTE for Web**: this method will have effect only if the iframe has the same origin.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
   ///- Web
+  ///{@endtemplate}
   Future<List<WebStorageItem>> getItems() {
     throw UnimplementedError(
         'getItems is not implemented on the current platform');
   }
 
+  ///{@template flutter_inappwebview_platform_interface.PlatformStorage.clear}
   ///Clears all keys stored in a given Storage object.
   ///
   ///**NOTE for Web**: this method will have effect only if the iframe has the same origin.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
   ///- Web
+  ///{@endtemplate}
   Future<void> clear() {
     throw UnimplementedError(
         'clear is not implemented on the current platform');
   }
 
+  ///{@template flutter_inappwebview_platform_interface.PlatformStorage.key}
   ///When passed a number [index], returns the name of the nth key in a given Storage object.
   ///The order of keys is user-agent defined, so you should not rely on it.
   ///
   ///**NOTE for Web**: this method will have effect only if the iframe has the same origin.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
   ///- Web
+  ///{@endtemplate}
   Future<String> key({required int index}) {
     throw UnimplementedError('key is not implemented on the current platform');
   }
@@ -243,8 +264,10 @@ class PlatformLocalStorageCreationParams extends PlatformStorageCreationParams {
   }
 }
 
+///{@template flutter_inappwebview_platform_interface.PlatformLocalStorage}
 ///Class that provides methods to manage the JavaScript `window.localStorage` object.
 ///It used by [PlatformWebStorage].
+///{@endtemplate}
 abstract class PlatformLocalStorage extends PlatformStorage {
   /// Creates a new [PlatformLocalStorage]
   factory PlatformLocalStorage(PlatformLocalStorageCreationParams params) {
@@ -298,8 +321,10 @@ class PlatformSessionStorageCreationParams
   }
 }
 
+///{@template flutter_inappwebview_platform_interface.PlatformSessionStorage}
 ///Class that provides methods to manage the JavaScript `window.sessionStorage` object.
 ///It used by [PlatformWebStorage].
+///{@endtemplate}
 abstract class PlatformSessionStorage extends PlatformStorage {
   /// Creates a new [PlatformSessionStorage]
   factory PlatformSessionStorage(PlatformSessionStorageCreationParams params) {

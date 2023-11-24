@@ -7,7 +7,7 @@ part of 'render_process_gone_detail.dart';
 // **************************************************************************
 
 ///Class that provides more specific information about why the render process exited.
-///It is used by the [WebView.onRenderProcessGone] event.
+///It is used by the [PlatformWebViewCreationParams.onRenderProcessGone] event.
 class RenderProcessGoneDetail {
   ///Indicates whether the render process was observed to crash, or whether it was killed by the system.
   ///

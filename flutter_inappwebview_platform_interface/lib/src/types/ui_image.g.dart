@@ -11,7 +11,7 @@ part of 'ui_image.dart';
 ///Check iOS [UIKit.UIImage](https://developer.apple.com/documentation/uikit/uiimage) for more details.
 ///Check MacOS [AppKit.NSImage](https://developer.apple.com/documentation/appkit/nsimage) for more details.
 ///
-///**Supported Platforms/Implementations**:
+///**Officially Supported Platforms/Implementations**:
 ///- iOS
 ///- MacOS
 class UIImage {
@@ -23,7 +23,7 @@ class UIImage {
 
   ///The name of the system symbol image.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- iOS 13.0+
   ///- MacOS 11.0+
   String? systemName;

@@ -25,14 +25,7 @@ class AndroidWebStorageCreationParams extends PlatformWebStorageCreationParams {
   }
 }
 
-///Class that provides access to the JavaScript [Web Storage API](https://developer.mozilla.org/en-US/docs/Web/API/Web_Storage_API): `window.sessionStorage` and `window.localStorage`.
-///It used by [InAppWebViewController.webStorage].
-///
-///**Supported Platforms/Implementations**:
-///- Android native WebView
-///- iOS
-///- MacOS
-///- Web
+///{@macro flutter_inappwebview_platform_interface.PlatformWebStorage}
 class AndroidWebStorage extends PlatformWebStorage {
   /// Constructs a [AndroidWebStorage].
   AndroidWebStorage(PlatformWebStorageCreationParams params)
@@ -43,11 +36,12 @@ class AndroidWebStorage extends PlatformWebStorage {
                   .fromPlatformWebStorageCreationParams(params),
         );
 
+  @override
   PlatformLocalStorage get localStorage => params.localStorage;
 
+  @override
   PlatformSessionStorage get sessionStorage => params.sessionStorage;
 
-  ///Disposes the web storage.
   @override
   void dispose() {
     localStorage.dispose();
@@ -73,8 +67,7 @@ class AndroidStorageCreationParams extends PlatformStorageCreationParams {
   }
 }
 
-///Class that provides methods to manage the JavaScript [Storage](https://developer.mozilla.org/en-US/docs/Web/API/Storage) object.
-///It is used by [AndroidLocalStorage] and [AndroidSessionStorage].
+///{@macro flutter_inappwebview_platform_interface.PlatformStorage}
 class AndroidStorage extends PlatformStorage {
   /// Constructs a [AndroidStorage].
   AndroidStorage(PlatformStorageCreationParams params)
@@ -87,14 +80,7 @@ class AndroidStorage extends PlatformStorage {
 
   AndroidInAppWebViewController? _controller;
 
-  ///Returns an integer representing the number of data items stored in the Storage object.
-  ///
-  ///**NOTE for Web**: this method will have effect only if the iframe has the same origin.
-  ///
-  ///**Supported Platforms/Implementations**:
-  ///- Android native WebView
-  ///- iOS
-  ///- Web
+  @override
   Future<int?> length() async {
     var result = await _controller?.evaluateJavascript(source: """
     window.$webStorageType.length;
@@ -102,14 +88,7 @@ class AndroidStorage extends PlatformStorage {
     return result != null ? int.parse(json.decode(result)) : null;
   }
 
-  ///When passed a [key] name and [value], will add that key to the storage, or update that key's value if it already exists.
-  ///
-  ///**NOTE for Web**: this method will have effect only if the iframe has the same origin.
-  ///
-  ///**Supported Platforms/Implementations**:
-  ///- Android native WebView
-  ///- iOS
-  ///- Web
+  @override
   Future<void> setItem({required String key, required dynamic value}) async {
     var encodedValue = json.encode(value);
     await _controller?.evaluateJavascript(source: """
@@ -117,14 +96,7 @@ class AndroidStorage extends PlatformStorage {
     """);
   }
 
-  ///When passed a [key] name, will return that key's value, or `null` if the key does not exist, in the given Storage object.
-  ///
-  ///**NOTE for Web**: this method will have effect only if the iframe has the same origin.
-  ///
-  ///**Supported Platforms/Implementations**:
-  ///- Android native WebView
-  ///- iOS
-  ///- Web
+  @override
   Future<dynamic> getItem({required String key}) async {
     var itemValue = await _controller?.evaluateJavascript(source: """
     window.$webStorageType.getItem("$key");
@@ -141,28 +113,14 @@ class AndroidStorage extends PlatformStorage {
     return itemValue;
   }
 
-  ///When passed a [key] name, will remove that key from the given Storage object if it exists.
-  ///
-  ///**NOTE for Web**: this method will have effect only if the iframe has the same origin.
-  ///
-  ///**Supported Platforms/Implementations**:
-  ///- Android native WebView
-  ///- iOS
-  ///- Web
+  @override
   Future<void> removeItem({required String key}) async {
     await _controller?.evaluateJavascript(source: """
     window.$webStorageType.removeItem("$key");
     """);
   }
 
-  ///Returns the list of all items from the given Storage object.
-  ///
-  ///**NOTE for Web**: this method will have effect only if the iframe has the same origin.
-  ///
-  ///**Supported Platforms/Implementations**:
-  ///- Android native WebView
-  ///- iOS
-  ///- Web
+  @override
   Future<List<WebStorageItem>> getItems() async {
     var webStorageItems = <WebStorageItem>[];
 
@@ -195,29 +153,14 @@ class AndroidStorage extends PlatformStorage {
     return webStorageItems;
   }
 
-  ///Clears all keys stored in a given Storage object.
-  ///
-  ///**NOTE for Web**: this method will have effect only if the iframe has the same origin.
-  ///
-  ///**Supported Platforms/Implementations**:
-  ///- Android native WebView
-  ///- iOS
-  ///- Web
+  @override
   Future<void> clear() async {
     await _controller?.evaluateJavascript(source: """
     window.$webStorageType.clear();
     """);
   }
 
-  ///When passed a number [index], returns the name of the nth key in a given Storage object.
-  ///The order of keys is user-agent defined, so you should not rely on it.
-  ///
-  ///**NOTE for Web**: this method will have effect only if the iframe has the same origin.
-  ///
-  ///**Supported Platforms/Implementations**:
-  ///- Android native WebView
-  ///- iOS
-  ///- Web
+  @override
   Future<String> key({required int index}) async {
     var result = await _controller?.evaluateJavascript(source: """
     window.$webStorageType.key($index);
@@ -225,7 +168,6 @@ class AndroidStorage extends PlatformStorage {
     return result != null ? json.decode(result) : null;
   }
 
-  ///Disposes the storage.
   @override
   void dispose() {
     _controller = null;
@@ -251,8 +193,7 @@ class AndroidLocalStorageCreationParams
   }
 }
 
-///Class that provides methods to manage the JavaScript `window.localStorage` object.
-///It used by [AndroidWebStorage].
+///{@macro flutter_inappwebview_platform_interface.PlatformLocalStorage}
 class AndroidLocalStorage extends AndroidStorage
     implements PlatformLocalStorage {
   /// Constructs a [AndroidLocalStorage].
@@ -291,8 +232,7 @@ class AndroidSessionStorageCreationParams
   }
 }
 
-///Class that provides methods to manage the JavaScript `window.sessionStorage` object.
-///It used by [AndroidWebStorage].
+///{@macro flutter_inappwebview_platform_interface.PlatformSessionStorage}
 class AndroidSessionStorage extends AndroidStorage
     implements PlatformSessionStorage {
   /// Constructs a [AndroidSessionStorage].

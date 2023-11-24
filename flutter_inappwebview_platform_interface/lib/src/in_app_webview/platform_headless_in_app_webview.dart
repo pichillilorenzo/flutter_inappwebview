@@ -135,7 +135,7 @@ class PlatformHeadlessInAppWebViewCreationParams
   ///
   ///**NOTE for Android**: `Size` width and height values will be converted to `int` values because they cannot have `double` values.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
   ///- Web
@@ -143,13 +143,13 @@ class PlatformHeadlessInAppWebViewCreationParams
   final Size initialSize;
 }
 
-///{@template flutter_inappwebview.HeadlessInAppWebView}
+///{@template flutter_inappwebview_platform_interface.PlatformHeadlessInAppWebView}
 ///Class that represents a WebView in headless mode.
 ///It can be used to run a WebView in background without attaching an `InAppWebView` to the widget tree.
 ///
 ///**NOTE**: Remember to dispose it when you don't need it anymore.
 ///
-///**Supported Platforms/Implementations**:
+///**Officially Supported Platforms/Implementations**:
 ///- Android native WebView
 ///- iOS
 ///- Web
@@ -187,40 +187,49 @@ abstract class PlatformHeadlessInAppWebView extends PlatformInterface
   /// The parameters used to initialize the [PlatformHeadlessInAppWebView].
   final PlatformHeadlessInAppWebViewCreationParams params;
 
+  ///{@template flutter_inappwebview_platform_interface.PlatformHeadlessInAppWebView.id}
+  ///View ID.
+  ///{@endtemplate}
+  String get id =>
+      throw UnimplementedError('id is not implemented on the current platform');
+
+  ///{@template flutter_inappwebview_platform_interface.PlatformHeadlessInAppWebView.webViewController}
   ///WebView Controller that can be used to access the [InAppWebViewController] API.
+  ///{@endtemplate}
   PlatformInAppWebViewController? get webViewController =>
       throw UnimplementedError(
           'webViewController is not implemented on the current platform');
 
-  ///View ID.
-  String get id =>
-      throw UnimplementedError('id is not implemented on the current platform');
-
+  ///{@template flutter_inappwebview_platform_interface.PlatformHeadlessInAppWebView.run}
   ///Runs the headless WebView.
   ///
   ///**NOTE for Web**: it will append a new `iframe` to the body.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
   ///- Web
   ///- MacOS
+  ///{@endtemplate}
   Future<void> run() {
     throw UnimplementedError('run is not implemented on the current platform');
   }
 
+  ///{@template flutter_inappwebview_platform_interface.PlatformHeadlessInAppWebView.isRunning}
   ///Indicates if the headless WebView is running or not.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
   ///- Web
   ///- MacOS
+  ///{@endtemplate}
   bool isRunning() {
     throw UnimplementedError(
         'isRunning is not implemented on the current platform');
   }
 
+  ///{@template flutter_inappwebview_platform_interface.PlatformHeadlessInAppWebView.setSize}
   ///Set the size of the WebView in pixels.
   ///
   ///Set `-1` to match the corresponding width or height of the current device screen size.
@@ -230,37 +239,42 @@ abstract class PlatformHeadlessInAppWebView extends PlatformInterface
   ///
   ///**NOTE for Android**: `Size` width and height values will be converted to `int` values because they cannot have `double` values.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
   ///- Web
   ///- MacOS
+  ///{@endtemplate}
   Future<void> setSize(Size size) {
     throw UnimplementedError(
         'setSize is not implemented on the current platform');
   }
 
+  ///{@template flutter_inappwebview_platform_interface.PlatformHeadlessInAppWebView.getSize}
   ///Gets the current size in pixels of the WebView.
   ///
   ///Note that if the [PlatformHeadlessInAppWebView] is not running, this method will return `null`.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
   ///- Web
   ///- MacOS
+  ///{@endtemplate}
   Future<Size?> getSize() {
     throw UnimplementedError(
         'getSize is not implemented on the current platform');
   }
 
+  ///{@template flutter_inappwebview_platform_interface.PlatformHeadlessInAppWebView.dispose}
   ///Disposes the headless WebView.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
   ///- Web
   ///- MacOS
+  ///{@endtemplate}
   Future<void> dispose() {
     throw UnimplementedError(
         'dispose is not implemented on the current platform');

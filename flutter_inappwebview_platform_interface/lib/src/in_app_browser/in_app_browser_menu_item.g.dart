@@ -8,7 +8,7 @@ part of 'in_app_browser_menu_item.dart';
 
 ///Class that represents a custom menu item for a [PlatformInAppBrowser] instance.
 ///
-///**Supported Platforms/Implementations**:
+///**Officially Supported Platforms/Implementations**:
 ///- Android native WebView
 ///- iOS
 ///- MacOS
@@ -18,7 +18,7 @@ class InAppBrowserMenuItem {
 
   ///Icon color.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS 13.0+
   ///- MacOS
@@ -40,7 +40,7 @@ class InAppBrowserMenuItem {
   String title;
 
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
   ///- MacOS

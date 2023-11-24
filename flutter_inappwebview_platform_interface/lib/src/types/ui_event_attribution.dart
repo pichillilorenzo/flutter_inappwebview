@@ -12,7 +12,7 @@ part 'ui_event_attribution.g.dart';
 ///
 ///Check [UIEventAttribution](https://developer.apple.com/documentation/uikit/uieventattribution) for details.
 ///
-///**Supported Platforms/Implementations**:
+///**Officially Supported Platforms/Implementations**:
 ///- iOS
 @ExchangeableObject()
 class UIEventAttribution_ {

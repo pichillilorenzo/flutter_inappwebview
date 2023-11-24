@@ -10,7 +10,7 @@ part of 'url_protection_space.dart';
 class URLProtectionSpace {
   ///The authentication method used by the receiver.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- iOS ([Official API - URLProtectionSpace.authenticationMethod](https://developer.apple.com/documentation/foundation/urlprotectionspace/1415028-authenticationmethod))
   ///- MacOS ([Official API - URLProtectionSpace.authenticationMethod](https://developer.apple.com/documentation/foundation/urlprotectionspace/1415028-authenticationmethod))
   URLProtectionSpaceAuthenticationMethod? authenticationMethod;
@@ -19,7 +19,7 @@ class URLProtectionSpace {
   ///This value is `null` if the authentication method of the protection space is not client certificate.
   ///The returned issuing authorities are encoded with Distinguished Encoding Rules (DER).
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- iOS ([Official API - URLProtectionSpace.distinguishedNames](https://developer.apple.com/documentation/foundation/urlprotectionspace/1417061-distinguishednames))
   ///- MacOS ([Official API - URLProtectionSpace.distinguishedNames](https://developer.apple.com/documentation/foundation/urlprotectionspace/1417061-distinguishednames))
   List<X509Certificate>? distinguishedNames;
@@ -53,7 +53,7 @@ class URLProtectionSpace {
   ///This value is `null` if the receiver does not represent a proxy protection space.
   ///The supported proxy types are listed in [URLProtectionSpaceProxyType.values].
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- iOS ([Official API - URLProtectionSpace.proxyType](https://developer.apple.com/documentation/foundation/urlprotectionspace/1411924-proxytype))
   ///- MacOS ([Official API - URLProtectionSpace.proxyType](https://developer.apple.com/documentation/foundation/urlprotectionspace/1411924-proxytype))
   URLProtectionSpaceProxyType? proxyType;
@@ -66,7 +66,7 @@ class URLProtectionSpace {
   ///A Boolean value that indicates whether the credentials for the protection space can be sent securely.
   ///This value is `true` if the credentials for the protection space represented by the receiver can be sent securely, `false` otherwise.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- iOS ([Official API - URLProtectionSpace.receivesCredentialSecurely](https://developer.apple.com/documentation/foundation/urlprotectionspace/1415176-receivescredentialsecurely))
   ///- MacOS ([Official API - URLProtectionSpace.receivesCredentialSecurely](https://developer.apple.com/documentation/foundation/urlprotectionspace/1415176-receivescredentialsecurely))
   bool? receivesCredentialSecurely;

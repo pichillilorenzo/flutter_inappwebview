@@ -6,7 +6,7 @@ part of 'permission_request.dart';
 // ExchangeableObjectGenerator
 // **************************************************************************
 
-///Class that represents the response used by the [WebView.onPermissionRequest] event.
+///Class that represents the response used by the [PlatformWebViewCreationParams.onPermissionRequest] event.
 class PermissionRequest {
   ///The frame that initiates the request in the web view.
   FrameInfo? frame;

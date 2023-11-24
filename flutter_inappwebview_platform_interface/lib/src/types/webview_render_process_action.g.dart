@@ -6,7 +6,7 @@ part of 'webview_render_process_action.dart';
 // ExchangeableEnumGenerator
 // **************************************************************************
 
-///Class that represents the action to take used by the [WebView.onRenderProcessUnresponsive] and [WebView.onRenderProcessResponsive] event
+///Class that represents the action to take used by the [PlatformWebViewCreationParams.onRenderProcessUnresponsive] and [PlatformWebViewCreationParams.onRenderProcessResponsive] event
 ///to terminate the Android [WebViewRenderProcess](https://developer.android.com/reference/android/webkit/WebViewRenderProcess).
 class WebViewRenderProcessAction {
   final int _value;

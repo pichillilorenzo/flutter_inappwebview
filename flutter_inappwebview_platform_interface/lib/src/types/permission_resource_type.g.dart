@@ -18,7 +18,7 @@ class PermissionResourceType {
 
   ///Resource belongs to video capture device, like camera.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - PermissionRequest.RESOURCE_VIDEO_CAPTURE](https://developer.android.com/reference/android/webkit/PermissionRequest#RESOURCE_VIDEO_CAPTURE))
   ///- iOS 15.0+ ([Official API - WKMediaCaptureType.camera](https://developer.apple.com/documentation/webkit/wkmediacapturetype/camera))
   ///- MacOS 12.0+ ([Official API - WKMediaCaptureType.camera](https://developer.apple.com/documentation/webkit/wkmediacapturetype/camera))
@@ -39,7 +39,7 @@ class PermissionResourceType {
 
   ///A media device or devices that can capture audio and video.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- iOS 15.0+ ([Official API - WKMediaCaptureType.cameraAndMicrophone](https://developer.apple.com/documentation/webkit/wkmediacapturetype/cameraandmicrophone))
   ///- MacOS 12.0+ ([Official API - WKMediaCaptureType.cameraAndMicrophone](https://developer.apple.com/documentation/webkit/wkmediacapturetype/cameraandmicrophone))
   static final CAMERA_AND_MICROPHONE =
@@ -58,7 +58,7 @@ class PermissionResourceType {
 
   ///Resource belongs to the device’s orientation and motion.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- iOS 15.0+
   ///- MacOS 12.0+
   static final DEVICE_ORIENTATION_AND_MOTION =
@@ -77,7 +77,7 @@ class PermissionResourceType {
 
   ///Resource belongs to audio capture device, like microphone.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - PermissionRequest.RESOURCE_AUDIO_CAPTURE](https://developer.android.com/reference/android/webkit/PermissionRequest#RESOURCE_AUDIO_CAPTURE))
   ///- iOS 15.0+ ([Official API - WKMediaCaptureType.microphone](https://developer.apple.com/documentation/webkit/wkmediacapturetype/microphone))
   ///- MacOS 12.0+ ([Official API - WKMediaCaptureType.microphone](https://developer.apple.com/documentation/webkit/wkmediacapturetype/microphone))
@@ -100,7 +100,7 @@ class PermissionResourceType {
   ///These messages are privileged operations, e.g. modifying sound libraries and sampling data, or even updating the MIDI device's firmware.
   ///Permission may be requested for this resource in API levels 21 and above, if the Android device has been updated to WebView 45 or above.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - PermissionRequest.RESOURCE_MIDI_SYSEX](https://developer.android.com/reference/android/webkit/PermissionRequest#RESOURCE_MIDI_SYSEX))
   static final MIDI_SYSEX =
       PermissionResourceType._internalMultiPlatform('MIDI_SYSEX', () {
@@ -115,7 +115,7 @@ class PermissionResourceType {
 
   ///Resource belongs to protected media identifier. After the user grants this resource, the origin can use EME APIs to generate the license requests.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID](https://developer.android.com/reference/android/webkit/PermissionRequest#RESOURCE_PROTECTED_MEDIA_ID))
   static final PROTECTED_MEDIA_ID =
       PermissionResourceType._internalMultiPlatform('PROTECTED_MEDIA_ID', () {

@@ -8,7 +8,7 @@ part of 'platform_webview_feature.dart';
 
 ///Class that represents an Android-specific utility class for checking which WebView Support Library features are supported on the device.
 ///
-///**Supported Platforms/Implementations**:
+///**Officially Supported Platforms/Implementations**:
 ///- Android native WebView
 class WebViewFeature {
   final String _value;

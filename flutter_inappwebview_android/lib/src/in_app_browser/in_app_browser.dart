@@ -46,15 +46,9 @@ class AndroidInAppBrowserCreationParams
   final AndroidPullToRefreshController? pullToRefreshController;
 }
 
-///This class uses the native WebView of the platform.
-///The [webViewController] field can be used to access the [InAppWebViewController] API.
-///
-///**Supported Platforms/Implementations**:
-///- Android native WebView
-///- iOS
-///- MacOS
+///{@macro flutter_inappwebview_platform_interface.PlatformInAppBrowser}
 class AndroidInAppBrowser extends PlatformInAppBrowser with ChannelController {
-  ///View ID used internally.
+  @override
   final String id = IdGenerator.generate();
 
   /// Constructs a [AndroidInAppBrowser].
@@ -71,6 +65,7 @@ class AndroidInAppBrowser extends PlatformInAppBrowser with ChannelController {
   static final AndroidInAppBrowser _staticValue =
       AndroidInAppBrowser(AndroidInAppBrowserCreationParams());
 
+  /// Provide static access.
   factory AndroidInAppBrowser.static() {
     return _staticValue;
   }
@@ -83,14 +78,14 @@ class AndroidInAppBrowser extends PlatformInAppBrowser with ChannelController {
 
   ContextMenu? _contextMenu;
 
+  @override
   ContextMenu? get contextMenu => _contextMenu;
 
   Map<int, InAppBrowserMenuItem> _menuItems = HashMap();
   bool _isOpened = false;
   AndroidInAppWebViewController? _webViewController;
 
-  ///WebView Controller that can be used to access the [AndroidInAppWebViewController] API.
-  ///When [onExit] is fired, this will be `null` and cannot be used anymore.
+  @override
   AndroidInAppWebViewController? get webViewController {
     return _isOpened ? _webViewController : null;
   }
@@ -177,18 +172,7 @@ class AndroidInAppBrowser extends PlatformInAppBrowser with ChannelController {
     return args;
   }
 
-  ///Opens the [PlatformInAppBrowser] instance with an [urlRequest].
-  ///
-  ///[urlRequest]: The [urlRequest] to load.
-  ///
-  ///[options]: Options for the [PlatformInAppBrowser].
-  ///
-  ///[settings]: Settings for the [PlatformInAppBrowser].
-  ///
-  ///**Supported Platforms/Implementations**:
-  ///- Android native WebView
-  ///- iOS
-  ///- MacOS
+  @override
   Future<void> openUrlRequest(
       {required URLRequest urlRequest,
       // ignore: deprecated_member_use_from_same_package
@@ -202,48 +186,7 @@ class AndroidInAppBrowser extends PlatformInAppBrowser with ChannelController {
     await _staticChannel.invokeMethod('open', args);
   }
 
-  ///Opens the [PlatformInAppBrowser] instance with the given [assetFilePath] file.
-  ///
-  ///[options]: Options for the [PlatformInAppBrowser].
-  ///
-  ///To be able to load your local files (assets, js, css, etc.), you need to add them in the `assets` section of the `pubspec.yaml` file, otherwise they cannot be found!
-  ///
-  ///Example of a `pubspec.yaml` file:
-  ///```yaml
-  ///...
-  ///
-  ///# The following section is specific to Flutter.
-  ///flutter:
-  ///
-  ///  # The following line ensures that the Material Icons font is
-  ///  # included with your application, so that you can use the icons in
-  ///  # the material Icons class.
-  ///  uses-material-design: true
-  ///
-  ///  assets:
-  ///    - assets/index.html
-  ///    - assets/css/
-  ///    - assets/images/
-  ///
-  ///...
-  ///```
-  ///Example of a `main.dart` file:
-  ///```dart
-  ///...
-  ///inAppBrowser.openFile(assetFilePath: "assets/index.html");
-  ///...
-  ///```
-  ///
-  ///[headers]: The additional headers to be used in the HTTP request for this URL, specified as a map from name to value.
-  ///
-  ///[options]: Options for the [PlatformInAppBrowser].
-  ///
-  ///[settings]: Settings for the [PlatformInAppBrowser].
-  ///
-  ///**Supported Platforms/Implementations**:
-  ///- Android native WebView
-  ///- iOS
-  ///- MacOS
+  @override
   Future<void> openFile(
       {required String assetFilePath,
       // ignore: deprecated_member_use_from_same_package
@@ -257,22 +200,7 @@ class AndroidInAppBrowser extends PlatformInAppBrowser with ChannelController {
     await _staticChannel.invokeMethod('open', args);
   }
 
-  ///Opens the [PlatformInAppBrowser] instance with [data] as a content, using [baseUrl] as the base URL for it.
-  ///
-  ///The [mimeType] parameter specifies the format of the data. The default value is `"text/html"`.
-  ///
-  ///The [encoding] parameter specifies the encoding of the data. The default value is `"utf8"`.
-  ///
-  ///The [androidHistoryUrl] parameter is the URL to use as the history entry. The default value is `about:blank`. If non-null, this must be a valid URL. This parameter is used only on Android.
-  ///
-  ///The [options] parameter specifies the options for the [PlatformInAppBrowser].
-  ///
-  ///[settings]: Settings for the [PlatformInAppBrowser].
-  ///
-  ///**Supported Platforms/Implementations**:
-  ///- Android native WebView
-  ///- iOS
-  ///- MacOS
+  @override
   Future<void> openData(
       {required String data,
       String mimeType = "text/html",
@@ -294,12 +222,7 @@ class AndroidInAppBrowser extends PlatformInAppBrowser with ChannelController {
     await _staticChannel.invokeMethod('open', args);
   }
 
-  ///This is a static method that opens an [url] in the system browser. You wont be able to use the [PlatformInAppBrowser] methods here!
-  ///
-  ///**Supported Platforms/Implementations**:
-  ///- Android native WebView
-  ///- iOS
-  ///- MacOS
+  @override
   Future<void> openWithSystemBrowser({required WebUri url}) async {
     assert(url.toString().isNotEmpty);
 
@@ -308,81 +231,41 @@ class AndroidInAppBrowser extends PlatformInAppBrowser with ChannelController {
     return await _staticChannel.invokeMethod('openWithSystemBrowser', args);
   }
 
-  ///Adds a [InAppBrowserMenuItem] to the menu.
-  ///If the browser is already open,
-  ///it will take effect the next time it is opened.
-  ///
-  ///**Supported Platforms/Implementations**:
-  ///- Android
-  ///- iOS 14.0+
+  @override
   void addMenuItem(InAppBrowserMenuItem menuItem) {
     _menuItems[menuItem.id] = menuItem;
   }
 
-  ///Adds a list of [InAppBrowserMenuItem] to the menu.
-  ///If the browser is already open,
-  ///it will take effect the next time it is opened.
-  ///
-  ///**Supported Platforms/Implementations**:
-  ///- Android
-  ///- iOS 14.0+
+  @override
   void addMenuItems(List<InAppBrowserMenuItem> menuItems) {
     menuItems.forEach((menuItem) {
       _menuItems[menuItem.id] = menuItem;
     });
   }
 
-  ///Removes the [menuItem] from the list.
-  ///Returns `true` if it was in the list, `false` otherwise.
-  ///If the browser is already open,
-  ///it will take effect the next time it is opened.
-  ///
-  ///**Supported Platforms/Implementations**:
-  ///- Android
-  ///- iOS 14.0+
+  @override
   bool removeMenuItem(InAppBrowserMenuItem menuItem) {
     return _menuItems.remove(menuItem.id) != null;
   }
 
-  ///Removes a list of [menuItems] from the list.
-  ///If the browser is already open,
-  ///it will take effect the next time it is opened.
-  ///
-  ///**Supported Platforms/Implementations**:
-  ///- Android
-  ///- iOS 14.0+
+  @override
   void removeMenuItems(List<InAppBrowserMenuItem> menuItems) {
     for (final menuItem in menuItems) {
       removeMenuItem(menuItem);
     }
   }
 
-  ///Removes all the menu items from the list.
-  ///If the browser is already open,
-  ///it will take effect the next time it is opened.
-  ///
-  ///**Supported Platforms/Implementations**:
-  ///- Android
-  ///- iOS 14.0+
+  @override
   void removeAllMenuItem() {
     _menuItems.clear();
   }
 
-  ///Returns `true` if the [menuItem] has been already added, otherwise `false`.
-  ///
-  ///**Supported Platforms/Implementations**:
-  ///- Android native WebView
-  ///- iOS 14.0+
+  @override
   bool hasMenuItem(InAppBrowserMenuItem menuItem) {
     return _menuItems.containsKey(menuItem.id);
   }
 
-  ///Displays an [PlatformInAppBrowser] window that was opened hidden. Calling this has no effect if the [PlatformInAppBrowser] was already visible.
-  ///
-  ///**Supported Platforms/Implementations**:
-  ///- Android native WebView
-  ///- iOS
-  ///- MacOS
+  @override
   Future<void> show() async {
     assert(_isOpened, 'The browser is not opened.');
 
@@ -390,12 +273,7 @@ class AndroidInAppBrowser extends PlatformInAppBrowser with ChannelController {
     await channel?.invokeMethod('show', args);
   }
 
-  ///Hides the [PlatformInAppBrowser] window. Calling this has no effect if the [PlatformInAppBrowser] was already hidden.
-  ///
-  ///**Supported Platforms/Implementations**:
-  ///- Android native WebView
-  ///- iOS
-  ///- MacOS
+  @override
   Future<void> hide() async {
     assert(_isOpened, 'The browser is not opened.');
 
@@ -403,12 +281,7 @@ class AndroidInAppBrowser extends PlatformInAppBrowser with ChannelController {
     await channel?.invokeMethod('hide', args);
   }
 
-  ///Closes the [PlatformInAppBrowser] window.
-  ///
-  ///**Supported Platforms/Implementations**:
-  ///- Android native WebView
-  ///- iOS
-  ///- MacOS
+  @override
   Future<void> close() async {
     assert(_isOpened, 'The browser is not opened.');
 
@@ -416,12 +289,7 @@ class AndroidInAppBrowser extends PlatformInAppBrowser with ChannelController {
     await channel?.invokeMethod('close', args);
   }
 
-  ///Check if the Web View of the [PlatformInAppBrowser] instance is hidden.
-  ///
-  ///**Supported Platforms/Implementations**:
-  ///- Android native WebView
-  ///- iOS
-  ///- MacOS
+  @override
   Future<bool> isHidden() async {
     assert(_isOpened, 'The browser is not opened.');
 
@@ -429,7 +297,7 @@ class AndroidInAppBrowser extends PlatformInAppBrowser with ChannelController {
     return await channel?.invokeMethod<bool>('isHidden', args) ?? false;
   }
 
-  ///Use [setSettings] instead.
+  @override
   @Deprecated('Use setSettings instead')
   Future<void> setOptions({required InAppBrowserClassOptions options}) async {
     assert(_isOpened, 'The browser is not opened.');
@@ -439,7 +307,7 @@ class AndroidInAppBrowser extends PlatformInAppBrowser with ChannelController {
     await channel?.invokeMethod('setSettings', args);
   }
 
-  ///Use [getSettings] instead.
+  @override
   @Deprecated('Use getSettings instead')
   Future<InAppBrowserClassOptions?> getOptions() async {
     assert(_isOpened, 'The browser is not opened.');
@@ -455,12 +323,7 @@ class AndroidInAppBrowser extends PlatformInAppBrowser with ChannelController {
     return null;
   }
 
-  ///Sets the [PlatformInAppBrowser] settings with the new [settings] and evaluates them.
-  ///
-  ///**Supported Platforms/Implementations**:
-  ///- Android native WebView
-  ///- iOS
-  ///- MacOS
+  @override
   Future<void> setSettings(
       {required InAppBrowserClassSettings settings}) async {
     assert(_isOpened, 'The browser is not opened.');
@@ -470,12 +333,7 @@ class AndroidInAppBrowser extends PlatformInAppBrowser with ChannelController {
     await channel?.invokeMethod('setSettings', args);
   }
 
-  ///Gets the current [PlatformInAppBrowser] settings. Returns `null` if it wasn't able to get them.
-  ///
-  ///**Supported Platforms/Implementations**:
-  ///- Android native WebView
-  ///- iOS
-  ///- MacOS
+  @override
   Future<InAppBrowserClassSettings?> getSettings() async {
     assert(_isOpened, 'The browser is not opened.');
 
@@ -492,17 +350,11 @@ class AndroidInAppBrowser extends PlatformInAppBrowser with ChannelController {
     return null;
   }
 
-  ///Returns `true` if the [PlatformInAppBrowser] instance is opened, otherwise `false`.
-  ///
-  ///**Supported Platforms/Implementations**:
-  ///- Android native WebView
-  ///- iOS
-  ///- MacOS
+  @override
   bool isOpened() {
     return this._isOpened;
   }
 
-  ///Disposes the channel and controllers.
   @override
   @mustCallSuper
   void dispose() {

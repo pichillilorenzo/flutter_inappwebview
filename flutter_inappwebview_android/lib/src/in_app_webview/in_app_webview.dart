@@ -475,7 +475,7 @@ class AndroidInAppWebViewWidget extends PlatformInAppWebViewWidget {
 
   @override
   T controllerFromPlatform<T>(PlatformInAppWebViewController controller) {
-    // TODO: implement controllerFromPlatform
+    // unused
     throw UnimplementedError();
   }
 }

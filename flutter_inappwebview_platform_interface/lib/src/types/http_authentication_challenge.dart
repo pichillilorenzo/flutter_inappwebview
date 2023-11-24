@@ -4,10 +4,11 @@ import 'url_credential.dart';
 import 'url_response.dart';
 import 'url_authentication_challenge.dart';
 import 'url_protection_space.dart';
+import '../in_app_webview/platform_webview.dart';
 
 part 'http_authentication_challenge.g.dart';
 
-///Class that represents the challenge of the [WebView.onReceivedHttpAuthRequest] event.
+///Class that represents the challenge of the [PlatformWebViewCreationParams.onReceivedHttpAuthRequest] event.
 ///It provides all the information about the challenge.
 @ExchangeableObject()
 class HttpAuthenticationChallenge_ extends URLAuthenticationChallenge_ {

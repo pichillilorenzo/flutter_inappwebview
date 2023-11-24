@@ -8,7 +8,7 @@ part of 'platform_tracing_controller.dart';
 
 ///Class that represents the settings used to configure the [PlatformTracingController].
 ///
-///**Supported Platforms/Implementations**:
+///**Officially Supported Platforms/Implementations**:
 ///- Android native WebView ([Official API - TracingConfig](https://developer.android.com/reference/androidx/webkit/TracingConfig))
 class TracingSettings {
   ///Adds predefined [TracingCategory] and/or custom [String] sets of categories to be included in the trace output.

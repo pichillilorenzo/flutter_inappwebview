@@ -32,6 +32,7 @@ import '../platform_webview_feature.dart';
 import '../in_app_webview/platform_inappwebview_controller.dart';
 import '../context_menu/context_menu.dart';
 import '../in_app_browser/platform_in_app_browser.dart';
+import 'platform_webview.dart';
 
 part 'in_app_webview_settings.g.dart';
 
@@ -51,27 +52,27 @@ List<ContentBlocker> _deserializeContentBlockers(
 ///This class represents all the WebView settings available.
 @ExchangeableObject(copyMethod: true)
 class InAppWebViewSettings_ {
-  ///Set to `true` to be able to listen at the [WebView.shouldOverrideUrlLoading] event.
+  ///Set to `true` to be able to listen at the [PlatformWebViewCreationParams.shouldOverrideUrlLoading] event.
   ///
-  ///If the [WebView.shouldOverrideUrlLoading] event is implemented and this value is `null`,
+  ///If the [PlatformWebViewCreationParams.shouldOverrideUrlLoading] event is implemented and this value is `null`,
   ///it will be automatically inferred as `true`, otherwise, the default value is `false`.
   ///This logic will not be applied for [PlatformInAppBrowser], where you must set the value manually.
   @SupportedPlatforms(
       platforms: [AndroidPlatform(), IOSPlatform(), MacOSPlatform()])
   bool? useShouldOverrideUrlLoading;
 
-  ///Set to `true` to be able to listen at the [WebView.onLoadResource] event.
+  ///Set to `true` to be able to listen at the [PlatformWebViewCreationParams.onLoadResource] event.
   ///
-  ///If the [WebView.onLoadResource] event is implemented and this value is `null`,
+  ///If the [PlatformWebViewCreationParams.onLoadResource] event is implemented and this value is `null`,
   ///it will be automatically inferred as `true`, otherwise, the default value is `false`.
   ///This logic will not be applied for [PlatformInAppBrowser], where you must set the value manually.
   @SupportedPlatforms(
       platforms: [AndroidPlatform(), IOSPlatform(), MacOSPlatform()])
   bool? useOnLoadResource;
 
-  ///Set to `true` to be able to listen at the [WebView.onDownloadStartRequest] event.
+  ///Set to `true` to be able to listen at the [PlatformWebViewCreationParams.onDownloadStartRequest] event.
   ///
-  ///If the [WebView.onDownloadStartRequest] event is implemented and this value is `null`,
+  ///If the [PlatformWebViewCreationParams.onDownloadStartRequest] event is implemented and this value is `null`,
   ///it will be automatically inferred as `true`, otherwise, the default value is `false`.
   ///This logic will not be applied for [PlatformInAppBrowser], where you must set the value manually.
   @SupportedPlatforms(
@@ -219,7 +220,7 @@ class InAppWebViewSettings_ {
   ])
   bool? horizontalScrollBarEnabled;
 
-  ///List of custom schemes that the WebView must handle. Use the [WebView.onLoadResourceWithCustomScheme] event to intercept resource requests with custom scheme.
+  ///List of custom schemes that the WebView must handle. Use the [PlatformWebViewCreationParams.onLoadResourceWithCustomScheme] event to intercept resource requests with custom scheme.
   @SupportedPlatforms(platforms: [
     AndroidPlatform(),
     IOSPlatform(available: "11.0"),
@@ -252,18 +253,18 @@ class InAppWebViewSettings_ {
   ])
   UserPreferredContentMode_? preferredContentMode;
 
-  ///Set to `true` to be able to listen at the [WebView.shouldInterceptAjaxRequest] event.
+  ///Set to `true` to be able to listen at the [PlatformWebViewCreationParams.shouldInterceptAjaxRequest] event.
   ///
-  ///If the [WebView.shouldInterceptAjaxRequest] event is implemented and this value is `null`,
+  ///If the [PlatformWebViewCreationParams.shouldInterceptAjaxRequest] event is implemented and this value is `null`,
   ///it will be automatically inferred as `true`, otherwise, the default value is `false`.
   ///This logic will not be applied for [PlatformInAppBrowser], where you must set the value manually.
   @SupportedPlatforms(
       platforms: [AndroidPlatform(), IOSPlatform(), MacOSPlatform()])
   bool? useShouldInterceptAjaxRequest;
 
-  ///Set to `true` to be able to listen at the [WebView.shouldInterceptFetchRequest] event.
+  ///Set to `true` to be able to listen at the [PlatformWebViewCreationParams.shouldInterceptFetchRequest] event.
   ///
-  ///If the [WebView.shouldInterceptFetchRequest] event is implemented and this value is `null`,
+  ///If the [PlatformWebViewCreationParams.shouldInterceptFetchRequest] event is implemented and this value is `null`,
   ///it will be automatically inferred as `true`, otherwise, the default value is `false`.
   ///This logic will not be applied for [PlatformInAppBrowser], where you must set the value manually.
   @SupportedPlatforms(
@@ -605,7 +606,7 @@ because there isn't any way to make the website data store non-persistent for th
         note:
             """Please note that in order for the Geolocation API to be usable by a page in the WebView, the following requirements must be met:
 - an application must have permission to access the device location, see [Manifest.permission.ACCESS_COARSE_LOCATION](https://developer.android.com/reference/android/Manifest.permission#ACCESS_COARSE_LOCATION), [Manifest.permission.ACCESS_FINE_LOCATION](https://developer.android.com/reference/android/Manifest.permission#ACCESS_FINE_LOCATION);
-- an application must provide an implementation of the [WebView.onGeolocationPermissionsShowPrompt] callback to receive notifications that a page is requesting access to location via the JavaScript Geolocation API.""")
+- an application must provide an implementation of the [PlatformWebViewCreationParams.onGeolocationPermissionsShowPrompt] callback to receive notifications that a page is requesting access to location via the JavaScript Geolocation API.""")
   ])
   bool? geolocationEnabled;
 
@@ -745,7 +746,7 @@ because there isn't any way to make the website data store non-persistent for th
   bool? hardwareAcceleration;
 
   ///Sets whether the WebView supports multiple windows.
-  ///If set to `true`, [WebView.onCreateWindow] event must be implemented by the host application. The default value is `false`.
+  ///If set to `true`, [PlatformWebViewCreationParams.onCreateWindow] event must be implemented by the host application. The default value is `false`.
   @SupportedPlatforms(platforms: [
     AndroidPlatform(
         apiName: "WebSettings.setSupportMultipleWindows",
@@ -754,7 +755,7 @@ because there isn't any way to make the website data store non-persistent for th
   ])
   bool? supportMultipleWindows;
 
-  ///Regular expression used by [WebView.shouldOverrideUrlLoading] event to cancel navigation requests for frames that are not the main frame.
+  ///Regular expression used by [PlatformWebViewCreationParams.shouldOverrideUrlLoading] event to cancel navigation requests for frames that are not the main frame.
   ///If the url request of a subframe matches the regular expression, then the request of that subframe is canceled.
   @SupportedPlatforms(platforms: [AndroidPlatform()])
   String? regexToCancelSubFramesLoading;
@@ -769,17 +770,17 @@ as it can cause framerate drops on animations in Android 9 and lower (see [Hybri
   ])
   bool? useHybridComposition;
 
-  ///Set to `true` to be able to listen at the [WebView.shouldInterceptRequest] event.
+  ///Set to `true` to be able to listen at the [PlatformWebViewCreationParams.shouldInterceptRequest] event.
   ///
-  ///If the [WebView.shouldInterceptRequest] event is implemented and this value is `null`,
+  ///If the [PlatformWebViewCreationParams.shouldInterceptRequest] event is implemented and this value is `null`,
   ///it will be automatically inferred as `true`, otherwise, the default value is `false`.
   ///This logic will not be applied for [PlatformInAppBrowser], where you must set the value manually.
   @SupportedPlatforms(platforms: [AndroidPlatform()])
   bool? useShouldInterceptRequest;
 
-  ///Set to `true` to be able to listen at the [WebView.onRenderProcessGone] event.
+  ///Set to `true` to be able to listen at the [PlatformWebViewCreationParams.onRenderProcessGone] event.
   ///
-  ///If the [WebView.onRenderProcessGone] event is implemented and this value is `null`,
+  ///If the [PlatformWebViewCreationParams.onRenderProcessGone] event is implemented and this value is `null`,
   ///it will be automatically inferred as `true`, otherwise, the default value is `false`.
   ///This logic will not be applied for [PlatformInAppBrowser], where you must set the value manually.
   @SupportedPlatforms(platforms: [AndroidPlatform()])
@@ -1288,9 +1289,9 @@ as it can cause framerate drops on animations in Android 9 and lower (see [Hybri
   ])
   bool? limitsNavigationsToAppBoundDomains;
 
-  ///Set to `true` to be able to listen to the [WebView.onNavigationResponse] event.
+  ///Set to `true` to be able to listen to the [PlatformWebViewCreationParams.onNavigationResponse] event.
   ///
-  ///If the [WebView.onNavigationResponse] event is implemented and this value is `null`,
+  ///If the [PlatformWebViewCreationParams.onNavigationResponse] event is implemented and this value is `null`,
   ///it will be automatically inferred as `true`, otherwise, the default value is `false`.
   ///This logic will not be applied for [PlatformInAppBrowser], where you must set the value manually.
   @SupportedPlatforms(platforms: [IOSPlatform(), MacOSPlatform()])
@@ -1338,7 +1339,7 @@ as it can cause framerate drops on animations in Android 9 and lower (see [Hybri
   ///- [PlatformInAppWebViewController.canScrollHorizontally]
   ///
   ///Settings affected:
-  ///- [WebView.initialUserScripts]
+  ///- [PlatformWebViewCreationParams.initialUserScripts]
   ///- [InAppWebViewSettings.supportZoom]
   ///- [InAppWebViewSettings.useOnLoadResource]
   ///- [InAppWebViewSettings.useShouldInterceptAjaxRequest]
@@ -1346,32 +1347,32 @@ as it can cause framerate drops on animations in Android 9 and lower (see [Hybri
   ///- [InAppWebViewSettings.enableViewportScale]
   ///
   ///Events affected:
-  ///- the `hitTestResult` argument of [WebView.onLongPressHitTestResult] will be empty
+  ///- the `hitTestResult` argument of [PlatformWebViewCreationParams.onLongPressHitTestResult] will be empty
   ///- the `hitTestResult` argument of [ContextMenu.onCreateContextMenu] will be empty
-  ///- [WebView.onLoadResource]
-  ///- [WebView.shouldInterceptAjaxRequest]
-  ///- [WebView.onAjaxReadyStateChange]
-  ///- [WebView.onAjaxProgress]
-  ///- [WebView.shouldInterceptFetchRequest]
-  ///- [WebView.onConsoleMessage]
-  ///- [WebView.onPrintRequest]
-  ///- [WebView.onWindowFocus]
-  ///- [WebView.onWindowBlur]
-  ///- [WebView.onFindResultReceived]
+  ///- [PlatformWebViewCreationParams.onLoadResource]
+  ///- [PlatformWebViewCreationParams.shouldInterceptAjaxRequest]
+  ///- [PlatformWebViewCreationParams.onAjaxReadyStateChange]
+  ///- [PlatformWebViewCreationParams.onAjaxProgress]
+  ///- [PlatformWebViewCreationParams.shouldInterceptFetchRequest]
+  ///- [PlatformWebViewCreationParams.onConsoleMessage]
+  ///- [PlatformWebViewCreationParams.onPrintRequest]
+  ///- [PlatformWebViewCreationParams.onWindowFocus]
+  ///- [PlatformWebViewCreationParams.onWindowBlur]
+  ///- [PlatformWebViewCreationParams.onFindResultReceived]
   ///- [FindInteractionController.onFindResultReceived]
   ///
   ///Also, on MacOS:
-  ///- [WebView.onScrollChanged]
+  ///- [PlatformWebViewCreationParams.onScrollChanged]
   @SupportedPlatforms(platforms: [
     IOSPlatform(available: "13.0"),
     MacOSPlatform(available: "10.15")
   ])
   bool? applePayAPIEnabled;
 
-  ///Used in combination with [WebView.initialUrlRequest] or [WebView.initialData] (using the `file://` scheme), it represents the URL from which to read the web content.
+  ///Used in combination with [PlatformWebViewCreationParams.initialUrlRequest] or [PlatformWebViewCreationParams.initialData] (using the `file://` scheme), it represents the URL from which to read the web content.
   ///This URL must be a file-based URL (using the `file://` scheme).
-  ///Specify the same value as the [URLRequest.url] if you are using it with the [WebView.initialUrlRequest] parameter or
-  ///the [InAppWebViewInitialData.baseUrl] if you are using it with the [WebView.initialData] parameter to prevent WebView from reading any other content.
+  ///Specify the same value as the [URLRequest.url] if you are using it with the [PlatformWebViewCreationParams.initialUrlRequest] parameter or
+  ///the [InAppWebViewInitialData.baseUrl] if you are using it with the [PlatformWebViewCreationParams.initialData] parameter to prevent WebView from reading any other content.
   ///Specify a directory to give WebView permission to read additional files in the specified directory.
   @SupportedPlatforms(platforms: [IOSPlatform(), MacOSPlatform()])
   WebUri? allowingReadAccessTo;
@@ -1854,13 +1855,13 @@ class WebViewOptions {
 @Deprecated('Use InAppWebViewSettings instead')
 class InAppWebViewOptions
     implements WebViewOptions, BrowserOptions, AndroidOptions, IosOptions {
-  ///Set to `true` to be able to listen at the [WebView.shouldOverrideUrlLoading] event. The default value is `false`.
+  ///Set to `true` to be able to listen at the [PlatformWebViewCreationParams.shouldOverrideUrlLoading] event. The default value is `false`.
   bool useShouldOverrideUrlLoading;
 
-  ///Set to `true` to be able to listen at the [WebView.onLoadResource] event. The default value is `false`.
+  ///Set to `true` to be able to listen at the [PlatformWebViewCreationParams.onLoadResource] event. The default value is `false`.
   bool useOnLoadResource;
 
-  ///Set to `true` to be able to listen at the [WebView.onDownloadStart] event. The default value is `false`.
+  ///Set to `true` to be able to listen at the [PlatformWebViewCreationParams.onDownloadStart] event. The default value is `false`.
   bool useOnDownloadStart;
 
   ///Set to `true` to have all the browser's cache cleared before the new WebView is opened. The default value is `false`.
@@ -1896,7 +1897,7 @@ class InAppWebViewOptions
   ///Define whether the horizontal scrollbar should be drawn or not. The default value is `true`.
   bool horizontalScrollBarEnabled;
 
-  ///List of custom schemes that the WebView must handle. Use the [WebView.onLoadResourceCustomScheme] event to intercept resource requests with custom scheme.
+  ///List of custom schemes that the WebView must handle. Use the [PlatformWebViewCreationParams.onLoadResourceCustomScheme] event to intercept resource requests with custom scheme.
   ///
   ///**NOTE**: available on iOS 11.0+.
   List<String> resourceCustomSchemes;
@@ -1911,10 +1912,10 @@ class InAppWebViewOptions
   ///**NOTE**: available on iOS 13.0+.
   UserPreferredContentMode? preferredContentMode;
 
-  ///Set to `true` to be able to listen at the [WebView.shouldInterceptAjaxRequest] event. The default value is `false`.
+  ///Set to `true` to be able to listen at the [PlatformWebViewCreationParams.shouldInterceptAjaxRequest] event. The default value is `false`.
   bool useShouldInterceptAjaxRequest;
 
-  ///Set to `true` to be able to listen at the [WebView.shouldInterceptFetchRequest] event. The default value is `false`.
+  ///Set to `true` to be able to listen at the [PlatformWebViewCreationParams.shouldInterceptFetchRequest] event. The default value is `false`.
   bool useShouldInterceptFetchRequest;
 
   ///Set to `true` to open a browser window with incognito mode. The default value is `false`.

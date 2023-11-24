@@ -6,7 +6,7 @@ part of 'navigation_response_action.dart';
 // ExchangeableEnumGenerator
 // **************************************************************************
 
-///Class that is used by [WebView.onNavigationResponse] event.
+///Class that is used by [PlatformWebViewCreationParams.onNavigationResponse] event.
 ///It represents the policy to pass back to the decision handler.
 class NavigationResponseAction {
   final int _value;
@@ -87,7 +87,7 @@ class NavigationResponseAction {
   }
 }
 
-///Class that is used by [WebView.onNavigationResponse] event.
+///Class that is used by [PlatformWebViewCreationParams.onNavigationResponse] event.
 ///It represents the policy to pass back to the decision handler.
 ///Use [NavigationResponseAction] instead.
 @Deprecated('Use NavigationResponseAction instead')

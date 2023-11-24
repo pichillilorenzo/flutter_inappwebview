@@ -10,20 +10,20 @@ part of 'print_job_settings.dart';
 class PrintJobSettings {
   ///`true` to animate the display of the sheet, `false` to display the sheet immediately.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- iOS
   bool? animated;
 
   ///Whether the print operation should spawn a separate thread in which to run itself.
   ///The default value is `true`.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- MacOS
   bool? canSpawnSeparateThread;
 
   ///The color mode.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- MacOS
   PrintJobColorMode? colorMode;
@@ -31,14 +31,14 @@ class PrintJobSettings {
   ///How many copies to print.
   ///The default value is `1`.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- MacOS
   int? copies;
 
   ///If `true`, produce detailed reports when an error occurs.
   ///The default value is `false`.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- MacOS
   bool? detailedErrorReporting;
 
@@ -46,20 +46,20 @@ class PrintJobSettings {
   ///
   ///**NOTE for Android native WebView**: available only on Android 23+.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
   PrintJobDuplexMode? duplexMode;
 
   ///A fax number.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- MacOS
   String? faxNumber;
 
   ///An integer value that specifies the first page in the print job.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- MacOS
   int? firstPage;
 
@@ -68,7 +68,7 @@ class PrintJobSettings {
   ///The footer is measured in points from the bottom of [printableRect] and is below the content area.
   ///The default footer height is `0.0`.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- iOS
   double? footerHeight;
 
@@ -76,7 +76,7 @@ class PrintJobSettings {
   ///
   ///**NOTE for iOS**: available only on iOS 14.5+.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- iOS
   PrintJobRenderingQuality? forceRenderingQuality;
 
@@ -84,7 +84,7 @@ class PrintJobSettings {
   ///Otherwise, it will be handled and disposed automatically by the system.
   ///The default value is `false`.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
   ///- MacOS
@@ -93,7 +93,7 @@ class PrintJobSettings {
   ///If `true`, a standard header and footer are added outside the margins of each page.
   ///The default value is `true`.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- MacOS
   bool? headerAndFooter;
 
@@ -102,33 +102,33 @@ class PrintJobSettings {
   ///The header is measured in points from the top of [printableRect] and is above the content area.
   ///The default header height is `0.0`.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- iOS
   double? headerHeight;
 
   ///The horizontal pagination mode.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- MacOS
   PrintJobPaginationMode? horizontalPagination;
 
   ///Indicates whether the image is centered horizontally.
   ///The default value is `true`.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- MacOS
   bool? isHorizontallyCentered;
 
   ///Indicates whether the image is centered vertically.
   ///The default value is `true`.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- MacOS
   bool? isVerticallyCentered;
 
   ///The action specified for the job.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- MacOS
   PrintJobDisposition? jobDisposition;
 
@@ -136,7 +136,7 @@ class PrintJobSettings {
   ///An application should set this property to a name appropriate to the content being printed.
   ///The default job name is the current webpage title concatenated with the "Document" word at the end.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
   ///- MacOS
@@ -144,13 +144,13 @@ class PrintJobSettings {
 
   ///An URL containing the location to which the job file will be saved when the [jobDisposition] is [PrintJobDisposition.SAVE].
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- MacOS
   WebUri? jobSavingURL;
 
   ///An integer value that specifies the last page in the print job.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- MacOS
   int? lastPage;
 
@@ -158,7 +158,7 @@ class PrintJobSettings {
   ///Margins define the white space around the content where the left margin defines
   ///the amount of white space on the left of the content and so on.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- iOS
   ///- MacOS
   EdgeInsets? margins;
@@ -170,7 +170,7 @@ class PrintJobSettings {
   ///the top inset value; it uses the lower of the two values.
   ///The default value of this property is the maximum float value.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- iOS
   double? maximumContentHeight;
 
@@ -180,32 +180,32 @@ class PrintJobSettings {
   ///It compares the value of this property with the printing rectangle’s width minus the left and right inset values and uses the lower of the two.
   ///The default value of this property is the maximum float value.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- iOS
   double? maximumContentWidth;
 
   ///The media size.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView
   PrintJobMediaSize? mediaSize;
 
   ///If `true`, collates output.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- MacOS
   bool? mustCollate;
 
   ///The number of pages to render.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- iOS
   ///- MacOS
   int? numberOfPages;
 
   ///The orientation of the printed content, portrait or landscape.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
   ///- MacOS
@@ -213,50 +213,50 @@ class PrintJobSettings {
 
   ///The kind of printable content.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- iOS
   PrintJobOutputType? outputType;
 
   ///The print order for the pages of the operation.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- MacOS
   PrintJobPageOrder? pageOrder;
 
   ///The number of logical pages to be tiled horizontally on a physical sheet of paper.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- MacOS
   int? pagesAcross;
 
   ///The number of logical pages to be tiled vertically on a physical sheet of paper.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- MacOS
   int? pagesDown;
 
   ///The name of the currently selected paper size.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- MacOS
   String? paperName;
 
   ///The supported resolution in DPI (dots per inch).
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView
   PrintJobResolution? resolution;
 
   ///The current scaling factor. From `0.0` to `1.0`.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- MacOS
   double? scalingFactor;
 
   ///A Boolean value that determines whether the printing options include the number of copies.
   ///The default value is `true`.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- iOS
   ///- MacOS
   bool? showsNumberOfCopies;
@@ -264,14 +264,14 @@ class PrintJobSettings {
   ///A Boolean value that determines whether the Print panel includes a set of fields for manipulating the range of pages being printed.
   ///The default value is `true`.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- MacOS
   bool? showsPageRange;
 
   ///A Boolean value that determines whether the Print panel includes a separate accessory view for manipulating the paper size, orientation, and scaling attributes.
   ///The default value is `true`.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- MacOS
   bool? showsPageSetupAccessory;
 
@@ -280,7 +280,7 @@ class PrintJobSettings {
   ///
   ///**NOTE for iOS**: available only on iOS 15.0+.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- iOS
   ///- MacOS
   bool? showsPaperOrientation;
@@ -290,21 +290,21 @@ class PrintJobSettings {
   ///Setting the value to `true` enables a paper selection menu on printers that support different types of paper and have more than one paper type loaded.
   ///On printers where only one paper type is available, no paper selection menu is displayed, regardless of the value of this property.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- iOS
   bool? showsPaperSelectionForLoadedPapers;
 
   ///A Boolean value that determines whether the print panel includes a control for manipulating the paper size of the printer.
   ///The default value is `true`.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- MacOS
   bool? showsPaperSize;
 
   ///A Boolean value that determines whether the Print panel displays a built-in preview of the document contents.
   ///The default value is `true`.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- MacOS
   bool? showsPreview;
 
@@ -315,14 +315,14 @@ class PrintJobSettings {
   ///that operation is controlled by the [showsProgressPanel] property.
   ///Operations that generate EPS or PDF data do no display a progress panel, regardless of the value in the flag parameter.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- MacOS
   bool? showsPrintPanel;
 
   ///A Boolean value that determines whether the Print panel includes an additional selection option for paper range.
   ///The default value is `true`.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- MacOS
   bool? showsPrintSelection;
 
@@ -333,26 +333,26 @@ class PrintJobSettings {
   ///that operation is controlled by the [showsPrintPanel] property.
   ///Operations that generate EPS or PDF data do no display a progress panel, regardless of the value in the flag parameter.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- MacOS
   bool? showsProgressPanel;
 
   ///A Boolean value that determines whether the Print panel includes a control for scaling the printed output.
   ///The default value is `true`.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- MacOS
   bool? showsScaling;
 
   ///A timestamp that specifies the time at which printing should begin.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- MacOS
   int? time;
 
   ///The vertical pagination to the specified mode.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- MacOS
   PrintJobPaginationMode? verticalPagination;
   PrintJobSettings(

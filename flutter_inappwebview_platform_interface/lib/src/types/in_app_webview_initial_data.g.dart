@@ -23,7 +23,7 @@ class InAppWebViewInitialData {
 
   ///The URL to use as the history entry. If `null` defaults to `about:blank`. If non-null, this must be a valid URL.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView
   WebUri? historyUrl;
 

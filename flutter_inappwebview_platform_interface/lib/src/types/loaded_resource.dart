@@ -1,11 +1,11 @@
 import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_internal_annotations.dart';
-
+import '../in_app_webview/platform_webview.dart';
 import '../web_uri.dart';
 
 part 'loaded_resource.g.dart';
 
 ///Class representing a resource response of the `WebView`.
-///It is used by the method [WebView.onLoadResource].
+///It is used by the method [PlatformWebViewCreationParams.onLoadResource].
 @ExchangeableObject()
 class LoadedResource_ {
   ///A string representing the type of resource.

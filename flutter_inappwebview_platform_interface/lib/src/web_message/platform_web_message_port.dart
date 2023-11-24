@@ -23,6 +23,7 @@ class PlatformWebMessagePortCreationParams {
   }
 }
 
+///{@template flutter_inappwebview_platform_interface.PlatformWebMessagePort}
 ///The representation of the [HTML5 message ports](https://html.spec.whatwg.org/multipage/comms.html#messageport).
 ///
 ///A Message port represents one endpoint of a Message Channel. In Android webview, there is no separate Message Channel object.
@@ -41,6 +42,7 @@ class PlatformWebMessagePortCreationParams {
 ///A transferred port cannot be closed by the application, since the ownership is also transferred.
 ///
 ///It is possible to transfer both ports of a channel to JavaScript, for example for communication between subframes.
+///{@endtemplate}
 abstract class PlatformWebMessagePort extends PlatformInterface
     implements IWebMessagePort {
   /// Creates a new [PlatformWebMessagePort]
@@ -77,19 +79,25 @@ abstract class PlatformWebMessagePort extends PlatformInterface
 }
 
 abstract class IWebMessagePort {
+  ///{@template flutter_inappwebview_platform_interface.PlatformWebMessagePort.setWebMessageCallback}
   ///Sets a callback to receive message events on the main thread.
+  ///{@endtemplate}
   Future<void> setWebMessageCallback(WebMessageCallback? onMessage) {
     throw UnimplementedError(
         'setWebMessageCallback is not implemented on the current platform');
   }
 
+  ///{@template flutter_inappwebview_platform_interface.PlatformWebMessagePort.postMessage}
   ///Post a WebMessage to the entangled port.
+  ///{@endtemplate}
   Future<void> postMessage(WebMessage message) {
     throw UnimplementedError(
         'postMessage is not implemented on the current platform');
   }
 
+  ///{@template flutter_inappwebview_platform_interface.PlatformWebMessagePort.close}
   ///Close the message port and free any resources associated with it.
+  ///{@endtemplate}
   Future<void> close() {
     throw UnimplementedError(
         'close is not implemented on the current platform');

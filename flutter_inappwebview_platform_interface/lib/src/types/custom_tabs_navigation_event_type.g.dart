@@ -18,7 +18,7 @@ class CustomTabsNavigationEventType {
 
   ///Sent when loading was aborted by a user action before it finishes like clicking on a link or refreshing the page.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView
   static final ABORTED =
       CustomTabsNavigationEventType._internalMultiPlatform(4, () {
@@ -33,7 +33,7 @@ class CustomTabsNavigationEventType {
 
   ///Sent when the tab couldn't finish loading due to a failure.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView
   static final FAILED =
       CustomTabsNavigationEventType._internalMultiPlatform(3, () {
@@ -48,7 +48,7 @@ class CustomTabsNavigationEventType {
 
   ///Sent when the tab has finished loading a page.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView
   static final FINISHED =
       CustomTabsNavigationEventType._internalMultiPlatform(2, () {
@@ -63,7 +63,7 @@ class CustomTabsNavigationEventType {
 
   ///Sent when the tab has started loading a page.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView
   static final STARTED =
       CustomTabsNavigationEventType._internalMultiPlatform(1, () {
@@ -78,7 +78,7 @@ class CustomTabsNavigationEventType {
 
   ///Sent when the tab becomes hidden.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView
   static final TAB_HIDDEN =
       CustomTabsNavigationEventType._internalMultiPlatform(6, () {
@@ -93,7 +93,7 @@ class CustomTabsNavigationEventType {
 
   ///Sent when the tab becomes visible.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView
   static final TAB_SHOWN =
       CustomTabsNavigationEventType._internalMultiPlatform(5, () {

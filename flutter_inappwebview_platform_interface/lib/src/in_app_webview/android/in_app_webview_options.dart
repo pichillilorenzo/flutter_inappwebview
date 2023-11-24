@@ -158,10 +158,10 @@ class AndroidInAppWebViewOptions
   bool hardwareAcceleration;
 
   ///Sets whether the WebView supports multiple windows.
-  ///If set to `true`, [WebView.onCreateWindow] event must be implemented by the host application. The default value is `false`.
+  ///If set to `true`, [PlatformWebViewCreationParams.onCreateWindow] event must be implemented by the host application. The default value is `false`.
   bool supportMultipleWindows;
 
-  ///Regular expression used by [WebView.shouldOverrideUrlLoading] event to cancel navigation requests for frames that are not the main frame.
+  ///Regular expression used by [PlatformWebViewCreationParams.shouldOverrideUrlLoading] event to cancel navigation requests for frames that are not the main frame.
   ///If the url request of a subframe matches the regular expression, then the request of that subframe is canceled.
   String? regexToCancelSubFramesLoading;
 
@@ -172,10 +172,10 @@ class AndroidInAppWebViewOptions
   ///as it can cause framerate drops on animations in Android 9 and lower (see [Hybrid-Composition#performance](https://github.com/flutter/flutter/wiki/Hybrid-Composition#performance)).
   bool useHybridComposition;
 
-  ///Set to `true` to be able to listen at the [WebView.androidShouldInterceptRequest] event. The default value is `false`.
+  ///Set to `true` to be able to listen at the [PlatformWebViewCreationParams.androidShouldInterceptRequest] event. The default value is `false`.
   bool useShouldInterceptRequest;
 
-  ///Set to `true` to be able to listen at the [WebView.androidOnRenderProcessGone] event. The default value is `false`.
+  ///Set to `true` to be able to listen at the [PlatformWebViewCreationParams.androidOnRenderProcessGone] event. The default value is `false`.
   bool useOnRenderProcessGone;
 
   ///Sets the WebView's over-scroll mode.

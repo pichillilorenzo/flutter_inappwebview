@@ -43,6 +43,7 @@ class PlatformWebAuthenticationSessionCreationParams {
   WebAuthenticationSessionCompletionHandler onComplete;
 }
 
+///{@template flutter_inappwebview_platform_interface.PlatformWebAuthenticationSession}
 ///A session that an app uses to authenticate a user through a web service.
 ///
 ///It is implemented using [ASWebAuthenticationSession](https://developer.apple.com/documentation/authenticationservices/aswebauthenticationsession) on iOS 12.0+ and MacOS 10.15+
@@ -63,9 +64,10 @@ class PlatformWebAuthenticationSessionCreationParams {
 ///
 ///**NOTE for MacOS**: Available only on MacOS 10.15+.
 ///
-///**Supported Platforms/Implementations**:
+///**Officially Supported Platforms/Implementations**:
 ///- iOS
 ///- MacOS
+///{@endtemplate}
 abstract class PlatformWebAuthenticationSession extends PlatformInterface
     implements Disposable {
   ///Debug settings.
@@ -143,6 +145,7 @@ abstract class PlatformWebAuthenticationSession extends PlatformInterface
   ///{@endtemplate}
   WebAuthenticationSessionCompletionHandler get onComplete => params.onComplete;
 
+  ///{@template flutter_inappwebview_platform_interface.PlatformWebAuthenticationSession.create}
   ///Used to create and initialize a session.
   ///
   ///[url] represents a URL with the `http` or `https` scheme pointing to the authentication webpage.
@@ -150,6 +153,7 @@ abstract class PlatformWebAuthenticationSession extends PlatformInterface
   ///[callbackURLScheme] represents the custom URL scheme that the app expects in the callback URL.
   ///
   ///[onComplete] represents a completion handler the session calls when it completes successfully, or when the user cancels the session.
+  ///{@endtemplate}
   Future<PlatformWebAuthenticationSession> create(
       {required WebUri url,
       String? callbackURLScheme,
@@ -159,15 +163,18 @@ abstract class PlatformWebAuthenticationSession extends PlatformInterface
         'create is not implemented on the current platform');
   }
 
+  ///{@template flutter_inappwebview_platform_interface.PlatformWebAuthenticationSession.canStart}
   ///Indicates whether the session can begin.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- iOS ([Official API - ASWebAuthenticationSession.canStart](https://developer.apple.com/documentation/authenticationservices/aswebauthenticationsession/3516277-canstart))
+  ///{@endtemplate}
   Future<bool> canStart() {
     throw UnimplementedError(
         'canStart is not implemented on the current platform');
   }
 
+  ///{@template flutter_inappwebview_platform_interface.PlatformWebAuthenticationSession.start}
   ///Starts the web authentication session.
   ///
   ///Returns a boolean value indicating whether the web authentication session started successfully.
@@ -175,41 +182,48 @@ abstract class PlatformWebAuthenticationSession extends PlatformInterface
   ///Only call this method once for a given [PlatformWebAuthenticationSession] instance after initialization.
   ///Calling the [start] method on a canceled session results in a failure.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- iOS ([Official API - ASWebAuthenticationSession.start](https://developer.apple.com/documentation/authenticationservices/aswebauthenticationsession/2990953-start))
+  ///{@endtemplate}
   Future<bool> start() {
     throw UnimplementedError(
         'start is not implemented on the current platform');
   }
 
+  ///{@template flutter_inappwebview_platform_interface.PlatformWebAuthenticationSession.cancel}
   ///Cancels the web authentication session.
   ///
   ///If the session has already presented a view with the authentication webpage, calling this method dismisses that view.
   ///Calling [cancel] on an already canceled session has no effect.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- iOS ([Official API - ASWebAuthenticationSession.cancel](https://developer.apple.com/documentation/authenticationservices/aswebauthenticationsession/2990951-cancel))
+  ///{@endtemplate}
   Future<void> cancel() {
     throw UnimplementedError(
         'cancel is not implemented on the current platform');
   }
 
+  ///{@template flutter_inappwebview_platform_interface.PlatformWebAuthenticationSession.dispose}
   ///Disposes the web authentication session.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- iOS
+  ///{@endtemplate}
   @override
   Future<void> dispose() {
     throw UnimplementedError(
         'cancel is not implemented on the current platform');
   }
 
+  ///{@template flutter_inappwebview_platform_interface.PlatformWebAuthenticationSession.isAvailable}
   ///Returns `true` if [ASWebAuthenticationSession](https://developer.apple.com/documentation/authenticationservices/aswebauthenticationsession)
   ///or [SFAuthenticationSession](https://developer.apple.com/documentation/safariservices/sfauthenticationsession) is available.
   ///Otherwise returns `false`.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- iOS
+  ///{@endtemplate}
   Future<bool> isAvailable() {
     throw UnimplementedError(
         'isAvailable is not implemented on the current platform');

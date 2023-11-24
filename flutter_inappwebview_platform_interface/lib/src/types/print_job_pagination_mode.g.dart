@@ -18,7 +18,7 @@ class PrintJobPaginationMode {
 
   ///
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- MacOS
   static final AUTOMATIC =
       PrintJobPaginationMode._internalMultiPlatform('AUTOMATIC', () {
@@ -33,7 +33,7 @@ class PrintJobPaginationMode {
 
   ///
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- MacOS
   static final CLIP = PrintJobPaginationMode._internalMultiPlatform('CLIP', () {
     switch (defaultTargetPlatform) {
@@ -47,7 +47,7 @@ class PrintJobPaginationMode {
 
   ///
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- MacOS
   static final FIT = PrintJobPaginationMode._internalMultiPlatform('FIT', () {
     switch (defaultTargetPlatform) {

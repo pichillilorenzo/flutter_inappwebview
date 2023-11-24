@@ -31,14 +31,16 @@ class PlatformInAppLocalhostServerCreationParams {
   final bool shared;
 }
 
+///{@template flutter_inappwebview_platform_interface.PlatformInAppLocalhostServer}
 ///This class allows you to create a simple server on `http://localhost:[port]/`
 ///in order to be able to load your assets file on a local server.
 ///The default `port` value is `8080`.
 ///
-///**Supported Platforms/Implementations**:
+///**Officially Supported Platforms/Implementations**:
 ///- Android native WebView
 ///- iOS
 ///- MacOS
+///{@endtemplate}
 abstract class PlatformInAppLocalhostServer extends PlatformInterface {
   /// Creates a new [PlatformInAppLocalhostServer]
   factory PlatformInAppLocalhostServer(
@@ -96,6 +98,7 @@ abstract class PlatformInAppLocalhostServer extends PlatformInterface {
   ///{@endtemplate}
   bool get shared => params.shared;
 
+  ///{@template flutter_inappwebview_platform_interface.PlatformInAppLocalhostServer.start}
   ///Starts the server on `http://localhost:[port]/`.
   ///
   ///**NOTE for iOS**: For the iOS Platform, you need to add the `NSAllowsLocalNetworking` key with `true` in the `Info.plist` file
@@ -108,18 +111,23 @@ abstract class PlatformInAppLocalhostServer extends PlatformInterface {
   ///</dict>
   ///```
   ///The `NSAllowsLocalNetworking` key is available since **iOS 10**.
+  ///{@endtemplate}
   Future<void> start() {
     throw UnimplementedError(
         'start is not implemented on the current platform');
   }
 
+  ///{@template flutter_inappwebview_platform_interface.PlatformInAppLocalhostServer.close}
   ///Closes the server.
+  ///{@endtemplate}
   Future<void> close() {
     throw UnimplementedError(
         'close is not implemented on the current platform');
   }
 
+  ///{@template flutter_inappwebview_platform_interface.PlatformInAppLocalhostServer.isRunning}
   ///Indicates if the server is running or not.
+  ///{@endtemplate}
   bool isRunning() {
     throw UnimplementedError(
         'isRunning is not implemented on the current platform');

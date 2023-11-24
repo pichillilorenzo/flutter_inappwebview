@@ -1,24 +1,8 @@
 import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_platform_interface.dart';
 
-///The representation of the [HTML5 message ports](https://html.spec.whatwg.org/multipage/comms.html#messageport).
-///
-///A Message port represents one endpoint of a Message Channel. In Android webview, there is no separate Message Channel object.
-///When a message channel is created, both ports are tangled to each other and started.
-///See [InAppWebViewController.createWebMessageChannel] for creating a message channel.
-///
-///When a message port is first created or received via transfer, it does not have a [WebMessageCallback] to receive web messages.
-///On Android, the messages are queued until a [WebMessageCallback] is set.
-///
-///A message port should be closed when it is not used by the embedder application anymore.
-///A closed port cannot be transferred or cannot be reopened to send messages.
-///Close can be called multiple times.
-///
-///When a port is transferred to JavaScript, it cannot be used to send or receive messages at the Dart side anymore.
-///Different from HTML5 Spec, a port cannot be transferred if one of these has ever happened: i. a message callback was set, ii. a message was posted on it.
-///A transferred port cannot be closed by the application, since the ownership is also transferred.
-///
-///It is possible to transfer both ports of a channel to JavaScript, for example for communication between subframes.
+///{@macro flutter_inappwebview_platform_interface.PlatformWebMessagePort}
 class WebMessagePort implements IWebMessagePort {
+  ///{@macro flutter_inappwebview_platform_interface.PlatformWebMessagePort}
   WebMessagePort({required int index})
       : this.fromPlatformCreationParams(
             params: PlatformWebMessagePortCreationParams(index: index));
@@ -37,14 +21,14 @@ class WebMessagePort implements IWebMessagePort {
   /// Implementation of [PlatformWebMessagePort] for the current platform.
   final PlatformWebMessagePort platform;
 
-  ///Sets a callback to receive message events on the main thread.
+  ///{@macro flutter_inappwebview_platform_interface.PlatformWebMessagePort.setWebMessageCallback}
   Future<void> setWebMessageCallback(WebMessageCallback? onMessage) =>
       platform.setWebMessageCallback(onMessage);
 
-  ///Post a WebMessage to the entangled port.
+  ///{@macro flutter_inappwebview_platform_interface.PlatformWebMessagePort.postMessage}
   Future<void> postMessage(WebMessage message) => platform.postMessage(message);
 
-  ///Close the message port and free any resources associated with it.
+  ///{@macro flutter_inappwebview_platform_interface.PlatformWebMessagePort.close}
   Future<void> close() => platform.close();
 
   Map<String, dynamic> toMap() => platform.toMap();

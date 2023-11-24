@@ -13,7 +13,7 @@ class ChromeSafariBrowserSettings implements ChromeSafariBrowserOptions {
   ///
   ///**NOTE**: available on iOS 15.0+.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- iOS
   ActivityButton? activityButton;
 
@@ -21,7 +21,7 @@ class ChromeSafariBrowserSettings implements ChromeSafariBrowserOptions {
   ///
   ///**NOTE**: Available only in a Trusted Web Activity.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android
   List<String>? additionalTrustedOrigins;
 
@@ -30,13 +30,13 @@ class ChromeSafariBrowserSettings implements ChromeSafariBrowserOptions {
   ///Calling this with an intent will override any custom tabs related customizations.
   ///The default value is `false`.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android
   bool? alwaysUseBrowserUI;
 
   ///Set to `true` to enable bar collapsing. The default value is `false`.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- iOS
   bool? barCollapsingEnabled;
 
@@ -44,7 +44,7 @@ class ChromeSafariBrowserSettings implements ChromeSafariBrowserOptions {
   ///
   ///**NOTE**: available on iOS 11.0+.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- iOS
   DismissButtonStyle? dismissButtonStyle;
 
@@ -52,7 +52,7 @@ class ChromeSafariBrowserSettings implements ChromeSafariBrowserOptions {
   ///
   ///**NOTE**: Available only in a Trusted Web Activity.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android
   TrustedWebActivityDisplayMode? displayMode;
 
@@ -60,13 +60,13 @@ class ChromeSafariBrowserSettings implements ChromeSafariBrowserOptions {
   ///
   ///**NOTE**: Not available in a Trusted Web Activity.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android
   bool? enableUrlBarHiding;
 
   ///Set to `true` if Reader mode should be entered automatically when it is available for the webpage. The default value is `false`.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- iOS
   bool? entersReaderIfAvailable;
 
@@ -75,7 +75,7 @@ class ChromeSafariBrowserSettings implements ChromeSafariBrowserOptions {
   ///
   ///**NOTE**: available on iOS 15.2+.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- iOS
   UIEventAttribution? eventAttribution;
 
@@ -83,7 +83,7 @@ class ChromeSafariBrowserSettings implements ChromeSafariBrowserOptions {
   ///It must contain 2 [AndroidResource], where the first one represents the "enter" animation for the application
   ///and the second one represents the "exit" animation for the browser.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android
   List<AndroidResource>? exitAnimations;
 
@@ -91,43 +91,43 @@ class ChromeSafariBrowserSettings implements ChromeSafariBrowserOptions {
   ///
   ///**NOTE**: Not available in a Trusted Web Activity.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android
   bool? instantAppsEnabled;
 
   ///Set to `true` to launch the Android activity in `singleInstance` mode. The default value is `false`.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android
   bool? isSingleInstance;
 
   ///Set to `true` to launch the Custom Tab as a Trusted Web Activity. The default value is `false`.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android
   bool? isTrustedWebActivity;
 
   ///Set to `true` to enable Keep Alive. The default value is `false`.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android
   bool? keepAliveEnabled;
 
   ///Sets the navigation bar color. Has no effect on Android API versions below L.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android
   Color? navigationBarColor;
 
   ///Sets the navigation bar divider color. Has no effect on Android API versions below P.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android
   Color? navigationBarDividerColor;
 
   ///Set to `true` to launch the Android intent with the flag `FLAG_ACTIVITY_NO_HISTORY`. The default value is `false`.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android
   bool? noHistory;
 
@@ -137,7 +137,7 @@ class ChromeSafariBrowserSettings implements ChromeSafariBrowserOptions {
   ///If non-null, the Intent can only match the components in the given
   ///application package.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android
   String? packageName;
 
@@ -145,7 +145,7 @@ class ChromeSafariBrowserSettings implements ChromeSafariBrowserOptions {
   ///
   ///**NOTE**: available on iOS 10.0+.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- iOS
   Color? preferredBarTintColor;
 
@@ -153,13 +153,13 @@ class ChromeSafariBrowserSettings implements ChromeSafariBrowserOptions {
   ///
   ///**NOTE**: available on iOS 10.0+.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- iOS
   Color? preferredControlTintColor;
 
   ///Set the custom modal presentation style when presenting the WebView. The default value is [ModalPresentationStyle.FULL_SCREEN].
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- iOS
   ModalPresentationStyle? presentationStyle;
 
@@ -167,13 +167,13 @@ class ChromeSafariBrowserSettings implements ChromeSafariBrowserOptions {
   ///
   ///**NOTE**: Available only in a Trusted Web Activity.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android
   TrustedWebActivityScreenOrientation? screenOrientation;
 
   ///Sets the color of the secondary toolbar.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android
   Color? secondaryToolbarColor;
 
@@ -181,7 +181,7 @@ class ChromeSafariBrowserSettings implements ChromeSafariBrowserOptions {
   ///
   ///**NOTE**: Not available in a Trusted Web Activity.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android
   CustomTabsShareState? shareState;
 
@@ -189,7 +189,7 @@ class ChromeSafariBrowserSettings implements ChromeSafariBrowserOptions {
   ///
   ///**NOTE**: Not available in a Trusted Web Activity.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android
   bool? showTitle;
 
@@ -197,19 +197,19 @@ class ChromeSafariBrowserSettings implements ChromeSafariBrowserOptions {
   ///It must contain 2 [AndroidResource], where the first one represents the "enter" animation for the browser
   ///and the second one represents the "exit" animation for the application.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android
   List<AndroidResource>? startAnimations;
 
   ///Set the custom background color of the toolbar.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android
   Color? toolbarBackgroundColor;
 
   ///Set to the custom transition style when presenting the WebView. The default value is [ModalTransitionStyle.COVER_VERTICAL].
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- iOS
   ModalTransitionStyle? transitionStyle;
   ChromeSafariBrowserSettings(

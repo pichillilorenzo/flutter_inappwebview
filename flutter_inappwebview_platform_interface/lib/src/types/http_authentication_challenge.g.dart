@@ -6,7 +6,7 @@ part of 'http_authentication_challenge.dart';
 // ExchangeableObjectGenerator
 // **************************************************************************
 
-///Class that represents the challenge of the [WebView.onReceivedHttpAuthRequest] event.
+///Class that represents the challenge of the [PlatformWebViewCreationParams.onReceivedHttpAuthRequest] event.
 ///It provides all the information about the challenge.
 class HttpAuthenticationChallenge extends URLAuthenticationChallenge {
   ///The error object representing the last authentication failure.

@@ -19,7 +19,7 @@ class SslErrorType {
 
   ///The date of the certificate is invalid.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - SslError.DATE_INVALID](https://developer.android.com/reference/android/net/http/SslError#SSL_DATE_INVALID))
   static final DATE_INVALID =
       SslErrorType._internalMultiPlatform('DATE_INVALID', () {
@@ -39,7 +39,7 @@ class SslErrorType {
   ///Your app should not trust the chain.
   ///The Keychain Access utility refers to this value as "Never Trust."
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- iOS ([Official API - SecTrustResultType.deny](https://developer.apple.com/documentation/security/sectrustresulttype/deny))
   ///- MacOS ([Official API - SecTrustResultType.deny](https://developer.apple.com/documentation/security/sectrustresulttype/deny))
   static final DENY = SslErrorType._internalMultiPlatform('DENY', () {
@@ -56,7 +56,7 @@ class SslErrorType {
 
   ///The certificate has expired.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - SslError.SSL_EXPIRED](https://developer.android.com/reference/android/net/http/SslError#SSL_EXPIRED))
   static final EXPIRED = SslErrorType._internalMultiPlatform('EXPIRED', () {
     switch (defaultTargetPlatform) {
@@ -75,7 +75,7 @@ class SslErrorType {
   ///an unsupported critical extension, or some other critical portion of the certificate that couldn’t be interpreted.
   ///Changing parameter values and reevaluating is unlikely to succeed unless you provide different certificates.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- iOS ([Official API - SecTrustResultType.fatalTrustFailure](https://developer.apple.com/documentation/security/sectrustresulttype/fataltrustfailure))
   ///- MacOS ([Official API - SecTrustResultType.fatalTrustFailure](https://developer.apple.com/documentation/security/sectrustresulttype/fataltrustfailure))
   static final FATAL_TRUST_FAILURE =
@@ -93,7 +93,7 @@ class SslErrorType {
 
   ///Hostname mismatch.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - SslError.SSL_IDMISMATCH](https://developer.android.com/reference/android/net/http/SslError#SSL_IDMISMATCH))
   static final IDMISMATCH =
       SslErrorType._internalMultiPlatform('IDMISMATCH', () {
@@ -108,7 +108,7 @@ class SslErrorType {
 
   ///Indicates an invalid setting or result. A generic error occurred.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - SslError.SSL_INVALID](https://developer.android.com/reference/android/net/http/SslError#SSL_INVALID))
   ///- iOS ([Official API - SecTrustResultType.invalid](https://developer.apple.com/documentation/security/sectrustresulttype/invalid))
   ///- MacOS ([Official API - SecTrustResultType.invalid](https://developer.apple.com/documentation/security/sectrustresulttype/invalid))
@@ -128,7 +128,7 @@ class SslErrorType {
 
   ///The certificate is not yet valid.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - SslError.SSL_NOTYETVALID](https://developer.android.com/reference/android/net/http/SslError#SSL_NOTYETVALID))
   static final NOT_YET_VALID =
       SslErrorType._internalMultiPlatform('NOT_YET_VALID', () {
@@ -146,7 +146,7 @@ class SslErrorType {
   ///This value indicates that evaluation failed for some other reason.
   ///This can be caused by either a revoked certificate or by OS-level errors that are unrelated to the certificates themselves.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- iOS ([Official API - SecTrustResultType.otherError](https://developer.apple.com/documentation/security/sectrustresulttype/othererror))
   ///- MacOS ([Official API - SecTrustResultType.otherError](https://developer.apple.com/documentation/security/sectrustresulttype/othererror))
   static final OTHER_ERROR =
@@ -172,7 +172,7 @@ class SslErrorType {
   ///For example, if you are performing signature validation and you know when the message was originally received,
   ///you should check again using that date to see if the message was valid when you originally received it.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- iOS ([Official API - SecTrustResultType.recoverableTrustFailure](https://developer.apple.com/documentation/security/sectrustresulttype/recoverabletrustfailure))
   ///- MacOS ([Official API - SecTrustResultType.recoverableTrustFailure](https://developer.apple.com/documentation/security/sectrustresulttype/recoverabletrustfailure))
   static final RECOVERABLE_TRUST_FAILURE =
@@ -197,7 +197,7 @@ class SslErrorType {
   ///
   ///When receiving this value, most apps should trust the chain.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- iOS ([Official API - SecTrustResultType.unspecified](https://developer.apple.com/documentation/security/sectrustresulttype/unspecified))
   ///- MacOS ([Official API - SecTrustResultType.unspecified](https://developer.apple.com/documentation/security/sectrustresulttype/unspecified))
   static final UNSPECIFIED =
@@ -215,7 +215,7 @@ class SslErrorType {
 
   ///The certificate authority is not trusted.
   ///
-  ///**Supported Platforms/Implementations**:
+  ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - SslError.SSL_UNTRUSTED](https://developer.android.com/reference/android/net/http/SslError#SSL_UNTRUSTED))
   static final UNTRUSTED = SslErrorType._internalMultiPlatform('UNTRUSTED', () {
     switch (defaultTargetPlatform) {

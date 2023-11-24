@@ -6,7 +6,7 @@ part of 'geolocation_permission_show_prompt_response.dart';
 // ExchangeableObjectGenerator
 // **************************************************************************
 
-///Class used by the host application to set the Geolocation permission state for an origin during the [WebView.onGeolocationPermissionsShowPrompt] event.
+///Class used by the host application to set the Geolocation permission state for an origin during the [PlatformWebViewCreationParams.onGeolocationPermissionsShowPrompt] event.
 class GeolocationPermissionShowPromptResponse {
   ///Whether or not the origin should be allowed to use the Geolocation API.
   bool allow;

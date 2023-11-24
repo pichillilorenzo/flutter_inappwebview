@@ -6,7 +6,7 @@ part of 'custom_scheme_response.dart';
 // ExchangeableObjectGenerator
 // **************************************************************************
 
-///Class representing the response returned by the [WebView.onLoadResourceWithCustomScheme] event.
+///Class representing the response returned by the [PlatformWebViewCreationParams.onLoadResourceWithCustomScheme] event.
 ///It allows to load a specific resource. The resource data must be encoded to `base64`.
 class CustomSchemeResponse {
   ///Content-Encoding of the data, such as `utf-8`.

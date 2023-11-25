@@ -34,7 +34,7 @@ class WebViewAssetLoader {
   ///
   ///[WebViewAssetLoader] will try Path Handlers in the order they're registered,
   ///and will use whichever is the first to return a non-null.
-  List<IPathHandler>? pathHandlers;
+  List<PlatformPathHandler>? pathHandlers;
   WebViewAssetLoader({this.domain, this.httpAllowed, this.pathHandlers});
 
   ///Gets a possible [WebViewAssetLoader] instance from a [Map] value.
@@ -46,7 +46,7 @@ class WebViewAssetLoader {
       domain: map['domain'],
       httpAllowed: map['httpAllowed'],
       pathHandlers: map['pathHandlers'] != null
-          ? List<IPathHandler>.from(map['pathHandlers'].map((e) => e))
+          ? List<PlatformPathHandler>.from(map['pathHandlers'].map((e) => e))
           : null,
     );
     return instance;

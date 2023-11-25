@@ -89,7 +89,11 @@ abstract class PlatformWebStorage extends PlatformInterface
 @immutable
 class PlatformStorageCreationParams {
   /// Used by the platform implementation to create a new [PlatformStorage].
-  const PlatformStorageCreationParams({required this.webStorageType});
+  const PlatformStorageCreationParams(
+      {required this.controller, required this.webStorageType});
+
+  ///{@macro flutter_inappwebview_platform_interface.PlatformStorage.controller}
+  final PlatformInAppWebViewController? controller;
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformStorage.webStorageType}
   final WebStorageType webStorageType;
@@ -99,38 +103,19 @@ class PlatformStorageCreationParams {
 ///Class that provides methods to manage the JavaScript [Storage](https://developer.mozilla.org/en-US/docs/Web/API/Storage) object.
 ///It is used by [PlatformLocalStorage] and [PlatformSessionStorage].
 ///{@endtemplate}
-abstract class PlatformStorage extends PlatformInterface implements Disposable {
-  /// Creates a new [PlatformStorage]
-  factory PlatformStorage(PlatformStorageCreationParams params) {
-    assert(
-      InAppWebViewPlatform.instance != null,
-      'A platform implementation for `flutter_inappwebview` has not been set. Please '
-      'ensure that an implementation of `InAppWebViewPlatform` has been set to '
-      '`InAppWebViewPlatform.instance` before use. For unit testing, '
-      '`InAppWebViewPlatform.instance` can be set with your own test implementation.',
-    );
-    final PlatformStorage storage =
-        InAppWebViewPlatform.instance!.createPlatformStorage(params);
-    PlatformInterface.verify(storage, _token);
-    return storage;
-  }
-
-  /// Used by the platform implementation to create a new [PlatformStorage].
-  ///
-  /// Should only be used by platform implementations because they can't extend
-  /// a class that only contains a factory constructor.
-  @protected
-  PlatformStorage.implementation(this.params) : super(token: _token);
-
-  static final Object _token = Object();
-
-  /// The parameters used to initialize the [PlatformStorage].
-  final PlatformStorageCreationParams params;
+abstract class PlatformStorage implements Disposable {
+  ///{@template flutter_inappwebview_platform_interface.PlatformStorage.controller}
+  ///Controller used to interact with storage.
+  ///{@endtemplate}
+  PlatformInAppWebViewController? get controller;
 
   ///{@template flutter_inappwebview_platform_interface.PlatformStorage.webStorageType}
   ///The web storage type: `window.sessionStorage` or `window.localStorage`.
   ///{@endtemplate}
-  WebStorageType get webStorageType => params.webStorageType;
+  WebStorageType get webStorageType {
+    throw UnimplementedError(
+        'webStorageType is not implemented on the current platform');
+  }
 
   ///{@template flutter_inappwebview_platform_interface.PlatformStorage.length}
   ///Returns an integer representing the number of data items stored in the Storage object.
@@ -251,11 +236,13 @@ abstract class PlatformStorage extends PlatformInterface implements Disposable {
 @immutable
 class PlatformLocalStorageCreationParams extends PlatformStorageCreationParams {
   /// Used by the platform implementation to create a new [PlatformLocalStorage].
-  const PlatformLocalStorageCreationParams(
+  PlatformLocalStorageCreationParams(
     // This parameter prevents breaking changes later.
     // ignore: avoid_unused_constructor_parameters
     PlatformStorageCreationParams params,
-  ) : super(webStorageType: WebStorageType.LOCAL_STORAGE);
+  ) : super(
+            controller: params.controller,
+            webStorageType: WebStorageType.LOCAL_STORAGE);
 
   /// Creates a [AndroidCookieManagerCreationParams] instance based on [PlatformCookieManagerCreationParams].
   factory PlatformLocalStorageCreationParams.fromPlatformStorageCreationParams(
@@ -268,7 +255,8 @@ class PlatformLocalStorageCreationParams extends PlatformStorageCreationParams {
 ///Class that provides methods to manage the JavaScript `window.localStorage` object.
 ///It used by [PlatformWebStorage].
 ///{@endtemplate}
-abstract class PlatformLocalStorage extends PlatformStorage {
+abstract class PlatformLocalStorage extends PlatformInterface
+    with PlatformStorage {
   /// Creates a new [PlatformLocalStorage]
   factory PlatformLocalStorage(PlatformLocalStorageCreationParams params) {
     assert(
@@ -289,15 +277,15 @@ abstract class PlatformLocalStorage extends PlatformStorage {
   /// Should only be used by platform implementations because they can't extend
   /// a class that only contains a factory constructor.
   @protected
-  PlatformLocalStorage.implementation(PlatformStorageCreationParams params)
-      : super.implementation(
-          params is PlatformLocalStorageCreationParams
-              ? params
-              : PlatformLocalStorageCreationParams
-                  .fromPlatformStorageCreationParams(params),
-        );
+  PlatformLocalStorage.implementation(this.params) : super(token: _token);
 
   static final Object _token = Object();
+
+  /// The parameters used to initialize the [PlatformLocalStorage].
+  final PlatformLocalStorageCreationParams params;
+
+  @override
+  WebStorageType get webStorageType => params.webStorageType;
 }
 
 /// Object specifying creation parameters for creating a [PlatformSessionStorage].
@@ -308,11 +296,13 @@ abstract class PlatformLocalStorage extends PlatformStorage {
 class PlatformSessionStorageCreationParams
     extends PlatformStorageCreationParams {
   /// Used by the platform implementation to create a new [PlatformSessionStorage].
-  const PlatformSessionStorageCreationParams(
+  PlatformSessionStorageCreationParams(
     // This parameter prevents breaking changes later.
     // ignore: avoid_unused_constructor_parameters
     PlatformStorageCreationParams params,
-  ) : super(webStorageType: WebStorageType.SESSION_STORAGE);
+  ) : super(
+            controller: params.controller,
+            webStorageType: WebStorageType.SESSION_STORAGE);
 
   /// Creates a [AndroidCookieManagerCreationParams] instance based on [PlatformCookieManagerCreationParams].
   factory PlatformSessionStorageCreationParams.fromPlatformStorageCreationParams(
@@ -325,7 +315,8 @@ class PlatformSessionStorageCreationParams
 ///Class that provides methods to manage the JavaScript `window.sessionStorage` object.
 ///It used by [PlatformWebStorage].
 ///{@endtemplate}
-abstract class PlatformSessionStorage extends PlatformStorage {
+abstract class PlatformSessionStorage extends PlatformInterface
+    with PlatformStorage {
   /// Creates a new [PlatformSessionStorage]
   factory PlatformSessionStorage(PlatformSessionStorageCreationParams params) {
     assert(
@@ -346,13 +337,13 @@ abstract class PlatformSessionStorage extends PlatformStorage {
   /// Should only be used by platform implementations because they can't extend
   /// a class that only contains a factory constructor.
   @protected
-  PlatformSessionStorage.implementation(PlatformStorageCreationParams params)
-      : super.implementation(
-          params is PlatformSessionStorageCreationParams
-              ? params
-              : PlatformSessionStorageCreationParams
-                  .fromPlatformStorageCreationParams(params),
-        );
+  PlatformSessionStorage.implementation(this.params) : super(token: _token);
 
   static final Object _token = Object();
+
+  /// The parameters used to initialize the [PlatformSessionStorage].
+  final PlatformSessionStorageCreationParams params;
+
+  @override
+  WebStorageType get webStorageType => params.webStorageType;
 }

@@ -56,33 +56,27 @@ class AndroidWebStorage extends PlatformWebStorage {
 /// more information.
 class AndroidStorageCreationParams extends PlatformStorageCreationParams {
   /// Creates a new [AndroidStorageCreationParams] instance.
-  AndroidStorageCreationParams({required super.webStorageType});
+  AndroidStorageCreationParams(
+      {required super.controller, required super.webStorageType});
 
   /// Creates a [AndroidStorageCreationParams] instance based on [PlatformStorageCreationParams].
   factory AndroidStorageCreationParams.fromPlatformStorageCreationParams(
       // Recommended placeholder to prevent being broken by platform interface.
       // ignore: avoid_unused_constructor_parameters
       PlatformStorageCreationParams params) {
-    return AndroidStorageCreationParams(webStorageType: params.webStorageType);
+    return AndroidStorageCreationParams(
+        controller: params.controller, webStorageType: params.webStorageType);
   }
 }
 
 ///{@macro flutter_inappwebview_platform_interface.PlatformStorage}
-class AndroidStorage extends PlatformStorage {
-  /// Constructs a [AndroidStorage].
-  AndroidStorage(PlatformStorageCreationParams params)
-      : super.implementation(
-          params is AndroidStorageCreationParams
-              ? params
-              : AndroidStorageCreationParams.fromPlatformStorageCreationParams(
-                  params),
-        );
-
-  AndroidInAppWebViewController? _controller;
+abstract class AndroidStorage implements PlatformStorage {
+  @override
+  AndroidInAppWebViewController? controller;
 
   @override
   Future<int?> length() async {
-    var result = await _controller?.evaluateJavascript(source: """
+    var result = await controller?.evaluateJavascript(source: """
     window.$webStorageType.length;
     """);
     return result != null ? int.parse(json.decode(result)) : null;
@@ -91,14 +85,14 @@ class AndroidStorage extends PlatformStorage {
   @override
   Future<void> setItem({required String key, required dynamic value}) async {
     var encodedValue = json.encode(value);
-    await _controller?.evaluateJavascript(source: """
+    await controller?.evaluateJavascript(source: """
     window.$webStorageType.setItem("$key", ${value is String ? encodedValue : "JSON.stringify($encodedValue)"});
     """);
   }
 
   @override
   Future<dynamic> getItem({required String key}) async {
-    var itemValue = await _controller?.evaluateJavascript(source: """
+    var itemValue = await controller?.evaluateJavascript(source: """
     window.$webStorageType.getItem("$key");
     """);
 
@@ -115,7 +109,7 @@ class AndroidStorage extends PlatformStorage {
 
   @override
   Future<void> removeItem({required String key}) async {
-    await _controller?.evaluateJavascript(source: """
+    await controller?.evaluateJavascript(source: """
     window.$webStorageType.removeItem("$key");
     """);
   }
@@ -125,7 +119,7 @@ class AndroidStorage extends PlatformStorage {
     var webStorageItems = <WebStorageItem>[];
 
     List<Map<dynamic, dynamic>>? items =
-        (await _controller?.evaluateJavascript(source: """
+        (await controller?.evaluateJavascript(source: """
 (function() {
   var webStorageItems = [];
   for(var i = 0; i < window.$webStorageType.length; i++){
@@ -139,7 +133,7 @@ class AndroidStorage extends PlatformStorage {
   }
   return webStorageItems;
 })();
-    """)).cast<Map<dynamic, dynamic>>();
+    """))?.cast<Map<dynamic, dynamic>>();
 
     if (items == null) {
       return webStorageItems;
@@ -155,14 +149,14 @@ class AndroidStorage extends PlatformStorage {
 
   @override
   Future<void> clear() async {
-    await _controller?.evaluateJavascript(source: """
+    await controller?.evaluateJavascript(source: """
     window.$webStorageType.clear();
     """);
   }
 
   @override
   Future<String> key({required int index}) async {
-    var result = await _controller?.evaluateJavascript(source: """
+    var result = await controller?.evaluateJavascript(source: """
     window.$webStorageType.key($index);
     """);
     return result != null ? json.decode(result) : null;
@@ -170,7 +164,7 @@ class AndroidStorage extends PlatformStorage {
 
   @override
   void dispose() {
-    _controller = null;
+    controller = null;
   }
 }
 
@@ -194,11 +188,10 @@ class AndroidLocalStorageCreationParams
 }
 
 ///{@macro flutter_inappwebview_platform_interface.PlatformLocalStorage}
-class AndroidLocalStorage extends AndroidStorage
-    implements PlatformLocalStorage {
+class AndroidLocalStorage extends PlatformLocalStorage with AndroidStorage {
   /// Constructs a [AndroidLocalStorage].
   AndroidLocalStorage(PlatformLocalStorageCreationParams params)
-      : super(
+      : super.implementation(
           params is AndroidLocalStorageCreationParams
               ? params
               : AndroidLocalStorageCreationParams
@@ -206,11 +199,17 @@ class AndroidLocalStorage extends AndroidStorage
         );
 
   /// Default storage
-  factory AndroidLocalStorage.defaultStorage() {
+  factory AndroidLocalStorage.defaultStorage(
+      {required PlatformInAppWebViewController? controller}) {
     return AndroidLocalStorage(AndroidLocalStorageCreationParams(
         PlatformLocalStorageCreationParams(PlatformStorageCreationParams(
+            controller: controller,
             webStorageType: WebStorageType.LOCAL_STORAGE))));
   }
+
+  @override
+  AndroidInAppWebViewController? get controller =>
+      params.controller as AndroidInAppWebViewController?;
 }
 
 /// Object specifying creation parameters for creating a [AndroidSessionStorage].
@@ -233,11 +232,10 @@ class AndroidSessionStorageCreationParams
 }
 
 ///{@macro flutter_inappwebview_platform_interface.PlatformSessionStorage}
-class AndroidSessionStorage extends AndroidStorage
-    implements PlatformSessionStorage {
+class AndroidSessionStorage extends PlatformSessionStorage with AndroidStorage {
   /// Constructs a [AndroidSessionStorage].
   AndroidSessionStorage(PlatformSessionStorageCreationParams params)
-      : super(
+      : super.implementation(
           params is AndroidSessionStorageCreationParams
               ? params
               : AndroidSessionStorageCreationParams
@@ -245,9 +243,15 @@ class AndroidSessionStorage extends AndroidStorage
         );
 
   /// Default storage
-  factory AndroidSessionStorage.defaultStorage() {
+  factory AndroidSessionStorage.defaultStorage(
+      {required PlatformInAppWebViewController? controller}) {
     return AndroidSessionStorage(AndroidSessionStorageCreationParams(
         PlatformSessionStorageCreationParams(PlatformStorageCreationParams(
+            controller: controller,
             webStorageType: WebStorageType.SESSION_STORAGE))));
   }
+
+  @override
+  AndroidInAppWebViewController? get controller =>
+      params.controller as AndroidInAppWebViewController?;
 }

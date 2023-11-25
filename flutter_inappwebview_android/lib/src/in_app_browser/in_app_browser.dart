@@ -131,8 +131,9 @@ class AndroidInAppBrowser extends PlatformInAppBrowser with ChannelController {
       case "onExit":
         _debugLog(call.method, call.arguments);
         _isOpened = false;
+        final onExit = eventHandler?.onExit;
         dispose();
-        eventHandler?.onExit();
+        onExit?.call();
         break;
       default:
         return _webViewController?.handleMethod(call);

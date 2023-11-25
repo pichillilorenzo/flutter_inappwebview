@@ -36,26 +36,9 @@ class WebViewAssetLoader_ {
   ///
   ///[WebViewAssetLoader] will try Path Handlers in the order they're registered,
   ///and will use whichever is the first to return a non-null.
-  List<IPathHandler>? pathHandlers;
+  List<PlatformPathHandler>? pathHandlers;
 
   WebViewAssetLoader_({this.domain, this.httpAllowed, this.pathHandlers});
-}
-
-///[PlatformPathHandler] interface.
-abstract class IPathHandler {
-  String get path {
-    throw UnimplementedError('path is not implemented on the current platform');
-  }
-
-  Map<String, dynamic> toMap() {
-    throw UnimplementedError(
-        'toMap is not implemented on the current platform');
-  }
-
-  Map<String, dynamic> toJson() {
-    throw UnimplementedError(
-        'toJson is not implemented on the current platform');
-  }
 }
 
 /// Object specifying creation parameters for creating a [PlatformPathHandler].
@@ -76,45 +59,25 @@ class PlatformPathHandlerCreationParams {
 ///
 ///Implement this interface to handle other use-cases according to your app's needs.
 ///{@endtemplate}
-abstract class PlatformPathHandler extends PlatformInterface
-    implements IPathHandler {
-  /// Creates a new [PlatformWebViewAssetLoader]
-  factory PlatformPathHandler(PlatformPathHandlerCreationParams params) {
-    assert(
-      InAppWebViewPlatform.instance != null,
-      'A platform implementation for `flutter_inappwebview` has not been set. Please '
-      'ensure that an implementation of `InAppWebViewPlatform` has been set to '
-      '`WebViewPlatform.instance` before use. For unit testing, '
-      '`WebViewPlatform.instance` can be set with your own test implementation.',
-    );
-    final PlatformPathHandler pathHandler =
-        InAppWebViewPlatform.instance!.createPlatformPathHandler(params);
-    PlatformInterface.verify(pathHandler, _token);
-    return pathHandler;
-  }
-
-  /// Used by the platform implementation to create a new
-  /// [PlatformPathHandler].
-  ///
-  /// Should only be used by platform implementations because they can't extend
-  /// a class that only contains a factory constructor.
-  @protected
-  PlatformPathHandler.implementation(this.params) : super(token: _token);
-
-  static final Object _token = Object();
-
-  /// The parameters used to initialize the [PlatformPathHandler].
-  final PlatformPathHandlerCreationParams params;
-
+abstract class PlatformPathHandler {
   /// Event handler object that handles the [PlatformPathHandler] events.
-  PlatformPathHandlerEvents? eventHandler;
+  late final PlatformPathHandlerEvents? eventHandler;
+
+  ///{@template flutter_inappwebview_platform_interface.PlatformPathHandler.type}
+  ///The path handler type.
+  ///{@endtemplate}
+  String get type {
+    throw UnimplementedError('type is not implemented on the current platform');
+  }
 
   ///{@template flutter_inappwebview_platform_interface.PlatformPathHandler.path}
   ///The suffix path to be handled.
   ///
   ///The path should start and end with a `"/"` and it shouldn't collide with a real web path.
   ///{@endtemplate}
-  String get path => params.path;
+  String get path {
+    throw UnimplementedError('path is not implemented on the current platform');
+  }
 
   Map<String, dynamic> toMap() {
     throw UnimplementedError(
@@ -181,7 +144,7 @@ class PlatformAssetsPathHandlerCreationParams
 ///Developers should ensure that asset files are named using standard file extensions.
 ///If the file does not have a recognised extension, `text/plain` will be used by default.
 ///{@endtemplate}
-abstract class PlatformAssetsPathHandler extends PlatformPathHandler {
+abstract class PlatformAssetsPathHandler extends PlatformInterface implements PlatformPathHandler {
   /// Creates a new [PlatformAssetsPathHandler]
   factory PlatformAssetsPathHandler(
       PlatformAssetsPathHandlerCreationParams params) {
@@ -203,16 +166,18 @@ abstract class PlatformAssetsPathHandler extends PlatformPathHandler {
   /// Should only be used by platform implementations because they can't extend
   /// a class that only contains a factory constructor.
   @protected
-  PlatformAssetsPathHandler.implementation(
-      PlatformPathHandlerCreationParams params)
-      : super.implementation(
-          params is PlatformAssetsPathHandlerCreationParams
-              ? params
-              : PlatformAssetsPathHandlerCreationParams
-                  .fromPlatformPathHandlerCreationParams(params),
-        );
+  PlatformAssetsPathHandler.implementation(this.params) : super(token: _token);
 
   static final Object _token = Object();
+
+  /// The parameters used to initialize the [PlatformAssetsPathHandler].
+  final PlatformAssetsPathHandlerCreationParams params;
+
+  @override
+  String get type => 'AssetsPathHandler';
+
+  @override
+  String get path => params.path;
 }
 
 /// Object specifying creation parameters for creating a [PlatformResourcesPathHandler].
@@ -251,7 +216,7 @@ class PlatformResourcesPathHandlerCreationParams
 ///Developers should ensure that asset files are named using standard file extensions.
 ///If the file does not have a recognised extension, `text/plain` will be used by default.
 ///{@endtemplate}
-abstract class PlatformResourcesPathHandler extends PlatformPathHandler {
+abstract class PlatformResourcesPathHandler extends PlatformInterface implements PlatformPathHandler {
   /// Creates a new [PlatformResourcesPathHandler]
   factory PlatformResourcesPathHandler(
       PlatformResourcesPathHandlerCreationParams params) {
@@ -274,16 +239,18 @@ abstract class PlatformResourcesPathHandler extends PlatformPathHandler {
   /// Should only be used by platform implementations because they can't extend
   /// a class that only contains a factory constructor.
   @protected
-  PlatformResourcesPathHandler.implementation(
-      PlatformPathHandlerCreationParams params)
-      : super.implementation(
-          params is PlatformResourcesPathHandlerCreationParams
-              ? params
-              : PlatformResourcesPathHandlerCreationParams
-                  .fromPlatformPathHandlerCreationParams(params),
-        );
+  PlatformResourcesPathHandler.implementation(this.params) : super(token: _token);
 
   static final Object _token = Object();
+
+  /// The parameters used to initialize the [PlatformResourcesPathHandler].
+  final PlatformResourcesPathHandlerCreationParams params;
+
+  @override
+  String get type => 'ResourcesPathHandler';
+
+  @override
+  String get path => params.path;
 }
 
 /// Object specifying creation parameters for creating a [PlatformInternalStoragePathHandler].
@@ -332,7 +299,7 @@ class PlatformInternalStoragePathHandlerCreationParams
 ///Developers should ensure that asset files are named using standard file extensions.
 ///If the file does not have a recognised extension, `text/plain` will be used by default.
 ///{@endtemplate}
-abstract class PlatformInternalStoragePathHandler extends PlatformPathHandler {
+abstract class PlatformInternalStoragePathHandler extends PlatformInterface implements PlatformPathHandler {
   /// Creates a new [PlatformResourcesPathHandler]
   factory PlatformInternalStoragePathHandler(
       PlatformInternalStoragePathHandlerCreationParams params) {
@@ -355,21 +322,18 @@ abstract class PlatformInternalStoragePathHandler extends PlatformPathHandler {
   /// Should only be used by platform implementations because they can't extend
   /// a class that only contains a factory constructor.
   @protected
-  PlatformInternalStoragePathHandler.implementation(
-      PlatformPathHandlerCreationParams params,
-      {required String directory})
-      : super.implementation(
-          params is PlatformInternalStoragePathHandlerCreationParams
-              ? params
-              : PlatformInternalStoragePathHandlerCreationParams
-                  .fromPlatformPathHandlerCreationParams(params,
-                      directory: directory),
-        );
+  PlatformInternalStoragePathHandler.implementation(this.params) : super(token: _token);
 
   static final Object _token = Object();
 
-  PlatformInternalStoragePathHandlerCreationParams get _internalParams =>
-      params as PlatformInternalStoragePathHandlerCreationParams;
+  /// The parameters used to initialize the [PlatformInternalStoragePathHandler].
+  final PlatformInternalStoragePathHandlerCreationParams params;
 
-  String get directory => _internalParams.directory;
+  @override
+  String get type => 'InternalStoragePathHandler';
+
+  @override
+  String get path => params.path;
+
+  String get directory => params.directory;
 }

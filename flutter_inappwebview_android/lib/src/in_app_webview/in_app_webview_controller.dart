@@ -164,8 +164,9 @@ class AndroidInAppWebViewController extends PlatformInAppWebViewController
         params.webviewParams?.controllerFromPlatform?.call(this) ?? this;
 
     webStorage = AndroidWebStorage(AndroidWebStorageCreationParams(
-        localStorage: AndroidLocalStorage.defaultStorage(),
-        sessionStorage: AndroidSessionStorage.defaultStorage()));
+        localStorage: AndroidLocalStorage.defaultStorage(controller: this),
+        sessionStorage:
+            AndroidSessionStorage.defaultStorage(controller: this)));
 
     if (params.webviewParams is PlatformInAppWebViewWidgetCreationParams) {
       final keepAlive =
@@ -1018,7 +1019,6 @@ class AndroidInAppWebViewController extends PlatformInAppWebViewController
                       _controllerFromPlatform, permissionRequest))
                   ?.toMap();
             else {
-              // ignore: deprecated_member_use_from_same_package
               return (await webviewParams!.androidOnPermissionRequest!(
                       _controllerFromPlatform, origin, resources))
                   ?.toMap();

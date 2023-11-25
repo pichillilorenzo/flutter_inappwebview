@@ -1,5 +1,7 @@
 import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_platform_interface.dart';
 
+import '../in_app_webview/in_app_webview_controller.dart';
+
 ///{@macro flutter_inappwebview_platform_interface.PlatformWebStorage}
 class WebStorage {
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebStorage}
@@ -37,26 +39,15 @@ class WebStorage {
 }
 
 ///{@macro flutter_inappwebview_platform_interface.PlatformStorage}
-class Storage {
-  ///{@macro flutter_inappwebview_platform_interface.PlatformStorage}
-  Storage({required WebStorageType webStorageType})
-      : this.fromPlatformCreationParams(
-            params:
-                PlatformStorageCreationParams(webStorageType: webStorageType));
-
-  /// Constructs a [Storage].
-  ///
-  /// See [Storage.fromPlatformCreationParams] for setting parameters for
-  /// a specific platform.
-  Storage.fromPlatformCreationParams({
-    required PlatformStorageCreationParams params,
-  }) : this.fromPlatform(platform: PlatformStorage(params));
-
+abstract class Storage implements PlatformStorage {
   /// Constructs a [Storage] from a specific platform implementation.
   Storage.fromPlatform({required this.platform});
 
   /// Implementation of [PlatformStorage] for the current platform.
   final PlatformStorage platform;
+
+  ///{@macro flutter_inappwebview_platform_interface.PlatformStorage.controller}
+  PlatformInAppWebViewController? get controller => platform.controller;
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformStorage.webStorageType}
   WebStorageType get webStorageType => platform.webStorageType;
@@ -91,10 +82,11 @@ class Storage {
 ///{@macro flutter_inappwebview_platform_interface.PlatformLocalStorage}
 class LocalStorage extends Storage {
   ///{@macro flutter_inappwebview_platform_interface.PlatformLocalStorage}
-  LocalStorage()
+  LocalStorage({required InAppWebViewController? controller})
       : this.fromPlatformCreationParams(
             params: PlatformLocalStorageCreationParams(
                 PlatformStorageCreationParams(
+                    controller: controller?.platform,
                     webStorageType: WebStorageType.LOCAL_STORAGE)));
 
   /// Constructs a [LocalStorage].
@@ -116,10 +108,11 @@ class LocalStorage extends Storage {
 ///{@macro flutter_inappwebview_platform_interface.PlatformSessionStorage}
 class SessionStorage extends Storage {
   ///{@macro flutter_inappwebview_platform_interface.PlatformSessionStorage}
-  SessionStorage()
+  SessionStorage({required InAppWebViewController? controller})
       : this.fromPlatformCreationParams(
             params: PlatformSessionStorageCreationParams(
                 PlatformStorageCreationParams(
+                    controller: controller?.platform,
                     webStorageType: WebStorageType.SESSION_STORAGE)));
 
   /// Constructs a [SessionStorage].

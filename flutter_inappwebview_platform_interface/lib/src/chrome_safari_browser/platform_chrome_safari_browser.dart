@@ -463,7 +463,7 @@ abstract class PlatformChromeSafariBrowser extends PlatformInterface
   }
 
   ///{@template flutter_inappwebview_platform_interface.PlatformChromeSafariBrowser.dispose}
-  ///Disposes the channel.
+  ///Disposes the channel and event handler.
   ///{@endtemplate}
   @override
   void dispose() {

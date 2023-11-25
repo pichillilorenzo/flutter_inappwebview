@@ -25,25 +25,23 @@ class AndroidPathHandlerCreationParams
 }
 
 ///{@macro flutter_inappwebview_platform_interface.PlatformPathHandler}
-class AndroidPathHandler extends PlatformPathHandler with ChannelController {
-  /// Creates a new [AndroidPathHandler].
-  AndroidPathHandler(PlatformPathHandlerCreationParams params)
-      : super.implementation(
-          params is AndroidPathHandlerCreationParams
-              ? params
-              : AndroidPathHandlerCreationParams
-                  .fromPlatformPathHandlerCreationParams(params),
-        ) {
-    _type = this.runtimeType.toString();
-    _id = IdGenerator.generate();
+abstract class AndroidPathHandler
+    implements ChannelController, PlatformPathHandler {
+  final String _id = IdGenerator.generate();
+
+  @override
+  late final PlatformPathHandlerEvents? eventHandler;
+
+  @override
+  late final String path;
+
+  void _init(PlatformPathHandlerCreationParams params) {
+    this.path = params.path;
     channel = MethodChannel(
         'com.pichillilorenzo/flutter_inappwebview_custompathhandler_${_id}');
     handler = _handleMethod;
     initMethodCallHandler();
   }
-
-  late final String _type;
-  late final String _id;
 
   Future<dynamic> _handleMethod(MethodCall call) async {
     switch (call.method) {
@@ -57,7 +55,7 @@ class AndroidPathHandler extends PlatformPathHandler with ChannelController {
 
   @override
   Map<String, dynamic> toMap() {
-    return {"path": path, "type": _type, "id": _id};
+    return {"path": path, "type": type, "id": _id};
   }
 
   @override
@@ -67,7 +65,7 @@ class AndroidPathHandler extends PlatformPathHandler with ChannelController {
 
   @override
   String toString() {
-    return 'AndroidPathHandler{path: $path}';
+    return 'AndroidPathHandler{path: $path, type: $type}';
   }
 
   @override
@@ -100,16 +98,18 @@ class AndroidAssetsPathHandlerCreationParams
 }
 
 ///{@macro flutter_inappwebview_platform_interface.PlatformAssetsPathHandler}
-class AndroidAssetsPathHandler extends AndroidPathHandler
-    implements PlatformAssetsPathHandler {
+class AndroidAssetsPathHandler extends PlatformAssetsPathHandler
+    with AndroidPathHandler, ChannelController {
   /// Constructs a [AndroidAssetsPathHandler].
   AndroidAssetsPathHandler(PlatformAssetsPathHandlerCreationParams params)
-      : super(
+      : super.implementation(
           params is AndroidAssetsPathHandlerCreationParams
               ? params
               : AndroidAssetsPathHandlerCreationParams
                   .fromPlatformAssetsPathHandlerCreationParams(params),
-        );
+        ) {
+    _init(params);
+  }
 }
 
 /// Object specifying creation parameters for creating a [AndroidResourcesPathHandler].
@@ -135,16 +135,18 @@ class AndroidResourcesPathHandlerCreationParams
 }
 
 ///{@macro flutter_inappwebview_platform_interface.PlatformResourcesPathHandler}
-class AndroidResourcesPathHandler extends AndroidPathHandler
-    implements PlatformResourcesPathHandler {
+class AndroidResourcesPathHandler extends PlatformResourcesPathHandler
+    with AndroidPathHandler, ChannelController {
   /// Constructs a [AndroidResourcesPathHandler].
   AndroidResourcesPathHandler(PlatformResourcesPathHandlerCreationParams params)
-      : super(
+      : super.implementation(
           params is AndroidResourcesPathHandlerCreationParams
               ? params
               : AndroidResourcesPathHandlerCreationParams
                   .fromPlatformResourcesPathHandlerCreationParams(params),
-        );
+        ) {
+    _init(params);
+  }
 }
 
 /// Object specifying creation parameters for creating a [AndroidInternalStoragePathHandler].
@@ -170,17 +172,20 @@ class AndroidInternalStoragePathHandlerCreationParams
 }
 
 ///{@macro flutter_inappwebview_platform_interface.PlatformInternalStoragePathHandler}
-class AndroidInternalStoragePathHandler extends AndroidPathHandler
-    implements PlatformInternalStoragePathHandler {
+class AndroidInternalStoragePathHandler
+    extends PlatformInternalStoragePathHandler
+    with AndroidPathHandler, ChannelController {
   /// Constructs a [AndroidInternalStoragePathHandler].
   AndroidInternalStoragePathHandler(
       PlatformInternalStoragePathHandlerCreationParams params)
-      : super(
+      : super.implementation(
           params is AndroidInternalStoragePathHandlerCreationParams
               ? params
               : AndroidInternalStoragePathHandlerCreationParams
                   .fromPlatformInternalStoragePathHandlerCreationParams(params),
-        );
+        ) {
+    _init(params);
+  }
 
   AndroidInternalStoragePathHandlerCreationParams get _internalParams =>
       params as AndroidInternalStoragePathHandlerCreationParams;

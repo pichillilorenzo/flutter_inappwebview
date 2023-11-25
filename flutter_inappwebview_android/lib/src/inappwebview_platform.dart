@@ -150,16 +150,6 @@ class AndroidInAppWebViewPlatform extends InAppWebViewPlatform {
     return AndroidWebStorage(params);
   }
 
-  /// Creates a new [AndroidStorage].
-  ///
-  /// This function should only be called by the app-facing package.
-  /// Look at using [AndroidStorage] in `flutter_inappwebview` instead.
-  AndroidStorage createPlatformStorage(
-    PlatformStorageCreationParams params,
-  ) {
-    return AndroidStorage(params);
-  }
-
   /// Creates a new [AndroidLocalStorage].
   ///
   /// This function should only be called by the app-facing package.
@@ -264,16 +254,6 @@ class AndroidInAppWebViewPlatform extends InAppWebViewPlatform {
     PlatformTracingControllerCreationParams params,
   ) {
     return AndroidTracingController(params);
-  }
-
-  /// Creates a new [AndroidPathHandler].
-  ///
-  /// This function should only be called by the app-facing package.
-  /// Look at using [PathHandler] in `flutter_inappwebview` instead.
-  AndroidPathHandler createPlatformPathHandler(
-    PlatformPathHandlerCreationParams params,
-  ) {
-    return AndroidPathHandler(params);
   }
 
   /// Creates a new [AndroidAssetsPathHandler].

@@ -209,17 +209,6 @@ abstract class InAppWebViewPlatform extends PlatformInterface {
         'createPlatformWebStorage is not implemented on the current platform.');
   }
 
-  /// Creates a new [PlatformStorage].
-  ///
-  /// This function should only be called by the app-facing package.
-  /// Look at using [Storage] in `flutter_inappwebview` instead.
-  PlatformStorage createPlatformStorage(
-    PlatformStorageCreationParams params,
-  ) {
-    throw UnimplementedError(
-        'createPlatformStorage is not implemented on the current platform.');
-  }
-
   /// Creates a new [PlatformLocalStorage].
   ///
   /// This function should only be called by the app-facing package.
@@ -347,17 +336,6 @@ abstract class InAppWebViewPlatform extends PlatformInterface {
   ) {
     throw UnimplementedError(
         'createPlatformTracingController is not implemented on the current platform.');
-  }
-
-  /// Creates a new [PlatformPathHandler].
-  ///
-  /// This function should only be called by the app-facing package.
-  /// Look at using [PathHandler] in `flutter_inappwebview` instead.
-  PlatformPathHandler createPlatformPathHandler(
-    PlatformPathHandlerCreationParams params,
-  ) {
-    throw UnimplementedError(
-        'createPlatformPathHandler is not implemented on the current platform.');
   }
 
   /// Creates a new [PlatformAssetsPathHandler].

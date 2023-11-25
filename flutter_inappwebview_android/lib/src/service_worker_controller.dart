@@ -75,19 +75,15 @@ class AndroidServiceWorkerController extends PlatformServiceWorkerController
   }
 
   Future<dynamic> _handleMethod(MethodCall call) async {
-    AndroidServiceWorkerController controller =
-        AndroidServiceWorkerController.instance();
-    ServiceWorkerClient? serviceWorkerClient = controller._serviceWorkerClient;
-
     switch (call.method) {
       case "shouldInterceptRequest":
         if (serviceWorkerClient != null &&
-            serviceWorkerClient.shouldInterceptRequest != null) {
+            serviceWorkerClient!.shouldInterceptRequest != null) {
           Map<String, dynamic> arguments =
               call.arguments.cast<String, dynamic>();
           WebResourceRequest request = WebResourceRequest.fromMap(arguments)!;
 
-          return (await serviceWorkerClient.shouldInterceptRequest!(request))
+          return (await serviceWorkerClient!.shouldInterceptRequest!(request))
               ?.toMap();
         }
         break;

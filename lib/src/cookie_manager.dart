@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_platform_interface.dart';
 
 import 'in_app_webview/in_app_webview_controller.dart';
-import 'in_app_webview/headless_in_app_webview.dart';
 
 ///{@macro flutter_inappwebview_platform_interface.PlatformCookieManager}
 class CookieManager {

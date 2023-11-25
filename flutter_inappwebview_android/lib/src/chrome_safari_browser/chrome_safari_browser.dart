@@ -111,8 +111,9 @@ class AndroidChromeSafariBrowser extends PlatformChromeSafariBrowser
         break;
       case "onClosed":
         _isOpened = false;
+        final onClosed = eventHandler?.onClosed;
         dispose();
-        eventHandler?.onClosed();
+        onClosed?.call();
         break;
       case "onItemActionPerform":
         String url = call.arguments["url"];
@@ -402,5 +403,6 @@ class AndroidChromeSafariBrowser extends PlatformChromeSafariBrowser
   @mustCallSuper
   void dispose() {
     disposeChannel();
+    eventHandler = null;
   }
 }

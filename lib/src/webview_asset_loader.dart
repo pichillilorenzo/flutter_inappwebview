@@ -1,32 +1,26 @@
 import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_platform_interface.dart';
 
 ///{@macro flutter_inappwebview_platform_interface.PlatformPathHandler}
-abstract class PathHandler implements IPathHandler, PlatformPathHandlerEvents {
-  ///{@macro flutter_inappwebview_platform_interface.PlatformPathHandler}
-  PathHandler({required String path})
-      : this.fromPlatformCreationParams(
-            params: PlatformPathHandlerCreationParams(path: path));
-
-  /// Constructs a [PathHandler].
-  ///
-  /// See [PathHandler.fromPlatformCreationParams] for setting parameters for
-  /// a specific platform.
-  PathHandler.fromPlatformCreationParams({
-    required PlatformPathHandlerCreationParams params,
-  }) : this.fromPlatform(platform: PlatformPathHandler(params));
-
+abstract class PathHandler
+    implements PlatformPathHandler, PlatformPathHandlerEvents {
   /// Constructs a [PathHandler] from a specific platform implementation.
   PathHandler.fromPlatform({required this.platform}) {
     this.platform.eventHandler = this;
   }
 
+  @override
+  late final PlatformPathHandlerEvents? eventHandler;
+
   /// Implementation of [PlatformPathHandler] for the current platform.
   final PlatformPathHandler platform;
 
-  ///{@macro flutter_inappwebview_platform_interface.PlatformPathHandler.path}
+  @override
+  String get type => platform.type;
+
+  @override
   String get path => platform.path;
 
-  ///{@macro flutter_inappwebview_platform_interface.PlatformPathHandler.handle}
+  @override
   Future<WebResourceResponse?> handle(String path) async {
     return null;
   }

@@ -47,11 +47,12 @@ class DefaultInAppLocalhostServer extends PlatformInAppLocalhostServer {
               : DefaultInAppLocalhostServerCreationParams
                   .fromPlatformInAppLocalhostServerCreationParams(params),
         ) {
-    this._port = port;
-    this._directoryIndex = directoryIndex;
-    this._documentRoot =
-        (documentRoot.endsWith('/')) ? documentRoot : '$documentRoot/';
-    this._shared = shared;
+    this._port = params.port;
+    this._directoryIndex = params.directoryIndex;
+    this._documentRoot = (params.documentRoot.endsWith('/'))
+        ? params.documentRoot
+        : '${params.documentRoot}/';
+    this._shared = params.shared;
   }
 
   @override
@@ -98,6 +99,7 @@ class DefaultInAppLocalhostServer extends PlatformInAppLocalhostServer {
                 .buffer
                 .asUint8List();
           } catch (e) {
+            print(Uri.decodeFull(path));
             print(e.toString());
             request.response.close();
             return;

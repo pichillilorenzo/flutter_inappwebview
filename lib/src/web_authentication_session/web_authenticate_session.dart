@@ -5,17 +5,9 @@ import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_pla
 ///{@macro flutter_inappwebview_platform_interface.PlatformWebAuthenticationSession}
 class WebAuthenticationSession {
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebAuthenticationSession}
-  WebAuthenticationSession(
-      {required WebUri url,
-      String? callbackURLScheme,
-      WebAuthenticationSessionSettings? initialSettings,
-      WebAuthenticationSessionCompletionHandler onComplete})
+  WebAuthenticationSession()
       : this.fromPlatformCreationParams(
-            params: PlatformWebAuthenticationSessionCreationParams(
-                url: url,
-                callbackURLScheme: callbackURLScheme,
-                initialSettings: initialSettings,
-                onComplete: onComplete));
+            params: PlatformWebAuthenticationSessionCreationParams());
 
   /// Constructs a [WebAuthenticationSession].
   ///

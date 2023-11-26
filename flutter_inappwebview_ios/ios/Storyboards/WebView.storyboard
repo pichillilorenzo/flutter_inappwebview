@@ -11,7 +11,7 @@
         <!--In App Browser Navigation Controller-->
         <scene sceneID="jLX-8h-9MF">
             <objects>
-                <navigationController storyboardIdentifier="navController" id="kDN-39-Jxf" customClass="InAppBrowserNavigationController" customModule="flutter_inappwebview" sceneMemberID="viewController">
+                <navigationController storyboardIdentifier="navController" id="kDN-39-Jxf" customClass="InAppBrowserNavigationController" customModule="flutter_inappwebview_ios" sceneMemberID="viewController">
                     <navigationBar key="navigationBar" contentMode="scaleToFill" id="uWm-7N-XXH">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="44"/>
                         <autoresizingMask key="autoresizingMask"/>
@@ -24,7 +24,7 @@
         <!--In App Browser Web View Controller-->
         <scene sceneID="aus-qq-RXG">
             <objects>
-                <viewController storyboardIdentifier="viewController" id="Myh-pL-l6f" customClass="InAppBrowserWebViewController" customModule="flutter_inappwebview" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="viewController" id="Myh-pL-l6f" customClass="InAppBrowserWebViewController" customModule="flutter_inappwebview_ios" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="t5f-B2-Tnb"/>
                         <viewControllerLayoutGuide type="bottom" id="Rnw-Dd-Oxb"/>

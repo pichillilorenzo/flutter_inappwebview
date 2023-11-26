@@ -25,6 +25,8 @@ dependencies:
     path: flutter_inappwebview_platform_interface
   flutter_inappwebview_android:
     path: flutter_inappwebview_android
+  flutter_inappwebview_ios:
+    path: flutter_inappwebview_ios
 
 dev_dependencies:
   flutter_test:
@@ -46,7 +48,7 @@ flutter:
       android:
         default_package: flutter_inappwebview_android
       ios:
-        pluginClass: InAppWebViewFlutterPlugin
+        default_package: flutter_inappwebview_ios
       macos:
         pluginClass: InAppWebViewFlutterPlugin
       web:

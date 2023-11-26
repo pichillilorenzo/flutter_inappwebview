@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
-import 'package:flutter_inappwebview_platform_interface/src/types/disposable.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 import '../debug_logging_settings.dart';
 import '../inappwebview_platform.dart';
@@ -19,28 +18,7 @@ typedef WebAuthenticationSessionCompletionHandler = Future<void> Function(
 /// this class.
 class PlatformWebAuthenticationSessionCreationParams {
   /// Used by the platform implementation to create a new [PlatformWebAuthenticationSession].
-  PlatformWebAuthenticationSessionCreationParams(
-      {required this.url,
-      this.callbackURLScheme,
-      this.onComplete,
-      WebAuthenticationSessionSettings? initialSettings})
-      : this.initialSettings =
-            initialSettings ?? WebAuthenticationSessionSettings();
-
-  ///{@macro flutter_inappwebview_platform_interface.PlatformWebAuthenticationSession.id}
-  late final String id;
-
-  ///{@macro flutter_inappwebview_platform_interface.PlatformWebAuthenticationSession.url}
-  final WebUri url;
-
-  ///{@macro flutter_inappwebview_platform_interface.PlatformWebAuthenticationSession.callbackURLScheme}
-  final String? callbackURLScheme;
-
-  ///{@macro flutter_inappwebview_platform_interface.PlatformWebAuthenticationSession.initialSettings}
-  late final WebAuthenticationSessionSettings? initialSettings;
-
-  ///{@macro flutter_inappwebview_platform_interface.PlatformWebAuthenticationSession.onComplete}
-  WebAuthenticationSessionCompletionHandler onComplete;
+  const PlatformWebAuthenticationSessionCreationParams();
 }
 
 ///{@template flutter_inappwebview_platform_interface.PlatformWebAuthenticationSession}
@@ -122,28 +100,34 @@ abstract class PlatformWebAuthenticationSession extends PlatformInterface
   ///{@template flutter_inappwebview_platform_interface.PlatformWebAuthenticationSession.id}
   ///ID used internally.
   ///{@endtemplate}
-  String get id => params.id;
+  String get id =>
+      throw UnimplementedError('id is not implemented on the current platform');
 
   ///{@template flutter_inappwebview_platform_interface.PlatformWebAuthenticationSession.url}
   ///A URL with the `http` or `https` scheme pointing to the authentication webpage.
   ///{@endtemplate}
-  WebUri get url => params.url;
+  WebUri get url => throw UnimplementedError(
+      'url is not implemented on the current platform');
 
   ///{@template flutter_inappwebview_platform_interface.PlatformWebAuthenticationSession.callbackURLScheme}
   ///The custom URL scheme that the app expects in the callback URL.
   ///{@endtemplate}
-  String? get callbackURLScheme => params.callbackURLScheme;
+  String? get callbackURLScheme => throw UnimplementedError(
+      'callbackURLScheme is not implemented on the current platform');
 
   ///{@template flutter_inappwebview_platform_interface.PlatformWebAuthenticationSession.initialSettings}
   ///Initial settings.
   ///{@endtemplate}
   WebAuthenticationSessionSettings? get initialSettings =>
-      params.initialSettings;
+      throw UnimplementedError(
+          'initialSettings is not implemented on the current platform');
 
   ///{@template flutter_inappwebview_platform_interface.PlatformWebAuthenticationSession.onComplete}
   ///A completion handler the session calls when it completes successfully, or when the user cancels the session.
   ///{@endtemplate}
-  WebAuthenticationSessionCompletionHandler get onComplete => params.onComplete;
+  WebAuthenticationSessionCompletionHandler get onComplete =>
+      throw UnimplementedError(
+          'onComplete is not implemented on the current platform');
 
   ///{@template flutter_inappwebview_platform_interface.PlatformWebAuthenticationSession.create}
   ///Used to create and initialize a session.
@@ -153,6 +137,8 @@ abstract class PlatformWebAuthenticationSession extends PlatformInterface
   ///[callbackURLScheme] represents the custom URL scheme that the app expects in the callback URL.
   ///
   ///[onComplete] represents a completion handler the session calls when it completes successfully, or when the user cancels the session.
+  ///
+  ///[initialSettings] represents initial settings.
   ///{@endtemplate}
   Future<PlatformWebAuthenticationSession> create(
       {required WebUri url,

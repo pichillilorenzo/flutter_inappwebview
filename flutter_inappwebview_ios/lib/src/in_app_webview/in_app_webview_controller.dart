@@ -2596,63 +2596,6 @@ class IOSInAppWebViewController extends PlatformInAppWebViewController
   }
 
   @override
-  Future<bool> startSafeBrowsing() async {
-    Map<String, dynamic> args = <String, dynamic>{};
-    return await channel?.invokeMethod<bool>('startSafeBrowsing', args) ??
-        false;
-  }
-
-  @override
-  Future<void> clearSslPreferences() async {
-    Map<String, dynamic> args = <String, dynamic>{};
-    await channel?.invokeMethod('clearSslPreferences', args);
-  }
-
-  @override
-  Future<void> pause() async {
-    Map<String, dynamic> args = <String, dynamic>{};
-    await channel?.invokeMethod('pause', args);
-  }
-
-  @override
-  Future<void> resume() async {
-    Map<String, dynamic> args = <String, dynamic>{};
-    await channel?.invokeMethod('resume', args);
-  }
-
-  @override
-  Future<bool> pageDown({required bool bottom}) async {
-    Map<String, dynamic> args = <String, dynamic>{};
-    args.putIfAbsent("bottom", () => bottom);
-    return await channel?.invokeMethod<bool>('pageDown', args) ?? false;
-  }
-
-  @override
-  Future<bool> pageUp({required bool top}) async {
-    Map<String, dynamic> args = <String, dynamic>{};
-    args.putIfAbsent("top", () => top);
-    return await channel?.invokeMethod<bool>('pageUp', args) ?? false;
-  }
-
-  @override
-  Future<bool> zoomIn() async {
-    Map<String, dynamic> args = <String, dynamic>{};
-    return await channel?.invokeMethod<bool>('zoomIn', args) ?? false;
-  }
-
-  @override
-  Future<bool> zoomOut() async {
-    Map<String, dynamic> args = <String, dynamic>{};
-    return await channel?.invokeMethod<bool>('zoomOut', args) ?? false;
-  }
-
-  @override
-  Future<void> clearHistory() async {
-    Map<String, dynamic> args = <String, dynamic>{};
-    return await channel?.invokeMethod('clearHistory', args);
-  }
-
-  @override
   Future<void> reloadFromOrigin() async {
     Map<String, dynamic> args = <String, dynamic>{};
     await channel?.invokeMethod('reloadFromOrigin', args);
@@ -2757,84 +2700,11 @@ class IOSInAppWebViewController extends PlatformInAppWebViewController
   }
 
   @override
-  Future<String?> getIFrameId() async {
-    Map<String, dynamic> args = <String, dynamic>{};
-    return await channel?.invokeMethod<String?>('getIFrameId', args);
-  }
-
-  @override
   Future<String> getDefaultUserAgent() async {
     Map<String, dynamic> args = <String, dynamic>{};
     return await _staticChannel.invokeMethod<String>(
             'getDefaultUserAgent', args) ??
         '';
-  }
-
-  @override
-  Future<void> clearClientCertPreferences() async {
-    Map<String, dynamic> args = <String, dynamic>{};
-    await _staticChannel.invokeMethod('clearClientCertPreferences', args);
-  }
-
-  @override
-  Future<WebUri?> getSafeBrowsingPrivacyPolicyUrl() async {
-    Map<String, dynamic> args = <String, dynamic>{};
-    String? url = await _staticChannel.invokeMethod(
-        'getSafeBrowsingPrivacyPolicyUrl', args);
-    return url != null ? WebUri(url) : null;
-  }
-
-  @override
-  @Deprecated("Use setSafeBrowsingAllowlist instead")
-  Future<bool> setSafeBrowsingWhitelist({required List<String> hosts}) async {
-    return await setSafeBrowsingAllowlist(hosts: hosts);
-  }
-
-  @override
-  Future<bool> setSafeBrowsingAllowlist({required List<String> hosts}) async {
-    Map<String, dynamic> args = <String, dynamic>{};
-    args.putIfAbsent('hosts', () => hosts);
-    return await _staticChannel.invokeMethod<bool>(
-            'setSafeBrowsingAllowlist', args) ??
-        false;
-  }
-
-  @override
-  Future<WebViewPackageInfo?> getCurrentWebViewPackage() async {
-    Map<String, dynamic> args = <String, dynamic>{};
-    Map<String, dynamic>? packageInfo =
-        (await _staticChannel.invokeMethod('getCurrentWebViewPackage', args))
-            ?.cast<String, dynamic>();
-    return WebViewPackageInfo.fromMap(packageInfo);
-  }
-
-  @override
-  Future<void> setWebContentsDebuggingEnabled(bool debuggingEnabled) async {
-    Map<String, dynamic> args = <String, dynamic>{};
-    args.putIfAbsent('debuggingEnabled', () => debuggingEnabled);
-    return await _staticChannel.invokeMethod(
-        'setWebContentsDebuggingEnabled', args);
-  }
-
-  @override
-  Future<String?> getVariationsHeader() async {
-    Map<String, dynamic> args = <String, dynamic>{};
-    return await _staticChannel.invokeMethod<String?>(
-        'getVariationsHeader', args);
-  }
-
-  @override
-  Future<bool> isMultiProcessEnabled() async {
-    Map<String, dynamic> args = <String, dynamic>{};
-    return await _staticChannel.invokeMethod<bool>(
-            'isMultiProcessEnabled', args) ??
-        false;
-  }
-
-  @override
-  Future<void> disableWebView() async {
-    Map<String, dynamic> args = <String, dynamic>{};
-    await _staticChannel.invokeMethod('disableWebView', args);
   }
 
   @override

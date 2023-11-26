@@ -125,6 +125,7 @@ abstract class PlatformStorage implements Disposable {
   ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
+  ///- MacOS
   ///- Web
   ///{@endtemplate}
   Future<int?> length() {
@@ -140,6 +141,7 @@ abstract class PlatformStorage implements Disposable {
   ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
+  ///- MacOS
   ///- Web
   ///{@endtemplate}
   Future<void> setItem({required String key, required dynamic value}) {
@@ -155,6 +157,7 @@ abstract class PlatformStorage implements Disposable {
   ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
+  ///- MacOS
   ///- Web
   ///{@endtemplate}
   Future<dynamic> getItem({required String key}) {
@@ -170,6 +173,7 @@ abstract class PlatformStorage implements Disposable {
   ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
+  ///- MacOS
   ///- Web
   ///{@endtemplate}
   Future<void> removeItem({required String key}) {
@@ -185,6 +189,7 @@ abstract class PlatformStorage implements Disposable {
   ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
+  ///- MacOS
   ///- Web
   ///{@endtemplate}
   Future<List<WebStorageItem>> getItems() {
@@ -200,6 +205,7 @@ abstract class PlatformStorage implements Disposable {
   ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
+  ///- MacOS
   ///- Web
   ///{@endtemplate}
   Future<void> clear() {
@@ -216,6 +222,7 @@ abstract class PlatformStorage implements Disposable {
   ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
+  ///- MacOS
   ///- Web
   ///{@endtemplate}
   Future<String> key({required int index}) {

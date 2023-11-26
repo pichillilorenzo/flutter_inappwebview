@@ -5,9 +5,6 @@ import 'package:flutter/services.dart';
 
 import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_platform_interface.dart';
 
-import 'in_app_webview/headless_in_app_webview.dart';
-import 'platform_util.dart';
-
 /// Object specifying creation parameters for creating a [AndroidCookieManager].
 ///
 /// When adding additional fields make sure they can be null or have a default
@@ -77,27 +74,10 @@ class AndroidCookieManager extends PlatformCookieManager
       @Deprecated("Use webViewController instead")
       PlatformInAppWebViewController? iosBelow11WebViewController,
       PlatformInAppWebViewController? webViewController}) async {
-    webViewController = webViewController ?? iosBelow11WebViewController;
-
     assert(url.toString().isNotEmpty);
     assert(name.isNotEmpty);
     assert(value.isNotEmpty);
     assert(path.isNotEmpty);
-
-    if (await _shouldUseJavascript()) {
-      await _setCookieWithJavaScript(
-          url: url,
-          name: name,
-          value: value,
-          domain: domain,
-          path: path,
-          expiresDate: expiresDate,
-          maxAge: maxAge,
-          isSecure: isSecure,
-          sameSite: sameSite,
-          webViewController: webViewController);
-      return true;
-    }
 
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('url', () => url.toString());
@@ -114,57 +94,6 @@ class AndroidCookieManager extends PlatformCookieManager
     return await channel?.invokeMethod<bool>('setCookie', args) ?? false;
   }
 
-  Future<void> _setCookieWithJavaScript(
-      {required WebUri url,
-      required String name,
-      required String value,
-      String path = "/",
-      String? domain,
-      int? expiresDate,
-      int? maxAge,
-      bool? isSecure,
-      HTTPCookieSameSitePolicy? sameSite,
-      PlatformInAppWebViewController? webViewController}) async {
-    var cookieValue = name + "=" + value + "; Path=" + path;
-
-    if (domain != null) cookieValue += "; Domain=" + domain;
-
-    if (expiresDate != null)
-      cookieValue += "; Expires=" + await _getCookieExpirationDate(expiresDate);
-
-    if (maxAge != null) cookieValue += "; Max-Age=" + maxAge.toString();
-
-    if (isSecure != null && isSecure) cookieValue += "; Secure";
-
-    if (sameSite != null)
-      cookieValue += "; SameSite=" + sameSite.toNativeValue();
-
-    cookieValue += ";";
-
-    if (webViewController != null) {
-      final javaScriptEnabled =
-          (await webViewController.getSettings())?.javaScriptEnabled ?? false;
-      if (javaScriptEnabled) {
-        await webViewController.evaluateJavascript(
-            source: 'document.cookie="$cookieValue"');
-        return;
-      }
-    }
-
-    final setCookieCompleter = Completer<void>();
-    final headlessWebView =
-        AndroidHeadlessInAppWebView(AndroidHeadlessInAppWebViewCreationParams(
-            initialUrlRequest: URLRequest(url: url),
-            onLoadStop: (controller, url) async {
-              await controller.evaluateJavascript(
-                  source: 'document.cookie="$cookieValue"');
-              setCookieCompleter.complete();
-            }));
-    await headlessWebView.run();
-    await setCookieCompleter.future;
-    await headlessWebView.dispose();
-  }
-
   @override
   Future<List<Cookie>> getCookies(
       {required WebUri url,
@@ -172,13 +101,6 @@ class AndroidCookieManager extends PlatformCookieManager
       PlatformInAppWebViewController? iosBelow11WebViewController,
       PlatformInAppWebViewController? webViewController}) async {
     assert(url.toString().isNotEmpty);
-
-    webViewController = webViewController ?? iosBelow11WebViewController;
-
-    if (await _shouldUseJavascript()) {
-      return await _getCookiesWithJavaScript(
-          url: url, webViewController: webViewController);
-    }
 
     List<Cookie> cookies = [];
 
@@ -204,64 +126,6 @@ class AndroidCookieManager extends PlatformCookieManager
     return cookies;
   }
 
-  Future<List<Cookie>> _getCookiesWithJavaScript(
-      {required WebUri url,
-      PlatformInAppWebViewController? webViewController}) async {
-    assert(url.toString().isNotEmpty);
-
-    List<Cookie> cookies = [];
-
-    if (webViewController != null) {
-      final javaScriptEnabled =
-          (await webViewController.getSettings())?.javaScriptEnabled ?? false;
-      if (javaScriptEnabled) {
-        List<String> documentCookies = (await webViewController
-                .evaluateJavascript(source: 'document.cookie') as String)
-            .split(';')
-            .map((documentCookie) => documentCookie.trim())
-            .toList();
-        documentCookies.forEach((documentCookie) {
-          List<String> cookie = documentCookie.split('=');
-          if (cookie.length > 1) {
-            cookies.add(Cookie(
-              name: cookie[0],
-              value: cookie[1],
-            ));
-          }
-        });
-        return cookies;
-      }
-    }
-
-    final pageLoaded = Completer<void>();
-    final headlessWebView =
-        AndroidHeadlessInAppWebView(AndroidHeadlessInAppWebViewCreationParams(
-      initialUrlRequest: URLRequest(url: url),
-      onLoadStop: (controller, url) async {
-        pageLoaded.complete();
-      },
-    ));
-    await headlessWebView.run();
-    await pageLoaded.future;
-
-    List<String> documentCookies = (await headlessWebView.webViewController!
-            .evaluateJavascript(source: 'document.cookie') as String)
-        .split(';')
-        .map((documentCookie) => documentCookie.trim())
-        .toList();
-    documentCookies.forEach((documentCookie) {
-      List<String> cookie = documentCookie.split('=');
-      if (cookie.length > 1) {
-        cookies.add(Cookie(
-          name: cookie[0],
-          value: cookie[1],
-        ));
-      }
-    });
-    await headlessWebView.dispose();
-    return cookies;
-  }
-
   @override
   Future<Cookie?> getCookie(
       {required WebUri url,
@@ -271,16 +135,6 @@ class AndroidCookieManager extends PlatformCookieManager
       PlatformInAppWebViewController? webViewController}) async {
     assert(url.toString().isNotEmpty);
     assert(name.isNotEmpty);
-
-    webViewController = webViewController ?? iosBelow11WebViewController;
-
-    if (await _shouldUseJavascript()) {
-      List<Cookie> cookies = await _getCookiesWithJavaScript(
-          url: url, webViewController: webViewController);
-      return cookies
-          .cast<Cookie?>()
-          .firstWhere((cookie) => cookie!.name == name, orElse: () => null);
-    }
 
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('url', () => url.toString());
@@ -317,20 +171,6 @@ class AndroidCookieManager extends PlatformCookieManager
     assert(url.toString().isNotEmpty);
     assert(name.isNotEmpty);
 
-    webViewController = webViewController ?? iosBelow11WebViewController;
-
-    if (await _shouldUseJavascript()) {
-      await _setCookieWithJavaScript(
-          url: url,
-          name: name,
-          value: "",
-          path: path,
-          domain: domain,
-          maxAge: -1,
-          webViewController: webViewController);
-      return;
-    }
-
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('url', () => url.toString());
     args.putIfAbsent('name', () => name);
@@ -349,24 +189,6 @@ class AndroidCookieManager extends PlatformCookieManager
       PlatformInAppWebViewController? webViewController}) async {
     assert(url.toString().isNotEmpty);
 
-    webViewController = webViewController ?? iosBelow11WebViewController;
-
-    if (await _shouldUseJavascript()) {
-      List<Cookie> cookies = await _getCookiesWithJavaScript(
-          url: url, webViewController: webViewController);
-      for (var i = 0; i < cookies.length; i++) {
-        await _setCookieWithJavaScript(
-            url: url,
-            name: cookies[i].name,
-            value: "",
-            path: path,
-            domain: domain,
-            maxAge: -1,
-            webViewController: webViewController);
-      }
-      return;
-    }
-
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('url', () => url.toString());
     args.putIfAbsent('domain', () => domain);
@@ -378,57 +200,6 @@ class AndroidCookieManager extends PlatformCookieManager
   Future<void> deleteAllCookies() async {
     Map<String, dynamic> args = <String, dynamic>{};
     await channel?.invokeMethod('deleteAllCookies', args);
-  }
-
-  @override
-  Future<List<Cookie>> getAllCookies() async {
-    List<Cookie> cookies = [];
-
-    Map<String, dynamic> args = <String, dynamic>{};
-    List<dynamic> cookieListMap =
-        await channel?.invokeMethod<List>('getAllCookies', args) ?? [];
-    cookieListMap = cookieListMap.cast<Map<dynamic, dynamic>>();
-
-    cookieListMap.forEach((cookieMap) {
-      cookies.add(Cookie(
-          name: cookieMap["name"],
-          value: cookieMap["value"],
-          expiresDate: cookieMap["expiresDate"],
-          isSessionOnly: cookieMap["isSessionOnly"],
-          domain: cookieMap["domain"],
-          sameSite:
-              HTTPCookieSameSitePolicy.fromNativeValue(cookieMap["sameSite"]),
-          isSecure: cookieMap["isSecure"],
-          isHttpOnly: cookieMap["isHttpOnly"],
-          path: cookieMap["path"]));
-    });
-    return cookies;
-  }
-
-  Future<String> _getCookieExpirationDate(int expiresDate) async {
-    var platformUtil = PlatformUtil.instance();
-    var dateTime = DateTime.fromMillisecondsSinceEpoch(expiresDate).toUtc();
-    return !kIsWeb
-        ? await platformUtil.formatDate(
-            date: dateTime,
-            format: 'EEE, dd MMM yyyy hh:mm:ss z',
-            locale: 'en_US',
-            timezone: 'GMT')
-        : await platformUtil.getWebCookieExpirationDate(date: dateTime);
-  }
-
-  Future<bool> _shouldUseJavascript() async {
-    if (Util.isWeb) {
-      return true;
-    }
-    if (Util.isIOS || Util.isMacOS) {
-      final platformUtil = PlatformUtil.instance();
-      final systemVersion = await platformUtil.getSystemVersion();
-      return Util.isIOS
-          ? systemVersion.compareTo("11") == -1
-          : systemVersion.compareTo("10.13") == -1;
-    }
-    return false;
   }
 
   @override

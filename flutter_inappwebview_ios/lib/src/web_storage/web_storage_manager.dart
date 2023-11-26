@@ -59,53 +59,6 @@ class IOSWebStorageManager extends PlatformWebStorageManager
   Future<dynamic> _handleMethod(MethodCall call) async {}
 
   @override
-  Future<List<WebStorageOrigin>> getOrigins() async {
-    List<WebStorageOrigin> originsList = [];
-
-    Map<String, dynamic> args = <String, dynamic>{};
-    List<Map<dynamic, dynamic>> origins =
-        (await channel?.invokeMethod<List>('getOrigins', args))
-                ?.cast<Map<dynamic, dynamic>>() ??
-            [];
-
-    for (var origin in origins) {
-      originsList.add(WebStorageOrigin(
-          origin: origin["origin"],
-          quota: origin["quota"],
-          usage: origin["usage"]));
-    }
-
-    return originsList;
-  }
-
-  @override
-  Future<void> deleteAllData() async {
-    Map<String, dynamic> args = <String, dynamic>{};
-    await channel?.invokeMethod('deleteAllData', args);
-  }
-
-  @override
-  Future<void> deleteOrigin({required String origin}) async {
-    Map<String, dynamic> args = <String, dynamic>{};
-    args.putIfAbsent("origin", () => origin);
-    await channel?.invokeMethod('deleteOrigin', args);
-  }
-
-  @override
-  Future<int> getQuotaForOrigin({required String origin}) async {
-    Map<String, dynamic> args = <String, dynamic>{};
-    args.putIfAbsent("origin", () => origin);
-    return await channel?.invokeMethod<int>('getQuotaForOrigin', args) ?? 0;
-  }
-
-  @override
-  Future<int> getUsageForOrigin({required String origin}) async {
-    Map<String, dynamic> args = <String, dynamic>{};
-    args.putIfAbsent("origin", () => origin);
-    return await channel?.invokeMethod<int>('getUsageForOrigin', args) ?? 0;
-  }
-
-  @override
   Future<List<WebsiteDataRecord>> fetchDataRecords(
       {required Set<WebsiteDataType> dataTypes}) async {
     List<WebsiteDataRecord> recordList = [];

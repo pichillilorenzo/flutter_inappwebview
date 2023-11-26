@@ -56,18 +56,6 @@ class IOSPrintJobController extends PlatformPrintJobController
   }
 
   @override
-  Future<void> cancel() async {
-    Map<String, dynamic> args = <String, dynamic>{};
-    await channel?.invokeMethod('cancel', args);
-  }
-
-  @override
-  Future<void> restart() async {
-    Map<String, dynamic> args = <String, dynamic>{};
-    await channel?.invokeMethod('restart', args);
-  }
-
-  @override
   Future<void> dismiss({bool animated: true}) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent("animated", () => animated);

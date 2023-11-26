@@ -86,11 +86,6 @@ class AndroidChromeSafariBrowser extends PlatformChromeSafariBrowser
         final bool? didLoadSuccessfully = call.arguments["didLoadSuccessfully"];
         eventHandler?.onCompletedInitialLoad(didLoadSuccessfully);
         break;
-      case "onInitialLoadDidRedirect":
-        final String? url = call.arguments["url"];
-        final WebUri? uri = url != null ? WebUri(url) : null;
-        eventHandler?.onInitialLoadDidRedirect(uri);
-        break;
       case "onNavigationEvent":
         final navigationEvent = CustomTabsNavigationEventType.fromNativeValue(
             call.arguments["navigationEvent"]);
@@ -105,9 +100,6 @@ class AndroidChromeSafariBrowser extends PlatformChromeSafariBrowser
         final bool result = call.arguments["result"];
         eventHandler?.onRelationshipValidationResult(
             relation, requestedOrigin, result);
-        break;
-      case "onWillOpenInBrowser":
-        eventHandler?.onWillOpenInBrowser();
         break;
       case "onClosed":
         _isOpened = false;
@@ -368,30 +360,6 @@ class AndroidChromeSafariBrowser extends PlatformChromeSafariBrowser
     args.putIfAbsent("packages", () => packages);
     args.putIfAbsent("ignoreDefault", () => ignoreDefault);
     return await _staticChannel.invokeMethod<String?>("getPackageName", args);
-  }
-
-  @override
-  Future<void> clearWebsiteData() async {
-    Map<String, dynamic> args = <String, dynamic>{};
-    await _staticChannel.invokeMethod("clearWebsiteData", args);
-  }
-
-  @override
-  Future<PrewarmingToken?> prewarmConnections(List<WebUri> URLs) async {
-    Map<String, dynamic> args = <String, dynamic>{};
-    args.putIfAbsent('URLs', () => URLs.map((e) => e.toString()).toList());
-    Map<String, dynamic>? result =
-        (await _staticChannel.invokeMethod("prewarmConnections", args))
-            ?.cast<String, dynamic>();
-    return PrewarmingToken.fromMap(result);
-  }
-
-  @override
-  Future<void> invalidatePrewarmingToken(
-      PrewarmingToken prewarmingToken) async {
-    Map<String, dynamic> args = <String, dynamic>{};
-    args.putIfAbsent('prewarmingToken', () => prewarmingToken.toMap());
-    await _staticChannel.invokeMethod("invalidatePrewarmingToken", args);
   }
 
   @override

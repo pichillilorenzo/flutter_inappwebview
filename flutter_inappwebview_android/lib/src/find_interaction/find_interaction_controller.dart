@@ -98,30 +98,6 @@ class AndroidFindInteractionController extends PlatformFindInteractionController
     return await channel?.invokeMethod<String?>('getSearchText', args);
   }
 
-  ///{@macro flutter_inappwebview_platform_interface.PlatformFindInteractionController.isFindNavigatorVisible}
-  Future<bool?> isFindNavigatorVisible() async {
-    Map<String, dynamic> args = <String, dynamic>{};
-    return await channel?.invokeMethod<bool?>('isFindNavigatorVisible', args);
-  }
-
-  ///{@macro flutter_inappwebview_platform_interface.PlatformFindInteractionController.updateResultCount}
-  Future<void> updateResultCount() async {
-    Map<String, dynamic> args = <String, dynamic>{};
-    await channel?.invokeMethod('updateResultCount', args);
-  }
-
-  ///{@macro flutter_inappwebview_platform_interface.PlatformFindInteractionController.presentFindNavigator}
-  Future<void> presentFindNavigator() async {
-    Map<String, dynamic> args = <String, dynamic>{};
-    await channel?.invokeMethod('presentFindNavigator', args);
-  }
-
-  ///{@macro flutter_inappwebview_platform_interface.PlatformFindInteractionController.dismissFindNavigator}
-  Future<void> dismissFindNavigator() async {
-    Map<String, dynamic> args = <String, dynamic>{};
-    await channel?.invokeMethod('dismissFindNavigator', args);
-  }
-
   ///{@macro flutter_inappwebview_platform_interface.PlatformFindInteractionController.getActiveFindSession}
   Future<FindSession?> getActiveFindSession() async {
     Map<String, dynamic> args = <String, dynamic>{};

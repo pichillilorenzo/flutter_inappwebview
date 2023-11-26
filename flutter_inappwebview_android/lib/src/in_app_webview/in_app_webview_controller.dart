@@ -1923,7 +1923,7 @@ class AndroidInAppWebViewController extends PlatformInAppWebViewController
     args.putIfAbsent('source', () => source);
     args.putIfAbsent('contentWorld', () => contentWorld?.toMap());
     var data = await channel?.invokeMethod('evaluateJavascript', args);
-    if (data != null && (Util.isAndroid || Util.isWeb)) {
+    if (data != null) {
       try {
         // try to json decode the data coming from JavaScript
         // otherwise return it as it is.
@@ -2185,8 +2185,7 @@ class AndroidInAppWebViewController extends PlatformInAppWebViewController
       {required double zoomFactor,
       @Deprecated('Use animated instead') bool? iosAnimated,
       bool animated = false}) async {
-    assert(!Util.isAndroid ||
-        (Util.isAndroid && zoomFactor > 0.01 && zoomFactor <= 100.0));
+    assert(zoomFactor > 0.01 && zoomFactor <= 100.0);
 
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('zoomFactor', () => zoomFactor);
@@ -2398,8 +2397,6 @@ class AndroidInAppWebViewController extends PlatformInAppWebViewController
 
   @override
   Future<void> addUserScript({required UserScript userScript}) async {
-    assert(webviewParams?.windowId == null || (!Util.isIOS && !Util.isMacOS));
-
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('userScript', () => userScript.toMap());
     if (!(_userScripts[userScript.injectionTime]?.contains(userScript) ??
@@ -2411,8 +2408,6 @@ class AndroidInAppWebViewController extends PlatformInAppWebViewController
 
   @override
   Future<void> addUserScripts({required List<UserScript> userScripts}) async {
-    assert(webviewParams?.windowId == null || (!Util.isIOS && !Util.isMacOS));
-
     for (var i = 0; i < userScripts.length; i++) {
       await addUserScript(userScript: userScripts[i]);
     }
@@ -2420,8 +2415,6 @@ class AndroidInAppWebViewController extends PlatformInAppWebViewController
 
   @override
   Future<bool> removeUserScript({required UserScript userScript}) async {
-    assert(webviewParams?.windowId == null || (!Util.isIOS && !Util.isMacOS));
-
     var index = _userScripts[userScript.injectionTime]?.indexOf(userScript);
     if (index == null || index == -1) {
       return false;
@@ -2438,8 +2431,6 @@ class AndroidInAppWebViewController extends PlatformInAppWebViewController
 
   @override
   Future<void> removeUserScriptsByGroupName({required String groupName}) async {
-    assert(webviewParams?.windowId == null || (!Util.isIOS && !Util.isMacOS));
-
     final List<UserScript> userScriptsAtDocumentStart = List.from(
         _userScripts[UserScriptInjectionTime.AT_DOCUMENT_START] ?? []);
     for (final userScript in userScriptsAtDocumentStart) {
@@ -2464,17 +2455,13 @@ class AndroidInAppWebViewController extends PlatformInAppWebViewController
   @override
   Future<void> removeUserScripts(
       {required List<UserScript> userScripts}) async {
-    assert(webviewParams?.windowId == null || (!Util.isIOS && !Util.isMacOS));
-
-    for (final userScript in userScripts) {
+   for (final userScript in userScripts) {
       await removeUserScript(userScript: userScript);
     }
   }
 
   @override
   Future<void> removeAllUserScripts() async {
-    assert(webviewParams?.windowId == null || (!Util.isIOS && !Util.isMacOS));
-
     _userScripts[UserScriptInjectionTime.AT_DOCUMENT_START]?.clear();
     _userScripts[UserScriptInjectionTime.AT_DOCUMENT_END]?.clear();
 
@@ -2501,9 +2488,7 @@ class AndroidInAppWebViewController extends PlatformInAppWebViewController
     if (data == null) {
       return null;
     }
-    if (Util.isAndroid) {
-      data = json.decode(data);
-    }
+    data = json.decode(data);
     return CallAsyncJavaScriptResult(
         value: data["value"], error: data["error"]);
   }
@@ -2512,12 +2497,7 @@ class AndroidInAppWebViewController extends PlatformInAppWebViewController
   Future<String?> saveWebArchive(
       {required String filePath, bool autoname = false}) async {
     if (!autoname) {
-      if (Util.isAndroid) {
-        assert(filePath.endsWith("." + WebArchiveFormat.MHT.toNativeValue()));
-      } else if (Util.isIOS || Util.isMacOS) {
-        assert(filePath
-            .endsWith("." + WebArchiveFormat.WEBARCHIVE.toNativeValue()));
-      }
+      assert(filePath.endsWith("." + WebArchiveFormat.MHT.toNativeValue()));
     }
 
     Map<String, dynamic> args = <String, dynamic>{};
@@ -2653,113 +2633,9 @@ class AndroidInAppWebViewController extends PlatformInAppWebViewController
   }
 
   @override
-  Future<void> reloadFromOrigin() async {
-    Map<String, dynamic> args = <String, dynamic>{};
-    await channel?.invokeMethod('reloadFromOrigin', args);
-  }
-
-  @override
-  Future<Uint8List?> createPdf(
-      {@Deprecated("Use pdfConfiguration instead")
-      // ignore: deprecated_member_use_from_same_package
-      IOSWKPDFConfiguration? iosWKPdfConfiguration,
-      PDFConfiguration? pdfConfiguration}) async {
-    Map<String, dynamic> args = <String, dynamic>{};
-    args.putIfAbsent('pdfConfiguration',
-        () => pdfConfiguration?.toMap() ?? iosWKPdfConfiguration?.toMap());
-    return await channel?.invokeMethod<Uint8List?>('createPdf', args);
-  }
-
-  @override
-  Future<Uint8List?> createWebArchiveData() async {
-    Map<String, dynamic> args = <String, dynamic>{};
-    return await channel?.invokeMethod('createWebArchiveData', args);
-  }
-
-  @override
-  Future<bool> hasOnlySecureContent() async {
-    Map<String, dynamic> args = <String, dynamic>{};
-    return await channel?.invokeMethod<bool>('hasOnlySecureContent', args) ??
-        false;
-  }
-
-  @override
-  Future<void> pauseAllMediaPlayback() async {
-    Map<String, dynamic> args = <String, dynamic>{};
-    return await channel?.invokeMethod('pauseAllMediaPlayback', args);
-  }
-
-  @override
-  Future<void> setAllMediaPlaybackSuspended({required bool suspended}) async {
-    Map<String, dynamic> args = <String, dynamic>{};
-    args.putIfAbsent("suspended", () => suspended);
-    return await channel?.invokeMethod('setAllMediaPlaybackSuspended', args);
-  }
-
-  @override
-  Future<void> closeAllMediaPresentations() async {
-    Map<String, dynamic> args = <String, dynamic>{};
-    return await channel?.invokeMethod('closeAllMediaPresentations', args);
-  }
-
-  @override
-  Future<MediaPlaybackState?> requestMediaPlaybackState() async {
-    Map<String, dynamic> args = <String, dynamic>{};
-    return MediaPlaybackState.fromNativeValue(
-        await channel?.invokeMethod('requestMediaPlaybackState', args));
-  }
-
-  @override
   Future<bool> isInFullscreen() async {
     Map<String, dynamic> args = <String, dynamic>{};
     return await channel?.invokeMethod<bool>('isInFullscreen', args) ?? false;
-  }
-
-  @override
-  Future<MediaCaptureState?> getCameraCaptureState() async {
-    Map<String, dynamic> args = <String, dynamic>{};
-    return MediaCaptureState.fromNativeValue(
-        await channel?.invokeMethod('getCameraCaptureState', args));
-  }
-
-  @override
-  Future<void> setCameraCaptureState({required MediaCaptureState state}) async {
-    Map<String, dynamic> args = <String, dynamic>{};
-    args.putIfAbsent('state', () => state.toNativeValue());
-    await channel?.invokeMethod('setCameraCaptureState', args);
-  }
-
-  @override
-  Future<MediaCaptureState?> getMicrophoneCaptureState() async {
-    Map<String, dynamic> args = <String, dynamic>{};
-    return MediaCaptureState.fromNativeValue(
-        await channel?.invokeMethod('getMicrophoneCaptureState', args));
-  }
-
-  @override
-  Future<void> setMicrophoneCaptureState(
-      {required MediaCaptureState state}) async {
-    Map<String, dynamic> args = <String, dynamic>{};
-    args.putIfAbsent('state', () => state.toNativeValue());
-    await channel?.invokeMethod('setMicrophoneCaptureState', args);
-  }
-
-  @override
-  Future<void> loadSimulatedRequest(
-      {required URLRequest urlRequest,
-      required Uint8List data,
-      URLResponse? urlResponse}) async {
-    Map<String, dynamic> args = <String, dynamic>{};
-    args.putIfAbsent('urlRequest', () => urlRequest.toMap());
-    args.putIfAbsent('data', () => data);
-    args.putIfAbsent('urlResponse', () => urlResponse?.toMap());
-    await channel?.invokeMethod('loadSimulatedRequest', args);
-  }
-
-  @override
-  Future<String?> getIFrameId() async {
-    Map<String, dynamic> args = <String, dynamic>{};
-    return await channel?.invokeMethod<String?>('getIFrameId', args);
   }
 
   @override
@@ -2835,13 +2711,6 @@ class AndroidInAppWebViewController extends PlatformInAppWebViewController
   Future<void> disableWebView() async {
     Map<String, dynamic> args = <String, dynamic>{};
     await _staticChannel.invokeMethod('disableWebView', args);
-  }
-
-  @override
-  Future<bool> handlesURLScheme(String urlScheme) async {
-    Map<String, dynamic> args = <String, dynamic>{};
-    args.putIfAbsent('urlScheme', () => urlScheme);
-    return await _staticChannel.invokeMethod('handlesURLScheme', args);
   }
 
   @override

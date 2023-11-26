@@ -110,43 +110,6 @@ class IOSPullToRefreshController extends PlatformPullToRefreshController
     await channel?.invokeMethod('setBackgroundColor', args);
   }
 
-  @override
-  Future<void> setDistanceToTriggerSync(int distanceToTriggerSync) async {
-    Map<String, dynamic> args = <String, dynamic>{};
-    args.putIfAbsent('distanceToTriggerSync', () => distanceToTriggerSync);
-    await channel?.invokeMethod('setDistanceToTriggerSync', args);
-  }
-
-  @override
-  Future<void> setSlingshotDistance(int slingshotDistance) async {
-    Map<String, dynamic> args = <String, dynamic>{};
-    args.putIfAbsent('slingshotDistance', () => slingshotDistance);
-    await channel?.invokeMethod('setSlingshotDistance', args);
-  }
-
-  @override
-  Future<int> getDefaultSlingshotDistance() async {
-    Map<String, dynamic> args = <String, dynamic>{};
-    return await channel?.invokeMethod<int>(
-            'getDefaultSlingshotDistance', args) ??
-        0;
-  }
-
-  @Deprecated("Use setIndicatorSize instead")
-  @override
-  Future<void> setSize(AndroidPullToRefreshSize size) async {
-    Map<String, dynamic> args = <String, dynamic>{};
-    args.putIfAbsent('size', () => size.toNativeValue());
-    await channel?.invokeMethod('setSize', args);
-  }
-
-  @override
-  Future<void> setIndicatorSize(PullToRefreshSize size) async {
-    Map<String, dynamic> args = <String, dynamic>{};
-    args.putIfAbsent('size', () => size.toNativeValue());
-    await channel?.invokeMethod('setSize', args);
-  }
-
   @Deprecated("Use setStyledTitle instead")
   @override
   Future<void> setAttributedTitle(IOSNSAttributedString attributedTitle) async {

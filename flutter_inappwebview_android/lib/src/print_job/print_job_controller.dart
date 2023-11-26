@@ -43,13 +43,6 @@ class AndroidPrintJobController extends PlatformPrintJobController
 
   Future<dynamic> _handleMethod(MethodCall call) async {
     switch (call.method) {
-      case "onComplete":
-        bool completed = call.arguments["completed"];
-        String? error = call.arguments["error"];
-        if (params.onComplete != null) {
-          params.onComplete!(completed, error);
-        }
-        break;
       default:
         throw UnimplementedError("Unimplemented ${call.method} method");
     }
@@ -65,13 +58,6 @@ class AndroidPrintJobController extends PlatformPrintJobController
   Future<void> restart() async {
     Map<String, dynamic> args = <String, dynamic>{};
     await channel?.invokeMethod('restart', args);
-  }
-
-  @override
-  Future<void> dismiss({bool animated: true}) async {
-    Map<String, dynamic> args = <String, dynamic>{};
-    args.putIfAbsent("animated", () => animated);
-    await channel?.invokeMethod('dismiss', args);
   }
 
   @override

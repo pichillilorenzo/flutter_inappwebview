@@ -1,8 +1,8 @@
-name: flutter_inappwebview_ios
-description: iOS implementation of the flutter_inappwebview plugin.
+name: flutter_inappwebview_macos
+description: macOS implementation of the flutter_inappwebview plugin.
 version: 1.0.0
 homepage: https://inappwebview.dev/
-repository: https://github.com/pichillilorenzo/flutter_inappwebview/tree/master/flutter_inappwebview_ios
+repository: https://github.com/pichillilorenzo/flutter_inappwebview/tree/master/flutter_inappwebview_macos
 issue_tracker: https://github.com/pichillilorenzo/flutter_inappwebview/issues
 topics:
   - html
@@ -45,9 +45,9 @@ flutter:
   plugin:
     implements: flutter_inappwebview
     platforms:
-      ios:
+      macos:
         pluginClass: InAppWebViewFlutterPlugin
-        dartPluginClass: IOSInAppWebViewPlatform
+        dartPluginClass: MacOSInAppWebViewPlatform
 
   # To add assets to your plugin package, add an assets section, like this:
   # assets:

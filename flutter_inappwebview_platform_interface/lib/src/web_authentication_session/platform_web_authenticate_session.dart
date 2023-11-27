@@ -154,6 +154,7 @@ abstract class PlatformWebAuthenticationSession extends PlatformInterface
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- iOS ([Official API - ASWebAuthenticationSession.canStart](https://developer.apple.com/documentation/authenticationservices/aswebauthenticationsession/3516277-canstart))
+  ///- MacOS ([Official API - ASWebAuthenticationSession.canStart](https://developer.apple.com/documentation/authenticationservices/aswebauthenticationsession/3516277-canstart))
   ///{@endtemplate}
   Future<bool> canStart() {
     throw UnimplementedError(
@@ -170,6 +171,7 @@ abstract class PlatformWebAuthenticationSession extends PlatformInterface
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- iOS ([Official API - ASWebAuthenticationSession.start](https://developer.apple.com/documentation/authenticationservices/aswebauthenticationsession/2990953-start))
+  ///- MacOS ([Official API - ASWebAuthenticationSession.start](https://developer.apple.com/documentation/authenticationservices/aswebauthenticationsession/2990953-start))
   ///{@endtemplate}
   Future<bool> start() {
     throw UnimplementedError(
@@ -184,6 +186,7 @@ abstract class PlatformWebAuthenticationSession extends PlatformInterface
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- iOS ([Official API - ASWebAuthenticationSession.cancel](https://developer.apple.com/documentation/authenticationservices/aswebauthenticationsession/2990951-cancel))
+  ///- MacOS ([Official API - ASWebAuthenticationSession.cancel](https://developer.apple.com/documentation/authenticationservices/aswebauthenticationsession/2990951-cancel))
   ///{@endtemplate}
   Future<void> cancel() {
     throw UnimplementedError(
@@ -195,6 +198,7 @@ abstract class PlatformWebAuthenticationSession extends PlatformInterface
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- iOS
+  ///- MacOS
   ///{@endtemplate}
   @override
   Future<void> dispose() {
@@ -209,6 +213,7 @@ abstract class PlatformWebAuthenticationSession extends PlatformInterface
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- iOS
+  ///- MacOS
   ///{@endtemplate}
   Future<bool> isAvailable() {
     throw UnimplementedError(

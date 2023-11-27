@@ -3,43 +3,43 @@ import 'dart:async';
 import 'package:flutter/services.dart';
 import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_platform_interface.dart';
 
-/// Object specifying creation parameters for creating a [IOSWebAuthenticationSession].
+/// Object specifying creation parameters for creating a [MacOSWebAuthenticationSession].
 ///
 /// When adding additional fields make sure they can be null or have a default
 /// value to avoid breaking changes. See [PlatformWebAuthenticationSessionCreationParams] for
 /// more information.
-class IOSWebAuthenticationSessionCreationParams
+class MacOSWebAuthenticationSessionCreationParams
     extends PlatformWebAuthenticationSessionCreationParams {
-  /// Creates a new [IOSWebAuthenticationSessionCreationParams] instance.
-  const IOSWebAuthenticationSessionCreationParams();
+  /// Creates a new [MacOSWebAuthenticationSessionCreationParams] instance.
+  const MacOSWebAuthenticationSessionCreationParams();
 
-  /// Creates a [IOSWebAuthenticationSessionCreationParams] instance based on [PlatformWebAuthenticationSessionCreationParams].
-  factory IOSWebAuthenticationSessionCreationParams.fromPlatformWebAuthenticationSessionCreationParams(
+  /// Creates a [MacOSWebAuthenticationSessionCreationParams] instance based on [PlatformWebAuthenticationSessionCreationParams].
+  factory MacOSWebAuthenticationSessionCreationParams.fromPlatformWebAuthenticationSessionCreationParams(
       // Recommended placeholder to prevent being broken by platform interface.
       // ignore: avoid_unused_constructor_parameters
       PlatformWebAuthenticationSessionCreationParams params) {
-    return IOSWebAuthenticationSessionCreationParams();
+    return MacOSWebAuthenticationSessionCreationParams();
   }
 }
 
 ///{@macro flutter_inappwebview_platform_interface.PlatformWebAuthenticationSession}
-class IOSWebAuthenticationSession extends PlatformWebAuthenticationSession
+class MacOSWebAuthenticationSession extends PlatformWebAuthenticationSession
     with ChannelController {
-  /// Constructs a [IOSWebAuthenticationSession].
-  IOSWebAuthenticationSession(
+  /// Constructs a [MacOSWebAuthenticationSession].
+  MacOSWebAuthenticationSession(
       PlatformWebAuthenticationSessionCreationParams params)
       : super.implementation(
-          params is IOSWebAuthenticationSessionCreationParams
+          params is MacOSWebAuthenticationSessionCreationParams
               ? params
-              : IOSWebAuthenticationSessionCreationParams
+              : MacOSWebAuthenticationSessionCreationParams
                   .fromPlatformWebAuthenticationSessionCreationParams(params),
         );
 
-  static final IOSWebAuthenticationSession _staticValue =
-      IOSWebAuthenticationSession(IOSWebAuthenticationSessionCreationParams());
+  static final MacOSWebAuthenticationSession _staticValue =
+      MacOSWebAuthenticationSession(MacOSWebAuthenticationSessionCreationParams());
 
   /// Provide static access.
-  factory IOSWebAuthenticationSession.static() {
+  factory MacOSWebAuthenticationSession.static() {
     return _staticValue;
   }
 
@@ -62,12 +62,12 @@ class IOSWebAuthenticationSession extends PlatformWebAuthenticationSession
       'com.pichillilorenzo/flutter_webauthenticationsession');
 
   @override
-  Future<IOSWebAuthenticationSession> create(
+  Future<MacOSWebAuthenticationSession> create(
       {required WebUri url,
       String? callbackURLScheme,
       WebAuthenticationSessionCompletionHandler onComplete,
       WebAuthenticationSessionSettings? initialSettings}) async {
-    var session = IOSWebAuthenticationSession._create(
+    var session = MacOSWebAuthenticationSession._create(
         url: url,
         callbackURLScheme: callbackURLScheme,
         onComplete: onComplete,
@@ -83,14 +83,14 @@ class IOSWebAuthenticationSession extends PlatformWebAuthenticationSession
     return session;
   }
 
-  IOSWebAuthenticationSession._create(
+  MacOSWebAuthenticationSession._create(
       {required this.url,
       this.callbackURLScheme,
       this.onComplete,
       WebAuthenticationSessionSettings? initialSettings})
-      : super.implementation(IOSWebAuthenticationSessionCreationParams()) {
+      : super.implementation(MacOSWebAuthenticationSessionCreationParams()) {
     assert(url.toString().isNotEmpty);
-    if (Util.isIOS || Util.isMacOS) {
+    if (Util.isMacOS || Util.isMacOS) {
       assert(['http', 'https'].contains(url.scheme),
           'The specified URL has an unsupported scheme. Only HTTP and HTTPS URLs are supported on iOS.');
     }

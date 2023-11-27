@@ -60,7 +60,9 @@ public class WebAuthenticationSessionChannelDelegate : ChannelDelegate {
             "url": url?.absoluteString,
             "errorCode": errorCode
         ]
-        channel?.invokeMethod("onComplete", arguments: arguments)
+        DispatchQueue.main.async { [weak self] in
+            self?.channel?.invokeMethod("onComplete", arguments: arguments)
+        }
     }
     
     public override func dispose() {

@@ -1,15 +1,14 @@
-# flutter_inappwebview_web
+# flutter\_inappwebview\_web
 
-A new Flutter project.
+The Web Platform [iframe](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/iframe)
+implementation of [`flutter_inappwebview`][https://pub.dev/packages/flutter_inappwebview].
 
-## Getting Started
+## Usage
 
-This project is a starting point for a Flutter
-[plug-in package](https://flutter.dev/developing-packages/),
-a specialized package that includes platform-specific implementation code for
-Android and/or iOS.
+This package is [endorsed][https://flutter.dev/docs/development/packages-and-plugins/developing-packages#endorsed-federated-plugin],
+which means you can simply use `flutter_inappwebview`
+normally. This package will be automatically included in your app when you do,
+so you do not need to add it to your `pubspec.yaml`.
 
-For help getting started with Flutter development, view the
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
-
+However, if you `import` this package to use any of its APIs directly, you
+should add it to your `pubspec.yaml` as usual.

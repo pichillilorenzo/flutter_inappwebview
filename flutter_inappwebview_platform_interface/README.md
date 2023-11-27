@@ -1,6 +1,6 @@
 # flutter\_inappwebview\_platform\_interface
 
-A common platform interface for the [`flutter_inappwebview`][https://pub.dev/packages/flutter_inappwebview] plugin.
+A common platform interface for the [`flutter_inappwebview`](https://pub.dev/packages/flutter_inappwebview) plugin.
 
 This interface allows platform-specific implementations of the `flutter_inappwebview`
 plugin, as well as the plugin itself, to ensure they are supporting the

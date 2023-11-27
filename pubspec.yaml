@@ -18,8 +18,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  flutter_inappwebview_platform_interface:
-    path: flutter_inappwebview_platform_interface
+  flutter_inappwebview_platform_interface: ^1.0.0
   flutter_inappwebview_android:
     path: flutter_inappwebview_android
   flutter_inappwebview_ios:

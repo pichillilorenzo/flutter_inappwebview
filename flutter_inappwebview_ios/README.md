@@ -1,6 +1,6 @@
 # flutter\_inappwebview\_ios
 
-The Apple iOS WKWebView implementation of [`flutter_inappwebview`][https://pub.dev/packages/flutter_inappwebview].
+The Apple iOS WKWebView implementation of [`flutter_inappwebview`](https://pub.dev/packages/flutter_inappwebview).
 
 ## Usage
 

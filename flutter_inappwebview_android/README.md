@@ -1,6 +1,6 @@
 # flutter\_inappwebview\_android
 
-The Android WebView implementation of [`flutter_inappwebview`][https://pub.dev/packages/flutter_inappwebview].
+The Android WebView implementation of [`flutter_inappwebview`](https://pub.dev/packages/flutter_inappwebview).
 
 ## Usage
 

@@ -21,8 +21,7 @@ dependencies:
   flutter_web_plugins:
     sdk: flutter
   js: ^0.6.4
-  flutter_inappwebview_platform_interface:
-    path: ../flutter_inappwebview_platform_interface
+  flutter_inappwebview_platform_interface: ^1.0.0
 
 dev_dependencies:
   flutter_test:

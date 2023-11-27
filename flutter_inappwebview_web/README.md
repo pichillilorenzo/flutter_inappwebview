@@ -1,7 +1,7 @@
 # flutter\_inappwebview\_web
 
 The Web Platform [iframe](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/iframe)
-implementation of [`flutter_inappwebview`][https://pub.dev/packages/flutter_inappwebview].
+implementation of [`flutter_inappwebview`](https://pub.dev/packages/flutter_inappwebview).
 
 ## Usage
 

@@ -1,6 +1,6 @@
 # flutter\_inappwebview\_macos
 
-The Apple macOS WKWebView implementation of [`flutter_inappwebview`][https://pub.dev/packages/flutter_inappwebview].
+The Apple macOS WKWebView implementation of [`flutter_inappwebview`](https://pub.dev/packages/flutter_inappwebview).
 
 ## Usage
 

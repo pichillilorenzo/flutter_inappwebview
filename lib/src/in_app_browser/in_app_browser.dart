@@ -190,22 +190,30 @@ class InAppBrowser implements PlatformInAppBrowserEvents {
   void dispose() => platform.dispose();
 
   @override
-  Future<FormResubmissionAction?>? androidOnFormResubmission(Uri? url) {}
+  Future<FormResubmissionAction?>? androidOnFormResubmission(Uri? url) {
+    return null;
+  }
 
   @override
   void androidOnGeolocationPermissionsHidePrompt() {}
 
   @override
   Future<GeolocationPermissionShowPromptResponse?>?
-      androidOnGeolocationPermissionsShowPrompt(String origin) {}
+      androidOnGeolocationPermissionsShowPrompt(String origin) {
+        return null;
+      }
 
   @override
   Future<JsBeforeUnloadResponse?>? androidOnJsBeforeUnload(
-      JsBeforeUnloadRequest jsBeforeUnloadRequest) {}
+      JsBeforeUnloadRequest jsBeforeUnloadRequest) {
+        return null;
+      }
 
   @override
   Future<PermissionRequestResponse?>? androidOnPermissionRequest(
-      String origin, List<String> resources) {}
+      String origin, List<String> resources) {
+        return null;
+      }
 
   @override
   void androidOnReceivedIcon(Uint8List icon) {}
@@ -221,42 +229,58 @@ class InAppBrowser implements PlatformInAppBrowserEvents {
 
   @override
   Future<WebViewRenderProcessAction?>? androidOnRenderProcessResponsive(
-      Uri? url) {}
+      Uri? url) {
+        return null;
+      }
 
   @override
   Future<WebViewRenderProcessAction?>? androidOnRenderProcessUnresponsive(
-      Uri? url) {}
+      Uri? url) {
+        return null;
+      }
 
   @override
   Future<SafeBrowsingResponse?>? androidOnSafeBrowsingHit(
-      Uri url, SafeBrowsingThreat? threatType) {}
+      Uri url, SafeBrowsingThreat? threatType) {
+        return null;
+      }
 
   @override
   void androidOnScaleChanged(double oldScale, double newScale) {}
 
   @override
   Future<WebResourceResponse?>? androidShouldInterceptRequest(
-      WebResourceRequest request) {}
+      WebResourceRequest request) {
+        return null;
+      }
 
   @override
   void iosOnDidReceiveServerRedirectForProvisionalNavigation() {}
 
   @override
   Future<IOSNavigationResponseAction?>? iosOnNavigationResponse(
-      IOSWKNavigationResponse navigationResponse) {}
+      IOSWKNavigationResponse navigationResponse) {
+        return null;
+      }
 
   @override
   void iosOnWebContentProcessDidTerminate() {}
 
   @override
   Future<IOSShouldAllowDeprecatedTLSAction?>? iosShouldAllowDeprecatedTLS(
-      URLAuthenticationChallenge challenge) {}
+      URLAuthenticationChallenge challenge) {
+        return null;
+      }
 
   @override
-  Future<AjaxRequestAction?>? onAjaxProgress(AjaxRequest ajaxRequest) {}
+  Future<AjaxRequestAction?>? onAjaxProgress(AjaxRequest ajaxRequest) {
+    return null;
+  }
 
   @override
-  Future<AjaxRequestAction?>? onAjaxReadyStateChange(AjaxRequest ajaxRequest) {}
+  Future<AjaxRequestAction?>? onAjaxReadyStateChange(AjaxRequest ajaxRequest) {
+    return null;
+  }
 
   @override
   void onBrowserCreated() {}
@@ -275,7 +299,9 @@ class InAppBrowser implements PlatformInAppBrowserEvents {
   void onContentSizeChanged(Size oldContentSize, Size newContentSize) {}
 
   @override
-  Future<bool?>? onCreateWindow(CreateWindowAction createWindowAction) {}
+  Future<bool?>? onCreateWindow(CreateWindowAction createWindowAction) {
+    return null;
+  }
 
   @override
   void onDidReceiveServerRedirectForProvisionalNavigation() {}
@@ -300,27 +326,39 @@ class InAppBrowser implements PlatformInAppBrowserEvents {
       int activeMatchOrdinal, int numberOfMatches, bool isDoneCounting) {}
 
   @override
-  Future<FormResubmissionAction?>? onFormResubmission(WebUri? url) {}
+  Future<FormResubmissionAction?>? onFormResubmission(WebUri? url) {
+    return null;
+  }
 
   @override
   void onGeolocationPermissionsHidePrompt() {}
 
   @override
   Future<GeolocationPermissionShowPromptResponse?>?
-      onGeolocationPermissionsShowPrompt(String origin) {}
+      onGeolocationPermissionsShowPrompt(String origin) {
+        return null;
+      }
 
   @override
-  Future<JsAlertResponse?>? onJsAlert(JsAlertRequest jsAlertRequest) {}
+  Future<JsAlertResponse?>? onJsAlert(JsAlertRequest jsAlertRequest) {
+    return null;
+  }
 
   @override
   Future<JsBeforeUnloadResponse?>? onJsBeforeUnload(
-      JsBeforeUnloadRequest jsBeforeUnloadRequest) {}
+      JsBeforeUnloadRequest jsBeforeUnloadRequest) {
+        return null;
+      }
 
   @override
-  Future<JsConfirmResponse?>? onJsConfirm(JsConfirmRequest jsConfirmRequest) {}
+  Future<JsConfirmResponse?>? onJsConfirm(JsConfirmRequest jsConfirmRequest) {
+    return null;
+  }
 
   @override
-  Future<JsPromptResponse?>? onJsPrompt(JsPromptRequest jsPromptRequest) {}
+  Future<JsPromptResponse?>? onJsPrompt(JsPromptRequest jsPromptRequest) {
+    return null;
+  }
 
   @override
   void onLoadError(Uri? url, int code, String message) {}
@@ -332,11 +370,15 @@ class InAppBrowser implements PlatformInAppBrowserEvents {
   void onLoadResource(LoadedResource resource) {}
 
   @override
-  Future<CustomSchemeResponse?>? onLoadResourceCustomScheme(Uri url) {}
+  Future<CustomSchemeResponse?>? onLoadResourceCustomScheme(Uri url) {
+    return null;
+  }
 
   @override
   Future<CustomSchemeResponse?>? onLoadResourceWithCustomScheme(
-      WebResourceRequest request) {}
+      WebResourceRequest request) {
+        return null;
+      }
 
   @override
   void onLoadStart(WebUri? url) {}
@@ -353,7 +395,9 @@ class InAppBrowser implements PlatformInAppBrowserEvents {
 
   @override
   Future<NavigationResponseAction?>? onNavigationResponse(
-      NavigationResponse navigationResponse) {}
+      NavigationResponse navigationResponse) {
+        return null;
+      }
 
   @override
   void onOverScrolled(int x, int y, bool clampedX, bool clampedY) {}
@@ -363,7 +407,9 @@ class InAppBrowser implements PlatformInAppBrowserEvents {
 
   @override
   Future<PermissionResponse?>? onPermissionRequest(
-      PermissionRequest permissionRequest) {}
+      PermissionRequest permissionRequest) {
+        return null;
+      }
 
   @override
   void onPermissionRequestCanceled(PermissionRequest permissionRequest) {}
@@ -373,21 +419,27 @@ class InAppBrowser implements PlatformInAppBrowserEvents {
 
   @override
   Future<bool?>? onPrintRequest(
-      WebUri? url, PlatformPrintJobController? printJobController) {}
+      WebUri? url, PlatformPrintJobController? printJobController) {
+        return null;
+      }
 
   @override
   void onProgressChanged(int progress) {}
 
   @override
   Future<ClientCertResponse?>? onReceivedClientCertRequest(
-      URLAuthenticationChallenge challenge) {}
+      URLAuthenticationChallenge challenge) {
+        return null;
+      }
 
   @override
   void onReceivedError(WebResourceRequest request, WebResourceError error) {}
 
   @override
   Future<HttpAuthResponse?>? onReceivedHttpAuthRequest(
-      URLAuthenticationChallenge challenge) {}
+      URLAuthenticationChallenge challenge) {
+        return null;
+      }
 
   @override
   void onReceivedHttpError(
@@ -401,7 +453,9 @@ class InAppBrowser implements PlatformInAppBrowserEvents {
 
   @override
   Future<ServerTrustAuthResponse?>? onReceivedServerTrustAuthRequest(
-      URLAuthenticationChallenge challenge) {}
+      URLAuthenticationChallenge challenge) {
+        return null;
+      }
 
   @override
   void onReceivedTouchIconUrl(WebUri url, bool precomposed) {}
@@ -410,18 +464,24 @@ class InAppBrowser implements PlatformInAppBrowserEvents {
   void onRenderProcessGone(RenderProcessGoneDetail detail) {}
 
   @override
-  Future<WebViewRenderProcessAction?>? onRenderProcessResponsive(WebUri? url) {}
+  Future<WebViewRenderProcessAction?>? onRenderProcessResponsive(WebUri? url) {
+    return null;
+  }
 
   @override
   Future<WebViewRenderProcessAction?>? onRenderProcessUnresponsive(
-      WebUri? url) {}
+      WebUri? url) {
+        return null;
+      }
 
   @override
   void onRequestFocus() {}
 
   @override
   Future<SafeBrowsingResponse?>? onSafeBrowsingHit(
-      WebUri url, SafeBrowsingThreat? threatType) {}
+      WebUri url, SafeBrowsingThreat? threatType) {
+        return null;
+      }
 
   @override
   void onScrollChanged(int x, int y) {}
@@ -446,20 +506,30 @@ class InAppBrowser implements PlatformInAppBrowserEvents {
 
   @override
   Future<ShouldAllowDeprecatedTLSAction?>? shouldAllowDeprecatedTLS(
-      URLAuthenticationChallenge challenge) {}
+      URLAuthenticationChallenge challenge) {
+        return null;
+      }
 
   @override
-  Future<AjaxRequest?>? shouldInterceptAjaxRequest(AjaxRequest ajaxRequest) {}
+  Future<AjaxRequest?>? shouldInterceptAjaxRequest(AjaxRequest ajaxRequest) {
+    return null;
+  }
 
   @override
   Future<FetchRequest?>? shouldInterceptFetchRequest(
-      FetchRequest fetchRequest) {}
+      FetchRequest fetchRequest) {
+        return null;
+      }
 
   @override
   Future<WebResourceResponse?>? shouldInterceptRequest(
-      WebResourceRequest request) {}
+      WebResourceRequest request) {
+        return null;
+      }
 
   @override
   Future<NavigationActionPolicy?>? shouldOverrideUrlLoading(
-      NavigationAction navigationAction) {}
+      NavigationAction navigationAction) {
+        return null;
+      }
 }

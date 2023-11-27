@@ -56,7 +56,7 @@ class IOSPrintJobController extends PlatformPrintJobController
   }
 
   @override
-  Future<void> dismiss({bool animated: true}) async {
+  Future<void> dismiss({bool animated = true}) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent("animated", () => animated);
     await channel?.invokeMethod('dismiss', args);

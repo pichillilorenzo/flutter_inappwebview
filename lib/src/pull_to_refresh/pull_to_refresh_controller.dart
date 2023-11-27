@@ -2,7 +2,6 @@ import 'dart:ui';
 
 import 'package:flutter/services.dart';
 import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_platform_interface.dart';
-import '../in_app_browser/in_app_browser.dart';
 
 ///{@macro flutter_inappwebview_platform_interface.PlatformPullToRefreshController}
 class PullToRefreshController {

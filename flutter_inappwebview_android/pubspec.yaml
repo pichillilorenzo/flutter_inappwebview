@@ -46,7 +46,7 @@ flutter:
     implements: flutter_inappwebview
     platforms:
       android:
-        package: com.pichillilorenzo.flutter_inappwebview
+        package: com.pichillilorenzo.flutter_inappwebview_android
         pluginClass: InAppWebViewFlutterPlugin
         dartPluginClass: AndroidInAppWebViewPlatform
 

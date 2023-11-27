@@ -3,7 +3,8 @@
 ### BREAKING CHANGES
 
 - Plugin conversion to a [Federated Plugin](https://docs.flutter.dev/packages-and-plugins/developing-packages#federated-plugins) to better support multiple environments and implementations.
-- `web_support.js` path has been changed to `packages/flutter_inappwebview_web/assets/web/web_support.js`
+- Android package name has been changed to `com.pichillilorenzo.flutter_inappwebview_android`. References to old package name `com.pichillilorenzo.flutter_inappwebview` should be updated, for example inside `AndroidManifest.xml` file: `<provider android:name="com.pichillilorenzo.flutter_inappwebview_android.InAppWebViewFileProvider" android:authorities="${applicationId}.flutter_inappwebview_android.fileprovider" ...`
+- Web Platform: `web_support.js` file path has been changed to `packages/flutter_inappwebview_web/assets/web/web_support.js`
 
 ## 6.0.0-beta.28
 

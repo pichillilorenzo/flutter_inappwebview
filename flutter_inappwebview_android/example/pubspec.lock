@@ -81,7 +81,7 @@ packages:
       path: ".."
       relative: true
     source: path
-    version: "0.0.1"
+    version: "1.0.0"
   flutter_inappwebview_internal_annotations:
     dependency: transitive
     description:
@@ -96,7 +96,7 @@ packages:
       path: "../../flutter_inappwebview_platform_interface"
       relative: true
     source: path
-    version: "0.0.1"
+    version: "1.0.0"
   flutter_lints:
     dependency: "direct dev"
     description:

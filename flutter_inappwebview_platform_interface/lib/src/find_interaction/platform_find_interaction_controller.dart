@@ -247,7 +247,7 @@ abstract class PlatformFindInteractionController extends PlatformInterface
   ///Disposes the controller.
   ///{@endtemplate}
   @override
-  void dispose() {
+  void dispose({bool isKeepAlive = false}) {
     throw UnimplementedError(
         'dispose is not implemented on the current platform');
   }

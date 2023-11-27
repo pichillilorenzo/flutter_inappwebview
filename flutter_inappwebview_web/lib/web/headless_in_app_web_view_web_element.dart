@@ -4,7 +4,7 @@ import 'package:flutter/services.dart';
 
 import 'headless_inappwebview_manager.dart';
 import 'in_app_web_view_web_element.dart';
-import '../../../flutter_inappwebview_platform_interface/lib/src/util.dart';
+import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_platform_interface.dart';
 
 class HeadlessInAppWebViewWebElement extends ChannelController {
   String id;

@@ -1,8 +1,9 @@
-## 6.1.0-beta.1
+## 6.0.0-beta.29
 
 ### BREAKING CHANGES
 
-Plugin conversion to a [Federated Plugin](https://docs.flutter.dev/packages-and-plugins/developing-packages#federated-plugins) to better support multiple environments and implementations.
+- Plugin conversion to a [Federated Plugin](https://docs.flutter.dev/packages-and-plugins/developing-packages#federated-plugins) to better support multiple environments and implementations.
+- `web_support.js` path has been changed to `packages/flutter_inappwebview_web/assets/web/web_support.js`
 
 ## 6.0.0-beta.28
 

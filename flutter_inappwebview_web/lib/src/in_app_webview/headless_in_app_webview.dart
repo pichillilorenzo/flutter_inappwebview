@@ -3,20 +3,18 @@ import 'dart:ui';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_platform_interface.dart';
-import '../find_interaction/find_interaction_controller.dart';
-import '../pull_to_refresh/pull_to_refresh_controller.dart';
 import 'in_app_webview_controller.dart';
 
-/// Object specifying creation parameters for creating a [IOSHeadlessInAppWebView].
+/// Object specifying creation parameters for creating a [WebPlatformHeadlessInAppWebView].
 ///
 /// When adding additional fields make sure they can be null or have a default
 /// value to avoid breaking changes. See [PlatformHeadlessInAppWebViewCreationParams] for
 /// more information.
 @immutable
-class IOSHeadlessInAppWebViewCreationParams
+class WebPlatformHeadlessInAppWebViewCreationParams
     extends PlatformHeadlessInAppWebViewCreationParams {
-  /// Creates a new [IOSHeadlessInAppWebViewCreationParams] instance.
-  IOSHeadlessInAppWebViewCreationParams(
+  /// Creates a new [WebPlatformHeadlessInAppWebViewCreationParams] instance.
+  WebPlatformHeadlessInAppWebViewCreationParams(
       {super.controllerFromPlatform,
       super.initialSize,
       super.windowId,
@@ -126,11 +124,11 @@ class IOSHeadlessInAppWebViewCreationParams
       super.initialSettings,
       super.contextMenu,
       super.initialUserScripts,
-      this.pullToRefreshController,
-      this.findInteractionController});
+      super.pullToRefreshController,
+      super.findInteractionController});
 
-  /// Creates a [IOSHeadlessInAppWebViewCreationParams] instance based on [PlatformHeadlessInAppWebViewCreationParams].
-  IOSHeadlessInAppWebViewCreationParams.fromPlatformHeadlessInAppWebViewCreationParams(
+  /// Creates a [WebPlatformHeadlessInAppWebViewCreationParams] instance based on [PlatformHeadlessInAppWebViewCreationParams].
+  WebPlatformHeadlessInAppWebViewCreationParams.fromPlatformHeadlessInAppWebViewCreationParams(
       PlatformHeadlessInAppWebViewCreationParams params)
       : this(
             controllerFromPlatform: params.controllerFromPlatform,
@@ -237,20 +235,12 @@ class IOSHeadlessInAppWebViewCreationParams
             initialSettings: params.initialSettings,
             contextMenu: params.contextMenu,
             initialUserScripts: params.initialUserScripts,
-            pullToRefreshController: params.pullToRefreshController
-                as IOSPullToRefreshController?,
-            findInteractionController: params.findInteractionController
-                as IOSFindInteractionController?);
-
-  @override
-  final IOSFindInteractionController? findInteractionController;
-
-  @override
-  final IOSPullToRefreshController? pullToRefreshController;
+            pullToRefreshController: params.pullToRefreshController,
+            findInteractionController: params.findInteractionController);
 }
 
 ///{@macro flutter_inappwebview_platform_interface.PlatformHeadlessInAppWebView}
-class IOSHeadlessInAppWebView extends PlatformHeadlessInAppWebView
+class WebPlatformHeadlessInAppWebView extends PlatformHeadlessInAppWebView
     with ChannelController {
   @override
   late final String id;
@@ -261,37 +251,35 @@ class IOSHeadlessInAppWebView extends PlatformHeadlessInAppWebView
   static const MethodChannel _sharedChannel =
       const MethodChannel('com.pichillilorenzo/flutter_headless_inappwebview');
 
-  IOSInAppWebViewController? _webViewController;
+  WebPlatformInAppWebViewController? _webViewController;
 
-  /// Constructs a [IOSHeadlessInAppWebView].
-  IOSHeadlessInAppWebView(PlatformHeadlessInAppWebViewCreationParams params)
+  /// Constructs a [WebPlatformHeadlessInAppWebView].
+  WebPlatformHeadlessInAppWebView(PlatformHeadlessInAppWebViewCreationParams params)
       : super.implementation(
-          params is IOSHeadlessInAppWebViewCreationParams
+          params is WebPlatformHeadlessInAppWebViewCreationParams
               ? params
-              : IOSHeadlessInAppWebViewCreationParams
+              : WebPlatformHeadlessInAppWebViewCreationParams
                   .fromPlatformHeadlessInAppWebViewCreationParams(params),
         ) {
     id = IdGenerator.generate();
   }
 
   @override
-  IOSInAppWebViewController? get webViewController => _webViewController;
+  WebPlatformInAppWebViewController? get webViewController => _webViewController;
 
   dynamic _controllerFromPlatform;
 
-  IOSHeadlessInAppWebViewCreationParams get _iosParams =>
-      params as IOSHeadlessInAppWebViewCreationParams;
+  WebPlatformHeadlessInAppWebViewCreationParams get _macosParams =>
+      params as WebPlatformHeadlessInAppWebViewCreationParams;
 
   _init() {
-    _webViewController = IOSInAppWebViewController(
-      IOSInAppWebViewControllerCreationParams(
+    _webViewController = WebPlatformInAppWebViewController(
+      WebPlatformInAppWebViewControllerCreationParams(
           id: id, webviewParams: params),
     );
     _controllerFromPlatform =
         params.controllerFromPlatform?.call(_webViewController!) ??
             _webViewController!;
-    _iosParams.pullToRefreshController?.init(id);
-    _iosParams.findInteractionController?.init(id);
     channel =
         MethodChannel('com.pichillilorenzo/flutter_headless_inappwebview_$id');
     handler = _handleMethod;
@@ -327,8 +315,8 @@ class IOSHeadlessInAppWebView extends PlatformHeadlessInAppWebView
             initialSettings.toMap();
 
     Map<String, dynamic> pullToRefreshSettings =
-        _iosParams.pullToRefreshController?.params.settings.toMap() ??
-            _iosParams.pullToRefreshController?.params.options.toMap() ??
+        _macosParams.pullToRefreshController?.params.settings.toMap() ??
+            _macosParams.pullToRefreshController?.params.options.toMap() ??
             PullToRefreshSettings(enabled: false).toMap();
 
     Map<String, dynamic> args = <String, dynamic>{};
@@ -427,12 +415,12 @@ class IOSHeadlessInAppWebView extends PlatformHeadlessInAppWebView
     _webViewController?.dispose();
     _webViewController = null;
     _controllerFromPlatform = null;
-    _iosParams.pullToRefreshController?.dispose();
-    _iosParams.findInteractionController?.dispose();
+    _macosParams.pullToRefreshController?.dispose();
+    _macosParams.findInteractionController?.dispose();
   }
 }
 
-extension InternalHeadlessInAppWebView on IOSHeadlessInAppWebView {
+extension InternalHeadlessInAppWebView on WebPlatformHeadlessInAppWebView {
   Future<void> internalDispose() async {
     _started = false;
     _running = false;

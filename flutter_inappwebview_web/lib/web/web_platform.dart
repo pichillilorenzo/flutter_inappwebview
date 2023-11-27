@@ -1,8 +1,9 @@
 import 'dart:async';
+import 'dart:ui_web';
+import '../src/inappwebview_platform.dart';
 import 'headless_inappwebview_manager.dart';
 import 'web_platform_manager.dart';
 import 'package:flutter_web_plugins/flutter_web_plugins.dart';
-import 'shims/dart_ui.dart' as ui;
 
 import 'in_app_web_view_web_element.dart';
 import 'platform_util.dart';
@@ -11,10 +12,10 @@ import 'package:js/js.dart';
 /// Builds an iframe based WebView.
 ///
 /// This is used as the default implementation for `WebView` on web.
-class FlutterInAppWebViewWebPlatform {
-  /// Constructs a new instance of [FlutterInAppWebViewWebPlatform].
-  FlutterInAppWebViewWebPlatform(Registrar registrar) {
-    ui.platformViewRegistry.registerViewFactory(
+class InAppWebViewFlutterPlugin {
+  /// Constructs a new instance of [InAppWebViewFlutterPlugin].
+  InAppWebViewFlutterPlugin(Registrar registrar) {
+    platformViewRegistry.registerViewFactory(
         'com.pichillilorenzo/flutter_inappwebview', (int viewId) {
       var webView =
           InAppWebViewWebElement(viewId: viewId, messenger: registrar);
@@ -24,8 +25,9 @@ class FlutterInAppWebViewWebPlatform {
   }
 
   static void registerWith(Registrar registrar) {
+    WebPlatformInAppWebViewPlatform.registerWith();
     // ignore: unused_local_variable
-    final pluginInstance = FlutterInAppWebViewWebPlatform(registrar);
+    final pluginInstance = InAppWebViewFlutterPlugin(registrar);
     // ignore: unused_local_variable
     final platformUtil = PlatformUtil(messenger: registrar);
     // ignore: unused_local_variable

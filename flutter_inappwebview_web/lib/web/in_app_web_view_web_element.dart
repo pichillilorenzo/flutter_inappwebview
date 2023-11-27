@@ -2,15 +2,12 @@ import 'dart:async';
 import 'dart:typed_data';
 import 'dart:ui';
 import 'package:flutter/services.dart';
-import '../../../flutter_inappwebview_platform_interface/lib/src/web_uri.dart';
+import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_platform_interface.dart';
 import 'dart:html';
 import 'dart:js' as js;
 
 import 'headless_inappwebview_manager.dart';
 import 'web_platform_manager.dart';
-import '../in_app_webview/in_app_webview_settings.dart';
-import '../types/main.dart';
-import '../types/disposable.dart';
 
 class InAppWebViewWebElement implements Disposable {
   late dynamic _viewId;
@@ -157,6 +154,8 @@ class InAppWebViewWebElement implements Disposable {
         break;
       case "getContentHeight":
         return await getContentHeight();
+      case "getContentWidth":
+        return await getContentWidth();
       case "getOriginalUrl":
         return await getOriginalUrl();
       case "getSelectedText":
@@ -390,6 +389,10 @@ class InAppWebViewWebElement implements Disposable {
 
   Future<int?> getContentHeight() async {
     return (_callMethod('getContentHeight') as num?)?.toInt();
+  }
+
+  Future<int?> getContentWidth() async {
+    return (_callMethod('getContentWidth') as num?)?.toInt();
   }
 
   Future<String?> getOriginalUrl() async {

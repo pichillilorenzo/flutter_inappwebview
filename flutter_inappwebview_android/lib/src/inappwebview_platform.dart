@@ -17,7 +17,7 @@ import 'tracing_controller.dart';
 import 'webview_asset_loader.dart';
 import 'webview_feature.dart' as wv;
 
-/// Implementation of [InAppWebViewPlatform] using the WebKit API.
+/// Implementation of [InAppWebViewPlatform] using the WebView API.
 class AndroidInAppWebViewPlatform extends InAppWebViewPlatform {
   /// Registers this class as the default instance of [InAppWebViewPlatform].
   static void registerWith() {

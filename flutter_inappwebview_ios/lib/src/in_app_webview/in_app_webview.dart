@@ -335,12 +335,10 @@ class IOSInAppWebViewWidget extends PlatformInAppWebViewWidget {
 
   void _onPlatformViewCreated(int id) {
     dynamic viewId = id;
-    if (!kIsWeb) {
-      if (_iosParams.headlessWebView?.isRunning() ?? false) {
-        viewId = _iosParams.headlessWebView?.id;
-      }
-      viewId = _iosParams.keepAlive?.id ?? viewId ?? id;
+    if (_iosParams.headlessWebView?.isRunning() ?? false) {
+      viewId = _iosParams.headlessWebView?.id;
     }
+    viewId = _iosParams.keepAlive?.id ?? viewId ?? id;
     _iosHeadlessInAppWebView?.internalDispose();
     _controller = IOSInAppWebViewController(
         PlatformInAppWebViewControllerCreationParams(

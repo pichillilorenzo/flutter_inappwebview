@@ -34,4 +34,3 @@ export 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_pla
         MapSize,
         MapEdgeInsets;
 export 'src/main.dart';
-export 'src/web/main_stub.dart' if (dart.library.html) 'src/web/main.dart';

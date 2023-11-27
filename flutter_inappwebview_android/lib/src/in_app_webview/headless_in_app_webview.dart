@@ -7,7 +7,7 @@ import '../find_interaction/find_interaction_controller.dart';
 import '../pull_to_refresh/pull_to_refresh_controller.dart';
 import 'in_app_webview_controller.dart';
 
-/// Object specifying creation parameters for creating a [AndroidCookieManager].
+/// Object specifying creation parameters for creating a [AndroidHeadlessInAppWebView].
 ///
 /// When adding additional fields make sure they can be null or have a default
 /// value to avoid breaking changes. See [PlatformHeadlessInAppWebViewCreationParams] for

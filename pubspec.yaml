@@ -18,9 +18,6 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  flutter_web_plugins:
-    sdk: flutter
-  js: ^0.6.4
   flutter_inappwebview_platform_interface:
     path: flutter_inappwebview_platform_interface
   flutter_inappwebview_android:
@@ -29,6 +26,8 @@ dependencies:
     path: flutter_inappwebview_ios
   flutter_inappwebview_macos:
     path: flutter_inappwebview_macos
+  flutter_inappwebview_web:
+    path: flutter_inappwebview_web
 
 dev_dependencies:
   flutter_test:
@@ -54,13 +53,11 @@ flutter:
       macos:
         default_package: flutter_inappwebview_macos
       web:
-        pluginClass: FlutterInAppWebViewWebPlatform
-        fileName: flutter_inappwebview.dart
+        default_package: flutter_inappwebview_web
 
   assets:
     - packages/flutter_inappwebview/assets/t_rex_runner/t-rex.html
     - packages/flutter_inappwebview/assets/t_rex_runner/t-rex.css
-    - packages/flutter_inappwebview/assets/web/web_support.js
   # To add assets to your plugin package, add an assets section, like this:
   # assets:
   #  - images/a_dot_burr.jpeg

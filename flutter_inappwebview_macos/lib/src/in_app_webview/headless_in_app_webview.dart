@@ -6,7 +6,7 @@ import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_pla
 import '../find_interaction/find_interaction_controller.dart';
 import 'in_app_webview_controller.dart';
 
-/// Object specifying creation parameters for creating a [MacOSCookieManager].
+/// Object specifying creation parameters for creating a [MacOSHeadlessInAppWebView].
 ///
 /// When adding additional fields make sure they can be null or have a default
 /// value to avoid breaking changes. See [PlatformHeadlessInAppWebViewCreationParams] for

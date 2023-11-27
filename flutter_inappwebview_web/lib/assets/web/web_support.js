@@ -485,6 +485,15 @@ window.flutter_inappwebview = {
                 }
                 return null;
             },
+            getContentWidth: function() {
+                var iframe = webView.iframe;
+                try {
+                    return iframe.contentDocument.documentElement.scrollWidth;
+                } catch (e) {
+                    console.log(e);
+                }
+                return null;
+            },
             getSelectedText: function() {
                 var iframe = webView.iframe;
                 try {

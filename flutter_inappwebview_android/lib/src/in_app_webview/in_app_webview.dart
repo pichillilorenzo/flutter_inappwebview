@@ -391,12 +391,10 @@ class AndroidInAppWebViewWidget extends PlatformInAppWebViewWidget {
 
   void _onPlatformViewCreated(int id) {
     dynamic viewId = id;
-    if (!kIsWeb) {
-      if (_androidParams.headlessWebView?.isRunning() ?? false) {
-        viewId = _androidParams.headlessWebView?.id;
-      }
-      viewId = _androidParams.keepAlive?.id ?? viewId ?? id;
+    if (_androidParams.headlessWebView?.isRunning() ?? false) {
+      viewId = _androidParams.headlessWebView?.id;
     }
+    viewId = _androidParams.keepAlive?.id ?? viewId ?? id;
     _androidHeadlessInAppWebView?.internalDispose();
     _controller = AndroidInAppWebViewController(
         PlatformInAppWebViewControllerCreationParams(

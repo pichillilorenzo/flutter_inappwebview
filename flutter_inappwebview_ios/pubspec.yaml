@@ -1,7 +1,15 @@
 name: flutter_inappwebview_ios
 description: iOS implementation of the flutter_inappwebview plugin.
-version: 0.0.1
-homepage:
+version: 1.0.0
+homepage: https://inappwebview.dev/
+repository: https://github.com/pichillilorenzo/flutter_inappwebview/tree/master/flutter_inappwebview_ios
+issue_tracker: https://github.com/pichillilorenzo/flutter_inappwebview/issues
+topics:
+  - html
+  - webview
+  - webview-flutter
+  - inappwebview
+  - browser
 
 environment:
   sdk: ">=2.17.0 <4.0.0"
@@ -34,6 +42,7 @@ flutter:
   # This is required for using `dart:ffi`.
   # All these are used by the tooling to maintain consistency when
   # adding or updating assets for this project.
+  implements: flutter_inappwebview
   plugin:
     platforms:
       ios:

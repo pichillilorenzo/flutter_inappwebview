@@ -144,7 +144,8 @@ class PlatformAssetsPathHandlerCreationParams
 ///Developers should ensure that asset files are named using standard file extensions.
 ///If the file does not have a recognised extension, `text/plain` will be used by default.
 ///{@endtemplate}
-abstract class PlatformAssetsPathHandler extends PlatformInterface implements PlatformPathHandler {
+abstract class PlatformAssetsPathHandler extends PlatformInterface
+    implements PlatformPathHandler {
   /// Creates a new [PlatformAssetsPathHandler]
   factory PlatformAssetsPathHandler(
       PlatformAssetsPathHandlerCreationParams params) {
@@ -216,7 +217,8 @@ class PlatformResourcesPathHandlerCreationParams
 ///Developers should ensure that asset files are named using standard file extensions.
 ///If the file does not have a recognised extension, `text/plain` will be used by default.
 ///{@endtemplate}
-abstract class PlatformResourcesPathHandler extends PlatformInterface implements PlatformPathHandler {
+abstract class PlatformResourcesPathHandler extends PlatformInterface
+    implements PlatformPathHandler {
   /// Creates a new [PlatformResourcesPathHandler]
   factory PlatformResourcesPathHandler(
       PlatformResourcesPathHandlerCreationParams params) {
@@ -239,7 +241,8 @@ abstract class PlatformResourcesPathHandler extends PlatformInterface implements
   /// Should only be used by platform implementations because they can't extend
   /// a class that only contains a factory constructor.
   @protected
-  PlatformResourcesPathHandler.implementation(this.params) : super(token: _token);
+  PlatformResourcesPathHandler.implementation(this.params)
+      : super(token: _token);
 
   static final Object _token = Object();
 
@@ -299,7 +302,8 @@ class PlatformInternalStoragePathHandlerCreationParams
 ///Developers should ensure that asset files are named using standard file extensions.
 ///If the file does not have a recognised extension, `text/plain` will be used by default.
 ///{@endtemplate}
-abstract class PlatformInternalStoragePathHandler extends PlatformInterface implements PlatformPathHandler {
+abstract class PlatformInternalStoragePathHandler extends PlatformInterface
+    implements PlatformPathHandler {
   /// Creates a new [PlatformResourcesPathHandler]
   factory PlatformInternalStoragePathHandler(
       PlatformInternalStoragePathHandlerCreationParams params) {
@@ -322,7 +326,8 @@ abstract class PlatformInternalStoragePathHandler extends PlatformInterface impl
   /// Should only be used by platform implementations because they can't extend
   /// a class that only contains a factory constructor.
   @protected
-  PlatformInternalStoragePathHandler.implementation(this.params) : super(token: _token);
+  PlatformInternalStoragePathHandler.implementation(this.params)
+      : super(token: _token);
 
   static final Object _token = Object();
 

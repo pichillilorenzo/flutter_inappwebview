@@ -2455,7 +2455,7 @@ class AndroidInAppWebViewController extends PlatformInAppWebViewController
   @override
   Future<void> removeUserScripts(
       {required List<UserScript> userScripts}) async {
-   for (final userScript in userScripts) {
+    for (final userScript in userScripts) {
       await removeUserScript(userScript: userScript);
     }
   }

@@ -60,9 +60,9 @@ class MacOSWebMessageChannel extends PlatformWebMessageChannel
     return _staticValue;
   }
 
-  MacOSWebMessagePort get _iosPort1 => port1 as MacOSWebMessagePort;
+  MacOSWebMessagePort get _macosPort1 => port1 as MacOSWebMessagePort;
 
-  MacOSWebMessagePort get _iosPort2 => port2 as MacOSWebMessagePort;
+  MacOSWebMessagePort get _macosPort2 => port2 as MacOSWebMessagePort;
 
   static MacOSWebMessageChannel? _fromMap(Map<String, dynamic>? map) {
     if (map == null) {
@@ -75,8 +75,8 @@ class MacOSWebMessageChannel extends PlatformWebMessageChannel
                 MacOSWebMessagePortCreationParams(index: 0)),
             port2: MacOSWebMessagePort(
                 MacOSWebMessagePortCreationParams(index: 1))));
-    webMessageChannel._iosPort1.webMessageChannel = webMessageChannel;
-    webMessageChannel._iosPort2.webMessageChannel = webMessageChannel;
+    webMessageChannel._macosPort1.webMessageChannel = webMessageChannel;
+    webMessageChannel._macosPort2.webMessageChannel = webMessageChannel;
     return webMessageChannel;
   }
 
@@ -84,7 +84,7 @@ class MacOSWebMessageChannel extends PlatformWebMessageChannel
     switch (call.method) {
       case "onMessage":
         int index = call.arguments["index"];
-        var port = index == 0 ? _iosPort1 : _iosPort2;
+        var port = index == 0 ? _macosPort1 : _macosPort2;
         if (port.onMessage != null) {
           WebMessage? message = call.arguments["message"] != null
               ? WebMessage.fromMap(

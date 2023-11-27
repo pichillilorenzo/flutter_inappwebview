@@ -262,16 +262,11 @@ class AndroidInAppWebViewWidgetCreationParams
   final AndroidPullToRefreshController? pullToRefreshController;
 }
 
-///{@template flutter_inappwebview.InAppWebView}
-///Flutter Widget for adding an **inline native WebView** integrated in the flutter widget tree.
-///
-///**Supported Platforms/Implementations**:
-///- Android native WebView
-///- iOS
-///- Web
-///{@endtemplate}
+///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewWidget}
 class AndroidInAppWebViewWidget extends PlatformInAppWebViewWidget {
   /// Constructs a [AndroidInAppWebViewWidget].
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewWidget}
   AndroidInAppWebViewWidget(PlatformInAppWebViewWidgetCreationParams params)
       : super.implementation(
           params is AndroidInAppWebViewWidgetCreationParams

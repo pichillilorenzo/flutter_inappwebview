@@ -65,7 +65,7 @@ class MacOSInAppBrowser extends PlatformInAppBrowser with ChannelController {
     return _staticValue;
   }
 
-  MacOSInAppBrowserCreationParams get _iosParams =>
+  MacOSInAppBrowserCreationParams get _macosParams =>
       params as MacOSInAppBrowserCreationParams;
 
   static const MethodChannel _staticChannel =
@@ -95,7 +95,7 @@ class MacOSInAppBrowser extends PlatformInAppBrowser with ChannelController {
         channel!,
         this,
         this.initialUserScripts);
-    _iosParams.findInteractionController?.init(id);
+    _macosParams.findInteractionController?.init(id);
   }
 
   _debugLog(String method, dynamic args) {

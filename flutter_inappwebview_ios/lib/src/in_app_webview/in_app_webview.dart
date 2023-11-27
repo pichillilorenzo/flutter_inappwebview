@@ -260,16 +260,11 @@ class IOSInAppWebViewWidgetCreationParams
   final IOSPullToRefreshController? pullToRefreshController;
 }
 
-///{@template flutter_inappwebview.InAppWebView}
-///Flutter Widget for adding an **inline native WebView** integrated in the flutter widget tree.
-///
-///**Supported Platforms/Implementations**:
-///- IOS native WebView
-///- iOS
-///- Web
-///{@endtemplate}
+///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewWidget}
 class IOSInAppWebViewWidget extends PlatformInAppWebViewWidget {
   /// Constructs a [IOSInAppWebViewWidget].
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewWidget}
   IOSInAppWebViewWidget(PlatformInAppWebViewWidgetCreationParams params)
       : super.implementation(
           params is IOSInAppWebViewWidgetCreationParams

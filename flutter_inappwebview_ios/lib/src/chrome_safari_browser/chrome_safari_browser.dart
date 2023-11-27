@@ -125,11 +125,9 @@ class IOSChromeSafariBrowser extends PlatformChromeSafariBrowser
     assert(!_isOpened, 'The browser is already opened.');
     _isOpened = true;
 
-    if (Util.isIOS) {
-      assert(url != null, 'The specified URL must not be null on iOS.');
-      assert(['http', 'https'].contains(url!.scheme),
-          'The specified URL has an unsupported scheme. Only HTTP and HTTPS URLs are supported on iOS.');
-    }
+    assert(url != null, 'The specified URL must not be null on iOS.');
+    assert(['http', 'https'].contains(url!.scheme),
+    'The specified URL has an unsupported scheme. Only HTTP and HTTPS URLs are supported on iOS.');
     if (url != null) {
       assert(url.toString().isNotEmpty, 'The specified URL must not be empty.');
     }

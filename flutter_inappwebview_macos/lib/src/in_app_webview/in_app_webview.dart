@@ -254,16 +254,11 @@ class MacOSInAppWebViewWidgetCreationParams
   final MacOSFindInteractionController? findInteractionController;
 }
 
-///{@template flutter_inappwebview.InAppWebView}
-///Flutter Widget for adding an **inline native WebView** integrated in the flutter widget tree.
-///
-///**Supported Platforms/Implementations**:
-///- MacOS native WebView
-///- iOS
-///- Web
-///{@endtemplate}
+///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewWidget}
 class MacOSInAppWebViewWidget extends PlatformInAppWebViewWidget {
   /// Constructs a [MacOSInAppWebViewWidget].
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewWidget}
   MacOSInAppWebViewWidget(PlatformInAppWebViewWidgetCreationParams params)
       : super.implementation(
           params is MacOSInAppWebViewWidgetCreationParams
@@ -272,61 +267,61 @@ class MacOSInAppWebViewWidget extends PlatformInAppWebViewWidget {
                   .fromPlatformInAppWebViewWidgetCreationParams(params),
         );
 
-  MacOSInAppWebViewWidgetCreationParams get _iosParams =>
+  MacOSInAppWebViewWidgetCreationParams get _macosParams =>
       params as MacOSInAppWebViewWidgetCreationParams;
 
   MacOSInAppWebViewController? _controller;
 
-  MacOSHeadlessInAppWebView? get _iosHeadlessInAppWebView =>
-      _iosParams.headlessWebView as MacOSHeadlessInAppWebView?;
+  MacOSHeadlessInAppWebView? get _macosHeadlessInAppWebView =>
+      _macosParams.headlessWebView as MacOSHeadlessInAppWebView?;
 
   @override
   Widget build(BuildContext context) {
     final initialSettings =
-        _iosParams.initialSettings ?? InAppWebViewSettings();
+        _macosParams.initialSettings ?? InAppWebViewSettings();
     _inferInitialSettings(initialSettings);
 
-    Map<String, dynamic> settingsMap = (_iosParams.initialSettings != null
+    Map<String, dynamic> settingsMap = (_macosParams.initialSettings != null
             ? initialSettings.toMap()
             : null) ??
         // ignore: deprecated_member_use_from_same_package
-        _iosParams.initialOptions?.toMap() ??
+        _macosParams.initialOptions?.toMap() ??
         initialSettings.toMap();
 
     Map<String, dynamic> pullToRefreshSettings =
-        _iosParams.pullToRefreshController?.params.settings.toMap() ??
+        _macosParams.pullToRefreshController?.params.settings.toMap() ??
             // ignore: deprecated_member_use_from_same_package
-            _iosParams.pullToRefreshController?.params.options.toMap() ??
+            _macosParams.pullToRefreshController?.params.options.toMap() ??
             PullToRefreshSettings(enabled: false).toMap();
 
-    if ((_iosParams.headlessWebView?.isRunning() ?? false) &&
-        _iosParams.keepAlive != null) {
-      final headlessId = _iosParams.headlessWebView?.id;
+    if ((_macosParams.headlessWebView?.isRunning() ?? false) &&
+        _macosParams.keepAlive != null) {
+      final headlessId = _macosParams.headlessWebView?.id;
       if (headlessId != null) {
         // force keep alive id to match headless webview id
-        _iosParams.keepAlive?.id = headlessId;
+        _macosParams.keepAlive?.id = headlessId;
       }
     }
 
     return UiKitView(
       viewType: 'com.pichillilorenzo/flutter_inappwebview',
       onPlatformViewCreated: _onPlatformViewCreated,
-      gestureRecognizers: _iosParams.gestureRecognizers,
+      gestureRecognizers: _macosParams.gestureRecognizers,
       creationParams: <String, dynamic>{
-        'initialUrlRequest': _iosParams.initialUrlRequest?.toMap(),
-        'initialFile': _iosParams.initialFile,
-        'initialData': _iosParams.initialData?.toMap(),
+        'initialUrlRequest': _macosParams.initialUrlRequest?.toMap(),
+        'initialFile': _macosParams.initialFile,
+        'initialData': _macosParams.initialData?.toMap(),
         'initialSettings': settingsMap,
-        'contextMenu': _iosParams.contextMenu?.toMap() ?? {},
-        'windowId': _iosParams.windowId,
-        'headlessWebViewId': _iosParams.headlessWebView?.isRunning() ?? false
-            ? _iosParams.headlessWebView?.id
+        'contextMenu': _macosParams.contextMenu?.toMap() ?? {},
+        'windowId': _macosParams.windowId,
+        'headlessWebViewId': _macosParams.headlessWebView?.isRunning() ?? false
+            ? _macosParams.headlessWebView?.id
             : null,
         'initialUserScripts':
-        _iosParams.initialUserScripts?.map((e) => e.toMap()).toList() ?? [],
+        _macosParams.initialUserScripts?.map((e) => e.toMap()).toList() ?? [],
         'pullToRefreshSettings': pullToRefreshSettings,
-        'keepAliveId': _iosParams.keepAlive?.id,
-        'preventGestureDelay': _iosParams.preventGestureDelay
+        'keepAliveId': _macosParams.keepAlive?.id,
+        'preventGestureDelay': _macosParams.preventGestureDelay
       },
       creationParamsCodec: const StandardMessageCodec(),
     );
@@ -335,16 +330,16 @@ class MacOSInAppWebViewWidget extends PlatformInAppWebViewWidget {
   void _onPlatformViewCreated(int id) {
     dynamic viewId = id;
     if (!kIsWeb) {
-      if (_iosParams.headlessWebView?.isRunning() ?? false) {
-        viewId = _iosParams.headlessWebView?.id;
+      if (_macosParams.headlessWebView?.isRunning() ?? false) {
+        viewId = _macosParams.headlessWebView?.id;
       }
-      viewId = _iosParams.keepAlive?.id ?? viewId ?? id;
+      viewId = _macosParams.keepAlive?.id ?? viewId ?? id;
     }
-    _iosHeadlessInAppWebView?.internalDispose();
+    _macosHeadlessInAppWebView?.internalDispose();
     _controller = MacOSInAppWebViewController(
         PlatformInAppWebViewControllerCreationParams(
             id: viewId, webviewParams: params));
-    _iosParams.findInteractionController?.init(viewId);
+    _macosParams.findInteractionController?.init(viewId);
     debugLog(
         className: runtimeType.toString(),
         id: viewId?.toString(),
@@ -352,42 +347,42 @@ class MacOSInAppWebViewWidget extends PlatformInAppWebViewWidget {
             PlatformInAppWebViewController.debugLoggingSettings,
         method: "onWebViewCreated",
         args: []);
-    if (_iosParams.onWebViewCreated != null) {
-      _iosParams.onWebViewCreated!(
+    if (_macosParams.onWebViewCreated != null) {
+      _macosParams.onWebViewCreated!(
           params.controllerFromPlatform?.call(_controller!) ?? _controller!);
     }
   }
 
   void _inferInitialSettings(InAppWebViewSettings settings) {
-    if (_iosParams.shouldOverrideUrlLoading != null &&
+    if (_macosParams.shouldOverrideUrlLoading != null &&
         settings.useShouldOverrideUrlLoading == null) {
       settings.useShouldOverrideUrlLoading = true;
     }
-    if (_iosParams.onLoadResource != null &&
+    if (_macosParams.onLoadResource != null &&
         settings.useOnLoadResource == null) {
       settings.useOnLoadResource = true;
     }
-    if (_iosParams.onDownloadStartRequest != null &&
+    if (_macosParams.onDownloadStartRequest != null &&
         settings.useOnDownloadStart == null) {
       settings.useOnDownloadStart = true;
     }
-    if (_iosParams.shouldInterceptAjaxRequest != null &&
+    if (_macosParams.shouldInterceptAjaxRequest != null &&
         settings.useShouldInterceptAjaxRequest == null) {
       settings.useShouldInterceptAjaxRequest = true;
     }
-    if (_iosParams.shouldInterceptFetchRequest != null &&
+    if (_macosParams.shouldInterceptFetchRequest != null &&
         settings.useShouldInterceptFetchRequest == null) {
       settings.useShouldInterceptFetchRequest = true;
     }
-    if (_iosParams.shouldInterceptRequest != null &&
+    if (_macosParams.shouldInterceptRequest != null &&
         settings.useShouldInterceptRequest == null) {
       settings.useShouldInterceptRequest = true;
     }
-    if (_iosParams.onRenderProcessGone != null &&
+    if (_macosParams.onRenderProcessGone != null &&
         settings.useOnRenderProcessGone == null) {
       settings.useOnRenderProcessGone = true;
     }
-    if (_iosParams.onNavigationResponse != null &&
+    if (_macosParams.onNavigationResponse != null &&
         settings.useOnNavigationResponse == null) {
       settings.useOnNavigationResponse = true;
     }
@@ -403,11 +398,11 @@ class MacOSInAppWebViewWidget extends PlatformInAppWebViewWidget {
             PlatformInAppWebViewController.debugLoggingSettings,
         method: "dispose",
         args: []);
-    final isKeepAlive = _iosParams.keepAlive != null;
+    final isKeepAlive = _macosParams.keepAlive != null;
     _controller?.dispose(isKeepAlive: isKeepAlive);
     _controller = null;
-    _iosParams.pullToRefreshController?.dispose(isKeepAlive: isKeepAlive);
-    _iosParams.findInteractionController?.dispose(isKeepAlive: isKeepAlive);
+    _macosParams.pullToRefreshController?.dispose(isKeepAlive: isKeepAlive);
+    _macosParams.findInteractionController?.dispose(isKeepAlive: isKeepAlive);
   }
 
   @override

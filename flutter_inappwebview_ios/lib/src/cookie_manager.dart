@@ -418,14 +418,9 @@ class IOSCookieManager extends PlatformCookieManager
   }
 
   Future<bool> _shouldUseJavascript() async {
-    if (Util.isIOS || Util.isMacOS) {
-      final platformUtil = PlatformUtil.instance();
-      final systemVersion = await platformUtil.getSystemVersion();
-      return Util.isIOS
-          ? systemVersion.compareTo("11") == -1
-          : systemVersion.compareTo("10.13") == -1;
-    }
-    return false;
+    final platformUtil = PlatformUtil.instance();
+    final systemVersion = await platformUtil.getSystemVersion();
+    return systemVersion.compareTo("10.13") == -1;
   }
 
   @override

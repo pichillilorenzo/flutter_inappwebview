@@ -47,7 +47,7 @@ class MacOSWebMessageListener extends PlatformWebMessageListener
               : MacOSWebMessageListenerCreationParams
                   .fromPlatformWebMessageListenerCreationParams(params),
         ) {
-    assert(!this._iosParams.allowedOriginRules.contains(""),
+    assert(!this._macosParams.allowedOriginRules.contains(""),
         "allowedOriginRules cannot contain empty strings");
     channel = MethodChannel(
         'com.pichillilorenzo/flutter_inappwebview_web_message_listener_${_id}_${params.jsObjectName}');
@@ -60,7 +60,7 @@ class MacOSWebMessageListener extends PlatformWebMessageListener
 
   MacOSJavaScriptReplyProxy? _replyProxy;
 
-  MacOSWebMessageListenerCreationParams get _iosParams =>
+  MacOSWebMessageListenerCreationParams get _macosParams =>
       params as MacOSWebMessageListenerCreationParams;
 
   Future<dynamic> _handleMethod(MethodCall call) async {
@@ -99,7 +99,7 @@ class MacOSWebMessageListener extends PlatformWebMessageListener
     return {
       "id": _id,
       "jsObjectName": params.jsObjectName,
-      "allowedOriginRules": _iosParams.allowedOriginRules.toList(),
+      "allowedOriginRules": _macosParams.allowedOriginRules.toList(),
     };
   }
 
@@ -147,14 +147,14 @@ class MacOSJavaScriptReplyProxy extends PlatformJavaScriptReplyProxy {
                   .fromPlatformJavaScriptReplyProxyCreationParams(params),
         );
 
-  MacOSWebMessageListener get _iosWebMessageListener =>
+  MacOSWebMessageListener get _macosWebMessageListener =>
       params.webMessageListener as MacOSWebMessageListener;
 
   @override
   Future<void> postMessage(WebMessage message) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('message', () => message.toMap());
-    await _iosWebMessageListener.channel?.invokeMethod('postMessage', args);
+    await _macosWebMessageListener.channel?.invokeMethod('postMessage', args);
   }
 
   @override

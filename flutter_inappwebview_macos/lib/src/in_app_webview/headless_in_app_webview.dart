@@ -274,7 +274,7 @@ class MacOSHeadlessInAppWebView extends PlatformHeadlessInAppWebView
 
   dynamic _controllerFromPlatform;
 
-  MacOSHeadlessInAppWebViewCreationParams get _iosParams =>
+  MacOSHeadlessInAppWebViewCreationParams get _macosParams =>
       params as MacOSHeadlessInAppWebViewCreationParams;
 
   _init() {
@@ -285,7 +285,7 @@ class MacOSHeadlessInAppWebView extends PlatformHeadlessInAppWebView
     _controllerFromPlatform =
         params.controllerFromPlatform?.call(_webViewController!) ??
             _webViewController!;
-    _iosParams.findInteractionController?.init(id);
+    _macosParams.findInteractionController?.init(id);
     channel =
         MethodChannel('com.pichillilorenzo/flutter_headless_inappwebview_$id');
     handler = _handleMethod;
@@ -321,8 +321,8 @@ class MacOSHeadlessInAppWebView extends PlatformHeadlessInAppWebView
             initialSettings.toMap();
 
     Map<String, dynamic> pullToRefreshSettings =
-        _iosParams.pullToRefreshController?.params.settings.toMap() ??
-            _iosParams.pullToRefreshController?.params.options.toMap() ??
+        _macosParams.pullToRefreshController?.params.settings.toMap() ??
+            _macosParams.pullToRefreshController?.params.options.toMap() ??
             PullToRefreshSettings(enabled: false).toMap();
 
     Map<String, dynamic> args = <String, dynamic>{};
@@ -421,8 +421,8 @@ class MacOSHeadlessInAppWebView extends PlatformHeadlessInAppWebView
     _webViewController?.dispose();
     _webViewController = null;
     _controllerFromPlatform = null;
-    _iosParams.pullToRefreshController?.dispose();
-    _iosParams.findInteractionController?.dispose();
+    _macosParams.pullToRefreshController?.dispose();
+    _macosParams.findInteractionController?.dispose();
   }
 }
 

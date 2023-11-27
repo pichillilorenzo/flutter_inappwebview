@@ -1,76 +1,54 @@
-import 'package:flutter/services.dart';
-import 'package:flutter_inappwebview/src/util.dart';
+import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_platform_interface.dart';
 import 'web_message_port.dart';
-import 'web_message.dart';
 
-///The representation of the [HTML5 message channels](https://html.spec.whatwg.org/multipage/web-messaging.html#message-channels).
-///
-///**Supported Platforms/Implementations**:
-///- Android native WebView
-///- iOS
-///- MacOS
-class WebMessageChannel extends ChannelController {
-  ///Message Channel ID used internally.
-  final String id;
-
-  ///The first [WebMessagePort] object of the channel.
-  final WebMessagePort port1;
-
-  ///The second [WebMessagePort] object of the channel.
-  final WebMessagePort port2;
-
+///{@macro flutter_inappwebview_platform_interface.PlatformWebMessageChannel}
+class WebMessageChannel {
+  ///{@macro flutter_inappwebview_platform_interface.PlatformWebMessageChannel}
   WebMessageChannel(
-      {required this.id, required this.port1, required this.port2}) {
-    channel = MethodChannel(
-        'com.pichillilorenzo/flutter_inappwebview_web_message_channel_$id');
-    handler = _handleMethod;
-    initMethodCallHandler();
-  }
+      {required String id,
+      required WebMessagePort port1,
+      required WebMessagePort port2})
+      : this.fromPlatformCreationParams(
+            params: PlatformWebMessageChannelCreationParams(
+                id: id, port1: port1.platform, port2: port2.platform));
+
+  /// Constructs a [WebMessageChannel].
+  ///
+  /// See [WebMessageChannel.fromPlatformCreationParams] for setting parameters for
+  /// a specific platform.
+  WebMessageChannel.fromPlatformCreationParams({
+    required PlatformWebMessageChannelCreationParams params,
+  }) : this.fromPlatform(platform: PlatformWebMessageChannel(params));
+
+  /// Constructs a [WebMessageChannel] from a specific platform implementation.
+  WebMessageChannel.fromPlatform({required this.platform});
+
+  /// Implementation of [PlatformWebMessageChannel] for the current platform.
+  final PlatformWebMessageChannel platform;
 
   static WebMessageChannel? fromMap(Map<String, dynamic>? map) {
-    if (map == null) {
+    PlatformWebMessageChannel? platform =
+        PlatformWebMessageChannel.static().fromMap(map);
+    if (platform == null) {
       return null;
     }
-    var webMessageChannel = WebMessageChannel(
-        id: map["id"],
-        port1: WebMessagePort(index: 0),
-        port2: WebMessagePort(index: 1));
-    webMessageChannel.port1.webMessageChannel = webMessageChannel;
-    webMessageChannel.port2.webMessageChannel = webMessageChannel;
-    return webMessageChannel;
+    return WebMessageChannel.fromPlatform(platform: platform);
   }
 
-  Future<dynamic> _handleMethod(MethodCall call) async {
-    switch (call.method) {
-      case "onMessage":
-        int index = call.arguments["index"];
-        var port = index == 0 ? this.port1 : this.port2;
-        if (port.onMessage != null) {
-          WebMessage? message = call.arguments["message"] != null
-              ? WebMessage.fromMap(
-                  call.arguments["message"].cast<String, dynamic>())
-              : null;
-          port.onMessage!(message);
-        }
-        break;
-      default:
-        throw UnimplementedError("Unimplemented ${call.method} method");
-    }
-    return null;
-  }
+  ///{@macro flutter_inappwebview_platform_interface.PlatformWebMessageChannel.id}
+  String get id => platform.id;
 
-  ///Disposes the web message channel.
-  @override
-  void dispose() {
-    disposeChannel();
-  }
+  ///{@macro flutter_inappwebview_platform_interface.PlatformWebMessageChannel.port1}
+  WebMessagePort get port1 =>
+      WebMessagePort.fromPlatform(platform: platform.port1);
+
+  ///{@macro flutter_inappwebview_platform_interface.PlatformWebMessageChannel.port2}
+  WebMessagePort get port2 =>
+      WebMessagePort.fromPlatform(platform: platform.port2);
+
+  ///{@macro flutter_inappwebview_platform_interface.PlatformWebMessageChannel.dispose}
+  void dispose() => platform.dispose();
 
   @override
-  String toString() {
-    return 'WebMessageChannel{id: $id, port1: $port1, port2: $port2}';
-  }
-}
-
-extension InternalWebMessageChannel on WebMessageChannel {
-  MethodChannel? get internalChannel => channel;
+  String toString() => platform.toString();
 }

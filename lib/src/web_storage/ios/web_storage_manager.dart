@@ -1,9 +1,8 @@
 import 'dart:async';
 
-import 'package:flutter/services.dart';
+import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_platform_interface.dart';
 
-import '../../types/main.dart';
-import '../_static_channel.dart';
+import '../web_storage_manager.dart';
 
 ///Class that represents various types of data that a website might make use of.
 ///This includes cookies, disk and memory caches, and persistent data such as WebSQL, IndexedDB databases, and local storage.
@@ -13,34 +12,33 @@ import '../_static_channel.dart';
 ///Use [WebStorageManager] instead.
 @Deprecated("Use WebStorageManager instead")
 class IOSWebStorageManager {
-  static MethodChannel _staticChannel = WEB_STORAGE_STATIC_CHANNEL;
-
   ///Fetches data records containing the given website data types.
   ///
   ///[dataTypes] represents the website data types to fetch records for.
   Future<List<IOSWKWebsiteDataRecord>> fetchDataRecords(
       {required Set<IOSWKWebsiteDataType> dataTypes}) async {
     List<IOSWKWebsiteDataRecord> recordList = [];
-    List<String> dataTypesList = [];
+    Set<WebsiteDataType> dataTypesList = Set();
     for (var dataType in dataTypes) {
-      dataTypesList.add(dataType.toNativeValue());
+      dataTypesList
+          .add(WebsiteDataType.fromNativeValue(dataType.toNativeValue())!);
     }
-    Map<String, dynamic> args = <String, dynamic>{};
-    args.putIfAbsent("dataTypes", () => dataTypesList);
-    List<Map<dynamic, dynamic>> records =
-        (await _staticChannel.invokeMethod('fetchDataRecords', args))
-            .cast<Map<dynamic, dynamic>>();
+
+    List<WebsiteDataRecord> records = await WebStorageManager.instance()
+        .fetchDataRecords(dataTypes: dataTypesList);
+
     for (var record in records) {
-      List<String> dataTypesString = record["dataTypes"].cast<String>();
+      Set<WebsiteDataType> dataTypesString = record.dataTypes ?? Set();
       Set<IOSWKWebsiteDataType> dataTypes = Set();
       for (var dataTypeValue in dataTypesString) {
-        var dataType = IOSWKWebsiteDataType.fromNativeValue(dataTypeValue);
+        var dataType =
+            IOSWKWebsiteDataType.fromNativeValue(dataTypeValue.toNativeValue());
         if (dataType != null) {
           dataTypes.add(dataType);
         }
       }
       recordList.add(IOSWKWebsiteDataRecord(
-          displayName: record["displayName"], dataTypes: dataTypes));
+          displayName: record.displayName, dataTypes: dataTypes));
     }
     return recordList;
   }
@@ -53,20 +51,19 @@ class IOSWebStorageManager {
   Future<void> removeDataFor(
       {required Set<IOSWKWebsiteDataType> dataTypes,
       required List<IOSWKWebsiteDataRecord> dataRecords}) async {
-    List<String> dataTypesList = [];
+    Set<WebsiteDataType> dataTypesList = Set();
     for (var dataType in dataTypes) {
-      dataTypesList.add(dataType.toNativeValue());
+      dataTypesList
+          .add(WebsiteDataType.fromNativeValue(dataType.toNativeValue())!);
     }
 
-    List<Map<String, dynamic>> recordList = [];
+    List<WebsiteDataRecord> recordList = [];
     for (var record in dataRecords) {
-      recordList.add(record.toMap());
+      recordList.add(WebsiteDataRecord.fromMap(record.toMap())!);
     }
 
-    Map<String, dynamic> args = <String, dynamic>{};
-    args.putIfAbsent("dataTypes", () => dataTypesList);
-    args.putIfAbsent("recordList", () => recordList);
-    await _staticChannel.invokeMethod('removeDataFor', args);
+    await WebStorageManager.instance()
+        .removeDataFor(dataRecords: recordList, dataTypes: dataTypesList);
   }
 
   ///Removes all website data of the given types that has been modified since the given date.
@@ -77,16 +74,13 @@ class IOSWebStorageManager {
   Future<void> removeDataModifiedSince(
       {required Set<IOSWKWebsiteDataType> dataTypes,
       required DateTime date}) async {
-    List<String> dataTypesList = [];
+    Set<WebsiteDataType> dataTypesList = Set();
     for (var dataType in dataTypes) {
-      dataTypesList.add(dataType.toNativeValue());
+      dataTypesList
+          .add(WebsiteDataType.fromNativeValue(dataType.toNativeValue())!);
     }
 
-    var timestamp = date.millisecondsSinceEpoch;
-
-    Map<String, dynamic> args = <String, dynamic>{};
-    args.putIfAbsent("dataTypes", () => dataTypesList);
-    args.putIfAbsent("timestamp", () => timestamp);
-    await _staticChannel.invokeMethod('removeDataModifiedSince', args);
+    await WebStorageManager.instance()
+        .removeDataModifiedSince(dataTypes: dataTypesList, date: date);
   }
 }

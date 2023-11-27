@@ -2,24 +2,24 @@ import 'dart:core';
 import 'dart:typed_data';
 
 import 'package:flutter/services.dart';
+import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_platform_interface.dart';
 
-import '../../types/main.dart';
 import '../in_app_webview_controller.dart';
 
 ///Use [InAppWebViewController] instead.
 @Deprecated("Use InAppWebViewController instead")
 class IOSInAppWebViewController {
-  MethodChannel? _channel;
+  PlatformInAppWebViewController? _controller;
 
-  IOSInAppWebViewController({required MethodChannel channel}) {
-    this._channel = channel;
+  IOSInAppWebViewController(
+      {required PlatformInAppWebViewController controller}) {
+    this._controller = controller;
   }
 
   ///Use [InAppWebViewController.reloadFromOrigin] instead.
   @Deprecated("Use InAppWebViewController.reloadFromOrigin instead")
   Future<void> reloadFromOrigin() async {
-    Map<String, dynamic> args = <String, dynamic>{};
-    await _channel?.invokeMethod('reloadFromOrigin', args);
+    await _controller?.reloadFromOrigin();
   }
 
   ///Use [InAppWebViewController.createPdf] instead.
@@ -29,24 +29,21 @@ class IOSInAppWebViewController {
       // ignore: deprecated_member_use_from_same_package
       IOSWKPDFConfiguration? iosWKPdfConfiguration,
       PDFConfiguration? pdfConfiguration}) async {
-    Map<String, dynamic> args = <String, dynamic>{};
-    args.putIfAbsent('pdfConfiguration',
-        () => pdfConfiguration?.toMap() ?? iosWKPdfConfiguration?.toMap());
-    return await _channel?.invokeMethod('createPdf', args);
+    return await _controller?.createPdf(
+        iosWKPdfConfiguration: iosWKPdfConfiguration,
+        pdfConfiguration: pdfConfiguration);
   }
 
   ///Use [InAppWebViewController.createWebArchiveData] instead.
   @Deprecated("Use InAppWebViewController.createWebArchiveData instead")
   Future<Uint8List?> createWebArchiveData() async {
-    Map<String, dynamic> args = <String, dynamic>{};
-    return await _channel?.invokeMethod('createWebArchiveData', args);
+    return await _controller?.createWebArchiveData();
   }
 
   ///Use [InAppWebViewController.hasOnlySecureContent] instead.
   @Deprecated("Use InAppWebViewController.hasOnlySecureContent instead")
   Future<bool> hasOnlySecureContent() async {
-    Map<String, dynamic> args = <String, dynamic>{};
-    return await _channel?.invokeMethod('hasOnlySecureContent', args);
+    return await _controller?.hasOnlySecureContent() ?? false;
   }
 
   ///Use [InAppWebViewController.handlesURLScheme] instead.
@@ -56,6 +53,6 @@ class IOSInAppWebViewController {
   }
 
   void dispose() {
-    _channel = null;
+    _controller = null;
   }
 }

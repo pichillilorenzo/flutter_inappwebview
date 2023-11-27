@@ -15,7 +15,7 @@ import 'package:pointer_interceptor/pointer_interceptor.dart';
 // import 'package:permission_handler/permission_handler.dart';
 
 InAppLocalhostServer localhostServer =
-    new InAppLocalhostServer(documentRoot: 'assets');
+    InAppLocalhostServer(documentRoot: 'assets');
 
 Future main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -130,7 +130,7 @@ PointerInterceptor myDrawer({required BuildContext context}) {
 
 class MyApp extends StatefulWidget {
   @override
-  _MyAppState createState() => new _MyAppState();
+  _MyAppState createState() => _MyAppState();
 }
 
 class _MyAppState extends State<MyApp> {

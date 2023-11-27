@@ -1,158 +1,65 @@
 import 'dart:async';
+import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_platform_interface.dart';
 
-import 'types/main.dart';
-import 'package:flutter/services.dart';
-
-///Class that implements a singleton object (shared instance) which manages the shared HTTP auth credentials cache.
-///On iOS and MacOS, this class uses the [URLCredentialStorage](https://developer.apple.com/documentation/foundation/urlcredentialstorage) class.
-///On Android, this class has a custom implementation using `android.database.sqlite.SQLiteDatabase` because
-///[WebViewDatabase](https://developer.android.com/reference/android/webkit/WebViewDatabase)
-///doesn't offer the same functionalities as iOS `URLCredentialStorage`.
-///
-///**Supported Platforms/Implementations**:
-///- Android native WebView
-///- iOS
-///- MacOS
+///{@macro flutter_inappwebview_platform_interface.PlatformHttpAuthCredentialDatabase}
 class HttpAuthCredentialDatabase {
+  ///{@macro flutter_inappwebview_platform_interface.PlatformHttpAuthCredentialDatabase}
+  HttpAuthCredentialDatabase()
+      : this.fromPlatformCreationParams(
+          const PlatformHttpAuthCredentialDatabaseCreationParams(),
+        );
+
+  /// Constructs a [HttpAuthCredentialDatabase] from creation params for a specific
+  /// platform.
+  HttpAuthCredentialDatabase.fromPlatformCreationParams(
+    PlatformHttpAuthCredentialDatabaseCreationParams params,
+  ) : this.fromPlatform(PlatformHttpAuthCredentialDatabase(params));
+
+  /// Constructs a [HttpAuthCredentialDatabase] from a specific platform
+  /// implementation.
+  HttpAuthCredentialDatabase.fromPlatform(this.platform);
+
+  /// Implementation of [PlatformHttpAuthCredentialDatabase] for the current platform.
+  final PlatformHttpAuthCredentialDatabase platform;
+
   static HttpAuthCredentialDatabase? _instance;
-  static const MethodChannel _channel = const MethodChannel(
-      'com.pichillilorenzo/flutter_inappwebview_credential_database');
 
-  HttpAuthCredentialDatabase._();
-
-  ///Gets the database shared instance.
+  ///Gets the [HttpAuthCredentialDatabase] shared instance.
   static HttpAuthCredentialDatabase instance() {
-    return (_instance != null) ? _instance! : _init();
-  }
-
-  static HttpAuthCredentialDatabase _init() {
-    _channel.setMethodCallHandler((call) async {
-      try {
-        return await _handleMethod(call);
-      } on Error catch (e) {
-        print(e);
-        print(e.stackTrace);
-      }
-    });
-    _instance = HttpAuthCredentialDatabase._();
+    if (_instance == null) {
+      _instance = HttpAuthCredentialDatabase();
+    }
     return _instance!;
   }
 
-  static Future<dynamic> _handleMethod(MethodCall call) async {}
+  ///{@macro flutter_inappwebview_platform_interface.PlatformHttpAuthCredentialDatabase.getAllAuthCredentials}
+  Future<List<URLProtectionSpaceHttpAuthCredentials>> getAllAuthCredentials() =>
+      platform.getAllAuthCredentials();
 
-  ///Gets a map list of all HTTP auth credentials saved.
-  ///Each map contains the key `protectionSpace` of type [URLProtectionSpace]
-  ///and the key `credentials` of type List<[URLCredential]> that contains all the HTTP auth credentials saved for that `protectionSpace`.
-  ///
-  ///**Supported Platforms/Implementations**:
-  ///- Android native WebView
-  ///- iOS ([Official API - URLCredentialStorage.allCredentials](https://developer.apple.com/documentation/foundation/urlcredentialstorage/1413859-allcredentials))
-  ///- MacOS ([Official API - URLCredentialStorage.allCredentials](https://developer.apple.com/documentation/foundation/urlcredentialstorage/1413859-allcredentials))
-  Future<List<URLProtectionSpaceHttpAuthCredentials>>
-      getAllAuthCredentials() async {
-    Map<String, dynamic> args = <String, dynamic>{};
-    List<dynamic> allCredentials =
-        await _channel.invokeMethod('getAllAuthCredentials', args);
-
-    List<URLProtectionSpaceHttpAuthCredentials> result = [];
-
-    for (Map<dynamic, dynamic> map in allCredentials) {
-      var element = URLProtectionSpaceHttpAuthCredentials.fromMap(
-          map.cast<String, dynamic>());
-      if (element != null) {
-        result.add(element);
-      }
-    }
-    return result;
-  }
-
-  ///Gets all the HTTP auth credentials saved for that [protectionSpace].
-  ///
-  ///**Supported Platforms/Implementations**:
-  ///- Android native WebView
-  ///- iOS
-  ///- MacOS
+  ///{@macro flutter_inappwebview_platform_interface.PlatformHttpAuthCredentialDatabase.getHttpAuthCredentials}
   Future<List<URLCredential>> getHttpAuthCredentials(
-      {required URLProtectionSpace protectionSpace}) async {
-    Map<String, dynamic> args = <String, dynamic>{};
-    args.putIfAbsent("host", () => protectionSpace.host);
-    args.putIfAbsent("protocol", () => protectionSpace.protocol);
-    args.putIfAbsent("realm", () => protectionSpace.realm);
-    args.putIfAbsent("port", () => protectionSpace.port);
-    List<dynamic> credentialList =
-        await _channel.invokeMethod('getHttpAuthCredentials', args);
-    List<URLCredential> credentials = [];
-    for (Map<dynamic, dynamic> map in credentialList) {
-      var credential = URLCredential.fromMap(map.cast<String, dynamic>());
-      if (credential != null) {
-        credentials.add(credential);
-      }
-    }
-    return credentials;
-  }
+          {required URLProtectionSpace protectionSpace}) =>
+      platform.getHttpAuthCredentials(protectionSpace: protectionSpace);
 
-  ///Saves an HTTP auth [credential] for that [protectionSpace].
-  ///
-  ///**Supported Platforms/Implementations**:
-  ///- Android native WebView
-  ///- iOS ([Official API - URLCredentialStorage.set](https://developer.apple.com/documentation/foundation/urlcredentialstorage/1407227-set))
-  ///- MacOS ([Official API - URLCredentialStorage.set](https://developer.apple.com/documentation/foundation/urlcredentialstorage/1407227-set))
+  ///{@macro flutter_inappwebview_platform_interface.PlatformHttpAuthCredentialDatabase.setHttpAuthCredential}
   Future<void> setHttpAuthCredential(
-      {required URLProtectionSpace protectionSpace,
-      required URLCredential credential}) async {
-    Map<String, dynamic> args = <String, dynamic>{};
-    args.putIfAbsent("host", () => protectionSpace.host);
-    args.putIfAbsent("protocol", () => protectionSpace.protocol);
-    args.putIfAbsent("realm", () => protectionSpace.realm);
-    args.putIfAbsent("port", () => protectionSpace.port);
-    args.putIfAbsent("username", () => credential.username);
-    args.putIfAbsent("password", () => credential.password);
-    await _channel.invokeMethod('setHttpAuthCredential', args);
-  }
+          {required URLProtectionSpace protectionSpace,
+          required URLCredential credential}) =>
+      platform.setHttpAuthCredential(
+          protectionSpace: protectionSpace, credential: credential);
 
-  ///Removes an HTTP auth [credential] for that [protectionSpace].
-  ///
-  ///**Supported Platforms/Implementations**:
-  ///- Android native WebView
-  ///- iOS ([Official API - URLCredentialStorage.remove](https://developer.apple.com/documentation/foundation/urlcredentialstorage/1408664-remove))
-  ///- MacOS ([Official API - URLCredentialStorage.remove](https://developer.apple.com/documentation/foundation/urlcredentialstorage/1408664-remove))
+  ///{@macro flutter_inappwebview_platform_interface.PlatformHttpAuthCredentialDatabase.removeHttpAuthCredential}
   Future<void> removeHttpAuthCredential(
-      {required URLProtectionSpace protectionSpace,
-      required URLCredential credential}) async {
-    Map<String, dynamic> args = <String, dynamic>{};
-    args.putIfAbsent("host", () => protectionSpace.host);
-    args.putIfAbsent("protocol", () => protectionSpace.protocol);
-    args.putIfAbsent("realm", () => protectionSpace.realm);
-    args.putIfAbsent("port", () => protectionSpace.port);
-    args.putIfAbsent("username", () => credential.username);
-    args.putIfAbsent("password", () => credential.password);
-    await _channel.invokeMethod('removeHttpAuthCredential', args);
-  }
+          {required URLProtectionSpace protectionSpace,
+          required URLCredential credential}) =>
+      platform.removeHttpAuthCredential(
+          protectionSpace: protectionSpace, credential: credential);
 
-  ///Removes all the HTTP auth credentials saved for that [protectionSpace].
-  ///
-  ///**Supported Platforms/Implementations**:
-  ///- Android native WebView
-  ///- iOS
-  ///- MacOS
+  ///{@macro flutter_inappwebview_platform_interface.PlatformHttpAuthCredentialDatabase.removeHttpAuthCredentials}
   Future<void> removeHttpAuthCredentials(
-      {required URLProtectionSpace protectionSpace}) async {
-    Map<String, dynamic> args = <String, dynamic>{};
-    args.putIfAbsent("host", () => protectionSpace.host);
-    args.putIfAbsent("protocol", () => protectionSpace.protocol);
-    args.putIfAbsent("realm", () => protectionSpace.realm);
-    args.putIfAbsent("port", () => protectionSpace.port);
-    await _channel.invokeMethod('removeHttpAuthCredentials', args);
-  }
+          {required URLProtectionSpace protectionSpace}) =>
+      platform.removeHttpAuthCredentials(protectionSpace: protectionSpace);
 
-  ///Removes all the HTTP auth credentials saved in the database.
-  ///
-  ///**Supported Platforms/Implementations**:
-  ///- Android native WebView
-  ///- iOS
-  ///- MacOS
-  Future<void> clearAllAuthCredentials() async {
-    Map<String, dynamic> args = <String, dynamic>{};
-    await _channel.invokeMethod('clearAllAuthCredentials', args);
-  }
+  ///{@macro flutter_inappwebview_platform_interface.PlatformHttpAuthCredentialDatabase.clearAllAuthCredentials}
+  Future<void> clearAllAuthCredentials() => platform.clearAllAuthCredentials();
 }

@@ -1,202 +1,132 @@
-import 'dart:convert';
+import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_platform_interface.dart';
 
 import '../in_app_webview/in_app_webview_controller.dart';
-import '../types/disposable.dart';
-import '../types/main.dart';
-import 'web_storage_item.dart';
 
-///Class that provides access to the JavaScript [Web Storage API](https://developer.mozilla.org/en-US/docs/Web/API/Web_Storage_API): `window.sessionStorage` and `window.localStorage`.
-///It used by [InAppWebViewController.webStorage].
-///
-///**Supported Platforms/Implementations**:
-///- Android native WebView
-///- iOS
-///- MacOS
-///- Web
-class WebStorage implements Disposable {
-  ///Represents `window.localStorage`.
-  LocalStorage localStorage;
+///{@macro flutter_inappwebview_platform_interface.PlatformWebStorage}
+class WebStorage {
+  ///{@macro flutter_inappwebview_platform_interface.PlatformWebStorage}
+  WebStorage(
+      {required PlatformLocalStorage localStorage,
+      required PlatformSessionStorage sessionStorage})
+      : this.fromPlatformCreationParams(
+            params: PlatformWebStorageCreationParams(
+                localStorage: localStorage, sessionStorage: sessionStorage));
 
-  ///Represents `window.sessionStorage`.
-  SessionStorage sessionStorage;
+  /// Constructs a [WebStorage].
+  ///
+  /// See [WebStorage.fromPlatformCreationParams] for setting parameters for
+  /// a specific platform.
+  WebStorage.fromPlatformCreationParams({
+    required PlatformWebStorageCreationParams params,
+  }) : this.fromPlatform(platform: PlatformWebStorage(params));
 
-  WebStorage({required this.localStorage, required this.sessionStorage});
+  /// Constructs a [WebStorage] from a specific platform implementation.
+  WebStorage.fromPlatform({required this.platform});
 
-  ///Disposes the web storage.
-  @override
-  void dispose() {
-    localStorage.dispose();
-    sessionStorage.dispose();
-  }
+  /// Implementation of [PlatformWebStorage] for the current platform.
+  final PlatformWebStorage platform;
+
+  ///{@macro flutter_inappwebview_platform_interface.PlatformWebStorage.localStorage}
+  LocalStorage get localStorage =>
+      LocalStorage.fromPlatform(platform: platform.localStorage);
+
+  ///{@macro flutter_inappwebview_platform_interface.PlatformWebStorage.sessionStorage}
+  SessionStorage get sessionStorage =>
+      SessionStorage.fromPlatform(platform: platform.sessionStorage);
+
+  ///{@macro flutter_inappwebview_platform_interface.PlatformWebStorage.dispose}
+  void dispose() => platform.dispose();
 }
 
-///Class that provides methods to manage the JavaScript [Storage](https://developer.mozilla.org/en-US/docs/Web/API/Storage) object.
-///It is used by [LocalStorage] and [SessionStorage].
-class Storage implements Disposable {
-  InAppWebViewController? _controller;
+///{@macro flutter_inappwebview_platform_interface.PlatformStorage}
+abstract class Storage implements PlatformStorage {
+  /// Constructs a [Storage] from a specific platform implementation.
+  Storage.fromPlatform({required this.platform});
 
-  ///The web storage type: `window.sessionStorage` or `window.localStorage`.
-  WebStorageType webStorageType;
+  /// Implementation of [PlatformStorage] for the current platform.
+  final PlatformStorage platform;
 
-  Storage(InAppWebViewController controller, this.webStorageType) {
-    this._controller = controller;
-  }
+  ///{@macro flutter_inappwebview_platform_interface.PlatformStorage.controller}
+  PlatformInAppWebViewController? get controller => platform.controller;
 
-  ///Returns an integer representing the number of data items stored in the Storage object.
-  ///
-  ///**NOTE for Web**: this method will have effect only if the iframe has the same origin.
-  ///
-  ///**Supported Platforms/Implementations**:
-  ///- Android native WebView
-  ///- iOS
-  ///- Web
-  Future<int?> length() async {
-    var result = await _controller?.evaluateJavascript(source: """
-    window.$webStorageType.length;
-    """);
-    return result != null ? int.parse(json.decode(result)) : null;
-  }
+  ///{@macro flutter_inappwebview_platform_interface.PlatformStorage.webStorageType}
+  WebStorageType get webStorageType => platform.webStorageType;
 
-  ///When passed a [key] name and [value], will add that key to the storage, or update that key's value if it already exists.
-  ///
-  ///**NOTE for Web**: this method will have effect only if the iframe has the same origin.
-  ///
-  ///**Supported Platforms/Implementations**:
-  ///- Android native WebView
-  ///- iOS
-  ///- Web
-  Future<void> setItem({required String key, required dynamic value}) async {
-    var encodedValue = json.encode(value);
-    await _controller?.evaluateJavascript(source: """
-    window.$webStorageType.setItem("$key", ${value is String ? encodedValue : "JSON.stringify($encodedValue)"});
-    """);
-  }
+  ///{@macro flutter_inappwebview_platform_interface.PlatformStorage.length}
+  Future<int?> length() => platform.length();
 
-  ///When passed a [key] name, will return that key's value, or `null` if the key does not exist, in the given Storage object.
-  ///
-  ///**NOTE for Web**: this method will have effect only if the iframe has the same origin.
-  ///
-  ///**Supported Platforms/Implementations**:
-  ///- Android native WebView
-  ///- iOS
-  ///- Web
-  Future<dynamic> getItem({required String key}) async {
-    var itemValue = await _controller?.evaluateJavascript(source: """
-    window.$webStorageType.getItem("$key");
-    """);
+  ///{@macro flutter_inappwebview_platform_interface.PlatformStorage.setItem}
+  Future<void> setItem({required String key, required dynamic value}) =>
+      platform.setItem(key: key, value: value);
 
-    if (itemValue == null) {
-      return null;
-    }
+  ///{@macro flutter_inappwebview_platform_interface.PlatformStorage.getItem}
+  Future<dynamic> getItem({required String key}) => platform.getItem(key: key);
 
-    try {
-      return json.decode(itemValue);
-    } catch (e) {}
+  ///{@macro flutter_inappwebview_platform_interface.PlatformStorage.removeItem}
+  Future<void> removeItem({required String key}) =>
+      platform.removeItem(key: key);
 
-    return itemValue;
-  }
+  ///{@macro flutter_inappwebview_platform_interface.PlatformStorage.getItems}
+  Future<List<WebStorageItem>> getItems() => platform.getItems();
 
-  ///When passed a [key] name, will remove that key from the given Storage object if it exists.
-  ///
-  ///**NOTE for Web**: this method will have effect only if the iframe has the same origin.
-  ///
-  ///**Supported Platforms/Implementations**:
-  ///- Android native WebView
-  ///- iOS
-  ///- Web
-  Future<void> removeItem({required String key}) async {
-    await _controller?.evaluateJavascript(source: """
-    window.$webStorageType.removeItem("$key");
-    """);
-  }
+  ///{@macro flutter_inappwebview_platform_interface.PlatformStorage.clear}
+  Future<void> clear() => platform.clear();
 
-  ///Returns the list of all items from the given Storage object.
-  ///
-  ///**NOTE for Web**: this method will have effect only if the iframe has the same origin.
-  ///
-  ///**Supported Platforms/Implementations**:
-  ///- Android native WebView
-  ///- iOS
-  ///- Web
-  Future<List<WebStorageItem>> getItems() async {
-    var webStorageItems = <WebStorageItem>[];
+  ///{@macro flutter_inappwebview_platform_interface.PlatformStorage.key}
+  Future<String> key({required int index}) => platform.key(index: index);
 
-    List<Map<dynamic, dynamic>>? items =
-        (await _controller?.evaluateJavascript(source: """
-(function() {
-  var webStorageItems = [];
-  for(var i = 0; i < window.$webStorageType.length; i++){
-    var key = window.$webStorageType.key(i);
-    webStorageItems.push(
-      {
-        key: key,
-        value: window.$webStorageType.getItem(key)
-      }
-    );
-  }
-  return webStorageItems;
-})();
-    """)).cast<Map<dynamic, dynamic>>();
-
-    if (items == null) {
-      return webStorageItems;
-    }
-
-    for (var item in items) {
-      webStorageItems
-          .add(WebStorageItem(key: item["key"], value: item["value"]));
-    }
-
-    return webStorageItems;
-  }
-
-  ///Clears all keys stored in a given Storage object.
-  ///
-  ///**NOTE for Web**: this method will have effect only if the iframe has the same origin.
-  ///
-  ///**Supported Platforms/Implementations**:
-  ///- Android native WebView
-  ///- iOS
-  ///- Web
-  Future<void> clear() async {
-    await _controller?.evaluateJavascript(source: """
-    window.$webStorageType.clear();
-    """);
-  }
-
-  ///When passed a number [index], returns the name of the nth key in a given Storage object.
-  ///The order of keys is user-agent defined, so you should not rely on it.
-  ///
-  ///**NOTE for Web**: this method will have effect only if the iframe has the same origin.
-  ///
-  ///**Supported Platforms/Implementations**:
-  ///- Android native WebView
-  ///- iOS
-  ///- Web
-  Future<String> key({required int index}) async {
-    var result = await _controller?.evaluateJavascript(source: """
-    window.$webStorageType.key($index);
-    """);
-    return result != null ? json.decode(result) : null;
-  }
-
-  ///Disposes the storage.
-  @override
-  void dispose() {
-    _controller = null;
-  }
+  ///{@macro flutter_inappwebview_platform_interface.PlatformStorage.dispose}
+  void dispose() => platform.dispose();
 }
 
-///Class that provides methods to manage the JavaScript `window.localStorage` object.
-///It used by [WebStorage].
+///{@macro flutter_inappwebview_platform_interface.PlatformLocalStorage}
 class LocalStorage extends Storage {
-  LocalStorage(InAppWebViewController controller)
-      : super(controller, WebStorageType.LOCAL_STORAGE);
+  ///{@macro flutter_inappwebview_platform_interface.PlatformLocalStorage}
+  LocalStorage({required InAppWebViewController? controller})
+      : this.fromPlatformCreationParams(
+            params: PlatformLocalStorageCreationParams(
+                PlatformStorageCreationParams(
+                    controller: controller?.platform,
+                    webStorageType: WebStorageType.LOCAL_STORAGE)));
+
+  /// Constructs a [LocalStorage].
+  ///
+  /// See [LocalStorage.fromPlatformCreationParams] for setting parameters for
+  /// a specific platform.
+  LocalStorage.fromPlatformCreationParams({
+    required PlatformLocalStorageCreationParams params,
+  }) : this.fromPlatform(platform: PlatformLocalStorage(params));
+
+  /// Constructs a [LocalStorage] from a specific platform implementation.
+  LocalStorage.fromPlatform({required this.platform})
+      : super.fromPlatform(platform: platform);
+
+  /// Implementation of [PlatformLocalStorage] for the current platform.
+  final PlatformLocalStorage platform;
 }
 
-///Class that provides methods to manage the JavaScript `window.sessionStorage` object.
-///It used by [WebStorage].
+///{@macro flutter_inappwebview_platform_interface.PlatformSessionStorage}
 class SessionStorage extends Storage {
-  SessionStorage(InAppWebViewController controller)
-      : super(controller, WebStorageType.SESSION_STORAGE);
+  ///{@macro flutter_inappwebview_platform_interface.PlatformSessionStorage}
+  SessionStorage({required InAppWebViewController? controller})
+      : this.fromPlatformCreationParams(
+            params: PlatformSessionStorageCreationParams(
+                PlatformStorageCreationParams(
+                    controller: controller?.platform,
+                    webStorageType: WebStorageType.SESSION_STORAGE)));
+
+  /// Constructs a [SessionStorage].
+  ///
+  /// See [SessionStorage.fromPlatformCreationParams] for setting parameters for
+  /// a specific platform.
+  SessionStorage.fromPlatformCreationParams({
+    required PlatformSessionStorageCreationParams params,
+  }) : this.fromPlatform(platform: PlatformSessionStorage(params));
+
+  /// Constructs a [SessionStorage] from a specific platform implementation.
+  SessionStorage.fromPlatform({required this.platform})
+      : super.fromPlatform(platform: platform);
+
+  /// Implementation of [PlatformSessionStorage] for the current platform.
+  final PlatformSessionStorage platform;
 }

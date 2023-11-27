@@ -5,7 +5,7 @@
 import FlutterMacOS
 import Foundation
 
-import flutter_inappwebview
+import flutter_inappwebview_macos
 import path_provider_foundation
 import url_launcher_macos
 

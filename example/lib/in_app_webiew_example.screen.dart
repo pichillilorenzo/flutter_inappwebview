@@ -9,7 +9,7 @@ import 'main.dart';
 class InAppWebViewExampleScreen extends StatefulWidget {
   @override
   _InAppWebViewExampleScreenState createState() =>
-      new _InAppWebViewExampleScreenState();
+      _InAppWebViewExampleScreenState();
 }
 
 class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {

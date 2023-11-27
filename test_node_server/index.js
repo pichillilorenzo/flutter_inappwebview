@@ -167,7 +167,7 @@ app.get("/echo-headers", (req, res) => {
 })
 
 app.get('/test-index', (req, res) => {
-    res.sendFile(__dirname + '/public/index.html');
+    res.sendFile(__dirname + '/public/test-index.html');
 })
 
 app.post("/test-post", (req, res) => {

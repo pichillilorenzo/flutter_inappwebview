@@ -66,11 +66,11 @@ abstract class Util {
         return """///
         ${platformNoteList.join("\n///\n")}
         ///
-        ///**Supported Platforms/Implementations**:
+        ///**Officially Supported Platforms/Implementations**:
         ${platformSupportedList.join("\n")}""";
       } else {
         return """///
-        ///**Supported Platforms/Implementations**:
+        ///**Officially Supported Platforms/Implementations**:
         ${platformSupportedList.join("\n")}""";
       }
     }

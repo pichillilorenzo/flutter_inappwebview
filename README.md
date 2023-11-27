@@ -47,7 +47,7 @@ Send a submission request to the [Submit App](https://inappwebview.dev/submit-ap
 
 ## Requirements
 
-- Dart sdk: ">=2.15.0 <4.0.0"
+- Dart sdk: ">=2.17.0 <4.0.0"
 - Flutter: ">=3.0.0"
 - Android: `minSdkVersion 19` and add support for `androidx` (see [AndroidX Migration](https://docs.flutter.dev/development/platform-integration/android/androidx-migration) to migrate an existing app)
 - iOS 9.0+: `--ios-language swift`, Xcode version `>= 14.3`
@@ -64,7 +64,7 @@ To make it work properly on the Web platform, you need to add the `web_support.j
 ```html
 <head>
     <!-- ... -->
-    <script type="application/javascript" src="/assets/packages/flutter_inappwebview/assets/web/web_support.js" defer></script>
+    <script type="application/javascript" src="/assets/packages/flutter_inappwebview_web/assets/web/web_support.js" defer></script>
     <!-- ... -->
 </head>
 ```  

@@ -9,7 +9,8 @@ import '../in_app_webview/in_app_webview_controller.dart';
 /// When adding additional fields make sure they can be null or have a default
 /// value to avoid breaking changes. See [PlatformWebStorageCreationParams] for
 /// more information.
-class WebPlatformWebStorageCreationParams extends PlatformWebStorageCreationParams {
+class WebPlatformWebStorageCreationParams
+    extends PlatformWebStorageCreationParams {
   /// Creates a new [WebPlatformWebStorageCreationParams] instance.
   WebPlatformWebStorageCreationParams(
       {required super.localStorage, required super.sessionStorage});
@@ -188,7 +189,8 @@ class WebPlatformLocalStorageCreationParams
 }
 
 ///{@macro flutter_inappwebview_platform_interface.PlatformLocalStorage}
-class WebPlatformLocalStorage extends PlatformLocalStorage with WebPlatformStorage {
+class WebPlatformLocalStorage extends PlatformLocalStorage
+    with WebPlatformStorage {
   /// Constructs a [WebPlatformLocalStorage].
   WebPlatformLocalStorage(PlatformLocalStorageCreationParams params)
       : super.implementation(
@@ -232,7 +234,8 @@ class WebPlatformSessionStorageCreationParams
 }
 
 ///{@macro flutter_inappwebview_platform_interface.PlatformSessionStorage}
-class WebPlatformSessionStorage extends PlatformSessionStorage with WebPlatformStorage {
+class WebPlatformSessionStorage extends PlatformSessionStorage
+    with WebPlatformStorage {
   /// Constructs a [WebPlatformSessionStorage].
   WebPlatformSessionStorage(PlatformSessionStorageCreationParams params)
       : super.implementation(

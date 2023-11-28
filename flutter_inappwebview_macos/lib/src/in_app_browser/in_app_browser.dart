@@ -31,8 +31,8 @@ class MacOSInAppBrowserCreationParams
     return MacOSInAppBrowserCreationParams(
         contextMenu: params.contextMenu,
         pullToRefreshController: params.pullToRefreshController,
-        findInteractionController: params.findInteractionController
-            as MacOSFindInteractionController?,
+        findInteractionController:
+            params.findInteractionController as MacOSFindInteractionController?,
         initialUserScripts: params.initialUserScripts,
         windowId: params.windowId);
   }

@@ -173,8 +173,7 @@ abstract class IOSStorage implements PlatformStorage {
 /// When adding additional fields make sure they can be null or have a default
 /// value to avoid breaking changes. See [PlatformLocalStorageCreationParams] for
 /// more information.
-class IOSLocalStorageCreationParams
-    extends PlatformLocalStorageCreationParams {
+class IOSLocalStorageCreationParams extends PlatformLocalStorageCreationParams {
   /// Creates a new [IOSLocalStorageCreationParams] instance.
   IOSLocalStorageCreationParams(super.params);
 

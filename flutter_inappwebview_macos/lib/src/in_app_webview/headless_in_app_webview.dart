@@ -279,8 +279,7 @@ class MacOSHeadlessInAppWebView extends PlatformHeadlessInAppWebView
 
   _init() {
     _webViewController = MacOSInAppWebViewController(
-      MacOSInAppWebViewControllerCreationParams(
-          id: id, webviewParams: params),
+      MacOSInAppWebViewControllerCreationParams(id: id, webviewParams: params),
     );
     _controllerFromPlatform =
         params.controllerFromPlatform?.call(_webViewController!) ??

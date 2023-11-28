@@ -247,8 +247,8 @@ class IOSInAppWebViewWidgetCreationParams
             initialSettings: params.initialSettings,
             contextMenu: params.contextMenu,
             initialUserScripts: params.initialUserScripts,
-            pullToRefreshController: params.pullToRefreshController
-                as IOSPullToRefreshController?,
+            pullToRefreshController:
+                params.pullToRefreshController as IOSPullToRefreshController?,
             findInteractionController: params.findInteractionController
                 as IOSFindInteractionController?);
 
@@ -286,12 +286,11 @@ class IOSInAppWebViewWidget extends PlatformInAppWebViewWidget {
         _iosParams.initialSettings ?? InAppWebViewSettings();
     _inferInitialSettings(initialSettings);
 
-    Map<String, dynamic> settingsMap = (_iosParams.initialSettings != null
-            ? initialSettings.toMap()
-            : null) ??
-        // ignore: deprecated_member_use_from_same_package
-        _iosParams.initialOptions?.toMap() ??
-        initialSettings.toMap();
+    Map<String, dynamic> settingsMap =
+        (_iosParams.initialSettings != null ? initialSettings.toMap() : null) ??
+            // ignore: deprecated_member_use_from_same_package
+            _iosParams.initialOptions?.toMap() ??
+            initialSettings.toMap();
 
     Map<String, dynamic> pullToRefreshSettings =
         _iosParams.pullToRefreshController?.params.settings.toMap() ??
@@ -323,7 +322,7 @@ class IOSInAppWebViewWidget extends PlatformInAppWebViewWidget {
             ? _iosParams.headlessWebView?.id
             : null,
         'initialUserScripts':
-        _iosParams.initialUserScripts?.map((e) => e.toMap()).toList() ?? [],
+            _iosParams.initialUserScripts?.map((e) => e.toMap()).toList() ?? [],
         'pullToRefreshSettings': pullToRefreshSettings,
         'keepAliveId': _iosParams.keepAlive?.id,
         'preventGestureDelay': _iosParams.preventGestureDelay

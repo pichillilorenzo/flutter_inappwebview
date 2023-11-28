@@ -8,6 +8,7 @@
 .buildlog/
 .history
 .svn/
+migrate_working_dir/
 
 # IntelliJ related
 *.iml
@@ -27,18 +28,3 @@
 .dart_tool/
 .packages
 build/
-.fvm/
-
-flutter_driver_tests.log
-tool/chromedriver
-tool/chromedriver.*
-
-scripts/
-dev_packages/
-flutter_inappwebview_platform_interface/
-flutter_inappwebview_android/
-flutter_inappwebview_ios/
-flutter_inappwebview_macos/
-flutter_inappwebview_web/
-test_node_server/
-.idea/

@@ -14,8 +14,7 @@ import '../pull_to_refresh/pull_to_refresh_controller.dart';
 /// When adding additional fields make sure they can be null or have a default
 /// value to avoid breaking changes. See [PlatformInAppBrowserCreationParams] for
 /// more information.
-class IOSInAppBrowserCreationParams
-    extends PlatformInAppBrowserCreationParams {
+class IOSInAppBrowserCreationParams extends PlatformInAppBrowserCreationParams {
   /// Creates a new [IOSInAppBrowserCreationParams] instance.
   IOSInAppBrowserCreationParams(
       {super.contextMenu,
@@ -33,8 +32,8 @@ class IOSInAppBrowserCreationParams
         contextMenu: params.contextMenu,
         pullToRefreshController:
             params.pullToRefreshController as IOSPullToRefreshController?,
-        findInteractionController: params.findInteractionController
-            as IOSFindInteractionController?,
+        findInteractionController:
+            params.findInteractionController as IOSFindInteractionController?,
         initialUserScripts: params.initialUserScripts,
         windowId: params.windowId);
   }

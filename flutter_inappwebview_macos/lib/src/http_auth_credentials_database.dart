@@ -26,8 +26,8 @@ class MacOSHttpAuthCredentialDatabaseCreationParams
 }
 
 ///{@macro flutter_inappwebview_platform_interface.PlatformHttpAuthCredentialDatabase}
-class MacOSHttpAuthCredentialDatabase
-    extends PlatformHttpAuthCredentialDatabase with ChannelController {
+class MacOSHttpAuthCredentialDatabase extends PlatformHttpAuthCredentialDatabase
+    with ChannelController {
   /// Creates a new [MacOSHttpAuthCredentialDatabase].
   MacOSHttpAuthCredentialDatabase(
       PlatformHttpAuthCredentialDatabaseCreationParams params)

@@ -50,8 +50,8 @@ class MacOSWebMessageChannel extends PlatformWebMessageChannel
   static final MacOSWebMessageChannel _staticValue = MacOSWebMessageChannel(
       MacOSWebMessageChannelCreationParams(
           id: '',
-          port1: MacOSWebMessagePort(
-              MacOSWebMessagePortCreationParams(index: 0)),
+          port1:
+              MacOSWebMessagePort(MacOSWebMessagePortCreationParams(index: 0)),
           port2: MacOSWebMessagePort(
               MacOSWebMessagePortCreationParams(index: 1))));
 

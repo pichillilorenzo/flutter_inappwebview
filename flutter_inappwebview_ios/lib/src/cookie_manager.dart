@@ -31,8 +31,7 @@ class IOSCookieManagerCreationParams
 }
 
 ///{@macro flutter_inappwebview_platform_interface.PlatformCookieManager}
-class IOSCookieManager extends PlatformCookieManager
-    with ChannelController {
+class IOSCookieManager extends PlatformCookieManager with ChannelController {
   /// Creates a new [IOSCookieManager].
   IOSCookieManager(PlatformCookieManagerCreationParams params)
       : super.implementation(

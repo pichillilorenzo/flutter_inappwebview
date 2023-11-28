@@ -36,7 +36,8 @@ class MacOSWebAuthenticationSession extends PlatformWebAuthenticationSession
         );
 
   static final MacOSWebAuthenticationSession _staticValue =
-      MacOSWebAuthenticationSession(MacOSWebAuthenticationSessionCreationParams());
+      MacOSWebAuthenticationSession(
+          MacOSWebAuthenticationSessionCreationParams());
 
   /// Provide static access.
   factory MacOSWebAuthenticationSession.static() {
@@ -91,7 +92,7 @@ class MacOSWebAuthenticationSession extends PlatformWebAuthenticationSession
       : super.implementation(MacOSWebAuthenticationSessionCreationParams()) {
     assert(url.toString().isNotEmpty);
     assert(['http', 'https'].contains(url.scheme),
-    'The specified URL has an unsupported scheme. Only HTTP and HTTPS URLs are supported on iOS.');
+        'The specified URL has an unsupported scheme. Only HTTP and HTTPS URLs are supported on iOS.');
 
     this.initialSettings =
         initialSettings ?? WebAuthenticationSessionSettings();

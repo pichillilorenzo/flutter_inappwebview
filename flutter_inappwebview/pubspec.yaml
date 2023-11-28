@@ -32,7 +32,7 @@ dev_dependencies:
   flutter_lints: ^2.0.1
   build_runner: ^2.2.1
   generators:
-    path: dev_packages/generators
+    path: ../dev_packages/generators
 
 # For information on the generic Dart part of this file, see the
 # following page: https://www.dartlang.org/tools/pub/pubspec

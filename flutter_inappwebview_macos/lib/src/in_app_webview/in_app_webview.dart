@@ -317,7 +317,8 @@ class MacOSInAppWebViewWidget extends PlatformInAppWebViewWidget {
             ? _macosParams.headlessWebView?.id
             : null,
         'initialUserScripts':
-        _macosParams.initialUserScripts?.map((e) => e.toMap()).toList() ?? [],
+            _macosParams.initialUserScripts?.map((e) => e.toMap()).toList() ??
+                [],
         'pullToRefreshSettings': pullToRefreshSettings,
         'keepAliveId': _macosParams.keepAlive?.id,
         'preventGestureDelay': _macosParams.preventGestureDelay

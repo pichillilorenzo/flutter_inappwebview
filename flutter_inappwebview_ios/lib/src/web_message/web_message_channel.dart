@@ -50,10 +50,8 @@ class IOSWebMessageChannel extends PlatformWebMessageChannel
   static final IOSWebMessageChannel _staticValue = IOSWebMessageChannel(
       IOSWebMessageChannelCreationParams(
           id: '',
-          port1: IOSWebMessagePort(
-              IOSWebMessagePortCreationParams(index: 0)),
-          port2: IOSWebMessagePort(
-              IOSWebMessagePortCreationParams(index: 1))));
+          port1: IOSWebMessagePort(IOSWebMessagePortCreationParams(index: 0)),
+          port2: IOSWebMessagePort(IOSWebMessagePortCreationParams(index: 1))));
 
   /// Provide static access.
   factory IOSWebMessageChannel.static() {
@@ -71,10 +69,9 @@ class IOSWebMessageChannel extends PlatformWebMessageChannel
     var webMessageChannel = IOSWebMessageChannel(
         IOSWebMessageChannelCreationParams(
             id: map["id"],
-            port1: IOSWebMessagePort(
-                IOSWebMessagePortCreationParams(index: 0)),
-            port2: IOSWebMessagePort(
-                IOSWebMessagePortCreationParams(index: 1))));
+            port1: IOSWebMessagePort(IOSWebMessagePortCreationParams(index: 0)),
+            port2:
+                IOSWebMessagePort(IOSWebMessagePortCreationParams(index: 1))));
     webMessageChannel._iosPort1.webMessageChannel = webMessageChannel;
     webMessageChannel._iosPort2.webMessageChannel = webMessageChannel;
     return webMessageChannel;

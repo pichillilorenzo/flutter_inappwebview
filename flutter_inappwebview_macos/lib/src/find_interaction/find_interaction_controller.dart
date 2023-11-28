@@ -114,8 +114,7 @@ class MacOSFindInteractionController extends PlatformFindInteractionController
   }
 }
 
-extension InternalFindInteractionController
-    on MacOSFindInteractionController {
+extension InternalFindInteractionController on MacOSFindInteractionController {
   void init(dynamic id) {
     channel = MethodChannel(
         'com.pichillilorenzo/flutter_inappwebview_find_interaction_$id');

@@ -254,7 +254,8 @@ class WebPlatformHeadlessInAppWebView extends PlatformHeadlessInAppWebView
   WebPlatformInAppWebViewController? _webViewController;
 
   /// Constructs a [WebPlatformHeadlessInAppWebView].
-  WebPlatformHeadlessInAppWebView(PlatformHeadlessInAppWebViewCreationParams params)
+  WebPlatformHeadlessInAppWebView(
+      PlatformHeadlessInAppWebViewCreationParams params)
       : super.implementation(
           params is WebPlatformHeadlessInAppWebViewCreationParams
               ? params
@@ -265,7 +266,8 @@ class WebPlatformHeadlessInAppWebView extends PlatformHeadlessInAppWebView
   }
 
   @override
-  WebPlatformInAppWebViewController? get webViewController => _webViewController;
+  WebPlatformInAppWebViewController? get webViewController =>
+      _webViewController;
 
   dynamic _controllerFromPlatform;
 

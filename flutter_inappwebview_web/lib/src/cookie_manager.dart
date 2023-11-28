@@ -136,8 +136,8 @@ class WebPlatformCookieManager extends PlatformCookieManager
     }
 
     final setCookieCompleter = Completer<void>();
-    final headlessWebView =
-        WebPlatformHeadlessInAppWebView(WebPlatformHeadlessInAppWebViewCreationParams(
+    final headlessWebView = WebPlatformHeadlessInAppWebView(
+        WebPlatformHeadlessInAppWebViewCreationParams(
             initialUrlRequest: URLRequest(url: url),
             onLoadStop: (controller, url) async {
               await controller.evaluateJavascript(
@@ -193,8 +193,8 @@ class WebPlatformCookieManager extends PlatformCookieManager
     }
 
     final pageLoaded = Completer<void>();
-    final headlessWebView =
-        WebPlatformHeadlessInAppWebView(WebPlatformHeadlessInAppWebViewCreationParams(
+    final headlessWebView = WebPlatformHeadlessInAppWebView(
+        WebPlatformHeadlessInAppWebViewCreationParams(
       initialUrlRequest: URLRequest(url: url),
       onLoadStop: (controller, url) async {
         pageLoaded.complete();

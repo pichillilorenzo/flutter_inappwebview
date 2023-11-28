@@ -289,13 +289,14 @@ class WebPlatformInAppWebViewWidget extends PlatformInAppWebViewWidget {
       onPlatformViewCreated: (int viewId) {
         var webViewHtmlElement = WebPlatformManager.webViews[viewId]!;
         webViewHtmlElement.initialSettings = initialSettings;
-        webViewHtmlElement.initialUrlRequest = _webPlatformParams.initialUrlRequest;
+        webViewHtmlElement.initialUrlRequest =
+            _webPlatformParams.initialUrlRequest;
         webViewHtmlElement.initialFile = _webPlatformParams.initialFile;
         webViewHtmlElement.initialData = _webPlatformParams.initialData;
         webViewHtmlElement.headlessWebViewId =
-        _webPlatformParams.headlessWebView?.isRunning() ?? false
-            ? _webPlatformParams.headlessWebView?.id
-            : null;
+            _webPlatformParams.headlessWebView?.isRunning() ?? false
+                ? _webPlatformParams.headlessWebView?.id
+                : null;
         webViewHtmlElement.prepare();
         if (webViewHtmlElement.headlessWebViewId == null) {
           webViewHtmlElement.makeInitialLoad();
@@ -372,8 +373,10 @@ class WebPlatformInAppWebViewWidget extends PlatformInAppWebViewWidget {
     final isKeepAlive = _webPlatformParams.keepAlive != null;
     _controller?.dispose(isKeepAlive: isKeepAlive);
     _controller = null;
-    _webPlatformParams.pullToRefreshController?.dispose(isKeepAlive: isKeepAlive);
-    _webPlatformParams.findInteractionController?.dispose(isKeepAlive: isKeepAlive);
+    _webPlatformParams.pullToRefreshController
+        ?.dispose(isKeepAlive: isKeepAlive);
+    _webPlatformParams.findInteractionController
+        ?.dispose(isKeepAlive: isKeepAlive);
   }
 
   @override

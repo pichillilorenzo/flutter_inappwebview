@@ -91,7 +91,7 @@ class IOSWebAuthenticationSession extends PlatformWebAuthenticationSession
       : super.implementation(IOSWebAuthenticationSessionCreationParams()) {
     assert(url.toString().isNotEmpty);
     assert(['http', 'https'].contains(url.scheme),
-    'The specified URL has an unsupported scheme. Only HTTP and HTTPS URLs are supported on iOS.');
+        'The specified URL has an unsupported scheme. Only HTTP and HTTPS URLs are supported on iOS.');
 
     this.initialSettings =
         initialSettings ?? WebAuthenticationSessionSettings();

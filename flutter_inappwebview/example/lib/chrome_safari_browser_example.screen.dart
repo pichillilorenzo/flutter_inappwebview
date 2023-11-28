@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
@@ -8,7 +9,6 @@ class MyChromeSafariBrowser extends ChromeSafariBrowser {
   @override
   void onOpened() async {
     print("ChromeSafari browser opened");
-    print(await isEngagementSignalsApiAvailable());
   }
 
   @override
@@ -35,15 +35,17 @@ class _ChromeSafariBrowserExampleScreenState
   @override
   void initState() {
     rootBundle.load('assets/images/flutter-logo.png').then((actionButtonIcon) {
-      widget.browser.setActionButton(ChromeSafariBrowserActionButton(
-          id: 1,
-          description: 'Action Button description',
-          icon: actionButtonIcon.buffer.asUint8List(),
-          onClick: (url, title) {
-            print('Action Button 1 clicked!');
-            print(url);
-            print(title);
-          }));
+      if (defaultTargetPlatform == TargetPlatform.android) {
+        widget.browser.setActionButton(ChromeSafariBrowserActionButton(
+            id: 1,
+            description: 'Action Button description',
+            icon: actionButtonIcon.buffer.asUint8List(),
+            onClick: (url, title) {
+              print('Action Button 1 clicked!');
+              print(url);
+              print(title);
+            }));
+      }
     });
 
     widget.browser.addMenuItem(ChromeSafariBrowserMenuItem(

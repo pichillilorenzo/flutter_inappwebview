@@ -91,10 +91,8 @@ class IOSInAppWebViewController extends PlatformInAppWebViewController
   @override
   late IOSWebStorage webStorage;
 
-  IOSInAppWebViewController(
-      PlatformInAppWebViewControllerCreationParams params)
-      : super.implementation(params
-                is IOSInAppWebViewControllerCreationParams
+  IOSInAppWebViewController(PlatformInAppWebViewControllerCreationParams params)
+      : super.implementation(params is IOSInAppWebViewControllerCreationParams
             ? params
             : IOSInAppWebViewControllerCreationParams
                 .fromPlatformInAppWebViewControllerCreationParams(params)) {
@@ -134,11 +132,10 @@ class IOSInAppWebViewController extends PlatformInAppWebViewController
       MethodChannel channel,
       IOSInAppBrowser inAppBrowser,
       UnmodifiableListView<UserScript>? initialUserScripts)
-      : super.implementation(
-            params is IOSInAppWebViewControllerCreationParams
-                ? params
-                : IOSInAppWebViewControllerCreationParams
-                    .fromPlatformInAppWebViewControllerCreationParams(params)) {
+      : super.implementation(params is IOSInAppWebViewControllerCreationParams
+            ? params
+            : IOSInAppWebViewControllerCreationParams
+                .fromPlatformInAppWebViewControllerCreationParams(params)) {
     this.channel = channel;
     this._inAppBrowser = inAppBrowser;
 
@@ -165,8 +162,7 @@ class IOSInAppWebViewController extends PlatformInAppWebViewController
 
     webStorage = IOSWebStorage(IOSWebStorageCreationParams(
         localStorage: IOSLocalStorage.defaultStorage(controller: this),
-        sessionStorage:
-            IOSSessionStorage.defaultStorage(controller: this)));
+        sessionStorage: IOSSessionStorage.defaultStorage(controller: this)));
 
     if (params.webviewParams is PlatformInAppWebViewWidgetCreationParams) {
       final keepAlive =
@@ -2499,8 +2495,8 @@ class IOSInAppWebViewController extends PlatformInAppWebViewController
   Future<String?> saveWebArchive(
       {required String filePath, bool autoname = false}) async {
     if (!autoname) {
-      assert(filePath
-          .endsWith("." + WebArchiveFormat.WEBARCHIVE.toNativeValue()));
+      assert(
+          filePath.endsWith("." + WebArchiveFormat.WEBARCHIVE.toNativeValue()));
     }
 
     Map<String, dynamic> args = <String, dynamic>{};

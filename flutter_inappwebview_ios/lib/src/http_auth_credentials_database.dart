@@ -26,8 +26,8 @@ class IOSHttpAuthCredentialDatabaseCreationParams
 }
 
 ///{@macro flutter_inappwebview_platform_interface.PlatformHttpAuthCredentialDatabase}
-class IOSHttpAuthCredentialDatabase
-    extends PlatformHttpAuthCredentialDatabase with ChannelController {
+class IOSHttpAuthCredentialDatabase extends PlatformHttpAuthCredentialDatabase
+    with ChannelController {
   /// Creates a new [IOSHttpAuthCredentialDatabase].
   IOSHttpAuthCredentialDatabase(
       PlatformHttpAuthCredentialDatabaseCreationParams params)
@@ -149,7 +149,6 @@ class IOSHttpAuthCredentialDatabase
   }
 }
 
-extension InternalHttpAuthCredentialDatabase
-    on IOSHttpAuthCredentialDatabase {
+extension InternalHttpAuthCredentialDatabase on IOSHttpAuthCredentialDatabase {
   get handleMethod => _handleMethod;
 }

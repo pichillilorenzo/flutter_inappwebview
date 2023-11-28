@@ -237,8 +237,8 @@ class IOSHeadlessInAppWebViewCreationParams
             initialSettings: params.initialSettings,
             contextMenu: params.contextMenu,
             initialUserScripts: params.initialUserScripts,
-            pullToRefreshController: params.pullToRefreshController
-                as IOSPullToRefreshController?,
+            pullToRefreshController:
+                params.pullToRefreshController as IOSPullToRefreshController?,
             findInteractionController: params.findInteractionController
                 as IOSFindInteractionController?);
 
@@ -284,8 +284,7 @@ class IOSHeadlessInAppWebView extends PlatformHeadlessInAppWebView
 
   _init() {
     _webViewController = IOSInAppWebViewController(
-      IOSInAppWebViewControllerCreationParams(
-          id: id, webviewParams: params),
+      IOSInAppWebViewControllerCreationParams(id: id, webviewParams: params),
     );
     _controllerFromPlatform =
         params.controllerFromPlatform?.call(_webViewController!) ??

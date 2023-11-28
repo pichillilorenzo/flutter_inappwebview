@@ -52,10 +52,11 @@ class WebPlatformInAppWebViewController extends PlatformInAppWebViewController
 
   WebPlatformInAppWebViewController(
       PlatformInAppWebViewControllerCreationParams params)
-      : super.implementation(params is WebPlatformInAppWebViewControllerCreationParams
-            ? params
-            : WebPlatformInAppWebViewControllerCreationParams
-                .fromPlatformInAppWebViewControllerCreationParams(params)) {
+      : super.implementation(
+            params is WebPlatformInAppWebViewControllerCreationParams
+                ? params
+                : WebPlatformInAppWebViewControllerCreationParams
+                    .fromPlatformInAppWebViewControllerCreationParams(params)) {
     channel = MethodChannel('com.pichillilorenzo/flutter_inappwebview_$id');
     handler = handleMethod;
     initMethodCallHandler();
@@ -77,7 +78,8 @@ class WebPlatformInAppWebViewController extends PlatformInAppWebViewController
 
     webStorage = WebPlatformWebStorage(WebPlatformWebStorageCreationParams(
         localStorage: WebPlatformLocalStorage.defaultStorage(controller: this),
-        sessionStorage: WebPlatformSessionStorage.defaultStorage(controller: this)));
+        sessionStorage:
+            WebPlatformSessionStorage.defaultStorage(controller: this)));
   }
 
   _debugLog(String method, dynamic args) {
@@ -212,16 +214,14 @@ class WebPlatformInAppWebViewController extends PlatformInAppWebViewController
       case "onInjectedScriptLoaded":
         String id = call.arguments[0];
         var onLoadCallback = _injectedScriptsFromURL[id]?.onLoad;
-        if ((webviewParams != null) &&
-            onLoadCallback != null) {
+        if ((webviewParams != null) && onLoadCallback != null) {
           onLoadCallback();
         }
         break;
       case "onInjectedScriptError":
         String id = call.arguments[0];
         var onErrorCallback = _injectedScriptsFromURL[id]?.onError;
-        if ((webviewParams != null) &&
-            onErrorCallback != null) {
+        if ((webviewParams != null) && onErrorCallback != null) {
           onErrorCallback();
         }
         break;

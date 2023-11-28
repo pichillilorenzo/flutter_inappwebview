@@ -37,7 +37,8 @@ class WebPlatformInAppWebViewPlatform extends InAppWebViewPlatform {
   /// This function should only be called by the app-facing package.
   /// Look at using [InAppWebViewController] in `flutter_inappwebview` instead.
   @override
-  WebPlatformInAppWebViewController createPlatformInAppWebViewControllerStatic() {
+  WebPlatformInAppWebViewController
+      createPlatformInAppWebViewControllerStatic() {
     return WebPlatformInAppWebViewController.static();
   }
 

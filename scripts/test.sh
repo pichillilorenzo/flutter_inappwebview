@@ -42,7 +42,7 @@ flutter --version
 flutter devices
 flutter clean
 flutter pub get
-cd $PROJECT_DIR/example
+cd $PROJECT_DIR/flutter_inappwebview/example
 flutter clean
 if [ ! -z "$2" ]; then
   flutter driver --driver=test_driver/integration_test.dart --target=integration_test/webview_flutter_test.dart --device-id=$DEVICE_ID

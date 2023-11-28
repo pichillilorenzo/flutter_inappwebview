@@ -28,6 +28,10 @@ class PrintJobController {
   ///{@macro flutter_inappwebview_platform_interface.PlatformPrintJobController.onComplete}
   PrintJobCompletionHandler? get onComplete => platform.onComplete;
 
+  void set onComplete(PrintJobCompletionHandler? handler) {
+    platform.onComplete = handler;
+  }
+
   ///{@macro flutter_inappwebview_platform_interface.PlatformPrintJobController.cancel}
   Future<void> cancel() => platform.cancel();
 

@@ -1,3 +1,8 @@
+## 6.0.0-beta.30
+
+- Updated minimum platform interface and implementation versions
+- Fixed "Crash when starting ChromeSafariBrowser on Android java.lang.NoSuchMethodError: No virtual method isEngagementSignalsApiAvailable" [#1881](https://github.com/pichillilorenzo/flutter_inappwebview/issues/1881)
+
 ## 6.0.0-beta.29
 
 ### BREAKING CHANGES

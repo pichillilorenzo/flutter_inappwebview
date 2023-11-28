@@ -76,7 +76,7 @@ abstract class PlatformPrintJobController extends PlatformInterface
   ///- iOS ([Official API - UIPrintInteractionController.CompletionHandler](https://developer.apple.com/documentation/uikit/uiprintinteractioncontroller/completionhandler))
   ///- MacOS ([Official API - NSPrintOperation.runModal](https://developer.apple.com/documentation/appkit/nsprintoperation/1532065-runmodal))
   ///{@endtemplate}
-  PrintJobCompletionHandler? get onComplete => params.onComplete;
+  PrintJobCompletionHandler? onComplete;
 
   ///{@template flutter_inappwebview_platform_interface.PlatformPrintJobController.cancel}
   ///Cancels this print job.

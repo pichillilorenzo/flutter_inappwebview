@@ -106,7 +106,7 @@ public class ChromeCustomTabsChannelDelegate extends ChannelDelegateImpl {
         if (chromeCustomTabsActivity != null && chromeCustomTabsActivity.customTabsSession != null) {
           try {
             result.success(chromeCustomTabsActivity.customTabsSession.isEngagementSignalsApiAvailable(new Bundle()));
-          } catch (Exception e) {
+          } catch (Throwable e) {
             result.success(false);
           }
         } else {

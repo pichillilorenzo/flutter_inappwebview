@@ -31,6 +31,18 @@ dependencies:
   flutter_inappwebview:
     path: ../
 
+dependency_overrides:
+  flutter_inappwebview_platform_interface:
+    path: ../flutter_inappwebview_platform_interface
+  flutter_inappwebview_android:
+    path: ../flutter_inappwebview_android
+  flutter_inappwebview_ios:
+    path: ../flutter_inappwebview_ios
+  flutter_inappwebview_macos:
+    path: ../flutter_inappwebview_macos
+  flutter_inappwebview_web:
+    path: ../flutter_inappwebview_web
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

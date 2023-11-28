@@ -9,6 +9,7 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.RemoteViews;
 
 import androidx.annotation.CallSuper;
@@ -239,7 +240,8 @@ public class ChromeCustomTabsActivity extends Activity implements Disposable {
             }
           }, bundle);
         }
-      } catch (Exception ignored) {
+      } catch (Throwable e) {
+        Log.d(LOG_TAG, "Custom Tabs Engagement Signals API not supported", e);
       }
     }
 

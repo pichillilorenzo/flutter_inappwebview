@@ -6,8 +6,9 @@ import 'main.dart';
 
 class MyChromeSafariBrowser extends ChromeSafariBrowser {
   @override
-  void onOpened() {
+  void onOpened() async {
     print("ChromeSafari browser opened");
+    print(await isEngagementSignalsApiAvailable());
   }
 
   @override

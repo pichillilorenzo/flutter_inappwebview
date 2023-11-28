@@ -35,6 +35,7 @@ class MacOSPrintJobController extends PlatformPrintJobController
               : MacOSPrintJobControllerCreationParams
                   .fromPlatformPrintJobControllerCreationParams(params),
         ) {
+    onComplete = params.onComplete;
     channel = MethodChannel(
         'com.pichillilorenzo/flutter_inappwebview_printjobcontroller_${params.id}');
     handler = _handleMethod;
@@ -46,8 +47,8 @@ class MacOSPrintJobController extends PlatformPrintJobController
       case "onComplete":
         bool completed = call.arguments["completed"];
         String? error = call.arguments["error"];
-        if (params.onComplete != null) {
-          params.onComplete!(completed, error);
+        if (onComplete != null) {
+          onComplete!(completed, error);
         }
         break;
       default:

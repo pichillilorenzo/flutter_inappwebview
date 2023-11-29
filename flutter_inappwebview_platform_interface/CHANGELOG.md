@@ -1,3 +1,7 @@
+## 1.0.3
+
+- Expose missing old `AndroidInAppWebViewOptions` and `IOSInAppWebViewOptions` classes
+
 ## 1.0.2
 
 - Added `PlatformPrintJobController.onComplete` setter

@@ -1,3 +1,7 @@
+## 1.0.3
+
+- Updated `ContentBlockerHandler` CSS_DISPLAY_NONE action type and `JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_JS_SOURCE` javascript implementation code
+
 ## 1.0.2
 
 - Updated `flutter_inappwebview_platform_interface` version dependency to `1.0.2` 

@@ -214,24 +214,27 @@ public class JavaScriptBridgeJS {
           "    }" +
           "};";
 
-  public static final String JAVASCRIPT_BRIDGE_JS_SOURCE = "if (window.top == null || window.top === window) {" +
-          "  if (window." + JAVASCRIPT_BRIDGE_NAME + " != null) {" +
-          "    window." + JAVASCRIPT_BRIDGE_NAME + ".callHandler = function() {" +
-          "      var _callHandlerID = setTimeout(function(){});" +
-          "      window." + JAVASCRIPT_BRIDGE_NAME + "._callHandler(arguments[0], _callHandlerID, JSON.stringify(Array.prototype.slice.call(arguments, 1)));" +
-          "      return new Promise(function(resolve, reject) {" +
-          "        window." + JAVASCRIPT_BRIDGE_NAME + "[_callHandlerID] = {resolve: resolve, reject: reject};" +
-          "      });" +
-          "    };" +
-          "  }"+
-          "} else {" +
+  public static final String JAVASCRIPT_BRIDGE_JS_SOURCE = "if (window." + JAVASCRIPT_BRIDGE_NAME + " != null) {" +
+          "  window." + JAVASCRIPT_BRIDGE_NAME + ".callHandler = function() {" +
+          "    var _callHandlerID = setTimeout(function(){});" +
+          "    window." + JAVASCRIPT_BRIDGE_NAME + "._callHandler(arguments[0], _callHandlerID, JSON.stringify(Array.prototype.slice.call(arguments, 1)));" +
+          "    return new Promise(function(resolve, reject) {" +
+          "      window." + JAVASCRIPT_BRIDGE_NAME + "[_callHandlerID] = {resolve: resolve, reject: reject};" +
+          "    });" +
+          "  };" +
+          "}"+
+          "if (window.top != null && window.top !== window && window." + JAVASCRIPT_BRIDGE_NAME + " == null) {" +
           "  window." + JAVASCRIPT_BRIDGE_NAME + " = {};" +
           "  window." + JAVASCRIPT_BRIDGE_NAME + ".callHandler = function() {" +
           "    var _callHandlerID = setTimeout(function(){});" +
-          "    window.top." + JAVASCRIPT_BRIDGE_NAME + "._callHandler(arguments[0], _callHandlerID, JSON.stringify(Array.prototype.slice.call(arguments, 1)));" +
-          "    return new Promise(function(resolve, reject) {" +
-          "      window.top." + JAVASCRIPT_BRIDGE_NAME + "[_callHandlerID] = {resolve: resolve, reject: reject};" +
-          "    });" +
+          "    try {" +
+          "      window.top." + JAVASCRIPT_BRIDGE_NAME + "._callHandler(arguments[0], _callHandlerID, JSON.stringify(Array.prototype.slice.call(arguments, 1)));" +
+          "      return new Promise(function(resolve, reject) {" +
+          "        window.top." + JAVASCRIPT_BRIDGE_NAME + "[_callHandlerID] = {resolve: resolve, reject: reject};" +
+          "      });" +
+          "    } catch (error) {" +
+          "      return new Promise(function(resolve, reject) { reject(error); });" +
+          "    }" +
           "  };" +
           "}" +
           "if (window." + JAVASCRIPT_BRIDGE_NAME + " != null) {" +

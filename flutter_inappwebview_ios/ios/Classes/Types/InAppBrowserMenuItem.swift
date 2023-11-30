@@ -23,7 +23,7 @@ public class InAppBrowserMenuItem: NSObject {
         self.iconColor = iconColor
         self.showAsAction = showAsAction
         if #available(iOS 13.0, *), let icon = icon, let iconColor = iconColor {
-            icon.withTintColor(iconColor)
+            icon.withTintColor(iconColor, renderingMode: .alwaysOriginal)
         }
     }
     

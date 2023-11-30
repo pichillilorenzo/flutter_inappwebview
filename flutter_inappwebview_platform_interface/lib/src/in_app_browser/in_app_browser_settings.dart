@@ -304,6 +304,7 @@ class InAppBrowserSettings_
       this.closeButtonCaption,
       this.closeButtonColor,
       this.hideCloseButton = false,
+      this.menuButtonColor,
       this.presentationStyle = ModalPresentationStyle_.FULL_SCREEN,
       this.transitionStyle = ModalTransitionStyle_.COVER_VERTICAL,
       this.hideTitleBar = false,

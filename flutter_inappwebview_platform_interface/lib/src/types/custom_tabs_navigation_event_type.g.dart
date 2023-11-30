@@ -6,7 +6,7 @@ part of 'custom_tabs_navigation_event_type.dart';
 // ExchangeableEnumGenerator
 // **************************************************************************
 
-///The type corresponding to the navigation event of [PlatformChromeSafariBrowser.onNavigationEvent].
+///The type corresponding to the navigation event of [PlatformChromeSafariBrowserEvents.onNavigationEvent].
 class CustomTabsNavigationEventType {
   final int _value;
   final int? _nativeValue;

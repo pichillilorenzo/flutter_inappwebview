@@ -1,3 +1,7 @@
+## 1.0.3
+
+- Fixed `InAppBrowserMenuItem.iconColor` not working
+
 ## 1.0.2
 
 - Added `PlatformPrintJobController.onComplete` setter

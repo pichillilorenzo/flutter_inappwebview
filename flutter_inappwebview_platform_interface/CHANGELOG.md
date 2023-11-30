@@ -1,3 +1,7 @@
+## 1.0.4
+
+- Expose missing `InAppBrowserSettings.menuButtonColor` option
+
 ## 1.0.3
 
 - Expose missing old `AndroidInAppWebViewOptions` and `IOSInAppWebViewOptions` classes

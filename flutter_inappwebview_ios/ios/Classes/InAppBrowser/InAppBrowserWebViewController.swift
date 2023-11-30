@@ -325,9 +325,9 @@ public class InAppBrowserWebViewController: UIViewController, InAppBrowserDelega
                     if !menuItem.showAsAction {
                         uiActions.append(uiAction)
                     } else {
-                        navigationItem.rightBarButtonItems?.append(
-                            UIBarButtonItem(primaryAction: uiAction)
-                        )
+                        let buttonItem = UIBarButtonItem(primaryAction: uiAction)
+                        buttonItem.tintColor = menuItem.iconColor
+                        navigationItem.rightBarButtonItems?.append(buttonItem)
                     }
                 }
                 if !uiActions.isEmpty {

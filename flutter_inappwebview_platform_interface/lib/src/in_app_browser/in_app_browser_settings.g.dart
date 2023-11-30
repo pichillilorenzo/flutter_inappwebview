@@ -213,6 +213,7 @@ class InAppBrowserSettings
       this.hideToolbarBottom = false,
       this.hideToolbarTop = false,
       this.hideUrlBar = false,
+      this.menuButtonColor,
       this.presentationStyle = ModalPresentationStyle.FULL_SCREEN,
       this.shouldCloseOnBackButtonPressed = false,
       this.toolbarBottomBackgroundColor,
@@ -238,6 +239,9 @@ class InAppBrowserSettings
       closeButtonCaption: map['closeButtonCaption'],
       closeButtonColor: map['closeButtonColor'] != null
           ? UtilColor.fromStringRepresentation(map['closeButtonColor'])
+          : null,
+      menuButtonColor: map['menuButtonColor'] != null
+          ? UtilColor.fromStringRepresentation(map['menuButtonColor'])
           : null,
       toolbarBottomBackgroundColor: map['toolbarBottomBackgroundColor'] != null
           ? UtilColor.fromStringRepresentation(
@@ -271,9 +275,6 @@ class InAppBrowserSettings
     instance.hideToolbarBottom = map['hideToolbarBottom'];
     instance.hideToolbarTop = map['hideToolbarTop'];
     instance.hideUrlBar = map['hideUrlBar'];
-    instance.menuButtonColor = map['menuButtonColor'] != null
-        ? UtilColor.fromStringRepresentation(map['menuButtonColor'])
-        : null;
     instance.presentationStyle =
         ModalPresentationStyle.fromNativeValue(map['presentationStyle']);
     instance.shouldCloseOnBackButtonPressed =

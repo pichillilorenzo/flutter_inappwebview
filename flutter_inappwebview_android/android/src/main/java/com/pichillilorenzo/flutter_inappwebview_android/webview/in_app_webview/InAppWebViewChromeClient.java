@@ -790,11 +790,7 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
     try {
       byteArrayOutputStream.close();
     } catch (IOException e) {
-      e.printStackTrace();
-      String errorMessage = e.getMessage();
-      if (errorMessage != null) {
-        Log.e(LOG_TAG, errorMessage);
-      }
+      Log.e(LOG_TAG, "", e);
     }
     icon.recycle();
 
@@ -1176,7 +1172,6 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
       capturedFile = getCapturedFile(intentType);
     } catch (IOException e) {
       Log.e(LOG_TAG, "Error occurred while creating the File", e);
-      e.printStackTrace();
     }
     if (capturedFile == null) {
       return null;
@@ -1199,11 +1194,7 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
               fileProviderAuthority,
               capturedFile);
     } catch (Exception e) {
-      e.printStackTrace();
-      String errorMessage = e.getMessage();
-      if (errorMessage != null) {
-        Log.e(LOG_TAG, errorMessage);
-      }
+      Log.e(LOG_TAG, "", e);
     }
     return null;
   }

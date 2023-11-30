@@ -2,6 +2,7 @@ package com.pichillilorenzo.flutter_inappwebview_android.types;
 
 import android.content.Context;
 import android.os.Build;
+import android.util.Log;
 import android.webkit.WebResourceResponse;
 
 import androidx.annotation.NonNull;
@@ -122,7 +123,7 @@ public class WebViewAssetLoaderExt implements Disposable {
         try {
           response = channelDelegate.handle(path);
         } catch (InterruptedException e) {
-          e.printStackTrace();
+          Log.e(LOG_TAG, "", e);
           return null;
         }
 

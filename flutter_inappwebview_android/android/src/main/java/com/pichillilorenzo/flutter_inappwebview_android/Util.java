@@ -142,15 +142,13 @@ public class Util {
       }
       certificateFileStream.close();
     } catch (Exception e) {
-      e.printStackTrace();
-      Log.e(LOG_TAG, e.getMessage());
+      Log.e(LOG_TAG, "", e);
     } finally {
       if (certificateFileStream != null) {
         try {
           certificateFileStream.close();
         } catch (IOException ex) {
-          ex.printStackTrace();
-          Log.e(LOG_TAG, ex.getMessage());
+          Log.e(LOG_TAG, "", ex);
         }
       }
     }
@@ -193,8 +191,7 @@ public class Util {
     }
     catch (Exception e) {
       if (!(e instanceof SSLHandshakeException)) {
-        e.printStackTrace();
-        Log.e(LOG_TAG, e.getMessage());
+        Log.e(LOG_TAG, "", e);
       }
       if (urlConnection != null) {
         urlConnection.disconnect();

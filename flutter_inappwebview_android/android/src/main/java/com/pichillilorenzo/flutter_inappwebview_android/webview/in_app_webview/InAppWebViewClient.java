@@ -360,7 +360,7 @@ public class InAppWebViewClient extends WebViewClient {
         protocol = uri.getScheme();
         port = uri.getPort();
       } catch (URISyntaxException e) {
-        e.printStackTrace();
+        Log.e(LOG_TAG, "", e);
       }
     }
 
@@ -451,7 +451,7 @@ public class InAppWebViewClient extends WebViewClient {
       protocol = uri.getScheme();
       port = uri.getPort();
     } catch (URISyntaxException e) {
-      e.printStackTrace();
+      Log.e(LOG_TAG, "", e);
     }
 
     URLProtectionSpace protectionSpace = new URLProtectionSpace(host, protocol, null, port, sslError.getCertificate(), sslError);
@@ -510,7 +510,7 @@ public class InAppWebViewClient extends WebViewClient {
         URI uri = new URI(url);
         protocol = uri.getScheme();
       } catch (URISyntaxException e) {
-        e.printStackTrace();
+        Log.e(LOG_TAG, "", e);
       }
     }
 
@@ -640,7 +640,7 @@ public class InAppWebViewClient extends WebViewClient {
           return webResourceResponse;
         }
       } catch (Exception e) {
-        e.printStackTrace();
+        Log.e(LOG_TAG, "", e);
       }
     }
 
@@ -650,7 +650,7 @@ public class InAppWebViewClient extends WebViewClient {
         try {
           response = webView.channelDelegate.shouldInterceptRequest(request);
         } catch (InterruptedException e) {
-          e.printStackTrace();
+          Log.e(LOG_TAG, "", e);
           return null;
         }
       }
@@ -687,7 +687,7 @@ public class InAppWebViewClient extends WebViewClient {
         try {
           customSchemeResponse = webView.channelDelegate.onLoadResourceWithCustomScheme(request);
         } catch (InterruptedException e) {
-          e.printStackTrace();
+          Log.e(LOG_TAG, "", e);
           return null;
         }
       }
@@ -697,7 +697,7 @@ public class InAppWebViewClient extends WebViewClient {
         try {
           response = webView.contentBlockerHandler.checkUrl(webView, request, customSchemeResponse.getContentType());
         } catch (Exception e) {
-          e.printStackTrace();
+          Log.e(LOG_TAG, "", e);
         }
         if (response != null)
           return response;
@@ -712,7 +712,7 @@ public class InAppWebViewClient extends WebViewClient {
       try {
         response = webView.contentBlockerHandler.checkUrl(webView, request);
       } catch (Exception e) {
-        e.printStackTrace();
+        Log.e(LOG_TAG, "", e);
       }
     }
     return response;

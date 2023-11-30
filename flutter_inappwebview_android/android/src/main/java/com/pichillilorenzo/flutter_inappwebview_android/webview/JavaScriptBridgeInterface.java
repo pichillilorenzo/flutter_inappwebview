@@ -100,7 +100,7 @@ public class JavaScriptBridgeInterface {
               inAppWebView.callAsyncJavaScriptCallbacks.remove(resultUuid);
             }
           } catch (JSONException e) {
-            e.printStackTrace();
+            Log.e(LOG_TAG, "", e);
           }
           return;
         } else if (handlerName.equals("evaluateJavaScriptWithContentWorld")) {
@@ -114,7 +114,7 @@ public class JavaScriptBridgeInterface {
               inAppWebView.evaluateJavaScriptContentWorldCallbacks.remove(resultUuid);
             }
           } catch (JSONException e) {
-            e.printStackTrace();
+            Log.e(LOG_TAG, "", e);
           }
           return;
         }

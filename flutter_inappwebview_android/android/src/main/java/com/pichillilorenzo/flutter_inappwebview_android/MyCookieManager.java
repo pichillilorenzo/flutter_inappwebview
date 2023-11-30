@@ -250,16 +250,14 @@ public class MyCookieManager extends ChannelDelegateImpl {
                 cookieMap.put("expiresDate", expiryDate.getTime());
               }
             } catch (ParseException e) {
-              e.printStackTrace();
-              Log.e(LOG_TAG, e.getMessage());
+              Log.e(LOG_TAG, "", e);
             }
           } else if (cookieParamName.equalsIgnoreCase("Max-Age")) {
             try {
               long maxAge = Long.parseLong(cookieParamValue);
               cookieMap.put("expiresDate", System.currentTimeMillis() + maxAge);
             } catch (NumberFormatException e) {
-              e.printStackTrace();
-              Log.e(LOG_TAG, e.getMessage());
+              Log.e(LOG_TAG, "", e);
             }
           } else if (cookieParamName.equalsIgnoreCase("Domain")) {
             cookieMap.put("domain", cookieParamValue);

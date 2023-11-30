@@ -1,6 +1,7 @@
 package com.pichillilorenzo.flutter_inappwebview_android.service_worker;
 
 import android.os.Build;
+import android.util.Log;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebResourceResponse;
 
@@ -61,7 +62,7 @@ public class ServiceWorkerManager implements Disposable {
             try {
               response = channelDelegate.shouldInterceptRequest(requestExt);
             } catch (InterruptedException e) {
-              e.printStackTrace();
+              Log.e(LOG_TAG, "", e);
               return null;
             }
           }

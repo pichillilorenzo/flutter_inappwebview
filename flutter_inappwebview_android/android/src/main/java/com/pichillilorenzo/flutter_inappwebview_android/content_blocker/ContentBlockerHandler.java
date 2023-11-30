@@ -3,6 +3,7 @@ package com.pichillilorenzo.flutter_inappwebview_android.content_blocker;
 import android.os.Build;
 import android.os.Handler;
 import android.text.TextUtils;
+import android.util.Log;
 import android.webkit.WebResourceResponse;
 
 import androidx.annotation.Nullable;
@@ -229,7 +230,7 @@ public class ContentBlockerHandler {
                                     }
                                 } catch (Exception e) {
                                     if (!(e instanceof SSLHandshakeException)) {
-                                        e.printStackTrace();
+                                        Log.e(LOG_TAG, "", e);
                                     }
                                 } finally {
                                     urlConnection.disconnect();
@@ -262,8 +263,7 @@ public class ContentBlockerHandler {
 //                                    response.close();
 //                                }
 //                                if (!(e instanceof SSLHandshakeException)) {
-//                                    e.printStackTrace();
-//                                    Log.e(LOG_TAG, e.getMessage());
+//                                    Log.e(LOG_TAG, "", e);
 //                                }
 //                            }
                         }
@@ -302,7 +302,7 @@ public class ContentBlockerHandler {
                         responseResourceType = getResourceTypeFromContentType(contentType);
                     }
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    Log.e(LOG_TAG, "", e);
                 } finally {
                     urlConnection.disconnect();
                 }

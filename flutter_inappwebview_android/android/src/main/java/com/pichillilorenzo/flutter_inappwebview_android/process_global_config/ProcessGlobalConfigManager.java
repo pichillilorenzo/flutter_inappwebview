@@ -1,5 +1,7 @@
 package com.pichillilorenzo.flutter_inappwebview_android.process_global_config;
 
+import android.util.Log;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.webkit.ProcessGlobalConfig;
@@ -13,7 +15,7 @@ import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 
 public class ProcessGlobalConfigManager extends ChannelDelegateImpl {
-  protected static final String LOG_TAG = "ProcessGlobalConfigManager";
+  protected static final String LOG_TAG = "ProcessGlobalConfigM";
   public static final String METHOD_CHANNEL_NAME = "com.pichillilorenzo/flutter_inappwebview_processglobalconfig";
 
   @Nullable
@@ -31,9 +33,15 @@ public class ProcessGlobalConfigManager extends ChannelDelegateImpl {
         if (plugin != null && plugin.activity != null) {
           ProcessGlobalConfigSettings settings = (new ProcessGlobalConfigSettings())
                   .parse((Map<String, Object>) call.argument("settings"));
-          ProcessGlobalConfig.apply(settings.toProcessGlobalConfig(plugin.activity));
+          try {
+            ProcessGlobalConfig.apply(settings.toProcessGlobalConfig(plugin.activity));
+            result.success(true);
+          } catch (Exception e) {
+            result.error(LOG_TAG, "", e);
+          }
+        } else {
+          result.success(false);
         }
-        result.success(true);
         break;
       default:
         result.notImplemented();

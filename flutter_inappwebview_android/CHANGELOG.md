@@ -1,3 +1,7 @@
+## 1.0.4
+
+- Throw platform exception when ProcessGlobalConfig.apply throws an error on the native side
+
 ## 1.0.3
 
 - Updated `ContentBlockerHandler` CSS_DISPLAY_NONE action type and `JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_JS_SOURCE` javascript implementation code

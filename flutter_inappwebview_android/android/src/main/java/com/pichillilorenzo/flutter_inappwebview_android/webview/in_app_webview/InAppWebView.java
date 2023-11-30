@@ -729,7 +729,7 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
             try {
               compressFormat = Bitmap.CompressFormat.valueOf((String) screenshotConfiguration.get("compressFormat"));
             } catch (IllegalArgumentException e) {
-              e.printStackTrace();
+              Log.e(LOG_TAG, "", e);
             }
 
             quality = (Integer) screenshotConfiguration.get("quality");
@@ -743,13 +743,13 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
           try {
             byteArrayOutputStream.close();
           } catch (IOException e) {
-            e.printStackTrace();
+            Log.e(LOG_TAG, "", e);
           }
           screenshotBitmap.recycle();
           result.success(byteArrayOutputStream.toByteArray());
 
         } catch (IllegalArgumentException e) {
-          e.printStackTrace();
+          Log.e(LOG_TAG, "", e);
           result.success(null);
         }
       }

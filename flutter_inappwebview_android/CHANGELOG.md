@@ -1,6 +1,6 @@
 ## 1.0.4
 
-- Throw platform exception when ProcessGlobalConfig.apply throws an error on the native side
+- Throw platform exception when ProcessGlobalConfig.apply throws an error on the native side to be able to catch it on Flutter side
 
 ## 1.0.3
 

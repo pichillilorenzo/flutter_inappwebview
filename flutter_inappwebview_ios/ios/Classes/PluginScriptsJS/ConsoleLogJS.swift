@@ -21,6 +21,17 @@ let CONSOLE_LOG_JS_PLUGIN_SCRIPT = PluginScript(
 let CONSOLE_LOG_JS_SOURCE = """
 (function(console) {
 
+    function _callHandler(oldLog, args) {
+        var message = '';
+        for (var i in args) {
+            try {
+                message += message === '' ? args[i] : ' ' + args[i];
+            } catch(ignored) {}
+        }
+        var _windowId = \(WINDOW_ID_VARIABLE_JS_SOURCE);
+        window.webkit.messageHandlers[oldLog].postMessage({'message': message, '_windowId': _windowId});
+    }
+
     var oldLogs = {
         'consoleLog': console.log,
         'consoleDebug': console.debug,
@@ -33,24 +44,7 @@ let CONSOLE_LOG_JS_SOURCE = """
         (function(oldLog) {
             console[oldLog.replace('console', '').toLowerCase()] = function() {
                 oldLogs[oldLog].apply(null, arguments);
-                var args = arguments;
-
-                // on iOS, for some reason, accessing the arguments object synchronously can throw some errors, such as "TypeError"
-                // see https://github.com/pichillilorenzo/flutter_inappwebview/issues/776
-                setTimeout(function() {
-                    var message = '';
-                    for (var i in args) {
-                        if (message == '') {
-                            message += args[i];
-                        }
-                        else {
-                            message += ' ' + args[i];
-                        }
-                    }
-
-                    var _windowId = \(WINDOW_ID_VARIABLE_JS_SOURCE);
-                    window.webkit.messageHandlers[oldLog].postMessage({'message': message, '_windowId': _windowId});
-                });
+                _callHandler(oldLog, arguments);
             }
         })(k);
     }

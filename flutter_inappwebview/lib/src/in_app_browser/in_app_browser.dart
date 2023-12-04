@@ -93,9 +93,9 @@ class InAppBrowser implements PlatformInAppBrowserEvents {
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformInAppBrowser.openUrlRequest}
   Future<void> openUrlRequest(
-          {required URLRequest urlRequest,
-          @Deprecated('Use settings instead') InAppBrowserClassOptions? options,
-          InAppBrowserClassSettings? settings}) {
+      {required URLRequest urlRequest,
+      @Deprecated('Use settings instead') InAppBrowserClassOptions? options,
+      InAppBrowserClassSettings? settings}) {
     this.platform.eventHandler = this;
     return platform.openUrlRequest(
         urlRequest: urlRequest, options: options, settings: settings);
@@ -103,9 +103,9 @@ class InAppBrowser implements PlatformInAppBrowserEvents {
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformInAppBrowser.openFile}
   Future<void> openFile(
-          {required String assetFilePath,
-          @Deprecated('Use settings instead') InAppBrowserClassOptions? options,
-          InAppBrowserClassSettings? settings}) {
+      {required String assetFilePath,
+      @Deprecated('Use settings instead') InAppBrowserClassOptions? options,
+      InAppBrowserClassSettings? settings}) {
     this.platform.eventHandler = this;
     return platform.openFile(
         assetFilePath: assetFilePath, options: options, settings: settings);
@@ -113,14 +113,14 @@ class InAppBrowser implements PlatformInAppBrowserEvents {
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformInAppBrowser.openData}
   Future<void> openData(
-          {required String data,
-          String mimeType = "text/html",
-          String encoding = "utf8",
-          WebUri? baseUrl,
-          @Deprecated("Use historyUrl instead") Uri? androidHistoryUrl,
-          WebUri? historyUrl,
-          @Deprecated('Use settings instead') InAppBrowserClassOptions? options,
-          InAppBrowserClassSettings? settings}) {
+      {required String data,
+      String mimeType = "text/html",
+      String encoding = "utf8",
+      WebUri? baseUrl,
+      @Deprecated("Use historyUrl instead") Uri? androidHistoryUrl,
+      WebUri? historyUrl,
+      @Deprecated('Use settings instead') InAppBrowserClassOptions? options,
+      InAppBrowserClassSettings? settings}) {
     this.platform.eventHandler = this;
     return platform.openData(
         data: data,

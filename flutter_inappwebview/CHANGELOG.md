@@ -1,3 +1,8 @@
+## 6.0.0-beta.31
+
+- Updated minimum platform interface and implementation versions
+- Fixed events not called on `InAppBrowser` and `ChromeSafariBrowser` opening same instance multiple times 
+
 ## 6.0.0-beta.30
 
 - Updated minimum platform interface and implementation versions

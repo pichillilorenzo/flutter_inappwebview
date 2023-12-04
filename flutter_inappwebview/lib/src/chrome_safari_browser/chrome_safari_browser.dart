@@ -42,13 +42,15 @@ class ChromeSafariBrowser implements PlatformChromeSafariBrowserEvents {
           @Deprecated('Use settings instead')
           // ignore: deprecated_member_use_from_same_package
           ChromeSafariBrowserClassOptions? options,
-          ChromeSafariBrowserSettings? settings}) =>
-      platform.open(
-          url: url,
-          headers: headers,
-          otherLikelyURLs: otherLikelyURLs,
-          options: options,
-          settings: settings);
+          ChromeSafariBrowserSettings? settings}) {
+    this.platform.eventHandler = this;
+    return platform.open(
+        url: url,
+        headers: headers,
+        otherLikelyURLs: otherLikelyURLs,
+        options: options,
+        settings: settings);
+  }
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformChromeSafariBrowser.launchUrl}
   Future<void> launchUrl({

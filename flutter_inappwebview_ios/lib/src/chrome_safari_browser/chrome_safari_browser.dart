@@ -212,7 +212,7 @@ class IOSChromeSafariBrowser extends PlatformChromeSafariBrowser
   @override
   @mustCallSuper
   void dispose() {
+    super.dispose();
     disposeChannel();
-    eventHandler = null;
   }
 }

@@ -1,6 +1,6 @@
 name: flutter_inappwebview_web
 description: Web implementation of the flutter_inappwebview plugin.
-version: 1.0.1
+version: 1.0.2
 homepage: https://inappwebview.dev/
 repository: https://github.com/pichillilorenzo/flutter_inappwebview/tree/master/flutter_inappwebview_web
 issue_tracker: https://github.com/pichillilorenzo/flutter_inappwebview/issues
@@ -21,7 +21,7 @@ dependencies:
   flutter_web_plugins:
     sdk: flutter
   js: ^0.6.4
-  flutter_inappwebview_platform_interface: ^1.0.2
+  flutter_inappwebview_platform_interface: ^1.0.5
 
 dev_dependencies:
   flutter_test:

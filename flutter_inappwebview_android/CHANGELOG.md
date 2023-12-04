@@ -1,3 +1,7 @@
+## 1.0.5
+
+- Call `super.dispose();` on `InAppBrowser` and `ChromeSafari` implementations 
+
 ## 1.0.4
 
 - Throw platform exception when ProcessGlobalConfig.apply throws an error on the native side to be able to catch it on Flutter side

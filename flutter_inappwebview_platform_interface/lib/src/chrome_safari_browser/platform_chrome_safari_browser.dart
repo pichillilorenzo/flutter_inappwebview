@@ -466,9 +466,9 @@ abstract class PlatformChromeSafariBrowser extends PlatformInterface
   ///Disposes the channel and event handler.
   ///{@endtemplate}
   @override
+  @mustCallSuper
   void dispose() {
-    throw UnimplementedError(
-        'dispose is not implemented on the current platform');
+    eventHandler = null;
   }
 }
 

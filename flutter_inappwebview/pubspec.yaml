@@ -20,6 +20,8 @@ dependencies:
     sdk: flutter
   flutter_inappwebview_platform_interface: ^1.0.2
   flutter_inappwebview_android: ^1.0.2
+  flutter_inappwebview_android_geckoview:
+    path: ../flutter_inappwebview_android_geckoview
   flutter_inappwebview_ios: ^1.0.2
   flutter_inappwebview_macos: ^1.0.1
   flutter_inappwebview_web: ^1.0.1

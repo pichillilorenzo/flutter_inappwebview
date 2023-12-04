@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
+import 'package:flutter_inappwebview_android_geckoview/flutter_inappwebview_android_geckoview.dart';
 
 import 'package:flutter_inappwebview_example/chrome_safari_browser_example.screen.dart';
 import 'package:flutter_inappwebview_example/headless_in_app_webview.screen.dart';
@@ -19,6 +20,9 @@ InAppLocalhostServer localhostServer =
 
 Future main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  InAppWebViewPlatform.instance = AndroidGeckoViewInAppWebViewPlatform();
+
   // await Permission.camera.request();
   // await Permission.microphone.request();
   // await Permission.storage.request();

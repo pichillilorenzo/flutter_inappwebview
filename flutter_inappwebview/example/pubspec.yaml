@@ -30,12 +30,16 @@ dependencies:
   # connectivity: ^0.4.5+6
   flutter_inappwebview:
     path: ../
+  flutter_inappwebview_android_geckoview:
+    path: ../../flutter_inappwebview_android_geckoview
 
 dependency_overrides:
   flutter_inappwebview_platform_interface:
     path: ../../flutter_inappwebview_platform_interface
   flutter_inappwebview_android:
     path: ../../flutter_inappwebview_android
+  flutter_inappwebview_android_geckoview:
+    path: ../../flutter_inappwebview_android_geckoview
   flutter_inappwebview_ios:
     path: ../../flutter_inappwebview_ios
   flutter_inappwebview_macos:

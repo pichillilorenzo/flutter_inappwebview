@@ -1,3 +1,7 @@
+## 1.0.5
+
+- Must call super `dispose` method for `PlatformInAppBrowser` and `PlatformChromeSafariBrowser` 
+
 ## 1.0.4
 
 - Expose missing `InAppBrowserSettings.menuButtonColor` option

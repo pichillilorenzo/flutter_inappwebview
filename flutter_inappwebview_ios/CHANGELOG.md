@@ -1,3 +1,7 @@
+## 1.0.5
+
+- Call `super.dispose();` on `InAppBrowser` and `ChromeSafari` implementations
+
 ## 1.0.4
 
 - Fixed "Cloudflare Turnstile failure" [#1738](https://github.com/pichillilorenzo/flutter_inappwebview/issues/1738)

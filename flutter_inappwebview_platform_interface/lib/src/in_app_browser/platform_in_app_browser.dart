@@ -474,9 +474,9 @@ abstract class PlatformInAppBrowser extends PlatformInterface
   ///Disposes the channel and controllers.
   ///{@endtemplate}
   @override
+  @mustCallSuper
   void dispose() {
-    throw UnimplementedError(
-        'dispose is not implemented on the current platform');
+    eventHandler = null;
   }
 }
 

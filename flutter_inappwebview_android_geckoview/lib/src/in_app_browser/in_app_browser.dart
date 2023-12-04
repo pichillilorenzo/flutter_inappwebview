@@ -359,12 +359,12 @@ class AndroidInAppBrowser extends PlatformInAppBrowser with ChannelController {
   @override
   @mustCallSuper
   void dispose() {
+    super.dispose();
     disposeChannel();
     _webViewController?.dispose();
     _webViewController = null;
     pullToRefreshController?.dispose();
     findInteractionController?.dispose();
-    eventHandler = null;
   }
 }
 

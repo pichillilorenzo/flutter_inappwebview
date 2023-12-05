@@ -284,11 +284,6 @@ public class WebViewChannelDelegate extends ChannelDelegateImpl {
           webView.clearAllCache();
         result.success(true);
         break;
-      case clearSslPreferences:
-        if (webView != null)
-          webView.clearSslPreferences();
-        result.success(true);
-        break;
       case findAll:
         if (webView != null) {
           String find = (String) call.argument("find");
@@ -339,18 +334,6 @@ public class WebViewChannelDelegate extends ChannelDelegateImpl {
         }
         result.success(true);
         break;
-      case pauseTimers:
-        if (webView != null) {
-          webView.pauseTimers();
-        }
-        result.success(true);
-        break;
-      case resumeTimers:
-        if (webView != null) {
-          webView.resumeTimers();
-        }
-        result.success(true);
-        break;
       case printCurrentPage:
         if (webView != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
           PrintJobSettings settings = new PrintJobSettings();
@@ -364,14 +347,14 @@ public class WebViewChannelDelegate extends ChannelDelegateImpl {
         }
         break;
       case getContentHeight:
-        if (webView instanceof InAppWebView) {
+        if (webView != null) {
           result.success(webView.getContentHeight());
         } else {
           result.success(null);
         }
         break;
       case getContentWidth:
-        if (webView instanceof InAppWebView) {
+        if (webView != null) {
           webView.getContentWidth(new ValueCallback<Integer>() {
             @Override
             public void onReceiveValue(@Nullable Integer contentWidth) {
@@ -393,20 +376,15 @@ public class WebViewChannelDelegate extends ChannelDelegateImpl {
         result.success((webView != null) ? webView.getOriginalUrl() : null);
         break;
       case getZoomScale:
-        if (webView instanceof InAppWebView) {
+        if (webView != null) {
           result.success(webView.getZoomScale());
         } else {
           result.success(null);
         }
         break;
       case getSelectedText:
-        if ((webView instanceof InAppWebView && Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)) {
-          webView.getSelectedText(new ValueCallback<String>() {
-            @Override
-            public void onReceiveValue(String value) {
-              result.success(value);
-            }
-          });
+        if (webView != null) {
+          result.success(webView.getSelectedText());
         } else {
           result.success(null);
         }
@@ -501,14 +479,14 @@ public class WebViewChannelDelegate extends ChannelDelegateImpl {
         break;
       case getScrollX:
         if (webView != null) {
-          result.success(webView.getScrollX());
+          result.success(webView.scrollX());
         } else {
           result.success(null);
         }
         break;
       case getScrollY:
         if (webView != null) {
-          result.success(webView.getScrollY());
+          result.success(webView.scrollY());
         } else {
           result.success(null);
         }

@@ -76,7 +76,7 @@ public class FlutterWebView implements PlatformWebView {
     pullToRefreshLayout.prepare();
 
     FindInteractionController findInteractionController = new FindInteractionController(webView, plugin, id, null);
-//    webView.findInteractionController = findInteractionController;
+    webView.findInteractionController = findInteractionController;
     findInteractionController.prepare();
 
     webView.prepare();

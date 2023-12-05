@@ -3,6 +3,7 @@ package com.pichillilorenzo.flutter_inappwebview_android_geckoview.pull_to_refre
 import android.content.Context;
 import android.graphics.Color;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 
 import androidx.annotation.NonNull;
@@ -48,8 +49,7 @@ public class PullToRefreshLayout extends SwipeRefreshLayout implements Disposabl
       public boolean canChildScrollUp(@NonNull SwipeRefreshLayout parent, @Nullable View child) {
         if (child instanceof InAppWebView) {
           InAppWebView inAppWebView = (InAppWebView) child;
-          return (inAppWebView.canScrollVertically() && inAppWebView.getScrollY() > 0) ||
-                 (!inAppWebView.canScrollVertically() && inAppWebView.getScrollY() == 0);
+          return !inAppWebView.canOverscrollTop();
         }
         return true;
       }

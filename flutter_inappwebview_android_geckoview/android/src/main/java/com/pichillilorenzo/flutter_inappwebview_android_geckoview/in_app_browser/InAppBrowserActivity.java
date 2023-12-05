@@ -114,7 +114,7 @@ public class InAppBrowserActivity extends AppCompatActivity implements InAppBrow
     webView.plugin = manager.plugin;
 
     FindInteractionController findInteractionController = new FindInteractionController(webView, manager.plugin, id, null);
-//    webView.findInteractionController = findInteractionController;
+    webView.findInteractionController = findInteractionController;
     findInteractionController.prepare();
 
     final MethodChannel channel = new MethodChannel(manager.plugin.messenger, METHOD_CHANNEL_NAME_PREFIX + id);

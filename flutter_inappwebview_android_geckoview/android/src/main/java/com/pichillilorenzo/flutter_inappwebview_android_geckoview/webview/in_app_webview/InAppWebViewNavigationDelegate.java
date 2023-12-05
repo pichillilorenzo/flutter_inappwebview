@@ -20,7 +20,7 @@ import org.mozilla.geckoview.WebRequestError;
 import java.util.List;
 
 public class InAppWebViewNavigationDelegate implements GeckoSession.NavigationDelegate, Disposable {
-  private static String LOG_TAG = "InAppWebViewNavigationDelegate";
+  private static final String LOG_TAG = "InAppWebViewNavigationD";
   @Nullable
   public InAppWebViewFlutterPlugin plugin;
   @Nullable
@@ -51,7 +51,7 @@ public class InAppWebViewNavigationDelegate implements GeckoSession.NavigationDe
 
   @Override
   public void onCanGoForward(@NonNull GeckoSession session, boolean canGoForward) {
-    this.canGoBack = canGoForward;
+    this.canGoForward = canGoForward;
   }
 
   @Nullable
@@ -115,6 +115,10 @@ public class InAppWebViewNavigationDelegate implements GeckoSession.NavigationDe
   @Nullable
   @Override
   public GeckoResult<GeckoSession> onNewSession(@NonNull GeckoSession session, @NonNull String uri) {
+    if (webView != null && !webView.customSettings.supportMultipleWindows) {
+      webView.loadUrl(uri);
+      return null;
+    }
     return GeckoSession.NavigationDelegate.super.onNewSession(session, uri);
   }
 

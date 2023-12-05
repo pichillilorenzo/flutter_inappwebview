@@ -1,12 +1,18 @@
 package com.pichillilorenzo.flutter_inappwebview_android_geckoview.webview.in_app_webview;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.Point;
 import android.net.Uri;
 import android.net.http.SslCertificate;
+import android.os.Handler;
 import android.os.Looper;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewParent;
 import android.webkit.ValueCallback;
 import android.webkit.WebMessage;
 import android.webkit.WebView;
@@ -16,8 +22,10 @@ import androidx.annotation.Nullable;
 
 import com.pichillilorenzo.flutter_inappwebview_android_geckoview.InAppWebViewFlutterPlugin;
 import com.pichillilorenzo.flutter_inappwebview_android_geckoview.Util;
+import com.pichillilorenzo.flutter_inappwebview_android_geckoview.find_interaction.FindInteractionController;
 import com.pichillilorenzo.flutter_inappwebview_android_geckoview.in_app_browser.InAppBrowserDelegate;
 import com.pichillilorenzo.flutter_inappwebview_android_geckoview.print_job.PrintJobSettings;
+import com.pichillilorenzo.flutter_inappwebview_android_geckoview.pull_to_refresh.PullToRefreshLayout;
 import com.pichillilorenzo.flutter_inappwebview_android_geckoview.types.ContentWorld;
 import com.pichillilorenzo.flutter_inappwebview_android_geckoview.types.HitTestResult;
 import com.pichillilorenzo.flutter_inappwebview_android_geckoview.types.URLRequest;
@@ -26,10 +34,17 @@ import com.pichillilorenzo.flutter_inappwebview_android_geckoview.types.UserScri
 import com.pichillilorenzo.flutter_inappwebview_android_geckoview.webview.InAppWebViewManager;
 import com.pichillilorenzo.flutter_inappwebview_android_geckoview.webview.WebViewChannelDelegate;
 
+import org.mozilla.geckoview.GeckoResult;
+import org.mozilla.geckoview.GeckoRuntime;
 import org.mozilla.geckoview.GeckoSession;
+import org.mozilla.geckoview.PanZoomController;
+import org.mozilla.geckoview.ScreenLength;
+import org.mozilla.geckoview.StorageController;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -52,6 +67,11 @@ final public class InAppWebView extends InputAwareWebView {
   public InAppWebViewSettings customSettings = new InAppWebViewSettings();
   @Nullable
   public Map<String, Object> contextMenu = null;
+  @Nullable
+  public String lastSearchString;
+  public Handler mainLooperHandler = new Handler(Looper.getMainLooper());
+  @Nullable
+  public FindInteractionController findInteractionController;
 
   public InAppWebView(Context context) {
     super(context);
@@ -89,9 +109,30 @@ final public class InAppWebView extends InputAwareWebView {
     session.setContentDelegate(new InAppWebViewContentDelegate(plugin, this));
     session.setNavigationDelegate(new InAppWebViewNavigationDelegate(plugin, this));
     session.setProgressDelegate(new InAppWebViewProgressDelegate(plugin, this));
+    session.setHistoryDelegate(new InAppWebViewHistoryDelegate(plugin, this));
+    session.setScrollDelegate(new InAppWebViewScrollDelegate(plugin, this));
 
     session.open(InAppWebViewManager.geckoRuntime);
     setSession(session);
+  }
+
+  @Nullable
+  public PanZoomController.InputResultDetail inputResultDetail;
+
+  @SuppressLint("ClickableViewAccessibility")
+  @Override
+  public boolean onTouchEvent(MotionEvent ev) {
+    MotionEvent event = MotionEvent.obtain(ev);
+    if (ev.getActionMasked() == MotionEvent.ACTION_DOWN) {
+      onTouchEventForDetailResult(event).accept(detail -> {
+        inputResultDetail = detail;
+      });
+      event.recycle();
+      return true;
+    }
+    boolean eventHandled = super.onTouchEvent(event);
+    event.recycle();
+    return eventHandled;
   }
 
   @Nullable
@@ -260,23 +301,148 @@ final public class InAppWebView extends InputAwareWebView {
   }
 
   public void goBackOrForward(int steps) {
+    GeckoSession session = getSession();
+    InAppWebViewHistoryDelegate historyDelegate = getHistoryDelegate();
+    if (session == null || historyDelegate == null) {
+      return;
+    }
+    GeckoSession.HistoryDelegate.HistoryList historyList = historyDelegate.historyList;
+    if (historyList == null) {
+      return;
+    }
 
+    int currentIndex = historyList.getCurrentIndex();
+    session.gotoHistoryIndex(currentIndex + steps);
   }
 
   public boolean canGoBackOrForward(int steps) {
-    return false;
+    GeckoSession session = getSession();
+    InAppWebViewHistoryDelegate historyDelegate = getHistoryDelegate();
+    if (session == null || historyDelegate == null) {
+      return false;
+    }
+    GeckoSession.HistoryDelegate.HistoryList historyList = historyDelegate.historyList;
+    if (historyList == null || historyList.size() > 0) {
+      return false;
+    }
+
+    if (steps < 0) {
+      return historyList.getCurrentIndex() - steps >= 0;
+    }
+    return historyList.getCurrentIndex() + steps <= historyList.size() - 1;
   }
 
   public void stopLoading() {
+    GeckoSession session = getSession();
+    if (session == null) {
+      return;
+    }
 
+    session.stop();
   }
 
   public boolean isLoading() {
-    return false;
+    InAppWebViewProgressDelegate progressDelegate = getProgressDelegate();
+    if (progressDelegate == null) {
+      return false;
+    }
+    return progressDelegate.isLoading;
   }
 
   public void takeScreenshot(Map<String, Object> screenshotConfiguration, MethodChannel.Result result) {
+    final float pixelDensity = Util.getPixelDensity(getContext());
 
+    mainLooperHandler.post(new Runnable() {
+      @Override
+      public void run() {
+
+        capturePixels().accept(new GeckoResult.Consumer<Bitmap>() {
+          @Override
+          public void accept(@Nullable Bitmap screenshotBitmap) {
+            if (screenshotBitmap == null) {
+              mainLooperHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                  result.success(null);
+                }
+              });
+              return;
+            }
+
+            final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+            Bitmap.CompressFormat compressFormat = Bitmap.CompressFormat.PNG;
+            int quality = 100;
+
+            if (screenshotConfiguration != null) {
+              Map<String, Double> rect = (Map<String, Double>) screenshotConfiguration.get("rect");
+              if (rect != null) {
+                int rectX = (int) Math.floor(rect.get("x") * pixelDensity + 0.5);
+                int rectY = (int) Math.floor(rect.get("y") * pixelDensity + 0.5);
+                int rectWidth = Math.min(screenshotBitmap.getWidth(), (int) Math.floor(rect.get("width") * pixelDensity + 0.5));
+                int rectHeight = Math.min(screenshotBitmap.getHeight(), (int) Math.floor(rect.get("height") * pixelDensity + 0.5));
+                screenshotBitmap = Bitmap.createBitmap(
+                        screenshotBitmap,
+                        rectX,
+                        rectY,
+                        rectWidth,
+                        rectHeight);
+              }
+
+              Double snapshotWidth = (Double) screenshotConfiguration.get("snapshotWidth");
+              if (snapshotWidth != null) {
+                int dstWidth = (int) Math.floor(snapshotWidth * pixelDensity + 0.5);
+                float ratioBitmap = (float) screenshotBitmap.getWidth() / (float) screenshotBitmap.getHeight();
+                int dstHeight = (int) ((float) dstWidth / ratioBitmap);
+                screenshotBitmap = Bitmap.createScaledBitmap(screenshotBitmap, dstWidth, dstHeight, true);
+              }
+
+              try {
+                compressFormat = Bitmap.CompressFormat.valueOf((String) screenshotConfiguration.get("compressFormat"));
+              } catch (IllegalArgumentException e) {
+                Log.e(LOG_TAG, "", e);
+              }
+
+              quality = (Integer) screenshotConfiguration.get("quality");
+            }
+
+            int finalQuality = quality;
+            Bitmap.CompressFormat finalCompressFormat = compressFormat;
+            Bitmap finalScreenshotBitmap = screenshotBitmap;
+            mainLooperHandler.post(new Runnable() {
+              @Override
+              public void run() {
+                finalScreenshotBitmap.compress(
+                        finalCompressFormat,
+                        finalQuality,
+                        byteArrayOutputStream);
+
+                try {
+                  byteArrayOutputStream.close();
+                } catch (IOException e) {
+                  Log.e(LOG_TAG, "", e);
+                }
+                finalScreenshotBitmap.recycle();
+                result.success(byteArrayOutputStream.toByteArray());
+              }
+            });
+          }
+        }, new GeckoResult.Consumer<Throwable>() {
+          @Override
+          public void accept(@Nullable Throwable throwable) {
+            if (throwable != null) {
+              Log.e(LOG_TAG, "", throwable);
+            }
+
+            mainLooperHandler.post(new Runnable() {
+              @Override
+              public void run() {
+                result.success(null);
+              }
+            });
+          }
+        });
+      }
+    });
   }
 
   public void setSettings(InAppWebViewSettings newCustomSettings, HashMap<String, Object> newSettingsMap) {
@@ -288,56 +454,152 @@ final public class InAppWebView extends InputAwareWebView {
     return (customSettings != null) ? customSettings.getRealSettings(this) : null;
   }
 
+  @Nullable
   public HashMap<String, Object> getCopyBackForwardList() {
-    return null;
+    InAppWebViewHistoryDelegate historyDelegate = getHistoryDelegate();
+    if (historyDelegate == null) {
+      return null;
+    }
+    GeckoSession.HistoryDelegate.HistoryList historyList = historyDelegate.historyList;
+    if (historyList == null) {
+      return null;
+    }
+
+    int currentIndex = historyList.getCurrentIndex();
+
+    List<HashMap<String, String>> history = new ArrayList<>();
+
+    for (GeckoSession.HistoryDelegate.HistoryItem historyItem : historyList) {
+      HashMap<String, String> historyItemMap = new HashMap<>();
+
+      historyItemMap.put("originalUrl", historyItem.getUri());
+      historyItemMap.put("title", historyItem.getTitle());
+      historyItemMap.put("url", historyItem.getUri());
+
+      history.add(historyItemMap);
+    }
+
+    HashMap<String, Object> result = new HashMap<>();
+
+    result.put("list", history);
+    result.put("currentIndex", currentIndex);
+
+    return result;
   }
 
   public void clearAllCache() {
-
-  }
-
-  public void clearSslPreferences() {
-
+    GeckoRuntime geckoRuntime = InAppWebViewManager.geckoRuntime;
+    if (geckoRuntime == null) {
+      return;
+    }
+    geckoRuntime.getStorageController().clearData(StorageController.ClearFlags.ALL);
   }
 
   public void findAllAsync(String find) {
+    GeckoSession session = getSession();
+    if (session == null) {
+      return;
+    }
 
+    lastSearchString = find;
+    session.getFinder().find(find, 0).accept(new GeckoResult.Consumer<GeckoSession.FinderResult>() {
+      @Override
+      public void accept(@Nullable GeckoSession.FinderResult finderResult) {
+        if (finderResult != null && finderResult.found) {
+          int activeMatchOrdinal = finderResult.current - 1;
+          int numberOfMatches = finderResult.total;
+          boolean isDoneCounting = finderResult.current == finderResult.total;
+          if (findInteractionController != null && findInteractionController.channelDelegate != null)
+            findInteractionController.channelDelegate.onFindResultReceived(activeMatchOrdinal, numberOfMatches, isDoneCounting);
+          if (channelDelegate != null)
+            channelDelegate.onFindResultReceived(activeMatchOrdinal, numberOfMatches, isDoneCounting);
+        }
+      }
+    }, new GeckoResult.Consumer<Throwable>() {
+      @Override
+      public void accept(@Nullable Throwable throwable) {
+        if (throwable != null) {
+          Log.e(LOG_TAG, "", throwable);
+        }
+      }
+    });
   }
 
   public void findNext(boolean forward) {
+    GeckoSession session = getSession();
+    if (session == null || lastSearchString == null) {
+      return;
+    }
 
+    int flags = forward ? 0 : GeckoSession.FINDER_FIND_BACKWARDS;
+
+    session.getFinder().find(lastSearchString, flags).accept(new GeckoResult.Consumer<GeckoSession.FinderResult>() {
+      @Override
+      public void accept(@Nullable GeckoSession.FinderResult finderResult) {
+        if (finderResult != null && finderResult.found) {
+          int activeMatchOrdinal = finderResult.current - 1;
+          int numberOfMatches = finderResult.total;
+          boolean isDoneCounting = finderResult.current == finderResult.total;
+          if (findInteractionController != null && findInteractionController.channelDelegate != null)
+            findInteractionController.channelDelegate.onFindResultReceived(activeMatchOrdinal, numberOfMatches, isDoneCounting);
+          if (channelDelegate != null)
+            channelDelegate.onFindResultReceived(activeMatchOrdinal, numberOfMatches, isDoneCounting);
+        }
+      }
+    }, new GeckoResult.Consumer<Throwable>() {
+      @Override
+      public void accept(@Nullable Throwable throwable) {
+        if (throwable != null) {
+          Log.e(LOG_TAG, "", throwable);
+        }
+      }
+    });
   }
 
   public void clearMatches() {
+    GeckoSession session = getSession();
+    if (session == null) {
+      return;
+    }
 
+    session.getFinder().clear();
   }
 
   public void scrollTo(Integer x, Integer y, Boolean animated) {
-
+    getPanZoomController().scrollTo(ScreenLength.fromPixels(x),
+            ScreenLength.fromPixels(y),
+            animated ? PanZoomController.SCROLL_BEHAVIOR_SMOOTH : PanZoomController.SCROLL_BEHAVIOR_AUTO);
   }
 
   public void scrollBy(Integer x, Integer y, Boolean animated) {
-
+    getPanZoomController().scrollBy(ScreenLength.fromPixels(x),
+            ScreenLength.fromPixels(y),
+            animated ? PanZoomController.SCROLL_BEHAVIOR_SMOOTH : PanZoomController.SCROLL_BEHAVIOR_AUTO);
   }
 
   public void onPause() {
-
+    GeckoSession session = getSession();
+    if (session == null) {
+      return;
+    }
+    session.setActive(false);
   }
 
   public void onResume() {
-
-  }
-
-  public void pauseTimers() {
-
-  }
-
-  public void resumeTimers() {
-
+    GeckoSession session = getSession();
+    if (session == null) {
+      return;
+    }
+    session.setActive(true);
   }
 
   @Nullable
   public String printCurrentPage(@Nullable PrintJobSettings settings) {
+    GeckoSession session = getSession();
+    if (session == null) {
+      return null;
+    }
+    session.getPrintDelegate();
     return null;
   }
 
@@ -391,20 +653,12 @@ final public class InAppWebView extends InputAwareWebView {
 
   }
 
-  public Looper getWebViewLooper() {
-    return null;
-  }
-
   public boolean isInFullscreen() {
-    return false;
-  }
-
-  public void setInFullscreen(boolean inFullscreen) {
-
-  }
-
-  public void getContentHeight(ValueCallback<Integer> callback) {
-    callback.onReceiveValue(getContentHeight());
+    InAppWebViewContentDelegate contentDelegate = getContentDelegate();
+    if (contentDelegate == null) {
+      return false;
+    }
+    return contentDelegate.fullScreen;
   }
 
   public void getContentWidth(ValueCallback<Integer> callback) {
@@ -423,8 +677,12 @@ final public class InAppWebView extends InputAwareWebView {
     return progressDelegate.currentOriginalUrl;
   }
 
-  public void getSelectedText(ValueCallback<String> callback) {
-
+  public String getSelectedText() {
+    InAppWebViewContentDelegate contentDelegate = getContentDelegate();
+    if (contentDelegate == null || contentDelegate.lastContextElement == null) {
+      return null;
+    }
+    return contentDelegate.lastContextElement.textContent;
   }
 
   public WebView.HitTestResult getHitTestResult() {
@@ -472,7 +730,11 @@ final public class InAppWebView extends InputAwareWebView {
   }
 
   public void clearHistory() {
-
+    GeckoSession session = getSession();
+    if (session == null) {
+      return;
+    }
+    session.purgeHistory();
   }
 
   public void callAsyncJavaScript(String functionBody, Map<String, Object> arguments, ContentWorld contentWorld, ValueCallback<String> resultCallback) {
@@ -491,12 +753,96 @@ final public class InAppWebView extends InputAwareWebView {
 
   }
 
+  public boolean canScrollToLeft() {
+    if (inputResultDetail == null) {
+      return false;
+    }
+    return inputResultDetail.handledResult() == PanZoomController.INPUT_RESULT_HANDLED &&
+            Util.hasFlag(inputResultDetail.scrollableDirections(), PanZoomController.SCROLLABLE_FLAG_LEFT);
+  }
+
+  public boolean canScrollToTop() {
+    if (inputResultDetail == null) {
+      return false;
+    }
+    return inputResultDetail.handledResult() == PanZoomController.INPUT_RESULT_HANDLED &&
+            Util.hasFlag(inputResultDetail.scrollableDirections(), PanZoomController.SCROLLABLE_FLAG_TOP);
+  }
+
+  public boolean canScrollToRight() {
+    if (inputResultDetail == null) {
+      return false;
+    }
+    return inputResultDetail.handledResult() == PanZoomController.INPUT_RESULT_HANDLED &&
+            Util.hasFlag(inputResultDetail.scrollableDirections(), PanZoomController.SCROLLABLE_FLAG_RIGHT);
+  }
+
+  public boolean canScrollToBottom() {
+    if (inputResultDetail == null) {
+      return false;
+    }
+    return inputResultDetail.handledResult() == PanZoomController.INPUT_RESULT_HANDLED &&
+            Util.hasFlag(inputResultDetail.scrollableDirections(), PanZoomController.SCROLLABLE_FLAG_BOTTOM);
+  }
+
+  public boolean canOverscrollLeft() {
+    if (inputResultDetail == null) {
+      return false;
+    }
+    return inputResultDetail.handledResult() != PanZoomController.INPUT_RESULT_HANDLED_CONTENT &&
+            !Util.hasFlag(inputResultDetail.scrollableDirections(), PanZoomController.SCROLLABLE_FLAG_LEFT) &&
+            Util.hasFlag(inputResultDetail.overscrollDirections(), PanZoomController.OVERSCROLL_FLAG_HORIZONTAL);
+  }
+
+  public boolean canOverscrollRight() {
+    if (inputResultDetail == null) {
+      return false;
+    }
+    return inputResultDetail.handledResult() != PanZoomController.INPUT_RESULT_HANDLED_CONTENT &&
+            !Util.hasFlag(inputResultDetail.scrollableDirections(), PanZoomController.SCROLLABLE_FLAG_RIGHT) &&
+            Util.hasFlag(inputResultDetail.overscrollDirections(), PanZoomController.OVERSCROLL_FLAG_HORIZONTAL);
+  }
+
+  public boolean canOverscrollBottom() {
+    if (inputResultDetail == null) {
+      return false;
+    }
+    return inputResultDetail.handledResult() != PanZoomController.INPUT_RESULT_HANDLED_CONTENT &&
+            !Util.hasFlag(inputResultDetail.scrollableDirections(), PanZoomController.SCROLLABLE_FLAG_BOTTOM) &&
+            Util.hasFlag(inputResultDetail.overscrollDirections(), PanZoomController.OVERSCROLL_FLAG_VERTICAL);
+  }
+
+  public boolean canOverscrollTop() {
+    if (inputResultDetail == null) {
+      return false;
+    }
+    return inputResultDetail.handledResult() != PanZoomController.INPUT_RESULT_HANDLED_CONTENT &&
+            !Util.hasFlag(inputResultDetail.scrollableDirections(), PanZoomController.SCROLLABLE_FLAG_TOP) &&
+            Util.hasFlag(inputResultDetail.overscrollDirections(), PanZoomController.OVERSCROLL_FLAG_VERTICAL);
+  }
+
   public boolean canScrollVertically() {
     return false;
   }
 
   public boolean canScrollHorizontally() {
     return false;
+  }
+
+  public int scrollX() {
+    InAppWebViewScrollDelegate scrollDelegate = getScrollDelegate();
+    if (scrollDelegate == null) {
+      return 0;
+    }
+    return scrollDelegate.scrollX;
+  }
+
+  public int scrollY() {
+    InAppWebViewScrollDelegate scrollDelegate = getScrollDelegate();
+    if (scrollDelegate == null) {
+      return 0;
+    }
+    return scrollDelegate.scrollY;
   }
 
   public float getZoomScale() {
@@ -543,6 +889,24 @@ final public class InAppWebView extends InputAwareWebView {
     return (InAppWebViewProgressDelegate) session.getProgressDelegate();
   }
 
+  @Nullable
+  public InAppWebViewHistoryDelegate getHistoryDelegate() {
+    GeckoSession session = getSession();
+    if (session == null) {
+      return null;
+    }
+    return (InAppWebViewHistoryDelegate) session.getHistoryDelegate();
+  }
+
+  @Nullable
+  public InAppWebViewScrollDelegate getScrollDelegate() {
+    GeckoSession session = getSession();
+    if (session == null) {
+      return null;
+    }
+    return (InAppWebViewScrollDelegate) session.getScrollDelegate();
+  }
+
   @Override
   public void dispose() {
     if (channelDelegate != null) {
@@ -562,11 +926,21 @@ final public class InAppWebView extends InputAwareWebView {
     if (progressDelegate != null) {
       progressDelegate.dispose();
     }
+    InAppWebViewHistoryDelegate historyDelegate = getHistoryDelegate();
+    if (historyDelegate != null) {
+      historyDelegate.dispose();
+    }
+    InAppWebViewScrollDelegate scrollDelegate = getScrollDelegate();
+    if (scrollDelegate != null) {
+      scrollDelegate.dispose();
+    }
     GeckoSession session = getSession();
     if (session != null) {
       session.setContentDelegate(null);
       session.setNavigationDelegate(null);
       session.setProgressDelegate(null);
+      session.setHistoryDelegate(null);
+      session.setScrollDelegate(null);
       session.close();
     }
     if (windowId != null && plugin != null && plugin.inAppWebViewManager != null) {

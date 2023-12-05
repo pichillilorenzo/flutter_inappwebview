@@ -27,6 +27,8 @@ public class InAppWebViewContentDelegate implements GeckoSession.ContentDelegate
   @Nullable
   public ContextElement lastContextElement;
 
+  public boolean fullScreen;
+
   InAppWebViewContentDelegate(@NonNull final InAppWebViewFlutterPlugin plugin, @NonNull InAppWebView webView) {
     this.plugin = plugin;
     this.webView = webView;
@@ -61,6 +63,7 @@ public class InAppWebViewContentDelegate implements GeckoSession.ContentDelegate
 
   @Override
   public void onFullScreen(@NonNull GeckoSession session, boolean fullScreen) {
+    this.fullScreen = fullScreen;
     if (webView != null && webView.channelDelegate != null) {
       if (fullScreen) {
         webView.channelDelegate.onEnterFullscreen();

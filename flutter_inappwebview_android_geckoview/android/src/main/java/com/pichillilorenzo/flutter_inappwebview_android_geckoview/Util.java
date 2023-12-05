@@ -383,4 +383,8 @@ public class Util {
   public static Drawable drawableFromBytes(Context context, byte[] data) {
     return new BitmapDrawable(context.getResources(), BitmapFactory.decodeByteArray(data, 0, data.length));
   }
+
+  public static boolean hasFlag(int value, int flag) {
+    return (value & flag) == flag;
+  }
 }

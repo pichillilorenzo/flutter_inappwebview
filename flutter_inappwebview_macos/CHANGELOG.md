@@ -1,3 +1,7 @@
+## 1.0.4
+
+- Possible fix for "iOS Fatal Crash" [#1894](https://github.com/pichillilorenzo/flutter_inappwebview/issues/1894)
+
 ## 1.0.3
 
 - Call `super.dispose();` on `InAppBrowser` implementation

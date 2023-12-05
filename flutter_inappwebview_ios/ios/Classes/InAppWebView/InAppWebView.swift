@@ -2042,12 +2042,15 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
                 return
             }
             
-            // workaround for ProtectionSpace SSL Certificate
-            // https://github.com/pichillilorenzo/flutter_inappwebview/issues/1678
-            DispatchQueue.global(qos: .background).async {
-                if let scheme = challenge.protectionSpace.protocol, scheme == "https",
-                   let sslCertificate = challenge.protectionSpace.sslCertificate {
-                    InAppWebView.sslCertificatesMap[challenge.protectionSpace.host] = sslCertificate
+            if let scheme = challenge.protectionSpace.protocol, scheme == "https" {
+                // workaround for ProtectionSpace SSL Certificate
+                // https://github.com/pichillilorenzo/flutter_inappwebview/issues/1678
+                DispatchQueue.global(qos: .background).async {
+                    if let sslCertificate = challenge.protectionSpace.sslCertificate {
+                        DispatchQueue.main.async {
+                            InAppWebView.sslCertificatesMap[challenge.protectionSpace.host] = sslCertificate
+                        }
+                    }
                 }
             }
             

@@ -1712,7 +1712,7 @@ class AndroidInAppWebViewController extends PlatformInAppWebViewController
           manifestResponse.headers.contentType?.mimeType == "application/json";
     } catch (e) {
       developer.log("Manifest file not found: " + e.toString(),
-          name: this.runtimeType.toString());
+          name: runtimeType.toString());
     }
 
     if (manifestFound) {
@@ -1725,9 +1725,12 @@ class AndroidInAppWebViewController extends PlatformInAppWebViewController
                 icon["src"], icon["rel"], icon["sizes"], true));
           }
         }
-      } on FormatException catch (_) {
-        /// The [manifestResponse] might not has a valid JSON string, catch and
-        /// ignore the error
+      } catch (e) {
+        developer.log(
+            "Cannot get favicons from Manifest file. It might not have a valid format: " +
+                e.toString(),
+            error: e,
+            name: runtimeType.toString());
       }
     }
 

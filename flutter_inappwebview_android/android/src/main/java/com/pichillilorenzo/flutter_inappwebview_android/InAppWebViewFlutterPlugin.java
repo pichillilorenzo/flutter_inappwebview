@@ -8,6 +8,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.pichillilorenzo.flutter_inappwebview_android.chrome_custom_tabs.ChromeSafariBrowserManager;
+import com.pichillilorenzo.flutter_inappwebview_android.chrome_custom_tabs.NoHistoryCustomTabsActivityCallbacks;
 import com.pichillilorenzo.flutter_inappwebview_android.credential_database.CredentialDatabaseHandler;
 import com.pichillilorenzo.flutter_inappwebview_android.headless_in_app_webview.HeadlessInAppWebViewManager;
 import com.pichillilorenzo.flutter_inappwebview_android.in_app_browser.InAppBrowserManager;
@@ -39,6 +40,8 @@ public class InAppWebViewFlutterPlugin implements FlutterPlugin, ActivityAware {
   public HeadlessInAppWebViewManager headlessInAppWebViewManager;
   @Nullable
   public ChromeSafariBrowserManager chromeSafariBrowserManager;
+  @Nullable
+  public NoHistoryCustomTabsActivityCallbacks noHistoryCustomTabsActivityCallbacks;
   @Nullable
   public InAppWebViewManager inAppWebViewManager;
   @Nullable
@@ -103,6 +106,7 @@ public class InAppWebViewFlutterPlugin implements FlutterPlugin, ActivityAware {
     inAppBrowserManager = new InAppBrowserManager(this);
     headlessInAppWebViewManager = new HeadlessInAppWebViewManager(this);
     chromeSafariBrowserManager = new ChromeSafariBrowserManager(this);
+    noHistoryCustomTabsActivityCallbacks = new NoHistoryCustomTabsActivityCallbacks(this);
     flutterWebViewFactory = new FlutterWebViewFactory(this);
     platformViewRegistry.registerViewFactory(
             FlutterWebViewFactory.VIEW_TYPE_ID, flutterWebViewFactory);
@@ -143,6 +147,10 @@ public class InAppWebViewFlutterPlugin implements FlutterPlugin, ActivityAware {
     if (chromeSafariBrowserManager != null) {
       chromeSafariBrowserManager.dispose();
       chromeSafariBrowserManager = null;
+    }
+    if (noHistoryCustomTabsActivityCallbacks != null) {
+      noHistoryCustomTabsActivityCallbacks.dispose();
+      noHistoryCustomTabsActivityCallbacks = null;
     }
     if (myCookieManager != null) {
       myCookieManager.dispose();
@@ -190,23 +198,39 @@ public class InAppWebViewFlutterPlugin implements FlutterPlugin, ActivityAware {
   public void onAttachedToActivity(ActivityPluginBinding activityPluginBinding) {
     this.activityPluginBinding = activityPluginBinding;
     this.activity = activityPluginBinding.getActivity();
+
+    if (noHistoryCustomTabsActivityCallbacks != null) {
+      this.activity.getApplication().registerActivityLifecycleCallbacks(noHistoryCustomTabsActivityCallbacks.activityLifecycleCallbacks);
+    }
   }
 
   @Override
   public void onDetachedFromActivityForConfigChanges() {
-    this.activityPluginBinding = null;
-    this.activity = null;
+    if (activity != null && noHistoryCustomTabsActivityCallbacks != null) {
+      this.activity.getApplication().unregisterActivityLifecycleCallbacks(noHistoryCustomTabsActivityCallbacks.activityLifecycleCallbacks);
+    }
+
+    activityPluginBinding = null;
+    activity = null;
   }
 
   @Override
   public void onReattachedToActivityForConfigChanges(ActivityPluginBinding activityPluginBinding) {
     this.activityPluginBinding = activityPluginBinding;
     this.activity = activityPluginBinding.getActivity();
+
+    if (noHistoryCustomTabsActivityCallbacks != null) {
+      this.activity.getApplication().registerActivityLifecycleCallbacks(noHistoryCustomTabsActivityCallbacks.activityLifecycleCallbacks);
+    }
   }
 
   @Override
   public void onDetachedFromActivity() {
-    this.activityPluginBinding = null;
-    this.activity = null;
+    if (activity != null && noHistoryCustomTabsActivityCallbacks != null) {
+      this.activity.getApplication().unregisterActivityLifecycleCallbacks(noHistoryCustomTabsActivityCallbacks.activityLifecycleCallbacks);
+    }
+
+    activityPluginBinding = null;
+    activity = null;
   }
 }

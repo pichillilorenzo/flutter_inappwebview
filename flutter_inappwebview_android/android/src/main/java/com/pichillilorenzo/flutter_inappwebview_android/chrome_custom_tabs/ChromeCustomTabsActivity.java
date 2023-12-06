@@ -47,7 +47,8 @@ public class ChromeCustomTabsActivity extends Activity implements Disposable {
   public CustomTabActivityHelper customTabActivityHelper = new CustomTabActivityHelper();
   @Nullable
   public CustomTabsSession customTabsSession;
-  protected final int CHROME_CUSTOM_TAB_REQUEST_CODE = 100;
+  public final static int CHROME_CUSTOM_TAB_REQUEST_CODE = 100;
+  public final static int NO_HISTORY_CHROME_CUSTOM_TAB_REQUEST_CODE = 101;
   protected boolean onOpened = false;
   protected boolean onCompletedInitialLoad = false;
   protected boolean isBindSuccess = false;
@@ -102,6 +103,10 @@ public class ChromeCustomTabsActivity extends Activity implements Disposable {
     List<Map<String, Object>> menuItemList = (List<Map<String, Object>>) b.getSerializable("menuItemList");
     for (Map<String, Object> menuItem : menuItemList) {
       menuItems.add(CustomTabsMenuItem.fromMap(menuItem));
+    }
+
+    if (customSettings.noHistory && manager.plugin.noHistoryCustomTabsActivityCallbacks != null) {
+      manager.plugin.noHistoryCustomTabsActivityCallbacks.noHistoryBrowserIDs.put(id, id);
     }
 
     final ChromeCustomTabsActivity chromeCustomTabsActivity = this;

@@ -1690,7 +1690,7 @@ class MacOSInAppWebViewController extends PlatformInAppWebViewController
       }
     } catch (e) {
       developer.log("/favicon.ico file not found: " + e.toString(),
-          name: this.runtimeType.toString());
+          name: runtimeType.toString());
     }
 
     // try to get the manifest file
@@ -1722,9 +1722,12 @@ class MacOSInAppWebViewController extends PlatformInAppWebViewController
                 icon["src"], icon["rel"], icon["sizes"], true));
           }
         }
-      } on FormatException catch (_) {
-        /// The [manifestResponse] might not has a valid JSON string, catch and
-        /// ignore the error
+      } catch (e) {
+        developer.log(
+            "Cannot get favicons from Manifest file. It might not have a valid format: " +
+                e.toString(),
+            error: e,
+            name: runtimeType.toString());
       }
     }
 

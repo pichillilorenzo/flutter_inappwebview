@@ -30,7 +30,7 @@ dev_dependencies:
   flutter_driver:
     sdk: flutter
   flutter_lints: ^2.0.1
-  build_runner: ^2.2.1
+  build_runner: 2.3.3
   generators:
     path: ../dev_packages/generators
 

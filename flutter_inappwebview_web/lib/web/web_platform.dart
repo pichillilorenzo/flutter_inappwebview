@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:ui_web';
 import '../src/inappwebview_platform.dart';
 import 'headless_inappwebview_manager.dart';
 import 'web_platform_manager.dart';
@@ -8,6 +7,8 @@ import 'package:flutter_web_plugins/flutter_web_plugins.dart';
 import 'in_app_web_view_web_element.dart';
 import 'platform_util.dart';
 import 'package:js/js.dart';
+
+import 'shims/platform_view_registry.dart' show platformViewRegistry;
 
 /// Builds an iframe based WebView.
 ///

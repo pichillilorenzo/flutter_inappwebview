@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_platform_interface.dart';
 import 'dart:html';
 import 'dart:js' as js;
+import 'dart:developer';
 
 import 'headless_inappwebview_manager.dart';
 import 'web_platform_manager.dart';
@@ -51,8 +52,8 @@ class InAppWebViewWebElement implements Disposable {
       try {
         return await handleMethodCall(call);
       } on Error catch (e) {
-        print(e);
-        print(e.stackTrace);
+        log(e.toString(),
+            name: runtimeType.toString(), error: e, stackTrace: e.stackTrace);
       }
     });
 
@@ -291,7 +292,17 @@ class InAppWebViewWebElement implements Disposable {
         (urlRequest.headers == null || urlRequest.headers!.isEmpty)) {
       iframe.src = urlRequest.url.toString();
     } else {
-      iframe.src = _convertHttpResponseToData(await _makeRequest(urlRequest));
+      try {
+        iframe.src = _convertHttpResponseToData(await _makeRequest(urlRequest));
+      } catch (e) {
+        log('Can\'t load the URLRequest for "${urlRequest.url}". Probably caused by a CORS policy error.',
+            name: runtimeType.toString(), error: e);
+        if (urlRequest.method == null || urlRequest.method == "GET") {
+          log('Load the request using just the URL.',
+              name: runtimeType.toString(), error: e);
+          iframe.src = urlRequest.url.toString();
+        }
+      }
     }
   }
 

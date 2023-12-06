@@ -23,14 +23,15 @@ labels: bug
 
 ## Environment
 
-| Technology      | Version       |
-|-----------------| ------------- |
-| Flutter version |               |
-| Plugin version  |               |
-| Android version |               |
-| iOS version     |               |
-| macOS version   |               |
-| Xcode version   |               |
+| Technology            | Version       |
+|-----------------------| ------------- |
+| Flutter version       |               |
+| Plugin version        |               |
+| Android version       |               |
+| iOS version           |               |
+| macOS version         |               |
+| Xcode version         |               |
+| Google Chrome version |               |
 
 Device information: <!-- Manufacturer and model -->
 

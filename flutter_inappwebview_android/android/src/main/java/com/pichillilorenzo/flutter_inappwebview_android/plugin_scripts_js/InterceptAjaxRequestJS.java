@@ -220,7 +220,7 @@ public class InterceptAjaxRequestJS {
           "              data = new Uint8Array(result.data);" +
           "            }" +
           "            self.withCredentials = result.withCredentials;" +
-          "            if (result.responseType != null && result.isAsync) {" +
+          "            if (result.responseType != null && self.isAsync) {" +
           "              self.responseType = result.responseType;" +
           "            };" +
           "            for (var header in result.headers) {" +

@@ -219,7 +219,7 @@ let INTERCEPT_AJAX_REQUEST_JS_SOURCE = """
                 data = new Uint8Array(result.data);
               }
               self.withCredentials = result.withCredentials;
-              if (result.responseType != null) {
+              if (result.responseType != null && self.isAsync) {
                 self.responseType = result.responseType;
               };
               if (result.headers != null) {
@@ -234,10 +234,13 @@ let INTERCEPT_AJAX_REQUEST_JS_SOURCE = """
                   setRequestHeader.call(self, header, value);
                 };
               }
-              if ((self._flutter_inappwebview_method != result.method && result.method != null) || (self._flutter_inappwebview_url != result.url && result.url != null)) {
+              if ((self._flutter_inappwebview_method != result.method && result.method != null) ||
+                  (self._flutter_inappwebview_url != result.url && result.url != null) ||
+                  (self._flutter_inappwebview_isAsync != result.isAsync && result.isAsync != null) ||
+                  (self._flutter_inappwebview_user != result.user && result.user != null) ||
+                  (self._flutter_inappwebview_password != result.password && result.password != null)) {
                 self.abort();
                 self.open(result.method, result.url, result.isAsync, result.user, result.password);
-                return;
               }
             }
             send.call(self, data);

@@ -1,3 +1,8 @@
+## 1.0.7
+
+- Merged "Fixed error in InterceptAjaxRequestJS 'Failed to set responseType property'" [#1904](https://github.com/pichillilorenzo/flutter_inappwebview/pull/1904) (thanks to [EArminjon](https://github.com/EArminjon))
+- Fixed shouldInterceptAjaxRequest javascript code when overriding XMLHttpRequest.open method parameters
+
 ## 1.0.6
 
 - Fixed "getFavicons: _TypeError: type '_Map<String, dynamic>' is not a subtype of type 'Iterable<dynamic>'" [#1897](https://github.com/pichillilorenzo/flutter_inappwebview/issues/1897)

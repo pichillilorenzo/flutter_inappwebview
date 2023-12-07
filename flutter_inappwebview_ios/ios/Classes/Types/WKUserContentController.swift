@@ -91,7 +91,7 @@ extension WKUserContentController {
     public func sync(scriptMessageHandler: WKScriptMessageHandler) {
         let pluginScriptsList = pluginScripts.compactMap({ $0.value }).joined()
         for pluginScript in pluginScriptsList {
-            if !containsPluginScript(with: pluginScript.groupName!) {
+            if !containsPluginScript(pluginScript: pluginScript) {
                 addUserScript(pluginScript)
                 for messageHandlerName in pluginScript.messageHandlerNames {
                     removeScriptMessageHandler(forName: messageHandlerName)
@@ -100,8 +100,8 @@ extension WKUserContentController {
             }
             if #available(iOS 14.0, *), pluginScript.requiredInAllContentWorlds {
                 for contentWorld in contentWorlds {
-                    let pluginScriptWithContentWorld = pluginScript.copyAndSet(contentWorld: contentWorld)
-                    if !containsPluginScript(with: pluginScriptWithContentWorld.groupName!, in: contentWorld) {
+                    if !containsPluginScript(pluginScript: pluginScript, in: contentWorld) {
+                        let pluginScriptWithContentWorld = pluginScript.copyAndSet(contentWorld: contentWorld)
                         addUserScript(pluginScriptWithContentWorld)
                         for messageHandlerName in pluginScriptWithContentWorld.messageHandlerNames {
                             removeScriptMessageHandler(forName: messageHandlerName, contentWorld: contentWorld)
@@ -314,6 +314,16 @@ extension WKUserContentController {
         removeUserScripts(scriptsToRemove: scriptsToRemove, shouldAddPreviousScripts: shouldAddPreviousScripts)
     }
 
+    public func containsPluginScript(pluginScript: PluginScript) -> Bool {
+        let userScripts = useCopyOfUserScripts()
+        for script in userScripts {
+            if let script = script as? PluginScript, script == pluginScript {
+                return true
+            }
+        }
+        return false
+    }
+    
     public func containsPluginScript(with groupName: String) -> Bool {
         let userScripts = useCopyOfUserScripts()
         for script in userScripts {
@@ -324,6 +334,17 @@ extension WKUserContentController {
         return false
     }
 
+    @available(iOS 14.0, *)
+    public func containsPluginScript(pluginScript: PluginScript, in contentWorld: WKContentWorld) -> Bool {
+        let userScripts = useCopyOfUserScripts()
+        for script in userScripts {
+            if let script = script as? PluginScript, script == pluginScript, script.contentWorld == contentWorld {
+                return true
+            }
+        }
+        return false
+    }
+    
     @available(iOS 14.0, *)
     public func containsPluginScript(with groupName: String, in contentWorld: WKContentWorld) -> Bool {
         let userScripts = useCopyOfUserScripts()

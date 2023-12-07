@@ -10,6 +10,9 @@ import Foundation
 let INTERCEPT_AJAX_REQUEST_JS_PLUGIN_SCRIPT_GROUP_NAME = "IN_APP_WEBVIEW_INTERCEPT_AJAX_REQUEST_JS_PLUGIN_SCRIPT"
 let FLAG_VARIABLE_FOR_SHOULD_INTERCEPT_AJAX_REQUEST_JS_SOURCE = "window.\(JAVASCRIPT_BRIDGE_NAME)._useShouldInterceptAjaxRequest"
 
+
+let FLAG_VARIABLE_FOR_INTERCEPT_ONLY_ASYNC_AJAX_REQUESTS_JS_SOURCE = "window.\(JAVASCRIPT_BRIDGE_NAME)._interceptOnlyAsyncAjaxRequests";
+
 let INTERCEPT_AJAX_REQUEST_JS_PLUGIN_SCRIPT = PluginScript(
     groupName: INTERCEPT_AJAX_REQUEST_JS_PLUGIN_SCRIPT_GROUP_NAME,
     source: INTERCEPT_AJAX_REQUEST_JS_SOURCE,
@@ -17,6 +20,16 @@ let INTERCEPT_AJAX_REQUEST_JS_PLUGIN_SCRIPT = PluginScript(
     forMainFrameOnly: false,
     requiredInAllContentWorlds: true,
     messageHandlerNames: [])
+
+func createInterceptOnlyAsyncAjaxRequestsPluginScript(onlyAsync: Bool) -> PluginScript {
+    return PluginScript(groupName: INTERCEPT_AJAX_REQUEST_JS_PLUGIN_SCRIPT_GROUP_NAME,
+        source: "\(FLAG_VARIABLE_FOR_INTERCEPT_ONLY_ASYNC_AJAX_REQUESTS_JS_SOURCE) = \(onlyAsync);",
+        injectionTime: .atDocumentStart,
+        forMainFrameOnly: false,
+        requiredInAllContentWorlds: true,
+        messageHandlerNames: []
+    );
+}
 
 let INTERCEPT_AJAX_REQUEST_JS_SOURCE = """
 \(FLAG_VARIABLE_FOR_SHOULD_INTERCEPT_AJAX_REQUEST_JS_SOURCE) = true;
@@ -122,7 +135,8 @@ let INTERCEPT_AJAX_REQUEST_JS_SOURCE = """
   };
   ajax.prototype.send = function(data) {
     var self = this;
-    if (\(FLAG_VARIABLE_FOR_SHOULD_INTERCEPT_AJAX_REQUEST_JS_SOURCE) == null || \(FLAG_VARIABLE_FOR_SHOULD_INTERCEPT_AJAX_REQUEST_JS_SOURCE) == true) {
+    var canBeIntercepted = self._flutter_inappwebview_isAsync || \(FLAG_VARIABLE_FOR_INTERCEPT_ONLY_ASYNC_AJAX_REQUESTS_JS_SOURCE) === false;
+    if (canBeIntercepted && (\(FLAG_VARIABLE_FOR_SHOULD_INTERCEPT_AJAX_REQUEST_JS_SOURCE) == null || \(FLAG_VARIABLE_FOR_SHOULD_INTERCEPT_AJAX_REQUEST_JS_SOURCE) == true)) {
       if (!this._flutter_inappwebview_already_onreadystatechange_wrapped) {
         this._flutter_inappwebview_already_onreadystatechange_wrapped = true;
         var onreadystatechange = this.onreadystatechange;
@@ -219,7 +233,7 @@ let INTERCEPT_AJAX_REQUEST_JS_SOURCE = """
                 data = new Uint8Array(result.data);
               }
               self.withCredentials = result.withCredentials;
-              if (result.responseType != null && self.isAsync) {
+              if (result.responseType != null && self._flutter_inappwebview_isAsync) {
                 self.responseType = result.responseType;
               };
               if (result.headers != null) {

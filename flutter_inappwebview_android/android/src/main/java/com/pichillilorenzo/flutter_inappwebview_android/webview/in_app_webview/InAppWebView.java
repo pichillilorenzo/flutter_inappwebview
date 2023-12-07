@@ -174,6 +174,9 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
   @Nullable
   public WebViewAssetLoaderExt webViewAssetLoaderExt;
 
+  @Nullable
+  private PluginScript interceptOnlyAsyncAjaxRequestsPluginScript;
+
   public InAppWebView(Context context) {
     super(context);
   }
@@ -565,7 +568,9 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
     userContentController.addPluginScript(PrintJS.PRINT_JS_PLUGIN_SCRIPT);
     userContentController.addPluginScript(OnWindowBlurEventJS.ON_WINDOW_BLUR_EVENT_JS_PLUGIN_SCRIPT);
     userContentController.addPluginScript(OnWindowFocusEventJS.ON_WINDOW_FOCUS_EVENT_JS_PLUGIN_SCRIPT);
+    interceptOnlyAsyncAjaxRequestsPluginScript = InterceptAjaxRequestJS.createInterceptOnlyAsyncAjaxRequestsPluginScript(customSettings.interceptOnlyAsyncAjaxRequests);
     if (customSettings.useShouldInterceptAjaxRequest) {
+      userContentController.addPluginScript(interceptOnlyAsyncAjaxRequestsPluginScript);
       userContentController.addPluginScript(InterceptAjaxRequestJS.INTERCEPT_AJAX_REQUEST_JS_PLUGIN_SCRIPT);
     }
     if (customSettings.useShouldInterceptFetchRequest) {
@@ -769,6 +774,14 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
               InterceptAjaxRequestJS.FLAG_VARIABLE_FOR_SHOULD_INTERCEPT_AJAX_REQUEST_JS_SOURCE,
               newCustomSettings.useShouldInterceptAjaxRequest,
               InterceptAjaxRequestJS.INTERCEPT_AJAX_REQUEST_JS_PLUGIN_SCRIPT
+      );
+    }
+
+    if (newSettingsMap.get("interceptOnlyAsyncAjaxRequests") != null && customSettings.interceptOnlyAsyncAjaxRequests != newCustomSettings.interceptOnlyAsyncAjaxRequests) {
+      enablePluginScriptAtRuntime(
+              InterceptAjaxRequestJS.FLAG_VARIABLE_FOR_INTERCEPT_ONLY_ASYNC_AJAX_REQUESTS_JS_SOURCE,
+              newCustomSettings.interceptOnlyAsyncAjaxRequests,
+              interceptOnlyAsyncAjaxRequestsPluginScript
       );
     }
 
@@ -2030,6 +2043,7 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
         destroy();
       }
     });
+    interceptOnlyAsyncAjaxRequestsPluginScript = null;
     userContentController.dispose();
     if (findInteractionController != null) {
       findInteractionController.dispose();

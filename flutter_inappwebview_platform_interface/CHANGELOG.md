@@ -1,3 +1,8 @@
+## 1.0.6
+
+- Updated `InAppWebViewSettings.useShouldInterceptAjaxRequest` docs
+- Added `InAppWebViewSettings.interceptOnlyAsyncAjaxRequests` [#1905](https://github.com/pichillilorenzo/flutter_inappwebview/issues/1905)
+
 ## 1.0.5
 
 - Must call super `dispose` method for `PlatformInAppBrowser` and `PlatformChromeSafariBrowser` 

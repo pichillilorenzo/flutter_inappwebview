@@ -7,6 +7,7 @@ public class InterceptAjaxRequestJS {
 
   public static final String INTERCEPT_AJAX_REQUEST_JS_PLUGIN_SCRIPT_GROUP_NAME = "IN_APP_WEBVIEW_INTERCEPT_AJAX_REQUEST_JS_PLUGIN_SCRIPT";
   public static final String FLAG_VARIABLE_FOR_SHOULD_INTERCEPT_AJAX_REQUEST_JS_SOURCE = JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME + "._useShouldInterceptAjaxRequest";
+  public static final String FLAG_VARIABLE_FOR_INTERCEPT_ONLY_ASYNC_AJAX_REQUESTS_JS_SOURCE = JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME + "._interceptOnlyAsyncAjaxRequests";
   public static final PluginScript INTERCEPT_AJAX_REQUEST_JS_PLUGIN_SCRIPT = new PluginScript(
           InterceptAjaxRequestJS.INTERCEPT_AJAX_REQUEST_JS_PLUGIN_SCRIPT_GROUP_NAME,
           InterceptAjaxRequestJS.INTERCEPT_AJAX_REQUEST_JS_SOURCE,
@@ -15,6 +16,17 @@ public class InterceptAjaxRequestJS {
           true,
           null
   );
+
+  public static PluginScript createInterceptOnlyAsyncAjaxRequestsPluginScript(boolean onlyAsync) {
+    return new PluginScript(
+            InterceptAjaxRequestJS.INTERCEPT_AJAX_REQUEST_JS_PLUGIN_SCRIPT_GROUP_NAME,
+            "window." + FLAG_VARIABLE_FOR_INTERCEPT_ONLY_ASYNC_AJAX_REQUESTS_JS_SOURCE + " = " + onlyAsync +";",
+            UserScriptInjectionTime.AT_DOCUMENT_START,
+            null,
+            true,
+            null
+    );
+  }
 
   public static final String INTERCEPT_AJAX_REQUEST_JS_SOURCE = "(function(ajax) {" +
           "  var w = (window.top == null || window.top === window) ? window : window.top;" +
@@ -122,7 +134,8 @@ public class InterceptAjaxRequestJS {
           "  ajax.prototype.send = function(data) {" +
           "    var self = this;" +
           "    var w = (window.top == null || window.top === window) ? window : window.top;" +
-          "    if (w." + FLAG_VARIABLE_FOR_SHOULD_INTERCEPT_AJAX_REQUEST_JS_SOURCE + " == null || w." + FLAG_VARIABLE_FOR_SHOULD_INTERCEPT_AJAX_REQUEST_JS_SOURCE + " == true) {" +
+          "    var canBeIntercepted = self._flutter_inappwebview_isAsync || w." + FLAG_VARIABLE_FOR_INTERCEPT_ONLY_ASYNC_AJAX_REQUESTS_JS_SOURCE + " === false;" +
+          "    if (canBeIntercepted && (w." + FLAG_VARIABLE_FOR_SHOULD_INTERCEPT_AJAX_REQUEST_JS_SOURCE + " == null || w." + FLAG_VARIABLE_FOR_SHOULD_INTERCEPT_AJAX_REQUEST_JS_SOURCE + " == true)) {" +
           "      if (!this._flutter_inappwebview_already_onreadystatechange_wrapped) {" +
           "        this._flutter_inappwebview_already_onreadystatechange_wrapped = true;" +
           "        var onreadystatechange = this.onreadystatechange;" +
@@ -220,7 +233,7 @@ public class InterceptAjaxRequestJS {
           "              data = new Uint8Array(result.data);" +
           "            }" +
           "            self.withCredentials = result.withCredentials;" +
-          "            if (result.responseType != null && self.isAsync) {" +
+          "            if (result.responseType != null && self._flutter_inappwebview_isAsync) {" +
           "              self.responseType = result.responseType;" +
           "            };" +
           "            for (var header in result.headers) {" +

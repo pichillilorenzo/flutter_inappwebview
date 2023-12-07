@@ -278,54 +278,53 @@ class IOSInAppWebViewWidget extends PlatformInAppWebViewWidget {
   IOSInAppWebViewController? _controller;
 
   IOSHeadlessInAppWebView? get _iosHeadlessInAppWebView =>
-      _iosParams.headlessWebView as IOSHeadlessInAppWebView?;
+      params.headlessWebView as IOSHeadlessInAppWebView?;
 
   @override
   Widget build(BuildContext context) {
-    final initialSettings =
-        _iosParams.initialSettings ?? InAppWebViewSettings();
+    final initialSettings = params.initialSettings ?? InAppWebViewSettings();
     _inferInitialSettings(initialSettings);
 
     Map<String, dynamic> settingsMap =
-        (_iosParams.initialSettings != null ? initialSettings.toMap() : null) ??
+        (params.initialSettings != null ? initialSettings.toMap() : null) ??
             // ignore: deprecated_member_use_from_same_package
-            _iosParams.initialOptions?.toMap() ??
+            params.initialOptions?.toMap() ??
             initialSettings.toMap();
 
     Map<String, dynamic> pullToRefreshSettings =
-        _iosParams.pullToRefreshController?.params.settings.toMap() ??
+        params.pullToRefreshController?.params.settings.toMap() ??
             // ignore: deprecated_member_use_from_same_package
-            _iosParams.pullToRefreshController?.params.options.toMap() ??
+            params.pullToRefreshController?.params.options.toMap() ??
             PullToRefreshSettings(enabled: false).toMap();
 
-    if ((_iosParams.headlessWebView?.isRunning() ?? false) &&
-        _iosParams.keepAlive != null) {
-      final headlessId = _iosParams.headlessWebView?.id;
+    if ((params.headlessWebView?.isRunning() ?? false) &&
+        params.keepAlive != null) {
+      final headlessId = params.headlessWebView?.id;
       if (headlessId != null) {
         // force keep alive id to match headless webview id
-        _iosParams.keepAlive?.id = headlessId;
+        params.keepAlive?.id = headlessId;
       }
     }
 
     return UiKitView(
       viewType: 'com.pichillilorenzo/flutter_inappwebview',
       onPlatformViewCreated: _onPlatformViewCreated,
-      gestureRecognizers: _iosParams.gestureRecognizers,
+      gestureRecognizers: params.gestureRecognizers,
       creationParams: <String, dynamic>{
-        'initialUrlRequest': _iosParams.initialUrlRequest?.toMap(),
-        'initialFile': _iosParams.initialFile,
-        'initialData': _iosParams.initialData?.toMap(),
+        'initialUrlRequest': params.initialUrlRequest?.toMap(),
+        'initialFile': params.initialFile,
+        'initialData': params.initialData?.toMap(),
         'initialSettings': settingsMap,
-        'contextMenu': _iosParams.contextMenu?.toMap() ?? {},
-        'windowId': _iosParams.windowId,
-        'headlessWebViewId': _iosParams.headlessWebView?.isRunning() ?? false
-            ? _iosParams.headlessWebView?.id
+        'contextMenu': params.contextMenu?.toMap() ?? {},
+        'windowId': params.windowId,
+        'headlessWebViewId': params.headlessWebView?.isRunning() ?? false
+            ? params.headlessWebView?.id
             : null,
         'initialUserScripts':
-            _iosParams.initialUserScripts?.map((e) => e.toMap()).toList() ?? [],
+            params.initialUserScripts?.map((e) => e.toMap()).toList() ?? [],
         'pullToRefreshSettings': pullToRefreshSettings,
-        'keepAliveId': _iosParams.keepAlive?.id,
-        'preventGestureDelay': _iosParams.preventGestureDelay
+        'keepAliveId': params.keepAlive?.id,
+        'preventGestureDelay': params.preventGestureDelay
       },
       creationParamsCodec: const StandardMessageCodec(),
     );
@@ -333,10 +332,10 @@ class IOSInAppWebViewWidget extends PlatformInAppWebViewWidget {
 
   void _onPlatformViewCreated(int id) {
     dynamic viewId = id;
-    if (_iosParams.headlessWebView?.isRunning() ?? false) {
-      viewId = _iosParams.headlessWebView?.id;
+    if (params.headlessWebView?.isRunning() ?? false) {
+      viewId = params.headlessWebView?.id;
     }
-    viewId = _iosParams.keepAlive?.id ?? viewId ?? id;
+    viewId = params.keepAlive?.id ?? viewId ?? id;
     _iosHeadlessInAppWebView?.internalDispose();
     _controller = IOSInAppWebViewController(
         PlatformInAppWebViewControllerCreationParams(
@@ -350,42 +349,43 @@ class IOSInAppWebViewWidget extends PlatformInAppWebViewWidget {
             PlatformInAppWebViewController.debugLoggingSettings,
         method: "onWebViewCreated",
         args: []);
-    if (_iosParams.onWebViewCreated != null) {
-      _iosParams.onWebViewCreated!(
+    if (params.onWebViewCreated != null) {
+      params.onWebViewCreated!(
           params.controllerFromPlatform?.call(_controller!) ?? _controller!);
     }
   }
 
   void _inferInitialSettings(InAppWebViewSettings settings) {
-    if (_iosParams.shouldOverrideUrlLoading != null &&
+    if (params.shouldOverrideUrlLoading != null &&
         settings.useShouldOverrideUrlLoading == null) {
       settings.useShouldOverrideUrlLoading = true;
     }
-    if (_iosParams.onLoadResource != null &&
-        settings.useOnLoadResource == null) {
+    if (params.onLoadResource != null && settings.useOnLoadResource == null) {
       settings.useOnLoadResource = true;
     }
-    if (_iosParams.onDownloadStartRequest != null &&
+    if (params.onDownloadStartRequest != null &&
         settings.useOnDownloadStart == null) {
       settings.useOnDownloadStart = true;
     }
-    if (_iosParams.shouldInterceptAjaxRequest != null &&
+    if ((params.shouldInterceptAjaxRequest != null ||
+            params.onAjaxProgress != null ||
+            params.onAjaxReadyStateChange != null) &&
         settings.useShouldInterceptAjaxRequest == null) {
       settings.useShouldInterceptAjaxRequest = true;
     }
-    if (_iosParams.shouldInterceptFetchRequest != null &&
+    if (params.shouldInterceptFetchRequest != null &&
         settings.useShouldInterceptFetchRequest == null) {
       settings.useShouldInterceptFetchRequest = true;
     }
-    if (_iosParams.shouldInterceptRequest != null &&
+    if (params.shouldInterceptRequest != null &&
         settings.useShouldInterceptRequest == null) {
       settings.useShouldInterceptRequest = true;
     }
-    if (_iosParams.onRenderProcessGone != null &&
+    if (params.onRenderProcessGone != null &&
         settings.useOnRenderProcessGone == null) {
       settings.useOnRenderProcessGone = true;
     }
-    if (_iosParams.onNavigationResponse != null &&
+    if (params.onNavigationResponse != null &&
         settings.useOnNavigationResponse == null) {
       settings.useOnNavigationResponse = true;
     }
@@ -401,11 +401,11 @@ class IOSInAppWebViewWidget extends PlatformInAppWebViewWidget {
             PlatformInAppWebViewController.debugLoggingSettings,
         method: "dispose",
         args: []);
-    final isKeepAlive = _iosParams.keepAlive != null;
+    final isKeepAlive = params.keepAlive != null;
     _controller?.dispose(isKeepAlive: isKeepAlive);
     _controller = null;
-    _iosParams.pullToRefreshController?.dispose(isKeepAlive: isKeepAlive);
-    _iosParams.findInteractionController?.dispose(isKeepAlive: isKeepAlive);
+    params.pullToRefreshController?.dispose(isKeepAlive: isKeepAlive);
+    params.findInteractionController?.dispose(isKeepAlive: isKeepAlive);
   }
 
   @override

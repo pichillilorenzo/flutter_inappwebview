@@ -255,12 +255,27 @@ class InAppWebViewSettings_ {
 
   ///Set to `true` to be able to listen at the [PlatformWebViewCreationParams.shouldInterceptAjaxRequest] event.
   ///
-  ///If the [PlatformWebViewCreationParams.shouldInterceptAjaxRequest] event is implemented and this value is `null`,
+  ///Due to the async nature of [PlatformWebViewCreationParams.shouldInterceptAjaxRequest] event implementation,
+  ///it will intercept only async `XMLHttpRequest`s ([AjaxRequest.isAsync] with `true`).
+  ///To be able to intercept sync `XMLHttpRequest`s, use [InAppWebViewSettings.interceptOnlyAsyncAjaxRequests] to `false`.
+  ///
+  ///If the [PlatformWebViewCreationParams.shouldInterceptAjaxRequest] event or
+  ///any other Ajax event is implemented and this value is `null`,
   ///it will be automatically inferred as `true`, otherwise, the default value is `false`.
   ///This logic will not be applied for [PlatformInAppBrowser], where you must set the value manually.
   @SupportedPlatforms(
       platforms: [AndroidPlatform(), IOSPlatform(), MacOSPlatform()])
   bool? useShouldInterceptAjaxRequest;
+
+  ///Set to `false` to be able to listen to also sync `XMLHttpRequest`s at the
+  ///[PlatformWebViewCreationParams.shouldInterceptAjaxRequest] event.
+  ///
+  ///**NOTE**: Using `false` will cause the `XMLHttpRequest.send()` method for sync
+  ///requests to not wait on the JavaScript code the response synchronously,
+  ///as if it was an async `XMLHttpRequest`.
+  @SupportedPlatforms(
+      platforms: [AndroidPlatform(), IOSPlatform(), MacOSPlatform()])
+  bool? interceptOnlyAsyncAjaxRequests;
 
   ///Set to `true` to be able to listen at the [PlatformWebViewCreationParams.shouldInterceptFetchRequest] event.
   ///
@@ -1621,6 +1636,7 @@ as it can cause framerate drops on animations in Android 9 and lower (see [Hybri
     this.contentBlockers = const [],
     this.preferredContentMode = UserPreferredContentMode_.RECOMMENDED,
     this.useShouldInterceptAjaxRequest,
+    this.interceptOnlyAsyncAjaxRequests = true,
     this.useShouldInterceptFetchRequest,
     this.incognito = false,
     this.cacheEnabled = true,

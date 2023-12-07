@@ -281,43 +281,41 @@ class AndroidInAppWebViewWidget extends PlatformInAppWebViewWidget {
   AndroidInAppWebViewController? _controller;
 
   AndroidHeadlessInAppWebView? get _androidHeadlessInAppWebView =>
-      _androidParams.headlessWebView as AndroidHeadlessInAppWebView?;
+      params.headlessWebView as AndroidHeadlessInAppWebView?;
 
   @override
   Widget build(BuildContext context) {
-    final initialSettings =
-        _androidParams.initialSettings ?? InAppWebViewSettings();
+    final initialSettings = params.initialSettings ?? InAppWebViewSettings();
     _inferInitialSettings(initialSettings);
 
-    Map<String, dynamic> settingsMap = (_androidParams.initialSettings != null
-            ? initialSettings.toMap()
-            : null) ??
-        // ignore: deprecated_member_use_from_same_package
-        _androidParams.initialOptions?.toMap() ??
-        initialSettings.toMap();
+    Map<String, dynamic> settingsMap =
+        (params.initialSettings != null ? initialSettings.toMap() : null) ??
+            // ignore: deprecated_member_use_from_same_package
+            params.initialOptions?.toMap() ??
+            initialSettings.toMap();
 
     Map<String, dynamic> pullToRefreshSettings =
-        _androidParams.pullToRefreshController?.params.settings.toMap() ??
+        params.pullToRefreshController?.params.settings.toMap() ??
             // ignore: deprecated_member_use_from_same_package
-            _androidParams.pullToRefreshController?.params.options.toMap() ??
+            params.pullToRefreshController?.params.options.toMap() ??
             PullToRefreshSettings(enabled: false).toMap();
 
-    if ((_androidParams.headlessWebView?.isRunning() ?? false) &&
-        _androidParams.keepAlive != null) {
-      final headlessId = _androidParams.headlessWebView?.id;
+    if ((params.headlessWebView?.isRunning() ?? false) &&
+        params.keepAlive != null) {
+      final headlessId = params.headlessWebView?.id;
       if (headlessId != null) {
         // force keep alive id to match headless webview id
-        _androidParams.keepAlive?.id = headlessId;
+        params.keepAlive?.id = headlessId;
       }
     }
 
-    var useHybridComposition = (_androidParams.initialSettings != null
+    var useHybridComposition = (params.initialSettings != null
             ? initialSettings.useHybridComposition
-            : _androidParams.initialOptions?.android.useHybridComposition) ??
+            : params.initialOptions?.android.useHybridComposition) ??
         true;
 
     return PlatformViewLink(
-      key: _androidParams.key,
+      key: params.key,
       viewType: 'com.pichillilorenzo/flutter_inappwebview',
       surfaceFactory: (
         BuildContext context,
@@ -325,7 +323,7 @@ class AndroidInAppWebViewWidget extends PlatformInAppWebViewWidget {
       ) {
         return AndroidViewSurface(
           controller: controller as AndroidViewController,
-          gestureRecognizers: _androidParams.gestureRecognizers ??
+          gestureRecognizers: params.gestureRecognizers ??
               const <Factory<OneSequenceGestureRecognizer>>{},
           hitTestBehavior: PlatformViewHitTestBehavior.opaque,
         );
@@ -335,26 +333,28 @@ class AndroidInAppWebViewWidget extends PlatformInAppWebViewWidget {
           hybridComposition: useHybridComposition,
           id: params.id,
           viewType: 'com.pichillilorenzo/flutter_inappwebview',
-          layoutDirection: _androidParams.layoutDirection ??
+          layoutDirection: this.params.layoutDirection ??
               Directionality.maybeOf(context) ??
               TextDirection.rtl,
           creationParams: <String, dynamic>{
-            'initialUrlRequest': _androidParams.initialUrlRequest?.toMap(),
-            'initialFile': _androidParams.initialFile,
-            'initialData': _androidParams.initialData?.toMap(),
+            'initialUrlRequest': this.params.initialUrlRequest?.toMap(),
+            'initialFile': this.params.initialFile,
+            'initialData': this.params.initialData?.toMap(),
             'initialSettings': settingsMap,
-            'contextMenu': _androidParams.contextMenu?.toMap() ?? {},
-            'windowId': _androidParams.windowId,
+            'contextMenu': this.params.contextMenu?.toMap() ?? {},
+            'windowId': this.params.windowId,
             'headlessWebViewId':
-                _androidParams.headlessWebView?.isRunning() ?? false
-                    ? _androidParams.headlessWebView?.id
+                this.params.headlessWebView?.isRunning() ?? false
+                    ? this.params.headlessWebView?.id
                     : null,
-            'initialUserScripts': _androidParams.initialUserScripts
+            'initialUserScripts': this
+                    .params
+                    .initialUserScripts
                     ?.map((e) => e.toMap())
                     .toList() ??
                 [],
             'pullToRefreshSettings': pullToRefreshSettings,
-            'keepAliveId': _androidParams.keepAlive?.id
+            'keepAliveId': this.params.keepAlive?.id
           },
         )
           ..addOnPlatformViewCreatedListener(params.onPlatformViewCreated)
@@ -391,10 +391,10 @@ class AndroidInAppWebViewWidget extends PlatformInAppWebViewWidget {
 
   void _onPlatformViewCreated(int id) {
     dynamic viewId = id;
-    if (_androidParams.headlessWebView?.isRunning() ?? false) {
-      viewId = _androidParams.headlessWebView?.id;
+    if (params.headlessWebView?.isRunning() ?? false) {
+      viewId = params.headlessWebView?.id;
     }
-    viewId = _androidParams.keepAlive?.id ?? viewId ?? id;
+    viewId = params.keepAlive?.id ?? viewId ?? id;
     _androidHeadlessInAppWebView?.internalDispose();
     _controller = AndroidInAppWebViewController(
         PlatformInAppWebViewControllerCreationParams(
@@ -408,42 +408,43 @@ class AndroidInAppWebViewWidget extends PlatformInAppWebViewWidget {
             PlatformInAppWebViewController.debugLoggingSettings,
         method: "onWebViewCreated",
         args: []);
-    if (_androidParams.onWebViewCreated != null) {
-      _androidParams.onWebViewCreated!(
+    if (params.onWebViewCreated != null) {
+      params.onWebViewCreated!(
           params.controllerFromPlatform?.call(_controller!) ?? _controller!);
     }
   }
 
   void _inferInitialSettings(InAppWebViewSettings settings) {
-    if (_androidParams.shouldOverrideUrlLoading != null &&
+    if (params.shouldOverrideUrlLoading != null &&
         settings.useShouldOverrideUrlLoading == null) {
       settings.useShouldOverrideUrlLoading = true;
     }
-    if (_androidParams.onLoadResource != null &&
-        settings.useOnLoadResource == null) {
+    if (params.onLoadResource != null && settings.useOnLoadResource == null) {
       settings.useOnLoadResource = true;
     }
-    if (_androidParams.onDownloadStartRequest != null &&
+    if (params.onDownloadStartRequest != null &&
         settings.useOnDownloadStart == null) {
       settings.useOnDownloadStart = true;
     }
-    if (_androidParams.shouldInterceptAjaxRequest != null &&
+    if ((params.shouldInterceptAjaxRequest != null ||
+            params.onAjaxProgress != null ||
+            params.onAjaxReadyStateChange != null) &&
         settings.useShouldInterceptAjaxRequest == null) {
       settings.useShouldInterceptAjaxRequest = true;
     }
-    if (_androidParams.shouldInterceptFetchRequest != null &&
+    if (params.shouldInterceptFetchRequest != null &&
         settings.useShouldInterceptFetchRequest == null) {
       settings.useShouldInterceptFetchRequest = true;
     }
-    if (_androidParams.shouldInterceptRequest != null &&
+    if (params.shouldInterceptRequest != null &&
         settings.useShouldInterceptRequest == null) {
       settings.useShouldInterceptRequest = true;
     }
-    if (_androidParams.onRenderProcessGone != null &&
+    if (params.onRenderProcessGone != null &&
         settings.useOnRenderProcessGone == null) {
       settings.useOnRenderProcessGone = true;
     }
-    if (_androidParams.onNavigationResponse != null &&
+    if (params.onNavigationResponse != null &&
         settings.useOnNavigationResponse == null) {
       settings.useOnNavigationResponse = true;
     }
@@ -459,11 +460,11 @@ class AndroidInAppWebViewWidget extends PlatformInAppWebViewWidget {
             PlatformInAppWebViewController.debugLoggingSettings,
         method: "dispose",
         args: []);
-    final isKeepAlive = _androidParams.keepAlive != null;
+    final isKeepAlive = params.keepAlive != null;
     _controller?.dispose(isKeepAlive: isKeepAlive);
     _controller = null;
-    _androidParams.pullToRefreshController?.dispose(isKeepAlive: isKeepAlive);
-    _androidParams.findInteractionController?.dispose(isKeepAlive: isKeepAlive);
+    params.pullToRefreshController?.dispose(isKeepAlive: isKeepAlive);
+    params.findInteractionController?.dispose(isKeepAlive: isKeepAlive);
   }
 
   @override

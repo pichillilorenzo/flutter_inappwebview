@@ -87,4 +87,23 @@ public class PluginScript : UserScript {
             messageHandlerNames: messageHandlerNames ?? self.messageHandlerNames
         )
     }
+
+    static func == (lhs: PluginScript, rhs: PluginScript) -> Bool {
+        if #available(iOS 14.0, *) {
+            return lhs.groupName == rhs.groupName &&
+                lhs.source == rhs.source &&
+                lhs.injectionTime == rhs.injectionTime &&
+                lhs.isForMainFrameOnly == rhs.isForMainFrameOnly &&
+                lhs.contentWorld == rhs.contentWorld &&
+                lhs.requiredInAllContentWorlds == rhs.requiredInAllContentWorlds &&
+                lhs.messageHandlerNames == rhs.messageHandlerNames
+        } else {
+            return lhs.groupName == rhs.groupName &&
+                lhs.source == rhs.source &&
+                lhs.injectionTime == rhs.injectionTime &&
+                lhs.isForMainFrameOnly == rhs.isForMainFrameOnly &&
+                lhs.requiredInAllContentWorlds == rhs.requiredInAllContentWorlds &&
+                lhs.messageHandlerNames == rhs.messageHandlerNames
+        }
+    }
 }

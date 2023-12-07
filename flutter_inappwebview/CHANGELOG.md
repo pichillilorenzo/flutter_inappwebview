@@ -1,3 +1,8 @@
+## 6.0.0-beta.32
+
+- Updated minimum platform interface and implementation versions
+- Added `InAppWebViewSettings.interceptOnlyAsyncAjaxRequests` [#1905](https://github.com/pichillilorenzo/flutter_inappwebview/issues/1905)
+
 ## 6.0.0-beta.31
 
 - Updated minimum platform interface and implementation versions

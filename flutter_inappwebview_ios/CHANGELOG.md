@@ -1,3 +1,8 @@
+## 1.0.9
+
+- Implemented `InAppWebViewSettings.interceptOnlyAsyncAjaxRequests`
+- Updated `useShouldInterceptAjaxRequest` automatic infer logic
+
 ## 1.0.8
 
 - Fixed error in InterceptAjaxRequestJS 'Failed to set responseType property'

@@ -26,6 +26,7 @@ public class InAppWebViewSettings: ISettings<InAppWebView> {
     var contentBlockers: [[String: [String : Any]]] = []
     var minimumFontSize = 0
     var useShouldInterceptAjaxRequest = false
+    var interceptOnlyAsyncAjaxRequests = true
     var useShouldInterceptFetchRequest = false
     var incognito = false
     var cacheEnabled = true

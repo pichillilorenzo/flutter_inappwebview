@@ -1,3 +1,8 @@
+## 1.0.8
+
+- Implemented `InAppWebViewSettings.interceptOnlyAsyncAjaxRequests`
+- Updated `useShouldInterceptAjaxRequest` automatic infer logic
+
 ## 1.0.7
 
 - Merged "Fixed error in InterceptAjaxRequestJS 'Failed to set responseType property'" [#1904](https://github.com/pichillilorenzo/flutter_inappwebview/pull/1904) (thanks to [EArminjon](https://github.com/EArminjon))

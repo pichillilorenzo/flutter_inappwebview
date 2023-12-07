@@ -1,3 +1,7 @@
+## 1.0.4
+
+- Updated `flutter_inappwebview_platform_interface` version dependency to `1.0.6`
+
 ## 1.0.3
 
 - Fixed "Flutter 3.7.10 error Dart library 'dart:ui_web' is not available on this platform" [#1900](https://github.com/pichillilorenzo/flutter_inappwebview/issues/1900)

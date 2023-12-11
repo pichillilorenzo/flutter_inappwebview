@@ -46,6 +46,11 @@ public class InAppWebViewManager: ChannelDelegate {
                 disposeKeepAlive(keepAliveId: keepAliveId)
                 result(true)
                 break
+            case "clearAllCache":
+                let includeDiskFiles = arguments!["includeDiskFiles"] as! Bool
+                clearAllCache(includeDiskFiles: includeDiskFiles, completionHandler: {
+                    result(true)
+                })
             default:
                 result(FlutterMethodNotImplemented)
                 break
@@ -83,6 +88,19 @@ public class InAppWebViewManager: ChannelDelegate {
             flutterWebView.dispose(removeFromSuperview: true)
             keepAliveWebViews[keepAliveId] = nil
         }
+    }
+    
+    public func clearAllCache(includeDiskFiles: Bool, completionHandler: @escaping () -> Void) {
+        var websiteDataTypes = Set([WKWebsiteDataTypeMemoryCache])
+        if includeDiskFiles {
+            websiteDataTypes.insert(WKWebsiteDataTypeDiskCache)
+            if #available(macOS 10.13.4, *) {
+                websiteDataTypes.insert(WKWebsiteDataTypeFetchCache)
+            }
+            websiteDataTypes.insert(WKWebsiteDataTypeOfflineWebApplicationCache)
+        }
+        let date = NSDate(timeIntervalSince1970: 0)
+        WKWebsiteDataStore.default().removeData(ofTypes: websiteDataTypes, modifiedSince: date as Date, completionHandler: completionHandler)
     }
     
     public override func dispose() {

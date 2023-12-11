@@ -1,8 +1,14 @@
 ## 6.0.0-beta.32
 
 - Updated minimum platform interface and implementation versions
-- Updated `useShouldInterceptAjaxRequest` automatic infer logic
 - Added `InAppWebViewSettings.interceptOnlyAsyncAjaxRequests` [#1905](https://github.com/pichillilorenzo/flutter_inappwebview/issues/1905)
+- Added `InAppWebViewController.clearFormData` Android-specific method
+- Added `InAppWebViewController.clearAllCache` static method
+- Added `CookieManager.removeSessionCookies` Android-specific method
+- Deprecated `InAppWebViewController.clearCache` and `InAppWebViewSettings.clearCache`. Use `InAppWebViewController.clearAllCache` static method instead
+- Deprecated `InAppWebViewSettings.clearSessionCache`. Use `CookieManager.removeSessionCookies` method instead
+- Updated `useShouldInterceptAjaxRequest` automatic infer logic
+- Updated `CookieManager` methods return value
 - Fixed "iOS crash at public func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage)" [#1912](https://github.com/pichillilorenzo/flutter_inappwebview/issues/1912)
 - Fixed "iOS Fatal Crash" [#1894](https://github.com/pichillilorenzo/flutter_inappwebview/issues/1894)
 - Fixed "getFavicons: _TypeError: type '_Map<String, dynamic>' is not a subtype of type 'Iterable<dynamic>'" [#1897](https://github.com/pichillilorenzo/flutter_inappwebview/issues/1897)

@@ -1,6 +1,7 @@
 ## 1.0.4
 
 - Updated `flutter_inappwebview_platform_interface` version dependency to `1.0.6`
+- Updated `CookieManager` methods return value
 
 ## 1.0.3
 

@@ -305,7 +305,7 @@ class MacOSCookieManager extends PlatformCookieManager with ChannelController {
   }
 
   @override
-  Future<void> deleteCookie(
+  Future<bool> deleteCookie(
       {required WebUri url,
       required String name,
       String path = "/",
@@ -327,7 +327,7 @@ class MacOSCookieManager extends PlatformCookieManager with ChannelController {
           domain: domain,
           maxAge: -1,
           webViewController: webViewController);
-      return;
+      return true;
     }
 
     Map<String, dynamic> args = <String, dynamic>{};
@@ -335,11 +335,11 @@ class MacOSCookieManager extends PlatformCookieManager with ChannelController {
     args.putIfAbsent('name', () => name);
     args.putIfAbsent('domain', () => domain);
     args.putIfAbsent('path', () => path);
-    await channel?.invokeMethod('deleteCookie', args);
+    return await channel?.invokeMethod<bool>('deleteCookie', args) ?? false;
   }
 
   @override
-  Future<void> deleteCookies(
+  Future<bool> deleteCookies(
       {required WebUri url,
       String path = "/",
       String? domain,
@@ -363,20 +363,20 @@ class MacOSCookieManager extends PlatformCookieManager with ChannelController {
             maxAge: -1,
             webViewController: webViewController);
       }
-      return;
+      return true;
     }
 
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('url', () => url.toString());
     args.putIfAbsent('domain', () => domain);
     args.putIfAbsent('path', () => path);
-    await channel?.invokeMethod('deleteCookies', args);
+    return await channel?.invokeMethod<bool>('deleteCookies', args) ?? false;
   }
 
   @override
-  Future<void> deleteAllCookies() async {
+  Future<bool> deleteAllCookies() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    await channel?.invokeMethod('deleteAllCookies', args);
+    return await channel?.invokeMethod<bool>('deleteAllCookies', args) ?? false;
   }
 
   @override

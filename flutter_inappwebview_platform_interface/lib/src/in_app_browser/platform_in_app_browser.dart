@@ -64,7 +64,7 @@ class PlatformInAppBrowserCreationParams {
 ///- Android native WebView
 ///- iOS
 ///- MacOS
-///@{endtemplate}
+///{@endtemplate}
 abstract class PlatformInAppBrowser extends PlatformInterface
     implements Disposable {
   ///Debug settings.
@@ -75,43 +75,43 @@ abstract class PlatformInAppBrowser extends PlatformInterface
 
   ///{@template flutter_inappwebview_platform_interface.PlatformInAppBrowser.id}
   ///View ID used internally.
-  ///@{endtemplate}
+  ///{@endtemplate}
   String get id {
     throw UnimplementedError('id is not implemented on the current platform');
   }
 
   ///{@template flutter_inappwebview_platform_interface.PlatformInAppBrowser.contextMenu}
   ///Context menu used by the browser. It should be set before opening the browser.
-  ///@{endtemplate}
+  ///{@endtemplate}
   ContextMenu? get contextMenu => params.contextMenu;
 
   ///{@template flutter_inappwebview_platform_interface.PlatformInAppBrowser.pullToRefreshController}
   ///Represents the pull-to-refresh feature controller.
-  ///@{endtemplate}
+  ///{@endtemplate}
   PlatformPullToRefreshController? get pullToRefreshController =>
       params.pullToRefreshController;
 
   ///{@template flutter_inappwebview_platform_interface.PlatformInAppBrowser.findInteractionController}
   ///Represents the find interaction feature controller.
-  ///@{endtemplate}
+  ///{@endtemplate}
   PlatformFindInteractionController? get findInteractionController =>
       params.findInteractionController;
 
   ///{@template flutter_inappwebview_platform_interface.PlatformInAppBrowser.initialUserScripts}
   ///Initial list of user scripts to be loaded at start or end of a page loading.
-  ///@{endtemplate}
+  ///{@endtemplate}
   UnmodifiableListView<UserScript>? get initialUserScripts =>
       params.initialUserScripts;
 
   ///{@template flutter_inappwebview_platform_interface.PlatformInAppBrowser.windowId}
   ///The window id of a [CreateWindowAction.windowId].
-  ///@{endtemplate}
+  ///{@endtemplate}
   int? get windowId => params.windowId;
 
   ///{@template flutter_inappwebview_platform_interface.PlatformInAppBrowser.webViewController}
   ///WebView Controller that can be used to access the [PlatformInAppWebViewController] API.
   ///When [onExit] is fired, this will be `null` and cannot be used anymore.
-  ///@{endtemplate}
+  ///{@endtemplate}
   PlatformInAppWebViewController? get webViewController {
     throw UnimplementedError(
         'webViewController is not implemented on the current platform');

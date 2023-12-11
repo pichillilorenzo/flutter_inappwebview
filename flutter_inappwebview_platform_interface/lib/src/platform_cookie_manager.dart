@@ -176,6 +176,9 @@ abstract class PlatformCookieManager extends PlatformInterface {
   ///from the current context of the `WebView` managed by that controller when you need to target iOS below 11, MacOS below 10.13 and Web platform. JavaScript must be enabled in order to work.
   ///In this case the [url] parameter is ignored.
   ///
+  ///The return value indicates whether the cookie was deleted successfully.
+  ///Note that it will return always `true` for Web platform, iOS below 11.0 and MacOS below 10.13.
+  ///
   ///**NOTE for iOS below 11.0 and MacOS below 10.13**: If [webViewController] is `null` or JavaScript is disabled for it, it will try to use a [PlatformHeadlessInAppWebView]
   ///to delete the cookie (session-only cookie and cookie with `isHttpOnly` enabled won't be deleted!).
   ///
@@ -189,7 +192,7 @@ abstract class PlatformCookieManager extends PlatformInterface {
   ///- MacOS ([Official API - WKHTTPCookieStore.delete](https://developer.apple.com/documentation/webkit/wkhttpcookiestore/2882009-delete)
   ///- Web
   ///{@endtemplate}
-  Future<void> deleteCookie(
+  Future<bool> deleteCookie(
       {required WebUri url,
       required String name,
       String path = "/",
@@ -210,6 +213,9 @@ abstract class PlatformCookieManager extends PlatformInterface {
   ///from the current context of the `WebView` managed by that controller when you need to target iOS below 11, MacOS below 10.13 and Web platform. JavaScript must be enabled in order to work.
   ///In this case the [url] parameter is ignored.
   ///
+  ///The return value indicates whether cookies were deleted successfully.
+  ///Note that it will return always `true` for Web platform, iOS below 11.0 and MacOS below 10.13.
+  ///
   ///**NOTE for iOS below 11.0 and MacOS below 10.13**: If [webViewController] is `null` or JavaScript is disabled for it, it will try to use a [PlatformHeadlessInAppWebView]
   ///to delete the cookies (session-only cookies and cookies with `isHttpOnly` enabled won't be deleted!).
   ///
@@ -223,7 +229,7 @@ abstract class PlatformCookieManager extends PlatformInterface {
   ///- MacOS
   ///- Web
   ///{@endtemplate}
-  Future<void> deleteCookies(
+  Future<bool> deleteCookies(
       {required WebUri url,
       String path = "/",
       String? domain,
@@ -237,6 +243,9 @@ abstract class PlatformCookieManager extends PlatformInterface {
   ///{@template flutter_inappwebview_platform_interface.PlatformCookieManager.deleteAllCookies}
   ///Removes all cookies.
   ///
+  ///The return value indicates whether any cookies were removed.
+  ///Note that it will return always `true` for Web, iOS and MacOS platforms.
+  ///
   ///**NOTE for iOS**: available from iOS 11.0+.
   ///
   ///**NOTE for MacOS**: available from iOS 10.13+.
@@ -246,7 +255,7 @@ abstract class PlatformCookieManager extends PlatformInterface {
   ///- iOS ([Official API - WKWebsiteDataStore.removeData](https://developer.apple.com/documentation/webkit/wkwebsitedatastore/1532938-removedata))
   ///- MacOS ([Official API - WKWebsiteDataStore.removeData](https://developer.apple.com/documentation/webkit/wkwebsitedatastore/1532938-removedata))
   ///{@endtemplate}
-  Future<void> deleteAllCookies() {
+  Future<bool> deleteAllCookies() {
     throw UnimplementedError(
         'deleteAllCookies is not implemented on the current platform');
   }
@@ -265,5 +274,18 @@ abstract class PlatformCookieManager extends PlatformInterface {
   Future<List<Cookie>> getAllCookies() {
     throw UnimplementedError(
         'getAllCookies is not implemented on the current platform');
+  }
+
+  ///{@template flutter_inappwebview_platform_interface.PlatformCookieManager.removeSessionCookies}
+  ///Removes all session cookies, which are cookies without an expiration date.
+  ///
+  ///The return value indicates whether any cookies were removed.
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Android native WebView ([Official API - CookieManager.removeSessionCookies](https://developer.android.com/reference/android/webkit/CookieManager#removeSessionCookies(android.webkit.ValueCallback%3Cjava.lang.Boolean%3E)))
+  ///{@endtemplate}
+  Future<bool> removeSessionCookies() {
+    throw UnimplementedError(
+        'removeSessionCookies is not implemented on the current platform');
   }
 }

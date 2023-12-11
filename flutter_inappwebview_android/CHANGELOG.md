@@ -1,7 +1,10 @@
 ## 1.0.8
 
 - Implemented `InAppWebViewSettings.interceptOnlyAsyncAjaxRequests`
+- Implemented `PlatformInAppWebViewController.clearFormData` method
+- Implemented `PlatformCookieManager.removeSessionCookies` method
 - Updated `useShouldInterceptAjaxRequest` automatic infer logic
+- Updated `CookieManager` methods return value
 
 ## 1.0.7
 

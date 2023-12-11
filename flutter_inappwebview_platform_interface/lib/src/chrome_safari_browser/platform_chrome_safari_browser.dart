@@ -41,7 +41,7 @@ abstract class PlatformChromeSafariBrowser extends PlatformInterface
 
   ///{@template flutter_inappwebview_platform_interface.PlatformChromeSafariBrowser.id}
   ///View ID used internally.
-  ///@{endtemplate}
+  ///{@endtemplate}
   String get id {
     throw UnimplementedError('id is not implemented on the current platform');
   }

@@ -672,6 +672,10 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
     return isLoading;
   }
 
+  /**
+   * @deprecated
+   */
+  @Deprecated
   private void clearCookies() {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
       CookieManager.getInstance().removeAllCookies(new ValueCallback<Boolean>() {
@@ -685,6 +689,10 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
     }
   }
 
+  /**
+   * @deprecated
+   */
+  @Deprecated
   public void clearAllCache() {
     clearCache(true);
     clearCookies();

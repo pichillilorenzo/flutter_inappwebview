@@ -49,6 +49,12 @@ void setGetDelete() {
 
     final url = WebUri(await pageLoaded.future);
 
+    if (defaultTargetPlatform == TargetPlatform.android) {
+      await cookieManager.setCookie(
+          url: url, name: "myCookie", value: "myValue");
+      expect(await cookieManager.removeSessionCookies(), isTrue);
+    }
+
     await cookieManager.setCookie(url: url, name: "myCookie", value: "myValue");
     List<Cookie> cookies = await cookieManager.getCookies(url: url);
     expect(cookies, isNotEmpty);
@@ -56,12 +62,20 @@ void setGetDelete() {
     Cookie? cookie = await cookieManager.getCookie(url: url, name: "myCookie");
     expect(cookie?.value.toString(), "myValue");
 
-    await cookieManager.deleteCookie(url: url, name: "myCookie");
+    expect(
+        await cookieManager.deleteCookie(url: url, name: "myCookie"), isTrue);
     cookie = await cookieManager.getCookie(url: url, name: "myCookie");
     expect(cookie, isNull);
 
-    await cookieManager.deleteCookies(
-        url: url, domain: ".${TEST_CROSS_PLATFORM_URL_1.host}");
+    expect(
+        await cookieManager.deleteCookies(
+            url: url, domain: ".${TEST_CROSS_PLATFORM_URL_1.host}"),
+        isTrue);
+    cookies = await cookieManager.getCookies(url: url);
+    expect(cookies, isEmpty);
+
+    await cookieManager.setCookie(url: url, name: "myCookie", value: "myValue");
+    expect(await cookieManager.deleteAllCookies(), isTrue);
     cookies = await cookieManager.getCookies(url: url);
     expect(cookies, isEmpty);
 

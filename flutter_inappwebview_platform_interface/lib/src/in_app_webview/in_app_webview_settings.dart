@@ -79,7 +79,8 @@ class InAppWebViewSettings_ {
       platforms: [AndroidPlatform(), IOSPlatform(), MacOSPlatform()])
   bool? useOnDownloadStart;
 
-  ///Set to `true` to have all the browser's cache cleared before the new WebView is opened. The default value is `false`.
+  ///Use [PlatformInAppWebViewController.clearAllCache] instead.
+  @Deprecated("Use InAppWebViewController.clearAllCache instead")
   @SupportedPlatforms(
       platforms: [AndroidPlatform(), IOSPlatform(), MacOSPlatform()])
   bool? clearCache;
@@ -398,7 +399,8 @@ because there isn't any way to make the website data store non-persistent for th
   ])
   int? textZoom;
 
-  ///Set to `true` to have the session cookie cache cleared before the new window is opened.
+  ///Use [PlatformCookieManager.removeSessionCookies] instead.
+  @Deprecated("Use CookieManager.removeSessionCookies instead")
   @SupportedPlatforms(platforms: [AndroidPlatform()])
   bool? clearSessionCache;
 

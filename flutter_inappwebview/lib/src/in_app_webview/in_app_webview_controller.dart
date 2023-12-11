@@ -206,6 +206,7 @@ class InAppWebViewController {
       platform.getCopyBackForwardList();
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.clearCache}
+  @Deprecated("Use InAppWebViewController.clearAllCache instead")
   Future<void> clearCache() => platform.clearCache();
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.findAllAsync}
@@ -457,6 +458,9 @@ class InAppWebViewController {
   ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.isInFullscreen}
   Future<bool> isInFullscreen() => platform.isInFullscreen();
 
+  ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.clearFormData}
+  Future<void> clearFormData() => platform.clearFormData();
+
   ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.getCameraCaptureState}
   Future<MediaCaptureState?> getCameraCaptureState() =>
       platform.getCameraCaptureState();
@@ -534,6 +538,11 @@ class InAppWebViewController {
   ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.disposeKeepAlive}
   static Future<void> disposeKeepAlive(InAppWebViewKeepAlive keepAlive) =>
       PlatformInAppWebViewController.static().disposeKeepAlive(keepAlive);
+
+  ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.clearAllCache}
+  static Future<void> clearAllCache({bool includeDiskFiles = true}) =>
+      PlatformInAppWebViewController.static()
+          .clearAllCache(includeDiskFiles: includeDiskFiles);
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.tRexRunnerHtml}
   static Future<String> get tRexRunnerHtml =>

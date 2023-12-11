@@ -100,6 +100,9 @@ public class MyCookieManager extends ChannelDelegateImpl {
       case "deleteAllCookies":
         deleteAllCookies(result);
         break;
+      case "removeSessionCookies":
+        removeSessionCookies(result);
+        break;
       default:
         result.notImplemented();
     }
@@ -151,7 +154,10 @@ public class MyCookieManager extends ChannelDelegateImpl {
                                String sameSite,
                                final MethodChannel.Result result) {
     cookieManager = getCookieManager();
-    if (cookieManager == null) return;
+    if (cookieManager == null) {
+      result.success(false);
+      return;
+    }
 
     String cookieValue = name + "=" + value + "; Path=" + path;
 
@@ -188,9 +194,9 @@ public class MyCookieManager extends ChannelDelegateImpl {
       CookieSyncManager cookieSyncMngr = CookieSyncManager.createInstance(plugin.applicationContext);
       cookieSyncMngr.startSync();
       cookieManager.setCookie(url, cookieValue);
-      result.success(true);
       cookieSyncMngr.stopSync();
       cookieSyncMngr.sync();
+      result.success(true);
     } else {
       cookieManager.setCookie(url, cookieValue);
       result.success(true);
@@ -281,7 +287,10 @@ public class MyCookieManager extends ChannelDelegateImpl {
 
   public void deleteCookie(String url, String name, String domain, String path, final MethodChannel.Result result) {
     cookieManager = getCookieManager();
-    if (cookieManager == null) return;
+    if (cookieManager == null) {
+      result.success(false);
+      return;
+    }
 
     String cookieValue = name + "=; Path=" + path + "; Max-Age=-1";
 
@@ -294,7 +303,7 @@ public class MyCookieManager extends ChannelDelegateImpl {
       cookieManager.setCookie(url, cookieValue, new ValueCallback<Boolean>() {
         @Override
         public void onReceiveValue(Boolean successful) {
-          result.success(true);
+          result.success(successful);
         }
       });
       cookieManager.flush();
@@ -303,9 +312,9 @@ public class MyCookieManager extends ChannelDelegateImpl {
       CookieSyncManager cookieSyncMngr = CookieSyncManager.createInstance(plugin.applicationContext);
       cookieSyncMngr.startSync();
       cookieManager.setCookie(url, cookieValue);
-      result.success(true);
       cookieSyncMngr.stopSync();
       cookieSyncMngr.sync();
+      result.success(true);
     } else {
       cookieManager.setCookie(url, cookieValue);
       result.success(true);
@@ -314,7 +323,10 @@ public class MyCookieManager extends ChannelDelegateImpl {
 
   public void deleteCookies(String url, String domain, String path, final MethodChannel.Result result) {
     cookieManager = getCookieManager();
-    if (cookieManager == null) return;
+    if (cookieManager == null) {
+      result.success(false);
+      return;
+    }
 
     CookieSyncManager cookieSyncMngr = null;
 
@@ -355,13 +367,16 @@ public class MyCookieManager extends ChannelDelegateImpl {
 
   public void deleteAllCookies(final MethodChannel.Result result) {
     cookieManager = getCookieManager();
-    if (cookieManager == null) return;
+    if (cookieManager == null) {
+      result.success(false);
+      return;
+    }
 
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
       cookieManager.removeAllCookies(new ValueCallback<Boolean>() {
         @Override
         public void onReceiveValue(Boolean successful) {
-          result.success(true);
+          result.success(successful);
         }
       });
       cookieManager.flush();
@@ -370,11 +385,40 @@ public class MyCookieManager extends ChannelDelegateImpl {
       CookieSyncManager cookieSyncMngr = CookieSyncManager.createInstance(plugin.applicationContext);
       cookieSyncMngr.startSync();
       cookieManager.removeAllCookie();
-      result.success(true);
       cookieSyncMngr.stopSync();
       cookieSyncMngr.sync();
+      result.success(true);
     } else {
       cookieManager.removeAllCookie();
+      result.success(true);
+    }
+  }
+
+  public void removeSessionCookies(final MethodChannel.Result result) {
+    cookieManager = getCookieManager();
+    if (cookieManager == null) {
+      result.success(false);
+      return;
+    }
+
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+      cookieManager.removeSessionCookies(new ValueCallback<Boolean>() {
+        @Override
+        public void onReceiveValue(Boolean successful) {
+          result.success(successful);
+        }
+      });
+      cookieManager.flush();
+    }
+    else if (plugin != null) {
+      CookieSyncManager cookieSyncMngr = CookieSyncManager.createInstance(plugin.applicationContext);
+      cookieSyncMngr.startSync();
+      cookieManager.removeSessionCookie();
+      cookieSyncMngr.stopSync();
+      cookieSyncMngr.sync();
+      result.success(true);
+    } else {
+      cookieManager.removeSessionCookie();
       result.success(true);
     }
   }

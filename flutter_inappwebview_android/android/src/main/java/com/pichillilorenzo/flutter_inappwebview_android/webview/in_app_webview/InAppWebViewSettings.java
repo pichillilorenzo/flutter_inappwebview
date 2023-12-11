@@ -31,6 +31,10 @@ public class InAppWebViewSettings implements ISettings<InAppWebViewInterface> {
   public Boolean useShouldOverrideUrlLoading = false;
   public Boolean useOnLoadResource = false;
   public Boolean useOnDownloadStart = false;
+  /**
+   * @deprecated
+   */
+  @Deprecated
   public Boolean clearCache = false;
   public String userAgent = "";
   public String applicationNameForUserAgent = "";
@@ -57,6 +61,10 @@ public class InAppWebViewSettings implements ISettings<InAppWebViewInterface> {
   public Boolean allowUniversalAccessFromFileURLs = false;
   public Boolean allowBackgroundAudioPlaying = false;
   public Integer textZoom = 100;
+  /**
+   * @deprecated
+   */
+  @Deprecated
   public Boolean clearSessionCache = false;
   public Boolean builtInZoomControls = true;
   public Boolean displayZoomControls = false;

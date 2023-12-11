@@ -93,7 +93,7 @@ class CookieManager {
           webViewController: webViewController?.platform);
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformCookieManager.deleteCookie}
-  Future<void> deleteCookie(
+  Future<bool> deleteCookie(
           {required WebUri url,
           required String name,
           String path = "/",
@@ -110,7 +110,7 @@ class CookieManager {
           webViewController: webViewController?.platform);
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformCookieManager.deleteCookies}
-  Future<void> deleteCookies(
+  Future<bool> deleteCookies(
           {required WebUri url,
           String path = "/",
           String? domain,
@@ -125,10 +125,13 @@ class CookieManager {
           webViewController: webViewController?.platform);
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformCookieManager.deleteAllCookies}
-  Future<void> deleteAllCookies() => platform.deleteAllCookies();
+  Future<bool> deleteAllCookies() => platform.deleteAllCookies();
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformCookieManager.getAllCookies}
   Future<List<Cookie>> getAllCookies() => platform.getAllCookies();
+
+  ///{@macro flutter_inappwebview_platform_interface.PlatformCookieManager.removeSessionCookies}
+  Future<bool> removeSessionCookies() => platform.removeSessionCookies();
 }
 
 ///Class that contains only iOS-specific methods of [CookieManager].

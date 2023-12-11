@@ -1,7 +1,10 @@
 ## 1.0.6
 
-- Updated `InAppWebViewSettings.useShouldInterceptAjaxRequest` docs
 - Added `InAppWebViewSettings.interceptOnlyAsyncAjaxRequests` [#1905](https://github.com/pichillilorenzo/flutter_inappwebview/issues/1905)
+- Added `PlatformInAppWebViewController.clearFormData` method
+- Added `PlatformCookieManager.removeSessionCookies` method
+- Updated `InAppWebViewSettings.useShouldInterceptAjaxRequest` docs
+- Updated `PlatformCookieManager` methods return value
 
 ## 1.0.5
 

@@ -30,6 +30,10 @@ public enum WebViewChannelDelegateMethods {
   isHidden,
   getCopyBackForwardList,
   startSafeBrowsing,
+  /**
+   * @deprecated
+   */
+  @Deprecated
   clearCache,
   clearSslPreferences,
   /**
@@ -77,5 +81,6 @@ public enum WebViewChannelDelegateMethods {
   addWebMessageListener,
   canScrollVertically,
   canScrollHorizontally,
-  isInFullscreen
+  isInFullscreen,
+  clearFormData
 }

@@ -66,9 +66,9 @@ public class WebViewChannelDelegate extends ChannelDelegateImpl {
   static final String LOG_TAG = "WebViewChannelDelegate";
 
   @Nullable
-  private InAppWebViewInterface webView;
+  private InAppWebView webView;
 
-  public WebViewChannelDelegate(@NonNull InAppWebViewInterface webView, @NonNull MethodChannel channel) {
+  public WebViewChannelDelegate(@NonNull InAppWebView webView, @NonNull MethodChannel channel) {
     super(channel);
     this.webView = webView;
   }
@@ -670,6 +670,11 @@ public class WebViewChannelDelegate extends ChannelDelegateImpl {
           result.success(false);
         }
         break;
+      case clearFormData:
+        if (webView != null) {
+          webView.clearFormData();
+        }
+        result.success(true);
     }
   }
 

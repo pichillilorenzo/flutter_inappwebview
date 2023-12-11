@@ -96,15 +96,17 @@ public class InAppWebViewManager extends ChannelDelegateImpl {
           result.success(false);
         break;
       case "getCurrentWebViewPackage":
-        Context context = null;
-        if (plugin != null) {
-          context = plugin.activity;
-          if (context == null) {
-            context = plugin.applicationContext;
+        {
+          Context context = null;
+          if (plugin != null) {
+            context = plugin.activity;
+            if (context == null) {
+              context = plugin.applicationContext;
+            }
           }
+          PackageInfo packageInfo = context != null ? WebViewCompat.getCurrentWebViewPackage(context) : null;
+          result.success(packageInfo != null ? convertWebViewPackageToMap(packageInfo) : null);
         }
-        PackageInfo packageInfo = context != null ? WebViewCompat.getCurrentWebViewPackage(context) : null;
-        result.success(packageInfo != null ? convertWebViewPackageToMap(packageInfo) : null);
         break;
       case "setWebContentsDebuggingEnabled":
         {
@@ -144,6 +146,22 @@ public class InAppWebViewManager extends ChannelDelegateImpl {
         }
         result.success(true);
         break;
+      case "clearAllCache":
+        {
+          Context context = null;
+          if (plugin != null) {
+            context = plugin.activity;
+            if (context == null) {
+              context = plugin.applicationContext;
+            }
+            if (context != null) {
+              boolean includeDiskFiles = (boolean) call.argument("includeDiskFiles");
+              clearAllCache(context, includeDiskFiles);
+            }
+          }
+        }
+        result.success(true);
+        break;
       default:
         result.notImplemented();
     }
@@ -176,6 +194,12 @@ public class InAppWebViewManager extends ChannelDelegateImpl {
     if (keepAliveWebViews.containsKey(keepAliveId)) {
       keepAliveWebViews.put(keepAliveId, null);
     }
+  }
+
+  public void clearAllCache(@NonNull Context context, boolean includeDiskFiles) {
+    WebView tempWebView = new WebView(context);
+    tempWebView.clearCache(includeDiskFiles);
+    tempWebView.destroy();
   }
 
   @Override

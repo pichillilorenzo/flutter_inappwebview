@@ -241,7 +241,7 @@ class WebPlatformCookieManager extends PlatformCookieManager
   }
 
   @override
-  Future<void> deleteCookie(
+  Future<bool> deleteCookie(
       {required WebUri url,
       required String name,
       String path = "/",
@@ -262,11 +262,11 @@ class WebPlatformCookieManager extends PlatformCookieManager
         domain: domain,
         maxAge: -1,
         webViewController: webViewController);
-    return;
+    return true;
   }
 
   @override
-  Future<void> deleteCookies(
+  Future<bool> deleteCookies(
       {required WebUri url,
       String path = "/",
       String? domain,
@@ -289,7 +289,7 @@ class WebPlatformCookieManager extends PlatformCookieManager
           maxAge: -1,
           webViewController: webViewController);
     }
-    return;
+    return true;
   }
 
   Future<String> _getCookieExpirationDate(int expiresDate) async {

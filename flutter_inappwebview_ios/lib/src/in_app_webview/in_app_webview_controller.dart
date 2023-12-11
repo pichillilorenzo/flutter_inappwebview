@@ -2056,6 +2056,7 @@ class IOSInAppWebViewController extends PlatformInAppWebViewController
   }
 
   @override
+  @Deprecated("Use InAppWebViewController.clearAllCache instead")
   Future<void> clearCache() async {
     Map<String, dynamic> args = <String, dynamic>{};
     await channel?.invokeMethod('clearCache', args);
@@ -2702,6 +2703,13 @@ class IOSInAppWebViewController extends PlatformInAppWebViewController
     args.putIfAbsent('keepAliveId', () => keepAlive.id);
     await _staticChannel.invokeMethod('disposeKeepAlive', args);
     _keepAliveMap[keepAlive] = null;
+  }
+
+  @override
+  Future<void> clearAllCache({bool includeDiskFiles = true}) async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    args.putIfAbsent('includeDiskFiles', () => includeDiskFiles);
+    await _staticChannel.invokeMethod('clearAllCache', args);
   }
 
   @override

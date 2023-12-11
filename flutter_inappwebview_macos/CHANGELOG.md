@@ -2,6 +2,7 @@
 
 - Implemented `InAppWebViewSettings.interceptOnlyAsyncAjaxRequests`
 - Updated `useShouldInterceptAjaxRequest` automatic infer logic
+- Fixed "iOS crash at public func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage)" [#1912](https://github.com/pichillilorenzo/flutter_inappwebview/issues/1912)
 
 ## 1.0.6
 

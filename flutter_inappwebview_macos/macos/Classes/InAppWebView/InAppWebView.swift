@@ -44,7 +44,7 @@ public class InAppWebView: WKWebView, WKUIDelegate,
     
     var customIMPs: [IMP] = []
     
-    var callAsyncJavaScriptBelowIOS14Results: [String:((Any?) -> Void)] = [:]
+    var callAsyncJavaScriptBelowMacOS11Results: [String:((Any?) -> Void)] = [:]
     
     var currentOpenPanel: NSOpenPanel?
     
@@ -941,7 +941,7 @@ public class InAppWebView: WKWebView, WKUIDelegate,
         
         let resultUuid = NSUUID().uuidString
         if let completionHandler = completionHandler {
-            callAsyncJavaScriptBelowIOS14Results[resultUuid] = completionHandler
+            callAsyncJavaScriptBelowMacOS11Results[resultUuid] = completionHandler
         }
         
         var functionArgumentNamesList: [String] = []
@@ -970,7 +970,7 @@ public class InAppWebView: WKWebView, WKUIDelegate,
                                    error.localizedDescription
                 self.channelDelegate?.onConsoleMessage(message: String(describing: errorMessage), messageLevel: 3)
                 completionHandler?(nil)
-                self.callAsyncJavaScriptBelowIOS14Results.removeValue(forKey: resultUuid)
+                self.callAsyncJavaScriptBelowMacOS11Results.removeValue(forKey: resultUuid)
             }
         }
     }
@@ -2083,7 +2083,11 @@ public class InAppWebView: WKWebView, WKUIDelegate,
 //    }
     
     public func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
-        if message.name.starts(with: "console") {
+        guard let body = message.body as? [String: Any?] else {
+            return
+        }
+        
+        if ["consoleLog", "consoleDebug", "consoleError", "consoleInfo", "consoleWarn"].contains(message.name) {
             var messageLevel = 1
             switch (message.name) {
                 case "consoleLog":
@@ -2107,8 +2111,7 @@ public class InAppWebView: WKWebView, WKUIDelegate,
                     messageLevel = 1
                     break;
             }
-            let body = message.body as! [String: Any?]
-            let consoleMessage = body["message"] as! String
+            let consoleMessage = body["message"] as? String ?? ""
             
             let _windowId = body["_windowId"] as? Int64
             var webView = self
@@ -2116,10 +2119,7 @@ public class InAppWebView: WKWebView, WKUIDelegate,
                 webView = webViewTransport.webView
             }
             webView.channelDelegate?.onConsoleMessage(message: consoleMessage, messageLevel: messageLevel)
-        } else if message.name == "callHandler" {
-            let body = message.body as! [String: Any?]
-            let handlerName = body["handlerName"] as! String
-            
+        } else if message.name == "callHandler", let handlerName = body["handlerName"] as? String {
             if handlerName == "onPrintRequest" {
                 let settings = PrintJobSettings()
                 settings.handledByClient = true
@@ -2142,8 +2142,8 @@ public class InAppWebView: WKWebView, WKUIDelegate,
                 return
             }
             
-            let _callHandlerID = body["_callHandlerID"] as! Int64
-            let args = body["args"] as! String
+            let _callHandlerID = body["_callHandlerID"] as? Int64 ?? 0
+            let args = body["args"] as? String ?? ""
             
             let _windowId = body["_windowId"] as? Int64
             var webView = self
@@ -2180,12 +2180,11 @@ if(window.\(JAVASCRIPT_BRIDGE_NAME)[\(_callHandlerID)] != null) {
             if let channelDelegate = webView.channelDelegate {
                 channelDelegate.onCallJsHandler(handlerName: handlerName, args: args, callback: callback)
             }
-        } else if message.name == "onFindResultReceived" {
-            let body = message.body as! [String: Any?]
-            let findResult = body["findResult"] as! [String: Any]
-            let activeMatchOrdinal = findResult["activeMatchOrdinal"] as! Int
-            let numberOfMatches = findResult["numberOfMatches"] as! Int
-            let isDoneCounting = findResult["isDoneCounting"] as! Bool
+        } else if message.name == "onFindResultReceived",
+                  let findResult = body["findResult"] as? [String: Any],
+                  let activeMatchOrdinal = findResult["activeMatchOrdinal"] as? Int,
+                  let numberOfMatches = findResult["numberOfMatches"] as? Int,
+                  let isDoneCounting = findResult["isDoneCounting"] as? Bool {
             
             let _windowId = body["_windowId"] as? Int64
             var webView = self
@@ -2194,31 +2193,26 @@ if(window.\(JAVASCRIPT_BRIDGE_NAME)[\(_callHandlerID)] != null) {
             }
             webView.findInteractionController?.channelDelegate?.onFindResultReceived(activeMatchOrdinal: activeMatchOrdinal, numberOfMatches: numberOfMatches, isDoneCounting: isDoneCounting)
             webView.channelDelegate?.onFindResultReceived(activeMatchOrdinal: activeMatchOrdinal, numberOfMatches: numberOfMatches, isDoneCounting: isDoneCounting)
-        } else if message.name == "onScrollChanged" {
-            let body = message.body as! [String: Any?]
-            let x = body["x"] as! Int
-            let y = body["y"] as! Int
-            
+        } else if message.name == "onScrollChanged",
+                  let x = body["x"] as? Int,
+                  let y = body["y"] as? Int {
             let _windowId = body["_windowId"] as? Int64
             var webView = self
             if let wId = _windowId, let webViewTransport = plugin?.inAppWebViewManager?.windowWebViews[wId] {
                 webView = webViewTransport.webView
             }
             webView.channelDelegate?.onScrollChanged(x: x, y: y)
-        } else if message.name == "onCallAsyncJavaScriptResultBelowIOS14Received" {
-            let body = message.body as! [String: Any?]
-            let resultUuid = body["resultUuid"] as! String
-            if let result = callAsyncJavaScriptBelowIOS14Results[resultUuid] {
-                result([
-                        "value": body["value"],
-                        "error": body["error"]
-                ])
-                callAsyncJavaScriptBelowIOS14Results.removeValue(forKey: resultUuid)
-            }
-        } else if message.name == "onWebMessagePortMessageReceived" {
-            let body = message.body as! [String: Any?]
-            let webMessageChannelId = body["webMessageChannelId"] as! String
-            let index = body["index"] as! Int64
+        } else if message.name == "onCallAsyncJavaScriptResultBelowIOS14Received",
+                  let resultUuid = body["resultUuid"] as? String,
+                  let result = callAsyncJavaScriptBelowMacOS11Results[resultUuid] {
+            result([
+                    "value": body["value"],
+                    "error": body["error"]
+            ])
+            callAsyncJavaScriptBelowMacOS11Results.removeValue(forKey: resultUuid)
+        } else if message.name == "onWebMessagePortMessageReceived",
+                  let webMessageChannelId = body["webMessageChannelId"] as? String,
+                  let index = body["index"] as? Int64 {
             var webMessage: WebMessage? = nil
             if let webMessageMap = body["message"] as? [String : Any?] {
                 webMessage = WebMessage.fromMap(map: webMessageMap)
@@ -2227,9 +2221,7 @@ if(window.\(JAVASCRIPT_BRIDGE_NAME)[\(_callHandlerID)] != null) {
             if let webMessageChannel = webMessageChannels[webMessageChannelId] {
                 webMessageChannel.channelDelegate?.onMessage(index: index, message: webMessage)
             }
-        } else if message.name == "onWebMessageListenerPostMessageReceived" {
-            let body = message.body as! [String: Any?]
-            let jsObjectName = body["jsObjectName"] as! String
+        } else if message.name == "onWebMessageListenerPostMessageReceived", let jsObjectName = body["jsObjectName"] as? String {
             var webMessage: WebMessage? = nil
             if let webMessageMap = body["message"] as? [String : Any?] {
                 webMessage = WebMessage.fromMap(map: webMessageMap)
@@ -2644,7 +2636,7 @@ if(window.\(JAVASCRIPT_BRIDGE_NAME)[\(_callHandlerID)] != null) {
         uiDelegate = nil
         navigationDelegate = nil
         isPausedTimersCompletionHandler = nil
-        callAsyncJavaScriptBelowIOS14Results.removeAll()
+        callAsyncJavaScriptBelowMacOS11Results.removeAll()
         plugin = nil
     }
     

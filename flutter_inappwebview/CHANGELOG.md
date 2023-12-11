@@ -1,7 +1,19 @@
 ## 6.0.0-beta.32
 
 - Updated minimum platform interface and implementation versions
+- Updated `useShouldInterceptAjaxRequest` automatic infer logic
 - Added `InAppWebViewSettings.interceptOnlyAsyncAjaxRequests` [#1905](https://github.com/pichillilorenzo/flutter_inappwebview/issues/1905)
+- Fixed "iOS crash at public func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage)" [#1912](https://github.com/pichillilorenzo/flutter_inappwebview/issues/1912)
+- Fixed "iOS Fatal Crash" [#1894](https://github.com/pichillilorenzo/flutter_inappwebview/issues/1894)
+- Fixed "getFavicons: _TypeError: type '_Map<String, dynamic>' is not a subtype of type 'Iterable<dynamic>'" [#1897](https://github.com/pichillilorenzo/flutter_inappwebview/issues/1897)
+- Fixed error in InterceptAjaxRequestJS 'Failed to set responseType property'
+- Fixed shouldInterceptAjaxRequest javascript code when overriding XMLHttpRequest.open method parameters
+- Fixed "onClosed not considering back navigation or up button / close button in ChromeSafariBrowser when using noHistory: true" [#1882](https://github.com/pichillilorenzo/flutter_inappwebview/issues/1882)
+- Merged "Fixed error in InterceptAjaxRequestJS 'Failed to set responseType property'" [#1904](https://github.com/pichillilorenzo/flutter_inappwebview/pull/1904) (thanks to [EArminjon](https://github.com/EArminjon))
+
+### BREAKING CHANGE
+
+- Due to Flutter platform channels async nature, using `useShouldInterceptAjaxRequest: true` would break sync ajax requests, so that the `XMLHttpRequest.send()` will not wait for the response. To fix this issue, the default value of `InAppWebViewSettings.interceptOnlyAsyncAjaxRequests` is `true`. To intercept also sync ajax requests, this value should be `false`.
 
 ## 6.0.0-beta.31
 

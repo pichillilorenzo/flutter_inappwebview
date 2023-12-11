@@ -3,8 +3,10 @@ import 'dart:typed_data';
 import 'dart:ui';
 import 'package:flutter/services.dart';
 import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_platform_interface.dart';
-import 'dart:html';
 import 'dart:js' as js;
+import 'dart:js_interop';
+import 'package:web/helpers.dart';
+import 'package:web/web.dart';
 import 'dart:developer';
 
 import 'headless_inappwebview_manager.dart';
@@ -13,8 +15,8 @@ import 'web_platform_manager.dart';
 class InAppWebViewWebElement implements Disposable {
   late dynamic _viewId;
   late BinaryMessenger _messenger;
-  late DivElement iframeContainer;
-  late IFrameElement iframe;
+  late HTMLDivElement iframeContainer;
+  late HTMLIFrameElement iframe;
   late MethodChannel? _channel;
   InAppWebViewSettings? initialSettings;
   URLRequest? initialUrlRequest;
@@ -30,17 +32,17 @@ class InAppWebViewWebElement implements Disposable {
       {required dynamic viewId, required BinaryMessenger messenger}) {
     this._viewId = viewId;
     this._messenger = messenger;
-    iframeContainer = DivElement()
+    iframeContainer = createElementTag('div') as HTMLDivElement
       ..id = 'flutter_inappwebview-$_viewId-container'
       ..style.height = '100%'
       ..style.width = '100%'
       ..style.border = 'none';
-    iframe = IFrameElement()
+    iframe = createIFrameElement()
       ..id = 'flutter_inappwebview-$_viewId'
       ..style.height = '100%'
       ..style.width = '100%'
       ..style.border = 'none';
-    iframeContainer.append(iframe);
+    iframeContainer.append(iframe as JSAny);
 
     _channel = MethodChannel(
       'com.pichillilorenzo/flutter_inappwebview_$_viewId',
@@ -193,7 +195,7 @@ class InAppWebViewWebElement implements Disposable {
         if (webView != null) {
           webView.iframe.id = iframe.id;
           iframe.remove();
-          iframeContainer.append(webView.iframe);
+          iframeContainer.append(webView.iframe as JSAny);
           iframe = webView.iframe;
 
           initialSettings = webView.initialSettings;
@@ -261,7 +263,7 @@ class InAppWebViewWebElement implements Disposable {
     }
   }
 
-  Future<HttpRequest> _makeRequest(URLRequest urlRequest,
+  Future<XMLHttpRequest> _makeRequest(URLRequest urlRequest,
       {bool? withCredentials,
       String? responseType,
       String? mimeType,
@@ -276,11 +278,10 @@ class InAppWebViewWebElement implements Disposable {
         onProgress: onProgress);
   }
 
-  String _convertHttpResponseToData(HttpRequest httpRequest) {
+  String _convertHttpResponseToData(XMLHttpRequest httpRequest) {
     final String contentType =
         httpRequest.getResponseHeader('content-type') ?? 'text/html';
-    return 'data:$contentType,' +
-        Uri.encodeComponent(httpRequest.responseText ?? '');
+    return 'data:$contentType,' + Uri.encodeComponent(httpRequest.responseText);
   }
 
   String getIFrameId() {
@@ -437,12 +438,10 @@ class InAppWebViewWebElement implements Disposable {
   Set<Sandbox> getSandbox() {
     var sandbox = iframe.sandbox;
     Set<Sandbox> values = Set();
-    if (sandbox != null) {
-      for (int i = 0; i < sandbox.length; i++) {
-        var token = Sandbox.fromNativeValue(sandbox.item(i));
-        if (token != null) {
-          values.add(token);
-        }
+    for (int i = 0; i < sandbox.length; i++) {
+      var token = Sandbox.fromNativeValue(sandbox.item(i));
+      if (token != null) {
+        values.add(token);
       }
     }
     return values.isEmpty ? Set.from(Sandbox.values) : values;
@@ -466,19 +465,19 @@ class InAppWebViewWebElement implements Disposable {
     }
 
     if (settings!.iframeAllow != newSettings.iframeAllow) {
-      iframe.allow = newSettings.iframeAllow;
+      iframe.allow = newSettings.iframeAllow ?? '';
     }
     if (settings!.iframeAllowFullscreen != newSettings.iframeAllowFullscreen) {
-      iframe.allowFullscreen = newSettings.iframeAllowFullscreen;
+      iframe.allowFullscreen = newSettings.iframeAllowFullscreen ?? true;
     }
     if (settings!.iframeReferrerPolicy != newSettings.iframeReferrerPolicy) {
-      iframe.referrerPolicy = newSettings.iframeReferrerPolicy?.toNativeValue();
+      iframe.referrerPolicy = newSettings.iframeReferrerPolicy?.toNativeValue() ?? '';
     }
     if (settings!.iframeName != newSettings.iframeName) {
-      iframe.name = newSettings.iframeName;
+      iframe.name = newSettings.iframeName ?? '';
     }
     if (settings!.iframeCsp != newSettings.iframeCsp) {
-      iframe.csp = newSettings.iframeCsp;
+      iframe.csp = newSettings.iframeCsp ?? '';
     }
 
     if (settings!.iframeSandbox != newSettings.iframeSandbox) {

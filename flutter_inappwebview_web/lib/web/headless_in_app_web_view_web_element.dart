@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:ui';
 import 'package:flutter/services.dart';
+import 'package:web/web.dart';
 
 import 'headless_inappwebview_manager.dart';
 import 'in_app_web_view_web_element.dart';
@@ -52,8 +53,8 @@ class HeadlessInAppWebViewWebElement extends ChannelController {
   }
 
   void setSize(Size size) {
-    webView?.iframeContainer.style.width = size.width.toString() + "px";
-    webView?.iframeContainer.style.height = size.height.toString() + "px";
+    webView?.iframeContainer.style.setProperty('width', size.width.toString() + "px");
+    webView?.iframeContainer.style.setProperty('height', size.height.toString() + "px");
   }
 
   InAppWebViewWebElement? disposeAndGetFlutterWebView() {

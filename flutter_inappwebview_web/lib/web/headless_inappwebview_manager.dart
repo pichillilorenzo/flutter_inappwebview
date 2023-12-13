@@ -1,10 +1,11 @@
-import 'dart:html';
-
 import 'package:flutter/services.dart';
 import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_platform_interface.dart';
 import 'web_platform_manager.dart';
 import 'in_app_web_view_web_element.dart';
 import 'headless_in_app_web_view_web_element.dart';
+import 'package:web/web.dart';
+import 'package:web/helpers.dart';
+import 'dart:js_interop';
 
 class HeadlessInAppWebViewManager {
   static final Map<String, HeadlessInAppWebViewWebElement?> webViews = {};
@@ -77,7 +78,7 @@ class HeadlessInAppWebViewManager {
     webView.initialFile = params["initialFile"];
     webView.initialData = InAppWebViewInitialData.fromMap(
         params["initialData"]?.cast<String, dynamic>());
-    document.body?.append(webView.iframeContainer);
+    document.body?.append(webView.iframeContainer as JSAny);
     webView.prepare();
   }
 }

@@ -2,13 +2,13 @@
 
 - Updated minimum platform interface and implementation versions
 - Added `InAppBrowser.onMainWindowWillClose` event
-- Added `WindowType.WINDOW` for `InAppWebViewSettings.windowType`
+- Added `WindowType.WINDOW` for `InAppBrowserSettings.windowType`
 - Fixed "Cloudflare Turnstile failure" [#1738](https://github.com/pichillilorenzo/flutter_inappwebview/issues/1738)
 - Fixed `InAppWebViewController.callAsyncJavaScript` Android-issue when the last line of the `functionBody` parameter includes a code comment
 
 ### BREAKING CHANGES
 
-- Default value of `InAppWebViewSettings.windowType` is `WindowType.WINDOW`
+- Default value of `InAppBrowserSettings.windowType` is `WindowType.WINDOW`
 
 ## 6.0.0-beta.32
 

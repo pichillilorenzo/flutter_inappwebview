@@ -1,7 +1,7 @@
 ## 1.0.7
 
 - Added `InAppBrowser.onMainWindowWillClose` event
-- Added `WindowType.WINDOW` for `InAppWebViewSettings.windowType`
+- Added `WindowType.WINDOW` for `InAppBrowserSettings.windowType`
 
 ## 1.0.6
 

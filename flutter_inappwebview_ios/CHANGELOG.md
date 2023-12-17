@@ -1,3 +1,7 @@
+## 1.0.10
+
+- Updated `flutter_inappwebview_platform_interface` version dependency to `^1.0.7`
+
 ## 1.0.9
 
 - Implemented `InAppWebViewSettings.interceptOnlyAsyncAjaxRequests`

@@ -1,3 +1,8 @@
+## 1.0.7
+
+- Added `InAppBrowser.onMainWindowWillClose` event
+- Added `WindowType.WINDOW` for `InAppWebViewSettings.windowType`
+
 ## 1.0.6
 
 - Added `InAppWebViewSettings.interceptOnlyAsyncAjaxRequests` [#1905](https://github.com/pichillilorenzo/flutter_inappwebview/issues/1905)

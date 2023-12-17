@@ -1,3 +1,8 @@
+## 1.0.8
+
+- Updated `flutter_inappwebview_platform_interface` version dependency to `^1.0.7`
+- Implemented `InAppBrowser.onMainWindowWillClose` event
+
 ## 1.0.7
 
 - Implemented `InAppWebViewSettings.interceptOnlyAsyncAjaxRequests`
@@ -29,7 +34,7 @@
 ## 1.0.1
 
 - Added `PlatformPrintJobController.onComplete` setter
-- Updated `flutter_inappwebview_platform_interface` version dependency to `1.0.2`
+- Updated `flutter_inappwebview_platform_interface` version dependency to `^1.0.2`
 
 ## 1.0.0
 

@@ -8,6 +8,7 @@
 import Foundation
 
 public enum InAppBrowserWindowType: String {
+    case window = "WINDOW"
     case child = "CHILD"
     case tabbed = "TABBED"
 }

@@ -1,3 +1,9 @@
+## 1.0.9
+
+- Updated `flutter_inappwebview_platform_interface` version dependency to `^1.0.7`
+- Fixed "Cloudflare Turnstile failure" [#1738](https://github.com/pichillilorenzo/flutter_inappwebview/issues/1738)
+- Fixed `InAppWebViewController.callAsyncJavaScript` issue when the last line of the `functionBody` parameter includes a code comment
+
 ## 1.0.8
 
 - Implemented `InAppWebViewSettings.interceptOnlyAsyncAjaxRequests`

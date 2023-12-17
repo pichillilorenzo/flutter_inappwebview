@@ -74,7 +74,7 @@ class DefaultInAppLocalhostServer extends PlatformInAppLocalhostServer {
     }
     this._started = true;
 
-    var completer = Completer();
+    final completer = Completer();
 
     runZonedGuarded(() {
       HttpServer.bind('127.0.0.1', _port, shared: _shared).then((server) {
@@ -108,7 +108,7 @@ class DefaultInAppLocalhostServer extends PlatformInAppLocalhostServer {
           var contentType = ContentType('text', 'html', charset: 'utf-8');
           if (!request.requestedUri.path.endsWith('/') &&
               request.requestedUri.pathSegments.isNotEmpty) {
-            var mimeType = MimeTypeResolver.lookup(request.requestedUri.path);
+            final mimeType = MimeTypeResolver.lookup(request.requestedUri.path);
             if (mimeType != null) {
               contentType = _getContentTypeFromMimeType(mimeType);
             }

@@ -26,7 +26,9 @@ void onReceivedIcon() {
             pageLoaded.complete();
           },
           onReceivedIcon: (controller, icon) {
-            onReceivedIconCompleter.complete(icon);
+            if (!onReceivedIconCompleter.isCompleted) {
+              onReceivedIconCompleter.complete(icon);
+            }
           },
         ),
       ),

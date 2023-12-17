@@ -61,6 +61,10 @@ class MyInAppBrowser extends InAppBrowser {
     print("\n\nOverride ${navigationAction.request.url}\n\n");
     return NavigationActionPolicy.ALLOW;
   }
+
+  void onMainWindowWillClose() {
+    close();
+  }
 }
 
 class InAppBrowserExampleScreen extends StatefulWidget {

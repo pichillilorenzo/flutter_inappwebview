@@ -538,4 +538,7 @@ class InAppBrowser implements PlatformInAppBrowserEvents {
       NavigationAction navigationAction) {
     return null;
   }
+
+  @override
+  void onMainWindowWillClose() {}
 }

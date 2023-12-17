@@ -62,7 +62,7 @@ public class InAppBrowserWindow : NSWindow, NSWindowDelegate, NSToolbarDelegate,
         delegate = self
         
         NotificationCenter.default.addObserver(self,
-                                               selector: #selector(onMainWindowClose(_:)),
+                                               selector: #selector(onMainWindowWillClose(_:)),
                                                name: NSWindow.willCloseNotification,
                                                object: NSApplication.shared.mainWindow)
         
@@ -348,13 +348,17 @@ public class InAppBrowserWindow : NSWindow, NSWindowDelegate, NSToolbarDelegate,
         dispose()
     }
     
-    @objc func onMainWindowClose(_ notification: Notification) {
-        close()
+    @objc func onMainWindowWillClose(_ notification: Notification) {
+        if let webViewController = contentViewController as? InAppBrowserWebViewController {
+            webViewController.channelDelegate?.onMainWindowWillClose()
+        }
     }
-    
     
     public func dispose() {
         delegate = nil
+        NotificationCenter.default.removeObserver(self,
+                                                  name: NSWindow.willCloseNotification,
+                                                  object: NSApplication.shared.mainWindow)
         if let webViewController = contentViewController as? InAppBrowserWebViewController {
             webViewController.dispose()
         }

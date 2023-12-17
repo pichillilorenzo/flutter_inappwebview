@@ -122,6 +122,10 @@ class MacOSInAppBrowser extends PlatformInAppBrowser with ChannelController {
           }
         }
         break;
+      case "onMainWindowWillClose":
+        _debugLog(call.method, call.arguments);
+        eventHandler?.onMainWindowWillClose();
+        break;
       case "onExit":
         _debugLog(call.method, call.arguments);
         _isOpened = false;

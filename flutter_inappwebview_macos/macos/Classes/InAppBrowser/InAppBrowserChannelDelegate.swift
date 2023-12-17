@@ -25,6 +25,11 @@ public class InAppBrowserChannelDelegate : ChannelDelegate {
         channel?.invokeMethod("onMenuItemClicked", arguments: arguments)
     }
     
+    public func onMainWindowWillClose() {
+        let arguments: [String: Any?] = [:]
+        channel?.invokeMethod("onMainWindowWillClose", arguments: arguments)
+    }
+    
     public func onExit() {
         let arguments: [String: Any?] = [:]
         channel?.invokeMethod("onExit", arguments: arguments)

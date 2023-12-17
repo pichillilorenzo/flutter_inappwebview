@@ -195,7 +195,7 @@ class InAppBrowserSettings
   WindowTitlebarSeparatorStyle? windowTitlebarSeparatorStyle;
 
   ///How the browser window should be added to the main window.
-  ///The default value is [WindowType.CHILD].
+  ///The default value is [WindowType.WINDOW].
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- MacOS

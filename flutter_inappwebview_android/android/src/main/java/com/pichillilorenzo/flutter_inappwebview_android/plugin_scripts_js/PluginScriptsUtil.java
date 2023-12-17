@@ -18,7 +18,7 @@ public class PluginScriptsUtil {
 
   public static final String CALL_ASYNC_JAVA_SCRIPT_WRAPPER_JS_SOURCE = "(function(obj) {" +
           "  (async function(" + VAR_FUNCTION_ARGUMENT_NAMES + ") {" +
-          "    " + VAR_FUNCTION_BODY +
+          "    \n" + VAR_FUNCTION_BODY + "\n" +
           "  })(" + VAR_FUNCTION_ARGUMENT_VALUES + ").then(function(value) {" +
           "    window." + JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME + ".callHandler('callAsyncJavaScript', {'value': value, 'error': null, 'resultUuid': '" + VAR_RESULT_UUID + "'});" +
           "  }).catch(function(error) {" +

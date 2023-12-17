@@ -11,6 +11,10 @@ class WindowType_ {
 
   const WindowType_._internal(this._value);
 
+  ///Adds the new browser window as a separate new window from the main window.
+  @EnumSupportedPlatforms(platforms: [EnumMacOSPlatform(value: 'WINDOW')])
+  static const WINDOW = const WindowType_._internal('WINDOW');
+
   ///Adds the new browser window as a child window of the main window.
   @EnumSupportedPlatforms(platforms: [EnumMacOSPlatform(value: 'CHILD')])
   static const CHILD = const WindowType_._internal('CHILD');

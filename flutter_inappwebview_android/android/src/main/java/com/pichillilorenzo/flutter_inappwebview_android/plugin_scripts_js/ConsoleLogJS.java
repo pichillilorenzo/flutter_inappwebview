@@ -15,6 +15,15 @@ public class ConsoleLogJS {
   );
 
   public static final String CONSOLE_LOG_JS_SOURCE = "(function(console) {" +
+          "   function _buildMessage(args) {" +
+          "     var message = '';" +
+          "     for (var i in args) {" +
+          "       try {" +
+          "         message += message === '' ? args[i] : ' ' + args[i];" +
+          "       } catch(ignored) {}" +
+          "     }" +
+          "     return message;" +
+          "   }" +
           "   var oldLogs = {" +
           "       'log': console.log," +
           "       'debug': console.debug," +
@@ -25,16 +34,7 @@ public class ConsoleLogJS {
           "   for (var k in oldLogs) {" +
           "       (function(oldLog) {" +
           "           console[oldLog] = function() {" +
-          "               var message = '';" +
-          "               for (var i in arguments) {" +
-          "                   if (message == '') {" +
-          "                       message += arguments[i];" +
-          "                   }" +
-          "                   else {" +
-          "                       message += ' ' + arguments[i];" +
-          "                   }" +
-          "               }" +
-          "               oldLogs[oldLog].call(console, message);" +
+          "               oldLogs[oldLog].call(console, _buildMessage(arguments));" +
           "           }" +
           "       })(k);" +
           "   }" +

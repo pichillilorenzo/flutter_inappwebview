@@ -497,6 +497,12 @@ abstract class PlatformInAppBrowserEvents {
   ///- MacOS
   void onExit() {}
 
+  ///Event fired when the main window is about to close.
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- MacOS
+  void onMainWindowWillClose() {}
+
   ///Event fired when the [PlatformInAppBrowser] starts to load an [url].
   ///
   ///**Officially Supported Platforms/Implementations**:

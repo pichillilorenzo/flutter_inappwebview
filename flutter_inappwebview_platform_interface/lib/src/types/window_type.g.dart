@@ -44,10 +44,25 @@ class WindowType {
     return null;
   });
 
+  ///Adds the new browser window as a separate new window from the main window.
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- MacOS
+  static final WINDOW = WindowType._internalMultiPlatform('WINDOW', () {
+    switch (defaultTargetPlatform) {
+      case TargetPlatform.macOS:
+        return 'WINDOW';
+      default:
+        break;
+    }
+    return null;
+  });
+
   ///Set of all values of [WindowType].
   static final Set<WindowType> values = [
     WindowType.CHILD,
     WindowType.TABBED,
+    WindowType.WINDOW,
   ].toSet();
 
   ///Gets a possible [WindowType] instance from [String] value.

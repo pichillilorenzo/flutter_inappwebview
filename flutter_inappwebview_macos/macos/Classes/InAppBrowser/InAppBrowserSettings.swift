@@ -16,7 +16,7 @@ public class InAppBrowserSettings: ISettings<InAppBrowserWebViewController> {
     var hideUrlBar = false
     var hideProgressBar = false
     var toolbarTopFixedTitle: String?
-    var windowType = InAppBrowserWindowType.child
+    var windowType = InAppBrowserWindowType.window
     var windowAlphaValue = 1.0
     var _windowStyleMask: NSNumber?
     var windowStyleMask: NSWindow.StyleMask? {

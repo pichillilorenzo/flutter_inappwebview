@@ -86,8 +86,10 @@ public class InAppBrowserManager: ChannelDelegate {
         
         if #available(macOS 10.12, *), browserSettings.windowType == .tabbed {
             NSApplication.shared.mainWindow?.addTabbedWindow(window, ordered: .above)
-        } else {
+        } else if browserSettings.windowType == .child {
             NSApplication.shared.mainWindow?.addChildWindow(window, ordered: .above)
+        } else {
+            window.windowController?.showWindow(self)
         }
         
         if browserSettings.hidden {

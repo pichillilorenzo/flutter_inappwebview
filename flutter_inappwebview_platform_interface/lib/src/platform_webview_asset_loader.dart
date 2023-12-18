@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_internal_annotations.dart';
+import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_platform_interface.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 
 import 'inappwebview_platform.dart';
@@ -122,7 +123,7 @@ class PlatformAssetsPathHandlerCreationParams
     PlatformPathHandlerCreationParams params,
   ) : super(path: params.path);
 
-  /// Creates a [AndroidCookieManagerCreationParams] instance based on [PlatformCookieManagerCreationParams].
+  /// Creates a [PlatformAssetsPathHandlerCreationParams] instance based on [PlatformPathHandlerCreationParams].
   factory PlatformAssetsPathHandlerCreationParams.fromPlatformPathHandlerCreationParams(
       PlatformPathHandlerCreationParams params) {
     return PlatformAssetsPathHandlerCreationParams(params);
@@ -195,7 +196,7 @@ class PlatformResourcesPathHandlerCreationParams
     PlatformPathHandlerCreationParams params,
   ) : super(path: params.path);
 
-  /// Creates a [AndroidCookieManagerCreationParams] instance based on [PlatformCookieManagerCreationParams].
+  /// Creates a [PlatformResourcesPathHandlerCreationParams] instance based on [PlatformPathHandlerCreationParams].
   factory PlatformResourcesPathHandlerCreationParams.fromPlatformPathHandlerCreationParams(
       PlatformPathHandlerCreationParams params) {
     return PlatformResourcesPathHandlerCreationParams(params);
@@ -271,7 +272,7 @@ class PlatformInternalStoragePathHandlerCreationParams
       {required this.directory})
       : super(path: params.path);
 
-  /// Creates a [AndroidCookieManagerCreationParams] instance based on [PlatformCookieManagerCreationParams].
+  /// Creates a [PlatformInternalStoragePathHandlerCreationParams] instance based on [PlatformPathHandlerCreationParams].
   factory PlatformInternalStoragePathHandlerCreationParams.fromPlatformPathHandlerCreationParams(
       PlatformPathHandlerCreationParams params,
       {required String directory}) {
@@ -341,4 +342,75 @@ abstract class PlatformInternalStoragePathHandler extends PlatformInterface
   String get path => params.path;
 
   String get directory => params.directory;
+}
+
+/// Object specifying creation parameters for creating a [PlatformCustomPathHandler].
+///
+/// Platform specific implementations can add additional fields by extending
+/// this class.
+@immutable
+class PlatformCustomPathHandlerCreationParams
+    extends PlatformPathHandlerCreationParams {
+  /// Used by the platform implementation to create a new [PlatformCustomPathHandler].
+  PlatformCustomPathHandlerCreationParams(
+    // This parameter prevents breaking changes later.
+    // ignore: avoid_unused_constructor_parameters
+    PlatformPathHandlerCreationParams params,
+  ) : super(path: params.path);
+
+  /// Creates a [PlatformCustomPathHandlerCreationParams] instance based on [PlatformPathHandlerCreationParams].
+  factory PlatformCustomPathHandlerCreationParams.fromPlatformPathHandlerCreationParams(
+      PlatformPathHandlerCreationParams params) {
+    return PlatformCustomPathHandlerCreationParams(params);
+  }
+}
+
+///{@template flutter_inappwebview_platform_interface.PlatformCustomPathHandler}
+///Custom handler class used to implement a custom logic to open a file.
+///
+///The matched prefix path used shouldn't be a prefix of a real web path.
+///Thus, if the requested file cannot be found a [WebResourceResponse] object with a `null` data will be returned instead of `null`.
+///This saves the time of falling back to network and trying to resolve a path that doesn't exist.
+///A [WebResourceResponse] with `null` data will be received as an HTTP response with status code `404` and no body.
+///
+///The MIME type for the file will be determined from the file's extension using
+///[guessContentTypeFromName](https://developer.android.com/reference/java/net/URLConnection.html#guessContentTypeFromName-java.lang.String-).
+///Developers should ensure that asset files are named using standard file extensions.
+///If the file does not have a recognised extension, `text/plain` will be used by default.
+///{@endtemplate}
+abstract class PlatformCustomPathHandler extends PlatformInterface
+    implements PlatformPathHandler {
+  /// Creates a new [PlatformCustomPathHandler]
+  factory PlatformCustomPathHandler(
+      PlatformCustomPathHandlerCreationParams params) {
+    assert(
+      InAppWebViewPlatform.instance != null,
+      'A platform implementation for `flutter_inappwebview` has not been set. Please '
+      'ensure that an implementation of `InAppWebViewPlatform` has been set to '
+      '`InAppWebViewPlatform.instance` before use. For unit testing, '
+      '`InAppWebViewPlatform.instance` can be set with your own test implementation.',
+    );
+    final PlatformCustomPathHandler customPathHandler =
+        InAppWebViewPlatform.instance!.createPlatformCustomPathHandler(params);
+    PlatformInterface.verify(customPathHandler, _token);
+    return customPathHandler;
+  }
+
+  /// Used by the platform implementation to create a new [PlatformCustomPathHandler].
+  ///
+  /// Should only be used by platform implementations because they can't extend
+  /// a class that only contains a factory constructor.
+  @protected
+  PlatformCustomPathHandler.implementation(this.params) : super(token: _token);
+
+  static final Object _token = Object();
+
+  /// The parameters used to initialize the [PlatformCustomPathHandler].
+  final PlatformCustomPathHandlerCreationParams params;
+
+  @override
+  String get type => 'CustomPathHandler';
+
+  @override
+  String get path => params.path;
 }

@@ -371,6 +371,17 @@ abstract class InAppWebViewPlatform extends PlatformInterface {
         'createPlatformInternalStoragePathHandler is not implemented on the current platform.');
   }
 
+  /// Creates a new [PlatformCustomPathHandler].
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [CustomPathHandler] in `flutter_inappwebview` instead.
+  PlatformCustomPathHandler createPlatformCustomPathHandler(
+    PlatformCustomPathHandlerCreationParams params,
+  ) {
+    throw UnimplementedError(
+        'createPlatformCustomPathHandler is not implemented on the current platform.');
+  }
+
   /// Creates a new [PlatformWebViewFeature].
   ///
   /// This function should only be called by the app-facing package.

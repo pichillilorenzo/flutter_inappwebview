@@ -1,3 +1,7 @@
+## 1.0.8
+
+- Added `PlatformCustomPathHandler` class to be able to implement custom path handlers for `WebViewAssetLoader`
+
 ## 1.0.7
 
 - Added `InAppBrowser.onMainWindowWillClose` event

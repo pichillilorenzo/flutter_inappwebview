@@ -198,3 +198,40 @@ class AndroidInternalStoragePathHandler
     return {...toMap(), 'directory': directory};
   }
 }
+
+/// Object specifying creation parameters for creating a [AndroidCustomPathHandler].
+///
+/// When adding additional fields make sure they can be null or have a default
+/// value to avoid breaking changes. See [PlatformCustomPathHandlerCreationParams] for
+/// more information.
+@immutable
+class AndroidCustomPathHandlerCreationParams
+    extends PlatformCustomPathHandlerCreationParams {
+  /// Creates a new [AndroidCustomPathHandlerCreationParams] instance.
+  AndroidCustomPathHandlerCreationParams(
+    // This parameter prevents breaking changes later.
+    // ignore: avoid_unused_constructor_parameters
+    PlatformCustomPathHandlerCreationParams params,
+  ) : super(params);
+
+  /// Creates a [AndroidCustomPathHandlerCreationParams] instance based on [PlatformCustomPathHandlerCreationParams].
+  factory AndroidCustomPathHandlerCreationParams.fromPlatformCustomPathHandlerCreationParams(
+      PlatformCustomPathHandlerCreationParams params) {
+    return AndroidCustomPathHandlerCreationParams(params);
+  }
+}
+
+///{@macro flutter_inappwebview_platform_interface.PlatformCustomPathHandler}
+class AndroidCustomPathHandler extends PlatformCustomPathHandler
+    with AndroidPathHandler, ChannelController {
+  /// Constructs a [AndroidCustomPathHandler].
+  AndroidCustomPathHandler(PlatformCustomPathHandlerCreationParams params)
+      : super.implementation(
+          params is AndroidCustomPathHandlerCreationParams
+              ? params
+              : AndroidCustomPathHandlerCreationParams
+                  .fromPlatformCustomPathHandlerCreationParams(params),
+        ) {
+    _init(params);
+  }
+}

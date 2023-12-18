@@ -313,6 +313,17 @@ class AndroidInAppWebViewPlatform extends InAppWebViewPlatform {
     return AndroidInternalStoragePathHandler(params);
   }
 
+  /// Creates a new [AndroidCustomPathHandler].
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [CustomPathHandler] in `flutter_inappwebview` instead.
+  @override
+  AndroidCustomPathHandler createPlatformCustomPathHandler(
+    PlatformCustomPathHandlerCreationParams params,
+  ) {
+    return AndroidCustomPathHandler(params);
+  }
+
   /// Creates a new [wv.AndroidWebViewFeature].
   ///
   /// This function should only be called by the app-facing package.

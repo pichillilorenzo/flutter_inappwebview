@@ -1,3 +1,8 @@
+## 6.0.0-rc.2
+
+- Updated minimum platform interface and implementation versions
+- Added `CustomPathHandler` class to be able to implement Android custom path handlers for `WebViewAssetLoader`
+
 ## 6.0.0-rc.1
 
 - Updated minimum platform interface and implementation versions

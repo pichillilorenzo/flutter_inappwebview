@@ -14,8 +14,7 @@ import 'package:pointer_interceptor/pointer_interceptor.dart';
 // import 'package:path_provider/path_provider.dart';
 // import 'package:permission_handler/permission_handler.dart';
 
-InAppLocalhostServer localhostServer =
-    InAppLocalhostServer(documentRoot: 'assets');
+final localhostServer = InAppLocalhostServer(documentRoot: 'assets');
 
 Future main() async {
   WidgetsFlutterBinding.ensureInitialized();

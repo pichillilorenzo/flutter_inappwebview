@@ -106,3 +106,27 @@ class InternalStoragePathHandler extends PathHandler {
 
   String get directory => platform.directory;
 }
+
+///{@macro flutter_inappwebview_platform_interface.PlatformCustomPathHandler}
+abstract class CustomPathHandler extends PathHandler {
+  ///{@macro flutter_inappwebview_platform_interface.PlatformCustomPathHandler}
+  CustomPathHandler({required String path})
+      : this.fromPlatformCreationParams(
+            params: PlatformCustomPathHandlerCreationParams(
+                PlatformPathHandlerCreationParams(path: path)));
+
+  /// Constructs a [CustomPathHandler].
+  ///
+  /// See [CustomPathHandler.fromPlatformCreationParams] for setting parameters for
+  /// a specific platform.
+  CustomPathHandler.fromPlatformCreationParams({
+    required PlatformCustomPathHandlerCreationParams params,
+  }) : this.fromPlatform(platform: PlatformCustomPathHandler(params));
+
+  /// Constructs a [CustomPathHandler] from a specific platform implementation.
+  CustomPathHandler.fromPlatform({required this.platform})
+      : super.fromPlatform(platform: platform);
+
+  /// Implementation of [PlatformCustomPathHandler] for the current platform.
+  final PlatformCustomPathHandler platform;
+}

@@ -89,15 +89,15 @@ packages:
       path: ".."
       relative: true
     source: path
-    version: "1.0.10"
+    version: "1.0.11"
   flutter_inappwebview_platform_interface:
     dependency: transitive
     description:
       name: flutter_inappwebview_platform_interface
-      sha256: b4db31621880c4f4a60c9ddfc01d2b9f0133bf7776ddbd3a1d34062c076afec7
+      sha256: "08b7263382609d8363a9741bd95bd9703a95357ca9a40b6b4edfa0b1c36d1da7"
       url: "https://pub.dev"
     source: hosted
-    version: "1.0.7"
+    version: "1.0.8"
   flutter_lints:
     dependency: "direct dev"
     description:

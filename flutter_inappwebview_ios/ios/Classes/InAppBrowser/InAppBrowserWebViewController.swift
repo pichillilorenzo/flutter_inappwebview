@@ -11,7 +11,7 @@ import WebKit
 import Foundation
 
 public class InAppBrowserWebViewController: UIViewController, InAppBrowserDelegate, UIScrollViewDelegate, UISearchBarDelegate, Disposable {
-    static var METHOD_CHANNEL_NAME_PREFIX = "com.pichillilorenzo/flutter_inappbrowser_";
+    static let METHOD_CHANNEL_NAME_PREFIX = "com.pichillilorenzo/flutter_inappbrowser_"
     
     var closeButton: UIBarButtonItem!
     var reloadButton: UIBarButtonItem!

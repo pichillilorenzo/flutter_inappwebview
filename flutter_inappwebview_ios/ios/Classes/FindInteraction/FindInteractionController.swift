@@ -8,14 +8,14 @@
 import Foundation
 import Flutter
 
-public class FindInteractionController : NSObject, Disposable {
-    
-    static var METHOD_CHANNEL_NAME_PREFIX = "com.pichillilorenzo/flutter_inappwebview_find_interaction_";
-    var plugin: SwiftFlutterPlugin?
+public class FindInteractionController: NSObject, Disposable {
+    static let METHOD_CHANNEL_NAME_PREFIX = "com.pichillilorenzo/flutter_inappwebview_find_interaction_"
+
     var webView: InAppWebView?
     var channelDelegate: FindInteractionChannelDelegate?
-    var settings: FindInteractionSettings?
-    var shouldCallOnRefresh = false
+
+    private var plugin: SwiftFlutterPlugin?
+    private var settings: FindInteractionSettings?
     
     private var _searchText: String? = nil
     var searchText: String? {

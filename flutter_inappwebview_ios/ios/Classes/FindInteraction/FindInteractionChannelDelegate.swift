@@ -7,7 +7,7 @@
 
 import Foundation
 
-public class FindInteractionChannelDelegate : ChannelDelegate {
+public class FindInteractionChannelDelegate: ChannelDelegate {
     private weak var findInteractionController: FindInteractionController?
     
     public init(findInteractionController: FindInteractionController, channel: FlutterMethodChannel) {

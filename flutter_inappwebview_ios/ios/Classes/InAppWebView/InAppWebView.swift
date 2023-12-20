@@ -14,7 +14,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
                             WKDownloadDelegate,
                             PullToRefreshDelegate,
                             Disposable {
-    static var METHOD_CHANNEL_NAME_PREFIX = "com.pichillilorenzo/flutter_inappwebview_"
+    static let METHOD_CHANNEL_NAME_PREFIX = "com.pichillilorenzo/flutter_inappwebview_"
 
     var id: Any? // viewId
     var plugin: SwiftFlutterPlugin?
@@ -26,14 +26,14 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
     var settings: InAppWebViewSettings?
     var pullToRefreshControl: PullToRefreshControl?
     var findInteractionController: FindInteractionController?
-    var webMessageChannels: [String:WebMessageChannel] = [:]
+    var webMessageChannels: [String: WebMessageChannel] = [:]
     var webMessageListeners: [WebMessageListener] = []
     var currentOriginalUrl: URL?
     var inFullscreen = false
     var preventGestureDelay = false
     
-    static var sslCertificatesMap: [String: SslCertificate] = [:] // [URL host name : SslCertificate]
-    static var credentialsProposed: [URLCredential] = []
+    private static var sslCertificatesMap: [String: SslCertificate] = [:] // [URL host name : SslCertificate]
+    private static var credentialsProposed: [URLCredential] = []
     
     var lastScrollX: CGFloat = 0
     var lastScrollY: CGFloat = 0
@@ -103,14 +103,14 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
         set {
             super.frame = newValue
             
-            self.scrollView.contentInset = UIEdgeInsets.zero;
+            self.scrollView.contentInset = .zero
             if #available(iOS 11, *) {
                 // Above iOS 11, adjust contentInset to compensate the adjustedContentInset so the sum will
                 // always be 0.
                 if (scrollView.adjustedContentInset != UIEdgeInsets.zero) {
-                    let insetToAdjust = self.scrollView.adjustedContentInset;
+                    let insetToAdjust = self.scrollView.adjustedContentInset
                     scrollView.contentInset = UIEdgeInsets(top: -insetToAdjust.top, left: -insetToAdjust.left,
-                                                                bottom: -insetToAdjust.bottom, right: -insetToAdjust.right);
+                                                                bottom: -insetToAdjust.bottom, right: -insetToAdjust.right)
                 }
             }
         }
@@ -2214,13 +2214,13 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
             if let certEntry:Dictionary = dict as? Dictionary<String, AnyObject> {
                 // grab the identity
                 let identityPointer:AnyObject? = certEntry["identity"];
-                let secIdentityRef:SecIdentity = (identityPointer as! SecIdentity?)!;
+                let secIdentityRef:SecIdentity = (identityPointer as! SecIdentity?)!
                 // grab the trust
-                let trustPointer:AnyObject? = certEntry["trust"];
-                let trustRef:SecTrust = trustPointer as! SecTrust;
+                let trustPointer:AnyObject? = certEntry["trust"]
+                let trustRef:SecTrust = trustPointer as! SecTrust
                 // grab the cert
-                let chainPointer:AnyObject? = certEntry["chain"];
-                identityAndTrust = IdentityAndTrust(identityRef: secIdentityRef, trust: trustRef, certArray:  chainPointer!);
+                let chainPointer:AnyObject? = certEntry["chain"]
+                identityAndTrust = IdentityAndTrust(identityRef: secIdentityRef, trust: trustRef, certArray:  chainPointer!)
             }
         } else {
             print("Security Error: " + securityError.description)
@@ -2228,7 +2228,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
                 print(SecCopyErrorMessageString(securityError,nil) ?? "")
             }
         }
-        return identityAndTrust;
+        return identityAndTrust
     }
     
     func createAlertDialog(message: String?, responseMessage: String?, confirmButtonTitle: String?, completionHandler: @escaping () -> Void) {

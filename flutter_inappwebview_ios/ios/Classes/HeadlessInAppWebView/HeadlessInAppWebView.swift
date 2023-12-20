@@ -7,8 +7,9 @@
 
 import Foundation
 
-public class HeadlessInAppWebView : Disposable {
+public class HeadlessInAppWebView: Disposable {
     static let METHOD_CHANNEL_NAME_PREFIX = "com.pichillilorenzo/flutter_headless_inappwebview_"
+
     var id: String
     var channelDelegate: HeadlessWebViewChannelDelegate?
     var flutterWebView: FlutterWebViewController?
@@ -24,7 +25,7 @@ public class HeadlessInAppWebView : Disposable {
     }
     
     public func onWebViewCreated() {
-        channelDelegate?.onWebViewCreated();
+        channelDelegate?.onWebViewCreated()
     }
     
     public func prepare(params: NSDictionary) {

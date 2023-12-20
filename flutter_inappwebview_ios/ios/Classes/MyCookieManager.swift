@@ -11,8 +11,9 @@ import WebKit
 @available(iOS 11.0, *)
 public class MyCookieManager: ChannelDelegate {
     static let METHOD_CHANNEL_NAME = "com.pichillilorenzo/flutter_inappwebview_cookiemanager"
-    var plugin: SwiftFlutterPlugin?
-    static var httpCookieStore = WKWebsiteDataStore.default().httpCookieStore
+    static let httpCookieStore = WKWebsiteDataStore.default().httpCookieStore
+
+    private var plugin: SwiftFlutterPlugin?
     
     init(plugin: SwiftFlutterPlugin) {
         super.init(channel: FlutterMethodChannel(name: MyCookieManager.METHOD_CHANNEL_NAME, binaryMessenger: plugin.registrar!.messenger()))
@@ -64,13 +65,13 @@ public class MyCookieManager: ChannelDelegate {
                 let path = arguments!["path"] as! String
                 let domain = arguments!["domain"] as? String
                 MyCookieManager.deleteCookie(url: url, name: name, path: path, domain: domain, result: result)
-                break;
+                break
             case "deleteCookies":
                 let url = arguments!["url"] as! String
                 let path = arguments!["path"] as! String
                 let domain = arguments!["domain"] as? String
                 MyCookieManager.deleteCookies(url: url, path: path, domain: domain, result: result)
-                break;
+                break
             case "deleteAllCookies":
                 MyCookieManager.deleteAllCookies(result: result)
                 break

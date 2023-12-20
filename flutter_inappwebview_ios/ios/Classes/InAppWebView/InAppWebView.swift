@@ -2190,17 +2190,16 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
     }
     
     struct IdentityAndTrust {
-
-        var identityRef:SecIdentity
-        var trust:SecTrust
-        var certArray:AnyObject
+        var identityRef: SecIdentity
+        var trust: SecTrust
+        var certArray: AnyObject
     }
 
-    func extractIdentity(PKCS12Data:NSData, password: String) -> IdentityAndTrust? {
-        var identityAndTrust:IdentityAndTrust?
-        var securityError:OSStatus = errSecSuccess
+    func extractIdentity(PKCS12Data: NSData, password: String) -> IdentityAndTrust? {
+        var identityAndTrust: IdentityAndTrust?
+        var securityError: OSStatus = errSecSuccess
 
-        var importResult: CFArray? = nil
+        var importResult: CFArray?
         securityError = SecPKCS12Import(
             PKCS12Data as NSData,
             [kSecImportExportPassphrase as String: password] as NSDictionary,
@@ -2208,24 +2207,24 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
         )
 
         if securityError == errSecSuccess {
-            let certItems:CFArray = importResult! as CFArray;
-            let certItemsArray:Array = certItems as Array
-            let dict:AnyObject? = certItemsArray.first;
-            if let certEntry:Dictionary = dict as? Dictionary<String, AnyObject> {
+            let certItems: CFArray = importResult! as CFArray
+            let certItemsArray: Array = certItems as Array
+            let dict: AnyObject? = certItemsArray.first
+            if let certEntry: Dictionary = dict as? Dictionary<String, AnyObject> {
                 // grab the identity
-                let identityPointer:AnyObject? = certEntry["identity"];
+                let identityPointer: AnyObject? = certEntry["identity"]
                 let secIdentityRef:SecIdentity = (identityPointer as! SecIdentity?)!
                 // grab the trust
-                let trustPointer:AnyObject? = certEntry["trust"]
+                let trustPointer: AnyObject? = certEntry["trust"]
                 let trustRef:SecTrust = trustPointer as! SecTrust
                 // grab the cert
-                let chainPointer:AnyObject? = certEntry["chain"]
+                let chainPointer: AnyObject? = certEntry["chain"]
                 identityAndTrust = IdentityAndTrust(identityRef: secIdentityRef, trust: trustRef, certArray:  chainPointer!)
             }
         } else {
             print("Security Error: " + securityError.description)
             if #available(iOS 11.3, *) {
-                print(SecCopyErrorMessageString(securityError,nil) ?? "")
+                print(SecCopyErrorMessageString(securityError, nil) ?? "")
             }
         }
         return identityAndTrust
@@ -2239,7 +2238,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
         
         alertController.addAction(UIAlertAction(title: okButton, style: UIAlertAction.Style.default) {
             _ in completionHandler()}
-        );
+        )
         
         guard let presentingViewController = inAppBrowserDelegate != nil ? inAppBrowserDelegate as? InAppBrowserWebViewController : window?.rootViewController else {
             completionHandler()
@@ -2463,16 +2462,16 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
         let disableHorizontalScroll = settings?.disableHorizontalScroll ?? false
         if startedByUser {
             if disableVerticalScroll && disableHorizontalScroll {
-                scrollView.contentOffset = CGPoint(x: lastScrollX, y: lastScrollY);
+                scrollView.contentOffset = CGPoint(x: lastScrollX, y: lastScrollY)
             }
             else if disableVerticalScroll {
                 if scrollView.contentOffset.y >= 0 || scrollView.contentOffset.y < 0 {
-                    scrollView.contentOffset = CGPoint(x: scrollView.contentOffset.x, y: lastScrollY);
+                    scrollView.contentOffset = CGPoint(x: scrollView.contentOffset.x, y: lastScrollY)
                 }
             }
             else if disableHorizontalScroll {
                 if scrollView.contentOffset.x >= 0 || scrollView.contentOffset.x < 0 {
-                    scrollView.contentOffset = CGPoint(x: lastScrollX, y: scrollView.contentOffset.y);
+                    scrollView.contentOffset = CGPoint(x: lastScrollX, y: scrollView.contentOffset.y)
                 }
             }
         }
@@ -2789,24 +2788,24 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
             switch (message.name) {
                 case "consoleLog":
                     messageLevel = 1
-                    break;
+                    break
                 case "consoleDebug":
                     // on Android, console.debug is TIP
                     messageLevel = 0
-                    break;
+                    break
                 case "consoleError":
                     messageLevel = 3
-                    break;
+                    break
                 case "consoleInfo":
                     // on Android, console.info is LOG
                     messageLevel = 1
-                    break;
+                    break
                 case "consoleWarn":
                     messageLevel = 2
-                    break;
+                    break
                 default:
                     messageLevel = 1
-                    break;
+                    break
             }
             let consoleMessage = body["message"] as? String ?? ""
             

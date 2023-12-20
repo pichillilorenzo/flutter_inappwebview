@@ -108,7 +108,7 @@ public class InAppBrowserWebViewController: NSViewController, InAppBrowserDelega
                 if let contentBlockers = webView?.settings?.contentBlockers, contentBlockers.count > 0 {
                     do {
                         let jsonData = try JSONSerialization.data(withJSONObject: contentBlockers, options: [])
-                        let blockRules = String(data: jsonData, encoding: String.Encoding.utf8)
+                        let blockRules = String(data: jsonData, encoding: .utf8)
                         WKContentRuleListStore.default().compileContentRuleList(
                             forIdentifier: "ContentBlockingRules",
                             encodedContentRuleList: blockRules) { (contentRuleList, error) in

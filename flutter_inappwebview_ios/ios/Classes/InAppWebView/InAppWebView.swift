@@ -1250,7 +1250,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
             if contentBlockers.count > 0 {
                 do {
                     let jsonData = try JSONSerialization.data(withJSONObject: contentBlockers, options: [])
-                    let blockRules = String(data: jsonData, encoding: String.Encoding.utf8)
+                    let blockRules = String(data: jsonData, encoding: .utf8)
                     WKContentRuleListStore.default().compileContentRuleList(
                         forIdentifier: "ContentBlockingRules",
                         encodedContentRuleList: blockRules) { (contentRuleList, error) in
@@ -1368,7 +1368,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
         var jsToInject = source
         if let wrapper = jsWrapper {
             let jsonData: Data? = try? JSONSerialization.data(withJSONObject: [source], options: [])
-            let sourceArrayString = String(data: jsonData!, encoding: String.Encoding.utf8)
+            let sourceArrayString = String(data: jsonData!, encoding: .utf8)
             let sourceString: String? = (sourceArrayString! as NSString).substring(with: NSRange(location: 1, length: (sourceArrayString?.count ?? 0) - 2))
             jsToInject = String(format: wrapper, sourceString!)
         }
@@ -1400,7 +1400,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
         var jsToInject = source
         if let wrapper = jsWrapper {
             let jsonData: Data? = try? JSONSerialization.data(withJSONObject: [source], options: [])
-            let sourceArrayString = String(data: jsonData!, encoding: String.Encoding.utf8)
+            let sourceArrayString = String(data: jsonData!, encoding: .utf8)
             let sourceString: String? = (sourceArrayString! as NSString).substring(with: NSRange(location: 1, length: (sourceArrayString?.count ?? 0) - 2))
             jsToInject = String(format: wrapper, sourceString!)
         }

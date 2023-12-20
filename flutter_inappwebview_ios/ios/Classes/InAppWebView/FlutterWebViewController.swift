@@ -138,7 +138,7 @@ public class FlutterWebViewController: NSObject, FlutterPlatformView, Disposable
             }
             load(initialUrlRequest: initialUrlRequest, initialFile: initialFile, initialData: initialData)
         }
-        else if let wId = windowId {
+        else if windowId != nil {
             webView.runWindowBeforeCreatedCallbacks()
         }
     }

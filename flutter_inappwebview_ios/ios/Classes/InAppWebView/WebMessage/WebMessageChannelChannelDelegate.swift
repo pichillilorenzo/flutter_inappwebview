@@ -39,7 +39,7 @@ public class WebMessageChannelChannelDelegate : ChannelDelegate {
             if let webView = webMessageChannel?.webView, let ports = webMessageChannel?.ports, ports.count > 0 {
                 let index = arguments!["index"] as! Int
                 let port = ports[index]
-                var message = WebMessage.fromMap(map: arguments!["message"] as! [String: Any?])
+                let message = WebMessage.fromMap(map: arguments!["message"] as! [String: Any?])
                 
                 var ports: [WebMessagePort] = []
                 if let notConnectedPorts = message.ports {

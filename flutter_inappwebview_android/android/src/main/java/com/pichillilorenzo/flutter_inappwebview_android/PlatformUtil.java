@@ -52,10 +52,10 @@ public class PlatformUtil extends ChannelDelegateImpl {
     if (locale == null) {
       return Locale.US;
     }
-    String[] localeSplitted = locale.split("_");
-    String language = localeSplitted[0];
-    String country = localeSplitted.length > 1 ? localeSplitted[1] : "";
-    String variant = localeSplitted.length > 2 ? localeSplitted[2] : "";
+    String[] localeSplit = locale.split("_");
+    String language = localeSplit[0];
+    String country = localeSplit.length > 1 ? localeSplit[1] : "";
+    String variant = localeSplit.length > 2 ? localeSplit[2] : "";
     return new Locale(language, country, variant);
   }
 

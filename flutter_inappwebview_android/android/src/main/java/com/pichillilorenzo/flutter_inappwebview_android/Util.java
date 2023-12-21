@@ -202,7 +202,7 @@ public class Util {
 
   /**
    * SslCertificate class does not has a public getter for the underlying
-   * X509Certificate, we can only do this by hack. This only works for andorid 4.0+
+   * X509Certificate, we can only do this by hack. This only works for Android 4.0+
    * https://groups.google.com/forum/#!topic/android-developers/eAPJ6b7mrmg
    */
   public static X509Certificate getX509CertFromSslCertHack(SslCertificate sslCert) {

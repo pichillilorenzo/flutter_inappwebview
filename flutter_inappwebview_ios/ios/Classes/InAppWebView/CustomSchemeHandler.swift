@@ -1,5 +1,5 @@
 //
-//  CustomeSchemeHandler.swift
+//  CustomSchemeHandler.swift
 //  flutter_inappwebview
 //
 //  Created by Lorenzo Pichilli on 25/10/2019.

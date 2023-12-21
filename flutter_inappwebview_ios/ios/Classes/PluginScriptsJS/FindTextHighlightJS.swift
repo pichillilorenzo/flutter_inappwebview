@@ -111,7 +111,7 @@ window.\(JAVASCRIPT_BRIDGE_NAME)._findAllAsync = function(keyword) {
   );
 }
 
-// helper function, recursively removes the highlights in elements and their childs
+// helper function, recursively removes the highlights in elements and their children
 window.\(JAVASCRIPT_BRIDGE_NAME)._clearMatchesForElement = function(element) {
   if (element) {
     if (element.nodeType == 1) {

@@ -49,7 +49,7 @@ extension URLProtectionSpace {
     public func toMap () -> [String:Any?] {
         return [
             "host": host,
-            "procotol": self.protocol,
+            "protocol": self.protocol,
             "realm": realm,
             "port": port,
             "sslCertificate": sslCertificate?.toMap(),

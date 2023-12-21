@@ -202,11 +202,11 @@ public class ContentBlockerHandler {
                                     if (contentType == null) {
                                         contentType = "text/plain";
                                     } else {
-                                        String[] contentTypeSplitted = contentType.split(";");
-                                        contentType = contentTypeSplitted[0].trim();
+                                        String[] contentTypeSplit = contentType.split(";");
+                                        contentType = contentTypeSplit[0].trim();
                                         if (encoding == null) {
-                                            encoding = (contentTypeSplitted.length > 1 && contentTypeSplitted[1].contains("charset="))
-                                                    ? contentTypeSplitted[1].replace("charset=", "").trim()
+                                            encoding = (contentTypeSplit.length > 1 && contentTypeSplit[1].contains("charset="))
+                                                    ? contentTypeSplit[1].replace("charset=", "").trim()
                                                     : "utf-8";
                                         }
                                     }
@@ -245,11 +245,11 @@ public class ContentBlockerHandler {
 //                                byte[] dataBytes = response.body().bytes();
 //                                InputStream dataStream = new ByteArrayInputStream(dataBytes);
 //
-//                                String[] contentTypeSplitted = response.header("content-type", "text/plain").split(";");
+//                                String[] contentTypeSplit = response.header("content-type", "text/plain").split(";");
 //
-//                                String contentType = contentTypeSplitted[0].trim();
-//                                String encoding = (contentTypeSplitted.length > 1 && contentTypeSplitted[1].contains("charset="))
-//                                        ? contentTypeSplitted[1].replace("charset=", "").trim()
+//                                String contentType = contentTypeSplit[0].trim();
+//                                String encoding = (contentTypeSplit.length > 1 && contentTypeSplit[1].contains("charset="))
+//                                        ? contentTypeSplit[1].replace("charset=", "").trim()
 //                                        : "utf-8";
 //
 //                                response.body().close();
@@ -297,8 +297,8 @@ public class ContentBlockerHandler {
                 try {
                     String contentType = urlConnection.getContentType();
                     if (contentType != null) {
-                        String[] contentTypeSplitted = contentType.split(";");
-                        contentType = contentTypeSplitted[0].trim();
+                        String[] contentTypeSplit = contentType.split(";");
+                        contentType = contentTypeSplit[0].trim();
                         responseResourceType = getResourceTypeFromContentType(contentType);
                     }
                 } catch (Exception e) {

@@ -8,7 +8,7 @@
 import Foundation
 import FlutterMacOS
 
-public class HeadlessInAppWebView : Disposable {
+public class HeadlessInAppWebView: Disposable {
     static let METHOD_CHANNEL_NAME_PREFIX = "com.pichillilorenzo/flutter_headless_inappwebview_"
     var id: String
     var channelDelegate: HeadlessWebViewChannelDelegate?

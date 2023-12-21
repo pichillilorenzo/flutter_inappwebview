@@ -7,7 +7,7 @@
 
 import Foundation
 
-public class HttpAuthResponse : NSObject {
+public class HttpAuthResponse: NSObject {
     var username: String
     var password: String
     var permanentPersistence: Bool

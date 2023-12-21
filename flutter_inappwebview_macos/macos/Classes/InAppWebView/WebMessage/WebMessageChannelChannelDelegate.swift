@@ -8,7 +8,7 @@
 import Foundation
 import FlutterMacOS
 
-public class WebMessageChannelChannelDelegate : ChannelDelegate {
+public class WebMessageChannelChannelDelegate: ChannelDelegate {
     private weak var webMessageChannel: WebMessageChannel?
     
     public init(webMessageChannel: WebMessageChannel, channel: FlutterMethodChannel) {

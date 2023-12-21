@@ -7,7 +7,7 @@
 
 import Foundation
 
-public class PullToRefreshChannelDelegate : ChannelDelegate {
+public class PullToRefreshChannelDelegate: ChannelDelegate {
     private weak var pullToRefreshControl: PullToRefreshControl?
     
     public init(pullToRefreshControl: PullToRefreshControl, channel: FlutterMethodChannel) {

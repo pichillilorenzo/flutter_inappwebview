@@ -8,7 +8,7 @@
 import Foundation
 import FlutterMacOS
 
-public class FindInteractionController : NSObject, Disposable {
+public class FindInteractionController: NSObject, Disposable {
     
     static var METHOD_CHANNEL_NAME_PREFIX = "com.pichillilorenzo/flutter_inappwebview_find_interaction_";
     var plugin: InAppWebViewFlutterPlugin?

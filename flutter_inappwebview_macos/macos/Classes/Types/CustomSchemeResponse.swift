@@ -8,7 +8,7 @@
 import Foundation
 import FlutterMacOS
 
-public class CustomSchemeResponse : NSObject {
+public class CustomSchemeResponse: NSObject {
     var data: Data
     var contentType: String
     var contentEncoding: String

@@ -7,7 +7,7 @@
 
 import Foundation
 
-public class FindInteractionSettings : ISettings<FindInteractionController> {
+public class FindInteractionSettings: ISettings<FindInteractionController> {
     
     override init(){
         super.init()

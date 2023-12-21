@@ -8,7 +8,7 @@
 import Foundation
 import WebKit
 
-public class PluginScript : UserScript {
+public class PluginScript: UserScript {
     var requiredInAllContentWorlds = false
     var messageHandlerNames: [String] = []
     

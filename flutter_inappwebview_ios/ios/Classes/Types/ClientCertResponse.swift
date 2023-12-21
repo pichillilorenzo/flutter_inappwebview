@@ -7,7 +7,7 @@
 
 import Foundation
 
-public class ClientCertResponse : NSObject {
+public class ClientCertResponse: NSObject {
     var certificatePath: String
     var certificatePassword: String?
     var keyStoreType: String?

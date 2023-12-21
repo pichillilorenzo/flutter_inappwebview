@@ -7,7 +7,7 @@
 
 import Foundation
 
-public class ServerTrustAuthResponse : NSObject {
+public class ServerTrustAuthResponse: NSObject {
     var action: Int?
     
     public init(action: Int? = nil) {

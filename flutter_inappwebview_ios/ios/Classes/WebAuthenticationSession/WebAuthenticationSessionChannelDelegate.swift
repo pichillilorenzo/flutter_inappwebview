@@ -7,7 +7,7 @@
 
 import Foundation
 
-public class WebAuthenticationSessionChannelDelegate : ChannelDelegate {
+public class WebAuthenticationSessionChannelDelegate: ChannelDelegate {
     private weak var webAuthenticationSession: WebAuthenticationSession?
     
     public init(webAuthenticationSession: WebAuthenticationSession, channel: FlutterMethodChannel) {

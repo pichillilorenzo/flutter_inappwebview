@@ -8,7 +8,7 @@
 import Foundation
 import WebKit
 
-public class UserScript : WKUserScript {
+public class UserScript: WKUserScript {
     var groupName: String?
 
     private var contentWorldWrapper: Any?

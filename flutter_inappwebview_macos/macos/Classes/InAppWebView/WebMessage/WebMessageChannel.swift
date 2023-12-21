@@ -8,7 +8,7 @@
 import Foundation
 import FlutterMacOS
 
-public class WebMessageChannel : FlutterMethodCallDelegate {
+public class WebMessageChannel: FlutterMethodCallDelegate {
     static var METHOD_CHANNEL_NAME_PREFIX = "com.pichillilorenzo/flutter_inappwebview_web_message_channel_"
     var id: String
     var plugin: InAppWebViewFlutterPlugin?

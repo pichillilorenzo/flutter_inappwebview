@@ -106,10 +106,10 @@ public class Util {
             }
             if let ipv4Range = Range(match.range(at: 2), in: address) {
                 let ipv4 = address[ipv4Range]
-                let ipv4Splitted = ipv4.split(separator: ".")
+                let ipv4Split = ipv4.split(separator: ".")
                 var ipv4Converted = Array(repeating: "0000", count: 4)
                 for i in 0...3 {
-                    let byte = Int(ipv4Splitted[i])!
+                    let byte = Int(ipv4Split[i])!
                     let hex = ("0" + String(byte, radix: 16))
                     var offset = hex.count - 3
                     offset = offset < 0 ? 0 : offset

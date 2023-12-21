@@ -1745,7 +1745,7 @@ class AndroidInAppWebViewController extends PlatformInAppWebViewController
       String urlIcon, String? rel, String? sizes, bool isManifest) {
     List<Favicon> favicons = [];
 
-    List<String> urlSplitted = urlIcon.split("/");
+    List<String> urlSplit = urlIcon.split("/");
     if (!_isUrlAbsolute(urlIcon)) {
       if (urlIcon.startsWith("/")) {
         urlIcon = urlIcon.substring(1);
@@ -1757,7 +1757,7 @@ class AndroidInAppWebViewController extends PlatformInAppWebViewController
     }
     if (isManifest) {
       rel = (sizes != null)
-          ? urlSplitted[urlSplitted.length - 1]
+          ? urlSplit[urlSplit.length - 1]
               .replaceFirst("-" + sizes, "")
               .split(" ")[0]
               .split(".")[0]

@@ -62,8 +62,8 @@ public class ContentBlockerHandler {
         try {
             u = new URI(url);
         } catch (URISyntaxException e) {
-            String[] urlSplitted = url.split(":");
-            String scheme = urlSplitted[0];
+            String[] urlSplit = url.split(":");
+            String scheme = urlSplit[0];
             URL tempUrl = new URL(url.replace(scheme, "https"));
             u = new URI(scheme, tempUrl.getUserInfo(), tempUrl.getHost(), tempUrl.getPort(), tempUrl.getPath(), tempUrl.getQuery(), tempUrl.getRef());
         }

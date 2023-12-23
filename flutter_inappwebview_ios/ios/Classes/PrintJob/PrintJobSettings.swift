@@ -148,7 +148,7 @@ public class PrintJobSettings: ISettings<PrintJobController> {
     }
     
     override func getRealSettings(obj: PrintJobController?) -> [String: Any?] {
-        var realOptions: [String: Any?] = toMap()
+        let realOptions: [String: Any?] = toMap()
         return realOptions
     }
 }

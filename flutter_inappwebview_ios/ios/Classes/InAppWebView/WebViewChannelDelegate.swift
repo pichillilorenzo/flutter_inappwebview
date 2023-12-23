@@ -509,7 +509,7 @@ public class WebViewChannelDelegate : ChannelDelegate {
             break
         case .postWebMessage:
             if let webView = webView {
-                var message = WebMessage.fromMap(map: arguments!["message"] as! [String: Any?])
+                let message = WebMessage.fromMap(map: arguments!["message"] as! [String: Any?])
                 let targetOrigin = arguments!["targetOrigin"] as! String
                 
                 var ports: [WebMessagePort] = []

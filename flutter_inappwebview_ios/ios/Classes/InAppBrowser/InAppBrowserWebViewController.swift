@@ -145,7 +145,7 @@ public class InAppBrowserWebViewController: UIViewController, InAppBrowserDelega
             }
         }
         
-        if let wId = windowId {
+        if windowId != nil {
             channelDelegate?.onBrowserCreated()
             webView?.runWindowBeforeCreatedCallbacks()
         } else {

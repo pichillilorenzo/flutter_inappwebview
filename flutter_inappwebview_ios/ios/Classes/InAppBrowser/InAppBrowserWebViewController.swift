@@ -633,16 +633,16 @@ public class InAppBrowserWebViewController: UIViewController, InAppBrowserDelega
         webView?.removeFromSuperview()
         webView = nil
         view = nil
-        if previousStatusBarStyle != -1 {
-            UIApplication.shared.statusBarStyle = UIStatusBarStyle(rawValue: previousStatusBarStyle)!
+        if previousStatusBarStyle != -1, let statusBarStyle = UIStatusBarStyle(rawValue: previousStatusBarStyle) {
+            UIApplication.shared.statusBarStyle = statusBarStyle
         }
         transitioningDelegate = nil
-        searchBar.delegate = nil
-        closeButton.target = nil
-        forwardButton.target = nil
-        backButton.target = nil
-        reloadButton.target = nil
-        shareButton.target = nil
+        searchBar?.delegate = nil
+        closeButton?.target = nil
+        forwardButton?.target = nil
+        backButton?.target = nil
+        reloadButton?.target = nil
+        shareButton?.target = nil
         menuButton?.target = nil
         plugin = nil
     }

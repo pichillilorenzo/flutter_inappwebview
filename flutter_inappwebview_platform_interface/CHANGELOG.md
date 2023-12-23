@@ -1,3 +1,7 @@
+## 1.0.9
+
+- Fix typos (thanks to [michalsrutek](https://github.com/michalsrutek))
+
 ## 1.0.8
 
 - Added `PlatformCustomPathHandler` class to be able to implement custom path handlers for `WebViewAssetLoader`

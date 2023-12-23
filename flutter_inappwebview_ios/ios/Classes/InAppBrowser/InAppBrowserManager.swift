@@ -134,7 +134,7 @@ public class InAppBrowserManager: ChannelDelegate {
         }
         else {
             if #available(iOS 10.0, *) {
-                UIApplication.shared.open(absoluteUrl, options: [:], completionHandler: nil)
+                UIApplication.shared.open(absoluteUrl)
             } else {
                 UIApplication.shared.openURL(absoluteUrl)
             }

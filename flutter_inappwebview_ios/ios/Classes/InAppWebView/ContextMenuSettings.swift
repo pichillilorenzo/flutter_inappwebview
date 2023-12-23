@@ -8,8 +8,8 @@
 import Foundation
 
 public class ContextMenuSettings: ISettings<NSObject> {
-    
-    var hideDefaultSystemContextMenuItems = false;
+
+    var hideDefaultSystemContextMenuItems = false
 
     override init(){
         super.init()

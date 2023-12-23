@@ -7,7 +7,7 @@
 
 import Foundation
 
-public class BaseCallbackResult<T> : CallbackResult<T> {
+public class BaseCallbackResult<T>: CallbackResult<T> {
     
     override init() {
         super.init()

@@ -7,7 +7,7 @@
 
 import Foundation
 
-public class Size2D : NSObject {
+public class Size2D: NSObject {
     var width: Double
     var height: Double
     

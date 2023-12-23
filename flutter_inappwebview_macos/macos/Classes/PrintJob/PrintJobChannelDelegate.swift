@@ -8,7 +8,7 @@
 import Foundation
 import FlutterMacOS
 
-public class PrintJobChannelDelegate : ChannelDelegate {
+public class PrintJobChannelDelegate: ChannelDelegate {
     private weak var printJobController: PrintJobController?
     
     public init(printJobController: PrintJobController, channel: FlutterMethodChannel) {

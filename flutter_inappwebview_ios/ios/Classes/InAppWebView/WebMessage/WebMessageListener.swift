@@ -8,7 +8,7 @@
 import Foundation
 import WebKit
 
-public class WebMessageListener : FlutterMethodCallDelegate {
+public class WebMessageListener: FlutterMethodCallDelegate {
     static var METHOD_CHANNEL_NAME_PREFIX = "com.pichillilorenzo/flutter_inappwebview_web_message_listener_"
     var id: String
     var jsObjectName: String

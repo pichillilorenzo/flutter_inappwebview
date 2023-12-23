@@ -7,7 +7,7 @@
 
 import Foundation
 
-public class PrintJobInfo : NSObject {
+public class PrintJobInfo: NSObject {
     var state: PrintJobState
     var attributes: PrintAttributes
     var creationTime: Int64

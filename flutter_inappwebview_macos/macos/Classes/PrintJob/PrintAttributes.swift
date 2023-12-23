@@ -7,7 +7,7 @@
 
 import Foundation
 
-public class PrintAttributes : NSObject {
+public class PrintAttributes: NSObject {
     var orientation: NSPrintInfo.PaperOrientation?
     var margins: NSEdgeInsets?
     var paperRect: CGRect?

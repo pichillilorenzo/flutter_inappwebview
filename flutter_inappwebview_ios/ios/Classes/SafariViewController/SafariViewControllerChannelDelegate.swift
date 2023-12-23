@@ -7,7 +7,7 @@
 
 import Foundation
 
-public class SafariViewControllerChannelDelegate : ChannelDelegate {
+public class SafariViewControllerChannelDelegate: ChannelDelegate {
     private weak var safariViewController: SafariViewController?
     
     public init(safariViewController: SafariViewController, channel: FlutterMethodChannel) {

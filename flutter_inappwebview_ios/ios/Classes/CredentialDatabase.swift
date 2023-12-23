@@ -9,8 +9,9 @@ import Foundation
 
 public class CredentialDatabase: ChannelDelegate {
     static let METHOD_CHANNEL_NAME = "com.pichillilorenzo/flutter_inappwebview_credential_database"
-    var plugin: SwiftFlutterPlugin?
-    static var credentialStore = URLCredentialStorage.shared
+    static let credentialStore = URLCredentialStorage.shared
+
+    private var plugin: SwiftFlutterPlugin?
 
     init(plugin: SwiftFlutterPlugin) {
         super.init(channel: FlutterMethodChannel(name: CredentialDatabase.METHOD_CHANNEL_NAME, binaryMessenger: plugin.registrar!.messenger()))
@@ -44,7 +45,7 @@ public class CredentialDatabase: ChannelDelegate {
                 let host = arguments!["host"] as! String
                 let urlProtocol = arguments!["protocol"] as? String
                 let urlPort = arguments!["port"] as? Int ?? 0
-                var realm = arguments!["realm"] as? String;
+                var realm = arguments!["realm"] as? String
                 if let r = realm, r.isEmpty {
                     realm = nil
                 }
@@ -64,7 +65,7 @@ public class CredentialDatabase: ChannelDelegate {
                 let host = arguments!["host"] as! String
                 let urlProtocol = arguments!["protocol"] as? String
                 let urlPort = arguments!["port"] as? Int ?? 0
-                var realm = arguments!["realm"] as? String;
+                var realm = arguments!["realm"] as? String
                 if let r = realm, r.isEmpty {
                     realm = nil
                 }
@@ -80,14 +81,14 @@ public class CredentialDatabase: ChannelDelegate {
                 let host = arguments!["host"] as! String
                 let urlProtocol = arguments!["protocol"] as? String
                 let urlPort = arguments!["port"] as? Int ?? 0
-                var realm = arguments!["realm"] as? String;
+                var realm = arguments!["realm"] as? String
                 if let r = realm, r.isEmpty {
                     realm = nil
                 }
                 let username = arguments!["username"] as! String
                 let password = arguments!["password"] as! String
                 
-                var credential: URLCredential? = nil;
+                var credential: URLCredential? = nil
                 var protectionSpaceCredential: URLProtectionSpace? = nil
                 
                 for (protectionSpace, credentials) in CredentialDatabase.credentialStore.allCredentials {
@@ -116,12 +117,12 @@ public class CredentialDatabase: ChannelDelegate {
                 let host = arguments!["host"] as! String
                 let urlProtocol = arguments!["protocol"] as? String
                 let urlPort = arguments!["port"] as? Int ?? 0
-                var realm = arguments!["realm"] as? String;
+                var realm = arguments!["realm"] as? String
                 if let r = realm, r.isEmpty {
                     realm = nil
                 }
                 
-                var credentialsToRemove: [URLCredential] = [];
+                var credentialsToRemove: [URLCredential] = []
                 var protectionSpaceCredential: URLProtectionSpace? = nil
                 
                 for (protectionSpace, credentials) in CredentialDatabase.credentialStore.allCredentials {

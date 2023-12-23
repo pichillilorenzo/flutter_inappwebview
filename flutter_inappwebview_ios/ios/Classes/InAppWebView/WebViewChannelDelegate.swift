@@ -8,7 +8,7 @@
 import Foundation
 import WebKit
 
-public class WebViewChannelDelegate : ChannelDelegate {
+public class WebViewChannelDelegate: ChannelDelegate {
     private weak var webView: InAppWebView?
     
     public init(webView: InAppWebView, channel: FlutterMethodChannel) {
@@ -743,7 +743,7 @@ public class WebViewChannelDelegate : ChannelDelegate {
         channel?.invokeMethod("onExitFullscreen", arguments: arguments)
     }
     
-    public class JsAlertCallback : BaseCallbackResult<JsAlertResponse> {
+    public class JsAlertCallback: BaseCallbackResult<JsAlertResponse> {
         override init() {
             super.init()
             self.decodeResult = { (obj: Any?) in
@@ -769,7 +769,7 @@ public class WebViewChannelDelegate : ChannelDelegate {
         channel?.invokeMethod("onJsAlert", arguments: arguments, callback: callback)
     }
     
-    public class JsConfirmCallback : BaseCallbackResult<JsConfirmResponse> {
+    public class JsConfirmCallback: BaseCallbackResult<JsConfirmResponse> {
         override init() {
             super.init()
             self.decodeResult = { (obj: Any?) in
@@ -795,7 +795,7 @@ public class WebViewChannelDelegate : ChannelDelegate {
         channel?.invokeMethod("onJsConfirm", arguments: arguments, callback: callback)
     }
     
-    public class JsPromptCallback : BaseCallbackResult<JsPromptResponse> {
+    public class JsPromptCallback: BaseCallbackResult<JsPromptResponse> {
         override init() {
             super.init()
             self.decodeResult = { (obj: Any?) in
@@ -822,7 +822,7 @@ public class WebViewChannelDelegate : ChannelDelegate {
         channel?.invokeMethod("onJsPrompt", arguments: arguments, callback: callback)
     }
     
-    public class CreateWindowCallback : BaseCallbackResult<Bool> {
+    public class CreateWindowCallback: BaseCallbackResult<Bool> {
         override init() {
             super.init()
             self.decodeResult = { (obj: Any?) in
@@ -866,7 +866,7 @@ public class WebViewChannelDelegate : ChannelDelegate {
         channel?.invokeMethod("onTitleChanged", arguments: arguments)
     }
     
-    public class PermissionRequestCallback : BaseCallbackResult<PermissionResponse> {
+    public class PermissionRequestCallback: BaseCallbackResult<PermissionResponse> {
         override init() {
             super.init()
             self.decodeResult = { (obj: Any?) in
@@ -887,7 +887,7 @@ public class WebViewChannelDelegate : ChannelDelegate {
         channel?.invokeMethod("onPermissionRequest", arguments: request.toMap(), callback: callback)
     }
     
-    public class ShouldOverrideUrlLoadingCallback : BaseCallbackResult<WKNavigationActionPolicy> {
+    public class ShouldOverrideUrlLoadingCallback: BaseCallbackResult<WKNavigationActionPolicy> {
         override init() {
             super.init()
             self.decodeResult = { (obj: Any?) in
@@ -945,7 +945,7 @@ public class WebViewChannelDelegate : ChannelDelegate {
         channel?.invokeMethod("onReceivedHttpError", arguments: arguments)
     }
     
-    public class ReceivedHttpAuthRequestCallback : BaseCallbackResult<HttpAuthResponse> {
+    public class ReceivedHttpAuthRequestCallback: BaseCallbackResult<HttpAuthResponse> {
         override init() {
             super.init()
             self.decodeResult = { (obj: Any?) in
@@ -977,7 +977,7 @@ public class WebViewChannelDelegate : ChannelDelegate {
         }
     }
     
-    public class ReceivedServerTrustAuthRequestCallback : BaseCallbackResult<ServerTrustAuthResponse> {
+    public class ReceivedServerTrustAuthRequestCallback: BaseCallbackResult<ServerTrustAuthResponse> {
         override init() {
             super.init()
             self.decodeResult = { (obj: Any?) in
@@ -1009,7 +1009,7 @@ public class WebViewChannelDelegate : ChannelDelegate {
         }
     }
     
-    public class ReceivedClientCertRequestCallback : BaseCallbackResult<ClientCertResponse> {
+    public class ReceivedClientCertRequestCallback: BaseCallbackResult<ClientCertResponse> {
         override init() {
             super.init()
             self.decodeResult = { (obj: Any?) in
@@ -1056,7 +1056,7 @@ public class WebViewChannelDelegate : ChannelDelegate {
         channel?.invokeMethod("onPageCommitVisible", arguments: arguments)
     }
     
-    public class LoadResourceWithCustomSchemeCallback : BaseCallbackResult<CustomSchemeResponse> {
+    public class LoadResourceWithCustomSchemeCallback: BaseCallbackResult<CustomSchemeResponse> {
         override init() {
             super.init()
             self.decodeResult = { (obj: Any?) in
@@ -1074,7 +1074,7 @@ public class WebViewChannelDelegate : ChannelDelegate {
         channel?.invokeMethod("onLoadResourceWithCustomScheme", arguments: arguments, callback: callback)
     }
     
-    public class CallJsHandlerCallback : BaseCallbackResult<Any> {
+    public class CallJsHandlerCallback: BaseCallbackResult<Any> {
         override init() {
             super.init()
             self.decodeResult = { (obj: Any?) in
@@ -1095,7 +1095,7 @@ public class WebViewChannelDelegate : ChannelDelegate {
         channel?.invokeMethod("onCallJsHandler", arguments: arguments, callback: callback)
     }
     
-    public class NavigationResponseCallback : BaseCallbackResult<WKNavigationResponsePolicy> {
+    public class NavigationResponseCallback: BaseCallbackResult<WKNavigationResponsePolicy> {
         override init() {
             super.init()
             self.decodeResult = { (obj: Any?) in
@@ -1119,7 +1119,7 @@ public class WebViewChannelDelegate : ChannelDelegate {
         channel?.invokeMethod("onNavigationResponse", arguments: navigationResponse.toMap(), callback: callback)
     }
     
-    public class ShouldAllowDeprecatedTLSCallback : BaseCallbackResult<Bool> {
+    public class ShouldAllowDeprecatedTLSCallback: BaseCallbackResult<Bool> {
         override init() {
             super.init()
             self.decodeResult = { (obj: Any?) in
@@ -1182,7 +1182,7 @@ public class WebViewChannelDelegate : ChannelDelegate {
         channel?.invokeMethod("onMicrophoneCaptureStateChanged", arguments: arguments)
     }
     
-    public class PrintRequestCallback : BaseCallbackResult<Bool> {
+    public class PrintRequestCallback: BaseCallbackResult<Bool> {
         override init() {
             super.init()
             self.decodeResult = { (obj: Any?) in

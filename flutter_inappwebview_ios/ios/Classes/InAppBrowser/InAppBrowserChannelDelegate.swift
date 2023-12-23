@@ -7,7 +7,7 @@
 
 import Foundation
 
-public class InAppBrowserChannelDelegate : ChannelDelegate {
+public class InAppBrowserChannelDelegate: ChannelDelegate {
     public override init(channel: FlutterMethodChannel) {
         super.init(channel: channel)
     }

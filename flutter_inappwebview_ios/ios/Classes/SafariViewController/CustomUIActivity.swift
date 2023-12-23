@@ -7,7 +7,7 @@
 
 import Foundation
 
-class CustomUIActivity : UIActivity {
+class CustomUIActivity: UIActivity {
     var plugin: SwiftFlutterPlugin
     var viewId: String
     var id: Int64

@@ -7,7 +7,7 @@
 
 import Foundation
 
-public class PermissionResponse : NSObject {
+public class PermissionResponse: NSObject {
     var resources: [Any]
     var action: Int?
     

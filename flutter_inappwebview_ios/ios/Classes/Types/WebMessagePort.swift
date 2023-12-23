@@ -7,7 +7,7 @@
 
 import Foundation
 
-public class WebMessagePort : NSObject {
+public class WebMessagePort: NSObject {
     var name: String
     var index: Int64
     var webMessageChannelId: String

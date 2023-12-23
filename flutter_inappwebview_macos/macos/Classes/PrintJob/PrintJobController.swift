@@ -15,7 +15,7 @@ public enum PrintJobState: Int {
     case canceled = 7
 }
 
-public class PrintJobController : NSObject, Disposable {
+public class PrintJobController: NSObject, Disposable {
     static let METHOD_CHANNEL_NAME_PREFIX = "com.pichillilorenzo/flutter_inappwebview_printjobcontroller_"
     var id: String
     var plugin: InAppWebViewFlutterPlugin?

@@ -11,8 +11,9 @@ import WebKit
 @available(iOS 9.0, *)
 public class MyWebStorageManager: ChannelDelegate {
     static let METHOD_CHANNEL_NAME = "com.pichillilorenzo/flutter_inappwebview_webstoragemanager"
-    var plugin: SwiftFlutterPlugin?
-    static var websiteDataStore = WKWebsiteDataStore.default()
+    static let websiteDataStore = WKWebsiteDataStore.default()
+
+    private var plugin: SwiftFlutterPlugin?
     
     init(plugin: SwiftFlutterPlugin) {
         super.init(channel: FlutterMethodChannel(name: MyWebStorageManager.METHOD_CHANNEL_NAME, binaryMessenger: plugin.registrar!.messenger()))

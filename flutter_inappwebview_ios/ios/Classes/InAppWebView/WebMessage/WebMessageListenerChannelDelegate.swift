@@ -7,7 +7,7 @@
 
 import Foundation
 
-public class WebMessageListenerChannelDelegate : ChannelDelegate {
+public class WebMessageListenerChannelDelegate: ChannelDelegate {
     private weak var webMessageListener: WebMessageListener?
     
     public init(webMessageListener: WebMessageListener, channel: FlutterMethodChannel) {

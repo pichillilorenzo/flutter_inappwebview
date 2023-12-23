@@ -7,7 +7,7 @@
 
 import Foundation
 
-public class CallbackResult<T> : MethodChannelResult {
+public class CallbackResult<T>: MethodChannelResult {
     public var notImplemented: () -> Void = {}
     public var success: (Any?) -> Void = {_ in }
     public var error: (String, String?, Any?) -> Void = {_,_,_ in }

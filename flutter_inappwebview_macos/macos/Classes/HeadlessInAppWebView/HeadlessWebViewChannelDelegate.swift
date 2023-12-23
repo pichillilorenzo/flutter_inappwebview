@@ -8,7 +8,7 @@
 import Foundation
 import FlutterMacOS
 
-public class HeadlessWebViewChannelDelegate : ChannelDelegate {
+public class HeadlessWebViewChannelDelegate: ChannelDelegate {
     private weak var headlessWebView: HeadlessInAppWebView?
     
     public init(headlessWebView: HeadlessInAppWebView, channel: FlutterMethodChannel) {

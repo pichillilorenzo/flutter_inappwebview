@@ -8,7 +8,7 @@
 import Foundation
 import WebKit
 
-public class CreateWindowAction : NSObject {
+public class CreateWindowAction: NSObject {
     var navigationAction: WKNavigationAction
     var windowId: Int64
     var windowFeatures: WKWindowFeatures

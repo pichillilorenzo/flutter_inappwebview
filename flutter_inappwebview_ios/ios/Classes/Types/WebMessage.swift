@@ -7,7 +7,7 @@
 
 import Foundation
 
-public class WebMessage : NSObject, Disposable {
+public class WebMessage: NSObject, Disposable {
     var data: Any?
     var type: WebMessageType
     var ports: [WebMessagePort]?

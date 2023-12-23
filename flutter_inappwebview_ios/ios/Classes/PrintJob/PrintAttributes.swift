@@ -7,7 +7,7 @@
 
 import Foundation
 
-public class PrintAttributes : NSObject {
+public class PrintAttributes: NSObject {
     var orientation: UIPrintInfo.Orientation?
     var duplex: UIPrintInfo.Duplex?
     var outputType: UIPrintInfo.OutputType?

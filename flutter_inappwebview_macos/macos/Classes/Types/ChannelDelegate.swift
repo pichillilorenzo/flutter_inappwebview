@@ -8,7 +8,7 @@
 import Foundation
 import FlutterMacOS
 
-public class ChannelDelegate : FlutterMethodCallDelegate, Disposable {
+public class ChannelDelegate: FlutterMethodCallDelegate, Disposable {
     var channel: FlutterMethodChannel?
     
     public init(channel: FlutterMethodChannel) {

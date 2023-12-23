@@ -15,7 +15,7 @@ struct ToolbarIdentifiers {
     static let menuButton = NSToolbarItem.Identifier(rawValue: "MenuButton")
 }
 
-public class InAppBrowserWindow : NSWindow, NSWindowDelegate, NSToolbarDelegate, NSSearchFieldDelegate {
+public class InAppBrowserWindow: NSWindow, NSWindowDelegate, NSToolbarDelegate, NSSearchFieldDelegate {
     var searchItem: NSToolbarItem?
     var backItem: NSToolbarItem?
     var forwardItem: NSToolbarItem?

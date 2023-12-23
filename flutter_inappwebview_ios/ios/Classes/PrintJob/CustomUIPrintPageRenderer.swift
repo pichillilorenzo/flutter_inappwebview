@@ -7,7 +7,7 @@
 
 import Foundation
 
-public class CustomUIPrintPageRenderer : UIPrintPageRenderer {
+public class CustomUIPrintPageRenderer: UIPrintPageRenderer {
     private var _numberOfPages: Int?
     private var forceRenderingQuality: Int?
 

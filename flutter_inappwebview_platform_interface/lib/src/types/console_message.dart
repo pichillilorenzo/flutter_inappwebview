@@ -14,7 +14,7 @@ class ConsoleMessage_ {
   ///Console message
   String message;
 
-  ///Console messsage level
+  ///Console message level
   ConsoleMessageLevel_ messageLevel;
 
   ConsoleMessage_(

@@ -1365,7 +1365,7 @@ public class InAppWebView: WKWebView, WKUIDelegate,
                     switch action {
                         case 0:
                             InAppWebView.credentialsProposed = []
-                            // used .performDefaultHandling to mantain consistency with Android
+                            // used .performDefaultHandling to maintain consistency with Android
                             // because .cancelAuthenticationChallenge will call webView(_:didFail:withError:)
                             completionHandler(.performDefaultHandling, nil)
                             //completionHandler(.cancelAuthenticationChallenge, nil)

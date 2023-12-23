@@ -27,8 +27,8 @@ public class FlutterWebViewController: NSObject, /*FlutterPlatformView,*/ Dispos
         
         var userScripts: [UserScript] = []
         if let initialUserScripts = initialUserScripts {
-            for intialUserScript in initialUserScripts {
-                userScripts.append(UserScript.fromMap(map: intialUserScript, windowId: windowId)!)
+            for initialUserScript in initialUserScripts {
+                userScripts.append(UserScript.fromMap(map: initialUserScript, windowId: windowId)!)
             }
         }
         

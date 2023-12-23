@@ -14,7 +14,7 @@ class ConsoleMessage {
   ///Console message
   String message;
 
-  ///Console messsage level
+  ///Console message level
   ConsoleMessageLevel messageLevel;
   ConsoleMessage(
       {this.message = "", this.messageLevel = ConsoleMessageLevel.LOG});

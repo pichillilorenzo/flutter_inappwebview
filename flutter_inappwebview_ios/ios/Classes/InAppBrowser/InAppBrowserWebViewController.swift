@@ -62,8 +62,8 @@ public class InAppBrowserWebViewController: UIViewController, InAppBrowserDelega
         channelDelegate = InAppBrowserChannelDelegate(channel: channel)
         
         var userScripts: [UserScript] = []
-        for intialUserScript in initialUserScripts {
-            userScripts.append(UserScript.fromMap(map: intialUserScript, windowId: windowId)!)
+        for initialUserScript in initialUserScripts {
+            userScripts.append(UserScript.fromMap(map: initialUserScript, windowId: windowId)!)
         }
         
         let preWebviewConfiguration = InAppWebView.preWKWebViewConfiguration(settings: webViewSettings)

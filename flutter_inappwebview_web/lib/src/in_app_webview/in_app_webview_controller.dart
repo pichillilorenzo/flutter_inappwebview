@@ -261,8 +261,8 @@ class WebPlatformInAppWebViewController extends PlatformInAppWebViewController
     }
 
     if (webviewUrl.isScheme("file")) {
-      var assetPathSplitted = webviewUrl.toString().split("/flutter_assets/");
-      var assetPath = assetPathSplitted[assetPathSplitted.length - 1];
+      var assetPathSplit = webviewUrl.toString().split("/flutter_assets/");
+      var assetPath = assetPathSplit[assetPathSplit.length - 1];
       try {
         var bytes = await rootBundle.load(assetPath);
         html = utf8.decode(bytes.buffer.asUint8List());
@@ -291,8 +291,8 @@ class WebPlatformInAppWebViewController extends PlatformInAppWebViewController
     var assetPathBase;
 
     if (webviewUrl.isScheme("file")) {
-      var assetPathSplitted = webviewUrl.toString().split("/flutter_assets/");
-      assetPathBase = assetPathSplitted[0] + "/flutter_assets/";
+      var assetPathSplit = webviewUrl.toString().split("/flutter_assets/");
+      assetPathBase = assetPathSplit[0] + "/flutter_assets/";
     }
 
     InAppWebViewSettings? settings = await getSettings();
@@ -354,7 +354,7 @@ class WebPlatformInAppWebViewController extends PlatformInAppWebViewController
       String urlIcon, String? rel, String? sizes, bool isManifest) {
     List<Favicon> favicons = [];
 
-    List<String> urlSplitted = urlIcon.split("/");
+    List<String> urlSplit = urlIcon.split("/");
     if (!_isUrlAbsolute(urlIcon)) {
       if (urlIcon.startsWith("/")) {
         urlIcon = urlIcon.substring(1);
@@ -366,15 +366,15 @@ class WebPlatformInAppWebViewController extends PlatformInAppWebViewController
     }
     if (isManifest) {
       rel = (sizes != null)
-          ? urlSplitted[urlSplitted.length - 1]
+          ? urlSplit[urlSplit.length - 1]
               .replaceFirst("-" + sizes, "")
               .split(" ")[0]
               .split(".")[0]
           : null;
     }
     if (sizes != null && sizes.isNotEmpty && sizes != "any") {
-      List<String> sizesSplitted = sizes.split(" ");
-      for (String size in sizesSplitted) {
+      List<String> sizesSplit = sizes.split(" ");
+      for (String size in sizesSplit) {
         int width = int.parse(size.split("x")[0]);
         int height = int.parse(size.split("x")[1]);
         favicons.add(Favicon(

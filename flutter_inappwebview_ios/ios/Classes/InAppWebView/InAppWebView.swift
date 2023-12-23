@@ -2079,10 +2079,13 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
                             completionHandler(.cancelAuthenticationChallenge, nil)
                             break
                         case 1:
-                            let exceptions = SecTrustCopyExceptions(serverTrust)
-                            SecTrustSetExceptions(serverTrust, exceptions)
-                            let credential = URLCredential(trust: serverTrust)
-                            completionHandler(.useCredential, credential)
+                            // workaround for https://github.com/pichillilorenzo/flutter_inappwebview/issues/1924
+                            DispatchQueue.global(qos: .background).async {
+                                let exceptions = SecTrustCopyExceptions(serverTrust)
+                                SecTrustSetExceptions(serverTrust, exceptions)
+                                let credential = URLCredential(trust: serverTrust)
+                                completionHandler(.useCredential, credential)
+                            }
                             break
                         default:
                             InAppWebView.credentialsProposed = []

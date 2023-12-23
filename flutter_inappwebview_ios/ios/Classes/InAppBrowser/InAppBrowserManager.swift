@@ -114,7 +114,15 @@ public class InAppBrowserManager: ChannelDelegate {
             assertionFailure("Failure init the visibleViewController!")
             return
         }
-        
+
+        if let popover = navController.popoverPresentationController {
+            let sourceView = visibleViewController.view ?? UIView()
+
+            popover.sourceRect = CGRect(x: sourceView.bounds.midX, y: sourceView.bounds.midY, width: 0, height: 0)
+            popover.permittedArrowDirections = []
+            popover.sourceView = sourceView
+        }
+
         visibleViewController.present(navController, animated: animated)
     }
     

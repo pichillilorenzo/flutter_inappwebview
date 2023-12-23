@@ -1,5 +1,6 @@
 ## 1.0.12
 
+- Updated `flutter_inappwebview_platform_interface` version dependency to `^1.0.9`
 - Fix typos and other code improvements (thanks to [michalsrutek](https://github.com/michalsrutek))
 - Merged "💥 Fix iPad crash due to missing sourceView" [#1933](https://github.com/pichillilorenzo/flutter_inappwebview/pull/1933) (thanks to [michalsrutek](https://github.com/michalsrutek))
 - Merged "💥 Fix crash - remove force unwrapping from dispose method" [#1932](https://github.com/pichillilorenzo/flutter_inappwebview/pull/1932) (thanks to [michalsrutek](https://github.com/michalsrutek))

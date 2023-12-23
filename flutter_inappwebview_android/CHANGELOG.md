@@ -1,5 +1,6 @@
 ## 1.0.11
 
+- Updated `flutter_inappwebview_platform_interface` version dependency to `^1.0.9`
 - Fix typos (thanks to [michalsrutek](https://github.com/michalsrutek))
 
 ## 1.0.10

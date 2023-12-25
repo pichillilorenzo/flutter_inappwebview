@@ -188,6 +188,17 @@ class WebUri implements Uri {
   @override
   String get userInfo => _uri.userInfo;
 
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) {
+      return true;
+    }
+    return other is WebUri &&
+        _uri == other._uri &&
+        _rawValue == other._rawValue &&
+        forceToStringRawValue == other.forceToStringRawValue;
+  }
+
   ///If [forceToStringRawValue] is `true` or [isValidUri] is `false`, it returns [rawValue],
   ///otherwise the value of [uriValue]`.toString()`.
   @override

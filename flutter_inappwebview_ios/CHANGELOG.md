@@ -1,3 +1,7 @@
+## 1.0.13
+
+- Updated `flutter_inappwebview_platform_interface` version dependency to `^1.0.10`
+
 ## 1.0.12
 
 - Updated `flutter_inappwebview_platform_interface` version dependency to `^1.0.9`

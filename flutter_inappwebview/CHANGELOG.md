@@ -1,3 +1,8 @@
+## 6.0.0
+
+- Updated minimum platform interface and implementation versions
+- Merged "Added == operator and hashCode to WebUri" [#1941](https://github.com/pichillilorenzo/flutter_inappwebview/pull/1941) (thanks to [daisukeueta](https://github.com/daisukeueta))
+
 ## 6.0.0-rc.3
 
 - Updated minimum platform interface and implementation versions

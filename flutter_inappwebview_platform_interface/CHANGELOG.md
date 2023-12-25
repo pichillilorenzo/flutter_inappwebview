@@ -1,3 +1,7 @@
+## 1.0.10
+
+- Merged "Added == operator and hashCode to WebUri" [#1941](https://github.com/pichillilorenzo/flutter_inappwebview/pull/1941) (thanks to [daisukeueta](https://github.com/daisukeueta))
+
 ## 1.0.9
 
 - Fix typos (thanks to [michalsrutek](https://github.com/michalsrutek))

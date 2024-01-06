@@ -26,10 +26,6 @@ Future main() async {
     await InAppWebViewController.setWebContentsDebuggingEnabled(kDebugMode);
   }
 
-  if (!kIsWeb) {
-    await localhostServer.start();
-  }
-
   runApp(MyApp());
 }
 
@@ -75,6 +71,41 @@ PointerInterceptor myDrawer({required BuildContext context}) {
         },
       )
     ];
+  } else if (defaultTargetPlatform == TargetPlatform.macOS ||
+      defaultTargetPlatform == TargetPlatform.windows ||
+      defaultTargetPlatform == TargetPlatform.linux) {
+    children = [
+      // ListTile(
+      //   title: Text('InAppWebView'),
+      //   onTap: () {
+      //     Navigator.pushReplacementNamed(context, '/');
+      //   },
+      // ),
+      // ListTile(
+      //   title: Text('InAppBrowser'),
+      //   onTap: () {
+      //     Navigator.pushReplacementNamed(context, '/InAppBrowser');
+      //   },
+      // ),
+      ListTile(
+        title: Text('InAppBrowser'),
+        onTap: () {
+          Navigator.pushReplacementNamed(context, '/');
+        },
+      ),
+      ListTile(
+        title: Text('WebAuthenticationSession'),
+        onTap: () {
+          Navigator.pushReplacementNamed(context, '/WebAuthenticationSession');
+        },
+      ),
+      ListTile(
+        title: Text('HeadlessInAppWebView'),
+        onTap: () {
+          Navigator.pushReplacementNamed(context, '/HeadlessInAppWebView');
+        },
+      ),
+    ];
   } else if (defaultTargetPlatform == TargetPlatform.macOS) {
     children = [
       // ListTile(
@@ -99,6 +130,34 @@ PointerInterceptor myDrawer({required BuildContext context}) {
         title: Text('WebAuthenticationSession'),
         onTap: () {
           Navigator.pushReplacementNamed(context, '/WebAuthenticationSession');
+        },
+      ),
+      ListTile(
+        title: Text('HeadlessInAppWebView'),
+        onTap: () {
+          Navigator.pushReplacementNamed(context, '/HeadlessInAppWebView');
+        },
+      ),
+    ];
+  } else if (defaultTargetPlatform == TargetPlatform.windows ||
+      defaultTargetPlatform == TargetPlatform.linux) {
+    children = [
+      // ListTile(
+      //   title: Text('InAppWebView'),
+      //   onTap: () {
+      //     Navigator.pushReplacementNamed(context, '/');
+      //   },
+      // ),
+      // ListTile(
+      //   title: Text('InAppBrowser'),
+      //   onTap: () {
+      //     Navigator.pushReplacementNamed(context, '/InAppBrowser');
+      //   },
+      // ),
+      ListTile(
+        title: Text('InAppBrowser'),
+        onTap: () {
+          Navigator.pushReplacementNamed(context, '/');
         },
       ),
       ListTile(
@@ -159,6 +218,15 @@ class _MyAppState extends State<MyApp> {
             HeadlessInAppWebViewExampleScreen(),
         '/WebAuthenticationSession': (context) =>
             WebAuthenticationSessionExampleScreen(),
+      });
+    } else  if (defaultTargetPlatform == TargetPlatform.windows ||
+        defaultTargetPlatform == TargetPlatform.linux) {
+      return MaterialApp(initialRoute: '/', routes: {
+        // '/': (context) => InAppWebViewExampleScreen(),
+        // '/InAppBrowser': (context) => InAppBrowserExampleScreen(),
+        '/': (context) => InAppBrowserExampleScreen(),
+        '/HeadlessInAppWebView': (context) =>
+            HeadlessInAppWebViewExampleScreen(),
       });
     }
     return MaterialApp(initialRoute: '/', routes: {

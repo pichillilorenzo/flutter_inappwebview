@@ -75,13 +75,6 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
-  flutter_inappwebview_android:
-    dependency: "direct main"
-    description:
-      path: ".."
-      relative: true
-    source: path
-    version: "1.0.12"
   flutter_inappwebview_internal_annotations:
     dependency: transitive
     description:
@@ -98,6 +91,13 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.10"
+  flutter_inappwebview_windows:
+    dependency: "direct main"
+    description:
+      path: ".."
+      relative: true
+    source: path
+    version: "1.0.11"
   flutter_lints:
     dependency: "direct dev"
     description:
@@ -279,5 +279,5 @@ packages:
     source: hosted
     version: "3.0.2"
 sdks:
-  dart: ">=3.2.0-194.0.dev <4.0.0"
+  dart: ">=3.2.3 <4.0.0"
   flutter: ">=3.0.0"

@@ -20,6 +20,7 @@ namespace flutter_inappwebview_plugin
 
 		FlutterInappwebviewWindowsBasePlugin* plugin;
 		std::variant<std::string, int> id;
+		wil::com_ptr<ICoreWebView2Environment> webViewEnv;
 		wil::com_ptr<ICoreWebView2Controller> webViewController;
 		wil::com_ptr<ICoreWebView2> webView;
 		std::unique_ptr<WebViewChannelDelegate> channelDelegate;
@@ -32,6 +33,7 @@ namespace flutter_inappwebview_plugin
 		void loadUrl(const URLRequest urlRequest) const;
 
 	private:
+		bool callShouldOverrideUrlLoading = true;
 		void createWebView(const HWND parentWindow, const std::function<void()> completionHandler);
 		void InAppWebView::registerEventHandlers();
 	};

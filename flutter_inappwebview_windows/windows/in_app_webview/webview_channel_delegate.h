@@ -5,15 +5,25 @@
 #include <flutter/standard_message_codec.h>
 
 #include "../types/channel_delegate.h"
+#include "../types/base_callback_result.h"
+#include "../types/navigation_action.h"
 
 namespace flutter_inappwebview_plugin
 {
     class InAppWebView;
 
+    enum NavigationActionPolicy {cancel = 0, allow = 1};
+
     class WebViewChannelDelegate : public ChannelDelegate
     {
     public:
         InAppWebView* webView;
+
+        class ShouldOverrideUrlLoadingCallback : public BaseCallbackResult<NavigationActionPolicy> {
+        public:
+            ShouldOverrideUrlLoadingCallback();
+            ~ShouldOverrideUrlLoadingCallback() = default;
+        };
 
         WebViewChannelDelegate(InAppWebView* webView, flutter::BinaryMessenger* messenger);
         WebViewChannelDelegate(InAppWebView* webView, flutter::BinaryMessenger* messenger, const std::string& name);
@@ -25,6 +35,7 @@ namespace flutter_inappwebview_plugin
 
         void onLoadStart(const std::optional<std::string> url) const;
         void onLoadStop(const std::optional<std::string> url) const;
+        void shouldOverrideUrlLoading(std::shared_ptr<NavigationAction> navigationAction, std::unique_ptr<ShouldOverrideUrlLoadingCallback> callback);
     };
 }
 

@@ -45,11 +45,7 @@ namespace flutter_inappwebview_plugin
 
 	InAppBrowserManager::~InAppBrowserManager()
 	{
-		std::cout << "dealloc InAppBrowserManager\n";
-		for (std::map<std::string, std::unique_ptr<InAppBrowser>>::iterator itr = browsers.begin(); itr != browsers.end(); itr++)
-		{
-			browsers.erase(itr->first);
-		}
+		debugLog("dealloc InAppBrowserManager");
 		browsers.clear();
 		plugin = nullptr;
 	}

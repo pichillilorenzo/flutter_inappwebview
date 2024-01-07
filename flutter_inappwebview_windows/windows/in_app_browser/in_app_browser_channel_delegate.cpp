@@ -35,6 +35,6 @@ namespace flutter_inappwebview_plugin
 
     InAppBrowserChannelDelegate::~InAppBrowserChannelDelegate()
     {
-        std::cout << "dealloc InAppBrowserChannelDelegate\n";
+        debugLog("dealloc InAppBrowserChannelDelegate");
     }
 }

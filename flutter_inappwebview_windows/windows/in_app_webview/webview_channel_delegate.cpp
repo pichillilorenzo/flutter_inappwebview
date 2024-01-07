@@ -3,6 +3,7 @@
 
 #include "../utils/util.h"
 #include "../utils/strconv.h"
+#include "../types/base_callback_result.h"
 
 namespace flutter_inappwebview_plugin
 {
@@ -18,6 +19,16 @@ namespace flutter_inappwebview_plugin
 
 	}
 
+	WebViewChannelDelegate::ShouldOverrideUrlLoadingCallback::ShouldOverrideUrlLoadingCallback() {
+		decodeResult = [](const flutter::EncodableValue* value) {
+			if (value->IsNull()) {
+				return cancel;
+			}
+			auto navigationPolicy = std::get<int>(*value);
+			return static_cast<NavigationActionPolicy>(navigationPolicy);
+		};
+	}
+
 	void WebViewChannelDelegate::HandleMethodCall(const flutter::MethodCall<flutter::EncodableValue>& method_call,
 		std::unique_ptr<flutter::MethodResult<flutter::EncodableValue>> result)
 	{
@@ -27,8 +38,12 @@ namespace flutter_inappwebview_plugin
 		}
 
 		if (method_call.method_name().compare("getUrl") == 0) {
-			std::optional<std::string> url = webView->getUrl();
-			result->Success(url.has_value() ? flutter::EncodableValue(url.value()) : flutter::EncodableValue());
+			result->Success(optional_to_fl_value(webView->getUrl()));
+		} else if (method_call.method_name().compare("loadUrl") == 0) {
+			auto& arguments = std::get<flutter::EncodableMap>(*method_call.arguments());
+			auto urlRequest = std::make_unique<URLRequest>(get_fl_map_value<flutter::EncodableMap>(arguments, "urlRequest"));
+			webView->loadUrl(*urlRequest);
+			result->Success(flutter::EncodableValue(true));
 		}
 		else {
 			result->NotImplemented();
@@ -42,7 +57,7 @@ namespace flutter_inappwebview_plugin
 		}
 
 		auto arguments = std::make_unique<flutter::EncodableValue>(flutter::EncodableMap {
-			{flutter::EncodableValue("url"), url.has_value() ? flutter::EncodableValue(url.value()) : flutter::EncodableValue()},
+			{flutter::EncodableValue("url"), optional_to_fl_value(url)},
 		});
 		channel->InvokeMethod("onLoadStart", std::move(arguments));
 	}
@@ -54,14 +69,24 @@ namespace flutter_inappwebview_plugin
 		}
 
 		auto arguments = std::make_unique<flutter::EncodableValue>(flutter::EncodableMap{
-			{flutter::EncodableValue("url"), url.has_value() ? flutter::EncodableValue(url.value()) : flutter::EncodableValue()},
+			{flutter::EncodableValue("url"), optional_to_fl_value(url)},
 		});
 		channel->InvokeMethod("onLoadStop", std::move(arguments));
 	}
 
+	void WebViewChannelDelegate::shouldOverrideUrlLoading(std::shared_ptr<NavigationAction> navigationAction, std::unique_ptr<ShouldOverrideUrlLoadingCallback> callback)
+	{
+		if (!channel) {
+			return;
+		}
+
+		auto arguments = std::make_unique<flutter::EncodableValue>(navigationAction->toEncodableMap());
+		channel->InvokeMethod("shouldOverrideUrlLoading", std::move(arguments), std::move(callback));
+	}
+
     WebViewChannelDelegate::~WebViewChannelDelegate()
 	{
-		std::cout << "dealloc WebViewChannelDelegate\n";
+		debugLog("dealloc WebViewChannelDelegate");
 		webView = nullptr;
     }
 }

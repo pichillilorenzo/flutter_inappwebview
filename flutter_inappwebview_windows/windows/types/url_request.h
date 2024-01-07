@@ -12,8 +12,13 @@ namespace flutter_inappwebview_plugin
 	public:
 		const std::optional<std::string> url;
 		const std::optional<std::string> method;
+		const std::optional<std::map<std::string, std::string>> headers;
+		const std::optional<std::vector<uint8_t>> body;
 
+		URLRequest(std::optional<std::string> url, std::optional<std::string> method, std::optional<std::map<std::string, std::string>> headers, std::optional<std::vector<uint8_t>> body);
 		URLRequest(const flutter::EncodableMap map);
+		~URLRequest() = default;
+		flutter::EncodableMap toEncodableMap();
 	};
 }
 

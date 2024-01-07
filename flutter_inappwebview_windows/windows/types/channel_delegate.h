@@ -1,4 +1,5 @@
-#pragma once
+#ifndef FLUTTER_INAPPWEBVIEW_PLUGIN_CHANNEL_DELEGATE_H_
+#define FLUTTER_INAPPWEBVIEW_PLUGIN_CHANNEL_DELEGATE_H_
 
 #include <flutter/method_channel.h>
 
@@ -18,10 +19,12 @@ namespace flutter_inappwebview_plugin
 		flutter::BinaryMessenger* messenger;
 
 		ChannelDelegate(flutter::BinaryMessenger* messenger, const std::string& name);
-		~ChannelDelegate();
+		virtual ~ChannelDelegate();
 
 		virtual void HandleMethodCall(
 			const flutter::MethodCall<flutter::EncodableValue>& method_call,
 			std::unique_ptr<flutter::MethodResult<flutter::EncodableValue>> result);
 	};
 }
+
+#endif //FLUTTER_INAPPWEBVIEW_PLUGIN_CHANNEL_DELEGATE_H_

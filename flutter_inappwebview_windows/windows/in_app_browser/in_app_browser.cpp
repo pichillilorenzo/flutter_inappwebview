@@ -16,6 +16,7 @@
 #include <wil/wrl.h>
 #include <wil/com.h>
 #include "../utils/strconv.h"
+#include "../utils/util.h"
 
 #include <WebView2.h>
 #include <WebView2EnvironmentOptions.h>
@@ -229,7 +230,7 @@ namespace flutter_inappwebview_plugin
 
 	InAppBrowser::~InAppBrowser()
 	{
-		std::cout << "dealloc InAppBrowser\n";
+		debugLog("dealloc InAppBrowser");
 		webView.reset();
 		SetWindowLongPtr(m_hWnd, GWLP_USERDATA, 0);
 		plugin = nullptr;

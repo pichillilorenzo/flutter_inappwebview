@@ -49,12 +49,11 @@ add_custom_command(
 
 # Any new source files that you add to the plugin should be added here.
 list(APPEND PLUGIN_SOURCES
-  "flutter_inappwebview_windows_base_plugin.h"
-  "flutter_inappwebview_windows_base_plugin.cpp"
   "flutter_inappwebview_windows_plugin.cpp"
   "flutter_inappwebview_windows_plugin.h"
   "utils/strconv.h"
   "utils/util.h"
+  "utils/flutter.h"
   "types/channel_delegate.cpp"
   "types/channel_delegate.h"
   "types/base_callback_result.h"
@@ -62,6 +61,12 @@ list(APPEND PLUGIN_SOURCES
   "types/url_request.h"
   "types/navigation_action.cpp"
   "types/navigation_action.h"
+  "types/web_resource_error.cpp"
+  "types/web_resource_error.h"
+  "types/web_resource_request.cpp"
+  "types/web_resource_request.h"
+  "types/web_resource_response.cpp"
+  "types/web_resource_response.h"
   "in_app_webview/in_app_webview.cpp"
   "in_app_webview/in_app_webview.h"
   "in_app_webview/webview_channel_delegate.cpp"

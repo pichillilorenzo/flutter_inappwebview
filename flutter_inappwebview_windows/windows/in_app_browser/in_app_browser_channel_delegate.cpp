@@ -5,7 +5,7 @@
 
 namespace flutter_inappwebview_plugin
 {
-    InAppBrowserChannelDelegate::InAppBrowserChannelDelegate(const std::string id, flutter::BinaryMessenger* messenger)
+    InAppBrowserChannelDelegate::InAppBrowserChannelDelegate(const std::string& id, flutter::BinaryMessenger* messenger)
             : ChannelDelegate(messenger, InAppBrowser::METHOD_CHANNEL_NAME_PREFIX + id)
     {
 

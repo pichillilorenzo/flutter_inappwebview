@@ -13,7 +13,7 @@ namespace flutter_inappwebview_plugin
         const std::shared_ptr<URLRequest> request;
         const bool isForMainFrame;
 
-        NavigationAction(std::shared_ptr<URLRequest> request, bool isForMainFrame);
+        NavigationAction(std::shared_ptr<URLRequest> request, const bool& isForMainFrame);
         ~NavigationAction() = default;
         flutter::EncodableMap toEncodableMap();
     };

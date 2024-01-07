@@ -65,7 +65,7 @@ class WindowsInAppBrowser extends PlatformInAppBrowser with ChannelController {
     return _staticValue;
   }
 
-  WindowsInAppBrowserCreationParams get _macosParams =>
+  WindowsInAppBrowserCreationParams get _windowsParams =>
       params as WindowsInAppBrowserCreationParams;
 
   static const MethodChannel _staticChannel =
@@ -95,7 +95,7 @@ class WindowsInAppBrowser extends PlatformInAppBrowser with ChannelController {
         channel!,
         this,
         this.initialUserScripts);
-    _macosParams.findInteractionController?.init(id);
+    _windowsParams.findInteractionController?.init(id);
   }
 
   _debugLog(String method, dynamic args) {

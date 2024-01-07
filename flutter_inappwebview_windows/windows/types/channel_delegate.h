@@ -3,11 +3,6 @@
 
 #include <flutter/method_channel.h>
 
-#include <memory>
-#include <set>
-
-#include "../flutter_inappwebview_windows_base_plugin.h"
-
 namespace flutter_inappwebview_plugin
 {
 	class ChannelDelegate

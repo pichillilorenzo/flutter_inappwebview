@@ -1,33 +1,11 @@
 #include <Windows.h>
 #include "in_app_browser.h"
-
-#include <cstdint>
-#include <memory>
-
-#include "flutter/event_channel.h"
-#include "flutter/plugin_registrar.h"
-#include "flutter/plugin_registrar_windows.h"
-#include "flutter/method_channel.h"
-#include "flutter/encodable_value.h"
-
-#include <stdlib.h>
-#include <string>
-#include <tchar.h>
-#include <wil/wrl.h>
-#include <wil/com.h>
-#include "../utils/strconv.h"
 #include "../utils/util.h"
-
-#include <WebView2.h>
-#include <WebView2EnvironmentOptions.h>
+#include "in_app_browser_manager.h"
 
 namespace flutter_inappwebview_plugin
 {
-	using namespace Microsoft::WRL;
-
-	const wchar_t* CLASS_NAME = L"InAppBrowser";
-
-	InAppBrowser::InAppBrowser(FlutterInappwebviewWindowsBasePlugin* plugin, const InAppBrowserCreationParams& params)
+	InAppBrowser::InAppBrowser(FlutterInappwebviewWindowsPlugin* plugin, const InAppBrowserCreationParams& params)
 		: plugin(plugin),		
 		m_hInstance(GetModuleHandle(nullptr)),
 		id(params.id),
@@ -35,7 +13,7 @@ namespace flutter_inappwebview_plugin
 		channelDelegate(std::make_unique<InAppBrowserChannelDelegate>(id, plugin->registrar->messenger()))
 	{
 		WNDCLASS wndClass = {};
-		wndClass.lpszClassName = CLASS_NAME;
+		wndClass.lpszClassName = InAppBrowser::CLASS_NAME;
 		wndClass.hInstance = m_hInstance;
 		wndClass.hIcon = LoadIcon(NULL, IDI_WINLOGO);
 		wndClass.hCursor = LoadCursor(NULL, IDC_ARROW);
@@ -45,9 +23,9 @@ namespace flutter_inappwebview_plugin
 
 		m_hWnd = CreateWindowEx(
 			0,                              // Optional window styles.
-			CLASS_NAME,                     // Window class
-			L"Learn to Program Windows",    // Window text
-			WS_OVERLAPPEDWINDOW,            // Window style
+			InAppBrowser::CLASS_NAME,		// Window class
+			L"",							// Window text
+			WS_OVERLAPPEDWINDOW,			// Window style
 
 			// Size and position
 			CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,
@@ -186,14 +164,18 @@ namespace flutter_inappwebview_plugin
 		) noexcept {
 		switch (message) {
 		case WM_DESTROY: {
-			webView.reset();
-
 			// might receive multiple WM_DESTROY messages.
 			if (!destroyed_) {
 				destroyed_ = true;
 
+				webView.reset();
+
 				if (channelDelegate) {
 					channelDelegate->onExit();
+				}
+
+				if (plugin && plugin->inAppBrowserManager) {
+					plugin->inAppBrowserManager->browsers.erase(id);
 				}
 			}
 			return 0;

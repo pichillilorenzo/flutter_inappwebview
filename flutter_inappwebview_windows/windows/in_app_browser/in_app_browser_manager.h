@@ -6,7 +6,7 @@
 #include <flutter/method_channel.h>
 #include <flutter/standard_message_codec.h>
 
-#include "../flutter_inappwebview_windows_base_plugin.h"
+#include "../flutter_inappwebview_windows_plugin.h"
 
 #include "in_app_browser.h"
 
@@ -19,10 +19,10 @@ namespace flutter_inappwebview_plugin
 	public:
 		static inline const std::string METHOD_CHANNEL_NAME = "com.pichillilorenzo/flutter_inappbrowser";
 
-		FlutterInappwebviewWindowsBasePlugin* plugin;
+		FlutterInappwebviewWindowsPlugin* plugin;
 		std::map<std::string, std::unique_ptr<InAppBrowser>> browsers;
 
-		InAppBrowserManager(FlutterInappwebviewWindowsBasePlugin* plugin);
+		InAppBrowserManager(FlutterInappwebviewWindowsPlugin* plugin);
 		~InAppBrowserManager();
 
 		void HandleMethodCall(

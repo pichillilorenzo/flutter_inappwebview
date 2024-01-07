@@ -7,6 +7,9 @@
 #include "../types/channel_delegate.h"
 #include "../types/base_callback_result.h"
 #include "../types/navigation_action.h"
+#include "../types/web_resource_request.h"
+#include "../types/web_resource_error.h"
+#include "../types/web_resource_response.h"
 
 namespace flutter_inappwebview_plugin
 {
@@ -33,9 +36,11 @@ namespace flutter_inappwebview_plugin
             const flutter::MethodCall<flutter::EncodableValue>& method_call,
             std::unique_ptr<flutter::MethodResult<flutter::EncodableValue>> result);
 
-        void onLoadStart(const std::optional<std::string> url) const;
-        void onLoadStop(const std::optional<std::string> url) const;
-        void shouldOverrideUrlLoading(std::shared_ptr<NavigationAction> navigationAction, std::unique_ptr<ShouldOverrideUrlLoadingCallback> callback);
+        void onLoadStart(const std::optional<std::string>& url) const;
+        void onLoadStop(const std::optional<std::string>& url) const;
+        void shouldOverrideUrlLoading(std::shared_ptr<NavigationAction> navigationAction, std::unique_ptr<ShouldOverrideUrlLoadingCallback> callback) const;
+        void WebViewChannelDelegate::onReceivedError(std::shared_ptr<WebResourceRequest> request, std::shared_ptr<WebResourceError> error) const;
+        void WebViewChannelDelegate::onReceivedHttpError(std::shared_ptr<WebResourceRequest> request, std::shared_ptr<WebResourceResponse> error) const;
     };
 }
 

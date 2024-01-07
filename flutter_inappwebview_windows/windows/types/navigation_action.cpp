@@ -4,7 +4,7 @@
 
 namespace flutter_inappwebview_plugin
 {
-    NavigationAction::NavigationAction(std::shared_ptr<URLRequest> request, bool isForMainFrame)
+    NavigationAction::NavigationAction(std::shared_ptr<URLRequest> request, const bool& isForMainFrame)
             : request(std::move(request)), isForMainFrame(isForMainFrame)
     {
 

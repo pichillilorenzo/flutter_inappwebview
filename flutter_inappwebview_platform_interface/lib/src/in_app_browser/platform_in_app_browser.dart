@@ -64,6 +64,7 @@ class PlatformInAppBrowserCreationParams {
 ///- Android native WebView
 ///- iOS
 ///- MacOS
+///- Windows
 ///{@endtemplate}
 abstract class PlatformInAppBrowser extends PlatformInterface
     implements Disposable {
@@ -172,6 +173,7 @@ abstract class PlatformInAppBrowser extends PlatformInterface
   ///- Android native WebView
   ///- iOS
   ///- MacOS
+  ///- Windows
   ///{@endtemplate}
   Future<void> openUrlRequest(
       {required URLRequest urlRequest,
@@ -464,6 +466,7 @@ abstract class PlatformInAppBrowser extends PlatformInterface
   ///- Android native WebView
   ///- iOS
   ///- MacOS
+  ///- Windows
   ///{@endtemplate}
   bool isOpened() {
     throw UnimplementedError(
@@ -487,6 +490,7 @@ abstract class PlatformInAppBrowserEvents {
   ///- Android native WebView
   ///- iOS
   ///- MacOS
+  ///- Windows
   void onBrowserCreated() {}
 
   ///Event fired when the [PlatformInAppBrowser] window is closed.
@@ -495,6 +499,7 @@ abstract class PlatformInAppBrowserEvents {
   ///- Android native WebView
   ///- iOS
   ///- MacOS
+  ///- Windows
   void onExit() {}
 
   ///Event fired when the main window is about to close.
@@ -509,6 +514,7 @@ abstract class PlatformInAppBrowserEvents {
   ///- Android native WebView ([Official API - WebViewClient.onPageStarted](https://developer.android.com/reference/android/webkit/WebViewClient#onPageStarted(android.webkit.WebView,%20java.lang.String,%20android.graphics.Bitmap)))
   ///- iOS ([Official API - WKNavigationDelegate.webView](https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455621-webview))
   ///- MacOS ([Official API - WKNavigationDelegate.webView](https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455621-webview))
+  ///- Windows ([Official API - IWebView2WebView.add_NavigationStarting](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/iwebview2webview?view=webview2-0.8.355#add_navigationstarting))
   void onLoadStart(WebUri? url) {}
 
   ///Event fired when the [PlatformInAppBrowser] finishes loading an [url].
@@ -517,6 +523,7 @@ abstract class PlatformInAppBrowserEvents {
   ///- Android native WebView ([Official API - WebViewClient.onPageFinished](https://developer.android.com/reference/android/webkit/WebViewClient#onPageFinished(android.webkit.WebView,%20java.lang.String)))
   ///- iOS ([Official API - WKNavigationDelegate.webView](https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455629-webview))
   ///- MacOS ([Official API - WKNavigationDelegate.webView](https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455629-webview))
+  ///- Windows ([Official API - IWebView2WebView.add_NavigationCompleted](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/iwebview2webview?view=webview2-0.8.355#add_navigationcompleted))
   void onLoadStop(WebUri? url) {}
 
   ///Use [onReceivedError] instead.
@@ -529,6 +536,7 @@ abstract class PlatformInAppBrowserEvents {
   ///- Android native WebView ([Official API - WebViewClient.onReceivedError](https://developer.android.com/reference/android/webkit/WebViewClient#onReceivedError(android.webkit.WebView,%20android.webkit.WebResourceRequest,%20android.webkit.WebResourceError)))
   ///- iOS ([Official API - WKNavigationDelegate.webView](https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455623-webview))
   ///- MacOS ([Official API - WKNavigationDelegate.webView](https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455623-webview))
+  ///- Windows ([Official API - IWebView2WebView.add_NavigationCompleted](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/iwebview2webview?view=webview2-0.8.355#add_navigationcompleted))
   void onReceivedError(WebResourceRequest request, WebResourceError error) {}
 
   ///Use [onReceivedHttpError] instead.
@@ -547,6 +555,7 @@ abstract class PlatformInAppBrowserEvents {
   ///- Android native WebView ([Official API - WebViewClient.onReceivedHttpError](https://developer.android.com/reference/android/webkit/WebViewClient#onReceivedHttpError(android.webkit.WebView,%20android.webkit.WebResourceRequest,%20android.webkit.WebResourceResponse)))
   ///- iOS ([Official API - WKNavigationDelegate.webView](https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455643-webview))
   ///- MacOS ([Official API - WKNavigationDelegate.webView](https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455643-webview))
+  ///- Windows ([Official API - IWebView2WebView.add_NavigationCompleted](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/iwebview2webview?view=webview2-0.8.355#add_navigationcompleted))
   void onReceivedHttpError(
       WebResourceRequest request, WebResourceResponse errorResponse) {}
 

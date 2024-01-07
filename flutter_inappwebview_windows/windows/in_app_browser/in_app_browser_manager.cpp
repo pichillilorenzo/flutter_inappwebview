@@ -1,16 +1,17 @@
 #include <memory>
 #include <flutter/method_channel.h>
 #include <flutter/standard_method_codec.h>
+#include <optional>
 
 #include "in_app_browser_manager.h"
 
 #include "../types/url_request.h"
 
-#include "../utils/util.h"
+#include "../utils/flutter.h"
 
 namespace flutter_inappwebview_plugin
 {
-	InAppBrowserManager::InAppBrowserManager(FlutterInappwebviewWindowsBasePlugin* plugin)
+	InAppBrowserManager::InAppBrowserManager(FlutterInappwebviewWindowsPlugin* plugin)
 		: plugin(plugin), ChannelDelegate(plugin->registrar->messenger(), InAppBrowserManager::METHOD_CHANNEL_NAME)
 	{
 
@@ -31,16 +32,16 @@ namespace flutter_inappwebview_plugin
 
 	void InAppBrowserManager::open(const flutter::EncodableMap* arguments)
 	{
-		auto id = std::get<std::string>(arguments->at(flutter::EncodableValue("id")));
-		auto urlRequestMap = std::get_if<flutter::EncodableMap>(&arguments->at(flutter::EncodableValue("urlRequest")));
-		auto urlRequest = make_pointer_optional<URLRequest>(new URLRequest(*urlRequestMap));
+		auto id = get_fl_map_value<std::string>(*arguments, "id");
+		auto urlRequestMap = get_optional_fl_map_value<flutter::EncodableMap>(*arguments, "urlRequest");
+		std::optional<URLRequest> urlRequest = urlRequestMap.has_value() ? std::make_optional<URLRequest>(urlRequestMap.value()) : std::optional<URLRequest>{};
 
 		InAppBrowserCreationParams params = {
 			id,
 			urlRequest
 		};
 		auto inAppBrowser = std::make_unique<InAppBrowser>(plugin, params);
-		browsers[id] = std::move(inAppBrowser);
+		browsers.insert({ id, std::move(inAppBrowser) });
 	}
 
 	InAppBrowserManager::~InAppBrowserManager()

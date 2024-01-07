@@ -3,6 +3,8 @@
 
 #include "channel_delegate.h"
 
+#include "../utils/util.h"
+
 namespace flutter_inappwebview_plugin
 {
 	ChannelDelegate::ChannelDelegate(flutter::BinaryMessenger* messenger, const std::string& name) : messenger(messenger)

@@ -134,6 +134,7 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///- iOS ([Official API - WKWebView.url](https://developer.apple.com/documentation/webkit/wkwebview/1415005-url))
   ///- MacOS ([Official API - WKWebView.url](https://developer.apple.com/documentation/webkit/wkwebview/1415005-url))
   ///- Web
+  ///- Windows ([Official API - IWebView2WebView.get_Source](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/iwebview2webview?view=webview2-0.8.355#get_source))
   ///{@endtemplate}
   Future<WebUri?> getUrl() {
     throw UnimplementedError(
@@ -224,6 +225,7 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///- iOS ([Official API - WKWebView.load](https://developer.apple.com/documentation/webkit/wkwebview/1414954-load). If [allowingReadAccessTo] is used, [Official API - WKWebView.loadFileURL](https://developer.apple.com/documentation/webkit/wkwebview/1414973-loadfileurl))
   ///- MacOS ([Official API - WKWebView.load](https://developer.apple.com/documentation/webkit/wkwebview/1414954-load). If [allowingReadAccessTo] is used, [Official API - WKWebView.loadFileURL](https://developer.apple.com/documentation/webkit/wkwebview/1414973-loadfileurl))
   ///- Web
+  ///- Windows ([Official API - ICoreWebView2_2.NavigateWithWebResourceRequest](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2_2?view=webview2-1.0.2210.55#navigatewithwebresourcerequest))
   ///{@endtemplate}
   Future<void> loadUrl(
       {required URLRequest urlRequest,

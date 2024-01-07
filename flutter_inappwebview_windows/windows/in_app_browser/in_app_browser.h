@@ -6,7 +6,7 @@
 #include <optional>
 
 #include <wil/com.h>
-#include "../flutter_inappwebview_windows_base_plugin.h"
+#include "../flutter_inappwebview_windows_plugin.h"
 #include "../in_app_webview/in_app_webview.h"
 #include "../types/url_request.h"
 #include "in_app_browser_channel_delegate.h"
@@ -22,19 +22,20 @@ namespace flutter_inappwebview_plugin
 	class InAppBrowser {
 	public:
 		static inline const std::string METHOD_CHANNEL_NAME_PREFIX = "com.pichillilorenzo/flutter_inappbrowser_";
+		static inline const wchar_t* CLASS_NAME = L"InAppBrowser";
 
 		static LRESULT CALLBACK WndProc(HWND window,
 			UINT message,
 			WPARAM wparam,
 			LPARAM lparam) noexcept;
 
-		FlutterInappwebviewWindowsBasePlugin* plugin;
+		FlutterInappwebviewWindowsPlugin* plugin;
 		std::string id;
 		std::optional<URLRequest> initialUrlRequest;
 		std::unique_ptr<InAppWebView> webView;
 		std::unique_ptr<InAppBrowserChannelDelegate> channelDelegate;
 
-		InAppBrowser(FlutterInappwebviewWindowsBasePlugin* plugin, const InAppBrowserCreationParams& params);
+		InAppBrowser(FlutterInappwebviewWindowsPlugin* plugin, const InAppBrowserCreationParams& params);
 		~InAppBrowser();
 
 	private:

@@ -6,18 +6,20 @@
 #include <Shlwapi.h>
 #include "../utils/strconv.h"
 #include "../utils/util.h"
+#include "../types/web_resource_request.h"
+#include "../types/web_resource_error.h"
 
 namespace flutter_inappwebview_plugin
 {
 	using namespace Microsoft::WRL;
 
-	InAppWebView::InAppWebView(FlutterInappwebviewWindowsBasePlugin* plugin, std::variant<std::string, int> id, const HWND parentWindow, const std::function<void()> completionHandler)
+	InAppWebView::InAppWebView(FlutterInappwebviewWindowsPlugin* plugin, const std::variant<std::string, int>& id, const HWND parentWindow, const std::function<void()> completionHandler)
 		: plugin(plugin), id(id), channelDelegate(std::make_unique<WebViewChannelDelegate>(this, plugin->registrar->messenger()))
 	{
 		createWebView(parentWindow, completionHandler);
 	}
 
-	InAppWebView::InAppWebView(FlutterInappwebviewWindowsBasePlugin* plugin, std::variant<std::string, int> id, const HWND parentWindow, const std::string& channelName, const std::function<void()> completionHandler)
+	InAppWebView::InAppWebView(FlutterInappwebviewWindowsPlugin* plugin, const std::variant<std::string, int>& id, const HWND parentWindow, const std::string& channelName, const std::function<void()> completionHandler)
 		: plugin(plugin), id(id), channelDelegate(std::make_unique<WebViewChannelDelegate>(this, plugin->registrar->messenger(), channelName))
 	{
 		createWebView(parentWindow, completionHandler);
@@ -29,7 +31,7 @@ namespace flutter_inappwebview_plugin
 			Callback<ICoreWebView2CreateCoreWebView2EnvironmentCompletedHandler>(
 				[parentWindow, completionHandler, this](HRESULT result, ICoreWebView2Environment* env) -> HRESULT {
 					webViewEnv = env;
-					// Create a CoreWebView2Controller and get the associated CoreWebView2 whose parent is the main window hWnd
+					// Create a CoreWebView2Controller and get the associated CoreWebView2 whose parent is the main window HWND
 					env->CreateCoreWebView2Controller(parentWindow, Callback<ICoreWebView2CreateCoreWebView2ControllerCompletedHandler>(
 						[parentWindow, completionHandler, this](HRESULT result, ICoreWebView2Controller* controller) -> HRESULT {
 							if (controller != nullptr) {
@@ -67,9 +69,9 @@ namespace flutter_inappwebview_plugin
 					}
 					
 					wil::unique_cotaskmem_string uri = nullptr;
-					std::optional<std::string> url = SUCCEEDED(args->get_Uri(&uri)) ? wide_to_utf8(std::wstring(uri.get())) : std::optional<std::string>{};
+					std::optional<std::string> url = SUCCEEDED(args->get_Uri(&uri)) ? wide_to_utf8(uri.get()) : std::optional<std::string>{};
 
-					wil::unique_cotaskmem_string method = nullptr;
+					wil::unique_cotaskmem_string requestMethod = nullptr;
 					wil::com_ptr<ICoreWebView2HttpRequestHeaders> requestHeaders = nullptr;
 					std::optional<std::map<std::string, std::string>> headers = std::optional<std::map<std::string, std::string>>{};
 					if (SUCCEEDED(args->get_RequestHeaders(&requestHeaders))) {
@@ -83,26 +85,33 @@ namespace flutter_inappwebview_plugin
 							wil::unique_cotaskmem_string value;
 
 							if (SUCCEEDED(iterator->GetCurrentHeader(&name, &value))) {
-								headers->insert({ wide_to_utf8(std::wstring(name.get())), wide_to_utf8(std::wstring(value.get())) });
+								headers->insert({ wide_to_utf8(name.get()), wide_to_utf8(value.get()) });
 							}
 
 							BOOL hasNext = FALSE;
 							iterator->MoveNext(&hasNext);
 						}
 
-						requestHeaders->GetHeader(L"Flutter-InAppWebView-Request-Method", &method);
+						requestHeaders->GetHeader(L"Flutter-InAppWebView-Request-Method", &requestMethod);
 						requestHeaders->RemoveHeader(L"Flutter-InAppWebView-Request-Method");
 					}
 
-					if (callShouldOverrideUrlLoading && method == nullptr) {
-						// for some reason, we can't cancel and load an URL with other HTTP methods other than GET,
-						// so ignore the shouldOverrideUrlLoading event.
+					std::optional<std::string> method = requestMethod ? wide_to_utf8(requestMethod.get()) : std::optional<std::string>{};
 
-						auto urlRequest = std::make_shared<URLRequest>(url, std::nullopt, headers, std::nullopt);
-						auto navigationAction = std::make_unique<NavigationAction>(
-							urlRequest,
-							true
-						);
+					auto urlRequest = std::make_shared<URLRequest>(url, method, headers, std::nullopt);
+					auto navigationAction = std::make_shared<NavigationAction>(
+						urlRequest,
+						true
+					);
+
+					UINT64 navigationId;
+					if (SUCCEEDED(args->get_NavigationId(&navigationId))) {
+						navigationActions.insert({navigationId, navigationAction});
+					}
+
+					if (callShouldOverrideUrlLoading && requestMethod == nullptr) {
+						// for some reason, we can't cancel and load an URL with other HTTP methods than GET,
+						// so ignore the shouldOverrideUrlLoading event.
 						
 						auto callback = std::make_unique<WebViewChannelDelegate::ShouldOverrideUrlLoadingCallback>();
 						callback->nonNullSuccess = [this, urlRequest](const NavigationActionPolicy actionPolicy) {
@@ -137,9 +146,17 @@ namespace flutter_inappwebview_plugin
 		webView->add_NavigationCompleted(
 			Callback<ICoreWebView2NavigationCompletedEventHandler>(
 				[this](ICoreWebView2* sender, ICoreWebView2NavigationCompletedEventArgs* args) {
-					COREWEBVIEW2_WEB_ERROR_STATUS web_error_status;
-					args->get_WebErrorStatus(&web_error_status);
-					debugLog("WebErrorStatus " + std::to_string(web_error_status) + "\n");
+					std::shared_ptr<NavigationAction> navigationAction;
+					UINT64 navigationId;
+					if (SUCCEEDED(args->get_NavigationId(&navigationId))) {
+						navigationAction = map_at_or_null(navigationActions, navigationId);
+						if (navigationAction) {
+							navigationActions.erase(navigationId);
+						}
+					}
+
+					COREWEBVIEW2_WEB_ERROR_STATUS webErrorType = COREWEBVIEW2_WEB_ERROR_STATUS_UNKNOWN;
+					args->get_WebErrorStatus(&webErrorType);
 
 					BOOL isSuccess;
 					args->get_IsSuccess(&isSuccess);
@@ -150,7 +167,21 @@ namespace flutter_inappwebview_plugin
 						if (isSuccess) {
 							channelDelegate->onLoadStop(url);
 						}
+						else if (!InAppWebView::isSslError(webErrorType) && navigationAction) {
+							auto webResourceRequest = std::make_unique<WebResourceRequest>(url, navigationAction->request->method, navigationAction->request->headers, navigationAction->isForMainFrame);
+							int httpStatusCode = 0;
+							wil::com_ptr<ICoreWebView2NavigationCompletedEventArgs2> args2;
+							if (SUCCEEDED(args->QueryInterface(IID_PPV_ARGS(&args2))) && SUCCEEDED(args2->get_HttpStatusCode(&httpStatusCode)) && httpStatusCode >= 400) {
+								auto webResourceResponse = std::make_unique<WebResourceResponse>(httpStatusCode);
+								channelDelegate->onReceivedHttpError(std::move(webResourceRequest), std::move(webResourceResponse));
+							}
+							else if (httpStatusCode < 400) {
+								auto webResourceError = std::make_unique<WebResourceError>(WebErrorStatusDescription[webErrorType], webErrorType);
+								channelDelegate->onReceivedError(std::move(webResourceRequest), std::move(webResourceError));
+							}
+						}
 					}
+
 					return S_OK;
 				}
 		).Get(), nullptr);
@@ -159,10 +190,10 @@ namespace flutter_inappwebview_plugin
 	std::optional<std::string> InAppWebView::getUrl() const
 	{
 		LPWSTR uri = nullptr;
-		return SUCCEEDED(webView->get_Source(&uri)) ? wide_to_utf8(std::wstring(uri)) : std::optional<std::string>{};
+		return SUCCEEDED(webView->get_Source(&uri)) ? wide_to_utf8(uri) : std::optional<std::string>{};
 	}
 
-	void InAppWebView::loadUrl(const URLRequest urlRequest) const
+	void InAppWebView::loadUrl(const URLRequest& urlRequest) const
 	{
 		if (!webView || !urlRequest.url.has_value()) {
 			return;
@@ -191,7 +222,7 @@ namespace flutter_inappwebview_plugin
 			);
 			wil::com_ptr<ICoreWebView2HttpRequestHeaders> requestHeaders;
 			if (SUCCEEDED(webResourceRequest->get_Headers(&requestHeaders))) {
-				if (urlRequest.method.has_value() && urlRequest.method.value().compare("GET") != 0) {
+				if (method.compare(L"GET") != 0) {
 					requestHeaders->SetHeader(L"Flutter-InAppWebView-Request-Method", method.c_str());
 				}
 				if (urlRequest.headers.has_value()) {
@@ -208,6 +239,10 @@ namespace flutter_inappwebview_plugin
 		}
 	}
 
+	bool InAppWebView::isSslError(const COREWEBVIEW2_WEB_ERROR_STATUS& webErrorStatus) {
+		return webErrorStatus >= COREWEBVIEW2_WEB_ERROR_STATUS_CERTIFICATE_COMMON_NAME_IS_INCORRECT && webErrorStatus <= COREWEBVIEW2_WEB_ERROR_STATUS_CERTIFICATE_IS_INVALID;
+	}
+
 	InAppWebView::~InAppWebView()
 	{
 		debugLog("dealloc InAppWebView");
@@ -217,6 +252,7 @@ namespace flutter_inappwebview_plugin
 		if (webViewController) {
 			webViewController->Close();
 		}
+		navigationActions.clear();
 		plugin = nullptr;
 	}
 }

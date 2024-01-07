@@ -3,6 +3,8 @@
 #include <flutter/method_channel.h>
 #include <flutter/plugin_registrar_windows.h>
 
+#include "in_app_browser/in_app_browser_manager.h"
+
 namespace flutter_inappwebview_plugin
 {
     // static
@@ -13,7 +15,7 @@ namespace flutter_inappwebview_plugin
     }
 
     FlutterInappwebviewWindowsPlugin::FlutterInappwebviewWindowsPlugin(flutter::PluginRegistrarWindows* registrar)
-        : FlutterInappwebviewWindowsBasePlugin(registrar)
+        : registrar(registrar)
     {
         inAppBrowserManager = std::make_unique<InAppBrowserManager>(this);
     }

@@ -22,52 +22,7 @@ namespace flutter_inappwebview_plugin
 		return value == nullptr ? std::nullopt : std::make_optional<T>(*value);
 	}
 
-	template<typename T>
-	static inline T get_fl_map_value(const flutter::EncodableMap map, const char* string)
-	{
-		return std::get<T>(map.at(flutter::EncodableValue(string)));
-	}
-
-	template<typename T>
-	static inline std::optional<T> get_optional_fl_map_value(const flutter::EncodableMap map, const char* string)
-	{
-		return make_pointer_optional<T>(std::get_if<T>(&map.at(flutter::EncodableValue(string))));
-	}
-
-	static inline std::optional<std::map<std::string, std::string>> get_optional_fl_map_value(const flutter::EncodableMap map, const char* string)
-	{
-		auto mapValue = std::map<std::string, std::string>{};
-		auto flMap = std::get_if<flutter::EncodableMap>(&map.at(flutter::EncodableValue(string)));
-		if (flMap) {
-			for (auto itr = flMap->begin(); itr != flMap->end(); itr++)
-			{
-				mapValue.insert({ std::get<std::string>(itr->first),  std::get<std::string>(itr->second) });
-			}
-		}
-		return make_pointer_optional<std::map<std::string, std::string>>(&mapValue);
-	}
-
-	template<typename T>
-	static inline flutter::EncodableValue optional_to_fl_value(const std::optional<T> optional)
-	{
-		return optional.has_value() ? flutter::EncodableValue(optional.value()) : flutter::EncodableValue();
-	}
-
-	static inline flutter::EncodableValue optional_to_fl_value(const std::optional<std::map<std::string, std::string>> optional)
-	{
-		if (!optional.has_value()) {
-			return flutter::EncodableValue();
-		}
-		auto& mapValue = optional.value();
-		auto encodableMap = flutter::EncodableMap{};
-		for (auto const& [key, val] : mapValue)
-		{
-			encodableMap.insert({ flutter::EncodableValue(key), flutter::EncodableValue(val) });
-		}
-		return encodableMap;
-	}
-
-	static inline std::string variant_to_string(std::variant<std::string, int> var)
+	static inline std::string variant_to_string(const std::variant<std::string, int>& var)
 	{
 		return std::visit([](auto&& arg) {
 			using T = std::decay_t<decltype(arg)>;
@@ -78,6 +33,19 @@ namespace flutter_inappwebview_plugin
 			else
 				static_assert(always_false_v<T>, "non-exhaustive visitor!");
 			}, var);
+	}
+
+	template<typename K, typename T>
+	static inline bool map_contains(const std::map<K, T>& map, const K& key)
+	{
+		return  map.find(key) != map.end();
+	}
+
+	template<typename K, typename T>
+	static inline T map_at_or_null(const std::map<K, T>& map, const K& key)
+	{
+		auto itr = map.find(key);
+		return itr != map.end() ? itr->second : nullptr;
 	}
 }
 

@@ -8,19 +8,19 @@
 
 namespace flutter_inappwebview_plugin
 {
-    class InAppBrowserChannelDelegate : public ChannelDelegate
-    {
-    public:
-        InAppBrowserChannelDelegate(const std::string& id, flutter::BinaryMessenger* messenger);
-        ~InAppBrowserChannelDelegate();
+  class InAppBrowserChannelDelegate : public ChannelDelegate
+  {
+  public:
+    InAppBrowserChannelDelegate(const std::string& id, flutter::BinaryMessenger* messenger);
+    ~InAppBrowserChannelDelegate();
 
-        void HandleMethodCall(
-                const flutter::MethodCall<flutter::EncodableValue>& method_call,
-                std::unique_ptr<flutter::MethodResult<flutter::EncodableValue>> result);
+    void HandleMethodCall(
+      const flutter::MethodCall<flutter::EncodableValue>& method_call,
+      std::unique_ptr<flutter::MethodResult<flutter::EncodableValue>> result);
 
-        void onBrowserCreated() const;
-        void onExit() const;
-    };
+    void onBrowserCreated() const;
+    void onExit() const;
+  };
 }
 
 #endif //FLUTTER_INAPPWEBVIEW_PLUGIN_IN_APP_BROWSER_CHANNEL_DELEGATE_H_

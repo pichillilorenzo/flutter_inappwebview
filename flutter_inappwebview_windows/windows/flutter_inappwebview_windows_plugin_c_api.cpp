@@ -5,8 +5,9 @@
 #include "flutter_inappwebview_windows_plugin.h"
 
 void FlutterInappwebviewWindowsPluginCApiRegisterWithRegistrar(
-    FlutterDesktopPluginRegistrarRef registrar) {
-    flutter_inappwebview_plugin::FlutterInappwebviewWindowsPlugin::RegisterWithRegistrar(
-      flutter::PluginRegistrarManager::GetInstance()
-          ->GetRegistrar<flutter::PluginRegistrarWindows>(registrar));
+  FlutterDesktopPluginRegistrarRef registrar)
+{
+  flutter_inappwebview_plugin::FlutterInappwebviewWindowsPlugin::RegisterWithRegistrar(
+    flutter::PluginRegistrarManager::GetInstance()
+    ->GetRegistrar<flutter::PluginRegistrarWindows>(registrar));
 }

@@ -7,21 +7,20 @@
 
 namespace flutter_inappwebview_plugin
 {
-    // static
-    void FlutterInappwebviewWindowsPlugin::RegisterWithRegistrar(
-        flutter::PluginRegistrarWindows* registrar) {
-        auto plugin = std::make_unique<FlutterInappwebviewWindowsPlugin>(registrar);
-        registrar->AddPlugin(std::move(plugin));
-    }
+  // static
+  void FlutterInappwebviewWindowsPlugin::RegisterWithRegistrar(
+    flutter::PluginRegistrarWindows* registrar)
+  {
+    auto plugin = std::make_unique<FlutterInappwebviewWindowsPlugin>(registrar);
+    registrar->AddPlugin(std::move(plugin));
+  }
 
-    FlutterInappwebviewWindowsPlugin::FlutterInappwebviewWindowsPlugin(flutter::PluginRegistrarWindows* registrar)
-        : registrar(registrar)
-    {
-        inAppBrowserManager = std::make_unique<InAppBrowserManager>(this);
-    }
+  FlutterInappwebviewWindowsPlugin::FlutterInappwebviewWindowsPlugin(flutter::PluginRegistrarWindows* registrar)
+    : registrar(registrar)
+  {
+    inAppBrowserManager = std::make_unique<InAppBrowserManager>(this);
+  }
 
-    FlutterInappwebviewWindowsPlugin::~FlutterInappwebviewWindowsPlugin()
-    {
-
-    }
+  FlutterInappwebviewWindowsPlugin::~FlutterInappwebviewWindowsPlugin()
+  {}
 }

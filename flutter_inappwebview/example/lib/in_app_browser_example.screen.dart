@@ -30,7 +30,6 @@ class MyInAppBrowser extends InAppBrowser {
   @override
   Future onLoadStop(url) async {
     pullToRefreshController?.endRefreshing();
-    print(await webViewController?.getUrl());
   }
 
   @override

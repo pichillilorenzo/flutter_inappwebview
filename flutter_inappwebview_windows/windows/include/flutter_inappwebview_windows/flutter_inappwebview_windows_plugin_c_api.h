@@ -13,7 +13,7 @@
 extern "C" {
 #endif
 
-FLUTTER_PLUGIN_EXPORT void FlutterInappwebviewWindowsPluginCApiRegisterWithRegistrar(
+  FLUTTER_PLUGIN_EXPORT void FlutterInappwebviewWindowsPluginCApiRegisterWithRegistrar(
     FlutterDesktopPluginRegistrarRef registrar);
 
 #if defined(__cplusplus)

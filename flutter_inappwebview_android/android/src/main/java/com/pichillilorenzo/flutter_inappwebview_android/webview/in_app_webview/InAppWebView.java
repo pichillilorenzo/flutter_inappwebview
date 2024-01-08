@@ -205,6 +205,10 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
     if (plugin != null && plugin.activity != null) {
       plugin.activity.registerForContextMenu(this);
     }
+
+    setFocusableInTouchMode(true);
+    setFocusable(true);
+
   }
 
   public WebViewClient createWebViewClient(InAppBrowserDelegate inAppBrowserDelegate) {

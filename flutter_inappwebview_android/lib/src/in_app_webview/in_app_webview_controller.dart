@@ -2248,6 +2248,13 @@ class AndroidInAppWebViewController extends PlatformInAppWebViewController
   }
 
   @override
+  Future<bool> requestFocus() async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    return await channel?.invokeMethod<bool>('requestFocus', args) ??
+        false;
+  }
+
+  @override
   Future<void> setContextMenu(ContextMenu? contextMenu) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent("contextMenu", () => contextMenu?.toMap());

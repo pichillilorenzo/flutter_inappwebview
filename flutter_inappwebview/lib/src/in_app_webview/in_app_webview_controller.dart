@@ -293,6 +293,8 @@ class InAppWebViewController {
   ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.clearFocus}
   Future<void> clearFocus() => platform.clearFocus();
 
+  Future<bool> requestFocus() => platform.requestFocus();
+
   ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.setContextMenu}
   Future<void> setContextMenu(ContextMenu? contextMenu) =>
       platform.setContextMenu(contextMenu);

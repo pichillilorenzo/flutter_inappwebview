@@ -1036,6 +1036,11 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
         'clearFocus is not implemented on the current platform');
   }
 
+  Future<bool> requestFocus() {
+    throw UnimplementedError(
+        'requestFocus is not implemented on the current platform');
+  }
+
   ///{@template flutter_inappwebview_platform_interface.PlatformInAppWebViewController.setContextMenu}
   ///Sets or updates the WebView context menu to be used next time it will appear.
   ///

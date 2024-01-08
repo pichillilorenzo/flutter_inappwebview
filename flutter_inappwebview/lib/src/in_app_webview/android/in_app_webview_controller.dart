@@ -20,6 +20,12 @@ class AndroidInAppWebViewController {
     return await _controller?.startSafeBrowsing() ?? false;
   }
 
+  @override
+  Future<bool> requestFocus() async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    return await _controller?.requestFocus() ?? false;
+  }
+
   ///Use [InAppWebViewController.clearSslPreferences] instead.
   @Deprecated("Use InAppWebViewController.clearSslPreferences instead")
   Future<void> clearSslPreferences() async {

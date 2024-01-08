@@ -4,6 +4,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.webkit.ValueCallback;
 import android.webkit.WebView;
+import android.view.accessibility.AccessibilityEvent;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -473,6 +474,15 @@ public class WebViewChannelDelegate extends ChannelDelegateImpl {
           webView.clearFocus();
         }
         result.success(true);
+        break;
+      case requestFocus:
+        webView.sendAccessibilityEvent(AccessibilityEvent.TYPE_VIEW_ACCESSIBILITY_FOCUS_CLEARED);
+
+        webView.postDelayed(() -> {
+          webView.sendAccessibilityEvent(AccessibilityEvent.TYPE_VIEW_ACCESSIBILITY_FOCUS_CLEARED);
+          webView.sendAccessibilityEvent(AccessibilityEvent.TYPE_VIEW_FOCUSED);
+          webView.sendAccessibilityEvent(AccessibilityEvent.TYPE_VIEW_SELECTED);
+        }, 100);
         break;
       case setContextMenu:
         if (webView != null) {

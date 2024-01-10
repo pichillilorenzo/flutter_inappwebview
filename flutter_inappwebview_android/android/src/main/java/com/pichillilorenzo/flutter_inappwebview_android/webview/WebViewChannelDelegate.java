@@ -63,6 +63,10 @@ import java.util.Map;
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 
+import android.os.Handler;
+import android.os.Looper;
+import android.util.Log;
+
 public class WebViewChannelDelegate extends ChannelDelegateImpl {
     static final String LOG_TAG = "WebViewChannelDelegate";
 
@@ -470,23 +474,35 @@ public class WebViewChannelDelegate extends ChannelDelegateImpl {
                 }
                 break;
             case clearFocus:
+                Log.d(LOG_TAG, "chiamo clearFocus");
                 if (webView != null) {
+                    webView.sendAccessibilityEvent(AccessibilityEvent.TYPE_VIEW_ACCESSIBILITY_FOCUS_CLEARED);
+                    Log.d(LOG_TAG, "focused, I'm going to clear focus");
                     webView.clearFocus();
                 }
                 result.success(true);
                 break;
             case requestFocus:
-
+                Log.d(LOG_TAG, "chiamo RequestFocus");
                 webView.getSettings().setJavaScriptEnabled(true);
                 webView.setFocusable(true);
 
-                webView.sendAccessibilityEvent(AccessibilityEvent.TYPE_VIEW_ACCESSIBILITY_FOCUS_CLEARED);
 
-                webView.postDelayed(() -> {
+                if (!webView.isFocused()) {
+
                     webView.sendAccessibilityEvent(AccessibilityEvent.TYPE_VIEW_ACCESSIBILITY_FOCUS_CLEARED);
-                    webView.sendAccessibilityEvent(AccessibilityEvent.TYPE_VIEW_FOCUSED);
-                    webView.sendAccessibilityEvent(AccessibilityEvent.TYPE_VIEW_SELECTED);
-                }, 100);
+                    Log.d(LOG_TAG, "not focused, I'm going to focus");
+//                    new Handler(Looper.getMainLooper()).post(() -> {
+                        webView.postDelayed(() -> {
+                            webView.sendAccessibilityEvent(AccessibilityEvent.TYPE_VIEW_ACCESSIBILITY_FOCUS_CLEARED);
+                            webView.sendAccessibilityEvent(AccessibilityEvent.TYPE_VIEW_FOCUSED);
+                            webView.sendAccessibilityEvent(AccessibilityEvent.TYPE_VIEW_SELECTED);
+                        }, 100);
+                        webView.requestFocus();
+//                    });
+                } else {
+                    Log.d(LOG_TAG, "focused, I'm not going to focus");
+                }
                 break;
             case setContextMenu:
                 if (webView != null) {

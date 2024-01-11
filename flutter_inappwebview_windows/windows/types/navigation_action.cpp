@@ -10,8 +10,8 @@ namespace flutter_inappwebview_plugin
   flutter::EncodableMap NavigationAction::toEncodableMap() const
   {
     return flutter::EncodableMap{
-      {make_fl_value("request"), request->toEncodableMap()},
-      {make_fl_value("isForMainFrame"), make_fl_value(isForMainFrame)}
+      {"request", request->toEncodableMap()},
+      {"isForMainFrame", make_fl_value(isForMainFrame)}
     };
   }
 }

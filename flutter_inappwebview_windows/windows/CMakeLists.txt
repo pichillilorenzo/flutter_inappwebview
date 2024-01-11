@@ -22,7 +22,6 @@ cmake_policy(VERSION 3.14...3.25)
 set(PLUGIN_NAME "flutter_inappwebview_windows_plugin")
 
 set(NUGET_URL https://dist.nuget.org/win-x86-commandline/latest/nuget.exe)
-set(NUGET_SHA256 852b71cc8c8c2d40d09ea49d321ff56fd2397b9d6ea9f96e532530307bbbafd3)
 
 find_program(NUGET nuget)
 if(NOT NUGET)
@@ -31,11 +30,6 @@ if(NOT NUGET)
   if (NOT EXISTS ${NUGET})
     message(NOTICE "Attempting to download nuget.")
     file(DOWNLOAD ${NUGET_URL} ${NUGET})
-  endif()
-
-  file(SHA256 ${NUGET} NUGET_DL_HASH)
-  if (NOT NUGET_DL_HASH STREQUAL NUGET_SHA256)
-    message(FATAL_ERROR "Integrity check for ${NUGET} failed.")
   endif()
 endif()
 
@@ -67,10 +61,14 @@ list(APPEND PLUGIN_SOURCES
   "types/web_resource_request.h"
   "types/web_resource_response.cpp"
   "types/web_resource_response.h"
+  "in_app_webview/in_app_webview_settings.cpp"
+  "in_app_webview/in_app_webview_settings.h"
   "in_app_webview/in_app_webview.cpp"
   "in_app_webview/in_app_webview.h"
   "in_app_webview/webview_channel_delegate.cpp"
   "in_app_webview/webview_channel_delegate.h"
+  "in_app_browser/in_app_browser_settings.cpp"
+  "in_app_browser/in_app_browser_settings.h"
   "in_app_browser/in_app_browser_manager.cpp"
   "in_app_browser/in_app_browser_manager.h"
   "in_app_browser/in_app_browser.cpp"

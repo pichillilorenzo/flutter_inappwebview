@@ -55,7 +55,7 @@ namespace flutter_inappwebview_plugin
     }
 
     auto arguments = std::make_unique<flutter::EncodableValue>(flutter::EncodableMap{
-      {flutter::EncodableValue("url"), make_fl_value(url)},
+      {"url", make_fl_value(url)},
       });
     channel->InvokeMethod("onLoadStart", std::move(arguments));
   }
@@ -67,7 +67,7 @@ namespace flutter_inappwebview_plugin
     }
 
     auto arguments = std::make_unique<flutter::EncodableValue>(flutter::EncodableMap{
-      {flutter::EncodableValue("url"), make_fl_value(url)},
+      {"url", make_fl_value(url)},
       });
     channel->InvokeMethod("onLoadStop", std::move(arguments));
   }
@@ -89,8 +89,8 @@ namespace flutter_inappwebview_plugin
     }
 
     auto arguments = std::make_unique<flutter::EncodableValue>(flutter::EncodableMap{
-      {flutter::EncodableValue("request"), request->toEncodableMap()},
-      {flutter::EncodableValue("error"), error->toEncodableMap()},
+      {"request", request->toEncodableMap()},
+      {"error", error->toEncodableMap()},
       });
     channel->InvokeMethod("onReceivedError", std::move(arguments));
   }
@@ -102,8 +102,8 @@ namespace flutter_inappwebview_plugin
     }
 
     auto arguments = std::make_unique<flutter::EncodableValue>(flutter::EncodableMap{
-      {flutter::EncodableValue("request"), request->toEncodableMap()},
-      {flutter::EncodableValue("errorResponse"), errorResponse->toEncodableMap()},
+      {"request", request->toEncodableMap()},
+      {"errorResponse", errorResponse->toEncodableMap()},
       });
     channel->InvokeMethod("onReceivedHttpError", std::move(arguments));
   }

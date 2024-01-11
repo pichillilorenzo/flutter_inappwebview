@@ -1,5 +1,6 @@
 #pragma comment(lib, "Shlwapi.lib")
 
+#include <cstring>
 #include <Shlwapi.h>
 #include <WebView2EnvironmentOptions.h>
 #include <wil/wrl.h>
@@ -14,14 +15,14 @@ namespace flutter_inappwebview_plugin
 {
   using namespace Microsoft::WRL;
 
-  InAppWebView::InAppWebView(FlutterInappwebviewWindowsPlugin* plugin, const std::variant<std::string, int>& id, const HWND parentWindow, const std::function<void()> completionHandler)
-    : plugin(plugin), id(id), channelDelegate(std::make_unique<WebViewChannelDelegate>(this, plugin->registrar->messenger()))
+  InAppWebView::InAppWebView(const FlutterInappwebviewWindowsPlugin* plugin, const InAppWebViewCreationParams& params, const HWND parentWindow, const std::function<void()> completionHandler)
+    : plugin(plugin), id(params.id), settings(params.initialSettings), channelDelegate(std::make_unique<WebViewChannelDelegate>(this, plugin->registrar->messenger()))
   {
     createWebView(parentWindow, completionHandler);
   }
 
-  InAppWebView::InAppWebView(FlutterInappwebviewWindowsPlugin* plugin, const std::variant<std::string, int>& id, const HWND parentWindow, const std::string& channelName, const std::function<void()> completionHandler)
-    : plugin(plugin), id(id), channelDelegate(std::make_unique<WebViewChannelDelegate>(this, plugin->registrar->messenger(), channelName))
+  InAppWebView::InAppWebView(const FlutterInappwebviewWindowsPlugin* plugin, const InAppWebViewCreationParams& params, const HWND parentWindow, const std::string& channelName, const std::function<void()> completionHandler)
+    : plugin(plugin), id(params.id), settings(params.initialSettings), channelDelegate(std::make_unique<WebViewChannelDelegate>(this, plugin->registrar->messenger(), channelName))
   {
     createWebView(parentWindow, completionHandler);
   }
@@ -40,6 +41,20 @@ namespace flutter_inappwebview_plugin
               if (controller != nullptr) {
                 webViewController = controller;
                 webViewController->get_CoreWebView2(webView.put());
+              }
+
+              wil::com_ptr<ICoreWebView2Settings> webView2Settings;
+              if (SUCCEEDED(webView->get_Settings(&webView2Settings))) {
+                webView2Settings->put_IsScriptEnabled(settings->javaScriptEnabled);
+                webView2Settings->put_IsZoomControlEnabled(settings->supportZoom);
+                webView2Settings->put_IsStatusBarEnabled(true);
+
+                wil::com_ptr<ICoreWebView2Settings2> webView2Settings2;
+                if (SUCCEEDED(webView2Settings->QueryInterface(IID_PPV_ARGS(&webView2Settings2)))) {
+                  if (!settings->userAgent.empty()) {
+                    webView2Settings2->put_UserAgent(ansi_to_wide(settings->userAgent).c_str());
+                  }
+                }
               }
 
               // Resize WebView to fit the bounds of the parent window

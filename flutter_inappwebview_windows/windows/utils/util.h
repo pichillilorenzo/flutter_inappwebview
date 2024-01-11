@@ -12,6 +12,34 @@
 
 namespace flutter_inappwebview_plugin
 {
+  template<typename T = void, typename = void>
+  struct is_vector_impl : std::false_type { };
+
+  template<typename T, typename U = void>
+  struct is_mappish_impl : std::false_type { };
+
+  template<typename T>
+  struct is_vector_impl<T, std::enable_if_t<
+    std::is_same<T, typename std::vector<std::string>>::value>
+  > : std::true_type { };
+
+  template<typename T>
+  struct is_vector_impl<T, std::enable_if_t<
+    std::is_same<T, typename std::vector<typename std::iterator_traits<T>::value_type>::iterator>::value>
+  > : std::true_type { };
+
+  template<typename T>
+  struct is_mappish_impl<T, std::void_t<typename T::key_type,
+    typename T::mapped_type,
+    decltype(std::declval<T&>()[std::declval<const typename T::key_type&>()])>>
+    : std::true_type { };
+
+  template<typename T>
+  struct is_mappish : is_mappish_impl<T>::type { };
+
+  template<typename T>
+  struct is_vector : is_vector_impl<T>::type { };
+
   static inline void debugLog(const std::string& msg)
   {
 #ifndef NDEBUG

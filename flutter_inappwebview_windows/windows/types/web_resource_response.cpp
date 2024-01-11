@@ -14,7 +14,7 @@ namespace flutter_inappwebview_plugin
   flutter::EncodableMap WebResourceResponse::toEncodableMap() const
   {
     return flutter::EncodableMap{
-            {make_fl_value("statusCode"), make_fl_value(statusCode)}
+      {"statusCode", make_fl_value(statusCode)}
     };
   }
 }

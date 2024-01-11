@@ -15,8 +15,8 @@ namespace flutter_inappwebview_plugin
   flutter::EncodableMap WebResourceError::toEncodableMap() const
   {
     return flutter::EncodableMap{
-            {make_fl_value("description"), make_fl_value(description)},
-            {make_fl_value("type"), make_fl_value(type)}
+      {"description", make_fl_value(description)},
+      {"type", make_fl_value(type)}
     };
   }
 }

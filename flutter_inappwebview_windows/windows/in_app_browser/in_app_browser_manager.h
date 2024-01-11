@@ -17,10 +17,10 @@ namespace flutter_inappwebview_plugin
   public:
     static inline const std::string METHOD_CHANNEL_NAME = "com.pichillilorenzo/flutter_inappbrowser";
 
-    FlutterInappwebviewWindowsPlugin* plugin;
+    const FlutterInappwebviewWindowsPlugin* plugin;
     std::map<std::string, std::unique_ptr<InAppBrowser>> browsers;
 
-    InAppBrowserManager(FlutterInappwebviewWindowsPlugin* plugin);
+    InAppBrowserManager(const FlutterInappwebviewWindowsPlugin* plugin);
     ~InAppBrowserManager();
 
     void HandleMethodCall(

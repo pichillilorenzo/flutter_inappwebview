@@ -8,11 +8,17 @@
 #include "../flutter_inappwebview_windows_plugin.h"
 #include "../types/navigation_action.h"
 #include "../types/url_request.h"
+#include "in_app_webview_settings.h"
 #include "webview_channel_delegate.h"
 
 namespace flutter_inappwebview_plugin
 {
   using namespace Microsoft::WRL;
+
+  struct InAppWebViewCreationParams {
+    const std::variant<std::string, int> id;
+    const std::shared_ptr<InAppWebViewSettings> initialSettings;
+  };
 
   class InAppWebView
   {
@@ -26,9 +32,10 @@ namespace flutter_inappwebview_plugin
     wil::com_ptr<ICoreWebView2> webView;
     const std::unique_ptr<WebViewChannelDelegate> channelDelegate;
     std::map<UINT64, std::shared_ptr<NavigationAction>> navigationActions = {};
+    const std::shared_ptr<InAppWebViewSettings> settings;
 
-    InAppWebView(FlutterInappwebviewWindowsPlugin* plugin, const std::variant<std::string, int>& id, const HWND parentWindow, const std::function<void()> completionHandler);
-    InAppWebView(FlutterInappwebviewWindowsPlugin* plugin, const std::variant<std::string, int>& id, const HWND parentWindow, const std::string& channelName, const std::function<void()> completionHandler);
+    InAppWebView(const FlutterInappwebviewWindowsPlugin* plugin, const InAppWebViewCreationParams& params, const HWND parentWindow, const std::function<void()> completionHandler);
+    InAppWebView(const FlutterInappwebviewWindowsPlugin* plugin, const InAppWebViewCreationParams& params, const HWND parentWindow, const std::string& channelName, const std::function<void()> completionHandler);
     ~InAppWebView();
 
     std::optional<std::string> getUrl() const;

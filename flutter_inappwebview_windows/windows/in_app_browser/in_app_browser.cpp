@@ -6,13 +6,15 @@
 
 namespace flutter_inappwebview_plugin
 {
-  InAppBrowser::InAppBrowser(FlutterInappwebviewWindowsPlugin* plugin, const InAppBrowserCreationParams& params)
+  InAppBrowser::InAppBrowser(const FlutterInappwebviewWindowsPlugin* plugin, const InAppBrowserCreationParams& params)
     : plugin(plugin),
     m_hInstance(GetModuleHandle(nullptr)),
     id(params.id),
     initialUrlRequest(params.urlRequest),
+    settings(params.initialSettings),
     channelDelegate(std::make_unique<InAppBrowserChannelDelegate>(id, plugin->registrar->messenger()))
   {
+
     WNDCLASS wndClass = {};
     wndClass.lpszClassName = InAppBrowser::CLASS_NAME;
     wndClass.hInstance = m_hInstance;
@@ -39,7 +41,12 @@ namespace flutter_inappwebview_plugin
 
     ShowWindow(m_hWnd, SW_SHOW);
 
-    webView = std::make_unique<InAppWebView>(plugin, id, m_hWnd, InAppBrowser::METHOD_CHANNEL_NAME_PREFIX + id, [this]() -> void
+    InAppWebViewCreationParams webViewParams = {
+      id,
+      params.initialWebViewSettings
+    };
+
+    webView = std::make_unique<InAppWebView>(plugin, webViewParams, m_hWnd, InAppBrowser::METHOD_CHANNEL_NAME_PREFIX + id, [this]() -> void
       {
         if (channelDelegate) {
           channelDelegate->onBrowserCreated();

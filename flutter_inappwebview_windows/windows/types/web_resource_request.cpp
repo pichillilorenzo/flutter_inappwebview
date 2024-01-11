@@ -11,17 +11,17 @@ namespace flutter_inappwebview_plugin
   WebResourceRequest::WebResourceRequest(const flutter::EncodableMap& map)
     : url(get_optional_fl_map_value<std::string>(map, "url")),
     method(get_optional_fl_map_value<std::string>(map, "method")),
-    headers(get_optional_fl_map_value<std::string, std::string>(map, "headers")),
+    headers(get_optional_fl_map_value<std::map<std::string, std::string>>(map, "headers")),
     isForMainFrame(get_optional_fl_map_value<bool>(map, "isForMainFrame"))
   {}
 
   flutter::EncodableMap WebResourceRequest::toEncodableMap() const
   {
     return flutter::EncodableMap{
-        {make_fl_value("url"), make_fl_value(url)},
-        {make_fl_value("method"), make_fl_value(method)},
-        {make_fl_value("headers"), make_fl_value(headers)},
-        {make_fl_value("isForMainFrame"), make_fl_value(isForMainFrame)}
+      {"url", make_fl_value(url)},
+      {"method", make_fl_value(method)},
+      {"headers", make_fl_value(headers)},
+      {"isForMainFrame", make_fl_value(isForMainFrame)}
     };
   }
 }

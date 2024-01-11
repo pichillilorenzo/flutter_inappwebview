@@ -11,17 +11,17 @@ namespace flutter_inappwebview_plugin
   URLRequest::URLRequest(const flutter::EncodableMap& map)
     : url(get_optional_fl_map_value<std::string>(map, "url")),
     method(get_optional_fl_map_value<std::string>(map, "method")),
-    headers(get_optional_fl_map_value<std::string, std::string>(map, "headers")),
+    headers(get_optional_fl_map_value<std::map<std::string, std::string>>(map, "headers")),
     body(get_optional_fl_map_value<std::vector<uint8_t>>(map, "body"))
   {}
 
   flutter::EncodableMap URLRequest::toEncodableMap() const
   {
     return flutter::EncodableMap{
-      {make_fl_value("url"), make_fl_value(url)},
-      {make_fl_value("method"), make_fl_value(method)},
-      {make_fl_value("headers"), make_fl_value(headers)},
-      {make_fl_value("body"), make_fl_value(body)}
+      {"url", make_fl_value(url)},
+      {"method", make_fl_value(method)},
+      {"headers", make_fl_value(headers)},
+      {"body", make_fl_value(body)}
     };
   }
 }

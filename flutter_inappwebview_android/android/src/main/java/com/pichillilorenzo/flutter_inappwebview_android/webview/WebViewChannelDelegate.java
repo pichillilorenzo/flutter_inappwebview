@@ -474,32 +474,28 @@ public class WebViewChannelDelegate extends ChannelDelegateImpl {
                 }
                 break;
             case clearFocus:
-                Log.d(LOG_TAG, "chiamo clearFocus");
                 if (webView != null) {
                     webView.sendAccessibilityEvent(AccessibilityEvent.TYPE_VIEW_ACCESSIBILITY_FOCUS_CLEARED);
-                    Log.d(LOG_TAG, "focused, I'm going to clear focus");
                     webView.clearFocus();
                 }
                 result.success(true);
                 break;
             case requestFocus:
-                Log.d(LOG_TAG, "chiamo RequestFocus");
                 webView.getSettings().setJavaScriptEnabled(true);
                 webView.setFocusable(true);
 
-
                 if (!webView.isFocused()) {
-
-                    webView.sendAccessibilityEvent(AccessibilityEvent.TYPE_VIEW_ACCESSIBILITY_FOCUS_CLEARED);
-                    Log.d(LOG_TAG, "not focused, I'm going to focus");
-//                    new Handler(Looper.getMainLooper()).post(() -> {
+                    if (webView != null) {
+                        webView.sendAccessibilityEvent(AccessibilityEvent.TYPE_VIEW_ACCESSIBILITY_FOCUS_CLEARED);
                         webView.postDelayed(() -> {
-                            webView.sendAccessibilityEvent(AccessibilityEvent.TYPE_VIEW_ACCESSIBILITY_FOCUS_CLEARED);
-                            webView.sendAccessibilityEvent(AccessibilityEvent.TYPE_VIEW_FOCUSED);
-                            webView.sendAccessibilityEvent(AccessibilityEvent.TYPE_VIEW_SELECTED);
+                            if (webView != null) {
+                                webView.sendAccessibilityEvent(AccessibilityEvent.TYPE_VIEW_ACCESSIBILITY_FOCUS_CLEARED);
+                                webView.sendAccessibilityEvent(AccessibilityEvent.TYPE_VIEW_FOCUSED);
+                                webView.sendAccessibilityEvent(AccessibilityEvent.TYPE_VIEW_SELECTED);
+                            }
                         }, 100);
                         webView.requestFocus();
-//                    });
+                    }
                 } else {
                     Log.d(LOG_TAG, "focused, I'm not going to focus");
                 }

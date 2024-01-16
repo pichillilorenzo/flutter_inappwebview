@@ -152,7 +152,7 @@ class MacOSCookieManager extends PlatformCookieManager with ChannelController {
 
     final setCookieCompleter = Completer<void>();
     final headlessWebView =
-        MacOSHeadlessInAppWebView(MacOSHeadlessInAppWebViewCreationParams(
+        WindowsHeadlessInAppWebView(WindowsHeadlessInAppWebViewCreationParams(
             initialUrlRequest: URLRequest(url: url),
             onLoadStop: (controller, url) async {
               await controller.evaluateJavascript(
@@ -234,7 +234,7 @@ class MacOSCookieManager extends PlatformCookieManager with ChannelController {
 
     final pageLoaded = Completer<void>();
     final headlessWebView =
-        MacOSHeadlessInAppWebView(MacOSHeadlessInAppWebViewCreationParams(
+        WindowsHeadlessInAppWebView(WindowsHeadlessInAppWebViewCreationParams(
       initialUrlRequest: URLRequest(url: url),
       onLoadStop: (controller, url) async {
         pageLoaded.complete();

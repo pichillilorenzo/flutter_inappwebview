@@ -18,7 +18,7 @@ namespace flutter_inappwebview_plugin
   {
     if (method_call.method_name().compare("open") == 0) {
       auto* arguments = std::get_if<flutter::EncodableMap>(method_call.arguments());
-      open(arguments);
+      createInAppWebView(arguments);
       result->Success(flutter::EncodableValue(true));
     }
     else {
@@ -26,7 +26,7 @@ namespace flutter_inappwebview_plugin
     }
   }
 
-  void InAppBrowserManager::open(const flutter::EncodableMap* arguments)
+  void InAppBrowserManager::createInAppWebView(const flutter::EncodableMap* arguments)
   {
     auto id = get_fl_map_value<std::string>(*arguments, "id");
     auto urlRequestMap = get_optional_fl_map_value<flutter::EncodableMap>(*arguments, "urlRequest");

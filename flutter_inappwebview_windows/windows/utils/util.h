@@ -2,6 +2,7 @@
 #define FLUTTER_INAPPWEBVIEW_PLUGIN_UTIL_H_
 
 #include <algorithm>
+#include <comdef.h>
 #include <iostream>
 #include <map>
 #include <optional>
@@ -48,13 +49,19 @@ namespace flutter_inappwebview_plugin
 #endif
   }
 
+  static inline std::string getErrorMessage(const HRESULT& error)
+  {
+    _com_error err(error);
+    return wide_to_ansi(err.ErrorMessage());
+  }
+
   template<typename T>
   static inline std::optional<T> make_pointer_optional(const T* value)
   {
     return value == nullptr ? std::nullopt : std::make_optional<T>(*value);
   }
 
-  static inline std::string variant_to_string(const std::variant<std::string, int>& var)
+  static inline std::string variant_to_string(const std::variant<std::string, int64_t>& var)
   {
     return std::visit([](auto&& arg)
       {

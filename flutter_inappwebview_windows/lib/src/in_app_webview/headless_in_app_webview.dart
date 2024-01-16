@@ -6,16 +6,16 @@ import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_pla
 import '../find_interaction/find_interaction_controller.dart';
 import 'in_app_webview_controller.dart';
 
-/// Object specifying creation parameters for creating a [MacOSHeadlessInAppWebView].
+/// Object specifying creation parameters for creating a [WindowsHeadlessInAppWebView].
 ///
 /// When adding additional fields make sure they can be null or have a default
 /// value to avoid breaking changes. See [PlatformHeadlessInAppWebViewCreationParams] for
 /// more information.
 @immutable
-class MacOSHeadlessInAppWebViewCreationParams
+class WindowsHeadlessInAppWebViewCreationParams
     extends PlatformHeadlessInAppWebViewCreationParams {
-  /// Creates a new [MacOSHeadlessInAppWebViewCreationParams] instance.
-  MacOSHeadlessInAppWebViewCreationParams(
+  /// Creates a new [WindowsHeadlessInAppWebViewCreationParams] instance.
+  WindowsHeadlessInAppWebViewCreationParams(
       {super.controllerFromPlatform,
       super.initialSize,
       super.windowId,
@@ -128,8 +128,8 @@ class MacOSHeadlessInAppWebViewCreationParams
       super.pullToRefreshController,
       this.findInteractionController});
 
-  /// Creates a [MacOSHeadlessInAppWebViewCreationParams] instance based on [PlatformHeadlessInAppWebViewCreationParams].
-  MacOSHeadlessInAppWebViewCreationParams.fromPlatformHeadlessInAppWebViewCreationParams(
+  /// Creates a [WindowsHeadlessInAppWebViewCreationParams] instance based on [PlatformHeadlessInAppWebViewCreationParams].
+  WindowsHeadlessInAppWebViewCreationParams.fromPlatformHeadlessInAppWebViewCreationParams(
       PlatformHeadlessInAppWebViewCreationParams params)
       : this(
             controllerFromPlatform: params.controllerFromPlatform,
@@ -245,7 +245,7 @@ class MacOSHeadlessInAppWebViewCreationParams
 }
 
 ///{@macro flutter_inappwebview_platform_interface.PlatformHeadlessInAppWebView}
-class MacOSHeadlessInAppWebView extends PlatformHeadlessInAppWebView
+class WindowsHeadlessInAppWebView extends PlatformHeadlessInAppWebView
     with ChannelController {
   @override
   late final String id;
@@ -258,12 +258,12 @@ class MacOSHeadlessInAppWebView extends PlatformHeadlessInAppWebView
 
   WindowsInAppWebViewController? _webViewController;
 
-  /// Constructs a [MacOSHeadlessInAppWebView].
-  MacOSHeadlessInAppWebView(PlatformHeadlessInAppWebViewCreationParams params)
+  /// Constructs a [WindowsHeadlessInAppWebView].
+  WindowsHeadlessInAppWebView(PlatformHeadlessInAppWebViewCreationParams params)
       : super.implementation(
-          params is MacOSHeadlessInAppWebViewCreationParams
+          params is WindowsHeadlessInAppWebViewCreationParams
               ? params
-              : MacOSHeadlessInAppWebViewCreationParams
+              : WindowsHeadlessInAppWebViewCreationParams
                   .fromPlatformHeadlessInAppWebViewCreationParams(params),
         ) {
     id = IdGenerator.generate();
@@ -274,8 +274,8 @@ class MacOSHeadlessInAppWebView extends PlatformHeadlessInAppWebView
 
   dynamic _controllerFromPlatform;
 
-  MacOSHeadlessInAppWebViewCreationParams get _macosParams =>
-      params as MacOSHeadlessInAppWebViewCreationParams;
+  WindowsHeadlessInAppWebViewCreationParams get _macosParams =>
+      params as WindowsHeadlessInAppWebViewCreationParams;
 
   _init() {
     _webViewController = WindowsInAppWebViewController(
@@ -425,7 +425,7 @@ class MacOSHeadlessInAppWebView extends PlatformHeadlessInAppWebView
   }
 }
 
-extension InternalHeadlessInAppWebView on MacOSHeadlessInAppWebView {
+extension InternalHeadlessInAppWebView on WindowsHeadlessInAppWebView {
   Future<void> internalDispose() async {
     _started = false;
     _running = false;

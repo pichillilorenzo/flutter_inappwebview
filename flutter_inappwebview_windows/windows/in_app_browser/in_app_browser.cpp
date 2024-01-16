@@ -26,7 +26,7 @@ namespace flutter_inappwebview_plugin
 
     m_hWnd = CreateWindowEx(
       0,                              // Optional window styles.
-      InAppBrowser::CLASS_NAME,		// Window class
+      wndClass.lpszClassName,		// Window class
       L"",							// Window text
       WS_OVERLAPPEDWINDOW,			// Window style
 
@@ -35,25 +35,35 @@ namespace flutter_inappwebview_plugin
 
       NULL,       // Parent window    
       NULL,       // Menu
-      m_hInstance,// Instance handle
+      wndClass.hInstance,// Instance handle
       this        // Additional application data
     );
 
-    ShowWindow(m_hWnd, SW_SHOW);
+    ShowWindow(m_hWnd, settings->hidden ? SW_HIDE : SW_SHOW);
 
     InAppWebViewCreationParams webViewParams = {
       id,
       params.initialWebViewSettings
     };
 
-    webView = std::make_unique<InAppWebView>(plugin, webViewParams, m_hWnd, InAppBrowser::METHOD_CHANNEL_NAME_PREFIX + id, [this]() -> void
+    InAppWebView::createInAppWebViewEnv(m_hWnd, false,
+      [this, webViewParams](wil::com_ptr<ICoreWebView2Environment> webViewEnv, wil::com_ptr<ICoreWebView2Controller> webViewController, wil::com_ptr<ICoreWebView2CompositionController> webViewCompositionController) -> void
       {
-        if (channelDelegate) {
-          channelDelegate->onBrowserCreated();
-        }
+        if (webViewEnv && webViewController) {
+          webView = std::make_unique<InAppWebView>(this, this->plugin, webViewParams, m_hWnd, std::move(webViewEnv), std::move(webViewController), nullptr);
+          webView->initChannel(std::nullopt, InAppBrowser::METHOD_CHANNEL_NAME_PREFIX + id);
 
-        if (initialUrlRequest.has_value()) {
-          webView->loadUrl(initialUrlRequest.value());
+          if (channelDelegate) {
+            channelDelegate->onBrowserCreated();
+          }
+
+          if (initialUrlRequest.has_value()) {
+            webView->loadUrl(initialUrlRequest.value());
+          }
+        }
+        else {
+          std::cerr << "Cannot create the InAppWebView instance!" << std::endl;
+          close();
         }
       });
 
@@ -146,6 +156,35 @@ namespace flutter_inappwebview_plugin
     //				}).Get());
     //			return S_OK;
     //		}).Get());
+  }
+
+  void InAppBrowser::close() const
+  {
+    DestroyWindow(m_hWnd);
+  }
+
+  void InAppBrowser::show() const
+  {
+    ShowWindow(m_hWnd, SW_SHOW);
+    webView->webViewController->put_IsVisible(true);
+  }
+
+  void InAppBrowser::hide() const
+  {
+    ShowWindow(m_hWnd, SW_HIDE);
+    webView->webViewController->put_IsVisible(false);
+  }
+
+  bool InAppBrowser::isHidden() const
+  {
+    return !IsWindowVisible(m_hWnd);
+  }
+
+  void InAppBrowser::didChangeTitle(const std::optional<std::string>& title) const
+  {
+    if (title.has_value()) {
+      SetWindowText(m_hWnd, ansi_to_wide(title.value()).c_str());
+    }
   }
 
   LRESULT CALLBACK InAppBrowser::WndProc(

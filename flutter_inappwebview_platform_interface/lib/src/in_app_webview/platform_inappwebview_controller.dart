@@ -134,7 +134,7 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///- iOS ([Official API - WKWebView.url](https://developer.apple.com/documentation/webkit/wkwebview/1415005-url))
   ///- MacOS ([Official API - WKWebView.url](https://developer.apple.com/documentation/webkit/wkwebview/1415005-url))
   ///- Web
-  ///- Windows ([Official API - IWebView2WebView.get_Source](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/iwebview2webview?view=webview2-0.8.355#get_source))
+  ///- Windows ([Official API - IWebView2WebView.get_Source](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2?view=webview2-1.0.2210.55#get_source))
   ///{@endtemplate}
   Future<WebUri?> getUrl() {
     throw UnimplementedError(
@@ -151,6 +151,7 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///- iOS ([Official API - WKWebView.title](https://developer.apple.com/documentation/webkit/wkwebview/1415015-title))
   ///- MacOS ([Official API - WKWebView.title](https://developer.apple.com/documentation/webkit/wkwebview/1415015-title))
   ///- Web
+  ///- Windows ([Official API - IWebView2WebView.get_DocumentTitle](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2?view=webview2-1.0.2210.55#get_documenttitle))
   ///{@endtemplate}
   Future<String?> getTitle() {
     throw UnimplementedError(
@@ -345,6 +346,7 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///- iOS ([Official API - WKWebView.reload](https://developer.apple.com/documentation/webkit/wkwebview/1414969-reload))
   ///- MacOS ([Official API - WKWebView.reload](https://developer.apple.com/documentation/webkit/wkwebview/1414969-reload))
   ///- Web ([Official API - Location.reload](https://developer.mozilla.org/en-US/docs/Web/API/Location/reload))
+  ///- Windows ([Official API - IWebView2WebView.Reload](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2?view=webview2-1.0.2210.55#reload))
   ///{@endtemplate}
   Future<void> reload() {
     throw UnimplementedError(
@@ -361,6 +363,7 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///- iOS ([Official API - WKWebView.goBack](https://developer.apple.com/documentation/webkit/wkwebview/1414952-goback))
   ///- MacOS ([Official API - WKWebView.goBack](https://developer.apple.com/documentation/webkit/wkwebview/1414952-goback))
   ///- Web ([Official API - History.back](https://developer.mozilla.org/en-US/docs/Web/API/History/back))
+  ///- Windows ([Official API - IWebView2WebView.GoBack](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2?view=webview2-1.0.2210.55#goback))
   ///{@endtemplate}
   Future<void> goBack() {
     throw UnimplementedError(
@@ -390,6 +393,7 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///- iOS ([Official API - WKWebView.goForward](https://developer.apple.com/documentation/webkit/wkwebview/1414993-goforward))
   ///- MacOS ([Official API - WKWebView.goForward](https://developer.apple.com/documentation/webkit/wkwebview/1414993-goforward))
   ///- Web ([Official API - History.forward](https://developer.mozilla.org/en-US/docs/Web/API/History/forward))
+  ///- Windows ([Official API - IWebView2WebView.GoForward](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2?view=webview2-1.0.2210.55#goforward))
   ///{@endtemplate}
   Future<void> goForward() {
     throw UnimplementedError(
@@ -492,7 +496,7 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///Those changes remain visible to all scripts, regardless of which content world you specify.
   ///For more information about content worlds, see [ContentWorld].
   ///Available on iOS 14.0+ and MacOS 11.0+.
-  ///**NOTE**: not used on Web.
+  ///**NOTE**: not used on Web and on Windows platforms.
   ///
   ///**NOTE**: This method shouldn't be called in the [PlatformWebViewCreationParams.onWebViewCreated] or [PlatformWebViewCreationParams.onLoadStart] events,
   ///because, in these events, the `WebView` is not ready to handle it yet.
@@ -506,6 +510,7 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///- iOS ([Official API - WKWebView.evaluateJavascript](https://developer.apple.com/documentation/webkit/wkwebview/3656442-evaluatejavascript))
   ///- MacOS ([Official API - WKWebView.evaluateJavascript](https://developer.apple.com/documentation/webkit/wkwebview/3656442-evaluatejavascript))
   ///- Web ([Official API - Window.eval](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/eval?retiredLocale=it))
+  ///- Windows ([Official API - IWebView2WebView.ExecuteScript](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2?view=webview2-1.0.2210.55#executescript))
   ///{@endtemplate}
   Future<dynamic> evaluateJavascript(
       {required String source, ContentWorld? contentWorld}) {

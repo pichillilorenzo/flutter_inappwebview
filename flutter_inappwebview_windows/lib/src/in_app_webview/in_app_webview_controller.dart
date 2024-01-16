@@ -57,7 +57,7 @@ class WindowsInAppWebViewControllerCreationParams
   }
 }
 
-///Controls a WebView, such as an [InAppWebView] widget instance, a [MacOSHeadlessInAppWebView] instance or [WindowsInAppBrowser] WebView instance.
+///Controls a WebView, such as an [InAppWebView] widget instance, a [WindowsHeadlessInAppWebView] instance or [WindowsInAppBrowser] WebView instance.
 ///
 ///If you are using the [InAppWebView] widget, an [InAppWebViewController] instance can be obtained by setting the [InAppWebView.onWebViewCreated]
 ///callback. Instead, if you are using an [WindowsInAppBrowser] instance, you can get it through the [WindowsInAppBrowser.webViewController] attribute.
@@ -1923,6 +1923,13 @@ class WindowsInAppWebViewController extends PlatformInAppWebViewController
     args.putIfAbsent('source', () => source);
     args.putIfAbsent('contentWorld', () => contentWorld?.toMap());
     var data = await channel?.invokeMethod('evaluateJavascript', args);
+    if (data != null) {
+      try {
+        // try to json decode the data coming from JavaScript
+        // otherwise return it as it is.
+        data = json.decode(data);
+      } catch (e) {}
+    }
     return data;
   }
 

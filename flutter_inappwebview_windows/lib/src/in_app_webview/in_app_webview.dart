@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_platform_interface.dart';
 import 'headless_in_app_webview.dart';
@@ -7,13 +6,15 @@ import 'headless_in_app_webview.dart';
 import '../find_interaction/find_interaction_controller.dart';
 import 'in_app_webview_controller.dart';
 
+import 'custom_platform_view.dart';
+
 /// Object specifying creation parameters for creating a [PlatformInAppWebViewWidget].
 ///
 /// Platform specific implementations can add additional fields by extending
 /// this class.
-class MacOSInAppWebViewWidgetCreationParams
+class WindowsInAppWebViewWidgetCreationParams
     extends PlatformInAppWebViewWidgetCreationParams {
-  MacOSInAppWebViewWidgetCreationParams(
+  WindowsInAppWebViewWidgetCreationParams(
       {super.controllerFromPlatform,
       super.key,
       super.layoutDirection,
@@ -131,9 +132,9 @@ class MacOSInAppWebViewWidgetCreationParams
       super.pullToRefreshController,
       this.findInteractionController});
 
-  /// Constructs a [MacOSInAppWebViewWidgetCreationParams] using a
+  /// Constructs a [WindowsInAppWebViewWidgetCreationParams] using a
   /// [PlatformInAppWebViewWidgetCreationParams].
-  MacOSInAppWebViewWidgetCreationParams.fromPlatformInAppWebViewWidgetCreationParams(
+  WindowsInAppWebViewWidgetCreationParams.fromPlatformInAppWebViewWidgetCreationParams(
       PlatformInAppWebViewWidgetCreationParams params)
       : this(
             controllerFromPlatform: params.controllerFromPlatform,
@@ -254,25 +255,25 @@ class MacOSInAppWebViewWidgetCreationParams
 }
 
 ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewWidget}
-class MacOSInAppWebViewWidget extends PlatformInAppWebViewWidget {
-  /// Constructs a [MacOSInAppWebViewWidget].
+class WindowsInAppWebViewWidget extends PlatformInAppWebViewWidget {
+  /// Constructs a [WindowsInAppWebViewWidget].
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewWidget}
-  MacOSInAppWebViewWidget(PlatformInAppWebViewWidgetCreationParams params)
+  WindowsInAppWebViewWidget(PlatformInAppWebViewWidgetCreationParams params)
       : super.implementation(
-          params is MacOSInAppWebViewWidgetCreationParams
+          params is WindowsInAppWebViewWidgetCreationParams
               ? params
-              : MacOSInAppWebViewWidgetCreationParams
+              : WindowsInAppWebViewWidgetCreationParams
                   .fromPlatformInAppWebViewWidgetCreationParams(params),
         );
 
-  MacOSInAppWebViewWidgetCreationParams get _macosParams =>
-      params as MacOSInAppWebViewWidgetCreationParams;
+  WindowsInAppWebViewWidgetCreationParams get _macosParams =>
+      params as WindowsInAppWebViewWidgetCreationParams;
 
   WindowsInAppWebViewController? _controller;
 
-  MacOSHeadlessInAppWebView? get _macosHeadlessInAppWebView =>
-      params.headlessWebView as MacOSHeadlessInAppWebView?;
+  WindowsHeadlessInAppWebView? get _macosHeadlessInAppWebView =>
+      params.headlessWebView as WindowsHeadlessInAppWebView?;
 
   @override
   Widget build(BuildContext context) {
@@ -300,10 +301,8 @@ class MacOSInAppWebViewWidget extends PlatformInAppWebViewWidget {
       }
     }
 
-    return UiKitView(
-      viewType: 'com.pichillilorenzo/flutter_inappwebview',
+    return CustomPlatformView(
       onPlatformViewCreated: _onPlatformViewCreated,
-      gestureRecognizers: params.gestureRecognizers,
       creationParams: <String, dynamic>{
         'initialUrlRequest': params.initialUrlRequest?.toMap(),
         'initialFile': params.initialFile,
@@ -320,7 +319,6 @@ class MacOSInAppWebViewWidget extends PlatformInAppWebViewWidget {
         'keepAliveId': params.keepAlive?.id,
         'preventGestureDelay': params.preventGestureDelay
       },
-      creationParamsCodec: const StandardMessageCodec(),
     );
   }
 

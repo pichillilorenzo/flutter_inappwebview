@@ -192,6 +192,7 @@ class PlatformInAppWebViewWidgetCreationParams
 ///- Android native WebView
 ///- iOS
 ///- Web
+///- Windows
 ///{@endtemplate}
 abstract class PlatformInAppWebViewWidget extends PlatformInterface
     implements Disposable {

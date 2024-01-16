@@ -21,16 +21,9 @@ cmake_policy(VERSION 3.14...3.25)
 # not be changed
 set(PLUGIN_NAME "flutter_inappwebview_windows_plugin")
 
-set(NUGET_URL https://dist.nuget.org/win-x86-commandline/latest/nuget.exe)
-
 find_program(NUGET nuget)
 if(NOT NUGET)
   message(NOTICE "Nuget is not installed.")
-  set(NUGET ${CMAKE_BINARY_DIR}/nuget.exe)
-  if (NOT EXISTS ${NUGET})
-    message(NOTICE "Attempting to download nuget.")
-    file(DOWNLOAD ${NUGET_URL} ${NUGET})
-  endif()
 endif()
 
 add_custom_target(${PROJECT_NAME}_DEPENDENCIES_DOWNLOAD ALL)
@@ -61,10 +54,25 @@ list(APPEND PLUGIN_SOURCES
   "types/web_resource_request.h"
   "types/web_resource_response.cpp"
   "types/web_resource_response.h"
+  "custom_platform_view/custom_platform_view.cc"
+  "custom_platform_view/custom_platform_view.h"
+  "custom_platform_view/texture_bridge.cc"
+  "custom_platform_view/texture_bridge.h"
+  "custom_platform_view/graphics_context.cc"
+  "custom_platform_view/graphics_context.h"
+  "custom_platform_view/util/direct3d11.interop.cc"
+  "custom_platform_view/util/direct3d11.interop.h"
+  "custom_platform_view/util/rohelper.cc"
+  "custom_platform_view/util/rohelper.h"
+  "custom_platform_view/util/string_converter.cc"
+  "custom_platform_view/util/string_converter.h"
+  "custom_platform_view/util/swizzle.h"
   "in_app_webview/in_app_webview_settings.cpp"
   "in_app_webview/in_app_webview_settings.h"
   "in_app_webview/in_app_webview.cpp"
   "in_app_webview/in_app_webview.h"
+  "in_app_webview/in_app_webview_manager.cpp"
+  "in_app_webview/in_app_webview_manager.h"
   "in_app_webview/webview_channel_delegate.cpp"
   "in_app_webview/webview_channel_delegate.h"
   "in_app_browser/in_app_browser_settings.cpp"
@@ -84,6 +92,29 @@ add_library(${PLUGIN_NAME} SHARED
   "flutter_inappwebview_windows_plugin_c_api.cpp"
   ${PLUGIN_SOURCES}
 )
+
+if(NOT FLUTTER_WEBVIEW_WINDOWS_USE_TEXTURE_FALLBACK)
+  message(STATUS "Building with D3D texture support.")
+  target_compile_definitions("${PLUGIN_NAME}" PRIVATE
+    HAVE_FLUTTER_D3D_TEXTURE
+  )
+  target_sources("${PLUGIN_NAME}" PRIVATE
+    "custom_platform_view/texture_bridge_gpu.cc"
+    "custom_platform_view/texture_bridge_gpu.h"
+  )
+else()
+  message(STATUS "Building with fallback PixelBuffer texture.")
+  target_sources("${PLUGIN_NAME}" PRIVATE
+    "custom_platform_view/texture_bridge_fallback.cc"
+    "custom_platform_view/texture_bridge_fallback.h"
+    "custom_platform_view/util/cpuid/cpuinfo.cc"
+    "custom_platform_view/util/cpuid/cpuinfo.h"
+  )
+  # Enable AVX2 for pixel buffer conversions
+  if(MSVC)
+    target_compile_options(${PLUGIN_NAME} PRIVATE "/arch:AVX2")
+  endif()
+endif()
 
 # Apply a standard set of build settings that are configured in the
 # application-level CMakeLists.txt. This can be removed for plugins that want

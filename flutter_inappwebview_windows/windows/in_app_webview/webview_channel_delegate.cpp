@@ -1,3 +1,4 @@
+#include "../in_app_browser/in_app_browser.h"
 #include "../types/base_callback_result.h"
 #include "../utils/flutter.h"
 #include "../utils/strconv.h"
@@ -34,13 +35,51 @@ namespace flutter_inappwebview_plugin
       return;
     }
 
+    auto& arguments = std::get<flutter::EncodableMap>(*method_call.arguments());
+
     if (method_call.method_name().compare("getUrl") == 0) {
       result->Success(make_fl_value(webView->getUrl()));
     }
+    else if (method_call.method_name().compare("getTitle") == 0) {
+      result->Success(make_fl_value(webView->getUrl()));
+    }
     else if (method_call.method_name().compare("loadUrl") == 0) {
-      auto& arguments = std::get<flutter::EncodableMap>(*method_call.arguments());
       auto urlRequest = std::make_unique<URLRequest>(get_fl_map_value<flutter::EncodableMap>(arguments, "urlRequest"));
       webView->loadUrl(*urlRequest);
+      result->Success(make_fl_value(true));
+    }
+    else if (method_call.method_name().compare("reload") == 0) {
+      webView->reload();
+      result->Success(make_fl_value(true));
+    }
+    else if (method_call.method_name().compare("goBack") == 0) {
+      webView->goBack();
+      result->Success(make_fl_value(true));
+    }
+    else if (method_call.method_name().compare("goForward") == 0) {
+      webView->goForward();
+      result->Success(make_fl_value(true));
+    }
+    else if (method_call.method_name().compare("evaluateJavascript") == 0) {
+      auto result_ = std::shared_ptr<flutter::MethodResult<flutter::EncodableValue>>(std::move(result));
+
+      auto source = get_fl_map_value<std::string>(arguments, "source");
+      webView->evaluateJavascript(source, [result_ = std::move(result_)](const std::string& value)
+        {
+          result_->Success(make_fl_value(value));
+        });
+    }
+    // for inAppBrowser
+    else if (webView->inAppBrowser && method_call.method_name().compare("show") == 0) {
+      webView->inAppBrowser->show();
+      result->Success(make_fl_value(true));
+    }
+    else if (webView->inAppBrowser && method_call.method_name().compare("hide") == 0) {
+      webView->inAppBrowser->hide();
+      result->Success(make_fl_value(true));
+    }
+    else if (webView->inAppBrowser && method_call.method_name().compare("close") == 0) {
+      webView->inAppBrowser->close();
       result->Success(make_fl_value(true));
     }
     else {
@@ -106,6 +145,22 @@ namespace flutter_inappwebview_plugin
       {"errorResponse", errorResponse->toEncodableMap()},
       });
     channel->InvokeMethod("onReceivedHttpError", std::move(arguments));
+  }
+
+  void WebViewChannelDelegate::onTitleChanged(const std::optional<std::string>& title) const
+  {
+    if (!channel) {
+      return;
+    }
+
+    auto arguments = std::make_unique<flutter::EncodableValue>(flutter::EncodableMap{
+      {"title", make_fl_value(title)}
+      });
+    channel->InvokeMethod("onTitleChanged", std::move(arguments));
+
+    if (webView && webView->inAppBrowser) {
+      webView->inAppBrowser->didChangeTitle(title);
+    }
   }
 
   WebViewChannelDelegate::~WebViewChannelDelegate()

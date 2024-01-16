@@ -372,6 +372,7 @@ abstract class PlatformInAppBrowser extends PlatformInterface
   ///- Android native WebView
   ///- iOS
   ///- MacOS
+  ///- Windows
   ///{@endtemplate}
   Future<void> show() {
     throw UnimplementedError('show is not implemented on the current platform');
@@ -384,6 +385,7 @@ abstract class PlatformInAppBrowser extends PlatformInterface
   ///- Android native WebView
   ///- iOS
   ///- MacOS
+  ///- Windows
   ///{@endtemplate}
   Future<void> hide() {
     throw UnimplementedError('hide is not implemented on the current platform');
@@ -396,6 +398,7 @@ abstract class PlatformInAppBrowser extends PlatformInterface
   ///- Android native WebView
   ///- iOS
   ///- MacOS
+  ///- Windows
   ///{@endtemplate}
   Future<void> close() {
     throw UnimplementedError(
@@ -409,6 +412,7 @@ abstract class PlatformInAppBrowser extends PlatformInterface
   ///- Android native WebView
   ///- iOS
   ///- MacOS
+  ///- Windows
   ///{@endtemplate}
   Future<bool> isHidden() {
     throw UnimplementedError(
@@ -964,6 +968,7 @@ abstract class PlatformInAppBrowserEvents {
   ///- Android native WebView ([Official API - WebChromeClient.onReceivedTitle](https://developer.android.com/reference/android/webkit/WebChromeClient#onReceivedTitle(android.webkit.WebView,%20java.lang.String)))
   ///- iOS
   ///- MacOS
+  ///- Windows ([Official API - IWebView2WebView.add_DocumentTitleChanged](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2?view=webview2-1.0.2210.55#add_documenttitlechanged))
   void onTitleChanged(String? title) {}
 
   ///Event fired to respond to the results of an over-scroll operation.

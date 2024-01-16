@@ -43,6 +43,13 @@ namespace flutter_inappwebview_plugin
     InAppBrowser(const FlutterInappwebviewWindowsPlugin* plugin, const InAppBrowserCreationParams& params);
     ~InAppBrowser();
 
+    void close() const;
+    void show() const;
+    void hide() const;
+    bool isHidden() const;
+
+    void didChangeTitle(const std::optional<std::string>& title) const;
+
   private:
     const HINSTANCE m_hInstance;
     HWND m_hWnd;

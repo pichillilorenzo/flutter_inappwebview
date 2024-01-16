@@ -1,75 +1,133 @@
-#pragma comment(lib, "Shlwapi.lib")
-
 #include <cstring>
 #include <Shlwapi.h>
 #include <WebView2EnvironmentOptions.h>
 #include <wil/wrl.h>
 
+#include "../custom_platform_view/util/composition.desktop.interop.h"
 #include "../types/web_resource_error.h"
 #include "../types/web_resource_request.h"
 #include "../utils/strconv.h"
 #include "../utils/util.h"
 #include "in_app_webview.h"
+#include "in_app_webview_manager.h"
 
 namespace flutter_inappwebview_plugin
 {
   using namespace Microsoft::WRL;
 
-  InAppWebView::InAppWebView(const FlutterInappwebviewWindowsPlugin* plugin, const InAppWebViewCreationParams& params, const HWND parentWindow, const std::function<void()> completionHandler)
-    : plugin(plugin), id(params.id), settings(params.initialSettings), channelDelegate(std::make_unique<WebViewChannelDelegate>(this, plugin->registrar->messenger()))
+  InAppWebView::InAppWebView(const FlutterInappwebviewWindowsPlugin* plugin, const InAppWebViewCreationParams& params, const HWND parentWindow, wil::com_ptr<ICoreWebView2Environment> webViewEnv,
+    wil::com_ptr<ICoreWebView2Controller> webViewController,
+    wil::com_ptr<ICoreWebView2CompositionController> webViewCompositionController)
+    : plugin(plugin), id(params.id), webViewEnv(std::move(webViewEnv)), webViewController(std::move(webViewController)), webViewCompositionController(std::move(webViewCompositionController)),
+    settings(params.initialSettings)
   {
-    createWebView(parentWindow, completionHandler);
+    this->webViewController->get_CoreWebView2(webView.put());
+
+    if (this->webViewCompositionController) {
+      if (!createSurface(parentWindow, plugin->inAppWebViewManager->compositor())) {
+        std::cerr << "Cannot create InAppWebView surface\n";
+      }
+      registerSurfaceEventHandlers();
+    }
+    else {
+      // Resize WebView to fit the bounds of the parent window
+      RECT bounds;
+      GetClientRect(parentWindow, &bounds);
+      this->webViewController->put_Bounds(bounds);
+    }
+
+    wil::com_ptr<ICoreWebView2Settings> webView2Settings;
+    if (SUCCEEDED(webView->get_Settings(&webView2Settings))) {
+      webView2Settings->put_IsScriptEnabled(settings->javaScriptEnabled);
+      webView2Settings->put_IsZoomControlEnabled(settings->supportZoom);
+
+      wil::com_ptr<ICoreWebView2Settings2> webView2Settings2;
+      if (SUCCEEDED(webView2Settings->QueryInterface(IID_PPV_ARGS(&webView2Settings2)))) {
+        if (!settings->userAgent.empty()) {
+          webView2Settings2->put_UserAgent(ansi_to_wide(settings->userAgent).c_str());
+        }
+      }
+    }
+
+    registerEventHandlers();
   }
 
-  InAppWebView::InAppWebView(const FlutterInappwebviewWindowsPlugin* plugin, const InAppWebViewCreationParams& params, const HWND parentWindow, const std::string& channelName, const std::function<void()> completionHandler)
-    : plugin(plugin), id(params.id), settings(params.initialSettings), channelDelegate(std::make_unique<WebViewChannelDelegate>(this, plugin->registrar->messenger(), channelName))
+  InAppWebView::InAppWebView(InAppBrowser* inAppBrowser, const FlutterInappwebviewWindowsPlugin* plugin, const InAppWebViewCreationParams& params, const HWND parentWindow, wil::com_ptr<ICoreWebView2Environment> webViewEnv,
+    wil::com_ptr<ICoreWebView2Controller> webViewController,
+    wil::com_ptr<ICoreWebView2CompositionController> webViewCompositionController)
+    : InAppWebView(plugin, params, parentWindow, std::move(webViewEnv), std::move(webViewController), std::move(webViewCompositionController))
   {
-    createWebView(parentWindow, completionHandler);
+    this->inAppBrowser = inAppBrowser;
   }
 
-  void InAppWebView::createWebView(const HWND parentWindow, const std::function<void()> completionHandler)
+  void InAppWebView::createInAppWebViewEnv(const HWND parentWindow, const bool willBeSurface, std::function<void(wil::com_ptr<ICoreWebView2Environment> webViewEnv,
+    wil::com_ptr<ICoreWebView2Controller> webViewController,
+    wil::com_ptr<ICoreWebView2CompositionController> webViewCompositionController)> completionHandler)
   {
     CreateCoreWebView2EnvironmentWithOptions(nullptr, nullptr, nullptr,
       Callback<ICoreWebView2CreateCoreWebView2EnvironmentCompletedHandler>(
-        [parentWindow, completionHandler, this](HRESULT result, ICoreWebView2Environment* env) -> HRESULT
+        [parentWindow, completionHandler, willBeSurface](HRESULT result, wil::com_ptr<ICoreWebView2Environment> env) -> HRESULT
         {
-          webViewEnv = env;
-          // Create a CoreWebView2Controller and get the associated CoreWebView2 whose parent is the main window HWND
-          env->CreateCoreWebView2Controller(parentWindow, Callback<ICoreWebView2CreateCoreWebView2ControllerCompletedHandler>(
-            [parentWindow, completionHandler, this](HRESULT result, ICoreWebView2Controller* controller) -> HRESULT
-            {
-              if (controller != nullptr) {
-                webViewController = controller;
-                webViewController->get_CoreWebView2(webView.put());
-              }
+          if (FAILED(result) || !env) {
+            completionHandler(nullptr, nullptr, nullptr);
+            debugLog(getErrorMessage(result));
+            return E_FAIL;
+          }
 
-              wil::com_ptr<ICoreWebView2Settings> webView2Settings;
-              if (SUCCEEDED(webView->get_Settings(&webView2Settings))) {
-                webView2Settings->put_IsScriptEnabled(settings->javaScriptEnabled);
-                webView2Settings->put_IsZoomControlEnabled(settings->supportZoom);
-                webView2Settings->put_IsStatusBarEnabled(true);
+          wil::com_ptr<ICoreWebView2Environment3> webViewEnv3;
+          if (willBeSurface && SUCCEEDED(env->QueryInterface(IID_PPV_ARGS(&webViewEnv3)))) {
+            webViewEnv3->CreateCoreWebView2CompositionController(parentWindow, Callback<ICoreWebView2CreateCoreWebView2CompositionControllerCompletedHandler>(
+              [completionHandler, env](HRESULT result, wil::com_ptr<ICoreWebView2CompositionController> compositionController) -> HRESULT
+              {
+                wil::com_ptr<ICoreWebView2Controller3> webViewController = compositionController.try_query<ICoreWebView2Controller3>();
 
-                wil::com_ptr<ICoreWebView2Settings2> webView2Settings2;
-                if (SUCCEEDED(webView2Settings->QueryInterface(IID_PPV_ARGS(&webView2Settings2)))) {
-                  if (!settings->userAgent.empty()) {
-                    webView2Settings2->put_UserAgent(ansi_to_wide(settings->userAgent).c_str());
-                  }
+                if (FAILED(result) || !webViewController) {
+                  completionHandler(nullptr, nullptr, nullptr);
+                  debugLog(getErrorMessage(result));
+                  return E_FAIL;
                 }
+
+                ICoreWebView2Controller3* webViewController3;
+                HRESULT hr = webViewController->QueryInterface(IID_PPV_ARGS(&webViewController3));
+                if (SUCCEEDED(hr)) {
+                  webViewController3->put_BoundsMode(COREWEBVIEW2_BOUNDS_MODE_USE_RAW_PIXELS);
+                  webViewController3->put_ShouldDetectMonitorScaleChanges(FALSE);
+                  webViewController3->put_RasterizationScale(1.0);
+                }
+                else {
+                  debugLog(getErrorMessage(hr));
+                }
+
+                completionHandler(std::move(env), std::move(webViewController), std::move(compositionController));
+                return S_OK;
               }
+            ).Get());
+          }
+          else {
+            env->CreateCoreWebView2Controller(parentWindow, Callback<ICoreWebView2CreateCoreWebView2ControllerCompletedHandler>(
+              [completionHandler, env](HRESULT result, wil::com_ptr<ICoreWebView2Controller> controller) -> HRESULT
+              {
+                if (FAILED(result) || !controller) {
+                  completionHandler(nullptr, nullptr, nullptr);
+                  debugLog(getErrorMessage(result));
+                  return E_FAIL;
+                }
 
-              // Resize WebView to fit the bounds of the parent window
-              RECT bounds;
-              GetClientRect(parentWindow, &bounds);
-              webViewController->put_Bounds(bounds);
-
-              registerEventHandlers();
-
-              completionHandler();
-
-              return S_OK;
-            }).Get());
+                completionHandler(std::move(env), std::move(controller), nullptr);
+                return S_OK;
+              }).Get());
+          }
           return S_OK;
         }).Get());
+  }
+
+  void InAppWebView::initChannel(const std::optional<std::variant<std::string, int64_t>> viewId, const std::optional<std::string> channelName)
+  {
+    if (viewId.has_value()) {
+      id = viewId.value();
+    }
+    channelDelegate = channelName.has_value() ? std::make_unique<WebViewChannelDelegate>(this, plugin->registrar->messenger(), channelName.value()) :
+      std::make_unique<WebViewChannelDelegate>(this, plugin->registrar->messenger());
   }
 
   void InAppWebView::registerEventHandlers()
@@ -124,17 +182,17 @@ namespace flutter_inappwebview_plugin
 
           UINT64 navigationId;
           if (SUCCEEDED(args->get_NavigationId(&navigationId))) {
-            navigationActions.insert({ navigationId, navigationAction });
+            navigationActions.insert({ navigationId, navigationAction }); callShouldOverrideUrlLoading_ =
           }
 
-          if (callShouldOverrideUrlLoading && requestMethod == nullptr) {
+          if (callShouldOverrideUrlLoading_ && requestMethod == nullptr) {
             // for some reason, we can't cancel and load an URL with other HTTP methods than GET,
             // so ignore the shouldOverrideUrlLoading event.
 
             auto callback = std::make_unique<WebViewChannelDelegate::ShouldOverrideUrlLoadingCallback>();
             callback->nonNullSuccess = [this, urlRequest](const NavigationActionPolicy actionPolicy)
               {
-                callShouldOverrideUrlLoading = false;
+                callShouldOverrideUrlLoading_ = false;
                 if (actionPolicy == allow) {
                   loadUrl(*urlRequest);
                 }
@@ -142,7 +200,7 @@ namespace flutter_inappwebview_plugin
               };
             auto defaultBehaviour = [this, urlRequest](const std::optional<NavigationActionPolicy> actionPolicy)
               {
-                callShouldOverrideUrlLoading = false;
+                callShouldOverrideUrlLoading_ = false;
                 loadUrl(*urlRequest);
               };
             callback->defaultBehaviour = defaultBehaviour;
@@ -155,7 +213,7 @@ namespace flutter_inappwebview_plugin
             args->put_Cancel(true);
           }
           else {
-            callShouldOverrideUrlLoading = true;
+            callShouldOverrideUrlLoading_ = true;
             channelDelegate->onLoadStart(url);
             args->put_Cancel(false);
           }
@@ -207,12 +265,51 @@ namespace flutter_inappwebview_plugin
           return S_OK;
         }
     ).Get(), nullptr);
+
+    webView->add_DocumentTitleChanged(Callback<ICoreWebView2DocumentTitleChangedEventHandler>(
+      [this](ICoreWebView2* sender, IUnknown* args)
+      {
+        if (channelDelegate) {
+          wil::unique_cotaskmem_string title;
+          sender->get_DocumentTitle(&title);
+          channelDelegate->onTitleChanged(title.is_valid() ? wide_to_ansi(title.get()) : std::optional<std::string>{});
+        }
+        return S_OK;
+      }
+    ).Get(), nullptr);
+  }
+
+  void InAppWebView::registerSurfaceEventHandlers()
+  {
+    if (!webViewCompositionController) {
+      return;
+    }
+
+    webViewCompositionController->add_CursorChanged(
+      Callback<ICoreWebView2CursorChangedEventHandler>(
+        [this](ICoreWebView2CompositionController* sender,
+          IUnknown* args) -> HRESULT
+        {
+          HCURSOR cursor;
+          if (cursorChangedCallback_ &&
+            sender->get_Cursor(&cursor) == S_OK) {
+            cursorChangedCallback_(cursor);
+          }
+          return S_OK;
+        })
+      .Get(), nullptr);
   }
 
   std::optional<std::string> InAppWebView::getUrl() const
   {
-    LPWSTR uri = nullptr;
+    LPWSTR uri;
     return SUCCEEDED(webView->get_Source(&uri)) ? wide_to_utf8(uri) : std::optional<std::string>{};
+  }
+
+  std::optional<std::string> InAppWebView::getTitle() const
+  {
+    LPWSTR title;
+    return SUCCEEDED(webView->get_DocumentTitle(&title)) ? wide_to_utf8(title) : std::optional<std::string>{};
   }
 
   void InAppWebView::loadUrl(const URLRequest& urlRequest) const
@@ -261,6 +358,338 @@ namespace flutter_inappwebview_plugin
     }
   }
 
+  void InAppWebView::reload() const
+  {
+    webView->Reload();
+  }
+
+  void InAppWebView::goBack() const
+  {
+    webView->GoBack();
+  }
+
+  void InAppWebView::goForward() const
+  {
+    webView->GoForward();
+  }
+
+  void InAppWebView::evaluateJavascript(const std::string& source, std::function<void(std::string)> completionHanlder) const
+  {
+    webView->ExecuteScript(ansi_to_wide(source).c_str(),
+      Callback<ICoreWebView2ExecuteScriptCompletedHandler>(
+        [completionHanlder = std::move(completionHanlder)](HRESULT error, PCWSTR result) -> HRESULT
+        {
+          if (error != S_OK) {
+            debugLog(getErrorMessage(error));
+          }
+          completionHanlder(wide_to_ansi(result));
+          return S_OK;
+        }).Get());
+  }
+
+  // flutter_view
+  void InAppWebView::setSurfaceSize(size_t width, size_t height, float scale_factor)
+  {
+    if (!webViewController) {
+      return;
+    }
+
+    if (surface_ && width > 0 && height > 0) {
+      scaleFactor_ = scale_factor;
+      auto scaled_width = width * scale_factor;
+      auto scaled_height = height * scale_factor;
+
+      RECT bounds;
+      bounds.left = 0;
+      bounds.top = 0;
+      bounds.right = static_cast<LONG>(scaled_width);
+      bounds.bottom = static_cast<LONG>(scaled_height);
+
+      surface_->put_Size({ scaled_width, scaled_height });
+
+      wil::com_ptr<ICoreWebView2Controller3> webViewController3;
+      if (SUCCEEDED(webViewController->QueryInterface(IID_PPV_ARGS(&webViewController3)))) {
+        webViewController3->put_RasterizationScale(scale_factor);
+      }
+
+      if (webViewController->put_Bounds(bounds) != S_OK) {
+        std::cerr << "Setting webview bounds failed." << std::endl;
+      }
+
+      if (surfaceSizeChangedCallback_) {
+        surfaceSizeChangedCallback_(width, height);
+      }
+    }
+  }
+
+  void InAppWebView::setCursorPos(double x, double y)
+  {
+    if (!webViewCompositionController) {
+      return;
+    }
+
+    POINT point;
+    point.x = static_cast<LONG>(x * scaleFactor_);
+    point.y = static_cast<LONG>(y * scaleFactor_);
+    lastCursorPos_ = point;
+
+    // https://docs.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2?view=webview2-1.0.774.44
+    webViewCompositionController->SendMouseInput(
+      COREWEBVIEW2_MOUSE_EVENT_KIND::COREWEBVIEW2_MOUSE_EVENT_KIND_MOVE,
+      virtualKeys_.state(), 0, point);
+  }
+
+  void InAppWebView::setPointerUpdate(int32_t pointer,
+    InAppWebViewPointerEventKind eventKind, double x,
+    double y, double size, double pressure)
+  {
+    if (!webViewEnv || !webViewCompositionController) {
+      return;
+    }
+
+    COREWEBVIEW2_POINTER_EVENT_KIND event =
+      COREWEBVIEW2_POINTER_EVENT_KIND_UPDATE;
+    UINT32 pointerFlags = POINTER_FLAG_NONE;
+    switch (eventKind) {
+    case InAppWebViewPointerEventKind::Activate:
+      event = COREWEBVIEW2_POINTER_EVENT_KIND_ACTIVATE;
+      break;
+    case InAppWebViewPointerEventKind::Down:
+      event = COREWEBVIEW2_POINTER_EVENT_KIND_DOWN;
+      pointerFlags =
+        POINTER_FLAG_DOWN | POINTER_FLAG_INRANGE | POINTER_FLAG_INCONTACT;
+      break;
+    case InAppWebViewPointerEventKind::Enter:
+      event = COREWEBVIEW2_POINTER_EVENT_KIND_ENTER;
+      break;
+    case InAppWebViewPointerEventKind::Leave:
+      event = COREWEBVIEW2_POINTER_EVENT_KIND_LEAVE;
+      break;
+    case InAppWebViewPointerEventKind::Up:
+      event = COREWEBVIEW2_POINTER_EVENT_KIND_UP;
+      pointerFlags = POINTER_FLAG_UP;
+      break;
+    case InAppWebViewPointerEventKind::Update:
+      event = COREWEBVIEW2_POINTER_EVENT_KIND_UPDATE;
+      pointerFlags =
+        POINTER_FLAG_UPDATE | POINTER_FLAG_INRANGE | POINTER_FLAG_INCONTACT;
+      break;
+    }
+
+    POINT point;
+    point.x = static_cast<LONG>(x * scaleFactor_);
+    point.y = static_cast<LONG>(y * scaleFactor_);
+
+    RECT rect;
+    rect.left = point.x - 2;
+    rect.right = point.x + 2;
+    rect.top = point.y - 2;
+    rect.bottom = point.y + 2;
+
+    wil::com_ptr<ICoreWebView2Environment3> webViewEnv3;
+    if (SUCCEEDED(webViewEnv->QueryInterface(IID_PPV_ARGS(&webViewEnv3)))) {
+      wil::com_ptr<ICoreWebView2PointerInfo> pInfo;
+      if (SUCCEEDED(webViewEnv3->CreateCoreWebView2PointerInfo(&pInfo))) {
+        if (pInfo) {
+          pInfo->put_PointerId(pointer);
+          pInfo->put_PointerKind(PT_TOUCH);
+          pInfo->put_PointerFlags(pointerFlags);
+          pInfo->put_TouchFlags(TOUCH_FLAG_NONE);
+          pInfo->put_TouchMask(TOUCH_MASK_CONTACTAREA | TOUCH_MASK_PRESSURE);
+          pInfo->put_TouchPressure(
+            std::clamp((UINT32)(pressure == 0.0 ? 1024 : 1024 * pressure),
+              (UINT32)0, (UINT32)1024));
+          pInfo->put_PixelLocationRaw(point);
+          pInfo->put_TouchContactRaw(rect);
+          webViewCompositionController->SendPointerInput(event, pInfo.get());
+        }
+      }
+    }
+  }
+
+  void InAppWebView::setPointerButtonState(InAppWebViewPointerButton button, bool is_down)
+  {
+    if (!webViewCompositionController) {
+      return;
+    }
+
+    COREWEBVIEW2_MOUSE_EVENT_KIND kind;
+    switch (button) {
+    case InAppWebViewPointerButton::Primary:
+      virtualKeys_.setIsLeftButtonDown(is_down);
+      kind = is_down ? COREWEBVIEW2_MOUSE_EVENT_KIND_LEFT_BUTTON_DOWN
+        : COREWEBVIEW2_MOUSE_EVENT_KIND_LEFT_BUTTON_UP;
+      break;
+    case InAppWebViewPointerButton::Secondary:
+      virtualKeys_.setIsRightButtonDown(is_down);
+      kind = is_down ? COREWEBVIEW2_MOUSE_EVENT_KIND_RIGHT_BUTTON_DOWN
+        : COREWEBVIEW2_MOUSE_EVENT_KIND_RIGHT_BUTTON_UP;
+      break;
+    case InAppWebViewPointerButton::Tertiary:
+      virtualKeys_.setIsMiddleButtonDown(is_down);
+      kind = is_down ? COREWEBVIEW2_MOUSE_EVENT_KIND_MIDDLE_BUTTON_DOWN
+        : COREWEBVIEW2_MOUSE_EVENT_KIND_MIDDLE_BUTTON_UP;
+      break;
+    default:
+      kind = static_cast<COREWEBVIEW2_MOUSE_EVENT_KIND>(0);
+    }
+
+    webViewCompositionController->SendMouseInput(kind, virtualKeys_.state(), 0,
+      lastCursorPos_);
+  }
+
+  void InAppWebView::sendScroll(double delta, bool horizontal)
+  {
+    if (!webViewCompositionController) {
+      return;
+    }
+
+    // delta * 6 gives me a multiple of WHEEL_DELTA (120)
+    constexpr auto kScrollMultiplier = 6;
+
+    auto offset = static_cast<short>(delta * kScrollMultiplier);
+
+    /*
+    // For some reason,
+    // setting the point other than (x: 0, y: 0)
+    // will not make the scroll work.
+    // Unfortunately, this will break the scroll event
+    // for nested HTML scrollable elements.
+    POINT point;
+    point.x = 0;
+    point.y = 0;
+
+
+    if (horizontal) {
+      webViewCompositionController->SendMouseInput(
+        COREWEBVIEW2_MOUSE_EVENT_KIND_HORIZONTAL_WHEEL, virtual_keys_.state(),
+        offset, point);
+    }
+    else {
+      webViewCompositionController->SendMouseInput(COREWEBVIEW2_MOUSE_EVENT_KIND_WHEEL,
+        virtual_keys_.state(), offset,
+        point);
+    }
+    */
+
+    // Workaround for scroll events
+    auto workaroundScrollJS = "(function(horizontal, offset, x, y) { \
+  function elemCanScrollY(elem) { \
+    if (elem.scrollTop > 0) { \
+      return elem; \
+    } else { \
+      elem.scrollTop++; \
+      const top = elem.scrollTop; \
+      top && (elem.scrollTop = 0); \
+      if (top > 0) { \
+        return elem; \
+      } else { \
+        return elemCanScrollY(elem.parentElement); \
+      } \
+    } \
+  } \
+  function elemCanScrollX(elem) { \
+    if (elem.scrollLeft > 0) { \
+      return elem; \
+    } else { \
+      elem.scrollLeft++; \
+      const left = elem.scrollLeft; \
+      left && (elem.scrollLeft = 0); \
+      if (left > 0) { \
+        return elem; \
+      } else { \
+        return elemCanScrollX(elem.parentElement); \
+      } \
+    } \
+  } \
+  const elem = document.elementFromPoint(x, y); \
+  const elem2 = horizontal ? elemCanScrollX(elem) : elemCanScrollY(elem); \
+  const handled = elem2 != null && elem2 != document.documentElement && elem2 != document.body; \
+  if (handled) { \
+    elem2.scrollBy({left: horizontal ? offset : 0, top: horizontal ? 0 : offset}); \
+  } \
+  return handled; \
+})(" + std::to_string(horizontal) + ", " + std::to_string(offset) + ", " + std::to_string(lastCursorPos_.x) + ", " + std::to_string(lastCursorPos_.y) + ");";
+
+    webView->ExecuteScript(ansi_to_wide(workaroundScrollJS).c_str(), Callback<ICoreWebView2ExecuteScriptCompletedHandler>(
+      [this, horizontal, offset](HRESULT error, PCWSTR result) -> HRESULT
+      {
+        if (webViewCompositionController && (error != S_OK || wide_to_ansi(result).compare("false") == 0)) {
+          // try to use native mouse wheel handler
+
+          POINT point;
+          point.x = 0;
+          point.y = 0;
+
+          if (horizontal) {
+            webViewCompositionController->SendMouseInput(
+              COREWEBVIEW2_MOUSE_EVENT_KIND_HORIZONTAL_WHEEL, virtualKeys_.state(),
+              offset, point);
+          }
+          else {
+            webViewCompositionController->SendMouseInput(COREWEBVIEW2_MOUSE_EVENT_KIND_WHEEL,
+              virtualKeys_.state(), offset,
+              point);
+          }
+        }
+
+        return S_OK;
+      }).Get());
+  }
+
+  void InAppWebView::setScrollDelta(double delta_x, double delta_y)
+  {
+    if (!webViewCompositionController) {
+      return;
+    }
+
+    if (delta_x != 0.0) {
+      sendScroll(delta_x, true);
+    }
+    if (delta_y != 0.0) {
+      sendScroll(delta_y, false);
+    }
+  }
+
+  bool InAppWebView::createSurface(const HWND parentWindow,
+    winrt::com_ptr<ABI::Windows::UI::Composition::ICompositor> compositor)
+  {
+    if (!webViewCompositionController || !webViewController) {
+      return false;
+    }
+
+    winrt::com_ptr<ABI::Windows::UI::Composition::IContainerVisual> root;
+    if (FAILED(compositor->CreateContainerVisual(root.put()))) {
+      return false;
+    }
+    surface_ = root.try_as<ABI::Windows::UI::Composition::IVisual>();
+    assert(surface_);
+
+    // initial size. doesn't matter as we resize the surface anyway.
+    surface_->put_Size({ 1280, 720 });
+    surface_->put_IsVisible(true);
+
+    winrt::com_ptr<ABI::Windows::UI::Composition::IVisual> webview_visual;
+    compositor->CreateContainerVisual(
+      reinterpret_cast<ABI::Windows::UI::Composition::IContainerVisual**>(
+        webview_visual.put()));
+
+    auto webview_visual2 =
+      webview_visual.try_as<ABI::Windows::UI::Composition::IVisual2>();
+    if (webview_visual2) {
+      webview_visual2->put_RelativeSizeAdjustment({ 1.0f, 1.0f });
+    }
+
+    winrt::com_ptr<ABI::Windows::UI::Composition::IVisualCollection> children;
+    root->get_Children(children.put());
+    children->InsertAtTop(webview_visual.get());
+    webViewCompositionController->put_RootVisualTarget(webview_visual2.get());
+
+    webViewController->put_IsVisible(true);
+
+    return true;
+  }
+
   bool InAppWebView::isSslError(const COREWEBVIEW2_WEB_ERROR_STATUS& webErrorStatus)
   {
     return webErrorStatus >= COREWEBVIEW2_WEB_ERROR_STATUS_CERTIFICATE_COMMON_NAME_IS_INCORRECT && webErrorStatus <= COREWEBVIEW2_WEB_ERROR_STATUS_CERTIFICATE_IS_INVALID;
@@ -276,6 +705,7 @@ namespace flutter_inappwebview_plugin
       webViewController->Close();
     }
     navigationActions.clear();
+    inAppBrowser = nullptr;
     plugin = nullptr;
   }
 }

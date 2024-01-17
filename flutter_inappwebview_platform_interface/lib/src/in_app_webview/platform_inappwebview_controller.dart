@@ -783,6 +783,7 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///- Android native WebView ([Official API - WebView.copyBackForwardList](https://developer.android.com/reference/android/webkit/WebView#copyBackForwardList()))
   ///- iOS ([Official API - WKWebView.backForwardList](https://developer.apple.com/documentation/webkit/wkwebview/1414977-backforwardlist))
   ///- MacOS ([Official API - WKWebView.backForwardList](https://developer.apple.com/documentation/webkit/wkwebview/1414977-backforwardlist))
+  ///- Windows
   ///{@endtemplate}
   Future<WebHistory?> getCopyBackForwardList() {
     throw UnimplementedError(

@@ -46,19 +46,19 @@ namespace flutter_inappwebview_plugin
     else if (method_call.method_name().compare("loadUrl") == 0) {
       auto urlRequest = std::make_unique<URLRequest>(get_fl_map_value<flutter::EncodableMap>(arguments, "urlRequest"));
       webView->loadUrl(*urlRequest);
-      result->Success(make_fl_value(true));
+      result->Success(true);
     }
     else if (method_call.method_name().compare("reload") == 0) {
       webView->reload();
-      result->Success(make_fl_value(true));
+      result->Success(true);
     }
     else if (method_call.method_name().compare("goBack") == 0) {
       webView->goBack();
-      result->Success(make_fl_value(true));
+      result->Success(true);
     }
     else if (method_call.method_name().compare("goForward") == 0) {
       webView->goForward();
-      result->Success(make_fl_value(true));
+      result->Success(true);
     }
     else if (method_call.method_name().compare("evaluateJavascript") == 0) {
       auto result_ = std::shared_ptr<flutter::MethodResult<flutter::EncodableValue>>(std::move(result));
@@ -66,21 +66,28 @@ namespace flutter_inappwebview_plugin
       auto source = get_fl_map_value<std::string>(arguments, "source");
       webView->evaluateJavascript(source, [result_ = std::move(result_)](const std::string& value)
         {
-          result_->Success(make_fl_value(value));
+          result_->Success(value);
+        });
+    }
+    else if (method_call.method_name().compare("getCopyBackForwardList") == 0) {
+      auto result_ = std::shared_ptr<flutter::MethodResult<flutter::EncodableValue>>(std::move(result));
+      webView->getCopyBackForwardList([result_ = std::move(result_)](const std::unique_ptr<WebHistory> value)
+        {
+          result_->Success(value->toEncodableMap());
         });
     }
     // for inAppBrowser
     else if (webView->inAppBrowser && method_call.method_name().compare("show") == 0) {
       webView->inAppBrowser->show();
-      result->Success(make_fl_value(true));
+      result->Success(true);
     }
     else if (webView->inAppBrowser && method_call.method_name().compare("hide") == 0) {
       webView->inAppBrowser->hide();
-      result->Success(make_fl_value(true));
+      result->Success(true);
     }
     else if (webView->inAppBrowser && method_call.method_name().compare("close") == 0) {
       webView->inAppBrowser->close();
-      result->Success(make_fl_value(true));
+      result->Success(true);
     }
     else {
       result->NotImplemented();

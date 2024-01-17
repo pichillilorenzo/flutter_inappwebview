@@ -1,4 +1,5 @@
 #include <cstring>
+#include <nlohmann/json.hpp>
 #include <Shlwapi.h>
 #include <WebView2EnvironmentOptions.h>
 #include <wil/wrl.h>
@@ -21,11 +22,15 @@ namespace flutter_inappwebview_plugin
     : plugin(plugin), id(params.id), webViewEnv(std::move(webViewEnv)), webViewController(std::move(webViewController)), webViewCompositionController(std::move(webViewCompositionController)),
     settings(params.initialSettings)
   {
-    this->webViewController->get_CoreWebView2(webView.put());
+    auto hrWebView2 = this->webViewController->get_CoreWebView2(webView.put());
+    if (FAILED(hrWebView2)) {
+      std::cerr << "Cannot create CoreWebView2." << std::endl;
+      debugLog(getErrorMessage(hrWebView2));
+    }
 
     if (this->webViewCompositionController) {
       if (!createSurface(parentWindow, plugin->inAppWebViewManager->compositor())) {
-        std::cerr << "Cannot create InAppWebView surface\n";
+        std::cerr << "Cannot create InAppWebView surface." << std::endl;
       }
       registerSurfaceEventHandlers();
     }
@@ -37,7 +42,8 @@ namespace flutter_inappwebview_plugin
     }
 
     wil::com_ptr<ICoreWebView2Settings> webView2Settings;
-    if (SUCCEEDED(webView->get_Settings(&webView2Settings))) {
+    auto hrWebView2Settings = webView->get_Settings(&webView2Settings);
+    if (SUCCEEDED(hrWebView2Settings)) {
       webView2Settings->put_IsScriptEnabled(settings->javaScriptEnabled);
       webView2Settings->put_IsZoomControlEnabled(settings->supportZoom);
 
@@ -47,6 +53,9 @@ namespace flutter_inappwebview_plugin
           webView2Settings2->put_UserAgent(ansi_to_wide(settings->userAgent).c_str());
         }
       }
+    }
+    else {
+      debugLog(getErrorMessage(hrWebView2Settings));
     }
 
     registerEventHandlers();
@@ -182,7 +191,7 @@ namespace flutter_inappwebview_plugin
 
           UINT64 navigationId;
           if (SUCCEEDED(args->get_NavigationId(&navigationId))) {
-            navigationActions.insert({ navigationId, navigationAction }); callShouldOverrideUrlLoading_ =
+            navigationActions.insert({ navigationId, navigationAction });
           }
 
           if (callShouldOverrideUrlLoading_ && requestMethod == nullptr) {
@@ -363,14 +372,53 @@ namespace flutter_inappwebview_plugin
     webView->Reload();
   }
 
-  void InAppWebView::goBack() const
+  void InAppWebView::goBack()
   {
+    callShouldOverrideUrlLoading_ = false;
     webView->GoBack();
   }
 
-  void InAppWebView::goForward() const
+  void InAppWebView::goForward()
   {
+    callShouldOverrideUrlLoading_ = false;
     webView->GoForward();
+  }
+
+  void InAppWebView::getCopyBackForwardList(const std::function<void(std::unique_ptr<WebHistory>)> completionHandler) const
+  {
+    webView->CallDevToolsProtocolMethod(L"Page.getNavigationHistory", L"{}", Callback<ICoreWebView2CallDevToolsProtocolMethodCompletedHandler>(
+      [completionHandler](HRESULT errorCode, LPCWSTR returnObjectAsJson)
+      {
+        if (errorCode == S_OK) {
+          auto historyJson = nlohmann::json::parse(wide_to_ansi(returnObjectAsJson));
+
+          int64_t currentIndex = historyJson.at("currentIndex").is_number_unsigned() ? historyJson.at("currentIndex").get<int64_t>() : 0;
+          auto entries = historyJson.at("entries").is_array() ? historyJson.at("entries").get<std::vector<nlohmann::json>>() : std::vector<nlohmann::json>{};
+
+          std::vector<std::shared_ptr<WebHistoryItem>> webHistoryItems;
+          webHistoryItems.reserve(entries.size());
+          int64_t i = 0;
+          for (auto const& entry : entries) {
+            int64_t offset = i - currentIndex;
+            webHistoryItems.push_back(std::make_shared<WebHistoryItem>(
+              i,
+              offset,
+              entry.at("userTypedURL").is_string() ? entry.at("userTypedURL").get<std::string>() : std::optional<std::string>{},
+              entry.at("title").is_string() ? entry.at("title").get<std::string>() : std::optional<std::string>{},
+              entry.at("url").is_string() ? entry.at("url").get<std::string>() : std::optional<std::string>{}
+            ));
+            i++;
+          }
+
+          completionHandler(std::make_unique<WebHistory>(currentIndex, webHistoryItems));
+        }
+        else {
+          debugLog(getErrorMessage(errorCode));
+        }
+
+        return S_OK;
+      }
+    ).Get());
   }
 
   void InAppWebView::evaluateJavascript(const std::string& source, std::function<void(std::string)> completionHanlder) const

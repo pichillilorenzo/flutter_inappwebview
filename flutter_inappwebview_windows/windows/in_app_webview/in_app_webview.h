@@ -11,6 +11,7 @@
 #include "../flutter_inappwebview_windows_plugin.h"
 #include "../types/navigation_action.h"
 #include "../types/url_request.h"
+#include "../types/web_history.h"
 #include "in_app_webview_settings.h"
 #include "webview_channel_delegate.h"
 
@@ -130,9 +131,10 @@ namespace flutter_inappwebview_plugin
     std::optional<std::string> getTitle() const;
     void loadUrl(const URLRequest& urlRequest) const;
     void reload() const;
-    void goBack() const;
-    void goForward() const;
+    void goBack();
+    void goForward();
     void evaluateJavascript(const std::string& source, std::function<void(std::string)> completionHanlder) const;
+    void getCopyBackForwardList(const std::function<void(std::unique_ptr<WebHistory>)> completionHandler) const;
 
     static bool isSslError(const COREWEBVIEW2_WEB_ERROR_STATUS& webErrorStatus);
   private:

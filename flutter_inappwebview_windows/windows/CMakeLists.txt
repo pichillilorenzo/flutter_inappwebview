@@ -6,6 +6,7 @@ cmake_minimum_required(VERSION 3.14)
 
 set(WIL_VERSION "1.0.231216.1")
 set(WEBVIEW_VERSION "1.0.2210.55")
+set(NLOHMANN_JSON "3.11.2")
 
 message(VERBOSE "CMake system version is ${CMAKE_SYSTEM_VERSION} (using SDK ${CMAKE_VS_WINDOWS_TARGET_PLATFORM_VERSION})")
 
@@ -31,6 +32,7 @@ add_custom_command(
   TARGET ${PROJECT_NAME}_DEPENDENCIES_DOWNLOAD PRE_BUILD
   COMMAND ${NUGET} install Microsoft.Windows.ImplementationLibrary -Version ${WIL_VERSION} -ExcludeVersion -OutputDirectory ${CMAKE_BINARY_DIR}/packages
   COMMAND ${NUGET} install Microsoft.Web.WebView2 -Version ${WEBVIEW_VERSION} -ExcludeVersion -OutputDirectory ${CMAKE_BINARY_DIR}/packages
+  COMMAND ${NUGET} install nlohmann.json -Version ${NLOHMANN_JSON} -ExcludeVersion -OutputDirectory ${CMAKE_BINARY_DIR}/packages
   DEPENDS ${NUGET}
 )
 
@@ -54,6 +56,10 @@ list(APPEND PLUGIN_SOURCES
   "types/web_resource_request.h"
   "types/web_resource_response.cpp"
   "types/web_resource_response.h"
+  "types/web_history.cpp"
+  "types/web_history.h"
+  "types/web_history_item.cpp"
+  "types/web_history_item.h"
   "custom_platform_view/custom_platform_view.cc"
   "custom_platform_view/custom_platform_view.h"
   "custom_platform_view/texture_bridge.cc"
@@ -123,6 +129,7 @@ apply_standard_settings(${PLUGIN_NAME})
 
 target_link_libraries(${PLUGIN_NAME} PRIVATE ${CMAKE_BINARY_DIR}/packages/Microsoft.Web.WebView2/build/native/Microsoft.Web.WebView2.targets)
 target_link_libraries(${PLUGIN_NAME} PRIVATE ${CMAKE_BINARY_DIR}/packages/Microsoft.Windows.ImplementationLibrary/build/native/Microsoft.Windows.ImplementationLibrary.targets)
+target_link_libraries(${PLUGIN_NAME} PRIVATE ${CMAKE_BINARY_DIR}/packages/nlohmann.json/build/native/nlohmann.json.targets)
 
 # Symbols are hidden by default to reduce the chance of accidental conflicts
 # between plugins. This should not be removed; any symbols that should be

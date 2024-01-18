@@ -474,6 +474,12 @@ public class WebViewChannelDelegate extends ChannelDelegateImpl {
         }
         result.success(true);
         break;
+      case requestFocus:
+        if (webView != null) {
+          webView.requestFocus();
+        }
+        result.success(true);
+        break;
       case setContextMenu:
         if (webView != null) {
           Map<String, Object> contextMenu = (Map<String, Object>) call.argument("contextMenu");

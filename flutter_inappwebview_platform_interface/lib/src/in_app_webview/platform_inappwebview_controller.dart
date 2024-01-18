@@ -1045,6 +1045,11 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
         'getHitTestResult is not implemented on the current platform');
   }
 
+  Future<void> requestFocus() {
+    throw UnimplementedError(
+        'requestFocus is not implemented on the current platform');
+  }
+
   ///{@template flutter_inappwebview_platform_interface.PlatformInAppWebViewController.clearFocus}
   ///Clears the current focus. On iOS and Android native WebView, it will clear also, for example, the current text selection.
   ///

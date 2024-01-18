@@ -82,6 +82,11 @@ public class InAppBrowserActivity extends AppCompatActivity implements InAppBrow
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
 
+    if (savedInstanceState != null) {
+      finish();
+      return;
+    }
+
     Bundle b = getIntent().getExtras();
     if (b == null) return;
     

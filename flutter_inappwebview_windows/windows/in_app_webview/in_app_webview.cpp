@@ -1,4 +1,5 @@
 #include <cstring>
+#include <filesystem>
 #include <nlohmann/json.hpp>
 #include <Shlwapi.h>
 #include <WebView2EnvironmentOptions.h>
@@ -9,7 +10,9 @@
 #include "../types/web_resource_error.h"
 #include "../types/web_resource_request.h"
 #include "../utils/log.h"
+#include "../utils/map.h"
 #include "../utils/strconv.h"
+#include "../utils/string.h"
 #include "in_app_webview.h"
 #include "in_app_webview_manager.h"
 
@@ -246,14 +249,14 @@ namespace flutter_inappwebview_plugin
               {
                 callShouldOverrideUrlLoading_ = false;
                 if (actionPolicy == NavigationActionPolicy::allow) {
-                  loadUrl(*urlRequest);
+                  loadUrl(urlRequest);
                 }
                 return false;
               };
-            auto defaultBehaviour = [this, urlRequest](const std::optional<NavigationActionPolicy> actionPolicy)
+            auto defaultBehaviour = [this, urlRequest](const std::optional<const NavigationActionPolicy> actionPolicy)
               {
                 callShouldOverrideUrlLoading_ = false;
-                loadUrl(*urlRequest);
+                loadUrl(urlRequest);
               };
             callback->defaultBehaviour = defaultBehaviour;
             callback->error = [defaultBehaviour](const std::string& error_code, const std::string& error_message, const flutter::EncodableValue* error_details)
@@ -279,6 +282,11 @@ namespace flutter_inappwebview_plugin
         [this](ICoreWebView2* sender, ICoreWebView2NavigationCompletedEventArgs* args)
         {
           isLoading_ = false;
+
+          if (userContentController) {
+            evaluateJavascript(userContentController->generateWrappedCodeForDocumentEnd(), nullptr);
+          }
+          evaluateJavascript(PLATFORM_READY_JS_SOURCE, nullptr);
 
           std::shared_ptr<NavigationAction> navigationAction;
           UINT64 navigationId;
@@ -349,12 +357,61 @@ namespace flutter_inappwebview_plugin
     failedLog(webView->add_WebMessageReceived(Callback<ICoreWebView2WebMessageReceivedEventHandler>(
       [this](ICoreWebView2* sender, ICoreWebView2WebMessageReceivedEventArgs* args)
       {
-        wil::unique_cotaskmem_string uri;
-        args->get_Source(&uri);
+        if (!channelDelegate) {
+          return S_OK;
+        }
+
+        /*
+        wil::unique_cotaskmem_string url;
+        args->get_Source(&url);
+
+        wil::com_ptr<IUri> uri;
+        failedLog(CreateUri(
+          url.get(),                  // NULL terminated URI
+          Uri_CREATE_ALLOW_RELATIVE,  // Flags to control behavior
+          0,                          // Reserved must be 0
+          &uri));
+        */
 
         wil::unique_cotaskmem_string json;
         if (succeededOrLog(args->get_WebMessageAsJson(&json))) {
-          debugLog(json.get());
+          auto message = nlohmann::json::parse(wide_to_ansi(json.get()));
+
+          if (message.is_object() && message.contains("name") && message.at("name").is_string() && message.contains("body") && message.at("body").is_object()) {
+            auto name = message.at("name").get<std::string>();
+            auto body = message.at("body").get<nlohmann::json>();
+
+            if (name.compare("callHandler") == 0 && body.contains("handlerName") && body.at("handlerName").is_string()) {
+              auto handlerName = body.at("handlerName").get<std::string>();
+              auto callHandlerID = body.at("_callHandlerID").is_number_integer() ? body.at("_callHandlerID").get<int64_t>() : 0;
+              std::string handlerArgs = body.at("args").is_string() ? body.at("args").get<std::string>() : "";
+
+              auto callback = std::make_unique<WebViewChannelDelegate::CallJsHandlerCallback>();
+              callback->defaultBehaviour = [this, callHandlerID](const std::optional<const flutter::EncodableValue*> response)
+                {
+                  std::string json = "null";
+                  if (response.has_value() && !response.value()->IsNull()) {
+                    json = std::get<std::string>(*(response.value()));
+                  }
+
+                  evaluateJavascript("if (window." + JAVASCRIPT_BRIDGE_NAME + "[" + std::to_string(callHandlerID) + "] != null) { \
+                      window." + JAVASCRIPT_BRIDGE_NAME + "[" + std::to_string(callHandlerID) + "].resolve(" + json + "); \
+                      delete window." + JAVASCRIPT_BRIDGE_NAME + "[" + std::to_string(callHandlerID) + "]; \
+                    }", nullptr);
+                };
+              callback->error = [this, callHandlerID](const std::string& error_code, const std::string& error_message, const flutter::EncodableValue* error_details)
+                {
+                  auto errorMessage = error_code + ", " + error_message;
+                  debugLog(errorMessage);
+
+                  evaluateJavascript("if (window." + JAVASCRIPT_BRIDGE_NAME + "[" + std::to_string(callHandlerID) + "] != null) { \
+                      window." + JAVASCRIPT_BRIDGE_NAME + "[" + std::to_string(callHandlerID) + "].reject(new Error('" + replace_all_copy(errorMessage, "\'", "\\'") + "')); \
+                      delete window." + JAVASCRIPT_BRIDGE_NAME + "[" + std::to_string(callHandlerID) + "]; \
+                    }", nullptr);
+                };
+              channelDelegate->onCallJsHandler(handlerName, handlerArgs, std::move(callback));
+            }
+          }
         }
 
         return S_OK;
@@ -395,23 +452,23 @@ namespace flutter_inappwebview_plugin
     return webView && succeededOrLog(webView->get_DocumentTitle(&title)) ? wide_to_utf8(title.get()) : std::optional<std::string>{};
   }
 
-  void InAppWebView::loadUrl(const URLRequest& urlRequest) const
+  void InAppWebView::loadUrl(const std::shared_ptr<URLRequest> urlRequest) const
   {
-    if (!webView || !urlRequest.url.has_value()) {
+    if (!webView || !urlRequest->url.has_value()) {
       return;
     }
 
-    std::wstring url = ansi_to_wide(urlRequest.url.value());
+    std::wstring url = ansi_to_wide(urlRequest->url.value());
 
     wil::com_ptr<ICoreWebView2Environment2> webViewEnv2;
     wil::com_ptr<ICoreWebView2_2> webView2;
     if (SUCCEEDED(webViewEnv->QueryInterface(IID_PPV_ARGS(&webViewEnv2))) && SUCCEEDED(webView->QueryInterface(IID_PPV_ARGS(&webView2)))) {
       wil::com_ptr<ICoreWebView2WebResourceRequest> webResourceRequest;
-      std::wstring method = urlRequest.method.has_value() ? ansi_to_wide(urlRequest.method.value()) : L"GET";
+      std::wstring method = urlRequest->method.has_value() ? ansi_to_wide(urlRequest->method.value()) : L"GET";
 
       wil::com_ptr<IStream> postDataStream = nullptr;
-      if (urlRequest.body.has_value()) {
-        auto postData = std::string(urlRequest.body->begin(), urlRequest.body->end());
+      if (urlRequest->body.has_value()) {
+        auto postData = std::string(urlRequest->body->begin(), urlRequest->body->end());
         postDataStream = SHCreateMemStream(
           reinterpret_cast<const BYTE*>(postData.data()), static_cast<UINT>(postData.length()));
       }
@@ -427,8 +484,8 @@ namespace flutter_inappwebview_plugin
           if (method.compare(L"GET") != 0) {
             requestHeaders->SetHeader(L"Flutter-InAppWebView-Request-Method", method.c_str());
           }
-          if (urlRequest.headers.has_value()) {
-            auto& headers = urlRequest.headers.value();
+          if (urlRequest->headers.has_value()) {
+            auto& headers = urlRequest->headers.value();
             for (auto const& [key, val] : headers) {
               requestHeaders->SetHeader(ansi_to_wide(key).c_str(), ansi_to_wide(val).c_str());
             }
@@ -439,6 +496,37 @@ namespace flutter_inappwebview_plugin
       return;
     }
     failedLog(webView->Navigate(url.c_str()));
+  }
+
+
+  void InAppWebView::loadFile(const std::string& assetFilePath) const
+  {
+    if (!webView) {
+      return;
+    }
+
+    WCHAR* buf = new WCHAR[32768];
+    GetModuleFileName(NULL, buf, 32768);
+    std::filesystem::path exeAbsPath = std::wstring(buf);
+    delete[] buf;
+
+    std::filesystem::path flutterAssetPath("data/flutter_assets/" + assetFilePath);
+    auto absAssetFilePath = exeAbsPath.parent_path() / flutterAssetPath;
+
+    if (!std::filesystem::exists(absAssetFilePath)) {
+      debugLog(absAssetFilePath.native() + L" asset file cannot be found!");
+      return;
+    }
+    failedLog(webView->Navigate(absAssetFilePath.c_str()));
+  }
+
+  void InAppWebView::loadData(const std::string& data) const
+  {
+    if (!webView) {
+      return;
+    }
+
+    failedLog(webView->NavigateToString(ansi_to_wide(data).c_str()));
   }
 
   void InAppWebView::reload() const
@@ -527,7 +615,10 @@ namespace flutter_inappwebview_plugin
           int64_t size = items->size();
           canGoBackOrForward_ = nextIndex >= 0 && nextIndex < size;
         }
-        completionHandler(canGoBackOrForward_);
+
+        if (completionHandler) {
+          completionHandler(canGoBackOrForward_);
+        }
       }
     );
   }
@@ -544,13 +635,19 @@ namespace flutter_inappwebview_plugin
   void InAppWebView::getCopyBackForwardList(const std::function<void(std::unique_ptr<WebHistory>)> completionHandler) const
   {
     if (!webView) {
-      completionHandler(std::make_unique<WebHistory>(std::nullopt, std::nullopt));
+      if (completionHandler) {
+        completionHandler(std::make_unique<WebHistory>(std::nullopt, std::nullopt));
+      }
       return;
     }
 
     failedLog(webView->CallDevToolsProtocolMethod(L"Page.getNavigationHistory", L"{}", Callback<ICoreWebView2CallDevToolsProtocolMethodCompletedHandler>(
       [completionHandler](HRESULT errorCode, LPCWSTR returnObjectAsJson)
       {
+        if (!completionHandler) {
+          return S_OK;
+        }
+
         if (errorCode == S_OK) {
           auto historyJson = nlohmann::json::parse(wide_to_ansi(returnObjectAsJson));
 
@@ -585,7 +682,7 @@ namespace flutter_inappwebview_plugin
     ).Get()));
   }
 
-  void InAppWebView::evaluateJavascript(const std::string& source, std::function<void(std::string)> completionHanlder) const
+  void InAppWebView::evaluateJavascript(const std::string& source, const std::function<void(std::string)> completionHanlder) const
   {
     failedLog(webView->ExecuteScript(ansi_to_wide(source).c_str(),
       Callback<ICoreWebView2ExecuteScriptCompletedHandler>(
@@ -594,9 +691,49 @@ namespace flutter_inappwebview_plugin
           if (error != S_OK) {
             debugLog(error);
           }
-          completionHanlder(wide_to_ansi(result));
+
+          if (completionHanlder) {
+            completionHanlder(wide_to_ansi(result));
+          }
+
           return S_OK;
         }).Get()));
+  }
+
+  void InAppWebView::addUserScript(const std::shared_ptr<UserScript> userScript) const
+  {
+    if (!userContentController) {
+      return;
+    }
+
+    userContentController->addUserOnlyScript(userScript);
+  }
+
+  void InAppWebView::removeUserScript(const int64_t index, const std::shared_ptr<UserScript> userScript) const
+  {
+    if (!userContentController) {
+      return;
+    }
+
+    userContentController->removeUserOnlyScriptAt(index, userScript->injectionTime);
+  }
+
+  void InAppWebView::removeUserScriptsByGroupName(const std::string& groupName) const
+  {
+    if (!userContentController) {
+      return;
+    }
+
+    userContentController->removeUserOnlyScriptsByGroupName(groupName);
+  }
+
+  void InAppWebView::removeAllUserScripts() const
+  {
+    if (!userContentController) {
+      return;
+    }
+
+    userContentController->removeAllUserOnlyScripts();
   }
 
   // flutter_view

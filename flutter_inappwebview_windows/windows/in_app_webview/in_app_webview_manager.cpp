@@ -76,6 +76,8 @@ namespace flutter_inappwebview_plugin
 
     auto settingsMap = get_fl_map_value<flutter::EncodableMap>(*arguments, "initialSettings");
     auto urlRequestMap = get_optional_fl_map_value<flutter::EncodableMap>(*arguments, "initialUrlRequest");
+    auto initialFile = get_optional_fl_map_value<std::string>(*arguments, "initialFile");
+    auto initialDataMap = get_optional_fl_map_value<flutter::EncodableMap>(*arguments, "initialData");
 
     auto hwnd = CreateWindowEx(0, windowClass_.lpszClassName, L"", 0, CW_DEFAULT,
       CW_DEFAULT, 0, 0, HWND_MESSAGE, nullptr,
@@ -98,9 +100,15 @@ namespace flutter_inappwebview_plugin
             std::move(webViewEnv), std::move(webViewController), std::move(webViewCompositionController)
           );
 
-          std::optional<URLRequest> urlRequest = urlRequestMap.has_value() ? std::make_optional<URLRequest>(urlRequestMap.value()) : std::optional<URLRequest>{};
+          std::optional<std::shared_ptr<URLRequest>> urlRequest = urlRequestMap.has_value() ? std::make_shared<URLRequest>(urlRequestMap.value()) : std::optional<std::shared_ptr<URLRequest>>{};
           if (urlRequest.has_value()) {
             inAppWebView->loadUrl(urlRequest.value());
+          }
+          else if (initialFile.has_value()) {
+            inAppWebView->loadFile(initialFile.value());
+          }
+          else if (initialDataMap.has_value()) {
+            inAppWebView->loadData(get_fl_map_value<std::string>(initialDataMap.value(), "data"));
           }
 
           auto customPlatformView = std::make_unique<CustomPlatformView>(plugin->registrar->messenger(),

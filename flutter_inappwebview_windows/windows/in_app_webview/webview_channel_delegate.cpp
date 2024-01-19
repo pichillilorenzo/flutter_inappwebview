@@ -3,6 +3,7 @@
 #include "../utils/flutter.h"
 #include "../utils/log.h"
 #include "../utils/strconv.h"
+#include "../utils/string.h"
 #include "in_app_webview.h"
 #include "webview_channel_delegate.h"
 
@@ -28,6 +29,14 @@ namespace flutter_inappwebview_plugin
       };
   }
 
+  WebViewChannelDelegate::CallJsHandlerCallback::CallJsHandlerCallback()
+  {
+    decodeResult = [](const flutter::EncodableValue* value)
+      {
+        return value;
+      };
+  }
+
   void WebViewChannelDelegate::HandleMethodCall(const flutter::MethodCall<flutter::EncodableValue>& method_call,
     std::unique_ptr<flutter::MethodResult<flutter::EncodableValue>> result)
   {
@@ -37,42 +46,53 @@ namespace flutter_inappwebview_plugin
     }
 
     auto& arguments = std::get<flutter::EncodableMap>(*method_call.arguments());
+    auto& methodName = method_call.method_name();
 
-    if (method_call.method_name().compare("getUrl") == 0) {
+    if (string_equals(methodName, "getUrl")) {
       result->Success(make_fl_value(webView->getUrl()));
     }
-    else if (method_call.method_name().compare("getTitle") == 0) {
+    else if (string_equals(methodName, "getTitle")) {
       result->Success(make_fl_value(webView->getUrl()));
     }
-    else if (method_call.method_name().compare("loadUrl") == 0) {
+    else if (string_equals(methodName, "loadUrl")) {
       auto urlRequest = std::make_unique<URLRequest>(get_fl_map_value<flutter::EncodableMap>(arguments, "urlRequest"));
-      webView->loadUrl(*urlRequest);
+      webView->loadUrl(std::move(urlRequest));
       result->Success(true);
     }
-    else if (method_call.method_name().compare("reload") == 0) {
+    else if (string_equals(methodName, "loadFile")) {
+      auto assetFilePath = get_fl_map_value<std::string>(arguments, "assetFilePath");
+      webView->loadFile(assetFilePath);
+      result->Success(true);
+    }
+    else if (string_equals(methodName, "loadData")) {
+      auto data = get_fl_map_value<std::string>(arguments, "data");
+      webView->loadData(data);
+      result->Success(true);
+    }
+    else if (string_equals(methodName, "reload")) {
       webView->reload();
       result->Success(true);
     }
-    else if (method_call.method_name().compare("goBack") == 0) {
+    else if (string_equals(methodName, "goBack")) {
       webView->goBack();
       result->Success(true);
     }
-    else if (method_call.method_name().compare("canGoBack") == 0) {
+    else if (string_equals(methodName, "canGoBack")) {
       result->Success(webView->canGoBack());
     }
-    else if (method_call.method_name().compare("goForward") == 0) {
+    else if (string_equals(methodName, "goForward")) {
       webView->goForward();
       result->Success(true);
     }
-    else if (method_call.method_name().compare("canGoForward") == 0) {
+    else if (string_equals(methodName, "canGoForward")) {
       result->Success(webView->canGoForward());
     }
-    else if (method_call.method_name().compare("goBackOrForward") == 0) {
+    else if (string_equals(methodName, "goBackOrForward")) {
       auto steps = get_fl_map_value<int>(arguments, "steps");
       webView->goBackOrForward(steps);
       result->Success(true);
     }
-    else if (method_call.method_name().compare("canGoBackOrForward") == 0) {
+    else if (string_equals(methodName, "canGoBackOrForward")) {
       auto result_ = std::shared_ptr<flutter::MethodResult<flutter::EncodableValue>>(std::move(result));
 
       auto steps = get_fl_map_value<int>(arguments, "steps");
@@ -81,14 +101,14 @@ namespace flutter_inappwebview_plugin
           result_->Success(value);
         });
     }
-    else if (method_call.method_name().compare("isLoading") == 0) {
+    else if (string_equals(methodName, "isLoading")) {
       result->Success(webView->isLoading());
     }
-    else if (method_call.method_name().compare("stopLoading") == 0) {
+    else if (string_equals(methodName, "stopLoading")) {
       webView->stopLoading();
       result->Success(true);
     }
-    else if (method_call.method_name().compare("evaluateJavascript") == 0) {
+    else if (string_equals(methodName, "evaluateJavascript")) {
       auto result_ = std::shared_ptr<flutter::MethodResult<flutter::EncodableValue>>(std::move(result));
 
       auto source = get_fl_map_value<std::string>(arguments, "source");
@@ -97,23 +117,43 @@ namespace flutter_inappwebview_plugin
           result_->Success(value);
         });
     }
-    else if (method_call.method_name().compare("getCopyBackForwardList") == 0) {
+    else if (string_equals(methodName, "getCopyBackForwardList")) {
       auto result_ = std::shared_ptr<flutter::MethodResult<flutter::EncodableValue>>(std::move(result));
       webView->getCopyBackForwardList([result_ = std::move(result_)](const std::unique_ptr<WebHistory> value)
         {
           result_->Success(value->toEncodableMap());
         });
     }
+    else if (string_equals(methodName, "addUserScript")) {
+      auto userScript = std::make_unique<UserScript>(get_fl_map_value<flutter::EncodableMap>(arguments, "userScript"));
+      webView->addUserScript(std::move(userScript));
+      result->Success(true);
+    }
+    else if (string_equals(methodName, "removeUserScript")) {
+      auto index = get_fl_map_value<int64_t>(arguments, "index");
+      auto userScript = std::make_unique<UserScript>(get_fl_map_value<flutter::EncodableMap>(arguments, "userScript"));
+      webView->removeUserScript(index, std::move(userScript));
+      result->Success(true);
+    }
+    else if (string_equals(methodName, "removeUserScriptsByGroupName")) {
+      auto groupName = get_fl_map_value<std::string>(arguments, "groupName");
+      webView->removeUserScriptsByGroupName(groupName);
+      result->Success(true);
+    }
+    else if (string_equals(methodName, "removeAllUserScripts")) {
+      webView->removeAllUserScripts();
+      result->Success(true);
+    }
     // for inAppBrowser
-    else if (webView->inAppBrowser && method_call.method_name().compare("show") == 0) {
+    else if (webView->inAppBrowser && string_equals(methodName, "show")) {
       webView->inAppBrowser->show();
       result->Success(true);
     }
-    else if (webView->inAppBrowser && method_call.method_name().compare("hide") == 0) {
+    else if (webView->inAppBrowser && string_equals(methodName, "hide")) {
       webView->inAppBrowser->hide();
       result->Success(true);
     }
-    else if (webView->inAppBrowser && method_call.method_name().compare("close") == 0) {
+    else if (webView->inAppBrowser && string_equals(methodName, "close")) {
       webView->inAppBrowser->close();
       result->Success(true);
     }
@@ -209,6 +249,19 @@ namespace flutter_inappwebview_plugin
       {"isReload", make_fl_value(isReload)}
       });
     channel->InvokeMethod("onUpdateVisitedHistory", std::move(arguments));
+  }
+
+  void WebViewChannelDelegate::onCallJsHandler(const std::string& handlerName, const std::string& args, std::unique_ptr<CallJsHandlerCallback> callback) const
+  {
+    if (!channel) {
+      return;
+    }
+
+    auto arguments = std::make_unique<flutter::EncodableValue>(flutter::EncodableMap{
+      {"handlerName", handlerName},
+      {"args", args}
+      });
+    channel->InvokeMethod("onCallJsHandler", std::move(arguments), std::move(callback));
   }
 
   WebViewChannelDelegate::~WebViewChannelDelegate()

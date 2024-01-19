@@ -31,7 +31,7 @@ namespace flutter_inappwebview_plugin
   {
     auto id = get_fl_map_value<std::string>(*arguments, "id");
     auto urlRequestMap = get_optional_fl_map_value<flutter::EncodableMap>(*arguments, "urlRequest");
-    std::optional<URLRequest> urlRequest = urlRequestMap.has_value() ? std::make_optional<URLRequest>(urlRequestMap.value()) : std::optional<URLRequest>{};
+    std::optional<std::shared_ptr<URLRequest>> urlRequest = urlRequestMap.has_value() ? std::make_shared<URLRequest>(urlRequestMap.value()) : std::optional<std::shared_ptr<URLRequest>>{};
 
     auto settingsMap = get_fl_map_value<flutter::EncodableMap>(*arguments, "settings");
     auto initialSettings = std::make_unique<InAppBrowserSettings>(settingsMap);

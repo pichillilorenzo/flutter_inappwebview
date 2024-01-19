@@ -6,7 +6,7 @@ namespace flutter_inappwebview_plugin
     const std::optional<std::string>& groupName,
     const std::string& source,
     const UserScriptInjectionTime& injectionTime,
-    const std::set<std::string>& allowedOriginRules
+    const std::vector<std::string>& allowedOriginRules
   ) : UserScript(groupName, source, injectionTime, allowedOriginRules)
   {}
 

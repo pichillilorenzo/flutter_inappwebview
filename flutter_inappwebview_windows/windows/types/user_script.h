@@ -1,14 +1,17 @@
 #ifndef FLUTTER_INAPPWEBVIEW_PLUGIN_USER_SCRIPT_H_
 #define FLUTTER_INAPPWEBVIEW_PLUGIN_USER_SCRIPT_H_
 
+#include <flutter/standard_method_codec.h>
 #include <optional>
-#include <set>
 #include <string>
+#include <vector>
+
+#include "../utils/flutter.h"
 
 namespace flutter_inappwebview_plugin
 {
   enum UserScriptInjectionTime {
-    atDocumentStart,
+    atDocumentStart = 0,
     atDocumentEnd
   };
 
@@ -19,14 +22,15 @@ namespace flutter_inappwebview_plugin
     const std::optional<std::string> groupName;
     const std::string source;
     const UserScriptInjectionTime injectionTime;
-    const std::set<std::string> allowedOriginRules;
+    const std::vector<std::string> allowedOriginRules;
 
     UserScript(
       const std::optional<std::string>& groupName,
       const std::string& source,
       const UserScriptInjectionTime& injectionTime,
-      const std::set<std::string>& allowedOriginRules
+      const std::vector<std::string>& allowedOriginRules
     );
+    UserScript(const flutter::EncodableMap& map);
     ~UserScript();
   };
 }

@@ -132,7 +132,9 @@ namespace flutter_inappwebview_plugin
     void prepare();
     std::optional<std::string> getUrl() const;
     std::optional<std::string> getTitle() const;
-    void loadUrl(const URLRequest& urlRequest) const;
+    void loadUrl(const std::shared_ptr<URLRequest> urlRequest) const;
+    void loadFile(const std::string& assetFilePath) const;
+    void loadData(const std::string& data) const;
     void reload() const;
     void goBack();
     bool canGoBack() const;
@@ -145,8 +147,12 @@ namespace flutter_inappwebview_plugin
       return isLoading_;
     }
     void stopLoading() const;
-    void evaluateJavascript(const std::string& source, std::function<void(std::string)> completionHanlder) const;
+    void evaluateJavascript(const std::string& source, const std::function<void(std::string)> completionHanlder) const;
     void getCopyBackForwardList(const std::function<void(std::unique_ptr<WebHistory>)> completionHandler) const;
+    void addUserScript(const std::shared_ptr<UserScript> userScript) const;
+    void removeUserScript(const int64_t index, const std::shared_ptr<UserScript> userScript) const;
+    void removeUserScriptsByGroupName(const std::string& groupName) const;
+    void removeAllUserScripts() const;
 
     static bool isSslError(const COREWEBVIEW2_WEB_ERROR_STATUS& webErrorStatus);
   private:

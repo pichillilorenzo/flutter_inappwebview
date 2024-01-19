@@ -18,7 +18,7 @@ namespace flutter_inappwebview_plugin
   struct InAppBrowserCreationParams
   {
     const std::string id;
-    const std::optional<URLRequest> urlRequest;
+    const std::optional<std::shared_ptr<URLRequest>> urlRequest;
     const std::shared_ptr<InAppBrowserSettings> initialSettings;
     const std::shared_ptr<InAppWebViewSettings> initialWebViewSettings;
   };
@@ -35,7 +35,7 @@ namespace flutter_inappwebview_plugin
 
     const FlutterInappwebviewWindowsPlugin* plugin;
     const std::string id;
-    const std::optional<URLRequest> initialUrlRequest;
+    const std::optional<std::shared_ptr<URLRequest>> initialUrlRequest;
     std::unique_ptr<InAppWebView> webView;
     std::unique_ptr<InAppBrowserChannelDelegate> channelDelegate;
     const std::shared_ptr<InAppBrowserSettings> settings;

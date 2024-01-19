@@ -22,10 +22,16 @@ namespace flutter_inappwebview_plugin
   public:
     InAppWebView* webView;
 
-    class ShouldOverrideUrlLoadingCallback : public BaseCallbackResult<NavigationActionPolicy> {
+    class ShouldOverrideUrlLoadingCallback : public BaseCallbackResult<const NavigationActionPolicy> {
     public:
       ShouldOverrideUrlLoadingCallback();
       ~ShouldOverrideUrlLoadingCallback() = default;
+    };
+
+    class CallJsHandlerCallback : public BaseCallbackResult<const flutter::EncodableValue*> {
+    public:
+      CallJsHandlerCallback();
+      ~CallJsHandlerCallback() = default;
     };
 
     WebViewChannelDelegate(InAppWebView* webView, flutter::BinaryMessenger* messenger);
@@ -43,6 +49,7 @@ namespace flutter_inappwebview_plugin
     void onReceivedHttpError(std::shared_ptr<WebResourceRequest> request, std::shared_ptr<WebResourceResponse> error) const;
     void onTitleChanged(const std::optional<std::string>& title) const;
     void onUpdateVisitedHistory(const std::optional<std::string>& url, const std::optional<bool>& isReload) const;
+    void onCallJsHandler(const std::string& handlerName, const std::string& args, std::unique_ptr<CallJsHandlerCallback> callback) const;
   };
 }
 

@@ -44,7 +44,7 @@ namespace flutter_inappwebview_plugin
       this->webViewController->put_Bounds(bounds);
     }
 
-    prepare();
+    prepare(params);
   }
 
   InAppWebView::InAppWebView(InAppBrowser* inAppBrowser, const FlutterInappwebviewWindowsPlugin* plugin, const InAppWebViewCreationParams& params, const HWND parentWindow, wil::com_ptr<ICoreWebView2Environment> webViewEnv,
@@ -118,7 +118,7 @@ namespace flutter_inappwebview_plugin
       std::make_unique<WebViewChannelDelegate>(this, plugin->registrar->messenger());
   }
 
-  void InAppWebView::prepare()
+  void InAppWebView::prepare(const InAppWebViewCreationParams& params)
   {
     if (!webView) {
       return;
@@ -139,6 +139,10 @@ namespace flutter_inappwebview_plugin
     }
 
     userContentController->addPluginScript(std::move(createJavaScriptBridgePluginScript()));
+
+    if (params.initialUserScripts.has_value()) {
+      userContentController->addUserOnlyScripts(params.initialUserScripts.value());
+    }
 
     registerEventHandlers();
   }

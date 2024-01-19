@@ -1124,6 +1124,7 @@ class PlatformWebViewCreationParams<T> {
   ///- Android native WebView
   ///- iOS
   ///- MacOS
+  ///- Windows
   ///{@endtemplate}
   final UnmodifiableListView<UserScript>? initialUserScripts;
 

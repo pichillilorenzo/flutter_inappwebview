@@ -19,8 +19,11 @@ namespace flutter_inappwebview_plugin
   {
     const std::string id;
     const std::optional<std::shared_ptr<URLRequest>> urlRequest;
+    const std::optional<std::string> assetFilePath;
+    const std::optional<std::string> data;
     const std::shared_ptr<InAppBrowserSettings> initialSettings;
     const std::shared_ptr<InAppWebViewSettings> initialWebViewSettings;
+    const std::optional<std::vector<std::shared_ptr<UserScript>>> initialUserScripts;
   };
 
   class InAppBrowser {
@@ -35,7 +38,6 @@ namespace flutter_inappwebview_plugin
 
     const FlutterInappwebviewWindowsPlugin* plugin;
     const std::string id;
-    const std::optional<std::shared_ptr<URLRequest>> initialUrlRequest;
     std::unique_ptr<InAppWebView> webView;
     std::unique_ptr<InAppBrowserChannelDelegate> channelDelegate;
     const std::shared_ptr<InAppBrowserSettings> settings;

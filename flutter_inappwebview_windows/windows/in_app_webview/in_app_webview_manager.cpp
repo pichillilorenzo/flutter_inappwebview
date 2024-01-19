@@ -6,8 +6,11 @@
 
 #include "../in_app_webview/in_app_webview_settings.h"
 #include "../types/url_request.h"
+#include "../types/user_script.h"
 #include "../utils/flutter.h"
 #include "../utils/log.h"
+#include "../utils/string.h"
+#include "../utils/vector.h"
 #include "in_app_webview_manager.h"
 
 namespace flutter_inappwebview_plugin
@@ -49,16 +52,17 @@ namespace flutter_inappwebview_plugin
     std::unique_ptr<flutter::MethodResult<flutter::EncodableValue>> result)
   {
     auto* arguments = std::get_if<flutter::EncodableMap>(method_call.arguments());
+    auto& methodName = method_call.method_name();
 
-    if (method_call.method_name().compare("createInAppWebView") == 0) {
+    if (string_equals(methodName, "createInAppWebView")) {
       if (isSupported()) {
-        createInAppWebView(arguments, std::move(result));
+        createInAppBrowser(arguments, std::move(result));
       }
       else {
         result->Error("0", "Creating an InAppWebView instance is not supported! Graphics Context is not valid!");
       }
     }
-    else if (method_call.method_name().compare("dispose") == 0) {
+    else if (string_equals(methodName, "dispose")) {
       auto id = get_fl_map_value<int64_t>(*arguments, "id");
       if (map_contains(webViews, (uint64_t)id)) {
         webViews.erase(id);
@@ -70,7 +74,7 @@ namespace flutter_inappwebview_plugin
     }
   }
 
-  void InAppWebViewManager::createInAppWebView(const flutter::EncodableMap* arguments, std::unique_ptr<flutter::MethodResult<flutter::EncodableValue>> result)
+  void InAppWebViewManager::createInAppBrowser(const flutter::EncodableMap* arguments, std::unique_ptr<flutter::MethodResult<flutter::EncodableValue>> result)
   {
     auto result_ = std::shared_ptr<flutter::MethodResult<flutter::EncodableValue>>(std::move(result));
 
@@ -78,6 +82,7 @@ namespace flutter_inappwebview_plugin
     auto urlRequestMap = get_optional_fl_map_value<flutter::EncodableMap>(*arguments, "initialUrlRequest");
     auto initialFile = get_optional_fl_map_value<std::string>(*arguments, "initialFile");
     auto initialDataMap = get_optional_fl_map_value<flutter::EncodableMap>(*arguments, "initialData");
+    auto initialUserScriptList = get_optional_fl_map_value<flutter::EncodableList>(*arguments, "initialUserScripts");
 
     auto hwnd = CreateWindowEx(0, windowClass_.lpszClassName, L"", 0, CW_DEFAULT,
       CW_DEFAULT, 0, 0, HWND_MESSAGE, nullptr,
@@ -90,10 +95,14 @@ namespace flutter_inappwebview_plugin
       {
         if (webViewEnv && webViewController && webViewCompositionController) {
           auto initialSettings = std::make_unique<InAppWebViewSettings>(settingsMap);
+          std::optional<std::vector<std::shared_ptr<UserScript>>> initialUserScripts = initialUserScriptList.has_value() ?
+            functional_map(initialUserScriptList.value(), [](const flutter::EncodableValue& map) { return std::make_shared<UserScript>(std::get<flutter::EncodableMap>(map)); }) :
+            std::optional<std::vector<std::shared_ptr<UserScript>>>{};
 
           InAppWebViewCreationParams params = {
             "",
             std::move(initialSettings),
+            initialUserScripts
           };
 
           auto inAppWebView = std::make_unique<InAppWebView>(plugin, params, hwnd,

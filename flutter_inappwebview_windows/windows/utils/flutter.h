@@ -81,32 +81,36 @@ namespace flutter_inappwebview_plugin
   }
 
   template<typename T>
-  static inline T get_fl_map_value(const flutter::EncodableMap& map, const char* string)
+  static inline T get_fl_map_value(const flutter::EncodableMap& map, const char* key)
   {
-    return std::get<T>(map.at(make_fl_value(string)));
+    return std::get<T>(map.at(make_fl_value(key)));
   }
 
   template<typename T, typename std::enable_if<((!is_mappish<T>::value && !is_vector<T>::value) ||
     std::is_same<T, flutter::EncodableMap>::value || std::is_same<T, flutter::EncodableList>::value), int>::type* = nullptr>
-  static inline std::optional<T> get_optional_fl_map_value(const flutter::EncodableMap& map, const char* string)
+  static inline std::optional<T> get_optional_fl_map_value(const flutter::EncodableMap& map, const char* key)
   {
-    return make_pointer_optional<T>(std::get_if<T>(&map.at(make_fl_value(string))));
+    auto fl_key = make_fl_value(key);
+    if (map_contains<flutter::EncodableValue, flutter::EncodableValue>(map, fl_key)) {
+      return make_pointer_optional<T>(std::get_if<T>(&map.at(fl_key)));
+    }
+    return std::nullopt;
   }
 
   template<typename T>
-  static inline T get_fl_map_value(const flutter::EncodableMap& map, const char* string, const T& defaultValue)
+  static inline T get_fl_map_value(const flutter::EncodableMap& map, const char* key, const T& defaultValue)
   {
-    auto optional = get_optional_fl_map_value<T>(map, string);
+    auto optional = get_optional_fl_map_value<T>(map, key);
     return !optional.has_value() ? defaultValue : optional.value();
   }
 
   template<typename T, typename std::enable_if<(is_mappish<T>::value && !std::is_same<T, flutter::EncodableMap>::value)>::type* = nullptr>
-  static inline std::optional<T> get_optional_fl_map_value(const flutter::EncodableMap& map, const char* string)
+  static inline std::optional<T> get_optional_fl_map_value(const flutter::EncodableMap& map, const char* key)
   {
     using K = typename T::key_type;
     using V = typename T::mapped_type;
 
-    auto flMap = std::get_if<flutter::EncodableMap>(&map.at(make_fl_value(string)));
+    auto flMap = std::get_if<flutter::EncodableMap>(&map.at(make_fl_value(key)));
     if (flMap) {
       T mapValue = {};
       for (auto itr = flMap->begin(); itr != flMap->end(); itr++) {
@@ -118,18 +122,18 @@ namespace flutter_inappwebview_plugin
   }
 
   template<typename K, typename T>
-  static inline std::map<K, T> get_fl_map_value(const flutter::EncodableMap& map, const char* string, const std::map<K, T>& defaultValue)
+  static inline std::map<K, T> get_fl_map_value(const flutter::EncodableMap& map, const char* key, const std::map<K, T>& defaultValue)
   {
-    auto optional = get_optional_fl_map_value<std::map<K, T>>(map, string);
+    auto optional = get_optional_fl_map_value<std::map<K, T>>(map, key);
     return !optional.has_value() ? defaultValue : optional.value();
   }
 
   template<typename T, typename std::enable_if<(is_vector<T>::value && !std::is_same<T, flutter::EncodableList>::value), bool>::type* = nullptr>
-  static inline std::optional<T> get_optional_fl_map_value(const flutter::EncodableMap& map, const char* string)
+  static inline std::optional<T> get_optional_fl_map_value(const flutter::EncodableMap& map, const char* key)
   {
     using V = typename T::value_type;
 
-    auto flList = std::get_if<flutter::EncodableList>(&map.at(make_fl_value(string)));
+    auto flList = std::get_if<flutter::EncodableList>(&map.at(make_fl_value(key)));
     if (flList) {
       T vecValue(flList->size());
       for (auto itr = flList->begin(); itr != flList->end(); itr++) {
@@ -141,9 +145,9 @@ namespace flutter_inappwebview_plugin
   }
 
   template<typename T>
-  static inline std::vector<T> get_fl_map_value(const flutter::EncodableMap& map, const char* string, const std::vector<T>& defaultValue)
+  static inline std::vector<T> get_fl_map_value(const flutter::EncodableMap& map, const char* key, const std::vector<T>& defaultValue)
   {
-    auto optional = get_optional_fl_map_value<std::vector<T>>(map, string);
+    auto optional = get_optional_fl_map_value<std::vector<T>>(map, key);
     return !optional.has_value() ? defaultValue : optional.value();
   }
 }

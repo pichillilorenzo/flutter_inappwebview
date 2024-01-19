@@ -11,7 +11,6 @@ namespace flutter_inappwebview_plugin
     : plugin(plugin),
     m_hInstance(GetModuleHandle(nullptr)),
     id(params.id),
-    initialUrlRequest(params.urlRequest),
     settings(params.initialSettings),
     channelDelegate(std::make_unique<InAppBrowserChannelDelegate>(id, plugin->registrar->messenger()))
   {
@@ -26,29 +25,30 @@ namespace flutter_inappwebview_plugin
     RegisterClass(&wndClass);
 
     m_hWnd = CreateWindowEx(
-      0,                              // Optional window styles.
+      0,                        // Optional window styles.
       wndClass.lpszClassName,		// Window class
-      L"",							// Window text
+      L"",							        // Window text
       WS_OVERLAPPEDWINDOW,			// Window style
 
       // Size and position
       CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,
 
-      NULL,       // Parent window    
-      NULL,       // Menu
-      wndClass.hInstance,// Instance handle
-      this        // Additional application data
+      NULL,                // Parent window    
+      NULL,                // Menu
+      wndClass.hInstance,  // Instance handle
+      this                 // Additional application data
     );
 
     ShowWindow(m_hWnd, settings->hidden ? SW_HIDE : SW_SHOW);
 
     InAppWebViewCreationParams webViewParams = {
       id,
-      params.initialWebViewSettings
+      params.initialWebViewSettings,
+      params.initialUserScripts
     };
 
     InAppWebView::createInAppWebViewEnv(m_hWnd, false,
-      [this, webViewParams](wil::com_ptr<ICoreWebView2Environment> webViewEnv, wil::com_ptr<ICoreWebView2Controller> webViewController, wil::com_ptr<ICoreWebView2CompositionController> webViewCompositionController) -> void
+      [this, params, webViewParams](wil::com_ptr<ICoreWebView2Environment> webViewEnv, wil::com_ptr<ICoreWebView2Controller> webViewController, wil::com_ptr<ICoreWebView2CompositionController> webViewCompositionController) -> void
       {
         if (webViewEnv && webViewController) {
           webView = std::make_unique<InAppWebView>(this, this->plugin, webViewParams, m_hWnd, std::move(webViewEnv), std::move(webViewController), nullptr);
@@ -58,8 +58,14 @@ namespace flutter_inappwebview_plugin
             channelDelegate->onBrowserCreated();
           }
 
-          if (initialUrlRequest.has_value()) {
-            webView->loadUrl(initialUrlRequest.value());
+          if (params.urlRequest.has_value()) {
+            webView->loadUrl(params.urlRequest.value());
+          }
+          else if (params.assetFilePath.has_value()) {
+            webView->loadFile(params.assetFilePath.value());
+          }
+          else if (params.data.has_value()) {
+            webView->loadData(params.data.value());
           }
         }
         else {

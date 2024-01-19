@@ -315,9 +315,7 @@ class WindowsInAppWebViewWidget extends PlatformInAppWebViewWidget {
             : null,
         'initialUserScripts':
             params.initialUserScripts?.map((e) => e.toMap()).toList() ?? [],
-        'pullToRefreshSettings': pullToRefreshSettings,
         'keepAliveId': params.keepAlive?.id,
-        'preventGestureDelay': params.preventGestureDelay
       },
     );
   }

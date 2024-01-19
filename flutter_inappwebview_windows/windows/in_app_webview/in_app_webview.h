@@ -72,6 +72,7 @@ namespace flutter_inappwebview_plugin
   struct InAppWebViewCreationParams {
     const std::variant<std::string, int64_t> id;
     const std::shared_ptr<InAppWebViewSettings> initialSettings;
+    const std::optional<std::vector<std::shared_ptr<UserScript>>> initialUserScripts;
   };
 
   class InAppWebView
@@ -129,7 +130,7 @@ namespace flutter_inappwebview_plugin
       winrt::com_ptr<ABI::Windows::UI::Composition::ICompositor> compositor);
 
     void initChannel(const std::optional<std::variant<std::string, int64_t>> viewId, const std::optional<std::string> channelName);
-    void prepare();
+    void prepare(const InAppWebViewCreationParams& params);
     std::optional<std::string> getUrl() const;
     std::optional<std::string> getTitle() const;
     void loadUrl(const std::shared_ptr<URLRequest> urlRequest) const;

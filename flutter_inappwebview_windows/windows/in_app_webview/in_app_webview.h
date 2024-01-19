@@ -13,6 +13,7 @@
 #include "../types/url_request.h"
 #include "../types/web_history.h"
 #include "in_app_webview_settings.h"
+#include "user_content_controller.h"
 #include "webview_channel_delegate.h"
 
 namespace flutter_inappwebview_plugin
@@ -88,6 +89,7 @@ namespace flutter_inappwebview_plugin
     std::map<UINT64, std::shared_ptr<NavigationAction>> navigationActions = {};
     const std::shared_ptr<InAppWebViewSettings> settings;
     InAppBrowser* inAppBrowser = nullptr;
+    std::unique_ptr<UserContentController> userContentController;
 
     InAppWebView(const FlutterInappwebviewWindowsPlugin* plugin, const InAppWebViewCreationParams& params, const HWND parentWindow,
       wil::com_ptr<ICoreWebView2Environment> webViewEnv,
@@ -127,12 +129,22 @@ namespace flutter_inappwebview_plugin
       winrt::com_ptr<ABI::Windows::UI::Composition::ICompositor> compositor);
 
     void initChannel(const std::optional<std::variant<std::string, int64_t>> viewId, const std::optional<std::string> channelName);
+    void prepare();
     std::optional<std::string> getUrl() const;
     std::optional<std::string> getTitle() const;
     void loadUrl(const URLRequest& urlRequest) const;
     void reload() const;
     void goBack();
+    bool canGoBack() const;
     void goForward();
+    bool canGoForward() const;
+    void goBackOrForward(const int& steps);
+    void canGoBackOrForward(const int& steps, std::function<void(bool)> completionHandler) const;
+    bool isLoading() const
+    {
+      return isLoading_;
+    }
+    void stopLoading() const;
     void evaluateJavascript(const std::string& source, std::function<void(std::string)> completionHanlder) const;
     void getCopyBackForwardList(const std::function<void(std::unique_ptr<WebHistory>)> completionHandler) const;
 
@@ -147,6 +159,9 @@ namespace flutter_inappwebview_plugin
     VirtualKeyState virtualKeys_;
 
     bool callShouldOverrideUrlLoading_ = true;
+    std::shared_ptr<NavigationAction> lastNavigationAction_;
+    bool isLoading_ = false;
+
     void InAppWebView::registerEventHandlers();
     void InAppWebView::registerSurfaceEventHandlers();
   };

@@ -1,6 +1,7 @@
 #include <Windows.h>
 
-#include "../utils/util.h"
+#include "../utils/log.h"
+#include "../utils/strconv.h"
 #include "in_app_browser.h"
 #include "in_app_browser_manager.h"
 

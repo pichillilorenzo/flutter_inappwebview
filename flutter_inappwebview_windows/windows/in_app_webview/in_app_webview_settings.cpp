@@ -1,4 +1,5 @@
 #include "../utils/flutter.h"
+#include "../utils/log.h"
 #include "in_app_webview_settings.h"
 
 namespace flutter_inappwebview_plugin

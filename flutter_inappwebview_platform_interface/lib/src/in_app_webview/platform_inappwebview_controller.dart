@@ -377,6 +377,7 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///- Android native WebView ([Official API - WebView.canGoBack](https://developer.android.com/reference/android/webkit/WebView#canGoBack()))
   ///- iOS ([Official API - WKWebView.canGoBack](https://developer.apple.com/documentation/webkit/wkwebview/1414966-cangoback))
   ///- MacOS ([Official API - WKWebView.canGoBack](https://developer.apple.com/documentation/webkit/wkwebview/1414966-cangoback))
+  ///- Windows ([Official API - IWebView2WebView.get_CanGoBack](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2?view=webview2-1.0.2210.55#get_cangoback))
   ///{@endtemplate}
   Future<bool> canGoBack() {
     throw UnimplementedError(
@@ -407,6 +408,7 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///- Android native WebView ([Official API - WebView.canGoForward](https://developer.android.com/reference/android/webkit/WebView#canGoForward()))
   ///- iOS ([Official API - WKWebView.canGoForward](https://developer.apple.com/documentation/webkit/wkwebview/1414962-cangoforward))
   ///- MacOS ([Official API - WKWebView.canGoForward](https://developer.apple.com/documentation/webkit/wkwebview/1414962-cangoforward))
+  ///- Windows ([Official API - IWebView2WebView.get_CanGoForward](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2?view=webview2-1.0.2210.55#get_cangoforward))
   ///{@endtemplate}
   Future<bool> canGoForward() {
     throw UnimplementedError(
@@ -423,6 +425,7 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///- iOS ([Official API - WKWebView.go](https://developer.apple.com/documentation/webkit/wkwebview/1414991-go))
   ///- MacOS ([Official API - WKWebView.go](https://developer.apple.com/documentation/webkit/wkwebview/1414991-go))
   ///- Web ([Official API - History.go](https://developer.mozilla.org/en-US/docs/Web/API/History/go))
+  ///- Windows
   ///{@endtemplate}
   Future<void> goBackOrForward({required int steps}) {
     throw UnimplementedError(
@@ -436,6 +439,7 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///- Android native WebView ([Official API - WebView.canGoBackOrForward](https://developer.android.com/reference/android/webkit/WebView#canGoBackOrForward(int)))
   ///- iOS
   ///- MacOS
+  ///- Windows
   ///{@endtemplate}
   Future<bool> canGoBackOrForward({required int steps}) {
     throw UnimplementedError(
@@ -452,6 +456,7 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///- iOS
   ///- MacOS
   ///- Web
+  ///- Windows
   ///{@endtemplate}
   Future<void> goTo({required WebHistoryItem historyItem}) {
     throw UnimplementedError('goTo is not implemented on the current platform');
@@ -465,6 +470,7 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///- iOS
   ///- MacOS
   ///- Web
+  ///- Windows
   ///{@endtemplate}
   Future<bool> isLoading() {
     throw UnimplementedError(
@@ -481,6 +487,7 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///- iOS ([Official API - WKWebView.stopLoading](https://developer.apple.com/documentation/webkit/wkwebview/1414981-stoploading))
   ///- MacOS ([Official API - WKWebView.stopLoading](https://developer.apple.com/documentation/webkit/wkwebview/1414981-stoploading))
   ///- Web ([Official API - Window.stop](https://developer.mozilla.org/en-US/docs/Web/API/Window/stop))
+  ///- Windows ([Official API - IWebView2WebView.Stop](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2?view=webview2-1.0.2210.55#stop))
   ///{@endtemplate}
   Future<void> stopLoading() {
     throw UnimplementedError(
@@ -558,6 +565,7 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///- iOS
   ///- MacOS
   ///- Web
+  ///- Windows
   ///{@endtemplate}
   Future<dynamic> injectJavascriptFileFromAsset(
       {required String assetFilePath}) {

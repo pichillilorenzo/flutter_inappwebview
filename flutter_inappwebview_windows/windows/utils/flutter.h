@@ -3,7 +3,9 @@
 
 #include <flutter/encodable_value.h>
 
+#include "map.h"
 #include "util.h"
+#include "vector.h"
 
 namespace flutter_inappwebview_plugin
 {

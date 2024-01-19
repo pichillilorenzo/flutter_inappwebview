@@ -899,6 +899,7 @@ abstract class PlatformInAppBrowserEvents {
   ///- Android native WebView ([Official API - WebViewClient.doUpdateVisitedHistory](https://developer.android.com/reference/android/webkit/WebViewClient#doUpdateVisitedHistory(android.webkit.WebView,%20java.lang.String,%20boolean)))
   ///- iOS
   ///- MacOS
+  ///- Windows ([Official API - IWebView2WebView.add_HistoryChanged](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2?view=webview2-1.0.2210.55#add_historychanged))
   void onUpdateVisitedHistory(WebUri? url, bool? isReload) {}
 
   ///Use [onPrintRequest] instead

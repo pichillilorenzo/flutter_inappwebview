@@ -5,10 +5,11 @@
 #include <wil/wrl.h>
 
 #include "../custom_platform_view/util/composition.desktop.interop.h"
+#include "../plugin_scripts_js/javascript_bridge_js.h"
 #include "../types/web_resource_error.h"
 #include "../types/web_resource_request.h"
+#include "../utils/log.h"
 #include "../utils/strconv.h"
-#include "../utils/util.h"
 #include "in_app_webview.h"
 #include "in_app_webview_manager.h"
 
@@ -19,13 +20,12 @@ namespace flutter_inappwebview_plugin
   InAppWebView::InAppWebView(const FlutterInappwebviewWindowsPlugin* plugin, const InAppWebViewCreationParams& params, const HWND parentWindow, wil::com_ptr<ICoreWebView2Environment> webViewEnv,
     wil::com_ptr<ICoreWebView2Controller> webViewController,
     wil::com_ptr<ICoreWebView2CompositionController> webViewCompositionController)
-    : plugin(plugin), id(params.id), webViewEnv(std::move(webViewEnv)), webViewController(std::move(webViewController)), webViewCompositionController(std::move(webViewCompositionController)),
-    settings(params.initialSettings)
+    : plugin(plugin), id(params.id),
+    webViewEnv(std::move(webViewEnv)), webViewController(std::move(webViewController)), webViewCompositionController(std::move(webViewCompositionController)),
+    settings(params.initialSettings), userContentController(std::make_unique<UserContentController>(this))
   {
-    auto hrWebView2 = this->webViewController->get_CoreWebView2(webView.put());
-    if (FAILED(hrWebView2)) {
+    if (failedAndLog(this->webViewController->get_CoreWebView2(webView.put()))) {
       std::cerr << "Cannot create CoreWebView2." << std::endl;
-      debugLog(getErrorMessage(hrWebView2));
     }
 
     if (this->webViewCompositionController) {
@@ -41,24 +41,7 @@ namespace flutter_inappwebview_plugin
       this->webViewController->put_Bounds(bounds);
     }
 
-    wil::com_ptr<ICoreWebView2Settings> webView2Settings;
-    auto hrWebView2Settings = webView->get_Settings(&webView2Settings);
-    if (SUCCEEDED(hrWebView2Settings)) {
-      webView2Settings->put_IsScriptEnabled(settings->javaScriptEnabled);
-      webView2Settings->put_IsZoomControlEnabled(settings->supportZoom);
-
-      wil::com_ptr<ICoreWebView2Settings2> webView2Settings2;
-      if (SUCCEEDED(webView2Settings->QueryInterface(IID_PPV_ARGS(&webView2Settings2)))) {
-        if (!settings->userAgent.empty()) {
-          webView2Settings2->put_UserAgent(ansi_to_wide(settings->userAgent).c_str());
-        }
-      }
-    }
-    else {
-      debugLog(getErrorMessage(hrWebView2Settings));
-    }
-
-    registerEventHandlers();
+    prepare();
   }
 
   InAppWebView::InAppWebView(InAppBrowser* inAppBrowser, const FlutterInappwebviewWindowsPlugin* plugin, const InAppWebViewCreationParams& params, const HWND parentWindow, wil::com_ptr<ICoreWebView2Environment> webViewEnv,
@@ -73,61 +56,54 @@ namespace flutter_inappwebview_plugin
     wil::com_ptr<ICoreWebView2Controller> webViewController,
     wil::com_ptr<ICoreWebView2CompositionController> webViewCompositionController)> completionHandler)
   {
-    CreateCoreWebView2EnvironmentWithOptions(nullptr, nullptr, nullptr,
+    failedLog(CreateCoreWebView2EnvironmentWithOptions(nullptr, nullptr, nullptr,
       Callback<ICoreWebView2CreateCoreWebView2EnvironmentCompletedHandler>(
         [parentWindow, completionHandler, willBeSurface](HRESULT result, wil::com_ptr<ICoreWebView2Environment> env) -> HRESULT
         {
-          if (FAILED(result) || !env) {
+          if (failedAndLog(result) || !env) {
             completionHandler(nullptr, nullptr, nullptr);
-            debugLog(getErrorMessage(result));
             return E_FAIL;
           }
 
           wil::com_ptr<ICoreWebView2Environment3> webViewEnv3;
-          if (willBeSurface && SUCCEEDED(env->QueryInterface(IID_PPV_ARGS(&webViewEnv3)))) {
-            webViewEnv3->CreateCoreWebView2CompositionController(parentWindow, Callback<ICoreWebView2CreateCoreWebView2CompositionControllerCompletedHandler>(
+          if (willBeSurface && succeededOrLog(env->QueryInterface(IID_PPV_ARGS(&webViewEnv3)))) {
+            failedLog(webViewEnv3->CreateCoreWebView2CompositionController(parentWindow, Callback<ICoreWebView2CreateCoreWebView2CompositionControllerCompletedHandler>(
               [completionHandler, env](HRESULT result, wil::com_ptr<ICoreWebView2CompositionController> compositionController) -> HRESULT
               {
                 wil::com_ptr<ICoreWebView2Controller3> webViewController = compositionController.try_query<ICoreWebView2Controller3>();
 
-                if (FAILED(result) || !webViewController) {
+                if (failedAndLog(result) || !webViewController) {
                   completionHandler(nullptr, nullptr, nullptr);
-                  debugLog(getErrorMessage(result));
                   return E_FAIL;
                 }
 
                 ICoreWebView2Controller3* webViewController3;
-                HRESULT hr = webViewController->QueryInterface(IID_PPV_ARGS(&webViewController3));
-                if (SUCCEEDED(hr)) {
+                if (succeededOrLog(webViewController->QueryInterface(IID_PPV_ARGS(&webViewController3)))) {
                   webViewController3->put_BoundsMode(COREWEBVIEW2_BOUNDS_MODE_USE_RAW_PIXELS);
                   webViewController3->put_ShouldDetectMonitorScaleChanges(FALSE);
                   webViewController3->put_RasterizationScale(1.0);
-                }
-                else {
-                  debugLog(getErrorMessage(hr));
                 }
 
                 completionHandler(std::move(env), std::move(webViewController), std::move(compositionController));
                 return S_OK;
               }
-            ).Get());
+            ).Get()));
           }
           else {
-            env->CreateCoreWebView2Controller(parentWindow, Callback<ICoreWebView2CreateCoreWebView2ControllerCompletedHandler>(
+            failedLog(env->CreateCoreWebView2Controller(parentWindow, Callback<ICoreWebView2CreateCoreWebView2ControllerCompletedHandler>(
               [completionHandler, env](HRESULT result, wil::com_ptr<ICoreWebView2Controller> controller) -> HRESULT
               {
-                if (FAILED(result) || !controller) {
+                if (failedAndLog(result) || !controller) {
                   completionHandler(nullptr, nullptr, nullptr);
-                  debugLog(getErrorMessage(result));
                   return E_FAIL;
                 }
 
                 completionHandler(std::move(env), std::move(controller), nullptr);
                 return S_OK;
-              }).Get());
+              }).Get()));
           }
           return S_OK;
-        }).Get());
+        }).Get()));
   }
 
   void InAppWebView::initChannel(const std::optional<std::variant<std::string, int64_t>> viewId, const std::optional<std::string> channelName)
@@ -139,16 +115,43 @@ namespace flutter_inappwebview_plugin
       std::make_unique<WebViewChannelDelegate>(this, plugin->registrar->messenger());
   }
 
+  void InAppWebView::prepare()
+  {
+    if (!webView) {
+      return;
+    }
+
+    wil::com_ptr<ICoreWebView2Settings> webView2Settings;
+    auto hrWebView2Settings = webView->get_Settings(&webView2Settings);
+    if (succeededOrLog(hrWebView2Settings)) {
+      webView2Settings->put_IsScriptEnabled(settings->javaScriptEnabled);
+      webView2Settings->put_IsZoomControlEnabled(settings->supportZoom);
+
+      wil::com_ptr<ICoreWebView2Settings2> webView2Settings2;
+      if (succeededOrLog(webView2Settings->QueryInterface(IID_PPV_ARGS(&webView2Settings2)))) {
+        if (!settings->userAgent.empty()) {
+          webView2Settings2->put_UserAgent(ansi_to_wide(settings->userAgent).c_str());
+        }
+      }
+    }
+
+    userContentController->addPluginScript(std::move(createJavaScriptBridgePluginScript()));
+
+    registerEventHandlers();
+  }
+
   void InAppWebView::registerEventHandlers()
   {
     if (!webView) {
       return;
     }
 
-    webView->add_NavigationStarting(
+    failedLog(webView->add_NavigationStarting(
       Callback<ICoreWebView2NavigationStartingEventHandler>(
         [this](ICoreWebView2* sender, ICoreWebView2NavigationStartingEventArgs* args)
         {
+          isLoading_ = true;
+
           if (!channelDelegate) {
             args->put_Cancel(false);
             return S_OK;
@@ -183,11 +186,51 @@ namespace flutter_inappwebview_plugin
 
           std::optional<std::string> method = requestMethod ? wide_to_utf8(requestMethod.get()) : std::optional<std::string>{};
 
+          BOOL isUserInitiated;
+          if (FAILED(args->get_IsUserInitiated(&isUserInitiated))) {
+            isUserInitiated = FALSE;
+          }
+
+          BOOL isRedirect;
+          if (FAILED(args->get_IsRedirected(&isRedirect))) {
+            isRedirect = FALSE;
+          }
+
+          std::optional<NavigationActionType> navigationType = std::nullopt;
+          wil::com_ptr<ICoreWebView2NavigationStartingEventArgs3> args3;
+          if (SUCCEEDED(args->QueryInterface(IID_PPV_ARGS(&args3)))) {
+            COREWEBVIEW2_NAVIGATION_KIND navigationKind;
+            if (SUCCEEDED(args3->get_NavigationKind(&navigationKind))) {
+              switch (navigationKind) {
+              case COREWEBVIEW2_NAVIGATION_KIND_RELOAD:
+                navigationType = NavigationActionType::reload;
+                break;
+              case COREWEBVIEW2_NAVIGATION_KIND_BACK_OR_FORWARD:
+                navigationType = NavigationActionType::backForward;
+                break;
+              case COREWEBVIEW2_NAVIGATION_KIND_NEW_DOCUMENT:
+                if (isUserInitiated && !isRedirect) {
+                  navigationType = NavigationActionType::linkActivated;
+                }
+                else {
+                  navigationType = NavigationActionType::other;
+                }
+                break;
+              default:
+                navigationType = NavigationActionType::other;
+              }
+            }
+          }
+
           auto urlRequest = std::make_shared<URLRequest>(url, method, headers, std::nullopt);
           auto navigationAction = std::make_shared<NavigationAction>(
             urlRequest,
-            true
+            true,
+            isRedirect,
+            navigationType
           );
+
+          lastNavigationAction_ = navigationAction;
 
           UINT64 navigationId;
           if (SUCCEEDED(args->get_NavigationId(&navigationId))) {
@@ -202,7 +245,7 @@ namespace flutter_inappwebview_plugin
             callback->nonNullSuccess = [this, urlRequest](const NavigationActionPolicy actionPolicy)
               {
                 callShouldOverrideUrlLoading_ = false;
-                if (actionPolicy == allow) {
+                if (actionPolicy == NavigationActionPolicy::allow) {
                   loadUrl(*urlRequest);
                 }
                 return false;
@@ -229,12 +272,14 @@ namespace flutter_inappwebview_plugin
 
           return S_OK;
         }
-    ).Get(), nullptr);
+    ).Get(), nullptr));
 
-    webView->add_NavigationCompleted(
+    failedLog(webView->add_NavigationCompleted(
       Callback<ICoreWebView2NavigationCompletedEventHandler>(
         [this](ICoreWebView2* sender, ICoreWebView2NavigationCompletedEventArgs* args)
         {
+          isLoading_ = false;
+
           std::shared_ptr<NavigationAction> navigationAction;
           UINT64 navigationId;
           if (SUCCEEDED(args->get_NavigationId(&navigationId))) {
@@ -251,8 +296,8 @@ namespace flutter_inappwebview_plugin
           args->get_IsSuccess(&isSuccess);
 
           if (channelDelegate) {
-            LPWSTR uri = nullptr;
-            std::optional<std::string> url = SUCCEEDED(webView->get_Source(&uri)) ? wide_to_utf8(std::wstring(uri)) : std::optional<std::string>{};
+            wil::unique_cotaskmem_string uri;
+            std::optional<std::string> url = SUCCEEDED(webView->get_Source(&uri)) ? wide_to_utf8(uri.get()) : std::optional<std::string>{};
             if (isSuccess) {
               channelDelegate->onLoadStop(url);
             }
@@ -273,9 +318,9 @@ namespace flutter_inappwebview_plugin
 
           return S_OK;
         }
-    ).Get(), nullptr);
+    ).Get(), nullptr));
 
-    webView->add_DocumentTitleChanged(Callback<ICoreWebView2DocumentTitleChangedEventHandler>(
+    failedLog(webView->add_DocumentTitleChanged(Callback<ICoreWebView2DocumentTitleChangedEventHandler>(
       [this](ICoreWebView2* sender, IUnknown* args)
       {
         if (channelDelegate) {
@@ -285,7 +330,36 @@ namespace flutter_inappwebview_plugin
         }
         return S_OK;
       }
-    ).Get(), nullptr);
+    ).Get(), nullptr));
+
+    failedLog(webView->add_HistoryChanged(Callback<ICoreWebView2HistoryChangedEventHandler>(
+      [this](ICoreWebView2* sender, IUnknown* args)
+      {
+        if (channelDelegate) {
+          std::optional<bool> isReload = std::nullopt;
+          if (lastNavigationAction_ && lastNavigationAction_->navigationType.has_value()) {
+            isReload = lastNavigationAction_->navigationType.value() == NavigationActionType::reload;
+          }
+          channelDelegate->onUpdateVisitedHistory(getUrl(), isReload);
+        }
+        return S_OK;
+      }
+    ).Get(), nullptr));
+
+    failedLog(webView->add_WebMessageReceived(Callback<ICoreWebView2WebMessageReceivedEventHandler>(
+      [this](ICoreWebView2* sender, ICoreWebView2WebMessageReceivedEventArgs* args)
+      {
+        wil::unique_cotaskmem_string uri;
+        args->get_Source(&uri);
+
+        wil::unique_cotaskmem_string json;
+        if (succeededOrLog(args->get_WebMessageAsJson(&json))) {
+          debugLog(json.get());
+        }
+
+        return S_OK;
+      }
+    ).Get(), nullptr));
   }
 
   void InAppWebView::registerSurfaceEventHandlers()
@@ -294,7 +368,7 @@ namespace flutter_inappwebview_plugin
       return;
     }
 
-    webViewCompositionController->add_CursorChanged(
+    failedLog(webViewCompositionController->add_CursorChanged(
       Callback<ICoreWebView2CursorChangedEventHandler>(
         [this](ICoreWebView2CompositionController* sender,
           IUnknown* args) -> HRESULT
@@ -306,19 +380,19 @@ namespace flutter_inappwebview_plugin
           }
           return S_OK;
         })
-      .Get(), nullptr);
+      .Get(), nullptr));
   }
 
   std::optional<std::string> InAppWebView::getUrl() const
   {
-    LPWSTR uri;
-    return SUCCEEDED(webView->get_Source(&uri)) ? wide_to_utf8(uri) : std::optional<std::string>{};
+    wil::unique_cotaskmem_string uri;
+    return webView && succeededOrLog(webView->get_Source(&uri)) ? wide_to_utf8(uri.get()) : std::optional<std::string>{};
   }
 
   std::optional<std::string> InAppWebView::getTitle() const
   {
-    LPWSTR title;
-    return SUCCEEDED(webView->get_DocumentTitle(&title)) ? wide_to_utf8(title) : std::optional<std::string>{};
+    wil::unique_cotaskmem_string title;
+    return webView && succeededOrLog(webView->get_DocumentTitle(&title)) ? wide_to_utf8(title.get()) : std::optional<std::string>{};
   }
 
   void InAppWebView::loadUrl(const URLRequest& urlRequest) const
@@ -341,59 +415,147 @@ namespace flutter_inappwebview_plugin
         postDataStream = SHCreateMemStream(
           reinterpret_cast<const BYTE*>(postData.data()), static_cast<UINT>(postData.length()));
       }
-      webViewEnv2->CreateWebResourceRequest(
+      if (succeededOrLog(webViewEnv2->CreateWebResourceRequest(
         url.c_str(),
         method.c_str(),
         postDataStream.get(),
         L"",
         &webResourceRequest
-      );
-      wil::com_ptr<ICoreWebView2HttpRequestHeaders> requestHeaders;
-      if (SUCCEEDED(webResourceRequest->get_Headers(&requestHeaders))) {
-        if (method.compare(L"GET") != 0) {
-          requestHeaders->SetHeader(L"Flutter-InAppWebView-Request-Method", method.c_str());
-        }
-        if (urlRequest.headers.has_value()) {
-          auto& headers = urlRequest.headers.value();
-          for (auto const& [key, val] : headers) {
-            requestHeaders->SetHeader(ansi_to_wide(key).c_str(), ansi_to_wide(val).c_str());
+      ))) {
+        wil::com_ptr<ICoreWebView2HttpRequestHeaders> requestHeaders;
+        if (SUCCEEDED(webResourceRequest->get_Headers(&requestHeaders))) {
+          if (method.compare(L"GET") != 0) {
+            requestHeaders->SetHeader(L"Flutter-InAppWebView-Request-Method", method.c_str());
+          }
+          if (urlRequest.headers.has_value()) {
+            auto& headers = urlRequest.headers.value();
+            for (auto const& [key, val] : headers) {
+              requestHeaders->SetHeader(ansi_to_wide(key).c_str(), ansi_to_wide(val).c_str());
+            }
           }
         }
+        failedLog(webView2->NavigateWithWebResourceRequest(webResourceRequest.get()));
       }
-      webView2->NavigateWithWebResourceRequest(webResourceRequest.get());
+      return;
     }
-    else {
-      webView->Navigate(url.c_str());
-    }
+    failedLog(webView->Navigate(url.c_str()));
   }
 
   void InAppWebView::reload() const
   {
-    webView->Reload();
+    if (!webView) {
+      return;
+    }
+
+    failedLog(webView->Reload());
   }
 
   void InAppWebView::goBack()
   {
+    if (!webView) {
+      return;
+    }
+
     callShouldOverrideUrlLoading_ = false;
-    webView->GoBack();
+    failedLog(webView->GoBack());
+  }
+
+  bool InAppWebView::canGoBack() const
+  {
+    BOOL canGoBack_;
+    return webView && succeededOrLog(webView->get_CanGoBack(&canGoBack_)) ? canGoBack_ : false;
   }
 
   void InAppWebView::goForward()
   {
+    if (!webView) {
+      return;
+    }
+
     callShouldOverrideUrlLoading_ = false;
-    webView->GoForward();
+    failedLog(webView->GoForward());
+  }
+
+  bool InAppWebView::canGoForward() const
+  {
+    BOOL canGoForward_;
+    return webView && succeededOrLog(webView->get_CanGoForward(&canGoForward_)) ? canGoForward_ : false;
+  }
+
+  void InAppWebView::goBackOrForward(const int& steps)
+  {
+    getCopyBackForwardList(
+      [this, steps](std::unique_ptr<WebHistory> webHistory)
+      {
+        if (webHistory && webHistory->currentIndex.has_value() && webHistory->list.has_value()) {
+          auto currentIndex = webHistory->currentIndex.value();
+          auto items = &webHistory->list.value();
+          auto nextIndex = currentIndex + steps;
+          int64_t size = items->size();
+          if (nextIndex >= 0 && nextIndex < size) {
+            auto entryId = items->at(nextIndex)->entryId;
+            std::cout << "entryId: " + std::to_string(entryId.value()) << "\n";
+            if (entryId.has_value()) {
+              auto oldCallShouldOverrideUrlLoading_ = callShouldOverrideUrlLoading_;
+              callShouldOverrideUrlLoading_ = false;
+              if (failedAndLog(webView->CallDevToolsProtocolMethod(L"Page.navigateToHistoryEntry", ansi_to_wide("{\"entryId\": " + std::to_string(entryId.value()) + "}").c_str(), Callback<ICoreWebView2CallDevToolsProtocolMethodCompletedHandler>(
+                [this](HRESULT errorCode, LPCWSTR returnObjectAsJson)
+                {
+                  failedLog(errorCode);
+                  return S_OK;
+                }
+              ).Get()))) {
+                callShouldOverrideUrlLoading_ = oldCallShouldOverrideUrlLoading_;
+              }
+            }
+          }
+        }
+      }
+    );
+  }
+
+  void InAppWebView::canGoBackOrForward(const int& steps, std::function<void(bool)> completionHandler) const
+  {
+    getCopyBackForwardList(
+      [steps, completionHandler](std::unique_ptr<WebHistory> webHistory)
+      {
+        auto canGoBackOrForward_ = false;
+        if (webHistory && webHistory->currentIndex.has_value() && webHistory->list.has_value()) {
+          auto currentIndex = webHistory->currentIndex.value();
+          auto items = &webHistory->list.value();
+          auto nextIndex = currentIndex + steps;
+          int64_t size = items->size();
+          canGoBackOrForward_ = nextIndex >= 0 && nextIndex < size;
+        }
+        completionHandler(canGoBackOrForward_);
+      }
+    );
+  }
+
+  void InAppWebView::stopLoading() const
+  {
+    if (!webView) {
+      return;
+    }
+
+    failedLog(webView->Stop());
   }
 
   void InAppWebView::getCopyBackForwardList(const std::function<void(std::unique_ptr<WebHistory>)> completionHandler) const
   {
-    webView->CallDevToolsProtocolMethod(L"Page.getNavigationHistory", L"{}", Callback<ICoreWebView2CallDevToolsProtocolMethodCompletedHandler>(
+    if (!webView) {
+      completionHandler(std::make_unique<WebHistory>(std::nullopt, std::nullopt));
+      return;
+    }
+
+    failedLog(webView->CallDevToolsProtocolMethod(L"Page.getNavigationHistory", L"{}", Callback<ICoreWebView2CallDevToolsProtocolMethodCompletedHandler>(
       [completionHandler](HRESULT errorCode, LPCWSTR returnObjectAsJson)
       {
         if (errorCode == S_OK) {
           auto historyJson = nlohmann::json::parse(wide_to_ansi(returnObjectAsJson));
 
           int64_t currentIndex = historyJson.at("currentIndex").is_number_unsigned() ? historyJson.at("currentIndex").get<int64_t>() : 0;
-          auto entries = historyJson.at("entries").is_array() ? historyJson.at("entries").get<std::vector<nlohmann::json>>() : std::vector<nlohmann::json>{};
+          std::vector<nlohmann::json> entries = historyJson.at("entries").is_array() ? historyJson.at("entries").get<std::vector<nlohmann::json>>() : std::vector<nlohmann::json>{};
 
           std::vector<std::shared_ptr<WebHistoryItem>> webHistoryItems;
           webHistoryItems.reserve(entries.size());
@@ -401,6 +563,7 @@ namespace flutter_inappwebview_plugin
           for (auto const& entry : entries) {
             int64_t offset = i - currentIndex;
             webHistoryItems.push_back(std::make_shared<WebHistoryItem>(
+              entry.at("id").is_number_integer() ? entry.at("id").get<int64_t>() : std::optional<int64_t>{},
               i,
               offset,
               entry.at("userTypedURL").is_string() ? entry.at("userTypedURL").get<std::string>() : std::optional<std::string>{},
@@ -413,26 +576,27 @@ namespace flutter_inappwebview_plugin
           completionHandler(std::make_unique<WebHistory>(currentIndex, webHistoryItems));
         }
         else {
-          debugLog(getErrorMessage(errorCode));
+          debugLog(errorCode);
+          completionHandler(std::make_unique<WebHistory>(std::nullopt, std::nullopt));
         }
 
         return S_OK;
       }
-    ).Get());
+    ).Get()));
   }
 
   void InAppWebView::evaluateJavascript(const std::string& source, std::function<void(std::string)> completionHanlder) const
   {
-    webView->ExecuteScript(ansi_to_wide(source).c_str(),
+    failedLog(webView->ExecuteScript(ansi_to_wide(source).c_str(),
       Callback<ICoreWebView2ExecuteScriptCompletedHandler>(
         [completionHanlder = std::move(completionHanlder)](HRESULT error, PCWSTR result) -> HRESULT
         {
           if (error != S_OK) {
-            debugLog(getErrorMessage(error));
+            debugLog(error);
           }
           completionHanlder(wide_to_ansi(result));
           return S_OK;
-        }).Get());
+        }).Get()));
   }
 
   // flutter_view

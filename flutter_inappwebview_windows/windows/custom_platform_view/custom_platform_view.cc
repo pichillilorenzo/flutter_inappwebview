@@ -1,3 +1,4 @@
+#include "../utils/log.h"
 #include "custom_platform_view.h"
 
 #include <flutter/event_stream_handler_functions.h>

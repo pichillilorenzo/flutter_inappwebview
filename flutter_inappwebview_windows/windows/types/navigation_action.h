@@ -8,13 +8,22 @@
 
 namespace flutter_inappwebview_plugin
 {
+  enum NavigationActionType {
+    linkActivated = 0,
+    backForward,
+    reload,
+    other
+  };
+
   class NavigationAction
   {
   public:
     const std::shared_ptr<URLRequest> request;
     const bool isForMainFrame;
+    const std::optional<bool> isRedirect;
+    const std::optional<NavigationActionType> navigationType;
 
-    NavigationAction(std::shared_ptr<URLRequest> request, const bool& isForMainFrame);
+    NavigationAction(std::shared_ptr<URLRequest> request, const bool& isForMainFrame, const std::optional<bool>& isRedirect, const std::optional<NavigationActionType>& navigationType);
     ~NavigationAction() = default;
 
     flutter::EncodableMap toEncodableMap() const;

@@ -1,6 +1,7 @@
 #include "../in_app_browser/in_app_browser.h"
 #include "../types/base_callback_result.h"
 #include "../utils/flutter.h"
+#include "../utils/log.h"
 #include "../utils/strconv.h"
 #include "in_app_webview.h"
 #include "webview_channel_delegate.h"
@@ -20,7 +21,7 @@ namespace flutter_inappwebview_plugin
     decodeResult = [](const flutter::EncodableValue* value)
       {
         if (value->IsNull()) {
-          return cancel;
+          return NavigationActionPolicy::cancel;
         }
         auto navigationPolicy = std::get<int>(*value);
         return static_cast<NavigationActionPolicy>(navigationPolicy);
@@ -56,8 +57,35 @@ namespace flutter_inappwebview_plugin
       webView->goBack();
       result->Success(true);
     }
+    else if (method_call.method_name().compare("canGoBack") == 0) {
+      result->Success(webView->canGoBack());
+    }
     else if (method_call.method_name().compare("goForward") == 0) {
       webView->goForward();
+      result->Success(true);
+    }
+    else if (method_call.method_name().compare("canGoForward") == 0) {
+      result->Success(webView->canGoForward());
+    }
+    else if (method_call.method_name().compare("goBackOrForward") == 0) {
+      auto steps = get_fl_map_value<int>(arguments, "steps");
+      webView->goBackOrForward(steps);
+      result->Success(true);
+    }
+    else if (method_call.method_name().compare("canGoBackOrForward") == 0) {
+      auto result_ = std::shared_ptr<flutter::MethodResult<flutter::EncodableValue>>(std::move(result));
+
+      auto steps = get_fl_map_value<int>(arguments, "steps");
+      webView->canGoBackOrForward(steps, [result_ = std::move(result_)](const bool& value)
+        {
+          result_->Success(value);
+        });
+    }
+    else if (method_call.method_name().compare("isLoading") == 0) {
+      result->Success(webView->isLoading());
+    }
+    else if (method_call.method_name().compare("stopLoading") == 0) {
+      webView->stopLoading();
       result->Success(true);
     }
     else if (method_call.method_name().compare("evaluateJavascript") == 0) {
@@ -168,6 +196,19 @@ namespace flutter_inappwebview_plugin
     if (webView && webView->inAppBrowser) {
       webView->inAppBrowser->didChangeTitle(title);
     }
+  }
+
+  void WebViewChannelDelegate::onUpdateVisitedHistory(const std::optional<std::string>& url, const std::optional<bool>& isReload) const
+  {
+    if (!channel) {
+      return;
+    }
+
+    auto arguments = std::make_unique<flutter::EncodableValue>(flutter::EncodableMap{
+      {"url", make_fl_value(url)},
+      {"isReload", make_fl_value(isReload)}
+      });
+    channel->InvokeMethod("onUpdateVisitedHistory", std::move(arguments));
   }
 
   WebViewChannelDelegate::~WebViewChannelDelegate()

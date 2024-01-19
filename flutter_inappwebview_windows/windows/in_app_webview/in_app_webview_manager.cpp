@@ -7,6 +7,7 @@
 #include "../in_app_webview/in_app_webview_settings.h"
 #include "../types/url_request.h"
 #include "../utils/flutter.h"
+#include "../utils/log.h"
 #include "in_app_webview_manager.h"
 
 namespace flutter_inappwebview_plugin

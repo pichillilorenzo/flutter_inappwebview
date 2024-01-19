@@ -11,13 +11,14 @@ namespace flutter_inappwebview_plugin
   class WebHistoryItem
   {
   public:
+    const std::optional<int64_t> entryId;
     const std::optional<int64_t> index;
     const std::optional<int64_t> offset;
     const std::optional<std::string> originalUrl;
     const std::optional<std::string> title;
     const std::optional<std::string> url;
 
-    WebHistoryItem(const std::optional<int64_t>& index, const std::optional<int64_t>& offset,
+    WebHistoryItem(const std::optional<int64_t>& entryId, const std::optional<int64_t>& index, const std::optional<int64_t>& offset,
       const std::optional<std::string>& originalUrl, const std::optional<std::string>& title,
       const std::optional<std::string>& url);
     WebHistoryItem(const flutter::EncodableMap& map);

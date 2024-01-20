@@ -9,6 +9,7 @@
 #include <winrt/base.h>
 
 #include "../flutter_inappwebview_windows_plugin.h"
+#include "../types/content_world.h"
 #include "../types/navigation_action.h"
 #include "../types/url_request.h"
 #include "../types/web_history.h"
@@ -87,7 +88,6 @@ namespace flutter_inappwebview_plugin
     wil::com_ptr<ICoreWebView2CompositionController> webViewCompositionController;
     wil::com_ptr<ICoreWebView2> webView;
     std::unique_ptr<WebViewChannelDelegate> channelDelegate;
-    std::map<UINT64, std::shared_ptr<NavigationAction>> navigationActions = {};
     const std::shared_ptr<InAppWebViewSettings> settings;
     InAppBrowser* inAppBrowser = nullptr;
     std::unique_ptr<UserContentController> userContentController;
@@ -148,12 +148,17 @@ namespace flutter_inappwebview_plugin
       return isLoading_;
     }
     void stopLoading() const;
-    void evaluateJavascript(const std::string& source, const std::function<void(std::string)> completionHanlder) const;
+    void evaluateJavascript(const std::string& source, const std::shared_ptr<ContentWorld> contentWorld, const std::function<void(std::string)> completionHandler) const;
     void getCopyBackForwardList(const std::function<void(std::unique_ptr<WebHistory>)> completionHandler) const;
     void addUserScript(const std::shared_ptr<UserScript> userScript) const;
     void removeUserScript(const int64_t index, const std::shared_ptr<UserScript> userScript) const;
     void removeUserScriptsByGroupName(const std::string& groupName) const;
     void removeAllUserScripts() const;
+
+    std::string pageFrameId() const
+    {
+      return pageFrameId_;
+    }
 
     static bool isSslError(const COREWEBVIEW2_WEB_ERROR_STATUS& webErrorStatus);
   private:
@@ -166,11 +171,13 @@ namespace flutter_inappwebview_plugin
     VirtualKeyState virtualKeys_;
 
     bool callShouldOverrideUrlLoading_ = true;
+    std::map<UINT64, std::shared_ptr<NavigationAction>> navigationActions_ = {};
     std::shared_ptr<NavigationAction> lastNavigationAction_;
     bool isLoading_ = false;
+    std::string pageFrameId_;
 
-    void InAppWebView::registerEventHandlers();
-    void InAppWebView::registerSurfaceEventHandlers();
+    void registerEventHandlers();
+    void registerSurfaceEventHandlers();
   };
 }
 #endif //FLUTTER_INAPPWEBVIEW_PLUGIN_IN_APP_WEBVIEW_H_

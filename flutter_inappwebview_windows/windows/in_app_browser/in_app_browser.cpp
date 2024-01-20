@@ -190,7 +190,7 @@ namespace flutter_inappwebview_plugin
   void InAppBrowser::didChangeTitle(const std::optional<std::string>& title) const
   {
     if (title.has_value()) {
-      SetWindowText(m_hWnd, ansi_to_wide(title.value()).c_str());
+      SetWindowText(m_hWnd, utf8_to_wide(title.value()).c_str());
     }
   }
 

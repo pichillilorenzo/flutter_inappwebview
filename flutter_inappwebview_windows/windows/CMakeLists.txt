@@ -64,6 +64,8 @@ list(APPEND PLUGIN_SOURCES
   "types/web_history.h"
   "types/web_history_item.cpp"
   "types/web_history_item.h"
+  "types/content_world.cpp"
+  "types/content_world.h"
   "types/user_script.cpp"
   "types/user_script.h"
   "types/plugin_script.cpp"

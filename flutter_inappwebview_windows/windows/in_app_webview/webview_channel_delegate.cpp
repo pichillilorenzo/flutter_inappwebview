@@ -1,5 +1,6 @@
 #include "../in_app_browser/in_app_browser.h"
 #include "../types/base_callback_result.h"
+#include "../types/content_world.h"
 #include "../utils/flutter.h"
 #include "../utils/log.h"
 #include "../utils/strconv.h"
@@ -112,7 +113,9 @@ namespace flutter_inappwebview_plugin
       auto result_ = std::shared_ptr<flutter::MethodResult<flutter::EncodableValue>>(std::move(result));
 
       auto source = get_fl_map_value<std::string>(arguments, "source");
-      webView->evaluateJavascript(source, [result_ = std::move(result_)](const std::string& value)
+      auto contentWorldMap = get_optional_fl_map_value<flutter::EncodableMap>(arguments, "contentWorld");
+      std::shared_ptr<ContentWorld> contentWorld = contentWorldMap.has_value() ? std::make_shared<ContentWorld>(contentWorldMap.value()) : ContentWorld::page();
+      webView->evaluateJavascript(source, std::move(contentWorld), [result_ = std::move(result_)](const std::string& value)
         {
           result_->Success(value);
         });
@@ -130,7 +133,7 @@ namespace flutter_inappwebview_plugin
       result->Success(true);
     }
     else if (string_equals(methodName, "removeUserScript")) {
-      auto index = get_fl_map_value<int64_t>(arguments, "index");
+      auto index = get_fl_map_value<int>(arguments, "index");
       auto userScript = std::make_unique<UserScript>(get_fl_map_value<flutter::EncodableMap>(arguments, "userScript"));
       webView->removeUserScript(index, std::move(userScript));
       result->Success(true);
@@ -262,6 +265,19 @@ namespace flutter_inappwebview_plugin
       {"args", args}
       });
     channel->InvokeMethod("onCallJsHandler", std::move(arguments), std::move(callback));
+  }
+
+  void WebViewChannelDelegate::onConsoleMessage(const std::string& message, const int64_t& messageLevel) const
+  {
+    if (!channel) {
+      return;
+    }
+
+    auto arguments = std::make_unique<flutter::EncodableValue>(flutter::EncodableMap{
+      {"message", message},
+      {"messageLevel", messageLevel}
+      });
+    channel->InvokeMethod("onConsoleMessage", std::move(arguments));
   }
 
   WebViewChannelDelegate::~WebViewChannelDelegate()

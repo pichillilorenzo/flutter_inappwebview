@@ -133,10 +133,39 @@ namespace flutter_inappwebview_plugin
       wil::com_ptr<ICoreWebView2Settings2> webView2Settings2;
       if (succeededOrLog(webView2Settings->QueryInterface(IID_PPV_ARGS(&webView2Settings2)))) {
         if (!settings->userAgent.empty()) {
-          webView2Settings2->put_UserAgent(ansi_to_wide(settings->userAgent).c_str());
+          webView2Settings2->put_UserAgent(utf8_to_wide(settings->userAgent).c_str());
         }
       }
     }
+
+    // required to make Runtime events work
+    failedLog(webView->CallDevToolsProtocolMethod(L"Runtime.enable", L"{}", Callback<ICoreWebView2CallDevToolsProtocolMethodCompletedHandler>(
+      [this](HRESULT errorCode, LPCWSTR returnObjectAsJson)
+      {
+        failedLog(errorCode);
+        return S_OK;
+      }
+    ).Get()));
+
+    // required to make Page events work and to add User Scripts
+    failedLog(webView->CallDevToolsProtocolMethod(L"Page.enable", L"{}", Callback<ICoreWebView2CallDevToolsProtocolMethodCompletedHandler>(
+      [this](HRESULT errorCode, LPCWSTR returnObjectAsJson)
+      {
+        failedLog(errorCode);
+        return S_OK;
+      }
+    ).Get()));
+
+    failedLog(webView->CallDevToolsProtocolMethod(L"Page.getFrameTree", L"{}", Callback<ICoreWebView2CallDevToolsProtocolMethodCompletedHandler>(
+      [this](HRESULT errorCode, LPCWSTR returnObjectAsJson)
+      {
+        if (succeededOrLog(errorCode)) {
+          auto treeJson = nlohmann::json::parse(wide_to_utf8(returnObjectAsJson));
+          pageFrameId_ = treeJson["frameTree"]["frame"]["id"].get<std::string>();
+        }
+        return S_OK;
+      }
+    ).Get()));
 
     userContentController->addPluginScript(std::move(createJavaScriptBridgePluginScript()));
 
@@ -241,7 +270,7 @@ namespace flutter_inappwebview_plugin
 
           UINT64 navigationId;
           if (SUCCEEDED(args->get_NavigationId(&navigationId))) {
-            navigationActions.insert({ navigationId, navigationAction });
+            navigationActions_.insert({ navigationId, navigationAction });
           }
 
           if (callShouldOverrideUrlLoading_ && requestMethod == nullptr) {
@@ -287,17 +316,14 @@ namespace flutter_inappwebview_plugin
         {
           isLoading_ = false;
 
-          if (userContentController) {
-            evaluateJavascript(userContentController->generateWrappedCodeForDocumentEnd(), nullptr);
-          }
-          evaluateJavascript(PLATFORM_READY_JS_SOURCE, nullptr);
+          evaluateJavascript(PLATFORM_READY_JS_SOURCE, ContentWorld::page(), nullptr);
 
           std::shared_ptr<NavigationAction> navigationAction;
           UINT64 navigationId;
           if (SUCCEEDED(args->get_NavigationId(&navigationId))) {
-            navigationAction = map_at_or_null(navigationActions, navigationId);
+            navigationAction = map_at_or_null(navigationActions_, navigationId);
             if (navigationAction) {
-              navigationActions.erase(navigationId);
+              navigationActions_.erase(navigationId);
             }
           }
 
@@ -338,7 +364,7 @@ namespace flutter_inappwebview_plugin
         if (channelDelegate) {
           wil::unique_cotaskmem_string title;
           sender->get_DocumentTitle(&title);
-          channelDelegate->onTitleChanged(title.is_valid() ? wide_to_ansi(title.get()) : std::optional<std::string>{});
+          channelDelegate->onTitleChanged(title.is_valid() ? wide_to_utf8(title.get()) : std::optional<std::string>{});
         }
         return S_OK;
       }
@@ -379,7 +405,7 @@ namespace flutter_inappwebview_plugin
 
         wil::unique_cotaskmem_string json;
         if (succeededOrLog(args->get_WebMessageAsJson(&json))) {
-          auto message = nlohmann::json::parse(wide_to_ansi(json.get()));
+          auto message = nlohmann::json::parse(wide_to_utf8(json.get()));
 
           if (message.is_object() && message.contains("name") && message.at("name").is_string() && message.contains("body") && message.at("body").is_object()) {
             auto name = message.at("name").get<std::string>();
@@ -401,7 +427,7 @@ namespace flutter_inappwebview_plugin
                   evaluateJavascript("if (window." + JAVASCRIPT_BRIDGE_NAME + "[" + std::to_string(callHandlerID) + "] != null) { \
                       window." + JAVASCRIPT_BRIDGE_NAME + "[" + std::to_string(callHandlerID) + "].resolve(" + json + "); \
                       delete window." + JAVASCRIPT_BRIDGE_NAME + "[" + std::to_string(callHandlerID) + "]; \
-                    }", nullptr);
+                    }", ContentWorld::page(), nullptr);
                 };
               callback->error = [this, callHandlerID](const std::string& error_code, const std::string& error_message, const flutter::EncodableValue* error_details)
                 {
@@ -411,7 +437,7 @@ namespace flutter_inappwebview_plugin
                   evaluateJavascript("if (window." + JAVASCRIPT_BRIDGE_NAME + "[" + std::to_string(callHandlerID) + "] != null) { \
                       window." + JAVASCRIPT_BRIDGE_NAME + "[" + std::to_string(callHandlerID) + "].reject(new Error('" + replace_all_copy(errorMessage, "\'", "\\'") + "')); \
                       delete window." + JAVASCRIPT_BRIDGE_NAME + "[" + std::to_string(callHandlerID) + "]; \
-                    }", nullptr);
+                    }", ContentWorld::page(), nullptr);
                 };
               channelDelegate->onCallJsHandler(handlerName, handlerArgs, std::move(callback));
             }
@@ -421,6 +447,55 @@ namespace flutter_inappwebview_plugin
         return S_OK;
       }
     ).Get(), nullptr));
+
+    wil::com_ptr<ICoreWebView2DevToolsProtocolEventReceiver> consoleMessageReceiver;
+    if (succeededOrLog(webView->GetDevToolsProtocolEventReceiver(L"Runtime.consoleAPICalled", &consoleMessageReceiver))) {
+      failedLog(consoleMessageReceiver->add_DevToolsProtocolEventReceived(
+        Callback<ICoreWebView2DevToolsProtocolEventReceivedEventHandler>(
+          [this](
+            ICoreWebView2* sender,
+            ICoreWebView2DevToolsProtocolEventReceivedEventArgs* args) -> HRESULT
+          {
+
+            if (!channelDelegate) {
+              return S_OK;
+            }
+
+            wil::unique_cotaskmem_string json;
+            if (succeededOrLog(args->get_ParameterObjectAsJson(&json))) {
+              auto consoleMessageJson = nlohmann::json::parse(wide_to_utf8(json.get()));
+
+              auto level = consoleMessageJson.at("type").get<std::string>();
+              int64_t messageLevel = 1;
+              if (string_equals(level, "log")) {
+                messageLevel = 1;
+              }
+              else if (string_equals(level, "debug")) {
+                messageLevel = 0;
+              }
+              else if (string_equals(level, "error")) {
+                messageLevel = 3;
+              }
+              else if (string_equals(level, "info")) {
+                messageLevel = 1;
+              }
+              else if (string_equals(level, "warn")) {
+                messageLevel = 2;
+              }
+
+              auto consoleArgs = consoleMessageJson.at("args").get<std::vector<nlohmann::json>>();
+              auto message = join(functional_map(consoleArgs, [](const nlohmann::json& json) { return json.contains("value") ? json.at("value").dump() : (json.contains("description") ? json.at("description").dump() : json.dump()); }), std::string{ " " });
+              channelDelegate->onConsoleMessage(message, messageLevel);
+            }
+
+            return S_OK;
+          })
+        .Get(), nullptr));
+    }
+
+    if (userContentController) {
+      userContentController->registerEventHandlers();
+    }
   }
 
   void InAppWebView::registerSurfaceEventHandlers()
@@ -462,13 +537,13 @@ namespace flutter_inappwebview_plugin
       return;
     }
 
-    std::wstring url = ansi_to_wide(urlRequest->url.value());
+    std::wstring url = utf8_to_wide(urlRequest->url.value());
 
     wil::com_ptr<ICoreWebView2Environment2> webViewEnv2;
     wil::com_ptr<ICoreWebView2_2> webView2;
     if (SUCCEEDED(webViewEnv->QueryInterface(IID_PPV_ARGS(&webViewEnv2))) && SUCCEEDED(webView->QueryInterface(IID_PPV_ARGS(&webView2)))) {
       wil::com_ptr<ICoreWebView2WebResourceRequest> webResourceRequest;
-      std::wstring method = urlRequest->method.has_value() ? ansi_to_wide(urlRequest->method.value()) : L"GET";
+      std::wstring method = urlRequest->method.has_value() ? utf8_to_wide(urlRequest->method.value()) : L"GET";
 
       wil::com_ptr<IStream> postDataStream = nullptr;
       if (urlRequest->body.has_value()) {
@@ -491,7 +566,7 @@ namespace flutter_inappwebview_plugin
           if (urlRequest->headers.has_value()) {
             auto& headers = urlRequest->headers.value();
             for (auto const& [key, val] : headers) {
-              requestHeaders->SetHeader(ansi_to_wide(key).c_str(), ansi_to_wide(val).c_str());
+              requestHeaders->SetHeader(utf8_to_wide(key).c_str(), utf8_to_wide(val).c_str());
             }
           }
         }
@@ -530,7 +605,7 @@ namespace flutter_inappwebview_plugin
       return;
     }
 
-    failedLog(webView->NavigateToString(ansi_to_wide(data).c_str()));
+    failedLog(webView->NavigateToString(utf8_to_wide(data).c_str()));
   }
 
   void InAppWebView::reload() const
@@ -590,7 +665,7 @@ namespace flutter_inappwebview_plugin
             if (entryId.has_value()) {
               auto oldCallShouldOverrideUrlLoading_ = callShouldOverrideUrlLoading_;
               callShouldOverrideUrlLoading_ = false;
-              if (failedAndLog(webView->CallDevToolsProtocolMethod(L"Page.navigateToHistoryEntry", ansi_to_wide("{\"entryId\": " + std::to_string(entryId.value()) + "}").c_str(), Callback<ICoreWebView2CallDevToolsProtocolMethodCompletedHandler>(
+              if (failedAndLog(webView->CallDevToolsProtocolMethod(L"Page.navigateToHistoryEntry", utf8_to_wide("{\"entryId\": " + std::to_string(entryId.value()) + "}").c_str(), Callback<ICoreWebView2CallDevToolsProtocolMethodCompletedHandler>(
                 [this](HRESULT errorCode, LPCWSTR returnObjectAsJson)
                 {
                   failedLog(errorCode);
@@ -653,7 +728,7 @@ namespace flutter_inappwebview_plugin
         }
 
         if (errorCode == S_OK) {
-          auto historyJson = nlohmann::json::parse(wide_to_ansi(returnObjectAsJson));
+          auto historyJson = nlohmann::json::parse(wide_to_utf8(returnObjectAsJson));
 
           int64_t currentIndex = historyJson.at("currentIndex").is_number_unsigned() ? historyJson.at("currentIndex").get<int64_t>() : 0;
           std::vector<nlohmann::json> entries = historyJson.at("entries").is_array() ? historyJson.at("entries").get<std::vector<nlohmann::json>>() : std::vector<nlohmann::json>{};
@@ -686,22 +761,44 @@ namespace flutter_inappwebview_plugin
     ).Get()));
   }
 
-  void InAppWebView::evaluateJavascript(const std::string& source, const std::function<void(std::string)> completionHanlder) const
+  void InAppWebView::evaluateJavascript(const std::string& source, const std::shared_ptr<ContentWorld> contentWorld, const std::function<void(std::string)> completionHandler) const
   {
-    failedLog(webView->ExecuteScript(ansi_to_wide(source).c_str(),
-      Callback<ICoreWebView2ExecuteScriptCompletedHandler>(
-        [completionHanlder = std::move(completionHanlder)](HRESULT error, PCWSTR result) -> HRESULT
-        {
-          if (error != S_OK) {
-            debugLog(error);
-          }
+    if (!webView || !userContentController) {
+      if (completionHandler) {
+        completionHandler("null");
+      }
+      return;
+    }
 
-          if (completionHanlder) {
-            completionHanlder(wide_to_ansi(result));
-          }
+    userContentController->createContentWorld(contentWorld,
+      [=](const int& contextId)
+      {
+        nlohmann::json parameters = {
+          {"expression", source}
+        };
 
-          return S_OK;
-        }).Get()));
+        if (contextId >= 0) {
+          parameters["contextId"] = contextId;
+        }
+
+        auto hr = webView->CallDevToolsProtocolMethod(L"Runtime.evaluate", utf8_to_wide(parameters.dump()).c_str(), Callback<ICoreWebView2CallDevToolsProtocolMethodCompletedHandler>(
+          [this, completionHandler](HRESULT errorCode, LPCWSTR returnObjectAsJson)
+          {
+            std::string result = "null";
+            if (succeededOrLog(errorCode)) {
+              result = wide_to_utf8(returnObjectAsJson);
+            }
+            if (completionHandler) {
+              completionHandler(result);
+            }
+            return S_OK;
+          }
+        ).Get());
+
+        if (failedAndLog(hr) && completionHandler) {
+          completionHandler("null");
+        }
+      });
   }
 
   void InAppWebView::addUserScript(const std::shared_ptr<UserScript> userScript) const
@@ -964,10 +1061,10 @@ namespace flutter_inappwebview_plugin
   return handled; \
 })(" + std::to_string(horizontal) + ", " + std::to_string(offset) + ", " + std::to_string(lastCursorPos_.x) + ", " + std::to_string(lastCursorPos_.y) + ");";
 
-    webView->ExecuteScript(ansi_to_wide(workaroundScrollJS).c_str(), Callback<ICoreWebView2ExecuteScriptCompletedHandler>(
+    webView->ExecuteScript(utf8_to_wide(workaroundScrollJS).c_str(), Callback<ICoreWebView2ExecuteScriptCompletedHandler>(
       [this, horizontal, offset](HRESULT error, PCWSTR result) -> HRESULT
       {
-        if (webViewCompositionController && (error != S_OK || wide_to_ansi(result).compare("false") == 0)) {
+        if (webViewCompositionController && (error != S_OK || wide_to_utf8(result).compare("false") == 0)) {
           // try to use native mouse wheel handler
 
           POINT point;
@@ -1057,7 +1154,7 @@ namespace flutter_inappwebview_plugin
     if (webViewController) {
       webViewController->Close();
     }
-    navigationActions.clear();
+    navigationActions_.clear();
     inAppBrowser = nullptr;
     plugin = nullptr;
   }

@@ -1,8 +1,10 @@
 #ifndef FLUTTER_INAPPWEBVIEW_PLUGIN_UTIL_STRING_H_
 #define FLUTTER_INAPPWEBVIEW_PLUGIN_UTIL_STRING_H_
 
+#include <numeric>
 #include <optional>
 #include <string>
+#include <vector>
 
 #include "strconv.h"
 
@@ -42,12 +44,12 @@ namespace flutter_inappwebview_plugin
 
   static inline bool string_equals(const std::string& s1, const std::wstring& s2)
   {
-    return string_equals(s1, wide_to_ansi(s2));
+    return string_equals(s1, wide_to_utf8(s2));
   }
 
   static inline bool string_equals(const std::wstring& s1, const std::string& s2)
   {
-    return string_equals(wide_to_ansi(s1), s2);
+    return string_equals(wide_to_utf8(s1), s2);
   }
 
   template <typename T>
@@ -106,6 +108,33 @@ namespace flutter_inappwebview_plugin
     newString += source.substr(lastPos);
 
     return newString;
+  }
+
+  template <typename T>
+  static inline std::basic_string<T> join(const std::vector<std::basic_string<T>>& vec, const std::basic_string<T>& delim)
+  {
+    return vec.empty() ? std::basic_string<T>{ "" } : /* leave early if there are no items in the list */
+      std::accumulate( /* otherwise, accumulate */
+        ++vec.begin(), vec.end(), /* the range 2nd to after-last */
+        *vec.begin(), /* and start accumulating with the first item */
+        [delim](auto& a, auto& b) { return a + delim + b; });
+  }
+
+  template <typename T>
+  static inline std::vector<std::basic_string<T>> split(const std::basic_string<T>& s, std::basic_string<T> delimiter)
+  {
+    size_t pos_start = 0, pos_end, delim_len = delimiter.length();
+    std::basic_string<T> token;
+    std::vector<std::basic_string<T>> res;
+
+    while ((pos_end = s.find(delimiter, pos_start)) != std::basic_string<T>::npos) {
+      token = s.substr(pos_start, pos_end - pos_start);
+      pos_start = pos_end + delim_len;
+      res.push_back(token);
+    }
+
+    res.push_back(s.substr(pos_start));
+    return res;
   }
 }
 

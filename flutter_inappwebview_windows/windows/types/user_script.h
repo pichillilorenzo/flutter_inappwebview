@@ -7,6 +7,7 @@
 #include <vector>
 
 #include "../utils/flutter.h"
+#include "content_world.h"
 
 namespace flutter_inappwebview_plugin
 {
@@ -18,17 +19,19 @@ namespace flutter_inappwebview_plugin
   class UserScript
   {
   public:
-    std::wstring id;
+    std::string id;
     const std::optional<std::string> groupName;
     const std::string source;
     const UserScriptInjectionTime injectionTime;
     const std::vector<std::string> allowedOriginRules;
+    const std::shared_ptr<ContentWorld> contentWorld;
 
     UserScript(
       const std::optional<std::string>& groupName,
       const std::string& source,
       const UserScriptInjectionTime& injectionTime,
-      const std::vector<std::string>& allowedOriginRules
+      const std::vector<std::string>& allowedOriginRules,
+      std::shared_ptr<ContentWorld> contentWorld
     );
     UserScript(const flutter::EncodableMap& map);
     ~UserScript();

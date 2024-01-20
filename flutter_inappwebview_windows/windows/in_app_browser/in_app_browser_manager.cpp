@@ -32,7 +32,7 @@ namespace flutter_inappwebview_plugin
       auto url = get_fl_map_value<std::string>(*arguments, "url");
 
       int status = static_cast<int>(reinterpret_cast<INT_PTR>(
-        ShellExecute(nullptr, TEXT("open"), ansi_to_wide(url).c_str(),
+        ShellExecute(nullptr, TEXT("open"), utf8_to_wide(url).c_str(),
           nullptr, nullptr, SW_SHOWNORMAL)));
 
       // Anything >32 indicates success.

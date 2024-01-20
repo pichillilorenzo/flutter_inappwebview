@@ -50,6 +50,7 @@ namespace flutter_inappwebview_plugin
     void onTitleChanged(const std::optional<std::string>& title) const;
     void onUpdateVisitedHistory(const std::optional<std::string>& url, const std::optional<bool>& isReload) const;
     void onCallJsHandler(const std::string& handlerName, const std::string& args, std::unique_ptr<CallJsHandlerCallback> callback) const;
+    void onConsoleMessage(const std::string& message, const int64_t& messageLevel) const;
   };
 }
 

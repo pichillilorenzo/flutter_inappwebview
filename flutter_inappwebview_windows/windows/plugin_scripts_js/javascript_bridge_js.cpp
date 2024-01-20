@@ -11,7 +11,9 @@ namespace flutter_inappwebview_plugin
       JAVASCRIPT_BRIDGE_JS_PLUGIN_SCRIPT_GROUP_NAME,
       JAVASCRIPT_BRIDGE_JS_SOURCE,
       UserScriptInjectionTime::atDocumentStart,
-      allowedOriginRules
+      allowedOriginRules,
+      nullptr,
+      true
     );
   }
 }

@@ -13,9 +13,21 @@ namespace flutter_inappwebview_plugin
       const std::optional<std::string>& groupName,
       const std::string& source,
       const UserScriptInjectionTime& injectionTime,
-      const std::vector<std::string>& allowedOriginRules
+      const std::vector<std::string>& allowedOriginRules,
+      std::shared_ptr<ContentWorld> contentWorld,
+      const bool& requiredInAllContentWorlds
     );
     ~PluginScript();
+
+    bool isRequiredInAllContentWorlds() const
+    {
+      return requiredInAllContentWorlds_;
+    }
+
+    std::shared_ptr<PluginScript> copyAndSet(const std::shared_ptr<ContentWorld> cw) const;
+
+  private:
+    bool requiredInAllContentWorlds_;
   };
 }
 #endif //FLUTTER_INAPPWEBVIEW_PLUGIN_PLUGIN_SCRIPT_H_

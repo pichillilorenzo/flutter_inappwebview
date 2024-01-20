@@ -1,3 +1,4 @@
+#include <nlohmann/json.hpp>
 #include <wil/wrl.h>
 
 #include "../utils/log.h"
@@ -14,6 +15,67 @@ namespace flutter_inappwebview_plugin
     : webView_(webView)
   {}
 
+  void UserContentController::registerEventHandlers()
+  {
+    if (!webView_ || !(webView_->webView)) {
+      return;
+    }
+
+    wil::com_ptr<ICoreWebView2DevToolsProtocolEventReceiver> executionContextCreated;
+    if (succeededOrLog(webView_->webView->GetDevToolsProtocolEventReceiver(L"Runtime.executionContextCreated", &executionContextCreated))) {
+      auto hr = executionContextCreated->add_DevToolsProtocolEventReceived(
+        Callback<ICoreWebView2DevToolsProtocolEventReceivedEventHandler>(
+          [this](
+            ICoreWebView2* sender,
+            ICoreWebView2DevToolsProtocolEventReceivedEventArgs* args) -> HRESULT
+          {
+            wil::unique_cotaskmem_string json;
+            if (succeededOrLog(args->get_ParameterObjectAsJson(&json))) {
+              nlohmann::json context = nlohmann::json::parse(wide_to_utf8(json.get()))["context"];
+              auto id = context["id"].get<int>();
+              auto name = context["name"].get<std::string>();
+              nlohmann::json auxData = context["auxData"];
+              auto isDefault = auxData["isDefault"].get<bool>();
+              auto frameId = auxData["frameId"].get<std::string>();
+              if (string_equals(webView_->pageFrameId(), frameId)) {
+                if (isDefault) {
+                  contentWorlds_.insert_or_assign(ContentWorld::page()->name, id);
+                }
+                else {
+                  contentWorlds_.insert_or_assign(name, id);
+                  addPluginScriptsIfRequired(std::make_shared<ContentWorld>(name));
+                }
+              }
+            }
+
+            return S_OK;
+          })
+        .Get(), nullptr);
+
+      failedLog(hr);
+    }
+
+    /*
+    wil::com_ptr<ICoreWebView2DevToolsProtocolEventReceiver> executionContextDestroyed;
+    if (succeededOrLog(webView_->webView->GetDevToolsProtocolEventReceiver(L"Runtime.executionContextDestroyed ", &executionContextDestroyed))) {
+      failedLog(executionContextDestroyed->add_DevToolsProtocolEventReceived(
+        Callback<ICoreWebView2DevToolsProtocolEventReceivedEventHandler>(
+          [this](
+            ICoreWebView2* sender,
+            ICoreWebView2DevToolsProtocolEventReceivedEventArgs* args) -> HRESULT
+          {
+            wil::unique_cotaskmem_string json;
+            if (succeededOrLog(args->get_ParameterObjectAsJson(&json))) {
+              debugLog("executionContextDestroyed: " + wide_to_utf8(json.get()));
+            }
+
+            return S_OK;
+          })
+        .Get(), nullptr));
+    }
+    */
+  }
+
   std::vector<std::shared_ptr<UserScript>> UserContentController::getUserOnlyScriptsAt(const UserScriptInjectionTime& injectionTime) const
   {
     return userOnlyScripts_.at(injectionTime);
@@ -25,18 +87,8 @@ namespace flutter_inappwebview_plugin
       return;
     }
 
-    if (userScript->injectionTime == UserScriptInjectionTime::atDocumentStart && webView_) {
-      failedLog(webView_->webView->AddScriptToExecuteOnDocumentCreated(ansi_to_wide(userScript->source).c_str(),
-        Callback<ICoreWebView2AddScriptToExecuteOnDocumentCreatedCompletedHandler>(
-          [userScript](HRESULT error, PCWSTR id) -> HRESULT
-          {
-            if (succeededOrLog(error)) {
-              userScript->id = id;
-            }
-            return S_OK;
-          }).Get()));
-    }
-
+    addPluginScriptsIfRequired(userScript->contentWorld);
+    addScriptToWebView(userScript, nullptr);
     userOnlyScripts_.at(userScript->injectionTime).push_back(std::move(userScript));
   }
 
@@ -54,7 +106,7 @@ namespace flutter_inappwebview_plugin
     }
 
     if (webView_) {
-      failedLog(webView_->webView->RemoveScriptToExecuteOnDocumentCreated(userScript->id.c_str()));
+      removeScriptFromWebView(userScript, nullptr);
     }
 
     vector_remove_erase(userOnlyScripts_.at(userScript->injectionTime), std::move(userScript));
@@ -70,9 +122,7 @@ namespace flutter_inappwebview_plugin
 
     auto& userScript = vec.at(index);
     if (userScript) {
-      if (webView_) {
-        failedLog(webView_->webView->RemoveScriptToExecuteOnDocumentCreated(userScript->id.c_str()));
-      }
+      removeScriptFromWebView(userScript, nullptr);
       vec.erase(vec.begin() + index);
     }
   }
@@ -84,10 +134,10 @@ namespace flutter_inappwebview_plugin
 
     if (webView_) {
       for (auto& userScript : userScriptsAtStart) {
-        failedLog(webView_->webView->RemoveScriptToExecuteOnDocumentCreated(userScript->id.c_str()));
+        removeScriptFromWebView(userScript, nullptr);
       }
       for (auto& userScript : userScriptsAtEnd) {
-        failedLog(webView_->webView->RemoveScriptToExecuteOnDocumentCreated(userScript->id.c_str()));
+        removeScriptFromWebView(userScript, nullptr);
       }
     }
 
@@ -139,18 +189,7 @@ namespace flutter_inappwebview_plugin
       return;
     }
 
-    if (pluginScript->injectionTime == UserScriptInjectionTime::atDocumentStart && webView_) {
-      failedLog(webView_->webView->AddScriptToExecuteOnDocumentCreated(ansi_to_wide(pluginScript->source).c_str(),
-        Callback<ICoreWebView2AddScriptToExecuteOnDocumentCreatedCompletedHandler>(
-          [pluginScript](HRESULT error, PCWSTR id) -> HRESULT
-          {
-            if (succeededOrLog(error)) {
-              pluginScript->id = id;
-            }
-            return S_OK;
-          }).Get()));
-    }
-
+    addScriptToWebView(pluginScript, nullptr);
     pluginScripts_.at(pluginScript->injectionTime).push_back(std::move(pluginScript));
   }
 
@@ -168,7 +207,7 @@ namespace flutter_inappwebview_plugin
     }
 
     if (webView_) {
-      failedLog(webView_->webView->RemoveScriptToExecuteOnDocumentCreated(pluginScript->id.c_str()));
+      removeScriptFromWebView(pluginScript, nullptr);
     }
 
     vector_remove_erase(pluginScripts_.at(pluginScript->injectionTime), std::move(pluginScript));
@@ -181,10 +220,10 @@ namespace flutter_inappwebview_plugin
 
     if (webView_) {
       for (auto& pluginScript : pluginScriptsAtStart) {
-        failedLog(webView_->webView->RemoveScriptToExecuteOnDocumentCreated(pluginScript->id.c_str()));
+        removeScriptFromWebView(pluginScript, nullptr);
       }
       for (auto& pluginScript : pluginScriptsAtEnd) {
-        failedLog(webView_->webView->RemoveScriptToExecuteOnDocumentCreated(pluginScript->id.c_str()));
+        removeScriptFromWebView(pluginScript, nullptr);
       }
     }
 
@@ -198,7 +237,18 @@ namespace flutter_inappwebview_plugin
       return false;
     }
 
-    return vector_contains(pluginScripts_.at(pluginScript->injectionTime), std::move(pluginScript));
+    auto injectionTime = pluginScript->injectionTime;
+    return vector_contains(pluginScripts_.at(injectionTime), std::move(pluginScript));
+  }
+
+
+  bool UserContentController::containsPluginScript(std::shared_ptr<PluginScript> pluginScript, const std::shared_ptr<ContentWorld> contentWorld) const
+  {
+    if (!pluginScript || !map_contains(pluginScriptsInContentWorlds_, contentWorld->name)) {
+      return false;
+    }
+
+    return vector_contains(pluginScriptsInContentWorlds_.at(contentWorld->name), std::move(pluginScript));
   }
 
   bool UserContentController::containsPluginScriptByGroupName(const std::string& groupName) const
@@ -225,31 +275,150 @@ namespace flutter_inappwebview_plugin
     }
   }
 
-  std::string UserContentController::generatePluginScriptsCodeAt(const UserScriptInjectionTime& injectionTime) const
+
+  std::vector<std::shared_ptr<PluginScript>> UserContentController::getPluginScriptsRequiredInAllContentWorlds() const
   {
-    std::string code;
-    std::vector<std::shared_ptr<PluginScript>> pluginScripts = pluginScripts_.at(injectionTime);
-    for (auto& pluginScript : pluginScripts) {
-      code += ";" + pluginScript->source;
+    std::vector<std::shared_ptr<PluginScript>> res;
+
+    std::vector<std::shared_ptr<PluginScript>> pluginScriptsAtStart = pluginScripts_.at(UserScriptInjectionTime::atDocumentStart);
+    std::vector<std::shared_ptr<PluginScript>> pluginScriptsAtEnd = pluginScripts_.at(UserScriptInjectionTime::atDocumentEnd);
+
+    for (auto& pluginScript : pluginScriptsAtStart) {
+      if (!pluginScript->contentWorld && pluginScript->isRequiredInAllContentWorlds()) {
+        res.push_back(pluginScript);
+      }
     }
-    return code;
+
+    for (auto& pluginScript : pluginScriptsAtEnd) {
+      if (!pluginScript->contentWorld && pluginScript->isRequiredInAllContentWorlds()) {
+        res.push_back(pluginScript);
+      }
+    }
+
+    return res;
   }
 
-  std::string UserContentController::generateUserOnlyScriptsCodeAt(const UserScriptInjectionTime& injectionTime) const
+  void UserContentController::createContentWorld(const std::shared_ptr<ContentWorld> contentWorld, const std::function<void(int)> completionHandler)
   {
-    std::string code;
-    std::vector<std::shared_ptr<UserScript>> userScripts = userOnlyScripts_.at(injectionTime);
-    for (auto& userScript : userScripts) {
-      code += ";" + userScript->source;
+    if (!webView_ || !(webView_->webView) || ContentWorld::isPage(contentWorld)) {
+      if (completionHandler) {
+        completionHandler(-1);
+      }
+      return;
     }
-    return code;
+
+    auto& worldName = contentWorld->name;
+    if (!map_contains(contentWorlds_, worldName)) {
+      nlohmann::json parameters = {
+        {"frameId", webView_->pageFrameId()},
+        {"worldName", worldName}
+      };
+      auto hr = webView_->webView->CallDevToolsProtocolMethod(L"Page.createIsolatedWorld", utf8_to_wide(parameters.dump()).c_str(), Callback<ICoreWebView2CallDevToolsProtocolMethodCompletedHandler>(
+        [this, completionHandler, worldName](HRESULT errorCode, LPCWSTR returnObjectAsJson)
+        {
+          if (succeededOrLog(errorCode) && completionHandler) {
+            auto id = nlohmann::json::parse(wide_to_utf8(returnObjectAsJson))["executionContextId"].get<int>();
+            addPluginScriptsIfRequired(std::make_shared<ContentWorld>(worldName));
+            completionHandler(id);
+          }
+          return S_OK;
+        }
+      ).Get());
+      if (failedAndLog(hr) && completionHandler) {
+        completionHandler(-1);
+      }
+    }
+    else if (completionHandler) {
+      completionHandler(contentWorlds_.at(worldName));
+    }
   }
 
-  std::string UserContentController::generateWrappedCodeForDocumentEnd() const
+  void UserContentController::addScriptToWebView(std::shared_ptr<UserScript> userScript, const std::function<void(std::string)> completionHandler) const
   {
-    std::string code = generatePluginScriptsCodeAt(UserScriptInjectionTime::atDocumentEnd);
-    code += generateUserOnlyScriptsCodeAt(UserScriptInjectionTime::atDocumentEnd);
-    return replace_all_copy(USER_SCRIPTS_AT_DOCUMENT_END_WRAPPER_JS_SOURCE, VAR_PLACEHOLDER_VALUE, code);
+    if (!webView_ || !(webView_->webView)) {
+      if (completionHandler) {
+        completionHandler(userScript->id);
+      }
+    }
+
+    std::string source = userScript->source;
+    if (userScript->injectionTime == UserScriptInjectionTime::atDocumentEnd) {
+      source = replace_all_copy(USER_SCRIPTS_AT_DOCUMENT_END_WRAPPER_JS_SOURCE, VAR_PLACEHOLDER_VALUE, source);
+      std::ostringstream address;
+      address << std::addressof(userScript);
+      replace_all(source, VAR_PLACEHOLDER_MEMORY_ADDRESS_VALUE, address.str());
+    }
+
+    nlohmann::json parameters = {
+      {"source", source}
+    };
+
+    if (userScript->contentWorld && !ContentWorld::isPage(userScript->contentWorld)) {
+      parameters["worldName"] = userScript->contentWorld->name;
+    }
+
+    auto hr = webView_->webView->CallDevToolsProtocolMethod(L"Page.addScriptToEvaluateOnNewDocument", utf8_to_wide(parameters.dump()).c_str(), Callback<ICoreWebView2CallDevToolsProtocolMethodCompletedHandler>(
+      [userScript, completionHandler](HRESULT errorCode, LPCWSTR returnObjectAsJson)
+      {
+        if (succeededOrLog(errorCode)) {
+          nlohmann::json json = nlohmann::json::parse(wide_to_utf8(returnObjectAsJson));
+          userScript->id = json["identifier"].get<std::string>();
+        }
+        if (completionHandler) {
+          completionHandler(userScript->id);
+        }
+        return S_OK;
+      }
+    ).Get());
+
+    if (failedAndLog(hr) && completionHandler) {
+      completionHandler(userScript->id);
+    }
+  }
+
+  void UserContentController::removeScriptFromWebView(std::shared_ptr<UserScript> userScript, const std::function<void()> completionHandler) const
+  {
+    if (!webView_ || !(webView_->webView)) {
+      if (completionHandler) {
+        completionHandler();
+      }
+      return;
+    }
+
+    nlohmann::json parameters = {
+      {"identifier", userScript->id}
+    };
+
+    auto hr = webView_->webView->CallDevToolsProtocolMethod(L"Page.removeScriptToEvaluateOnNewDocument", utf8_to_wide(parameters.dump()).c_str(), Callback<ICoreWebView2CallDevToolsProtocolMethodCompletedHandler>(
+      [userScript, completionHandler](HRESULT errorCode, LPCWSTR returnObjectAsJson)
+      {
+        failedLog(errorCode);
+        if (completionHandler) {
+          completionHandler();
+        }
+        return S_OK;
+      }
+    ).Get());
+
+    if (failedAndLog(hr) && completionHandler) {
+      completionHandler();
+    }
+  }
+
+  void UserContentController::addPluginScriptsIfRequired(const std::shared_ptr<ContentWorld> contentWorld)
+  {
+    if (contentWorld && !ContentWorld::isPage(contentWorld)) {
+      std::vector<std::shared_ptr<PluginScript>> pluginScriptsRequiredInAllContentWorlds = getPluginScriptsRequiredInAllContentWorlds();
+      for (auto& pluginScript : pluginScriptsRequiredInAllContentWorlds) {
+        if (!containsPluginScript(pluginScript, contentWorld)) {
+          if (!map_contains(pluginScriptsInContentWorlds_, contentWorld->name)) {
+            pluginScriptsInContentWorlds_.insert({ contentWorld->name, {} });
+          }
+          pluginScriptsInContentWorlds_.at(contentWorld->name).push_back(pluginScript);
+          addPluginScript(pluginScript->copyAndSet(contentWorld));
+        }
+      }
+    }
   }
 
   UserContentController::~UserContentController()
@@ -257,6 +426,8 @@ namespace flutter_inappwebview_plugin
     debugLog("dealloc UserContentController");
     removeAllUserOnlyScripts();
     removeAllPluginScripts();
+    contentWorlds_.clear();
+    pluginScriptsInContentWorlds_.clear();
     webView_ = nullptr;
   }
 }

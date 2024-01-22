@@ -56,7 +56,7 @@ namespace flutter_inappwebview_plugin
 
     if (string_equals(methodName, "createInAppWebView")) {
       if (isSupported()) {
-        createInAppBrowser(arguments, std::move(result));
+        createInAppWebView(arguments, std::move(result));
       }
       else {
         result->Error("0", "Creating an InAppWebView instance is not supported! Graphics Context is not valid!");
@@ -74,7 +74,7 @@ namespace flutter_inappwebview_plugin
     }
   }
 
-  void InAppWebViewManager::createInAppBrowser(const flutter::EncodableMap* arguments, std::unique_ptr<flutter::MethodResult<flutter::EncodableValue>> result)
+  void InAppWebViewManager::createInAppWebView(const flutter::EncodableMap* arguments, std::unique_ptr<flutter::MethodResult<flutter::EncodableValue>> result)
   {
     auto result_ = std::shared_ptr<flutter::MethodResult<flutter::EncodableValue>>(std::move(result));
 
@@ -84,8 +84,13 @@ namespace flutter_inappwebview_plugin
     auto initialDataMap = get_optional_fl_map_value<flutter::EncodableMap>(*arguments, "initialData");
     auto initialUserScriptList = get_optional_fl_map_value<flutter::EncodableList>(*arguments, "initialUserScripts");
 
-    auto hwnd = CreateWindowEx(0, windowClass_.lpszClassName, L"", 0, CW_DEFAULT,
-      CW_DEFAULT, 0, 0, HWND_MESSAGE, nullptr,
+    RECT bounds;
+    GetClientRect(plugin->registrar->GetView()->GetNativeWindow(), &bounds);
+
+    auto hwnd = CreateWindowEx(0, windowClass_.lpszClassName, L"", 0, 0,
+      0, bounds.right - bounds.left, bounds.bottom - bounds.top,
+      plugin->registrar->GetView()->GetNativeWindow(), // HWND_MESSAGE,
+      nullptr,
       windowClass_.hInstance, nullptr);
 
     InAppWebView::createInAppWebViewEnv(hwnd, true,

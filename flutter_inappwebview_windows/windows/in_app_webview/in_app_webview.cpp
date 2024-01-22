@@ -14,6 +14,7 @@
 #include "../utils/strconv.h"
 #include "../utils/string.h"
 #include "in_app_webview.h"
+
 #include "in_app_webview_manager.h"
 
 namespace flutter_inappwebview_plugin
@@ -872,6 +873,38 @@ namespace flutter_inappwebview_plugin
     }
   }
 
+
+  void InAppWebView::setPosition(size_t x, size_t y, float scale_factor)
+  {
+    if (!webViewController || !plugin || !plugin->registrar) {
+      return;
+    }
+
+    if (x >= 0 && y >= 0) {
+      scaleFactor_ = scale_factor;
+      auto scaled_x = static_cast<int>(x * scale_factor);
+      auto scaled_y = static_cast<int>(y * scale_factor);
+
+      auto titleBarHeight = ((GetSystemMetrics(SM_CYCAPTION) + GetSystemMetrics(SM_CYFRAME)) * scale_factor) + GetSystemMetrics(SM_CXPADDEDBORDER);
+      auto borderWidth = (GetSystemMetrics(SM_CXBORDER) + GetSystemMetrics(SM_CXPADDEDBORDER)) * scale_factor;
+
+      RECT flutterWindowRect;
+      HWND flutterWindowHWnd = plugin->registrar->GetView()->GetNativeWindow();
+      GetWindowRect(flutterWindowHWnd, &flutterWindowRect);
+
+      HWND webViewHWnd;
+      if (succeededOrLog(webViewController->get_ParentWindow(&webViewHWnd))) {
+        ::SetWindowPos(webViewHWnd,
+          nullptr,
+          static_cast<int>(flutterWindowRect.left + scaled_x - borderWidth),
+          static_cast<int>(flutterWindowRect.top + scaled_y - titleBarHeight),
+          0, 0,
+          SWP_NOZORDER | SWP_NOSIZE | SWP_NOACTIVATE);
+      }
+    }
+  }
+
+
   void InAppWebView::setCursorPos(double x, double y)
   {
     if (!webViewCompositionController) {
@@ -999,92 +1032,16 @@ namespace flutter_inappwebview_plugin
 
     auto offset = static_cast<short>(delta * kScrollMultiplier);
 
-    /*
-    // For some reason,
-    // setting the point other than (x: 0, y: 0)
-    // will not make the scroll work.
-    // Unfortunately, this will break the scroll event
-    // for nested HTML scrollable elements.
-    POINT point;
-    point.x = 0;
-    point.y = 0;
-
-
     if (horizontal) {
       webViewCompositionController->SendMouseInput(
-        COREWEBVIEW2_MOUSE_EVENT_KIND_HORIZONTAL_WHEEL, virtual_keys_.state(),
-        offset, point);
+        COREWEBVIEW2_MOUSE_EVENT_KIND_HORIZONTAL_WHEEL, virtualKeys_.state(),
+        offset, lastCursorPos_);
     }
     else {
       webViewCompositionController->SendMouseInput(COREWEBVIEW2_MOUSE_EVENT_KIND_WHEEL,
-        virtual_keys_.state(), offset,
-        point);
+        virtualKeys_.state(), offset,
+        lastCursorPos_);
     }
-    */
-
-    // Workaround for scroll events
-    auto workaroundScrollJS = "(function(horizontal, offset, x, y) { \
-  function elemCanScrollY(elem) { \
-    if (elem.scrollTop > 0) { \
-      return elem; \
-    } else { \
-      elem.scrollTop++; \
-      const top = elem.scrollTop; \
-      top && (elem.scrollTop = 0); \
-      if (top > 0) { \
-        return elem; \
-      } else { \
-        return elemCanScrollY(elem.parentElement); \
-      } \
-    } \
-  } \
-  function elemCanScrollX(elem) { \
-    if (elem.scrollLeft > 0) { \
-      return elem; \
-    } else { \
-      elem.scrollLeft++; \
-      const left = elem.scrollLeft; \
-      left && (elem.scrollLeft = 0); \
-      if (left > 0) { \
-        return elem; \
-      } else { \
-        return elemCanScrollX(elem.parentElement); \
-      } \
-    } \
-  } \
-  const elem = document.elementFromPoint(x, y); \
-  const elem2 = horizontal ? elemCanScrollX(elem) : elemCanScrollY(elem); \
-  const handled = elem2 != null && elem2 != document.documentElement && elem2 != document.body; \
-  if (handled) { \
-    elem2.scrollBy({left: horizontal ? offset : 0, top: horizontal ? 0 : offset}); \
-  } \
-  return handled; \
-})(" + std::to_string(horizontal) + ", " + std::to_string(offset) + ", " + std::to_string(lastCursorPos_.x) + ", " + std::to_string(lastCursorPos_.y) + ");";
-
-    webView->ExecuteScript(utf8_to_wide(workaroundScrollJS).c_str(), Callback<ICoreWebView2ExecuteScriptCompletedHandler>(
-      [this, horizontal, offset](HRESULT error, PCWSTR result) -> HRESULT
-      {
-        if (webViewCompositionController && (error != S_OK || wide_to_utf8(result).compare("false") == 0)) {
-          // try to use native mouse wheel handler
-
-          POINT point;
-          point.x = 0;
-          point.y = 0;
-
-          if (horizontal) {
-            webViewCompositionController->SendMouseInput(
-              COREWEBVIEW2_MOUSE_EVENT_KIND_HORIZONTAL_WHEEL, virtualKeys_.state(),
-              offset, point);
-          }
-          else {
-            webViewCompositionController->SendMouseInput(COREWEBVIEW2_MOUSE_EVENT_KIND_WHEEL,
-              virtualKeys_.state(), offset,
-              point);
-          }
-        }
-
-        return S_OK;
-      }).Get());
   }
 
   void InAppWebView::setScrollDelta(double delta_x, double delta_y)

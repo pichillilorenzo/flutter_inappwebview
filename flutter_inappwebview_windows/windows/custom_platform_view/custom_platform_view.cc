@@ -15,6 +15,7 @@ namespace flutter_inappwebview_plugin
   constexpr auto kErrorInvalidArgs = "invalidArguments";
 
   constexpr auto kMethodSetSize = "setSize";
+  constexpr auto kMethodSetPosition = "setPosition";
   constexpr auto kMethodSetCursorPos = "setCursorPos";
   constexpr auto kMethodSetPointerUpdate = "setPointerUpdate";
   constexpr auto kMethodSetPointerButton = "setPointerButton";
@@ -299,8 +300,20 @@ namespace flutter_inappwebview_plugin
       }
       return result->Error(kErrorInvalidArgs);
     }
+    else if (method_name.compare(kMethodSetPosition) == 0) {
+      auto position = GetPointAndScaleFactorFromArgs(method_call.arguments());
+      if (position && view) {
+        const auto [x, y, scale_factor] = position.value();
 
-    if (method_name.compare(kMethodSetFpsLimit) == 0) {
+        view->setPosition(static_cast<size_t>(x),
+          static_cast<size_t>(y),
+          static_cast<float>(scale_factor));
+
+        return result->Success();
+      }
+      return result->Error(kErrorInvalidArgs);
+    }
+    else if (method_name.compare(kMethodSetFpsLimit) == 0) {
       if (const auto value = std::get_if<int32_t>(method_call.arguments())) {
         texture_bridge_->SetFpsLimit(*value == 0 ? std::nullopt
           : std::make_optional(*value));

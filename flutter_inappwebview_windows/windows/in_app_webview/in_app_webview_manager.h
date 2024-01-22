@@ -44,7 +44,7 @@ namespace flutter_inappwebview_plugin
       const flutter::MethodCall<flutter::EncodableValue>& method_call,
       std::unique_ptr<flutter::MethodResult<flutter::EncodableValue>> result);
 
-    void createInAppBrowser(const flutter::EncodableMap* arguments, std::unique_ptr<flutter::MethodResult<flutter::EncodableValue>> result);
+    void createInAppWebView(const flutter::EncodableMap* arguments, std::unique_ptr<flutter::MethodResult<flutter::EncodableValue>> result);
   private:
     std::unique_ptr<rx::RoHelper> rohelper_;
     winrt::com_ptr<ABI::Windows::System::IDispatcherQueueController>

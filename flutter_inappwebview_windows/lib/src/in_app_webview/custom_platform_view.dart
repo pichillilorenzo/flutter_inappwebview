@@ -220,6 +220,16 @@ class CustomPlatformViewController
     return _methodChannel
         .invokeMethod('setSize', [size.width, size.height, scaleFactor]);
   }
+
+  /// Sets the surface size to the provided [size].
+  Future<void> _setPosition(Offset position, double scaleFactor) async {
+    if (_isDisposed) {
+      return;
+    }
+    assert(value.isInitialized);
+    return _methodChannel
+        .invokeMethod('setPosition', [position.dx, position.dy, scaleFactor]);
+  }
 }
 
 class CustomPlatformView extends StatefulWidget {
@@ -273,8 +283,11 @@ class _CustomPlatformViewState extends State<CustomPlatformView> {
         },
         arguments: widget.creationParams);
 
-    // Report initial surface size
-    WidgetsBinding.instance.addPostFrameCallback((_) => _reportSurfaceSize());
+    // Report initial surface size and widget position
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _reportSurfaceSize();
+      _reportWidgetPosition();
+    });
 
     _cursorSubscription = _controller._cursor.listen((cursor) {
       setState(() {
@@ -301,6 +314,7 @@ class _CustomPlatformViewState extends State<CustomPlatformView> {
     return NotificationListener<SizeChangedLayoutNotification>(
         onNotification: (notification) {
           _reportSurfaceSize();
+          _reportWidgetPosition();
           return true;
         },
         child: SizeChangedLayoutNotifier(
@@ -316,6 +330,9 @@ class _CustomPlatformViewState extends State<CustomPlatformView> {
                       _controller._setCursorPos(ev.localPosition);
                     },
                     onPointerDown: (ev) {
+                      _reportSurfaceSize();
+                      _reportWidgetPosition();
+
                       if (!_focusNode.hasFocus) {
                         _focusNode.requestFocus();
                         Future.delayed(const Duration(milliseconds: 50), () {
@@ -401,6 +418,17 @@ class _CustomPlatformViewState extends State<CustomPlatformView> {
       await _controller.ready;
       unawaited(_controller._setSize(
           box.size, widget.scaleFactor ?? window.devicePixelRatio));
+
+    }
+  }
+
+  void _reportWidgetPosition() async {
+    final box = _key.currentContext?.findRenderObject() as RenderBox?;
+    if (box != null) {
+      await _controller.ready;
+      final position = box.localToGlobal(Offset.zero);
+      unawaited(_controller._setPosition(
+          position, widget.scaleFactor ?? window.devicePixelRatio));
     }
   }
 

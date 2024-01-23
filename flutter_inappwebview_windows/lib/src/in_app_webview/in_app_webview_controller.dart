@@ -2428,12 +2428,13 @@ class WindowsInAppWebViewController extends PlatformInAppWebViewController
       ContentWorld? contentWorld}) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('functionBody', () => functionBody);
-    args.putIfAbsent('arguments', () => arguments);
+    args.putIfAbsent('arguments', () => jsonEncode(arguments));
     args.putIfAbsent('contentWorld', () => contentWorld?.toMap());
     var data = await channel?.invokeMethod('callAsyncJavaScript', args);
     if (data == null) {
       return null;
     }
+    data = json.decode(data);
     return CallAsyncJavaScriptResult(
         value: data["value"], error: data["error"]);
   }

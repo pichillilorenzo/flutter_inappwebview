@@ -120,6 +120,18 @@ namespace flutter_inappwebview_plugin
           result_->Success(value);
         });
     }
+    else if (string_equals(methodName, "callAsyncJavaScript")) {
+      auto result_ = std::shared_ptr<flutter::MethodResult<flutter::EncodableValue>>(std::move(result));
+
+      auto functionBody = get_fl_map_value<std::string>(arguments, "functionBody");
+      auto argumentsAsJson = get_fl_map_value<std::string>(arguments, "arguments");
+      auto contentWorldMap = get_optional_fl_map_value<flutter::EncodableMap>(arguments, "contentWorld");
+      std::shared_ptr<ContentWorld> contentWorld = contentWorldMap.has_value() ? std::make_shared<ContentWorld>(contentWorldMap.value()) : ContentWorld::page();
+      webView->callAsyncJavaScript(functionBody, argumentsAsJson, std::move(contentWorld), [result_ = std::move(result_)](const std::string& value)
+        {
+          result_->Success(value);
+        });
+    }
     else if (string_equals(methodName, "getCopyBackForwardList")) {
       auto result_ = std::shared_ptr<flutter::MethodResult<flutter::EncodableValue>>(std::move(result));
       webView->getCopyBackForwardList([result_ = std::move(result_)](const std::unique_ptr<WebHistory> value)

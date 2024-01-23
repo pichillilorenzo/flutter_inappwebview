@@ -121,6 +121,12 @@ namespace flutter_inappwebview_plugin
   }
 
   template <typename T>
+  static inline std::basic_string<T> join(const std::vector<std::basic_string<T>>& vec, const char* delim)
+  {
+    return join(vec, std::basic_string<T>{ delim });
+  }
+
+  template <typename T>
   static inline std::vector<std::basic_string<T>> split(const std::basic_string<T>& s, std::basic_string<T> delimiter)
   {
     size_t pos_start = 0, pos_end, delim_len = delimiter.length();

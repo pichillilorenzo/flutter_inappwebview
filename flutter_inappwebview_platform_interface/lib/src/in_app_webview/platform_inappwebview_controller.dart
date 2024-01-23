@@ -521,7 +521,7 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///- iOS ([Official API - WKWebView.evaluateJavascript](https://developer.apple.com/documentation/webkit/wkwebview/3656442-evaluatejavascript))
   ///- MacOS ([Official API - WKWebView.evaluateJavascript](https://developer.apple.com/documentation/webkit/wkwebview/3656442-evaluatejavascript))
   ///- Web ([Official API - Window.eval](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/eval?retiredLocale=it))
-  ///- Windows ([Official API - ICoreWebView2.ExecuteScript](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2?view=webview2-1.0.2210.55#executescript))
+  ///- Windows
   ///{@endtemplate}
   Future<dynamic> evaluateJavascript(
       {required String source, ContentWorld? contentWorld}) {
@@ -1342,6 +1342,7 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///- Android native WebView
   ///- iOS ([Official API - WKWebView.callAsyncJavaScript](https://developer.apple.com/documentation/webkit/wkwebview/3656441-callasyncjavascript))
   ///- MacOS ([Official API - WKWebView.callAsyncJavaScript](https://developer.apple.com/documentation/webkit/wkwebview/3656441-callasyncjavascript))
+  ///- Windows
   ///{@endtemplate}
   Future<CallAsyncJavaScriptResult?> callAsyncJavaScript(
       {required String functionBody,

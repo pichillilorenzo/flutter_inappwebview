@@ -785,12 +785,94 @@ namespace flutter_inappwebview_plugin
         auto hr = webView->CallDevToolsProtocolMethod(L"Runtime.evaluate", utf8_to_wide(parameters.dump()).c_str(), Callback<ICoreWebView2CallDevToolsProtocolMethodCompletedHandler>(
           [this, completionHandler](HRESULT errorCode, LPCWSTR returnObjectAsJson)
           {
-            std::string result = "null";
+            nlohmann::json result;
             if (succeededOrLog(errorCode)) {
-              result = wide_to_utf8(returnObjectAsJson);
+              nlohmann::json json = nlohmann::json::parse(wide_to_utf8(returnObjectAsJson));
+              result = json["result"].contains("value") ? json["result"]["value"] : nlohmann::json{};
+              if (json.contains("exceptionDetails")) {
+                nlohmann::json exceptionDetails = json["exceptionDetails"];
+                auto errorMessage = exceptionDetails.contains("exception") && exceptionDetails["exception"].contains("value")
+                  ? exceptionDetails["exception"]["value"].dump() :
+                  (result["value"].is_null() ? exceptionDetails["text"].get<std::string>() : result["value"].dump());
+                result = nlohmann::json{};
+                debugLog(exceptionDetails.dump());
+                if (channelDelegate) {
+                  channelDelegate->onConsoleMessage(errorMessage, 3);
+                }
+              }
             }
             if (completionHandler) {
-              completionHandler(result);
+              completionHandler(result.dump());
+            }
+            return S_OK;
+          }
+        ).Get());
+
+        if (failedAndLog(hr) && completionHandler) {
+          completionHandler("null");
+        }
+      });
+  }
+
+  void InAppWebView::callAsyncJavaScript(const std::string& functionBody, const std::string& argumentsAsJson, const std::shared_ptr<ContentWorld> contentWorld, const std::function<void(std::string)> completionHandler) const
+  {
+    if (!webView || !userContentController) {
+      if (completionHandler) {
+        completionHandler("null");
+      }
+      return;
+    }
+
+    userContentController->createContentWorld(contentWorld,
+      [=](const int& contextId)
+      {
+        std::vector<std::string> functionArgumentNamesList;
+        std::vector<std::string> functionArgumentValuesList;
+
+        auto jsonVal = nlohmann::json::parse(argumentsAsJson);
+        for (auto const& [key, val] : jsonVal.items()) {
+          functionArgumentNamesList.push_back(key);
+          functionArgumentValuesList.push_back(val.dump());
+        }
+
+        auto source = replace_all_copy(CALL_ASYNC_JAVASCRIPT_WRAPPER_JS, VAR_FUNCTION_ARGUMENT_NAMES, join(functionArgumentNamesList, ", "));
+        replace_all(source, VAR_FUNCTION_ARGUMENT_VALUES, join(functionArgumentValuesList, ", "));
+        replace_all(source, VAR_FUNCTION_BODY, functionBody);
+
+        nlohmann::json parameters = {
+          {"expression", source},
+          {"awaitPromise", true}
+        };
+
+        if (contextId >= 0) {
+          parameters["contextId"] = contextId;
+        }
+
+        auto hr = webView->CallDevToolsProtocolMethod(L"Runtime.evaluate", utf8_to_wide(parameters.dump()).c_str(), Callback<ICoreWebView2CallDevToolsProtocolMethodCompletedHandler>(
+          [this, completionHandler](HRESULT errorCode, LPCWSTR returnObjectAsJson)
+          {
+            nlohmann::json result = {
+              {"value", nlohmann::json{}},
+              {"error", nlohmann::json{}}
+            };
+            if (succeededOrLog(errorCode)) {
+              nlohmann::json json = nlohmann::json::parse(wide_to_utf8(returnObjectAsJson));
+              result["value"] = json["result"].contains("value") ? json["result"]["value"] : nlohmann::json{};
+              if (json.contains("exceptionDetails")) {
+                nlohmann::json exceptionDetails = json["exceptionDetails"];
+                auto errorMessage = exceptionDetails.contains("exception") && exceptionDetails["exception"].contains("value")
+                  ? exceptionDetails["exception"]["value"].dump() :
+                  (result["value"].is_null() ? exceptionDetails["text"].get<std::string>() : result["value"].dump());
+                result["value"] = nlohmann::json{};
+                result["error"] = errorMessage;
+                debugLog(exceptionDetails.dump());
+                if (channelDelegate) {
+                  channelDelegate->onConsoleMessage(errorMessage, 3);
+                }
+              }
+            }
+            if (completionHandler) {
+              completionHandler(result.dump());
             }
             return S_OK;
           }
@@ -1105,6 +1187,8 @@ namespace flutter_inappwebview_plugin
   InAppWebView::~InAppWebView()
   {
     debugLog("dealloc InAppWebView");
+    HWND parentWindow;
+    webViewController->get_ParentWindow(&parentWindow);
     if (webView) {
       webView->Stop();
     }
@@ -1114,5 +1198,10 @@ namespace flutter_inappwebview_plugin
     navigationActions_.clear();
     inAppBrowser = nullptr;
     plugin = nullptr;
+    if (webViewCompositionController) {
+      // if it's an InAppWebView,
+      // then destroy the Window created with it
+      DestroyWindow(parentWindow);
+    }
   }
 }

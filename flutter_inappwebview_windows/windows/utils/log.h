@@ -63,7 +63,8 @@ namespace flutter_inappwebview_plugin
   static inline void debugLog(const HRESULT& hr, const std::string& filename = "", const int& line = 0)
   {
     auto isError = hr != S_OK;
-    debugLog((isError ? "Error: " : "Message: ") + getHRMessage(hr), isError, filename, line);
+    auto errorCode = std::to_string(hr);
+    debugLog((isError ? "Error " + errorCode + ": " : "Message: ") + getHRMessage(hr), isError, filename, line);
   }
 
   static inline bool succeededOrLog(const HRESULT& hr, const std::string& filename = "", const int& line = 0)

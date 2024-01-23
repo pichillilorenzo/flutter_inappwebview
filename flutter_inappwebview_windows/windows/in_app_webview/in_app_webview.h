@@ -9,6 +9,7 @@
 #include <winrt/base.h>
 
 #include "../flutter_inappwebview_windows_plugin.h"
+#include "../plugin_scripts_js/plugin_scripts_util.h"
 #include "../types/content_world.h"
 #include "../types/navigation_action.h"
 #include "../types/url_request.h"
@@ -69,6 +70,10 @@ namespace flutter_inappwebview_plugin
       }
     }
   };
+
+  const std::string CALL_ASYNC_JAVASCRIPT_WRAPPER_JS = "(async function(" + VAR_FUNCTION_ARGUMENT_NAMES + ") { \
+        " + VAR_FUNCTION_BODY + " \
+    })(" + VAR_FUNCTION_ARGUMENT_VALUES + ");";
 
   struct InAppWebViewCreationParams {
     const std::variant<std::string, int64_t> id;
@@ -150,6 +155,7 @@ namespace flutter_inappwebview_plugin
     }
     void stopLoading() const;
     void evaluateJavascript(const std::string& source, const std::shared_ptr<ContentWorld> contentWorld, const std::function<void(std::string)> completionHandler) const;
+    void callAsyncJavaScript(const std::string& functionBody, const std::string& argumentsAsJson, const std::shared_ptr<ContentWorld> contentWorld, const std::function<void(std::string)> completionHandler) const;
     void getCopyBackForwardList(const std::function<void(std::unique_ptr<WebHistory>)> completionHandler) const;
     void addUserScript(const std::shared_ptr<UserScript> userScript) const;
     void removeUserScript(const int64_t index, const std::shared_ptr<UserScript> userScript) const;

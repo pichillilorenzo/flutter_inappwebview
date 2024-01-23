@@ -89,7 +89,7 @@ namespace flutter_inappwebview_plugin
 
     auto hwnd = CreateWindowEx(0, windowClass_.lpszClassName, L"", 0, 0,
       0, bounds.right - bounds.left, bounds.bottom - bounds.top,
-      plugin->registrar->GetView()->GetNativeWindow(), // HWND_MESSAGE,
+      plugin->registrar->GetView()->GetNativeWindow(),
       nullptr,
       windowClass_.hInstance, nullptr);
 

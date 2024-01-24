@@ -22,7 +22,7 @@ namespace flutter_inappwebview_plugin
   {
     decodeResult = [](const flutter::EncodableValue* value)
       {
-        if (value->IsNull()) {
+        if (!value || value->IsNull()) {
           return NavigationActionPolicy::cancel;
         }
         auto navigationPolicy = std::get<int>(*value);

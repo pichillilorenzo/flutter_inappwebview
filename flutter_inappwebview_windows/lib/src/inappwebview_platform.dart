@@ -3,6 +3,7 @@ import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_pla
 import 'in_app_browser/in_app_browser.dart';
 import 'in_app_webview/in_app_webview.dart';
 import 'in_app_webview/in_app_webview_controller.dart';
+import 'in_app_webview/headless_in_app_webview.dart';
 
 /// Implementation of [InAppWebViewPlatform] using the WebKit API.
 class WindowsInAppWebViewPlatform extends InAppWebViewPlatform {
@@ -60,5 +61,16 @@ class WindowsInAppWebViewPlatform extends InAppWebViewPlatform {
   @override
   WindowsInAppBrowser createPlatformInAppBrowserStatic() {
     return WindowsInAppBrowser.static();
+  }
+
+  /// Creates a new [WindowsHeadlessInAppWebView].
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [HeadlessInAppWebView] in `flutter_inappwebview` instead.
+  @override
+  WindowsHeadlessInAppWebView createPlatformHeadlessInAppWebView(
+      PlatformHeadlessInAppWebViewCreationParams params,
+      ) {
+    return WindowsHeadlessInAppWebView(params);
   }
 }

@@ -274,7 +274,7 @@ class WindowsHeadlessInAppWebView extends PlatformHeadlessInAppWebView
 
   dynamic _controllerFromPlatform;
 
-  WindowsHeadlessInAppWebViewCreationParams get _macosParams =>
+  WindowsHeadlessInAppWebViewCreationParams get _windowsParams =>
       params as WindowsHeadlessInAppWebViewCreationParams;
 
   _init() {
@@ -284,7 +284,7 @@ class WindowsHeadlessInAppWebView extends PlatformHeadlessInAppWebView
     _controllerFromPlatform =
         params.controllerFromPlatform?.call(_webViewController!) ??
             _webViewController!;
-    _macosParams.findInteractionController?.init(id);
+    _windowsParams.findInteractionController?.init(id);
     channel =
         MethodChannel('com.pichillilorenzo/flutter_headless_inappwebview_$id');
     handler = _handleMethod;
@@ -320,8 +320,8 @@ class WindowsHeadlessInAppWebView extends PlatformHeadlessInAppWebView
             initialSettings.toMap();
 
     Map<String, dynamic> pullToRefreshSettings =
-        _macosParams.pullToRefreshController?.params.settings.toMap() ??
-            _macosParams.pullToRefreshController?.params.options.toMap() ??
+        _windowsParams.pullToRefreshController?.params.settings.toMap() ??
+            _windowsParams.pullToRefreshController?.params.options.toMap() ??
             PullToRefreshSettings(enabled: false).toMap();
 
     Map<String, dynamic> args = <String, dynamic>{};
@@ -341,8 +341,14 @@ class WindowsHeadlessInAppWebView extends PlatformHeadlessInAppWebView
               'pullToRefreshSettings': pullToRefreshSettings,
               'initialSize': params.initialSize.toMap()
             });
-    await _sharedChannel.invokeMethod('run', args);
-    _running = true;
+    try {
+      await _sharedChannel.invokeMethod('run', args);
+      _running = true;
+    } catch (e) {
+      _running = false;
+      _started = false;
+      throw e;
+    }
   }
 
   void _inferInitialSettings(InAppWebViewSettings settings) {
@@ -420,8 +426,8 @@ class WindowsHeadlessInAppWebView extends PlatformHeadlessInAppWebView
     _webViewController?.dispose();
     _webViewController = null;
     _controllerFromPlatform = null;
-    _macosParams.pullToRefreshController?.dispose();
-    _macosParams.findInteractionController?.dispose();
+    _windowsParams.pullToRefreshController?.dispose();
+    _windowsParams.findInteractionController?.dispose();
   }
 }
 

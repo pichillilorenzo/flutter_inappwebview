@@ -274,7 +274,7 @@ namespace flutter_inappwebview_plugin
             navigationActions_.insert({ navigationId, navigationAction });
           }
 
-          if (callShouldOverrideUrlLoading_ && requestMethod == nullptr) {
+          if (settings->useShouldOverrideUrlLoading && callShouldOverrideUrlLoading_ && requestMethod == nullptr) {
             // for some reason, we can't cancel and load an URL with other HTTP methods than GET,
             // so ignore the shouldOverrideUrlLoading event.
 
@@ -1187,21 +1187,20 @@ namespace flutter_inappwebview_plugin
   InAppWebView::~InAppWebView()
   {
     debugLog("dealloc InAppWebView");
-    HWND parentWindow;
-    webViewController->get_ParentWindow(&parentWindow);
-    if (webView) {
-      webView->Stop();
-    }
-    if (webViewController) {
-      webViewController->Close();
-    }
-    navigationActions_.clear();
-    inAppBrowser = nullptr;
-    plugin = nullptr;
-    if (webViewCompositionController) {
+    HWND parentWindow = nullptr;
+    if (webViewCompositionController && succeededOrLog(webViewController->get_ParentWindow(&parentWindow))) {
       // if it's an InAppWebView,
       // then destroy the Window created with it
       DestroyWindow(parentWindow);
     }
+    if (webView) {
+      failedLog(webView->Stop());
+    }
+    if (webViewController) {
+      failedLog(webViewController->Close());
+    }
+    navigationActions_.clear();
+    inAppBrowser = nullptr;
+    plugin = nullptr;
   }
 }

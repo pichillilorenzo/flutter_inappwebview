@@ -8,12 +8,14 @@ namespace flutter_inappwebview_plugin
 {
   class InAppWebViewManager;
   class InAppBrowserManager;
+  class HeadlessInAppWebViewManager;
 
   class FlutterInappwebviewWindowsPlugin : public flutter::Plugin {
   public:
     flutter::PluginRegistrarWindows* registrar;
     std::unique_ptr<InAppWebViewManager> inAppWebViewManager;
     std::unique_ptr<InAppBrowserManager> inAppBrowserManager;
+    std::unique_ptr<HeadlessInAppWebViewManager> headlessInAppWebViewManager;
 
     static void RegisterWithRegistrar(flutter::PluginRegistrarWindows* registrar);
 

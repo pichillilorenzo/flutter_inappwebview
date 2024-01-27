@@ -14,7 +14,18 @@ namespace flutter_inappwebview_plugin
   WebViewEnvironmentManager::WebViewEnvironmentManager(const FlutterInappwebviewWindowsPlugin* plugin)
     : plugin(plugin),
     ChannelDelegate(plugin->registrar->messenger(), WebViewEnvironmentManager::METHOD_CHANNEL_NAME)
-  {}
+  {
+    windowClass_.lpszClassName = WebViewEnvironmentManager::CLASS_NAME;
+    windowClass_.lpfnWndProc = &DefWindowProc;
+
+    RegisterClass(&windowClass_);
+
+    hwnd_ = CreateWindowEx(0, windowClass_.lpszClassName, L"", 0, 0,
+      0, 0, 0,
+      plugin->registrar->GetView()->GetNativeWindow(),
+      nullptr,
+      windowClass_.hInstance, nullptr);
+  }
 
   void WebViewEnvironmentManager::HandleMethodCall(const flutter::MethodCall<flutter::EncodableValue>& method_call,
     std::unique_ptr<flutter::MethodResult<flutter::EncodableValue>> result)
@@ -54,10 +65,38 @@ namespace flutter_inappwebview_plugin
     webViewEnvironments.insert({ id, std::move(webViewEnvironment) });
   }
 
+  void WebViewEnvironmentManager::createOrGetDefaultWebViewEnvironment(const std::function<void(WebViewEnvironment*)> completionHandler)
+  {
+    if (defaultEnvironment_) {
+      if (completionHandler) {
+        completionHandler(defaultEnvironment_.get());
+      }
+      return;
+    }
+
+    defaultEnvironment_ = std::make_unique<WebViewEnvironment>(plugin, "-1");
+    defaultEnvironment_->create(nullptr, [this, completionHandler](HRESULT errorCode)
+      {
+        if (succeededOrLog(errorCode)) {
+          if (completionHandler) {
+            completionHandler(defaultEnvironment_.get());
+          }
+        }
+        else if (completionHandler) {
+          defaultEnvironment_ = nullptr;
+          completionHandler(nullptr);
+        }
+      });
+  }
+
   WebViewEnvironmentManager::~WebViewEnvironmentManager()
   {
     debugLog("dealloc WebViewEnvironmentManager");
     webViewEnvironments.clear();
     plugin = nullptr;
+    defaultEnvironment_ = nullptr;
+    if (hwnd_) {
+      DestroyWindow(hwnd_);
+    }
   }
 }

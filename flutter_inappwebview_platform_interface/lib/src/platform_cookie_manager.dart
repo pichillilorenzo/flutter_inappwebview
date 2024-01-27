@@ -8,6 +8,7 @@ import 'types/main.dart';
 import 'web_uri.dart';
 import 'inappwebview_platform.dart';
 import 'in_app_webview/platform_headless_in_app_webview.dart';
+import 'webview_environment/platform_webview_environment.dart';
 
 /// Object specifying creation parameters for creating a [PlatformCookieManager].
 ///
@@ -16,7 +17,13 @@ import 'in_app_webview/platform_headless_in_app_webview.dart';
 @immutable
 class PlatformCookieManagerCreationParams {
   /// Used by the platform implementation to create a new [PlatformCookieManager].
-  const PlatformCookieManagerCreationParams();
+  const PlatformCookieManagerCreationParams({this.webViewEnvironment});
+
+  ///Used to create the [PlatformCookieManager] using the specified environment.
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Windows
+  final PlatformWebViewEnvironment? webViewEnvironment;
 }
 
 ///{@template flutter_inappwebview_platform_interface.PlatformCookieManager}

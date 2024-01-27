@@ -184,7 +184,7 @@ class PlatformInAppWebViewWidgetCreationParams
   ///- iOS
   final bool? preventGestureDelay;
 
-  ///Used create the [PlatformInAppWebViewWidget] using the specified environment.
+  ///Used to create the [PlatformInAppWebViewWidget] using the specified environment.
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- Windows

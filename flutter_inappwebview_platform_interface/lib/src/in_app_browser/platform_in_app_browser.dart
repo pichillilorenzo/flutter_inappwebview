@@ -56,7 +56,7 @@ class PlatformInAppBrowserCreationParams {
   ///{@macro flutter_inappwebview_platform_interface.PlatformInAppBrowser.windowId}
   final int? windowId;
 
-  ///Used create the [PlatformInAppBrowser] using the specified environment.
+  ///Used to create the [PlatformInAppBrowser] using the specified environment.
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- Windows

@@ -57,7 +57,7 @@ namespace flutter_inappwebview_plugin
     this->inAppBrowser = inAppBrowser;
   }
 
-  void InAppWebView::createInAppWebViewEnv(const HWND parentWindow, const bool& willBeSurface, const WebViewEnvironment* webViewEnvironment, std::function<void(wil::com_ptr<ICoreWebView2Environment> webViewEnv,
+  void InAppWebView::createInAppWebViewEnv(const HWND parentWindow, const bool& willBeSurface, WebViewEnvironment* webViewEnvironment, std::function<void(wil::com_ptr<ICoreWebView2Environment> webViewEnv,
     wil::com_ptr<ICoreWebView2Controller> webViewController,
     wil::com_ptr<ICoreWebView2CompositionController> webViewCompositionController)> completionHandler)
   {
@@ -109,8 +109,8 @@ namespace flutter_inappwebview_plugin
       };
 
     HRESULT hr;
-    if (webViewEnvironment && webViewEnvironment->env) {
-      hr = callback(S_OK, webViewEnvironment->env);
+    if (webViewEnvironment && webViewEnvironment->getEnvironment()) {
+      hr = callback(S_OK, webViewEnvironment->getEnvironment());
     }
     else {
       hr = CreateCoreWebView2EnvironmentWithOptions(

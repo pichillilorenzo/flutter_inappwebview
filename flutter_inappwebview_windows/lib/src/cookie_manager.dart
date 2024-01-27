@@ -5,6 +5,8 @@ import 'package:flutter/services.dart';
 
 import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_platform_interface.dart';
 
+import 'webview_environment/webview_environment.dart';
+
 /// Object specifying creation parameters for creating a [WindowsCookieManager].
 ///
 /// When adding additional fields make sure they can be null or have a default
@@ -15,16 +17,19 @@ class WindowsCookieManagerCreationParams
     extends PlatformCookieManagerCreationParams {
   /// Creates a new [WindowsCookieManagerCreationParams] instance.
   const WindowsCookieManagerCreationParams(
-      // This parameter prevents breaking changes later.
-      // ignore: avoid_unused_constructor_parameters
-      PlatformCookieManagerCreationParams params,
-      ) : super();
+      {this.webViewEnvironment});
 
   /// Creates a [WindowsCookieManagerCreationParams] instance based on [PlatformCookieManagerCreationParams].
   factory WindowsCookieManagerCreationParams.fromPlatformCookieManagerCreationParams(
+      // Recommended placeholder to prevent being broken by platform interface.
+      // ignore: avoid_unused_constructor_parameters
       PlatformCookieManagerCreationParams params) {
-    return WindowsCookieManagerCreationParams(params);
+    return WindowsCookieManagerCreationParams(
+        webViewEnvironment: params.webViewEnvironment as WindowsWebViewEnvironment?);
   }
+
+  @override
+  final WindowsWebViewEnvironment? webViewEnvironment;
 }
 
 ///{@macro flutter_inappwebview_platform_interface.PlatformCookieManager}
@@ -47,13 +52,21 @@ class WindowsCookieManager extends PlatformCookieManager
   static WindowsCookieManager? _instance;
 
   ///Gets the [WindowsCookieManager] shared instance.
-  static WindowsCookieManager instance() {
-    return (_instance != null) ? _instance! : _init();
+  static WindowsCookieManager instance({WindowsWebViewEnvironment? webViewEnvironment}) {
+    if (webViewEnvironment == null) {
+      if (_instance == null) {
+        _instance = _init();
+      }
+      return _instance!;
+    } else {
+      return WindowsCookieManager(
+          WindowsCookieManagerCreationParams(webViewEnvironment: webViewEnvironment)
+      );
+    }
   }
 
   static WindowsCookieManager _init() {
-    _instance = WindowsCookieManager(WindowsCookieManagerCreationParams(
-        const PlatformCookieManagerCreationParams()));
+    _instance = WindowsCookieManager(WindowsCookieManagerCreationParams());
     return _instance!;
   }
 
@@ -90,6 +103,7 @@ class WindowsCookieManager extends PlatformCookieManager
     args.putIfAbsent('isSecure', () => isSecure);
     args.putIfAbsent('isHttpOnly', () => isHttpOnly);
     args.putIfAbsent('sameSite', () => sameSite?.toNativeValue());
+    args.putIfAbsent('webViewEnvironmentId', () => params.webViewEnvironment?.id);
 
     return await channel?.invokeMethod<bool>('setCookie', args) ?? false;
   }
@@ -106,6 +120,7 @@ class WindowsCookieManager extends PlatformCookieManager
 
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('url', () => url.toString());
+    args.putIfAbsent('webViewEnvironmentId', () => params.webViewEnvironment?.id);
     List<dynamic> cookieListMap =
         await channel?.invokeMethod<List>('getCookies', args) ?? [];
     cookieListMap = cookieListMap.cast<Map<dynamic, dynamic>>();
@@ -138,6 +153,7 @@ class WindowsCookieManager extends PlatformCookieManager
 
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('url', () => url.toString());
+    args.putIfAbsent('webViewEnvironmentId', () => params.webViewEnvironment?.id);
     List<dynamic> cookies =
         await channel?.invokeMethod<List>('getCookies', args) ?? [];
     cookies = cookies.cast<Map<dynamic, dynamic>>();
@@ -176,6 +192,7 @@ class WindowsCookieManager extends PlatformCookieManager
     args.putIfAbsent('name', () => name);
     args.putIfAbsent('domain', () => domain);
     args.putIfAbsent('path', () => path);
+    args.putIfAbsent('webViewEnvironmentId', () => params.webViewEnvironment?.id);
     return await channel?.invokeMethod<bool>('deleteCookie', args) ?? false;
   }
 
@@ -193,18 +210,21 @@ class WindowsCookieManager extends PlatformCookieManager
     args.putIfAbsent('url', () => url.toString());
     args.putIfAbsent('domain', () => domain);
     args.putIfAbsent('path', () => path);
+    args.putIfAbsent('webViewEnvironmentId', () => params.webViewEnvironment?.id);
     return await channel?.invokeMethod<bool>('deleteCookies', args) ?? false;
   }
 
   @override
   Future<bool> deleteAllCookies() async {
     Map<String, dynamic> args = <String, dynamic>{};
+    args.putIfAbsent('webViewEnvironmentId', () => params.webViewEnvironment?.id);
     return await channel?.invokeMethod<bool>('deleteAllCookies', args) ?? false;
   }
 
   @override
   Future<bool> removeSessionCookies() async {
     Map<String, dynamic> args = <String, dynamic>{};
+    args.putIfAbsent('webViewEnvironmentId', () => params.webViewEnvironment?.id);
     return await channel?.invokeMethod<bool>('removeSessionCookies', args) ??
         false;
   }

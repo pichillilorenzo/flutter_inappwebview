@@ -4,6 +4,8 @@
 #include "../utils/log.h"
 #include "webview_environment.h"
 
+#include "webview_environment_manager.h"
+
 namespace flutter_inappwebview_plugin
 {
   using namespace Microsoft::WRL;
@@ -15,6 +17,21 @@ namespace flutter_inappwebview_plugin
 
   void WebViewEnvironment::create(const std::unique_ptr<WebViewEnvironmentSettings> settings, const std::function<void(HRESULT)> completionHandler)
   {
+    if (!plugin) {
+      if (completionHandler) {
+        completionHandler(E_FAIL);
+      }
+      return;
+    }
+
+    auto hwnd = plugin->webViewEnvironmentManager->getHWND();
+    if (!hwnd) {
+      if (completionHandler) {
+        completionHandler(E_FAIL);
+      }
+      return;
+    }
+
     auto options = Make<CoreWebView2EnvironmentOptions>();
     if (settings) {
       if (settings->additionalBrowserArguments.has_value()) {
@@ -36,12 +53,30 @@ namespace flutter_inappwebview_plugin
       settings && settings->userDataFolder.has_value() ? utf8_to_wide(settings->userDataFolder.value()).c_str() : nullptr,
       options.Get(),
       Callback<ICoreWebView2CreateCoreWebView2EnvironmentCompletedHandler>(
-        [this, completionHandler](HRESULT result, wil::com_ptr<ICoreWebView2Environment> environment) -> HRESULT
+        [this, hwnd, completionHandler](HRESULT result, wil::com_ptr<ICoreWebView2Environment> environment) -> HRESULT
         {
           if (succeededOrLog(result)) {
-            env = std::move(environment);
+            environment_ = std::move(environment);
+
+            auto hr = environment_->CreateCoreWebView2Controller(hwnd, Callback<ICoreWebView2CreateCoreWebView2ControllerCompletedHandler>(
+              [this, completionHandler](HRESULT result, wil::com_ptr<ICoreWebView2Controller> controller) -> HRESULT
+              {
+                if (succeededOrLog(result)) {
+                  webViewController_ = std::move(controller);
+                  webViewController_->get_CoreWebView2(&webView_);
+                  webViewController_->put_IsVisible(false);
+                }
+                if (completionHandler) {
+                  completionHandler(result);
+                }
+                return S_OK;
+              }).Get());
+
+            if (failedAndLog(hr) && completionHandler) {
+              completionHandler(hr);
+            }
           }
-          if (completionHandler) {
+          else if (completionHandler) {
             completionHandler(result);
           }
           return S_OK;

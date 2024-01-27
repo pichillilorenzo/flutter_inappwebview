@@ -15,6 +15,7 @@ namespace flutter_inappwebview_plugin
   class WebViewEnvironmentManager : public ChannelDelegate
   {
   public:
+    static inline const wchar_t* CLASS_NAME = L"WebViewEnvironmentManager";
     static inline const std::string METHOD_CHANNEL_NAME = "com.pichillilorenzo/flutter_webview_environment";
 
     const FlutterInappwebviewWindowsPlugin* plugin;
@@ -28,6 +29,15 @@ namespace flutter_inappwebview_plugin
       std::unique_ptr<flutter::MethodResult<flutter::EncodableValue>> result);
 
     void createWebViewEnvironment(const std::string& id, std::unique_ptr<WebViewEnvironmentSettings> settings, std::unique_ptr<flutter::MethodResult<flutter::EncodableValue>> result);
+    void createOrGetDefaultWebViewEnvironment(const std::function<void(WebViewEnvironment*)> completionHandler);
+    HWND getHWND()
+    {
+      return hwnd_;
+    }
+  private:
+    std::unique_ptr<WebViewEnvironment> defaultEnvironment_;
+    WNDCLASS windowClass_ = {};
+    HWND hwnd_ = nullptr;
   };
 }
 #endif //FLUTTER_INAPPWEBVIEW_PLUGIN_WEBVIEW_ENVIRONMENT_MANAGER_H_

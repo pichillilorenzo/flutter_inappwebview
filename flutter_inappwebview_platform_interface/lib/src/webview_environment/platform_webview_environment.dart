@@ -88,7 +88,13 @@ abstract class PlatformWebViewEnvironment extends PlatformInterface
   WebViewEnvironmentSettings? get settings => params.settings;
 
   ///{@template flutter_inappwebview_platform_interface.PlatformWebViewEnvironment.create}
-  ///Initializes the [PlatformWebViewEnvironment] using [settings].
+  ///Creates the [PlatformWebViewEnvironment] using [settings].
+  ///
+  ///Check https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2210.55#createcorewebview2environmentwithoptions
+  ///for more info.
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Windows ([Official API - CreateCoreWebView2EnvironmentWithOptions](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2210.55#createcorewebview2environmentwithoptions))
   ///{@endtemplate}
   Future<PlatformWebViewEnvironment> create(
       {WebViewEnvironmentSettings? settings}) {

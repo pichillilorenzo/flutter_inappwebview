@@ -144,7 +144,7 @@ class PlatformHeadlessInAppWebViewCreationParams
   ///- MacOS
   final Size initialSize;
 
-  ///Used create the [PlatformHeadlessInAppWebView] using the specified environment.
+  ///Used to create the [PlatformHeadlessInAppWebView] using the specified environment.
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- Windows

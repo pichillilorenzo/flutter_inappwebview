@@ -6,16 +6,20 @@
 
 namespace flutter_inappwebview_plugin
 {
+  class WebViewEnvironmentManager;
   class InAppWebViewManager;
   class InAppBrowserManager;
   class HeadlessInAppWebViewManager;
+  class CookieManager;
 
   class FlutterInappwebviewWindowsPlugin : public flutter::Plugin {
   public:
     flutter::PluginRegistrarWindows* registrar;
+    std::unique_ptr<WebViewEnvironmentManager> webViewEnvironmentManager;
     std::unique_ptr<InAppWebViewManager> inAppWebViewManager;
     std::unique_ptr<InAppBrowserManager> inAppBrowserManager;
     std::unique_ptr<HeadlessInAppWebViewManager> headlessInAppWebViewManager;
+    std::unique_ptr<CookieManager> cookieManager;
 
     static void RegisterWithRegistrar(flutter::PluginRegistrarWindows* registrar);
 

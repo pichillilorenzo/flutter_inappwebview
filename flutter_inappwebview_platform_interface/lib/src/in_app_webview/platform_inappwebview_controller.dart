@@ -750,6 +750,7 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///- Android native WebView
   ///- iOS ([Official API - WKWebView.takeSnapshot](https://developer.apple.com/documentation/webkit/wkwebview/2873260-takesnapshot))
   ///- MacOS ([Official API - WKWebView.takeSnapshot](https://developer.apple.com/documentation/webkit/wkwebview/2873260-takesnapshot))
+  ///- Windows
   ///{@endtemplate}
   Future<Uint8List?> takeScreenshot(
       {ScreenshotConfiguration? screenshotConfiguration}) {

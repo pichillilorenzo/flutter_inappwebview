@@ -2,7 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_platform_interface.dart';
 
-/// Object specifying creation parameters for creating a [MacOSFindInteractionController].
+/// Object specifying creation parameters for creating a [WindowsFindInteractionController].
 ///
 /// When adding additional fields make sure they can be null or have a default
 /// value to avoid breaking changes. See [PlatformFindInteractionControllerCreationParams] for
@@ -25,10 +25,10 @@ class MacOSFindInteractionControllerCreationParams
 }
 
 ///{@macro flutter_inappwebview_platform_interface.PlatformFindInteractionController}
-class MacOSFindInteractionController extends PlatformFindInteractionController
+class WindowsFindInteractionController extends PlatformFindInteractionController
     with ChannelController {
-  /// Constructs a [MacOSFindInteractionController].
-  MacOSFindInteractionController(
+  /// Constructs a [WindowsFindInteractionController].
+  WindowsFindInteractionController(
       PlatformFindInteractionControllerCreationParams params)
       : super.implementation(
           params is MacOSFindInteractionControllerCreationParams
@@ -114,7 +114,7 @@ class MacOSFindInteractionController extends PlatformFindInteractionController
   }
 }
 
-extension InternalFindInteractionController on MacOSFindInteractionController {
+extension InternalFindInteractionController on WindowsFindInteractionController {
   void init(dynamic id) {
     channel = MethodChannel(
         'com.pichillilorenzo/flutter_inappwebview_find_interaction_$id');

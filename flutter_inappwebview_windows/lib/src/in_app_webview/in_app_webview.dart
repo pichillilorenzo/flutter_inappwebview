@@ -23,6 +23,7 @@ class WindowsInAppWebViewWidgetCreationParams
       super.keepAlive,
       super.preventGestureDelay,
       super.windowId,
+        super.webViewEnvironment,
       super.onWebViewCreated,
       super.onLoadStart,
       super.onLoadStop,
@@ -145,6 +146,7 @@ class WindowsInAppWebViewWidgetCreationParams
             keepAlive: params.keepAlive,
             preventGestureDelay: params.preventGestureDelay,
             windowId: params.windowId,
+            webViewEnvironment: params.webViewEnvironment,
             onWebViewCreated: params.onWebViewCreated,
             onLoadStart: params.onLoadStart,
             onLoadStop: params.onLoadStop,
@@ -248,10 +250,10 @@ class WindowsInAppWebViewWidgetCreationParams
             initialUserScripts: params.initialUserScripts,
             pullToRefreshController: params.pullToRefreshController,
             findInteractionController: params.findInteractionController
-                as MacOSFindInteractionController?);
+                as WindowsFindInteractionController?);
 
   @override
-  final MacOSFindInteractionController? findInteractionController;
+  final WindowsFindInteractionController? findInteractionController;
 }
 
 ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewWidget}
@@ -267,12 +269,12 @@ class WindowsInAppWebViewWidget extends PlatformInAppWebViewWidget {
                   .fromPlatformInAppWebViewWidgetCreationParams(params),
         );
 
-  WindowsInAppWebViewWidgetCreationParams get _macosParams =>
+  WindowsInAppWebViewWidgetCreationParams get _windowsParams =>
       params as WindowsInAppWebViewWidgetCreationParams;
 
   WindowsInAppWebViewController? _controller;
 
-  WindowsHeadlessInAppWebView? get _macosHeadlessInAppWebView =>
+  WindowsHeadlessInAppWebView? get _windowsHeadlessInAppWebView =>
       params.headlessWebView as WindowsHeadlessInAppWebView?;
 
   @override
@@ -316,6 +318,7 @@ class WindowsInAppWebViewWidget extends PlatformInAppWebViewWidget {
         'initialUserScripts':
             params.initialUserScripts?.map((e) => e.toMap()).toList() ?? [],
         'keepAliveId': params.keepAlive?.id,
+        'webViewEnvironmentId': params.webViewEnvironment?.id,
       },
     );
   }
@@ -326,11 +329,11 @@ class WindowsInAppWebViewWidget extends PlatformInAppWebViewWidget {
       viewId = params.headlessWebView?.id;
     }
     viewId = params.keepAlive?.id ?? viewId ?? id;
-    _macosHeadlessInAppWebView?.internalDispose();
+    _windowsHeadlessInAppWebView?.internalDispose();
     _controller = WindowsInAppWebViewController(
         PlatformInAppWebViewControllerCreationParams(
             id: viewId, webviewParams: params));
-    _macosParams.findInteractionController?.init(viewId);
+    _windowsParams.findInteractionController?.init(viewId);
     debugLog(
         className: runtimeType.toString(),
         id: viewId?.toString(),

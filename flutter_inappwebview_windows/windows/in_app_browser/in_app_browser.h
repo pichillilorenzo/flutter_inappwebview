@@ -24,6 +24,7 @@ namespace flutter_inappwebview_plugin
     const std::shared_ptr<InAppBrowserSettings> initialSettings;
     const std::shared_ptr<InAppWebViewSettings> initialWebViewSettings;
     const std::optional<std::vector<std::shared_ptr<UserScript>>> initialUserScripts;
+    const std::optional<std::string> webViewEnvironmentId;
   };
 
   class InAppBrowser {

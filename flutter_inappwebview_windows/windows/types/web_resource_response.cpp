@@ -3,7 +3,7 @@
 
 namespace flutter_inappwebview_plugin
 {
-  WebResourceResponse::WebResourceResponse(const std::optional<int>& statusCode)
+  WebResourceResponse::WebResourceResponse(const std::optional<int64_t>& statusCode)
     : statusCode(statusCode)
   {}
 

@@ -31,7 +31,7 @@ class MacOSWebMessagePortCreationParams
 ///{@macro flutter_inappwebview_platform_interface.PlatformWebMessagePort}
 class MacOSWebMessagePort extends PlatformWebMessagePort {
   WebMessageCallback? _onMessage;
-  late MacOSWebMessageChannel _webMessageChannel;
+  late WindowsWebMessageChannel _webMessageChannel;
 
   /// Constructs a [MacOSWebMessagePort].
   MacOSWebMessagePort(PlatformWebMessagePortCreationParams params)
@@ -89,7 +89,7 @@ extension InternalWebMessagePort on MacOSWebMessagePort {
   WebMessageCallback? get onMessage => _onMessage;
   void set onMessage(WebMessageCallback? value) => _onMessage = value;
 
-  MacOSWebMessageChannel get webMessageChannel => _webMessageChannel;
-  void set webMessageChannel(MacOSWebMessageChannel value) =>
+  WindowsWebMessageChannel get webMessageChannel => _webMessageChannel;
+  void set webMessageChannel(WindowsWebMessageChannel value) =>
       _webMessageChannel = value;
 }

@@ -33,9 +33,9 @@ namespace flutter_inappwebview_plugin
   {
   public:
     const std::string description;
-    const int type;
+    const int64_t type;
 
-    WebResourceError(const std::string& description, const int type);
+    WebResourceError(const std::string& description, const int64_t type);
     WebResourceError(const flutter::EncodableMap& map);
     ~WebResourceError() = default;
 

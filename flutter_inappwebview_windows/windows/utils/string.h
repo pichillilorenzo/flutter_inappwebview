@@ -1,6 +1,7 @@
 #ifndef FLUTTER_INAPPWEBVIEW_PLUGIN_UTIL_STRING_H_
 #define FLUTTER_INAPPWEBVIEW_PLUGIN_UTIL_STRING_H_
 
+#include <algorithm>
 #include <numeric>
 #include <optional>
 #include <string>
@@ -141,6 +142,39 @@ namespace flutter_inappwebview_plugin
 
     res.push_back(s.substr(pos_start));
     return res;
+  }
+
+  template <typename T>
+  void to_lowercase(const std::basic_string<T>& s)
+  {
+    std::transform(s.begin(), s.end(), s.begin(),
+      [](const T v) { return static_cast<T>(std::tolower(v)); });
+  }
+
+  template <typename T>
+  std::basic_string<T> to_lowercase_copy(const std::basic_string<T>& s)
+  {
+    std::basic_string<T> s2 = s;
+    std::transform(s2.begin(), s2.end(), s2.begin(),
+      [](const T v) { return static_cast<T>(std::tolower(v)); });
+    return s2;
+  }
+
+  template <typename T>
+  void to_uppercase(const std::basic_string<T>& s)
+  {
+    std::transform(s.begin(), s.end(), s.begin(),
+      [](const T v) { return static_cast<T>(std::toupper(v)); });
+    return s2;
+  }
+
+  template <typename T>
+  std::basic_string<T> to_uppercase_copy(const std::basic_string<T>& s)
+  {
+    std::basic_string<T> s2 = s;
+    std::transform(s2.begin(), s2.end(), s2.begin(),
+      [](const T v) { return static_cast<T>(std::toupper(v)); });
+    return s2;
   }
 }
 

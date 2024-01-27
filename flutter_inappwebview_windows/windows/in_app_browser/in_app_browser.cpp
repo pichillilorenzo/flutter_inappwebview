@@ -2,6 +2,7 @@
 
 #include "../utils/log.h"
 #include "../utils/strconv.h"
+#include "../webview_environment/webview_environment_manager.h"
 #include "in_app_browser.h"
 #include "in_app_browser_manager.h"
 
@@ -41,13 +42,22 @@ namespace flutter_inappwebview_plugin
 
     ShowWindow(m_hWnd, settings->hidden ? SW_HIDE : SW_SHOW);
 
+    CreateInAppWebViewEnvParams webViewEnvParams = {
+      m_hWnd,
+      false
+    };
+
+
     InAppWebViewCreationParams webViewParams = {
       id,
       params.initialWebViewSettings,
       params.initialUserScripts
     };
 
-    InAppWebView::createInAppWebViewEnv(m_hWnd, false,
+    auto webViewEnvironment = params.webViewEnvironmentId.has_value() && map_contains(plugin->webViewEnvironmentManager->webViewEnvironments, params.webViewEnvironmentId.value())
+      ? plugin->webViewEnvironmentManager->webViewEnvironments.at(params.webViewEnvironmentId.value()).get() : nullptr;
+
+    InAppWebView::createInAppWebViewEnv(webViewEnvParams, webViewEnvironment,
       [this, params, webViewParams](wil::com_ptr<ICoreWebView2Environment> webViewEnv, wil::com_ptr<ICoreWebView2Controller> webViewController, wil::com_ptr<ICoreWebView2CompositionController> webViewCompositionController) -> void
       {
         if (webViewEnv && webViewController) {
@@ -83,13 +93,11 @@ namespace flutter_inappwebview_plugin
   void InAppBrowser::show() const
   {
     ShowWindow(m_hWnd, SW_SHOW);
-    webView->webViewController->put_IsVisible(true);
   }
 
   void InAppBrowser::hide() const
   {
     ShowWindow(m_hWnd, SW_HIDE);
-    webView->webViewController->put_IsVisible(false);
   }
 
   bool InAppBrowser::isHidden() const

@@ -13,6 +13,8 @@
 #include "../utils/vector.h"
 #include "in_app_webview_manager.h"
 
+#include ".plugin_symlinks/flutter_inappwebview_windows/windows/webview_environment/webview_environment_manager.h"
+
 namespace flutter_inappwebview_plugin
 {
   InAppWebViewManager::InAppWebViewManager(const FlutterInappwebviewWindowsPlugin* plugin)
@@ -83,6 +85,7 @@ namespace flutter_inappwebview_plugin
     auto initialFile = get_optional_fl_map_value<std::string>(*arguments, "initialFile");
     auto initialDataMap = get_optional_fl_map_value<flutter::EncodableMap>(*arguments, "initialData");
     auto initialUserScriptList = get_optional_fl_map_value<flutter::EncodableList>(*arguments, "initialUserScripts");
+    auto webViewEnvironmentId = get_optional_fl_map_value<std::string>(*arguments, "webViewEnvironmentId");
 
     RECT bounds;
     GetClientRect(plugin->registrar->GetView()->GetNativeWindow(), &bounds);
@@ -93,7 +96,15 @@ namespace flutter_inappwebview_plugin
       nullptr,
       windowClass_.hInstance, nullptr);
 
-    InAppWebView::createInAppWebViewEnv(hwnd, true,
+    CreateInAppWebViewEnvParams webViewEnvParams = {
+      hwnd,
+      true
+    };
+
+    auto webViewEnvironment = webViewEnvironmentId.has_value() && map_contains(plugin->webViewEnvironmentManager->webViewEnvironments, webViewEnvironmentId.value())
+      ? plugin->webViewEnvironmentManager->webViewEnvironments.at(webViewEnvironmentId.value()).get() : nullptr;
+
+    InAppWebView::createInAppWebViewEnv(webViewEnvParams, webViewEnvironment,
       [=](wil::com_ptr<ICoreWebView2Environment> webViewEnv,
         wil::com_ptr<ICoreWebView2Controller> webViewController,
         wil::com_ptr<ICoreWebView2CompositionController> webViewCompositionController)

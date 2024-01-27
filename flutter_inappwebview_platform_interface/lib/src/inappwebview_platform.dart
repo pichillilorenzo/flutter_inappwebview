@@ -24,6 +24,7 @@ import 'platform_tracing_controller.dart';
 import 'platform_webview_asset_loader.dart';
 import 'platform_webview_feature.dart';
 import 'in_app_localhost_server.dart';
+import 'webview_environment/platform_webview_environment.dart';
 
 /// Interface for a platform implementation of a WebView.
 abstract class InAppWebViewPlatform extends PlatformInterface {
@@ -429,5 +430,25 @@ abstract class InAppWebViewPlatform extends PlatformInterface {
   PlatformChromeSafariBrowser createPlatformChromeSafariBrowserStatic() {
     throw UnimplementedError(
         'createPlatformChromeSafariBrowserStatic is not implemented on the current platform.');
+  }
+
+  /// Creates a new [PlatformWebViewEnvironment].
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [WebViewEnvironment] in `flutter_inappwebview` instead.
+  PlatformWebViewEnvironment createPlatformWebViewEnvironment(
+      PlatformWebViewEnvironmentCreationParams params,
+      ) {
+    throw UnimplementedError(
+        'createPlatformWebViewEnvironment is not implemented on the current platform.');
+  }
+
+  /// Creates a new empty [PlatformWebViewEnvironment] to access static methods.
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [WebViewEnvironment] in `flutter_inappwebview` instead.
+  PlatformWebViewEnvironment createPlatformWebViewEnvironmentStatic() {
+    throw UnimplementedError(
+        'createPlatformWebViewEnvironmentStatic is not implemented on the current platform.');
   }
 }

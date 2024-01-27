@@ -32,13 +32,13 @@ class WindowsInAppBrowserCreationParams
         contextMenu: params.contextMenu,
         pullToRefreshController: params.pullToRefreshController,
         findInteractionController:
-            params.findInteractionController as MacOSFindInteractionController?,
+            params.findInteractionController as WindowsFindInteractionController?,
         initialUserScripts: params.initialUserScripts,
         windowId: params.windowId);
   }
 
   @override
-  final MacOSFindInteractionController? findInteractionController;
+  final WindowsFindInteractionController? findInteractionController;
 }
 
 ///{@macro flutter_inappwebview_platform_interface.PlatformInAppBrowser}

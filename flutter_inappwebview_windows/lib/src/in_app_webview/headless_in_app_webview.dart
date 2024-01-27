@@ -238,10 +238,10 @@ class WindowsHeadlessInAppWebViewCreationParams
             initialUserScripts: params.initialUserScripts,
             pullToRefreshController: params.pullToRefreshController,
             findInteractionController: params.findInteractionController
-                as MacOSFindInteractionController?);
+                as WindowsFindInteractionController?);
 
   @override
-  final MacOSFindInteractionController? findInteractionController;
+  final WindowsFindInteractionController? findInteractionController;
 }
 
 ///{@macro flutter_inappwebview_platform_interface.PlatformHeadlessInAppWebView}

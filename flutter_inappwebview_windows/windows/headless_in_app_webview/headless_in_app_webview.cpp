@@ -19,7 +19,6 @@ namespace flutter_inappwebview_plugin
     if (!webView) {
       return;
     }
-    webView->webViewController->put_IsVisible(false);
   }
 
   void HeadlessInAppWebView::setSize(const std::shared_ptr<Size2D> size) const
@@ -48,12 +47,13 @@ namespace flutter_inappwebview_plugin
   HeadlessInAppWebView::~HeadlessInAppWebView()
   {
     debugLog("dealloc HeadlessInAppWebView");
+    HWND parentWindow = nullptr;
     if (webView && webView->webViewController) {
-      HWND parentWindow;
-      if (succeededOrLog(webView->webViewController->get_ParentWindow(&parentWindow))) {
-        DestroyWindow(parentWindow);
-      }
+      webView->webViewController->get_ParentWindow(&parentWindow);
     }
     webView = nullptr;
+    if (parentWindow) {
+      DestroyWindow(parentWindow);
+    }
   }
 }

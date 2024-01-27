@@ -15,12 +15,20 @@ import 'package:pointer_interceptor/pointer_interceptor.dart';
 // import 'package:permission_handler/permission_handler.dart';
 
 final localhostServer = InAppLocalhostServer(documentRoot: 'assets');
+WebViewEnvironment? webViewEnvironment;
 
 Future main() async {
   WidgetsFlutterBinding.ensureInitialized();
   // await Permission.camera.request();
   // await Permission.microphone.request();
   // await Permission.storage.request();
+
+  if (!kIsWeb && defaultTargetPlatform == TargetPlatform.windows) {
+    webViewEnvironment = await WebViewEnvironment.create(settings:
+      WebViewEnvironmentSettings(
+          userDataFolder: 'custom_path'
+      ));
+  }
 
   if (!kIsWeb && defaultTargetPlatform == TargetPlatform.android) {
     await InAppWebViewController.setWebContentsDebuggingEnabled(kDebugMode);

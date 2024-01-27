@@ -9,9 +9,9 @@ namespace flutter_inappwebview_plugin
   class WebResourceResponse
   {
   public:
-    const std::optional<int> statusCode;
+    const std::optional<int64_t> statusCode;
 
-    WebResourceResponse(const std::optional<int>& statusCode);
+    WebResourceResponse(const std::optional<int64_t>& statusCode);
     WebResourceResponse(const flutter::EncodableMap& map);
     ~WebResourceResponse() = default;
 

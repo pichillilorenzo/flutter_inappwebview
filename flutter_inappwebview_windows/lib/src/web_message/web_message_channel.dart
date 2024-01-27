@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_platform_interface.dart';
 import 'web_message_port.dart';
 
-/// Object specifying creation parameters for creating a [MacOSWebMessageChannel].
+/// Object specifying creation parameters for creating a [WindowsWebMessageChannel].
 ///
 /// When adding additional fields make sure they can be null or have a default
 /// value to avoid breaking changes. See [PlatformWebMessageChannelCreationParams] for
@@ -31,10 +31,10 @@ class MacOSWebMessageChannelCreationParams
 }
 
 ///{@macro flutter_inappwebview_platform_interface.PlatformWebMessageChannel}
-class MacOSWebMessageChannel extends PlatformWebMessageChannel
+class WindowsWebMessageChannel extends PlatformWebMessageChannel
     with ChannelController {
-  /// Constructs a [MacOSWebMessageChannel].
-  MacOSWebMessageChannel(PlatformWebMessageChannelCreationParams params)
+  /// Constructs a [WindowsWebMessageChannel].
+  WindowsWebMessageChannel(PlatformWebMessageChannelCreationParams params)
       : super.implementation(
           params is MacOSWebMessageChannelCreationParams
               ? params
@@ -47,7 +47,7 @@ class MacOSWebMessageChannel extends PlatformWebMessageChannel
     initMethodCallHandler();
   }
 
-  static final MacOSWebMessageChannel _staticValue = MacOSWebMessageChannel(
+  static final WindowsWebMessageChannel _staticValue = WindowsWebMessageChannel(
       MacOSWebMessageChannelCreationParams(
           id: '',
           port1:
@@ -56,7 +56,7 @@ class MacOSWebMessageChannel extends PlatformWebMessageChannel
               MacOSWebMessagePortCreationParams(index: 1))));
 
   /// Provide static access.
-  factory MacOSWebMessageChannel.static() {
+  factory WindowsWebMessageChannel.static() {
     return _staticValue;
   }
 
@@ -64,11 +64,11 @@ class MacOSWebMessageChannel extends PlatformWebMessageChannel
 
   MacOSWebMessagePort get _macosPort2 => port2 as MacOSWebMessagePort;
 
-  static MacOSWebMessageChannel? _fromMap(Map<String, dynamic>? map) {
+  static WindowsWebMessageChannel? _fromMap(Map<String, dynamic>? map) {
     if (map == null) {
       return null;
     }
-    var webMessageChannel = MacOSWebMessageChannel(
+    var webMessageChannel = WindowsWebMessageChannel(
         MacOSWebMessageChannelCreationParams(
             id: map["id"],
             port1: MacOSWebMessagePort(
@@ -100,7 +100,7 @@ class MacOSWebMessageChannel extends PlatformWebMessageChannel
   }
 
   @override
-  MacOSWebMessageChannel? fromMap(Map<String, dynamic>? map) {
+  WindowsWebMessageChannel? fromMap(Map<String, dynamic>? map) {
     return _fromMap(map);
   }
 
@@ -115,6 +115,6 @@ class MacOSWebMessageChannel extends PlatformWebMessageChannel
   }
 }
 
-extension InternalWebMessageChannel on MacOSWebMessageChannel {
+extension InternalWebMessageChannel on WindowsWebMessageChannel {
   MethodChannel? get internalChannel => channel;
 }

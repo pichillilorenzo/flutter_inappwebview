@@ -14,6 +14,8 @@
 #include "../types/navigation_action.h"
 #include "../types/url_request.h"
 #include "../types/web_history.h"
+#include "../webview_environment/webview_environment.h"
+#include ".plugin_symlinks/flutter_inappwebview_windows/windows/types/screenshot_configuration.h"
 #include "in_app_webview_settings.h"
 #include "user_content_controller.h"
 #include "webview_channel_delegate.h"
@@ -81,6 +83,11 @@ namespace flutter_inappwebview_plugin
     const std::optional<std::vector<std::shared_ptr<UserScript>>> initialUserScripts;
   };
 
+  struct CreateInAppWebViewEnvParams {
+    const HWND parentWindow;
+    const bool willBeSurface;
+  };
+
   class InAppWebView
   {
   public:
@@ -107,7 +114,7 @@ namespace flutter_inappwebview_plugin
       wil::com_ptr<ICoreWebView2CompositionController> webViewCompositionController);
     ~InAppWebView();
 
-    static void createInAppWebViewEnv(const HWND parentWindow, const bool willBeSurface, std::function<void(wil::com_ptr<ICoreWebView2Environment> webViewEnv,
+    static void createInAppWebViewEnv(const CreateInAppWebViewEnvParams& params, const WebViewEnvironment* webViewEnvironment, std::function<void(wil::com_ptr<ICoreWebView2Environment> webViewEnv,
       wil::com_ptr<ICoreWebView2Controller> webViewController,
       wil::com_ptr<ICoreWebView2CompositionController> webViewCompositionController)> completionHandler);
 
@@ -147,8 +154,8 @@ namespace flutter_inappwebview_plugin
     bool canGoBack() const;
     void goForward();
     bool canGoForward() const;
-    void goBackOrForward(const int& steps);
-    void canGoBackOrForward(const int& steps, std::function<void(bool)> completionHandler) const;
+    void goBackOrForward(const int64_t& steps);
+    void canGoBackOrForward(const int64_t& steps, std::function<void(bool)> completionHandler) const;
     bool isLoading() const
     {
       return isLoading_;
@@ -161,6 +168,7 @@ namespace flutter_inappwebview_plugin
     void removeUserScript(const int64_t index, const std::shared_ptr<UserScript> userScript) const;
     void removeUserScriptsByGroupName(const std::string& groupName) const;
     void removeAllUserScripts() const;
+    void takeScreenshot(const std::optional<std::shared_ptr<ScreenshotConfiguration>> screenshotConfiguration, const std::function<void(const std::optional<std::string>)> completionHandler) const;
 
     std::string pageFrameId() const
     {

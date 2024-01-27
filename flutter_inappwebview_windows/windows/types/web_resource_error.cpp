@@ -3,7 +3,7 @@
 
 namespace flutter_inappwebview_plugin
 {
-  WebResourceError::WebResourceError(const std::string& description, const int type)
+  WebResourceError::WebResourceError(const std::string& description, const int64_t type)
     : description(description), type(type)
   {}
 

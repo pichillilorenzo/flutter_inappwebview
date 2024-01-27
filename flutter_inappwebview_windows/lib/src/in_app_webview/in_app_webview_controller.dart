@@ -74,7 +74,7 @@ class WindowsInAppWebViewController extends PlatformInAppWebViewController
   };
   Set<String> _webMessageListenerObjNames = Set();
   Map<String, ScriptHtmlTagAttributes> _injectedScriptsFromURL = {};
-  Set<MacOSWebMessageChannel> _webMessageChannels = Set();
+  Set<WindowsWebMessageChannel> _webMessageChannels = Set();
   Set<MacOSWebMessageListener> _webMessageListeners = Set();
 
   // static map that contains the properties to be saved and restored for keep alive feature
@@ -187,7 +187,7 @@ class WindowsInAppWebViewController extends PlatformInAppWebViewController
           _userScripts = props.userScripts;
           _webMessageListenerObjNames = props.webMessageListenerObjNames;
           _webMessageChannels =
-              props.webMessageChannels as Set<MacOSWebMessageChannel>;
+              props.webMessageChannels as Set<WindowsWebMessageChannel>;
           _webMessageListeners =
               props.webMessageListeners as Set<MacOSWebMessageListener>;
         }
@@ -2007,7 +2007,8 @@ class WindowsInAppWebViewController extends PlatformInAppWebViewController
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent(
         'screenshotConfiguration', () => screenshotConfiguration?.toMap());
-    return await channel?.invokeMethod<Uint8List?>('takeScreenshot', args);
+    final base64 = await channel?.invokeMethod<String?>('takeScreenshot', args);
+    return base64 != null ? base64Decode(base64) : null;
   }
 
   @override
@@ -2460,12 +2461,12 @@ class WindowsInAppWebViewController extends PlatformInAppWebViewController
   }
 
   @override
-  Future<MacOSWebMessageChannel?> createWebMessageChannel() async {
+  Future<WindowsWebMessageChannel?> createWebMessageChannel() async {
     Map<String, dynamic> args = <String, dynamic>{};
     Map<String, dynamic>? result =
         (await channel?.invokeMethod('createWebMessageChannel', args))
             ?.cast<String, dynamic>();
-    final webMessageChannel = MacOSWebMessageChannel.static().fromMap(result);
+    final webMessageChannel = WindowsWebMessageChannel.static().fromMap(result);
     if (webMessageChannel != null) {
       _webMessageChannels.add(webMessageChannel);
     }

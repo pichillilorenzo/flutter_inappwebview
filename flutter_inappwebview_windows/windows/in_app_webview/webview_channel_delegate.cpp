@@ -159,6 +159,16 @@ namespace flutter_inappwebview_plugin
       webView->removeAllUserScripts();
       result->Success(true);
     }
+    else if (string_equals(methodName, "takeScreenshot")) {
+      auto result_ = std::shared_ptr<flutter::MethodResult<flutter::EncodableValue>>(std::move(result));
+      auto screenshotConfigurationMap = get_optional_fl_map_value<flutter::EncodableMap>(arguments, "screenshotConfiguration");
+      std::optional<std::unique_ptr<ScreenshotConfiguration>> screenshotConfiguration =
+        screenshotConfigurationMap.has_value() ? std::make_unique<ScreenshotConfiguration>(screenshotConfigurationMap.value()) : std::optional<std::unique_ptr<ScreenshotConfiguration>>{};
+      webView->takeScreenshot(std::move(screenshotConfiguration), [result_ = std::move(result_)](const std::optional<std::string> data)
+        {
+          result_->Success(make_fl_value(data));
+        });
+    }
     // for inAppBrowser
     else if (webView->inAppBrowser && string_equals(methodName, "show")) {
       webView->inAppBrowser->show();

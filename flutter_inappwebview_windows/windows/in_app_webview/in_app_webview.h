@@ -15,7 +15,7 @@
 #include "../types/url_request.h"
 #include "../types/web_history.h"
 #include "../webview_environment/webview_environment.h"
-#include ".plugin_symlinks/flutter_inappwebview_windows/windows/types/screenshot_configuration.h"
+#include "../types/screenshot_configuration.h"
 #include "in_app_webview_settings.h"
 #include "user_content_controller.h"
 #include "webview_channel_delegate.h"

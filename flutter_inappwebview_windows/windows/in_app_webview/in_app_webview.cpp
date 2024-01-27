@@ -13,9 +13,8 @@
 #include "../utils/map.h"
 #include "../utils/strconv.h"
 #include "../utils/string.h"
+#include "../webview_environment/webview_environment_manager.h"
 #include "in_app_webview.h"
-
-#include ".plugin_symlinks/flutter_inappwebview_windows/windows/webview_environment/webview_environment_manager.h"
 #include "in_app_webview_manager.h"
 
 namespace flutter_inappwebview_plugin

@@ -57,11 +57,11 @@ namespace flutter_inappwebview_plugin
     this->inAppBrowser = inAppBrowser;
   }
 
-  void InAppWebView::createInAppWebViewEnv(const CreateInAppWebViewEnvParams& params, const WebViewEnvironment* webViewEnvironment, std::function<void(wil::com_ptr<ICoreWebView2Environment> webViewEnv,
+  void InAppWebView::createInAppWebViewEnv(const HWND parentWindow, const bool& willBeSurface, const WebViewEnvironment* webViewEnvironment, std::function<void(wil::com_ptr<ICoreWebView2Environment> webViewEnv,
     wil::com_ptr<ICoreWebView2Controller> webViewController,
     wil::com_ptr<ICoreWebView2CompositionController> webViewCompositionController)> completionHandler)
   {
-    auto callback = [params, completionHandler](HRESULT result, wil::com_ptr<ICoreWebView2Environment> env) -> HRESULT
+    auto callback = [parentWindow, willBeSurface, completionHandler](HRESULT result, wil::com_ptr<ICoreWebView2Environment> env) -> HRESULT
       {
         if (failedAndLog(result) || !env) {
           completionHandler(nullptr, nullptr, nullptr);
@@ -69,8 +69,8 @@ namespace flutter_inappwebview_plugin
         }
 
         wil::com_ptr<ICoreWebView2Environment3> webViewEnv3;
-        if (params.willBeSurface && succeededOrLog(env->QueryInterface(IID_PPV_ARGS(&webViewEnv3)))) {
-          failedLog(webViewEnv3->CreateCoreWebView2CompositionController(params.parentWindow, Callback<ICoreWebView2CreateCoreWebView2CompositionControllerCompletedHandler>(
+        if (willBeSurface && succeededOrLog(env->QueryInterface(IID_PPV_ARGS(&webViewEnv3)))) {
+          failedLog(webViewEnv3->CreateCoreWebView2CompositionController(parentWindow, Callback<ICoreWebView2CreateCoreWebView2CompositionControllerCompletedHandler>(
             [completionHandler, env](HRESULT result, wil::com_ptr<ICoreWebView2CompositionController> compositionController) -> HRESULT
             {
               wil::com_ptr<ICoreWebView2Controller3> webViewController = compositionController.try_query<ICoreWebView2Controller3>();
@@ -93,7 +93,7 @@ namespace flutter_inappwebview_plugin
           ).Get()));
         }
         else {
-          failedLog(env->CreateCoreWebView2Controller(params.parentWindow, Callback<ICoreWebView2CreateCoreWebView2ControllerCompletedHandler>(
+          failedLog(env->CreateCoreWebView2Controller(parentWindow, Callback<ICoreWebView2CreateCoreWebView2ControllerCompletedHandler>(
             [completionHandler, env](HRESULT result, wil::com_ptr<ICoreWebView2Controller> controller) -> HRESULT
             {
               if (failedAndLog(result) || !controller) {

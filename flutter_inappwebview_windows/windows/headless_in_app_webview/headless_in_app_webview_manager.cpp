@@ -56,7 +56,7 @@ namespace flutter_inappwebview_plugin
     auto initialFile = get_optional_fl_map_value<std::string>(params, "initialFile");
     auto initialDataMap = get_optional_fl_map_value<flutter::EncodableMap>(params, "initialData");
     auto initialUserScriptList = get_optional_fl_map_value<flutter::EncodableList>(params, "initialUserScripts");
-    auto webViewEnvironmentId = get_optional_fl_map_value<std::string>(*arguments, "webViewEnvironmentId");
+    auto webViewEnvironmentId = get_optional_fl_map_value<std::string>(params, "webViewEnvironmentId");
 
     RECT bounds;
     GetClientRect(plugin->registrar->GetView()->GetNativeWindow(), &bounds);
@@ -70,15 +70,10 @@ namespace flutter_inappwebview_plugin
       nullptr,
       windowClass_.hInstance, nullptr);
 
-    CreateInAppWebViewEnvParams webViewEnvParams = {
-      hwnd,
-      false
-    };
-
     auto webViewEnvironment = webViewEnvironmentId.has_value() && map_contains(plugin->webViewEnvironmentManager->webViewEnvironments, webViewEnvironmentId.value())
       ? plugin->webViewEnvironmentManager->webViewEnvironments.at(webViewEnvironmentId.value()).get() : nullptr;
 
-    InAppWebView::createInAppWebViewEnv(webViewEnvParams, webViewEnvironment,
+    InAppWebView::createInAppWebViewEnv(hwnd, false, webViewEnvironment,
       [=](wil::com_ptr<ICoreWebView2Environment> webViewEnv,
         wil::com_ptr<ICoreWebView2Controller> webViewController,
         wil::com_ptr<ICoreWebView2CompositionController> webViewCompositionController)

@@ -19,6 +19,7 @@ import '../in_app_webview/in_app_webview_settings.dart';
 
 import '../print_job/main.dart';
 import '../web_uri.dart';
+import '../webview_environment/platform_webview_environment.dart';
 import 'in_app_browser_menu_item.dart';
 import 'in_app_browser_settings.dart';
 import '../debug_logging_settings.dart';
@@ -36,7 +37,9 @@ class PlatformInAppBrowserCreationParams {
       this.pullToRefreshController,
       this.findInteractionController,
       this.initialUserScripts,
-      this.windowId});
+      this.windowId,
+      this.webViewEnvironment,
+      });
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformInAppBrowser.contextMenu}
   final ContextMenu? contextMenu;
@@ -52,6 +55,12 @@ class PlatformInAppBrowserCreationParams {
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformInAppBrowser.windowId}
   final int? windowId;
+
+  ///Used create the [PlatformInAppBrowser] using the specified environment.
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Windows
+  final PlatformWebViewEnvironment? webViewEnvironment;
 }
 
 ///{@template flutter_inappwebview_platform_interface.PlatformInAppBrowser}

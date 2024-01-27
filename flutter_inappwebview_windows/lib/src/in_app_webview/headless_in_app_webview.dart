@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_platform_interface.dart';
 import '../find_interaction/find_interaction_controller.dart';
+import '../webview_environment/webview_environment.dart';
 import 'in_app_webview_controller.dart';
 
 /// Object specifying creation parameters for creating a [WindowsHeadlessInAppWebView].
@@ -18,6 +19,7 @@ class WindowsHeadlessInAppWebViewCreationParams
   WindowsHeadlessInAppWebViewCreationParams(
       {super.controllerFromPlatform,
       super.initialSize,
+        this.webViewEnvironment,
       super.windowId,
       super.onWebViewCreated,
       super.onLoadStart,
@@ -133,6 +135,7 @@ class WindowsHeadlessInAppWebViewCreationParams
       PlatformHeadlessInAppWebViewCreationParams params)
       : this(
             controllerFromPlatform: params.controllerFromPlatform,
+            webViewEnvironment: params.webViewEnvironment as WindowsWebViewEnvironment?,
             initialSize: params.initialSize,
             windowId: params.windowId,
             onWebViewCreated: params.onWebViewCreated,
@@ -242,6 +245,9 @@ class WindowsHeadlessInAppWebViewCreationParams
 
   @override
   final WindowsFindInteractionController? findInteractionController;
+
+  @override
+  final WindowsWebViewEnvironment? webViewEnvironment;
 }
 
 ///{@macro flutter_inappwebview_platform_interface.PlatformHeadlessInAppWebView}
@@ -339,7 +345,8 @@ class WindowsHeadlessInAppWebView extends PlatformHeadlessInAppWebView
                   params.initialUserScripts?.map((e) => e.toMap()).toList() ??
                       [],
               'pullToRefreshSettings': pullToRefreshSettings,
-              'initialSize': params.initialSize.toMap()
+              'initialSize': params.initialSize.toMap(),
+              'webViewEnvironmentId': params.webViewEnvironment?.id,
             });
     try {
       await _sharedChannel.invokeMethod('run', args);

@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 import '../inappwebview_platform.dart';
 import '../types/disposable.dart';
+import '../webview_environment/platform_webview_environment.dart';
 import 'platform_inappwebview_controller.dart';
 import 'platform_webview.dart';
 
@@ -17,6 +18,7 @@ class PlatformHeadlessInAppWebViewCreationParams
   /// Used by the platform implementation to create a new [PlatformHeadlessInAppWebView].
   const PlatformHeadlessInAppWebViewCreationParams(
       {this.initialSize = const Size(-1, -1),
+        this.webViewEnvironment,
       super.controllerFromPlatform,
       super.windowId,
       super.onWebViewCreated,
@@ -141,6 +143,12 @@ class PlatformHeadlessInAppWebViewCreationParams
   ///- Web
   ///- MacOS
   final Size initialSize;
+
+  ///Used create the [PlatformHeadlessInAppWebView] using the specified environment.
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Windows
+  final PlatformWebViewEnvironment? webViewEnvironment;
 }
 
 ///{@template flutter_inappwebview_platform_interface.PlatformHeadlessInAppWebView}

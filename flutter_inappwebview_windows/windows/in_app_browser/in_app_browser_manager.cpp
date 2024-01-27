@@ -26,7 +26,7 @@ namespace flutter_inappwebview_plugin
 
     if (string_equals(methodName, "open")) {
       createInAppBrowser(arguments);
-      result->Success(flutter::EncodableValue(true));
+      result->Success(true);
     }
     else if (string_equals(methodName, "openWithSystemBrowser")) {
       auto url = get_fl_map_value<std::string>(*arguments, "url");

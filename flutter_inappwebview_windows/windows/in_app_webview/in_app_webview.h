@@ -12,10 +12,10 @@
 #include "../plugin_scripts_js/plugin_scripts_util.h"
 #include "../types/content_world.h"
 #include "../types/navigation_action.h"
+#include "../types/screenshot_configuration.h"
 #include "../types/url_request.h"
 #include "../types/web_history.h"
 #include "../webview_environment/webview_environment.h"
-#include "../types/screenshot_configuration.h"
 #include "in_app_webview_settings.h"
 #include "user_content_controller.h"
 #include "webview_channel_delegate.h"
@@ -83,11 +83,6 @@ namespace flutter_inappwebview_plugin
     const std::optional<std::vector<std::shared_ptr<UserScript>>> initialUserScripts;
   };
 
-  struct CreateInAppWebViewEnvParams {
-    const HWND parentWindow;
-    const bool willBeSurface;
-  };
-
   class InAppWebView
   {
   public:
@@ -114,7 +109,7 @@ namespace flutter_inappwebview_plugin
       wil::com_ptr<ICoreWebView2CompositionController> webViewCompositionController);
     ~InAppWebView();
 
-    static void createInAppWebViewEnv(const CreateInAppWebViewEnvParams& params, const WebViewEnvironment* webViewEnvironment, std::function<void(wil::com_ptr<ICoreWebView2Environment> webViewEnv,
+    static void createInAppWebViewEnv(const HWND parentWindow, const bool& willBeSurface, const WebViewEnvironment* webViewEnvironment, std::function<void(wil::com_ptr<ICoreWebView2Environment> webViewEnv,
       wil::com_ptr<ICoreWebView2Controller> webViewController,
       wil::com_ptr<ICoreWebView2CompositionController> webViewCompositionController)> completionHandler);
 

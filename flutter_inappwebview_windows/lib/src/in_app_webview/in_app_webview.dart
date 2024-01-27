@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_platform_interface.dart';
+import '../webview_environment/webview_environment.dart';
 import 'headless_in_app_webview.dart';
 
 import '../find_interaction/find_interaction_controller.dart';
@@ -23,7 +24,7 @@ class WindowsInAppWebViewWidgetCreationParams
       super.keepAlive,
       super.preventGestureDelay,
       super.windowId,
-        super.webViewEnvironment,
+        this.webViewEnvironment,
       super.onWebViewCreated,
       super.onLoadStart,
       super.onLoadStop,
@@ -146,7 +147,7 @@ class WindowsInAppWebViewWidgetCreationParams
             keepAlive: params.keepAlive,
             preventGestureDelay: params.preventGestureDelay,
             windowId: params.windowId,
-            webViewEnvironment: params.webViewEnvironment,
+            webViewEnvironment: params.webViewEnvironment as WindowsWebViewEnvironment?,
             onWebViewCreated: params.onWebViewCreated,
             onLoadStart: params.onLoadStart,
             onLoadStop: params.onLoadStop,
@@ -254,6 +255,9 @@ class WindowsInAppWebViewWidgetCreationParams
 
   @override
   final WindowsFindInteractionController? findInteractionController;
+
+  @override
+  final WindowsWebViewEnvironment? webViewEnvironment;
 }
 
 ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewWidget}

@@ -11,8 +11,8 @@
 #include "../utils/log.h"
 #include "../utils/string.h"
 #include "../utils/vector.h"
-#include "in_app_webview_manager.h"
 #include "../webview_environment/webview_environment_manager.h"
+#include "in_app_webview_manager.h"
 
 namespace flutter_inappwebview_plugin
 {
@@ -95,15 +95,10 @@ namespace flutter_inappwebview_plugin
       nullptr,
       windowClass_.hInstance, nullptr);
 
-    CreateInAppWebViewEnvParams webViewEnvParams = {
-      hwnd,
-      true
-    };
-
     auto webViewEnvironment = webViewEnvironmentId.has_value() && map_contains(plugin->webViewEnvironmentManager->webViewEnvironments, webViewEnvironmentId.value())
       ? plugin->webViewEnvironmentManager->webViewEnvironments.at(webViewEnvironmentId.value()).get() : nullptr;
 
-    InAppWebView::createInAppWebViewEnv(webViewEnvParams, webViewEnvironment,
+    InAppWebView::createInAppWebViewEnv(hwnd, true, webViewEnvironment,
       [=](wil::com_ptr<ICoreWebView2Environment> webViewEnv,
         wil::com_ptr<ICoreWebView2Controller> webViewController,
         wil::com_ptr<ICoreWebView2CompositionController> webViewCompositionController)
@@ -147,7 +142,7 @@ namespace flutter_inappwebview_plugin
 
           webViews.insert({ textureId, std::move(customPlatformView) });
 
-          result_->Success(flutter::EncodableValue(textureId));
+          result_->Success(textureId);
         }
         else {
           result_->Error("0", "Cannot create the InAppWebView instance!");

@@ -7,6 +7,7 @@ import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_pla
 
 import '../find_interaction/find_interaction_controller.dart';
 import '../in_app_webview/in_app_webview_controller.dart';
+import '../webview_environment/webview_environment.dart';
 
 /// Object specifying creation parameters for creating a [WindowsInAppBrowser].
 ///
@@ -21,7 +22,8 @@ class WindowsInAppBrowserCreationParams
       super.pullToRefreshController,
       this.findInteractionController,
       super.initialUserScripts,
-      super.windowId});
+      super.windowId,
+      this.webViewEnvironment});
 
   /// Creates a [WindowsInAppBrowserCreationParams] instance based on [PlatformInAppBrowserCreationParams].
   factory WindowsInAppBrowserCreationParams.fromPlatformInAppBrowserCreationParams(
@@ -34,11 +36,15 @@ class WindowsInAppBrowserCreationParams
         findInteractionController:
             params.findInteractionController as WindowsFindInteractionController?,
         initialUserScripts: params.initialUserScripts,
-        windowId: params.windowId);
+        windowId: params.windowId,
+        webViewEnvironment: params.webViewEnvironment as WindowsWebViewEnvironment?);
   }
 
   @override
   final WindowsFindInteractionController? findInteractionController;
+
+  @override
+  final WindowsWebViewEnvironment? webViewEnvironment;
 }
 
 ///{@macro flutter_inappwebview_platform_interface.PlatformInAppBrowser}
@@ -168,6 +174,7 @@ class WindowsInAppBrowser extends PlatformInAppBrowser with ChannelController {
         () => initialUserScripts?.map((e) => e.toMap()).toList() ?? []);
     args.putIfAbsent('pullToRefreshSettings', () => pullToRefreshSettings);
     args.putIfAbsent('menuItems', () => menuItemList);
+    args.putIfAbsent('webViewEnvironmentId', () => _windowsParams.webViewEnvironment?.id);
     return args;
   }
 

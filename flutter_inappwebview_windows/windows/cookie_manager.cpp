@@ -26,12 +26,7 @@ namespace flutter_inappwebview_plugin
       nullptr,
       windowClass_.hInstance, nullptr);
 
-    CreateInAppWebViewEnvParams webViewEnvParams = {
-      hwnd,
-      false
-    };
-
-    InAppWebView::createInAppWebViewEnv(webViewEnvParams, nullptr,
+    InAppWebView::createInAppWebViewEnv(hwnd, false, nullptr,
       [=](wil::com_ptr<ICoreWebView2Environment> webViewEnv,
         wil::com_ptr<ICoreWebView2Controller> webViewController,
         wil::com_ptr<ICoreWebView2CompositionController> webViewCompositionController)
@@ -80,7 +75,6 @@ namespace flutter_inappwebview_plugin
       if (expiresDate.has_value()) {
         parameters["expires"] = expiresDate.value() / 1000;
       }
-      debugLog(maxAge.value());
       if (maxAge.has_value()) {
         // time(NULL) represents the current unix timestamp in seconds
         parameters["expires"] = time(NULL) + maxAge.value();

@@ -20,6 +20,7 @@ class PlatformWebViewEnvironmentCreationParams {
 }
 
 ///Controls a WebView Environment used by WebView instances.
+///Use [dispose] when not needed anymore to release references.
 ///
 ///**Officially Supported Platforms/Implementations**:
 ///- Windows
@@ -100,6 +101,40 @@ abstract class PlatformWebViewEnvironment extends PlatformInterface
       {WebViewEnvironmentSettings? settings}) {
     throw UnimplementedError(
         'create is not implemented on the current platform');
+  }
+
+  ///{@template flutter_inappwebview_platform_interface.PlatformWebViewEnvironment.getAvailableVersion}
+  ///Get the browser version info including channel name if it is not the WebView2 Runtime.
+  ///
+  ///Channel names are Beta, Dev, and Canary.
+  ///If an override exists for the browserExecutableFolder or the channel preference, the override is used.
+  ///If an override is not specified, then the parameter value passed to [getAvailableVersion] is used.
+  ///Returns `null` if it fails to find an installed WebView2 runtime or non-stable Microsoft Edge installation.
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Windows ([Official API - GetAvailableCoreWebView2BrowserVersionString](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2210.55#comparebrowserversions))
+  ///{@endtemplate}
+  Future<String?> getAvailableVersion(
+      {String? browserExecutableFolder}) {
+    throw UnimplementedError(
+        'getAvailableVersion is not implemented on the current platform');
+  }
+
+  ///{@template flutter_inappwebview_platform_interface.PlatformWebViewEnvironment.compareBrowserVersions}
+  ///This method is for anyone want to compare version correctly to determine which version is newer, older or same.
+  ///
+  ///Use it to determine whether to use webview2 or certain feature based upon version.
+  ///Sets the value of result to `-1`, `0` or `1` if version1 is less than, equal or greater than version2 respectively.
+  ///Returns `null` if it fails to parse any of the version strings.
+  ///Directly use the version info obtained from [getAvailableVersion] with input, channel information is ignored.
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Windows ([Official API - CompareBrowserVersions](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2210.55#comparebrowserversions))
+  ///{@endtemplate}
+  Future<int?> compareBrowserVersions(
+      {required String version1, required String version2}) {
+    throw UnimplementedError(
+        'compareBrowserVersions is not implemented on the current platform');
   }
 
   ///{@template flutter_inappwebview_platform_interface.PlatformWebViewEnvironment.dispose}

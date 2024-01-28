@@ -222,14 +222,6 @@ class WindowsCookieManager extends PlatformCookieManager
   }
 
   @override
-  Future<bool> removeSessionCookies() async {
-    Map<String, dynamic> args = <String, dynamic>{};
-    args.putIfAbsent('webViewEnvironmentId', () => params.webViewEnvironment?.id);
-    return await channel?.invokeMethod<bool>('removeSessionCookies', args) ??
-        false;
-  }
-
-  @override
   void dispose() {
     // empty
   }

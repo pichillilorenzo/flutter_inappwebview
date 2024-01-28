@@ -34,6 +34,9 @@ namespace flutter_inappwebview_plugin
     {
       return hwnd_;
     }
+
+    static std::optional<std::string> getAvailableVersion(std::optional<std::string> browserExecutableFolder);
+    static std::optional<int> compareBrowserVersions(std::string version1, std::string version2);
   private:
     std::unique_ptr<WebViewEnvironment> defaultEnvironment_;
     WNDCLASS windowClass_ = {};

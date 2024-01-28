@@ -6,6 +6,7 @@ import 'in_app_webview/in_app_webview.dart';
 import 'in_app_webview/in_app_webview_controller.dart';
 import 'in_app_webview/headless_in_app_webview.dart';
 import 'webview_environment/webview_environment.dart';
+import 'web_storage/web_storage.dart';
 
 /// Implementation of [InAppWebViewPlatform] using the WebKit API.
 class WindowsInAppWebViewPlatform extends InAppWebViewPlatform {
@@ -106,5 +107,38 @@ class WindowsInAppWebViewPlatform extends InAppWebViewPlatform {
   @override
   WindowsWebViewEnvironment createPlatformWebViewEnvironmentStatic() {
     return WindowsWebViewEnvironment.static();
+  }
+
+  /// Creates a new [WindowsWebStorage].
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [WebStorage] in `flutter_inappwebview` instead.
+  @override
+  WindowsWebStorage createPlatformWebStorage(
+      PlatformWebStorageCreationParams params,
+      ) {
+    return WindowsWebStorage(params);
+  }
+
+  /// Creates a new [WindowsLocalStorage].
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [LocalStorage] in `flutter_inappwebview` instead.
+  @override
+  WindowsLocalStorage createPlatformLocalStorage(
+      PlatformLocalStorageCreationParams params,
+      ) {
+    return WindowsLocalStorage(params);
+  }
+
+  /// Creates a new [WindowsSessionStorage].
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [SessionStorage] in `flutter_inappwebview` instead.
+  @override
+  WindowsSessionStorage createPlatformSessionStorage(
+      PlatformSessionStorageCreationParams params,
+      ) {
+    return WindowsSessionStorage(params);
   }
 }

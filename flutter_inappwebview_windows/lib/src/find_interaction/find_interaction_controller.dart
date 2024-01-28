@@ -8,18 +8,18 @@ import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_pla
 /// value to avoid breaking changes. See [PlatformFindInteractionControllerCreationParams] for
 /// more information.
 @immutable
-class MacOSFindInteractionControllerCreationParams
+class WindowsFindInteractionControllerCreationParams
     extends PlatformFindInteractionControllerCreationParams {
-  /// Creates a new [MacOSFindInteractionControllerCreationParams] instance.
-  const MacOSFindInteractionControllerCreationParams(
+  /// Creates a new [WindowsFindInteractionControllerCreationParams] instance.
+  const WindowsFindInteractionControllerCreationParams(
       {super.onFindResultReceived});
 
-  /// Creates a [MacOSFindInteractionControllerCreationParams] instance based on [PlatformFindInteractionControllerCreationParams].
-  factory MacOSFindInteractionControllerCreationParams.fromPlatformFindInteractionControllerCreationParams(
+  /// Creates a [WindowsFindInteractionControllerCreationParams] instance based on [PlatformFindInteractionControllerCreationParams].
+  factory WindowsFindInteractionControllerCreationParams.fromPlatformFindInteractionControllerCreationParams(
       // Recommended placeholder to prevent being broken by platform interface.
       // ignore: avoid_unused_constructor_parameters
       PlatformFindInteractionControllerCreationParams params) {
-    return MacOSFindInteractionControllerCreationParams(
+    return WindowsFindInteractionControllerCreationParams(
         onFindResultReceived: params.onFindResultReceived);
   }
 }
@@ -31,9 +31,9 @@ class WindowsFindInteractionController extends PlatformFindInteractionController
   WindowsFindInteractionController(
       PlatformFindInteractionControllerCreationParams params)
       : super.implementation(
-          params is MacOSFindInteractionControllerCreationParams
+          params is WindowsFindInteractionControllerCreationParams
               ? params
-              : MacOSFindInteractionControllerCreationParams
+              : WindowsFindInteractionControllerCreationParams
                   .fromPlatformFindInteractionControllerCreationParams(params),
         );
 

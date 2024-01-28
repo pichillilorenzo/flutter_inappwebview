@@ -2,26 +2,26 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_platform_interface.dart';
 
-/// Object specifying creation parameters for creating a [MacOSWebMessageListener].
+/// Object specifying creation parameters for creating a [WindowsWebMessageListener].
 ///
 /// When adding additional fields make sure they can be null or have a default
 /// value to avoid breaking changes. See [PlatformWebMessageListenerCreationParams] for
 /// more information.
 @immutable
-class MacOSWebMessageListenerCreationParams
+class WindowsWebMessageListenerCreationParams
     extends PlatformWebMessageListenerCreationParams {
-  /// Creates a new [MacOSWebMessageListenerCreationParams] instance.
-  const MacOSWebMessageListenerCreationParams(
+  /// Creates a new [WindowsWebMessageListenerCreationParams] instance.
+  const WindowsWebMessageListenerCreationParams(
       {required this.allowedOriginRules,
       required super.jsObjectName,
       super.onPostMessage});
 
-  /// Creates a [MacOSWebMessageListenerCreationParams] instance based on [PlatformWebMessageListenerCreationParams].
-  factory MacOSWebMessageListenerCreationParams.fromPlatformWebMessageListenerCreationParams(
+  /// Creates a [WindowsWebMessageListenerCreationParams] instance based on [PlatformWebMessageListenerCreationParams].
+  factory WindowsWebMessageListenerCreationParams.fromPlatformWebMessageListenerCreationParams(
       // Recommended placeholder to prevent being broken by platform interface.
       // ignore: avoid_unused_constructor_parameters
       PlatformWebMessageListenerCreationParams params) {
-    return MacOSWebMessageListenerCreationParams(
+    return WindowsWebMessageListenerCreationParams(
         allowedOriginRules: params.allowedOriginRules ?? Set.from(["*"]),
         jsObjectName: params.jsObjectName,
         onPostMessage: params.onPostMessage);
@@ -37,14 +37,14 @@ class MacOSWebMessageListenerCreationParams
 }
 
 ///{@macro flutter_inappwebview_platform_interface.PlatformWebMessageListener}
-class MacOSWebMessageListener extends PlatformWebMessageListener
+class WindowsWebMessageListener extends PlatformWebMessageListener
     with ChannelController {
-  /// Constructs a [MacOSWebMessageListener].
-  MacOSWebMessageListener(PlatformWebMessageListenerCreationParams params)
+  /// Constructs a [WindowsWebMessageListener].
+  WindowsWebMessageListener(PlatformWebMessageListenerCreationParams params)
       : super.implementation(
-          params is MacOSWebMessageListenerCreationParams
+          params is WindowsWebMessageListenerCreationParams
               ? params
-              : MacOSWebMessageListenerCreationParams
+              : WindowsWebMessageListenerCreationParams
                   .fromPlatformWebMessageListenerCreationParams(params),
         ) {
     assert(!this._macosParams.allowedOriginRules.contains(""),
@@ -60,8 +60,8 @@ class MacOSWebMessageListener extends PlatformWebMessageListener
 
   MacOSJavaScriptReplyProxy? _replyProxy;
 
-  MacOSWebMessageListenerCreationParams get _macosParams =>
-      params as MacOSWebMessageListenerCreationParams;
+  WindowsWebMessageListenerCreationParams get _macosParams =>
+      params as WindowsWebMessageListenerCreationParams;
 
   Future<dynamic> _handleMethod(MethodCall call) async {
     switch (call.method) {
@@ -138,7 +138,7 @@ class MacOSJavaScriptReplyProxyCreationParams
 
 ///{@macro flutter_inappwebview_platform_interface.JavaScriptReplyProxy}
 class MacOSJavaScriptReplyProxy extends PlatformJavaScriptReplyProxy {
-  /// Constructs a [MacOSWebMessageListener].
+  /// Constructs a [WindowsWebMessageListener].
   MacOSJavaScriptReplyProxy(PlatformJavaScriptReplyProxyCreationParams params)
       : super.implementation(
           params is MacOSJavaScriptReplyProxyCreationParams
@@ -147,8 +147,8 @@ class MacOSJavaScriptReplyProxy extends PlatformJavaScriptReplyProxy {
                   .fromPlatformJavaScriptReplyProxyCreationParams(params),
         );
 
-  MacOSWebMessageListener get _macosWebMessageListener =>
-      params.webMessageListener as MacOSWebMessageListener;
+  WindowsWebMessageListener get _macosWebMessageListener =>
+      params.webMessageListener as WindowsWebMessageListener;
 
   @override
   Future<void> postMessage(WebMessage message) async {

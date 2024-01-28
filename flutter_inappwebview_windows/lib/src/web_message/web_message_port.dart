@@ -3,23 +3,23 @@ import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_pla
 
 import 'web_message_channel.dart';
 
-/// Object specifying creation parameters for creating a [MacOSWebMessagePort].
+/// Object specifying creation parameters for creating a [WindowsWebMessagePort].
 ///
 /// When adding additional fields make sure they can be null or have a default
 /// value to avoid breaking changes. See [PlatformWebMessagePortCreationParams] for
 /// more information.
 @immutable
-class MacOSWebMessagePortCreationParams
+class WindowsWebMessagePortCreationParams
     extends PlatformWebMessagePortCreationParams {
-  /// Creates a new [MacOSWebMessagePortCreationParams] instance.
-  const MacOSWebMessagePortCreationParams({required super.index});
+  /// Creates a new [WindowsWebMessagePortCreationParams] instance.
+  const WindowsWebMessagePortCreationParams({required super.index});
 
-  /// Creates a [MacOSWebMessagePortCreationParams] instance based on [PlatformWebMessagePortCreationParams].
-  factory MacOSWebMessagePortCreationParams.fromPlatformWebMessagePortCreationParams(
+  /// Creates a [WindowsWebMessagePortCreationParams] instance based on [PlatformWebMessagePortCreationParams].
+  factory WindowsWebMessagePortCreationParams.fromPlatformWebMessagePortCreationParams(
       // Recommended placeholder to prevent being broken by platform interface.
       // ignore: avoid_unused_constructor_parameters
       PlatformWebMessagePortCreationParams params) {
-    return MacOSWebMessagePortCreationParams(index: params.index);
+    return WindowsWebMessagePortCreationParams(index: params.index);
   }
 
   @override
@@ -29,16 +29,16 @@ class MacOSWebMessagePortCreationParams
 }
 
 ///{@macro flutter_inappwebview_platform_interface.PlatformWebMessagePort}
-class MacOSWebMessagePort extends PlatformWebMessagePort {
+class WindowsWebMessagePort extends PlatformWebMessagePort {
   WebMessageCallback? _onMessage;
   late WindowsWebMessageChannel _webMessageChannel;
 
-  /// Constructs a [MacOSWebMessagePort].
-  MacOSWebMessagePort(PlatformWebMessagePortCreationParams params)
+  /// Constructs a [WindowsWebMessagePort].
+  WindowsWebMessagePort(PlatformWebMessagePortCreationParams params)
       : super.implementation(
-          params is MacOSWebMessagePortCreationParams
+          params is WindowsWebMessagePortCreationParams
               ? params
-              : MacOSWebMessagePortCreationParams
+              : WindowsWebMessagePortCreationParams
                   .fromPlatformWebMessagePortCreationParams(params),
         );
 
@@ -85,7 +85,7 @@ class MacOSWebMessagePort extends PlatformWebMessagePort {
   }
 }
 
-extension InternalWebMessagePort on MacOSWebMessagePort {
+extension InternalWebMessagePort on WindowsWebMessagePort {
   WebMessageCallback? get onMessage => _onMessage;
   void set onMessage(WebMessageCallback? value) => _onMessage = value;
 

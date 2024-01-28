@@ -9,18 +9,18 @@ import 'web_message_port.dart';
 /// value to avoid breaking changes. See [PlatformWebMessageChannelCreationParams] for
 /// more information.
 @immutable
-class MacOSWebMessageChannelCreationParams
+class WindowsWebMessageChannelCreationParams
     extends PlatformWebMessageChannelCreationParams {
-  /// Creates a new [MacOSWebMessageChannelCreationParams] instance.
-  const MacOSWebMessageChannelCreationParams(
+  /// Creates a new [WindowsWebMessageChannelCreationParams] instance.
+  const WindowsWebMessageChannelCreationParams(
       {required super.id, required super.port1, required super.port2});
 
-  /// Creates a [MacOSWebMessageChannelCreationParams] instance based on [PlatformWebMessageChannelCreationParams].
-  factory MacOSWebMessageChannelCreationParams.fromPlatformWebMessageChannelCreationParams(
+  /// Creates a [WindowsWebMessageChannelCreationParams] instance based on [PlatformWebMessageChannelCreationParams].
+  factory WindowsWebMessageChannelCreationParams.fromPlatformWebMessageChannelCreationParams(
       // Recommended placeholder to prevent being broken by platform interface.
       // ignore: avoid_unused_constructor_parameters
       PlatformWebMessageChannelCreationParams params) {
-    return MacOSWebMessageChannelCreationParams(
+    return WindowsWebMessageChannelCreationParams(
         id: params.id, port1: params.port1, port2: params.port2);
   }
 
@@ -36,9 +36,9 @@ class WindowsWebMessageChannel extends PlatformWebMessageChannel
   /// Constructs a [WindowsWebMessageChannel].
   WindowsWebMessageChannel(PlatformWebMessageChannelCreationParams params)
       : super.implementation(
-          params is MacOSWebMessageChannelCreationParams
+          params is WindowsWebMessageChannelCreationParams
               ? params
-              : MacOSWebMessageChannelCreationParams
+              : WindowsWebMessageChannelCreationParams
                   .fromPlatformWebMessageChannelCreationParams(params),
         ) {
     channel = MethodChannel(
@@ -48,33 +48,33 @@ class WindowsWebMessageChannel extends PlatformWebMessageChannel
   }
 
   static final WindowsWebMessageChannel _staticValue = WindowsWebMessageChannel(
-      MacOSWebMessageChannelCreationParams(
+      WindowsWebMessageChannelCreationParams(
           id: '',
           port1:
-              MacOSWebMessagePort(MacOSWebMessagePortCreationParams(index: 0)),
-          port2: MacOSWebMessagePort(
-              MacOSWebMessagePortCreationParams(index: 1))));
+              WindowsWebMessagePort(WindowsWebMessagePortCreationParams(index: 0)),
+          port2: WindowsWebMessagePort(
+              WindowsWebMessagePortCreationParams(index: 1))));
 
   /// Provide static access.
   factory WindowsWebMessageChannel.static() {
     return _staticValue;
   }
 
-  MacOSWebMessagePort get _macosPort1 => port1 as MacOSWebMessagePort;
+  WindowsWebMessagePort get _macosPort1 => port1 as WindowsWebMessagePort;
 
-  MacOSWebMessagePort get _macosPort2 => port2 as MacOSWebMessagePort;
+  WindowsWebMessagePort get _macosPort2 => port2 as WindowsWebMessagePort;
 
   static WindowsWebMessageChannel? _fromMap(Map<String, dynamic>? map) {
     if (map == null) {
       return null;
     }
     var webMessageChannel = WindowsWebMessageChannel(
-        MacOSWebMessageChannelCreationParams(
+        WindowsWebMessageChannelCreationParams(
             id: map["id"],
-            port1: MacOSWebMessagePort(
-                MacOSWebMessagePortCreationParams(index: 0)),
-            port2: MacOSWebMessagePort(
-                MacOSWebMessagePortCreationParams(index: 1))));
+            port1: WindowsWebMessagePort(
+                WindowsWebMessagePortCreationParams(index: 0)),
+            port2: WindowsWebMessagePort(
+                WindowsWebMessagePortCreationParams(index: 1))));
     webMessageChannel._macosPort1.webMessageChannel = webMessageChannel;
     webMessageChannel._macosPort2.webMessageChannel = webMessageChannel;
     return webMessageChannel;

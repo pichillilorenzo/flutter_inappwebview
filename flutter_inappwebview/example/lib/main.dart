@@ -24,6 +24,9 @@ Future main() async {
   // await Permission.storage.request();
 
   if (!kIsWeb && defaultTargetPlatform == TargetPlatform.windows) {
+    final availableVersion = await WebViewEnvironment.getAvailableVersion();
+    assert(availableVersion != null, 'Failed to find an installed WebView2 runtime or non-stable Microsoft Edge installation.');
+
     webViewEnvironment = await WebViewEnvironment.create(settings:
       WebViewEnvironmentSettings(
           userDataFolder: 'custom_path'

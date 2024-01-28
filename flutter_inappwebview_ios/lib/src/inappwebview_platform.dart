@@ -150,7 +150,7 @@ class IOSInAppWebViewPlatform extends InAppWebViewPlatform {
   /// Creates a new [IOSWebStorage].
   ///
   /// This function should only be called by the app-facing package.
-  /// Look at using [IOSWebStorage] in `flutter_inappwebview` instead.
+  /// Look at using [WebStorage] in `flutter_inappwebview` instead.
   @override
   IOSWebStorage createPlatformWebStorage(
     PlatformWebStorageCreationParams params,
@@ -161,7 +161,7 @@ class IOSInAppWebViewPlatform extends InAppWebViewPlatform {
   /// Creates a new [IOSLocalStorage].
   ///
   /// This function should only be called by the app-facing package.
-  /// Look at using [IOSLocalStorage] in `flutter_inappwebview` instead.
+  /// Look at using [LocalStorage] in `flutter_inappwebview` instead.
   @override
   IOSLocalStorage createPlatformLocalStorage(
     PlatformLocalStorageCreationParams params,
@@ -172,7 +172,7 @@ class IOSInAppWebViewPlatform extends InAppWebViewPlatform {
   /// Creates a new [IOSSessionStorage].
   ///
   /// This function should only be called by the app-facing package.
-  /// Look at using [PlatformSessionStorage] in `flutter_inappwebview` instead.
+  /// Look at using [SessionStorage] in `flutter_inappwebview` instead.
   @override
   IOSSessionStorage createPlatformSessionStorage(
     PlatformSessionStorageCreationParams params,

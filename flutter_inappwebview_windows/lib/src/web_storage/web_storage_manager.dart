@@ -4,37 +4,37 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_platform_interface.dart';
 
-/// Object specifying creation parameters for creating a [MacOSWebStorageManager].
+/// Object specifying creation parameters for creating a [WindowsWebStorageManager].
 ///
 /// When adding additional fields make sure they can be null or have a default
 /// value to avoid breaking changes. See [PlatformWebStorageManagerCreationParams] for
 /// more information.
 @immutable
-class MacOSWebStorageManagerCreationParams
+class WindowsWebStorageManagerCreationParams
     extends PlatformWebStorageManagerCreationParams {
-  /// Creates a new [MacOSWebStorageManagerCreationParams] instance.
-  const MacOSWebStorageManagerCreationParams(
+  /// Creates a new [WindowsWebStorageManagerCreationParams] instance.
+  const WindowsWebStorageManagerCreationParams(
     // This parameter prevents breaking changes later.
     // ignore: avoid_unused_constructor_parameters
     PlatformWebStorageManagerCreationParams params,
   ) : super();
 
-  /// Creates a [MacOSWebStorageManagerCreationParams] instance based on [PlatformWebStorageManagerCreationParams].
-  factory MacOSWebStorageManagerCreationParams.fromPlatformWebStorageManagerCreationParams(
+  /// Creates a [WindowsWebStorageManagerCreationParams] instance based on [PlatformWebStorageManagerCreationParams].
+  factory WindowsWebStorageManagerCreationParams.fromPlatformWebStorageManagerCreationParams(
       PlatformWebStorageManagerCreationParams params) {
-    return MacOSWebStorageManagerCreationParams(params);
+    return WindowsWebStorageManagerCreationParams(params);
   }
 }
 
 ///{@macro flutter_inappwebview_platform_interface.PlatformWebStorageManager}
-class MacOSWebStorageManager extends PlatformWebStorageManager
+class WindowsWebStorageManager extends PlatformWebStorageManager
     with ChannelController {
-  /// Creates a new [MacOSWebStorageManager].
-  MacOSWebStorageManager(PlatformWebStorageManagerCreationParams params)
+  /// Creates a new [WindowsWebStorageManager].
+  WindowsWebStorageManager(PlatformWebStorageManagerCreationParams params)
       : super.implementation(
-          params is MacOSWebStorageManagerCreationParams
+          params is WindowsWebStorageManagerCreationParams
               ? params
-              : MacOSWebStorageManagerCreationParams
+              : WindowsWebStorageManagerCreationParams
                   .fromPlatformWebStorageManagerCreationParams(params),
         ) {
     channel = const MethodChannel(
@@ -43,15 +43,15 @@ class MacOSWebStorageManager extends PlatformWebStorageManager
     initMethodCallHandler();
   }
 
-  static MacOSWebStorageManager? _instance;
+  static WindowsWebStorageManager? _instance;
 
   ///Gets the WebStorage manager shared instance.
-  static MacOSWebStorageManager instance() {
+  static WindowsWebStorageManager instance() {
     return (_instance != null) ? _instance! : _init();
   }
 
-  static MacOSWebStorageManager _init() {
-    _instance = MacOSWebStorageManager(MacOSWebStorageManagerCreationParams(
+  static WindowsWebStorageManager _init() {
+    _instance = WindowsWebStorageManager(WindowsWebStorageManagerCreationParams(
         const PlatformWebStorageManagerCreationParams()));
     return _instance!;
   }
@@ -129,6 +129,6 @@ class MacOSWebStorageManager extends PlatformWebStorageManager
   }
 }
 
-extension InternalWebStorageManager on MacOSWebStorageManager {
+extension InternalWebStorageManager on WindowsWebStorageManager {
   get handleMethod => _handleMethod;
 }

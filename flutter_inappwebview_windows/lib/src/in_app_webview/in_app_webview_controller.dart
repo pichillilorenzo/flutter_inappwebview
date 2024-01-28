@@ -75,7 +75,7 @@ class WindowsInAppWebViewController extends PlatformInAppWebViewController
   Set<String> _webMessageListenerObjNames = Set();
   Map<String, ScriptHtmlTagAttributes> _injectedScriptsFromURL = {};
   Set<WindowsWebMessageChannel> _webMessageChannels = Set();
-  Set<MacOSWebMessageListener> _webMessageListeners = Set();
+  Set<WindowsWebMessageListener> _webMessageListeners = Set();
 
   // static map that contains the properties to be saved and restored for keep alive feature
   static final Map<InAppWebViewKeepAlive, InAppWebViewControllerKeepAliveProps?>
@@ -89,7 +89,7 @@ class WindowsInAppWebViewController extends PlatformInAppWebViewController
   dynamic _controllerFromPlatform;
 
   @override
-  late MacOSWebStorage webStorage;
+  late WindowsWebStorage webStorage;
 
   WindowsInAppWebViewController(
       PlatformInAppWebViewControllerCreationParams params)
@@ -161,9 +161,9 @@ class WindowsInAppWebViewController extends PlatformInAppWebViewController
     _controllerFromPlatform =
         params.webviewParams?.controllerFromPlatform?.call(this) ?? this;
 
-    webStorage = MacOSWebStorage(MacOSWebStorageCreationParams(
-        localStorage: MacOSLocalStorage.defaultStorage(controller: this),
-        sessionStorage: MacOSSessionStorage.defaultStorage(controller: this)));
+    webStorage = WindowsWebStorage(WindowsWebStorageCreationParams(
+        localStorage: WindowsLocalStorage.defaultStorage(controller: this),
+        sessionStorage: WindowsSessionStorage.defaultStorage(controller: this)));
 
     if (params.webviewParams is PlatformInAppWebViewWidgetCreationParams) {
       final keepAlive =
@@ -189,7 +189,7 @@ class WindowsInAppWebViewController extends PlatformInAppWebViewController
           _webMessageChannels =
               props.webMessageChannels as Set<WindowsWebMessageChannel>;
           _webMessageListeners =
-              props.webMessageListeners as Set<MacOSWebMessageListener>;
+              props.webMessageListeners as Set<WindowsWebMessageListener>;
         }
       }
     }
@@ -1311,9 +1311,9 @@ class WindowsInAppWebViewController extends PlatformInAppWebViewController
           String? url = call.arguments["url"];
           String? printJobId = call.arguments["printJobId"];
           WebUri? uri = url != null ? WebUri(url) : null;
-          MacOSPrintJobController? printJob = printJobId != null
-              ? MacOSPrintJobController(
-                  MacOSPrintJobControllerCreationParams(id: printJobId))
+          WindowsPrintJobController? printJob = printJobId != null
+              ? WindowsPrintJobController(
+                  WindowsPrintJobControllerCreationParams(id: printJobId))
               : null;
 
           if (webviewParams != null) {
@@ -2139,14 +2139,14 @@ class WindowsInAppWebViewController extends PlatformInAppWebViewController
   }
 
   @override
-  Future<MacOSPrintJobController?> printCurrentPage(
+  Future<WindowsPrintJobController?> printCurrentPage(
       {PrintJobSettings? settings}) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent("settings", () => settings?.toMap());
     String? jobId =
         await channel?.invokeMethod<String?>('printCurrentPage', args);
     if (jobId != null) {
-      return MacOSPrintJobController(
+      return WindowsPrintJobController(
           PlatformPrintJobControllerCreationParams(id: jobId));
     }
     return null;
@@ -2494,7 +2494,7 @@ class WindowsInAppWebViewController extends PlatformInAppWebViewController
         !_webMessageListenerObjNames
             .contains(webMessageListener.params.jsObjectName),
         "jsObjectName ${webMessageListener.params.jsObjectName} was already added.");
-    _webMessageListeners.add(webMessageListener as MacOSWebMessageListener);
+    _webMessageListeners.add(webMessageListener as WindowsWebMessageListener);
     _webMessageListenerObjNames.add(webMessageListener.params.jsObjectName);
 
     Map<String, dynamic> args = <String, dynamic>{};

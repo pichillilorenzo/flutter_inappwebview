@@ -30,6 +30,14 @@ class WebViewEnvironment {
     return WebViewEnvironment.fromPlatform(platform: await PlatformWebViewEnvironment.static().create(settings: settings));
   }
 
+  ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewEnvironment.getAvailableVersion}
+  static Future<String?> getAvailableVersion(
+      {String? browserExecutableFolder}) => PlatformWebViewEnvironment.static().getAvailableVersion(browserExecutableFolder: browserExecutableFolder);
+
+  ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewEnvironment.getAvailableVersion}
+  static Future<int?> compareBrowserVersions(
+      {required String version1, required String version2}) => PlatformWebViewEnvironment.static().compareBrowserVersions(version1: version1, version2: version2);
+
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewEnvironment.dispose}
   Future<void> dispose() => platform.dispose();
 }

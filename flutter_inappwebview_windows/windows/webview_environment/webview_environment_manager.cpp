@@ -39,6 +39,15 @@ namespace flutter_inappwebview_plugin
       auto settings = settingsMap.has_value() ? std::make_unique<WebViewEnvironmentSettings>(settingsMap.value()) : nullptr;
       createWebViewEnvironment(id, std::move(settings), std::move(result));
     }
+    else if (string_equals(methodName, "getAvailableVersion")) {
+      auto browserExecutableFolder = get_optional_fl_map_value<std::string>(*arguments, "browserExecutableFolder");
+      result->Success(make_fl_value(getAvailableVersion(browserExecutableFolder)));
+    }
+    else if (string_equals(methodName, "compareBrowserVersions")) {
+      auto version1 = get_fl_map_value<std::string>(*arguments, "version1");
+      auto version2 = get_fl_map_value<std::string>(*arguments, "version2");
+      result->Success(make_fl_value(compareBrowserVersions(version1, version2)));
+    }
     else {
       result->NotImplemented();
     }
@@ -87,6 +96,24 @@ namespace flutter_inappwebview_plugin
           completionHandler(nullptr);
         }
       });
+  }
+
+  std::optional<std::string> WebViewEnvironmentManager::getAvailableVersion(std::optional<std::string> browserExecutableFolder)
+  {
+    wil::unique_cotaskmem_string versionInfo;
+    if (succeededOrLog(GetAvailableCoreWebView2BrowserVersionString(browserExecutableFolder.has_value() ? utf8_to_wide(browserExecutableFolder.value()).c_str() : nullptr, &versionInfo))) {
+      return wide_to_utf8(versionInfo.get());
+    }
+    return std::nullopt;
+  }
+
+  std::optional<int> WebViewEnvironmentManager::compareBrowserVersions(std::string version1, std::string version2)
+  {
+    int result = 0;
+    if (succeededOrLog(CompareBrowserVersions(utf8_to_wide(version1).c_str(), utf8_to_wide(version2).c_str(), &result))) {
+      return result;
+    }
+    return std::nullopt;
   }
 
   WebViewEnvironmentManager::~WebViewEnvironmentManager()

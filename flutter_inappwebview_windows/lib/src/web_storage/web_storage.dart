@@ -4,35 +4,35 @@ import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_pla
 
 import '../in_app_webview/in_app_webview_controller.dart';
 
-/// Object specifying creation parameters for creating a [MacOSWebStorage].
+/// Object specifying creation parameters for creating a [WindowsWebStorage].
 ///
 /// When adding additional fields make sure they can be null or have a default
 /// value to avoid breaking changes. See [PlatformWebStorageCreationParams] for
 /// more information.
-class MacOSWebStorageCreationParams extends PlatformWebStorageCreationParams {
-  /// Creates a new [MacOSWebStorageCreationParams] instance.
-  MacOSWebStorageCreationParams(
+class WindowsWebStorageCreationParams extends PlatformWebStorageCreationParams {
+  /// Creates a new [WindowsWebStorageCreationParams] instance.
+  WindowsWebStorageCreationParams(
       {required super.localStorage, required super.sessionStorage});
 
-  /// Creates a [MacOSWebStorageCreationParams] instance based on [PlatformWebStorageCreationParams].
-  factory MacOSWebStorageCreationParams.fromPlatformWebStorageCreationParams(
+  /// Creates a [WindowsWebStorageCreationParams] instance based on [PlatformWebStorageCreationParams].
+  factory WindowsWebStorageCreationParams.fromPlatformWebStorageCreationParams(
       // Recommended placeholder to prevent being broken by platform interface.
       // ignore: avoid_unused_constructor_parameters
       PlatformWebStorageCreationParams params) {
-    return MacOSWebStorageCreationParams(
+    return WindowsWebStorageCreationParams(
         localStorage: params.localStorage,
         sessionStorage: params.sessionStorage);
   }
 }
 
 ///{@macro flutter_inappwebview_platform_interface.PlatformWebStorage}
-class MacOSWebStorage extends PlatformWebStorage {
-  /// Constructs a [MacOSWebStorage].
-  MacOSWebStorage(PlatformWebStorageCreationParams params)
+class WindowsWebStorage extends PlatformWebStorage {
+  /// Constructs a [WindowsWebStorage].
+  WindowsWebStorage(PlatformWebStorageCreationParams params)
       : super.implementation(
-          params is MacOSWebStorageCreationParams
+          params is WindowsWebStorageCreationParams
               ? params
-              : MacOSWebStorageCreationParams
+              : WindowsWebStorageCreationParams
                   .fromPlatformWebStorageCreationParams(params),
         );
 
@@ -49,28 +49,28 @@ class MacOSWebStorage extends PlatformWebStorage {
   }
 }
 
-/// Object specifying creation parameters for creating a [MacOSStorage].
+/// Object specifying creation parameters for creating a [WindowsStorage].
 ///
 /// When adding additional fields make sure they can be null or have a default
 /// value to avoid breaking changes. See [PlatformStorageCreationParams] for
 /// more information.
-class MacOSStorageCreationParams extends PlatformStorageCreationParams {
-  /// Creates a new [MacOSStorageCreationParams] instance.
-  MacOSStorageCreationParams(
+class WindowsStorageCreationParams extends PlatformStorageCreationParams {
+  /// Creates a new [WindowsStorageCreationParams] instance.
+  WindowsStorageCreationParams(
       {required super.controller, required super.webStorageType});
 
-  /// Creates a [MacOSStorageCreationParams] instance based on [PlatformStorageCreationParams].
-  factory MacOSStorageCreationParams.fromPlatformStorageCreationParams(
+  /// Creates a [WindowsStorageCreationParams] instance based on [PlatformStorageCreationParams].
+  factory WindowsStorageCreationParams.fromPlatformStorageCreationParams(
       // Recommended placeholder to prevent being broken by platform interface.
       // ignore: avoid_unused_constructor_parameters
       PlatformStorageCreationParams params) {
-    return MacOSStorageCreationParams(
+    return WindowsStorageCreationParams(
         controller: params.controller, webStorageType: params.webStorageType);
   }
 }
 
 ///{@macro flutter_inappwebview_platform_interface.PlatformStorage}
-abstract class MacOSStorage implements PlatformStorage {
+abstract class WindowsStorage implements PlatformStorage {
   @override
   WindowsInAppWebViewController? controller;
 
@@ -168,40 +168,40 @@ abstract class MacOSStorage implements PlatformStorage {
   }
 }
 
-/// Object specifying creation parameters for creating a [MacOSLocalStorage].
+/// Object specifying creation parameters for creating a [WindowsLocalStorage].
 ///
 /// When adding additional fields make sure they can be null or have a default
 /// value to avoid breaking changes. See [PlatformLocalStorageCreationParams] for
 /// more information.
-class MacOSLocalStorageCreationParams
+class WindowsLocalStorageCreationParams
     extends PlatformLocalStorageCreationParams {
-  /// Creates a new [MacOSLocalStorageCreationParams] instance.
-  MacOSLocalStorageCreationParams(super.params);
+  /// Creates a new [WindowsLocalStorageCreationParams] instance.
+  WindowsLocalStorageCreationParams(super.params);
 
-  /// Creates a [MacOSLocalStorageCreationParams] instance based on [PlatformLocalStorageCreationParams].
-  factory MacOSLocalStorageCreationParams.fromPlatformLocalStorageCreationParams(
+  /// Creates a [WindowsLocalStorageCreationParams] instance based on [PlatformLocalStorageCreationParams].
+  factory WindowsLocalStorageCreationParams.fromPlatformLocalStorageCreationParams(
       // Recommended placeholder to prevent being broken by platform interface.
       // ignore: avoid_unused_constructor_parameters
       PlatformLocalStorageCreationParams params) {
-    return MacOSLocalStorageCreationParams(params);
+    return WindowsLocalStorageCreationParams(params);
   }
 }
 
 ///{@macro flutter_inappwebview_platform_interface.PlatformLocalStorage}
-class MacOSLocalStorage extends PlatformLocalStorage with MacOSStorage {
-  /// Constructs a [MacOSLocalStorage].
-  MacOSLocalStorage(PlatformLocalStorageCreationParams params)
+class WindowsLocalStorage extends PlatformLocalStorage with WindowsStorage {
+  /// Constructs a [WindowsLocalStorage].
+  WindowsLocalStorage(PlatformLocalStorageCreationParams params)
       : super.implementation(
-          params is MacOSLocalStorageCreationParams
+          params is WindowsLocalStorageCreationParams
               ? params
-              : MacOSLocalStorageCreationParams
+              : WindowsLocalStorageCreationParams
                   .fromPlatformLocalStorageCreationParams(params),
         );
 
   /// Default storage
-  factory MacOSLocalStorage.defaultStorage(
+  factory WindowsLocalStorage.defaultStorage(
       {required PlatformInAppWebViewController? controller}) {
-    return MacOSLocalStorage(MacOSLocalStorageCreationParams(
+    return WindowsLocalStorage(WindowsLocalStorageCreationParams(
         PlatformLocalStorageCreationParams(PlatformStorageCreationParams(
             controller: controller,
             webStorageType: WebStorageType.LOCAL_STORAGE))));
@@ -212,40 +212,40 @@ class MacOSLocalStorage extends PlatformLocalStorage with MacOSStorage {
       params.controller as WindowsInAppWebViewController?;
 }
 
-/// Object specifying creation parameters for creating a [MacOSSessionStorage].
+/// Object specifying creation parameters for creating a [WindowsSessionStorage].
 ///
 /// When adding additional fields make sure they can be null or have a default
 /// value to avoid breaking changes. See [PlatformSessionStorageCreationParams] for
 /// more information.
-class MacOSSessionStorageCreationParams
+class WindowsSessionStorageCreationParams
     extends PlatformSessionStorageCreationParams {
-  /// Creates a new [MacOSSessionStorageCreationParams] instance.
-  MacOSSessionStorageCreationParams(super.params);
+  /// Creates a new [WindowsSessionStorageCreationParams] instance.
+  WindowsSessionStorageCreationParams(super.params);
 
-  /// Creates a [MacOSSessionStorageCreationParams] instance based on [PlatformSessionStorageCreationParams].
-  factory MacOSSessionStorageCreationParams.fromPlatformSessionStorageCreationParams(
+  /// Creates a [WindowsSessionStorageCreationParams] instance based on [PlatformSessionStorageCreationParams].
+  factory WindowsSessionStorageCreationParams.fromPlatformSessionStorageCreationParams(
       // Recommended placeholder to prevent being broken by platform interface.
       // ignore: avoid_unused_constructor_parameters
       PlatformSessionStorageCreationParams params) {
-    return MacOSSessionStorageCreationParams(params);
+    return WindowsSessionStorageCreationParams(params);
   }
 }
 
 ///{@macro flutter_inappwebview_platform_interface.PlatformSessionStorage}
-class MacOSSessionStorage extends PlatformSessionStorage with MacOSStorage {
-  /// Constructs a [MacOSSessionStorage].
-  MacOSSessionStorage(PlatformSessionStorageCreationParams params)
+class WindowsSessionStorage extends PlatformSessionStorage with WindowsStorage {
+  /// Constructs a [WindowsSessionStorage].
+  WindowsSessionStorage(PlatformSessionStorageCreationParams params)
       : super.implementation(
-          params is MacOSSessionStorageCreationParams
+          params is WindowsSessionStorageCreationParams
               ? params
-              : MacOSSessionStorageCreationParams
+              : WindowsSessionStorageCreationParams
                   .fromPlatformSessionStorageCreationParams(params),
         );
 
   /// Default storage
-  factory MacOSSessionStorage.defaultStorage(
+  factory WindowsSessionStorage.defaultStorage(
       {required PlatformInAppWebViewController? controller}) {
-    return MacOSSessionStorage(MacOSSessionStorageCreationParams(
+    return WindowsSessionStorage(WindowsSessionStorageCreationParams(
         PlatformSessionStorageCreationParams(PlatformStorageCreationParams(
             controller: controller,
             webStorageType: WebStorageType.SESSION_STORAGE))));

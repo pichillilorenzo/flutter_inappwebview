@@ -74,6 +74,7 @@ list(APPEND PLUGIN_SOURCES
   "types/size_2d.h"
   "types/rect.cpp"
   "types/rect.h"
+  "types/callbacks_complete.h"
   "types/screenshot_configuration.cpp"
   "types/screenshot_configuration.h"
   "custom_platform_view/custom_platform_view.cc"

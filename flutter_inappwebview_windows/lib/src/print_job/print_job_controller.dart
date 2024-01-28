@@ -2,37 +2,37 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_platform_interface.dart';
 
-/// Object specifying creation parameters for creating a [MacOSPrintJobController].
+/// Object specifying creation parameters for creating a [WindowsPrintJobController].
 ///
 /// When adding additional fields make sure they can be null or have a default
 /// value to avoid breaking changes. See [PlatformPrintJobControllerCreationParams] for
 /// more information.
 @immutable
-class MacOSPrintJobControllerCreationParams
+class WindowsPrintJobControllerCreationParams
     extends PlatformPrintJobControllerCreationParams {
-  /// Creates a new [MacOSPrintJobControllerCreationParams] instance.
-  const MacOSPrintJobControllerCreationParams(
+  /// Creates a new [WindowsPrintJobControllerCreationParams] instance.
+  const WindowsPrintJobControllerCreationParams(
       {required super.id, super.onComplete});
 
-  /// Creates a [MacOSPrintJobControllerCreationParams] instance based on [PlatformPrintJobControllerCreationParams].
-  factory MacOSPrintJobControllerCreationParams.fromPlatformPrintJobControllerCreationParams(
+  /// Creates a [WindowsPrintJobControllerCreationParams] instance based on [PlatformPrintJobControllerCreationParams].
+  factory WindowsPrintJobControllerCreationParams.fromPlatformPrintJobControllerCreationParams(
       // Recommended placeholder to prevent being broken by platform interface.
       // ignore: avoid_unused_constructor_parameters
       PlatformPrintJobControllerCreationParams params) {
-    return MacOSPrintJobControllerCreationParams(
+    return WindowsPrintJobControllerCreationParams(
         id: params.id, onComplete: params.onComplete);
   }
 }
 
 ///{@macro flutter_inappwebview_platform_interface.PlatformPrintJobController}
-class MacOSPrintJobController extends PlatformPrintJobController
+class WindowsPrintJobController extends PlatformPrintJobController
     with ChannelController {
-  /// Constructs a [MacOSPrintJobController].
-  MacOSPrintJobController(PlatformPrintJobControllerCreationParams params)
+  /// Constructs a [WindowsPrintJobController].
+  WindowsPrintJobController(PlatformPrintJobControllerCreationParams params)
       : super.implementation(
-          params is MacOSPrintJobControllerCreationParams
+          params is WindowsPrintJobControllerCreationParams
               ? params
-              : MacOSPrintJobControllerCreationParams
+              : WindowsPrintJobControllerCreationParams
                   .fromPlatformPrintJobControllerCreationParams(params),
         ) {
     onComplete = params.onComplete;

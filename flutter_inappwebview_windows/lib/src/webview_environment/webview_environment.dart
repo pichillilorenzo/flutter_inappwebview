@@ -90,6 +90,25 @@ class WindowsWebViewEnvironment extends PlatformWebViewEnvironment
   }
 
   @override
+  Future<String?> getAvailableVersion(
+      {String? browserExecutableFolder}) async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    args.putIfAbsent('browserExecutableFolder', () => browserExecutableFolder);
+    return await _staticChannel.invokeMethod<String>(
+        'getAvailableVersion', args);
+  }
+
+  @override
+  Future<int?> compareBrowserVersions(
+      {required String version1, required String version2}) async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    args.putIfAbsent('version1', () => version1);
+    args.putIfAbsent('version2', () => version2);
+    return await _staticChannel.invokeMethod<int>(
+        'compareBrowserVersions', args);
+  }
+
+  @override
   Future<void> dispose() async {
     Map<String, dynamic> args = <String, dynamic>{};
     await channel?.invokeMethod('dispose', args);

@@ -3,38 +3,38 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_platform_interface.dart';
 
-/// Object specifying creation parameters for creating a [MacOSHttpAuthCredentialDatabase].
+/// Object specifying creation parameters for creating a [WindowsHttpAuthCredentialDatabase].
 ///
 /// When adding additional fields make sure they can be null or have a default
 /// value to avoid breaking changes. See [PlatformHttpAuthCredentialDatabaseCreationParams] for
 /// more information.
 @immutable
-class MacOSHttpAuthCredentialDatabaseCreationParams
+class WindowsHttpAuthCredentialDatabaseCreationParams
     extends PlatformHttpAuthCredentialDatabaseCreationParams {
-  /// Creates a new [MacOSHttpAuthCredentialDatabaseCreationParams] instance.
-  const MacOSHttpAuthCredentialDatabaseCreationParams(
+  /// Creates a new [WindowsHttpAuthCredentialDatabaseCreationParams] instance.
+  const WindowsHttpAuthCredentialDatabaseCreationParams(
     // This parameter prevents breaking changes later.
     // ignore: avoid_unused_constructor_parameters
     PlatformHttpAuthCredentialDatabaseCreationParams params,
   ) : super();
 
-  /// Creates a [MacOSHttpAuthCredentialDatabaseCreationParams] instance based on [PlatformHttpAuthCredentialDatabaseCreationParams].
-  factory MacOSHttpAuthCredentialDatabaseCreationParams.fromPlatformHttpAuthCredentialDatabaseCreationParams(
+  /// Creates a [WindowsHttpAuthCredentialDatabaseCreationParams] instance based on [PlatformHttpAuthCredentialDatabaseCreationParams].
+  factory WindowsHttpAuthCredentialDatabaseCreationParams.fromPlatformHttpAuthCredentialDatabaseCreationParams(
       PlatformHttpAuthCredentialDatabaseCreationParams params) {
-    return MacOSHttpAuthCredentialDatabaseCreationParams(params);
+    return WindowsHttpAuthCredentialDatabaseCreationParams(params);
   }
 }
 
 ///{@macro flutter_inappwebview_platform_interface.PlatformHttpAuthCredentialDatabase}
-class MacOSHttpAuthCredentialDatabase extends PlatformHttpAuthCredentialDatabase
+class WindowsHttpAuthCredentialDatabase extends PlatformHttpAuthCredentialDatabase
     with ChannelController {
-  /// Creates a new [MacOSHttpAuthCredentialDatabase].
-  MacOSHttpAuthCredentialDatabase(
+  /// Creates a new [WindowsHttpAuthCredentialDatabase].
+  WindowsHttpAuthCredentialDatabase(
       PlatformHttpAuthCredentialDatabaseCreationParams params)
       : super.implementation(
-          params is MacOSHttpAuthCredentialDatabaseCreationParams
+          params is WindowsHttpAuthCredentialDatabaseCreationParams
               ? params
-              : MacOSHttpAuthCredentialDatabaseCreationParams
+              : WindowsHttpAuthCredentialDatabaseCreationParams
                   .fromPlatformHttpAuthCredentialDatabaseCreationParams(params),
         ) {
     channel = const MethodChannel(
@@ -43,16 +43,16 @@ class MacOSHttpAuthCredentialDatabase extends PlatformHttpAuthCredentialDatabase
     initMethodCallHandler();
   }
 
-  static MacOSHttpAuthCredentialDatabase? _instance;
+  static WindowsHttpAuthCredentialDatabase? _instance;
 
   ///Gets the database shared instance.
-  static MacOSHttpAuthCredentialDatabase instance() {
+  static WindowsHttpAuthCredentialDatabase instance() {
     return (_instance != null) ? _instance! : _init();
   }
 
-  static MacOSHttpAuthCredentialDatabase _init() {
-    _instance = MacOSHttpAuthCredentialDatabase(
-        MacOSHttpAuthCredentialDatabaseCreationParams(
+  static WindowsHttpAuthCredentialDatabase _init() {
+    _instance = WindowsHttpAuthCredentialDatabase(
+        WindowsHttpAuthCredentialDatabaseCreationParams(
             const PlatformHttpAuthCredentialDatabaseCreationParams()));
     return _instance!;
   }
@@ -150,6 +150,6 @@ class MacOSHttpAuthCredentialDatabase extends PlatformHttpAuthCredentialDatabase
 }
 
 extension InternalHttpAuthCredentialDatabase
-    on MacOSHttpAuthCredentialDatabase {
+    on WindowsHttpAuthCredentialDatabase {
   get handleMethod => _handleMethod;
 }

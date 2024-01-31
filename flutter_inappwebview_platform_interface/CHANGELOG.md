@@ -1,3 +1,7 @@
+## 1.0.11
+
+- Added `PlatformWebViewEnvironment` class
+
 ## 1.0.10
 
 - Merged "Added == operator and hashCode to WebUri" [#1941](https://github.com/pichillilorenzo/flutter_inappwebview/pull/1941) (thanks to [daisukeueta](https://github.com/daisukeueta))

@@ -52,13 +52,15 @@ class NavigationAction {
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView 21+ ([Official API - WebResourceRequest.isRedirect](https://developer.android.com/reference/android/webkit/WebResourceRequest#isRedirect()))
+  ///- Windows
   bool? isRedirect;
 
-  ///The type of action triggering the navigation.ì
+  ///The type of action triggering the navigation.
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- iOS ([Official API - WKNavigationAction.navigationType](https://developer.apple.com/documentation/webkit/wknavigationaction/1401914-navigationtype))
   ///- MacOS ([Official API - WKNavigationAction.navigationType](https://developer.apple.com/documentation/webkit/wknavigationaction/1401914-navigationtype))
+  ///- Windows
   NavigationType? navigationType;
 
   ///The URL request object associated with the navigation action.

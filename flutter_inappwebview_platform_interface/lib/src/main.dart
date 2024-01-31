@@ -1,5 +1,6 @@
 export 'inappwebview_platform.dart';
 export 'types/main.dart';
+export 'webview_environment/main.dart';
 export 'in_app_webview/main.dart';
 export 'in_app_browser/main.dart';
 export 'chrome_safari_browser/main.dart';

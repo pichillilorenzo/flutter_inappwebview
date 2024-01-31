@@ -5,6 +5,7 @@ import 'dart:ui';
 import 'package:flutter/services.dart';
 import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_platform_interface.dart';
 import '../find_interaction/find_interaction_controller.dart';
+import '../webview_environment/webview_environment.dart';
 import 'in_app_webview_controller.dart';
 import '../pull_to_refresh/pull_to_refresh_controller.dart';
 
@@ -42,6 +43,7 @@ class HeadlessInAppWebView {
     HeadlessInAppWebView? headlessWebView,
     InAppWebViewKeepAlive? keepAlive,
     bool? preventGestureDelay,
+    WebViewEnvironment? webViewEnvironment,
     @Deprecated('Use onGeolocationPermissionsHidePrompt instead')
     void Function(InAppWebViewController controller)?
         androidOnGeolocationPermissionsHidePrompt,
@@ -307,6 +309,7 @@ class HeadlessInAppWebView {
           pullToRefreshController: pullToRefreshController?.platform,
           findInteractionController: findInteractionController?.platform,
           contextMenu: contextMenu,
+          webViewEnvironment: webViewEnvironment?.platform,
           onWebViewCreated: onWebViewCreated != null
               ? (controller) => onWebViewCreated.call(controller)
               : null,

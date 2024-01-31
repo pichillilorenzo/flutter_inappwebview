@@ -12,13 +12,19 @@ class ScreenshotConfiguration {
   ///The default value of this property is `true`, which causes the web view to incorporate any recent changes to the view’s content and then generate the snapshot.
   ///If you change the value to `false`, the `WebView` takes the snapshot immediately, and before incorporating any new changes.
   ///
-  ///**NOTE**: available only on iOS.
-  ///
-  ///**NOTE for iOS**: Available from iOS 13.0+.
+  ///**Officially Supported Platforms/Implementations**:
+  ///- iOS 13.0+
+  ///- MacOS 10.15+
   bool afterScreenUpdates;
 
   ///The compression format of the captured image.
   ///The default value is [CompressFormat.PNG].
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Android native WebView
+  ///- iOS
+  ///- MacOS
+  ///- Windows
   CompressFormat compressFormat;
 
   ///Use [afterScreenUpdates] instead.
@@ -27,11 +33,23 @@ class ScreenshotConfiguration {
 
   ///Hint to the compressor, `0-100`. The value is interpreted differently depending on the [CompressFormat].
   ///[CompressFormat.PNG] is lossless, so this value is ignored.
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Android native WebView
+  ///- iOS
+  ///- MacOS
+  ///- Windows
   int quality;
 
   ///The portion of your web view to capture, specified as a rectangle in the view’s coordinate system.
   ///The default value of this property is `null`, which captures everything in the view’s bounds rectangle.
   ///If you specify a custom rectangle, it must lie within the bounds rectangle of the `WebView` object.
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Android native WebView
+  ///- iOS
+  ///- MacOS
+  ///- Windows
   InAppWebViewRect? rect;
 
   ///The width of the captured image, in points.
@@ -39,6 +57,11 @@ class ScreenshotConfiguration {
   ///The web view maintains the aspect ratio of the captured content, but scales it to match the width you specify.
   ///
   ///The default value of this property is `null`, which returns an image whose size matches the original size of the captured rectangle.
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Android native WebView
+  ///- iOS
+  ///- MacOS
   double? snapshotWidth;
   ScreenshotConfiguration(
       {this.rect,

@@ -17,7 +17,8 @@ class MyInAppBrowser extends InAppBrowser {
       : super(
             windowId: windowId,
             initialUserScripts: initialUserScripts,
-            pullToRefreshController: pullToRefreshController);
+            pullToRefreshController: pullToRefreshController,
+            webViewEnvironment: webViewEnvironment,);
 
   @override
   Future onBrowserCreated() async {

@@ -11,6 +11,7 @@ import '../find_interaction/find_interaction_controller.dart';
 import '../pull_to_refresh/main.dart';
 
 import '../in_app_webview/in_app_webview_controller.dart';
+import '../webview_environment/webview_environment.dart';
 
 ///{@macro flutter_inappwebview_platform_interface.PlatformInAppBrowser}
 class InAppBrowser implements PlatformInAppBrowserEvents {
@@ -22,14 +23,17 @@ class InAppBrowser implements PlatformInAppBrowserEvents {
       PullToRefreshController? pullToRefreshController,
       FindInteractionController? findInteractionController,
       UnmodifiableListView<UserScript>? initialUserScripts,
-      int? windowId})
+      int? windowId,
+      WebViewEnvironment? webViewEnvironment,
+      })
       : this.fromPlatformCreationParams(
           PlatformInAppBrowserCreationParams(
               contextMenu: contextMenu,
               pullToRefreshController: pullToRefreshController?.platform,
               findInteractionController: findInteractionController?.platform,
               initialUserScripts: initialUserScripts,
-              windowId: windowId),
+              windowId: windowId,
+              webViewEnvironment: webViewEnvironment?.platform,),
         );
 
   /// Constructs a [InAppBrowser] from creation params for a specific

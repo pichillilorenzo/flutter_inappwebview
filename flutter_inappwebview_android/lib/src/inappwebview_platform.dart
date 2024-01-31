@@ -155,7 +155,7 @@ class AndroidInAppWebViewPlatform extends InAppWebViewPlatform {
   /// Creates a new [AndroidWebStorage].
   ///
   /// This function should only be called by the app-facing package.
-  /// Look at using [AndroidWebStorage] in `flutter_inappwebview` instead.
+  /// Look at using [WebStorage] in `flutter_inappwebview` instead.
   @override
   AndroidWebStorage createPlatformWebStorage(
     PlatformWebStorageCreationParams params,
@@ -166,7 +166,7 @@ class AndroidInAppWebViewPlatform extends InAppWebViewPlatform {
   /// Creates a new [AndroidLocalStorage].
   ///
   /// This function should only be called by the app-facing package.
-  /// Look at using [AndroidLocalStorage] in `flutter_inappwebview` instead.
+  /// Look at using [LocalStorage] in `flutter_inappwebview` instead.
   @override
   AndroidLocalStorage createPlatformLocalStorage(
     PlatformLocalStorageCreationParams params,
@@ -177,7 +177,7 @@ class AndroidInAppWebViewPlatform extends InAppWebViewPlatform {
   /// Creates a new [AndroidSessionStorage].
   ///
   /// This function should only be called by the app-facing package.
-  /// Look at using [PlatformSessionStorage] in `flutter_inappwebview` instead.
+  /// Look at using [SessionStorage] in `flutter_inappwebview` instead.
   @override
   AndroidSessionStorage createPlatformSessionStorage(
     PlatformSessionStorageCreationParams params,

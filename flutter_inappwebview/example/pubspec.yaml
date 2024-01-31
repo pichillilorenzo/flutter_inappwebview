@@ -43,6 +43,8 @@ dependency_overrides:
     path: ../../flutter_inappwebview_macos
   flutter_inappwebview_web:
     path: ../../flutter_inappwebview_web
+  flutter_inappwebview_windows:
+    path: ../../flutter_inappwebview_windows
 
 dev_dependencies:
   flutter_test:

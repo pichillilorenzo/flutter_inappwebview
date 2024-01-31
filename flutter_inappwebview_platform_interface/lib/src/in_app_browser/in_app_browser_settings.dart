@@ -98,194 +98,198 @@ class InAppBrowserSettings_
     implements BrowserOptions, AndroidOptions, IosOptions {
   ///Set to `true` to create the browser and load the page, but not show it. Omit or set to `false` to have the browser open and load normally.
   ///The default value is `false`.
-  ///
-  ///**Officially Supported Platforms/Implementations**:
-  ///- Android native WebView
-  ///- iOS
-  ///- MacOS
+  @SupportedPlatforms(platforms: [
+    AndroidPlatform(),
+    IOSPlatform(),
+    MacOSPlatform(),
+    WindowsPlatform()
+  ])
   bool? hidden;
 
   ///Set to `true` to hide the toolbar at the top of the WebView. The default value is `false`.
-  ///
-  ///**Officially Supported Platforms/Implementations**:
-  ///- Android native WebView
-  ///- iOS
-  ///- MacOS
+  @SupportedPlatforms(platforms: [
+    AndroidPlatform(),
+    IOSPlatform(),
+    MacOSPlatform()
+  ])
   bool? hideToolbarTop;
 
   ///Set the custom background color of the toolbar at the top.
-  ///
-  ///**Officially Supported Platforms/Implementations**:
-  ///- Android native WebView
-  ///- iOS
-  ///- MacOS
+  @SupportedPlatforms(platforms: [
+    AndroidPlatform(),
+    IOSPlatform(),
+    MacOSPlatform()
+  ])
   Color_? toolbarTopBackgroundColor;
 
   ///Set to `true` to hide the url bar on the toolbar at the top. The default value is `false`.
-  ///
-  ///**Officially Supported Platforms/Implementations**:
-  ///- Android native WebView
-  ///- iOS
-  ///- MacOS
+  @SupportedPlatforms(platforms: [
+    AndroidPlatform(),
+    IOSPlatform(),
+    MacOSPlatform()
+  ])
   bool? hideUrlBar;
 
   ///Set to `true` to hide the progress bar when the WebView is loading a page. The default value is `false`.
-  ///
-  ///**Officially Supported Platforms/Implementations**:
-  ///- Android native WebView
-  ///- iOS
-  ///- MacOS
+  @SupportedPlatforms(platforms: [
+    AndroidPlatform(),
+    IOSPlatform(),
+    MacOSPlatform()
+  ])
   bool? hideProgressBar;
 
   ///Set to `true` to hide the default menu items. The default value is `false`.
-  ///
-  ///**Officially Supported Platforms/Implementations**:
-  ///- Android native WebView
-  ///- iOS
+  @SupportedPlatforms(platforms: [
+    AndroidPlatform(),
+    IOSPlatform(),
+    MacOSPlatform()
+  ])
   bool? hideDefaultMenuItems;
 
   ///Set to `true` if you want the title should be displayed. The default value is `false`.
-  ///
-  ///**Officially Supported Platforms/Implementations**:
-  ///- Android native WebView
+  @SupportedPlatforms(platforms: [
+    AndroidPlatform()
+  ])
   bool? hideTitleBar;
 
   ///Set the action bar's title.
-  ///
-  ///**Officially Supported Platforms/Implementations**:
-  ///- Android native WebView
-  ///- MacOS
+  @SupportedPlatforms(platforms: [
+    AndroidPlatform(),
+    MacOSPlatform(),
+    WindowsPlatform()
+  ])
   String? toolbarTopFixedTitle;
 
   ///Set to `false` to not close the InAppBrowser when the user click on the Android back button and the WebView cannot go back to the history. The default value is `true`.
-  ///
-  ///**Officially Supported Platforms/Implementations**:
-  ///- Android native WebView
+  @SupportedPlatforms(platforms: [
+    AndroidPlatform()
+  ])
   bool? closeOnCannotGoBack;
 
   ///Set to `false` to block the InAppBrowser WebView going back when the user click on the Android back button. The default value is `true`.
-  ///
-  ///**Officially Supported Platforms/Implementations**:
-  ///- Android native WebView
+  @SupportedPlatforms(platforms: [
+    AndroidPlatform()
+  ])
   bool? allowGoBackWithBackButton;
 
   ///Set to `true` to close the InAppBrowser when the user click on the Android back button. The default value is `false`.
-  ///
-  ///**Officially Supported Platforms/Implementations**:
-  ///- Android native WebView
+  @SupportedPlatforms(platforms: [
+    AndroidPlatform()
+  ])
   bool? shouldCloseOnBackButtonPressed;
 
   ///Set to `true` to set the toolbar at the top translucent. The default value is `true`.
-  ///
-  ///**Officially Supported Platforms/Implementations**:
-  ///- iOS
+  @SupportedPlatforms(platforms: [
+    IOSPlatform()
+  ])
   bool? toolbarTopTranslucent;
 
   ///Set the tint color to apply to the navigation bar background.
-  ///
-  ///**Officially Supported Platforms/Implementations**:
-  ///- iOS
+  @SupportedPlatforms(platforms: [
+    IOSPlatform()
+  ])
   Color_? toolbarTopBarTintColor;
 
   ///Set the tint color to apply to the navigation items and bar button items.
-  ///
-  ///**Officially Supported Platforms/Implementations**:
-  ///- iOS
+  @SupportedPlatforms(platforms: [
+    IOSPlatform()
+  ])
   Color_? toolbarTopTintColor;
 
   ///Set to `true` to hide the toolbar at the bottom of the WebView. The default value is `false`.
-  ///
-  ///**Officially Supported Platforms/Implementations**:
-  ///- iOS
+  @SupportedPlatforms(platforms: [
+    IOSPlatform()
+  ])
   bool? hideToolbarBottom;
 
   ///Set the custom background color of the toolbar at the bottom.
-  ///
-  ///**Officially Supported Platforms/Implementations**:
-  ///- iOS
+  @SupportedPlatforms(platforms: [
+    IOSPlatform()
+  ])
   Color_? toolbarBottomBackgroundColor;
 
   ///Set the tint color to apply to the bar button items.
-  ///
-  ///**Officially Supported Platforms/Implementations**:
-  ///- iOS
+  @SupportedPlatforms(platforms: [
+    IOSPlatform()
+  ])
   Color_? toolbarBottomTintColor;
 
   ///Set to `true` to set the toolbar at the bottom translucent. The default value is `true`.
-  ///
-  ///**Officially Supported Platforms/Implementations**:
-  ///- iOS
+  @SupportedPlatforms(platforms: [
+    IOSPlatform()
+  ])
   bool? toolbarBottomTranslucent;
 
   ///Set the custom text for the close button.
-  ///
-  ///**Officially Supported Platforms/Implementations**:
-  ///- iOS
+  @SupportedPlatforms(platforms: [
+    IOSPlatform()
+  ])
   String? closeButtonCaption;
 
   ///Set the custom color for the close button.
-  ///
-  ///**Officially Supported Platforms/Implementations**:
-  ///- iOS
+  @SupportedPlatforms(platforms: [
+    IOSPlatform()
+  ])
   Color_? closeButtonColor;
 
   ///Set to `true` to hide the close button. The default value is `false`.
-  ///
-  ///**Officially Supported Platforms/Implementations**:
-  ///- iOS
+  @SupportedPlatforms(platforms: [
+    IOSPlatform()
+  ])
   bool? hideCloseButton;
 
   ///Set the custom color for the menu button.
-  ///
-  ///**Officially Supported Platforms/Implementations**:
-  ///- iOS
+  @SupportedPlatforms(platforms: [
+    IOSPlatform()
+  ])
   Color_? menuButtonColor;
 
   ///Set the custom modal presentation style when presenting the WebView. The default value is [ModalPresentationStyle.FULL_SCREEN].
-  ///
-  ///**Officially Supported Platforms/Implementations**:
-  ///- iOS
+  @SupportedPlatforms(platforms: [
+    IOSPlatform()
+  ])
   ModalPresentationStyle_? presentationStyle;
 
   ///Set to the custom transition style when presenting the WebView. The default value is [ModalTransitionStyle.COVER_VERTICAL].
-  ///
-  ///**Officially Supported Platforms/Implementations**:
-  ///- iOS
+  @SupportedPlatforms(platforms: [
+    IOSPlatform()
+  ])
   ModalTransitionStyle_? transitionStyle;
 
   ///How the browser window should be added to the main window.
   ///The default value is [WindowType.WINDOW].
-  ///
-  ///**Officially Supported Platforms/Implementations**:
-  ///- MacOS
+  @SupportedPlatforms(platforms: [
+    MacOSPlatform(),
+    WindowsPlatform()
+  ])
   WindowType_? windowType;
 
   ///The window’s alpha value.
   ///The default value is `1.0`.
-  ///
-  ///**Officially Supported Platforms/Implementations**:
-  ///- MacOS
+  @SupportedPlatforms(platforms: [
+    MacOSPlatform(),
+    WindowsPlatform()
+  ])
   double? windowAlphaValue;
 
   ///Flags that describe the window’s current style, such as if it’s resizable or in full-screen mode.
-  ///
-  ///**Officially Supported Platforms/Implementations**:
-  ///- MacOS
+  @SupportedPlatforms(platforms: [
+    MacOSPlatform()
+  ])
   WindowStyleMask_? windowStyleMask;
 
   ///The type of separator that the app displays between the title bar and content of a window.
-  ///
-  ///**NOTE for MacOS**: available on MacOS 11.0+.
-  ///
-  ///**Officially Supported Platforms/Implementations**:
-  ///- MacOS
+  @SupportedPlatforms(platforms: [
+    MacOSPlatform(available: '11.0')
+  ])
   WindowTitlebarSeparatorStyle_? windowTitlebarSeparatorStyle;
 
   ///Sets the origin and size of the window’s frame rectangle according to a given frame rectangle,
   ///thereby setting its position and size onscreen.
-  ///
-  ///**Officially Supported Platforms/Implementations**:
-  ///- MacOS
+  @SupportedPlatforms(platforms: [
+    MacOSPlatform(),
+    WindowsPlatform()
+  ])
   InAppWebViewRect_? windowFrame;
 
   InAppBrowserSettings_(

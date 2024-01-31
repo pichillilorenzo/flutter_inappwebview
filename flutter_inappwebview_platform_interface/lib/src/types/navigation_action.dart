@@ -54,7 +54,8 @@ class NavigationAction_ {
         available: "21",
         apiName: "WebResourceRequest.isRedirect",
         apiUrl:
-            "https://developer.android.com/reference/android/webkit/WebResourceRequest#isRedirect()")
+            "https://developer.android.com/reference/android/webkit/WebResourceRequest#isRedirect()"),
+    WindowsPlatform()
   ])
   bool? isRedirect;
 
@@ -62,7 +63,7 @@ class NavigationAction_ {
   @Deprecated("Use navigationType instead")
   IOSWKNavigationType_? iosWKNavigationType;
 
-  ///The type of action triggering the navigation.ì
+  ///The type of action triggering the navigation.
   @SupportedPlatforms(platforms: [
     IOSPlatform(
         apiName: "WKNavigationAction.navigationType",
@@ -71,7 +72,8 @@ class NavigationAction_ {
     MacOSPlatform(
         apiName: "WKNavigationAction.navigationType",
         apiUrl:
-            "https://developer.apple.com/documentation/webkit/wknavigationaction/1401914-navigationtype")
+            "https://developer.apple.com/documentation/webkit/wknavigationaction/1401914-navigationtype"),
+    WindowsPlatform()
   ])
   NavigationType_? navigationType;
 

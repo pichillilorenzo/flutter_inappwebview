@@ -484,6 +484,21 @@ class InAppWebViewController {
           URLResponse? urlResponse}) =>
       platform.loadSimulatedRequest(urlRequest: urlRequest, data: data);
 
+  ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.openDevTools}
+  Future<void> openDevTools() => platform.openDevTools();
+
+  ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.callDevToolsProtocolMethod}
+  Future<dynamic> callDevToolsProtocolMethod({required String methodName, Map<String, dynamic>? parameters}) =>
+      platform.callDevToolsProtocolMethod(methodName: methodName, parameters: parameters);
+
+  ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.addDevToolsProtocolEventListener}
+  Future<void> addDevToolsProtocolEventListener({required String eventName, required Function(dynamic data) callback}) =>
+      platform.addDevToolsProtocolEventListener(eventName: eventName, callback: callback);
+
+  ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.removeDevToolsProtocolEventListener}
+  Future<void> removeDevToolsProtocolEventListener({required String eventName}) =>
+      platform.removeDevToolsProtocolEventListener(eventName: eventName);
+
   ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.getIFrameId}
   Future<String?> getIFrameId() => platform.getIFrameId();
 

@@ -24,6 +24,12 @@ class WebHistoryItem_ {
   ///Position offset respect to the currentIndex of the back-forward [WebHistory.list].
   int? offset;
 
+  ///Unique id of the navigation history entry.
+  @SupportedPlatforms(platforms: [
+    WindowsPlatform()
+  ])
+  int? entryId;
+
   WebHistoryItem_(
-      {this.originalUrl, this.title, this.url, this.index, this.offset});
+      {this.originalUrl, this.title, this.url, this.index, this.offset, this.entryId});
 }

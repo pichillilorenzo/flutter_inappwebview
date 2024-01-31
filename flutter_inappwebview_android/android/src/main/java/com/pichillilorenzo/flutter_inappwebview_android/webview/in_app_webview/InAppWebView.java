@@ -389,10 +389,12 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
     settings.setSaveFormData(customSettings.saveFormData);
     if (customSettings.incognito)
       setIncognito(true);
-    if (customSettings.hardwareAcceleration)
-      setLayerType(View.LAYER_TYPE_HARDWARE, null);
-    else
-      setLayerType(View.LAYER_TYPE_SOFTWARE, null);
+    if (customSettings.useHybridComposition) {
+      if (customSettings.hardwareAcceleration)
+        setLayerType(View.LAYER_TYPE_HARDWARE, null);
+      else
+        setLayerType(View.LAYER_TYPE_NONE, null);
+    }
     if (customSettings.regexToCancelSubFramesLoading != null) {
       regexToCancelSubFramesLoadingCompiled = Pattern.compile(customSettings.regexToCancelSubFramesLoading);
     }
@@ -1024,11 +1026,13 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
     if (newSettingsMap.get("incognito") != null && customSettings.incognito != newCustomSettings.incognito)
       setIncognito(newCustomSettings.incognito);
 
-    if (newSettingsMap.get("hardwareAcceleration") != null && customSettings.hardwareAcceleration != newCustomSettings.hardwareAcceleration) {
-      if (newCustomSettings.hardwareAcceleration)
-        setLayerType(View.LAYER_TYPE_HARDWARE, null);
-      else
-        setLayerType(View.LAYER_TYPE_SOFTWARE, null);
+    if (customSettings.useHybridComposition) {
+      if (newSettingsMap.get("hardwareAcceleration") != null && customSettings.hardwareAcceleration != newCustomSettings.hardwareAcceleration) {
+        if (newCustomSettings.hardwareAcceleration)
+          setLayerType(View.LAYER_TYPE_HARDWARE, null);
+        else
+          setLayerType(View.LAYER_TYPE_NONE, null);
+      }
     }
 
     if (newSettingsMap.get("regexToCancelSubFramesLoading") != null && (customSettings.regexToCancelSubFramesLoading == null ||

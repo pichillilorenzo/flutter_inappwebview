@@ -1,3 +1,7 @@
+## 1.0.13
+
+- Fixed "Android emulator using API 34 fails to draw on resume sometimes" [#1981](https://github.com/pichillilorenzo/flutter_inappwebview/issues/1981)
+
 ## 1.0.12
 
 - Updated `flutter_inappwebview_platform_interface` version dependency to `^1.0.10`

@@ -673,7 +673,6 @@ namespace flutter_inappwebview_plugin
           int64_t size = items->size();
           if (nextIndex >= 0 && nextIndex < size) {
             auto entryId = items->at(nextIndex)->entryId;
-            std::cout << "entryId: " + std::to_string(entryId.value()) << "\n";
             if (entryId.has_value()) {
               auto oldCallShouldOverrideUrlLoading_ = callShouldOverrideUrlLoading_;
               callShouldOverrideUrlLoading_ = false;

@@ -19,7 +19,7 @@ class WindowsHeadlessInAppWebViewCreationParams
   WindowsHeadlessInAppWebViewCreationParams(
       {super.controllerFromPlatform,
       super.initialSize,
-        this.webViewEnvironment,
+      this.webViewEnvironment,
       super.windowId,
       super.onWebViewCreated,
       super.onLoadStart,
@@ -135,7 +135,8 @@ class WindowsHeadlessInAppWebViewCreationParams
       PlatformHeadlessInAppWebViewCreationParams params)
       : this(
             controllerFromPlatform: params.controllerFromPlatform,
-            webViewEnvironment: params.webViewEnvironment as WindowsWebViewEnvironment?,
+            webViewEnvironment:
+                params.webViewEnvironment as WindowsWebViewEnvironment?,
             initialSize: params.initialSize,
             windowId: params.windowId,
             onWebViewCreated: params.onWebViewCreated,
@@ -285,7 +286,8 @@ class WindowsHeadlessInAppWebView extends PlatformHeadlessInAppWebView
 
   _init() {
     _webViewController = WindowsInAppWebViewController(
-      WindowsInAppWebViewControllerCreationParams(id: id, webviewParams: params),
+      WindowsInAppWebViewControllerCreationParams(
+          id: id, webviewParams: params),
     );
     _controllerFromPlatform =
         params.controllerFromPlatform?.call(_webViewController!) ??

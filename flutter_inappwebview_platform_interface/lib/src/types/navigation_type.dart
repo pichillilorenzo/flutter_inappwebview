@@ -18,52 +18,51 @@ class NavigationType_ {
     EnumIOSPlatform(
         apiName: 'WKNavigationType.linkActivated',
         apiUrl:
-        'https://developer.apple.com/documentation/webkit/wknavigationtype/linkactivated',
+            'https://developer.apple.com/documentation/webkit/wknavigationtype/linkactivated',
         value: 0),
     EnumMacOSPlatform(
         apiName: 'WKNavigationType.linkActivated',
         apiUrl:
-        'https://developer.apple.com/documentation/webkit/wknavigationtype/linkactivated',
+            'https://developer.apple.com/documentation/webkit/wknavigationtype/linkactivated',
         value: 0),
-    EnumWindowsPlatform(
-        value: 0
-    ),
+    EnumWindowsPlatform(value: 0),
   ])
-  static const LINK_ACTIVATED = const NavigationType_._internal('LINK_ACTIVATED');
+  static const LINK_ACTIVATED =
+      const NavigationType_._internal('LINK_ACTIVATED');
 
   ///A form was submitted.
   @EnumSupportedPlatforms(platforms: [
     EnumIOSPlatform(
         apiName: 'WKNavigationType.formSubmitted',
         apiUrl:
-        'https://developer.apple.com/documentation/webkit/wknavigationtype/formsubmitted',
+            'https://developer.apple.com/documentation/webkit/wknavigationtype/formsubmitted',
         value: 1),
     EnumMacOSPlatform(
         apiName: 'WKNavigationType.formSubmitted',
         apiUrl:
-        'https://developer.apple.com/documentation/webkit/wknavigationtype/formsubmitted',
+            'https://developer.apple.com/documentation/webkit/wknavigationtype/formsubmitted',
         value: 1),
   ])
-  static const FORM_SUBMITTED = const NavigationType_._internal('FORM_SUBMITTED');
+  static const FORM_SUBMITTED =
+      const NavigationType_._internal('FORM_SUBMITTED');
 
   ///An item from the back-forward list was requested.
   @EnumSupportedPlatforms(platforms: [
     EnumIOSPlatform(
         apiName: 'WKNavigationType.formSubmitted',
         apiUrl:
-        'https://developer.apple.com/documentation/webkit/wknavigationtype/formsubmitted',
+            'https://developer.apple.com/documentation/webkit/wknavigationtype/formsubmitted',
         value: 2),
     EnumMacOSPlatform(
         apiName: 'WKNavigationType.formSubmitted',
         apiUrl:
-        'https://developer.apple.com/documentation/webkit/wknavigationtype/formsubmitted',
+            'https://developer.apple.com/documentation/webkit/wknavigationtype/formsubmitted',
         value: 2),
     EnumWindowsPlatform(
         apiName: 'COREWEBVIEW2_NAVIGATION_KIND_BACK_OR_FORWARD',
         apiUrl:
-        'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2210.55#corewebview2_navigation_kind',
-        value: 1
-    ),
+            'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2210.55#corewebview2_navigation_kind',
+        value: 1),
   ])
   static const BACK_FORWARD = const NavigationType_._internal('BACK_FORWARD');
 
@@ -72,19 +71,18 @@ class NavigationType_ {
     EnumIOSPlatform(
         apiName: 'WKNavigationType.reload',
         apiUrl:
-        'https://developer.apple.com/documentation/webkit/wknavigationtype/reload',
+            'https://developer.apple.com/documentation/webkit/wknavigationtype/reload',
         value: 3),
     EnumMacOSPlatform(
         apiName: 'WKNavigationType.reload',
         apiUrl:
-        'https://developer.apple.com/documentation/webkit/wknavigationtype/reload',
+            'https://developer.apple.com/documentation/webkit/wknavigationtype/reload',
         value: 3),
     EnumWindowsPlatform(
         apiName: 'COREWEBVIEW2_NAVIGATION_KIND_RELOAD',
         apiUrl:
-        'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2210.55#corewebview2_navigation_kind',
-        value: 2
-    ),
+            'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2210.55#corewebview2_navigation_kind',
+        value: 2),
   ])
   static const RELOAD = const NavigationType_._internal('RELOAD');
 
@@ -93,31 +91,30 @@ class NavigationType_ {
     EnumIOSPlatform(
         apiName: 'WKNavigationType.formSubmitted',
         apiUrl:
-        'https://developer.apple.com/documentation/webkit/wknavigationtype/formresubmitted',
+            'https://developer.apple.com/documentation/webkit/wknavigationtype/formresubmitted',
         value: 4),
     EnumMacOSPlatform(
         apiName: 'WKNavigationType.formSubmitted',
         apiUrl:
-        'https://developer.apple.com/documentation/webkit/wknavigationtype/formresubmitted',
+            'https://developer.apple.com/documentation/webkit/wknavigationtype/formresubmitted',
         value: 4),
   ])
-  static const FORM_RESUBMITTED = const NavigationType_._internal('FORM_RESUBMITTED');
+  static const FORM_RESUBMITTED =
+      const NavigationType_._internal('FORM_RESUBMITTED');
 
   ///Navigation is taking place for some other reason.
   @EnumSupportedPlatforms(platforms: [
     EnumIOSPlatform(
         apiName: 'WKNavigationType.other',
         apiUrl:
-        'https://developer.apple.com/documentation/webkit/wknavigationtype/other',
+            'https://developer.apple.com/documentation/webkit/wknavigationtype/other',
         value: -1),
     EnumMacOSPlatform(
         apiName: 'WKNavigationType.other',
         apiUrl:
-        'https://developer.apple.com/documentation/webkit/wknavigationtype/other',
+            'https://developer.apple.com/documentation/webkit/wknavigationtype/other',
         value: -1),
-    EnumWindowsPlatform(
-        value: 3
-    ),
+    EnumWindowsPlatform(value: 3),
   ])
   static const OTHER = const NavigationType_._internal('OTHER');
 }

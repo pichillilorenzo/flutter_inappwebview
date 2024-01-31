@@ -41,11 +41,8 @@ class Cookie_ {
   int? expiresDate;
 
   ///Indicates if the cookie is a session only cookie.
-  @SupportedPlatforms(platforms: [
-    IOSPlatform(),
-    MacOSPlatform(),
-    WindowsPlatform()
-  ])
+  @SupportedPlatforms(
+      platforms: [IOSPlatform(), MacOSPlatform(), WindowsPlatform()])
   bool? isSessionOnly;
 
   ///The cookie domain.

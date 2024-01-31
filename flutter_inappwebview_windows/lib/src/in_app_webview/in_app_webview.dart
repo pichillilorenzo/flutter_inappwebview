@@ -24,7 +24,7 @@ class WindowsInAppWebViewWidgetCreationParams
       super.keepAlive,
       super.preventGestureDelay,
       super.windowId,
-        this.webViewEnvironment,
+      this.webViewEnvironment,
       super.onWebViewCreated,
       super.onLoadStart,
       super.onLoadStop,
@@ -147,7 +147,8 @@ class WindowsInAppWebViewWidgetCreationParams
             keepAlive: params.keepAlive,
             preventGestureDelay: params.preventGestureDelay,
             windowId: params.windowId,
-            webViewEnvironment: params.webViewEnvironment as WindowsWebViewEnvironment?,
+            webViewEnvironment:
+                params.webViewEnvironment as WindowsWebViewEnvironment?,
             onWebViewCreated: params.onWebViewCreated,
             onLoadStart: params.onLoadStart,
             onLoadStop: params.onLoadStop,

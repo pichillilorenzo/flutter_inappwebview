@@ -45,8 +45,8 @@ class CookieManager {
       return _instance!;
     } else {
       return CookieManager.fromPlatformCreationParams(
-          PlatformCookieManagerCreationParams(webViewEnvironment: webViewEnvironment.platform)
-      );
+          PlatformCookieManagerCreationParams(
+              webViewEnvironment: webViewEnvironment.platform));
     }
   }
 

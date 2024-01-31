@@ -33,11 +33,12 @@ class WindowsInAppBrowserCreationParams
     return WindowsInAppBrowserCreationParams(
         contextMenu: params.contextMenu,
         pullToRefreshController: params.pullToRefreshController,
-        findInteractionController:
-            params.findInteractionController as WindowsFindInteractionController?,
+        findInteractionController: params.findInteractionController
+            as WindowsFindInteractionController?,
         initialUserScripts: params.initialUserScripts,
         windowId: params.windowId,
-        webViewEnvironment: params.webViewEnvironment as WindowsWebViewEnvironment?);
+        webViewEnvironment:
+            params.webViewEnvironment as WindowsWebViewEnvironment?);
   }
 
   @override
@@ -174,7 +175,8 @@ class WindowsInAppBrowser extends PlatformInAppBrowser with ChannelController {
         () => initialUserScripts?.map((e) => e.toMap()).toList() ?? []);
     args.putIfAbsent('pullToRefreshSettings', () => pullToRefreshSettings);
     args.putIfAbsent('menuItems', () => menuItemList);
-    args.putIfAbsent('webViewEnvironmentId', () => _windowsParams.webViewEnvironment?.id);
+    args.putIfAbsent(
+        'webViewEnvironmentId', () => _windowsParams.webViewEnvironment?.id);
     return args;
   }
 

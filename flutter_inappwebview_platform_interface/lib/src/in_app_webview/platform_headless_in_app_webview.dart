@@ -18,7 +18,7 @@ class PlatformHeadlessInAppWebViewCreationParams
   /// Used by the platform implementation to create a new [PlatformHeadlessInAppWebView].
   const PlatformHeadlessInAppWebViewCreationParams(
       {this.initialSize = const Size(-1, -1),
-        this.webViewEnvironment,
+      this.webViewEnvironment,
       super.controllerFromPlatform,
       super.windowId,
       super.onWebViewCreated,

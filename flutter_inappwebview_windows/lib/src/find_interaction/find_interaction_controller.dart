@@ -114,7 +114,8 @@ class WindowsFindInteractionController extends PlatformFindInteractionController
   }
 }
 
-extension InternalFindInteractionController on WindowsFindInteractionController {
+extension InternalFindInteractionController
+    on WindowsFindInteractionController {
   void init(dynamic id) {
     channel = MethodChannel(
         'com.pichillilorenzo/flutter_inappwebview_find_interaction_$id');

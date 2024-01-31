@@ -32,14 +32,14 @@ import '../pull_to_refresh/platform_pull_to_refresh_controller.dart';
 @immutable
 class PlatformInAppBrowserCreationParams {
   /// Used by the platform implementation to create a new [PlatformInAppBrowser].
-  const PlatformInAppBrowserCreationParams(
-      {this.contextMenu,
-      this.pullToRefreshController,
-      this.findInteractionController,
-      this.initialUserScripts,
-      this.windowId,
-      this.webViewEnvironment,
-      });
+  const PlatformInAppBrowserCreationParams({
+    this.contextMenu,
+    this.pullToRefreshController,
+    this.findInteractionController,
+    this.initialUserScripts,
+    this.windowId,
+    this.webViewEnvironment,
+  });
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformInAppBrowser.contextMenu}
   final ContextMenu? contextMenu;

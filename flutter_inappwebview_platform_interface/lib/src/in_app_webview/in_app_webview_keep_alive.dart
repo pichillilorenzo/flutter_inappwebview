@@ -37,6 +37,5 @@ class InAppWebViewControllerKeepAliveProps {
       this.injectedScriptsFromURL = const {},
       this.webMessageChannels = const {},
       this.webMessageListeners = const {},
-      this.devToolsProtocolEventListenerMap = const {}
-      });
+      this.devToolsProtocolEventListenerMap = const {}});
 }

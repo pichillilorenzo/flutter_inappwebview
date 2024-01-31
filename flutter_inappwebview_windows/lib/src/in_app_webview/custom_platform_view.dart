@@ -128,8 +128,8 @@ class CustomPlatformViewController
 
     _methodChannel =
         MethodChannel('com.pichillilorenzo/custom_platform_view_$_textureId');
-    _eventChannel =
-        EventChannel('com.pichillilorenzo/custom_platform_view_${_textureId}_events');
+    _eventChannel = EventChannel(
+        'com.pichillilorenzo/custom_platform_view_${_textureId}_events');
     _eventStreamSubscription =
         _eventChannel.receiveBroadcastStream().listen((event) {
       final map = event as Map<dynamic, dynamic>;
@@ -303,9 +303,7 @@ class _CustomPlatformViewState extends State<CustomPlatformView> {
       focusNode: _focusNode,
       canRequestFocus: true,
       debugLabel: "flutter_inappwebview_windows_custom_platform_view",
-      onFocusChange: (focused) {
-
-      },
+      onFocusChange: (focused) {},
       child: SizedBox.expand(key: _key, child: _buildInner()),
     );
   }
@@ -418,7 +416,6 @@ class _CustomPlatformViewState extends State<CustomPlatformView> {
       await _controller.ready;
       unawaited(_controller._setSize(
           box.size, widget.scaleFactor ?? window.devicePixelRatio));
-
     }
   }
 

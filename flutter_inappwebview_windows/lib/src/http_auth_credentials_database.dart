@@ -26,8 +26,8 @@ class WindowsHttpAuthCredentialDatabaseCreationParams
 }
 
 ///{@macro flutter_inappwebview_platform_interface.PlatformHttpAuthCredentialDatabase}
-class WindowsHttpAuthCredentialDatabase extends PlatformHttpAuthCredentialDatabase
-    with ChannelController {
+class WindowsHttpAuthCredentialDatabase
+    extends PlatformHttpAuthCredentialDatabase with ChannelController {
   /// Creates a new [WindowsHttpAuthCredentialDatabase].
   WindowsHttpAuthCredentialDatabase(
       PlatformHttpAuthCredentialDatabaseCreationParams params)

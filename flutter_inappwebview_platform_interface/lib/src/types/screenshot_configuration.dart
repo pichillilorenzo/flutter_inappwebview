@@ -25,11 +25,8 @@ class ScreenshotConfiguration_ {
   ///The web view maintains the aspect ratio of the captured content, but scales it to match the width you specify.
   ///
   ///The default value of this property is `null`, which returns an image whose size matches the original size of the captured rectangle.
-  @SupportedPlatforms(platforms: [
-    AndroidPlatform(),
-    IOSPlatform(),
-    MacOSPlatform()
-  ])
+  @SupportedPlatforms(
+      platforms: [AndroidPlatform(), IOSPlatform(), MacOSPlatform()])
   double? snapshotWidth;
 
   ///The compression format of the captured image.

@@ -64,7 +64,7 @@ class WebResourceErrorType_ {
     EnumWindowsPlatform(
         apiName: 'COREWEBVIEW2_WEB_ERROR_STATUS_CANNOT_CONNECT',
         apiUrl:
-        'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2210.55#corewebview2_web_error_status',
+            'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2210.55#corewebview2_web_error_status',
         value: 12)
   ])
   static const CANNOT_CONNECT_TO_HOST =
@@ -133,7 +133,7 @@ class WebResourceErrorType_ {
     EnumWindowsPlatform(
         apiName: 'COREWEBVIEW2_WEB_ERROR_STATUS_HOST_NAME_NOT_RESOLVED',
         apiUrl:
-        'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2210.55#corewebview2_web_error_status',
+            'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2210.55#corewebview2_web_error_status',
         value: 13)
   ])
   static const HOST_LOOKUP = WebResourceErrorType_._internal("HOST_LOOKUP");
@@ -200,7 +200,7 @@ class WebResourceErrorType_ {
     EnumWindowsPlatform(
         apiName: 'COREWEBVIEW2_WEB_ERROR_STATUS_TIMEOUT',
         apiUrl:
-        'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2210.55#corewebview2_web_error_status',
+            'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2210.55#corewebview2_web_error_status',
         value: 7)
   ])
   static const TIMEOUT = WebResourceErrorType_._internal("TIMEOUT");
@@ -236,7 +236,7 @@ class WebResourceErrorType_ {
     EnumWindowsPlatform(
         apiName: 'COREWEBVIEW2_WEB_ERROR_STATUS_UNKNOWN',
         apiUrl:
-        'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2210.55#corewebview2_web_error_status',
+            'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2210.55#corewebview2_web_error_status',
         value: 0)
   ])
   static const UNKNOWN = WebResourceErrorType_._internal("UNKNOWN");
@@ -300,7 +300,7 @@ class WebResourceErrorType_ {
     EnumWindowsPlatform(
         apiName: 'COREWEBVIEW2_WEB_ERROR_STATUS_OPERATION_CANCELED',
         apiUrl:
-        'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2210.55#corewebview2_web_error_status',
+            'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2210.55#corewebview2_web_error_status',
         value: 14)
   ])
   static const CANCELLED = WebResourceErrorType_._internal("CANCELLED");
@@ -320,7 +320,7 @@ class WebResourceErrorType_ {
     EnumWindowsPlatform(
         apiName: 'COREWEBVIEW2_WEB_ERROR_STATUS_DISCONNECTED',
         apiUrl:
-        'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2210.55#corewebview2_web_error_status',
+            'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2210.55#corewebview2_web_error_status',
         value: 11)
   ])
   static const NETWORK_CONNECTION_LOST =
@@ -388,9 +388,10 @@ class WebResourceErrorType_ {
             'https://developer.apple.com/documentation/foundation/urlerror/2293606-badserverresponse',
         value: -1011),
     EnumWindowsPlatform(
-        apiName: 'COREWEBVIEW2_WEB_ERROR_STATUS_ERROR_HTTP_INVALID_SERVER_RESPONSE',
+        apiName:
+            'COREWEBVIEW2_WEB_ERROR_STATUS_ERROR_HTTP_INVALID_SERVER_RESPONSE',
         apiUrl:
-        'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2210.55#corewebview2_web_error_status',
+            'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2210.55#corewebview2_web_error_status',
         value: 8)
   ])
   static const BAD_SERVER_RESPONSE =
@@ -426,9 +427,10 @@ class WebResourceErrorType_ {
             'https://developer.apple.com/documentation/foundation/urlerror/2293560-userauthenticationrequired',
         value: -1013),
     EnumWindowsPlatform(
-        apiName: 'COREWEBVIEW2_WEB_ERROR_STATUS_VALID_AUTHENTICATION_CREDENTIALS_REQUIRED',
+        apiName:
+            'COREWEBVIEW2_WEB_ERROR_STATUS_VALID_AUTHENTICATION_CREDENTIALS_REQUIRED',
         apiUrl:
-        'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2210.55#corewebview2_web_error_status',
+            'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2210.55#corewebview2_web_error_status',
         value: 17),
   ])
   static const USER_AUTHENTICATION_REQUIRED =
@@ -936,29 +938,31 @@ class WebResourceErrorType_ {
   ///Indicates that the host is unreachable.
   @EnumSupportedPlatforms(platforms: [
     EnumWindowsPlatform(
-    apiName: 'COREWEBVIEW2_WEB_ERROR_STATUS_SERVER_UNREACHABLE',
-    apiUrl:
-    'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2210.55#corewebview2_web_error_status',
-    value: 6),
+        apiName: 'COREWEBVIEW2_WEB_ERROR_STATUS_SERVER_UNREACHABLE',
+        apiUrl:
+            'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2210.55#corewebview2_web_error_status',
+        value: 6),
   ])
-  static const SERVER_UNREACHABLE = WebResourceErrorType_._internal("SERVER_UNREACHABLE");
+  static const SERVER_UNREACHABLE =
+      WebResourceErrorType_._internal("SERVER_UNREACHABLE");
 
   ///Indicates that the connection was stopped.
   @EnumSupportedPlatforms(platforms: [
     EnumWindowsPlatform(
         apiName: 'COREWEBVIEW2_WEB_ERROR_STATUS_CONNECTION_ABORTED',
         apiUrl:
-        'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2210.55#corewebview2_web_error_status',
+            'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2210.55#corewebview2_web_error_status',
         value: 9)
   ])
-  static const CONNECTION_ABORTED = WebResourceErrorType_._internal("CONNECTION_ABORTED");
+  static const CONNECTION_ABORTED =
+      WebResourceErrorType_._internal("CONNECTION_ABORTED");
 
   ///Indicates that the connection was reset.
   @EnumSupportedPlatforms(platforms: [
     EnumWindowsPlatform(
         apiName: 'COREWEBVIEW2_WEB_ERROR_STATUS_CONNECTION_RESET',
         apiUrl:
-        'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2210.55#corewebview2_web_error_status',
+            'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2210.55#corewebview2_web_error_status',
         value: 10),
   ])
   static const RESET = WebResourceErrorType_._internal("RESET");
@@ -968,28 +972,32 @@ class WebResourceErrorType_ {
     EnumWindowsPlatform(
         apiName: 'COREWEBVIEW2_WEB_ERROR_STATUS_REDIRECT_FAILED',
         apiUrl:
-        'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2210.55#corewebview2_web_error_status',
+            'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2210.55#corewebview2_web_error_status',
         value: 15),
   ])
-  static const REDIRECT_FAILED = WebResourceErrorType_._internal("REDIRECT_FAILED");
+  static const REDIRECT_FAILED =
+      WebResourceErrorType_._internal("REDIRECT_FAILED");
 
   ///Indicates that an unexpected error occurred.
   @EnumSupportedPlatforms(platforms: [
     EnumWindowsPlatform(
         apiName: 'COREWEBVIEW2_WEB_ERROR_STATUS_UNEXPECTED_ERROR',
         apiUrl:
-        'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2210.55#corewebview2_web_error_status',
+            'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2210.55#corewebview2_web_error_status',
         value: 16),
   ])
-  static const UNEXPECTED_ERROR = WebResourceErrorType_._internal("UNEXPECTED_ERROR");
+  static const UNEXPECTED_ERROR =
+      WebResourceErrorType_._internal("UNEXPECTED_ERROR");
 
   ///Indicates that user lacks proper authentication credentials for a proxy server.
   @EnumSupportedPlatforms(platforms: [
     EnumWindowsPlatform(
-        apiName: 'COREWEBVIEW2_WEB_ERROR_STATUS_VALID_PROXY_AUTHENTICATION_REQUIRED',
+        apiName:
+            'COREWEBVIEW2_WEB_ERROR_STATUS_VALID_PROXY_AUTHENTICATION_REQUIRED',
         apiUrl:
-        'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2210.55#corewebview2_web_error_status',
+            'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2210.55#corewebview2_web_error_status',
         value: 18),
   ])
-  static const VALID_PROXY_AUTHENTICATION_REQUIRED = WebResourceErrorType_._internal("VALID_PROXY_AUTHENTICATION_REQUIRED");
+  static const VALID_PROXY_AUTHENTICATION_REQUIRED =
+      WebResourceErrorType_._internal("VALID_PROXY_AUTHENTICATION_REQUIRED");
 }

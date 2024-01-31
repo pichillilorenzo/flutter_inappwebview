@@ -2069,7 +2069,8 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///**Officially Supported Platforms/Implementations**:
   ///- Windows ([Official API - ICoreWebView2.CallDevToolsProtocolMethod](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2?view=webview2-1.0.2210.55#calldevtoolsprotocolmethod))
   ///{@endtemplate}
-  Future<dynamic> callDevToolsProtocolMethod({required String methodName, Map<String, dynamic>? parameters}) {
+  Future<dynamic> callDevToolsProtocolMethod(
+      {required String methodName, Map<String, dynamic>? parameters}) {
     throw UnimplementedError(
         'callDevToolsProtocolMethod is not implemented on the current platform');
   }
@@ -2080,7 +2081,8 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///**Officially Supported Platforms/Implementations**:
   ///- Windows ([Official API - ICoreWebView2DevToolsProtocolEventReceiver.add_DevToolsProtocolEventReceived](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2devtoolsprotocoleventreceiver?view=webview2-1.0.2210.55#add_devtoolsprotocoleventreceived))
   ///{@endtemplate}
-  Future<void> addDevToolsProtocolEventListener({required String eventName, required Function(dynamic data) callback}) {
+  Future<void> addDevToolsProtocolEventListener(
+      {required String eventName, required Function(dynamic data) callback}) {
     throw UnimplementedError(
         'addDevToolsProtocolEventListener is not implemented on the current platform');
   }
@@ -2091,7 +2093,8 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///**Officially Supported Platforms/Implementations**:
   ///- Windows ([Official API - ICoreWebView2DevToolsProtocolEventReceiver.remove_DevToolsProtocolEventReceived](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2devtoolsprotocoleventreceiver?view=webview2-1.0.2210.55#remove_devtoolsprotocoleventreceived))
   ///{@endtemplate}
-  Future<void> removeDevToolsProtocolEventListener({required String eventName}) {
+  Future<void> removeDevToolsProtocolEventListener(
+      {required String eventName}) {
     throw UnimplementedError(
         'removeDevToolsProtocolEventListener is not implemented on the current platform');
   }

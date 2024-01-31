@@ -437,8 +437,8 @@ abstract class InAppWebViewPlatform extends PlatformInterface {
   /// This function should only be called by the app-facing package.
   /// Look at using [WebViewEnvironment] in `flutter_inappwebview` instead.
   PlatformWebViewEnvironment createPlatformWebViewEnvironment(
-      PlatformWebViewEnvironmentCreationParams params,
-      ) {
+    PlatformWebViewEnvironmentCreationParams params,
+  ) {
     throw UnimplementedError(
         'createPlatformWebViewEnvironment is not implemented on the current platform.');
   }

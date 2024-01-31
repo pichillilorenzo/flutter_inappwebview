@@ -7,7 +7,8 @@ import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_pla
 /// Platform specific implementations can add additional fields by extending
 /// this class.
 @immutable
-class WindowsWebViewEnvironmentCreationParams extends PlatformWebViewEnvironmentCreationParams {
+class WindowsWebViewEnvironmentCreationParams
+    extends PlatformWebViewEnvironmentCreationParams {
   /// Creates a new [WindowsInAppWebViewControllerCreationParams] instance.
   const WindowsWebViewEnvironmentCreationParams({super.settings});
 
@@ -16,9 +17,7 @@ class WindowsWebViewEnvironmentCreationParams extends PlatformWebViewEnvironment
       // Recommended placeholder to prevent being broken by platform interface.
       // ignore: avoid_unused_constructor_parameters
       PlatformWebViewEnvironmentCreationParams params) {
-    return WindowsWebViewEnvironmentCreationParams(
-      settings: params.settings
-    );
+    return WindowsWebViewEnvironmentCreationParams(settings: params.settings);
   }
 }
 
@@ -28,21 +27,20 @@ class WindowsWebViewEnvironmentCreationParams extends PlatformWebViewEnvironment
 ///- Windows
 class WindowsWebViewEnvironment extends PlatformWebViewEnvironment
     with ChannelController {
-  static final MethodChannel _staticChannel = MethodChannel('com.pichillilorenzo/flutter_webview_environment');
+  static final MethodChannel _staticChannel =
+      MethodChannel('com.pichillilorenzo/flutter_webview_environment');
 
   @override
   final String id = IdGenerator.generate();
 
-  WindowsWebViewEnvironment(
-      PlatformWebViewEnvironmentCreationParams params)
+  WindowsWebViewEnvironment(PlatformWebViewEnvironmentCreationParams params)
       : super.implementation(params is WindowsWebViewEnvironmentCreationParams
-      ? params
-      : WindowsWebViewEnvironmentCreationParams
-      .fromPlatformWebViewEnvironmentCreationParams(params));
+            ? params
+            : WindowsWebViewEnvironmentCreationParams
+                .fromPlatformWebViewEnvironmentCreationParams(params));
 
   static final WindowsWebViewEnvironment _staticValue =
-    WindowsWebViewEnvironment(
-        WindowsWebViewEnvironmentCreationParams());
+      WindowsWebViewEnvironment(WindowsWebViewEnvironmentCreationParams());
 
   factory WindowsWebViewEnvironment.static() {
     return _staticValue;
@@ -52,8 +50,7 @@ class WindowsWebViewEnvironment extends PlatformWebViewEnvironment
     debugLog(
         className: this.runtimeType.toString(),
         id: id,
-        debugLoggingSettings:
-        PlatformWebViewEnvironment.debugLoggingSettings,
+        debugLoggingSettings: PlatformWebViewEnvironment.debugLoggingSettings,
         method: method,
         args: args);
   }
@@ -74,24 +71,22 @@ class WindowsWebViewEnvironment extends PlatformWebViewEnvironment
   Future<WindowsWebViewEnvironment> create(
       {WebViewEnvironmentSettings? settings}) async {
     final env = WindowsWebViewEnvironment(
-        WindowsWebViewEnvironmentCreationParams(settings: settings)
-    );
+        WindowsWebViewEnvironmentCreationParams(settings: settings));
 
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('id', () => env.id);
     args.putIfAbsent('settings', () => env.settings?.toMap());
-    await _staticChannel.invokeMethod(
-        'create', args);
+    await _staticChannel.invokeMethod('create', args);
 
-    env.channel = MethodChannel('com.pichillilorenzo/flutter_webview_environment_$id');
+    env.channel =
+        MethodChannel('com.pichillilorenzo/flutter_webview_environment_$id');
     env.handler = env.handleMethod;
     env.initMethodCallHandler();
     return env;
   }
 
   @override
-  Future<String?> getAvailableVersion(
-      {String? browserExecutableFolder}) async {
+  Future<String?> getAvailableVersion({String? browserExecutableFolder}) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('browserExecutableFolder', () => browserExecutableFolder);
     return await _staticChannel.invokeMethod<String>(

@@ -40,6 +40,7 @@ class InAppBrowserSettings
   ///- Android native WebView
   ///- iOS
   ///- MacOS
+  ///- Windows
   bool? hidden;
 
   ///Set to `true` to hide the close button. The default value is `false`.
@@ -53,6 +54,7 @@ class InAppBrowserSettings
   ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
+  ///- MacOS
   bool? hideDefaultMenuItems;
 
   ///Set to `true` to hide the progress bar when the WebView is loading a page. The default value is `false`.
@@ -146,6 +148,7 @@ class InAppBrowserSettings
   ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- MacOS
+  ///- Windows
   String? toolbarTopFixedTitle;
 
   ///Set the tint color to apply to the navigation items and bar button items.
@@ -171,6 +174,7 @@ class InAppBrowserSettings
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- MacOS
+  ///- Windows
   double? windowAlphaValue;
 
   ///Sets the origin and size of the window’s frame rectangle according to a given frame rectangle,
@@ -178,6 +182,7 @@ class InAppBrowserSettings
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- MacOS
+  ///- Windows
   InAppWebViewRect? windowFrame;
 
   ///Flags that describe the window’s current style, such as if it’s resizable or in full-screen mode.
@@ -188,10 +193,8 @@ class InAppBrowserSettings
 
   ///The type of separator that the app displays between the title bar and content of a window.
   ///
-  ///**NOTE for MacOS**: available on MacOS 11.0+.
-  ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- MacOS
+  ///- MacOS 11.0+
   WindowTitlebarSeparatorStyle? windowTitlebarSeparatorStyle;
 
   ///How the browser window should be added to the main window.
@@ -199,6 +202,7 @@ class InAppBrowserSettings
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- MacOS
+  ///- Windows
   WindowType? windowType;
   InAppBrowserSettings(
       {this.allowGoBackWithBackButton = true,

@@ -18,22 +18,22 @@ class InAppBrowser implements PlatformInAppBrowserEvents {
   /// Constructs a [InAppBrowser].
   ///
   /// {@macro flutter_inappwebview_platform_interface.PlatformInAppBrowser}
-  InAppBrowser(
-      {ContextMenu? contextMenu,
-      PullToRefreshController? pullToRefreshController,
-      FindInteractionController? findInteractionController,
-      UnmodifiableListView<UserScript>? initialUserScripts,
-      int? windowId,
-      WebViewEnvironment? webViewEnvironment,
-      })
-      : this.fromPlatformCreationParams(
+  InAppBrowser({
+    ContextMenu? contextMenu,
+    PullToRefreshController? pullToRefreshController,
+    FindInteractionController? findInteractionController,
+    UnmodifiableListView<UserScript>? initialUserScripts,
+    int? windowId,
+    WebViewEnvironment? webViewEnvironment,
+  }) : this.fromPlatformCreationParams(
           PlatformInAppBrowserCreationParams(
-              contextMenu: contextMenu,
-              pullToRefreshController: pullToRefreshController?.platform,
-              findInteractionController: findInteractionController?.platform,
-              initialUserScripts: initialUserScripts,
-              windowId: windowId,
-              webViewEnvironment: webViewEnvironment?.platform,),
+            contextMenu: contextMenu,
+            pullToRefreshController: pullToRefreshController?.platform,
+            findInteractionController: findInteractionController?.platform,
+            initialUserScripts: initialUserScripts,
+            windowId: windowId,
+            webViewEnvironment: webViewEnvironment?.platform,
+          ),
         );
 
   /// Constructs a [InAppBrowser] from creation params for a specific

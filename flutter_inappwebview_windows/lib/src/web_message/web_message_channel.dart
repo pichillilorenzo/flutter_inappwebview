@@ -50,8 +50,8 @@ class WindowsWebMessageChannel extends PlatformWebMessageChannel
   static final WindowsWebMessageChannel _staticValue = WindowsWebMessageChannel(
       WindowsWebMessageChannelCreationParams(
           id: '',
-          port1:
-              WindowsWebMessagePort(WindowsWebMessagePortCreationParams(index: 0)),
+          port1: WindowsWebMessagePort(
+              WindowsWebMessagePortCreationParams(index: 0)),
           port2: WindowsWebMessagePort(
               WindowsWebMessagePortCreationParams(index: 1))));
 

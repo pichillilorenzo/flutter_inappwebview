@@ -16,8 +16,7 @@ import 'webview_environment/webview_environment.dart';
 class WindowsCookieManagerCreationParams
     extends PlatformCookieManagerCreationParams {
   /// Creates a new [WindowsCookieManagerCreationParams] instance.
-  const WindowsCookieManagerCreationParams(
-      {this.webViewEnvironment});
+  const WindowsCookieManagerCreationParams({this.webViewEnvironment});
 
   /// Creates a [WindowsCookieManagerCreationParams] instance based on [PlatformCookieManagerCreationParams].
   factory WindowsCookieManagerCreationParams.fromPlatformCookieManagerCreationParams(
@@ -25,7 +24,8 @@ class WindowsCookieManagerCreationParams
       // ignore: avoid_unused_constructor_parameters
       PlatformCookieManagerCreationParams params) {
     return WindowsCookieManagerCreationParams(
-        webViewEnvironment: params.webViewEnvironment as WindowsWebViewEnvironment?);
+        webViewEnvironment:
+            params.webViewEnvironment as WindowsWebViewEnvironment?);
   }
 
   @override
@@ -38,11 +38,11 @@ class WindowsCookieManager extends PlatformCookieManager
   /// Creates a new [WindowsCookieManager].
   WindowsCookieManager(PlatformCookieManagerCreationParams params)
       : super.implementation(
-    params is WindowsCookieManagerCreationParams
-        ? params
-        : WindowsCookieManagerCreationParams
-        .fromPlatformCookieManagerCreationParams(params),
-  ) {
+          params is WindowsCookieManagerCreationParams
+              ? params
+              : WindowsCookieManagerCreationParams
+                  .fromPlatformCookieManagerCreationParams(params),
+        ) {
     channel = const MethodChannel(
         'com.pichillilorenzo/flutter_inappwebview_cookiemanager');
     handler = handleMethod;
@@ -52,16 +52,16 @@ class WindowsCookieManager extends PlatformCookieManager
   static WindowsCookieManager? _instance;
 
   ///Gets the [WindowsCookieManager] shared instance.
-  static WindowsCookieManager instance({WindowsWebViewEnvironment? webViewEnvironment}) {
+  static WindowsCookieManager instance(
+      {WindowsWebViewEnvironment? webViewEnvironment}) {
     if (webViewEnvironment == null) {
       if (_instance == null) {
         _instance = _init();
       }
       return _instance!;
     } else {
-      return WindowsCookieManager(
-          WindowsCookieManagerCreationParams(webViewEnvironment: webViewEnvironment)
-      );
+      return WindowsCookieManager(WindowsCookieManagerCreationParams(
+          webViewEnvironment: webViewEnvironment));
     }
   }
 
@@ -75,18 +75,18 @@ class WindowsCookieManager extends PlatformCookieManager
   @override
   Future<bool> setCookie(
       {required WebUri url,
-        required String name,
-        required String value,
-        String path = "/",
-        String? domain,
-        int? expiresDate,
-        int? maxAge,
-        bool? isSecure,
-        bool? isHttpOnly,
-        HTTPCookieSameSitePolicy? sameSite,
-        @Deprecated("Use webViewController instead")
-        PlatformInAppWebViewController? iosBelow11WebViewController,
-        PlatformInAppWebViewController? webViewController}) async {
+      required String name,
+      required String value,
+      String path = "/",
+      String? domain,
+      int? expiresDate,
+      int? maxAge,
+      bool? isSecure,
+      bool? isHttpOnly,
+      HTTPCookieSameSitePolicy? sameSite,
+      @Deprecated("Use webViewController instead")
+      PlatformInAppWebViewController? iosBelow11WebViewController,
+      PlatformInAppWebViewController? webViewController}) async {
     assert(url.toString().isNotEmpty);
     assert(name.isNotEmpty);
     assert(value.isNotEmpty);
@@ -103,7 +103,8 @@ class WindowsCookieManager extends PlatformCookieManager
     args.putIfAbsent('isSecure', () => isSecure);
     args.putIfAbsent('isHttpOnly', () => isHttpOnly);
     args.putIfAbsent('sameSite', () => sameSite?.toNativeValue());
-    args.putIfAbsent('webViewEnvironmentId', () => params.webViewEnvironment?.id);
+    args.putIfAbsent(
+        'webViewEnvironmentId', () => params.webViewEnvironment?.id);
 
     return await channel?.invokeMethod<bool>('setCookie', args) ?? false;
   }
@@ -111,16 +112,17 @@ class WindowsCookieManager extends PlatformCookieManager
   @override
   Future<List<Cookie>> getCookies(
       {required WebUri url,
-        @Deprecated("Use webViewController instead")
-        PlatformInAppWebViewController? iosBelow11WebViewController,
-        PlatformInAppWebViewController? webViewController}) async {
+      @Deprecated("Use webViewController instead")
+      PlatformInAppWebViewController? iosBelow11WebViewController,
+      PlatformInAppWebViewController? webViewController}) async {
     assert(url.toString().isNotEmpty);
 
     List<Cookie> cookies = [];
 
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('url', () => url.toString());
-    args.putIfAbsent('webViewEnvironmentId', () => params.webViewEnvironment?.id);
+    args.putIfAbsent(
+        'webViewEnvironmentId', () => params.webViewEnvironment?.id);
     List<dynamic> cookieListMap =
         await channel?.invokeMethod<List>('getCookies', args) ?? [];
     cookieListMap = cookieListMap.cast<Map<dynamic, dynamic>>();
@@ -133,7 +135,7 @@ class WindowsCookieManager extends PlatformCookieManager
           isSessionOnly: cookieMap["isSessionOnly"],
           domain: cookieMap["domain"],
           sameSite:
-          HTTPCookieSameSitePolicy.fromNativeValue(cookieMap["sameSite"]),
+              HTTPCookieSameSitePolicy.fromNativeValue(cookieMap["sameSite"]),
           isSecure: cookieMap["isSecure"],
           isHttpOnly: cookieMap["isHttpOnly"],
           path: cookieMap["path"]));
@@ -144,16 +146,17 @@ class WindowsCookieManager extends PlatformCookieManager
   @override
   Future<Cookie?> getCookie(
       {required WebUri url,
-        required String name,
-        @Deprecated("Use webViewController instead")
-        PlatformInAppWebViewController? iosBelow11WebViewController,
-        PlatformInAppWebViewController? webViewController}) async {
+      required String name,
+      @Deprecated("Use webViewController instead")
+      PlatformInAppWebViewController? iosBelow11WebViewController,
+      PlatformInAppWebViewController? webViewController}) async {
     assert(url.toString().isNotEmpty);
     assert(name.isNotEmpty);
 
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('url', () => url.toString());
-    args.putIfAbsent('webViewEnvironmentId', () => params.webViewEnvironment?.id);
+    args.putIfAbsent(
+        'webViewEnvironmentId', () => params.webViewEnvironment?.id);
     List<dynamic> cookies =
         await channel?.invokeMethod<List>('getCookies', args) ?? [];
     cookies = cookies.cast<Map<dynamic, dynamic>>();
@@ -178,12 +181,12 @@ class WindowsCookieManager extends PlatformCookieManager
   @override
   Future<bool> deleteCookie(
       {required WebUri url,
-        required String name,
-        String path = "/",
-        String? domain,
-        @Deprecated("Use webViewController instead")
-        PlatformInAppWebViewController? iosBelow11WebViewController,
-        PlatformInAppWebViewController? webViewController}) async {
+      required String name,
+      String path = "/",
+      String? domain,
+      @Deprecated("Use webViewController instead")
+      PlatformInAppWebViewController? iosBelow11WebViewController,
+      PlatformInAppWebViewController? webViewController}) async {
     assert(url.toString().isNotEmpty);
     assert(name.isNotEmpty);
 
@@ -192,32 +195,35 @@ class WindowsCookieManager extends PlatformCookieManager
     args.putIfAbsent('name', () => name);
     args.putIfAbsent('domain', () => domain);
     args.putIfAbsent('path', () => path);
-    args.putIfAbsent('webViewEnvironmentId', () => params.webViewEnvironment?.id);
+    args.putIfAbsent(
+        'webViewEnvironmentId', () => params.webViewEnvironment?.id);
     return await channel?.invokeMethod<bool>('deleteCookie', args) ?? false;
   }
 
   @override
   Future<bool> deleteCookies(
       {required WebUri url,
-        String path = "/",
-        String? domain,
-        @Deprecated("Use webViewController instead")
-        PlatformInAppWebViewController? iosBelow11WebViewController,
-        PlatformInAppWebViewController? webViewController}) async {
+      String path = "/",
+      String? domain,
+      @Deprecated("Use webViewController instead")
+      PlatformInAppWebViewController? iosBelow11WebViewController,
+      PlatformInAppWebViewController? webViewController}) async {
     assert(url.toString().isNotEmpty);
 
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('url', () => url.toString());
     args.putIfAbsent('domain', () => domain);
     args.putIfAbsent('path', () => path);
-    args.putIfAbsent('webViewEnvironmentId', () => params.webViewEnvironment?.id);
+    args.putIfAbsent(
+        'webViewEnvironmentId', () => params.webViewEnvironment?.id);
     return await channel?.invokeMethod<bool>('deleteCookies', args) ?? false;
   }
 
   @override
   Future<bool> deleteAllCookies() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    args.putIfAbsent('webViewEnvironmentId', () => params.webViewEnvironment?.id);
+    args.putIfAbsent(
+        'webViewEnvironmentId', () => params.webViewEnvironment?.id);
     return await channel?.invokeMethod<bool>('deleteAllCookies', args) ?? false;
   }
 

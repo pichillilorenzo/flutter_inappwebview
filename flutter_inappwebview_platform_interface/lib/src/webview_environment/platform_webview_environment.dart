@@ -27,23 +27,21 @@ class PlatformWebViewEnvironmentCreationParams {
 abstract class PlatformWebViewEnvironment extends PlatformInterface
     implements Disposable {
   ///Debug settings used by [PlatformWebViewEnvironment].
-  static DebugLoggingSettings debugLoggingSettings = DebugLoggingSettings(
-      maxLogMessageLength: 1000
-  );
+  static DebugLoggingSettings debugLoggingSettings =
+      DebugLoggingSettings(maxLogMessageLength: 1000);
 
   /// Creates a new [PlatformInAppWebViewController]
   factory PlatformWebViewEnvironment(
       PlatformWebViewEnvironmentCreationParams params) {
     assert(
-    InAppWebViewPlatform.instance != null,
-    'A platform implementation for `flutter_inappwebview` has not been set. Please '
-        'ensure that an implementation of `InAppWebViewPlatform` has been set to '
-        '`InAppWebViewPlatform.instance` before use. For unit testing, '
-        '`InAppWebViewPlatform.instance` can be set with your own test implementation.',
+      InAppWebViewPlatform.instance != null,
+      'A platform implementation for `flutter_inappwebview` has not been set. Please '
+      'ensure that an implementation of `InAppWebViewPlatform` has been set to '
+      '`InAppWebViewPlatform.instance` before use. For unit testing, '
+      '`InAppWebViewPlatform.instance` can be set with your own test implementation.',
     );
     final PlatformWebViewEnvironment webViewEnvironment =
-    InAppWebViewPlatform.instance!
-        .createPlatformWebViewEnvironment(params);
+        InAppWebViewPlatform.instance!.createPlatformWebViewEnvironment(params);
     PlatformInterface.verify(webViewEnvironment, _token);
     return webViewEnvironment;
   }
@@ -51,15 +49,14 @@ abstract class PlatformWebViewEnvironment extends PlatformInterface
   /// Creates a new [PlatformWebViewEnvironment] to access static methods.
   factory PlatformWebViewEnvironment.static() {
     assert(
-    InAppWebViewPlatform.instance != null,
-    'A platform implementation for `flutter_inappwebview` has not been set. Please '
-        'ensure that an implementation of `InAppWebViewPlatform` has been set to '
-        '`InAppWebViewPlatform.instance` before use. For unit testing, '
-        '`InAppWebViewPlatform.instance` can be set with your own test implementation.',
+      InAppWebViewPlatform.instance != null,
+      'A platform implementation for `flutter_inappwebview` has not been set. Please '
+      'ensure that an implementation of `InAppWebViewPlatform` has been set to '
+      '`InAppWebViewPlatform.instance` before use. For unit testing, '
+      '`InAppWebViewPlatform.instance` can be set with your own test implementation.',
     );
     final PlatformWebViewEnvironment webViewEnvironment =
-    InAppWebViewPlatform.instance!
-        .createPlatformWebViewEnvironmentStatic();
+        InAppWebViewPlatform.instance!.createPlatformWebViewEnvironmentStatic();
     PlatformInterface.verify(webViewEnvironment, _token);
     return webViewEnvironment;
   }
@@ -69,8 +66,7 @@ abstract class PlatformWebViewEnvironment extends PlatformInterface
   /// Should only be used by platform implementations because they can't extend
   /// a class that only contains a factory constructor.
   @protected
-  PlatformWebViewEnvironment.implementation(this.params)
-      : super(token: _token);
+  PlatformWebViewEnvironment.implementation(this.params) : super(token: _token);
 
   static final Object _token = Object();
 
@@ -114,8 +110,7 @@ abstract class PlatformWebViewEnvironment extends PlatformInterface
   ///**Officially Supported Platforms/Implementations**:
   ///- Windows ([Official API - GetAvailableCoreWebView2BrowserVersionString](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2210.55#comparebrowserversions))
   ///{@endtemplate}
-  Future<String?> getAvailableVersion(
-      {String? browserExecutableFolder}) {
+  Future<String?> getAvailableVersion({String? browserExecutableFolder}) {
     throw UnimplementedError(
         'getAvailableVersion is not implemented on the current platform');
   }

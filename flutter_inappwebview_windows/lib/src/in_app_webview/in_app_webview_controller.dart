@@ -76,6 +76,7 @@ class WindowsInAppWebViewController extends PlatformInAppWebViewController
   Map<String, ScriptHtmlTagAttributes> _injectedScriptsFromURL = {};
   Set<WindowsWebMessageChannel> _webMessageChannels = Set();
   Set<WindowsWebMessageListener> _webMessageListeners = Set();
+  Map<String, Function(dynamic data)> _devToolsProtocolEventListenerMap = HashMap();
 
   // static map that contains the properties to be saved and restored for keep alive feature
   static final Map<InAppWebViewKeepAlive, InAppWebViewControllerKeepAliveProps?>
@@ -179,7 +180,9 @@ class WindowsInAppWebViewController extends PlatformInAppWebViewController
               userScripts: _userScripts,
               webMessageListenerObjNames: _webMessageListenerObjNames,
               webMessageChannels: _webMessageChannels,
-              webMessageListeners: _webMessageListeners);
+              webMessageListeners: _webMessageListeners,
+              devToolsProtocolEventListenerMap: _devToolsProtocolEventListenerMap
+          );
         } else {
           // restore controller properties
           _injectedScriptsFromURL = props.injectedScriptsFromURL;
@@ -190,6 +193,7 @@ class WindowsInAppWebViewController extends PlatformInAppWebViewController
               props.webMessageChannels as Set<WindowsWebMessageChannel>;
           _webMessageListeners =
               props.webMessageListeners as Set<WindowsWebMessageListener>;
+          _devToolsProtocolEventListenerMap = props.devToolsProtocolEventListenerMap;
         }
       }
     }
@@ -1401,6 +1405,14 @@ class WindowsInAppWebViewController extends PlatformInAppWebViewController
           else
             _inAppBrowserEventHandler!
                 .onContentSizeChanged(oldContentSize, newContentSize);
+        }
+        break;
+      case "onDevToolsProtocolEventReceived":
+        String eventName = call.arguments["eventName"];
+        dynamic data = call.arguments["data"] != null ? jsonDecode(call.arguments["data"]) : null;
+
+        if (this._devToolsProtocolEventListenerMap.containsKey(eventName)) {
+          this._devToolsProtocolEventListenerMap[eventName]!.call(data);
         }
         break;
       case "onCallJsHandler":
@@ -2628,6 +2640,40 @@ class WindowsInAppWebViewController extends PlatformInAppWebViewController
   }
 
   @override
+  Future<void> openDevTools() async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    await channel?.invokeMethod('openDevTools', args);
+  }
+
+  @override
+  Future<dynamic> callDevToolsProtocolMethod({required String methodName, Map<String, dynamic>? parameters}) async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    args.putIfAbsent('methodName', () => methodName);
+    args.putIfAbsent('parametersAsJson', () => parameters != null ? jsonEncode(parameters) : null);
+    final result = await channel?.invokeMethod<String>('callDevToolsProtocolMethod', args);
+    if (result != null) {
+      return jsonDecode(result);
+    }
+    return null;
+  }
+
+  @override
+  Future<void> addDevToolsProtocolEventListener({required String eventName, required Function(dynamic data) callback}) async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    args.putIfAbsent('eventName', () => eventName);
+    await channel?.invokeMethod('addDevToolsProtocolEventListener', args);
+    this._devToolsProtocolEventListenerMap[eventName] = callback;
+  }
+
+  @override
+  Future<void> removeDevToolsProtocolEventListener({required String eventName}) async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    args.putIfAbsent('eventName', () => eventName);
+    await channel?.invokeMethod('removeDevToolsProtocolEventListener', args);
+    this._devToolsProtocolEventListenerMap.remove(eventName);
+  }
+
+  @override
   Future<String> getDefaultUserAgent() async {
     Map<String, dynamic> args = <String, dynamic>{};
     return await _staticChannel.invokeMethod<String>(
@@ -2689,6 +2735,7 @@ class WindowsInAppWebViewController extends PlatformInAppWebViewController
         webMessageListener.dispose();
       }
       _webMessageListeners.clear();
+      _devToolsProtocolEventListenerMap.clear();
     }
   }
 }

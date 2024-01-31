@@ -169,6 +169,55 @@ namespace flutter_inappwebview_plugin
           result_->Success(make_fl_value(data));
         });
     }
+    else if (string_equals(methodName, "setSettings")) {
+      if (webView->inAppBrowser) {
+        auto settingsMap = get_fl_map_value<flutter::EncodableMap>(arguments, "settings");
+        auto settings = std::make_unique<InAppBrowserSettings>(settingsMap);
+        webView->inAppBrowser->setSettings(std::move(settings), settingsMap);
+      }
+      else {
+        auto settingsMap = get_fl_map_value<flutter::EncodableMap>(arguments, "settings");
+        auto settings = std::make_unique<InAppWebViewSettings>(settingsMap);
+        webView->setSettings(std::move(settings), settingsMap);
+      }
+      result->Success(true);
+    }
+    else if (string_equals(methodName, "getSettings")) {
+      if (webView->inAppBrowser) {
+        result->Success(webView->inAppBrowser->getSettings());
+      }
+      else {
+        result->Success(webView->getSettings());
+      }
+    }
+    else if (string_equals(methodName, "openDevTools")) {
+      webView->openDevTools();
+      result->Success(true);
+    }
+    else if (string_equals(methodName, "callDevToolsProtocolMethod")) {
+      auto result_ = std::shared_ptr<flutter::MethodResult<flutter::EncodableValue>>(std::move(result));
+      auto cdpMethodName = get_fl_map_value<std::string>(arguments, "methodName");
+      auto parametersAsJson = get_optional_fl_map_value<std::string>(arguments, "parametersAsJson");
+      webView->callDevToolsProtocolMethod(cdpMethodName, parametersAsJson, [result_ = std::move(result_)](const HRESULT& errorCode, const std::optional<std::string>& data)
+        {
+          if (SUCCEEDED(errorCode)) {
+            result_->Success(make_fl_value(data));
+          }
+          else {
+            result_->Error(std::to_string(errorCode), getHRMessage(errorCode));
+          }
+        });
+    }
+    else if (string_equals(methodName, "addDevToolsProtocolEventListener")) {
+      auto eventName = get_fl_map_value<std::string>(arguments, "eventName");
+      webView->addDevToolsProtocolEventListener(eventName);
+      result->Success(true);
+    }
+    else if (string_equals(methodName, "removeDevToolsProtocolEventListener")) {
+      auto eventName = get_fl_map_value<std::string>(arguments, "eventName");
+      webView->removeDevToolsProtocolEventListener(eventName);
+      result->Success(true);
+    }
     // for inAppBrowser
     else if (webView->inAppBrowser && string_equals(methodName, "show")) {
       webView->inAppBrowser->show();
@@ -300,6 +349,20 @@ namespace flutter_inappwebview_plugin
       {"messageLevel", messageLevel}
       });
     channel->InvokeMethod("onConsoleMessage", std::move(arguments));
+  }
+
+
+  void WebViewChannelDelegate::onDevToolsProtocolEventReceived(const std::string& eventName, const std::string& data) const
+  {
+    if (!channel) {
+      return;
+    }
+
+    auto arguments = std::make_unique<flutter::EncodableValue>(flutter::EncodableMap{
+      {"eventName", eventName},
+      {"data", data}
+      });
+    channel->InvokeMethod("onDevToolsProtocolEventReceived", std::move(arguments));
   }
 
   WebViewChannelDelegate::~WebViewChannelDelegate()

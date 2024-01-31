@@ -3,7 +3,6 @@
 
 #include <optional>
 #include <string>
-#include <wil/com.h>
 #include <Windows.h>
 
 #include "../flutter_inappwebview_windows_plugin.h"
@@ -41,7 +40,7 @@ namespace flutter_inappwebview_plugin
     const std::string id;
     std::unique_ptr<InAppWebView> webView;
     std::unique_ptr<InAppBrowserChannelDelegate> channelDelegate;
-    const std::shared_ptr<InAppBrowserSettings> settings;
+    std::shared_ptr<InAppBrowserSettings> settings;
 
     InAppBrowser(const FlutterInappwebviewWindowsPlugin* plugin, const InAppBrowserCreationParams& params);
     ~InAppBrowser();
@@ -50,9 +49,14 @@ namespace flutter_inappwebview_plugin
     void show() const;
     void hide() const;
     bool isHidden() const;
+    void setSettings(const std::shared_ptr<InAppBrowserSettings> newSettings, const flutter::EncodableMap& newSettingsMap);
+    flutter::EncodableValue getSettings() const;
 
     void didChangeTitle(const std::optional<std::string>& title) const;
-
+    HWND getHWND() const
+    {
+      return m_hWnd;
+    }
   private:
     const HINSTANCE m_hInstance;
     HWND m_hWnd;

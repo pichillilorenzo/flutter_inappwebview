@@ -2040,6 +2040,62 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
         'loadSimulatedRequest is not implemented on the current platform');
   }
 
+  ///{@template flutter_inappwebview_platform_interface.PlatformInAppWebViewController.openDevTools}
+  ///Opens the DevTools window for the current document in the WebView.
+  ///Does nothing if run when the DevTools window is already open.
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Windows ([Official API - ICoreWebView2.OpenDevToolsWindow](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2?view=webview2-1.0.2210.55#opendevtoolswindow))
+  ///{@endtemplate}
+  Future<void> openDevTools() {
+    throw UnimplementedError(
+        'openDevTools is not implemented on the current platform');
+  }
+
+  ///{@template flutter_inappwebview_platform_interface.PlatformInAppWebViewController.callDevToolsProtocolMethod}
+  ///Runs an asynchronous `DevToolsProtocol` method.
+  ///
+  ///For more information about available methods, navigate to [DevTools Protocol Viewer](https://chromedevtools.github.io/devtools-protocol/tot).
+  ///The [methodName] parameter is the full name of the method in the `{domain}.{method}` format.
+  ///The [parameters] will be a JSON formatted string containing the parameters for the corresponding method.
+  ///This function throws an error if the [methodName] is unknown or the [parameters] has an error.
+  ///In the case of such an error, the [parameters] parameter of the
+  ///handler will include information about the error.
+  ///Note even though WebView dispatches the CDP messages in the order called,
+  ///CDP method calls may be processed out of order.
+  ///If you require CDP methods to run in a particular order, you should wait for
+  ///the previous method's completed handler to run before calling the next method.
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Windows ([Official API - ICoreWebView2.CallDevToolsProtocolMethod](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2?view=webview2-1.0.2210.55#calldevtoolsprotocolmethod))
+  ///{@endtemplate}
+  Future<dynamic> callDevToolsProtocolMethod({required String methodName, Map<String, dynamic>? parameters}) {
+    throw UnimplementedError(
+        'callDevToolsProtocolMethod is not implemented on the current platform');
+  }
+
+  ///{@template flutter_inappwebview_platform_interface.PlatformInAppWebViewController.addDevToolsProtocolEventListener}
+  ///Subscribe to a `DevToolsProtocol` event.
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Windows ([Official API - ICoreWebView2DevToolsProtocolEventReceiver.add_DevToolsProtocolEventReceived](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2devtoolsprotocoleventreceiver?view=webview2-1.0.2210.55#add_devtoolsprotocoleventreceived))
+  ///{@endtemplate}
+  Future<void> addDevToolsProtocolEventListener({required String eventName, required Function(dynamic data) callback}) {
+    throw UnimplementedError(
+        'addDevToolsProtocolEventListener is not implemented on the current platform');
+  }
+
+  ///{@template flutter_inappwebview_platform_interface.PlatformInAppWebViewController.removeDevToolsProtocolEventListener}
+  ///Remove an event handler previously added with [addDevToolsProtocolEventListener].
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Windows ([Official API - ICoreWebView2DevToolsProtocolEventReceiver.remove_DevToolsProtocolEventReceived](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2devtoolsprotocoleventreceiver?view=webview2-1.0.2210.55#remove_devtoolsprotocoleventreceived))
+  ///{@endtemplate}
+  Future<void> removeDevToolsProtocolEventListener({required String eventName}) {
+    throw UnimplementedError(
+        'removeDevToolsProtocolEventListener is not implemented on the current platform');
+  }
+
   ///{@template flutter_inappwebview_platform_interface.PlatformInAppWebViewController.getIFrameId}
   ///Returns the iframe `id` attribute used on the Web platform.
   ///

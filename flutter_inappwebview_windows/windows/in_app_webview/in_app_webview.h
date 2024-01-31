@@ -95,7 +95,7 @@ namespace flutter_inappwebview_plugin
     wil::com_ptr<ICoreWebView2CompositionController> webViewCompositionController;
     wil::com_ptr<ICoreWebView2> webView;
     std::unique_ptr<WebViewChannelDelegate> channelDelegate;
-    const std::shared_ptr<InAppWebViewSettings> settings;
+    std::shared_ptr<InAppWebViewSettings> settings;
     InAppBrowser* inAppBrowser = nullptr;
     std::unique_ptr<UserContentController> userContentController;
 
@@ -164,6 +164,12 @@ namespace flutter_inappwebview_plugin
     void removeUserScriptsByGroupName(const std::string& groupName) const;
     void removeAllUserScripts() const;
     void takeScreenshot(const std::optional<std::shared_ptr<ScreenshotConfiguration>> screenshotConfiguration, const std::function<void(const std::optional<std::string>)> completionHandler) const;
+    void setSettings(const std::shared_ptr<InAppWebViewSettings> newSettings, const flutter::EncodableMap& newSettingsMap);
+    flutter::EncodableValue getSettings() const;
+    void openDevTools() const;
+    void callDevToolsProtocolMethod(const std::string& methodName, const std::optional<std::string>& parametersAsJson, const std::function<void(const HRESULT& errorCode, const std::optional<std::string>&)> completionHandler) const;
+    void addDevToolsProtocolEventListener(const std::string& eventName);
+    void removeDevToolsProtocolEventListener(const std::string& eventName);
 
     std::string pageFrameId() const
     {
@@ -185,6 +191,7 @@ namespace flutter_inappwebview_plugin
     std::shared_ptr<NavigationAction> lastNavigationAction_;
     bool isLoading_ = false;
     std::string pageFrameId_;
+    std::map<std::string, std::pair<wil::com_ptr<ICoreWebView2DevToolsProtocolEventReceiver>, EventRegistrationToken>> devToolsProtocolEventListener_ = {};
 
     void registerEventHandlers();
     void registerSurfaceEventHandlers();

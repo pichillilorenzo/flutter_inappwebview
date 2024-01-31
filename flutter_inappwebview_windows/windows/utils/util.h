@@ -4,6 +4,7 @@
 #include <optional>
 #include <string>
 #include <variant>
+#include <Windows.h>
 
 namespace flutter_inappwebview_plugin
 {
@@ -25,6 +26,12 @@ namespace flutter_inappwebview_plugin
         else
           static_assert(always_false_v<T>, "non-exhaustive visitor!");
       }, var);
+  }
+
+  static inline float get_current_scale_factor(HWND hwnd)
+  {
+    auto dpi = GetDpiForWindow(hwnd);
+    return dpi > 0 ? dpi / 96.0f : 1.0f;
   }
 }
 

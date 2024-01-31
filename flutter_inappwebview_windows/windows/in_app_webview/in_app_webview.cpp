@@ -143,12 +143,21 @@ namespace flutter_inappwebview_plugin
     if (succeededOrLog(hrWebView2Settings)) {
       webView2Settings->put_IsScriptEnabled(settings->javaScriptEnabled);
       webView2Settings->put_IsZoomControlEnabled(settings->supportZoom);
+      webView2Settings->put_AreDevToolsEnabled(settings->isInspectable);
+      webView2Settings->put_AreDefaultContextMenusEnabled(!settings->disableContextMenu);
 
       wil::com_ptr<ICoreWebView2Settings2> webView2Settings2;
       if (succeededOrLog(webView2Settings->QueryInterface(IID_PPV_ARGS(&webView2Settings2)))) {
         if (!settings->userAgent.empty()) {
           webView2Settings2->put_UserAgent(utf8_to_wide(settings->userAgent).c_str());
         }
+      }
+    }
+
+    wil::com_ptr<ICoreWebView2Controller2> webViewController2;
+    if (succeededOrLog(webViewController->QueryInterface(IID_PPV_ARGS(&webViewController2)))) {
+      if (!settings->transparentBackground) {
+        webViewController2->put_DefaultBackgroundColor({ 0, 255, 255, 255 });
       }
     }
 
@@ -968,6 +977,137 @@ namespace flutter_inappwebview_plugin
     ).Get());
     if (failedAndLog(hr) && completionHandler) {
       completionHandler(std::nullopt);
+    }
+  }
+
+  void InAppWebView::setSettings(const std::shared_ptr<InAppWebViewSettings> newSettings, const flutter::EncodableMap& newSettingsMap)
+  {
+    wil::com_ptr<ICoreWebView2Settings> webView2Settings;
+    if (succeededOrLog(webView->get_Settings(&webView2Settings))) {
+      if (fl_map_contains_not_null(newSettingsMap, "javaScriptEnabled") && settings->javaScriptEnabled != newSettings->javaScriptEnabled) {
+        webView2Settings->put_IsScriptEnabled(newSettings->javaScriptEnabled);
+      }
+
+      if (fl_map_contains_not_null(newSettingsMap, "supportZoom") && settings->supportZoom != newSettings->supportZoom) {
+        webView2Settings->put_IsZoomControlEnabled(newSettings->supportZoom);
+      }
+
+      if (fl_map_contains_not_null(newSettingsMap, "isInspectable") && settings->isInspectable != newSettings->isInspectable) {
+        webView2Settings->put_AreDevToolsEnabled(newSettings->isInspectable);
+      }
+
+      if (fl_map_contains_not_null(newSettingsMap, "disableContextMenu") && settings->disableContextMenu != newSettings->disableContextMenu) {
+        webView2Settings->put_AreDefaultContextMenusEnabled(!newSettings->disableContextMenu);
+      }
+
+      wil::com_ptr<ICoreWebView2Settings2> webView2Settings2;
+      if (succeededOrLog(webView2Settings->QueryInterface(IID_PPV_ARGS(&webView2Settings2)))) {
+        if (fl_map_contains_not_null(newSettingsMap, "userAgent") && !string_equals(settings->userAgent, newSettings->userAgent)) {
+          webView2Settings2->put_UserAgent(utf8_to_wide(newSettings->userAgent).c_str());
+        }
+      }
+    }
+
+    wil::com_ptr<ICoreWebView2Controller2> webViewController2;
+    if (succeededOrLog(webViewController->QueryInterface(IID_PPV_ARGS(&webViewController2)))) {
+      if (fl_map_contains_not_null(newSettingsMap, "transparentBackground") && settings->transparentBackground != newSettings->transparentBackground) {
+        BYTE alpha = newSettings->transparentBackground ? 0 : 255;
+        webViewController2->put_DefaultBackgroundColor({ alpha, 255, 255, 255 });
+      }
+    }
+
+    settings = newSettings;
+  }
+
+  flutter::EncodableValue InAppWebView::getSettings() const
+  {
+    if (!settings || !webView) {
+      return make_fl_value();
+    }
+
+    wil::com_ptr<ICoreWebView2Settings> webView2Settings;
+    if (succeededOrLog(webView->get_Settings(&webView2Settings))) {
+      return settings->getRealSettings(webView2Settings.get());
+    }
+    return settings->toEncodableMap();
+  }
+
+  void InAppWebView::openDevTools() const
+  {
+    if (!webView) {
+      return;
+    }
+
+    failedLog(webView->OpenDevToolsWindow());
+  }
+
+  void InAppWebView::callDevToolsProtocolMethod(const std::string& methodName, const std::optional<std::string>& parametersAsJson, const std::function<void(const HRESULT& errorCode, const std::optional<std::string>&)> completionHandler) const
+  {
+    if (!webView) {
+      if (completionHandler) {
+        completionHandler(S_OK, std::nullopt);
+      }
+      return;
+    }
+
+    auto hr = webView->CallDevToolsProtocolMethod(
+      utf8_to_wide(methodName).c_str(),
+      !parametersAsJson.has_value() || parametersAsJson.value().empty() ? L"{}" : utf8_to_wide(parametersAsJson.value()).c_str(),
+      Callback<ICoreWebView2CallDevToolsProtocolMethodCompletedHandler>(
+        [completionHandler](HRESULT errorCode, LPCWSTR returnObjectAsJson)
+        {
+          failedLog(errorCode);
+          if (completionHandler) {
+            completionHandler(errorCode, wide_to_utf8(returnObjectAsJson));
+          }
+          return S_OK;
+        }
+    ).Get());
+
+    if (failedAndLog(hr) && completionHandler) {
+      completionHandler(hr, std::nullopt);
+    }
+  }
+
+  void InAppWebView::addDevToolsProtocolEventListener(const std::string& eventName)
+  {
+    if (map_contains(devToolsProtocolEventListener_, eventName)) {
+      return;
+    }
+
+    wil::com_ptr<ICoreWebView2DevToolsProtocolEventReceiver> eventReceiver;
+    if (succeededOrLog(webView->GetDevToolsProtocolEventReceiver(utf8_to_wide(eventName).c_str(), &eventReceiver))) {
+      EventRegistrationToken token = {};
+      auto hr = eventReceiver->add_DevToolsProtocolEventReceived(
+        Callback<ICoreWebView2DevToolsProtocolEventReceivedEventHandler>(
+          [this, eventName](
+            ICoreWebView2* sender,
+            ICoreWebView2DevToolsProtocolEventReceivedEventArgs* args) -> HRESULT
+          {
+            if (!channelDelegate) {
+              return S_OK;
+            }
+
+            wil::unique_cotaskmem_string json;
+            failedLog(args->get_ParameterObjectAsJson(&json));
+            channelDelegate->onDevToolsProtocolEventReceived(eventName, wide_to_utf8(json.get()));
+
+            return S_OK;
+          })
+        .Get(), &token);
+      if (succeededOrLog(hr)) {
+        devToolsProtocolEventListener_.insert({ eventName, std::make_pair(std::move(eventReceiver), token) });
+      }
+    }
+  }
+
+  void InAppWebView::removeDevToolsProtocolEventListener(const std::string& eventName)
+  {
+    if (map_contains(devToolsProtocolEventListener_, eventName)) {
+      auto eventReceiver = devToolsProtocolEventListener_.at(eventName).first;
+      auto token = devToolsProtocolEventListener_.at(eventName).second;
+      eventReceiver->remove_DevToolsProtocolEventReceived(token);
+      devToolsProtocolEventListener_.erase(eventName);
     }
   }
 

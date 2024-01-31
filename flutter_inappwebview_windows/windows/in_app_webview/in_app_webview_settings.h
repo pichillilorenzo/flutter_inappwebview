@@ -3,6 +3,7 @@
 
 #include <flutter/standard_message_codec.h>
 #include <string>
+#include <WebView2.h>
 
 namespace flutter_inappwebview_plugin
 {
@@ -17,10 +18,15 @@ namespace flutter_inappwebview_plugin
     std::vector<std::string> resourceCustomSchemes;
     bool transparentBackground = false;
     bool supportZoom = true;
+    bool isInspectable = true;
+    bool disableContextMenu = false;
 
     InAppWebViewSettings();
     InAppWebViewSettings(const flutter::EncodableMap& encodableMap);
     ~InAppWebViewSettings();
+
+    flutter::EncodableMap toEncodableMap() const;
+    flutter::EncodableMap getRealSettings(ICoreWebView2Settings* settings) const;
   };
 }
 #endif //FLUTTER_INAPPWEBVIEW_PLUGIN_IN_APP_WEBVIEW_SETTINGS_H_

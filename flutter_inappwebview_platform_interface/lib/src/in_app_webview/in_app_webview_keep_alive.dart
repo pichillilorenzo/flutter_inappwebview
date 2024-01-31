@@ -28,6 +28,7 @@ class InAppWebViewControllerKeepAliveProps {
   Map<String, ScriptHtmlTagAttributes> injectedScriptsFromURL;
   Set<PlatformWebMessageChannel> webMessageChannels = Set();
   Set<PlatformWebMessageListener> webMessageListeners = Set();
+  Map<String, Function(dynamic data)> devToolsProtocolEventListenerMap;
 
   InAppWebViewControllerKeepAliveProps(
       {required this.javaScriptHandlersMap,
@@ -35,5 +36,7 @@ class InAppWebViewControllerKeepAliveProps {
       required this.webMessageListenerObjNames,
       required this.injectedScriptsFromURL,
       required this.webMessageChannels,
-      required this.webMessageListeners});
+      required this.webMessageListeners,
+      required this.devToolsProtocolEventListenerMap
+      });
 }

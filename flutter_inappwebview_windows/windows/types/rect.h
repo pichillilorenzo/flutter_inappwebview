@@ -20,6 +20,15 @@ namespace flutter_inappwebview_plugin
     Rect(const flutter::EncodableMap& map);
     ~Rect() = default;
 
+    bool Rect::operator==(const Rect& other)
+    {
+      return x == other.x && y == other.y && width == other.width && height == other.height;
+    }
+    bool Rect::operator!=(const Rect& other)
+    {
+      return !(*this == other);
+    }
+
     flutter::EncodableMap toEncodableMap() const;
   };
 }

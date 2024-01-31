@@ -21,24 +21,47 @@ namespace flutter_inappwebview_plugin
     wndClass.hInstance = m_hInstance;
     wndClass.hIcon = LoadIcon(NULL, IDI_WINLOGO);
     wndClass.hCursor = LoadCursor(NULL, IDC_ARROW);
+    wndClass.hbrBackground = (HBRUSH)GetStockObject(WHITE_BRUSH);
     wndClass.lpfnWndProc = InAppBrowser::WndProc;
 
     RegisterClass(&wndClass);
 
+    auto parentWindow = plugin->registrar->GetView()->GetNativeWindow();
+    RECT bounds;
+    GetWindowRect(parentWindow, &bounds);
+
+    auto x = CW_USEDEFAULT;
+    auto y = CW_USEDEFAULT;
+    auto width = bounds.right - bounds.left;
+    auto height = bounds.bottom - bounds.top;
+
+    if (settings->windowFrame) {
+      x = (int)settings->windowFrame->x;
+      y = (int)settings->windowFrame->y;
+      width = (int)settings->windowFrame->width;
+      height = (int)settings->windowFrame->height;
+    }
+
     m_hWnd = CreateWindowEx(
-      0,                        // Optional window styles.
+      WS_EX_LAYERED,            // Optional window styles.
       wndClass.lpszClassName,		// Window class
-      L"",							        // Window text
-      WS_OVERLAPPEDWINDOW,			// Window style
 
-      // Size and position
-      CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,
+      settings->toolbarTopFixedTitle.empty() ? L"" : utf8_to_wide(settings->toolbarTopFixedTitle).c_str(),	// Window text
 
-      NULL,                // Parent window    
-      NULL,                // Menu
+      settings->windowType == InAppBrowserWindowType::window ? WS_OVERLAPPEDWINDOW : (WS_CHILDWINDOW | WS_OVERLAPPEDWINDOW), // Window style
+
+      // Position
+      x, y,
+      // Size
+      width, height,
+
+      settings->windowType == InAppBrowserWindowType::window ? nullptr : parentWindow, // Parent window    
+      nullptr,             // Menu
       wndClass.hInstance,  // Instance handle
       this                 // Additional application data
     );
+
+    SetLayeredWindowAttributes(m_hWnd, 0, (BYTE)(255 * settings->windowAlphaValue), LWA_ALPHA);
 
     ShowWindow(m_hWnd, settings->hidden ? SW_HIDE : SW_SHOW);
 
@@ -99,9 +122,49 @@ namespace flutter_inappwebview_plugin
     return !IsWindowVisible(m_hWnd);
   }
 
+  void InAppBrowser::setSettings(const std::shared_ptr<InAppBrowserSettings> newSettings, const flutter::EncodableMap& newSettingsMap)
+  {
+    if (webView) {
+      webView->setSettings(std::make_shared<InAppWebViewSettings>(newSettingsMap), newSettingsMap);
+    }
+
+    if (fl_map_contains_not_null(newSettingsMap, "hidden") && settings->hidden != newSettings->hidden) {
+      newSettings->hidden ? hide() : show();
+    }
+
+    if (fl_map_contains_not_null(newSettingsMap, "toolbarTopFixedTitle") && !string_equals(settings->toolbarTopFixedTitle, newSettings->toolbarTopFixedTitle) && !newSettings->toolbarTopFixedTitle.empty()) {
+      SetWindowText(m_hWnd, utf8_to_wide(newSettings->toolbarTopFixedTitle).c_str());
+    }
+
+    if (fl_map_contains_not_null(newSettingsMap, "windowAlphaValue") && settings->windowAlphaValue != newSettings->windowAlphaValue) {
+      SetLayeredWindowAttributes(m_hWnd, 0, (BYTE)(255 * newSettings->windowAlphaValue), LWA_ALPHA);
+    }
+
+    if (fl_map_contains_not_null(newSettingsMap, "windowFrame")) {
+      auto x = (int)newSettings->windowFrame->x;
+      auto y = (int)newSettings->windowFrame->y;
+      auto width = (int)newSettings->windowFrame->width;
+      auto height = (int)newSettings->windowFrame->height;
+      MoveWindow(m_hWnd, x, y, width, height, true);
+    }
+
+    settings = newSettings;
+  }
+
+  flutter::EncodableValue InAppBrowser::getSettings() const
+  {
+    if (!settings || !webView) {
+      return make_fl_value();
+    }
+
+    auto encodableMap = settings->getRealSettings(this);
+    encodableMap.merge(std::get<flutter::EncodableMap>(webView->getSettings()));
+    return encodableMap;
+  }
+
   void InAppBrowser::didChangeTitle(const std::optional<std::string>& title) const
   {
-    if (title.has_value()) {
+    if (title.has_value() && settings->toolbarTopFixedTitle.empty()) {
       SetWindowText(m_hWnd, utf8_to_wide(title.value()).c_str());
     }
   }

@@ -1,3 +1,7 @@
+## 1.0.13+1
+
+- Added privacy manifest.
+
 ## 1.0.13
 
 - Updated `flutter_inappwebview_platform_interface` version dependency to `^1.0.10`

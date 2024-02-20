@@ -68,7 +68,7 @@ import io.flutter.plugin.common.PluginRegistry;
 
 import static android.app.Activity.RESULT_OK;
 
-public class InAppWebViewChromeClient extends WebChromeClient implements PluginRegistry.ActivityResultListener, ActivityResultListener {
+public class InAppWebViewChromeClient extends WebChromeClient implements PluginRegistry.ActivityResultListener, ActivityResultListener, PluginRegistry.RequestPermissionsResultListener {
 
   protected static final String LOG_TAG = "IABWebChromeClient";
   private InAppBrowserDelegate inAppBrowserDelegate;
@@ -126,11 +126,34 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
       this.inAppBrowserDelegate.getActivityResultListeners().add(this);
     }
 
-    if (plugin.registrar != null)
+    if (plugin.registrar != null) {
       plugin.registrar.addActivityResultListener(this);
-    else if (plugin.activityPluginBinding != null)
+      plugin.registrar.addRequestPermissionsResultListener(this);
+    } else if (plugin.activityPluginBinding != null)
       plugin.activityPluginBinding.addActivityResultListener(this);
+    plugin.activityPluginBinding.addRequestPermissionsResultListener(this);
   }
+
+  private static final int CAMERA_PICKER = 11;
+
+  @Nullable
+  private FilePickerRequest filePickerRequest;
+
+  @Override
+  public boolean onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+    if (requestCode == CAMERA_PICKER && filePickerRequest != null) {
+      if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+        Log.w(LOG_TAG, "onRequestPermissionsResult: camera granted");
+      }
+
+      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+        customStartPickerIntent(filePickerRequest);
+      }
+      return true;
+    }
+    return false;
+  }
+
 
   @Nullable
   @Override
@@ -988,45 +1011,46 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
                                    final boolean allowMultiple, final boolean captureEnabled) {
     filePathCallback = callback;
 
-    boolean images = acceptsImages(acceptTypes);
-    boolean video = acceptsVideo(acceptTypes);
+    filePickerRequest = new FilePickerRequest(callback, acceptTypes, allowMultiple, captureEnabled);
+
+    // Request camera permission first. The picker intent will be started once the
+    // permission is either granted or denied.
+    if (captureEnabled && needsCameraPermission() && Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+      getActivity().requestPermissions(new String[]{Manifest.permission.CAMERA}, CAMERA_PICKER);
+      return true;
+    }
+
+    // If capture is not enabled, we can start the picker intent right away
+    return customStartPickerIntent(filePickerRequest);
+  }
+
+  private boolean customStartPickerIntent(FilePickerRequest request) {
+    Log.w(LOG_TAG, "customStartPickerIntent");
+    filePathCallback = request.callback;
+
+    boolean images = acceptsImages(request.acceptTypes);
+    boolean video = acceptsVideo(request.acceptTypes);
 
     Intent pickerIntent = null;
 
-    if (captureEnabled) {
-      if (!needsCameraPermission()) {
-        if (images) {
-          pickerIntent = getPhotoIntent();
-        }
-        else if (video) {
-          pickerIntent = getVideoIntent();
-        }
+    ArrayList<Parcelable> extraIntents = new ArrayList<>();
+    if (!needsCameraPermission()) {
+      if (images) {
+        extraIntents.add(getPhotoIntent());
+      }
+      if (video) {
+        extraIntents.add(getVideoIntent());
       }
     }
-    if (pickerIntent == null) {
-      ArrayList<Parcelable> extraIntents = new ArrayList<>();
-      if (!needsCameraPermission()) {
-        if (images) {
-          extraIntents.add(getPhotoIntent());
-        }
-        if (video) {
-          extraIntents.add(getVideoIntent());
-        }
-      }
 
-      Intent fileSelectionIntent = getFileChooserIntent(acceptTypes, allowMultiple);
+    Intent fileSelectionIntent = getFileChooserIntent(request.acceptTypes, request.allowMultiple);
 
-      pickerIntent = new Intent(Intent.ACTION_CHOOSER);
-      pickerIntent.putExtra(Intent.EXTRA_INTENT, fileSelectionIntent);
-      pickerIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, extraIntents.toArray(new Parcelable[]{}));
-    }
+    pickerIntent = new Intent(Intent.ACTION_CHOOSER);
+    pickerIntent.putExtra(Intent.EXTRA_INTENT, fileSelectionIntent);
+    pickerIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, extraIntents.toArray(new Parcelable[]{}));
 
     Activity activity = getActivity();
-    if (activity != null && pickerIntent.resolveActivity(activity.getPackageManager()) != null) {
-      activity.startActivityForResult(pickerIntent, PICKER);
-    } else {
-      Log.d(LOG_TAG, "there is no Activity to handle this Intent");
-    }
+    activity.startActivityForResult(pickerIntent, PICKER);
 
     return true;
   }
@@ -1273,7 +1297,7 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
           defaultBehaviour(null);
         }
       };
-      
+
       if(inAppWebView != null && inAppWebView.channelDelegate != null) {
         inAppWebView.channelDelegate.onPermissionRequest(request.getOrigin().toString(),
                 Arrays.asList(request.getResources()), null, callback);
@@ -1329,4 +1353,18 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
     inAppWebView = null;
     plugin = null;
   }
+}
+
+class FilePickerRequest {
+  public FilePickerRequest(ValueCallback<Uri[]> callback, String[] acceptTypes, boolean allowMultiple, boolean captureEnabled) {
+    this.callback = callback;
+    this.acceptTypes = acceptTypes;
+    this.allowMultiple = allowMultiple;
+    this.captureEnabled = captureEnabled;
+  }
+
+  public ValueCallback<Uri[]> callback;
+  public String[] acceptTypes;
+  public boolean allowMultiple;
+  public boolean captureEnabled;
 }

@@ -1,15 +1,23 @@
+import 'dart:typed_data';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_internal_annotations.dart';
-import 'dart:typed_data';
 
+import '../content_blocker.dart';
+import '../context_menu/context_menu.dart';
+import '../in_app_browser/in_app_browser_settings.dart';
+import '../in_app_browser/platform_in_app_browser.dart';
+import '../in_app_webview/platform_inappwebview_controller.dart';
 import '../platform_webview_asset_loader.dart';
+import '../platform_webview_feature.dart';
 import '../types/action_mode_menu_item.dart';
 import '../types/cache_mode.dart';
 import '../types/data_detector_types.dart';
 import '../types/force_dark.dart';
 import '../types/force_dark_strategy.dart';
 import '../types/layout_algorithm.dart';
+import '../types/main.dart';
 import '../types/mixed_content_mode.dart';
 import '../types/over_scroll_mode.dart';
 import '../types/referrer_policy.dart';
@@ -21,17 +29,10 @@ import '../types/scrollview_deceleration_rate.dart';
 import '../types/selection_granularity.dart';
 import '../types/user_preferred_content_mode.dart';
 import '../types/vertical_scrollbar_position.dart';
+import '../util.dart';
 import '../web_uri.dart';
 import 'android/in_app_webview_options.dart';
 import 'apple/in_app_webview_options.dart';
-import '../content_blocker.dart';
-import '../types/main.dart';
-import '../util.dart';
-import '../in_app_browser/in_app_browser_settings.dart';
-import '../platform_webview_feature.dart';
-import '../in_app_webview/platform_inappwebview_controller.dart';
-import '../context_menu/context_menu.dart';
-import '../in_app_browser/platform_in_app_browser.dart';
 import 'platform_webview.dart';
 
 part 'in_app_webview_settings.g.dart';
@@ -57,12 +58,8 @@ class InAppWebViewSettings_ {
   ///If the [PlatformWebViewCreationParams.shouldOverrideUrlLoading] event is implemented and this value is `null`,
   ///it will be automatically inferred as `true`, otherwise, the default value is `false`.
   ///This logic will not be applied for [PlatformInAppBrowser], where you must set the value manually.
-  @SupportedPlatforms(platforms: [
-    AndroidPlatform(),
-    IOSPlatform(),
-    MacOSPlatform(),
-    WindowsPlatform()
-  ])
+  @SupportedPlatforms(
+      platforms: [AndroidPlatform(), IOSPlatform(), MacOSPlatform()])
   bool? useShouldOverrideUrlLoading;
 
   ///Set to `true` to be able to listen at the [PlatformWebViewCreationParams.onLoadResource] event.
@@ -102,11 +99,7 @@ class InAppWebViewSettings_ {
     MacOSPlatform(
         apiName: "WKWebView.customUserAgent",
         apiUrl:
-            "https://developer.apple.com/documentation/webkit/wkwebview/1414950-customuseragent"),
-    WindowsPlatform(
-        apiName: 'ICoreWebView2Settings2.put_UserAgent',
-        apiUrl:
-            'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2settings2?view=webview2-1.0.2210.55#put_useragent')
+            "https://developer.apple.com/documentation/webkit/wkwebview/1414950-customuseragent")
   ])
   String? userAgent;
 
@@ -138,11 +131,7 @@ class InAppWebViewSettings_ {
         apiName: "WKWebpagePreferences.allowsContentJavaScript",
         apiUrl:
             "https://developer.apple.com/documentation/webkit/wkwebpagepreferences/3552422-allowscontentjavascript/"),
-    WebPlatform(requiresSameOrigin: false),
-    WindowsPlatform(
-        apiName: "ICoreWebView2Settings.put_IsScriptEnabled",
-        apiUrl:
-            "https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2settings?view=webview2-1.0.2210.55#put_isscriptenabled")
+    WebPlatform(requiresSameOrigin: false)
   ])
   bool? javaScriptEnabled;
 
@@ -319,12 +308,7 @@ because there isn't any way to make the website data store non-persistent for th
   @SupportedPlatforms(platforms: [
     AndroidPlatform(),
     IOSPlatform(),
-    MacOSPlatform(available: "12.0"),
-    WindowsPlatform(
-        available: '1.0.774.44',
-        apiName: 'ICoreWebView2Controller2.put_DefaultBackgroundColor',
-        apiUrl:
-            'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2controller2?view=webview2-1.0.2210.55#put_defaultbackgroundcolor')
+    MacOSPlatform(available: "12.0")
   ])
   bool? transparentBackground;
 
@@ -339,15 +323,8 @@ because there isn't any way to make the website data store non-persistent for th
   bool? disableHorizontalScroll;
 
   ///Set to `true` to disable context menu. The default value is `false`.
-  @SupportedPlatforms(platforms: [
-    AndroidPlatform(),
-    IOSPlatform(),
-    WebPlatform(),
-    WindowsPlatform(
-        apiName: "ICoreWebView2Settings.put_AreDefaultContextMenusEnabled",
-        apiUrl:
-            "https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2settings?view=webview2-1.0.2210.55#put_aredefaultcontextmenusenabled")
-  ])
+  @SupportedPlatforms(
+      platforms: [AndroidPlatform(), IOSPlatform(), WebPlatform()])
   bool? disableContextMenu;
 
   ///Set to `false` if the WebView should not support zooming using its on-screen zoom controls and gestures. The default value is `true`.
@@ -357,11 +334,7 @@ because there isn't any way to make the website data store non-persistent for th
         apiUrl:
             "https://developer.android.com/reference/android/webkit/WebSettings?hl=en#setSupportZoom(boolean)"),
     IOSPlatform(),
-    MacOSPlatform(),
-    WindowsPlatform(
-        apiName: "ICoreWebView2Settings.put_IsZoomControlEnabled",
-        apiUrl:
-            "https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2settings?view=webview2-1.0.2210.55#put_iszoomcontrolenabled")
+    MacOSPlatform()
   ])
   bool? supportZoom;
 
@@ -804,6 +777,11 @@ because there isn't any way to make the website data store non-persistent for th
   ///If the url request of a subframe matches the regular expression, then the request of that subframe is canceled.
   @SupportedPlatforms(platforms: [AndroidPlatform()])
   String? regexToCancelSubFramesLoading;
+
+  ///Regular expression used by [PlatformWebViewCreationParams.shouldOverrideUrlLoading] event to cancel navigation requests
+  ///If the url request not matches the regular expression, then the shouldOverrideUrlLoading is return false.
+  @SupportedPlatforms(platforms: [AndroidPlatform()])
+  String? regexToCancelOverrideUrlLoading;
 
   ///Set to `false` to disable Flutter Hybrid Composition. The default value is `true`.
   ///Hybrid Composition is supported starting with Flutter v1.20+.
@@ -1565,11 +1543,7 @@ as it can cause framerate drops on animations in Android 9 and lower (see [Hybri
         available: "13.3",
         apiName: "WKWebView.isInspectable",
         apiUrl:
-            "https://developer.apple.com/documentation/webkit/wkwebview/4111163-isinspectable"),
-    WindowsPlatform(
-        apiName: "ICoreWebView2Settings.put_AreDevToolsEnabled",
-        apiUrl:
-            "https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2settings?view=webview2-1.0.2210.55#put_aredevtoolsenabled")
+            "https://developer.apple.com/documentation/webkit/wkwebview/4111163-isinspectable")
   ])
   bool? isInspectable;
 
@@ -1722,6 +1696,7 @@ as it can cause framerate drops on animations in Android 9 and lower (see [Hybri
     this.initialScale = 0,
     this.supportMultipleWindows = false,
     this.regexToCancelSubFramesLoading,
+    this.regexToCancelOverrideUrlLoading,
     this.useHybridComposition = true,
     this.useShouldInterceptRequest,
     this.useOnRenderProcessGone,

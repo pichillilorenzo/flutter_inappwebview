@@ -1,6 +1,12 @@
 window.flutter_inappwebview = {
     webViews: {},
-    createFlutterInAppWebView: function(viewId, iframeId) {
+    /**
+     * @param viewId {number}
+     * @param iframeId {String}
+     * @param iframe {HTMLIFrameElement}
+     * @param iframeContainer {HTMLDivElement}
+     */
+    createFlutterInAppWebView: function(viewId, iframeId, iframe, iframeContainer) {
         var webView = {
             viewId: viewId,
             iframeId: iframeId,
@@ -19,8 +25,6 @@ window.flutter_inappwebview = {
             },
             prepare: function(settings) {
                 webView.settings = settings;
-                var iframe = document.getElementById(iframeId);
-                var iframeContainer = document.getElementById(iframeId + '-container');
 
                 document.addEventListener('fullscreenchange', function(event) {
                     // document.fullscreenElement will point to the element that

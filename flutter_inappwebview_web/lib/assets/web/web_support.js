@@ -2,11 +2,11 @@ window.flutter_inappwebview = {
     webViews: {},
     /**
      * @param viewId {number}
-     * @param iframeId {String}
      * @param iframe {HTMLIFrameElement}
      * @param iframeContainer {HTMLDivElement}
      */
-    createFlutterInAppWebView: function(viewId, iframeId, iframe, iframeContainer) {
+    createFlutterInAppWebView: function(viewId, iframe, iframeContainer) {
+        const iframeId = iframe.id;
         var webView = {
             viewId: viewId,
             iframeId: iframeId,

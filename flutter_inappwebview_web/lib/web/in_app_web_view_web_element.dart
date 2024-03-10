@@ -13,7 +13,8 @@ import 'js_bridge.dart';
 
 extension on HTMLIFrameElement {
   // https://developer.mozilla.org/en-US/docs/Web/API/HTMLIFrameElement/csp
-  external JSString? csp;
+  external set csp(String? value);
+  external String? get csp;
 }
 
 class InAppWebViewWebElement implements Disposable {
@@ -29,7 +30,7 @@ class InAppWebViewWebElement implements Disposable {
   String? headlessWebViewId;
 
   InAppWebViewSettings? settings;
-  JSWebView? webViewJS;
+  JSWebView? jsWebView;
   bool isLoading = false;
 
   InAppWebViewWebElement(
@@ -63,7 +64,7 @@ class InAppWebViewWebElement implements Disposable {
       }
     });
 
-    webViewJS = flutterInAppWebView?.createFlutterInAppWebView(_viewId, iframe, iframeContainer);
+    jsWebView = flutterInAppWebView?.createFlutterInAppWebView(_viewId, iframe, iframeContainer);
   }
 
   /// Handles method calls over the MethodChannel of this plugin.
@@ -205,7 +206,7 @@ class InAppWebViewWebElement implements Disposable {
           initialData = webView.initialData;
           initialFile = webView.initialFile;
 
-          webViewJS = flutterInAppWebView?.createFlutterInAppWebView(_viewId, iframe, iframeContainer);
+          jsWebView = flutterInAppWebView?.createFlutterInAppWebView(_viewId, iframe, iframeContainer);
         }
       }
     }
@@ -226,7 +227,7 @@ class InAppWebViewWebElement implements Disposable {
       iframe.referrerPolicy = settings!.iframeReferrerPolicy?.toNativeValue() ??
           iframe.referrerPolicy;
       iframe.name = settings!.iframeName ?? iframe.name;
-      iframe.csp = settings?.iframeCsp?.toJS ?? iframe.csp;
+      iframe.csp = settings!.iframeCsp ?? iframe.csp;
 
       if (settings!.iframeSandbox != null &&
           settings!.iframeSandbox != Sandbox.ALLOW_ALL) {
@@ -241,7 +242,7 @@ class InAppWebViewWebElement implements Disposable {
       }
     }
 
-    webViewJS?.prepare(settings?.toMap().jsify());
+    jsWebView?.prepare(settings?.toMap().jsify());
   }
 
   void makeInitialLoad() async {
@@ -309,31 +310,31 @@ class InAppWebViewWebElement implements Disposable {
   }
 
   Future<void> reload() async {
-    webViewJS?.reload();
+    jsWebView?.reload();
   }
 
   Future<void> goBack() async {
-    webViewJS?.goBack();
+    jsWebView?.goBack();
   }
 
   Future<void> goForward() async {
-    webViewJS?.goForward();
+    jsWebView?.goForward();
   }
 
   Future<void> goBackOrForward({required int steps}) async {
-    webViewJS?.goBackOrForward(steps.toJS);
+    jsWebView?.goBackOrForward(steps.toJS);
   }
 
   Future<dynamic> evaluateJavascript({required String source}) async {
-    webViewJS?.evaluateJavascript(source.toJS);
+    jsWebView?.evaluateJavascript(source.toJS);
   }
 
   Future<void> stopLoading() async {
-    webViewJS?.stopLoading();
+    jsWebView?.stopLoading();
   }
 
   Future<String?> getUrl() async {
-    String? url = webViewJS?.getUrl()?.toDart;
+    String? url = jsWebView?.getUrl()?.toDart;
     if (url == null || url.isEmpty || url == 'about:blank') {
       url = iframe.src;
     }
@@ -341,7 +342,7 @@ class InAppWebViewWebElement implements Disposable {
   }
 
   Future<String?> getTitle() async {
-    return webViewJS?.getTitle()?.toDart;
+    return jsWebView?.getTitle()?.toDart;
   }
 
   Future<void> postUrl(
@@ -354,39 +355,39 @@ class InAppWebViewWebElement implements Disposable {
   Future<void> injectJavascriptFileFromUrl(
       {required String urlFile,
       Map<String, dynamic>? scriptHtmlTagAttributes}) async {
-    webViewJS?.injectJavascriptFileFromUrl(urlFile.toJS, scriptHtmlTagAttributes?.jsify());
+    jsWebView?.injectJavascriptFileFromUrl(urlFile.toJS, scriptHtmlTagAttributes?.jsify());
   }
 
   Future<void> injectCSSCode({required String source}) async {
-    webViewJS?.injectCSSCode(source.toJS);
+    jsWebView?.injectCSSCode(source.toJS);
   }
 
   Future<void> injectCSSFileFromUrl(
       {required String urlFile,
       Map<String, dynamic>? cssLinkHtmlTagAttributes}) async {
-    webViewJS?.injectCSSFileFromUrl(urlFile.toJS, cssLinkHtmlTagAttributes?.jsify());
+    jsWebView?.injectCSSFileFromUrl(urlFile.toJS, cssLinkHtmlTagAttributes?.jsify());
   }
 
   Future<void> scrollTo(
       {required int x, required int y, bool animated = false}) async {
-    webViewJS?.scrollTo(x.toJS, y.toJS, animated.toJS);
+    jsWebView?.scrollTo(x.toJS, y.toJS, animated.toJS);
   }
 
   Future<void> scrollBy(
       {required int x, required int y, bool animated = false}) async {
-    webViewJS?.scrollBy(x.toJS, y.toJS, animated.toJS);
+    jsWebView?.scrollBy(x.toJS, y.toJS, animated.toJS);
   }
 
   Future<void> printCurrentPage() async {
-    webViewJS?.printCurrentPage();
+    jsWebView?.printCurrentPage();
   }
 
   Future<int?> getContentHeight() async {
-    return webViewJS?.getContentHeight()?.toDartInt;
+    return jsWebView?.getContentHeight()?.toDartInt;
   }
 
   Future<int?> getContentWidth() async {
-    return webViewJS?.getContentWidth()?.toDartInt;
+    return jsWebView?.getContentWidth()?.toDartInt;
   }
 
   Future<String?> getOriginalUrl() async {
@@ -394,7 +395,7 @@ class InAppWebViewWebElement implements Disposable {
   }
 
   Future<String?> getSelectedText() async {
-    final jsPromise = webViewJS?.getSelectedText();
+    final jsPromise = jsWebView?.getSelectedText();
     if (jsPromise != null) {
       return jsPromise.toDart.then((value) => value?.toDart);
     }
@@ -402,23 +403,23 @@ class InAppWebViewWebElement implements Disposable {
   }
 
   Future<int?> getScrollX() async {
-    return webViewJS?.getScrollX()?.toDartInt;
+    return jsWebView?.getScrollX()?.toDartInt;
   }
 
   Future<int?> getScrollY() async {
-    return webViewJS?.getScrollY()?.toDartInt;
+    return jsWebView?.getScrollY()?.toDartInt;
   }
 
   Future<bool> isSecureContext() async {
-    return webViewJS?.isSecureContext().toDart ?? false;
+    return jsWebView?.isSecureContext().toDart ?? false;
   }
 
   Future<bool> canScrollVertically() async {
-    return webViewJS?.canScrollVertically().toDart ?? false;
+    return jsWebView?.canScrollVertically().toDart ?? false;
   }
 
   Future<bool> canScrollHorizontally() async {
-    return webViewJS?.canScrollHorizontally().toDart ?? false;
+    return jsWebView?.canScrollHorizontally().toDart ?? false;
   }
 
   Set<Sandbox> getSandbox() {
@@ -436,7 +437,7 @@ class InAppWebViewWebElement implements Disposable {
   }
 
   Size getSize() {
-    var size = webViewJS?.getSize();
+    var size = jsWebView?.getSize();
     return Size(size!.width!.toDartDouble, size.height!.toDartDouble);
   }
 
@@ -465,7 +466,7 @@ class InAppWebViewWebElement implements Disposable {
       iframe.name = newSettings.iframeName ?? '';
     }
     if (settings!.iframeCsp != newSettings.iframeCsp) {
-      iframe.csp = newSettings.iframeCsp?.toJS;
+      iframe.csp = newSettings.iframeCsp;
     }
 
     if (settings!.iframeSandbox != newSettings.iframeSandbox) {
@@ -482,7 +483,7 @@ class InAppWebViewWebElement implements Disposable {
     }
     newSettings.iframeSandbox = sandbox;
 
-    webViewJS?.setSettings(newSettings.toMap().jsify());
+    jsWebView?.setSettings(newSettings.toMap().jsify());
 
     settings = newSettings;
   }

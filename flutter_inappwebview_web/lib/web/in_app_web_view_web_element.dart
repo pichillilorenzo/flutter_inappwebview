@@ -274,7 +274,7 @@ class InAppWebViewWebElement implements Disposable {
     final String contentType =
         httpRequest.getResponseHeader('content-type') ?? 'text/html';
     return 'data:$contentType,' +
-        Uri.encodeComponent(httpRequest.responseText ?? '');
+        Uri.encodeComponent(httpRequest.responseText);
   }
 
   String getIFrameId() {
@@ -425,12 +425,10 @@ class InAppWebViewWebElement implements Disposable {
   Set<Sandbox> getSandbox() {
     var sandbox = iframe.sandbox;
     Set<Sandbox> values = Set();
-    if (sandbox != null) {
-      for (int i = 0; i < sandbox.length; i++) {
-        var token = Sandbox.fromNativeValue(sandbox.item(i));
-        if (token != null) {
-          values.add(token);
-        }
+    for (int i = 0; i < sandbox.length; i++) {
+      var token = Sandbox.fromNativeValue(sandbox.item(i));
+      if (token != null) {
+        values.add(token);
       }
     }
     return values.isEmpty ? Set.from(Sandbox.values) : values;

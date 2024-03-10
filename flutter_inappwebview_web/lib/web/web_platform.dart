@@ -110,4 +110,5 @@ Future<JSAny?> _dartNativeCommunication(String method, num viewId,
         break;
     }
   }
+  return null;
 }

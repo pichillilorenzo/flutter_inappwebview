@@ -1,2 +1,10 @@
-export 'platform_view_registry_dart_ui.dart'
-    if (dart.library.ui_web) 'platform_view_registry_dart_ui_web.dart';
+import 'package:web/web.dart' as web;
+import 'dart:ui_web' as ui_web;
+
+class platformViewRegistry {
+  static bool registerViewFactory(
+      String viewTypeId, web.Element Function(int viewId) viewFactory) {
+    return ui_web.platformViewRegistry
+        .registerViewFactory(viewTypeId, viewFactory);
+  }
+}

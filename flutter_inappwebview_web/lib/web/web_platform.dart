@@ -1,12 +1,13 @@
 import 'dart:async';
+import 'dart:js_interop';
 import '../src/inappwebview_platform.dart';
 import 'headless_inappwebview_manager.dart';
+import 'js_bridge.dart';
 import 'web_platform_manager.dart';
 import 'package:flutter_web_plugins/flutter_web_plugins.dart';
 
 import 'in_app_web_view_web_element.dart';
 import 'platform_util.dart';
-import 'package:js/js.dart';
 
 import 'shims/platform_view_registry.dart' show platformViewRegistry;
 
@@ -33,21 +34,13 @@ class InAppWebViewFlutterPlugin {
     final platformUtil = PlatformUtil(messenger: registrar);
     // ignore: unused_local_variable
     final headlessManager = HeadlessInAppWebViewManager(messenger: registrar);
-    _nativeCommunication = allowInterop(_dartNativeCommunication);
+    flutterInAppWebView?.nativeCommunication = (
+      (String method, num viewId, [JSArray? args]) => _dartNativeCommunication(method, viewId, args?.toDart).toJS
+    ).toJS;
   }
 }
 
-/// Allows assigning a function to be callable from `window.flutter_inappwebview.nativeCommunication()`
-@JS('flutter_inappwebview.nativeCommunication')
-external set _nativeCommunication(
-    Future<dynamic> Function(String method, dynamic viewId, [List? args]) f);
-
-/// Allows calling the assigned function from Dart as well.
-@JS()
-external Future<dynamic> nativeCommunication(String method, dynamic viewId,
-    [List? args]);
-
-Future<dynamic> _dartNativeCommunication(String method, dynamic viewId,
+Future<JSAny?> _dartNativeCommunication(String method, num viewId,
     [List? args]) async {
   if (WebPlatformManager.webViews.containsKey(viewId)) {
     var webViewHtmlElement =
@@ -80,8 +73,8 @@ Future<dynamic> _dartNativeCommunication(String method, dynamic viewId,
         String url = args[1] ?? 'about:blank';
         String? target = args[2];
         String? windowFeatures = args[3];
-        return await webViewHtmlElement.onCreateWindow(
-            windowId, url, target, windowFeatures);
+        return (await webViewHtmlElement.onCreateWindow(
+            windowId, url, target, windowFeatures))?.toJS;
       case 'onWindowFocus':
         webViewHtmlElement.onWindowFocus();
         break;

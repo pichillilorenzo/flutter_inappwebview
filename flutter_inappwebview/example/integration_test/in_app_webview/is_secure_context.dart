@@ -34,6 +34,7 @@ void isSecureContext() {
     );
 
     final InAppWebViewController controller = await controllerCompleter.future;
+    await tester.pump();
     await pageLoads.stream.first;
     expect(await controller.isSecureContext(), true);
 

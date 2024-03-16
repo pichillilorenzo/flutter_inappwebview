@@ -33,9 +33,8 @@ void getContentHeight() {
     );
 
     final InAppWebViewController controller = await controllerCompleter.future;
-    await pageLoaded.future;
-
     await tester.pump();
+    await pageLoaded.future;
 
     final contentHeight = await controller.getContentHeight();
     expect(contentHeight, isNonZero);

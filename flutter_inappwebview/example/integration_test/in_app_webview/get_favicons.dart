@@ -33,6 +33,7 @@ void getFavicons() {
     );
 
     final InAppWebViewController controller = await controllerCompleter.future;
+    await tester.pump();
     await pageLoaded.future;
 
     final List<Favicon>? favicons = await controller.getFavicons();

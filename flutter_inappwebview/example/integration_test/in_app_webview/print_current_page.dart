@@ -33,8 +33,8 @@ void printCurrentPage() {
     );
 
     final InAppWebViewController controller = await controllerCompleter.future;
-    await pageLoaded.future;
     await tester.pump();
+    await pageLoaded.future;
     await expectLater(controller.printCurrentPage(), completes);
   }, skip: shouldSkip);
 }

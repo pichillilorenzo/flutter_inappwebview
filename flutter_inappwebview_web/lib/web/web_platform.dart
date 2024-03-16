@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:js_interop';
+import 'dart:ui_web' as ui_web;
 import '../src/inappwebview_platform.dart';
 import 'headless_inappwebview_manager.dart';
 import 'js_bridge.dart';
@@ -9,15 +10,13 @@ import 'package:flutter_web_plugins/flutter_web_plugins.dart';
 import 'in_app_web_view_web_element.dart';
 import 'platform_util.dart';
 
-import 'shims/platform_view_registry.dart' show platformViewRegistry;
-
 /// Builds an iframe based WebView.
 ///
 /// This is used as the default implementation for `WebView` on web.
 class InAppWebViewFlutterPlugin {
   /// Constructs a new instance of [InAppWebViewFlutterPlugin].
   InAppWebViewFlutterPlugin(Registrar registrar) {
-    platformViewRegistry.registerViewFactory(
+    ui_web.platformViewRegistry.registerViewFactory(
         'com.pichillilorenzo/flutter_inappwebview', (int viewId) {
       var webView =
           InAppWebViewWebElement(viewId: viewId, messenger: registrar);

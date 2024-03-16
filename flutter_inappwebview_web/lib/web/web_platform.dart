@@ -34,12 +34,12 @@ class InAppWebViewFlutterPlugin {
     // ignore: unused_local_variable
     final headlessManager = HeadlessInAppWebViewManager(messenger: registrar);
     flutterInAppWebView?.nativeCommunication = (
-      (String method, num viewId, [JSArray? args]) => _dartNativeCommunication(method, viewId, args?.toDart).toJS
+      (String method, JSAny viewId, [JSArray? args]) => _dartNativeCommunication(method, viewId, args?.toDart).toJS
     ).toJS;
   }
 }
 
-Future<JSAny?> _dartNativeCommunication(String method, num viewId,
+Future<JSAny?> _dartNativeCommunication(String method, dynamic viewId,
     [List? args]) async {
   if (WebPlatformManager.webViews.containsKey(viewId)) {
     var webViewHtmlElement =

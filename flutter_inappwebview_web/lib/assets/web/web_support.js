@@ -1,7 +1,7 @@
 window.flutter_inappwebview = {
     webViews: {},
     /**
-     * @param viewId {number}
+     * @param viewId {number | string}
      * @param iframe {HTMLIFrameElement}
      * @param iframeContainer {HTMLDivElement}
      */

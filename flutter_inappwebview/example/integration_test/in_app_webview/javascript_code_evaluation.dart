@@ -40,6 +40,7 @@ void javascriptCodeEvaluation() {
       );
       final InAppWebViewController controller =
           await controllerCompleter.future;
+      await tester.pump();
       await pageLoaded.future;
 
       var result = await controller.evaluateJavascript(source: """

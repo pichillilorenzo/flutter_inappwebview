@@ -37,6 +37,7 @@ void injectJavascriptFile() {
 
       final InAppWebViewController controller =
           await controllerCompleter.future;
+      await tester.pump();
       await pageLoaded.future;
 
       await controller.injectJavascriptFileFromUrl(
@@ -97,6 +98,7 @@ void injectJavascriptFile() {
 
       final InAppWebViewController controller =
           await controllerCompleter.future;
+      await tester.pump();
       await pageLoaded.future;
 
       await controller.injectJavascriptFileFromAsset(

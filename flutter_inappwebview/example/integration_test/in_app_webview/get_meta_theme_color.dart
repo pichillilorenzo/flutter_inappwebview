@@ -33,6 +33,7 @@ void getMetaThemeColor() {
     );
 
     final InAppWebViewController controller = await controllerCompleter.future;
+    await tester.pump();
     await pageLoaded.future;
 
     expect(await controller.getMetaThemeColor(), isNotNull);

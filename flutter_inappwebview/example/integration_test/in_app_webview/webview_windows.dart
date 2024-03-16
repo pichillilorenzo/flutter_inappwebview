@@ -49,7 +49,7 @@ void webViewWindows() {
           ),
         ),
       );
-
+      await tester.pump();
       await expectLater(pageLoaded.future, completes);
     }, skip: shouldSkipTest1);
 

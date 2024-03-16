@@ -1,3 +1,8 @@
+## Next
+
+- Migrates package to `package:web`.
+- Updates minimum supported SDK version to Flutter 3.19/Dart 3.3.
+
 ## 1.0.8
 
 - Updated `flutter_inappwebview_platform_interface` version dependency to `^1.0.10`

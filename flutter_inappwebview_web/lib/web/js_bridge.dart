@@ -17,7 +17,7 @@ extension type JSWebView._(JSObject _) implements JSObject {
   external void goBack();
   external void goForward();
   external void goBackOrForward(JSNumber steps);
-  external void evaluateJavascript(JSString source);
+  external JSString? evaluateJavascript(JSString source);
   external void stopLoading();
   external JSString? getUrl();
   external JSString? getTitle();

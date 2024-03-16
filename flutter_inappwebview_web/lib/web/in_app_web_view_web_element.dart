@@ -326,7 +326,7 @@ class InAppWebViewWebElement implements Disposable {
   }
 
   Future<dynamic> evaluateJavascript({required String source}) async {
-    jsWebView?.evaluateJavascript(source.toJS);
+    return jsWebView?.evaluateJavascript(source.toJS)?.toDart;
   }
 
   Future<void> stopLoading() async {

@@ -60,7 +60,7 @@ class InAppWebViewWebElement implements Disposable {
     bridgeJsObject = js.JsObject.fromBrowserObject(
         js.context[WebPlatformManager.BRIDGE_JS_OBJECT_NAME]);
     bridgeJsObject['webViews'][_viewId] = bridgeJsObject
-        .callMethod("createFlutterInAppWebView", [_viewId, iframe.id]);
+        .callMethod("createFlutterInAppWebView", [_viewId, iframe, iframeContainer]);
   }
 
   /// Handles method calls over the MethodChannel of this plugin.
@@ -203,7 +203,7 @@ class InAppWebViewWebElement implements Disposable {
           initialFile = webView.initialFile;
 
           bridgeJsObject['webViews'][_viewId] = bridgeJsObject
-              .callMethod("createFlutterInAppWebView", [_viewId, iframe.id]);
+              .callMethod("createFlutterInAppWebView", [_viewId, iframe, iframeContainer]);
         }
       }
     }

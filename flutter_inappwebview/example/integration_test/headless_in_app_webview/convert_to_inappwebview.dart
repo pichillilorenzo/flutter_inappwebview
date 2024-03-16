@@ -26,6 +26,7 @@ void convertToInAppWebView() {
     expect(headlessWebView.isRunning(), true);
 
     final InAppWebViewController controller = await controllerCompleter.future;
+    await tester.pump();
     await pageLoaded.future;
 
     final String? url = (await controller.getUrl())?.toString();
@@ -55,6 +56,7 @@ void convertToInAppWebView() {
     );
     final InAppWebViewController widgetController =
         await widgetControllerCompleter.future;
+    await tester.pump();
 
     expect(headlessWebView.isRunning(), false);
 

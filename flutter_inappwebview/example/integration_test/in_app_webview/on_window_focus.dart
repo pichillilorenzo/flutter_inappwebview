@@ -29,6 +29,7 @@ void onWindowFocus() {
         ),
       ),
     );
+    await tester.pump();
     await expectLater(onWindowFocusCompleter.future, completes);
   }, skip: shouldSkip);
 }

@@ -43,6 +43,7 @@ void onUpdateVisitedHistory() {
     );
 
     final InAppWebViewController controller = await controllerCompleter.future;
+    await tester.pump();
     await pageLoaded.future;
 
     await controller.evaluateJavascript(source: """

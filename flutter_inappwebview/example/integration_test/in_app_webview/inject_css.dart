@@ -35,6 +35,7 @@ void injectCSS() {
 
       final InAppWebViewController controller =
           await controllerCompleter.future;
+      await tester.pump();
       await pageLoaded.future;
 
       await controller.injectCSSCode(source: """
@@ -74,6 +75,7 @@ void injectCSS() {
 
       final InAppWebViewController controller =
           await controllerCompleter.future;
+      await tester.pump();
       await pageLoaded.future;
 
       await controller.injectCSSFileFromUrl(
@@ -110,6 +112,7 @@ void injectCSS() {
 
       final InAppWebViewController controller =
           await controllerCompleter.future;
+      await tester.pump();
       await pageLoaded.future;
 
       await controller.injectCSSFileFromAsset(

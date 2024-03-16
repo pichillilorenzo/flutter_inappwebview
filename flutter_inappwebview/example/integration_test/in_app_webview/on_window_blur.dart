@@ -29,6 +29,7 @@ void onWindowBlur() {
         ),
       ),
     );
+    await tester.pump();
     await expectLater(onWindowBlurCompleter.future, completes);
   }, skip: shouldSkip);
 }

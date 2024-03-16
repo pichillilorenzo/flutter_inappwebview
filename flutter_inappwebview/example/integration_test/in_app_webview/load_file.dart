@@ -32,6 +32,8 @@ void loadFile() {
     );
 
     final InAppWebViewController controller = await controllerCompleter.future;
+    // do not wait for pump to not miss the load event
+    tester.pump();
     await pageLoads.stream.first;
 
     await controller.loadFile(

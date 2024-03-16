@@ -33,6 +33,7 @@ void getOriginalUrl() {
     );
 
     final InAppWebViewController controller = await controllerCompleter.future;
+    await tester.pump();
     await pageLoaded.future;
     var originUrl = (await controller.getOriginalUrl())?.toString();
     expect(originUrl, url.toString());

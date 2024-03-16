@@ -33,7 +33,7 @@ void onConsoleMessage() {
         ),
       ),
     );
-
+    await tester.pump();
     final ConsoleMessage consoleMessage =
         await onConsoleMessageCompleter.future;
     expect(consoleMessage.message, 'message');

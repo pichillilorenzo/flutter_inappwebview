@@ -2,17 +2,17 @@
   "name": "flutter_inappwebview",
   "version": "1.0.0",
   "directories": {
-    "example": "example",
-    "lib": "lib",
-    "test": "test"
+    "example": "flutter_inappwebview/example",
+    "lib": "flutter_inappwebview/lib"
   },
   "private": true,
   "scripts": {
     "build": "flutter pub run build_runner build --delete-conflicting-outputs",
     "watch": "flutter pub run build_runner watch --delete-conflicting-outputs",
-    "publish:dry": "npm run build && flutter pub publish --dry-run",
-    "publish": "npm run build && flutter pub publish",
-    "format": "dart format lib example/integration_test",
+    "publish:dry": "flutter pub publish --dry-run",
+    "publish": "flutter pub publish",
+    "format": "dart format flutter_inappwebview/lib flutter_inappwebview/example/integration_test flutter_inappwebview_platform_interface/lib flutter_inappwebview_android/lib flutter_inappwebview_ios/lib flutter_inappwebview_macos/lib  flutter_inappwebview_web/lib  flutter_inappwebview_windows/lib",
+    "build:publish": "npm run format && npm run build && flutter pub publish",
     "docs:gen": "flutter pub global activate dartdoc && flutter pub global run dartdoc:dartdoc",
     "docs:serve": "flutter pub global activate dhttpd && flutter pub global run dhttpd:dhttpd --path doc/api"
   },

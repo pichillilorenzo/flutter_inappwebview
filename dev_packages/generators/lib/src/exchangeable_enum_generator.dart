@@ -140,6 +140,7 @@ class ExchangeableEnumGenerator
                   <DartObject>[];
           var hasWebSupport = false;
           var webSupportValue = null;
+          var allPlatformsWithoutValue = true;
           if (platforms.isNotEmpty) {
             for (var platform in platforms) {
               final targetPlatformName =
@@ -150,6 +151,9 @@ class ExchangeableEnumGenerator
                       ? platformValueField.toIntValue() ??
                           "'${platformValueField.toStringValue()}'"
                       : null;
+              if (allPlatformsWithoutValue && platformValue != null) {
+                allPlatformsWithoutValue = false;
+              }
               if (targetPlatformName == "web") {
                 hasWebSupport = true;
                 webSupportValue = platformValue;
@@ -170,8 +174,13 @@ class ExchangeableEnumGenerator
           nativeValueBody += "return $defaultValue;";
           nativeValueBody += "}";
 
-          classBuffer.writeln(
-              "static final $fieldName = $extClassName._internalMultiPlatform($constantValue, $nativeValueBody);");
+          if (!allPlatformsWithoutValue) {
+            classBuffer.writeln(
+                "static final $fieldName = $extClassName._internalMultiPlatform($constantValue, $nativeValueBody);");
+          } else {
+            classBuffer.writeln(
+                "static const $fieldName = $extClassName._internal($constantValue, ${defaultValue ?? constantValue});");
+          }
         } else {
           classBuffer.writeln(
               "static const $fieldName = $extClassName._internal($constantValue, $constantValue);");

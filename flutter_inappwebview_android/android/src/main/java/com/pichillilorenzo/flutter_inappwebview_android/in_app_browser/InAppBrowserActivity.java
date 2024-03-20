@@ -45,6 +45,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import io.flutter.plugin.common.MethodChannel;
 
@@ -145,7 +146,11 @@ public class InAppBrowserActivity extends AppCompatActivity implements InAppBrow
 
     actionBar = getSupportActionBar();
 
-    prepareView();
+    try {
+      prepareView();
+    } catch (ClassNotFoundException e) {
+      Log.d(LOG_TAG, Objects.requireNonNull(e.getMessage()));
+    }
 
     if (windowId != -1) {
       if (webView.plugin != null && webView.plugin.inAppWebViewManager != null) {
@@ -187,7 +192,7 @@ public class InAppBrowserActivity extends AppCompatActivity implements InAppBrow
     }
   }
 
-  private void prepareView() {
+  private void prepareView() throws ClassNotFoundException {
 
     if (webView != null) {
       webView.prepare();
@@ -421,7 +426,7 @@ public class InAppBrowserActivity extends AppCompatActivity implements InAppBrow
     }
   }
 
-  public void show() {
+  public void show() throws ClassNotFoundException {
     isHidden = false;
     Intent openActivity = new Intent(this, InAppBrowserActivity.class);
     openActivity.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
@@ -451,7 +456,7 @@ public class InAppBrowserActivity extends AppCompatActivity implements InAppBrow
     close(null);
   }
 
-  public void setSettings(InAppBrowserSettings newSettings, HashMap<String, Object> newSettingsMap) {
+  public void setSettings(InAppBrowserSettings newSettings, HashMap<String, Object> newSettingsMap) throws ClassNotFoundException {
 
     InAppWebViewSettings newInAppWebViewSettings = new InAppWebViewSettings();
     newInAppWebViewSettings.parse(newSettingsMap);

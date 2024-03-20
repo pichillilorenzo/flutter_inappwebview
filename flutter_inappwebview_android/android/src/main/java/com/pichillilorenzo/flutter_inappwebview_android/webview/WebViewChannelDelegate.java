@@ -219,7 +219,11 @@ public class WebViewChannelDelegate extends ChannelDelegateImpl {
           InAppBrowserSettings inAppBrowserSettings = new InAppBrowserSettings();
           HashMap<String, Object> inAppBrowserSettingsMap = (HashMap<String, Object>) call.argument("settings");
           inAppBrowserSettings.parse(inAppBrowserSettingsMap);
-          inAppBrowserActivity.setSettings(inAppBrowserSettings, inAppBrowserSettingsMap);
+          try {
+            inAppBrowserActivity.setSettings(inAppBrowserSettings, inAppBrowserSettingsMap);
+          } catch (ClassNotFoundException e) {
+            result.error(LOG_TAG, e.getMessage(), null);
+          }
         } else if (webView != null) {
           InAppWebViewSettings inAppWebViewSettings = new InAppWebViewSettings();
           HashMap<String, Object> inAppWebViewSettingsMap = (HashMap<String, Object>) call.argument("settings");
@@ -247,7 +251,11 @@ public class WebViewChannelDelegate extends ChannelDelegateImpl {
       case show:
         if (webView != null && webView.getInAppBrowserDelegate() instanceof InAppBrowserActivity) {
           InAppBrowserActivity inAppBrowserActivity = (InAppBrowserActivity) webView.getInAppBrowserDelegate();
-          inAppBrowserActivity.show();
+          try {
+            inAppBrowserActivity.show();
+          } catch (ClassNotFoundException e) {
+            result.error(LOG_TAG, e.getMessage(), null);
+          }
           result.success(true);
         } else {
           result.notImplemented();

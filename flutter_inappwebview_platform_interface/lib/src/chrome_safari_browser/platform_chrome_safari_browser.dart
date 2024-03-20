@@ -590,6 +590,14 @@ abstract class PlatformChromeSafariBrowserEvents {
   ///{@endtemplate}
   void onGreatestScrollPercentageIncreased(int scrollPercentage) {}
 
+  ///{@template flutter_inappwebview_platform_interface.PlatformChromeSafariBrowser.onBrowserNotSupported}
+  /// Called when the browser is not supported.
+  /// This can happen if a user forces a certain browser package to be used but the browser is not installed on the user's system.
+  void onBrowserNotSupported() {
+    throw UnimplementedError(
+        'onBrowserNotSupported is not implemented on the current platform');
+  }
+
   ///{@template flutter_inappwebview_platform_interface.PlatformChromeSafariBrowser.onSessionEnded}
   ///Called when a `CustomTabsSession` is ending or when no further Engagement Signals
   ///callbacks are expected to report whether any user action has occurred during the session.

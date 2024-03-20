@@ -20,6 +20,11 @@ class MyChromeSafariBrowser extends ChromeSafariBrowser {
   void onClosed() {
     print("ChromeSafari browser closed");
   }
+
+  @override
+  void onBrowserNotSupported() {
+    print("ChromeSafari is not supported");
+  }
 }
 
 class ChromeSafariBrowserExampleScreen extends StatefulWidget {

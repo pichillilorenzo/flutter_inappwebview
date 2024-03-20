@@ -170,6 +170,9 @@ class MyChromeSafariBrowser extends ChromeSafariBrowser {
   }
 
   @override
+  void onBrowserNotSupported() {}
+
+  @override
   void onClosed() {
     closed.complete();
   }

@@ -122,7 +122,7 @@ let INTERCEPT_AJAX_REQUEST_JS_SOURCE = """
         };
         window.\(JAVASCRIPT_BRIDGE_NAME).callHandler('onAjaxProgress', ajaxRequest).then(function(result) {
           if (result != null) {
-            switch (result.action) {
+            switch (result) {
               case 0:
                 self.abort();
                 return;
@@ -173,7 +173,7 @@ let INTERCEPT_AJAX_REQUEST_JS_SOURCE = """
               };
               window.\(JAVASCRIPT_BRIDGE_NAME).callHandler('onAjaxReadyStateChange', ajaxRequest).then(function(result) {
                 if (result != null) {
-                  switch (result.action) {
+                  switch (result) {
                     case 0:
                       self.abort();
                       return;

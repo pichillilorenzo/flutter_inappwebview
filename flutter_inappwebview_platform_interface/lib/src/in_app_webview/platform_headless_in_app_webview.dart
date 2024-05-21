@@ -21,6 +21,7 @@ class PlatformHeadlessInAppWebViewCreationParams
       super.windowId,
       super.onWebViewCreated,
       super.onLoadStart,
+        super.onShowFileChooserAndroid,
       super.onLoadStop,
       @Deprecated('Use onReceivedError instead') super.onLoadError,
       super.onReceivedError,

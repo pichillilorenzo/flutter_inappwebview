@@ -1,30 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.pichillilorenzo.flutter_inappwebview_android">
+
     <application>
         <activity
-            android:theme="@style/AppTheme"
-            android:exported="false"
             android:name="com.pichillilorenzo.flutter_inappwebview_android.in_app_browser.InAppBrowserActivity"
-            android:configChanges="orientation|keyboardHidden|keyboard|screenSize|locale|layoutDirection|fontScale|screenLayout|density" />
-        <activity
-            android:theme="@style/ThemeTransparent"
+            android:configChanges="orientation|keyboardHidden|keyboard|screenSize|locale|layoutDirection|fontScale|screenLayout|density"
             android:exported="false"
-            android:name="com.pichillilorenzo.flutter_inappwebview_android.chrome_custom_tabs.ChromeCustomTabsActivity" />
+            android:theme="@style/AppTheme" />
         <activity
-            android:theme="@style/ThemeTransparent"
+            android:name="com.pichillilorenzo.flutter_inappwebview_android.chrome_custom_tabs.ChromeCustomTabsActivity"
             android:exported="false"
-            android:name="com.pichillilorenzo.flutter_inappwebview_android.chrome_custom_tabs.TrustedWebActivity" />
+            android:theme="@style/ThemeTransparent" />
         <activity
-            android:theme="@style/ThemeTransparent"
+            android:name="com.pichillilorenzo.flutter_inappwebview_android.chrome_custom_tabs.TrustedWebActivity"
             android:exported="false"
+            android:theme="@style/ThemeTransparent" />
+        <activity
             android:name="com.pichillilorenzo.flutter_inappwebview_android.chrome_custom_tabs.ChromeCustomTabsActivitySingleInstance"
-            android:launchMode="singleInstance"/>
-        <activity
-            android:theme="@style/ThemeTransparent"
             android:exported="false"
+            android:launchMode="singleInstance"
+            android:theme="@style/ThemeTransparent" />
+        <activity
             android:name="com.pichillilorenzo.flutter_inappwebview_android.chrome_custom_tabs.TrustedWebActivitySingleInstance"
-            android:launchMode="singleInstance"/>
+            android:exported="false"
+            android:launchMode="singleInstance"
+            android:theme="@style/ThemeTransparent" />
+
         <receiver
             android:name="com.pichillilorenzo.flutter_inappwebview_android.chrome_custom_tabs.ActionBroadcastReceiver"
             android:enabled="true"
@@ -32,12 +34,20 @@
         <meta-data
             android:name="io.flutter.embedded_views_preview"
             android:value="true" />
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="com.pichillilorenzo.flutter_inappwebview_android.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/provider_paths" />
+        </provider>
     </application>
 
     <queries>
         <intent>
-            <action android:name=
-                "android.support.customtabs.action.CustomTabsService" />
+            <action android:name="android.support.customtabs.action.CustomTabsService" />
         </intent>
     </queries>
 </manifest>

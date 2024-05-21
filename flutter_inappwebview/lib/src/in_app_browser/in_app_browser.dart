@@ -541,4 +541,9 @@ class InAppBrowser implements PlatformInAppBrowserEvents {
 
   @override
   void onMainWindowWillClose() {}
+
+  @override
+  Future<List<String>>? onShowFileChooserAndroid(String type) {
+    return null;
+  }
 }

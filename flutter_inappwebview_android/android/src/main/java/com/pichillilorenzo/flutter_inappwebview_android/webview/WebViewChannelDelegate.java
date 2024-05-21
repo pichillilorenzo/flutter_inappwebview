@@ -1128,6 +1128,27 @@ public class WebViewChannelDelegate extends ChannelDelegateImpl {
     channel.invokeMethod("onFormResubmission", obj, callback);
   }
 
+  //for <input of onShowFileChooser
+  public static class ShowFileChooserCallback extends BaseCallbackResultImpl<List<String>> {
+    @Nullable
+    @Override
+    public List<String> decodeResult(@Nullable Object obj) {
+      return obj instanceof List ? (List<String>) obj : null;
+    }
+  }
+
+  public void onShowFileChooser(String type,@NonNull ShowFileChooserCallback callback) {
+    MethodChannel channel = getChannel();
+    if (channel == null) {
+      callback.defaultBehaviour(null);
+      return;
+    }
+    Map<String, Object> obj = new HashMap<>();
+    obj.put("type", type);
+    channel.invokeMethod("onShowFileChooser", obj, callback);
+  }
+
+
   public void onPageCommitVisible(String url) {
     MethodChannel channel = getChannel();
     if (channel == null) return;

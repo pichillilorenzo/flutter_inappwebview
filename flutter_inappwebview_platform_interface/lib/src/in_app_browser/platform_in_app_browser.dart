@@ -1092,6 +1092,11 @@ abstract class PlatformInAppBrowserEvents {
     return null;
   }
 
+  Future<List<String>>? onShowFileChooserAndroid(String type){
+    return null;    
+  }
+
+
   ///Use [onRenderProcessUnresponsive] instead.
   @Deprecated("Use onRenderProcessUnresponsive instead")
   Future<WebViewRenderProcessAction?>? androidOnRenderProcessUnresponsive(

@@ -153,6 +153,7 @@ class InAppWebView extends StatefulWidget {
             InAppWebViewController controller, WebResourceRequest request)?
         onLoadResourceWithCustomScheme,
     void Function(InAppWebViewController controller, WebUri? url)? onLoadStart,
+    Future<List<String>> Function(InAppWebViewController controller, String type)? onShowFileChooserAndroid,
     void Function(InAppWebViewController controller, WebUri? url)? onLoadStop,
     void Function(InAppWebViewController controller,
             InAppWebViewHitTestResult hitTestResult)?
@@ -315,6 +316,9 @@ class InAppWebView extends StatefulWidget {
                   : null,
               onLoadStart: onLoadStart != null
                   ? (controller, url) => onLoadStart.call(controller, url)
+                  : null,
+              onShowFileChooserAndroid: onShowFileChooserAndroid != null
+                  ? (controller, type) => onShowFileChooserAndroid.call(controller, type)
                   : null,
               onLoadStop: onLoadStop != null
                   ? (controller, url) => onLoadStop.call(controller, url)

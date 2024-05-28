@@ -1662,6 +1662,15 @@ as it can cause framerate drops on animations in Android 9 and lower (see [Hybri
   ])
   String? iframeRole;
 
+  @SupportedPlatforms(platforms: [
+    WebPlatform(
+        requiresSameOrigin: false,
+        apiName: "iframe.ariaHidden",
+        apiUrl:
+        "https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Attributes/aria-hidden")
+  ])
+  String? iframeAriaHidden;
+
   @ExchangeableObjectConstructor()
   InAppWebViewSettings_({
     this.useShouldOverrideUrlLoading,
@@ -1805,6 +1814,7 @@ as it can cause framerate drops on animations in Android 9 and lower (see [Hybri
     this.iframeName,
     this.iframeCsp,
     this.iframeRole,
+    this.iframeAriaHidden,
   }) {
     if (this.minimumFontSize == null)
       this.minimumFontSize = Util.isAndroid ? 8 : 0;

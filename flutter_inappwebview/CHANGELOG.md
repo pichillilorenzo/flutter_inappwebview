@@ -1,3 +1,7 @@
+## 6.0.0+1
+
+* Removes references to and support for deprecated v1 Android embedding.
+
 ## 6.0.0
 
 - Updated minimum platform interface and implementation versions

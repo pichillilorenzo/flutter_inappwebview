@@ -431,9 +431,6 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
               (boolean) customSettings.rendererPriorityPolicy.get("waivedWhenNotVisible"));
     }
 
-    if (WebViewFeature.isFeatureSupported(WebViewFeature.SUPPRESS_ERROR_PAGE)) {
-      WebSettingsCompat.setWillSuppressErrorPage(settings, customSettings.disableDefaultErrorPage);
-    }
     if (WebViewFeature.isFeatureSupported(WebViewFeature.ALGORITHMIC_DARKENING) && Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
       WebSettingsCompat.setAlgorithmicDarkeningAllowed(settings, customSettings.algorithmicDarkeningAllowed);
     }
@@ -1101,11 +1098,6 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
         setHorizontalScrollbarTrackDrawable(new ColorDrawable(Color.parseColor(newCustomSettings.horizontalScrollbarTrackColor)));
     }
 
-    if (newSettingsMap.get("disableDefaultErrorPage") != null &&
-            !Util.objEquals(customSettings.disableDefaultErrorPage, newCustomSettings.disableDefaultErrorPage) &&
-            WebViewFeature.isFeatureSupported(WebViewFeature.SUPPRESS_ERROR_PAGE)) {
-      WebSettingsCompat.setWillSuppressErrorPage(settings, newCustomSettings.disableDefaultErrorPage);
-    }
     if (newSettingsMap.get("algorithmicDarkeningAllowed") != null &&
             !Util.objEquals(customSettings.algorithmicDarkeningAllowed, newCustomSettings.algorithmicDarkeningAllowed) &&
             WebViewFeature.isFeatureSupported(WebViewFeature.ALGORITHMIC_DARKENING) && Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {

@@ -309,12 +309,6 @@ public class InAppWebViewClientCompat extends WebViewClientCompat {
   public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
     final InAppWebView webView = (InAppWebView) view;
 
-    if (!WebViewFeature.isFeatureSupported(WebViewFeature.SUPPRESS_ERROR_PAGE) &&
-            webView.customSettings.disableDefaultErrorPage) {
-      webView.stopLoading();
-      webView.loadUrl("about:blank");
-    }
-
     webView.isLoading = false;
     previousAuthRequestFailureCount = 0;
     credentialsProposed = null;

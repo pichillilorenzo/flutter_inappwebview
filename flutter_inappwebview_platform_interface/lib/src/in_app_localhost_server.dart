@@ -83,6 +83,8 @@ class DefaultInAppLocalhostServer extends PlatformInAppLocalhostServer {
         this._server = server;
 
         server.listen((HttpRequest request) async {
+          request.response.headers.add('Access-Control-Allow-Origin', '*');
+          
           Uint8List body = Uint8List(0);
 
           var path = request.requestedUri.path;

@@ -1,3 +1,7 @@
+## 1.0.14
+
+- Fixed an issue with Android release mode compilation on Flutter 3.22
+
 ## 1.0.13
 
 - Fixed "Android emulator using API 34 fails to draw on resume sometimes" [#1981](https://github.com/pichillilorenzo/flutter_inappwebview/issues/1981)

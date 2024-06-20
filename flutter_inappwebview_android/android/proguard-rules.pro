@@ -15,3 +15,6 @@
      private *;
 }
 -keep class com.pichillilorenzo.flutter_inappwebview_android.** { *; }
+
+# Required for compiling on Flutter 3.22.x
+-dontwarn android.window.BackEvent

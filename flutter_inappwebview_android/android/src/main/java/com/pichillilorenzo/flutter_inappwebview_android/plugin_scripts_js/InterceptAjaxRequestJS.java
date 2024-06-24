@@ -140,6 +140,9 @@ public class InterceptAjaxRequestJS {
           "        this._flutter_inappwebview_already_onreadystatechange_wrapped = true;" +
           "        var onreadystatechange = this.onreadystatechange;" +
           "        this.onreadystatechange = function() {" +
+          "          if (this.readyState != XMLHttpRequest.DONE) {" +
+          "            return;" +
+          "          }" +
           "          var w = (window.top == null || window.top === window) ? window : window.top;" +
           "          if (w." + FLAG_VARIABLE_FOR_SHOULD_INTERCEPT_AJAX_REQUEST_JS_SOURCE + " == null || w." + FLAG_VARIABLE_FOR_SHOULD_INTERCEPT_AJAX_REQUEST_JS_SOURCE + " == true) {" +
           "            var headers = this.getAllResponseHeaders();" +

@@ -1429,7 +1429,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
         }
     }
     
-    public override func evaluateJavaScript(_ javaScriptString: String, completionHandler: ((Any?, Error?) -> Void)? = nil) {
+    public func evaluateJavaScript(_ javaScriptString: String, completionHandler: ((Any?, Error?) -> Void)? = nil) {
         if let applePayAPIEnabled = settings?.applePayAPIEnabled, applePayAPIEnabled {
             if let completionHandler = completionHandler {
                 completionHandler(nil, nil)
@@ -2856,24 +2856,10 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
                 if let r = response as? String {
                     json = r
                 }
-                
-                self?.evaluateJavaScript("""
-if(window.\(JAVASCRIPT_BRIDGE_NAME)[\(_callHandlerID)] != null) {
-    window.\(JAVASCRIPT_BRIDGE_NAME)[\(_callHandlerID)].resolve(\(json));
-    delete window.\(JAVASCRIPT_BRIDGE_NAME)[\(_callHandlerID)];
-}
-""", completionHandler: nil)
             }
             callback.error = { [weak self] (code: String, message: String?, details: Any?) in
                 let errorMessage = code + (message != nil ? ", " + (message ?? "") : "")
                 print(errorMessage)
-                
-                self?.evaluateJavaScript("""
-if(window.\(JAVASCRIPT_BRIDGE_NAME)[\(_callHandlerID)] != null) {
-    window.\(JAVASCRIPT_BRIDGE_NAME)[\(_callHandlerID)].reject(new Error('\(errorMessage.replacingOccurrences(of: "\'", with: "\\'"))'));
-    delete window.\(JAVASCRIPT_BRIDGE_NAME)[\(_callHandlerID)];
-}
-""", completionHandler: nil)
             }
             
             if let channelDelegate = webView.channelDelegate {

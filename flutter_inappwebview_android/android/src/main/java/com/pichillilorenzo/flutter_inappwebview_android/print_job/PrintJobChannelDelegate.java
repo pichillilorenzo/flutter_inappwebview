@@ -62,6 +62,10 @@ public class PrintJobChannelDelegate extends ChannelDelegateImpl {
     }
   }
 
+  public void onComplete() {
+    getChannel().invokeMethod("onComplete", null);
+  }
+
   @Override
   public void dispose() {
     super.dispose();

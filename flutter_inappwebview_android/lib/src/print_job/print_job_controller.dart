@@ -43,6 +43,9 @@ class AndroidPrintJobController extends PlatformPrintJobController
 
   Future<dynamic> _handleMethod(MethodCall call) async {
     switch (call.method) {
+      case "onComplete":
+          onComplete?.call(true, null);
+        break;
       default:
         throw UnimplementedError("Unimplemented ${call.method} method");
     }

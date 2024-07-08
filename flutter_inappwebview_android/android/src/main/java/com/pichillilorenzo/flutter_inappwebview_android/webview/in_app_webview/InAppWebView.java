@@ -17,9 +17,12 @@ import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.CancellationSignal;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
+import android.os.ParcelFileDescriptor;
+import android.print.PageRange;
 import android.print.PrintAttributes;
 import android.print.PrintDocumentAdapter;
 import android.print.PrintManager;
@@ -1403,6 +1406,37 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
     webSettings.setBuiltInZoomControls(enabled);
   }
 
+  interface PrintDocumentAdapterWrapperCallback {
+    void onFinish();
+  }
+
+  @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+  class PrintDocumentAdapterWrapper extends PrintDocumentAdapter {
+    @NonNull PrintDocumentAdapter delegate;
+    @Nullable PrintDocumentAdapterWrapperCallback callback;
+
+    PrintDocumentAdapterWrapper(@NonNull PrintDocumentAdapter delegate, @Nullable PrintDocumentAdapterWrapperCallback callback) {
+      this.delegate = delegate;
+      this.callback = callback;
+    }
+
+    @Override
+    public void onLayout(PrintAttributes oldAttributes, PrintAttributes newAttributes, CancellationSignal cancellationSignal, LayoutResultCallback callback, Bundle extras) {
+      this.delegate.onLayout(oldAttributes, newAttributes, cancellationSignal, callback, extras);
+    }
+
+    @Override
+    public void onWrite(PageRange[] pages, ParcelFileDescriptor destination, CancellationSignal cancellationSignal, WriteResultCallback callback) {
+      this.delegate.onWrite(pages, destination, cancellationSignal, callback);
+    }
+
+    @Override
+    public void onFinish() {
+      this.delegate.onFinish();
+      if (this.callback != null) this.callback.onFinish();
+    }
+  }
+
   @RequiresApi(api = Build.VERSION_CODES.KITKAT)
   @Nullable
   public String printCurrentPage(@Nullable PrintJobSettings settings) {
@@ -1458,15 +1492,21 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
           printAdapter = createPrintDocumentAdapter();
         }
 
-        // Create a printCurrentPage job with name and adapter instance
-        android.print.PrintJob job = printManager.print(jobName, printAdapter, builder.build());
+        PrintJobController printJobController = null;
+        String id = null;
 
         if (settings != null && settings.handledByClient && plugin.printJobManager != null) {
-          String id = UUID.randomUUID().toString();
-          PrintJobController printJobController = new PrintJobController(id, job, settings, plugin);
+          id = UUID.randomUUID().toString();
+          printJobController = new PrintJobController(id, settings, plugin);
           plugin.printJobManager.jobs.put(printJobController.id, printJobController);
-          return id;
+          printAdapter = new PrintDocumentAdapterWrapper(printAdapter, printJobController::onComplete);
         }
+
+        // Create a printCurrentPage job with name and adapter instance
+        android.print.PrintJob job = printManager.print(jobName, printAdapter, builder.build());
+        if (printJobController != null) printJobController.setJob(job);
+
+        return id;
       } else {
         Log.e(LOG_TAG, "No PrintManager available");
       }

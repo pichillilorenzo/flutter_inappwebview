@@ -34,6 +34,6 @@ dependencies:
   # implementations, as both are compatible.
   # url_launcher_linux: 1.0.11
   flutter_inappwebview_macos: 1.0.11
-  flutter_inappwebview_platform_interface: 1.0.11
+  # flutter_inappwebview_platform_interface: 1.0.11
   flutter_inappwebview_web: 1.0.8
   # flutter_inappwebview_windows: 1.0.11

@@ -1,0 +1,39 @@
+name: flutter_inappwebview
+description: Flutter plugin that allows you to incorporate WebView widgets into your Flutter app,
+to use headless WebViews, or to use In-App browsers.
+repository: https://github.com/pichillilorenzo/flutter_inappwebview
+issue_tracker: https://github.com/pichillilorenzo/flutter_inappwebview/issues?q=is%3Aopen+is%3Aissue
+version: 6.3.0
+
+environment:
+  sdk: ">=3.2.0 <4.0.0"
+  flutter: ">=3.16.0"
+
+flutter:
+  plugin:
+    platforms:
+      android:
+        default_package: flutter_inappwebview_android
+      ios:
+        default_package: flutter_inappwebview_ios
+      # platform_interface:
+      #   default_package: flutter_inappwebview_platform_interface
+      macos:
+        default_package: flutter_inappwebview_macos
+      web:
+        default_package: flutter_inappwebview_web
+      windows:
+        default_package: flutter_inappwebview_windows
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_inappwebview_android: 1.0.13
+  flutter_inappwebview_ios: 1.0.13
+  # Allow either the pure-native or Dart/native hybrid versions of the desktop
+  # implementations, as both are compatible.
+  # url_launcher_linux: 1.0.11
+  flutter_inappwebview_macos: 1.0.11
+  flutter_inappwebview_platform_interface: 1.0.11
+  flutter_inappwebview_web: 1.0.8
+  flutter_inappwebview_windows: 1.0.11

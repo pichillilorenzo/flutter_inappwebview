@@ -1,3 +1,7 @@
+## 1.0.14
+
+- Fixed Xcode 16 `error: method does not override any method from its superclass`
+
 ## 1.0.13
 
 - Updated `flutter_inappwebview_platform_interface` version dependency to `^1.0.10`

@@ -730,9 +730,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
             let startedByUser = scrollView.isDragging || scrollView.isDecelerating
             if #available(iOS 17.2, *) {
                 if let y = newContentOffset?.y {
-                    print("y ", y)
                     if(!startedByUser && scrollView.contentInset.bottom < 0.0 && y < 0) {
-                        print("gets here")
                         scrollView.contentOffset = oldContentOffset ?? .zero
                         return
                     }

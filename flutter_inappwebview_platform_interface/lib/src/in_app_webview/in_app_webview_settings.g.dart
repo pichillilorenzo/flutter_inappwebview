@@ -371,6 +371,7 @@ class InAppWebViewSettings {
   ///- Android native WebView
   ///- iOS
   ///- Web but iframe requires same origin
+  ///- Windows ([Official API - ICoreWebView2Settings.put_AreDefaultContextMenusEnabled](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2settings?view=webview2-1.0.2210.55#put_aredefaultcontextmenusenabled))
   bool? disableContextMenu;
 
   ///Sets whether the default Android WebView’s internal error page should be suppressed or displayed for bad navigations.
@@ -648,6 +649,7 @@ class InAppWebViewSettings {
   ///**Officially Supported Platforms/Implementations**:
   ///- iOS 16.4+ ([Official API - WKWebView.isInspectable](https://developer.apple.com/documentation/webkit/wkwebview/4111163-isinspectable))
   ///- MacOS 13.3+ ([Official API - WKWebView.isInspectable](https://developer.apple.com/documentation/webkit/wkwebview/4111163-isinspectable))
+  ///- Windows ([Official API - ICoreWebView2Settings.put_AreDevToolsEnabled](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2settings?view=webview2-1.0.2210.55#put_aredevtoolsenabled))
   bool? isInspectable;
 
   ///A Boolean value that determines whether paging is enabled for the scroll view.
@@ -691,6 +693,7 @@ class InAppWebViewSettings {
   ///- iOS ([Official API - WKWebpagePreferences.allowsContentJavaScript](https://developer.apple.com/documentation/webkit/wkwebpagepreferences/3552422-allowscontentjavascript/))
   ///- MacOS ([Official API - WKWebpagePreferences.allowsContentJavaScript](https://developer.apple.com/documentation/webkit/wkwebpagepreferences/3552422-allowscontentjavascript/))
   ///- Web
+  ///- Windows ([Official API - ICoreWebView2Settings.put_IsScriptEnabled](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2settings?view=webview2-1.0.2210.55#put_isscriptenabled))
   bool? javaScriptEnabled;
 
   ///Sets the underlying layout algorithm. This will cause a re-layout of the WebView.
@@ -983,6 +986,7 @@ class InAppWebViewSettings {
   ///- Android native WebView ([Official API - WebSettings.setSupportZoom](https://developer.android.com/reference/android/webkit/WebSettings?hl=en#setSupportZoom(boolean)))
   ///- iOS
   ///- MacOS
+  ///- Windows ([Official API - ICoreWebView2Settings.put_IsZoomControlEnabled](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2settings?view=webview2-1.0.2210.55#put_iszoomcontrolenabled))
   bool? supportZoom;
 
   ///Set to `true` if you want the WebView suppresses content rendering until it is fully loaded into memory. The default value is `false`.
@@ -1012,6 +1016,7 @@ class InAppWebViewSettings {
   ///- Android native WebView
   ///- iOS
   ///- MacOS 12.0+
+  ///- Windows 1.0.774.44+ ([Official API - ICoreWebView2Controller2.put_DefaultBackgroundColor](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2controller2?view=webview2-1.0.2210.55#put_defaultbackgroundcolor))
   bool? transparentBackground;
 
   ///The color the web view displays behind the active page, visible when the user scrolls beyond the bounds of the page.
@@ -1137,6 +1142,7 @@ class InAppWebViewSettings {
   ///- Android native WebView
   ///- iOS
   ///- MacOS
+  ///- Windows
   bool? useShouldOverrideUrlLoading;
 
   ///Set to `true` if the WebView should enable support for the "viewport" HTML meta tag or should use a wide viewport.
@@ -1154,6 +1160,7 @@ class InAppWebViewSettings {
   ///- Android native WebView ([Official API - WebSettings.setUserAgentString](https://developer.android.com/reference/android/webkit/WebSettings?hl=en#setUserAgentString(java.lang.String)))
   ///- iOS ([Official API - WKWebView.customUserAgent](https://developer.apple.com/documentation/webkit/wkwebview/1414950-customuseragent))
   ///- MacOS ([Official API - WKWebView.customUserAgent](https://developer.apple.com/documentation/webkit/wkwebview/1414950-customuseragent))
+  ///- Windows ([Official API - ICoreWebView2Settings2.put_UserAgent](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2settings2?view=webview2-1.0.2210.55#put_useragent))
   String? userAgent;
 
   ///Define whether the vertical scrollbar should be drawn or not. The default value is `true`.

@@ -15,6 +15,7 @@ import 'package:pointer_interceptor/pointer_interceptor.dart';
 // import 'package:permission_handler/permission_handler.dart';
 
 final localhostServer = InAppLocalhostServer(documentRoot: 'assets');
+WebViewEnvironment? webViewEnvironment;
 
 Future main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -22,12 +23,18 @@ Future main() async {
   // await Permission.microphone.request();
   // await Permission.storage.request();
 
-  if (!kIsWeb && defaultTargetPlatform == TargetPlatform.android) {
-    await InAppWebViewController.setWebContentsDebuggingEnabled(kDebugMode);
+  if (!kIsWeb && defaultTargetPlatform == TargetPlatform.windows) {
+    final availableVersion = await WebViewEnvironment.getAvailableVersion();
+    assert(availableVersion != null, 'Failed to find an installed WebView2 runtime or non-stable Microsoft Edge installation.');
+
+    webViewEnvironment = await WebViewEnvironment.create(settings:
+      WebViewEnvironmentSettings(
+          userDataFolder: 'custom_path'
+      ));
   }
 
-  if (!kIsWeb) {
-    await localhostServer.start();
+  if (!kIsWeb && defaultTargetPlatform == TargetPlatform.android) {
+    await InAppWebViewController.setWebContentsDebuggingEnabled(kDebugMode);
   }
 
   runApp(MyApp());
@@ -108,6 +115,28 @@ PointerInterceptor myDrawer({required BuildContext context}) {
         },
       ),
     ];
+  } else if (defaultTargetPlatform == TargetPlatform.windows ||
+      defaultTargetPlatform == TargetPlatform.linux) {
+    children = [
+      ListTile(
+        title: Text('InAppWebView'),
+        onTap: () {
+          Navigator.pushReplacementNamed(context, '/');
+        },
+      ),
+      ListTile(
+        title: Text('InAppBrowser'),
+        onTap: () {
+          Navigator.pushReplacementNamed(context, '/InAppBrowser');
+        },
+      ),
+      ListTile(
+        title: Text('HeadlessInAppWebView'),
+        onTap: () {
+          Navigator.pushReplacementNamed(context, '/HeadlessInAppWebView');
+        },
+      ),
+    ];
   }
   return PointerInterceptor(
     child: Drawer(
@@ -159,6 +188,14 @@ class _MyAppState extends State<MyApp> {
             HeadlessInAppWebViewExampleScreen(),
         '/WebAuthenticationSession': (context) =>
             WebAuthenticationSessionExampleScreen(),
+      });
+    } else if (defaultTargetPlatform == TargetPlatform.windows ||
+        defaultTargetPlatform == TargetPlatform.linux) {
+      return MaterialApp(initialRoute: '/', routes: {
+        '/': (context) => InAppWebViewExampleScreen(),
+        '/InAppBrowser': (context) => InAppBrowserExampleScreen(),
+        '/HeadlessInAppWebView': (context) =>
+            HeadlessInAppWebViewExampleScreen(),
       });
     }
     return MaterialApp(initialRoute: '/', routes: {

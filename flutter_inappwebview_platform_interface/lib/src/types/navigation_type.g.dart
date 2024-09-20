@@ -8,31 +8,131 @@ part of 'navigation_type.dart';
 
 ///Class that represents the type of action triggering a navigation for the [PlatformWebViewCreationParams.shouldOverrideUrlLoading] event.
 class NavigationType {
-  final int _value;
-  final int _nativeValue;
+  final String _value;
+  final int? _nativeValue;
   const NavigationType._internal(this._value, this._nativeValue);
 // ignore: unused_element
   factory NavigationType._internalMultiPlatform(
-          int value, Function nativeValue) =>
+          String value, Function nativeValue) =>
       NavigationType._internal(value, nativeValue());
 
   ///An item from the back-forward list was requested.
-  static const BACK_FORWARD = NavigationType._internal(2, 2);
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- iOS ([Official API - WKNavigationType.formSubmitted](https://developer.apple.com/documentation/webkit/wknavigationtype/formsubmitted))
+  ///- MacOS ([Official API - WKNavigationType.formSubmitted](https://developer.apple.com/documentation/webkit/wknavigationtype/formsubmitted))
+  ///- Windows ([Official API - COREWEBVIEW2_NAVIGATION_KIND_BACK_OR_FORWARD](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2210.55#corewebview2_navigation_kind))
+  static final BACK_FORWARD =
+      NavigationType._internalMultiPlatform('BACK_FORWARD', () {
+    switch (defaultTargetPlatform) {
+      case TargetPlatform.iOS:
+        return 2;
+      case TargetPlatform.macOS:
+        return 2;
+      case TargetPlatform.windows:
+        return 1;
+      default:
+        break;
+    }
+    return null;
+  });
 
   ///A form was resubmitted (for example by going back, going forward, or reloading).
-  static const FORM_RESUBMITTED = NavigationType._internal(4, 4);
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- iOS ([Official API - WKNavigationType.formSubmitted](https://developer.apple.com/documentation/webkit/wknavigationtype/formresubmitted))
+  ///- MacOS ([Official API - WKNavigationType.formSubmitted](https://developer.apple.com/documentation/webkit/wknavigationtype/formresubmitted))
+  static final FORM_RESUBMITTED =
+      NavigationType._internalMultiPlatform('FORM_RESUBMITTED', () {
+    switch (defaultTargetPlatform) {
+      case TargetPlatform.iOS:
+        return 4;
+      case TargetPlatform.macOS:
+        return 4;
+      default:
+        break;
+    }
+    return null;
+  });
 
   ///A form was submitted.
-  static const FORM_SUBMITTED = NavigationType._internal(1, 1);
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- iOS ([Official API - WKNavigationType.formSubmitted](https://developer.apple.com/documentation/webkit/wknavigationtype/formsubmitted))
+  ///- MacOS ([Official API - WKNavigationType.formSubmitted](https://developer.apple.com/documentation/webkit/wknavigationtype/formsubmitted))
+  static final FORM_SUBMITTED =
+      NavigationType._internalMultiPlatform('FORM_SUBMITTED', () {
+    switch (defaultTargetPlatform) {
+      case TargetPlatform.iOS:
+        return 1;
+      case TargetPlatform.macOS:
+        return 1;
+      default:
+        break;
+    }
+    return null;
+  });
 
   ///A link with an href attribute was activated by the user.
-  static const LINK_ACTIVATED = NavigationType._internal(0, 0);
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- iOS ([Official API - WKNavigationType.linkActivated](https://developer.apple.com/documentation/webkit/wknavigationtype/linkactivated))
+  ///- MacOS ([Official API - WKNavigationType.linkActivated](https://developer.apple.com/documentation/webkit/wknavigationtype/linkactivated))
+  ///- Windows
+  static final LINK_ACTIVATED =
+      NavigationType._internalMultiPlatform('LINK_ACTIVATED', () {
+    switch (defaultTargetPlatform) {
+      case TargetPlatform.iOS:
+        return 0;
+      case TargetPlatform.macOS:
+        return 0;
+      case TargetPlatform.windows:
+        return 0;
+      default:
+        break;
+    }
+    return null;
+  });
 
   ///Navigation is taking place for some other reason.
-  static const OTHER = NavigationType._internal(-1, -1);
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- iOS ([Official API - WKNavigationType.other](https://developer.apple.com/documentation/webkit/wknavigationtype/other))
+  ///- MacOS ([Official API - WKNavigationType.other](https://developer.apple.com/documentation/webkit/wknavigationtype/other))
+  ///- Windows
+  static final OTHER = NavigationType._internalMultiPlatform('OTHER', () {
+    switch (defaultTargetPlatform) {
+      case TargetPlatform.iOS:
+        return -1;
+      case TargetPlatform.macOS:
+        return -1;
+      case TargetPlatform.windows:
+        return 3;
+      default:
+        break;
+    }
+    return null;
+  });
 
   ///The webpage was reloaded.
-  static const RELOAD = NavigationType._internal(3, 3);
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- iOS ([Official API - WKNavigationType.reload](https://developer.apple.com/documentation/webkit/wknavigationtype/reload))
+  ///- MacOS ([Official API - WKNavigationType.reload](https://developer.apple.com/documentation/webkit/wknavigationtype/reload))
+  ///- Windows ([Official API - COREWEBVIEW2_NAVIGATION_KIND_RELOAD](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2210.55#corewebview2_navigation_kind))
+  static final RELOAD = NavigationType._internalMultiPlatform('RELOAD', () {
+    switch (defaultTargetPlatform) {
+      case TargetPlatform.iOS:
+        return 3;
+      case TargetPlatform.macOS:
+        return 3;
+      case TargetPlatform.windows:
+        return 2;
+      default:
+        break;
+    }
+    return null;
+  });
 
   ///Set of all values of [NavigationType].
   static final Set<NavigationType> values = [
@@ -44,8 +144,8 @@ class NavigationType {
     NavigationType.RELOAD,
   ].toSet();
 
-  ///Gets a possible [NavigationType] instance from [int] value.
-  static NavigationType? fromValue(int? value) {
+  ///Gets a possible [NavigationType] instance from [String] value.
+  static NavigationType? fromValue(String? value) {
     if (value != null) {
       try {
         return NavigationType.values
@@ -70,11 +170,11 @@ class NavigationType {
     return null;
   }
 
-  ///Gets [int] value.
-  int toValue() => _value;
+  ///Gets [String] value.
+  String toValue() => _value;
 
-  ///Gets [int] native value.
-  int toNativeValue() => _nativeValue;
+  ///Gets [int?] native value.
+  int? toNativeValue() => _nativeValue;
 
   @override
   int get hashCode => _value.hashCode;
@@ -84,21 +184,7 @@ class NavigationType {
 
   @override
   String toString() {
-    switch (_value) {
-      case 2:
-        return 'BACK_FORWARD';
-      case 4:
-        return 'FORM_RESUBMITTED';
-      case 1:
-        return 'FORM_SUBMITTED';
-      case 0:
-        return 'LINK_ACTIVATED';
-      case -1:
-        return 'OTHER';
-      case 3:
-        return 'RELOAD';
-    }
-    return _value.toString();
+    return _value;
   }
 }
 

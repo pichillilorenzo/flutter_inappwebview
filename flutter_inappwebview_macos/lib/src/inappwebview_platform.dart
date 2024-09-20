@@ -138,7 +138,7 @@ class MacOSInAppWebViewPlatform extends InAppWebViewPlatform {
   /// Creates a new [MacOSWebStorage].
   ///
   /// This function should only be called by the app-facing package.
-  /// Look at using [MacOSWebStorage] in `flutter_inappwebview` instead.
+  /// Look at using [WebStorage] in `flutter_inappwebview` instead.
   @override
   MacOSWebStorage createPlatformWebStorage(
     PlatformWebStorageCreationParams params,
@@ -149,7 +149,7 @@ class MacOSInAppWebViewPlatform extends InAppWebViewPlatform {
   /// Creates a new [MacOSLocalStorage].
   ///
   /// This function should only be called by the app-facing package.
-  /// Look at using [MacOSLocalStorage] in `flutter_inappwebview` instead.
+  /// Look at using [LocalStorage] in `flutter_inappwebview` instead.
   @override
   MacOSLocalStorage createPlatformLocalStorage(
     PlatformLocalStorageCreationParams params,
@@ -160,7 +160,7 @@ class MacOSInAppWebViewPlatform extends InAppWebViewPlatform {
   /// Creates a new [MacOSSessionStorage].
   ///
   /// This function should only be called by the app-facing package.
-  /// Look at using [PlatformSessionStorage] in `flutter_inappwebview` instead.
+  /// Look at using [SessionStorage] in `flutter_inappwebview` instead.
   @override
   MacOSSessionStorage createPlatformSessionStorage(
     PlatformSessionStorageCreationParams params,

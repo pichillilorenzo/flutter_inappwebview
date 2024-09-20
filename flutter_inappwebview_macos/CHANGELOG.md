@@ -1,3 +1,8 @@
+## 1.0.12
+
+- Fixed "[MACOS] launching InAppBrowser with 'hidden: true' calls onExit immediately" [#1939](https://github.com/pichillilorenzo/flutter_inappwebview/issues/1939)
+- Fixed XCode 16 build
+
 ## 1.0.11
 
 - Updated `flutter_inappwebview_platform_interface` version dependency to `^1.0.10`

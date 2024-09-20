@@ -1,3 +1,7 @@
+## 1.0.14
+
+- Fixed XCode 16 build
+
 ## 1.0.13
 
 - Updated `flutter_inappwebview_platform_interface` version dependency to `^1.0.10`

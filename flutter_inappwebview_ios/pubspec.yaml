@@ -1,6 +1,6 @@
 name: flutter_inappwebview_ios
 description: iOS implementation of the flutter_inappwebview plugin.
-version: 1.0.13
+version: 1.0.14
 homepage: https://inappwebview.dev/
 repository: https://github.com/pichillilorenzo/flutter_inappwebview/tree/master/flutter_inappwebview_ios
 issue_tracker: https://github.com/pichillilorenzo/flutter_inappwebview/issues

@@ -102,6 +102,13 @@ class _InAppBrowserExampleScreenState extends State<InAppBrowserExampleScreen> {
     browser = MyInAppBrowser(pullToRefreshController: pullToRefreshController);
   }
 
+
+  @override
+  void dispose() {
+    browser.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -120,15 +127,10 @@ class _InAppBrowserExampleScreenState extends State<InAppBrowserExampleScreen> {
                       urlRequest:
                           URLRequest(url: WebUri("https://flutter.dev")),
                       settings: InAppBrowserClassSettings(
-                        browserSettings: InAppBrowserSettings(
-                            toolbarTopBackgroundColor: Colors.blue,
-                            presentationStyle: ModalPresentationStyle.POPOVER),
-                        webViewSettings: InAppWebViewSettings(
-                          isInspectable: kDebugMode,
-                          useShouldOverrideUrlLoading: true,
-                          useOnLoadResource: true,
-                        ),
-                      ),
+                          browserSettings: InAppBrowserSettings(
+                              hideUrlBar: true, hideToolbarTop: true, hidden: true),
+                          webViewSettings: InAppWebViewSettings(
+                              javaScriptEnabled: true, isInspectable: kDebugMode)),
                     );
                   },
                   child: Text("Open In-App Browser")),

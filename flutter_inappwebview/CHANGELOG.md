@@ -1,7 +1,7 @@
 ## 6.1.0
 
 - Added initial Windows support
-- Added `InAppWebView` MacOS support
+- Added `InAppWebView` widget MacOS support
 - Updates minimum supported SDK version to Flutter 3.24/Dart 3.5.
 - Updated androidx.webkit:webkit:1.8.0 to androidx.webkit:webkit:1.12.0
 - Updated androidx.browser:browser:1.6.0 to androidx.browser:browser:1.8.0

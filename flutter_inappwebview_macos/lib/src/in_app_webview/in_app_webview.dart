@@ -300,7 +300,7 @@ class MacOSInAppWebViewWidget extends PlatformInAppWebViewWidget {
       }
     }
 
-    return UiKitView(
+    return AppKitView(
       viewType: 'com.pichillilorenzo/flutter_inappwebview',
       onPlatformViewCreated: _onPlatformViewCreated,
       gestureRecognizers: params.gestureRecognizers,

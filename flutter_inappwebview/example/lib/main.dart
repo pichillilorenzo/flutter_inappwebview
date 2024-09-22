@@ -84,22 +84,16 @@ PointerInterceptor myDrawer({required BuildContext context}) {
     ];
   } else if (defaultTargetPlatform == TargetPlatform.macOS) {
     children = [
-      // ListTile(
-      //   title: Text('InAppWebView'),
-      //   onTap: () {
-      //     Navigator.pushReplacementNamed(context, '/');
-      //   },
-      // ),
-      // ListTile(
-      //   title: Text('InAppBrowser'),
-      //   onTap: () {
-      //     Navigator.pushReplacementNamed(context, '/InAppBrowser');
-      //   },
-      // ),
+      ListTile(
+        title: Text('InAppWebView'),
+        onTap: () {
+          Navigator.pushReplacementNamed(context, '/');
+        },
+      ),
       ListTile(
         title: Text('InAppBrowser'),
         onTap: () {
-          Navigator.pushReplacementNamed(context, '/');
+          Navigator.pushReplacementNamed(context, '/InAppBrowser');
         },
       ),
       ListTile(
@@ -181,9 +175,8 @@ class _MyAppState extends State<MyApp> {
     }
     if (defaultTargetPlatform == TargetPlatform.macOS) {
       return MaterialApp(initialRoute: '/', routes: {
-        // '/': (context) => InAppWebViewExampleScreen(),
-        // '/InAppBrowser': (context) => InAppBrowserExampleScreen(),
-        '/': (context) => InAppBrowserExampleScreen(),
+        '/': (context) => InAppWebViewExampleScreen(),
+        '/InAppBrowser': (context) => InAppBrowserExampleScreen(),
         '/HeadlessInAppWebView': (context) =>
             HeadlessInAppWebViewExampleScreen(),
         '/WebAuthenticationSession': (context) =>

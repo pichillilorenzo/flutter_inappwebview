@@ -2,6 +2,7 @@
 
 - Added `PlatformWebViewEnvironment` class
 - Updates minimum supported SDK version to Flutter 3.24/Dart 3.5.
+- Removed unsupported feature `WebViewFeature.SUPPRESS_ERROR_PAGE`
 
 ## 1.0.10
 

@@ -104,7 +104,7 @@ class PlatformStorageCreationParams {
 ///Class that provides methods to manage the JavaScript [Storage](https://developer.mozilla.org/en-US/docs/Web/API/Storage) object.
 ///It is used by [PlatformLocalStorage] and [PlatformSessionStorage].
 ///{@endtemplate}
-abstract class PlatformStorage implements Disposable {
+abstract mixin class PlatformStorage implements Disposable {
   ///{@template flutter_inappwebview_platform_interface.PlatformStorage.controller}
   ///Controller used to interact with storage.
   ///{@endtemplate}

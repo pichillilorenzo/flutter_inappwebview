@@ -23,10 +23,6 @@ A Flutter plugin that allows you to add an inline webview, to use an headless we
 
 </div>
 
-## New Version 6.x.x is OUT NOW!
-
-Migrating from version `5.x.x` is easy! Follow the online [Migration guide](https://inappwebview.dev/docs/migration-guide).
-
 ## Articles/Resources
 
 - [Official documentation: inappwebview.dev/docs](https://inappwebview.dev/docs/intro)
@@ -47,8 +43,8 @@ Send a submission request to the [Submit App](https://inappwebview.dev/submit-ap
 
 ## Requirements
 
-- Dart sdk: ">=2.17.0 <4.0.0"
-- Flutter: ">=3.0.0"
+- Dart sdk: "^3.5.0"
+- Flutter: ">=3.24.0"
 - Android: `minSdkVersion >= 19`, `compileSdk >= 34`, [AGP](https://developer.android.com/build/releases/gradle-plugin) version `>= 7.3.0` (use [Android Studio - Android Gradle plugin Upgrade Assistant](https://developer.android.com/build/agp-upgrade-assistant) for help), support for `androidx` (see [AndroidX Migration](https://flutter.dev/docs/development/androidx-migration) to migrate an existing app)
 - iOS 9.0+: `--ios-language swift`, Xcode version `>= 14.3`
 - MacOS 10.11+: Xcode version `>= 14.3`

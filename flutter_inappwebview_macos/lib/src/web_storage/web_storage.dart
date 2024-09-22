@@ -70,7 +70,7 @@ class MacOSStorageCreationParams extends PlatformStorageCreationParams {
 }
 
 ///{@macro flutter_inappwebview_platform_interface.PlatformStorage}
-abstract class MacOSStorage implements PlatformStorage {
+abstract mixin class MacOSStorage implements PlatformStorage {
   @override
   MacOSInAppWebViewController? controller;
 

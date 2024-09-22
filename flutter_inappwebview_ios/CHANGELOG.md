@@ -1,6 +1,7 @@
-## 1.0.14
+## 1.1.0
 
 - Fixed XCode 16 build
+- Updates minimum supported SDK version to Flutter 3.24/Dart 3.5.
 
 ## 1.0.13
 

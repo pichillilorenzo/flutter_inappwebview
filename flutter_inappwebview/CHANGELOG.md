@@ -1,3 +1,8 @@
+## 6.1.0
+
+- Added initial Windows support
+- Updates minimum supported SDK version to Flutter 3.24/Dart 3.5.
+
 ## 6.0.0
 
 - Updated minimum platform interface and implementation versions

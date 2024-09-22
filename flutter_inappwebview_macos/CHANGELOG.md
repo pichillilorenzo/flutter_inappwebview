@@ -1,7 +1,8 @@
-## 1.0.12
+## 1.1.0
 
 - Fixed "[MACOS] launching InAppBrowser with 'hidden: true' calls onExit immediately" [#1939](https://github.com/pichillilorenzo/flutter_inappwebview/issues/1939)
 - Fixed XCode 16 build
+- Updates minimum supported SDK version to Flutter 3.24/Dart 3.5.
 
 ## 1.0.11
 

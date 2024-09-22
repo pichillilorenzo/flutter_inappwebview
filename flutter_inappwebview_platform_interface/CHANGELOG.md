@@ -1,6 +1,7 @@
-## 1.0.11
+## 1.1.0
 
 - Added `PlatformWebViewEnvironment` class
+- Updates minimum supported SDK version to Flutter 3.24/Dart 3.5.
 
 ## 1.0.10
 

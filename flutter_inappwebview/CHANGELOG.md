@@ -1,3 +1,7 @@
+## 6.1.0+1
+
+- Updated README
+
 ## 6.1.0
 
 - Added initial Windows support

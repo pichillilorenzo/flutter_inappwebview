@@ -493,10 +493,12 @@
       "avatar_url": "https://avatars.githubusercontent.com/u/1270149?v=4",
       "profile": "https://uekoetter.dev/",
       "contributions": [
-        "doc"
+        "doc",
+        "code"
       ]
     }
   ],
   "contributorsPerLine": 7,
-  "linkToUsage": false
+  "linkToUsage": false,
+  "commitType": "docs"
 }

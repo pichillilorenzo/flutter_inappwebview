@@ -1,6 +1,6 @@
 name: flutter_inappwebview_platform_interface
 description: A common platform interface for the flutter_inappwebview plugin.
-version: 1.0.11
+version: 1.1.0
 homepage: https://inappwebview.dev/
 repository: https://github.com/pichillilorenzo/flutter_inappwebview/tree/master/flutter_inappwebview_platform_interface
 issue_tracker: https://github.com/pichillilorenzo/flutter_inappwebview/issues
@@ -12,20 +12,20 @@ topics:
   - browser
 
 environment:
-  sdk: ">=2.17.0 <4.0.0"
-  flutter: ">=3.0.0"
+  sdk: ^3.5.0
+  flutter: ">=3.24.0"
 
 dependencies:
   flutter:
     sdk: flutter
   flutter_inappwebview_internal_annotations: ^1.1.1
-  plugin_platform_interface: ^2.1.6
+  plugin_platform_interface: ^2.1.8
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^2.0.0
-  build_runner: ^2.4.0
+  flutter_lints: ^4.0.0
+  build_runner: ^2.4.12
   generators:
     path: ../dev_packages/generators
 

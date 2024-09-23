@@ -23,10 +23,6 @@ A Flutter plugin that allows you to add an inline webview, to use an headless we
 
 </div>
 
-## New Version 6.x.x is OUT NOW!
-
-Migrating from version `5.x.x` is easy! Follow the online [Migration guide](https://inappwebview.dev/docs/migration-guide).
-
 ## Articles/Resources
 
 - [Official documentation: inappwebview.dev/docs](https://inappwebview.dev/docs/intro)
@@ -47,11 +43,11 @@ Send a submission request to the [Submit App](https://inappwebview.dev/submit-ap
 
 ## Requirements
 
-- Dart sdk: ">=2.17.0 <4.0.0"
-- Flutter: ">=3.0.0"
+- Dart sdk: "^3.5.0"
+- Flutter: ">=3.24.0"
 - Android: `minSdkVersion >= 19`, `compileSdk >= 34`, [AGP](https://developer.android.com/build/releases/gradle-plugin) version `>= 7.3.0` (use [Android Studio - Android Gradle plugin Upgrade Assistant](https://developer.android.com/build/agp-upgrade-assistant) for help), support for `androidx` (see [AndroidX Migration](https://flutter.dev/docs/development/androidx-migration) to migrate an existing app)
-- iOS 9.0+: `--ios-language swift`, Xcode version `>= 14.3`
-- MacOS 10.11+: Xcode version `>= 14.3`
+- iOS 12.0+: `--ios-language swift`, Xcode version `>= 16.0`
+- MacOS 10.14+: Xcode version `>= 16.0`
 
 ## Installation
 
@@ -150,43 +146,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
       <td align="center" valign="top" width="14.28%"><a href="https://xraph.com/"><img src="https://avatars.githubusercontent.com/u/11243590?v=4?s=100" width="100px;" alt="Rex Raphael"/><br /><sub><b>Rex Raphael</b></sub></a><br /><a href="https://github.com/pichillilorenzo/flutter_inappwebview/commits?author=juicycleff" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/Sense545"><img src="https://avatars.githubusercontent.com/u/769406?v=4?s=100" width="100px;" alt="Jan Henrik Høiland"/><br /><sub><b>Jan Henrik Høiland</b></sub></a><br /><a href="https://github.com/pichillilorenzo/flutter_inappwebview/commits?author=Sense545" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/igtm"><img src="https://avatars.githubusercontent.com/u/6331737?v=4?s=100" width="100px;" alt="Iguchi Tomokatsu"/><br /><sub><b>Iguchi Tomokatsu</b></sub></a><br /><a href="https://github.com/pichillilorenzo/flutter_inappwebview/commits?author=igtm" title="Code">💻</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="https://uekoetter.dev/"><img src="https://avatars.githubusercontent.com/u/1270149?v=4?s=100" width="100px;" alt="Jonas Uekötter"/><br /><sub><b>Jonas Uekötter</b></sub></a><br /><a href="https://github.com/pichillilorenzo/flutter_inappwebview/commits?author=ueman" title="Documentation">📖</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/emakar"><img src="https://avatars.githubusercontent.com/u/7767193?v=4?s=100" width="100px;" alt="emakar"/><br /><sub><b>emakar</b></sub></a><br /><a href="https://github.com/pichillilorenzo/flutter_inappwebview/commits?author=emakar" title="Code">💻</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="https://weibo.com/magicrolan"><img src="https://avatars.githubusercontent.com/u/671431?v=4?s=100" width="100px;" alt="liasica"/><br /><sub><b>liasica</b></sub></a><br /><a href="https://github.com/pichillilorenzo/flutter_inappwebview/commits?author=liasica" title="Code">💻</a></td>
-    </tr>
-    <tr>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/addie9000"><img src="https://avatars.githubusercontent.com/u/2036910?v=4?s=100" width="100px;" alt="Eiichiro Adachi"/><br /><sub><b>Eiichiro Adachi</b></sub></a><br /><a href="https://github.com/pichillilorenzo/flutter_inappwebview/commits?author=addie9000" title="Code">💻</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/kamilpowalowski"><img src="https://avatars.githubusercontent.com/u/83073?v=4?s=100" width="100px;" alt="Kamil Powałowski"/><br /><sub><b>Kamil Powałowski</b></sub></a><br /><a href="https://github.com/pichillilorenzo/flutter_inappwebview/commits?author=kamilpowalowski" title="Code">💻</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/akioyamamoto1977"><img src="https://avatars.githubusercontent.com/u/429219?v=4?s=100" width="100px;" alt="Akio Yamamoto"/><br /><sub><b>Akio Yamamoto</b></sub></a><br /><a href="https://github.com/pichillilorenzo/flutter_inappwebview/commits?author=akioyamamoto1977" title="Code">💻</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/mohenaxiba"><img src="https://avatars.githubusercontent.com/u/7977540?v=4?s=100" width="100px;" alt="mohenaxiba"/><br /><sub><b>mohenaxiba</b></sub></a><br /><a href="https://github.com/pichillilorenzo/flutter_inappwebview/commits?author=mohenaxiba" title="Code">💻</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="https://www.acidic.co.nz"><img src="https://avatars.githubusercontent.com/u/1319813?v=4?s=100" width="100px;" alt="Ben Anderson"/><br /><sub><b>Ben Anderson</b></sub></a><br /><a href="https://github.com/pichillilorenzo/flutter_inappwebview/commits?author=bagedevimo" title="Code">💻</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/daanporon"><img src="https://avatars.githubusercontent.com/u/71901?v=4?s=100" width="100px;" alt="Daan Poron"/><br /><sub><b>Daan Poron</b></sub></a><br /><a href="#security-daanporon" title="Security">🛡️</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="https://yuki0311.com"><img src="https://avatars.githubusercontent.com/u/34892635?v=4?s=100" width="100px;" alt="ふぁ"/><br /><sub><b>ふぁ</b></sub></a><br /><a href="https://github.com/pichillilorenzo/flutter_inappwebview/commits?author=fa0311" title="Code">💻</a></td>
-    </tr>
-    <tr>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/perffecto"><img src="https://avatars.githubusercontent.com/u/2116618?v=4?s=100" width="100px;" alt="perffecto"/><br /><sub><b>perffecto</b></sub></a><br /><a href="https://github.com/pichillilorenzo/flutter_inappwebview/commits?author=perffecto" title="Code">💻</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="https://www.linkedin.com/in/chandra-abdul-fattah"><img src="https://avatars.githubusercontent.com/u/16184998?v=4?s=100" width="100px;" alt="Chandra Abdul Fattah"/><br /><sub><b>Chandra Abdul Fattah</b></sub></a><br /><a href="https://github.com/pichillilorenzo/flutter_inappwebview/commits?author=chandrabezzo" title="Code">💻</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="https://www.bebilica.rs/"><img src="https://avatars.githubusercontent.com/u/41632269?v=4?s=100" width="100px;" alt="Aleksandar Lugonja"/><br /><sub><b>Aleksandar Lugonja</b></sub></a><br /><a href="https://github.com/pichillilorenzo/flutter_inappwebview/commits?author=LugonjaAleksandar" title="Code">💻</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="https://www.hera.cc"><img src="https://avatars.githubusercontent.com/u/534840?v=4?s=100" width="100px;" alt="Alexandre Richonnier"/><br /><sub><b>Alexandre Richonnier</b></sub></a><br /><a href="https://github.com/pichillilorenzo/flutter_inappwebview/commits?author=heralight" title="Code">💻</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/Sunbreak"><img src="https://avatars.githubusercontent.com/u/7928961?v=4?s=100" width="100px;" alt="Sunbreak"/><br /><sub><b>Sunbreak</b></sub></a><br /><a href="https://github.com/pichillilorenzo/flutter_inappwebview/commits?author=Sunbreak" title="Code">💻</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/cslee"><img src="https://avatars.githubusercontent.com/u/590752?v=4?s=100" width="100px;" alt="Eric Lee"/><br /><sub><b>Eric Lee</b></sub></a><br /><a href="https://github.com/pichillilorenzo/flutter_inappwebview/commits?author=cslee" title="Documentation">📖</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/KhatibFX"><img src="https://avatars.githubusercontent.com/u/5616640?v=4?s=100" width="100px;" alt="KhatibFX"/><br /><sub><b>KhatibFX</b></sub></a><br /><a href="https://github.com/pichillilorenzo/flutter_inappwebview/commits?author=KhatibFX" title="Code">💻</a></td>
-    </tr>
-    <tr>
-      <td align="center" valign="top" width="14.28%"><a href="https://www.guide.inc"><img src="https://avatars.githubusercontent.com/u/106543148?v=4?s=100" width="100px;" alt="Guide.inc"/><br /><sub><b>Guide.inc</b></sub></a><br /><a href="https://github.com/pichillilorenzo/flutter_inappwebview/commits?author=guide-flutter" title="Code">💻</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/Nirajn2311"><img src="https://avatars.githubusercontent.com/u/36357875?v=4?s=100" width="100px;" alt="Niraj Nandish"/><br /><sub><b>Niraj Nandish</b></sub></a><br /><a href="https://github.com/pichillilorenzo/flutter_inappwebview/commits?author=Nirajn2311" title="Code">💻</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/nesquikm"><img src="https://avatars.githubusercontent.com/u/3867874?v=4?s=100" width="100px;" alt="nesquikm"/><br /><sub><b>nesquikm</b></sub></a><br /><a href="https://github.com/pichillilorenzo/flutter_inappwebview/commits?author=nesquikm" title="Code">💻</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/andreasgangso"><img src="https://avatars.githubusercontent.com/u/727125?v=4?s=100" width="100px;" alt="Andreas Gangsø"/><br /><sub><b>Andreas Gangsø</b></sub></a><br /><a href="https://github.com/pichillilorenzo/flutter_inappwebview/commits?author=andreasgangso" title="Code">💻</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/AlexT84"><img src="https://avatars.githubusercontent.com/u/80742383?v=4?s=100" width="100px;" alt="Alexandru Terente"/><br /><sub><b>Alexandru Terente</b></sub></a><br /><a href="https://github.com/pichillilorenzo/flutter_inappwebview/commits?author=AlexT84" title="Code">💻</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/darkang3lz92"><img src="https://avatars.githubusercontent.com/u/33158127?v=4?s=100" width="100px;" alt="Dango Mango"/><br /><sub><b>Dango Mango</b></sub></a><br /><a href="https://github.com/pichillilorenzo/flutter_inappwebview/commits?author=darkang3lz92" title="Code">💻</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="https://medium.com/@m-zimmermann1"><img src="https://avatars.githubusercontent.com/u/72440045?v=4?s=100" width="100px;" alt="Max Zimmermann"/><br /><sub><b>Max Zimmermann</b></sub></a><br /><a href="https://github.com/pichillilorenzo/flutter_inappwebview/commits?author=maxmitz" title="Code">💻</a></td>
-    </tr>
-    <tr>
-      <td align="center" valign="top" width="14.28%"><a href="https://www.linkedin.com/in/alexandru-dochioiu/"><img src="https://avatars.githubusercontent.com/u/38853913?v=4?s=100" width="100px;" alt="Alexandru Dochioiu"/><br /><sub><b>Alexandru Dochioiu</b></sub></a><br /><a href="https://github.com/pichillilorenzo/flutter_inappwebview/commits?author=AlexDochioiu" title="Code">💻</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/YumengNevix"><img src="https://avatars.githubusercontent.com/u/137131451?v=4?s=100" width="100px;" alt="YumengNevix"/><br /><sub><b>YumengNevix</b></sub></a><br /><a href="https://github.com/pichillilorenzo/flutter_inappwebview/commits?author=YumengNevix" title="Code">💻</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/lrorpilla"><img src="https://avatars.githubusercontent.com/u/11363922?v=4?s=100" width="100px;" alt="lrorpilla"/><br /><sub><b>lrorpilla</b></sub></a><br /><a href="https://github.com/pichillilorenzo/flutter_inappwebview/commits?author=lrorpilla" title="Code">💻</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/michalsrutek"><img src="https://avatars.githubusercontent.com/u/35694712?v=4?s=100" width="100px;" alt="Michal Šrůtek"/><br /><sub><b>Michal Šrůtek</b></sub></a><br /><a href="https://github.com/pichillilorenzo/flutter_inappwebview/commits?author=michalsrutek" title="Code">💻</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/daisukeueta"><img src="https://avatars.githubusercontent.com/u/122339799?v=4?s=100" width="100px;" alt="daisukeueta"/><br /><sub><b>daisukeueta</b></sub></a><br /><a href="https://github.com/pichillilorenzo/flutter_inappwebview/commits?author=daisukeueta" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://uekoetter.dev/"><img src="https://avatars.githubusercontent.com/u/1270149?v=4?s=100" width="100px;" alt="Jonas Uekötter"/><br /><sub><b>Jonas Uekötter</b></sub></a><br /><a href="https://github.com/pichillilorenzo/flutter_inappwebview/commits?author=ueman" title="Documentation">📖</a> <a href="https://github.com/pichillilorenzo/flutter_inappwebview/commits?author=ueman" title="Code">💻</a></td>
     </tr>
   </tbody>
 </table>

@@ -48,17 +48,16 @@ class MacOSInAppWebViewPlatform extends InAppWebViewPlatform {
     return MacOSInAppWebViewController.static();
   }
 
-  // TODO: unhide when Flutter official PlatformView for macOS is available
-  // /// Creates a new [MacOSInAppWebViewWidget].
-  // ///
-  // /// This function should only be called by the app-facing package.
-  // /// Look at using [InAppWebView] in `flutter_inappwebview` instead.
-  // @override
-  // MacOSInAppWebViewWidget createPlatformInAppWebViewWidget(
-  //   PlatformInAppWebViewWidgetCreationParams params,
-  // ) {
-  //   return MacOSInAppWebViewWidget(params);
-  // }
+  /// Creates a new [MacOSInAppWebViewWidget].
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [InAppWebView] in `flutter_inappwebview` instead.
+  @override
+  MacOSInAppWebViewWidget createPlatformInAppWebViewWidget(
+    PlatformInAppWebViewWidgetCreationParams params,
+  ) {
+    return MacOSInAppWebViewWidget(params);
+  }
 
   /// Creates a new [MacOSFindInteractionController].
   ///

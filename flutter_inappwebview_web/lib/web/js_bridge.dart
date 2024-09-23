@@ -21,9 +21,11 @@ extension type JSWebView._(JSObject _) implements JSObject {
   external void stopLoading();
   external JSString? getUrl();
   external JSString? getTitle();
-  external void injectJavascriptFileFromUrl(JSString urlFile, JSAny? scriptHtmlTagAttributes);
+  external void injectJavascriptFileFromUrl(
+      JSString urlFile, JSAny? scriptHtmlTagAttributes);
   external void injectCSSCode(JSString source);
-  external void injectCSSFileFromUrl(JSString urlFile, JSAny? cssLinkHtmlTagAttributes);
+  external void injectCSSFileFromUrl(
+      JSString urlFile, JSAny? cssLinkHtmlTagAttributes);
   external void scrollTo(JSNumber x, JSNumber y, JSBoolean animated);
   external void scrollBy(JSNumber x, JSNumber y, JSBoolean animated);
   external void printCurrentPage();
@@ -43,8 +45,10 @@ external FlutterInAppWebViewBridge? get flutterInAppWebView;
 
 extension type FlutterInAppWebViewBridge._(JSObject _) implements JSObject {
   external JSObject webViews;
-  external JSWebView createFlutterInAppWebView(JSAny viewId, HTMLIFrameElement iframe, HTMLDivElement iframeContainer);
+  external JSWebView createFlutterInAppWebView(
+      JSAny viewId, HTMLIFrameElement iframe, HTMLDivElement iframeContainer);
   external JSString getCookieExpirationDate(num timestamp);
+
   /// Allows assigning a function to be callable from `window.flutter_inappwebview.nativeCommunication()`
   external JSFunction nativeCommunication;
 }

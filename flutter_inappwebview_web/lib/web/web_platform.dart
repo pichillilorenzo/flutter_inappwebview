@@ -33,9 +33,9 @@ class InAppWebViewFlutterPlugin {
     final platformUtil = PlatformUtil(messenger: registrar);
     // ignore: unused_local_variable
     final headlessManager = HeadlessInAppWebViewManager(messenger: registrar);
-    flutterInAppWebView?.nativeCommunication = (
-      (String method, JSAny viewId, [JSArray? args]) => _dartNativeCommunication(method, viewId, args?.toDart).toJS
-    ).toJS;
+    flutterInAppWebView?.nativeCommunication = ((String method, JSAny viewId,
+            [JSArray? args]) =>
+        _dartNativeCommunication(method, viewId, args?.toDart).toJS).toJS;
   }
 }
 
@@ -73,7 +73,8 @@ Future<JSAny?> _dartNativeCommunication(String method, dynamic viewId,
         String? target = args[2];
         String? windowFeatures = args[3];
         return (await webViewHtmlElement.onCreateWindow(
-            windowId, url, target, windowFeatures))?.toJS;
+                windowId, url, target, windowFeatures))
+            ?.toJS;
       case 'onWindowFocus':
         webViewHtmlElement.onWindowFocus();
         break;

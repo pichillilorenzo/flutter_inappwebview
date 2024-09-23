@@ -64,7 +64,8 @@ class InAppWebViewWebElement implements Disposable {
       }
     });
 
-    jsWebView = flutterInAppWebView?.createFlutterInAppWebView(_viewId, iframe, iframeContainer);
+    jsWebView = flutterInAppWebView?.createFlutterInAppWebView(
+        _viewId, iframe, iframeContainer);
   }
 
   /// Handles method calls over the MethodChannel of this plugin.
@@ -206,7 +207,8 @@ class InAppWebViewWebElement implements Disposable {
           initialData = webView.initialData;
           initialFile = webView.initialFile;
 
-          jsWebView = flutterInAppWebView?.createFlutterInAppWebView(_viewId, iframe, iframeContainer);
+          jsWebView = flutterInAppWebView?.createFlutterInAppWebView(
+              _viewId, iframe, iframeContainer);
         }
       }
     }
@@ -273,8 +275,7 @@ class InAppWebViewWebElement implements Disposable {
   String _convertHttpResponseToData(XMLHttpRequest httpRequest) {
     final String contentType =
         httpRequest.getResponseHeader('content-type') ?? 'text/html';
-    return 'data:$contentType,' +
-        Uri.encodeComponent(httpRequest.responseText);
+    return 'data:$contentType,' + Uri.encodeComponent(httpRequest.responseText);
   }
 
   String getIFrameId() {
@@ -355,7 +356,8 @@ class InAppWebViewWebElement implements Disposable {
   Future<void> injectJavascriptFileFromUrl(
       {required String urlFile,
       Map<String, dynamic>? scriptHtmlTagAttributes}) async {
-    jsWebView?.injectJavascriptFileFromUrl(urlFile.toJS, scriptHtmlTagAttributes?.jsify());
+    jsWebView?.injectJavascriptFileFromUrl(
+        urlFile.toJS, scriptHtmlTagAttributes?.jsify());
   }
 
   Future<void> injectCSSCode({required String source}) async {
@@ -365,7 +367,8 @@ class InAppWebViewWebElement implements Disposable {
   Future<void> injectCSSFileFromUrl(
       {required String urlFile,
       Map<String, dynamic>? cssLinkHtmlTagAttributes}) async {
-    jsWebView?.injectCSSFileFromUrl(urlFile.toJS, cssLinkHtmlTagAttributes?.jsify());
+    jsWebView?.injectCSSFileFromUrl(
+        urlFile.toJS, cssLinkHtmlTagAttributes?.jsify());
   }
 
   Future<void> scrollTo(
@@ -458,7 +461,8 @@ class InAppWebViewWebElement implements Disposable {
       iframe.allowFullscreen = newSettings.iframeAllowFullscreen ?? false;
     }
     if (settings!.iframeReferrerPolicy != newSettings.iframeReferrerPolicy) {
-      iframe.referrerPolicy = newSettings.iframeReferrerPolicy?.toNativeValue() ?? '';
+      iframe.referrerPolicy =
+          newSettings.iframeReferrerPolicy?.toNativeValue() ?? '';
     }
     if (settings!.iframeName != newSettings.iframeName) {
       iframe.name = newSettings.iframeName ?? '';

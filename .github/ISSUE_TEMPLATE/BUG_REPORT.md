@@ -18,20 +18,20 @@ labels: bug
     ❗️❗️❗️ IMPORTANT ❗️❗️❗️
 -->
 
-- [x] I have read the [Get Started - Installation](https://inappwebview.dev/docs/get-started/installation/) section
-- [x] I have read and done the [Get Started - Setup Android](https://inappwebview.dev/docs/get-started/setup-android/) section
-- [x] I have read and done the [Get Started - Setup iOS](https://inappwebview.dev/docs/get-started/setup-ios/) section
+- [x] I have read the [Getting Started](https://inappwebview.dev/docs/intro/) section
 - [x] I have already searched for the same problem
 
 ## Environment
 
-| Technology           | Version       |
-| -------------------- | ------------- |
-| Flutter version      |               |
-| Plugin version       |               |
-| Android version      |               |
-| iOS version          |               |
-| Xcode version        |               |
+| Technology            | Version       |
+|-----------------------| ------------- |
+| Flutter version       |               |
+| Plugin version        |               |
+| Android version       |               |
+| iOS version           |               |
+| macOS version         |               |
+| Xcode version         |               |
+| Google Chrome version |               |
 
 Device information: <!-- Manufacturer and model -->
 

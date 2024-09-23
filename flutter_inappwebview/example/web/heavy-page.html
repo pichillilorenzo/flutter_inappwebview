@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base href="$FLUTTER_BASE_HREF">
+
+  <meta charset="UTF-8">
+  <meta content="IE=Edge" http-equiv="X-UA-Compatible">
+  <meta name="description" content="Demonstrates how to use the flutter_inappwebview plugin.">
+
+  <!-- iOS meta tags & icons -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-title" content="flutter_inappwebview_example">
+  <link rel="apple-touch-icon" href="icons/Icon-192.png">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="favicon.png"/>
+
+  <title>heavy page</title>
+  <link rel="manifest" href="manifest.json">
+</head>
+<body>
+  <h1>Heavy Page</h1>
+  <a href="/page.html">Go to page 1</a>
+  <br>
+  <p id="infotext">Loading image...</p>
+  <img src="https://picsum.photos/5000" alt="Loading failed" onerror="this.src = ''; window.infotext != null ? infotext.remove() : null" onload="window.infotext != null ? infotext.remove() : null">
+</body>
+</html>

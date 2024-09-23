@@ -293,10 +293,6 @@ class WebViewFeature_ {
   static const DOCUMENT_START_SCRIPT =
       const WebViewFeature_._internal("DOCUMENT_START_SCRIPT");
 
-  ///Feature for [isFeatureSupported]. This feature covers [InAppWebViewSettings.willSuppressErrorPage].
-  static const SUPPRESS_ERROR_PAGE =
-      const WebViewFeature_._internal("SUPPRESS_ERROR_PAGE");
-
   ///Feature for [isFeatureSupported]. This feature covers [InAppWebViewSettings.algorithmicDarkeningAllowed].
   static const ALGORITHMIC_DARKENING =
       const WebViewFeature_._internal("ALGORITHMIC_DARKENING");

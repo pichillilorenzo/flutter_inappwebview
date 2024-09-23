@@ -1,7 +1,7 @@
-## Next
-
+## 1.1.0
+ 
 - Migrates package to `package:web`.
-- Updates minimum supported SDK version to Flutter 3.19/Dart 3.3.
+- Updates minimum supported SDK version to Flutter 3.24/Dart 3.5.
 
 ## 1.0.8
 

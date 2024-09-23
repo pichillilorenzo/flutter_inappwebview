@@ -70,7 +70,7 @@ class IOSStorageCreationParams extends PlatformStorageCreationParams {
 }
 
 ///{@macro flutter_inappwebview_platform_interface.PlatformStorage}
-abstract class IOSStorage implements PlatformStorage {
+abstract mixin class IOSStorage implements PlatformStorage {
   @override
   IOSInAppWebViewController? controller;
 

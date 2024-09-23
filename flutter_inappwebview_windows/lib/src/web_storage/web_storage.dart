@@ -70,7 +70,7 @@ class WindowsStorageCreationParams extends PlatformStorageCreationParams {
 }
 
 ///{@macro flutter_inappwebview_platform_interface.PlatformStorage}
-abstract class WindowsStorage implements PlatformStorage {
+abstract mixin class WindowsStorage implements PlatformStorage {
   @override
   WindowsInAppWebViewController? controller;
 

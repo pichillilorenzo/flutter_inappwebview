@@ -69,7 +69,6 @@ public class InAppWebViewFlutterPlugin implements FlutterPlugin, ActivityAware {
   public ActivityPluginBinding activityPluginBinding;
   @Nullable
   public Activity activity;
-  @SuppressWarnings("deprecation")
   public FlutterView flutterView;
 
   public InAppWebViewFlutterPlugin() {}
@@ -86,7 +85,6 @@ public class InAppWebViewFlutterPlugin implements FlutterPlugin, ActivityAware {
             binding.getApplicationContext(), binding.getBinaryMessenger(), this.activity, binding.getPlatformViewRegistry(), null);
   }
 
-  @SuppressWarnings("deprecation")
   private void onAttachedToEngine(Context applicationContext, BinaryMessenger messenger, Activity activity, PlatformViewRegistry platformViewRegistry, FlutterView flutterView) {
     this.applicationContext = applicationContext;
     this.activity = activity;

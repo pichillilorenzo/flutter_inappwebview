@@ -10,6 +10,7 @@
 - Fixed XCode 16 build
 - Removed unsupported WebViewFeature.SUPPRESS_ERROR_PAGE
 - Merged "Add privacy manifest for iOS" [#2029](https://github.com/pichillilorenzo/flutter_inappwebview/pull/2029) (thanks to [ueman](https://github.com/ueman))
+- Merged "Remove references to deprecated v1 Android embedding" [#2176](https://github.com/pichillilorenzo/flutter_inappwebview/pull/2176) (thanks to [gmackall](https://github.com/gmackall))
 
 ## 6.0.0
 

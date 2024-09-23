@@ -3,7 +3,8 @@
 - Added initial Windows support
 - Added `InAppWebView` widget MacOS support
 - Added privacy manifest for MacOS
-- Updates minimum supported SDK version to Flutter 3.24/Dart 3.5.
+- Migrated web support to `package:web`.
+- Updated minimum supported SDK version to Flutter 3.24/Dart 3.5.
 - Updated androidx.webkit:webkit:1.8.0 to androidx.webkit:webkit:1.12.0
 - Updated androidx.browser:browser:1.6.0 to androidx.browser:browser:1.8.0
 - Fixed "[MACOS] launching InAppBrowser with 'hidden: true' calls onExit immediately" [#1939](https://github.com/pichillilorenzo/flutter_inappwebview/issues/1939)

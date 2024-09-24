@@ -700,6 +700,7 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///- Android native WebView
   ///- iOS
   ///- MacOS
+  ///- Windows
   ///{@endtemplate}
   void addJavaScriptHandler(
       {required String handlerName,
@@ -717,6 +718,7 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///- Android native WebView
   ///- iOS
   ///- MacOS
+  ///- Windows
   ///{@endtemplate}
   JavaScriptHandlerCallback? removeJavaScriptHandler(
       {required String handlerName}) {
@@ -731,6 +733,7 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///- Android native WebView
   ///- iOS
   ///- MacOS
+  ///- Windows
   ///{@endtemplate}
   bool hasJavaScriptHandler({required String handlerName}) {
     throw UnimplementedError(

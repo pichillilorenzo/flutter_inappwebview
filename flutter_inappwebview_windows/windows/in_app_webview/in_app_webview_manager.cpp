@@ -70,6 +70,11 @@ namespace flutter_inappwebview_plugin
       }
       result->Success();
     }
+    else if (string_equals(methodName, "disposeKeepAlive")) {
+      auto keepAliveId = get_fl_map_value<std::string>(*arguments, "keepAliveId");
+      disposeKeepAlive(keepAliveId);
+      result->Success();
+    }
     else {
       result->NotImplemented();
     }
@@ -85,6 +90,8 @@ namespace flutter_inappwebview_plugin
     auto initialDataMap = get_optional_fl_map_value<flutter::EncodableMap>(*arguments, "initialData");
     auto initialUserScriptList = get_optional_fl_map_value<flutter::EncodableList>(*arguments, "initialUserScripts");
     auto webViewEnvironmentId = get_optional_fl_map_value<std::string>(*arguments, "webViewEnvironmentId");
+    auto keepAliveId = get_optional_fl_map_value<std::string>(*arguments, "keepAliveId");
+    auto windowId = get_optional_fl_map_value<int64_t>(*arguments, "windowId");
 
     RECT bounds;
     GetClientRect(plugin->registrar->GetView()->GetNativeWindow(), &bounds);
@@ -94,6 +101,20 @@ namespace flutter_inappwebview_plugin
       plugin->registrar->GetView()->GetNativeWindow(),
       nullptr,
       windowClass_.hInstance, nullptr);
+
+    if (keepAliveId.has_value() && map_contains(keepAliveWebViews, keepAliveId.value())) {
+      auto webView = std::move(keepAliveWebViews.at(keepAliveId.value())->view);
+      keepAliveWebViews.erase(keepAliveId.value());
+      auto customPlatformView = std::make_unique<CustomPlatformView>(plugin->registrar->messenger(),
+        plugin->registrar->texture_registrar(),
+        graphics_context(),
+        hwnd,
+        std::move(webView));
+      auto textureId = customPlatformView->texture_id();
+      keepAliveWebViews.insert({ keepAliveId.value(), std::move(customPlatformView) });
+      result_->Success(textureId);
+      return;
+    }
 
     auto webViewEnvironment = webViewEnvironmentId.has_value() && map_contains(plugin->webViewEnvironmentManager->webViewEnvironments, webViewEnvironmentId.value())
       ? plugin->webViewEnvironmentManager->webViewEnvironments.at(webViewEnvironmentId.value()).get() : nullptr;
@@ -115,9 +136,7 @@ namespace flutter_inappwebview_plugin
             initialUserScripts
           };
 
-          auto inAppWebView = std::make_unique<InAppWebView>(plugin, params, hwnd,
-            std::move(webViewEnv), std::move(webViewController), std::move(webViewCompositionController)
-          );
+          auto inAppWebView = std::make_unique<InAppWebView>(plugin, params, hwnd, std::move(webViewEnv), std::move(webViewController), std::move(webViewCompositionController));
 
           std::optional<std::shared_ptr<URLRequest>> urlRequest = urlRequestMap.has_value() ? std::make_shared<URLRequest>(urlRequestMap.value()) : std::optional<std::shared_ptr<URLRequest>>{};
           if (urlRequest.has_value()) {
@@ -130,6 +149,14 @@ namespace flutter_inappwebview_plugin
             inAppWebView->loadData(get_fl_map_value<std::string>(initialDataMap.value(), "data"));
           }
 
+          if (windowId.has_value() && map_contains(windowWebViews, windowId.value())) {
+            auto windowWebViewArgs = windowWebViews.at(windowId.value()).get();
+            windowWebViewArgs->args->put_NewWindow(inAppWebView->webView.get());
+            windowWebViewArgs->args->put_Handled(TRUE);
+            windowWebViewArgs->deferral->Complete();
+            windowWebViews.erase(windowId.value());
+          }
+
           auto customPlatformView = std::make_unique<CustomPlatformView>(plugin->registrar->messenger(),
             plugin->registrar->texture_registrar(),
             graphics_context(),
@@ -138,10 +165,14 @@ namespace flutter_inappwebview_plugin
 
           auto textureId = customPlatformView->texture_id();
 
-          customPlatformView->view->initChannel(textureId, std::nullopt);
-
-          webViews.insert({ textureId, std::move(customPlatformView) });
-
+          if (keepAliveId.has_value()) {
+            customPlatformView->view->initChannel(keepAliveId.value(), std::nullopt);
+            keepAliveWebViews.insert({ keepAliveId.value(), std::move(customPlatformView) });
+          }
+          else {
+            customPlatformView->view->initChannel(textureId, std::nullopt);
+            webViews.insert({ textureId, std::move(customPlatformView) });
+          }
           result_->Success(textureId);
         }
         else {
@@ -149,6 +180,13 @@ namespace flutter_inappwebview_plugin
         }
       }
     );
+  }
+
+  void InAppWebViewManager::disposeKeepAlive(const std::string& keepAliveId)
+  {
+    if (map_contains(keepAliveWebViews, keepAliveId)) {
+      keepAliveWebViews.erase(keepAliveId);
+    }
   }
 
   bool InAppWebViewManager::isGraphicsCaptureSessionSupported()
@@ -184,6 +222,8 @@ namespace flutter_inappwebview_plugin
   {
     debugLog("dealloc InAppWebViewManager");
     webViews.clear();
+    keepAliveWebViews.clear();
+    windowWebViews.clear();
     UnregisterClass(windowClass_.lpszClassName, nullptr);
     plugin = nullptr;
   }

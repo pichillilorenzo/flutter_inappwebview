@@ -7,6 +7,7 @@
 
 #include "../custom_platform_view/util/composition.desktop.interop.h"
 #include "../plugin_scripts_js/javascript_bridge_js.h"
+#include "../types/create_window_action.h"
 #include "../types/web_resource_error.h"
 #include "../types/web_resource_request.h"
 #include "../utils/log.h"
@@ -327,12 +328,38 @@ namespace flutter_inappwebview_plugin
           else {
             callShouldOverrideUrlLoading_ = true;
             channelDelegate->onLoadStart(url);
+            channelDelegate->onProgressChanged(0);
             args->put_Cancel(false);
           }
 
           return S_OK;
         }
-    ).Get(), nullptr));
+      ).Get(), nullptr));
+
+    failedLog(webView->add_ContentLoading(
+      Callback<ICoreWebView2ContentLoadingEventHandler>(
+        [this](ICoreWebView2* sender, ICoreWebView2ContentLoadingEventArgs* args)
+        {
+          if (channelDelegate) {
+            channelDelegate->onProgressChanged(33);
+          }
+          return S_OK;
+        }
+      ).Get(), nullptr));
+
+    wil::com_ptr<ICoreWebView2_2> webView2;
+    if (SUCCEEDED(webView->QueryInterface(IID_PPV_ARGS(&webView2)))) {
+      failedLog(webView2->add_DOMContentLoaded(
+        Callback<ICoreWebView2DOMContentLoadedEventHandler>(
+          [this](ICoreWebView2* sender, ICoreWebView2DOMContentLoadedEventArgs* args)
+          {
+            if (channelDelegate) {
+              channelDelegate->onProgressChanged(66);
+            }
+            return S_OK;
+          }
+        ).Get(), nullptr));
+    }
 
     failedLog(webView->add_NavigationCompleted(
       Callback<ICoreWebView2NavigationCompletedEventHandler>(
@@ -360,6 +387,7 @@ namespace flutter_inappwebview_plugin
           if (channelDelegate) {
             wil::unique_cotaskmem_string uri;
             std::optional<std::string> url = SUCCEEDED(webView->get_Source(&uri)) ? wide_to_utf8(uri.get()) : std::optional<std::string>{};
+            channelDelegate->onProgressChanged(100);
             if (isSuccess) {
               channelDelegate->onLoadStop(url);
             }
@@ -380,7 +408,7 @@ namespace flutter_inappwebview_plugin
 
           return S_OK;
         }
-    ).Get(), nullptr));
+      ).Get(), nullptr));
 
     failedLog(webView->add_DocumentTitleChanged(Callback<ICoreWebView2DocumentTitleChangedEventHandler>(
       [this](ICoreWebView2* sender, IUnknown* args)
@@ -504,6 +532,75 @@ namespace flutter_inappwebview_plugin
           })
         .Get(), nullptr));
     }
+
+    failedLog(webView->add_NewWindowRequested(
+      Callback<ICoreWebView2NewWindowRequestedEventHandler>(
+        [this](ICoreWebView2* sender, ICoreWebView2NewWindowRequestedEventArgs* args)
+        {
+          wil::com_ptr<ICoreWebView2Deferral> deferral;
+          if (channelDelegate && plugin && plugin->inAppWebViewManager && succeededOrLog(args->GetDeferral(&deferral))) {
+            plugin->inAppWebViewManager->windowAutoincrementId++;
+            int64_t windowId = plugin->inAppWebViewManager->windowAutoincrementId;
+            auto newWindowRequestedArgs = std::make_unique<NewWindowRequestedArgs>(args, deferral);
+            plugin->inAppWebViewManager->windowWebViews.insert({ windowId, std::move(newWindowRequestedArgs) });
+
+            wil::unique_cotaskmem_string uri = nullptr;
+            std::optional<std::string> url = SUCCEEDED(args->get_Uri(&uri)) ? wide_to_utf8(uri.get()) : std::optional<std::string>{};
+
+            BOOL hasGesture;
+            if (FAILED(args->get_IsUserInitiated(&hasGesture))) {
+              hasGesture = FALSE;
+            }
+
+            wil::com_ptr<ICoreWebView2WindowFeatures> webviewWindowFeatures;
+            std::optional<std::unique_ptr<WindowFeatures>> windowFeatures;
+            if (SUCCEEDED(args->get_WindowFeatures(&webviewWindowFeatures))) {
+              windowFeatures = std::make_unique<WindowFeatures>(webviewWindowFeatures);
+            }
+
+            auto urlRequest = std::make_shared<URLRequest>(url, "GET", std::nullopt, std::nullopt);
+            auto createWindowAction = std::make_shared<CreateWindowAction>(
+              urlRequest,
+              windowId,
+              true,
+              hasGesture,
+              std::move(windowFeatures));
+
+            auto callback = std::make_unique<WebViewChannelDelegate::CreateWindowCallback>();
+            auto defaultBehaviour = [this, windowId, urlRequest, deferral, args](const std::optional<const bool> handledByClient)
+              {
+                if (plugin && plugin->inAppWebViewManager && map_contains(plugin->inAppWebViewManager->windowWebViews, windowId)) {
+                  plugin->inAppWebViewManager->windowWebViews.erase(windowId);
+                }
+                loadUrl(urlRequest);
+                failedLog(args->put_Handled(TRUE));
+                failedLog(deferral->Complete());
+              };
+            callback->nonNullSuccess = [this, deferral, args](const bool handledByClient)
+              {
+                return !handledByClient;
+              };
+            callback->defaultBehaviour = defaultBehaviour;
+            callback->error = [this, defaultBehaviour](const std::string& error_code, const std::string& error_message, const flutter::EncodableValue* error_details)
+              {
+                debugLog(error_code + ", " + error_message);
+                defaultBehaviour(std::nullopt);
+              };
+            channelDelegate->onCreateWindow(std::move(createWindowAction), std::move(callback));
+          }
+          return S_OK;
+        }
+      ).Get(), nullptr));
+
+    failedLog(webView->add_WindowCloseRequested(Callback<ICoreWebView2WindowCloseRequestedEventHandler>(
+      [this](ICoreWebView2* sender, IUnknown* args)
+      {
+        if (channelDelegate) {
+          channelDelegate->onCloseWindow();
+        }
+        return S_OK;
+      }
+    ).Get(), nullptr));
 
     if (userContentController) {
       userContentController->registerEventHandlers();
@@ -1061,7 +1158,7 @@ namespace flutter_inappwebview_plugin
           }
           return S_OK;
         }
-    ).Get());
+      ).Get());
 
     if (failedAndLog(hr) && completionHandler) {
       completionHandler(hr, std::nullopt);

@@ -5,6 +5,7 @@
 #include <flutter/standard_message_codec.h>
 #include <map>
 #include <string>
+#include <variant>
 #include <wil/com.h>
 #include <winrt/base.h>
 
@@ -13,6 +14,7 @@
 #include "../custom_platform_view/util/rohelper.h"
 #include "../flutter_inappwebview_windows_plugin.h"
 #include "../types/channel_delegate.h"
+#include "../types/new_window_requested_args.h"
 #include "windows.ui.composition.h"
 
 namespace flutter_inappwebview_plugin
@@ -24,6 +26,9 @@ namespace flutter_inappwebview_plugin
 
     const FlutterInappwebviewWindowsPlugin* plugin;
     std::map<uint64_t, std::unique_ptr<CustomPlatformView>> webViews;
+    std::map<std::string, std::unique_ptr<CustomPlatformView>> keepAliveWebViews;
+    std::map<int64_t, std::unique_ptr<NewWindowRequestedArgs>> windowWebViews;
+    int64_t windowAutoincrementId = 0;
 
     bool isSupported() const { return valid_; }
     bool isGraphicsCaptureSessionSupported();
@@ -45,6 +50,7 @@ namespace flutter_inappwebview_plugin
       std::unique_ptr<flutter::MethodResult<flutter::EncodableValue>> result);
 
     void createInAppWebView(const flutter::EncodableMap* arguments, std::unique_ptr<flutter::MethodResult<flutter::EncodableValue>> result);
+    void disposeKeepAlive(const std::string& keepAliveId);
   private:
     std::unique_ptr<rx::RoHelper> rohelper_;
     winrt::com_ptr<ABI::Windows::System::IDispatcherQueueController>

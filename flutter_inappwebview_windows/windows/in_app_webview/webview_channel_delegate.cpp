@@ -38,6 +38,18 @@ namespace flutter_inappwebview_plugin
       };
   }
 
+  WebViewChannelDelegate::CreateWindowCallback::CreateWindowCallback()
+  {
+    decodeResult = [](const flutter::EncodableValue* value)
+      {
+        if (!value || value->IsNull()) {
+          return false;
+        }
+        auto handledByClient = std::get<bool>(*value);
+        return handledByClient;
+      };
+  }
+
   void WebViewChannelDelegate::HandleMethodCall(const flutter::MethodCall<flutter::EncodableValue>& method_call,
     std::unique_ptr<flutter::MethodResult<flutter::EncodableValue>> result)
   {
@@ -351,7 +363,6 @@ namespace flutter_inappwebview_plugin
     channel->InvokeMethod("onConsoleMessage", std::move(arguments));
   }
 
-
   void WebViewChannelDelegate::onDevToolsProtocolEventReceived(const std::string& eventName, const std::string& data) const
   {
     if (!channel) {
@@ -363,6 +374,38 @@ namespace flutter_inappwebview_plugin
       {"data", data}
       });
     channel->InvokeMethod("onDevToolsProtocolEventReceived", std::move(arguments));
+  }
+
+  void WebViewChannelDelegate::onProgressChanged(const int64_t& progress) const
+  {
+    if (!channel) {
+      return;
+    }
+
+    auto arguments = std::make_unique<flutter::EncodableValue>(flutter::EncodableMap{
+      {"progress", progress}
+      });
+    channel->InvokeMethod("onProgressChanged", std::move(arguments));
+  }
+
+  void WebViewChannelDelegate::onCreateWindow(std::shared_ptr<CreateWindowAction> createWindowAction, std::unique_ptr<CreateWindowCallback> callback) const
+  {
+    if (!channel) {
+      return;
+    }
+
+    auto arguments = std::make_unique<flutter::EncodableValue>(createWindowAction->toEncodableMap());
+    channel->InvokeMethod("onCreateWindow", std::move(arguments), std::move(callback));
+  }
+
+  void WebViewChannelDelegate::onCloseWindow() const
+  {
+    if (!channel) {
+      return;
+    }
+
+    auto arguments = std::make_unique<flutter::EncodableValue>();
+    channel->InvokeMethod("onCloseWindow", std::move(arguments));
   }
 
   WebViewChannelDelegate::~WebViewChannelDelegate()

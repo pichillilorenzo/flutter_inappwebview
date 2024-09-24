@@ -1,10 +1,9 @@
 import 'dart:async';
+import 'dart:js_interop';
 import 'package:flutter/services.dart';
 import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_platform_interface.dart';
 
-import 'dart:js' as js;
-
-import 'web_platform_manager.dart';
+import 'js_bridge.dart';
 
 class PlatformUtil extends ChannelController {
   late BinaryMessenger _messenger;
@@ -36,9 +35,7 @@ class PlatformUtil extends ChannelController {
   }
 
   String getWebCookieExpirationDate(int timestamp) {
-    var bridgeJsObject = js.JsObject.fromBrowserObject(
-        js.context[WebPlatformManager.BRIDGE_JS_OBJECT_NAME]);
-    return bridgeJsObject.callMethod("getCookieExpirationDate", [timestamp]);
+    return flutterInAppWebView!.getCookieExpirationDate(timestamp).toDart;
   }
 
   @override

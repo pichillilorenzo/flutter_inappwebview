@@ -80,6 +80,8 @@ void initialUrlRequest() {
           ),
         ),
       );
+      // Platform view creation happens asynchronously.
+      await tester.pump();
 
       await pageLoaded.future;
       final InAppWebViewController controller =

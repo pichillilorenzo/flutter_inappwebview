@@ -2,6 +2,7 @@
 
 - Fixed XCode 16 build
 - Updates minimum supported SDK version to Flutter 3.24/Dart 3.5.
+- Merged "Add privacy manifest for iOS" [#2029](https://github.com/pichillilorenzo/flutter_inappwebview/pull/2029) (thanks to [ueman](https://github.com/ueman))
 
 ## 1.0.13
 

@@ -200,6 +200,7 @@ class PlatformInAppWebViewWidgetCreationParams
 ///- Android native WebView
 ///- iOS
 ///- Web
+///- MacOS
 ///- Windows
 ///{@endtemplate}
 abstract class PlatformInAppWebViewWidget extends PlatformInterface

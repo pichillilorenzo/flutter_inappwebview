@@ -2306,6 +2306,8 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
+  ///- MacOS
+  ///- Windows
   ///{@endtemplate}
   Future<void> disposeKeepAlive(InAppWebViewKeepAlive keepAlive) {
     throw UnimplementedError(

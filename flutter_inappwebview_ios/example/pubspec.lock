@@ -94,10 +94,10 @@ packages:
     dependency: transitive
     description:
       name: flutter_inappwebview_platform_interface
-      sha256: "545fd4c25a07d2775f7d5af05a979b2cac4fbf79393b0a7f5d33ba39ba4f6187"
+      sha256: "491281ff6c15b205f04e4c11df4af23245a5b2cb1aa70113f6f42a1296836559"
       url: "https://pub.dev"
     source: hosted
-    version: "1.0.10"
+    version: "1.1.0"
   flutter_lints:
     dependency: "direct dev"
     description:

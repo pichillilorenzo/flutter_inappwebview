@@ -1,3 +1,8 @@
+## 1.1.0+1
+
+- Downgraded androidx.appcompat:appcompat:1.7.0 to androidx.appcompat:appcompat:1.6.1
+- Added `-dontwarn android.window.BackEvent` proguard rule
+
 ## 1.1.0
 
 - Updated androidx.webkit:webkit:1.8.0 to androidx.webkit:webkit:1.12.0

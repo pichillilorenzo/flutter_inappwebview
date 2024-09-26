@@ -4,6 +4,8 @@ version: 1.1.0
 homepage: https://inappwebview.dev/
 repository: https://github.com/pichillilorenzo/flutter_inappwebview/tree/master/flutter_inappwebview_platform_interface
 issue_tracker: https://github.com/pichillilorenzo/flutter_inappwebview/issues
+funding:
+  - https://inappwebview.dev/donate/
 topics:
   - html
   - webview

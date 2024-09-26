@@ -326,6 +326,7 @@ abstract class PlatformInAppBrowser extends PlatformInterface
   ///**Officially Supported Platforms/Implementations**:
   ///- Android
   ///- iOS 14.0+
+  ///- macOS 10.15+
   ///{@endtemplate}
   void addMenuItem(InAppBrowserMenuItem menuItem) {
     throw UnimplementedError(
@@ -340,6 +341,7 @@ abstract class PlatformInAppBrowser extends PlatformInterface
   ///**Officially Supported Platforms/Implementations**:
   ///- Android
   ///- iOS 14.0+
+  ///- macOS 10.15+
   ///{@endtemplate}
   void addMenuItems(List<InAppBrowserMenuItem> menuItems) {
     throw UnimplementedError(
@@ -355,6 +357,7 @@ abstract class PlatformInAppBrowser extends PlatformInterface
   ///**Officially Supported Platforms/Implementations**:
   ///- Android
   ///- iOS 14.0+
+  ///- macOS 10.15+
   ///{@endtemplate}
   bool removeMenuItem(InAppBrowserMenuItem menuItem) {
     throw UnimplementedError(
@@ -369,6 +372,7 @@ abstract class PlatformInAppBrowser extends PlatformInterface
   ///**Officially Supported Platforms/Implementations**:
   ///- Android
   ///- iOS 14.0+
+  ///- macOS 10.15+
   ///{@endtemplate}
   void removeMenuItems(List<InAppBrowserMenuItem> menuItems) {
     throw UnimplementedError(
@@ -383,6 +387,7 @@ abstract class PlatformInAppBrowser extends PlatformInterface
   ///**Officially Supported Platforms/Implementations**:
   ///- Android
   ///- iOS 14.0+
+  ///- macOS 10.15+
   ///{@endtemplate}
   void removeAllMenuItem() {
     throw UnimplementedError(
@@ -395,6 +400,7 @@ abstract class PlatformInAppBrowser extends PlatformInterface
   ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS 14.0+
+  ///- macOS 10.15+
   ///{@endtemplate}
   bool hasMenuItem(InAppBrowserMenuItem menuItem) {
     throw UnimplementedError(

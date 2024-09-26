@@ -23,8 +23,11 @@ class NavigationAction {
   ///
   ///**NOTE for Android native WebView**: On Android < 21, this is always `false`
   ///
+  ///**NOTE for Windows**: Available only if the request is associated to the [PlatformWebViewCreationParams.onCreateWindow] event
+  ///
   ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView 21+ ([Official API - WebResourceRequest.hasGesture](https://developer.android.com/reference/android/webkit/WebResourceRequest#hasGesture()))
+  ///- Windows
   bool? hasGesture;
 
   ///Use [sourceFrame] instead.
@@ -41,7 +44,7 @@ class NavigationAction {
 
   ///Indicates whether the request was made for the main frame.
   ///
-  ///**NOTE for Android**: If the request is associated to the [PlatformWebViewCreationParams.onCreateWindow] event, this is always `true`.
+  ///**NOTE for Android and Windows**: If the request is associated to the [PlatformWebViewCreationParams.onCreateWindow] event, this is always `true`.
   ///Also, on Android < 21, this is always `true`.
   bool isForMainFrame;
 

@@ -5,7 +5,7 @@
 cmake_minimum_required(VERSION 3.14)
 
 set(WIL_VERSION "1.0.231216.1")
-set(WEBVIEW_VERSION "1.0.2210.55")
+set(WEBVIEW_VERSION "1.0.2792.45")
 set(NLOHMANN_JSON "3.11.2")
 
 message(VERBOSE "CMake system version is ${CMAKE_SYSTEM_VERSION} (using SDK ${CMAKE_VS_WINDOWS_TARGET_PLATFORM_VERSION})")

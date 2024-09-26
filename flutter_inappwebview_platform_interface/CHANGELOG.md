@@ -1,3 +1,7 @@
+## ## 1.1.0+1
+
+- Updated docs and pubspec.yaml
+
 ## 1.1.0
 
 - Added `PlatformWebViewEnvironment` class

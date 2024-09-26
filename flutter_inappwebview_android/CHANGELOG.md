@@ -1,3 +1,11 @@
+## ## 1.1.0+3
+
+- Fixed compilation error
+
+## ## 1.1.0+2
+
+- Updated pubspec.yaml
+
 ## 1.1.0+1
 
 - Downgraded androidx.appcompat:appcompat:1.7.0 to androidx.appcompat:appcompat:1.6.1

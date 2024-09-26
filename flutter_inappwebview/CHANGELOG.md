@@ -1,3 +1,9 @@
+## 6.1.1
+
+- Updated README
+- Updated pubspec.yaml
+- Updated minimum platform implementation versions
+
 ## 6.1.0+1
 
 - Updated README

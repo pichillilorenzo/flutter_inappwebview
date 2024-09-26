@@ -1,3 +1,7 @@
+## ## 1.1.0+1
+
+- Updated pubspec.yaml
+
 ## 1.1.0
  
 - Migrates package to `package:web`.

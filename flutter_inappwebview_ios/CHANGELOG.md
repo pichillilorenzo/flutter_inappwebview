@@ -1,3 +1,7 @@
+## ## 1.1.0+2
+
+- Updated pubspec.yaml
+
 ## 1.1.0+1 
 
 - Fixed "v6.1.0 fails to compile on Xcode 15" [#2288](https://github.com/pichillilorenzo/flutter_inappwebview/issues/2288)

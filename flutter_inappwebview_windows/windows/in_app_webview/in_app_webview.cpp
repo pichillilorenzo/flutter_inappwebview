@@ -882,7 +882,8 @@ namespace flutter_inappwebview_plugin
       [=](const int& contextId)
       {
         nlohmann::json parameters = {
-          {"expression", source}
+          {"expression", source},
+          { "returnByValue", true }
         };
 
         if (contextId >= 0) {
@@ -1036,9 +1037,7 @@ namespace flutter_inappwebview_plugin
       return;
     }
 
-    nlohmann::json parameters = {
-      {"captureBeyondViewport", true}
-    };
+    nlohmann::json parameters = {};
     if (screenshotConfiguration.has_value()) {
       auto& scp = screenshotConfiguration.value();
       parameters["format"] = to_lowercase_copy(CompressFormatToString(scp->compressFormat));

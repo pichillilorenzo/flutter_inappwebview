@@ -1,3 +1,9 @@
+## 0.2.0+1
+
+- Fixed `InAppWebViewController.evaluateJavascript` not working with JSON objects
+- Fixed `InAppWebViewManager::METHOD_CHANNEL_NAME` c++ value
+- Fixed `InAppWebViewController.takeScreenshot` to behave consistently with the other platforms
+
 ## 0.2.0
 
 - Added support for keeping alive InAppWebView widgets

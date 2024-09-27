@@ -1180,6 +1180,7 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///- Android native WebView ([Official API - WebView.getCertificate](https://developer.android.com/reference/android/webkit/WebView#getCertificate()))
   ///- iOS
   ///- MacOS
+  ///- Windows
   ///{@endtemplate}
   Future<SslCertificate?> getCertificate() {
     throw UnimplementedError(
@@ -1705,6 +1706,7 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebView.onPause](https://developer.android.com/reference/android/webkit/WebView#onPause()))
+  ///- Windows ([Official API - ICoreWebView2_3.TrySuspend](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2_3?view=webview2-1.0.2792.45#trysuspend)
   ///{@endtemplate}
   Future<void> pause() {
     throw UnimplementedError(
@@ -1716,6 +1718,7 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebView.onResume](https://developer.android.com/reference/android/webkit/WebView#onResume()))
+  ///- Windows ([Official API - ICoreWebView2_3.Resume](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2_3?view=webview2-1.0.2792.45#resume)
   ///{@endtemplate}
   Future<void> resume() {
     throw UnimplementedError(

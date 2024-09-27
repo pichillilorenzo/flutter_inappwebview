@@ -2346,6 +2346,9 @@ class WindowsInAppWebViewController extends PlatformInAppWebViewController
     Map<String, dynamic>? sslCertificateMap =
         (await channel?.invokeMethod('getCertificate', args))
             ?.cast<String, dynamic>();
+    if (sslCertificateMap != null && sslCertificateMap['x509Certificate'] != null) {
+      sslCertificateMap['x509Certificate'] = base64Decode(sslCertificateMap['x509Certificate']);
+    }
     return SslCertificate.fromMap(sslCertificateMap);
   }
 
@@ -2684,6 +2687,18 @@ class WindowsInAppWebViewController extends PlatformInAppWebViewController
     args.putIfAbsent('eventName', () => eventName);
     await channel?.invokeMethod('removeDevToolsProtocolEventListener', args);
     this._devToolsProtocolEventListenerMap.remove(eventName);
+  }
+
+  @override
+  Future<void> pause() async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    await channel?.invokeMethod('pause', args);
+  }
+
+  @override
+  Future<void> resume() async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    await channel?.invokeMethod('resume', args);
   }
 
   @override

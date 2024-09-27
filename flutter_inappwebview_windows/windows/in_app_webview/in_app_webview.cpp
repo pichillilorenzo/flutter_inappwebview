@@ -180,6 +180,15 @@ namespace flutter_inappwebview_plugin
       }
     ).Get()));
 
+    // required to use Network domain
+    failedLog(webView->CallDevToolsProtocolMethod(L"Network.enable", L"{}", Callback<ICoreWebView2CallDevToolsProtocolMethodCompletedHandler>(
+      [this](HRESULT errorCode, LPCWSTR returnObjectAsJson)
+      {
+        failedLog(errorCode);
+        return S_OK;
+      }
+    ).Get()));
+
     failedLog(webView->CallDevToolsProtocolMethod(L"Page.getFrameTree", L"{}", Callback<ICoreWebView2CallDevToolsProtocolMethodCompletedHandler>(
       [this](HRESULT errorCode, LPCWSTR returnObjectAsJson)
       {
@@ -347,20 +356,6 @@ namespace flutter_inappwebview_plugin
         }
       ).Get(), nullptr));
 
-    wil::com_ptr<ICoreWebView2_2> webView2;
-    if (SUCCEEDED(webView->QueryInterface(IID_PPV_ARGS(&webView2)))) {
-      failedLog(webView2->add_DOMContentLoaded(
-        Callback<ICoreWebView2DOMContentLoadedEventHandler>(
-          [this](ICoreWebView2* sender, ICoreWebView2DOMContentLoadedEventArgs* args)
-          {
-            if (channelDelegate) {
-              channelDelegate->onProgressChanged(66);
-            }
-            return S_OK;
-          }
-        ).Get(), nullptr));
-    }
-
     failedLog(webView->add_NavigationCompleted(
       Callback<ICoreWebView2NavigationCompletedEventHandler>(
         [this](ICoreWebView2* sender, ICoreWebView2NavigationCompletedEventArgs* args)
@@ -387,6 +382,7 @@ namespace flutter_inappwebview_plugin
           if (channelDelegate) {
             wil::unique_cotaskmem_string uri;
             std::optional<std::string> url = SUCCEEDED(webView->get_Source(&uri)) ? wide_to_utf8(uri.get()) : std::optional<std::string>{};
+
             channelDelegate->onProgressChanged(100);
             if (isSuccess) {
               channelDelegate->onLoadStop(url);
@@ -601,6 +597,88 @@ namespace flutter_inappwebview_plugin
         return S_OK;
       }
     ).Get(), nullptr));
+
+    failedLog(webView->add_PermissionRequested(Callback<ICoreWebView2PermissionRequestedEventHandler>(
+      [this](ICoreWebView2* sender, ICoreWebView2PermissionRequestedEventArgs* args)
+      {
+        wil::com_ptr<ICoreWebView2Deferral> deferral;
+        if (channelDelegate && succeededOrLog(args->GetDeferral(&deferral))) {
+          wil::unique_cotaskmem_string uri;
+          std::string url = SUCCEEDED(args->get_Uri(&uri)) ? wide_to_utf8(uri.get()) : "";
+
+          COREWEBVIEW2_PERMISSION_KIND resource = COREWEBVIEW2_PERMISSION_KIND_UNKNOWN_PERMISSION;
+          failedAndLog(args->get_PermissionKind(&resource));
+
+          auto callback = std::make_unique<WebViewChannelDelegate::PermissionRequestCallback>();
+          auto defaultBehaviour = [this, deferral, args](const std::optional<const std::shared_ptr<PermissionResponse>> permissionResponse)
+            {
+              failedLog(args->put_State(COREWEBVIEW2_PERMISSION_STATE_DENY));
+              failedLog(deferral->Complete());
+            };
+          callback->nonNullSuccess = [this, deferral, args](const std::shared_ptr<PermissionResponse> permissionResponse)
+            {
+              auto action = permissionResponse->action;
+              if (action.has_value()) {
+                switch (action.value()) {
+                case PermissionResponseActionType::grant:
+                  failedLog(args->put_State(COREWEBVIEW2_PERMISSION_STATE_ALLOW));
+                  break;
+                case PermissionResponseActionType::prompt:
+                  failedLog(args->put_State(COREWEBVIEW2_PERMISSION_STATE_DEFAULT));
+                  break;
+                default:
+                  failedLog(args->put_State(COREWEBVIEW2_PERMISSION_STATE_DENY));
+                  break;
+                }
+                failedLog(deferral->Complete());
+                return false;
+              }
+              return true;
+            };
+          callback->defaultBehaviour = defaultBehaviour;
+          callback->error = [this, defaultBehaviour](const std::string& error_code, const std::string& error_message, const flutter::EncodableValue* error_details)
+            {
+              debugLog(error_code + ", " + error_message);
+              defaultBehaviour(std::nullopt);
+            };
+          channelDelegate->onPermissionRequest(url, { resource }, std::move(callback));
+        }
+        return S_OK;
+      }
+    ).Get(), nullptr));
+
+    wil::com_ptr<ICoreWebView2_2> webView2;
+    if (SUCCEEDED(webView->QueryInterface(IID_PPV_ARGS(&webView2)))) {
+      failedLog(webView2->add_DOMContentLoaded(
+        Callback<ICoreWebView2DOMContentLoadedEventHandler>(
+          [this](ICoreWebView2* sender, ICoreWebView2DOMContentLoadedEventArgs* args)
+          {
+            if (channelDelegate) {
+              channelDelegate->onProgressChanged(66);
+            }
+            return S_OK;
+          }
+        ).Get(), nullptr));
+    }
+
+    /*
+    wil::com_ptr<ICoreWebView2_14> webView14;
+    if (SUCCEEDED(webView->QueryInterface(IID_PPV_ARGS(&webView14)))) {
+      failedLog(webView14->add_ServerCertificateErrorDetected(
+        Callback<ICoreWebView2ServerCertificateErrorDetectedEventHandler>(
+          [this](ICoreWebView2* sender, ICoreWebView2ServerCertificateErrorDetectedEventArgs* args)
+          {
+            debugLog("add_ServerCertificateErrorDetected");
+            wil::com_ptr<ICoreWebView2Certificate> certificate = nullptr;
+            if (SUCCEEDED(args->get_ServerCertificate(&certificate))) {
+              wil::unique_cotaskmem_string displayName = nullptr;
+              std::optional<std::string> url = SUCCEEDED(certificate->get_DisplayName(&displayName)) ? wide_to_utf8(displayName.get()) : std::optional<std::string>{};
+              debugLog(displayName.get());
+            }
+            return S_OK;
+          }
+        ).Get(), nullptr));
+    }*/
 
     if (userContentController) {
       userContentController->registerEventHandlers();
@@ -1203,6 +1281,70 @@ namespace flutter_inappwebview_plugin
       auto token = devToolsProtocolEventListener_.at(eventName).second;
       eventReceiver->remove_DevToolsProtocolEventReceived(token);
       devToolsProtocolEventListener_.erase(eventName);
+    }
+  }
+
+
+  void InAppWebView::pause() const
+  {
+    wil::com_ptr<ICoreWebView2_3> webView3;
+    if (SUCCEEDED(webView->QueryInterface(IID_PPV_ARGS(&webView3))) && succeededOrLog(webViewController->put_IsVisible(false))) {
+      failedLog(webView3->TrySuspend(Callback<ICoreWebView2TrySuspendCompletedHandler>(
+        [this](HRESULT errorCode, BOOL isSuccessful) -> HRESULT
+        {
+          failedLog(errorCode);
+          return S_OK;
+        })
+        .Get()));
+    }
+  }
+
+  void InAppWebView::resume() const
+  {
+    wil::com_ptr<ICoreWebView2_3> webView3;
+    if (SUCCEEDED(webView->QueryInterface(IID_PPV_ARGS(&webView3))) && succeededOrLog(webViewController->put_IsVisible(true))) {
+      failedLog(webView3->Resume());
+    }
+  }
+
+
+  void InAppWebView::getCertificate(const std::function<void(const std::optional<std::unique_ptr<SslCertificate>>)> completionHandler) const
+  {
+    auto url = getUrl();
+    if (!webView || !url.has_value()) {
+      if (completionHandler) {
+        completionHandler(std::nullopt);
+      }
+      return;
+    }
+
+    debugLog("Network.getCertificate");
+
+    nlohmann::json parameters = {
+      {"origin", url.value()}
+    };
+
+    auto hr = webView->CallDevToolsProtocolMethod(L"Network.getCertificate", utf8_to_wide(parameters.dump()).c_str(), Callback<ICoreWebView2CallDevToolsProtocolMethodCompletedHandler>(
+      [this, completionHandler](HRESULT errorCode, LPCWSTR returnObjectAsJson)
+      {
+        std::optional<std::unique_ptr<SslCertificate>> result = std::nullopt;
+        if (succeededOrLog(errorCode)) {
+          nlohmann::json json = nlohmann::json::parse(wide_to_utf8(returnObjectAsJson));
+          if (json.at("tableNames").is_array()) {
+            auto tableNames = json.at("tableNames").get<std::vector<std::string>>();
+            if (tableNames.size() > 0) {
+              result = std::make_unique<SslCertificate>(tableNames.at(0));
+            }
+          }
+        }
+        if (completionHandler) {
+          completionHandler(std::move(result));
+        }
+        return S_OK;
+      }
+    ).Get());
+    if (failedAndLog(hr) && completionHandler) {
+      completionHandler(std::nullopt);
     }
   }
 

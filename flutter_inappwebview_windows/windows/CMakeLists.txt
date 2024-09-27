@@ -24,7 +24,7 @@ set(PLUGIN_NAME "flutter_inappwebview_windows_plugin")
 
 find_program(NUGET nuget)
 if(NOT NUGET)
-  message(NOTICE "Nuget is not installed.")
+  message(NOTICE "Nuget is not installed! The flutter_inappwebview_windows plugin requires it. Check https://inappwebview.dev/docs/intro#setup-windows")
 endif()
 
 add_custom_target(${PROJECT_NAME}_DEPENDENCIES_DOWNLOAD ALL)
@@ -83,6 +83,10 @@ list(APPEND PLUGIN_SOURCES
   "types/new_window_requested_args.h"
   "types/window_features.cpp"
   "types/window_features.h"
+  "types/ssl_certificate.cpp"
+  "types/ssl_certificate.h"
+  "types/permission_response.cpp"
+  "types/permission_response.h"
   "custom_platform_view/custom_platform_view.cc"
   "custom_platform_view/custom_platform_view.h"
   "custom_platform_view/texture_bridge.cc"

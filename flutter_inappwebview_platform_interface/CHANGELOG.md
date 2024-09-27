@@ -1,4 +1,8 @@
-## ## 1.1.0+1
+## 1.1.1
+
+- Updated permission models for Windows platform
+
+## 1.1.0+1
 
 - Updated docs and pubspec.yaml
 

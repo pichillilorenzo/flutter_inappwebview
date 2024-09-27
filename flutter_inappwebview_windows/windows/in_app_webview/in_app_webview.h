@@ -13,6 +13,7 @@
 #include "../types/content_world.h"
 #include "../types/navigation_action.h"
 #include "../types/screenshot_configuration.h"
+#include "../types/ssl_certificate.h"
 #include "../types/url_request.h"
 #include "../types/web_history.h"
 #include "../webview_environment/webview_environment.h"
@@ -170,6 +171,9 @@ namespace flutter_inappwebview_plugin
     void callDevToolsProtocolMethod(const std::string& methodName, const std::optional<std::string>& parametersAsJson, const std::function<void(const HRESULT& errorCode, const std::optional<std::string>&)> completionHandler) const;
     void addDevToolsProtocolEventListener(const std::string& eventName);
     void removeDevToolsProtocolEventListener(const std::string& eventName);
+    void pause() const;
+    void resume() const;
+    void getCertificate(const std::function<void(const std::optional<std::unique_ptr<SslCertificate>>)> completionHandler) const;
 
     std::string pageFrameId() const
     {

@@ -50,6 +50,14 @@ namespace flutter_inappwebview_plugin
       };
   }
 
+  WebViewChannelDelegate::PermissionRequestCallback::PermissionRequestCallback()
+  {
+    decodeResult = [](const flutter::EncodableValue* value)
+      {
+        return std::make_shared<PermissionResponse>(std::get<flutter::EncodableMap>(*value));
+      };
+  }
+
   void WebViewChannelDelegate::HandleMethodCall(const flutter::MethodCall<flutter::EncodableValue>& method_call,
     std::unique_ptr<flutter::MethodResult<flutter::EncodableValue>> result)
   {
@@ -230,6 +238,21 @@ namespace flutter_inappwebview_plugin
       webView->removeDevToolsProtocolEventListener(eventName);
       result->Success(true);
     }
+    else if (string_equals(methodName, "pause")) {
+      webView->pause();
+      result->Success(true);
+    }
+    else if (string_equals(methodName, "resume")) {
+      webView->resume();
+      result->Success(true);
+    }
+    else if (string_equals(methodName, "getCertificate")) {
+      auto result_ = std::shared_ptr<flutter::MethodResult<flutter::EncodableValue>>(std::move(result));
+      webView->getCertificate([result_ = std::move(result_)](const std::optional<std::unique_ptr<SslCertificate>> data)
+        {
+          result_->Success(data.has_value() ? data.value()->toEncodableMap() : make_fl_value());
+        });
+    }
     // for inAppBrowser
     else if (webView->inAppBrowser && string_equals(methodName, "show")) {
       webView->inAppBrowser->show();
@@ -275,6 +298,7 @@ namespace flutter_inappwebview_plugin
   void WebViewChannelDelegate::shouldOverrideUrlLoading(std::shared_ptr<NavigationAction> navigationAction, std::unique_ptr<ShouldOverrideUrlLoadingCallback> callback) const
   {
     if (!channel) {
+      callback->defaultBehaviour(std::nullopt);
       return;
     }
 
@@ -340,6 +364,7 @@ namespace flutter_inappwebview_plugin
   void WebViewChannelDelegate::onCallJsHandler(const std::string& handlerName, const std::string& args, std::unique_ptr<CallJsHandlerCallback> callback) const
   {
     if (!channel) {
+      callback->defaultBehaviour(std::nullopt);
       return;
     }
 
@@ -391,6 +416,7 @@ namespace flutter_inappwebview_plugin
   void WebViewChannelDelegate::onCreateWindow(std::shared_ptr<CreateWindowAction> createWindowAction, std::unique_ptr<CreateWindowCallback> callback) const
   {
     if (!channel) {
+      callback->defaultBehaviour(std::nullopt);
       return;
     }
 
@@ -406,6 +432,20 @@ namespace flutter_inappwebview_plugin
 
     auto arguments = std::make_unique<flutter::EncodableValue>();
     channel->InvokeMethod("onCloseWindow", std::move(arguments));
+  }
+
+  void WebViewChannelDelegate::onPermissionRequest(const std::string& origin, const std::vector<int64_t>& resources, std::unique_ptr<PermissionRequestCallback> callback) const
+  {
+    if (!channel) {
+      callback->defaultBehaviour(std::nullopt);
+      return;
+    }
+
+    auto arguments = std::make_unique<flutter::EncodableValue>(flutter::EncodableMap{
+      {"origin", origin},
+      {"resources", make_fl_value(resources)}
+      });
+    channel->InvokeMethod("onPermissionRequest", std::move(arguments), std::move(callback));
   }
 
   WebViewChannelDelegate::~WebViewChannelDelegate()

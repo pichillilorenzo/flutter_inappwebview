@@ -687,6 +687,7 @@ class PlatformWebViewCreationParams<T> {
   ///- Android native WebView ([Official API - WebChromeClient.onPermissionRequest](https://developer.android.com/reference/android/webkit/WebChromeClient#onPermissionRequest(android.webkit.PermissionRequest)))
   ///- iOS
   ///- MacOS
+  ///- Windows
   ///{@endtemplate}
   final Future<PermissionResponse?> Function(
       T controller, PermissionRequest permissionRequest)? onPermissionRequest;

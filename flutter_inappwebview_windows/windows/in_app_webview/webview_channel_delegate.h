@@ -8,6 +8,7 @@
 #include "../types/channel_delegate.h"
 #include "../types/create_window_action.h"
 #include "../types/navigation_action.h"
+#include "../types/permission_response.h"
 #include "../types/web_resource_error.h"
 #include "../types/web_resource_request.h"
 #include "../types/web_resource_response.h"
@@ -41,6 +42,12 @@ namespace flutter_inappwebview_plugin
       ~CreateWindowCallback() = default;
     };
 
+    class PermissionRequestCallback : public BaseCallbackResult<const std::shared_ptr<PermissionResponse>> {
+    public:
+      PermissionRequestCallback();
+      ~PermissionRequestCallback() = default;
+    };
+
     WebViewChannelDelegate(InAppWebView* webView, flutter::BinaryMessenger* messenger);
     WebViewChannelDelegate(InAppWebView* webView, flutter::BinaryMessenger* messenger, const std::string& name);
     ~WebViewChannelDelegate();
@@ -62,6 +69,7 @@ namespace flutter_inappwebview_plugin
     void onDevToolsProtocolEventReceived(const std::string& eventName, const std::string& data) const;
     void onCreateWindow(std::shared_ptr<CreateWindowAction> createWindowAction, std::unique_ptr<CreateWindowCallback> callback) const;
     void onCloseWindow() const;
+    void onPermissionRequest(const std::string& origin, const std::vector<int64_t>& resources, std::unique_ptr<PermissionRequestCallback> callback) const;
   };
 }
 

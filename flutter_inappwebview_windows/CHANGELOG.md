@@ -1,3 +1,8 @@
+## 0.3.0
+
+- Implemented `pause`, `resume`, `getCertificate` methods for `InAppWebViewController`
+- Implemented `onPermissionRequest` WebView event
+
 ## 0.2.0+1
 
 - Fixed `InAppWebViewController.evaluateJavascript` not working with JSON objects

@@ -39,8 +39,8 @@ class NavigationAction_ {
             "https://developer.android.com/reference/android/webkit/WebResourceRequest#hasGesture()",
         note: "On Android < 21, this is always `false`"),
     WindowsPlatform(
-        note: "Available only if the request is associated to the [PlatformWebViewCreationParams.onCreateWindow] event"
-    )
+        note:
+            "Available only if the request is associated to the [PlatformWebViewCreationParams.onCreateWindow] event")
   ])
   bool? hasGesture;
 

@@ -1,3 +1,15 @@
+## 6.1.2
+
+- Updated minimum platform implementation versions
+
+#### Windows Platform
+
+- Implemented `pause`, `resume`, `getCertificate` methods for `InAppWebViewController`
+- Implemented `onPermissionRequest` WebView event
+- Fixed `InAppWebViewController.evaluateJavascript` not working with JSON objects
+- Fixed `InAppWebViewManager::METHOD_CHANNEL_NAME` c++ value
+- Fixed `InAppWebViewController.takeScreenshot` to behave consistently with the other platforms
+
 ## 6.1.1
 
 - Updated README

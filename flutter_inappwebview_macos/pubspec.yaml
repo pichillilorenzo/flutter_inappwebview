@@ -1,6 +1,6 @@
 name: flutter_inappwebview_macos
 description: macOS implementation of the flutter_inappwebview plugin.
-version: 1.1.0+2
+version: 1.1.0+3
 homepage: https://inappwebview.dev/
 repository: https://github.com/pichillilorenzo/flutter_inappwebview/tree/master/flutter_inappwebview_macos
 issue_tracker: https://github.com/pichillilorenzo/flutter_inappwebview/issues
@@ -20,7 +20,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  flutter_inappwebview_platform_interface: ^1.1.0
+  flutter_inappwebview_platform_interface: ^1.1.1
 
 dev_dependencies:
   flutter_test:

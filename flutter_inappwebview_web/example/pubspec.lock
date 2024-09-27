@@ -87,17 +87,17 @@ packages:
     dependency: transitive
     description:
       name: flutter_inappwebview_platform_interface
-      sha256: "491281ff6c15b205f04e4c11df4af23245a5b2cb1aa70113f6f42a1296836559"
+      sha256: da6c7bf193beba655bdfcd825b6c7f7b51da4944e1eb76bf9faddf685ca15fa2
       url: "https://pub.dev"
     source: hosted
-    version: "1.1.0"
+    version: "1.1.1"
   flutter_inappwebview_web:
     dependency: "direct main"
     description:
       path: ".."
       relative: true
     source: path
-    version: "1.1.0"
+    version: "1.1.0+2"
   flutter_lints:
     dependency: "direct dev"
     description:
@@ -295,10 +295,10 @@ packages:
     dependency: transitive
     description:
       name: web
-      sha256: d43c1d6b787bf0afad444700ae7f4db8827f701bc61c255ac8d328c6f4d52062
+      sha256: cd3543bd5798f6ad290ea73d210f423502e71900302dde696f8bff84bf89a1cb
       url: "https://pub.dev"
     source: hosted
-    version: "1.0.0"
+    version: "1.1.0"
   webdriver:
     dependency: transitive
     description:

@@ -1318,8 +1318,6 @@ namespace flutter_inappwebview_plugin
       return;
     }
 
-    debugLog("Network.getCertificate");
-
     nlohmann::json parameters = {
       {"origin", url.value()}
     };

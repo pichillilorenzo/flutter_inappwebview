@@ -1,3 +1,7 @@
+## 0.3.0+1
+
+- Removed unwanted debug log
+
 ## 0.3.0
 
 - Implemented `pause`, `resume`, `getCertificate` methods for `InAppWebViewController`

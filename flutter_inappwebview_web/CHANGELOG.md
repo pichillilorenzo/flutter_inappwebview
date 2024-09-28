@@ -1,4 +1,8 @@
-## ## 1.1.0+1
+## 1.1.0+2
+
+- Updated flutter_inappwebview_platform_interface version
+
+## 1.1.0+1
 
 - Updated pubspec.yaml
 

@@ -40,7 +40,7 @@ class CreateWindowAction_ extends NavigationAction_ {
     WindowsPlatform(
         apiName: "ICoreWebView2WindowFeatures",
         apiUrl:
-        "https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2windowfeatures?view=webview2-1.0.2210.55")
+            "https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2windowfeatures?view=webview2-1.0.2210.55")
   ])
   WindowFeatures_? windowFeatures;
 

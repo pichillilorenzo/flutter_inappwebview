@@ -34,7 +34,7 @@ class PermissionResourceType_ {
     EnumWindowsPlatform(
         apiName: 'COREWEBVIEW2_PERMISSION_KIND_MICROPHONE',
         apiUrl:
-        'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2792.45#corewebview2_permission_kind',
+            'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2792.45#corewebview2_permission_kind',
         value: 1)
   ])
   static const MICROPHONE = PermissionResourceType_._internal('MICROPHONE');
@@ -51,7 +51,7 @@ class PermissionResourceType_ {
     EnumWindowsPlatform(
         apiName: 'COREWEBVIEW2_PERMISSION_KIND_MIDI_SYSTEM_EXCLUSIVE_MESSAGES',
         apiUrl:
-        'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2792.45#corewebview2_permission_kind',
+            'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2792.45#corewebview2_permission_kind',
         value: 11)
   ])
   static const MIDI_SYSEX = PermissionResourceType_._internal('MIDI_SYSEX');
@@ -89,7 +89,7 @@ class PermissionResourceType_ {
     EnumWindowsPlatform(
         apiName: 'COREWEBVIEW2_PERMISSION_KIND_CAMERA',
         apiUrl:
-        'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2792.45#corewebview2_permission_kind',
+            'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2792.45#corewebview2_permission_kind',
         value: 2)
   ])
   static const CAMERA = PermissionResourceType_._internal('CAMERA');
@@ -125,7 +125,7 @@ class PermissionResourceType_ {
     EnumWindowsPlatform(
         apiName: 'COREWEBVIEW2_PERMISSION_KIND_UNKNOWN_PERMISSION',
         apiUrl:
-        'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2792.45#corewebview2_permission_kind',
+            'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2792.45#corewebview2_permission_kind',
         value: 0)
   ])
   static const UNKNOWN = PermissionResourceType_._internal('UNKNOWN');
@@ -135,7 +135,7 @@ class PermissionResourceType_ {
     EnumWindowsPlatform(
         apiName: 'COREWEBVIEW2_PERMISSION_KIND_GEOLOCATION',
         apiUrl:
-        'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2792.45#corewebview2_permission_kind',
+            'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2792.45#corewebview2_permission_kind',
         value: 3)
   ])
   static const GEOLOCATION = PermissionResourceType_._internal('GEOLOCATION');
@@ -145,30 +145,33 @@ class PermissionResourceType_ {
     EnumWindowsPlatform(
         apiName: 'COREWEBVIEW2_PERMISSION_KIND_NOTIFICATIONS',
         apiUrl:
-        'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2792.45#corewebview2_permission_kind',
+            'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2792.45#corewebview2_permission_kind',
         value: 4)
   ])
-  static const NOTIFICATIONS = PermissionResourceType_._internal('NOTIFICATIONS');
+  static const NOTIFICATIONS =
+      PermissionResourceType_._internal('NOTIFICATIONS');
 
   ///Indicates permission to access generic sensor. Generic Sensor covers ambient-light-sensor, accelerometer, gyroscope, and magnetometer.
   @EnumSupportedPlatforms(platforms: [
     EnumWindowsPlatform(
         apiName: 'COREWEBVIEW2_PERMISSION_KIND_OTHER_SENSORS',
         apiUrl:
-        'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2792.45#corewebview2_permission_kind',
+            'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2792.45#corewebview2_permission_kind',
         value: 5)
   ])
-  static const OTHER_SENSORS = PermissionResourceType_._internal('OTHER_SENSORS');
+  static const OTHER_SENSORS =
+      PermissionResourceType_._internal('OTHER_SENSORS');
 
   ///Indicates permission to read the system clipboard without a user gesture.
   @EnumSupportedPlatforms(platforms: [
     EnumWindowsPlatform(
         apiName: 'COREWEBVIEW2_PERMISSION_KIND_CLIPBOARD_READ',
         apiUrl:
-        'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2792.45#corewebview2_permission_kind',
+            'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2792.45#corewebview2_permission_kind',
         value: 6)
   ])
-  static const CLIPBOARD_READ = PermissionResourceType_._internal('CLIPBOARD_READ');
+  static const CLIPBOARD_READ =
+      PermissionResourceType_._internal('CLIPBOARD_READ');
 
   ///Indicates permission to automatically download multiple files.
   ///Permission is requested when multiple downloads are triggered in quick succession.
@@ -176,10 +179,11 @@ class PermissionResourceType_ {
     EnumWindowsPlatform(
         apiName: 'COREWEBVIEW2_PERMISSION_KIND_MULTIPLE_AUTOMATIC_DOWNLOADS',
         apiUrl:
-        'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2792.45#corewebview2_permission_kind',
+            'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2792.45#corewebview2_permission_kind',
         value: 7)
   ])
-  static const MULTIPLE_AUTOMATIC_DOWNLOADS = PermissionResourceType_._internal('MULTIPLE_AUTOMATIC_DOWNLOADS');
+  static const MULTIPLE_AUTOMATIC_DOWNLOADS =
+      PermissionResourceType_._internal('MULTIPLE_AUTOMATIC_DOWNLOADS');
 
   ///Indicates permission to read and write to files or folders on the device.
   ///Permission is requested when developers use the [File System Access API](https://developer.mozilla.org/en-US/docs/Web/API/File_System_API)
@@ -189,10 +193,11 @@ class PermissionResourceType_ {
     EnumWindowsPlatform(
         apiName: 'COREWEBVIEW2_PERMISSION_KIND_FILE_READ_WRITE',
         apiUrl:
-        'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2792.45#corewebview2_permission_kind',
+            'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2792.45#corewebview2_permission_kind',
         value: 8)
   ])
-  static const FILE_READ_WRITE = PermissionResourceType_._internal('FILE_READ_WRITE');
+  static const FILE_READ_WRITE =
+      PermissionResourceType_._internal('FILE_READ_WRITE');
 
   ///Indicates permission to play audio and video automatically on sites.
   ///This permission affects the autoplay attribute and play method of the audio
@@ -203,7 +208,7 @@ class PermissionResourceType_ {
     EnumWindowsPlatform(
         apiName: 'COREWEBVIEW2_PERMISSION_KIND_AUTOPLAY',
         apiUrl:
-        'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2792.45#corewebview2_permission_kind',
+            'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2792.45#corewebview2_permission_kind',
         value: 9)
   ])
   static const AUTOPLAY = PermissionResourceType_._internal('AUTOPLAY');
@@ -215,7 +220,7 @@ class PermissionResourceType_ {
     EnumWindowsPlatform(
         apiName: 'COREWEBVIEW2_PERMISSION_KIND_LOCAL_FONTS',
         apiUrl:
-        'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2792.45#corewebview2_permission_kind',
+            'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2792.45#corewebview2_permission_kind',
         value: 10)
   ])
   static const LOCAL_FONTS = PermissionResourceType_._internal('LOCAL_FONTS');
@@ -227,8 +232,9 @@ class PermissionResourceType_ {
     EnumWindowsPlatform(
         apiName: 'COREWEBVIEW2_PERMISSION_KIND_WINDOW_MANAGEMENT',
         apiUrl:
-        'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2792.45#corewebview2_permission_kind',
+            'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2792.45#corewebview2_permission_kind',
         value: 12)
   ])
-  static const WINDOW_MANAGEMENT = PermissionResourceType_._internal('WINDOW_MANAGEMENT');
+  static const WINDOW_MANAGEMENT =
+      PermissionResourceType_._internal('WINDOW_MANAGEMENT');
 }

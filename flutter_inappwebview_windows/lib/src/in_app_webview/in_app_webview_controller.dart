@@ -2346,8 +2346,10 @@ class WindowsInAppWebViewController extends PlatformInAppWebViewController
     Map<String, dynamic>? sslCertificateMap =
         (await channel?.invokeMethod('getCertificate', args))
             ?.cast<String, dynamic>();
-    if (sslCertificateMap != null && sslCertificateMap['x509Certificate'] != null) {
-      sslCertificateMap['x509Certificate'] = base64Decode(sslCertificateMap['x509Certificate']);
+    if (sslCertificateMap != null &&
+        sslCertificateMap['x509Certificate'] != null) {
+      sslCertificateMap['x509Certificate'] =
+          base64Decode(sslCertificateMap['x509Certificate']);
     }
     return SslCertificate.fromMap(sslCertificateMap);
   }

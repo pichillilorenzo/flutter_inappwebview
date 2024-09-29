@@ -244,7 +244,15 @@ namespace flutter_inappwebview_plugin
               auto isResponseStage = requestPausedData.contains("responseStatusCode");
               auto frameId = requestPausedData.at("frameId").get<std::string>();
 
-              auto allowRequest = [this, requestId]()
+              auto request = requestPausedData.at("request").get<nlohmann::json>();
+              std::optional<std::string> url = request.at("url").is_string() ? request.at("url").get<std::string>() : std::optional<std::string>{};
+              std::optional<std::string> urlFragment = request.contains("urlFragment") && request.at("urlFragment").is_string() ? request.at("urlFragment").get<std::string>() : std::optional<std::string>{};
+              if (url.has_value() && urlFragment.has_value()) {
+                url = url.value() + urlFragment.value();
+              }
+              auto isForMainFrame = pageFrameId_.empty() || string_equals(pageFrameId_, frameId);
+
+              auto allowRequest = [this, requestId, url, isForMainFrame]()
                 {
                   failedAndLog(webView->CallDevToolsProtocolMethod(L"Fetch.continueRequest",
                     utf8_to_wide("{\"requestId\":\"" + requestId + "\"}").c_str(),
@@ -255,6 +263,13 @@ namespace flutter_inappwebview_plugin
                         return S_OK;
                       }
                     ).Get()));
+
+                  if (channelDelegate && isForMainFrame) {
+                    // if shouldOverrideUrlLoading is used, then call onLoadStart and onProgressChanged here
+                    // to match the behaviour of the other platforms
+                    channelDelegate->onLoadStart(url);
+                    channelDelegate->onProgressChanged(0);
+                  }
                 };
 
               auto cancelRequest = [this, requestId]()
@@ -271,12 +286,6 @@ namespace flutter_inappwebview_plugin
                 };
 
               if (!isResponseStage && channelDelegate && settings->useShouldOverrideUrlLoading && string_equals(resourceType, "Document")) {
-                auto request = requestPausedData.at("request").get<nlohmann::json>();
-                std::optional<std::string> url = request.at("url").is_string() ? request.at("url").get<std::string>() : std::optional<std::string>{};
-                std::optional<std::string> urlFragment = request.contains("urlFragment") && request.at("urlFragment").is_string() ? request.at("urlFragment").get<std::string>() : std::optional<std::string>{};
-                if (url.has_value() && urlFragment.has_value()) {
-                  url = url.value() + urlFragment.value();
-                }
                 std::optional<std::string> method = request.at("method").is_string() ? request.at("method").get<std::string>() : std::optional<std::string>{};
                 std::optional<std::map<std::string, std::string>> headers = request.at("headers").is_object() ? request.at("headers").get<std::map<std::string, std::string>>() : std::optional<std::map<std::string, std::string>>{};
                 std::optional<std::string> redirectedRequestId = request.contains("redirectedRequestId") && request.at("redirectedRequestId").is_string() ? request.at("redirectedRequestId").get<std::string>() : std::optional<std::string>{};
@@ -311,8 +320,6 @@ namespace flutter_inappwebview_plugin
 
                 std::optional<NavigationActionType> navigationType = isRedirect ? NavigationActionType::other : std::optional<NavigationActionType>{};
 
-                auto isForMainFrame = pageFrameId_.empty() || string_equals(pageFrameId_, frameId);
-
                 auto urlRequest = std::make_shared<URLRequest>(url, method, headers, body);
                 auto navigationAction = std::make_shared<NavigationAction>(
                   urlRequest,
@@ -345,7 +352,8 @@ namespace flutter_inappwebview_plugin
                 channelDelegate->shouldOverrideUrlLoading(std::move(navigationAction), std::move(callback));
               }
               else {
-                // check if a custom event listener is found and give the opportunity to it to handle the request
+                // check if a custom event listener is found and give back the opportunity to it to handle the request
+                // through the Chrome Dev Protocol API
                 if (!map_contains(devToolsProtocolEventListener_, std::string("Fetch.requestPaused"))) {
                   // if a custom event listener is not found, continue the request
                   allowRequest();
@@ -449,8 +457,11 @@ namespace flutter_inappwebview_plugin
             navigationActions_.insert({ navigationId, navigationAction });
           }
 
-          channelDelegate->onLoadStart(url);
-          channelDelegate->onProgressChanged(0);
+          // if shouldOverrideUrlLoading is not used, then call onLoadStart and onProgressChanged here
+          if (!settings->useShouldOverrideUrlLoading) {
+            channelDelegate->onLoadStart(url);
+            channelDelegate->onProgressChanged(0);
+          }
           args->put_Cancel(false);
 
           return S_OK;

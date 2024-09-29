@@ -1,3 +1,16 @@
+## 6.1.3
+
+- Updated dependencies to the latest versions for all platform implementations:
+  - `flutter_inappwebview_platform_interface`: `^1.1.0` -> `^1.2.0`
+  - `flutter_inappwebview_android`: `^1.1.0+4` -> `^1.1.1`
+  - `flutter_inappwebview_ios`: `^1.1.0+3` -> `^1.1.1`
+  - `flutter_inappwebview_macos`: `^1.1.0+3` -> `^1.1.1`
+  - `flutter_inappwebview_web`: `^1.1.0+2` -> `^1.1.1`
+  - `flutter_inappwebview_windows`: `^0.3.0` -> `^0.4.0`
+
+#### Windows Platform
+  - Updated `shouldOverrideUrlLoading` implementation using the Chrome DevTools Protocol API Fetch.requestPaused event
+
 ## 6.1.2
 
 - Updated minimum platform implementation versions

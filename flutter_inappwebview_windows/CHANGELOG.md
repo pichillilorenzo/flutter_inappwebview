@@ -1,6 +1,7 @@
 ## 0.4.0
 
 - Updated `shouldOverrideUrlLoading` implementation using the Chrome DevTools Protocol API Fetch.requestPaused event
+- Updated flutter_inappwebview_platform_interface version to ^1.2.0
 
 ## 0.3.0+1
 

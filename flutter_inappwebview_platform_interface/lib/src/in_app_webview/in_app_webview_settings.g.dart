@@ -1370,7 +1370,9 @@ class InAppWebViewSettings {
           ? WebUri(map['allowingReadAccessTo'])
           : null,
       appCachePath: map['appCachePath'],
-      defaultVideoPoster: map['defaultVideoPoster'],
+      defaultVideoPoster: map['defaultVideoPoster'] != null
+          ? Uint8List.fromList(map['defaultVideoPoster'].cast<int>())
+          : null,
       disabledActionModeMenuItems: ActionModeMenuItem.fromNativeValue(
           map['disabledActionModeMenuItems']),
       horizontalScrollbarThumbColor:

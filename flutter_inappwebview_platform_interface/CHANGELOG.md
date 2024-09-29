@@ -1,3 +1,7 @@
+## 1.2.0
+
+- Updated `Uint8List` conversion inside `fromMap` methods
+
 ## 1.1.1
 
 - Updated permission models for Windows platform

@@ -1,3 +1,7 @@
+## 0.4.0
+
+- Updated `shouldOverrideUrlLoading` implementation using the Chrome DevTools Protocol API Fetch.requestPaused event
+
 ## 0.3.0+1
 
 - Removed unwanted debug log

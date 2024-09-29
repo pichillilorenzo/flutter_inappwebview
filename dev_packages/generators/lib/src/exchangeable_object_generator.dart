@@ -556,6 +556,12 @@ class ExchangeableObjectGenerator
       } else {
         return "$value != null ? DateTime.fromMillisecondsSinceEpoch($value) : null";
       }
+    } else if (displayString == "Uint8List") {
+      if (!isNullable) {
+        return "Uint8List.fromList($value.cast<int>())";
+      } else {
+        return "$value != null ? Uint8List.fromList($value.cast<int>()) : null";
+      }
     } else if (elementType.isDartCoreList || elementType.isDartCoreSet) {
       final genericTypes = Util.getGenericTypes(elementType);
       final genericType = genericTypes.isNotEmpty ? genericTypes.first : null;

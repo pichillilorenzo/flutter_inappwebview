@@ -10,6 +10,7 @@
 #include "../types/create_window_action.h"
 #include "../types/web_resource_error.h"
 #include "../types/web_resource_request.h"
+#include "../utils/base64.h"
 #include "../utils/log.h"
 #include "../utils/map.h"
 #include "../utils/strconv.h"
@@ -189,6 +190,15 @@ namespace flutter_inappwebview_plugin
       }
     ).Get()));
 
+    // required to use Fetch domain and implement the shouldOverrideUrlLoading event correctly
+    failedLog(webView->CallDevToolsProtocolMethod(L"Fetch.enable", L"{\"patterns\": [{\"resourceType\": \"Document\", \"requestStage\": \"Request\"}]}", Callback<ICoreWebView2CallDevToolsProtocolMethodCompletedHandler>(
+      [this](HRESULT errorCode, LPCWSTR returnObjectAsJson)
+      {
+        failedLog(errorCode);
+        return S_OK;
+      }
+    ).Get()));
+
     failedLog(webView->CallDevToolsProtocolMethod(L"Page.getFrameTree", L"{}", Callback<ICoreWebView2CallDevToolsProtocolMethodCompletedHandler>(
       [this](HRESULT errorCode, LPCWSTR returnObjectAsJson)
       {
@@ -214,6 +224,138 @@ namespace flutter_inappwebview_plugin
   {
     if (!webView) {
       return;
+    }
+
+    wil::com_ptr<ICoreWebView2DevToolsProtocolEventReceiver> fetchRequestPausedEventReceiver;
+
+    if (succeededOrLog(webView->GetDevToolsProtocolEventReceiver(L"Fetch.requestPaused", &fetchRequestPausedEventReceiver))) {
+      failedAndLog(fetchRequestPausedEventReceiver->add_DevToolsProtocolEventReceived(
+        Callback<ICoreWebView2DevToolsProtocolEventReceivedEventHandler>(
+          [this](
+            ICoreWebView2* sender,
+            ICoreWebView2DevToolsProtocolEventReceivedEventArgs* args) -> HRESULT
+          {
+            wil::unique_cotaskmem_string json;
+            if (succeededOrLog(args->get_ParameterObjectAsJson(&json))) {
+              auto requestPausedData = nlohmann::json::parse(wide_to_utf8(json.get()));
+
+              auto requestId = requestPausedData.at("requestId").get<std::string>();
+              auto resourceType = requestPausedData.at("resourceType").get<std::string>();
+              auto isResponseStage = requestPausedData.contains("responseStatusCode");
+              auto frameId = requestPausedData.at("frameId").get<std::string>();
+
+              auto allowRequest = [this, requestId]()
+                {
+                  failedAndLog(webView->CallDevToolsProtocolMethod(L"Fetch.continueRequest",
+                    utf8_to_wide("{\"requestId\":\"" + requestId + "\"}").c_str(),
+                    Callback<ICoreWebView2CallDevToolsProtocolMethodCompletedHandler>(
+                      [this](HRESULT errorCode, LPCWSTR returnObjectAsJson)
+                      {
+                        failedLog(errorCode);
+                        return S_OK;
+                      }
+                    ).Get()));
+                };
+
+              auto cancelRequest = [this, requestId]()
+                {
+                  failedAndLog(webView->CallDevToolsProtocolMethod(L"Fetch.failRequest",
+                    utf8_to_wide("{\"requestId\":\"" + requestId + "\", \"errorReason\": \"Aborted\"}").c_str(),
+                    Callback<ICoreWebView2CallDevToolsProtocolMethodCompletedHandler>(
+                      [this](HRESULT errorCode, LPCWSTR returnObjectAsJson)
+                      {
+                        failedLog(errorCode);
+                        return S_OK;
+                      }
+                    ).Get()));
+                };
+
+              if (!isResponseStage && channelDelegate && settings->useShouldOverrideUrlLoading && string_equals(resourceType, "Document")) {
+                auto request = requestPausedData.at("request").get<nlohmann::json>();
+                std::optional<std::string> url = request.at("url").is_string() ? request.at("url").get<std::string>() : std::optional<std::string>{};
+                std::optional<std::string> urlFragment = request.contains("urlFragment") && request.at("urlFragment").is_string() ? request.at("urlFragment").get<std::string>() : std::optional<std::string>{};
+                if (url.has_value() && urlFragment.has_value()) {
+                  url = url.value() + urlFragment.value();
+                }
+                std::optional<std::string> method = request.at("method").is_string() ? request.at("method").get<std::string>() : std::optional<std::string>{};
+                std::optional<std::map<std::string, std::string>> headers = request.at("headers").is_object() ? request.at("headers").get<std::map<std::string, std::string>>() : std::optional<std::map<std::string, std::string>>{};
+                std::optional<std::string> redirectedRequestId = request.contains("redirectedRequestId") && request.at("redirectedRequestId").is_string() ? request.at("redirectedRequestId").get<std::string>() : std::optional<std::string>{};
+
+                std::optional<std::vector<uint8_t>> body = std::optional<std::vector<uint8_t>>{};
+                auto hasPostData = request.contains("hasPostData") && request.at("hasPostData").is_boolean() && request.at("hasPostData").get<bool>()
+                  && request.contains("postDataEntries") && request.at("postDataEntries").is_array();
+                if (hasPostData) {
+                  auto postDataEntries = request.at("postDataEntries").get<std::vector<nlohmann::json>>();
+
+                  if (postDataEntries.size() > 0) {
+                    body = std::vector<uint8_t>{};
+                    for (auto const& entry : postDataEntries) {
+                      if (entry.contains("bytes")) {
+                        try {
+                          auto entryData = base64_decode(entry.at("bytes").get<std::string>());
+                          std::vector<uint8_t> bytes(entryData.begin(), entryData.end());
+                          body->insert(body->end(), bytes.begin(), bytes.end());
+                        }
+                        catch (const std::exception& err) {
+                          debugLog("Error decoding base64 data");
+                          debugLog(err.what());
+                          body = std::optional<std::vector<uint8_t>>{};
+                          break;
+                        }
+                      }
+                    }
+                  }
+                }
+
+                BOOL isRedirect = redirectedRequestId.has_value() && !redirectedRequestId.value().empty();
+
+                std::optional<NavigationActionType> navigationType = isRedirect ? NavigationActionType::other : std::optional<NavigationActionType>{};
+
+                auto isForMainFrame = pageFrameId_.empty() || string_equals(pageFrameId_, frameId);
+
+                auto urlRequest = std::make_shared<URLRequest>(url, method, headers, body);
+                auto navigationAction = std::make_shared<NavigationAction>(
+                  urlRequest,
+                  isForMainFrame,
+                  isRedirect,
+                  navigationType
+                );
+
+                auto callback = std::make_unique<WebViewChannelDelegate::ShouldOverrideUrlLoadingCallback>();
+                callback->nonNullSuccess = [this, allowRequest, cancelRequest](const NavigationActionPolicy actionPolicy)
+                  {
+                    if (actionPolicy == NavigationActionPolicy::allow) {
+                      allowRequest();
+                    }
+                    else {
+                      cancelRequest();
+                    }
+                    return false;
+                  };
+                auto defaultBehaviour = [this, allowRequest](const std::optional<const NavigationActionPolicy> actionPolicy)
+                  {
+                    allowRequest();
+                  };
+                callback->defaultBehaviour = defaultBehaviour;
+                callback->error = [defaultBehaviour](const std::string& error_code, const std::string& error_message, const flutter::EncodableValue* error_details)
+                  {
+                    debugLog(error_code + ", " + error_message);
+                    defaultBehaviour(std::nullopt);
+                  };
+                channelDelegate->shouldOverrideUrlLoading(std::move(navigationAction), std::move(callback));
+              }
+              else {
+                // check if a custom event listener is found and give the opportunity to it to handle the request
+                if (!map_contains(devToolsProtocolEventListener_, std::string("Fetch.requestPaused"))) {
+                  // if a custom event listener is not found, continue the request
+                  allowRequest();
+                }
+              }
+            }
+
+            return S_OK;
+          })
+        .Get(), nullptr));
     }
 
     failedLog(webView->add_NavigationStarting(
@@ -307,39 +449,9 @@ namespace flutter_inappwebview_plugin
             navigationActions_.insert({ navigationId, navigationAction });
           }
 
-          if (settings->useShouldOverrideUrlLoading && callShouldOverrideUrlLoading_ && requestMethod == nullptr) {
-            // for some reason, we can't cancel and load an URL with other HTTP methods than GET,
-            // so ignore the shouldOverrideUrlLoading event.
-
-            auto callback = std::make_unique<WebViewChannelDelegate::ShouldOverrideUrlLoadingCallback>();
-            callback->nonNullSuccess = [this, urlRequest](const NavigationActionPolicy actionPolicy)
-              {
-                callShouldOverrideUrlLoading_ = false;
-                if (actionPolicy == NavigationActionPolicy::allow) {
-                  loadUrl(urlRequest);
-                }
-                return false;
-              };
-            auto defaultBehaviour = [this, urlRequest](const std::optional<const NavigationActionPolicy> actionPolicy)
-              {
-                callShouldOverrideUrlLoading_ = false;
-                loadUrl(urlRequest);
-              };
-            callback->defaultBehaviour = defaultBehaviour;
-            callback->error = [defaultBehaviour](const std::string& error_code, const std::string& error_message, const flutter::EncodableValue* error_details)
-              {
-                debugLog(error_code + ", " + error_message);
-                defaultBehaviour(std::nullopt);
-              };
-            channelDelegate->shouldOverrideUrlLoading(std::move(navigationAction), std::move(callback));
-            args->put_Cancel(true);
-          }
-          else {
-            callShouldOverrideUrlLoading_ = true;
-            channelDelegate->onLoadStart(url);
-            channelDelegate->onProgressChanged(0);
-            args->put_Cancel(false);
-          }
+          channelDelegate->onLoadStart(url);
+          channelDelegate->onProgressChanged(0);
+          args->put_Cancel(false);
 
           return S_OK;
         }
@@ -810,7 +922,6 @@ namespace flutter_inappwebview_plugin
       return;
     }
 
-    callShouldOverrideUrlLoading_ = false;
     failedLog(webView->GoBack());
   }
 
@@ -826,7 +937,6 @@ namespace flutter_inappwebview_plugin
       return;
     }
 
-    callShouldOverrideUrlLoading_ = false;
     failedLog(webView->GoForward());
   }
 
@@ -849,17 +959,13 @@ namespace flutter_inappwebview_plugin
           if (nextIndex >= 0 && nextIndex < size) {
             auto entryId = items->at(nextIndex)->entryId;
             if (entryId.has_value()) {
-              auto oldCallShouldOverrideUrlLoading_ = callShouldOverrideUrlLoading_;
-              callShouldOverrideUrlLoading_ = false;
-              if (failedAndLog(webView->CallDevToolsProtocolMethod(L"Page.navigateToHistoryEntry", utf8_to_wide("{\"entryId\": " + std::to_string(entryId.value()) + "}").c_str(), Callback<ICoreWebView2CallDevToolsProtocolMethodCompletedHandler>(
+              failedAndLog(webView->CallDevToolsProtocolMethod(L"Page.navigateToHistoryEntry", utf8_to_wide("{\"entryId\": " + std::to_string(entryId.value()) + "}").c_str(), Callback<ICoreWebView2CallDevToolsProtocolMethodCompletedHandler>(
                 [this](HRESULT errorCode, LPCWSTR returnObjectAsJson)
                 {
                   failedLog(errorCode);
                   return S_OK;
                 }
-              ).Get()))) {
-                callShouldOverrideUrlLoading_ = oldCallShouldOverrideUrlLoading_;
-              }
+              ).Get()));
             }
           }
         }

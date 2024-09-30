@@ -62,6 +62,7 @@ public enum WebViewChannelDelegateMethods {
   saveWebArchive,
   zoomIn,
   zoomOut,
+  requestFocus,
   clearFocus,
   setContextMenu,
   requestFocusNodeHref,

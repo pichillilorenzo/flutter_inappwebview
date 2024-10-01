@@ -71,7 +71,6 @@ import com.pichillilorenzo.flutter_inappwebview_android.content_blocker.ContentB
 import com.pichillilorenzo.flutter_inappwebview_android.content_blocker.ContentBlockerTrigger;
 import com.pichillilorenzo.flutter_inappwebview_android.find_interaction.FindInteractionController;
 import com.pichillilorenzo.flutter_inappwebview_android.in_app_browser.InAppBrowserDelegate;
-import com.pichillilorenzo.flutter_inappwebview_android.plugin_scripts_js.ConsoleLogJS;
 import com.pichillilorenzo.flutter_inappwebview_android.plugin_scripts_js.InterceptAjaxRequestJS;
 import com.pichillilorenzo.flutter_inappwebview_android.plugin_scripts_js.InterceptFetchRequestJS;
 import com.pichillilorenzo.flutter_inappwebview_android.plugin_scripts_js.JavaScriptBridgeJS;
@@ -563,7 +562,6 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
   public void prepareAndAddUserScripts() {
     userContentController.addPluginScript(PromisePolyfillJS.PROMISE_POLYFILL_JS_PLUGIN_SCRIPT);
     userContentController.addPluginScript(JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_JS_PLUGIN_SCRIPT);
-    userContentController.addPluginScript(ConsoleLogJS.CONSOLE_LOG_JS_PLUGIN_SCRIPT);
     userContentController.addPluginScript(PrintJS.PRINT_JS_PLUGIN_SCRIPT);
     userContentController.addPluginScript(OnWindowBlurEventJS.ON_WINDOW_BLUR_EVENT_JS_PLUGIN_SCRIPT);
     userContentController.addPluginScript(OnWindowFocusEventJS.ON_WINDOW_FOCUS_EVENT_JS_PLUGIN_SCRIPT);

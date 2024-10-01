@@ -1,29 +1,36 @@
 {
   "name": "flutter_inappwebview",
   "version": "1.0.0",
-  "directories": {
-    "example": "flutter_inappwebview/example",
-    "lib": "flutter_inappwebview/lib"
-  },
   "private": true,
   "scripts": {
-    "build": ".fvm/flutter_sdk/bin/flutter pub run build_runner build --delete-conflicting-outputs",
-    "watch": ".fvm/flutter_sdk/bin/flutter pub run build_runner watch --delete-conflicting-outputs",
+    "build": "cd flutter_inappwebview_platform_interface && ../.fvm/flutter_sdk/bin/flutter pub run build_runner build --delete-conflicting-outputs",
+    "watch": "cd flutter_inappwebview_platform_interface && ../.fvm/flutter_sdk/bin/flutter pub run build_runner watch --delete-conflicting-outputs",
+
     "publish:dry": ".fvm/flutter_sdk/bin/flutter pub publish --dry-run",
-    "publish": ".fvm/flutter_sdk/bin/flutter pub publish",
     "format": ".fvm/flutter_sdk/bin/dart format flutter_inappwebview/lib flutter_inappwebview/example/integration_test flutter_inappwebview_platform_interface/lib flutter_inappwebview_android/lib flutter_inappwebview_ios/lib flutter_inappwebview_macos/lib  flutter_inappwebview_web/lib  flutter_inappwebview_windows/lib",
-    "build:publish": "npm run format && npm run build && .fvm/flutter_sdk/bin/flutter pub publish",
-    "docs:gen": ".fvm/flutter_sdk/bin/dart doc",
-    "docs:serve": ".fvm/flutter_sdk/bin/flutter pub global activate dhttpd && .fvm/flutter_sdk/bin/flutter pub global run dhttpd:dhttpd --path doc/api"
+
+    "docs:gen": "cd flutter_inappwebview && ../.fvm/flutter_sdk/bin/dart doc ../",
+    "docs:serve": ".fvm/flutter_sdk/bin/flutter pub global activate dhttpd && .fvm/flutter_sdk/bin/flutter pub global run dhttpd:dhttpd --path doc/api",
+
+    "publish:platform_interface": "cd flutter_inappwebview_platform_interface && ../.fvm/flutter_sdk/bin/flutter pub publish && cd ..",
+    "publish:android": "cd flutter_inappwebview_android && ../.fvm/flutter_sdk/bin/flutter pub publish && cd ..",
+    "publish:ios": "cd flutter_inappwebview_ios && ../.fvm/flutter_sdk/bin/flutter pub publish && cd ..",
+    "publish:macos": "cd flutter_inappwebview_macos && ../.fvm/flutter_sdk/bin/flutter pub publish && cd ..",
+    "publish:web": "cd flutter_inappwebview_web && ../.fvm/flutter_sdk/bin/flutter pub publish && cd ..",
+    "publish:windows": "cd flutter_inappwebview_windows && ../.fvm/flutter_sdk/bin/flutter pub publish && cd ..",
+    "publish:all_platforms": "npm run publish:android && npm run publish:ios && npm run publish:macos && npm run publish:web && npm run publish:windows",
+    "publish:interface_and_all_platforms": "npm run publish:platform_interface && npm run publish:all_platforms",
+
+    "publish:plugin": "cd flutter_inappwebview && ../.fvm/flutter_sdk/bin/flutter pub publish && cd .."
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/pichillilorenzo/flutter_inappwebview.git"
   },
-  "author": "",
+  "author": "Lorenzo Pichilli",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/pichillilorenzo/flutter_inappwebview/issues"
   },
-  "homepage": "https://github.com/pichillilorenzo/flutter_inappwebview#readme"
+  "homepage": "https://github.com/pichillilorenzo/flutter_inappwebview#README.md"
 }

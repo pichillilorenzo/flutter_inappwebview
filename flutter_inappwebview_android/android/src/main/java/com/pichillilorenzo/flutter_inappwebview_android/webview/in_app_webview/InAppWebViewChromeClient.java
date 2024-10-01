@@ -739,7 +739,7 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
               consoleMessage.message(),
               consoleMessage.messageLevel().ordinal());
     }
-    return true;
+    return super.onConsoleMessage(consoleMessage);
   }
 
   @Override

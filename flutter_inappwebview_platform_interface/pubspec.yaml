@@ -15,7 +15,7 @@ topics:
 
 environment:
   sdk: ">=3.4.0"
-  flutter: ">=3.24.0"
+  flutter: ">=3.22.3"
 
 dependencies:
   flutter:

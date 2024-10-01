@@ -1,3 +1,7 @@
+## 0.4.1
+
+- Implemented `incognito` for `InAppWebViewSettings`
+
 ## 0.4.0
 
 - Updated `shouldOverrideUrlLoading` implementation using the Chrome DevTools Protocol API Fetch.requestPaused event

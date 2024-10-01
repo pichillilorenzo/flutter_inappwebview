@@ -306,7 +306,11 @@ class InAppWebViewSettings_ {
             """setting this to `true`, it will clear all the cookies of all WebView instances, 
 because there isn't any way to make the website data store non-persistent for the specific WebView instance such as on iOS."""),
     IOSPlatform(),
-    MacOSPlatform()
+    MacOSPlatform(),
+    WindowsPlatform(
+      apiName: "ICoreWebView2ControllerOptions.put_IsInPrivateModeEnabled",
+      apiUrl: "https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2controlleroptions?view=webview2-1.0.2792.45#put_isinprivatemodeenabled"
+    )
   ])
   bool? incognito;
 

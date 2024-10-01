@@ -73,13 +73,14 @@ namespace flutter_inappwebview_plugin
     auto webViewEnvironment = webViewEnvironmentId.has_value() && map_contains(plugin->webViewEnvironmentManager->webViewEnvironments, webViewEnvironmentId.value())
       ? plugin->webViewEnvironmentManager->webViewEnvironments.at(webViewEnvironmentId.value()).get() : nullptr;
 
-    InAppWebView::createInAppWebViewEnv(hwnd, false, webViewEnvironment,
+    auto initialSettings = std::make_shared<InAppWebViewSettings>(settingsMap);
+
+    InAppWebView::createInAppWebViewEnv(hwnd, false, webViewEnvironment, initialSettings,
       [=](wil::com_ptr<ICoreWebView2Environment> webViewEnv,
         wil::com_ptr<ICoreWebView2Controller> webViewController,
         wil::com_ptr<ICoreWebView2CompositionController> webViewCompositionController)
       {
         if (webViewEnv && webViewController) {
-          auto initialSettings = std::make_unique<InAppWebViewSettings>(settingsMap);
           std::optional<std::vector<std::shared_ptr<UserScript>>> initialUserScripts = initialUserScriptList.has_value() ?
             functional_map(initialUserScriptList.value(), [](const flutter::EncodableValue& map) { return std::make_shared<UserScript>(std::get<flutter::EncodableMap>(map)); }) :
             std::optional<std::vector<std::shared_ptr<UserScript>>>{};

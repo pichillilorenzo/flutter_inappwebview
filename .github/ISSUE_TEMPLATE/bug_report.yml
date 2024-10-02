@@ -75,11 +75,11 @@ body:
       placeholder: v3.22.0, v3.24.3, etc.
     validations:
       required: true
-  - type: input
+  - type: textarea
     attributes:
-      label: Operating System or Technology
+      label: Operating System, Device-specific and/or Tool
       description: |
-        The Operating System or Technology in which you want to have this feature.
+        The Operating System, Device-specific and/or Tool in which you used the plugin to face the issue.
         For example: All platforms, Android, iOS, XCode, macOS, Windows, Web, Chrome, etc.
         Make sure to include the version too.
       placeholder: Android 34+, iOS 17.0+, macOS, Windows, etc.

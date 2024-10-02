@@ -14,9 +14,9 @@ body:
           required: true
   - type: input
     attributes:
-      label: Operating System or Technology
+      label: Operating System
       description: |
-        The Operating System or Technology in which you want to have this feature.
+        The Operating System in which you want to have this feature.
         For example: All platforms if possible, Android, iOS, macOS, Windows, Web, Chrome, etc.
       placeholder: All platforms if possible, Android, iOS, macOS, Windows, etc.
     validations:

@@ -78,8 +78,11 @@ body:
   - type: input
     attributes:
       label: Operating System or Technology
-      description: The Operating System or Technology in which you used the plugin to face the issue.
-      placeholder: Android 34+, iOS 17.0+, XCode 15.0, macOS, Windows, Web, Chrome, etc. Make sure to include the version too.
+      description: |
+        The Operating System or Technology in which you want to have this feature.
+        For example: All platforms, Android, iOS, macOS, Windows, Web, Chrome, etc.
+        Make sure to include the version too.
+      placeholder: Android 34+, iOS 17.0+, macOS, Windows, etc.
     validations:
       required: true
   - type: input
@@ -95,3 +98,10 @@ body:
       description: Anything else you'd like to include? Like screenshots or a video recording of the issue.
     validations:
       required: false
+  - type: checkboxes
+    attributes:
+      label: Self grab
+      description: If you are a developer and want to work on this issue yourself, you can check this box and wait for maintainer response. We welcome contributions!
+      options:
+        - label: I'm ready to work on this issue!
+          required: false

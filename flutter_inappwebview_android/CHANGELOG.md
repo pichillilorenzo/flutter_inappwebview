@@ -1,3 +1,7 @@
+## 1.1.3
+
+- Updated flutter_inappwebview_platform_interface version to ^1.3.0
+
 ## 1.1.2
 
 - Removed webview/plugin_scripts_js/ConsoleLogJS.java file, use native WebChromeClient.onConsoleMessage instead

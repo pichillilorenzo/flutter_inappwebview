@@ -57,17 +57,18 @@ Send a submission request to the [Submit App](https://inappwebview.dev/submit-ap
 - Android: `minSdkVersion >= 19`, `compileSdk >= 34`, [AGP](https://developer.android.com/build/releases/gradle-plugin) version `>= 7.3.0` (use [Android Studio - Android Gradle plugin Upgrade Assistant](https://developer.android.com/build/agp-upgrade-assistant) for help), support for `androidx` (see [AndroidX Migration](https://flutter.dev/docs/development/androidx-migration) to migrate an existing app)
 - iOS 12.0+: `--ios-language swift`, Xcode version `>= 15.0`
 - MacOS 10.14+: Xcode version `>= 15.0`
+- Windows: [NuGet CLI](https://learn.microsoft.com/en-us/nuget/install-nuget-client-tools?tabs=windows#nugetexe-cli) available on your PATH environment variable
 
 ## Installation
 
 Add `flutter_inappwebview` as a [dependency in your pubspec.yaml file](https://flutter.io/using-packages/).
 
-### Platform installation setup:
-- Android: https://inappwebview.dev/docs/intro/#setup-android
-- iOS: https://inappwebview.dev/docs/intro/#setup-ios
-- macOS: https://inappwebview.dev/docs/intro/#setup-macos
-- Windows: https://inappwebview.dev/docs/intro/#setup-windows
-- Web: https://inappwebview.dev/docs/intro/#setup-web
+### Platform Installation Setup:
+- [Android](https://inappwebview.dev/docs/intro/#setup-android)
+- [iOS](https://inappwebview.dev/docs/intro/#setup-ios)
+- [macOS](https://inappwebview.dev/docs/intro/#setup-macos)
+- [Windows](https://inappwebview.dev/docs/intro/#setup-windows)
+- [Web](https://inappwebview.dev/docs/intro/#setup-web)
 
 ## Support
 

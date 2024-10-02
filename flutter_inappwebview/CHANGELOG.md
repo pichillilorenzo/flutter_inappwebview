@@ -1,3 +1,19 @@
+## 6.1.4
+
+- Updated dependencies to the latest versions for all platform implementations:
+  - `flutter_inappwebview_platform_interface`: `^1.2.0` -> `^1.3.0`
+  - `flutter_inappwebview_android`: `^1.1.1` -> `^1.1.3`
+  - `flutter_inappwebview_ios`: `^1.1.1` -> `^1.1.2`
+  - `flutter_inappwebview_macos`: `^1.1.1` -> `^1.1.2`
+  - `flutter_inappwebview_web`: `^1.1.1` -> `^1.1.2`
+  - `flutter_inappwebview_windows`: `^0.4.0` -> `^0.5.0`
+
+#### Android Platform
+- Removed webview/plugin_scripts_js/ConsoleLogJS.java file, use native WebChromeClient.onConsoleMessage instead
+
+#### Windows Platform
+- Implemented `shouldInterceptRequest`, `onLoadResourceWithCustomScheme` WebView events
+
 ## 6.1.3
 
 - Updated dependencies to the latest versions for all platform implementations:

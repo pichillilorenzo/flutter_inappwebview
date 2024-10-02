@@ -27,8 +27,6 @@ body:
         - label: Mobile
         - label: Desktop
         - label: Web
-    validations:
-      required: true
   - type: input
     attributes:
       label: Short Description

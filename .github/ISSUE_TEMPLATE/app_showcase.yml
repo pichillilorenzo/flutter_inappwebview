@@ -18,6 +18,15 @@ body:
         Add your App Icon here. You can drag and drop the image directly inside this textarea.
     validations:
       required: true
+  - type: textarea
+    attributes:
+      label: What is the reason of using flutter_inappwebview in your app?
+      description: |
+        Explain why you are using the flutter_inappwebview plugin in your app.
+      placeholder: |
+        I'm using the flutter_inappwebview plugin in my app to create a custom Browser, to use WebRTC feature, to display local HTML content, etc.
+    validations:
+      required: true
   - type: checkboxes
     attributes:
       label: Platforms

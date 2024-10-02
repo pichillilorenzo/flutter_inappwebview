@@ -80,7 +80,7 @@ body:
       label: Operating System or Technology
       description: |
         The Operating System or Technology in which you want to have this feature.
-        For example: All platforms, Android, iOS, macOS, Windows, Web, Chrome, etc.
+        For example: All platforms, Android, iOS, XCode, macOS, Windows, Web, Chrome, etc.
         Make sure to include the version too.
       placeholder: Android 34+, iOS 17.0+, macOS, Windows, etc.
     validations:

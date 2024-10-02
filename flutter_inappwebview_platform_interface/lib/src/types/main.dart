@@ -225,4 +225,6 @@ export 'tracing_mode.dart' show TracingMode;
 export 'tracing_category.dart' show TracingCategory;
 export 'custom_tabs_post_message_result_type.dart'
     show CustomTabsPostMessageResultType;
+export 'custom_scheme_registration.dart'
+    show CustomSchemeRegistration;
 export 'disposable.dart';

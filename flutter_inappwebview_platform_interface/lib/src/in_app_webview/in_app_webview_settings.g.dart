@@ -579,6 +579,7 @@ class InAppWebViewSettings {
   ///- Android native WebView
   ///- iOS
   ///- MacOS
+  ///- Windows ([Official API - ICoreWebView2ControllerOptions.put_IsInPrivateModeEnabled](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2controlleroptions?view=webview2-1.0.2792.45#put_isinprivatemodeenabled))
   bool? incognito;
 
   ///Sets the initial scale for this WebView. 0 means default. The behavior for the default scale depends on the state of [useWideViewPort] and [loadWithOverviewMode].

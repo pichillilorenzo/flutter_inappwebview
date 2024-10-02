@@ -1,3 +1,9 @@
+## 1.3.0
+
+- Added `WebViewEnvironment.customSchemeRegistrations` parameter for Windows
+- Added `CustomSchemeRegistration` type
+- Updated docs
+
 ## 1.2.0
 
 - Updated `Uint8List` conversion inside `fromMap` methods

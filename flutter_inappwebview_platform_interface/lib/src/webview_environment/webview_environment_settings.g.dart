@@ -50,6 +50,12 @@ class WebViewEnvironmentSettings {
   ///- Windows ([Official API - CreateCoreWebView2EnvironmentWithOptions.browserExecutableFolder](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2210.55#createcorewebview2environmentwithoptions))
   final String? browserExecutableFolder;
 
+  ///Set the array of custom scheme registrations to be used.
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Windows ([Official API - ICoreWebView2EnvironmentOptions4.SetCustomSchemeRegistrations](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2environmentoptions4?view=webview2-1.0.2739.15#setcustomschemeregistrations))
+  final List<CustomSchemeRegistration>? customSchemeRegistrations;
+
   ///The default display language for WebView.
   ///
   ///**Officially Supported Platforms/Implementations**:
@@ -88,6 +94,7 @@ class WebViewEnvironmentSettings {
       {this.additionalBrowserArguments,
       this.allowSingleSignOnUsingOSPrimaryAccount,
       this.browserExecutableFolder,
+      this.customSchemeRegistrations,
       this.language,
       this.targetCompatibleBrowserVersion,
       this.userDataFolder});
@@ -102,6 +109,11 @@ class WebViewEnvironmentSettings {
       allowSingleSignOnUsingOSPrimaryAccount:
           map['allowSingleSignOnUsingOSPrimaryAccount'],
       browserExecutableFolder: map['browserExecutableFolder'],
+      customSchemeRegistrations: map['customSchemeRegistrations'] != null
+          ? List<CustomSchemeRegistration>.from(map['customSchemeRegistrations']
+              .map((e) => CustomSchemeRegistration.fromMap(
+                  e?.cast<String, dynamic>())!))
+          : null,
       language: map['language'],
       targetCompatibleBrowserVersion: map['targetCompatibleBrowserVersion'],
       userDataFolder: map['userDataFolder'],
@@ -116,6 +128,8 @@ class WebViewEnvironmentSettings {
       "allowSingleSignOnUsingOSPrimaryAccount":
           allowSingleSignOnUsingOSPrimaryAccount,
       "browserExecutableFolder": browserExecutableFolder,
+      "customSchemeRegistrations":
+          customSchemeRegistrations?.map((e) => e.toMap()).toList(),
       "language": language,
       "targetCompatibleBrowserVersion": targetCompatibleBrowserVersion,
       "userDataFolder": userDataFolder,
@@ -135,6 +149,6 @@ class WebViewEnvironmentSettings {
 
   @override
   String toString() {
-    return 'WebViewEnvironmentSettings{additionalBrowserArguments: $additionalBrowserArguments, allowSingleSignOnUsingOSPrimaryAccount: $allowSingleSignOnUsingOSPrimaryAccount, browserExecutableFolder: $browserExecutableFolder, language: $language, targetCompatibleBrowserVersion: $targetCompatibleBrowserVersion, userDataFolder: $userDataFolder}';
+    return 'WebViewEnvironmentSettings{additionalBrowserArguments: $additionalBrowserArguments, allowSingleSignOnUsingOSPrimaryAccount: $allowSingleSignOnUsingOSPrimaryAccount, browserExecutableFolder: $browserExecutableFolder, customSchemeRegistrations: $customSchemeRegistrations, language: $language, targetCompatibleBrowserVersion: $targetCompatibleBrowserVersion, userDataFolder: $userDataFolder}';
   }
 }

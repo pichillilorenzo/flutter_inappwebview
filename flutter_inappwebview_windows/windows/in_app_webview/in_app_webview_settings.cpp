@@ -17,9 +17,9 @@ namespace flutter_inappwebview_plugin
     useShouldOverrideUrlLoading = get_fl_map_value(encodableMap, "useShouldOverrideUrlLoading", useShouldOverrideUrlLoading);
     useOnLoadResource = get_fl_map_value(encodableMap, "useOnLoadResource", useOnLoadResource);
     useOnDownloadStart = get_fl_map_value(encodableMap, "useOnDownloadStart", useOnDownloadStart);
+    useShouldInterceptRequest = get_fl_map_value(encodableMap, "useShouldInterceptRequest", useShouldInterceptRequest);
     userAgent = get_fl_map_value(encodableMap, "userAgent", userAgent);
     javaScriptEnabled = get_fl_map_value(encodableMap, "javaScriptEnabled", javaScriptEnabled);
-    resourceCustomSchemes = get_fl_map_value(encodableMap, "resourceCustomSchemes", resourceCustomSchemes);
     transparentBackground = get_fl_map_value(encodableMap, "transparentBackground", transparentBackground);
     supportZoom = get_fl_map_value(encodableMap, "supportZoom", supportZoom);
     isInspectable = get_fl_map_value(encodableMap, "isInspectable", isInspectable);
@@ -33,9 +33,9 @@ namespace flutter_inappwebview_plugin
       {"useShouldOverrideUrlLoading", useShouldOverrideUrlLoading},
       {"useOnLoadResource", useOnLoadResource},
       {"useOnDownloadStart", useOnDownloadStart},
+      {"useShouldInterceptRequest", useShouldInterceptRequest},
       {"userAgent", userAgent},
       {"javaScriptEnabled", javaScriptEnabled},
-      {"resourceCustomSchemes", make_fl_value(resourceCustomSchemes)},
       {"transparentBackground", transparentBackground},
       {"supportZoom", supportZoom},
       {"isInspectable", isInspectable},

@@ -89,6 +89,10 @@ list(APPEND PLUGIN_SOURCES
   "types/ssl_certificate.h"
   "types/permission_response.cpp"
   "types/permission_response.h"
+  "types/custom_scheme_response.cpp"
+  "types/custom_scheme_response.h"
+  "types/custom_scheme_registration.cpp"
+  "types/custom_scheme_registration.h"
   "custom_platform_view/custom_platform_view.cc"
   "custom_platform_view/custom_platform_view.h"
   "custom_platform_view/texture_bridge.cc"
@@ -175,7 +179,19 @@ endif()
 # Apply a standard set of build settings that are configured in the
 # application-level CMakeLists.txt. This can be removed for plugins that want
 # full control over build settings.
-apply_standard_settings(${PLUGIN_NAME})
+# apply_standard_settings(${PLUGIN_NAME})
+#
+# IMPORTANT: The apply_standard_settings function is not used here because it
+# is causing the plugin to fail to compile because of the usage of /WX flag.
+# So, creating here a custom function to apply the standard settings without the /WX flag.
+function(FLUTTER_INAPPWEBVIEW_WINDOWS_APPLY_STANDARD_SETTINGS TARGET)
+  target_compile_features(${TARGET} PUBLIC cxx_std_17)
+  target_compile_options(${TARGET} PRIVATE /W4 /wd"4100")
+  target_compile_options(${TARGET} PRIVATE /EHsc)
+  target_compile_definitions(${TARGET} PRIVATE "_HAS_EXCEPTIONS=0")
+  target_compile_definitions(${TARGET} PRIVATE "$<$<CONFIG:Debug>:_DEBUG>")
+endfunction()
+flutter_inappwebview_windows_apply_standard_settings(${PLUGIN_NAME})
 
 target_link_libraries(${PLUGIN_NAME} PRIVATE ${CMAKE_BINARY_DIR}/packages/Microsoft.Web.WebView2/build/native/Microsoft.Web.WebView2.targets)
 target_link_libraries(${PLUGIN_NAME} PRIVATE ${CMAKE_BINARY_DIR}/packages/Microsoft.Windows.ImplementationLibrary/build/native/Microsoft.Windows.ImplementationLibrary.targets)

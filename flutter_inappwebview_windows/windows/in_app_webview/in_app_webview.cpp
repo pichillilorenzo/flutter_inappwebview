@@ -2,7 +2,6 @@
 #include <filesystem>
 #include <nlohmann/json.hpp>
 #include <Shlwapi.h>
-#include <WebView2EnvironmentOptions.h>
 #include <wil/wrl.h>
 
 #include "../custom_platform_view/util/composition.desktop.interop.h"
@@ -565,7 +564,12 @@ namespace flutter_inappwebview_plugin
               int httpStatusCode = 0;
               wil::com_ptr<ICoreWebView2NavigationCompletedEventArgs2> args2;
               if (SUCCEEDED(args->QueryInterface(IID_PPV_ARGS(&args2))) && SUCCEEDED(args2->get_HttpStatusCode(&httpStatusCode)) && httpStatusCode >= 400) {
-                auto webResourceResponse = std::make_unique<WebResourceResponse>(httpStatusCode);
+                auto webResourceResponse = std::make_unique<WebResourceResponse>(std::optional<std::string>{},
+                  std::optional<std::string>{},
+                  httpStatusCode,
+                  std::optional<std::string>{},
+                  std::optional<std::map<std::string, std::string>>{},
+                  std::optional<std::vector<uint8_t>>{});
                 channelDelegate->onReceivedHttpError(std::move(webResourceRequest), std::move(webResourceResponse));
               }
               else if (httpStatusCode < 400) {
@@ -819,6 +823,77 @@ namespace flutter_inappwebview_plugin
         return S_OK;
       }
     ).Get(), nullptr));
+
+    failedLog(webView->AddWebResourceRequestedFilter(L"*", COREWEBVIEW2_WEB_RESOURCE_CONTEXT_ALL));
+    failedLog(webView->add_WebResourceRequested(
+      Callback<ICoreWebView2WebResourceRequestedEventHandler>(
+        [this](
+          ICoreWebView2* sender, ICoreWebView2WebResourceRequestedEventArgs* args)
+        {
+          wil::com_ptr<ICoreWebView2Deferral> deferral;
+          wil::com_ptr<ICoreWebView2WebResourceRequest> webResourceRequest;
+          if (channelDelegate && succeededOrLog(args->get_Request(&webResourceRequest)) && succeededOrLog(args->GetDeferral(&deferral))) {
+            auto request = std::make_shared<WebResourceRequest>(webResourceRequest);
+
+            auto onLoadResourceWithCustomSchemeCallback = [this, deferral, request, args]()
+              {
+                if (channelDelegate) {
+                  auto callback = std::make_unique<WebViewChannelDelegate::LoadResourceWithCustomSchemeCallback>();
+                  auto defaultBehaviour = [this, deferral, args](const std::optional<std::shared_ptr<CustomSchemeResponse>> response)
+                    {
+                      failedLog(deferral->Complete());
+                    };
+                  callback->nonNullSuccess = [this, deferral, args](const std::shared_ptr<CustomSchemeResponse> response)
+                    {
+                      args->put_Response(response->toWebView2Response(webViewEnv));
+                      failedLog(deferral->Complete());
+                      return false;
+                    };
+                  callback->defaultBehaviour = defaultBehaviour;
+                  callback->error = [this, defaultBehaviour](const std::string& error_code, const std::string& error_message, const flutter::EncodableValue* error_details)
+                    {
+                      debugLog(error_code + ", " + error_message);
+                      defaultBehaviour(std::nullopt);
+                    };
+                  channelDelegate->onLoadResourceWithCustomScheme(request, std::move(callback));
+                }
+                else {
+                  failedLog(deferral->Complete());
+                }
+              };
+
+            if (settings->useShouldInterceptRequest) {
+              auto callback = std::make_unique<WebViewChannelDelegate::ShouldInterceptRequestCallback>();
+              auto defaultBehaviour = [this, deferral, args](const std::optional<std::shared_ptr<WebResourceResponse>> response)
+                {
+                  failedLog(deferral->Complete());
+                };
+              callback->nonNullSuccess = [this, deferral, args](const std::shared_ptr<WebResourceResponse> response)
+                {
+                  args->put_Response(response->toWebView2Response(webViewEnv));
+                  failedLog(deferral->Complete());
+                  return false;
+                };
+              callback->nullSuccess = [this, deferral, args, onLoadResourceWithCustomSchemeCallback]()
+                {
+                  onLoadResourceWithCustomSchemeCallback();
+                  return false;
+                };
+              callback->defaultBehaviour = defaultBehaviour;
+              callback->error = [this, defaultBehaviour](const std::string& error_code, const std::string& error_message, const flutter::EncodableValue* error_details)
+                {
+                  debugLog(error_code + ", " + error_message);
+                  defaultBehaviour(std::nullopt);
+                };
+              channelDelegate->shouldInterceptRequest(request, std::move(callback));
+            }
+            else {
+              onLoadResourceWithCustomSchemeCallback();
+            }
+          }
+          return S_OK;
+        }
+      ).Get(), nullptr));
 
     wil::com_ptr<ICoreWebView2_2> webView2;
     if (SUCCEEDED(webView->QueryInterface(IID_PPV_ARGS(&webView2)))) {

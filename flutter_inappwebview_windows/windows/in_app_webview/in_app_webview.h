@@ -21,6 +21,8 @@
 #include "user_content_controller.h"
 #include "webview_channel_delegate.h"
 
+#include <WebView2EnvironmentOptions.h>
+
 namespace flutter_inappwebview_plugin
 {
   class InAppBrowser;

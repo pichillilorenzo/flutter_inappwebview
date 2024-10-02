@@ -58,6 +58,22 @@ namespace flutter_inappwebview_plugin
       };
   }
 
+  WebViewChannelDelegate::ShouldInterceptRequestCallback::ShouldInterceptRequestCallback()
+  {
+    decodeResult = [](const flutter::EncodableValue* value)
+      {
+        return value == nullptr || value->IsNull() ? std::optional<std::shared_ptr<WebResourceResponse>>{} : std::make_shared<WebResourceResponse>(std::get<flutter::EncodableMap>(*value));
+      };
+  }
+
+  WebViewChannelDelegate::LoadResourceWithCustomSchemeCallback::LoadResourceWithCustomSchemeCallback()
+  {
+    decodeResult = [](const flutter::EncodableValue* value)
+      {
+        return value == nullptr || value->IsNull() ? std::optional<std::shared_ptr<CustomSchemeResponse>>{} : std::make_shared<CustomSchemeResponse>(std::get<flutter::EncodableMap>(*value));
+      };
+  }
+
   void WebViewChannelDelegate::HandleMethodCall(const flutter::MethodCall<flutter::EncodableValue>& method_call,
     std::unique_ptr<flutter::MethodResult<flutter::EncodableValue>> result)
   {
@@ -446,6 +462,30 @@ namespace flutter_inappwebview_plugin
       {"resources", make_fl_value(resources)}
       });
     channel->InvokeMethod("onPermissionRequest", std::move(arguments), std::move(callback));
+  }
+
+  void WebViewChannelDelegate::shouldInterceptRequest(std::shared_ptr<WebResourceRequest> request, std::unique_ptr<ShouldInterceptRequestCallback> callback) const
+  {
+    if (!channel) {
+      callback->defaultBehaviour(std::nullopt);
+      return;
+    }
+
+    auto arguments = std::make_unique<flutter::EncodableValue>(make_fl_value(request->toEncodableMap()));
+    channel->InvokeMethod("shouldInterceptRequest", std::move(arguments), std::move(callback));
+  }
+
+  void WebViewChannelDelegate::onLoadResourceWithCustomScheme(std::shared_ptr<WebResourceRequest> request, std::unique_ptr<LoadResourceWithCustomSchemeCallback> callback) const
+  {
+    if (!channel) {
+      callback->defaultBehaviour(std::nullopt);
+      return;
+    }
+
+    auto arguments = std::make_unique<flutter::EncodableValue>(flutter::EncodableMap{
+      {"request", request->toEncodableMap()},
+      });
+    channel->InvokeMethod("onLoadResourceWithCustomScheme", std::move(arguments), std::move(callback));
   }
 
   WebViewChannelDelegate::~WebViewChannelDelegate()

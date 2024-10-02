@@ -25,12 +25,11 @@ Future main() async {
 
   if (!kIsWeb && defaultTargetPlatform == TargetPlatform.windows) {
     final availableVersion = await WebViewEnvironment.getAvailableVersion();
-    assert(availableVersion != null, 'Failed to find an installed WebView2 runtime or non-stable Microsoft Edge installation.');
+    assert(availableVersion != null,
+        'Failed to find an installed WebView2 runtime or non-stable Microsoft Edge installation.');
 
-    webViewEnvironment = await WebViewEnvironment.create(settings:
-      WebViewEnvironmentSettings(
-          userDataFolder: 'custom_path'
-      ));
+    webViewEnvironment = await WebViewEnvironment.create(
+        settings: WebViewEnvironmentSettings(userDataFolder: 'custom_path'));
   }
 
   if (!kIsWeb && defaultTargetPlatform == TargetPlatform.android) {

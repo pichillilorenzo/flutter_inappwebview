@@ -229,6 +229,7 @@ class PlatformWebViewCreationParams<T> {
   ///- Android native WebView
   ///- iOS ([Official API - WKURLSchemeHandler](https://developer.apple.com/documentation/webkit/wkurlschemehandler))
   ///- MacOS ([Official API - WKURLSchemeHandler](https://developer.apple.com/documentation/webkit/wkurlschemehandler))
+  ///- Windows
   ///{@endtemplate}
   final Future<CustomSchemeResponse?> Function(
       T controller, WebResourceRequest request)? onLoadResourceWithCustomScheme;
@@ -745,6 +746,7 @@ class PlatformWebViewCreationParams<T> {
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebViewClient.shouldInterceptRequest](https://developer.android.com/reference/android/webkit/WebViewClient#shouldInterceptRequest(android.webkit.WebView,%20android.webkit.WebResourceRequest)))
+  ///- Windows ([ICoreWebView2.add_WebResourceRequested](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2?view=webview2-1.0.2478.35#add_webresourcerequested))
   ///{@endtemplate}
   final Future<WebResourceResponse?> Function(
       T controller, WebResourceRequest request)? shouldInterceptRequest;

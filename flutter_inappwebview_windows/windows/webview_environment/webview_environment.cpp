@@ -46,6 +46,14 @@ namespace flutter_inappwebview_plugin
       if (settings->targetCompatibleBrowserVersion.has_value()) {
         options->put_TargetCompatibleBrowserVersion(utf8_to_wide(settings->targetCompatibleBrowserVersion.value()).c_str());
       }
+      wil::com_ptr<ICoreWebView2EnvironmentOptions4> options4;
+      if (succeededOrLog(options->QueryInterface(IID_PPV_ARGS(&options4))) && settings->customSchemeRegistrations.has_value()) {
+        std::vector<ICoreWebView2CustomSchemeRegistration*> registrations = {};
+        for (auto& customSchemeRegistration : settings->customSchemeRegistrations.value()) {
+          registrations.push_back(std::move(customSchemeRegistration->toWebView2CustomSchemeRegistration()));
+        }
+        options4->SetCustomSchemeRegistrations(static_cast<UINT32>(registrations.size()), registrations.data());
+      }
     }
 
     auto hr = CreateCoreWebView2EnvironmentWithOptions(

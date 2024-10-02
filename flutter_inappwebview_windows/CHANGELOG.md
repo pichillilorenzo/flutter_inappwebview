@@ -1,3 +1,8 @@
+## 0.5.0
+
+- Implemented `shouldInterceptRequest`, `onLoadResourceWithCustomScheme` WebView events
+- Updated flutter_inappwebview_platform_interface version to ^1.3.0
+
 ## 0.4.1
 
 - Implemented `incognito` for `InAppWebViewSettings`

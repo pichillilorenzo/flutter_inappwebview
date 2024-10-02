@@ -13,13 +13,11 @@ body:
         **Please fill out the following information:**
   - type: checkboxes
     attributes:
-      label: Is there an existing issue for this? (Please read the description)
+      label: Is there an existing issue for this?
       description: |
         PLEASE! Make sure to check if this issue is a duplicate. 
         
-        Search for it using the GitHub issue search box (check the closed issues too) or 
-        on the official [inappwebview.dev](https://inappwebview.dev/) website,
-        or, also, using Google, StackOverflow, etc. before posting a new one.
+        Search for it using the GitHub issue search box (check the closed issues too) or on the official [inappwebview.dev](https://inappwebview.dev/) website, or using Google, StackOverflow, etc. before posting a new one.
         
         You may already find an answer to your problem!
       options:
@@ -88,7 +86,9 @@ body:
     attributes:
       label: Plugin version
       description: In which version of flutter_inappwebview did you encounter this bug?
-      placeholder: (e.g.) v6.1.0
+      placeholder: v6.1.0, v6.0.0, etc.
+    validations:
+      required: true
   - type: textarea
     attributes:
       label: Additional information

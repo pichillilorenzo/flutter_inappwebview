@@ -1,3 +1,7 @@
+## 1.3.0+1
+
+- Fixed `X509Certificate.toMap` method
+
 ## 1.3.0
 
 - Added `WebViewEnvironment.customSchemeRegistrations` parameter for Windows

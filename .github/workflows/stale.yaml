@@ -2,7 +2,7 @@ name: Close Stale Issues
 
 on:
   schedule:
-    - cron: '0 0 * * *' # Run every day at midnight
+    - cron: '0 * * * *' # Run every hour
 
 jobs:
   close-issues:
@@ -11,10 +11,12 @@ jobs:
       issues: write
     steps:
       - name: Close stale issues
-        uses: actions/stale@v5
+        uses: actions/stale@v9.0.0
         with:
           days-before-issue-stale: 365
           days-before-issue-close: 0
           stale-issue-label: "stale"
           stale-issue-message: "This issue is stale and has been automatically closed because it has been open for more than 365 days with no activity. Please reopen a new issue if you still have it."
+          days-before-pr-stale: -1
+          days-before-pr-close: -1
           repo-token: ${{ secrets.GITHUB_TOKEN }}

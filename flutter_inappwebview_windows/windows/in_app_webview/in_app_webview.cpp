@@ -1283,7 +1283,8 @@ namespace flutter_inappwebview_plugin
 
         nlohmann::json parameters = {
           {"expression", source},
-          {"awaitPromise", true}
+          {"awaitPromise", true},
+          { "returnByValue", true }
         };
 
         if (contextId >= 0) {

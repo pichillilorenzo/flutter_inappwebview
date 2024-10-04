@@ -1,3 +1,7 @@
+## 0.5.0+2
+
+- Fixed `InAppWebViewController.callAsyncJavaScript` not working with JSON objects
+
 ## 0.5.0+1
 
 - Fixed `onLoadResourceWithCustomScheme` WebView event called every time

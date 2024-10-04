@@ -835,6 +835,12 @@ namespace flutter_inappwebview_plugin
           if (channelDelegate && succeededOrLog(args->get_Request(&webResourceRequest)) && succeededOrLog(args->GetDeferral(&deferral))) {
             auto request = std::make_shared<WebResourceRequest>(webResourceRequest);
 
+            // The add_WebResourceRequested event is by default raised for file, http, and https URI schemes.
+            // This is also raised for registered custom URI schemes.
+            // https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2?view=webview2-1.0.2792.45#add_webresourcerequested
+            auto url = request->url.has_value() ? request->url.value() : "";
+            auto isCustomScheme = !url.empty() && !starts_with(url, std::string{ "file://" }) && !starts_with(url, std::string{ "http://" }) && !starts_with(url, std::string{ "https://" });
+
             auto onLoadResourceWithCustomSchemeCallback = [this, deferral, request, args]()
               {
                 if (channelDelegate) {
@@ -874,9 +880,14 @@ namespace flutter_inappwebview_plugin
                   failedLog(deferral->Complete());
                   return false;
                 };
-              callback->nullSuccess = [this, deferral, args, onLoadResourceWithCustomSchemeCallback]()
+              callback->nullSuccess = [this, deferral, args, isCustomScheme, onLoadResourceWithCustomSchemeCallback]()
                 {
-                  onLoadResourceWithCustomSchemeCallback();
+                  if (isCustomScheme) {
+                    onLoadResourceWithCustomSchemeCallback();
+                  }
+                  else {
+                    failedLog(deferral->Complete());
+                  }
                   return false;
                 };
               callback->defaultBehaviour = defaultBehaviour;
@@ -887,8 +898,11 @@ namespace flutter_inappwebview_plugin
                 };
               channelDelegate->shouldInterceptRequest(request, std::move(callback));
             }
-            else {
+            else if (isCustomScheme) {
               onLoadResourceWithCustomSchemeCallback();
+            }
+            else {
+              failedLog(deferral->Complete());
             }
           }
           return S_OK;

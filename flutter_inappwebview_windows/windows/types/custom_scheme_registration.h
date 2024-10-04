@@ -4,7 +4,6 @@
 #include <flutter/standard_method_codec.h>
 #include <optional>
 #include <WebView2EnvironmentOptions.h>
-#include <wil/com.h>
 
 namespace flutter_inappwebview_plugin
 {

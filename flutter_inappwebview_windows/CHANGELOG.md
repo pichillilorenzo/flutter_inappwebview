@@ -1,3 +1,7 @@
+## 0.5.0+1
+
+- Fixed `onLoadResourceWithCustomScheme` WebView event called every time
+
 ## 0.5.0
 
 - Implemented `shouldInterceptRequest`, `onLoadResourceWithCustomScheme` WebView events

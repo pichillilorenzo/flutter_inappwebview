@@ -29,6 +29,8 @@ namespace flutter_inappwebview_plugin
     TextureBridge* texture_bridge() const { return texture_bridge_.get(); }
 
     int64_t texture_id() const { return texture_id_; }
+
+    void UnregisterMethodCallHandler() const;
   private:
     HWND hwnd_;
     std::unique_ptr<flutter::TextureVariant> flutter_texture_;

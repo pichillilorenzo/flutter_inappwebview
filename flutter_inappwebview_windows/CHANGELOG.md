@@ -1,3 +1,7 @@
+## 0.6.0
+
+- Updated code to support multiple flutter windows
+
 ## 0.5.0+2
 
 - Fixed `InAppWebViewController.callAsyncJavaScript` not working with JSON objects

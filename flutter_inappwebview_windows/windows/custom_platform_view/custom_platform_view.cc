@@ -186,12 +186,21 @@ namespace flutter_inappwebview_plugin
     event_channel_->SetStreamHandler(std::move(handler));
   }
 
+  void CustomPlatformView::UnregisterMethodCallHandler() const
+  {
+    if (method_channel_) {
+      method_channel_->SetMethodCallHandler(nullptr);
+      if (view && view->channelDelegate) {
+        view->channelDelegate->UnregisterMethodCallHandler();
+      }
+    }
+  }
+
   CustomPlatformView::~CustomPlatformView()
   {
     debugLog("dealloc CustomPlatformView");
-    method_channel_->SetMethodCallHandler(nullptr);
     event_sink_ = nullptr;
-    texture_registrar_->UnregisterTexture(texture_id_);
+    texture_registrar_->UnregisterTexture(texture_id_, nullptr);
   }
 
   void CustomPlatformView::RegisterEventHandlers()

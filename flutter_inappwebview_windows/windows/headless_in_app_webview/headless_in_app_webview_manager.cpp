@@ -46,6 +46,11 @@ namespace flutter_inappwebview_plugin
   {
     auto result_ = std::shared_ptr<flutter::MethodResult<flutter::EncodableValue>>(std::move(result));
 
+    if (!plugin) {
+      result_->Error("0", "Cannot create the HeadlessInAppWebView instance!");
+      return;
+    }
+
     auto id = get_fl_map_value<std::string>(*arguments, "id");
     auto params = get_fl_map_value<flutter::EncodableMap>(*arguments, "params");
 
@@ -80,7 +85,7 @@ namespace flutter_inappwebview_plugin
         wil::com_ptr<ICoreWebView2Controller> webViewController,
         wil::com_ptr<ICoreWebView2CompositionController> webViewCompositionController)
       {
-        if (webViewEnv && webViewController) {
+        if (plugin && webViewEnv && webViewController) {
           std::optional<std::vector<std::shared_ptr<UserScript>>> initialUserScripts = initialUserScriptList.has_value() ?
             functional_map(initialUserScriptList.value(), [](const flutter::EncodableValue& map) { return std::make_shared<UserScript>(std::get<flutter::EncodableMap>(map)); }) :
             std::optional<std::vector<std::shared_ptr<UserScript>>>{};

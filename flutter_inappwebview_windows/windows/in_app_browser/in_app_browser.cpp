@@ -200,11 +200,17 @@ namespace flutter_inappwebview_plugin
       if (!destroyed_) {
         destroyed_ = true;
 
-        webView.reset();
-
         if (channelDelegate) {
           channelDelegate->onExit();
         }
+
+        if (channelDelegate) {
+          channelDelegate->UnregisterMethodCallHandler();
+          if (webView && webView->channelDelegate) {
+            webView->channelDelegate->UnregisterMethodCallHandler();
+          }
+        }
+        webView.reset();
 
         if (plugin && plugin->inAppBrowserManager) {
           plugin->inAppBrowserManager->browsers.erase(id);

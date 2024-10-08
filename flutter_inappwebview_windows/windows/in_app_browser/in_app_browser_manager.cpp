@@ -25,8 +25,14 @@ namespace flutter_inappwebview_plugin
     auto& methodName = method_call.method_name();
 
     if (string_equals(methodName, "open")) {
-      createInAppBrowser(arguments);
-      result->Success(true);
+      if (plugin) {
+        createInAppBrowser(arguments);
+        result->Success(true);
+      }
+      else {
+        result->Error("0", "Cannot create the InAppBrowser instance!");
+
+      }
     }
     else if (string_equals(methodName, "openWithSystemBrowser")) {
       auto url = get_fl_map_value<std::string>(*arguments, "url");

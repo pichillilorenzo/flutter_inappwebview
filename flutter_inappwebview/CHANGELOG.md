@@ -1,3 +1,13 @@
+## 6.1.5
+
+- Updated dependencies to the latest versions for all platform implementations:
+  - `flutter_inappwebview_windows`: `^0.5.0` -> `^0.6.0`
+
+#### Windows Platform
+- Updated code to support multiple flutter windows
+- Fixed `InAppWebViewController.callAsyncJavaScript` not working with JSON objects
+- Fixed `onLoadResourceWithCustomScheme` WebView event called every time
+
 ## 6.1.4
 
 - Updated dependencies to the latest versions for all platform implementations:

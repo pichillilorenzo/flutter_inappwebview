@@ -31,8 +31,9 @@ func createInterceptOnlyAsyncAjaxRequestsPluginScript(onlyAsync: Bool) -> Plugin
 }
 
 let INTERCEPT_AJAX_REQUEST_JS_SOURCE = """
-\(FLAG_VARIABLE_FOR_SHOULD_INTERCEPT_AJAX_REQUEST_JS_SOURCE) = true;
 (function(ajax) {
+  var w = (window.top == null || window.top === window) ? window : window.top;
+  w.\(FLAG_VARIABLE_FOR_SHOULD_INTERCEPT_AJAX_REQUEST_JS_SOURCE) = true;
   var send = ajax.prototype.send;
   var open = ajax.prototype.open;
   var setRequestHeader = ajax.prototype.setRequestHeader;
@@ -83,7 +84,8 @@ let INTERCEPT_AJAX_REQUEST_JS_SOURCE = """
   };
   function handleEvent(e) {
     var self = this;
-    if (\(FLAG_VARIABLE_FOR_SHOULD_INTERCEPT_AJAX_REQUEST_JS_SOURCE) == null || \(FLAG_VARIABLE_FOR_SHOULD_INTERCEPT_AJAX_REQUEST_JS_SOURCE) == true) {
+    var w = (window.top == null || window.top === window) ? window : window.top;
+    if (w.\(FLAG_VARIABLE_FOR_SHOULD_INTERCEPT_AJAX_REQUEST_JS_SOURCE) == null || w.\(FLAG_VARIABLE_FOR_SHOULD_INTERCEPT_AJAX_REQUEST_JS_SOURCE) == true) {
       var headers = this.getAllResponseHeaders();
       var responseHeaders = {};
       if (headers != null) {
@@ -134,13 +136,14 @@ let INTERCEPT_AJAX_REQUEST_JS_SOURCE = """
   };
   ajax.prototype.send = function(data) {
     var self = this;
-    var canBeIntercepted = self._flutter_inappwebview_isAsync || \(FLAG_VARIABLE_FOR_INTERCEPT_ONLY_ASYNC_AJAX_REQUESTS_JS_SOURCE) === false;
-    if (canBeIntercepted && (\(FLAG_VARIABLE_FOR_SHOULD_INTERCEPT_AJAX_REQUEST_JS_SOURCE) == null || \(FLAG_VARIABLE_FOR_SHOULD_INTERCEPT_AJAX_REQUEST_JS_SOURCE) == true)) {
+    var w = (window.top == null || window.top === window) ? window : window.top;
+    var canBeIntercepted = self._flutter_inappwebview_isAsync || w.\(FLAG_VARIABLE_FOR_INTERCEPT_ONLY_ASYNC_AJAX_REQUESTS_JS_SOURCE) === false;
+    if (canBeIntercepted && (w.\(FLAG_VARIABLE_FOR_SHOULD_INTERCEPT_AJAX_REQUEST_JS_SOURCE) == null || w.\(FLAG_VARIABLE_FOR_SHOULD_INTERCEPT_AJAX_REQUEST_JS_SOURCE) == true)) {
       if (!this._flutter_inappwebview_already_onreadystatechange_wrapped) {
         this._flutter_inappwebview_already_onreadystatechange_wrapped = true;
         var onreadystatechange = this.onreadystatechange;
         this.onreadystatechange = function() {
-          if (\(FLAG_VARIABLE_FOR_SHOULD_INTERCEPT_AJAX_REQUEST_JS_SOURCE) == null || \(FLAG_VARIABLE_FOR_SHOULD_INTERCEPT_AJAX_REQUEST_JS_SOURCE) == true) {
+          if (w.\(FLAG_VARIABLE_FOR_SHOULD_INTERCEPT_AJAX_REQUEST_JS_SOURCE) == null || w.\(FLAG_VARIABLE_FOR_SHOULD_INTERCEPT_AJAX_REQUEST_JS_SOURCE) == true) {
             var headers = this.getAllResponseHeaders();
             var responseHeaders = {};
             if (headers != null) {

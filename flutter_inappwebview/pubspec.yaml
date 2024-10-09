@@ -12,6 +12,10 @@ topics:
   - webview-flutter
   - inappwebview
   - browser
+platforms:
+  android:
+  ios:
+  web:
 
 environment:
   sdk: ^3.5.0

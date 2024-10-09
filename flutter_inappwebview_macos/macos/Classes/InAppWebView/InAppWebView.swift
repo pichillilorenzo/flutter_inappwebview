@@ -1455,7 +1455,7 @@ public class InAppWebView: WKWebView, WKUIDelegate,
             if let scheme = challenge.protectionSpace.protocol, scheme == "https" {
                 // workaround for ProtectionSpace SSL Certificate
                 // https://github.com/pichillilorenzo/flutter_inappwebview/issues/1678
-                DispatchQueue.global(qos: .background).async {
+                DispatchQueue.global().async {
                     if let sslCertificate = challenge.protectionSpace.sslCertificate {
                         DispatchQueue.main.async {
                             InAppWebView.sslCertificatesMap[challenge.protectionSpace.host] = sslCertificate
@@ -1475,7 +1475,7 @@ public class InAppWebView: WKWebView, WKUIDelegate,
                             break
                         case 1:
                             // workaround for https://github.com/pichillilorenzo/flutter_inappwebview/issues/1924
-                            DispatchQueue.global(qos: .background).async {
+                            DispatchQueue.global().async {
                                 let exceptions = SecTrustCopyExceptions(serverTrust)
                                 SecTrustSetExceptions(serverTrust, exceptions)
                                 let credential = URLCredential(trust: serverTrust)

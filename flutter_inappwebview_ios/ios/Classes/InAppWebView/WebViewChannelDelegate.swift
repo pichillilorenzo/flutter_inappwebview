@@ -344,6 +344,10 @@ public class WebViewChannelDelegate: ChannelDelegate {
                 result(nil)
             }
             break
+        case .requestFocus:
+            webView?.requestFocus()
+            result(true)
+            break
         case .clearFocus:
             webView?.clearFocus()
             result(true)

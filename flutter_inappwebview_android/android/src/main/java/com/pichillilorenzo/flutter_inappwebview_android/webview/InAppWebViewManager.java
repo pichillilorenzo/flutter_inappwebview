@@ -178,22 +178,24 @@ public class InAppWebViewManager extends ChannelDelegateImpl {
   }
 
   public void disposeKeepAlive(@NonNull String keepAliveId) {
-    FlutterWebView flutterWebView = keepAliveWebViews.get(keepAliveId);
-    if (flutterWebView != null) {
-      flutterWebView.keepAliveId = null;
-      // be sure to remove the view from the previous parent.
-      View view = flutterWebView.getView();
-      if (view != null) {
-        ViewGroup parent = (ViewGroup) view.getParent();
-        if (parent != null) {
-          parent.removeView(view);
-        }
+    FlutterWebView flutterWebView = keepAliveWebViews.remove(keepAliveId);
+    disposeKeepAlive(flutterWebView);
+  }
+
+  public void disposeKeepAlive(@Nullable FlutterWebView flutterWebView) {
+    if (flutterWebView == null || flutterWebView.keepAliveId == null) {
+        return;
+    }
+    flutterWebView.keepAliveId = null;
+    // be sure to remove the view from the previous parent.
+    View view = flutterWebView.getView();
+    if (view != null) {
+      ViewGroup parent = (ViewGroup) view.getParent();
+      if (parent != null) {
+        parent.removeView(view);
       }
-      flutterWebView.dispose();
     }
-    if (keepAliveWebViews.containsKey(keepAliveId)) {
-      keepAliveWebViews.put(keepAliveId, null);
-    }
+    flutterWebView.dispose();
   }
 
   public void clearAllCache(@NonNull Context context, boolean includeDiskFiles) {
@@ -207,10 +209,7 @@ public class InAppWebViewManager extends ChannelDelegateImpl {
     super.dispose();
     Collection<FlutterWebView> flutterWebViews = keepAliveWebViews.values();
     for (FlutterWebView flutterWebView : flutterWebViews) {
-      String keepAliveId = flutterWebView.keepAliveId;
-      if (keepAliveId != null) {
-        disposeKeepAlive(flutterWebView.keepAliveId);
-      }
+      disposeKeepAlive(flutterWebView);
     }
     keepAliveWebViews.clear();
     windowWebViewMessages.clear();

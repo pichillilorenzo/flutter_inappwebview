@@ -59,6 +59,7 @@ public enum WebViewChannelDelegateMethods: String {
     case getSelectedText = "getSelectedText"
     case getHitTestResult = "getHitTestResult"
     case clearFocus = "clearFocus"
+    case requestFocus = "requestFocus"
     case setContextMenu = "setContextMenu"
     case requestFocusNodeHref = "requestFocusNodeHref"
     case requestImageRef = "requestImageRef"

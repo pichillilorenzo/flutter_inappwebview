@@ -1033,10 +1033,8 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
             if !newSettings.enableViewportScale {
                 if configuration.userContentController.userScripts.contains(ENABLE_VIEWPORT_SCALE_JS_PLUGIN_SCRIPT) {
                     configuration.userContentController.removePluginScript(ENABLE_VIEWPORT_SCALE_JS_PLUGIN_SCRIPT)
-                    evaluateJavaScript(NOT_ENABLE_VIEWPORT_SCALE_JS_SOURCE)
                 }
             } else {
-                evaluateJavaScript(ENABLE_VIEWPORT_SCALE_JS_SOURCE)
                 configuration.userContentController.addUserScript(ENABLE_VIEWPORT_SCALE_JS_PLUGIN_SCRIPT)
             }
         }
@@ -1045,10 +1043,8 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
             if newSettings.supportZoom {
                 if configuration.userContentController.userScripts.contains(NOT_SUPPORT_ZOOM_JS_PLUGIN_SCRIPT) {
                     configuration.userContentController.removePluginScript(NOT_SUPPORT_ZOOM_JS_PLUGIN_SCRIPT)
-                    evaluateJavaScript(SUPPORT_ZOOM_JS_SOURCE)
                 }
             } else {
-                evaluateJavaScript(NOT_SUPPORT_ZOOM_JS_SOURCE)
                 configuration.userContentController.addUserScript(NOT_SUPPORT_ZOOM_JS_PLUGIN_SCRIPT)
             }
         }
@@ -1322,10 +1318,8 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
                 let enableSource = "\(flagVariable) = \(enable);"
                 if #available(iOS 14.0, *), pluginScript.requiredInAllContentWorlds {
                     for contentWorld in self.configuration.userContentController.contentWorlds {
-                        self.evaluateJavaScript(enableSource, frame: nil, contentWorld: contentWorld, completionHandler: nil)
                     }
                 } else {
-                    self.evaluateJavaScript(enableSource, completionHandler: nil)
                 }
                 if !enable {
                     self.configuration.userContentController.removePluginScripts(with: pluginScript.groupName!)
@@ -1334,11 +1328,9 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
             else if enable {
                 if #available(iOS 14.0, *), pluginScript.requiredInAllContentWorlds {
                     for contentWorld in self.configuration.userContentController.contentWorlds {
-                        self.evaluateJavaScript(pluginScript.source, frame: nil, contentWorld: contentWorld, completionHandler: nil)
                         self.configuration.userContentController.addPluginScript(pluginScript)
                     }
                 } else {
-                    self.evaluateJavaScript(pluginScript.source, completionHandler: nil)
                     self.configuration.userContentController.addPluginScript(pluginScript)
                 }
                 self.configuration.userContentController.sync(scriptMessageHandler: self)
@@ -1429,8 +1421,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
         }
     }
     
-#if compiler(>=6.0)
-    public override func evaluateJavaScript(_ javaScriptString: String, completionHandler: (@MainActor @Sendable (Any?, (any Error)?) -> Void)? = nil) {
+    public func evaluateJavaScript(_ javaScriptString: String, completionHandler: ((Any?, Error?) -> Void)? = nil) {
         if let applePayAPIEnabled = settings?.applePayAPIEnabled, applePayAPIEnabled {
             if let completionHandler = completionHandler {
                 completionHandler(nil, nil)
@@ -1439,17 +1430,6 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
         }
         super.evaluateJavaScript(javaScriptString, completionHandler: completionHandler)
     }
-#else
-    public override func evaluateJavaScript(_ javaScriptString: String, completionHandler: ((Any?, Error?) -> Void)? = nil) {
-        if let applePayAPIEnabled = settings?.applePayAPIEnabled, applePayAPIEnabled {
-            if let completionHandler = completionHandler {
-                completionHandler(nil, nil)
-            }
-            return
-        }
-        super.evaluateJavaScript(javaScriptString, completionHandler: completionHandler)
-    }
-#endif
     
     @available(iOS 14.0, *)
     public func evaluateJavaScript(_ javaScript: String, frame: WKFrameInfo? = nil, contentWorld: WKContentWorld, completionHandler: ((Result<Any, Error>) -> Void)? = nil) {
@@ -1922,7 +1902,6 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
         initializeWindowIdJS()
         
         InAppWebView.credentialsProposed = []
-        evaluateJavaScript(PLATFORM_READY_JS_SOURCE, completionHandler: nil)
         
         // sometimes scrollView.contentSize doesn't fit all the frame.size available
         // so, we call setNeedsLayout to redraw the layout
@@ -2868,24 +2847,10 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
                 if let r = response as? String {
                     json = r
                 }
-                
-                self?.evaluateJavaScript("""
-if(window.\(JAVASCRIPT_BRIDGE_NAME)[\(_callHandlerID)] != null) {
-    window.\(JAVASCRIPT_BRIDGE_NAME)[\(_callHandlerID)].resolve(\(json));
-    delete window.\(JAVASCRIPT_BRIDGE_NAME)[\(_callHandlerID)];
-}
-""", completionHandler: nil)
             }
             callback.error = { [weak self] (code: String, message: String?, details: Any?) in
                 let errorMessage = code + (message != nil ? ", " + (message ?? "") : "")
                 print(errorMessage)
-                
-                self?.evaluateJavaScript("""
-if(window.\(JAVASCRIPT_BRIDGE_NAME)[\(_callHandlerID)] != null) {
-    window.\(JAVASCRIPT_BRIDGE_NAME)[\(_callHandlerID)].reject(new Error('\(errorMessage.replacingOccurrences(of: "\'", with: "\\'"))'));
-    delete window.\(JAVASCRIPT_BRIDGE_NAME)[\(_callHandlerID)];
-}
-""", completionHandler: nil)
             }
             
             if let channelDelegate = webView.channelDelegate {
@@ -2974,7 +2939,6 @@ if(window.\(JAVASCRIPT_BRIDGE_NAME)[\(_callHandlerID)] != null) {
         if !isPausedTimers {
             isPausedTimers = true
             let script = "alert();";
-            self.evaluateJavaScript(script, completionHandler: nil)
         }
     }
     

@@ -55,7 +55,11 @@ public class ChromeSafariBrowserManager extends ChannelDelegateImpl {
           HashMap<String, Object> actionButton = (HashMap<String, Object>) call.argument("actionButton");
           HashMap<String, Object> secondaryToolbar = (HashMap<String, Object>) call.argument("secondaryToolbar");
           List<HashMap<String, Object>> menuItemList = (List<HashMap<String, Object>>) call.argument("menuItemList");
-          open(plugin.activity, viewId, url, headers, referrer, otherLikelyURLs, settings, actionButton, secondaryToolbar, menuItemList, result);
+          try {
+            open(plugin.activity, viewId, url, headers, referrer, otherLikelyURLs, settings, actionButton, secondaryToolbar, menuItemList, result);
+          } catch (ClassNotFoundException e) {
+            result.error(LOG_TAG, e.getMessage(), null);
+          }
         } else {
           result.success(false);
         }

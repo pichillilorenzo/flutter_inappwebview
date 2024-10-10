@@ -243,6 +243,13 @@ public class ChromeCustomTabsChannelDelegate extends ChannelDelegateImpl {
     channel.invokeMethod("onSessionEnded", obj);
   }
 
+  public void onBrowserNotSupported() {
+    MethodChannel channel = getChannel();
+    if (channel == null) return;
+    Map<String, Object> obj = new HashMap<>();
+    channel.invokeMethod("onBrowserNotSupported", obj);
+  }
+
   @Override
   public void dispose() {
     super.dispose();

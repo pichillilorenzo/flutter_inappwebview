@@ -114,9 +114,16 @@ public class ChromeCustomTabsActivity extends Activity implements Disposable {
     customTabActivityHelper.setConnectionCallback(new CustomTabActivityHelper.ConnectionCallback() {
       @Override
       public void onCustomTabsConnected() {
-        customTabsConnected();
-        if (channelDelegate != null) {
-          channelDelegate.onServiceConnected();
+        try {
+          customTabsConnected();
+          if (channelDelegate != null) {
+            channelDelegate.onServiceConnected();
+          }
+        } catch (java.lang.Exception e) {
+          if (channelDelegate != null) {
+            channelDelegate.onBrowserNotSupported();
+          }
+          Log.d(LOG_TAG, "Custom Tabs not supported", e);
         }
       }
 
@@ -181,7 +188,7 @@ public class ChromeCustomTabsActivity extends Activity implements Disposable {
   public void launchUrl(@NonNull String url,
                         @Nullable Map<String, String> headers,
                         @Nullable String referrer,
-                        @Nullable List<String> otherLikelyURLs) {
+                        @Nullable List<String> otherLikelyURLs) throws ClassNotFoundException {
     launchUrlWithSession(customTabsSession, url, headers, referrer, otherLikelyURLs);
   }
 
@@ -189,7 +196,7 @@ public class ChromeCustomTabsActivity extends Activity implements Disposable {
                                    @NonNull String url,
                                    @Nullable Map<String, String> headers,
                                    @Nullable String referrer,
-                                   @Nullable List<String> otherLikelyURLs) {
+                                   @Nullable List<String> otherLikelyURLs) throws ClassNotFoundException {
     mayLaunchUrl(url, otherLikelyURLs);
     builder = new CustomTabsIntent.Builder(session);
     prepareCustomTabs();

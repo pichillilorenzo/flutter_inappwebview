@@ -8,10 +8,12 @@
     public boolean *(android.webkit.WebView, java.lang.String);
     public void *(android.webkit.webView, jav.lang.String);
 }
--keepclassmembers class com.pichillilorenzo.flutter_inappwebview_android$JavaScriptBridgeInterface {
+-keepclassmembers class com.pichillilorenzo.flutter_inappwebview$JavaScriptBridgeInterface {
      <fields>;
      <methods>;
      public *;
      private *;
 }
 -keep class com.pichillilorenzo.flutter_inappwebview_android.** { *; }
+# This is generated automatically by the Android Gradle plugin.
+-dontwarn android.window.BackEvent

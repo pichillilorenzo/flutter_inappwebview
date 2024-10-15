@@ -1,8 +1,13 @@
 # Configuration for probot-auto-labeler - https://github.com/probot/autolabeler
 
 # label: file | path
-android: ["/android", "*.kt", "*.java", "*gradle*", "AndroidManifest.xml"]
-iOS: ["/ios", "*.swift", "*.h", "*.m", "*.xcodeproj", "*.xcworkspace", "*.plist", "*.storyboard", "*.xcconfig", Podfile*"]
-flutter/dart: ["/lib", "*.dart"]
+android: ["/flutter_inappwebview_android", "*.dart", "*.kt", "*.java", "*gradle*", "AndroidManifest.xml"]
+iOS: ["/flutter_inappwebview_ios", "*.dart", "*.swift", "*.h", "*.m", "*.plist", "*.storyboard", "*.xcconfig", Podfile*"]
+macOS: ["/flutter_inappwebview_macos", "*.dart", "*.swift", "*.h", "*.m", "*.plist", "*.storyboard", "*.xcconfig", Podfile*"]
+windows: ["/flutter_inappwebview_windows", "*.dart", "*.cs", "*.c", "*.cpp", "*.h", "CMakeLists.txt"]
+linux: ["/flutter_inappwebview_linux", "*.dart", "*.c", "*.h", "*.cpp", "*.cmake", "*.makefile", "CMakeLists.txt"]
+web: ["/flutter_inappwebview_web", "*.dart", "*.html", "*.js", "*.css"]
+platform_interface: ["/flutter_inappwebview_platform_interface", "*.dart"]
+plugin: ["/flutter_inappwebview", "*.dart"]
 documentation: ["*.md"]
 legal: ["LICENSE*", "NOTICES*"]

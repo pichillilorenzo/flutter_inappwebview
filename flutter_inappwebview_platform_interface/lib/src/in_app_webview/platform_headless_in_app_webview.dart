@@ -162,6 +162,7 @@ class PlatformHeadlessInAppWebViewCreationParams
 ///- iOS
 ///- Web
 ///- MacOS
+///- Windows
 ///{@endtemplate}
 abstract class PlatformHeadlessInAppWebView extends PlatformInterface
     implements Disposable {

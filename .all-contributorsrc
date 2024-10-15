@@ -493,7 +493,8 @@
       "avatar_url": "https://avatars.githubusercontent.com/u/1270149?v=4",
       "profile": "https://uekoetter.dev/",
       "contributions": [
-        "doc"
+        "doc",
+        "code"
       ]
     },
     {
@@ -744,6 +745,24 @@
       "name": "daisukeueta",
       "avatar_url": "https://avatars.githubusercontent.com/u/122339799?v=4",
       "profile": "https://github.com/daisukeueta",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "gmackall",
+      "name": "Gray Mackall",
+      "avatar_url": "https://avatars.githubusercontent.com/u/34871572?v=4",
+      "profile": "https://github.com/gmackall",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "p-mazhnik",
+      "name": "Pavel Mazhnik",
+      "avatar_url": "https://avatars.githubusercontent.com/u/25964451?v=4",
+      "profile": "https://github.com/p-mazhnik",
       "contributions": [
         "code"
       ]

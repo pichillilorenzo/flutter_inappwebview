@@ -46,6 +46,11 @@ namespace flutter_inappwebview_plugin
   {
     auto result_ = std::shared_ptr<flutter::MethodResult<flutter::EncodableValue>>(std::move(result));
 
+    if (!plugin) {
+      result_->Error("0", "Cannot create the HeadlessInAppWebView instance!");
+      return;
+    }
+
     auto id = get_fl_map_value<std::string>(*arguments, "id");
     auto params = get_fl_map_value<flutter::EncodableMap>(*arguments, "params");
 
@@ -73,13 +78,14 @@ namespace flutter_inappwebview_plugin
     auto webViewEnvironment = webViewEnvironmentId.has_value() && map_contains(plugin->webViewEnvironmentManager->webViewEnvironments, webViewEnvironmentId.value())
       ? plugin->webViewEnvironmentManager->webViewEnvironments.at(webViewEnvironmentId.value()).get() : nullptr;
 
-    InAppWebView::createInAppWebViewEnv(hwnd, false, webViewEnvironment,
+    auto initialSettings = std::make_shared<InAppWebViewSettings>(settingsMap);
+
+    InAppWebView::createInAppWebViewEnv(hwnd, false, webViewEnvironment, initialSettings,
       [=](wil::com_ptr<ICoreWebView2Environment> webViewEnv,
         wil::com_ptr<ICoreWebView2Controller> webViewController,
         wil::com_ptr<ICoreWebView2CompositionController> webViewCompositionController)
       {
-        if (webViewEnv && webViewController) {
-          auto initialSettings = std::make_unique<InAppWebViewSettings>(settingsMap);
+        if (plugin && webViewEnv && webViewController) {
           std::optional<std::vector<std::shared_ptr<UserScript>>> initialUserScripts = initialUserScriptList.has_value() ?
             functional_map(initialUserScriptList.value(), [](const flutter::EncodableValue& map) { return std::make_shared<UserScript>(std::get<flutter::EncodableMap>(map)); }) :
             std::optional<std::vector<std::shared_ptr<UserScript>>>{};

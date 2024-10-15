@@ -50,6 +50,7 @@ void getTitle() {
     );
 
     final InAppWebViewController controller = await controllerCompleter.future;
+    await tester.pump();
     await pageStarted.future;
     await pageLoaded.future;
 

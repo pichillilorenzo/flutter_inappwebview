@@ -126,9 +126,7 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
       this.inAppBrowserDelegate.getActivityResultListeners().add(this);
     }
 
-    if (plugin.registrar != null)
-      plugin.registrar.addActivityResultListener(this);
-    else if (plugin.activityPluginBinding != null)
+    if (plugin.activityPluginBinding != null)
       plugin.activityPluginBinding.addActivityResultListener(this);
   }
 
@@ -741,7 +739,7 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
               consoleMessage.message(),
               consoleMessage.messageLevel().ordinal());
     }
-    return true;
+    return super.onConsoleMessage(consoleMessage);
   }
 
   @Override

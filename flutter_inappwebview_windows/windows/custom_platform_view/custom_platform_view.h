@@ -17,18 +17,20 @@ namespace flutter_inappwebview_plugin
   public:
     static inline const wchar_t* CLASS_NAME = L"CustomPlatformView";
 
-    const std::unique_ptr<flutter_inappwebview_plugin::InAppWebView> view;
+    std::shared_ptr<flutter_inappwebview_plugin::InAppWebView> view;
 
     CustomPlatformView(flutter::BinaryMessenger* messenger,
       flutter::TextureRegistrar* texture_registrar,
       GraphicsContext* graphics_context,
       HWND hwnd,
-      std::unique_ptr<flutter_inappwebview_plugin::InAppWebView> webView);
+      std::shared_ptr<flutter_inappwebview_plugin::InAppWebView> webView);
     ~CustomPlatformView();
 
     TextureBridge* texture_bridge() const { return texture_bridge_.get(); }
 
     int64_t texture_id() const { return texture_id_; }
+
+    void UnregisterMethodCallHandler() const;
   private:
     HWND hwnd_;
     std::unique_ptr<flutter::TextureVariant> flutter_texture_;

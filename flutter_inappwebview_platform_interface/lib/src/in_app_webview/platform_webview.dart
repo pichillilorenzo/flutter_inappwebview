@@ -123,6 +123,7 @@ class PlatformWebViewCreationParams<T> {
   ///- Android native WebView ([Official API - WebChromeClient.onProgressChanged](https://developer.android.com/reference/android/webkit/WebChromeClient#onProgressChanged(android.webkit.WebView,%20int)))
   ///- iOS
   ///- MacOS
+  ///- Windows
   ///{@endtemplate}
   final void Function(T controller, int progress)? onProgressChanged;
 
@@ -136,6 +137,7 @@ class PlatformWebViewCreationParams<T> {
   ///- iOS
   ///- MacOS
   ///- Web
+  ///- Windows
   ///{@endtemplate}
   final void Function(T controller, ConsoleMessage consoleMessage)?
       onConsoleMessage;
@@ -227,6 +229,7 @@ class PlatformWebViewCreationParams<T> {
   ///- Android native WebView
   ///- iOS ([Official API - WKURLSchemeHandler](https://developer.apple.com/documentation/webkit/wkurlschemehandler))
   ///- MacOS ([Official API - WKURLSchemeHandler](https://developer.apple.com/documentation/webkit/wkurlschemehandler))
+  ///- Windows
   ///{@endtemplate}
   final Future<CustomSchemeResponse?> Function(
       T controller, WebResourceRequest request)? onLoadResourceWithCustomScheme;
@@ -269,6 +272,7 @@ class PlatformWebViewCreationParams<T> {
   ///- iOS ([Official API - WKUIDelegate.webView](https://developer.apple.com/documentation/webkit/wkuidelegate/1536907-webview))
   ///- MacOS ([Official API - WKUIDelegate.webView](https://developer.apple.com/documentation/webkit/wkuidelegate/1536907-webview))
   ///- Web
+  ///- Windows ([Official API - ICoreWebView2.add_NewWindowRequested](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2?view=webview2-1.0.2210.55#add_newwindowrequested))
   ///{@endtemplate}
   final Future<bool?> Function(
       T controller, CreateWindowAction createWindowAction)? onCreateWindow;
@@ -281,6 +285,7 @@ class PlatformWebViewCreationParams<T> {
   ///- Android native WebView ([Official API - WebChromeClient.onCloseWindow](https://developer.android.com/reference/android/webkit/WebChromeClient#onCloseWindow(android.webkit.WebView)))
   ///- iOS ([Official API - WKUIDelegate.webViewDidClose](https://developer.apple.com/documentation/webkit/wkuidelegate/1537390-webviewdidclose))
   ///- MacOS ([Official API - WKUIDelegate.webViewDidClose](https://developer.apple.com/documentation/webkit/wkuidelegate/1537390-webviewdidclose))
+  ///- Windows ([Official API - ICoreWebView2.add_WindowCloseRequested](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2?view=webview2-1.0.2210.55#add_windowcloserequested))
   ///{@endtemplate}
   final void Function(T controller)? onCloseWindow;
 
@@ -683,6 +688,7 @@ class PlatformWebViewCreationParams<T> {
   ///- Android native WebView ([Official API - WebChromeClient.onPermissionRequest](https://developer.android.com/reference/android/webkit/WebChromeClient#onPermissionRequest(android.webkit.PermissionRequest)))
   ///- iOS
   ///- MacOS
+  ///- Windows ([Official API - ICoreWebView2.add_PermissionRequested](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/iwebview2webview?view=webview2-0.8.355#add_permissionrequested))
   ///{@endtemplate}
   final Future<PermissionResponse?> Function(
       T controller, PermissionRequest permissionRequest)? onPermissionRequest;
@@ -740,6 +746,7 @@ class PlatformWebViewCreationParams<T> {
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebViewClient.shouldInterceptRequest](https://developer.android.com/reference/android/webkit/WebViewClient#shouldInterceptRequest(android.webkit.WebView,%20android.webkit.WebResourceRequest)))
+  ///- Windows ([ICoreWebView2.add_WebResourceRequested](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2?view=webview2-1.0.2478.35#add_webresourcerequested))
   ///{@endtemplate}
   final Future<WebResourceResponse?> Function(
       T controller, WebResourceRequest request)? shouldInterceptRequest;

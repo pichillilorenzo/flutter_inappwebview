@@ -9,15 +9,12 @@ import Foundation
 import WebKit
 import FlutterMacOS
 
-public class FlutterWebViewController: NSObject, /*FlutterPlatformView,*/ Disposable {
+public class FlutterWebViewController: NSView, Disposable {
     
-    var myView: NSView?
     var keepAliveId: String?
 
     init(plugin: InAppWebViewFlutterPlugin, withFrame frame: CGRect, viewIdentifier viewId: Any, params: NSDictionary) {
-        super.init()
-        
-        myView = NSView(frame: frame)
+        super.init(frame: frame)
         
         keepAliveId = params["keepAliveId"] as? String
         
@@ -47,12 +44,12 @@ public class FlutterWebViewController: NSObject, /*FlutterPlatformView,*/ Dispos
                                                    binaryMessenger: registrar.messenger)
                 webView!.channelDelegate = WebViewChannelDelegate(webView: webView!, channel: channel)
             }
-            webView!.frame = myView!.bounds
+            webView!.frame = self.bounds
             webView!.initialUserScripts = userScripts
         } else {
             webView = InAppWebView(id: viewId,
                                    plugin: plugin,
-                                   frame: myView!.bounds,
+                                   frame: self.bounds,
                                    configuration: preWebviewConfiguration,
                                    userScripts: userScripts)
         }
@@ -64,17 +61,21 @@ public class FlutterWebViewController: NSObject, /*FlutterPlatformView,*/ Dispos
         findInteractionController.prepare()
         
         webView!.autoresizingMask = [.width, .height]
-        myView!.autoresizesSubviews = true
-        myView!.autoresizingMask = [.width, .height]
-        myView!.addSubview(webView!)
+        self.autoresizesSubviews = true
+        self.autoresizingMask = [.width, .height]
+        self.addSubview(webView!)
 
         webView!.settings = settings
         webView!.prepare()
         webView!.windowCreated = true
     }
     
+    required init?(coder nsCoder: NSCoder) {
+        super.init(coder: nsCoder)
+    }
+    
     public func webView() -> InAppWebView? {
-        for subview in myView?.subviews ?? []
+        for subview in self.subviews
         {
             if let item = subview as? InAppWebView
             {
@@ -85,7 +86,7 @@ public class FlutterWebViewController: NSObject, /*FlutterPlatformView,*/ Dispos
     }
     
     public func view() -> NSView {
-        return myView!
+        return self
     }
     
     public func makeInitialLoad(params: NSDictionary) {
@@ -185,9 +186,8 @@ public class FlutterWebViewController: NSObject, /*FlutterPlatformView,*/ Dispos
                 }
             }
             if removeFromSuperview {
-                myView?.removeFromSuperview()
+                self.removeFromSuperview()
             }
-            myView = nil
         }
     }
     

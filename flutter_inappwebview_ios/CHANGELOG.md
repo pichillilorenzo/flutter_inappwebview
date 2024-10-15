@@ -1,3 +1,29 @@
+## 1.1.2
+
+- Updated flutter_inappwebview_platform_interface version to ^1.3.0
+
+## 1.1.1
+
+- Updated flutter_inappwebview_platform_interface version to ^1.2.0
+
+## 1.1.0+3
+
+- Updated flutter_inappwebview_platform_interface version
+
+## ## 1.1.0+2
+
+- Updated pubspec.yaml
+
+## 1.1.0+1 
+
+- Fixed "v6.1.0 fails to compile on Xcode 15" [#2288](https://github.com/pichillilorenzo/flutter_inappwebview/issues/2288)
+
+## 1.1.0
+
+- Fixed XCode 16 build
+- Updates minimum supported SDK version to Flutter 3.24/Dart 3.5.
+- Merged "Add privacy manifest for iOS" [#2029](https://github.com/pichillilorenzo/flutter_inappwebview/pull/2029) (thanks to [ueman](https://github.com/ueman))
+
 ## 1.0.13
 
 - Updated `flutter_inappwebview_platform_interface` version dependency to `^1.0.10`

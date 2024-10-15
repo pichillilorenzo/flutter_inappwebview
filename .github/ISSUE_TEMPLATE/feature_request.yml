@@ -1,0 +1,54 @@
+name: ✨ Feature Request
+description: Suggest an idea for this project
+title: "Write the title here"
+labels:
+  - enhancement
+
+body:
+  - type: checkboxes
+    attributes:
+      label: Is there an existing feature request for this?
+      description: Make sure to check if this feature request is a duplicate.
+      options:
+        - label: I have searched the existing feature request
+          required: true
+  - type: input
+    attributes:
+      label: Operating System
+      description: |
+        The Operating System in which you want to have this feature.
+        For example: All platforms if possible, Android, iOS, macOS, Windows, Web, Chrome, etc.
+      placeholder: All platforms if possible, Android, iOS, macOS, Windows, etc.
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Pain
+      description: Explain your feature request.
+      placeholder: I'd like to have that / I don't like that I've to do this
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Suggested solution
+      description: Tell about a solution you can think of
+      placeholder: You could add that / change this / use that
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Useful resources
+      description: Provide some useful resource which could help implement your suggestion.
+  - type: textarea
+    attributes:
+      label: Additional information
+      description: Anything else you'd like to include? Like screenshots or a video recording of the issue.
+    validations:
+      required: false
+  - type: checkboxes
+    attributes:
+      label: Self grab
+      description: If you are a developer and want to work on this feature request yourself, you can check this box and wait for maintainer response. We welcome contributions!
+      options:
+        - label: I'm ready to work on this issue!
+          required: false

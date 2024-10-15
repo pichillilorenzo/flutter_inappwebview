@@ -13,12 +13,15 @@
 #include "../types/content_world.h"
 #include "../types/navigation_action.h"
 #include "../types/screenshot_configuration.h"
+#include "../types/ssl_certificate.h"
 #include "../types/url_request.h"
 #include "../types/web_history.h"
 #include "../webview_environment/webview_environment.h"
 #include "in_app_webview_settings.h"
 #include "user_content_controller.h"
 #include "webview_channel_delegate.h"
+
+#include <WebView2EnvironmentOptions.h>
 
 namespace flutter_inappwebview_plugin
 {
@@ -109,7 +112,7 @@ namespace flutter_inappwebview_plugin
       wil::com_ptr<ICoreWebView2CompositionController> webViewCompositionController);
     ~InAppWebView();
 
-    static void createInAppWebViewEnv(const HWND parentWindow, const bool& willBeSurface, WebViewEnvironment* webViewEnvironment, std::function<void(wil::com_ptr<ICoreWebView2Environment> webViewEnv,
+    static void createInAppWebViewEnv(const HWND parentWindow, const bool& willBeSurface, WebViewEnvironment* webViewEnvironment, const std::shared_ptr<InAppWebViewSettings> initialSettings, std::function<void(wil::com_ptr<ICoreWebView2Environment> webViewEnv,
       wil::com_ptr<ICoreWebView2Controller> webViewController,
       wil::com_ptr<ICoreWebView2CompositionController> webViewCompositionController)> completionHandler);
 
@@ -170,6 +173,9 @@ namespace flutter_inappwebview_plugin
     void callDevToolsProtocolMethod(const std::string& methodName, const std::optional<std::string>& parametersAsJson, const std::function<void(const HRESULT& errorCode, const std::optional<std::string>&)> completionHandler) const;
     void addDevToolsProtocolEventListener(const std::string& eventName);
     void removeDevToolsProtocolEventListener(const std::string& eventName);
+    void pause() const;
+    void resume() const;
+    void getCertificate(const std::function<void(const std::optional<std::unique_ptr<SslCertificate>>)> completionHandler) const;
 
     std::string pageFrameId() const
     {
@@ -186,7 +192,6 @@ namespace flutter_inappwebview_plugin
     POINT lastCursorPos_ = { 0, 0 };
     VirtualKeyState virtualKeys_;
 
-    bool callShouldOverrideUrlLoading_ = true;
     std::map<UINT64, std::shared_ptr<NavigationAction>> navigationActions_ = {};
     std::shared_ptr<NavigationAction> lastNavigationAction_;
     bool isLoading_ = false;

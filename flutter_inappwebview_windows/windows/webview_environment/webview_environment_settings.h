@@ -6,6 +6,7 @@
 #include <string>
 
 #include "../flutter_inappwebview_windows_plugin.h"
+#include "../types/custom_scheme_registration.h"
 
 namespace flutter_inappwebview_plugin
 {
@@ -18,6 +19,7 @@ namespace flutter_inappwebview_plugin
     const std::optional<bool> allowSingleSignOnUsingOSPrimaryAccount;
     const std::optional<std::string> language;
     const std::optional<std::string> targetCompatibleBrowserVersion;
+    const std::optional<std::vector<std::shared_ptr<CustomSchemeRegistration>>> customSchemeRegistrations;
 
     WebViewEnvironmentSettings() = default;
     WebViewEnvironmentSettings(const flutter::EncodableMap& map);

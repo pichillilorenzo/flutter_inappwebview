@@ -10,7 +10,7 @@ part 'permission_response.g.dart';
 class PermissionResponse_ {
   ///Resources granted to be accessed by origin.
   ///
-  ///**NOTE for iOS**: not used. The [action] taken is based on the [PermissionRequest.resources].
+  ///**NOTE for iOS, macOS and Windows**: not used. The [action] taken is based on the [PermissionRequest.resources].
   List<PermissionResourceType_> resources;
 
   ///Indicate the [PermissionResponseAction] to take in response of a permission request.

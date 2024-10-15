@@ -26,7 +26,7 @@ android {
     if (project.android.hasProperty("namespace")) {
         namespace 'com.pichillilorenzo.flutter_inappwebview_android'
     }
-    compileSdkVersion 33
+    compileSdk 34
 
     defaultConfig {
         minSdkVersion 19
@@ -49,8 +49,8 @@ android {
         }
     }
     dependencies {
-        implementation 'androidx.webkit:webkit:1.8.0'
-        implementation 'androidx.browser:browser:1.6.0'
+        implementation 'androidx.webkit:webkit:1.12.0'
+        implementation 'androidx.browser:browser:1.8.0'
         implementation 'androidx.appcompat:appcompat:1.6.1'
         implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'
     }

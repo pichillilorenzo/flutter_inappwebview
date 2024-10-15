@@ -1,3 +1,40 @@
+## 1.1.3
+
+- Updated flutter_inappwebview_platform_interface version to ^1.3.0
+
+## 1.1.2
+
+- Removed webview/plugin_scripts_js/ConsoleLogJS.java file, use native WebChromeClient.onConsoleMessage instead
+
+## 1.1.1
+
+- Updated flutter_inappwebview_platform_interface version to ^1.2.0
+
+## 1.1.0+4
+
+- Updated flutter_inappwebview_platform_interface version
+
+## 1.1.0+3
+
+- Fixed compilation error
+
+## 1.1.0+2
+
+- Updated pubspec.yaml
+
+## 1.1.0+1
+
+- Downgraded androidx.appcompat:appcompat:1.7.0 to androidx.appcompat:appcompat:1.6.1
+- Added `-dontwarn android.window.BackEvent` proguard rule
+
+## 1.1.0
+
+- Updated androidx.webkit:webkit:1.8.0 to androidx.webkit:webkit:1.12.0
+- Updated androidx.browser:browser:1.6.0 to androidx.browser:browser:1.8.0
+- Updates minimum supported SDK version to Flutter 3.24/Dart 3.5.
+- Removed unsupported WebViewFeature.SUPPRESS_ERROR_PAGE
+- Merged "Remove references to deprecated v1 Android embedding" [#2176](https://github.com/pichillilorenzo/flutter_inappwebview/pull/2176) (thanks to [gmackall](https://github.com/gmackall))
+
 ## 1.0.13
 
 - Fixed "Android emulator using API 34 fails to draw on resume sometimes" [#1981](https://github.com/pichillilorenzo/flutter_inappwebview/issues/1981)

@@ -38,6 +38,42 @@ namespace flutter_inappwebview_plugin
       };
   }
 
+  WebViewChannelDelegate::CreateWindowCallback::CreateWindowCallback()
+  {
+    decodeResult = [](const flutter::EncodableValue* value)
+      {
+        if (!value || value->IsNull()) {
+          return false;
+        }
+        auto handledByClient = std::get<bool>(*value);
+        return handledByClient;
+      };
+  }
+
+  WebViewChannelDelegate::PermissionRequestCallback::PermissionRequestCallback()
+  {
+    decodeResult = [](const flutter::EncodableValue* value)
+      {
+        return std::make_shared<PermissionResponse>(std::get<flutter::EncodableMap>(*value));
+      };
+  }
+
+  WebViewChannelDelegate::ShouldInterceptRequestCallback::ShouldInterceptRequestCallback()
+  {
+    decodeResult = [](const flutter::EncodableValue* value)
+      {
+        return value == nullptr || value->IsNull() ? std::optional<std::shared_ptr<WebResourceResponse>>{} : std::make_shared<WebResourceResponse>(std::get<flutter::EncodableMap>(*value));
+      };
+  }
+
+  WebViewChannelDelegate::LoadResourceWithCustomSchemeCallback::LoadResourceWithCustomSchemeCallback()
+  {
+    decodeResult = [](const flutter::EncodableValue* value)
+      {
+        return value == nullptr || value->IsNull() ? std::optional<std::shared_ptr<CustomSchemeResponse>>{} : std::make_shared<CustomSchemeResponse>(std::get<flutter::EncodableMap>(*value));
+      };
+  }
+
   void WebViewChannelDelegate::HandleMethodCall(const flutter::MethodCall<flutter::EncodableValue>& method_call,
     std::unique_ptr<flutter::MethodResult<flutter::EncodableValue>> result)
   {
@@ -218,6 +254,21 @@ namespace flutter_inappwebview_plugin
       webView->removeDevToolsProtocolEventListener(eventName);
       result->Success(true);
     }
+    else if (string_equals(methodName, "pause")) {
+      webView->pause();
+      result->Success(true);
+    }
+    else if (string_equals(methodName, "resume")) {
+      webView->resume();
+      result->Success(true);
+    }
+    else if (string_equals(methodName, "getCertificate")) {
+      auto result_ = std::shared_ptr<flutter::MethodResult<flutter::EncodableValue>>(std::move(result));
+      webView->getCertificate([result_ = std::move(result_)](const std::optional<std::unique_ptr<SslCertificate>> data)
+        {
+          result_->Success(data.has_value() ? data.value()->toEncodableMap() : make_fl_value());
+        });
+    }
     // for inAppBrowser
     else if (webView->inAppBrowser && string_equals(methodName, "show")) {
       webView->inAppBrowser->show();
@@ -263,6 +314,7 @@ namespace flutter_inappwebview_plugin
   void WebViewChannelDelegate::shouldOverrideUrlLoading(std::shared_ptr<NavigationAction> navigationAction, std::unique_ptr<ShouldOverrideUrlLoadingCallback> callback) const
   {
     if (!channel) {
+      callback->defaultBehaviour(std::nullopt);
       return;
     }
 
@@ -328,6 +380,7 @@ namespace flutter_inappwebview_plugin
   void WebViewChannelDelegate::onCallJsHandler(const std::string& handlerName, const std::string& args, std::unique_ptr<CallJsHandlerCallback> callback) const
   {
     if (!channel) {
+      callback->defaultBehaviour(std::nullopt);
       return;
     }
 
@@ -351,7 +404,6 @@ namespace flutter_inappwebview_plugin
     channel->InvokeMethod("onConsoleMessage", std::move(arguments));
   }
 
-
   void WebViewChannelDelegate::onDevToolsProtocolEventReceived(const std::string& eventName, const std::string& data) const
   {
     if (!channel) {
@@ -363,6 +415,77 @@ namespace flutter_inappwebview_plugin
       {"data", data}
       });
     channel->InvokeMethod("onDevToolsProtocolEventReceived", std::move(arguments));
+  }
+
+  void WebViewChannelDelegate::onProgressChanged(const int64_t& progress) const
+  {
+    if (!channel) {
+      return;
+    }
+
+    auto arguments = std::make_unique<flutter::EncodableValue>(flutter::EncodableMap{
+      {"progress", progress}
+      });
+    channel->InvokeMethod("onProgressChanged", std::move(arguments));
+  }
+
+  void WebViewChannelDelegate::onCreateWindow(std::shared_ptr<CreateWindowAction> createWindowAction, std::unique_ptr<CreateWindowCallback> callback) const
+  {
+    if (!channel) {
+      callback->defaultBehaviour(std::nullopt);
+      return;
+    }
+
+    auto arguments = std::make_unique<flutter::EncodableValue>(createWindowAction->toEncodableMap());
+    channel->InvokeMethod("onCreateWindow", std::move(arguments), std::move(callback));
+  }
+
+  void WebViewChannelDelegate::onCloseWindow() const
+  {
+    if (!channel) {
+      return;
+    }
+
+    auto arguments = std::make_unique<flutter::EncodableValue>();
+    channel->InvokeMethod("onCloseWindow", std::move(arguments));
+  }
+
+  void WebViewChannelDelegate::onPermissionRequest(const std::string& origin, const std::vector<int64_t>& resources, std::unique_ptr<PermissionRequestCallback> callback) const
+  {
+    if (!channel) {
+      callback->defaultBehaviour(std::nullopt);
+      return;
+    }
+
+    auto arguments = std::make_unique<flutter::EncodableValue>(flutter::EncodableMap{
+      {"origin", origin},
+      {"resources", make_fl_value(resources)}
+      });
+    channel->InvokeMethod("onPermissionRequest", std::move(arguments), std::move(callback));
+  }
+
+  void WebViewChannelDelegate::shouldInterceptRequest(std::shared_ptr<WebResourceRequest> request, std::unique_ptr<ShouldInterceptRequestCallback> callback) const
+  {
+    if (!channel) {
+      callback->defaultBehaviour(std::nullopt);
+      return;
+    }
+
+    auto arguments = std::make_unique<flutter::EncodableValue>(make_fl_value(request->toEncodableMap()));
+    channel->InvokeMethod("shouldInterceptRequest", std::move(arguments), std::move(callback));
+  }
+
+  void WebViewChannelDelegate::onLoadResourceWithCustomScheme(std::shared_ptr<WebResourceRequest> request, std::unique_ptr<LoadResourceWithCustomSchemeCallback> callback) const
+  {
+    if (!channel) {
+      callback->defaultBehaviour(std::nullopt);
+      return;
+    }
+
+    auto arguments = std::make_unique<flutter::EncodableValue>(flutter::EncodableMap{
+      {"request", request->toEncodableMap()},
+      });
+    channel->InvokeMethod("onLoadResourceWithCustomScheme", std::move(arguments), std::move(callback));
   }
 
   WebViewChannelDelegate::~WebViewChannelDelegate()

@@ -326,6 +326,7 @@ abstract class PlatformInAppBrowser extends PlatformInterface
   ///**Officially Supported Platforms/Implementations**:
   ///- Android
   ///- iOS 14.0+
+  ///- macOS 10.15+
   ///{@endtemplate}
   void addMenuItem(InAppBrowserMenuItem menuItem) {
     throw UnimplementedError(
@@ -340,6 +341,7 @@ abstract class PlatformInAppBrowser extends PlatformInterface
   ///**Officially Supported Platforms/Implementations**:
   ///- Android
   ///- iOS 14.0+
+  ///- macOS 10.15+
   ///{@endtemplate}
   void addMenuItems(List<InAppBrowserMenuItem> menuItems) {
     throw UnimplementedError(
@@ -355,6 +357,7 @@ abstract class PlatformInAppBrowser extends PlatformInterface
   ///**Officially Supported Platforms/Implementations**:
   ///- Android
   ///- iOS 14.0+
+  ///- macOS 10.15+
   ///{@endtemplate}
   bool removeMenuItem(InAppBrowserMenuItem menuItem) {
     throw UnimplementedError(
@@ -369,6 +372,7 @@ abstract class PlatformInAppBrowser extends PlatformInterface
   ///**Officially Supported Platforms/Implementations**:
   ///- Android
   ///- iOS 14.0+
+  ///- macOS 10.15+
   ///{@endtemplate}
   void removeMenuItems(List<InAppBrowserMenuItem> menuItems) {
     throw UnimplementedError(
@@ -383,6 +387,7 @@ abstract class PlatformInAppBrowser extends PlatformInterface
   ///**Officially Supported Platforms/Implementations**:
   ///- Android
   ///- iOS 14.0+
+  ///- macOS 10.15+
   ///{@endtemplate}
   void removeAllMenuItem() {
     throw UnimplementedError(
@@ -395,6 +400,7 @@ abstract class PlatformInAppBrowser extends PlatformInterface
   ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS 14.0+
+  ///- macOS 10.15+
   ///{@endtemplate}
   bool hasMenuItem(InAppBrowserMenuItem menuItem) {
     throw UnimplementedError(
@@ -605,6 +611,7 @@ abstract class PlatformInAppBrowserEvents {
   ///- Android native WebView ([Official API - WebChromeClient.onProgressChanged](https://developer.android.com/reference/android/webkit/WebChromeClient#onProgressChanged(android.webkit.WebView,%20int)))
   ///- iOS
   ///- MacOS
+  ///- Windows
   void onProgressChanged(int progress) {}
 
   ///Event fired when the [PlatformInAppBrowser] webview receives a [ConsoleMessage].
@@ -613,6 +620,7 @@ abstract class PlatformInAppBrowserEvents {
   ///- Android native WebView ([Official API - WebChromeClient.onConsoleMessage](https://developer.android.com/reference/android/webkit/WebChromeClient#onConsoleMessage(android.webkit.ConsoleMessage)))
   ///- iOS
   ///- MacOS
+  ///- Windows
   void onConsoleMessage(ConsoleMessage consoleMessage) {}
 
   ///Give the host application a chance to take control when a URL is about to be loaded in the current WebView. This event is not called on the initial load of the WebView.
@@ -690,6 +698,7 @@ abstract class PlatformInAppBrowserEvents {
   ///- Android native WebView
   ///- iOS ([Official API - WKURLSchemeHandler](https://developer.apple.com/documentation/webkit/wkurlschemehandler))
   ///- MacOS ([Official API - WKURLSchemeHandler](https://developer.apple.com/documentation/webkit/wkurlschemehandler))
+  ///- Windows
   Future<CustomSchemeResponse?>? onLoadResourceWithCustomScheme(
       WebResourceRequest request) {
     return null;
@@ -727,6 +736,7 @@ abstract class PlatformInAppBrowserEvents {
   ///- Android native WebView ([Official API - WebChromeClient.onCreateWindow](https://developer.android.com/reference/android/webkit/WebChromeClient#onCreateWindow(android.webkit.WebView,%20boolean,%20boolean,%20android.os.Message)))
   ///- iOS ([Official API - WKUIDelegate.webView](https://developer.apple.com/documentation/webkit/wkuidelegate/1536907-webview))
   ///- MacOS ([Official API - WKUIDelegate.webView](https://developer.apple.com/documentation/webkit/wkuidelegate/1536907-webview))
+  ///- Windows ([Official API - ICoreWebView2.add_NewWindowRequested](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2?view=webview2-1.0.2210.55#add_newwindowrequested))
   Future<bool?>? onCreateWindow(CreateWindowAction createWindowAction) {
     return null;
   }
@@ -738,6 +748,7 @@ abstract class PlatformInAppBrowserEvents {
   ///- Android native WebView ([Official API - WebChromeClient.onCloseWindow](https://developer.android.com/reference/android/webkit/WebChromeClient#onCloseWindow(android.webkit.WebView)))
   ///- iOS ([Official API - WKUIDelegate.webViewDidClose](https://developer.apple.com/documentation/webkit/wkuidelegate/1537390-webviewdidclose))
   ///- MacOS ([Official API - WKUIDelegate.webViewDidClose](https://developer.apple.com/documentation/webkit/wkuidelegate/1537390-webviewdidclose))
+  ///- Windows ([Official API - ICoreWebView2.add_WindowCloseRequested](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2?view=webview2-1.0.2210.55#add_windowcloserequested))
   void onCloseWindow() {}
 
   ///Event fired when the JavaScript `window` object of the WebView has received focus.
@@ -1079,6 +1090,7 @@ abstract class PlatformInAppBrowserEvents {
   ///- Android native WebView ([Official API - WebChromeClient.onPermissionRequest](https://developer.android.com/reference/android/webkit/WebChromeClient#onPermissionRequest(android.webkit.PermissionRequest)))
   ///- iOS
   ///- MacOS
+  ///- Windows ([Official API - ICoreWebView2.add_PermissionRequested](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/iwebview2webview?view=webview2-0.8.355#add_permissionrequested))
   Future<PermissionResponse?>? onPermissionRequest(
       PermissionRequest permissionRequest) {
     return null;
@@ -1138,6 +1150,7 @@ abstract class PlatformInAppBrowserEvents {
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebViewClient.shouldInterceptRequest](https://developer.android.com/reference/android/webkit/WebViewClient#shouldInterceptRequest(android.webkit.WebView,%20android.webkit.WebResourceRequest)))
+  ///- Windows ([ICoreWebView2.add_WebResourceRequested](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2?view=webview2-1.0.2478.35#add_webresourcerequested))
   Future<WebResourceResponse?>? shouldInterceptRequest(
       WebResourceRequest request) {
     return null;

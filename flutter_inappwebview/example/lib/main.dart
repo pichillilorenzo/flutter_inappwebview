@@ -25,12 +25,11 @@ Future main() async {
 
   if (!kIsWeb && defaultTargetPlatform == TargetPlatform.windows) {
     final availableVersion = await WebViewEnvironment.getAvailableVersion();
-    assert(availableVersion != null, 'Failed to find an installed WebView2 runtime or non-stable Microsoft Edge installation.');
+    assert(availableVersion != null,
+        'Failed to find an installed WebView2 runtime or non-stable Microsoft Edge installation.');
 
-    webViewEnvironment = await WebViewEnvironment.create(settings:
-      WebViewEnvironmentSettings(
-          userDataFolder: 'custom_path'
-      ));
+    webViewEnvironment = await WebViewEnvironment.create(
+        settings: WebViewEnvironmentSettings(userDataFolder: 'custom_path'));
   }
 
   if (!kIsWeb && defaultTargetPlatform == TargetPlatform.android) {
@@ -84,22 +83,16 @@ PointerInterceptor myDrawer({required BuildContext context}) {
     ];
   } else if (defaultTargetPlatform == TargetPlatform.macOS) {
     children = [
-      // ListTile(
-      //   title: Text('InAppWebView'),
-      //   onTap: () {
-      //     Navigator.pushReplacementNamed(context, '/');
-      //   },
-      // ),
-      // ListTile(
-      //   title: Text('InAppBrowser'),
-      //   onTap: () {
-      //     Navigator.pushReplacementNamed(context, '/InAppBrowser');
-      //   },
-      // ),
+      ListTile(
+        title: Text('InAppWebView'),
+        onTap: () {
+          Navigator.pushReplacementNamed(context, '/');
+        },
+      ),
       ListTile(
         title: Text('InAppBrowser'),
         onTap: () {
-          Navigator.pushReplacementNamed(context, '/');
+          Navigator.pushReplacementNamed(context, '/InAppBrowser');
         },
       ),
       ListTile(
@@ -181,9 +174,8 @@ class _MyAppState extends State<MyApp> {
     }
     if (defaultTargetPlatform == TargetPlatform.macOS) {
       return MaterialApp(initialRoute: '/', routes: {
-        // '/': (context) => InAppWebViewExampleScreen(),
-        // '/InAppBrowser': (context) => InAppBrowserExampleScreen(),
-        '/': (context) => InAppBrowserExampleScreen(),
+        '/': (context) => InAppWebViewExampleScreen(),
+        '/InAppBrowser': (context) => InAppBrowserExampleScreen(),
         '/HeadlessInAppWebView': (context) =>
             HeadlessInAppWebViewExampleScreen(),
         '/WebAuthenticationSession': (context) =>

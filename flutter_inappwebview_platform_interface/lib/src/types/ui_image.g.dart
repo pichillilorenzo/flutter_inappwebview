@@ -37,7 +37,9 @@ class UIImage {
       return null;
     }
     final instance = UIImage(
-      data: map['data'],
+      data: map['data'] != null
+          ? Uint8List.fromList(map['data'].cast<int>())
+          : null,
       name: map['name'],
       systemName: map['systemName'],
     );

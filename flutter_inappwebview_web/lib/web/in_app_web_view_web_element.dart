@@ -65,7 +65,7 @@ class InAppWebViewWebElement implements Disposable {
     });
 
     jsWebView = flutterInAppWebView?.createFlutterInAppWebView(
-        _viewId, iframe, iframeContainer);
+        _viewId.toString(), iframe, iframeContainer);
   }
 
   /// Handles method calls over the MethodChannel of this plugin.
@@ -208,7 +208,7 @@ class InAppWebViewWebElement implements Disposable {
           initialFile = webView.initialFile;
 
           jsWebView = flutterInAppWebView?.createFlutterInAppWebView(
-              _viewId, iframe, iframeContainer);
+              _viewId.toString(), iframe, iframeContainer);
         }
       }
     }

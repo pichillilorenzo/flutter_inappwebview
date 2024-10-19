@@ -46,7 +46,7 @@ external FlutterInAppWebViewBridge? get flutterInAppWebView;
 extension type FlutterInAppWebViewBridge._(JSObject _) implements JSObject {
   external JSObject webViews;
   external JSWebView createFlutterInAppWebView(
-      JSAny viewId, HTMLIFrameElement iframe, HTMLDivElement iframeContainer);
+      String viewId, HTMLIFrameElement iframe, HTMLDivElement iframeContainer);
   external JSString getCookieExpirationDate(num timestamp);
 
   /// Allows assigning a function to be callable from `window.flutter_inappwebview.nativeCommunication()`

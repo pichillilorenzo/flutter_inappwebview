@@ -21,7 +21,7 @@ export 'util.dart';
 export 'platform_service_worker_controller.dart';
 export 'platform_webview_feature.dart'
     hide WebViewFeature_, AndroidWebViewFeature_;
-export 'platform_proxy_controller.dart' hide ProxySettings_;
+export 'platform_proxy_controller.dart' hide IOSProxySettings_, AndroidProxySettings_;
 export 'platform_webview_asset_loader.dart';
 export 'platform_tracing_controller.dart' hide TracingSettings_;
 export 'platform_process_global_config.dart'

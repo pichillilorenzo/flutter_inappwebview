@@ -60,7 +60,7 @@ class AndroidProxyController extends PlatformProxyController
   @override
   Future<void> setProxyOverride({required ProxySettings settings}) async {
     Map<String, dynamic> args = <String, dynamic>{};
-    args.putIfAbsent("settings", () => settings.toMap());
+    args.putIfAbsent("settings", () => settings.androidProxySettings?.toMap());
     await channel?.invokeMethod('setProxyOverride', args);
   }
 

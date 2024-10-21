@@ -1,3 +1,4 @@
+import 'package:flutter_inappwebview_ios/src/proxy_controller.dart';
 import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_platform_interface.dart';
 
 import 'chrome_safari_browser/chrome_safari_browser.dart';
@@ -269,5 +270,14 @@ class IOSInAppWebViewPlatform extends InAppWebViewPlatform {
   @override
   IOSWebAuthenticationSession createPlatformWebAuthenticationSessionStatic() {
     return IOSWebAuthenticationSession.static();
+  }
+
+  /// Creates a new [IosProxyController].
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [ProxyController] in `flutter_inappwebview` instead.
+  @override
+  PlatformProxyController createPlatformProxyController(PlatformProxyControllerCreationParams params) {
+    return IosProxyController(params);
   }
 }

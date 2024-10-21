@@ -28,6 +28,7 @@ public class SwiftFlutterPlugin: NSObject, FlutterPlugin {
     var platformUtil: PlatformUtil?
     var inAppWebViewManager: InAppWebViewManager?
     var myCookieManager: Any?
+    var proxyManager: Any?
     var myWebStorageManager: Any?
     var credentialDatabase: CredentialDatabase?
     var inAppBrowserManager: InAppBrowserManager?
@@ -57,6 +58,9 @@ public class SwiftFlutterPlugin: NSObject, FlutterPlugin {
         if #available(iOS 9.0, *) {
             myWebStorageManager = MyWebStorageManager(plugin: self)
         }
+        if #available(iOS 17.0, *) {
+            proxyManager = ProxyManager(plugin: self)
+        }
         webAuthenticationSessionManager = WebAuthenticationSessionManager(plugin: self)
         printJobManager = PrintJobManager(plugin: self)
     }
@@ -85,6 +89,10 @@ public class SwiftFlutterPlugin: NSObject, FlutterPlugin {
         if #available(iOS 9.0, *) {
             (myWebStorageManager as! MyWebStorageManager?)?.dispose()
             myWebStorageManager = nil
+        }
+        if #available(iOS 17.0, *) {
+            (proxyManager as! ProxyManager?)?.dispose()
+            proxyManager = nil
         }
         webAuthenticationSessionManager?.dispose()
         webAuthenticationSessionManager = nil

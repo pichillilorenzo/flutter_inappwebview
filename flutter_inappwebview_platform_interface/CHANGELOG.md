@@ -1,3 +1,7 @@
+## 1.4.0
+
+- Added Proxy controller implementation for iOS platform.
+
 ## 1.3.0+1
 
 - Fixed `X509Certificate.toMap` method

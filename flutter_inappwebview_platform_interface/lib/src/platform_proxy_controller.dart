@@ -19,21 +19,22 @@ class PlatformProxyControllerCreationParams {
 }
 
 ///{@template flutter_inappwebview_platform_interface.PlatformProxyController}
-///Manages setting and clearing a process-specific override for the Android system-wide proxy settings that govern network requests made by `WebView`.
+///Manages setting and clearing a process-specific override for the Android/iOS system-wide proxy settings that govern network requests made
+///by `WebView`/`WKWebView`
 ///
-///`WebView` may make network requests in order to fetch content that is not otherwise read from the file system or provided directly by application code.
-///In this case by default the system-wide Android network proxy settings are used to redirect requests to appropriate proxy servers.
+///Webview may make network requests in order to fetch content that is not otherwise read from the file system or provided directly by application code.
+///In this case by default the system-wide Android/iOS network proxy settings are used to redirect requests to appropriate proxy servers.
 ///
 ///In the rare case that it is necessary for an application to explicitly specify its proxy configuration,
 ///this API may be used to explicitly specify the proxy rules that govern WebView initiated network requests.
 ///
 ///**Officially Supported Platforms/Implementations**:
 ///- Android native WebView ([Official API - ProxyController](https://developer.android.com/reference/androidx/webkit/ProxyController))
+///- iOS 17.0+ WKWebView  ([Official API - ProxyConfiguration](https://developer.apple.com/documentation/network/proxyconfiguration))
 ///{@endtemplate}
 abstract class PlatformProxyController extends PlatformInterface {
   /// Creates a new [PlatformProxyController]
-  factory PlatformProxyController(
-      PlatformProxyControllerCreationParams params) {
+  factory PlatformProxyController(PlatformProxyControllerCreationParams params) {
     assert(
       InAppWebViewPlatform.instance != null,
       'A platform implementation for `flutter_inappwebview` has not been set. Please '
@@ -65,25 +66,17 @@ abstract class PlatformProxyController extends PlatformInterface {
   ///URLs that match patterns in the bypass list will not be directed to any proxy.
   ///Instead, the request will be made directly to the origin specified by the URL.
   ///Network connections are not guaranteed to immediately use the new proxy setting; wait for the method to return before loading a page.
-  ///
-  ///**Officially Supported Platforms/Implementations**:
-  ///- Android native WebView ([Official API - ProxyController.setProxyOverride](https://developer.android.com/reference/androidx/webkit/ProxyController#setProxyOverride(androidx.webkit.ProxyConfig,%20java.util.concurrent.Executor,%20java.lang.Runnable)))
   ///{@endtemplate}
   Future<void> setProxyOverride({required ProxySettings settings}) {
-    throw UnimplementedError(
-        'setProxyOverride is not implemented on the current platform');
+    throw UnimplementedError('setProxyOverride is not implemented on the current platform');
   }
 
   ///{@template flutter_inappwebview_platform_interface.PlatformProxyController.clearProxyOverride}
   ///Clears the proxy settings.
   ///Network connections are not guaranteed to immediately use the new proxy setting; wait for the method to return before loading a page.
-  ///
-  ///**Officially Supported Platforms/Implementations**:
-  ///- Android native WebView ([Official API - ProxyController.clearProxyOverride](https://developer.android.com/reference/androidx/webkit/ProxyController#clearProxyOverride(java.util.concurrent.Executor,%20java.lang.Runnable)))
   ///{@endtemplate}
   Future<void> clearProxyOverride() {
-    throw UnimplementedError(
-        'clearProxyOverride is not implemented on the current platform');
+    throw UnimplementedError('clearProxyOverride is not implemented on the current platform');
   }
 }
 
@@ -91,8 +84,41 @@ abstract class PlatformProxyController extends PlatformInterface {
 ///
 ///**Officially Supported Platforms/Implementations**:
 ///- Android native WebView ([Official API - ProxyConfig](https://developer.android.com/reference/androidx/webkit/ProxyConfig))
+///- iOS WKWebView ([Official API - ProxyConfiguration](https://developer.apple.com/documentation/network/proxyconfiguration))
+class ProxySettings {
+  AndroidProxySettings? androidProxySettings;
+  IOSProxySettings? iOSProxySettings;
+
+  ProxySettings({
+    this.androidProxySettings,
+    this.iOSProxySettings,
+  });
+}
+
 @ExchangeableObject(copyMethod: true)
-class ProxySettings_ {
+class IOSProxySettings_ {
+  ///Proxy is a string in the format `[scheme://]host[:port]`.
+  ///Scheme is optional, if present must be `HTTP`, `HTTPS` or [SOCKS](https://tools.ietf.org/html/rfc1928) and defaults to `HTTP`.
+  String proxyUrl;
+
+  /// A Boolean that indicates whether or not a proxy configuration allows failover to non-proxied connections.
+  /// Failover isn’t allowed by default.
+  bool allowFailover;
+
+  List<String> excludedDomains;
+
+  List<String> matchDomains;
+
+  IOSProxySettings_({
+    this.proxyUrl = '',
+    this.allowFailover = false,
+    this.excludedDomains = const [],
+    this.matchDomains = const [],
+  });
+}
+
+@ExchangeableObject(copyMethod: true)
+class AndroidProxySettings_ {
   ///List of bypass rules.
   ///
   ///A bypass rule describes URLs that should skip proxy override settings and make a direct connection instead. These can be URLs or IP addresses. Wildcards are accepted.
@@ -142,7 +168,7 @@ class ProxySettings_ {
   ///**NOTE**: available only if [WebViewFeature.PROXY_OVERRIDE_REVERSE_BYPASS] feature is supported.
   bool reverseBypassEnabled;
 
-  ProxySettings_(
+  AndroidProxySettings_(
       {this.bypassRules = const [],
       this.directs = const [],
       this.proxyRules = const [],

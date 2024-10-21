@@ -5,6 +5,7 @@ void clearAndSetProxyOverride() {
       ? true
       : ![
           TargetPlatform.android,
+          TargetPlatform.iOS
         ].contains(defaultTargetPlatform);
 
   skippableTestWidgets('clear and set proxy override',
@@ -13,17 +14,28 @@ void clearAndSetProxyOverride() {
         Completer<InAppWebViewController>();
     final Completer<String> pageLoaded = Completer<String>();
 
-    var proxyAvailable =
+    var proxyAvailable = defaultTargetPlatform != TargetPlatform.android ||
         await WebViewFeature.isFeatureSupported(WebViewFeature.PROXY_OVERRIDE);
 
     if (proxyAvailable) {
       ProxyController proxyController = ProxyController.instance();
-
       await proxyController.clearProxyOverride();
-      await proxyController.setProxyOverride(
+      
+      if (defaultTargetPlatform == TargetPlatform.android) {
+        await proxyController.setProxyOverride(
           settings: ProxySettings(
-        proxyRules: [ProxyRule(url: "${environment["NODE_SERVER_IP"]}:8083")],
-      ));
+            androidProxySettings: AndroidProxySettings(
+              proxyRules: [ProxyRule(url: "${environment["NODE_SERVER_IP"]}:8083")],
+            ),
+          ),
+        );
+      } else {
+        await proxyController.setProxyOverride(
+          settings: ProxySettings(
+            iOSProxySettings: IOSProxySettings(proxyUrl: "${environment["NODE_SERVER_IP"]}:8083"),
+          ),
+        );
+      }
     }
 
     await tester.pumpWidget(

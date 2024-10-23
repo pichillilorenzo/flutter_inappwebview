@@ -66,7 +66,7 @@ public class FlutterWebView implements PlatformWebView {
     webView = new InAppWebView(context, plugin, id, windowId, customSettings, contextMenu, 
             customSettings.useHybridComposition ? null : plugin.flutterView, userScripts);
     displayListenerProxy.onPostWebViewInitialization(displayManager);
-    if (customSettings.useHybridComposition) {
+    if (false) {
       // set MATCH_PARENT layout params to the WebView, otherwise it won't take all the available space!
       webView.setLayoutParams(new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
       PullToRefreshSettings pullToRefreshSettings = new PullToRefreshSettings();

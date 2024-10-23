@@ -143,6 +143,9 @@ class CookieManager {
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformCookieManager.removeSessionCookies}
   Future<bool> removeSessionCookies() => platform.removeSessionCookies();
+
+  ///{@macro flutter_inappwebview_platform_interface.PlatformCookieManager.flush}
+  Future<void> flush() => platform.flush();
 }
 
 ///Class that contains only iOS-specific methods of [CookieManager].

@@ -749,6 +749,9 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///
   ///**NOTE for MacOS**: available on MacOS 10.13+.
   ///
+  ///**NOTE for Android**: To be able to take screenshots outside the visible viewport,
+  ///you must call [PlatformInAppWebViewController.enableSlowWholeDocumentDraw] before any WebViews are created.
+  ///
   ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS ([Official API - WKWebView.takeSnapshot](https://developer.apple.com/documentation/webkit/wkwebview/2873260-takesnapshot))
@@ -2333,6 +2336,26 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   Future<void> clearAllCache({bool includeDiskFiles = true}) {
     throw UnimplementedError(
         'clearAllCache is not implemented on the current platform');
+  }
+
+  ///{@template flutter_inappwebview_platform_interface.PlatformInAppWebViewController.enableSlowWholeDocumentDraw}
+  ///For apps targeting the L release, WebView has a new default behavior that reduces memory footprint and increases
+  ///performance by intelligently choosing the portion of the HTML document that needs to be drawn.
+  ///These optimizations are transparent to the developers.
+  ///However, under certain circumstances, an App developer may want to disable them, for example
+  ///when an app draws and accesses portions of the page that is way outside the visible portion of the page.
+  ///Enabling drawing the entire HTML document has a significant performance cost.
+  ///
+  ///**NOTE**: This method should be called before any WebViews are created.
+  ///
+  ///**NOTE for Android**: available only on Android 21+.
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Android native WebView ([Official API - WebView.getUrl](https://developer.android.com/reference/android/webkit/WebView#enableSlowWholeDocumentDraw()))
+  ///{@endtemplate}
+  Future<void> enableSlowWholeDocumentDraw() {
+    throw UnimplementedError(
+        'enableSlowWholeDocumentDraw is not implemented on the current platform');
   }
 
   ///{@template flutter_inappwebview_platform_interface.PlatformInAppWebViewController.tRexRunnerHtml}

@@ -11,6 +11,11 @@
 #### Platform Interface
 - Updated static `fromMap` implementation for some classes
 
+#### Android Platform
+- Added `InAppWebViewController.enableSlowWholeDocumentDraw` static method
+- Added `CookieManager.flush` method
+- Updated `InAppWebViewController.takeScreenshot` implementation to support screenshot out of visible viewport when `InAppWebViewController.enableSlowWholeDocumentDraw` is called
+
 #### iOS Platform
 - Moved `WKUserContentController` initialization on `preWKWebViewConfiguration` to fix possible `undefined is not an object (evaluating 'window.webkit.messageHandlers')` javascript error
 

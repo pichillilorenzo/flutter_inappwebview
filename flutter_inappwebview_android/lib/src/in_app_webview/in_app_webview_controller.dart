@@ -2739,6 +2739,12 @@ class AndroidInAppWebViewController extends PlatformInAppWebViewController
   }
 
   @override
+  Future<void> enableSlowWholeDocumentDraw() async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    await _staticChannel.invokeMethod('enableSlowWholeDocumentDraw', args);
+  }
+
+  @override
   Future<String> get tRexRunnerHtml async => await rootBundle.loadString(
       'packages/flutter_inappwebview/assets/t_rex_runner/t-rex.html');
 

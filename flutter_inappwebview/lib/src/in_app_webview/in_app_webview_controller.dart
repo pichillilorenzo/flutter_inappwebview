@@ -565,6 +565,11 @@ class InAppWebViewController {
       PlatformInAppWebViewController.static()
           .clearAllCache(includeDiskFiles: includeDiskFiles);
 
+  ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.enableSlowWholeDocumentDraw}
+  static Future<void> enableSlowWholeDocumentDraw() =>
+      PlatformInAppWebViewController.static()
+          .enableSlowWholeDocumentDraw();
+
   ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.tRexRunnerHtml}
   static Future<String> get tRexRunnerHtml =>
       PlatformInAppWebViewController.static().tRexRunnerHtml;

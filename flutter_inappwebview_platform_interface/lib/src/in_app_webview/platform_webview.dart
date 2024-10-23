@@ -812,6 +812,9 @@ class PlatformWebViewCreationParams<T> {
   ///The application's implementation of this callback should only attempt to clean up the WebView.
   ///The WebView should be removed from the view hierarchy, all references to it should be cleaned up.
   ///
+  ///To cause an render process crash for test purpose, the application can call load url `"chrome://crash"` on the WebView.
+  ///Note that multiple WebView instances may be affected if they share a render process, not just the specific WebView which loaded `"chrome://crash"`.
+  ///
   ///[detail] the reason why it exited.
   ///
   ///**NOTE**: available only on Android 26+.

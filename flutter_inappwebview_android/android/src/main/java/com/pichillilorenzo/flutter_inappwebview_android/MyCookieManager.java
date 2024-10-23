@@ -103,6 +103,9 @@ public class MyCookieManager extends ChannelDelegateImpl {
       case "removeSessionCookies":
         removeSessionCookies(result);
         break;
+      case "flush":
+        flush(result);
+        break;
       default:
         result.notImplemented();
     }
@@ -420,6 +423,20 @@ public class MyCookieManager extends ChannelDelegateImpl {
     } else {
       cookieManager.removeSessionCookie();
       result.success(true);
+    }
+  }
+
+  public void flush(MethodChannel.Result result) {
+    cookieManager = getCookieManager();
+    if (cookieManager == null) {
+      result.success(false);
+      return;
+    }
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+      cookieManager.flush();
+    } else if (plugin != null) {
+      CookieSyncManager cookieSyncMngr = CookieSyncManager.createInstance(plugin.applicationContext);
+      cookieSyncMngr.sync();
     }
   }
 

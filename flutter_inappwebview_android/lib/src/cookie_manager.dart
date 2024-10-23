@@ -210,6 +210,12 @@ class AndroidCookieManager extends PlatformCookieManager
   }
 
   @override
+  Future<void> flush() async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    await channel?.invokeMethod('flush', args);
+  }
+
+  @override
   void dispose() {
     // empty
   }

@@ -162,6 +162,14 @@ public class InAppWebViewManager extends ChannelDelegateImpl {
         }
         result.success(true);
         break;
+      case "enableSlowWholeDocumentDraw":
+      {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+          WebView.enableSlowWholeDocumentDraw();
+        }
+      }
+      result.success(true);
+      break;
       default:
         result.notImplemented();
     }

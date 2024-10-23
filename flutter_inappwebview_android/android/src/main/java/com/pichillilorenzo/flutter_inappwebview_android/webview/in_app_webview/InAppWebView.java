@@ -215,8 +215,8 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
     }
 
     boolean isChromiumWebView = "com.android.webview".equals(packageInfo.packageName) ||
-                                "com.google.android.webview".equals(packageInfo.packageName) ||
-                                "com.android.chrome".equals(packageInfo.packageName);
+            "com.google.android.webview".equals(packageInfo.packageName) ||
+            "com.android.chrome".equals(packageInfo.packageName);
     boolean isChromiumWebViewBugFixed = false;
     if (isChromiumWebView) {
       String versionName = packageInfo.versionName != null ? packageInfo.versionName : "";
@@ -224,7 +224,8 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
         int majorVersion = versionName.contains(".") ?
                 Integer.parseInt(versionName.split("\\.")[0]) : 0;
         isChromiumWebViewBugFixed = majorVersion >= 73;
-      } catch (NumberFormatException ignored) {}
+      } catch (NumberFormatException ignored) {
+      }
     }
 
     if (isChromiumWebViewBugFixed || !isChromiumWebView) {
@@ -704,36 +705,21 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
       @Override
       public void run() {
         try {
-          Bitmap screenshotBitmap = Bitmap.createBitmap(getMeasuredWidth(), getMeasuredHeight(), Bitmap.Config.ARGB_8888);
-          Canvas c = new Canvas(screenshotBitmap);
-          c.translate(-getScrollX(), -getScrollY());
-          draw(c);
+          int bitmapWidth = getMeasuredWidth();
+          int bitmapHeight = getMeasuredHeight();
+          int bitmapScrollX = getScrollX();
+          int bitmapScrollY = getScrollY();
 
-          ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
           Bitmap.CompressFormat compressFormat = Bitmap.CompressFormat.PNG;
           int quality = 100;
 
           if (screenshotConfiguration != null) {
             Map<String, Double> rect = (Map<String, Double>) screenshotConfiguration.get("rect");
             if (rect != null) {
-              int rectX = (int) Math.floor(rect.get("x") * pixelDensity + 0.5);
-              int rectY = (int) Math.floor(rect.get("y") * pixelDensity + 0.5);
-              int rectWidth = Math.min(screenshotBitmap.getWidth(), (int) Math.floor(rect.get("width") * pixelDensity + 0.5));
-              int rectHeight = Math.min(screenshotBitmap.getHeight(), (int) Math.floor(rect.get("height") * pixelDensity + 0.5));
-              screenshotBitmap = Bitmap.createBitmap(
-                      screenshotBitmap,
-                      rectX,
-                      rectY,
-                      rectWidth,
-                      rectHeight);
-            }
-
-            Double snapshotWidth = (Double) screenshotConfiguration.get("snapshotWidth");
-            if (snapshotWidth != null) {
-              int dstWidth = (int) Math.floor(snapshotWidth * pixelDensity + 0.5);
-              float ratioBitmap = (float) screenshotBitmap.getWidth() / (float) screenshotBitmap.getHeight();
-              int dstHeight = (int) ((float) dstWidth / ratioBitmap);
-              screenshotBitmap = Bitmap.createScaledBitmap(screenshotBitmap, dstWidth, dstHeight, true);
+              bitmapScrollX = (int) Math.floor(rect.get("x") * pixelDensity + 0.5);
+              bitmapScrollY = (int) Math.floor(rect.get("y") * pixelDensity + 0.5);
+              bitmapWidth = (int) Math.floor(rect.get("width") * pixelDensity + 0.5);
+              bitmapHeight = (int) Math.floor(rect.get("height") * pixelDensity + 0.5);
             }
 
             try {
@@ -745,10 +731,31 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
             quality = (Integer) screenshotConfiguration.get("quality");
           }
 
-          screenshotBitmap.compress(
+          Bitmap screenshotBitmap = Bitmap.createBitmap(bitmapWidth, bitmapHeight, Bitmap.Config.ARGB_8888);
+          Canvas c = new Canvas(screenshotBitmap);
+          c.translate(-bitmapScrollX, -bitmapScrollY);
+          draw(c);
+
+          ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+
+          if (screenshotConfiguration != null) {
+            Double snapshotWidth = (Double) screenshotConfiguration.get("snapshotWidth");
+            if (snapshotWidth != null) {
+              int dstWidth = (int) Math.floor(snapshotWidth * pixelDensity + 0.5);
+              float ratioBitmap = (float) screenshotBitmap.getWidth() / (float) screenshotBitmap.getHeight();
+              int dstHeight = (int) ((float) dstWidth / ratioBitmap);
+              screenshotBitmap = Bitmap.createScaledBitmap(screenshotBitmap, dstWidth, dstHeight, true);
+            }
+          }
+
+          final boolean compressed = screenshotBitmap.compress(
                   compressFormat,
                   quality,
                   byteArrayOutputStream);
+          if (!compressed) {
+            Log.e(LOG_TAG, "Screenshot cannot be compressed using compressFormat " +
+                    compressFormat.name() + " with quality " + quality, null);
+          }
 
           try {
             byteArrayOutputStream.close();
@@ -932,7 +939,7 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
 
     if (newSettingsMap.get("disabledActionModeMenuItems") != null &&
             (customSettings.disabledActionModeMenuItems == null ||
-            !customSettings.disabledActionModeMenuItems.equals(newCustomSettings.disabledActionModeMenuItems))) {
+                    !customSettings.disabledActionModeMenuItems.equals(newCustomSettings.disabledActionModeMenuItems))) {
       if (WebViewFeature.isFeatureSupported(WebViewFeature.DISABLED_ACTION_MODE_MENU_ITEMS))
         WebSettingsCompat.setDisabledActionModeMenuItems(settings, newCustomSettings.disabledActionModeMenuItems);
       else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
@@ -1164,7 +1171,7 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
     if (resultUuid != null && resultCallback != null) {
       evaluateJavaScriptContentWorldCallbacks.put(resultUuid, resultCallback);
       scriptToInject = Util.replaceAll(PluginScriptsUtil.EVALUATE_JAVASCRIPT_WITH_CONTENT_WORLD_WRAPPER_JS_SOURCE,
-              PluginScriptsUtil.VAR_RANDOM_NAME, "_" + JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME + "_" + Math.round(Math.random() * 1000000))
+                      PluginScriptsUtil.VAR_RANDOM_NAME, "_" + JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME + "_" + Math.round(Math.random() * 1000000))
               .replace(PluginScriptsUtil.VAR_PLACEHOLDER_VALUE, UserContentController.escapeCode(source))
               .replace(PluginScriptsUtil.VAR_RESULT_UUID, resultUuid);
     }
@@ -1209,15 +1216,15 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
         String scriptIdEscaped = idAttr.replaceAll("'", "\\\\'");
         scriptAttributes += " script.id = '" + scriptIdEscaped + "'; ";
         scriptAttributes += " script.onload = function() {" +
-        "  if (window." + JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME + " != null) {" +
-        "    window." + JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME + ".callHandler('onInjectedScriptLoaded', '" + scriptIdEscaped + "');" +
-        "  }" +
-        "};";
+                "  if (window." + JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME + " != null) {" +
+                "    window." + JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME + ".callHandler('onInjectedScriptLoaded', '" + scriptIdEscaped + "');" +
+                "  }" +
+                "};";
         scriptAttributes += " script.onerror = function() {" +
-        "  if (window." + JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME + " != null) {" +
-        "    window." + JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME + ".callHandler('onInjectedScriptError', '" + scriptIdEscaped + "');" +
-        "  }" +
-        "};";
+                "  if (window." + JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME + " != null) {" +
+                "    window." + JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME + ".callHandler('onInjectedScriptError', '" + scriptIdEscaped + "');" +
+                "  }" +
+                "};";
       }
       Boolean asyncAttr = (Boolean) scriptHtmlTagAttributes.get("async");
       if (asyncAttr != null && asyncAttr) {
@@ -1368,13 +1375,13 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
     @Override
     public void onDownloadStart(String url, String userAgent, String contentDisposition, String mimeType, long contentLength) {
       DownloadStartRequest downloadStartRequest = new DownloadStartRequest(
-        url,
-        userAgent,
-        contentDisposition,
-        mimeType,
-        contentLength,
-        URLUtil.guessFileName(url, contentDisposition, mimeType),
-        null
+              url,
+              userAgent,
+              contentDisposition,
+              mimeType,
+              contentLength,
+              URLUtil.guessFileName(url, contentDisposition, mimeType),
+              null
       );
       if (channelDelegate != null) channelDelegate.onDownloadStartRequest(downloadStartRequest);
     }
@@ -1516,7 +1523,8 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
     }
 
     if (overScrolledHorizontally || overScrolledVertically) {
-      if (channelDelegate != null) channelDelegate.onOverScrolled(scrollX, scrollY, overScrolledHorizontally, overScrolledVertically);
+      if (channelDelegate != null)
+        channelDelegate.onOverScrolled(scrollX, scrollY, overScrolledHorizontally, overScrolledVertically);
     }
   }
 
@@ -1639,7 +1647,8 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
             hideContextMenu();
             callback.onActionItemClicked(actionMode, menuItem);
 
-            if (channelDelegate != null) channelDelegate.onContextMenuActionItemClicked(itemId, itemTitle);
+            if (channelDelegate != null)
+              channelDelegate.onContextMenuActionItemClicked(itemId, itemTitle);
           }
         });
         if (floatingContextMenu != null) {
@@ -1659,7 +1668,8 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
         public void onClick(View v) {
           hideContextMenu();
 
-          if (channelDelegate != null) channelDelegate.onContextMenuActionItemClicked(itemId, itemTitle);
+          if (channelDelegate != null)
+            channelDelegate.onContextMenuActionItemClicked(itemId, itemTitle);
         }
       });
       if (floatingContextMenu != null) {

@@ -965,7 +965,7 @@ public class WebViewChannelDelegate: ChannelDelegate {
         }
         // workaround for ProtectionSpace.toMap() SSL Certificate
         // https://github.com/pichillilorenzo/flutter_inappwebview/issues/1678
-        DispatchQueue.global(qos: .background).async {
+        DispatchQueue.global().async {
             let arguments = challenge.toMap()
             DispatchQueue.main.async { [weak self] in
                 if self?.channel == nil {
@@ -997,7 +997,7 @@ public class WebViewChannelDelegate: ChannelDelegate {
         }
         // workaround for ProtectionSpace.toMap() SSL Certificate
         // https://github.com/pichillilorenzo/flutter_inappwebview/issues/1678
-        DispatchQueue.global(qos: .background).async {
+        DispatchQueue.global().async {
             let arguments = challenge.toMap()
             DispatchQueue.main.async { [weak self] in
                 if self?.channel == nil {
@@ -1029,7 +1029,7 @@ public class WebViewChannelDelegate: ChannelDelegate {
         }
         // workaround for ProtectionSpace.toMap() SSL Certificate
         // https://github.com/pichillilorenzo/flutter_inappwebview/issues/1678
-        DispatchQueue.global(qos: .background).async {
+        DispatchQueue.global().async {
             let arguments = challenge.toMap()
             DispatchQueue.main.async { [weak self] in
                 if self?.channel == nil {
@@ -1142,7 +1142,7 @@ public class WebViewChannelDelegate: ChannelDelegate {
         }
         // workaround for ProtectionSpace.toMap() SSL Certificate
         // https://github.com/pichillilorenzo/flutter_inappwebview/issues/1678
-        DispatchQueue.global(qos: .background).async {
+        DispatchQueue.global().async {
             let arguments = challenge.toMap()
             DispatchQueue.main.async { [weak self] in
                 if self?.channel == nil {

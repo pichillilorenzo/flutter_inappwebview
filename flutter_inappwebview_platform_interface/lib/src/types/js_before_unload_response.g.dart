@@ -37,10 +37,18 @@ class JsBeforeUnloadResponse {
     final instance = JsBeforeUnloadResponse();
     instance.action =
         JsBeforeUnloadResponseAction.fromNativeValue(map['action']);
-    instance.cancelButtonTitle = map['cancelButtonTitle'];
-    instance.confirmButtonTitle = map['confirmButtonTitle'];
-    instance.handledByClient = map['handledByClient'];
-    instance.message = map['message'];
+    if (map['cancelButtonTitle'] != null) {
+      instance.cancelButtonTitle = map['cancelButtonTitle'];
+    }
+    if (map['confirmButtonTitle'] != null) {
+      instance.confirmButtonTitle = map['confirmButtonTitle'];
+    }
+    if (map['handledByClient'] != null) {
+      instance.handledByClient = map['handledByClient'];
+    }
+    if (map['message'] != null) {
+      instance.message = map['message'];
+    }
     return instance;
   }
 

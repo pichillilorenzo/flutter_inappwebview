@@ -335,6 +335,7 @@ class ExchangeableObjectGenerator
                 .trim();
             value = "map['$newFieldName']";
           }
+          final mapValue = value;
 
           final customDeserializer = _coreCheckerObjectProperty
               .firstAnnotationOf(fieldElement)
@@ -361,7 +362,14 @@ class ExchangeableObjectGenerator
           if (isRequiredParameter || fieldElement.isFinal || annotation.read("fromMapForceAllInline").boolValue) {
             requiredFields.add('$fieldName: $value,');
           } else {
+            final isFieldNullable = Util.typeIsNullable(fieldElement.type);
+            if (!isFieldNullable) {
+              nonRequiredFields.add("if ($mapValue != null) {");
+            }
             nonRequiredFields.add("instance.$fieldName = $value;");
+            if (!isFieldNullable) {
+              nonRequiredFields.add("}");
+            }
           }
         }
       }

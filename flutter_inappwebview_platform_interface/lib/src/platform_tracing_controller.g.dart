@@ -42,7 +42,9 @@ class TracingSettings {
     final instance = TracingSettings(
       tracingMode: TracingMode.fromNativeValue(map['tracingMode']),
     );
-    instance.categories = _deserializeCategories(map['categories']);
+    if (map['categories'] != null) {
+      instance.categories = _deserializeCategories(map['categories']);
+    }
     return instance;
   }
 

@@ -43,8 +43,10 @@ class TrustedWebActivityImmersiveDisplayMode
           AndroidLayoutInDisplayCutoutMode.fromNativeValue(
               map['displayCutoutMode']),
     );
-    instance.displayCutoutMode =
-        LayoutInDisplayCutoutMode.fromNativeValue(map['displayCutoutMode'])!;
+    if (map['displayCutoutMode'] != null) {
+      instance.displayCutoutMode =
+          LayoutInDisplayCutoutMode.fromNativeValue(map['displayCutoutMode'])!;
+    }
     return instance;
   }
 

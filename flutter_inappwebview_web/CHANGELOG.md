@@ -1,3 +1,7 @@
+## 1.2.0
+
+- Updated flutter_inappwebview_platform_interface version to ^1.4.0
+
 ## 1.1.2
 
 - Updated flutter_inappwebview_platform_interface version to ^1.3.0

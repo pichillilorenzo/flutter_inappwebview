@@ -193,7 +193,6 @@ public class InAppWebView: WKWebView, WKUIDelegate,
             // This is a limitation of the official WebKit API.
             return
         }
-        configuration.userContentController = WKUserContentController()
         configuration.userContentController.initialize()
         
         if let applePayAPIEnabled = settings?.applePayAPIEnabled, applePayAPIEnabled {
@@ -242,7 +241,8 @@ public class InAppWebView: WKWebView, WKUIDelegate,
     
     public static func preWKWebViewConfiguration(settings: InAppWebViewSettings?) -> WKWebViewConfiguration {
         let configuration = WKWebViewConfiguration()
-        
+        // initialzie WKUserContentController here to fix possible "undefined is not an object (evaluating 'window.webkit.messageHandlers')" javascript error
+        configuration.userContentController = WKUserContentController()
         configuration.processPool = WKProcessPoolManager.sharedProcessPool
         
         if let settings = settings {

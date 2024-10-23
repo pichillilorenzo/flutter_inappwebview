@@ -32,9 +32,15 @@ class HttpAuthResponse {
     }
     final instance = HttpAuthResponse();
     instance.action = HttpAuthResponseAction.fromNativeValue(map['action']);
-    instance.password = map['password'];
-    instance.permanentPersistence = map['permanentPersistence'];
-    instance.username = map['username'];
+    if (map['password'] != null) {
+      instance.password = map['password'];
+    }
+    if (map['permanentPersistence'] != null) {
+      instance.permanentPersistence = map['permanentPersistence'];
+    }
+    if (map['username'] != null) {
+      instance.username = map['username'];
+    }
     return instance;
   }
 

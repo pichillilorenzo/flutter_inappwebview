@@ -86,10 +86,16 @@ class ScreenshotConfiguration {
       rect: InAppWebViewRect.fromMap(map['rect']?.cast<String, dynamic>()),
       snapshotWidth: map['snapshotWidth'],
     );
-    instance.afterScreenUpdates = map['afterScreenUpdates'];
-    instance.compressFormat =
-        CompressFormat.fromNativeValue(map['compressFormat'])!;
-    instance.quality = map['quality'];
+    if (map['afterScreenUpdates'] != null) {
+      instance.afterScreenUpdates = map['afterScreenUpdates'];
+    }
+    if (map['compressFormat'] != null) {
+      instance.compressFormat =
+          CompressFormat.fromNativeValue(map['compressFormat'])!;
+    }
+    if (map['quality'] != null) {
+      instance.quality = map['quality'];
+    }
     return instance;
   }
 

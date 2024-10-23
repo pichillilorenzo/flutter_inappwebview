@@ -25,7 +25,9 @@ class SafeBrowsingResponse {
     }
     final instance = SafeBrowsingResponse();
     instance.action = SafeBrowsingResponseAction.fromNativeValue(map['action']);
-    instance.report = map['report'];
+    if (map['report'] != null) {
+      instance.report = map['report'];
+    }
     return instance;
   }
 

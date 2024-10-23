@@ -52,8 +52,12 @@ class InAppWebViewInitialData {
       data: map['data'],
       historyUrl: map['historyUrl'] != null ? WebUri(map['historyUrl']) : null,
     );
-    instance.encoding = map['encoding'];
-    instance.mimeType = map['mimeType'];
+    if (map['encoding'] != null) {
+      instance.encoding = map['encoding'];
+    }
+    if (map['mimeType'] != null) {
+      instance.mimeType = map['mimeType'];
+    }
     return instance;
   }
 

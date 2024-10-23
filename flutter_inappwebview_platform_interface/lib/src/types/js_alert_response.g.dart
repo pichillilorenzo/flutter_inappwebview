@@ -32,9 +32,15 @@ class JsAlertResponse {
     }
     final instance = JsAlertResponse();
     instance.action = JsAlertResponseAction.fromNativeValue(map['action']);
-    instance.confirmButtonTitle = map['confirmButtonTitle'];
-    instance.handledByClient = map['handledByClient'];
-    instance.message = map['message'];
+    if (map['confirmButtonTitle'] != null) {
+      instance.confirmButtonTitle = map['confirmButtonTitle'];
+    }
+    if (map['handledByClient'] != null) {
+      instance.handledByClient = map['handledByClient'];
+    }
+    if (map['message'] != null) {
+      instance.message = map['message'];
+    }
     return instance;
   }
 

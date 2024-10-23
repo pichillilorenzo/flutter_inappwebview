@@ -1,3 +1,7 @@
+#### 1.4.0
+
+- Updated static `fromMap` implementation for some classes
+
 ## 1.3.0+1
 
 - Fixed `X509Certificate.toMap` method

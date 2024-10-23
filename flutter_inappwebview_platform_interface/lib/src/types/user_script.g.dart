@@ -64,10 +64,17 @@ class UserScript {
       iosForMainFrameOnly: map['forMainFrameOnly'],
       source: map['source'],
     );
-    instance.allowedOriginRules =
-        Set<String>.from(map['allowedOriginRules']!.cast<String>());
-    instance.contentWorld = map['contentWorld'];
-    instance.forMainFrameOnly = map['forMainFrameOnly'];
+    if (map['allowedOriginRules'] != null) {
+      instance.allowedOriginRules =
+          Set<String>.from(map['allowedOriginRules']!.cast<String>());
+    }
+    if (map['contentWorld'] != null) {
+      instance.contentWorld =
+          ContentWorld.fromMap(map['contentWorld']?.cast<String, dynamic>())!;
+    }
+    if (map['forMainFrameOnly'] != null) {
+      instance.forMainFrameOnly = map['forMainFrameOnly'];
+    }
     return instance;
   }
 

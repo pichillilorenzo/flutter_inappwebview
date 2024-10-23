@@ -55,7 +55,9 @@ class ChromeSafariBrowserActionButton {
       icon: Uint8List.fromList(map['icon'].cast<int>()),
       id: map['id'],
     );
-    instance.shouldTint = map['shouldTint'];
+    if (map['shouldTint'] != null) {
+      instance.shouldTint = map['shouldTint'];
+    }
     return instance;
   }
 

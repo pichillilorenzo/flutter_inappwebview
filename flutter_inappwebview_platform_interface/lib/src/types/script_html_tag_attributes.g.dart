@@ -100,7 +100,9 @@ class ScriptHtmlTagAttributes {
       nonce: map['nonce'],
       referrerPolicy: ReferrerPolicy.fromNativeValue(map['referrerPolicy']),
     );
-    instance.type = map['type'];
+    if (map['type'] != null) {
+      instance.type = map['type'];
+    }
     return instance;
   }
 

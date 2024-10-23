@@ -18,8 +18,10 @@ class ContextMenuSettings {
       return null;
     }
     final instance = ContextMenuSettings();
-    instance.hideDefaultSystemContextMenuItems =
-        map['hideDefaultSystemContextMenuItems'];
+    if (map['hideDefaultSystemContextMenuItems'] != null) {
+      instance.hideDefaultSystemContextMenuItems =
+          map['hideDefaultSystemContextMenuItems'];
+    }
     return instance;
   }
 

@@ -1,3 +1,7 @@
+## 0.7.0
+
+- Updated flutter_inappwebview_platform_interface version to ^1.4.0
+
 ## 0.6.0
 
 - Updated code to support multiple flutter windows

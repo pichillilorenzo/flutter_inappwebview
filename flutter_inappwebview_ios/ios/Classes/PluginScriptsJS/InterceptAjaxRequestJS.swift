@@ -140,6 +140,9 @@ let INTERCEPT_AJAX_REQUEST_JS_SOURCE = """
         this._flutter_inappwebview_already_onreadystatechange_wrapped = true;
         var onreadystatechange = this.onreadystatechange;
         this.onreadystatechange = function() {
+          if (this.readyState != XMLHttpRequest.DONE) {
+            return;
+          }
           if (\(FLAG_VARIABLE_FOR_SHOULD_INTERCEPT_AJAX_REQUEST_JS_SOURCE) == null || \(FLAG_VARIABLE_FOR_SHOULD_INTERCEPT_AJAX_REQUEST_JS_SOURCE) == true) {
             var headers = this.getAllResponseHeaders();
             var responseHeaders = {};

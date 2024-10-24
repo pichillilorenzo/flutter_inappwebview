@@ -5,6 +5,92 @@
 //  Created by Lorenzo Pichilli on 08/12/2019.
 //
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scroll Optimization</title>
+    <style>
+        /* Ensuring smooth scrolling on iOS */
+        .scrollable-container {
+            overflow-y: auto;
+            height: 100vh;  /* Fixed height for scrolling */
+            -webkit-overflow-scrolling: touch; /* Smoother scrolling on iOS */
+        }
+    </style>
+</head>
+<body>
+    <div class="scrollable-container">
+        <!-- Content that causes scrolling -->
+        <div style="height: 2000px;">
+            <h1>Scroll down to test the height issue</h1>
+            <p>Long content...</p>
+        </div>
+    </div>
+
+    <script>
+        // Function to debounce scroll events
+        function debounce(func, wait) {
+            let timeout;
+            return function (...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+
+        // Function to throttle resize events
+        function throttle(func, limit) {
+            let inThrottle;
+            return function(...args) {
+                if (!inThrottle) {
+                    func(...args);
+                    inThrottle = true;
+                    setTimeout(() => (inThrottle = false), limit);
+                }
+            };
+        }
+
+        // Use requestAnimationFrame for height calculation during scrolling
+        let ticking = false;
+        const scrollableContainer = document.querySelector('.scrollable-container');
+
+        function handleScroll() {
+            if (!ticking) {
+                window.requestAnimationFrame(() => {
+                    // Here you can handle height adjustments if needed
+                    console.log('Handling height adjustments on scroll');
+                    // Example: adjust container height or perform other calculations
+                    const containerHeight = scrollableContainer.scrollHeight;
+                    console.log('Container height:', containerHeight);
+                    ticking = false;
+                });
+                ticking = true;
+            }
+        }
+
+        // Debounce scroll handling for smoother performance
+        window.addEventListener('scroll', debounce(handleScroll, 200));
+
+        // Throttle resize events to avoid multiple renders
+        window.addEventListener('resize', throttle(() => {
+            console.log('Resize event handled');
+        }, 300));
+
+        // iOS-specific fix detection
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+        if (isIOS) {
+            console.log('Running on iOS');
+            // Apply any iOS-specific logic here if needed
+        }
+    </script>
+</body>
+</html>
+
 import Foundation
 import WebKit
 

@@ -2235,6 +2235,12 @@ class IOSInAppWebViewController extends PlatformInAppWebViewController
   }
 
   @override
+  Future<void> requestFocus() async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    return await channel?.invokeMethod('requestFocus', args);
+  }
+
+  @override
   Future<void> setContextMenu(ContextMenu? contextMenu) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent("contextMenu", () => contextMenu?.toMap());

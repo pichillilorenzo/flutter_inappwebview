@@ -1656,6 +1656,25 @@ as it can cause framerate drops on animations in Android 9 and lower (see [Hybri
   ])
   String? iframeCsp;
 
+  ///A string that reflects the `role` HTML attribute, containing a WAI-ARIA role for the element.
+  @SupportedPlatforms(platforms: [
+    WebPlatform(
+        requiresSameOrigin: false,
+        apiName: "iframe.role",
+        apiUrl:
+            "https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Roles")
+  ])
+  String? iframeRole;
+
+  @SupportedPlatforms(platforms: [
+    WebPlatform(
+        requiresSameOrigin: false,
+        apiName: "iframe.ariaHidden",
+        apiUrl:
+        "https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Attributes/aria-hidden")
+  ])
+  String? iframeAriaHidden;
+
   @ExchangeableObjectConstructor()
   InAppWebViewSettings_({
     this.useShouldOverrideUrlLoading,
@@ -1798,6 +1817,8 @@ as it can cause framerate drops on animations in Android 9 and lower (see [Hybri
     this.iframeReferrerPolicy,
     this.iframeName,
     this.iframeCsp,
+    this.iframeRole,
+    this.iframeAriaHidden,
   }) {
     if (this.minimumFontSize == null)
       this.minimumFontSize = Util.isAndroid ? 8 : 0;

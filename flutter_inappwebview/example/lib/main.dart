@@ -22,8 +22,6 @@ Future main() async {
   // await Permission.microphone.request();
   // await Permission.storage.request();
 
-  await localhostServer.start();
-
   if (!kIsWeb && defaultTargetPlatform == TargetPlatform.windows) {
     final availableVersion = await WebViewEnvironment.getAvailableVersion();
     assert(availableVersion != null,

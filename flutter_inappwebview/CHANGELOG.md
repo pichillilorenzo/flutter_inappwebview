@@ -10,6 +10,7 @@
 
 #### Platform Interface
 - Updated static `fromMap` implementation for some classes
+- Added `PlatformInAppLocalhostServer.onData` parameter to set a custom on data server callback
 
 #### Android Platform
 - Added `InAppWebViewController.enableSlowWholeDocumentDraw` static method
@@ -20,6 +21,9 @@
 #### macOS and iOS Platforms
 - Moved `WKUserContentController` initialization on `preWKWebViewConfiguration` to fix possible `undefined is not an object (evaluating 'window.webkit.messageHandlers')` javascript error
 - Merged "change priority of DispatchQueue" [#2322](https://github.com/pichillilorenzo/flutter_inappwebview/pull/2322) (thanks to [nnnlog](https://github.com/nnnlog))
+
+#### Web Platform
+- Merged "[web] support iframe role and aria-hidden attributes" [2293](https://github.com/pichillilorenzo/flutter_inappwebview/pull/2293) (thanks to [p-mazhnik](https://github.com/p-mazhnik))
 
 ## 6.1.5
 

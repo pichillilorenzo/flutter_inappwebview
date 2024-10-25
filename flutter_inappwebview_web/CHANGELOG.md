@@ -1,6 +1,7 @@
 ## 1.2.0
 
 - Updated flutter_inappwebview_platform_interface version to ^1.4.0
+- Merged "[web] support iframe role and aria-hidden attributes" [2293](https://github.com/pichillilorenzo/flutter_inappwebview/pull/2293) (thanks to [p-mazhnik](https://github.com/p-mazhnik))
 
 ## 1.1.2
 

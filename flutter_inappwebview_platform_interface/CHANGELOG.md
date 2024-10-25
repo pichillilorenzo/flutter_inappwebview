@@ -1,6 +1,7 @@
 #### 1.4.0
 
 - Updated static `fromMap` implementation for some classes
+- Added `PlatformInAppLocalhostServer.onData` parameter to set a custom on data server callback
 
 ## 1.3.0+1
 

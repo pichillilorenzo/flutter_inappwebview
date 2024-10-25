@@ -4,6 +4,7 @@
 - Added `InAppWebViewController.enableSlowWholeDocumentDraw` static method
 - Added `CookieManager.flush` method
 - Updated `InAppWebViewController.takeScreenshot` implementation to support screenshot out of visible viewport when `InAppWebViewController.enableSlowWholeDocumentDraw` is called
+- Fixed "After dispose a InAppWebViewKeepAlive using InAppWebViewController.disposeKeepAlive. NullPointerException is thrown when main activity enter destroyed state." [#2025](https://github.com/pichillilorenzo/flutter_inappwebview/issues/2025)
 
 ## 1.1.3
 

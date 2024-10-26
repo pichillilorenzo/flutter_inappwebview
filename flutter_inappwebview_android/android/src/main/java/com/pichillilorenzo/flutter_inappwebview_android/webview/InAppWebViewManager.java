@@ -16,6 +16,7 @@ import androidx.webkit.WebViewCompat;
 import androidx.webkit.WebViewFeature;
 
 import com.pichillilorenzo.flutter_inappwebview_android.InAppWebViewFlutterPlugin;
+import com.pichillilorenzo.flutter_inappwebview_android.plugin_scripts_js.JavaScriptBridgeJS;
 import com.pichillilorenzo.flutter_inappwebview_android.types.ChannelDelegateImpl;
 import com.pichillilorenzo.flutter_inappwebview_android.webview.in_app_webview.FlutterWebView;
 
@@ -32,7 +33,7 @@ import io.flutter.plugin.common.MethodChannel;
 public class InAppWebViewManager extends ChannelDelegateImpl {
   protected static final String LOG_TAG = "InAppWebViewManager";
   public static final String METHOD_CHANNEL_NAME = "com.pichillilorenzo/flutter_inappwebview_manager";
-  
+
   @Nullable
   public InAppWebViewFlutterPlugin plugin;
 
@@ -163,13 +164,22 @@ public class InAppWebViewManager extends ChannelDelegateImpl {
         result.success(true);
         break;
       case "enableSlowWholeDocumentDraw":
-      {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-          WebView.enableSlowWholeDocumentDraw();
+        {
+          if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            WebView.enableSlowWholeDocumentDraw();
+          }
         }
-      }
-      result.success(true);
-      break;
+        result.success(true);
+        break;
+      case "setJavaScriptBridgeName":
+        JavaScriptBridgeJS.set_JAVASCRIPT_BRIDGE_NAME((String) call.argument("bridgeName"));
+        result.success(true);
+        break;
+      case "getJavaScriptBridgeName":
+        {
+          result.success(JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME());
+        }
+        break;
       default:
         result.notImplemented();
     }

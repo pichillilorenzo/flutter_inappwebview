@@ -704,7 +704,7 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///{@endtemplate}
   void addJavaScriptHandler(
       {required String handlerName,
-      required JavaScriptHandlerCallback callback}) {
+      required Function callback}) {
     throw UnimplementedError(
         'addJavaScriptHandler is not implemented on the current platform');
   }
@@ -720,7 +720,7 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///- MacOS
   ///- Windows
   ///{@endtemplate}
-  JavaScriptHandlerCallback? removeJavaScriptHandler(
+  Function? removeJavaScriptHandler(
       {required String handlerName}) {
     throw UnimplementedError(
         'removeJavaScriptHandler is not implemented on the current platform');
@@ -2356,6 +2356,34 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   Future<void> enableSlowWholeDocumentDraw() {
     throw UnimplementedError(
         'enableSlowWholeDocumentDraw is not implemented on the current platform');
+  }
+
+  ///{@template flutter_inappwebview_platform_interface.PlatformInAppWebViewController.setJavaScriptBridgeName}
+  ///Sets the name of the JavaScript Bridge object that will be used to interact with the WebView.
+  ///This method should be called before any WebViews are created or when there are no WebViews.
+  ///Calling this method after a WebView has been created will not change
+  ///the current JavaScript Bridge object and could lead to errors.
+  ///The default name used by this plugin is `flutter_inappwebview`.
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Android native WebView
+  ///{@endtemplate}
+  Future<void> setJavaScriptBridgeName(String bridgeName) {
+    throw UnimplementedError(
+        'setJavaScriptBridgeName is not implemented on the current platform');
+  }
+
+  ///{@template flutter_inappwebview_platform_interface.PlatformInAppWebViewController.getJavaScriptBridgeName}
+  ///Gets the name of the JavaScript Bridge object that is used to interact with the WebView.
+  ///Use [setJavaScriptBridgeName] to set a custom name.
+  ///The default name used by this plugin is `flutter_inappwebview`.
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Android native WebView
+  ///{@endtemplate}
+  Future<String> getJavaScriptBridgeName() {
+    throw UnimplementedError(
+        'getJavaScriptBridgeName is not implemented on the current platform');
   }
 
   ///{@template flutter_inappwebview_platform_interface.PlatformInAppWebViewController.tRexRunnerHtml}

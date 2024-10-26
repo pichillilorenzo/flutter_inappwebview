@@ -102,6 +102,7 @@ import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -188,6 +189,9 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
     super(context, attrs, defaultStyle);
   }
 
+  @NonNull
+  private final String expectedBridgeSecret = UUID.randomUUID().toString();
+
   public InAppWebView(Context context, @NonNull InAppWebViewFlutterPlugin plugin,
                       @NonNull Object id, @Nullable Integer windowId, InAppWebViewSettings customSettings,
                       @Nullable Map<String, Object> contextMenu, View containerView,
@@ -243,8 +247,8 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
       webViewAssetLoaderExt = WebViewAssetLoaderExt.fromMap(customSettings.webViewAssetLoader, plugin, getContext());
     }
 
-    javaScriptBridgeInterface = new JavaScriptBridgeInterface(this);
-    addJavascriptInterface(javaScriptBridgeInterface, JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME);
+    javaScriptBridgeInterface = new JavaScriptBridgeInterface(this, expectedBridgeSecret);
+    addJavascriptInterface(javaScriptBridgeInterface, JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME());
 
     inAppWebViewChromeClient = new InAppWebViewChromeClient(plugin, this, inAppBrowserDelegate);
     setWebChromeClient(inAppWebViewChromeClient);
@@ -561,24 +565,34 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
   }
 
   public void prepareAndAddUserScripts() {
-    userContentController.addPluginScript(PromisePolyfillJS.PROMISE_POLYFILL_JS_PLUGIN_SCRIPT);
-    userContentController.addPluginScript(JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_JS_PLUGIN_SCRIPT);
-    userContentController.addPluginScript(PrintJS.PRINT_JS_PLUGIN_SCRIPT);
-    userContentController.addPluginScript(OnWindowBlurEventJS.ON_WINDOW_BLUR_EVENT_JS_PLUGIN_SCRIPT);
-    userContentController.addPluginScript(OnWindowFocusEventJS.ON_WINDOW_FOCUS_EVENT_JS_PLUGIN_SCRIPT);
+    userContentController.addPluginScript(PromisePolyfillJS.PROMISE_POLYFILL_JS_PLUGIN_SCRIPT(customSettings.pluginScriptsOriginAllowList,
+            customSettings.pluginScriptsForMainFrameOnly));
+    userContentController.addPluginScript(JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_JS_PLUGIN_SCRIPT(expectedBridgeSecret,
+            customSettings.pluginScriptsOriginAllowList,
+            customSettings.pluginScriptsForMainFrameOnly));
+    userContentController.addPluginScript(PrintJS.PRINT_JS_PLUGIN_SCRIPT(customSettings.pluginScriptsOriginAllowList,
+            customSettings.pluginScriptsForMainFrameOnly));
+    userContentController.addPluginScript(OnWindowBlurEventJS.ON_WINDOW_BLUR_EVENT_JS_PLUGIN_SCRIPT(customSettings.pluginScriptsOriginAllowList,
+            customSettings.pluginScriptsForMainFrameOnly));
+    userContentController.addPluginScript(OnWindowFocusEventJS.ON_WINDOW_FOCUS_EVENT_JS_PLUGIN_SCRIPT(customSettings.pluginScriptsOriginAllowList,
+            customSettings.pluginScriptsForMainFrameOnly));
     interceptOnlyAsyncAjaxRequestsPluginScript = InterceptAjaxRequestJS.createInterceptOnlyAsyncAjaxRequestsPluginScript(customSettings.interceptOnlyAsyncAjaxRequests);
     if (customSettings.useShouldInterceptAjaxRequest) {
       userContentController.addPluginScript(interceptOnlyAsyncAjaxRequestsPluginScript);
-      userContentController.addPluginScript(InterceptAjaxRequestJS.INTERCEPT_AJAX_REQUEST_JS_PLUGIN_SCRIPT);
+      userContentController.addPluginScript(InterceptAjaxRequestJS.INTERCEPT_AJAX_REQUEST_JS_PLUGIN_SCRIPT(customSettings.pluginScriptsOriginAllowList,
+              customSettings.pluginScriptsForMainFrameOnly));
     }
     if (customSettings.useShouldInterceptFetchRequest) {
-      userContentController.addPluginScript(InterceptFetchRequestJS.INTERCEPT_FETCH_REQUEST_JS_PLUGIN_SCRIPT);
+      userContentController.addPluginScript(InterceptFetchRequestJS.INTERCEPT_FETCH_REQUEST_JS_PLUGIN_SCRIPT(customSettings.pluginScriptsOriginAllowList,
+              customSettings.pluginScriptsForMainFrameOnly));
     }
     if (customSettings.useOnLoadResource) {
-      userContentController.addPluginScript(OnLoadResourceJS.ON_LOAD_RESOURCE_JS_PLUGIN_SCRIPT);
+      userContentController.addPluginScript(OnLoadResourceJS.ON_LOAD_RESOURCE_JS_PLUGIN_SCRIPT(customSettings.pluginScriptsOriginAllowList,
+              customSettings.pluginScriptsForMainFrameOnly));
     }
     if (!customSettings.useHybridComposition) {
-      userContentController.addPluginScript(PluginScriptsUtil.CHECK_GLOBAL_KEY_DOWN_EVENT_TO_HIDE_CONTEXT_MENU_JS_PLUGIN_SCRIPT);
+      userContentController.addPluginScript(PluginScriptsUtil.CHECK_GLOBAL_KEY_DOWN_EVENT_TO_HIDE_CONTEXT_MENU_JS_PLUGIN_SCRIPT(customSettings.pluginScriptsOriginAllowList,
+              customSettings.pluginScriptsForMainFrameOnly));
     }
     this.userContentController.addUserOnlyScripts(this.initialUserOnlyScripts);
   }
@@ -783,15 +797,16 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
 
     if (newSettingsMap.get("useShouldInterceptAjaxRequest") != null && customSettings.useShouldInterceptAjaxRequest != newCustomSettings.useShouldInterceptAjaxRequest) {
       enablePluginScriptAtRuntime(
-              InterceptAjaxRequestJS.FLAG_VARIABLE_FOR_SHOULD_INTERCEPT_AJAX_REQUEST_JS_SOURCE,
+              InterceptAjaxRequestJS.FLAG_VARIABLE_FOR_SHOULD_INTERCEPT_AJAX_REQUEST_JS_SOURCE(),
               newCustomSettings.useShouldInterceptAjaxRequest,
-              InterceptAjaxRequestJS.INTERCEPT_AJAX_REQUEST_JS_PLUGIN_SCRIPT
+              InterceptAjaxRequestJS.INTERCEPT_AJAX_REQUEST_JS_PLUGIN_SCRIPT(customSettings.pluginScriptsOriginAllowList,
+                      customSettings.pluginScriptsForMainFrameOnly)
       );
     }
 
     if (newSettingsMap.get("interceptOnlyAsyncAjaxRequests") != null && customSettings.interceptOnlyAsyncAjaxRequests != newCustomSettings.interceptOnlyAsyncAjaxRequests) {
       enablePluginScriptAtRuntime(
-              InterceptAjaxRequestJS.FLAG_VARIABLE_FOR_INTERCEPT_ONLY_ASYNC_AJAX_REQUESTS_JS_SOURCE,
+              InterceptAjaxRequestJS.FLAG_VARIABLE_FOR_INTERCEPT_ONLY_ASYNC_AJAX_REQUESTS_JS_SOURCE(),
               newCustomSettings.interceptOnlyAsyncAjaxRequests,
               interceptOnlyAsyncAjaxRequestsPluginScript
       );
@@ -799,17 +814,19 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
 
     if (newSettingsMap.get("useShouldInterceptFetchRequest") != null && customSettings.useShouldInterceptFetchRequest != newCustomSettings.useShouldInterceptFetchRequest) {
       enablePluginScriptAtRuntime(
-              InterceptFetchRequestJS.FLAG_VARIABLE_FOR_SHOULD_INTERCEPT_FETCH_REQUEST_JS_SOURCE,
+              InterceptFetchRequestJS.FLAG_VARIABLE_FOR_SHOULD_INTERCEPT_FETCH_REQUEST_JS_SOURCE(),
               newCustomSettings.useShouldInterceptFetchRequest,
-              InterceptFetchRequestJS.INTERCEPT_FETCH_REQUEST_JS_PLUGIN_SCRIPT
+              InterceptFetchRequestJS.INTERCEPT_FETCH_REQUEST_JS_PLUGIN_SCRIPT(customSettings.pluginScriptsOriginAllowList,
+                      customSettings.pluginScriptsForMainFrameOnly)
       );
     }
 
     if (newSettingsMap.get("useOnLoadResource") != null && customSettings.useOnLoadResource != newCustomSettings.useOnLoadResource) {
       enablePluginScriptAtRuntime(
-              OnLoadResourceJS.FLAG_VARIABLE_FOR_ON_LOAD_RESOURCE_JS_SOURCE,
+              OnLoadResourceJS.FLAG_VARIABLE_FOR_ON_LOAD_RESOURCE_JS_SOURCE(),
               newCustomSettings.useOnLoadResource,
-              OnLoadResourceJS.ON_LOAD_RESOURCE_JS_PLUGIN_SCRIPT
+              OnLoadResourceJS.ON_LOAD_RESOURCE_JS_PLUGIN_SCRIPT(customSettings.pluginScriptsOriginAllowList,
+                      customSettings.pluginScriptsForMainFrameOnly)
       );
     }
 
@@ -1133,7 +1150,7 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
     customSettings = newCustomSettings;
   }
 
-  public Map<String, Object> getCustomSettings() {
+  public Map<String, Object> getCustomSettingsMap() {
     return (customSettings != null) ? customSettings.getRealSettings(this) : null;
   }
 
@@ -1170,8 +1187,8 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
     }
     if (resultUuid != null && resultCallback != null) {
       evaluateJavaScriptContentWorldCallbacks.put(resultUuid, resultCallback);
-      scriptToInject = Util.replaceAll(PluginScriptsUtil.EVALUATE_JAVASCRIPT_WITH_CONTENT_WORLD_WRAPPER_JS_SOURCE,
-                      PluginScriptsUtil.VAR_RANDOM_NAME, "_" + JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME + "_" + Math.round(Math.random() * 1000000))
+      scriptToInject = Util.replaceAll(PluginScriptsUtil.EVALUATE_JAVASCRIPT_WITH_CONTENT_WORLD_WRAPPER_JS_SOURCE(),
+                      PluginScriptsUtil.VAR_RANDOM_NAME, "_" + JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME() + "_" + Math.round(Math.random() * 1000000))
               .replace(PluginScriptsUtil.VAR_PLACEHOLDER_VALUE, UserContentController.escapeCode(source))
               .replace(PluginScriptsUtil.VAR_RESULT_UUID, resultUuid);
     }
@@ -1216,13 +1233,13 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
         String scriptIdEscaped = idAttr.replaceAll("'", "\\\\'");
         scriptAttributes += " script.id = '" + scriptIdEscaped + "'; ";
         scriptAttributes += " script.onload = function() {" +
-                "  if (window." + JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME + " != null) {" +
-                "    window." + JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME + ".callHandler('onInjectedScriptLoaded', '" + scriptIdEscaped + "');" +
+                "  if (window." + JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME() + " != null) {" +
+                "    window." + JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME() + ".callHandler('onInjectedScriptLoaded', '" + scriptIdEscaped + "');" +
                 "  }" +
                 "};";
         scriptAttributes += " script.onerror = function() {" +
-                "  if (window." + JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME + " != null) {" +
-                "    window." + JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME + ".callHandler('onInjectedScriptError', '" + scriptIdEscaped + "');" +
+                "  if (window." + JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME() + " != null) {" +
+                "    window." + JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME() + ".callHandler('onInjectedScriptError', '" + scriptIdEscaped + "');" +
                 "  }" +
                 "};";
       }
@@ -1846,7 +1863,7 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
     String functionArgumentValues = TextUtils.join(", ", functionArgumentValuesList);
     String functionArgumentsObj = Util.JSONStringify(arguments);
 
-    String sourceToInject = PluginScriptsUtil.CALL_ASYNC_JAVA_SCRIPT_WRAPPER_JS_SOURCE
+    String sourceToInject = PluginScriptsUtil.CALL_ASYNC_JAVA_SCRIPT_WRAPPER_JS_SOURCE()
             .replace(PluginScriptsUtil.VAR_FUNCTION_ARGUMENT_NAMES, functionArgumentNames)
             .replace(PluginScriptsUtil.VAR_FUNCTION_ARGUMENT_VALUES, functionArgumentValues)
             .replace(PluginScriptsUtil.VAR_FUNCTION_ARGUMENTS_OBJ, functionArgumentsObj)
@@ -2037,6 +2054,11 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
   }
 
   @Override
+  public InAppWebViewSettings getCustomSettings() {
+    return customSettings;
+  }
+
+  @Override
   public void dispose() {
     if (channelDelegate != null) {
       channelDelegate.dispose();
@@ -2045,7 +2067,7 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
     super.dispose();
     WebSettings settings = getSettings();
     settings.setJavaScriptEnabled(false);
-    removeJavascriptInterface(JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME);
+    removeJavascriptInterface(JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME());
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && WebViewFeature.isFeatureSupported(WebViewFeature.WEB_VIEW_RENDERER_CLIENT_BASIC_USAGE)) {
       WebViewCompat.setWebViewRenderProcessClient(this, null);
     }

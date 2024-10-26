@@ -20,12 +20,14 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  flutter_inappwebview_platform_interface: ^1.4.0
-  flutter_inappwebview_android: ^1.2.0
-  flutter_inappwebview_ios: ^1.2.0
-  flutter_inappwebview_macos: ^1.2.0
-  flutter_inappwebview_web: ^1.2.0
-  flutter_inappwebview_windows: ^0.7.0
+  flutter_inappwebview_platform_interface: #^1.4.0
+    path: ../flutter_inappwebview_platform_interface
+  flutter_inappwebview_android: #^1.2.0
+    path: ../flutter_inappwebview_android
+#  flutter_inappwebview_ios: ^1.2.0
+#  flutter_inappwebview_macos: ^1.2.0
+#  flutter_inappwebview_web: ^1.2.0
+#  flutter_inappwebview_windows: ^0.7.0
 
 dev_dependencies:
   flutter_test:

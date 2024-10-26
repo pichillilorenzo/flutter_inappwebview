@@ -56,7 +56,7 @@ public class WebMessageChannel implements Disposable {
     if (webView != null) {
       final WebMessageChannel webMessageChannel = this;
       webView.evaluateJavascript("(function() {" +
-              JavaScriptBridgeJS.WEB_MESSAGE_CHANNELS_VARIABLE_NAME + "['" + webMessageChannel.id + "'] = new MessageChannel();" +
+              JavaScriptBridgeJS.WEB_MESSAGE_CHANNELS_VARIABLE_NAME() + "['" + webMessageChannel.id + "'] = new MessageChannel();" +
               "})();", null, new ValueCallback<String>() {
         @Override
         public void onReceiveValue(String value) {

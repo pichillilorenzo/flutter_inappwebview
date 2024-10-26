@@ -11,10 +11,16 @@
 #### Platform Interface
 - Updated static `fromMap` implementation for some classes
 - Added `PlatformInAppLocalhostServer.onData` parameter to set a custom on data server callback
+- Added `javaScriptHandlerOriginAllowList`, `pluginScriptsOriginAllowList`, `pluginScriptsForMainFrameOnly` InAppWebViewSettings parameters
+- Added `setJavaScriptBridgeName`, `getJavaScriptBridgeName` static WebView controller methods
+- Added `JavaScriptHandlerFunctionData` type
+- Deprecated `JavaScriptHandlerCallback` type in favor of `JavaScriptHandlerFunction` type
 
 #### Android Platform
 - Added `InAppWebViewController.enableSlowWholeDocumentDraw` static method
 - Added `CookieManager.flush` method
+- Added support for `UserScript.forMainFrameOnly` parameter
+- Updated UserScript at document end implementation
 - Updated `InAppWebViewController.takeScreenshot` implementation to support screenshot out of visible viewport when `InAppWebViewController.enableSlowWholeDocumentDraw` is called
 - Fixed "After dispose a InAppWebViewKeepAlive using InAppWebViewController.disposeKeepAlive. NullPointerException is thrown when main activity enter destroyed state." [#2025](https://github.com/pichillilorenzo/flutter_inappwebview/issues/2025)
 - Fixed crash when trying to open InAppBrowser with R.menu.menu_main on release mode

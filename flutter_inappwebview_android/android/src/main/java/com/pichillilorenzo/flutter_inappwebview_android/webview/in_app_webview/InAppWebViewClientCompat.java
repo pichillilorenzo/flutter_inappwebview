@@ -189,12 +189,13 @@ public class InAppWebViewClientCompat extends WebViewClientCompat {
   public void loadCustomJavaScriptOnPageFinished(WebView view) {
     InAppWebView webView = (InAppWebView) view;
 
-    String source = webView.userContentController.generateWrappedCodeForDocumentEnd();
-
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-      webView.evaluateJavascript(source, (ValueCallback<String>) null);
-    } else {
-      webView.loadUrl("javascript:" + source.replaceAll("[\r\n]+", ""));
+    if (!WebViewFeature.isFeatureSupported(WebViewFeature.DOCUMENT_START_SCRIPT)) {
+      String source = webView.userContentController.generateWrappedCodeForDocumentEnd();
+      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+        webView.evaluateJavascript(source, (ValueCallback<String>) null);
+      } else {
+        webView.loadUrl("javascript:" + source.replaceAll("[\r\n]+", ""));
+      }
     }
   }
 
@@ -237,7 +238,7 @@ public class InAppWebViewClientCompat extends WebViewClientCompat {
       CookieSyncManager.getInstance().sync();
     }
 
-    String js = JavaScriptBridgeJS.PLATFORM_READY_JS_SOURCE;
+    String js = JavaScriptBridgeJS.PLATFORM_READY_JS_SOURCE();
 
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
       webView.evaluateJavascript(js, (ValueCallback<String>) null);

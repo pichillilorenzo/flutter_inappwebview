@@ -10,7 +10,8 @@ part of 'user_script.dart';
 class UserScript {
   ///A set of matching rules for the allowed origins.
   ///
-  ///**NOTE**: available only on Android and only if [WebViewFeature.DOCUMENT_START_SCRIPT] feature is supported.
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Android native WebView
   late Set<String> allowedOriginRules;
 
   ///A scope of execution in which to evaluate the script to prevent conflicts between different scripts.
@@ -21,7 +22,10 @@ class UserScript {
   ///Specify true to inject the script only into the main frame, or false to inject it into all frames.
   ///The default value is `true`.
   ///
-  ///**NOTE**: available only on iOS and MacOS.
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Android native WebView
+  ///- iOS
+  ///- MacOS
   bool forMainFrameOnly;
 
   ///The script’s group name.

@@ -9,21 +9,27 @@ import android.webkit.ValueCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.pichillilorenzo.flutter_inappwebview_android.plugin_scripts_js.JavaScriptBridgeJS;
 import com.pichillilorenzo.flutter_inappwebview_android.print_job.PrintJobController;
 import com.pichillilorenzo.flutter_inappwebview_android.print_job.PrintJobSettings;
+import com.pichillilorenzo.flutter_inappwebview_android.types.JavaScriptHandlerFunctionData;
 import com.pichillilorenzo.flutter_inappwebview_android.webview.in_app_webview.InAppWebView;
-import com.pichillilorenzo.flutter_inappwebview_android.plugin_scripts_js.JavaScriptBridgeJS;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.regex.Pattern;
+
 public class JavaScriptBridgeInterface {
   private static final String LOG_TAG = "JSBridgeInterface";
   private InAppWebView inAppWebView;
-  
-  public JavaScriptBridgeInterface(InAppWebView inAppWebView) {
+  @NonNull
+  private final String expectedBridgeSecret;
+
+  public JavaScriptBridgeInterface(InAppWebView inAppWebView, @NonNull String expectedBridgeSecret) {
     this.inAppWebView = inAppWebView;
+    this.expectedBridgeSecret = expectedBridgeSecret;
   }
 
   @JavascriptInterface
@@ -44,8 +50,37 @@ public class JavaScriptBridgeInterface {
   }
 
   @JavascriptInterface
-  public void _callHandler(final String handlerName, final String _callHandlerID, final String args) {
+  public void _callHandler(final String handlerName, final String _callHandlerID,
+                           final String bridgeSecret, final String origin, final boolean isMainFrame,
+                           final String args) {
     if (inAppWebView == null) {
+      return;
+    }
+
+    if (handlerName == null || handlerName.isEmpty()) {
+      Log.d(LOG_TAG, "handlerName is null or empty");
+      return;
+    }
+
+    if (!expectedBridgeSecret.equals(bridgeSecret)) {
+      Log.e(LOG_TAG, "Bridge access attempt with wrong secret token, possibly from malicious code!");
+      return;
+    }
+
+    boolean isOriginAllowed = false;
+    if (inAppWebView.customSettings.javaScriptHandlerOriginAllowList != null) {
+      for (Pattern allowedOrigin : inAppWebView.customSettings.javaScriptHandlerOriginAllowList) {
+        if (allowedOrigin.matcher(origin).matches()) {
+          isOriginAllowed = true;
+          break;
+        }
+      }
+    } else {
+      // origin is by default allowed if the allow list is null
+      isOriginAllowed = true;
+    }
+    if (!isOriginAllowed) {
+      Log.e(LOG_TAG, "Bridge access attempt from an origin not allowed: " + origin);
       return;
     }
 
@@ -120,22 +155,22 @@ public class JavaScriptBridgeInterface {
         }
 
         if (inAppWebView.channelDelegate != null) {
+          JavaScriptHandlerFunctionData data = new JavaScriptHandlerFunctionData(origin, isMainFrame, args);
           // invoke flutter javascript handler and send back flutter data as a JSON Object to javascript
-          inAppWebView.channelDelegate.onCallJsHandler(handlerName, args, new WebViewChannelDelegate.CallJsHandlerCallback() {
+          inAppWebView.channelDelegate.onCallJsHandler(handlerName, data, new WebViewChannelDelegate.CallJsHandlerCallback() {
             @Override
             public void defaultBehaviour(@Nullable Object json) {
               if (inAppWebView == null) {
                 // The webview has already been disposed, ignore.
                 return;
               }
-              String sourceCode = "if (window." + JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME + "[" + _callHandlerID + "] != null) { " +
-                "window." + JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME + "[" + _callHandlerID + "].resolve(" + json + "); " +
-                "delete window." + JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME + "[" + _callHandlerID + "]; " +
-              "}";
+              String sourceCode = "if (window." + JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME() + "[" + _callHandlerID + "] != null) { " +
+                      "window." + JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME() + "[" + _callHandlerID + "].resolve(" + json + "); " +
+                      "delete window." + JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME() + "[" + _callHandlerID + "]; " +
+                      "}";
               if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
                 inAppWebView.evaluateJavascript(sourceCode, (ValueCallback<String>) null);
-              }
-              else {
+              } else {
                 inAppWebView.loadUrl("javascript:" + sourceCode);
               }
             }
@@ -150,14 +185,13 @@ public class JavaScriptBridgeInterface {
                 return;
               }
 
-              String sourceCode = "if (window." + JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME + "[" + _callHandlerID + "] != null) { " +
-                      "window." + JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME + "[" + _callHandlerID + "].reject(new Error(" + JSONObject.quote(message) + ")); " +
-                      "delete window." + JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME + "[" + _callHandlerID + "]; " +
+              String sourceCode = "if (window." + JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME() + "[" + _callHandlerID + "] != null) { " +
+                      "window." + JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME() + "[" + _callHandlerID + "].reject(new Error(" + JSONObject.quote(message) + ")); " +
+                      "delete window." + JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME() + "[" + _callHandlerID + "]; " +
                       "}";
               if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
                 inAppWebView.evaluateJavascript(sourceCode, (ValueCallback<String>) null);
-              }
-              else {
+              } else {
                 inAppWebView.loadUrl("javascript:" + sourceCode);
               }
             }

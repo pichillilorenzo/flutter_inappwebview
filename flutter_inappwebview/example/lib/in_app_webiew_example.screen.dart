@@ -21,6 +21,9 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
       mediaPlaybackRequiresUserGesture: false,
       allowsInlineMediaPlayback: true,
       iframeAllow: "camera; microphone",
+      javaScriptHandlerOriginAllowList: {".*"},
+      pluginScriptsForMainFrameOnly: false,
+      pluginScriptsOriginAllowList: {"*"},
       iframeAllowFullscreen: true);
 
   PullToRefreshController? pullToRefreshController;
@@ -116,16 +119,31 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                   key: webViewKey,
                   webViewEnvironment: webViewEnvironment,
                   initialUrlRequest:
-                      URLRequest(url: WebUri('https://flutter.dev')),
+                    URLRequest(url: WebUri('https://www.w3schools.com/tags/tryit.asp?filename=tryhtml_iframe')),
                   // initialUrlRequest:
                   // URLRequest(url: WebUri(Uri.base.toString().replaceFirst("/#/", "/") + 'page.html')),
                   // initialFile: "assets/index.html",
-                  initialUserScripts: UnmodifiableListView<UserScript>([]),
+                  // initialUserScripts: UnmodifiableListView<UserScript>([]),
                   initialSettings: settings,
                   contextMenu: contextMenu,
                   pullToRefreshController: pullToRefreshController,
+                  initialUserScripts: UnmodifiableListView<UserScript>([
+                    UserScript(
+                        source: "console.log('loaded'); window.custom_js_bridge.callHandler('handlerName', 1, 4, true, {\"foo\": \"bar\"});",
+                        injectionTime: UserScriptInjectionTime.AT_DOCUMENT_END,
+                        allowedOriginRules: {"https://www.w3schools.com", "https://www.example.com"},
+                        forMainFrameOnly: false),
+                  ]),
                   onWebViewCreated: (controller) async {
                     webViewController = controller;
+                    controller.addJavaScriptHandler(handlerName: 'handlerName', callback: (JavaScriptHandlerFunctionData handlerData) {
+                      print(handlerData);
+                      return handlerData.args;
+                    });
+                    controller.addJavaScriptHandler(handlerName: 'handlerName2', callback: (arguments) {
+                      print(arguments);
+                      return arguments;
+                    });
                   },
                   onLoadStart: (controller, url) async {
                     setState(() {

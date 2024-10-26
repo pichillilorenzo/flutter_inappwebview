@@ -2,6 +2,9 @@
 
 - Updated static `fromMap` implementation for some classes
 - Added `PlatformInAppLocalhostServer.onData` parameter to set a custom on data server callback
+- Added `javaScriptHandlerOriginAllowList`, `pluginScriptsOriginAllowList`, `pluginScriptsForMainFrameOnly` InAppWebViewSettings parameters
+- Added `JavaScriptHandlerFunctionData` type
+- Deprecated `JavaScriptHandlerCallback` type in favor of `JavaScriptHandlerFunction` type
 
 ## 1.3.0+1
 

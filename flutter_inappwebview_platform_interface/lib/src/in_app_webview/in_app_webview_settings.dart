@@ -21,6 +21,7 @@ import '../types/scrollview_deceleration_rate.dart';
 import '../types/selection_granularity.dart';
 import '../types/user_preferred_content_mode.dart';
 import '../types/vertical_scrollbar_position.dart';
+import '../types/user_script.dart';
 import '../web_uri.dart';
 import 'android/in_app_webview_options.dart';
 import 'apple/in_app_webview_options.dart';
@@ -1594,6 +1595,39 @@ as it can cause framerate drops on animations in Android 9 and lower (see [Hybri
   ])
   bool? shouldPrintBackgrounds;
 
+  ///A list of patterns that will be used to match the allowed origins
+  ///that are able to execute the JavaScript Handlers defined for the current WebView.
+  ///This will affect also the internal JavaScript Handlers used by the plugin itself.
+  ///The default value is `null` and will allow every origin.
+  @SupportedPlatforms(platforms: [
+    AndroidPlatform(),
+    IOSPlatform(),
+    MacOSPlatform(),
+    WindowsPlatform(),
+  ])
+  Set<String>? javaScriptHandlerOriginAllowList;
+
+  ///A list of patterns that will be used to match the allowed origins
+  ///that are able to load all the internal plugin [UserScript]s used by the plugin itself.
+  ///The default value is `null` and will allow every origin.
+  @SupportedPlatforms(platforms: [
+    AndroidPlatform(),
+    IOSPlatform(),
+    MacOSPlatform(),
+    WindowsPlatform(),
+  ])
+  Set<String>? pluginScriptsOriginAllowList;
+
+  ///Set to `true` to allow internal plugin [UserScript]s only on the main frame.
+  ///The default value is `false`.
+  @SupportedPlatforms(platforms: [
+    AndroidPlatform(),
+    IOSPlatform(),
+    MacOSPlatform(),
+    WindowsPlatform(),
+  ])
+  bool? pluginScriptsForMainFrameOnly;
+
   ///Specifies a feature policy for the `<iframe>`.
   ///The policy defines what features are available to the `<iframe>` based on the origin of the request
   ///(e.g. access to the microphone, camera, battery, web-share API, etc.).
@@ -1666,6 +1700,7 @@ as it can cause framerate drops on animations in Android 9 and lower (see [Hybri
   ])
   String? iframeRole;
 
+  ///A string that reflects the `aria-hidden` HTML attribute, indicating whether the element is exposed to an accessibility API.
   @SupportedPlatforms(platforms: [
     WebPlatform(
         requiresSameOrigin: false,
@@ -1811,6 +1846,9 @@ as it can cause framerate drops on animations in Android 9 and lower (see [Hybri
     this.shouldPrintBackgrounds = false,
     this.allowBackgroundAudioPlaying = false,
     this.webViewAssetLoader,
+    this.javaScriptHandlerOriginAllowList,
+    this.pluginScriptsOriginAllowList,
+    this.pluginScriptsForMainFrameOnly = false,
     this.iframeAllow,
     this.iframeAllowFullscreen,
     this.iframeSandbox,

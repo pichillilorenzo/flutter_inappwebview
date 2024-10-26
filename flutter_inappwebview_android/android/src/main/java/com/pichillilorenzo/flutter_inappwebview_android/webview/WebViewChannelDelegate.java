@@ -29,6 +29,7 @@ import com.pichillilorenzo.flutter_inappwebview_android.types.GeolocationPermiss
 import com.pichillilorenzo.flutter_inappwebview_android.types.HitTestResult;
 import com.pichillilorenzo.flutter_inappwebview_android.types.HttpAuthResponse;
 import com.pichillilorenzo.flutter_inappwebview_android.types.HttpAuthenticationChallenge;
+import com.pichillilorenzo.flutter_inappwebview_android.types.JavaScriptHandlerFunctionData;
 import com.pichillilorenzo.flutter_inappwebview_android.types.JsAlertResponse;
 import com.pichillilorenzo.flutter_inappwebview_android.types.JsBeforeUnloadResponse;
 import com.pichillilorenzo.flutter_inappwebview_android.types.JsConfirmResponse;
@@ -231,9 +232,9 @@ public class WebViewChannelDelegate extends ChannelDelegateImpl {
       case getSettings:
         if (webView != null && webView.getInAppBrowserDelegate() instanceof InAppBrowserActivity) {
           InAppBrowserActivity inAppBrowserActivity = (InAppBrowserActivity) webView.getInAppBrowserDelegate();
-          result.success(inAppBrowserActivity.getCustomSettings());
+          result.success(inAppBrowserActivity.getCustomSettingsMap());
         } else {
-          result.success((webView != null) ? webView.getCustomSettings() : null);
+          result.success((webView != null) ? webView.getCustomSettingsMap() : null);
         }
         break;
       case close:
@@ -1271,7 +1272,7 @@ public class WebViewChannelDelegate extends ChannelDelegateImpl {
     }
   }
 
-  public void onCallJsHandler(String handlerName, String args, @NonNull CallJsHandlerCallback callback) {
+  public void onCallJsHandler(String handlerName, JavaScriptHandlerFunctionData data, @NonNull CallJsHandlerCallback callback) {
     MethodChannel channel = getChannel();
     if (channel == null) {
       callback.defaultBehaviour(null);
@@ -1279,7 +1280,7 @@ public class WebViewChannelDelegate extends ChannelDelegateImpl {
     }
     Map<String, Object> obj = new HashMap<>();
     obj.put("handlerName", handlerName);
-    obj.put("args", args);
+    obj.put("data", data.toMap());
     channel.invokeMethod("onCallJsHandler", obj, callback);
   }
 

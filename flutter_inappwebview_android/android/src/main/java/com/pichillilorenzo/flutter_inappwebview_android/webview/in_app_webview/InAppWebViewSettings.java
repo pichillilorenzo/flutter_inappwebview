@@ -23,6 +23,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 public class InAppWebViewSettings implements ISettings<InAppWebViewInterface> {
 
@@ -133,6 +134,11 @@ public class InAppWebViewSettings implements ISettings<InAppWebViewInterface> {
   public byte[] defaultVideoPoster;
   @Nullable
   public Set<String> requestedWithHeaderOriginAllowList;
+  @Nullable
+  public Set<Pattern> javaScriptHandlerOriginAllowList;
+  @Nullable
+  public Set<String> pluginScriptsOriginAllowList;
+  public Boolean pluginScriptsForMainFrameOnly = false;
 
   @NonNull
   @Override
@@ -412,6 +418,18 @@ public class InAppWebViewSettings implements ISettings<InAppWebViewInterface> {
         case "requestedWithHeaderOriginAllowList":
           requestedWithHeaderOriginAllowList = new HashSet<>((List<String>) value);
           break;
+        case "javaScriptHandlerOriginAllowList":
+          javaScriptHandlerOriginAllowList = new HashSet<>();
+          for (String pattern : (List<String>) value) {
+            javaScriptHandlerOriginAllowList.add(Pattern.compile(pattern));
+          }
+          break;
+        case "pluginScriptsOriginAllowList":
+          pluginScriptsOriginAllowList = new HashSet<>((List<String>) value);
+          break;
+        case "pluginScriptsForMainFrameOnly":
+          pluginScriptsForMainFrameOnly = (Boolean) value;
+          break;
       }
     }
 
@@ -511,6 +529,15 @@ public class InAppWebViewSettings implements ISettings<InAppWebViewInterface> {
     settings.put("defaultVideoPoster", defaultVideoPoster);
     settings.put("requestedWithHeaderOriginAllowList",
             requestedWithHeaderOriginAllowList != null ? new ArrayList<>(requestedWithHeaderOriginAllowList) : null);
+    settings.put("javaScriptHandlerOriginAllowList",
+            javaScriptHandlerOriginAllowList != null ? new ArrayList<String>() {{
+              for (Pattern pattern : javaScriptHandlerOriginAllowList) {
+                add(pattern.pattern());
+              }
+            }} : null);
+    settings.put("pluginScriptsOriginAllowList",
+            pluginScriptsOriginAllowList != null ? new ArrayList<>(pluginScriptsOriginAllowList) : null);
+    settings.put("pluginScriptsForMainFrameOnly", pluginScriptsForMainFrameOnly);
     return settings;
   }
 
@@ -557,7 +584,8 @@ public class InAppWebViewSettings implements ISettings<InAppWebViewInterface> {
       realSettings.put("defaultTextEncodingName", settings.getDefaultTextEncodingName());
       if (WebViewFeature.isFeatureSupported(WebViewFeature.DISABLED_ACTION_MODE_MENU_ITEMS)) {
         realSettings.put("disabledActionModeMenuItems", WebSettingsCompat.getDisabledActionModeMenuItems(settings));
-      } if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+      }
+      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
         realSettings.put("disabledActionModeMenuItems", settings.getDisabledActionModeMenuItems());
       }
       realSettings.put("fantasyFontFamily", settings.getFantasyFontFamily());

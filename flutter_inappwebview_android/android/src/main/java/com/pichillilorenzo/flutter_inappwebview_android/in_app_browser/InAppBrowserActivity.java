@@ -541,8 +541,8 @@ public class InAppBrowserActivity extends AppCompatActivity implements InAppBrow
     customSettings = newSettings;
   }
 
-  public Map<String, Object> getCustomSettings() {
-    Map<String, Object> webViewSettingsMap = webView != null ? webView.getCustomSettings() : null;
+  public Map<String, Object> getCustomSettingsMap() {
+    Map<String, Object> webViewSettingsMap = webView != null ? webView.getCustomSettingsMap() : null;
     if (customSettings == null || webViewSettingsMap == null)
       return null;
 

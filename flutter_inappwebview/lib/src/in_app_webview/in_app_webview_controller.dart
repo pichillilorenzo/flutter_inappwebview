@@ -167,12 +167,12 @@ class InAppWebViewController {
   ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.addJavaScriptHandler}
   void addJavaScriptHandler(
           {required String handlerName,
-          required JavaScriptHandlerCallback callback}) =>
+          required Function callback}) =>
       platform.addJavaScriptHandler(
           handlerName: handlerName, callback: callback);
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.removeJavaScriptHandler}
-  JavaScriptHandlerCallback? removeJavaScriptHandler(
+  Function? removeJavaScriptHandler(
           {required String handlerName}) =>
       platform.removeJavaScriptHandler(handlerName: handlerName);
 
@@ -569,6 +569,16 @@ class InAppWebViewController {
   static Future<void> enableSlowWholeDocumentDraw() =>
       PlatformInAppWebViewController.static()
           .enableSlowWholeDocumentDraw();
+
+  ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.setJavaScriptBridgeName}
+  static Future<void> setJavaScriptBridgeName(String bridgeName) =>
+      PlatformInAppWebViewController.static()
+          .setJavaScriptBridgeName(bridgeName);
+
+  ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.getJavaScriptBridgeName}
+  static Future<void> getJavaScriptBridgeName() =>
+      PlatformInAppWebViewController.static()
+          .getJavaScriptBridgeName();
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.tRexRunnerHtml}
   static Future<String> get tRexRunnerHtml =>

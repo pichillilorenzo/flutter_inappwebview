@@ -52,7 +52,8 @@ public interface InAppWebViewInterface {
   boolean isLoading();
   void takeScreenshot(Map<String, Object> screenshotConfiguration, MethodChannel.Result result);
   void setSettings(InAppWebViewSettings newSettings, HashMap<String, Object> newSettingsMap);
-  Map<String, Object> getCustomSettings();
+  InAppWebViewSettings getCustomSettings();
+  Map<String, Object> getCustomSettingsMap();
   HashMap<String, Object> getCopyBackForwardList();
   void clearAllCache();
   void clearSslPreferences();

@@ -9,12 +9,15 @@ import java.util.Map;
 public class JavaScriptHandlerFunctionData {
   @NonNull
   private String origin;
+  @NonNull
+  private String requestUrl;
   private boolean isMainFrame;
   @NonNull
   private String args;
 
-  public JavaScriptHandlerFunctionData(@NonNull String origin, boolean isMainFrame, @NonNull String args) {
+  public JavaScriptHandlerFunctionData(@NonNull String origin, @NonNull String requestUrl, boolean isMainFrame, @NonNull String args) {
     this.origin = origin;
+    this.requestUrl = requestUrl;
     this.isMainFrame = isMainFrame;
     this.args = args;
   }
@@ -25,17 +28,28 @@ public class JavaScriptHandlerFunctionData {
       return null;
     }
     String origin = (String) map.get("origin");
+    String requestUrl = (String) map.get("requestUrl");
     boolean isMainFrame = (boolean) map.get("isMainFrame");
     String args = (String) map.get("args");
-    return new JavaScriptHandlerFunctionData(origin, isMainFrame, args);
+    return new JavaScriptHandlerFunctionData(origin, requestUrl, isMainFrame, args);
   }
 
   public Map<String, Object> toMap() {
     Map<String, Object> map = new HashMap<>();
     map.put("origin", origin);
+    map.put("requestUrl", requestUrl);
     map.put("isMainFrame", isMainFrame);
     map.put("args", args);
     return map;
+  }
+
+  @NonNull
+  public String getRequestUrl() {
+    return requestUrl;
+  }
+
+  public void setRequestUrl(@NonNull String requestUrl) {
+    this.requestUrl = requestUrl;
   }
 
   @NonNull
@@ -70,12 +84,13 @@ public class JavaScriptHandlerFunctionData {
     if (o == null || getClass() != o.getClass()) return false;
 
     JavaScriptHandlerFunctionData that = (JavaScriptHandlerFunctionData) o;
-    return isMainFrame == that.isMainFrame && origin.equals(that.origin) && args.equals(that.args);
+    return isMainFrame == that.isMainFrame && origin.equals(that.origin) && requestUrl.equals(that.requestUrl) && args.equals(that.args);
   }
 
   @Override
   public int hashCode() {
     int result = origin.hashCode();
+    result = 31 * result + requestUrl.hashCode();
     result = 31 * result + Boolean.hashCode(isMainFrame);
     result = 31 * result + args.hashCode();
     return result;
@@ -85,6 +100,7 @@ public class JavaScriptHandlerFunctionData {
   public String toString() {
     return "JavaScriptHandlerFunctionData{" +
             "origin='" + origin + '\'' +
+            ", requestUrl='" + requestUrl + '\'' +
             ", isMainFrame=" + isMainFrame +
             ", args='" + args + '\'' +
             '}';

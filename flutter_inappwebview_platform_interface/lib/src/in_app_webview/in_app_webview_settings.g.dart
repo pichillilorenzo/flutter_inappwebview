@@ -709,7 +709,7 @@ class InAppWebViewSettings {
   ///- Windows ([Official API - ICoreWebView2Settings.put_IsScriptEnabled](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2settings?view=webview2-1.0.2210.55#put_isscriptenabled))
   bool? javaScriptEnabled;
 
-  ///A list of patterns that will be used to match the allowed origins
+  ///A list of Regular Expression Patterns that will be used on native side to match the allowed origins
   ///that are able to execute the JavaScript Handlers defined for the current WebView.
   ///This will affect also the internal JavaScript Handlers used by the plugin itself.
   ///The default value is `null` and will allow every origin.
@@ -871,6 +871,13 @@ class InAppWebViewSettings {
 
   ///A list of patterns that will be used to match the allowed origins
   ///that are able to load all the internal plugin [UserScript]s used by the plugin itself.
+  ///Adding `'*'` as an allowed origin or setting this to `null`, it means it will allow every origin.
+  ///
+  ///**NOTE for Android**: each origin pattern MUST follow the table rule of [PlatformInAppWebViewController.addWebMessageListener].
+  ///
+  ///**NOTE for iOS and macOS**: each origin pattern will be used as a
+  ///Regular Expression Pattern that will be used on JavaScript side using [RegExp](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp).
+  ///
   ///The default value is `null` and will allow every origin.
   ///
   ///**Officially Supported Platforms/Implementations**:

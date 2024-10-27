@@ -1,8 +1,10 @@
 #### 1.4.0
 
 - Updated static `fromMap` implementation for some classes
+- Updated `kJavaScriptHandlerForbiddenNames` list
 - Added `PlatformInAppLocalhostServer.onData` parameter to set a custom on data server callback
 - Added `javaScriptHandlerOriginAllowList`, `pluginScriptsOriginAllowList`, `pluginScriptsForMainFrameOnly` InAppWebViewSettings parameters
+- Added `setJavaScriptBridgeName`, `getJavaScriptBridgeName` static WebView controller methods
 - Added `JavaScriptHandlerFunctionData` type
 - Deprecated `JavaScriptHandlerCallback` type in favor of `JavaScriptHandlerFunction` type
 

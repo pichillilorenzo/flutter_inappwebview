@@ -82,6 +82,9 @@ public class InAppWebViewSettings: ISettings<InAppWebView> {
     var maximumViewportInset: UIEdgeInsets? = nil
     var isInspectable = false
     var shouldPrintBackgrounds = false
+    var javaScriptHandlerOriginAllowList: [String]? = nil
+    var pluginScriptsOriginAllowList: [String]? = nil
+    var pluginScriptsForMainFrameOnly = false
     
     override init(){
         super.init()

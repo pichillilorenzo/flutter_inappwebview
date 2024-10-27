@@ -15,21 +15,6 @@ import '../web_storage/web_storage.dart';
 import '_static_channel.dart';
 import 'headless_in_app_webview.dart';
 
-///List of forbidden names for JavaScript handlers.
-// ignore: non_constant_identifier_names
-final _JAVASCRIPT_HANDLER_FORBIDDEN_NAMES = UnmodifiableListView<String>([
-  "onLoadResource",
-  "shouldInterceptAjaxRequest",
-  "onAjaxReadyStateChange",
-  "onAjaxProgress",
-  "shouldInterceptFetchRequest",
-  "onPrintRequest",
-  "onWindowFocus",
-  "onWindowBlur",
-  "callAsyncJavaScript",
-  "evaluateJavaScriptWithContentWorld"
-]);
-
 /// Object specifying creation parameters for creating a [AndroidInAppWebViewController].
 ///
 /// When adding additional fields make sure they can be null or have a default
@@ -1995,7 +1980,7 @@ class AndroidInAppWebViewController extends PlatformInAppWebViewController
   @override
   void addJavaScriptHandler(
       {required String handlerName, required Function callback}) {
-    assert(!_JAVASCRIPT_HANDLER_FORBIDDEN_NAMES.contains(handlerName),
+    assert(!kJavaScriptHandlerForbiddenNames.contains(handlerName),
         '"$handlerName" is a forbidden name!');
     this._javaScriptHandlersMap[handlerName] = (callback);
   }

@@ -50,20 +50,35 @@ public class JavaScriptBridgeInterface {
   }
 
   @JavascriptInterface
-  public void _callHandler(final String handlerName, final String _callHandlerID,
-                           final String bridgeSecret, final String origin, final boolean isMainFrame,
-                           final String args) {
+  public void _callHandler(final String jsonStringifiedData) {
     if (inAppWebView == null) {
       return;
     }
 
-    if (handlerName == null || handlerName.isEmpty()) {
-      Log.d(LOG_TAG, "handlerName is null or empty");
+    JSONObject data;
+    try {
+      data = new JSONObject(jsonStringifiedData);
+    } catch (Exception e) {
+      e.printStackTrace();
+      Log.e(LOG_TAG, "Cannot convert jsonStringifiedData parameter of _callHandler method to a valid JSONObject");
       return;
     }
 
+    if (!data.has("handlerName") || data.isNull("handlerName")) {
+      Log.d(LOG_TAG, "handlerName is null or undefined");
+      return;
+    }
+
+    final String handlerName = data.optString("handlerName");
+    final String bridgeSecret = data.optString("_bridgeSecret");
+    final Integer _callHandlerID = data.optInt("_callHandlerID");
+    final String origin = data.optString("origin");
+    final String requestUrl = data.optString("requestUrl");
+    final Boolean isMainFrame = data.optBoolean("isMainFrame");
+    final String args = data.optString("args");
+
     if (!expectedBridgeSecret.equals(bridgeSecret)) {
-      Log.e(LOG_TAG, "Bridge access attempt with wrong secret token, possibly from malicious code!");
+      Log.e(LOG_TAG, "Bridge access attempt with wrong secret token, possibly from malicious code from origin: " + origin);
       return;
     }
 
@@ -95,67 +110,86 @@ public class JavaScriptBridgeInterface {
           return;
         }
 
-        if (handlerName.equals("onPrintRequest") && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-          PrintJobSettings settings = new PrintJobSettings();
-          settings.handledByClient = true;
-          final String printJobId = inAppWebView.printCurrentPage(settings);
-          if (inAppWebView != null && inAppWebView.channelDelegate != null) {
-            inAppWebView.channelDelegate.onPrintRequest(inAppWebView.getUrl(), printJobId, new WebViewChannelDelegate.PrintRequestCallback() {
-              @Override
-              public boolean nonNullSuccess(@NonNull Boolean handledByClient) {
-                return !handledByClient;
-              }
-
-              @Override
-              public void defaultBehaviour(@Nullable Boolean handledByClient) {
-                if (inAppWebView != null && inAppWebView.plugin != null && inAppWebView.plugin.printJobManager != null) {
-                  PrintJobController printJobController = inAppWebView.plugin.printJobManager.jobs.get(printJobId);
-                  if (printJobController != null) {
-                    printJobController.disposeNoCancel();
+        boolean isInternalHandler = true;
+        switch (handlerName) {
+          case "onPrintRequest":
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+              PrintJobSettings settings = new PrintJobSettings();
+              settings.handledByClient = true;
+              final String printJobId = inAppWebView.printCurrentPage(settings);
+              if (inAppWebView != null && inAppWebView.channelDelegate != null) {
+                inAppWebView.channelDelegate.onPrintRequest(inAppWebView.getUrl(), printJobId, new WebViewChannelDelegate.PrintRequestCallback() {
+                  @Override
+                  public boolean nonNullSuccess(@NonNull Boolean handledByClient) {
+                    return !handledByClient;
                   }
-                }
-              }
 
-              @Override
-              public void error(String errorCode, @Nullable String errorMessage, @Nullable Object errorDetails) {
-                Log.e(LOG_TAG, errorCode + ", " + ((errorMessage != null) ? errorMessage : ""));
-                defaultBehaviour(null);
+                  @Override
+                  public void defaultBehaviour(@Nullable Boolean handledByClient) {
+                    if (inAppWebView != null && inAppWebView.plugin != null && inAppWebView.plugin.printJobManager != null) {
+                      PrintJobController printJobController = inAppWebView.plugin.printJobManager.jobs.get(printJobId);
+                      if (printJobController != null) {
+                        printJobController.disposeNoCancel();
+                      }
+                    }
+                  }
+
+                  @Override
+                  public void error(String errorCode, @Nullable String errorMessage, @Nullable Object errorDetails) {
+                    Log.e(LOG_TAG, errorCode + ", " + ((errorMessage != null) ? errorMessage : ""));
+                    defaultBehaviour(null);
+                  }
+                });
               }
-            });
-          }
-          return;
-        } else if (handlerName.equals("callAsyncJavaScript")) {
-          try {
-            JSONArray arguments = new JSONArray(args);
-            JSONObject jsonObject = arguments.getJSONObject(0);
-            String resultUuid = jsonObject.getString("resultUuid");
-            ValueCallback<String> callAsyncJavaScriptCallback = inAppWebView.callAsyncJavaScriptCallbacks.get(resultUuid);
-            if (callAsyncJavaScriptCallback != null) {
-              callAsyncJavaScriptCallback.onReceiveValue(jsonObject.toString());
-              inAppWebView.callAsyncJavaScriptCallbacks.remove(resultUuid);
             }
-          } catch (JSONException e) {
-            Log.e(LOG_TAG, "", e);
-          }
-          return;
-        } else if (handlerName.equals("evaluateJavaScriptWithContentWorld")) {
-          try {
-            JSONArray arguments = new JSONArray(args);
-            JSONObject jsonObject = arguments.getJSONObject(0);
-            String resultUuid = jsonObject.getString("resultUuid");
-            ValueCallback<String> evaluateJavaScriptCallback = inAppWebView.evaluateJavaScriptContentWorldCallbacks.get(resultUuid);
-            if (evaluateJavaScriptCallback != null) {
-              evaluateJavaScriptCallback.onReceiveValue(jsonObject.has("value") ? jsonObject.get("value").toString() : "null");
-              inAppWebView.evaluateJavaScriptContentWorldCallbacks.remove(resultUuid);
+            break;
+          case "callAsyncJavaScript":
+            try {
+              JSONArray arguments = new JSONArray(args);
+              JSONObject jsonObject = arguments.getJSONObject(0);
+              String resultUuid = jsonObject.getString("resultUuid");
+              ValueCallback<String> callAsyncJavaScriptCallback = inAppWebView.callAsyncJavaScriptCallbacks.get(resultUuid);
+              if (callAsyncJavaScriptCallback != null) {
+                callAsyncJavaScriptCallback.onReceiveValue(jsonObject.toString());
+                inAppWebView.callAsyncJavaScriptCallbacks.remove(resultUuid);
+              }
+            } catch (JSONException e) {
+              Log.e(LOG_TAG, "", e);
             }
-          } catch (JSONException e) {
-            Log.e(LOG_TAG, "", e);
+            break;
+          case "evaluateJavaScriptWithContentWorld":
+            try {
+              JSONArray arguments = new JSONArray(args);
+              JSONObject jsonObject = arguments.getJSONObject(0);
+              String resultUuid = jsonObject.getString("resultUuid");
+              ValueCallback<String> evaluateJavaScriptCallback = inAppWebView.evaluateJavaScriptContentWorldCallbacks.get(resultUuid);
+              if (evaluateJavaScriptCallback != null) {
+                evaluateJavaScriptCallback.onReceiveValue(jsonObject.has("value") ? jsonObject.get("value").toString() : "null");
+                inAppWebView.evaluateJavaScriptContentWorldCallbacks.remove(resultUuid);
+              }
+            } catch (JSONException e) {
+              Log.e(LOG_TAG, "", e);
+            }
+            break;
+          default:
+            isInternalHandler = false;
+            break;
+        }
+
+        if (isInternalHandler) {
+          if (inAppWebView != null) {
+            String sourceCode = "if (window." + JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME() + "[" + _callHandlerID + "] != null) { " +
+                    "window." + JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME() + "[" + _callHandlerID + "].resolve(); " +
+                    "delete window." + JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME() + "[" + _callHandlerID + "]; " +
+                    "}";
+            inAppWebView.evaluateJavascript(sourceCode, (ValueCallback<String>) null);
           }
           return;
         }
 
+
         if (inAppWebView.channelDelegate != null) {
-          JavaScriptHandlerFunctionData data = new JavaScriptHandlerFunctionData(origin, isMainFrame, args);
+          JavaScriptHandlerFunctionData data = new JavaScriptHandlerFunctionData(origin, requestUrl, isMainFrame, args);
           // invoke flutter javascript handler and send back flutter data as a JSON Object to javascript
           inAppWebView.channelDelegate.onCallJsHandler(handlerName, data, new WebViewChannelDelegate.CallJsHandlerCallback() {
             @Override
@@ -168,11 +202,7 @@ public class JavaScriptBridgeInterface {
                       "window." + JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME() + "[" + _callHandlerID + "].resolve(" + json + "); " +
                       "delete window." + JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME() + "[" + _callHandlerID + "]; " +
                       "}";
-              if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                inAppWebView.evaluateJavascript(sourceCode, (ValueCallback<String>) null);
-              } else {
-                inAppWebView.loadUrl("javascript:" + sourceCode);
-              }
+              inAppWebView.evaluateJavascript(sourceCode, (ValueCallback<String>) null);
             }
 
             @Override
@@ -189,11 +219,7 @@ public class JavaScriptBridgeInterface {
                       "window." + JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME() + "[" + _callHandlerID + "].reject(new Error(" + JSONObject.quote(message) + ")); " +
                       "delete window." + JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME() + "[" + _callHandlerID + "]; " +
                       "}";
-              if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                inAppWebView.evaluateJavascript(sourceCode, (ValueCallback<String>) null);
-              } else {
-                inAppWebView.loadUrl("javascript:" + sourceCode);
-              }
+              inAppWebView.evaluateJavascript(sourceCode, (ValueCallback<String>) null);
             }
           });
         }

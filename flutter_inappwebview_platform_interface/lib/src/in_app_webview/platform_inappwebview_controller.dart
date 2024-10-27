@@ -1,3 +1,4 @@
+import 'dart:collection';
 import 'dart:convert';
 import 'dart:core';
 import 'dart:typed_data';
@@ -26,6 +27,25 @@ import 'in_app_webview_keep_alive.dart';
 import 'in_app_webview_settings.dart';
 
 import '../print_job/main.dart';
+
+///List of forbidden names for JavaScript handlers used internally bu the plugin.
+final kJavaScriptHandlerForbiddenNames = UnmodifiableListView<String>([
+  "onLoadResource",
+  "onConsoleMessage",
+  "shouldInterceptAjaxRequest",
+  "onAjaxReadyStateChange",
+  "onAjaxProgress",
+  "shouldInterceptFetchRequest",
+  "onPrintRequest",
+  "onWindowFocus",
+  "onWindowBlur",
+  "callAsyncJavaScript",
+  "evaluateJavaScriptWithContentWorld",
+  "onFindResultReceived",
+  "onCallAsyncJavaScriptResultBelowIOS14Received",
+  "onWebMessagePortMessageReceived",
+  "onWebMessageListenerPostMessageReceived"
+]);
 
 /// Object specifying creation parameters for creating a [PlatformInAppWebViewController].
 ///
@@ -645,10 +665,11 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   }
 
   ///{@template flutter_inappwebview_platform_interface.PlatformInAppWebViewController.addJavaScriptHandler}
-  ///Adds a JavaScript message handler [callback] ([JavaScriptHandlerCallback]) that listen to post messages sent from JavaScript by the handler with name [handlerName].
+  ///Adds a JavaScript message handler [callback] ([JavaScriptHandlerCallback] or [JavaScriptHandlerFunction]) that listen to post messages sent from JavaScript by the handler with name [handlerName].
+  ///Forbidden [handlerName]s are represented by [kJavaScriptHandlerForbiddenNames], they are used internally by this plugin.
   ///
   ///The Android implementation uses [addJavascriptInterface](https://developer.android.com/reference/android/webkit/WebView#addJavascriptInterface(java.lang.Object,%20java.lang.String)).
-  ///The iOS implementation uses [addScriptMessageHandler](https://developer.apple.com/documentation/webkit/wkusercontentcontroller/1537172-addscriptmessagehandler?language=objc)
+  ///The iOS/macOS implementation uses [addScriptMessageHandler](https://developer.apple.com/documentation/webkit/wkusercontentcontroller/1537172-addscriptmessagehandler?language=objc)
   ///
   ///The JavaScript function that can be used to call the handler is `window.flutter_inappwebview.callHandler(handlerName <String>, ...args)`, where `args` are [rest parameters](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/rest_parameters).
   ///The `args` will be stringified automatically using `JSON.stringify(args)` method and then they will be decoded on the Dart side.
@@ -662,7 +683,7 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///```
   ///
   ///`window.flutter_inappwebview.callHandler` returns a JavaScript [Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
-  ///that can be used to get the json result returned by [JavaScriptHandlerCallback].
+  ///that can be used to get the json result returned by [JavaScriptHandlerCallback] or [JavaScriptHandlerFunction].
   ///In this case, simply return data that you want to send and it will be automatically json encoded using [jsonEncode] from the `dart:convert` library.
   ///
   ///So, on the JavaScript side, to get data coming from the Dart side, you will use:

@@ -2,6 +2,7 @@ package com.pichillilorenzo.flutter_inappwebview_android.types;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.webkit.WebViewFeature;
 
 import java.util.HashSet;
 import java.util.List;
@@ -26,13 +27,38 @@ public class UserScript {
                     @NonNull UserScriptInjectionTime injectionTime, @Nullable ContentWorld contentWorld,
                     @Nullable Set<String> allowedOriginRules, boolean forMainFrameOnly) {
     this.groupName = groupName;
-    this.source = source;
+    this.source = wrapSourceCodeAddChecks(source, allowedOriginRules, forMainFrameOnly);
     this.injectionTime = injectionTime;
     this.contentWorld = contentWorld == null ? ContentWorld.PAGE : contentWorld;
     this.allowedOriginRules = allowedOriginRules == null ? new HashSet<String>() {{
       add("*");
     }} : allowedOriginRules;
     this.forMainFrameOnly = forMainFrameOnly;
+  }
+
+  private String wrapSourceCodeAddChecks(String source, @Nullable Set<String> allowedOriginRules, boolean forMainFrameOnly) {
+    StringBuilder ifStatement = new StringBuilder("if (");
+    if (!WebViewFeature.isFeatureSupported(WebViewFeature.DOCUMENT_START_SCRIPT) &&
+            (allowedOriginRules != null && !allowedOriginRules.isEmpty() && !allowedOriginRules.contains("*"))) {
+      StringBuilder jsRegExpArray = new StringBuilder("[");
+      for (String allowedOriginRule : allowedOriginRules) {
+        if (jsRegExpArray.length() > 1) {
+          jsRegExpArray.append(", ");
+        }
+        jsRegExpArray.append("new RegExp(").append(UserContentController.escapeCode(allowedOriginRule)).append(")");
+      }
+      if (jsRegExpArray.length() > 1) {
+        jsRegExpArray.append("]");
+        ifStatement.append(jsRegExpArray).append(".some(function(rx) { return rx.test(window.location.origin); })");
+      }
+    }
+    if (forMainFrameOnly) {
+      if (ifStatement.length() > 4) {
+        ifStatement.append(" && ");
+      }
+      ifStatement.append("window.self === window.top");
+    }
+    return ifStatement.length() > 4 ? ifStatement.append(") {").append(source).append("}").toString() : source;
   }
 
   @Nullable

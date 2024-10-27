@@ -11,8 +11,12 @@ class JavaScriptHandlerFunctionData {
   List<dynamic> args;
   bool isMainFrame;
   WebUri origin;
+  WebUri requestUrl;
   JavaScriptHandlerFunctionData(
-      {this.args = const [], required this.isMainFrame, required this.origin});
+      {this.args = const [],
+      required this.isMainFrame,
+      required this.origin,
+      required this.requestUrl});
 
   ///Gets a possible [JavaScriptHandlerFunctionData] instance from a [Map] value.
   static JavaScriptHandlerFunctionData? fromMap(Map<String, dynamic>? map) {
@@ -22,6 +26,7 @@ class JavaScriptHandlerFunctionData {
     final instance = JavaScriptHandlerFunctionData(
       isMainFrame: map['isMainFrame'],
       origin: WebUri(map['origin']),
+      requestUrl: WebUri(map['requestUrl']),
     );
     if (map['args'] != null) {
       instance.args = List<dynamic>.from(map['args']!.cast<dynamic>());
@@ -35,6 +40,7 @@ class JavaScriptHandlerFunctionData {
       "args": args,
       "isMainFrame": isMainFrame,
       "origin": origin.toString(),
+      "requestUrl": requestUrl.toString(),
     };
   }
 
@@ -45,6 +51,6 @@ class JavaScriptHandlerFunctionData {
 
   @override
   String toString() {
-    return 'JavaScriptHandlerFunctionData{args: $args, isMainFrame: $isMainFrame, origin: $origin}';
+    return 'JavaScriptHandlerFunctionData{args: $args, isMainFrame: $isMainFrame, origin: $origin, requestUrl: $requestUrl}';
   }
 }

@@ -249,55 +249,73 @@ public class JavaScriptBridgeJS {
 
   public static String JAVASCRIPT_BRIDGE_JS_SOURCE() {
     return "if (window." + JAVASCRIPT_BRIDGE_NAME() + " != null) {" +
-            "  (function (window) {" +
+            "  (function(window) {" +
             "    var bridgeSecret = '" + VAR_JAVASCRIPT_BRIDGE_BRIDGE_SECRET + "';" +
             "    var origin = '';" +
+            "    var requestUrl = '';" +
             "    var isMainFrame = false;" +
             "    try {" +
             "      origin = window.location.origin;" +
             "    } catch (_) {}" +
             "    try {" +
+            "      requestUrl = window.location.href;" +
+            "    } catch (_) {}" +
+            "    try {" +
             "      isMainFrame = window.self === window.top;" +
             "    } catch (_) {}" +
             "    window." + JAVASCRIPT_BRIDGE_NAME() + ".callHandler = function() {" +
-            "      if (arguments == null || arguments[0] == null || arguments[0] === '') {" +
-            "        return new Promise(function(resolve, reject) { reject('Handler name is undefined, null or empty'); });" +
-            "      }" +
             "      var _callHandlerID = setTimeout(function(){});" +
-            "      window." + JAVASCRIPT_BRIDGE_NAME() + "._callHandler(arguments[0], _callHandlerID, bridgeSecret, origin, isMainFrame, JSON.stringify(Array.prototype.slice.call(arguments, 1)));" +
+            "      window." + JAVASCRIPT_BRIDGE_NAME() + "._callHandler(JSON.stringify({" +
+            "        'handlerName': arguments[0]," +
+            "        '_callHandlerID': _callHandlerID," +
+            "        '_bridgeSecret': bridgeSecret," +
+            "        'origin': origin," +
+            "        'requestUrl': requestUrl," +
+            "        'isMainFrame': isMainFrame," +
+            "        'args': JSON.stringify(Array.prototype.slice.call(arguments, 1))" +
+            "      }));" +
             "      return new Promise(function(resolve, reject) {" +
             "        try {" +
             "          (isMainFrame ? window : window.top)." + JAVASCRIPT_BRIDGE_NAME() + "[_callHandlerID] = {resolve: resolve, reject: reject};" +
-            "        } catch(e) { reject(e); }" +
+            "        } catch(e) { resolve(); }" +
             "      });" +
             "    };" +
             "  })(window);" +
             "}" +
             "if (window.top != null && window.top !== window && window." + JAVASCRIPT_BRIDGE_NAME() + " == null) {" +
             "  window." + JAVASCRIPT_BRIDGE_NAME() + " = {};" +
-            "  (function (window) {" +
+            "  (function(window) {" +
             "    var bridgeSecret = '" + VAR_JAVASCRIPT_BRIDGE_BRIDGE_SECRET + "';" +
             "    var origin = '';" +
+            "    var requestUrl = '';" +
             "    var isMainFrame = false;" +
             "    try {" +
             "      origin = window.location.origin;" +
             "    } catch (_) {}" +
             "    try {" +
+            "      requestUrl = window.location.href;" +
+            "    } catch (_) {}" +
+            "    try {" +
             "      isMainFrame = window.self === window.top;" +
             "    } catch (_) {}" +
             "    window." + JAVASCRIPT_BRIDGE_NAME() + ".callHandler = function() {" +
-            "      if (arguments == null || arguments[0] == null || arguments[0] === '') {" +
-            "        return new Promise(function(resolve, reject) { reject('Handler name is undefined, null or empty'); });" +
-            "      }" +
             "      var _callHandlerID = setTimeout(function(){});" +
             "      console.log(window.self === window.top, window.location.href, 'TEST TEST', window.top." + JAVASCRIPT_BRIDGE_NAME() + ");" +
             "      try {" +
-            "        window.top." + JAVASCRIPT_BRIDGE_NAME() + "._callHandler(arguments[0], _callHandlerID, bridgeSecret, origin, isMainFrame, JSON.stringify(Array.prototype.slice.call(arguments, 1)));" +
+            "        window.top." + JAVASCRIPT_BRIDGE_NAME() + "._callHandler(JSON.stringify({" +
+            "          'handlerName': arguments[0]," +
+            "          '_callHandlerID': _callHandlerID," +
+            "          '_bridgeSecret': bridgeSecret," +
+            "          'origin': origin," +
+            "          'requestUrl': requestUrl," +
+            "          'isMainFrame': isMainFrame," +
+            "          'args': JSON.stringify(Array.prototype.slice.call(arguments, 1))" +
+            "        }));" +
             "        return new Promise(function(resolve, reject) {" +
             "          window.top." + JAVASCRIPT_BRIDGE_NAME() + "[_callHandlerID] = {resolve: resolve, reject: reject};" +
             "        });" +
             "      } catch (error) {" +
-            "        return new Promise(function(resolve, reject) { reject(error); });" +
+            "        return new Promise(function(resolve, reject) { resolve(); });" +
             "      }" +
             "    };" +
             "  })(window);" +

@@ -2,7 +2,7 @@ import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_i
 
 import 'user_script_injection_time.dart';
 import 'content_world.dart';
-import '../platform_webview_feature.dart';
+import '../in_app_webview/platform_inappwebview_controller.dart';
 
 part 'user_script.g.dart';
 
@@ -33,8 +33,15 @@ class UserScript_ {
   bool forMainFrameOnly;
 
   ///A set of matching rules for the allowed origins.
+  ///
+  ///**NOTE for Android**: each origin pattern MUST follow the table rule of [PlatformInAppWebViewController.addWebMessageListener].
+  ///
+  ///**NOTE for iOS and macOS**: each origin pattern will be used as a
+  ///Regular Expression Pattern that will be used on JavaScript side using [RegExp](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp).
   @SupportedPlatforms(platforms: [
     AndroidPlatform(),
+    IOSPlatform(),
+    MacOSPlatform(),
   ])
   late Set<String> allowedOriginRules;
 

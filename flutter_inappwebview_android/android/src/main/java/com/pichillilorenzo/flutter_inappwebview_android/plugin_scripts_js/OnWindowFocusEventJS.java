@@ -9,8 +9,9 @@ import java.util.Set;
 
 public class OnWindowFocusEventJS {
   public static final String ON_WINDOW_FOCUS_EVENT_JS_PLUGIN_SCRIPT_GROUP_NAME = "IN_APP_WEBVIEW_ON_WINDOW_FOCUS_EVENT_JS_PLUGIN_SCRIPT";
-  public static PluginScript ON_WINDOW_FOCUS_EVENT_JS_PLUGIN_SCRIPT(@Nullable Set<String> allowedOriginRules,
-                                                                    boolean forMainFrameOnly) {
+
+  // This plugin is only for main frame
+  public static PluginScript ON_WINDOW_FOCUS_EVENT_JS_PLUGIN_SCRIPT(@Nullable Set<String> allowedOriginRules) {
     return
             new PluginScript(
                     OnWindowFocusEventJS.ON_WINDOW_FOCUS_EVENT_JS_PLUGIN_SCRIPT_GROUP_NAME,
@@ -19,7 +20,7 @@ public class OnWindowFocusEventJS {
                     null,
                     false,
                     allowedOriginRules,
-                    forMainFrameOnly
+                    true
             );
   }
 

@@ -1595,7 +1595,7 @@ as it can cause framerate drops on animations in Android 9 and lower (see [Hybri
   ])
   bool? shouldPrintBackgrounds;
 
-  ///A list of patterns that will be used to match the allowed origins
+  ///A list of Regular Expression Patterns that will be used on native side to match the allowed origins
   ///that are able to execute the JavaScript Handlers defined for the current WebView.
   ///This will affect also the internal JavaScript Handlers used by the plugin itself.
   ///The default value is `null` and will allow every origin.
@@ -1609,6 +1609,13 @@ as it can cause framerate drops on animations in Android 9 and lower (see [Hybri
 
   ///A list of patterns that will be used to match the allowed origins
   ///that are able to load all the internal plugin [UserScript]s used by the plugin itself.
+  ///Adding `'*'` as an allowed origin or setting this to `null`, it means it will allow every origin.
+  ///
+  ///**NOTE for Android**: each origin pattern MUST follow the table rule of [PlatformInAppWebViewController.addWebMessageListener].
+  ///
+  ///**NOTE for iOS and macOS**: each origin pattern will be used as a
+  ///Regular Expression Pattern that will be used on JavaScript side using [RegExp](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp).
+  ///
   ///The default value is `null` and will allow every origin.
   @SupportedPlatforms(platforms: [
     AndroidPlatform(),

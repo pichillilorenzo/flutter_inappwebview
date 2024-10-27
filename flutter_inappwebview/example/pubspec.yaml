@@ -37,8 +37,8 @@ dependency_overrides:
     path: ../../flutter_inappwebview_platform_interface
   flutter_inappwebview_android:
     path: ../../flutter_inappwebview_android
-#  flutter_inappwebview_ios:
-#    path: ../../flutter_inappwebview_ios
+  flutter_inappwebview_ios:
+    path: ../../flutter_inappwebview_ios
 #  flutter_inappwebview_macos:
 #    path: ../../flutter_inappwebview_macos
 #  flutter_inappwebview_web:

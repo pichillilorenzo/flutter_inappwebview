@@ -101,16 +101,21 @@ public class WebMessageListener: FlutterMethodCallDelegate {
                 var scheme = !isPageBlank ? window.location.protocol.replace(":", "") : null;
                 var host = !isPageBlank ? window.location.hostname : null;
                 var port = !isPageBlank ? window.location.port : null;
-                if (window.\(JAVASCRIPT_BRIDGE_NAME)._isOriginAllowed(allowedOriginRules, scheme, host, port)) {
+                if (window.\(JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME())._isOriginAllowed(allowedOriginRules, scheme, host, port)) {
                     window['\(jsObjectNameEscaped)'] = new FlutterInAppWebViewWebMessageListener('\(jsObjectNameEscaped)');
                 }
             })();
             """
+            
+            let allowedOriginRules = webView.settings?.pluginScriptsOriginAllowList
+            let forMainFrameOnly = webView.settings?.pluginScriptsForMainFrameOnly ?? true
+            
             webView.configuration.userContentController.addPluginScript(PluginScript(
                 groupName: "WebMessageListener-" + id + "-" + jsObjectName,
                 source: source,
                 injectionTime: .atDocumentStart,
-                forMainFrameOnly: false,
+                forMainFrameOnly: forMainFrameOnly,
+                allowedOriginRules: allowedOriginRules,
                 requiredInAllContentWorlds: false,
                 messageHandlerNames: ["onWebMessageListenerPostMessageReceived"]
             ))

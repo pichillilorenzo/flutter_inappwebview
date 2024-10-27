@@ -572,10 +572,8 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
             customSettings.pluginScriptsForMainFrameOnly));
     userContentController.addPluginScript(PrintJS.PRINT_JS_PLUGIN_SCRIPT(customSettings.pluginScriptsOriginAllowList,
             customSettings.pluginScriptsForMainFrameOnly));
-    userContentController.addPluginScript(OnWindowBlurEventJS.ON_WINDOW_BLUR_EVENT_JS_PLUGIN_SCRIPT(customSettings.pluginScriptsOriginAllowList,
-            customSettings.pluginScriptsForMainFrameOnly));
-    userContentController.addPluginScript(OnWindowFocusEventJS.ON_WINDOW_FOCUS_EVENT_JS_PLUGIN_SCRIPT(customSettings.pluginScriptsOriginAllowList,
-            customSettings.pluginScriptsForMainFrameOnly));
+    userContentController.addPluginScript(OnWindowBlurEventJS.ON_WINDOW_BLUR_EVENT_JS_PLUGIN_SCRIPT(customSettings.pluginScriptsOriginAllowList));
+    userContentController.addPluginScript(OnWindowFocusEventJS.ON_WINDOW_FOCUS_EVENT_JS_PLUGIN_SCRIPT(customSettings.pluginScriptsOriginAllowList));
     interceptOnlyAsyncAjaxRequestsPluginScript = InterceptAjaxRequestJS.createInterceptOnlyAsyncAjaxRequestsPluginScript(customSettings.interceptOnlyAsyncAjaxRequests);
     if (customSettings.useShouldInterceptAjaxRequest) {
       userContentController.addPluginScript(interceptOnlyAsyncAjaxRequestsPluginScript);

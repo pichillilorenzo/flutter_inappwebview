@@ -10,6 +10,7 @@
 
 #### Platform Interface
 - Updated static `fromMap` implementation for some classes
+- Updated `kJavaScriptHandlerForbiddenNames` list
 - Added `PlatformInAppLocalhostServer.onData` parameter to set a custom on data server callback
 - Added `javaScriptHandlerOriginAllowList`, `pluginScriptsOriginAllowList`, `pluginScriptsForMainFrameOnly` InAppWebViewSettings parameters
 - Added `setJavaScriptBridgeName`, `getJavaScriptBridgeName` static WebView controller methods
@@ -28,6 +29,7 @@
 
 #### macOS and iOS Platforms
 - Moved `WKUserContentController` initialization on `preWKWebViewConfiguration` to fix possible `undefined is not an object (evaluating 'window.webkit.messageHandlers')` javascript error
+- Added support for `UserScript.allowedOriginRules` parameter
 - Merged "change priority of DispatchQueue" [#2322](https://github.com/pichillilorenzo/flutter_inappwebview/pull/2322) (thanks to [nnnlog](https://github.com/nnnlog))
 
 #### Web Platform

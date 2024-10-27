@@ -10,6 +10,7 @@ import WebKit
 
 public class UserScript: WKUserScript {
     var groupName: String?
+    var allowedOriginRules: [String]?
 
     private var contentWorldWrapper: Any?
     @available(iOS 14.0, *)
@@ -27,9 +28,10 @@ public class UserScript: WKUserScript {
         super.init(source: source, injectionTime: injectionTime, forMainFrameOnly: forMainFrameOnly)
     }
     
-    public init(groupName: String?, source: String, injectionTime: WKUserScriptInjectionTime, forMainFrameOnly: Bool) {
-        super.init(source: source, injectionTime: injectionTime, forMainFrameOnly: forMainFrameOnly)
+    public init(groupName: String?, source: String, injectionTime: WKUserScriptInjectionTime, forMainFrameOnly: Bool, allowedOriginRules: [String]?) {
+        super.init(source: UserScript.wrapSourceCodeAddChecks(source: source, allowedOriginRules: allowedOriginRules), injectionTime: injectionTime, forMainFrameOnly: forMainFrameOnly)
         self.groupName = groupName
+        self.allowedOriginRules = allowedOriginRules
     }
     
     @available(iOS 14.0, *)
@@ -39,10 +41,29 @@ public class UserScript: WKUserScript {
     }
 
     @available(iOS 14.0, *)
-    public init(groupName: String?, source: String, injectionTime: WKUserScriptInjectionTime, forMainFrameOnly: Bool, in contentWorld: WKContentWorld) {
-        super.init(source: source, injectionTime: injectionTime, forMainFrameOnly: forMainFrameOnly, in: contentWorld)
+    public init(groupName: String?, source: String, injectionTime: WKUserScriptInjectionTime, forMainFrameOnly: Bool, in contentWorld: WKContentWorld, allowedOriginRules: [String]?) {
+        super.init(source: UserScript.wrapSourceCodeAddChecks(source: source, allowedOriginRules: allowedOriginRules), injectionTime: injectionTime, forMainFrameOnly: forMainFrameOnly, in: contentWorld)
         self.groupName = groupName
         self.contentWorld = contentWorld
+        self.allowedOriginRules = allowedOriginRules
+    }
+    
+    static private func wrapSourceCodeAddChecks(source: String, allowedOriginRules: [String]?) -> String {
+        var ifStatement = "if ("
+        if let allowedOriginRules = allowedOriginRules, !allowedOriginRules.contains("*") {
+            var jsRegExpArray = "["
+            for allowedOriginRule in allowedOriginRules {
+                if jsRegExpArray.count > 1 {
+                    jsRegExpArray += ","
+                }
+                jsRegExpArray += "new RegExp('\(allowedOriginRule.replacingOccurrences(of: "\'", with: "\\'"))')"
+            }
+            if jsRegExpArray.count > 1 {
+                jsRegExpArray += "]"
+                ifStatement += "\(jsRegExpArray).some(function(rx) { return rx.test(window.location.origin); })"
+            }
+        }
+        return ifStatement.count > 4 ? "\(ifStatement)) { \(source) }" : source
     }
     
     public static func fromMap(map: [String:Any?]?, windowId: Int64?) -> UserScript? {
@@ -58,14 +79,16 @@ public class UserScript: WKUserScript {
                 source: map["source"] as! String,
                 injectionTime: WKUserScriptInjectionTime.init(rawValue: map["injectionTime"] as! Int) ?? .atDocumentStart,
                 forMainFrameOnly: map["forMainFrameOnly"] as! Bool,
-                in: contentWorld
+                in: contentWorld,
+                allowedOriginRules: map["allowedOriginRules"] as? [String]
             )
         }
         return UserScript(
             groupName: map["groupName"] as? String,
             source: map["source"] as! String,
             injectionTime: WKUserScriptInjectionTime.init(rawValue: map["injectionTime"] as! Int) ?? .atDocumentStart,
-            forMainFrameOnly: map["forMainFrameOnly"] as! Bool
+            forMainFrameOnly: map["forMainFrameOnly"] as! Bool,
+            allowedOriginRules: map["allowedOriginRules"] as? [String]
         )
     }
 }

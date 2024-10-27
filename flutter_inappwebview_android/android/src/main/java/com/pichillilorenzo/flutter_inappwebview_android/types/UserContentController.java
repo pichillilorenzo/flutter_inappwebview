@@ -118,7 +118,6 @@ public class UserContentController implements Disposable {
     LinkedHashSet<PluginScript> scripts = this.getPluginScriptsAt(injectionTime);
     for (PluginScript script : scripts) {
       String source = ";" + script.getSource();
-      source = wrapSourceCodeAddChecks(script, source);
       source = wrapSourceCodeInContentWorld(script.getContentWorld(), source);
       js.append(source);
     }
@@ -130,36 +129,10 @@ public class UserContentController implements Disposable {
     LinkedHashSet<UserScript> scripts = this.getUserOnlyScriptsAt(injectionTime);
     for (UserScript script : scripts) {
       String source = ";" + script.getSource();
-      source = wrapSourceCodeAddChecks(script, source);
       source = wrapSourceCodeInContentWorld(script.getContentWorld(), source);
       js.append(source);
     }
     return js.toString();
-  }
-
-  private String wrapSourceCodeAddChecks(UserScript script, String source) {
-    Set<String> allowedOriginRules = script.getAllowedOriginRules();
-    StringBuilder ifStatement = new StringBuilder("if (");
-    if (!WebViewFeature.isFeatureSupported(WebViewFeature.DOCUMENT_START_SCRIPT) && (!allowedOriginRules.isEmpty() && !allowedOriginRules.contains("*"))) {
-      StringBuilder jsRegExpArray = new StringBuilder("[");
-      for (String allowedOriginRule : allowedOriginRules) {
-        if (jsRegExpArray.length() > 1) {
-          jsRegExpArray.append(", ");
-        }
-        jsRegExpArray.append("new RegExp(").append(escapeCode(allowedOriginRule)).append(")");
-      }
-      if (jsRegExpArray.length() > 1) {
-        jsRegExpArray.append("]");
-        ifStatement.append(jsRegExpArray).append(".some(function(rx) { return rx.test(window.location.origin); })");
-      }
-    }
-    if (script.isForMainFrameOnly()) {
-      if (ifStatement.length() > 4) {
-        ifStatement.append(" && ");
-      }
-      ifStatement.append("window.self === window.top");
-    }
-    return ifStatement.length() > 4 ? ifStatement.append(") {").append(source).append("}").toString() : source;
   }
 
   public String generateCodeForScriptEvaluation(String source, @Nullable ContentWorld contentWorld) {
@@ -235,12 +208,10 @@ public class UserContentController implements Disposable {
       if (userOnlyScript.getInjectionTime() == UserScriptInjectionTime.AT_DOCUMENT_END) {
         source = "if (document.readyState === 'complete') { " + source + "} else { window.addEventListener('load', function() { " + source + " }); }";
       }
-      source = wrapSourceCodeAddChecks(userOnlyScript, source);
-      userOnlyScript.setSource(source);
 
       ScriptHandler scriptHandler = WebViewCompat.addDocumentStartJavaScript(
               webView,
-              wrapSourceCodeInContentWorld(userOnlyScript.getContentWorld(), userOnlyScript.getSource()),
+              wrapSourceCodeInContentWorld(userOnlyScript.getContentWorld(), source),
               userOnlyScript.getAllowedOriginRules()
       );
       this.scriptHandlerMap.put(userOnlyScript, scriptHandler);
@@ -318,12 +289,10 @@ public class UserContentController implements Disposable {
       if (pluginScript.getInjectionTime() == UserScriptInjectionTime.AT_DOCUMENT_END) {
         source = "if (document.readyState === 'complete') { " + source + "} else { window.addEventListener('load', function() { " + source + " }); }";
       }
-      source = wrapSourceCodeAddChecks(pluginScript, source);
-      pluginScript.setSource(source);
 
       ScriptHandler scriptHandler = WebViewCompat.addDocumentStartJavaScript(
               webView,
-              wrapSourceCodeInContentWorld(pluginScript.getContentWorld(), pluginScript.getSource()),
+              wrapSourceCodeInContentWorld(pluginScript.getContentWorld(), source),
               pluginScript.getAllowedOriginRules()
       );
       this.scriptHandlerMap.put(pluginScript, scriptHandler);

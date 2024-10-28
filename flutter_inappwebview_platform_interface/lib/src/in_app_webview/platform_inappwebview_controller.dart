@@ -44,7 +44,8 @@ final kJavaScriptHandlerForbiddenNames = UnmodifiableListView<String>([
   "onFindResultReceived",
   "onCallAsyncJavaScriptResultBelowIOS14Received",
   "onWebMessagePortMessageReceived",
-  "onWebMessageListenerPostMessageReceived"
+  "onWebMessageListenerPostMessageReceived",
+  "onScrollChanged"
 ]);
 
 /// Object specifying creation parameters for creating a [PlatformInAppWebViewController].

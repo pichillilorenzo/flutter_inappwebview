@@ -1,6 +1,7 @@
 ## 1.2.0
 
 - Updated flutter_inappwebview_platform_interface version to ^1.4.0
+- Added support for `UserScript.allowedOriginRules` parameter
 - Moved `WKUserContentController` initialization on `preWKWebViewConfiguration` to fix possible `undefined is not an object (evaluating 'window.webkit.messageHandlers')` javascript error
 - Merged "change priority of DispatchQueue" [#2322](https://github.com/pichillilorenzo/flutter_inappwebview/pull/2322) (thanks to [nnnlog](https://github.com/nnnlog))
 

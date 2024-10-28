@@ -21,10 +21,10 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
       mediaPlaybackRequiresUserGesture: false,
       allowsInlineMediaPlayback: true,
       iframeAllow: "camera; microphone",
+      // javaScriptHandlerOriginAllowList: {"https://www.example.com"},
       javaScriptHandlerOriginAllowList: {".*"},
       pluginScriptsForMainFrameOnly: false,
       pluginScriptsOriginAllowList: {"*"},
-      isFindInteractionEnabled: false,
       iframeAllowFullscreen: true);
 
   PullToRefreshController? pullToRefreshController;
@@ -132,14 +132,15 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                     UserScript(
                         source: """console.log('loaded', window.location.href); window.custom_js_bridge.callHandler('handlerName', 1, 4, true, {'foo': 'bar'});""",
                         injectionTime: UserScriptInjectionTime.AT_DOCUMENT_END,
-                        forMainFrameOnly: true),
+                        // allowedOriginRules: {"https://www.example.com"},
+                        forMainFrameOnly: false),
                   ]),
                   onWebViewCreated: (controller) async {
                     webViewController = controller;
                     controller.addJavaScriptHandler(handlerName: 'handlerName', callback: (JavaScriptHandlerFunctionData handlerData) {
-                      if (handlerData.origin.host != "www.w3schools.com" || !handlerData.isMainFrame) {
-                        throw Exception("This is an exception from a JavaScript handler");
-                      }
+                      // if (handlerData.origin.host != "www.w3schools.com" || !handlerData.isMainFrame) {
+                      //   throw Exception("This is an exception from a JavaScript handler");
+                      // }
                       print(handlerData);
                       return handlerData.args;
                     });

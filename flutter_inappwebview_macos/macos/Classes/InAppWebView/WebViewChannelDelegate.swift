@@ -1046,14 +1046,14 @@ public class WebViewChannelDelegate: ChannelDelegate {
         }
     }
     
-    public func onCallJsHandler(handlerName: String, args: String, callback: CallJsHandlerCallback) {
+    public func onCallJsHandler(handlerName: String, data: JavaScriptHandlerFunctionData, callback: CallJsHandlerCallback) {
         if channel == nil {
             callback.defaultBehaviour(nil)
             return
         }
         let arguments: [String: Any?] = [
             "handlerName": handlerName,
-            "args": args
+            "data": data.toMap()
         ]
         channel?.invokeMethod("onCallJsHandler", arguments: arguments, callback: callback)
     }

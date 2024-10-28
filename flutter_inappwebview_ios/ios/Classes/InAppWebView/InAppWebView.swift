@@ -2851,25 +2851,25 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
             var isInternalHandler = true
             switch (handlerName) {
                 case "onPrintRequest":
-                        let settings = PrintJobSettings()
-                        settings.handledByClient = true
-                        if let printJobId = printCurrentPage(settings: settings) {
-                            let callback = WebViewChannelDelegate.PrintRequestCallback()
-                            callback.nonNullSuccess = { (handledByClient: Bool) in
-                                return !handledByClient
-                            }
-                            callback.defaultBehaviour = { [weak self] (handledByClient: Bool?) in
-                                if let printJob = self?.plugin?.printJobManager?.jobs[printJobId] {
-                                    printJob?.disposeNoDismiss()
-                                }
-                            }
-                            callback.error = { [weak callback] (code: String, message: String?, details: Any?) in
-                                print(code + ", " + (message ?? ""))
-                                callback?.defaultBehaviour(nil)
-                            }
-                            channelDelegate?.onPrintRequest(url: url, printJobId: printJobId, callback: callback)
+                    let settings = PrintJobSettings()
+                    settings.handledByClient = true
+                    if let printJobId = printCurrentPage(settings: settings) {
+                        let callback = WebViewChannelDelegate.PrintRequestCallback()
+                        callback.nonNullSuccess = { (handledByClient: Bool) in
+                            return !handledByClient
                         }
-                        break
+                        callback.defaultBehaviour = { [weak self] (handledByClient: Bool?) in
+                            if let printJob = self?.plugin?.printJobManager?.jobs[printJobId] {
+                                printJob?.disposeNoDismiss()
+                            }
+                        }
+                        callback.error = { [weak callback] (code: String, message: String?, details: Any?) in
+                            print(code + ", " + (message ?? ""))
+                            callback?.defaultBehaviour(nil)
+                        }
+                        channelDelegate?.onPrintRequest(url: url, printJobId: printJobId, callback: callback)
+                    }
+                    break
                 case "onConsoleMessage":
                     if let args = body["args"] as? String, let data = args.data(using: .utf8) {
                         let jsonArgs = try? JSONSerialization.jsonObject(with: data, options: .mutableContainers) as? [[String: Any]]

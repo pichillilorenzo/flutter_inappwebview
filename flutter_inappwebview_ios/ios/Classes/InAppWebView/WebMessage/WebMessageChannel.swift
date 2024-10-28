@@ -35,7 +35,7 @@ public class WebMessageChannel: FlutterMethodCallDelegate {
         if let webView = self.webView {
             webView.evaluateJavascript(source: """
             (function() {
-                        \(WebMessageChannelJS.WEB_MESSAGE_CHANNELS_VARIABLE_NAME())["\(id)"] = new MessageChannel();
+                \(WebMessageChannelJS.WEB_MESSAGE_CHANNELS_VARIABLE_NAME())["\(id)"] = new MessageChannel();
             })();
             """) { (_) in
                 completionHandler?(self)

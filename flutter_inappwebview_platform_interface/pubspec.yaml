@@ -14,8 +14,8 @@ topics:
   - browser
 
 environment:
-  sdk: ^3.5.0
-  flutter: ">=3.24.0"
+  sdk: ">=3.4.0"
+  flutter: ">=3.22.3"
 
 dependencies:
   flutter:

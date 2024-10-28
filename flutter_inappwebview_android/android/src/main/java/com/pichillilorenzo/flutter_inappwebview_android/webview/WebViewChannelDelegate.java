@@ -468,6 +468,12 @@ public class WebViewChannelDelegate extends ChannelDelegateImpl {
           result.success(false);
         }
         break;
+      case requestFocus:
+        if (webView != null) {
+          webView.requestFocus();
+        }
+        result.success(true);
+        break;
       case clearFocus:
         if (webView != null) {
           webView.clearFocus();

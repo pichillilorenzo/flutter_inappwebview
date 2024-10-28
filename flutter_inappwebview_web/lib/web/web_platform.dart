@@ -17,7 +17,7 @@ class InAppWebViewFlutterPlugin {
   /// Constructs a new instance of [InAppWebViewFlutterPlugin].
   InAppWebViewFlutterPlugin(Registrar registrar) {
     ui_web.platformViewRegistry.registerViewFactory(
-        'com.pichillilorenzo/flutter_inappwebview', (int viewId) {
+        'com.pichillilorenzo/flutter_inappwebview', (String viewId) {
       var webView =
           InAppWebViewWebElement(viewId: viewId, messenger: registrar);
       WebPlatformManager.webViews.putIfAbsent(viewId, () => webView);

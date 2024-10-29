@@ -9,12 +9,12 @@ namespace flutter_inappwebview_plugin
   {}
 
   WebHistoryItem::WebHistoryItem(const flutter::EncodableMap& map)
-    : entryId(get_optional_fl_map_value<int64_t>(map, "entryId")),
-    index(get_optional_fl_map_value<int64_t>(map, "index")),
-    offset(get_optional_fl_map_value<int64_t>(map, "offset")),
-    originalUrl(get_optional_fl_map_value<std::string>(map, "originalUrl")),
-    title(get_optional_fl_map_value<std::string>(map, "title")),
-    url(get_optional_fl_map_value<std::string>(map, "url"))
+    : WebHistoryItem(get_optional_fl_map_value<int64_t>(map, "entryId"),
+      get_optional_fl_map_value<int64_t>(map, "index"),
+      get_optional_fl_map_value<int64_t>(map, "offset"),
+      get_optional_fl_map_value<std::string>(map, "originalUrl"),
+      get_optional_fl_map_value<std::string>(map, "title"),
+      get_optional_fl_map_value<std::string>(map, "url"))
   {}
 
   flutter::EncodableMap WebHistoryItem::toEncodableMap() const

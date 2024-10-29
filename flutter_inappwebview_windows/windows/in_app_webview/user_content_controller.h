@@ -46,15 +46,6 @@ namespace flutter_inappwebview_plugin
     void registerEventHandlers();
     void createContentWorld(const std::shared_ptr<ContentWorld> contentWorld, const std::function<void(int)> completionHandler);
 
-    static std::string USER_SCRIPTS_AT_DOCUMENT_END_WRAPPER_JS_SOURCE()
-    {
-      return "window.addEventListener('load', () => { \
-        if (window." + JavaScriptBridgeJS::get_JAVASCRIPT_BRIDGE_NAME() + " != null && (window." + JavaScriptBridgeJS::get_JAVASCRIPT_BRIDGE_NAME() + "._userScript" + VAR_PLACEHOLDER_MEMORY_ADDRESS_VALUE + "AtDocumentEndLoaded == null || !window." + JavaScriptBridgeJS::get_JAVASCRIPT_BRIDGE_NAME() + "._userScript" + VAR_PLACEHOLDER_MEMORY_ADDRESS_VALUE + "AtDocumentEndLoaded)) { \
-          window." + JavaScriptBridgeJS::get_JAVASCRIPT_BRIDGE_NAME() + "._userScript" + VAR_PLACEHOLDER_MEMORY_ADDRESS_VALUE + "AtDocumentEndLoaded = true; \
-          " + VAR_PLACEHOLDER_VALUE + " \
-        } \
-      });";
-    }
   private:
     InAppWebView* webView_;
 

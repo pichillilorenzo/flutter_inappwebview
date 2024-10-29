@@ -7,8 +7,8 @@ namespace flutter_inappwebview_plugin
   {}
 
   PermissionResponse::PermissionResponse(const flutter::EncodableMap& map)
-    : resources(get_optional_fl_map_value<std::vector<int64_t>>(map, "resources")),
-    action(PermissionResponseActionTypeFromInteger(get_optional_fl_map_value<int64_t>(map, "action")))
+    : PermissionResponse(get_optional_fl_map_value<std::vector<int64_t>>(map, "resources"),
+      PermissionResponseActionTypeFromInteger(get_optional_fl_map_value<int64_t>(map, "action")))
   {}
 
   flutter::EncodableMap PermissionResponse::toEncodableMap() const

@@ -20,9 +20,14 @@ namespace flutter_inappwebview_plugin
   {
     std::string ifStatement = "if (";
 
-    if (allowedOriginRules.has_value() && !allowedOriginRules.value().empty() && !vector_contains<std::string>(allowedOriginRules.value(), "*")) {
-      std::string jsRegExpArray = "[";
+    if (allowedOriginRules.has_value() && !vector_contains<std::string>(allowedOriginRules.value(), "*")) {
+      if (allowedOriginRules.value().empty()) {
+        // return empty source string if allowedOriginRules is an empty list.
+        // an empty list means that this UserScript is not allowed for any origin.
+        return "";
+      }
 
+      std::string jsRegExpArray = "[";
       for (const auto& allowedOriginRule : allowedOriginRules.value()) {
         if (jsRegExpArray.length() > 1) {
           jsRegExpArray += ", ";

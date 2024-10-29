@@ -1387,10 +1387,12 @@ class AndroidInAppWebViewController extends PlatformInAppWebViewController
         break;
       case "onCallJsHandler":
         String handlerName = call.arguments["handlerName"];
-        Map<String, dynamic> handlerDataMap = call.arguments["data"].cast<String, dynamic>();
+        Map<String, dynamic> handlerDataMap =
+            call.arguments["data"].cast<String, dynamic>();
         // decode args to json
         handlerDataMap["args"] = jsonDecode(handlerDataMap["args"]);
-        final handlerData = JavaScriptHandlerFunctionData.fromMap(handlerDataMap)!;
+        final handlerData =
+            JavaScriptHandlerFunctionData.fromMap(handlerDataMap)!;
 
         _debugLog(handlerName, handlerData);
 
@@ -1399,7 +1401,8 @@ class AndroidInAppWebViewController extends PlatformInAppWebViewController
             if ((webviewParams != null &&
                     webviewParams!.onLoadResource != null) ||
                 _inAppBrowserEventHandler != null) {
-              Map<String, dynamic> arguments = handlerData.args[0].cast<String, dynamic>();
+              Map<String, dynamic> arguments =
+                  handlerData.args[0].cast<String, dynamic>();
               arguments["startTime"] = arguments["startTime"] is int
                   ? arguments["startTime"].toDouble()
                   : arguments["startTime"];
@@ -1421,7 +1424,8 @@ class AndroidInAppWebViewController extends PlatformInAppWebViewController
             if ((webviewParams != null &&
                     webviewParams!.shouldInterceptAjaxRequest != null) ||
                 _inAppBrowserEventHandler != null) {
-              Map<String, dynamic> arguments = handlerData.args[0].cast<String, dynamic>();
+              Map<String, dynamic> arguments =
+                  handlerData.args[0].cast<String, dynamic>();
               AjaxRequest request = AjaxRequest.fromMap(arguments)!;
 
               if (webviewParams != null &&
@@ -1438,7 +1442,8 @@ class AndroidInAppWebViewController extends PlatformInAppWebViewController
             if ((webviewParams != null &&
                     webviewParams!.onAjaxReadyStateChange != null) ||
                 _inAppBrowserEventHandler != null) {
-              Map<String, dynamic> arguments = handlerData.args[0].cast<String, dynamic>();
+              Map<String, dynamic> arguments =
+                  handlerData.args[0].cast<String, dynamic>();
               AjaxRequest request = AjaxRequest.fromMap(arguments)!;
 
               if (webviewParams != null &&
@@ -1456,7 +1461,8 @@ class AndroidInAppWebViewController extends PlatformInAppWebViewController
             if ((webviewParams != null &&
                     webviewParams!.onAjaxProgress != null) ||
                 _inAppBrowserEventHandler != null) {
-              Map<String, dynamic> arguments = handlerData.args[0].cast<String, dynamic>();
+              Map<String, dynamic> arguments =
+                  handlerData.args[0].cast<String, dynamic>();
               AjaxRequest request = AjaxRequest.fromMap(arguments)!;
 
               if (webviewParams != null &&
@@ -1474,7 +1480,8 @@ class AndroidInAppWebViewController extends PlatformInAppWebViewController
             if ((webviewParams != null &&
                     webviewParams!.shouldInterceptFetchRequest != null) ||
                 _inAppBrowserEventHandler != null) {
-              Map<String, dynamic> arguments = handlerData.args[0].cast<String, dynamic>();
+              Map<String, dynamic> arguments =
+                  handlerData.args[0].cast<String, dynamic>();
               FetchRequest request = FetchRequest.fromMap(arguments)!;
 
               if (webviewParams != null &&
@@ -2738,7 +2745,7 @@ class AndroidInAppWebViewController extends PlatformInAppWebViewController
   @override
   Future<void> setJavaScriptBridgeName(String bridgeName) async {
     assert(RegExp(r'^[a-zA-Z_]\w*$').hasMatch(bridgeName),
-      'bridgeName must be a non-empty string with only alphanumeric and underscore characters. It can\'t start with a number.');
+        'bridgeName must be a non-empty string with only alphanumeric and underscore characters. It can\'t start with a number.');
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('bridgeName', () => bridgeName);
     await _staticChannel.invokeMethod('setJavaScriptBridgeName', args);

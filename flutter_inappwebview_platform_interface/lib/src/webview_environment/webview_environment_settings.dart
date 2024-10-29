@@ -105,9 +105,9 @@ class WebViewEnvironmentSettings_ {
   @SupportedPlatforms(platforms: [
     WindowsPlatform(
         apiName:
-        'ICoreWebView2EnvironmentOptions4.SetCustomSchemeRegistrations',
+            'ICoreWebView2EnvironmentOptions4.SetCustomSchemeRegistrations',
         apiUrl:
-        'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2environmentoptions4?view=webview2-1.0.2739.15#setcustomschemeregistrations')
+            'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2environmentoptions4?view=webview2-1.0.2739.15#setcustomschemeregistrations')
   ])
   final List<CustomSchemeRegistration_>? customSchemeRegistrations;
 

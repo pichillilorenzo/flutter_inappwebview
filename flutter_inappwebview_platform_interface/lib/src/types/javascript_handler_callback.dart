@@ -30,5 +30,8 @@ class JavaScriptHandlerFunctionData_ {
   WebUri requestUrl;
 
   JavaScriptHandlerFunctionData_(
-      {this.args = const [], required this.origin, required this.isMainFrame, required this.requestUrl});
+      {this.args = const [],
+      required this.origin,
+      required this.isMainFrame,
+      required this.requestUrl});
 }

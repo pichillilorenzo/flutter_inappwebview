@@ -309,9 +309,9 @@ because there isn't any way to make the website data store non-persistent for th
     IOSPlatform(),
     MacOSPlatform(),
     WindowsPlatform(
-      apiName: "ICoreWebView2ControllerOptions.put_IsInPrivateModeEnabled",
-      apiUrl: "https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2controlleroptions?view=webview2-1.0.2792.45#put_isinprivatemodeenabled"
-    )
+        apiName: "ICoreWebView2ControllerOptions.put_IsInPrivateModeEnabled",
+        apiUrl:
+            "https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2controlleroptions?view=webview2-1.0.2792.45#put_isinprivatemodeenabled")
   ])
   bool? incognito;
 
@@ -1724,7 +1724,7 @@ as it can cause framerate drops on animations in Android 9 and lower (see [Hybri
         requiresSameOrigin: false,
         apiName: "iframe.ariaHidden",
         apiUrl:
-        "https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Attributes/aria-hidden")
+            "https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Attributes/aria-hidden")
   ])
   String? iframeAriaHidden;
 

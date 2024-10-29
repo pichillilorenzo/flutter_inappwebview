@@ -725,8 +725,7 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///- Windows
   ///{@endtemplate}
   void addJavaScriptHandler(
-      {required String handlerName,
-      required Function callback}) {
+      {required String handlerName, required Function callback}) {
     throw UnimplementedError(
         'addJavaScriptHandler is not implemented on the current platform');
   }
@@ -742,8 +741,7 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///- MacOS
   ///- Windows
   ///{@endtemplate}
-  Function? removeJavaScriptHandler(
-      {required String handlerName}) {
+  Function? removeJavaScriptHandler({required String handlerName}) {
     throw UnimplementedError(
         'removeJavaScriptHandler is not implemented on the current platform');
   }

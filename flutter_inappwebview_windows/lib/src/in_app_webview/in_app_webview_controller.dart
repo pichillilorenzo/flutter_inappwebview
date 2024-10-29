@@ -20,21 +20,6 @@ import '_static_channel.dart';
 
 import '../print_job/main.dart';
 
-///List of forbidden names for JavaScript handlers.
-// ignore: non_constant_identifier_names
-final _JAVASCRIPT_HANDLER_FORBIDDEN_NAMES = UnmodifiableListView<String>([
-  "onLoadResource",
-  "shouldInterceptAjaxRequest",
-  "onAjaxReadyStateChange",
-  "onAjaxProgress",
-  "shouldInterceptFetchRequest",
-  "onPrintRequest",
-  "onWindowFocus",
-  "onWindowBlur",
-  "callAsyncJavaScript",
-  "evaluateJavaScriptWithContentWorld"
-]);
-
 /// Object specifying creation parameters for creating a [WindowsInAppWebViewController].
 ///
 /// When adding additional fields make sure they can be null or have a default
@@ -66,8 +51,8 @@ class WindowsInAppWebViewController extends PlatformInAppWebViewController
   static final MethodChannel _staticChannel = IN_APP_WEBVIEW_STATIC_CHANNEL;
 
   // List of properties to be saved and restored for keep alive feature
-  Map<String, JavaScriptHandlerCallback> _javaScriptHandlersMap =
-      HashMap<String, JavaScriptHandlerCallback>();
+  Map<String, Function> _javaScriptHandlersMap =
+      HashMap<String, Function>();
   Map<UserScriptInjectionTime, List<UserScript>> _userScripts = {
     UserScriptInjectionTime.AT_DOCUMENT_START: <UserScript>[],
     UserScriptInjectionTime.AT_DOCUMENT_END: <UserScript>[]
@@ -1424,17 +1409,19 @@ class WindowsInAppWebViewController extends PlatformInAppWebViewController
         break;
       case "onCallJsHandler":
         String handlerName = call.arguments["handlerName"];
+        Map<String, dynamic> handlerDataMap = call.arguments["data"].cast<String, dynamic>();
         // decode args to json
-        List<dynamic> args = jsonDecode(call.arguments["args"]);
+        handlerDataMap["args"] = jsonDecode(handlerDataMap["args"]);
+        final handlerData = JavaScriptHandlerFunctionData.fromMap(handlerDataMap)!;
 
-        _debugLog(handlerName, args);
+        _debugLog(handlerName, handlerData);
 
         switch (handlerName) {
           case "onLoadResource":
             if ((webviewParams != null &&
                     webviewParams!.onLoadResource != null) ||
                 _inAppBrowserEventHandler != null) {
-              Map<String, dynamic> arguments = args[0].cast<String, dynamic>();
+              Map<String, dynamic> arguments = handlerData.args[0].cast<String, dynamic>();
               arguments["startTime"] = arguments["startTime"] is int
                   ? arguments["startTime"].toDouble()
                   : arguments["startTime"];
@@ -1456,7 +1443,7 @@ class WindowsInAppWebViewController extends PlatformInAppWebViewController
             if ((webviewParams != null &&
                     webviewParams!.shouldInterceptAjaxRequest != null) ||
                 _inAppBrowserEventHandler != null) {
-              Map<String, dynamic> arguments = args[0].cast<String, dynamic>();
+              Map<String, dynamic> arguments = handlerData.args[0].cast<String, dynamic>();
               AjaxRequest request = AjaxRequest.fromMap(arguments)!;
 
               if (webviewParams != null &&
@@ -1473,7 +1460,7 @@ class WindowsInAppWebViewController extends PlatformInAppWebViewController
             if ((webviewParams != null &&
                     webviewParams!.onAjaxReadyStateChange != null) ||
                 _inAppBrowserEventHandler != null) {
-              Map<String, dynamic> arguments = args[0].cast<String, dynamic>();
+              Map<String, dynamic> arguments = handlerData.args[0].cast<String, dynamic>();
               AjaxRequest request = AjaxRequest.fromMap(arguments)!;
 
               if (webviewParams != null &&
@@ -1491,7 +1478,7 @@ class WindowsInAppWebViewController extends PlatformInAppWebViewController
             if ((webviewParams != null &&
                     webviewParams!.onAjaxProgress != null) ||
                 _inAppBrowserEventHandler != null) {
-              Map<String, dynamic> arguments = args[0].cast<String, dynamic>();
+              Map<String, dynamic> arguments = handlerData.args[0].cast<String, dynamic>();
               AjaxRequest request = AjaxRequest.fromMap(arguments)!;
 
               if (webviewParams != null &&
@@ -1509,7 +1496,7 @@ class WindowsInAppWebViewController extends PlatformInAppWebViewController
             if ((webviewParams != null &&
                     webviewParams!.shouldInterceptFetchRequest != null) ||
                 _inAppBrowserEventHandler != null) {
-              Map<String, dynamic> arguments = args[0].cast<String, dynamic>();
+              Map<String, dynamic> arguments = handlerData.args[0].cast<String, dynamic>();
               FetchRequest request = FetchRequest.fromMap(arguments)!;
 
               if (webviewParams != null &&
@@ -1535,7 +1522,7 @@ class WindowsInAppWebViewController extends PlatformInAppWebViewController
               _inAppBrowserEventHandler!.onWindowBlur();
             return null;
           case "onInjectedScriptLoaded":
-            String id = args[0];
+            String id = handlerData.args[0];
             var onLoadCallback = _injectedScriptsFromURL[id]?.onLoad;
             if ((webviewParams != null || _inAppBrowserEventHandler != null) &&
                 onLoadCallback != null) {
@@ -1543,7 +1530,7 @@ class WindowsInAppWebViewController extends PlatformInAppWebViewController
             }
             return null;
           case "onInjectedScriptError":
-            String id = args[0];
+            String id = handlerData.args[0];
             var onErrorCallback = _injectedScriptsFromURL[id]?.onError;
             if ((webviewParams != null || _inAppBrowserEventHandler != null) &&
                 onErrorCallback != null) {
@@ -1555,7 +1542,17 @@ class WindowsInAppWebViewController extends PlatformInAppWebViewController
         if (_javaScriptHandlersMap.containsKey(handlerName)) {
           // convert result to json
           try {
-            return jsonEncode(await _javaScriptHandlersMap[handlerName]!(args));
+            var jsHandlerResult = null;
+            if (_javaScriptHandlersMap[handlerName] is JavaScriptHandlerCallback) {
+              jsHandlerResult = await (_javaScriptHandlersMap[handlerName]
+              as JavaScriptHandlerCallback)(handlerData.args);
+            } else if (_javaScriptHandlersMap[handlerName] is JavaScriptHandlerFunction) {
+              jsHandlerResult = await (_javaScriptHandlersMap[handlerName]
+              as JavaScriptHandlerFunction)(handlerData);
+            } else {
+              jsHandlerResult = await _javaScriptHandlersMap[handlerName]!();
+            }
+            return jsonEncode(jsHandlerResult);
           } catch (error, stacktrace) {
             developer.log(error.toString() + '\n' + stacktrace.toString(),
                 name: 'JavaScript Handler "$handlerName"');
@@ -2003,14 +2000,14 @@ class WindowsInAppWebViewController extends PlatformInAppWebViewController
   @override
   void addJavaScriptHandler(
       {required String handlerName,
-      required JavaScriptHandlerCallback callback}) {
-    assert(!_JAVASCRIPT_HANDLER_FORBIDDEN_NAMES.contains(handlerName),
+      required Function callback}) {
+    assert(!kJavaScriptHandlerForbiddenNames.contains(handlerName),
         '"$handlerName" is a forbidden name!');
     this._javaScriptHandlersMap[handlerName] = (callback);
   }
 
   @override
-  JavaScriptHandlerCallback? removeJavaScriptHandler(
+  Function? removeJavaScriptHandler(
       {required String handlerName}) {
     return this._javaScriptHandlersMap.remove(handlerName);
   }
@@ -2731,6 +2728,23 @@ class WindowsInAppWebViewController extends PlatformInAppWebViewController
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('includeDiskFiles', () => includeDiskFiles);
     await _staticChannel.invokeMethod('clearAllCache', args);
+  }
+
+  @override
+  Future<void> setJavaScriptBridgeName(String bridgeName) async {
+    assert(RegExp(r'^[a-zA-Z_]\w*$').hasMatch(bridgeName),
+      'bridgeName must be a non-empty string with only alphanumeric and underscore characters. It can\'t start with a number.');
+    Map<String, dynamic> args = <String, dynamic>{};
+    args.putIfAbsent('bridgeName', () => bridgeName);
+    await _staticChannel.invokeMethod('setJavaScriptBridgeName', args);
+  }
+
+  @override
+  Future<String> getJavaScriptBridgeName() async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    return await _staticChannel.invokeMethod<String>(
+        'getJavaScriptBridgeName', args) ??
+        '';
   }
 
   @override

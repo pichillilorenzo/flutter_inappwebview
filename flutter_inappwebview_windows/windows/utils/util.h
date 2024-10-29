@@ -1,7 +1,10 @@
 #ifndef FLUTTER_INAPPWEBVIEW_PLUGIN_UTIL_H_
 #define FLUTTER_INAPPWEBVIEW_PLUGIN_UTIL_H_
 
+#pragma comment(lib, "rpcrt4.lib")  // UuidCreate - Minimum supported OS Win 2000
+
 #include <optional>
+#include <rpc.h>
 #include <string>
 #include <variant>
 #include <Windows.h>
@@ -32,6 +35,22 @@ namespace flutter_inappwebview_plugin
   {
     auto dpi = GetDpiForWindow(hwnd);
     return dpi > 0 ? dpi / 96.0f : 1.0f;
+  }
+
+  static inline std::string get_uuid()
+  {
+    UUID uuid = { 0 };
+    std::string guid;
+
+    ::UuidCreate(&uuid);
+
+    RPC_CSTR szUuid = NULL;
+    if (::UuidToStringA(&uuid, &szUuid) == RPC_S_OK) {
+      guid = (char*)szUuid;
+      ::RpcStringFreeA(&szUuid);
+    }
+
+    return guid;
   }
 }
 

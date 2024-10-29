@@ -1,6 +1,7 @@
 #ifndef FLUTTER_INAPPWEBVIEW_PLUGIN_IN_APP_WEBVIEW_SETTINGS_H_
 #define FLUTTER_INAPPWEBVIEW_PLUGIN_IN_APP_WEBVIEW_SETTINGS_H_
 
+#include <optional>
 #include <string>
 
 namespace flutter_inappwebview_plugin
@@ -21,6 +22,10 @@ namespace flutter_inappwebview_plugin
     bool isInspectable = true;
     bool disableContextMenu = false;
     bool incognito = false;
+    std::optional<std::vector<std::string>> javaScriptHandlerOriginAllowList = std::optional<std::vector<std::string>>{};
+    std::optional<std::vector<std::string>> pluginScriptsOriginAllowList = std::optional<std::vector<std::string>>{};
+    bool pluginScriptsForMainFrameOnly = false;
+    int64_t scrollMultiplier = 1;
 
     InAppWebViewSettings();
     InAppWebViewSettings(const flutter::EncodableMap& encodableMap);

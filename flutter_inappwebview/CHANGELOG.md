@@ -8,14 +8,16 @@
   - `flutter_inappwebview_web`: `^1.1.2` -> `^1.2.0`
   - `flutter_inappwebview_windows`: `^0.6.0` -> `^0.7.0`
 
+Implemented security features to better manage access to the native javascript bridge.
+
 #### Platform Interface
-- Updated static `fromMap` implementation for some classes
-- Updated `kJavaScriptHandlerForbiddenNames` list
-- Added `PlatformInAppLocalhostServer.onData` parameter to set a custom on data server callback
-- Added `javaScriptHandlerOriginAllowList`, `pluginScriptsOriginAllowList`, `pluginScriptsForMainFrameOnly` InAppWebViewSettings parameters
+- Added `javaScriptHandlerOriginAllowList`, `pluginScriptsOriginAllowList`, `pluginScriptsForMainFrameOnly`, `scrollMultiplier` InAppWebViewSettings parameters
 - Added `setJavaScriptBridgeName`, `getJavaScriptBridgeName` static WebView controller methods
+- Added `PlatformInAppLocalhostServer.onData` parameter to set a custom on data server callback
 - Added `JavaScriptHandlerFunctionData` type
 - Deprecated `JavaScriptHandlerCallback` type in favor of `JavaScriptHandlerFunction` type
+- Updated static `fromMap` implementation for some classes
+- Updated `kJavaScriptHandlerForbiddenNames` list
 
 #### Android Platform
 - Added `InAppWebViewController.enableSlowWholeDocumentDraw` static method
@@ -31,6 +33,11 @@
 - Moved `WKUserContentController` initialization on `preWKWebViewConfiguration` to fix possible `undefined is not an object (evaluating 'window.webkit.messageHandlers')` javascript error
 - Added support for `UserScript.allowedOriginRules` parameter
 - Merged "change priority of DispatchQueue" [#2322](https://github.com/pichillilorenzo/flutter_inappwebview/pull/2322) (thanks to [nnnlog](https://github.com/nnnlog))
+
+#### Windows Platform
+- Updated `scrollMultiplier` default value from 6 to 1
+- Added support for `UserScript.allowedOriginRules` and `UserScript.forMainFrameOnly` parameters
+- Fixed `get_optional_fl_map_value` implementation in `utils/flutter.h`
 
 #### Web Platform
 - Merged "[web] support iframe role and aria-hidden attributes" [2293](https://github.com/pichillilorenzo/flutter_inappwebview/pull/2293) (thanks to [p-mazhnik](https://github.com/p-mazhnik))

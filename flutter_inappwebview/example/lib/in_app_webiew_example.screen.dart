@@ -120,7 +120,7 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                   key: webViewKey,
                   webViewEnvironment: webViewEnvironment,
                   initialUrlRequest:
-                    URLRequest(url: WebUri('https://www.w3schools.com/tags/tryit.asp?filename=tryhtml_iframe')),
+                    URLRequest(url: WebUri('https://flutter.dev')),
                   // initialUrlRequest:
                   // URLRequest(url: WebUri(Uri.base.toString().replaceFirst("/#/", "/") + 'page.html')),
                   // initialFile: "assets/index.html",
@@ -137,7 +137,7 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                   ]),
                   onWebViewCreated: (controller) async {
                     webViewController = controller;
-                    controller.addJavaScriptHandler(handlerName: 'handlerName', callback: (JavaScriptHandlerFunctionData handlerData) {
+                    controller.addJavaScriptHandler(handlerName: 'handlerName', callback: (JavaScriptHandlerFunctionData handlerData) async {
                       // if (handlerData.origin.host != "www.w3schools.com" || !handlerData.isMainFrame) {
                       //   throw Exception("This is an exception from a JavaScript handler");
                       // }

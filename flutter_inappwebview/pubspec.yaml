@@ -30,7 +30,8 @@ dependencies:
     path: ../flutter_inappwebview_macos
   flutter_inappwebview_web: #^1.2.0
     path: ../flutter_inappwebview_web
-#  flutter_inappwebview_windows: ^0.7.0
+  flutter_inappwebview_windows: #^0.7.0
+    path: ../flutter_inappwebview_windows
 
 dev_dependencies:
   flutter_test:

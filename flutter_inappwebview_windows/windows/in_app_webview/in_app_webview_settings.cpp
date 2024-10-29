@@ -25,6 +25,14 @@ namespace flutter_inappwebview_plugin
     isInspectable = get_fl_map_value(encodableMap, "isInspectable", isInspectable);
     disableContextMenu = get_fl_map_value(encodableMap, "disableContextMenu", disableContextMenu);
     incognito = get_fl_map_value(encodableMap, "incognito", incognito);
+    if (fl_map_contains_not_null(encodableMap, "javaScriptHandlerOriginAllowList")) {
+      javaScriptHandlerOriginAllowList = get_optional_fl_map_value<std::vector<std::string>>(encodableMap, "javaScriptHandlerOriginAllowList");
+    }
+    if (fl_map_contains_not_null(encodableMap, "pluginScriptsOriginAllowList")) {
+      pluginScriptsOriginAllowList = get_optional_fl_map_value<std::vector<std::string>>(encodableMap, "pluginScriptsOriginAllowList");
+    }
+    pluginScriptsForMainFrameOnly = get_fl_map_value(encodableMap, "pluginScriptsForMainFrameOnly", pluginScriptsForMainFrameOnly);
+    scrollMultiplier = get_fl_map_value(encodableMap, "scrollMultiplier", scrollMultiplier);
   }
 
   flutter::EncodableMap InAppWebViewSettings::toEncodableMap() const
@@ -41,6 +49,10 @@ namespace flutter_inappwebview_plugin
       {"isInspectable", isInspectable},
       {"disableContextMenu", disableContextMenu},
       {"incognito", incognito},
+      {"javaScriptHandlerOriginAllowList", make_fl_value(javaScriptHandlerOriginAllowList)},
+      {"pluginScriptsOriginAllowList", make_fl_value(pluginScriptsOriginAllowList)},
+      {"pluginScriptsForMainFrameOnly", pluginScriptsForMainFrameOnly},
+      {"scrollMultiplier", scrollMultiplier},
     };
   }
 

@@ -5,6 +5,7 @@
 #include <windows.graphics.capture.h>
 
 #include "../in_app_webview/in_app_webview_settings.h"
+#include "../plugin_scripts_js/javascript_bridge_js.h"
 #include "../types/url_request.h"
 #include "../types/user_script.h"
 #include "../utils/flutter.h"
@@ -81,6 +82,14 @@ namespace flutter_inappwebview_plugin
       auto keepAliveId = get_fl_map_value<std::string>(*arguments, "keepAliveId");
       disposeKeepAlive(keepAliveId);
       result->Success();
+    }
+    else if (string_equals(methodName, "setJavaScriptBridgeName")) {
+      auto bridgeName = get_fl_map_value<std::string>(*arguments, "bridgeName");
+      JavaScriptBridgeJS::set_JAVASCRIPT_BRIDGE_NAME(bridgeName);
+      result->Success();
+    }
+    else if (string_equals(methodName, "getJavaScriptBridgeName")) {
+      result->Success(JavaScriptBridgeJS::get_JAVASCRIPT_BRIDGE_NAME());
     }
     else {
       result->NotImplemented();

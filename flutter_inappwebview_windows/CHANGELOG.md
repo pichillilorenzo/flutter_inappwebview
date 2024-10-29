@@ -1,6 +1,9 @@
 ## 0.7.0
 
 - Updated flutter_inappwebview_platform_interface version to ^1.4.0
+- Updated `scrollMultiplier` default value from 6 to 1
+- Added support for `UserScript.allowedOriginRules` and `UserScript.forMainFrameOnly` parameters
+- Fixed `get_optional_fl_map_value` implementation in `utils/flutter.h`
 
 ## 0.6.0
 

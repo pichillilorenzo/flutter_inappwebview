@@ -1,12 +1,14 @@
 #include <cstring>
 #include <filesystem>
 #include <nlohmann/json.hpp>
+#include <regex>
 #include <Shlwapi.h>
 #include <wil/wrl.h>
 
 #include "../custom_platform_view/util/composition.desktop.interop.h"
 #include "../plugin_scripts_js/javascript_bridge_js.h"
 #include "../types/create_window_action.h"
+#include "../types/javascript_handler_function_data.h"
 #include "../types/web_resource_error.h"
 #include "../types/web_resource_request.h"
 #include "../utils/base64.h"
@@ -260,7 +262,10 @@ namespace flutter_inappwebview_plugin
     ).Get()));
 
     if (userContentController) {
-      userContentController->addPluginScript(std::move(createJavaScriptBridgePluginScript()));
+      auto pluginScriptsOriginAllowList = settings->pluginScriptsOriginAllowList;
+      auto pluginScriptsForMainFrameOnly = settings->pluginScriptsForMainFrameOnly;
+
+      userContentController->addPluginScript(std::move(JavaScriptBridgeJS::JAVASCRIPT_BRIDGE_JS_PLUGIN_SCRIPT(expectedBridgeSecret, pluginScriptsOriginAllowList, pluginScriptsForMainFrameOnly)));
       if (params.initialUserScripts.has_value()) {
         userContentController->addUserOnlyScripts(params.initialUserScripts.value());
       }
@@ -534,7 +539,7 @@ namespace flutter_inappwebview_plugin
         {
           isLoading_ = false;
 
-          evaluateJavascript(PLATFORM_READY_JS_SOURCE, ContentWorld::page(), nullptr);
+          evaluateJavascript(JavaScriptBridgeJS::PLATFORM_READY_JS_SOURCE(), ContentWorld::page(), nullptr);
 
           std::shared_ptr<NavigationAction> navigationAction;
           UINT64 navigationId;
@@ -612,52 +617,7 @@ namespace flutter_inappwebview_plugin
     failedLog(webView->add_WebMessageReceived(Callback<ICoreWebView2WebMessageReceivedEventHandler>(
       [this](ICoreWebView2* sender, ICoreWebView2WebMessageReceivedEventArgs* args)
       {
-        if (!channelDelegate) {
-          return S_OK;
-        }
-
-        wil::unique_cotaskmem_string json;
-        if (succeededOrLog(args->get_WebMessageAsJson(&json))) {
-          auto message = nlohmann::json::parse(wide_to_utf8(json.get()));
-
-          if (message.is_object() && message.contains("name") && message.at("name").is_string() && message.contains("body") && message.at("body").is_object()) {
-            auto name = message.at("name").get<std::string>();
-            auto body = message.at("body").get<nlohmann::json>();
-
-            if (name.compare("callHandler") == 0 && body.contains("handlerName") && body.at("handlerName").is_string()) {
-              auto handlerName = body.at("handlerName").get<std::string>();
-              auto callHandlerID = body.at("_callHandlerID").is_number_integer() ? body.at("_callHandlerID").get<int64_t>() : 0;
-              std::string handlerArgs = body.at("args").is_string() ? body.at("args").get<std::string>() : "";
-
-              auto callback = std::make_unique<WebViewChannelDelegate::CallJsHandlerCallback>();
-              callback->defaultBehaviour = [this, callHandlerID](const std::optional<const flutter::EncodableValue*> response)
-                {
-                  std::string json = "null";
-                  if (response.has_value() && !response.value()->IsNull()) {
-                    json = std::get<std::string>(*(response.value()));
-                  }
-
-                  evaluateJavascript("if (window." + JAVASCRIPT_BRIDGE_NAME + "[" + std::to_string(callHandlerID) + "] != null) { \
-                      window." + JAVASCRIPT_BRIDGE_NAME + "[" + std::to_string(callHandlerID) + "].resolve(" + json + "); \
-                      delete window." + JAVASCRIPT_BRIDGE_NAME + "[" + std::to_string(callHandlerID) + "]; \
-                    }", ContentWorld::page(), nullptr);
-                };
-              callback->error = [this, callHandlerID](const std::string& error_code, const std::string& error_message, const flutter::EncodableValue* error_details)
-                {
-                  auto errorMessage = error_code + ", " + error_message;
-                  debugLog(errorMessage);
-
-                  evaluateJavascript("if (window." + JAVASCRIPT_BRIDGE_NAME + "[" + std::to_string(callHandlerID) + "] != null) { \
-                      window." + JAVASCRIPT_BRIDGE_NAME + "[" + std::to_string(callHandlerID) + "].reject(new Error('" + replace_all_copy(errorMessage, "\'", "\\'") + "')); \
-                      delete window." + JAVASCRIPT_BRIDGE_NAME + "[" + std::to_string(callHandlerID) + "]; \
-                    }", ContentWorld::page(), nullptr);
-                };
-              channelDelegate->onCallJsHandler(handlerName, handlerArgs, std::move(callback));
-            }
-          }
-        }
-
-        return S_OK;
+        return this->onCallJsHandler(true, args);
       }
     ).Get(), nullptr));
 
@@ -917,6 +877,26 @@ namespace flutter_inappwebview_plugin
           {
             if (channelDelegate) {
               channelDelegate->onProgressChanged(66);
+            }
+            return S_OK;
+          }
+        ).Get(), nullptr));
+    }
+
+    wil::com_ptr<ICoreWebView2_4> webView4;
+    if (SUCCEEDED(webView->QueryInterface(IID_PPV_ARGS(&webView4)))) {
+      failedLog(webView4->add_FrameCreated(
+        Callback<ICoreWebView2FrameCreatedEventHandler>(
+          [this](ICoreWebView2* sender, ICoreWebView2FrameCreatedEventArgs* args)
+          {
+            wil::com_ptr<ICoreWebView2Frame> frame;
+            wil::com_ptr<ICoreWebView2Frame2> frame2;
+            if (succeededOrLog(args->get_Frame(&frame)) && SUCCEEDED(frame->QueryInterface(IID_PPV_ARGS(&frame2)))) {
+              failedLog(frame2->add_WebMessageReceived(Callback<ICoreWebView2FrameWebMessageReceivedEventHandler>(
+                [this](ICoreWebView2Frame* sender, ICoreWebView2WebMessageReceivedEventArgs* args)
+                {
+                  return this->onCallJsHandler(false, args);
+                }).Get(), nullptr));
             }
             return S_OK;
           }
@@ -1788,10 +1768,7 @@ namespace flutter_inappwebview_plugin
       return;
     }
 
-    // delta * 6 gives me a multiple of WHEEL_DELTA (120)
-    constexpr auto kScrollMultiplier = 6;
-
-    auto offset = static_cast<short>(delta * kScrollMultiplier);
+    auto offset = static_cast<short>(delta * settings->scrollMultiplier);
 
     if (horizontal) {
       webViewCompositionController->SendMouseInput(
@@ -1861,6 +1838,132 @@ namespace flutter_inappwebview_plugin
   bool InAppWebView::isSslError(const COREWEBVIEW2_WEB_ERROR_STATUS& webErrorStatus)
   {
     return webErrorStatus >= COREWEBVIEW2_WEB_ERROR_STATUS_CERTIFICATE_COMMON_NAME_IS_INCORRECT && webErrorStatus <= COREWEBVIEW2_WEB_ERROR_STATUS_CERTIFICATE_IS_INVALID;
+  }
+
+  HRESULT InAppWebView::onCallJsHandler(const bool& isMainFrame, ICoreWebView2WebMessageReceivedEventArgs* args)
+  {
+    if (!channelDelegate) {
+      return S_OK;
+    }
+
+    wil::unique_cotaskmem_string json;
+    if (succeededOrLog(args->get_WebMessageAsJson(&json))) {
+      nlohmann::basic_json<> message;
+      try {
+        message = nlohmann::json::parse(wide_to_utf8(json.get()));
+      }
+      catch (nlohmann::json::parse_error& ex) {
+        debugLog("Error parsing JSON message of callHandler method: " + std::string(ex.what()));
+        return S_OK;
+      }
+
+      if (message.is_object() && message.contains("name") && message.at("name").is_string() && message.contains("body") && message.at("body").is_object()) {
+        auto name = message.at("name").get<std::string>();
+        auto body = message.at("body").get<nlohmann::json>();
+
+        if (name.compare("callHandler") == 0) {
+          if (!body.contains("handlerName") || !body.at("handlerName").is_string()) {
+            debugLog("handlerName is null or undefined");
+            return S_OK;
+          }
+
+          auto handlerName = body.at("handlerName").get<std::string>();
+          auto bridgeSecret = body.contains("_bridgeSecret") && body.at("_bridgeSecret").is_string() ? body.at("_bridgeSecret").get<std::string>() : "";
+          auto callHandlerID = body.contains("_callHandlerID") && body.at("_callHandlerID").is_number_integer() ? body.at("_callHandlerID").get<int64_t>() : 0;
+          auto origin = body.contains("origin") && body.at("origin").is_string() ? body.at("origin").get<std::string>() : "";
+          auto requestUrl = body.contains("requestUrl") && body.at("requestUrl").is_string() ? body.at("requestUrl").get<std::string>() : "";
+          auto handlerArgs = body.contains("args") && body.at("args").is_string() ? body.at("args").get<std::string>() : "";
+
+          wil::unique_cotaskmem_string uri;
+          if (succeededOrLog(args->get_Source(&uri))) {
+            requestUrl = wide_to_utf8(uri.get());
+            auto urlSplit = split(requestUrl, std::string{ "://" });
+            if (urlSplit.size() > 1) {
+              auto scheme = urlSplit[0];
+              auto afterScheme = urlSplit[1];
+              auto afterSchemeSplit = split(afterScheme, std::string{ "/" });
+              auto host = afterSchemeSplit[0];
+              origin = scheme + "://" + host;
+            }
+            else {
+              origin = requestUrl;
+            }
+          }
+
+          if (!string_equals(expectedBridgeSecret, bridgeSecret)) {
+            debugLog("Bridge access attempt with wrong secret token, possibly from malicious code from origin: " + origin);
+            return S_OK;
+          }
+
+          bool isOriginAllowed = false;
+          if (settings->javaScriptHandlerOriginAllowList.has_value()) {
+            for (auto& allowedOrigin : settings->javaScriptHandlerOriginAllowList.value()) {
+              if (std::regex_match(origin, std::regex(allowedOrigin))) {
+                isOriginAllowed = true;
+                break;
+              }
+            }
+          }
+          else {
+            // origin is by default allowed if the allow list is null
+            isOriginAllowed = true;
+          }
+          if (!isOriginAllowed) {
+            debugLog("Bridge access attempt from an origin not allowed: " + origin);
+            return S_OK;
+          }
+
+          /*
+          boolean isInternalHandler = true;
+          switch (handlerName) {
+          default:
+            isInternalHandler = false;
+            break;
+          }
+
+          if (isInternalHandler) {
+            evaluateJavascript("if (window." + JavaScriptBridgeJS::get_JAVASCRIPT_BRIDGE_NAME() + "[" + std::to_string(callHandlerID) + "] != null) { \
+                window." + JavaScriptBridgeJS::get_JAVASCRIPT_BRIDGE_NAME() + "[" + std::to_string(callHandlerID) + "].resolve(); \
+                delete window." + JavaScriptBridgeJS::get_JAVASCRIPT_BRIDGE_NAME() + "[" + std::to_string(callHandlerID) + "]; \
+              }", ContentWorld::page(), nullptr);
+            return S_OK;
+          }
+          */
+
+          auto callback = std::make_unique<WebViewChannelDelegate::CallJsHandlerCallback>();
+          callback->defaultBehaviour = [this, callHandlerID](const std::optional<const flutter::EncodableValue*> response)
+            {
+              std::string json = "null";
+              if (response.has_value() && !response.value()->IsNull()) {
+                json = std::get<std::string>(*(response.value()));
+              }
+
+              evaluateJavascript("if (window." + JavaScriptBridgeJS::get_JAVASCRIPT_BRIDGE_NAME() + "[" + std::to_string(callHandlerID) + "] != null) { \
+                      window." + JavaScriptBridgeJS::get_JAVASCRIPT_BRIDGE_NAME() + "[" + std::to_string(callHandlerID) + "].resolve(" + json + "); \
+                      delete window." + JavaScriptBridgeJS::get_JAVASCRIPT_BRIDGE_NAME() + "[" + std::to_string(callHandlerID) + "]; \
+                    }", ContentWorld::page(), nullptr);
+            };
+          callback->error = [this, callHandlerID](const std::string& error_code, const std::string& error_message, const flutter::EncodableValue* error_details)
+            {
+              auto errorMessage = error_code + ", " + error_message;
+              debugLog(errorMessage);
+
+              evaluateJavascript("if (window." + JavaScriptBridgeJS::get_JAVASCRIPT_BRIDGE_NAME() + "[" + std::to_string(callHandlerID) + "] != null) { \
+                      window." + JavaScriptBridgeJS::get_JAVASCRIPT_BRIDGE_NAME() + "[" + std::to_string(callHandlerID) + "].reject(new Error('" + replace_all_copy(errorMessage, "\'", "\\'") + "')); \
+                      delete window." + JavaScriptBridgeJS::get_JAVASCRIPT_BRIDGE_NAME() + "[" + std::to_string(callHandlerID) + "]; \
+                    }", ContentWorld::page(), nullptr);
+            };
+
+          auto data = std::make_unique<JavaScriptHandlerFunctionData>(origin, requestUrl, isMainFrame, handlerArgs);
+          channelDelegate->onCallJsHandler(handlerName, std::move(data), std::move(callback));
+        }
+      }
+      else {
+        debugLog("Invalid JSON message of callHandler method");
+      }
+    }
+
+    return S_OK;
   }
 
   InAppWebView::~InAppWebView()

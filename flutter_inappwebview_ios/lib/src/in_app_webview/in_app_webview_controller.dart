@@ -2712,6 +2712,8 @@ class IOSInAppWebViewController extends PlatformInAppWebViewController
 
   @override
   Future<void> setJavaScriptBridgeName(String bridgeName) async {
+    assert(RegExp(r'^[a-zA-Z_]\w*$').hasMatch(bridgeName),
+      'bridgeName must be a non-empty string with only alphanumeric and underscore characters. It can\'t start with a number.');
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('bridgeName', () => bridgeName);
     await _staticChannel.invokeMethod('setJavaScriptBridgeName', args);

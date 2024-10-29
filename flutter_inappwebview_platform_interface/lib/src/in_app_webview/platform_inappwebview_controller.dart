@@ -2385,10 +2385,17 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///This method should be called before any WebViews are created or when there are no WebViews.
   ///Calling this method after a WebView has been created will not change
   ///the current JavaScript Bridge object and could lead to errors.
+  ///
+  ///The [bridgeName] must be a non-empty string with only alphanumeric and underscore characters.
+  ///It can't start with a number.
+  ///
   ///The default name used by this plugin is `flutter_inappwebview`.
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView
+  ///- iOS
+  ///- macOS
+  ///- Windows
   ///{@endtemplate}
   Future<void> setJavaScriptBridgeName(String bridgeName) {
     throw UnimplementedError(
@@ -2402,6 +2409,9 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView
+  ///- iOS
+  ///- macOS
+  ///- Windows
   ///{@endtemplate}
   Future<String> getJavaScriptBridgeName() {
     throw UnimplementedError(

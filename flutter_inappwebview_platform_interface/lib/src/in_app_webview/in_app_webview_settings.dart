@@ -1635,6 +1635,17 @@ as it can cause framerate drops on animations in Android 9 and lower (see [Hybri
   ])
   bool? pluginScriptsForMainFrameOnly;
 
+  ///The multiplier applied to the scroll amount for the WebView.
+  ///
+  ///This value determines how much the content will scroll in response to user input.
+  ///A higher value means faster scrolling, while a lower value means slower scrolling.
+  ///
+  ///The default value is `1`.
+  @SupportedPlatforms(platforms: [
+    WindowsPlatform(),
+  ])
+  int? scrollMultiplier;
+
   ///Specifies a feature policy for the `<iframe>`.
   ///The policy defines what features are available to the `<iframe>` based on the origin of the request
   ///(e.g. access to the microphone, camera, battery, web-share API, etc.).
@@ -1856,6 +1867,7 @@ as it can cause framerate drops on animations in Android 9 and lower (see [Hybri
     this.javaScriptHandlerOriginAllowList,
     this.pluginScriptsOriginAllowList,
     this.pluginScriptsForMainFrameOnly = false,
+    this.scrollMultiplier = 1,
     this.iframeAllow,
     this.iframeAllowFullscreen,
     this.iframeSandbox,

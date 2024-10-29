@@ -194,6 +194,7 @@ namespace flutter_inappwebview_plugin
     VirtualKeyState virtualKeys_;
 
     const std::string expectedBridgeSecret = get_uuid();
+    bool javaScriptBridgeEnabled = true;
     std::map<UINT64, std::shared_ptr<NavigationAction>> navigationActions_ = {};
     std::shared_ptr<NavigationAction> lastNavigationAction_;
     bool isLoading_ = false;

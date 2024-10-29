@@ -6,20 +6,20 @@
 
 namespace flutter_inappwebview_plugin
 {
-    class JavaScriptHandlerFunctionData
-    {
-    public:
-        const std::string origin;
-        const std::string requestUrl;
-        const bool isMainFrame;
-        const std::string args;
+  class JavaScriptHandlerFunctionData
+  {
+  public:
+    const std::string origin;
+    const std::string requestUrl;
+    const bool isMainFrame;
+    const std::string args;
 
-        JavaScriptHandlerFunctionData(const std::string& origin, const std::string& requestUrl, const bool& isMainFrame, const std::string& args);
-        JavaScriptHandlerFunctionData(const flutter::EncodableMap& map);
-        ~JavaScriptHandlerFunctionData() = default;
+    JavaScriptHandlerFunctionData(const std::string& origin, const std::string& requestUrl, const bool& isMainFrame, const std::string& args);
+    JavaScriptHandlerFunctionData(const flutter::EncodableMap& map);
+    ~JavaScriptHandlerFunctionData() = default;
 
-        flutter::EncodableMap toEncodableMap() const;
-    };
+    flutter::EncodableMap toEncodableMap() const;
+  };
 }
 
 #endif //FLUTTER_INAPPWEBVIEW_PLUGIN_JAVASCRIPT_HANDLER_FUNCTION_DATA_H_

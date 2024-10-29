@@ -23,6 +23,10 @@ namespace flutter_inappwebview_plugin
     bool disableContextMenu = false;
     bool incognito = false;
     std::optional<std::vector<std::string>> javaScriptHandlersOriginAllowList = std::optional<std::vector<std::string>>{};
+    bool javaScriptHandlersForMainFrameOnly = false;
+    bool javaScriptBridgeEnabled = true;
+    std::optional<std::vector<std::string>> javaScriptBridgeOriginAllowList = std::optional<std::vector<std::string>>{};
+    std::optional<bool> javaScriptBridgeForMainFrameOnly = std::optional<bool>{};
     std::optional<std::vector<std::string>> pluginScriptsOriginAllowList = std::optional<std::vector<std::string>>{};
     bool pluginScriptsForMainFrameOnly = false;
     int64_t scrollMultiplier = 1;

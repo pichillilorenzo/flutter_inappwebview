@@ -343,10 +343,7 @@ namespace flutter_inappwebview_plugin
 
     std::string source = userScript->source;
     if (userScript->injectionTime == UserScriptInjectionTime::atDocumentEnd) {
-      source = replace_all_copy(UserContentController::USER_SCRIPTS_AT_DOCUMENT_END_WRAPPER_JS_SOURCE(), VAR_PLACEHOLDER_VALUE, source);
-      std::ostringstream address;
-      address << std::addressof(userScript);
-      replace_all(source, VAR_PLACEHOLDER_MEMORY_ADDRESS_VALUE, address.str());
+      source = "if (document.readyState === 'complete') { " + source + "} else { window.addEventListener('load', function() { " + source + " }); }";
     }
 
     nlohmann::json parameters = {

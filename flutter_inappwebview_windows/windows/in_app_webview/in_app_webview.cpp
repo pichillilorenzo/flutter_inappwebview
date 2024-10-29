@@ -191,6 +191,8 @@ namespace flutter_inappwebview_plugin
       return;
     }
 
+    javaScriptBridgeEnabled = settings->javaScriptBridgeEnabled;
+
     wil::com_ptr<ICoreWebView2Settings> webView2Settings;
     auto hrWebView2Settings = webView->get_Settings(&webView2Settings);
     if (succeededOrLog(hrWebView2Settings)) {
@@ -262,10 +264,15 @@ namespace flutter_inappwebview_plugin
     ).Get()));
 
     if (userContentController) {
-      auto pluginScriptsOriginAllowList = settings->pluginScriptsOriginAllowList;
-      auto pluginScriptsForMainFrameOnly = settings->pluginScriptsForMainFrameOnly;
+      if (javaScriptBridgeEnabled) {
+        auto pluginScriptsOriginAllowList = settings->pluginScriptsOriginAllowList;
+        auto pluginScriptsForMainFrameOnly = settings->pluginScriptsForMainFrameOnly;
 
-      userContentController->addPluginScript(std::move(JavaScriptBridgeJS::JAVASCRIPT_BRIDGE_JS_PLUGIN_SCRIPT(expectedBridgeSecret, pluginScriptsOriginAllowList, pluginScriptsForMainFrameOnly)));
+        auto javaScriptBridgeOriginAllowList = settings->javaScriptBridgeOriginAllowList.has_value() ? settings->javaScriptBridgeOriginAllowList : pluginScriptsOriginAllowList;
+        auto javaScriptBridgeForMainFrameOnly = settings->javaScriptBridgeForMainFrameOnly.has_value() ? settings->javaScriptBridgeForMainFrameOnly.value() : pluginScriptsForMainFrameOnly;
+        userContentController->addPluginScript(std::move(JavaScriptBridgeJS::JAVASCRIPT_BRIDGE_JS_PLUGIN_SCRIPT(expectedBridgeSecret, javaScriptBridgeOriginAllowList, javaScriptBridgeForMainFrameOnly)));
+      }
+
       if (params.initialUserScripts.has_value()) {
         userContentController->addUserOnlyScripts(params.initialUserScripts.value());
       }
@@ -1910,6 +1917,11 @@ namespace flutter_inappwebview_plugin
           }
           if (!isOriginAllowed) {
             debugLog("Bridge access attempt from an origin not allowed: " + origin);
+            return S_OK;
+          }
+
+          if (settings->javaScriptHandlersForMainFrameOnly && !isMainFrame) {
+            debugLog("Bridge access attempt from a sub-frame origin: " + origin);
             return S_OK;
           }
 

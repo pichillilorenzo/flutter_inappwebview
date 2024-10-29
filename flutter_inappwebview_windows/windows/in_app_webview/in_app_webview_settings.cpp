@@ -28,6 +28,14 @@ namespace flutter_inappwebview_plugin
     if (fl_map_contains_not_null(encodableMap, "javaScriptHandlersOriginAllowList")) {
       javaScriptHandlersOriginAllowList = get_optional_fl_map_value<std::vector<std::string>>(encodableMap, "javaScriptHandlersOriginAllowList");
     }
+    javaScriptHandlersForMainFrameOnly = get_fl_map_value(encodableMap, "javaScriptHandlersForMainFrameOnly", javaScriptHandlersForMainFrameOnly);
+    javaScriptBridgeEnabled = get_fl_map_value(encodableMap, "javaScriptBridgeEnabled", javaScriptBridgeEnabled);
+    if (fl_map_contains_not_null(encodableMap, "javaScriptBridgeOriginAllowList")) {
+      javaScriptBridgeOriginAllowList = get_optional_fl_map_value<std::vector<std::string>>(encodableMap, "javaScriptBridgeOriginAllowList");
+    }
+    if (fl_map_contains_not_null(encodableMap, "javaScriptBridgeForMainFrameOnly")) {
+      javaScriptBridgeForMainFrameOnly = get_fl_map_value<bool>(encodableMap, "javaScriptBridgeForMainFrameOnly");
+    }
     if (fl_map_contains_not_null(encodableMap, "pluginScriptsOriginAllowList")) {
       pluginScriptsOriginAllowList = get_optional_fl_map_value<std::vector<std::string>>(encodableMap, "pluginScriptsOriginAllowList");
     }
@@ -50,6 +58,10 @@ namespace flutter_inappwebview_plugin
       {"disableContextMenu", disableContextMenu},
       {"incognito", incognito},
       {"javaScriptHandlersOriginAllowList", make_fl_value(javaScriptHandlersOriginAllowList)},
+      {"javaScriptHandlersForMainFrameOnly", javaScriptHandlersForMainFrameOnly},
+      {"javaScriptBridgeEnabled", javaScriptBridgeEnabled},
+      {"javaScriptBridgeOriginAllowList", make_fl_value(javaScriptBridgeOriginAllowList)},
+      {"javaScriptBridgeForMainFrameOnly", make_fl_value(javaScriptBridgeForMainFrameOnly)},
       {"pluginScriptsOriginAllowList", make_fl_value(pluginScriptsOriginAllowList)},
       {"pluginScriptsForMainFrameOnly", pluginScriptsForMainFrameOnly},
       {"scrollMultiplier", scrollMultiplier},

@@ -28,7 +28,7 @@ public class OnWindowBlurEventJS {
     return
             "(function(){" +
                     "  window.addEventListener('blur', function(e) {" +
-                    "    window." + JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME() + ".callHandler('onWindowBlur');" +
+                    "    window." + JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME() + ".callHandler('onWindowBlur');" +
                     "  });" +
                     "})();";
   }

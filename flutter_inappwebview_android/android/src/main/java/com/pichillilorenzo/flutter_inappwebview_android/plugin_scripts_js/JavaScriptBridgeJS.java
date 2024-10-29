@@ -18,7 +18,7 @@ public class JavaScriptBridgeJS {
   }
 
   @NonNull
-  public static String JAVASCRIPT_BRIDGE_NAME() {
+  public static String get_JAVASCRIPT_BRIDGE_NAME() {
     return _JAVASCRIPT_BRIDGE_NAME;
   }
 
@@ -42,11 +42,11 @@ public class JavaScriptBridgeJS {
   }
 
   public static String JAVASCRIPT_UTIL_VAR_NAME() {
-    return "window." + JAVASCRIPT_BRIDGE_NAME() + "._Util";
+    return "window." + get_JAVASCRIPT_BRIDGE_NAME() + "._Util";
   }
 
   public static String WEB_MESSAGE_CHANNELS_VARIABLE_NAME() {
-    return "window." + JAVASCRIPT_BRIDGE_NAME() + "._webMessageChannels";
+    return "window." + get_JAVASCRIPT_BRIDGE_NAME() + "._webMessageChannels";
   }
 
   public static String UTIL_JS_SOURCE() {
@@ -248,7 +248,7 @@ public class JavaScriptBridgeJS {
   }
 
   public static String JAVASCRIPT_BRIDGE_JS_SOURCE() {
-    return "if (window." + JAVASCRIPT_BRIDGE_NAME() + " != null) {" +
+    return "if (window." + get_JAVASCRIPT_BRIDGE_NAME() + " != null) {" +
             "  (function(window) {" +
             "    var bridgeSecret = '" + VAR_JAVASCRIPT_BRIDGE_BRIDGE_SECRET + "';" +
             "    var origin = '';" +
@@ -261,11 +261,11 @@ public class JavaScriptBridgeJS {
             "      requestUrl = window.location.href;" +
             "    } catch (_) {}" +
             "    try {" +
-            "      isMainFrame = window.self === window.top;" +
+            "      isMainFrame = window === window.top;" +
             "    } catch (_) {}" +
-            "    window." + JAVASCRIPT_BRIDGE_NAME() + ".callHandler = function() {" +
+            "    window." + get_JAVASCRIPT_BRIDGE_NAME() + ".callHandler = function() {" +
             "      var _callHandlerID = setTimeout(function(){});" +
-            "      window." + JAVASCRIPT_BRIDGE_NAME() + "._callHandler(JSON.stringify({" +
+            "      window." + get_JAVASCRIPT_BRIDGE_NAME() + "._callHandler(JSON.stringify({" +
             "        'handlerName': arguments[0]," +
             "        '_callHandlerID': _callHandlerID," +
             "        '_bridgeSecret': bridgeSecret," +
@@ -276,14 +276,14 @@ public class JavaScriptBridgeJS {
             "      }));" +
             "      return new Promise(function(resolve, reject) {" +
             "        try {" +
-            "          (isMainFrame ? window : window.top)." + JAVASCRIPT_BRIDGE_NAME() + "[_callHandlerID] = {resolve: resolve, reject: reject};" +
+            "          (isMainFrame ? window : window.top)." + get_JAVASCRIPT_BRIDGE_NAME() + "[_callHandlerID] = {resolve: resolve, reject: reject};" +
             "        } catch(e) { resolve(); }" +
             "      });" +
             "    };" +
             "  })(window);" +
             "}" +
-            "if (window.top != null && window.top !== window && window." + JAVASCRIPT_BRIDGE_NAME() + " == null) {" +
-            "  window." + JAVASCRIPT_BRIDGE_NAME() + " = {};" +
+            "if (window.top != null && window.top !== window && window." + get_JAVASCRIPT_BRIDGE_NAME() + " == null) {" +
+            "  window." + get_JAVASCRIPT_BRIDGE_NAME() + " = {};" +
             "  (function(window) {" +
             "    var bridgeSecret = '" + VAR_JAVASCRIPT_BRIDGE_BRIDGE_SECRET + "';" +
             "    var origin = '';" +
@@ -296,13 +296,12 @@ public class JavaScriptBridgeJS {
             "      requestUrl = window.location.href;" +
             "    } catch (_) {}" +
             "    try {" +
-            "      isMainFrame = window.self === window.top;" +
+            "      isMainFrame = window === window.top;" +
             "    } catch (_) {}" +
-            "    window." + JAVASCRIPT_BRIDGE_NAME() + ".callHandler = function() {" +
+            "    window." + get_JAVASCRIPT_BRIDGE_NAME() + ".callHandler = function() {" +
             "      var _callHandlerID = setTimeout(function(){});" +
-            "      console.log(window.self === window.top, window.location.href, 'TEST TEST', window.top." + JAVASCRIPT_BRIDGE_NAME() + ");" +
             "      try {" +
-            "        window.top." + JAVASCRIPT_BRIDGE_NAME() + "._callHandler(JSON.stringify({" +
+            "        window.top." + get_JAVASCRIPT_BRIDGE_NAME() + "._callHandler(JSON.stringify({" +
             "          'handlerName': arguments[0]," +
             "          '_callHandlerID': _callHandlerID," +
             "          '_bridgeSecret': bridgeSecret," +
@@ -312,7 +311,7 @@ public class JavaScriptBridgeJS {
             "          'args': JSON.stringify(Array.prototype.slice.call(arguments, 1))" +
             "        }));" +
             "        return new Promise(function(resolve, reject) {" +
-            "          window.top." + JAVASCRIPT_BRIDGE_NAME() + "[_callHandlerID] = {resolve: resolve, reject: reject};" +
+            "          window.top." + get_JAVASCRIPT_BRIDGE_NAME() + "[_callHandlerID] = {resolve: resolve, reject: reject};" +
             "        });" +
             "      } catch (error) {" +
             "        return new Promise(function(resolve, reject) { resolve(); });" +
@@ -320,16 +319,16 @@ public class JavaScriptBridgeJS {
             "    };" +
             "  })(window);" +
             "}" +
-            "if (window." + JAVASCRIPT_BRIDGE_NAME() + " != null) {" +
+            "if (window." + get_JAVASCRIPT_BRIDGE_NAME() + " != null) {" +
             "  " + UTIL_JS_SOURCE() +
             "}";
   }
 
   public static String PLATFORM_READY_JS_SOURCE() {
     return "(function() {" +
-            "  if ((window.top == null || window.top === window) && window." + JAVASCRIPT_BRIDGE_NAME() + " != null && window." + JAVASCRIPT_BRIDGE_NAME() + "._platformReady == null) {" +
+            "  if ((window.top == null || window.top === window) && window." + get_JAVASCRIPT_BRIDGE_NAME() + " != null && window." + get_JAVASCRIPT_BRIDGE_NAME() + "._platformReady == null) {" +
             "    window.dispatchEvent(new Event('flutterInAppWebViewPlatformReady'));" +
-            "    window." + JAVASCRIPT_BRIDGE_NAME() + "._platformReady = true;" +
+            "    window." + get_JAVASCRIPT_BRIDGE_NAME() + "._platformReady = true;" +
             "  }" +
             "})();";
   }

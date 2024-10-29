@@ -12,11 +12,11 @@ public class InterceptAjaxRequestJS {
   public static final String INTERCEPT_AJAX_REQUEST_JS_PLUGIN_SCRIPT_GROUP_NAME = "IN_APP_WEBVIEW_INTERCEPT_AJAX_REQUEST_JS_PLUGIN_SCRIPT";
   public static String FLAG_VARIABLE_FOR_SHOULD_INTERCEPT_AJAX_REQUEST_JS_SOURCE() {
     return
-            JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME() + "._useShouldInterceptAjaxRequest";
+            JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME() + "._useShouldInterceptAjaxRequest";
   }
   public static String FLAG_VARIABLE_FOR_INTERCEPT_ONLY_ASYNC_AJAX_REQUESTS_JS_SOURCE() {
     return
-            JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME() + "._interceptOnlyAsyncAjaxRequests";
+            JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME() + "._interceptOnlyAsyncAjaxRequests";
   }
   public static PluginScript INTERCEPT_AJAX_REQUEST_JS_PLUGIN_SCRIPT(@Nullable Set<String> allowedOriginRules,
                                                                      boolean forMainFrameOnly) {
@@ -137,7 +137,7 @@ public class InterceptAjaxRequestJS {
                     "            total: e.total" +
                     "          }" +
                     "        };" +
-                    "        window." + JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME() + ".callHandler('onAjaxProgress', ajaxRequest).then(function(result) {" +
+                    "        window." + JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME() + ".callHandler('onAjaxProgress', ajaxRequest).then(function(result) {" +
                     "          if (result != null) {" +
                     "            switch (result) {" +
                     "              case 0:" +
@@ -190,7 +190,7 @@ public class InterceptAjaxRequestJS {
                     "                statusText: self.statusText," +
                     "                responseHeaders: responseHeaders" +
                     "              };" +
-                    "              window." + JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME() + ".callHandler('onAjaxReadyStateChange', ajaxRequest).then(function(result) {" +
+                    "              window." + JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME() + ".callHandler('onAjaxReadyStateChange', ajaxRequest).then(function(result) {" +
                     "                if (result != null) {" +
                     "                  switch (result) {" +
                     "                    case 0:" +
@@ -227,7 +227,7 @@ public class InterceptAjaxRequestJS {
                     "          headers: self._flutter_inappwebview_request_headers," +
                     "          responseType: self.responseType" +
                     "        };" +
-                    "        window." + JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME() + ".callHandler('shouldInterceptAjaxRequest', ajaxRequest).then(function(result) {" +
+                    "        window." + JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME() + ".callHandler('shouldInterceptAjaxRequest', ajaxRequest).then(function(result) {" +
                     "          if (result != null) {" +
                     "            switch (result) {" +
                     "              case 0:" +

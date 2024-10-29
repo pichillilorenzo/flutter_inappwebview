@@ -26,9 +26,9 @@ public class PluginScriptsUtil {
                     "  (async function(" + VAR_FUNCTION_ARGUMENT_NAMES + ") {" +
                     "    \n" + VAR_FUNCTION_BODY + "\n" +
                     "  })(" + VAR_FUNCTION_ARGUMENT_VALUES + ").then(function(value) {" +
-                    "    window." + JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME() + ".callHandler('callAsyncJavaScript', {'value': value, 'error': null, 'resultUuid': '" + VAR_RESULT_UUID + "'});" +
+                    "    window." + JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME() + ".callHandler('callAsyncJavaScript', {'value': value, 'error': null, 'resultUuid': '" + VAR_RESULT_UUID + "'});" +
                     "  }).catch(function(error) {" +
-                    "    window." + JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME() + ".callHandler('callAsyncJavaScript', {'value': null, 'error': error + '', 'resultUuid': '" + VAR_RESULT_UUID + "'});" +
+                    "    window." + JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME() + ".callHandler('callAsyncJavaScript', {'value': null, 'error': error + '', 'resultUuid': '" + VAR_RESULT_UUID + "'});" +
                     "  });" +
                     "  return null;" +
                     "})(" + VAR_FUNCTION_ARGUMENTS_OBJ + ");";
@@ -42,7 +42,7 @@ public class PluginScriptsUtil {
                     "} catch(e) {" +
                     "  console.error(e);" +
                     "}" +
-                    "window." + JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME() + ".callHandler('evaluateJavaScriptWithContentWorld', {'value': $IN_APP_WEBVIEW_VARIABLE_RANDOM_NAME, 'resultUuid': '" + VAR_RESULT_UUID + "'});";
+                    "window." + JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME() + ".callHandler('evaluateJavaScriptWithContentWorld', {'value': $IN_APP_WEBVIEW_VARIABLE_RANDOM_NAME, 'resultUuid': '" + VAR_RESULT_UUID + "'});";
   }
 
   public static final String IS_ACTIVE_ELEMENT_INPUT_EDITABLE_JS_SOURCE =
@@ -100,7 +100,7 @@ public class PluginScriptsUtil {
     return
             "(function(){" +
                     "  document.addEventListener('keydown', function(e) {" +
-                    "    window." + JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME() + "._hideContextMenu();" +
+                    "    window." + JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME() + "._hideContextMenu();" +
                     "  });" +
                     "})();";
   }

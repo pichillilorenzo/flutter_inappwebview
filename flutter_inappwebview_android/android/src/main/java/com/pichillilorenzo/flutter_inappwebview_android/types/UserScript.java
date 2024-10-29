@@ -36,7 +36,7 @@ public class UserScript {
     this.forMainFrameOnly = forMainFrameOnly;
   }
 
-  private String wrapSourceCodeAddChecks(String source, @Nullable Set<String> allowedOriginRules, boolean forMainFrameOnly) {
+  static private String wrapSourceCodeAddChecks(String source, @Nullable Set<String> allowedOriginRules, boolean forMainFrameOnly) {
     StringBuilder ifStatement = new StringBuilder("if (");
     if (!WebViewFeature.isFeatureSupported(WebViewFeature.DOCUMENT_START_SCRIPT) &&
             (allowedOriginRules != null && !allowedOriginRules.isEmpty() && !allowedOriginRules.contains("*"))) {
@@ -56,7 +56,7 @@ public class UserScript {
       if (ifStatement.length() > 4) {
         ifStatement.append(" && ");
       }
-      ifStatement.append("window.self === window.top");
+      ifStatement.append("window === window.top");
     }
     return ifStatement.length() > 4 ? ifStatement.append(") {").append(source).append("}").toString() : source;
   }

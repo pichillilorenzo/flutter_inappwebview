@@ -2,7 +2,6 @@ package com.pichillilorenzo.flutter_inappwebview_android.types;
 
 import android.annotation.SuppressLint;
 import android.text.TextUtils;
-import android.util.Log;
 import android.webkit.WebView;
 
 import androidx.annotation.NonNull;
@@ -19,7 +18,6 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -427,15 +425,15 @@ public class UserContentController implements Disposable {
   }
 
   private static String USER_SCRIPTS_AT_DOCUMENT_START_WRAPPER_JS_SOURCE() {
-    return "if (window." + JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME() + " != null && (window." + JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME() + "._userScriptsAtDocumentStartLoaded == null || !window." + JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME() + "._userScriptsAtDocumentStartLoaded)) {" +
-            "  window." + JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME() + "._userScriptsAtDocumentStartLoaded = true;" +
+    return "if (window." + JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME() + " != null && (window." + JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME() + "._userScriptsAtDocumentStartLoaded == null || !window." + JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME() + "._userScriptsAtDocumentStartLoaded)) {" +
+            "  window." + JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME() + "._userScriptsAtDocumentStartLoaded = true;" +
             "  " + PluginScriptsUtil.VAR_PLACEHOLDER_VALUE +
             "}";
   }
 
   private static String USER_SCRIPTS_AT_DOCUMENT_END_WRAPPER_JS_SOURCE() {
-      return "if (window." + JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME() + " != null && (window." + JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME() + "._userScriptsAtDocumentEndLoaded == null || !window." + JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME() + "._userScriptsAtDocumentEndLoaded)) {" +
-              "  window." + JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME() + "._userScriptsAtDocumentEndLoaded = true;" +
+      return "if (window." + JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME() + " != null && (window." + JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME() + "._userScriptsAtDocumentEndLoaded == null || !window." + JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME() + "._userScriptsAtDocumentEndLoaded)) {" +
+              "  window." + JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME() + "._userScriptsAtDocumentEndLoaded = true;" +
               "  " + PluginScriptsUtil.VAR_PLACEHOLDER_VALUE +
               "}";
     }
@@ -446,7 +444,7 @@ public class UserContentController implements Disposable {
                 "    if (document.body == null) {return;}" +
                 "    var contentWorldNames = [" + PluginScriptsUtil.VAR_CONTENT_WORLD_NAME_ARRAY + "];" +
                 "    for (var contentWorldName of contentWorldNames) {" +
-                "      var iframeId = '" + JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME() + "_' + contentWorldName;" +
+                "      var iframeId = '" + JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME() + "_' + contentWorldName;" +
                 "      var iframe = document.getElementById(iframeId);" +
                 "      if (iframe == null) {" +
                 "        iframe = document.createElement('iframe');" +
@@ -454,9 +452,9 @@ public class UserContentController implements Disposable {
                 "        iframe.style = 'display: none; z-index: 0; position: absolute; width: 0px; height: 0px';" +
                 "        document.body.append(iframe);" +
                 "      }" +
-                "      if (iframe.contentWindow.document.getElementById('" + JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME() + "_plugin_scripts') == null) {" +
+                "      if (iframe.contentWindow.document.getElementById('" + JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME() + "_plugin_scripts') == null) {" +
                 "        var script = iframe.contentWindow.document.createElement('script');" +
-                "        script.id = '" + JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME() + "_plugin_scripts';" +
+                "        script.id = '" + JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME() + "_plugin_scripts';" +
                 "        script.innerHTML = " + PluginScriptsUtil.VAR_JSON_SOURCE_ENCODED + ";" +
                 "        iframe.contentWindow.document.body.append(script);" +
                 "      }" +
@@ -470,7 +468,7 @@ public class UserContentController implements Disposable {
           return "(function() {" +
                   "  var interval = setInterval(function() {" +
                   "    if (document.body == null) {return;}" +
-                  "    var iframeId = '" + JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME() + "_" + PluginScriptsUtil.VAR_CONTENT_WORLD_NAME + "';" +
+                  "    var iframeId = '" + JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME() + "_" + PluginScriptsUtil.VAR_CONTENT_WORLD_NAME + "';" +
                   "    var iframe = document.getElementById(iframeId);" +
                   "    if (iframe == null) {" +
                   "      iframe = document.createElement('iframe');" +
@@ -478,7 +476,7 @@ public class UserContentController implements Disposable {
                   "      iframe.style = 'display: none; z-index: 0; position: absolute; width: 0px; height: 0px';" +
                   "      document.body.append(iframe);" +
                   "    }" +
-                  "    if (iframe.contentWindow.document.querySelector('#" + JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME() + "_plugin_scripts') == null) {" +
+                  "    if (iframe.contentWindow.document.querySelector('#" + JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME() + "_plugin_scripts') == null) {" +
                   "      return;" +
                   "    }" +
                   "    var script = iframe.contentWindow.document.createElement('script');" +

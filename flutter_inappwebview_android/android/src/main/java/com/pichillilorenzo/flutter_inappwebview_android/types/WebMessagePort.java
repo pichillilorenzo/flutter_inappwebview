@@ -39,7 +39,7 @@ public class WebMessagePort {
               "  var webMessageChannel = " + JavaScriptBridgeJS.WEB_MESSAGE_CHANNELS_VARIABLE_NAME() + "['" + webMessageChannel.id + "'];" +
               "  if (webMessageChannel != null) {" +
               "      webMessageChannel." + this.name + ".onmessage = function (event) {" +
-              "          window." + JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME() + ".callHandler('onWebMessagePortMessageReceived', {" +
+              "          window." + JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME() + ".callHandler('onWebMessagePortMessageReceived', {" +
               "              'webMessageChannelId': '" + webMessageChannel.id + "'," +
               "              'index': " + index + "," +
               "              'message': event.data" +

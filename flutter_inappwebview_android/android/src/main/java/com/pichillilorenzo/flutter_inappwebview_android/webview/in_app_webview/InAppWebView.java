@@ -102,7 +102,6 @@ import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -248,7 +247,7 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
     }
 
     javaScriptBridgeInterface = new JavaScriptBridgeInterface(this, expectedBridgeSecret);
-    addJavascriptInterface(javaScriptBridgeInterface, JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME());
+    addJavascriptInterface(javaScriptBridgeInterface, JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME());
 
     inAppWebViewChromeClient = new InAppWebViewChromeClient(plugin, this, inAppBrowserDelegate);
     setWebChromeClient(inAppWebViewChromeClient);
@@ -1186,7 +1185,7 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
     if (resultUuid != null && resultCallback != null) {
       evaluateJavaScriptContentWorldCallbacks.put(resultUuid, resultCallback);
       scriptToInject = Util.replaceAll(PluginScriptsUtil.EVALUATE_JAVASCRIPT_WITH_CONTENT_WORLD_WRAPPER_JS_SOURCE(),
-                      PluginScriptsUtil.VAR_RANDOM_NAME, "_" + JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME() + "_" + Math.round(Math.random() * 1000000))
+                      PluginScriptsUtil.VAR_RANDOM_NAME, "_" + JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME() + "_" + Math.round(Math.random() * 1000000))
               .replace(PluginScriptsUtil.VAR_PLACEHOLDER_VALUE, UserContentController.escapeCode(source))
               .replace(PluginScriptsUtil.VAR_RESULT_UUID, resultUuid);
     }
@@ -1231,13 +1230,13 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
         String scriptIdEscaped = idAttr.replaceAll("'", "\\\\'");
         scriptAttributes += " script.id = '" + scriptIdEscaped + "'; ";
         scriptAttributes += " script.onload = function() {" +
-                "  if (window." + JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME() + " != null) {" +
-                "    window." + JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME() + ".callHandler('onInjectedScriptLoaded', '" + scriptIdEscaped + "');" +
+                "  if (window." + JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME() + " != null) {" +
+                "    window." + JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME() + ".callHandler('onInjectedScriptLoaded', '" + scriptIdEscaped + "');" +
                 "  }" +
                 "};";
         scriptAttributes += " script.onerror = function() {" +
-                "  if (window." + JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME() + " != null) {" +
-                "    window." + JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME() + ".callHandler('onInjectedScriptError', '" + scriptIdEscaped + "');" +
+                "  if (window." + JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME() + " != null) {" +
+                "    window." + JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME() + ".callHandler('onInjectedScriptError', '" + scriptIdEscaped + "');" +
                 "  }" +
                 "};";
       }
@@ -2065,7 +2064,7 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
     super.dispose();
     WebSettings settings = getSettings();
     settings.setJavaScriptEnabled(false);
-    removeJavascriptInterface(JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME());
+    removeJavascriptInterface(JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME());
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && WebViewFeature.isFeatureSupported(WebViewFeature.WEB_VIEW_RENDERER_CLIENT_BASIC_USAGE)) {
       WebViewCompat.setWebViewRenderProcessClient(this, null);
     }

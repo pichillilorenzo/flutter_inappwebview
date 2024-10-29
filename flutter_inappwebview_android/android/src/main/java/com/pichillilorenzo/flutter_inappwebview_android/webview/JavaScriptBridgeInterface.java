@@ -178,9 +178,9 @@ public class JavaScriptBridgeInterface {
 
         if (isInternalHandler) {
           if (inAppWebView != null) {
-            String sourceCode = "if (window." + JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME() + "[" + _callHandlerID + "] != null) { " +
-                    "window." + JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME() + "[" + _callHandlerID + "].resolve(); " +
-                    "delete window." + JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME() + "[" + _callHandlerID + "]; " +
+            String sourceCode = "if (window." + JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME() + "[" + _callHandlerID + "] != null) { " +
+                    "window." + JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME() + "[" + _callHandlerID + "].resolve(); " +
+                    "delete window." + JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME() + "[" + _callHandlerID + "]; " +
                     "}";
             inAppWebView.evaluateJavascript(sourceCode, (ValueCallback<String>) null);
           }
@@ -198,9 +198,9 @@ public class JavaScriptBridgeInterface {
                 // The webview has already been disposed, ignore.
                 return;
               }
-              String sourceCode = "if (window." + JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME() + "[" + _callHandlerID + "] != null) { " +
-                      "window." + JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME() + "[" + _callHandlerID + "].resolve(" + json + "); " +
-                      "delete window." + JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME() + "[" + _callHandlerID + "]; " +
+              String sourceCode = "if (window." + JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME() + "[" + _callHandlerID + "] != null) { " +
+                      "window." + JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME() + "[" + _callHandlerID + "].resolve(" + json + "); " +
+                      "delete window." + JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME() + "[" + _callHandlerID + "]; " +
                       "}";
               inAppWebView.evaluateJavascript(sourceCode, (ValueCallback<String>) null);
             }
@@ -215,9 +215,9 @@ public class JavaScriptBridgeInterface {
                 return;
               }
 
-              String sourceCode = "if (window." + JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME() + "[" + _callHandlerID + "] != null) { " +
-                      "window." + JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME() + "[" + _callHandlerID + "].reject(new Error(" + JSONObject.quote(message) + ")); " +
-                      "delete window." + JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME() + "[" + _callHandlerID + "]; " +
+              String sourceCode = "if (window." + JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME() + "[" + _callHandlerID + "] != null) { " +
+                      "window." + JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME() + "[" + _callHandlerID + "].reject(new Error(" + JSONObject.quote(message) + ")); " +
+                      "delete window." + JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME() + "[" + _callHandlerID + "]; " +
                       "}";
               inAppWebView.evaluateJavascript(sourceCode, (ValueCallback<String>) null);
             }

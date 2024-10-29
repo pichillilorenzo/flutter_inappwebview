@@ -28,7 +28,7 @@ public class OnWindowFocusEventJS {
     return
             "(function(){" +
                     "  window.addEventListener('focus', function(e) {" +
-                    "    window." + JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME() + ".callHandler('onWindowFocus');" +
+                    "    window." + JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME() + ".callHandler('onWindowFocus');" +
                     "  });" +
                     "})();";
   }

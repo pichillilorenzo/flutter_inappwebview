@@ -12,7 +12,7 @@ public class InterceptFetchRequestJS {
   public static final String INTERCEPT_FETCH_REQUEST_JS_PLUGIN_SCRIPT_GROUP_NAME = "IN_APP_WEBVIEW_INTERCEPT_FETCH_REQUEST_JS_PLUGIN_SCRIPT";
 
   public static String FLAG_VARIABLE_FOR_SHOULD_INTERCEPT_FETCH_REQUEST_JS_SOURCE() {
-    return JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME() + "._useShouldInterceptFetchRequest";
+    return JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME() + "._useShouldInterceptFetchRequest";
   }
 
   public static PluginScript INTERCEPT_FETCH_REQUEST_JS_PLUGIN_SCRIPT(@Nullable Set<String> allowedOriginRules,
@@ -87,7 +87,7 @@ public class InterceptFetchRequestJS {
             "      fetchRequest.credentials = " + JavaScriptBridgeJS.JAVASCRIPT_UTIL_VAR_NAME() + ".convertCredentialsToJson(fetchRequest.credentials);" +
             "      return " + JavaScriptBridgeJS.JAVASCRIPT_UTIL_VAR_NAME() + ".convertBodyRequest(fetchRequest.body).then(function(body) {" +
             "        fetchRequest.body = body;" +
-            "        return window." + JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME() + ".callHandler('shouldInterceptFetchRequest', fetchRequest).then(function(result) {" +
+            "        return window." + JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME() + ".callHandler('shouldInterceptFetchRequest', fetchRequest).then(function(result) {" +
             "          if (result != null) {" +
             "            switch (result.action) {" +
             "              case 0:" +

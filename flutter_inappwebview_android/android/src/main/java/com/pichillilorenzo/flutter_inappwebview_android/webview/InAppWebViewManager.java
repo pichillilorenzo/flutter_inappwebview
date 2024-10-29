@@ -177,7 +177,7 @@ public class InAppWebViewManager extends ChannelDelegateImpl {
         break;
       case "getJavaScriptBridgeName":
         {
-          result.success(JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME());
+          result.success(JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME());
         }
         break;
       default:

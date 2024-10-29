@@ -38,7 +38,7 @@ Future main() async {
     await InAppWebViewController.setWebContentsDebuggingEnabled(kDebugMode);
   }
 
-  await InAppWebViewController.setJavaScriptBridgeName('my00__JavaScriptBridge ');
+  await InAppWebViewController.setJavaScriptBridgeName('custom_js_bridge');
 
   runApp(MyApp());
 }

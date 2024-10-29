@@ -11,7 +11,7 @@
 Implemented security features to better manage access to the native javascript bridge.
 
 #### Platform Interface
-- Added `javaScriptHandlerOriginAllowList`, `pluginScriptsOriginAllowList`, `pluginScriptsForMainFrameOnly`, `scrollMultiplier` InAppWebViewSettings parameters
+- Added `javaScriptBridgeEnabled`, `javaScriptBridgeOriginAllowList`, `javaScriptBridgeForMainFrameOnly`, `pluginScriptsOriginAllowList`, `pluginScriptsForMainFrameOnly`, `javaScriptHandlersOriginAllowList`, `javaScriptHandlersForMainFrameOnly`, `scrollMultiplier` InAppWebViewSettings parameters
 - Added `setJavaScriptBridgeName`, `getJavaScriptBridgeName` static WebView controller methods
 - Added `PlatformInAppLocalhostServer.onData` parameter to set a custom on data server callback
 - Added `JavaScriptHandlerFunctionData` type

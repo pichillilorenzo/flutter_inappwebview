@@ -55,7 +55,10 @@ public class InAppWebViewSettings: ISettings<InAppWebView> {
     var isElementFullscreenEnabled = true
     var isInspectable = false
     var shouldPrintBackgrounds = false
-    var javaScriptHandlerOriginAllowList: [String]? = nil
+    var javaScriptHandlersOriginAllowList: [String]? = nil
+    var javaScriptBridgeEnabled = true
+    var javaScriptBridgeOriginAllowList: [String]? = nil
+    var javaScriptBridgeForMainFrameOnly = false
     var pluginScriptsOriginAllowList: [String]? = nil
     var pluginScriptsForMainFrameOnly = false
     

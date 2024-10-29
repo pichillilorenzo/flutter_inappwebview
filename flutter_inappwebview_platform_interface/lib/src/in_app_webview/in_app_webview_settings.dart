@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_internal_annotations.dart';
+import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_platform_interface.dart';
 import 'dart:typed_data';
 
 import '../platform_webview_asset_loader.dart';
@@ -1595,9 +1596,12 @@ as it can cause framerate drops on animations in Android 9 and lower (see [Hybri
   ])
   bool? shouldPrintBackgrounds;
 
-  ///A list of Regular Expression Patterns that will be used on native side to match the allowed origins
+  ///A [Set] of Regular Expression Patterns that will be used on native side to match the allowed origins
   ///that are able to execute the JavaScript Handlers defined for the current WebView.
   ///This will affect also the internal JavaScript Handlers used by the plugin itself.
+  ///
+  ///An empty [Set] will block every origin.
+  ///
   ///The default value is `null` and will allow every origin.
   @SupportedPlatforms(platforms: [
     AndroidPlatform(),
@@ -1605,15 +1609,89 @@ as it can cause framerate drops on animations in Android 9 and lower (see [Hybri
     MacOSPlatform(),
     WindowsPlatform(),
   ])
-  Set<String>? javaScriptHandlerOriginAllowList;
+  Set<String>? javaScriptHandlersOriginAllowList;
 
-  ///A list of patterns that will be used to match the allowed origins
-  ///that are able to load all the internal plugin [UserScript]s used by the plugin itself.
+  ///Set to `true` to allow to execute the JavaScript Handlers only on the main frame.
+  ///This will affect also the internal JavaScript Handlers used by the plugin itself.
+  ///The default value is `false`.
+  @SupportedPlatforms(platforms: [
+    AndroidPlatform(),
+    IOSPlatform(),
+    MacOSPlatform(),
+    WindowsPlatform(),
+  ])
+  bool? javaScriptHandlersForMainFrameOnly;
+
+  ///Set to `false` to disable the JavaScript Bridge completely.
+  ///This will affect also all the internal plugin [UserScript]s
+  ///that are using the JavaScript Bridge to work.
+  ///
+  ///**NOTE**: setting or changing this value after the WebView has been created won't have any effect.
+  ///It should be set when initializing the WebView through [PlatformWebViewCreationParams.initialSettings] parameter.
+  ///
+  ///The default value is `true`.
+  @SupportedPlatforms(platforms: [
+    AndroidPlatform(),
+    IOSPlatform(),
+    MacOSPlatform(),
+    WindowsPlatform(),
+  ])
+  bool? javaScriptBridgeEnabled;
+
+  ///A [Set] of patterns that will be used to match the allowed origins where
+  ///the JavaScript Bridge could be used.
+  ///If [pluginScriptsOriginAllowList] is present, then this value will override
+  ///it only for the JavaScript Bridge internal plugin.
   ///Adding `'*'` as an allowed origin or setting this to `null`, it means it will allow every origin.
+  ///Instead, an empty [Set] will block every origin and, in this case,
+  ///it will force the behaviour of the [javaScriptBridgeEnabled] parameter,
+  ///as it was set to `false`.
+  ///
+  ///**NOTE**: setting or changing this value after the WebView has been created won't have any effect.
+  ///It should be set when initializing the WebView through [PlatformWebViewCreationParams.initialSettings] parameter.
   ///
   ///**NOTE for Android**: each origin pattern MUST follow the table rule of [PlatformInAppWebViewController.addWebMessageListener].
   ///
-  ///**NOTE for iOS and macOS**: each origin pattern will be used as a
+  ///**NOTE for iOS, macOS, Windows**: each origin pattern will be used as a
+  ///Regular Expression Pattern that will be used on JavaScript side using [RegExp](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp).
+  ///
+  ///The default value is `null` and will allow every origin.
+  @SupportedPlatforms(platforms: [
+    AndroidPlatform(),
+    IOSPlatform(),
+    MacOSPlatform(),
+    WindowsPlatform(),
+  ])
+  Set<String>? javaScriptBridgeOriginAllowList;
+
+  ///Set to `true` to allow the JavaScript Bridge only on the main frame.
+  ///If [pluginScriptsForMainFrameOnly] is present, then this value will override
+  ///it only for the JavaScript Bridge internal plugin.
+  ///
+  ///**NOTE**: setting or changing this value after the WebView has been created won't have any effect.
+  ///It should be set when initializing the WebView through [PlatformWebViewCreationParams.initialSettings] parameter.
+  ///
+  ///The default value is `false`.
+  @SupportedPlatforms(platforms: [
+    AndroidPlatform(),
+    IOSPlatform(),
+    MacOSPlatform(),
+    WindowsPlatform(),
+  ])
+  bool? javaScriptBridgeForMainFrameOnly;
+
+  ///A [Set] of patterns that will be used to match the allowed origins
+  ///that are able to load all the internal plugin [UserScript]s used by the plugin itself.
+  ///Adding `'*'` as an allowed origin or setting this to `null`, it means it will allow every origin.
+  ///Instead, an empty [Set] will block every origin.
+  ///
+  ///**NOTE**: If [javaScriptBridgeOriginAllowList] is not present, this value will affect also the JavaScript Bridge internal plugin.
+  ///Also, setting or changing this value after the WebView has been created won't have any effect.
+  ///It should be set when initializing the WebView through [PlatformWebViewCreationParams.initialSettings] parameter.
+  ///
+  ///**NOTE for Android**: each origin pattern MUST follow the table rule of [PlatformInAppWebViewController.addWebMessageListener].
+  ///
+  ///**NOTE for iOS, macOS, Windows**: each origin pattern will be used as a
   ///Regular Expression Pattern that will be used on JavaScript side using [RegExp](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp).
   ///
   ///The default value is `null` and will allow every origin.
@@ -1626,6 +1704,11 @@ as it can cause framerate drops on animations in Android 9 and lower (see [Hybri
   Set<String>? pluginScriptsOriginAllowList;
 
   ///Set to `true` to allow internal plugin [UserScript]s only on the main frame.
+  ///
+  ///**NOTE**: If [javaScriptBridgeForMainFrameOnly] is not present, this value will affect also the JavaScript Bridge internal plugin.
+  ///Also, setting or changing this value after the WebView has been created won't have any effect.
+  ///It should be set when initializing the WebView through [PlatformWebViewCreationParams.initialSettings] parameter.
+  ///
   ///The default value is `false`.
   @SupportedPlatforms(platforms: [
     AndroidPlatform(),
@@ -1864,7 +1947,11 @@ as it can cause framerate drops on animations in Android 9 and lower (see [Hybri
     this.shouldPrintBackgrounds = false,
     this.allowBackgroundAudioPlaying = false,
     this.webViewAssetLoader,
-    this.javaScriptHandlerOriginAllowList,
+    this.javaScriptHandlersOriginAllowList,
+    this.javaScriptHandlersForMainFrameOnly,
+    this.javaScriptBridgeEnabled = true,
+    this.javaScriptBridgeOriginAllowList,
+    this.javaScriptBridgeForMainFrameOnly,
     this.pluginScriptsOriginAllowList,
     this.pluginScriptsForMainFrameOnly = false,
     this.scrollMultiplier = 1,

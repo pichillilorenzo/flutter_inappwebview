@@ -39,7 +39,12 @@ public class UserScript {
   static private String wrapSourceCodeAddChecks(String source, @Nullable Set<String> allowedOriginRules, boolean forMainFrameOnly) {
     StringBuilder ifStatement = new StringBuilder("if (");
     if (!WebViewFeature.isFeatureSupported(WebViewFeature.DOCUMENT_START_SCRIPT) &&
-            (allowedOriginRules != null && !allowedOriginRules.isEmpty() && !allowedOriginRules.contains("*"))) {
+            (allowedOriginRules != null && !allowedOriginRules.contains("*"))) {
+      if (allowedOriginRules.isEmpty()) {
+        // return empty source string if allowedOriginRules is an empty list.
+        // an empty list means that this UserScript is not allowed for any origin.
+        return "";
+      }
       StringBuilder jsRegExpArray = new StringBuilder("[");
       for (String allowedOriginRule : allowedOriginRules) {
         if (jsRegExpArray.length() > 1) {

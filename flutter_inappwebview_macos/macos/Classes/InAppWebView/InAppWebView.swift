@@ -50,7 +50,8 @@ public class InAppWebView: WKWebView, WKUIDelegate,
     
     fileprivate var interceptOnlyAsyncAjaxRequestsPluginScript: PluginScript?
     
-    private var exceptedBridgeSecret = NSUUID().uuidString;
+    private var exceptedBridgeSecret = NSUUID().uuidString
+    private var javaScriptBridgeEnabled = true
     
     init(id: Any?, plugin: InAppWebViewFlutterPlugin?, frame: CGRect, configuration: WKWebViewConfiguration,
          userScripts: [UserScript] = []) {
@@ -120,6 +121,11 @@ public class InAppWebView: WKWebView, WKUIDelegate,
 //        }
         
         if let settings = settings {
+            javaScriptBridgeEnabled = settings.javaScriptBridgeEnabled
+            if let javaScriptBridgeOriginAllowList = settings.javaScriptBridgeOriginAllowList, javaScriptBridgeOriginAllowList.isEmpty {
+                // an empty list means that the JavaScript Bridge is not allowed for any origin.
+                javaScriptBridgeEnabled = false
+            }
             
             if #available(macOS 12.0, *), settings.transparentBackground {
                 underPageBackgroundColor = .clear
@@ -201,46 +207,51 @@ public class InAppWebView: WKWebView, WKUIDelegate,
             return
         }
         
-        let allowedOriginRules = settings?.pluginScriptsOriginAllowList
-        let forMainFrameOnly = settings?.pluginScriptsForMainFrameOnly ?? true
-                
-        configuration.userContentController.addPluginScript(PromisePolyfillJS.PROMISE_POLYFILL_JS_PLUGIN_SCRIPT(allowedOriginRules: allowedOriginRules, forMainFrameOnly: forMainFrameOnly))
-        configuration.userContentController.addPluginScript(JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_JS_PLUGIN_SCRIPT(expectedBridgeSecret: exceptedBridgeSecret, allowedOriginRules: allowedOriginRules, forMainFrameOnly: forMainFrameOnly))
-        configuration.userContentController.addPluginScript(ConsoleLogJS.CONSOLE_LOG_JS_PLUGIN_SCRIPT(allowedOriginRules: allowedOriginRules, forMainFrameOnly: forMainFrameOnly))
-        configuration.userContentController.addPluginScript(PrintJS.PRINT_JS_PLUGIN_SCRIPT(allowedOriginRules: allowedOriginRules, forMainFrameOnly: forMainFrameOnly))
-        configuration.userContentController.addPluginScript(OnWindowBlurEventJS.ON_WINDOW_BLUR_EVENT_JS_PLUGIN_SCRIPT(allowedOriginRules: allowedOriginRules))
-        configuration.userContentController.addPluginScript(OnWindowFocusEventJS.ON_WINDOW_FOCUS_EVENT_JS_PLUGIN_SCRIPT(allowedOriginRules: allowedOriginRules))
-        configuration.userContentController.addPluginScript(FindElementsAtPointJS.FIND_ELEMENTS_AT_POINT_JS_PLUGIN_SCRIPT(allowedOriginRules: allowedOriginRules))
-        configuration.userContentController.addPluginScript(FindTextHighlightJS.FIND_TEXT_HIGHLIGHT_JS_PLUGIN_SCRIPT(allowedOriginRules: allowedOriginRules))
-        configuration.userContentController.addPluginScript(OriginalViewPortMetaTagContentJS.ORIGINAL_VIEWPORT_METATAG_CONTENT_JS_PLUGIN_SCRIPT(allowedOriginRules: allowedOriginRules))
-        configuration.userContentController.addPluginScript(OnScrollChangedJS.ON_SCROLL_CHANGED_EVENT_JS_PLUGIN_SCRIPT(allowedOriginRules: allowedOriginRules))
-        if let settings = settings {
-            interceptOnlyAsyncAjaxRequestsPluginScript = InterceptAjaxRequestJS.createInterceptOnlyAsyncAjaxRequestsPluginScript(onlyAsync: settings.interceptOnlyAsyncAjaxRequests,
-                                                                                                                                 allowedOriginRules: allowedOriginRules, forMainFrameOnly: forMainFrameOnly)
-            if settings.useShouldInterceptAjaxRequest {
-                if let interceptOnlyAsyncAjaxRequestsPluginScript = interceptOnlyAsyncAjaxRequestsPluginScript {
-                    configuration.userContentController.addPluginScript(interceptOnlyAsyncAjaxRequestsPluginScript)
+        if javaScriptBridgeEnabled {
+            let pluginScriptsOriginAllowList = settings?.pluginScriptsOriginAllowList
+            let pluginScriptsForMainFrameOnly = settings?.pluginScriptsForMainFrameOnly ?? true
+            
+            let javaScriptBridgeOriginAllowList = settings?.javaScriptBridgeOriginAllowList ?? pluginScriptsOriginAllowList
+            let javaScriptBridgeForMainFrameOnly = settings?.javaScriptBridgeForMainFrameOnly ?? pluginScriptsForMainFrameOnly
+            
+            configuration.userContentController.addPluginScript(PromisePolyfillJS.PROMISE_POLYFILL_JS_PLUGIN_SCRIPT(allowedOriginRules: pluginScriptsOriginAllowList, forMainFrameOnly: pluginScriptsForMainFrameOnly))
+            configuration.userContentController.addPluginScript(JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_JS_PLUGIN_SCRIPT(expectedBridgeSecret: exceptedBridgeSecret, allowedOriginRules: javaScriptBridgeOriginAllowList, forMainFrameOnly: javaScriptBridgeForMainFrameOnly))
+            configuration.userContentController.addPluginScript(ConsoleLogJS.CONSOLE_LOG_JS_PLUGIN_SCRIPT(allowedOriginRules: pluginScriptsOriginAllowList, forMainFrameOnly: pluginScriptsForMainFrameOnly))
+            configuration.userContentController.addPluginScript(PrintJS.PRINT_JS_PLUGIN_SCRIPT(allowedOriginRules: pluginScriptsOriginAllowList, forMainFrameOnly: pluginScriptsForMainFrameOnly))
+            configuration.userContentController.addPluginScript(OnWindowBlurEventJS.ON_WINDOW_BLUR_EVENT_JS_PLUGIN_SCRIPT(allowedOriginRules: pluginScriptsOriginAllowList))
+            configuration.userContentController.addPluginScript(OnWindowFocusEventJS.ON_WINDOW_FOCUS_EVENT_JS_PLUGIN_SCRIPT(allowedOriginRules: pluginScriptsOriginAllowList))
+            configuration.userContentController.addPluginScript(FindElementsAtPointJS.FIND_ELEMENTS_AT_POINT_JS_PLUGIN_SCRIPT(allowedOriginRules: pluginScriptsOriginAllowList))
+            configuration.userContentController.addPluginScript(FindTextHighlightJS.FIND_TEXT_HIGHLIGHT_JS_PLUGIN_SCRIPT(allowedOriginRules: pluginScriptsOriginAllowList))
+            configuration.userContentController.addPluginScript(OriginalViewPortMetaTagContentJS.ORIGINAL_VIEWPORT_METATAG_CONTENT_JS_PLUGIN_SCRIPT(allowedOriginRules: pluginScriptsOriginAllowList))
+            configuration.userContentController.addPluginScript(OnScrollChangedJS.ON_SCROLL_CHANGED_EVENT_JS_PLUGIN_SCRIPT(allowedOriginRules: pluginScriptsOriginAllowList))
+            if let settings = settings {
+                interceptOnlyAsyncAjaxRequestsPluginScript = InterceptAjaxRequestJS.createInterceptOnlyAsyncAjaxRequestsPluginScript(onlyAsync: settings.interceptOnlyAsyncAjaxRequests,
+                                                                                                                                     allowedOriginRules: pluginScriptsOriginAllowList, forMainFrameOnly: pluginScriptsForMainFrameOnly)
+                if settings.useShouldInterceptAjaxRequest {
+                    if let interceptOnlyAsyncAjaxRequestsPluginScript = interceptOnlyAsyncAjaxRequestsPluginScript {
+                        configuration.userContentController.addPluginScript(interceptOnlyAsyncAjaxRequestsPluginScript)
+                    }
+                    configuration.userContentController.addPluginScript(InterceptAjaxRequestJS.INTERCEPT_AJAX_REQUEST_JS_PLUGIN_SCRIPT(allowedOriginRules: pluginScriptsOriginAllowList, forMainFrameOnly: pluginScriptsForMainFrameOnly))
                 }
-                configuration.userContentController.addPluginScript(InterceptAjaxRequestJS.INTERCEPT_AJAX_REQUEST_JS_PLUGIN_SCRIPT(allowedOriginRules: allowedOriginRules, forMainFrameOnly: forMainFrameOnly))
+                if settings.useShouldInterceptFetchRequest {
+                    configuration.userContentController.addPluginScript(InterceptFetchRequestJS.INTERCEPT_FETCH_REQUEST_JS_PLUGIN_SCRIPT(allowedOriginRules: pluginScriptsOriginAllowList, forMainFrameOnly: pluginScriptsForMainFrameOnly))
+                }
+                if settings.useOnLoadResource {
+                    configuration.userContentController.addPluginScript(OnLoadResourceJS.ON_LOAD_RESOURCE_JS_PLUGIN_SCRIPT(allowedOriginRules: pluginScriptsOriginAllowList, forMainFrameOnly: pluginScriptsForMainFrameOnly))
+                }
+                if !settings.supportZoom {
+                    configuration.userContentController.addPluginScript(SupportZoomJS.NOT_SUPPORT_ZOOM_JS_PLUGIN_SCRIPT(allowedOriginRules: pluginScriptsOriginAllowList))
+                } else if settings.enableViewportScale {
+                    configuration.userContentController.addPluginScript(EnableViewportScaleJS.ENABLE_VIEWPORT_SCALE_JS_PLUGIN_SCRIPT(allowedOriginRules: pluginScriptsOriginAllowList))
+                }
             }
-            if settings.useShouldInterceptFetchRequest {
-                configuration.userContentController.addPluginScript(InterceptFetchRequestJS.INTERCEPT_FETCH_REQUEST_JS_PLUGIN_SCRIPT(allowedOriginRules: allowedOriginRules, forMainFrameOnly: forMainFrameOnly))
-            }
-            if settings.useOnLoadResource {
-                configuration.userContentController.addPluginScript(OnLoadResourceJS.ON_LOAD_RESOURCE_JS_PLUGIN_SCRIPT(allowedOriginRules: allowedOriginRules, forMainFrameOnly: forMainFrameOnly))
-            }
-            if !settings.supportZoom {
-                configuration.userContentController.addPluginScript(SupportZoomJS.NOT_SUPPORT_ZOOM_JS_PLUGIN_SCRIPT(allowedOriginRules: allowedOriginRules))
-            } else if settings.enableViewportScale {
-                configuration.userContentController.addPluginScript(EnableViewportScaleJS.ENABLE_VIEWPORT_SCALE_JS_PLUGIN_SCRIPT(allowedOriginRules: allowedOriginRules))
-            }
+            configuration.userContentController.removeScriptMessageHandler(forName: "onCallAsyncJavaScriptResultBelowIOS14Received")
+            configuration.userContentController.add(self, name: "onCallAsyncJavaScriptResultBelowIOS14Received")
+            configuration.userContentController.removeScriptMessageHandler(forName: "onWebMessagePortMessageReceived")
+            configuration.userContentController.add(self, name: "onWebMessagePortMessageReceived")
+            configuration.userContentController.removeScriptMessageHandler(forName: "onWebMessageListenerPostMessageReceived")
+            configuration.userContentController.add(self, name: "onWebMessageListenerPostMessageReceived")
         }
-        configuration.userContentController.removeScriptMessageHandler(forName: "onCallAsyncJavaScriptResultBelowIOS14Received")
-        configuration.userContentController.add(self, name: "onCallAsyncJavaScriptResultBelowIOS14Received")
-        configuration.userContentController.removeScriptMessageHandler(forName: "onWebMessagePortMessageReceived")
-        configuration.userContentController.add(self, name: "onWebMessagePortMessageReceived")
-        configuration.userContentController.removeScriptMessageHandler(forName: "onWebMessageListenerPostMessageReceived")
-        configuration.userContentController.add(self, name: "onWebMessageListenerPostMessageReceived")
         configuration.userContentController.addUserOnlyScripts(initialUserScripts)
         configuration.userContentController.sync(scriptMessageHandler: self)
     }
@@ -578,7 +589,9 @@ public class InAppWebView: WKWebView, WKUIDelegate,
                 }
             } else {
                 evaluateJavaScript(EnableViewportScaleJS.ENABLE_VIEWPORT_SCALE_JS_SOURCE)
-                configuration.userContentController.addUserScript(EnableViewportScaleJS.ENABLE_VIEWPORT_SCALE_JS_PLUGIN_SCRIPT(allowedOriginRules: newSettings.pluginScriptsOriginAllowList))
+                if javaScriptBridgeEnabled {
+                    configuration.userContentController.addPluginScript(EnableViewportScaleJS.ENABLE_VIEWPORT_SCALE_JS_PLUGIN_SCRIPT(allowedOriginRules: newSettings.pluginScriptsOriginAllowList))
+                }
             }
         }
         
@@ -590,16 +603,20 @@ public class InAppWebView: WKWebView, WKUIDelegate,
                 }
             } else {
                 evaluateJavaScript(SupportZoomJS.NOT_SUPPORT_ZOOM_JS_SOURCE)
-                configuration.userContentController.addUserScript(SupportZoomJS.NOT_SUPPORT_ZOOM_JS_PLUGIN_SCRIPT(allowedOriginRules: newSettings.pluginScriptsOriginAllowList))
+                if javaScriptBridgeEnabled {
+                    configuration.userContentController.addPluginScript(SupportZoomJS.NOT_SUPPORT_ZOOM_JS_PLUGIN_SCRIPT(allowedOriginRules: newSettings.pluginScriptsOriginAllowList))
+                }
             }
         }
         
         if newSettingsMap["useOnLoadResource"] != nil && settings?.useOnLoadResource != newSettings.useOnLoadResource {
             if let applePayAPIEnabled = settings?.applePayAPIEnabled, !applePayAPIEnabled {
-                enablePluginScriptAtRuntime(flagVariable: OnLoadResourceJS.FLAG_VARIABLE_FOR_ON_LOAD_RESOURCE_JS_SOURCE(),
-                                            enable: newSettings.useOnLoadResource,
-                                            pluginScript: OnLoadResourceJS.ON_LOAD_RESOURCE_JS_PLUGIN_SCRIPT(allowedOriginRules: newSettings.pluginScriptsOriginAllowList,
-                                                                                                             forMainFrameOnly: newSettings.pluginScriptsForMainFrameOnly))
+                if javaScriptBridgeEnabled {
+                    enablePluginScriptAtRuntime(flagVariable: OnLoadResourceJS.FLAG_VARIABLE_FOR_ON_LOAD_RESOURCE_JS_SOURCE(),
+                                                enable: newSettings.useOnLoadResource,
+                                                pluginScript: OnLoadResourceJS.ON_LOAD_RESOURCE_JS_PLUGIN_SCRIPT(allowedOriginRules: newSettings.pluginScriptsOriginAllowList,
+                                                                                                                 forMainFrameOnly: newSettings.pluginScriptsForMainFrameOnly))
+                }
             } else {
                 newSettings.useOnLoadResource = false
             }
@@ -607,10 +624,12 @@ public class InAppWebView: WKWebView, WKUIDelegate,
         
         if newSettingsMap["useShouldInterceptAjaxRequest"] != nil && settings?.useShouldInterceptAjaxRequest != newSettings.useShouldInterceptAjaxRequest {
             if let applePayAPIEnabled = settings?.applePayAPIEnabled, !applePayAPIEnabled {
-                enablePluginScriptAtRuntime(flagVariable: InterceptAjaxRequestJS.FLAG_VARIABLE_FOR_SHOULD_INTERCEPT_AJAX_REQUEST_JS_SOURCE(),
-                                            enable: newSettings.useShouldInterceptAjaxRequest,
-                                            pluginScript: InterceptAjaxRequestJS.INTERCEPT_AJAX_REQUEST_JS_PLUGIN_SCRIPT(allowedOriginRules: newSettings.pluginScriptsOriginAllowList,
-                                                                                                                         forMainFrameOnly: newSettings.pluginScriptsForMainFrameOnly))
+                if javaScriptBridgeEnabled {
+                    enablePluginScriptAtRuntime(flagVariable: InterceptAjaxRequestJS.FLAG_VARIABLE_FOR_SHOULD_INTERCEPT_AJAX_REQUEST_JS_SOURCE(),
+                                                enable: newSettings.useShouldInterceptAjaxRequest,
+                                                pluginScript: InterceptAjaxRequestJS.INTERCEPT_AJAX_REQUEST_JS_PLUGIN_SCRIPT(allowedOriginRules: newSettings.pluginScriptsOriginAllowList,
+                                                                                                                             forMainFrameOnly: newSettings.pluginScriptsForMainFrameOnly))
+                }
             } else {
                 newSettings.useShouldInterceptAjaxRequest = false
             }
@@ -619,18 +638,22 @@ public class InAppWebView: WKWebView, WKUIDelegate,
         if newSettingsMap["interceptOnlyAsyncAjaxRequests"] != nil && settings?.interceptOnlyAsyncAjaxRequests != newSettings.interceptOnlyAsyncAjaxRequests {
             if let applePayAPIEnabled = settings?.applePayAPIEnabled, !applePayAPIEnabled,
                let interceptOnlyAsyncAjaxRequestsPluginScript = interceptOnlyAsyncAjaxRequestsPluginScript {
-                enablePluginScriptAtRuntime(flagVariable: InterceptAjaxRequestJS.FLAG_VARIABLE_FOR_INTERCEPT_ONLY_ASYNC_AJAX_REQUESTS_JS_SOURCE(),
-                                            enable: newSettings.interceptOnlyAsyncAjaxRequests,
-                                            pluginScript: interceptOnlyAsyncAjaxRequestsPluginScript)
+                if javaScriptBridgeEnabled {
+                    enablePluginScriptAtRuntime(flagVariable: InterceptAjaxRequestJS.FLAG_VARIABLE_FOR_INTERCEPT_ONLY_ASYNC_AJAX_REQUESTS_JS_SOURCE(),
+                                                enable: newSettings.interceptOnlyAsyncAjaxRequests,
+                                                pluginScript: interceptOnlyAsyncAjaxRequestsPluginScript)
+                }
             }
         }
         
         if newSettingsMap["useShouldInterceptFetchRequest"] != nil && settings?.useShouldInterceptFetchRequest != newSettings.useShouldInterceptFetchRequest {
             if let applePayAPIEnabled = settings?.applePayAPIEnabled, !applePayAPIEnabled {
-                enablePluginScriptAtRuntime(flagVariable: InterceptFetchRequestJS.FLAG_VARIABLE_FOR_SHOULD_INTERCEPT_FETCH_REQUEST_JS_SOURCE(),
-                                            enable: newSettings.useShouldInterceptFetchRequest,
-                                            pluginScript: InterceptFetchRequestJS.INTERCEPT_FETCH_REQUEST_JS_PLUGIN_SCRIPT(allowedOriginRules: newSettings.pluginScriptsOriginAllowList,
-                                                                                                                           forMainFrameOnly: newSettings.pluginScriptsForMainFrameOnly))
+                if javaScriptBridgeEnabled {
+                    enablePluginScriptAtRuntime(flagVariable: InterceptFetchRequestJS.FLAG_VARIABLE_FOR_SHOULD_INTERCEPT_FETCH_REQUEST_JS_SOURCE(),
+                                                enable: newSettings.useShouldInterceptFetchRequest,
+                                                pluginScript: InterceptFetchRequestJS.INTERCEPT_FETCH_REQUEST_JS_PLUGIN_SCRIPT(allowedOriginRules: newSettings.pluginScriptsOriginAllowList,
+                                                                                                                               forMainFrameOnly: newSettings.pluginScriptsForMainFrameOnly))
+                }
             } else {
                 newSettings.useShouldInterceptFetchRequest = false
             }
@@ -2107,6 +2130,10 @@ public class InAppWebView: WKWebView, WKUIDelegate,
 //    }
     
     public func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
+        guard javaScriptBridgeEnabled else {
+            return
+        }
+        
         guard let body = message.body as? [String: Any?] else {
             return
         }
@@ -2127,9 +2154,9 @@ public class InAppWebView: WKWebView, WKUIDelegate,
         let requestUrl = message.frameInfo.request.url
         
         var isOriginAllowed = false
-        if let javaScriptHandlerOriginAllowList = settings?.javaScriptHandlerOriginAllowList {
+        if let javaScriptHandlersOriginAllowList = settings?.javaScriptHandlersOriginAllowList {
             if let origin = sourceOrigin?.absoluteString {
-                for allowedOrigin in javaScriptHandlerOriginAllowList {
+                for allowedOrigin in javaScriptHandlersOriginAllowList {
                     if origin.range(of: allowedOrigin, options: .regularExpression, range: nil, locale: nil) != nil {
                         isOriginAllowed = true
                         break

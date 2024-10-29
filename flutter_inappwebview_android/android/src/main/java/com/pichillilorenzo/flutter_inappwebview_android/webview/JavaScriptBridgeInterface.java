@@ -83,8 +83,8 @@ public class JavaScriptBridgeInterface {
     }
 
     boolean isOriginAllowed = false;
-    if (inAppWebView.customSettings.javaScriptHandlerOriginAllowList != null) {
-      for (Pattern allowedOrigin : inAppWebView.customSettings.javaScriptHandlerOriginAllowList) {
+    if (inAppWebView.customSettings.javaScriptHandlersOriginAllowList != null) {
+      for (Pattern allowedOrigin : inAppWebView.customSettings.javaScriptHandlersOriginAllowList) {
         if (allowedOrigin.matcher(origin).matches()) {
           isOriginAllowed = true;
           break;
@@ -96,6 +96,11 @@ public class JavaScriptBridgeInterface {
     }
     if (!isOriginAllowed) {
       Log.e(LOG_TAG, "Bridge access attempt from an origin not allowed: " + origin);
+      return;
+    }
+
+    if (inAppWebView.customSettings.javaScriptHandlersForMainFrameOnly && !isMainFrame) {
+      Log.e(LOG_TAG, "Bridge access attempt from a sub-frame origin: " + origin);
       return;
     }
 

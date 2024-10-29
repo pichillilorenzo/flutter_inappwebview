@@ -1896,8 +1896,8 @@ namespace flutter_inappwebview_plugin
           }
 
           bool isOriginAllowed = false;
-          if (settings->javaScriptHandlerOriginAllowList.has_value()) {
-            for (auto& allowedOrigin : settings->javaScriptHandlerOriginAllowList.value()) {
+          if (settings->javaScriptHandlersOriginAllowList.has_value()) {
+            for (auto& allowedOrigin : settings->javaScriptHandlersOriginAllowList.value()) {
               if (std::regex_match(origin, std::regex(allowedOrigin))) {
                 isOriginAllowed = true;
                 break;

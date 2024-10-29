@@ -51,6 +51,11 @@ public class UserScript: WKUserScript {
     static private func wrapSourceCodeAddChecks(source: String, allowedOriginRules: [String]?) -> String {
         var ifStatement = "if ("
         if let allowedOriginRules = allowedOriginRules, !allowedOriginRules.contains("*") {
+            if allowedOriginRules.isEmpty {
+                // return empty source string if allowedOriginRules is an empty list.
+                // an empty list means that this UserScript is not allowed for any origin.
+                return ""
+            }
             var jsRegExpArray = "["
             for allowedOriginRule in allowedOriginRules {
                 if jsRegExpArray.count > 1 {

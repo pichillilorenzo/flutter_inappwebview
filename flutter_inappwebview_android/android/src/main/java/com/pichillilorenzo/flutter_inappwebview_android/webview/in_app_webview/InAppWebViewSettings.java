@@ -135,7 +135,13 @@ public class InAppWebViewSettings implements ISettings<InAppWebViewInterface> {
   @Nullable
   public Set<String> requestedWithHeaderOriginAllowList;
   @Nullable
-  public Set<Pattern> javaScriptHandlerOriginAllowList;
+  public Set<Pattern> javaScriptHandlersOriginAllowList;
+  public Boolean javaScriptHandlersForMainFrameOnly = false;
+  public Boolean javaScriptBridgeEnabled = true;
+  @Nullable
+  public Set<String> javaScriptBridgeOriginAllowList;
+  @Nullable
+  public Boolean javaScriptBridgeForMainFrameOnly;
   @Nullable
   public Set<String> pluginScriptsOriginAllowList;
   public Boolean pluginScriptsForMainFrameOnly = false;
@@ -418,11 +424,23 @@ public class InAppWebViewSettings implements ISettings<InAppWebViewInterface> {
         case "requestedWithHeaderOriginAllowList":
           requestedWithHeaderOriginAllowList = new HashSet<>((List<String>) value);
           break;
-        case "javaScriptHandlerOriginAllowList":
-          javaScriptHandlerOriginAllowList = new HashSet<>();
+        case "javaScriptHandlersOriginAllowList":
+          javaScriptHandlersOriginAllowList = new HashSet<>();
           for (String pattern : (List<String>) value) {
-            javaScriptHandlerOriginAllowList.add(Pattern.compile(pattern));
+            javaScriptHandlersOriginAllowList.add(Pattern.compile(pattern));
           }
+          break;
+        case "javaScriptHandlersForMainFrameOnly":
+          javaScriptHandlersForMainFrameOnly = (Boolean) value;
+          break;
+        case "javaScriptBridgeEnabled":
+          javaScriptBridgeEnabled = (Boolean) value;
+          break;
+        case "javaScriptBridgeOriginAllowList":
+          javaScriptBridgeOriginAllowList = new HashSet<>((List<String>) value);
+          break;
+        case "javaScriptBridgeForMainFrameOnly":
+          javaScriptBridgeForMainFrameOnly = (Boolean) value;
           break;
         case "pluginScriptsOriginAllowList":
           pluginScriptsOriginAllowList = new HashSet<>((List<String>) value);
@@ -529,12 +547,17 @@ public class InAppWebViewSettings implements ISettings<InAppWebViewInterface> {
     settings.put("defaultVideoPoster", defaultVideoPoster);
     settings.put("requestedWithHeaderOriginAllowList",
             requestedWithHeaderOriginAllowList != null ? new ArrayList<>(requestedWithHeaderOriginAllowList) : null);
-    settings.put("javaScriptHandlerOriginAllowList",
-            javaScriptHandlerOriginAllowList != null ? new ArrayList<String>() {{
-              for (Pattern pattern : javaScriptHandlerOriginAllowList) {
+    settings.put("javaScriptHandlersOriginAllowList",
+            javaScriptHandlersOriginAllowList != null ? new ArrayList<String>() {{
+              for (Pattern pattern : javaScriptHandlersOriginAllowList) {
                 add(pattern.pattern());
               }
             }} : null);
+    settings.put("javaScriptHandlersForMainFrameOnly", javaScriptHandlersForMainFrameOnly);
+    settings.put("javaScriptBridgeEnabled", javaScriptBridgeEnabled);
+    settings.put("javaScriptBridgeOriginAllowList",
+            javaScriptBridgeOriginAllowList != null ? new ArrayList<>(javaScriptBridgeOriginAllowList) : null);
+    settings.put("javaScriptBridgeForMainFrameOnly", javaScriptBridgeForMainFrameOnly);
     settings.put("pluginScriptsOriginAllowList",
             pluginScriptsOriginAllowList != null ? new ArrayList<>(pluginScriptsOriginAllowList) : null);
     settings.put("pluginScriptsForMainFrameOnly", pluginScriptsForMainFrameOnly);

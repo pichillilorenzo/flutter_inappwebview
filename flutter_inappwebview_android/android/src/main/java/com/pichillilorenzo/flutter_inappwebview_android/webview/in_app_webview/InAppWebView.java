@@ -107,6 +107,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.regex.Pattern;
 
@@ -176,6 +177,10 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
   @Nullable
   private PluginScript interceptOnlyAsyncAjaxRequestsPluginScript;
 
+  @NonNull
+  private final String expectedBridgeSecret = UUID.randomUUID().toString();
+  private boolean javaScriptBridgeEnabled = true;
+
   public InAppWebView(Context context) {
     super(context);
   }
@@ -187,9 +192,6 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
   public InAppWebView(Context context, AttributeSet attrs, int defaultStyle) {
     super(context, attrs, defaultStyle);
   }
-
-  @NonNull
-  private final String expectedBridgeSecret = UUID.randomUUID().toString();
 
   public InAppWebView(Context context, @NonNull InAppWebViewFlutterPlugin plugin,
                       @NonNull Object id, @Nullable Integer windowId, InAppWebViewSettings customSettings,
@@ -242,12 +244,20 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
 
   @SuppressLint("RestrictedApi")
   public void prepare() {
+    javaScriptBridgeEnabled = customSettings.javaScriptBridgeEnabled;
+    if (customSettings.javaScriptBridgeOriginAllowList != null && customSettings.javaScriptBridgeOriginAllowList.isEmpty()) {
+      // an empty list means that the JavaScript Bridge is not allowed for any origin.
+      javaScriptBridgeEnabled = false;
+    }
+
     if (plugin != null) {
       webViewAssetLoaderExt = WebViewAssetLoaderExt.fromMap(customSettings.webViewAssetLoader, plugin, getContext());
     }
 
-    javaScriptBridgeInterface = new JavaScriptBridgeInterface(this, expectedBridgeSecret);
-    addJavascriptInterface(javaScriptBridgeInterface, JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME());
+    if (javaScriptBridgeEnabled) {
+      javaScriptBridgeInterface = new JavaScriptBridgeInterface(this, expectedBridgeSecret);
+      addJavascriptInterface(javaScriptBridgeInterface, JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME());
+    }
 
     inAppWebViewChromeClient = new InAppWebViewChromeClient(plugin, this, inAppBrowserDelegate);
     setWebChromeClient(inAppWebViewChromeClient);
@@ -564,32 +574,41 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
   }
 
   public void prepareAndAddUserScripts() {
-    userContentController.addPluginScript(PromisePolyfillJS.PROMISE_POLYFILL_JS_PLUGIN_SCRIPT(customSettings.pluginScriptsOriginAllowList,
-            customSettings.pluginScriptsForMainFrameOnly));
-    userContentController.addPluginScript(JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_JS_PLUGIN_SCRIPT(expectedBridgeSecret,
-            customSettings.pluginScriptsOriginAllowList,
-            customSettings.pluginScriptsForMainFrameOnly));
-    userContentController.addPluginScript(PrintJS.PRINT_JS_PLUGIN_SCRIPT(customSettings.pluginScriptsOriginAllowList,
-            customSettings.pluginScriptsForMainFrameOnly));
-    userContentController.addPluginScript(OnWindowBlurEventJS.ON_WINDOW_BLUR_EVENT_JS_PLUGIN_SCRIPT(customSettings.pluginScriptsOriginAllowList));
-    userContentController.addPluginScript(OnWindowFocusEventJS.ON_WINDOW_FOCUS_EVENT_JS_PLUGIN_SCRIPT(customSettings.pluginScriptsOriginAllowList));
-    interceptOnlyAsyncAjaxRequestsPluginScript = InterceptAjaxRequestJS.createInterceptOnlyAsyncAjaxRequestsPluginScript(customSettings.interceptOnlyAsyncAjaxRequests);
-    if (customSettings.useShouldInterceptAjaxRequest) {
-      userContentController.addPluginScript(interceptOnlyAsyncAjaxRequestsPluginScript);
-      userContentController.addPluginScript(InterceptAjaxRequestJS.INTERCEPT_AJAX_REQUEST_JS_PLUGIN_SCRIPT(customSettings.pluginScriptsOriginAllowList,
+    if (javaScriptBridgeEnabled) {
+      // all the plugin scripts are using the JavaScript Bridge to work
+      userContentController.addPluginScript(PromisePolyfillJS.PROMISE_POLYFILL_JS_PLUGIN_SCRIPT(customSettings.pluginScriptsOriginAllowList,
               customSettings.pluginScriptsForMainFrameOnly));
-    }
-    if (customSettings.useShouldInterceptFetchRequest) {
-      userContentController.addPluginScript(InterceptFetchRequestJS.INTERCEPT_FETCH_REQUEST_JS_PLUGIN_SCRIPT(customSettings.pluginScriptsOriginAllowList,
+
+      final Set<String> javaScriptBridgeOriginAllowList = customSettings.javaScriptBridgeOriginAllowList != null ?
+              customSettings.javaScriptBridgeOriginAllowList : customSettings.pluginScriptsOriginAllowList;
+      final boolean javaScriptBridgeForMainFrameOnly = customSettings.javaScriptBridgeForMainFrameOnly != null ?
+              customSettings.javaScriptBridgeForMainFrameOnly : customSettings.pluginScriptsForMainFrameOnly;
+      userContentController.addPluginScript(JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_JS_PLUGIN_SCRIPT(expectedBridgeSecret,
+              javaScriptBridgeOriginAllowList,
+              javaScriptBridgeForMainFrameOnly));
+
+      userContentController.addPluginScript(PrintJS.PRINT_JS_PLUGIN_SCRIPT(customSettings.pluginScriptsOriginAllowList,
               customSettings.pluginScriptsForMainFrameOnly));
-    }
-    if (customSettings.useOnLoadResource) {
-      userContentController.addPluginScript(OnLoadResourceJS.ON_LOAD_RESOURCE_JS_PLUGIN_SCRIPT(customSettings.pluginScriptsOriginAllowList,
-              customSettings.pluginScriptsForMainFrameOnly));
-    }
-    if (!customSettings.useHybridComposition) {
-      userContentController.addPluginScript(PluginScriptsUtil.CHECK_GLOBAL_KEY_DOWN_EVENT_TO_HIDE_CONTEXT_MENU_JS_PLUGIN_SCRIPT(customSettings.pluginScriptsOriginAllowList,
-              customSettings.pluginScriptsForMainFrameOnly));
+      userContentController.addPluginScript(OnWindowBlurEventJS.ON_WINDOW_BLUR_EVENT_JS_PLUGIN_SCRIPT(customSettings.pluginScriptsOriginAllowList));
+      userContentController.addPluginScript(OnWindowFocusEventJS.ON_WINDOW_FOCUS_EVENT_JS_PLUGIN_SCRIPT(customSettings.pluginScriptsOriginAllowList));
+      interceptOnlyAsyncAjaxRequestsPluginScript = InterceptAjaxRequestJS.createInterceptOnlyAsyncAjaxRequestsPluginScript(customSettings.interceptOnlyAsyncAjaxRequests);
+      if (customSettings.useShouldInterceptAjaxRequest) {
+        userContentController.addPluginScript(interceptOnlyAsyncAjaxRequestsPluginScript);
+        userContentController.addPluginScript(InterceptAjaxRequestJS.INTERCEPT_AJAX_REQUEST_JS_PLUGIN_SCRIPT(customSettings.pluginScriptsOriginAllowList,
+                customSettings.pluginScriptsForMainFrameOnly));
+      }
+      if (customSettings.useShouldInterceptFetchRequest) {
+        userContentController.addPluginScript(InterceptFetchRequestJS.INTERCEPT_FETCH_REQUEST_JS_PLUGIN_SCRIPT(customSettings.pluginScriptsOriginAllowList,
+                customSettings.pluginScriptsForMainFrameOnly));
+      }
+      if (customSettings.useOnLoadResource) {
+        userContentController.addPluginScript(OnLoadResourceJS.ON_LOAD_RESOURCE_JS_PLUGIN_SCRIPT(customSettings.pluginScriptsOriginAllowList,
+                customSettings.pluginScriptsForMainFrameOnly));
+      }
+      if (!customSettings.useHybridComposition) {
+        userContentController.addPluginScript(PluginScriptsUtil.CHECK_GLOBAL_KEY_DOWN_EVENT_TO_HIDE_CONTEXT_MENU_JS_PLUGIN_SCRIPT(customSettings.pluginScriptsOriginAllowList,
+                customSettings.pluginScriptsForMainFrameOnly));
+      }
     }
     this.userContentController.addUserOnlyScripts(this.initialUserOnlyScripts);
   }
@@ -1164,7 +1183,7 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
           if (!enable) {
             userContentController.removePluginScript(pluginScript);
           }
-        } else if (enable) {
+        } else if (enable && javaScriptBridgeEnabled) {
           evaluateJavascript(pluginScript.getSource(), null, null);
           userContentController.addPluginScript(pluginScript);
         }

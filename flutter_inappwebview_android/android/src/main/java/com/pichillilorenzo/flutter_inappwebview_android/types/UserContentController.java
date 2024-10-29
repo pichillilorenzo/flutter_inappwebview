@@ -425,15 +425,15 @@ public class UserContentController implements Disposable {
   }
 
   private static String USER_SCRIPTS_AT_DOCUMENT_START_WRAPPER_JS_SOURCE() {
-    return "if (window." + JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME() + " != null && (window." + JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME() + "._userScriptsAtDocumentStartLoaded == null || !window." + JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME() + "._userScriptsAtDocumentStartLoaded)) {" +
-            "  window." + JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME() + "._userScriptsAtDocumentStartLoaded = true;" +
+    return "if (window._userScriptsAtDocumentStartLoaded == null || !window._userScriptsAtDocumentStartLoaded) {" +
+            "  window._userScriptsAtDocumentStartLoaded = true;" +
             "  " + PluginScriptsUtil.VAR_PLACEHOLDER_VALUE +
             "}";
   }
 
   private static String USER_SCRIPTS_AT_DOCUMENT_END_WRAPPER_JS_SOURCE() {
-      return "if (window." + JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME() + " != null && (window." + JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME() + "._userScriptsAtDocumentEndLoaded == null || !window." + JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME() + "._userScriptsAtDocumentEndLoaded)) {" +
-              "  window." + JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME() + "._userScriptsAtDocumentEndLoaded = true;" +
+      return "if (window._userScriptsAtDocumentEndLoaded == null || !window._userScriptsAtDocumentEndLoaded) {" +
+              "  window._userScriptsAtDocumentEndLoaded = true;" +
               "  " + PluginScriptsUtil.VAR_PLACEHOLDER_VALUE +
               "}";
     }

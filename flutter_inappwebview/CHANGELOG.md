@@ -18,6 +18,7 @@ Implemented security features to better manage access to the native javascript b
 - Deprecated `JavaScriptHandlerCallback` type in favor of `JavaScriptHandlerFunction` type
 - Updated static `fromMap` implementation for some classes
 - Updated `kJavaScriptHandlerForbiddenNames` list
+- Fixed specific URLAuthenticationChallenge type for `onReceivedHttpAuthRequest`, `onReceivedServerTrustAuthRequest`, `onReceivedClientCertRequest` events
 
 #### Android Platform
 - Added `InAppWebViewController.enableSlowWholeDocumentDraw` static method

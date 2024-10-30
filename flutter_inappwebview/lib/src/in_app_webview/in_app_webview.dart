@@ -167,13 +167,13 @@ class InAppWebView extends StatefulWidget {
     void Function(InAppWebViewController controller, int progress)?
         onProgressChanged,
     Future<ClientCertResponse?> Function(InAppWebViewController controller,
-            URLAuthenticationChallenge challenge)?
+        ClientCertChallenge challenge)?
         onReceivedClientCertRequest,
     Future<HttpAuthResponse?> Function(InAppWebViewController controller,
-            URLAuthenticationChallenge challenge)?
+         HttpAuthenticationChallenge challenge)?
         onReceivedHttpAuthRequest,
     Future<ServerTrustAuthResponse?> Function(InAppWebViewController controller,
-            URLAuthenticationChallenge challenge)?
+        ServerTrustChallenge challenge)?
         onReceivedServerTrustAuthRequest,
     void Function(InAppWebViewController controller, int x, int y)?
         onScrollChanged,

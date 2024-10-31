@@ -120,7 +120,7 @@ public class InAppWebViewClientCompat extends WebViewClientCompat {
     if (isForMainFrame) {
       // There isn't any way to load an URL for a frame that is not the main frame,
       // so call this only on main frame.
-      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && headers != null)
         webView.loadUrl(url, headers);
       else
         webView.loadUrl(url);
@@ -178,11 +178,7 @@ public class InAppWebViewClientCompat extends WebViewClientCompat {
 
     if (!WebViewFeature.isFeatureSupported(WebViewFeature.DOCUMENT_START_SCRIPT)) {
       String source = webView.userContentController.generateWrappedCodeForDocumentStart();
-      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-        webView.evaluateJavascript(source, (ValueCallback<String>) null);
-      } else {
-        webView.loadUrl("javascript:" + source.replaceAll("[\r\n]+", ""));
-      }
+      webView.evaluateJavascript(source, (ValueCallback<String>) null);
     }
   }
 
@@ -191,11 +187,7 @@ public class InAppWebViewClientCompat extends WebViewClientCompat {
 
     if (!WebViewFeature.isFeatureSupported(WebViewFeature.DOCUMENT_START_SCRIPT)) {
       String source = webView.userContentController.generateWrappedCodeForDocumentEnd();
-      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-        webView.evaluateJavascript(source, (ValueCallback<String>) null);
-      } else {
-        webView.loadUrl("javascript:" + source.replaceAll("[\r\n]+", ""));
-      }
+      webView.evaluateJavascript(source, (ValueCallback<String>) null);
     }
   }
 
@@ -239,12 +231,7 @@ public class InAppWebViewClientCompat extends WebViewClientCompat {
     }
 
     String js = JavaScriptBridgeJS.PLATFORM_READY_JS_SOURCE();
-
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-      webView.evaluateJavascript(js, (ValueCallback<String>) null);
-    } else {
-      webView.loadUrl("javascript:" + js.replaceAll("[\r\n]+", ""));
-    }
+    webView.evaluateJavascript(js, (ValueCallback<String>) null);
 
     if (webView.channelDelegate != null) {
       webView.channelDelegate.onLoadStop(url);
@@ -382,7 +369,7 @@ public class InAppWebViewClientCompat extends WebViewClientCompat {
       credentialsProposed = CredentialDatabase.getInstance(view.getContext()).getHttpAuthCredentials(host, protocol, realm, port);
 
     URLCredential credentialProposed = null;
-    if (credentialsProposed != null && credentialsProposed.size() > 0) {
+    if (credentialsProposed != null && !credentialsProposed.isEmpty()) {
       credentialProposed = credentialsProposed.get(0);
     }
 
@@ -409,7 +396,7 @@ public class InAppWebViewClientCompat extends WebViewClientCompat {
               handler.proceed(username, password);
               break;
             case 2:
-              if (credentialsProposed.size() > 0) {
+              if (!credentialsProposed.isEmpty()) {
                 URLCredential credential = credentialsProposed.remove(0);
                 handler.proceed(credential.getUsername(), credential.getPassword());
               } else {
@@ -735,7 +722,7 @@ public class InAppWebViewClientCompat extends WebViewClientCompat {
     }
 
     WebResourceResponse response = null;
-    if (webView.contentBlockerHandler.getRuleList().size() > 0) {
+    if (!webView.contentBlockerHandler.getRuleList().isEmpty()) {
       try {
         response = webView.contentBlockerHandler.checkUrl(webView, request);
       } catch (Exception e) {

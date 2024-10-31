@@ -120,7 +120,7 @@ public class WebMessageListener: FlutterMethodCallDelegate {
                 forMainFrameOnly: forMainFrameOnly,
                 allowedOriginRules: allowedOriginRules,
                 requiredInAllContentWorlds: false,
-                messageHandlerNames: ["onWebMessageListenerPostMessageReceived"]
+                messageHandlerNames: []
             ))
             webView.configuration.userContentController.sync(scriptMessageHandler: webView)
         }

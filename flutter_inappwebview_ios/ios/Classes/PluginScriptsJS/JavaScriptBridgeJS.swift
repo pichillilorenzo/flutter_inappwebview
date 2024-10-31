@@ -38,17 +38,33 @@ public class JavaScriptBridgeJS {
             \(WebMessageChannelJS.WEB_MESSAGE_CHANNELS_VARIABLE_NAME()) = {};
             (function(window) {
                 var bridgeSecret = '\(VAR_JAVASCRIPT_BRIDGE_BRIDGE_SECRET)';
+                var _JSON_stringify;
+                var _Array_slice;
+                var _setTimeout;
+                var _Promise;
+                var _UserMessageHandler;
+                var _postMessage;
+                try {
+                  _JSON_stringify = window.JSON.stringify;
+                  _Array_slice = window.Array.prototype.slice;
+                  _Array_slice.call = window.Function.prototype.call;
+                  _setTimeout = window.setTimeout;
+                  _Promise = window.Promise;
+                  _UserMessageHandler = window.webkit.messageHandlers['callHandler'];
+                  _postMessage = _UserMessageHandler.postMessage;
+                  _postMessage.call = window.Function.prototype.call;
+                } catch (_) { return; }
                 window.\(get_JAVASCRIPT_BRIDGE_NAME()).callHandler = function() {
                     var _windowId = \(WindowIdJS.WINDOW_ID_VARIABLE_JS_SOURCE());
-                    var _callHandlerID = setTimeout(function(){});
-                    window.webkit.messageHandlers['callHandler'].postMessage({
+                    var _callHandlerID = _setTimeout(function(){});
+                    _postMessage.call(_UserMessageHandler, {
                         'handlerName': arguments[0],
                         '_callHandlerID': _callHandlerID,
                         '_bridgeSecret': bridgeSecret,
-                        'args': JSON.stringify(Array.prototype.slice.call(arguments, 1)),
+                        'args': _JSON_stringify(_Array_slice.call(arguments, 1)),
                         '_windowId': _windowId
                     });
-                    return new Promise(function(resolve, reject) {
+                    return new _Promise(function(resolve, reject) {
                         try {
                             (window.top != window ? window.top : window).\(get_JAVASCRIPT_BRIDGE_NAME())[_callHandlerID] = {resolve: resolve, reject: reject};
                         } catch (e) {

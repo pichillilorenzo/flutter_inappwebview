@@ -28,7 +28,7 @@ public class FindTextHighlightJS {
             forMainFrameOnly: true,
             allowedOriginRules: allowedOriginRules,
             requiredInAllContentWorlds: false,
-            messageHandlerNames: ["onFindResultReceived"])
+            messageHandlerNames: [])
     }
     
     public static func FIND_TEXT_HIGHLIGHT_JS_SOURCE() -> String {

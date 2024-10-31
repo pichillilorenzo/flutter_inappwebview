@@ -53,7 +53,7 @@ public class UserContentController implements Disposable {
   @Nullable
   public WebView webView;
 
-  public UserContentController(WebView webView) {
+  public UserContentController(@Nullable WebView webView) {
     this.webView = webView;
   }
 
@@ -117,6 +117,7 @@ public class UserContentController implements Disposable {
     for (PluginScript script : scripts) {
       String source = ";" + script.getSource();
       source = wrapSourceCodeInContentWorld(script.getContentWorld(), source);
+      source = wrapSourceCodeAddChecks(source, script);
       js.append(source);
     }
     return js.toString();
@@ -128,6 +129,7 @@ public class UserContentController implements Disposable {
     for (UserScript script : scripts) {
       String source = ";" + script.getSource();
       source = wrapSourceCodeInContentWorld(script.getContentWorld(), source);
+      source = wrapSourceCodeAddChecks(source, script);
       js.append(source);
     }
     return js.toString();
@@ -206,6 +208,7 @@ public class UserContentController implements Disposable {
       if (userOnlyScript.getInjectionTime() == UserScriptInjectionTime.AT_DOCUMENT_END) {
         source = "if (document.readyState === 'complete') { " + source + "} else { window.addEventListener('load', function() { " + source + " }); }";
       }
+      source = wrapSourceCodeAddChecks(source, userOnlyScript);
 
       ScriptHandler scriptHandler = WebViewCompat.addDocumentStartJavaScript(
               webView,
@@ -287,6 +290,7 @@ public class UserContentController implements Disposable {
       if (pluginScript.getInjectionTime() == UserScriptInjectionTime.AT_DOCUMENT_END) {
         source = "if (document.readyState === 'complete') { " + source + "} else { window.addEventListener('load', function() { " + source + " }); }";
       }
+      source = wrapSourceCodeAddChecks(source, pluginScript);
 
       ScriptHandler scriptHandler = WebViewCompat.addDocumentStartJavaScript(
               webView,
@@ -422,6 +426,37 @@ public class UserContentController implements Disposable {
   @NonNull
   public LinkedHashSet<ContentWorld> getContentWorlds() {
     return new LinkedHashSet<>(this.contentWorlds);
+  }
+
+  static private String wrapSourceCodeAddChecks(String source, UserScript userScript) {
+    StringBuilder ifStatement = new StringBuilder("if (");
+    Set<String> allowedOriginRules = userScript.getAllowedOriginRules();
+    boolean forMainFrameOnly = userScript.isForMainFrameOnly();
+    if (!WebViewFeature.isFeatureSupported(WebViewFeature.DOCUMENT_START_SCRIPT) && !allowedOriginRules.contains("*")) {
+      if (allowedOriginRules.isEmpty()) {
+        // return empty source string if allowedOriginRules is an empty list.
+        // an empty list means that this UserScript is not allowed for any origin.
+        return "";
+      }
+      StringBuilder jsRegExpArray = new StringBuilder("[");
+      for (String allowedOriginRule : allowedOriginRules) {
+        if (jsRegExpArray.length() > 1) {
+          jsRegExpArray.append(", ");
+        }
+        jsRegExpArray.append("new RegExp(").append(UserContentController.escapeCode(allowedOriginRule)).append(")");
+      }
+      if (jsRegExpArray.length() > 1) {
+        jsRegExpArray.append("]");
+        ifStatement.append(jsRegExpArray).append(".some(function(rx) { return rx.test(window.location.origin); })");
+      }
+    }
+    if (forMainFrameOnly) {
+      if (ifStatement.length() > 4) {
+        ifStatement.append(" && ");
+      }
+      ifStatement.append("window === window.top");
+    }
+    return ifStatement.length() > 4 ? ifStatement.append(") {").append(source).append("}").toString() : source;
   }
 
   private static String USER_SCRIPTS_AT_DOCUMENT_START_WRAPPER_JS_SOURCE() {

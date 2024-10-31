@@ -11,15 +11,18 @@ public class ConsoleLogJS {
     
     public static let CONSOLE_LOG_JS_PLUGIN_SCRIPT_GROUP_NAME = "IN_APP_WEBVIEW_CONSOLE_LOG_JS_PLUGIN_SCRIPT"
     
-    public static func CONSOLE_LOG_JS_PLUGIN_SCRIPT(allowedOriginRules: [String]?, forMainFrameOnly: Bool) -> PluginScript {
+    // This plugin is only for main frame.
+    // Using it also on non-main frames could cause issues
+    // such as https://github.com/pichillilorenzo/flutter_inappwebview/issues/1738
+    public static func CONSOLE_LOG_JS_PLUGIN_SCRIPT(allowedOriginRules: [String]?) -> PluginScript {
         return PluginScript(
             groupName: CONSOLE_LOG_JS_PLUGIN_SCRIPT_GROUP_NAME,
             source: CONSOLE_LOG_JS_SOURCE(),
             injectionTime: .atDocumentStart,
-            forMainFrameOnly: forMainFrameOnly,
+            forMainFrameOnly: true,
             allowedOriginRules: allowedOriginRules,
             requiredInAllContentWorlds: true,
-            messageHandlerNames: ["consoleLog", "consoleDebug", "consoleError", "consoleInfo", "consoleWarn"])
+            messageHandlerNames: [])
     }
     
     // the message needs to be concatenated with '' in order to have the same behavior like on Android
@@ -32,9 +35,11 @@ public class ConsoleLogJS {
                 for (var i in args) {
                     try {
                         message += message === '' ? args[i] : ' ' + args[i];
-                    } catch(ignored) {}
+                    } catch(_) {}
                 }
-                window.\(JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME()).callHandler('onConsoleMessage', {'level': logLevel, 'message': message})
+                try {
+                    window.\(JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME()).callHandler('onConsoleMessage', {'level': logLevel, 'message': message})
+                } catch(_) {}
             }
         
             var oldLogs = {

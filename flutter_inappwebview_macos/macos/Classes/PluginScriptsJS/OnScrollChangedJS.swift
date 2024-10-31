@@ -20,7 +20,7 @@ public class OnScrollChangedJS {
             forMainFrameOnly: true,
             allowedOriginRules: allowedOriginRules,
             requiredInAllContentWorlds: false,
-            messageHandlerNames: ["onScrollChanged"])
+            messageHandlerNames: [])
     }
     
     public static func ON_SCROLL_CHANGED_EVENT_JS_SOURCE() -> String {

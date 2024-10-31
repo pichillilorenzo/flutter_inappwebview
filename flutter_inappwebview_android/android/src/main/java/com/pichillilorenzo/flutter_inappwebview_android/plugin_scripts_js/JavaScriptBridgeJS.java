@@ -254,6 +254,11 @@ public class JavaScriptBridgeJS {
             "    var origin = '';" +
             "    var requestUrl = '';" +
             "    var isMainFrame = false;" +
+            "    var _JSON_stringify;" +
+            "    var _Array_slice;" +
+            "    var _setTimeout;" +
+            "    var _Promise;" +
+            "    var _javaInjectedObject;" +
             "    try {" +
             "      origin = window.location.origin;" +
             "    } catch (_) {}" +
@@ -263,18 +268,26 @@ public class JavaScriptBridgeJS {
             "    try {" +
             "      isMainFrame = window === window.top;" +
             "    } catch (_) {}" +
+            "    try {" +
+            "      _JSON_stringify = window.JSON.stringify;" +
+            "      _Array_slice = window.Array.prototype.slice;" +
+            "      _Array_slice.call = window.Function.prototype.call;" +
+            "      _setTimeout = window.setTimeout;" +
+            "      _Promise = window.Promise;" +
+            "      _javaInjectedObject = window." + get_JAVASCRIPT_BRIDGE_NAME() + ";" +
+            "    } catch (_) { return; }" +
             "    window." + get_JAVASCRIPT_BRIDGE_NAME() + ".callHandler = function() {" +
-            "      var _callHandlerID = setTimeout(function(){});" +
-            "      window." + get_JAVASCRIPT_BRIDGE_NAME() + "._callHandler(JSON.stringify({" +
+            "      var _callHandlerID = _setTimeout(function(){});" +
+            "      _javaInjectedObject._callHandler(_JSON_stringify({" +
             "        'handlerName': arguments[0]," +
             "        '_callHandlerID': _callHandlerID," +
             "        '_bridgeSecret': bridgeSecret," +
             "        'origin': origin," +
             "        'requestUrl': requestUrl," +
             "        'isMainFrame': isMainFrame," +
-            "        'args': JSON.stringify(Array.prototype.slice.call(arguments, 1))" +
+            "        'args': _JSON_stringify(_Array_slice.call(arguments, 1))" +
             "      }));" +
-            "      return new Promise(function(resolve, reject) {" +
+            "      return new _Promise(function(resolve, reject) {" +
             "        try {" +
             "          (isMainFrame ? window : window.top)." + get_JAVASCRIPT_BRIDGE_NAME() + "[_callHandlerID] = {resolve: resolve, reject: reject};" +
             "        } catch(e) { resolve(); }" +
@@ -289,6 +302,11 @@ public class JavaScriptBridgeJS {
             "    var origin = '';" +
             "    var requestUrl = '';" +
             "    var isMainFrame = false;" +
+            "    var _JSON_stringify;" +
+            "    var _Array_slice;" +
+            "    var _setTimeout;" +
+            "    var _Promise;" +
+            "    var _javaInjectedObject;" +
             "    try {" +
             "      origin = window.location.origin;" +
             "    } catch (_) {}" +
@@ -298,23 +316,31 @@ public class JavaScriptBridgeJS {
             "    try {" +
             "      isMainFrame = window === window.top;" +
             "    } catch (_) {}" +
+            "    try {" +
+            "      _JSON_stringify = window.JSON.stringify;" +
+            "      _Array_slice = window.Array.prototype.slice;" +
+            "      _Array_slice.call = window.Function.prototype.call;" +
+            "      _setTimeout = window.setTimeout;" +
+            "      _Promise = window.Promise;" +
+            "      _javaInjectedObject = window." + get_JAVASCRIPT_BRIDGE_NAME() + ";" +
+            "    } catch (_) { return; }" +
             "    window." + get_JAVASCRIPT_BRIDGE_NAME() + ".callHandler = function() {" +
-            "      var _callHandlerID = setTimeout(function(){});" +
+            "      var _callHandlerID = _setTimeout(function(){});" +
             "      try {" +
-            "        window.top." + get_JAVASCRIPT_BRIDGE_NAME() + "._callHandler(JSON.stringify({" +
+            "        _javaInjectedObject._callHandler(_JSON_stringify({" +
             "          'handlerName': arguments[0]," +
             "          '_callHandlerID': _callHandlerID," +
             "          '_bridgeSecret': bridgeSecret," +
             "          'origin': origin," +
             "          'requestUrl': requestUrl," +
             "          'isMainFrame': isMainFrame," +
-            "          'args': JSON.stringify(Array.prototype.slice.call(arguments, 1))" +
+            "          'args': _JSON_stringify(_Array_slice.call(arguments, 1))" +
             "        }));" +
-            "        return new Promise(function(resolve, reject) {" +
+            "        return new _Promise(function(resolve, reject) {" +
             "          window.top." + get_JAVASCRIPT_BRIDGE_NAME() + "[_callHandlerID] = {resolve: resolve, reject: reject};" +
             "        });" +
             "      } catch (error) {" +
-            "        return new Promise(function(resolve, reject) { resolve(); });" +
+            "        return new _Promise(function(resolve, reject) { resolve(); });" +
             "      }" +
             "    };" +
             "  })(window);" +

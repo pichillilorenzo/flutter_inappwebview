@@ -27,43 +27,13 @@ public class UserScript {
                     @NonNull UserScriptInjectionTime injectionTime, @Nullable ContentWorld contentWorld,
                     @Nullable Set<String> allowedOriginRules, boolean forMainFrameOnly) {
     this.groupName = groupName;
-    this.source = wrapSourceCodeAddChecks(source, allowedOriginRules, forMainFrameOnly);
+    this.source = source;
     this.injectionTime = injectionTime;
     this.contentWorld = contentWorld == null ? ContentWorld.PAGE : contentWorld;
     this.allowedOriginRules = allowedOriginRules == null ? new HashSet<String>() {{
       add("*");
     }} : allowedOriginRules;
     this.forMainFrameOnly = forMainFrameOnly;
-  }
-
-  static private String wrapSourceCodeAddChecks(String source, @Nullable Set<String> allowedOriginRules, boolean forMainFrameOnly) {
-    StringBuilder ifStatement = new StringBuilder("if (");
-    if (!WebViewFeature.isFeatureSupported(WebViewFeature.DOCUMENT_START_SCRIPT) &&
-            (allowedOriginRules != null && !allowedOriginRules.contains("*"))) {
-      if (allowedOriginRules.isEmpty()) {
-        // return empty source string if allowedOriginRules is an empty list.
-        // an empty list means that this UserScript is not allowed for any origin.
-        return "";
-      }
-      StringBuilder jsRegExpArray = new StringBuilder("[");
-      for (String allowedOriginRule : allowedOriginRules) {
-        if (jsRegExpArray.length() > 1) {
-          jsRegExpArray.append(", ");
-        }
-        jsRegExpArray.append("new RegExp(").append(UserContentController.escapeCode(allowedOriginRule)).append(")");
-      }
-      if (jsRegExpArray.length() > 1) {
-        jsRegExpArray.append("]");
-        ifStatement.append(jsRegExpArray).append(".some(function(rx) { return rx.test(window.location.origin); })");
-      }
-    }
-    if (forMainFrameOnly) {
-      if (ifStatement.length() > 4) {
-        ifStatement.append(" && ");
-      }
-      ifStatement.append("window === window.top");
-    }
-    return ifStatement.length() > 4 ? ifStatement.append(") {").append(source).append("}").toString() : source;
   }
 
   @Nullable

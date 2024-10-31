@@ -4,11 +4,14 @@
 #include <regex>
 #include <Shlwapi.h>
 #include <wil/wrl.h>
+#include <winrt/Windows.Foundation.h>
 
 #include "../custom_platform_view/util/composition.desktop.interop.h"
 #include "../plugin_scripts_js/javascript_bridge_js.h"
 #include "../types/create_window_action.h"
+#include "../types/http_auth_response.h"
 #include "../types/javascript_handler_function_data.h"
+#include "../types/url_credential.h"
 #include "../types/web_resource_error.h"
 #include "../types/web_resource_request.h"
 #include "../utils/base64.h"
@@ -545,6 +548,7 @@ namespace flutter_inappwebview_plugin
         [this](ICoreWebView2* sender, ICoreWebView2NavigationCompletedEventArgs* args)
         {
           isLoading_ = false;
+          previousAuthRequestFailureCount = 0;
 
           evaluateJavascript(JavaScriptBridgeJS::PLATFORM_READY_JS_SOURCE(), ContentWorld::page(), nullptr);
 
@@ -908,6 +912,91 @@ namespace flutter_inappwebview_plugin
             return S_OK;
           }
         ).Get(), nullptr));
+    }
+
+    if (auto webView10 = webView.try_query<ICoreWebView2_10>()) {
+      failedLog(webView10->add_BasicAuthenticationRequested(
+        Callback<ICoreWebView2BasicAuthenticationRequestedEventHandler>(
+          [this](
+            ICoreWebView2* sender,
+            ICoreWebView2BasicAuthenticationRequestedEventArgs* args)
+          {
+            wil::com_ptr<ICoreWebView2Deferral> deferral;
+            wil::com_ptr<ICoreWebView2BasicAuthenticationResponse> basicAuthenticationResponse;
+            wil::unique_cotaskmem_string url;
+            wil::unique_cotaskmem_string realmChallenge;
+
+            if (channelDelegate && plugin && plugin->inAppWebViewManager &&
+              succeededOrLog(args->get_Uri(&url)) && succeededOrLog(args->get_Challenge(&realmChallenge)) &&
+              succeededOrLog(args->get_Response(&basicAuthenticationResponse)) && succeededOrLog(args->GetDeferral(&deferral))) {
+
+              previousAuthRequestFailureCount++;
+
+              try {
+                winrt::Windows::Foundation::Uri const uri{ url.get() };
+
+                auto basicRealm = std::string{ "Basic realm=\"" };
+                auto basicRealmLength = basicRealm.length();
+                auto realm = wide_to_utf8(realmChallenge.get());
+                if (starts_with(realm, basicRealm)) {
+                  realm = realm.substr(basicRealmLength, realm.length() - basicRealmLength - 1);
+                }
+
+                auto protectionSpace = std::make_unique<URLProtectionSpace>(
+                  wide_to_utf8(uri.Host().c_str()),
+                  wide_to_utf8(uri.SchemeName().c_str()),
+                  realm,
+                  uri.Port(),
+                  std::optional<std::shared_ptr<SslCertificate>>{}
+                );
+                auto challenge = std::make_unique<HttpAuthenticationChallenge>(
+                  std::move(protectionSpace),
+                  previousAuthRequestFailureCount,
+                  std::optional<std::shared_ptr<URLCredential>>{}
+                );
+
+                auto callback = std::make_unique<WebViewChannelDelegate::ReceivedHttpAuthRequestCallback>();
+                auto defaultBehaviour = [this, deferral, args](const std::optional<std::shared_ptr<HttpAuthResponse>> response)
+                  {
+                    failedLog(deferral->Complete());
+                  };
+                callback->nonNullSuccess = [this, deferral, basicAuthenticationResponse, args](const std::shared_ptr<HttpAuthResponse> response)
+                  {
+                    auto action = response->action;
+                    std::wstring username = utf8_to_wide(response->username);
+                    std::wstring password = utf8_to_wide(response->password);
+
+                    if (action.has_value()) {
+                      switch (action.value()) {
+                      case HttpAuthResponseAction::proceed:
+                        failedLog(basicAuthenticationResponse->put_UserName(username.c_str()));
+                        failedLog(basicAuthenticationResponse->put_Password(password.c_str()));
+                        break;
+                      case HttpAuthResponseAction::cancel:
+                      default:
+                        args->put_Cancel(true);
+                        break;
+                      }
+                      failedLog(deferral->Complete());
+                      return false;
+                    }
+                    return true;
+                  };
+                callback->defaultBehaviour = defaultBehaviour;
+                callback->error = [this, defaultBehaviour](const std::string& error_code, const std::string& error_message, const flutter::EncodableValue* error_details)
+                  {
+                    debugLog(error_code + ", " + error_message);
+                    defaultBehaviour(std::nullopt);
+                  };
+                channelDelegate->onReceivedHttpAuthRequest(std::move(challenge), std::move(callback));
+              }
+              catch (winrt::hresult_error const& ex) {
+                debugLog(wide_to_utf8(ex.message().c_str()));
+              }
+            }
+            return S_OK;
+          })
+        .Get(), nullptr));
     }
 
     /*
@@ -1881,20 +1970,10 @@ namespace flutter_inappwebview_plugin
           auto requestUrl = body.contains("requestUrl") && body.at("requestUrl").is_string() ? body.at("requestUrl").get<std::string>() : "";
           auto handlerArgs = body.contains("args") && body.at("args").is_string() ? body.at("args").get<std::string>() : "";
 
-          wil::unique_cotaskmem_string uri;
-          if (succeededOrLog(args->get_Source(&uri))) {
-            requestUrl = wide_to_utf8(uri.get());
-            auto urlSplit = split(requestUrl, std::string{ "://" });
-            if (urlSplit.size() > 1) {
-              auto scheme = urlSplit[0];
-              auto afterScheme = urlSplit[1];
-              auto afterSchemeSplit = split(afterScheme, std::string{ "/" });
-              auto host = afterSchemeSplit[0];
-              origin = scheme + "://" + host;
-            }
-            else {
-              origin = requestUrl;
-            }
+          wil::unique_cotaskmem_string sourceUrl;
+          if (succeededOrLog(args->get_Source(&sourceUrl))) {
+            requestUrl = wide_to_utf8(sourceUrl.get());
+            origin = get_origin_from_url(requestUrl);
           }
 
           if (!string_equals(expectedBridgeSecret, bridgeSecret)) {

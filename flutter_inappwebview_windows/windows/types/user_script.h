@@ -11,7 +11,7 @@
 
 namespace flutter_inappwebview_plugin
 {
-  enum UserScriptInjectionTime {
+  enum class UserScriptInjectionTime {
     atDocumentStart = 0,
     atDocumentEnd
   };

@@ -74,6 +74,14 @@ namespace flutter_inappwebview_plugin
       };
   }
 
+  WebViewChannelDelegate::ReceivedHttpAuthRequestCallback::ReceivedHttpAuthRequestCallback()
+  {
+    decodeResult = [](const flutter::EncodableValue* value)
+      {
+        return value == nullptr || value->IsNull() ? std::optional<std::shared_ptr<HttpAuthResponse>>{} : std::make_shared<HttpAuthResponse>(std::get<flutter::EncodableMap>(*value));
+      };
+  }
+
   void WebViewChannelDelegate::HandleMethodCall(const flutter::MethodCall<flutter::EncodableValue>& method_call,
     std::unique_ptr<flutter::MethodResult<flutter::EncodableValue>> result)
   {
@@ -486,6 +494,17 @@ namespace flutter_inappwebview_plugin
       {"request", request->toEncodableMap()},
       });
     channel->InvokeMethod("onLoadResourceWithCustomScheme", std::move(arguments), std::move(callback));
+  }
+
+  void WebViewChannelDelegate::onReceivedHttpAuthRequest(std::shared_ptr<HttpAuthenticationChallenge> challenge, std::unique_ptr<ReceivedHttpAuthRequestCallback> callback) const
+  {
+    if (!channel) {
+      callback->defaultBehaviour(std::nullopt);
+      return;
+    }
+
+    auto arguments = std::make_unique<flutter::EncodableValue>(challenge->toEncodableMap());
+    channel->InvokeMethod("onReceivedHttpAuthRequest", std::move(arguments), std::move(callback));
   }
 
   WebViewChannelDelegate::~WebViewChannelDelegate()

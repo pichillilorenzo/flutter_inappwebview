@@ -15,7 +15,7 @@ namespace flutter_inappwebview_plugin
   {
     return flutter::EncodableMap{
       {"resources", make_fl_value(resources)},
-      {"action", make_fl_value(action)},
+      {"action", make_fl_value(PermissionResponseActionTypeToInteger(action))},
     };
   }
 }

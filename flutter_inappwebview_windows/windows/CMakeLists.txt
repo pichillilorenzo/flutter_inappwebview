@@ -6,7 +6,8 @@ cmake_minimum_required(VERSION 3.14)
 
 set(WIL_VERSION "1.0.231216.1")
 set(WEBVIEW_VERSION "1.0.2792.45")
-set(NLOHMANN_JSON "3.11.2")
+set(NLOHMANN_JSON_VERSION "3.11.2")
+set(CPP_WINRT_VERSION "2.0.240405.15")
 
 message(VERBOSE "CMake system version is ${CMAKE_SYSTEM_VERSION} (using SDK ${CMAKE_VS_WINDOWS_TARGET_PLATFORM_VERSION})")
 
@@ -31,8 +32,9 @@ add_custom_target(${PROJECT_NAME}_DEPENDENCIES_DOWNLOAD ALL)
 add_custom_command(
   TARGET ${PROJECT_NAME}_DEPENDENCIES_DOWNLOAD PRE_BUILD
   COMMAND ${NUGET} install Microsoft.Windows.ImplementationLibrary -Version ${WIL_VERSION} -ExcludeVersion -OutputDirectory ${CMAKE_BINARY_DIR}/packages
+  COMMAND ${NUGET} install Microsoft.Windows.CppWinRT -Version ${CPP_WINRT_VERSION} -ExcludeVersion -OutputDirectory ${CMAKE_BINARY_DIR}/packages
   COMMAND ${NUGET} install Microsoft.Web.WebView2 -Version ${WEBVIEW_VERSION} -ExcludeVersion -OutputDirectory ${CMAKE_BINARY_DIR}/packages
-  COMMAND ${NUGET} install nlohmann.json -Version ${NLOHMANN_JSON} -ExcludeVersion -OutputDirectory ${CMAKE_BINARY_DIR}/packages
+  COMMAND ${NUGET} install nlohmann.json -Version ${NLOHMANN_JSON_VERSION} -ExcludeVersion -OutputDirectory ${CMAKE_BINARY_DIR}/packages
   DEPENDS ${NUGET}
 )
 
@@ -95,6 +97,16 @@ list(APPEND PLUGIN_SOURCES
   "types/custom_scheme_registration.h"
   "types/javascript_handler_function_data.cpp"
   "types/javascript_handler_function_data.h"
+  "types/url_credential.cpp"
+  "types/url_credential.h"
+  "types/url_protection_space.cpp"
+  "types/url_protection_space.h"
+  "types/url_authentication_challenge.cpp"
+  "types/url_authentication_challenge.h"
+  "types/http_authentication_challenge.cpp"
+  "types/http_authentication_challenge.h"
+  "types/http_auth_response.cpp"
+  "types/http_auth_response.h"
   "custom_platform_view/custom_platform_view.cc"
   "custom_platform_view/custom_platform_view.h"
   "custom_platform_view/texture_bridge.cc"

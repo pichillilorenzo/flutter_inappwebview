@@ -727,7 +727,9 @@ class InAppWebViewSettings {
   ///If [pluginScriptsOriginAllowList] is present, then this value will override
   ///it only for the JavaScript Bridge internal plugin.
   ///Adding `'*'` as an allowed origin or setting this to `null`, it means it will allow every origin.
-  ///Instead, An empty [Set] will block every origin.
+  ///Instead, an empty [Set] will block every origin and, in this case,
+  ///it will force the behaviour of the [javaScriptBridgeEnabled] parameter,
+  ///as it was set to `false`.
   ///
   ///**NOTE**: setting or changing this value after the WebView has been created won't have any effect.
   ///It should be set when initializing the WebView through [PlatformWebViewCreationParams.initialSettings] parameter.
@@ -947,7 +949,7 @@ class InAppWebViewSettings {
   ///A [Set] of patterns that will be used to match the allowed origins
   ///that are able to load all the internal plugin [UserScript]s used by the plugin itself.
   ///Adding `'*'` as an allowed origin or setting this to `null`, it means it will allow every origin.
-  ///Instead, An empty [Set] will block every origin.
+  ///Instead, an empty [Set] will block every origin.
   ///
   ///**NOTE**: If [javaScriptBridgeOriginAllowList] is not present, this value will affect also the JavaScript Bridge internal plugin.
   ///Also, setting or changing this value after the WebView has been created won't have any effect.

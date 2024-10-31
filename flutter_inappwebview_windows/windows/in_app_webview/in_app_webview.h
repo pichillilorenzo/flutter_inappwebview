@@ -200,6 +200,7 @@ namespace flutter_inappwebview_plugin
     bool isLoading_ = false;
     std::string pageFrameId_;
     std::map<std::string, std::pair<wil::com_ptr<ICoreWebView2DevToolsProtocolEventReceiver>, EventRegistrationToken>> devToolsProtocolEventListener_ = {};
+    int64_t previousAuthRequestFailureCount = 0;
 
     void registerEventHandlers();
     void registerSurfaceEventHandlers();

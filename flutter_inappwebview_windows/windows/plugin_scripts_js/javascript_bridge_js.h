@@ -36,6 +36,11 @@ namespace flutter_inappwebview_plugin
           var origin = '';\
           var requestUrl = '';\
           var isMainFrame = false;\
+          var _JSON_stringify;\
+          var _Array_slice;\
+          var _setTimeout;\
+          var _Promise;\
+          var _postMessage;\
           try {\
             origin = window.location.origin;\
           } catch (_) {}\
@@ -45,21 +50,25 @@ namespace flutter_inappwebview_plugin
           try {\
             isMainFrame = window === window.top;\
           } catch (_) {}\
-          var _postMessage;\
           try {\
+            _JSON_stringify = window.JSON.stringify;\
+            _Array_slice = window.Array.prototype.slice;\
+            _Array_slice.call = window.Function.prototype.call;\
+            _setTimeout = window.setTimeout;\
+            _Promise = window.Promise;\
             _postMessage = window.chrome.webview.postMessage;\
           } catch (_) { return; }\
           window." + get_JAVASCRIPT_BRIDGE_NAME() + ".callHandler = function() { \
-            var _callHandlerID = setTimeout(function() {}); \
+            var _callHandlerID = _setTimeout(function() {}); \
             _postMessage({ 'name': 'callHandler', 'body': {\
               'handlerName': arguments[0],\
               '_callHandlerID' : _callHandlerID,\
               '_bridgeSecret': bridgeSecret,\
               'origin': origin,\
               'requestUrl': requestUrl,\
-              'args' : JSON.stringify(Array.prototype.slice.call(arguments, 1))}\
+              'args' : _JSON_stringify(_Array_slice.call(arguments, 1))}\
             });\
-            return new Promise(function(resolve, reject) { \
+            return new _Promise(function(resolve, reject) { \
               try {\
                 (isMainFrame ? window : window.top)." + get_JAVASCRIPT_BRIDGE_NAME() + "[_callHandlerID] = { resolve: resolve, reject : reject };\
               } catch(e) { resolve(); }\

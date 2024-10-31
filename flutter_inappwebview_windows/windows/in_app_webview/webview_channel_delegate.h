@@ -8,6 +8,8 @@
 #include "../types/channel_delegate.h"
 #include "../types/create_window_action.h"
 #include "../types/custom_scheme_response.h"
+#include "../types/http_auth_response.h"
+#include "../types/http_authentication_challenge.h"
 #include "../types/javascript_handler_function_data.h"
 #include "../types/navigation_action.h"
 #include "../types/permission_response.h"
@@ -19,7 +21,7 @@ namespace flutter_inappwebview_plugin
 {
   class InAppWebView;
 
-  enum NavigationActionPolicy { cancel = 0, allow = 1 };
+  enum class NavigationActionPolicy { cancel = 0, allow = 1 };
 
   class WebViewChannelDelegate : public ChannelDelegate
   {
@@ -62,6 +64,12 @@ namespace flutter_inappwebview_plugin
       ~LoadResourceWithCustomSchemeCallback() = default;
     };
 
+    class ReceivedHttpAuthRequestCallback : public BaseCallbackResult<const std::shared_ptr<HttpAuthResponse>> {
+    public:
+      ReceivedHttpAuthRequestCallback();
+      ~ReceivedHttpAuthRequestCallback() = default;
+    };
+
     WebViewChannelDelegate(InAppWebView* webView, flutter::BinaryMessenger* messenger);
     WebViewChannelDelegate(InAppWebView* webView, flutter::BinaryMessenger* messenger, const std::string& name);
     ~WebViewChannelDelegate();
@@ -86,6 +94,7 @@ namespace flutter_inappwebview_plugin
     void onPermissionRequest(const std::string& origin, const std::vector<int64_t>& resources, std::unique_ptr<PermissionRequestCallback> callback) const;
     void shouldInterceptRequest(std::shared_ptr<WebResourceRequest> request, std::unique_ptr<ShouldInterceptRequestCallback> callback) const;
     void onLoadResourceWithCustomScheme(std::shared_ptr<WebResourceRequest> request, std::unique_ptr<LoadResourceWithCustomSchemeCallback> callback) const;
+    void onReceivedHttpAuthRequest(std::shared_ptr<HttpAuthenticationChallenge> challenge, std::unique_ptr<ReceivedHttpAuthRequestCallback> callback) const;
   };
 }
 

@@ -2,13 +2,12 @@
 #define FLUTTER_INAPPWEBVIEW_PLUGIN_PERMISSION_RESPONSE_H_
 
 #include <flutter/standard_method_codec.h>
-#include <WebView2.h>
 
 #include "../utils/flutter.h"
 
 namespace flutter_inappwebview_plugin
 {
-  enum PermissionResponseActionType {
+  enum class PermissionResponseActionType {
     deny = 0,
     grant,
     prompt
@@ -28,6 +27,11 @@ namespace flutter_inappwebview_plugin
     default:
       return PermissionResponseActionType::prompt;
     }
+  }
+
+  inline std::optional<int64_t> PermissionResponseActionTypeToInteger(const std::optional<PermissionResponseActionType>& action)
+  {
+    return action.has_value() ? static_cast<int64_t>(action.value()) : std::optional<int64_t>{};
   }
 
   class PermissionResponse

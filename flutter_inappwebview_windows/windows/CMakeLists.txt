@@ -51,6 +51,8 @@ list(APPEND PLUGIN_SOURCES
   "utils/flutter.h"
   "utils/base64.cpp"
   "utils/base64.h"
+  "utils/uri.h"
+  "utils/uuid.h"
   "types/channel_delegate.cpp"
   "types/channel_delegate.h"
   "types/base_callback_result.h"

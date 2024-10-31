@@ -5,10 +5,6 @@
 #include <rpc.h>
 #include <string>
 #include <variant>
-#include <Windows.h>
-#include <winrt/Windows.Foundation.h>
-
-#include "string.h"
 
 namespace flutter_inappwebview_plugin
 {
@@ -36,48 +32,6 @@ namespace flutter_inappwebview_plugin
   {
     auto dpi = GetDpiForWindow(hwnd);
     return dpi > 0 ? dpi / 96.0f : 1.0f;
-  }
-
-  static inline std::string get_uuid()
-  {
-    UUID uuid = { 0 };
-    std::string guid;
-
-    ::UuidCreate(&uuid);
-
-    RPC_CSTR szUuid = NULL;
-    if (::UuidToStringA(&uuid, &szUuid) == RPC_S_OK) {
-      guid = (char*)szUuid;
-      ::RpcStringFreeA(&szUuid);
-    }
-
-    return guid;
-  }
-
-  static inline std::string get_origin_from_url(const std::string& url)
-  {
-    try {
-      winrt::Windows::Foundation::Uri const uri{ utf8_to_wide(url) };
-      auto scheme = winrt::to_string(uri.SchemeName());
-      auto host = winrt::to_string(uri.Host());
-      auto uriPort = uri.Port();
-      std::string port = "";
-      if (uriPort > 0 && ((string_equals(scheme, "http") && uriPort != 80) || (string_equals(scheme, "https") && uriPort != 443))) {
-        port = ":" + std::to_string(uriPort);
-      }
-      return scheme + "://" + host + port;
-    }
-    catch (...) {
-      auto urlSplit = split(url, std::string{ "://" });
-      if (urlSplit.size() > 1) {
-        auto scheme = urlSplit[0];
-        auto afterScheme = urlSplit[1];
-        auto afterSchemeSplit = split(afterScheme, std::string{ "/" });
-        auto host = afterSchemeSplit[0];
-        return scheme + "://" + host;
-      }
-    }
-    return url;
   }
 }
 

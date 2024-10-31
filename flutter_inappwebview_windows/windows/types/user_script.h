@@ -37,9 +37,6 @@ namespace flutter_inappwebview_plugin
     );
     UserScript(const flutter::EncodableMap& map);
     ~UserScript();
-
-  private:
-    static std::string wrapSourceCodeAddChecks(const std::string& source, const std::optional<std::vector<std::string>>& allowedOriginRules, const bool& forMainFrameOnly);
   };
 }
 #endif //FLUTTER_INAPPWEBVIEW_PLUGIN_USER_SCRIPT_H_

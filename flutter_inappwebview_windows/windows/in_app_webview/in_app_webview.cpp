@@ -19,6 +19,7 @@
 #include "../utils/map.h"
 #include "../utils/strconv.h"
 #include "../utils/string.h"
+#include "../utils/uri.h"
 #include "../webview_environment/webview_environment_manager.h"
 #include "in_app_webview.h"
 #include "in_app_webview_manager.h"

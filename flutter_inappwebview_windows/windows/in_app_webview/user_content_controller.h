@@ -68,6 +68,8 @@ namespace flutter_inappwebview_plugin
     void removeScriptFromWebView(std::shared_ptr<UserScript> userScript, const std::function<void()> completionHandler) const;
 
     void addPluginScriptsIfRequired(const std::shared_ptr<ContentWorld> contentWorld);
+
+    static std::string wrapSourceCodeAddChecks(const std::string& source, const std::shared_ptr<UserScript> userScript);
   };
 }
 #endif //FLUTTER_INAPPWEBVIEW_PLUGIN_USER_CONTENT_CONTROLLER_H_

@@ -12,44 +12,9 @@ namespace flutter_inappwebview_plugin
     const bool& forMainFrameOnly,
     const std::optional<std::vector<std::string>>& allowedOriginRules,
     std::shared_ptr<ContentWorld> contentWorld
-  ) : groupName(groupName), source(UserScript::wrapSourceCodeAddChecks(source, allowedOriginRules, forMainFrameOnly)),
+  ) : groupName(groupName), source(source),
     injectionTime(injectionTime), forMainFrameOnly(forMainFrameOnly), allowedOriginRules(allowedOriginRules), contentWorld(std::move(contentWorld))
   {}
-
-  std::string UserScript::wrapSourceCodeAddChecks(const std::string& source, const std::optional<std::vector<std::string>>& allowedOriginRules, const bool& forMainFrameOnly)
-  {
-    std::string ifStatement = "if (";
-
-    if (allowedOriginRules.has_value() && !vector_contains<std::string>(allowedOriginRules.value(), "*")) {
-      if (allowedOriginRules.value().empty()) {
-        // return empty source string if allowedOriginRules is an empty list.
-        // an empty list means that this UserScript is not allowed for any origin.
-        return "";
-      }
-
-      std::string jsRegExpArray = "[";
-      for (const auto& allowedOriginRule : allowedOriginRules.value()) {
-        if (jsRegExpArray.length() > 1) {
-          jsRegExpArray += ", ";
-        }
-        jsRegExpArray += "new RegExp('" + replace_all_copy(allowedOriginRule, "\'", "\\'") + "')";
-      }
-
-      if (jsRegExpArray.length() > 1) {
-        jsRegExpArray += "]";
-        ifStatement += jsRegExpArray + ".some(function(rx) { return rx.test(window.location.origin); })";
-      }
-    }
-
-    if (forMainFrameOnly) {
-      if (ifStatement.length() > 4) {
-        ifStatement += " && ";
-      }
-      ifStatement += "window === window.top";
-    }
-
-    return ifStatement.length() > 4 ? ifStatement + ") { " + source + "}" : source;
-  }
 
   UserScript::UserScript(const flutter::EncodableMap& map)
     : UserScript(get_optional_fl_map_value<std::string>(map, "groupName"),

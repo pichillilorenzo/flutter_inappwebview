@@ -16,7 +16,7 @@
 #include "../types/ssl_certificate.h"
 #include "../types/url_request.h"
 #include "../types/web_history.h"
-#include "../utils/util.h"
+#include "../utils/uuid.h"
 #include "../webview_environment/webview_environment.h"
 #include "in_app_webview_settings.h"
 #include "user_content_controller.h"

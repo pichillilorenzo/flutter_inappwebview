@@ -253,7 +253,7 @@ public class MyCookieManager extends ChannelDelegateImpl {
 
           if (cookieParamName.equalsIgnoreCase("Expires")) {
             try {
-              final SimpleDateFormat sdf = new SimpleDateFormat("EEE, dd MMM yyyy hh:mm:ss z", Locale.US);
+              final SimpleDateFormat sdf = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss z", Locale.US);
               Date expiryDate = sdf.parse(cookieParamValue);
               if (expiryDate != null) {
                 cookieMap.put("expiresDate", expiryDate.getTime());
@@ -441,7 +441,7 @@ public class MyCookieManager extends ChannelDelegateImpl {
   }
 
   public static String getCookieExpirationDate(Long timestamp) {
-    final SimpleDateFormat sdf = new SimpleDateFormat("EEE, dd MMM yyyy hh:mm:ss z", Locale.US);
+    final SimpleDateFormat sdf = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss z", Locale.US);
     sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
     return sdf.format(new Date(timestamp));
   }

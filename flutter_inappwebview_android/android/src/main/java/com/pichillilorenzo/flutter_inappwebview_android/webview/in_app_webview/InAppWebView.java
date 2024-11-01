@@ -705,6 +705,12 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
       @Override
       public void run() {
         try {
+          boolean wasHorizontalScrollBarEnabled = isHorizontalScrollBarEnabled();
+          boolean wasVerticalScrollBarEnabled = isVerticalScrollBarEnabled();
+
+          // Disable the scroll bars temporarily
+          setHorizontalScrollBarEnabled(false);
+          setVerticalScrollBarEnabled(false);
           int bitmapWidth = getMeasuredWidth();
           int bitmapHeight = getMeasuredHeight();
           int bitmapScrollX = getScrollX();
@@ -734,7 +740,11 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
           Bitmap screenshotBitmap = Bitmap.createBitmap(bitmapWidth, bitmapHeight, Bitmap.Config.ARGB_8888);
           Canvas c = new Canvas(screenshotBitmap);
           c.translate(-bitmapScrollX, -bitmapScrollY);
+          layout(0,0,bitmapWidth, bitmapHeight);
           draw(c);
+
+          setHorizontalScrollBarEnabled(wasHorizontalScrollBarEnabled);
+          setVerticalScrollBarEnabled(wasVerticalScrollBarEnabled);
 
           ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
 

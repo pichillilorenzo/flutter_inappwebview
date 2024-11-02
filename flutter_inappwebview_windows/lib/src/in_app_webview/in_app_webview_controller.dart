@@ -929,6 +929,15 @@ class WindowsInAppWebViewController extends PlatformInAppWebViewController
             _inAppBrowserEventHandler != null) {
           Map<String, dynamic> arguments =
               call.arguments.cast<String, dynamic>();
+
+          arguments['mutuallyTrustedCertificates'] =
+              (arguments['mutuallyTrustedCertificates'] as List<dynamic>)
+                  .cast<Map<dynamic, dynamic>>()
+                  .map((c) {
+                c['x509Certificate'] = utf8.encode(c['x509Certificate']);
+                return c;
+              }).toList();
+
           ClientCertChallenge challenge =
               ClientCertChallenge.fromMap(arguments)!;
 

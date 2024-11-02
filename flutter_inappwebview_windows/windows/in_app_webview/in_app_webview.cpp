@@ -8,6 +8,7 @@
 
 #include "../custom_platform_view/util/composition.desktop.interop.h"
 #include "../plugin_scripts_js/javascript_bridge_js.h"
+#include "../types/client_cert_response.h"
 #include "../types/create_window_action.h"
 #include "../types/http_auth_response.h"
 #include "../types/javascript_handler_function_data.h"
@@ -215,7 +216,7 @@ namespace flutter_inappwebview_plugin
 
     wil::com_ptr<ICoreWebView2Controller2> webViewController2;
     if (succeededOrLog(webViewController->QueryInterface(IID_PPV_ARGS(&webViewController2)))) {
-      if (!settings->transparentBackground) {
+      if (settings->transparentBackground) {
         webViewController2->put_DefaultBackgroundColor({ 0, 255, 255, 255 });
       }
     }
@@ -294,7 +295,7 @@ namespace flutter_inappwebview_plugin
     wil::com_ptr<ICoreWebView2DevToolsProtocolEventReceiver> fetchRequestPausedEventReceiver;
 
     if (succeededOrLog(webView->GetDevToolsProtocolEventReceiver(L"Fetch.requestPaused", &fetchRequestPausedEventReceiver))) {
-      failedAndLog(fetchRequestPausedEventReceiver->add_DevToolsProtocolEventReceived(
+      auto add_DevToolsProtocolEventReceived_HResult = fetchRequestPausedEventReceiver->add_DevToolsProtocolEventReceived(
         Callback<ICoreWebView2DevToolsProtocolEventReceivedEventHandler>(
           [this](
             ICoreWebView2* sender,
@@ -428,10 +429,11 @@ namespace flutter_inappwebview_plugin
 
             return S_OK;
           })
-        .Get(), nullptr));
+        .Get(), nullptr);
+      failedAndLog(add_DevToolsProtocolEventReceived_HResult);
     }
 
-    failedLog(webView->add_NavigationStarting(
+    auto add_NavigationStarting_HResult = webView->add_NavigationStarting(
       Callback<ICoreWebView2NavigationStartingEventHandler>(
         [this](ICoreWebView2* sender, ICoreWebView2NavigationStartingEventArgs* args)
         {
@@ -531,9 +533,10 @@ namespace flutter_inappwebview_plugin
 
           return S_OK;
         }
-      ).Get(), nullptr));
+      ).Get(), nullptr);
+    failedLog(add_NavigationStarting_HResult);
 
-    failedLog(webView->add_ContentLoading(
+    auto add_ContentLoading_HResult = webView->add_ContentLoading(
       Callback<ICoreWebView2ContentLoadingEventHandler>(
         [this](ICoreWebView2* sender, ICoreWebView2ContentLoadingEventArgs* args)
         {
@@ -542,9 +545,10 @@ namespace flutter_inappwebview_plugin
           }
           return S_OK;
         }
-      ).Get(), nullptr));
+      ).Get(), nullptr);
+    failedLog(add_ContentLoading_HResult);
 
-    failedLog(webView->add_NavigationCompleted(
+    auto add_NavigationCompleted_HResult = webView->add_NavigationCompleted(
       Callback<ICoreWebView2NavigationCompletedEventHandler>(
         [this](ICoreWebView2* sender, ICoreWebView2NavigationCompletedEventArgs* args)
         {
@@ -598,9 +602,10 @@ namespace flutter_inappwebview_plugin
 
           return S_OK;
         }
-      ).Get(), nullptr));
+      ).Get(), nullptr);
+    failedLog(add_NavigationCompleted_HResult);
 
-    failedLog(webView->add_DocumentTitleChanged(Callback<ICoreWebView2DocumentTitleChangedEventHandler>(
+    auto add_DocumentTitleChanged_HResult = webView->add_DocumentTitleChanged(Callback<ICoreWebView2DocumentTitleChangedEventHandler>(
       [this](ICoreWebView2* sender, IUnknown* args)
       {
         if (channelDelegate) {
@@ -610,9 +615,10 @@ namespace flutter_inappwebview_plugin
         }
         return S_OK;
       }
-    ).Get(), nullptr));
+    ).Get(), nullptr);
+    failedLog(add_DocumentTitleChanged_HResult);
 
-    failedLog(webView->add_HistoryChanged(Callback<ICoreWebView2HistoryChangedEventHandler>(
+    auto add_HistoryChanged_HResult = webView->add_HistoryChanged(Callback<ICoreWebView2HistoryChangedEventHandler>(
       [this](ICoreWebView2* sender, IUnknown* args)
       {
         if (channelDelegate) {
@@ -624,18 +630,20 @@ namespace flutter_inappwebview_plugin
         }
         return S_OK;
       }
-    ).Get(), nullptr));
+    ).Get(), nullptr);
+    failedLog(add_HistoryChanged_HResult);
 
-    failedLog(webView->add_WebMessageReceived(Callback<ICoreWebView2WebMessageReceivedEventHandler>(
+    auto add_WebMessageReceived_HResult = webView->add_WebMessageReceived(Callback<ICoreWebView2WebMessageReceivedEventHandler>(
       [this](ICoreWebView2* sender, ICoreWebView2WebMessageReceivedEventArgs* args)
       {
         return this->onCallJsHandler(true, args);
       }
-    ).Get(), nullptr));
+    ).Get(), nullptr);
+    failedLog(add_WebMessageReceived_HResult);
 
     wil::com_ptr<ICoreWebView2DevToolsProtocolEventReceiver> consoleMessageReceiver;
     if (succeededOrLog(webView->GetDevToolsProtocolEventReceiver(L"Runtime.consoleAPICalled", &consoleMessageReceiver))) {
-      failedLog(consoleMessageReceiver->add_DevToolsProtocolEventReceived(
+      auto consoleMessageReceiver_add_DevToolsProtocolEventReceived_HResult = consoleMessageReceiver->add_DevToolsProtocolEventReceived(
         Callback<ICoreWebView2DevToolsProtocolEventReceivedEventHandler>(
           [this](
             ICoreWebView2* sender,
@@ -675,10 +683,11 @@ namespace flutter_inappwebview_plugin
 
             return S_OK;
           })
-        .Get(), nullptr));
+        .Get(), nullptr);
+      failedLog(consoleMessageReceiver_add_DevToolsProtocolEventReceived_HResult);
     }
 
-    failedLog(webView->add_NewWindowRequested(
+    auto add_NewWindowRequested_HResult = webView->add_NewWindowRequested(
       Callback<ICoreWebView2NewWindowRequestedEventHandler>(
         [this](ICoreWebView2* sender, ICoreWebView2NewWindowRequestedEventArgs* args)
         {
@@ -735,9 +744,10 @@ namespace flutter_inappwebview_plugin
           }
           return S_OK;
         }
-      ).Get(), nullptr));
+      ).Get(), nullptr);
+    failedLog(add_NewWindowRequested_HResult);
 
-    failedLog(webView->add_WindowCloseRequested(Callback<ICoreWebView2WindowCloseRequestedEventHandler>(
+    auto add_WindowCloseRequested_HResult = webView->add_WindowCloseRequested(Callback<ICoreWebView2WindowCloseRequestedEventHandler>(
       [this](ICoreWebView2* sender, IUnknown* args)
       {
         if (channelDelegate) {
@@ -745,9 +755,10 @@ namespace flutter_inappwebview_plugin
         }
         return S_OK;
       }
-    ).Get(), nullptr));
+    ).Get(), nullptr);
+    failedLog(add_WindowCloseRequested_HResult);
 
-    failedLog(webView->add_PermissionRequested(Callback<ICoreWebView2PermissionRequestedEventHandler>(
+    auto add_PermissionRequested_HResult = webView->add_PermissionRequested(Callback<ICoreWebView2PermissionRequestedEventHandler>(
       [this](ICoreWebView2* sender, ICoreWebView2PermissionRequestedEventArgs* args)
       {
         wil::com_ptr<ICoreWebView2Deferral> deferral;
@@ -794,10 +805,11 @@ namespace flutter_inappwebview_plugin
         }
         return S_OK;
       }
-    ).Get(), nullptr));
+    ).Get(), nullptr);
+    failedLog(add_PermissionRequested_HResult);
 
     failedLog(webView->AddWebResourceRequestedFilter(L"*", COREWEBVIEW2_WEB_RESOURCE_CONTEXT_ALL));
-    failedLog(webView->add_WebResourceRequested(
+    auto add_WebResourceRequested_HResult = webView->add_WebResourceRequested(
       Callback<ICoreWebView2WebResourceRequestedEventHandler>(
         [this](
           ICoreWebView2* sender, ICoreWebView2WebResourceRequestedEventArgs* args)
@@ -879,11 +891,12 @@ namespace flutter_inappwebview_plugin
           }
           return S_OK;
         }
-      ).Get(), nullptr));
+      ).Get(), nullptr);
+    failedLog(add_WebResourceRequested_HResult);
 
     wil::com_ptr<ICoreWebView2_2> webView2;
     if (SUCCEEDED(webView->QueryInterface(IID_PPV_ARGS(&webView2)))) {
-      failedLog(webView2->add_DOMContentLoaded(
+      auto add_DOMContentLoaded_HResult = webView2->add_DOMContentLoaded(
         Callback<ICoreWebView2DOMContentLoadedEventHandler>(
           [this](ICoreWebView2* sender, ICoreWebView2DOMContentLoadedEventArgs* args)
           {
@@ -892,31 +905,152 @@ namespace flutter_inappwebview_plugin
             }
             return S_OK;
           }
-        ).Get(), nullptr));
+        ).Get(), nullptr);
+      failedLog(add_DOMContentLoaded_HResult);
     }
 
     wil::com_ptr<ICoreWebView2_4> webView4;
     if (SUCCEEDED(webView->QueryInterface(IID_PPV_ARGS(&webView4)))) {
-      failedLog(webView4->add_FrameCreated(
+      auto add_FrameCreated_HResult = webView4->add_FrameCreated(
         Callback<ICoreWebView2FrameCreatedEventHandler>(
           [this](ICoreWebView2* sender, ICoreWebView2FrameCreatedEventArgs* args)
           {
             wil::com_ptr<ICoreWebView2Frame> frame;
             wil::com_ptr<ICoreWebView2Frame2> frame2;
             if (succeededOrLog(args->get_Frame(&frame)) && SUCCEEDED(frame->QueryInterface(IID_PPV_ARGS(&frame2)))) {
-              failedLog(frame2->add_WebMessageReceived(Callback<ICoreWebView2FrameWebMessageReceivedEventHandler>(
+              auto frame_add_WebMessageReceived_HResult = frame2->add_WebMessageReceived(Callback<ICoreWebView2FrameWebMessageReceivedEventHandler>(
                 [this](ICoreWebView2Frame* sender, ICoreWebView2WebMessageReceivedEventArgs* args)
                 {
                   return this->onCallJsHandler(false, args);
-                }).Get(), nullptr));
+                }).Get(), nullptr);
+              failedLog(frame_add_WebMessageReceived_HResult);
             }
             return S_OK;
           }
-        ).Get(), nullptr));
+        ).Get(), nullptr);
+      failedLog(add_FrameCreated_HResult);
+    }
+
+    if (auto webView5 = webView.try_query<ICoreWebView2_5>()) {
+      auto add_ClientCertificateRequested_HResult = webView5->add_ClientCertificateRequested(
+        Callback<ICoreWebView2ClientCertificateRequestedEventHandler>(
+          [this](
+            ICoreWebView2* sender,
+            ICoreWebView2ClientCertificateRequestedEventArgs* args)
+          {
+            wil::com_ptr<ICoreWebView2Deferral> deferral;
+            wil::unique_cotaskmem_string host;
+
+            if (channelDelegate && plugin && plugin->inAppWebViewManager &&
+              succeededOrLog(args->get_Host(&host)) && succeededOrLog(args->GetDeferral(&deferral))) {
+
+              std::vector<std::shared_ptr<SslCertificate>> mutuallyTrustedCertificates = {};
+              wil::com_ptr<ICoreWebView2ClientCertificateCollection> certificateCollection;
+              uint32_t certCount = 0;
+              if (succeededOrLog(args->get_MutuallyTrustedCertificates(&certificateCollection)) && succeededOrLog(certificateCollection->get_Count(&certCount))) {
+
+                for (uint32_t i = 0; i < certCount; i++) {
+                  wil::com_ptr<ICoreWebView2ClientCertificate> clientCert;
+                  if (succeededOrLog(certificateCollection->GetValueAtIndex(i, &clientCert))) {
+                    wil::unique_cotaskmem_string certPemEncoded;
+                    if (succeededOrLog(clientCert->ToPemEncoding(&certPemEncoded))) {
+                      mutuallyTrustedCertificates.push_back(std::make_shared<SslCertificate>(wide_to_utf8(certPemEncoded.get())));
+                    }
+                  }
+                }
+              }
+
+              std::vector<std::string> allowedCertificateAuthorities = {};
+              wil::com_ptr<ICoreWebView2StringCollection> authoritiesCollection;
+              uint32_t authoritiesCount = 0;
+              if (succeededOrLog(args->get_AllowedCertificateAuthorities(&authoritiesCollection)) && succeededOrLog(authoritiesCollection->get_Count(&authoritiesCount))) {
+                for (uint32_t i = 0; i < authoritiesCount; i++) {
+                  wil::unique_cotaskmem_string authority;
+                  if (succeededOrLog(authoritiesCollection->GetValueAtIndex(i, &authority))) {
+                    allowedCertificateAuthorities.push_back(base64_decode(wide_to_utf8(authority.get())));
+                  }
+                }
+              }
+
+              args->get_AllowedCertificateAuthorities(&authoritiesCollection);
+
+              int port = 0;
+              args->get_Port(&port);
+
+              BOOL isProxy = false;
+              args->get_IsProxy(&isProxy);
+
+              std::string scheme = "";
+              auto currentUrl = getUrl();
+              if (currentUrl.has_value()) {
+                scheme = currentUrl.value().substr(0, currentUrl.value().find(':'));
+              }
+
+              auto protectionSpace = std::make_unique<URLProtectionSpace>(
+                wide_to_utf8(host.get()),
+                scheme,
+                std::optional<std::string>{},
+                port,
+                std::optional<std::shared_ptr<SslCertificate>>{}
+              );
+              auto challenge = std::make_unique<ClientCertChallenge>(
+                std::move(protectionSpace),
+                allowedCertificateAuthorities,
+                isProxy,
+                mutuallyTrustedCertificates
+              );
+
+              auto callback = std::make_unique<WebViewChannelDelegate::ReceivedClientCertRequestCallback>();
+              auto defaultBehaviour = [this, deferral, args](const std::optional<std::shared_ptr<ClientCertResponse>> response)
+                {
+                  failedLog(deferral->Complete());
+                };
+              callback->nonNullSuccess = [this, deferral, certCount, certificateCollection, args](const std::shared_ptr<ClientCertResponse> response)
+                {
+                  auto action = response->action;
+
+                  if (action.has_value()) {
+                    switch (action.value()) {
+                    case ClientCertResponseAction::proceed:
+                      if (certCount > 0 && response->selectedCertificate >= 0) {
+                        wil::com_ptr<ICoreWebView2ClientCertificate> selectedClientCert;
+                        if (succeededOrLog(certificateCollection->GetValueAtIndex((uint32_t)response->selectedCertificate, &selectedClientCert))) {
+                          args->put_SelectedCertificate(selectedClientCert.get());
+                        }
+                      }
+                      args->put_Handled(true);
+                      args->put_Cancel(false);
+                      break;
+                    case ClientCertResponseAction::ignore:
+                      args->put_Handled(true);
+                      args->put_Cancel(false);
+                      break;
+                    case ClientCertResponseAction::cancel:
+                    default:
+                      args->put_Cancel(true);
+                      break;
+                    }
+                    failedLog(deferral->Complete());
+                    return false;
+                  }
+                  return true;
+                };
+              callback->defaultBehaviour = defaultBehaviour;
+              callback->error = [this, defaultBehaviour](const std::string& error_code, const std::string& error_message, const flutter::EncodableValue* error_details)
+                {
+                  debugLog(error_code + ", " + error_message);
+                  defaultBehaviour(std::nullopt);
+                };
+              channelDelegate->onReceivedClientCertRequest(std::move(challenge), std::move(callback));
+            }
+            return S_OK;
+          })
+        .Get(), nullptr);
+      failedLog(add_ClientCertificateRequested_HResult);
     }
 
     if (auto webView10 = webView.try_query<ICoreWebView2_10>()) {
-      failedLog(webView10->add_BasicAuthenticationRequested(
+      auto add_BasicAuthenticationRequested_HResult = webView10->add_BasicAuthenticationRequested(
         Callback<ICoreWebView2BasicAuthenticationRequestedEventHandler>(
           [this](
             ICoreWebView2* sender,
@@ -997,7 +1131,8 @@ namespace flutter_inappwebview_plugin
             }
             return S_OK;
           })
-        .Get(), nullptr));
+        .Get(), nullptr);
+      failedLog(add_BasicAuthenticationRequested_HResult);
     }
 
     /*

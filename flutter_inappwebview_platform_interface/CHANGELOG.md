@@ -7,6 +7,7 @@
 - Added `setJavaScriptBridgeName`, `getJavaScriptBridgeName` static WebView controller methods
 - Added `JavaScriptHandlerFunctionData` type
 - Deprecated `JavaScriptHandlerCallback` type in favor of `JavaScriptHandlerFunction` type
+- Fixed X509Certificate PEM base64 decoding
 
 ## 1.3.0+1
 

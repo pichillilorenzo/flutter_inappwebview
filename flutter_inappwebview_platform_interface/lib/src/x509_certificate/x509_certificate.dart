@@ -86,7 +86,7 @@ class X509Certificate {
 
       Uint8List? derDataDecoded;
       try {
-        derDataDecoded = Uint8List.fromList(utf8.encode(base64buffer));
+        derDataDecoded = Uint8List.fromList(base64Decode(base64buffer));
       } catch (e) {}
       if (derDataDecoded != null) {
         return derDataDecoded;

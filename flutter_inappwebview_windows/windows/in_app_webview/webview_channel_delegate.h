@@ -6,6 +6,8 @@
 
 #include "../types/base_callback_result.h"
 #include "../types/channel_delegate.h"
+#include "../types/client_cert_challenge.h"
+#include "../types/client_cert_response.h"
 #include "../types/create_window_action.h"
 #include "../types/custom_scheme_response.h"
 #include "../types/http_auth_response.h"
@@ -70,6 +72,12 @@ namespace flutter_inappwebview_plugin
       ~ReceivedHttpAuthRequestCallback() = default;
     };
 
+    class ReceivedClientCertRequestCallback : public BaseCallbackResult<const std::shared_ptr<ClientCertResponse>> {
+    public:
+      ReceivedClientCertRequestCallback();
+      ~ReceivedClientCertRequestCallback() = default;
+    };
+
     WebViewChannelDelegate(InAppWebView* webView, flutter::BinaryMessenger* messenger);
     WebViewChannelDelegate(InAppWebView* webView, flutter::BinaryMessenger* messenger, const std::string& name);
     ~WebViewChannelDelegate();
@@ -95,6 +103,7 @@ namespace flutter_inappwebview_plugin
     void shouldInterceptRequest(std::shared_ptr<WebResourceRequest> request, std::unique_ptr<ShouldInterceptRequestCallback> callback) const;
     void onLoadResourceWithCustomScheme(std::shared_ptr<WebResourceRequest> request, std::unique_ptr<LoadResourceWithCustomSchemeCallback> callback) const;
     void onReceivedHttpAuthRequest(std::shared_ptr<HttpAuthenticationChallenge> challenge, std::unique_ptr<ReceivedHttpAuthRequestCallback> callback) const;
+    void onReceivedClientCertRequest(std::shared_ptr<ClientCertChallenge> challenge, std::unique_ptr<ReceivedClientCertRequestCallback> callback) const;
   };
 }
 

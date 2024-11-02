@@ -82,6 +82,14 @@ namespace flutter_inappwebview_plugin
       };
   }
 
+  WebViewChannelDelegate::ReceivedClientCertRequestCallback::ReceivedClientCertRequestCallback()
+  {
+    decodeResult = [](const flutter::EncodableValue* value)
+      {
+        return value == nullptr || value->IsNull() ? std::optional<std::shared_ptr<ClientCertResponse>>{} : std::make_shared<ClientCertResponse>(std::get<flutter::EncodableMap>(*value));
+      };
+  }
+
   void WebViewChannelDelegate::HandleMethodCall(const flutter::MethodCall<flutter::EncodableValue>& method_call,
     std::unique_ptr<flutter::MethodResult<flutter::EncodableValue>> result)
   {
@@ -505,6 +513,17 @@ namespace flutter_inappwebview_plugin
 
     auto arguments = std::make_unique<flutter::EncodableValue>(challenge->toEncodableMap());
     channel->InvokeMethod("onReceivedHttpAuthRequest", std::move(arguments), std::move(callback));
+  }
+
+  void WebViewChannelDelegate::onReceivedClientCertRequest(std::shared_ptr<ClientCertChallenge> challenge, std::unique_ptr<ReceivedClientCertRequestCallback> callback) const
+  {
+    if (!channel) {
+      callback->defaultBehaviour(std::nullopt);
+      return;
+    }
+
+    auto arguments = std::make_unique<flutter::EncodableValue>(challenge->toEncodableMap());
+    channel->InvokeMethod("onReceivedClientCertRequest", std::move(arguments), std::move(callback));
   }
 
   WebViewChannelDelegate::~WebViewChannelDelegate()

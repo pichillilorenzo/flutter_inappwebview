@@ -90,6 +90,14 @@ namespace flutter_inappwebview_plugin
       };
   }
 
+  WebViewChannelDelegate::ReceivedServerTrustAuthRequestCallback::ReceivedServerTrustAuthRequestCallback()
+  {
+    decodeResult = [](const flutter::EncodableValue* value)
+      {
+        return value == nullptr || value->IsNull() ? std::optional<std::shared_ptr<ServerTrustAuthResponse>>{} : std::make_shared<ServerTrustAuthResponse>(std::get<flutter::EncodableMap>(*value));
+      };
+  }
+
   void WebViewChannelDelegate::HandleMethodCall(const flutter::MethodCall<flutter::EncodableValue>& method_call,
     std::unique_ptr<flutter::MethodResult<flutter::EncodableValue>> result)
   {
@@ -283,6 +291,13 @@ namespace flutter_inappwebview_plugin
       webView->getCertificate([result_ = std::move(result_)](const std::optional<std::unique_ptr<SslCertificate>> data)
         {
           result_->Success(data.has_value() ? data.value()->toEncodableMap() : make_fl_value());
+        });
+    }
+    else if (string_equals(methodName, "clearSslPreferences")) {
+      auto result_ = std::shared_ptr<flutter::MethodResult<flutter::EncodableValue>>(std::move(result));
+      webView->clearSslPreferences([result_ = std::move(result_)]()
+        {
+          result_->Success();
         });
     }
     // for inAppBrowser
@@ -524,6 +539,17 @@ namespace flutter_inappwebview_plugin
 
     auto arguments = std::make_unique<flutter::EncodableValue>(challenge->toEncodableMap());
     channel->InvokeMethod("onReceivedClientCertRequest", std::move(arguments), std::move(callback));
+  }
+
+  void WebViewChannelDelegate::onReceivedServerTrustAuthRequest(std::shared_ptr<ServerTrustChallenge> challenge, std::unique_ptr<ReceivedServerTrustAuthRequestCallback> callback) const
+  {
+    if (!channel) {
+      callback->defaultBehaviour(std::nullopt);
+      return;
+    }
+
+    auto arguments = std::make_unique<flutter::EncodableValue>(challenge->toEncodableMap());
+    channel->InvokeMethod("onReceivedServerTrustAuthRequest", std::move(arguments), std::move(callback));
   }
 
   WebViewChannelDelegate::~WebViewChannelDelegate()

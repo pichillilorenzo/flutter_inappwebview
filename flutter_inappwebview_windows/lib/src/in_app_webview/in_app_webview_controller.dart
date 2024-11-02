@@ -889,6 +889,12 @@ class WindowsInAppWebViewController extends PlatformInAppWebViewController
             _inAppBrowserEventHandler != null) {
           Map<String, dynamic> arguments =
               call.arguments.cast<String, dynamic>();
+
+          if (arguments['protectionSpace'] is Map && arguments['protectionSpace']['sslCertificate'] is Map &&
+              arguments['protectionSpace']['sslCertificate']['x509Certificate'] is String) {
+            arguments['protectionSpace']['sslCertificate']['x509Certificate'] = utf8.encode(arguments['protectionSpace']['sslCertificate']['x509Certificate']);
+          }
+
           HttpAuthenticationChallenge challenge =
               HttpAuthenticationChallenge.fromMap(arguments)!;
 
@@ -909,6 +915,12 @@ class WindowsInAppWebViewController extends PlatformInAppWebViewController
             _inAppBrowserEventHandler != null) {
           Map<String, dynamic> arguments =
               call.arguments.cast<String, dynamic>();
+
+          if (arguments['protectionSpace'] is Map && arguments['protectionSpace']['sslCertificate'] is Map &&
+              arguments['protectionSpace']['sslCertificate']['x509Certificate'] is String) {
+            arguments['protectionSpace']['sslCertificate']['x509Certificate'] = utf8.encode(arguments['protectionSpace']['sslCertificate']['x509Certificate']);
+          }
+
           ServerTrustChallenge challenge =
               ServerTrustChallenge.fromMap(arguments)!;
 
@@ -929,6 +941,11 @@ class WindowsInAppWebViewController extends PlatformInAppWebViewController
             _inAppBrowserEventHandler != null) {
           Map<String, dynamic> arguments =
               call.arguments.cast<String, dynamic>();
+
+          if (arguments['protectionSpace'] is Map && arguments['protectionSpace']['sslCertificate'] is Map &&
+              arguments['protectionSpace']['sslCertificate']['x509Certificate'] is String) {
+            arguments['protectionSpace']['sslCertificate']['x509Certificate'] = utf8.encode(arguments['protectionSpace']['sslCertificate']['x509Certificate']);
+          }
 
           arguments['mutuallyTrustedCertificates'] =
               (arguments['mutuallyTrustedCertificates'] as List<dynamic>)
@@ -2696,6 +2713,12 @@ class WindowsInAppWebViewController extends PlatformInAppWebViewController
     args.putIfAbsent('eventName', () => eventName);
     await channel?.invokeMethod('removeDevToolsProtocolEventListener', args);
     this._devToolsProtocolEventListenerMap.remove(eventName);
+  }
+
+  @override
+  Future<void> clearSslPreferences() async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    await channel?.invokeMethod('clearSslPreferences', args);
   }
 
   @override

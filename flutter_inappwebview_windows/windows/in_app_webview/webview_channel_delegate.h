@@ -15,6 +15,8 @@
 #include "../types/javascript_handler_function_data.h"
 #include "../types/navigation_action.h"
 #include "../types/permission_response.h"
+#include "../types/server_trust_auth_response.h"
+#include "../types/server_trust_challenge.h"
 #include "../types/web_resource_error.h"
 #include "../types/web_resource_request.h"
 #include "../types/web_resource_response.h"
@@ -78,6 +80,12 @@ namespace flutter_inappwebview_plugin
       ~ReceivedClientCertRequestCallback() = default;
     };
 
+    class ReceivedServerTrustAuthRequestCallback : public BaseCallbackResult<const std::shared_ptr<ServerTrustAuthResponse>> {
+    public:
+      ReceivedServerTrustAuthRequestCallback();
+      ~ReceivedServerTrustAuthRequestCallback() = default;
+    };
+
     WebViewChannelDelegate(InAppWebView* webView, flutter::BinaryMessenger* messenger);
     WebViewChannelDelegate(InAppWebView* webView, flutter::BinaryMessenger* messenger, const std::string& name);
     ~WebViewChannelDelegate();
@@ -104,6 +112,7 @@ namespace flutter_inappwebview_plugin
     void onLoadResourceWithCustomScheme(std::shared_ptr<WebResourceRequest> request, std::unique_ptr<LoadResourceWithCustomSchemeCallback> callback) const;
     void onReceivedHttpAuthRequest(std::shared_ptr<HttpAuthenticationChallenge> challenge, std::unique_ptr<ReceivedHttpAuthRequestCallback> callback) const;
     void onReceivedClientCertRequest(std::shared_ptr<ClientCertChallenge> challenge, std::unique_ptr<ReceivedClientCertRequestCallback> callback) const;
+    void onReceivedServerTrustAuthRequest(std::shared_ptr<ServerTrustChallenge> challenge, std::unique_ptr<ReceivedServerTrustAuthRequestCallback> callback) const;
   };
 }
 

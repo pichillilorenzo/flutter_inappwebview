@@ -6,6 +6,7 @@
 #include <string>
 
 #include "ssl_certificate.h"
+#include "ssl_error.h"
 
 namespace flutter_inappwebview_plugin
 {
@@ -17,10 +18,12 @@ namespace flutter_inappwebview_plugin
     const std::optional<std::string> realm;
     const int64_t port;
     const std::optional<std::shared_ptr<SslCertificate>> sslCertificate;
+    const std::optional<std::shared_ptr<SslError>> sslError;
 
     URLProtectionSpace(const std::string& host, const std::string& protocol,
       const std::optional<std::string>& realm, const int64_t& port,
-      const std::optional<std::shared_ptr<SslCertificate>> sslCertificate);
+      const std::optional<std::shared_ptr<SslCertificate>> sslCertificate,
+      const std::optional<std::shared_ptr<SslError>> sslError);
     ~URLProtectionSpace() = default;
 
     flutter::EncodableMap toEncodableMap() const;

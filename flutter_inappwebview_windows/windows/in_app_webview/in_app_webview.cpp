@@ -12,6 +12,8 @@
 #include "../types/create_window_action.h"
 #include "../types/http_auth_response.h"
 #include "../types/javascript_handler_function_data.h"
+#include "../types/server_trust_auth_response.h"
+#include "../types/ssl_error.h"
 #include "../types/url_credential.h"
 #include "../types/web_resource_error.h"
 #include "../types/web_resource_request.h"
@@ -991,7 +993,8 @@ namespace flutter_inappwebview_plugin
                 scheme,
                 std::optional<std::string>{},
                 port,
-                std::optional<std::shared_ptr<SslCertificate>>{}
+                std::optional<std::shared_ptr<SslCertificate>>{},
+                std::optional<std::shared_ptr<SslError>>{}
               );
               auto challenge = std::make_unique<ClientCertChallenge>(
                 std::move(protectionSpace),
@@ -1082,7 +1085,8 @@ namespace flutter_inappwebview_plugin
                   wide_to_utf8(uri.SchemeName().c_str()),
                   realm,
                   uri.Port(),
-                  std::optional<std::shared_ptr<SslCertificate>>{}
+                  std::optional<std::shared_ptr<SslCertificate>>{},
+                  std::optional<std::shared_ptr<SslError>>{}
                 );
                 auto challenge = std::make_unique<HttpAuthenticationChallenge>(
                   std::move(protectionSpace),
@@ -1135,24 +1139,90 @@ namespace flutter_inappwebview_plugin
       failedLog(add_BasicAuthenticationRequested_HResult);
     }
 
-    /*
-    wil::com_ptr<ICoreWebView2_14> webView14;
-    if (SUCCEEDED(webView->QueryInterface(IID_PPV_ARGS(&webView14)))) {
-      failedLog(webView14->add_ServerCertificateErrorDetected(
+    if (auto webView14 = webView.try_query<ICoreWebView2_14>()) {
+      auto add_ServerCertificateErrorDetected_HResult = webView14->add_ServerCertificateErrorDetected(
         Callback<ICoreWebView2ServerCertificateErrorDetectedEventHandler>(
           [this](ICoreWebView2* sender, ICoreWebView2ServerCertificateErrorDetectedEventArgs* args)
           {
-            debugLog("add_ServerCertificateErrorDetected");
-            wil::com_ptr<ICoreWebView2Certificate> certificate = nullptr;
-            if (SUCCEEDED(args->get_ServerCertificate(&certificate))) {
-              wil::unique_cotaskmem_string displayName = nullptr;
-              std::optional<std::string> url = SUCCEEDED(certificate->get_DisplayName(&displayName)) ? wide_to_utf8(displayName.get()) : std::optional<std::string>{};
-              debugLog(displayName.get());
+            wil::com_ptr<ICoreWebView2Deferral> deferral;
+            wil::unique_cotaskmem_string requestUrl;
+            if (succeededOrLog(args->get_RequestUri(&requestUrl)) && succeededOrLog(args->GetDeferral(&deferral))) {
+
+              wil::com_ptr<ICoreWebView2Certificate> serverCert;
+              auto sslCert = std::optional<std::shared_ptr<SslCertificate>>{};
+              if (succeededOrLog(args->get_ServerCertificate(&serverCert))) {
+                wil::unique_cotaskmem_string certPemEncoded;
+                if (succeededOrLog(serverCert->ToPemEncoding(&certPemEncoded))) {
+                  sslCert = std::make_shared<SslCertificate>(wide_to_utf8(certPemEncoded.get()));
+                }
+              }
+
+              auto sslError = std::optional<std::shared_ptr<SslError>>{};
+              COREWEBVIEW2_WEB_ERROR_STATUS errorStatus;
+              if (succeededOrLog(args->get_ErrorStatus(&errorStatus))) {
+                sslError = std::make_shared<SslError>(
+                  errorStatus,
+                  COREWEBVIEW2_WEB_ERROR_STATUS_ToString(errorStatus)
+                );
+              }
+
+              try {
+                winrt::Windows::Foundation::Uri const uri{ requestUrl.get() };
+
+                auto protectionSpace = std::make_unique<URLProtectionSpace>(
+                  wide_to_utf8(uri.Host().c_str()),
+                  wide_to_utf8(uri.SchemeName().c_str()),
+                  std::optional<std::string>{},
+                  uri.Port(),
+                  sslCert,
+                  sslError
+                );
+                auto challenge = std::make_unique<ServerTrustChallenge>(
+                  std::move(protectionSpace)
+                );
+
+                auto callback = std::make_unique<WebViewChannelDelegate::ReceivedServerTrustAuthRequestCallback>();
+                auto defaultBehaviour = [this, deferral, args](const std::optional<std::shared_ptr<ServerTrustAuthResponse>> response)
+                  {
+                    failedLog(deferral->Complete());
+                  };
+                callback->nonNullSuccess = [this, deferral, args](const std::shared_ptr<ServerTrustAuthResponse> response)
+                  {
+                    auto action = response->action;
+
+                    if (action.has_value()) {
+                      switch (action.value()) {
+                      case ServerTrustAuthResponseAction::proceed:
+                        args->put_Action(COREWEBVIEW2_SERVER_CERTIFICATE_ERROR_ACTION_ALWAYS_ALLOW);
+                        break;
+                      case ServerTrustAuthResponseAction::cancel:
+                        args->put_Action(COREWEBVIEW2_SERVER_CERTIFICATE_ERROR_ACTION_CANCEL);
+                        break;
+                      default:
+                        args->put_Action(COREWEBVIEW2_SERVER_CERTIFICATE_ERROR_ACTION_DEFAULT);
+                      }
+                      failedLog(deferral->Complete());
+                      return false;
+                    }
+                    return true;
+                  };
+                callback->defaultBehaviour = defaultBehaviour;
+                callback->error = [this, defaultBehaviour](const std::string& error_code, const std::string& error_message, const flutter::EncodableValue* error_details)
+                  {
+                    debugLog(error_code + ", " + error_message);
+                    defaultBehaviour(std::nullopt);
+                  };
+                channelDelegate->onReceivedServerTrustAuthRequest(std::move(challenge), std::move(callback));
+              }
+              catch (winrt::hresult_error const& ex) {
+                debugLog(wide_to_utf8(ex.message().c_str()));
+              }
             }
             return S_OK;
           }
-        ).Get(), nullptr));
-    }*/
+        ).Get(), nullptr);
+      failedLog(add_ServerCertificateErrorDetected_HResult);
+    }
 
     if (userContentController) {
       userContentController->registerEventHandlers();
@@ -1808,6 +1878,38 @@ namespace flutter_inappwebview_plugin
     ).Get());
     if (failedAndLog(hr) && completionHandler) {
       completionHandler(std::nullopt);
+    }
+  }
+
+  void InAppWebView::clearSslPreferences(const std::function<void()> completionHandler) const
+  {
+    if (!webView) {
+      if (completionHandler) {
+        completionHandler();
+      }
+      return;
+    }
+
+    if (auto webView14 = webView.try_query<ICoreWebView2_14>()) {
+      auto hr = webView14->ClearServerCertificateErrorActions(Callback<ICoreWebView2ClearServerCertificateErrorActionsCompletedHandler>(
+        [completionHandler](HRESULT errorCode)
+        {
+          failedAndLog(errorCode);
+          if (completionHandler) {
+            completionHandler();
+          }
+          return S_OK;
+        }
+      ).Get());
+
+      if (failedAndLog(hr) && completionHandler) {
+        completionHandler();
+      }
+      return;
+    }
+
+    if (completionHandler) {
+      completionHandler();
     }
   }
 

@@ -1717,6 +1717,7 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebView.clearSslPreferences](https://developer.android.com/reference/android/webkit/WebView#clearSslPreferences()))
+  ///- Windows ([Official API - ICoreWebView2_3.ClearServerCertificateErrorActions](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2_14?view=webview2-1.0.2792.45#clearservercertificateerroractions))
   ///{@endtemplate}
   Future<void> clearSslPreferences() {
     throw UnimplementedError(

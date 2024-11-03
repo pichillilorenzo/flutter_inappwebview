@@ -3,7 +3,7 @@
 - Updated flutter_inappwebview_platform_interface version to ^1.4.0
 - Updated `scrollMultiplier` default value from 6 to 1
 - Added support for `UserScript.allowedOriginRules` and `UserScript.forMainFrameOnly` parameters
-- Implemented `onReceivedHttpAuthRequest`, `onReceivedClientCertRequest`, `onReceivedServerTrustAuthRequest` WebView events
+- Implemented `onReceivedHttpAuthRequest`, `onReceivedClientCertRequest`, `onReceivedServerTrustAuthRequest`, `onRenderProcessGone`, `onRenderProcessUnresponsive`, `onWebContentProcessDidTerminate`, `onProcessFailed` WebView events
 - Implemented `clearSslPreferences` WebView method
 - Fixed `get_optional_fl_map_value` implementation in `utils/flutter.h`
 - Fixed "Error in transparentBackground handling in Windows" [#2391](https://github.com/pichillilorenzo/flutter_inappwebview/issues/2391)

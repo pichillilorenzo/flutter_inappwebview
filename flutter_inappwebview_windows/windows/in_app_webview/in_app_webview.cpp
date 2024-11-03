@@ -896,6 +896,74 @@ namespace flutter_inappwebview_plugin
       ).Get(), nullptr);
     failedLog(add_WebResourceRequested_HResult);
 
+    auto add_ProcessFailed_HResult = webView->add_ProcessFailed(
+      Callback<ICoreWebView2ProcessFailedEventHandler>(
+        [this](ICoreWebView2* sender, ICoreWebView2ProcessFailedEventArgs* argsRaw)
+        {
+          if (!channelDelegate) {
+            return S_OK;
+          }
+
+          wil::com_ptr<ICoreWebView2ProcessFailedEventArgs> args = argsRaw;
+          auto args2 = args.try_query<ICoreWebView2ProcessFailedEventArgs2>();
+          auto args3 = args.try_query<ICoreWebView2ProcessFailedEventArgs3>();
+
+          COREWEBVIEW2_PROCESS_FAILED_REASON reason = COREWEBVIEW2_PROCESS_FAILED_REASON_UNEXPECTED;
+          if (args2) {
+            args2->get_Reason(&reason);
+          }
+
+          COREWEBVIEW2_PROCESS_FAILED_KIND kind;
+          if (succeededOrLog(args->get_ProcessFailedKind(&kind))) {
+            if (kind == COREWEBVIEW2_PROCESS_FAILED_KIND_BROWSER_PROCESS_EXITED) {
+              auto didCrash = reason == COREWEBVIEW2_PROCESS_FAILED_REASON_CRASHED;
+              auto detail = std::make_unique<RenderProcessGoneDetail>(
+                didCrash
+              );
+              channelDelegate->onRenderProcessGone(std::move(detail));
+            }
+            else if (kind == COREWEBVIEW2_PROCESS_FAILED_KIND_RENDER_PROCESS_UNRESPONSIVE) {
+              channelDelegate->onRenderProcessUnresponsive(getUrl());
+            }
+            else if (kind == COREWEBVIEW2_PROCESS_FAILED_KIND_RENDER_PROCESS_EXITED) {
+              channelDelegate->onWebContentProcessDidTerminate();
+            }
+
+            auto frameInfos = std::optional<std::vector<std::shared_ptr<FrameInfo>>>{};
+            wil::com_ptr<ICoreWebView2FrameInfoCollection> frameInfoCollection;
+            wil::com_ptr<ICoreWebView2FrameInfoCollectionIterator> frameIterator;
+            if (args2 && succeededOrLog(args2->get_FrameInfosForFailedProcess(&frameInfoCollection)) && frameInfoCollection && succeededOrLog(frameInfoCollection->GetIterator(&frameIterator))) {
+              frameInfos = std::vector<std::shared_ptr<FrameInfo>>{};
+              BOOL hasCurrent = FALSE;
+              while (SUCCEEDED(frameIterator->MoveNext(&hasCurrent)) && hasCurrent) {
+                wil::com_ptr<ICoreWebView2FrameInfo> frameInfo;
+                if (SUCCEEDED(frameIterator->GetCurrent(&frameInfo))) {
+                  frameInfos.value().push_back(std::move(FrameInfo::fromICoreWebView2FrameInfo(frameInfo)));
+                }
+                BOOL hasNext = FALSE;
+                failedLog(frameIterator->MoveNext(&hasNext));
+              }
+            }
+
+            wil::unique_cotaskmem_string processDescription;
+            int exitCode;
+            wil::unique_cotaskmem_string failedModule;
+
+            auto detail = std::make_unique<ProcessFailedDetail>(
+              (int64_t)kind,
+              args2 && succeededOrLog(args2->get_ExitCode(&exitCode)) ? exitCode : std::optional<int64_t>{},
+              args2 && succeededOrLog(args2->get_ProcessDescription(&processDescription)) ? wide_to_utf8(processDescription.get()) : std::optional<std::string>{},
+              args2 ? (int64_t)reason : std::optional<int64_t>{},
+              args3 && succeededOrLog(args3->get_FailureSourceModulePath(&failedModule)) ? wide_to_utf8(failedModule.get()) : std::optional<std::string>{},
+              frameInfos
+            );
+            channelDelegate->onProcessFailed(std::move(detail));
+          }
+          return S_OK;
+        }
+      ).Get(), nullptr);
+    failedLog(add_ProcessFailed_HResult);
+
     wil::com_ptr<ICoreWebView2_2> webView2;
     if (SUCCEEDED(webView->QueryInterface(IID_PPV_ARGS(&webView2)))) {
       auto add_DOMContentLoaded_HResult = webView2->add_DOMContentLoaded(

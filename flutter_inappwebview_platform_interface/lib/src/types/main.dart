@@ -231,3 +231,7 @@ export 'custom_tabs_post_message_result_type.dart'
     show CustomTabsPostMessageResultType;
 export 'custom_scheme_registration.dart' show CustomSchemeRegistration;
 export 'disposable.dart';
+export 'frame_kind.dart' show FrameKind;
+export 'process_failed_kind.dart' show ProcessFailedKind;
+export 'process_failed_reason.dart' show ProcessFailedReason;
+export 'process_failed_detail.dart' show ProcessFailedDetail;

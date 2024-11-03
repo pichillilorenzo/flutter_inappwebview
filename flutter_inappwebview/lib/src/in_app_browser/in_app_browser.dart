@@ -545,4 +545,7 @@ class InAppBrowser implements PlatformInAppBrowserEvents {
 
   @override
   void onMainWindowWillClose() {}
+
+  @override
+  void onProcessFailed(ProcessFailedDetail detail) {}
 }

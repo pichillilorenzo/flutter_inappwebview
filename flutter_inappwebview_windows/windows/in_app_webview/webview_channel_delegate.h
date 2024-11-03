@@ -15,6 +15,8 @@
 #include "../types/javascript_handler_function_data.h"
 #include "../types/navigation_action.h"
 #include "../types/permission_response.h"
+#include "../types/process_failed_detail.h"
+#include "../types/render_process_gone_detail.h"
 #include "../types/server_trust_auth_response.h"
 #include "../types/server_trust_challenge.h"
 #include "../types/web_resource_error.h"
@@ -113,6 +115,10 @@ namespace flutter_inappwebview_plugin
     void onReceivedHttpAuthRequest(std::shared_ptr<HttpAuthenticationChallenge> challenge, std::unique_ptr<ReceivedHttpAuthRequestCallback> callback) const;
     void onReceivedClientCertRequest(std::shared_ptr<ClientCertChallenge> challenge, std::unique_ptr<ReceivedClientCertRequestCallback> callback) const;
     void onReceivedServerTrustAuthRequest(std::shared_ptr<ServerTrustChallenge> challenge, std::unique_ptr<ReceivedServerTrustAuthRequestCallback> callback) const;
+    void onRenderProcessGone(const std::shared_ptr<RenderProcessGoneDetail> detail) const;
+    void onRenderProcessUnresponsive(const std::optional<std::string>& url) const;
+    void onWebContentProcessDidTerminate() const;
+    void onProcessFailed(const std::shared_ptr<ProcessFailedDetail> detail) const;
   };
 }
 

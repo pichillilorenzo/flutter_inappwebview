@@ -127,6 +127,7 @@ class PlatformInAppWebViewWidgetCreationParams
       super.onCameraCaptureStateChanged,
       super.onMicrophoneCaptureStateChanged,
       super.onContentSizeChanged,
+      super.onProcessFailed,
       super.initialUrlRequest,
       super.initialFile,
       super.initialData,

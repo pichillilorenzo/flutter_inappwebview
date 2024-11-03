@@ -1427,6 +1427,21 @@ class WindowsInAppWebViewController extends PlatformInAppWebViewController
           this._devToolsProtocolEventListenerMap[eventName]!.call(data);
         }
         break;
+      case "onProcessFailed":
+        if ((webviewParams != null &&
+            webviewParams!.onProcessFailed != null) ||
+            _inAppBrowserEventHandler != null) {
+          Map<String, dynamic> arguments = call.arguments.cast<String, dynamic>();
+          final detail = ProcessFailedDetail.fromMap(arguments)!;
+
+          if (webviewParams != null &&
+              webviewParams!.onProcessFailed != null)
+            webviewParams!.onProcessFailed!(_controllerFromPlatform, detail);
+          else
+            _inAppBrowserEventHandler!
+                .onProcessFailed(detail);
+        }
+        break;
       case "onCallJsHandler":
         String handlerName = call.arguments["handlerName"];
         Map<String, dynamic> handlerDataMap =

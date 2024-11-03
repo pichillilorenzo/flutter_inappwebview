@@ -552,6 +552,47 @@ namespace flutter_inappwebview_plugin
     channel->InvokeMethod("onReceivedServerTrustAuthRequest", std::move(arguments), std::move(callback));
   }
 
+  void WebViewChannelDelegate::onRenderProcessGone(const std::shared_ptr<RenderProcessGoneDetail> detail) const
+  {
+    if (!channel) {
+      return;
+    }
+
+    auto arguments = std::make_unique<flutter::EncodableValue>(detail->toEncodableMap());
+    channel->InvokeMethod("onDevToolsProtocolEventReceived", std::move(arguments));
+  }
+
+  void WebViewChannelDelegate::onRenderProcessUnresponsive(const std::optional<std::string>& url) const
+  {
+    if (!channel) {
+      return;
+    }
+
+    auto arguments = std::make_unique<flutter::EncodableValue>(flutter::EncodableMap{
+      {"url", make_fl_value(url)},
+      });
+    channel->InvokeMethod("onRenderProcessUnresponsive", std::move(arguments));
+  }
+  void WebViewChannelDelegate::onWebContentProcessDidTerminate() const
+  {
+    if (!channel) {
+      return;
+    }
+
+    auto arguments = std::make_unique<flutter::EncodableValue>();
+    channel->InvokeMethod("onWebContentProcessDidTerminate", std::move(arguments));
+  }
+
+  void WebViewChannelDelegate::onProcessFailed(const std::shared_ptr<ProcessFailedDetail> detail) const
+  {
+    if (!channel) {
+      return;
+    }
+
+    auto arguments = std::make_unique<flutter::EncodableValue>(detail->toEncodableMap());
+    channel->InvokeMethod("onProcessFailed", std::move(arguments));
+  }
+
   WebViewChannelDelegate::~WebViewChannelDelegate()
   {
     debugLog("dealloc WebViewChannelDelegate");

@@ -11,13 +11,15 @@
 Implemented security features to better manage access to the native javascript bridge.
 
 #### Platform Interface
-- Added `javaScriptBridgeEnabled`, `javaScriptBridgeOriginAllowList`, `javaScriptBridgeForMainFrameOnly`, `pluginScriptsOriginAllowList`, `pluginScriptsForMainFrameOnly`, `javaScriptHandlersOriginAllowList`, `javaScriptHandlersForMainFrameOnly`, `scrollMultiplier` InAppWebViewSettings parameters
-- Added `setJavaScriptBridgeName`, `getJavaScriptBridgeName` static WebView controller methods
-- Added `PlatformInAppLocalhostServer.onData` parameter to set a custom on data server callback
-- Added `JavaScriptHandlerFunctionData` type
-- Deprecated `JavaScriptHandlerCallback` type in favor of `JavaScriptHandlerFunction` type
 - Updated static `fromMap` implementation for some classes
 - Updated `kJavaScriptHandlerForbiddenNames` list
+- Added `PlatformInAppLocalhostServer.onData` parameter to set a custom on data server callback
+- Added `javaScriptBridgeEnabled`, `javaScriptBridgeOriginAllowList`, `javaScriptBridgeForMainFrameOnly`, `pluginScriptsOriginAllowList`, `pluginScriptsForMainFrameOnly`, `javaScriptHandlersOriginAllowList`, `javaScriptHandlersForMainFrameOnly`, `scrollMultiplier` InAppWebViewSettings parameters
+- Added `setJavaScriptBridgeName`, `getJavaScriptBridgeName` static WebView controller methods
+- Added `onProcessFailed` WebView event
+- Added `JavaScriptHandlerFunctionData` type
+- Deprecated `JavaScriptHandlerCallback` type in favor of `JavaScriptHandlerFunction` type
+- Fixed X509Certificate PEM base64 decoding
 - Fixed specific URLAuthenticationChallenge type for `onReceivedHttpAuthRequest`, `onReceivedServerTrustAuthRequest`, `onReceivedClientCertRequest` events
 
 #### Android Platform
@@ -39,7 +41,10 @@ Implemented security features to better manage access to the native javascript b
 #### Windows Platform
 - Updated `scrollMultiplier` default value from 6 to 1
 - Added support for `UserScript.allowedOriginRules` and `UserScript.forMainFrameOnly` parameters
+- Implemented `onReceivedHttpAuthRequest`, `onReceivedClientCertRequest`, `onReceivedServerTrustAuthRequest`, `onRenderProcessGone`, `onRenderProcessUnresponsive`, `onWebContentProcessDidTerminate`, `onProcessFailed` WebView events
+- Implemented `clearSslPreferences` WebView method
 - Fixed `get_optional_fl_map_value` implementation in `utils/flutter.h`
+- Fixed "Error in transparentBackground handling in Windows" [#2391](https://github.com/pichillilorenzo/flutter_inappwebview/issues/2391)
 
 #### Web Platform
 - Merged "[web] support iframe role and aria-hidden attributes" [2293](https://github.com/pichillilorenzo/flutter_inappwebview/pull/2293) (thanks to [p-mazhnik](https://github.com/p-mazhnik))

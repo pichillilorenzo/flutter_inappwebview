@@ -21,14 +21,6 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
       mediaPlaybackRequiresUserGesture: false,
       allowsInlineMediaPlayback: true,
       iframeAllow: "camera; microphone",
-      // javaScriptHandlersOriginAllowList: {"https://www.example.com"},
-      javaScriptHandlersOriginAllowList: {".*"},
-      javaScriptHandlersForMainFrameOnly: false,
-      javaScriptBridgeOriginAllowList: {"*"},
-      javaScriptBridgeEnabled: true,
-      javaScriptBridgeForMainFrameOnly: false,
-      pluginScriptsForMainFrameOnly: false,
-      pluginScriptsOriginAllowList: {"*"},
       iframeAllowFullscreen: true);
 
   PullToRefreshController? pullToRefreshController;
@@ -128,30 +120,12 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                   // initialUrlRequest:
                   // URLRequest(url: WebUri(Uri.base.toString().replaceFirst("/#/", "/") + 'page.html')),
                   // initialFile: "assets/index.html",
-                  // initialUserScripts: UnmodifiableListView<UserScript>([]),
+                  initialUserScripts: UnmodifiableListView<UserScript>([]),
                   initialSettings: settings,
                   contextMenu: contextMenu,
                   pullToRefreshController: pullToRefreshController,
-                  initialUserScripts: UnmodifiableListView<UserScript>([
-                    UserScript(
-                        source: """console.log('loaded', window.location.href); window.custom_js_bridge.callHandler('handlerName', 1, 4, true, {'foo': 'bar'});""",
-                        injectionTime: UserScriptInjectionTime.AT_DOCUMENT_END,
-                        // allowedOriginRules: {"https://www.example.com"},
-                        forMainFrameOnly: false),
-                  ]),
                   onWebViewCreated: (controller) async {
                     webViewController = controller;
-                    controller.addJavaScriptHandler(handlerName: 'handlerName', callback: (JavaScriptHandlerFunctionData handlerData) async {
-                      // if (handlerData.origin.host != "www.w3schools.com" || !handlerData.isMainFrame) {
-                      //   throw Exception("This is an exception from a JavaScript handler");
-                      // }
-                      print(handlerData);
-                      return handlerData.args;
-                    });
-                    controller.addJavaScriptHandler(handlerName: 'handlerName2', callback: (arguments) {
-                      print(arguments);
-                      return arguments;
-                    });
                   },
                   onLoadStart: (controller, url) async {
                     setState(() {

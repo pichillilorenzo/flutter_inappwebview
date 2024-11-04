@@ -5,7 +5,7 @@
 ![InAppWebView-logo](https://user-images.githubusercontent.com/5956938/195422744-bdcfed16-73f0-4bc9-94ab-ecf10771a1c4.png)
 
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-89-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-90-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 [![flutter_inappwebview version](https://img.shields.io/pub/v/flutter_inappwebview?include_prereleases)](https://pub.dartlang.org/packages/flutter_inappwebview)
@@ -197,6 +197,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/bschulz87"><img src="https://avatars.githubusercontent.com/u/30199362?v=4?s=100" width="100px;" alt="Benjamin Schulz"/><br /><sub><b>Benjamin Schulz</b></sub></a><br /><a href="#ideas-bschulz87" title="Ideas, Planning, & Feedback">🤔</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/ShuheiSuzuki-07"><img src="https://avatars.githubusercontent.com/u/118415919?v=4?s=100" width="100px;" alt="seal-app"/><br /><sub><b>seal-app</b></sub></a><br /><a href="https://github.com/pichillilorenzo/flutter_inappwebview/commits?author=ShuheiSuzuki-07" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/takuyaaaaaaahaaaaaa"><img src="https://avatars.githubusercontent.com/u/31458194?v=4?s=100" width="100px;" alt="Takuya Tominaga"/><br /><sub><b>Takuya Tominaga</b></sub></a><br /><a href="https://github.com/pichillilorenzo/flutter_inappwebview/commits?author=takuyaaaaaaahaaaaaa" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/yamaha252"><img src="https://avatars.githubusercontent.com/u/4444068?v=4?s=100" width="100px;" alt="Sergey"/><br /><sub><b>Sergey</b></sub></a><br /><a href="https://github.com/pichillilorenzo/flutter_inappwebview/commits?author=yamaha252" title="Code">💻</a></td>
     </tr>
   </tbody>
 </table>

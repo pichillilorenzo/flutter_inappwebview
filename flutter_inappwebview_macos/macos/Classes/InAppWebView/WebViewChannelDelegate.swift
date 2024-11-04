@@ -370,6 +370,12 @@ public class WebViewChannelDelegate: ChannelDelegate {
                 result(nil)
             }
             break
+        case .clearFocus:
+            result(webView?.clearFocus())
+            break
+        case .requestFocus:
+            result(webView?.requestFocus())
+            break
         case .getCertificate:
             result(webView?.getCertificate()?.toMap())
             break
@@ -1164,6 +1170,16 @@ public class WebViewChannelDelegate: ChannelDelegate {
             "printJobId": printJobId,
         ]
         channel?.invokeMethod("onPrintRequest", arguments: arguments, callback: callback)
+    }
+    
+    internal func _onMouseDown(callback: @escaping () -> Void) {
+        if channel == nil {
+            return
+        }
+        let arguments: [String:Any] = [:];
+        channel?.invokeMethod("_onMouseDown", arguments: arguments) {(result) -> Void in
+            callback()
+        }
     }
     
     public override func dispose() {

@@ -2240,6 +2240,16 @@ class AndroidInAppWebViewController extends PlatformInAppWebViewController
   }
 
   @override
+  Future<bool?> requestFocus(
+      {FocusDirection? direction,
+      InAppWebViewRect? previouslyFocusedRect}) async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    args.putIfAbsent("direction", () => direction?.toNativeValue());
+    args.putIfAbsent("previouslyFocusedRect", () => previouslyFocusedRect?.toMap());
+    return await channel?.invokeMethod<bool>('requestFocus', args);
+  }
+
+  @override
   Future<void> clearFocus() async {
     Map<String, dynamic> args = <String, dynamic>{};
     return await channel?.invokeMethod('clearFocus', args);

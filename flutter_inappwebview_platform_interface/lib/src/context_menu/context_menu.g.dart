@@ -59,7 +59,8 @@ class ContextMenu {
     final instance = ContextMenu(
       menuItems: List<ContextMenuItem>.from(map['menuItems']
           .map((e) => ContextMenuItem.fromMap(e?.cast<String, dynamic>())!)),
-      options: map['settings'],
+      options:
+          ContextMenuOptions.fromMap(map['settings']?.cast<String, dynamic>()),
       settings:
           ContextMenuSettings.fromMap(map['settings']?.cast<String, dynamic>()),
     );
@@ -69,8 +70,8 @@ class ContextMenu {
   @ExchangeableObjectMethod(toMapMergeWith: true)
   Map<String, dynamic> _toMapMergeWith() {
     return {
-      "settings":
-          (settings as ContextMenuSettings?)?.toMap() ?? options?.toMap()
+      "settings": (settings as ContextMenuSettings?)?.toMap() ??
+          (options as ContextMenuOptions?)?.toMap()
     };
   }
 

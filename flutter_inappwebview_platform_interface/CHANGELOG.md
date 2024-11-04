@@ -8,6 +8,7 @@
 - Added `onProcessFailed` WebView event
 - Added `JavaScriptHandlerFunctionData` type
 - Deprecated `JavaScriptHandlerCallback` type in favor of `JavaScriptHandlerFunction` type
+- Deprecated `InAppWebViewSettings.forceDark` and `InAppWebViewSettings.forceDarkStrategy` Android-only properties in favor of `InAppWebViewSettings.algorithmicDarkeningAllowed`
 - Fixed X509Certificate PEM base64 decoding
 - Fixed specific URLAuthenticationChallenge type for `onReceivedHttpAuthRequest`, `onReceivedServerTrustAuthRequest`, `onReceivedClientCertRequest` events
 

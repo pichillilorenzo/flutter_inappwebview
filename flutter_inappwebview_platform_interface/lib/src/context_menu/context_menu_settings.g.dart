@@ -47,3 +47,46 @@ class ContextMenuSettings {
     return 'ContextMenuSettings{hideDefaultSystemContextMenuItems: $hideDefaultSystemContextMenuItems}';
   }
 }
+
+///Use [ContextMenuSettings] instead.
+@Deprecated('Use ContextMenuSettings instead')
+class ContextMenuOptions {
+  ///Whether all the default system context menu items should be hidden or not. The default value is `false`.
+  bool hideDefaultSystemContextMenuItems;
+  ContextMenuOptions({this.hideDefaultSystemContextMenuItems = false});
+
+  ///Gets a possible [ContextMenuOptions] instance from a [Map] value.
+  static ContextMenuOptions? fromMap(Map<String, dynamic>? map) {
+    if (map == null) {
+      return null;
+    }
+    final instance = ContextMenuOptions();
+    if (map['hideDefaultSystemContextMenuItems'] != null) {
+      instance.hideDefaultSystemContextMenuItems =
+          map['hideDefaultSystemContextMenuItems'];
+    }
+    return instance;
+  }
+
+  ///Converts instance to a map.
+  Map<String, dynamic> toMap() {
+    return {
+      "hideDefaultSystemContextMenuItems": hideDefaultSystemContextMenuItems,
+    };
+  }
+
+  ///Converts instance to a map.
+  Map<String, dynamic> toJson() {
+    return toMap();
+  }
+
+  ///Returns a copy of ContextMenuOptions.
+  ContextMenuOptions copy() {
+    return ContextMenuOptions.fromMap(toMap()) ?? ContextMenuOptions();
+  }
+
+  @override
+  String toString() {
+    return 'ContextMenuOptions{hideDefaultSystemContextMenuItems: $hideDefaultSystemContextMenuItems}';
+  }
+}

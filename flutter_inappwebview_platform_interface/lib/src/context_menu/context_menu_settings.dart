@@ -15,24 +15,10 @@ class ContextMenuSettings_ {
 
 ///Use [ContextMenuSettings] instead.
 @Deprecated("Use ContextMenuSettings instead")
-class ContextMenuOptions {
+@ExchangeableObject(copyMethod: true)
+class ContextMenuOptions_ {
   ///Whether all the default system context menu items should be hidden or not. The default value is `false`.
   bool hideDefaultSystemContextMenuItems;
 
-  ContextMenuOptions({this.hideDefaultSystemContextMenuItems = false});
-
-  Map<String, dynamic> toMap() {
-    return {
-      "hideDefaultSystemContextMenuItems": hideDefaultSystemContextMenuItems
-    };
-  }
-
-  Map<String, dynamic> toJson() {
-    return this.toMap();
-  }
-
-  @override
-  String toString() {
-    return toMap().toString();
-  }
+  ContextMenuOptions_({this.hideDefaultSystemContextMenuItems = false});
 }

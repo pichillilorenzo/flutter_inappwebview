@@ -373,7 +373,13 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
         settings.setForceDark(customSettings.forceDark);
     }
     if (customSettings.forceDarkStrategy != null && WebViewFeature.isFeatureSupported(WebViewFeature.FORCE_DARK_STRATEGY)) {
-      WebSettingsCompat.setForceDarkStrategy(settings, customSettings.forceDarkStrategy);
+      try {
+        // for some reason the setForceDarkStrategy method could throw a ClassCastException
+        // from the Android WebView Chromium library.
+        WebSettingsCompat.setForceDarkStrategy(settings, customSettings.forceDarkStrategy);
+      } catch (Exception e) {
+        e.printStackTrace();
+      }
     }
     settings.setGeolocationEnabled(customSettings.geolocationEnabled);
     if (customSettings.layoutAlgorithm != null) {
@@ -995,7 +1001,13 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
     if (newSettingsMap.get("forceDarkStrategy") != null &&
             !customSettings.forceDarkStrategy.equals(newCustomSettings.forceDarkStrategy) &&
             WebViewFeature.isFeatureSupported(WebViewFeature.FORCE_DARK_STRATEGY)) {
-      WebSettingsCompat.setForceDarkStrategy(settings, newCustomSettings.forceDarkStrategy);
+      try {
+        // for some reason the setForceDarkStrategy method could throw a ClassCastException
+        // from the Android WebView Chromium library.
+        WebSettingsCompat.setForceDarkStrategy(settings, newCustomSettings.forceDarkStrategy);
+      } catch (Exception e) {
+        e.printStackTrace();
+      }
     }
 
     if (newSettingsMap.get("geolocationEnabled") != null && customSettings.geolocationEnabled != newCustomSettings.geolocationEnabled)

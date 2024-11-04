@@ -33,7 +33,7 @@ class ContextMenu_ {
 
   ///Use [settings] instead
   @Deprecated("Use settings instead")
-  final ContextMenuOptions? options;
+  final ContextMenuOptions_? options;
 
   ///Context menu settings.
   final ContextMenuSettings_? settings;
@@ -55,7 +55,7 @@ class ContextMenu_ {
   Map<String, dynamic> _toMapMergeWith() {
     return {
       "settings":
-          (settings as ContextMenuSettings?)?.toMap() ?? options?.toMap()
+          (settings as ContextMenuSettings?)?.toMap() ?? (options as ContextMenuOptions?)?.toMap()
     };
   }
 }

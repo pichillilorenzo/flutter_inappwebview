@@ -624,7 +624,16 @@ because there isn't any way to make the website data store non-persistent for th
   ])
   String? fixedFontFamily;
 
+  ///Use [algorithmicDarkeningAllowed] instead.
+  ///
   ///Set the force dark mode for this WebView. The default value is [ForceDark.OFF].
+  ///
+  ///Deprecated - The "force dark" model previously implemented by WebView was complex and didn't
+  ///interoperate well with current Web standards for `prefers-color-scheme` and `color-scheme`.
+  ///In apps with `targetSdkVersion` ≥ `android.os.Build.VERSION_CODES.TIRAMISU` this API is a no-op and
+  ///WebView will always use the dark style defined by web content authors if the app's theme is dark.
+  ///To customize the behavior, refer to [algorithmicDarkeningAllowed].
+  @Deprecated("Use algorithmicDarkeningAllowed instead")
   @SupportedPlatforms(platforms: [
     AndroidPlatform(
         available: "29",
@@ -634,10 +643,17 @@ because there isn't any way to make the website data store non-persistent for th
   ])
   ForceDark_? forceDark;
 
-  ///Sets whether Geolocation API is enabled. The default value is `true`.
-
+  ///Use [algorithmicDarkeningAllowed] instead.
+  ///
   ///Set how WebView content should be darkened.
   ///The default value is [ForceDarkStrategy.PREFER_WEB_THEME_OVER_USER_AGENT_DARKENING].
+  ///
+  ///Deprecated - The "force dark" model previously implemented by WebView was complex and didn't
+  ///interoperate well with current Web standards for `prefers-color-scheme` and `color-scheme`.
+  ///In apps with `targetSdkVersion` ≥ `android.os.Build.VERSION_CODES.TIRAMISU` this API is a no-op and
+  ///WebView will always use the dark style defined by web content authors if the app's theme is dark.
+  ///To customize the behavior, refer to [algorithmicDarkeningAllowed].
+  @Deprecated("Use algorithmicDarkeningAllowed instead")
   @SupportedPlatforms(platforms: [
     AndroidPlatform(
         apiName: "WebSettingsCompat.setForceDarkStrategy",
@@ -1862,9 +1878,8 @@ as it can cause framerate drops on animations in Android 9 and lower (see [Hybri
     this.disabledActionModeMenuItems,
     this.fantasyFontFamily = "fantasy",
     this.fixedFontFamily = "monospace",
-    this.forceDark = ForceDark_.OFF,
-    this.forceDarkStrategy =
-        ForceDarkStrategy_.PREFER_WEB_THEME_OVER_USER_AGENT_DARKENING,
+    this.forceDark,
+    this.forceDarkStrategy,
     this.geolocationEnabled = true,
     this.layoutAlgorithm,
     this.loadWithOverviewMode = true,

@@ -407,13 +407,11 @@ class IOSCookieManager extends PlatformCookieManager with ChannelController {
   Future<String> _getCookieExpirationDate(int expiresDate) async {
     var platformUtil = PlatformUtil.instance();
     var dateTime = DateTime.fromMillisecondsSinceEpoch(expiresDate).toUtc();
-    return !kIsWeb
-        ? await platformUtil.formatDate(
+    return await platformUtil.formatDate(
             date: dateTime,
-            format: 'EEE, dd MMM yyyy hh:mm:ss z',
+            format: 'EEE, dd MMM yyyy HH:mm:ss z',
             locale: 'en_US',
-            timezone: 'GMT')
-        : await platformUtil.getWebCookieExpirationDate(date: dateTime);
+            timezone: 'GMT');
   }
 
   Future<bool> _shouldUseJavascript() async {

@@ -235,3 +235,4 @@ export 'frame_kind.dart' show FrameKind;
 export 'process_failed_kind.dart' show ProcessFailedKind;
 export 'process_failed_reason.dart' show ProcessFailedReason;
 export 'process_failed_detail.dart' show ProcessFailedDetail;
+export 'focus_direction.dart' show FocusDirection;

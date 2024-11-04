@@ -53,6 +53,8 @@ public class InAppWebView: WKWebView, WKUIDelegate,
     private var exceptedBridgeSecret = NSUUID().uuidString
     private var javaScriptBridgeEnabled = true
     
+    public override var acceptsFirstResponder: Bool { return true }
+    
     init(id: Any?, plugin: InAppWebViewFlutterPlugin?, frame: CGRect, configuration: WKWebViewConfiguration,
          userScripts: [UserScript] = []) {
         super.init(frame: frame, configuration: configuration)
@@ -2601,6 +2603,48 @@ if(window.\(JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME())[\(_callHandlerID)] 
             evaluateJavaScript(PluginScriptsUtil.GET_SELECTED_TEXT_JS_SOURCE, completionHandler: completionHandler)
         } else {
             completionHandler(nil, nil)
+        }
+    }
+    
+    public func clearFocus() -> Bool {
+        return (self.superview?.window ?? self.window)?.makeFirstResponder(nil) ?? false
+    }
+
+    public func requestFocus() -> Bool {
+        return (self.superview?.window ?? self.window)?.makeFirstResponder(self) ?? false
+    }
+    
+    // Workaround for https://github.com/pichillilorenzo/flutter_inappwebview/issues/2380
+    // TODO: remove when Flutter fixes this
+    private var _isFirstResponder = true
+    override open func becomeFirstResponder() -> Bool {
+        _isFirstResponder = true
+        return super.becomeFirstResponder()
+    }
+    private func _fixFocus(callback: @escaping () -> Void) {
+        if _isFirstResponder, let channelDelegate = channelDelegate {
+            _isFirstResponder = false
+            channelDelegate._onMouseDown(callback: { [weak self] in
+                let _ = self?.requestFocus()
+                callback()
+            })
+        } else {
+            callback()
+        }
+    }
+    override public func mouseDown(with event: NSEvent) {
+        _fixFocus {
+            super.mouseDown(with: event)
+        }
+    }
+    override public func rightMouseDown(with event: NSEvent) {
+        _fixFocus {
+            super.rightMouseDown(with: event)
+        }
+    }
+    override public func otherMouseDown(with event: NSEvent) {
+        _fixFocus {
+            super.otherMouseDown(with: event)
         }
     }
     

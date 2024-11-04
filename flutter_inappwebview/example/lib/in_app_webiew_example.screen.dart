@@ -1,4 +1,5 @@
 import 'dart:collection';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
@@ -116,7 +117,7 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                   key: webViewKey,
                   webViewEnvironment: webViewEnvironment,
                   initialUrlRequest:
-                    URLRequest(url: WebUri('https://flutter.dev')),
+                      URLRequest(url: WebUri('https://flutter.dev')),
                   // initialUrlRequest:
                   // URLRequest(url: WebUri(Uri.base.toString().replaceFirst("/#/", "/") + 'page.html')),
                   // initialFile: "assets/index.html",

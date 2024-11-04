@@ -1,17 +1,13 @@
 import 'dart:core';
-import 'dart:typed_data';
-import 'dart:ui';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_platform_interface.dart';
 
+import '../print_job/main.dart';
 import '../web_message/main.dart';
 import '../web_storage/web_storage.dart';
 import 'android/in_app_webview_controller.dart';
 import 'apple/in_app_webview_controller.dart';
-
-import '../print_job/main.dart';
 
 ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController}
 class InAppWebViewController {
@@ -289,7 +285,11 @@ class InAppWebViewController {
       platform.getHitTestResult();
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.requestFocus}
-  Future<void> requestFocus() => platform.requestFocus();
+  Future<bool?> requestFocus(
+          {FocusDirection? direction,
+          InAppWebViewRect? previouslyFocusedRect}) =>
+      platform.requestFocus(
+          direction: direction, previouslyFocusedRect: previouslyFocusedRect);
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.clearFocus}
   Future<void> clearFocus() => platform.clearFocus();

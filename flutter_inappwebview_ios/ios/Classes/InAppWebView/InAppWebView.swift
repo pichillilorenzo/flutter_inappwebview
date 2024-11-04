@@ -3259,12 +3259,12 @@ if(window.\(JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME())[\(_callHandlerID)] 
         }
     }
     
-    public func clearFocus() {
-        self.scrollView.subviews.first?.resignFirstResponder()
+    public func clearFocus() -> Bool {
+        return self.scrollView.subviews.first?.resignFirstResponder() ?? false
     }
 
-    public func requestFocus() {
-        self.scrollView.subviews.first?.becomeFirstResponder()
+    public func requestFocus() -> Bool {
+        return self.scrollView.subviews.first?.becomeFirstResponder() ?? false
     }
     
     public func getCertificate() -> SslCertificate? {

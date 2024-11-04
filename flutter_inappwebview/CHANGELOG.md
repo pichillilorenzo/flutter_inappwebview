@@ -16,6 +16,7 @@ Implemented security features to better manage access to the native javascript b
 - Added `PlatformInAppLocalhostServer.onData` parameter to set a custom on data server callback
 - Added `javaScriptBridgeEnabled`, `javaScriptBridgeOriginAllowList`, `javaScriptBridgeForMainFrameOnly`, `pluginScriptsOriginAllowList`, `pluginScriptsForMainFrameOnly`, `javaScriptHandlersOriginAllowList`, `javaScriptHandlersForMainFrameOnly`, `scrollMultiplier` InAppWebViewSettings parameters
 - Added `setJavaScriptBridgeName`, `getJavaScriptBridgeName` static WebView controller methods
+- Added `requestFocus` WebView method
 - Added `onProcessFailed` WebView event
 - Added `JavaScriptHandlerFunctionData` type
 - Deprecated `JavaScriptHandlerCallback` type in favor of `JavaScriptHandlerFunction` type
@@ -27,6 +28,7 @@ Implemented security features to better manage access to the native javascript b
 - Added `InAppWebViewController.enableSlowWholeDocumentDraw` static method
 - Added `CookieManager.flush` method
 - Added support for `UserScript.forMainFrameOnly` parameter
+- Implemented `requestFocus` WebView method
 - Updated UserScript at document end implementation
 - Updated `InAppWebViewController.takeScreenshot` implementation to support screenshot out of visible viewport when `InAppWebViewController.enableSlowWholeDocumentDraw` is called
 - Fixed "After dispose a InAppWebViewKeepAlive using InAppWebViewController.disposeKeepAlive. NullPointerException is thrown when main activity enter destroyed state." [#2025](https://github.com/pichillilorenzo/flutter_inappwebview/issues/2025)
@@ -35,10 +37,13 @@ Implemented security features to better manage access to the native javascript b
 - Merged "Update Android Cookie Expiration date format to 24-hour format (HH)" [#2389](https://github.com/pichillilorenzo/flutter_inappwebview/pull/2389) (thanks to [takuyaaaaaaahaaaaaa](https://github.com/takuyaaaaaaahaaaaaa))
 
 #### macOS and iOS Platforms
+- Implemented `requestFocus` WebView method
 - Updated ConsoleLogJS internal PluginScript to main-frame only as using it on non-main frames could cause issues such as [#1738](https://github.com/pichillilorenzo/flutter_inappwebview/issues/1738)
 - Moved `WKUserContentController` initialization on `preWKWebViewConfiguration` to fix possible `undefined is not an object (evaluating 'window.webkit.messageHandlers')` javascript error
 - Added support for `UserScript.allowedOriginRules` parameter
 - Merged "change priority of DispatchQueue" [#2322](https://github.com/pichillilorenzo/flutter_inappwebview/pull/2322) (thanks to [nnnlog](https://github.com/nnnlog))
+- macOS: Implemented also `clearFocus` WebView method
+- macOS: Implemented workaround for "[macOS] Copy Shortcut does not work if TextField outside of WebView has focus" [#2380](https://github.com/pichillilorenzo/flutter_inappwebview/issues/2380)
 
 #### Windows Platform
 - Updated `scrollMultiplier` default value from 6 to 1

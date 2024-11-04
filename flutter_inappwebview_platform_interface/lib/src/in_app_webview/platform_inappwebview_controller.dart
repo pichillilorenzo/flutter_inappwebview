@@ -1071,7 +1071,24 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
         'getHitTestResult is not implemented on the current platform');
   }
 
-  Future<void> requestFocus() {
+  ///{@template flutter_inappwebview_platform_interface.PlatformInAppWebViewController.requestFocus}
+  ///Call this method when you want to try the WebView to be the first responder.
+  ///
+  ///On Android, call this to try to give focus to the WebView and
+  ///give it hints about the [direction] and a specific [previouslyFocusedRect] that the focus is coming from.
+  ///The [previouslyFocusedRect] can help give larger views a finer grained hint about where focus is coming from,
+  ///and therefore, where to show selection, or forward focus change internally.
+  ///
+  ///Returns `true` whether this WebView actually took focus; otherwise, `false`.
+  ///
+  ///**NOTE**: [direction] and [previouslyFocusedRect] are available only on Android.
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Android native WebView ([Official API - WebView.requestFocus](https://developer.android.com/reference/android/webkit/WebView#requestFocus(int,%20android.graphics.Rect)))
+  ///- iOS ([Official API - UIResponder.becomeFirstResponder](https://developer.apple.com/documentation/uikit/uiresponder/1621113-becomefirstresponder))
+  ///- MacOS ([Official API - NSWindow.makeFirstResponder](https://developer.apple.com/documentation/appkit/nswindow/1419366-makefirstresponder))
+  ///{@endtemplate}
+  Future<bool?> requestFocus({FocusDirection? direction, InAppWebViewRect? previouslyFocusedRect}) {
     throw UnimplementedError(
         'requestFocus is not implemented on the current platform');
   }
@@ -1082,6 +1099,7 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - ViewGroup.clearFocus](https://developer.android.com/reference/android/view/ViewGroup#clearFocus()))
   ///- iOS ([Official API - UIResponder.resignFirstResponder](https://developer.apple.com/documentation/uikit/uiresponder/1621097-resignfirstresponder))
+  ///- MacOS ([Official API - NSWindow.makeFirstResponder](https://developer.apple.com/documentation/appkit/nswindow/1419366-makefirstresponder))
   ///{@endtemplate}
   Future<void> clearFocus() {
     throw UnimplementedError(

@@ -6,6 +6,7 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_platform_interface.dart';
 
 import '../in_app_browser/in_app_browser.dart';
@@ -188,6 +189,13 @@ class MacOSInAppWebViewController extends PlatformInAppWebViewController
   }
 
   Future<dynamic> _handleMethod(MethodCall call) async {
+    if (call.method == "_onMouseDown") {
+      // Workaround for https://github.com/pichillilorenzo/flutter_inappwebview/issues/2380
+      // TODO: remove when Flutter fixes this
+      FocusManager.instance.primaryFocus?.unfocus();
+      return;
+    }
+
     if (PlatformInAppWebViewController.debugLoggingSettings.enabled &&
         call.method != "onCallJsHandler") {
       _debugLog(call.method, call.arguments);
@@ -2200,6 +2208,22 @@ class MacOSInAppWebViewController extends PlatformInAppWebViewController
   Future<String?> getSelectedText() async {
     Map<String, dynamic> args = <String, dynamic>{};
     return await channel?.invokeMethod<String?>('getSelectedText', args);
+  }
+
+  @override
+  Future<bool?> requestFocus(
+      {FocusDirection? direction,
+        InAppWebViewRect? previouslyFocusedRect}) async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    args.putIfAbsent("direction", () => direction?.toNativeValue());
+    args.putIfAbsent("previouslyFocusedRect", () => previouslyFocusedRect?.toMap());
+    return await channel?.invokeMethod<bool>('requestFocus', args);
+  }
+
+  @override
+  Future<void> clearFocus() async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    return await channel?.invokeMethod('clearFocus', args);
   }
 
   @override

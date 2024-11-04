@@ -2,7 +2,7 @@ import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_i
 
 import 'user_script_injection_time.dart';
 import 'content_world.dart';
-import '../platform_webview_feature.dart';
+import '../in_app_webview/platform_inappwebview_controller.dart';
 
 part 'user_script.g.dart';
 
@@ -25,13 +25,24 @@ class UserScript_ {
   ///A Boolean value that indicates whether to inject the script into the main frame.
   ///Specify true to inject the script only into the main frame, or false to inject it into all frames.
   ///The default value is `true`.
-  ///
-  ///**NOTE**: available only on iOS and MacOS.
+  @SupportedPlatforms(platforms: [
+    AndroidPlatform(),
+    IOSPlatform(),
+    MacOSPlatform(),
+  ])
   bool forMainFrameOnly;
 
   ///A set of matching rules for the allowed origins.
   ///
-  ///**NOTE**: available only on Android and only if [WebViewFeature.DOCUMENT_START_SCRIPT] feature is supported.
+  ///**NOTE for Android**: each origin pattern MUST follow the table rule of [PlatformInAppWebViewController.addWebMessageListener].
+  ///
+  ///**NOTE for iOS and macOS**: each origin pattern will be used as a
+  ///Regular Expression Pattern that will be used on JavaScript side using [RegExp](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp).
+  @SupportedPlatforms(platforms: [
+    AndroidPlatform(),
+    IOSPlatform(),
+    MacOSPlatform(),
+  ])
   late Set<String> allowedOriginRules;
 
   ///A scope of execution in which to evaluate the script to prevent conflicts between different scripts.

@@ -16,6 +16,7 @@
 #include "../types/ssl_certificate.h"
 #include "../types/url_request.h"
 #include "../types/web_history.h"
+#include "../utils/uuid.h"
 #include "../webview_environment/webview_environment.h"
 #include "in_app_webview_settings.h"
 #include "user_content_controller.h"
@@ -176,6 +177,7 @@ namespace flutter_inappwebview_plugin
     void pause() const;
     void resume() const;
     void getCertificate(const std::function<void(const std::optional<std::unique_ptr<SslCertificate>>)> completionHandler) const;
+    void clearSslPreferences(const std::function<void()> completionHandler) const;
 
     std::string pageFrameId() const
     {
@@ -192,14 +194,18 @@ namespace flutter_inappwebview_plugin
     POINT lastCursorPos_ = { 0, 0 };
     VirtualKeyState virtualKeys_;
 
+    const std::string expectedBridgeSecret = get_uuid();
+    bool javaScriptBridgeEnabled = true;
     std::map<UINT64, std::shared_ptr<NavigationAction>> navigationActions_ = {};
     std::shared_ptr<NavigationAction> lastNavigationAction_;
     bool isLoading_ = false;
     std::string pageFrameId_;
     std::map<std::string, std::pair<wil::com_ptr<ICoreWebView2DevToolsProtocolEventReceiver>, EventRegistrationToken>> devToolsProtocolEventListener_ = {};
+    int64_t previousAuthRequestFailureCount = 0;
 
     void registerEventHandlers();
     void registerSurfaceEventHandlers();
+    HRESULT onCallJsHandler(const bool& isMainFrame, ICoreWebView2WebMessageReceivedEventArgs* args);
   };
 }
 #endif //FLUTTER_INAPPWEBVIEW_PLUGIN_IN_APP_WEBVIEW_H_

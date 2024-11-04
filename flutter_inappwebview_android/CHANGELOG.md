@@ -1,8 +1,10 @@
-## 1.2.0
+## 1.2.0-beta.1
 
 - Updated flutter_inappwebview_platform_interface version to ^1.4.0
 - Added `InAppWebViewController.enableSlowWholeDocumentDraw` static method
 - Added `CookieManager.flush` method
+- Added support for `UserScript.forMainFrameOnly` parameter
+- Updated UserScript at document end implementation
 - Updated `InAppWebViewController.takeScreenshot` implementation to support screenshot out of visible viewport when `InAppWebViewController.enableSlowWholeDocumentDraw` is called
 - Fixed "After dispose a InAppWebViewKeepAlive using InAppWebViewController.disposeKeepAlive. NullPointerException is thrown when main activity enter destroyed state." [#2025](https://github.com/pichillilorenzo/flutter_inappwebview/issues/2025)
 - Fixed crash when trying to open InAppBrowser with R.menu.menu_main on release mode

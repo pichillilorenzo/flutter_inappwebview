@@ -166,7 +166,7 @@ extension WKUserContentController {
                 }
             }
             if let windowId = contentWorld.windowId {
-                generatedCode += "\(WINDOW_ID_VARIABLE_JS_SOURCE) = \(String(windowId));\n"
+                generatedCode += "\(WindowIdJS.WINDOW_ID_VARIABLE_JS_SOURCE()) = \(String(windowId));\n"
             }
             return generatedCode + "\n" + source
         }

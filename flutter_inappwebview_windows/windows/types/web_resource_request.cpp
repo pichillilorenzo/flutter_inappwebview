@@ -10,10 +10,10 @@ namespace flutter_inappwebview_plugin
   {}
 
   WebResourceRequest::WebResourceRequest(const flutter::EncodableMap& map)
-    : url(get_optional_fl_map_value<std::string>(map, "url")),
-    method(get_optional_fl_map_value<std::string>(map, "method")),
-    headers(get_optional_fl_map_value<std::map<std::string, std::string>>(map, "headers")),
-    isForMainFrame(get_optional_fl_map_value<bool>(map, "isForMainFrame"))
+    : WebResourceRequest(get_optional_fl_map_value<std::string>(map, "url"),
+      get_optional_fl_map_value<std::string>(map, "method"),
+      get_optional_fl_map_value<std::map<std::string, std::string>>(map, "headers"),
+      get_optional_fl_map_value<bool>(map, "isForMainFrame"))
   {}
 
   WebResourceRequest::WebResourceRequest(wil::com_ptr<ICoreWebView2WebResourceRequest> webResourceRequest)

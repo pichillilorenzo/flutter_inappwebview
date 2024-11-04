@@ -59,7 +59,11 @@ export 'in_app_webview_hit_test_result_type.dart'
     show InAppWebViewHitTestResultType;
 export 'in_app_webview_initial_data.dart' show InAppWebViewInitialData;
 export 'in_app_webview_rect.dart' show InAppWebViewRect;
-export 'javascript_handler_callback.dart' show JavaScriptHandlerCallback;
+export 'javascript_handler_callback.dart'
+    show
+        JavaScriptHandlerCallback,
+        JavaScriptHandlerFunction,
+        JavaScriptHandlerFunctionData;
 export 'js_alert_request.dart' show JsAlertRequest;
 export 'js_alert_response.dart' show JsAlertResponse;
 export 'js_alert_response_action.dart' show JsAlertResponseAction;
@@ -225,6 +229,9 @@ export 'tracing_mode.dart' show TracingMode;
 export 'tracing_category.dart' show TracingCategory;
 export 'custom_tabs_post_message_result_type.dart'
     show CustomTabsPostMessageResultType;
-export 'custom_scheme_registration.dart'
-    show CustomSchemeRegistration;
+export 'custom_scheme_registration.dart' show CustomSchemeRegistration;
 export 'disposable.dart';
+export 'frame_kind.dart' show FrameKind;
+export 'process_failed_kind.dart' show ProcessFailedKind;
+export 'process_failed_reason.dart' show ProcessFailedReason;
+export 'process_failed_detail.dart' show ProcessFailedDetail;

@@ -1,9 +1,10 @@
-import 'package:build/src/builder/build_step.dart';
-import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/analysis/results.dart';
+import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
-import 'package:source_gen/source_gen.dart';
+import 'package:build/src/builder/build_step.dart';
+import 'package:collection/collection.dart';
 import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_internal_annotations.dart';
+import 'package:source_gen/source_gen.dart';
 
 import 'model_visitor.dart';
 import 'util.dart';
@@ -229,24 +230,26 @@ class ExchangeableObjectGenerator
             .firstAnnotationOfExact(deprecatedField)!
             .getField("message")!
             .toStringValue()!;
-        final fieldName = message
+        final newFieldName = message
             .replaceFirst("Use ", "")
             .replaceFirst(" instead", "")
             .trim();
-        final fieldElement = visitor.fields[fieldName];
-        if (fieldElement != null) {
-          final fieldTypeElement = fieldElement.type.element;
+
+        final newFieldElement = visitor.fields[newFieldName];
+        final shouldUseNewFieldName = newFieldElement != null;
+        if (shouldUseNewFieldName) {
+          final fieldTypeElement = newFieldElement.type.element;
           final deprecatedFieldTypeElement = deprecatedField.type.element;
 
-          final isNullable = Util.typeIsNullable(fieldElement.type);
-          var hasDefaultValue = (fieldElement is ParameterElement)
-              ? (fieldElement as ParameterElement).hasDefaultValue
+          final isNullable = Util.typeIsNullable(newFieldElement.type);
+          var hasDefaultValue = (newFieldElement is ParameterElement)
+              ? (newFieldElement as ParameterElement).hasDefaultValue
               : false;
           if (!isNullable && hasDefaultValue) {
             continue;
           }
 
-          classBuffer.write('$fieldName = $fieldName ?? ');
+          classBuffer.write('$newFieldName = $newFieldName ?? ');
           if (fieldTypeElement != null && deprecatedFieldTypeElement != null) {
             final deprecatedIsNullable =
                 Util.typeIsNullable(deprecatedField.type);
@@ -274,7 +277,7 @@ class ExchangeableObjectGenerator
             } else if (deprecatedField.type
                         .getDisplayString(withNullability: false) ==
                     "Uri" &&
-                fieldElement.type.getDisplayString(withNullability: false) ==
+                newFieldElement.type.getDisplayString(withNullability: false) ==
                     "WebUri") {
               if (deprecatedIsNullable) {
                 classBuffer.write(
@@ -333,7 +336,26 @@ class ExchangeableObjectGenerator
                 .replaceFirst("Use ", "")
                 .replaceFirst(" instead", "")
                 .trim();
-            value = "map['$newFieldName']";
+            final newFieldElement = fieldElements
+                .firstWhereOrNull((element) => element.name == newFieldName);
+            final shouldUseNewFieldName = newFieldElement != null &&
+                (newFieldElement.type == fieldElement.type ||
+                    (fieldElement.name.startsWith(RegExp(r'android|ios')) &&
+                        fieldElement.name.toLowerCase().replaceFirst(
+                                RegExp(r'android|ioswk|ios'), "") ==
+                            newFieldName.toLowerCase()) ||
+                    (newFieldElement.type.element != null &&
+                        fieldElement.type.element != null &&
+                        ((hasFromNativeValueMethod(
+                                    newFieldElement.type.element!) &&
+                                hasFromNativeValueMethod(
+                                    fieldElement.type.element!) ||
+                            (hasFromMapMethod(newFieldElement.type.element!) &&
+                                hasFromMapMethod(
+                                    fieldElement.type.element!))))));
+            if (shouldUseNewFieldName) {
+              value = "map['$newFieldName']";
+            }
           }
           final mapValue = value;
 
@@ -356,10 +378,13 @@ class ExchangeableObjectGenerator
           final constructorParameter = visitor.constructorParameters[fieldName];
           final isRequiredParameter = constructorParameter != null &&
               (constructorParameter.isRequiredNamed ||
-                  constructorParameter.isFinal || fieldElement.isFinal ||
+                  constructorParameter.isFinal ||
+                  fieldElement.isFinal ||
                   !Util.typeIsNullable(constructorParameter.type)) &&
               !constructorParameter.hasDefaultValue;
-          if (isRequiredParameter || fieldElement.isFinal || annotation.read("fromMapForceAllInline").boolValue) {
+          if (isRequiredParameter ||
+              fieldElement.isFinal ||
+              annotation.read("fromMapForceAllInline").boolValue) {
             requiredFields.add('$fieldName: $value,');
           } else {
             final isFieldNullable = Util.typeIsNullable(fieldElement.type);

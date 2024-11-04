@@ -51,6 +51,14 @@ public class InAppWebViewManager: ChannelDelegate {
                 clearAllCache(includeDiskFiles: includeDiskFiles, completionHandler: {
                     result(true)
                 })
+            case "setJavaScriptBridgeName":
+                let bridgeName = arguments!["bridgeName"] as! String
+                JavaScriptBridgeJS.set_JAVASCRIPT_BRIDGE_NAME(bridgeName: bridgeName)
+                result(true)
+                break
+            case "getJavaScriptBridgeName":
+                result(JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME())
+                break
             default:
                 result(FlutterMethodNotImplemented)
                 break

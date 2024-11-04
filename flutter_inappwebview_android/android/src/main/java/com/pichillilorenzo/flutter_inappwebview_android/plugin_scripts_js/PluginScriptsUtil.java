@@ -1,7 +1,11 @@
 package com.pichillilorenzo.flutter_inappwebview_android.plugin_scripts_js;
 
+import androidx.annotation.Nullable;
+
 import com.pichillilorenzo.flutter_inappwebview_android.types.PluginScript;
 import com.pichillilorenzo.flutter_inappwebview_android.types.UserScriptInjectionTime;
+
+import java.util.Set;
 
 public class PluginScriptsUtil {
 
@@ -16,24 +20,30 @@ public class PluginScriptsUtil {
   public static final String VAR_RESULT_UUID = "$IN_APP_WEBVIEW_RESULT_UUID";
   public static final String VAR_RANDOM_NAME = "$IN_APP_WEBVIEW_VARIABLE_RANDOM_NAME";
 
-  public static final String CALL_ASYNC_JAVA_SCRIPT_WRAPPER_JS_SOURCE = "(function(obj) {" +
-          "  (async function(" + VAR_FUNCTION_ARGUMENT_NAMES + ") {" +
-          "    \n" + VAR_FUNCTION_BODY + "\n" +
-          "  })(" + VAR_FUNCTION_ARGUMENT_VALUES + ").then(function(value) {" +
-          "    window." + JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME + ".callHandler('callAsyncJavaScript', {'value': value, 'error': null, 'resultUuid': '" + VAR_RESULT_UUID + "'});" +
-          "  }).catch(function(error) {" +
-          "    window." + JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME + ".callHandler('callAsyncJavaScript', {'value': null, 'error': error + '', 'resultUuid': '" + VAR_RESULT_UUID + "'});" +
-          "  });" +
-          "  return null;" +
-          "})(" + VAR_FUNCTION_ARGUMENTS_OBJ + ");";
+  public static String CALL_ASYNC_JAVA_SCRIPT_WRAPPER_JS_SOURCE() {
+    return
+            "(function(obj) {" +
+                    "  (async function(" + VAR_FUNCTION_ARGUMENT_NAMES + ") {" +
+                    "    \n" + VAR_FUNCTION_BODY + "\n" +
+                    "  })(" + VAR_FUNCTION_ARGUMENT_VALUES + ").then(function(value) {" +
+                    "    window." + JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME() + ".callHandler('callAsyncJavaScript', {'value': value, 'error': null, 'resultUuid': '" + VAR_RESULT_UUID + "'});" +
+                    "  }).catch(function(error) {" +
+                    "    window." + JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME() + ".callHandler('callAsyncJavaScript', {'value': null, 'error': error + '', 'resultUuid': '" + VAR_RESULT_UUID + "'});" +
+                    "  });" +
+                    "  return null;" +
+                    "})(" + VAR_FUNCTION_ARGUMENTS_OBJ + ");";
+  }
 
-  public static final String EVALUATE_JAVASCRIPT_WITH_CONTENT_WORLD_WRAPPER_JS_SOURCE = "var $IN_APP_WEBVIEW_VARIABLE_RANDOM_NAME = null;" +
-          "try {" +
-          "  $IN_APP_WEBVIEW_VARIABLE_RANDOM_NAME = eval(" + VAR_PLACEHOLDER_VALUE + ");" +
-          "} catch(e) {" +
-          "  console.error(e);" +
-          "}" +
-          "window." + JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME + ".callHandler('evaluateJavaScriptWithContentWorld', {'value': $IN_APP_WEBVIEW_VARIABLE_RANDOM_NAME, 'resultUuid': '" + VAR_RESULT_UUID + "'});";
+  public static String EVALUATE_JAVASCRIPT_WITH_CONTENT_WORLD_WRAPPER_JS_SOURCE() {
+    return
+            "var $IN_APP_WEBVIEW_VARIABLE_RANDOM_NAME = null;" +
+                    "try {" +
+                    "  $IN_APP_WEBVIEW_VARIABLE_RANDOM_NAME = eval(" + VAR_PLACEHOLDER_VALUE + ");" +
+                    "} catch(e) {" +
+                    "  console.error(e);" +
+                    "}" +
+                    "window." + JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME() + ".callHandler('evaluateJavaScriptWithContentWorld', {'value': $IN_APP_WEBVIEW_VARIABLE_RANDOM_NAME, 'resultUuid': '" + VAR_RESULT_UUID + "'});";
+  }
 
   public static final String IS_ACTIVE_ELEMENT_INPUT_EDITABLE_JS_SOURCE =
           "var activeEl = document.activeElement;" +
@@ -71,19 +81,27 @@ public class PluginScriptsUtil {
           "})();";
 
   public static final String CHECK_GLOBAL_KEY_DOWN_EVENT_TO_HIDE_CONTEXT_MENU_JS_PLUGIN_SCRIPT_GROUP_NAME = "CHECK_GLOBAL_KEY_DOWN_EVENT_TO_HIDE_CONTEXT_MENU_JS_PLUGIN_SCRIPT";
-  public static final PluginScript CHECK_GLOBAL_KEY_DOWN_EVENT_TO_HIDE_CONTEXT_MENU_JS_PLUGIN_SCRIPT = new PluginScript(
-          PluginScriptsUtil.CHECK_GLOBAL_KEY_DOWN_EVENT_TO_HIDE_CONTEXT_MENU_JS_PLUGIN_SCRIPT_GROUP_NAME,
-          PluginScriptsUtil.CHECK_GLOBAL_KEY_DOWN_EVENT_TO_HIDE_CONTEXT_MENU_JS_SOURCE,
-          UserScriptInjectionTime.AT_DOCUMENT_START,
-          null,
-          false,
-          null
-  );
+  public static PluginScript CHECK_GLOBAL_KEY_DOWN_EVENT_TO_HIDE_CONTEXT_MENU_JS_PLUGIN_SCRIPT(@Nullable Set<String> allowedOriginRules,
+                                                                                               boolean forMainFrameOnly) {
+    return
+            new PluginScript(
+                    PluginScriptsUtil.CHECK_GLOBAL_KEY_DOWN_EVENT_TO_HIDE_CONTEXT_MENU_JS_PLUGIN_SCRIPT_GROUP_NAME,
+                    PluginScriptsUtil.CHECK_GLOBAL_KEY_DOWN_EVENT_TO_HIDE_CONTEXT_MENU_JS_SOURCE(),
+                    UserScriptInjectionTime.AT_DOCUMENT_START,
+                    null,
+                    false,
+                    allowedOriginRules,
+                    forMainFrameOnly
+            );
+  }
 
   // android Workaround to hide context menu when user emit a keydown event
-  public static final String CHECK_GLOBAL_KEY_DOWN_EVENT_TO_HIDE_CONTEXT_MENU_JS_SOURCE = "(function(){" +
-          "  document.addEventListener('keydown', function(e) {" +
-          "    window." + JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME + "._hideContextMenu();" +
-          "  });" +
-          "})();";
+  public static String CHECK_GLOBAL_KEY_DOWN_EVENT_TO_HIDE_CONTEXT_MENU_JS_SOURCE() {
+    return
+            "(function(){" +
+                    "  document.addEventListener('keydown', function(e) {" +
+                    "    window." + JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME() + "._hideContextMenu();" +
+                    "  });" +
+                    "})();";
+  }
 }

@@ -28,12 +28,17 @@ Future main() async {
         'Failed to find an installed WebView2 runtime or non-stable Microsoft Edge installation.');
 
     webViewEnvironment = await WebViewEnvironment.create(
-        settings: WebViewEnvironmentSettings(userDataFolder: 'custom_path'));
+        settings: WebViewEnvironmentSettings(
+            additionalBrowserArguments: kDebugMode ? '--enable-features=msEdgeDevToolsWdpRemoteDebugging' : null,
+            userDataFolder: 'custom_path',
+        ));
   }
 
   if (!kIsWeb && defaultTargetPlatform == TargetPlatform.android) {
     await InAppWebViewController.setWebContentsDebuggingEnabled(kDebugMode);
   }
+
+  await InAppWebViewController.setJavaScriptBridgeName('custom_js_bridge');
 
   runApp(MyApp());
 }

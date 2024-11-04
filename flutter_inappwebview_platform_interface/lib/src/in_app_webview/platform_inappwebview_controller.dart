@@ -1,3 +1,4 @@
+import 'dart:collection';
 import 'dart:convert';
 import 'dart:core';
 import 'dart:typed_data';
@@ -26,6 +27,26 @@ import 'in_app_webview_keep_alive.dart';
 import 'in_app_webview_settings.dart';
 
 import '../print_job/main.dart';
+
+///List of forbidden names for JavaScript handlers used internally bu the plugin.
+final kJavaScriptHandlerForbiddenNames = UnmodifiableListView<String>([
+  "onLoadResource",
+  "onConsoleMessage",
+  "shouldInterceptAjaxRequest",
+  "onAjaxReadyStateChange",
+  "onAjaxProgress",
+  "shouldInterceptFetchRequest",
+  "onPrintRequest",
+  "onWindowFocus",
+  "onWindowBlur",
+  "callAsyncJavaScript",
+  "evaluateJavaScriptWithContentWorld",
+  "onFindResultReceived",
+  "onCallAsyncJavaScriptResultBelowIOS14Received",
+  "onWebMessagePortMessageReceived",
+  "onWebMessageListenerPostMessageReceived",
+  "onScrollChanged"
+]);
 
 /// Object specifying creation parameters for creating a [PlatformInAppWebViewController].
 ///
@@ -645,10 +666,11 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   }
 
   ///{@template flutter_inappwebview_platform_interface.PlatformInAppWebViewController.addJavaScriptHandler}
-  ///Adds a JavaScript message handler [callback] ([JavaScriptHandlerCallback]) that listen to post messages sent from JavaScript by the handler with name [handlerName].
+  ///Adds a JavaScript message handler [callback] ([JavaScriptHandlerCallback] or [JavaScriptHandlerFunction]) that listen to post messages sent from JavaScript by the handler with name [handlerName].
+  ///Forbidden [handlerName]s are represented by [kJavaScriptHandlerForbiddenNames], they are used internally by this plugin.
   ///
   ///The Android implementation uses [addJavascriptInterface](https://developer.android.com/reference/android/webkit/WebView#addJavascriptInterface(java.lang.Object,%20java.lang.String)).
-  ///The iOS implementation uses [addScriptMessageHandler](https://developer.apple.com/documentation/webkit/wkusercontentcontroller/1537172-addscriptmessagehandler?language=objc)
+  ///The iOS/macOS implementation uses [addScriptMessageHandler](https://developer.apple.com/documentation/webkit/wkusercontentcontroller/1537172-addscriptmessagehandler?language=objc)
   ///
   ///The JavaScript function that can be used to call the handler is `window.flutter_inappwebview.callHandler(handlerName <String>, ...args)`, where `args` are [rest parameters](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/rest_parameters).
   ///The `args` will be stringified automatically using `JSON.stringify(args)` method and then they will be decoded on the Dart side.
@@ -662,7 +684,7 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///```
   ///
   ///`window.flutter_inappwebview.callHandler` returns a JavaScript [Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
-  ///that can be used to get the json result returned by [JavaScriptHandlerCallback].
+  ///that can be used to get the json result returned by [JavaScriptHandlerCallback] or [JavaScriptHandlerFunction].
   ///In this case, simply return data that you want to send and it will be automatically json encoded using [jsonEncode] from the `dart:convert` library.
   ///
   ///So, on the JavaScript side, to get data coming from the Dart side, you will use:
@@ -703,8 +725,7 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///- Windows
   ///{@endtemplate}
   void addJavaScriptHandler(
-      {required String handlerName,
-      required JavaScriptHandlerCallback callback}) {
+      {required String handlerName, required Function callback}) {
     throw UnimplementedError(
         'addJavaScriptHandler is not implemented on the current platform');
   }
@@ -720,8 +741,7 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///- MacOS
   ///- Windows
   ///{@endtemplate}
-  JavaScriptHandlerCallback? removeJavaScriptHandler(
-      {required String handlerName}) {
+  Function? removeJavaScriptHandler({required String handlerName}) {
     throw UnimplementedError(
         'removeJavaScriptHandler is not implemented on the current platform');
   }
@@ -1697,6 +1717,7 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebView.clearSslPreferences](https://developer.android.com/reference/android/webkit/WebView#clearSslPreferences()))
+  ///- Windows ([Official API - ICoreWebView2_3.ClearServerCertificateErrorActions](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2_14?view=webview2-1.0.2792.45#clearservercertificateerroractions))
   ///{@endtemplate}
   Future<void> clearSslPreferences() {
     throw UnimplementedError(
@@ -2356,6 +2377,44 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   Future<void> enableSlowWholeDocumentDraw() {
     throw UnimplementedError(
         'enableSlowWholeDocumentDraw is not implemented on the current platform');
+  }
+
+  ///{@template flutter_inappwebview_platform_interface.PlatformInAppWebViewController.setJavaScriptBridgeName}
+  ///Sets the name of the JavaScript Bridge object that will be used to interact with the WebView.
+  ///This method should be called before any WebViews are created or when there are no WebViews.
+  ///Calling this method after a WebView has been created will not change
+  ///the current JavaScript Bridge object and could lead to errors.
+  ///
+  ///The [bridgeName] must be a non-empty string with only alphanumeric and underscore characters.
+  ///It can't start with a number.
+  ///
+  ///The default name used by this plugin is `flutter_inappwebview`.
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Android native WebView
+  ///- iOS
+  ///- macOS
+  ///- Windows
+  ///{@endtemplate}
+  Future<void> setJavaScriptBridgeName(String bridgeName) {
+    throw UnimplementedError(
+        'setJavaScriptBridgeName is not implemented on the current platform');
+  }
+
+  ///{@template flutter_inappwebview_platform_interface.PlatformInAppWebViewController.getJavaScriptBridgeName}
+  ///Gets the name of the JavaScript Bridge object that is used to interact with the WebView.
+  ///Use [setJavaScriptBridgeName] to set a custom name.
+  ///The default name used by this plugin is `flutter_inappwebview`.
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Android native WebView
+  ///- iOS
+  ///- macOS
+  ///- Windows
+  ///{@endtemplate}
+  Future<String> getJavaScriptBridgeName() {
+    throw UnimplementedError(
+        'getJavaScriptBridgeName is not implemented on the current platform');
   }
 
   ///{@template flutter_inappwebview_platform_interface.PlatformInAppWebViewController.tRexRunnerHtml}

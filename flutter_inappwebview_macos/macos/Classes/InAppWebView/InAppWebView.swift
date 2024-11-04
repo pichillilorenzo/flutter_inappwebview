@@ -50,6 +50,9 @@ public class InAppWebView: WKWebView, WKUIDelegate,
     
     fileprivate var interceptOnlyAsyncAjaxRequestsPluginScript: PluginScript?
     
+    private var exceptedBridgeSecret = NSUUID().uuidString
+    private var javaScriptBridgeEnabled = true
+    
     init(id: Any?, plugin: InAppWebViewFlutterPlugin?, frame: CGRect, configuration: WKWebViewConfiguration,
          userScripts: [UserScript] = []) {
         super.init(frame: frame, configuration: configuration)
@@ -118,6 +121,11 @@ public class InAppWebView: WKWebView, WKUIDelegate,
 //        }
         
         if let settings = settings {
+            javaScriptBridgeEnabled = settings.javaScriptBridgeEnabled
+            if let javaScriptBridgeOriginAllowList = settings.javaScriptBridgeOriginAllowList, javaScriptBridgeOriginAllowList.isEmpty {
+                // an empty list means that the JavaScript Bridge is not allowed for any origin.
+                javaScriptBridgeEnabled = false
+            }
             
             if #available(macOS 12.0, *), settings.transparentBackground {
                 underPageBackgroundColor = .clear
@@ -199,42 +207,45 @@ public class InAppWebView: WKWebView, WKUIDelegate,
             return
         }
         
-        configuration.userContentController.addPluginScript(PROMISE_POLYFILL_JS_PLUGIN_SCRIPT)
-        configuration.userContentController.addPluginScript(JAVASCRIPT_BRIDGE_JS_PLUGIN_SCRIPT)
-        configuration.userContentController.addPluginScript(CONSOLE_LOG_JS_PLUGIN_SCRIPT)
-        configuration.userContentController.addPluginScript(PRINT_JS_PLUGIN_SCRIPT)
-        configuration.userContentController.addPluginScript(ON_WINDOW_BLUR_EVENT_JS_PLUGIN_SCRIPT)
-        configuration.userContentController.addPluginScript(ON_WINDOW_FOCUS_EVENT_JS_PLUGIN_SCRIPT)
-        configuration.userContentController.addPluginScript(FIND_ELEMENTS_AT_POINT_JS_PLUGIN_SCRIPT)
-        configuration.userContentController.addPluginScript(FIND_TEXT_HIGHLIGHT_JS_PLUGIN_SCRIPT)
-        configuration.userContentController.addPluginScript(ORIGINAL_VIEWPORT_METATAG_CONTENT_JS_PLUGIN_SCRIPT)
-        configuration.userContentController.addPluginScript(ON_SCROLL_CHANGED_EVENT_JS_PLUGIN_SCRIPT)
-        if let settings = settings {
-            interceptOnlyAsyncAjaxRequestsPluginScript = createInterceptOnlyAsyncAjaxRequestsPluginScript(onlyAsync: settings.interceptOnlyAsyncAjaxRequests)
-            if settings.useShouldInterceptAjaxRequest {
-                if let interceptOnlyAsyncAjaxRequestsPluginScript = interceptOnlyAsyncAjaxRequestsPluginScript {
-                    configuration.userContentController.addPluginScript(interceptOnlyAsyncAjaxRequestsPluginScript)
+        if javaScriptBridgeEnabled {
+            let pluginScriptsOriginAllowList = settings?.pluginScriptsOriginAllowList
+            let pluginScriptsForMainFrameOnly = settings?.pluginScriptsForMainFrameOnly ?? true
+            
+            let javaScriptBridgeOriginAllowList = settings?.javaScriptBridgeOriginAllowList ?? pluginScriptsOriginAllowList
+            let javaScriptBridgeForMainFrameOnly = settings?.javaScriptBridgeForMainFrameOnly ?? pluginScriptsForMainFrameOnly
+            
+            configuration.userContentController.addPluginScript(PromisePolyfillJS.PROMISE_POLYFILL_JS_PLUGIN_SCRIPT(allowedOriginRules: pluginScriptsOriginAllowList, forMainFrameOnly: pluginScriptsForMainFrameOnly))
+            configuration.userContentController.addPluginScript(JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_JS_PLUGIN_SCRIPT(expectedBridgeSecret: exceptedBridgeSecret, allowedOriginRules: javaScriptBridgeOriginAllowList, forMainFrameOnly: javaScriptBridgeForMainFrameOnly))
+            configuration.userContentController.addPluginScript(ConsoleLogJS.CONSOLE_LOG_JS_PLUGIN_SCRIPT(allowedOriginRules: pluginScriptsOriginAllowList))
+            configuration.userContentController.addPluginScript(PrintJS.PRINT_JS_PLUGIN_SCRIPT(allowedOriginRules: pluginScriptsOriginAllowList, forMainFrameOnly: pluginScriptsForMainFrameOnly))
+            configuration.userContentController.addPluginScript(OnWindowBlurEventJS.ON_WINDOW_BLUR_EVENT_JS_PLUGIN_SCRIPT(allowedOriginRules: pluginScriptsOriginAllowList))
+            configuration.userContentController.addPluginScript(OnWindowFocusEventJS.ON_WINDOW_FOCUS_EVENT_JS_PLUGIN_SCRIPT(allowedOriginRules: pluginScriptsOriginAllowList))
+            configuration.userContentController.addPluginScript(FindElementsAtPointJS.FIND_ELEMENTS_AT_POINT_JS_PLUGIN_SCRIPT(allowedOriginRules: pluginScriptsOriginAllowList))
+            configuration.userContentController.addPluginScript(FindTextHighlightJS.FIND_TEXT_HIGHLIGHT_JS_PLUGIN_SCRIPT(allowedOriginRules: pluginScriptsOriginAllowList))
+            configuration.userContentController.addPluginScript(OriginalViewPortMetaTagContentJS.ORIGINAL_VIEWPORT_METATAG_CONTENT_JS_PLUGIN_SCRIPT(allowedOriginRules: pluginScriptsOriginAllowList))
+            configuration.userContentController.addPluginScript(OnScrollChangedJS.ON_SCROLL_CHANGED_EVENT_JS_PLUGIN_SCRIPT(allowedOriginRules: pluginScriptsOriginAllowList))
+            if let settings = settings {
+                interceptOnlyAsyncAjaxRequestsPluginScript = InterceptAjaxRequestJS.createInterceptOnlyAsyncAjaxRequestsPluginScript(onlyAsync: settings.interceptOnlyAsyncAjaxRequests,
+                                                                                                                                     allowedOriginRules: pluginScriptsOriginAllowList, forMainFrameOnly: pluginScriptsForMainFrameOnly)
+                if settings.useShouldInterceptAjaxRequest {
+                    if let interceptOnlyAsyncAjaxRequestsPluginScript = interceptOnlyAsyncAjaxRequestsPluginScript {
+                        configuration.userContentController.addPluginScript(interceptOnlyAsyncAjaxRequestsPluginScript)
+                    }
+                    configuration.userContentController.addPluginScript(InterceptAjaxRequestJS.INTERCEPT_AJAX_REQUEST_JS_PLUGIN_SCRIPT(allowedOriginRules: pluginScriptsOriginAllowList, forMainFrameOnly: pluginScriptsForMainFrameOnly))
                 }
-                configuration.userContentController.addPluginScript(INTERCEPT_AJAX_REQUEST_JS_PLUGIN_SCRIPT)
-            }
-            if settings.useShouldInterceptFetchRequest {
-                configuration.userContentController.addPluginScript(INTERCEPT_FETCH_REQUEST_JS_PLUGIN_SCRIPT)
-            }
-            if settings.useOnLoadResource {
-                configuration.userContentController.addPluginScript(ON_LOAD_RESOURCE_JS_PLUGIN_SCRIPT)
-            }
-            if !settings.supportZoom {
-                configuration.userContentController.addPluginScript(NOT_SUPPORT_ZOOM_JS_PLUGIN_SCRIPT)
-            } else if settings.enableViewportScale {
-                configuration.userContentController.addPluginScript(ENABLE_VIEWPORT_SCALE_JS_PLUGIN_SCRIPT)
+                if settings.useShouldInterceptFetchRequest {
+                    configuration.userContentController.addPluginScript(InterceptFetchRequestJS.INTERCEPT_FETCH_REQUEST_JS_PLUGIN_SCRIPT(allowedOriginRules: pluginScriptsOriginAllowList, forMainFrameOnly: pluginScriptsForMainFrameOnly))
+                }
+                if settings.useOnLoadResource {
+                    configuration.userContentController.addPluginScript(OnLoadResourceJS.ON_LOAD_RESOURCE_JS_PLUGIN_SCRIPT(allowedOriginRules: pluginScriptsOriginAllowList, forMainFrameOnly: pluginScriptsForMainFrameOnly))
+                }
+                if !settings.supportZoom {
+                    configuration.userContentController.addPluginScript(SupportZoomJS.NOT_SUPPORT_ZOOM_JS_PLUGIN_SCRIPT(allowedOriginRules: pluginScriptsOriginAllowList))
+                } else if settings.enableViewportScale {
+                    configuration.userContentController.addPluginScript(EnableViewportScaleJS.ENABLE_VIEWPORT_SCALE_JS_PLUGIN_SCRIPT(allowedOriginRules: pluginScriptsOriginAllowList))
+                }
             }
         }
-        configuration.userContentController.removeScriptMessageHandler(forName: "onCallAsyncJavaScriptResultBelowIOS14Received")
-        configuration.userContentController.add(self, name: "onCallAsyncJavaScriptResultBelowIOS14Received")
-        configuration.userContentController.removeScriptMessageHandler(forName: "onWebMessagePortMessageReceived")
-        configuration.userContentController.add(self, name: "onWebMessagePortMessageReceived")
-        configuration.userContentController.removeScriptMessageHandler(forName: "onWebMessageListenerPostMessageReceived")
-        configuration.userContentController.add(self, name: "onWebMessageListenerPostMessageReceived")
         configuration.userContentController.addUserOnlyScripts(initialUserScripts)
         configuration.userContentController.sync(scriptMessageHandler: self)
     }
@@ -354,11 +365,11 @@ public class InAppWebView: WKWebView, WKUIDelegate,
             if #available(macOS 11.0, *) {
                 let contentWorlds = configuration.userContentController.getContentWorlds(with: windowId)
                 for contentWorld in contentWorlds {
-                    let source = WINDOW_ID_INITIALIZE_JS_SOURCE.replacingOccurrences(of: PluginScriptsUtil.VAR_PLACEHOLDER_VALUE, with: String(windowId))
+                    let source = WindowIdJS.WINDOW_ID_INITIALIZE_JS_SOURCE().replacingOccurrences(of: PluginScriptsUtil.VAR_PLACEHOLDER_VALUE, with: String(windowId))
                     evaluateJavascript(source: source, contentWorld: contentWorld)
                 }
             } else {
-                let source = WINDOW_ID_INITIALIZE_JS_SOURCE.replacingOccurrences(of: PluginScriptsUtil.VAR_PLACEHOLDER_VALUE, with: String(windowId))
+                let source = WindowIdJS.WINDOW_ID_INITIALIZE_JS_SOURCE().replacingOccurrences(of: PluginScriptsUtil.VAR_PLACEHOLDER_VALUE, with: String(windowId))
                 evaluateJavascript(source: source)
             }
         }
@@ -566,33 +577,40 @@ public class InAppWebView: WKWebView, WKUIDelegate,
         
         if newSettingsMap["enableViewportScale"] != nil && settings?.enableViewportScale != newSettings.enableViewportScale {
             if !newSettings.enableViewportScale {
-                if configuration.userContentController.userScripts.contains(ENABLE_VIEWPORT_SCALE_JS_PLUGIN_SCRIPT) {
-                    configuration.userContentController.removePluginScript(ENABLE_VIEWPORT_SCALE_JS_PLUGIN_SCRIPT)
-                    evaluateJavaScript(NOT_ENABLE_VIEWPORT_SCALE_JS_SOURCE)
+                if configuration.userContentController.containsPluginScript(with: EnableViewportScaleJS.ENABLE_VIEWPORT_SCALE_JS_PLUGIN_SCRIPT_GROUP_NAME) {
+                    configuration.userContentController.removePluginScripts(with: EnableViewportScaleJS.ENABLE_VIEWPORT_SCALE_JS_PLUGIN_SCRIPT_GROUP_NAME, shouldAddPreviousScripts: false)
+                    evaluateJavaScript(EnableViewportScaleJS.NOT_ENABLE_VIEWPORT_SCALE_JS_SOURCE())
                 }
             } else {
-                evaluateJavaScript(ENABLE_VIEWPORT_SCALE_JS_SOURCE)
-                configuration.userContentController.addUserScript(ENABLE_VIEWPORT_SCALE_JS_PLUGIN_SCRIPT)
+                evaluateJavaScript(EnableViewportScaleJS.ENABLE_VIEWPORT_SCALE_JS_SOURCE)
+                if javaScriptBridgeEnabled {
+                    configuration.userContentController.addPluginScript(EnableViewportScaleJS.ENABLE_VIEWPORT_SCALE_JS_PLUGIN_SCRIPT(allowedOriginRules: newSettings.pluginScriptsOriginAllowList))
+                }
             }
         }
         
         if newSettingsMap["supportZoom"] != nil && settings?.supportZoom != newSettings.supportZoom {
             if newSettings.supportZoom {
-                if configuration.userContentController.userScripts.contains(NOT_SUPPORT_ZOOM_JS_PLUGIN_SCRIPT) {
-                    configuration.userContentController.removePluginScript(NOT_SUPPORT_ZOOM_JS_PLUGIN_SCRIPT)
-                    evaluateJavaScript(SUPPORT_ZOOM_JS_SOURCE)
+                if configuration.userContentController.containsPluginScript(with: SupportZoomJS.NOT_SUPPORT_ZOOM_JS_PLUGIN_SCRIPT_GROUP_NAME) {
+                    configuration.userContentController.removePluginScripts(with: SupportZoomJS.NOT_SUPPORT_ZOOM_JS_PLUGIN_SCRIPT_GROUP_NAME, shouldAddPreviousScripts: false)
+                    evaluateJavaScript(SupportZoomJS.SUPPORT_ZOOM_JS_SOURCE())
                 }
             } else {
-                evaluateJavaScript(NOT_SUPPORT_ZOOM_JS_SOURCE)
-                configuration.userContentController.addUserScript(NOT_SUPPORT_ZOOM_JS_PLUGIN_SCRIPT)
+                evaluateJavaScript(SupportZoomJS.NOT_SUPPORT_ZOOM_JS_SOURCE)
+                if javaScriptBridgeEnabled {
+                    configuration.userContentController.addPluginScript(SupportZoomJS.NOT_SUPPORT_ZOOM_JS_PLUGIN_SCRIPT(allowedOriginRules: newSettings.pluginScriptsOriginAllowList))
+                }
             }
         }
         
         if newSettingsMap["useOnLoadResource"] != nil && settings?.useOnLoadResource != newSettings.useOnLoadResource {
             if let applePayAPIEnabled = settings?.applePayAPIEnabled, !applePayAPIEnabled {
-                enablePluginScriptAtRuntime(flagVariable: FLAG_VARIABLE_FOR_ON_LOAD_RESOURCE_JS_SOURCE,
-                                            enable: newSettings.useOnLoadResource,
-                                            pluginScript: ON_LOAD_RESOURCE_JS_PLUGIN_SCRIPT)
+                if javaScriptBridgeEnabled {
+                    enablePluginScriptAtRuntime(flagVariable: OnLoadResourceJS.FLAG_VARIABLE_FOR_ON_LOAD_RESOURCE_JS_SOURCE(),
+                                                enable: newSettings.useOnLoadResource,
+                                                pluginScript: OnLoadResourceJS.ON_LOAD_RESOURCE_JS_PLUGIN_SCRIPT(allowedOriginRules: newSettings.pluginScriptsOriginAllowList,
+                                                                                                                 forMainFrameOnly: newSettings.pluginScriptsForMainFrameOnly))
+                }
             } else {
                 newSettings.useOnLoadResource = false
             }
@@ -600,9 +618,12 @@ public class InAppWebView: WKWebView, WKUIDelegate,
         
         if newSettingsMap["useShouldInterceptAjaxRequest"] != nil && settings?.useShouldInterceptAjaxRequest != newSettings.useShouldInterceptAjaxRequest {
             if let applePayAPIEnabled = settings?.applePayAPIEnabled, !applePayAPIEnabled {
-                enablePluginScriptAtRuntime(flagVariable: FLAG_VARIABLE_FOR_SHOULD_INTERCEPT_AJAX_REQUEST_JS_SOURCE,
-                                            enable: newSettings.useShouldInterceptAjaxRequest,
-                                            pluginScript: INTERCEPT_AJAX_REQUEST_JS_PLUGIN_SCRIPT)
+                if javaScriptBridgeEnabled {
+                    enablePluginScriptAtRuntime(flagVariable: InterceptAjaxRequestJS.FLAG_VARIABLE_FOR_SHOULD_INTERCEPT_AJAX_REQUEST_JS_SOURCE(),
+                                                enable: newSettings.useShouldInterceptAjaxRequest,
+                                                pluginScript: InterceptAjaxRequestJS.INTERCEPT_AJAX_REQUEST_JS_PLUGIN_SCRIPT(allowedOriginRules: newSettings.pluginScriptsOriginAllowList,
+                                                                                                                             forMainFrameOnly: newSettings.pluginScriptsForMainFrameOnly))
+                }
             } else {
                 newSettings.useShouldInterceptAjaxRequest = false
             }
@@ -611,17 +632,22 @@ public class InAppWebView: WKWebView, WKUIDelegate,
         if newSettingsMap["interceptOnlyAsyncAjaxRequests"] != nil && settings?.interceptOnlyAsyncAjaxRequests != newSettings.interceptOnlyAsyncAjaxRequests {
             if let applePayAPIEnabled = settings?.applePayAPIEnabled, !applePayAPIEnabled,
                let interceptOnlyAsyncAjaxRequestsPluginScript = interceptOnlyAsyncAjaxRequestsPluginScript {
-                enablePluginScriptAtRuntime(flagVariable: FLAG_VARIABLE_FOR_INTERCEPT_ONLY_ASYNC_AJAX_REQUESTS_JS_SOURCE,
-                                            enable: newSettings.interceptOnlyAsyncAjaxRequests,
-                                            pluginScript: interceptOnlyAsyncAjaxRequestsPluginScript)
+                if javaScriptBridgeEnabled {
+                    enablePluginScriptAtRuntime(flagVariable: InterceptAjaxRequestJS.FLAG_VARIABLE_FOR_INTERCEPT_ONLY_ASYNC_AJAX_REQUESTS_JS_SOURCE(),
+                                                enable: newSettings.interceptOnlyAsyncAjaxRequests,
+                                                pluginScript: interceptOnlyAsyncAjaxRequestsPluginScript)
+                }
             }
         }
         
         if newSettingsMap["useShouldInterceptFetchRequest"] != nil && settings?.useShouldInterceptFetchRequest != newSettings.useShouldInterceptFetchRequest {
             if let applePayAPIEnabled = settings?.applePayAPIEnabled, !applePayAPIEnabled {
-                enablePluginScriptAtRuntime(flagVariable: FLAG_VARIABLE_FOR_SHOULD_INTERCEPT_FETCH_REQUEST_JS_SOURCE,
-                                            enable: newSettings.useShouldInterceptFetchRequest,
-                                            pluginScript: INTERCEPT_FETCH_REQUEST_JS_PLUGIN_SCRIPT)
+                if javaScriptBridgeEnabled {
+                    enablePluginScriptAtRuntime(flagVariable: InterceptFetchRequestJS.FLAG_VARIABLE_FOR_SHOULD_INTERCEPT_FETCH_REQUEST_JS_SOURCE(),
+                                                enable: newSettings.useShouldInterceptFetchRequest,
+                                                pluginScript: InterceptFetchRequestJS.INTERCEPT_FETCH_REQUEST_JS_PLUGIN_SCRIPT(allowedOriginRules: newSettings.pluginScriptsOriginAllowList,
+                                                                                                                               forMainFrameOnly: newSettings.pluginScriptsForMainFrameOnly))
+                }
             } else {
                 newSettings.useShouldInterceptFetchRequest = false
             }
@@ -968,7 +994,7 @@ public class InAppWebView: WKWebView, WKUIDelegate,
         let functionArgumentNames = functionArgumentNamesList.joined(separator: ", ")
         let functionArgumentValues = functionArgumentValuesList.joined(separator: ", ")
         
-        jsToInject = CALL_ASYNC_JAVASCRIPT_BELOW_IOS_14_WRAPPER_JS
+        jsToInject = CallAsyncJavaScriptBelowIOS14WrapperJS.CALL_ASYNC_JAVASCRIPT_BELOW_IOS_14_WRAPPER_JS()
             .replacingOccurrences(of: PluginScriptsUtil.VAR_FUNCTION_ARGUMENT_NAMES, with: functionArgumentNames)
             .replacingOccurrences(of: PluginScriptsUtil.VAR_FUNCTION_ARGUMENT_VALUES, with: functionArgumentValues)
             .replacingOccurrences(of: PluginScriptsUtil.VAR_FUNCTION_ARGUMENTS_OBJ, with: Util.JSONStringify(value: arguments))
@@ -999,15 +1025,15 @@ public class InAppWebView: WKWebView, WKUIDelegate,
                 scriptAttributes += " script.id = '\(scriptIdEscaped)'; "
                 scriptAttributes += """
                 script.onload = function() {
-                    if (window.\(JAVASCRIPT_BRIDGE_NAME) != null) {
-                        window.\(JAVASCRIPT_BRIDGE_NAME).callHandler('onInjectedScriptLoaded', '\(scriptIdEscaped)');
+                    if (window.\(JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME()) != null) {
+                        window.\(JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME()).callHandler('onInjectedScriptLoaded', '\(scriptIdEscaped)');
                     }
                 };
                 """
                 scriptAttributes += """
                 script.onerror = function() {
-                    if (window.\(JAVASCRIPT_BRIDGE_NAME) != null) {
-                        window.\(JAVASCRIPT_BRIDGE_NAME).callHandler('onInjectedScriptError', '\(scriptIdEscaped)');
+                    if (window.\(JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME()) != null) {
+                        window.\(JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME()).callHandler('onInjectedScriptError', '\(scriptIdEscaped)');
                     }
                 };
                 """
@@ -1313,7 +1339,7 @@ public class InAppWebView: WKWebView, WKUIDelegate,
         initializeWindowIdJS()
         
         InAppWebView.credentialsProposed = []
-        evaluateJavaScript(PLATFORM_READY_JS_SOURCE, completionHandler: nil)
+        evaluateJavaScript(JavaScriptBridgeJS.PLATFORM_READY_JS_SOURCE, completionHandler: nil)
 
         channelDelegate?.onLoadStop(url: url?.absoluteString)
         
@@ -2098,66 +2124,226 @@ public class InAppWebView: WKWebView, WKUIDelegate,
 //    }
     
     public func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
+        guard javaScriptBridgeEnabled else {
+            return
+        }
+        
         guard let body = message.body as? [String: Any?] else {
             return
         }
         
-        if ["consoleLog", "consoleDebug", "consoleError", "consoleInfo", "consoleWarn"].contains(message.name) {
-            var messageLevel = 1
-            switch (message.name) {
-                case "consoleLog":
-                    messageLevel = 1
-                    break;
-                case "consoleDebug":
-                    // on Android, console.debug is TIP
-                    messageLevel = 0
-                    break;
-                case "consoleError":
-                    messageLevel = 3
-                    break;
-                case "consoleInfo":
-                    // on Android, console.info is LOG
-                    messageLevel = 1
-                    break;
-                case "consoleWarn":
-                    messageLevel = 2
-                    break;
-                default:
-                    messageLevel = 1
-                    break;
-            }
-            let consoleMessage = body["message"] as? String ?? ""
-            
-            let _windowId = body["_windowId"] as? Int64
-            var webView = self
-            if let wId = _windowId, let webViewTransport = plugin?.inAppWebViewManager?.windowWebViews[wId] {
-                webView = webViewTransport.webView
-            }
-            webView.channelDelegate?.onConsoleMessage(message: consoleMessage, messageLevel: messageLevel)
-        } else if message.name == "callHandler", let handlerName = body["handlerName"] as? String {
-            if handlerName == "onPrintRequest" {
-                let settings = PrintJobSettings()
-                settings.handledByClient = true
-                if let printJobId = printCurrentPage(settings: settings) {
-                    let callback = WebViewChannelDelegate.PrintRequestCallback()
-                    callback.nonNullSuccess = { (handledByClient: Bool) in
-                        return !handledByClient
+        guard let bridgeSecret = body["_bridgeSecret"] as? String, bridgeSecret == exceptedBridgeSecret else {
+            print("Bridge access attempt with wrong secret token, possibly from malicious code from origin \(message.frameInfo.securityOrigin)")
+            return
+        }
+        
+        var sourceOrigin: URL? = nil
+        let securityOrigin = message.frameInfo.securityOrigin
+        let scheme = securityOrigin.protocol
+        let host = securityOrigin.host
+        let port = securityOrigin.port
+        if !scheme.isEmpty, !host.isEmpty {
+            sourceOrigin = URL(string: "\(scheme)://\(host)\(port != 0 ? ":" + String(port) : "")")
+        }
+        let requestUrl = message.frameInfo.request.url
+        
+        var isOriginAllowed = false
+        if let javaScriptHandlersOriginAllowList = settings?.javaScriptHandlersOriginAllowList {
+            if let origin = sourceOrigin?.absoluteString {
+                for allowedOrigin in javaScriptHandlersOriginAllowList {
+                    if origin.range(of: allowedOrigin, options: .regularExpression, range: nil, locale: nil) != nil {
+                        isOriginAllowed = true
+                        break
                     }
-                    callback.defaultBehaviour = { [weak self] (handledByClient: Bool?) in
-                        if let printJob = self?.plugin?.printJobManager?.jobs[printJobId] {
-                            printJob?.disposeNoDismiss()
-                        }
-                    }
-                    callback.error = { [weak callback] (code: String, message: String?, details: Any?) in
-                        print(code + ", " + (message ?? ""))
-                        callback?.defaultBehaviour(nil)
-                    }
-                    channelDelegate?.onPrintRequest(url: url, printJobId: printJobId, callback: callback)
                 }
+            }
+        } else {
+            // origin is by default allowed if the allow list is null
+            isOriginAllowed = true
+        }
+        
+        if !isOriginAllowed {
+          print("Bridge access attempt from an origin not allowed: \(message.frameInfo.securityOrigin)")
+          return
+        }
+        
+        if message.name == "callHandler" {
+            guard let handlerName = body["handlerName"] as? String else {
+                print("handlerName is null or undefined")
                 return
             }
             
+            var isInternalHandler = true
+            switch (handlerName) {
+                case "onPrintRequest":
+                    let settings = PrintJobSettings()
+                    settings.handledByClient = true
+                    if let printJobId = printCurrentPage(settings: settings) {
+                        let callback = WebViewChannelDelegate.PrintRequestCallback()
+                        callback.nonNullSuccess = { (handledByClient: Bool) in
+                            return !handledByClient
+                        }
+                        callback.defaultBehaviour = { [weak self] (handledByClient: Bool?) in
+                            if let printJob = self?.plugin?.printJobManager?.jobs[printJobId] {
+                                printJob?.disposeNoDismiss()
+                            }
+                        }
+                        callback.error = { [weak callback] (code: String, message: String?, details: Any?) in
+                            print(code + ", " + (message ?? ""))
+                            callback?.defaultBehaviour(nil)
+                        }
+                        channelDelegate?.onPrintRequest(url: url, printJobId: printJobId, callback: callback)
+                    }
+                    break
+                case "onConsoleMessage":
+                    if let args = body["args"] as? String, let data = args.data(using: .utf8) {
+                        let jsonArgs = try? JSONSerialization.jsonObject(with: data, options: .mutableContainers) as? [[String: Any]]
+                        if let jsonData = jsonArgs?.first {
+                            var messageLevel = 1
+                            switch (jsonData["level"] as? String) {
+                            case "log":
+                                messageLevel = 1
+                                break
+                            case "debug":
+                                // on Android, console.debug is TIP
+                                messageLevel = 0
+                                break
+                            case "error":
+                                messageLevel = 3
+                                break
+                            case "info":
+                                // on Android, console.info is LOG
+                                messageLevel = 1
+                                break
+                            case "warn":
+                                messageLevel = 2
+                                break
+                            default:
+                                messageLevel = 1
+                                break
+                            }
+                            let consoleMessage = jsonData["message"] as? String ?? ""
+                            
+                            let _windowId = body["_windowId"] as? Int64
+                            var webView = self
+                            if let wId = _windowId, let webViewTransport = plugin?.inAppWebViewManager?.windowWebViews[wId] {
+                                webView = webViewTransport.webView
+                            }
+                            webView.channelDelegate?.onConsoleMessage(message: consoleMessage, messageLevel: messageLevel)
+                        }
+                    }
+                    break
+                case "onFindResultReceived":
+                    if let args = body["args"] as? String, let data = args.data(using: .utf8) {
+                        let jsonArgs = try? JSONSerialization.jsonObject(with: data, options: .mutableContainers) as? [[String: Any]]
+                        if let jsonData = jsonArgs?.first,
+                           let findResult = jsonData["findResult"] as? [String: Any],
+                           let activeMatchOrdinal = findResult["activeMatchOrdinal"] as? Int,
+                           let numberOfMatches = findResult["numberOfMatches"] as? Int,
+                           let isDoneCounting = findResult["isDoneCounting"] as? Bool {
+                            let _windowId = body["_windowId"] as? Int64
+                            var webView = self
+                            if let wId = _windowId, let webViewTransport = plugin?.inAppWebViewManager?.windowWebViews[wId] {
+                                webView = webViewTransport.webView
+                            }
+                            webView.findInteractionController?.channelDelegate?.onFindResultReceived(activeMatchOrdinal: activeMatchOrdinal, numberOfMatches: numberOfMatches, isDoneCounting: isDoneCounting)
+                            webView.channelDelegate?.onFindResultReceived(activeMatchOrdinal: activeMatchOrdinal, numberOfMatches: numberOfMatches, isDoneCounting: isDoneCounting)
+                        }
+                    }
+                    break
+                case "onCallAsyncJavaScriptResultBelowIOS14Received":
+                    if let args = body["args"] as? String, let data = args.data(using: .utf8) {
+                        let jsonArgs = try? JSONSerialization.jsonObject(with: data, options: .mutableContainers) as? [[String: Any]]
+                        if let jsonData = jsonArgs?.first,
+                           let resultUuid = jsonData["resultUuid"] as? String,
+                           let result = callAsyncJavaScriptBelowMacOS11Results[resultUuid] {
+                            result([
+                                "value": jsonData["value"],
+                                "error": jsonData["error"]
+                            ])
+                            callAsyncJavaScriptBelowMacOS11Results.removeValue(forKey: resultUuid)
+                        }
+                    }
+                    break
+                case "onWebMessagePortMessageReceived":
+                    if let args = body["args"] as? String, let data = args.data(using: .utf8) {
+                        let jsonArgs = try? JSONSerialization.jsonObject(with: data, options: .mutableContainers) as? [[String: Any]]
+                        if let jsonData = jsonArgs?.first,
+                           let webMessageChannelId = jsonData["webMessageChannelId"] as? String,
+                           let index = jsonData["index"] as? Int64 {
+                            var webMessage: WebMessage? = nil
+                            if let webMessageMap = jsonData["message"] as? [String : Any?] {
+                                webMessage = WebMessage.fromMap(map: webMessageMap)
+                            }
+                            
+                            if let webMessageChannel = webMessageChannels[webMessageChannelId] {
+                                webMessageChannel.channelDelegate?.onMessage(index: index, message: webMessage)
+                            }
+                        }
+                    }
+                    break
+                case "onWebMessageListenerPostMessageReceived":
+                    if let args = body["args"] as? String, let data = args.data(using: .utf8) {
+                        let jsonArgs = try? JSONSerialization.jsonObject(with: data, options: .mutableContainers) as? [[String: Any]]
+                        if let jsonData = jsonArgs?.first, let jsObjectName = jsonData["jsObjectName"] as? String {
+                            var webMessage: WebMessage? = nil
+                            if let webMessageMap = body["message"] as? [String : Any?] {
+                                webMessage = WebMessage.fromMap(map: webMessageMap)
+                            }
+                            
+                            if let webMessageListener = webMessageListeners.first(where: ({($0.jsObjectName == jsObjectName)})) {
+                                let isMainFrame = message.frameInfo.isMainFrame
+                                
+                                let securityOrigin = message.frameInfo.securityOrigin
+                                let scheme = securityOrigin.protocol
+                                let host = securityOrigin.host
+                                let port = securityOrigin.port
+                                
+                                if !webMessageListener.isOriginAllowed(scheme: scheme, host: host, port: port) {
+                                    return
+                                }
+                                
+                                var sourceOrigin: URL? = nil
+                                if !scheme.isEmpty, !host.isEmpty {
+                                    sourceOrigin = URL(string: "\(scheme)://\(host)\(port != 0 ? ":" + String(port) : "")")
+                                }
+                                webMessageListener.channelDelegate?.onPostMessage(message: webMessage, sourceOrigin: sourceOrigin, isMainFrame: isMainFrame)
+                            }
+                        }
+                    }
+                    break
+                case "onScrollChanged":
+                    if let args = body["args"] as? String, let data = args.data(using: .utf8) {
+                        let jsonArgs = try? JSONSerialization.jsonObject(with: data, options: .mutableContainers) as? [[String: Any]]
+                        if let jsonData = jsonArgs?.first,
+                           let x = jsonData["x"] as? Int,
+                           let y = jsonData["y"] as? Int {
+                            let _windowId = body["_windowId"] as? Int64
+                            var webView = self
+                            if let wId = _windowId, let webViewTransport = plugin?.inAppWebViewManager?.windowWebViews[wId] {
+                                webView = webViewTransport.webView
+                            }
+                            webView.channelDelegate?.onScrollChanged(x: x, y: y)
+                        }
+                    }
+                    break
+                default:
+                    isInternalHandler = false
+                    break
+            }
+            
             let _callHandlerID = body["_callHandlerID"] as? Int64 ?? 0
+            
+            if isInternalHandler {
+                evaluateJavaScript("""
+if(window.\(JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME())[\(_callHandlerID)] != null) {
+    window.\(JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME())[\(_callHandlerID)].resolve();
+    delete window.\(JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME())[\(_callHandlerID)];
+}
+""", completionHandler: nil)
+                return
+            }
+            
             let args = body["args"] as? String ?? ""
             
             let _windowId = body["_windowId"] as? Int64
@@ -2174,9 +2360,9 @@ public class InAppWebView: WKWebView, WKUIDelegate,
                 }
                 
                 self?.evaluateJavaScript("""
-if(window.\(JAVASCRIPT_BRIDGE_NAME)[\(_callHandlerID)] != null) {
-    window.\(JAVASCRIPT_BRIDGE_NAME)[\(_callHandlerID)].resolve(\(json));
-    delete window.\(JAVASCRIPT_BRIDGE_NAME)[\(_callHandlerID)];
+if(window.\(JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME())[\(_callHandlerID)] != null) {
+    window.\(JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME())[\(_callHandlerID)].resolve(\(json));
+    delete window.\(JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME())[\(_callHandlerID)];
 }
 """, completionHandler: nil)
             }
@@ -2185,80 +2371,20 @@ if(window.\(JAVASCRIPT_BRIDGE_NAME)[\(_callHandlerID)] != null) {
                 print(errorMessage)
                 
                 self?.evaluateJavaScript("""
-if(window.\(JAVASCRIPT_BRIDGE_NAME)[\(_callHandlerID)] != null) {
-    window.\(JAVASCRIPT_BRIDGE_NAME)[\(_callHandlerID)].reject(new Error('\(errorMessage.replacingOccurrences(of: "\'", with: "\\'"))'));
-    delete window.\(JAVASCRIPT_BRIDGE_NAME)[\(_callHandlerID)];
+if(window.\(JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME())[\(_callHandlerID)] != null) {
+    window.\(JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME())[\(_callHandlerID)].reject(new Error('\(errorMessage.replacingOccurrences(of: "\'", with: "\\'"))'));
+    delete window.\(JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME())[\(_callHandlerID)];
 }
 """, completionHandler: nil)
             }
             
             if let channelDelegate = webView.channelDelegate {
-                channelDelegate.onCallJsHandler(handlerName: handlerName, args: args, callback: callback)
-            }
-        } else if message.name == "onFindResultReceived",
-                  let findResult = body["findResult"] as? [String: Any],
-                  let activeMatchOrdinal = findResult["activeMatchOrdinal"] as? Int,
-                  let numberOfMatches = findResult["numberOfMatches"] as? Int,
-                  let isDoneCounting = findResult["isDoneCounting"] as? Bool {
-            
-            let _windowId = body["_windowId"] as? Int64
-            var webView = self
-            if let wId = _windowId, let webViewTransport = plugin?.inAppWebViewManager?.windowWebViews[wId] {
-                webView = webViewTransport.webView
-            }
-            webView.findInteractionController?.channelDelegate?.onFindResultReceived(activeMatchOrdinal: activeMatchOrdinal, numberOfMatches: numberOfMatches, isDoneCounting: isDoneCounting)
-            webView.channelDelegate?.onFindResultReceived(activeMatchOrdinal: activeMatchOrdinal, numberOfMatches: numberOfMatches, isDoneCounting: isDoneCounting)
-        } else if message.name == "onScrollChanged",
-                  let x = body["x"] as? Int,
-                  let y = body["y"] as? Int {
-            let _windowId = body["_windowId"] as? Int64
-            var webView = self
-            if let wId = _windowId, let webViewTransport = plugin?.inAppWebViewManager?.windowWebViews[wId] {
-                webView = webViewTransport.webView
-            }
-            webView.channelDelegate?.onScrollChanged(x: x, y: y)
-        } else if message.name == "onCallAsyncJavaScriptResultBelowIOS14Received",
-                  let resultUuid = body["resultUuid"] as? String,
-                  let result = callAsyncJavaScriptBelowMacOS11Results[resultUuid] {
-            result([
-                    "value": body["value"],
-                    "error": body["error"]
-            ])
-            callAsyncJavaScriptBelowMacOS11Results.removeValue(forKey: resultUuid)
-        } else if message.name == "onWebMessagePortMessageReceived",
-                  let webMessageChannelId = body["webMessageChannelId"] as? String,
-                  let index = body["index"] as? Int64 {
-            var webMessage: WebMessage? = nil
-            if let webMessageMap = body["message"] as? [String : Any?] {
-                webMessage = WebMessage.fromMap(map: webMessageMap)
-            }
-            
-            if let webMessageChannel = webMessageChannels[webMessageChannelId] {
-                webMessageChannel.channelDelegate?.onMessage(index: index, message: webMessage)
-            }
-        } else if message.name == "onWebMessageListenerPostMessageReceived", let jsObjectName = body["jsObjectName"] as? String {
-            var webMessage: WebMessage? = nil
-            if let webMessageMap = body["message"] as? [String : Any?] {
-                webMessage = WebMessage.fromMap(map: webMessageMap)
-            }
-            
-            if let webMessageListener = webMessageListeners.first(where: ({($0.jsObjectName == jsObjectName)})) {
-                let isMainFrame = message.frameInfo.isMainFrame
-                
-                let securityOrigin = message.frameInfo.securityOrigin
-                let scheme = securityOrigin.protocol
-                let host = securityOrigin.host
-                let port = securityOrigin.port
-                
-                if !webMessageListener.isOriginAllowed(scheme: scheme, host: host, port: port) {
-                    return
-                }
-                
-                var sourceOrigin: URL? = nil
-                if !scheme.isEmpty, !host.isEmpty {
-                    sourceOrigin = URL(string: "\(scheme)://\(host)\(port != 0 ? ":" + String(port) : "")")
-                }
-                webMessageListener.channelDelegate?.onPostMessage(message: webMessage, sourceOrigin: sourceOrigin, isMainFrame: isMainFrame)
+                let data = JavaScriptHandlerFunctionData(
+                    args: args, isMainFrame: message.frameInfo.isMainFrame,
+                    origin: sourceOrigin?.absoluteString ?? "",
+                    requestUrl: requestUrl?.absoluteString ?? ""
+                )
+                channelDelegate.onCallJsHandler(handlerName: handlerName, data: data, callback: callback)
             }
         }
     }
@@ -2543,7 +2669,7 @@ if(window.\(JAVASCRIPT_BRIDGE_NAME)[\(_callHandlerID)] != null) {
                     throw NSError(domain: "Port is already closed or transferred", code: 0)
                 }
                 port.isTransferred = true
-                portArrayString.append("\(WEB_MESSAGE_CHANNELS_VARIABLE_NAME)['\(port.webMessageChannel!.id)'].\(port.name)")
+                portArrayString.append("\(WebMessageChannelJS.WEB_MESSAGE_CHANNELS_VARIABLE_NAME())['\(port.webMessageChannel!.id)'].\(port.name)")
             }
             portsString = "[" + portArrayString.joined(separator: ", ") + "]"
         }
@@ -2631,9 +2757,6 @@ if(window.\(JAVASCRIPT_BRIDGE_NAME)[\(_callHandlerID)] != null) {
         interceptOnlyAsyncAjaxRequestsPluginScript = nil
         if windowId == nil {
             configuration.userContentController.removeAllPluginScriptMessageHandlers()
-            configuration.userContentController.removeScriptMessageHandler(forName: "onCallAsyncJavaScriptResultBelowIOS14Received")
-            configuration.userContentController.removeScriptMessageHandler(forName: "onWebMessagePortMessageReceived")
-            configuration.userContentController.removeScriptMessageHandler(forName: "onWebMessageListenerPostMessageReceived")
             configuration.userContentController.removeAllUserScripts()
             if #available(macOS 10.13, *) {
                 configuration.userContentController.removeAllContentRuleLists()

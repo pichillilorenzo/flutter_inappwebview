@@ -2,9 +2,9 @@
 #define FLUTTER_INAPPWEBVIEW_PLUGIN_UTIL_H_
 
 #include <optional>
+#include <rpc.h>
 #include <string>
 #include <variant>
-#include <Windows.h>
 
 namespace flutter_inappwebview_plugin
 {

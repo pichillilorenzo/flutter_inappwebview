@@ -167,13 +167,13 @@ class InAppWebView extends StatefulWidget {
     void Function(InAppWebViewController controller, int progress)?
         onProgressChanged,
     Future<ClientCertResponse?> Function(InAppWebViewController controller,
-            URLAuthenticationChallenge challenge)?
+        ClientCertChallenge challenge)?
         onReceivedClientCertRequest,
     Future<HttpAuthResponse?> Function(InAppWebViewController controller,
-            URLAuthenticationChallenge challenge)?
+         HttpAuthenticationChallenge challenge)?
         onReceivedHttpAuthRequest,
     Future<ServerTrustAuthResponse?> Function(InAppWebViewController controller,
-            URLAuthenticationChallenge challenge)?
+        ServerTrustChallenge challenge)?
         onReceivedServerTrustAuthRequest,
     void Function(InAppWebViewController controller, int x, int y)?
         onScrollChanged,
@@ -294,6 +294,8 @@ class InAppWebView extends StatefulWidget {
     void Function(InAppWebViewController controller, Size oldContentSize,
             Size newContentSize)?
         onContentSizeChanged,
+    void Function(InAppWebViewController controller, ProcessFailedDetail detail)?
+    onProcessFailed,
   }) : this.fromPlatformCreationParams(
             key: key,
             params: PlatformInAppWebViewWidgetCreationParams(
@@ -655,6 +657,11 @@ class InAppWebView extends StatefulWidget {
                   ? (controller, oldContentSize, newContentSize) =>
                       onContentSizeChanged.call(
                           controller, oldContentSize, newContentSize)
+                  : null,
+              onProcessFailed: onProcessFailed != null
+                  ? (controller, detail) =>
+                  onProcessFailed.call(
+                      controller, detail)
                   : null,
               gestureRecognizers: gestureRecognizers,
               headlessWebView: headlessWebView?.platform,

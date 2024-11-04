@@ -33,10 +33,10 @@ public class WebMessagePort: NSObject {
             let index = name == "port1" ? 0 : 1
             webView.evaluateJavascript(source: """
             (function() {
-                var webMessageChannel = \(WEB_MESSAGE_CHANNELS_VARIABLE_NAME)["\(webMessageChannel.id)"];
+                var webMessageChannel = \(WebMessageChannelJS.WEB_MESSAGE_CHANNELS_VARIABLE_NAME())["\(webMessageChannel.id)"];
                 if (webMessageChannel != null) {
                     webMessageChannel.\(self.name).onmessage = function (event) {
-                        window.webkit.messageHandlers["onWebMessagePortMessageReceived"].postMessage({
+                        window.\(JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME()).callHandler('onWebMessagePortMessageReceived', {
                             "webMessageChannelId": "\(webMessageChannel.id)",
                             "index": \(String(index)),
                             "message": {
@@ -74,14 +74,14 @@ public class WebMessagePort: NSObject {
                         throw NSError(domain: "Port is already closed or transferred", code: 0)
                     }
                     port.isTransferred = true
-                    portArrayString.append("\(WEB_MESSAGE_CHANNELS_VARIABLE_NAME)['\(port.webMessageChannel!.id)'].\(port.name)")
+                    portArrayString.append("\(WebMessageChannelJS.WEB_MESSAGE_CHANNELS_VARIABLE_NAME())['\(port.webMessageChannel!.id)'].\(port.name)")
                 }
                 portsString = "[" + portArrayString.joined(separator: ", ") + "]"
             }
             
             let source = """
             (function() {
-                var webMessageChannel = \(WEB_MESSAGE_CHANNELS_VARIABLE_NAME)["\(webMessageChannel.id)"];
+                var webMessageChannel = \(WebMessageChannelJS.WEB_MESSAGE_CHANNELS_VARIABLE_NAME())["\(webMessageChannel.id)"];
                 if (webMessageChannel != null) {
                     webMessageChannel.\(self.name).postMessage(\(message.jsData), \(portsString));
                 }
@@ -104,7 +104,7 @@ public class WebMessagePort: NSObject {
         if let webMessageChannel = webMessageChannel, let webView = webMessageChannel.webView {
             let source = """
             (function() {
-                var webMessageChannel = \(WEB_MESSAGE_CHANNELS_VARIABLE_NAME)["\(webMessageChannel.id)"];
+                var webMessageChannel = \(WebMessageChannelJS.WEB_MESSAGE_CHANNELS_VARIABLE_NAME())["\(webMessageChannel.id)"];
                 if (webMessageChannel != null) {
                     webMessageChannel.\(self.name).close();
                 }

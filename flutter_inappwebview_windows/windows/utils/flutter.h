@@ -177,7 +177,7 @@ namespace flutter_inappwebview_plugin
 
     auto flList = std::get_if<flutter::EncodableList>(&map.at(make_fl_value(key)));
     if (flList) {
-      T vecValue(flList->size());
+      T vecValue;
       for (auto itr = flList->begin(); itr != flList->end(); itr++) {
         vecValue.push_back(std::get<V>(*itr));
       }

@@ -1,12 +1,20 @@
 #include <cstring>
 #include <filesystem>
 #include <nlohmann/json.hpp>
+#include <regex>
 #include <Shlwapi.h>
 #include <wil/wrl.h>
+#include <winrt/Windows.Foundation.h>
 
 #include "../custom_platform_view/util/composition.desktop.interop.h"
 #include "../plugin_scripts_js/javascript_bridge_js.h"
+#include "../types/client_cert_response.h"
 #include "../types/create_window_action.h"
+#include "../types/http_auth_response.h"
+#include "../types/javascript_handler_function_data.h"
+#include "../types/server_trust_auth_response.h"
+#include "../types/ssl_error.h"
+#include "../types/url_credential.h"
 #include "../types/web_resource_error.h"
 #include "../types/web_resource_request.h"
 #include "../utils/base64.h"
@@ -14,6 +22,7 @@
 #include "../utils/map.h"
 #include "../utils/strconv.h"
 #include "../utils/string.h"
+#include "../utils/uri.h"
 #include "../webview_environment/webview_environment_manager.h"
 #include "in_app_webview.h"
 #include "in_app_webview_manager.h"
@@ -189,6 +198,8 @@ namespace flutter_inappwebview_plugin
       return;
     }
 
+    javaScriptBridgeEnabled = settings->javaScriptBridgeEnabled;
+
     wil::com_ptr<ICoreWebView2Settings> webView2Settings;
     auto hrWebView2Settings = webView->get_Settings(&webView2Settings);
     if (succeededOrLog(hrWebView2Settings)) {
@@ -207,7 +218,7 @@ namespace flutter_inappwebview_plugin
 
     wil::com_ptr<ICoreWebView2Controller2> webViewController2;
     if (succeededOrLog(webViewController->QueryInterface(IID_PPV_ARGS(&webViewController2)))) {
-      if (!settings->transparentBackground) {
+      if (settings->transparentBackground) {
         webViewController2->put_DefaultBackgroundColor({ 0, 255, 255, 255 });
       }
     }
@@ -260,7 +271,15 @@ namespace flutter_inappwebview_plugin
     ).Get()));
 
     if (userContentController) {
-      userContentController->addPluginScript(std::move(createJavaScriptBridgePluginScript()));
+      if (javaScriptBridgeEnabled) {
+        auto pluginScriptsOriginAllowList = settings->pluginScriptsOriginAllowList;
+        auto pluginScriptsForMainFrameOnly = settings->pluginScriptsForMainFrameOnly;
+
+        auto javaScriptBridgeOriginAllowList = settings->javaScriptBridgeOriginAllowList.has_value() ? settings->javaScriptBridgeOriginAllowList : pluginScriptsOriginAllowList;
+        auto javaScriptBridgeForMainFrameOnly = settings->javaScriptBridgeForMainFrameOnly.has_value() ? settings->javaScriptBridgeForMainFrameOnly.value() : pluginScriptsForMainFrameOnly;
+        userContentController->addPluginScript(std::move(JavaScriptBridgeJS::JAVASCRIPT_BRIDGE_JS_PLUGIN_SCRIPT(expectedBridgeSecret, javaScriptBridgeOriginAllowList, javaScriptBridgeForMainFrameOnly)));
+      }
+
       if (params.initialUserScripts.has_value()) {
         userContentController->addUserOnlyScripts(params.initialUserScripts.value());
       }
@@ -278,7 +297,7 @@ namespace flutter_inappwebview_plugin
     wil::com_ptr<ICoreWebView2DevToolsProtocolEventReceiver> fetchRequestPausedEventReceiver;
 
     if (succeededOrLog(webView->GetDevToolsProtocolEventReceiver(L"Fetch.requestPaused", &fetchRequestPausedEventReceiver))) {
-      failedAndLog(fetchRequestPausedEventReceiver->add_DevToolsProtocolEventReceived(
+      auto add_DevToolsProtocolEventReceived_HResult = fetchRequestPausedEventReceiver->add_DevToolsProtocolEventReceived(
         Callback<ICoreWebView2DevToolsProtocolEventReceivedEventHandler>(
           [this](
             ICoreWebView2* sender,
@@ -412,10 +431,11 @@ namespace flutter_inappwebview_plugin
 
             return S_OK;
           })
-        .Get(), nullptr));
+        .Get(), nullptr);
+      failedAndLog(add_DevToolsProtocolEventReceived_HResult);
     }
 
-    failedLog(webView->add_NavigationStarting(
+    auto add_NavigationStarting_HResult = webView->add_NavigationStarting(
       Callback<ICoreWebView2NavigationStartingEventHandler>(
         [this](ICoreWebView2* sender, ICoreWebView2NavigationStartingEventArgs* args)
         {
@@ -515,9 +535,10 @@ namespace flutter_inappwebview_plugin
 
           return S_OK;
         }
-      ).Get(), nullptr));
+      ).Get(), nullptr);
+    failedLog(add_NavigationStarting_HResult);
 
-    failedLog(webView->add_ContentLoading(
+    auto add_ContentLoading_HResult = webView->add_ContentLoading(
       Callback<ICoreWebView2ContentLoadingEventHandler>(
         [this](ICoreWebView2* sender, ICoreWebView2ContentLoadingEventArgs* args)
         {
@@ -526,15 +547,17 @@ namespace flutter_inappwebview_plugin
           }
           return S_OK;
         }
-      ).Get(), nullptr));
+      ).Get(), nullptr);
+    failedLog(add_ContentLoading_HResult);
 
-    failedLog(webView->add_NavigationCompleted(
+    auto add_NavigationCompleted_HResult = webView->add_NavigationCompleted(
       Callback<ICoreWebView2NavigationCompletedEventHandler>(
         [this](ICoreWebView2* sender, ICoreWebView2NavigationCompletedEventArgs* args)
         {
           isLoading_ = false;
+          previousAuthRequestFailureCount = 0;
 
-          evaluateJavascript(PLATFORM_READY_JS_SOURCE, ContentWorld::page(), nullptr);
+          evaluateJavascript(JavaScriptBridgeJS::PLATFORM_READY_JS_SOURCE(), ContentWorld::page(), nullptr);
 
           std::shared_ptr<NavigationAction> navigationAction;
           UINT64 navigationId;
@@ -581,9 +604,10 @@ namespace flutter_inappwebview_plugin
 
           return S_OK;
         }
-      ).Get(), nullptr));
+      ).Get(), nullptr);
+    failedLog(add_NavigationCompleted_HResult);
 
-    failedLog(webView->add_DocumentTitleChanged(Callback<ICoreWebView2DocumentTitleChangedEventHandler>(
+    auto add_DocumentTitleChanged_HResult = webView->add_DocumentTitleChanged(Callback<ICoreWebView2DocumentTitleChangedEventHandler>(
       [this](ICoreWebView2* sender, IUnknown* args)
       {
         if (channelDelegate) {
@@ -593,9 +617,10 @@ namespace flutter_inappwebview_plugin
         }
         return S_OK;
       }
-    ).Get(), nullptr));
+    ).Get(), nullptr);
+    failedLog(add_DocumentTitleChanged_HResult);
 
-    failedLog(webView->add_HistoryChanged(Callback<ICoreWebView2HistoryChangedEventHandler>(
+    auto add_HistoryChanged_HResult = webView->add_HistoryChanged(Callback<ICoreWebView2HistoryChangedEventHandler>(
       [this](ICoreWebView2* sender, IUnknown* args)
       {
         if (channelDelegate) {
@@ -607,63 +632,20 @@ namespace flutter_inappwebview_plugin
         }
         return S_OK;
       }
-    ).Get(), nullptr));
+    ).Get(), nullptr);
+    failedLog(add_HistoryChanged_HResult);
 
-    failedLog(webView->add_WebMessageReceived(Callback<ICoreWebView2WebMessageReceivedEventHandler>(
+    auto add_WebMessageReceived_HResult = webView->add_WebMessageReceived(Callback<ICoreWebView2WebMessageReceivedEventHandler>(
       [this](ICoreWebView2* sender, ICoreWebView2WebMessageReceivedEventArgs* args)
       {
-        if (!channelDelegate) {
-          return S_OK;
-        }
-
-        wil::unique_cotaskmem_string json;
-        if (succeededOrLog(args->get_WebMessageAsJson(&json))) {
-          auto message = nlohmann::json::parse(wide_to_utf8(json.get()));
-
-          if (message.is_object() && message.contains("name") && message.at("name").is_string() && message.contains("body") && message.at("body").is_object()) {
-            auto name = message.at("name").get<std::string>();
-            auto body = message.at("body").get<nlohmann::json>();
-
-            if (name.compare("callHandler") == 0 && body.contains("handlerName") && body.at("handlerName").is_string()) {
-              auto handlerName = body.at("handlerName").get<std::string>();
-              auto callHandlerID = body.at("_callHandlerID").is_number_integer() ? body.at("_callHandlerID").get<int64_t>() : 0;
-              std::string handlerArgs = body.at("args").is_string() ? body.at("args").get<std::string>() : "";
-
-              auto callback = std::make_unique<WebViewChannelDelegate::CallJsHandlerCallback>();
-              callback->defaultBehaviour = [this, callHandlerID](const std::optional<const flutter::EncodableValue*> response)
-                {
-                  std::string json = "null";
-                  if (response.has_value() && !response.value()->IsNull()) {
-                    json = std::get<std::string>(*(response.value()));
-                  }
-
-                  evaluateJavascript("if (window." + JAVASCRIPT_BRIDGE_NAME + "[" + std::to_string(callHandlerID) + "] != null) { \
-                      window." + JAVASCRIPT_BRIDGE_NAME + "[" + std::to_string(callHandlerID) + "].resolve(" + json + "); \
-                      delete window." + JAVASCRIPT_BRIDGE_NAME + "[" + std::to_string(callHandlerID) + "]; \
-                    }", ContentWorld::page(), nullptr);
-                };
-              callback->error = [this, callHandlerID](const std::string& error_code, const std::string& error_message, const flutter::EncodableValue* error_details)
-                {
-                  auto errorMessage = error_code + ", " + error_message;
-                  debugLog(errorMessage);
-
-                  evaluateJavascript("if (window." + JAVASCRIPT_BRIDGE_NAME + "[" + std::to_string(callHandlerID) + "] != null) { \
-                      window." + JAVASCRIPT_BRIDGE_NAME + "[" + std::to_string(callHandlerID) + "].reject(new Error('" + replace_all_copy(errorMessage, "\'", "\\'") + "')); \
-                      delete window." + JAVASCRIPT_BRIDGE_NAME + "[" + std::to_string(callHandlerID) + "]; \
-                    }", ContentWorld::page(), nullptr);
-                };
-              channelDelegate->onCallJsHandler(handlerName, handlerArgs, std::move(callback));
-            }
-          }
-        }
-
-        return S_OK;
+        return this->onCallJsHandler(true, args);
       }
-    ).Get(), nullptr));
+    ).Get(), nullptr);
+    failedLog(add_WebMessageReceived_HResult);
 
     wil::com_ptr<ICoreWebView2DevToolsProtocolEventReceiver> consoleMessageReceiver;
     if (succeededOrLog(webView->GetDevToolsProtocolEventReceiver(L"Runtime.consoleAPICalled", &consoleMessageReceiver))) {
-      failedLog(consoleMessageReceiver->add_DevToolsProtocolEventReceived(
+      auto consoleMessageReceiver_add_DevToolsProtocolEventReceived_HResult = consoleMessageReceiver->add_DevToolsProtocolEventReceived(
         Callback<ICoreWebView2DevToolsProtocolEventReceivedEventHandler>(
           [this](
             ICoreWebView2* sender,
@@ -703,10 +685,11 @@ namespace flutter_inappwebview_plugin
 
             return S_OK;
           })
-        .Get(), nullptr));
+        .Get(), nullptr);
+      failedLog(consoleMessageReceiver_add_DevToolsProtocolEventReceived_HResult);
     }
 
-    failedLog(webView->add_NewWindowRequested(
+    auto add_NewWindowRequested_HResult = webView->add_NewWindowRequested(
       Callback<ICoreWebView2NewWindowRequestedEventHandler>(
         [this](ICoreWebView2* sender, ICoreWebView2NewWindowRequestedEventArgs* args)
         {
@@ -763,9 +746,10 @@ namespace flutter_inappwebview_plugin
           }
           return S_OK;
         }
-      ).Get(), nullptr));
+      ).Get(), nullptr);
+    failedLog(add_NewWindowRequested_HResult);
 
-    failedLog(webView->add_WindowCloseRequested(Callback<ICoreWebView2WindowCloseRequestedEventHandler>(
+    auto add_WindowCloseRequested_HResult = webView->add_WindowCloseRequested(Callback<ICoreWebView2WindowCloseRequestedEventHandler>(
       [this](ICoreWebView2* sender, IUnknown* args)
       {
         if (channelDelegate) {
@@ -773,9 +757,10 @@ namespace flutter_inappwebview_plugin
         }
         return S_OK;
       }
-    ).Get(), nullptr));
+    ).Get(), nullptr);
+    failedLog(add_WindowCloseRequested_HResult);
 
-    failedLog(webView->add_PermissionRequested(Callback<ICoreWebView2PermissionRequestedEventHandler>(
+    auto add_PermissionRequested_HResult = webView->add_PermissionRequested(Callback<ICoreWebView2PermissionRequestedEventHandler>(
       [this](ICoreWebView2* sender, ICoreWebView2PermissionRequestedEventArgs* args)
       {
         wil::com_ptr<ICoreWebView2Deferral> deferral;
@@ -822,10 +807,11 @@ namespace flutter_inappwebview_plugin
         }
         return S_OK;
       }
-    ).Get(), nullptr));
+    ).Get(), nullptr);
+    failedLog(add_PermissionRequested_HResult);
 
     failedLog(webView->AddWebResourceRequestedFilter(L"*", COREWEBVIEW2_WEB_RESOURCE_CONTEXT_ALL));
-    failedLog(webView->add_WebResourceRequested(
+    auto add_WebResourceRequested_HResult = webView->add_WebResourceRequested(
       Callback<ICoreWebView2WebResourceRequestedEventHandler>(
         [this](
           ICoreWebView2* sender, ICoreWebView2WebResourceRequestedEventArgs* args)
@@ -907,11 +893,80 @@ namespace flutter_inappwebview_plugin
           }
           return S_OK;
         }
-      ).Get(), nullptr));
+      ).Get(), nullptr);
+    failedLog(add_WebResourceRequested_HResult);
+
+    auto add_ProcessFailed_HResult = webView->add_ProcessFailed(
+      Callback<ICoreWebView2ProcessFailedEventHandler>(
+        [this](ICoreWebView2* sender, ICoreWebView2ProcessFailedEventArgs* argsRaw)
+        {
+          if (!channelDelegate) {
+            return S_OK;
+          }
+
+          wil::com_ptr<ICoreWebView2ProcessFailedEventArgs> args = argsRaw;
+          auto args2 = args.try_query<ICoreWebView2ProcessFailedEventArgs2>();
+          auto args3 = args.try_query<ICoreWebView2ProcessFailedEventArgs3>();
+
+          COREWEBVIEW2_PROCESS_FAILED_REASON reason = COREWEBVIEW2_PROCESS_FAILED_REASON_UNEXPECTED;
+          if (args2) {
+            args2->get_Reason(&reason);
+          }
+
+          COREWEBVIEW2_PROCESS_FAILED_KIND kind;
+          if (succeededOrLog(args->get_ProcessFailedKind(&kind))) {
+            if (kind == COREWEBVIEW2_PROCESS_FAILED_KIND_BROWSER_PROCESS_EXITED) {
+              auto didCrash = reason == COREWEBVIEW2_PROCESS_FAILED_REASON_CRASHED;
+              auto detail = std::make_unique<RenderProcessGoneDetail>(
+                didCrash
+              );
+              channelDelegate->onRenderProcessGone(std::move(detail));
+            }
+            else if (kind == COREWEBVIEW2_PROCESS_FAILED_KIND_RENDER_PROCESS_UNRESPONSIVE) {
+              channelDelegate->onRenderProcessUnresponsive(getUrl());
+            }
+            else if (kind == COREWEBVIEW2_PROCESS_FAILED_KIND_RENDER_PROCESS_EXITED) {
+              channelDelegate->onWebContentProcessDidTerminate();
+            }
+
+            auto frameInfos = std::optional<std::vector<std::shared_ptr<FrameInfo>>>{};
+            wil::com_ptr<ICoreWebView2FrameInfoCollection> frameInfoCollection;
+            wil::com_ptr<ICoreWebView2FrameInfoCollectionIterator> frameIterator;
+            if (args2 && succeededOrLog(args2->get_FrameInfosForFailedProcess(&frameInfoCollection)) && frameInfoCollection && succeededOrLog(frameInfoCollection->GetIterator(&frameIterator))) {
+              frameInfos = std::vector<std::shared_ptr<FrameInfo>>{};
+              BOOL hasCurrent = FALSE;
+              while (SUCCEEDED(frameIterator->MoveNext(&hasCurrent)) && hasCurrent) {
+                wil::com_ptr<ICoreWebView2FrameInfo> frameInfo;
+                if (SUCCEEDED(frameIterator->GetCurrent(&frameInfo))) {
+                  frameInfos.value().push_back(std::move(FrameInfo::fromICoreWebView2FrameInfo(frameInfo)));
+                }
+                BOOL hasNext = FALSE;
+                failedLog(frameIterator->MoveNext(&hasNext));
+              }
+            }
+
+            wil::unique_cotaskmem_string processDescription;
+            int exitCode;
+            wil::unique_cotaskmem_string failedModule;
+
+            auto detail = std::make_unique<ProcessFailedDetail>(
+              (int64_t)kind,
+              args2 && succeededOrLog(args2->get_ExitCode(&exitCode)) ? exitCode : std::optional<int64_t>{},
+              args2 && succeededOrLog(args2->get_ProcessDescription(&processDescription)) ? wide_to_utf8(processDescription.get()) : std::optional<std::string>{},
+              args2 ? (int64_t)reason : std::optional<int64_t>{},
+              args3 && succeededOrLog(args3->get_FailureSourceModulePath(&failedModule)) ? wide_to_utf8(failedModule.get()) : std::optional<std::string>{},
+              frameInfos
+            );
+            channelDelegate->onProcessFailed(std::move(detail));
+          }
+          return S_OK;
+        }
+      ).Get(), nullptr);
+    failedLog(add_ProcessFailed_HResult);
 
     wil::com_ptr<ICoreWebView2_2> webView2;
     if (SUCCEEDED(webView->QueryInterface(IID_PPV_ARGS(&webView2)))) {
-      failedLog(webView2->add_DOMContentLoaded(
+      auto add_DOMContentLoaded_HResult = webView2->add_DOMContentLoaded(
         Callback<ICoreWebView2DOMContentLoadedEventHandler>(
           [this](ICoreWebView2* sender, ICoreWebView2DOMContentLoadedEventArgs* args)
           {
@@ -920,27 +975,322 @@ namespace flutter_inappwebview_plugin
             }
             return S_OK;
           }
-        ).Get(), nullptr));
+        ).Get(), nullptr);
+      failedLog(add_DOMContentLoaded_HResult);
     }
 
-    /*
-    wil::com_ptr<ICoreWebView2_14> webView14;
-    if (SUCCEEDED(webView->QueryInterface(IID_PPV_ARGS(&webView14)))) {
-      failedLog(webView14->add_ServerCertificateErrorDetected(
-        Callback<ICoreWebView2ServerCertificateErrorDetectedEventHandler>(
-          [this](ICoreWebView2* sender, ICoreWebView2ServerCertificateErrorDetectedEventArgs* args)
+    wil::com_ptr<ICoreWebView2_4> webView4;
+    if (SUCCEEDED(webView->QueryInterface(IID_PPV_ARGS(&webView4)))) {
+      auto add_FrameCreated_HResult = webView4->add_FrameCreated(
+        Callback<ICoreWebView2FrameCreatedEventHandler>(
+          [this](ICoreWebView2* sender, ICoreWebView2FrameCreatedEventArgs* args)
           {
-            debugLog("add_ServerCertificateErrorDetected");
-            wil::com_ptr<ICoreWebView2Certificate> certificate = nullptr;
-            if (SUCCEEDED(args->get_ServerCertificate(&certificate))) {
-              wil::unique_cotaskmem_string displayName = nullptr;
-              std::optional<std::string> url = SUCCEEDED(certificate->get_DisplayName(&displayName)) ? wide_to_utf8(displayName.get()) : std::optional<std::string>{};
-              debugLog(displayName.get());
+            wil::com_ptr<ICoreWebView2Frame> frame;
+            wil::com_ptr<ICoreWebView2Frame2> frame2;
+            if (succeededOrLog(args->get_Frame(&frame)) && SUCCEEDED(frame->QueryInterface(IID_PPV_ARGS(&frame2)))) {
+              auto frame_add_WebMessageReceived_HResult = frame2->add_WebMessageReceived(Callback<ICoreWebView2FrameWebMessageReceivedEventHandler>(
+                [this](ICoreWebView2Frame* sender, ICoreWebView2WebMessageReceivedEventArgs* args)
+                {
+                  return this->onCallJsHandler(false, args);
+                }).Get(), nullptr);
+              failedLog(frame_add_WebMessageReceived_HResult);
             }
             return S_OK;
           }
-        ).Get(), nullptr));
-    }*/
+        ).Get(), nullptr);
+      failedLog(add_FrameCreated_HResult);
+    }
+
+    if (auto webView5 = webView.try_query<ICoreWebView2_5>()) {
+      auto add_ClientCertificateRequested_HResult = webView5->add_ClientCertificateRequested(
+        Callback<ICoreWebView2ClientCertificateRequestedEventHandler>(
+          [this](
+            ICoreWebView2* sender,
+            ICoreWebView2ClientCertificateRequestedEventArgs* args)
+          {
+            wil::com_ptr<ICoreWebView2Deferral> deferral;
+            wil::unique_cotaskmem_string host;
+
+            if (channelDelegate && plugin && plugin->inAppWebViewManager &&
+              succeededOrLog(args->get_Host(&host)) && succeededOrLog(args->GetDeferral(&deferral))) {
+
+              std::vector<std::shared_ptr<SslCertificate>> mutuallyTrustedCertificates = {};
+              wil::com_ptr<ICoreWebView2ClientCertificateCollection> certificateCollection;
+              uint32_t certCount = 0;
+              if (succeededOrLog(args->get_MutuallyTrustedCertificates(&certificateCollection)) && succeededOrLog(certificateCollection->get_Count(&certCount))) {
+
+                for (uint32_t i = 0; i < certCount; i++) {
+                  wil::com_ptr<ICoreWebView2ClientCertificate> clientCert;
+                  if (succeededOrLog(certificateCollection->GetValueAtIndex(i, &clientCert))) {
+                    wil::unique_cotaskmem_string certPemEncoded;
+                    if (succeededOrLog(clientCert->ToPemEncoding(&certPemEncoded))) {
+                      mutuallyTrustedCertificates.push_back(std::make_shared<SslCertificate>(wide_to_utf8(certPemEncoded.get())));
+                    }
+                  }
+                }
+              }
+
+              std::vector<std::string> allowedCertificateAuthorities = {};
+              wil::com_ptr<ICoreWebView2StringCollection> authoritiesCollection;
+              uint32_t authoritiesCount = 0;
+              if (succeededOrLog(args->get_AllowedCertificateAuthorities(&authoritiesCollection)) && succeededOrLog(authoritiesCollection->get_Count(&authoritiesCount))) {
+                for (uint32_t i = 0; i < authoritiesCount; i++) {
+                  wil::unique_cotaskmem_string authority;
+                  if (succeededOrLog(authoritiesCollection->GetValueAtIndex(i, &authority))) {
+                    allowedCertificateAuthorities.push_back(base64_decode(wide_to_utf8(authority.get())));
+                  }
+                }
+              }
+
+              args->get_AllowedCertificateAuthorities(&authoritiesCollection);
+
+              int port = 0;
+              args->get_Port(&port);
+
+              BOOL isProxy = false;
+              args->get_IsProxy(&isProxy);
+
+              std::string scheme = "";
+              auto currentUrl = getUrl();
+              if (currentUrl.has_value()) {
+                scheme = currentUrl.value().substr(0, currentUrl.value().find(':'));
+              }
+
+              auto protectionSpace = std::make_unique<URLProtectionSpace>(
+                wide_to_utf8(host.get()),
+                scheme,
+                std::optional<std::string>{},
+                port,
+                std::optional<std::shared_ptr<SslCertificate>>{},
+                std::optional<std::shared_ptr<SslError>>{}
+              );
+              auto challenge = std::make_unique<ClientCertChallenge>(
+                std::move(protectionSpace),
+                allowedCertificateAuthorities,
+                isProxy,
+                mutuallyTrustedCertificates
+              );
+
+              auto callback = std::make_unique<WebViewChannelDelegate::ReceivedClientCertRequestCallback>();
+              auto defaultBehaviour = [this, deferral, args](const std::optional<std::shared_ptr<ClientCertResponse>> response)
+                {
+                  failedLog(deferral->Complete());
+                };
+              callback->nonNullSuccess = [this, deferral, certCount, certificateCollection, args](const std::shared_ptr<ClientCertResponse> response)
+                {
+                  auto action = response->action;
+
+                  if (action.has_value()) {
+                    switch (action.value()) {
+                    case ClientCertResponseAction::proceed:
+                      if (certCount > 0 && response->selectedCertificate >= 0) {
+                        wil::com_ptr<ICoreWebView2ClientCertificate> selectedClientCert;
+                        if (succeededOrLog(certificateCollection->GetValueAtIndex((uint32_t)response->selectedCertificate, &selectedClientCert))) {
+                          args->put_SelectedCertificate(selectedClientCert.get());
+                        }
+                      }
+                      args->put_Handled(true);
+                      args->put_Cancel(false);
+                      break;
+                    case ClientCertResponseAction::ignore:
+                      args->put_Handled(true);
+                      args->put_Cancel(false);
+                      break;
+                    case ClientCertResponseAction::cancel:
+                    default:
+                      args->put_Cancel(true);
+                      break;
+                    }
+                    failedLog(deferral->Complete());
+                    return false;
+                  }
+                  return true;
+                };
+              callback->defaultBehaviour = defaultBehaviour;
+              callback->error = [this, defaultBehaviour](const std::string& error_code, const std::string& error_message, const flutter::EncodableValue* error_details)
+                {
+                  debugLog(error_code + ", " + error_message);
+                  defaultBehaviour(std::nullopt);
+                };
+              channelDelegate->onReceivedClientCertRequest(std::move(challenge), std::move(callback));
+            }
+            return S_OK;
+          })
+        .Get(), nullptr);
+      failedLog(add_ClientCertificateRequested_HResult);
+    }
+
+    if (auto webView10 = webView.try_query<ICoreWebView2_10>()) {
+      auto add_BasicAuthenticationRequested_HResult = webView10->add_BasicAuthenticationRequested(
+        Callback<ICoreWebView2BasicAuthenticationRequestedEventHandler>(
+          [this](
+            ICoreWebView2* sender,
+            ICoreWebView2BasicAuthenticationRequestedEventArgs* args)
+          {
+            wil::com_ptr<ICoreWebView2Deferral> deferral;
+            wil::com_ptr<ICoreWebView2BasicAuthenticationResponse> basicAuthenticationResponse;
+            wil::unique_cotaskmem_string url;
+            wil::unique_cotaskmem_string realmChallenge;
+
+            if (channelDelegate && plugin && plugin->inAppWebViewManager &&
+              succeededOrLog(args->get_Uri(&url)) && succeededOrLog(args->get_Challenge(&realmChallenge)) &&
+              succeededOrLog(args->get_Response(&basicAuthenticationResponse)) && succeededOrLog(args->GetDeferral(&deferral))) {
+
+              previousAuthRequestFailureCount++;
+
+              try {
+                winrt::Windows::Foundation::Uri const uri{ url.get() };
+
+                auto basicRealm = std::string{ "Basic realm=\"" };
+                auto basicRealmLength = basicRealm.length();
+                auto realm = wide_to_utf8(realmChallenge.get());
+                if (starts_with(realm, basicRealm)) {
+                  realm = realm.substr(basicRealmLength, realm.length() - basicRealmLength - 1);
+                }
+
+                auto protectionSpace = std::make_unique<URLProtectionSpace>(
+                  wide_to_utf8(uri.Host().c_str()),
+                  wide_to_utf8(uri.SchemeName().c_str()),
+                  realm,
+                  uri.Port(),
+                  std::optional<std::shared_ptr<SslCertificate>>{},
+                  std::optional<std::shared_ptr<SslError>>{}
+                );
+                auto challenge = std::make_unique<HttpAuthenticationChallenge>(
+                  std::move(protectionSpace),
+                  previousAuthRequestFailureCount,
+                  std::optional<std::shared_ptr<URLCredential>>{}
+                );
+
+                auto callback = std::make_unique<WebViewChannelDelegate::ReceivedHttpAuthRequestCallback>();
+                auto defaultBehaviour = [this, deferral, args](const std::optional<std::shared_ptr<HttpAuthResponse>> response)
+                  {
+                    failedLog(deferral->Complete());
+                  };
+                callback->nonNullSuccess = [this, deferral, basicAuthenticationResponse, args](const std::shared_ptr<HttpAuthResponse> response)
+                  {
+                    auto action = response->action;
+                    std::wstring username = utf8_to_wide(response->username);
+                    std::wstring password = utf8_to_wide(response->password);
+
+                    if (action.has_value()) {
+                      switch (action.value()) {
+                      case HttpAuthResponseAction::proceed:
+                        failedLog(basicAuthenticationResponse->put_UserName(username.c_str()));
+                        failedLog(basicAuthenticationResponse->put_Password(password.c_str()));
+                        break;
+                      case HttpAuthResponseAction::cancel:
+                      default:
+                        args->put_Cancel(true);
+                        break;
+                      }
+                      failedLog(deferral->Complete());
+                      return false;
+                    }
+                    return true;
+                  };
+                callback->defaultBehaviour = defaultBehaviour;
+                callback->error = [this, defaultBehaviour](const std::string& error_code, const std::string& error_message, const flutter::EncodableValue* error_details)
+                  {
+                    debugLog(error_code + ", " + error_message);
+                    defaultBehaviour(std::nullopt);
+                  };
+                channelDelegate->onReceivedHttpAuthRequest(std::move(challenge), std::move(callback));
+              }
+              catch (winrt::hresult_error const& ex) {
+                debugLog(wide_to_utf8(ex.message().c_str()));
+              }
+            }
+            return S_OK;
+          })
+        .Get(), nullptr);
+      failedLog(add_BasicAuthenticationRequested_HResult);
+    }
+
+    if (auto webView14 = webView.try_query<ICoreWebView2_14>()) {
+      auto add_ServerCertificateErrorDetected_HResult = webView14->add_ServerCertificateErrorDetected(
+        Callback<ICoreWebView2ServerCertificateErrorDetectedEventHandler>(
+          [this](ICoreWebView2* sender, ICoreWebView2ServerCertificateErrorDetectedEventArgs* args)
+          {
+            wil::com_ptr<ICoreWebView2Deferral> deferral;
+            wil::unique_cotaskmem_string requestUrl;
+            if (succeededOrLog(args->get_RequestUri(&requestUrl)) && succeededOrLog(args->GetDeferral(&deferral))) {
+
+              wil::com_ptr<ICoreWebView2Certificate> serverCert;
+              auto sslCert = std::optional<std::shared_ptr<SslCertificate>>{};
+              if (succeededOrLog(args->get_ServerCertificate(&serverCert))) {
+                wil::unique_cotaskmem_string certPemEncoded;
+                if (succeededOrLog(serverCert->ToPemEncoding(&certPemEncoded))) {
+                  sslCert = std::make_shared<SslCertificate>(wide_to_utf8(certPemEncoded.get()));
+                }
+              }
+
+              auto sslError = std::optional<std::shared_ptr<SslError>>{};
+              COREWEBVIEW2_WEB_ERROR_STATUS errorStatus;
+              if (succeededOrLog(args->get_ErrorStatus(&errorStatus))) {
+                sslError = std::make_shared<SslError>(
+                  errorStatus,
+                  COREWEBVIEW2_WEB_ERROR_STATUS_ToString(errorStatus)
+                );
+              }
+
+              try {
+                winrt::Windows::Foundation::Uri const uri{ requestUrl.get() };
+
+                auto protectionSpace = std::make_unique<URLProtectionSpace>(
+                  wide_to_utf8(uri.Host().c_str()),
+                  wide_to_utf8(uri.SchemeName().c_str()),
+                  std::optional<std::string>{},
+                  uri.Port(),
+                  sslCert,
+                  sslError
+                );
+                auto challenge = std::make_unique<ServerTrustChallenge>(
+                  std::move(protectionSpace)
+                );
+
+                auto callback = std::make_unique<WebViewChannelDelegate::ReceivedServerTrustAuthRequestCallback>();
+                auto defaultBehaviour = [this, deferral, args](const std::optional<std::shared_ptr<ServerTrustAuthResponse>> response)
+                  {
+                    failedLog(deferral->Complete());
+                  };
+                callback->nonNullSuccess = [this, deferral, args](const std::shared_ptr<ServerTrustAuthResponse> response)
+                  {
+                    auto action = response->action;
+
+                    if (action.has_value()) {
+                      switch (action.value()) {
+                      case ServerTrustAuthResponseAction::proceed:
+                        args->put_Action(COREWEBVIEW2_SERVER_CERTIFICATE_ERROR_ACTION_ALWAYS_ALLOW);
+                        break;
+                      case ServerTrustAuthResponseAction::cancel:
+                        args->put_Action(COREWEBVIEW2_SERVER_CERTIFICATE_ERROR_ACTION_CANCEL);
+                        break;
+                      default:
+                        args->put_Action(COREWEBVIEW2_SERVER_CERTIFICATE_ERROR_ACTION_DEFAULT);
+                      }
+                      failedLog(deferral->Complete());
+                      return false;
+                    }
+                    return true;
+                  };
+                callback->defaultBehaviour = defaultBehaviour;
+                callback->error = [this, defaultBehaviour](const std::string& error_code, const std::string& error_message, const flutter::EncodableValue* error_details)
+                  {
+                    debugLog(error_code + ", " + error_message);
+                    defaultBehaviour(std::nullopt);
+                  };
+                channelDelegate->onReceivedServerTrustAuthRequest(std::move(challenge), std::move(callback));
+              }
+              catch (winrt::hresult_error const& ex) {
+                debugLog(wide_to_utf8(ex.message().c_str()));
+              }
+            }
+            return S_OK;
+          }
+        ).Get(), nullptr);
+      failedLog(add_ServerCertificateErrorDetected_HResult);
+    }
 
     if (userContentController) {
       userContentController->registerEventHandlers();
@@ -1599,6 +1949,38 @@ namespace flutter_inappwebview_plugin
     }
   }
 
+  void InAppWebView::clearSslPreferences(const std::function<void()> completionHandler) const
+  {
+    if (!webView) {
+      if (completionHandler) {
+        completionHandler();
+      }
+      return;
+    }
+
+    if (auto webView14 = webView.try_query<ICoreWebView2_14>()) {
+      auto hr = webView14->ClearServerCertificateErrorActions(Callback<ICoreWebView2ClearServerCertificateErrorActionsCompletedHandler>(
+        [completionHandler](HRESULT errorCode)
+        {
+          failedAndLog(errorCode);
+          if (completionHandler) {
+            completionHandler();
+          }
+          return S_OK;
+        }
+      ).Get());
+
+      if (failedAndLog(hr) && completionHandler) {
+        completionHandler();
+      }
+      return;
+    }
+
+    if (completionHandler) {
+      completionHandler();
+    }
+  }
+
   // flutter_view
   void InAppWebView::setSurfaceSize(size_t width, size_t height, float scale_factor)
   {
@@ -1788,10 +2170,7 @@ namespace flutter_inappwebview_plugin
       return;
     }
 
-    // delta * 6 gives me a multiple of WHEEL_DELTA (120)
-    constexpr auto kScrollMultiplier = 6;
-
-    auto offset = static_cast<short>(delta * kScrollMultiplier);
+    auto offset = static_cast<short>(delta * settings->scrollMultiplier);
 
     if (horizontal) {
       webViewCompositionController->SendMouseInput(
@@ -1861,6 +2240,127 @@ namespace flutter_inappwebview_plugin
   bool InAppWebView::isSslError(const COREWEBVIEW2_WEB_ERROR_STATUS& webErrorStatus)
   {
     return webErrorStatus >= COREWEBVIEW2_WEB_ERROR_STATUS_CERTIFICATE_COMMON_NAME_IS_INCORRECT && webErrorStatus <= COREWEBVIEW2_WEB_ERROR_STATUS_CERTIFICATE_IS_INVALID;
+  }
+
+  HRESULT InAppWebView::onCallJsHandler(const bool& isMainFrame, ICoreWebView2WebMessageReceivedEventArgs* args)
+  {
+    if (!channelDelegate) {
+      return S_OK;
+    }
+
+    wil::unique_cotaskmem_string json;
+    if (succeededOrLog(args->get_WebMessageAsJson(&json))) {
+      nlohmann::basic_json<> message;
+      try {
+        message = nlohmann::json::parse(wide_to_utf8(json.get()));
+      }
+      catch (nlohmann::json::parse_error& ex) {
+        debugLog("Error parsing JSON message of callHandler method: " + std::string(ex.what()));
+        return S_OK;
+      }
+
+      if (message.is_object() && message.contains("name") && message.at("name").is_string() && message.contains("body") && message.at("body").is_object()) {
+        auto name = message.at("name").get<std::string>();
+        auto body = message.at("body").get<nlohmann::json>();
+
+        if (name.compare("callHandler") == 0) {
+          if (!body.contains("handlerName") || !body.at("handlerName").is_string()) {
+            debugLog("handlerName is null or undefined");
+            return S_OK;
+          }
+
+          auto handlerName = body.at("handlerName").get<std::string>();
+          auto bridgeSecret = body.contains("_bridgeSecret") && body.at("_bridgeSecret").is_string() ? body.at("_bridgeSecret").get<std::string>() : "";
+          auto callHandlerID = body.contains("_callHandlerID") && body.at("_callHandlerID").is_number_integer() ? body.at("_callHandlerID").get<int64_t>() : 0;
+          auto origin = body.contains("origin") && body.at("origin").is_string() ? body.at("origin").get<std::string>() : "";
+          auto requestUrl = body.contains("requestUrl") && body.at("requestUrl").is_string() ? body.at("requestUrl").get<std::string>() : "";
+          auto handlerArgs = body.contains("args") && body.at("args").is_string() ? body.at("args").get<std::string>() : "";
+
+          wil::unique_cotaskmem_string sourceUrl;
+          if (succeededOrLog(args->get_Source(&sourceUrl))) {
+            requestUrl = wide_to_utf8(sourceUrl.get());
+            origin = get_origin_from_url(requestUrl);
+          }
+
+          if (!string_equals(expectedBridgeSecret, bridgeSecret)) {
+            debugLog("Bridge access attempt with wrong secret token, possibly from malicious code from origin: " + origin);
+            return S_OK;
+          }
+
+          bool isOriginAllowed = false;
+          if (settings->javaScriptHandlersOriginAllowList.has_value()) {
+            for (auto& allowedOrigin : settings->javaScriptHandlersOriginAllowList.value()) {
+              if (std::regex_match(origin, std::regex(allowedOrigin))) {
+                isOriginAllowed = true;
+                break;
+              }
+            }
+          }
+          else {
+            // origin is by default allowed if the allow list is null
+            isOriginAllowed = true;
+          }
+          if (!isOriginAllowed) {
+            debugLog("Bridge access attempt from an origin not allowed: " + origin);
+            return S_OK;
+          }
+
+          if (settings->javaScriptHandlersForMainFrameOnly && !isMainFrame) {
+            debugLog("Bridge access attempt from a sub-frame origin: " + origin);
+            return S_OK;
+          }
+
+          /*
+          boolean isInternalHandler = true;
+          switch (handlerName) {
+          default:
+            isInternalHandler = false;
+            break;
+          }
+
+          if (isInternalHandler) {
+            evaluateJavascript("if (window." + JavaScriptBridgeJS::get_JAVASCRIPT_BRIDGE_NAME() + "[" + std::to_string(callHandlerID) + "] != null) { \
+                window." + JavaScriptBridgeJS::get_JAVASCRIPT_BRIDGE_NAME() + "[" + std::to_string(callHandlerID) + "].resolve(); \
+                delete window." + JavaScriptBridgeJS::get_JAVASCRIPT_BRIDGE_NAME() + "[" + std::to_string(callHandlerID) + "]; \
+              }", ContentWorld::page(), nullptr);
+            return S_OK;
+          }
+          */
+
+          auto callback = std::make_unique<WebViewChannelDelegate::CallJsHandlerCallback>();
+          callback->defaultBehaviour = [this, callHandlerID](const std::optional<const flutter::EncodableValue*> response)
+            {
+              std::string json = "null";
+              if (response.has_value() && !response.value()->IsNull()) {
+                json = std::get<std::string>(*(response.value()));
+              }
+
+              evaluateJavascript("if (window." + JavaScriptBridgeJS::get_JAVASCRIPT_BRIDGE_NAME() + "[" + std::to_string(callHandlerID) + "] != null) { \
+                      window." + JavaScriptBridgeJS::get_JAVASCRIPT_BRIDGE_NAME() + "[" + std::to_string(callHandlerID) + "].resolve(" + json + "); \
+                      delete window." + JavaScriptBridgeJS::get_JAVASCRIPT_BRIDGE_NAME() + "[" + std::to_string(callHandlerID) + "]; \
+                    }", ContentWorld::page(), nullptr);
+            };
+          callback->error = [this, callHandlerID](const std::string& error_code, const std::string& error_message, const flutter::EncodableValue* error_details)
+            {
+              auto errorMessage = error_code + ", " + error_message;
+              debugLog(errorMessage);
+
+              evaluateJavascript("if (window." + JavaScriptBridgeJS::get_JAVASCRIPT_BRIDGE_NAME() + "[" + std::to_string(callHandlerID) + "] != null) { \
+                      window." + JavaScriptBridgeJS::get_JAVASCRIPT_BRIDGE_NAME() + "[" + std::to_string(callHandlerID) + "].reject(new Error('" + replace_all_copy(errorMessage, "\'", "\\'") + "')); \
+                      delete window." + JavaScriptBridgeJS::get_JAVASCRIPT_BRIDGE_NAME() + "[" + std::to_string(callHandlerID) + "]; \
+                    }", ContentWorld::page(), nullptr);
+            };
+
+          auto data = std::make_unique<JavaScriptHandlerFunctionData>(origin, requestUrl, isMainFrame, handlerArgs);
+          channelDelegate->onCallJsHandler(handlerName, std::move(data), std::move(callback));
+        }
+      }
+      else {
+        debugLog("Invalid JSON message of callHandler method");
+      }
+    }
+
+    return S_OK;
   }
 
   InAppWebView::~InAppWebView()

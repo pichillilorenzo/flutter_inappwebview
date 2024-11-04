@@ -36,7 +36,7 @@ public class WebMessageChannel: FlutterMethodCallDelegate {
         if let webView = self.webView {
             webView.evaluateJavascript(source: """
             (function() {
-                \(WEB_MESSAGE_CHANNELS_VARIABLE_NAME)["\(id)"] = new MessageChannel();
+                \(WebMessageChannelJS.WEB_MESSAGE_CHANNELS_VARIABLE_NAME())["\(id)"] = new MessageChannel();
             })();
             """) { (_) in
                 completionHandler?(self)
@@ -61,11 +61,11 @@ public class WebMessageChannel: FlutterMethodCallDelegate {
         ports.removeAll()
         webView?.evaluateJavascript(source: """
         (function() {
-            var webMessageChannel = \(WEB_MESSAGE_CHANNELS_VARIABLE_NAME)["\(id)"];
+            var webMessageChannel = \(WebMessageChannelJS.WEB_MESSAGE_CHANNELS_VARIABLE_NAME())["\(id)"];
             if (webMessageChannel != null) {
                 webMessageChannel.port1.close();
                 webMessageChannel.port2.close();
-                delete \(WEB_MESSAGE_CHANNELS_VARIABLE_NAME)["\(id)"];
+                delete \(WebMessageChannelJS.WEB_MESSAGE_CHANNELS_VARIABLE_NAME())["\(id)"];
             }
         })();
         """)

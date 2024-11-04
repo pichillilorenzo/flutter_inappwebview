@@ -17,12 +17,29 @@ class HttpAuthResponseAction {
       HttpAuthResponseAction._internal(value, nativeValue());
 
   ///Instructs the WebView to cancel the authentication request.
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Android native WebView
+  ///- iOS
+  ///- MacOS
+  ///- Windows
   static const CANCEL = HttpAuthResponseAction._internal(0, 0);
 
   ///Instructs the WebView to proceed with the authentication with the given credentials.
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Android native WebView
+  ///- iOS
+  ///- MacOS
+  ///- Windows
   static const PROCEED = HttpAuthResponseAction._internal(1, 1);
 
   ///Uses the credentials stored for the current host.
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Android native WebView
+  ///- iOS
+  ///- MacOS
   static const USE_SAVED_HTTP_AUTH_CREDENTIALS =
       HttpAuthResponseAction._internal(2, 2);
 

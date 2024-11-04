@@ -1,4 +1,4 @@
-#### 1.4.0
+#### 1.4.0-beta.1
 
 - Updated static `fromMap` implementation for some classes
 - Updated `kJavaScriptHandlerForbiddenNames` list

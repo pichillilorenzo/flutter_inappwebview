@@ -1,4 +1,4 @@
-## 0.7.0
+## 0.7.0-beta.1
 
 - Updated flutter_inappwebview_platform_interface version to ^1.4.0
 - Updated `scrollMultiplier` default value from 6 to 1

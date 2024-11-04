@@ -1,4 +1,4 @@
-## 1.2.0
+## 1.2.0-beta.1
 
 - Updated flutter_inappwebview_platform_interface version to ^1.4.0
 - Added `InAppWebViewController.enableSlowWholeDocumentDraw` static method

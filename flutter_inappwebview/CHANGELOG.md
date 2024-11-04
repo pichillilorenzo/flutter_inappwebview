@@ -1,12 +1,12 @@
-## 6.2.0
+## 6.2.0-beta.1
 
 - Updated dependencies to the latest versions for all platform implementations:
-  - `flutter_inappwebview_platform_interface`: `^1.3.0` -> `^1.4.0`
-  - `flutter_inappwebview_android`: `^1.1.3` -> `^1.2.0`
-  - `flutter_inappwebview_ios`: `^1.1.2` -> `^1.2.0`
-  - `flutter_inappwebview_macos`: `^1.1.2` -> `^1.2.0`
-  - `flutter_inappwebview_web`: `^1.1.2` -> `^1.2.0`
-  - `flutter_inappwebview_windows`: `^0.6.0` -> `^0.7.0`
+  - `flutter_inappwebview_platform_interface`: `^1.3.0` -> `^1.4.0-beta.1`
+  - `flutter_inappwebview_android`: `^1.1.3` -> `^1.2.0-beta.1`
+  - `flutter_inappwebview_ios`: `^1.1.2` -> `^1.2.0-beta.1`
+  - `flutter_inappwebview_macos`: `^1.1.2` -> `^1.2.0-beta.1`
+  - `flutter_inappwebview_web`: `^1.1.2` -> `^1.2.0-beta.1`
+  - `flutter_inappwebview_windows`: `^0.6.0` -> `^0.7.0-beta.1`
 
 Implemented security features to better manage access to the native javascript bridge.
 

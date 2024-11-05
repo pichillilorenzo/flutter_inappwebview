@@ -59,6 +59,7 @@ Implemented security features to better manage access to the native javascript b
 
 #### Web Platform
 - Merged "[web] support iframe role and aria-hidden attributes" [2293](https://github.com/pichillilorenzo/flutter_inappwebview/pull/2293) (thanks to [p-mazhnik](https://github.com/p-mazhnik))
+- Fixed 'Type 'int' is not a subtype of type 'JSValue' in type cast' when compiling/running using WASM
 
 ## 6.1.5
 

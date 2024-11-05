@@ -1,19 +1,19 @@
 import 'dart:async';
-import 'dart:typed_data';
-import 'dart:ui';
+import 'dart:developer';
+import 'dart:js_interop';
+
 import 'package:flutter/services.dart';
 import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_platform_interface.dart';
-import 'dart:js_interop';
-import 'dart:developer';
 import 'package:web/web.dart';
 
 import 'headless_inappwebview_manager.dart';
-import 'web_platform_manager.dart';
 import 'js_bridge.dart';
+import 'web_platform_manager.dart';
 
 extension on HTMLIFrameElement {
   // https://developer.mozilla.org/en-US/docs/Web/API/HTMLIFrameElement/csp
   external set csp(String? value);
+
   external String? get csp;
 }
 
@@ -65,7 +65,9 @@ class InAppWebViewWebElement implements Disposable {
     });
 
     jsWebView = flutterInAppWebView?.createFlutterInAppWebView(
-        _viewId, iframe, iframeContainer);
+        _viewId is int ? (_viewId as int).toJS : _viewId.toString().toJS,
+        iframe,
+        iframeContainer);
   }
 
   /// Handles method calls over the MethodChannel of this plugin.
@@ -208,7 +210,9 @@ class InAppWebViewWebElement implements Disposable {
           initialFile = webView.initialFile;
 
           jsWebView = flutterInAppWebView?.createFlutterInAppWebView(
-              _viewId, iframe, iframeContainer);
+              _viewId is int ? (_viewId as int).toJS : _viewId.toString().toJS,
+              iframe,
+              iframeContainer);
         }
       }
     }

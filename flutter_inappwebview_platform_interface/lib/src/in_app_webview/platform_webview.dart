@@ -1080,7 +1080,8 @@ class PlatformWebViewCreationParams<T> {
   ///**Officially Supported Platforms/Implementations**:
   ///- Windows ([Official API - ICoreWebView2.add_ProcessFailed](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2?view=webview2-1.0.2849.39#add_processfailed))
   ///{@endtemplate}
-  final void Function(T controller, ProcessFailedDetail detail)? onProcessFailed;
+  final void Function(T controller, ProcessFailedDetail detail)?
+      onProcessFailed;
 
   ///{@template flutter_inappwebview_platform_interface.PlatformWebViewCreationParams.initialUrlRequest}
   ///Initial url request that will be loaded.

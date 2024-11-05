@@ -166,14 +166,14 @@ class InAppWebView extends StatefulWidget {
         onPrintRequest,
     void Function(InAppWebViewController controller, int progress)?
         onProgressChanged,
-    Future<ClientCertResponse?> Function(InAppWebViewController controller,
-        ClientCertChallenge challenge)?
+    Future<ClientCertResponse?> Function(
+            InAppWebViewController controller, ClientCertChallenge challenge)?
         onReceivedClientCertRequest,
     Future<HttpAuthResponse?> Function(InAppWebViewController controller,
-         HttpAuthenticationChallenge challenge)?
+            HttpAuthenticationChallenge challenge)?
         onReceivedHttpAuthRequest,
-    Future<ServerTrustAuthResponse?> Function(InAppWebViewController controller,
-        ServerTrustChallenge challenge)?
+    Future<ServerTrustAuthResponse?> Function(
+            InAppWebViewController controller, ServerTrustChallenge challenge)?
         onReceivedServerTrustAuthRequest,
     void Function(InAppWebViewController controller, int x, int y)?
         onScrollChanged,
@@ -294,8 +294,9 @@ class InAppWebView extends StatefulWidget {
     void Function(InAppWebViewController controller, Size oldContentSize,
             Size newContentSize)?
         onContentSizeChanged,
-    void Function(InAppWebViewController controller, ProcessFailedDetail detail)?
-    onProcessFailed,
+    void Function(
+            InAppWebViewController controller, ProcessFailedDetail detail)?
+        onProcessFailed,
   }) : this.fromPlatformCreationParams(
             key: key,
             params: PlatformInAppWebViewWidgetCreationParams(
@@ -660,8 +661,7 @@ class InAppWebView extends StatefulWidget {
                   : null,
               onProcessFailed: onProcessFailed != null
                   ? (controller, detail) =>
-                  onProcessFailed.call(
-                      controller, detail)
+                      onProcessFailed.call(controller, detail)
                   : null,
               gestureRecognizers: gestureRecognizers,
               headlessWebView: headlessWebView?.platform,

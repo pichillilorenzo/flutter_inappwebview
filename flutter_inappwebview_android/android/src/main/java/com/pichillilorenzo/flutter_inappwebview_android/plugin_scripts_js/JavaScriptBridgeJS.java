@@ -322,7 +322,7 @@ public class JavaScriptBridgeJS {
             "      _Array_slice.call = window.Function.prototype.call;" +
             "      _setTimeout = window.setTimeout;" +
             "      _Promise = window.Promise;" +
-            "      _javaInjectedObject = window." + get_JAVASCRIPT_BRIDGE_NAME() + ";" +
+            "      _javaInjectedObject = window.top." + get_JAVASCRIPT_BRIDGE_NAME() + ";" +
             "    } catch (_) { return; }" +
             "    window." + get_JAVASCRIPT_BRIDGE_NAME() + ".callHandler = function() {" +
             "      var _callHandlerID = _setTimeout(function(){});" +
@@ -337,7 +337,7 @@ public class JavaScriptBridgeJS {
             "          'args': _JSON_stringify(_Array_slice.call(arguments, 1))" +
             "        }));" +
             "        return new _Promise(function(resolve, reject) {" +
-            "          window.top." + get_JAVASCRIPT_BRIDGE_NAME() + "[_callHandlerID] = {resolve: resolve, reject: reject};" +
+            "          _javaInjectedObject[_callHandlerID] = {resolve: resolve, reject: reject};" +
             "        });" +
             "      } catch (error) {" +
             "        return new _Promise(function(resolve, reject) { resolve(); });" +

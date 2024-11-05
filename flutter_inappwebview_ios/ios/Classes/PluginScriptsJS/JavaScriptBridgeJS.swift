@@ -66,7 +66,7 @@ public class JavaScriptBridgeJS {
                     });
                     return new _Promise(function(resolve, reject) {
                         try {
-                            (window.top != window ? window.top : window).\(get_JAVASCRIPT_BRIDGE_NAME())[_callHandlerID] = {resolve: resolve, reject: reject};
+                            (window.top === window ? window : window.top).\(get_JAVASCRIPT_BRIDGE_NAME())[_callHandlerID] = {resolve: resolve, reject: reject};
                         } catch (e) {
                             resolve();
                         }

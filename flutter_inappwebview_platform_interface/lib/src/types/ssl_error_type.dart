@@ -36,7 +36,7 @@ class SslErrorType_ {
     EnumWindowsPlatform(
         apiName: 'COREWEBVIEW2_WEB_ERROR_STATUS_CERTIFICATE_EXPIRED',
         apiUrl:
-        'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2849.39#corewebview2_web_error_status',
+            'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2849.39#corewebview2_web_error_status',
         value: 2)
   ])
   static const EXPIRED = SslErrorType_._internal('EXPIRED');
@@ -91,7 +91,7 @@ class SslErrorType_ {
     EnumWindowsPlatform(
         apiName: 'COREWEBVIEW2_WEB_ERROR_STATUS_CERTIFICATE_IS_INVALID',
         apiUrl:
-        'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2849.39#corewebview2_web_error_status',
+            'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2849.39#corewebview2_web_error_status',
         value: 5)
   ])
   static const INVALID = SslErrorType_._internal('INVALID');
@@ -201,9 +201,10 @@ class SslErrorType_ {
             'https://developer.apple.com/documentation/security/sectrustresulttype/othererror',
         value: 7),
     EnumWindowsPlatform(
-        apiName: 'COREWEBVIEW2_WEB_ERROR_STATUS_CLIENT_CERTIFICATE_CONTAINS_ERRORS',
+        apiName:
+            'COREWEBVIEW2_WEB_ERROR_STATUS_CLIENT_CERTIFICATE_CONTAINS_ERRORS',
         apiUrl:
-        'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2849.39#corewebview2_web_error_status',
+            'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2849.39#corewebview2_web_error_status',
         value: 3)
   ])
   static const OTHER_ERROR = SslErrorType_._internal('OTHER_ERROR');
@@ -211,19 +212,21 @@ class SslErrorType_ {
   ///Indicates that the SSL certificate common name does not match the web address.
   @EnumSupportedPlatforms(platforms: [
     EnumWindowsPlatform(
-        apiName: 'COREWEBVIEW2_WEB_ERROR_STATUS_CERTIFICATE_COMMON_NAME_IS_INCORRECT',
+        apiName:
+            'COREWEBVIEW2_WEB_ERROR_STATUS_CERTIFICATE_COMMON_NAME_IS_INCORRECT',
         apiUrl:
-        'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2849.39#corewebview2_web_error_status',
+            'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2849.39#corewebview2_web_error_status',
         value: 1)
   ])
-  static const COMMON_NAME_IS_INCORRECT = SslErrorType_._internal('COMMON_NAME_IS_INCORRECT');
+  static const COMMON_NAME_IS_INCORRECT =
+      SslErrorType_._internal('COMMON_NAME_IS_INCORRECT');
 
   ///Indicates that the SSL certificate has been revoked.
   @EnumSupportedPlatforms(platforms: [
     EnumWindowsPlatform(
         apiName: 'COREWEBVIEW2_WEB_ERROR_STATUS_CERTIFICATE_REVOKED',
         apiUrl:
-        'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2849.39#corewebview2_web_error_status',
+            'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2849.39#corewebview2_web_error_status',
         value: 4)
   ])
   static const REVOKED = SslErrorType_._internal('REVOKED');

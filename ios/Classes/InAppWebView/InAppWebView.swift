@@ -558,16 +558,16 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         
         if let lastLongPressTouhLocation = lastLongPressTouchPoint {
             if configuration.preferences.javaScriptEnabled {
-                self.evaluateJavaScript("window.\(JAVASCRIPT_BRIDGE_NAME)._findElementsAtPoint(\(lastLongPressTouhLocation.x),\(lastLongPressTouhLocation.y))", completionHandler: {(value, error) in
-                    if error != nil {
-                        print("Long press gesture recognizer error: \(error?.localizedDescription ?? "")")
-                    } else if var value = value as? [String: Any?] {
-                        value["type"] = value["type"] as? Int
-                        self.channel?.invokeMethod("onCreateContextMenu", arguments: value)
-                    } else {
-                        self.channel?.invokeMethod("onCreateContextMenu", arguments: [:])
-                    }
-                })
+                // self.evaluateJavaScript("window.\(JAVASCRIPT_BRIDGE_NAME)._findElementsAtPoint(\(lastLongPressTouhLocation.x),\(lastLongPressTouhLocation.y))", completionHandler: {(value, error) in
+                //     if error != nil {
+                //         print("Long press gesture recognizer error: \(error?.localizedDescription ?? "")")
+                //     } else if var value = value as? [String: Any?] {
+                //         value["type"] = value["type"] as? Int
+                //         self.channel?.invokeMethod("onCreateContextMenu", arguments: value)
+                //     } else {
+                //         self.channel?.invokeMethod("onCreateContextMenu", arguments: [:])
+                //     }
+                // })
             } else {
                 channel?.invokeMethod("onCreateContextMenu", arguments: [:])
             }
@@ -1116,7 +1116,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
                 let enableSource = "\(flagVariable) = \(enable);"
                 if #available(iOS 14.0, *), pluginScript.requiredInAllContentWorlds {
                     for contentWorld in self.configuration.userContentController.contentWorlds {
-                        self.evaluateJavaScript(enableSource, frame: nil, contentWorld: contentWorld, completionHandler: nil)
+                        // self.evaluateJavaScript(enableSource, frame: nil, contentWorld: contentWorld, completionHandler: nil)
                     }
                 } else {
                     // self.evaluateJavaScript(enableSource, completionHandler: nil)
@@ -1128,11 +1128,11 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
             else if enable {
                 if #available(iOS 14.0, *), pluginScript.requiredInAllContentWorlds {
                     for contentWorld in self.configuration.userContentController.contentWorlds {
-                        self.evaluateJavaScript(pluginScript.source, frame: nil, contentWorld: contentWorld, completionHandler: nil)
+                        // self.evaluateJavaScript(pluginScript.source, frame: nil, contentWorld: contentWorld, completionHandler: nil)
                         self.configuration.userContentController.addPluginScript(pluginScript)
                     }
                 } else {
-                    self.evaluateJavaScript(pluginScript.source, completionHandler: nil)
+                    // self.evaluateJavaScript(pluginScript.source, completionHandler: nil)
                     self.configuration.userContentController.addPluginScript(pluginScript)
                 }
                 self.configuration.userContentController.sync(scriptMessageHandler: self)
@@ -2893,17 +2893,17 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
     
     public func getHitTestResult(completionHandler: @escaping (HitTestResult) -> Void) {
         if configuration.preferences.javaScriptEnabled, let lastTouchLocation = lastTouchPoint {
-            self.evaluateJavaScript("window.\(JAVASCRIPT_BRIDGE_NAME)._findElementsAtPoint(\(lastTouchLocation.x),\(lastTouchLocation.y))", completionHandler: {(value, error) in
-                if error != nil {
-                    print("getHitTestResult error: \(error?.localizedDescription ?? "")")
-                    completionHandler(HitTestResult(type: .unknownType, extra: nil))
-                } else if let value = value as? [String: Any?] {
-                    let hitTestResult = HitTestResult.fromMap(map: value)!
-                    completionHandler(hitTestResult)
-                } else {
-                    completionHandler(HitTestResult(type: .unknownType, extra: nil))
-                }
-            })
+            // self.evaluateJavaScript("window.\(JAVASCRIPT_BRIDGE_NAME)._findElementsAtPoint(\(lastTouchLocation.x),\(lastTouchLocation.y))", completionHandler: {(value, error) in
+            //     if error != nil {
+            //         print("getHitTestResult error: \(error?.localizedDescription ?? "")")
+            //         completionHandler(HitTestResult(type: .unknownType, extra: nil))
+            //     } else if let value = value as? [String: Any?] {
+            //         let hitTestResult = HitTestResult.fromMap(map: value)!
+            //         completionHandler(hitTestResult)
+            //     } else {
+            //         completionHandler(HitTestResult(type: .unknownType, extra: nil))
+            //     }
+            // })
         } else {
             completionHandler(HitTestResult(type: .unknownType, extra: nil))
         }
@@ -2913,10 +2913,10 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         if configuration.preferences.javaScriptEnabled {
             // add some delay to make it sure _lastAnchorOrImageTouched is updated
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
-                self.evaluateJavaScript("window.\(JAVASCRIPT_BRIDGE_NAME)._lastAnchorOrImageTouched", completionHandler: {(value, error) in
-                    let lastAnchorOrImageTouched = value as? [String: Any?]
-                    completionHandler(lastAnchorOrImageTouched, error)
-                })
+                // self.evaluateJavaScript("window.\(JAVASCRIPT_BRIDGE_NAME)._lastAnchorOrImageTouched", completionHandler: {(value, error) in
+                //     let lastAnchorOrImageTouched = value as? [String: Any?]
+                //     completionHandler(lastAnchorOrImageTouched, error)
+                // })
             }
         } else {
             completionHandler(nil, nil)
@@ -2927,10 +2927,10 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         if configuration.preferences.javaScriptEnabled {
             // add some delay to make it sure _lastImageTouched is updated
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
-                self.evaluateJavaScript("window.\(JAVASCRIPT_BRIDGE_NAME)._lastImageTouched", completionHandler: {(value, error) in
-                    let lastImageTouched = value as? [String: Any?]
-                    completionHandler(lastImageTouched, error)
-                })
+                // self.evaluateJavaScript("window.\(JAVASCRIPT_BRIDGE_NAME)._lastImageTouched", completionHandler: {(value, error) in
+                //     let lastImageTouched = value as? [String: Any?]
+                //     completionHandler(lastImageTouched, error)
+                // })
             }
         } else {
             completionHandler(nil, nil)

@@ -1,23 +1,16 @@
-import 'dart:typed_data';
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_internal_annotations.dart';
+import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_platform_interface.dart';
+import 'dart:typed_data';
 
-import '../content_blocker.dart';
-import '../context_menu/context_menu.dart';
-import '../in_app_browser/in_app_browser_settings.dart';
-import '../in_app_browser/platform_in_app_browser.dart';
-import '../in_app_webview/platform_inappwebview_controller.dart';
 import '../platform_webview_asset_loader.dart';
-import '../platform_webview_feature.dart';
 import '../types/action_mode_menu_item.dart';
 import '../types/cache_mode.dart';
 import '../types/data_detector_types.dart';
 import '../types/force_dark.dart';
 import '../types/force_dark_strategy.dart';
 import '../types/layout_algorithm.dart';
-import '../types/main.dart';
 import '../types/mixed_content_mode.dart';
 import '../types/over_scroll_mode.dart';
 import '../types/referrer_policy.dart';
@@ -29,10 +22,18 @@ import '../types/scrollview_deceleration_rate.dart';
 import '../types/selection_granularity.dart';
 import '../types/user_preferred_content_mode.dart';
 import '../types/vertical_scrollbar_position.dart';
-import '../util.dart';
+import '../types/user_script.dart';
 import '../web_uri.dart';
 import 'android/in_app_webview_options.dart';
 import 'apple/in_app_webview_options.dart';
+import '../content_blocker.dart';
+import '../types/main.dart';
+import '../util.dart';
+import '../in_app_browser/in_app_browser_settings.dart';
+import '../platform_webview_feature.dart';
+import '../in_app_webview/platform_inappwebview_controller.dart';
+import '../context_menu/context_menu.dart';
+import '../in_app_browser/platform_in_app_browser.dart';
 import 'platform_webview.dart';
 
 part 'in_app_webview_settings.g.dart';
@@ -58,8 +59,12 @@ class InAppWebViewSettings_ {
   ///If the [PlatformWebViewCreationParams.shouldOverrideUrlLoading] event is implemented and this value is `null`,
   ///it will be automatically inferred as `true`, otherwise, the default value is `false`.
   ///This logic will not be applied for [PlatformInAppBrowser], where you must set the value manually.
-  @SupportedPlatforms(
-      platforms: [AndroidPlatform(), IOSPlatform(), MacOSPlatform()])
+  @SupportedPlatforms(platforms: [
+    AndroidPlatform(),
+    IOSPlatform(),
+    MacOSPlatform(),
+    WindowsPlatform()
+  ])
   bool? useShouldOverrideUrlLoading;
 
   ///Set to `true` to be able to listen at the [PlatformWebViewCreationParams.onLoadResource] event.
@@ -99,7 +104,11 @@ class InAppWebViewSettings_ {
     MacOSPlatform(
         apiName: "WKWebView.customUserAgent",
         apiUrl:
-            "https://developer.apple.com/documentation/webkit/wkwebview/1414950-customuseragent")
+            "https://developer.apple.com/documentation/webkit/wkwebview/1414950-customuseragent"),
+    WindowsPlatform(
+        apiName: 'ICoreWebView2Settings2.put_UserAgent',
+        apiUrl:
+            'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2settings2?view=webview2-1.0.2210.55#put_useragent')
   ])
   String? userAgent;
 
@@ -131,7 +140,11 @@ class InAppWebViewSettings_ {
         apiName: "WKWebpagePreferences.allowsContentJavaScript",
         apiUrl:
             "https://developer.apple.com/documentation/webkit/wkwebpagepreferences/3552422-allowscontentjavascript/"),
-    WebPlatform(requiresSameOrigin: false)
+    WebPlatform(requiresSameOrigin: false),
+    WindowsPlatform(
+        apiName: "ICoreWebView2Settings.put_IsScriptEnabled",
+        apiUrl:
+            "https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2settings?view=webview2-1.0.2210.55#put_isscriptenabled")
   ])
   bool? javaScriptEnabled;
 
@@ -295,7 +308,11 @@ class InAppWebViewSettings_ {
             """setting this to `true`, it will clear all the cookies of all WebView instances, 
 because there isn't any way to make the website data store non-persistent for the specific WebView instance such as on iOS."""),
     IOSPlatform(),
-    MacOSPlatform()
+    MacOSPlatform(),
+    WindowsPlatform(
+        apiName: "ICoreWebView2ControllerOptions.put_IsInPrivateModeEnabled",
+        apiUrl:
+            "https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2controlleroptions?view=webview2-1.0.2792.45#put_isinprivatemodeenabled")
   ])
   bool? incognito;
 
@@ -308,7 +325,12 @@ because there isn't any way to make the website data store non-persistent for th
   @SupportedPlatforms(platforms: [
     AndroidPlatform(),
     IOSPlatform(),
-    MacOSPlatform(available: "12.0")
+    MacOSPlatform(available: "12.0"),
+    WindowsPlatform(
+        available: '1.0.774.44',
+        apiName: 'ICoreWebView2Controller2.put_DefaultBackgroundColor',
+        apiUrl:
+            'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2controller2?view=webview2-1.0.2210.55#put_defaultbackgroundcolor')
   ])
   bool? transparentBackground;
 
@@ -323,8 +345,15 @@ because there isn't any way to make the website data store non-persistent for th
   bool? disableHorizontalScroll;
 
   ///Set to `true` to disable context menu. The default value is `false`.
-  @SupportedPlatforms(
-      platforms: [AndroidPlatform(), IOSPlatform(), WebPlatform()])
+  @SupportedPlatforms(platforms: [
+    AndroidPlatform(),
+    IOSPlatform(),
+    WebPlatform(),
+    WindowsPlatform(
+        apiName: "ICoreWebView2Settings.put_AreDefaultContextMenusEnabled",
+        apiUrl:
+            "https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2settings?view=webview2-1.0.2210.55#put_aredefaultcontextmenusenabled")
+  ])
   bool? disableContextMenu;
 
   ///Set to `false` if the WebView should not support zooming using its on-screen zoom controls and gestures. The default value is `true`.
@@ -334,7 +363,11 @@ because there isn't any way to make the website data store non-persistent for th
         apiUrl:
             "https://developer.android.com/reference/android/webkit/WebSettings?hl=en#setSupportZoom(boolean)"),
     IOSPlatform(),
-    MacOSPlatform()
+    MacOSPlatform(),
+    WindowsPlatform(
+        apiName: "ICoreWebView2Settings.put_IsZoomControlEnabled",
+        apiUrl:
+            "https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2settings?view=webview2-1.0.2210.55#put_iszoomcontrolenabled")
   ])
   bool? supportZoom;
 
@@ -591,7 +624,16 @@ because there isn't any way to make the website data store non-persistent for th
   ])
   String? fixedFontFamily;
 
+  ///Use [algorithmicDarkeningAllowed] instead.
+  ///
   ///Set the force dark mode for this WebView. The default value is [ForceDark.OFF].
+  ///
+  ///Deprecated - The "force dark" model previously implemented by WebView was complex and didn't
+  ///interoperate well with current Web standards for `prefers-color-scheme` and `color-scheme`.
+  ///In apps with `targetSdkVersion` ≥ `android.os.Build.VERSION_CODES.TIRAMISU` this API is a no-op and
+  ///WebView will always use the dark style defined by web content authors if the app's theme is dark.
+  ///To customize the behavior, refer to [algorithmicDarkeningAllowed].
+  @Deprecated("Use algorithmicDarkeningAllowed instead")
   @SupportedPlatforms(platforms: [
     AndroidPlatform(
         available: "29",
@@ -601,10 +643,17 @@ because there isn't any way to make the website data store non-persistent for th
   ])
   ForceDark_? forceDark;
 
-  ///Sets whether Geolocation API is enabled. The default value is `true`.
-
+  ///Use [algorithmicDarkeningAllowed] instead.
+  ///
   ///Set how WebView content should be darkened.
   ///The default value is [ForceDarkStrategy.PREFER_WEB_THEME_OVER_USER_AGENT_DARKENING].
+  ///
+  ///Deprecated - The "force dark" model previously implemented by WebView was complex and didn't
+  ///interoperate well with current Web standards for `prefers-color-scheme` and `color-scheme`.
+  ///In apps with `targetSdkVersion` ≥ `android.os.Build.VERSION_CODES.TIRAMISU` this API is a no-op and
+  ///WebView will always use the dark style defined by web content authors if the app's theme is dark.
+  ///To customize the behavior, refer to [algorithmicDarkeningAllowed].
+  @Deprecated("Use algorithmicDarkeningAllowed instead")
   @SupportedPlatforms(platforms: [
     AndroidPlatform(
         apiName: "WebSettingsCompat.setForceDarkStrategy",
@@ -778,8 +827,8 @@ because there isn't any way to make the website data store non-persistent for th
   @SupportedPlatforms(platforms: [AndroidPlatform()])
   String? regexToCancelSubFramesLoading;
 
-  ///Regular expression used by [PlatformWebViewCreationParams.shouldOverrideUrlLoading] event to cancel navigation requests
-  ///If the url request not matches the regular expression, then the shouldOverrideUrlLoading is return false.
+  ///Regular expression used by [PlatformWebViewCreationParams.shouldOverrideUrlLoading] event to cancel navigation requests.
+  ///If the url request doesn't match the regular expression, then the request is canceled.
   @SupportedPlatforms(platforms: [AndroidPlatform()])
   String? regexToCancelOverrideUrlLoading;
 
@@ -1543,7 +1592,11 @@ as it can cause framerate drops on animations in Android 9 and lower (see [Hybri
         available: "13.3",
         apiName: "WKWebView.isInspectable",
         apiUrl:
-            "https://developer.apple.com/documentation/webkit/wkwebview/4111163-isinspectable")
+            "https://developer.apple.com/documentation/webkit/wkwebview/4111163-isinspectable"),
+    WindowsPlatform(
+        apiName: "ICoreWebView2Settings.put_AreDevToolsEnabled",
+        apiUrl:
+            "https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2settings?view=webview2-1.0.2210.55#put_aredevtoolsenabled")
   ])
   bool? isInspectable;
 
@@ -1563,6 +1616,139 @@ as it can cause framerate drops on animations in Android 9 and lower (see [Hybri
             "https://developer.apple.com/documentation/webkit/wkpreferences/4104043-shouldprintbackgrounds")
   ])
   bool? shouldPrintBackgrounds;
+
+  ///A [Set] of Regular Expression Patterns that will be used on native side to match the allowed origins
+  ///that are able to execute the JavaScript Handlers defined for the current WebView.
+  ///This will affect also the internal JavaScript Handlers used by the plugin itself.
+  ///
+  ///An empty [Set] will block every origin.
+  ///
+  ///The default value is `null` and will allow every origin.
+  @SupportedPlatforms(platforms: [
+    AndroidPlatform(),
+    IOSPlatform(),
+    MacOSPlatform(),
+    WindowsPlatform(),
+  ])
+  Set<String>? javaScriptHandlersOriginAllowList;
+
+  ///Set to `true` to allow to execute the JavaScript Handlers only on the main frame.
+  ///This will affect also the internal JavaScript Handlers used by the plugin itself.
+  ///The default value is `false`.
+  @SupportedPlatforms(platforms: [
+    AndroidPlatform(),
+    IOSPlatform(),
+    MacOSPlatform(),
+    WindowsPlatform(),
+  ])
+  bool? javaScriptHandlersForMainFrameOnly;
+
+  ///Set to `false` to disable the JavaScript Bridge completely.
+  ///This will affect also all the internal plugin [UserScript]s
+  ///that are using the JavaScript Bridge to work.
+  ///
+  ///**NOTE**: setting or changing this value after the WebView has been created won't have any effect.
+  ///It should be set when initializing the WebView through [PlatformWebViewCreationParams.initialSettings] parameter.
+  ///
+  ///The default value is `true`.
+  @SupportedPlatforms(platforms: [
+    AndroidPlatform(),
+    IOSPlatform(),
+    MacOSPlatform(),
+    WindowsPlatform(),
+  ])
+  bool? javaScriptBridgeEnabled;
+
+  ///A [Set] of patterns that will be used to match the allowed origins where
+  ///the JavaScript Bridge could be used.
+  ///If [pluginScriptsOriginAllowList] is present, then this value will override
+  ///it only for the JavaScript Bridge internal plugin.
+  ///Adding `'*'` as an allowed origin or setting this to `null`, it means it will allow every origin.
+  ///Instead, an empty [Set] will block every origin and, in this case,
+  ///it will force the behaviour of the [javaScriptBridgeEnabled] parameter,
+  ///as it was set to `false`.
+  ///
+  ///**NOTE**: setting or changing this value after the WebView has been created won't have any effect.
+  ///It should be set when initializing the WebView through [PlatformWebViewCreationParams.initialSettings] parameter.
+  ///
+  ///**NOTE for Android**: each origin pattern MUST follow the table rule of [PlatformInAppWebViewController.addWebMessageListener].
+  ///
+  ///**NOTE for iOS, macOS, Windows**: each origin pattern will be used as a
+  ///Regular Expression Pattern that will be used on JavaScript side using [RegExp](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp).
+  ///
+  ///The default value is `null` and will allow every origin.
+  @SupportedPlatforms(platforms: [
+    AndroidPlatform(),
+    IOSPlatform(),
+    MacOSPlatform(),
+    WindowsPlatform(),
+  ])
+  Set<String>? javaScriptBridgeOriginAllowList;
+
+  ///Set to `true` to allow the JavaScript Bridge only on the main frame.
+  ///If [pluginScriptsForMainFrameOnly] is present, then this value will override
+  ///it only for the JavaScript Bridge internal plugin.
+  ///
+  ///**NOTE**: setting or changing this value after the WebView has been created won't have any effect.
+  ///It should be set when initializing the WebView through [PlatformWebViewCreationParams.initialSettings] parameter.
+  ///
+  ///The default value is `false`.
+  @SupportedPlatforms(platforms: [
+    AndroidPlatform(),
+    IOSPlatform(),
+    MacOSPlatform(),
+    WindowsPlatform(),
+  ])
+  bool? javaScriptBridgeForMainFrameOnly;
+
+  ///A [Set] of patterns that will be used to match the allowed origins
+  ///that are able to load all the internal plugin [UserScript]s used by the plugin itself.
+  ///Adding `'*'` as an allowed origin or setting this to `null`, it means it will allow every origin.
+  ///Instead, an empty [Set] will block every origin.
+  ///
+  ///**NOTE**: If [javaScriptBridgeOriginAllowList] is not present, this value will affect also the JavaScript Bridge internal plugin.
+  ///Also, setting or changing this value after the WebView has been created won't have any effect.
+  ///It should be set when initializing the WebView through [PlatformWebViewCreationParams.initialSettings] parameter.
+  ///
+  ///**NOTE for Android**: each origin pattern MUST follow the table rule of [PlatformInAppWebViewController.addWebMessageListener].
+  ///
+  ///**NOTE for iOS, macOS, Windows**: each origin pattern will be used as a
+  ///Regular Expression Pattern that will be used on JavaScript side using [RegExp](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp).
+  ///
+  ///The default value is `null` and will allow every origin.
+  @SupportedPlatforms(platforms: [
+    AndroidPlatform(),
+    IOSPlatform(),
+    MacOSPlatform(),
+    WindowsPlatform(),
+  ])
+  Set<String>? pluginScriptsOriginAllowList;
+
+  ///Set to `true` to allow internal plugin [UserScript]s only on the main frame.
+  ///
+  ///**NOTE**: If [javaScriptBridgeForMainFrameOnly] is not present, this value will affect also the JavaScript Bridge internal plugin.
+  ///Also, setting or changing this value after the WebView has been created won't have any effect.
+  ///It should be set when initializing the WebView through [PlatformWebViewCreationParams.initialSettings] parameter.
+  ///
+  ///The default value is `false`.
+  @SupportedPlatforms(platforms: [
+    AndroidPlatform(),
+    IOSPlatform(),
+    MacOSPlatform(),
+    WindowsPlatform(),
+  ])
+  bool? pluginScriptsForMainFrameOnly;
+
+  ///The multiplier applied to the scroll amount for the WebView.
+  ///
+  ///This value determines how much the content will scroll in response to user input.
+  ///A higher value means faster scrolling, while a lower value means slower scrolling.
+  ///
+  ///The default value is `1`.
+  @SupportedPlatforms(platforms: [
+    WindowsPlatform(),
+  ])
+  int? scrollMultiplier;
 
   ///Specifies a feature policy for the `<iframe>`.
   ///The policy defines what features are available to the `<iframe>` based on the origin of the request
@@ -1626,6 +1812,26 @@ as it can cause framerate drops on animations in Android 9 and lower (see [Hybri
   ])
   String? iframeCsp;
 
+  ///A string that reflects the `role` HTML attribute, containing a WAI-ARIA role for the element.
+  @SupportedPlatforms(platforms: [
+    WebPlatform(
+        requiresSameOrigin: false,
+        apiName: "iframe.role",
+        apiUrl:
+            "https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Roles")
+  ])
+  String? iframeRole;
+
+  ///A string that reflects the `aria-hidden` HTML attribute, indicating whether the element is exposed to an accessibility API.
+  @SupportedPlatforms(platforms: [
+    WebPlatform(
+        requiresSameOrigin: false,
+        apiName: "iframe.ariaHidden",
+        apiUrl:
+            "https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Attributes/aria-hidden")
+  ])
+  String? iframeAriaHidden;
+
   @ExchangeableObjectConstructor()
   InAppWebViewSettings_({
     this.useShouldOverrideUrlLoading,
@@ -1677,9 +1883,8 @@ as it can cause framerate drops on animations in Android 9 and lower (see [Hybri
     this.disabledActionModeMenuItems,
     this.fantasyFontFamily = "fantasy",
     this.fixedFontFamily = "monospace",
-    this.forceDark = ForceDark_.OFF,
-    this.forceDarkStrategy =
-        ForceDarkStrategy_.PREFER_WEB_THEME_OVER_USER_AGENT_DARKENING,
+    this.forceDark,
+    this.forceDarkStrategy,
     this.geolocationEnabled = true,
     this.layoutAlgorithm,
     this.loadWithOverviewMode = true,
@@ -1763,12 +1968,22 @@ as it can cause framerate drops on animations in Android 9 and lower (see [Hybri
     this.shouldPrintBackgrounds = false,
     this.allowBackgroundAudioPlaying = false,
     this.webViewAssetLoader,
+    this.javaScriptHandlersOriginAllowList,
+    this.javaScriptHandlersForMainFrameOnly,
+    this.javaScriptBridgeEnabled = true,
+    this.javaScriptBridgeOriginAllowList,
+    this.javaScriptBridgeForMainFrameOnly,
+    this.pluginScriptsOriginAllowList,
+    this.pluginScriptsForMainFrameOnly = false,
+    this.scrollMultiplier = 1,
     this.iframeAllow,
     this.iframeAllowFullscreen,
     this.iframeSandbox,
     this.iframeReferrerPolicy,
     this.iframeName,
     this.iframeCsp,
+    this.iframeRole,
+    this.iframeAriaHidden,
   }) {
     if (this.minimumFontSize == null)
       this.minimumFontSize = Util.isAndroid ? 8 : 0;

@@ -41,31 +41,25 @@ class ClientCertChallenge_ extends URLAuthenticationChallenge_ {
 
   ///The collection contains Base64 encoding of DER encoded distinguished names
   ///of certificate authorities allowed by the server.
-  @SupportedPlatforms(platforms: [
-    WindowsPlatform()
-  ])
+  @SupportedPlatforms(platforms: [WindowsPlatform()])
   List<String>? allowedCertificateAuthorities;
 
   ///If the server that issued this request is an http proxy.
-  @SupportedPlatforms(platforms: [
-    WindowsPlatform()
-  ])
+  @SupportedPlatforms(platforms: [WindowsPlatform()])
   bool? isProxy;
 
   ///The collection contains mutually trusted CA certificates.
-  @SupportedPlatforms(platforms: [
-    WindowsPlatform()
-  ])
+  @SupportedPlatforms(platforms: [WindowsPlatform()])
   List<SslCertificate_>? mutuallyTrustedCertificates;
 
-  ClientCertChallenge_(
-      {required URLProtectionSpace_ protectionSpace,
-      @Deprecated('Use principals instead') this.androidPrincipals,
-      this.principals,
-      @Deprecated('Use keyTypes instead') this.androidKeyTypes,
-      this.keyTypes,
-      this.allowedCertificateAuthorities,
-      this.isProxy,
-      this.mutuallyTrustedCertificates,})
-      : super(protectionSpace: protectionSpace);
+  ClientCertChallenge_({
+    required URLProtectionSpace_ protectionSpace,
+    @Deprecated('Use principals instead') this.androidPrincipals,
+    this.principals,
+    @Deprecated('Use keyTypes instead') this.androidKeyTypes,
+    this.keyTypes,
+    this.allowedCertificateAuthorities,
+    this.isProxy,
+    this.mutuallyTrustedCertificates,
+  }) : super(protectionSpace: protectionSpace);
 }

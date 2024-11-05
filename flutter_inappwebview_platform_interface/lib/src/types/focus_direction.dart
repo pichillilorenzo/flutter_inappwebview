@@ -16,9 +16,9 @@ class FocusDirection_ {
   @EnumSupportedPlatforms(platforms: [
     EnumAndroidPlatform(
         apiName: 'FOCUS_UP',
-        apiUrl: 'https://developer.android.com/reference/android/view/View#FOCUS_UP',
-        value: 33
-    ),
+        apiUrl:
+            'https://developer.android.com/reference/android/view/View#FOCUS_UP',
+        value: 33),
   ])
   static const UP = const FocusDirection_._internal('UP');
 
@@ -26,9 +26,9 @@ class FocusDirection_ {
   @EnumSupportedPlatforms(platforms: [
     EnumAndroidPlatform(
         apiName: 'FOCUS_DOWN',
-        apiUrl: 'https://developer.android.com/reference/android/view/View#FOCUS_DOWN',
-        value: 130
-    ),
+        apiUrl:
+            'https://developer.android.com/reference/android/view/View#FOCUS_DOWN',
+        value: 130),
   ])
   static const DOWN = const FocusDirection_._internal('DOWN');
 
@@ -36,9 +36,9 @@ class FocusDirection_ {
   @EnumSupportedPlatforms(platforms: [
     EnumAndroidPlatform(
         apiName: 'FOCUS_LEFT',
-        apiUrl: 'https://developer.android.com/reference/android/view/View#FOCUS_LEFT',
-        value: 130
-    ),
+        apiUrl:
+            'https://developer.android.com/reference/android/view/View#FOCUS_LEFT',
+        value: 130),
   ])
   static const LEFT = const FocusDirection_._internal('LEFT');
 
@@ -46,9 +46,9 @@ class FocusDirection_ {
   @EnumSupportedPlatforms(platforms: [
     EnumAndroidPlatform(
         apiName: 'FOCUS_RIGHT',
-        apiUrl: 'https://developer.android.com/reference/android/view/View#FOCUS_RIGHT',
-        value: 130
-    ),
+        apiUrl:
+            'https://developer.android.com/reference/android/view/View#FOCUS_RIGHT',
+        value: 130),
   ])
   static const RIGHT = const FocusDirection_._internal('RIGHT');
 }

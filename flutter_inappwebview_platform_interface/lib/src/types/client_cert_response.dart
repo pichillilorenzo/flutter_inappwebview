@@ -51,7 +51,7 @@ class ClientCertResponse_ {
       @Deprecated('Use keyStoreType instead')
       this.androidKeyStoreType = "PKCS12",
       this.keyStoreType = "PKCS12",
-        this.selectedCertificate = -1,
+      this.selectedCertificate = -1,
       this.action = ClientCertResponseAction_.CANCEL}) {
     if (this.action == ClientCertResponseAction_.PROCEED && !Util.isWindows)
       assert(certificatePath.isNotEmpty);

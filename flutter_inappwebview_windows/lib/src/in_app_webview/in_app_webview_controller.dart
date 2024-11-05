@@ -890,9 +890,13 @@ class WindowsInAppWebViewController extends PlatformInAppWebViewController
           Map<String, dynamic> arguments =
               call.arguments.cast<String, dynamic>();
 
-          if (arguments['protectionSpace'] is Map && arguments['protectionSpace']['sslCertificate'] is Map &&
-              arguments['protectionSpace']['sslCertificate']['x509Certificate'] is String) {
-            arguments['protectionSpace']['sslCertificate']['x509Certificate'] = utf8.encode(arguments['protectionSpace']['sslCertificate']['x509Certificate']);
+          if (arguments['protectionSpace'] is Map &&
+              arguments['protectionSpace']['sslCertificate'] is Map &&
+              arguments['protectionSpace']['sslCertificate']['x509Certificate']
+                  is String) {
+            arguments['protectionSpace']['sslCertificate']['x509Certificate'] =
+                utf8.encode(arguments['protectionSpace']['sslCertificate']
+                    ['x509Certificate']);
           }
 
           HttpAuthenticationChallenge challenge =
@@ -916,9 +920,13 @@ class WindowsInAppWebViewController extends PlatformInAppWebViewController
           Map<String, dynamic> arguments =
               call.arguments.cast<String, dynamic>();
 
-          if (arguments['protectionSpace'] is Map && arguments['protectionSpace']['sslCertificate'] is Map &&
-              arguments['protectionSpace']['sslCertificate']['x509Certificate'] is String) {
-            arguments['protectionSpace']['sslCertificate']['x509Certificate'] = utf8.encode(arguments['protectionSpace']['sslCertificate']['x509Certificate']);
+          if (arguments['protectionSpace'] is Map &&
+              arguments['protectionSpace']['sslCertificate'] is Map &&
+              arguments['protectionSpace']['sslCertificate']['x509Certificate']
+                  is String) {
+            arguments['protectionSpace']['sslCertificate']['x509Certificate'] =
+                utf8.encode(arguments['protectionSpace']['sslCertificate']
+                    ['x509Certificate']);
           }
 
           ServerTrustChallenge challenge =
@@ -942,18 +950,22 @@ class WindowsInAppWebViewController extends PlatformInAppWebViewController
           Map<String, dynamic> arguments =
               call.arguments.cast<String, dynamic>();
 
-          if (arguments['protectionSpace'] is Map && arguments['protectionSpace']['sslCertificate'] is Map &&
-              arguments['protectionSpace']['sslCertificate']['x509Certificate'] is String) {
-            arguments['protectionSpace']['sslCertificate']['x509Certificate'] = utf8.encode(arguments['protectionSpace']['sslCertificate']['x509Certificate']);
+          if (arguments['protectionSpace'] is Map &&
+              arguments['protectionSpace']['sslCertificate'] is Map &&
+              arguments['protectionSpace']['sslCertificate']['x509Certificate']
+                  is String) {
+            arguments['protectionSpace']['sslCertificate']['x509Certificate'] =
+                utf8.encode(arguments['protectionSpace']['sslCertificate']
+                    ['x509Certificate']);
           }
 
           arguments['mutuallyTrustedCertificates'] =
               (arguments['mutuallyTrustedCertificates'] as List<dynamic>)
                   .cast<Map<dynamic, dynamic>>()
                   .map((c) {
-                c['x509Certificate'] = utf8.encode(c['x509Certificate']);
-                return c;
-              }).toList();
+            c['x509Certificate'] = utf8.encode(c['x509Certificate']);
+            return c;
+          }).toList();
 
           ClientCertChallenge challenge =
               ClientCertChallenge.fromMap(arguments)!;
@@ -1428,18 +1440,16 @@ class WindowsInAppWebViewController extends PlatformInAppWebViewController
         }
         break;
       case "onProcessFailed":
-        if ((webviewParams != null &&
-            webviewParams!.onProcessFailed != null) ||
+        if ((webviewParams != null && webviewParams!.onProcessFailed != null) ||
             _inAppBrowserEventHandler != null) {
-          Map<String, dynamic> arguments = call.arguments.cast<String, dynamic>();
+          Map<String, dynamic> arguments =
+              call.arguments.cast<String, dynamic>();
           final detail = ProcessFailedDetail.fromMap(arguments)!;
 
-          if (webviewParams != null &&
-              webviewParams!.onProcessFailed != null)
+          if (webviewParams != null && webviewParams!.onProcessFailed != null)
             webviewParams!.onProcessFailed!(_controllerFromPlatform, detail);
           else
-            _inAppBrowserEventHandler!
-                .onProcessFailed(detail);
+            _inAppBrowserEventHandler!.onProcessFailed(detail);
         }
         break;
       case "onCallJsHandler":

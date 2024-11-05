@@ -15,10 +15,10 @@ class FrameKind_ {
   ///Indicates that the frame is an unknown type frame. We may extend this enum type to identify more frame kinds in the future.
   @EnumSupportedPlatforms(platforms: [
     EnumWindowsPlatform(
-      apiName: 'COREWEBVIEW2_FRAME_KIND_UNKNOWN',
-      apiUrl: 'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2849.39#corewebview2_frame_kind',
-        value: 0
-    ),
+        apiName: 'COREWEBVIEW2_FRAME_KIND_UNKNOWN',
+        apiUrl:
+            'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2849.39#corewebview2_frame_kind',
+        value: 0),
   ])
   static const UNKNOWN = const FrameKind_._internal('UNKNOWN');
 
@@ -26,9 +26,9 @@ class FrameKind_ {
   @EnumSupportedPlatforms(platforms: [
     EnumWindowsPlatform(
         apiName: 'COREWEBVIEW2_FRAME_KIND_MAIN_FRAME',
-        apiUrl: 'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2849.39#corewebview2_frame_kind',
-      value: 1
-    ),
+        apiUrl:
+            'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2849.39#corewebview2_frame_kind',
+        value: 1),
   ])
   static const MAIN_FRAME = const FrameKind_._internal('MAIN_FRAME');
 
@@ -36,9 +36,9 @@ class FrameKind_ {
   @EnumSupportedPlatforms(platforms: [
     EnumWindowsPlatform(
         apiName: 'COREWEBVIEW2_FRAME_KIND_IFRAME',
-        apiUrl: 'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2849.39#corewebview2_frame_kind',
-        value: 2
-    ),
+        apiUrl:
+            'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2849.39#corewebview2_frame_kind',
+        value: 2),
   ])
   static const IFRAME = const FrameKind_._internal('IFRAME');
 
@@ -46,9 +46,9 @@ class FrameKind_ {
   @EnumSupportedPlatforms(platforms: [
     EnumWindowsPlatform(
         apiName: 'COREWEBVIEW2_FRAME_KIND_EMBED',
-        apiUrl: 'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2849.39#corewebview2_frame_kind',
-        value: 3
-    ),
+        apiUrl:
+            'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2849.39#corewebview2_frame_kind',
+        value: 3),
   ])
   static const EMBED = const FrameKind_._internal('EMBED');
 
@@ -56,9 +56,9 @@ class FrameKind_ {
   @EnumSupportedPlatforms(platforms: [
     EnumWindowsPlatform(
         apiName: 'COREWEBVIEW2_FRAME_KIND_OBJECT',
-        apiUrl: 'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2849.39#corewebview2_frame_kind',
-        value: 4
-    ),
+        apiUrl:
+            'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2849.39#corewebview2_frame_kind',
+        value: 4),
   ])
   static const OBJECT = const FrameKind_._internal('OBJECT');
 }

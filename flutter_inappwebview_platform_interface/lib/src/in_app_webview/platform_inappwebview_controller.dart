@@ -1088,7 +1088,8 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///- iOS ([Official API - UIResponder.becomeFirstResponder](https://developer.apple.com/documentation/uikit/uiresponder/1621113-becomefirstresponder))
   ///- MacOS ([Official API - NSWindow.makeFirstResponder](https://developer.apple.com/documentation/appkit/nswindow/1419366-makefirstresponder))
   ///{@endtemplate}
-  Future<bool?> requestFocus({FocusDirection? direction, InAppWebViewRect? previouslyFocusedRect}) {
+  Future<bool?> requestFocus(
+      {FocusDirection? direction, InAppWebViewRect? previouslyFocusedRect}) {
     throw UnimplementedError(
         'requestFocus is not implemented on the current platform');
   }

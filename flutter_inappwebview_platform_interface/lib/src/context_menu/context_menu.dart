@@ -54,8 +54,8 @@ class ContextMenu_ {
   // ignore: unused_element
   Map<String, dynamic> _toMapMergeWith() {
     return {
-      "settings":
-          (settings as ContextMenuSettings?)?.toMap() ?? (options as ContextMenuOptions?)?.toMap()
+      "settings": (settings as ContextMenuSettings?)?.toMap() ??
+          (options as ContextMenuOptions?)?.toMap()
     };
   }
 }

@@ -52,8 +52,12 @@ class FrameInfo_ {
   FrameKind_? kind;
 
   FrameInfo_(
-      {required this.isMainFrame, required this.request, this.securityOrigin,
-        this.name, this.frameId, this.kind});
+      {required this.isMainFrame,
+      required this.request,
+      this.securityOrigin,
+      this.name,
+      this.frameId,
+      this.kind});
 }
 
 ///An object that contains information about a frame on a webpage.

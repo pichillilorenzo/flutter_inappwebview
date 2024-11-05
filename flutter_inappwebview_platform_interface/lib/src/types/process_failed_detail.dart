@@ -65,12 +65,12 @@ class ProcessFailedDetail_ {
   ])
   List<FrameInfo_>? frameInfos;
 
-  ProcessFailedDetail_(
-      {required this.kind,
-        this.exitCode,
-        this.processDescription,
-        this.reason,
-        this.failureSourceModulePath,
-        this.frameInfos,
-      });
+  ProcessFailedDetail_({
+    required this.kind,
+    this.exitCode,
+    this.processDescription,
+    this.reason,
+    this.failureSourceModulePath,
+    this.frameInfos,
+  });
 }

@@ -408,10 +408,10 @@ class IOSCookieManager extends PlatformCookieManager with ChannelController {
     var platformUtil = PlatformUtil.instance();
     var dateTime = DateTime.fromMillisecondsSinceEpoch(expiresDate).toUtc();
     return await platformUtil.formatDate(
-            date: dateTime,
-            format: 'EEE, dd MMM yyyy HH:mm:ss z',
-            locale: 'en_US',
-            timezone: 'GMT');
+        date: dateTime,
+        format: 'EEE, dd MMM yyyy HH:mm:ss z',
+        locale: 'en_US',
+        timezone: 'GMT');
   }
 
   Future<bool> _shouldUseJavascript() async {

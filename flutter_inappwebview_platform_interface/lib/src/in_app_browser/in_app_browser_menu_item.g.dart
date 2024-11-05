@@ -67,7 +67,9 @@ class InAppBrowserMenuItem {
       order: map['order'],
       title: map['title'],
     );
-    instance.showAsAction = map['showAsAction'];
+    if (map['showAsAction'] != null) {
+      instance.showAsAction = map['showAsAction'];
+    }
     return instance;
   }
 

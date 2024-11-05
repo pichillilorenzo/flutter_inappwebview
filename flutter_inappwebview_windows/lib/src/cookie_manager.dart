@@ -98,7 +98,7 @@ class WindowsCookieManager extends PlatformCookieManager
     args.putIfAbsent('value', () => value);
     args.putIfAbsent('domain', () => domain);
     args.putIfAbsent('path', () => path);
-    args.putIfAbsent('expiresDate', () => expiresDate?.toString());
+    args.putIfAbsent('expiresDate', () => expiresDate);
     args.putIfAbsent('maxAge', () => maxAge);
     args.putIfAbsent('isSecure', () => isSecure);
     args.putIfAbsent('isHttpOnly', () => isHttpOnly);

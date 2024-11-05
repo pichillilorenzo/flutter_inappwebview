@@ -70,7 +70,7 @@ class AndroidStorageCreationParams extends PlatformStorageCreationParams {
 }
 
 ///{@macro flutter_inappwebview_platform_interface.PlatformStorage}
-abstract class AndroidStorage implements PlatformStorage {
+abstract mixin class AndroidStorage implements PlatformStorage {
   @override
   AndroidInAppWebViewController? controller;
 

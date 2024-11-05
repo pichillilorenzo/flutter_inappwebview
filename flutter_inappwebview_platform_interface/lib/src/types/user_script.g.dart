@@ -10,18 +10,33 @@ part of 'user_script.dart';
 class UserScript {
   ///A set of matching rules for the allowed origins.
   ///
-  ///**NOTE**: available only on Android and only if [WebViewFeature.DOCUMENT_START_SCRIPT] feature is supported.
+  ///**NOTE for Android**: each origin pattern MUST follow the table rule of [PlatformInAppWebViewController.addWebMessageListener].
+  ///
+  ///**NOTE for iOS and macOS**: each origin pattern will be used as a
+  ///Regular Expression Pattern that will be used on JavaScript side using [RegExp](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp).
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Android native WebView
+  ///- iOS
+  ///- MacOS
   late Set<String> allowedOriginRules;
 
   ///A scope of execution in which to evaluate the script to prevent conflicts between different scripts.
   ///For more information about content worlds, see [ContentWorld].
+  ///
+  ///**NOTE for Android**: because of how a Content World is implemented on Android, if [forMainFrameOnly] is `true`,
+  ///the [source] inside a specific Content World that is not [ContentWorld.PAGE] will not be executed.
+  ///See [ContentWorld] for more details.
   late ContentWorld contentWorld;
 
   ///A Boolean value that indicates whether to inject the script into the main frame.
   ///Specify true to inject the script only into the main frame, or false to inject it into all frames.
   ///The default value is `true`.
   ///
-  ///**NOTE**: available only on iOS and MacOS.
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Android native WebView
+  ///- iOS
+  ///- MacOS
   bool forMainFrameOnly;
 
   ///The script’s group name.
@@ -64,10 +79,17 @@ class UserScript {
       iosForMainFrameOnly: map['forMainFrameOnly'],
       source: map['source'],
     );
-    instance.allowedOriginRules =
-        Set<String>.from(map['allowedOriginRules']!.cast<String>());
-    instance.contentWorld = map['contentWorld'];
-    instance.forMainFrameOnly = map['forMainFrameOnly'];
+    if (map['allowedOriginRules'] != null) {
+      instance.allowedOriginRules =
+          Set<String>.from(map['allowedOriginRules']!.cast<String>());
+    }
+    if (map['contentWorld'] != null) {
+      instance.contentWorld =
+          ContentWorld.fromMap(map['contentWorld']?.cast<String, dynamic>())!;
+    }
+    if (map['forMainFrameOnly'] != null) {
+      instance.forMainFrameOnly = map['forMainFrameOnly'];
+    }
     return instance;
   }
 

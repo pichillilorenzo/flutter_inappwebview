@@ -8,15 +8,54 @@ part of 'frame_info.dart';
 
 ///An object that contains information about a frame on a webpage.
 class FrameInfo {
+  ///The unique identifier of the frame associated with the current [FrameInfo].
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Windows
+  int? frameId;
+
   ///A Boolean value indicating whether the frame is the web site's main frame or a subframe.
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- iOS
+  ///- MacOS
+  ///- Windows
   bool isMainFrame;
 
+  ///The kind of the frame.
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Windows
+  FrameKind? kind;
+
+  ///Gets the name attribute of the frame, as in <iframe name="frame-name">...</iframe>.
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Windows
+  String? name;
+
   ///The frame’s current request.
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- iOS
+  ///- MacOS
+  ///- Windows
   URLRequest? request;
 
   ///The frame’s security origin.
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- iOS
+  ///- MacOS
+  ///- Windows
   SecurityOrigin? securityOrigin;
-  FrameInfo({required this.isMainFrame, this.request, this.securityOrigin});
+  FrameInfo(
+      {this.frameId,
+      required this.isMainFrame,
+      this.kind,
+      this.name,
+      this.request,
+      this.securityOrigin});
 
   ///Gets a possible [FrameInfo] instance from a [Map] value.
   static FrameInfo? fromMap(Map<String, dynamic>? map) {
@@ -24,7 +63,10 @@ class FrameInfo {
       return null;
     }
     final instance = FrameInfo(
+      frameId: map['frameId'],
       isMainFrame: map['isMainFrame'],
+      kind: FrameKind.fromNativeValue(map['kind']),
+      name: map['name'],
       request: URLRequest.fromMap(map['request']?.cast<String, dynamic>()),
       securityOrigin: SecurityOrigin.fromMap(
           map['securityOrigin']?.cast<String, dynamic>()),
@@ -35,7 +77,10 @@ class FrameInfo {
   ///Converts instance to a map.
   Map<String, dynamic> toMap() {
     return {
+      "frameId": frameId,
       "isMainFrame": isMainFrame,
+      "kind": kind?.toNativeValue(),
+      "name": name,
       "request": request?.toMap(),
       "securityOrigin": securityOrigin?.toMap(),
     };
@@ -48,7 +93,7 @@ class FrameInfo {
 
   @override
   String toString() {
-    return 'FrameInfo{isMainFrame: $isMainFrame, request: $request, securityOrigin: $securityOrigin}';
+    return 'FrameInfo{frameId: $frameId, isMainFrame: $isMainFrame, kind: $kind, name: $name, request: $request, securityOrigin: $securityOrigin}';
   }
 }
 

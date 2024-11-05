@@ -33,6 +33,8 @@ void getHtml() {
     );
 
     final InAppWebViewController controller = await controllerCompleter.future;
+    // Platform view creation happens asynchronously.
+    await tester.pump();
     await pageLoaded.future;
 
     final String? html = await controller.getHtml();

@@ -1,4 +1,5 @@
 import 'dart:collection';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
@@ -73,8 +74,7 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
             onRefresh: () async {
               if (defaultTargetPlatform == TargetPlatform.android) {
                 webViewController?.reload();
-              } else if (defaultTargetPlatform == TargetPlatform.iOS ||
-                  defaultTargetPlatform == TargetPlatform.macOS) {
+              } else if (defaultTargetPlatform == TargetPlatform.iOS) {
                 webViewController?.loadUrl(
                     urlRequest:
                         URLRequest(url: await webViewController?.getUrl()));

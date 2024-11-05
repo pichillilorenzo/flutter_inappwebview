@@ -120,6 +120,7 @@ class PlatformHeadlessInAppWebViewCreationParams
       super.onCameraCaptureStateChanged,
       super.onMicrophoneCaptureStateChanged,
       super.onContentSizeChanged,
+      super.onProcessFailed,
       super.initialUrlRequest,
       super.initialFile,
       super.initialData,
@@ -162,6 +163,7 @@ class PlatformHeadlessInAppWebViewCreationParams
 ///- iOS
 ///- Web
 ///- MacOS
+///- Windows
 ///{@endtemplate}
 abstract class PlatformHeadlessInAppWebView extends PlatformInterface
     implements Disposable {

@@ -18,6 +18,9 @@ class WebViewRenderProcessAction {
       WebViewRenderProcessAction._internal(value, nativeValue());
 
   ///Cause this renderer to terminate.
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Android native WebView
   static const TERMINATE = WebViewRenderProcessAction._internal(0, 0);
 
   ///Set of all values of [WebViewRenderProcessAction].

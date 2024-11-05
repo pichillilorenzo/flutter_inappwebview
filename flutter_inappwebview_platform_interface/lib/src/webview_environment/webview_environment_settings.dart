@@ -1,6 +1,7 @@
 import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_internal_annotations.dart';
 
 import 'platform_webview_environment.dart';
+import '../types/custom_scheme_registration.dart';
 
 part 'webview_environment_settings.g.dart';
 
@@ -100,11 +101,22 @@ class WebViewEnvironmentSettings_ {
   ])
   final String? targetCompatibleBrowserVersion;
 
+  ///Set the array of custom scheme registrations to be used.
+  @SupportedPlatforms(platforms: [
+    WindowsPlatform(
+        apiName:
+            'ICoreWebView2EnvironmentOptions4.SetCustomSchemeRegistrations',
+        apiUrl:
+            'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2environmentoptions4?view=webview2-1.0.2739.15#setcustomschemeregistrations')
+  ])
+  final List<CustomSchemeRegistration_>? customSchemeRegistrations;
+
   WebViewEnvironmentSettings_(
       {this.browserExecutableFolder,
       this.userDataFolder,
       this.additionalBrowserArguments,
       this.allowSingleSignOnUsingOSPrimaryAccount,
       this.language,
-      this.targetCompatibleBrowserVersion});
+      this.targetCompatibleBrowserVersion,
+      this.customSchemeRegistrations});
 }

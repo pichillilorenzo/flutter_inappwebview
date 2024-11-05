@@ -199,7 +199,9 @@ class URLRequest {
       allowsExpensiveNetworkAccess: map['allowsExpensiveNetworkAccess'],
       assumesHTTP3Capable: map['assumesHTTP3Capable'],
       attribution: URLRequestAttribution.fromNativeValue(map['attribution']),
-      body: map['body'],
+      body: map['body'] != null
+          ? Uint8List.fromList(map['body'].cast<int>())
+          : null,
       cachePolicy: URLRequestCachePolicy.fromNativeValue(map['cachePolicy']),
       headers: map['headers']?.cast<String, String>(),
       httpShouldHandleCookies: map['httpShouldHandleCookies'],

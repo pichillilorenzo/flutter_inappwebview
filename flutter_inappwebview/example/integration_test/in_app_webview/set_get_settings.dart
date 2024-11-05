@@ -32,6 +32,8 @@ void setGetSettings() {
         ),
       ),
     );
+    // Platform view creation happens asynchronously.
+    await tester.pumpAndSettle();
     final InAppWebViewController controller = await controllerCompleter.future;
     await pageLoaded.future;
 

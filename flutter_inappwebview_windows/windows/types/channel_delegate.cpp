@@ -24,12 +24,16 @@ namespace flutter_inappwebview_plugin
     std::unique_ptr<flutter::MethodResult<flutter::EncodableValue>> result)
   {}
 
+  void ChannelDelegate::UnregisterMethodCallHandler() const
+  {
+    if (channel) {
+      channel->SetMethodCallHandler(nullptr);
+    }
+  }
+
   ChannelDelegate::~ChannelDelegate()
   {
     messenger = nullptr;
-    if (channel != nullptr) {
-      channel->SetMethodCallHandler(nullptr);
-    }
     channel.reset();
   }
 }

@@ -1,6 +1,44 @@
-## 1.0.11
+#### 1.4.0-beta.1
+
+- Updated static `fromMap` implementation for some classes
+- Updated `kJavaScriptHandlerForbiddenNames` list
+- Added `PlatformInAppLocalhostServer.onData` parameter to set a custom on data server callback
+- Added `javaScriptBridgeEnabled`, `javaScriptBridgeOriginAllowList`, `javaScriptBridgeForMainFrameOnly`, `pluginScriptsOriginAllowList`, `pluginScriptsForMainFrameOnly`, `javaScriptHandlersOriginAllowList`, `javaScriptHandlersForMainFrameOnly`, `scrollMultiplier` InAppWebViewSettings parameters
+- Added `setJavaScriptBridgeName`, `getJavaScriptBridgeName` static WebView controller methods
+- Added `onProcessFailed` WebView event
+- Added `JavaScriptHandlerFunctionData` type
+- Deprecated `JavaScriptHandlerCallback` type in favor of `JavaScriptHandlerFunction` type
+- Deprecated `InAppWebViewSettings.forceDark` and `InAppWebViewSettings.forceDarkStrategy` Android-only properties in favor of `InAppWebViewSettings.algorithmicDarkeningAllowed`
+- Fixed X509Certificate PEM base64 decoding
+- Fixed specific URLAuthenticationChallenge type for `onReceivedHttpAuthRequest`, `onReceivedServerTrustAuthRequest`, `onReceivedClientCertRequest` events
+
+## 1.3.0+1
+
+- Fixed `X509Certificate.toMap` method
+
+## 1.3.0
+
+- Added `WebViewEnvironment.customSchemeRegistrations` parameter for Windows
+- Added `CustomSchemeRegistration` type
+- Updated docs
+
+## 1.2.0
+
+- Updated `Uint8List` conversion inside `fromMap` methods
+
+## 1.1.1
+
+- Updated permission models for Windows platform
+
+## 1.1.0+1
+
+- Updated docs and pubspec.yaml
+
+## 1.1.0
 
 - Added `PlatformWebViewEnvironment` class
+- Updates minimum supported SDK version to Flutter 3.24/Dart 3.5.
+- Removed unsupported feature `WebViewFeature.SUPPRESS_ERROR_PAGE`
 
 ## 1.0.10
 

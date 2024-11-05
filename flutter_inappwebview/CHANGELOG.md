@@ -1,3 +1,138 @@
+## 6.2.0-beta.1
+
+- Updated dependencies to the latest versions for all platform implementations:
+  - `flutter_inappwebview_platform_interface`: `^1.3.0` -> `^1.4.0-beta.1`
+  - `flutter_inappwebview_android`: `^1.1.3` -> `^1.2.0-beta.1`
+  - `flutter_inappwebview_ios`: `^1.1.2` -> `^1.2.0-beta.1`
+  - `flutter_inappwebview_macos`: `^1.1.2` -> `^1.2.0-beta.1`
+  - `flutter_inappwebview_web`: `^1.1.2` -> `^1.2.0-beta.1`
+  - `flutter_inappwebview_windows`: `^0.6.0` -> `^0.7.0-beta.1`
+
+Implemented security features to better manage access to the native javascript bridge.
+
+#### Platform Interface
+- Updated static `fromMap` implementation for some classes
+- Updated `kJavaScriptHandlerForbiddenNames` list
+- Added `PlatformInAppLocalhostServer.onData` parameter to set a custom on data server callback
+- Added `javaScriptBridgeEnabled`, `javaScriptBridgeOriginAllowList`, `javaScriptBridgeForMainFrameOnly`, `pluginScriptsOriginAllowList`, `pluginScriptsForMainFrameOnly`, `javaScriptHandlersOriginAllowList`, `javaScriptHandlersForMainFrameOnly`, `scrollMultiplier` InAppWebViewSettings parameters
+- Added `setJavaScriptBridgeName`, `getJavaScriptBridgeName` static WebView controller methods
+- Added `requestFocus` WebView method
+- Added `onProcessFailed` WebView event
+- Added `JavaScriptHandlerFunctionData` type
+- Deprecated `JavaScriptHandlerCallback` type in favor of `JavaScriptHandlerFunction` type
+- Deprecated `InAppWebViewSettings.forceDark` and `InAppWebViewSettings.forceDarkStrategy` Android-only properties in favor of `InAppWebViewSettings.algorithmicDarkeningAllowed`
+- Fixed X509Certificate PEM base64 decoding
+- Fixed specific URLAuthenticationChallenge type for `onReceivedHttpAuthRequest`, `onReceivedServerTrustAuthRequest`, `onReceivedClientCertRequest` events
+
+#### Android Platform
+- Added `InAppWebViewController.enableSlowWholeDocumentDraw` static method
+- Added `CookieManager.flush` method
+- Added support for `UserScript.forMainFrameOnly` parameter
+- Implemented `requestFocus` WebView method
+- Updated UserScript at document end implementation
+- Updated `InAppWebViewController.takeScreenshot` implementation to support screenshot out of visible viewport when `InAppWebViewController.enableSlowWholeDocumentDraw` is called
+- Fixed "After dispose a InAppWebViewKeepAlive using InAppWebViewController.disposeKeepAlive. NullPointerException is thrown when main activity enter destroyed state." [#2025](https://github.com/pichillilorenzo/flutter_inappwebview/issues/2025)
+- Fixed crash when trying to open InAppBrowser with R.menu.menu_main on release mode
+- Merged "Prevent blank InAppBrowser Activity from being restored" [#1984](https://github.com/pichillilorenzo/flutter_inappwebview/pull/1984) (thanks to [ShuheiSuzuki-07](https://github.com/ShuheiSuzuki-07))
+- Merged "Update Android Cookie Expiration date format to 24-hour format (HH)" [#2389](https://github.com/pichillilorenzo/flutter_inappwebview/pull/2389) (thanks to [takuyaaaaaaahaaaaaa](https://github.com/takuyaaaaaaahaaaaaa))
+
+#### macOS and iOS Platforms
+- Implemented `requestFocus` WebView method
+- Updated ConsoleLogJS internal PluginScript to main-frame only as using it on non-main frames could cause issues such as [#1738](https://github.com/pichillilorenzo/flutter_inappwebview/issues/1738)
+- Moved `WKUserContentController` initialization on `preWKWebViewConfiguration` to fix possible `undefined is not an object (evaluating 'window.webkit.messageHandlers')` javascript error
+- Added support for `UserScript.allowedOriginRules` parameter
+- Merged "change priority of DispatchQueue" [#2322](https://github.com/pichillilorenzo/flutter_inappwebview/pull/2322) (thanks to [nnnlog](https://github.com/nnnlog))
+- ios: Fixed `show`, `hide` methods and `hidden` setting for `InAppBrowser`
+- macOS: Implemented also `clearFocus` WebView method
+- macOS: Implemented workaround for "[macOS] Copy Shortcut does not work if TextField outside of WebView has focus" [#2380](https://github.com/pichillilorenzo/flutter_inappwebview/issues/2380)
+
+#### Windows Platform
+- Updated `scrollMultiplier` default value from 6 to 1
+- Added support for `UserScript.allowedOriginRules` and `UserScript.forMainFrameOnly` parameters
+- Implemented `onReceivedHttpAuthRequest`, `onReceivedClientCertRequest`, `onReceivedServerTrustAuthRequest`, `onRenderProcessGone`, `onRenderProcessUnresponsive`, `onWebContentProcessDidTerminate`, `onProcessFailed` WebView events
+- Implemented `clearSslPreferences` WebView method
+- Fixed `get_optional_fl_map_value` implementation in `utils/flutter.h`
+- Fixed "Error in transparentBackground handling in Windows" [#2391](https://github.com/pichillilorenzo/flutter_inappwebview/issues/2391)
+
+#### Web Platform
+- Merged "[web] support iframe role and aria-hidden attributes" [2293](https://github.com/pichillilorenzo/flutter_inappwebview/pull/2293) (thanks to [p-mazhnik](https://github.com/p-mazhnik))
+
+## 6.1.5
+
+- Updated dependencies to the latest versions for all platform implementations:
+  - `flutter_inappwebview_windows`: `^0.5.0` -> `^0.6.0`
+
+#### Windows Platform
+- Updated code to support multiple flutter windows
+- Fixed `InAppWebViewController.callAsyncJavaScript` not working with JSON objects
+- Fixed `onLoadResourceWithCustomScheme` WebView event called every time
+
+## 6.1.4
+
+- Updated dependencies to the latest versions for all platform implementations:
+  - `flutter_inappwebview_platform_interface`: `^1.2.0` -> `^1.3.0`
+  - `flutter_inappwebview_android`: `^1.1.1` -> `^1.1.3`
+  - `flutter_inappwebview_ios`: `^1.1.1` -> `^1.1.2`
+  - `flutter_inappwebview_macos`: `^1.1.1` -> `^1.1.2`
+  - `flutter_inappwebview_web`: `^1.1.1` -> `^1.1.2`
+  - `flutter_inappwebview_windows`: `^0.4.0` -> `^0.5.0`
+
+#### Android Platform
+- Removed webview/plugin_scripts_js/ConsoleLogJS.java file, use native WebChromeClient.onConsoleMessage instead
+
+#### Windows Platform
+- Implemented `shouldInterceptRequest`, `onLoadResourceWithCustomScheme` WebView events
+
+## 6.1.3
+
+- Updated dependencies to the latest versions for all platform implementations:
+  - `flutter_inappwebview_platform_interface`: `^1.1.0` -> `^1.2.0`
+  - `flutter_inappwebview_android`: `^1.1.0+4` -> `^1.1.1`
+  - `flutter_inappwebview_ios`: `^1.1.0+3` -> `^1.1.1`
+  - `flutter_inappwebview_macos`: `^1.1.0+3` -> `^1.1.1`
+  - `flutter_inappwebview_web`: `^1.1.0+2` -> `^1.1.1`
+  - `flutter_inappwebview_windows`: `^0.3.0` -> `^0.4.0`
+
+#### Windows Platform
+  - Updated `shouldOverrideUrlLoading` implementation using the Chrome DevTools Protocol API Fetch.requestPaused event
+
+## 6.1.2
+
+- Updated minimum platform implementation versions
+
+#### Windows Platform
+
+- Implemented `pause`, `resume`, `getCertificate` methods for `InAppWebViewController`
+- Implemented `onPermissionRequest` WebView event
+- Fixed `InAppWebViewController.evaluateJavascript` not working with JSON objects
+- Fixed `InAppWebViewManager::METHOD_CHANNEL_NAME` c++ value
+- Fixed `InAppWebViewController.takeScreenshot` to behave consistently with the other platforms
+
+## 6.1.1
+
+- Updated README
+- Updated pubspec.yaml
+- Updated minimum platform implementation versions
+
+## 6.1.0+1
+
+- Updated README
+
+## 6.1.0
+
+- Added initial Windows support
+- Added `InAppWebView` widget MacOS support
+- Added privacy manifest for MacOS
+- Migrated web support to `package:web`.
+- Updated minimum supported SDK version to Flutter 3.24/Dart 3.5.
+- Updated androidx.webkit:webkit:1.8.0 to androidx.webkit:webkit:1.12.0
+- Updated androidx.browser:browser:1.6.0 to androidx.browser:browser:1.8.0
+- Fixed "[MACOS] launching InAppBrowser with 'hidden: true' calls onExit immediately" [#1939](https://github.com/pichillilorenzo/flutter_inappwebview/issues/1939)
+- Fixed XCode 16 build
+- Removed unsupported WebViewFeature.SUPPRESS_ERROR_PAGE
+- Merged "Add privacy manifest for iOS" [#2029](https://github.com/pichillilorenzo/flutter_inappwebview/pull/2029) (thanks to [ueman](https://github.com/ueman))
+- Merged "Remove references to deprecated v1 Android embedding" [#2176](https://github.com/pichillilorenzo/flutter_inappwebview/pull/2176) (thanks to [gmackall](https://github.com/gmackall))
+
 ## 6.0.0
 
 - Updated minimum platform interface and implementation versions

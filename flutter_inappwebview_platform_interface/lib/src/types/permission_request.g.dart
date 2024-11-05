@@ -16,7 +16,7 @@ class PermissionRequest {
 
   ///List of resources the web content wants to access.
   ///
-  ///**NOTE for iOS**: this list will have only 1 element and will be used by the [PermissionResponse.action]
+  ///**NOTE for iOS, macOS and Windows**: this list will have only 1 element and will be used by the [PermissionResponse.action]
   ///as the resource to consider when applying the corresponding action.
   List<PermissionResourceType> resources;
   PermissionRequest(
@@ -31,8 +31,10 @@ class PermissionRequest {
       frame: FrameInfo.fromMap(map['frame']?.cast<String, dynamic>()),
       origin: WebUri(map['origin']),
     );
-    instance.resources = List<PermissionResourceType>.from(map['resources']
-        .map((e) => PermissionResourceType.fromNativeValue(e)!));
+    if (map['resources'] != null) {
+      instance.resources = List<PermissionResourceType>.from(map['resources']
+          .map((e) => PermissionResourceType.fromNativeValue(e)!));
+    }
     return instance;
   }
 

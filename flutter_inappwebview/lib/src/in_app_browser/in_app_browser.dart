@@ -438,7 +438,7 @@ class InAppBrowser implements PlatformInAppBrowserEvents {
 
   @override
   Future<ClientCertResponse?>? onReceivedClientCertRequest(
-      URLAuthenticationChallenge challenge) {
+      ClientCertChallenge challenge) {
     return null;
   }
 
@@ -447,7 +447,7 @@ class InAppBrowser implements PlatformInAppBrowserEvents {
 
   @override
   Future<HttpAuthResponse?>? onReceivedHttpAuthRequest(
-      URLAuthenticationChallenge challenge) {
+      HttpAuthenticationChallenge challenge) {
     return null;
   }
 
@@ -463,7 +463,7 @@ class InAppBrowser implements PlatformInAppBrowserEvents {
 
   @override
   Future<ServerTrustAuthResponse?>? onReceivedServerTrustAuthRequest(
-      URLAuthenticationChallenge challenge) {
+      ServerTrustChallenge challenge) {
     return null;
   }
 
@@ -545,4 +545,7 @@ class InAppBrowser implements PlatformInAppBrowserEvents {
 
   @override
   void onMainWindowWillClose() {}
+
+  @override
+  void onProcessFailed(ProcessFailedDetail detail) {}
 }

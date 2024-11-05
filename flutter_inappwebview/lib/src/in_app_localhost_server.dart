@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_platform_interface.dart';
 
 ///{@macro flutter_inappwebview_platform_interface.PlatformInAppLocalhostServer}
@@ -9,12 +10,14 @@ class InAppLocalhostServer {
     String directoryIndex = 'index.html',
     String documentRoot = './',
     bool shared = false,
+    Future<bool> Function(HttpRequest request)? onData,
   }) : this.fromPlatformCreationParams(
           PlatformInAppLocalhostServerCreationParams(
               port: port,
               directoryIndex: directoryIndex,
               documentRoot: documentRoot,
-              shared: shared),
+              shared: shared,
+              onData: onData),
         );
 
   /// Constructs a [InAppLocalhostServer] from creation params for a specific
@@ -41,6 +44,9 @@ class InAppLocalhostServer {
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformInAppLocalhostServer.shared}
   bool get shared => platform.shared;
+
+  ///{@macro flutter_inappwebview_platform_interface.PlatformInAppLocalhostServer.onData}
+  Future<bool> Function(HttpRequest request)? get onData => platform.onData;
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformInAppLocalhostServer.start}
   Future<void> start() => platform.start();

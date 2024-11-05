@@ -71,6 +71,8 @@ void reload() {
       );
       final InAppWebViewController controller =
           await controllerCompleter.future;
+      // do not wait for pump to not miss the load event
+      tester.pump();
       String? reloadUrl = await pageLoads.stream.first;
       expect(reloadUrl, url.toString());
 

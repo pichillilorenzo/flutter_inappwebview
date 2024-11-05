@@ -1,5 +1,6 @@
 package com.pichillilorenzo.flutter_inappwebview_android.webview;
 
+import android.graphics.Rect;
 import android.net.Uri;
 import android.os.Build;
 import android.webkit.ValueCallback;
@@ -29,6 +30,8 @@ import com.pichillilorenzo.flutter_inappwebview_android.types.GeolocationPermiss
 import com.pichillilorenzo.flutter_inappwebview_android.types.HitTestResult;
 import com.pichillilorenzo.flutter_inappwebview_android.types.HttpAuthResponse;
 import com.pichillilorenzo.flutter_inappwebview_android.types.HttpAuthenticationChallenge;
+import com.pichillilorenzo.flutter_inappwebview_android.types.InAppWebViewRect;
+import com.pichillilorenzo.flutter_inappwebview_android.types.JavaScriptHandlerFunctionData;
 import com.pichillilorenzo.flutter_inappwebview_android.types.JsAlertResponse;
 import com.pichillilorenzo.flutter_inappwebview_android.types.JsBeforeUnloadResponse;
 import com.pichillilorenzo.flutter_inappwebview_android.types.JsConfirmResponse;
@@ -231,9 +234,9 @@ public class WebViewChannelDelegate extends ChannelDelegateImpl {
       case getSettings:
         if (webView != null && webView.getInAppBrowserDelegate() instanceof InAppBrowserActivity) {
           InAppBrowserActivity inAppBrowserActivity = (InAppBrowserActivity) webView.getInAppBrowserDelegate();
-          result.success(inAppBrowserActivity.getCustomSettings());
+          result.success(inAppBrowserActivity.getCustomSettingsMap());
         } else {
-          result.success((webView != null) ? webView.getCustomSettings() : null);
+          result.success((webView != null) ? webView.getCustomSettingsMap() : null);
         }
         break;
       case close:
@@ -473,6 +476,23 @@ public class WebViewChannelDelegate extends ChannelDelegateImpl {
           webView.clearFocus();
         }
         result.success(true);
+        break;
+      case requestFocus:
+        if (webView != null) {
+          boolean resultValue = false;
+          Integer direction = (Integer) call.argument("direction");
+          InAppWebViewRect previouslyFocusedRect = InAppWebViewRect.fromMap((Map<String, Object>) call.argument("previouslyFocusedRect"));
+          if (direction != null && previouslyFocusedRect != null) {
+            resultValue = webView.requestFocus(direction, previouslyFocusedRect.toRect());
+          } else if (direction != null) {
+            resultValue = webView.requestFocus(direction);
+          } else {
+            resultValue = webView.requestFocus();
+          }
+          result.success(resultValue);
+        } else {
+          result.success(false);
+        }
         break;
       case setContextMenu:
         if (webView != null) {
@@ -1271,7 +1291,7 @@ public class WebViewChannelDelegate extends ChannelDelegateImpl {
     }
   }
 
-  public void onCallJsHandler(String handlerName, String args, @NonNull CallJsHandlerCallback callback) {
+  public void onCallJsHandler(String handlerName, JavaScriptHandlerFunctionData data, @NonNull CallJsHandlerCallback callback) {
     MethodChannel channel = getChannel();
     if (channel == null) {
       callback.defaultBehaviour(null);
@@ -1279,7 +1299,7 @@ public class WebViewChannelDelegate extends ChannelDelegateImpl {
     }
     Map<String, Object> obj = new HashMap<>();
     obj.put("handlerName", handlerName);
-    obj.put("args", args);
+    obj.put("data", data.toMap());
     channel.invokeMethod("onCallJsHandler", obj, callback);
   }
 

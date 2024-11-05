@@ -36,10 +36,10 @@ public class WebMessagePort {
     if (webView != null) {
       int index = name.equals("port1") ? 0 : 1;
       webView.evaluateJavascript("(function() {" +
-              "  var webMessageChannel = " + JavaScriptBridgeJS.WEB_MESSAGE_CHANNELS_VARIABLE_NAME + "['" + webMessageChannel.id + "'];" +
+              "  var webMessageChannel = " + JavaScriptBridgeJS.WEB_MESSAGE_CHANNELS_VARIABLE_NAME() + "['" + webMessageChannel.id + "'];" +
               "  if (webMessageChannel != null) {" +
               "      webMessageChannel." + this.name + ".onmessage = function (event) {" +
-              "          window." + JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME + ".callHandler('onWebMessagePortMessageReceived', {" +
+              "          window." + JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME() + ".callHandler('onWebMessagePortMessageReceived', {" +
               "              'webMessageChannelId': '" + webMessageChannel.id + "'," +
               "              'index': " + index + "," +
               "              'message': event.data" +
@@ -82,13 +82,13 @@ public class WebMessagePort {
             throw new Exception("Port is already closed or transferred");
           }
           port.isTransferred = true;
-          portArrayString.add(JavaScriptBridgeJS.WEB_MESSAGE_CHANNELS_VARIABLE_NAME + "['" + webMessageChannel.id + "']." + port.name);
+          portArrayString.add(JavaScriptBridgeJS.WEB_MESSAGE_CHANNELS_VARIABLE_NAME() + "['" + webMessageChannel.id + "']." + port.name);
         }
         portsString = "[" + TextUtils.join(", ", portArrayString) + "]";
       }
       String data = message.data != null ? Util.replaceAll(message.data, "\'", "\\'") : "null";
       String source = "(function() {" +
-              "  var webMessageChannel = " + JavaScriptBridgeJS.WEB_MESSAGE_CHANNELS_VARIABLE_NAME + "['" + webMessageChannel.id + "'];" +
+              "  var webMessageChannel = " + JavaScriptBridgeJS.WEB_MESSAGE_CHANNELS_VARIABLE_NAME() + "['" + webMessageChannel.id + "'];" +
               "  if (webMessageChannel != null) {" +
               "      webMessageChannel." + this.name + ".postMessage('" + data + "', " + portsString + ");" +
               "  }" +
@@ -113,7 +113,7 @@ public class WebMessagePort {
     InAppWebViewInterface webView = webMessageChannel != null && webMessageChannel.webView != null ? webMessageChannel.webView : null;
     if (webView != null) {
       String source = "(function() {" +
-              "  var webMessageChannel = " + JavaScriptBridgeJS.WEB_MESSAGE_CHANNELS_VARIABLE_NAME + "['" + webMessageChannel.id + "'];" +
+              "  var webMessageChannel = " + JavaScriptBridgeJS.WEB_MESSAGE_CHANNELS_VARIABLE_NAME() + "['" + webMessageChannel.id + "'];" +
               "  if (webMessageChannel != null) {" +
               "      webMessageChannel." + this.name + ".close();" +
               "  }" +

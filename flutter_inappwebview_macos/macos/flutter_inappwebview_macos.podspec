@@ -18,10 +18,11 @@ A new Flutter plugin project.
   s.resources = 'Storyboards/**/*.storyboard'
   s.public_header_files = 'Classes/**/*.h'
   s.dependency 'FlutterMacOS'
+  s.resource_bundles = {'flutter_inappwebview_macos_privacy' => ['Resources/PrivacyInfo.xcprivacy']}
 
-  s.platform = :osx, '10.11'
+  s.platform = :osx, '10.14'
   s.pod_target_xcconfig = { 'DEFINES_MODULE' => 'YES' }
   s.swift_version = '5.0'
 
-  s.dependency 'OrderedSet', '~>5.0'
+  s.dependency 'OrderedSet', '~>6.0.3'
 end

@@ -1,17 +1,13 @@
 import 'dart:core';
-import 'dart:typed_data';
-import 'dart:ui';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_platform_interface.dart';
 
+import '../print_job/main.dart';
 import '../web_message/main.dart';
 import '../web_storage/web_storage.dart';
 import 'android/in_app_webview_controller.dart';
 import 'apple/in_app_webview_controller.dart';
-
-import '../print_job/main.dart';
 
 ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController}
 class InAppWebViewController {
@@ -166,14 +162,12 @@ class InAppWebViewController {
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.addJavaScriptHandler}
   void addJavaScriptHandler(
-          {required String handlerName,
-          required JavaScriptHandlerCallback callback}) =>
+          {required String handlerName, required Function callback}) =>
       platform.addJavaScriptHandler(
           handlerName: handlerName, callback: callback);
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.removeJavaScriptHandler}
-  JavaScriptHandlerCallback? removeJavaScriptHandler(
-          {required String handlerName}) =>
+  Function? removeJavaScriptHandler({required String handlerName}) =>
       platform.removeJavaScriptHandler(handlerName: handlerName);
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.hasJavaScriptHandler}
@@ -289,6 +283,13 @@ class InAppWebViewController {
   ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.getHitTestResult}
   Future<InAppWebViewHitTestResult?> getHitTestResult() =>
       platform.getHitTestResult();
+
+  ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.requestFocus}
+  Future<bool?> requestFocus(
+          {FocusDirection? direction,
+          InAppWebViewRect? previouslyFocusedRect}) =>
+      platform.requestFocus(
+          direction: direction, previouslyFocusedRect: previouslyFocusedRect);
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.clearFocus}
   Future<void> clearFocus() => platform.clearFocus();
@@ -564,6 +565,19 @@ class InAppWebViewController {
   static Future<void> clearAllCache({bool includeDiskFiles = true}) =>
       PlatformInAppWebViewController.static()
           .clearAllCache(includeDiskFiles: includeDiskFiles);
+
+  ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.enableSlowWholeDocumentDraw}
+  static Future<void> enableSlowWholeDocumentDraw() =>
+      PlatformInAppWebViewController.static().enableSlowWholeDocumentDraw();
+
+  ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.setJavaScriptBridgeName}
+  static Future<void> setJavaScriptBridgeName(String bridgeName) =>
+      PlatformInAppWebViewController.static()
+          .setJavaScriptBridgeName(bridgeName);
+
+  ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.getJavaScriptBridgeName}
+  static Future<void> getJavaScriptBridgeName() =>
+      PlatformInAppWebViewController.static().getJavaScriptBridgeName();
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.tRexRunnerHtml}
   static Future<String> get tRexRunnerHtml =>

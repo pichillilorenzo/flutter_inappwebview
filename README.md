@@ -5,10 +5,10 @@
 ![InAppWebView-logo](https://user-images.githubusercontent.com/5956938/195422744-bdcfed16-73f0-4bc9-94ab-ecf10771a1c4.png)
 
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-82-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-90-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
-[![Pub](https://img.shields.io/pub/v/flutter_inappwebview?include_prereleases)](https://pub.dartlang.org/packages/flutter_inappwebview)
+[![flutter_inappwebview version](https://img.shields.io/pub/v/flutter_inappwebview?include_prereleases)](https://pub.dartlang.org/packages/flutter_inappwebview)
 [![Pub Points](https://img.shields.io/pub/points/flutter_inappwebview)](https://pub.dev/packages/flutter_inappwebview/score)
 [![Pub Popularity](https://img.shields.io/pub/popularity/flutter_inappwebview)](https://pub.dev/packages/flutter_inappwebview/score)
 [![Pub Likes](https://img.shields.io/pub/likes/flutter_inappwebview)](https://pub.dev/packages/flutter_inappwebview/score)
@@ -19,13 +19,18 @@
 [![GitHub forks](https://img.shields.io/github/forks/pichillilorenzo/flutter_inappwebview?style=social)](https://github.com/pichillilorenzo/flutter_inappwebview)
 [![GitHub stars](https://img.shields.io/github/stars/pichillilorenzo/flutter_inappwebview?style=social)](https://github.com/pichillilorenzo/flutter_inappwebview)
 
+###### Supported Platforms
+
+[![flutter_inappwebview_platform_interface version](https://img.shields.io/pub/v/flutter_inappwebview_platform_interface?include_prereleases&label=Platform%20Interface)](https://pub.dartlang.org/packages/flutter_inappwebview_platform_interface)
+[![flutter_inappwebview_android version](https://img.shields.io/pub/v/flutter_inappwebview_android?include_prereleases&label=Android)](https://pub.dartlang.org/packages/flutter_inappwebview_android)
+[![flutter_inappwebview_ios version](https://img.shields.io/pub/v/flutter_inappwebview_ios?include_prereleases&label=iOS)](https://pub.dartlang.org/packages/flutter_inappwebview_ios)
+[![flutter_inappwebview_macos version](https://img.shields.io/pub/v/flutter_inappwebview_macos?include_prereleases&label=macOS)](https://pub.dartlang.org/packages/flutter_inappwebview_macos)
+[![flutter_inappwebview_windows version](https://img.shields.io/pub/v/flutter_inappwebview_windows?include_prereleases&label=Windows)](https://pub.dartlang.org/packages/flutter_inappwebview_windows)
+[![flutter_inappwebview_web version](https://img.shields.io/pub/v/flutter_inappwebview_web?include_prereleases&label=Web)](https://pub.dartlang.org/packages/flutter_inappwebview_web)
+
 A Flutter plugin that allows you to add an inline webview, to use an headless webview, and to open an in-app browser window.
 
 </div>
-
-## New Version 6.x.x is OUT NOW!
-
-Migrating from version `5.x.x` is easy! Follow the online [Migration guide](https://inappwebview.dev/docs/migration-guide).
 
 ## Articles/Resources
 
@@ -47,27 +52,23 @@ Send a submission request to the [Submit App](https://inappwebview.dev/submit-ap
 
 ## Requirements
 
-- Dart sdk: ">=2.17.0 <4.0.0"
-- Flutter: ">=3.0.0"
+- Dart sdk: "^3.5.0"
+- Flutter: ">=3.24.0"
 - Android: `minSdkVersion >= 19`, `compileSdk >= 34`, [AGP](https://developer.android.com/build/releases/gradle-plugin) version `>= 7.3.0` (use [Android Studio - Android Gradle plugin Upgrade Assistant](https://developer.android.com/build/agp-upgrade-assistant) for help), support for `androidx` (see [AndroidX Migration](https://flutter.dev/docs/development/androidx-migration) to migrate an existing app)
-- iOS 9.0+: `--ios-language swift`, Xcode version `>= 14.3`
-- MacOS 10.11+: Xcode version `>= 14.3`
+- iOS 12.0+: `--ios-language swift`, Xcode version `>= 15.0`
+- MacOS 10.14+: Xcode version `>= 15.0`
+- Windows: [NuGet CLI](https://learn.microsoft.com/en-us/nuget/install-nuget-client-tools?tabs=windows#nugetexe-cli) available on your PATH environment variable
 
 ## Installation
 
 Add `flutter_inappwebview` as a [dependency in your pubspec.yaml file](https://flutter.io/using-packages/).
 
-### Installation - Web support
-
-To make it work properly on the Web platform, you need to add the `web_support.js` file inside the `<head>` of your `web/index.html` file:
-
-```html
-<head>
-    <!-- ... -->
-    <script type="application/javascript" src="/assets/packages/flutter_inappwebview_web/assets/web/web_support.js" defer></script>
-    <!-- ... -->
-</head>
-```  
+### Platform Installation Setup:
+- [Android](https://inappwebview.dev/docs/intro/#setup-android)
+- [iOS](https://inappwebview.dev/docs/intro/#setup-ios)
+- [macOS](https://inappwebview.dev/docs/intro/#setup-macos)
+- [Windows](https://inappwebview.dev/docs/intro/#setup-windows)
+- [Web](https://inappwebview.dev/docs/intro/#setup-web)
 
 ## Support
 
@@ -150,7 +151,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
       <td align="center" valign="top" width="14.28%"><a href="https://xraph.com/"><img src="https://avatars.githubusercontent.com/u/11243590?v=4?s=100" width="100px;" alt="Rex Raphael"/><br /><sub><b>Rex Raphael</b></sub></a><br /><a href="https://github.com/pichillilorenzo/flutter_inappwebview/commits?author=juicycleff" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/Sense545"><img src="https://avatars.githubusercontent.com/u/769406?v=4?s=100" width="100px;" alt="Jan Henrik Høiland"/><br /><sub><b>Jan Henrik Høiland</b></sub></a><br /><a href="https://github.com/pichillilorenzo/flutter_inappwebview/commits?author=Sense545" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/igtm"><img src="https://avatars.githubusercontent.com/u/6331737?v=4?s=100" width="100px;" alt="Iguchi Tomokatsu"/><br /><sub><b>Iguchi Tomokatsu</b></sub></a><br /><a href="https://github.com/pichillilorenzo/flutter_inappwebview/commits?author=igtm" title="Code">💻</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="https://uekoetter.dev/"><img src="https://avatars.githubusercontent.com/u/1270149?v=4?s=100" width="100px;" alt="Jonas Uekötter"/><br /><sub><b>Jonas Uekötter</b></sub></a><br /><a href="https://github.com/pichillilorenzo/flutter_inappwebview/commits?author=ueman" title="Documentation">📖</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://uekoetter.dev/"><img src="https://avatars.githubusercontent.com/u/1270149?v=4?s=100" width="100px;" alt="Jonas Uekötter"/><br /><sub><b>Jonas Uekötter</b></sub></a><br /><a href="https://github.com/pichillilorenzo/flutter_inappwebview/commits?author=ueman" title="Documentation">📖</a> <a href="https://github.com/pichillilorenzo/flutter_inappwebview/commits?author=ueman" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/emakar"><img src="https://avatars.githubusercontent.com/u/7767193?v=4?s=100" width="100px;" alt="emakar"/><br /><sub><b>emakar</b></sub></a><br /><a href="https://github.com/pichillilorenzo/flutter_inappwebview/commits?author=emakar" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://weibo.com/magicrolan"><img src="https://avatars.githubusercontent.com/u/671431?v=4?s=100" width="100px;" alt="liasica"/><br /><sub><b>liasica</b></sub></a><br /><a href="https://github.com/pichillilorenzo/flutter_inappwebview/commits?author=liasica" title="Code">💻</a></td>
     </tr>
@@ -187,6 +188,16 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/lrorpilla"><img src="https://avatars.githubusercontent.com/u/11363922?v=4?s=100" width="100px;" alt="lrorpilla"/><br /><sub><b>lrorpilla</b></sub></a><br /><a href="https://github.com/pichillilorenzo/flutter_inappwebview/commits?author=lrorpilla" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/michalsrutek"><img src="https://avatars.githubusercontent.com/u/35694712?v=4?s=100" width="100px;" alt="Michal Šrůtek"/><br /><sub><b>Michal Šrůtek</b></sub></a><br /><a href="https://github.com/pichillilorenzo/flutter_inappwebview/commits?author=michalsrutek" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/daisukeueta"><img src="https://avatars.githubusercontent.com/u/122339799?v=4?s=100" width="100px;" alt="daisukeueta"/><br /><sub><b>daisukeueta</b></sub></a><br /><a href="https://github.com/pichillilorenzo/flutter_inappwebview/commits?author=daisukeueta" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/gmackall"><img src="https://avatars.githubusercontent.com/u/34871572?v=4?s=100" width="100px;" alt="Gray Mackall"/><br /><sub><b>Gray Mackall</b></sub></a><br /><a href="https://github.com/pichillilorenzo/flutter_inappwebview/commits?author=gmackall" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/p-mazhnik"><img src="https://avatars.githubusercontent.com/u/25964451?v=4?s=100" width="100px;" alt="Pavel Mazhnik"/><br /><sub><b>Pavel Mazhnik</b></sub></a><br /><a href="https://github.com/pichillilorenzo/flutter_inappwebview/commits?author=p-mazhnik" title="Code">💻</a></td>
+    </tr>
+    <tr>
+      <td align="center" valign="top" width="14.28%"><a href="https://nlog.dev"><img src="https://avatars.githubusercontent.com/u/20399222?v=4?s=100" width="100px;" alt="nlog (solrin)"/><br /><sub><b>nlog (solrin)</b></sub></a><br /><a href="https://github.com/pichillilorenzo/flutter_inappwebview/commits?author=nnnlog" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/Murmurl912"><img src="https://avatars.githubusercontent.com/u/36264246?v=4?s=100" width="100px;" alt="Murmurl912"/><br /><sub><b>Murmurl912</b></sub></a><br /><a href="https://github.com/pichillilorenzo/flutter_inappwebview/commits?author=Murmurl912" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/bschulz87"><img src="https://avatars.githubusercontent.com/u/30199362?v=4?s=100" width="100px;" alt="Benjamin Schulz"/><br /><sub><b>Benjamin Schulz</b></sub></a><br /><a href="#ideas-bschulz87" title="Ideas, Planning, & Feedback">🤔</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/ShuheiSuzuki-07"><img src="https://avatars.githubusercontent.com/u/118415919?v=4?s=100" width="100px;" alt="seal-app"/><br /><sub><b>seal-app</b></sub></a><br /><a href="https://github.com/pichillilorenzo/flutter_inappwebview/commits?author=ShuheiSuzuki-07" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/takuyaaaaaaahaaaaaa"><img src="https://avatars.githubusercontent.com/u/31458194?v=4?s=100" width="100px;" alt="Takuya Tominaga"/><br /><sub><b>Takuya Tominaga</b></sub></a><br /><a href="https://github.com/pichillilorenzo/flutter_inappwebview/commits?author=takuyaaaaaaahaaaaaa" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/yamaha252"><img src="https://avatars.githubusercontent.com/u/4444068?v=4?s=100" width="100px;" alt="Sergey"/><br /><sub><b>Sergey</b></sub></a><br /><a href="https://github.com/pichillilorenzo/flutter_inappwebview/commits?author=yamaha252" title="Code">💻</a></td>
     </tr>
   </tbody>
 </table>

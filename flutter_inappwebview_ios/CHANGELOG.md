@@ -1,3 +1,39 @@
+## 1.2.0-beta.1
+
+- Updated flutter_inappwebview_platform_interface version to ^1.4.0
+- Implemented `requestFocus` WebView method
+- Updated ConsoleLogJS internal PluginScript to main-frame only as using it on non-main frames could cause issues such as [#1738](https://github.com/pichillilorenzo/flutter_inappwebview/issues/1738)
+- Added support for `UserScript.allowedOriginRules` parameter
+- Moved `WKUserContentController` initialization on `preWKWebViewConfiguration` to fix possible `undefined is not an object (evaluating 'window.webkit.messageHandlers')` javascript error
+- Merged "change priority of DispatchQueue" [#2322](https://github.com/pichillilorenzo/flutter_inappwebview/pull/2322) (thanks to [nnnlog](https://github.com/nnnlog))
+- Fixed `show`, `hide` methods and `hidden` setting for `InAppBrowser`
+
+## 1.1.2
+
+- Updated flutter_inappwebview_platform_interface version to ^1.3.0
+
+## 1.1.1
+
+- Updated flutter_inappwebview_platform_interface version to ^1.2.0
+
+## 1.1.0+3
+
+- Updated flutter_inappwebview_platform_interface version
+
+## ## 1.1.0+2
+
+- Updated pubspec.yaml
+
+## 1.1.0+1 
+
+- Fixed "v6.1.0 fails to compile on Xcode 15" [#2288](https://github.com/pichillilorenzo/flutter_inappwebview/issues/2288)
+
+## 1.1.0
+
+- Fixed XCode 16 build
+- Updates minimum supported SDK version to Flutter 3.24/Dart 3.5.
+- Merged "Add privacy manifest for iOS" [#2029](https://github.com/pichillilorenzo/flutter_inappwebview/pull/2029) (thanks to [ueman](https://github.com/ueman))
+
 ## 1.0.13
 
 - Updated `flutter_inappwebview_platform_interface` version dependency to `^1.0.10`

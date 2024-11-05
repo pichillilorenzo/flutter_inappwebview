@@ -76,12 +76,20 @@ class ProxySettings {
       bypassSimpleHostnames: map['bypassSimpleHostnames'],
       removeImplicitRules: map['removeImplicitRules'],
     );
-    instance.bypassRules =
-        List<String>.from(map['bypassRules']!.cast<String>());
-    instance.directs = List<String>.from(map['directs']!.cast<String>());
-    instance.proxyRules = List<ProxyRule>.from(map['proxyRules']
-        .map((e) => ProxyRule.fromMap(e?.cast<String, dynamic>())!));
-    instance.reverseBypassEnabled = map['reverseBypassEnabled'];
+    if (map['bypassRules'] != null) {
+      instance.bypassRules =
+          List<String>.from(map['bypassRules']!.cast<String>());
+    }
+    if (map['directs'] != null) {
+      instance.directs = List<String>.from(map['directs']!.cast<String>());
+    }
+    if (map['proxyRules'] != null) {
+      instance.proxyRules = List<ProxyRule>.from(map['proxyRules']
+          .map((e) => ProxyRule.fromMap(e?.cast<String, dynamic>())!));
+    }
+    if (map['reverseBypassEnabled'] != null) {
+      instance.reverseBypassEnabled = map['reverseBypassEnabled'];
+    }
     return instance;
   }
 

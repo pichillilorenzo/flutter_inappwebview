@@ -22,7 +22,7 @@ extension InternalInAppWebViewKeepAlive on InAppWebViewKeepAlive {
 ///Used internally to save and restore [PlatformInAppWebViewController] properties
 ///for the keep alive feature.
 class InAppWebViewControllerKeepAliveProps {
-  Map<String, JavaScriptHandlerCallback> javaScriptHandlersMap;
+  Map<String, Function> javaScriptHandlersMap;
   Map<UserScriptInjectionTime, List<UserScript>> userScripts;
   Set<String> webMessageListenerObjNames;
   Map<String, ScriptHtmlTagAttributes> injectedScriptsFromURL;

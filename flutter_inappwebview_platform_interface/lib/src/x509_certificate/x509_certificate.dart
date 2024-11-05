@@ -86,7 +86,7 @@ class X509Certificate {
 
       Uint8List? derDataDecoded;
       try {
-        derDataDecoded = Uint8List.fromList(utf8.encode(base64buffer));
+        derDataDecoded = Uint8List.fromList(base64Decode(base64buffer));
       } catch (e) {}
       if (derDataDecoded != null) {
         return derDataDecoded;
@@ -410,8 +410,8 @@ class X509Certificate {
       "extendedKeyUsage": extendedKeyUsage,
       "issuerDistinguishedName": issuerDistinguishedName,
       "keyUsage": keyUsage,
-      "notAfter": notAfter,
-      "notBefore": notBefore,
+      "notAfter": notAfter?.millisecondsSinceEpoch,
+      "notBefore": notBefore?.millisecondsSinceEpoch,
       "serialNumber": serialNumber,
       "sigAlgName": sigAlgName,
       "sigAlgOID": sigAlgOID,

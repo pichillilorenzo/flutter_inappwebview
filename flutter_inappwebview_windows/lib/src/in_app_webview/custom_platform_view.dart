@@ -5,6 +5,7 @@ import 'dart:ui';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import '_static_channel.dart';
 
 const Map<String, SystemMouseCursor> _cursors = {
   'none': SystemMouseCursors.none,
@@ -71,8 +72,7 @@ PointerButton _getButton(int value) {
   }
 }
 
-const String _pluginChannelPrefix = 'com.pichillilorenzo/flutter_inappwebview';
-const MethodChannel _pluginChannel = MethodChannel(_pluginChannelPrefix);
+const MethodChannel _pluginChannel = IN_APP_WEBVIEW_STATIC_CHANNEL;
 
 class CustomFlutterViewControllerValue {
   const CustomFlutterViewControllerValue({

@@ -43,11 +43,13 @@ class ChromeSafariBrowserSecondaryToolbar {
     final instance = ChromeSafariBrowserSecondaryToolbar(
       layout: AndroidResource.fromMap(map['layout']?.cast<String, dynamic>())!,
     );
-    instance.clickableIDs =
-        List<ChromeSafariBrowserSecondaryToolbarClickableID>.from(
-            map['clickableIDs'].map((e) =>
-                ChromeSafariBrowserSecondaryToolbarClickableID.fromMap(
-                    e?.cast<String, dynamic>())!));
+    if (map['clickableIDs'] != null) {
+      instance.clickableIDs =
+          List<ChromeSafariBrowserSecondaryToolbarClickableID>.from(
+              map['clickableIDs'].map((e) =>
+                  ChromeSafariBrowserSecondaryToolbarClickableID.fromMap(
+                      e?.cast<String, dynamic>())!));
+    }
     return instance;
   }
 

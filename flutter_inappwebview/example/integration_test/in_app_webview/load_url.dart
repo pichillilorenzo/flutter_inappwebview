@@ -39,6 +39,7 @@ void loadUrl() {
       ),
     );
     final InAppWebViewController controller = await controllerCompleter.future;
+    await tester.pump();
     expect(await firstUrlLoad.future, initialUrl.toString());
 
     await controller.loadUrl(

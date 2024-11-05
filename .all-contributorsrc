@@ -493,7 +493,8 @@
       "avatar_url": "https://avatars.githubusercontent.com/u/1270149?v=4",
       "profile": "https://uekoetter.dev/",
       "contributions": [
-        "doc"
+        "doc",
+        "code"
       ]
     },
     {
@@ -744,6 +745,78 @@
       "name": "daisukeueta",
       "avatar_url": "https://avatars.githubusercontent.com/u/122339799?v=4",
       "profile": "https://github.com/daisukeueta",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "gmackall",
+      "name": "Gray Mackall",
+      "avatar_url": "https://avatars.githubusercontent.com/u/34871572?v=4",
+      "profile": "https://github.com/gmackall",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "p-mazhnik",
+      "name": "Pavel Mazhnik",
+      "avatar_url": "https://avatars.githubusercontent.com/u/25964451?v=4",
+      "profile": "https://github.com/p-mazhnik",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "nnnlog",
+      "name": "nlog (solrin)",
+      "avatar_url": "https://avatars.githubusercontent.com/u/20399222?v=4",
+      "profile": "https://nlog.dev",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "Murmurl912",
+      "name": "Murmurl912",
+      "avatar_url": "https://avatars.githubusercontent.com/u/36264246?v=4",
+      "profile": "https://github.com/Murmurl912",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "bschulz87",
+      "name": "Benjamin Schulz",
+      "avatar_url": "https://avatars.githubusercontent.com/u/30199362?v=4",
+      "profile": "https://github.com/bschulz87",
+      "contributions": [
+        "ideas"
+      ]
+    },
+    {
+      "login": "ShuheiSuzuki-07",
+      "name": "seal-app",
+      "avatar_url": "https://avatars.githubusercontent.com/u/118415919?v=4",
+      "profile": "https://github.com/ShuheiSuzuki-07",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "takuyaaaaaaahaaaaaa",
+      "name": "Takuya Tominaga",
+      "avatar_url": "https://avatars.githubusercontent.com/u/31458194?v=4",
+      "profile": "https://github.com/takuyaaaaaaahaaaaaa",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "yamaha252",
+      "name": "Sergey",
+      "avatar_url": "https://avatars.githubusercontent.com/u/4444068?v=4",
+      "profile": "https://github.com/yamaha252",
       "contributions": [
         "code"
       ]

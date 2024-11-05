@@ -1,0 +1,93 @@
+name: 📱 App Showcase
+description: Add your App on the Official Showcase plugin website page
+title: "Write your App name here"
+labels:
+  - showcase
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **Request to submit your application to the official [Showcase](https://inappwebview.dev/showcase) plugin website page.**
+
+        **Please fill out the following information:**
+  - type: textarea
+    attributes:
+      label: App Icon
+      description: |
+        Add your App Icon here. You can drag and drop the image directly inside this textarea.
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: What is the reason of using flutter_inappwebview in your app?
+      description: |
+        Explain why you are using the flutter_inappwebview plugin in your app.
+      placeholder: |
+        I'm using the flutter_inappwebview plugin in my app to create a custom Browser, to use WebRTC feature, to display local HTML content, etc.
+    validations:
+      required: true
+  - type: checkboxes
+    attributes:
+      label: Platforms
+      description: |
+        Your App is available on which platforms?
+      options:
+        - label: Mobile
+        - label: Desktop
+        - label: Web
+  - type: input
+    attributes:
+      label: Short Description
+      description: |
+        A short description of your app. Max 250 characters.
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Long Description
+      description: |
+        A long description of your app.
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: App Screenshots
+      description: |
+        Add some screenshots of your app. You can drag and drop images directly inside this textarea. Max 8 images.
+    validations:
+      required: true
+  - type: input
+    attributes:
+      label: App Website URL
+      description: |
+        Your App's official website URL, if available.
+    validations:
+      required: false
+  - type: input
+    attributes:
+      label: App Source Code Repository URL
+      description: |
+        Your App's source code repository URL, if available.
+    validations:
+      required: false
+  - type: input
+    attributes:
+      label: Google Play Store URL
+      description: |
+        Your App's Google Play Store URL, if available.
+    validations:
+      required: false
+  - type: input
+    attributes:
+      label: Apple App Store URL
+      description: |
+        Your App's Apple App Store URL, if available.
+    validations:
+      required: false
+  - type: textarea
+    attributes:
+      label: Additional information
+      description: Anything else you'd like to include?
+    validations:
+      required: false

@@ -67,6 +67,6 @@ public class FlutterWebViewFactory: NSObject, FlutterPlatformViewFactory {
             flutterWebView?.makeInitialLoad(params: arguments!)
         }
         
-        return flutterWebView!.view()
+        return flutterWebView!
     }
 }

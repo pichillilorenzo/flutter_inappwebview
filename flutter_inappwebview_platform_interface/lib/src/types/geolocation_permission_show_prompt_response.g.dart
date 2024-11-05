@@ -30,7 +30,9 @@ class GeolocationPermissionShowPromptResponse {
       allow: map['allow'],
       origin: map['origin'],
     );
-    instance.retain = map['retain'];
+    if (map['retain'] != null) {
+      instance.retain = map['retain'];
+    }
     return instance;
   }
 

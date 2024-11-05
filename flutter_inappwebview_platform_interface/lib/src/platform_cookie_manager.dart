@@ -302,4 +302,16 @@ abstract class PlatformCookieManager extends PlatformInterface {
     throw UnimplementedError(
         'removeSessionCookies is not implemented on the current platform');
   }
+
+  ///{@template flutter_inappwebview_platform_interface.PlatformCookieManager.flush}
+  ///Ensures all cookies currently accessible through the getCookie API are written to persistent storage.
+  ///This call will block the caller until it is done and may perform I/O.
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Android native WebView ([Official API - CookieManager.flush](https://developer.android.com/reference/android/webkit/CookieManager#flush()))
+  ///{@endtemplate}
+  Future<void> flush() {
+    throw UnimplementedError(
+        'flush is not implemented on the current platform');
+  }
 }

@@ -1,9 +1,11 @@
 name: flutter_inappwebview
 description: A Flutter plugin that allows you to add an inline webview, to use an headless webview, and to open an in-app browser window.
-version: 6.0.0
+version: 6.2.0-beta.1
 homepage: https://inappwebview.dev/
 repository: https://github.com/pichillilorenzo/flutter_inappwebview
 issue_tracker: https://github.com/pichillilorenzo/flutter_inappwebview/issues
+funding:
+  - https://inappwebview.dev/donate/
 topics:
   - html
   - webview
@@ -12,25 +14,32 @@ topics:
   - browser
 
 environment:
-  sdk: ">=2.17.0 <4.0.0"
-  flutter: ">=3.0.0"
+  sdk: ^3.5.0
+  flutter: ">=3.24.0"
 
 dependencies:
   flutter:
     sdk: flutter
-  flutter_inappwebview_platform_interface: ^1.0.10
-  flutter_inappwebview_android: ^1.0.12
-  flutter_inappwebview_ios: ^1.0.13
-  flutter_inappwebview_macos: ^1.0.11
-  flutter_inappwebview_web: ^1.0.8
+  flutter_inappwebview_platform_interface: #^1.4.0-beta.1
+    path: ../flutter_inappwebview_platform_interface
+  flutter_inappwebview_android: #^1.2.0-beta.1
+    path: ../flutter_inappwebview_android
+  flutter_inappwebview_ios: #^1.2.0-beta.1
+    path: ../flutter_inappwebview_ios
+  flutter_inappwebview_macos: #^1.2.0-beta.1
+    path: ../flutter_inappwebview_macos
+  flutter_inappwebview_web: #^1.2.0-beta.1
+    path: ../flutter_inappwebview_web
+  flutter_inappwebview_windows: #^0.7.0-beta.1
+    path: ../flutter_inappwebview_windows
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_driver:
     sdk: flutter
-  flutter_lints: ^2.0.1
-  build_runner: ^2.4.0
+  flutter_lints: ^4.0.0
+  build_runner: ^2.4.12
   generators:
     path: ../dev_packages/generators
 
@@ -49,6 +58,8 @@ flutter:
         default_package: flutter_inappwebview_macos
       web:
         default_package: flutter_inappwebview_web
+      windows:
+        default_package: flutter_inappwebview_windows
 
   assets:
     - packages/flutter_inappwebview/assets/t_rex_runner/t-rex.html

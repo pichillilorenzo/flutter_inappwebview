@@ -7,10 +7,10 @@ namespace flutter_inappwebview_plugin
   {}
 
   Rect::Rect(const flutter::EncodableMap& map)
-    : x(get_fl_map_value<double>(map, "x")),
-    y(get_fl_map_value<double>(map, "y")),
-    width(get_fl_map_value<double>(map, "width")),
-    height(get_fl_map_value<double>(map, "height"))
+    : Rect(get_fl_map_value<double>(map, "x"),
+      get_fl_map_value<double>(map, "y"),
+      get_fl_map_value<double>(map, "width"),
+      get_fl_map_value<double>(map, "height"))
   {}
 
   flutter::EncodableMap Rect::toEncodableMap() const

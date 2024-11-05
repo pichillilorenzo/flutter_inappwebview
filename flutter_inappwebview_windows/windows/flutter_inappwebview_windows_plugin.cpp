@@ -11,6 +11,8 @@
 #pragma comment(lib, "Shlwapi.lib")
 #pragma comment(lib, "dxgi.lib")
 #pragma comment(lib, "d3d11.lib")
+#pragma comment(lib, "rpcrt4.lib")  // UuidCreate - Minimum supported OS Win 2000
+#pragma comment(lib, "WindowsApp.lib")
 
 namespace flutter_inappwebview_plugin
 {
@@ -33,5 +35,11 @@ namespace flutter_inappwebview_plugin
   }
 
   FlutterInappwebviewWindowsPlugin::~FlutterInappwebviewWindowsPlugin()
-  {}
+  {
+    webViewEnvironmentManager = nullptr;
+    inAppWebViewManager = nullptr;
+    inAppBrowserManager = nullptr;
+    headlessInAppWebViewManager = nullptr;
+    cookieManager = nullptr;
+  }
 }

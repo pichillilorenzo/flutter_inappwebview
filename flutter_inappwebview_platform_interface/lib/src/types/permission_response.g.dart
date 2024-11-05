@@ -13,7 +13,7 @@ class PermissionResponse {
 
   ///Resources granted to be accessed by origin.
   ///
-  ///**NOTE for iOS**: not used. The [action] taken is based on the [PermissionRequest.resources].
+  ///**NOTE for iOS, macOS and Windows**: not used. The [action] taken is based on the [PermissionRequest.resources].
   List<PermissionResourceType> resources;
   PermissionResponse(
       {this.action = PermissionResponseAction.DENY, this.resources = const []});
@@ -25,8 +25,10 @@ class PermissionResponse {
     }
     final instance = PermissionResponse();
     instance.action = PermissionResponseAction.fromNativeValue(map['action']);
-    instance.resources = List<PermissionResourceType>.from(map['resources']
-        .map((e) => PermissionResourceType.fromNativeValue(e)!));
+    if (map['resources'] != null) {
+      instance.resources = List<PermissionResourceType>.from(map['resources']
+          .map((e) => PermissionResourceType.fromNativeValue(e)!));
+    }
     return instance;
   }
 
@@ -70,7 +72,9 @@ class PermissionRequestResponse {
     final instance = PermissionRequestResponse();
     instance.action =
         PermissionRequestResponseAction.fromNativeValue(map['action']);
-    instance.resources = List<String>.from(map['resources']!.cast<String>());
+    if (map['resources'] != null) {
+      instance.resources = List<String>.from(map['resources']!.cast<String>());
+    }
     return instance;
   }
 

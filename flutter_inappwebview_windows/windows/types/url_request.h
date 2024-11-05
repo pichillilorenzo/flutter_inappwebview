@@ -4,8 +4,6 @@
 #include <flutter/standard_method_codec.h>
 #include <optional>
 
-#include "../utils/flutter.h"
-
 namespace flutter_inappwebview_plugin
 {
   class URLRequest

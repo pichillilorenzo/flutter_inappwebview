@@ -6,6 +6,7 @@
 #include <vector>
 
 #include "../plugin_scripts_js/javascript_bridge_js.h"
+#include "../plugin_scripts_js/javascript_bridge_js.h"
 #include "../plugin_scripts_js/plugin_scripts_util.h"
 #include "../types/content_world.h"
 #include "../types/plugin_script.h"
@@ -14,13 +15,6 @@
 namespace flutter_inappwebview_plugin
 {
   class InAppWebView;
-
-  const std::string USER_SCRIPTS_AT_DOCUMENT_END_WRAPPER_JS_SOURCE = "window.addEventListener('load', () => { \
-    if (window." + JAVASCRIPT_BRIDGE_NAME + " != null && (window." + JAVASCRIPT_BRIDGE_NAME + "._userScript" + VAR_PLACEHOLDER_MEMORY_ADDRESS_VALUE + "AtDocumentEndLoaded == null || !window." + JAVASCRIPT_BRIDGE_NAME + "._userScript" + VAR_PLACEHOLDER_MEMORY_ADDRESS_VALUE + "AtDocumentEndLoaded)) { \
-      window." + JAVASCRIPT_BRIDGE_NAME + "._userScript" + VAR_PLACEHOLDER_MEMORY_ADDRESS_VALUE + "AtDocumentEndLoaded = true; \
-      " + VAR_PLACEHOLDER_VALUE + " \
-    } \
-  });";
 
   class UserContentController
   {
@@ -51,6 +45,7 @@ namespace flutter_inappwebview_plugin
 
     void registerEventHandlers();
     void createContentWorld(const std::shared_ptr<ContentWorld> contentWorld, const std::function<void(int)> completionHandler);
+
   private:
     InAppWebView* webView_;
 
@@ -73,6 +68,8 @@ namespace flutter_inappwebview_plugin
     void removeScriptFromWebView(std::shared_ptr<UserScript> userScript, const std::function<void()> completionHandler) const;
 
     void addPluginScriptsIfRequired(const std::shared_ptr<ContentWorld> contentWorld);
+
+    static std::string wrapSourceCodeAddChecks(const std::string& source, const std::shared_ptr<UserScript> userScript);
   };
 }
 #endif //FLUTTER_INAPPWEBVIEW_PLUGIN_USER_CONTENT_CONTROLLER_H_

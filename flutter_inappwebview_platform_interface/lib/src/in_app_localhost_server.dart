@@ -38,6 +38,7 @@ class DefaultInAppLocalhostServer extends PlatformInAppLocalhostServer {
   bool _shared = false;
   String _directoryIndex = 'index.html';
   String _documentRoot = './';
+  Future<bool> Function(HttpRequest)? _customOnData;
 
   /// Creates a new [DefaultInAppLocalhostServer].
   DefaultInAppLocalhostServer(PlatformInAppLocalhostServerCreationParams params)
@@ -53,6 +54,7 @@ class DefaultInAppLocalhostServer extends PlatformInAppLocalhostServer {
         ? params.documentRoot
         : '${params.documentRoot}/';
     this._shared = params.shared;
+    this._customOnData = params.onData;
   }
 
   @override
@@ -68,6 +70,9 @@ class DefaultInAppLocalhostServer extends PlatformInAppLocalhostServer {
   bool get shared => _shared;
 
   @override
+  Future<bool> Function(HttpRequest request)? get onData => _customOnData;
+
+  @override
   Future<void> start() async {
     if (this._started) {
       throw Exception('Server already started on http://localhost:$_port');
@@ -78,11 +83,19 @@ class DefaultInAppLocalhostServer extends PlatformInAppLocalhostServer {
 
     runZonedGuarded(() {
       HttpServer.bind('127.0.0.1', _port, shared: _shared).then((server) {
-        print('Server running on http://localhost:' + _port.toString());
+        if (kDebugMode) {
+          print('Server running on http://localhost:' + _port.toString());
+        }
 
         this._server = server;
 
         server.listen((HttpRequest request) async {
+          if (await _customOnData?.call(request) ?? false) {
+            // if _customOnData returns true,
+            // it means that the request has been handled
+            return;
+          }
+
           Uint8List body = Uint8List(0);
 
           var path = request.requestedUri.path;
@@ -99,8 +112,10 @@ class DefaultInAppLocalhostServer extends PlatformInAppLocalhostServer {
                 .buffer
                 .asUint8List();
           } catch (e) {
-            print(Uri.decodeFull(path));
-            print(e.toString());
+            if (kDebugMode) {
+              print(Uri.decodeFull(path));
+              print(e.toString());
+            }
             request.response.close();
             return;
           }
@@ -115,13 +130,18 @@ class DefaultInAppLocalhostServer extends PlatformInAppLocalhostServer {
           }
 
           request.response.headers.contentType = contentType;
+          print(request.response.headers);
           request.response.add(body);
           request.response.close();
         });
 
         completer.complete();
       });
-    }, (e, stackTrace) => print('Error: $e $stackTrace'));
+    }, (e, stackTrace) {
+      if (kDebugMode) {
+        print('Error: $e $stackTrace');
+      }
+    });
 
     return completer.future;
   }
@@ -132,7 +152,9 @@ class DefaultInAppLocalhostServer extends PlatformInAppLocalhostServer {
       return;
     }
     await this._server!.close(force: true);
-    print('Server running on http://localhost:$_port closed');
+    if (kDebugMode) {
+      print('Server running on http://localhost:$_port closed');
+    }
     this._started = false;
     this._server = null;
   }

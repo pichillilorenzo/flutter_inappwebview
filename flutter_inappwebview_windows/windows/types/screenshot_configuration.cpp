@@ -39,9 +39,9 @@ namespace flutter_inappwebview_plugin
   {}
 
   ScreenshotConfiguration::ScreenshotConfiguration(const flutter::EncodableMap& map)
-    : compressFormat(CompressFormatFromString(get_fl_map_value<std::string>(map, "compressFormat"))),
-    quality(get_fl_map_value<int>(map, "quality")),
-    rect(fl_map_contains_not_null(map, "rect") ? std::make_shared<Rect>(get_fl_map_value<flutter::EncodableMap>(map, "rect")) : std::optional<std::shared_ptr<Rect>>{})
+    : ScreenshotConfiguration(CompressFormatFromString(get_fl_map_value<std::string>(map, "compressFormat")),
+      get_fl_map_value<int>(map, "quality"),
+      fl_map_contains_not_null(map, "rect") ? std::make_shared<Rect>(get_fl_map_value<flutter::EncodableMap>(map, "rect")) : std::optional<std::shared_ptr<Rect>>{})
   {}
 
   ScreenshotConfiguration::~ScreenshotConfiguration() {}

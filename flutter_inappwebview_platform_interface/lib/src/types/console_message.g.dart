@@ -25,9 +25,13 @@ class ConsoleMessage {
       return null;
     }
     final instance = ConsoleMessage();
-    instance.message = map['message'];
-    instance.messageLevel =
-        ConsoleMessageLevel.fromNativeValue(map['messageLevel'])!;
+    if (map['message'] != null) {
+      instance.message = map['message'];
+    }
+    if (map['messageLevel'] != null) {
+      instance.messageLevel =
+          ConsoleMessageLevel.fromNativeValue(map['messageLevel'])!;
+    }
     return instance;
   }
 

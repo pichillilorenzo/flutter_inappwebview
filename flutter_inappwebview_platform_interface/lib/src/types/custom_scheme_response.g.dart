@@ -29,9 +29,11 @@ class CustomSchemeResponse {
     }
     final instance = CustomSchemeResponse(
       contentType: map['contentType'],
-      data: map['data'],
+      data: Uint8List.fromList(map['data'].cast<int>()),
     );
-    instance.contentEncoding = map['contentEncoding'];
+    if (map['contentEncoding'] != null) {
+      instance.contentEncoding = map['contentEncoding'];
+    }
     return instance;
   }
 

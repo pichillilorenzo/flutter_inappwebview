@@ -19,7 +19,7 @@ public class ChromeSafariBrowserManager: ChannelDelegate {
     var prewarmingTokens: [String: Any?] = [:]
     
     init(plugin: SwiftFlutterPlugin) {
-        super.init(channel: FlutterMethodChannel(name: ChromeSafariBrowserManager.METHOD_CHANNEL_NAME, binaryMessenger: plugin.registrar!.messenger()))
+        super.init(channel: FlutterMethodChannel(name: ChromeSafariBrowserManager.METHOD_CHANNEL_NAME, binaryMessenger: plugin.registrar.messenger()))
         self.plugin = plugin
     }
     

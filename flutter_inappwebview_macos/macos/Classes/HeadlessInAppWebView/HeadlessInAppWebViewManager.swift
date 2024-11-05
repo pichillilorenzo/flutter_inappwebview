@@ -19,7 +19,7 @@ public class HeadlessInAppWebViewManager: ChannelDelegate {
     var webViews: [String: HeadlessInAppWebView?] = [:]
     
     init(plugin: InAppWebViewFlutterPlugin) {
-        super.init(channel: FlutterMethodChannel(name: HeadlessInAppWebViewManager.METHOD_CHANNEL_NAME, binaryMessenger: plugin.registrar!.messenger))
+        super.init(channel: FlutterMethodChannel(name: HeadlessInAppWebViewManager.METHOD_CHANNEL_NAME, binaryMessenger: plugin.registrar.messenger))
         self.plugin = plugin
     }
     

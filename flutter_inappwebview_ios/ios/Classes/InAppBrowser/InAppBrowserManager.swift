@@ -21,7 +21,7 @@ public class InAppBrowserManager: ChannelDelegate {
     var navControllers: [String: InAppBrowserNavigationController?] = [:]
     
     init(plugin: SwiftFlutterPlugin) {
-        super.init(channel: FlutterMethodChannel(name: InAppBrowserManager.METHOD_CHANNEL_NAME, binaryMessenger: plugin.registrar!.messenger()))
+        super.init(channel: FlutterMethodChannel(name: InAppBrowserManager.METHOD_CHANNEL_NAME, binaryMessenger: plugin.registrar.messenger()))
         self.plugin = plugin
     }
     

@@ -13,7 +13,7 @@ public class PlatformUtil: ChannelDelegate {
     var plugin: InAppWebViewFlutterPlugin?
     
     init(plugin: InAppWebViewFlutterPlugin) {
-        super.init(channel: FlutterMethodChannel(name: PlatformUtil.METHOD_CHANNEL_NAME, binaryMessenger: plugin.registrar!.messenger))
+        super.init(channel: FlutterMethodChannel(name: PlatformUtil.METHOD_CHANNEL_NAME, binaryMessenger: plugin.registrar.messenger))
         self.plugin = plugin
     }
     

@@ -37,7 +37,7 @@ public class WebAuthenticationSession: NSObject, ASWebAuthenticationPresentation
             self.session = SFAuthenticationSession(url: self.url, callbackURLScheme: self.callbackURLScheme, completionHandler: self.completionHandler)
         }
         let channel = FlutterMethodChannel(name: WebAuthenticationSession.METHOD_CHANNEL_NAME_PREFIX + id,
-                                           binaryMessenger: plugin.registrar!.messenger())
+                                           binaryMessenger: plugin.registrar.messenger())
         self.channelDelegate = WebAuthenticationSessionChannelDelegate(webAuthenticationSession: self, channel: channel)
     }
     

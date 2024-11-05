@@ -36,11 +36,9 @@ public class PrintJobController: NSObject, Disposable {
         super.init()
         self.job = job
         self.settings = settings
-        if let registrar = plugin.registrar {
-            let channel = FlutterMethodChannel(name: PrintJobController.METHOD_CHANNEL_NAME_PREFIX + id,
-                                               binaryMessenger: registrar.messenger)
-            self.channelDelegate = PrintJobChannelDelegate(printJobController: self, channel: channel)
-        }
+        let channel = FlutterMethodChannel(name: PrintJobController.METHOD_CHANNEL_NAME_PREFIX + id,
+                                           binaryMessenger: plugin.registrar.messenger)
+        self.channelDelegate = PrintJobChannelDelegate(printJobController: self, channel: channel)
     }
     
     public func present(parentWindow: NSWindow? = nil, completionHandler: PrintJobController.CompletionHandler? = nil) {

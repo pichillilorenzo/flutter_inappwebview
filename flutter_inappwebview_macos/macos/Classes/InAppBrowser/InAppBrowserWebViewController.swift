@@ -33,11 +33,11 @@ public class InAppBrowserWebViewController: NSViewController, InAppBrowserDelega
     var isHidden = false
 
     public override func loadView() {
-        guard let plugin = plugin, let registrar = plugin.registrar else {
+        guard let plugin = plugin else {
             return
         }
         
-        let channel = FlutterMethodChannel(name: InAppBrowserWebViewController.METHOD_CHANNEL_NAME_PREFIX + id, binaryMessenger: registrar.messenger)
+        let channel = FlutterMethodChannel(name: InAppBrowserWebViewController.METHOD_CHANNEL_NAME_PREFIX + id, binaryMessenger: plugin.registrar.messenger)
         channelDelegate = InAppBrowserChannelDelegate(channel: channel)
         
         var userScripts: [UserScript] = []

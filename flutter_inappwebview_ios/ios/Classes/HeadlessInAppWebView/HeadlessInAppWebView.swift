@@ -20,7 +20,7 @@ public class HeadlessInAppWebView: Disposable {
         self.flutterWebView = flutterWebView
         self.plugin = plugin
         let channel = FlutterMethodChannel(name: HeadlessInAppWebView.METHOD_CHANNEL_NAME_PREFIX + id,
-                                           binaryMessenger: plugin.registrar!.messenger())
+                                           binaryMessenger: plugin.registrar.messenger())
         self.channelDelegate = HeadlessWebViewChannelDelegate(headlessWebView: self, channel: channel)
     }
     

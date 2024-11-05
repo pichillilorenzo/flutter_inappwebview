@@ -14,7 +14,7 @@ public class CredentialDatabase: ChannelDelegate {
     private var plugin: SwiftFlutterPlugin?
 
     init(plugin: SwiftFlutterPlugin) {
-        super.init(channel: FlutterMethodChannel(name: CredentialDatabase.METHOD_CHANNEL_NAME, binaryMessenger: plugin.registrar!.messenger()))
+        super.init(channel: FlutterMethodChannel(name: CredentialDatabase.METHOD_CHANNEL_NAME, binaryMessenger: plugin.registrar.messenger()))
         self.plugin = plugin
     }
 

@@ -19,7 +19,7 @@ public class InAppWebViewManager: ChannelDelegate {
     var windowAutoincrementId: Int64 = 0
     
     init(plugin: SwiftFlutterPlugin) {
-        super.init(channel: FlutterMethodChannel(name: InAppWebViewManager.METHOD_CHANNEL_NAME, binaryMessenger: plugin.registrar!.messenger()))
+        super.init(channel: FlutterMethodChannel(name: InAppWebViewManager.METHOD_CHANNEL_NAME, binaryMessenger: plugin.registrar.messenger()))
         self.plugin = plugin
     }
     

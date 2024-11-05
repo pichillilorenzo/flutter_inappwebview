@@ -26,7 +26,7 @@ public class SafariViewController: SFSafariViewController, SFSafariViewControlle
         SafariViewController.prepareConfig(configuration: configuration, safariSettings: safariSettings)
         super.init(url: url, configuration: configuration)
         let channel = FlutterMethodChannel(name: SafariViewController.METHOD_CHANNEL_NAME_PREFIX + id,
-                                           binaryMessenger: plugin.registrar!.messenger())
+                                           binaryMessenger: plugin.registrar.messenger())
         self.channelDelegate = SafariViewControllerChannelDelegate(safariViewController: self, channel: channel)
         self.delegate = self
     }
@@ -38,7 +38,7 @@ public class SafariViewController: SFSafariViewController, SFSafariViewControlle
         self.safariSettings = safariSettings
         super.init(url: url, entersReaderIfAvailable: entersReaderIfAvailable)
         let channel = FlutterMethodChannel(name: SafariViewController.METHOD_CHANNEL_NAME_PREFIX + id,
-                                           binaryMessenger: plugin.registrar!.messenger())
+                                           binaryMessenger: plugin.registrar.messenger())
         self.channelDelegate = SafariViewControllerChannelDelegate(safariViewController: self, channel: channel)
         self.delegate = self
     }

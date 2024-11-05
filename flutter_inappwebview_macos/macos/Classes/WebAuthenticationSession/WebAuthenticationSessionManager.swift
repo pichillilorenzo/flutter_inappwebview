@@ -18,7 +18,7 @@ public class WebAuthenticationSessionManager: ChannelDelegate {
     var sessions: [String: WebAuthenticationSession?] = [:]
     
     init(plugin: InAppWebViewFlutterPlugin) {
-        super.init(channel: FlutterMethodChannel(name: WebAuthenticationSessionManager.METHOD_CHANNEL_NAME, binaryMessenger: plugin.registrar!.messenger))
+        super.init(channel: FlutterMethodChannel(name: WebAuthenticationSessionManager.METHOD_CHANNEL_NAME, binaryMessenger: plugin.registrar.messenger))
         self.plugin = plugin
     }
     

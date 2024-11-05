@@ -822,10 +822,18 @@ because there isn't any way to make the website data store non-persistent for th
   ])
   bool? supportMultipleWindows;
 
-  ///Regular expression used by [PlatformWebViewCreationParams.shouldOverrideUrlLoading] event to cancel navigation requests for frames that are not the main frame.
-  ///If the url request of a subframe matches the regular expression, then the request of that subframe is canceled.
+  ///Regular expression used on native side by the [PlatformWebViewCreationParams.shouldOverrideUrlLoading]
+  ///event to cancel navigation requests for frames that are not the main frame.
+  ///If the url request of a sub-frame matches the regular expression, then the request of that sub-frame is canceled.
   @SupportedPlatforms(platforms: [AndroidPlatform()])
   String? regexToCancelSubFramesLoading;
+
+  ///Regular expression used on native side by the [PlatformWebViewCreationParams.shouldOverrideUrlLoading]
+  ///event to allow navigation requests synchronously.
+  ///If the url request match the regular expression, then the request is allowed automatically,
+  ///and the [PlatformWebViewCreationParams.shouldOverrideUrlLoading] event will not be fired.
+  @SupportedPlatforms(platforms: [AndroidPlatform()])
+  String? regexToAllowSyncUrlLoading;
 
   ///Set to `false` to disable Flutter Hybrid Composition. The default value is `true`.
   ///Hybrid Composition is supported starting with Flutter v1.20+.
@@ -1896,6 +1904,7 @@ as it can cause framerate drops on animations in Android 9 and lower (see [Hybri
     this.initialScale = 0,
     this.supportMultipleWindows = false,
     this.regexToCancelSubFramesLoading,
+    this.regexToAllowSyncUrlLoading,
     this.useHybridComposition = true,
     this.useShouldInterceptRequest,
     this.useOnRenderProcessGone,

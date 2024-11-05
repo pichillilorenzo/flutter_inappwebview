@@ -141,7 +141,6 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
   private boolean inFullscreen = false;
   public float zoomScale = 1.0f;
   public ContentBlockerHandler contentBlockerHandler = new ContentBlockerHandler();
-  public Pattern regexToCancelSubFramesLoadingCompiled;
   @Nullable
   public GestureDetector gestureDetector = null;
   @Nullable
@@ -413,9 +412,6 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
         setLayerType(View.LAYER_TYPE_HARDWARE, null);
       else
         setLayerType(View.LAYER_TYPE_NONE, null);
-    }
-    if (customSettings.regexToCancelSubFramesLoading != null) {
-      regexToCancelSubFramesLoadingCompiled = Pattern.compile(customSettings.regexToCancelSubFramesLoading);
     }
     setScrollBarStyle(customSettings.scrollBarStyle);
     if (customSettings.scrollBarDefaultDelayBeforeFade != null) {
@@ -1082,14 +1078,6 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
       }
     }
 
-    if (newSettingsMap.get("regexToCancelSubFramesLoading") != null && (customSettings.regexToCancelSubFramesLoading == null ||
-            !customSettings.regexToCancelSubFramesLoading.equals(newCustomSettings.regexToCancelSubFramesLoading))) {
-      if (newCustomSettings.regexToCancelSubFramesLoading == null)
-        regexToCancelSubFramesLoadingCompiled = null;
-      else
-        regexToCancelSubFramesLoadingCompiled = Pattern.compile(customSettings.regexToCancelSubFramesLoading);
-    }
-
     if (newCustomSettings.contentBlockers != null) {
       contentBlockerHandler.getRuleList().clear();
       for (Map<String, Map<String, Object>> contentBlocker : newCustomSettings.contentBlockers) {
@@ -1225,22 +1213,14 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
       @Override
       public void run() {
         String scriptToInject = userContentController.generateCodeForScriptEvaluation(finalScriptToInject, contentWorld);
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {
-          // This action will have the side-effect of blurring the currently focused element
-          loadUrl("javascript:" + scriptToInject.replaceAll("[\r\n]+", ""));
-          if (contentWorld != null && resultCallback != null) {
-            resultCallback.onReceiveValue("");
+        evaluateJavascript(scriptToInject, new ValueCallback<String>() {
+          @Override
+          public void onReceiveValue(String s) {
+            if (resultUuid != null || resultCallback == null)
+              return;
+            resultCallback.onReceiveValue(s);
           }
-        } else {
-          evaluateJavascript(scriptToInject, new ValueCallback<String>() {
-            @Override
-            public void onReceiveValue(String s) {
-              if (resultUuid != null || resultCallback == null)
-                return;
-              resultCallback.onReceiveValue(s);
-            }
-          });
-        }
+        });
       }
     });
   }

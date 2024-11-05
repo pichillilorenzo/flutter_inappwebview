@@ -2396,7 +2396,7 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///**NOTE for Android**: available only on Android 21+.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Android native WebView ([Official API - WebView.getUrl](https://developer.android.com/reference/android/webkit/WebView#enableSlowWholeDocumentDraw()))
+  ///- Android native WebView ([Official API - WebView.enableSlowWholeDocumentDraw](https://developer.android.com/reference/android/webkit/WebView#enableSlowWholeDocumentDraw()))
   ///{@endtemplate}
   Future<void> enableSlowWholeDocumentDraw() {
     throw UnimplementedError(

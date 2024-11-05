@@ -9,16 +9,19 @@ part of 'user_script.dart';
 ///Class that represents a script that the `WebView` injects into the web page.
 class UserScript {
   ///A set of matching rules for the allowed origins.
+  ///Adding `'*'` as an allowed origin or setting this to `null`, it means it will allow every origin.
+  ///Instead, an empty [Set] will block every origin.
   ///
   ///**NOTE for Android**: each origin pattern MUST follow the table rule of [PlatformInAppWebViewController.addWebMessageListener].
   ///
-  ///**NOTE for iOS and macOS**: each origin pattern will be used as a
+  ///**NOTE for iOS, macOS, Windows**: each origin pattern will be used as a
   ///Regular Expression Pattern that will be used on JavaScript side using [RegExp](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp).
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
   ///- MacOS
+  ///- Windows
   late Set<String> allowedOriginRules;
 
   ///A scope of execution in which to evaluate the script to prevent conflicts between different scripts.
@@ -30,13 +33,14 @@ class UserScript {
   late ContentWorld contentWorld;
 
   ///A Boolean value that indicates whether to inject the script into the main frame.
-  ///Specify true to inject the script only into the main frame, or false to inject it into all frames.
+  ///Specify `true` to inject the script only into the main frame, or false to inject it into all frames.
   ///The default value is `true`.
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
   ///- MacOS
+  ///- Windows
   bool forMainFrameOnly;
 
   ///The script’s group name.

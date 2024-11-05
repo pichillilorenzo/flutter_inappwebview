@@ -874,10 +874,10 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
             if !newOptions.enableViewportScale {
                 if configuration.userContentController.userScripts.contains(ENABLE_VIEWPORT_SCALE_JS_PLUGIN_SCRIPT) {
                     configuration.userContentController.removePluginScript(ENABLE_VIEWPORT_SCALE_JS_PLUGIN_SCRIPT)
-                    evaluateJavaScript(NOT_ENABLE_VIEWPORT_SCALE_JS_SOURCE)
+                    // evaluateJavaScript(NOT_ENABLE_VIEWPORT_SCALE_JS_SOURCE)
                 }
             } else {
-                evaluateJavaScript(ENABLE_VIEWPORT_SCALE_JS_SOURCE)
+                // evaluateJavaScript(ENABLE_VIEWPORT_SCALE_JS_SOURCE)
                 configuration.userContentController.addUserScript(ENABLE_VIEWPORT_SCALE_JS_PLUGIN_SCRIPT)
             }
         }
@@ -886,10 +886,10 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
             if newOptions.supportZoom {
                 if configuration.userContentController.userScripts.contains(NOT_SUPPORT_ZOOM_JS_PLUGIN_SCRIPT) {
                     configuration.userContentController.removePluginScript(NOT_SUPPORT_ZOOM_JS_PLUGIN_SCRIPT)
-                    evaluateJavaScript(SUPPORT_ZOOM_JS_SOURCE)
+                    // evaluateJavaScript(SUPPORT_ZOOM_JS_SOURCE)
                 }
             } else {
-                evaluateJavaScript(NOT_SUPPORT_ZOOM_JS_SOURCE)
+                // evaluateJavaScript(NOT_SUPPORT_ZOOM_JS_SOURCE)
                 configuration.userContentController.addUserScript(NOT_SUPPORT_ZOOM_JS_PLUGIN_SCRIPT)
             }
         }
@@ -1119,7 +1119,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
                         self.evaluateJavaScript(enableSource, frame: nil, contentWorld: contentWorld, completionHandler: nil)
                     }
                 } else {
-                    self.evaluateJavaScript(enableSource, completionHandler: nil)
+                    // self.evaluateJavaScript(enableSource, completionHandler: nil)
                 }
                 if !enable {
                     self.configuration.userContentController.removePluginScripts(with: pluginScript.groupName!)
@@ -1619,7 +1619,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         initializeWindowIdJS()
         
         InAppWebView.credentialsProposed = []
-        evaluateJavaScript(PLATFORM_READY_JS_SOURCE, completionHandler: nil)
+        // evaluateJavaScript(PLATFORM_READY_JS_SOURCE, completionHandler: nil)
         
         // sometimes scrollView.contentSize doesn't fit all the frame.size available
         // so, we call setNeedsLayout to redraw the layout
@@ -2616,12 +2616,12 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
                     json = r as! String
                 }
                 
-                self.evaluateJavaScript("""
-if(window.\(JAVASCRIPT_BRIDGE_NAME)[\(_callHandlerID)] != null) {
-    window.\(JAVASCRIPT_BRIDGE_NAME)[\(_callHandlerID)](\(json));
-    delete window.\(JAVASCRIPT_BRIDGE_NAME)[\(_callHandlerID)];
-}
-""", completionHandler: nil)
+//                 self.evaluateJavaScript("""
+// if(window.\(JAVASCRIPT_BRIDGE_NAME)[\(_callHandlerID)] != null) {
+//     window.\(JAVASCRIPT_BRIDGE_NAME)[\(_callHandlerID)](\(json));
+//     delete window.\(JAVASCRIPT_BRIDGE_NAME)[\(_callHandlerID)];
+// }
+// """, completionHandler: nil)
             }
         })
     }
@@ -2831,7 +2831,7 @@ if(window.\(JAVASCRIPT_BRIDGE_NAME)[\(_callHandlerID)] != null) {
         if !isPausedTimers {
             isPausedTimers = true
             let script = "alert();";
-            self.evaluateJavaScript(script, completionHandler: nil)
+            // self.evaluateJavaScript(script, completionHandler: nil)
         }
     }
     

@@ -106,8 +106,10 @@ public class InAppWebViewSettings implements ISettings<InAppWebViewInterface> {
   public Boolean thirdPartyCookiesEnabled = true;
   public Boolean hardwareAcceleration = true;
   public Boolean supportMultipleWindows = false;
-  public String regexToCancelSubFramesLoading;
-  public String regexToCancelOverrideUrlLoading;
+  @Nullable
+  public Pattern regexToCancelSubFramesLoading = null;
+  @Nullable
+  public Pattern regexToAllowSyncUrlLoading = null;
   public Integer overScrollMode = View.OVER_SCROLL_IF_CONTENT_SCROLLS;
   @Nullable
   public Boolean networkAvailable = null;
@@ -362,10 +364,10 @@ public class InAppWebViewSettings implements ISettings<InAppWebViewInterface> {
           supportMultipleWindows = (Boolean) value;
           break;
         case "regexToCancelSubFramesLoading":
-          regexToCancelSubFramesLoading = (String) value;
+          regexToCancelSubFramesLoading = Pattern.compile((String) value);
           break;
-        case "regexToCancelOverrideUrlLoading":
-          regexToCancelOverrideUrlLoading = (String) value;
+        case "regexToAllowSyncUrlLoading":
+          regexToAllowSyncUrlLoading = Pattern.compile((String) value);
           break;
         case "overScrollMode":
           overScrollMode = (Integer) value;
@@ -533,8 +535,8 @@ public class InAppWebViewSettings implements ISettings<InAppWebViewInterface> {
     settings.put("thirdPartyCookiesEnabled", thirdPartyCookiesEnabled);
     settings.put("hardwareAcceleration", hardwareAcceleration);
     settings.put("supportMultipleWindows", supportMultipleWindows);
-    settings.put("regexToCancelSubFramesLoading", regexToCancelSubFramesLoading);
-    settings.put("regexToCancelOverrideUrlLoading", regexToCancelOverrideUrlLoading);
+    settings.put("regexToCancelSubFramesLoading", regexToCancelSubFramesLoading != null ? regexToCancelSubFramesLoading.pattern() : null);
+    settings.put("regexToAllowSyncUrlLoading", regexToAllowSyncUrlLoading != null ? regexToAllowSyncUrlLoading.pattern() : null);
     settings.put("overScrollMode", overScrollMode);
     settings.put("networkAvailable", networkAvailable);
     settings.put("scrollBarStyle", scrollBarStyle);

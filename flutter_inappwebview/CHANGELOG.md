@@ -18,6 +18,7 @@ Implemented security features to better manage access to the native javascript b
 - Added `setJavaScriptBridgeName`, `getJavaScriptBridgeName` static WebView controller methods
 - Added `requestFocus` WebView method
 - Added `onProcessFailed` WebView event
+- Added `regexToAllowSyncUrlLoading` Android-specific property to `InAppWebViewSettings`
 - Added `JavaScriptHandlerFunctionData` type
 - Deprecated `JavaScriptHandlerCallback` type in favor of `JavaScriptHandlerFunction` type
 - Deprecated `InAppWebViewSettings.forceDark` and `InAppWebViewSettings.forceDarkStrategy` Android-only properties in favor of `InAppWebViewSettings.algorithmicDarkeningAllowed`
@@ -35,6 +36,7 @@ Implemented security features to better manage access to the native javascript b
 - Fixed crash when trying to open InAppBrowser with R.menu.menu_main on release mode
 - Merged "Prevent blank InAppBrowser Activity from being restored" [#1984](https://github.com/pichillilorenzo/flutter_inappwebview/pull/1984) (thanks to [ShuheiSuzuki-07](https://github.com/ShuheiSuzuki-07))
 - Merged "Update Android Cookie Expiration date format to 24-hour format (HH)" [#2389](https://github.com/pichillilorenzo/flutter_inappwebview/pull/2389) (thanks to [takuyaaaaaaahaaaaaa](https://github.com/takuyaaaaaaahaaaaaa))
+- Merged "[Android] allow sync navigation requests using a regular expression" [#2008](https://github.com/pichillilorenzo/flutter_inappwebview/pull/2008) (thanks to [lyb5834](https://github.com/lyb5834))
 
 #### macOS and iOS Platforms
 - Implemented `requestFocus` WebView method

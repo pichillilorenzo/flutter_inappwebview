@@ -6,6 +6,7 @@
 - Added `javaScriptBridgeEnabled`, `javaScriptBridgeOriginAllowList`, `javaScriptBridgeForMainFrameOnly`, `pluginScriptsOriginAllowList`, `pluginScriptsForMainFrameOnly`, `javaScriptHandlersOriginAllowList`, `javaScriptHandlersForMainFrameOnly`, `scrollMultiplier` InAppWebViewSettings parameters
 - Added `setJavaScriptBridgeName`, `getJavaScriptBridgeName` static WebView controller methods
 - Added `onProcessFailed` WebView event
+- Added `regexToAllowSyncUrlLoading` Android-specific property to `InAppWebViewSettings`
 - Added `JavaScriptHandlerFunctionData` type
 - Deprecated `JavaScriptHandlerCallback` type in favor of `JavaScriptHandlerFunction` type
 - Deprecated `InAppWebViewSettings.forceDark` and `InAppWebViewSettings.forceDarkStrategy` Android-only properties in favor of `InAppWebViewSettings.algorithmicDarkeningAllowed`

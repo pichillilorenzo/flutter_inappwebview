@@ -42,6 +42,7 @@ Implemented security features to better manage access to the native javascript b
 - Moved `WKUserContentController` initialization on `preWKWebViewConfiguration` to fix possible `undefined is not an object (evaluating 'window.webkit.messageHandlers')` javascript error
 - Added support for `UserScript.allowedOriginRules` parameter
 - Merged "change priority of DispatchQueue" [#2322](https://github.com/pichillilorenzo/flutter_inappwebview/pull/2322) (thanks to [nnnlog](https://github.com/nnnlog))
+- ios: Fixed `show`, `hide` methods and `hidden` setting for `InAppBrowser`
 - macOS: Implemented also `clearFocus` WebView method
 - macOS: Implemented workaround for "[macOS] Copy Shortcut does not work if TextField outside of WebView has focus" [#2380](https://github.com/pichillilorenzo/flutter_inappwebview/issues/2380)
 

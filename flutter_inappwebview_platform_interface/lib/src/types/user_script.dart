@@ -47,6 +47,10 @@ class UserScript_ {
 
   ///A scope of execution in which to evaluate the script to prevent conflicts between different scripts.
   ///For more information about content worlds, see [ContentWorld].
+  ///
+  ///**NOTE for Android**: because of how a Content World is implemented on Android, if [forMainFrameOnly] is `true`,
+  ///the [source] inside a specific Content World that is not [ContentWorld.PAGE] will not be executed.
+  ///See [ContentWorld] for more details.
   late ContentWorld contentWorld;
 
   @ExchangeableObjectConstructor()

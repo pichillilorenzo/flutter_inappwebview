@@ -24,11 +24,9 @@ public class WebMessageListener: FlutterMethodCallDelegate {
         self.jsObjectName = jsObjectName
         self.allowedOriginRules = allowedOriginRules
         super.init()
-        if let registrar = plugin.registrar {
-            let channel = FlutterMethodChannel(name: WebMessageListener.METHOD_CHANNEL_NAME_PREFIX + self.id + "_" + self.jsObjectName,
-                                               binaryMessenger: registrar.messenger)
-            self.channelDelegate = WebMessageListenerChannelDelegate(webMessageListener: self, channel: channel)
-        }
+        let channel = FlutterMethodChannel(name: WebMessageListener.METHOD_CHANNEL_NAME_PREFIX + self.id + "_" + self.jsObjectName,
+                                           binaryMessenger: plugin.registrar.messenger)
+        self.channelDelegate = WebMessageListenerChannelDelegate(webMessageListener: self, channel: channel)
     }
     
     public func assertOriginRulesValid() throws {

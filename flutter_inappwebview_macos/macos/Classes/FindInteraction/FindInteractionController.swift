@@ -24,11 +24,9 @@ public class FindInteractionController: NSObject, Disposable {
         self.plugin = plugin
         self.webView = webView
         self.settings = settings
-        if let registrar = plugin.registrar {
-            let channel = FlutterMethodChannel(name: FindInteractionController.METHOD_CHANNEL_NAME_PREFIX + String(describing: id),
-                                               binaryMessenger: registrar.messenger)
-            self.channelDelegate = FindInteractionChannelDelegate(findInteractionController: self, channel: channel)
-        }
+        let channel = FlutterMethodChannel(name: FindInteractionController.METHOD_CHANNEL_NAME_PREFIX + String(describing: id),
+                                           binaryMessenger: plugin.registrar.messenger)
+        self.channelDelegate = FindInteractionChannelDelegate(findInteractionController: self, channel: channel)
     }
     
     public func prepare() {

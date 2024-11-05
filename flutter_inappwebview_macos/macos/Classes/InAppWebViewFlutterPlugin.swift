@@ -25,7 +25,7 @@ import SafariServices
 
 public class InAppWebViewFlutterPlugin: NSObject, FlutterPlugin {
     
-    var registrar: FlutterPluginRegistrar?
+    var registrar: FlutterPluginRegistrar
     var platformUtil: PlatformUtil?
     var inAppWebViewManager: InAppWebViewManager?
     var myCookieManager: Any?
@@ -40,8 +40,8 @@ public class InAppWebViewFlutterPlugin: NSObject, FlutterPlugin {
     var safariViewControllers: [String: Any?] = [:]
     
     public init(with registrar: FlutterPluginRegistrar) {
-        super.init()
         self.registrar = registrar
+        super.init()
         registrar.register(FlutterWebViewFactory(plugin: self) as FlutterPlatformViewFactory, withId: FlutterWebViewFactory.VIEW_TYPE_ID)
         
         platformUtil = PlatformUtil(plugin: self)

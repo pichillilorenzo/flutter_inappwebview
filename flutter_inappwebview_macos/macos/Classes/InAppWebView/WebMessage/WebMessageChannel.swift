@@ -20,11 +20,9 @@ public class WebMessageChannel: FlutterMethodCallDelegate {
         self.id = id
         self.plugin = plugin
         super.init()
-        if let registrar = plugin.registrar {
-            let channel = FlutterMethodChannel(name: WebMessageChannel.METHOD_CHANNEL_NAME_PREFIX + id,
-                                               binaryMessenger: registrar.messenger)
-            self.channelDelegate = WebMessageChannelChannelDelegate(webMessageChannel: self, channel: channel)
-        }
+        let channel = FlutterMethodChannel(name: WebMessageChannel.METHOD_CHANNEL_NAME_PREFIX + id,
+                                           binaryMessenger: plugin.registrar.messenger)
+        self.channelDelegate = WebMessageChannelChannelDelegate(webMessageChannel: self, channel: channel)
         self.ports = [
             WebMessagePort(name: "port1", index: 0, webMessageChannelId: self.id, webMessageChannel: self),
             WebMessagePort(name: "port2", index: 1, webMessageChannelId: self.id, webMessageChannel: self)

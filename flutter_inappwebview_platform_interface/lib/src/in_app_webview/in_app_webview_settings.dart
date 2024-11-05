@@ -827,6 +827,11 @@ because there isn't any way to make the website data store non-persistent for th
   @SupportedPlatforms(platforms: [AndroidPlatform()])
   String? regexToCancelSubFramesLoading;
 
+  ///Regular expression used by [PlatformWebViewCreationParams.shouldOverrideUrlLoading] event to cancel navigation requests.
+  ///If the url request doesn't match the regular expression, then the request is canceled.
+  @SupportedPlatforms(platforms: [AndroidPlatform()])
+  String? regexToCancelOverrideUrlLoading;
+
   ///Set to `false` to disable Flutter Hybrid Composition. The default value is `true`.
   ///Hybrid Composition is supported starting with Flutter v1.20+.
   @SupportedPlatforms(platforms: [
@@ -1896,6 +1901,7 @@ as it can cause framerate drops on animations in Android 9 and lower (see [Hybri
     this.initialScale = 0,
     this.supportMultipleWindows = false,
     this.regexToCancelSubFramesLoading,
+    this.regexToCancelOverrideUrlLoading,
     this.useHybridComposition = true,
     this.useShouldInterceptRequest,
     this.useOnRenderProcessGone,

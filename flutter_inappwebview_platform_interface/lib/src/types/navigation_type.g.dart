@@ -170,11 +170,59 @@ class NavigationType {
     return null;
   }
 
+  /// Gets a possible [NavigationType] instance value with name [name].
+  ///
+  /// Goes through [NavigationType.values] looking for a value with
+  /// name [name], as reported by [NavigationType.name].
+  /// Returns the first value with the given name, otherwise `null`.
+  static NavigationType? byName(String? name) {
+    if (name != null) {
+      try {
+        return NavigationType.values
+            .firstWhere((element) => element.name() == name);
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
+  }
+
+  /// Creates a map from the names of [NavigationType] values to the values.
+  ///
+  /// The collection that this method is called on is expected to have
+  /// values with distinct names, like the `values` list of an enum class.
+  /// Only one value for each name can occur in the created map,
+  /// so if two or more values have the same name (either being the
+  /// same value, or being values of different enum type), at most one of
+  /// them will be represented in the returned map.
+  static Map<String, NavigationType> asNameMap() => <String, NavigationType>{
+        for (final value in NavigationType.values) value.name(): value
+      };
+
   ///Gets [String] value.
   String toValue() => _value;
 
   ///Gets [int?] native value.
   int? toNativeValue() => _nativeValue;
+
+  ///Gets the name of the value.
+  String name() {
+    switch (_value) {
+      case 'BACK_FORWARD':
+        return 'BACK_FORWARD';
+      case 'FORM_RESUBMITTED':
+        return 'FORM_RESUBMITTED';
+      case 'FORM_SUBMITTED':
+        return 'FORM_SUBMITTED';
+      case 'LINK_ACTIVATED':
+        return 'LINK_ACTIVATED';
+      case 'OTHER':
+        return 'OTHER';
+      case 'RELOAD':
+        return 'RELOAD';
+    }
+    return _value.toString();
+  }
 
   @override
   int get hashCode => _value.hashCode;
@@ -254,20 +302,44 @@ class IOSWKNavigationType {
     return null;
   }
 
+  /// Gets a possible [IOSWKNavigationType] instance value with name [name].
+  ///
+  /// Goes through [IOSWKNavigationType.values] looking for a value with
+  /// name [name], as reported by [IOSWKNavigationType.name].
+  /// Returns the first value with the given name, otherwise `null`.
+  static IOSWKNavigationType? byName(String? name) {
+    if (name != null) {
+      try {
+        return IOSWKNavigationType.values
+            .firstWhere((element) => element.name() == name);
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
+  }
+
+  /// Creates a map from the names of [IOSWKNavigationType] values to the values.
+  ///
+  /// The collection that this method is called on is expected to have
+  /// values with distinct names, like the `values` list of an enum class.
+  /// Only one value for each name can occur in the created map,
+  /// so if two or more values have the same name (either being the
+  /// same value, or being values of different enum type), at most one of
+  /// them will be represented in the returned map.
+  static Map<String, IOSWKNavigationType> asNameMap() =>
+      <String, IOSWKNavigationType>{
+        for (final value in IOSWKNavigationType.values) value.name(): value
+      };
+
   ///Gets [int] value.
   int toValue() => _value;
 
   ///Gets [int] native value.
   int toNativeValue() => _nativeValue;
 
-  @override
-  int get hashCode => _value.hashCode;
-
-  @override
-  bool operator ==(value) => value == _value;
-
-  @override
-  String toString() {
+  ///Gets the name of the value.
+  String name() {
     switch (_value) {
       case 2:
         return 'BACK_FORWARD';
@@ -283,5 +355,16 @@ class IOSWKNavigationType {
         return 'RELOAD';
     }
     return _value.toString();
+  }
+
+  @override
+  int get hashCode => _value.hashCode;
+
+  @override
+  bool operator ==(value) => value == _value;
+
+  @override
+  String toString() {
+    return name();
   }
 }

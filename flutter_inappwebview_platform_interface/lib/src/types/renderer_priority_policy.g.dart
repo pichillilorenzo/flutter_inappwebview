@@ -22,22 +22,34 @@ class RendererPriorityPolicy {
       {this.rendererRequestedPriority, required this.waivedWhenNotVisible});
 
   ///Gets a possible [RendererPriorityPolicy] instance from a [Map] value.
-  static RendererPriorityPolicy? fromMap(Map<String, dynamic>? map) {
+  static RendererPriorityPolicy? fromMap(Map<String, dynamic>? map,
+      {EnumMethod? enumMethod}) {
     if (map == null) {
       return null;
     }
     final instance = RendererPriorityPolicy(
-      rendererRequestedPriority:
+      rendererRequestedPriority: switch (enumMethod ?? EnumMethod.nativeValue) {
+        EnumMethod.nativeValue =>
           RendererPriority.fromNativeValue(map['rendererRequestedPriority']),
+        EnumMethod.value =>
+          RendererPriority.fromValue(map['rendererRequestedPriority']),
+        EnumMethod.name =>
+          RendererPriority.byName(map['rendererRequestedPriority'])
+      },
       waivedWhenNotVisible: map['waivedWhenNotVisible'],
     );
     return instance;
   }
 
   ///Converts instance to a map.
-  Map<String, dynamic> toMap() {
+  Map<String, dynamic> toMap({EnumMethod? enumMethod}) {
     return {
-      "rendererRequestedPriority": rendererRequestedPriority?.toNativeValue(),
+      "rendererRequestedPriority": switch (
+          enumMethod ?? EnumMethod.nativeValue) {
+        EnumMethod.nativeValue => rendererRequestedPriority?.toNativeValue(),
+        EnumMethod.value => rendererRequestedPriority?.toValue(),
+        EnumMethod.name => rendererRequestedPriority?.name()
+      },
       "waivedWhenNotVisible": waivedWhenNotVisible,
     };
   }

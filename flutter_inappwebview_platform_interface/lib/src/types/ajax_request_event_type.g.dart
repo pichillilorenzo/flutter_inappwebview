@@ -77,11 +77,62 @@ class AjaxRequestEventType {
     return null;
   }
 
+  /// Gets a possible [AjaxRequestEventType] instance value with name [name].
+  ///
+  /// Goes through [AjaxRequestEventType.values] looking for a value with
+  /// name [name], as reported by [AjaxRequestEventType.name].
+  /// Returns the first value with the given name, otherwise `null`.
+  static AjaxRequestEventType? byName(String? name) {
+    if (name != null) {
+      try {
+        return AjaxRequestEventType.values
+            .firstWhere((element) => element.name() == name);
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
+  }
+
+  /// Creates a map from the names of [AjaxRequestEventType] values to the values.
+  ///
+  /// The collection that this method is called on is expected to have
+  /// values with distinct names, like the `values` list of an enum class.
+  /// Only one value for each name can occur in the created map,
+  /// so if two or more values have the same name (either being the
+  /// same value, or being values of different enum type), at most one of
+  /// them will be represented in the returned map.
+  static Map<String, AjaxRequestEventType> asNameMap() =>
+      <String, AjaxRequestEventType>{
+        for (final value in AjaxRequestEventType.values) value.name(): value
+      };
+
   ///Gets [String] value.
   String toValue() => _value;
 
   ///Gets [String] native value.
   String toNativeValue() => _nativeValue;
+
+  ///Gets the name of the value.
+  String name() {
+    switch (_value) {
+      case 'abort':
+        return 'ABORT';
+      case 'error':
+        return 'ERROR';
+      case 'load':
+        return 'LOAD';
+      case 'loadend':
+        return 'LOADEND';
+      case 'loadstart':
+        return 'LOADSTART';
+      case 'progress':
+        return 'PROGRESS';
+      case 'timeout':
+        return 'TIMEOUT';
+    }
+    return _value.toString();
+  }
 
   @override
   int get hashCode => _value.hashCode;

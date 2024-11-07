@@ -16,22 +16,32 @@ class WebResourceError {
   WebResourceError({required this.description, required this.type});
 
   ///Gets a possible [WebResourceError] instance from a [Map] value.
-  static WebResourceError? fromMap(Map<String, dynamic>? map) {
+  static WebResourceError? fromMap(Map<String, dynamic>? map,
+      {EnumMethod? enumMethod}) {
     if (map == null) {
       return null;
     }
     final instance = WebResourceError(
       description: map['description'],
-      type: WebResourceErrorType.fromNativeValue(map['type'])!,
+      type: switch (enumMethod ?? EnumMethod.nativeValue) {
+        EnumMethod.nativeValue =>
+          WebResourceErrorType.fromNativeValue(map['type']),
+        EnumMethod.value => WebResourceErrorType.fromValue(map['type']),
+        EnumMethod.name => WebResourceErrorType.byName(map['type'])
+      }!,
     );
     return instance;
   }
 
   ///Converts instance to a map.
-  Map<String, dynamic> toMap() {
+  Map<String, dynamic> toMap({EnumMethod? enumMethod}) {
     return {
       "description": description,
-      "type": type.toNativeValue(),
+      "type": switch (enumMethod ?? EnumMethod.nativeValue) {
+        EnumMethod.nativeValue => type.toNativeValue(),
+        EnumMethod.value => type.toValue(),
+        EnumMethod.name => type.name()
+      },
     };
   }
 

@@ -2,6 +2,7 @@ import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_i
 
 import 'platform_webview_environment.dart';
 import '../types/custom_scheme_registration.dart';
+import '../types/enum_method.dart';
 
 part 'webview_environment_settings.g.dart';
 

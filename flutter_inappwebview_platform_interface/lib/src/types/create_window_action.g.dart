@@ -72,19 +72,23 @@ class CreateWindowAction extends NavigationAction {
   }
 
   ///Gets a possible [CreateWindowAction] instance from a [Map] value.
-  static CreateWindowAction? fromMap(Map<String, dynamic>? map) {
+  static CreateWindowAction? fromMap(Map<String, dynamic>? map,
+      {EnumMethod? enumMethod}) {
     if (map == null) {
       return null;
     }
     final instance = CreateWindowAction(
-      request: URLRequest.fromMap(map['request']?.cast<String, dynamic>())!,
+      request: URLRequest.fromMap(map['request']?.cast<String, dynamic>(),
+          enumMethod: enumMethod)!,
       isForMainFrame: map['isForMainFrame'],
       androidIsDialog: map['isDialog'],
       iosWindowFeatures: IOSWKWindowFeatures.fromMap(
-          map['windowFeatures']?.cast<String, dynamic>()),
+          map['windowFeatures']?.cast<String, dynamic>(),
+          enumMethod: enumMethod),
       isDialog: map['isDialog'],
       windowFeatures: WindowFeatures.fromMap(
-          map['windowFeatures']?.cast<String, dynamic>()),
+          map['windowFeatures']?.cast<String, dynamic>(),
+          enumMethod: enumMethod),
       windowId: map['windowId'],
     );
     instance.androidHasGesture = map['hasGesture'];
@@ -92,34 +96,51 @@ class CreateWindowAction extends NavigationAction {
     instance.androidIsRedirect = map['isRedirect'];
     instance.isRedirect = map['isRedirect'];
     instance.iosWKNavigationType =
-        IOSWKNavigationType.fromNativeValue(map['navigationType']);
-    instance.navigationType =
-        NavigationType.fromNativeValue(map['navigationType']);
-    instance.iosSourceFrame =
-        IOSWKFrameInfo.fromMap(map['sourceFrame']?.cast<String, dynamic>());
-    instance.sourceFrame =
-        FrameInfo.fromMap(map['sourceFrame']?.cast<String, dynamic>());
-    instance.iosTargetFrame =
-        IOSWKFrameInfo.fromMap(map['targetFrame']?.cast<String, dynamic>());
-    instance.targetFrame =
-        FrameInfo.fromMap(map['targetFrame']?.cast<String, dynamic>());
+        switch (enumMethod ?? EnumMethod.nativeValue) {
+      EnumMethod.nativeValue =>
+        IOSWKNavigationType.fromNativeValue(map['navigationType']),
+      EnumMethod.value => IOSWKNavigationType.fromValue(map['navigationType']),
+      EnumMethod.name => IOSWKNavigationType.byName(map['navigationType'])
+    };
+    instance.navigationType = switch (enumMethod ?? EnumMethod.nativeValue) {
+      EnumMethod.nativeValue =>
+        NavigationType.fromNativeValue(map['navigationType']),
+      EnumMethod.value => NavigationType.fromValue(map['navigationType']),
+      EnumMethod.name => NavigationType.byName(map['navigationType'])
+    };
+    instance.iosSourceFrame = IOSWKFrameInfo.fromMap(
+        map['sourceFrame']?.cast<String, dynamic>(),
+        enumMethod: enumMethod);
+    instance.sourceFrame = FrameInfo.fromMap(
+        map['sourceFrame']?.cast<String, dynamic>(),
+        enumMethod: enumMethod);
+    instance.iosTargetFrame = IOSWKFrameInfo.fromMap(
+        map['targetFrame']?.cast<String, dynamic>(),
+        enumMethod: enumMethod);
+    instance.targetFrame = FrameInfo.fromMap(
+        map['targetFrame']?.cast<String, dynamic>(),
+        enumMethod: enumMethod);
     instance.shouldPerformDownload = map['shouldPerformDownload'];
     return instance;
   }
 
   ///Converts instance to a map.
-  Map<String, dynamic> toMap() {
+  Map<String, dynamic> toMap({EnumMethod? enumMethod}) {
     return {
-      "request": request.toMap(),
+      "request": request.toMap(enumMethod: enumMethod),
       "isForMainFrame": isForMainFrame,
       "hasGesture": hasGesture,
       "isRedirect": isRedirect,
-      "navigationType": navigationType?.toNativeValue(),
-      "sourceFrame": sourceFrame?.toMap(),
-      "targetFrame": targetFrame?.toMap(),
+      "navigationType": switch (enumMethod ?? EnumMethod.nativeValue) {
+        EnumMethod.nativeValue => navigationType?.toNativeValue(),
+        EnumMethod.value => navigationType?.toValue(),
+        EnumMethod.name => navigationType?.name()
+      },
+      "sourceFrame": sourceFrame?.toMap(enumMethod: enumMethod),
+      "targetFrame": targetFrame?.toMap(enumMethod: enumMethod),
       "shouldPerformDownload": shouldPerformDownload,
       "isDialog": isDialog,
-      "windowFeatures": windowFeatures?.toMap(),
+      "windowFeatures": windowFeatures?.toMap(enumMethod: enumMethod),
       "windowId": windowId,
     };
   }

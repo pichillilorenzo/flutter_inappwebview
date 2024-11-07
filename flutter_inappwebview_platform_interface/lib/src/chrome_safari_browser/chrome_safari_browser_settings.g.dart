@@ -252,19 +252,24 @@ class ChromeSafariBrowserSettings implements ChromeSafariBrowserOptions {
   }
 
   ///Gets a possible [ChromeSafariBrowserSettings] instance from a [Map] value.
-  static ChromeSafariBrowserSettings? fromMap(Map<String, dynamic>? map) {
+  static ChromeSafariBrowserSettings? fromMap(Map<String, dynamic>? map,
+      {EnumMethod? enumMethod}) {
     if (map == null) {
       return null;
     }
     final instance = ChromeSafariBrowserSettings(
       activityButton: ActivityButton.fromMap(
-          map['activityButton']?.cast<String, dynamic>()),
-      displayMode: _deserializeDisplayMode(map['displayMode']),
+          map['activityButton']?.cast<String, dynamic>(),
+          enumMethod: enumMethod),
+      displayMode:
+          _deserializeDisplayMode(map['displayMode'], enumMethod: enumMethod),
       eventAttribution: UIEventAttribution.fromMap(
-          map['eventAttribution']?.cast<String, dynamic>()),
+          map['eventAttribution']?.cast<String, dynamic>(),
+          enumMethod: enumMethod),
       exitAnimations: map['exitAnimations'] != null
-          ? List<AndroidResource>.from(map['exitAnimations']
-              .map((e) => AndroidResource.fromMap(e?.cast<String, dynamic>())!))
+          ? List<AndroidResource>.from(map['exitAnimations'].map((e) =>
+              AndroidResource.fromMap(e?.cast<String, dynamic>(),
+                  enumMethod: enumMethod)!))
           : null,
       navigationBarColor: map['navigationBarColor'] != null
           ? UtilColor.fromStringRepresentation(map['navigationBarColor'])
@@ -283,8 +288,9 @@ class ChromeSafariBrowserSettings implements ChromeSafariBrowserOptions {
           ? UtilColor.fromStringRepresentation(map['secondaryToolbarColor'])
           : null,
       startAnimations: map['startAnimations'] != null
-          ? List<AndroidResource>.from(map['startAnimations']
-              .map((e) => AndroidResource.fromMap(e?.cast<String, dynamic>())!))
+          ? List<AndroidResource>.from(map['startAnimations'].map((e) =>
+              AndroidResource.fromMap(e?.cast<String, dynamic>(),
+                  enumMethod: enumMethod)!))
           : null,
       toolbarBackgroundColor: map['toolbarBackgroundColor'] != null
           ? UtilColor.fromStringRepresentation(map['toolbarBackgroundColor'])
@@ -296,7 +302,13 @@ class ChromeSafariBrowserSettings implements ChromeSafariBrowserOptions {
     instance.alwaysUseBrowserUI = map['alwaysUseBrowserUI'];
     instance.barCollapsingEnabled = map['barCollapsingEnabled'];
     instance.dismissButtonStyle =
-        DismissButtonStyle.fromNativeValue(map['dismissButtonStyle']);
+        switch (enumMethod ?? EnumMethod.nativeValue) {
+      EnumMethod.nativeValue =>
+        DismissButtonStyle.fromNativeValue(map['dismissButtonStyle']),
+      EnumMethod.value =>
+        DismissButtonStyle.fromValue(map['dismissButtonStyle']),
+      EnumMethod.name => DismissButtonStyle.byName(map['dismissButtonStyle'])
+    };
     instance.enableUrlBarHiding = map['enableUrlBarHiding'];
     instance.entersReaderIfAvailable = map['entersReaderIfAvailable'];
     instance.instantAppsEnabled = map['instantAppsEnabled'];
@@ -304,32 +316,57 @@ class ChromeSafariBrowserSettings implements ChromeSafariBrowserOptions {
     instance.isTrustedWebActivity = map['isTrustedWebActivity'];
     instance.keepAliveEnabled = map['keepAliveEnabled'];
     instance.noHistory = map['noHistory'];
-    instance.presentationStyle =
-        ModalPresentationStyle.fromNativeValue(map['presentationStyle']);
-    instance.screenOrientation =
+    instance.presentationStyle = switch (enumMethod ?? EnumMethod.nativeValue) {
+      EnumMethod.nativeValue =>
+        ModalPresentationStyle.fromNativeValue(map['presentationStyle']),
+      EnumMethod.value =>
+        ModalPresentationStyle.fromValue(map['presentationStyle']),
+      EnumMethod.name => ModalPresentationStyle.byName(map['presentationStyle'])
+    };
+    instance.screenOrientation = switch (enumMethod ?? EnumMethod.nativeValue) {
+      EnumMethod.nativeValue =>
         TrustedWebActivityScreenOrientation.fromNativeValue(
-            map['screenOrientation']);
-    instance.shareState =
-        CustomTabsShareState.fromNativeValue(map['shareState']);
+            map['screenOrientation']),
+      EnumMethod.value =>
+        TrustedWebActivityScreenOrientation.fromValue(map['screenOrientation']),
+      EnumMethod.name =>
+        TrustedWebActivityScreenOrientation.byName(map['screenOrientation'])
+    };
+    instance.shareState = switch (enumMethod ?? EnumMethod.nativeValue) {
+      EnumMethod.nativeValue =>
+        CustomTabsShareState.fromNativeValue(map['shareState']),
+      EnumMethod.value => CustomTabsShareState.fromValue(map['shareState']),
+      EnumMethod.name => CustomTabsShareState.byName(map['shareState'])
+    };
     instance.showTitle = map['showTitle'];
-    instance.transitionStyle =
-        ModalTransitionStyle.fromNativeValue(map['transitionStyle']);
+    instance.transitionStyle = switch (enumMethod ?? EnumMethod.nativeValue) {
+      EnumMethod.nativeValue =>
+        ModalTransitionStyle.fromNativeValue(map['transitionStyle']),
+      EnumMethod.value =>
+        ModalTransitionStyle.fromValue(map['transitionStyle']),
+      EnumMethod.name => ModalTransitionStyle.byName(map['transitionStyle'])
+    };
     return instance;
   }
 
   ///Converts instance to a map.
-  Map<String, dynamic> toMap() {
+  Map<String, dynamic> toMap({EnumMethod? enumMethod}) {
     return {
-      "activityButton": activityButton?.toMap(),
+      "activityButton": activityButton?.toMap(enumMethod: enumMethod),
       "additionalTrustedOrigins": additionalTrustedOrigins,
       "alwaysUseBrowserUI": alwaysUseBrowserUI,
       "barCollapsingEnabled": barCollapsingEnabled,
-      "dismissButtonStyle": dismissButtonStyle?.toNativeValue(),
-      "displayMode": displayMode?.toMap(),
+      "dismissButtonStyle": switch (enumMethod ?? EnumMethod.nativeValue) {
+        EnumMethod.nativeValue => dismissButtonStyle?.toNativeValue(),
+        EnumMethod.value => dismissButtonStyle?.toValue(),
+        EnumMethod.name => dismissButtonStyle?.name()
+      },
+      "displayMode": displayMode?.toMap(enumMethod: enumMethod),
       "enableUrlBarHiding": enableUrlBarHiding,
       "entersReaderIfAvailable": entersReaderIfAvailable,
-      "eventAttribution": eventAttribution?.toMap(),
-      "exitAnimations": exitAnimations?.map((e) => e.toMap()).toList(),
+      "eventAttribution": eventAttribution?.toMap(enumMethod: enumMethod),
+      "exitAnimations":
+          exitAnimations?.map((e) => e.toMap(enumMethod: enumMethod)).toList(),
       "instantAppsEnabled": instantAppsEnabled,
       "isSingleInstance": isSingleInstance,
       "isTrustedWebActivity": isTrustedWebActivity,
@@ -340,14 +377,31 @@ class ChromeSafariBrowserSettings implements ChromeSafariBrowserOptions {
       "packageName": packageName,
       "preferredBarTintColor": preferredBarTintColor?.toHex(),
       "preferredControlTintColor": preferredControlTintColor?.toHex(),
-      "presentationStyle": presentationStyle?.toNativeValue(),
-      "screenOrientation": screenOrientation?.toNativeValue(),
+      "presentationStyle": switch (enumMethod ?? EnumMethod.nativeValue) {
+        EnumMethod.nativeValue => presentationStyle?.toNativeValue(),
+        EnumMethod.value => presentationStyle?.toValue(),
+        EnumMethod.name => presentationStyle?.name()
+      },
+      "screenOrientation": switch (enumMethod ?? EnumMethod.nativeValue) {
+        EnumMethod.nativeValue => screenOrientation?.toNativeValue(),
+        EnumMethod.value => screenOrientation?.toValue(),
+        EnumMethod.name => screenOrientation?.name()
+      },
       "secondaryToolbarColor": secondaryToolbarColor?.toHex(),
-      "shareState": shareState?.toNativeValue(),
+      "shareState": switch (enumMethod ?? EnumMethod.nativeValue) {
+        EnumMethod.nativeValue => shareState?.toNativeValue(),
+        EnumMethod.value => shareState?.toValue(),
+        EnumMethod.name => shareState?.name()
+      },
       "showTitle": showTitle,
-      "startAnimations": startAnimations?.map((e) => e.toMap()).toList(),
+      "startAnimations":
+          startAnimations?.map((e) => e.toMap(enumMethod: enumMethod)).toList(),
       "toolbarBackgroundColor": toolbarBackgroundColor?.toHex(),
-      "transitionStyle": transitionStyle?.toNativeValue(),
+      "transitionStyle": switch (enumMethod ?? EnumMethod.nativeValue) {
+        EnumMethod.nativeValue => transitionStyle?.toNativeValue(),
+        EnumMethod.value => transitionStyle?.toValue(),
+        EnumMethod.name => transitionStyle?.name()
+      },
     };
   }
 

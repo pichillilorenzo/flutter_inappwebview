@@ -238,11 +238,68 @@ class ProcessFailedKind {
     return null;
   }
 
+  /// Gets a possible [ProcessFailedKind] instance value with name [name].
+  ///
+  /// Goes through [ProcessFailedKind.values] looking for a value with
+  /// name [name], as reported by [ProcessFailedKind.name].
+  /// Returns the first value with the given name, otherwise `null`.
+  static ProcessFailedKind? byName(String? name) {
+    if (name != null) {
+      try {
+        return ProcessFailedKind.values
+            .firstWhere((element) => element.name() == name);
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
+  }
+
+  /// Creates a map from the names of [ProcessFailedKind] values to the values.
+  ///
+  /// The collection that this method is called on is expected to have
+  /// values with distinct names, like the `values` list of an enum class.
+  /// Only one value for each name can occur in the created map,
+  /// so if two or more values have the same name (either being the
+  /// same value, or being values of different enum type), at most one of
+  /// them will be represented in the returned map.
+  static Map<String, ProcessFailedKind> asNameMap() =>
+      <String, ProcessFailedKind>{
+        for (final value in ProcessFailedKind.values) value.name(): value
+      };
+
   ///Gets [String] value.
   String toValue() => _value;
 
   ///Gets [dynamic] native value.
   dynamic toNativeValue() => _nativeValue;
+
+  ///Gets the name of the value.
+  String name() {
+    switch (_value) {
+      case 'BROWSER_PROCESS_EXITED':
+        return 'BROWSER_PROCESS_EXITED';
+      case 'FRAME_RENDER_PROCESS_EXITED':
+        return 'FRAME_RENDER_PROCESS_EXITED';
+      case 'GPU_PROCESS_EXITED':
+        return 'GPU_PROCESS_EXITED';
+      case 'PPAPI_BROKER_PROCESS_EXITED':
+        return 'PPAPI_BROKER_PROCESS_EXITED';
+      case 'PPAPI_PLUGIN_PROCESS_EXITED':
+        return 'PPAPI_PLUGIN_PROCESS_EXITED';
+      case 'RENDER_PROCESS_EXITED':
+        return 'RENDER_PROCESS_EXITED';
+      case 'RENDER_PROCESS_UNRESPONSIVE':
+        return 'RENDER_PROCESS_UNRESPONSIVE';
+      case 'SANDBOX_HELPER_PROCESS_EXITED':
+        return 'SANDBOX_HELPER_PROCESS_EXITED';
+      case 'UNKNOWN_PROCESS_EXITED':
+        return 'UNKNOWN_PROCESS_EXITED';
+      case 'UTILITY_PROCESS_EXITED':
+        return 'UTILITY_PROCESS_EXITED';
+    }
+    return _value.toString();
+  }
 
   @override
   int get hashCode => _value.hashCode;

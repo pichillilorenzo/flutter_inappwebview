@@ -54,12 +54,13 @@ class InAppBrowserMenuItem {
       required this.title});
 
   ///Gets a possible [InAppBrowserMenuItem] instance from a [Map] value.
-  static InAppBrowserMenuItem? fromMap(Map<String, dynamic>? map) {
+  static InAppBrowserMenuItem? fromMap(Map<String, dynamic>? map,
+      {EnumMethod? enumMethod}) {
     if (map == null) {
       return null;
     }
     final instance = InAppBrowserMenuItem(
-      icon: _deserializeIcon(map['icon']),
+      icon: _deserializeIcon(map['icon'], enumMethod: enumMethod),
       iconColor: map['iconColor'] != null
           ? UtilColor.fromStringRepresentation(map['iconColor'])
           : null,
@@ -74,9 +75,9 @@ class InAppBrowserMenuItem {
   }
 
   ///Converts instance to a map.
-  Map<String, dynamic> toMap() {
+  Map<String, dynamic> toMap({EnumMethod? enumMethod}) {
     return {
-      "icon": _serializeIcon(icon),
+      "icon": _serializeIcon(icon, enumMethod: enumMethod),
       "iconColor": iconColor?.toHex(),
       "id": id,
       "order": order,

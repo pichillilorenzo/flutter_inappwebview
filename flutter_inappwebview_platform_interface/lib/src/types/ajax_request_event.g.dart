@@ -26,7 +26,8 @@ class AjaxRequestEvent {
   AjaxRequestEvent({this.lengthComputable, this.loaded, this.total, this.type});
 
   ///Gets a possible [AjaxRequestEvent] instance from a [Map] value.
-  static AjaxRequestEvent? fromMap(Map<String, dynamic>? map) {
+  static AjaxRequestEvent? fromMap(Map<String, dynamic>? map,
+      {EnumMethod? enumMethod}) {
     if (map == null) {
       return null;
     }
@@ -34,18 +35,27 @@ class AjaxRequestEvent {
       lengthComputable: map['lengthComputable'],
       loaded: map['loaded'],
       total: map['total'],
-      type: AjaxRequestEventType.fromNativeValue(map['type']),
+      type: switch (enumMethod ?? EnumMethod.nativeValue) {
+        EnumMethod.nativeValue =>
+          AjaxRequestEventType.fromNativeValue(map['type']),
+        EnumMethod.value => AjaxRequestEventType.fromValue(map['type']),
+        EnumMethod.name => AjaxRequestEventType.byName(map['type'])
+      },
     );
     return instance;
   }
 
   ///Converts instance to a map.
-  Map<String, dynamic> toMap() {
+  Map<String, dynamic> toMap({EnumMethod? enumMethod}) {
     return {
       "lengthComputable": lengthComputable,
       "loaded": loaded,
       "total": total,
-      "type": type?.toNativeValue(),
+      "type": switch (enumMethod ?? EnumMethod.nativeValue) {
+        EnumMethod.nativeValue => type?.toNativeValue(),
+        EnumMethod.value => type?.toValue(),
+        EnumMethod.name => type?.name()
+      },
     };
   }
 

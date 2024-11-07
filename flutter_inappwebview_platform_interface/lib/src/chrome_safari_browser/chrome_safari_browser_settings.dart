@@ -15,17 +15,19 @@ import '../types/ui_event_attribution.dart';
 import '../util.dart';
 import 'android/chrome_custom_tabs_options.dart';
 import 'apple/safari_options.dart';
+import '../types/enum_method.dart';
 
 part 'chrome_safari_browser_settings.g.dart';
 
 TrustedWebActivityDisplayMode? _deserializeDisplayMode(
-    Map<String, dynamic>? displayMode) {
+    Map<String, dynamic>? displayMode,
+    {EnumMethod? enumMethod}) {
   if (displayMode == null) {
     return null;
   }
   switch (displayMode["type"]) {
     case "IMMERSIVE_MODE":
-      return TrustedWebActivityImmersiveDisplayMode.fromMap(displayMode);
+      return TrustedWebActivityImmersiveDisplayMode.fromMap(displayMode, enumMethod: enumMethod);
     case "DEFAULT_MODE":
     default:
       return TrustedWebActivityDefaultDisplayMode();

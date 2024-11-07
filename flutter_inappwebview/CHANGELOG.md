@@ -1,3 +1,20 @@
+## 6.2.0-beta.2
+
+- Updated dependencies to the latest versions for all platform implementations:
+  - `flutter_inappwebview_platform_interface`: `^1.4.0-beta.1` -> `^1.4.0-beta.2`
+  - `flutter_inappwebview_android`: `^1.2.0-beta.1` -> `^1.2.0-beta.2`
+  - `flutter_inappwebview_ios`: `^1.2.0-beta.1` -> `^1.2.0-beta.2`
+  - `flutter_inappwebview_macos`: `^1.2.0-beta.1` -> `^1.2.0-beta.2`
+  - `flutter_inappwebview_web`: `^1.2.0-beta.1` -> `^1.2.0-beta.2`
+  - `flutter_inappwebview_windows`: `^0.7.0-beta.1` -> `^0.7.0-beta.2`
+- Fixed specific URLAuthenticationChallenge type for `onReceivedHttpAuthRequest`, `onReceivedServerTrustAuthRequest`, `onReceivedClientCertRequest` events of HeadlessInAppWebView
+- Fixed missing return type for `InAppWebView.getJavaScriptBridgeName` static method
+
+#### Platform Interface
+- Updated `flutter_inappwebview_internal_annotations` dependency from `^1.1.1` to `^1.2.0`
+- Updated `fromMap` static method and `toMap` method implementations
+- Added `byName`, `name`, `asNameMap` custom enum classes methods
+
 ## 6.2.0-beta.1
 
 - Updated dependencies to the latest versions for all platform implementations:
@@ -7,6 +24,7 @@
   - `flutter_inappwebview_macos`: `^1.1.2` -> `^1.2.0-beta.1`
   - `flutter_inappwebview_web`: `^1.1.2` -> `^1.2.0-beta.1`
   - `flutter_inappwebview_windows`: `^0.6.0` -> `^0.7.0-beta.1`
+- Fixed specific URLAuthenticationChallenge type for `onReceivedHttpAuthRequest`, `onReceivedServerTrustAuthRequest`, `onReceivedClientCertRequest` events
 
 Implemented security features to better manage access to the native javascript bridge.
 
@@ -23,7 +41,6 @@ Implemented security features to better manage access to the native javascript b
 - Deprecated `JavaScriptHandlerCallback` type in favor of `JavaScriptHandlerFunction` type
 - Deprecated `InAppWebViewSettings.forceDark` and `InAppWebViewSettings.forceDarkStrategy` Android-only properties in favor of `InAppWebViewSettings.algorithmicDarkeningAllowed`
 - Fixed X509Certificate PEM base64 decoding
-- Fixed specific URLAuthenticationChallenge type for `onReceivedHttpAuthRequest`, `onReceivedServerTrustAuthRequest`, `onReceivedClientCertRequest` events
 
 #### Android Platform
 - Added `InAppWebViewController.enableSlowWholeDocumentDraw` static method

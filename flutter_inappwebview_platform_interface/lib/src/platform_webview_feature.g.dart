@@ -312,6 +312,35 @@ class WebViewFeature {
     return null;
   }
 
+  /// Gets a possible [WebViewFeature] instance value with name [name].
+  ///
+  /// Goes through [WebViewFeature.values] looking for a value with
+  /// name [name], as reported by [WebViewFeature.name].
+  /// Returns the first value with the given name, otherwise `null`.
+  static WebViewFeature? byName(String? name) {
+    if (name != null) {
+      try {
+        return WebViewFeature.values
+            .firstWhere((element) => element.name() == name);
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
+  }
+
+  /// Creates a map from the names of [WebViewFeature] values to the values.
+  ///
+  /// The collection that this method is called on is expected to have
+  /// values with distinct names, like the `values` list of an enum class.
+  /// Only one value for each name can occur in the created map,
+  /// so if two or more values have the same name (either being the
+  /// same value, or being values of different enum type), at most one of
+  /// them will be represented in the returned map.
+  static Map<String, WebViewFeature> asNameMap() => <String, WebViewFeature>{
+        for (final value in WebViewFeature.values) value.name(): value
+      };
+
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewFeature.isFeatureSupported}
   static Future<bool> isFeatureSupported(WebViewFeature feature) =>
       PlatformWebViewFeature.static().isFeatureSupported(feature);
@@ -326,6 +355,115 @@ class WebViewFeature {
 
   ///Gets [String] native value.
   String toNativeValue() => _nativeValue;
+
+  ///Gets the name of the value.
+  String name() {
+    switch (_value) {
+      case 'ALGORITHMIC_DARKENING':
+        return 'ALGORITHMIC_DARKENING';
+      case 'CREATE_WEB_MESSAGE_CHANNEL':
+        return 'CREATE_WEB_MESSAGE_CHANNEL';
+      case 'DISABLED_ACTION_MODE_MENU_ITEMS':
+        return 'DISABLED_ACTION_MODE_MENU_ITEMS';
+      case 'DOCUMENT_START_SCRIPT':
+        return 'DOCUMENT_START_SCRIPT';
+      case 'ENTERPRISE_AUTHENTICATION_APP_LINK_POLICY':
+        return 'ENTERPRISE_AUTHENTICATION_APP_LINK_POLICY';
+      case 'FORCE_DARK':
+        return 'FORCE_DARK';
+      case 'FORCE_DARK_STRATEGY':
+        return 'FORCE_DARK_STRATEGY';
+      case 'GET_COOKIE_INFO':
+        return 'GET_COOKIE_INFO';
+      case 'GET_VARIATIONS_HEADER':
+        return 'GET_VARIATIONS_HEADER';
+      case 'GET_WEB_CHROME_CLIENT':
+        return 'GET_WEB_CHROME_CLIENT';
+      case 'GET_WEB_VIEW_CLIENT':
+        return 'GET_WEB_VIEW_CLIENT';
+      case 'GET_WEB_VIEW_RENDERER':
+        return 'GET_WEB_VIEW_RENDERER';
+      case 'MULTI_PROCESS':
+        return 'MULTI_PROCESS';
+      case 'OFF_SCREEN_PRERASTER':
+        return 'OFF_SCREEN_PRERASTER';
+      case 'POST_WEB_MESSAGE':
+        return 'POST_WEB_MESSAGE';
+      case 'PROXY_OVERRIDE':
+        return 'PROXY_OVERRIDE';
+      case 'PROXY_OVERRIDE_REVERSE_BYPASS':
+        return 'PROXY_OVERRIDE_REVERSE_BYPASS';
+      case 'RECEIVE_HTTP_ERROR':
+        return 'RECEIVE_HTTP_ERROR';
+      case 'RECEIVE_WEB_RESOURCE_ERROR':
+        return 'RECEIVE_WEB_RESOURCE_ERROR';
+      case 'REQUESTED_WITH_HEADER_ALLOW_LIST':
+        return 'REQUESTED_WITH_HEADER_ALLOW_LIST';
+      case 'SAFE_BROWSING_ALLOWLIST':
+        return 'SAFE_BROWSING_ALLOWLIST';
+      case 'SAFE_BROWSING_ENABLE':
+        return 'SAFE_BROWSING_ENABLE';
+      case 'SAFE_BROWSING_HIT':
+        return 'SAFE_BROWSING_HIT';
+      case 'SAFE_BROWSING_PRIVACY_POLICY_URL':
+        return 'SAFE_BROWSING_PRIVACY_POLICY_URL';
+      case 'SAFE_BROWSING_RESPONSE_BACK_TO_SAFETY':
+        return 'SAFE_BROWSING_RESPONSE_BACK_TO_SAFETY';
+      case 'SAFE_BROWSING_RESPONSE_PROCEED':
+        return 'SAFE_BROWSING_RESPONSE_PROCEED';
+      case 'SAFE_BROWSING_RESPONSE_SHOW_INTERSTITIAL':
+        return 'SAFE_BROWSING_RESPONSE_SHOW_INTERSTITIAL';
+      case 'SAFE_BROWSING_WHITELIST':
+        return 'SAFE_BROWSING_WHITELIST';
+      case 'SERVICE_WORKER_BASIC_USAGE':
+        return 'SERVICE_WORKER_BASIC_USAGE';
+      case 'SERVICE_WORKER_BLOCK_NETWORK_LOADS':
+        return 'SERVICE_WORKER_BLOCK_NETWORK_LOADS';
+      case 'SERVICE_WORKER_CACHE_MODE':
+        return 'SERVICE_WORKER_CACHE_MODE';
+      case 'SERVICE_WORKER_CONTENT_ACCESS':
+        return 'SERVICE_WORKER_CONTENT_ACCESS';
+      case 'SERVICE_WORKER_FILE_ACCESS':
+        return 'SERVICE_WORKER_FILE_ACCESS';
+      case 'SERVICE_WORKER_SHOULD_INTERCEPT_REQUEST':
+        return 'SERVICE_WORKER_SHOULD_INTERCEPT_REQUEST';
+      case 'SHOULD_OVERRIDE_WITH_REDIRECTS':
+        return 'SHOULD_OVERRIDE_WITH_REDIRECTS';
+      case 'STARTUP_FEATURE_SET_DATA_DIRECTORY_SUFFIX':
+        return 'STARTUP_FEATURE_SET_DATA_DIRECTORY_SUFFIX';
+      case 'STARTUP_FEATURE_SET_DIRECTORY_BASE_PATHS':
+        return 'STARTUP_FEATURE_SET_DIRECTORY_BASE_PATHS';
+      case 'START_SAFE_BROWSING':
+        return 'START_SAFE_BROWSING';
+      case 'TRACING_CONTROLLER_BASIC_USAGE':
+        return 'TRACING_CONTROLLER_BASIC_USAGE';
+      case 'VISUAL_STATE_CALLBACK':
+        return 'VISUAL_STATE_CALLBACK';
+      case 'WEB_MESSAGE_ARRAY_BUFFER':
+        return 'WEB_MESSAGE_ARRAY_BUFFER';
+      case 'WEB_MESSAGE_CALLBACK_ON_MESSAGE':
+        return 'WEB_MESSAGE_CALLBACK_ON_MESSAGE';
+      case 'WEB_MESSAGE_LISTENER':
+        return 'WEB_MESSAGE_LISTENER';
+      case 'WEB_MESSAGE_PORT_CLOSE':
+        return 'WEB_MESSAGE_PORT_CLOSE';
+      case 'WEB_MESSAGE_PORT_POST_MESSAGE':
+        return 'WEB_MESSAGE_PORT_POST_MESSAGE';
+      case 'WEB_MESSAGE_PORT_SET_MESSAGE_CALLBACK':
+        return 'WEB_MESSAGE_PORT_SET_MESSAGE_CALLBACK';
+      case 'WEB_RESOURCE_ERROR_GET_CODE':
+        return 'WEB_RESOURCE_ERROR_GET_CODE';
+      case 'WEB_RESOURCE_ERROR_GET_DESCRIPTION':
+        return 'WEB_RESOURCE_ERROR_GET_DESCRIPTION';
+      case 'WEB_RESOURCE_REQUEST_IS_REDIRECT':
+        return 'WEB_RESOURCE_REQUEST_IS_REDIRECT';
+      case 'WEB_VIEW_RENDERER_CLIENT_BASIC_USAGE':
+        return 'WEB_VIEW_RENDERER_CLIENT_BASIC_USAGE';
+      case 'WEB_VIEW_RENDERER_TERMINATE':
+        return 'WEB_VIEW_RENDERER_TERMINATE';
+    }
+    return _value.toString();
+  }
 
   @override
   int get hashCode => _value.hashCode;
@@ -625,6 +763,36 @@ class AndroidWebViewFeature {
     return null;
   }
 
+  /// Gets a possible [AndroidWebViewFeature] instance value with name [name].
+  ///
+  /// Goes through [AndroidWebViewFeature.values] looking for a value with
+  /// name [name], as reported by [AndroidWebViewFeature.name].
+  /// Returns the first value with the given name, otherwise `null`.
+  static AndroidWebViewFeature? byName(String? name) {
+    if (name != null) {
+      try {
+        return AndroidWebViewFeature.values
+            .firstWhere((element) => element.name() == name);
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
+  }
+
+  /// Creates a map from the names of [AndroidWebViewFeature] values to the values.
+  ///
+  /// The collection that this method is called on is expected to have
+  /// values with distinct names, like the `values` list of an enum class.
+  /// Only one value for each name can occur in the created map,
+  /// so if two or more values have the same name (either being the
+  /// same value, or being values of different enum type), at most one of
+  /// them will be represented in the returned map.
+  static Map<String, AndroidWebViewFeature> asNameMap() =>
+      <String, AndroidWebViewFeature>{
+        for (final value in AndroidWebViewFeature.values) value.name(): value
+      };
+
   ///Return whether a feature is supported at run-time. On devices running Android version `Build.VERSION_CODES.LOLLIPOP` and higher,
   ///this will check whether a feature is supported, depending on the combination of the desired feature, the Android version of device,
   ///and the WebView APK on the device. If running on a device with a lower API level, this will always return `false`.
@@ -639,6 +807,105 @@ class AndroidWebViewFeature {
 
   ///Gets [String] native value.
   String toNativeValue() => _nativeValue;
+
+  ///Gets the name of the value.
+  String name() {
+    switch (_value) {
+      case 'ALGORITHMIC_DARKENING':
+        return 'ALGORITHMIC_DARKENING';
+      case 'CREATE_WEB_MESSAGE_CHANNEL':
+        return 'CREATE_WEB_MESSAGE_CHANNEL';
+      case 'DISABLED_ACTION_MODE_MENU_ITEMS':
+        return 'DISABLED_ACTION_MODE_MENU_ITEMS';
+      case 'DOCUMENT_START_SCRIPT':
+        return 'DOCUMENT_START_SCRIPT';
+      case 'ENTERPRISE_AUTHENTICATION_APP_LINK_POLICY':
+        return 'ENTERPRISE_AUTHENTICATION_APP_LINK_POLICY';
+      case 'FORCE_DARK':
+        return 'FORCE_DARK';
+      case 'FORCE_DARK_STRATEGY':
+        return 'FORCE_DARK_STRATEGY';
+      case 'GET_WEB_CHROME_CLIENT':
+        return 'GET_WEB_CHROME_CLIENT';
+      case 'GET_WEB_VIEW_CLIENT':
+        return 'GET_WEB_VIEW_CLIENT';
+      case 'GET_WEB_VIEW_RENDERER':
+        return 'GET_WEB_VIEW_RENDERER';
+      case 'MULTI_PROCESS':
+        return 'MULTI_PROCESS';
+      case 'OFF_SCREEN_PRERASTER':
+        return 'OFF_SCREEN_PRERASTER';
+      case 'POST_WEB_MESSAGE':
+        return 'POST_WEB_MESSAGE';
+      case 'PROXY_OVERRIDE':
+        return 'PROXY_OVERRIDE';
+      case 'RECEIVE_HTTP_ERROR':
+        return 'RECEIVE_HTTP_ERROR';
+      case 'RECEIVE_WEB_RESOURCE_ERROR':
+        return 'RECEIVE_WEB_RESOURCE_ERROR';
+      case 'REQUESTED_WITH_HEADER_CONTROL':
+        return 'REQUESTED_WITH_HEADER_CONTROL';
+      case 'SAFE_BROWSING_ALLOWLIST':
+        return 'SAFE_BROWSING_ALLOWLIST';
+      case 'SAFE_BROWSING_ENABLE':
+        return 'SAFE_BROWSING_ENABLE';
+      case 'SAFE_BROWSING_HIT':
+        return 'SAFE_BROWSING_HIT';
+      case 'SAFE_BROWSING_PRIVACY_POLICY_URL':
+        return 'SAFE_BROWSING_PRIVACY_POLICY_URL';
+      case 'SAFE_BROWSING_RESPONSE_BACK_TO_SAFETY':
+        return 'SAFE_BROWSING_RESPONSE_BACK_TO_SAFETY';
+      case 'SAFE_BROWSING_RESPONSE_PROCEED':
+        return 'SAFE_BROWSING_RESPONSE_PROCEED';
+      case 'SAFE_BROWSING_RESPONSE_SHOW_INTERSTITIAL':
+        return 'SAFE_BROWSING_RESPONSE_SHOW_INTERSTITIAL';
+      case 'SAFE_BROWSING_WHITELIST':
+        return 'SAFE_BROWSING_WHITELIST';
+      case 'SERVICE_WORKER_BASIC_USAGE':
+        return 'SERVICE_WORKER_BASIC_USAGE';
+      case 'SERVICE_WORKER_BLOCK_NETWORK_LOADS':
+        return 'SERVICE_WORKER_BLOCK_NETWORK_LOADS';
+      case 'SERVICE_WORKER_CACHE_MODE':
+        return 'SERVICE_WORKER_CACHE_MODE';
+      case 'SERVICE_WORKER_CONTENT_ACCESS':
+        return 'SERVICE_WORKER_CONTENT_ACCESS';
+      case 'SERVICE_WORKER_FILE_ACCESS':
+        return 'SERVICE_WORKER_FILE_ACCESS';
+      case 'SERVICE_WORKER_SHOULD_INTERCEPT_REQUEST':
+        return 'SERVICE_WORKER_SHOULD_INTERCEPT_REQUEST';
+      case 'SHOULD_OVERRIDE_WITH_REDIRECTS':
+        return 'SHOULD_OVERRIDE_WITH_REDIRECTS';
+      case 'START_SAFE_BROWSING':
+        return 'START_SAFE_BROWSING';
+      case 'SUPPRESS_ERROR_PAGE':
+        return 'SUPPRESS_ERROR_PAGE';
+      case 'TRACING_CONTROLLER_BASIC_USAGE':
+        return 'TRACING_CONTROLLER_BASIC_USAGE';
+      case 'VISUAL_STATE_CALLBACK':
+        return 'VISUAL_STATE_CALLBACK';
+      case 'WEB_MESSAGE_CALLBACK_ON_MESSAGE':
+        return 'WEB_MESSAGE_CALLBACK_ON_MESSAGE';
+      case 'WEB_MESSAGE_LISTENER':
+        return 'WEB_MESSAGE_LISTENER';
+      case 'WEB_MESSAGE_PORT_CLOSE':
+        return 'WEB_MESSAGE_PORT_CLOSE';
+      case 'WEB_MESSAGE_PORT_POST_MESSAGE':
+        return 'WEB_MESSAGE_PORT_POST_MESSAGE';
+      case 'WEB_MESSAGE_PORT_SET_MESSAGE_CALLBACK':
+        return 'WEB_MESSAGE_PORT_SET_MESSAGE_CALLBACK';
+      case 'WEB_RESOURCE_ERROR_GET_CODE':
+        return 'WEB_RESOURCE_ERROR_GET_CODE';
+      case 'WEB_RESOURCE_ERROR_GET_DESCRIPTION':
+        return 'WEB_RESOURCE_ERROR_GET_DESCRIPTION';
+      case 'WEB_RESOURCE_REQUEST_IS_REDIRECT':
+        return 'WEB_RESOURCE_REQUEST_IS_REDIRECT';
+      case 'WEB_VIEW_RENDERER_CLIENT_BASIC_USAGE':
+        return 'WEB_VIEW_RENDERER_CLIENT_BASIC_USAGE';
+      case 'WEB_VIEW_RENDERER_TERMINATE':
+        return 'WEB_VIEW_RENDERER_TERMINATE';
+    }
+    return _value.toString();
+  }
 
   @override
   int get hashCode => _value.hashCode;

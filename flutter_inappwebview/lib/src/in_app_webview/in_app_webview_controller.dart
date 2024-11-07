@@ -576,7 +576,7 @@ class InAppWebViewController {
           .setJavaScriptBridgeName(bridgeName);
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.getJavaScriptBridgeName}
-  static Future<void> getJavaScriptBridgeName() =>
+  static Future<String> getJavaScriptBridgeName() =>
       PlatformInAppWebViewController.static().getJavaScriptBridgeName();
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.tRexRunnerHtml}

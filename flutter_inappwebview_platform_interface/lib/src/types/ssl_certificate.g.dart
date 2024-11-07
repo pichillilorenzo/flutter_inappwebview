@@ -30,7 +30,8 @@ class SslCertificate {
       this.x509Certificate});
 
   ///Gets a possible [SslCertificate] instance from a [Map] value.
-  static SslCertificate? fromMap(Map<String, dynamic>? map) {
+  static SslCertificate? fromMap(Map<String, dynamic>? map,
+      {EnumMethod? enumMethod}) {
     if (map == null) {
       return null;
     }
@@ -72,9 +73,11 @@ class SslCertificate {
     }
     return SslCertificate(
         issuedBy: SslCertificateDName.fromMap(
-            map["issuedBy"]?.cast<String, dynamic>()),
+            map["issuedBy"]?.cast<String, dynamic>(),
+            enumMethod: enumMethod),
         issuedTo: SslCertificateDName.fromMap(
-            map["issuedTo"]?.cast<String, dynamic>()),
+            map["issuedTo"]?.cast<String, dynamic>(),
+            enumMethod: enumMethod),
         validNotAfterDate: map["validNotAfterDate"] != null
             ? DateTime.fromMillisecondsSinceEpoch(map["validNotAfterDate"])
             : null,
@@ -85,13 +88,13 @@ class SslCertificate {
   }
 
   ///Converts instance to a map.
-  Map<String, dynamic> toMap() {
+  Map<String, dynamic> toMap({EnumMethod? enumMethod}) {
     return {
-      "issuedBy": issuedBy?.toMap(),
-      "issuedTo": issuedTo?.toMap(),
+      "issuedBy": issuedBy?.toMap(enumMethod: enumMethod),
+      "issuedTo": issuedTo?.toMap(enumMethod: enumMethod),
       "validNotAfterDate": validNotAfterDate?.millisecondsSinceEpoch,
       "validNotBeforeDate": validNotBeforeDate?.millisecondsSinceEpoch,
-      "x509Certificate": x509Certificate?.toMap(),
+      "x509Certificate": x509Certificate?.toMap(enumMethod: enumMethod),
     };
   }
 

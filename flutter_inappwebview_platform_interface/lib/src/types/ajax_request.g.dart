@@ -96,19 +96,27 @@ class AjaxRequest {
       this.withCredentials});
 
   ///Gets a possible [AjaxRequest] instance from a [Map] value.
-  static AjaxRequest? fromMap(Map<String, dynamic>? map) {
+  static AjaxRequest? fromMap(Map<String, dynamic>? map,
+      {EnumMethod? enumMethod}) {
     if (map == null) {
       return null;
     }
     final instance = AjaxRequest(
       data: map['data'],
-      event: AjaxRequestEvent.fromMap(map['event']?.cast<String, dynamic>()),
-      headers:
-          AjaxRequestHeaders.fromMap(map['headers']?.cast<String, dynamic>()),
+      event: AjaxRequestEvent.fromMap(map['event']?.cast<String, dynamic>(),
+          enumMethod: enumMethod),
+      headers: AjaxRequestHeaders.fromMap(
+          map['headers']?.cast<String, dynamic>(),
+          enumMethod: enumMethod),
       isAsync: map['isAsync'],
       method: map['method'],
       password: map['password'],
-      readyState: AjaxRequestReadyState.fromNativeValue(map['readyState']),
+      readyState: switch (enumMethod ?? EnumMethod.nativeValue) {
+        EnumMethod.nativeValue =>
+          AjaxRequestReadyState.fromNativeValue(map['readyState']),
+        EnumMethod.value => AjaxRequestReadyState.fromValue(map['readyState']),
+        EnumMethod.name => AjaxRequestReadyState.byName(map['readyState'])
+      },
       response: map['response'],
       responseHeaders: map['responseHeaders']?.cast<String, dynamic>(),
       responseText: map['responseText'],
@@ -122,21 +130,34 @@ class AjaxRequest {
       user: map['user'],
       withCredentials: map['withCredentials'],
     );
-    instance.action = AjaxRequestAction.fromNativeValue(map['action']);
+    instance.action = switch (enumMethod ?? EnumMethod.nativeValue) {
+      EnumMethod.nativeValue =>
+        AjaxRequestAction.fromNativeValue(map['action']),
+      EnumMethod.value => AjaxRequestAction.fromValue(map['action']),
+      EnumMethod.name => AjaxRequestAction.byName(map['action'])
+    };
     return instance;
   }
 
   ///Converts instance to a map.
-  Map<String, dynamic> toMap() {
+  Map<String, dynamic> toMap({EnumMethod? enumMethod}) {
     return {
-      "action": action?.toNativeValue(),
+      "action": switch (enumMethod ?? EnumMethod.nativeValue) {
+        EnumMethod.nativeValue => action?.toNativeValue(),
+        EnumMethod.value => action?.toValue(),
+        EnumMethod.name => action?.name()
+      },
       "data": data,
-      "event": event?.toMap(),
-      "headers": headers?.toMap(),
+      "event": event?.toMap(enumMethod: enumMethod),
+      "headers": headers?.toMap(enumMethod: enumMethod),
       "isAsync": isAsync,
       "method": method,
       "password": password,
-      "readyState": readyState?.toNativeValue(),
+      "readyState": switch (enumMethod ?? EnumMethod.nativeValue) {
+        EnumMethod.nativeValue => readyState?.toNativeValue(),
+        EnumMethod.value => readyState?.toValue(),
+        EnumMethod.name => readyState?.name()
+      },
       "response": response,
       "responseHeaders": responseHeaders,
       "responseText": responseText,

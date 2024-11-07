@@ -1,5 +1,7 @@
 import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_internal_annotations.dart';
 
+import 'enum_method.dart';
+
 part 'android_resource.g.dart';
 
 ///Class that represents an Android resource file.

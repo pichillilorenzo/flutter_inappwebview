@@ -58,20 +58,44 @@ class DismissButtonStyle {
     return null;
   }
 
+  /// Gets a possible [DismissButtonStyle] instance value with name [name].
+  ///
+  /// Goes through [DismissButtonStyle.values] looking for a value with
+  /// name [name], as reported by [DismissButtonStyle.name].
+  /// Returns the first value with the given name, otherwise `null`.
+  static DismissButtonStyle? byName(String? name) {
+    if (name != null) {
+      try {
+        return DismissButtonStyle.values
+            .firstWhere((element) => element.name() == name);
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
+  }
+
+  /// Creates a map from the names of [DismissButtonStyle] values to the values.
+  ///
+  /// The collection that this method is called on is expected to have
+  /// values with distinct names, like the `values` list of an enum class.
+  /// Only one value for each name can occur in the created map,
+  /// so if two or more values have the same name (either being the
+  /// same value, or being values of different enum type), at most one of
+  /// them will be represented in the returned map.
+  static Map<String, DismissButtonStyle> asNameMap() =>
+      <String, DismissButtonStyle>{
+        for (final value in DismissButtonStyle.values) value.name(): value
+      };
+
   ///Gets [int] value.
   int toValue() => _value;
 
   ///Gets [int] native value.
   int toNativeValue() => _nativeValue;
 
-  @override
-  int get hashCode => _value.hashCode;
-
-  @override
-  bool operator ==(value) => value == _value;
-
-  @override
-  String toString() {
+  ///Gets the name of the value.
+  String name() {
     switch (_value) {
       case 2:
         return 'CANCEL';
@@ -81,6 +105,17 @@ class DismissButtonStyle {
         return 'DONE';
     }
     return _value.toString();
+  }
+
+  @override
+  int get hashCode => _value.hashCode;
+
+  @override
+  bool operator ==(value) => value == _value;
+
+  @override
+  String toString() {
+    return name();
   }
 }
 
@@ -141,20 +176,45 @@ class IOSSafariDismissButtonStyle {
     return null;
   }
 
+  /// Gets a possible [IOSSafariDismissButtonStyle] instance value with name [name].
+  ///
+  /// Goes through [IOSSafariDismissButtonStyle.values] looking for a value with
+  /// name [name], as reported by [IOSSafariDismissButtonStyle.name].
+  /// Returns the first value with the given name, otherwise `null`.
+  static IOSSafariDismissButtonStyle? byName(String? name) {
+    if (name != null) {
+      try {
+        return IOSSafariDismissButtonStyle.values
+            .firstWhere((element) => element.name() == name);
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
+  }
+
+  /// Creates a map from the names of [IOSSafariDismissButtonStyle] values to the values.
+  ///
+  /// The collection that this method is called on is expected to have
+  /// values with distinct names, like the `values` list of an enum class.
+  /// Only one value for each name can occur in the created map,
+  /// so if two or more values have the same name (either being the
+  /// same value, or being values of different enum type), at most one of
+  /// them will be represented in the returned map.
+  static Map<String, IOSSafariDismissButtonStyle> asNameMap() =>
+      <String, IOSSafariDismissButtonStyle>{
+        for (final value in IOSSafariDismissButtonStyle.values)
+          value.name(): value
+      };
+
   ///Gets [int] value.
   int toValue() => _value;
 
   ///Gets [int] native value.
   int toNativeValue() => _nativeValue;
 
-  @override
-  int get hashCode => _value.hashCode;
-
-  @override
-  bool operator ==(value) => value == _value;
-
-  @override
-  String toString() {
+  ///Gets the name of the value.
+  String name() {
     switch (_value) {
       case 2:
         return 'CANCEL';
@@ -164,5 +224,16 @@ class IOSSafariDismissButtonStyle {
         return 'DONE';
     }
     return _value.toString();
+  }
+
+  @override
+  int get hashCode => _value.hashCode;
+
+  @override
+  bool operator ==(value) => value == _value;
+
+  @override
+  String toString() {
+    return name();
   }
 }

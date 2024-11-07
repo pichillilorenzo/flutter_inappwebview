@@ -3,6 +3,7 @@ import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_i
 import 'frame_info.dart';
 import 'process_failed_kind.dart';
 import 'process_failed_reason.dart';
+import 'enum_method.dart';
 
 part 'process_failed_detail.g.dart';
 

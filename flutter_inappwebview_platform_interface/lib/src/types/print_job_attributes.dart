@@ -12,6 +12,7 @@ import 'print_job_media_size.dart';
 import 'print_job_resolution.dart';
 import 'print_job_pagination_mode.dart';
 import 'print_job_disposition.dart';
+import 'enum_method.dart';
 
 part 'print_job_attributes.g.dart';
 

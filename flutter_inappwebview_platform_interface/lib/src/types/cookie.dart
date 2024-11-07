@@ -3,6 +3,7 @@ import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_i
 import '../platform_cookie_manager.dart';
 import '../platform_webview_feature.dart';
 import 'http_cookie_same_site_policy.dart';
+import 'enum_method.dart';
 
 part 'cookie.g.dart';
 

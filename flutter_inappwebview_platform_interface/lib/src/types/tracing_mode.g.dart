@@ -59,11 +59,51 @@ class TracingMode {
     return null;
   }
 
+  /// Gets a possible [TracingMode] instance value with name [name].
+  ///
+  /// Goes through [TracingMode.values] looking for a value with
+  /// name [name], as reported by [TracingMode.name].
+  /// Returns the first value with the given name, otherwise `null`.
+  static TracingMode? byName(String? name) {
+    if (name != null) {
+      try {
+        return TracingMode.values
+            .firstWhere((element) => element.name() == name);
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
+  }
+
+  /// Creates a map from the names of [TracingMode] values to the values.
+  ///
+  /// The collection that this method is called on is expected to have
+  /// values with distinct names, like the `values` list of an enum class.
+  /// Only one value for each name can occur in the created map,
+  /// so if two or more values have the same name (either being the
+  /// same value, or being values of different enum type), at most one of
+  /// them will be represented in the returned map.
+  static Map<String, TracingMode> asNameMap() => <String, TracingMode>{
+        for (final value in TracingMode.values) value.name(): value
+      };
+
   ///Gets [int] value.
   int toValue() => _value;
 
   ///Gets [int] native value.
   int toNativeValue() => _nativeValue;
+
+  ///Gets the name of the value.
+  String name() {
+    switch (_value) {
+      case 1:
+        return 'RECORD_CONTINUOUSLY';
+      case 0:
+        return 'RECORD_UNTIL_FULL';
+    }
+    return _value.toString();
+  }
 
   @override
   int get hashCode => _value.hashCode;
@@ -73,12 +113,6 @@ class TracingMode {
 
   @override
   String toString() {
-    switch (_value) {
-      case 1:
-        return 'RECORD_CONTINUOUSLY';
-      case 0:
-        return 'RECORD_UNTIL_FULL';
-    }
-    return _value.toString();
+    return name();
   }
 }

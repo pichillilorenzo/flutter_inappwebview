@@ -26,12 +26,18 @@ class JsAlertResponse {
       this.message = ""});
 
   ///Gets a possible [JsAlertResponse] instance from a [Map] value.
-  static JsAlertResponse? fromMap(Map<String, dynamic>? map) {
+  static JsAlertResponse? fromMap(Map<String, dynamic>? map,
+      {EnumMethod? enumMethod}) {
     if (map == null) {
       return null;
     }
     final instance = JsAlertResponse();
-    instance.action = JsAlertResponseAction.fromNativeValue(map['action']);
+    instance.action = switch (enumMethod ?? EnumMethod.nativeValue) {
+      EnumMethod.nativeValue =>
+        JsAlertResponseAction.fromNativeValue(map['action']),
+      EnumMethod.value => JsAlertResponseAction.fromValue(map['action']),
+      EnumMethod.name => JsAlertResponseAction.byName(map['action'])
+    };
     if (map['confirmButtonTitle'] != null) {
       instance.confirmButtonTitle = map['confirmButtonTitle'];
     }
@@ -45,9 +51,13 @@ class JsAlertResponse {
   }
 
   ///Converts instance to a map.
-  Map<String, dynamic> toMap() {
+  Map<String, dynamic> toMap({EnumMethod? enumMethod}) {
     return {
-      "action": action?.toNativeValue(),
+      "action": switch (enumMethod ?? EnumMethod.nativeValue) {
+        EnumMethod.nativeValue => action?.toNativeValue(),
+        EnumMethod.value => action?.toValue(),
+        EnumMethod.name => action?.name()
+      },
       "confirmButtonTitle": confirmButtonTitle,
       "handledByClient": handledByClient,
       "message": message,

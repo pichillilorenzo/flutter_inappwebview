@@ -62,13 +62,15 @@ class ClientCertChallenge extends URLAuthenticationChallenge {
   }
 
   ///Gets a possible [ClientCertChallenge] instance from a [Map] value.
-  static ClientCertChallenge? fromMap(Map<String, dynamic>? map) {
+  static ClientCertChallenge? fromMap(Map<String, dynamic>? map,
+      {EnumMethod? enumMethod}) {
     if (map == null) {
       return null;
     }
     final instance = ClientCertChallenge(
       protectionSpace: URLProtectionSpace.fromMap(
-          map['protectionSpace']?.cast<String, dynamic>())!,
+          map['protectionSpace']?.cast<String, dynamic>(),
+          enumMethod: enumMethod)!,
       allowedCertificateAuthorities:
           map['allowedCertificateAuthorities'] != null
               ? List<String>.from(
@@ -85,8 +87,9 @@ class ClientCertChallenge extends URLAuthenticationChallenge {
           ? List<String>.from(map['keyTypes']!.cast<String>())
           : null,
       mutuallyTrustedCertificates: map['mutuallyTrustedCertificates'] != null
-          ? List<SslCertificate>.from(map['mutuallyTrustedCertificates']
-              .map((e) => SslCertificate.fromMap(e?.cast<String, dynamic>())!))
+          ? List<SslCertificate>.from(map['mutuallyTrustedCertificates'].map(
+              (e) => SslCertificate.fromMap(e?.cast<String, dynamic>(),
+                  enumMethod: enumMethod)!))
           : null,
       principals: map['principals'] != null
           ? List<String>.from(map['principals']!.cast<String>())
@@ -96,14 +99,15 @@ class ClientCertChallenge extends URLAuthenticationChallenge {
   }
 
   ///Converts instance to a map.
-  Map<String, dynamic> toMap() {
+  Map<String, dynamic> toMap({EnumMethod? enumMethod}) {
     return {
-      "protectionSpace": protectionSpace.toMap(),
+      "protectionSpace": protectionSpace.toMap(enumMethod: enumMethod),
       "allowedCertificateAuthorities": allowedCertificateAuthorities,
       "isProxy": isProxy,
       "keyTypes": keyTypes,
-      "mutuallyTrustedCertificates":
-          mutuallyTrustedCertificates?.map((e) => e.toMap()).toList(),
+      "mutuallyTrustedCertificates": mutuallyTrustedCertificates
+          ?.map((e) => e.toMap(enumMethod: enumMethod))
+          .toList(),
       "principals": principals,
     };
   }

@@ -58,31 +58,42 @@ class FrameInfo {
       this.securityOrigin});
 
   ///Gets a possible [FrameInfo] instance from a [Map] value.
-  static FrameInfo? fromMap(Map<String, dynamic>? map) {
+  static FrameInfo? fromMap(Map<String, dynamic>? map,
+      {EnumMethod? enumMethod}) {
     if (map == null) {
       return null;
     }
     final instance = FrameInfo(
       frameId: map['frameId'],
       isMainFrame: map['isMainFrame'],
-      kind: FrameKind.fromNativeValue(map['kind']),
+      kind: switch (enumMethod ?? EnumMethod.nativeValue) {
+        EnumMethod.nativeValue => FrameKind.fromNativeValue(map['kind']),
+        EnumMethod.value => FrameKind.fromValue(map['kind']),
+        EnumMethod.name => FrameKind.byName(map['kind'])
+      },
       name: map['name'],
-      request: URLRequest.fromMap(map['request']?.cast<String, dynamic>()),
+      request: URLRequest.fromMap(map['request']?.cast<String, dynamic>(),
+          enumMethod: enumMethod),
       securityOrigin: SecurityOrigin.fromMap(
-          map['securityOrigin']?.cast<String, dynamic>()),
+          map['securityOrigin']?.cast<String, dynamic>(),
+          enumMethod: enumMethod),
     );
     return instance;
   }
 
   ///Converts instance to a map.
-  Map<String, dynamic> toMap() {
+  Map<String, dynamic> toMap({EnumMethod? enumMethod}) {
     return {
       "frameId": frameId,
       "isMainFrame": isMainFrame,
-      "kind": kind?.toNativeValue(),
+      "kind": switch (enumMethod ?? EnumMethod.nativeValue) {
+        EnumMethod.nativeValue => kind?.toNativeValue(),
+        EnumMethod.value => kind?.toValue(),
+        EnumMethod.name => kind?.name()
+      },
       "name": name,
-      "request": request?.toMap(),
-      "securityOrigin": securityOrigin?.toMap(),
+      "request": request?.toMap(enumMethod: enumMethod),
+      "securityOrigin": securityOrigin?.toMap(enumMethod: enumMethod),
     };
   }
 
@@ -116,25 +127,28 @@ class IOSWKFrameInfo {
       {required this.isMainFrame, this.request, this.securityOrigin});
 
   ///Gets a possible [IOSWKFrameInfo] instance from a [Map] value.
-  static IOSWKFrameInfo? fromMap(Map<String, dynamic>? map) {
+  static IOSWKFrameInfo? fromMap(Map<String, dynamic>? map,
+      {EnumMethod? enumMethod}) {
     if (map == null) {
       return null;
     }
     final instance = IOSWKFrameInfo(
       isMainFrame: map['isMainFrame'],
-      request: URLRequest.fromMap(map['request']?.cast<String, dynamic>()),
+      request: URLRequest.fromMap(map['request']?.cast<String, dynamic>(),
+          enumMethod: enumMethod),
       securityOrigin: IOSWKSecurityOrigin.fromMap(
-          map['securityOrigin']?.cast<String, dynamic>()),
+          map['securityOrigin']?.cast<String, dynamic>(),
+          enumMethod: enumMethod),
     );
     return instance;
   }
 
   ///Converts instance to a map.
-  Map<String, dynamic> toMap() {
+  Map<String, dynamic> toMap({EnumMethod? enumMethod}) {
     return {
       "isMainFrame": isMainFrame,
-      "request": request?.toMap(),
-      "securityOrigin": securityOrigin?.toMap(),
+      "request": request?.toMap(enumMethod: enumMethod),
+      "securityOrigin": securityOrigin?.toMap(enumMethod: enumMethod),
     };
   }
 

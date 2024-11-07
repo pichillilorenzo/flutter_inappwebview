@@ -1,5 +1,7 @@
 import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_internal_annotations.dart';
 
+import 'enum_method.dart';
+
 part 'window_features.g.dart';
 
 ///Class that specifies optional attributes for the containing window when a new web view is requested.

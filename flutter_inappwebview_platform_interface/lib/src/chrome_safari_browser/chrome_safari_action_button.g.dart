@@ -46,7 +46,8 @@ class ChromeSafariBrowserActionButton {
       this.shouldTint = false});
 
   ///Gets a possible [ChromeSafariBrowserActionButton] instance from a [Map] value.
-  static ChromeSafariBrowserActionButton? fromMap(Map<String, dynamic>? map) {
+  static ChromeSafariBrowserActionButton? fromMap(Map<String, dynamic>? map,
+      {EnumMethod? enumMethod}) {
     if (map == null) {
       return null;
     }
@@ -62,7 +63,7 @@ class ChromeSafariBrowserActionButton {
   }
 
   ///Converts instance to a map.
-  Map<String, dynamic> toMap() {
+  Map<String, dynamic> toMap({EnumMethod? enumMethod}) {
     return {
       "description": description,
       "icon": icon,

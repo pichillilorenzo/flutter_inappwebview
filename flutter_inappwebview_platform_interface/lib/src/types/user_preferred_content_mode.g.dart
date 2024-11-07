@@ -58,20 +58,44 @@ class UserPreferredContentMode {
     return null;
   }
 
+  /// Gets a possible [UserPreferredContentMode] instance value with name [name].
+  ///
+  /// Goes through [UserPreferredContentMode.values] looking for a value with
+  /// name [name], as reported by [UserPreferredContentMode.name].
+  /// Returns the first value with the given name, otherwise `null`.
+  static UserPreferredContentMode? byName(String? name) {
+    if (name != null) {
+      try {
+        return UserPreferredContentMode.values
+            .firstWhere((element) => element.name() == name);
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
+  }
+
+  /// Creates a map from the names of [UserPreferredContentMode] values to the values.
+  ///
+  /// The collection that this method is called on is expected to have
+  /// values with distinct names, like the `values` list of an enum class.
+  /// Only one value for each name can occur in the created map,
+  /// so if two or more values have the same name (either being the
+  /// same value, or being values of different enum type), at most one of
+  /// them will be represented in the returned map.
+  static Map<String, UserPreferredContentMode> asNameMap() =>
+      <String, UserPreferredContentMode>{
+        for (final value in UserPreferredContentMode.values) value.name(): value
+      };
+
   ///Gets [int] value.
   int toValue() => _value;
 
   ///Gets [int] native value.
   int toNativeValue() => _nativeValue;
 
-  @override
-  int get hashCode => _value.hashCode;
-
-  @override
-  bool operator ==(value) => value == _value;
-
-  @override
-  String toString() {
+  ///Gets the name of the value.
+  String name() {
     switch (_value) {
       case 2:
         return 'DESKTOP';
@@ -81,5 +105,16 @@ class UserPreferredContentMode {
         return 'RECOMMENDED';
     }
     return _value.toString();
+  }
+
+  @override
+  int get hashCode => _value.hashCode;
+
+  @override
+  bool operator ==(value) => value == _value;
+
+  @override
+  String toString() {
+    return name();
   }
 }

@@ -1,7 +1,9 @@
 import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_internal_annotations.dart';
+
 import '../in_app_webview/platform_webview.dart';
 import 'permission_resource_type.dart';
 import 'permission_response_action.dart';
+import 'enum_method.dart';
 
 part 'permission_response.g.dart';
 

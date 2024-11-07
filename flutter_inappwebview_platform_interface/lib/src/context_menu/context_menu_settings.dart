@@ -1,6 +1,7 @@
 import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_internal_annotations.dart';
 
 import 'context_menu.dart';
+import '../types/enum_method.dart';
 
 part 'context_menu_settings.g.dart';
 

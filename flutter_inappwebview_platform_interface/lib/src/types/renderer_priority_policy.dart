@@ -1,6 +1,8 @@
 import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_internal_annotations.dart';
+
 import '../in_app_webview/platform_webview.dart';
 import 'renderer_priority.dart';
+import 'enum_method.dart';
 
 part 'renderer_priority_policy.g.dart';
 

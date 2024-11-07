@@ -23,7 +23,8 @@ class CustomSchemeResponse {
       required this.data});
 
   ///Gets a possible [CustomSchemeResponse] instance from a [Map] value.
-  static CustomSchemeResponse? fromMap(Map<String, dynamic>? map) {
+  static CustomSchemeResponse? fromMap(Map<String, dynamic>? map,
+      {EnumMethod? enumMethod}) {
     if (map == null) {
       return null;
     }
@@ -38,7 +39,7 @@ class CustomSchemeResponse {
   }
 
   ///Converts instance to a map.
-  Map<String, dynamic> toMap() {
+  Map<String, dynamic> toMap({EnumMethod? enumMethod}) {
     return {
       "contentEncoding": contentEncoding,
       "contentType": contentType,

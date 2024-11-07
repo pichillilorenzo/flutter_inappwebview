@@ -42,7 +42,8 @@ class WindowFeatures {
       this.y});
 
   ///Gets a possible [WindowFeatures] instance from a [Map] value.
-  static WindowFeatures? fromMap(Map<String, dynamic>? map) {
+  static WindowFeatures? fromMap(Map<String, dynamic>? map,
+      {EnumMethod? enumMethod}) {
     if (map == null) {
       return null;
     }
@@ -60,7 +61,7 @@ class WindowFeatures {
   }
 
   ///Converts instance to a map.
-  Map<String, dynamic> toMap() {
+  Map<String, dynamic> toMap({EnumMethod? enumMethod}) {
     return {
       "allowsResizing": allowsResizing,
       "height": height,
@@ -122,7 +123,8 @@ class IOSWKWindowFeatures {
       this.y});
 
   ///Gets a possible [IOSWKWindowFeatures] instance from a [Map] value.
-  static IOSWKWindowFeatures? fromMap(Map<String, dynamic>? map) {
+  static IOSWKWindowFeatures? fromMap(Map<String, dynamic>? map,
+      {EnumMethod? enumMethod}) {
     if (map == null) {
       return null;
     }
@@ -140,7 +142,7 @@ class IOSWKWindowFeatures {
   }
 
   ///Converts instance to a map.
-  Map<String, dynamic> toMap() {
+  Map<String, dynamic> toMap({EnumMethod? enumMethod}) {
     return {
       "allowsResizing": allowsResizing,
       "height": height,

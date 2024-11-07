@@ -62,11 +62,56 @@ class ActionModeMenuItem {
     return null;
   }
 
+  /// Gets a possible [ActionModeMenuItem] instance value with name [name].
+  ///
+  /// Goes through [ActionModeMenuItem.values] looking for a value with
+  /// name [name], as reported by [ActionModeMenuItem.name].
+  /// Returns the first value with the given name, otherwise `null`.
+  static ActionModeMenuItem? byName(String? name) {
+    if (name != null) {
+      try {
+        return ActionModeMenuItem.values
+            .firstWhere((element) => element.name() == name);
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
+  }
+
+  /// Creates a map from the names of [ActionModeMenuItem] values to the values.
+  ///
+  /// The collection that this method is called on is expected to have
+  /// values with distinct names, like the `values` list of an enum class.
+  /// Only one value for each name can occur in the created map,
+  /// so if two or more values have the same name (either being the
+  /// same value, or being values of different enum type), at most one of
+  /// them will be represented in the returned map.
+  static Map<String, ActionModeMenuItem> asNameMap() =>
+      <String, ActionModeMenuItem>{
+        for (final value in ActionModeMenuItem.values) value.name(): value
+      };
+
   ///Gets [int] value.
   int toValue() => _value;
 
   ///Gets [int] native value.
   int toNativeValue() => _nativeValue;
+
+  ///Gets the name of the value.
+  String name() {
+    switch (_value) {
+      case 0:
+        return 'MENU_ITEM_NONE';
+      case 4:
+        return 'MENU_ITEM_PROCESS_TEXT';
+      case 1:
+        return 'MENU_ITEM_SHARE';
+      case 2:
+        return 'MENU_ITEM_WEB_SEARCH';
+    }
+    return _value.toString();
+  }
 
   @override
   int get hashCode => _value.hashCode;
@@ -79,17 +124,7 @@ class ActionModeMenuItem {
           value.toValue() | _value, value.toNativeValue() | _nativeValue);
   @override
   String toString() {
-    switch (_value) {
-      case 0:
-        return 'MENU_ITEM_NONE';
-      case 4:
-        return 'MENU_ITEM_PROCESS_TEXT';
-      case 1:
-        return 'MENU_ITEM_SHARE';
-      case 2:
-        return 'MENU_ITEM_WEB_SEARCH';
-    }
-    return _value.toString();
+    return name();
   }
 }
 
@@ -155,11 +190,57 @@ class AndroidActionModeMenuItem {
     return null;
   }
 
+  /// Gets a possible [AndroidActionModeMenuItem] instance value with name [name].
+  ///
+  /// Goes through [AndroidActionModeMenuItem.values] looking for a value with
+  /// name [name], as reported by [AndroidActionModeMenuItem.name].
+  /// Returns the first value with the given name, otherwise `null`.
+  static AndroidActionModeMenuItem? byName(String? name) {
+    if (name != null) {
+      try {
+        return AndroidActionModeMenuItem.values
+            .firstWhere((element) => element.name() == name);
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
+  }
+
+  /// Creates a map from the names of [AndroidActionModeMenuItem] values to the values.
+  ///
+  /// The collection that this method is called on is expected to have
+  /// values with distinct names, like the `values` list of an enum class.
+  /// Only one value for each name can occur in the created map,
+  /// so if two or more values have the same name (either being the
+  /// same value, or being values of different enum type), at most one of
+  /// them will be represented in the returned map.
+  static Map<String, AndroidActionModeMenuItem> asNameMap() =>
+      <String, AndroidActionModeMenuItem>{
+        for (final value in AndroidActionModeMenuItem.values)
+          value.name(): value
+      };
+
   ///Gets [int] value.
   int toValue() => _value;
 
   ///Gets [int] native value.
   int toNativeValue() => _nativeValue;
+
+  ///Gets the name of the value.
+  String name() {
+    switch (_value) {
+      case 0:
+        return 'MENU_ITEM_NONE';
+      case 4:
+        return 'MENU_ITEM_PROCESS_TEXT';
+      case 1:
+        return 'MENU_ITEM_SHARE';
+      case 2:
+        return 'MENU_ITEM_WEB_SEARCH';
+    }
+    return _value.toString();
+  }
 
   @override
   int get hashCode => _value.hashCode;
@@ -172,16 +253,6 @@ class AndroidActionModeMenuItem {
           value.toValue() | _value, value.toNativeValue() | _nativeValue);
   @override
   String toString() {
-    switch (_value) {
-      case 0:
-        return 'MENU_ITEM_NONE';
-      case 4:
-        return 'MENU_ITEM_PROCESS_TEXT';
-      case 1:
-        return 'MENU_ITEM_SHARE';
-      case 2:
-        return 'MENU_ITEM_WEB_SEARCH';
-    }
-    return _value.toString();
+    return name();
   }
 }

@@ -1544,7 +1544,8 @@ class InAppWebViewSettings {
   }
 
   ///Gets a possible [InAppWebViewSettings] instance from a [Map] value.
-  static InAppWebViewSettings? fromMap(Map<String, dynamic>? map) {
+  static InAppWebViewSettings? fromMap(Map<String, dynamic>? map,
+      {EnumMethod? enumMethod}) {
     if (map == null) {
       return null;
     }
@@ -1556,11 +1557,27 @@ class InAppWebViewSettings {
       defaultVideoPoster: map['defaultVideoPoster'] != null
           ? Uint8List.fromList(map['defaultVideoPoster'].cast<int>())
           : null,
-      disabledActionModeMenuItems: ActionModeMenuItem.fromNativeValue(
-          map['disabledActionModeMenuItems']),
-      forceDark: ForceDark.fromNativeValue(map['forceDark']),
-      forceDarkStrategy:
+      disabledActionModeMenuItems: switch (
+          enumMethod ?? EnumMethod.nativeValue) {
+        EnumMethod.nativeValue => ActionModeMenuItem.fromNativeValue(
+            map['disabledActionModeMenuItems']),
+        EnumMethod.value =>
+          ActionModeMenuItem.fromValue(map['disabledActionModeMenuItems']),
+        EnumMethod.name =>
+          ActionModeMenuItem.byName(map['disabledActionModeMenuItems'])
+      },
+      forceDark: switch (enumMethod ?? EnumMethod.nativeValue) {
+        EnumMethod.nativeValue => ForceDark.fromNativeValue(map['forceDark']),
+        EnumMethod.value => ForceDark.fromValue(map['forceDark']),
+        EnumMethod.name => ForceDark.byName(map['forceDark'])
+      },
+      forceDarkStrategy: switch (enumMethod ?? EnumMethod.nativeValue) {
+        EnumMethod.nativeValue =>
           ForceDarkStrategy.fromNativeValue(map['forceDarkStrategy']),
+        EnumMethod.value =>
+          ForceDarkStrategy.fromValue(map['forceDarkStrategy']),
+        EnumMethod.name => ForceDarkStrategy.byName(map['forceDarkStrategy'])
+      },
       horizontalScrollbarThumbColor:
           map['horizontalScrollbarThumbColor'] != null
               ? UtilColor.fromStringRepresentation(
@@ -1576,12 +1593,21 @@ class InAppWebViewSettings {
       iframeAriaHidden: map['iframeAriaHidden'],
       iframeCsp: map['iframeCsp'],
       iframeName: map['iframeName'],
-      iframeReferrerPolicy:
+      iframeReferrerPolicy: switch (enumMethod ?? EnumMethod.nativeValue) {
+        EnumMethod.nativeValue =>
           ReferrerPolicy.fromNativeValue(map['iframeReferrerPolicy']),
+        EnumMethod.value =>
+          ReferrerPolicy.fromValue(map['iframeReferrerPolicy']),
+        EnumMethod.name => ReferrerPolicy.byName(map['iframeReferrerPolicy'])
+      },
       iframeRole: map['iframeRole'],
       iframeSandbox: map['iframeSandbox'] != null
-          ? Set<Sandbox>.from(
-              map['iframeSandbox'].map((e) => Sandbox.fromNativeValue(e)!))
+          ? Set<Sandbox>.from(map['iframeSandbox']
+              .map((e) => switch (enumMethod ?? EnumMethod.nativeValue) {
+                    EnumMethod.nativeValue => Sandbox.fromNativeValue(e),
+                    EnumMethod.value => Sandbox.fromValue(e),
+                    EnumMethod.name => Sandbox.byName(e)
+                  }!))
           : null,
       javaScriptBridgeForMainFrameOnly: map['javaScriptBridgeForMainFrameOnly'],
       javaScriptBridgeOriginAllowList:
@@ -1596,15 +1622,24 @@ class InAppWebViewSettings {
               ? Set<String>.from(
                   map['javaScriptHandlersOriginAllowList']!.cast<String>())
               : null,
-      layoutAlgorithm: LayoutAlgorithm.fromNativeValue(map['layoutAlgorithm']),
+      layoutAlgorithm: switch (enumMethod ?? EnumMethod.nativeValue) {
+        EnumMethod.nativeValue =>
+          LayoutAlgorithm.fromNativeValue(map['layoutAlgorithm']),
+        EnumMethod.value => LayoutAlgorithm.fromValue(map['layoutAlgorithm']),
+        EnumMethod.name => LayoutAlgorithm.byName(map['layoutAlgorithm'])
+      },
       maximumViewportInset: MapEdgeInsets.fromMap(
           map['maximumViewportInset']?.cast<String, dynamic>()),
       mediaType: map['mediaType'],
       minimumFontSize: map['minimumFontSize'],
       minimumViewportInset: MapEdgeInsets.fromMap(
           map['minimumViewportInset']?.cast<String, dynamic>()),
-      mixedContentMode:
+      mixedContentMode: switch (enumMethod ?? EnumMethod.nativeValue) {
+        EnumMethod.nativeValue =>
           MixedContentMode.fromNativeValue(map['mixedContentMode']),
+        EnumMethod.value => MixedContentMode.fromValue(map['mixedContentMode']),
+        EnumMethod.name => MixedContentMode.byName(map['mixedContentMode'])
+      },
       networkAvailable: map['networkAvailable'],
       pluginScriptsOriginAllowList: map['pluginScriptsOriginAllowList'] != null
           ? Set<String>.from(
@@ -1613,7 +1648,8 @@ class InAppWebViewSettings {
       regexToAllowSyncUrlLoading: map['regexToAllowSyncUrlLoading'],
       regexToCancelSubFramesLoading: map['regexToCancelSubFramesLoading'],
       rendererPriorityPolicy: RendererPriorityPolicy.fromMap(
-          map['rendererPriorityPolicy']?.cast<String, dynamic>()),
+          map['rendererPriorityPolicy']?.cast<String, dynamic>(),
+          enumMethod: enumMethod),
       requestedWithHeaderOriginAllowList:
           map['requestedWithHeaderOriginAllowList'] != null
               ? Set<String>.from(
@@ -1641,7 +1677,8 @@ class InAppWebViewSettings {
               map['verticalScrollbarTrackColor'])
           : null,
       webViewAssetLoader: WebViewAssetLoader.fromMap(
-          map['webViewAssetLoader']?.cast<String, dynamic>()),
+          map['webViewAssetLoader']?.cast<String, dynamic>(),
+          enumMethod: enumMethod),
     );
     instance.accessibilityIgnoresInvertColors =
         map['accessibilityIgnoresInvertColors'];
@@ -1670,22 +1707,45 @@ class InAppWebViewSettings {
     instance.blockNetworkLoads = map['blockNetworkLoads'];
     instance.builtInZoomControls = map['builtInZoomControls'];
     instance.cacheEnabled = map['cacheEnabled'];
-    instance.cacheMode = CacheMode.fromNativeValue(map['cacheMode']);
+    instance.cacheMode = switch (enumMethod ?? EnumMethod.nativeValue) {
+      EnumMethod.nativeValue => CacheMode.fromNativeValue(map['cacheMode']),
+      EnumMethod.value => CacheMode.fromValue(map['cacheMode']),
+      EnumMethod.name => CacheMode.byName(map['cacheMode'])
+    };
     instance.clearCache = map['clearCache'];
     instance.clearSessionCache = map['clearSessionCache'];
-    instance.contentBlockers =
-        _deserializeContentBlockers(map['contentBlockers']);
+    instance.contentBlockers = _deserializeContentBlockers(
+        map['contentBlockers'],
+        enumMethod: enumMethod);
     instance.contentInsetAdjustmentBehavior =
+        switch (enumMethod ?? EnumMethod.nativeValue) {
+      EnumMethod.nativeValue =>
         ScrollViewContentInsetAdjustmentBehavior.fromNativeValue(
-            map['contentInsetAdjustmentBehavior']);
+            map['contentInsetAdjustmentBehavior']),
+      EnumMethod.value => ScrollViewContentInsetAdjustmentBehavior.fromValue(
+          map['contentInsetAdjustmentBehavior']),
+      EnumMethod.name => ScrollViewContentInsetAdjustmentBehavior.byName(
+          map['contentInsetAdjustmentBehavior'])
+    };
     instance.cursiveFontFamily = map['cursiveFontFamily'];
     instance.dataDetectorTypes = map['dataDetectorTypes'] != null
         ? List<DataDetectorTypes>.from(map['dataDetectorTypes']
-            .map((e) => DataDetectorTypes.fromNativeValue(e)!))
+            .map((e) => switch (enumMethod ?? EnumMethod.nativeValue) {
+                  EnumMethod.nativeValue =>
+                    DataDetectorTypes.fromNativeValue(e),
+                  EnumMethod.value => DataDetectorTypes.fromValue(e),
+                  EnumMethod.name => DataDetectorTypes.byName(e)
+                }!))
         : null;
     instance.databaseEnabled = map['databaseEnabled'];
-    instance.decelerationRate =
-        ScrollViewDecelerationRate.fromNativeValue(map['decelerationRate']);
+    instance.decelerationRate = switch (enumMethod ?? EnumMethod.nativeValue) {
+      EnumMethod.nativeValue =>
+        ScrollViewDecelerationRate.fromNativeValue(map['decelerationRate']),
+      EnumMethod.value =>
+        ScrollViewDecelerationRate.fromValue(map['decelerationRate']),
+      EnumMethod.name =>
+        ScrollViewDecelerationRate.byName(map['decelerationRate'])
+    };
     instance.defaultFixedFontSize = map['defaultFixedFontSize'];
     instance.defaultFontSize = map['defaultFontSize'];
     instance.defaultTextEncodingName = map['defaultTextEncodingName'];
@@ -1737,26 +1797,48 @@ class InAppWebViewSettings {
     instance.minimumZoomScale = map['minimumZoomScale'];
     instance.needInitialFocus = map['needInitialFocus'];
     instance.offscreenPreRaster = map['offscreenPreRaster'];
-    instance.overScrollMode =
-        OverScrollMode.fromNativeValue(map['overScrollMode']);
+    instance.overScrollMode = switch (enumMethod ?? EnumMethod.nativeValue) {
+      EnumMethod.nativeValue =>
+        OverScrollMode.fromNativeValue(map['overScrollMode']),
+      EnumMethod.value => OverScrollMode.fromValue(map['overScrollMode']),
+      EnumMethod.name => OverScrollMode.byName(map['overScrollMode'])
+    };
     instance.pageZoom = map['pageZoom'];
     instance.pluginScriptsForMainFrameOnly =
         map['pluginScriptsForMainFrameOnly'];
     instance.preferredContentMode =
-        UserPreferredContentMode.fromNativeValue(map['preferredContentMode']);
+        switch (enumMethod ?? EnumMethod.nativeValue) {
+      EnumMethod.nativeValue =>
+        UserPreferredContentMode.fromNativeValue(map['preferredContentMode']),
+      EnumMethod.value =>
+        UserPreferredContentMode.fromValue(map['preferredContentMode']),
+      EnumMethod.name =>
+        UserPreferredContentMode.byName(map['preferredContentMode'])
+    };
     instance.resourceCustomSchemes = map['resourceCustomSchemes'] != null
         ? List<String>.from(map['resourceCustomSchemes']!.cast<String>())
         : null;
     instance.safeBrowsingEnabled = map['safeBrowsingEnabled'];
     instance.sansSerifFontFamily = map['sansSerifFontFamily'];
     instance.saveFormData = map['saveFormData'];
-    instance.scrollBarStyle =
-        ScrollBarStyle.fromNativeValue(map['scrollBarStyle']);
+    instance.scrollBarStyle = switch (enumMethod ?? EnumMethod.nativeValue) {
+      EnumMethod.nativeValue =>
+        ScrollBarStyle.fromNativeValue(map['scrollBarStyle']),
+      EnumMethod.value => ScrollBarStyle.fromValue(map['scrollBarStyle']),
+      EnumMethod.name => ScrollBarStyle.byName(map['scrollBarStyle'])
+    };
     instance.scrollMultiplier = map['scrollMultiplier'];
     instance.scrollbarFadingEnabled = map['scrollbarFadingEnabled'];
     instance.scrollsToTop = map['scrollsToTop'];
     instance.selectionGranularity =
-        SelectionGranularity.fromNativeValue(map['selectionGranularity']);
+        switch (enumMethod ?? EnumMethod.nativeValue) {
+      EnumMethod.nativeValue =>
+        SelectionGranularity.fromNativeValue(map['selectionGranularity']),
+      EnumMethod.value =>
+        SelectionGranularity.fromValue(map['selectionGranularity']),
+      EnumMethod.name =>
+        SelectionGranularity.byName(map['selectionGranularity'])
+    };
     instance.serifFontFamily = map['serifFontFamily'];
     instance.sharedCookiesEnabled = map['sharedCookiesEnabled'];
     instance.shouldPrintBackgrounds = map['shouldPrintBackgrounds'];
@@ -1774,13 +1856,19 @@ class InAppWebViewSettings {
     instance.userAgent = map['userAgent'];
     instance.verticalScrollBarEnabled = map['verticalScrollBarEnabled'];
     instance.verticalScrollbarPosition =
-        VerticalScrollbarPosition.fromNativeValue(
-            map['verticalScrollbarPosition']);
+        switch (enumMethod ?? EnumMethod.nativeValue) {
+      EnumMethod.nativeValue => VerticalScrollbarPosition.fromNativeValue(
+          map['verticalScrollbarPosition']),
+      EnumMethod.value =>
+        VerticalScrollbarPosition.fromValue(map['verticalScrollbarPosition']),
+      EnumMethod.name =>
+        VerticalScrollbarPosition.byName(map['verticalScrollbarPosition'])
+    };
     return instance;
   }
 
   ///Converts instance to a map.
-  Map<String, dynamic> toMap() {
+  Map<String, dynamic> toMap({EnumMethod? enumMethod}) {
     return {
       "accessibilityIgnoresInvertColors": accessibilityIgnoresInvertColors,
       "algorithmicDarkeningAllowed": algorithmicDarkeningAllowed,
@@ -1808,15 +1896,34 @@ class InAppWebViewSettings {
       "blockNetworkLoads": blockNetworkLoads,
       "builtInZoomControls": builtInZoomControls,
       "cacheEnabled": cacheEnabled,
-      "cacheMode": cacheMode?.toNativeValue(),
-      "contentBlockers": contentBlockers?.map((e) => e.toMap()).toList(),
-      "contentInsetAdjustmentBehavior":
+      "cacheMode": switch (enumMethod ?? EnumMethod.nativeValue) {
+        EnumMethod.nativeValue => cacheMode?.toNativeValue(),
+        EnumMethod.value => cacheMode?.toValue(),
+        EnumMethod.name => cacheMode?.name()
+      },
+      "contentBlockers":
+          contentBlockers?.map((e) => e.toMap(enumMethod: enumMethod)).toList(),
+      "contentInsetAdjustmentBehavior": switch (
+          enumMethod ?? EnumMethod.nativeValue) {
+        EnumMethod.nativeValue =>
           contentInsetAdjustmentBehavior?.toNativeValue(),
+        EnumMethod.value => contentInsetAdjustmentBehavior?.toValue(),
+        EnumMethod.name => contentInsetAdjustmentBehavior?.name()
+      },
       "cursiveFontFamily": cursiveFontFamily,
-      "dataDetectorTypes":
-          dataDetectorTypes?.map((e) => e.toNativeValue()).toList(),
+      "dataDetectorTypes": dataDetectorTypes
+          ?.map((e) => switch (enumMethod ?? EnumMethod.nativeValue) {
+                EnumMethod.nativeValue => e.toNativeValue(),
+                EnumMethod.value => e.toValue(),
+                EnumMethod.name => e.name()
+              })
+          .toList(),
       "databaseEnabled": databaseEnabled,
-      "decelerationRate": decelerationRate?.toNativeValue(),
+      "decelerationRate": switch (enumMethod ?? EnumMethod.nativeValue) {
+        EnumMethod.nativeValue => decelerationRate?.toNativeValue(),
+        EnumMethod.value => decelerationRate?.toValue(),
+        EnumMethod.name => decelerationRate?.name()
+      },
       "defaultFixedFontSize": defaultFixedFontSize,
       "defaultFontSize": defaultFontSize,
       "defaultTextEncodingName": defaultTextEncodingName,
@@ -1827,8 +1934,12 @@ class InAppWebViewSettings {
       "disableInputAccessoryView": disableInputAccessoryView,
       "disableLongPressContextMenuOnLinks": disableLongPressContextMenuOnLinks,
       "disableVerticalScroll": disableVerticalScroll,
-      "disabledActionModeMenuItems":
-          disabledActionModeMenuItems?.toNativeValue(),
+      "disabledActionModeMenuItems": switch (
+          enumMethod ?? EnumMethod.nativeValue) {
+        EnumMethod.nativeValue => disabledActionModeMenuItems?.toNativeValue(),
+        EnumMethod.value => disabledActionModeMenuItems?.toValue(),
+        EnumMethod.name => disabledActionModeMenuItems?.name()
+      },
       "disallowOverScroll": disallowOverScroll,
       "displayZoomControls": displayZoomControls,
       "domStorageEnabled": domStorageEnabled,
@@ -1847,9 +1958,19 @@ class InAppWebViewSettings {
       "iframeAriaHidden": iframeAriaHidden,
       "iframeCsp": iframeCsp,
       "iframeName": iframeName,
-      "iframeReferrerPolicy": iframeReferrerPolicy?.toNativeValue(),
+      "iframeReferrerPolicy": switch (enumMethod ?? EnumMethod.nativeValue) {
+        EnumMethod.nativeValue => iframeReferrerPolicy?.toNativeValue(),
+        EnumMethod.value => iframeReferrerPolicy?.toValue(),
+        EnumMethod.name => iframeReferrerPolicy?.name()
+      },
       "iframeRole": iframeRole,
-      "iframeSandbox": iframeSandbox?.map((e) => e.toNativeValue()).toList(),
+      "iframeSandbox": iframeSandbox
+          ?.map((e) => switch (enumMethod ?? EnumMethod.nativeValue) {
+                EnumMethod.nativeValue => e.toNativeValue(),
+                EnumMethod.value => e.toValue(),
+                EnumMethod.name => e.name()
+              })
+          .toList(),
       "ignoresViewportScaleLimits": ignoresViewportScaleLimits,
       "incognito": incognito,
       "initialScale": initialScale,
@@ -1872,7 +1993,11 @@ class InAppWebViewSettings {
       "javaScriptHandlersForMainFrameOnly": javaScriptHandlersForMainFrameOnly,
       "javaScriptHandlersOriginAllowList":
           javaScriptHandlersOriginAllowList?.toList(),
-      "layoutAlgorithm": layoutAlgorithm?.toNativeValue(),
+      "layoutAlgorithm": switch (enumMethod ?? EnumMethod.nativeValue) {
+        EnumMethod.nativeValue => layoutAlgorithm?.toNativeValue(),
+        EnumMethod.value => layoutAlgorithm?.toValue(),
+        EnumMethod.name => layoutAlgorithm?.name()
+      },
       "limitsNavigationsToAppBoundDomains": limitsNavigationsToAppBoundDomains,
       "loadWithOverviewMode": loadWithOverviewMode,
       "loadsImagesAutomatically": loadsImagesAutomatically,
@@ -1884,18 +2009,31 @@ class InAppWebViewSettings {
       "minimumLogicalFontSize": minimumLogicalFontSize,
       "minimumViewportInset": minimumViewportInset?.toMap(),
       "minimumZoomScale": minimumZoomScale,
-      "mixedContentMode": mixedContentMode?.toNativeValue(),
+      "mixedContentMode": switch (enumMethod ?? EnumMethod.nativeValue) {
+        EnumMethod.nativeValue => mixedContentMode?.toNativeValue(),
+        EnumMethod.value => mixedContentMode?.toValue(),
+        EnumMethod.name => mixedContentMode?.name()
+      },
       "needInitialFocus": needInitialFocus,
       "networkAvailable": networkAvailable,
       "offscreenPreRaster": offscreenPreRaster,
-      "overScrollMode": overScrollMode?.toNativeValue(),
+      "overScrollMode": switch (enumMethod ?? EnumMethod.nativeValue) {
+        EnumMethod.nativeValue => overScrollMode?.toNativeValue(),
+        EnumMethod.value => overScrollMode?.toValue(),
+        EnumMethod.name => overScrollMode?.name()
+      },
       "pageZoom": pageZoom,
       "pluginScriptsForMainFrameOnly": pluginScriptsForMainFrameOnly,
       "pluginScriptsOriginAllowList": pluginScriptsOriginAllowList?.toList(),
-      "preferredContentMode": preferredContentMode?.toNativeValue(),
+      "preferredContentMode": switch (enumMethod ?? EnumMethod.nativeValue) {
+        EnumMethod.nativeValue => preferredContentMode?.toNativeValue(),
+        EnumMethod.value => preferredContentMode?.toValue(),
+        EnumMethod.name => preferredContentMode?.name()
+      },
       "regexToAllowSyncUrlLoading": regexToAllowSyncUrlLoading,
       "regexToCancelSubFramesLoading": regexToCancelSubFramesLoading,
-      "rendererPriorityPolicy": rendererPriorityPolicy?.toMap(),
+      "rendererPriorityPolicy":
+          rendererPriorityPolicy?.toMap(enumMethod: enumMethod),
       "requestedWithHeaderOriginAllowList":
           requestedWithHeaderOriginAllowList?.toList(),
       "resourceCustomSchemes": resourceCustomSchemes,
@@ -1904,11 +2042,19 @@ class InAppWebViewSettings {
       "saveFormData": saveFormData,
       "scrollBarDefaultDelayBeforeFade": scrollBarDefaultDelayBeforeFade,
       "scrollBarFadeDuration": scrollBarFadeDuration,
-      "scrollBarStyle": scrollBarStyle?.toNativeValue(),
+      "scrollBarStyle": switch (enumMethod ?? EnumMethod.nativeValue) {
+        EnumMethod.nativeValue => scrollBarStyle?.toNativeValue(),
+        EnumMethod.value => scrollBarStyle?.toValue(),
+        EnumMethod.name => scrollBarStyle?.name()
+      },
       "scrollMultiplier": scrollMultiplier,
       "scrollbarFadingEnabled": scrollbarFadingEnabled,
       "scrollsToTop": scrollsToTop,
-      "selectionGranularity": selectionGranularity?.toNativeValue(),
+      "selectionGranularity": switch (enumMethod ?? EnumMethod.nativeValue) {
+        EnumMethod.nativeValue => selectionGranularity?.toNativeValue(),
+        EnumMethod.value => selectionGranularity?.toValue(),
+        EnumMethod.name => selectionGranularity?.name()
+      },
       "serifFontFamily": serifFontFamily,
       "sharedCookiesEnabled": sharedCookiesEnabled,
       "shouldPrintBackgrounds": shouldPrintBackgrounds,
@@ -1933,10 +2079,15 @@ class InAppWebViewSettings {
       "useWideViewPort": useWideViewPort,
       "userAgent": userAgent,
       "verticalScrollBarEnabled": verticalScrollBarEnabled,
-      "verticalScrollbarPosition": verticalScrollbarPosition?.toNativeValue(),
+      "verticalScrollbarPosition": switch (
+          enumMethod ?? EnumMethod.nativeValue) {
+        EnumMethod.nativeValue => verticalScrollbarPosition?.toNativeValue(),
+        EnumMethod.value => verticalScrollbarPosition?.toValue(),
+        EnumMethod.name => verticalScrollbarPosition?.name()
+      },
       "verticalScrollbarThumbColor": verticalScrollbarThumbColor?.toHex(),
       "verticalScrollbarTrackColor": verticalScrollbarTrackColor?.toHex(),
-      "webViewAssetLoader": webViewAssetLoader?.toMap(),
+      "webViewAssetLoader": webViewAssetLoader?.toMap(enumMethod: enumMethod),
     };
   }
 

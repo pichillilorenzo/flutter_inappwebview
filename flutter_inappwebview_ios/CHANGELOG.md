@@ -1,6 +1,10 @@
+## 1.2.0-beta.2
+
+- Updated flutter_inappwebview_platform_interface version to ^1.4.0-beta.2
+
 ## 1.2.0-beta.1
 
-- Updated flutter_inappwebview_platform_interface version to ^1.4.0
+- Updated flutter_inappwebview_platform_interface version to ^1.4.0-beta.1
 - Implemented `requestFocus` WebView method
 - Updated ConsoleLogJS internal PluginScript to main-frame only as using it on non-main frames could cause issues such as [#1738](https://github.com/pichillilorenzo/flutter_inappwebview/issues/1738)
 - Added support for `UserScript.allowedOriginRules` parameter

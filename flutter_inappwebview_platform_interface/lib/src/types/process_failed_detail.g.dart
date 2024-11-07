@@ -72,7 +72,8 @@ class ProcessFailedDetail {
       this.reason});
 
   ///Gets a possible [ProcessFailedDetail] instance from a [Map] value.
-  static ProcessFailedDetail? fromMap(Map<String, dynamic>? map) {
+  static ProcessFailedDetail? fromMap(Map<String, dynamic>? map,
+      {EnumMethod? enumMethod}) {
     if (map == null) {
       return null;
     }
@@ -80,25 +81,45 @@ class ProcessFailedDetail {
       exitCode: map['exitCode'],
       failureSourceModulePath: map['failureSourceModulePath'],
       frameInfos: map['frameInfos'] != null
-          ? List<FrameInfo>.from(map['frameInfos']
-              .map((e) => FrameInfo.fromMap(e?.cast<String, dynamic>())!))
+          ? List<FrameInfo>.from(map['frameInfos'].map((e) => FrameInfo.fromMap(
+              e?.cast<String, dynamic>(),
+              enumMethod: enumMethod)!))
           : null,
-      kind: ProcessFailedKind.fromNativeValue(map['kind'])!,
+      kind: switch (enumMethod ?? EnumMethod.nativeValue) {
+        EnumMethod.nativeValue =>
+          ProcessFailedKind.fromNativeValue(map['kind']),
+        EnumMethod.value => ProcessFailedKind.fromValue(map['kind']),
+        EnumMethod.name => ProcessFailedKind.byName(map['kind'])
+      }!,
       processDescription: map['processDescription'],
-      reason: ProcessFailedReason.fromNativeValue(map['reason']),
+      reason: switch (enumMethod ?? EnumMethod.nativeValue) {
+        EnumMethod.nativeValue =>
+          ProcessFailedReason.fromNativeValue(map['reason']),
+        EnumMethod.value => ProcessFailedReason.fromValue(map['reason']),
+        EnumMethod.name => ProcessFailedReason.byName(map['reason'])
+      },
     );
     return instance;
   }
 
   ///Converts instance to a map.
-  Map<String, dynamic> toMap() {
+  Map<String, dynamic> toMap({EnumMethod? enumMethod}) {
     return {
       "exitCode": exitCode,
       "failureSourceModulePath": failureSourceModulePath,
-      "frameInfos": frameInfos?.map((e) => e.toMap()).toList(),
-      "kind": kind.toNativeValue(),
+      "frameInfos":
+          frameInfos?.map((e) => e.toMap(enumMethod: enumMethod)).toList(),
+      "kind": switch (enumMethod ?? EnumMethod.nativeValue) {
+        EnumMethod.nativeValue => kind.toNativeValue(),
+        EnumMethod.value => kind.toValue(),
+        EnumMethod.name => kind.name()
+      },
       "processDescription": processDescription,
-      "reason": reason?.toNativeValue(),
+      "reason": switch (enumMethod ?? EnumMethod.nativeValue) {
+        EnumMethod.nativeValue => reason?.toNativeValue(),
+        EnumMethod.value => reason?.toValue(),
+        EnumMethod.name => reason?.name()
+      },
     };
   }
 

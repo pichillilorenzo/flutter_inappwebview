@@ -16,22 +16,33 @@ class InAppWebViewHitTestResult {
   InAppWebViewHitTestResult({this.extra, this.type});
 
   ///Gets a possible [InAppWebViewHitTestResult] instance from a [Map] value.
-  static InAppWebViewHitTestResult? fromMap(Map<String, dynamic>? map) {
+  static InAppWebViewHitTestResult? fromMap(Map<String, dynamic>? map,
+      {EnumMethod? enumMethod}) {
     if (map == null) {
       return null;
     }
     final instance = InAppWebViewHitTestResult(
       extra: map['extra'],
-      type: InAppWebViewHitTestResultType.fromNativeValue(map['type']),
+      type: switch (enumMethod ?? EnumMethod.nativeValue) {
+        EnumMethod.nativeValue =>
+          InAppWebViewHitTestResultType.fromNativeValue(map['type']),
+        EnumMethod.value =>
+          InAppWebViewHitTestResultType.fromValue(map['type']),
+        EnumMethod.name => InAppWebViewHitTestResultType.byName(map['type'])
+      },
     );
     return instance;
   }
 
   ///Converts instance to a map.
-  Map<String, dynamic> toMap() {
+  Map<String, dynamic> toMap({EnumMethod? enumMethod}) {
     return {
       "extra": extra,
-      "type": type?.toNativeValue(),
+      "type": switch (enumMethod ?? EnumMethod.nativeValue) {
+        EnumMethod.nativeValue => type?.toNativeValue(),
+        EnumMethod.value => type?.toValue(),
+        EnumMethod.name => type?.name()
+      },
     };
   }
 

@@ -117,11 +117,69 @@ class WebsiteDataType {
     return null;
   }
 
+  /// Gets a possible [WebsiteDataType] instance value with name [name].
+  ///
+  /// Goes through [WebsiteDataType.values] looking for a value with
+  /// name [name], as reported by [WebsiteDataType.name].
+  /// Returns the first value with the given name, otherwise `null`.
+  static WebsiteDataType? byName(String? name) {
+    if (name != null) {
+      try {
+        return WebsiteDataType.values
+            .firstWhere((element) => element.name() == name);
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
+  }
+
+  /// Creates a map from the names of [WebsiteDataType] values to the values.
+  ///
+  /// The collection that this method is called on is expected to have
+  /// values with distinct names, like the `values` list of an enum class.
+  /// Only one value for each name can occur in the created map,
+  /// so if two or more values have the same name (either being the
+  /// same value, or being values of different enum type), at most one of
+  /// them will be represented in the returned map.
+  static Map<String, WebsiteDataType> asNameMap() => <String, WebsiteDataType>{
+        for (final value in WebsiteDataType.values) value.name(): value
+      };
+
   ///Gets [String] value.
   String toValue() => _value;
 
   ///Gets [String] native value.
   String toNativeValue() => _nativeValue;
+
+  ///Gets the name of the value.
+  String name() {
+    switch (_value) {
+      case 'null':
+        return 'ALL';
+      case 'WKWebsiteDataTypeCookies':
+        return 'WKWebsiteDataTypeCookies';
+      case 'WKWebsiteDataTypeDiskCache':
+        return 'WKWebsiteDataTypeDiskCache';
+      case 'WKWebsiteDataTypeFetchCache':
+        return 'WKWebsiteDataTypeFetchCache';
+      case 'WKWebsiteDataTypeIndexedDBDatabases':
+        return 'WKWebsiteDataTypeIndexedDBDatabases';
+      case 'WKWebsiteDataTypeLocalStorage':
+        return 'WKWebsiteDataTypeLocalStorage';
+      case 'WKWebsiteDataTypeMemoryCache':
+        return 'WKWebsiteDataTypeMemoryCache';
+      case 'WKWebsiteDataTypeOfflineWebApplicationCache':
+        return 'WKWebsiteDataTypeOfflineWebApplicationCache';
+      case 'WKWebsiteDataTypeServiceWorkerRegistrations':
+        return 'WKWebsiteDataTypeServiceWorkerRegistrations';
+      case 'WKWebsiteDataTypeSessionStorage':
+        return 'WKWebsiteDataTypeSessionStorage';
+      case 'WKWebsiteDataTypeWebSQLDatabases':
+        return 'WKWebsiteDataTypeWebSQLDatabases';
+    }
+    return _value.toString();
+  }
 
   @override
   int get hashCode => _value.hashCode;
@@ -254,11 +312,70 @@ class IOSWKWebsiteDataType {
     return null;
   }
 
+  /// Gets a possible [IOSWKWebsiteDataType] instance value with name [name].
+  ///
+  /// Goes through [IOSWKWebsiteDataType.values] looking for a value with
+  /// name [name], as reported by [IOSWKWebsiteDataType.name].
+  /// Returns the first value with the given name, otherwise `null`.
+  static IOSWKWebsiteDataType? byName(String? name) {
+    if (name != null) {
+      try {
+        return IOSWKWebsiteDataType.values
+            .firstWhere((element) => element.name() == name);
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
+  }
+
+  /// Creates a map from the names of [IOSWKWebsiteDataType] values to the values.
+  ///
+  /// The collection that this method is called on is expected to have
+  /// values with distinct names, like the `values` list of an enum class.
+  /// Only one value for each name can occur in the created map,
+  /// so if two or more values have the same name (either being the
+  /// same value, or being values of different enum type), at most one of
+  /// them will be represented in the returned map.
+  static Map<String, IOSWKWebsiteDataType> asNameMap() =>
+      <String, IOSWKWebsiteDataType>{
+        for (final value in IOSWKWebsiteDataType.values) value.name(): value
+      };
+
   ///Gets [String] value.
   String toValue() => _value;
 
   ///Gets [String] native value.
   String toNativeValue() => _nativeValue;
+
+  ///Gets the name of the value.
+  String name() {
+    switch (_value) {
+      case 'null':
+        return 'ALL';
+      case 'WKWebsiteDataTypeCookies':
+        return 'WKWebsiteDataTypeCookies';
+      case 'WKWebsiteDataTypeDiskCache':
+        return 'WKWebsiteDataTypeDiskCache';
+      case 'WKWebsiteDataTypeFetchCache':
+        return 'WKWebsiteDataTypeFetchCache';
+      case 'WKWebsiteDataTypeIndexedDBDatabases':
+        return 'WKWebsiteDataTypeIndexedDBDatabases';
+      case 'WKWebsiteDataTypeLocalStorage':
+        return 'WKWebsiteDataTypeLocalStorage';
+      case 'WKWebsiteDataTypeMemoryCache':
+        return 'WKWebsiteDataTypeMemoryCache';
+      case 'WKWebsiteDataTypeOfflineWebApplicationCache':
+        return 'WKWebsiteDataTypeOfflineWebApplicationCache';
+      case 'WKWebsiteDataTypeServiceWorkerRegistrations':
+        return 'WKWebsiteDataTypeServiceWorkerRegistrations';
+      case 'WKWebsiteDataTypeSessionStorage':
+        return 'WKWebsiteDataTypeSessionStorage';
+      case 'WKWebsiteDataTypeWebSQLDatabases':
+        return 'WKWebsiteDataTypeWebSQLDatabases';
+    }
+    return _value.toString();
+  }
 
   @override
   int get hashCode => _value.hashCode;

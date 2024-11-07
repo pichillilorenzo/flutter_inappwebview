@@ -72,14 +72,20 @@ class UserScript {
   }
 
   ///Gets a possible [UserScript] instance from a [Map] value.
-  static UserScript? fromMap(Map<String, dynamic>? map) {
+  static UserScript? fromMap(Map<String, dynamic>? map,
+      {EnumMethod? enumMethod}) {
     if (map == null) {
       return null;
     }
     final instance = UserScript(
       groupName: map['groupName'],
-      injectionTime:
-          UserScriptInjectionTime.fromNativeValue(map['injectionTime'])!,
+      injectionTime: switch (enumMethod ?? EnumMethod.nativeValue) {
+        EnumMethod.nativeValue =>
+          UserScriptInjectionTime.fromNativeValue(map['injectionTime']),
+        EnumMethod.value =>
+          UserScriptInjectionTime.fromValue(map['injectionTime']),
+        EnumMethod.name => UserScriptInjectionTime.byName(map['injectionTime'])
+      }!,
       iosForMainFrameOnly: map['forMainFrameOnly'],
       source: map['source'],
     );
@@ -88,8 +94,9 @@ class UserScript {
           Set<String>.from(map['allowedOriginRules']!.cast<String>());
     }
     if (map['contentWorld'] != null) {
-      instance.contentWorld =
-          ContentWorld.fromMap(map['contentWorld']?.cast<String, dynamic>())!;
+      instance.contentWorld = ContentWorld.fromMap(
+          map['contentWorld']?.cast<String, dynamic>(),
+          enumMethod: enumMethod)!;
     }
     if (map['forMainFrameOnly'] != null) {
       instance.forMainFrameOnly = map['forMainFrameOnly'];
@@ -98,13 +105,17 @@ class UserScript {
   }
 
   ///Converts instance to a map.
-  Map<String, dynamic> toMap() {
+  Map<String, dynamic> toMap({EnumMethod? enumMethod}) {
     return {
       "allowedOriginRules": allowedOriginRules.toList(),
-      "contentWorld": contentWorld.toMap(),
+      "contentWorld": contentWorld.toMap(enumMethod: enumMethod),
       "forMainFrameOnly": forMainFrameOnly,
       "groupName": groupName,
-      "injectionTime": injectionTime.toNativeValue(),
+      "injectionTime": switch (enumMethod ?? EnumMethod.nativeValue) {
+        EnumMethod.nativeValue => injectionTime.toNativeValue(),
+        EnumMethod.value => injectionTime.toValue(),
+        EnumMethod.name => injectionTime.name()
+      },
       "source": source,
     };
   }

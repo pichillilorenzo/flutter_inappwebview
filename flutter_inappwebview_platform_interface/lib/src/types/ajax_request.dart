@@ -5,6 +5,7 @@ import 'ajax_request_headers.dart';
 import 'ajax_request_ready_state.dart';
 import 'ajax_request_event.dart';
 import 'ajax_request_action.dart';
+import 'enum_method.dart';
 
 part 'ajax_request.g.dart';
 

@@ -38,7 +38,8 @@ class DownloadStartRequest {
       this.userAgent});
 
   ///Gets a possible [DownloadStartRequest] instance from a [Map] value.
-  static DownloadStartRequest? fromMap(Map<String, dynamic>? map) {
+  static DownloadStartRequest? fromMap(Map<String, dynamic>? map,
+      {EnumMethod? enumMethod}) {
     if (map == null) {
       return null;
     }
@@ -55,7 +56,7 @@ class DownloadStartRequest {
   }
 
   ///Converts instance to a map.
-  Map<String, dynamic> toMap() {
+  Map<String, dynamic> toMap({EnumMethod? enumMethod}) {
     return {
       "contentDisposition": contentDisposition,
       "contentLength": contentLength,

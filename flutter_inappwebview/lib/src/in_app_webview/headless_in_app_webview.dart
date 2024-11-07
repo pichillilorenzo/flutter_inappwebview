@@ -1,13 +1,12 @@
 import 'dart:collection';
-import 'dart:typed_data';
-import 'dart:ui';
 
 import 'package:flutter/services.dart';
 import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_platform_interface.dart';
+
 import '../find_interaction/find_interaction_controller.dart';
+import '../pull_to_refresh/pull_to_refresh_controller.dart';
 import '../webview_environment/webview_environment.dart';
 import 'in_app_webview_controller.dart';
-import '../pull_to_refresh/pull_to_refresh_controller.dart';
 
 ///{@macro flutter_inappwebview_platform_interface.PlatformHeadlessInAppWebView}
 class HeadlessInAppWebView {
@@ -166,14 +165,14 @@ class HeadlessInAppWebView {
         onPrintRequest,
     void Function(InAppWebViewController controller, int progress)?
         onProgressChanged,
-    Future<ClientCertResponse?> Function(InAppWebViewController controller,
-            URLAuthenticationChallenge challenge)?
+    Future<ClientCertResponse?> Function(
+            InAppWebViewController controller, ClientCertChallenge challenge)?
         onReceivedClientCertRequest,
     Future<HttpAuthResponse?> Function(InAppWebViewController controller,
-            URLAuthenticationChallenge challenge)?
+            HttpAuthenticationChallenge challenge)?
         onReceivedHttpAuthRequest,
-    Future<ServerTrustAuthResponse?> Function(InAppWebViewController controller,
-            URLAuthenticationChallenge challenge)?
+    Future<ServerTrustAuthResponse?> Function(
+            InAppWebViewController controller, ServerTrustChallenge challenge)?
         onReceivedServerTrustAuthRequest,
     void Function(InAppWebViewController controller, int x, int y)?
         onScrollChanged,

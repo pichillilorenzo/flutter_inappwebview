@@ -54,34 +54,39 @@ class HttpAuthenticationChallenge extends URLAuthenticationChallenge {
   }
 
   ///Gets a possible [HttpAuthenticationChallenge] instance from a [Map] value.
-  static HttpAuthenticationChallenge? fromMap(Map<String, dynamic>? map) {
+  static HttpAuthenticationChallenge? fromMap(Map<String, dynamic>? map,
+      {EnumMethod? enumMethod}) {
     if (map == null) {
       return null;
     }
     final instance = HttpAuthenticationChallenge(
       protectionSpace: URLProtectionSpace.fromMap(
-          map['protectionSpace']?.cast<String, dynamic>())!,
+          map['protectionSpace']?.cast<String, dynamic>(),
+          enumMethod: enumMethod)!,
       error: map['error'],
-      failureResponse:
-          URLResponse.fromMap(map['failureResponse']?.cast<String, dynamic>()),
+      failureResponse: URLResponse.fromMap(
+          map['failureResponse']?.cast<String, dynamic>(),
+          enumMethod: enumMethod),
       iosError: map['error'],
       iosFailureResponse: IOSURLResponse.fromMap(
-          map['failureResponse']?.cast<String, dynamic>()),
+          map['failureResponse']?.cast<String, dynamic>(),
+          enumMethod: enumMethod),
       previousFailureCount: map['previousFailureCount'],
       proposedCredential: URLCredential.fromMap(
-          map['proposedCredential']?.cast<String, dynamic>()),
+          map['proposedCredential']?.cast<String, dynamic>(),
+          enumMethod: enumMethod),
     );
     return instance;
   }
 
   ///Converts instance to a map.
-  Map<String, dynamic> toMap() {
+  Map<String, dynamic> toMap({EnumMethod? enumMethod}) {
     return {
-      "protectionSpace": protectionSpace.toMap(),
+      "protectionSpace": protectionSpace.toMap(enumMethod: enumMethod),
       "error": error,
-      "failureResponse": failureResponse?.toMap(),
+      "failureResponse": failureResponse?.toMap(enumMethod: enumMethod),
       "previousFailureCount": previousFailureCount,
-      "proposedCredential": proposedCredential?.toMap(),
+      "proposedCredential": proposedCredential?.toMap(enumMethod: enumMethod),
     };
   }
 

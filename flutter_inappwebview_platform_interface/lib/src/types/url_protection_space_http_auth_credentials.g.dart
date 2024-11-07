@@ -19,26 +19,30 @@ class URLProtectionSpaceHttpAuthCredentials {
 
   ///Gets a possible [URLProtectionSpaceHttpAuthCredentials] instance from a [Map] value.
   static URLProtectionSpaceHttpAuthCredentials? fromMap(
-      Map<String, dynamic>? map) {
+      Map<String, dynamic>? map,
+      {EnumMethod? enumMethod}) {
     if (map == null) {
       return null;
     }
     final instance = URLProtectionSpaceHttpAuthCredentials(
       credentials: map['credentials'] != null
-          ? List<URLCredential>.from(map['credentials']
-              .map((e) => URLCredential.fromMap(e?.cast<String, dynamic>())!))
+          ? List<URLCredential>.from(map['credentials'].map((e) =>
+              URLCredential.fromMap(e?.cast<String, dynamic>(),
+                  enumMethod: enumMethod)!))
           : null,
       protectionSpace: URLProtectionSpace.fromMap(
-          map['protectionSpace']?.cast<String, dynamic>()),
+          map['protectionSpace']?.cast<String, dynamic>(),
+          enumMethod: enumMethod),
     );
     return instance;
   }
 
   ///Converts instance to a map.
-  Map<String, dynamic> toMap() {
+  Map<String, dynamic> toMap({EnumMethod? enumMethod}) {
     return {
-      "credentials": credentials?.map((e) => e.toMap()).toList(),
-      "protectionSpace": protectionSpace?.toMap(),
+      "credentials":
+          credentials?.map((e) => e.toMap(enumMethod: enumMethod)).toList(),
+      "protectionSpace": protectionSpace?.toMap(enumMethod: enumMethod),
     };
   }
 

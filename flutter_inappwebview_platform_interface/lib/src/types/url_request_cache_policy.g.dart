@@ -88,20 +88,44 @@ class URLRequestCachePolicy {
     return null;
   }
 
+  /// Gets a possible [URLRequestCachePolicy] instance value with name [name].
+  ///
+  /// Goes through [URLRequestCachePolicy.values] looking for a value with
+  /// name [name], as reported by [URLRequestCachePolicy.name].
+  /// Returns the first value with the given name, otherwise `null`.
+  static URLRequestCachePolicy? byName(String? name) {
+    if (name != null) {
+      try {
+        return URLRequestCachePolicy.values
+            .firstWhere((element) => element.name() == name);
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
+  }
+
+  /// Creates a map from the names of [URLRequestCachePolicy] values to the values.
+  ///
+  /// The collection that this method is called on is expected to have
+  /// values with distinct names, like the `values` list of an enum class.
+  /// Only one value for each name can occur in the created map,
+  /// so if two or more values have the same name (either being the
+  /// same value, or being values of different enum type), at most one of
+  /// them will be represented in the returned map.
+  static Map<String, URLRequestCachePolicy> asNameMap() =>
+      <String, URLRequestCachePolicy>{
+        for (final value in URLRequestCachePolicy.values) value.name(): value
+      };
+
   ///Gets [int] value.
   int toValue() => _value;
 
   ///Gets [int] native value.
   int toNativeValue() => _nativeValue;
 
-  @override
-  int get hashCode => _value.hashCode;
-
-  @override
-  bool operator ==(value) => value == _value;
-
-  @override
-  String toString() {
+  ///Gets the name of the value.
+  String name() {
     switch (_value) {
       case 4:
         return 'RELOAD_IGNORING_LOCAL_AND_REMOTE_CACHE_DATA';
@@ -117,6 +141,17 @@ class URLRequestCachePolicy {
         return 'USE_PROTOCOL_CACHE_POLICY';
     }
     return _value.toString();
+  }
+
+  @override
+  int get hashCode => _value.hashCode;
+
+  @override
+  bool operator ==(value) => value == _value;
+
+  @override
+  String toString() {
+    return name();
   }
 }
 
@@ -204,20 +239,44 @@ class IOSURLRequestCachePolicy {
     return null;
   }
 
+  /// Gets a possible [IOSURLRequestCachePolicy] instance value with name [name].
+  ///
+  /// Goes through [IOSURLRequestCachePolicy.values] looking for a value with
+  /// name [name], as reported by [IOSURLRequestCachePolicy.name].
+  /// Returns the first value with the given name, otherwise `null`.
+  static IOSURLRequestCachePolicy? byName(String? name) {
+    if (name != null) {
+      try {
+        return IOSURLRequestCachePolicy.values
+            .firstWhere((element) => element.name() == name);
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
+  }
+
+  /// Creates a map from the names of [IOSURLRequestCachePolicy] values to the values.
+  ///
+  /// The collection that this method is called on is expected to have
+  /// values with distinct names, like the `values` list of an enum class.
+  /// Only one value for each name can occur in the created map,
+  /// so if two or more values have the same name (either being the
+  /// same value, or being values of different enum type), at most one of
+  /// them will be represented in the returned map.
+  static Map<String, IOSURLRequestCachePolicy> asNameMap() =>
+      <String, IOSURLRequestCachePolicy>{
+        for (final value in IOSURLRequestCachePolicy.values) value.name(): value
+      };
+
   ///Gets [int] value.
   int toValue() => _value;
 
   ///Gets [int] native value.
   int toNativeValue() => _nativeValue;
 
-  @override
-  int get hashCode => _value.hashCode;
-
-  @override
-  bool operator ==(value) => value == _value;
-
-  @override
-  String toString() {
+  ///Gets the name of the value.
+  String name() {
     switch (_value) {
       case 4:
         return 'RELOAD_IGNORING_LOCAL_AND_REMOTE_CACHE_DATA';
@@ -233,5 +292,16 @@ class IOSURLRequestCachePolicy {
         return 'USE_PROTOCOL_CACHE_POLICY';
     }
     return _value.toString();
+  }
+
+  @override
+  int get hashCode => _value.hashCode;
+
+  @override
+  bool operator ==(value) => value == _value;
+
+  @override
+  String toString() {
+    return name();
   }
 }

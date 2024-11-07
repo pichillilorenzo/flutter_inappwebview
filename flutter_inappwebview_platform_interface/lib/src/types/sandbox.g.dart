@@ -88,6 +88,34 @@ class Sandbox {
     Sandbox.ALLOW_TOP_NAVIGATION_BY_USER_ACTIVATION,
   ].toSet();
 
+  /// Gets a possible [Sandbox] instance value with name [name].
+  ///
+  /// Goes through [Sandbox.values] looking for a value with
+  /// name [name], as reported by [Sandbox.name].
+  /// Returns the first value with the given name, otherwise `null`.
+  static Sandbox? byName(String? name) {
+    if (name != null) {
+      try {
+        return Sandbox.values.firstWhere((element) => element.name() == name);
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
+  }
+
+  /// Creates a map from the names of [Sandbox] values to the values.
+  ///
+  /// The collection that this method is called on is expected to have
+  /// values with distinct names, like the `values` list of an enum class.
+  /// Only one value for each name can occur in the created map,
+  /// so if two or more values have the same name (either being the
+  /// same value, or being values of different enum type), at most one of
+  /// them will be represented in the returned map.
+  static Map<String, Sandbox> asNameMap() => <String, Sandbox>{
+        for (final value in Sandbox.values) value.name(): value
+      };
+
   ///Gets a possible [Sandbox] instance from a native value.
   static Sandbox? fromNativeValue(String? value) {
     if (value == null) {
@@ -128,6 +156,41 @@ class Sandbox {
 
   ///Gets [String?] native value.
   String? toNativeValue() => _nativeValue;
+
+  ///Gets the name of the value.
+  String name() {
+    switch (_value) {
+      case 'null':
+        return 'ALLOW_ALL';
+      case 'allow-downloads':
+        return 'ALLOW_DOWNLOADS';
+      case 'allow-forms':
+        return 'ALLOW_FORMS';
+      case 'allow-modals':
+        return 'ALLOW_MODALS';
+      case 'null':
+        return 'ALLOW_NONE';
+      case 'allow-orientation-lock':
+        return 'ALLOW_ORIENTATION_LOCK';
+      case 'allow-pointer-lock':
+        return 'ALLOW_POINTER_LOCK';
+      case 'allow-popups':
+        return 'ALLOW_POPUPS';
+      case 'allow-popups-to-escape-sandbox':
+        return 'ALLOW_POPUPS_TO_ESCAPE_SANDBOX';
+      case 'allow-presentation':
+        return 'ALLOW_PRESENTATION';
+      case 'allow-same-origin':
+        return 'ALLOW_SAME_ORIGIN';
+      case 'allow-scripts':
+        return 'ALLOW_SCRIPTS';
+      case 'allow-top-navigation':
+        return 'ALLOW_TOP_NAVIGATION';
+      case 'allow-top-navigation-by-user-activation':
+        return 'ALLOW_TOP_NAVIGATION_BY_USER_ACTIVATION';
+    }
+    return _value.toString();
+  }
 
   @override
   int get hashCode => _value.hashCode;

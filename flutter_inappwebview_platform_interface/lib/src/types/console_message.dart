@@ -2,6 +2,7 @@ import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_i
 
 import '../in_app_webview/platform_webview.dart';
 import 'console_message_level.dart';
+import 'enum_method.dart';
 
 part 'console_message.g.dart';
 

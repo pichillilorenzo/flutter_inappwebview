@@ -35,17 +35,19 @@ import '../in_app_webview/platform_inappwebview_controller.dart';
 import '../context_menu/context_menu.dart';
 import '../in_app_browser/platform_in_app_browser.dart';
 import 'platform_webview.dart';
+import '../types/enum_method.dart';
 
 part 'in_app_webview_settings.g.dart';
 
 List<ContentBlocker> _deserializeContentBlockers(
-    List<dynamic>? contentBlockersMapList) {
+    List<dynamic>? contentBlockersMapList,
+    {EnumMethod? enumMethod}) {
   List<ContentBlocker> contentBlockers = [];
   if (contentBlockersMapList != null) {
     contentBlockersMapList.forEach((contentBlocker) {
       contentBlockers.add(ContentBlocker.fromMap(
           Map<dynamic, Map<dynamic, dynamic>>.from(
-              Map<dynamic, dynamic>.from(contentBlocker))));
+              Map<dynamic, dynamic>.from(contentBlocker)), enumMethod: enumMethod));
     });
   }
   return contentBlockers;

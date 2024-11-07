@@ -417,7 +417,8 @@ class PrintJobMediaSize {
       required this.widthMils});
 
   ///Gets a possible [PrintJobMediaSize] instance from a [Map] value.
-  static PrintJobMediaSize? fromMap(Map<String, dynamic>? map) {
+  static PrintJobMediaSize? fromMap(Map<String, dynamic>? map,
+      {EnumMethod? enumMethod}) {
     if (map == null) {
       return null;
     }
@@ -431,7 +432,7 @@ class PrintJobMediaSize {
   }
 
   ///Converts instance to a map.
-  Map<String, dynamic> toMap() {
+  Map<String, dynamic> toMap({EnumMethod? enumMethod}) {
     return {
       "heightMils": heightMils,
       "id": id,

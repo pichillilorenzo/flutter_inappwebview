@@ -85,5 +85,7 @@ public enum WebViewChannelDelegateMethods {
   isInFullscreen,
   clearFormData,
   disableInputMethod,
-  enableInputMethod
+  enableInputMethod,
+  hideInputMethod,
+  showInputMethod
 }

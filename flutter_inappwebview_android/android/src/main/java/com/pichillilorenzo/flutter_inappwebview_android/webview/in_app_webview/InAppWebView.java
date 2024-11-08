@@ -2069,31 +2069,29 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
     return customSettings;
   }
 
-  public void enableInputMethod() {
+public void enableInputMethod() {
     Activity activity = getActivity(getContext());
     if(activity != null) {
-        activity.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM);
-        showSoftKeyboard(this);
+        activity.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
+                | WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM);
     }
   }
 
-  private void showSoftKeyboard(View view) {
-    if(view.requestFocus()) {
-      InputMethodManager imm = (InputMethodManager) getContext().getSystemService(INPUT_METHOD_SERVICE);
-      imm.showSoftInput(this, 0);
-    }
+  public void showInputMethod() {
+    hideInputMethod();
+    InputMethodManager imm = (InputMethodManager) getContext().getSystemService(INPUT_METHOD_SERVICE);
+    imm.showSoftInput(this, 0);
   }
 
   public void disableInputMethod() {
     Activity activity = getActivity(getContext());
     if(activity != null) {
-        hideKeyboard();
-        activity.getWindow().setFlags(WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM,
+        activity.getWindow().setFlags(WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
               WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM);
     }
   }
 
-  private void hideKeyboard() {
+  public void hideInputMethod() {
       InputMethodManager imm = (InputMethodManager) getContext().getSystemService(INPUT_METHOD_SERVICE);
       imm.hideSoftInputFromWindow(this.getWindowToken(), 0);
   }

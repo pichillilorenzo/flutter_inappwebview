@@ -302,6 +302,12 @@ class InAppWebViewController {
   ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.enableInputMethod}
   Future<void> enableInputMethod() => platform.enableInputMethod();
 
+  ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.showInputMethod}
+  Future<void> showInputMethod() => platform.showInputMethod();
+
+  ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.hideInputMethod}
+  Future<void> hideInputMethod() => platform.hideInputMethod();
+
   ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.setContextMenu}
   Future<void> setContextMenu(ContextMenu? contextMenu) =>
       platform.setContextMenu(contextMenu);

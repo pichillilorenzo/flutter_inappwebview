@@ -2271,6 +2271,18 @@ class AndroidInAppWebViewController extends PlatformInAppWebViewController
   }
 
   @override
+  Future<void> showInputMethod() async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    return await channel?.invokeMethod('showInputMethod', args);
+  }
+
+  @override
+  Future<void> hideInputMethod() async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    return await channel?.invokeMethod('hideInputMethod', args);
+  }
+
+  @override
   Future<void> setContextMenu(ContextMenu? contextMenu) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent("contextMenu", () => contextMenu?.toMap());

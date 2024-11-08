@@ -224,6 +224,26 @@ namespace flutter_inappwebview_plugin
         webView2Settings4->put_IsGeneralAutofillEnabled(settings->generalAutofillEnabled);
         webView2Settings4->put_IsPasswordAutosaveEnabled(settings->passwordAutosaveEnabled);
       }
+
+      if (auto webView2Settings5 = webView2Settings.try_query<ICoreWebView2Settings5>()) {
+        webView2Settings5->put_IsPinchZoomEnabled(settings->pinchZoomEnabled);
+      }
+
+      if (auto webView2Settings6 = webView2Settings.try_query<ICoreWebView2Settings6>()) {
+        webView2Settings6->put_IsSwipeNavigationEnabled(settings->allowsBackForwardNavigationGestures);
+      }
+
+      if (auto webView2Settings7 = webView2Settings.try_query<ICoreWebView2Settings7>()) {
+        webView2Settings7->put_HiddenPdfToolbarItems((COREWEBVIEW2_PDF_TOOLBAR_ITEMS)settings->hiddenPdfToolbarItems);
+      }
+
+      if (auto webView2Settings8 = webView2Settings.try_query<ICoreWebView2Settings8>()) {
+        webView2Settings8->put_IsReputationCheckingRequired(settings->reputationCheckingRequired);
+      }
+
+      if (auto webView2Settings9 = webView2Settings.try_query<ICoreWebView2Settings9>()) {
+        webView2Settings9->put_IsNonClientRegionSupportEnabled(settings->nonClientRegionSupportEnabled);
+      }
     }
 
     if (auto webViewController2 = webViewController.try_query<ICoreWebView2Controller2>()) {
@@ -1815,6 +1835,36 @@ namespace flutter_inappwebview_plugin
         }
         if (fl_map_contains_not_null(newSettingsMap, "passwordAutosaveEnabled") && settings->passwordAutosaveEnabled != newSettings->passwordAutosaveEnabled) {
           webView2Settings4->put_IsPasswordAutosaveEnabled(newSettings->passwordAutosaveEnabled);
+        }
+      }
+
+      if (auto webView2Settings5 = webView2Settings.try_query<ICoreWebView2Settings5>()) {
+        if (fl_map_contains_not_null(newSettingsMap, "pinchZoomEnabled") && settings->pinchZoomEnabled != newSettings->pinchZoomEnabled) {
+          webView2Settings5->put_IsPinchZoomEnabled(newSettings->pinchZoomEnabled);
+        }
+      }
+
+      if (auto webView2Settings6 = webView2Settings.try_query<ICoreWebView2Settings6>()) {
+        if (fl_map_contains_not_null(newSettingsMap, "allowsBackForwardNavigationGestures") && settings->allowsBackForwardNavigationGestures != newSettings->allowsBackForwardNavigationGestures) {
+          webView2Settings6->put_IsSwipeNavigationEnabled(newSettings->allowsBackForwardNavigationGestures);
+        }
+      }
+
+      if (auto webView2Settings7 = webView2Settings.try_query<ICoreWebView2Settings7>()) {
+        if (fl_map_contains_not_null(newSettingsMap, "hiddenPdfToolbarItems") && settings->hiddenPdfToolbarItems != newSettings->hiddenPdfToolbarItems) {
+          webView2Settings7->put_HiddenPdfToolbarItems((COREWEBVIEW2_PDF_TOOLBAR_ITEMS)newSettings->hiddenPdfToolbarItems);
+        }
+      }
+
+      if (auto webView2Settings8 = webView2Settings.try_query<ICoreWebView2Settings8>()) {
+        if (fl_map_contains_not_null(newSettingsMap, "reputationCheckingRequired") && settings->reputationCheckingRequired != newSettings->reputationCheckingRequired) {
+          webView2Settings8->put_IsReputationCheckingRequired(newSettings->reputationCheckingRequired);
+        }
+      }
+
+      if (auto webView2Settings9 = webView2Settings.try_query<ICoreWebView2Settings9>()) {
+        if (fl_map_contains_not_null(newSettingsMap, "nonClientRegionSupportEnabled") && settings->nonClientRegionSupportEnabled != newSettings->nonClientRegionSupportEnabled) {
+          webView2Settings9->put_IsNonClientRegionSupportEnabled(newSettings->nonClientRegionSupportEnabled);
         }
       }
     }

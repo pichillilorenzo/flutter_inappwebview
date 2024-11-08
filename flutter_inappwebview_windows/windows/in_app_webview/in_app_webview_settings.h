@@ -3,6 +3,7 @@
 
 #include <optional>
 #include <string>
+#include <WebView2.h>
 
 namespace flutter_inappwebview_plugin
 {
@@ -35,6 +36,11 @@ namespace flutter_inappwebview_plugin
     bool browserAcceleratorKeysEnabled = true;
     bool generalAutofillEnabled = true;
     bool passwordAutosaveEnabled = false;
+    bool pinchZoomEnabled = true;
+    bool allowsBackForwardNavigationGestures = true;
+    int64_t hiddenPdfToolbarItems = COREWEBVIEW2_PDF_TOOLBAR_ITEMS::COREWEBVIEW2_PDF_TOOLBAR_ITEMS_NONE;
+    bool reputationCheckingRequired = true;
+    bool nonClientRegionSupportEnabled = false;
 
     InAppWebViewSettings();
     InAppWebViewSettings(const flutter::EncodableMap& encodableMap);

@@ -13,6 +13,7 @@ import '../types/force_dark_strategy.dart';
 import '../types/layout_algorithm.dart';
 import '../types/mixed_content_mode.dart';
 import '../types/over_scroll_mode.dart';
+import '../types/pdf_toolbar_items.dart';
 import '../types/referrer_policy.dart';
 import '../types/renderer_priority_policy.dart';
 import '../types/sandbox.dart';
@@ -1092,7 +1093,18 @@ as it can cause framerate drops on animations in Android 9 and lower (see [Hybri
   ])
   bool? allowsAirPlayForMediaPlayback;
 
-  ///Set to `true` to allow the horizontal swipe gestures trigger back-forward list navigations. The default value is `true`.
+  ///Set to `true` to allow the horizontal swipe gestures trigger back-forward list navigations.
+  ///
+  ///**NOTE for Windows**: Swiping down to refresh is off by default and not exposed via API currently,
+  ///it requires the "--pull-to-refresh" option to be included in
+  ///the additional browser arguments to be configured.
+  ///(See [WebViewEnvironmentSettings.additionalBrowserArguments].).
+  ///When set to `false`, the end user cannot swipe to navigate or pull to refresh.
+  ///This API only affects the overscrolling navigation functionality and has
+  ///no effect on the scrolling interaction used to explore the web content shown in WebView2.
+  ///Disabling/Enabling [allowsBackForwardNavigationGestures] takes effect after the next navigation.
+  ///
+  ///The default value is `true`.
   @SupportedPlatforms(platforms: [
     IOSPlatform(
         apiName: "WKWebView.allowsBackForwardNavigationGestures",
@@ -1101,7 +1113,13 @@ as it can cause framerate drops on animations in Android 9 and lower (see [Hybri
     MacOSPlatform(
         apiName: "WKWebView.allowsBackForwardNavigationGestures",
         apiUrl:
-            "https://developer.apple.com/documentation/webkit/wkwebview/1414995-allowsbackforwardnavigationgestu")
+            "https://developer.apple.com/documentation/webkit/wkwebview/1414995-allowsbackforwardnavigationgestu"),
+    WindowsPlatform(
+      available: "1.0.992.28",
+      apiName: "ICoreWebView2Settings6.put_IsSwipeNavigationEnabled",
+      apiUrl:
+      "https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2settings6?view=webview2-1.0.2849.39#put_isswipenavigationenabled"
+    ),
   ])
   bool? allowsBackForwardNavigationGestures;
 
@@ -1813,7 +1831,7 @@ as it can cause framerate drops on animations in Android 9 and lower (see [Hybri
   @SupportedPlatforms(platforms: [
     WindowsPlatform(
         available: '1.0.902.49',
-        apiName: "ICoreWebView2Settings.put_IsGeneralAutofillEnabled",
+        apiName: "ICoreWebView2Settings4.put_IsGeneralAutofillEnabled",
         apiUrl: 'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2settings4?view=webview2-1.0.2849.39#put_isgeneralautofillenabled'
     ),
   ])
@@ -1834,11 +1852,99 @@ as it can cause framerate drops on animations in Android 9 and lower (see [Hybri
   @SupportedPlatforms(platforms: [
     WindowsPlatform(
         available: '1.0.902.49',
-        apiName: "ICoreWebView2Settings.put_IsPasswordAutosaveEnabled",
+        apiName: "ICoreWebView2Settings4.put_IsPasswordAutosaveEnabled",
         apiUrl: 'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2settings4?view=webview2-1.0.2849.39#put_ispasswordautosaveenabled'
     ),
   ])
   bool? passwordAutosaveEnabled;
+
+  ///Pinch-zoom, referred to as "Page Scale" zoom, is performed as a post-rendering step,
+  ///it changes the page scale factor property and scales the surface the web page
+  ///is rendered onto when user performs a pinch zooming action.
+  ///
+  ///It does not change the layout but rather changes the viewport and clips the
+  ///web content, the content outside of the viewport isn't visible onscreen and users can't reach this content using mouse.
+  ///
+  ///The [pinchZoomEnabled] property enables or disables the ability of the end user
+  ///to use a pinching motion on touch input enabled devices to scale the web content in the WebView2.
+  ///When set to `false`, the end user cannot pinch zoom after the next navigation.
+  ///Disabling/Enabling [pinchZoomEnabled] only affects the end user's ability to
+  ///use pinch motions and does not change the page scale factor.
+  ///This API only affects the Page Scale zoom and has no effect on the existing
+  ///browser zoom properties or other end user mechanisms for zooming.
+  ///
+  ///The default value is `true`.
+  @SupportedPlatforms(platforms: [
+    WindowsPlatform(
+        available: '1.0.902.49',
+        apiName: "ICoreWebView2Settings5.put_IsPinchZoomEnabled",
+        apiUrl: 'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2settings5?view=webview2-1.0.2849.39#put_ispinchzoomenabled'
+    ),
+  ])
+  bool? pinchZoomEnabled;
+
+  ///This property is used to customize the PDF toolbar items.
+  ///
+  ///By default, it is [PdfToolbarItems.NONE] and so it displays all of the items.
+  ///Changes to this property apply to all CoreWebView2s in the same environment and using the same profile.
+  ///Changes to this setting apply only after the next navigation.
+  @SupportedPlatforms(platforms: [
+    WindowsPlatform(
+        available: '1.0.1185.39',
+        apiName: "ICoreWebView2Settings7.put_HiddenPdfToolbarItems",
+        apiUrl: 'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2settings7?view=webview2-1.0.2849.39#put_hiddenpdftoolbaritems'
+    ),
+  ])
+  PdfToolbarItems_? hiddenPdfToolbarItems;
+
+  ///[reputationCheckingRequired] is used to control whether SmartScreen enabled or not.
+  ///
+  ///SmartScreen helps webviews identify reported phishing and malware websites and also helps users make informed decisions about downloads.
+  ///SmartScreen is enabled or disabled for all CoreWebView2s using the same user data folder.
+  ///If [reputationCheckingRequired] is true for any CoreWebView2 using the same user data folder, then SmartScreen is enabled.
+  ///If [reputationCheckingRequired] is false for all CoreWebView2 using the same user data folder, then SmartScreen is disabled.
+  ///When it is changed, the change will be applied to all WebViews using the same user data folder on the next navigation or download.
+  ///If the newly created CoreWebview2 does not set SmartScreen to `false`,
+  ///when navigating(Such as Navigate(), LoadDataUrl(), ExecuteScript(), etc.), the default value will be applied to all CoreWebview2 using the same user data folder.
+  ///SmartScreen of WebView2 apps can be controlled by Windows system setting "SmartScreen for Microsoft Edge", specially,
+  ///for WebView2 in Windows Store apps, SmartScreen is controlled by another Windows system setting "SmartScreen for Microsoft Store apps".
+  ///When the Windows setting is enabled, the SmartScreen operates under the control of the [reputationCheckingRequired].
+  ///When the Windows setting is disabled, the SmartScreen will be disabled regardless of the [reputationCheckingRequired] value set in WebView2 apps.
+  ///In other words, under this circumstance the value of [reputationCheckingRequired] will be saved but overridden by system setting.
+  ///Upon re-enabling the Windows setting, the CoreWebview2 will reference the [reputationCheckingRequired] to determine the SmartScreen status.
+  ///
+  ///The default value is `true`.
+  @SupportedPlatforms(platforms: [
+    WindowsPlatform(
+        available: '1.0.1722.45',
+        apiName: "ICoreWebView2Settings8.put_IsReputationCheckingRequired",
+        apiUrl: 'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2settings8?view=webview2-1.0.2849.39#put_isreputationcheckingrequired'
+    ),
+  ])
+  bool? reputationCheckingRequired;
+
+  ///Enables web pages to use the `app-region` CSS style.
+  ///
+  ///Disabling/Enabling the [nonClientRegionSupportEnabled] takes effect after the next navigation.
+  ///
+  ///When this property is `true`, then all the non-client region features will be enabled:
+  ///Draggable Regions will be enabled, they are regions on a webpage that are marked with the CSS attribute `app-region: drag/no-drag`.
+  ///When set to drag, these regions will be treated like the window's title bar,
+  ///supporting dragging of the entire WebView and its host app window;
+  ///the system menu shows upon right click, and a double click will trigger maximizing/restoration of the window size.
+  ///
+  ///When set to `false`, all non-client region support will be disabled.
+  ///The `app-region` CSS style will be ignored on web pages.
+  ///
+  ///The default value is `false`.
+  @SupportedPlatforms(platforms: [
+    WindowsPlatform(
+        available: '1.0.2420.47',
+        apiName: "ICoreWebView2Settings9.put_IsNonClientRegionSupportEnabled",
+        apiUrl: 'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2settings9?view=webview2-1.0.2849.39#put_isnonclientregionsupportenabled'
+    ),
+  ])
+  bool? nonClientRegionSupportEnabled;
 
   ///Specifies a feature policy for the `<iframe>`.
   ///The policy defines what features are available to the `<iframe>` based on the origin of the request
@@ -2070,6 +2176,10 @@ as it can cause framerate drops on animations in Android 9 and lower (see [Hybri
     this.browserAcceleratorKeysEnabled = true,
     this.generalAutofillEnabled = true,
     this.passwordAutosaveEnabled = false,
+    this.pinchZoomEnabled = true,
+    this.hiddenPdfToolbarItems = PdfToolbarItems_.NONE,
+    this.reputationCheckingRequired = true,
+    this.nonClientRegionSupportEnabled = false,
     this.iframeAllow,
     this.iframeAllowFullscreen,
     this.iframeSandbox,

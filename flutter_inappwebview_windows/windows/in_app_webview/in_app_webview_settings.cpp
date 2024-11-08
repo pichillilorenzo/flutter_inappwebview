@@ -3,7 +3,6 @@
 #include "in_app_webview.h"
 #include "in_app_webview_settings.h"
 
-#include <WebView2.h>
 #include <wil/com.h>
 
 namespace flutter_inappwebview_plugin
@@ -41,11 +40,16 @@ namespace flutter_inappwebview_plugin
     }
     pluginScriptsForMainFrameOnly = get_fl_map_value(encodableMap, "pluginScriptsForMainFrameOnly", pluginScriptsForMainFrameOnly);
     scrollMultiplier = get_fl_map_value(encodableMap, "scrollMultiplier", scrollMultiplier);
-    disableDefaultErrorPage = get_fl_map_value<bool>(encodableMap, "disableDefaultErrorPage");
-    statusBarEnabled = get_fl_map_value<bool>(encodableMap, "statusBarEnabled");
-    browserAcceleratorKeysEnabled = get_fl_map_value<bool>(encodableMap, "browserAcceleratorKeysEnabled");
-    generalAutofillEnabled = get_fl_map_value<bool>(encodableMap, "generalAutofillEnabled");
-    passwordAutosaveEnabled = get_fl_map_value<bool>(encodableMap, "passwordAutosaveEnabled");
+    disableDefaultErrorPage = get_fl_map_value(encodableMap, "disableDefaultErrorPage", disableDefaultErrorPage);
+    statusBarEnabled = get_fl_map_value(encodableMap, "statusBarEnabled", statusBarEnabled);
+    browserAcceleratorKeysEnabled = get_fl_map_value(encodableMap, "browserAcceleratorKeysEnabled", browserAcceleratorKeysEnabled);
+    generalAutofillEnabled = get_fl_map_value(encodableMap, "generalAutofillEnabled", generalAutofillEnabled);
+    passwordAutosaveEnabled = get_fl_map_value(encodableMap, "passwordAutosaveEnabled", passwordAutosaveEnabled);
+    pinchZoomEnabled = get_fl_map_value(encodableMap, "pinchZoomEnabled", pinchZoomEnabled);
+    allowsBackForwardNavigationGestures = get_fl_map_value(encodableMap, "allowsBackForwardNavigationGestures", allowsBackForwardNavigationGestures);
+    hiddenPdfToolbarItems = get_fl_map_value(encodableMap, "hiddenPdfToolbarItems", hiddenPdfToolbarItems);
+    reputationCheckingRequired = get_fl_map_value(encodableMap, "reputationCheckingRequired", reputationCheckingRequired);
+    nonClientRegionSupportEnabled = get_fl_map_value(encodableMap, "nonClientRegionSupportEnabled", nonClientRegionSupportEnabled);
   }
 
   flutter::EncodableMap InAppWebViewSettings::toEncodableMap() const
@@ -74,7 +78,12 @@ namespace flutter_inappwebview_plugin
       {"statusBarEnabled", statusBarEnabled},
       {"browserAcceleratorKeysEnabled", browserAcceleratorKeysEnabled},
       {"generalAutofillEnabled", generalAutofillEnabled},
-      {"passwordAutosaveEnabled", passwordAutosaveEnabled}
+      {"passwordAutosaveEnabled", passwordAutosaveEnabled},
+      {"pinchZoomEnabled", pinchZoomEnabled},
+      {"allowsBackForwardNavigationGestures", allowsBackForwardNavigationGestures},
+      {"hiddenPdfToolbarItems", hiddenPdfToolbarItems},
+      {"reputationCheckingRequired", reputationCheckingRequired},
+      {"nonClientRegionSupportEnabled", nonClientRegionSupportEnabled}
     };
   }
 
@@ -132,6 +141,41 @@ namespace flutter_inappwebview_plugin
           BOOL isPasswordAutosaveEnabled;
           if (SUCCEEDED(settings4->get_IsPasswordAutosaveEnabled(&isPasswordAutosaveEnabled))) {
             settingsMap["passwordAutosaveEnabled"] = (bool)isPasswordAutosaveEnabled;
+          }
+        }
+
+        if (auto settings5 = settings.try_query<ICoreWebView2Settings5>()) {
+          BOOL isPinchZoomEnabled;
+          if (SUCCEEDED(settings5->get_IsPinchZoomEnabled(&isPinchZoomEnabled))) {
+            settingsMap["pinchZoomEnabled"] = (bool)isPinchZoomEnabled;
+          }
+        }
+
+        if (auto settings6 = settings.try_query<ICoreWebView2Settings6>()) {
+          BOOL isSwipeNavigationEnabled;
+          if (SUCCEEDED(settings6->get_IsSwipeNavigationEnabled(&isSwipeNavigationEnabled))) {
+            settingsMap["allowsBackForwardNavigationGestures"] = (bool)isSwipeNavigationEnabled;
+          }
+        }
+
+        if (auto settings7 = settings.try_query<ICoreWebView2Settings7>()) {
+          COREWEBVIEW2_PDF_TOOLBAR_ITEMS realHiddenPdfToolbarItems;
+          if (SUCCEEDED(settings7->get_HiddenPdfToolbarItems(&realHiddenPdfToolbarItems))) {
+            settingsMap["hiddenPdfToolbarItems"] = (int64_t)realHiddenPdfToolbarItems;
+          }
+        }
+
+        if (auto settings8 = settings.try_query<ICoreWebView2Settings8>()) {
+          BOOL isReputationCheckingRequired;
+          if (SUCCEEDED(settings8->get_IsReputationCheckingRequired(&isReputationCheckingRequired))) {
+            settingsMap["reputationCheckingRequired"] = (bool)isReputationCheckingRequired;
+          }
+        }
+
+        if (auto settings9 = settings.try_query<ICoreWebView2Settings9>()) {
+          BOOL isNonClientRegionSupportEnabled;
+          if (SUCCEEDED(settings9->get_IsNonClientRegionSupportEnabled(&isNonClientRegionSupportEnabled))) {
+            settingsMap["nonClientRegionSupportEnabled"] = (bool)isNonClientRegionSupportEnabled;
           }
         }
       }

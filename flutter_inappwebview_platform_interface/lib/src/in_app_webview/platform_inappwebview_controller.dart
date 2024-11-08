@@ -6,27 +6,26 @@ import 'dart:ui';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
+
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 
 import '../context_menu/main.dart';
 import '../debug_logging_settings.dart';
+import '../find_interaction/platform_find_interaction_controller.dart';
+import '../in_app_browser/platform_in_app_browser.dart';
 import '../inappwebview_platform.dart';
+import '../platform_webview_feature.dart';
+import '../print_job/main.dart';
+import '../types/main.dart';
 import '../web_message/main.dart';
 import '../web_storage/platform_web_storage.dart';
 import '../web_uri.dart';
 
-import '../types/main.dart';
-import '../in_app_browser/platform_in_app_browser.dart';
-import 'platform_headless_in_app_webview.dart';
-import 'platform_inappwebview_widget.dart';
-import '../platform_webview_feature.dart';
-import '../find_interaction/platform_find_interaction_controller.dart';
-
-import 'platform_webview.dart';
 import 'in_app_webview_keep_alive.dart';
 import 'in_app_webview_settings.dart';
-
-import '../print_job/main.dart';
+import 'platform_headless_in_app_webview.dart';
+import 'platform_inappwebview_widget.dart';
+import 'platform_webview.dart';
 
 ///List of forbidden names for JavaScript handlers used internally bu the plugin.
 final kJavaScriptHandlerForbiddenNames = UnmodifiableListView<String>([
@@ -1105,6 +1104,30 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   Future<void> clearFocus() {
     throw UnimplementedError(
         'clearFocus is not implemented on the current platform');
+  }
+
+  ///{@template flutter_inappwebview_platform_interface.PlatformInAppWebViewController.disableInputMethod}
+  /// Removes the current input method, effectively removing the keyboard whilst interacting with the webview.
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Android native WebView ([Official API - InputMethodManager](https://developer.android.com/reference/android/view/inputmethod/InputMethodManager))
+  ///- iOS ([Official API - WKWebView.inputMethod](https://trac.webkit.org/changeset/246229/webkit#file1))
+  ///{@endtemplate}
+  Future<void> disableInputMethod() {
+    throw UnimplementedError(
+        'disableInputMethod is not implemented on the current platform');
+  }
+
+  ///{@template flutter_inappwebview_platform_interface.PlatformInAppWebViewController.enableInputMethod}
+  /// Adds the keyboard input method, effectively adding the keyboard whilst interacting with the webview.
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Android native WebView ([Official API - ViewGroup.clearFocus](https://developer.android.com/reference/android/view/inputmethod/InputMethodManager))
+  ///- iOS ([Official API - WKWebView.inputMethod](https://trac.webkit.org/changeset/246229/webkit#file1))
+  ///{@endtemplate}
+  Future<void> enableInputMethod() {
+    throw UnimplementedError(
+        'enableInputMethod is not implemented on the current platform');
   }
 
   ///{@template flutter_inappwebview_platform_interface.PlatformInAppWebViewController.setContextMenu}

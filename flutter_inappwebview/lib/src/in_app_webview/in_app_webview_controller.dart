@@ -1,11 +1,13 @@
 import 'dart:core';
 
 import 'package:flutter/services.dart';
+
 import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_platform_interface.dart';
 
 import '../print_job/main.dart';
 import '../web_message/main.dart';
 import '../web_storage/web_storage.dart';
+
 import 'android/in_app_webview_controller.dart';
 import 'apple/in_app_webview_controller.dart';
 
@@ -293,6 +295,12 @@ class InAppWebViewController {
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.clearFocus}
   Future<void> clearFocus() => platform.clearFocus();
+
+  ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.disableInputMethod}
+  Future<void> disableInputMethod() => platform.disableInputMethod();
+
+  ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.enableInputMethod}
+  Future<void> enableInputMethod() => platform.enableInputMethod();
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.setContextMenu}
   Future<void> setContextMenu(ContextMenu? contextMenu) =>

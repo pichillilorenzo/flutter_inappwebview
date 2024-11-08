@@ -2066,6 +2066,42 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
     return customSettings;
   }
 
+  public void enableInputMethod() {
+    Activity activity = getActivity(getContext());
+    if(activity != null) {
+        activity.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM);
+        showSoftKeyboard(this);
+    }
+  }
+
+  private void showSoftKeyboard(View view) {
+    if(view.requestFocus()) {
+      InputMethodManager imm = (InputMethodManager) getContext().getSystemService(INPUT_METHOD_SERVICE);
+      imm.showSoftInput(this, 0);
+    }
+  }
+
+  public void disableInputMethod() {
+    Activity activity = getActivity(getContext());
+    if(activity != null) {
+        hideKeyboard();
+        activity.getWindow().setFlags(WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM,
+              WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM);
+    }
+  }
+
+  private void hideKeyboard() {
+      InputMethodManager imm = (InputMethodManager) getContext().getSystemService(INPUT_METHOD_SERVICE);
+      imm.hideSoftInputFromWindow(this.getWindowToken(), 0);
+  }
+
+  public static Activity getActivity(Context context) {
+    if (context == null) return null;
+    if (context instanceof Activity) return (Activity) context;
+    if (context instanceof ContextWrapper) return getActivity(((ContextWrapper)context).getBaseContext());
+    return null;
+  }
+
   @Override
   public void dispose() {
     if (channelDelegate != null) {

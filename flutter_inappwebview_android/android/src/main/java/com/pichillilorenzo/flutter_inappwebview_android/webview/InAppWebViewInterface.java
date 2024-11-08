@@ -117,4 +117,6 @@ public interface InAppWebViewInterface {
   @Nullable
   WebViewChannelDelegate getChannelDelegate();
   void setChannelDelegate(@Nullable WebViewChannelDelegate eventWebViewChannelDelegate);
+  void disableInputMethod();
+  void enableInputMethod();
 }

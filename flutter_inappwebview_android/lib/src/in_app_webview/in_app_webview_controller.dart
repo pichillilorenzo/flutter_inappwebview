@@ -2261,25 +2261,17 @@ class AndroidInAppWebViewController extends PlatformInAppWebViewController
   @override
   Future<void> disableInputMethod() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    return await channel?.invokeMethod('disableInputMethod', args);
+    return channel
+        ?.invokeMethod('disableInputMethod', args)
+        .then((_) => channel?.invokeMethod('hideInputMethod', args));
   }
 
   @override
   Future<void> enableInputMethod() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    return await channel?.invokeMethod('enableInputMethod', args);
-  }
-
-  @override
-  Future<void> showInputMethod() async {
-    Map<String, dynamic> args = <String, dynamic>{};
-    return await channel?.invokeMethod('showInputMethod', args);
-  }
-
-  @override
-  Future<void> hideInputMethod() async {
-    Map<String, dynamic> args = <String, dynamic>{};
-    return await channel?.invokeMethod('hideInputMethod', args);
+    return await channel
+        ?.invokeMethod('enableInputMethod', args)
+        .then((_) => channel?.invokeMethod('showInputMethod', args));
   }
 
   @override

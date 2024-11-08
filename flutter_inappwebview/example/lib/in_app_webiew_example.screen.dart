@@ -222,25 +222,27 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                   webViewController?.reload();
                 },
               ),
-              ElevatedButton(
-                child: inputDisabled
-                    ? Icon(Icons.keyboard)
-                    : Icon(Icons.keyboard_hide),
-                onPressed: () {
-                  if (inputDisabled) {
-                    webViewController
-                        ?.enableInputMethod()
-                        .then((_) => webViewController?.showInputMethod());
-                  } else {
-                    webViewController
-                        ?.disableInputMethod()
-                        .then((_) => webViewController?.hideInputMethod());
-                  }
-                  setState(() {
-                    inputDisabled = !inputDisabled;
-                  });
-                },
-              ),
+              if (defaultTargetPlatform == TargetPlatform.android ||
+                  defaultTargetPlatform == TargetPlatform.iOS)
+                ElevatedButton(
+                  child: inputDisabled
+                      ? Icon(Icons.keyboard)
+                      : Icon(Icons.keyboard_hide),
+                  onPressed: () {
+                    if (inputDisabled) {
+                      webViewController
+                          ?.enableInputMethod()
+                          .then((_) => webViewController?.showInputMethod());
+                    } else {
+                      webViewController
+                          ?.disableInputMethod()
+                          .then((_) => webViewController?.hideInputMethod());
+                    }
+                    setState(() {
+                      inputDisabled = !inputDisabled;
+                    });
+                  },
+                ),
             ],
           ),
         ])));

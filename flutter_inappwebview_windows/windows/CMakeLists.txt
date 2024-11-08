@@ -176,6 +176,8 @@ list(APPEND PLUGIN_SOURCES
   "in_app_browser/in_app_browser_channel_delegate.h"
   "cookie_manager.cpp"
   "cookie_manager.h"
+  "platform_util.cpp"
+  "platform_util.h"
 )
 
 # Define the plugin library target. Its name must not be changed (see comment

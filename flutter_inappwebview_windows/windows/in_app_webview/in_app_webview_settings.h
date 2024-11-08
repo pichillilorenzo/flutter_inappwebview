@@ -30,6 +30,11 @@ namespace flutter_inappwebview_plugin
     std::optional<std::vector<std::string>> pluginScriptsOriginAllowList = std::optional<std::vector<std::string>>{};
     bool pluginScriptsForMainFrameOnly = false;
     int64_t scrollMultiplier = 1;
+    bool disableDefaultErrorPage = false;
+    bool statusBarEnabled = true;
+    bool browserAcceleratorKeysEnabled = true;
+    bool generalAutofillEnabled = true;
+    bool passwordAutosaveEnabled = false;
 
     InAppWebViewSettings();
     InAppWebViewSettings(const flutter::EncodableMap& encodableMap);

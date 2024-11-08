@@ -3,6 +3,7 @@
 - Updated `flutter_inappwebview_internal_annotations` dependency from `^1.1.1` to `^1.2.0`
 - Updated `fromMap` static method and `toMap` method implementations
 - Added `byName`, `name`, `asNameMap` custom enum classes methods
+- Added `statusBarEnabled`, `browserAcceleratorKeysEnabled`, `generalAutofillEnabled`, `passwordAutosaveEnabled` property to `InAppWebViewSettings`
 
 ## 1.4.0-beta.1
 

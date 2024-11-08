@@ -207,17 +207,26 @@ namespace flutter_inappwebview_plugin
       webView2Settings->put_IsZoomControlEnabled(settings->supportZoom);
       webView2Settings->put_AreDevToolsEnabled(settings->isInspectable);
       webView2Settings->put_AreDefaultContextMenusEnabled(!settings->disableContextMenu);
+      webView2Settings->put_IsBuiltInErrorPageEnabled(!settings->disableDefaultErrorPage);
+      webView2Settings->put_IsStatusBarEnabled(settings->statusBarEnabled);
 
-      wil::com_ptr<ICoreWebView2Settings2> webView2Settings2;
-      if (succeededOrLog(webView2Settings->QueryInterface(IID_PPV_ARGS(&webView2Settings2)))) {
+      if (auto webView2Settings2 = webView2Settings.try_query<ICoreWebView2Settings2>()) {
         if (!settings->userAgent.empty()) {
           webView2Settings2->put_UserAgent(utf8_to_wide(settings->userAgent).c_str());
         }
       }
+
+      if (auto webView2Settings3 = webView2Settings.try_query<ICoreWebView2Settings3>()) {
+        webView2Settings3->put_AreBrowserAcceleratorKeysEnabled(settings->browserAcceleratorKeysEnabled);
+      }
+
+      if (auto webView2Settings4 = webView2Settings.try_query<ICoreWebView2Settings4>()) {
+        webView2Settings4->put_IsGeneralAutofillEnabled(settings->generalAutofillEnabled);
+        webView2Settings4->put_IsPasswordAutosaveEnabled(settings->passwordAutosaveEnabled);
+      }
     }
 
-    wil::com_ptr<ICoreWebView2Controller2> webViewController2;
-    if (succeededOrLog(webViewController->QueryInterface(IID_PPV_ARGS(&webViewController2)))) {
+    if (auto webViewController2 = webViewController.try_query<ICoreWebView2Controller2>()) {
       if (settings->transparentBackground) {
         webViewController2->put_DefaultBackgroundColor({ 0, 255, 255, 255 });
       }
@@ -1780,16 +1789,37 @@ namespace flutter_inappwebview_plugin
         webView2Settings->put_AreDefaultContextMenusEnabled(!newSettings->disableContextMenu);
       }
 
-      wil::com_ptr<ICoreWebView2Settings2> webView2Settings2;
-      if (succeededOrLog(webView2Settings->QueryInterface(IID_PPV_ARGS(&webView2Settings2)))) {
+      if (fl_map_contains_not_null(newSettingsMap, "disableDefaultErrorPage") && settings->disableDefaultErrorPage != newSettings->disableDefaultErrorPage) {
+        webView2Settings->put_IsBuiltInErrorPageEnabled(!newSettings->disableDefaultErrorPage);
+      }
+
+      if (fl_map_contains_not_null(newSettingsMap, "statusBarEnabled") && settings->statusBarEnabled != newSettings->statusBarEnabled) {
+        webView2Settings->put_IsStatusBarEnabled(newSettings->statusBarEnabled);
+      }
+
+      if (auto webView2Settings2 = webView2Settings.try_query<ICoreWebView2Settings2>()) {
         if (fl_map_contains_not_null(newSettingsMap, "userAgent") && !string_equals(settings->userAgent, newSettings->userAgent)) {
           webView2Settings2->put_UserAgent(utf8_to_wide(newSettings->userAgent).c_str());
         }
       }
+
+      if (auto webView2Settings3 = webView2Settings.try_query<ICoreWebView2Settings3>()) {
+        if (fl_map_contains_not_null(newSettingsMap, "browserAcceleratorKeysEnabled") && settings->browserAcceleratorKeysEnabled != newSettings->browserAcceleratorKeysEnabled) {
+          webView2Settings3->put_AreBrowserAcceleratorKeysEnabled(newSettings->browserAcceleratorKeysEnabled);
+        }
+      }
+
+      if (auto webView2Settings4 = webView2Settings.try_query<ICoreWebView2Settings4>()) {
+        if (fl_map_contains_not_null(newSettingsMap, "generalAutofillEnabled") && settings->generalAutofillEnabled != newSettings->generalAutofillEnabled) {
+          webView2Settings4->put_IsGeneralAutofillEnabled(newSettings->generalAutofillEnabled);
+        }
+        if (fl_map_contains_not_null(newSettingsMap, "passwordAutosaveEnabled") && settings->passwordAutosaveEnabled != newSettings->passwordAutosaveEnabled) {
+          webView2Settings4->put_IsPasswordAutosaveEnabled(newSettings->passwordAutosaveEnabled);
+        }
+      }
     }
 
-    wil::com_ptr<ICoreWebView2Controller2> webViewController2;
-    if (succeededOrLog(webViewController->QueryInterface(IID_PPV_ARGS(&webViewController2)))) {
+    if (auto webViewController2 = webViewController.try_query<ICoreWebView2Controller2>()) {
       if (fl_map_contains_not_null(newSettingsMap, "transparentBackground") && settings->transparentBackground != newSettings->transparentBackground) {
         BYTE alpha = newSettings->transparentBackground ? 0 : 255;
         webViewController2->put_DefaultBackgroundColor({ alpha, 255, 255, 255 });
@@ -2016,7 +2046,6 @@ namespace flutter_inappwebview_plugin
     }
   }
 
-
   void InAppWebView::setPosition(size_t x, size_t y, float scale_factor)
   {
     if (!webViewController || !plugin || !plugin->registrar) {
@@ -2046,7 +2075,6 @@ namespace flutter_inappwebview_plugin
       }
     }
   }
-
 
   void InAppWebView::setCursorPos(double x, double y)
   {

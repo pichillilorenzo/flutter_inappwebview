@@ -784,6 +784,7 @@ because there isn't any way to make the website data store non-persistent for th
   ///Sets whether the WebView should save form data. In Android O, the platform has implemented a fully functional Autofill feature to store form data.
   ///Therefore, the Webview form data save feature is disabled. Note that the feature will continue to be supported on older versions of Android as before.
   ///The default value is `true`.
+  @Deprecated('')
   @SupportedPlatforms(platforms: [
     AndroidPlatform(
         apiName: "WebSettings.setSaveFormData",
@@ -947,7 +948,13 @@ as it can cause framerate drops on animations in Android 9 and lower (see [Hybri
 
   ///Sets whether the default Android WebView’s internal error page should be suppressed or displayed for bad navigations.
   ///`true` means suppressed (not shown), `false` means it will be displayed. The default value is `false`.
-  @SupportedPlatforms(platforms: [AndroidPlatform()])
+  @SupportedPlatforms(platforms: [
+    AndroidPlatform(),
+    WindowsPlatform(
+        apiName: "ICoreWebView2Settings.put_IsBuiltInErrorPageEnabled",
+        apiUrl: 'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2settings?view=webview2-1.0.2849.39#put_isbuiltinerrorpageenabled'
+    ),
+  ])
   bool? disableDefaultErrorPage;
 
   ///Sets the vertical scrollbar thumb color.
@@ -1755,6 +1762,84 @@ as it can cause framerate drops on animations in Android 9 and lower (see [Hybri
   ])
   int? scrollMultiplier;
 
+  ///Specifies whether the status bar is displayed.
+  ///
+  ///The status bar is usually displayed in the lower left of the WebView and
+  ///shows things such as the URI of a link when the user hovers over it and other information.
+  ///The status bar UI can be altered by web content and should not be considered secure.
+  ///
+  ///The default value is `true`.
+  @SupportedPlatforms(platforms: [
+    WindowsPlatform(
+        apiName: "ICoreWebView2Settings.put_IsStatusBarEnabled",
+        apiUrl: 'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2settings?view=webview2-1.0.2849.39#put_isstatusbarenabled'
+    ),
+  ])
+  bool? statusBarEnabled;
+
+  ///When this setting is set to `false`, it disables all accelerator keys
+  ///that access features specific to a web browser, including but not limited to:
+  ///- Ctrl-F and F3 for Find on Page
+  ///- Ctrl-P for Print
+  ///- Ctrl-R and F5 for Reload
+  ///- Ctrl-Plus and Ctrl-Minus for zooming
+  ///- Ctrl-Shift-C and F12 for DevTools
+  ///Special keys for browser functions, such as Back, Forward, and Search
+  ///It does not disable accelerator keys related to movement and text editing, such as:
+  ///- Home, End, Page Up, and Page Down
+  ///- Ctrl-X, Ctrl-C, Ctrl-V
+  ///- Ctrl-A for Select All
+  ///- Ctrl-Z for Undo
+  ///
+  ///The default value is `true`.
+  @SupportedPlatforms(platforms: [
+    WindowsPlatform(
+      available: '1.0.864.35',
+        apiName: "ICoreWebView2Settings3.put_IsBuiltInErrorPageEnabled",
+        apiUrl: 'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2settings3?view=webview2-1.0.2849.39#put_arebrowseracceleratorkeysenabled'
+    ),
+  ])
+  bool? browserAcceleratorKeysEnabled;
+
+  ///Specifies whether autofill for information like names, street and email addresses, phone numbers, and arbitrary input is enabled.
+  ///
+  ///This excludes password and credit card information.
+  ///When [generalAutofillEnabled] is `false`, no suggestions appear, and no new information is saved.
+  ///When [generalAutofillEnabled] is `true`, information is saved, suggestions appear
+  ///and clicking on one will populate the form fields.
+  ///It will take effect immediately after setting.
+  ///
+  ///The default value is `true`.
+  @SupportedPlatforms(platforms: [
+    WindowsPlatform(
+        available: '1.0.902.49',
+        apiName: "ICoreWebView2Settings.put_IsGeneralAutofillEnabled",
+        apiUrl: 'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2settings4?view=webview2-1.0.2849.39#put_isgeneralautofillenabled'
+    ),
+  ])
+  bool? generalAutofillEnabled;
+
+  ///Specifies whether autosave for password information is enabled.
+  ///
+  ///The [passwordAutosaveEnabled] property behaves independently of the IsGeneralAutofillEnabled property.
+  ///When [passwordAutosaveEnabled] is `false`, no new password data is saved and no Save/Update Password prompts are displayed.
+  ///However, if there was password data already saved before disabling this setting, then that password
+  ///information is auto-populated, suggestions are shown and clicking on one will populate the fields.
+  ///When [passwordAutosaveEnabled] is `true`, password information is auto-populated,
+  ///suggestions are shown and clicking on one will populate the fields,
+  ///new data is saved, and a Save/Update Password prompt is displayed.
+  ///It will take effect immediately after setting.
+  ///
+  ///The default value is `false`.
+  @SupportedPlatforms(platforms: [
+    WindowsPlatform(
+        available: '1.0.902.49',
+        apiName: "ICoreWebView2Settings.put_IsPasswordAutosaveEnabled",
+        apiUrl: 'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2settings4?view=webview2-1.0.2849.39#put_ispasswordautosaveenabled'
+    ),
+  ])
+  bool? passwordAutosaveEnabled;
+
   ///Specifies a feature policy for the `<iframe>`.
   ///The policy defines what features are available to the `<iframe>` based on the origin of the request
   ///(e.g. access to the microphone, camera, battery, web-share API, etc.).
@@ -1981,6 +2066,10 @@ as it can cause framerate drops on animations in Android 9 and lower (see [Hybri
     this.pluginScriptsOriginAllowList,
     this.pluginScriptsForMainFrameOnly = false,
     this.scrollMultiplier = 1,
+    this.statusBarEnabled = true,
+    this.browserAcceleratorKeysEnabled = true,
+    this.generalAutofillEnabled = true,
+    this.passwordAutosaveEnabled = false,
     this.iframeAllow,
     this.iframeAllowFullscreen,
     this.iframeSandbox,

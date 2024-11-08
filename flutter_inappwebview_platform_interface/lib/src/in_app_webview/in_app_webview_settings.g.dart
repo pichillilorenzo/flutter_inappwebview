@@ -259,6 +259,26 @@ class InAppWebViewSettings {
   ///- Android native WebView ([Official API - WebSettings.setBlockNetworkLoads](https://developer.android.com/reference/android/webkit/WebSettings#setBlockNetworkLoads(boolean)))
   bool? blockNetworkLoads;
 
+  ///When this setting is set to `false`, it disables all accelerator keys
+  ///that access features specific to a web browser, including but not limited to:
+  ///- Ctrl-F and F3 for Find on Page
+  ///- Ctrl-P for Print
+  ///- Ctrl-R and F5 for Reload
+  ///- Ctrl-Plus and Ctrl-Minus for zooming
+  ///- Ctrl-Shift-C and F12 for DevTools
+  ///Special keys for browser functions, such as Back, Forward, and Search
+  ///It does not disable accelerator keys related to movement and text editing, such as:
+  ///- Home, End, Page Up, and Page Down
+  ///- Ctrl-X, Ctrl-C, Ctrl-V
+  ///- Ctrl-A for Select All
+  ///- Ctrl-Z for Undo
+  ///
+  ///The default value is `true`.
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Windows 1.0.864.35+ ([Official API - ICoreWebView2Settings3.put_IsBuiltInErrorPageEnabled](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2settings3?view=webview2-1.0.2849.39#put_arebrowseracceleratorkeysenabled))
+  bool? browserAcceleratorKeysEnabled;
+
   ///Set to `true` if the WebView should use its built-in zoom mechanisms. The default value is `true`.
   ///
   ///**Officially Supported Platforms/Implementations**:
@@ -379,6 +399,7 @@ class InAppWebViewSettings {
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView
+  ///- Windows ([Official API - ICoreWebView2Settings.put_IsBuiltInErrorPageEnabled](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2settings?view=webview2-1.0.2849.39#put_isbuiltinerrorpageenabled))
   bool? disableDefaultErrorPage;
 
   ///Set to `true` to disable horizontal scroll. The default value is `false`.
@@ -502,6 +523,20 @@ class InAppWebViewSettings {
   ///- Android native WebView ([Official API - WebSettingsCompat.setForceDarkStrategy](https://developer.android.com/reference/androidx/webkit/WebSettingsCompat#setForceDarkStrategy(android.webkit.WebSettings,int)))
   @Deprecated('Use algorithmicDarkeningAllowed instead')
   ForceDarkStrategy? forceDarkStrategy;
+
+  ///Specifies whether autofill for information like names, street and email addresses, phone numbers, and arbitrary input is enabled.
+  ///
+  ///This excludes password and credit card information.
+  ///When [generalAutofillEnabled] is `false`, no suggestions appear, and no new information is saved.
+  ///When [generalAutofillEnabled] is `true`, information is saved, suggestions appear
+  ///and clicking on one will populate the form fields.
+  ///It will take effect immediately after setting.
+  ///
+  ///The default value is `true`.
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Windows 1.0.902.49+ ([Official API - ICoreWebView2Settings.put_IsGeneralAutofillEnabled](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2settings4?view=webview2-1.0.2849.39#put_isgeneralautofillenabled))
+  bool? generalAutofillEnabled;
 
   ///Sets whether Geolocation is enabled. The default is `true`.
   ///
@@ -948,6 +983,23 @@ class InAppWebViewSettings {
   ///- MacOS 11.0+ ([Official API - WKWebView.pageZoom](https://developer.apple.com/documentation/webkit/wkwebview/3516411-pagezoom))
   double? pageZoom;
 
+  ///Specifies whether autosave for password information is enabled.
+  ///
+  ///The [passwordAutosaveEnabled] property behaves independently of the IsGeneralAutofillEnabled property.
+  ///When [passwordAutosaveEnabled] is `false`, no new password data is saved and no Save/Update Password prompts are displayed.
+  ///However, if there was password data already saved before disabling this setting, then that password
+  ///information is auto-populated, suggestions are shown and clicking on one will populate the fields.
+  ///When [passwordAutosaveEnabled] is `true`, password information is auto-populated,
+  ///suggestions are shown and clicking on one will populate the fields,
+  ///new data is saved, and a Save/Update Password prompt is displayed.
+  ///It will take effect immediately after setting.
+  ///
+  ///The default value is `false`.
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Windows 1.0.902.49+ ([Official API - ICoreWebView2Settings.put_IsPasswordAutosaveEnabled](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2settings4?view=webview2-1.0.2849.39#put_ispasswordautosaveenabled))
+  bool? passwordAutosaveEnabled;
+
   ///Set to `true` to allow internal plugin [UserScript]s only on the main frame.
   ///
   ///**NOTE**: If [javaScriptBridgeForMainFrameOnly] is not present, this value will affect also the JavaScript Bridge internal plugin.
@@ -1058,6 +1110,7 @@ class InAppWebViewSettings {
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebSettings.setSaveFormData](https://developer.android.com/reference/android/webkit/WebSettings?hl=en#setSaveFormData(boolean)))
+  @Deprecated('')
   bool? saveFormData;
 
   ///Defines the delay in milliseconds that a scrollbar waits before fade out.
@@ -1145,6 +1198,18 @@ class InAppWebViewSettings {
   ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebSettings.setStandardFontFamily](https://developer.android.com/reference/android/webkit/WebSettings?hl=en#setStandardFontFamily(java.lang.String)))
   String? standardFontFamily;
+
+  ///Specifies whether the status bar is displayed.
+  ///
+  ///The status bar is usually displayed in the lower left of the WebView and
+  ///shows things such as the URI of a link when the user hovers over it and other information.
+  ///The status bar UI can be altered by web content and should not be considered secure.
+  ///
+  ///The default value is `true`.
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Windows ([Official API - ICoreWebView2Settings.put_IsStatusBarEnabled](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2settings?view=webview2-1.0.2849.39#put_isstatusbarenabled))
+  bool? statusBarEnabled;
 
   ///Sets whether the WebView supports multiple windows.
   ///If set to `true`, [PlatformWebViewCreationParams.onCreateWindow] event must be implemented by the host application. The default value is `false`.
@@ -1514,6 +1579,10 @@ class InAppWebViewSettings {
       this.pluginScriptsOriginAllowList,
       this.pluginScriptsForMainFrameOnly = false,
       this.scrollMultiplier = 1,
+      this.statusBarEnabled = true,
+      this.browserAcceleratorKeysEnabled = true,
+      this.generalAutofillEnabled = true,
+      this.passwordAutosaveEnabled = false,
       this.iframeAllow,
       this.iframeAllowFullscreen,
       this.iframeSandbox,
@@ -1705,6 +1774,8 @@ class InAppWebViewSettings {
         map['automaticallyAdjustsScrollIndicatorInsets'];
     instance.blockNetworkImage = map['blockNetworkImage'];
     instance.blockNetworkLoads = map['blockNetworkLoads'];
+    instance.browserAcceleratorKeysEnabled =
+        map['browserAcceleratorKeysEnabled'];
     instance.builtInZoomControls = map['builtInZoomControls'];
     instance.cacheEnabled = map['cacheEnabled'];
     instance.cacheMode = switch (enumMethod ?? EnumMethod.nativeValue) {
@@ -1764,6 +1835,7 @@ class InAppWebViewSettings {
         map['enterpriseAuthenticationAppLinkPolicyEnabled'];
     instance.fantasyFontFamily = map['fantasyFontFamily'];
     instance.fixedFontFamily = map['fixedFontFamily'];
+    instance.generalAutofillEnabled = map['generalAutofillEnabled'];
     instance.geolocationEnabled = map['geolocationEnabled'];
     instance.hardwareAcceleration = map['hardwareAcceleration'];
     instance.horizontalScrollBarEnabled = map['horizontalScrollBarEnabled'];
@@ -1804,6 +1876,7 @@ class InAppWebViewSettings {
       EnumMethod.name => OverScrollMode.byName(map['overScrollMode'])
     };
     instance.pageZoom = map['pageZoom'];
+    instance.passwordAutosaveEnabled = map['passwordAutosaveEnabled'];
     instance.pluginScriptsForMainFrameOnly =
         map['pluginScriptsForMainFrameOnly'];
     instance.preferredContentMode =
@@ -1843,6 +1916,7 @@ class InAppWebViewSettings {
     instance.sharedCookiesEnabled = map['sharedCookiesEnabled'];
     instance.shouldPrintBackgrounds = map['shouldPrintBackgrounds'];
     instance.standardFontFamily = map['standardFontFamily'];
+    instance.statusBarEnabled = map['statusBarEnabled'];
     instance.supportMultipleWindows = map['supportMultipleWindows'];
     instance.supportZoom = map['supportZoom'];
     instance.suppressesIncrementalRendering =
@@ -1894,6 +1968,7 @@ class InAppWebViewSettings {
           automaticallyAdjustsScrollIndicatorInsets,
       "blockNetworkImage": blockNetworkImage,
       "blockNetworkLoads": blockNetworkLoads,
+      "browserAcceleratorKeysEnabled": browserAcceleratorKeysEnabled,
       "builtInZoomControls": builtInZoomControls,
       "cacheEnabled": cacheEnabled,
       "cacheMode": switch (enumMethod ?? EnumMethod.nativeValue) {
@@ -1948,6 +2023,7 @@ class InAppWebViewSettings {
           enterpriseAuthenticationAppLinkPolicyEnabled,
       "fantasyFontFamily": fantasyFontFamily,
       "fixedFontFamily": fixedFontFamily,
+      "generalAutofillEnabled": generalAutofillEnabled,
       "geolocationEnabled": geolocationEnabled,
       "hardwareAcceleration": hardwareAcceleration,
       "horizontalScrollBarEnabled": horizontalScrollBarEnabled,
@@ -2023,6 +2099,7 @@ class InAppWebViewSettings {
         EnumMethod.name => overScrollMode?.name()
       },
       "pageZoom": pageZoom,
+      "passwordAutosaveEnabled": passwordAutosaveEnabled,
       "pluginScriptsForMainFrameOnly": pluginScriptsForMainFrameOnly,
       "pluginScriptsOriginAllowList": pluginScriptsOriginAllowList?.toList(),
       "preferredContentMode": switch (enumMethod ?? EnumMethod.nativeValue) {
@@ -2039,7 +2116,6 @@ class InAppWebViewSettings {
       "resourceCustomSchemes": resourceCustomSchemes,
       "safeBrowsingEnabled": safeBrowsingEnabled,
       "sansSerifFontFamily": sansSerifFontFamily,
-      "saveFormData": saveFormData,
       "scrollBarDefaultDelayBeforeFade": scrollBarDefaultDelayBeforeFade,
       "scrollBarFadeDuration": scrollBarFadeDuration,
       "scrollBarStyle": switch (enumMethod ?? EnumMethod.nativeValue) {
@@ -2059,6 +2135,7 @@ class InAppWebViewSettings {
       "sharedCookiesEnabled": sharedCookiesEnabled,
       "shouldPrintBackgrounds": shouldPrintBackgrounds,
       "standardFontFamily": standardFontFamily,
+      "statusBarEnabled": statusBarEnabled,
       "supportMultipleWindows": supportMultipleWindows,
       "supportZoom": supportZoom,
       "suppressesIncrementalRendering": suppressesIncrementalRendering,
@@ -2103,6 +2180,6 @@ class InAppWebViewSettings {
 
   @override
   String toString() {
-    return 'InAppWebViewSettings{accessibilityIgnoresInvertColors: $accessibilityIgnoresInvertColors, algorithmicDarkeningAllowed: $algorithmicDarkeningAllowed, allowBackgroundAudioPlaying: $allowBackgroundAudioPlaying, allowContentAccess: $allowContentAccess, allowFileAccess: $allowFileAccess, allowFileAccessFromFileURLs: $allowFileAccessFromFileURLs, allowUniversalAccessFromFileURLs: $allowUniversalAccessFromFileURLs, allowingReadAccessTo: $allowingReadAccessTo, allowsAirPlayForMediaPlayback: $allowsAirPlayForMediaPlayback, allowsBackForwardNavigationGestures: $allowsBackForwardNavigationGestures, allowsInlineMediaPlayback: $allowsInlineMediaPlayback, allowsLinkPreview: $allowsLinkPreview, allowsPictureInPictureMediaPlayback: $allowsPictureInPictureMediaPlayback, alwaysBounceHorizontal: $alwaysBounceHorizontal, alwaysBounceVertical: $alwaysBounceVertical, appCachePath: $appCachePath, applePayAPIEnabled: $applePayAPIEnabled, applicationNameForUserAgent: $applicationNameForUserAgent, automaticallyAdjustsScrollIndicatorInsets: $automaticallyAdjustsScrollIndicatorInsets, blockNetworkImage: $blockNetworkImage, blockNetworkLoads: $blockNetworkLoads, builtInZoomControls: $builtInZoomControls, cacheEnabled: $cacheEnabled, cacheMode: $cacheMode, contentBlockers: $contentBlockers, contentInsetAdjustmentBehavior: $contentInsetAdjustmentBehavior, cursiveFontFamily: $cursiveFontFamily, dataDetectorTypes: $dataDetectorTypes, databaseEnabled: $databaseEnabled, decelerationRate: $decelerationRate, defaultFixedFontSize: $defaultFixedFontSize, defaultFontSize: $defaultFontSize, defaultTextEncodingName: $defaultTextEncodingName, defaultVideoPoster: $defaultVideoPoster, disableContextMenu: $disableContextMenu, disableDefaultErrorPage: $disableDefaultErrorPage, disableHorizontalScroll: $disableHorizontalScroll, disableInputAccessoryView: $disableInputAccessoryView, disableLongPressContextMenuOnLinks: $disableLongPressContextMenuOnLinks, disableVerticalScroll: $disableVerticalScroll, disabledActionModeMenuItems: $disabledActionModeMenuItems, disallowOverScroll: $disallowOverScroll, displayZoomControls: $displayZoomControls, domStorageEnabled: $domStorageEnabled, enableViewportScale: $enableViewportScale, enterpriseAuthenticationAppLinkPolicyEnabled: $enterpriseAuthenticationAppLinkPolicyEnabled, fantasyFontFamily: $fantasyFontFamily, fixedFontFamily: $fixedFontFamily, geolocationEnabled: $geolocationEnabled, hardwareAcceleration: $hardwareAcceleration, horizontalScrollBarEnabled: $horizontalScrollBarEnabled, horizontalScrollbarThumbColor: $horizontalScrollbarThumbColor, horizontalScrollbarTrackColor: $horizontalScrollbarTrackColor, iframeAllow: $iframeAllow, iframeAllowFullscreen: $iframeAllowFullscreen, iframeAriaHidden: $iframeAriaHidden, iframeCsp: $iframeCsp, iframeName: $iframeName, iframeReferrerPolicy: $iframeReferrerPolicy, iframeRole: $iframeRole, iframeSandbox: $iframeSandbox, ignoresViewportScaleLimits: $ignoresViewportScaleLimits, incognito: $incognito, initialScale: $initialScale, interceptOnlyAsyncAjaxRequests: $interceptOnlyAsyncAjaxRequests, isDirectionalLockEnabled: $isDirectionalLockEnabled, isElementFullscreenEnabled: $isElementFullscreenEnabled, isFindInteractionEnabled: $isFindInteractionEnabled, isFraudulentWebsiteWarningEnabled: $isFraudulentWebsiteWarningEnabled, isInspectable: $isInspectable, isPagingEnabled: $isPagingEnabled, isSiteSpecificQuirksModeEnabled: $isSiteSpecificQuirksModeEnabled, isTextInteractionEnabled: $isTextInteractionEnabled, javaScriptBridgeEnabled: $javaScriptBridgeEnabled, javaScriptBridgeForMainFrameOnly: $javaScriptBridgeForMainFrameOnly, javaScriptBridgeOriginAllowList: $javaScriptBridgeOriginAllowList, javaScriptCanOpenWindowsAutomatically: $javaScriptCanOpenWindowsAutomatically, javaScriptEnabled: $javaScriptEnabled, javaScriptHandlersForMainFrameOnly: $javaScriptHandlersForMainFrameOnly, javaScriptHandlersOriginAllowList: $javaScriptHandlersOriginAllowList, layoutAlgorithm: $layoutAlgorithm, limitsNavigationsToAppBoundDomains: $limitsNavigationsToAppBoundDomains, loadWithOverviewMode: $loadWithOverviewMode, loadsImagesAutomatically: $loadsImagesAutomatically, maximumViewportInset: $maximumViewportInset, maximumZoomScale: $maximumZoomScale, mediaPlaybackRequiresUserGesture: $mediaPlaybackRequiresUserGesture, mediaType: $mediaType, minimumFontSize: $minimumFontSize, minimumLogicalFontSize: $minimumLogicalFontSize, minimumViewportInset: $minimumViewportInset, minimumZoomScale: $minimumZoomScale, mixedContentMode: $mixedContentMode, needInitialFocus: $needInitialFocus, networkAvailable: $networkAvailable, offscreenPreRaster: $offscreenPreRaster, overScrollMode: $overScrollMode, pageZoom: $pageZoom, pluginScriptsForMainFrameOnly: $pluginScriptsForMainFrameOnly, pluginScriptsOriginAllowList: $pluginScriptsOriginAllowList, preferredContentMode: $preferredContentMode, regexToAllowSyncUrlLoading: $regexToAllowSyncUrlLoading, regexToCancelSubFramesLoading: $regexToCancelSubFramesLoading, rendererPriorityPolicy: $rendererPriorityPolicy, requestedWithHeaderOriginAllowList: $requestedWithHeaderOriginAllowList, resourceCustomSchemes: $resourceCustomSchemes, safeBrowsingEnabled: $safeBrowsingEnabled, sansSerifFontFamily: $sansSerifFontFamily, saveFormData: $saveFormData, scrollBarDefaultDelayBeforeFade: $scrollBarDefaultDelayBeforeFade, scrollBarFadeDuration: $scrollBarFadeDuration, scrollBarStyle: $scrollBarStyle, scrollMultiplier: $scrollMultiplier, scrollbarFadingEnabled: $scrollbarFadingEnabled, scrollsToTop: $scrollsToTop, selectionGranularity: $selectionGranularity, serifFontFamily: $serifFontFamily, sharedCookiesEnabled: $sharedCookiesEnabled, shouldPrintBackgrounds: $shouldPrintBackgrounds, standardFontFamily: $standardFontFamily, supportMultipleWindows: $supportMultipleWindows, supportZoom: $supportZoom, suppressesIncrementalRendering: $suppressesIncrementalRendering, textZoom: $textZoom, thirdPartyCookiesEnabled: $thirdPartyCookiesEnabled, transparentBackground: $transparentBackground, underPageBackgroundColor: $underPageBackgroundColor, upgradeKnownHostsToHTTPS: $upgradeKnownHostsToHTTPS, useHybridComposition: $useHybridComposition, useOnDownloadStart: $useOnDownloadStart, useOnLoadResource: $useOnLoadResource, useOnNavigationResponse: $useOnNavigationResponse, useOnRenderProcessGone: $useOnRenderProcessGone, useShouldInterceptAjaxRequest: $useShouldInterceptAjaxRequest, useShouldInterceptFetchRequest: $useShouldInterceptFetchRequest, useShouldInterceptRequest: $useShouldInterceptRequest, useShouldOverrideUrlLoading: $useShouldOverrideUrlLoading, useWideViewPort: $useWideViewPort, userAgent: $userAgent, verticalScrollBarEnabled: $verticalScrollBarEnabled, verticalScrollbarPosition: $verticalScrollbarPosition, verticalScrollbarThumbColor: $verticalScrollbarThumbColor, verticalScrollbarTrackColor: $verticalScrollbarTrackColor, webViewAssetLoader: $webViewAssetLoader}';
+    return 'InAppWebViewSettings{accessibilityIgnoresInvertColors: $accessibilityIgnoresInvertColors, algorithmicDarkeningAllowed: $algorithmicDarkeningAllowed, allowBackgroundAudioPlaying: $allowBackgroundAudioPlaying, allowContentAccess: $allowContentAccess, allowFileAccess: $allowFileAccess, allowFileAccessFromFileURLs: $allowFileAccessFromFileURLs, allowUniversalAccessFromFileURLs: $allowUniversalAccessFromFileURLs, allowingReadAccessTo: $allowingReadAccessTo, allowsAirPlayForMediaPlayback: $allowsAirPlayForMediaPlayback, allowsBackForwardNavigationGestures: $allowsBackForwardNavigationGestures, allowsInlineMediaPlayback: $allowsInlineMediaPlayback, allowsLinkPreview: $allowsLinkPreview, allowsPictureInPictureMediaPlayback: $allowsPictureInPictureMediaPlayback, alwaysBounceHorizontal: $alwaysBounceHorizontal, alwaysBounceVertical: $alwaysBounceVertical, appCachePath: $appCachePath, applePayAPIEnabled: $applePayAPIEnabled, applicationNameForUserAgent: $applicationNameForUserAgent, automaticallyAdjustsScrollIndicatorInsets: $automaticallyAdjustsScrollIndicatorInsets, blockNetworkImage: $blockNetworkImage, blockNetworkLoads: $blockNetworkLoads, browserAcceleratorKeysEnabled: $browserAcceleratorKeysEnabled, builtInZoomControls: $builtInZoomControls, cacheEnabled: $cacheEnabled, cacheMode: $cacheMode, contentBlockers: $contentBlockers, contentInsetAdjustmentBehavior: $contentInsetAdjustmentBehavior, cursiveFontFamily: $cursiveFontFamily, dataDetectorTypes: $dataDetectorTypes, databaseEnabled: $databaseEnabled, decelerationRate: $decelerationRate, defaultFixedFontSize: $defaultFixedFontSize, defaultFontSize: $defaultFontSize, defaultTextEncodingName: $defaultTextEncodingName, defaultVideoPoster: $defaultVideoPoster, disableContextMenu: $disableContextMenu, disableDefaultErrorPage: $disableDefaultErrorPage, disableHorizontalScroll: $disableHorizontalScroll, disableInputAccessoryView: $disableInputAccessoryView, disableLongPressContextMenuOnLinks: $disableLongPressContextMenuOnLinks, disableVerticalScroll: $disableVerticalScroll, disabledActionModeMenuItems: $disabledActionModeMenuItems, disallowOverScroll: $disallowOverScroll, displayZoomControls: $displayZoomControls, domStorageEnabled: $domStorageEnabled, enableViewportScale: $enableViewportScale, enterpriseAuthenticationAppLinkPolicyEnabled: $enterpriseAuthenticationAppLinkPolicyEnabled, fantasyFontFamily: $fantasyFontFamily, fixedFontFamily: $fixedFontFamily, generalAutofillEnabled: $generalAutofillEnabled, geolocationEnabled: $geolocationEnabled, hardwareAcceleration: $hardwareAcceleration, horizontalScrollBarEnabled: $horizontalScrollBarEnabled, horizontalScrollbarThumbColor: $horizontalScrollbarThumbColor, horizontalScrollbarTrackColor: $horizontalScrollbarTrackColor, iframeAllow: $iframeAllow, iframeAllowFullscreen: $iframeAllowFullscreen, iframeAriaHidden: $iframeAriaHidden, iframeCsp: $iframeCsp, iframeName: $iframeName, iframeReferrerPolicy: $iframeReferrerPolicy, iframeRole: $iframeRole, iframeSandbox: $iframeSandbox, ignoresViewportScaleLimits: $ignoresViewportScaleLimits, incognito: $incognito, initialScale: $initialScale, interceptOnlyAsyncAjaxRequests: $interceptOnlyAsyncAjaxRequests, isDirectionalLockEnabled: $isDirectionalLockEnabled, isElementFullscreenEnabled: $isElementFullscreenEnabled, isFindInteractionEnabled: $isFindInteractionEnabled, isFraudulentWebsiteWarningEnabled: $isFraudulentWebsiteWarningEnabled, isInspectable: $isInspectable, isPagingEnabled: $isPagingEnabled, isSiteSpecificQuirksModeEnabled: $isSiteSpecificQuirksModeEnabled, isTextInteractionEnabled: $isTextInteractionEnabled, javaScriptBridgeEnabled: $javaScriptBridgeEnabled, javaScriptBridgeForMainFrameOnly: $javaScriptBridgeForMainFrameOnly, javaScriptBridgeOriginAllowList: $javaScriptBridgeOriginAllowList, javaScriptCanOpenWindowsAutomatically: $javaScriptCanOpenWindowsAutomatically, javaScriptEnabled: $javaScriptEnabled, javaScriptHandlersForMainFrameOnly: $javaScriptHandlersForMainFrameOnly, javaScriptHandlersOriginAllowList: $javaScriptHandlersOriginAllowList, layoutAlgorithm: $layoutAlgorithm, limitsNavigationsToAppBoundDomains: $limitsNavigationsToAppBoundDomains, loadWithOverviewMode: $loadWithOverviewMode, loadsImagesAutomatically: $loadsImagesAutomatically, maximumViewportInset: $maximumViewportInset, maximumZoomScale: $maximumZoomScale, mediaPlaybackRequiresUserGesture: $mediaPlaybackRequiresUserGesture, mediaType: $mediaType, minimumFontSize: $minimumFontSize, minimumLogicalFontSize: $minimumLogicalFontSize, minimumViewportInset: $minimumViewportInset, minimumZoomScale: $minimumZoomScale, mixedContentMode: $mixedContentMode, needInitialFocus: $needInitialFocus, networkAvailable: $networkAvailable, offscreenPreRaster: $offscreenPreRaster, overScrollMode: $overScrollMode, pageZoom: $pageZoom, passwordAutosaveEnabled: $passwordAutosaveEnabled, pluginScriptsForMainFrameOnly: $pluginScriptsForMainFrameOnly, pluginScriptsOriginAllowList: $pluginScriptsOriginAllowList, preferredContentMode: $preferredContentMode, regexToAllowSyncUrlLoading: $regexToAllowSyncUrlLoading, regexToCancelSubFramesLoading: $regexToCancelSubFramesLoading, rendererPriorityPolicy: $rendererPriorityPolicy, requestedWithHeaderOriginAllowList: $requestedWithHeaderOriginAllowList, resourceCustomSchemes: $resourceCustomSchemes, safeBrowsingEnabled: $safeBrowsingEnabled, sansSerifFontFamily: $sansSerifFontFamily, scrollBarDefaultDelayBeforeFade: $scrollBarDefaultDelayBeforeFade, scrollBarFadeDuration: $scrollBarFadeDuration, scrollBarStyle: $scrollBarStyle, scrollMultiplier: $scrollMultiplier, scrollbarFadingEnabled: $scrollbarFadingEnabled, scrollsToTop: $scrollsToTop, selectionGranularity: $selectionGranularity, serifFontFamily: $serifFontFamily, sharedCookiesEnabled: $sharedCookiesEnabled, shouldPrintBackgrounds: $shouldPrintBackgrounds, standardFontFamily: $standardFontFamily, statusBarEnabled: $statusBarEnabled, supportMultipleWindows: $supportMultipleWindows, supportZoom: $supportZoom, suppressesIncrementalRendering: $suppressesIncrementalRendering, textZoom: $textZoom, thirdPartyCookiesEnabled: $thirdPartyCookiesEnabled, transparentBackground: $transparentBackground, underPageBackgroundColor: $underPageBackgroundColor, upgradeKnownHostsToHTTPS: $upgradeKnownHostsToHTTPS, useHybridComposition: $useHybridComposition, useOnDownloadStart: $useOnDownloadStart, useOnLoadResource: $useOnLoadResource, useOnNavigationResponse: $useOnNavigationResponse, useOnRenderProcessGone: $useOnRenderProcessGone, useShouldInterceptAjaxRequest: $useShouldInterceptAjaxRequest, useShouldInterceptFetchRequest: $useShouldInterceptFetchRequest, useShouldInterceptRequest: $useShouldInterceptRequest, useShouldOverrideUrlLoading: $useShouldOverrideUrlLoading, useWideViewPort: $useWideViewPort, userAgent: $userAgent, verticalScrollBarEnabled: $verticalScrollBarEnabled, verticalScrollbarPosition: $verticalScrollbarPosition, verticalScrollbarThumbColor: $verticalScrollbarThumbColor, verticalScrollbarTrackColor: $verticalScrollbarTrackColor, webViewAssetLoader: $webViewAssetLoader}';
   }
 }

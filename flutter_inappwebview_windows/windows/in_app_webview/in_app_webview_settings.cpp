@@ -41,6 +41,11 @@ namespace flutter_inappwebview_plugin
     }
     pluginScriptsForMainFrameOnly = get_fl_map_value(encodableMap, "pluginScriptsForMainFrameOnly", pluginScriptsForMainFrameOnly);
     scrollMultiplier = get_fl_map_value(encodableMap, "scrollMultiplier", scrollMultiplier);
+    disableDefaultErrorPage = get_fl_map_value<bool>(encodableMap, "disableDefaultErrorPage");
+    statusBarEnabled = get_fl_map_value<bool>(encodableMap, "statusBarEnabled");
+    browserAcceleratorKeysEnabled = get_fl_map_value<bool>(encodableMap, "browserAcceleratorKeysEnabled");
+    generalAutofillEnabled = get_fl_map_value<bool>(encodableMap, "generalAutofillEnabled");
+    passwordAutosaveEnabled = get_fl_map_value<bool>(encodableMap, "passwordAutosaveEnabled");
   }
 
   flutter::EncodableMap InAppWebViewSettings::toEncodableMap() const
@@ -65,6 +70,11 @@ namespace flutter_inappwebview_plugin
       {"pluginScriptsOriginAllowList", make_fl_value(pluginScriptsOriginAllowList)},
       {"pluginScriptsForMainFrameOnly", pluginScriptsForMainFrameOnly},
       {"scrollMultiplier", scrollMultiplier},
+      {"disableDefaultErrorPage", disableDefaultErrorPage},
+      {"statusBarEnabled", statusBarEnabled},
+      {"browserAcceleratorKeysEnabled", browserAcceleratorKeysEnabled},
+      {"generalAutofillEnabled", generalAutofillEnabled},
+      {"passwordAutosaveEnabled", passwordAutosaveEnabled}
     };
   }
 
@@ -91,12 +101,37 @@ namespace flutter_inappwebview_plugin
         if (SUCCEEDED(settings->get_AreDefaultContextMenusEnabled(&areDefaultContextMenusEnabled))) {
           settingsMap["disableContextMenu"] = !(bool)areDefaultContextMenusEnabled;
         }
+        BOOL isBuiltInErrorPageEnabled;
+        if (SUCCEEDED(settings->get_IsBuiltInErrorPageEnabled(&isBuiltInErrorPageEnabled))) {
+          settingsMap["disableDefaultErrorPage"] = !(bool)isBuiltInErrorPageEnabled;
+        }
+        BOOL isStatusBarEnabled;
+        if (SUCCEEDED(settings->get_IsBuiltInErrorPageEnabled(&isStatusBarEnabled))) {
+          settingsMap["statusBarEnabled"] = (bool)isStatusBarEnabled;
+        }
 
-        wil::com_ptr<ICoreWebView2Settings2> settings2;
-        if (SUCCEEDED(settings->QueryInterface(IID_PPV_ARGS(&settings2)))) {
+        if (auto settings2 = settings.try_query<ICoreWebView2Settings2>()) {
           wil::unique_cotaskmem_string realUserAgent;
           if (SUCCEEDED(settings2->get_UserAgent(&realUserAgent))) {
             settingsMap["userAgent"] = wide_to_utf8(realUserAgent.get());
+          }
+        }
+
+        if (auto settings3 = settings.try_query<ICoreWebView2Settings3>()) {
+          BOOL areBrowserAcceleratorKeysEnabled;
+          if (SUCCEEDED(settings3->get_AreBrowserAcceleratorKeysEnabled(&areBrowserAcceleratorKeysEnabled))) {
+            settingsMap["browserAcceleratorKeysEnabled"] = (bool)areBrowserAcceleratorKeysEnabled;
+          }
+        }
+
+        if (auto settings4 = settings.try_query<ICoreWebView2Settings4>()) {
+          BOOL isGeneralAutofillEnabled;
+          if (SUCCEEDED(settings4->get_IsGeneralAutofillEnabled(&isGeneralAutofillEnabled))) {
+            settingsMap["generalAutofillEnabled"] = (bool)isGeneralAutofillEnabled;
+          }
+          BOOL isPasswordAutosaveEnabled;
+          if (SUCCEEDED(settings4->get_IsPasswordAutosaveEnabled(&isPasswordAutosaveEnabled))) {
+            settingsMap["passwordAutosaveEnabled"] = (bool)isPasswordAutosaveEnabled;
           }
         }
       }

@@ -5,6 +5,7 @@ import 'dart:ui';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import '../platform_util.dart';
 import '_static_channel.dart';
 
 const Map<String, SystemMouseCursor> _cursors = {
@@ -259,7 +260,7 @@ class CustomPlatformView extends StatefulWidget {
   _CustomPlatformViewState createState() => _CustomPlatformViewState();
 }
 
-class _CustomPlatformViewState extends State<CustomPlatformView> {
+class _CustomPlatformViewState extends State<CustomPlatformView> with PlatformUtilListener {
   final GlobalKey _key = GlobalKey();
   final _downButtons = <int, PointerButton>{};
 
@@ -272,9 +273,15 @@ class _CustomPlatformViewState extends State<CustomPlatformView> {
 
   StreamSubscription? _cursorSubscription;
 
+  late final AppLifecycleListener _listener;
+
+  PlatformUtil _platformUtil = PlatformUtil.instance();
+
   @override
   void initState() {
     super.initState();
+
+    _platformUtil.addListener(this);
 
     _controller.initialize(
         onPlatformViewCreated: (id) {
@@ -282,6 +289,15 @@ class _CustomPlatformViewState extends State<CustomPlatformView> {
           setState(() {});
         },
         arguments: widget.creationParams);
+
+    _listener = AppLifecycleListener(
+        onStateChange: (state) {
+          if ([AppLifecycleState.resumed, AppLifecycleState.hidden].contains(state)) {
+            _reportSurfaceSize();
+            _reportWidgetPosition();
+          }
+        }
+    );
 
     // Report initial surface size and widget position
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -294,6 +310,12 @@ class _CustomPlatformViewState extends State<CustomPlatformView> {
         _cursor = cursor;
       });
     });
+  }
+
+  @override
+  void onWindowMove() {
+    _reportSurfaceSize();
+    _reportWidgetPosition();
   }
 
   @override
@@ -432,8 +454,10 @@ class _CustomPlatformViewState extends State<CustomPlatformView> {
   @override
   void dispose() {
     super.dispose();
+    _platformUtil.removeListener(this);
     _cursorSubscription?.cancel();
     _controller.dispose();
     _focusNode.dispose();
+    _listener.dispose();
   }
 }

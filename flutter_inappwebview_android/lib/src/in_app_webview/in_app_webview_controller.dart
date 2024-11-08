@@ -2269,7 +2269,7 @@ class AndroidInAppWebViewController extends PlatformInAppWebViewController
   @override
   Future<void> enableInputMethod() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    return await channel
+    return channel
         ?.invokeMethod('enableInputMethod', args)
         .then((_) => channel?.invokeMethod('showInputMethod', args));
   }

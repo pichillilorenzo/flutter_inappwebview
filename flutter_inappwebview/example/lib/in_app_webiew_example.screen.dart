@@ -224,8 +224,8 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
               ),
               ElevatedButton(
                 child: inputDisabled
-                    ? Icon(Icons.keyboard_arrow_up)
-                    : Icon(Icons.keyboard_arrow_down),
+                    ? Icon(Icons.keyboard)
+                    : Icon(Icons.keyboard_hide),
                 onPressed: () {
                   if (inputDisabled) {
                     webViewController?.enableInputMethod();

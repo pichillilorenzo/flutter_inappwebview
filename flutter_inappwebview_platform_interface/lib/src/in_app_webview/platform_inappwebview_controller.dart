@@ -1122,13 +1122,36 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   /// Adds the keyboard input method, effectively adding the keyboard whilst interacting with the webview.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Android native WebView ([Official API - ViewGroup.clearFocus](https://developer.android.com/reference/android/view/inputmethod/InputMethodManager))
+  ///- Android native WebView ([Official API - InputMethodManager](https://developer.android.com/reference/android/view/inputmethod/InputMethodManager))
   ///- iOS ([Official API - WKWebView.inputMethod](https://trac.webkit.org/changeset/246229/webkit#file1))
   ///{@endtemplate}
   Future<void> enableInputMethod() {
     throw UnimplementedError(
         'enableInputMethod is not implemented on the current platform');
   }
+
+  ///{@template flutter_inappwebview_platform_interface.PlatformInAppWebViewController.showInputMethod}
+  /// Shows the input method.
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Android native WebView ([Official API - InputMethodManager](https://developer.android.com/reference/android/view/inputmethod/InputMethodManager))
+  ///{@endtemplate}
+  Future<void> showInputMethod() {
+    throw UnimplementedError(
+        'showInputMethod is not implemented on the current platform');
+  }
+
+  ///{@template flutter_inappwebview_platform_interface.PlatformInAppWebViewController.hideInputMethod}
+  /// Hides the input method.
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Android native WebView ([Official API - InputMethodManager](https://developer.android.com/reference/android/view/inputmethod/InputMethodManager))
+  ///{@endtemplate}
+  Future<void> hideInputMethod() {
+    throw UnimplementedError(
+        'hideInputMethod is not implemented on the current platform');
+  }
+
 
   ///{@template flutter_inappwebview_platform_interface.PlatformInAppWebViewController.setContextMenu}
   ///Sets or updates the WebView context menu to be used next time it will appear.

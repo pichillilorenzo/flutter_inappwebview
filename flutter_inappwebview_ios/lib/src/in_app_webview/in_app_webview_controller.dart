@@ -2247,6 +2247,12 @@ class IOSInAppWebViewController extends PlatformInAppWebViewController
   }
 
   @override
+  Future<void> showInputMethod() async {}
+
+  @override
+  Future<void> hideInputMethod() async {}
+
+  @override
   Future<bool?> requestFocus(
       {FocusDirection? direction,
       InAppWebViewRect? previouslyFocusedRect}) async {

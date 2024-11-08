@@ -3384,12 +3384,16 @@ if(window.\(JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME())[\(_callHandlerID)] 
     var _inputView: UIView? = nil
 	public func disableInputMethod() {
 		_inputView = UIView()
-		self.scrollView.subviews.first?.reloadInputViews()
+        for subview in self.scrollView.subviews {
+            subview.reloadInputViews()
+        }
 	}
 	
 	public func enableInputMethod() {
 		_inputView = nil
-		self.scrollView.subviews.first?.reloadInputViews()
+        for subview in self.scrollView.subviews {
+            subview.reloadInputViews()
+        }
 	}
 	
 	

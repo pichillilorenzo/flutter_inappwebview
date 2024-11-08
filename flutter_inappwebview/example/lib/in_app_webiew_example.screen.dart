@@ -228,9 +228,13 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                     : Icon(Icons.keyboard_hide),
                 onPressed: () {
                   if (inputDisabled) {
-                    webViewController?.enableInputMethod();
+                    webViewController
+                        ?.enableInputMethod()
+                        .then((_) => webViewController?.showInputMethod());
                   } else {
-                    webViewController?.disableInputMethod();
+                    webViewController
+                        ?.disableInputMethod()
+                        .then((_) => webViewController?.hideInputMethod());
                   }
                   setState(() {
                     inputDisabled = !inputDisabled;

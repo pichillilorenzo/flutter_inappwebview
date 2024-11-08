@@ -677,6 +677,12 @@ public class WebViewChannelDelegate: ChannelDelegate {
             } else {
                 result(false)
             }
+        case .disableInputMethod:
+			webView?.disableInputMethod()
+			result(true)
+		case .enableInputMethod:
+			webView?.enableInputMethod()
+			result(true)
         }
     }
     

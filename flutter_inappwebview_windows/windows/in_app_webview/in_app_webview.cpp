@@ -2061,6 +2061,167 @@ namespace flutter_inappwebview_plugin
     }
   }
 
+  bool InAppWebView::isInterfaceSupported(const std::string& interfaceName) const
+  {
+    if (!webView) {
+      return false;
+    }
+
+    if (string_equals(interfaceName, "ICoreWebView2") || starts_with(interfaceName, std::string{ "ICoreWebView2_" })) {
+      switch (string_hash(interfaceName)) {
+      case string_hash("ICoreWebView2"):
+        return webView.try_query<ICoreWebView2>() != nullptr;
+      case string_hash("ICoreWebView2_2"):
+        return webView.try_query<ICoreWebView2_2>() != nullptr;
+      case string_hash("ICoreWebView2_3"):
+        return webView.try_query<ICoreWebView2_3>() != nullptr;
+      case string_hash("ICoreWebView2_4"):
+        return webView.try_query<ICoreWebView2_4>() != nullptr;
+      case string_hash("ICoreWebView2_5"):
+        return webView.try_query<ICoreWebView2_5>() != nullptr;
+      case string_hash("ICoreWebView2_6"):
+        return webView.try_query<ICoreWebView2_6>() != nullptr;
+      case string_hash("ICoreWebView2_7"):
+        return webView.try_query<ICoreWebView2_7>() != nullptr;
+      case string_hash("ICoreWebView2_8"):
+        return webView.try_query<ICoreWebView2_8>() != nullptr;
+      case string_hash("ICoreWebView2_9"):
+        return webView.try_query<ICoreWebView2_9>() != nullptr;
+      case string_hash("ICoreWebView2_10"):
+        return webView.try_query<ICoreWebView2_10>() != nullptr;
+      case string_hash("ICoreWebView2_11"):
+        return webView.try_query<ICoreWebView2_11>() != nullptr;
+      case string_hash("ICoreWebView2_12"):
+        return webView.try_query<ICoreWebView2_12>() != nullptr;
+      case string_hash("ICoreWebView2_13"):
+        return webView.try_query<ICoreWebView2_13>() != nullptr;
+      case string_hash("ICoreWebView2_14"):
+        return webView.try_query<ICoreWebView2_14>() != nullptr;
+      case string_hash("ICoreWebView2_15"):
+        return webView.try_query<ICoreWebView2_15>() != nullptr;
+      case string_hash("ICoreWebView2_16"):
+        return webView.try_query<ICoreWebView2_16>() != nullptr;
+      case string_hash("ICoreWebView2_17"):
+        return webView.try_query<ICoreWebView2_17>() != nullptr;
+      case string_hash("ICoreWebView2_18"):
+        return webView.try_query<ICoreWebView2_18>() != nullptr;
+      case string_hash("ICoreWebView2_19"):
+        return webView.try_query<ICoreWebView2_19>() != nullptr;
+      case string_hash("ICoreWebView2_20"):
+        return webView.try_query<ICoreWebView2_20>() != nullptr;
+      case string_hash("ICoreWebView2_21"):
+        return webView.try_query<ICoreWebView2_21>() != nullptr;
+      case string_hash("ICoreWebView2_22"):
+        return webView.try_query<ICoreWebView2_22>() != nullptr;
+      case string_hash("ICoreWebView2_23"):
+        return webView.try_query<ICoreWebView2_23>() != nullptr;
+      case string_hash("ICoreWebView2_24"):
+        return webView.try_query<ICoreWebView2_24>() != nullptr;
+      case string_hash("ICoreWebView2_25"):
+        return webView.try_query<ICoreWebView2_25>() != nullptr;
+      case string_hash("ICoreWebView2_26"):
+        return webView.try_query<ICoreWebView2_26>() != nullptr;
+      default:
+        return false;
+      }
+    }
+
+    wil::com_ptr<ICoreWebView2Settings> webView2Settings;
+    if (succeededOrLog(webView->get_Settings(&webView2Settings))) {
+      if (starts_with(interfaceName, std::string{ "ICoreWebView2Settings" })) {
+        switch (string_hash(interfaceName)) {
+        case string_hash("ICoreWebView2Settings"):
+          return webView2Settings.try_query<ICoreWebView2Settings>() != nullptr;
+        case string_hash("ICoreWebView2Settings2"):
+          return webView2Settings.try_query<ICoreWebView2Settings2>() != nullptr;
+        case string_hash("ICoreWebView2Settings3"):
+          return webView2Settings.try_query<ICoreWebView2Settings3>() != nullptr;
+        case string_hash("ICoreWebView2Settings4"):
+          return webView2Settings.try_query<ICoreWebView2Settings4>() != nullptr;
+        case string_hash("ICoreWebView2Settings5"):
+          return webView2Settings.try_query<ICoreWebView2Settings5>() != nullptr;
+        case string_hash("ICoreWebView2Settings6"):
+          return webView2Settings.try_query<ICoreWebView2Settings6>() != nullptr;
+        case string_hash("ICoreWebView2Settings7"):
+          return webView2Settings.try_query<ICoreWebView2Settings7>() != nullptr;
+        case string_hash("ICoreWebView2Settings8"):
+          return webView2Settings.try_query<ICoreWebView2Settings8>() != nullptr;
+        case string_hash("ICoreWebView2Settings9"):
+          return webView2Settings.try_query<ICoreWebView2Settings9>() != nullptr;
+        default:
+          return false;
+        }
+      }
+    }
+
+    if (starts_with(interfaceName, std::string{ "ICoreWebView2Controller" }) && webViewController) {
+      switch (string_hash(interfaceName)) {
+      case string_hash("ICoreWebView2Controller"):
+        return webViewController.try_query<ICoreWebView2Controller>() != nullptr;
+      case string_hash("ICoreWebView2Controller2"):
+        return webViewController.try_query<ICoreWebView2Controller2>() != nullptr;
+      case string_hash("ICoreWebView2Controller3"):
+        return webViewController.try_query<ICoreWebView2Controller3>() != nullptr;
+      case string_hash("ICoreWebView2Controller4"):
+        return webViewController.try_query<ICoreWebView2Controller4>() != nullptr;
+      default:
+        return false;
+      }
+    }
+
+    if (starts_with(interfaceName, std::string{ "ICoreWebView2CompositionController" }) && webViewCompositionController) {
+      switch (string_hash(interfaceName)) {
+      case string_hash("ICoreWebView2CompositionController"):
+        return webViewCompositionController.try_query<ICoreWebView2CompositionController>() != nullptr;
+      case string_hash("ICoreWebView2CompositionController2"):
+        return webViewCompositionController.try_query<ICoreWebView2CompositionController2>() != nullptr;
+      case string_hash("ICoreWebView2CompositionController3"):
+        return webViewCompositionController.try_query<ICoreWebView2CompositionController3>() != nullptr;
+      case string_hash("ICoreWebView2CompositionController4"):
+        return webViewCompositionController.try_query<ICoreWebView2CompositionController4>() != nullptr;
+      default:
+        return false;
+      }
+    }
+
+    if (starts_with(interfaceName, std::string{ "ICoreWebView2Environment" }) && webViewEnv) {
+      switch (string_hash(interfaceName)) {
+      case string_hash("ICoreWebView2Environment"):
+        return webViewEnv.try_query<ICoreWebView2Environment>() != nullptr;
+      case string_hash("ICoreWebView2Environment2"):
+        return webViewEnv.try_query<ICoreWebView2Environment2>() != nullptr;
+      case string_hash("ICoreWebView2Environment3"):
+        return webViewEnv.try_query<ICoreWebView2Environment3>() != nullptr;
+      case string_hash("ICoreWebView2Environment4"):
+        return webViewEnv.try_query<ICoreWebView2Environment4>() != nullptr;
+      case string_hash("ICoreWebView2Environment5"):
+        return webViewEnv.try_query<ICoreWebView2Environment5>() != nullptr;
+      case string_hash("ICoreWebView2Environment6"):
+        return webViewEnv.try_query<ICoreWebView2Environment6>() != nullptr;
+      case string_hash("ICoreWebView2Environment7"):
+        return webViewEnv.try_query<ICoreWebView2Environment7>() != nullptr;
+      case string_hash("ICoreWebView2Environment8"):
+        return webViewEnv.try_query<ICoreWebView2Environment8>() != nullptr;
+      case string_hash("ICoreWebView2Environment9"):
+        return webViewEnv.try_query<ICoreWebView2Environment9>() != nullptr;
+      case string_hash("ICoreWebView2Environment10"):
+        return webViewEnv.try_query<ICoreWebView2Environment10>() != nullptr;
+      case string_hash("ICoreWebView2Environment11"):
+        return webViewEnv.try_query<ICoreWebView2Environment11>() != nullptr;
+      case string_hash("ICoreWebView2Environment12"):
+        return webViewEnv.try_query<ICoreWebView2Environment12>() != nullptr;
+      case string_hash("ICoreWebView2Environment13"):
+        return webViewEnv.try_query<ICoreWebView2Environment13>() != nullptr;
+      case string_hash("ICoreWebView2Environment14"):
+        return webViewEnv.try_query<ICoreWebView2Environment14>() != nullptr;
+      default:
+        return false;
+      }
+    }
+
+    return false;
+  }
+
   // flutter_view
   void InAppWebView::setSurfaceSize(size_t width, size_t height, float scale_factor)
   {

@@ -1,7 +1,11 @@
 ## 0.7.0-beta.2
 
 - Updated flutter_inappwebview_platform_interface version to ^1.4.0-beta.2
+- Updated Microsoft.Web.WebView2 SDK version from `1.0.2792.45` to `1.0.2849.39`
 - Implemented `disableDefaultErrorPage`, `statusBarEnabled`, `browserAcceleratorKeysEnabled`, `generalAutofillEnabled`, `passwordAutosaveEnabled`, `isPinchZoomEnabled`, `allowsBackForwardNavigationGestures`, `hiddenPdfToolbarItems`, `reputationCheckingRequired`, `nonClientRegionSupportEnabled` properties of `InAppWebViewSettings`
+- Implemented `isInterfaceSupported` WebViewEnvironment method
+- Implemented `isInterfaceSupported` InAppWebViewController method
+- Fixed wrong channel name when creating a `WebViewEnvironment` instance
 - Fixed "[Windows] Has an overlay on the desktop when the application is minimized" [#2402](https://github.com/pichillilorenzo/flutter_inappwebview/issues/2402)
 - Fixed "[Windows] missing implementation of onPermissionRequest event will cause crash when requested by the webpage" [#2404](https://github.com/pichillilorenzo/flutter_inappwebview/issues/2404)
 

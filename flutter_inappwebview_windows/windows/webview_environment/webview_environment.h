@@ -38,6 +38,8 @@ namespace flutter_inappwebview_plugin
     {
       return webView_;
     }
+    bool isInterfaceSupported(const std::string& interfaceName) const;
+
   private:
     wil::com_ptr<ICoreWebView2Environment> environment_;
     wil::com_ptr<ICoreWebView2Controller> webViewController_;

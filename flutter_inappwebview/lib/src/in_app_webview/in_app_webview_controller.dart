@@ -506,6 +506,10 @@ class InAppWebViewController {
           {required String eventName}) =>
       platform.removeDevToolsProtocolEventListener(eventName: eventName);
 
+  ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.isInterfaceSupported}
+  Future<bool> isInterfaceSupported(WebViewInterface interface) =>
+      platform.isInterfaceSupported(interface);
+
   ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.getIFrameId}
   Future<String?> getIFrameId() => platform.getIFrameId();
 

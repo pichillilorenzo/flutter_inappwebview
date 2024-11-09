@@ -4,6 +4,7 @@ import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 import '../debug_logging_settings.dart';
 import '../inappwebview_platform.dart';
 import '../types/disposable.dart';
+import '../types/webview_interface.dart';
 import 'webview_environment_settings.dart';
 
 /// Object specifying creation parameters for creating a [PlatformWebViewEnvironment].
@@ -83,6 +84,19 @@ abstract class PlatformWebViewEnvironment extends PlatformInterface
   /// WebView Environment settings.
   ///{@endtemplate}
   WebViewEnvironmentSettings? get settings => params.settings;
+
+  ///{@template flutter_inappwebview_platform_interface.PlatformWebViewEnvironment.isInterfaceSupported}
+  ///Returns `true` if the WebView Environment supports the specified [interface], otherwise `false`.
+  ///Only the ones related to [WebViewInterface.ICoreWebView2Environment] are valid interfaces to check;
+  ///otherwise, it will always return `false`.
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Windows
+  ///{@endtemplate}
+  Future<bool> isInterfaceSupported(WebViewInterface interface) async {
+    throw UnimplementedError(
+        'isInterfaceSupported is not implemented on the current platform');
+  }
 
   ///{@template flutter_inappwebview_platform_interface.PlatformWebViewEnvironment.create}
   ///Creates the [PlatformWebViewEnvironment] using [settings].

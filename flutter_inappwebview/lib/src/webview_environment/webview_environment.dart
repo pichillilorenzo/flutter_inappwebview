@@ -24,6 +24,10 @@ class WebViewEnvironment {
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewEnvironment.settings}
   WebViewEnvironmentSettings? get settings => platform.settings;
 
+  ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewEnvironment.isInterfaceSupported}
+  Future<bool> isInterfaceSupported(WebViewInterface interface) =>
+      platform.isInterfaceSupported(interface);
+
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewEnvironment.create}
   static Future<WebViewEnvironment> create(
       {WebViewEnvironmentSettings? settings}) async {

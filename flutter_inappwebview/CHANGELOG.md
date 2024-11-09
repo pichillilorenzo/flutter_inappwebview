@@ -14,10 +14,16 @@
 - Updated `flutter_inappwebview_internal_annotations` dependency from `^1.1.1` to `^1.2.0`
 - Updated `fromMap` static method and `toMap` method implementations
 - Added `byName`, `name`, `asNameMap` custom enum classes methods
-- Added `statusBarEnabled`, `browserAcceleratorKeysEnabled`, `generalAutofillEnabled`, `passwordAutosaveEnabled` property to `InAppWebViewSettings`
+- Added `statusBarEnabled`, `browserAcceleratorKeysEnabled`, `generalAutofillEnabled`, `passwordAutosaveEnabled`, `isPinchZoomEnabled`, `hiddenPdfToolbarItems`, `reputationCheckingRequired`, `nonClientRegionSupportEnabled` property to `InAppWebViewSettings`
+- Added `isInterfaceSupported` method to `PlatformWebViewEnvironment` class
+- Added `isInterfaceSupported` method to `PlatformInAppWebViewController` class
 
 #### Windows Platform
-- Implemented `disableDefaultErrorPage`, `statusBarEnabled`, `browserAcceleratorKeysEnabled`, `generalAutofillEnabled`, `passwordAutosaveEnabled` properties of `InAppWebViewSettings`
+- Updated Microsoft.Web.WebView2 SDK version from `1.0.2792.45` to `1.0.2849.39`
+- Implemented `disableDefaultErrorPage`, `statusBarEnabled`, `browserAcceleratorKeysEnabled`, `generalAutofillEnabled`, `passwordAutosaveEnabled`, `isPinchZoomEnabled`, `allowsBackForwardNavigationGestures`, `hiddenPdfToolbarItems`, `reputationCheckingRequired`, `nonClientRegionSupportEnabled` properties of `InAppWebViewSettings`
+- Implemented `isInterfaceSupported` WebViewEnvironment method
+- Implemented `isInterfaceSupported` InAppWebViewController method
+- Fixed wrong channel name when creating a `WebViewEnvironment` instance
 - Fixed "[Windows] Has an overlay on the desktop when the application is minimized" [#2402](https://github.com/pichillilorenzo/flutter_inappwebview/issues/2402)
 - Fixed "[Windows] missing implementation of onPermissionRequest event will cause crash when requested by the webpage" [#2404](https://github.com/pichillilorenzo/flutter_inappwebview/issues/2404)
 

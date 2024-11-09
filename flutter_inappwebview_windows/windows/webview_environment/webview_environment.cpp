@@ -95,6 +95,50 @@ namespace flutter_inappwebview_plugin
     }
   }
 
+  bool WebViewEnvironment::isInterfaceSupported(const std::string& interfaceName) const
+  {
+    if (!environment_) {
+      return false;
+    }
+
+    if (starts_with(interfaceName, std::string{ "ICoreWebView2Environment" })) {
+      switch (string_hash(interfaceName)) {
+      case string_hash("ICoreWebView2Environment"):
+        return environment_.try_query<ICoreWebView2Environment>() != nullptr;
+      case string_hash("ICoreWebView2Environment2"):
+        return environment_.try_query<ICoreWebView2Environment2>() != nullptr;
+      case string_hash("ICoreWebView2Environment3"):
+        return environment_.try_query<ICoreWebView2Environment3>() != nullptr;
+      case string_hash("ICoreWebView2Environment4"):
+        return environment_.try_query<ICoreWebView2Environment4>() != nullptr;
+      case string_hash("ICoreWebView2Environment5"):
+        return environment_.try_query<ICoreWebView2Environment5>() != nullptr;
+      case string_hash("ICoreWebView2Environment6"):
+        return environment_.try_query<ICoreWebView2Environment6>() != nullptr;
+      case string_hash("ICoreWebView2Environment7"):
+        return environment_.try_query<ICoreWebView2Environment7>() != nullptr;
+      case string_hash("ICoreWebView2Environment8"):
+        return environment_.try_query<ICoreWebView2Environment8>() != nullptr;
+      case string_hash("ICoreWebView2Environment9"):
+        return environment_.try_query<ICoreWebView2Environment9>() != nullptr;
+      case string_hash("ICoreWebView2Environment10"):
+        return environment_.try_query<ICoreWebView2Environment10>() != nullptr;
+      case string_hash("ICoreWebView2Environment11"):
+        return environment_.try_query<ICoreWebView2Environment11>() != nullptr;
+      case string_hash("ICoreWebView2Environment12"):
+        return environment_.try_query<ICoreWebView2Environment12>() != nullptr;
+      case string_hash("ICoreWebView2Environment13"):
+        return environment_.try_query<ICoreWebView2Environment13>() != nullptr;
+      case string_hash("ICoreWebView2Environment14"):
+        return environment_.try_query<ICoreWebView2Environment14>() != nullptr;
+      default:
+        return false;
+      }
+    }
+
+    return false;
+  }
+
   WebViewEnvironment::~WebViewEnvironment()
   {
     debugLog("dealloc WebViewEnvironment");

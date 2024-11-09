@@ -2759,6 +2759,13 @@ class WindowsInAppWebViewController extends PlatformInAppWebViewController
   }
 
   @override
+  Future<bool> isInterfaceSupported(WebViewInterface interface) async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    args.putIfAbsent('interface', () => interface.toNativeValue());
+    return await channel?.invokeMethod<bool>('isInterfaceSupported', args) ?? false;
+  }
+
+  @override
   Future<String> getDefaultUserAgent() async {
     Map<String, dynamic> args = <String, dynamic>{};
     return await _staticChannel.invokeMethod<String>(

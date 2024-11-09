@@ -300,6 +300,10 @@ namespace flutter_inappwebview_plugin
           result_->Success();
         });
     }
+    else if (string_equals(methodName, "isInterfaceSupported")) {
+      auto interfaceName = get_fl_map_value<std::string>(arguments, "interface");
+      result->Success(webView->isInterfaceSupported(interfaceName));
+    }
     // for inAppBrowser
     else if (webView->inAppBrowser && string_equals(methodName, "show")) {
       webView->inAppBrowser->show();

@@ -1,5 +1,6 @@
 import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_internal_annotations.dart';
 
+import 'enum_method.dart';
 import 'user_script_injection_time.dart';
 import 'content_world.dart';
 import '../in_app_webview/platform_inappwebview_controller.dart';

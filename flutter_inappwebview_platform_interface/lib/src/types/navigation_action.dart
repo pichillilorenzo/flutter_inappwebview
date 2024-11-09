@@ -3,6 +3,7 @@ import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_i
 import 'url_request.dart';
 import 'navigation_type.dart';
 import 'frame_info.dart';
+import 'enum_method.dart';
 
 part 'navigation_action.g.dart';
 

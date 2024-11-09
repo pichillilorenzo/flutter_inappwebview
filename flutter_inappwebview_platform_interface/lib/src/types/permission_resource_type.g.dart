@@ -346,11 +346,80 @@ class PermissionResourceType {
     return null;
   }
 
+  /// Gets a possible [PermissionResourceType] instance value with name [name].
+  ///
+  /// Goes through [PermissionResourceType.values] looking for a value with
+  /// name [name], as reported by [PermissionResourceType.name].
+  /// Returns the first value with the given name, otherwise `null`.
+  static PermissionResourceType? byName(String? name) {
+    if (name != null) {
+      try {
+        return PermissionResourceType.values
+            .firstWhere((element) => element.name() == name);
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
+  }
+
+  /// Creates a map from the names of [PermissionResourceType] values to the values.
+  ///
+  /// The collection that this method is called on is expected to have
+  /// values with distinct names, like the `values` list of an enum class.
+  /// Only one value for each name can occur in the created map,
+  /// so if two or more values have the same name (either being the
+  /// same value, or being values of different enum type), at most one of
+  /// them will be represented in the returned map.
+  static Map<String, PermissionResourceType> asNameMap() =>
+      <String, PermissionResourceType>{
+        for (final value in PermissionResourceType.values) value.name(): value
+      };
+
   ///Gets [String] value.
   String toValue() => _value;
 
   ///Gets [dynamic] native value.
   dynamic toNativeValue() => _nativeValue;
+
+  ///Gets the name of the value.
+  String name() {
+    switch (_value) {
+      case 'AUTOPLAY':
+        return 'AUTOPLAY';
+      case 'CAMERA':
+        return 'CAMERA';
+      case 'CAMERA_AND_MICROPHONE':
+        return 'CAMERA_AND_MICROPHONE';
+      case 'CLIPBOARD_READ':
+        return 'CLIPBOARD_READ';
+      case 'DEVICE_ORIENTATION_AND_MOTION':
+        return 'DEVICE_ORIENTATION_AND_MOTION';
+      case 'FILE_READ_WRITE':
+        return 'FILE_READ_WRITE';
+      case 'GEOLOCATION':
+        return 'GEOLOCATION';
+      case 'LOCAL_FONTS':
+        return 'LOCAL_FONTS';
+      case 'MICROPHONE':
+        return 'MICROPHONE';
+      case 'MIDI_SYSEX':
+        return 'MIDI_SYSEX';
+      case 'MULTIPLE_AUTOMATIC_DOWNLOADS':
+        return 'MULTIPLE_AUTOMATIC_DOWNLOADS';
+      case 'NOTIFICATIONS':
+        return 'NOTIFICATIONS';
+      case 'OTHER_SENSORS':
+        return 'OTHER_SENSORS';
+      case 'PROTECTED_MEDIA_ID':
+        return 'PROTECTED_MEDIA_ID';
+      case 'UNKNOWN':
+        return 'UNKNOWN';
+      case 'WINDOW_MANAGEMENT':
+        return 'WINDOW_MANAGEMENT';
+    }
+    return _value.toString();
+  }
 
   @override
   int get hashCode => _value.hashCode;

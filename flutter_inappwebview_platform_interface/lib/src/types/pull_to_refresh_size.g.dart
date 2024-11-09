@@ -54,11 +54,52 @@ class PullToRefreshSize {
     return null;
   }
 
+  /// Gets a possible [PullToRefreshSize] instance value with name [name].
+  ///
+  /// Goes through [PullToRefreshSize.values] looking for a value with
+  /// name [name], as reported by [PullToRefreshSize.name].
+  /// Returns the first value with the given name, otherwise `null`.
+  static PullToRefreshSize? byName(String? name) {
+    if (name != null) {
+      try {
+        return PullToRefreshSize.values
+            .firstWhere((element) => element.name() == name);
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
+  }
+
+  /// Creates a map from the names of [PullToRefreshSize] values to the values.
+  ///
+  /// The collection that this method is called on is expected to have
+  /// values with distinct names, like the `values` list of an enum class.
+  /// Only one value for each name can occur in the created map,
+  /// so if two or more values have the same name (either being the
+  /// same value, or being values of different enum type), at most one of
+  /// them will be represented in the returned map.
+  static Map<String, PullToRefreshSize> asNameMap() =>
+      <String, PullToRefreshSize>{
+        for (final value in PullToRefreshSize.values) value.name(): value
+      };
+
   ///Gets [int] value.
   int toValue() => _value;
 
   ///Gets [int] native value.
   int toNativeValue() => _nativeValue;
+
+  ///Gets the name of the value.
+  String name() {
+    switch (_value) {
+      case 1:
+        return 'DEFAULT';
+      case 0:
+        return 'LARGE';
+    }
+    return _value.toString();
+  }
 
   @override
   int get hashCode => _value.hashCode;
@@ -68,13 +109,7 @@ class PullToRefreshSize {
 
   @override
   String toString() {
-    switch (_value) {
-      case 1:
-        return 'DEFAULT';
-      case 0:
-        return 'LARGE';
-    }
-    return _value.toString();
+    return name();
   }
 }
 
@@ -128,11 +163,52 @@ class AndroidPullToRefreshSize {
     return null;
   }
 
+  /// Gets a possible [AndroidPullToRefreshSize] instance value with name [name].
+  ///
+  /// Goes through [AndroidPullToRefreshSize.values] looking for a value with
+  /// name [name], as reported by [AndroidPullToRefreshSize.name].
+  /// Returns the first value with the given name, otherwise `null`.
+  static AndroidPullToRefreshSize? byName(String? name) {
+    if (name != null) {
+      try {
+        return AndroidPullToRefreshSize.values
+            .firstWhere((element) => element.name() == name);
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
+  }
+
+  /// Creates a map from the names of [AndroidPullToRefreshSize] values to the values.
+  ///
+  /// The collection that this method is called on is expected to have
+  /// values with distinct names, like the `values` list of an enum class.
+  /// Only one value for each name can occur in the created map,
+  /// so if two or more values have the same name (either being the
+  /// same value, or being values of different enum type), at most one of
+  /// them will be represented in the returned map.
+  static Map<String, AndroidPullToRefreshSize> asNameMap() =>
+      <String, AndroidPullToRefreshSize>{
+        for (final value in AndroidPullToRefreshSize.values) value.name(): value
+      };
+
   ///Gets [int] value.
   int toValue() => _value;
 
   ///Gets [int] native value.
   int toNativeValue() => _nativeValue;
+
+  ///Gets the name of the value.
+  String name() {
+    switch (_value) {
+      case 1:
+        return 'DEFAULT';
+      case 0:
+        return 'LARGE';
+    }
+    return _value.toString();
+  }
 
   @override
   int get hashCode => _value.hashCode;
@@ -142,12 +218,6 @@ class AndroidPullToRefreshSize {
 
   @override
   String toString() {
-    switch (_value) {
-      case 1:
-        return 'DEFAULT';
-      case 0:
-        return 'LARGE';
-    }
-    return _value.toString();
+    return name();
   }
 }

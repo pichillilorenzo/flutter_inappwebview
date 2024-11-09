@@ -62,14 +62,16 @@ class FetchRequest {
       this.url});
 
   ///Gets a possible [FetchRequest] instance from a [Map] value.
-  static FetchRequest? fromMap(Map<String, dynamic>? map) {
+  static FetchRequest? fromMap(Map<String, dynamic>? map,
+      {EnumMethod? enumMethod}) {
     if (map == null) {
       return null;
     }
     final instance = FetchRequest(
       body: map['body'],
       cache: map['cache'],
-      credentials: _fetchRequestCredentialDeserializer(map['credentials']),
+      credentials: _fetchRequestCredentialDeserializer(map['credentials'],
+          enumMethod: enumMethod),
       headers: map['headers']?.cast<String, dynamic>(),
       integrity: map['integrity'],
       keepalive: map['keepalive'],
@@ -77,20 +79,34 @@ class FetchRequest {
       mode: map['mode'],
       redirect: map['redirect'],
       referrer: map['referrer'],
-      referrerPolicy: ReferrerPolicy.fromNativeValue(map['referrerPolicy']),
+      referrerPolicy: switch (enumMethod ?? EnumMethod.nativeValue) {
+        EnumMethod.nativeValue =>
+          ReferrerPolicy.fromNativeValue(map['referrerPolicy']),
+        EnumMethod.value => ReferrerPolicy.fromValue(map['referrerPolicy']),
+        EnumMethod.name => ReferrerPolicy.byName(map['referrerPolicy'])
+      },
       url: map['url'] != null ? WebUri(map['url']) : null,
     );
-    instance.action = FetchRequestAction.fromNativeValue(map['action']);
+    instance.action = switch (enumMethod ?? EnumMethod.nativeValue) {
+      EnumMethod.nativeValue =>
+        FetchRequestAction.fromNativeValue(map['action']),
+      EnumMethod.value => FetchRequestAction.fromValue(map['action']),
+      EnumMethod.name => FetchRequestAction.byName(map['action'])
+    };
     return instance;
   }
 
   ///Converts instance to a map.
-  Map<String, dynamic> toMap() {
+  Map<String, dynamic> toMap({EnumMethod? enumMethod}) {
     return {
-      "action": action?.toNativeValue(),
+      "action": switch (enumMethod ?? EnumMethod.nativeValue) {
+        EnumMethod.nativeValue => action?.toNativeValue(),
+        EnumMethod.value => action?.toValue(),
+        EnumMethod.name => action?.name()
+      },
       "body": body,
       "cache": cache,
-      "credentials": credentials?.toMap(),
+      "credentials": credentials?.toMap(enumMethod: enumMethod),
       "headers": headers,
       "integrity": integrity,
       "keepalive": keepalive,
@@ -98,7 +114,11 @@ class FetchRequest {
       "mode": mode,
       "redirect": redirect,
       "referrer": referrer,
-      "referrerPolicy": referrerPolicy?.toNativeValue(),
+      "referrerPolicy": switch (enumMethod ?? EnumMethod.nativeValue) {
+        EnumMethod.nativeValue => referrerPolicy?.toNativeValue(),
+        EnumMethod.value => referrerPolicy?.toValue(),
+        EnumMethod.name => referrerPolicy?.name()
+      },
       "url": url?.toString(),
     };
   }

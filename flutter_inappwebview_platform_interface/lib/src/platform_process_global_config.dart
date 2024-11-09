@@ -5,6 +5,7 @@ import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 import 'inappwebview_platform.dart';
 import 'in_app_webview/platform_inappwebview_controller.dart';
 import 'platform_webview_feature.dart';
+import 'types/enum_method.dart';
 
 part 'platform_process_global_config.g.dart';
 

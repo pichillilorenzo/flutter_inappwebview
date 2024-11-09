@@ -105,50 +105,90 @@ class URLProtectionSpace {
   }
 
   ///Gets a possible [URLProtectionSpace] instance from a [Map] value.
-  static URLProtectionSpace? fromMap(Map<String, dynamic>? map) {
+  static URLProtectionSpace? fromMap(Map<String, dynamic>? map,
+      {EnumMethod? enumMethod}) {
     if (map == null) {
       return null;
     }
     final instance = URLProtectionSpace(
-      authenticationMethod:
+      authenticationMethod: switch (enumMethod ?? EnumMethod.nativeValue) {
+        EnumMethod.nativeValue =>
           URLProtectionSpaceAuthenticationMethod.fromNativeValue(
               map['authenticationMethod']),
-      distinguishedNames:
-          _distinguishedNamesDeserializer(map['distinguishedNames']),
+        EnumMethod.value => URLProtectionSpaceAuthenticationMethod.fromValue(
+            map['authenticationMethod']),
+        EnumMethod.name => URLProtectionSpaceAuthenticationMethod.byName(
+            map['authenticationMethod'])
+      },
+      distinguishedNames: _distinguishedNamesDeserializer(
+          map['distinguishedNames'],
+          enumMethod: enumMethod),
       host: map['host'],
-      iosAuthenticationMethod:
+      iosAuthenticationMethod: switch (enumMethod ?? EnumMethod.nativeValue) {
+        EnumMethod.nativeValue =>
           IOSNSURLProtectionSpaceAuthenticationMethod.fromNativeValue(
               map['authenticationMethod']),
-      iosDistinguishedNames:
-          _distinguishedNamesDeserializer(map['distinguishedNames']),
-      iosProxyType:
+        EnumMethod.value =>
+          IOSNSURLProtectionSpaceAuthenticationMethod.fromValue(
+              map['authenticationMethod']),
+        EnumMethod.name => IOSNSURLProtectionSpaceAuthenticationMethod.byName(
+            map['authenticationMethod'])
+      },
+      iosDistinguishedNames: _distinguishedNamesDeserializer(
+          map['distinguishedNames'],
+          enumMethod: enumMethod),
+      iosProxyType: switch (enumMethod ?? EnumMethod.nativeValue) {
+        EnumMethod.nativeValue =>
           IOSNSURLProtectionSpaceProxyType.fromNativeValue(map['proxyType']),
+        EnumMethod.value =>
+          IOSNSURLProtectionSpaceProxyType.fromValue(map['proxyType']),
+        EnumMethod.name =>
+          IOSNSURLProtectionSpaceProxyType.byName(map['proxyType'])
+      },
       iosReceivesCredentialSecurely: map['receivesCredentialSecurely'],
       port: map['port'],
       protocol: map['protocol'],
-      proxyType: URLProtectionSpaceProxyType.fromNativeValue(map['proxyType']),
+      proxyType: switch (enumMethod ?? EnumMethod.nativeValue) {
+        EnumMethod.nativeValue =>
+          URLProtectionSpaceProxyType.fromNativeValue(map['proxyType']),
+        EnumMethod.value =>
+          URLProtectionSpaceProxyType.fromValue(map['proxyType']),
+        EnumMethod.name => URLProtectionSpaceProxyType.byName(map['proxyType'])
+      },
       realm: map['realm'],
       receivesCredentialSecurely: map['receivesCredentialSecurely'],
       sslCertificate: SslCertificate.fromMap(
-          map['sslCertificate']?.cast<String, dynamic>()),
-      sslError: SslError.fromMap(map['sslError']?.cast<String, dynamic>()),
+          map['sslCertificate']?.cast<String, dynamic>(),
+          enumMethod: enumMethod),
+      sslError: SslError.fromMap(map['sslError']?.cast<String, dynamic>(),
+          enumMethod: enumMethod),
     );
     return instance;
   }
 
   ///Converts instance to a map.
-  Map<String, dynamic> toMap() {
+  Map<String, dynamic> toMap({EnumMethod? enumMethod}) {
     return {
-      "authenticationMethod": authenticationMethod?.toNativeValue(),
-      "distinguishedNames": distinguishedNames?.map((e) => e.toMap()).toList(),
+      "authenticationMethod": switch (enumMethod ?? EnumMethod.nativeValue) {
+        EnumMethod.nativeValue => authenticationMethod?.toNativeValue(),
+        EnumMethod.value => authenticationMethod?.toValue(),
+        EnumMethod.name => authenticationMethod?.name()
+      },
+      "distinguishedNames": distinguishedNames
+          ?.map((e) => e.toMap(enumMethod: enumMethod))
+          .toList(),
       "host": host,
       "port": port,
       "protocol": protocol,
-      "proxyType": proxyType?.toNativeValue(),
+      "proxyType": switch (enumMethod ?? EnumMethod.nativeValue) {
+        EnumMethod.nativeValue => proxyType?.toNativeValue(),
+        EnumMethod.value => proxyType?.toValue(),
+        EnumMethod.name => proxyType?.name()
+      },
       "realm": realm,
       "receivesCredentialSecurely": receivesCredentialSecurely,
-      "sslCertificate": sslCertificate?.toMap(),
-      "sslError": sslError?.toMap(),
+      "sslCertificate": sslCertificate?.toMap(enumMethod: enumMethod),
+      "sslError": sslError?.toMap(enumMethod: enumMethod),
     };
   }
 

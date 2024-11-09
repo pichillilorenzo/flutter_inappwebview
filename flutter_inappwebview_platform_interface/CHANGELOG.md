@@ -1,4 +1,13 @@
-#### 1.4.0-beta.1
+## 1.4.0-beta.2
+
+- Updated `flutter_inappwebview_internal_annotations` dependency from `^1.1.1` to `^1.2.0`
+- Updated `fromMap` static method and `toMap` method implementations
+- Added `byName`, `name`, `asNameMap` custom enum classes methods
+- Added `statusBarEnabled`, `browserAcceleratorKeysEnabled`, `generalAutofillEnabled`, `passwordAutosaveEnabled`, `isPinchZoomEnabled`, `hiddenPdfToolbarItems`, `reputationCheckingRequired`, `nonClientRegionSupportEnabled` property to `InAppWebViewSettings`
+- Added `isInterfaceSupported` method to `PlatformWebViewEnvironment` class
+- Added `isInterfaceSupported` method to `PlatformInAppWebViewController` class
+
+## 1.4.0-beta.1
 
 - Updated static `fromMap` implementation for some classes
 - Updated `kJavaScriptHandlerForbiddenNames` list
@@ -11,7 +20,6 @@
 - Deprecated `JavaScriptHandlerCallback` type in favor of `JavaScriptHandlerFunction` type
 - Deprecated `InAppWebViewSettings.forceDark` and `InAppWebViewSettings.forceDarkStrategy` Android-only properties in favor of `InAppWebViewSettings.algorithmicDarkeningAllowed`
 - Fixed X509Certificate PEM base64 decoding
-- Fixed specific URLAuthenticationChallenge type for `onReceivedHttpAuthRequest`, `onReceivedServerTrustAuthRequest`, `onReceivedClientCertRequest` events
 
 ## 1.3.0+1
 

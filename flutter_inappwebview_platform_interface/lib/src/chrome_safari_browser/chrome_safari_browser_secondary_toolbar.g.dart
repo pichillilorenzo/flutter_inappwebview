@@ -35,29 +35,32 @@ class ChromeSafariBrowserSecondaryToolbar {
       {this.clickableIDs = const [], required this.layout});
 
   ///Gets a possible [ChromeSafariBrowserSecondaryToolbar] instance from a [Map] value.
-  static ChromeSafariBrowserSecondaryToolbar? fromMap(
-      Map<String, dynamic>? map) {
+  static ChromeSafariBrowserSecondaryToolbar? fromMap(Map<String, dynamic>? map,
+      {EnumMethod? enumMethod}) {
     if (map == null) {
       return null;
     }
     final instance = ChromeSafariBrowserSecondaryToolbar(
-      layout: AndroidResource.fromMap(map['layout']?.cast<String, dynamic>())!,
+      layout: AndroidResource.fromMap(map['layout']?.cast<String, dynamic>(),
+          enumMethod: enumMethod)!,
     );
     if (map['clickableIDs'] != null) {
       instance.clickableIDs =
           List<ChromeSafariBrowserSecondaryToolbarClickableID>.from(
               map['clickableIDs'].map((e) =>
                   ChromeSafariBrowserSecondaryToolbarClickableID.fromMap(
-                      e?.cast<String, dynamic>())!));
+                      e?.cast<String, dynamic>(),
+                      enumMethod: enumMethod)!));
     }
     return instance;
   }
 
   ///Converts instance to a map.
-  Map<String, dynamic> toMap() {
+  Map<String, dynamic> toMap({EnumMethod? enumMethod}) {
     return {
-      "clickableIDs": clickableIDs.map((e) => e.toMap()).toList(),
-      "layout": layout.toMap(),
+      "clickableIDs":
+          clickableIDs.map((e) => e.toMap(enumMethod: enumMethod)).toList(),
+      "layout": layout.toMap(enumMethod: enumMethod),
     };
   }
 
@@ -95,20 +98,22 @@ class ChromeSafariBrowserSecondaryToolbarClickableID {
 
   ///Gets a possible [ChromeSafariBrowserSecondaryToolbarClickableID] instance from a [Map] value.
   static ChromeSafariBrowserSecondaryToolbarClickableID? fromMap(
-      Map<String, dynamic>? map) {
+      Map<String, dynamic>? map,
+      {EnumMethod? enumMethod}) {
     if (map == null) {
       return null;
     }
     final instance = ChromeSafariBrowserSecondaryToolbarClickableID(
-      id: AndroidResource.fromMap(map['id']?.cast<String, dynamic>())!,
+      id: AndroidResource.fromMap(map['id']?.cast<String, dynamic>(),
+          enumMethod: enumMethod)!,
     );
     return instance;
   }
 
   ///Converts instance to a map.
-  Map<String, dynamic> toMap() {
+  Map<String, dynamic> toMap({EnumMethod? enumMethod}) {
     return {
-      "id": id.toMap(),
+      "id": id.toMap(enumMethod: enumMethod),
     };
   }
 

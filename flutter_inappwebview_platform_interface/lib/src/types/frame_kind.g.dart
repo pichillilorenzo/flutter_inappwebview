@@ -121,11 +121,56 @@ class FrameKind {
     return null;
   }
 
+  /// Gets a possible [FrameKind] instance value with name [name].
+  ///
+  /// Goes through [FrameKind.values] looking for a value with
+  /// name [name], as reported by [FrameKind.name].
+  /// Returns the first value with the given name, otherwise `null`.
+  static FrameKind? byName(String? name) {
+    if (name != null) {
+      try {
+        return FrameKind.values.firstWhere((element) => element.name() == name);
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
+  }
+
+  /// Creates a map from the names of [FrameKind] values to the values.
+  ///
+  /// The collection that this method is called on is expected to have
+  /// values with distinct names, like the `values` list of an enum class.
+  /// Only one value for each name can occur in the created map,
+  /// so if two or more values have the same name (either being the
+  /// same value, or being values of different enum type), at most one of
+  /// them will be represented in the returned map.
+  static Map<String, FrameKind> asNameMap() => <String, FrameKind>{
+        for (final value in FrameKind.values) value.name(): value
+      };
+
   ///Gets [String] value.
   String toValue() => _value;
 
   ///Gets [dynamic] native value.
   dynamic toNativeValue() => _nativeValue;
+
+  ///Gets the name of the value.
+  String name() {
+    switch (_value) {
+      case 'EMBED':
+        return 'EMBED';
+      case 'IFRAME':
+        return 'IFRAME';
+      case 'MAIN_FRAME':
+        return 'MAIN_FRAME';
+      case 'OBJECT':
+        return 'OBJECT';
+      case 'UNKNOWN':
+        return 'UNKNOWN';
+    }
+    return _value.toString();
+  }
 
   @override
   int get hashCode => _value.hashCode;

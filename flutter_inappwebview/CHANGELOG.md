@@ -1,3 +1,32 @@
+## 6.2.0-beta.2
+
+- Updated dependencies to the latest versions for all platform implementations:
+  - `flutter_inappwebview_platform_interface`: `^1.4.0-beta.1` -> `^1.4.0-beta.2`
+  - `flutter_inappwebview_android`: `^1.2.0-beta.1` -> `^1.2.0-beta.2`
+  - `flutter_inappwebview_ios`: `^1.2.0-beta.1` -> `^1.2.0-beta.2`
+  - `flutter_inappwebview_macos`: `^1.2.0-beta.1` -> `^1.2.0-beta.2`
+  - `flutter_inappwebview_web`: `^1.2.0-beta.1` -> `^1.2.0-beta.2`
+  - `flutter_inappwebview_windows`: `^0.7.0-beta.1` -> `^0.7.0-beta.2`
+- Fixed specific URLAuthenticationChallenge type for `onReceivedHttpAuthRequest`, `onReceivedServerTrustAuthRequest`, `onReceivedClientCertRequest` events of HeadlessInAppWebView
+- Fixed missing return type for `InAppWebView.getJavaScriptBridgeName` static method
+
+#### Platform Interface
+- Updated `flutter_inappwebview_internal_annotations` dependency from `^1.1.1` to `^1.2.0`
+- Updated `fromMap` static method and `toMap` method implementations
+- Added `byName`, `name`, `asNameMap` custom enum classes methods
+- Added `statusBarEnabled`, `browserAcceleratorKeysEnabled`, `generalAutofillEnabled`, `passwordAutosaveEnabled`, `isPinchZoomEnabled`, `hiddenPdfToolbarItems`, `reputationCheckingRequired`, `nonClientRegionSupportEnabled` property to `InAppWebViewSettings`
+- Added `isInterfaceSupported` method to `PlatformWebViewEnvironment` class
+- Added `isInterfaceSupported` method to `PlatformInAppWebViewController` class
+
+#### Windows Platform
+- Updated Microsoft.Web.WebView2 SDK version from `1.0.2792.45` to `1.0.2849.39`
+- Implemented `disableDefaultErrorPage`, `statusBarEnabled`, `browserAcceleratorKeysEnabled`, `generalAutofillEnabled`, `passwordAutosaveEnabled`, `isPinchZoomEnabled`, `allowsBackForwardNavigationGestures`, `hiddenPdfToolbarItems`, `reputationCheckingRequired`, `nonClientRegionSupportEnabled` properties of `InAppWebViewSettings`
+- Implemented `isInterfaceSupported` WebViewEnvironment method
+- Implemented `isInterfaceSupported` InAppWebViewController method
+- Fixed wrong channel name when creating a `WebViewEnvironment` instance
+- Fixed "[Windows] Has an overlay on the desktop when the application is minimized" [#2402](https://github.com/pichillilorenzo/flutter_inappwebview/issues/2402)
+- Fixed "[Windows] missing implementation of onPermissionRequest event will cause crash when requested by the webpage" [#2404](https://github.com/pichillilorenzo/flutter_inappwebview/issues/2404)
+
 ## 6.2.0-beta.1
 
 - Updated dependencies to the latest versions for all platform implementations:
@@ -7,6 +36,7 @@
   - `flutter_inappwebview_macos`: `^1.1.2` -> `^1.2.0-beta.1`
   - `flutter_inappwebview_web`: `^1.1.2` -> `^1.2.0-beta.1`
   - `flutter_inappwebview_windows`: `^0.6.0` -> `^0.7.0-beta.1`
+- Fixed specific URLAuthenticationChallenge type for `onReceivedHttpAuthRequest`, `onReceivedServerTrustAuthRequest`, `onReceivedClientCertRequest` events
 
 Implemented security features to better manage access to the native javascript bridge.
 
@@ -23,7 +53,6 @@ Implemented security features to better manage access to the native javascript b
 - Deprecated `JavaScriptHandlerCallback` type in favor of `JavaScriptHandlerFunction` type
 - Deprecated `InAppWebViewSettings.forceDark` and `InAppWebViewSettings.forceDarkStrategy` Android-only properties in favor of `InAppWebViewSettings.algorithmicDarkeningAllowed`
 - Fixed X509Certificate PEM base64 decoding
-- Fixed specific URLAuthenticationChallenge type for `onReceivedHttpAuthRequest`, `onReceivedServerTrustAuthRequest`, `onReceivedClientCertRequest` events
 
 #### Android Platform
 - Added `InAppWebViewController.enableSlowWholeDocumentDraw` static method

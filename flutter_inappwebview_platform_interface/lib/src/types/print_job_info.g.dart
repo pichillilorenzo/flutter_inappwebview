@@ -139,13 +139,15 @@ class PrintJobInfo {
       this.state});
 
   ///Gets a possible [PrintJobInfo] instance from a [Map] value.
-  static PrintJobInfo? fromMap(Map<String, dynamic>? map) {
+  static PrintJobInfo? fromMap(Map<String, dynamic>? map,
+      {EnumMethod? enumMethod}) {
     if (map == null) {
       return null;
     }
     final instance = PrintJobInfo(
       attributes: PrintJobAttributes.fromMap(
-          map['attributes']?.cast<String, dynamic>()),
+          map['attributes']?.cast<String, dynamic>(),
+          enumMethod: enumMethod),
       canSpawnSeparateThread: map['canSpawnSeparateThread'],
       copies: map['copies'],
       creationTime: map['creationTime'],
@@ -155,21 +157,37 @@ class PrintJobInfo {
       label: map['label'],
       lastPage: map['lastPage'],
       numberOfPages: map['numberOfPages'],
-      pageOrder: PrintJobPageOrder.fromNativeValue(map['pageOrder']),
-      preferredRenderingQuality: PrintJobRenderingQuality.fromNativeValue(
-          map['preferredRenderingQuality']),
-      printer: Printer.fromMap(map['printer']?.cast<String, dynamic>()),
+      pageOrder: switch (enumMethod ?? EnumMethod.nativeValue) {
+        EnumMethod.nativeValue =>
+          PrintJobPageOrder.fromNativeValue(map['pageOrder']),
+        EnumMethod.value => PrintJobPageOrder.fromValue(map['pageOrder']),
+        EnumMethod.name => PrintJobPageOrder.byName(map['pageOrder'])
+      },
+      preferredRenderingQuality: switch (enumMethod ?? EnumMethod.nativeValue) {
+        EnumMethod.nativeValue => PrintJobRenderingQuality.fromNativeValue(
+            map['preferredRenderingQuality']),
+        EnumMethod.value =>
+          PrintJobRenderingQuality.fromValue(map['preferredRenderingQuality']),
+        EnumMethod.name =>
+          PrintJobRenderingQuality.byName(map['preferredRenderingQuality'])
+      },
+      printer: Printer.fromMap(map['printer']?.cast<String, dynamic>(),
+          enumMethod: enumMethod),
       showsPrintPanel: map['showsPrintPanel'],
       showsProgressPanel: map['showsProgressPanel'],
-      state: PrintJobState.fromNativeValue(map['state']),
+      state: switch (enumMethod ?? EnumMethod.nativeValue) {
+        EnumMethod.nativeValue => PrintJobState.fromNativeValue(map['state']),
+        EnumMethod.value => PrintJobState.fromValue(map['state']),
+        EnumMethod.name => PrintJobState.byName(map['state'])
+      },
     );
     return instance;
   }
 
   ///Converts instance to a map.
-  Map<String, dynamic> toMap() {
+  Map<String, dynamic> toMap({EnumMethod? enumMethod}) {
     return {
-      "attributes": attributes?.toMap(),
+      "attributes": attributes?.toMap(enumMethod: enumMethod),
       "canSpawnSeparateThread": canSpawnSeparateThread,
       "copies": copies,
       "creationTime": creationTime,
@@ -179,12 +197,25 @@ class PrintJobInfo {
       "label": label,
       "lastPage": lastPage,
       "numberOfPages": numberOfPages,
-      "pageOrder": pageOrder?.toNativeValue(),
-      "preferredRenderingQuality": preferredRenderingQuality?.toNativeValue(),
-      "printer": printer?.toMap(),
+      "pageOrder": switch (enumMethod ?? EnumMethod.nativeValue) {
+        EnumMethod.nativeValue => pageOrder?.toNativeValue(),
+        EnumMethod.value => pageOrder?.toValue(),
+        EnumMethod.name => pageOrder?.name()
+      },
+      "preferredRenderingQuality": switch (
+          enumMethod ?? EnumMethod.nativeValue) {
+        EnumMethod.nativeValue => preferredRenderingQuality?.toNativeValue(),
+        EnumMethod.value => preferredRenderingQuality?.toValue(),
+        EnumMethod.name => preferredRenderingQuality?.name()
+      },
+      "printer": printer?.toMap(enumMethod: enumMethod),
       "showsPrintPanel": showsPrintPanel,
       "showsProgressPanel": showsProgressPanel,
-      "state": state?.toNativeValue(),
+      "state": switch (enumMethod ?? EnumMethod.nativeValue) {
+        EnumMethod.nativeValue => state?.toNativeValue(),
+        EnumMethod.value => state?.toValue(),
+        EnumMethod.name => state?.name()
+      },
     };
   }
 

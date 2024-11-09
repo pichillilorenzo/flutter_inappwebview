@@ -1,6 +1,7 @@
 import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_internal_annotations.dart';
 
 import 'search_result_display_style.dart';
+import 'enum_method.dart';
 
 part 'find_session.g.dart';
 

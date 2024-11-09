@@ -236,3 +236,6 @@ export 'process_failed_kind.dart' show ProcessFailedKind;
 export 'process_failed_reason.dart' show ProcessFailedReason;
 export 'process_failed_detail.dart' show ProcessFailedDetail;
 export 'focus_direction.dart' show FocusDirection;
+export 'enum_method.dart';
+export 'pdf_toolbar_items.dart' show PdfToolbarItems;
+export 'webview_interface.dart' show WebViewInterface;

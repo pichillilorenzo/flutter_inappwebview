@@ -5,6 +5,7 @@ import 'url_response.dart';
 import 'url_authentication_challenge.dart';
 import 'url_protection_space.dart';
 import '../in_app_webview/platform_webview.dart';
+import 'enum_method.dart';
 
 part 'http_authentication_challenge.g.dart';
 

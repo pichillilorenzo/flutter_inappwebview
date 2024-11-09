@@ -100,7 +100,8 @@ class WebViewEnvironmentSettings {
       this.userDataFolder});
 
   ///Gets a possible [WebViewEnvironmentSettings] instance from a [Map] value.
-  static WebViewEnvironmentSettings? fromMap(Map<String, dynamic>? map) {
+  static WebViewEnvironmentSettings? fromMap(Map<String, dynamic>? map,
+      {EnumMethod? enumMethod}) {
     if (map == null) {
       return null;
     }
@@ -112,7 +113,8 @@ class WebViewEnvironmentSettings {
       customSchemeRegistrations: map['customSchemeRegistrations'] != null
           ? List<CustomSchemeRegistration>.from(map['customSchemeRegistrations']
               .map((e) => CustomSchemeRegistration.fromMap(
-                  e?.cast<String, dynamic>())!))
+                  e?.cast<String, dynamic>(),
+                  enumMethod: enumMethod)!))
           : null,
       language: map['language'],
       targetCompatibleBrowserVersion: map['targetCompatibleBrowserVersion'],
@@ -122,14 +124,15 @@ class WebViewEnvironmentSettings {
   }
 
   ///Converts instance to a map.
-  Map<String, dynamic> toMap() {
+  Map<String, dynamic> toMap({EnumMethod? enumMethod}) {
     return {
       "additionalBrowserArguments": additionalBrowserArguments,
       "allowSingleSignOnUsingOSPrimaryAccount":
           allowSingleSignOnUsingOSPrimaryAccount,
       "browserExecutableFolder": browserExecutableFolder,
-      "customSchemeRegistrations":
-          customSchemeRegistrations?.map((e) => e.toMap()).toList(),
+      "customSchemeRegistrations": customSchemeRegistrations
+          ?.map((e) => e.toMap(enumMethod: enumMethod))
+          .toList(),
       "language": language,
       "targetCompatibleBrowserVersion": targetCompatibleBrowserVersion,
       "userDataFolder": userDataFolder,

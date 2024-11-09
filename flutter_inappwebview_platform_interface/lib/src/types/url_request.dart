@@ -5,6 +5,7 @@ import '../web_uri.dart';
 import 'url_request_cache_policy.dart';
 import 'url_request_network_service_type.dart';
 import 'url_request_attribution.dart';
+import 'enum_method.dart';
 
 part 'url_request.g.dart';
 

@@ -50,28 +50,48 @@ class URLCredential {
   }
 
   ///Gets a possible [URLCredential] instance from a [Map] value.
-  static URLCredential? fromMap(Map<String, dynamic>? map) {
+  static URLCredential? fromMap(Map<String, dynamic>? map,
+      {EnumMethod? enumMethod}) {
     if (map == null) {
       return null;
     }
     final instance = URLCredential(
-      certificates: _certificatesDeserializer(map['certificates']),
-      iosCertificates: _certificatesDeserializer(map['certificates']),
-      iosPersistence:
+      certificates: _certificatesDeserializer(map['certificates'],
+          enumMethod: enumMethod),
+      iosCertificates: _certificatesDeserializer(map['certificates'],
+          enumMethod: enumMethod),
+      iosPersistence: switch (enumMethod ?? EnumMethod.nativeValue) {
+        EnumMethod.nativeValue =>
           IOSURLCredentialPersistence.fromNativeValue(map['persistence']),
+        EnumMethod.value =>
+          IOSURLCredentialPersistence.fromValue(map['persistence']),
+        EnumMethod.name =>
+          IOSURLCredentialPersistence.byName(map['persistence'])
+      },
       password: map['password'],
-      persistence: URLCredentialPersistence.fromNativeValue(map['persistence']),
+      persistence: switch (enumMethod ?? EnumMethod.nativeValue) {
+        EnumMethod.nativeValue =>
+          URLCredentialPersistence.fromNativeValue(map['persistence']),
+        EnumMethod.value =>
+          URLCredentialPersistence.fromValue(map['persistence']),
+        EnumMethod.name => URLCredentialPersistence.byName(map['persistence'])
+      },
       username: map['username'],
     );
     return instance;
   }
 
   ///Converts instance to a map.
-  Map<String, dynamic> toMap() {
+  Map<String, dynamic> toMap({EnumMethod? enumMethod}) {
     return {
-      "certificates": certificates?.map((e) => e.toMap()).toList(),
+      "certificates":
+          certificates?.map((e) => e.toMap(enumMethod: enumMethod)).toList(),
       "password": password,
-      "persistence": persistence?.toNativeValue(),
+      "persistence": switch (enumMethod ?? EnumMethod.nativeValue) {
+        EnumMethod.nativeValue => persistence?.toNativeValue(),
+        EnumMethod.value => persistence?.toValue(),
+        EnumMethod.name => persistence?.name()
+      },
       "username": username,
     };
   }

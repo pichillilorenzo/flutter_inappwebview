@@ -1239,11 +1239,170 @@ class WebResourceErrorType {
     return null;
   }
 
+  /// Gets a possible [WebResourceErrorType] instance value with name [name].
+  ///
+  /// Goes through [WebResourceErrorType.values] looking for a value with
+  /// name [name], as reported by [WebResourceErrorType.name].
+  /// Returns the first value with the given name, otherwise `null`.
+  static WebResourceErrorType? byName(String? name) {
+    if (name != null) {
+      try {
+        return WebResourceErrorType.values
+            .firstWhere((element) => element.name() == name);
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
+  }
+
+  /// Creates a map from the names of [WebResourceErrorType] values to the values.
+  ///
+  /// The collection that this method is called on is expected to have
+  /// values with distinct names, like the `values` list of an enum class.
+  /// Only one value for each name can occur in the created map,
+  /// so if two or more values have the same name (either being the
+  /// same value, or being values of different enum type), at most one of
+  /// them will be represented in the returned map.
+  static Map<String, WebResourceErrorType> asNameMap() =>
+      <String, WebResourceErrorType>{
+        for (final value in WebResourceErrorType.values) value.name(): value
+      };
+
   ///Gets [String] value.
   String toValue() => _value;
 
   ///Gets [int?] native value.
   int? toNativeValue() => _nativeValue;
+
+  ///Gets the name of the value.
+  String name() {
+    switch (_value) {
+      case 'APP_TRANSPORT_SECURITY_REQUIRES_SECURE_CONNECTION':
+        return 'APP_TRANSPORT_SECURITY_REQUIRES_SECURE_CONNECTION';
+      case 'BACKGROUND_SESSION_IN_USE_BY_ANOTHER_PROCESS':
+        return 'BACKGROUND_SESSION_IN_USE_BY_ANOTHER_PROCESS';
+      case 'BACKGROUND_SESSION_REQUIRES_SHARED_CONTAINER':
+        return 'BACKGROUND_SESSION_REQUIRES_SHARED_CONTAINER';
+      case 'BACKGROUND_SESSION_WAS_DISCONNECTED':
+        return 'BACKGROUND_SESSION_WAS_DISCONNECTED';
+      case 'BAD_SERVER_RESPONSE':
+        return 'BAD_SERVER_RESPONSE';
+      case 'BAD_URL':
+        return 'BAD_URL';
+      case 'CALL_IS_ACTIVE':
+        return 'CALL_IS_ACTIVE';
+      case 'CANCELLED':
+        return 'CANCELLED';
+      case 'CANNOT_CLOSE_FILE':
+        return 'CANNOT_CLOSE_FILE';
+      case 'CANNOT_CONNECT_TO_HOST':
+        return 'CANNOT_CONNECT_TO_HOST';
+      case 'CANNOT_CREATE_FILE':
+        return 'CANNOT_CREATE_FILE';
+      case 'CANNOT_DECODE_CONTENT_DATA':
+        return 'CANNOT_DECODE_CONTENT_DATA';
+      case 'CANNOT_DECODE_RAW_DATA':
+        return 'CANNOT_DECODE_RAW_DATA';
+      case 'CANNOT_LOAD_FROM_NETWORK':
+        return 'CANNOT_LOAD_FROM_NETWORK';
+      case 'CANNOT_MOVE_FILE':
+        return 'CANNOT_MOVE_FILE';
+      case 'CANNOT_OPEN_FILE':
+        return 'CANNOT_OPEN_FILE';
+      case 'CANNOT_PARSE_RESPONSE':
+        return 'CANNOT_PARSE_RESPONSE';
+      case 'CANNOT_REMOVE_FILE':
+        return 'CANNOT_REMOVE_FILE';
+      case 'CANNOT_WRITE_TO_FILE':
+        return 'CANNOT_WRITE_TO_FILE';
+      case 'CLIENT_CERTIFICATE_REJECTED':
+        return 'CLIENT_CERTIFICATE_REJECTED';
+      case 'CLIENT_CERTIFICATE_REQUIRED':
+        return 'CLIENT_CERTIFICATE_REQUIRED';
+      case 'CONNECTION_ABORTED':
+        return 'CONNECTION_ABORTED';
+      case 'DATA_LENGTH_EXCEEDS_MAXIMUM':
+        return 'DATA_LENGTH_EXCEEDS_MAXIMUM';
+      case 'DATA_NOT_ALLOWED':
+        return 'DATA_NOT_ALLOWED';
+      case 'DOWNLOAD_DECODING_FAILED_MID_STREAM':
+        return 'DOWNLOAD_DECODING_FAILED_MID_STREAM';
+      case 'DOWNLOAD_DECODING_FAILED_TO_COMPLETE':
+        return 'DOWNLOAD_DECODING_FAILED_TO_COMPLETE';
+      case 'FAILED_SSL_HANDSHAKE':
+        return 'FAILED_SSL_HANDSHAKE';
+      case 'FILE_IS_DIRECTORY':
+        return 'FILE_IS_DIRECTORY';
+      case 'FILE_NOT_FOUND':
+        return 'FILE_NOT_FOUND';
+      case 'GENERIC_FILE_ERROR':
+        return 'GENERIC_FILE_ERROR';
+      case 'HOST_LOOKUP':
+        return 'HOST_LOOKUP';
+      case 'INTERNATIONAL_ROAMING_OFF':
+        return 'INTERNATIONAL_ROAMING_OFF';
+      case 'IO':
+        return 'IO';
+      case 'NETWORK_CONNECTION_LOST':
+        return 'NETWORK_CONNECTION_LOST';
+      case 'NOT_CONNECTED_TO_INTERNET':
+        return 'NOT_CONNECTED_TO_INTERNET';
+      case 'NO_PERMISSIONS_TO_READ_FILE':
+        return 'NO_PERMISSIONS_TO_READ_FILE';
+      case 'PROXY_AUTHENTICATION':
+        return 'PROXY_AUTHENTICATION';
+      case 'REDIRECT_FAILED':
+        return 'REDIRECT_FAILED';
+      case 'REDIRECT_TO_NON_EXISTENT_LOCATION':
+        return 'REDIRECT_TO_NON_EXISTENT_LOCATION';
+      case 'REQUEST_BODY_STREAM_EXHAUSTED':
+        return 'REQUEST_BODY_STREAM_EXHAUSTED';
+      case 'RESET':
+        return 'RESET';
+      case 'RESOURCE_UNAVAILABLE':
+        return 'RESOURCE_UNAVAILABLE';
+      case 'SECURE_CONNECTION_FAILED':
+        return 'SECURE_CONNECTION_FAILED';
+      case 'SERVER_CERTIFICATE_HAS_BAD_DATE':
+        return 'SERVER_CERTIFICATE_HAS_BAD_DATE';
+      case 'SERVER_CERTIFICATE_HAS_UNKNOWN_ROOT':
+        return 'SERVER_CERTIFICATE_HAS_UNKNOWN_ROOT';
+      case 'SERVER_CERTIFICATE_NOT_YET_VALID':
+        return 'SERVER_CERTIFICATE_NOT_YET_VALID';
+      case 'SERVER_CERTIFICATE_UNTRUSTED':
+        return 'SERVER_CERTIFICATE_UNTRUSTED';
+      case 'SERVER_UNREACHABLE':
+        return 'SERVER_UNREACHABLE';
+      case 'TIMEOUT':
+        return 'TIMEOUT';
+      case 'TOO_MANY_REDIRECTS':
+        return 'TOO_MANY_REDIRECTS';
+      case 'TOO_MANY_REQUESTS':
+        return 'TOO_MANY_REQUESTS';
+      case 'UNEXPECTED_ERROR':
+        return 'UNEXPECTED_ERROR';
+      case 'UNKNOWN':
+        return 'UNKNOWN';
+      case 'UNSAFE_RESOURCE':
+        return 'UNSAFE_RESOURCE';
+      case 'UNSUPPORTED_AUTH_SCHEME':
+        return 'UNSUPPORTED_AUTH_SCHEME';
+      case 'UNSUPPORTED_SCHEME':
+        return 'UNSUPPORTED_SCHEME';
+      case 'USER_AUTHENTICATION_FAILED':
+        return 'USER_AUTHENTICATION_FAILED';
+      case 'USER_AUTHENTICATION_REQUIRED':
+        return 'USER_AUTHENTICATION_REQUIRED';
+      case 'USER_CANCELLED_AUTHENTICATION':
+        return 'USER_CANCELLED_AUTHENTICATION';
+      case 'VALID_PROXY_AUTHENTICATION_REQUIRED':
+        return 'VALID_PROXY_AUTHENTICATION_REQUIRED';
+      case 'ZERO_BYTE_RESOURCE':
+        return 'ZERO_BYTE_RESOURCE';
+    }
+    return _value.toString();
+  }
 
   @override
   int get hashCode => _value.hashCode;

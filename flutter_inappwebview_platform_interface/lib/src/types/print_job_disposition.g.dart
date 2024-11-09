@@ -108,11 +108,56 @@ class PrintJobDisposition {
     return null;
   }
 
+  /// Gets a possible [PrintJobDisposition] instance value with name [name].
+  ///
+  /// Goes through [PrintJobDisposition.values] looking for a value with
+  /// name [name], as reported by [PrintJobDisposition.name].
+  /// Returns the first value with the given name, otherwise `null`.
+  static PrintJobDisposition? byName(String? name) {
+    if (name != null) {
+      try {
+        return PrintJobDisposition.values
+            .firstWhere((element) => element.name() == name);
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
+  }
+
+  /// Creates a map from the names of [PrintJobDisposition] values to the values.
+  ///
+  /// The collection that this method is called on is expected to have
+  /// values with distinct names, like the `values` list of an enum class.
+  /// Only one value for each name can occur in the created map,
+  /// so if two or more values have the same name (either being the
+  /// same value, or being values of different enum type), at most one of
+  /// them will be represented in the returned map.
+  static Map<String, PrintJobDisposition> asNameMap() =>
+      <String, PrintJobDisposition>{
+        for (final value in PrintJobDisposition.values) value.name(): value
+      };
+
   ///Gets [String] value.
   String toValue() => _value;
 
   ///Gets [String] native value.
   String toNativeValue() => _nativeValue;
+
+  ///Gets the name of the value.
+  String name() {
+    switch (_value) {
+      case 'CANCEL':
+        return 'CANCEL';
+      case 'PREVIEW':
+        return 'PREVIEW';
+      case 'SAVE':
+        return 'SAVE';
+      case 'SPOOL':
+        return 'SPOOL';
+    }
+    return _value.toString();
+  }
 
   @override
   int get hashCode => _value.hashCode;

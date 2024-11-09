@@ -52,11 +52,51 @@ class AttributedStringTextEffectStyle {
     return null;
   }
 
+  /// Gets a possible [AttributedStringTextEffectStyle] instance value with name [name].
+  ///
+  /// Goes through [AttributedStringTextEffectStyle.values] looking for a value with
+  /// name [name], as reported by [AttributedStringTextEffectStyle.name].
+  /// Returns the first value with the given name, otherwise `null`.
+  static AttributedStringTextEffectStyle? byName(String? name) {
+    if (name != null) {
+      try {
+        return AttributedStringTextEffectStyle.values
+            .firstWhere((element) => element.name() == name);
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
+  }
+
+  /// Creates a map from the names of [AttributedStringTextEffectStyle] values to the values.
+  ///
+  /// The collection that this method is called on is expected to have
+  /// values with distinct names, like the `values` list of an enum class.
+  /// Only one value for each name can occur in the created map,
+  /// so if two or more values have the same name (either being the
+  /// same value, or being values of different enum type), at most one of
+  /// them will be represented in the returned map.
+  static Map<String, AttributedStringTextEffectStyle> asNameMap() =>
+      <String, AttributedStringTextEffectStyle>{
+        for (final value in AttributedStringTextEffectStyle.values)
+          value.name(): value
+      };
+
   ///Gets [String] value.
   String toValue() => _value;
 
   ///Gets [String] native value.
   String toNativeValue() => _nativeValue;
+
+  ///Gets the name of the value.
+  String name() {
+    switch (_value) {
+      case 'letterpressStyle':
+        return 'LETTERPRESS_STYLE';
+    }
+    return _value.toString();
+  }
 
   @override
   int get hashCode => _value.hashCode;
@@ -119,11 +159,51 @@ class IOSNSAttributedStringTextEffectStyle {
     return null;
   }
 
+  /// Gets a possible [IOSNSAttributedStringTextEffectStyle] instance value with name [name].
+  ///
+  /// Goes through [IOSNSAttributedStringTextEffectStyle.values] looking for a value with
+  /// name [name], as reported by [IOSNSAttributedStringTextEffectStyle.name].
+  /// Returns the first value with the given name, otherwise `null`.
+  static IOSNSAttributedStringTextEffectStyle? byName(String? name) {
+    if (name != null) {
+      try {
+        return IOSNSAttributedStringTextEffectStyle.values
+            .firstWhere((element) => element.name() == name);
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
+  }
+
+  /// Creates a map from the names of [IOSNSAttributedStringTextEffectStyle] values to the values.
+  ///
+  /// The collection that this method is called on is expected to have
+  /// values with distinct names, like the `values` list of an enum class.
+  /// Only one value for each name can occur in the created map,
+  /// so if two or more values have the same name (either being the
+  /// same value, or being values of different enum type), at most one of
+  /// them will be represented in the returned map.
+  static Map<String, IOSNSAttributedStringTextEffectStyle> asNameMap() =>
+      <String, IOSNSAttributedStringTextEffectStyle>{
+        for (final value in IOSNSAttributedStringTextEffectStyle.values)
+          value.name(): value
+      };
+
   ///Gets [String] value.
   String toValue() => _value;
 
   ///Gets [String] native value.
   String toNativeValue() => _nativeValue;
+
+  ///Gets the name of the value.
+  String name() {
+    switch (_value) {
+      case 'letterpressStyle':
+        return 'LETTERPRESS_STYLE';
+    }
+    return _value.toString();
+  }
 
   @override
   int get hashCode => _value.hashCode;

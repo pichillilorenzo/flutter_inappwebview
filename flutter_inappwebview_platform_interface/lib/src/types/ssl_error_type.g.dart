@@ -310,11 +310,73 @@ class SslErrorType {
     return null;
   }
 
+  /// Gets a possible [SslErrorType] instance value with name [name].
+  ///
+  /// Goes through [SslErrorType.values] looking for a value with
+  /// name [name], as reported by [SslErrorType.name].
+  /// Returns the first value with the given name, otherwise `null`.
+  static SslErrorType? byName(String? name) {
+    if (name != null) {
+      try {
+        return SslErrorType.values
+            .firstWhere((element) => element.name() == name);
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
+  }
+
+  /// Creates a map from the names of [SslErrorType] values to the values.
+  ///
+  /// The collection that this method is called on is expected to have
+  /// values with distinct names, like the `values` list of an enum class.
+  /// Only one value for each name can occur in the created map,
+  /// so if two or more values have the same name (either being the
+  /// same value, or being values of different enum type), at most one of
+  /// them will be represented in the returned map.
+  static Map<String, SslErrorType> asNameMap() => <String, SslErrorType>{
+        for (final value in SslErrorType.values) value.name(): value
+      };
+
   ///Gets [String] value.
   String toValue() => _value;
 
   ///Gets [int?] native value.
   int? toNativeValue() => _nativeValue;
+
+  ///Gets the name of the value.
+  String name() {
+    switch (_value) {
+      case 'COMMON_NAME_IS_INCORRECT':
+        return 'COMMON_NAME_IS_INCORRECT';
+      case 'DATE_INVALID':
+        return 'DATE_INVALID';
+      case 'DENY':
+        return 'DENY';
+      case 'EXPIRED':
+        return 'EXPIRED';
+      case 'FATAL_TRUST_FAILURE':
+        return 'FATAL_TRUST_FAILURE';
+      case 'IDMISMATCH':
+        return 'IDMISMATCH';
+      case 'INVALID':
+        return 'INVALID';
+      case 'NOT_YET_VALID':
+        return 'NOT_YET_VALID';
+      case 'OTHER_ERROR':
+        return 'OTHER_ERROR';
+      case 'RECOVERABLE_TRUST_FAILURE':
+        return 'RECOVERABLE_TRUST_FAILURE';
+      case 'REVOKED':
+        return 'REVOKED';
+      case 'UNSPECIFIED':
+        return 'UNSPECIFIED';
+      case 'UNTRUSTED':
+        return 'UNTRUSTED';
+    }
+    return _value.toString();
+  }
 
   @override
   int get hashCode => _value.hashCode;
@@ -395,20 +457,43 @@ class AndroidSslError {
     return null;
   }
 
+  /// Gets a possible [AndroidSslError] instance value with name [name].
+  ///
+  /// Goes through [AndroidSslError.values] looking for a value with
+  /// name [name], as reported by [AndroidSslError.name].
+  /// Returns the first value with the given name, otherwise `null`.
+  static AndroidSslError? byName(String? name) {
+    if (name != null) {
+      try {
+        return AndroidSslError.values
+            .firstWhere((element) => element.name() == name);
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
+  }
+
+  /// Creates a map from the names of [AndroidSslError] values to the values.
+  ///
+  /// The collection that this method is called on is expected to have
+  /// values with distinct names, like the `values` list of an enum class.
+  /// Only one value for each name can occur in the created map,
+  /// so if two or more values have the same name (either being the
+  /// same value, or being values of different enum type), at most one of
+  /// them will be represented in the returned map.
+  static Map<String, AndroidSslError> asNameMap() => <String, AndroidSslError>{
+        for (final value in AndroidSslError.values) value.name(): value
+      };
+
   ///Gets [int] value.
   int toValue() => _value;
 
   ///Gets [int] native value.
   int toNativeValue() => _nativeValue;
 
-  @override
-  int get hashCode => _value.hashCode;
-
-  @override
-  bool operator ==(value) => value == _value;
-
-  @override
-  String toString() {
+  ///Gets the name of the value.
+  String name() {
     switch (_value) {
       case 4:
         return 'SSL_DATE_INVALID';
@@ -424,6 +509,17 @@ class AndroidSslError {
         return 'SSL_UNTRUSTED';
     }
     return _value.toString();
+  }
+
+  @override
+  int get hashCode => _value.hashCode;
+
+  @override
+  bool operator ==(value) => value == _value;
+
+  @override
+  String toString() {
+    return name();
   }
 }
 
@@ -493,20 +589,43 @@ class IOSSslError {
     return null;
   }
 
+  /// Gets a possible [IOSSslError] instance value with name [name].
+  ///
+  /// Goes through [IOSSslError.values] looking for a value with
+  /// name [name], as reported by [IOSSslError.name].
+  /// Returns the first value with the given name, otherwise `null`.
+  static IOSSslError? byName(String? name) {
+    if (name != null) {
+      try {
+        return IOSSslError.values
+            .firstWhere((element) => element.name() == name);
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
+  }
+
+  /// Creates a map from the names of [IOSSslError] values to the values.
+  ///
+  /// The collection that this method is called on is expected to have
+  /// values with distinct names, like the `values` list of an enum class.
+  /// Only one value for each name can occur in the created map,
+  /// so if two or more values have the same name (either being the
+  /// same value, or being values of different enum type), at most one of
+  /// them will be represented in the returned map.
+  static Map<String, IOSSslError> asNameMap() => <String, IOSSslError>{
+        for (final value in IOSSslError.values) value.name(): value
+      };
+
   ///Gets [int] value.
   int toValue() => _value;
 
   ///Gets [int] native value.
   int toNativeValue() => _nativeValue;
 
-  @override
-  int get hashCode => _value.hashCode;
-
-  @override
-  bool operator ==(value) => value == _value;
-
-  @override
-  String toString() {
+  ///Gets the name of the value.
+  String name() {
     switch (_value) {
       case 3:
         return 'DENY';
@@ -522,5 +641,16 @@ class IOSSslError {
         return 'UNSPECIFIED';
     }
     return _value.toString();
+  }
+
+  @override
+  int get hashCode => _value.hashCode;
+
+  @override
+  bool operator ==(value) => value == _value;
+
+  @override
+  String toString() {
+    return name();
   }
 }

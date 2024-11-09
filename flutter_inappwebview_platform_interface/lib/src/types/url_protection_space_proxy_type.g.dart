@@ -70,11 +70,57 @@ class URLProtectionSpaceProxyType {
     return null;
   }
 
+  /// Gets a possible [URLProtectionSpaceProxyType] instance value with name [name].
+  ///
+  /// Goes through [URLProtectionSpaceProxyType.values] looking for a value with
+  /// name [name], as reported by [URLProtectionSpaceProxyType.name].
+  /// Returns the first value with the given name, otherwise `null`.
+  static URLProtectionSpaceProxyType? byName(String? name) {
+    if (name != null) {
+      try {
+        return URLProtectionSpaceProxyType.values
+            .firstWhere((element) => element.name() == name);
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
+  }
+
+  /// Creates a map from the names of [URLProtectionSpaceProxyType] values to the values.
+  ///
+  /// The collection that this method is called on is expected to have
+  /// values with distinct names, like the `values` list of an enum class.
+  /// Only one value for each name can occur in the created map,
+  /// so if two or more values have the same name (either being the
+  /// same value, or being values of different enum type), at most one of
+  /// them will be represented in the returned map.
+  static Map<String, URLProtectionSpaceProxyType> asNameMap() =>
+      <String, URLProtectionSpaceProxyType>{
+        for (final value in URLProtectionSpaceProxyType.values)
+          value.name(): value
+      };
+
   ///Gets [String] value.
   String toValue() => _value;
 
   ///Gets [String] native value.
   String toNativeValue() => _nativeValue;
+
+  ///Gets the name of the value.
+  String name() {
+    switch (_value) {
+      case 'NSURLProtectionSpaceFTPProxy':
+        return 'URL_PROTECTION_SPACE_FTP_PROXY';
+      case 'NSURLProtectionSpaceHTTPSProxy':
+        return 'URL_PROTECTION_SPACE_HTTPS_PROXY';
+      case 'NSURLProtectionSpaceHTTPProxy':
+        return 'URL_PROTECTION_SPACE_HTTP_PROXY';
+      case 'NSURLProtectionSpaceSOCKSProxy':
+        return 'URL_PROTECTION_SPACE_SOCKS_PROXY';
+    }
+    return _value.toString();
+  }
 
   @override
   int get hashCode => _value.hashCode;
@@ -155,11 +201,57 @@ class IOSNSURLProtectionSpaceProxyType {
     return null;
   }
 
+  /// Gets a possible [IOSNSURLProtectionSpaceProxyType] instance value with name [name].
+  ///
+  /// Goes through [IOSNSURLProtectionSpaceProxyType.values] looking for a value with
+  /// name [name], as reported by [IOSNSURLProtectionSpaceProxyType.name].
+  /// Returns the first value with the given name, otherwise `null`.
+  static IOSNSURLProtectionSpaceProxyType? byName(String? name) {
+    if (name != null) {
+      try {
+        return IOSNSURLProtectionSpaceProxyType.values
+            .firstWhere((element) => element.name() == name);
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
+  }
+
+  /// Creates a map from the names of [IOSNSURLProtectionSpaceProxyType] values to the values.
+  ///
+  /// The collection that this method is called on is expected to have
+  /// values with distinct names, like the `values` list of an enum class.
+  /// Only one value for each name can occur in the created map,
+  /// so if two or more values have the same name (either being the
+  /// same value, or being values of different enum type), at most one of
+  /// them will be represented in the returned map.
+  static Map<String, IOSNSURLProtectionSpaceProxyType> asNameMap() =>
+      <String, IOSNSURLProtectionSpaceProxyType>{
+        for (final value in IOSNSURLProtectionSpaceProxyType.values)
+          value.name(): value
+      };
+
   ///Gets [String] value.
   String toValue() => _value;
 
   ///Gets [String] native value.
   String toNativeValue() => _nativeValue;
+
+  ///Gets the name of the value.
+  String name() {
+    switch (_value) {
+      case 'NSURLProtectionSpaceFTPProxy':
+        return 'NSURL_PROTECTION_SPACE_FTP_PROXY';
+      case 'NSURLProtectionSpaceHTTPSProxy':
+        return 'NSURL_PROTECTION_SPACE_HTTPS_PROXY';
+      case 'NSURLProtectionSpaceSOCKSProxy':
+        return 'NSURL_PROTECTION_SPACE_SOCKS_PROXY';
+      case 'NSURLProtectionSpaceHTTPProxy':
+        return 'NSUR_PROTECTION_SPACE_HTTP_PROXY';
+    }
+    return _value.toString();
+  }
 
   @override
   int get hashCode => _value.hashCode;

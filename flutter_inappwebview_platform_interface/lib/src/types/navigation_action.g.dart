@@ -117,7 +117,8 @@ class NavigationAction {
   }
 
   ///Gets a possible [NavigationAction] instance from a [Map] value.
-  static NavigationAction? fromMap(Map<String, dynamic>? map) {
+  static NavigationAction? fromMap(Map<String, dynamic>? map,
+      {EnumMethod? enumMethod}) {
     if (map == null) {
       return null;
     }
@@ -125,36 +126,55 @@ class NavigationAction {
       androidHasGesture: map['hasGesture'],
       androidIsRedirect: map['isRedirect'],
       hasGesture: map['hasGesture'],
-      iosSourceFrame:
-          IOSWKFrameInfo.fromMap(map['sourceFrame']?.cast<String, dynamic>()),
-      iosTargetFrame:
-          IOSWKFrameInfo.fromMap(map['targetFrame']?.cast<String, dynamic>()),
-      iosWKNavigationType:
+      iosSourceFrame: IOSWKFrameInfo.fromMap(
+          map['sourceFrame']?.cast<String, dynamic>(),
+          enumMethod: enumMethod),
+      iosTargetFrame: IOSWKFrameInfo.fromMap(
+          map['targetFrame']?.cast<String, dynamic>(),
+          enumMethod: enumMethod),
+      iosWKNavigationType: switch (enumMethod ?? EnumMethod.nativeValue) {
+        EnumMethod.nativeValue =>
           IOSWKNavigationType.fromNativeValue(map['navigationType']),
+        EnumMethod.value =>
+          IOSWKNavigationType.fromValue(map['navigationType']),
+        EnumMethod.name => IOSWKNavigationType.byName(map['navigationType'])
+      },
       isForMainFrame: map['isForMainFrame'],
       isRedirect: map['isRedirect'],
-      navigationType: NavigationType.fromNativeValue(map['navigationType']),
-      request: URLRequest.fromMap(map['request']?.cast<String, dynamic>())!,
+      navigationType: switch (enumMethod ?? EnumMethod.nativeValue) {
+        EnumMethod.nativeValue =>
+          NavigationType.fromNativeValue(map['navigationType']),
+        EnumMethod.value => NavigationType.fromValue(map['navigationType']),
+        EnumMethod.name => NavigationType.byName(map['navigationType'])
+      },
+      request: URLRequest.fromMap(map['request']?.cast<String, dynamic>(),
+          enumMethod: enumMethod)!,
       shouldPerformDownload: map['shouldPerformDownload'],
-      sourceFrame:
-          FrameInfo.fromMap(map['sourceFrame']?.cast<String, dynamic>()),
-      targetFrame:
-          FrameInfo.fromMap(map['targetFrame']?.cast<String, dynamic>()),
+      sourceFrame: FrameInfo.fromMap(
+          map['sourceFrame']?.cast<String, dynamic>(),
+          enumMethod: enumMethod),
+      targetFrame: FrameInfo.fromMap(
+          map['targetFrame']?.cast<String, dynamic>(),
+          enumMethod: enumMethod),
     );
     return instance;
   }
 
   ///Converts instance to a map.
-  Map<String, dynamic> toMap() {
+  Map<String, dynamic> toMap({EnumMethod? enumMethod}) {
     return {
       "hasGesture": hasGesture,
       "isForMainFrame": isForMainFrame,
       "isRedirect": isRedirect,
-      "navigationType": navigationType?.toNativeValue(),
-      "request": request.toMap(),
+      "navigationType": switch (enumMethod ?? EnumMethod.nativeValue) {
+        EnumMethod.nativeValue => navigationType?.toNativeValue(),
+        EnumMethod.value => navigationType?.toValue(),
+        EnumMethod.name => navigationType?.name()
+      },
+      "request": request.toMap(enumMethod: enumMethod),
       "shouldPerformDownload": shouldPerformDownload,
-      "sourceFrame": sourceFrame?.toMap(),
-      "targetFrame": targetFrame?.toMap(),
+      "sourceFrame": sourceFrame?.toMap(enumMethod: enumMethod),
+      "targetFrame": targetFrame?.toMap(enumMethod: enumMethod),
     };
   }
 

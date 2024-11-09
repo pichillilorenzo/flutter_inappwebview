@@ -54,7 +54,7 @@ abstract mixin class AndroidPathHandler
   }
 
   @override
-  Map<String, dynamic> toMap() {
+  Map<String, dynamic> toMap({EnumMethod? enumMethod}) {
     return {"path": path, "type": type, "id": _id};
   }
 
@@ -194,7 +194,7 @@ class AndroidInternalStoragePathHandler
   String get directory => _internalParams.directory;
 
   @override
-  Map<String, dynamic> toMap() {
+  Map<String, dynamic> toMap({EnumMethod? enumMethod}) {
     return {...toMap(), 'directory': directory};
   }
 }

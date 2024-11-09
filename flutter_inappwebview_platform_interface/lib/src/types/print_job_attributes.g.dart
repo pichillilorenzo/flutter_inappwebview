@@ -240,84 +240,145 @@ class PrintJobAttributes {
       this.verticalPagination});
 
   ///Gets a possible [PrintJobAttributes] instance from a [Map] value.
-  static PrintJobAttributes? fromMap(Map<String, dynamic>? map) {
+  static PrintJobAttributes? fromMap(Map<String, dynamic>? map,
+      {EnumMethod? enumMethod}) {
     if (map == null) {
       return null;
     }
     final instance = PrintJobAttributes(
-      colorMode: PrintJobColorMode.fromNativeValue(map['colorMode']),
+      colorMode: switch (enumMethod ?? EnumMethod.nativeValue) {
+        EnumMethod.nativeValue =>
+          PrintJobColorMode.fromNativeValue(map['colorMode']),
+        EnumMethod.value => PrintJobColorMode.fromValue(map['colorMode']),
+        EnumMethod.name => PrintJobColorMode.byName(map['colorMode'])
+      },
       detailedErrorReporting: map['detailedErrorReporting'],
-      duplex: PrintJobDuplexMode.fromNativeValue(map['duplex']),
+      duplex: switch (enumMethod ?? EnumMethod.nativeValue) {
+        EnumMethod.nativeValue =>
+          PrintJobDuplexMode.fromNativeValue(map['duplex']),
+        EnumMethod.value => PrintJobDuplexMode.fromValue(map['duplex']),
+        EnumMethod.name => PrintJobDuplexMode.byName(map['duplex'])
+      },
       faxNumber: map['faxNumber'],
       footerHeight: map['footerHeight'],
       headerAndFooter: map['headerAndFooter'],
       headerHeight: map['headerHeight'],
-      horizontalPagination:
+      horizontalPagination: switch (enumMethod ?? EnumMethod.nativeValue) {
+        EnumMethod.nativeValue =>
           PrintJobPaginationMode.fromNativeValue(map['horizontalPagination']),
+        EnumMethod.value =>
+          PrintJobPaginationMode.fromValue(map['horizontalPagination']),
+        EnumMethod.name =>
+          PrintJobPaginationMode.byName(map['horizontalPagination'])
+      },
       isHorizontallyCentered: map['isHorizontallyCentered'],
       isSelectionOnly: map['isSelectionOnly'],
       isVerticallyCentered: map['isVerticallyCentered'],
-      jobDisposition:
+      jobDisposition: switch (enumMethod ?? EnumMethod.nativeValue) {
+        EnumMethod.nativeValue =>
           PrintJobDisposition.fromNativeValue(map['jobDisposition']),
+        EnumMethod.value =>
+          PrintJobDisposition.fromValue(map['jobDisposition']),
+        EnumMethod.name => PrintJobDisposition.byName(map['jobDisposition'])
+      },
       jobSavingURL:
           map['jobSavingURL'] != null ? WebUri(map['jobSavingURL']) : null,
       localizedPaperName: map['localizedPaperName'],
       margins: MapEdgeInsets.fromMap(map['margins']?.cast<String, dynamic>()),
       maximumContentHeight: map['maximumContentHeight'],
       maximumContentWidth: map['maximumContentWidth'],
-      mediaSize:
-          PrintJobMediaSize.fromMap(map['mediaSize']?.cast<String, dynamic>()),
+      mediaSize: PrintJobMediaSize.fromMap(
+          map['mediaSize']?.cast<String, dynamic>(),
+          enumMethod: enumMethod),
       mustCollate: map['mustCollate'],
-      orientation: PrintJobOrientation.fromNativeValue(map['orientation']),
+      orientation: switch (enumMethod ?? EnumMethod.nativeValue) {
+        EnumMethod.nativeValue =>
+          PrintJobOrientation.fromNativeValue(map['orientation']),
+        EnumMethod.value => PrintJobOrientation.fromValue(map['orientation']),
+        EnumMethod.name => PrintJobOrientation.byName(map['orientation'])
+      },
       pagesAcross: map['pagesAcross'],
       pagesDown: map['pagesDown'],
       paperName: map['paperName'],
-      paperRect:
-          InAppWebViewRect.fromMap(map['paperRect']?.cast<String, dynamic>()),
+      paperRect: InAppWebViewRect.fromMap(
+          map['paperRect']?.cast<String, dynamic>(),
+          enumMethod: enumMethod),
       printableRect: InAppWebViewRect.fromMap(
-          map['printableRect']?.cast<String, dynamic>()),
+          map['printableRect']?.cast<String, dynamic>(),
+          enumMethod: enumMethod),
       resolution: PrintJobResolution.fromMap(
-          map['resolution']?.cast<String, dynamic>()),
+          map['resolution']?.cast<String, dynamic>(),
+          enumMethod: enumMethod),
       scalingFactor: map['scalingFactor'],
       time: map['time'],
-      verticalPagination:
+      verticalPagination: switch (enumMethod ?? EnumMethod.nativeValue) {
+        EnumMethod.nativeValue =>
           PrintJobPaginationMode.fromNativeValue(map['verticalPagination']),
+        EnumMethod.value =>
+          PrintJobPaginationMode.fromValue(map['verticalPagination']),
+        EnumMethod.name =>
+          PrintJobPaginationMode.byName(map['verticalPagination'])
+      },
     );
     return instance;
   }
 
   ///Converts instance to a map.
-  Map<String, dynamic> toMap() {
+  Map<String, dynamic> toMap({EnumMethod? enumMethod}) {
     return {
-      "colorMode": colorMode?.toNativeValue(),
+      "colorMode": switch (enumMethod ?? EnumMethod.nativeValue) {
+        EnumMethod.nativeValue => colorMode?.toNativeValue(),
+        EnumMethod.value => colorMode?.toValue(),
+        EnumMethod.name => colorMode?.name()
+      },
       "detailedErrorReporting": detailedErrorReporting,
-      "duplex": duplex?.toNativeValue(),
+      "duplex": switch (enumMethod ?? EnumMethod.nativeValue) {
+        EnumMethod.nativeValue => duplex?.toNativeValue(),
+        EnumMethod.value => duplex?.toValue(),
+        EnumMethod.name => duplex?.name()
+      },
       "faxNumber": faxNumber,
       "footerHeight": footerHeight,
       "headerAndFooter": headerAndFooter,
       "headerHeight": headerHeight,
-      "horizontalPagination": horizontalPagination?.toNativeValue(),
+      "horizontalPagination": switch (enumMethod ?? EnumMethod.nativeValue) {
+        EnumMethod.nativeValue => horizontalPagination?.toNativeValue(),
+        EnumMethod.value => horizontalPagination?.toValue(),
+        EnumMethod.name => horizontalPagination?.name()
+      },
       "isHorizontallyCentered": isHorizontallyCentered,
       "isSelectionOnly": isSelectionOnly,
       "isVerticallyCentered": isVerticallyCentered,
-      "jobDisposition": jobDisposition?.toNativeValue(),
+      "jobDisposition": switch (enumMethod ?? EnumMethod.nativeValue) {
+        EnumMethod.nativeValue => jobDisposition?.toNativeValue(),
+        EnumMethod.value => jobDisposition?.toValue(),
+        EnumMethod.name => jobDisposition?.name()
+      },
       "jobSavingURL": jobSavingURL?.toString(),
       "localizedPaperName": localizedPaperName,
       "margins": margins?.toMap(),
       "maximumContentHeight": maximumContentHeight,
       "maximumContentWidth": maximumContentWidth,
-      "mediaSize": mediaSize?.toMap(),
+      "mediaSize": mediaSize?.toMap(enumMethod: enumMethod),
       "mustCollate": mustCollate,
-      "orientation": orientation?.toNativeValue(),
+      "orientation": switch (enumMethod ?? EnumMethod.nativeValue) {
+        EnumMethod.nativeValue => orientation?.toNativeValue(),
+        EnumMethod.value => orientation?.toValue(),
+        EnumMethod.name => orientation?.name()
+      },
       "pagesAcross": pagesAcross,
       "pagesDown": pagesDown,
       "paperName": paperName,
-      "paperRect": paperRect?.toMap(),
-      "printableRect": printableRect?.toMap(),
-      "resolution": resolution?.toMap(),
+      "paperRect": paperRect?.toMap(enumMethod: enumMethod),
+      "printableRect": printableRect?.toMap(enumMethod: enumMethod),
+      "resolution": resolution?.toMap(enumMethod: enumMethod),
       "scalingFactor": scalingFactor,
       "time": time,
-      "verticalPagination": verticalPagination?.toNativeValue(),
+      "verticalPagination": switch (enumMethod ?? EnumMethod.nativeValue) {
+        EnumMethod.nativeValue => verticalPagination?.toNativeValue(),
+        EnumMethod.value => verticalPagination?.toValue(),
+        EnumMethod.name => verticalPagination?.name()
+      },
     };
   }
 

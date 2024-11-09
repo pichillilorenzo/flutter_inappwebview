@@ -54,11 +54,52 @@ class FormResubmissionAction {
     return null;
   }
 
+  /// Gets a possible [FormResubmissionAction] instance value with name [name].
+  ///
+  /// Goes through [FormResubmissionAction.values] looking for a value with
+  /// name [name], as reported by [FormResubmissionAction.name].
+  /// Returns the first value with the given name, otherwise `null`.
+  static FormResubmissionAction? byName(String? name) {
+    if (name != null) {
+      try {
+        return FormResubmissionAction.values
+            .firstWhere((element) => element.name() == name);
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
+  }
+
+  /// Creates a map from the names of [FormResubmissionAction] values to the values.
+  ///
+  /// The collection that this method is called on is expected to have
+  /// values with distinct names, like the `values` list of an enum class.
+  /// Only one value for each name can occur in the created map,
+  /// so if two or more values have the same name (either being the
+  /// same value, or being values of different enum type), at most one of
+  /// them will be represented in the returned map.
+  static Map<String, FormResubmissionAction> asNameMap() =>
+      <String, FormResubmissionAction>{
+        for (final value in FormResubmissionAction.values) value.name(): value
+      };
+
   ///Gets [int] value.
   int toValue() => _value;
 
   ///Gets [int] native value.
   int toNativeValue() => _nativeValue;
+
+  ///Gets the name of the value.
+  String name() {
+    switch (_value) {
+      case 1:
+        return 'DONT_RESEND';
+      case 0:
+        return 'RESEND';
+    }
+    return _value.toString();
+  }
 
   @override
   int get hashCode => _value.hashCode;
@@ -68,12 +109,6 @@ class FormResubmissionAction {
 
   @override
   String toString() {
-    switch (_value) {
-      case 1:
-        return 'DONT_RESEND';
-      case 0:
-        return 'RESEND';
-    }
-    return _value.toString();
+    return name();
   }
 }

@@ -3,6 +3,7 @@ import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_i
 
 import '../util.dart';
 import 'client_cert_response_action.dart';
+import 'enum_method.dart';
 
 part 'client_cert_response.g.dart';
 

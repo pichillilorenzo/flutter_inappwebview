@@ -1,6 +1,7 @@
 import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_internal_annotations.dart';
 
 import 'proxy_scheme_filter.dart';
+import 'enum_method.dart';
 
 part 'proxy_rule.g.dart';
 

@@ -88,20 +88,44 @@ class ModalPresentationStyle {
     return null;
   }
 
+  /// Gets a possible [ModalPresentationStyle] instance value with name [name].
+  ///
+  /// Goes through [ModalPresentationStyle.values] looking for a value with
+  /// name [name], as reported by [ModalPresentationStyle.name].
+  /// Returns the first value with the given name, otherwise `null`.
+  static ModalPresentationStyle? byName(String? name) {
+    if (name != null) {
+      try {
+        return ModalPresentationStyle.values
+            .firstWhere((element) => element.name() == name);
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
+  }
+
+  /// Creates a map from the names of [ModalPresentationStyle] values to the values.
+  ///
+  /// The collection that this method is called on is expected to have
+  /// values with distinct names, like the `values` list of an enum class.
+  /// Only one value for each name can occur in the created map,
+  /// so if two or more values have the same name (either being the
+  /// same value, or being values of different enum type), at most one of
+  /// them will be represented in the returned map.
+  static Map<String, ModalPresentationStyle> asNameMap() =>
+      <String, ModalPresentationStyle>{
+        for (final value in ModalPresentationStyle.values) value.name(): value
+      };
+
   ///Gets [int] value.
   int toValue() => _value;
 
   ///Gets [int] native value.
   int toNativeValue() => _nativeValue;
 
-  @override
-  int get hashCode => _value.hashCode;
-
-  @override
-  bool operator ==(value) => value == _value;
-
-  @override
-  String toString() {
+  ///Gets the name of the value.
+  String name() {
     switch (_value) {
       case 9:
         return 'AUTOMATIC';
@@ -125,6 +149,17 @@ class ModalPresentationStyle {
         return 'POPOVER';
     }
     return _value.toString();
+  }
+
+  @override
+  int get hashCode => _value.hashCode;
+
+  @override
+  bool operator ==(value) => value == _value;
+
+  @override
+  String toString() {
+    return name();
   }
 }
 
@@ -213,20 +248,45 @@ class IOSUIModalPresentationStyle {
     return null;
   }
 
+  /// Gets a possible [IOSUIModalPresentationStyle] instance value with name [name].
+  ///
+  /// Goes through [IOSUIModalPresentationStyle.values] looking for a value with
+  /// name [name], as reported by [IOSUIModalPresentationStyle.name].
+  /// Returns the first value with the given name, otherwise `null`.
+  static IOSUIModalPresentationStyle? byName(String? name) {
+    if (name != null) {
+      try {
+        return IOSUIModalPresentationStyle.values
+            .firstWhere((element) => element.name() == name);
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
+  }
+
+  /// Creates a map from the names of [IOSUIModalPresentationStyle] values to the values.
+  ///
+  /// The collection that this method is called on is expected to have
+  /// values with distinct names, like the `values` list of an enum class.
+  /// Only one value for each name can occur in the created map,
+  /// so if two or more values have the same name (either being the
+  /// same value, or being values of different enum type), at most one of
+  /// them will be represented in the returned map.
+  static Map<String, IOSUIModalPresentationStyle> asNameMap() =>
+      <String, IOSUIModalPresentationStyle>{
+        for (final value in IOSUIModalPresentationStyle.values)
+          value.name(): value
+      };
+
   ///Gets [int] value.
   int toValue() => _value;
 
   ///Gets [int] native value.
   int toNativeValue() => _nativeValue;
 
-  @override
-  int get hashCode => _value.hashCode;
-
-  @override
-  bool operator ==(value) => value == _value;
-
-  @override
-  String toString() {
+  ///Gets the name of the value.
+  String name() {
     switch (_value) {
       case 9:
         return 'AUTOMATIC';
@@ -250,5 +310,16 @@ class IOSUIModalPresentationStyle {
         return 'POPOVER';
     }
     return _value.toString();
+  }
+
+  @override
+  int get hashCode => _value.hashCode;
+
+  @override
+  bool operator ==(value) => value == _value;
+
+  @override
+  String toString() {
+    return name();
   }
 }

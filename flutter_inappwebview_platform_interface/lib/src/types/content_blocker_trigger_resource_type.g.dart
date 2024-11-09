@@ -72,11 +72,65 @@ class ContentBlockerTriggerResourceType {
     return null;
   }
 
+  /// Gets a possible [ContentBlockerTriggerResourceType] instance value with name [name].
+  ///
+  /// Goes through [ContentBlockerTriggerResourceType.values] looking for a value with
+  /// name [name], as reported by [ContentBlockerTriggerResourceType.name].
+  /// Returns the first value with the given name, otherwise `null`.
+  static ContentBlockerTriggerResourceType? byName(String? name) {
+    if (name != null) {
+      try {
+        return ContentBlockerTriggerResourceType.values
+            .firstWhere((element) => element.name() == name);
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
+  }
+
+  /// Creates a map from the names of [ContentBlockerTriggerResourceType] values to the values.
+  ///
+  /// The collection that this method is called on is expected to have
+  /// values with distinct names, like the `values` list of an enum class.
+  /// Only one value for each name can occur in the created map,
+  /// so if two or more values have the same name (either being the
+  /// same value, or being values of different enum type), at most one of
+  /// them will be represented in the returned map.
+  static Map<String, ContentBlockerTriggerResourceType> asNameMap() =>
+      <String, ContentBlockerTriggerResourceType>{
+        for (final value in ContentBlockerTriggerResourceType.values)
+          value.name(): value
+      };
+
   ///Gets [String] value.
   String toValue() => _value;
 
   ///Gets [String] native value.
   String toNativeValue() => _nativeValue;
+
+  ///Gets the name of the value.
+  String name() {
+    switch (_value) {
+      case 'document':
+        return 'DOCUMENT';
+      case 'font':
+        return 'FONT';
+      case 'image':
+        return 'IMAGE';
+      case 'media':
+        return 'MEDIA';
+      case 'raw':
+        return 'RAW';
+      case 'script':
+        return 'SCRIPT';
+      case 'style-sheet':
+        return 'STYLE_SHEET';
+      case 'svg-document':
+        return 'SVG_DOCUMENT';
+    }
+    return _value.toString();
+  }
 
   @override
   int get hashCode => _value.hashCode;

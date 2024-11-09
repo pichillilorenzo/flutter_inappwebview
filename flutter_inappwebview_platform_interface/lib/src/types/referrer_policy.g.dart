@@ -91,11 +91,63 @@ class ReferrerPolicy {
     return null;
   }
 
+  /// Gets a possible [ReferrerPolicy] instance value with name [name].
+  ///
+  /// Goes through [ReferrerPolicy.values] looking for a value with
+  /// name [name], as reported by [ReferrerPolicy.name].
+  /// Returns the first value with the given name, otherwise `null`.
+  static ReferrerPolicy? byName(String? name) {
+    if (name != null) {
+      try {
+        return ReferrerPolicy.values
+            .firstWhere((element) => element.name() == name);
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
+  }
+
+  /// Creates a map from the names of [ReferrerPolicy] values to the values.
+  ///
+  /// The collection that this method is called on is expected to have
+  /// values with distinct names, like the `values` list of an enum class.
+  /// Only one value for each name can occur in the created map,
+  /// so if two or more values have the same name (either being the
+  /// same value, or being values of different enum type), at most one of
+  /// them will be represented in the returned map.
+  static Map<String, ReferrerPolicy> asNameMap() => <String, ReferrerPolicy>{
+        for (final value in ReferrerPolicy.values) value.name(): value
+      };
+
   ///Gets [String] value.
   String toValue() => _value;
 
   ///Gets [String] native value.
   String toNativeValue() => _nativeValue;
+
+  ///Gets the name of the value.
+  String name() {
+    switch (_value) {
+      case 'no-referrer':
+        return 'NO_REFERRER';
+      case 'no-referrer-when-downgrade':
+        return 'NO_REFERRER_WHEN_DOWNGRADE';
+      case 'origin':
+        return 'ORIGIN';
+      case 'origin-when-cross-origin':
+        return 'ORIGIN_WHEN_CROSS_ORIGIN';
+      case 'same-origin':
+        return 'SAME_ORIGIN';
+      case 'strict-origin':
+        return 'STRICT_ORIGIN';
+      case 'strict-origin-when-cross-origin':
+        return 'STRICT_ORIGIN_WHEN_CROSS_ORIGIN';
+      case 'unsafe-url':
+        return 'UNSAFE_URL';
+    }
+    return _value.toString();
+  }
 
   @override
   int get hashCode => _value.hashCode;

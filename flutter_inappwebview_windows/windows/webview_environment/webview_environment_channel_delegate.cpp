@@ -21,7 +21,7 @@ namespace flutter_inappwebview_plugin
       return;
     }
 
-    // auto& arguments = std::get<flutter::EncodableMap>(*method_call.arguments());
+    auto& arguments = std::get<flutter::EncodableMap>(*method_call.arguments());
     auto& methodName = method_call.method_name();
 
     if (string_equals(methodName, "dispose")) {
@@ -33,6 +33,10 @@ namespace flutter_inappwebview_plugin
         }
       }
       result->Success();
+    }
+    else if (string_equals(methodName, "isInterfaceSupported")) {
+      auto interfaceName = get_fl_map_value<std::string>(arguments, "interface");
+      result->Success(webViewEnvironment->isInterfaceSupported(interfaceName));
     }
     else {
       result->NotImplemented();

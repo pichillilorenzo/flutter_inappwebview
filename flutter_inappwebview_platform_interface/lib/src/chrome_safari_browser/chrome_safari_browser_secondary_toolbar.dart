@@ -3,6 +3,7 @@ import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_i
 import '../types/android_resource.dart';
 import '../web_uri.dart';
 import 'platform_chrome_safari_browser.dart';
+import '../types/enum_method.dart';
 
 part 'chrome_safari_browser_secondary_toolbar.g.dart';
 

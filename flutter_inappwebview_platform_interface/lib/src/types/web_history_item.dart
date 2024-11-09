@@ -2,6 +2,7 @@ import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_i
 
 import '../web_uri.dart';
 import 'web_history.dart';
+import 'enum_method.dart';
 
 part 'web_history_item.g.dart';
 

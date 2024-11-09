@@ -67,7 +67,7 @@ class WindowsWebMessagePort extends PlatformWebMessagePort {
   }
 
   @override
-  Map<String, dynamic> toMap() {
+  Map<String, dynamic> toMap({EnumMethod? enumMethod}) {
     return {
       "index": params.index,
       "webMessageChannelId": this._webMessageChannel.params.id

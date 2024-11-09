@@ -33,7 +33,8 @@ class JsConfirmRequest {
   }
 
   ///Gets a possible [JsConfirmRequest] instance from a [Map] value.
-  static JsConfirmRequest? fromMap(Map<String, dynamic>? map) {
+  static JsConfirmRequest? fromMap(Map<String, dynamic>? map,
+      {EnumMethod? enumMethod}) {
     if (map == null) {
       return null;
     }
@@ -47,7 +48,7 @@ class JsConfirmRequest {
   }
 
   ///Converts instance to a map.
-  Map<String, dynamic> toMap() {
+  Map<String, dynamic> toMap({EnumMethod? enumMethod}) {
     return {
       "isMainFrame": isMainFrame,
       "message": message,

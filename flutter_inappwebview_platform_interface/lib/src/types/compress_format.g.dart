@@ -100,11 +100,57 @@ class CompressFormat {
     return null;
   }
 
+  /// Gets a possible [CompressFormat] instance value with name [name].
+  ///
+  /// Goes through [CompressFormat.values] looking for a value with
+  /// name [name], as reported by [CompressFormat.name].
+  /// Returns the first value with the given name, otherwise `null`.
+  static CompressFormat? byName(String? name) {
+    if (name != null) {
+      try {
+        return CompressFormat.values
+            .firstWhere((element) => element.name() == name);
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
+  }
+
+  /// Creates a map from the names of [CompressFormat] values to the values.
+  ///
+  /// The collection that this method is called on is expected to have
+  /// values with distinct names, like the `values` list of an enum class.
+  /// Only one value for each name can occur in the created map,
+  /// so if two or more values have the same name (either being the
+  /// same value, or being values of different enum type), at most one of
+  /// them will be represented in the returned map.
+  static Map<String, CompressFormat> asNameMap() => <String, CompressFormat>{
+        for (final value in CompressFormat.values) value.name(): value
+      };
+
   ///Gets [String] value.
   String toValue() => _value;
 
   ///Gets [String] native value.
   String toNativeValue() => _nativeValue;
+
+  ///Gets the name of the value.
+  String name() {
+    switch (_value) {
+      case 'JPEG':
+        return 'JPEG';
+      case 'PNG':
+        return 'PNG';
+      case 'WEBP':
+        return 'WEBP';
+      case 'WEBP_LOSSLESS':
+        return 'WEBP_LOSSLESS';
+      case 'WEBP_LOSSY':
+        return 'WEBP_LOSSY';
+    }
+    return _value.toString();
+  }
 
   @override
   int get hashCode => _value.hashCode;

@@ -2153,6 +2153,17 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
         'removeDevToolsProtocolEventListener is not implemented on the current platform');
   }
 
+  ///{@template flutter_inappwebview_platform_interface.PlatformInAppWebViewController.isInterfaceSupported}
+  ///Returns `true` if the WebView supports the specified [interface], otherwise `false`.
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Windows
+  ///{@endtemplate}
+  Future<bool> isInterfaceSupported(WebViewInterface interface) async {
+    throw UnimplementedError(
+        'isInterfaceSupported is not implemented on the current platform');
+  }
+
   ///{@template flutter_inappwebview_platform_interface.PlatformInAppWebViewController.getIFrameId}
   ///Returns the iframe `id` attribute used on the Web platform.
   ///

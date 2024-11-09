@@ -204,13 +204,13 @@ class ExchangeableEnumGenerator
     }
 
     if (annotation.read("fromValueMethod").boolValue && (!visitor.methods.containsKey("fromValue") ||
-        Util.methodHasIgnore(visitor.methods['fromNativeValue']!))) {
+        Util.methodHasIgnore(visitor.methods['fromValue']!))) {
       final hasBitwiseOrOperator =
           annotation.read("bitwiseOrOperator").boolValue;
       classBuffer.writeln("""
       ///Gets a possible [$extClassName] instance from [${enumValue.type}] value.
       static $extClassName? fromValue(${enumValue.type}${!Util.typeIsNullable(enumValue.type) ? '?' : ''} value) {
-          if (value != null) {
+        if (value != null) {
           try {
             return $extClassName.values
                 .firstWhere((element) => element.toValue() == value);
@@ -230,7 +230,7 @@ class ExchangeableEnumGenerator
       classBuffer.writeln("""
       ///Gets a possible [$extClassName] instance from a native value.
       static $extClassName? fromNativeValue(${enumNativeValue.type}${!Util.typeIsNullable(enumNativeValue.type) ? '?' : ''} value) {
-          if (value != null) {
+        if (value != null) {
           try {
             return $extClassName.values
                 .firstWhere((element) => element.toNativeValue() == value);
@@ -240,6 +240,44 @@ class ExchangeableEnumGenerator
         }
         return null;
       }
+      """);
+    }
+
+    if (annotation.read("nameMethod").boolValue && annotation.read("byNameMethod").boolValue &&
+        (!visitor.methods.containsKey("byName") || Util.methodHasIgnore(visitor.methods['byName']!))) {
+      classBuffer.writeln("""
+      /// Gets a possible [$extClassName] instance value with name [name].
+      ///
+      /// Goes through [$extClassName.values] looking for a value with
+      /// name [name], as reported by [$extClassName.name].
+      /// Returns the first value with the given name, otherwise `null`.
+      static $extClassName? byName(String? name) {
+        if (name != null) {
+          try {
+            return $extClassName.values
+                .firstWhere((element) => element.name() == name);
+          } catch (e) {
+            return null;
+          }
+        }
+        return null;
+      }
+      """);
+    }
+
+    if (annotation.read("nameMethod").boolValue && annotation.read("asNameMapMethod").boolValue &&
+        (!visitor.methods.containsKey("asNameMap") || Util.methodHasIgnore(visitor.methods['asNameMap']!))) {
+      classBuffer.writeln("""
+      /// Creates a map from the names of [$extClassName] values to the values.
+      ///
+      /// The collection that this method is called on is expected to have
+      /// values with distinct names, like the `values` list of an enum class.
+      /// Only one value for each name can occur in the created map,
+      /// so if two or more values have the same name (either being the
+      /// same value, or being values of different enum type), at most one of
+      /// them will be represented in the returned map.
+      static Map<String, $extClassName> asNameMap() =>
+          <String, $extClassName>{for (final value in $extClassName.values) value.name(): value};
       """);
     }
 
@@ -282,6 +320,28 @@ class ExchangeableEnumGenerator
       """);
     }
 
+    if (annotation.read("nameMethod").boolValue && (!visitor.methods.containsKey("name") ||
+        Util.methodHasIgnore(visitor.methods['name']!))) {
+      classBuffer.writeln('///Gets the name of the value.');
+      classBuffer.writeln('String name() {');
+      classBuffer.writeln('switch(_value) {');
+      for (final entry in fieldEntriesSorted) {
+        final fieldName = entry.key;
+        final fieldElement = entry.value;
+        if (!fieldElement.isPrivate && fieldElement.isStatic) {
+          final fieldValue = fieldElement.computeConstantValue()?.getField("_value");
+          dynamic constantValue = fieldValue?.toIntValue();
+          if (enumValue.type.isDartCoreString) {
+            constantValue = "'${fieldValue?.toStringValue()}'";
+          }
+          classBuffer.writeln("case $constantValue: return '$fieldName';");
+        }
+      }
+      classBuffer.writeln('}');
+      classBuffer.writeln('return _value.toString();');
+      classBuffer.writeln('}');
+    }
+
     if (annotation.read("hashCodeMethod").boolValue && (!visitor.fields.containsKey("hashCode") ||
         Util.methodHasIgnore(visitor.methods['hashCode']!))) {
       classBuffer.writeln("""
@@ -315,19 +375,23 @@ class ExchangeableEnumGenerator
       if (enumValue.type.isDartCoreString) {
         classBuffer.writeln('return _value;');
       } else {
-        classBuffer.writeln('switch(_value) {');
-        for (final entry in fieldEntriesSorted) {
-          final fieldName = entry.key;
-          final fieldElement = entry.value;
-          if (!fieldElement.isPrivate && fieldElement.isStatic) {
-            final fieldValue =
-                fieldElement.computeConstantValue()?.getField("_value");
-            final constantValue = fieldValue?.toIntValue();
-            classBuffer.writeln("case $constantValue: return '$fieldName';");
+        if (annotation.read("nameMethod").boolValue) {
+          classBuffer.writeln('return name();');
+        } else {
+          classBuffer.writeln('switch(_value) {');
+          for (final entry in fieldEntriesSorted) {
+            final fieldName = entry.key;
+            final fieldElement = entry.value;
+            if (!fieldElement.isPrivate && fieldElement.isStatic) {
+              final fieldValue =
+              fieldElement.computeConstantValue()?.getField("_value");
+              final constantValue = fieldValue?.toIntValue();
+              classBuffer.writeln("case $constantValue: return '$fieldName';");
+            }
           }
+          classBuffer.writeln('}');
+          classBuffer.writeln('return _value.toString();');
         }
-        classBuffer.writeln('}');
-        classBuffer.writeln('return _value.toString();');
       }
       classBuffer.writeln('}');
     }

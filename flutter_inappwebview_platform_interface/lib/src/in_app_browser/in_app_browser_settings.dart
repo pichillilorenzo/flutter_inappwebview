@@ -17,6 +17,7 @@ import '../in_app_webview/android/in_app_webview_options.dart';
 
 import 'apple/in_app_browser_options.dart';
 import '../in_app_webview/apple/in_app_webview_options.dart';
+import '../types/enum_method.dart';
 
 part 'in_app_browser_settings.g.dart';
 
@@ -53,14 +54,14 @@ class InAppBrowserClassSettings {
   }
 
   factory InAppBrowserClassSettings.fromMap(Map<String, dynamic> options,
-      {InAppBrowserClassSettings? instance}) {
+      {InAppBrowserClassSettings? instance, EnumMethod? enumMethod}) {
     if (instance == null) {
       instance = InAppBrowserClassSettings();
     }
     instance.browserSettings =
-        InAppBrowserSettings.fromMap(options) ?? InAppBrowserSettings();
+        InAppBrowserSettings.fromMap(options, enumMethod: enumMethod) ?? InAppBrowserSettings();
     instance.webViewSettings =
-        InAppWebViewSettings.fromMap(options) ?? InAppWebViewSettings();
+        InAppWebViewSettings.fromMap(options, enumMethod: enumMethod) ?? InAppWebViewSettings();
     return instance;
   }
 
@@ -329,7 +330,8 @@ class InAppBrowserClassOptions {
     return toMap().toString();
   }
 
-  static InAppBrowserClassOptions fromMap(Map<String, dynamic> options) {
+  static InAppBrowserClassOptions fromMap(Map<String, dynamic> options,
+      {EnumMethod? enumMethod}) {
     InAppBrowserClassOptions inAppBrowserClassOptions =
         InAppBrowserClassOptions();
 

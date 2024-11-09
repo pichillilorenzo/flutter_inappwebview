@@ -23,7 +23,8 @@ class SslCertificateDName {
       {this.CName = "", this.DName = "", this.OName = "", this.UName = ""});
 
   ///Gets a possible [SslCertificateDName] instance from a [Map] value.
-  static SslCertificateDName? fromMap(Map<String, dynamic>? map) {
+  static SslCertificateDName? fromMap(Map<String, dynamic>? map,
+      {EnumMethod? enumMethod}) {
     if (map == null) {
       return null;
     }
@@ -36,7 +37,7 @@ class SslCertificateDName {
   }
 
   ///Converts instance to a map.
-  Map<String, dynamic> toMap() {
+  Map<String, dynamic> toMap({EnumMethod? enumMethod}) {
     return {
       "CName": CName,
       "DName": DName,

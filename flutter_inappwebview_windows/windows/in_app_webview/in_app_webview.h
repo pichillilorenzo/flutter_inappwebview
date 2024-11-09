@@ -178,6 +178,7 @@ namespace flutter_inappwebview_plugin
     void resume() const;
     void getCertificate(const std::function<void(const std::optional<std::unique_ptr<SslCertificate>>)> completionHandler) const;
     void clearSslPreferences(const std::function<void()> completionHandler) const;
+    bool isInterfaceSupported(const std::string& interfaceName) const;
 
     std::string pageFrameId() const
     {

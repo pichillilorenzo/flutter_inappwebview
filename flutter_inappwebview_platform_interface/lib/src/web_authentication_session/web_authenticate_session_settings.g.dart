@@ -31,7 +31,8 @@ class WebAuthenticationSessionSettings {
       {this.prefersEphemeralWebBrowserSession = false});
 
   ///Gets a possible [WebAuthenticationSessionSettings] instance from a [Map] value.
-  static WebAuthenticationSessionSettings? fromMap(Map<String, dynamic>? map) {
+  static WebAuthenticationSessionSettings? fromMap(Map<String, dynamic>? map,
+      {EnumMethod? enumMethod}) {
     if (map == null) {
       return null;
     }

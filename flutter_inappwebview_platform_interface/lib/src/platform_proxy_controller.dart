@@ -5,6 +5,7 @@ import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 import 'inappwebview_platform.dart';
 import 'types/proxy_rule.dart';
 import 'platform_webview_feature.dart';
+import 'types/enum_method.dart';
 
 part 'platform_proxy_controller.g.dart';
 

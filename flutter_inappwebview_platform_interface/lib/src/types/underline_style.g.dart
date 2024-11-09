@@ -82,20 +82,43 @@ class UnderlineStyle {
     return null;
   }
 
+  /// Gets a possible [UnderlineStyle] instance value with name [name].
+  ///
+  /// Goes through [UnderlineStyle.values] looking for a value with
+  /// name [name], as reported by [UnderlineStyle.name].
+  /// Returns the first value with the given name, otherwise `null`.
+  static UnderlineStyle? byName(String? name) {
+    if (name != null) {
+      try {
+        return UnderlineStyle.values
+            .firstWhere((element) => element.name() == name);
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
+  }
+
+  /// Creates a map from the names of [UnderlineStyle] values to the values.
+  ///
+  /// The collection that this method is called on is expected to have
+  /// values with distinct names, like the `values` list of an enum class.
+  /// Only one value for each name can occur in the created map,
+  /// so if two or more values have the same name (either being the
+  /// same value, or being values of different enum type), at most one of
+  /// them will be represented in the returned map.
+  static Map<String, UnderlineStyle> asNameMap() => <String, UnderlineStyle>{
+        for (final value in UnderlineStyle.values) value.name(): value
+      };
+
   ///Gets [int] value.
   int toValue() => _value;
 
   ///Gets [int] native value.
   int toNativeValue() => _nativeValue;
 
-  @override
-  int get hashCode => _value.hashCode;
-
-  @override
-  bool operator ==(value) => value == _value;
-
-  @override
-  String toString() {
+  ///Gets the name of the value.
+  String name() {
     switch (_value) {
       case 32768:
         return 'BY_WORD';
@@ -117,6 +140,17 @@ class UnderlineStyle {
         return 'THICK';
     }
     return _value.toString();
+  }
+
+  @override
+  int get hashCode => _value.hashCode;
+
+  @override
+  bool operator ==(value) => value == _value;
+
+  @override
+  String toString() {
+    return name();
   }
 }
 
@@ -198,20 +232,44 @@ class IOSNSUnderlineStyle {
     return null;
   }
 
+  /// Gets a possible [IOSNSUnderlineStyle] instance value with name [name].
+  ///
+  /// Goes through [IOSNSUnderlineStyle.values] looking for a value with
+  /// name [name], as reported by [IOSNSUnderlineStyle.name].
+  /// Returns the first value with the given name, otherwise `null`.
+  static IOSNSUnderlineStyle? byName(String? name) {
+    if (name != null) {
+      try {
+        return IOSNSUnderlineStyle.values
+            .firstWhere((element) => element.name() == name);
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
+  }
+
+  /// Creates a map from the names of [IOSNSUnderlineStyle] values to the values.
+  ///
+  /// The collection that this method is called on is expected to have
+  /// values with distinct names, like the `values` list of an enum class.
+  /// Only one value for each name can occur in the created map,
+  /// so if two or more values have the same name (either being the
+  /// same value, or being values of different enum type), at most one of
+  /// them will be represented in the returned map.
+  static Map<String, IOSNSUnderlineStyle> asNameMap() =>
+      <String, IOSNSUnderlineStyle>{
+        for (final value in IOSNSUnderlineStyle.values) value.name(): value
+      };
+
   ///Gets [int] value.
   int toValue() => _value;
 
   ///Gets [int] native value.
   int toNativeValue() => _nativeValue;
 
-  @override
-  int get hashCode => _value.hashCode;
-
-  @override
-  bool operator ==(value) => value == _value;
-
-  @override
-  String toString() {
+  ///Gets the name of the value.
+  String name() {
     switch (_value) {
       case 32768:
         return 'BY_WORD';
@@ -233,5 +291,16 @@ class IOSNSUnderlineStyle {
         return 'THICK';
     }
     return _value.toString();
+  }
+
+  @override
+  int get hashCode => _value.hashCode;
+
+  @override
+  bool operator ==(value) => value == _value;
+
+  @override
+  String toString() {
+    return name();
   }
 }

@@ -19,7 +19,8 @@ class JavaScriptHandlerFunctionData {
       required this.requestUrl});
 
   ///Gets a possible [JavaScriptHandlerFunctionData] instance from a [Map] value.
-  static JavaScriptHandlerFunctionData? fromMap(Map<String, dynamic>? map) {
+  static JavaScriptHandlerFunctionData? fromMap(Map<String, dynamic>? map,
+      {EnumMethod? enumMethod}) {
     if (map == null) {
       return null;
     }
@@ -35,7 +36,7 @@ class JavaScriptHandlerFunctionData {
   }
 
   ///Converts instance to a map.
-  Map<String, dynamic> toMap() {
+  Map<String, dynamic> toMap({EnumMethod? enumMethod}) {
     return {
       "args": args,
       "isMainFrame": isMainFrame,

@@ -63,11 +63,53 @@ class LayoutAlgorithm {
     return null;
   }
 
+  /// Gets a possible [LayoutAlgorithm] instance value with name [name].
+  ///
+  /// Goes through [LayoutAlgorithm.values] looking for a value with
+  /// name [name], as reported by [LayoutAlgorithm.name].
+  /// Returns the first value with the given name, otherwise `null`.
+  static LayoutAlgorithm? byName(String? name) {
+    if (name != null) {
+      try {
+        return LayoutAlgorithm.values
+            .firstWhere((element) => element.name() == name);
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
+  }
+
+  /// Creates a map from the names of [LayoutAlgorithm] values to the values.
+  ///
+  /// The collection that this method is called on is expected to have
+  /// values with distinct names, like the `values` list of an enum class.
+  /// Only one value for each name can occur in the created map,
+  /// so if two or more values have the same name (either being the
+  /// same value, or being values of different enum type), at most one of
+  /// them will be represented in the returned map.
+  static Map<String, LayoutAlgorithm> asNameMap() => <String, LayoutAlgorithm>{
+        for (final value in LayoutAlgorithm.values) value.name(): value
+      };
+
   ///Gets [String] value.
   String toValue() => _value;
 
   ///Gets [String] native value.
   String toNativeValue() => _nativeValue;
+
+  ///Gets the name of the value.
+  String name() {
+    switch (_value) {
+      case 'NARROW_COLUMNS':
+        return 'NARROW_COLUMNS';
+      case 'NORMAL':
+        return 'NORMAL';
+      case 'TEXT_AUTOSIZING':
+        return 'TEXT_AUTOSIZING';
+    }
+    return _value.toString();
+  }
 
   @override
   int get hashCode => _value.hashCode;
@@ -140,11 +182,54 @@ class AndroidLayoutAlgorithm {
     return null;
   }
 
+  /// Gets a possible [AndroidLayoutAlgorithm] instance value with name [name].
+  ///
+  /// Goes through [AndroidLayoutAlgorithm.values] looking for a value with
+  /// name [name], as reported by [AndroidLayoutAlgorithm.name].
+  /// Returns the first value with the given name, otherwise `null`.
+  static AndroidLayoutAlgorithm? byName(String? name) {
+    if (name != null) {
+      try {
+        return AndroidLayoutAlgorithm.values
+            .firstWhere((element) => element.name() == name);
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
+  }
+
+  /// Creates a map from the names of [AndroidLayoutAlgorithm] values to the values.
+  ///
+  /// The collection that this method is called on is expected to have
+  /// values with distinct names, like the `values` list of an enum class.
+  /// Only one value for each name can occur in the created map,
+  /// so if two or more values have the same name (either being the
+  /// same value, or being values of different enum type), at most one of
+  /// them will be represented in the returned map.
+  static Map<String, AndroidLayoutAlgorithm> asNameMap() =>
+      <String, AndroidLayoutAlgorithm>{
+        for (final value in AndroidLayoutAlgorithm.values) value.name(): value
+      };
+
   ///Gets [String] value.
   String toValue() => _value;
 
   ///Gets [String] native value.
   String toNativeValue() => _nativeValue;
+
+  ///Gets the name of the value.
+  String name() {
+    switch (_value) {
+      case 'NARROW_COLUMNS':
+        return 'NARROW_COLUMNS';
+      case 'NORMAL':
+        return 'NORMAL';
+      case 'TEXT_AUTOSIZING':
+        return 'TEXT_AUTOSIZING';
+    }
+    return _value.toString();
+  }
 
   @override
   int get hashCode => _value.hashCode;

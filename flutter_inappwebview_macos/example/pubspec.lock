@@ -78,11 +78,10 @@ packages:
   flutter_inappwebview_internal_annotations:
     dependency: transitive
     description:
-      name: flutter_inappwebview_internal_annotations
-      sha256: "5f80fd30e208ddded7dbbcd0d569e7995f9f63d45ea3f548d8dd4c0b473fb4c8"
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.1.1"
+      path: "../../dev_packages/flutter_inappwebview_internal_annotations"
+      relative: true
+    source: path
+    version: "1.2.0"
   flutter_inappwebview_macos:
     dependency: "direct main"
     description:
@@ -93,11 +92,10 @@ packages:
   flutter_inappwebview_platform_interface:
     dependency: transitive
     description:
-      name: flutter_inappwebview_platform_interface
-      sha256: a83de41eabef0853e567aff32891bf43fb42ab7af7f065ee551d7384e192fe93
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.4.0-beta.1"
+      path: "../../flutter_inappwebview_platform_interface"
+      relative: true
+    source: path
+    version: "1.4.0-beta.2"
   flutter_lints:
     dependency: "direct dev"
     description:

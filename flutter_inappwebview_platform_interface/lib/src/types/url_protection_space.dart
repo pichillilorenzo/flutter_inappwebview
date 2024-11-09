@@ -1,5 +1,4 @@
 import 'dart:typed_data';
-
 import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_internal_annotations.dart';
 
 import '../x509_certificate/x509_certificate.dart';
@@ -7,10 +6,12 @@ import 'url_protection_space_proxy_type.dart';
 import 'url_protection_space_authentication_method.dart';
 import 'ssl_error.dart';
 import 'ssl_certificate.dart';
+import 'enum_method.dart';
 
 part 'url_protection_space.g.dart';
 
-List<X509Certificate>? _distinguishedNamesDeserializer(dynamic value) {
+List<X509Certificate>? _distinguishedNamesDeserializer(dynamic value,
+    {EnumMethod? enumMethod}) {
   List<X509Certificate>? distinguishedNames;
   if (value != null) {
     distinguishedNames = <X509Certificate>[];

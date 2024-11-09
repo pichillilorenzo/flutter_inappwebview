@@ -16,21 +16,31 @@ class ProxyRule {
   ProxyRule({this.schemeFilter, required this.url});
 
   ///Gets a possible [ProxyRule] instance from a [Map] value.
-  static ProxyRule? fromMap(Map<String, dynamic>? map) {
+  static ProxyRule? fromMap(Map<String, dynamic>? map,
+      {EnumMethod? enumMethod}) {
     if (map == null) {
       return null;
     }
     final instance = ProxyRule(
-      schemeFilter: ProxySchemeFilter.fromNativeValue(map['schemeFilter']),
+      schemeFilter: switch (enumMethod ?? EnumMethod.nativeValue) {
+        EnumMethod.nativeValue =>
+          ProxySchemeFilter.fromNativeValue(map['schemeFilter']),
+        EnumMethod.value => ProxySchemeFilter.fromValue(map['schemeFilter']),
+        EnumMethod.name => ProxySchemeFilter.byName(map['schemeFilter'])
+      },
       url: map['url'],
     );
     return instance;
   }
 
   ///Converts instance to a map.
-  Map<String, dynamic> toMap() {
+  Map<String, dynamic> toMap({EnumMethod? enumMethod}) {
     return {
-      "schemeFilter": schemeFilter?.toNativeValue(),
+      "schemeFilter": switch (enumMethod ?? EnumMethod.nativeValue) {
+        EnumMethod.nativeValue => schemeFilter?.toNativeValue(),
+        EnumMethod.value => schemeFilter?.toValue(),
+        EnumMethod.name => schemeFilter?.name()
+      },
       "url": url,
     };
   }

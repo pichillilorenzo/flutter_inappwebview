@@ -4,6 +4,7 @@ import 'url_authentication_challenge.dart';
 import 'url_protection_space.dart';
 import '../in_app_webview/platform_webview.dart';
 import '../types/ssl_certificate.dart';
+import 'enum_method.dart';
 
 part 'client_cert_challenge.g.dart';
 

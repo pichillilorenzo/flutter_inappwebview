@@ -92,11 +92,68 @@ class DataDetectorTypes {
     return null;
   }
 
+  /// Gets a possible [DataDetectorTypes] instance value with name [name].
+  ///
+  /// Goes through [DataDetectorTypes.values] looking for a value with
+  /// name [name], as reported by [DataDetectorTypes.name].
+  /// Returns the first value with the given name, otherwise `null`.
+  static DataDetectorTypes? byName(String? name) {
+    if (name != null) {
+      try {
+        return DataDetectorTypes.values
+            .firstWhere((element) => element.name() == name);
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
+  }
+
+  /// Creates a map from the names of [DataDetectorTypes] values to the values.
+  ///
+  /// The collection that this method is called on is expected to have
+  /// values with distinct names, like the `values` list of an enum class.
+  /// Only one value for each name can occur in the created map,
+  /// so if two or more values have the same name (either being the
+  /// same value, or being values of different enum type), at most one of
+  /// them will be represented in the returned map.
+  static Map<String, DataDetectorTypes> asNameMap() =>
+      <String, DataDetectorTypes>{
+        for (final value in DataDetectorTypes.values) value.name(): value
+      };
+
   ///Gets [String] value.
   String toValue() => _value;
 
   ///Gets [String] native value.
   String toNativeValue() => _nativeValue;
+
+  ///Gets the name of the value.
+  String name() {
+    switch (_value) {
+      case 'ADDRESS':
+        return 'ADDRESS';
+      case 'ALL':
+        return 'ALL';
+      case 'CALENDAR_EVENT':
+        return 'CALENDAR_EVENT';
+      case 'FLIGHT_NUMBER':
+        return 'FLIGHT_NUMBER';
+      case 'LINK':
+        return 'LINK';
+      case 'LOOKUP_SUGGESTION':
+        return 'LOOKUP_SUGGESTION';
+      case 'NONE':
+        return 'NONE';
+      case 'PHONE_NUMBER':
+        return 'PHONE_NUMBER';
+      case 'SPOTLIGHT_SUGGESTION':
+        return 'SPOTLIGHT_SUGGESTION';
+      case 'TRACKING_NUMBER':
+        return 'TRACKING_NUMBER';
+    }
+    return _value.toString();
+  }
 
   @override
   int get hashCode => _value.hashCode;
@@ -201,11 +258,68 @@ class IOSWKDataDetectorTypes {
     return null;
   }
 
+  /// Gets a possible [IOSWKDataDetectorTypes] instance value with name [name].
+  ///
+  /// Goes through [IOSWKDataDetectorTypes.values] looking for a value with
+  /// name [name], as reported by [IOSWKDataDetectorTypes.name].
+  /// Returns the first value with the given name, otherwise `null`.
+  static IOSWKDataDetectorTypes? byName(String? name) {
+    if (name != null) {
+      try {
+        return IOSWKDataDetectorTypes.values
+            .firstWhere((element) => element.name() == name);
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
+  }
+
+  /// Creates a map from the names of [IOSWKDataDetectorTypes] values to the values.
+  ///
+  /// The collection that this method is called on is expected to have
+  /// values with distinct names, like the `values` list of an enum class.
+  /// Only one value for each name can occur in the created map,
+  /// so if two or more values have the same name (either being the
+  /// same value, or being values of different enum type), at most one of
+  /// them will be represented in the returned map.
+  static Map<String, IOSWKDataDetectorTypes> asNameMap() =>
+      <String, IOSWKDataDetectorTypes>{
+        for (final value in IOSWKDataDetectorTypes.values) value.name(): value
+      };
+
   ///Gets [String] value.
   String toValue() => _value;
 
   ///Gets [String] native value.
   String toNativeValue() => _nativeValue;
+
+  ///Gets the name of the value.
+  String name() {
+    switch (_value) {
+      case 'ADDRESS':
+        return 'ADDRESS';
+      case 'ALL':
+        return 'ALL';
+      case 'CALENDAR_EVENT':
+        return 'CALENDAR_EVENT';
+      case 'FLIGHT_NUMBER':
+        return 'FLIGHT_NUMBER';
+      case 'LINK':
+        return 'LINK';
+      case 'LOOKUP_SUGGESTION':
+        return 'LOOKUP_SUGGESTION';
+      case 'NONE':
+        return 'NONE';
+      case 'PHONE_NUMBER':
+        return 'PHONE_NUMBER';
+      case 'SPOTLIGHT_SUGGESTION':
+        return 'SPOTLIGHT_SUGGESTION';
+      case 'TRACKING_NUMBER':
+        return 'TRACKING_NUMBER';
+    }
+    return _value.toString();
+  }
 
   @override
   int get hashCode => _value.hashCode;

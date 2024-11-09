@@ -82,11 +82,52 @@ class PrintJobColorMode {
     return null;
   }
 
+  /// Gets a possible [PrintJobColorMode] instance value with name [name].
+  ///
+  /// Goes through [PrintJobColorMode.values] looking for a value with
+  /// name [name], as reported by [PrintJobColorMode.name].
+  /// Returns the first value with the given name, otherwise `null`.
+  static PrintJobColorMode? byName(String? name) {
+    if (name != null) {
+      try {
+        return PrintJobColorMode.values
+            .firstWhere((element) => element.name() == name);
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
+  }
+
+  /// Creates a map from the names of [PrintJobColorMode] values to the values.
+  ///
+  /// The collection that this method is called on is expected to have
+  /// values with distinct names, like the `values` list of an enum class.
+  /// Only one value for each name can occur in the created map,
+  /// so if two or more values have the same name (either being the
+  /// same value, or being values of different enum type), at most one of
+  /// them will be represented in the returned map.
+  static Map<String, PrintJobColorMode> asNameMap() =>
+      <String, PrintJobColorMode>{
+        for (final value in PrintJobColorMode.values) value.name(): value
+      };
+
   ///Gets [int] value.
   int toValue() => _value;
 
   ///Gets [dynamic] native value.
   dynamic toNativeValue() => _nativeValue;
+
+  ///Gets the name of the value.
+  String name() {
+    switch (_value) {
+      case 2:
+        return 'COLOR';
+      case 1:
+        return 'MONOCHROME';
+    }
+    return _value.toString();
+  }
 
   @override
   int get hashCode => _value.hashCode;
@@ -96,12 +137,6 @@ class PrintJobColorMode {
 
   @override
   String toString() {
-    switch (_value) {
-      case 2:
-        return 'COLOR';
-      case 1:
-        return 'MONOCHROME';
-    }
-    return _value.toString();
+    return name();
   }
 }

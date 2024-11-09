@@ -158,11 +158,58 @@ class ContentBlockerActionType {
     return null;
   }
 
+  /// Gets a possible [ContentBlockerActionType] instance value with name [name].
+  ///
+  /// Goes through [ContentBlockerActionType.values] looking for a value with
+  /// name [name], as reported by [ContentBlockerActionType.name].
+  /// Returns the first value with the given name, otherwise `null`.
+  static ContentBlockerActionType? byName(String? name) {
+    if (name != null) {
+      try {
+        return ContentBlockerActionType.values
+            .firstWhere((element) => element.name() == name);
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
+  }
+
+  /// Creates a map from the names of [ContentBlockerActionType] values to the values.
+  ///
+  /// The collection that this method is called on is expected to have
+  /// values with distinct names, like the `values` list of an enum class.
+  /// Only one value for each name can occur in the created map,
+  /// so if two or more values have the same name (either being the
+  /// same value, or being values of different enum type), at most one of
+  /// them will be represented in the returned map.
+  static Map<String, ContentBlockerActionType> asNameMap() =>
+      <String, ContentBlockerActionType>{
+        for (final value in ContentBlockerActionType.values) value.name(): value
+      };
+
   ///Gets [String] value.
   String toValue() => _value;
 
   ///Gets [String] native value.
   String toNativeValue() => _nativeValue;
+
+  ///Gets the name of the value.
+  String name() {
+    switch (_value) {
+      case 'block':
+        return 'BLOCK';
+      case 'block-cookies':
+        return 'BLOCK_COOKIES';
+      case 'css-display-none':
+        return 'CSS_DISPLAY_NONE';
+      case 'ignore-previous-rules':
+        return 'IGNORE_PREVIOUS_RULES';
+      case 'make-https':
+        return 'MAKE_HTTPS';
+    }
+    return _value.toString();
+  }
 
   @override
   int get hashCode => _value.hashCode;

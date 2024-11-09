@@ -1,6 +1,7 @@
 import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_internal_annotations.dart';
 
 import '../web_uri.dart';
+import 'enum_method.dart';
 import 'fetch_request_action.dart';
 import 'fetch_request_credential.dart';
 import 'fetch_request_credential_default.dart';
@@ -10,16 +11,20 @@ import 'referrer_policy.dart';
 
 part 'fetch_request.g.dart';
 
-FetchRequestCredential? _fetchRequestCredentialDeserializer(dynamic value) {
+FetchRequestCredential? _fetchRequestCredentialDeserializer(dynamic value,
+    {EnumMethod? enumMethod}) {
   Map<String, dynamic>? credentialMap = value?.cast<String, dynamic>();
   FetchRequestCredential? credentials;
   if (credentialMap != null) {
     if (credentialMap["type"] == "default") {
-      credentials = FetchRequestCredentialDefault.fromMap(credentialMap);
+      credentials = FetchRequestCredentialDefault.fromMap(credentialMap,
+          enumMethod: enumMethod);
     } else if (credentialMap["type"] == "federated") {
-      credentials = FetchRequestFederatedCredential.fromMap(credentialMap);
+      credentials = FetchRequestFederatedCredential.fromMap(credentialMap,
+          enumMethod: enumMethod);
     } else if (credentialMap["type"] == "password") {
-      credentials = FetchRequestPasswordCredential.fromMap(credentialMap);
+      credentials = FetchRequestPasswordCredential.fromMap(credentialMap,
+          enumMethod: enumMethod);
     }
   }
   return credentials;

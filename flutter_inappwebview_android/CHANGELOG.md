@@ -1,6 +1,10 @@
+## 1.2.0-beta.2
+
+- Updated flutter_inappwebview_platform_interface version to ^1.4.0-beta.2
+
 ## 1.2.0-beta.1
 
-- Updated flutter_inappwebview_platform_interface version to ^1.4.0
+- Updated flutter_inappwebview_platform_interface version to ^1.4.0-beta.1
 - Added `InAppWebViewController.enableSlowWholeDocumentDraw` static method
 - Added `CookieManager.flush` method
 - Added support for `UserScript.forMainFrameOnly` parameter

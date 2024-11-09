@@ -38,14 +38,20 @@ class JsPromptResponse {
       this.value});
 
   ///Gets a possible [JsPromptResponse] instance from a [Map] value.
-  static JsPromptResponse? fromMap(Map<String, dynamic>? map) {
+  static JsPromptResponse? fromMap(Map<String, dynamic>? map,
+      {EnumMethod? enumMethod}) {
     if (map == null) {
       return null;
     }
     final instance = JsPromptResponse(
       value: map['value'],
     );
-    instance.action = JsPromptResponseAction.fromNativeValue(map['action']);
+    instance.action = switch (enumMethod ?? EnumMethod.nativeValue) {
+      EnumMethod.nativeValue =>
+        JsPromptResponseAction.fromNativeValue(map['action']),
+      EnumMethod.value => JsPromptResponseAction.fromValue(map['action']),
+      EnumMethod.name => JsPromptResponseAction.byName(map['action'])
+    };
     if (map['cancelButtonTitle'] != null) {
       instance.cancelButtonTitle = map['cancelButtonTitle'];
     }
@@ -65,9 +71,13 @@ class JsPromptResponse {
   }
 
   ///Converts instance to a map.
-  Map<String, dynamic> toMap() {
+  Map<String, dynamic> toMap({EnumMethod? enumMethod}) {
     return {
-      "action": action?.toNativeValue(),
+      "action": switch (enumMethod ?? EnumMethod.nativeValue) {
+        EnumMethod.nativeValue => action?.toNativeValue(),
+        EnumMethod.value => action?.toValue(),
+        EnumMethod.name => action?.name()
+      },
       "cancelButtonTitle": cancelButtonTitle,
       "confirmButtonTitle": confirmButtonTitle,
       "defaultValue": defaultValue,

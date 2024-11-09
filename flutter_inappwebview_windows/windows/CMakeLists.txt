@@ -5,7 +5,7 @@
 cmake_minimum_required(VERSION 3.14)
 
 set(WIL_VERSION "1.0.231216.1")
-set(WEBVIEW_VERSION "1.0.2792.45")
+set(WEBVIEW_VERSION "1.0.2849.39")
 set(NLOHMANN_JSON_VERSION "3.11.2")
 set(CPP_WINRT_VERSION "2.0.240405.15")
 
@@ -28,9 +28,9 @@ if(NOT NUGET)
   message(NOTICE "Nuget is not installed! The flutter_inappwebview_windows plugin requires it. Check https://inappwebview.dev/docs/intro#setup-windows")
 endif()
 
-add_custom_target(${PROJECT_NAME}_DEPENDENCIES_DOWNLOAD ALL)
+add_custom_target(${PROJECT_NAME}_DEPS ALL)
 add_custom_command(
-  TARGET ${PROJECT_NAME}_DEPENDENCIES_DOWNLOAD PRE_BUILD
+  TARGET ${PROJECT_NAME}_DEPS PRE_BUILD
   COMMAND ${NUGET} install Microsoft.Windows.ImplementationLibrary -Version ${WIL_VERSION} -ExcludeVersion -OutputDirectory ${CMAKE_BINARY_DIR}/packages
   COMMAND ${NUGET} install Microsoft.Windows.CppWinRT -Version ${CPP_WINRT_VERSION} -ExcludeVersion -OutputDirectory ${CMAKE_BINARY_DIR}/packages
   COMMAND ${NUGET} install Microsoft.Web.WebView2 -Version ${WEBVIEW_VERSION} -ExcludeVersion -OutputDirectory ${CMAKE_BINARY_DIR}/packages
@@ -176,6 +176,8 @@ list(APPEND PLUGIN_SOURCES
   "in_app_browser/in_app_browser_channel_delegate.h"
   "cookie_manager.cpp"
   "cookie_manager.h"
+  "platform_util.cpp"
+  "platform_util.h"
 )
 
 # Define the plugin library target. Its name must not be changed (see comment
@@ -217,10 +219,12 @@ endif()
 # IMPORTANT: The apply_standard_settings function is not used here because it
 # is causing the plugin to fail to compile because of the usage of /WX flag.
 # So, creating here a custom function to apply the standard settings without the /WX flag.
+# Also, added /bigobj flag.
 function(FLUTTER_INAPPWEBVIEW_WINDOWS_APPLY_STANDARD_SETTINGS TARGET)
   target_compile_features(${TARGET} PUBLIC cxx_std_17)
   target_compile_options(${TARGET} PRIVATE /W4 /wd"4100")
   target_compile_options(${TARGET} PRIVATE /EHsc)
+  target_compile_options(${TARGET} PRIVATE /bigobj)
   target_compile_definitions(${TARGET} PRIVATE "_HAS_EXCEPTIONS=0")
   target_compile_definitions(${TARGET} PRIVATE "$<$<CONFIG:Debug>:_DEBUG>")
 endfunction()

@@ -32,23 +32,40 @@ class SslError {
   }
 
   ///Gets a possible [SslError] instance from a [Map] value.
-  static SslError? fromMap(Map<String, dynamic>? map) {
+  static SslError? fromMap(Map<String, dynamic>? map,
+      {EnumMethod? enumMethod}) {
     if (map == null) {
       return null;
     }
     final instance = SslError(
-      androidError: AndroidSslError.fromNativeValue(map['code']),
-      code: SslErrorType.fromNativeValue(map['code']),
-      iosError: IOSSslError.fromNativeValue(map['code']),
+      androidError: switch (enumMethod ?? EnumMethod.nativeValue) {
+        EnumMethod.nativeValue => AndroidSslError.fromNativeValue(map['code']),
+        EnumMethod.value => AndroidSslError.fromValue(map['code']),
+        EnumMethod.name => AndroidSslError.byName(map['code'])
+      },
+      code: switch (enumMethod ?? EnumMethod.nativeValue) {
+        EnumMethod.nativeValue => SslErrorType.fromNativeValue(map['code']),
+        EnumMethod.value => SslErrorType.fromValue(map['code']),
+        EnumMethod.name => SslErrorType.byName(map['code'])
+      },
+      iosError: switch (enumMethod ?? EnumMethod.nativeValue) {
+        EnumMethod.nativeValue => IOSSslError.fromNativeValue(map['code']),
+        EnumMethod.value => IOSSslError.fromValue(map['code']),
+        EnumMethod.name => IOSSslError.byName(map['code'])
+      },
       message: map['message'],
     );
     return instance;
   }
 
   ///Converts instance to a map.
-  Map<String, dynamic> toMap() {
+  Map<String, dynamic> toMap({EnumMethod? enumMethod}) {
     return {
-      "code": code?.toNativeValue(),
+      "code": switch (enumMethod ?? EnumMethod.nativeValue) {
+        EnumMethod.nativeValue => code?.toNativeValue(),
+        EnumMethod.value => code?.toValue(),
+        EnumMethod.name => code?.name()
+      },
       "message": message,
     };
   }

@@ -1,5 +1,7 @@
 import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_internal_annotations.dart';
+
 import 'platform_web_authenticate_session.dart';
+import '../types/enum_method.dart';
 
 part 'web_authenticate_session_settings.g.dart';
 

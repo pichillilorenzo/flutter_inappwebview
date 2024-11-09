@@ -77,21 +77,27 @@ class ScreenshotConfiguration {
   }
 
   ///Gets a possible [ScreenshotConfiguration] instance from a [Map] value.
-  static ScreenshotConfiguration? fromMap(Map<String, dynamic>? map) {
+  static ScreenshotConfiguration? fromMap(Map<String, dynamic>? map,
+      {EnumMethod? enumMethod}) {
     if (map == null) {
       return null;
     }
     final instance = ScreenshotConfiguration(
       iosAfterScreenUpdates: map['afterScreenUpdates'],
-      rect: InAppWebViewRect.fromMap(map['rect']?.cast<String, dynamic>()),
+      rect: InAppWebViewRect.fromMap(map['rect']?.cast<String, dynamic>(),
+          enumMethod: enumMethod),
       snapshotWidth: map['snapshotWidth'],
     );
     if (map['afterScreenUpdates'] != null) {
       instance.afterScreenUpdates = map['afterScreenUpdates'];
     }
     if (map['compressFormat'] != null) {
-      instance.compressFormat =
-          CompressFormat.fromNativeValue(map['compressFormat'])!;
+      instance.compressFormat = switch (enumMethod ?? EnumMethod.nativeValue) {
+        EnumMethod.nativeValue =>
+          CompressFormat.fromNativeValue(map['compressFormat']),
+        EnumMethod.value => CompressFormat.fromValue(map['compressFormat']),
+        EnumMethod.name => CompressFormat.byName(map['compressFormat'])
+      }!;
     }
     if (map['quality'] != null) {
       instance.quality = map['quality'];
@@ -100,12 +106,16 @@ class ScreenshotConfiguration {
   }
 
   ///Converts instance to a map.
-  Map<String, dynamic> toMap() {
+  Map<String, dynamic> toMap({EnumMethod? enumMethod}) {
     return {
       "afterScreenUpdates": afterScreenUpdates,
-      "compressFormat": compressFormat.toNativeValue(),
+      "compressFormat": switch (enumMethod ?? EnumMethod.nativeValue) {
+        EnumMethod.nativeValue => compressFormat.toNativeValue(),
+        EnumMethod.value => compressFormat.toValue(),
+        EnumMethod.name => compressFormat.name()
+      },
       "quality": quality,
-      "rect": rect?.toMap(),
+      "rect": rect?.toMap(enumMethod: enumMethod),
       "snapshotWidth": snapshotWidth,
     };
   }

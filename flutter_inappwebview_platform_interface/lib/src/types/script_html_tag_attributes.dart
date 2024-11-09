@@ -3,6 +3,7 @@ import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_i
 import '../in_app_webview/platform_inappwebview_controller.dart';
 import 'cross_origin.dart';
 import 'referrer_policy.dart';
+import 'enum_method.dart';
 
 part 'script_html_tag_attributes.g.dart';
 

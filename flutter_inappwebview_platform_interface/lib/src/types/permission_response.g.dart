@@ -19,24 +19,45 @@ class PermissionResponse {
       {this.action = PermissionResponseAction.DENY, this.resources = const []});
 
   ///Gets a possible [PermissionResponse] instance from a [Map] value.
-  static PermissionResponse? fromMap(Map<String, dynamic>? map) {
+  static PermissionResponse? fromMap(Map<String, dynamic>? map,
+      {EnumMethod? enumMethod}) {
     if (map == null) {
       return null;
     }
     final instance = PermissionResponse();
-    instance.action = PermissionResponseAction.fromNativeValue(map['action']);
+    instance.action = switch (enumMethod ?? EnumMethod.nativeValue) {
+      EnumMethod.nativeValue =>
+        PermissionResponseAction.fromNativeValue(map['action']),
+      EnumMethod.value => PermissionResponseAction.fromValue(map['action']),
+      EnumMethod.name => PermissionResponseAction.byName(map['action'])
+    };
     if (map['resources'] != null) {
       instance.resources = List<PermissionResourceType>.from(map['resources']
-          .map((e) => PermissionResourceType.fromNativeValue(e)!));
+          .map((e) => switch (enumMethod ?? EnumMethod.nativeValue) {
+                EnumMethod.nativeValue =>
+                  PermissionResourceType.fromNativeValue(e),
+                EnumMethod.value => PermissionResourceType.fromValue(e),
+                EnumMethod.name => PermissionResourceType.byName(e)
+              }!));
     }
     return instance;
   }
 
   ///Converts instance to a map.
-  Map<String, dynamic> toMap() {
+  Map<String, dynamic> toMap({EnumMethod? enumMethod}) {
     return {
-      "action": action?.toNativeValue(),
-      "resources": resources.map((e) => e.toNativeValue()).toList(),
+      "action": switch (enumMethod ?? EnumMethod.nativeValue) {
+        EnumMethod.nativeValue => action?.toNativeValue(),
+        EnumMethod.value => action?.toValue(),
+        EnumMethod.name => action?.name()
+      },
+      "resources": resources
+          .map((e) => switch (enumMethod ?? EnumMethod.nativeValue) {
+                EnumMethod.nativeValue => e.toNativeValue(),
+                EnumMethod.value => e.toValue(),
+                EnumMethod.name => e.name()
+              })
+          .toList(),
     };
   }
 
@@ -65,13 +86,19 @@ class PermissionRequestResponse {
       this.resources = const []});
 
   ///Gets a possible [PermissionRequestResponse] instance from a [Map] value.
-  static PermissionRequestResponse? fromMap(Map<String, dynamic>? map) {
+  static PermissionRequestResponse? fromMap(Map<String, dynamic>? map,
+      {EnumMethod? enumMethod}) {
     if (map == null) {
       return null;
     }
     final instance = PermissionRequestResponse();
-    instance.action =
-        PermissionRequestResponseAction.fromNativeValue(map['action']);
+    instance.action = switch (enumMethod ?? EnumMethod.nativeValue) {
+      EnumMethod.nativeValue =>
+        PermissionRequestResponseAction.fromNativeValue(map['action']),
+      EnumMethod.value =>
+        PermissionRequestResponseAction.fromValue(map['action']),
+      EnumMethod.name => PermissionRequestResponseAction.byName(map['action'])
+    };
     if (map['resources'] != null) {
       instance.resources = List<String>.from(map['resources']!.cast<String>());
     }
@@ -79,9 +106,13 @@ class PermissionRequestResponse {
   }
 
   ///Converts instance to a map.
-  Map<String, dynamic> toMap() {
+  Map<String, dynamic> toMap({EnumMethod? enumMethod}) {
     return {
-      "action": action?.toNativeValue(),
+      "action": switch (enumMethod ?? EnumMethod.nativeValue) {
+        EnumMethod.nativeValue => action?.toNativeValue(),
+        EnumMethod.value => action?.toValue(),
+        EnumMethod.name => action?.name()
+      },
       "resources": resources,
     };
   }

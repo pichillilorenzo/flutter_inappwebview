@@ -3,6 +3,7 @@ import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_i
 
 import '../platform_webview_feature.dart';
 import 'platform_web_message_port.dart';
+import '../types/enum_method.dart';
 
 part 'web_message.g.dart';
 

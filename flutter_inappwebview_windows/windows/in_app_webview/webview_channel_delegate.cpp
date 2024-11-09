@@ -54,7 +54,7 @@ namespace flutter_inappwebview_plugin
   {
     decodeResult = [](const flutter::EncodableValue* value)
       {
-        return std::make_shared<PermissionResponse>(std::get<flutter::EncodableMap>(*value));
+        return value == nullptr || value->IsNull() ? std::optional<std::shared_ptr<PermissionResponse>>{} : std::make_shared<PermissionResponse>(std::get<flutter::EncodableMap>(*value));
       };
   }
 
@@ -299,6 +299,10 @@ namespace flutter_inappwebview_plugin
         {
           result_->Success();
         });
+    }
+    else if (string_equals(methodName, "isInterfaceSupported")) {
+      auto interfaceName = get_fl_map_value<std::string>(arguments, "interface");
+      result->Success(webView->isInterfaceSupported(interfaceName));
     }
     // for inAppBrowser
     else if (webView->inAppBrowser && string_equals(methodName, "show")) {

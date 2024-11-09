@@ -85,20 +85,45 @@ class URLRequestNetworkServiceType {
     return null;
   }
 
+  /// Gets a possible [URLRequestNetworkServiceType] instance value with name [name].
+  ///
+  /// Goes through [URLRequestNetworkServiceType.values] looking for a value with
+  /// name [name], as reported by [URLRequestNetworkServiceType.name].
+  /// Returns the first value with the given name, otherwise `null`.
+  static URLRequestNetworkServiceType? byName(String? name) {
+    if (name != null) {
+      try {
+        return URLRequestNetworkServiceType.values
+            .firstWhere((element) => element.name() == name);
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
+  }
+
+  /// Creates a map from the names of [URLRequestNetworkServiceType] values to the values.
+  ///
+  /// The collection that this method is called on is expected to have
+  /// values with distinct names, like the `values` list of an enum class.
+  /// Only one value for each name can occur in the created map,
+  /// so if two or more values have the same name (either being the
+  /// same value, or being values of different enum type), at most one of
+  /// them will be represented in the returned map.
+  static Map<String, URLRequestNetworkServiceType> asNameMap() =>
+      <String, URLRequestNetworkServiceType>{
+        for (final value in URLRequestNetworkServiceType.values)
+          value.name(): value
+      };
+
   ///Gets [int] value.
   int toValue() => _value;
 
   ///Gets [int] native value.
   int toNativeValue() => _nativeValue;
 
-  @override
-  int get hashCode => _value.hashCode;
-
-  @override
-  bool operator ==(value) => value == _value;
-
-  @override
-  String toString() {
+  ///Gets the name of the value.
+  String name() {
     switch (_value) {
       case 8:
         return 'AV_STREAMING';
@@ -118,6 +143,17 @@ class URLRequestNetworkServiceType {
         return 'VOICE';
     }
     return _value.toString();
+  }
+
+  @override
+  int get hashCode => _value.hashCode;
+
+  @override
+  bool operator ==(value) => value == _value;
+
+  @override
+  String toString() {
+    return name();
   }
 }
 
@@ -205,20 +241,45 @@ class IOSURLRequestNetworkServiceType {
     return null;
   }
 
+  /// Gets a possible [IOSURLRequestNetworkServiceType] instance value with name [name].
+  ///
+  /// Goes through [IOSURLRequestNetworkServiceType.values] looking for a value with
+  /// name [name], as reported by [IOSURLRequestNetworkServiceType.name].
+  /// Returns the first value with the given name, otherwise `null`.
+  static IOSURLRequestNetworkServiceType? byName(String? name) {
+    if (name != null) {
+      try {
+        return IOSURLRequestNetworkServiceType.values
+            .firstWhere((element) => element.name() == name);
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
+  }
+
+  /// Creates a map from the names of [IOSURLRequestNetworkServiceType] values to the values.
+  ///
+  /// The collection that this method is called on is expected to have
+  /// values with distinct names, like the `values` list of an enum class.
+  /// Only one value for each name can occur in the created map,
+  /// so if two or more values have the same name (either being the
+  /// same value, or being values of different enum type), at most one of
+  /// them will be represented in the returned map.
+  static Map<String, IOSURLRequestNetworkServiceType> asNameMap() =>
+      <String, IOSURLRequestNetworkServiceType>{
+        for (final value in IOSURLRequestNetworkServiceType.values)
+          value.name(): value
+      };
+
   ///Gets [int] value.
   int toValue() => _value;
 
   ///Gets [int] native value.
   int toNativeValue() => _nativeValue;
 
-  @override
-  int get hashCode => _value.hashCode;
-
-  @override
-  bool operator ==(value) => value == _value;
-
-  @override
-  String toString() {
+  ///Gets the name of the value.
+  String name() {
     switch (_value) {
       case 8:
         return 'AV_STREAMING';
@@ -238,5 +299,16 @@ class IOSURLRequestNetworkServiceType {
         return 'VOICE';
     }
     return _value.toString();
+  }
+
+  @override
+  int get hashCode => _value.hashCode;
+
+  @override
+  bool operator ==(value) => value == _value;
+
+  @override
+  String toString() {
+    return name();
   }
 }

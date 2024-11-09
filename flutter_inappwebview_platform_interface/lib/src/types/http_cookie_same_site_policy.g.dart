@@ -66,11 +66,54 @@ class HTTPCookieSameSitePolicy {
     return null;
   }
 
+  /// Gets a possible [HTTPCookieSameSitePolicy] instance value with name [name].
+  ///
+  /// Goes through [HTTPCookieSameSitePolicy.values] looking for a value with
+  /// name [name], as reported by [HTTPCookieSameSitePolicy.name].
+  /// Returns the first value with the given name, otherwise `null`.
+  static HTTPCookieSameSitePolicy? byName(String? name) {
+    if (name != null) {
+      try {
+        return HTTPCookieSameSitePolicy.values
+            .firstWhere((element) => element.name() == name);
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
+  }
+
+  /// Creates a map from the names of [HTTPCookieSameSitePolicy] values to the values.
+  ///
+  /// The collection that this method is called on is expected to have
+  /// values with distinct names, like the `values` list of an enum class.
+  /// Only one value for each name can occur in the created map,
+  /// so if two or more values have the same name (either being the
+  /// same value, or being values of different enum type), at most one of
+  /// them will be represented in the returned map.
+  static Map<String, HTTPCookieSameSitePolicy> asNameMap() =>
+      <String, HTTPCookieSameSitePolicy>{
+        for (final value in HTTPCookieSameSitePolicy.values) value.name(): value
+      };
+
   ///Gets [String] value.
   String toValue() => _value;
 
   ///Gets [String] native value.
   String toNativeValue() => _nativeValue;
+
+  ///Gets the name of the value.
+  String name() {
+    switch (_value) {
+      case 'Lax':
+        return 'LAX';
+      case 'None':
+        return 'NONE';
+      case 'Strict':
+        return 'STRICT';
+    }
+    return _value.toString();
+  }
 
   @override
   int get hashCode => _value.hashCode;

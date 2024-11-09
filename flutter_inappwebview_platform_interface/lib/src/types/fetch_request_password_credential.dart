@@ -2,6 +2,7 @@ import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_i
 
 import '../web_uri.dart';
 import 'fetch_request_credential.dart';
+import 'enum_method.dart';
 
 part 'fetch_request_password_credential.g.dart';
 

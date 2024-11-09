@@ -3,6 +3,7 @@ import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_i
 import 'url_protection_space.dart';
 import 'url_credential.dart';
 import '../platform_http_auth_credentials_database.dart';
+import 'enum_method.dart';
 
 part 'url_protection_space_http_auth_credentials.g.dart';
 

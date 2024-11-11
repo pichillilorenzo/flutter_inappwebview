@@ -2,6 +2,7 @@ import 'dart:collection';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -30,6 +31,7 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
   String url = "";
   double progress = 0;
   final urlController = TextEditingController();
+  bool inputDisabled = false;
 
   @override
   void initState() {
@@ -220,6 +222,27 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                   webViewController?.reload();
                 },
               ),
+              if (defaultTargetPlatform == TargetPlatform.android ||
+                  defaultTargetPlatform == TargetPlatform.iOS)
+                ElevatedButton(
+                  child: inputDisabled
+                      ? Icon(Icons.keyboard)
+                      : Icon(Icons.keyboard_hide),
+                  onPressed: () {
+                    if (inputDisabled) {
+                      webViewController
+                          ?.enableInputMethod()
+                          .then((_) => webViewController?.showInputMethod());
+                    } else {
+                      webViewController
+                          ?.disableInputMethod()
+                          .then((_) => webViewController?.hideInputMethod());
+                    }
+                    setState(() {
+                      inputDisabled = !inputDisabled;
+                    });
+                  },
+                ),
             ],
           ),
         ])));

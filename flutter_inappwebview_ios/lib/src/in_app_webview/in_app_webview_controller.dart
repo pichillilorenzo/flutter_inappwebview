@@ -6,12 +6,14 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
+
 import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_platform_interface.dart';
 
 import '../in_app_browser/in_app_browser.dart';
 import '../print_job/main.dart';
 import '../web_message/main.dart';
 import '../web_storage/web_storage.dart';
+
 import '_static_channel.dart';
 import 'headless_in_app_webview.dart';
 
@@ -2231,6 +2233,24 @@ class IOSInAppWebViewController extends PlatformInAppWebViewController
     Map<String, dynamic> args = <String, dynamic>{};
     return await channel?.invokeMethod('clearFocus', args);
   }
+
+  @override
+  Future<void> disableInputMethod() async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    return await channel?.invokeMethod('disableInputMethod', args);
+  }
+
+  @override
+  Future<void> enableInputMethod() async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    return await channel?.invokeMethod('enableInputMethod', args);
+  }
+
+  @override
+  Future<void> showInputMethod() async {}
+
+  @override
+  Future<void> hideInputMethod() async {}
 
   @override
   Future<bool?> requestFocus(

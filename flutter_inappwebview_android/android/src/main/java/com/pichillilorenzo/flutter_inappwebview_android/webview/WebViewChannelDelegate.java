@@ -695,6 +695,31 @@ public class WebViewChannelDelegate extends ChannelDelegateImpl {
           webView.clearFormData();
         }
         result.success(true);
+      case disableInputMethod:
+        if (webView != null) {
+          webView.disableInputMethod();
+        }
+        result.success(true);
+        break;
+      case enableInputMethod:
+        if (webView != null) {
+          webView.enableInputMethod();
+        }
+        result.success(true);
+        break;
+      case hideInputMethod:
+        if (webView != null) {
+          webView.hideInputMethod();
+        }
+        result.success(true);
+        break;
+      case showInputMethod:
+        if (webView != null) {
+          webView.showInputMethod();
+        }
+        result.success(true);
+        break;
+
     }
   }
 

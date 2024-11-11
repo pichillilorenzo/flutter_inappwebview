@@ -7,7 +7,9 @@ import android.animation.ObjectAnimator;
 import android.animation.PropertyValuesHolder;
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
+import android.app.Activity;
 import android.content.Context;
+import android.content.ContextWrapper;
 import android.content.pm.PackageInfo;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -37,6 +39,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
 import android.view.ViewTreeObserver;
+import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputConnection;
 import android.view.inputmethod.InputMethodManager;
@@ -2064,6 +2067,40 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
   @Override
   public InAppWebViewSettings getCustomSettings() {
     return customSettings;
+  }
+
+public void enableInputMethod() {
+    Activity activity = getActivity(getContext());
+    if(activity != null) {
+        activity.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
+                | WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM);
+    }
+  }
+
+  public void showInputMethod() {
+    hideInputMethod();
+    InputMethodManager imm = (InputMethodManager) getContext().getSystemService(INPUT_METHOD_SERVICE);
+    imm.showSoftInput(this, 0);
+  }
+
+  public void disableInputMethod() {
+    Activity activity = getActivity(getContext());
+    if(activity != null) {
+        activity.getWindow().setFlags(WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
+              WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM);
+    }
+  }
+
+  public void hideInputMethod() {
+      InputMethodManager imm = (InputMethodManager) getContext().getSystemService(INPUT_METHOD_SERVICE);
+      imm.hideSoftInputFromWindow(this.getWindowToken(), 0);
+  }
+
+  public static Activity getActivity(Context context) {
+    if (context == null) return null;
+    if (context instanceof Activity) return (Activity) context;
+    if (context instanceof ContextWrapper) return getActivity(((ContextWrapper)context).getBaseContext());
+    return null;
   }
 
   @Override

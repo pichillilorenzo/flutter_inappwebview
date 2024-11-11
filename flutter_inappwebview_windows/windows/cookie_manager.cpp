@@ -183,9 +183,8 @@ namespace flutter_inappwebview_plugin
     ICoreWebView2_2 *web_view2_2 = static_cast<ICoreWebView2_2 *>(webview2);
     ICoreWebView2CookieManager *m_cookieManager;
     web_view2_2->get_CookieManager(&m_cookieManager);
-    std::wstring urlW = std::wstring(url.begin(), url.end());
     auto hr = m_cookieManager->GetCookies(
-        urlW.c_str(),
+        nullptr,
         Callback<ICoreWebView2GetCookiesCompletedHandler>(
             [completionHandler, name](HRESULT errorCode, ICoreWebView2CookieList *cookieList)
             {
@@ -274,9 +273,8 @@ namespace flutter_inappwebview_plugin
     ICoreWebView2CookieManager *m_cookieManager;
     web_view2_2->get_CookieManager(&m_cookieManager);
     
-    std::wstring urlW = std::wstring(url.begin(), url.end());
     auto hr = m_cookieManager->GetCookies(
-        urlW.c_str(),
+        nullptr,
         Callback<ICoreWebView2GetCookiesCompletedHandler>(
             [completionHandler](HRESULT errorCode, ICoreWebView2CookieList *cookieList) {
                 UINT cookieCount;

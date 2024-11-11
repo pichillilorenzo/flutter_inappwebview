@@ -1,6 +1,7 @@
 ## 1.2.0-beta.2
 
 - Updated flutter_inappwebview_platform_interface version to ^1.4.0-beta.2
+- Implemented `setInputMethodEnabled`, `hideInputMethod` InAppWebViewController methods
 
 ## 1.2.0-beta.1
 

@@ -3380,6 +3380,22 @@ if(window.\(JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME())[\(_callHandlerID)] 
     public override var inputAccessoryView: UIView? {
         return settings?.disableInputAccessoryView ?? false ? nil : super.inputAccessoryView
     }
+
+    private var _inputMethodEnabled = true
+    public override var inputView: UIView? {
+        return _inputMethodEnabled ? super.inputView : UIView()
+    }
+    
+    public func setInputMethodEnabled(enabled: Bool) {
+        _inputMethodEnabled = enabled
+        for subview in self.scrollView.subviews {
+            subview.reloadInputViews()
+        }
+	}
+    
+    public func hideInputMethod() {
+        endEditing(true)
+    }
     
     public func runWindowBeforeCreatedCallbacks() {
         let callbacks = windowBeforeCreatedCallbacks

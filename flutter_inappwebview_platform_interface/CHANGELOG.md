@@ -5,7 +5,7 @@
 - Added `byName`, `name`, `asNameMap` custom enum classes methods
 - Added `statusBarEnabled`, `browserAcceleratorKeysEnabled`, `generalAutofillEnabled`, `passwordAutosaveEnabled`, `isPinchZoomEnabled`, `hiddenPdfToolbarItems`, `reputationCheckingRequired`, `nonClientRegionSupportEnabled` property to `InAppWebViewSettings`
 - Added `isInterfaceSupported` method to `PlatformWebViewEnvironment` class
-- Added `isInterfaceSupported` method to `PlatformInAppWebViewController` class
+- Added `isInterfaceSupported`, `setInputMethodEnabled`, `hideInputMethod`, `showInputMethod` methods to `PlatformInAppWebViewController` class
 
 ## 1.4.0-beta.1
 

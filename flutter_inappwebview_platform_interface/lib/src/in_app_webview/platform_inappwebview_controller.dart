@@ -6,27 +6,26 @@ import 'dart:ui';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
+
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 
 import '../context_menu/main.dart';
 import '../debug_logging_settings.dart';
+import '../find_interaction/platform_find_interaction_controller.dart';
+import '../in_app_browser/platform_in_app_browser.dart';
 import '../inappwebview_platform.dart';
+import '../platform_webview_feature.dart';
+import '../print_job/main.dart';
+import '../types/main.dart';
 import '../web_message/main.dart';
 import '../web_storage/platform_web_storage.dart';
 import '../web_uri.dart';
 
-import '../types/main.dart';
-import '../in_app_browser/platform_in_app_browser.dart';
-import 'platform_headless_in_app_webview.dart';
-import 'platform_inappwebview_widget.dart';
-import '../platform_webview_feature.dart';
-import '../find_interaction/platform_find_interaction_controller.dart';
-
-import 'platform_webview.dart';
 import 'in_app_webview_keep_alive.dart';
 import 'in_app_webview_settings.dart';
-
-import '../print_job/main.dart';
+import 'platform_headless_in_app_webview.dart';
+import 'platform_inappwebview_widget.dart';
+import 'platform_webview.dart';
 
 ///List of forbidden names for JavaScript handlers used internally bu the plugin.
 final kJavaScriptHandlerForbiddenNames = UnmodifiableListView<String>([
@@ -1106,6 +1105,41 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
     throw UnimplementedError(
         'clearFocus is not implemented on the current platform');
   }
+
+  ///{@template flutter_inappwebview_platform_interface.PlatformInAppWebViewController.setInputMethodEnabled}
+  ///Enables/Disables the input method (system-supplied keyboard) whilst interacting with the webview.
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- iOS ([Official API - UIResponder.inputView](https://developer.apple.com/documentation/uikit/uiresponder/1621092-inputview))
+  ///{@endtemplate}
+  Future<void> setInputMethodEnabled(bool enabled) {
+    throw UnimplementedError(
+        'setInputMethodEnabled is not implemented on the current platform');
+  }
+
+  ///{@template flutter_inappwebview_platform_interface.PlatformInAppWebViewController.showInputMethod}
+  ///Explicitly request that the current input method's soft input area be shown to the user, if needed.
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Android native WebView ([Official API - InputMethodManager.showSoftInput](https://developer.android.com/reference/android/view/inputmethod/InputMethodManager#showSoftInput(android.view.View,%20int)))
+  ///{@endtemplate}
+  Future<void> showInputMethod() {
+    throw UnimplementedError(
+        'showInputMethod is not implemented on the current platform');
+  }
+
+  ///{@template flutter_inappwebview_platform_interface.PlatformInAppWebViewController.hideInputMethod}
+  ///Request to hide the soft input view from the context of the view that is currently accepting input.
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Android native WebView ([Official API - InputMethodManager.hideSoftInputFromWindow](https://developer.android.com/reference/android/view/inputmethod/InputMethodManager#hideSoftInputFromWindow(android.os.IBinder,%20int)))
+  ///- iOS ([Official API - UIView.endEditing](https://developer.apple.com/documentation/uikit/uiview/1619630-endediting))
+  ///{@endtemplate}
+  Future<void> hideInputMethod() {
+    throw UnimplementedError(
+        'hideInputMethod is not implemented on the current platform');
+  }
+
 
   ///{@template flutter_inappwebview_platform_interface.PlatformInAppWebViewController.setContextMenu}
   ///Sets or updates the WebView context menu to be used next time it will appear.

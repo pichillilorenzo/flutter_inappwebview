@@ -6,12 +6,14 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
+
 import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_platform_interface.dart';
 
 import '../in_app_browser/in_app_browser.dart';
 import '../print_job/main.dart';
 import '../web_message/main.dart';
 import '../web_storage/web_storage.dart';
+
 import '_static_channel.dart';
 import 'headless_in_app_webview.dart';
 
@@ -2254,6 +2256,18 @@ class AndroidInAppWebViewController extends PlatformInAppWebViewController
   Future<void> clearFocus() async {
     Map<String, dynamic> args = <String, dynamic>{};
     return await channel?.invokeMethod('clearFocus', args);
+  }
+
+  @override
+  Future<void> showInputMethod() async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    return await channel?.invokeMethod('showInputMethod', args);
+  }
+
+  @override
+  Future<void> hideInputMethod() async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    return await channel?.invokeMethod('hideInputMethod', args);
   }
 
   @override

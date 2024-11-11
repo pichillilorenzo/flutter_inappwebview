@@ -18,6 +18,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.IBinder;
 import android.os.Looper;
 import android.os.Message;
 import android.print.PrintAttributes;
@@ -109,7 +110,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-import java.util.regex.Pattern;
 
 import io.flutter.plugin.common.MethodChannel;
 
@@ -2064,6 +2064,32 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
   @Override
   public InAppWebViewSettings getCustomSettings() {
     return customSettings;
+  }
+
+  @Override
+  public void showInputMethod() {
+    if (plugin == null || plugin.activity == null) {
+      return;
+    }
+    InputMethodManager imm = (InputMethodManager) plugin.activity.getSystemService(INPUT_METHOD_SERVICE);
+    if (imm != null) {
+      imm.showSoftInput(this, 0);
+    }
+  }
+
+  @Override
+  public void hideInputMethod() {
+    if (plugin == null || plugin.activity == null) {
+      return;
+    }
+    InputMethodManager imm = (InputMethodManager) plugin.activity.getSystemService(INPUT_METHOD_SERVICE);
+    if (imm != null) {
+      IBinder windowToken = getWindowToken();
+      if (!customSettings.useHybridComposition && containerView != null) {
+        windowToken = containerView.getWindowToken();
+      }
+      imm.hideSoftInputFromWindow(windowToken, 0);
+    }
   }
 
   @Override

@@ -2235,22 +2235,17 @@ class IOSInAppWebViewController extends PlatformInAppWebViewController
   }
 
   @override
-  Future<void> disableInputMethod() async {
+  Future<void> setInputMethodEnabled(bool enabled) async {
     Map<String, dynamic> args = <String, dynamic>{};
-    return await channel?.invokeMethod('disableInputMethod', args);
+    args.putIfAbsent("enabled", () => enabled);
+    return await channel?.invokeMethod('setInputMethodEnabled', args);
   }
 
   @override
-  Future<void> enableInputMethod() async {
+  Future<void> hideInputMethod() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    return await channel?.invokeMethod('enableInputMethod', args);
+    return await channel?.invokeMethod('hideInputMethod', args);
   }
-
-  @override
-  Future<void> showInputMethod() async {}
-
-  @override
-  Future<void> hideInputMethod() async {}
 
   @override
   Future<bool?> requestFocus(

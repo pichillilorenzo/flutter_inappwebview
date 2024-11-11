@@ -677,12 +677,20 @@ public class WebViewChannelDelegate: ChannelDelegate {
             } else {
                 result(false)
             }
-        case .disableInputMethod:
-			webView?.disableInputMethod()
-			result(true)
-		case .enableInputMethod:
-			webView?.enableInputMethod()
-			result(true)
+            break
+        case .setInputMethodEnabled:
+            if let webView = webView {
+                let enabled = arguments!["enabled"] as! Bool
+                webView.setInputMethodEnabled(enabled: enabled)
+            }
+            result(true)
+            break
+        case .hideInputMethod:
+            if let webView = webView {
+                webView.hideInputMethod()
+            }
+            result(true)
+            break
         }
     }
     

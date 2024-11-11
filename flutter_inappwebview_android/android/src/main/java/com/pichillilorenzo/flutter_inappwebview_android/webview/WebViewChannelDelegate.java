@@ -1,6 +1,5 @@
 package com.pichillilorenzo.flutter_inappwebview_android.webview;
 
-import android.graphics.Rect;
 import android.net.Uri;
 import android.os.Build;
 import android.webkit.ValueCallback;
@@ -695,29 +694,21 @@ public class WebViewChannelDelegate extends ChannelDelegateImpl {
           webView.clearFormData();
         }
         result.success(true);
-      case disableInputMethod:
-        if (webView != null) {
-          webView.disableInputMethod();
-        }
-        result.success(true);
-        break;
-      case enableInputMethod:
-        if (webView != null) {
-          webView.enableInputMethod();
-        }
-        result.success(true);
-        break;
       case hideInputMethod:
         if (webView != null) {
           webView.hideInputMethod();
+          result.success(true);
+        } else {
+          result.success(false);
         }
-        result.success(true);
         break;
       case showInputMethod:
         if (webView != null) {
           webView.showInputMethod();
+          result.success(true);
+        } else {
+          result.success(false);
         }
-        result.success(true);
         break;
 
     }

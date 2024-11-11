@@ -296,11 +296,8 @@ class InAppWebViewController {
   ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.clearFocus}
   Future<void> clearFocus() => platform.clearFocus();
 
-  ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.disableInputMethod}
-  Future<void> disableInputMethod() => platform.disableInputMethod();
-
-  ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.enableInputMethod}
-  Future<void> enableInputMethod() => platform.enableInputMethod();
+  ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.setInputMethodEnabled}
+  Future<void> setInputMethodEnabled(bool enabled) => platform.setInputMethodEnabled(enabled);
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.showInputMethod}
   Future<void> showInputMethod() => platform.showInputMethod();

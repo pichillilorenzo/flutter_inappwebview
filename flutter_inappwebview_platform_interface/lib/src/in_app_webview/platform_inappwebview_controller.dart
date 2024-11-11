@@ -1106,35 +1106,22 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
         'clearFocus is not implemented on the current platform');
   }
 
-  ///{@template flutter_inappwebview_platform_interface.PlatformInAppWebViewController.disableInputMethod}
-  /// Removes the current input method, effectively removing the keyboard whilst interacting with the webview.
+  ///{@template flutter_inappwebview_platform_interface.PlatformInAppWebViewController.setInputMethodEnabled}
+  ///Enables/Disables the input method (system-supplied keyboard) whilst interacting with the webview.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Android native WebView ([Official API - InputMethodManager](https://developer.android.com/reference/android/view/inputmethod/InputMethodManager))
-  ///- iOS ([Official API - WKWebView.inputMethod](https://trac.webkit.org/changeset/246229/webkit#file1))
+  ///- iOS ([Official API - UIResponder.inputView](https://developer.apple.com/documentation/uikit/uiresponder/1621092-inputview))
   ///{@endtemplate}
-  Future<void> disableInputMethod() {
+  Future<void> setInputMethodEnabled(bool enabled) {
     throw UnimplementedError(
-        'disableInputMethod is not implemented on the current platform');
-  }
-
-  ///{@template flutter_inappwebview_platform_interface.PlatformInAppWebViewController.enableInputMethod}
-  /// Adds the keyboard input method, effectively adding the keyboard whilst interacting with the webview.
-  ///
-  ///**Officially Supported Platforms/Implementations**:
-  ///- Android native WebView ([Official API - InputMethodManager](https://developer.android.com/reference/android/view/inputmethod/InputMethodManager))
-  ///- iOS ([Official API - WKWebView.inputMethod](https://trac.webkit.org/changeset/246229/webkit#file1))
-  ///{@endtemplate}
-  Future<void> enableInputMethod() {
-    throw UnimplementedError(
-        'enableInputMethod is not implemented on the current platform');
+        'setInputMethodEnabled is not implemented on the current platform');
   }
 
   ///{@template flutter_inappwebview_platform_interface.PlatformInAppWebViewController.showInputMethod}
-  /// Shows the input method.
+  ///Explicitly request that the current input method's soft input area be shown to the user, if needed.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Android native WebView ([Official API - InputMethodManager](https://developer.android.com/reference/android/view/inputmethod/InputMethodManager))
+  ///- Android native WebView ([Official API - InputMethodManager.showSoftInput](https://developer.android.com/reference/android/view/inputmethod/InputMethodManager#showSoftInput(android.view.View,%20int)))
   ///{@endtemplate}
   Future<void> showInputMethod() {
     throw UnimplementedError(
@@ -1142,10 +1129,11 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   }
 
   ///{@template flutter_inappwebview_platform_interface.PlatformInAppWebViewController.hideInputMethod}
-  /// Hides the input method.
+  ///Request to hide the soft input view from the context of the view that is currently accepting input.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Android native WebView ([Official API - InputMethodManager](https://developer.android.com/reference/android/view/inputmethod/InputMethodManager))
+  ///- Android native WebView ([Official API - InputMethodManager.hideSoftInputFromWindow](https://developer.android.com/reference/android/view/inputmethod/InputMethodManager#hideSoftInputFromWindow(android.os.IBinder,%20int)))
+  ///- iOS ([Official API - UIView.endEditing](https://developer.apple.com/documentation/uikit/uiview/1619630-endediting))
   ///{@endtemplate}
   Future<void> hideInputMethod() {
     throw UnimplementedError(

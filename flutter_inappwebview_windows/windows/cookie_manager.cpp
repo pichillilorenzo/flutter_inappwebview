@@ -23,7 +23,16 @@ namespace flutter_inappwebview_plugin
 
     std::string mbStr(mbStrLen, 0);
     WideCharToMultiByte(CP_UTF8, 0, str, wideStrLen, &mbStr[0], mbStrLen, NULL, NULL);
-    return mbStr;
+
+    std::string result;
+    for (char c : mbStr) {
+        if ((c >= 0 && c <= 31) || (c == 127) || (c == 160) ||  (c >= 0x200B && c <= 0x200D) || (c == 0x2060) || (c == 0xFEFF)) {        
+            continue;
+        }
+        result += c;
+    }
+
+    return result;
   }
   
   void CookieManager::HandleMethodCall(const flutter::MethodCall<flutter::EncodableValue>& method_call,

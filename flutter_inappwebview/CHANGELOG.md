@@ -18,6 +18,14 @@
 - Added `isInterfaceSupported` method to `PlatformWebViewEnvironment` class
 - Added `isInterfaceSupported` method to `PlatformInAppWebViewController` class
 
+#### Android Platform
+- Implemented `hideInputMethod`, `showInputMethod` InAppWebViewController methods
+- Merged "Show / Hide / Disable / Enable soft Keyboard Input (Android & iOS)" [#2408](https://github.com/pichillilorenzo/flutter_inappwebview/pull/2408) (thanks to [Mecharyry](https://github.com/Mecharyry))
+
+#### iOS Platform
+- Implemented `setInputMethodEnabled`, `hideInputMethod` InAppWebViewController methods
+- Merged "Show / Hide / Disable / Enable soft Keyboard Input (Android & iOS)" [#2408](https://github.com/pichillilorenzo/flutter_inappwebview/pull/2408) (thanks to [Mecharyry](https://github.com/Mecharyry))
+
 #### Windows Platform
 - Updated Microsoft.Web.WebView2 SDK version from `1.0.2792.45` to `1.0.2849.39`
 - Implemented `disableDefaultErrorPage`, `statusBarEnabled`, `browserAcceleratorKeysEnabled`, `generalAutofillEnabled`, `passwordAutosaveEnabled`, `isPinchZoomEnabled`, `allowsBackForwardNavigationGestures`, `hiddenPdfToolbarItems`, `reputationCheckingRequired`, `nonClientRegionSupportEnabled` properties of `InAppWebViewSettings`
@@ -26,6 +34,7 @@
 - Fixed wrong channel name when creating a `WebViewEnvironment` instance
 - Fixed "[Windows] Has an overlay on the desktop when the application is minimized" [#2402](https://github.com/pichillilorenzo/flutter_inappwebview/issues/2402)
 - Fixed "[Windows] missing implementation of onPermissionRequest event will cause crash when requested by the webpage" [#2404](https://github.com/pichillilorenzo/flutter_inappwebview/issues/2404)
+- Fixed "Windows: getCookies return empty list" [#2314](https://github.com/pichillilorenzo/flutter_inappwebview/issues/2314)
 
 ## 6.2.0-beta.1
 

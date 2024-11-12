@@ -105,6 +105,8 @@ class WindowsCookieManager extends PlatformCookieManager
     args.putIfAbsent('sameSite', () => sameSite?.toNativeValue());
     args.putIfAbsent(
         'webViewEnvironmentId', () => params.webViewEnvironment?.id);
+    args.putIfAbsent(
+        'webViewId', () => webViewController?.id);
 
     return await channel?.invokeMethod<bool>('setCookie', args) ?? false;
   }
@@ -123,6 +125,8 @@ class WindowsCookieManager extends PlatformCookieManager
     args.putIfAbsent('url', () => url.toString());
     args.putIfAbsent(
         'webViewEnvironmentId', () => params.webViewEnvironment?.id);
+    args.putIfAbsent(
+        'webViewId', () => webViewController?.id);
     List<dynamic> cookieListMap =
         await channel?.invokeMethod<List>('getCookies', args) ?? [];
     cookieListMap = cookieListMap.cast<Map<dynamic, dynamic>>();
@@ -157,6 +161,8 @@ class WindowsCookieManager extends PlatformCookieManager
     args.putIfAbsent('url', () => url.toString());
     args.putIfAbsent(
         'webViewEnvironmentId', () => params.webViewEnvironment?.id);
+    args.putIfAbsent(
+        'webViewId', () => webViewController?.id);
     List<dynamic> cookies =
         await channel?.invokeMethod<List>('getCookies', args) ?? [];
     cookies = cookies.cast<Map<dynamic, dynamic>>();
@@ -197,6 +203,8 @@ class WindowsCookieManager extends PlatformCookieManager
     args.putIfAbsent('path', () => path);
     args.putIfAbsent(
         'webViewEnvironmentId', () => params.webViewEnvironment?.id);
+    args.putIfAbsent(
+        'webViewId', () => webViewController?.id);
     return await channel?.invokeMethod<bool>('deleteCookie', args) ?? false;
   }
 
@@ -216,6 +224,8 @@ class WindowsCookieManager extends PlatformCookieManager
     args.putIfAbsent('path', () => path);
     args.putIfAbsent(
         'webViewEnvironmentId', () => params.webViewEnvironment?.id);
+    args.putIfAbsent(
+        'webViewId', () => webViewController?.id);
     return await channel?.invokeMethod<bool>('deleteCookies', args) ?? false;
   }
 

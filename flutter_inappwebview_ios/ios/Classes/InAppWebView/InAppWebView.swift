@@ -119,17 +119,29 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
         }
     }
     
+    // Fix https://github.com/pichillilorenzo/flutter_inappwebview/issues/1947
+    private var _scrollViewContentInsetAdjusted = false
     @objc func keyboardWillShow(notification: NSNotification) {
-        // Fix https://github.com/pichillilorenzo/flutter_inappwebview/issues/1947
+        // UIResponder.keyboardWillShowNotification will be fired also
+        // when changing focus between HTML inputs with the keyboard already open
         if (scrollView.adjustedContentInset != .zero) {
+            // if resizeToAvoidBottomInset is false on Flutter side,
+            // scrollView.adjustedContentInset.bottom will be > 0
             if scrollView.adjustedContentInset.bottom > 0 {
-                let insetToAdjust = scrollView.adjustedContentInset
-                scrollView.contentInset = UIEdgeInsets(top: -insetToAdjust.top, left: -insetToAdjust.left,
-                                                       bottom: -insetToAdjust.bottom, right: -insetToAdjust.right)
+                // if the scrollView.contentInset has already been fixed, do nothing
+                if !_scrollViewContentInsetAdjusted {
+                    _scrollViewContentInsetAdjusted = true
+                    let insetToAdjust = scrollView.adjustedContentInset
+                    scrollView.contentInset = UIEdgeInsets(top: -insetToAdjust.top, left: -insetToAdjust.left,
+                                                           bottom: -insetToAdjust.bottom, right: -insetToAdjust.right)
+                }
             } else {
                 scrollView.contentInset = .zero
             }
         }
+    }
+    @objc func keyboardWillHide(notification: NSNotification) {
+        _scrollViewContentInsetAdjusted = false
     }
     
     required public init(coder aDecoder: NSCoder) {
@@ -365,6 +377,9 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
             // Fix https://github.com/pichillilorenzo/flutter_inappwebview/issues/1947
             NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow(notification:)),
                                                    name: UIResponder.keyboardWillShowNotification,
+                                                   object: nil)
+            NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide(notification:)),
+                                                   name: UIResponder.keyboardWillHideNotification,
                                                    object: nil)
         }
         

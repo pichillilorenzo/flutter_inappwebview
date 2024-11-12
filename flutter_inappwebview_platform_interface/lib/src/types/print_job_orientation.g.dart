@@ -19,10 +19,13 @@ class PrintJobOrientation {
   ///Pages are printed in landscape orientation.
   ///
   ///**Officially Supported Platforms/Implementations**:
+  ///- Android native WebView
   ///- iOS
   ///- MacOS
   static final LANDSCAPE = PrintJobOrientation._internalMultiPlatform(1, () {
     switch (defaultTargetPlatform) {
+      case TargetPlatform.android:
+        return 1;
       case TargetPlatform.iOS:
         return 1;
       case TargetPlatform.macOS:
@@ -36,10 +39,13 @@ class PrintJobOrientation {
   ///Pages are printed in portrait orientation.
   ///
   ///**Officially Supported Platforms/Implementations**:
+  ///- Android native WebView
   ///- iOS
   ///- MacOS
   static final PORTRAIT = PrintJobOrientation._internalMultiPlatform(0, () {
     switch (defaultTargetPlatform) {
+      case TargetPlatform.android:
+        return 0;
       case TargetPlatform.iOS:
         return 0;
       case TargetPlatform.macOS:

@@ -2,7 +2,9 @@
 
 - Updated flutter_inappwebview_platform_interface version to ^1.4.0-beta.2
 - Implemented `hideInputMethod`, `showInputMethod` InAppWebViewController methods
+- Implemented `isUserInteractionEnabled`, `alpha` properties of `InAppWebViewSettings`
 - Merged "Show / Hide / Disable / Enable soft Keyboard Input (Android & iOS)" [#2408](https://github.com/pichillilorenzo/flutter_inappwebview/pull/2408) (thanks to [Mecharyry](https://github.com/Mecharyry))
+- Fixed "[Android] PrintJobOrientation _TypeError (type 'Null' is not a subtype of type 'int')" [#2413](https://github.com/pichillilorenzo/flutter_inappwebview/issues/2413)
 
 ## 1.2.0-beta.1
 

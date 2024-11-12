@@ -61,12 +61,20 @@ public class InAppWebViewSettings: ISettings<InAppWebView> {
     var javaScriptBridgeForMainFrameOnly = false
     var pluginScriptsOriginAllowList: [String]? = nil
     var pluginScriptsForMainFrameOnly = false
+    var alpha: Double? = nil
     
     override init(){
         super.init()
     }
     
     override func parse(settings: [String: Any?]) -> InAppWebViewSettings {
+        var settings = settings // re-assing to be able to use removeValue
+        // nullable values with primitive type (Int, Double, etc.)
+        // must be handled here as super.parse will not work
+        if let alphaValue = settings["alpha"] as? Double {
+            alpha = alphaValue
+            settings.removeValue(forKey: "alpha")
+        }
         let _ = super.parse(settings: settings)
         if #available(macOS 10.15, *) {} else {
             applePayAPIEnabled = false

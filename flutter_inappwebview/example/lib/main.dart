@@ -29,9 +29,11 @@ Future main() async {
 
     webViewEnvironment = await WebViewEnvironment.create(
         settings: WebViewEnvironmentSettings(
-            additionalBrowserArguments: kDebugMode ? '--enable-features=msEdgeDevToolsWdpRemoteDebugging' : null,
-            userDataFolder: 'custom_path',
-        ));
+      additionalBrowserArguments: kDebugMode
+          ? '--enable-features=msEdgeDevToolsWdpRemoteDebugging'
+          : null,
+      userDataFolder: 'custom_path',
+    ));
   }
 
   if (!kIsWeb && defaultTargetPlatform == TargetPlatform.android) {

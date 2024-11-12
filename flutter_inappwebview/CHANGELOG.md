@@ -14,17 +14,25 @@
 - Updated `flutter_inappwebview_internal_annotations` dependency from `^1.1.1` to `^1.2.0`
 - Updated `fromMap` static method and `toMap` method implementations
 - Added `byName`, `name`, `asNameMap` custom enum classes methods
-- Added `statusBarEnabled`, `browserAcceleratorKeysEnabled`, `generalAutofillEnabled`, `passwordAutosaveEnabled`, `isPinchZoomEnabled`, `hiddenPdfToolbarItems`, `reputationCheckingRequired`, `nonClientRegionSupportEnabled` property to `InAppWebViewSettings`
+- Added `statusBarEnabled`, `browserAcceleratorKeysEnabled`, `generalAutofillEnabled`, `passwordAutosaveEnabled`, `isPinchZoomEnabled`, `hiddenPdfToolbarItems`, `reputationCheckingRequired`, `nonClientRegionSupportEnabled`, `alpha`, `isUserInteractionEnabled` properties to `InAppWebViewSettings`
 - Added `isInterfaceSupported` method to `PlatformWebViewEnvironment` class
 - Added `isInterfaceSupported` method to `PlatformInAppWebViewController` class
+- Fixed missing PrintJobOrientation android values
 
 #### Android Platform
 - Implemented `hideInputMethod`, `showInputMethod` InAppWebViewController methods
+- Implemented `isUserInteractionEnabled`, `alpha` properties of `InAppWebViewSettings`
 - Merged "Show / Hide / Disable / Enable soft Keyboard Input (Android & iOS)" [#2408](https://github.com/pichillilorenzo/flutter_inappwebview/pull/2408) (thanks to [Mecharyry](https://github.com/Mecharyry))
+- Fixed "[Android] PrintJobOrientation _TypeError (type 'Null' is not a subtype of type 'int')" [#2413](https://github.com/pichillilorenzo/flutter_inappwebview/issues/2413)
 
 #### iOS Platform
 - Implemented `setInputMethodEnabled`, `hideInputMethod` InAppWebViewController methods
+- Implemented `isUserInteractionEnabled`, `alpha` properties of `InAppWebViewSettings`
 - Merged "Show / Hide / Disable / Enable soft Keyboard Input (Android & iOS)" [#2408](https://github.com/pichillilorenzo/flutter_inappwebview/pull/2408) (thanks to [Mecharyry](https://github.com/Mecharyry))
+- Fixed "In iOS version 17.2, when moving the input focus in a WebView, an unknown area appears at the top of the screen." [#1947](https://github.com/pichillilorenzo/flutter_inappwebview/issues/1947)
+
+#### macOS Platform
+- Implemented `alpha` property of `InAppWebViewSettings`
 
 #### Windows Platform
 - Updated Microsoft.Web.WebView2 SDK version from `1.0.2792.45` to `1.0.2849.39`

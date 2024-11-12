@@ -241,8 +241,22 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
     }
   }
 
+  @Override
+  public void setAlpha(float alpha) {
+    ViewParent parent = getParent();
+    if (parent instanceof PullToRefreshLayout) {
+      ((PullToRefreshLayout) parent).setAlpha(alpha);
+    } else {
+      super.setAlpha(alpha);
+    }
+  }
+
   @SuppressLint("RestrictedApi")
   public void prepare() {
+    if (customSettings.alpha != null) {
+      setAlpha(customSettings.alpha.floatValue());
+    }
+
     javaScriptBridgeEnabled = customSettings.javaScriptBridgeEnabled;
     if (customSettings.javaScriptBridgeOriginAllowList != null && customSettings.javaScriptBridgeOriginAllowList.isEmpty()) {
       // an empty list means that the JavaScript Bridge is not allowed for any origin.
@@ -1517,6 +1531,10 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
 
   @Override
   public boolean onTouchEvent(MotionEvent ev) {
+    if (!customSettings.isUserInteractionEnabled) {
+      return true;
+    }
+
     lastTouch = new Point((int) ev.getX(), (int) ev.getY());
 
     ViewParent parent = getParent();

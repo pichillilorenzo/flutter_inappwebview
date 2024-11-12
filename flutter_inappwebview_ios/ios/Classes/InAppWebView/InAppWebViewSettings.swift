@@ -88,6 +88,8 @@ public class InAppWebViewSettings: ISettings<InAppWebView> {
     var javaScriptBridgeForMainFrameOnly = false
     var pluginScriptsOriginAllowList: [String]? = nil
     var pluginScriptsForMainFrameOnly = false
+    var isUserInteractionEnabled = true
+    var alpha: Double? = nil
     
     override init(){
         super.init()
@@ -103,6 +105,12 @@ public class InAppWebViewSettings: ISettings<InAppWebView> {
             maximumViewportInset = UIEdgeInsets.fromMap(map: maximumViewportInsetMap)
             settings.removeValue(forKey: "maximumViewportInset")
         }
+        // nullable values with primitive type (Int, Double, etc.)
+        // must be handled here as super.parse will not work
+        if let alphaValue = settings["alpha"] as? Double {
+            alpha = alphaValue
+            settings.removeValue(forKey: "alpha")
+        }
         let _ = super.parse(settings: settings)
         if #available(iOS 13.0, *) {} else {
             applePayAPIEnabled = false
@@ -113,6 +121,8 @@ public class InAppWebViewSettings: ISettings<InAppWebView> {
     override func getRealSettings(obj: InAppWebView?) -> [String: Any?] {
         var realSettings: [String: Any?] = toMap()
         if let webView = obj {
+            realSettings["isUserInteractionEnabled"] = webView.isUserInteractionEnabled
+            realSettings["alpha"] = Double(webView.alpha)
             let configuration = webView.configuration
             if #available(iOS 9.0, *) {
                 realSettings["userAgent"] = webView.customUserAgent

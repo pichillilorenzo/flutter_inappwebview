@@ -1,10 +1,10 @@
+import 'dart:typed_data';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_internal_annotations.dart';
 import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_platform_interface.dart';
-import 'dart:typed_data';
 
-import '../platform_webview_asset_loader.dart';
 import '../types/action_mode_menu_item.dart';
 import '../types/cache_mode.dart';
 import '../types/data_detector_types.dart';
@@ -23,20 +23,6 @@ import '../types/scrollview_deceleration_rate.dart';
 import '../types/selection_granularity.dart';
 import '../types/user_preferred_content_mode.dart';
 import '../types/vertical_scrollbar_position.dart';
-import '../types/user_script.dart';
-import '../web_uri.dart';
-import 'android/in_app_webview_options.dart';
-import 'apple/in_app_webview_options.dart';
-import '../content_blocker.dart';
-import '../types/main.dart';
-import '../util.dart';
-import '../in_app_browser/in_app_browser_settings.dart';
-import '../platform_webview_feature.dart';
-import '../in_app_webview/platform_inappwebview_controller.dart';
-import '../context_menu/context_menu.dart';
-import '../in_app_browser/platform_in_app_browser.dart';
-import 'platform_webview.dart';
-import '../types/enum_method.dart';
 
 part 'in_app_webview_settings.g.dart';
 
@@ -48,7 +34,8 @@ List<ContentBlocker> _deserializeContentBlockers(
     contentBlockersMapList.forEach((contentBlocker) {
       contentBlockers.add(ContentBlocker.fromMap(
           Map<dynamic, Map<dynamic, dynamic>>.from(
-              Map<dynamic, dynamic>.from(contentBlocker)), enumMethod: enumMethod));
+              Map<dynamic, dynamic>.from(contentBlocker)),
+          enumMethod: enumMethod));
     });
   }
   return contentBlockers;
@@ -90,6 +77,7 @@ class InAppWebViewSettings_ {
 
   ///Use [PlatformInAppWebViewController.clearAllCache] instead.
   @Deprecated("Use InAppWebViewController.clearAllCache instead")
+  @ExchangeableObjectProperty(leaveDeprecatedInToMapMethod: true)
   @SupportedPlatforms(
       platforms: [AndroidPlatform(), IOSPlatform(), MacOSPlatform()])
   bool? clearCache;
@@ -438,6 +426,7 @@ because there isn't any way to make the website data store non-persistent for th
 
   ///Use [PlatformCookieManager.removeSessionCookies] instead.
   @Deprecated("Use CookieManager.removeSessionCookies instead")
+  @ExchangeableObjectProperty(leaveDeprecatedInToMapMethod: true)
   @SupportedPlatforms(platforms: [AndroidPlatform()])
   bool? clearSessionCache;
 
@@ -637,6 +626,7 @@ because there isn't any way to make the website data store non-persistent for th
   ///WebView will always use the dark style defined by web content authors if the app's theme is dark.
   ///To customize the behavior, refer to [algorithmicDarkeningAllowed].
   @Deprecated("Use algorithmicDarkeningAllowed instead")
+  @ExchangeableObjectProperty(leaveDeprecatedInToMapMethod: true)
   @SupportedPlatforms(platforms: [
     AndroidPlatform(
         available: "29",
@@ -657,6 +647,7 @@ because there isn't any way to make the website data store non-persistent for th
   ///WebView will always use the dark style defined by web content authors if the app's theme is dark.
   ///To customize the behavior, refer to [algorithmicDarkeningAllowed].
   @Deprecated("Use algorithmicDarkeningAllowed instead")
+  @ExchangeableObjectProperty(leaveDeprecatedInToMapMethod: true)
   @SupportedPlatforms(platforms: [
     AndroidPlatform(
         apiName: "WebSettingsCompat.setForceDarkStrategy",
@@ -786,6 +777,8 @@ because there isn't any way to make the website data store non-persistent for th
   ///Therefore, the Webview form data save feature is disabled. Note that the feature will continue to be supported on older versions of Android as before.
   ///The default value is `true`.
   @Deprecated('')
+  @ExchangeableObjectProperty(
+      leaveDeprecatedInToMapMethod: true, leaveDeprecatedInFromMapMethod: true)
   @SupportedPlatforms(platforms: [
     AndroidPlatform(
         apiName: "WebSettings.setSaveFormData",
@@ -953,8 +946,8 @@ as it can cause framerate drops on animations in Android 9 and lower (see [Hybri
     AndroidPlatform(),
     WindowsPlatform(
         apiName: "ICoreWebView2Settings.put_IsBuiltInErrorPageEnabled",
-        apiUrl: 'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2settings?view=webview2-1.0.2849.39#put_isbuiltinerrorpageenabled'
-    ),
+        apiUrl:
+            'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2settings?view=webview2-1.0.2849.39#put_isbuiltinerrorpageenabled'),
   ])
   bool? disableDefaultErrorPage;
 
@@ -1115,11 +1108,10 @@ as it can cause framerate drops on animations in Android 9 and lower (see [Hybri
         apiUrl:
             "https://developer.apple.com/documentation/webkit/wkwebview/1414995-allowsbackforwardnavigationgestu"),
     WindowsPlatform(
-      available: "1.0.992.28",
-      apiName: "ICoreWebView2Settings6.put_IsSwipeNavigationEnabled",
-      apiUrl:
-      "https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2settings6?view=webview2-1.0.2849.39#put_isswipenavigationenabled"
-    ),
+        available: "1.0.992.28",
+        apiName: "ICoreWebView2Settings6.put_IsSwipeNavigationEnabled",
+        apiUrl:
+            "https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2settings6?view=webview2-1.0.2849.39#put_isswipenavigationenabled"),
   ])
   bool? allowsBackForwardNavigationGestures;
 
@@ -1790,8 +1782,8 @@ as it can cause framerate drops on animations in Android 9 and lower (see [Hybri
   @SupportedPlatforms(platforms: [
     WindowsPlatform(
         apiName: "ICoreWebView2Settings.put_IsStatusBarEnabled",
-        apiUrl: 'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2settings?view=webview2-1.0.2849.39#put_isstatusbarenabled'
-    ),
+        apiUrl:
+            'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2settings?view=webview2-1.0.2849.39#put_isstatusbarenabled'),
   ])
   bool? statusBarEnabled;
 
@@ -1812,10 +1804,10 @@ as it can cause framerate drops on animations in Android 9 and lower (see [Hybri
   ///The default value is `true`.
   @SupportedPlatforms(platforms: [
     WindowsPlatform(
-      available: '1.0.864.35',
+        available: '1.0.864.35',
         apiName: "ICoreWebView2Settings3.put_IsBuiltInErrorPageEnabled",
-        apiUrl: 'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2settings3?view=webview2-1.0.2849.39#put_arebrowseracceleratorkeysenabled'
-    ),
+        apiUrl:
+            'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2settings3?view=webview2-1.0.2849.39#put_arebrowseracceleratorkeysenabled'),
   ])
   bool? browserAcceleratorKeysEnabled;
 
@@ -1832,8 +1824,8 @@ as it can cause framerate drops on animations in Android 9 and lower (see [Hybri
     WindowsPlatform(
         available: '1.0.902.49',
         apiName: "ICoreWebView2Settings4.put_IsGeneralAutofillEnabled",
-        apiUrl: 'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2settings4?view=webview2-1.0.2849.39#put_isgeneralautofillenabled'
-    ),
+        apiUrl:
+            'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2settings4?view=webview2-1.0.2849.39#put_isgeneralautofillenabled'),
   ])
   bool? generalAutofillEnabled;
 
@@ -1853,8 +1845,8 @@ as it can cause framerate drops on animations in Android 9 and lower (see [Hybri
     WindowsPlatform(
         available: '1.0.902.49',
         apiName: "ICoreWebView2Settings4.put_IsPasswordAutosaveEnabled",
-        apiUrl: 'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2settings4?view=webview2-1.0.2849.39#put_ispasswordautosaveenabled'
-    ),
+        apiUrl:
+            'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2settings4?view=webview2-1.0.2849.39#put_ispasswordautosaveenabled'),
   ])
   bool? passwordAutosaveEnabled;
 
@@ -1878,8 +1870,8 @@ as it can cause framerate drops on animations in Android 9 and lower (see [Hybri
     WindowsPlatform(
         available: '1.0.902.49',
         apiName: "ICoreWebView2Settings5.put_IsPinchZoomEnabled",
-        apiUrl: 'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2settings5?view=webview2-1.0.2849.39#put_ispinchzoomenabled'
-    ),
+        apiUrl:
+            'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2settings5?view=webview2-1.0.2849.39#put_ispinchzoomenabled'),
   ])
   bool? pinchZoomEnabled;
 
@@ -1892,8 +1884,8 @@ as it can cause framerate drops on animations in Android 9 and lower (see [Hybri
     WindowsPlatform(
         available: '1.0.1185.39',
         apiName: "ICoreWebView2Settings7.put_HiddenPdfToolbarItems",
-        apiUrl: 'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2settings7?view=webview2-1.0.2849.39#put_hiddenpdftoolbaritems'
-    ),
+        apiUrl:
+            'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2settings7?view=webview2-1.0.2849.39#put_hiddenpdftoolbaritems'),
   ])
   PdfToolbarItems_? hiddenPdfToolbarItems;
 
@@ -1918,8 +1910,8 @@ as it can cause framerate drops on animations in Android 9 and lower (see [Hybri
     WindowsPlatform(
         available: '1.0.1722.45',
         apiName: "ICoreWebView2Settings8.put_IsReputationCheckingRequired",
-        apiUrl: 'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2settings8?view=webview2-1.0.2849.39#put_isreputationcheckingrequired'
-    ),
+        apiUrl:
+            'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2settings8?view=webview2-1.0.2849.39#put_isreputationcheckingrequired'),
   ])
   bool? reputationCheckingRequired;
 
@@ -1941,10 +1933,40 @@ as it can cause framerate drops on animations in Android 9 and lower (see [Hybri
     WindowsPlatform(
         available: '1.0.2420.47',
         apiName: "ICoreWebView2Settings9.put_IsNonClientRegionSupportEnabled",
-        apiUrl: 'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2settings9?view=webview2-1.0.2849.39#put_isnonclientregionsupportenabled'
-    ),
+        apiUrl:
+            'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2settings9?view=webview2-1.0.2849.39#put_isnonclientregionsupportenabled'),
   ])
   bool? nonClientRegionSupportEnabled;
+
+  ///A Boolean value that determines whether user events are ignored and removed from the event queue.
+  ///
+  ///The default value is `true`.
+  @SupportedPlatforms(platforms: [
+    AndroidPlatform(),
+    IOSPlatform(
+        apiName: "UIView.isUserInteractionEnabled",
+        apiUrl:
+            'https://developer.apple.com/documentation/uikit/uiview/1622577-isuserinteractionenabled'),
+  ])
+  bool? isUserInteractionEnabled;
+
+  ///The view’s alpha value. The value of this property is a floating-point number
+  ///in the range 0.0 to 1.0, where 0.0 represents totally transparent and 1.0 represents totally opaque.
+  @SupportedPlatforms(platforms: [
+    AndroidPlatform(
+        apiName: "View.setAlpha",
+        apiUrl:
+        'https://developer.android.com/reference/android/view/View#setAlpha(float)'),
+    IOSPlatform(
+        apiName: "UIView.alpha",
+        apiUrl:
+            'https://developer.apple.com/documentation/uikit/uiview/1622417-alpha'),
+    MacOSPlatform(
+        apiName: "NSView.alphaValue",
+        apiUrl:
+        'https://developer.apple.com/documentation/appkit/nsview/1483560-alphavalue'),
+  ])
+  double? alpha;
 
   ///Specifies a feature policy for the `<iframe>`.
   ///The policy defines what features are available to the `<iframe>` based on the origin of the request
@@ -2033,6 +2055,7 @@ as it can cause framerate drops on animations in Android 9 and lower (see [Hybri
     this.useShouldOverrideUrlLoading,
     this.useOnLoadResource,
     this.useOnDownloadStart,
+    @Deprecated("Use InAppWebViewController.clearAllCache instead")
     this.clearCache = false,
     this.userAgent = "",
     this.applicationNameForUserAgent = "",
@@ -2058,6 +2081,7 @@ as it can cause framerate drops on animations in Android 9 and lower (see [Hybri
     this.allowFileAccessFromFileURLs = false,
     this.allowUniversalAccessFromFileURLs = false,
     this.textZoom = 100,
+    @Deprecated("Use CookieManager.removeSessionCookies instead")
     this.clearSessionCache = false,
     this.builtInZoomControls = true,
     this.displayZoomControls = false,
@@ -2079,7 +2103,8 @@ as it can cause framerate drops on animations in Android 9 and lower (see [Hybri
     this.disabledActionModeMenuItems,
     this.fantasyFontFamily = "fantasy",
     this.fixedFontFamily = "monospace",
-    this.forceDark,
+    @Deprecated("Use algorithmicDarkeningAllowed instead") this.forceDark,
+    @Deprecated("Use algorithmicDarkeningAllowed instead")
     this.forceDarkStrategy,
     this.geolocationEnabled = true,
     this.layoutAlgorithm,
@@ -2091,7 +2116,7 @@ as it can cause framerate drops on animations in Android 9 and lower (see [Hybri
     this.sansSerifFontFamily = "sans-serif",
     this.serifFontFamily = "sans-serif",
     this.standardFontFamily = "sans-serif",
-    this.saveFormData = true,
+    @Deprecated('') this.saveFormData = true,
     this.thirdPartyCookiesEnabled = true,
     this.hardwareAcceleration = true,
     this.initialScale = 0,
@@ -2180,6 +2205,8 @@ as it can cause framerate drops on animations in Android 9 and lower (see [Hybri
     this.hiddenPdfToolbarItems = PdfToolbarItems_.NONE,
     this.reputationCheckingRequired = true,
     this.nonClientRegionSupportEnabled = false,
+    this.isUserInteractionEnabled = true,
+    this.alpha,
     this.iframeAllow,
     this.iframeAllowFullscreen,
     this.iframeSandbox,

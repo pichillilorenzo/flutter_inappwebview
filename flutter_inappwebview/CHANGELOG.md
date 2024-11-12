@@ -18,6 +18,14 @@
 - Added `isInterfaceSupported` method to `PlatformWebViewEnvironment` class
 - Added `isInterfaceSupported` method to `PlatformInAppWebViewController` class
 
+#### Android Platform
+- Implemented `hideInputMethod`, `showInputMethod` InAppWebViewController methods
+- Merged "Show / Hide / Disable / Enable soft Keyboard Input (Android & iOS)" [#2408](https://github.com/pichillilorenzo/flutter_inappwebview/pull/2408) (thanks to [Mecharyry](https://github.com/Mecharyry))
+
+#### iOS Platform
+- Implemented `setInputMethodEnabled`, `hideInputMethod` InAppWebViewController methods
+- Merged "Show / Hide / Disable / Enable soft Keyboard Input (Android & iOS)" [#2408](https://github.com/pichillilorenzo/flutter_inappwebview/pull/2408) (thanks to [Mecharyry](https://github.com/Mecharyry))
+
 #### Windows Platform
 - Updated Microsoft.Web.WebView2 SDK version from `1.0.2792.45` to `1.0.2849.39`
 - Implemented `disableDefaultErrorPage`, `statusBarEnabled`, `browserAcceleratorKeysEnabled`, `generalAutofillEnabled`, `passwordAutosaveEnabled`, `isPinchZoomEnabled`, `allowsBackForwardNavigationGestures`, `hiddenPdfToolbarItems`, `reputationCheckingRequired`, `nonClientRegionSupportEnabled` properties of `InAppWebViewSettings`

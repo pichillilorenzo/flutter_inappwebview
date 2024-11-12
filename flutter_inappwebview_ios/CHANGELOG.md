@@ -4,6 +4,7 @@
 - Implemented `setInputMethodEnabled`, `hideInputMethod` InAppWebViewController methods
 - Implemented `isUserInteractionEnabled`, `alpha` properties of `InAppWebViewSettings`
 - Merged "Show / Hide / Disable / Enable soft Keyboard Input (Android & iOS)" [#2408](https://github.com/pichillilorenzo/flutter_inappwebview/pull/2408) (thanks to [Mecharyry](https://github.com/Mecharyry))
+- Fixed "In iOS version 17.2, when moving the input focus in a WebView, an unknown area appears at the top of the screen." [#1947](https://github.com/pichillilorenzo/flutter_inappwebview/issues/1947)
 
 ## 1.2.0-beta.1
 

@@ -225,11 +225,22 @@ class ExchangeableObjectGenerator
     if (!hasCustomConstructor && deprecatedFields.length > 0) {
       classBuffer.writeln(' {');
       for (final deprecatedField in deprecatedFields) {
-        final deprecatedFieldName = deprecatedField.name;
+        final deprecatedUseNewFieldNameInConstructor = _coreCheckerObjectProperty
+            .firstAnnotationOf(deprecatedField)
+            ?.getField("deprecatedUseNewFieldNameInConstructor")
+            ?.toBoolValue() ?? true;
+        if (!deprecatedUseNewFieldNameInConstructor) {
+          continue;
+        }
+
         final message = _coreCheckerDeprecated
             .firstAnnotationOfExact(deprecatedField)!
             .getField("message")!
-            .toStringValue()!;
+            .toStringValue()!.trim();
+        if (!message.startsWith("Use ") && !message.endsWith(" instead")) {
+          continue;
+        }
+
         final newFieldName = message
             .replaceFirst("Use ", "")
             .replaceFirst(" instead", "")
@@ -238,6 +249,7 @@ class ExchangeableObjectGenerator
         final newFieldElement = visitor.fields[newFieldName];
         final shouldUseNewFieldName = newFieldElement != null;
         if (shouldUseNewFieldName) {
+          final deprecatedFieldName = deprecatedField.name;
           final fieldTypeElement = newFieldElement.type.element;
           final deprecatedFieldTypeElement = deprecatedField.type.element;
 
@@ -328,36 +340,57 @@ class ExchangeableObjectGenerator
             !(fieldElement.type.isDartCoreFunction ||
                 fieldElement.type is FunctionType)) {
           var value = "map['$fieldName']";
-          final deprecationMessage = _coreCheckerDeprecated
-              .firstAnnotationOfExact(fieldElement)
-              ?.getField("message")
-              ?.toStringValue();
-          if (deprecationMessage != null) {
-            final newFieldName = deprecationMessage
-                .replaceFirst("Use ", "")
-                .replaceFirst(" instead", "")
-                .trim();
-            final newFieldElement = fieldElements
-                .firstWhereOrNull((element) => element.name == newFieldName);
-            final shouldUseNewFieldName = newFieldElement != null &&
-                (newFieldElement.type == fieldElement.type ||
-                    (fieldElement.name.startsWith(RegExp(r'android|ios')) &&
-                        fieldElement.name.toLowerCase().replaceFirst(
-                                RegExp(r'android|ioswk|ios'), "") ==
-                            newFieldName.toLowerCase()) ||
-                    (newFieldElement.type.element != null &&
-                        fieldElement.type.element != null &&
-                        ((hasFromNativeValueMethod(
-                                    newFieldElement.type.element!) &&
-                                hasFromNativeValueMethod(
-                                    fieldElement.type.element!) ||
-                            (hasFromMapMethod(newFieldElement.type.element!) &&
-                                hasFromMapMethod(
-                                    fieldElement.type.element!))))));
-            if (shouldUseNewFieldName) {
-              value = "map['$newFieldName']";
+
+          if (fieldElement.hasDeprecated) {
+            final deprecatedUseNewFieldNameInFromMapMethod = _coreCheckerObjectProperty
+                .firstAnnotationOf(fieldElement)
+                ?.getField("deprecatedUseNewFieldNameInFromMapMethod")
+                ?.toBoolValue() ?? true;
+
+            final deprecationMessage = _coreCheckerDeprecated
+                .firstAnnotationOfExact(fieldElement)
+                ?.getField("message")
+                ?.toStringValue()?.trim();
+            if (deprecationMessage != null &&
+                deprecationMessage.startsWith("Use ") &&
+                deprecationMessage.endsWith(" instead") &&
+                deprecatedUseNewFieldNameInFromMapMethod) {
+              final newFieldName = deprecationMessage
+                  .replaceFirst("Use ", "")
+                  .replaceFirst(" instead", "")
+                  .trim();
+              final newFieldElement = fieldElements
+                  .firstWhereOrNull((element) => element.name == newFieldName);
+              final shouldUseNewFieldName = newFieldElement != null &&
+                  (newFieldElement.type == fieldElement.type ||
+                      (fieldElement.name.startsWith(RegExp(r'android|ios')) &&
+                          fieldElement.name.toLowerCase().replaceFirst(
+                              RegExp(r'android|ioswk|ios'), "") ==
+                              newFieldName.toLowerCase()) ||
+                      (newFieldElement.type.element != null &&
+                          fieldElement.type.element != null &&
+                          ((hasFromNativeValueMethod(
+                              newFieldElement.type.element!) &&
+                              hasFromNativeValueMethod(
+                                  fieldElement.type.element!) ||
+                              (hasFromMapMethod(
+                                  newFieldElement.type.element!) &&
+                                  hasFromMapMethod(
+                                      fieldElement.type.element!))))));
+              if (shouldUseNewFieldName) {
+                value = "map['$newFieldName']";
+              }
+            } else {
+              final leaveDeprecatedInFromMapMethod = _coreCheckerObjectProperty
+                  .firstAnnotationOf(fieldElement)
+                  ?.getField("leaveDeprecatedInFromMapMethod")
+                  ?.toBoolValue() ?? false;
+              if (!leaveDeprecatedInFromMapMethod) {
+                continue;
+              }
             }
           }
+
           final mapValue = value;
 
           final customDeserializer = _coreCheckerObjectProperty
@@ -442,7 +475,6 @@ class ExchangeableObjectGenerator
       if (superClass != null) {
         for (final fieldElement in superClass.element.fields) {
           if (!fieldElement.isPrivate &&
-              !fieldElement.hasDeprecated &&
               !fieldElement.isStatic &&
               !(fieldElement.type.isDartCoreFunction ||
                   fieldElement.type is FunctionType)) {
@@ -453,7 +485,6 @@ class ExchangeableObjectGenerator
       for (final entry in fieldEntriesSorted) {
         final fieldElement = entry.value;
         if (!fieldElement.isPrivate &&
-            !fieldElement.hasDeprecated &&
             !fieldElement.isStatic &&
             !(fieldElement.type.isDartCoreFunction ||
                 fieldElement.type is FunctionType)) {
@@ -462,10 +493,19 @@ class ExchangeableObjectGenerator
       }
       for (final fieldElement in fieldElements) {
         if (!fieldElement.isPrivate &&
-            !fieldElement.hasDeprecated &&
             !fieldElement.isStatic &&
             !(fieldElement.type.isDartCoreFunction ||
                 fieldElement.type is FunctionType)) {
+          if (fieldElement.hasDeprecated) {
+            final leaveDeprecatedInToMapMethod = _coreCheckerObjectProperty
+                .firstAnnotationOf(fieldElement)
+                ?.getField("leaveDeprecatedInToMapMethod")
+                ?.toBoolValue() ?? false;
+            if (!leaveDeprecatedInToMapMethod) {
+              continue;
+            }
+          }
+
           final fieldName = fieldElement.name;
           var mapValue = fieldName;
           final customSerializer = _coreCheckerObjectProperty

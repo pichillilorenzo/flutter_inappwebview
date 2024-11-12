@@ -153,6 +153,9 @@ public class InAppWebViewSettings implements ISettings<InAppWebViewInterface> {
   @Nullable
   public Set<String> pluginScriptsOriginAllowList;
   public Boolean pluginScriptsForMainFrameOnly = false;
+  public Boolean isUserInteractionEnabled = true;
+  @Nullable
+  public Double alpha = null;
 
   @NonNull
   @Override
@@ -459,6 +462,12 @@ public class InAppWebViewSettings implements ISettings<InAppWebViewInterface> {
         case "pluginScriptsForMainFrameOnly":
           pluginScriptsForMainFrameOnly = (Boolean) value;
           break;
+        case "isUserInteractionEnabled":
+          isUserInteractionEnabled = (Boolean) value;
+          break;
+        case "alpha":
+          alpha = (Double) value;
+          break;
       }
     }
 
@@ -573,6 +582,8 @@ public class InAppWebViewSettings implements ISettings<InAppWebViewInterface> {
     settings.put("pluginScriptsOriginAllowList",
             pluginScriptsOriginAllowList != null ? new ArrayList<>(pluginScriptsOriginAllowList) : null);
     settings.put("pluginScriptsForMainFrameOnly", pluginScriptsForMainFrameOnly);
+    settings.put("isUserInteractionEnabled", isUserInteractionEnabled);
+    settings.put("alpha", alpha);
     return settings;
   }
 
@@ -583,6 +594,8 @@ public class InAppWebViewSettings implements ISettings<InAppWebViewInterface> {
     Map<String, Object> realSettings = toMap();
     if (inAppWebView instanceof InAppWebView) {
       InAppWebView webView = (InAppWebView) inAppWebView;
+      realSettings.put("alpha", webView.getAlpha());
+
       WebSettings settings = webView.getSettings();
       realSettings.put("userAgent", settings.getUserAgentString());
       realSettings.put("javaScriptEnabled", settings.getJavaScriptEnabled());

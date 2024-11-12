@@ -417,6 +417,12 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
 //        }
         
         if let settings = settings {
+            isUserInteractionEnabled = settings.isUserInteractionEnabled
+            
+            if let viewAlpha = settings.alpha {
+                alpha = CGFloat(viewAlpha)
+            }
+            
             javaScriptBridgeEnabled = settings.javaScriptBridgeEnabled
             if let javaScriptBridgeOriginAllowList = settings.javaScriptBridgeOriginAllowList, javaScriptBridgeOriginAllowList.isEmpty {
                 // an empty list means that the JavaScript Bridge is not allowed for any origin.
@@ -988,6 +994,14 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
                     configuration.userContentController.removeAllUserScripts()
                 }
             }
+        }
+        
+        if newSettingsMap["isUserInteractionEnabled"] != nil && settings?.isUserInteractionEnabled != newSettings.isUserInteractionEnabled {
+            isUserInteractionEnabled = newSettings.isUserInteractionEnabled
+        }
+        
+        if newSettingsMap["alpha"] != nil, settings?.alpha != newSettings.alpha, let viewAlpha = newSettings.alpha {
+            alpha = CGFloat(viewAlpha)
         }
         
         if newSettingsMap["transparentBackground"] != nil && settings?.transparentBackground != newSettings.transparentBackground {

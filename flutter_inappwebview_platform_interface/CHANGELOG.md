@@ -6,6 +6,7 @@
 - Added `statusBarEnabled`, `browserAcceleratorKeysEnabled`, `generalAutofillEnabled`, `passwordAutosaveEnabled`, `isPinchZoomEnabled`, `hiddenPdfToolbarItems`, `reputationCheckingRequired`, `nonClientRegionSupportEnabled`, `alpha`, `isUserInteractionEnabled` properties to `InAppWebViewSettings`
 - Added `isInterfaceSupported` method to `PlatformWebViewEnvironment` class
 - Added `isInterfaceSupported`, `setInputMethodEnabled`, `hideInputMethod`, `showInputMethod` methods to `PlatformInAppWebViewController` class
+- Fixed missing PrintJobOrientation android values
 
 ## 1.4.0-beta.1
 

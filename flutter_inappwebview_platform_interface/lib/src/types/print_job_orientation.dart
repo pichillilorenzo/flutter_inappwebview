@@ -14,11 +14,19 @@ class PrintJobOrientation_ {
 
   ///Pages are printed in portrait orientation.
   @EnumSupportedPlatforms(
-      platforms: [EnumIOSPlatform(value: 0), EnumMacOSPlatform(value: 0)])
+      platforms: [
+        EnumAndroidPlatform(value: 0),
+        EnumIOSPlatform(value: 0),
+        EnumMacOSPlatform(value: 0),
+      ])
   static const PORTRAIT = const PrintJobOrientation_._internal(0);
 
   ///Pages are printed in landscape orientation.
   @EnumSupportedPlatforms(
-      platforms: [EnumIOSPlatform(value: 1), EnumMacOSPlatform(value: 1)])
+      platforms: [
+        EnumAndroidPlatform(value: 1),
+        EnumIOSPlatform(value: 1),
+        EnumMacOSPlatform(value: 1),
+      ])
   static const LANDSCAPE = const PrintJobOrientation_._internal(1);
 }

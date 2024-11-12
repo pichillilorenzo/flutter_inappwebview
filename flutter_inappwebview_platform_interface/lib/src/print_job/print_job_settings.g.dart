@@ -44,10 +44,8 @@ class PrintJobSettings {
 
   ///The duplex mode to use for the print job.
   ///
-  ///**NOTE for Android native WebView**: available only on Android 23+.
-  ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Android native WebView
+  ///- Android native WebView 23+
   ///- iOS
   PrintJobDuplexMode? duplexMode;
 

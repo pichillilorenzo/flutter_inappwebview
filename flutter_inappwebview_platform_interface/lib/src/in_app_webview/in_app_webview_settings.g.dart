@@ -151,7 +151,9 @@ class InAppWebViewSettings {
   ///in the range 0.0 to 1.0, where 0.0 represents totally transparent and 1.0 represents totally opaque.
   ///
   ///**Officially Supported Platforms/Implementations**:
+  ///- Android native WebView ([Official API - View.setAlpha](https://developer.android.com/reference/android/view/View#setAlpha(float)))
   ///- iOS ([Official API - UIView.alpha](https://developer.apple.com/documentation/uikit/uiview/1622417-alpha))
+  ///- MacOS ([Official API - NSView.alphaValue](https://developer.apple.com/documentation/appkit/nsview/1483560-alphavalue))
   double? alpha;
 
   ///A Boolean value that determines whether bouncing always occurs when horizontal scrolling reaches the end of the content view.

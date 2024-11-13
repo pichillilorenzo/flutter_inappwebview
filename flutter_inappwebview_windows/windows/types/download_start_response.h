@@ -3,6 +3,7 @@
 
 #include <flutter/standard_method_codec.h>
 #include <optional>
+#include <string>
 
 namespace flutter_inappwebview_plugin
 {
@@ -10,17 +11,17 @@ namespace flutter_inappwebview_plugin
     cancel = 0
   };
 
-  inline DownloadStartResponseAction DownloadStartResponseActionFromInteger(const std::optional<int64_t>& action)
+  inline std::optional<DownloadStartResponseAction> DownloadStartResponseActionFromInteger(const std::optional<int64_t>& action)
   {
-    if (!action.has_value()) {
-      return DownloadStartResponseAction::cancel;
+    if (action.has_value()) {
+      switch (action.value()) {
+      case 0:
+        return DownloadStartResponseAction::cancel;
+      default:
+        return DownloadStartResponseAction::cancel;
+      }
     }
-    switch (action.value()) {
-    case 0:
-      return DownloadStartResponseAction::cancel;
-    default:
-      return DownloadStartResponseAction::cancel;
-    }
+    return std::optional<DownloadStartResponseAction>{};
   }
 
   inline std::optional<int64_t> DownloadStartResponseActionToInteger(const std::optional<DownloadStartResponseAction>& action)
@@ -33,16 +34,19 @@ namespace flutter_inappwebview_plugin
   public:
     const bool handled;
     const std::optional<DownloadStartResponseAction> action;
+    const std::optional<std::string> resultFilePath;
 
     DownloadStartResponse(const bool& handled,
-      const std::optional<DownloadStartResponseAction>& action);
+      const std::optional<DownloadStartResponseAction>& action,
+      const std::optional<std::string>& resultFilePath);
     DownloadStartResponse(const flutter::EncodableMap& map);
     ~DownloadStartResponse() = default;
 
     bool DownloadStartResponse::operator==(const DownloadStartResponse& other)
     {
       return handled == other.handled &&
-        action == other.action;
+        action == other.action &&
+        resultFilePath == other.resultFilePath;
     }
     bool DownloadStartResponse::operator!=(const DownloadStartResponse& other)
     {

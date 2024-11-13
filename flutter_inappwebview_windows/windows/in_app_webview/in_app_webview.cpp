@@ -1067,19 +1067,21 @@ namespace flutter_inappwebview_plugin
                 };
               callback->nonNullSuccess = [this, deferral, args](const std::shared_ptr<DownloadStartResponse> response)
                 {
+                  failedLog(args->put_Handled(response->handled));
+                  auto resultFilePath = response->resultFilePath;
+                  if (resultFilePath.has_value()) {
+                    failedLog(args->put_ResultFilePath(utf8_to_wide(resultFilePath.value()).c_str()));
+                  }
                   auto action = response->action;
-                  if (action.has_value() || response->handled) {
+                  if (action.has_value()) {
                     switch (action.value()) {
                     case DownloadStartResponseAction::cancel:
-                    default:
                       failedLog(args->put_Cancel(true));
                       break;
                     }
-                    failedLog(args->put_Handled(response->handled));
-                    failedLog(deferral->Complete());
-                    return false;
                   }
-                  return true;
+                  failedLog(deferral->Complete());
+                  return false;
                 };
               callback->defaultBehaviour = defaultBehaviour;
               callback->error = [this, defaultBehaviour](const std::string& error_code, const std::string& error_message, const flutter::EncodableValue* error_details)

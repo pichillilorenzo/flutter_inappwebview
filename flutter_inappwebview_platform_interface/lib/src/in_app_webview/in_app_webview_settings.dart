@@ -2080,7 +2080,7 @@ as it can cause framerate drops on animations in Android 9 and lower (see [Hybri
     this.supportZoom = true,
     this.allowFileAccessFromFileURLs = false,
     this.allowUniversalAccessFromFileURLs = false,
-    this.textZoom = 100,
+    this.textZoom,
     @Deprecated("Use CookieManager.removeSessionCookies instead")
     this.clearSessionCache = false,
     this.builtInZoomControls = true,

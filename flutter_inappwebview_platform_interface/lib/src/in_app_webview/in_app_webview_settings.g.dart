@@ -1567,7 +1567,7 @@ class InAppWebViewSettings {
       this.supportZoom = true,
       this.allowFileAccessFromFileURLs = false,
       this.allowUniversalAccessFromFileURLs = false,
-      this.textZoom = 100,
+      this.textZoom,
       @Deprecated("Use CookieManager.removeSessionCookies instead")
       this.clearSessionCache = false,
       this.builtInZoomControls = true,
@@ -1838,6 +1838,7 @@ class InAppWebViewSettings {
               : null,
       scrollBarDefaultDelayBeforeFade: map['scrollBarDefaultDelayBeforeFade'],
       scrollBarFadeDuration: map['scrollBarFadeDuration'],
+      textZoom: map['textZoom'],
       underPageBackgroundColor: map['underPageBackgroundColor'] != null
           ? UtilColor.fromStringRepresentation(map['underPageBackgroundColor'])
           : null,
@@ -2046,7 +2047,6 @@ class InAppWebViewSettings {
     instance.supportZoom = map['supportZoom'];
     instance.suppressesIncrementalRendering =
         map['suppressesIncrementalRendering'];
-    instance.textZoom = map['textZoom'];
     instance.thirdPartyCookiesEnabled = map['thirdPartyCookiesEnabled'];
     instance.transparentBackground = map['transparentBackground'];
     instance.upgradeKnownHostsToHTTPS = map['upgradeKnownHostsToHTTPS'];

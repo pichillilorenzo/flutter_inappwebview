@@ -342,7 +342,8 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
     settings.setLoadWithOverviewMode(customSettings.loadWithOverviewMode);
     settings.setUseWideViewPort(customSettings.useWideViewPort);
     settings.setSupportZoom(customSettings.supportZoom);
-    settings.setTextZoom(customSettings.textZoom);
+    if (customSettings.textZoom != null)
+      settings.setTextZoom(customSettings.textZoom);
 
     setVerticalScrollBarEnabled(!customSettings.disableVerticalScroll && customSettings.verticalScrollBarEnabled);
     setHorizontalScrollBarEnabled(!customSettings.disableHorizontalScroll && customSettings.horizontalScrollBarEnabled);
@@ -912,7 +913,7 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
     if (newSettingsMap.get("supportZoom") != null && customSettings.supportZoom != newCustomSettings.supportZoom)
       settings.setSupportZoom(newCustomSettings.supportZoom);
 
-    if (newSettingsMap.get("textZoom") != null && !customSettings.textZoom.equals(newCustomSettings.textZoom))
+    if (newSettingsMap.get("textZoom") != null && (customSettings.textZoom == null || !customSettings.textZoom.equals(newCustomSettings.textZoom)))
       settings.setTextZoom(newCustomSettings.textZoom);
 
     if (newSettingsMap.get("verticalScrollBarEnabled") != null && customSettings.verticalScrollBarEnabled != newCustomSettings.verticalScrollBarEnabled)

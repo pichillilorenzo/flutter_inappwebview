@@ -10,6 +10,8 @@
 #include "../types/client_cert_response.h"
 #include "../types/create_window_action.h"
 #include "../types/custom_scheme_response.h"
+#include "../types/download_start_request.h"
+#include "../types/download_start_response.h"
 #include "../types/http_auth_response.h"
 #include "../types/http_authentication_challenge.h"
 #include "../types/javascript_handler_function_data.h"
@@ -88,6 +90,12 @@ namespace flutter_inappwebview_plugin
       ~ReceivedServerTrustAuthRequestCallback() = default;
     };
 
+    class DownloadStartRequestCallback : public BaseCallbackResult<const std::shared_ptr<DownloadStartResponse>> {
+    public:
+      DownloadStartRequestCallback();
+      ~DownloadStartRequestCallback() = default;
+    };
+
     WebViewChannelDelegate(InAppWebView* webView, flutter::BinaryMessenger* messenger);
     WebViewChannelDelegate(InAppWebView* webView, flutter::BinaryMessenger* messenger, const std::string& name);
     ~WebViewChannelDelegate();
@@ -119,6 +127,7 @@ namespace flutter_inappwebview_plugin
     void onRenderProcessUnresponsive(const std::optional<std::string>& url) const;
     void onWebContentProcessDidTerminate() const;
     void onProcessFailed(const std::shared_ptr<ProcessFailedDetail> detail) const;
+    void onDownloadStarting(std::shared_ptr<DownloadStartRequest> request, std::unique_ptr<DownloadStartRequestCallback> callback) const;
   };
 }
 

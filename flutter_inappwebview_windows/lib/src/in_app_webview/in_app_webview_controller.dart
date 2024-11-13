@@ -348,11 +348,11 @@ class WindowsInAppWebViewController extends PlatformInAppWebViewController
             _inAppBrowserEventHandler!.onScrollChanged(x, y);
         }
         break;
-      case "onDownloadStartRequest":
+      case "onDownloadStarting":
         if ((webviewParams != null &&
-                // ignore: deprecated_member_use_from_same_package
                 (webviewParams!.onDownloadStart != null ||
-                    webviewParams!.onDownloadStartRequest != null)) ||
+                    webviewParams!.onDownloadStartRequest != null ||
+                    webviewParams!.onDownloadStarting != null)) ||
             _inAppBrowserEventHandler != null) {
           Map<String, dynamic> arguments =
               call.arguments.cast<String, dynamic>();
@@ -360,20 +360,23 @@ class WindowsInAppWebViewController extends PlatformInAppWebViewController
               DownloadStartRequest.fromMap(arguments)!;
 
           if (webviewParams != null) {
-            if (webviewParams!.onDownloadStartRequest != null)
+            if (webviewParams!.onDownloadStarting != null)
+              return (await webviewParams!.onDownloadStarting!(
+                  _controllerFromPlatform, downloadStartRequest))?.toMap();
+            else if (webviewParams!.onDownloadStartRequest != null)
               webviewParams!.onDownloadStartRequest!(
                   _controllerFromPlatform, downloadStartRequest);
             else {
-              // ignore: deprecated_member_use_from_same_package
               webviewParams!.onDownloadStart!(
                   _controllerFromPlatform, downloadStartRequest.url);
             }
           } else {
-            // ignore: deprecated_member_use_from_same_package
             _inAppBrowserEventHandler!
                 .onDownloadStart(downloadStartRequest.url);
             _inAppBrowserEventHandler!
                 .onDownloadStartRequest(downloadStartRequest);
+            return (await _inAppBrowserEventHandler!
+                .onDownloadStarting(downloadStartRequest))?.toMap();
           }
         }
         break;

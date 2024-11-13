@@ -98,6 +98,14 @@ namespace flutter_inappwebview_plugin
       };
   }
 
+  WebViewChannelDelegate::DownloadStartRequestCallback::DownloadStartRequestCallback()
+  {
+    decodeResult = [](const flutter::EncodableValue* value)
+      {
+        return value == nullptr || value->IsNull() ? std::optional<std::shared_ptr<DownloadStartResponse>>{} : std::make_shared<DownloadStartResponse>(std::get<flutter::EncodableMap>(*value));
+      };
+  }
+
   void WebViewChannelDelegate::HandleMethodCall(const flutter::MethodCall<flutter::EncodableValue>& method_call,
     std::unique_ptr<flutter::MethodResult<flutter::EncodableValue>> result)
   {
@@ -595,6 +603,17 @@ namespace flutter_inappwebview_plugin
 
     auto arguments = std::make_unique<flutter::EncodableValue>(detail->toEncodableMap());
     channel->InvokeMethod("onProcessFailed", std::move(arguments));
+  }
+
+  void WebViewChannelDelegate::onDownloadStarting(std::shared_ptr<DownloadStartRequest> request, std::unique_ptr<DownloadStartRequestCallback> callback) const
+  {
+    if (!channel) {
+      callback->defaultBehaviour(std::nullopt);
+      return;
+    }
+
+    auto arguments = std::make_unique<flutter::EncodableValue>(request->toEncodableMap());
+    channel->InvokeMethod("onDownloadStarting", std::move(arguments), std::move(callback));
   }
 
   WebViewChannelDelegate::~WebViewChannelDelegate()

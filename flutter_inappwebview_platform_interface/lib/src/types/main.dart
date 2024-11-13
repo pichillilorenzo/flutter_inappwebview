@@ -239,3 +239,5 @@ export 'focus_direction.dart' show FocusDirection;
 export 'enum_method.dart';
 export 'pdf_toolbar_items.dart' show PdfToolbarItems;
 export 'webview_interface.dart' show WebViewInterface;
+export 'download_start_response_action.dart' show DownloadStartResponseAction;
+export 'download_start_response.dart' show DownloadStartResponse;

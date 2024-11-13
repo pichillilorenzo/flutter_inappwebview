@@ -798,7 +798,7 @@ namespace flutter_inappwebview_plugin
           std::string url = SUCCEEDED(args->get_Uri(&uri)) ? wide_to_utf8(uri.get()) : "";
 
           COREWEBVIEW2_PERMISSION_KIND resource = COREWEBVIEW2_PERMISSION_KIND_UNKNOWN_PERMISSION;
-          failedAndLog(args->get_PermissionKind(&resource));
+          failedLog(args->get_PermissionKind(&resource));
 
           auto callback = std::make_unique<WebViewChannelDelegate::PermissionRequestCallback>();
           auto defaultBehaviour = [this, deferral, args](const std::optional<const std::shared_ptr<PermissionResponse>> permissionResponse)
@@ -1028,6 +1028,71 @@ namespace flutter_inappwebview_plugin
           }
         ).Get(), nullptr);
       failedLog(add_FrameCreated_HResult);
+
+      auto add_DownloadStarting_HResult = webView4->add_DownloadStarting(
+        Callback<ICoreWebView2DownloadStartingEventHandler>(
+          [this](ICoreWebView2* sender, ICoreWebView2DownloadStartingEventArgs* args)
+          {
+            wil::com_ptr<ICoreWebView2Deferral> deferral;
+            wil::com_ptr<ICoreWebView2DownloadOperation> download;
+            if (channelDelegate && settings->useOnDownloadStart && succeededOrLog(args->get_DownloadOperation(&download)) && succeededOrLog(args->GetDeferral(&deferral))) {
+
+              wil::unique_cotaskmem_string uri;
+              std::string url = SUCCEEDED(download->get_Uri(&uri)) ? wide_to_utf8(uri.get()) : "";
+
+              INT64 contentLength = 0;
+              failedLog(download->get_TotalBytesToReceive(&contentLength));
+
+              wil::unique_cotaskmem_string downloadMimeType;
+              std::optional<std::string> mimeType = SUCCEEDED(download->get_MimeType(&downloadMimeType)) ? wide_to_utf8(downloadMimeType.get()) : std::optional<std::string>{};
+
+              wil::unique_cotaskmem_string downloadContentDisposition;
+              std::optional<std::string> contentDisposition = SUCCEEDED(download->get_ContentDisposition(&downloadContentDisposition)) ? wide_to_utf8(downloadContentDisposition.get()) : std::optional<std::string>{};
+
+              wil::unique_cotaskmem_string resultFilePath;
+              std::optional<std::string> suggestedFilename = SUCCEEDED(download->get_ContentDisposition(&resultFilePath)) ? wide_to_utf8(resultFilePath.get()) : std::optional<std::string>{};
+
+              auto request = std::make_shared<DownloadStartRequest>(
+                contentDisposition,
+                contentLength,
+                mimeType,
+                suggestedFilename,
+                url
+              );
+
+              auto callback = std::make_unique<WebViewChannelDelegate::DownloadStartRequestCallback>();
+              auto defaultBehaviour = [this, deferral, args](const std::optional<const std::shared_ptr<DownloadStartResponse>> response)
+                {
+                  failedLog(deferral->Complete());
+                };
+              callback->nonNullSuccess = [this, deferral, args](const std::shared_ptr<DownloadStartResponse> response)
+                {
+                  auto action = response->action;
+                  if (action.has_value() || response->handled) {
+                    switch (action.value()) {
+                    case DownloadStartResponseAction::cancel:
+                    default:
+                      failedLog(args->put_Cancel(true));
+                      break;
+                    }
+                    failedLog(args->put_Handled(response->handled));
+                    failedLog(deferral->Complete());
+                    return false;
+                  }
+                  return true;
+                };
+              callback->defaultBehaviour = defaultBehaviour;
+              callback->error = [this, defaultBehaviour](const std::string& error_code, const std::string& error_message, const flutter::EncodableValue* error_details)
+                {
+                  debugLog(error_code + ", " + error_message);
+                  defaultBehaviour(std::nullopt);
+                };
+              channelDelegate->onDownloadStarting(std::move(request), std::move(callback));
+            }
+            return S_OK;
+          }
+        ).Get(), nullptr);
+      failedLog(add_DownloadStarting_HResult);
     }
 
     if (auto webView5 = webView.try_query<ICoreWebView2_5>()) {

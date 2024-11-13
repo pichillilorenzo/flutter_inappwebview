@@ -128,13 +128,13 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                   onWebViewCreated: (controller) async {
                     webViewController = controller;
                   },
-                  onLoadStart: (controller, url) async {
+                  onLoadStart: (controller, url) {
                     setState(() {
                       this.url = url.toString();
                       urlController.text = this.url;
                     });
                   },
-                  onPermissionRequest: (controller, request) async {
+                  onPermissionRequest: (controller, request) {
                     return PermissionResponse(
                         resources: request.resources,
                         action: PermissionResponseAction.GRANT);
@@ -164,7 +164,7 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
 
                     return NavigationActionPolicy.ALLOW;
                   },
-                  onLoadStop: (controller, url) async {
+                  onLoadStop: (controller, url) {
                     pullToRefreshController?.endRefreshing();
                     setState(() {
                       this.url = url.toString();

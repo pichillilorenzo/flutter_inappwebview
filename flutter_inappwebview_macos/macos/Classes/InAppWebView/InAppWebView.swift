@@ -123,6 +123,10 @@ public class InAppWebView: WKWebView, WKUIDelegate,
 //        }
         
         if let settings = settings {
+            if let viewAlpha = settings.alpha {
+                alphaValue = CGFloat(viewAlpha)
+            }
+            
             javaScriptBridgeEnabled = settings.javaScriptBridgeEnabled
             if let javaScriptBridgeOriginAllowList = settings.javaScriptBridgeOriginAllowList, javaScriptBridgeOriginAllowList.isEmpty {
                 // an empty list means that the JavaScript Bridge is not allowed for any origin.
@@ -558,6 +562,10 @@ public class InAppWebView: WKWebView, WKUIDelegate,
             } else {
                 configuration.userContentController.removeAllUserScripts()
             }
+        }
+        
+        if newSettingsMap["alpha"] != nil, settings?.alpha != newSettings.alpha, let viewAlpha = newSettings.alpha {
+            alphaValue = CGFloat(viewAlpha)
         }
         
         if (newSettingsMap["incognito"] != nil && settings?.incognito != newSettings.incognito && newSettings.incognito) {

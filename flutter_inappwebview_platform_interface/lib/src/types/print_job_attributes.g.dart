@@ -145,6 +145,11 @@ class PrintJobAttributes {
   bool? mustCollate;
 
   ///The orientation of the printed content, portrait or landscape.
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Android native WebView
+  ///- iOS
+  ///- MacOS
   PrintJobOrientation? orientation;
 
   ///The number of logical pages to be tiled horizontally on a physical sheet of paper.

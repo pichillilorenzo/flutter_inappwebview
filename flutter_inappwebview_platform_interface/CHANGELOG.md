@@ -4,10 +4,11 @@
 - Updated `fromMap` static method and `toMap` method implementations
 - Updated all WebView events with return type `Future` to type `FutureOr` in order to not force the usage of `async` keyword
 - Added `byName`, `name`, `asNameMap` custom enum classes methods
-- Added `statusBarEnabled`, `browserAcceleratorKeysEnabled`, `generalAutofillEnabled`, `passwordAutosaveEnabled`, `isPinchZoomEnabled`, `hiddenPdfToolbarItems`, `reputationCheckingRequired`, `nonClientRegionSupportEnabled` property to `InAppWebViewSettings`
+- Added `statusBarEnabled`, `browserAcceleratorKeysEnabled`, `generalAutofillEnabled`, `passwordAutosaveEnabled`, `isPinchZoomEnabled`, `hiddenPdfToolbarItems`, `reputationCheckingRequired`, `nonClientRegionSupportEnabled`, `alpha`, `isUserInteractionEnabled` properties to `InAppWebViewSettings`
 - Added `isInterfaceSupported` method to `PlatformWebViewEnvironment` class
 - Added `isInterfaceSupported`, `setInputMethodEnabled`, `hideInputMethod`, `showInputMethod` methods to `PlatformInAppWebViewController` class
 - Added `onDownloadStarting` WebView event and deprecated `onDownloadStartRequest` event
+- Fixed missing PrintJobOrientation android values
 
 ## 1.4.0-beta.1
 

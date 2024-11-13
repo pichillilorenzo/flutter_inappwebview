@@ -7,7 +7,7 @@
 
 import Flutter
 import Foundation
-import WebKit
+@preconcurrency import WebKit
 
 public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
                             WKNavigationDelegate, WKScriptMessageHandler, UIGestureRecognizerDelegate,
@@ -106,17 +106,42 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
         set {
             super.frame = newValue
             
-            self.scrollView.contentInset = .zero
+            scrollView.contentInset = .zero
             if #available(iOS 11, *) {
                 // Above iOS 11, adjust contentInset to compensate the adjustedContentInset so the sum will
                 // always be 0.
-                if (scrollView.adjustedContentInset != UIEdgeInsets.zero) {
-                    let insetToAdjust = self.scrollView.adjustedContentInset
+                if (scrollView.adjustedContentInset != .zero) {
+                    let insetToAdjust = scrollView.adjustedContentInset
                     scrollView.contentInset = UIEdgeInsets(top: -insetToAdjust.top, left: -insetToAdjust.left,
-                                                                bottom: -insetToAdjust.bottom, right: -insetToAdjust.right)
+                                                           bottom: -insetToAdjust.bottom, right: -insetToAdjust.right)
                 }
             }
         }
+    }
+    
+    // Fix https://github.com/pichillilorenzo/flutter_inappwebview/issues/1947
+    private var _scrollViewContentInsetAdjusted = false
+    @objc func keyboardWillShow(notification: NSNotification) {
+        // UIResponder.keyboardWillShowNotification will be fired also
+        // when changing focus between HTML inputs with the keyboard already open
+        if (scrollView.adjustedContentInset != .zero) {
+            // if resizeToAvoidBottomInset is false on Flutter side,
+            // scrollView.adjustedContentInset.bottom will be > 0
+            if scrollView.adjustedContentInset.bottom > 0 {
+                // if the scrollView.contentInset has already been fixed, do nothing
+                if !_scrollViewContentInsetAdjusted {
+                    _scrollViewContentInsetAdjusted = true
+                    let insetToAdjust = scrollView.adjustedContentInset
+                    scrollView.contentInset = UIEdgeInsets(top: -insetToAdjust.top, left: -insetToAdjust.left,
+                                                           bottom: -insetToAdjust.bottom, right: -insetToAdjust.right)
+                }
+            } else {
+                scrollView.contentInset = .zero
+            }
+        }
+    }
+    @objc func keyboardWillHide(notification: NSNotification) {
+        _scrollViewContentInsetAdjusted = false
     }
     
     required public init(coder aDecoder: NSCoder) {
@@ -348,6 +373,16 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
     }
 
     public func prepare() {
+        if #available(iOS 17.2, *) {
+            // Fix https://github.com/pichillilorenzo/flutter_inappwebview/issues/1947
+            NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow(notification:)),
+                                                   name: UIResponder.keyboardWillShowNotification,
+                                                   object: nil)
+            NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide(notification:)),
+                                                   name: UIResponder.keyboardWillHideNotification,
+                                                   object: nil)
+        }
+        
         scrollView.addGestureRecognizer(self.longPressRecognizer)
         scrollView.addGestureRecognizer(self.recognizerForDisablingContextMenuOnLinks)
         scrollView.addGestureRecognizer(self.panGestureRecognizer)
@@ -417,6 +452,12 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
 //        }
         
         if let settings = settings {
+            isUserInteractionEnabled = settings.isUserInteractionEnabled
+            
+            if let viewAlpha = settings.alpha {
+                alpha = CGFloat(viewAlpha)
+            }
+            
             javaScriptBridgeEnabled = settings.javaScriptBridgeEnabled
             if let javaScriptBridgeOriginAllowList = settings.javaScriptBridgeOriginAllowList, javaScriptBridgeOriginAllowList.isEmpty {
                 // an empty list means that the JavaScript Bridge is not allowed for any origin.
@@ -988,6 +1029,14 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
                     configuration.userContentController.removeAllUserScripts()
                 }
             }
+        }
+        
+        if newSettingsMap["isUserInteractionEnabled"] != nil && settings?.isUserInteractionEnabled != newSettings.isUserInteractionEnabled {
+            isUserInteractionEnabled = newSettings.isUserInteractionEnabled
+        }
+        
+        if newSettingsMap["alpha"] != nil, settings?.alpha != newSettings.alpha, let viewAlpha = newSettings.alpha {
+            alpha = CGFloat(viewAlpha)
         }
         
         if newSettingsMap["transparentBackground"] != nil && settings?.transparentBackground != newSettings.transparentBackground {

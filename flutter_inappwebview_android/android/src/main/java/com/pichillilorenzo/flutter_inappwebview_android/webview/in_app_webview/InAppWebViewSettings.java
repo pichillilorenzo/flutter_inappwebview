@@ -61,7 +61,8 @@ public class InAppWebViewSettings implements ISettings<InAppWebViewInterface> {
   public Boolean allowFileAccessFromFileURLs = false;
   public Boolean allowUniversalAccessFromFileURLs = false;
   public Boolean allowBackgroundAudioPlaying = false;
-  public Integer textZoom = 100;
+  @Nullable
+  public Integer textZoom;
   /**
    * @deprecated
    */
@@ -73,9 +74,11 @@ public class InAppWebViewSettings implements ISettings<InAppWebViewInterface> {
   public Boolean domStorageEnabled = true;
   public Boolean useWideViewPort = true;
   public Boolean safeBrowsingEnabled = true;
+  @Nullable
   public Integer mixedContentMode;
   public Boolean allowContentAccess = true;
   public Boolean allowFileAccess = true;
+  @Nullable
   public String appCachePath;
   public Boolean blockNetworkImage = false;
   public Boolean blockNetworkLoads = false;
@@ -88,9 +91,9 @@ public class InAppWebViewSettings implements ISettings<InAppWebViewInterface> {
   public String fantasyFontFamily = "fantasy";
   public String fixedFontFamily = "monospace";
   @Nullable @Deprecated
-  public Integer forceDark = null;
+  public Integer forceDark;
   @Nullable @Deprecated
-  public Integer forceDarkStrategy = null;
+  public Integer forceDarkStrategy;
   public Boolean geolocationEnabled = true;
   public WebSettings.LayoutAlgorithm layoutAlgorithm;
   public Boolean loadWithOverviewMode = true;
@@ -107,21 +110,21 @@ public class InAppWebViewSettings implements ISettings<InAppWebViewInterface> {
   public Boolean hardwareAcceleration = true;
   public Boolean supportMultipleWindows = false;
   @Nullable
-  public Pattern regexToCancelSubFramesLoading = null;
+  public Pattern regexToCancelSubFramesLoading;
   @Nullable
-  public Pattern regexToAllowSyncUrlLoading = null;
+  public Pattern regexToAllowSyncUrlLoading;
   public Integer overScrollMode = View.OVER_SCROLL_IF_CONTENT_SCROLLS;
   @Nullable
-  public Boolean networkAvailable = null;
+  public Boolean networkAvailable;
   public Integer scrollBarStyle = View.SCROLLBARS_INSIDE_OVERLAY;
   public Integer verticalScrollbarPosition = View.SCROLLBAR_POSITION_DEFAULT;
   @Nullable
-  public Integer scrollBarDefaultDelayBeforeFade = null;
+  public Integer scrollBarDefaultDelayBeforeFade;
   public Boolean scrollbarFadingEnabled = true;
   @Nullable
-  public Integer scrollBarFadeDuration = null;
+  public Integer scrollBarFadeDuration;
   @Nullable
-  public Map<String, Object> rendererPriorityPolicy = null;
+  public Map<String, Object> rendererPriorityPolicy;
   public Boolean useShouldInterceptRequest = false;
   public Boolean useOnRenderProcessGone = false;
   public Boolean disableDefaultErrorPage = false;
@@ -153,6 +156,9 @@ public class InAppWebViewSettings implements ISettings<InAppWebViewInterface> {
   @Nullable
   public Set<String> pluginScriptsOriginAllowList;
   public Boolean pluginScriptsForMainFrameOnly = false;
+  public Boolean isUserInteractionEnabled = true;
+  @Nullable
+  public Double alpha;
 
   @NonNull
   @Override
@@ -459,6 +465,12 @@ public class InAppWebViewSettings implements ISettings<InAppWebViewInterface> {
         case "pluginScriptsForMainFrameOnly":
           pluginScriptsForMainFrameOnly = (Boolean) value;
           break;
+        case "isUserInteractionEnabled":
+          isUserInteractionEnabled = (Boolean) value;
+          break;
+        case "alpha":
+          alpha = (Double) value;
+          break;
       }
     }
 
@@ -573,6 +585,8 @@ public class InAppWebViewSettings implements ISettings<InAppWebViewInterface> {
     settings.put("pluginScriptsOriginAllowList",
             pluginScriptsOriginAllowList != null ? new ArrayList<>(pluginScriptsOriginAllowList) : null);
     settings.put("pluginScriptsForMainFrameOnly", pluginScriptsForMainFrameOnly);
+    settings.put("isUserInteractionEnabled", isUserInteractionEnabled);
+    settings.put("alpha", alpha);
     return settings;
   }
 
@@ -583,6 +597,8 @@ public class InAppWebViewSettings implements ISettings<InAppWebViewInterface> {
     Map<String, Object> realSettings = toMap();
     if (inAppWebView instanceof InAppWebView) {
       InAppWebView webView = (InAppWebView) inAppWebView;
+      realSettings.put("alpha", webView.getAlpha());
+
       WebSettings settings = webView.getSettings();
       realSettings.put("userAgent", settings.getUserAgentString());
       realSettings.put("javaScriptEnabled", settings.getJavaScriptEnabled());

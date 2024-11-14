@@ -3,6 +3,7 @@ package com.pichillilorenzo.flutter_inappwebview_android.webview.in_app_webview;
 import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -853,7 +854,7 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
                     File file = new File(path);
                     Uri data;
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                        data = FileProvider.getUriForFile(InAppWebViewChromeClient.this.inAppWebView.getContext(), "com.pichillilorenzo.flutter_inappwebview_android.fileprovider", file);
+                        data = FileProvider.getUriForFile(InAppWebViewChromeClient.this.inAppWebView.getContext(), getPkgName(InAppWebViewChromeClient.this.inAppWebView.getContext())+".fileprovider", file);
                     } else {
                         data = Uri.fromFile(file);
                     }
@@ -864,6 +865,16 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
             return true;
         }
     };
+
+    public String getPkgName(Context context){
+        try {
+            return context.getPackageManager().getPackageInfo(context.getPackageName(),0).packageName;
+        } catch (Exception e) {
+            return "";
+        }
+    }
+
+
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     @Override

@@ -46,6 +46,14 @@ namespace flutter_inappwebview_plugin
       if (settings->targetCompatibleBrowserVersion.has_value()) {
         options->put_TargetCompatibleBrowserVersion(utf8_to_wide(settings->targetCompatibleBrowserVersion.value()).c_str());
       }
+      wil::com_ptr<ICoreWebView2EnvironmentOptions2> options2;
+      if (succeededOrLog(options->QueryInterface(IID_PPV_ARGS(&options2))) && settings->exclusiveUserDataFolderAccess.has_value()) {
+        options2->put_ExclusiveUserDataFolderAccess(settings->exclusiveUserDataFolderAccess.value());
+      }
+      wil::com_ptr<ICoreWebView2EnvironmentOptions3> options3;
+      if (succeededOrLog(options->QueryInterface(IID_PPV_ARGS(&options3))) && settings->isCustomCrashReportingEnabled.has_value()) {
+        options3->put_IsCustomCrashReportingEnabled(settings->isCustomCrashReportingEnabled.value());
+      }
       wil::com_ptr<ICoreWebView2EnvironmentOptions4> options4;
       if (succeededOrLog(options->QueryInterface(IID_PPV_ARGS(&options4))) && settings->customSchemeRegistrations.has_value()) {
         std::vector<ICoreWebView2CustomSchemeRegistration*> registrations = {};
@@ -53,6 +61,27 @@ namespace flutter_inappwebview_plugin
           registrations.push_back(std::move(customSchemeRegistration->toWebView2CustomSchemeRegistration()));
         }
         options4->SetCustomSchemeRegistrations(static_cast<UINT32>(registrations.size()), registrations.data());
+      }
+      wil::com_ptr<ICoreWebView2EnvironmentOptions5> options5;
+      if (succeededOrLog(options->QueryInterface(IID_PPV_ARGS(&options5)) && settings->enableTrackingPrevention.has_value())) {
+        options5->put_EnableTrackingPrevention(settings->enableTrackingPrevention.value());
+      }
+      wil::com_ptr<ICoreWebView2EnvironmentOptions6> options6;
+      if (succeededOrLog(options->QueryInterface(IID_PPV_ARGS(&options6)) && settings->areBrowserExtensionsEnabled.has_value())) {
+        options6->put_AreBrowserExtensionsEnabled(settings->areBrowserExtensionsEnabled.value());
+      }
+      wil::com_ptr<ICoreWebView2EnvironmentOptions7> options7;
+      if (succeededOrLog(options->QueryInterface(IID_PPV_ARGS(&options7)))) {
+        if (settings->channelSearchKind.has_value()) {
+          options7->put_ChannelSearchKind(static_cast<COREWEBVIEW2_CHANNEL_SEARCH_KIND>(settings->channelSearchKind.value()));
+        }
+        if (settings->releaseChannels.has_value()) {
+          options7->put_ReleaseChannels(static_cast<COREWEBVIEW2_RELEASE_CHANNELS>(settings->releaseChannels.value()));
+        }
+      }
+      wil::com_ptr<ICoreWebView2EnvironmentOptions8> options8;
+      if (succeededOrLog(options->QueryInterface(IID_PPV_ARGS(&options8)) && settings->scrollbarStyle.has_value())) {
+        options8->put_ScrollBarStyle(static_cast<COREWEBVIEW2_SCROLLBAR_STYLE>(settings->scrollbarStyle.value()));
       }
     }
 

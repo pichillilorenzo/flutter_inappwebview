@@ -18,6 +18,8 @@
 - Added `statusBarEnabled`, `browserAcceleratorKeysEnabled`, `generalAutofillEnabled`, `passwordAutosaveEnabled`, `isPinchZoomEnabled`, `hiddenPdfToolbarItems`, `reputationCheckingRequired`, `nonClientRegionSupportEnabled`, `alpha`, `isUserInteractionEnabled` properties to `InAppWebViewSettings`
 - Added `isInterfaceSupported` method to `PlatformWebViewEnvironment` class
 - Added `isInterfaceSupported` method to `PlatformInAppWebViewController` class
+- Added `exclusiveUserDataFolderAccess`, `isCustomCrashReportingEnabled`, `enableTrackingPrevention`, `areBrowserExtensionsEnabled`, `channelSearchKind`, `releaseChannels`, `scrollbarStyle` properties to `WebViewEnvironmentSettings`
+- Added `onDownloadStarting` WebView event and deprecated `onDownloadStartRequest` event
 - Fixed missing PrintJobOrientation android values
 
 #### Android Platform
@@ -43,6 +45,7 @@
 - Implemented `isInterfaceSupported` WebViewEnvironment method
 - Implemented `isInterfaceSupported` InAppWebViewController method
 - Implemented `onDownloadStarting` WebView event
+- Implemented `exclusiveUserDataFolderAccess`, `isCustomCrashReportingEnabled`, `enableTrackingPrevention`, `areBrowserExtensionsEnabled`, `channelSearchKind`, `releaseChannels`, `scrollbarStyle` properties of `WebViewEnvironmentSettings`
 - Fixed wrong channel name when creating a `WebViewEnvironment` instance
 - Fixed "[Windows] Has an overlay on the desktop when the application is minimized" [#2402](https://github.com/pichillilorenzo/flutter_inappwebview/issues/2402)
 - Fixed "[Windows] missing implementation of onPermissionRequest event will cause crash when requested by the webpage" [#2404](https://github.com/pichillilorenzo/flutter_inappwebview/issues/2404)

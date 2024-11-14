@@ -14,11 +14,11 @@ namespace flutter_inappwebview_plugin
   flutter::EncodableMap DownloadStartRequest::toEncodableMap() const
   {
     return flutter::EncodableMap{
-    {"contentDisposition", make_fl_value(contentDisposition)},
-    {"contentLength", make_fl_value(contentLength)},
-    {"mimeType", make_fl_value(mimeType)},
-    {"suggestedFilename", make_fl_value(suggestedFilename)},
-    {"url", make_fl_value(url)}
+      {"contentDisposition", make_fl_value(contentDisposition)},
+      {"contentLength", make_fl_value(contentLength)},
+      {"mimeType", make_fl_value(mimeType)},
+      {"suggestedFilename", make_fl_value(suggestedFilename)},
+      {"url", make_fl_value(url)}
     };
   }
 }

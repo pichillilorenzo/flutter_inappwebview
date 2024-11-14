@@ -241,3 +241,6 @@ export 'pdf_toolbar_items.dart' show PdfToolbarItems;
 export 'webview_interface.dart' show WebViewInterface;
 export 'download_start_response_action.dart' show DownloadStartResponseAction;
 export 'download_start_response.dart' show DownloadStartResponse;
+export 'environment_channel_search_kind.dart' show EnvironmentChannelSearchKind;
+export 'environment_release_channels.dart' show EnvironmentReleaseChannels;
+export 'environment_scrollbar_style.dart' show EnvironmentScrollbarStyle;

@@ -28,6 +28,14 @@ class WebViewEnvironment {
   Future<bool> isInterfaceSupported(WebViewInterface interface) =>
       platform.isInterfaceSupported(interface);
 
+  ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewEnvironment.getProcessInfos}
+  Future<List<BrowserProcessInfo>> getProcessInfos() =>
+      platform.getProcessInfos();
+
+  ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewEnvironment.getFailureReportFolderPath}
+  Future<String?> getFailureReportFolderPath() =>
+      platform.getFailureReportFolderPath();
+
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewEnvironment.create}
   static Future<WebViewEnvironment> create(
       {WebViewEnvironmentSettings? settings}) async {
@@ -55,6 +63,10 @@ class WebViewEnvironment {
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewEnvironment.onBrowserProcessExited}
   void Function(BrowserProcessExitedDetail detail)? get onBrowserProcessExited => platform.onBrowserProcessExited;
   set onBrowserProcessExited(void Function(BrowserProcessExitedDetail detail)? value) => platform.onBrowserProcessExited = value;
+
+  ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewEnvironment.onProcessInfosChanged}
+  void Function(BrowserProcessInfosChangedDetail detail)? get onProcessInfosChanged => platform.onProcessInfosChanged;
+  set onProcessInfosChanged(void Function(BrowserProcessInfosChangedDetail detail)? value) => platform.onProcessInfosChanged = value;
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewEnvironment.dispose}
   Future<void> dispose() => platform.dispose();

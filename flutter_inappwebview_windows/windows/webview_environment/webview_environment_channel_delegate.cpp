@@ -2,6 +2,7 @@
 #include "../utils/log.h"
 #include "../utils/strconv.h"
 #include "../utils/string.h"
+#include "../utils/vector.h"
 #include "webview_environment.h"
 #include "webview_environment_channel_delegate.h"
 
@@ -38,6 +39,16 @@ namespace flutter_inappwebview_plugin
       auto interfaceName = get_fl_map_value<std::string>(arguments, "interface");
       result->Success(webViewEnvironment->isInterfaceSupported(interfaceName));
     }
+    else if (string_equals(methodName, "getProcessInfos")) {
+      auto result_ = std::shared_ptr<flutter::MethodResult<flutter::EncodableValue>>(std::move(result));
+      webViewEnvironment->getProcessInfos([result_ = std::move(result_)](std::vector<std::shared_ptr<BrowserProcessInfo>> processInfos)
+        {
+          result_->Success(make_fl_value(functional_map(processInfos, [](const std::shared_ptr<BrowserProcessInfo>& info) { return info->toEncodableMap(); })));
+        });
+    }
+    else if (string_equals(methodName, "getFailureReportFolderPath")) {
+      result->Success(make_fl_value(webViewEnvironment->getFailureReportFolderPath()));
+    }
     else {
       result->NotImplemented();
     }
@@ -59,6 +70,16 @@ namespace flutter_inappwebview_plugin
 
     auto arguments = std::make_unique<flutter::EncodableValue>(detail->toEncodableMap());
     channel->InvokeMethod("onBrowserProcessExited", std::move(arguments));
+  }
+
+  void WebViewEnvironmentChannelDelegate::onProcessInfosChanged(std::shared_ptr<BrowserProcessInfosChangedDetail> detail) const
+  {
+    if (!channel) {
+      return;
+    }
+
+    auto arguments = std::make_unique<flutter::EncodableValue>(detail->toEncodableMap());
+    channel->InvokeMethod("onProcessInfosChanged", std::move(arguments));
   }
 
   WebViewEnvironmentChannelDelegate::~WebViewEnvironmentChannelDelegate()

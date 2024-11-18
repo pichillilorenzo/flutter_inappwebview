@@ -2,6 +2,8 @@
 #define FLUTTER_INAPPWEBVIEW_PLUGIN_WEBVIEW_ENVIRONMENT_H_
 
 #include <functional>
+#include <string>
+#include <vector>
 #include <WebView2.h>
 #include <wil/com.h>
 
@@ -33,6 +35,8 @@ namespace flutter_inappwebview_plugin
     // without using a "temp" ICoreWebView2 for CookieManager and other possible usage, the onBrowserProcessExited event will never be called
     void useTempWebView(const std::function<void(wil::com_ptr<ICoreWebView2Controller>, wil::com_ptr<ICoreWebView2>)> completionHandler) const;
     bool isInterfaceSupported(const std::string& interfaceName) const;
+    void getProcessInfos(const std::function<void(std::vector<std::shared_ptr<BrowserProcessInfo>>)> completionHandler) const;
+    std::optional<std::string> getFailureReportFolderPath() const;
 
   private:
     wil::com_ptr<ICoreWebView2Environment> environment_;

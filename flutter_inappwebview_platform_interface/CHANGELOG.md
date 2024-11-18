@@ -5,11 +5,11 @@
 - Updated all WebView events with return type `Future` to type `FutureOr` in order to not force the usage of `async` keyword
 - Added `byName`, `name`, `asNameMap` custom enum classes methods
 - Added `statusBarEnabled`, `browserAcceleratorKeysEnabled`, `generalAutofillEnabled`, `passwordAutosaveEnabled`, `isPinchZoomEnabled`, `hiddenPdfToolbarItems`, `reputationCheckingRequired`, `nonClientRegionSupportEnabled`, `alpha`, `isUserInteractionEnabled` properties to `InAppWebViewSettings`
-- Added `isInterfaceSupported` method to `PlatformWebViewEnvironment` class
+- Added `isInterfaceSupported`, `getProcessInfos`, `getFailureReportFolderPath` methods to `PlatformWebViewEnvironment` class
 - Added `isInterfaceSupported`, `setInputMethodEnabled`, `hideInputMethod`, `showInputMethod` methods to `PlatformInAppWebViewController` class
 - Added `exclusiveUserDataFolderAccess`, `isCustomCrashReportingEnabled`, `enableTrackingPrevention`, `areBrowserExtensionsEnabled`, `channelSearchKind`, `releaseChannels`, `scrollbarStyle` properties to `WebViewEnvironmentSettings`
 - Added `onDownloadStarting` WebView event and deprecated `onDownloadStartRequest` event
-- Added `onNewBrowserVersionAvailable`, `onBrowserProcessExited` events to `PlatformWebViewEnvironment` class
+- Added `onNewBrowserVersionAvailable`, `onBrowserProcessExited`, `onProcessInfosChanged` events to `PlatformWebViewEnvironment` class
 - Fixed missing PrintJobOrientation android values
 
 ## 1.4.0-beta.1

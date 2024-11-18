@@ -3,11 +3,13 @@ import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 
 import '../debug_logging_settings.dart';
 import '../inappwebview_platform.dart';
+import '../in_app_webview/platform_webview.dart';
+import '../types/browser_process_info.dart';
 import '../types/disposable.dart';
 import '../types/browser_process_exited_detail.dart';
+import '../types/browser_process_infos_changed_detail.dart';
 import '../types/webview_interface.dart';
 import 'webview_environment_settings.dart';
-import '../in_app_webview/platform_webview.dart';
 
 /// Object specifying creation parameters for creating a [PlatformWebViewEnvironment].
 ///
@@ -98,6 +100,39 @@ abstract class PlatformWebViewEnvironment extends PlatformInterface
   Future<bool> isInterfaceSupported(WebViewInterface interface) async {
     throw UnimplementedError(
         'isInterfaceSupported is not implemented on the current platform');
+  }
+
+  ///{@template flutter_inappwebview_platform_interface.PlatformWebViewEnvironment.getProcessInfos}
+  ///Returns a list of all process using same user data folder except for crashpad process.
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Windows 1.0.1108.44+ ([Official API - ICoreWebView2Environment8.GetProcessInfos](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2environment8?view=webview2-1.0.2849.39#getprocessinfos))
+  ///{@endtemplate}
+  Future<List<BrowserProcessInfo>> getProcessInfos() async {
+    throw UnimplementedError(
+        'getProcessInfos is not implemented on the current platform');
+  }
+
+  ///{@template flutter_inappwebview_platform_interface.PlatformWebViewEnvironment.getProcessInfos}
+  ///Returns the path of the folder where minidump files are written.
+  ///
+  ///Whenever a WebView2 process crashes, a crash dump file will be created in the crash dump folder.
+  ///The crash dump format is minidump files.
+  ///Please see [Minidump Files documentation](https://learn.microsoft.com/en-us/windows/win32/debug/minidump-files) for detailed information.
+  ///Normally when a single child process fails, a minidump will be generated and written to disk,
+  ///then the [PlatformWebViewCreationParams.onProcessFailed] event is raised.
+  ///But for unexpected crashes, a minidump file might
+  ///not be generated at all, despite whether [PlatformWebViewCreationParams.onProcessFailed] event is raised.
+  ///If there are multiple process failures at once, multiple minidump files could be generated.
+  ///Thus [getFailureReportFolderPath] could contain old minidump files that are
+  ///not associated with a specific [PlatformWebViewCreationParams.onProcessFailed] event.
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Windows 1.0.1518.46+ ([Official API - ICoreWebView2Environment11.get_FailureReportFolderPath](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2environment11?view=webview2-1.0.2849.39#get_failurereportfolderpath))
+  ///{@endtemplate}
+  Future<String?> getFailureReportFolderPath() async {
+    throw UnimplementedError(
+        'getFailureReportFolderPath is not implemented on the current platform');
   }
 
   ///{@template flutter_inappwebview_platform_interface.PlatformWebViewEnvironment.create}
@@ -204,6 +239,14 @@ abstract class PlatformWebViewEnvironment extends PlatformInterface
   ///- Windows 1.0.992.28+ ([Official API - ICoreWebView2Environment5.add_BrowserProcessExited](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2environment5?view=webview2-1.0.2849.39#add_browserprocessexited))
   ///{@endtemplate}
   void Function(BrowserProcessExitedDetail detail)? onBrowserProcessExited;
+
+  ///{@template flutter_inappwebview_platform_interface.PlatformWebViewEnvironment.onProcessInfosChanged}
+  ///Event fired with a list of all process using same user data folder except for crashpad process.
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Windows 1.0.1108.44+ ([Official API - ICoreWebView2Environment8.add_ProcessInfosChanged](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2environment8?view=webview2-1.0.2849.39#add_processinfoschanged))
+  ///{@endtemplate}
+  void Function(BrowserProcessInfosChangedDetail detail)? onProcessInfosChanged;
 
   ///{@template flutter_inappwebview_platform_interface.PlatformWebViewEnvironment.dispose}
   ///Disposes the WebView Environment reference.

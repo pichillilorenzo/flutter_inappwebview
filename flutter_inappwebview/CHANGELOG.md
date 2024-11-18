@@ -16,10 +16,11 @@
 - Updated all WebView events with return type `Future` to type `FutureOr` in order to not force the usage of `async` keyword
 - Added `byName`, `name`, `asNameMap` custom enum classes methods
 - Added `statusBarEnabled`, `browserAcceleratorKeysEnabled`, `generalAutofillEnabled`, `passwordAutosaveEnabled`, `isPinchZoomEnabled`, `hiddenPdfToolbarItems`, `reputationCheckingRequired`, `nonClientRegionSupportEnabled`, `alpha`, `isUserInteractionEnabled` properties to `InAppWebViewSettings`
-- Added `isInterfaceSupported` method to `PlatformWebViewEnvironment` class
-- Added `isInterfaceSupported` method to `PlatformInAppWebViewController` class
+- Added `isInterfaceSupported`, `getProcessInfos`, `getFailureReportFolderPath` methods to `PlatformWebViewEnvironment` class
+- Added `isInterfaceSupported`, `setInputMethodEnabled`, `hideInputMethod`, `showInputMethod` methods to `PlatformInAppWebViewController` class
 - Added `exclusiveUserDataFolderAccess`, `isCustomCrashReportingEnabled`, `enableTrackingPrevention`, `areBrowserExtensionsEnabled`, `channelSearchKind`, `releaseChannels`, `scrollbarStyle` properties to `WebViewEnvironmentSettings`
 - Added `onDownloadStarting` WebView event and deprecated `onDownloadStartRequest` event
+- Added `onNewBrowserVersionAvailable`, `onBrowserProcessExited`, `onProcessInfosChanged` events to `PlatformWebViewEnvironment` class
 - Fixed missing PrintJobOrientation android values
 
 #### Android Platform
@@ -42,10 +43,11 @@
 #### Windows Platform
 - Updated Microsoft.Web.WebView2 SDK version from `1.0.2792.45` to `1.0.2849.39`
 - Implemented `disableDefaultErrorPage`, `statusBarEnabled`, `browserAcceleratorKeysEnabled`, `generalAutofillEnabled`, `passwordAutosaveEnabled`, `isPinchZoomEnabled`, `allowsBackForwardNavigationGestures`, `hiddenPdfToolbarItems`, `reputationCheckingRequired`, `nonClientRegionSupportEnabled` properties of `InAppWebViewSettings`
-- Implemented `isInterfaceSupported` WebViewEnvironment method
+- Implemented `isInterfaceSupported`, `getProcessInfos`, `getFailureReportFolderPath` WebViewEnvironment methods
 - Implemented `isInterfaceSupported` InAppWebViewController method
 - Implemented `onDownloadStarting` WebView event
 - Implemented `exclusiveUserDataFolderAccess`, `isCustomCrashReportingEnabled`, `enableTrackingPrevention`, `areBrowserExtensionsEnabled`, `channelSearchKind`, `releaseChannels`, `scrollbarStyle` properties of `WebViewEnvironmentSettings`
+- Implemented `onNewBrowserVersionAvailable`, `onBrowserProcessExited`, `onProcessInfosChanged` WebViewEnvironment events
 - Fixed wrong channel name when creating a `WebViewEnvironment` instance
 - Fixed "[Windows] Has an overlay on the desktop when the application is minimized" [#2402](https://github.com/pichillilorenzo/flutter_inappwebview/issues/2402)
 - Fixed "[Windows] missing implementation of onPermissionRequest event will cause crash when requested by the webpage" [#2404](https://github.com/pichillilorenzo/flutter_inappwebview/issues/2404)

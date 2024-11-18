@@ -4,6 +4,7 @@
 #include <flutter/method_channel.h>
 
 #include "../types/browser_process_exited_detail.h"
+#include "../types/browser_process_infos_changed_detail.h"
 #include "../types/channel_delegate.h"
 
 namespace flutter_inappwebview_plugin
@@ -24,6 +25,7 @@ namespace flutter_inappwebview_plugin
 
     void onNewBrowserVersionAvailable() const;
     void onBrowserProcessExited(std::shared_ptr<BrowserProcessExitedDetail> detail) const;
+    void onProcessInfosChanged(std::shared_ptr<BrowserProcessInfosChangedDetail> detail) const;
   };
 }
 

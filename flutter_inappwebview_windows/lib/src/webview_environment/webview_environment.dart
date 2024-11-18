@@ -61,6 +61,18 @@ class WindowsWebViewEnvironment extends PlatformWebViewEnvironment
     }
 
     switch (call.method) {
+      case 'onNewBrowserVersionAvailable':
+        if (onNewBrowserVersionAvailable != null) {
+          onNewBrowserVersionAvailable?.call();
+        }
+        break;
+      case 'onBrowserProcessExited':
+        if (onBrowserProcessExited != null) {
+          Map<String, dynamic> arguments = call.arguments.cast<String, dynamic>();
+          final detail = BrowserProcessExitedDetail.fromMap(arguments)!;
+          onBrowserProcessExited?.call(detail);
+        }
+        break;
       default:
         throw UnimplementedError("Unimplemented ${call.method} method");
     }

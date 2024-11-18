@@ -7,6 +7,7 @@
 - Implemented `isInterfaceSupported` InAppWebViewController method
 - Implemented `onDownloadStarting` WebView event
 - Implemented `exclusiveUserDataFolderAccess`, `isCustomCrashReportingEnabled`, `enableTrackingPrevention`, `areBrowserExtensionsEnabled`, `channelSearchKind`, `releaseChannels`, `scrollbarStyle` properties of `WebViewEnvironmentSettings`
+- Implemented `onNewBrowserVersionAvailable`, `onBrowserProcessExited` WebViewEnvironment events
 - Fixed wrong channel name when creating a `WebViewEnvironment` instance
 - Fixed "[Windows] Has an overlay on the desktop when the application is minimized" [#2402](https://github.com/pichillilorenzo/flutter_inappwebview/issues/2402)
 - Fixed "[Windows] missing implementation of onPermissionRequest event will cause crash when requested by the webpage" [#2404](https://github.com/pichillilorenzo/flutter_inappwebview/issues/2404)

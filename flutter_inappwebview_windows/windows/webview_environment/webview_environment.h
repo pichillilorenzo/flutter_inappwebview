@@ -30,20 +30,12 @@ namespace flutter_inappwebview_plugin
     {
       return environment_;
     }
-    wil::com_ptr<ICoreWebView2Controller> getWebViewController()
-    {
-      return webViewController_;
-    }
-    wil::com_ptr<ICoreWebView2> getWebView()
-    {
-      return webView_;
-    }
+    // without using a "temp" ICoreWebView2 for CookieManager and other possible usage, the onBrowserProcessExited event will never be called
+    void useTempWebView(const std::function<void(wil::com_ptr<ICoreWebView2Controller>, wil::com_ptr<ICoreWebView2>)> completionHandler) const;
     bool isInterfaceSupported(const std::string& interfaceName) const;
 
   private:
     wil::com_ptr<ICoreWebView2Environment> environment_;
-    wil::com_ptr<ICoreWebView2Controller> webViewController_;
-    wil::com_ptr<ICoreWebView2> webView_;
     WNDCLASS windowClass_ = {};
   };
 }

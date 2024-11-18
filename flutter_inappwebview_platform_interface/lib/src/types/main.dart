@@ -244,3 +244,5 @@ export 'download_start_response.dart' show DownloadStartResponse;
 export 'environment_channel_search_kind.dart' show EnvironmentChannelSearchKind;
 export 'environment_release_channels.dart' show EnvironmentReleaseChannels;
 export 'environment_scrollbar_style.dart' show EnvironmentScrollbarStyle;
+export 'browser_process_exit_kind.dart' show BrowserProcessExitKind;
+export 'browser_process_exited_detail.dart' show BrowserProcessExitedDetail;

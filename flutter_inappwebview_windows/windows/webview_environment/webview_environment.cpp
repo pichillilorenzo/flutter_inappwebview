@@ -63,11 +63,11 @@ namespace flutter_inappwebview_plugin
         options4->SetCustomSchemeRegistrations(static_cast<UINT32>(registrations.size()), registrations.data());
       }
       wil::com_ptr<ICoreWebView2EnvironmentOptions5> options5;
-      if (succeededOrLog(options->QueryInterface(IID_PPV_ARGS(&options5)) && settings->enableTrackingPrevention.has_value())) {
+      if (succeededOrLog(options->QueryInterface(IID_PPV_ARGS(&options5))) && settings->enableTrackingPrevention.has_value()) {
         options5->put_EnableTrackingPrevention(settings->enableTrackingPrevention.value());
       }
       wil::com_ptr<ICoreWebView2EnvironmentOptions6> options6;
-      if (succeededOrLog(options->QueryInterface(IID_PPV_ARGS(&options6)) && settings->areBrowserExtensionsEnabled.has_value())) {
+      if (succeededOrLog(options->QueryInterface(IID_PPV_ARGS(&options6))) && settings->areBrowserExtensionsEnabled.has_value()) {
         options6->put_AreBrowserExtensionsEnabled(settings->areBrowserExtensionsEnabled.value());
       }
       wil::com_ptr<ICoreWebView2EnvironmentOptions7> options7;
@@ -80,7 +80,7 @@ namespace flutter_inappwebview_plugin
         }
       }
       wil::com_ptr<ICoreWebView2EnvironmentOptions8> options8;
-      if (succeededOrLog(options->QueryInterface(IID_PPV_ARGS(&options8)) && settings->scrollbarStyle.has_value())) {
+      if (succeededOrLog(options->QueryInterface(IID_PPV_ARGS(&options8))) && settings->scrollbarStyle.has_value()) {
         options8->put_ScrollBarStyle(static_cast<COREWEBVIEW2_SCROLLBAR_STYLE>(settings->scrollbarStyle.value()));
       }
     }
@@ -95,23 +95,38 @@ namespace flutter_inappwebview_plugin
           if (succeededOrLog(result)) {
             environment_ = std::move(environment);
 
-            auto hr = environment_->CreateCoreWebView2Controller(hwnd, Callback<ICoreWebView2CreateCoreWebView2ControllerCompletedHandler>(
-              [this, completionHandler](HRESULT result, wil::com_ptr<ICoreWebView2Controller> controller) -> HRESULT
+            auto add_NewBrowserVersionAvailable_HResult = environment_->add_NewBrowserVersionAvailable(Callback<ICoreWebView2NewBrowserVersionAvailableEventHandler>(
+              [this](ICoreWebView2Environment* sender, IUnknown* args)
               {
-                if (succeededOrLog(result)) {
-                  webViewController_ = std::move(controller);
-                  webViewController_->get_CoreWebView2(&webView_);
-                  webViewController_->put_IsVisible(false);
-                }
-                if (completionHandler) {
-                  completionHandler(result);
+                if (channelDelegate) {
+                  channelDelegate->onNewBrowserVersionAvailable();
                 }
                 return S_OK;
-              }).Get());
+              }
+            ).Get(), nullptr);
+            failedLog(add_NewBrowserVersionAvailable_HResult);
 
-            if (failedAndLog(hr) && completionHandler) {
-              completionHandler(hr);
+            if (auto environment5 = environment_.try_query<ICoreWebView2Environment5>()) {
+              auto add_BrowserProcessExited_HResult = environment5->add_BrowserProcessExited(Callback<ICoreWebView2BrowserProcessExitedEventHandler>(
+                [this](ICoreWebView2Environment* sender, ICoreWebView2BrowserProcessExitedEventArgs* args)
+                {
+                  if (channelDelegate) {
+                    COREWEBVIEW2_BROWSER_PROCESS_EXIT_KIND exitKind;
+                    std::optional<int64_t> kind = SUCCEEDED(args->get_BrowserProcessExitKind(&exitKind)) ? static_cast<int64_t>(exitKind) : std::optional<int64_t>{};
+
+                    UINT32 pid;
+                    std::optional<int64_t> processId = SUCCEEDED(args->get_BrowserProcessId(&pid)) ? static_cast<int64_t>(pid) : std::optional<int64_t>{};
+
+                    auto browserProcessExitedDetail = std::make_shared<BrowserProcessExitedDetail>(kind, processId);
+                    channelDelegate->onBrowserProcessExited(std::move(browserProcessExitedDetail));
+                  }
+                  return S_OK;
+                }
+              ).Get(), nullptr);
+              failedLog(add_BrowserProcessExited_HResult);
             }
+
+            completionHandler(S_OK);
           }
           else if (completionHandler) {
             completionHandler(result);
@@ -121,6 +136,40 @@ namespace flutter_inappwebview_plugin
 
     if (failedAndLog(hr) && completionHandler) {
       completionHandler(hr);
+    }
+  }
+
+  void WebViewEnvironment::useTempWebView(const std::function<void(wil::com_ptr<ICoreWebView2Controller>, wil::com_ptr<ICoreWebView2>)> completionHandler) const
+  {
+    auto hwnd = plugin->webViewEnvironmentManager->getHWND();
+    if (!hwnd) {
+      if (completionHandler) {
+        completionHandler(nullptr, nullptr);
+      }
+      return;
+    }
+
+    auto hr = environment_->CreateCoreWebView2Controller(hwnd, Callback<ICoreWebView2CreateCoreWebView2ControllerCompletedHandler>(
+      [this, completionHandler](HRESULT result, wil::com_ptr<ICoreWebView2Controller> controller) -> HRESULT
+      {
+        if (succeededOrLog(result)) {
+          controller->put_IsVisible(false);
+
+          wil::com_ptr<ICoreWebView2> webView_;
+          controller->get_CoreWebView2(&webView_);
+
+          if (completionHandler) {
+            completionHandler(std::move(controller), std::move(webView_));
+          }
+        }
+        else if (completionHandler) {
+          completionHandler(nullptr, nullptr);
+        }
+        return S_OK;
+      }).Get());
+
+    if (failedAndLog(hr) && completionHandler) {
+      completionHandler(nullptr, nullptr);
     }
   }
 
@@ -171,5 +220,6 @@ namespace flutter_inappwebview_plugin
   WebViewEnvironment::~WebViewEnvironment()
   {
     debugLog("dealloc WebViewEnvironment");
+    environment_ = nullptr;
   }
 }

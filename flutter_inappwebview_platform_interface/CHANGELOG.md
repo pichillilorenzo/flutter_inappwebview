@@ -9,6 +9,7 @@
 - Added `isInterfaceSupported`, `setInputMethodEnabled`, `hideInputMethod`, `showInputMethod` methods to `PlatformInAppWebViewController` class
 - Added `exclusiveUserDataFolderAccess`, `isCustomCrashReportingEnabled`, `enableTrackingPrevention`, `areBrowserExtensionsEnabled`, `channelSearchKind`, `releaseChannels`, `scrollbarStyle` properties to `WebViewEnvironmentSettings`
 - Added `onDownloadStarting` WebView event and deprecated `onDownloadStartRequest` event
+- Added `onNewBrowserVersionAvailable`, `onBrowserProcessExited` events to `PlatformWebViewEnvironment` class
 - Fixed missing PrintJobOrientation android values
 
 ## 1.4.0-beta.1

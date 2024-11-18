@@ -43,6 +43,24 @@ namespace flutter_inappwebview_plugin
     }
   }
 
+  void WebViewEnvironmentChannelDelegate::onNewBrowserVersionAvailable() const
+  {
+    if (!channel) {
+      return;
+    }
+    channel->InvokeMethod("onNewBrowserVersionAvailable", nullptr);
+  }
+
+  void WebViewEnvironmentChannelDelegate::onBrowserProcessExited(std::shared_ptr<BrowserProcessExitedDetail> detail) const
+  {
+    if (!channel) {
+      return;
+    }
+
+    auto arguments = std::make_unique<flutter::EncodableValue>(detail->toEncodableMap());
+    channel->InvokeMethod("onBrowserProcessExited", std::move(arguments));
+  }
+
   WebViewEnvironmentChannelDelegate::~WebViewEnvironmentChannelDelegate()
   {
     debugLog("dealloc WebViewEnvironmentChannelDelegate");

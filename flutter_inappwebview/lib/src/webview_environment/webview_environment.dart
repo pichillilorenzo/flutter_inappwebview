@@ -48,6 +48,14 @@ class WebViewEnvironment {
       PlatformWebViewEnvironment.static()
           .compareBrowserVersions(version1: version1, version2: version2);
 
+  ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewEnvironment.onNewBrowserVersionAvailable}
+  void Function()? get onNewBrowserVersionAvailable => platform.onNewBrowserVersionAvailable;
+  set onNewBrowserVersionAvailable(void Function()? value) => platform.onNewBrowserVersionAvailable = value;
+
+  ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewEnvironment.onBrowserProcessExited}
+  void Function(BrowserProcessExitedDetail detail)? get onBrowserProcessExited => platform.onBrowserProcessExited;
+  set onBrowserProcessExited(void Function(BrowserProcessExitedDetail detail)? value) => platform.onBrowserProcessExited = value;
+
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewEnvironment.dispose}
   Future<void> dispose() => platform.dispose();
 }

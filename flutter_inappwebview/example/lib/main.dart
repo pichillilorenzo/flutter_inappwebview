@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -34,6 +35,12 @@ Future main() async {
           : null,
       userDataFolder: 'custom_path',
     ));
+
+    webViewEnvironment?.onBrowserProcessExited = (detail) {
+      if (kDebugMode) {
+        print('Browser process exited with detail: $detail');
+      }
+    };
   }
 
   if (!kIsWeb && defaultTargetPlatform == TargetPlatform.android) {

@@ -145,6 +145,7 @@ public class InAppBrowserActivity extends AppCompatActivity implements InAppBrow
     webView.customSettings = webViewSettings;
     webView.contextMenu = contextMenu;
 
+    webView.prepareAndAddUserScripts();
     List<UserScript> userScripts = new ArrayList<>();
     if (initialUserScripts != null) {
       for (Map<String, Object> initialUserScript : initialUserScripts) {

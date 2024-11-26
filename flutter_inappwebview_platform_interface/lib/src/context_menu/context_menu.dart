@@ -55,8 +55,9 @@ class ContextMenu_ {
   // ignore: unused_element
   Map<String, dynamic> _toMapMergeWith({EnumMethod? enumMethod}) {
     return {
-      "settings": (settings as ContextMenuSettings?)?.toMap(enumMethod: enumMethod) ??
-          (options as ContextMenuOptions?)?.toMap(enumMethod: enumMethod)
+      "settings":
+          (settings as ContextMenuSettings?)?.toMap(enumMethod: enumMethod) ??
+              (options as ContextMenuOptions?)?.toMap(enumMethod: enumMethod)
     };
   }
 }

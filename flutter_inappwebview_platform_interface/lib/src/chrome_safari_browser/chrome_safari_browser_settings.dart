@@ -27,7 +27,8 @@ TrustedWebActivityDisplayMode? _deserializeDisplayMode(
   }
   switch (displayMode["type"]) {
     case "IMMERSIVE_MODE":
-      return TrustedWebActivityImmersiveDisplayMode.fromMap(displayMode, enumMethod: enumMethod);
+      return TrustedWebActivityImmersiveDisplayMode.fromMap(displayMode,
+          enumMethod: enumMethod);
     case "DEFAULT_MODE":
     default:
       return TrustedWebActivityDefaultDisplayMode();

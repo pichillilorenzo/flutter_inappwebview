@@ -25,10 +25,7 @@ class DownloadStartRequest_ {
   String? userAgent;
 
   ///Content-disposition http header, if present.
-  @SupportedPlatforms(platforms: [
-    AndroidPlatform(),
-    WindowsPlatform()
-  ])
+  @SupportedPlatforms(platforms: [AndroidPlatform(), WindowsPlatform()])
   String? contentDisposition;
 
   ///The mimetype of the content reported by the server.
@@ -59,11 +56,8 @@ class DownloadStartRequest_ {
   String? suggestedFilename;
 
   ///The name of the text encoding of the receiver, or `null` if no text encoding was specified.
-  @SupportedPlatforms(platforms: [
-    AndroidPlatform(),
-    IOSPlatform(),
-    MacOSPlatform()
-  ])
+  @SupportedPlatforms(
+      platforms: [AndroidPlatform(), IOSPlatform(), MacOSPlatform()])
   String? textEncodingName;
 
   DownloadStartRequest_(

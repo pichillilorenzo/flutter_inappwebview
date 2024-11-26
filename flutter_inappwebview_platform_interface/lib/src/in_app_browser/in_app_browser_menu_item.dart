@@ -15,8 +15,7 @@ dynamic _serializeIcon(dynamic icon, {EnumMethod? enumMethod}) {
   return icon is Uint8List ? icon : icon?.toMap(enumMethod: enumMethod);
 }
 
-dynamic _deserializeIcon(dynamic icon,
-    {EnumMethod? enumMethod}) {
+dynamic _deserializeIcon(dynamic icon, {EnumMethod? enumMethod}) {
   if (icon is Uint8List) {
     return icon;
   }

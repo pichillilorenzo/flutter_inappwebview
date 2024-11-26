@@ -41,7 +41,8 @@ class PlatformInAppWebViewWidgetCreationParams
       super.onLoadResource,
       super.onScrollChanged,
       @Deprecated('Use onDownloadStarting instead') super.onDownloadStart,
-      @Deprecated('Use onDownloadStarting instead') super.onDownloadStartRequest,
+      @Deprecated('Use onDownloadStarting instead')
+      super.onDownloadStartRequest,
       super.onDownloadStarting,
       @Deprecated('Use onLoadResourceWithCustomScheme instead')
       super.onLoadResourceCustomScheme,

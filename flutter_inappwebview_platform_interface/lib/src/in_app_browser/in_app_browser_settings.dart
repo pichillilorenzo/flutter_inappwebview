@@ -59,9 +59,11 @@ class InAppBrowserClassSettings {
       instance = InAppBrowserClassSettings();
     }
     instance.browserSettings =
-        InAppBrowserSettings.fromMap(options, enumMethod: enumMethod) ?? InAppBrowserSettings();
+        InAppBrowserSettings.fromMap(options, enumMethod: enumMethod) ??
+            InAppBrowserSettings();
     instance.webViewSettings =
-        InAppWebViewSettings.fromMap(options, enumMethod: enumMethod) ?? InAppWebViewSettings();
+        InAppWebViewSettings.fromMap(options, enumMethod: enumMethod) ??
+            InAppWebViewSettings();
     return instance;
   }
 

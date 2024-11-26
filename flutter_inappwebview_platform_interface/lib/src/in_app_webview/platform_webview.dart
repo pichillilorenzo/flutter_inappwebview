@@ -221,8 +221,9 @@ class PlatformWebViewCreationParams<T> {
   ///- MacOS
   ///- Windows ([Official API - ICoreWebView2_4.add_DownloadStarting](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2_4?view=webview2-1.0.2849.39#add_downloadstarting))
   ///{@endtemplate}
-  final FutureOr<DownloadStartResponse?> Function(T controller, DownloadStartRequest downloadStartRequest)?
-  onDownloadStarting;
+  final FutureOr<DownloadStartResponse?> Function(
+          T controller, DownloadStartRequest downloadStartRequest)?
+      onDownloadStarting;
 
   ///Use [onLoadResourceWithCustomScheme] instead.
   @Deprecated('Use onLoadResourceWithCustomScheme instead')
@@ -504,8 +505,8 @@ class PlatformWebViewCreationParams<T> {
   ///- iOS
   ///- MacOS
   ///{@endtemplate}
-  final FutureOr<FetchRequest?> Function(T controller, FetchRequest fetchRequest)?
-      shouldInterceptFetchRequest;
+  final FutureOr<FetchRequest?> Function(
+      T controller, FetchRequest fetchRequest)? shouldInterceptFetchRequest;
 
   ///{@template flutter_inappwebview_platform_interface.PlatformWebViewCreationParams.onUpdateVisitedHistory}
   ///Event fired when the host application updates its visited links database.
@@ -794,8 +795,8 @@ class PlatformWebViewCreationParams<T> {
   ///- Android native WebView ([Official API - WebViewRenderProcessClient.onRenderProcessUnresponsive](https://developer.android.com/reference/android/webkit/WebViewRenderProcessClient#onRenderProcessUnresponsive(android.webkit.WebView,%20android.webkit.WebViewRenderProcess)))
   ///- Windows ([Official API - ICoreWebView2.add_ProcessFailed](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2?view=webview2-1.0.2849.39#add_processfailed))
   ///{@endtemplate}
-  final FutureOr<WebViewRenderProcessAction?> Function(T controller, WebUri? url)?
-      onRenderProcessUnresponsive;
+  final FutureOr<WebViewRenderProcessAction?> Function(
+      T controller, WebUri? url)? onRenderProcessUnresponsive;
 
   ///Use [onRenderProcessResponsive] instead.
   @Deprecated("Use onRenderProcessResponsive instead")
@@ -816,8 +817,8 @@ class PlatformWebViewCreationParams<T> {
   ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebViewRenderProcessClient.onRenderProcessResponsive](https://developer.android.com/reference/android/webkit/WebViewRenderProcessClient#onRenderProcessResponsive(android.webkit.WebView,%20android.webkit.WebViewRenderProcess)))
   ///{@endtemplate}
-  final FutureOr<WebViewRenderProcessAction?> Function(T controller, WebUri? url)?
-      onRenderProcessResponsive;
+  final FutureOr<WebViewRenderProcessAction?> Function(
+      T controller, WebUri? url)? onRenderProcessResponsive;
 
   ///Use [onRenderProcessGone] instead.
   @Deprecated("Use onRenderProcessGone instead")
@@ -1111,7 +1112,7 @@ class PlatformWebViewCreationParams<T> {
   ///- Windows ([Official API - ICoreWebView2Controller.add_AcceleratorKeyPressed](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2controller?view=webview2-1.0.2849.39#add_acceleratorkeypressed))
   ///{@endtemplate}
   final void Function(T controller, AcceleratorKeyPressedDetail detail)?
-    onAcceleratorKeyPressed;
+      onAcceleratorKeyPressed;
 
   ///{@template flutter_inappwebview_platform_interface.PlatformWebViewCreationParams.initialUrlRequest}
   ///Initial url request that will be loaded.

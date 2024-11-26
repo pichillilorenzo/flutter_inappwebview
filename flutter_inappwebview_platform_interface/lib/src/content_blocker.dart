@@ -207,8 +207,7 @@ class ContentBlockerTrigger {
           ContentBlockerTriggerResourceType.fromNativeValue(typeValue),
         EnumMethod.value =>
           ContentBlockerTriggerResourceType.fromValue(typeValue),
-        EnumMethod.name =>
-          ContentBlockerTriggerResourceType.byName(typeValue),
+        EnumMethod.name => ContentBlockerTriggerResourceType.byName(typeValue),
       };
       if (type != null) {
         resourceType.add(type);

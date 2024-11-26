@@ -68,14 +68,16 @@ class WindowsWebViewEnvironment extends PlatformWebViewEnvironment
         break;
       case 'onBrowserProcessExited':
         if (onBrowserProcessExited != null) {
-          Map<String, dynamic> arguments = call.arguments.cast<String, dynamic>();
+          Map<String, dynamic> arguments =
+              call.arguments.cast<String, dynamic>();
           final detail = BrowserProcessExitedDetail.fromMap(arguments)!;
           onBrowserProcessExited?.call(detail);
         }
         break;
-        case 'onProcessInfosChanged':
+      case 'onProcessInfosChanged':
         if (onProcessInfosChanged != null) {
-          Map<String, dynamic> arguments = call.arguments.cast<String, dynamic>();
+          Map<String, dynamic> arguments =
+              call.arguments.cast<String, dynamic>();
           final detail = BrowserProcessInfosChangedDetail.fromMap(arguments)!;
           onProcessInfosChanged?.call(detail);
         }
@@ -89,22 +91,27 @@ class WindowsWebViewEnvironment extends PlatformWebViewEnvironment
   Future<bool> isInterfaceSupported(WebViewInterface interface) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('interface', () => interface.toNativeValue());
-    return await channel?.invokeMethod<bool>('isInterfaceSupported', args) ?? false;
+    return await channel?.invokeMethod<bool>('isInterfaceSupported', args) ??
+        false;
   }
 
   @override
   Future<List<BrowserProcessInfo>> getProcessInfos() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    final result = await channel?.invokeMethod<List<dynamic>>('getProcessInfos', args);
-    return result?.map(
-            (e) => BrowserProcessInfo.fromMap(e.cast<String, dynamic>()))
-        .whereType<BrowserProcessInfo>().toList() ?? [];
+    final result =
+        await channel?.invokeMethod<List<dynamic>>('getProcessInfos', args);
+    return result
+            ?.map((e) => BrowserProcessInfo.fromMap(e.cast<String, dynamic>()))
+            .whereType<BrowserProcessInfo>()
+            .toList() ??
+        [];
   }
 
   @override
   Future<String?> getFailureReportFolderPath() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    return await channel?.invokeMethod<String>('getFailureReportFolderPath', args);
+    return await channel?.invokeMethod<String>(
+        'getFailureReportFolderPath', args);
   }
 
   @override
@@ -118,8 +125,8 @@ class WindowsWebViewEnvironment extends PlatformWebViewEnvironment
     args.putIfAbsent('settings', () => env.settings?.toMap());
     await _staticChannel.invokeMethod('create', args);
 
-    env.channel =
-        MethodChannel('com.pichillilorenzo/flutter_webview_environment_${env.id}');
+    env.channel = MethodChannel(
+        'com.pichillilorenzo/flutter_webview_environment_${env.id}');
     env.handler = env.handleMethod;
     env.initMethodCallHandler();
     return env;

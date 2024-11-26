@@ -1965,7 +1965,7 @@ as it can cause framerate drops on animations in Android 9 and lower (see [Hybri
     AndroidPlatform(
         apiName: "View.setAlpha",
         apiUrl:
-        'https://developer.android.com/reference/android/view/View#setAlpha(float)'),
+            'https://developer.android.com/reference/android/view/View#setAlpha(float)'),
     IOSPlatform(
         apiName: "UIView.alpha",
         apiUrl:
@@ -1973,7 +1973,7 @@ as it can cause framerate drops on animations in Android 9 and lower (see [Hybri
     MacOSPlatform(
         apiName: "NSView.alphaValue",
         apiUrl:
-        'https://developer.apple.com/documentation/appkit/nsview/1483560-alphavalue'),
+            'https://developer.apple.com/documentation/appkit/nsview/1483560-alphavalue'),
   ])
   double? alpha;
 

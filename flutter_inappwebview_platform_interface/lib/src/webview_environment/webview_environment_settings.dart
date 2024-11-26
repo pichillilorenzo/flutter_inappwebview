@@ -124,9 +124,9 @@ class WebViewEnvironmentSettings_ {
     WindowsPlatform(
         available: '1.0.1185.39',
         apiName:
-        'ICoreWebView2EnvironmentOptions2.put_ExclusiveUserDataFolderAccess',
+            'ICoreWebView2EnvironmentOptions2.put_ExclusiveUserDataFolderAccess',
         apiUrl:
-        'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2environmentoptions2?view=webview2-1.0.2849.39#put_exclusiveuserdatafolderaccess')
+            'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2environmentoptions2?view=webview2-1.0.2849.39#put_exclusiveuserdatafolderaccess')
   ])
   final bool? exclusiveUserDataFolderAccess;
 
@@ -139,9 +139,9 @@ class WebViewEnvironmentSettings_ {
     WindowsPlatform(
         available: '1.0.1518.46',
         apiName:
-        'ICoreWebView2EnvironmentOptions3.put_IsCustomCrashReportingEnabled',
+            'ICoreWebView2EnvironmentOptions3.put_IsCustomCrashReportingEnabled',
         apiUrl:
-        'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2environmentoptions3?view=webview2-1.0.2849.39#put_iscustomcrashreportingenabled')
+            'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2environmentoptions3?view=webview2-1.0.2849.39#put_iscustomcrashreportingenabled')
   ])
   final bool? isCustomCrashReportingEnabled;
 
@@ -164,9 +164,9 @@ class WebViewEnvironmentSettings_ {
     WindowsPlatform(
         available: '1.0.1661.34',
         apiName:
-        'ICoreWebView2EnvironmentOptions5.put_EnableTrackingPrevention',
+            'ICoreWebView2EnvironmentOptions5.put_EnableTrackingPrevention',
         apiUrl:
-        'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2environmentoptions5?view=webview2-1.0.2849.39#put_enabletrackingprevention')
+            'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2environmentoptions5?view=webview2-1.0.2849.39#put_enabletrackingprevention')
   ])
   final bool? enableTrackingPrevention;
 
@@ -180,9 +180,9 @@ class WebViewEnvironmentSettings_ {
     WindowsPlatform(
         available: '1.0.2210.55',
         apiName:
-        'ICoreWebView2EnvironmentOptions6.put_AreBrowserExtensionsEnabled',
+            'ICoreWebView2EnvironmentOptions6.put_AreBrowserExtensionsEnabled',
         apiUrl:
-        'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2environmentoptions6?view=webview2-1.0.2849.39#put_arebrowserextensionsenabled')
+            'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2environmentoptions6?view=webview2-1.0.2849.39#put_arebrowserextensionsenabled')
   ])
   final bool? areBrowserExtensionsEnabled;
 
@@ -202,10 +202,9 @@ class WebViewEnvironmentSettings_ {
   @SupportedPlatforms(platforms: [
     WindowsPlatform(
         available: '1.0.2478.35',
-        apiName:
-        'ICoreWebView2EnvironmentOptions7.put_ChannelSearchKind',
+        apiName: 'ICoreWebView2EnvironmentOptions7.put_ChannelSearchKind',
         apiUrl:
-        'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2environmentoptions7?view=webview2-1.0.2849.39#put_channelsearchkind')
+            'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2environmentoptions7?view=webview2-1.0.2849.39#put_channelsearchkind')
   ])
   final EnvironmentChannelSearchKind_? channelSearchKind;
 
@@ -246,10 +245,9 @@ class WebViewEnvironmentSettings_ {
   @SupportedPlatforms(platforms: [
     WindowsPlatform(
         available: '1.0.2478.35',
-        apiName:
-        'ICoreWebView2EnvironmentOptions7.put_ReleaseChannels',
+        apiName: 'ICoreWebView2EnvironmentOptions7.put_ReleaseChannels',
         apiUrl:
-        'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2environmentoptions7?view=webview2-1.0.2849.39#put_releasechannels')
+            'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2environmentoptions7?view=webview2-1.0.2849.39#put_releasechannels')
   ])
   final EnvironmentReleaseChannels_? releaseChannels;
 
@@ -263,27 +261,26 @@ class WebViewEnvironmentSettings_ {
   @SupportedPlatforms(platforms: [
     WindowsPlatform(
         available: '1.0.2535.41',
-        apiName:
-        'ICoreWebView2EnvironmentOptions8.put_ScrollBarStyle',
+        apiName: 'ICoreWebView2EnvironmentOptions8.put_ScrollBarStyle',
         apiUrl:
-        'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2environmentoptions8?view=webview2-1.0.2849.39#put_scrollbarstyle')
+            'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2environmentoptions8?view=webview2-1.0.2849.39#put_scrollbarstyle')
   ])
   final EnvironmentScrollbarStyle_? scrollbarStyle;
 
-  WebViewEnvironmentSettings_(
-      {this.browserExecutableFolder,
-      this.userDataFolder,
-      this.additionalBrowserArguments,
-      this.allowSingleSignOnUsingOSPrimaryAccount,
-      this.language,
-      this.targetCompatibleBrowserVersion,
-      this.customSchemeRegistrations,
-      this.exclusiveUserDataFolderAccess,
-      this.isCustomCrashReportingEnabled,
-      this.enableTrackingPrevention,
-      this.areBrowserExtensionsEnabled,
-      this.channelSearchKind,
-      this.releaseChannels,
-      this.scrollbarStyle,
-    });
+  WebViewEnvironmentSettings_({
+    this.browserExecutableFolder,
+    this.userDataFolder,
+    this.additionalBrowserArguments,
+    this.allowSingleSignOnUsingOSPrimaryAccount,
+    this.language,
+    this.targetCompatibleBrowserVersion,
+    this.customSchemeRegistrations,
+    this.exclusiveUserDataFolderAccess,
+    this.isCustomCrashReportingEnabled,
+    this.enableTrackingPrevention,
+    this.areBrowserExtensionsEnabled,
+    this.channelSearchKind,
+    this.releaseChannels,
+    this.scrollbarStyle,
+  });
 }

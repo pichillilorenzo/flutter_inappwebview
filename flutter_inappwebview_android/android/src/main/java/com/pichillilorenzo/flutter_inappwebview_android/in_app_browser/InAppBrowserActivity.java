@@ -119,7 +119,9 @@ public class InAppBrowserActivity extends AppCompatActivity implements InAppBrow
 
     webView = findViewById(R.id.webView);
     webView.id = id;
-    webView.windowId = windowId;
+    if (windowId != -1) {
+      webView.windowId = windowId;
+    }
     webView.inAppBrowserDelegate = this;
     webView.plugin = manager.plugin;
 

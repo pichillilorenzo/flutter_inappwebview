@@ -8,7 +8,7 @@
   - `flutter_inappwebview_web`: `^1.2.0-beta.1` -> `^1.2.0-beta.2`
   - `flutter_inappwebview_windows`: `^0.7.0-beta.1` -> `^0.7.0-beta.2`
 - Fixed specific URLAuthenticationChallenge type for `onReceivedHttpAuthRequest`, `onReceivedServerTrustAuthRequest`, `onReceivedClientCertRequest` events of HeadlessInAppWebView
-- Fixed missing return type for `InAppWebView.getJavaScriptBridgeName` static method
+- Fixed missing return type for `InAppWebViewController.getJavaScriptBridgeName` static method
 
 #### Platform Interface
 - Updated `flutter_inappwebview_internal_annotations` dependency from `^1.1.1` to `^1.2.0`
@@ -45,10 +45,11 @@
 - Updated Microsoft.Web.WebView2 SDK version from `1.0.2792.45` to `1.0.2849.39`
 - Implemented `disableDefaultErrorPage`, `statusBarEnabled`, `browserAcceleratorKeysEnabled`, `generalAutofillEnabled`, `passwordAutosaveEnabled`, `isPinchZoomEnabled`, `allowsBackForwardNavigationGestures`, `hiddenPdfToolbarItems`, `reputationCheckingRequired`, `nonClientRegionSupportEnabled` properties of `InAppWebViewSettings`
 - Implemented `isInterfaceSupported`, `getProcessInfos`, `getFailureReportFolderPath` WebViewEnvironment methods
-- Implemented `isInterfaceSupported` InAppWebViewController method
-- Implemented `onDownloadStarting` WebView event
+- Implemented `isInterfaceSupported`, `getZoomScale` InAppWebViewController method
+- Implemented `onDownloadStarting`, `onAcceleratorKeyPressed` WebView event
 - Implemented `exclusiveUserDataFolderAccess`, `isCustomCrashReportingEnabled`, `enableTrackingPrevention`, `areBrowserExtensionsEnabled`, `channelSearchKind`, `releaseChannels`, `scrollbarStyle` properties of `WebViewEnvironmentSettings`
 - Implemented `onNewBrowserVersionAvailable`, `onBrowserProcessExited`, `onProcessInfosChanged` WebViewEnvironment events
+- Send mouse leave region event to native view
 - Fixed wrong channel name when creating a `WebViewEnvironment` instance
 - Fixed "[Windows] Has an overlay on the desktop when the application is minimized" [#2402](https://github.com/pichillilorenzo/flutter_inappwebview/issues/2402)
 - Fixed "[Windows] missing implementation of onPermissionRequest event will cause crash when requested by the webpage" [#2404](https://github.com/pichillilorenzo/flutter_inappwebview/issues/2404)

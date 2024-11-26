@@ -43,6 +43,11 @@ namespace flutter_inappwebview_plugin
 
         graphics_context_ = std::make_unique<GraphicsContext>(rohelper_.get());
         compositor_ = graphics_context_->CreateCompositor();
+        if (compositor_) {
+          // fix for KernelBase.dll RaiseFailFastException
+          // when app is closing 
+          compositor_->AddRef();
+        }
         valid_ = graphics_context_->IsValid();
       }
     }

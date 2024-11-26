@@ -239,3 +239,16 @@ export 'focus_direction.dart' show FocusDirection;
 export 'enum_method.dart';
 export 'pdf_toolbar_items.dart' show PdfToolbarItems;
 export 'webview_interface.dart' show WebViewInterface;
+export 'download_start_response_action.dart' show DownloadStartResponseAction;
+export 'download_start_response.dart' show DownloadStartResponse;
+export 'environment_channel_search_kind.dart' show EnvironmentChannelSearchKind;
+export 'environment_release_channels.dart' show EnvironmentReleaseChannels;
+export 'environment_scrollbar_style.dart' show EnvironmentScrollbarStyle;
+export 'browser_process_exit_kind.dart' show BrowserProcessExitKind;
+export 'browser_process_exited_detail.dart' show BrowserProcessExitedDetail;
+export 'browser_process_kind.dart' show BrowserProcessKind;
+export 'browser_process_info.dart' show BrowserProcessInfo;
+export 'browser_process_infos_changed_detail.dart'
+    show BrowserProcessInfosChangedDetail;
+export 'physical_key_status.dart' show PhysicalKeyStatus;
+export 'accelerator_key_pressed_detail.dart' show AcceleratorKeyPressedDetail;

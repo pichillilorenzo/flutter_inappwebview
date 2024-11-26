@@ -23,7 +23,6 @@
 #include "../utils/strconv.h"
 #include "../utils/string.h"
 #include "../utils/uri.h"
-#include "../webview_environment/webview_environment_manager.h"
 #include "in_app_webview.h"
 #include "in_app_webview_manager.h"
 
@@ -319,12 +318,44 @@ namespace flutter_inappwebview_plugin
 
   void InAppWebView::registerEventHandlers()
   {
-    if (!webView) {
+    if (!webView || !webViewController) {
       return;
     }
 
-    wil::com_ptr<ICoreWebView2DevToolsProtocolEventReceiver> fetchRequestPausedEventReceiver;
+    auto add_AcceleratorKeyPressed_HResult = webViewController->add_AcceleratorKeyPressed(
+      Callback<ICoreWebView2AcceleratorKeyPressedEventHandler>(
+        [this](ICoreWebView2Controller* sender, ICoreWebView2AcceleratorKeyPressedEventArgs* args)
+        {
+          if (channelDelegate) {
+            auto handled = settings->handleAcceleratorKeyPressed;
+            args->put_Handled(handled);
+            if (handled) {
+              auto detail = AcceleratorKeyPressedDetail::fromICoreWebView2AcceleratorKeyPressedEventArgs(args);
+              channelDelegate->onAcceleratorKeyPressed(std::move(detail));
+            }
+          }
+          return S_OK;
+        }
+      ).Get(), nullptr);
+    failedLog(add_AcceleratorKeyPressed_HResult);
 
+    auto add_ZoomFactorChanged_HResult = webViewController->add_ZoomFactorChanged(
+      Callback<ICoreWebView2ZoomFactorChangedEventHandler>(
+        [this](ICoreWebView2Controller* sender, IUnknown* args)
+        {
+          double newScale;
+          if (succeededOrLog(sender->get_ZoomFactor(&newScale))) {
+            if (channelDelegate) {
+              channelDelegate->onZoomScaleChanged(zoomScaleFactor_, newScale);
+            }
+            zoomScaleFactor_ = newScale;
+          }
+          return S_OK;
+        }
+      ).Get(), nullptr);
+    failedLog(add_ZoomFactorChanged_HResult);
+
+    wil::com_ptr<ICoreWebView2DevToolsProtocolEventReceiver> fetchRequestPausedEventReceiver;
     if (succeededOrLog(webView->GetDevToolsProtocolEventReceiver(L"Fetch.requestPaused", &fetchRequestPausedEventReceiver))) {
       auto add_DevToolsProtocolEventReceived_HResult = fetchRequestPausedEventReceiver->add_DevToolsProtocolEventReceived(
         Callback<ICoreWebView2DevToolsProtocolEventReceivedEventHandler>(
@@ -798,7 +829,7 @@ namespace flutter_inappwebview_plugin
           std::string url = SUCCEEDED(args->get_Uri(&uri)) ? wide_to_utf8(uri.get()) : "";
 
           COREWEBVIEW2_PERMISSION_KIND resource = COREWEBVIEW2_PERMISSION_KIND_UNKNOWN_PERMISSION;
-          failedAndLog(args->get_PermissionKind(&resource));
+          failedLog(args->get_PermissionKind(&resource));
 
           auto callback = std::make_unique<WebViewChannelDelegate::PermissionRequestCallback>();
           auto defaultBehaviour = [this, deferral, args](const std::optional<const std::shared_ptr<PermissionResponse>> permissionResponse)
@@ -1028,6 +1059,73 @@ namespace flutter_inappwebview_plugin
           }
         ).Get(), nullptr);
       failedLog(add_FrameCreated_HResult);
+
+      auto add_DownloadStarting_HResult = webView4->add_DownloadStarting(
+        Callback<ICoreWebView2DownloadStartingEventHandler>(
+          [this](ICoreWebView2* sender, ICoreWebView2DownloadStartingEventArgs* args)
+          {
+            wil::com_ptr<ICoreWebView2Deferral> deferral;
+            wil::com_ptr<ICoreWebView2DownloadOperation> download;
+            if (channelDelegate && settings->useOnDownloadStart && succeededOrLog(args->get_DownloadOperation(&download)) && succeededOrLog(args->GetDeferral(&deferral))) {
+
+              wil::unique_cotaskmem_string uri;
+              std::string url = SUCCEEDED(download->get_Uri(&uri)) ? wide_to_utf8(uri.get()) : "";
+
+              INT64 contentLength = 0;
+              failedLog(download->get_TotalBytesToReceive(&contentLength));
+
+              wil::unique_cotaskmem_string downloadMimeType;
+              std::optional<std::string> mimeType = SUCCEEDED(download->get_MimeType(&downloadMimeType)) ? wide_to_utf8(downloadMimeType.get()) : std::optional<std::string>{};
+
+              wil::unique_cotaskmem_string downloadContentDisposition;
+              std::optional<std::string> contentDisposition = SUCCEEDED(download->get_ContentDisposition(&downloadContentDisposition)) ? wide_to_utf8(downloadContentDisposition.get()) : std::optional<std::string>{};
+
+              wil::unique_cotaskmem_string resultFilePath;
+              std::optional<std::string> suggestedFilename = SUCCEEDED(download->get_ContentDisposition(&resultFilePath)) ? wide_to_utf8(resultFilePath.get()) : std::optional<std::string>{};
+
+              auto request = std::make_shared<DownloadStartRequest>(
+                contentDisposition,
+                contentLength,
+                mimeType,
+                suggestedFilename,
+                url
+              );
+
+              auto callback = std::make_unique<WebViewChannelDelegate::DownloadStartRequestCallback>();
+              auto defaultBehaviour = [this, deferral, args](const std::optional<const std::shared_ptr<DownloadStartResponse>> response)
+                {
+                  failedLog(deferral->Complete());
+                };
+              callback->nonNullSuccess = [this, deferral, args](const std::shared_ptr<DownloadStartResponse> response)
+                {
+                  failedLog(args->put_Handled(response->handled));
+                  auto resultFilePath = response->resultFilePath;
+                  if (resultFilePath.has_value()) {
+                    failedLog(args->put_ResultFilePath(utf8_to_wide(resultFilePath.value()).c_str()));
+                  }
+                  auto action = response->action;
+                  if (action.has_value()) {
+                    switch (action.value()) {
+                    case DownloadStartResponseAction::cancel:
+                      failedLog(args->put_Cancel(true));
+                      break;
+                    }
+                  }
+                  failedLog(deferral->Complete());
+                  return false;
+                };
+              callback->defaultBehaviour = defaultBehaviour;
+              callback->error = [this, defaultBehaviour](const std::string& error_code, const std::string& error_message, const flutter::EncodableValue* error_details)
+                {
+                  debugLog(error_code + ", " + error_message);
+                  defaultBehaviour(std::nullopt);
+                };
+              channelDelegate->onDownloadStarting(std::move(request), std::move(callback));
+            }
+            return S_OK;
+          }
+        ).Get(), nullptr);
+      failedLog(add_DownloadStarting_HResult);
     }
 
     if (auto webView5 = webView.try_query<ICoreWebView2_5>()) {
@@ -2222,6 +2320,11 @@ namespace flutter_inappwebview_plugin
     return false;
   }
 
+  double InAppWebView::getZoomScale() const
+  {
+    return zoomScaleFactor_;
+  }
+
   // flutter_view
   void InAppWebView::setSurfaceSize(size_t width, size_t height, float scale_factor)
   {
@@ -2372,35 +2475,66 @@ namespace flutter_inappwebview_plugin
     }
   }
 
-  void InAppWebView::setPointerButtonState(InAppWebViewPointerButton button, bool is_down)
+  void InAppWebView::setPointerButtonState(InAppWebViewPointerEventKind kind, InAppWebViewPointerButton button)
   {
     if (!webViewCompositionController) {
       return;
     }
 
-    COREWEBVIEW2_MOUSE_EVENT_KIND kind;
-    switch (button) {
-    case InAppWebViewPointerButton::Primary:
-      virtualKeys_.setIsLeftButtonDown(is_down);
-      kind = is_down ? COREWEBVIEW2_MOUSE_EVENT_KIND_LEFT_BUTTON_DOWN
-        : COREWEBVIEW2_MOUSE_EVENT_KIND_LEFT_BUTTON_UP;
+    COREWEBVIEW2_MOUSE_EVENT_VIRTUAL_KEYS eventVirtualKeys_ = COREWEBVIEW2_MOUSE_EVENT_VIRTUAL_KEYS_NONE;
+    COREWEBVIEW2_MOUSE_EVENT_KIND eventKind;
+    UINT32 mouseData = 0;
+    POINT point = { 0, 0 };;
+
+    switch (kind) {
+    case InAppWebViewPointerEventKind::Down:
+      switch (button) {
+      case InAppWebViewPointerButton::Primary:
+        virtualKeys_.setIsLeftButtonDown(true);
+        eventKind = COREWEBVIEW2_MOUSE_EVENT_KIND_LEFT_BUTTON_DOWN;
+        break;
+      case InAppWebViewPointerButton::Secondary:
+        virtualKeys_.setIsRightButtonDown(true);
+        eventKind = COREWEBVIEW2_MOUSE_EVENT_KIND_RIGHT_BUTTON_DOWN;
+        break;
+      case InAppWebViewPointerButton::Tertiary:
+        virtualKeys_.setIsMiddleButtonDown(true);
+        eventKind = COREWEBVIEW2_MOUSE_EVENT_KIND_MIDDLE_BUTTON_DOWN;
+        break;
+      default:
+        eventKind = static_cast<COREWEBVIEW2_MOUSE_EVENT_KIND>(0);
+      }
+      eventVirtualKeys_ = virtualKeys_.state();
+      point = lastCursorPos_;
       break;
-    case InAppWebViewPointerButton::Secondary:
-      virtualKeys_.setIsRightButtonDown(is_down);
-      kind = is_down ? COREWEBVIEW2_MOUSE_EVENT_KIND_RIGHT_BUTTON_DOWN
-        : COREWEBVIEW2_MOUSE_EVENT_KIND_RIGHT_BUTTON_UP;
+    case InAppWebViewPointerEventKind::Up:
+      switch (button) {
+      case InAppWebViewPointerButton::Primary:
+        virtualKeys_.setIsLeftButtonDown(false);
+        eventKind = COREWEBVIEW2_MOUSE_EVENT_KIND_LEFT_BUTTON_UP;
+        break;
+      case InAppWebViewPointerButton::Secondary:
+        virtualKeys_.setIsRightButtonDown(false);
+        eventKind = COREWEBVIEW2_MOUSE_EVENT_KIND_RIGHT_BUTTON_UP;
+        break;
+      case InAppWebViewPointerButton::Tertiary:
+        virtualKeys_.setIsMiddleButtonDown(false);
+        eventKind = COREWEBVIEW2_MOUSE_EVENT_KIND_MIDDLE_BUTTON_UP;
+        break;
+      default:
+        eventKind = static_cast<COREWEBVIEW2_MOUSE_EVENT_KIND>(0);
+      }
+      eventVirtualKeys_ = virtualKeys_.state();
+      point = lastCursorPos_;
       break;
-    case InAppWebViewPointerButton::Tertiary:
-      virtualKeys_.setIsMiddleButtonDown(is_down);
-      kind = is_down ? COREWEBVIEW2_MOUSE_EVENT_KIND_MIDDLE_BUTTON_DOWN
-        : COREWEBVIEW2_MOUSE_EVENT_KIND_MIDDLE_BUTTON_UP;
+    case InAppWebViewPointerEventKind::Leave:
+      eventKind = COREWEBVIEW2_MOUSE_EVENT_KIND_LEAVE;
       break;
     default:
-      kind = static_cast<COREWEBVIEW2_MOUSE_EVENT_KIND>(0);
+      eventKind = static_cast<COREWEBVIEW2_MOUSE_EVENT_KIND>(0);
     }
 
-    webViewCompositionController->SendMouseInput(kind, virtualKeys_.state(), 0,
-      lastCursorPos_);
+    webViewCompositionController->SendMouseInput(eventKind, eventVirtualKeys_, mouseData, point);
   }
 
   void InAppWebView::sendScroll(double delta, bool horizontal)

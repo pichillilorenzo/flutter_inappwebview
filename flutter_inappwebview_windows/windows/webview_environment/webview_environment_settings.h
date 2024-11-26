@@ -20,6 +20,13 @@ namespace flutter_inappwebview_plugin
     const std::optional<std::string> language;
     const std::optional<std::string> targetCompatibleBrowserVersion;
     const std::optional<std::vector<std::shared_ptr<CustomSchemeRegistration>>> customSchemeRegistrations;
+    const std::optional<bool> exclusiveUserDataFolderAccess;
+    const std::optional<bool> isCustomCrashReportingEnabled;
+    const std::optional<bool> enableTrackingPrevention;
+    const std::optional<bool> areBrowserExtensionsEnabled;
+    const std::optional<int64_t> channelSearchKind;
+    const std::optional<int64_t> releaseChannels;
+    const std::optional<int64_t> scrollbarStyle;
 
     WebViewEnvironmentSettings() = default;
     WebViewEnvironmentSettings(const flutter::EncodableMap& map);

@@ -1,15 +1,17 @@
 #ifndef FLUTTER_INAPPWEBVIEW_PLUGIN_WEBVIEW_CHANNEL_DELEGATE_H_
 #define FLUTTER_INAPPWEBVIEW_PLUGIN_WEBVIEW_CHANNEL_DELEGATE_H_
 
-#include <flutter/method_channel.h>
 #include <flutter/standard_message_codec.h>
 
+#include "../types/accelerator_key_pressed_detail.h"
 #include "../types/base_callback_result.h"
 #include "../types/channel_delegate.h"
 #include "../types/client_cert_challenge.h"
 #include "../types/client_cert_response.h"
 #include "../types/create_window_action.h"
 #include "../types/custom_scheme_response.h"
+#include "../types/download_start_request.h"
+#include "../types/download_start_response.h"
 #include "../types/http_auth_response.h"
 #include "../types/http_authentication_challenge.h"
 #include "../types/javascript_handler_function_data.h"
@@ -88,6 +90,12 @@ namespace flutter_inappwebview_plugin
       ~ReceivedServerTrustAuthRequestCallback() = default;
     };
 
+    class DownloadStartRequestCallback : public BaseCallbackResult<const std::shared_ptr<DownloadStartResponse>> {
+    public:
+      DownloadStartRequestCallback();
+      ~DownloadStartRequestCallback() = default;
+    };
+
     WebViewChannelDelegate(InAppWebView* webView, flutter::BinaryMessenger* messenger);
     WebViewChannelDelegate(InAppWebView* webView, flutter::BinaryMessenger* messenger, const std::string& name);
     ~WebViewChannelDelegate();
@@ -119,6 +127,9 @@ namespace flutter_inappwebview_plugin
     void onRenderProcessUnresponsive(const std::optional<std::string>& url) const;
     void onWebContentProcessDidTerminate() const;
     void onProcessFailed(const std::shared_ptr<ProcessFailedDetail> detail) const;
+    void onDownloadStarting(std::shared_ptr<DownloadStartRequest> request, std::unique_ptr<DownloadStartRequestCallback> callback) const;
+    void onAcceleratorKeyPressed(std::shared_ptr<AcceleratorKeyPressedDetail> detail) const;
+    void onZoomScaleChanged(const double& oldScale, const double& newScale) const;
   };
 }
 

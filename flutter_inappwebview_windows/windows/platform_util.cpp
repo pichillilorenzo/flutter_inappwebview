@@ -4,6 +4,7 @@
 #include <winrt/base.h>
 #include <wrl/event.h>
 
+#include "in_app_webview/in_app_webview_manager.h"
 #include "platform_util.h"
 #include "types/callbacks_complete.h"
 #include "utils/flutter.h"

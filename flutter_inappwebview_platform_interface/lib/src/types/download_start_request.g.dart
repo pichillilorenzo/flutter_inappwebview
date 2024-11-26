@@ -9,24 +9,60 @@ part of 'download_start_request.dart';
 ///Class representing a download request of the WebView used by the event [PlatformWebViewCreationParams.onDownloadStartRequest].
 class DownloadStartRequest {
   ///Content-disposition http header, if present.
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Android native WebView
+  ///- Windows
   String? contentDisposition;
 
   ///The file size reported by the server.
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Android native WebView
+  ///- iOS
+  ///- MacOS
+  ///- Windows
   int contentLength;
 
   ///The mimetype of the content reported by the server.
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Android native WebView
+  ///- iOS
+  ///- MacOS
+  ///- Windows
   String? mimeType;
 
   ///A suggested filename to use if saving the resource to disk.
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Android native WebView
+  ///- iOS
+  ///- MacOS
+  ///- Windows
   String? suggestedFilename;
 
   ///The name of the text encoding of the receiver, or `null` if no text encoding was specified.
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Android native WebView
+  ///- iOS
+  ///- MacOS
   String? textEncodingName;
 
   ///The full url to the content that should be downloaded.
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Android native WebView
+  ///- iOS
+  ///- MacOS
+  ///- Windows
   WebUri url;
 
   ///the user agent to be used for the download.
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Android native WebView
   String? userAgent;
   DownloadStartRequest(
       {this.contentDisposition,

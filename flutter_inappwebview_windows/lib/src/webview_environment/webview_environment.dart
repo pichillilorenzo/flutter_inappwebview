@@ -61,6 +61,24 @@ class WindowsWebViewEnvironment extends PlatformWebViewEnvironment
     }
 
     switch (call.method) {
+      case 'onNewBrowserVersionAvailable':
+        if (onNewBrowserVersionAvailable != null) {
+          onNewBrowserVersionAvailable?.call();
+        }
+        break;
+      case 'onBrowserProcessExited':
+        if (onBrowserProcessExited != null) {
+          Map<String, dynamic> arguments = call.arguments.cast<String, dynamic>();
+          final detail = BrowserProcessExitedDetail.fromMap(arguments)!;
+          onBrowserProcessExited?.call(detail);
+        }
+        break;
+        case 'onProcessInfosChanged':
+        if (onProcessInfosChanged != null) {
+          Map<String, dynamic> arguments = call.arguments.cast<String, dynamic>();
+          final detail = BrowserProcessInfosChangedDetail.fromMap(arguments)!;
+          onProcessInfosChanged?.call(detail);
+        }
       default:
         throw UnimplementedError("Unimplemented ${call.method} method");
     }
@@ -72,6 +90,21 @@ class WindowsWebViewEnvironment extends PlatformWebViewEnvironment
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('interface', () => interface.toNativeValue());
     return await channel?.invokeMethod<bool>('isInterfaceSupported', args) ?? false;
+  }
+
+  @override
+  Future<List<BrowserProcessInfo>> getProcessInfos() async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    final result = await channel?.invokeMethod<List<dynamic>>('getProcessInfos', args);
+    return result?.map(
+            (e) => BrowserProcessInfo.fromMap(e.cast<String, dynamic>()))
+        .whereType<BrowserProcessInfo>().toList() ?? [];
+  }
+
+  @override
+  Future<String?> getFailureReportFolderPath() async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    return await channel?.invokeMethod<String>('getFailureReportFolderPath', args);
   }
 
   @override

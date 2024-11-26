@@ -743,10 +743,10 @@ public class WebViewChannelDelegate extends ChannelDelegateImpl {
     channel.invokeMethod("onScrollChanged", obj);
   }
 
-  public void onDownloadStartRequest(DownloadStartRequest downloadStartRequest) {
+  public void onDownloadStarting(DownloadStartRequest downloadStartRequest) {
     MethodChannel channel = getChannel();
     if (channel == null) return;
-    channel.invokeMethod("onDownloadStartRequest", downloadStartRequest.toMap());
+    channel.invokeMethod("onDownloadStarting", downloadStartRequest.toMap());
   }
 
   public void onCreateContextMenu(HitTestResult hitTestResult) {

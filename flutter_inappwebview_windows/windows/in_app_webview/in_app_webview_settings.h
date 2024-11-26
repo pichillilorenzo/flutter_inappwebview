@@ -41,6 +41,7 @@ namespace flutter_inappwebview_plugin
     int64_t hiddenPdfToolbarItems = COREWEBVIEW2_PDF_TOOLBAR_ITEMS::COREWEBVIEW2_PDF_TOOLBAR_ITEMS_NONE;
     bool reputationCheckingRequired = true;
     bool nonClientRegionSupportEnabled = false;
+    bool handleAcceleratorKeyPressed = false;
 
     InAppWebViewSettings();
     InAppWebViewSettings(const flutter::EncodableMap& encodableMap);

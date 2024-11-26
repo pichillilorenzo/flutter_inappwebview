@@ -34,24 +34,27 @@ namespace flutter_inappwebview_plugin
     auto request = std::optional<std::shared_ptr<URLRequest>>{};
     auto securityOrigin = std::optional<std::shared_ptr<SecurityOrigin>>{};
     if (succeededOrLog(webViewFrameInfo->get_Source(&url))) {
+      auto sourceUrl = wide_to_utf8(url.get());
       request = std::make_shared<URLRequest>(
-        wide_to_utf8(url.get()),
+        sourceUrl,
         std::optional<std::string>{},
         std::optional<std::map<std::string, std::string>>{},
         std::optional<std::vector<uint8_t>>{}
       );
 
-      try {
-        winrt::Windows::Foundation::Uri const uri{ url.get() };
+      if (!sourceUrl.empty()) {
+        try {
+          winrt::Windows::Foundation::Uri const uri{ url.get() };
 
-        securityOrigin = std::make_shared<SecurityOrigin>(
-          wide_to_utf8(uri.Host().c_str()),
-          uri.Port(),
-          wide_to_utf8(uri.SchemeName().c_str())
-        );
-      }
-      catch (winrt::hresult_error const& ex) {
-        debugLog(wide_to_utf8(ex.message().c_str()));
+          securityOrigin = std::make_shared<SecurityOrigin>(
+            wide_to_utf8(uri.Host().c_str()),
+            uri.Port(),
+            wide_to_utf8(uri.SchemeName().c_str())
+          );
+        }
+        catch (winrt::hresult_error const& ex) {
+          debugLog(wide_to_utf8(ex.message().c_str()));
+        }
       }
     }
 

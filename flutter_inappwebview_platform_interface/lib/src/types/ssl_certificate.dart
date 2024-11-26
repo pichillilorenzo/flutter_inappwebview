@@ -83,12 +83,12 @@ class SslCertificate_ {
     }
 
     return SslCertificate(
-      issuedBy:
-          SslCertificateDName.fromMap(map["issuedBy"]?.cast<String, dynamic>(),
-                  enumMethod: enumMethod),
-      issuedTo:
-          SslCertificateDName.fromMap(map["issuedTo"]?.cast<String, dynamic>(),
-                  enumMethod: enumMethod),
+      issuedBy: SslCertificateDName.fromMap(
+          map["issuedBy"]?.cast<String, dynamic>(),
+          enumMethod: enumMethod),
+      issuedTo: SslCertificateDName.fromMap(
+          map["issuedTo"]?.cast<String, dynamic>(),
+          enumMethod: enumMethod),
       validNotAfterDate: map["validNotAfterDate"] != null
           ? DateTime.fromMillisecondsSinceEpoch(map["validNotAfterDate"])
           : null,

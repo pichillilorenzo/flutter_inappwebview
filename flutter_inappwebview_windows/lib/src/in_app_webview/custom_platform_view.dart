@@ -56,7 +56,15 @@ enum PointerButton { none, primary, secondary, tertiary }
 
 /// Pointer Event kind
 // Order must match InAppWebViewPointerEventKind (see in_app_webview.h)
-enum InAppWebViewPointerEventKind { activate, down, enter, leave, up, update, cancel }
+enum InAppWebViewPointerEventKind {
+  activate,
+  down,
+  enter,
+  leave,
+  up,
+  update,
+  cancel
+}
 
 /// Attempts to translate a button constant such as [kPrimaryMouseButton]
 /// to a [PointerButton]
@@ -194,7 +202,8 @@ class CustomPlatformViewController
   }
 
   /// Indicates whether the specified [button] is currently down.
-  Future<void> _setPointerButtonState(InAppWebViewPointerEventKind kind, PointerButton button) async {
+  Future<void> _setPointerButtonState(
+      InAppWebViewPointerEventKind kind, PointerButton button) async {
     if (_isDisposed) {
       return;
     }
@@ -260,7 +269,8 @@ class CustomPlatformView extends StatefulWidget {
   _CustomPlatformViewState createState() => _CustomPlatformViewState();
 }
 
-class _CustomPlatformViewState extends State<CustomPlatformView> with PlatformUtilListener {
+class _CustomPlatformViewState extends State<CustomPlatformView>
+    with PlatformUtilListener {
   final GlobalKey _key = GlobalKey();
   final _downButtons = <int, PointerButton>{};
 
@@ -290,14 +300,13 @@ class _CustomPlatformViewState extends State<CustomPlatformView> with PlatformUt
         },
         arguments: widget.creationParams);
 
-    _listener = AppLifecycleListener(
-        onStateChange: (state) {
-          if ([AppLifecycleState.resumed, AppLifecycleState.hidden].contains(state)) {
-            _reportSurfaceSize();
-            _reportWidgetPosition();
-          }
-        }
-    );
+    _listener = AppLifecycleListener(onStateChange: (state) {
+      if ([AppLifecycleState.resumed, AppLifecycleState.hidden]
+          .contains(state)) {
+        _reportSurfaceSize();
+        _reportWidgetPosition();
+      }
+    });
 
     // Report initial surface size and widget position
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -374,7 +383,8 @@ class _CustomPlatformViewState extends State<CustomPlatformView> with PlatformUt
                       }
                       final button = _getButton(ev.buttons);
                       _downButtons[ev.pointer] = button;
-                      _controller._setPointerButtonState(InAppWebViewPointerEventKind.down, button);
+                      _controller._setPointerButtonState(
+                          InAppWebViewPointerEventKind.down, button);
                     },
                     onPointerUp: (ev) {
                       _pointerKind = ev.kind;
@@ -389,14 +399,16 @@ class _CustomPlatformViewState extends State<CustomPlatformView> with PlatformUt
                       }
                       final button = _downButtons.remove(ev.pointer);
                       if (button != null) {
-                        _controller._setPointerButtonState(InAppWebViewPointerEventKind.up, button);
+                        _controller._setPointerButtonState(
+                            InAppWebViewPointerEventKind.up, button);
                       }
                     },
                     onPointerCancel: (ev) {
                       _pointerKind = ev.kind;
                       final button = _downButtons.remove(ev.pointer);
                       if (button != null) {
-                        _controller._setPointerButtonState(InAppWebViewPointerEventKind.cancel, button);
+                        _controller._setPointerButtonState(
+                            InAppWebViewPointerEventKind.cancel, button);
                       }
                     },
                     onPointerMove: (ev) {
@@ -426,11 +438,13 @@ class _CustomPlatformViewState extends State<CustomPlatformView> with PlatformUt
                         cursor: _cursor,
                         onEnter: (ev) {
                           final button = _getButton(ev.buttons);
-                          _controller._setPointerButtonState(InAppWebViewPointerEventKind.enter, button);
+                          _controller._setPointerButtonState(
+                              InAppWebViewPointerEventKind.enter, button);
                         },
                         onExit: (ev) {
                           final button = _getButton(ev.buttons);
-                          _controller._setPointerButtonState(InAppWebViewPointerEventKind.leave, button);
+                          _controller._setPointerButtonState(
+                              InAppWebViewPointerEventKind.leave, button);
                         },
                         child: Texture(
                           textureId: _controller._textureId,

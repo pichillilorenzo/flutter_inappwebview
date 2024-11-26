@@ -109,8 +109,7 @@ List<dynamic> _deserializeCategories(List<dynamic> categories,
       deserializedCategories.add(category);
     } else if (category is int) {
       final mode = switch (enumMethod ?? EnumMethod.nativeValue) {
-        EnumMethod.nativeValue =>
-            TracingCategory.fromNativeValue(category),
+        EnumMethod.nativeValue => TracingCategory.fromNativeValue(category),
         EnumMethod.value => TracingCategory.fromValue(category),
         EnumMethod.name => null,
       };
@@ -122,7 +121,8 @@ List<dynamic> _deserializeCategories(List<dynamic> categories,
   return deserializedCategories;
 }
 
-List<dynamic> _serializeCategories(List<dynamic> categories, {EnumMethod? enumMethod}) {
+List<dynamic> _serializeCategories(List<dynamic> categories,
+    {EnumMethod? enumMethod}) {
   List<dynamic> serializedCategories = [];
   for (dynamic category in categories) {
     if (category is String) {

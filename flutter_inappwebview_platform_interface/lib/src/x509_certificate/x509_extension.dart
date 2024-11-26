@@ -254,7 +254,8 @@ class AuthorityInfoAccessExtension extends X509Extension {
 
   Map<String, dynamic> toMap({EnumMethod? enumMethod}) {
     return {
-      "infoAccess": infoAccess?.map((e) => e.toMap(enumMethod: enumMethod)).toList(),
+      "infoAccess":
+          infoAccess?.map((e) => e.toMap(enumMethod: enumMethod)).toList(),
     };
   }
 
@@ -378,7 +379,8 @@ class CertificatePolicy {
   Map<String, dynamic> toMap({EnumMethod? enumMethod}) {
     return {
       "oid": oid,
-      "qualifiers": qualifiers?.map((e) => e.toMap(enumMethod: enumMethod)).toList(),
+      "qualifiers":
+          qualifiers?.map((e) => e.toMap(enumMethod: enumMethod)).toList(),
     };
   }
 
@@ -439,7 +441,8 @@ class CertificatePoliciesExtension extends X509Extension {
 
   Map<String, dynamic> toMap({EnumMethod? enumMethod}) {
     return {
-      "policies": policies?.map((e) => e.toMap(enumMethod: enumMethod)).toList(),
+      "policies":
+          policies?.map((e) => e.toMap(enumMethod: enumMethod)).toList(),
     };
   }
 

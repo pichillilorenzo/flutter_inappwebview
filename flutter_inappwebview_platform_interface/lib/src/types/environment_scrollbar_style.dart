@@ -13,15 +13,11 @@ class EnvironmentScrollbarStyle_ {
   const EnvironmentScrollbarStyle_._internal(this._value);
 
   ///Browser default ScrollBar style.
-  @EnumSupportedPlatforms(platforms: [
-    EnumWindowsPlatform(value: 0)
-  ])
+  @EnumSupportedPlatforms(platforms: [EnumWindowsPlatform(value: 0)])
   static const DEFAULT = EnvironmentScrollbarStyle_._internal(0);
 
   ///Window style fluent overlay scroll bar.
   ///Please see [Fluent UI](https://developer.microsoft.com/fluentui#/) for more details on fluent UI.
-  @EnumSupportedPlatforms(platforms: [
-    EnumWindowsPlatform(value: 1)
-  ])
+  @EnumSupportedPlatforms(platforms: [EnumWindowsPlatform(value: 1)])
   static const FLUENT_OVERLAY = EnvironmentScrollbarStyle_._internal(1);
 }

@@ -13,7 +13,8 @@ class PlatformUtil {
   static const MethodChannel _channel =
       MethodChannel('com.pichillilorenzo/flutter_inappwebview_platformutil');
 
-  static final ObserverList<PlatformUtilListener> _listeners = ObserverList<PlatformUtilListener>();
+  static final ObserverList<PlatformUtilListener> _listeners =
+      ObserverList<PlatformUtilListener>();
 
   PlatformUtil._();
 

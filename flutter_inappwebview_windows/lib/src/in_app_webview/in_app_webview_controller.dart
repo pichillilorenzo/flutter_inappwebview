@@ -362,7 +362,8 @@ class WindowsInAppWebViewController extends PlatformInAppWebViewController
           if (webviewParams != null) {
             if (webviewParams!.onDownloadStarting != null)
               return (await webviewParams!.onDownloadStarting!(
-                  _controllerFromPlatform, downloadStartRequest))?.toMap();
+                      _controllerFromPlatform, downloadStartRequest))
+                  ?.toMap();
             else if (webviewParams!.onDownloadStartRequest != null)
               webviewParams!.onDownloadStartRequest!(
                   _controllerFromPlatform, downloadStartRequest);
@@ -376,7 +377,8 @@ class WindowsInAppWebViewController extends PlatformInAppWebViewController
             _inAppBrowserEventHandler!
                 .onDownloadStartRequest(downloadStartRequest);
             return (await _inAppBrowserEventHandler!
-                .onDownloadStarting(downloadStartRequest))?.toMap();
+                    .onDownloadStarting(downloadStartRequest))
+                ?.toMap();
           }
         }
         break;
@@ -1456,14 +1458,17 @@ class WindowsInAppWebViewController extends PlatformInAppWebViewController
         }
         break;
       case "onAcceleratorKeyPressed":
-        if ((webviewParams != null && webviewParams!.onAcceleratorKeyPressed != null) ||
+        if ((webviewParams != null &&
+                webviewParams!.onAcceleratorKeyPressed != null) ||
             _inAppBrowserEventHandler != null) {
           Map<String, dynamic> arguments =
-          call.arguments.cast<String, dynamic>();
+              call.arguments.cast<String, dynamic>();
           final detail = AcceleratorKeyPressedDetail.fromMap(arguments)!;
 
-          if (webviewParams != null && webviewParams!.onAcceleratorKeyPressed != null)
-            webviewParams!.onAcceleratorKeyPressed!(_controllerFromPlatform, detail);
+          if (webviewParams != null &&
+              webviewParams!.onAcceleratorKeyPressed != null)
+            webviewParams!.onAcceleratorKeyPressed!(
+                _controllerFromPlatform, detail);
           else
             _inAppBrowserEventHandler!.onAcceleratorKeyPressed(detail);
         }
@@ -2778,7 +2783,8 @@ class WindowsInAppWebViewController extends PlatformInAppWebViewController
   Future<bool> isInterfaceSupported(WebViewInterface interface) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('interface', () => interface.toNativeValue());
-    return await channel?.invokeMethod<bool>('isInterfaceSupported', args) ?? false;
+    return await channel?.invokeMethod<bool>('isInterfaceSupported', args) ??
+        false;
   }
 
   @override

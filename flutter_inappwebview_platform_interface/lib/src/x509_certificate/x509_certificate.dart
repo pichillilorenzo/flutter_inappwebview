@@ -424,10 +424,13 @@ class X509Certificate {
       "nonCriticalExtensionOIDs": nonCriticalExtensionOIDs,
       "encoded": encoded,
       "publicKey": publicKey?.toMap(enumMethod: enumMethod),
-      "subjectKeyIdentifier": subjectKeyIdentifier?.toMap(enumMethod: enumMethod),
-      "authorityKeyIdentifier": authorityKeyIdentifier?.toMap(enumMethod: enumMethod),
+      "subjectKeyIdentifier":
+          subjectKeyIdentifier?.toMap(enumMethod: enumMethod),
+      "authorityKeyIdentifier":
+          authorityKeyIdentifier?.toMap(enumMethod: enumMethod),
       "certificatePolicies": certificatePolicies?.toMap(enumMethod: enumMethod),
-      "cRLDistributionPoints": cRLDistributionPoints?.toMap(enumMethod: enumMethod),
+      "cRLDistributionPoints":
+          cRLDistributionPoints?.toMap(enumMethod: enumMethod),
       "authorityInfoAccess": authorityInfoAccess?.toMap(enumMethod: enumMethod),
     };
   }

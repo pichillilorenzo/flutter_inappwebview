@@ -14,16 +14,12 @@ class BrowserProcessExitKind_ {
   const BrowserProcessExitKind_._internal(this._value);
 
   ///Indicates that the browser process ended normally.
-  @EnumSupportedPlatforms(platforms: [
-    EnumWindowsPlatform(value: 0)
-  ])
+  @EnumSupportedPlatforms(platforms: [EnumWindowsPlatform(value: 0)])
   static const NORMAL = BrowserProcessExitKind_._internal(0);
 
   ///Indicates that the browser process ended unexpectedly.
   ///A [PlatformWebViewCreationParams.onProcessFailed] event will also be
   ///raised to listening WebViews from the [PlatformWebViewEnvironment] associated to the failed process.
-  @EnumSupportedPlatforms(platforms: [
-    EnumWindowsPlatform(value: 1)
-  ])
+  @EnumSupportedPlatforms(platforms: [EnumWindowsPlatform(value: 1)])
   static const FAILED = BrowserProcessExitKind_._internal(1);
 }

@@ -57,16 +57,24 @@ class WebViewEnvironment {
           .compareBrowserVersions(version1: version1, version2: version2);
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewEnvironment.onNewBrowserVersionAvailable}
-  void Function()? get onNewBrowserVersionAvailable => platform.onNewBrowserVersionAvailable;
-  set onNewBrowserVersionAvailable(void Function()? value) => platform.onNewBrowserVersionAvailable = value;
+  void Function()? get onNewBrowserVersionAvailable =>
+      platform.onNewBrowserVersionAvailable;
+  set onNewBrowserVersionAvailable(void Function()? value) =>
+      platform.onNewBrowserVersionAvailable = value;
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewEnvironment.onBrowserProcessExited}
-  void Function(BrowserProcessExitedDetail detail)? get onBrowserProcessExited => platform.onBrowserProcessExited;
-  set onBrowserProcessExited(void Function(BrowserProcessExitedDetail detail)? value) => platform.onBrowserProcessExited = value;
+  void Function(BrowserProcessExitedDetail detail)?
+      get onBrowserProcessExited => platform.onBrowserProcessExited;
+  set onBrowserProcessExited(
+          void Function(BrowserProcessExitedDetail detail)? value) =>
+      platform.onBrowserProcessExited = value;
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewEnvironment.onProcessInfosChanged}
-  void Function(BrowserProcessInfosChangedDetail detail)? get onProcessInfosChanged => platform.onProcessInfosChanged;
-  set onProcessInfosChanged(void Function(BrowserProcessInfosChangedDetail detail)? value) => platform.onProcessInfosChanged = value;
+  void Function(BrowserProcessInfosChangedDetail detail)?
+      get onProcessInfosChanged => platform.onProcessInfosChanged;
+  set onProcessInfosChanged(
+          void Function(BrowserProcessInfosChangedDetail detail)? value) =>
+      platform.onProcessInfosChanged = value;
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewEnvironment.dispose}
   Future<void> dispose() => platform.dispose();

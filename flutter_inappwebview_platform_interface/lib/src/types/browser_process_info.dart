@@ -25,9 +25,7 @@ class BrowserProcessInfo_ {
   ///A list of associated [FrameInfo]s which are actively running
   ///(showing or hiding UI elements) in the renderer process.
   @SupportedPlatforms(platforms: [
-    WindowsPlatform(
-      available: '1.0.2210.55'
-    ),
+    WindowsPlatform(available: '1.0.2210.55'),
   ])
   List<FrameInfo_>? frameInfos;
 

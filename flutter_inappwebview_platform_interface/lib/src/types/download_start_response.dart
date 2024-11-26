@@ -12,17 +12,13 @@ class DownloadStartResponse_ {
   ///Set this flag to `true` to hide the default download dialog for this download.
   ///
   ///The download will progress as normal if it is not canceled, there will just be no default UI shown.
-  @SupportedPlatforms(platforms: [
-    WindowsPlatform()
-  ])
+  @SupportedPlatforms(platforms: [WindowsPlatform()])
   bool handled;
 
   ///Action to take for the download request.
   ///
   ///If canceled, the download save dialog is not displayed regardless of the [handled] property.
-  @SupportedPlatforms(platforms: [
-    WindowsPlatform()
-  ])
+  @SupportedPlatforms(platforms: [WindowsPlatform()])
   DownloadStartResponseAction_? action;
 
   ///The path to the file.
@@ -31,13 +27,9 @@ class DownloadStartResponse_ {
   ///including the file name, and that the path does not point to an existing file.
   ///If the path points to an existing file, the file will be overwritten.
   ///If the directory does not exist, it is created.
-  @SupportedPlatforms(platforms: [
-    WindowsPlatform()
-  ])
+  @SupportedPlatforms(platforms: [WindowsPlatform()])
   String? resultFilePath;
 
   DownloadStartResponse_(
-      {required this.handled,
-      this.action,
-      this.resultFilePath});
+      {required this.handled, this.action, this.resultFilePath});
 }

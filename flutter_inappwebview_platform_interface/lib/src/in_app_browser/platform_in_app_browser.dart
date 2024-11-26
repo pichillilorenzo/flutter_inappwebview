@@ -688,7 +688,8 @@ abstract class PlatformInAppBrowserEvents {
   ///- iOS
   ///- MacOS
   ///- Windows ([Official API - ICoreWebView2_4.add_DownloadStarting](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2_4?view=webview2-1.0.2849.39#add_downloadstarting))
-  FutureOr<DownloadStartResponse?>? onDownloadStarting(DownloadStartRequest downloadStartRequest) {
+  FutureOr<DownloadStartResponse?>? onDownloadStarting(
+      DownloadStartRequest downloadStartRequest) {
     return null;
   }
 
@@ -904,7 +905,8 @@ abstract class PlatformInAppBrowserEvents {
   ///- Android native WebView
   ///- iOS
   ///- MacOS
-  FutureOr<AjaxRequestAction?>? onAjaxReadyStateChange(AjaxRequest ajaxRequest) {
+  FutureOr<AjaxRequestAction?>? onAjaxReadyStateChange(
+      AjaxRequest ajaxRequest) {
     return null;
   }
 
@@ -1222,7 +1224,8 @@ abstract class PlatformInAppBrowserEvents {
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebViewRenderProcessClient.onRenderProcessResponsive](https://developer.android.com/reference/android/webkit/WebViewRenderProcessClient#onRenderProcessResponsive(android.webkit.WebView,%20android.webkit.WebViewRenderProcess)))
-  FutureOr<WebViewRenderProcessAction?>? onRenderProcessResponsive(WebUri? url) {
+  FutureOr<WebViewRenderProcessAction?>? onRenderProcessResponsive(
+      WebUri? url) {
     return null;
   }
 

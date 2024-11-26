@@ -324,7 +324,8 @@ class InAppBrowser implements PlatformInAppBrowserEvents {
   }
 
   @override
-  FutureOr<AjaxRequestAction?>? onAjaxReadyStateChange(AjaxRequest ajaxRequest) {
+  FutureOr<AjaxRequestAction?>? onAjaxReadyStateChange(
+      AjaxRequest ajaxRequest) {
     return null;
   }
 
@@ -363,7 +364,8 @@ class InAppBrowser implements PlatformInAppBrowserEvents {
   void onDownloadStartRequest(DownloadStartRequest downloadStartRequest) {}
 
   @override
-  FutureOr<DownloadStartResponse?>? onDownloadStarting(DownloadStartRequest downloadStartRequest) {
+  FutureOr<DownloadStartResponse?>? onDownloadStarting(
+      DownloadStartRequest downloadStartRequest) {
     return null;
   }
 
@@ -529,7 +531,8 @@ class InAppBrowser implements PlatformInAppBrowserEvents {
   void onRenderProcessGone(RenderProcessGoneDetail detail) {}
 
   @override
-  FutureOr<WebViewRenderProcessAction?>? onRenderProcessResponsive(WebUri? url) {
+  FutureOr<WebViewRenderProcessAction?>? onRenderProcessResponsive(
+      WebUri? url) {
     return null;
   }
 

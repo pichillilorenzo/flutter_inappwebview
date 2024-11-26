@@ -26,12 +26,12 @@ class PhysicalKeyStatus_ {
   bool wasKeyDown;
 
   @ExchangeableObjectConstructor()
-  PhysicalKeyStatus_(
-      {required this.isExtendedKey,
-        required this.isKeyReleased,
-        required this.isMenuKeyDown,
-        required this.repeatCount,
-        required this.scanCode,
-        required this.wasKeyDown,
-      });
+  PhysicalKeyStatus_({
+    required this.isExtendedKey,
+    required this.isKeyReleased,
+    required this.isMenuKeyDown,
+    required this.repeatCount,
+    required this.scanCode,
+    required this.wasKeyDown,
+  });
 }

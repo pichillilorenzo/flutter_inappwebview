@@ -838,6 +838,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "fuzzybinary",
+      "name": "Jeff Ward",
+      "avatar_url": "https://avatars.githubusercontent.com/u/249982?v=4",
+      "profile": "https://fuzzybinary.com",
+      "contributions": [
+        "test"
+      ]
     }
   ],
   "contributorsPerLine": 7,

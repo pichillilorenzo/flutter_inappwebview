@@ -1204,7 +1204,7 @@ public class InAppWebView: WKWebView, WKUIDelegate,
                                                             contentLength: response.expectedContentLength,
                                                             suggestedFilename: suggestedFilename,
                                                             textEncodingName: response.textEncodingName)
-            channelDelegate?.onDownloadStartRequest(request: downloadStartRequest)
+            channelDelegate?.onDownloadStarting(request: downloadStartRequest)
         }
         download.delegate = nil
         // cancel the download
@@ -1222,7 +1222,7 @@ public class InAppWebView: WKWebView, WKUIDelegate,
                                                             contentLength: response.expectedContentLength,
                                                             suggestedFilename: response.suggestedFilename,
                                                             textEncodingName: response.textEncodingName)
-            channelDelegate?.onDownloadStartRequest(request: downloadStartRequest)
+            channelDelegate?.onDownloadStarting(request: downloadStartRequest)
         }
         download.delegate = nil
     }
@@ -1315,7 +1315,7 @@ public class InAppWebView: WKWebView, WKUIDelegate,
                                                                         contentLength: navigationResponse.response.expectedContentLength,
                                                                         suggestedFilename: navigationResponse.response.suggestedFilename,
                                                                         textEncodingName: navigationResponse.response.textEncodingName)
-                        channelDelegate?.onDownloadStartRequest(request: downloadStartRequest)
+                        channelDelegate?.onDownloadStarting(request: downloadStartRequest)
                         if useOnNavigationResponse == nil || !useOnNavigationResponse! {
                             decisionHandler(.cancel)
                         }

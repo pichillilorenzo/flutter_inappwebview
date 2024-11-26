@@ -686,8 +686,8 @@ public class WebViewChannelDelegate: ChannelDelegate {
         channel?.invokeMethod("onScrollChanged", arguments: arguments)
     }
     
-    public func onDownloadStartRequest(request: DownloadStartRequest) {
-        channel?.invokeMethod("onDownloadStartRequest", arguments: request.toMap())
+    public func onDownloadStarting(request: DownloadStartRequest) {
+        channel?.invokeMethod("onDownloadStarting", arguments: request.toMap())
     }
     
     public func onCreateContextMenu(hitTestResult: HitTestResult) {

@@ -1423,7 +1423,7 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
               URLUtil.guessFileName(url, contentDisposition, mimeType),
               null
       );
-      if (channelDelegate != null) channelDelegate.onDownloadStartRequest(downloadStartRequest);
+      if (channelDelegate != null) channelDelegate.onDownloadStarting(downloadStartRequest);
     }
   }
 

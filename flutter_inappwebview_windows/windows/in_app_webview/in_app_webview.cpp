@@ -23,7 +23,6 @@
 #include "../utils/strconv.h"
 #include "../utils/string.h"
 #include "../utils/uri.h"
-#include "../webview_environment/webview_environment_manager.h"
 #include "in_app_webview.h"
 #include "in_app_webview_manager.h"
 
@@ -319,12 +318,44 @@ namespace flutter_inappwebview_plugin
 
   void InAppWebView::registerEventHandlers()
   {
-    if (!webView) {
+    if (!webView || !webViewController) {
       return;
     }
 
-    wil::com_ptr<ICoreWebView2DevToolsProtocolEventReceiver> fetchRequestPausedEventReceiver;
+    auto add_AcceleratorKeyPressed_HResult = webViewController->add_AcceleratorKeyPressed(
+      Callback<ICoreWebView2AcceleratorKeyPressedEventHandler>(
+        [this](ICoreWebView2Controller* sender, ICoreWebView2AcceleratorKeyPressedEventArgs* args)
+        {
+          if (channelDelegate) {
+            auto handled = settings->handleAcceleratorKeyPressed;
+            args->put_Handled(handled);
+            if (handled) {
+              auto detail = AcceleratorKeyPressedDetail::fromICoreWebView2AcceleratorKeyPressedEventArgs(args);
+              channelDelegate->onAcceleratorKeyPressed(std::move(detail));
+            }
+          }
+          return S_OK;
+        }
+      ).Get(), nullptr);
+    failedLog(add_AcceleratorKeyPressed_HResult);
 
+    auto add_ZoomFactorChanged_HResult = webViewController->add_ZoomFactorChanged(
+      Callback<ICoreWebView2ZoomFactorChangedEventHandler>(
+        [this](ICoreWebView2Controller* sender, IUnknown* args)
+        {
+          double newScale;
+          if (succeededOrLog(sender->get_ZoomFactor(&newScale))) {
+            if (channelDelegate) {
+              channelDelegate->onZoomScaleChanged(zoomScaleFactor_, newScale);
+            }
+            zoomScaleFactor_ = newScale;
+          }
+          return S_OK;
+        }
+      ).Get(), nullptr);
+    failedLog(add_ZoomFactorChanged_HResult);
+
+    wil::com_ptr<ICoreWebView2DevToolsProtocolEventReceiver> fetchRequestPausedEventReceiver;
     if (succeededOrLog(webView->GetDevToolsProtocolEventReceiver(L"Fetch.requestPaused", &fetchRequestPausedEventReceiver))) {
       auto add_DevToolsProtocolEventReceived_HResult = fetchRequestPausedEventReceiver->add_DevToolsProtocolEventReceived(
         Callback<ICoreWebView2DevToolsProtocolEventReceivedEventHandler>(
@@ -2289,6 +2320,11 @@ namespace flutter_inappwebview_plugin
     return false;
   }
 
+  double InAppWebView::getZoomScale() const
+  {
+    return zoomScaleFactor_;
+  }
+
   // flutter_view
   void InAppWebView::setSurfaceSize(size_t width, size_t height, float scale_factor)
   {
@@ -2439,35 +2475,66 @@ namespace flutter_inappwebview_plugin
     }
   }
 
-  void InAppWebView::setPointerButtonState(InAppWebViewPointerButton button, bool is_down)
+  void InAppWebView::setPointerButtonState(InAppWebViewPointerEventKind kind, InAppWebViewPointerButton button)
   {
     if (!webViewCompositionController) {
       return;
     }
 
-    COREWEBVIEW2_MOUSE_EVENT_KIND kind;
-    switch (button) {
-    case InAppWebViewPointerButton::Primary:
-      virtualKeys_.setIsLeftButtonDown(is_down);
-      kind = is_down ? COREWEBVIEW2_MOUSE_EVENT_KIND_LEFT_BUTTON_DOWN
-        : COREWEBVIEW2_MOUSE_EVENT_KIND_LEFT_BUTTON_UP;
+    COREWEBVIEW2_MOUSE_EVENT_VIRTUAL_KEYS eventVirtualKeys_ = COREWEBVIEW2_MOUSE_EVENT_VIRTUAL_KEYS_NONE;
+    COREWEBVIEW2_MOUSE_EVENT_KIND eventKind;
+    UINT32 mouseData = 0;
+    POINT point = { 0, 0 };;
+
+    switch (kind) {
+    case InAppWebViewPointerEventKind::Down:
+      switch (button) {
+      case InAppWebViewPointerButton::Primary:
+        virtualKeys_.setIsLeftButtonDown(true);
+        eventKind = COREWEBVIEW2_MOUSE_EVENT_KIND_LEFT_BUTTON_DOWN;
+        break;
+      case InAppWebViewPointerButton::Secondary:
+        virtualKeys_.setIsRightButtonDown(true);
+        eventKind = COREWEBVIEW2_MOUSE_EVENT_KIND_RIGHT_BUTTON_DOWN;
+        break;
+      case InAppWebViewPointerButton::Tertiary:
+        virtualKeys_.setIsMiddleButtonDown(true);
+        eventKind = COREWEBVIEW2_MOUSE_EVENT_KIND_MIDDLE_BUTTON_DOWN;
+        break;
+      default:
+        eventKind = static_cast<COREWEBVIEW2_MOUSE_EVENT_KIND>(0);
+      }
+      eventVirtualKeys_ = virtualKeys_.state();
+      point = lastCursorPos_;
       break;
-    case InAppWebViewPointerButton::Secondary:
-      virtualKeys_.setIsRightButtonDown(is_down);
-      kind = is_down ? COREWEBVIEW2_MOUSE_EVENT_KIND_RIGHT_BUTTON_DOWN
-        : COREWEBVIEW2_MOUSE_EVENT_KIND_RIGHT_BUTTON_UP;
+    case InAppWebViewPointerEventKind::Up:
+      switch (button) {
+      case InAppWebViewPointerButton::Primary:
+        virtualKeys_.setIsLeftButtonDown(false);
+        eventKind = COREWEBVIEW2_MOUSE_EVENT_KIND_LEFT_BUTTON_UP;
+        break;
+      case InAppWebViewPointerButton::Secondary:
+        virtualKeys_.setIsRightButtonDown(false);
+        eventKind = COREWEBVIEW2_MOUSE_EVENT_KIND_RIGHT_BUTTON_UP;
+        break;
+      case InAppWebViewPointerButton::Tertiary:
+        virtualKeys_.setIsMiddleButtonDown(false);
+        eventKind = COREWEBVIEW2_MOUSE_EVENT_KIND_MIDDLE_BUTTON_UP;
+        break;
+      default:
+        eventKind = static_cast<COREWEBVIEW2_MOUSE_EVENT_KIND>(0);
+      }
+      eventVirtualKeys_ = virtualKeys_.state();
+      point = lastCursorPos_;
       break;
-    case InAppWebViewPointerButton::Tertiary:
-      virtualKeys_.setIsMiddleButtonDown(is_down);
-      kind = is_down ? COREWEBVIEW2_MOUSE_EVENT_KIND_MIDDLE_BUTTON_DOWN
-        : COREWEBVIEW2_MOUSE_EVENT_KIND_MIDDLE_BUTTON_UP;
+    case InAppWebViewPointerEventKind::Leave:
+      eventKind = COREWEBVIEW2_MOUSE_EVENT_KIND_LEAVE;
       break;
     default:
-      kind = static_cast<COREWEBVIEW2_MOUSE_EVENT_KIND>(0);
+      eventKind = static_cast<COREWEBVIEW2_MOUSE_EVENT_KIND>(0);
     }
 
-    webViewCompositionController->SendMouseInput(kind, virtualKeys_.state(), 0,
-      lastCursorPos_);
+    webViewCompositionController->SendMouseInput(eventKind, eventVirtualKeys_, mouseData, point);
   }
 
   void InAppWebView::sendScroll(double delta, bool horizontal)

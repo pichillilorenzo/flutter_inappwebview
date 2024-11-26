@@ -312,6 +312,9 @@ namespace flutter_inappwebview_plugin
       auto interfaceName = get_fl_map_value<std::string>(arguments, "interface");
       result->Success(webView->isInterfaceSupported(interfaceName));
     }
+    else if (string_equals(methodName, "getZoomScale")) {
+      result->Success(webView->getZoomScale());
+    }
     // for inAppBrowser
     else if (webView->inAppBrowser && string_equals(methodName, "show")) {
       webView->inAppBrowser->show();
@@ -614,6 +617,29 @@ namespace flutter_inappwebview_plugin
 
     auto arguments = std::make_unique<flutter::EncodableValue>(request->toEncodableMap());
     channel->InvokeMethod("onDownloadStarting", std::move(arguments), std::move(callback));
+  }
+
+  void WebViewChannelDelegate::onAcceleratorKeyPressed(std::shared_ptr<AcceleratorKeyPressedDetail> detail) const
+  {
+    if (!channel) {
+      return;
+    }
+
+    auto arguments = std::make_unique<flutter::EncodableValue>(detail->toEncodableMap());
+    channel->InvokeMethod("onAcceleratorKeyPressed", std::move(arguments));
+  }
+
+  void WebViewChannelDelegate::onZoomScaleChanged(const double& oldScale, const double& newScale) const
+  {
+    if (!channel) {
+      return;
+    }
+
+    auto arguments = std::make_unique<flutter::EncodableValue>(flutter::EncodableMap{
+      {"oldScale", make_fl_value(oldScale)},
+      {"newScale", make_fl_value(newScale)},
+      });
+    channel->InvokeMethod("onZoomScaleChanged", std::move(arguments));
   }
 
   WebViewChannelDelegate::~WebViewChannelDelegate()

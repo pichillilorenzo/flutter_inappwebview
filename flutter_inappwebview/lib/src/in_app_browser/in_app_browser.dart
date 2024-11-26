@@ -603,4 +603,7 @@ class InAppBrowser implements PlatformInAppBrowserEvents {
 
   @override
   void onProcessFailed(ProcessFailedDetail detail) {}
+
+  @override
+  void onAcceleratorKeyPressed(AcceleratorKeyPressedDetail detail) {}
 }

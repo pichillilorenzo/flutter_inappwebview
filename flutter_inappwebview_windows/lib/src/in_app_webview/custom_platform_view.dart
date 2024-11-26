@@ -56,7 +56,7 @@ enum PointerButton { none, primary, secondary, tertiary }
 
 /// Pointer Event kind
 // Order must match InAppWebViewPointerEventKind (see in_app_webview.h)
-enum InAppWebViewPointerEventKind { activate, down, enter, leave, up, update }
+enum InAppWebViewPointerEventKind { activate, down, enter, leave, up, update, cancel }
 
 /// Attempts to translate a button constant such as [kPrimaryMouseButton]
 /// to a [PointerButton]
@@ -194,13 +194,13 @@ class CustomPlatformViewController
   }
 
   /// Indicates whether the specified [button] is currently down.
-  Future<void> _setPointerButtonState(PointerButton button, bool isDown) async {
+  Future<void> _setPointerButtonState(InAppWebViewPointerEventKind kind, PointerButton button) async {
     if (_isDisposed) {
       return;
     }
     assert(value.isInitialized);
     return _methodChannel.invokeMethod('setPointerButton',
-        <String, dynamic>{'button': button.index, 'isDown': isDown});
+        <String, dynamic>{'kind': kind.index, 'button': button.index});
   }
 
   /// Sets the horizontal and vertical scroll delta.
@@ -374,7 +374,7 @@ class _CustomPlatformViewState extends State<CustomPlatformView> with PlatformUt
                       }
                       final button = _getButton(ev.buttons);
                       _downButtons[ev.pointer] = button;
-                      _controller._setPointerButtonState(button, true);
+                      _controller._setPointerButtonState(InAppWebViewPointerEventKind.down, button);
                     },
                     onPointerUp: (ev) {
                       _pointerKind = ev.kind;
@@ -389,14 +389,14 @@ class _CustomPlatformViewState extends State<CustomPlatformView> with PlatformUt
                       }
                       final button = _downButtons.remove(ev.pointer);
                       if (button != null) {
-                        _controller._setPointerButtonState(button, false);
+                        _controller._setPointerButtonState(InAppWebViewPointerEventKind.up, button);
                       }
                     },
                     onPointerCancel: (ev) {
                       _pointerKind = ev.kind;
                       final button = _downButtons.remove(ev.pointer);
                       if (button != null) {
-                        _controller._setPointerButtonState(button, false);
+                        _controller._setPointerButtonState(InAppWebViewPointerEventKind.cancel, button);
                       }
                     },
                     onPointerMove: (ev) {
@@ -424,6 +424,14 @@ class _CustomPlatformViewState extends State<CustomPlatformView> with PlatformUt
                     },
                     child: MouseRegion(
                         cursor: _cursor,
+                        onEnter: (ev) {
+                          final button = _getButton(ev.buttons);
+                          _controller._setPointerButtonState(InAppWebViewPointerEventKind.enter, button);
+                        },
+                        onExit: (ev) {
+                          final button = _getButton(ev.buttons);
+                          _controller._setPointerButtonState(InAppWebViewPointerEventKind.leave, button);
+                        },
                         child: Texture(
                           textureId: _controller._textureId,
                           filterQuality: widget.filterQuality,

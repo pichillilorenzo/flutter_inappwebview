@@ -250,3 +250,5 @@ export 'browser_process_kind.dart' show BrowserProcessKind;
 export 'browser_process_info.dart' show BrowserProcessInfo;
 export 'browser_process_infos_changed_detail.dart'
     show BrowserProcessInfosChangedDetail;
+export 'physical_key_status.dart' show PhysicalKeyStatus;
+export 'accelerator_key_pressed_detail.dart' show AcceleratorKeyPressedDetail;

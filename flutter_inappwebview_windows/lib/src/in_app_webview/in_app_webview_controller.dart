@@ -1455,6 +1455,19 @@ class WindowsInAppWebViewController extends PlatformInAppWebViewController
             _inAppBrowserEventHandler!.onProcessFailed(detail);
         }
         break;
+      case "onAcceleratorKeyPressed":
+        if ((webviewParams != null && webviewParams!.onAcceleratorKeyPressed != null) ||
+            _inAppBrowserEventHandler != null) {
+          Map<String, dynamic> arguments =
+          call.arguments.cast<String, dynamic>();
+          final detail = AcceleratorKeyPressedDetail.fromMap(arguments)!;
+
+          if (webviewParams != null && webviewParams!.onAcceleratorKeyPressed != null)
+            webviewParams!.onAcceleratorKeyPressed!(_controllerFromPlatform, detail);
+          else
+            _inAppBrowserEventHandler!.onAcceleratorKeyPressed(detail);
+        }
+        break;
       case "onCallJsHandler":
         String handlerName = call.arguments["handlerName"];
         Map<String, dynamic> handlerDataMap =

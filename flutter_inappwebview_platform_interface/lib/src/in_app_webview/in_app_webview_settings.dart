@@ -1950,6 +1950,15 @@ as it can cause framerate drops on animations in Android 9 and lower (see [Hybri
   ])
   bool? isUserInteractionEnabled;
 
+  ///A Boolean value that determines whether to listen and handle the
+  ///[PlatformWebViewCreationParams.onAcceleratorKeyPressed] event.
+  ///
+  ///The default value is `false`.
+  @SupportedPlatforms(platforms: [
+    WindowsPlatform(),
+  ])
+  bool? handleAcceleratorKeyPressed;
+
   ///The view’s alpha value. The value of this property is a floating-point number
   ///in the range 0.0 to 1.0, where 0.0 represents totally transparent and 1.0 represents totally opaque.
   @SupportedPlatforms(platforms: [
@@ -2206,6 +2215,7 @@ as it can cause framerate drops on animations in Android 9 and lower (see [Hybri
     this.reputationCheckingRequired = true,
     this.nonClientRegionSupportEnabled = false,
     this.isUserInteractionEnabled = true,
+    this.handleAcceleratorKeyPressed = false,
     this.alpha,
     this.iframeAllow,
     this.iframeAllowFullscreen,

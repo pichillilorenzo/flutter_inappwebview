@@ -301,6 +301,8 @@ class InAppWebView extends StatefulWidget {
     void Function(
             InAppWebViewController controller, ProcessFailedDetail detail)?
         onProcessFailed,
+    void Function(InAppWebViewController controller, AcceleratorKeyPressedDetail detail)?
+      onAcceleratorKeyPressed
   }) : this.fromPlatformCreationParams(
             key: key,
             params: PlatformInAppWebViewWidgetCreationParams(
@@ -670,6 +672,10 @@ class InAppWebView extends StatefulWidget {
               onProcessFailed: onProcessFailed != null
                   ? (controller, detail) =>
                       onProcessFailed.call(controller, detail)
+                  : null,
+              onAcceleratorKeyPressed: onAcceleratorKeyPressed != null
+                  ? (controller, detail) =>
+                  onAcceleratorKeyPressed.call(controller, detail)
                   : null,
               gestureRecognizers: gestureRecognizers,
               headlessWebView: headlessWebView?.platform,

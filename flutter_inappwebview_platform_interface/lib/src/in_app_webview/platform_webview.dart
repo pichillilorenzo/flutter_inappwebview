@@ -654,6 +654,7 @@ class PlatformWebViewCreationParams<T> {
   ///- Android native WebView ([Official API - WebViewClient.onScaleChanged](https://developer.android.com/reference/android/webkit/WebViewClient#onScaleChanged(android.webkit.WebView,%20float,%20float)))
   ///- iOS ([Official API - UIScrollViewDelegate.scrollViewDidZoom](https://developer.apple.com/documentation/uikit/uiscrollviewdelegate/1619409-scrollviewdidzoom))
   ///- Web
+  ///- Windows ([Official API - ICoreWebView2Controller.add_ZoomFactorChanged](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2controller?view=webview2-1.0.2849.39#add_zoomfactorchanged))
   ///{@endtemplate}
   final void Function(T controller, double oldScale, double newScale)?
       onZoomScaleChanged;
@@ -1091,6 +1092,27 @@ class PlatformWebViewCreationParams<T> {
   final void Function(T controller, ProcessFailedDetail detail)?
       onProcessFailed;
 
+  ///{@template flutter_inappwebview_platform_interface.PlatformWebViewCreationParams.onAcceleratorKeyPressed}
+  ///This event runs when an accelerator key or key combo is pressed or
+  ///released while the WebView is focused.
+  ///To listen this event, [InAppWebViewSettings.handleAcceleratorKeyPressed] must be `true`.
+  ///
+  ///A key is considered an accelerator if either of the following conditions are `true`:
+  ///- `Ctrl` or `Alt` is currently being held.
+  ///- The pressed key does not map to a character.
+  ///
+  ///A few specific keys are never considered accelerators, such as `Shift`.
+  ///The `Escape` key is always considered an accelerator.
+  ///
+  ///Auto-repeated key events caused by holding the key down also triggers this event.
+  ///Filter out the auto-repeated key events by verifying the [AcceleratorKeyPressedDetail.physicalKeyStatus] property.
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Windows ([Official API - ICoreWebView2Controller.add_AcceleratorKeyPressed](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2controller?view=webview2-1.0.2849.39#add_acceleratorkeypressed))
+  ///{@endtemplate}
+  final void Function(T controller, AcceleratorKeyPressedDetail detail)?
+    onAcceleratorKeyPressed;
+
   ///{@template flutter_inappwebview_platform_interface.PlatformWebViewCreationParams.initialUrlRequest}
   ///Initial url request that will be loaded.
   ///
@@ -1296,6 +1318,7 @@ class PlatformWebViewCreationParams<T> {
       this.onMicrophoneCaptureStateChanged,
       this.onContentSizeChanged,
       this.onProcessFailed,
+      this.onAcceleratorKeyPressed,
       this.initialUrlRequest,
       this.initialFile,
       this.initialData,

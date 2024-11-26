@@ -1,9 +1,9 @@
 #ifndef FLUTTER_INAPPWEBVIEW_PLUGIN_WEBVIEW_CHANNEL_DELEGATE_H_
 #define FLUTTER_INAPPWEBVIEW_PLUGIN_WEBVIEW_CHANNEL_DELEGATE_H_
 
-#include <flutter/method_channel.h>
 #include <flutter/standard_message_codec.h>
 
+#include "../types/accelerator_key_pressed_detail.h"
 #include "../types/base_callback_result.h"
 #include "../types/channel_delegate.h"
 #include "../types/client_cert_challenge.h"
@@ -128,6 +128,8 @@ namespace flutter_inappwebview_plugin
     void onWebContentProcessDidTerminate() const;
     void onProcessFailed(const std::shared_ptr<ProcessFailedDetail> detail) const;
     void onDownloadStarting(std::shared_ptr<DownloadStartRequest> request, std::unique_ptr<DownloadStartRequestCallback> callback) const;
+    void onAcceleratorKeyPressed(std::shared_ptr<AcceleratorKeyPressedDetail> detail) const;
+    void onZoomScaleChanged(const double& oldScale, const double& newScale) const;
   };
 }
 

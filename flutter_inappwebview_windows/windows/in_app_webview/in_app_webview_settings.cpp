@@ -50,6 +50,7 @@ namespace flutter_inappwebview_plugin
     hiddenPdfToolbarItems = get_fl_map_value(encodableMap, "hiddenPdfToolbarItems", hiddenPdfToolbarItems);
     reputationCheckingRequired = get_fl_map_value(encodableMap, "reputationCheckingRequired", reputationCheckingRequired);
     nonClientRegionSupportEnabled = get_fl_map_value(encodableMap, "nonClientRegionSupportEnabled", nonClientRegionSupportEnabled);
+    handleAcceleratorKeyPressed = get_fl_map_value(encodableMap, "handleAcceleratorKeyPressed", handleAcceleratorKeyPressed);
   }
 
   flutter::EncodableMap InAppWebViewSettings::toEncodableMap() const
@@ -83,7 +84,8 @@ namespace flutter_inappwebview_plugin
       {"allowsBackForwardNavigationGestures", allowsBackForwardNavigationGestures},
       {"hiddenPdfToolbarItems", hiddenPdfToolbarItems},
       {"reputationCheckingRequired", reputationCheckingRequired},
-      {"nonClientRegionSupportEnabled", nonClientRegionSupportEnabled}
+      {"nonClientRegionSupportEnabled", nonClientRegionSupportEnabled},
+      {"handleAcceleratorKeyPressed", handleAcceleratorKeyPressed}
     };
   }
 

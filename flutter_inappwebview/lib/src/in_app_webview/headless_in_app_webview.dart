@@ -298,6 +298,11 @@ class HeadlessInAppWebView {
     void Function(InAppWebViewController controller, Size oldContentSize,
             Size newContentSize)?
         onContentSizeChanged,
+    void Function(
+        InAppWebViewController controller, ProcessFailedDetail detail)?
+    onProcessFailed,
+    void Function(InAppWebViewController controller, AcceleratorKeyPressedDetail detail)?
+    onAcceleratorKeyPressed
   }) : this.fromPlatformCreationParams(
             params: PlatformHeadlessInAppWebViewCreationParams(
           controllerFromPlatform: (PlatformInAppWebViewController controller) =>
@@ -643,6 +648,14 @@ class HeadlessInAppWebView {
               ? (controller, oldContentSize, newContentSize) =>
                   onContentSizeChanged.call(
                       controller, oldContentSize, newContentSize)
+              : null,
+          onProcessFailed: onProcessFailed != null
+              ? (controller, detail) =>
+              onProcessFailed.call(controller, detail)
+              : null,
+          onAcceleratorKeyPressed: onAcceleratorKeyPressed != null
+              ? (controller, detail) =>
+              onAcceleratorKeyPressed.call(controller, detail)
               : null,
         ));
 

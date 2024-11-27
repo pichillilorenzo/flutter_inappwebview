@@ -1,3 +1,25 @@
+## 6.2.0-beta.3
+
+- Updated dependencies to the latest versions for all platform implementations:
+  - `flutter_inappwebview_platform_interface`: `^1.4.0-beta.2` -> `^1.4.0-beta.3`
+  - `flutter_inappwebview_android`: `^1.2.0-beta.2` -> `^1.2.0-beta.3`
+  - `flutter_inappwebview_ios`: `^1.2.0-beta.2` -> `^1.2.0-beta.3`
+  - `flutter_inappwebview_macos`: `^1.2.0-beta.2` -> `^1.2.0-beta.3`
+  - `flutter_inappwebview_web`: `^1.2.0-beta.2` -> `^1.2.0-beta.3`
+  - `flutter_inappwebview_windows`: `^0.7.0-beta.2` -> `^0.7.0-beta.3`
+
+#### Platform Interface
+
+- Added `saveState`, `restoreState` methods to `PlatformInAppWebViewController` class
+
+#### Android Platform
+
+- Implemented `saveState`, `restoreState` InAppWebViewController methods
+
+#### macOS and iOS Platforms
+
+- Implemented `saveState`, `restoreState` InAppWebViewController methods
+
 ## 6.2.0-beta.2
 
 - Updated dependencies to the latest versions for all platform implementations:

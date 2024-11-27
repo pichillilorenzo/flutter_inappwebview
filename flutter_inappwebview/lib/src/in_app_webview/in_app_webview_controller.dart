@@ -522,6 +522,12 @@ class InAppWebViewController {
   Future<bool> isInterfaceSupported(WebViewInterface interface) =>
       platform.isInterfaceSupported(interface);
 
+  ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.saveState}
+  Future<Uint8List?> saveState() => platform.saveState();
+
+  ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.restoreState}
+  Future<bool> restoreState(Uint8List state) => platform.restoreState(state);
+
   ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.getIFrameId}
   Future<String?> getIFrameId() => platform.getIFrameId();
 

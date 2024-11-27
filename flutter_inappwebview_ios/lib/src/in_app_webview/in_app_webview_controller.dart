@@ -2712,6 +2712,19 @@ class IOSInAppWebViewController extends PlatformInAppWebViewController
   }
 
   @override
+  Future<Uint8List?> saveState() async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    return await channel?.invokeMethod<Uint8List?>('saveState', args);
+  }
+
+  @override
+  Future<bool> restoreState(Uint8List? state) async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    args.putIfAbsent('state', () => state);
+    return await channel?.invokeMethod<bool>('restoreState', args) ?? false;
+  }
+
+  @override
   Future<String> getDefaultUserAgent() async {
     Map<String, dynamic> args = <String, dynamic>{};
     return await _staticChannel.invokeMethod<String>(

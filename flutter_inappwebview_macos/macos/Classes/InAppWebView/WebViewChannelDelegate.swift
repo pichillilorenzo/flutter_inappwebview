@@ -664,6 +664,23 @@ public class WebViewChannelDelegate: ChannelDelegate {
             } else {
                 result(false)
             }
+            break
+        case .saveState:
+            if let webView = webView, #available(macOS 12.0, *) {
+                result(webView.saveState())
+            } else {
+                result(nil)
+            }
+            break
+        case .restoreState:
+            if let webView = webView, #available(macOS 12.0, *) {
+                let state = arguments!["state"] as! FlutterStandardTypedData
+                webView.restoreState(state: state.data)
+                result(true)
+            } else {
+                result(false)
+            }
+            break
         }
     }
     

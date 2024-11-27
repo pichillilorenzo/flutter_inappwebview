@@ -2198,6 +2198,39 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
         'isInterfaceSupported is not implemented on the current platform');
   }
 
+  ///{@template flutter_inappwebview_platform_interface.PlatformInAppWebViewController.saveState}
+  ///Returns the current state of interaction in a web view so that you can restore
+  ///that state later to another web view using the [restoreState] method.
+  ///
+  ///**NOTE for Android**: this method doesn't store the display data for this WebView.
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Android native WebView ([Official API - WebView.saveState](https://developer.android.com/reference/android/webkit/WebView#saveState(android.os.Bundle)))
+  ///- iOS 15.0+ ([Official API - WKWebView.interactionState](https://developer.apple.com/documentation/webkit/wkwebview/3752236-interactionstate))
+  ///- MacOS 12.0+ ([Official API - WKWebView.interactionState](https://developer.apple.com/documentation/webkit/wkwebview/3752236-interactionstate))
+  ///{@endtemplate}
+  Future<Uint8List?> saveState() {
+    throw UnimplementedError(
+        'saveState is not implemented on the current platform');
+  }
+
+  ///{@template flutter_inappwebview_platform_interface.PlatformInAppWebViewController.restoreState}
+  ///Restores the state of this WebView from the given [state] returned by the [saveState] method.
+  ///If it is called after this WebView has had a chance to build state (load pages, create a back/forward list, etc.),
+  ///there may be undesirable side-effects.
+  ///
+  ///**NOTE for Android**: this method doesn't restore the display data for this WebView.
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Android native WebView ([Official API - WebView.restoreState](https://developer.android.com/reference/android/webkit/WebView#restoreState(android.os.Bundle)))
+  ///- iOS 15.0+ ([Official API - WKWebView.interactionState](https://developer.apple.com/documentation/webkit/wkwebview/3752236-interactionstate))
+  ///- MacOS 12.0+ ([Official API - WKWebView.interactionState](https://developer.apple.com/documentation/webkit/wkwebview/3752236-interactionstate))
+  ///{@endtemplate}
+  Future<bool> restoreState(Uint8List state) {
+    throw UnimplementedError(
+        'restoreState is not implemented on the current platform');
+  }
+
   ///{@template flutter_inappwebview_platform_interface.PlatformInAppWebViewController.getIFrameId}
   ///Returns the iframe `id` attribute used on the Web platform.
   ///

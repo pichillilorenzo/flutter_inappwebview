@@ -3440,10 +3440,20 @@ if(window.\(JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME())[\(_callHandlerID)] 
         for subview in self.scrollView.subviews {
             subview.reloadInputViews()
         }
-	}
+    }
     
     public func hideInputMethod() {
         endEditing(true)
+    }
+    
+    @available(iOS 15.0, *)
+    public func saveState() -> Data? {
+        return interactionState is NSData || interactionState is Data ? interactionState as? Data : nil
+    }
+    
+    @available(iOS 15.0, *)
+    public func restoreState(state: Data) {
+        interactionState = state
     }
     
     public func runWindowBeforeCreatedCallbacks() {

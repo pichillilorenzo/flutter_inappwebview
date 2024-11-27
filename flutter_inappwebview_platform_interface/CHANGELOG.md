@@ -1,3 +1,7 @@
+## 1.4.0-beta.3
+
+- Added `saveState`, `restoreState` methods to `PlatformInAppWebViewController` class
+
 ## 1.4.0-beta.2
 
 - Updated `flutter_inappwebview_internal_annotations` dependency from `^1.1.1` to `^1.2.0`

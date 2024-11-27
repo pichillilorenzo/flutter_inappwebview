@@ -93,4 +93,6 @@ public enum WebViewChannelDelegateMethods: String {
     case loadSimulatedRequest = "loadSimulatedRequest"
     case setInputMethodEnabled = "setInputMethodEnabled"
     case hideInputMethod = "hideInputMethod"
+    case saveState = "saveState"
+    case restoreState = "restoreState"
 }

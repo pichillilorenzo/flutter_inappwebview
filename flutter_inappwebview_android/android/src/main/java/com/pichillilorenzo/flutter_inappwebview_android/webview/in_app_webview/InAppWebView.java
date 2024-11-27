@@ -21,6 +21,7 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
 import android.os.Message;
+import android.os.Parcel;
 import android.print.PrintAttributes;
 import android.print.PrintDocumentAdapter;
 import android.print.PrintManager;
@@ -2110,6 +2111,32 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
       imm.hideSoftInputFromWindow(windowToken, 0);
     }
   }
+
+  @Override
+  @Nullable
+  public byte[] saveState() {
+    Bundle bundle = new Bundle();
+    if (saveState(bundle) != null) {
+      Parcel parcel = Parcel.obtain();
+      bundle.writeToParcel(parcel, 0);
+      byte[] bytes = parcel.marshall();
+      parcel.recycle();
+      return bytes;
+    }
+    return null;
+  }
+
+  @Override
+  public boolean restoreState(byte[] state) {
+    Parcel parcel = Parcel.obtain();
+    parcel.unmarshall(state, 0, state.length);
+    parcel.setDataPosition(0);
+    Bundle bundle = Bundle.CREATOR.createFromParcel(parcel);
+    boolean restored = restoreState(bundle) != null;
+    parcel.recycle();
+    return restored;
+  }
+
 
   @Override
   public void dispose() {

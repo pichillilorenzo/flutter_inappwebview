@@ -710,7 +710,21 @@ public class WebViewChannelDelegate extends ChannelDelegateImpl {
           result.success(false);
         }
         break;
-
+      case saveState:
+        if (webView != null) {
+          result.success(webView.saveState());
+        } else {
+          result.success(null);
+        }
+        break;
+      case restoreState:
+        if (webView != null) {
+          byte[] state = (byte[]) call.argument("state");
+          result.success(webView.restoreState(state));
+        } else {
+          result.success(false);
+        }
+        break;
     }
   }
 

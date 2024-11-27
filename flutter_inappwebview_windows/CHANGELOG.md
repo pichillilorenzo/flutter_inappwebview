@@ -1,3 +1,7 @@
+## 0.7.0-beta.3
+
+- Updated flutter_inappwebview_platform_interface version to ^1.4.0-beta.3
+
 ## 0.7.0-beta.2
 
 - Updated flutter_inappwebview_platform_interface version to ^1.4.0-beta.2

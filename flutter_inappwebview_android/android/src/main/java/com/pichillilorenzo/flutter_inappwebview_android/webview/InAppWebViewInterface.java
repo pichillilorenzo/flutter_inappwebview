@@ -119,4 +119,7 @@ public interface InAppWebViewInterface {
   void setChannelDelegate(@Nullable WebViewChannelDelegate eventWebViewChannelDelegate);
   void showInputMethod();
   void hideInputMethod();
+  @Nullable
+  byte[] saveState();
+  boolean restoreState(byte[] state);
 }

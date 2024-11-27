@@ -2128,12 +2128,18 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
 
   @Override
   public boolean restoreState(byte[] state) {
+    boolean restored = false;
     Parcel parcel = Parcel.obtain();
-    parcel.unmarshall(state, 0, state.length);
-    parcel.setDataPosition(0);
-    Bundle bundle = Bundle.CREATOR.createFromParcel(parcel);
-    boolean restored = restoreState(bundle) != null;
-    parcel.recycle();
+    try {
+      parcel.unmarshall(state, 0, state.length);
+      parcel.setDataPosition(0);
+      Bundle bundle = Bundle.CREATOR.createFromParcel(parcel);
+      restored = restoreState(bundle) != null;
+    } catch (Exception e) {
+      e.printStackTrace();
+    } finally {
+      parcel.recycle();
+    }
     return restored;
   }
 

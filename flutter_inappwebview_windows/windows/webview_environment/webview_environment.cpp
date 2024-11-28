@@ -103,7 +103,7 @@ namespace flutter_inappwebview_plugin
                 }
                 return S_OK;
               }
-            ).Get(), nullptr);
+            ).Get(), &newBrowserVersionAvailableToken_);
             failedLog(add_NewBrowserVersionAvailable_HResult);
 
             if (auto environment5 = environment_.try_query<ICoreWebView2Environment5>()) {
@@ -122,7 +122,7 @@ namespace flutter_inappwebview_plugin
                   }
                   return S_OK;
                 }
-              ).Get(), nullptr);
+              ).Get(), &browserProcessExitedToken_);
               failedLog(add_BrowserProcessExited_HResult);
             }
 
@@ -152,7 +152,7 @@ namespace flutter_inappwebview_plugin
                   }
                   return S_OK;
                 }
-              ).Get(), nullptr);
+              ).Get(), &processInfosChangedToken_);
               failedLog(add_ProcessInfosChanged_HResult);
             }
 
@@ -307,6 +307,15 @@ namespace flutter_inappwebview_plugin
 
   WebViewEnvironment::~WebViewEnvironment()
   {
+    if (environment_ != nullptr) {
+       if (auto environment8 = environment_.try_query<ICoreWebView2Environment8>()) {
+          auto add_ProcessInfosChanged_HResult = environment8->remove_ProcessInfosChanged(processInfosChangedToken_);
+       }
+       if (auto environment5 = environment_.try_query<ICoreWebView2Environment5>()) {
+          auto add_BrowserProcessExited_HResult = environment5->remove_BrowserProcessExited(browserProcessExitedToken_);
+       }
+       environment_->remove_NewBrowserVersionAvailable(newBrowserVersionAvailableToken_);
+    }
     debugLog("dealloc WebViewEnvironment");
     environment_ = nullptr;
   }

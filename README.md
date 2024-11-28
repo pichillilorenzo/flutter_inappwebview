@@ -5,7 +5,7 @@
 ![InAppWebView-logo](https://user-images.githubusercontent.com/5956938/195422744-bdcfed16-73f0-4bc9-94ab-ecf10771a1c4.png)
 
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-93-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-94-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 [![flutter_inappwebview version](https://img.shields.io/pub/v/flutter_inappwebview?include_prereleases)](https://pub.dartlang.org/packages/flutter_inappwebview)
@@ -203,6 +203,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     <tr>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/Mecharyry"><img src="https://avatars.githubusercontent.com/u/3380092?v=4?s=100" width="100px;" alt="Ryan Feline"/><br /><sub><b>Ryan Feline</b></sub></a><br /><a href="https://github.com/pichillilorenzo/flutter_inappwebview/commits?author=Mecharyry" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://fuzzybinary.com"><img src="https://avatars.githubusercontent.com/u/249982?v=4?s=100" width="100px;" alt="Jeff Ward"/><br /><sub><b>Jeff Ward</b></sub></a><br /><a href="https://github.com/pichillilorenzo/flutter_inappwebview/commits?author=fuzzybinary" title="Tests">⚠️</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/GooRingX"><img src="https://avatars.githubusercontent.com/u/167741400?v=4?s=100" width="100px;" alt="GooRingX"/><br /><sub><b>GooRingX</b></sub></a><br /><a href="https://github.com/pichillilorenzo/flutter_inappwebview/commits?author=GooRingX" title="Code">💻</a></td>
     </tr>
   </tbody>
 </table>

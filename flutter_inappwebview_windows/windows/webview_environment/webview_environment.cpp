@@ -307,12 +307,12 @@ namespace flutter_inappwebview_plugin
 
   WebViewEnvironment::~WebViewEnvironment()
   {
-    if (environment_ != nullptr) {
+    if (environment_) {
        if (auto environment8 = environment_.try_query<ICoreWebView2Environment8>()) {
-          auto add_ProcessInfosChanged_HResult = environment8->remove_ProcessInfosChanged(processInfosChangedToken_);
+          environment8->remove_ProcessInfosChanged(processInfosChangedToken_);
        }
        if (auto environment5 = environment_.try_query<ICoreWebView2Environment5>()) {
-          auto add_BrowserProcessExited_HResult = environment5->remove_BrowserProcessExited(browserProcessExitedToken_);
+          environment5->remove_BrowserProcessExited(browserProcessExitedToken_);
        }
        environment_->remove_NewBrowserVersionAvailable(newBrowserVersionAvailableToken_);
     }

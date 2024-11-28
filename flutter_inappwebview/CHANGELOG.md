@@ -17,6 +17,9 @@
 #### macOS and iOS Platforms
 - Implemented `saveState`, `restoreState` InAppWebViewController methods
 
+### Windows
+- Merged "windows: fix WebViewEnvironment dispose crash" [#2433](https://github.com/pichillilorenzo/flutter_inappwebview/pull/2433) (thanks to [GooRingX](https://github.com/GooRingX))
+
 ## 6.2.0-beta.2
 
 - Updated dependencies to the latest versions for all platform implementations:

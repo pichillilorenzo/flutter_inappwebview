@@ -35,6 +35,7 @@ public class SwiftFlutterPlugin: NSObject, FlutterPlugin {
     var chromeSafariBrowserManager: ChromeSafariBrowserManager?
     var webAuthenticationSessionManager: WebAuthenticationSessionManager?
     var printJobManager: PrintJobManager?
+    var proxyManager: Any?
     
     var webViewControllers: [String: InAppBrowserWebViewController?] = [:]
     var safariViewControllers: [String: Any?] = [:]
@@ -60,6 +61,9 @@ public class SwiftFlutterPlugin: NSObject, FlutterPlugin {
         }
         webAuthenticationSessionManager = WebAuthenticationSessionManager(plugin: self)
         printJobManager = PrintJobManager(plugin: self)
+        if #available(iOS 17.0, *) {
+            proxyManager = ProxyManager(plugin: self)
+        }
     }
     
     public static func register(with registrar: FlutterPluginRegistrar) {
@@ -80,16 +84,20 @@ public class SwiftFlutterPlugin: NSObject, FlutterPlugin {
         credentialDatabase?.dispose()
         credentialDatabase = nil
         if #available(iOS 11.0, *) {
-            (myCookieManager as! MyCookieManager?)?.dispose()
+            (myCookieManager as? MyCookieManager)?.dispose()
             myCookieManager = nil
         }
         if #available(iOS 9.0, *) {
-            (myWebStorageManager as! MyWebStorageManager?)?.dispose()
+            (myWebStorageManager as? MyWebStorageManager)?.dispose()
             myWebStorageManager = nil
         }
         webAuthenticationSessionManager?.dispose()
         webAuthenticationSessionManager = nil
         printJobManager?.dispose()
         printJobManager = nil
+        if #available(iOS 17.0, *) {
+            (proxyManager as? ProxyManager)?.dispose()
+            proxyManager = nil
+        }
     }
 }

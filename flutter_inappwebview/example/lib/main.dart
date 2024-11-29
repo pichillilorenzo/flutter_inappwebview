@@ -46,17 +46,6 @@ Future main() async {
     await InAppWebViewController.setWebContentsDebuggingEnabled(kDebugMode);
   }
 
-  ProxyController proxyController = ProxyController.instance();
-
-  await proxyController.clearProxyOverride();
-  await proxyController.setProxyOverride(
-      settings: ProxySettings(
-    proxyRules: [
-      ProxyRule(
-          url: "192.168.1.133:8083")
-    ],
-  ));
-
   runApp(MyApp());
 }
 

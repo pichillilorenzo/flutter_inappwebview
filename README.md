@@ -203,7 +203,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     <tr>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/Mecharyry"><img src="https://avatars.githubusercontent.com/u/3380092?v=4?s=100" width="100px;" alt="Ryan Feline"/><br /><sub><b>Ryan Feline</b></sub></a><br /><a href="https://github.com/pichillilorenzo/flutter_inappwebview/commits?author=Mecharyry" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://fuzzybinary.com"><img src="https://avatars.githubusercontent.com/u/249982?v=4?s=100" width="100px;" alt="Jeff Ward"/><br /><sub><b>Jeff Ward</b></sub></a><br /><a href="https://github.com/pichillilorenzo/flutter_inappwebview/commits?author=fuzzybinary" title="Tests">⚠️</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="http://hero.io"><img src="https://avatars.githubusercontent.com/u/33483071?v=4?s=100" width="100px;" alt="Yelzhan Yerkebulan"/><br /><sub><b>Yelzhan Yerkebulan</b></sub></a><br /><a href="https://github.com/pichillilorenzo/flutter_inappwebview/commits?author=yerkejs" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://hero.io"><img src="https://avatars.githubusercontent.com/u/33483071?v=4?s=100" width="100px;" alt="Yelzhan Yerkebulan"/><br /><sub><b>Yelzhan Yerkebulan</b></sub></a><br /><a href="https://github.com/pichillilorenzo/flutter_inappwebview/commits?author=yerkejs" title="Code">💻</a></td>
     </tr>
   </tbody>
 </table>

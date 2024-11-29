@@ -9,6 +9,7 @@ import 'print_job/main.dart';
 import 'web_message/main.dart';
 import 'web_storage/main.dart';
 import 'web_authentication_session/main.dart';
+import 'proxy_controller.dart';
 
 /// Implementation of [InAppWebViewPlatform] using the WebKit API.
 class MacOSInAppWebViewPlatform extends InAppWebViewPlatform {
@@ -236,5 +237,14 @@ class MacOSInAppWebViewPlatform extends InAppWebViewPlatform {
   @override
   MacOSWebAuthenticationSession createPlatformWebAuthenticationSessionStatic() {
     return MacOSWebAuthenticationSession.static();
+  }
+
+  /// Creates a new [MacOSProxyController].
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [ProxyController] in `flutter_inappwebview` instead.
+  @override
+  PlatformProxyController createPlatformProxyController(PlatformProxyControllerCreationParams params) {
+    return MacOSProxyController(params);
   }
 }

@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -46,6 +45,17 @@ Future main() async {
   if (!kIsWeb && defaultTargetPlatform == TargetPlatform.android) {
     await InAppWebViewController.setWebContentsDebuggingEnabled(kDebugMode);
   }
+
+  ProxyController proxyController = ProxyController.instance();
+
+  await proxyController.clearProxyOverride();
+  await proxyController.setProxyOverride(
+      settings: ProxySettings(
+    proxyRules: [
+      ProxyRule(
+          url: "192.168.1.133:8083")
+    ],
+  ));
 
   runApp(MyApp());
 }

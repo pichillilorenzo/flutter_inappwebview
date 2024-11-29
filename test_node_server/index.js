@@ -259,3 +259,7 @@ proxy.on('connect', (req, clientSocket, head) => {
 proxy.listen(8083, null, () => {
   console.log('proxy server listening on port 8083');
 });
+
+process.on('uncaughtException', function (err) {
+  console.error(err);
+});

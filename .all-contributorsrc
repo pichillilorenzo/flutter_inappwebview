@@ -847,6 +847,15 @@
       "contributions": [
         "test"
       ]
+    },
+    {
+      "login": "yerkejs",
+      "name": "Yelzhan Yerkebulan",
+      "avatar_url": "https://avatars.githubusercontent.com/u/33483071?v=4",
+      "profile": "http://hero.io",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,

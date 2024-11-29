@@ -10,25 +10,36 @@ part of 'platform_proxy_controller.dart';
 ///
 ///**Officially Supported Platforms/Implementations**:
 ///- Android native WebView ([Official API - ProxyConfig](https://developer.android.com/reference/androidx/webkit/ProxyConfig))
+///- iOS 17.0+ ([Official API - ProxyConfiguration](https://developer.apple.com/documentation/network/proxyconfiguration))
+///- MacOS 14.0+ ([Official API - ProxyConfiguration](https://developer.apple.com/documentation/network/proxyconfiguration))
 class ProxySettings {
   ///List of bypass rules.
   ///
   ///A bypass rule describes URLs that should skip proxy override settings and make a direct connection instead. These can be URLs or IP addresses. Wildcards are accepted.
   ///For instance, the rule "*example.com" would mean that requests to "http://example.com" and "www.example.com" would not be directed to any proxy,
   ///instead, would be made directly to the origin specified by the URL.
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Android native WebView
   List<String> bypassRules;
 
   ///Hostnames without a period in them (and that are not IP literals) will skip proxy settings and be connected to directly instead. Examples: `"abc"`, `"local"`, `"some-domain"`.
   ///
   ///Hostnames with a trailing dot are not considered simple by this definition.
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Android native WebView
   bool? bypassSimpleHostnames;
 
   ///List of scheme filters.
   ///
   ///URLs that match these scheme filters are connected to directly instead of using a proxy server.
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Android native WebView
   List<String> directs;
 
-  ///List of proxy rules to be used for all URLs. This method can be called multiple times to add multiple rules. Additional rules have decreasing precedence.
+  ///List of proxy rules to be used for all URLs. Additional rules have decreasing precedence.
   ///
   ///Proxy is a string in the format `[scheme://]host[:port]`.
   ///Scheme is optional, if present must be `HTTP`, `HTTPS` or [SOCKS](https://tools.ietf.org/html/rfc1928) and defaults to `HTTP`.
@@ -36,6 +47,11 @@ class ProxySettings {
   ///Port number is optional and defaults to `80` for `HTTP`, `443` for `HTTPS` and `1080` for `SOCKS`.
   ///
   ///The correct syntax for hosts is defined by [RFC 3986](https://tools.ietf.org/html/rfc3986#section-3.2.2).
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Android native WebView
+  ///- iOS
+  ///- MacOS
   List<ProxyRule> proxyRules;
 
   ///By default, certain hostnames implicitly bypass the proxy if they are link-local IPs, or localhost addresses.
@@ -47,6 +63,9 @@ class ProxySettings {
   ///- 169.254/16
   ///- [FE80::]/10
   ///Set this to `true` to override the default behavior and force localhost and link-local URLs to be sent through the proxy.
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Android native WebView
   bool? removeImplicitRules;
 
   ///Reverse the bypass list.
@@ -58,6 +77,9 @@ class ProxySettings {
   ///Use [bypassRules] to add bypass rules.
   ///
   ///**NOTE**: available only if [WebViewFeature.PROXY_OVERRIDE_REVERSE_BYPASS] feature is supported.
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Android native WebView
   bool reverseBypassEnabled;
   ProxySettings(
       {this.bypassRules = const [],

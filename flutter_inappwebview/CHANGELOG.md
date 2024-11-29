@@ -9,16 +9,17 @@
   - `flutter_inappwebview_windows`: `^0.7.0-beta.2` -> `^0.7.0-beta.3`
 
 #### Platform Interface
-
 - Added `saveState`, `restoreState` methods to `PlatformInAppWebViewController` class
 
 #### Android Platform
-
 - Implemented `saveState`, `restoreState` InAppWebViewController methods
 
 #### macOS and iOS Platforms
-
 - Implemented `saveState`, `restoreState` InAppWebViewController methods
+- Merged "Add proxy support for iOS" [#2362](https://github.com/pichillilorenzo/flutter_inappwebview/pull/2362) (thanks to [yerkejs](https://github.com/yerkejs))
+
+### Windows
+- Merged "windows: fix WebViewEnvironment dispose crash" [#2433](https://github.com/pichillilorenzo/flutter_inappwebview/pull/2433) (thanks to [GooRingX](https://github.com/GooRingX))
 
 ## 6.2.0-beta.2
 

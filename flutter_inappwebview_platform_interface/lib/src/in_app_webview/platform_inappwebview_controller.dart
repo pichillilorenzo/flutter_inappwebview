@@ -2219,6 +2219,8 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///If it is called after this WebView has had a chance to build state (load pages, create a back/forward list, etc.),
   ///there may be undesirable side-effects.
   ///
+  ///Returns `true` if the state was restored successfully, otherwise `false`.
+  ///
   ///**NOTE for Android**: this method doesn't restore the display data for this WebView.
   ///
   ///**Officially Supported Platforms/Implementations**:

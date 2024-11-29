@@ -40,6 +40,9 @@ namespace flutter_inappwebview_plugin
 
   private:
     wil::com_ptr<ICoreWebView2Environment> environment_;
+    EventRegistrationToken processInfosChangedToken_ = { 0 };
+    EventRegistrationToken browserProcessExitedToken_ = { 0 };
+    EventRegistrationToken newBrowserVersionAvailableToken_ = { 0 };
     WNDCLASS windowClass_ = {};
   };
 }

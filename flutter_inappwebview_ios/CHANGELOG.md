@@ -2,6 +2,7 @@
 
 - Updated flutter_inappwebview_platform_interface version to ^1.4.0-beta.3
 - Implemented `saveState`, `restoreState` InAppWebViewController methods
+- Merged "Add proxy support for iOS" [#2362](https://github.com/pichillilorenzo/flutter_inappwebview/pull/2362) (thanks to [yerkejs](https://github.com/yerkejs))
 
 ## 1.2.0-beta.2
 

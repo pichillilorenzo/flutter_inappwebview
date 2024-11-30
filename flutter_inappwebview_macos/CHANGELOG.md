@@ -4,6 +4,7 @@
 - Implemented `saveState`, `restoreState` InAppWebViewController methods
 - Implemented `PlatformProxyController` class
 - Fixed internal javascript callback handlers when the WebView has windowId not null
+- Fixed crash of unhandled `onPrintRequest` WebView event
 
 ## 1.2.0-beta.2
 

@@ -55,6 +55,7 @@ public class PrintJobChannelDelegate: ChannelDelegate {
     }
     
     deinit {
+        debugPrint("PrintJobChannelDelegate - dealloc")
         dispose()
     }
 }

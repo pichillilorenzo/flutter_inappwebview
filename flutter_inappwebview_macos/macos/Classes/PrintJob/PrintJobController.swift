@@ -55,11 +55,13 @@ public class PrintJobController: NSObject, Disposable {
     @objc func printOperationDidRun(printOperation: NSPrintOperation,
                                     success: Bool,
                                     contextInfo: UnsafeMutableRawPointer?) {
-        state = success ? .completed : .canceled
-        channelDelegate?.onComplete(completed: success, error: nil)
-        if let completionHandler = completionHandler {
-            completionHandler(printOperation, success, contextInfo)
-            self.completionHandler = nil
+        DispatchQueue.main.async { [weak self] in
+            self?.state = success ? .completed : .canceled
+            self?.channelDelegate?.onComplete(completed: success, error: nil)
+            if let completionHandler = self?.completionHandler {
+                completionHandler(printOperation, success, contextInfo)
+                self?.completionHandler = nil
+            }
         }
     }
     

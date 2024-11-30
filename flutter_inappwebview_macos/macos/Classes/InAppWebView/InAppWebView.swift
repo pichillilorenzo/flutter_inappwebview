@@ -7,7 +7,7 @@
 
 import FlutterMacOS
 import Foundation
-import WebKit
+@preconcurrency import WebKit
 
 public class InAppWebView: WKWebView, WKUIDelegate,
                             WKNavigationDelegate, WKScriptMessageHandler,
@@ -2183,18 +2183,23 @@ public class InAppWebView: WKWebView, WKUIDelegate,
                 return
             }
             
+            let _windowId = body["_windowId"] as? Int64
+            var webView = self
+            if let wId = _windowId, let webViewTransport = plugin?.inAppWebViewManager?.windowWebViews[wId] {
+                webView = webViewTransport.webView
+            }
             var isInternalHandler = true
             switch (handlerName) {
                 case "onPrintRequest":
                     let settings = PrintJobSettings()
                     settings.handledByClient = true
-                    if let printJobId = printCurrentPage(settings: settings) {
+                    if let printJobId = webView.printCurrentPage(settings: settings) {
                         let callback = WebViewChannelDelegate.PrintRequestCallback()
                         callback.nonNullSuccess = { (handledByClient: Bool) in
                             return !handledByClient
                         }
-                        callback.defaultBehaviour = { [weak self] (handledByClient: Bool?) in
-                            if let printJob = self?.plugin?.printJobManager?.jobs[printJobId] {
+                        callback.defaultBehaviour = { (handledByClient: Bool?) in
+                            if let printJob = webView.plugin?.printJobManager?.jobs[printJobId] {
                                 printJob?.disposeNoDismiss()
                             }
                         }
@@ -2202,7 +2207,7 @@ public class InAppWebView: WKWebView, WKUIDelegate,
                             print(code + ", " + (message ?? ""))
                             callback?.defaultBehaviour(nil)
                         }
-                        channelDelegate?.onPrintRequest(url: url, printJobId: printJobId, callback: callback)
+                        webView.channelDelegate?.onPrintRequest(url: webView.url, printJobId: printJobId, callback: callback)
                     }
                     break
                 case "onConsoleMessage":
@@ -2234,11 +2239,6 @@ public class InAppWebView: WKWebView, WKUIDelegate,
                             }
                             let consoleMessage = jsonData["message"] as? String ?? ""
                             
-                            let _windowId = body["_windowId"] as? Int64
-                            var webView = self
-                            if let wId = _windowId, let webViewTransport = plugin?.inAppWebViewManager?.windowWebViews[wId] {
-                                webView = webViewTransport.webView
-                            }
                             webView.channelDelegate?.onConsoleMessage(message: consoleMessage, messageLevel: messageLevel)
                         }
                     }
@@ -2251,11 +2251,6 @@ public class InAppWebView: WKWebView, WKUIDelegate,
                            let activeMatchOrdinal = findResult["activeMatchOrdinal"] as? Int,
                            let numberOfMatches = findResult["numberOfMatches"] as? Int,
                            let isDoneCounting = findResult["isDoneCounting"] as? Bool {
-                            let _windowId = body["_windowId"] as? Int64
-                            var webView = self
-                            if let wId = _windowId, let webViewTransport = plugin?.inAppWebViewManager?.windowWebViews[wId] {
-                                webView = webViewTransport.webView
-                            }
                             webView.findInteractionController?.channelDelegate?.onFindResultReceived(activeMatchOrdinal: activeMatchOrdinal, numberOfMatches: numberOfMatches, isDoneCounting: isDoneCounting)
                             webView.channelDelegate?.onFindResultReceived(activeMatchOrdinal: activeMatchOrdinal, numberOfMatches: numberOfMatches, isDoneCounting: isDoneCounting)
                         }
@@ -2266,12 +2261,12 @@ public class InAppWebView: WKWebView, WKUIDelegate,
                         let jsonArgs = try? JSONSerialization.jsonObject(with: data, options: .mutableContainers) as? [[String: Any]]
                         if let jsonData = jsonArgs?.first,
                            let resultUuid = jsonData["resultUuid"] as? String,
-                           let result = callAsyncJavaScriptBelowMacOS11Results[resultUuid] {
+                           let result = webView.callAsyncJavaScriptBelowMacOS11Results[resultUuid] {
                             result([
                                 "value": jsonData["value"],
                                 "error": jsonData["error"]
                             ])
-                            callAsyncJavaScriptBelowMacOS11Results.removeValue(forKey: resultUuid)
+                            webView.callAsyncJavaScriptBelowMacOS11Results.removeValue(forKey: resultUuid)
                         }
                     }
                     break
@@ -2286,7 +2281,7 @@ public class InAppWebView: WKWebView, WKUIDelegate,
                                 webMessage = WebMessage.fromMap(map: webMessageMap)
                             }
                             
-                            if let webMessageChannel = webMessageChannels[webMessageChannelId] {
+                            if let webMessageChannel = webView.webMessageChannels[webMessageChannelId] {
                                 webMessageChannel.channelDelegate?.onMessage(index: index, message: webMessage)
                             }
                         }
@@ -2301,7 +2296,7 @@ public class InAppWebView: WKWebView, WKUIDelegate,
                                 webMessage = WebMessage.fromMap(map: webMessageMap)
                             }
                             
-                            if let webMessageListener = webMessageListeners.first(where: ({($0.jsObjectName == jsObjectName)})) {
+                            if let webMessageListener = webView.webMessageListeners.first(where: ({($0.jsObjectName == jsObjectName)})) {
                                 let isMainFrame = message.frameInfo.isMainFrame
                                 
                                 let securityOrigin = message.frameInfo.securityOrigin
@@ -2328,11 +2323,6 @@ public class InAppWebView: WKWebView, WKUIDelegate,
                         if let jsonData = jsonArgs?.first,
                            let x = jsonData["x"] as? Int,
                            let y = jsonData["y"] as? Int {
-                            let _windowId = body["_windowId"] as? Int64
-                            var webView = self
-                            if let wId = _windowId, let webViewTransport = plugin?.inAppWebViewManager?.windowWebViews[wId] {
-                                webView = webViewTransport.webView
-                            }
                             webView.channelDelegate?.onScrollChanged(x: x, y: y)
                         }
                     }
@@ -2356,31 +2346,25 @@ if(window.\(JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME())[\(_callHandlerID)] 
             
             let args = body["args"] as? String ?? ""
             
-            let _windowId = body["_windowId"] as? Int64
-            var webView = self
-            if let wId = _windowId, let webViewTransport = plugin?.inAppWebViewManager?.windowWebViews[wId] {
-                webView = webViewTransport.webView
-            }
-            
             let callback = WebViewChannelDelegate.CallJsHandlerCallback()
-            callback.defaultBehaviour = { [weak self] (response: Any?) in
+            callback.defaultBehaviour = { (response: Any?) in
                 var json = "null"
                 if let r = response as? String {
                     json = r
                 }
                 
-                self?.evaluateJavaScript("""
+                webView.evaluateJavaScript("""
 if(window.\(JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME())[\(_callHandlerID)] != null) {
     window.\(JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME())[\(_callHandlerID)].resolve(\(json));
     delete window.\(JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME())[\(_callHandlerID)];
 }
 """, completionHandler: nil)
             }
-            callback.error = { [weak self] (code: String, message: String?, details: Any?) in
+            callback.error = { (code: String, message: String?, details: Any?) in
                 let errorMessage = code + (message != nil ? ", " + (message ?? "") : "")
                 print(errorMessage)
                 
-                self?.evaluateJavaScript("""
+                webView.evaluateJavaScript("""
 if(window.\(JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME())[\(_callHandlerID)] != null) {
     window.\(JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME())[\(_callHandlerID)].reject(new Error('\(errorMessage.replacingOccurrences(of: "\'", with: "\\'"))'));
     delete window.\(JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME())[\(_callHandlerID)];
@@ -2510,7 +2494,7 @@ if(window.\(JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME())[\(_callHandlerID)] 
                 if let pageOrder = settings.pageOrder, let order = NSPrintOperation.PageOrder.init(rawValue: pageOrder) {
                     printOperation.pageOrder = order
                 }
-                printOperation.canSpawnSeparateThread = settings.canSpawnSeparateThread
+                printOperation.canSpawnSeparateThread = false
                 printOperation.showsPrintPanel = settings.showsPrintPanel
                 printOperation.showsProgressPanel = settings.showsProgressPanel
                 if settings.showsPaperOrientation {

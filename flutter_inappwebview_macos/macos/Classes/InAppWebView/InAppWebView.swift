@@ -2494,7 +2494,7 @@ if(window.\(JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME())[\(_callHandlerID)] 
                 if let pageOrder = settings.pageOrder, let order = NSPrintOperation.PageOrder.init(rawValue: pageOrder) {
                     printOperation.pageOrder = order
                 }
-                printOperation.canSpawnSeparateThread = false
+                printOperation.canSpawnSeparateThread = settings.canSpawnSeparateThread
                 printOperation.showsPrintPanel = settings.showsPrintPanel
                 printOperation.showsProgressPanel = settings.showsProgressPanel
                 if settings.showsPaperOrientation {

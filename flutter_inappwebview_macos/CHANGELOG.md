@@ -3,6 +3,7 @@
 - Updated flutter_inappwebview_platform_interface version to ^1.4.0-beta.3
 - Implemented `saveState`, `restoreState` InAppWebViewController methods
 - Implemented `PlatformProxyController` class
+- Fixed internal javascript callback handlers when the WebView has windowId not null
 
 ## 1.2.0-beta.2
 

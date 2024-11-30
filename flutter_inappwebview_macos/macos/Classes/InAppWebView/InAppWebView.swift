@@ -2200,7 +2200,7 @@ public class InAppWebView: WKWebView, WKUIDelegate,
                         }
                         callback.defaultBehaviour = { (handledByClient: Bool?) in
                             if let printJob = webView.plugin?.printJobManager?.jobs[printJobId] {
-                                printJob?.disposeNoDismiss()
+                                printJob?.disposeWhenDidRun = true
                             }
                         }
                         callback.error = { [weak callback] (code: String, message: String?, details: Any?) in

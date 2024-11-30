@@ -24,6 +24,7 @@ public class PrintJobController: NSObject, Disposable {
     var channelDelegate: PrintJobChannelDelegate?
     var state = PrintJobState.created
     var creationTime = Int64(Date().timeIntervalSince1970 * 1000)
+    var disposeWhenDidRun = false
     private var completionHandler: PrintJobController.CompletionHandler?
     
     public typealias CompletionHandler = (_ printOperation: NSPrintOperation,
@@ -62,6 +63,9 @@ public class PrintJobController: NSObject, Disposable {
                 completionHandler(printOperation, success, contextInfo)
                 self?.completionHandler = nil
             }
+            if let disposeWhenDidRun = self?.disposeWhenDidRun, disposeWhenDidRun {
+                self?.dispose()
+            }
         }
     }
     
@@ -73,7 +77,7 @@ public class PrintJobController: NSObject, Disposable {
         return PrintJobInfo.init(fromPrintJobController: self)
     }
     
-    public func disposeNoDismiss() {
+    public func dispose() {
         channelDelegate?.dispose()
         channelDelegate = nil
         completionHandler = nil
@@ -82,12 +86,7 @@ public class PrintJobController: NSObject, Disposable {
         plugin = nil
     }
     
-    public func dispose() {
-        channelDelegate?.dispose()
-        channelDelegate = nil
-        completionHandler = nil
-        job = nil
-        plugin?.printJobManager?.jobs[id] = nil
-        plugin = nil
+    deinit {
+        debugPrint("PrintJobController - dealloc")
     }
 }

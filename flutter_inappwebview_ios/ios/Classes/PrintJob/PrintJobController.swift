@@ -97,4 +97,8 @@ public class PrintJobController: NSObject, Disposable, UIPrintInteractionControl
         plugin?.printJobManager?.jobs[id] = nil
         plugin = nil
     }
+    
+    deinit {
+        debugPrint("PrintJobController - dealloc")
+    }
 }

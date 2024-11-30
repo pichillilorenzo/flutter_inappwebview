@@ -3,10 +3,9 @@ import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_pla
 ///{@macro flutter_inappwebview_platform_interface.PlatformPrintJobController}
 class PrintJobController {
   ///{@macro flutter_inappwebview_platform_interface.PlatformPrintJobController}
-  PrintJobController({required String id, PrintJobCompletionHandler onComplete})
+  PrintJobController({required String id})
       : this.fromPlatformCreationParams(
-            params: PlatformPrintJobControllerCreationParams(
-                id: id, onComplete: onComplete));
+            params: PlatformPrintJobControllerCreationParams(id: id));
 
   /// Constructs a [PrintJobController].
   ///

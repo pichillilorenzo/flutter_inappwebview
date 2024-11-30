@@ -13,6 +13,7 @@
 
 #### Android Platform
 - Implemented `saveState`, `restoreState` InAppWebViewController methods
+- Merged "Android: implemented PlatformPrintJobController.onComplete" [#2216](https://github.com/pichillilorenzo/flutter_inappwebview/pull/2216) (thanks to [Doflatango](https://github.com/Doflatango))
 
 #### macOS and iOS Platforms
 - Implemented `saveState`, `restoreState` InAppWebViewController methods

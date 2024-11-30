@@ -12,7 +12,7 @@ class MacOSPrintJobControllerCreationParams
     extends PlatformPrintJobControllerCreationParams {
   /// Creates a new [MacOSPrintJobControllerCreationParams] instance.
   const MacOSPrintJobControllerCreationParams(
-      {required super.id, super.onComplete});
+      {required super.id});
 
   /// Creates a [MacOSPrintJobControllerCreationParams] instance based on [PlatformPrintJobControllerCreationParams].
   factory MacOSPrintJobControllerCreationParams.fromPlatformPrintJobControllerCreationParams(
@@ -20,7 +20,7 @@ class MacOSPrintJobControllerCreationParams
       // ignore: avoid_unused_constructor_parameters
       PlatformPrintJobControllerCreationParams params) {
     return MacOSPrintJobControllerCreationParams(
-        id: params.id, onComplete: params.onComplete);
+        id: params.id);
   }
 }
 
@@ -35,7 +35,6 @@ class MacOSPrintJobController extends PlatformPrintJobController
               : MacOSPrintJobControllerCreationParams
                   .fromPlatformPrintJobControllerCreationParams(params),
         ) {
-    onComplete = params.onComplete;
     channel = MethodChannel(
         'com.pichillilorenzo/flutter_inappwebview_printjobcontroller_${params.id}');
     handler = _handleMethod;

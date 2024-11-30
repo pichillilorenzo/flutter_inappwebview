@@ -164,12 +164,19 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
 
                     return NavigationActionPolicy.ALLOW;
                   },
-                  onLoadStop: (controller, url) {
+                  onLoadStop: (controller, url) async {
                     pullToRefreshController?.endRefreshing();
                     setState(() {
                       this.url = url.toString();
                       urlController.text = this.url;
                     });
+
+                    final printJobController = await controller.printCurrentPage(settings: PrintJobSettings(handledByClient: true));
+                    printJobController?.onComplete = (completed, error) async {
+                      print('Print job completed: $completed');
+                      print('Print job error: $error');
+                      printJobController.dispose();
+                    };
                   },
                   onReceivedError: (controller, request, error) {
                     pullToRefreshController?.endRefreshing();

@@ -22,8 +22,10 @@ import android.os.IBinder;
 import android.os.Looper;
 import android.os.Message;
 import android.os.Parcel;
+import android.print.InAppWebViewPrintDocumentAdapter;
 import android.print.PrintAttributes;
 import android.print.PrintDocumentAdapter;
+import android.print.PrintJob;
 import android.print.PrintManager;
 import android.text.TextUtils;
 import android.util.AttributeSet;
@@ -115,7 +117,7 @@ import java.util.UUID;
 import io.flutter.plugin.common.MethodChannel;
 
 final public class InAppWebView extends InputAwareWebView implements InAppWebViewInterface {
-  protected static final String LOG_TAG = "InAppWebView";
+  private static final String LOG_TAG = "InAppWebView";
   public static final String METHOD_CHANNEL_NAME_PREFIX = "com.pichillilorenzo/flutter_inappwebview_";
 
   @Nullable
@@ -1445,7 +1447,6 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
     webSettings.setBuiltInZoomControls(enabled);
   }
 
-  @RequiresApi(api = Build.VERSION_CODES.KITKAT)
   @Nullable
   public String printCurrentPage(@Nullable PrintJobSettings settings) {
     if (plugin != null && plugin.activity != null) {
@@ -1500,15 +1501,27 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
           printAdapter = createPrintDocumentAdapter();
         }
 
-        // Create a printCurrentPage job with name and adapter instance
-        android.print.PrintJob job = printManager.print(jobName, printAdapter, builder.build());
+        PrintJobController printJobController = null;
+        String id = null;
 
         if (settings != null && settings.handledByClient && plugin.printJobManager != null) {
-          String id = UUID.randomUUID().toString();
-          PrintJobController printJobController = new PrintJobController(id, job, settings, plugin);
+          id = UUID.randomUUID().toString();
+          printJobController = new PrintJobController(id, settings, plugin);
           plugin.printJobManager.jobs.put(printJobController.id, printJobController);
-          return id;
+          final PrintJobController finalPrintJobController = printJobController;
+          printAdapter = new InAppWebViewPrintDocumentAdapter(printAdapter, new InAppWebViewPrintDocumentAdapter.PrintDocumentAdapterCallback() {
+            @Override
+            public void onFinish() {
+              finalPrintJobController.onComplete(true, null);
+            }
+          });
         }
+
+        // Create a printCurrentPage job with name and adapter instance
+        PrintJob job = printManager.print(jobName, printAdapter, builder.build());
+        if (printJobController != null) printJobController.setJob(job);
+
+        return id;
       } else {
         Log.e(LOG_TAG, "No PrintManager available");
       }

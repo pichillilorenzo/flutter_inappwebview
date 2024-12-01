@@ -3,6 +3,7 @@
 - Updated flutter_inappwebview_platform_interface version to ^1.4.0-beta.3
 - Implemented `saveState`, `restoreState` InAppWebViewController methods
 - Merged "Android: implemented PlatformPrintJobController.onComplete" [#2216](https://github.com/pichillilorenzo/flutter_inappwebview/pull/2216) (thanks to [Doflatango](https://github.com/Doflatango))
+- Fixed "When useShouldInterceptAjaxRequest is true, some ajax requests doesn't work" [#2197](https://github.com/pichillilorenzo/flutter_inappwebview/issues/2197)
 
 ## 1.2.0-beta.2
 

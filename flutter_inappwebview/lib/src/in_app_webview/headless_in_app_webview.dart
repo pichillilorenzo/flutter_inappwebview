@@ -86,7 +86,7 @@ class HeadlessInAppWebView {
       @Deprecated('Use onNavigationResponse instead')
       FutureOr<IOSNavigationResponseAction?> Function(InAppWebViewController controller, IOSWKNavigationResponse navigationResponse)? iosOnNavigationResponse,
       @Deprecated('Use shouldAllowDeprecatedTLS instead') FutureOr<IOSShouldAllowDeprecatedTLSAction?> Function(InAppWebViewController controller, URLAuthenticationChallenge challenge)? iosShouldAllowDeprecatedTLS,
-      FutureOr<AjaxRequestAction> Function(InAppWebViewController controller, AjaxRequest ajaxRequest)? onAjaxProgress,
+      FutureOr<AjaxRequestAction?> Function(InAppWebViewController controller, AjaxRequest ajaxRequest)? onAjaxProgress,
       FutureOr<AjaxRequestAction?> Function(InAppWebViewController controller, AjaxRequest ajaxRequest)? onAjaxReadyStateChange,
       void Function(InAppWebViewController controller, ConsoleMessage consoleMessage)? onConsoleMessage,
       FutureOr<bool?> Function(InAppWebViewController controller, CreateWindowAction createWindowAction)? onCreateWindow,

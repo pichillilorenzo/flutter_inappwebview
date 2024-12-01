@@ -15,14 +15,22 @@ public class InterceptAjaxRequestJS {
         return "window.\(JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME())._useShouldInterceptAjaxRequest"
     }
     
+    public static func FLAG_VARIABLE_FOR_ON_AJAX_READY_STATE_CHANGE() -> String {
+        return "window.\(JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME())._useOnAjaxReadyStateChange"
+    }
+    
+    public static func FLAG_VARIABLE_FOR_ON_AJAX_PROGRESS() -> String {
+        return "window.\(JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME())._useOnAjaxProgress"
+    }
+    
     public static func FLAG_VARIABLE_FOR_INTERCEPT_ONLY_ASYNC_AJAX_REQUESTS_JS_SOURCE() -> String {
         return "window.\(JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME())._interceptOnlyAsyncAjaxRequests"
     }
     
-    public static func INTERCEPT_AJAX_REQUEST_JS_PLUGIN_SCRIPT(allowedOriginRules: [String]?, forMainFrameOnly: Bool) -> PluginScript {
+    public static func INTERCEPT_AJAX_REQUEST_JS_PLUGIN_SCRIPT(allowedOriginRules: [String]?, forMainFrameOnly: Bool, initialUseOnAjaxReadyStateChange: Bool = false, initialUseOnAjaxProgress: Bool = false) -> PluginScript {
         return PluginScript(
             groupName: INTERCEPT_AJAX_REQUEST_JS_PLUGIN_SCRIPT_GROUP_NAME,
-            source: INTERCEPT_AJAX_REQUEST_JS_SOURCE(),
+            source: INTERCEPT_AJAX_REQUEST_JS_SOURCE(initialUseOnAjaxReadyStateChange: initialUseOnAjaxReadyStateChange, initialUseOnAjaxProgress: initialUseOnAjaxProgress),
             injectionTime: .atDocumentStart,
             forMainFrameOnly: forMainFrameOnly,
             allowedOriginRules: allowedOriginRules,
@@ -41,9 +49,11 @@ public class InterceptAjaxRequestJS {
         );
     }
     
-    public static func INTERCEPT_AJAX_REQUEST_JS_SOURCE() -> String {
+    public static func INTERCEPT_AJAX_REQUEST_JS_SOURCE(initialUseOnAjaxReadyStateChange: Bool, initialUseOnAjaxProgress: Bool) -> String {
         return """
         \(FLAG_VARIABLE_FOR_SHOULD_INTERCEPT_AJAX_REQUEST_JS_SOURCE()) = true;
+        \(FLAG_VARIABLE_FOR_ON_AJAX_READY_STATE_CHANGE()) = \(initialUseOnAjaxReadyStateChange);
+        \(FLAG_VARIABLE_FOR_ON_AJAX_PROGRESS()) = \(initialUseOnAjaxProgress);
         (function(ajax) {
           var send = ajax.prototype.send;
           var open = ajax.prototype.open;
@@ -94,6 +104,9 @@ public class InterceptAjaxRequestJS {
             setRequestHeader.call(this, header, value);
           };
           function handleEvent(e) {
+            if (\(FLAG_VARIABLE_FOR_SHOULD_INTERCEPT_AJAX_REQUEST_JS_SOURCE()) === false || \(FLAG_VARIABLE_FOR_ON_AJAX_PROGRESS()) == null || \(FLAG_VARIABLE_FOR_ON_AJAX_PROGRESS()) === false) {
+                return;
+            }
             var self = this;
             if (\(FLAG_VARIABLE_FOR_SHOULD_INTERCEPT_AJAX_REQUEST_JS_SOURCE()) == null || \(FLAG_VARIABLE_FOR_SHOULD_INTERCEPT_AJAX_REQUEST_JS_SOURCE()) == true) {
               var headers = this.getAllResponseHeaders();
@@ -148,9 +161,9 @@ public class InterceptAjaxRequestJS {
             var self = this;
             var canBeIntercepted = self._flutter_inappwebview_isAsync || \(FLAG_VARIABLE_FOR_INTERCEPT_ONLY_ASYNC_AJAX_REQUESTS_JS_SOURCE()) === false;
             if (canBeIntercepted && (\(FLAG_VARIABLE_FOR_SHOULD_INTERCEPT_AJAX_REQUEST_JS_SOURCE()) == null || \(FLAG_VARIABLE_FOR_SHOULD_INTERCEPT_AJAX_REQUEST_JS_SOURCE()) == true)) {
-              if (!this._flutter_inappwebview_already_onreadystatechange_wrapped) {
+              if (\(FLAG_VARIABLE_FOR_ON_AJAX_READY_STATE_CHANGE()) === true && !this._flutter_inappwebview_already_onreadystatechange_wrapped) {
                 this._flutter_inappwebview_already_onreadystatechange_wrapped = true;
-                var onreadystatechange = this.onreadystatechange;
+                var realOnreadystatechange = this.onreadystatechange;
                 this.onreadystatechange = function() {
                   if (\(FLAG_VARIABLE_FOR_SHOULD_INTERCEPT_AJAX_REQUEST_JS_SOURCE()) == null || \(FLAG_VARIABLE_FOR_SHOULD_INTERCEPT_AJAX_REQUEST_JS_SOURCE()) == true) {
                     var headers = this.getAllResponseHeaders();
@@ -191,13 +204,13 @@ public class InterceptAjaxRequestJS {
                               return;
                           };
                         }
-                        if (onreadystatechange != null) {
-                          onreadystatechange();
+                        if (realOnreadystatechange != null) {
+                            realOnreadystatechange();
                         }
                       });
                     });
-                  } else if (onreadystatechange != null) {
-                    onreadystatechange();
+                  } else if (realOnreadystatechange != null) {
+                      realOnreadystatechange();
                   }
                 };
               }

@@ -6,6 +6,7 @@
 - Merged "Add proxy support for iOS" [#2362](https://github.com/pichillilorenzo/flutter_inappwebview/pull/2362) (thanks to [yerkejs](https://github.com/yerkejs))
 - Fixed "[iOS] Webview opened with windowId does not receive javascript handler callback." [#2393](https://github.com/pichillilorenzo/flutter_inappwebview/issues/2393)
 - Fixed internal javascript callback handlers when the WebView has windowId not null
+- Fixed "When useShouldInterceptAjaxRequest is true, some ajax requests doesn't work" [#2197](https://github.com/pichillilorenzo/flutter_inappwebview/issues/2197)
 
 ## 1.2.0-beta.2
 

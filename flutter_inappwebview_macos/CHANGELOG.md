@@ -5,6 +5,7 @@
 - Implemented `PlatformProxyController` class
 - Fixed internal javascript callback handlers when the WebView has windowId not null
 - Fixed crash of unhandled `onPrintRequest` WebView event
+- Fixed "When useShouldInterceptAjaxRequest is true, some ajax requests doesn't work" [#2197](https://github.com/pichillilorenzo/flutter_inappwebview/issues/2197)
 
 ## 1.2.0-beta.2
 

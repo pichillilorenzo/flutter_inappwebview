@@ -626,7 +626,10 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
                     if let interceptOnlyAsyncAjaxRequestsPluginScript = interceptOnlyAsyncAjaxRequestsPluginScript {
                         configuration.userContentController.addPluginScript(interceptOnlyAsyncAjaxRequestsPluginScript)
                     }
-                    configuration.userContentController.addPluginScript(InterceptAjaxRequestJS.INTERCEPT_AJAX_REQUEST_JS_PLUGIN_SCRIPT(allowedOriginRules: pluginScriptsOriginAllowList, forMainFrameOnly: pluginScriptsForMainFrameOnly))
+                    configuration.userContentController.addPluginScript(InterceptAjaxRequestJS.INTERCEPT_AJAX_REQUEST_JS_PLUGIN_SCRIPT(allowedOriginRules: pluginScriptsOriginAllowList,
+                                                                                                                                       forMainFrameOnly: pluginScriptsForMainFrameOnly,
+                                                                                                                                       initialUseOnAjaxReadyStateChange: settings.useOnAjaxReadyStateChange,
+                                                                                                                                       initialUseOnAjaxProgress: settings.useOnAjaxProgress))
                 }
                 if settings.useShouldInterceptFetchRequest {
                     configuration.userContentController.addPluginScript(InterceptFetchRequestJS.INTERCEPT_FETCH_REQUEST_JS_PLUGIN_SCRIPT(allowedOriginRules: pluginScriptsOriginAllowList, forMainFrameOnly: pluginScriptsForMainFrameOnly))
@@ -1137,10 +1140,32 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
                     enablePluginScriptAtRuntime(flagVariable: InterceptAjaxRequestJS.FLAG_VARIABLE_FOR_SHOULD_INTERCEPT_AJAX_REQUEST_JS_SOURCE(),
                                                 enable: newSettings.useShouldInterceptAjaxRequest,
                                                 pluginScript: InterceptAjaxRequestJS.INTERCEPT_AJAX_REQUEST_JS_PLUGIN_SCRIPT(allowedOriginRules: newSettings.pluginScriptsOriginAllowList,
-                                                                                                                             forMainFrameOnly: newSettings.pluginScriptsForMainFrameOnly))
+                                                                                                                             forMainFrameOnly: newSettings.pluginScriptsForMainFrameOnly,
+                                                                                                                             initialUseOnAjaxReadyStateChange: newSettings.useOnAjaxReadyStateChange,
+                                                                                                                             initialUseOnAjaxProgress: newSettings.useOnAjaxProgress))
                 }
             } else {
                 newSettings.useShouldInterceptAjaxRequest = false
+            }
+        }
+        
+        if newSettingsMap["useOnAjaxReadyStateChange"] != nil && settings?.useOnAjaxReadyStateChange != newSettings.useOnAjaxReadyStateChange {
+            if let applePayAPIEnabled = settings?.applePayAPIEnabled, !applePayAPIEnabled {
+                if javaScriptBridgeEnabled {
+                    evaluateJavaScript("\(InterceptAjaxRequestJS.FLAG_VARIABLE_FOR_ON_AJAX_READY_STATE_CHANGE()) = \(newSettings.useOnAjaxReadyStateChange);")
+                }
+            } else {
+                newSettings.useOnAjaxReadyStateChange = false
+            }
+        }
+        
+        if newSettingsMap["useOnAjaxProgress"] != nil && settings?.useOnAjaxProgress != newSettings.useOnAjaxProgress {
+            if let applePayAPIEnabled = settings?.applePayAPIEnabled, !applePayAPIEnabled {
+                if javaScriptBridgeEnabled {
+                    evaluateJavaScript("\(InterceptAjaxRequestJS.FLAG_VARIABLE_FOR_ON_AJAX_PROGRESS()) = \(newSettings.useOnAjaxProgress);")
+                }
+            } else {
+                newSettings.useOnAjaxProgress = false
             }
         }
         

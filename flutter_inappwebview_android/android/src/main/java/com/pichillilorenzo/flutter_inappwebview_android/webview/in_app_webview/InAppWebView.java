@@ -614,8 +614,11 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
       interceptOnlyAsyncAjaxRequestsPluginScript = InterceptAjaxRequestJS.createInterceptOnlyAsyncAjaxRequestsPluginScript(customSettings.interceptOnlyAsyncAjaxRequests);
       if (customSettings.useShouldInterceptAjaxRequest) {
         userContentController.addPluginScript(interceptOnlyAsyncAjaxRequestsPluginScript);
-        userContentController.addPluginScript(InterceptAjaxRequestJS.INTERCEPT_AJAX_REQUEST_JS_PLUGIN_SCRIPT(customSettings.pluginScriptsOriginAllowList,
-                customSettings.pluginScriptsForMainFrameOnly));
+        userContentController.addPluginScript(InterceptAjaxRequestJS.INTERCEPT_AJAX_REQUEST_JS_PLUGIN_SCRIPT(
+                customSettings.pluginScriptsOriginAllowList,
+                customSettings.pluginScriptsForMainFrameOnly,
+                customSettings.useOnAjaxReadyStateChange,
+                customSettings.useOnAjaxProgress));
       }
       if (customSettings.useShouldInterceptFetchRequest) {
         userContentController.addPluginScript(InterceptFetchRequestJS.INTERCEPT_FETCH_REQUEST_JS_PLUGIN_SCRIPT(customSettings.pluginScriptsOriginAllowList,
@@ -835,9 +838,20 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
       enablePluginScriptAtRuntime(
               InterceptAjaxRequestJS.FLAG_VARIABLE_FOR_SHOULD_INTERCEPT_AJAX_REQUEST_JS_SOURCE(),
               newCustomSettings.useShouldInterceptAjaxRequest,
-              InterceptAjaxRequestJS.INTERCEPT_AJAX_REQUEST_JS_PLUGIN_SCRIPT(customSettings.pluginScriptsOriginAllowList,
-                      customSettings.pluginScriptsForMainFrameOnly)
+              InterceptAjaxRequestJS.INTERCEPT_AJAX_REQUEST_JS_PLUGIN_SCRIPT(
+                      customSettings.pluginScriptsOriginAllowList,
+                      customSettings.pluginScriptsForMainFrameOnly,
+                      newCustomSettings.useOnAjaxReadyStateChange,
+                      newCustomSettings.useOnAjaxProgress)
       );
+    }
+
+    if (newSettingsMap.get("useOnAjaxReadyStateChange") != null && customSettings.useOnAjaxReadyStateChange != newCustomSettings.useOnAjaxReadyStateChange) {
+      evaluateJavascript("((window.top == null || window.top === window) ? window : window.top)." + InterceptAjaxRequestJS.FLAG_VARIABLE_FOR_ON_AJAX_READY_STATE_CHANGE() + " = " + newCustomSettings.useOnAjaxReadyStateChange + ";", null);
+    }
+
+    if (newSettingsMap.get("useOnAjaxProgress") != null && customSettings.useOnAjaxProgress != newCustomSettings.useOnAjaxProgress) {
+      evaluateJavascript("((window.top == null || window.top === window) ? window : window.top)." + InterceptAjaxRequestJS.FLAG_VARIABLE_FOR_ON_AJAX_PROGRESS() + " = " + newCustomSettings.useOnAjaxProgress + ";", null);
     }
 
     if (newSettingsMap.get("interceptOnlyAsyncAjaxRequests") != null && customSettings.interceptOnlyAsyncAjaxRequests != newCustomSettings.interceptOnlyAsyncAjaxRequests) {
@@ -1191,12 +1205,12 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
   public void enablePluginScriptAtRuntime(final String flagVariable,
                                           final boolean enable,
                                           final PluginScript pluginScript) {
-    evaluateJavascript("window." + flagVariable, null, new ValueCallback<String>() {
+    evaluateJavascript("((window.top == null || window.top === window) ? window : window.top)." + flagVariable, null, new ValueCallback<String>() {
       @Override
       public void onReceiveValue(String value) {
         boolean alreadyLoaded = value != null && !value.equalsIgnoreCase("null");
         if (alreadyLoaded) {
-          String enableSource = "window." + flagVariable + " = " + enable + ";";
+          String enableSource = "((window.top == null || window.top === window) ? window : window.top)." + flagVariable + " = " + enable + ";";
           evaluateJavascript(enableSource, null, null);
           if (!enable) {
             userContentController.removePluginScript(pluginScript);

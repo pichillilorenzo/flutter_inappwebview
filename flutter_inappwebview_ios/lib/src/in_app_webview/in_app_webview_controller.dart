@@ -1451,13 +1451,13 @@ class IOSInAppWebViewController extends PlatformInAppWebViewController
 
               if (webviewParams != null &&
                   webviewParams!.onAjaxReadyStateChange != null)
-                return (await webviewParams!.onAjaxReadyStateChange!(
+                return jsonEncode((await webviewParams!.onAjaxReadyStateChange!(
                         _controllerFromPlatform, request))
-                    ?.toNativeValue();
+                    ?.toNativeValue());
               else
-                return (await _inAppBrowserEventHandler!
+                return jsonEncode((await _inAppBrowserEventHandler!
                         .onAjaxReadyStateChange(request))
-                    ?.toNativeValue();
+                    ?.toNativeValue());
             }
             return null;
           case "onAjaxProgress":
@@ -1470,13 +1470,13 @@ class IOSInAppWebViewController extends PlatformInAppWebViewController
 
               if (webviewParams != null &&
                   webviewParams!.onAjaxProgress != null)
-                return (await webviewParams!.onAjaxProgress!(
+                return jsonEncode((await webviewParams!.onAjaxProgress!(
                         _controllerFromPlatform, request))
-                    ?.toNativeValue();
+                    ?.toNativeValue());
               else
-                return (await _inAppBrowserEventHandler!
+                return jsonEncode((await _inAppBrowserEventHandler!
                         .onAjaxProgress(request))
-                    ?.toNativeValue();
+                    ?.toNativeValue());
             }
             return null;
           case "shouldInterceptFetchRequest":

@@ -367,9 +367,18 @@ class IOSHeadlessInAppWebView extends PlatformHeadlessInAppWebView
         settings.useOnDownloadStart == null) {
       settings.useOnDownloadStart = true;
     }
-    if (params.shouldInterceptAjaxRequest != null &&
-        settings.useShouldInterceptAjaxRequest == null) {
-      settings.useShouldInterceptAjaxRequest = true;
+    if ((params.shouldInterceptAjaxRequest != null ||
+        params.onAjaxProgress != null ||
+        params.onAjaxReadyStateChange != null)) {
+      if (settings.useShouldInterceptAjaxRequest == null) {
+        settings.useShouldInterceptAjaxRequest = true;
+      }
+      if (params.onAjaxReadyStateChange != null && settings.useOnAjaxReadyStateChange == null) {
+        settings.useOnAjaxReadyStateChange = true;
+      }
+      if (params.onAjaxProgress != null && settings.useOnAjaxProgress == null) {
+        settings.useOnAjaxProgress = true;
+      }
     }
     if (params.shouldInterceptFetchRequest != null &&
         settings.useShouldInterceptFetchRequest == null) {

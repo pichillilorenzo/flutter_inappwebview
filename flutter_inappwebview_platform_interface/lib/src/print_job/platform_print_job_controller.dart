@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
+
 import '../in_app_webview/platform_inappwebview_controller.dart';
 import '../inappwebview_platform.dart';
 import '../types/disposable.dart';
@@ -17,13 +18,10 @@ typedef PrintJobCompletionHandler = Future<void> Function(
 class PlatformPrintJobControllerCreationParams {
   /// Used by the platform implementation to create a new [PlatformPrintJobController].
   const PlatformPrintJobControllerCreationParams(
-      {required this.id, this.onComplete});
+      {required this.id});
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformPrintJobController.id}
   final String id;
-
-  ///{@macro flutter_inappwebview_platform_interface.PlatformPrintJobController.onComplete}
-  final PrintJobCompletionHandler? onComplete;
 }
 
 ///{@template flutter_inappwebview_platform_interface.PlatformPrintJobController}
@@ -72,7 +70,10 @@ abstract class PlatformPrintJobController extends PlatformInterface
   ///{@template flutter_inappwebview_platform_interface.PlatformPrintJobController.onComplete}
   ///A completion handler used to handle the conclusion of the print job (for instance, to reset state) and to handle any errors encountered in printing.
   ///
+  ///**NOTE for Android**: `completed` is always `true` and `error` is always `null`.
+  ///
   ///**Officially Supported Platforms/Implementations**:
+  ///- Android native WebView ([Official API - PrintDocumentAdapter.onFinish](https://developer.android.com/reference/android/print/PrintDocumentAdapter#onFinish()))
   ///- iOS ([Official API - UIPrintInteractionController.CompletionHandler](https://developer.apple.com/documentation/uikit/uiprintinteractioncontroller/completionhandler))
   ///- MacOS ([Official API - NSPrintOperation.runModal](https://developer.apple.com/documentation/appkit/nsprintoperation/1532065-runmodal))
   ///{@endtemplate}

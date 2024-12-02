@@ -17,7 +17,11 @@ public class ShowFileChooserResponse {
     this.filePaths = filePaths;
   }
 
-  public static ShowFileChooserResponse fromMap(Map<String, Object> map) {
+  @Nullable
+  public static ShowFileChooserResponse fromMap(@Nullable Map<String, Object> map) {
+    if (map == null) {
+      return null;
+    }
     boolean handledByClient = (boolean) map.get("handledByClient");
     List<String> filePaths = (List<String>) map.get("filePaths");
     return new ShowFileChooserResponse(handledByClient, filePaths);

@@ -11,10 +11,12 @@
 
 #### Platform Interface
 - Added `saveState`, `restoreState` methods to `PlatformInAppWebViewController` class
-- Added `useOnAjaxReadyStateChange`, `useOnAjaxProgress` properties to `InAppWebViewSettings`
+- Added `useOnAjaxReadyStateChange`, `useOnAjaxProgress`, `useOnShowFileChooser` properties to `InAppWebViewSettings`
+- Added `onShowFileChooser` WebView events
 
 #### Android Platform
 - Implemented `saveState`, `restoreState` InAppWebViewController methods
+- Implemented `onShowFileChooser` WebView event
 - Merged "Android: implemented PlatformPrintJobController.onComplete" [#2216](https://github.com/pichillilorenzo/flutter_inappwebview/pull/2216) (thanks to [Doflatango](https://github.com/Doflatango))
 
 #### macOS and iOS Platforms

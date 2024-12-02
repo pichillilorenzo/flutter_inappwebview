@@ -1,30 +1,25 @@
 import 'dart:async';
 import 'dart:collection';
-import 'dart:typed_data';
-import 'dart:ui';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_inappwebview_platform_interface/src/types/disposable.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 
 import '../context_menu/context_menu.dart';
+import '../debug_logging_settings.dart';
 import '../find_interaction/platform_find_interaction_controller.dart';
-import '../inappwebview_platform.dart';
-import '../pull_to_refresh/main.dart';
-import '../types/main.dart';
-
-import '../in_app_webview/platform_inappwebview_controller.dart';
 import '../in_app_webview/in_app_webview_settings.dart';
-
+import '../in_app_webview/platform_inappwebview_controller.dart';
+import '../inappwebview_platform.dart';
+import '../platform_webview_feature.dart';
 import '../print_job/main.dart';
+import '../pull_to_refresh/main.dart';
+import '../pull_to_refresh/platform_pull_to_refresh_controller.dart';
+import '../types/main.dart';
 import '../web_uri.dart';
 import '../webview_environment/platform_webview_environment.dart';
 import 'in_app_browser_menu_item.dart';
 import 'in_app_browser_settings.dart';
-import '../debug_logging_settings.dart';
-import '../pull_to_refresh/platform_pull_to_refresh_controller.dart';
-import '../platform_webview_feature.dart';
 
 /// Object specifying creation parameters for creating a [PlatformInAppBrowser].
 ///
@@ -1495,4 +1490,22 @@ abstract class PlatformInAppBrowserEvents {
   ///**Officially Supported Platforms/Implementations**:
   ///- Windows ([Official API - ICoreWebView2Controller.add_AcceleratorKeyPressed](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2controller?view=webview2-1.0.2849.39#add_acceleratorkeypressed))
   void onAcceleratorKeyPressed(AcceleratorKeyPressedDetail detail) {}
+
+  ///Tell the client to show a file chooser.
+  ///This is called to handle HTML forms with 'file' input type,
+  ///in response to the user pressing the "Select File" button.
+  ///To cancel the request, return a [ShowFileChooserResponse] with [ShowFileChooserResponse.filePaths] to `null`.
+  ///
+  ///Note that the WebView does not enforce any restrictions on the chosen file(s).
+  ///WebView can access all files that your app can access.
+  ///In case the file(s) are chosen through an untrusted source such as a third-party app,
+  ///it is your own app's responsibility to check what the returned Uris refer
+  ///to.
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Android native WebView ([Official API - WebChromeClient.onShowFileChooser](https://developer.android.com/reference/android/webkit/WebChromeClient#onShowFileChooser(android.webkit.WebView,%20android.webkit.ValueCallback%3Candroid.net.Uri[]%3E,%20android.webkit.WebChromeClient.FileChooserParams)))
+  FutureOr<ShowFileChooserResponse?> onShowFileChooser(
+      ShowFileChooserRequest request) {
+    return null;
+  }
 }

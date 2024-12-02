@@ -1,7 +1,7 @@
 ## 1.4.0-beta.3
 
 - Added `saveState`, `restoreState` methods to `PlatformInAppWebViewController` class
-- Added `useOnAjaxReadyStateChange`, `useOnAjaxProgress` properties to `InAppWebViewSettings`
+- Added `useOnAjaxReadyStateChange`, `useOnAjaxProgress`, `useOnShowFileChooser` properties to `InAppWebViewSettings`
 
 ## 1.4.0-beta.2
 

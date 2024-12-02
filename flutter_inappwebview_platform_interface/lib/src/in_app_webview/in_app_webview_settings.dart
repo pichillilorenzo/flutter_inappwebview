@@ -2008,6 +2008,15 @@ as it can cause framerate drops on animations in Android 9 and lower (see [Hybri
   ])
   double? alpha;
 
+  ///Set to `true` to be able to listen at the [PlatformWebViewCreationParams.onShowFileChooser] event.
+  ///
+  ///If the [PlatformWebViewCreationParams.onShowFileChooser] event is implemented and this value is `null`,
+  ///it will be automatically inferred as `true`, otherwise, the default value is `false`.
+  ///This logic will not be applied for [PlatformInAppBrowser], where you must set the value manually.
+  @SupportedPlatforms(
+      platforms: [AndroidPlatform()])
+  bool? useOnShowFileChooser;
+
   ///Specifies a feature policy for the `<iframe>`.
   ///The policy defines what features are available to the `<iframe>` based on the origin of the request
   ///(e.g. access to the microphone, camera, battery, web-share API, etc.).
@@ -2250,6 +2259,7 @@ as it can cause framerate drops on animations in Android 9 and lower (see [Hybri
     this.isUserInteractionEnabled = true,
     this.handleAcceleratorKeyPressed = false,
     this.alpha,
+    this.useOnShowFileChooser,
     this.iframeAllow,
     this.iframeAllowFullscreen,
     this.iframeSandbox,

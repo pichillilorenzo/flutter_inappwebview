@@ -167,7 +167,8 @@ class HeadlessInAppWebView {
       )? onMicrophoneCaptureStateChanged,
       void Function(InAppWebViewController controller, Size oldContentSize, Size newContentSize)? onContentSizeChanged,
       void Function(InAppWebViewController controller, ProcessFailedDetail detail)? onProcessFailed,
-      void Function(InAppWebViewController controller, AcceleratorKeyPressedDetail detail)? onAcceleratorKeyPressed})
+      void Function(InAppWebViewController controller, AcceleratorKeyPressedDetail detail)? onAcceleratorKeyPressed,
+      FutureOr<ShowFileChooserResponse?> Function(InAppWebViewController controller, ShowFileChooserRequest request)? onShowFileChooser})
       : this.fromPlatformCreationParams(
             params: PlatformHeadlessInAppWebViewCreationParams(
           controllerFromPlatform: (PlatformInAppWebViewController controller) =>
@@ -520,6 +521,10 @@ class HeadlessInAppWebView {
           onAcceleratorKeyPressed: onAcceleratorKeyPressed != null
               ? (controller, detail) =>
                   onAcceleratorKeyPressed.call(controller, detail)
+              : null,
+          onShowFileChooser: onShowFileChooser != null
+              ? (controller, request) =>
+                  onShowFileChooser.call(controller, request)
               : null,
         ));
 

@@ -1,20 +1,19 @@
 import 'dart:async';
 import 'dart:collection';
-import 'dart:typed_data';
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_platform_interface.dart';
-import '../webview_environment/webview_environment.dart';
-import 'headless_in_app_webview.dart';
-import 'in_app_webview_controller.dart';
+
 import '../find_interaction/find_interaction_controller.dart';
 import '../pull_to_refresh/main.dart';
 import '../pull_to_refresh/pull_to_refresh_controller.dart';
+import '../webview_environment/webview_environment.dart';
+import 'headless_in_app_webview.dart';
+import 'in_app_webview_controller.dart';
 
 ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewWidget}
 class InAppWebView extends StatefulWidget {
@@ -167,7 +166,8 @@ class InAppWebView extends StatefulWidget {
       )? onMicrophoneCaptureStateChanged,
       void Function(InAppWebViewController controller, Size oldContentSize, Size newContentSize)? onContentSizeChanged,
       void Function(InAppWebViewController controller, ProcessFailedDetail detail)? onProcessFailed,
-      void Function(InAppWebViewController controller, AcceleratorKeyPressedDetail detail)? onAcceleratorKeyPressed})
+      void Function(InAppWebViewController controller, AcceleratorKeyPressedDetail detail)? onAcceleratorKeyPressed,
+      FutureOr<ShowFileChooserResponse?> Function(InAppWebViewController controller, ShowFileChooserRequest request)? onShowFileChooser})
       : this.fromPlatformCreationParams(
             key: key,
             params: PlatformInAppWebViewWidgetCreationParams(
@@ -541,6 +541,10 @@ class InAppWebView extends StatefulWidget {
               onAcceleratorKeyPressed: onAcceleratorKeyPressed != null
                   ? (controller, detail) =>
                       onAcceleratorKeyPressed.call(controller, detail)
+                  : null,
+              onShowFileChooser: onShowFileChooser != null
+                  ? (controller, request) =>
+                      onShowFileChooser.call(controller, request)
                   : null,
               gestureRecognizers: gestureRecognizers,
               headlessWebView: headlessWebView?.platform,

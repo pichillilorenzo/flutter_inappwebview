@@ -6,14 +6,12 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
-
 import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_platform_interface.dart';
 
 import '../in_app_browser/in_app_browser.dart';
 import '../print_job/main.dart';
 import '../web_message/main.dart';
 import '../web_storage/web_storage.dart';
-
 import '_static_channel.dart';
 import 'headless_in_app_webview.dart';
 
@@ -1392,6 +1390,24 @@ class AndroidInAppWebViewController extends PlatformInAppWebViewController
                 .onContentSizeChanged(oldContentSize, newContentSize);
         }
         break;
+      case "onShowFileChooser":
+        if ((webviewParams != null &&
+                webviewParams!.onShowFileChooser != null) ||
+            _inAppBrowserEventHandler != null) {
+          Map<String, dynamic> arguments =
+              call.arguments.cast<String, dynamic>();
+          ShowFileChooserRequest request =
+              ShowFileChooserRequest.fromMap(arguments)!;
+
+          if (webviewParams != null && webviewParams!.onShowFileChooser != null)
+            return (await webviewParams!.onShowFileChooser!(
+                    _controllerFromPlatform, request))
+                ?.toMap();
+          else
+            return (await _inAppBrowserEventHandler!.onShowFileChooser(request))
+                ?.toMap();
+        }
+        break;
       case "onCallJsHandler":
         String handlerName = call.arguments["handlerName"];
         Map<String, dynamic> handlerDataMap =
@@ -1478,9 +1494,9 @@ class AndroidInAppWebViewController extends PlatformInAppWebViewController
                         _controllerFromPlatform, request))
                     ?.toNativeValue());
               else
-                return jsonEncode((await _inAppBrowserEventHandler!
-                        .onAjaxProgress(request))
-                    ?.toNativeValue());
+                return jsonEncode(
+                    (await _inAppBrowserEventHandler!.onAjaxProgress(request))
+                        ?.toNativeValue());
             }
             return null;
           case "shouldInterceptFetchRequest":

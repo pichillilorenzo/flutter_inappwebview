@@ -124,6 +124,7 @@ class PlatformHeadlessInAppWebViewCreationParams
       super.onContentSizeChanged,
       super.onProcessFailed,
       super.onAcceleratorKeyPressed,
+      super.onShowFileChooser,
       super.initialUrlRequest,
       super.initialFile,
       super.initialData,

@@ -41,6 +41,8 @@ import com.pichillilorenzo.flutter_inappwebview_android.types.PermissionResponse
 import com.pichillilorenzo.flutter_inappwebview_android.types.SafeBrowsingResponse;
 import com.pichillilorenzo.flutter_inappwebview_android.types.ServerTrustAuthResponse;
 import com.pichillilorenzo.flutter_inappwebview_android.types.ServerTrustChallenge;
+import com.pichillilorenzo.flutter_inappwebview_android.types.ShowFileChooserRequest;
+import com.pichillilorenzo.flutter_inappwebview_android.types.ShowFileChooserResponse;
 import com.pichillilorenzo.flutter_inappwebview_android.types.SslCertificateExt;
 import com.pichillilorenzo.flutter_inappwebview_android.types.SyncBaseCallbackResultImpl;
 import com.pichillilorenzo.flutter_inappwebview_android.types.URLRequest;
@@ -1358,6 +1360,23 @@ public class WebViewChannelDelegate extends ChannelDelegateImpl {
     if (channel == null) return;
     Map<String, Object> obj = new HashMap<>();
     channel.invokeMethod("onRequestFocus", obj);
+  }
+
+  public static class ShowFileChooserCallback extends BaseCallbackResultImpl<ShowFileChooserResponse> {
+    @Nullable
+    @Override
+    public ShowFileChooserResponse decodeResult(@Nullable Object obj) {
+      return ShowFileChooserResponse.fromMap((Map<String, Object>) obj);
+    }
+  }
+
+  public void onShowFileChooser(ShowFileChooserRequest request, @NonNull ShowFileChooserCallback callback) {
+    MethodChannel channel = getChannel();
+    if (channel == null) {
+      callback.defaultBehaviour(null);
+      return;
+    }
+    channel.invokeMethod("onShowFileChooser", request.toMap(), callback);
   }
 
   @Override

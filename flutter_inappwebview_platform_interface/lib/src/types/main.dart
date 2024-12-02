@@ -253,3 +253,6 @@ export 'browser_process_infos_changed_detail.dart'
 export 'physical_key_status.dart' show PhysicalKeyStatus;
 export 'accelerator_key_pressed_detail.dart' show AcceleratorKeyPressedDetail;
 export 'proxy_relay_hop.dart' show ProxyRelayHop;
+export 'show_file_chooser_request_mode.dart' show ShowFileChooserRequestMode;
+export 'show_file_chooser_request.dart' show ShowFileChooserRequest;
+export 'show_file_chooser_response.dart' show ShowFileChooserResponse;

@@ -1126,6 +1126,23 @@ class PlatformWebViewCreationParams<T> {
   final void Function(T controller, AcceleratorKeyPressedDetail detail)?
       onAcceleratorKeyPressed;
 
+  ///{@template flutter_inappwebview_platform_interface.PlatformWebViewCreationParams.onShowFileChooser}
+  ///Tell the client to show a file chooser.
+  ///This is called to handle HTML forms with 'file' input type,
+  ///in response to the user pressing the "Select File" button.
+  ///To cancel the request, return a [ShowFileChooserResponse] with [ShowFileChooserResponse.filePaths] to `null`.
+  ///
+  ///Note that the WebView does not enforce any restrictions on the chosen file(s).
+  ///WebView can access all files that your app can access.
+  ///In case the file(s) are chosen through an untrusted source such as a third-party app,
+  ///it is your own app's responsibility to check what the returned Uris refer
+  ///to.
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Android native WebView ([Official API - WebChromeClient.onShowFileChooser](https://developer.android.com/reference/android/webkit/WebChromeClient#onShowFileChooser(android.webkit.WebView,%20android.webkit.ValueCallback%3Candroid.net.Uri[]%3E,%20android.webkit.WebChromeClient.FileChooserParams)))
+  ///{@endtemplate}
+  final FutureOr<ShowFileChooserResponse?> Function(T controller, ShowFileChooserRequest request)? onShowFileChooser;
+
   ///{@template flutter_inappwebview_platform_interface.PlatformWebViewCreationParams.initialUrlRequest}
   ///Initial url request that will be loaded.
   ///
@@ -1332,6 +1349,7 @@ class PlatformWebViewCreationParams<T> {
       this.onContentSizeChanged,
       this.onProcessFailed,
       this.onAcceleratorKeyPressed,
+      this.onShowFileChooser,
       this.initialUrlRequest,
       this.initialFile,
       this.initialData,

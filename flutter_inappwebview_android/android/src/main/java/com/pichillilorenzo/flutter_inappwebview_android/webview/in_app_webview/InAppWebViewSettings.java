@@ -161,6 +161,7 @@ public class InAppWebViewSettings implements ISettings<InAppWebViewInterface> {
   public Boolean isUserInteractionEnabled = true;
   @Nullable
   public Double alpha;
+  public Boolean useOnShowFileChooser = false;
 
   @NonNull
   @Override
@@ -479,6 +480,9 @@ public class InAppWebViewSettings implements ISettings<InAppWebViewInterface> {
         case "alpha":
           alpha = (Double) value;
           break;
+        case "useOnShowFileChooser":
+          useOnShowFileChooser = (Boolean) value;
+          break;
       }
     }
 
@@ -597,6 +601,7 @@ public class InAppWebViewSettings implements ISettings<InAppWebViewInterface> {
     settings.put("pluginScriptsForMainFrameOnly", pluginScriptsForMainFrameOnly);
     settings.put("isUserInteractionEnabled", isUserInteractionEnabled);
     settings.put("alpha", alpha);
+    settings.put("useOnShowFileChooser", useOnShowFileChooser);
     return settings;
   }
 

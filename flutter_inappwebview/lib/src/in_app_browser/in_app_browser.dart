@@ -609,4 +609,9 @@ class InAppBrowser implements PlatformInAppBrowserEvents {
 
   @override
   void onAcceleratorKeyPressed(AcceleratorKeyPressedDetail detail) {}
+
+  @override
+  FutureOr<ShowFileChooserResponse?> onShowFileChooser(ShowFileChooserRequest request) {
+    return null;
+  }
 }

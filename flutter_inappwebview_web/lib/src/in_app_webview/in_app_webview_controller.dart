@@ -1,16 +1,15 @@
+import 'dart:collection';
 import 'dart:convert';
 import 'dart:core';
-import 'dart:typed_data';
-import 'dart:ui';
+import 'dart:developer' as developer;
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_platform_interface.dart';
 
 import '../web_storage/web_storage.dart';
-
-import 'headless_in_app_webview.dart';
 import '_static_channel.dart';
+import 'headless_in_app_webview.dart';
 
 /// Object specifying creation parameters for creating a [WebPlatformInAppWebViewController].
 ///
@@ -43,6 +42,11 @@ class WebPlatformInAppWebViewController extends PlatformInAppWebViewController
   // ignore: unused_field
   static final MethodChannel _staticChannel = IN_APP_WEBVIEW_STATIC_CHANNEL;
 
+  Map<UserScriptInjectionTime, List<UserScript>> _userScripts = {
+    UserScriptInjectionTime.AT_DOCUMENT_START: <UserScript>[],
+    UserScriptInjectionTime.AT_DOCUMENT_END: <UserScript>[]
+  };
+  Map<String, Function> _javaScriptHandlersMap = HashMap<String, Function>();
   Map<String, ScriptHtmlTagAttributes> _injectedScriptsFromURL = {};
 
   dynamic _controllerFromPlatform;
@@ -143,6 +147,11 @@ class WebPlatformInAppWebViewController extends PlatformInAppWebViewController
               _controllerFromPlatform, createWindowAction);
         }
         break;
+      case "onCloseWindow":
+        if ((webviewParams != null && webviewParams!.onCloseWindow != null)) {
+          webviewParams!.onCloseWindow!(_controllerFromPlatform);
+        }
+        break;
       case "onTitleChanged":
         if ((webviewParams != null && webviewParams!.onTitleChanged != null)) {
           String? title = call.arguments["title"];
@@ -223,6 +232,40 @@ class WebPlatformInAppWebViewController extends PlatformInAppWebViewController
         var onErrorCallback = _injectedScriptsFromURL[id]?.onError;
         if ((webviewParams != null) && onErrorCallback != null) {
           onErrorCallback();
+        }
+        break;
+      case "onCallJsHandler":
+        String handlerName = call.arguments["handlerName"];
+        Map<String, dynamic> handlerDataMap =
+            call.arguments["data"].cast<String, dynamic>();
+        // decode args to json
+        handlerDataMap["args"] = jsonDecode(handlerDataMap["args"]);
+        final handlerData =
+            JavaScriptHandlerFunctionData.fromMap(handlerDataMap)!;
+
+        _debugLog(handlerName, handlerData);
+
+        if (_javaScriptHandlersMap.containsKey(handlerName)) {
+          // convert result to json
+          try {
+            var jsHandlerResult = null;
+            if (_javaScriptHandlersMap[handlerName]
+                is JavaScriptHandlerCallback) {
+              jsHandlerResult = await (_javaScriptHandlersMap[handlerName]
+                  as JavaScriptHandlerCallback)(handlerData.args);
+            } else if (_javaScriptHandlersMap[handlerName]
+                is JavaScriptHandlerFunction) {
+              jsHandlerResult = await (_javaScriptHandlersMap[handlerName]
+                  as JavaScriptHandlerFunction)(handlerData);
+            } else {
+              jsHandlerResult = await _javaScriptHandlersMap[handlerName]!();
+            }
+            return jsonEncode(jsHandlerResult);
+          } catch (error, stacktrace) {
+            developer.log(error.toString() + '\n' + stacktrace.toString(),
+                name: 'JavaScript Handler "$handlerName"');
+            throw Exception(error.toString().replaceFirst('Exception: ', ''));
+          }
         }
         break;
       default:
@@ -820,6 +863,129 @@ class WebPlatformInAppWebViewController extends PlatformInAppWebViewController
     Map<String, dynamic> args = <String, dynamic>{};
     return await channel?.invokeMethod<bool>('canScrollHorizontally', args) ??
         false;
+  }
+
+  @override
+  void addJavaScriptHandler(
+      {required String handlerName, required Function callback}) {
+    assert(!kJavaScriptHandlerForbiddenNames.contains(handlerName),
+        '"$handlerName" is a forbidden name!');
+    this._javaScriptHandlersMap[handlerName] = (callback);
+  }
+
+  @override
+  Function? removeJavaScriptHandler({required String handlerName}) {
+    return this._javaScriptHandlersMap.remove(handlerName);
+  }
+
+  @override
+  bool hasJavaScriptHandler({required String handlerName}) {
+    return this._javaScriptHandlersMap.containsKey(handlerName);
+  }
+
+  @override
+  Future<void> addUserScript({required UserScript userScript}) async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    args.putIfAbsent('userScript', () => userScript.toMap());
+    if (!(_userScripts[userScript.injectionTime]?.contains(userScript) ??
+        false)) {
+      _userScripts[userScript.injectionTime]?.add(userScript);
+      await channel?.invokeMethod('addUserScript', args);
+    }
+  }
+
+  @override
+  Future<void> addUserScripts({required List<UserScript> userScripts}) async {
+    for (var i = 0; i < userScripts.length; i++) {
+      await addUserScript(userScript: userScripts[i]);
+    }
+  }
+
+  @override
+  Future<bool> removeUserScript({required UserScript userScript}) async {
+    var index = _userScripts[userScript.injectionTime]?.indexOf(userScript);
+    if (index == null || index == -1) {
+      return false;
+    }
+
+    _userScripts[userScript.injectionTime]?.remove(userScript);
+    Map<String, dynamic> args = <String, dynamic>{};
+    args.putIfAbsent('userScript', () => userScript.toMap());
+    args.putIfAbsent('index', () => index);
+    await channel?.invokeMethod('removeUserScript', args);
+
+    return true;
+  }
+
+  @override
+  Future<void> removeUserScriptsByGroupName({required String groupName}) async {
+    final List<UserScript> userScriptsAtDocumentStart = List.from(
+        _userScripts[UserScriptInjectionTime.AT_DOCUMENT_START] ?? []);
+    for (final userScript in userScriptsAtDocumentStart) {
+      if (userScript.groupName == groupName) {
+        _userScripts[userScript.injectionTime]?.remove(userScript);
+      }
+    }
+
+    final List<UserScript> userScriptsAtDocumentEnd =
+        List.from(_userScripts[UserScriptInjectionTime.AT_DOCUMENT_END] ?? []);
+    for (final userScript in userScriptsAtDocumentEnd) {
+      if (userScript.groupName == groupName) {
+        _userScripts[userScript.injectionTime]?.remove(userScript);
+      }
+    }
+
+    Map<String, dynamic> args = <String, dynamic>{};
+    args.putIfAbsent('groupName', () => groupName);
+    await channel?.invokeMethod('removeUserScriptsByGroupName', args);
+  }
+
+  @override
+  Future<void> removeUserScripts(
+      {required List<UserScript> userScripts}) async {
+    for (final userScript in userScripts) {
+      await removeUserScript(userScript: userScript);
+    }
+  }
+
+  @override
+  Future<void> removeAllUserScripts() async {
+    _userScripts[UserScriptInjectionTime.AT_DOCUMENT_START]?.clear();
+    _userScripts[UserScriptInjectionTime.AT_DOCUMENT_END]?.clear();
+
+    Map<String, dynamic> args = <String, dynamic>{};
+    await channel?.invokeMethod('removeAllUserScripts', args);
+  }
+
+  @override
+  bool hasUserScript({required UserScript userScript}) {
+    return _userScripts[userScript.injectionTime]?.contains(userScript) ??
+        false;
+  }
+
+  @override
+  Future<void> setJavaScriptBridgeName(String bridgeName) async {
+    assert(RegExp(r'^[a-zA-Z_]\w*$').hasMatch(bridgeName),
+        'bridgeName must be a non-empty string with only alphanumeric and underscore characters. It can\'t start with a number.');
+    Map<String, dynamic> args = <String, dynamic>{};
+    args.putIfAbsent('bridgeName', () => bridgeName);
+    await _staticChannel.invokeMethod('setJavaScriptBridgeName', args);
+  }
+
+  @override
+  Future<String> getJavaScriptBridgeName() async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    return await _staticChannel.invokeMethod<String>(
+            'getJavaScriptBridgeName', args) ??
+        '';
+  }
+
+  @override
+  Future<String> getDefaultUserAgent() async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    return await _staticChannel.invokeMethod<String>(
+            'getDefaultUserAgent', args) ??
+        '';
   }
 
   @override

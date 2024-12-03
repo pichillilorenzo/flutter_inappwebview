@@ -722,6 +722,7 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///- iOS
   ///- MacOS
   ///- Windows
+  ///- Web
   ///{@endtemplate}
   void addJavaScriptHandler(
       {required String handlerName, required Function callback}) {
@@ -739,6 +740,7 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///- iOS
   ///- MacOS
   ///- Windows
+  ///- Web
   ///{@endtemplate}
   Function? removeJavaScriptHandler({required String handlerName}) {
     throw UnimplementedError(
@@ -753,6 +755,7 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///- iOS
   ///- MacOS
   ///- Windows
+  ///- Web
   ///{@endtemplate}
   bool hasJavaScriptHandler({required String handlerName}) {
     throw UnimplementedError(
@@ -1280,6 +1283,7 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///- iOS ([Official API - WKUserContentController.addUserScript](https://developer.apple.com/documentation/webkit/wkusercontentcontroller/1537448-adduserscript))
   ///- MacOS ([Official API - WKUserContentController.addUserScript](https://developer.apple.com/documentation/webkit/wkusercontentcontroller/1537448-adduserscript))
   ///- Windows
+  ///- Web
   ///{@endtemplate}
   Future<void> addUserScript({required UserScript userScript}) {
     throw UnimplementedError(
@@ -1298,6 +1302,7 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///- iOS
   ///- MacOS
   ///- Windows
+  ///- Web
   ///{@endtemplate}
   Future<void> addUserScripts({required List<UserScript> userScripts}) {
     throw UnimplementedError(
@@ -1318,6 +1323,7 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///- iOS
   ///- MacOS
   ///- Windows
+  ///- Web
   ///{@endtemplate}
   Future<bool> removeUserScript({required UserScript userScript}) {
     throw UnimplementedError(
@@ -1337,6 +1343,7 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///- iOS
   ///- MacOS
   ///- Windows
+  ///- Web
   ///{@endtemplate}
   Future<void> removeUserScriptsByGroupName({required String groupName}) {
     throw UnimplementedError(
@@ -1356,6 +1363,7 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///- iOS
   ///- MacOS
   ///- Windows
+  ///- Web
   ///{@endtemplate}
   Future<void> removeUserScripts({required List<UserScript> userScripts}) {
     throw UnimplementedError(
@@ -1374,6 +1382,7 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///- iOS ([Official API - WKUserContentController.removeAllUserScripts](https://developer.apple.com/documentation/webkit/wkusercontentcontroller/1536540-removealluserscripts))
   ///- MacOS ([Official API - WKUserContentController.removeAllUserScripts](https://developer.apple.com/documentation/webkit/wkusercontentcontroller/1536540-removealluserscripts))
   ///- Windows
+  ///- Web
   ///{@endtemplate}
   Future<void> removeAllUserScripts() {
     throw UnimplementedError(
@@ -1388,6 +1397,7 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///- iOS
   ///- MacOS
   ///- Windows
+  ///- Web
   ///{@endtemplate}
   bool hasUserScript({required UserScript userScript}) {
     throw UnimplementedError(
@@ -2259,6 +2269,7 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///- Android native WebView ([Official API - WebSettings.getDefaultUserAgent](https://developer.android.com/reference/android/webkit/WebSettings#getDefaultUserAgent(android.content.Context)))
   ///- iOS
   ///- MacOS
+  ///- Web ([Official API - Navigator.userAgent](https://developer.mozilla.org/en-US/docs/Web/API/Navigator/userAgent))
   ///{@endtemplate}
   Future<String> getDefaultUserAgent() {
     throw UnimplementedError(
@@ -2499,6 +2510,7 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///- iOS
   ///- macOS
   ///- Windows
+  ///- Web
   ///{@endtemplate}
   Future<void> setJavaScriptBridgeName(String bridgeName) {
     throw UnimplementedError(
@@ -2515,6 +2527,7 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///- iOS
   ///- macOS
   ///- Windows
+  ///- Web
   ///{@endtemplate}
   Future<String> getJavaScriptBridgeName() {
     throw UnimplementedError(

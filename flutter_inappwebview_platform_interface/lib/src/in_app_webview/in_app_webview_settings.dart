@@ -1682,6 +1682,7 @@ as it can cause framerate drops on animations in Android 9 and lower (see [Hybri
     IOSPlatform(),
     MacOSPlatform(),
     WindowsPlatform(),
+    WebPlatform(),
   ])
   Set<String>? javaScriptHandlersOriginAllowList;
 
@@ -1709,6 +1710,7 @@ as it can cause framerate drops on animations in Android 9 and lower (see [Hybri
     IOSPlatform(),
     MacOSPlatform(),
     WindowsPlatform(),
+    WebPlatform(),
   ])
   bool? javaScriptBridgeEnabled;
 
@@ -1735,6 +1737,7 @@ as it can cause framerate drops on animations in Android 9 and lower (see [Hybri
     IOSPlatform(),
     MacOSPlatform(),
     WindowsPlatform(),
+    WebPlatform(),
   ])
   Set<String>? javaScriptBridgeOriginAllowList;
 

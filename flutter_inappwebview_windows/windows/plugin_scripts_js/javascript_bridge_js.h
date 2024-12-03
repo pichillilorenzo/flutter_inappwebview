@@ -59,6 +59,9 @@ namespace flutter_inappwebview_plugin
             _postMessage = window.chrome.webview.postMessage;\
           } catch (_) { return; }\
           window." + get_JAVASCRIPT_BRIDGE_NAME() + ".callHandler = function() { \
+            try {\
+              requestUrl = window.location.href;\
+            } catch (_) {}\
             var _callHandlerID = _setTimeout(function() {}); \
             _postMessage({ 'name': 'callHandler', 'body': {\
               'handlerName': arguments[0],\

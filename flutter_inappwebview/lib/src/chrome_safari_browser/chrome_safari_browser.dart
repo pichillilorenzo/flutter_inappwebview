@@ -192,4 +192,7 @@ class ChromeSafariBrowser implements PlatformChromeSafariBrowserEvents {
 
   @override
   void onWillOpenInBrowser() {}
+
+  @override
+  void onBrowserNotSupported() {}
 }

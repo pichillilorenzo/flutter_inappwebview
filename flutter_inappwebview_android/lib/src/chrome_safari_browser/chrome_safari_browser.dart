@@ -173,6 +173,9 @@ class AndroidChromeSafariBrowser extends PlatformChromeSafariBrowser
         final bool didUserInteract = call.arguments["didUserInteract"];
         eventHandler?.onSessionEnded(didUserInteract);
         break;
+      case "onBrowserNotSupported":
+        eventHandler?.onBrowserNotSupported();
+        break;
       default:
         throw UnimplementedError("Unimplemented ${call.method} method");
     }

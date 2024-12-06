@@ -20,7 +20,7 @@ class EnvironmentChannelSearchKind {
   ///Search for a release channel from least to most stable: Canary -> Dev -> Beta -> WebView2 Runtime.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Windows
+  ///- Windows WebView2
   static final LEAST_STABLE =
       EnvironmentChannelSearchKind._internalMultiPlatform(1, () {
     switch (defaultTargetPlatform) {
@@ -35,7 +35,7 @@ class EnvironmentChannelSearchKind {
   ///Search for a release channel from most to least stable: WebView2 Runtime -> Beta -> Dev -> Canary. This is the default behavior.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Windows
+  ///- Windows WebView2
   static final MOST_STABLE =
       EnvironmentChannelSearchKind._internalMultiPlatform(0, () {
     switch (defaultTargetPlatform) {
@@ -132,6 +132,11 @@ class EnvironmentChannelSearchKind {
 
   @override
   bool operator ==(value) => value == _value;
+
+  ///Checks if the value is supported by the [defaultTargetPlatform].
+  bool isSupported() {
+    return toNativeValue() != null;
+  }
 
   @override
   String toString() {

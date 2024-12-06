@@ -12,8 +12,8 @@ class URLCredential {
   ///The intermediate certificates of the credential, if it is a client certificate credential.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- iOS
-  ///- MacOS
+  ///- iOS WKWebView
+  ///- macOS WKWebView
   List<X509Certificate>? certificates;
 
   ///Use [certificates] instead.
@@ -30,8 +30,8 @@ class URLCredential {
   ///The credential’s persistence setting.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- iOS
-  ///- MacOS
+  ///- iOS WKWebView
+  ///- macOS WKWebView
   URLCredentialPersistence? persistence;
 
   ///The credential’s user name.

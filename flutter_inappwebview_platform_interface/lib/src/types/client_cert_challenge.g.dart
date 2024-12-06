@@ -13,7 +13,7 @@ class ClientCertChallenge extends URLAuthenticationChallenge {
   ///of certificate authorities allowed by the server.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Windows
+  ///- Windows WebView2
   List<String>? allowedCertificateAuthorities;
 
   ///Use [keyTypes] instead.
@@ -27,25 +27,25 @@ class ClientCertChallenge extends URLAuthenticationChallenge {
   ///If the server that issued this request is an http proxy.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Windows
+  ///- Windows WebView2
   bool? isProxy;
 
   ///Returns the acceptable types of asymmetric keys.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Android native WebView 21+ ([Official API - ClientCertRequest.getKeyTypes](https://developer.android.com/reference/android/webkit/ClientCertRequest#getKeyTypes()))
+  ///- Android WebView 21+ ([Official API - ClientCertRequest.getKeyTypes](https://developer.android.com/reference/android/webkit/ClientCertRequest#getKeyTypes()))
   List<String>? keyTypes;
 
   ///The collection contains mutually trusted CA certificates.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Windows
+  ///- Windows WebView2
   List<SslCertificate>? mutuallyTrustedCertificates;
 
   ///The acceptable certificate issuers for the certificate matching the private key.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Android native WebView 21+ ([Official API - ClientCertRequest.getPrincipals](https://developer.android.com/reference/android/webkit/ClientCertRequest#getPrincipals()))
+  ///- Android WebView 21+ ([Official API - ClientCertRequest.getPrincipals](https://developer.android.com/reference/android/webkit/ClientCertRequest#getPrincipals()))
   List<String>? principals;
   ClientCertChallenge(
       {this.allowedCertificateAuthorities,

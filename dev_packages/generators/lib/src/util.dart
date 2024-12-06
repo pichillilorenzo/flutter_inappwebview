@@ -23,7 +23,6 @@ abstract class Util {
   }
 
   static String? getSupportedDocs(TypeChecker checker, Element element) {
-    final platformNoteList = <String>[];
     final platformSupportedList = <String>[];
     final platforms = checker
             .firstAnnotationOfExact(element)
@@ -32,17 +31,6 @@ abstract class Util {
         <DartObject>[];
     for (var platform in platforms) {
       final platformName = platform.getField("name")!.toStringValue();
-      final note = platform.getField("note")?.toStringValue();
-      if (note != null) {
-        final noteLines = note.split("\n");
-        var platformNote =
-            "///**NOTE for $platformName**: ${noteLines[0].trim()}";
-        for (int i = 1; i < noteLines.length; i++) {
-          platformNote += "\n///${noteLines[i].trim()}";
-        }
-        platformNoteList.add(platformNote);
-      }
-
       final apiName = platform.getField("apiName")?.toStringValue();
       final apiUrl = platform.getField("apiUrl")?.toStringValue();
       final available = platform.getField("available")?.toStringValue();
@@ -50,7 +38,10 @@ abstract class Util {
           platform.getField("requiresSameOrigin")?.toBoolValue() ?? false;
       var api = available != null ? "$available+ " : "";
       if (requiresSameOrigin) {
-        api += "but iframe requires same origin ";
+        api += "but requires same origin";
+        if (apiName != null || apiUrl != null) {
+          api += " ";
+        }
       }
       if (apiName != null && apiUrl != null) {
         api += "([Official API - $apiName]($apiUrl))";
@@ -59,22 +50,81 @@ abstract class Util {
       } else if (apiUrl != null) {
         api += "([Official API]($apiUrl))";
       }
-      platformSupportedList.add("///- $platformName $api");
+
+      var platformNote = "";
+      final note = platform.getField("note")?.toStringValue();
+      if (note != null) {
+        final noteLines = note.split("\n");
+        platformNote += noteLines[0].trim();
+        for (int i = 1; i < noteLines.length; i++) {
+          platformNote += " ${noteLines[i].trim()}";
+        }
+      }
+
+      platformSupportedList.add("///- $platformName $api${platformNote.isNotEmpty ? ":\n///    - " + platformNote : ""}");
     }
     if (platformSupportedList.isNotEmpty) {
-      if (platformNoteList.isNotEmpty) {
-        return """///
-        ${platformNoteList.join("\n///\n")}
-        ///
+      return """///
         ///**Officially Supported Platforms/Implementations**:
         ${platformSupportedList.join("\n")}""";
-      } else {
-        return """///
-        ///**Officially Supported Platforms/Implementations**:
-        ${platformSupportedList.join("\n")}""";
-      }
     }
     return null;
+  }
+
+  static String? getParameterSupportedDocs(TypeChecker checker, List<ParameterElement> parameters, [Map<String, List<DartObject>>? workaroundPlatforms]) {
+    final nonDeprecatedParameters = parameters.where((p) => !p.hasDeprecated).toList();
+    if (nonDeprecatedParameters.isEmpty) {
+      return null;
+    }
+
+    var docs = "///**Parameters - Officially Supported Platforms/Implementations**:";
+    for (final parameter in nonDeprecatedParameters) {
+      var platforms = checker
+          .firstAnnotationOfExact(parameter)
+          ?.getField('platforms')
+          ?.toListValue() ??
+          (workaroundPlatforms?[parameter.name] != null ? workaroundPlatforms![parameter.name]! : <DartObject>[]);
+      if (platforms.isEmpty) {
+        docs += "\n///- [${parameter.name}]: all platforms";
+      } else {
+        docs += "\n///- [${parameter.name}]: ";
+
+        for (var platform in platforms) {
+          final platformName = platform.getField("name")!.toStringValue();
+          final apiName = platform.getField("apiName")?.toStringValue();
+          final apiUrl = platform.getField("apiUrl")?.toStringValue();
+          final available = platform.getField("available")?.toStringValue();
+          final requiresSameOrigin =
+              platform.getField("requiresSameOrigin")?.toBoolValue() ?? false;
+          var api = available != null ? "$available+ " : "";
+          if (requiresSameOrigin) {
+            api += "but requires same origin";
+            if (apiName != null || apiUrl != null) {
+              api += " ";
+            }
+          }
+          if (apiName != null && apiUrl != null) {
+            api += "([Official API - $apiName]($apiUrl))";
+          } else if (apiName != null) {
+            api += "(Official API - $apiName)";
+          } else if (apiUrl != null) {
+            api += "([Official API]($apiUrl))";
+          }
+          docs += "\n///    - $platformName $api";
+
+          final note = platform.getField("note")?.toStringValue();
+          if (note != null) {
+            docs += ": ";
+            final noteLines = note.split("\n");
+            docs += noteLines[0].trim();
+            for (int i = 1; i < noteLines.length; i++) {
+              docs += " ${noteLines[i].trim()}";
+            }
+          }
+        }
+      }
+    }
+    return docs;
   }
 
   static Iterable<DartType> getGenericTypes(DartType type) {

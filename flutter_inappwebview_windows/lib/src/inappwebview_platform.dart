@@ -57,6 +57,15 @@ class WindowsInAppWebViewPlatform extends InAppWebViewPlatform {
     return WindowsInAppWebViewWidget(params);
   }
 
+  /// Creates a new empty [WindowsInAppWebViewWidget] to access static methods.
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [InAppWebView] in `flutter_inappwebview` instead.
+  @override
+  WindowsInAppWebViewWidget createPlatformInAppWebViewWidgetStatic() {
+    return WindowsInAppWebViewWidget.static();
+  }
+
   /// Creates a new [WindowsInAppBrowser].
   ///
   /// This function should only be called by the app-facing package.
@@ -86,6 +95,15 @@ class WindowsInAppWebViewPlatform extends InAppWebViewPlatform {
     PlatformHeadlessInAppWebViewCreationParams params,
   ) {
     return WindowsHeadlessInAppWebView(params);
+  }
+
+  /// Creates a new empty [WindowsHeadlessInAppWebView] to access static methods.
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [HeadlessInAppWebView] in `flutter_inappwebview` instead.
+  @override
+  WindowsHeadlessInAppWebView createPlatformHeadlessInAppWebViewStatic() {
+    return WindowsHeadlessInAppWebView.static();
   }
 
   /// Creates a new [WindowsWebViewEnvironment].

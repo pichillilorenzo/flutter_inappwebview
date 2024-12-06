@@ -20,7 +20,7 @@ class ProxySettings {
   ///instead, would be made directly to the origin specified by the URL.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Android native WebView
+  ///- Android WebView
   List<String> bypassRules;
 
   ///Hostnames without a period in them (and that are not IP literals) will skip proxy settings and be connected to directly instead. Examples: `"abc"`, `"local"`, `"some-domain"`.
@@ -28,7 +28,7 @@ class ProxySettings {
   ///Hostnames with a trailing dot are not considered simple by this definition.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Android native WebView
+  ///- Android WebView
   bool? bypassSimpleHostnames;
 
   ///List of scheme filters.
@@ -36,7 +36,7 @@ class ProxySettings {
   ///URLs that match these scheme filters are connected to directly instead of using a proxy server.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Android native WebView
+  ///- Android WebView
   List<String> directs;
 
   ///List of proxy rules to be used for all URLs. Additional rules have decreasing precedence.
@@ -49,9 +49,9 @@ class ProxySettings {
   ///The correct syntax for hosts is defined by [RFC 3986](https://tools.ietf.org/html/rfc3986#section-3.2.2).
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Android native WebView
-  ///- iOS
-  ///- MacOS
+  ///- Android WebView
+  ///- iOS WKWebView
+  ///- macOS WKWebView
   List<ProxyRule> proxyRules;
 
   ///By default, certain hostnames implicitly bypass the proxy if they are link-local IPs, or localhost addresses.
@@ -65,7 +65,7 @@ class ProxySettings {
   ///Set this to `true` to override the default behavior and force localhost and link-local URLs to be sent through the proxy.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Android native WebView
+  ///- Android WebView
   bool? removeImplicitRules;
 
   ///Reverse the bypass list.
@@ -79,7 +79,7 @@ class ProxySettings {
   ///**NOTE**: available only if [WebViewFeature.PROXY_OVERRIDE_REVERSE_BYPASS] feature is supported.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Android native WebView
+  ///- Android WebView
   bool reverseBypassEnabled;
   ProxySettings(
       {this.bypassRules = const [],

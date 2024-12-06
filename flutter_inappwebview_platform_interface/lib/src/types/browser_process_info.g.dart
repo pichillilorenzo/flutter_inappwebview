@@ -12,19 +12,19 @@ class BrowserProcessInfo {
   ///(showing or hiding UI elements) in the renderer process.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Windows 1.0.2210.55+
+  ///- Windows WebView2 1.0.2210.55+
   List<FrameInfo>? frameInfos;
 
   ///The kind of the process.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Windows
+  ///- Windows WebView2
   BrowserProcessKind kind;
 
   ///The process id of the process.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Windows
+  ///- Windows WebView2
   int? processId;
   BrowserProcessInfo({this.frameInfos, required this.kind, this.processId});
 

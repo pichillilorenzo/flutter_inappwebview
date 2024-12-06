@@ -9,7 +9,7 @@ class ProcessFailedKind_ {
   // ignore: unused_field
   final String _value;
   // ignore: unused_field
-  final dynamic _nativeValue = null;
+  final int? _nativeValue = null;
   const ProcessFailedKind_._internal(this._value);
 
   ///Indicates that the browser process ended unexpectedly. The WebView automatically moves to the Closed state.

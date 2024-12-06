@@ -21,7 +21,7 @@ class BrowserProcessExitKind {
   ///raised to listening WebViews from the [PlatformWebViewEnvironment] associated to the failed process.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Windows
+  ///- Windows WebView2
   static final FAILED = BrowserProcessExitKind._internalMultiPlatform(1, () {
     switch (defaultTargetPlatform) {
       case TargetPlatform.windows:
@@ -35,7 +35,7 @@ class BrowserProcessExitKind {
   ///Indicates that the browser process ended normally.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Windows
+  ///- Windows WebView2
   static final NORMAL = BrowserProcessExitKind._internalMultiPlatform(0, () {
     switch (defaultTargetPlatform) {
       case TargetPlatform.windows:
@@ -134,6 +134,12 @@ class BrowserProcessExitKind {
   BrowserProcessExitKind operator |(BrowserProcessExitKind value) =>
       BrowserProcessExitKind._internal(
           value.toValue() | _value, value.toNativeValue() | _nativeValue);
+
+  ///Checks if the value is supported by the [defaultTargetPlatform].
+  bool isSupported() {
+    return toNativeValue() != null;
+  }
+
   @override
   String toString() {
     return name();

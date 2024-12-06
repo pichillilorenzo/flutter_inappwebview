@@ -92,6 +92,15 @@ abstract class InAppWebViewPlatform extends PlatformInterface {
         'createPlatformInAppWebViewWidget is not implemented on the current platform.');
   }
 
+  /// Creates a new empty [PlatformInAppWebViewWidget] to access static methods.
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [InAppWebView] in `flutter_inappwebview` instead.
+  PlatformInAppWebViewWidget createPlatformInAppWebViewWidgetStatic() {
+    throw UnimplementedError(
+        'createPlatformInAppWebViewWidgetStatic is not implemented on the current platform.');
+  }
+
   /// Creates a new [PlatformFindInteractionController].
   ///
   /// This function should only be called by the app-facing package.
@@ -241,6 +250,15 @@ abstract class InAppWebViewPlatform extends PlatformInterface {
   ) {
     throw UnimplementedError(
         'createPlatformHeadlessInAppWebView is not implemented on the current platform.');
+  }
+
+  /// Creates a new empty [PlatformHeadlessInAppWebView] to access static methods.
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [HeadlessInAppWebView] in `flutter_inappwebview` instead.
+  PlatformHeadlessInAppWebView createPlatformHeadlessInAppWebViewStatic() {
+    throw UnimplementedError(
+        'createPlatformHeadlessInAppWebViewStatic is not implemented on the current platform.');
   }
 
   /// Creates a new [PlatformWebStorageManager].

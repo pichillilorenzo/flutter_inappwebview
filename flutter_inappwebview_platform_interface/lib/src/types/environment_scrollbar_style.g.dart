@@ -19,7 +19,7 @@ class EnvironmentScrollbarStyle {
   ///Browser default ScrollBar style.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Windows
+  ///- Windows WebView2
   static final DEFAULT =
       EnvironmentScrollbarStyle._internalMultiPlatform(0, () {
     switch (defaultTargetPlatform) {
@@ -35,7 +35,7 @@ class EnvironmentScrollbarStyle {
   ///Please see [Fluent UI](https://developer.microsoft.com/fluentui#/) for more details on fluent UI.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Windows
+  ///- Windows WebView2
   static final FLUENT_OVERLAY =
       EnvironmentScrollbarStyle._internalMultiPlatform(1, () {
     switch (defaultTargetPlatform) {
@@ -132,6 +132,11 @@ class EnvironmentScrollbarStyle {
 
   @override
   bool operator ==(value) => value == _value;
+
+  ///Checks if the value is supported by the [defaultTargetPlatform].
+  bool isSupported() {
+    return toNativeValue() != null;
+  }
 
   @override
   String toString() {

@@ -131,6 +131,11 @@ class ScrollBarStyle {
   @override
   bool operator ==(value) => value == _value;
 
+  ///Checks if the value is supported by the [defaultTargetPlatform].
+  bool isSupported() {
+    return true;
+  }
+
   @override
   String toString() {
     return name();
@@ -266,6 +271,11 @@ class AndroidScrollBarStyle {
 
   @override
   bool operator ==(value) => value == _value;
+
+  ///Checks if the value is supported by the [defaultTargetPlatform].
+  bool isSupported() {
+    return true;
+  }
 
   @override
   String toString() {

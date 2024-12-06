@@ -60,6 +60,15 @@ class MacOSInAppWebViewPlatform extends InAppWebViewPlatform {
     return MacOSInAppWebViewWidget(params);
   }
 
+  /// Creates a new empty [MacOSInAppWebViewWidget] to access static methods.
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [InAppWebView] in `flutter_inappwebview` instead.
+  @override
+  MacOSInAppWebViewWidget createPlatformInAppWebViewWidgetStatic() {
+    return MacOSInAppWebViewWidget.static();
+  }
+
   /// Creates a new [MacOSFindInteractionController].
   ///
   /// This function should only be called by the app-facing package.
@@ -177,6 +186,15 @@ class MacOSInAppWebViewPlatform extends InAppWebViewPlatform {
     PlatformHeadlessInAppWebViewCreationParams params,
   ) {
     return MacOSHeadlessInAppWebView(params);
+  }
+
+  /// Creates a new empty [MacOSHeadlessInAppWebView] to access static methods.
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [HeadlessInAppWebView] in `flutter_inappwebview` instead.
+  @override
+  MacOSHeadlessInAppWebView createPlatformHeadlessInAppWebViewStatic() {
+    return MacOSHeadlessInAppWebView.static();
   }
 
   /// Creates a new [MacOSHttpAuthCredentialDatabase].

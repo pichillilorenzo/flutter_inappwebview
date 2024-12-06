@@ -1,3 +1,4 @@
+import 'constants.dart';
 import 'supported_platforms.dart';
 
 abstract class EnumPlatform implements Platform {
@@ -24,8 +25,8 @@ class EnumAndroidPlatform implements EnumPlatform, AndroidPlatform {
   const EnumAndroidPlatform(
       {this.available, this.apiName, this.apiUrl, this.note, this.value});
 
-  final name = "Android native WebView";
-  final targetPlatformName = "android";
+  final name = kPlatformNameAndroid;
+  final targetPlatformName = kTargetPlatformNameAndroid;
 }
 
 class EnumIOSPlatform implements EnumPlatform, IOSPlatform {
@@ -38,8 +39,8 @@ class EnumIOSPlatform implements EnumPlatform, IOSPlatform {
   const EnumIOSPlatform(
       {this.available, this.apiName, this.apiUrl, this.note, this.value});
 
-  final name = "iOS";
-  final targetPlatformName = "iOS";
+  final name = kPlatformNameIOS;
+  final targetPlatformName = kTargetPlatformNameIOS;
 }
 
 class EnumMacOSPlatform implements EnumPlatform, MacOSPlatform {
@@ -52,8 +53,8 @@ class EnumMacOSPlatform implements EnumPlatform, MacOSPlatform {
   const EnumMacOSPlatform(
       {this.available, this.apiName, this.apiUrl, this.note, this.value});
 
-  final name = "MacOS";
-  final targetPlatformName = "macOS";
+  final name = kPlatformNameMacOS;
+  final targetPlatformName = kTargetPlatformNameMacOS;
 }
 
 class EnumWindowsPlatform implements EnumPlatform, WindowsPlatform {
@@ -66,8 +67,8 @@ class EnumWindowsPlatform implements EnumPlatform, WindowsPlatform {
   const EnumWindowsPlatform(
       {this.available, this.apiName, this.apiUrl, this.note, this.value});
 
-  final name = "Windows";
-  final targetPlatformName = "windows";
+  final name = kPlatformNameWindows;
+  final targetPlatformName = kTargetPlatformNameWindows;
 }
 
 class EnumLinuxPlatform implements EnumPlatform, LinuxPlatform {
@@ -80,8 +81,8 @@ class EnumLinuxPlatform implements EnumPlatform, LinuxPlatform {
   const EnumLinuxPlatform(
       {this.available, this.apiName, this.apiUrl, this.note, this.value});
 
-  final name = "Linux";
-  final targetPlatformName = "linux";
+  final name = kPlatformNameLinux;
+  final targetPlatformName = kTargetPlatformNameLinux;
 }
 
 class EnumWebPlatform implements EnumPlatform, WebPlatform {
@@ -100,8 +101,8 @@ class EnumWebPlatform implements EnumPlatform, WebPlatform {
         this.value,
         this.requiresSameOrigin = true});
 
-  final name = "Web";
-  final targetPlatformName = "web";
+  final name = kPlatformNameWeb;
+  final targetPlatformName = kTargetPlatformNameWeb;
 }
 
 class EnumSupportedPlatforms {

@@ -9,7 +9,7 @@ class FrameKind_ {
   // ignore: unused_field
   final String _value;
   // ignore: unused_field
-  final dynamic _nativeValue = null;
+  final int? _nativeValue = null;
   const FrameKind_._internal(this._value);
 
   ///Indicates that the frame is an unknown type frame. We may extend this enum type to identify more frame kinds in the future.

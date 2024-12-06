@@ -12,7 +12,7 @@ class WebHistoryItem {
   ///Unique id of the navigation history entry.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Windows
+  ///- Windows WebView2
   int? entryId;
 
   ///0-based position index in the back-forward [WebHistory.list].

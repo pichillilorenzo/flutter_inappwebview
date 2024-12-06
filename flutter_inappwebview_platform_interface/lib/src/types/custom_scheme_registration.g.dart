@@ -9,7 +9,7 @@ part of 'custom_scheme_registration.dart';
 ///Class that represents the registration of a custom scheme for [WebViewEnvironmentSettings] method.
 ///
 ///**Officially Supported Platforms/Implementations**:
-///- Windows
+///- Windows WebView2
 class CustomSchemeRegistration {
   ///List of origins that are allowed to issue requests with the custom scheme, such as XHRs and subresource requests that have an Origin header.
   List<String>? allowedOrigins;
@@ -27,7 +27,7 @@ class CustomSchemeRegistration {
 
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Windows
+  ///- Windows WebView2
   CustomSchemeRegistration(
       {this.allowedOrigins,
       this.hasAuthorityComponent,

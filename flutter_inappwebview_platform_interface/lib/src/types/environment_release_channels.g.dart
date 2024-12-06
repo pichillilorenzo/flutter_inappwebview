@@ -19,7 +19,7 @@ class EnvironmentReleaseChannels {
   ///The Beta release channel that is released every 4 weeks, a week before the stable release.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Windows
+  ///- Windows WebView2
   static final BETA = EnvironmentReleaseChannels._internalMultiPlatform(2, () {
     switch (defaultTargetPlatform) {
       case TargetPlatform.windows:
@@ -33,7 +33,7 @@ class EnvironmentReleaseChannels {
   ///The Canary release channel that is released daily.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Windows
+  ///- Windows WebView2
   static final CANARY =
       EnvironmentReleaseChannels._internalMultiPlatform(8, () {
     switch (defaultTargetPlatform) {
@@ -48,7 +48,7 @@ class EnvironmentReleaseChannels {
   ///The Dev release channel that is released weekly.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Windows
+  ///- Windows WebView2
   static final DEV = EnvironmentReleaseChannels._internalMultiPlatform(4, () {
     switch (defaultTargetPlatform) {
       case TargetPlatform.windows:
@@ -62,7 +62,7 @@ class EnvironmentReleaseChannels {
   ///No release channel. Passing only this value results in `HRESULT_FROM_WIN32(ERROR_FILE_NOT_FOUND)`.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Windows
+  ///- Windows WebView2
   static final NONE = EnvironmentReleaseChannels._internalMultiPlatform(0, () {
     switch (defaultTargetPlatform) {
       case TargetPlatform.windows:
@@ -76,7 +76,7 @@ class EnvironmentReleaseChannels {
   ///The stable WebView2 Runtime that is released every 4 weeks.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Windows
+  ///- Windows WebView2
   static final STABLE =
       EnvironmentReleaseChannels._internalMultiPlatform(1, () {
     switch (defaultTargetPlatform) {
@@ -186,6 +186,12 @@ class EnvironmentReleaseChannels {
   EnvironmentReleaseChannels operator |(EnvironmentReleaseChannels value) =>
       EnvironmentReleaseChannels._internal(
           value.toValue() | _value, value.toNativeValue() | _nativeValue);
+
+  ///Checks if the value is supported by the [defaultTargetPlatform].
+  bool isSupported() {
+    return toNativeValue() != null;
+  }
+
   @override
   String toString() {
     return name();

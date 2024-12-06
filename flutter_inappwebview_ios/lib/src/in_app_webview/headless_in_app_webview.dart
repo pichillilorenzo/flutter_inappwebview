@@ -277,6 +277,14 @@ class IOSHeadlessInAppWebView extends PlatformHeadlessInAppWebView
     id = IdGenerator.generate();
   }
 
+  static final IOSHeadlessInAppWebView _staticValue =
+  IOSHeadlessInAppWebView(
+      IOSHeadlessInAppWebViewCreationParams());
+
+  factory IOSHeadlessInAppWebView.static() {
+    return _staticValue;
+  }
+
   @override
   IOSInAppWebViewController? get webViewController => _webViewController;
 

@@ -9,7 +9,7 @@ class FocusDirection_ {
   // ignore: unused_field
   final String _value;
   // ignore: unused_field
-  final dynamic _nativeValue = null;
+  final int? _nativeValue = null;
   const FocusDirection_._internal(this._value);
 
   ///Move focus up.

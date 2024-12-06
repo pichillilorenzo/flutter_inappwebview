@@ -1,3 +1,5 @@
+import 'constants.dart';
+
 abstract class Platform {
   final String? available;
   final String? apiName;
@@ -18,8 +20,8 @@ class AndroidPlatform implements Platform {
 
   const AndroidPlatform({this.available, this.apiName, this.apiUrl, this.note});
 
-  final name = "Android native WebView";
-  final targetPlatformName = "android";
+  final name = kPlatformNameAndroid;
+  final targetPlatformName = kTargetPlatformNameAndroid;
 }
 
 class IOSPlatform implements Platform {
@@ -30,8 +32,8 @@ class IOSPlatform implements Platform {
 
   const IOSPlatform({this.available, this.apiName, this.apiUrl, this.note});
 
-  final name = "iOS";
-  final targetPlatformName = "iOS";
+  final name = kPlatformNameIOS;
+  final targetPlatformName = kTargetPlatformNameIOS;
 }
 
 class MacOSPlatform implements Platform {
@@ -42,8 +44,8 @@ class MacOSPlatform implements Platform {
 
   const MacOSPlatform({this.available, this.apiName, this.apiUrl, this.note});
 
-  final name = "MacOS";
-  final targetPlatformName = "macOS";
+  final name = kPlatformNameMacOS;
+  final targetPlatformName = kTargetPlatformNameMacOS;
 }
 
 class WindowsPlatform implements Platform {
@@ -54,8 +56,8 @@ class WindowsPlatform implements Platform {
 
   const WindowsPlatform({this.available, this.apiName, this.apiUrl, this.note});
 
-  final name = "Windows";
-  final targetPlatformName = "windows";
+  final name = kPlatformNameWindows;
+  final targetPlatformName = kTargetPlatformNameWindows;
 }
 
 class LinuxPlatform implements Platform {
@@ -66,8 +68,8 @@ class LinuxPlatform implements Platform {
 
   const LinuxPlatform({this.available, this.apiName, this.apiUrl, this.note});
 
-  final name = "Linux";
-  final targetPlatformName = "linux";
+  final name = kPlatformNameLinux;
+  final targetPlatformName = kTargetPlatformNameLinux;
 }
 
 class WebPlatform implements Platform {
@@ -84,12 +86,28 @@ class WebPlatform implements Platform {
       this.note,
       this.requiresSameOrigin = true});
 
-  final name = "Web";
-  final targetPlatformName = "web";
+  final name = kPlatformNameWeb;
+  final targetPlatformName = kTargetPlatformNameWeb;
 }
 
 class SupportedPlatforms {
   final List<Platform> platforms;
+  final bool ignore;
+  final List<String> ignorePropertyNames;
+  final List<String> ignoreMethodNames;
+  final List<String> ignoreParameterNames;
 
-  const SupportedPlatforms({required this.platforms});
+  /// Workaround for @SupportedPlatforms annotation not working
+  /// on parameters of a class fields which type is a function.
+  /// https://github.com/dart-lang/sdk/issues/59670
+  final Map<String, List<Platform>> parameterPlatforms;
+
+  const SupportedPlatforms({
+    required this.platforms,
+    this.ignore = false,
+    this.ignorePropertyNames = const [],
+    this.ignoreMethodNames = const [],
+    this.ignoreParameterNames = const [],
+    this.parameterPlatforms = const {},
+  });
 }

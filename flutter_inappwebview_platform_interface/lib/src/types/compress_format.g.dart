@@ -21,20 +21,20 @@ class CompressFormat {
   ///`100` means compress for max visual quality.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Android native WebView
-  ///- iOS
-  ///- MacOS
-  ///- Windows
+  ///- Android WebView
+  ///- iOS WKWebView
+  ///- macOS WKWebView
+  ///- Windows WebView2
   static const JPEG = CompressFormat._internal('JPEG', 'JPEG');
 
   ///Compress to the `PNG` format.
   ///PNG is lossless, so `quality` is ignored.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Android native WebView
-  ///- iOS
-  ///- MacOS
-  ///- Windows
+  ///- Android WebView
+  ///- iOS WKWebView
+  ///- macOS WKWebView
+  ///- Windows WebView2
   static const PNG = CompressFormat._internal('PNG', 'PNG');
 
   ///Compress to the `WEBP` lossy format.
@@ -42,8 +42,8 @@ class CompressFormat {
   ///`100` means compress for max visual quality.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Android native WebView
-  ///- Windows
+  ///- Android WebView
+  ///- Windows WebView2
   static const WEBP = CompressFormat._internal('WEBP', 'WEBP');
 
   ///Compress to the `WEBP` lossless format.
@@ -52,7 +52,7 @@ class CompressFormat {
   ///`100` means to spend more time compressing, resulting in a smaller file.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Android native WebView 30+
+  ///- Android WebView 30+
   static const WEBP_LOSSLESS =
       CompressFormat._internal('WEBP_LOSSLESS', 'WEBP_LOSSLESS');
 
@@ -61,7 +61,7 @@ class CompressFormat {
   ///`100` means compress for max visual quality.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Android native WebView 30+
+  ///- Android WebView 30+
   static const WEBP_LOSSY =
       CompressFormat._internal('WEBP_LOSSY', 'WEBP_LOSSY');
 
@@ -157,6 +157,11 @@ class CompressFormat {
 
   @override
   bool operator ==(value) => value == _value;
+
+  ///Checks if the value is supported by the [defaultTargetPlatform].
+  bool isSupported() {
+    return toNativeValue() != null;
+  }
 
   @override
   String toString() {

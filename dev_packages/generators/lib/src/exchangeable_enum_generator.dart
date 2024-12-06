@@ -1,6 +1,7 @@
 import 'package:build/src/builder/build_step.dart';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/analysis/results.dart';
+import 'package:collection/collection.dart';
 import 'package:source_gen/source_gen.dart';
 import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_internal_annotations.dart';
 import 'package:analyzer/dart/constant/value.dart';
@@ -315,7 +316,7 @@ class ExchangeableEnumGenerator
     if (annotation.read("toNativeValueMethod").boolValue && (!visitor.methods.containsKey("toNativeValue") ||
         Util.methodHasIgnore(visitor.methods['toNativeValue']!))) {
       classBuffer.writeln("""
-      ///Gets [${enumNativeValue.type}] native value.
+      ///Gets [${enumNativeValue.type.getDisplayString(withNullability: false)}] native value${Util.typeIsNullable(enumNativeValue.type) ? ' if supported by the current platform, otherwise `null`' : ''}.
       ${enumNativeValue.type} toNativeValue() => _nativeValue;
       """);
     }
@@ -367,6 +368,15 @@ class ExchangeableEnumGenerator
       }
       classBuffer.write(");");
     }
+
+    classBuffer.writeln('///Checks if the value is supported by the [defaultTargetPlatform].');
+    classBuffer.writeln('bool isSupported() {');
+    if (fieldEntriesSorted.firstWhereOrNull((e) => _coreCheckerEnumSupportedPlatforms.firstAnnotationOfExact(e.value) != null) != null) {
+      classBuffer.writeln('return toNativeValue() != null;');
+    } else {
+      classBuffer.writeln('return true;');
+    }
+    classBuffer.writeln('}');
 
     if (annotation.read("toStringMethod").boolValue && (!visitor.methods.containsKey("toString") ||
         Util.methodHasIgnore(visitor.methods['toString']!))) {

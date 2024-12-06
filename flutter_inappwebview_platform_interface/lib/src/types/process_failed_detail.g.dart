@@ -13,7 +13,7 @@ class ProcessFailedDetail {
   ///The exit code is always STILL_ACTIVE (259) when [ProcessFailedKind.RENDER_PROCESS_UNRESPONSIVE].
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Windows
+  ///- Windows WebView2
   int? exitCode;
 
   ///This property is the full path of the module that caused the crash in cases of Windows Code Integrity failures.
@@ -28,7 +28,7 @@ class ProcessFailedDetail {
   ///- It has been blocked by an administrator or a security policy. This property always will be the empty string if failure is not caused by STATUS_INVALID_IMAGE_HASH.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Windows
+  ///- Windows WebView2
   String? failureSourceModulePath;
 
   ///The collection of [FrameInfo]s for frames in the WebView that were being rendered by the failed process.
@@ -39,13 +39,13 @@ class ProcessFailedDetail {
   ///for the main frame and subframes within it, for which the failure kind is [ProcessFailedKind.RENDER_PROCESS_EXITED].
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Windows
+  ///- Windows WebView2
   List<FrameInfo>? frameInfos;
 
   ///The kind of process failure that has occurred.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Windows
+  ///- Windows WebView2
   ProcessFailedKind kind;
 
   ///Description of the process assigned by the WebView2 Runtime.
@@ -55,13 +55,13 @@ class ProcessFailedDetail {
   ///The returned [processDescription] is empty if the WebView2 Runtime did not assign a description to the process.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Windows
+  ///- Windows WebView2
   String? processDescription;
 
   ///The reason for the process failure.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Windows
+  ///- Windows WebView2
   ProcessFailedReason? reason;
   ProcessFailedDetail(
       {this.exitCode,

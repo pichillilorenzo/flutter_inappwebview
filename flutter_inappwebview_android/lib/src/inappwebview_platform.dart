@@ -66,6 +66,15 @@ class AndroidInAppWebViewPlatform extends InAppWebViewPlatform {
     return AndroidInAppWebViewWidget(params);
   }
 
+  /// Creates a new empty [AndroidInAppWebViewWidget] to access static methods.
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [InAppWebView] in `flutter_inappwebview` instead.
+  @override
+  AndroidInAppWebViewWidget createPlatformInAppWebViewWidgetStatic() {
+    return AndroidInAppWebViewWidget.static();
+  }
+
   /// Creates a new [AndroidFindInteractionController].
   ///
   /// This function should only be called by the app-facing package.
@@ -194,6 +203,15 @@ class AndroidInAppWebViewPlatform extends InAppWebViewPlatform {
     PlatformHeadlessInAppWebViewCreationParams params,
   ) {
     return AndroidHeadlessInAppWebView(params);
+  }
+
+  /// Creates a new empty [AndroidHeadlessInAppWebView] to access static methods.
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [HeadlessInAppWebView] in `flutter_inappwebview` instead.
+  @override
+  AndroidHeadlessInAppWebView createPlatformHeadlessInAppWebViewStatic() {
+    return AndroidHeadlessInAppWebView.static();
   }
 
   /// Creates a new [AndroidHttpAuthCredentialDatabase].

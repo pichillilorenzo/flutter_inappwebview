@@ -19,7 +19,7 @@ class PrintJobPaginationMode {
   ///
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- MacOS
+  ///- macOS WKWebView
   static final AUTOMATIC =
       PrintJobPaginationMode._internalMultiPlatform('AUTOMATIC', () {
     switch (defaultTargetPlatform) {
@@ -34,7 +34,7 @@ class PrintJobPaginationMode {
   ///
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- MacOS
+  ///- macOS WKWebView
   static final CLIP = PrintJobPaginationMode._internalMultiPlatform('CLIP', () {
     switch (defaultTargetPlatform) {
       case TargetPlatform.macOS:
@@ -48,7 +48,7 @@ class PrintJobPaginationMode {
   ///
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- MacOS
+  ///- macOS WKWebView
   static final FIT = PrintJobPaginationMode._internalMultiPlatform('FIT', () {
     switch (defaultTargetPlatform) {
       case TargetPlatform.macOS:
@@ -125,7 +125,7 @@ class PrintJobPaginationMode {
   ///Gets [String] value.
   String toValue() => _value;
 
-  ///Gets [int?] native value.
+  ///Gets [int] native value if supported by the current platform, otherwise `null`.
   int? toNativeValue() => _nativeValue;
 
   ///Gets the name of the value.
@@ -146,6 +146,11 @@ class PrintJobPaginationMode {
 
   @override
   bool operator ==(value) => value == _value;
+
+  ///Checks if the value is supported by the [defaultTargetPlatform].
+  bool isSupported() {
+    return toNativeValue() != null;
+  }
 
   @override
   String toString() {

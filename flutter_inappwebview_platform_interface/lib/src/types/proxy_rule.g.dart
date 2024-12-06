@@ -12,52 +12,52 @@ class ProxyRule {
   ///Failover isn’t allowed by default.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- iOS
-  ///- MacOS
+  ///- iOS WKWebView
+  ///- macOS WKWebView
   bool? allowFailover;
 
   ///Define an array of domains to determine which hosts should not use the proxy.
   ///If the array is empty, no domains are excluded.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- iOS
-  ///- MacOS
+  ///- iOS WKWebView
+  ///- macOS WKWebView
   List<String>? excludedDomains;
 
   ///Define an array of domains to determine which hosts should use the proxy. If the array is empty,
   ///all domains are allowed to use the proxy other than domains listed in [excludedDomains].
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- iOS
-  ///- MacOS
+  ///- iOS WKWebView
+  ///- macOS WKWebView
   List<String>? matchDomains;
 
   ///Sets a password to use as authentication for a proxy configuration.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- iOS
-  ///- MacOS
+  ///- iOS WKWebView
+  ///- macOS WKWebView
   String? password;
 
   ///Represents the scheme filter.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Android native WebView
+  ///- Android WebView
   ProxySchemeFilter? schemeFilter;
 
   ///Represents the proxy URL.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Android native WebView
-  ///- iOS
-  ///- MacOS
+  ///- Android WebView
+  ///- iOS WKWebView
+  ///- macOS WKWebView
   String url;
 
   ///Sets a username to use as authentication for a proxy configuration.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- iOS
-  ///- MacOS
+  ///- iOS WKWebView
+  ///- macOS WKWebView
   String? username;
   ProxyRule(
       {this.allowFailover,

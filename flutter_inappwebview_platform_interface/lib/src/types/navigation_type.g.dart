@@ -19,9 +19,9 @@ class NavigationType {
   ///An item from the back-forward list was requested.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- iOS ([Official API - WKNavigationType.formSubmitted](https://developer.apple.com/documentation/webkit/wknavigationtype/formsubmitted))
-  ///- MacOS ([Official API - WKNavigationType.formSubmitted](https://developer.apple.com/documentation/webkit/wknavigationtype/formsubmitted))
-  ///- Windows ([Official API - COREWEBVIEW2_NAVIGATION_KIND_BACK_OR_FORWARD](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2210.55#corewebview2_navigation_kind))
+  ///- iOS WKWebView ([Official API - WKNavigationType.formSubmitted](https://developer.apple.com/documentation/webkit/wknavigationtype/formsubmitted))
+  ///- macOS WKWebView ([Official API - WKNavigationType.formSubmitted](https://developer.apple.com/documentation/webkit/wknavigationtype/formsubmitted))
+  ///- Windows WebView2 ([Official API - COREWEBVIEW2_NAVIGATION_KIND_BACK_OR_FORWARD](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2210.55#corewebview2_navigation_kind))
   static final BACK_FORWARD =
       NavigationType._internalMultiPlatform('BACK_FORWARD', () {
     switch (defaultTargetPlatform) {
@@ -40,8 +40,8 @@ class NavigationType {
   ///A form was resubmitted (for example by going back, going forward, or reloading).
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- iOS ([Official API - WKNavigationType.formSubmitted](https://developer.apple.com/documentation/webkit/wknavigationtype/formresubmitted))
-  ///- MacOS ([Official API - WKNavigationType.formSubmitted](https://developer.apple.com/documentation/webkit/wknavigationtype/formresubmitted))
+  ///- iOS WKWebView ([Official API - WKNavigationType.formSubmitted](https://developer.apple.com/documentation/webkit/wknavigationtype/formresubmitted))
+  ///- macOS WKWebView ([Official API - WKNavigationType.formSubmitted](https://developer.apple.com/documentation/webkit/wknavigationtype/formresubmitted))
   static final FORM_RESUBMITTED =
       NavigationType._internalMultiPlatform('FORM_RESUBMITTED', () {
     switch (defaultTargetPlatform) {
@@ -58,8 +58,8 @@ class NavigationType {
   ///A form was submitted.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- iOS ([Official API - WKNavigationType.formSubmitted](https://developer.apple.com/documentation/webkit/wknavigationtype/formsubmitted))
-  ///- MacOS ([Official API - WKNavigationType.formSubmitted](https://developer.apple.com/documentation/webkit/wknavigationtype/formsubmitted))
+  ///- iOS WKWebView ([Official API - WKNavigationType.formSubmitted](https://developer.apple.com/documentation/webkit/wknavigationtype/formsubmitted))
+  ///- macOS WKWebView ([Official API - WKNavigationType.formSubmitted](https://developer.apple.com/documentation/webkit/wknavigationtype/formsubmitted))
   static final FORM_SUBMITTED =
       NavigationType._internalMultiPlatform('FORM_SUBMITTED', () {
     switch (defaultTargetPlatform) {
@@ -76,9 +76,9 @@ class NavigationType {
   ///A link with an href attribute was activated by the user.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- iOS ([Official API - WKNavigationType.linkActivated](https://developer.apple.com/documentation/webkit/wknavigationtype/linkactivated))
-  ///- MacOS ([Official API - WKNavigationType.linkActivated](https://developer.apple.com/documentation/webkit/wknavigationtype/linkactivated))
-  ///- Windows
+  ///- iOS WKWebView ([Official API - WKNavigationType.linkActivated](https://developer.apple.com/documentation/webkit/wknavigationtype/linkactivated))
+  ///- macOS WKWebView ([Official API - WKNavigationType.linkActivated](https://developer.apple.com/documentation/webkit/wknavigationtype/linkactivated))
+  ///- Windows WebView2
   static final LINK_ACTIVATED =
       NavigationType._internalMultiPlatform('LINK_ACTIVATED', () {
     switch (defaultTargetPlatform) {
@@ -97,9 +97,9 @@ class NavigationType {
   ///Navigation is taking place for some other reason.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- iOS ([Official API - WKNavigationType.other](https://developer.apple.com/documentation/webkit/wknavigationtype/other))
-  ///- MacOS ([Official API - WKNavigationType.other](https://developer.apple.com/documentation/webkit/wknavigationtype/other))
-  ///- Windows
+  ///- iOS WKWebView ([Official API - WKNavigationType.other](https://developer.apple.com/documentation/webkit/wknavigationtype/other))
+  ///- macOS WKWebView ([Official API - WKNavigationType.other](https://developer.apple.com/documentation/webkit/wknavigationtype/other))
+  ///- Windows WebView2
   static final OTHER = NavigationType._internalMultiPlatform('OTHER', () {
     switch (defaultTargetPlatform) {
       case TargetPlatform.iOS:
@@ -117,9 +117,9 @@ class NavigationType {
   ///The webpage was reloaded.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- iOS ([Official API - WKNavigationType.reload](https://developer.apple.com/documentation/webkit/wknavigationtype/reload))
-  ///- MacOS ([Official API - WKNavigationType.reload](https://developer.apple.com/documentation/webkit/wknavigationtype/reload))
-  ///- Windows ([Official API - COREWEBVIEW2_NAVIGATION_KIND_RELOAD](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2210.55#corewebview2_navigation_kind))
+  ///- iOS WKWebView ([Official API - WKNavigationType.reload](https://developer.apple.com/documentation/webkit/wknavigationtype/reload))
+  ///- macOS WKWebView ([Official API - WKNavigationType.reload](https://developer.apple.com/documentation/webkit/wknavigationtype/reload))
+  ///- Windows WebView2 ([Official API - COREWEBVIEW2_NAVIGATION_KIND_RELOAD](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2210.55#corewebview2_navigation_kind))
   static final RELOAD = NavigationType._internalMultiPlatform('RELOAD', () {
     switch (defaultTargetPlatform) {
       case TargetPlatform.iOS:
@@ -202,7 +202,7 @@ class NavigationType {
   ///Gets [String] value.
   String toValue() => _value;
 
-  ///Gets [int?] native value.
+  ///Gets [int] native value if supported by the current platform, otherwise `null`.
   int? toNativeValue() => _nativeValue;
 
   ///Gets the name of the value.
@@ -229,6 +229,11 @@ class NavigationType {
 
   @override
   bool operator ==(value) => value == _value;
+
+  ///Checks if the value is supported by the [defaultTargetPlatform].
+  bool isSupported() {
+    return toNativeValue() != null;
+  }
 
   @override
   String toString() {
@@ -362,6 +367,11 @@ class IOSWKNavigationType {
 
   @override
   bool operator ==(value) => value == _value;
+
+  ///Checks if the value is supported by the [defaultTargetPlatform].
+  bool isSupported() {
+    return true;
+  }
 
   @override
   String toString() {

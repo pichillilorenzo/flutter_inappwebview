@@ -154,7 +154,7 @@ class Sandbox {
     return _value ?? '';
   }
 
-  ///Gets [String?] native value.
+  ///Gets [String] native value if supported by the current platform, otherwise `null`.
   String? toNativeValue() => _nativeValue;
 
   ///Gets the name of the value.
@@ -197,4 +197,9 @@ class Sandbox {
 
   @override
   bool operator ==(value) => value == _value;
+
+  ///Checks if the value is supported by the [defaultTargetPlatform].
+  bool isSupported() {
+    return true;
+  }
 }

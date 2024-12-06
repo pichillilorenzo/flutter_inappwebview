@@ -272,6 +272,14 @@ class WebPlatformInAppWebViewWidget extends PlatformInAppWebViewWidget {
   WebPlatformHeadlessInAppWebView? get _macosHeadlessInAppWebView =>
       _webPlatformParams.headlessWebView as WebPlatformHeadlessInAppWebView?;
 
+  static final WebPlatformInAppWebViewWidget _staticValue =
+  WebPlatformInAppWebViewWidget(
+      WebPlatformInAppWebViewWidgetCreationParams());
+
+  factory WebPlatformInAppWebViewWidget.static() {
+    return _staticValue;
+  }
+
   @override
   Widget build(BuildContext context) {
     final initialSettings =

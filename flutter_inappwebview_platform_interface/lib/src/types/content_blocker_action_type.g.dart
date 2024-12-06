@@ -19,9 +19,9 @@ class ContentBlockerActionType {
   ///Stops loading of the resource. If the resource was cached, the cache is ignored.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Android native WebView
-  ///- iOS
-  ///- MacOS
+  ///- Android WebView
+  ///- iOS WKWebView
+  ///- macOS WKWebView
   static final BLOCK =
       ContentBlockerActionType._internalMultiPlatform('block', () {
     switch (defaultTargetPlatform) {
@@ -42,8 +42,8 @@ class ContentBlockerActionType {
   ///Combining with [IGNORE_PREVIOUS_RULES] doesn't override the browser’s privacy settings.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- iOS
-  ///- MacOS
+  ///- iOS WKWebView
+  ///- macOS WKWebView
   static final BLOCK_COOKIES =
       ContentBlockerActionType._internalMultiPlatform('block-cookies', () {
     switch (defaultTargetPlatform) {
@@ -64,9 +64,9 @@ class ContentBlockerActionType {
   ///**NOTE**: on Android, JavaScript must be enabled.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Android native WebView
-  ///- iOS
-  ///- MacOS
+  ///- Android WebView
+  ///- iOS WKWebView
+  ///- macOS WKWebView
   static final CSS_DISPLAY_NONE =
       ContentBlockerActionType._internalMultiPlatform('css-display-none', () {
     switch (defaultTargetPlatform) {
@@ -85,8 +85,8 @@ class ContentBlockerActionType {
   ///Ignores previously triggered actions.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- iOS
-  ///- MacOS
+  ///- iOS WKWebView
+  ///- macOS WKWebView
   static final IGNORE_PREVIOUS_RULES =
       ContentBlockerActionType._internalMultiPlatform('ignore-previous-rules',
           () {
@@ -105,9 +105,9 @@ class ContentBlockerActionType {
   ///URLs with a specified (nondefault) port and links using other protocols are unaffected.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Android native WebView
-  ///- iOS
-  ///- MacOS
+  ///- Android WebView
+  ///- iOS WKWebView
+  ///- macOS WKWebView
   static final MAKE_HTTPS =
       ContentBlockerActionType._internalMultiPlatform('make-https', () {
     switch (defaultTargetPlatform) {
@@ -216,6 +216,11 @@ class ContentBlockerActionType {
 
   @override
   bool operator ==(value) => value == _value;
+
+  ///Checks if the value is supported by the [defaultTargetPlatform].
+  bool isSupported() {
+    return toNativeValue() != null;
+  }
 
   @override
   String toString() {

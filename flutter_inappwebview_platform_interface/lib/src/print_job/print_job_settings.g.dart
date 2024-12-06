@@ -11,54 +11,54 @@ class PrintJobSettings {
   ///`true` to animate the display of the sheet, `false` to display the sheet immediately.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- iOS
+  ///- iOS WKWebView
   bool? animated;
 
   ///Whether the print operation should spawn a separate thread in which to run itself.
   ///The default value is `true`.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- MacOS
+  ///- macOS WKWebView
   bool? canSpawnSeparateThread;
 
   ///The color mode.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Android native WebView
-  ///- MacOS
+  ///- Android WebView
+  ///- macOS WKWebView
   PrintJobColorMode? colorMode;
 
   ///How many copies to print.
   ///The default value is `1`.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- MacOS
+  ///- macOS WKWebView
   int? copies;
 
   ///If `true`, produce detailed reports when an error occurs.
   ///The default value is `false`.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- MacOS
+  ///- macOS WKWebView
   bool? detailedErrorReporting;
 
   ///The duplex mode to use for the print job.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Android native WebView 23+
-  ///- iOS
+  ///- Android WebView 23+
+  ///- iOS WKWebView
   PrintJobDuplexMode? duplexMode;
 
   ///A fax number.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- MacOS
+  ///- macOS WKWebView
   String? faxNumber;
 
   ///An integer value that specifies the first page in the print job.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- MacOS
+  ///- macOS WKWebView
   int? firstPage;
 
   ///The height of the page footer.
@@ -67,7 +67,7 @@ class PrintJobSettings {
   ///The default footer height is `0.0`.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- iOS
+  ///- iOS WKWebView
   double? footerHeight;
 
   ///Force rendering quality.
@@ -75,7 +75,7 @@ class PrintJobSettings {
   ///**NOTE for iOS**: available only on iOS 14.5+.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- iOS
+  ///- iOS WKWebView
   PrintJobRenderingQuality? forceRenderingQuality;
 
   ///Set this to `true` to handle the [PlatformPrintJobController].
@@ -83,16 +83,16 @@ class PrintJobSettings {
   ///The default value is `false`.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Android native WebView
-  ///- iOS
-  ///- MacOS
+  ///- Android WebView
+  ///- iOS WKWebView
+  ///- macOS WKWebView
   bool? handledByClient;
 
   ///If `true`, a standard header and footer are added outside the margins of each page.
   ///The default value is `true`.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- MacOS
+  ///- macOS WKWebView
   bool? headerAndFooter;
 
   ///The height of the page header.
@@ -101,33 +101,33 @@ class PrintJobSettings {
   ///The default header height is `0.0`.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- iOS
+  ///- iOS WKWebView
   double? headerHeight;
 
   ///The horizontal pagination mode.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- MacOS
+  ///- macOS WKWebView
   PrintJobPaginationMode? horizontalPagination;
 
   ///Indicates whether the image is centered horizontally.
   ///The default value is `true`.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- MacOS
+  ///- macOS WKWebView
   bool? isHorizontallyCentered;
 
   ///Indicates whether the image is centered vertically.
   ///The default value is `true`.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- MacOS
+  ///- macOS WKWebView
   bool? isVerticallyCentered;
 
   ///The action specified for the job.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- MacOS
+  ///- macOS WKWebView
   PrintJobDisposition? jobDisposition;
 
   ///The name of the print job.
@@ -135,21 +135,21 @@ class PrintJobSettings {
   ///The default job name is the current webpage title concatenated with the "Document" word at the end.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Android native WebView
-  ///- iOS
-  ///- MacOS
+  ///- Android WebView
+  ///- iOS WKWebView
+  ///- macOS WKWebView
   String? jobName;
 
   ///An URL containing the location to which the job file will be saved when the [jobDisposition] is [PrintJobDisposition.SAVE].
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- MacOS
+  ///- macOS WKWebView
   WebUri? jobSavingURL;
 
   ///An integer value that specifies the last page in the print job.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- MacOS
+  ///- macOS WKWebView
   int? lastPage;
 
   ///The margins for each printed page.
@@ -157,8 +157,8 @@ class PrintJobSettings {
   ///the amount of white space on the left of the content and so on.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- iOS
-  ///- MacOS
+  ///- iOS WKWebView
+  ///- macOS WKWebView
   EdgeInsets? margins;
 
   ///The maximum height of the content area.
@@ -169,7 +169,7 @@ class PrintJobSettings {
   ///The default value of this property is the maximum float value.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- iOS
+  ///- iOS WKWebView
   double? maximumContentHeight;
 
   ///The maximum width of the content area.
@@ -179,98 +179,98 @@ class PrintJobSettings {
   ///The default value of this property is the maximum float value.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- iOS
+  ///- iOS WKWebView
   double? maximumContentWidth;
 
   ///The media size.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Android native WebView
+  ///- Android WebView
   PrintJobMediaSize? mediaSize;
 
   ///If `true`, collates output.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- MacOS
+  ///- macOS WKWebView
   bool? mustCollate;
 
   ///The number of pages to render.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- iOS
-  ///- MacOS
+  ///- iOS WKWebView
+  ///- macOS WKWebView
   int? numberOfPages;
 
   ///The orientation of the printed content, portrait or landscape.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Android native WebView
-  ///- iOS
-  ///- MacOS
+  ///- Android WebView
+  ///- iOS WKWebView
+  ///- macOS WKWebView
   PrintJobOrientation? orientation;
 
   ///The kind of printable content.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- iOS
+  ///- iOS WKWebView
   PrintJobOutputType? outputType;
 
   ///The print order for the pages of the operation.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- MacOS
+  ///- macOS WKWebView
   PrintJobPageOrder? pageOrder;
 
   ///The number of logical pages to be tiled horizontally on a physical sheet of paper.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- MacOS
+  ///- macOS WKWebView
   int? pagesAcross;
 
   ///The number of logical pages to be tiled vertically on a physical sheet of paper.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- MacOS
+  ///- macOS WKWebView
   int? pagesDown;
 
   ///The name of the currently selected paper size.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- MacOS
+  ///- macOS WKWebView
   String? paperName;
 
   ///The supported resolution in DPI (dots per inch).
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Android native WebView
+  ///- Android WebView
   PrintJobResolution? resolution;
 
   ///The current scaling factor. From `0.0` to `1.0`.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- MacOS
+  ///- macOS WKWebView
   double? scalingFactor;
 
   ///A Boolean value that determines whether the printing options include the number of copies.
   ///The default value is `true`.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- iOS
-  ///- MacOS
+  ///- iOS WKWebView
+  ///- macOS WKWebView
   bool? showsNumberOfCopies;
 
   ///A Boolean value that determines whether the Print panel includes a set of fields for manipulating the range of pages being printed.
   ///The default value is `true`.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- MacOS
+  ///- macOS WKWebView
   bool? showsPageRange;
 
   ///A Boolean value that determines whether the Print panel includes a separate accessory view for manipulating the paper size, orientation, and scaling attributes.
   ///The default value is `true`.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- MacOS
+  ///- macOS WKWebView
   bool? showsPageSetupAccessory;
 
   ///A Boolean value that determines whether the printing options include the paper orientation control when available.
@@ -279,8 +279,8 @@ class PrintJobSettings {
   ///**NOTE for iOS**: available only on iOS 15.0+.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- iOS
-  ///- MacOS
+  ///- iOS WKWebView
+  ///- macOS WKWebView
   bool? showsPaperOrientation;
 
   ///A Boolean value that determines whether the paper selection menu displays.
@@ -289,21 +289,21 @@ class PrintJobSettings {
   ///On printers where only one paper type is available, no paper selection menu is displayed, regardless of the value of this property.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- iOS
+  ///- iOS WKWebView
   bool? showsPaperSelectionForLoadedPapers;
 
   ///A Boolean value that determines whether the print panel includes a control for manipulating the paper size of the printer.
   ///The default value is `true`.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- MacOS
+  ///- macOS WKWebView
   bool? showsPaperSize;
 
   ///A Boolean value that determines whether the Print panel displays a built-in preview of the document contents.
   ///The default value is `true`.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- MacOS
+  ///- macOS WKWebView
   bool? showsPreview;
 
   ///A Boolean value that determines whether the print operation displays a print panel.
@@ -314,14 +314,14 @@ class PrintJobSettings {
   ///Operations that generate EPS or PDF data do no display a progress panel, regardless of the value in the flag parameter.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- MacOS
+  ///- macOS WKWebView
   bool? showsPrintPanel;
 
   ///A Boolean value that determines whether the Print panel includes an additional selection option for paper range.
   ///The default value is `true`.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- MacOS
+  ///- macOS WKWebView
   bool? showsPrintSelection;
 
   ///A Boolean value that determines whether the print operation displays a progress panel.
@@ -332,26 +332,26 @@ class PrintJobSettings {
   ///Operations that generate EPS or PDF data do no display a progress panel, regardless of the value in the flag parameter.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- MacOS
+  ///- macOS WKWebView
   bool? showsProgressPanel;
 
   ///A Boolean value that determines whether the Print panel includes a control for scaling the printed output.
   ///The default value is `true`.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- MacOS
+  ///- macOS WKWebView
   bool? showsScaling;
 
   ///A timestamp that specifies the time at which printing should begin.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- MacOS
+  ///- macOS WKWebView
   int? time;
 
   ///The vertical pagination to the specified mode.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- MacOS
+  ///- macOS WKWebView
   PrintJobPaginationMode? verticalPagination;
   PrintJobSettings(
       {this.animated = true,

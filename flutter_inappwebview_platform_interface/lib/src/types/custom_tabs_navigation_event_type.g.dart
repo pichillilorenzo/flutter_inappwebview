@@ -19,7 +19,7 @@ class CustomTabsNavigationEventType {
   ///Sent when loading was aborted by a user action before it finishes like clicking on a link or refreshing the page.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Android native WebView
+  ///- Android WebView
   static final ABORTED =
       CustomTabsNavigationEventType._internalMultiPlatform(4, () {
     switch (defaultTargetPlatform) {
@@ -34,7 +34,7 @@ class CustomTabsNavigationEventType {
   ///Sent when the tab couldn't finish loading due to a failure.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Android native WebView
+  ///- Android WebView
   static final FAILED =
       CustomTabsNavigationEventType._internalMultiPlatform(3, () {
     switch (defaultTargetPlatform) {
@@ -49,7 +49,7 @@ class CustomTabsNavigationEventType {
   ///Sent when the tab has finished loading a page.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Android native WebView
+  ///- Android WebView
   static final FINISHED =
       CustomTabsNavigationEventType._internalMultiPlatform(2, () {
     switch (defaultTargetPlatform) {
@@ -64,7 +64,7 @@ class CustomTabsNavigationEventType {
   ///Sent when the tab has started loading a page.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Android native WebView
+  ///- Android WebView
   static final STARTED =
       CustomTabsNavigationEventType._internalMultiPlatform(1, () {
     switch (defaultTargetPlatform) {
@@ -79,7 +79,7 @@ class CustomTabsNavigationEventType {
   ///Sent when the tab becomes hidden.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Android native WebView
+  ///- Android WebView
   static final TAB_HIDDEN =
       CustomTabsNavigationEventType._internalMultiPlatform(6, () {
     switch (defaultTargetPlatform) {
@@ -94,7 +94,7 @@ class CustomTabsNavigationEventType {
   ///Sent when the tab becomes visible.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Android native WebView
+  ///- Android WebView
   static final TAB_SHOWN =
       CustomTabsNavigationEventType._internalMultiPlatform(5, () {
     switch (defaultTargetPlatform) {
@@ -176,7 +176,7 @@ class CustomTabsNavigationEventType {
   ///Gets [int] value.
   int toValue() => _value;
 
-  ///Gets [int?] native value.
+  ///Gets [int] native value if supported by the current platform, otherwise `null`.
   int? toNativeValue() => _nativeValue;
 
   ///Gets the name of the value.
@@ -203,6 +203,11 @@ class CustomTabsNavigationEventType {
 
   @override
   bool operator ==(value) => value == _value;
+
+  ///Checks if the value is supported by the [defaultTargetPlatform].
+  bool isSupported() {
+    return toNativeValue() != null;
+  }
 
   @override
   String toString() {

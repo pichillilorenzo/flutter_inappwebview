@@ -62,6 +62,15 @@ class IOSInAppWebViewPlatform extends InAppWebViewPlatform {
     return IOSInAppWebViewWidget(params);
   }
 
+  /// Creates a new empty [IOSInAppWebViewWidget] to access static methods.
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [InAppWebView] in `flutter_inappwebview` instead.
+  @override
+  IOSInAppWebViewWidget createPlatformInAppWebViewWidgetStatic() {
+    return IOSInAppWebViewWidget.static();
+  }
+
   /// Creates a new [IOSFindInteractionController].
   ///
   /// This function should only be called by the app-facing package.
@@ -190,6 +199,15 @@ class IOSInAppWebViewPlatform extends InAppWebViewPlatform {
     PlatformHeadlessInAppWebViewCreationParams params,
   ) {
     return IOSHeadlessInAppWebView(params);
+  }
+
+  /// Creates a new empty [IOSHeadlessInAppWebView] to access static methods.
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [HeadlessInAppWebView] in `flutter_inappwebview` instead.
+  @override
+  IOSHeadlessInAppWebView createPlatformHeadlessInAppWebViewStatic() {
+    return IOSHeadlessInAppWebView.static();
   }
 
   /// Creates a new [IOSHttpAuthCredentialDatabase].

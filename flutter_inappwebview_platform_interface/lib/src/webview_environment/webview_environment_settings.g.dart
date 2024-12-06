@@ -12,7 +12,7 @@ part of 'webview_environment_settings.dart';
 ///may be overridden by values either specified in environment variables or in the registry.
 ///
 ///**Officially Supported Platforms/Implementations**:
-///- Windows
+///- Windows WebView2
 class WebViewEnvironmentSettings {
   ///If there are multiple switches, there should be a space in between them.
   ///The one exception is if multiple features are being enabled/disabled for a single switch,
@@ -20,14 +20,14 @@ class WebViewEnvironmentSettings {
   ///Example: `"--disable-features=feature1,feature2 --some-other-switch --do-something"`
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Windows ([Official API - ICoreWebView2EnvironmentOptions.put_AdditionalBrowserArguments](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2environmentoptions?view=webview2-1.0.2210.55#put_additionalbrowserarguments))
+  ///- Windows WebView2 ([Official API - ICoreWebView2EnvironmentOptions.put_AdditionalBrowserArguments](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2environmentoptions?view=webview2-1.0.2210.55#put_additionalbrowserarguments))
   final String? additionalBrowserArguments;
 
   ///This property is used to enable single sign on with Azure Active Directory (AAD)
   ///and personal Microsoft Account (MSA) resources inside WebView.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Windows ([Official API - ICoreWebView2EnvironmentOptions.put_AllowSingleSignOnUsingOSPrimaryAccount](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2environmentoptions?view=webview2-1.0.2210.55#put_allowsinglesignonusingosprimaryaccount))
+  ///- Windows WebView2 ([Official API - ICoreWebView2EnvironmentOptions.put_AllowSingleSignOnUsingOSPrimaryAccount](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2environmentoptions?view=webview2-1.0.2210.55#put_allowsinglesignonusingosprimaryaccount))
   final bool? allowSingleSignOnUsingOSPrimaryAccount;
 
   ///When this property is set to `true` new extensions can be added to user profile and used.
@@ -38,7 +38,7 @@ class WebViewEnvironmentSettings {
   ///[areBrowserExtensionsEnabled] property, it will fail with `HRESULT_FROM_WIN32(ERROR_INVALID_STATE)`.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Windows 1.0.2210.55+ ([Official API - ICoreWebView2EnvironmentOptions6.put_AreBrowserExtensionsEnabled](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2environmentoptions6?view=webview2-1.0.2849.39#put_arebrowserextensionsenabled))
+  ///- Windows WebView2 1.0.2210.55+ ([Official API - ICoreWebView2EnvironmentOptions6.put_AreBrowserExtensionsEnabled](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2environmentoptions6?view=webview2-1.0.2849.39#put_arebrowserextensionsenabled))
   final bool? areBrowserExtensionsEnabled;
 
   ///Use [browserExecutableFolder] to specify whether WebView2 controls use a fixed
@@ -58,7 +58,7 @@ class WebViewEnvironmentSettings {
   ///applicable `releaseChannelPreference` registry value is set to `1`, the channel search order is reversed.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Windows ([Official API - CreateCoreWebView2EnvironmentWithOptions.browserExecutableFolder](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2210.55#createcorewebview2environmentwithoptions))
+  ///- Windows WebView2 ([Official API - CreateCoreWebView2EnvironmentWithOptions.browserExecutableFolder](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2210.55#createcorewebview2environmentwithoptions))
   final String? browserExecutableFolder;
 
   ///This property is [EnvironmentChannelSearchKind.MOST_STABLE] by default;
@@ -76,13 +76,13 @@ class WebViewEnvironmentSettings {
   ///Set the value to `1` to set the search kind to [EnvironmentChannelSearchKind.LEAST_STABLE].
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Windows 1.0.2478.35+ ([Official API - ICoreWebView2EnvironmentOptions7.put_ChannelSearchKind](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2environmentoptions7?view=webview2-1.0.2849.39#put_channelsearchkind))
+  ///- Windows WebView2 1.0.2478.35+ ([Official API - ICoreWebView2EnvironmentOptions7.put_ChannelSearchKind](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2environmentoptions7?view=webview2-1.0.2849.39#put_channelsearchkind))
   final EnvironmentChannelSearchKind? channelSearchKind;
 
   ///Set the array of custom scheme registrations to be used.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Windows 1.0.1587.40+ ([Official API - ICoreWebView2EnvironmentOptions4.SetCustomSchemeRegistrations](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2environmentoptions4?view=webview2-1.0.2739.15#setcustomschemeregistrations))
+  ///- Windows WebView2 1.0.1587.40+ ([Official API - ICoreWebView2EnvironmentOptions4.SetCustomSchemeRegistrations](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2environmentoptions4?view=webview2-1.0.2739.15#setcustomschemeregistrations))
   final List<CustomSchemeRegistration>? customSchemeRegistrations;
 
   ///This property is used to enable/disable tracking prevention feature in WebView2.
@@ -102,7 +102,7 @@ class WebViewEnvironmentSettings {
   ///See [Tracking prevention](https://learn.microsoft.com/en-us/microsoft-edge/web-platform/tracking-prevention).
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Windows 1.0.1661.34+ ([Official API - ICoreWebView2EnvironmentOptions5.put_EnableTrackingPrevention](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2environmentoptions5?view=webview2-1.0.2849.39#put_enabletrackingprevention))
+  ///- Windows WebView2 1.0.1661.34+ ([Official API - ICoreWebView2EnvironmentOptions5.put_EnableTrackingPrevention](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2environmentoptions5?view=webview2-1.0.2849.39#put_enabletrackingprevention))
   final bool? enableTrackingPrevention;
 
   ///Whether other processes can create WebView2 from WebView2Environment created
@@ -111,7 +111,7 @@ class WebViewEnvironmentSettings {
   ///The default value is `false`.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Windows 1.0.1185.39+ ([Official API - ICoreWebView2EnvironmentOptions2.put_ExclusiveUserDataFolderAccess](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2environmentoptions2?view=webview2-1.0.2849.39#put_exclusiveuserdatafolderaccess))
+  ///- Windows WebView2 1.0.1185.39+ ([Official API - ICoreWebView2EnvironmentOptions2.put_ExclusiveUserDataFolderAccess](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2environmentoptions2?view=webview2-1.0.2849.39#put_exclusiveuserdatafolderaccess))
   final bool? exclusiveUserDataFolderAccess;
 
   ///When IsCustomCrashReportingEnabled is set to `true`,
@@ -121,13 +121,13 @@ class WebViewEnvironmentSettings {
   ///In this case, WebView will respect OS consent.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Windows 1.0.1518.46+ ([Official API - ICoreWebView2EnvironmentOptions3.put_IsCustomCrashReportingEnabled](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2environmentoptions3?view=webview2-1.0.2849.39#put_iscustomcrashreportingenabled))
+  ///- Windows WebView2 1.0.1518.46+ ([Official API - ICoreWebView2EnvironmentOptions3.put_IsCustomCrashReportingEnabled](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2environmentoptions3?view=webview2-1.0.2849.39#put_iscustomcrashreportingenabled))
   final bool? isCustomCrashReportingEnabled;
 
   ///The default display language for WebView.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Windows ([Official API - ICoreWebView2EnvironmentOptions.put_Language](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2environmentoptions?view=webview2-1.0.2210.55#put_language))
+  ///- Windows WebView2 ([Official API - ICoreWebView2EnvironmentOptions.put_Language](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2environmentoptions?view=webview2-1.0.2210.55#put_language))
   final String? language;
 
   ///Sets the [releaseChannels], which is a mask of one or more [EnvironmentReleaseChannels]
@@ -166,7 +166,7 @@ class WebViewEnvironmentSettings {
   ///[PlatformWebViewEnvironment] creation attempts to interpret each integer and treats any invalid entry as Stable channel.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Windows 1.0.2478.35+ ([Official API - ICoreWebView2EnvironmentOptions7.put_ReleaseChannels](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2environmentoptions7?view=webview2-1.0.2849.39#put_releasechannels))
+  ///- Windows WebView2 1.0.2478.35+ ([Official API - ICoreWebView2EnvironmentOptions7.put_ReleaseChannels](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2environmentoptions7?view=webview2-1.0.2849.39#put_releasechannels))
   final EnvironmentReleaseChannels? releaseChannels;
 
   ///The ScrollBar style being set on the WebView2 Environment.
@@ -178,13 +178,13 @@ class WebViewEnvironmentSettings {
   ///CSS styles that modify the ScrollBar applied on top of native ScrollBar styling that is selected with [scrollbarStyle].
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Windows 1.0.2535.41+ ([Official API - ICoreWebView2EnvironmentOptions8.put_ScrollBarStyle](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2environmentoptions8?view=webview2-1.0.2849.39#put_scrollbarstyle))
+  ///- Windows WebView2 1.0.2535.41+ ([Official API - ICoreWebView2EnvironmentOptions8.put_ScrollBarStyle](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2environmentoptions8?view=webview2-1.0.2849.39#put_scrollbarstyle))
   final EnvironmentScrollbarStyle? scrollbarStyle;
 
   ///Specifies the version of the WebView2 Runtime binaries required to be compatible with your app.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Windows ([Official API - ICoreWebView2EnvironmentOptions.put_TargetCompatibleBrowserVersion](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2environmentoptions?view=webview2-1.0.2210.55#put_targetcompatiblebrowserversion))
+  ///- Windows WebView2 ([Official API - ICoreWebView2EnvironmentOptions.put_TargetCompatibleBrowserVersion](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2environmentoptions?view=webview2-1.0.2210.55#put_targetcompatiblebrowserversion))
   final String? targetCompatibleBrowserVersion;
 
   ///You may specify the [userDataFolder] to change the default user data folder location for WebView2.
@@ -203,12 +203,12 @@ class WebViewEnvironmentSettings {
   ///running in the shared browser process.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Windows ([Official API - CreateCoreWebView2EnvironmentWithOptions.userDataFolder](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2210.55#createcorewebview2environmentwithoptions))
+  ///- Windows WebView2 ([Official API - CreateCoreWebView2EnvironmentWithOptions.userDataFolder](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2210.55#createcorewebview2environmentwithoptions))
   final String? userDataFolder;
 
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Windows
+  ///- Windows WebView2
   WebViewEnvironmentSettings(
       {this.additionalBrowserArguments,
       this.allowSingleSignOnUsingOSPrimaryAccount,

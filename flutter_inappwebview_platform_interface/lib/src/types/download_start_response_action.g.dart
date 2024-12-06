@@ -19,7 +19,7 @@ class DownloadStartResponseAction {
   ///Cancel the download.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Windows
+  ///- Windows WebView2
   static final CANCEL =
       DownloadStartResponseAction._internalMultiPlatform(0, () {
     switch (defaultTargetPlatform) {
@@ -113,6 +113,11 @@ class DownloadStartResponseAction {
 
   @override
   bool operator ==(value) => value == _value;
+
+  ///Checks if the value is supported by the [defaultTargetPlatform].
+  bool isSupported() {
+    return toNativeValue() != null;
+  }
 
   @override
   String toString() {

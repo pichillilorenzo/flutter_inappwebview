@@ -2,6 +2,7 @@ import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_pla
 
 import 'cookie_manager.dart';
 import 'in_app_webview/main.dart';
+import 'in_app_browser/main.dart';
 
 /// Implementation of [InAppWebViewPlatform] using the Web API.
 class WebPlatformInAppWebViewPlatform extends InAppWebViewPlatform {
@@ -53,6 +54,16 @@ class WebPlatformInAppWebViewPlatform extends InAppWebViewPlatform {
     return WebPlatformInAppWebViewWidget(params);
   }
 
+  /// Creates a new empty [WebPlatformInAppWebViewWidget] to access static methods.
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [InAppWebView] in `flutter_inappwebview` instead.
+  @override
+  WebPlatformInAppWebViewWidget createPlatformInAppWebViewWidgetStatic() {
+    return WebPlatformInAppWebViewWidget.static();
+  }
+
+
   /// Creates a new [WebPlatformHeadlessInAppWebView].
   ///
   /// This function should only be called by the app-facing package.
@@ -62,5 +73,23 @@ class WebPlatformInAppWebViewPlatform extends InAppWebViewPlatform {
     PlatformHeadlessInAppWebViewCreationParams params,
   ) {
     return WebPlatformHeadlessInAppWebView(params);
+  }
+
+  /// Creates a new empty [WebPlatformHeadlessInAppWebView] to access static methods.
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [HeadlessInAppWebView] in `flutter_inappwebview` instead.
+  @override
+  WebPlatformHeadlessInAppWebView createPlatformHeadlessInAppWebViewStatic() {
+    return WebPlatformHeadlessInAppWebView.static();
+  }
+
+  /// Creates a new empty [WebPlatformInAppBrowser] to access static methods.
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [InAppBrowser] in `flutter_inappwebview` instead.
+  @override
+  WebPlatformInAppBrowser createPlatformInAppBrowserStatic() {
+    return WebPlatformInAppBrowser.static();
   }
 }

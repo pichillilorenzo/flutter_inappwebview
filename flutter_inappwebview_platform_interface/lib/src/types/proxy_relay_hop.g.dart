@@ -17,22 +17,22 @@ class ProxyRelayHop {
   ///A dictionary of additional HTTP headers to send as part of CONNECT requests to the relay.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- iOS
-  ///- MacOS
+  ///- iOS WKWebView
+  ///- macOS WKWebView
   Map<String, String>? additionalHTTPHeaders;
 
   ///A URL or host endpoint identifying the relay server accessible using HTTP/2.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- iOS
-  ///- MacOS
+  ///- iOS WKWebView
+  ///- macOS WKWebView
   String? http2RelayEndpoint;
 
   ///A URL or host endpoint identifying the relay server accessible using HTTP/3.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- iOS
-  ///- MacOS
+  ///- iOS WKWebView
+  ///- macOS WKWebView
   String? http3RelayEndpoint;
   ProxyRelayHop(
       {this.http3RelayEndpoint,

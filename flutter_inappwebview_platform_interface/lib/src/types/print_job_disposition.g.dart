@@ -19,7 +19,7 @@ class PrintJobDisposition {
   ///Cancel print job.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- MacOS
+  ///- macOS WKWebView
   static final CANCEL =
       PrintJobDisposition._internalMultiPlatform('CANCEL', () {
     switch (defaultTargetPlatform) {
@@ -34,7 +34,7 @@ class PrintJobDisposition {
   ///Send to Preview application.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- MacOS
+  ///- macOS WKWebView
   static final PREVIEW =
       PrintJobDisposition._internalMultiPlatform('PREVIEW', () {
     switch (defaultTargetPlatform) {
@@ -49,7 +49,7 @@ class PrintJobDisposition {
   ///Save to a file.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- MacOS
+  ///- macOS WKWebView
   static final SAVE = PrintJobDisposition._internalMultiPlatform('SAVE', () {
     switch (defaultTargetPlatform) {
       case TargetPlatform.macOS:
@@ -63,7 +63,7 @@ class PrintJobDisposition {
   ///Normal print job.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- MacOS
+  ///- macOS WKWebView
   static final SPOOL = PrintJobDisposition._internalMultiPlatform('SPOOL', () {
     switch (defaultTargetPlatform) {
       case TargetPlatform.macOS:
@@ -164,6 +164,11 @@ class PrintJobDisposition {
 
   @override
   bool operator ==(value) => value == _value;
+
+  ///Checks if the value is supported by the [defaultTargetPlatform].
+  bool isSupported() {
+    return toNativeValue() != null;
+  }
 
   @override
   String toString() {

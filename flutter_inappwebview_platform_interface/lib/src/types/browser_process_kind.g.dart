@@ -19,7 +19,7 @@ class BrowserProcessKind {
   ///Indicates the browser process kind.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Windows
+  ///- Windows WebView2
   static final BROWSER = BrowserProcessKind._internalMultiPlatform(0, () {
     switch (defaultTargetPlatform) {
       case TargetPlatform.windows:
@@ -33,7 +33,7 @@ class BrowserProcessKind {
   ///Indicates the GPU process kind.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Windows
+  ///- Windows WebView2
   static final GPU = BrowserProcessKind._internalMultiPlatform(4, () {
     switch (defaultTargetPlatform) {
       case TargetPlatform.windows:
@@ -47,7 +47,7 @@ class BrowserProcessKind {
   ///Indicates the PPAPI plugin broker process kind.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Windows
+  ///- Windows WebView2
   static final PPAPI_BROKER = BrowserProcessKind._internalMultiPlatform(6, () {
     switch (defaultTargetPlatform) {
       case TargetPlatform.windows:
@@ -61,7 +61,7 @@ class BrowserProcessKind {
   ///Indicates the PPAPI plugin process kind.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Windows
+  ///- Windows WebView2
   static final PPAPI_PLUGIN = BrowserProcessKind._internalMultiPlatform(5, () {
     switch (defaultTargetPlatform) {
       case TargetPlatform.windows:
@@ -75,7 +75,7 @@ class BrowserProcessKind {
   ///Indicates the render process kind.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Windows
+  ///- Windows WebView2
   static final RENDERER = BrowserProcessKind._internalMultiPlatform(1, () {
     switch (defaultTargetPlatform) {
       case TargetPlatform.windows:
@@ -89,7 +89,7 @@ class BrowserProcessKind {
   ///Indicates the sandbox helper process kind.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Windows
+  ///- Windows WebView2
   static final SANDBOX_HELPER =
       BrowserProcessKind._internalMultiPlatform(3, () {
     switch (defaultTargetPlatform) {
@@ -104,7 +104,7 @@ class BrowserProcessKind {
   ///Indicates the utility process kind.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Windows
+  ///- Windows WebView2
   static final UTILITY = BrowserProcessKind._internalMultiPlatform(2, () {
     switch (defaultTargetPlatform) {
       case TargetPlatform.windows:
@@ -218,6 +218,12 @@ class BrowserProcessKind {
   BrowserProcessKind operator |(BrowserProcessKind value) =>
       BrowserProcessKind._internal(
           value.toValue() | _value, value.toNativeValue() | _nativeValue);
+
+  ///Checks if the value is supported by the [defaultTargetPlatform].
+  bool isSupported() {
+    return toNativeValue() != null;
+  }
+
   @override
   String toString() {
     return name();

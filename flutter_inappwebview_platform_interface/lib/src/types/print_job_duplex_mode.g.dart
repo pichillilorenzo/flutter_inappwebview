@@ -20,9 +20,9 @@ class PrintJobDuplexMode {
   ///Pages are turned sideways along the long edge - like a book.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Android native WebView
-  ///- iOS
-  ///- MacOS
+  ///- Android WebView
+  ///- iOS WKWebView
+  ///- macOS WKWebView
   static final LONG_EDGE =
       PrintJobDuplexMode._internalMultiPlatform('LONG_EDGE', () {
     switch (defaultTargetPlatform) {
@@ -41,9 +41,9 @@ class PrintJobDuplexMode {
   ///No double-sided (duplex) printing; single-sided printing only.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Android native WebView
-  ///- iOS
-  ///- MacOS
+  ///- Android WebView
+  ///- iOS WKWebView
+  ///- macOS WKWebView
   static final NONE = PrintJobDuplexMode._internalMultiPlatform('NONE', () {
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
@@ -62,9 +62,9 @@ class PrintJobDuplexMode {
   ///Pages are turned upwards along the short edge - like a notepad.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Android native WebView
-  ///- iOS
-  ///- MacOS
+  ///- Android WebView
+  ///- iOS WKWebView
+  ///- macOS WKWebView
   static final SHORT_EDGE =
       PrintJobDuplexMode._internalMultiPlatform('SHORT_EDGE', () {
     switch (defaultTargetPlatform) {
@@ -146,7 +146,7 @@ class PrintJobDuplexMode {
   ///Gets [String] value.
   String toValue() => _value;
 
-  ///Gets [int?] native value.
+  ///Gets [int] native value if supported by the current platform, otherwise `null`.
   int? toNativeValue() => _nativeValue;
 
   ///Gets the name of the value.
@@ -167,6 +167,11 @@ class PrintJobDuplexMode {
 
   @override
   bool operator ==(value) => value == _value;
+
+  ///Checks if the value is supported by the [defaultTargetPlatform].
+  bool isSupported() {
+    return toNativeValue() != null;
+  }
 
   @override
   String toString() {

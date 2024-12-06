@@ -11,43 +11,43 @@ class FrameInfo {
   ///The unique identifier of the frame associated with the current [FrameInfo].
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Windows
+  ///- Windows WebView2
   int? frameId;
 
   ///A Boolean value indicating whether the frame is the web site's main frame or a subframe.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- iOS
-  ///- MacOS
-  ///- Windows
+  ///- iOS WKWebView
+  ///- macOS WKWebView
+  ///- Windows WebView2
   bool isMainFrame;
 
   ///The kind of the frame.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Windows
+  ///- Windows WebView2
   FrameKind? kind;
 
   ///Gets the name attribute of the frame, as in <iframe name="frame-name">...</iframe>.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Windows
+  ///- Windows WebView2
   String? name;
 
   ///The frame’s current request.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- iOS
-  ///- MacOS
-  ///- Windows
+  ///- iOS WKWebView
+  ///- macOS WKWebView
+  ///- Windows WebView2
   URLRequest? request;
 
   ///The frame’s security origin.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- iOS
-  ///- MacOS
-  ///- Windows
+  ///- iOS WKWebView
+  ///- macOS WKWebView
+  ///- Windows WebView2
   SecurityOrigin? securityOrigin;
   FrameInfo(
       {this.frameId,

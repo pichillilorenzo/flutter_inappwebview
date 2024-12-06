@@ -1,15 +1,15 @@
 import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_platform_interface.dart';
 
 import 'cookie_manager.dart';
-import 'http_auth_credentials_database.dart';
 import 'find_interaction/main.dart';
+import 'http_auth_credentials_database.dart';
 import 'in_app_browser/in_app_browser.dart';
 import 'in_app_webview/main.dart';
 import 'print_job/main.dart';
+import 'proxy_controller.dart';
+import 'web_authentication_session/main.dart';
 import 'web_message/main.dart';
 import 'web_storage/main.dart';
-import 'web_authentication_session/main.dart';
-import 'proxy_controller.dart';
 
 /// Implementation of [InAppWebViewPlatform] using the WebKit API.
 class MacOSInAppWebViewPlatform extends InAppWebViewPlatform {
@@ -262,7 +262,28 @@ class MacOSInAppWebViewPlatform extends InAppWebViewPlatform {
   /// This function should only be called by the app-facing package.
   /// Look at using [ProxyController] in `flutter_inappwebview` instead.
   @override
-  PlatformProxyController createPlatformProxyController(PlatformProxyControllerCreationParams params) {
+  PlatformProxyController createPlatformProxyController(
+      PlatformProxyControllerCreationParams params) {
     return MacOSProxyController(params);
   }
+
+  // ************************************************************************ //
+  // Create static instances of unsupported classes to be able to call        //
+  // isClassSupported, isMethodSupported, isPropertySupported, etc.           //
+  // static methods without throwing a missing platform implementation        //
+  // exception.                                                               //
+  // ************************************************************************ //
+
+  PlatformChromeSafariBrowser createPlatformChromeSafariBrowserStatic() {
+    return _PlatformChromeSafariBrowser.static();
+  }
+}
+
+class _PlatformChromeSafariBrowser extends PlatformChromeSafariBrowser {
+  _PlatformChromeSafariBrowser(PlatformChromeSafariBrowserCreationParams params)
+      : super.implementation(params);
+  static final _PlatformChromeSafariBrowser _staticValue =
+      _PlatformChromeSafariBrowser(PlatformChromeSafariBrowserCreationParams());
+
+  factory _PlatformChromeSafariBrowser.static() => _staticValue;
 }

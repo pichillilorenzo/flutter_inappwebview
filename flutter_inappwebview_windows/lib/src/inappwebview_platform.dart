@@ -2,11 +2,11 @@ import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_pla
 
 import 'cookie_manager.dart';
 import 'in_app_browser/in_app_browser.dart';
+import 'in_app_webview/headless_in_app_webview.dart';
 import 'in_app_webview/in_app_webview.dart';
 import 'in_app_webview/in_app_webview_controller.dart';
-import 'in_app_webview/headless_in_app_webview.dart';
-import 'webview_environment/webview_environment.dart';
 import 'web_storage/web_storage.dart';
+import 'webview_environment/webview_environment.dart';
 
 /// Implementation of [InAppWebViewPlatform] using the WebKit API.
 class WindowsInAppWebViewPlatform extends InAppWebViewPlatform {
@@ -158,4 +158,28 @@ class WindowsInAppWebViewPlatform extends InAppWebViewPlatform {
   ) {
     return WindowsSessionStorage(params);
   }
+
+  // ************************************************************************ //
+  // Create static instances of unsupported classes to be able to call        //
+  // isClassSupported, isMethodSupported, isPropertySupported, etc.           //
+  // static methods without throwing a missing platform implementation        //
+  // exception.                                                               //
+  // ************************************************************************ //
+
+  /// Creates a new empty [PlatformChromeSafariBrowser] to access static methods.
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [ChromeSafariBrowser] in `flutter_inappwebview` instead.
+  PlatformChromeSafariBrowser createPlatformChromeSafariBrowserStatic() {
+    return _PlatformChromeSafariBrowser.static();
+  }
+}
+
+class _PlatformChromeSafariBrowser extends PlatformChromeSafariBrowser {
+  _PlatformChromeSafariBrowser(PlatformChromeSafariBrowserCreationParams params)
+      : super.implementation(params);
+  static final _PlatformChromeSafariBrowser _staticValue =
+      _PlatformChromeSafariBrowser(PlatformChromeSafariBrowserCreationParams());
+
+  factory _PlatformChromeSafariBrowser.static() => _staticValue;
 }

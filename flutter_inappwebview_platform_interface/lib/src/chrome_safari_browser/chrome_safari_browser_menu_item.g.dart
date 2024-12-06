@@ -9,7 +9,7 @@ part of 'chrome_safari_browser_menu_item.dart';
 ///Class that represents a custom menu item for a [PlatformChromeSafariBrowser] instance.
 ///
 ///**Officially Supported Platforms/Implementations**:
-///- Android WebView :
+///- Android WebView:
 ///    - Not available in an Android Trusted Web Activity.
 ///- iOS WKWebView
 class ChromeSafariBrowserMenuItem {
@@ -31,7 +31,7 @@ class ChromeSafariBrowserMenuItem {
 
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Android WebView :
+  ///- Android WebView:
   ///    - Not available in an Android Trusted Web Activity.
   ///- iOS WKWebView
   ChromeSafariBrowserMenuItem(

@@ -503,7 +503,7 @@ class InAppWebViewSettings {
   ///The default value is `true`.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Android WebView :
+  ///- Android WebView:
   ///    - available on Android only if [WebViewFeature.ENTERPRISE_AUTHENTICATION_APP_LINK_POLICY] feature is supported.
   bool? enterpriseAuthenticationAppLinkPolicyEnabled;
 
@@ -679,7 +679,7 @@ class InAppWebViewSettings {
   ///Set to `true` to open a browser window with incognito mode. The default value is `false`.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Android WebView :
+  ///- Android WebView:
   ///    - setting this to `true`, it will clear all the cookies of all WebView instances, because there isn't any way to make the website data store non-persistent for the specific WebView instance such as on iOS.
   ///- iOS WKWebView
   ///- macOS WKWebView
@@ -1393,7 +1393,7 @@ class InAppWebViewSettings {
   ///Hybrid Composition is supported starting with Flutter v1.20+.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Android WebView :
+  ///- Android WebView:
   ///    - It is recommended to use Hybrid Composition only on Android 10+ for a release app, as it can cause framerate drops on animations in Android 9 and lower (see [Hybrid-Composition#performance](https://github.com/flutter/flutter/wiki/Hybrid-Composition#performance)).
   bool? useHybridComposition;
 
@@ -2995,7 +2995,7 @@ enum InAppWebViewSettingsProperty {
   ///{@template flutter_inappwebview_platform_interface.InAppWebViewSettings.enterpriseAuthenticationAppLinkPolicyEnabled.supported_platforms}
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Android WebView :
+  ///- Android WebView:
   ///    - available on Android only if [WebViewFeature.ENTERPRISE_AUTHENTICATION_APP_LINK_POLICY] feature is supported.
   ///
   ///Use the [InAppWebViewSettings.isPropertySupported] method to check if this property is supported at runtime.
@@ -3245,7 +3245,7 @@ enum InAppWebViewSettingsProperty {
   ///{@template flutter_inappwebview_platform_interface.InAppWebViewSettings.incognito.supported_platforms}
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Android WebView :
+  ///- Android WebView:
   ///    - setting this to `true`, it will clear all the cookies of all WebView instances, because there isn't any way to make the website data store non-persistent for the specific WebView instance such as on iOS.
   ///- iOS WKWebView
   ///- macOS WKWebView
@@ -4105,7 +4105,7 @@ enum InAppWebViewSettingsProperty {
   ///{@template flutter_inappwebview_platform_interface.InAppWebViewSettings.useHybridComposition.supported_platforms}
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Android WebView :
+  ///- Android WebView:
   ///    - It is recommended to use Hybrid Composition only on Android 10+ for a release app, as it can cause framerate drops on animations in Android 9 and lower (see [Hybrid-Composition#performance](https://github.com/flutter/flutter/wiki/Hybrid-Composition#performance)).
   ///
   ///Use the [InAppWebViewSettings.isPropertySupported] method to check if this property is supported at runtime.

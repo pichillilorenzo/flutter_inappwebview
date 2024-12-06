@@ -40,27 +40,39 @@ class PlatformInAppBrowserCreationParams {
     this.webViewEnvironment,
   });
 
-  ///{@macro flutter_inappwebview_platform_interface.PlatformInAppBrowser.contextMenu}
+  ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewCreationParams.contextMenu}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformInAppBrowser.contextMenu.supported_platforms}
   final ContextMenu? contextMenu;
 
-  ///{@macro flutter_inappwebview_platform_interface.PlatformInAppBrowser.pullToRefreshController}
+  ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewCreationParams.pullToRefreshController}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformInAppBrowser.pullToRefreshController.supported_platforms}
   final PlatformPullToRefreshController? pullToRefreshController;
 
-  ///{@macro flutter_inappwebview_platform_interface.PlatformInAppBrowser.findInteractionController}
+  ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewCreationParams.findInteractionController}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformInAppBrowser.findInteractionController.supported_platforms}
   final PlatformFindInteractionController? findInteractionController;
 
-  ///{@macro flutter_inappwebview_platform_interface.PlatformInAppBrowser.initialUserScripts}
+  ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewCreationParams.initialUserScripts}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformInAppBrowser.initialUserScripts.supported_platforms}
   final UnmodifiableListView<UserScript>? initialUserScripts;
 
-  ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewCreationParams.windowId.supported_platforms}
+  ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewCreationParams.windowId}
   ///
-  ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewCreationParams.windowId.supported_platforms}
+  ///{@macro flutter_inappwebview_platform_interface.PlatformInAppBrowser.windowId.supported_platforms}
   final int? windowId;
 
+  ///{@template flutter_inappwebview_platform_interface.PlatformInAppBrowserCreationParams.webViewEnvironment}
   ///Used to create the [PlatformInAppBrowser] using the specified environment.
+  ///{@endtemplate}
   ///
-  ///**Officially Supported Platforms/Implementations**:
-  ///- Windows
+  ///{@macro flutter_inappwebview_platform_interface.PlatformInAppBrowserCreationParams.webViewEnvironment.supported_platforms}
+  @SupportedPlatforms(platforms: [
+    WindowsPlatform(),
+  ])
   final PlatformWebViewEnvironment? webViewEnvironment;
 }
 

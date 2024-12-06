@@ -24,7 +24,7 @@ class NavigationAction {
   ///**Officially Supported Platforms/Implementations**:
   ///- Android WebView 21+ ([Official API - WebResourceRequest.hasGesture](https://developer.android.com/reference/android/webkit/WebResourceRequest#hasGesture())):
   ///    - On Android < 21, this is always `false`
-  ///- Windows WebView2 :
+  ///- Windows WebView2:
   ///    - Available only if the request is associated to the [PlatformWebViewCreationParams.onCreateWindow] event
   bool? hasGesture;
 

@@ -39,7 +39,7 @@ enum PlatformHeadlessInAppWebViewCreationParamsProperty {
   ///{@template flutter_inappwebview_platform_interface.PlatformHeadlessInAppWebViewCreationParams.initialSize.supported_platforms}
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Android WebView :
+  ///- Android WebView:
   ///    - `Size` width and height values will be converted to `int` values because they cannot have `double` values.
   ///- iOS WKWebView
   ///- macOS WKWebView
@@ -167,7 +167,7 @@ enum PlatformHeadlessInAppWebViewMethod {
   ///- Android WebView
   ///- iOS WKWebView
   ///- macOS WKWebView
-  ///- Web \<iframe\> :
+  ///- Web \<iframe\>:
   ///    - It will append a new `iframe` to the body.
   ///- Windows WebView2
   ///
@@ -180,7 +180,7 @@ enum PlatformHeadlessInAppWebViewMethod {
   ///{@template flutter_inappwebview_platform_interface.PlatformHeadlessInAppWebView.setSize.supported_platforms}
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Android WebView :
+  ///- Android WebView:
   ///    - `Size` width and height values will be converted to `int` values because they cannot have `double` values.
   ///- iOS WKWebView
   ///- macOS WKWebView

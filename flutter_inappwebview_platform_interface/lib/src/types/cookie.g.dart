@@ -13,7 +13,7 @@ class Cookie {
   ///**Officially Supported Platforms/Implementations**:
   ///- iOS WKWebView
   ///- macOS WKWebView
-  ///- Android WebView :
+  ///- Android WebView:
   ///    - available on Android only if [WebViewFeature.GET_COOKIE_INFO] feature is supported.
   ///- Windows WebView2
   String? domain;
@@ -23,7 +23,7 @@ class Cookie {
   ///**Officially Supported Platforms/Implementations**:
   ///- iOS WKWebView
   ///- macOS WKWebView
-  ///- Android WebView :
+  ///- Android WebView:
   ///    - available on Android only if [WebViewFeature.GET_COOKIE_INFO] feature is supported.
   ///- Windows WebView2
   int? expiresDate;
@@ -33,7 +33,7 @@ class Cookie {
   ///**Officially Supported Platforms/Implementations**:
   ///- iOS WKWebView
   ///- macOS WKWebView
-  ///- Android WebView :
+  ///- Android WebView:
   ///    - available on Android only if [WebViewFeature.GET_COOKIE_INFO] feature is supported.
   ///- Windows WebView2
   bool? isHttpOnly;
@@ -43,7 +43,7 @@ class Cookie {
   ///**Officially Supported Platforms/Implementations**:
   ///- iOS WKWebView
   ///- macOS WKWebView
-  ///- Android WebView :
+  ///- Android WebView:
   ///    - available on Android only if [WebViewFeature.GET_COOKIE_INFO] feature is supported.
   ///- Windows WebView2
   bool? isSecure;
@@ -71,7 +71,7 @@ class Cookie {
   ///**Officially Supported Platforms/Implementations**:
   ///- iOS WKWebView
   ///- macOS WKWebView
-  ///- Android WebView :
+  ///- Android WebView:
   ///    - available on Android only if [WebViewFeature.GET_COOKIE_INFO] feature is supported.
   ///- Windows WebView2
   String? path;
@@ -81,7 +81,7 @@ class Cookie {
   ///**Officially Supported Platforms/Implementations**:
   ///- iOS WKWebView
   ///- macOS WKWebView
-  ///- Android WebView :
+  ///- Android WebView:
   ///    - available on Android only if [WebViewFeature.GET_COOKIE_INFO] feature is supported.
   ///- Windows WebView2
   HTTPCookieSameSitePolicy? sameSite;

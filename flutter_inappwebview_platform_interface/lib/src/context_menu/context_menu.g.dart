@@ -9,7 +9,7 @@ part of 'context_menu.dart';
 ///Class that represents the WebView context menu. It used by [PlatformWebViewCreationParams.contextMenu].
 ///
 ///**Officially Supported Platforms/Implementations**:
-///- Android WebView :
+///- Android WebView:
 ///    - To make it work properly on Android, JavaScript should be enabled!
 ///- iOS WKWebView
 class ContextMenu {
@@ -38,7 +38,7 @@ class ContextMenu {
 
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Android WebView :
+  ///- Android WebView:
   ///    - To make it work properly on Android, JavaScript should be enabled!
   ///- iOS WKWebView
   ContextMenu(

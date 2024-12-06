@@ -182,9 +182,9 @@ enum PlatformInAppWebViewControllerMethod {
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- Android WebView
-  ///- iOS WKWebView :
+  ///- iOS WKWebView:
   ///    - This method will throw an error if the [PlatformWebViewCreationParams.windowId] has been set. There isn't any way to add/remove user scripts specific to window WebViews. This is a limitation of the native WebKit APIs.
-  ///- macOS WKWebView :
+  ///- macOS WKWebView:
   ///    - This method will throw an error if the [PlatformWebViewCreationParams.windowId] has been set. There isn't any way to add/remove user scripts specific to window WebViews. This is a limitation of the native WebKit APIs.
   ///- Web \<iframe\> but requires same origin
   ///- Windows WebView2
@@ -203,9 +203,9 @@ enum PlatformInAppWebViewControllerMethod {
   ///**Officially Supported Platforms/Implementations**:
   ///- Android WebView ([Official API - WebViewCompat.WebMessageListener](https://developer.android.com/reference/androidx/webkit/WebViewCompat#addWebMessageListener(android.webkit.WebView,%20java.lang.String,%20java.util.Set%3Cjava.lang.String%3E,%20androidx.webkit.WebViewCompat.WebMessageListener))):
   ///    - This method should only be called if [WebViewFeature.isFeatureSupported] returns `true` for [WebViewFeature.WEB_MESSAGE_LISTENER].
-  ///- iOS WKWebView :
+  ///- iOS WKWebView:
   ///    - This method is implemented using JavaScript.
-  ///- macOS WKWebView :
+  ///- macOS WKWebView:
   ///    - This method is implemented using JavaScript.
   ///
   ///**Parameters - Officially Supported Platforms/Implementations**:
@@ -301,7 +301,7 @@ enum PlatformInAppWebViewControllerMethod {
   ///**Officially Supported Platforms/Implementations**:
   ///- Android WebView
   ///- iOS WKWebView
-  ///- macOS WKWebView :
+  ///- macOS WKWebView:
   ///    - This method is implemented using JavaScript.
   ///- Web \<iframe\> but requires same origin
   ///
@@ -316,7 +316,7 @@ enum PlatformInAppWebViewControllerMethod {
   ///**Officially Supported Platforms/Implementations**:
   ///- Android WebView
   ///- iOS WKWebView
-  ///- macOS WKWebView :
+  ///- macOS WKWebView:
   ///    - This method is implemented using JavaScript.
   ///- Web \<iframe\> but requires same origin
   ///
@@ -472,9 +472,9 @@ enum PlatformInAppWebViewControllerMethod {
   ///**Officially Supported Platforms/Implementations**:
   ///- Android WebView ([Official API - WebViewCompat.createWebMessageChannel](https://developer.android.com/reference/androidx/webkit/WebViewCompat#createWebMessageChannel(android.webkit.WebView))):
   ///    - This method should only be called if [WebViewFeature.isFeatureSupported] returns `true` for [WebViewFeature.CREATE_WEB_MESSAGE_CHANNEL].
-  ///- iOS WKWebView :
+  ///- iOS WKWebView:
   ///    - This method is implemented using JavaScript.
-  ///- macOS WKWebView :
+  ///- macOS WKWebView:
   ///    - This method is implemented using JavaScript.
   ///
   ///Use the [PlatformInAppWebViewController.isMethodSupported] method to check if this method is supported at runtime.
@@ -629,7 +629,7 @@ enum PlatformInAppWebViewControllerMethod {
   ///**Officially Supported Platforms/Implementations**:
   ///- Android WebView ([Official API - WebView.getContentHeight](https://developer.android.com/reference/android/webkit/WebView#getContentHeight()))
   ///- iOS WKWebView ([Official API - UIScrollView.contentSize](https://developer.apple.com/documentation/uikit/uiscrollview/1619399-contentsize))
-  ///- macOS WKWebView :
+  ///- macOS WKWebView:
   ///    - This method is implemented using JavaScript.
   ///- Web \<iframe\> but requires same origin ([Official API - Document.documentElement.scrollHeight](https://developer.mozilla.org/en-US/docs/Web/API/Element/scrollHeight))
   ///
@@ -642,10 +642,10 @@ enum PlatformInAppWebViewControllerMethod {
   ///{@template flutter_inappwebview_platform_interface.PlatformInAppWebViewController.getContentWidth.supported_platforms}
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Android WebView :
+  ///- Android WebView:
   ///    - This method is implemented using JavaScript.
   ///- iOS WKWebView ([Official API - UIScrollView.contentSize](https://developer.apple.com/documentation/uikit/uiscrollview/1619399-contentsize))
-  ///- macOS WKWebView :
+  ///- macOS WKWebView:
   ///    - This method is implemented using JavaScript.
   ///- Web \<iframe\> but requires same origin ([Official API - Document.documentElement.scrollWidth](https://developer.mozilla.org/en-US/docs/Web/API/Element/scrollWidth))
   ///
@@ -713,7 +713,7 @@ enum PlatformInAppWebViewControllerMethod {
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- Android WebView ([Official API - WebView.getHitTestResult](https://developer.android.com/reference/android/webkit/WebView#getHitTestResult()))
-  ///- iOS WKWebView :
+  ///- iOS WKWebView:
   ///    - This method is implemented using JavaScript.
   ///
   ///Use the [PlatformInAppWebViewController.isMethodSupported] method to check if this method is supported at runtime.
@@ -766,15 +766,15 @@ enum PlatformInAppWebViewControllerMethod {
   ///{@template flutter_inappwebview_platform_interface.PlatformInAppWebViewController.getMetaTags.supported_platforms}
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Android WebView :
+  ///- Android WebView:
   ///    - This method is implemented using JavaScript.
-  ///- iOS WKWebView :
+  ///- iOS WKWebView:
   ///    - This method is implemented using JavaScript.
-  ///- macOS WKWebView :
+  ///- macOS WKWebView:
   ///    - This method is implemented using JavaScript.
   ///- Web \<iframe\> but requires same origin:
   ///    - This method is implemented using JavaScript.
-  ///- Windows WebView2 :
+  ///- Windows WebView2:
   ///    - This method is implemented using JavaScript.
   ///
   ///Use the [PlatformInAppWebViewController.isMethodSupported] method to check if this method is supported at runtime.
@@ -786,7 +786,7 @@ enum PlatformInAppWebViewControllerMethod {
   ///{@template flutter_inappwebview_platform_interface.PlatformInAppWebViewController.getMetaThemeColor.supported_platforms}
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Android WebView :
+  ///- Android WebView:
   ///    - This method is implemented using JavaScript.
   ///- iOS WKWebView ([Official API - WKWebView.themeColor](https://developer.apple.com/documentation/webkit/wkwebview/3794258-themecolor)):
   ///    - On iOS < 15.0, this method is implemented using JavaScript.
@@ -794,7 +794,7 @@ enum PlatformInAppWebViewControllerMethod {
   ///    - On iOS < 12.0, this method is implemented using JavaScript.
   ///- Web \<iframe\> but requires same origin:
   ///    - This method is implemented using JavaScript.
-  ///- Windows WebView2 :
+  ///- Windows WebView2:
   ///    - This method is implemented using JavaScript.
   ///
   ///Use the [PlatformInAppWebViewController.isMethodSupported] method to check if this method is supported at runtime.
@@ -890,7 +890,7 @@ enum PlatformInAppWebViewControllerMethod {
   ///**Officially Supported Platforms/Implementations**:
   ///- Android WebView ([Official API - View.getScrollX](https://developer.android.com/reference/android/view/View#getScrollX()))
   ///- iOS WKWebView ([Official API - UIScrollView.contentOffset](https://developer.apple.com/documentation/uikit/uiscrollview/1619404-contentoffset))
-  ///- macOS WKWebView :
+  ///- macOS WKWebView:
   ///    - This method is implemented using JavaScript.
   ///- Web \<iframe\> but requires same origin ([Official API - Window.scrollX](https://developer.mozilla.org/en-US/docs/Web/API/Window/scrollX))
   ///
@@ -905,7 +905,7 @@ enum PlatformInAppWebViewControllerMethod {
   ///**Officially Supported Platforms/Implementations**:
   ///- Android WebView ([Official API - View.getScrollY](https://developer.android.com/reference/android/view/View#getScrollY()))
   ///- iOS WKWebView ([Official API - UIScrollView.contentOffset](https://developer.apple.com/documentation/uikit/uiscrollview/1619404-contentoffset))
-  ///- macOS WKWebView :
+  ///- macOS WKWebView:
   ///    - This method is implemented using JavaScript.
   ///- Web \<iframe\> but requires same origin ([Official API - Window.scrollY](https://developer.mozilla.org/en-US/docs/Web/API/Window/scrollY))
   ///
@@ -918,11 +918,11 @@ enum PlatformInAppWebViewControllerMethod {
   ///{@template flutter_inappwebview_platform_interface.PlatformInAppWebViewController.getSelectedText.supported_platforms}
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Android WebView :
+  ///- Android WebView:
   ///    - This method is implemented using JavaScript.
-  ///- iOS WKWebView :
+  ///- iOS WKWebView:
   ///    - This method is implemented using JavaScript.
-  ///- macOS WKWebView :
+  ///- macOS WKWebView:
   ///    - This method is implemented using JavaScript.
   ///- Web \<iframe\> but requires same origin:
   ///    - This method is implemented using JavaScript.
@@ -1353,11 +1353,11 @@ enum PlatformInAppWebViewControllerMethod {
   ///{@template flutter_inappwebview_platform_interface.PlatformInAppWebViewController.isSecureContext.supported_platforms}
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Android WebView 21+ :
+  ///- Android WebView 21+:
   ///    - This method is implemented using JavaScript.
-  ///- iOS WKWebView :
+  ///- iOS WKWebView:
   ///    - This method is implemented using JavaScript.
-  ///- macOS WKWebView :
+  ///- macOS WKWebView:
   ///    - This method is implemented using JavaScript.
   ///- Web \<iframe\> but requires same origin ([Official API - Window.isSecureContext](https://developer.mozilla.org/en-US/docs/Web/API/Window/isSecureContext))
   ///
@@ -1534,9 +1534,9 @@ enum PlatformInAppWebViewControllerMethod {
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- Android WebView ([Official API - WebView.pauseTimers](https://developer.android.com/reference/android/webkit/WebView#pauseTimers()))
-  ///- iOS WKWebView :
+  ///- iOS WKWebView:
   ///    - This method is implemented using JavaScript and it is restricted to just this WebView.
-  ///- macOS WKWebView :
+  ///- macOS WKWebView:
   ///    - This method is implemented using JavaScript and it is restricted to just this WebView.
   ///
   ///Use the [PlatformInAppWebViewController.isMethodSupported] method to check if this method is supported at runtime.
@@ -1570,9 +1570,9 @@ enum PlatformInAppWebViewControllerMethod {
   ///**Officially Supported Platforms/Implementations**:
   ///- Android WebView ([Official API - WebView.postWebMessage](https://developer.android.com/reference/androidx/webkit/WebViewCompat#postWebMessage(android.webkit.WebView,%20androidx.webkit.WebMessageCompat,%20android.net.Uri))):
   ///    - This method should only be called if [WebViewFeature.isFeatureSupported] returns `true` for [WebViewFeature.POST_WEB_MESSAGE].
-  ///- iOS WKWebView :
+  ///- iOS WKWebView:
   ///    - This method is implemented using JavaScript.
-  ///- macOS WKWebView :
+  ///- macOS WKWebView:
   ///    - This method is implemented using JavaScript.
   ///
   ///**Parameters - Officially Supported Platforms/Implementations**:
@@ -1685,9 +1685,9 @@ enum PlatformInAppWebViewControllerMethod {
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- Android WebView
-  ///- iOS WKWebView :
+  ///- iOS WKWebView:
   ///    - This method will throw an error if the [PlatformWebViewCreationParams.windowId] has been set. There isn't any way to add/remove user scripts specific to window WebViews. This is a limitation of the native WebKit APIs.
-  ///- macOS WKWebView :
+  ///- macOS WKWebView:
   ///    - This method will throw an error if the [PlatformWebViewCreationParams.windowId] has been set. There isn't any way to add/remove user scripts specific to window WebViews. This is a limitation of the native WebKit APIs.
   ///- Web \<iframe\> but requires same origin
   ///- Windows WebView2
@@ -1705,9 +1705,9 @@ enum PlatformInAppWebViewControllerMethod {
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- Android WebView
-  ///- iOS WKWebView :
+  ///- iOS WKWebView:
   ///    - This method will throw an error if the [PlatformWebViewCreationParams.windowId] has been set. There isn't any way to add/remove user scripts specific to window WebViews. This is a limitation of the native WebKit APIs.
-  ///- macOS WKWebView :
+  ///- macOS WKWebView:
   ///    - This method will throw an error if the [PlatformWebViewCreationParams.windowId] has been set. There isn't any way to add/remove user scripts specific to window WebViews. This is a limitation of the native WebKit APIs.
   ///- Web \<iframe\> but requires same origin
   ///- Windows WebView2
@@ -1725,9 +1725,9 @@ enum PlatformInAppWebViewControllerMethod {
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- Android WebView
-  ///- iOS WKWebView :
+  ///- iOS WKWebView:
   ///    - This method will throw an error if the [PlatformWebViewCreationParams.windowId] has been set. There isn't any way to add/remove user scripts specific to window WebViews. This is a limitation of the native WebKit APIs.
-  ///- macOS WKWebView :
+  ///- macOS WKWebView:
   ///    - This method will throw an error if the [PlatformWebViewCreationParams.windowId] has been set. There isn't any way to add/remove user scripts specific to window WebViews. This is a limitation of the native WebKit APIs.
   ///- Web \<iframe\> but requires same origin
   ///- Windows WebView2
@@ -1764,7 +1764,7 @@ enum PlatformInAppWebViewControllerMethod {
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- Android WebView ([Official API - WebView.requestFocusNodeHref](https://developer.android.com/reference/android/webkit/WebView#requestFocusNodeHref(android.os.Message)))
-  ///- iOS WKWebView :
+  ///- iOS WKWebView:
   ///    - This method is implemented using JavaScript.
   ///
   ///Use the [PlatformInAppWebViewController.isMethodSupported] method to check if this method is supported at runtime.
@@ -1777,7 +1777,7 @@ enum PlatformInAppWebViewControllerMethod {
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- Android WebView ([Official API - WebView.requestImageRef](https://developer.android.com/reference/android/webkit/WebView#requestImageRef(android.os.Message)))
-  ///- iOS WKWebView :
+  ///- iOS WKWebView:
   ///    - This method is implemented using JavaScript.
   ///
   ///Use the [PlatformInAppWebViewController.isMethodSupported] method to check if this method is supported at runtime.
@@ -1831,9 +1831,9 @@ enum PlatformInAppWebViewControllerMethod {
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- Android WebView ([Official API - WebView.resumeTimers](https://developer.android.com/reference/android/webkit/WebView#resumeTimers()))
-  ///- iOS WKWebView :
+  ///- iOS WKWebView:
   ///    - This method is implemented using JavaScript and it is restricted to just this WebView.
-  ///- macOS WKWebView :
+  ///- macOS WKWebView:
   ///    - This method is implemented using JavaScript and it is restricted to just this WebView.
   ///
   ///Use the [PlatformInAppWebViewController.isMethodSupported] method to check if this method is supported at runtime.
@@ -1861,9 +1861,9 @@ enum PlatformInAppWebViewControllerMethod {
   ///**Officially Supported Platforms/Implementations**:
   ///- Android WebView ([Official API - WebView.saveWebArchive](https://developer.android.com/reference/android/webkit/WebView#saveWebArchive(java.lang.String,%20boolean,%20android.webkit.ValueCallback%3Cjava.lang.String%3E))):
   ///    - if [autoname] is `false`, the [filePath] must ends with the [WebArchiveFormat.MHT] file extension.
-  ///- iOS WKWebView 14.0+ :
+  ///- iOS WKWebView 14.0+:
   ///    - If [autoname] is `false`, the [filePath] must ends with the [WebArchiveFormat.WEBARCHIVE] file extension.
-  ///- macOS WKWebView 11.0+ :
+  ///- macOS WKWebView 11.0+:
   ///    - If [autoname] is `false`, the [filePath] must ends with the [WebArchiveFormat.WEBARCHIVE] file extension.
   ///
   ///**Parameters - Officially Supported Platforms/Implementations**:
@@ -1881,7 +1881,7 @@ enum PlatformInAppWebViewControllerMethod {
   ///**Officially Supported Platforms/Implementations**:
   ///- Android WebView ([Official API - View.scrollBy](https://developer.android.com/reference/android/view/View#scrollBy(int,%20int)))
   ///- iOS WKWebView ([Official API - UIScrollView.setContentOffset](https://developer.apple.com/documentation/uikit/uiscrollview/1619400-setcontentoffset))
-  ///- macOS WKWebView :
+  ///- macOS WKWebView:
   ///    - This method is implemented using JavaScript.
   ///- Web \<iframe\> but requires same origin ([Official API - Window.scrollBy](https://developer.mozilla.org/en-US/docs/Web/API/Window/scrollBy))
   ///
@@ -1901,7 +1901,7 @@ enum PlatformInAppWebViewControllerMethod {
   ///**Officially Supported Platforms/Implementations**:
   ///- Android WebView ([Official API - View.scrollTo](https://developer.android.com/reference/android/webkit/WebView#scrollTo(int,%20int)))
   ///- iOS WKWebView ([Official API - UIScrollView.setContentOffset](https://developer.apple.com/documentation/uikit/uiscrollview/1619400-setcontentoffset))
-  ///- macOS WKWebView :
+  ///- macOS WKWebView:
   ///    - This method is implemented using JavaScript.
   ///- Web \<iframe\> but requires same origin ([Official API - Window.scrollTo](https://developer.mozilla.org/en-US/docs/Web/API/Window/scrollTo))
   ///
@@ -2130,7 +2130,7 @@ enum PlatformInAppWebViewControllerMethod {
   ///{@template flutter_inappwebview_platform_interface.PlatformInAppWebViewController.takeScreenshot.supported_platforms}
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Android WebView :
+  ///- Android WebView:
   ///    - To be able to take screenshots outside the visible viewport, you must call [PlatformInAppWebViewController.enableSlowWholeDocumentDraw] before any WebViews are created.
   ///- iOS WKWebView 11.0+ ([Official API - WKWebView.takeSnapshot](https://developer.apple.com/documentation/webkit/wkwebview/2873260-takesnapshot))
   ///- macOS WKWebView 10.13+ ([Official API - WKWebView.takeSnapshot](https://developer.apple.com/documentation/webkit/wkwebview/2873260-takesnapshot))

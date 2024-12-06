@@ -5,11 +5,17 @@ abstract class Platform {
   final String? apiName;
   final String? apiUrl;
   final String? note;
+  final String name;
+  final String targetPlatformName;
 
-  const Platform({this.available, this.apiName, this.apiUrl, this.note});
-
-  final name = "";
-  final targetPlatformName = "";
+  const Platform({
+    this.available,
+    this.apiName,
+    this.apiUrl,
+    this.note,
+    this.name = '',
+    this.targetPlatformName = '',
+  });
 }
 
 class AndroidPlatform implements Platform {
@@ -17,11 +23,17 @@ class AndroidPlatform implements Platform {
   final String? apiName;
   final String? apiUrl;
   final String? note;
+  final String name;
+  final String targetPlatformName;
 
-  const AndroidPlatform({this.available, this.apiName, this.apiUrl, this.note});
-
-  final name = kPlatformNameAndroid;
-  final targetPlatformName = kTargetPlatformNameAndroid;
+  const AndroidPlatform({
+    this.available,
+    this.apiName,
+    this.apiUrl,
+    this.note,
+    this.name = kPlatformNameAndroid,
+    this.targetPlatformName = kTargetPlatformNameAndroid,
+  });
 }
 
 class IOSPlatform implements Platform {
@@ -29,11 +41,17 @@ class IOSPlatform implements Platform {
   final String? apiName;
   final String? apiUrl;
   final String? note;
+  final String name;
+  final String targetPlatformName;
 
-  const IOSPlatform({this.available, this.apiName, this.apiUrl, this.note});
-
-  final name = kPlatformNameIOS;
-  final targetPlatformName = kTargetPlatformNameIOS;
+  const IOSPlatform({
+    this.available,
+    this.apiName,
+    this.apiUrl,
+    this.note,
+    this.name = kPlatformNameIOS,
+    this.targetPlatformName = kTargetPlatformNameIOS,
+  });
 }
 
 class MacOSPlatform implements Platform {
@@ -41,11 +59,17 @@ class MacOSPlatform implements Platform {
   final String? apiName;
   final String? apiUrl;
   final String? note;
+  final String name;
+  final String targetPlatformName;
 
-  const MacOSPlatform({this.available, this.apiName, this.apiUrl, this.note});
-
-  final name = kPlatformNameMacOS;
-  final targetPlatformName = kTargetPlatformNameMacOS;
+  const MacOSPlatform({
+    this.available,
+    this.apiName,
+    this.apiUrl,
+    this.note,
+    this.name = kPlatformNameMacOS,
+    this.targetPlatformName = kTargetPlatformNameMacOS,
+  });
 }
 
 class WindowsPlatform implements Platform {
@@ -53,11 +77,17 @@ class WindowsPlatform implements Platform {
   final String? apiName;
   final String? apiUrl;
   final String? note;
+  final String name;
+  final String targetPlatformName;
 
-  const WindowsPlatform({this.available, this.apiName, this.apiUrl, this.note});
-
-  final name = kPlatformNameWindows;
-  final targetPlatformName = kTargetPlatformNameWindows;
+  const WindowsPlatform({
+    this.available,
+    this.apiName,
+    this.apiUrl,
+    this.note,
+    this.name = kPlatformNameWindows,
+    this.targetPlatformName = kTargetPlatformNameWindows,
+  });
 }
 
 class LinuxPlatform implements Platform {
@@ -65,11 +95,17 @@ class LinuxPlatform implements Platform {
   final String? apiName;
   final String? apiUrl;
   final String? note;
+  final String name;
+  final String targetPlatformName;
 
-  const LinuxPlatform({this.available, this.apiName, this.apiUrl, this.note});
-
-  final name = kPlatformNameLinux;
-  final targetPlatformName = kTargetPlatformNameLinux;
+  const LinuxPlatform({
+    this.available,
+    this.apiName,
+    this.apiUrl,
+    this.note,
+    this.name = kPlatformNameLinux,
+    this.targetPlatformName = kTargetPlatformNameLinux,
+  });
 }
 
 class WebPlatform implements Platform {
@@ -77,17 +113,19 @@ class WebPlatform implements Platform {
   final String? apiName;
   final String? apiUrl;
   final String? note;
+  final String name;
+  final String targetPlatformName;
   final bool requiresSameOrigin;
 
-  const WebPlatform(
-      {this.available,
-      this.apiName,
-      this.apiUrl,
-      this.note,
-      this.requiresSameOrigin = true});
-
-  final name = kPlatformNameWeb;
-  final targetPlatformName = kTargetPlatformNameWeb;
+  const WebPlatform({
+    this.available,
+    this.apiName,
+    this.apiUrl,
+    this.note,
+    this.requiresSameOrigin = true,
+    this.name = kPlatformNameWeb,
+    this.targetPlatformName = kTargetPlatformNameWeb,
+  });
 }
 
 class SupportedPlatforms {

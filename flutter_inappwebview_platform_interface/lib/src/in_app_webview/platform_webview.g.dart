@@ -333,7 +333,7 @@ enum PlatformWebViewCreationParamsProperty {
   ///{@template flutter_inappwebview_platform_interface.PlatformWebViewCreationParams.initialUrlRequest.supported_platforms}
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Android WebView :
+  ///- Android WebView:
   ///    - When loading an URL Request using "POST" method, headers are ignored.
   ///- iOS WKWebView
   ///- macOS WKWebView
@@ -350,9 +350,9 @@ enum PlatformWebViewCreationParamsProperty {
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- Android WebView
-  ///- iOS WKWebView :
+  ///- iOS WKWebView:
   ///    - This property will be ignored if the [PlatformWebViewCreationParams.windowId] has been set. There isn't any way to add/remove user scripts specific to iOS window WebViews. This is a limitation of the native WebKit APIs.
-  ///- macOS WKWebView :
+  ///- macOS WKWebView:
   ///    - This property will be ignored if the [PlatformWebViewCreationParams.windowId] has been set. There isn't any way to add/remove user scripts specific to iOS window WebViews. This is a limitation of the native WebKit APIs.
   ///- Web \<iframe\> but requires same origin
   ///- Windows WebView2
@@ -434,7 +434,7 @@ enum PlatformWebViewCreationParamsProperty {
   ///{@template flutter_inappwebview_platform_interface.PlatformWebViewCreationParams.onAjaxProgress.supported_platforms}
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Android WebView :
+  ///- Android WebView:
   ///    - In order to be able to listen this event, check the [InAppWebViewSettings.useShouldInterceptAjaxRequest] and [InAppWebViewSettings.useOnAjaxProgress] settings documentation. Also, on Android that doesn't support the [WebViewFeature.DOCUMENT_START_SCRIPT], unlike iOS that has [WKUserScript](https://developer.apple.com/documentation/webkit/wkuserscript) that can inject javascript code right after the document element is created but before any other content is loaded, in Android the javascript code used to intercept ajax requests is loaded as soon as possible so it won't be instantaneous as iOS. In that case, after the `window.addEventListener("flutterInAppWebViewPlatformReady")` event is dispatched, the ajax requests can be intercept for sure.
   ///- iOS WKWebView
   ///- macOS WKWebView
@@ -451,7 +451,7 @@ enum PlatformWebViewCreationParamsProperty {
   ///{@template flutter_inappwebview_platform_interface.PlatformWebViewCreationParams.onAjaxReadyStateChange.supported_platforms}
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Android WebView :
+  ///- Android WebView:
   ///    - In order to be able to listen this event, check the [InAppWebViewSettings.useShouldInterceptAjaxRequest] and [InAppWebViewSettings.useOnAjaxReadyStateChange] settings documentation. Also, on Android that doesn't support the [WebViewFeature.DOCUMENT_START_SCRIPT], unlike iOS that has [WKUserScript](https://developer.apple.com/documentation/webkit/wkuserscript) that can inject javascript code right after the document element is created but before any other content is loaded, in Android the javascript code used to intercept ajax requests is loaded as soon as possible so it won't be instantaneous as iOS. In that case, after the `window.addEventListener("flutterInAppWebViewPlatformReady")` event is dispatched, the ajax requests can be intercept for sure.
   ///- iOS WKWebView
   ///- macOS WKWebView
@@ -500,9 +500,9 @@ enum PlatformWebViewCreationParamsProperty {
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- Android WebView ([Official API - WebChromeClient.onConsoleMessage](https://developer.android.com/reference/android/webkit/WebChromeClient#onConsoleMessage(android.webkit.ConsoleMessage)))
-  ///- iOS WKWebView :
+  ///- iOS WKWebView:
   ///    - This event is implemented using JavaScript.
-  ///- macOS WKWebView :
+  ///- macOS WKWebView:
   ///    - This event is implemented using JavaScript.
   ///- Web \<iframe\> but requires same origin
   ///- Windows WebView2
@@ -804,11 +804,11 @@ enum PlatformWebViewCreationParamsProperty {
   ///{@template flutter_inappwebview_platform_interface.PlatformWebViewCreationParams.onLoadResource.supported_platforms}
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Android WebView :
+  ///- Android WebView:
   ///    - This event is implemented using JavaScript.
-  ///- iOS WKWebView :
+  ///- iOS WKWebView:
   ///    - This event is implemented using JavaScript.
-  ///- macOS WKWebView :
+  ///- macOS WKWebView:
   ///    - This event is implemented using JavaScript.
   ///
   ///**Parameters - Officially Supported Platforms/Implementations**:
@@ -976,9 +976,9 @@ enum PlatformWebViewCreationParamsProperty {
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- Android WebView 21+ ([Official API - WebChromeClient.onPermissionRequest](https://developer.android.com/reference/android/webkit/WebChromeClient#onPermissionRequest(android.webkit.PermissionRequest)))
-  ///- iOS WKWebView 15.0+ :
+  ///- iOS WKWebView 15.0+:
   ///    - The default [PermissionResponse.action] is [PermissionResponseAction.PROMPT].
-  ///- macOS WKWebView 12.0+ :
+  ///- macOS WKWebView 12.0+:
   ///    - The default [PermissionResponse.action] is [PermissionResponseAction.PROMPT].
   ///- Windows WebView2 ([Official API - ICoreWebView2.add_PermissionRequested](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2?view=webview2-1.0.2210.55#add_permissionrequested))
   ///
@@ -1280,7 +1280,7 @@ enum PlatformWebViewCreationParamsProperty {
   ///**Officially Supported Platforms/Implementations**:
   ///- Android WebView ([Official API - WebView.onScrollChanged](https://developer.android.com/reference/android/webkit/WebView#onScrollChanged(int,%20int,%20int,%20int)))
   ///- iOS WKWebView ([Official API - UIScrollViewDelegate.scrollViewDidScroll](https://developer.apple.com/documentation/uikit/uiscrollviewdelegate/1619392-scrollviewdidscroll))
-  ///- macOS WKWebView :
+  ///- macOS WKWebView:
   ///    - This event is implemented using JavaScript.
   ///- Web \<iframe\> but requires same origin ([Official API - Window.onscroll](https://developer.mozilla.org/en-US/docs/Web/API/GlobalEventHandlers/onscroll))
   ///
@@ -1423,7 +1423,7 @@ enum PlatformWebViewCreationParamsProperty {
   ///{@template flutter_inappwebview_platform_interface.PlatformWebViewCreationParams.pullToRefreshController.supported_platforms}
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Android WebView :
+  ///- Android WebView:
   ///    - To be able to use the "pull-to-refresh" feature, [InAppWebViewSettings.useHybridComposition] must be `true`.
   ///- iOS WKWebView
   ///
@@ -1451,7 +1451,7 @@ enum PlatformWebViewCreationParamsProperty {
   ///{@template flutter_inappwebview_platform_interface.PlatformWebViewCreationParams.shouldInterceptAjaxRequest.supported_platforms}
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Android WebView :
+  ///- Android WebView:
   ///    - In order to be able to listen this event, check the [InAppWebViewSettings.useShouldInterceptAjaxRequest] setting documentation. Also, on Android that doesn't support the [WebViewFeature.DOCUMENT_START_SCRIPT], unlike iOS that has [WKUserScript](https://developer.apple.com/documentation/webkit/wkuserscript) that can inject javascript code right after the document element is created but before any other content is loaded, in Android the javascript code used to intercept ajax requests is loaded as soon as possible so it won't be instantaneous as iOS. In that case, after the `window.addEventListener("flutterInAppWebViewPlatformReady")` event is dispatched, the ajax requests can be intercept for sure.
   ///- iOS WKWebView
   ///- macOS WKWebView
@@ -1468,7 +1468,7 @@ enum PlatformWebViewCreationParamsProperty {
   ///{@template flutter_inappwebview_platform_interface.PlatformWebViewCreationParams.shouldInterceptFetchRequest.supported_platforms}
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Android WebView :
+  ///- Android WebView:
   ///    - In order to be able to listen this event, check the [InAppWebViewSettings.useShouldInterceptFetchRequest] setting documentation. Also, on Android that doesn't support the [WebViewFeature.DOCUMENT_START_SCRIPT], unlike iOS that has [WKUserScript](https://developer.apple.com/documentation/webkit/wkuserscript) that can inject javascript code right after the document element is created but before any other content is loaded, in Android the javascript code used to intercept ajax requests is loaded as soon as possible so it won't be instantaneous as iOS. In that case, after the `window.addEventListener("flutterInAppWebViewPlatformReady")` event is dispatched, the ajax requests can be intercept for sure.
   ///- iOS WKWebView
   ///- macOS WKWebView

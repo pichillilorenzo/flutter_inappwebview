@@ -61,6 +61,15 @@ abstract class InAppWebViewPlatform extends PlatformInterface {
         'createPlatformCookieManager is not implemented on the current platform.');
   }
 
+  /// Creates a new empty [PlatformCookieManager] to access static methods.
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [CookieManager] in `flutter_inappwebview` instead.
+  PlatformCookieManager createPlatformCookieManagerStatic() {
+    throw UnimplementedError(
+        'createPlatformCookieManagerStatic is not implemented on the current platform.');
+  }
+
   /// Creates a new [PlatformInAppWebViewController].
   ///
   /// This function should only be called by the app-facing package.

@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
-
 import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_platform_interface.dart';
 
 import 'webview_environment/webview_environment.dart';
@@ -47,6 +46,13 @@ class WindowsCookieManager extends PlatformCookieManager
         'com.pichillilorenzo/flutter_inappwebview_cookiemanager');
     handler = handleMethod;
     initMethodCallHandler();
+  }
+
+  static final WindowsCookieManager _staticValue =
+      WindowsCookieManager(WindowsCookieManagerCreationParams());
+
+  factory WindowsCookieManager.static() {
+    return _staticValue;
   }
 
   static WindowsCookieManager? _instance;

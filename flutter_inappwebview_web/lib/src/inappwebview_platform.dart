@@ -21,6 +21,15 @@ class WebPlatformInAppWebViewPlatform extends InAppWebViewPlatform {
     return WebPlatformCookieManager(params);
   }
 
+  /// Creates a new empty [WebPlatformCookieManager] to access static methods.
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [CookieManager] in `flutter_inappwebview` instead.
+  @override
+  WebPlatformCookieManager createPlatformCookieManagerStatic() {
+    return WebPlatformCookieManager.static();
+  }
+
   /// Creates a new [WebPlatformInAppWebViewController].
   ///
   /// This function should only be called by the app-facing package.

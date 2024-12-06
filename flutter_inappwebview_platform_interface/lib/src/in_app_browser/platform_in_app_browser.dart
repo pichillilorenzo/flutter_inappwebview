@@ -24,10 +24,12 @@ import 'in_app_browser_settings.dart';
 
 part 'platform_in_app_browser.g.dart';
 
+///{@template flutter_inappwebview_platform_interface.PlatformInAppBrowserCreationParams}
 /// Object specifying creation parameters for creating a [PlatformInAppBrowser].
 ///
 /// Platform specific implementations can add additional fields by extending
 /// this class.
+///{@endtemplate}
 @immutable
 class PlatformInAppBrowserCreationParams {
   /// Used by the platform implementation to create a new [PlatformInAppBrowser].
@@ -69,10 +71,7 @@ class PlatformInAppBrowserCreationParams {
   ///Used to create the [PlatformInAppBrowser] using the specified environment.
   ///{@endtemplate}
   ///
-  ///{@macro flutter_inappwebview_platform_interface.PlatformInAppBrowserCreationParams.webViewEnvironment.supported_platforms}
-  @SupportedPlatforms(platforms: [
-    WindowsPlatform(),
-  ])
+  ///{@macro flutter_inappwebview_platform_interface.PlatformInAppBrowser.webViewEnvironment.supported_platforms}
   final PlatformWebViewEnvironment? webViewEnvironment;
 }
 
@@ -169,6 +168,14 @@ This is a limitation of the native WebKit APIs."""),
     WindowsPlatform(),
   ])
   int? get windowId => params.windowId;
+
+  ///{@macro flutter_inappwebview_platform_interface.PlatformInAppBrowserCreationParams.webViewEnvironment}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformInAppBrowser.webViewEnvironment.supported_platforms}
+  @SupportedPlatforms(platforms: [
+    WindowsPlatform(),
+  ])
+  PlatformWebViewEnvironment? get webViewEnvironment => params.webViewEnvironment;
 
   ///{@template flutter_inappwebview_platform_interface.PlatformInAppBrowser.webViewController}
   ///WebView Controller that can be used to access the [PlatformInAppWebViewController] API.
@@ -630,7 +637,7 @@ This is a limitation of the native WebKit APIs."""),
           platform: platform);
 
   ///{@template flutter_inappwebview_platform_interface.PlatformInAppBrowser.isMethodSupported}
-  ///Check if the given [property] is supported by the [defaultTargetPlatform] or a specific [platform].
+  ///Check if the given [method] is supported by the [defaultTargetPlatform] or a specific [platform].
   ///{@endtemplate}
   bool isMethodSupported(PlatformInAppBrowserMethod method,
       {TargetPlatform? platform}) =>

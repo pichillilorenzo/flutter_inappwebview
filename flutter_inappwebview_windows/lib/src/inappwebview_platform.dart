@@ -26,6 +26,15 @@ class WindowsInAppWebViewPlatform extends InAppWebViewPlatform {
     return WindowsCookieManager(params);
   }
 
+  /// Creates a new empty [WindowsCookieManager] to access static methods.
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [CookieManager] in `flutter_inappwebview` instead.
+  @override
+  WindowsCookieManager createPlatformCookieManagerStatic() {
+    return WindowsCookieManager.static();
+  }
+
   /// Creates a new [WindowsInAppWebViewController].
   ///
   /// This function should only be called by the app-facing package.

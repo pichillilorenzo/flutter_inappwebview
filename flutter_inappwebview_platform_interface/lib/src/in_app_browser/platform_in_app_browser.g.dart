@@ -97,6 +97,17 @@ enum PlatformInAppBrowserProperty {
   ///{@endtemplate}
   pullToRefreshController,
 
+  ///Can be used to check if the [PlatformInAppBrowser.webViewEnvironment] property is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.PlatformInAppBrowser.webViewEnvironment.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Windows WebView2
+  ///
+  ///Use the [PlatformInAppBrowser.isPropertySupported] method to check if this property is supported at runtime.
+  ///{@endtemplate}
+  webViewEnvironment,
+
   ///Can be used to check if the [PlatformInAppBrowser.windowId] property is supported at runtime.
   ///
   ///{@template flutter_inappwebview_platform_interface.PlatformInAppBrowser.windowId.supported_platforms}
@@ -143,6 +154,10 @@ extension _PlatformInAppBrowserPropertySupported on PlatformInAppBrowser {
       case PlatformInAppBrowserProperty.pullToRefreshController:
         return !kIsWeb &&
             [TargetPlatform.android, TargetPlatform.iOS]
+                .contains(platform ?? defaultTargetPlatform);
+      case PlatformInAppBrowserProperty.webViewEnvironment:
+        return !kIsWeb &&
+            [TargetPlatform.windows]
                 .contains(platform ?? defaultTargetPlatform);
       case PlatformInAppBrowserProperty.windowId:
         return !kIsWeb &&

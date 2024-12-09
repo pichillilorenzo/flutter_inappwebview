@@ -191,6 +191,15 @@ class WindowsInAppWebViewPlatform extends InAppWebViewPlatform {
   PlatformHttpAuthCredentialDatabase createPlatformHttpAuthCredentialDatabaseStatic() {
     return _PlatformHttpAuthCredentialDatabase.static();
   }
+
+  /// Creates a new empty [PlatformProcessGlobalConfig] to access static methods.
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [ProcessGlobalConfig] in `flutter_inappwebview` instead.
+  @override
+  PlatformProcessGlobalConfig createPlatformProcessGlobalConfigStatic() {
+    return _PlatformProcessGlobalConfig.static();
+  }
 }
 
 class _PlatformChromeSafariBrowser extends PlatformChromeSafariBrowser {
@@ -213,4 +222,14 @@ class _PlatformHttpAuthCredentialDatabase
           const PlatformHttpAuthCredentialDatabaseCreationParams());
 
   factory _PlatformHttpAuthCredentialDatabase.static() => _staticValue;
+}
+
+class _PlatformProcessGlobalConfig extends PlatformProcessGlobalConfig {
+  _PlatformProcessGlobalConfig(PlatformProcessGlobalConfigCreationParams params)
+      : super.implementation(params);
+  static final _PlatformProcessGlobalConfig _staticValue =
+  _PlatformProcessGlobalConfig(
+      const PlatformProcessGlobalConfigCreationParams());
+
+  factory _PlatformProcessGlobalConfig.static() => _staticValue;
 }

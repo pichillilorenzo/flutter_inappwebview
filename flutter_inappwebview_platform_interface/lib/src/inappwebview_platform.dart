@@ -332,6 +332,15 @@ abstract class InAppWebViewPlatform extends PlatformInterface {
         'createPlatformProcessGlobalConfig is not implemented on the current platform.');
   }
 
+  /// Creates a new empty [PlatformProcessGlobalConfig] to access static methods.
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [ProcessGlobalConfig] in `flutter_inappwebview` instead.
+  PlatformProcessGlobalConfig createPlatformProcessGlobalConfigStatic() {
+    throw UnimplementedError(
+        'createPlatformProcessGlobalConfigStatic is not implemented on the current platform.');
+  }
+
   /// Creates a new [PlatformProxyController].
   ///
   /// This function should only be called by the app-facing package.

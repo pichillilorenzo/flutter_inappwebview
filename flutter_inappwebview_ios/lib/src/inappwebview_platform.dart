@@ -2,16 +2,16 @@ import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_pla
 
 import 'chrome_safari_browser/chrome_safari_browser.dart';
 import 'cookie_manager.dart';
-import 'http_auth_credentials_database.dart';
 import 'find_interaction/main.dart';
+import 'http_auth_credentials_database.dart';
 import 'in_app_browser/in_app_browser.dart';
 import 'in_app_webview/main.dart';
 import 'print_job/main.dart';
+import 'proxy_controller.dart';
 import 'pull_to_refresh/main.dart';
+import 'web_authentication_session/main.dart';
 import 'web_message/main.dart';
 import 'web_storage/main.dart';
-import 'web_authentication_session/main.dart';
-import 'proxy_controller.dart';
 
 /// Implementation of [InAppWebViewPlatform] using the WebKit API.
 class IOSInAppWebViewPlatform extends InAppWebViewPlatform {
@@ -235,7 +235,8 @@ class IOSInAppWebViewPlatform extends InAppWebViewPlatform {
   /// This function should only be called by the app-facing package.
   /// Look at using [HttpAuthCredentialDatabase] in `flutter_inappwebview` instead.
   @override
-  IOSHttpAuthCredentialDatabase createPlatformHttpAuthCredentialDatabaseStatic() {
+  IOSHttpAuthCredentialDatabase
+      createPlatformHttpAuthCredentialDatabaseStatic() {
     return IOSHttpAuthCredentialDatabase.static();
   }
 
@@ -313,7 +314,34 @@ class IOSInAppWebViewPlatform extends InAppWebViewPlatform {
   /// This function should only be called by the app-facing package.
   /// Look at using [ProxyController] in `flutter_inappwebview` instead.
   @override
-  PlatformProxyController createPlatformProxyController(PlatformProxyControllerCreationParams params) {
+  PlatformProxyController createPlatformProxyController(
+      PlatformProxyControllerCreationParams params) {
     return IOSProxyController(params);
   }
+
+  // ************************************************************************ //
+  // Create static instances of unsupported classes to be able to call        //
+  // isClassSupported, isMethodSupported, isPropertySupported, etc.           //
+  // static methods without throwing a missing platform implementation        //
+  // exception.                                                               //
+  // ************************************************************************ //
+
+  /// Creates a new empty [PlatformProcessGlobalConfig] to access static methods.
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [ProcessGlobalConfig] in `flutter_inappwebview` instead.
+  @override
+  PlatformProcessGlobalConfig createPlatformProcessGlobalConfigStatic() {
+    return _PlatformProcessGlobalConfig.static();
+  }
+}
+
+class _PlatformProcessGlobalConfig extends PlatformProcessGlobalConfig {
+  _PlatformProcessGlobalConfig(PlatformProcessGlobalConfigCreationParams params)
+      : super.implementation(params);
+  static final _PlatformProcessGlobalConfig _staticValue =
+      _PlatformProcessGlobalConfig(
+          const PlatformProcessGlobalConfigCreationParams());
+
+  factory _PlatformProcessGlobalConfig.static() => _staticValue;
 }

@@ -274,6 +274,15 @@ class AndroidInAppWebViewPlatform extends InAppWebViewPlatform {
     return AndroidProcessGlobalConfig(params);
   }
 
+  /// Creates a new empty [AndroidProcessGlobalConfig] to access static methods.
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [ProcessGlobalConfig] in `flutter_inappwebview` instead.
+  @override
+  AndroidProcessGlobalConfig createPlatformProcessGlobalConfigStatic() {
+    return AndroidProcessGlobalConfig.static();
+  }
+
   /// Creates a new [AndroidProxyController].
   ///
   /// This function should only be called by the app-facing package.

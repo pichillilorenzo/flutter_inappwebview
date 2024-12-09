@@ -26,7 +26,7 @@ class PlatformHttpAuthCredentialDatabaseCreationParams {
   /// Used by the platform implementation to create a new [PlatformHttpAuthCredentialDatabase].
   const PlatformHttpAuthCredentialDatabaseCreationParams();
 
-  ///{@template flutter_inappwebview_platform_interface.PlatformCookieManagerCreationParams.isClassSupported}
+  ///{@template flutter_inappwebview_platform_interface.PlatformHttpAuthCredentialDatabaseCreationParams.isClassSupported}
   ///Check if the current class is supported by the [defaultTargetPlatform] or a specific [platform].
   ///{@endtemplate}
   bool isClassSupported({TargetPlatform? platform}) =>

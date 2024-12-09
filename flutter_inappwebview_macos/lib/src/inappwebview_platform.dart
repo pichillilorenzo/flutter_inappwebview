@@ -318,6 +318,15 @@ class MacOSInAppWebViewPlatform extends InAppWebViewPlatform {
   PlatformProcessGlobalConfig createPlatformProcessGlobalConfigStatic() {
     return _PlatformProcessGlobalConfig.static();
   }
+
+  /// Creates a new empty [PlatformServiceWorkerController] to access static methods.
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [ServiceWorkerController] in `flutter_inappwebview` instead.
+  @override
+  PlatformServiceWorkerController createPlatformServiceWorkerControllerStatic() {
+    return _PlatformServiceWorkerController.static();
+  }
 }
 
 class _PlatformChromeSafariBrowser extends PlatformChromeSafariBrowser {
@@ -338,4 +347,17 @@ class _PlatformProcessGlobalConfig extends PlatformProcessGlobalConfig {
       const PlatformProcessGlobalConfigCreationParams());
 
   factory _PlatformProcessGlobalConfig.static() => _staticValue;
+}
+
+class _PlatformServiceWorkerController extends PlatformServiceWorkerController {
+  _PlatformServiceWorkerController(PlatformServiceWorkerControllerCreationParams params)
+      : super.implementation(params);
+  static final _PlatformServiceWorkerController _staticValue =
+  _PlatformServiceWorkerController(
+      const PlatformServiceWorkerControllerCreationParams());
+
+  factory _PlatformServiceWorkerController.static() => _staticValue;
+
+  @override
+  ServiceWorkerClient? get serviceWorkerClient => throw UnimplementedError();
 }

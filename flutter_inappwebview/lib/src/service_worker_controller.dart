@@ -1,4 +1,6 @@
 import 'dart:async';
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_platform_interface.dart';
 
 ///{@macro flutter_inappwebview_platform_interface.PlatformServiceWorkerController}
@@ -70,6 +72,17 @@ class ServiceWorkerController {
   ///{@macro flutter_inappwebview_platform_interface.PlatformServiceWorkerController.setCacheMode}
   static Future<void> setCacheMode(CacheMode mode) =>
       PlatformServiceWorkerController.static().setCacheMode(mode);
+
+  ///{@macro flutter_inappwebview_platform_interface.PlatformServiceWorkerControllerCreationParams.isClassSupported}
+  static bool isClassSupported({TargetPlatform? platform}) =>
+      PlatformServiceWorkerController.static()
+          .isClassSupported(platform: platform);
+
+  ///{@macro flutter_inappwebview_platform_interface.PlatformServiceWorkerController.isMethodSupported}
+  static bool isMethodSupported(PlatformServiceWorkerControllerMethod method,
+          {TargetPlatform? platform}) =>
+      PlatformServiceWorkerController.static()
+          .isMethodSupported(method, platform: platform);
 }
 
 ///Class that represents an Android-specific class that manages Service Workers used by `WebView`.

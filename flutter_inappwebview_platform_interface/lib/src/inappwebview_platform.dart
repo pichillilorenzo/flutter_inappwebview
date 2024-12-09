@@ -292,6 +292,15 @@ abstract class InAppWebViewPlatform extends PlatformInterface {
         'createPlatformHttpAuthCredentialDatabase is not implemented on the current platform.');
   }
 
+  /// Creates a new empty [PlatformHttpAuthCredentialDatabase] to access static methods.
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [HttpAuthCredentialDatabase] in `flutter_inappwebview` instead.
+  PlatformHttpAuthCredentialDatabase createPlatformHttpAuthCredentialDatabaseStatic() {
+    throw UnimplementedError(
+        'createPlatformHttpAuthCredentialDatabaseStatic is not implemented on the current platform.');
+  }
+
   /// Creates a new [PlatformInAppBrowser].
   ///
   /// This function should only be called by the app-facing package.

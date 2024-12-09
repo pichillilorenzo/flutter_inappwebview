@@ -71,7 +71,7 @@ class SupportedPlatformsGenerator
     }).toList();
     methodEntriesSorted.sort((a, b) => a.key.compareTo(b.key));
 
-    if (fieldEntriesSorted.isEmpty && methodEntriesSorted.isEmpty) {
+    if (!hasClassSupportedFunction && fieldEntriesSorted.isEmpty && methodEntriesSorted.isEmpty) {
       return '';
     }
 

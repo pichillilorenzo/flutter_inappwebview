@@ -182,13 +182,35 @@ class WindowsInAppWebViewPlatform extends InAppWebViewPlatform {
   PlatformChromeSafariBrowser createPlatformChromeSafariBrowserStatic() {
     return _PlatformChromeSafariBrowser.static();
   }
+
+  /// Creates a new empty [PlatformHttpAuthCredentialDatabase] to access static methods.
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [HttpAuthCredentialDatabase] in `flutter_inappwebview` instead.
+  @override
+  PlatformHttpAuthCredentialDatabase createPlatformHttpAuthCredentialDatabaseStatic() {
+    return _PlatformHttpAuthCredentialDatabase.static();
+  }
 }
 
 class _PlatformChromeSafariBrowser extends PlatformChromeSafariBrowser {
   _PlatformChromeSafariBrowser(PlatformChromeSafariBrowserCreationParams params)
       : super.implementation(params);
   static final _PlatformChromeSafariBrowser _staticValue =
-      _PlatformChromeSafariBrowser(PlatformChromeSafariBrowserCreationParams());
+      _PlatformChromeSafariBrowser(
+          const PlatformChromeSafariBrowserCreationParams());
 
   factory _PlatformChromeSafariBrowser.static() => _staticValue;
+}
+
+class _PlatformHttpAuthCredentialDatabase
+    extends PlatformHttpAuthCredentialDatabase {
+  _PlatformHttpAuthCredentialDatabase(
+      PlatformHttpAuthCredentialDatabaseCreationParams params)
+      : super.implementation(params);
+  static final _PlatformHttpAuthCredentialDatabase _staticValue =
+      _PlatformHttpAuthCredentialDatabase(
+          const PlatformHttpAuthCredentialDatabaseCreationParams());
+
+  factory _PlatformHttpAuthCredentialDatabase.static() => _staticValue;
 }

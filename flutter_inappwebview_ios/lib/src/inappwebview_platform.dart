@@ -230,6 +230,15 @@ class IOSInAppWebViewPlatform extends InAppWebViewPlatform {
     return IOSHttpAuthCredentialDatabase(params);
   }
 
+  /// Creates a new empty [IOSHttpAuthCredentialDatabase] to access static methods.
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [HttpAuthCredentialDatabase] in `flutter_inappwebview` instead.
+  @override
+  IOSHttpAuthCredentialDatabase createPlatformHttpAuthCredentialDatabaseStatic() {
+    return IOSHttpAuthCredentialDatabase.static();
+  }
+
   /// Creates a new [IOSInAppBrowser].
   ///
   /// This function should only be called by the app-facing package.

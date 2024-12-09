@@ -234,6 +234,15 @@ class AndroidInAppWebViewPlatform extends InAppWebViewPlatform {
     return AndroidHttpAuthCredentialDatabase(params);
   }
 
+  /// Creates a new empty [AndroidHttpAuthCredentialDatabase] to access static methods.
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [HttpAuthCredentialDatabase] in `flutter_inappwebview` instead.
+  @override
+  AndroidHttpAuthCredentialDatabase createPlatformHttpAuthCredentialDatabaseStatic() {
+    return AndroidHttpAuthCredentialDatabase.static();
+  }
+
   /// Creates a new [AndroidInAppBrowser].
   ///
   /// This function should only be called by the app-facing package.

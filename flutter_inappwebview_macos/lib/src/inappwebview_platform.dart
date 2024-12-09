@@ -217,6 +217,16 @@ class MacOSInAppWebViewPlatform extends InAppWebViewPlatform {
     return MacOSHttpAuthCredentialDatabase(params);
   }
 
+  /// Creates a new empty [MacOSHttpAuthCredentialDatabase] to access static methods.
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [HttpAuthCredentialDatabase] in `flutter_inappwebview` instead.
+  @override
+  MacOSHttpAuthCredentialDatabase
+      createPlatformHttpAuthCredentialDatabaseStatic() {
+    return MacOSHttpAuthCredentialDatabase.static();
+  }
+
   /// Creates a new [MacOSInAppBrowser].
   ///
   /// This function should only be called by the app-facing package.
@@ -292,7 +302,8 @@ class _PlatformChromeSafariBrowser extends PlatformChromeSafariBrowser {
   _PlatformChromeSafariBrowser(PlatformChromeSafariBrowserCreationParams params)
       : super.implementation(params);
   static final _PlatformChromeSafariBrowser _staticValue =
-      _PlatformChromeSafariBrowser(PlatformChromeSafariBrowserCreationParams());
+      _PlatformChromeSafariBrowser(
+          const PlatformChromeSafariBrowserCreationParams());
 
   factory _PlatformChromeSafariBrowser.static() => _staticValue;
 }

@@ -352,6 +352,15 @@ abstract class InAppWebViewPlatform extends PlatformInterface {
         'createPlatformProxyController is not implemented on the current platform.');
   }
 
+  /// Creates a new empty [PlatformProxyController] to access static methods.
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [ProxyController] in `flutter_inappwebview` instead.
+  PlatformProxyController createPlatformProxyControllerStatic() {
+    throw UnimplementedError(
+        'createPlatformProxyControllerStatic is not implemented on the current platform.');
+  }
+
   /// Creates a new [PlatformServiceWorkerController].
   ///
   /// This function should only be called by the app-facing package.

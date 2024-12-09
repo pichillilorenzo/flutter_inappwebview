@@ -188,7 +188,8 @@ class WindowsInAppWebViewPlatform extends InAppWebViewPlatform {
   /// This function should only be called by the app-facing package.
   /// Look at using [HttpAuthCredentialDatabase] in `flutter_inappwebview` instead.
   @override
-  PlatformHttpAuthCredentialDatabase createPlatformHttpAuthCredentialDatabaseStatic() {
+  PlatformHttpAuthCredentialDatabase
+      createPlatformHttpAuthCredentialDatabaseStatic() {
     return _PlatformHttpAuthCredentialDatabase.static();
   }
 
@@ -199,6 +200,15 @@ class WindowsInAppWebViewPlatform extends InAppWebViewPlatform {
   @override
   PlatformProcessGlobalConfig createPlatformProcessGlobalConfigStatic() {
     return _PlatformProcessGlobalConfig.static();
+  }
+
+  /// Creates a new empty [PlatformProxyController] to access static methods.
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [ProxyController] in `flutter_inappwebview` instead.
+  @override
+  PlatformProxyController createPlatformProxyControllerStatic() {
+    return _PlatformProxyController.static();
   }
 }
 
@@ -228,8 +238,17 @@ class _PlatformProcessGlobalConfig extends PlatformProcessGlobalConfig {
   _PlatformProcessGlobalConfig(PlatformProcessGlobalConfigCreationParams params)
       : super.implementation(params);
   static final _PlatformProcessGlobalConfig _staticValue =
-  _PlatformProcessGlobalConfig(
-      const PlatformProcessGlobalConfigCreationParams());
+      _PlatformProcessGlobalConfig(
+          const PlatformProcessGlobalConfigCreationParams());
 
   factory _PlatformProcessGlobalConfig.static() => _staticValue;
+}
+
+class _PlatformProxyController extends PlatformProxyController {
+  _PlatformProxyController(PlatformProxyControllerCreationParams params)
+      : super.implementation(params);
+  static final _PlatformProxyController _staticValue =
+      _PlatformProxyController(const PlatformProxyControllerCreationParams());
+
+  factory _PlatformProxyController.static() => _staticValue;
 }

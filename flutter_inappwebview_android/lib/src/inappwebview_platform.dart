@@ -2,18 +2,18 @@ import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_pla
 
 import 'chrome_safari_browser/chrome_safari_browser.dart';
 import 'cookie_manager.dart';
-import 'http_auth_credentials_database.dart';
 import 'find_interaction/main.dart';
+import 'http_auth_credentials_database.dart';
 import 'in_app_browser/in_app_browser.dart';
 import 'in_app_webview/main.dart';
 import 'print_job/main.dart';
-import 'pull_to_refresh/main.dart';
-import 'web_message/main.dart';
-import 'web_storage/main.dart';
 import 'process_global_config.dart';
 import 'proxy_controller.dart';
+import 'pull_to_refresh/main.dart';
 import 'service_worker_controller.dart';
 import 'tracing_controller.dart';
+import 'web_message/main.dart';
+import 'web_storage/main.dart';
 import 'webview_asset_loader.dart';
 import 'webview_feature.dart' as wv;
 
@@ -239,7 +239,8 @@ class AndroidInAppWebViewPlatform extends InAppWebViewPlatform {
   /// This function should only be called by the app-facing package.
   /// Look at using [HttpAuthCredentialDatabase] in `flutter_inappwebview` instead.
   @override
-  AndroidHttpAuthCredentialDatabase createPlatformHttpAuthCredentialDatabaseStatic() {
+  AndroidHttpAuthCredentialDatabase
+      createPlatformHttpAuthCredentialDatabaseStatic() {
     return AndroidHttpAuthCredentialDatabase.static();
   }
 
@@ -292,6 +293,15 @@ class AndroidInAppWebViewPlatform extends InAppWebViewPlatform {
     PlatformProxyControllerCreationParams params,
   ) {
     return AndroidProxyController(params);
+  }
+
+  /// Creates a new empty [AndroidProxyController] to access static methods.
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [ProxyController] in `flutter_inappwebview` instead.
+  @override
+  AndroidProxyController createPlatformProxyControllerStatic() {
+    return AndroidProxyController.static();
   }
 
   /// Creates a new [AndroidServiceWorkerController].

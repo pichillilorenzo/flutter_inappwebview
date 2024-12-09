@@ -6,12 +6,16 @@ part of 'platform_proxy_controller.dart';
 // ExchangeableObjectGenerator
 // **************************************************************************
 
+///{@template flutter_inappwebview_platform_interface.ProxySettings}
 ///Class that represents the settings used to configure the [PlatformProxyController].
+///{@endtemplate}
+///
+///{@macro flutter_inappwebview_platform_interface.ProxySettings.supported_platforms}
 ///
 ///**Officially Supported Platforms/Implementations**:
-///- Android native WebView ([Official API - ProxyConfig](https://developer.android.com/reference/androidx/webkit/ProxyConfig))
-///- iOS 17.0+ ([Official API - ProxyConfiguration](https://developer.apple.com/documentation/network/proxyconfiguration))
-///- MacOS 14.0+ ([Official API - ProxyConfiguration](https://developer.apple.com/documentation/network/proxyconfiguration))
+///- Android WebView ([Official API - ProxyConfig](https://developer.android.com/reference/androidx/webkit/ProxyConfig))
+///- iOS WKWebView 17.0+ ([Official API - ProxyConfiguration](https://developer.apple.com/documentation/network/proxyconfiguration))
+///- macOS WKWebView 14.0+ ([Official API - ProxyConfiguration](https://developer.apple.com/documentation/network/proxyconfiguration))
 class ProxySettings {
   ///List of bypass rules.
   ///
@@ -81,6 +85,12 @@ class ProxySettings {
   ///**Officially Supported Platforms/Implementations**:
   ///- Android WebView
   bool reverseBypassEnabled;
+
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Android WebView ([Official API - ProxyConfig](https://developer.android.com/reference/androidx/webkit/ProxyConfig))
+  ///- iOS WKWebView 17.0+ ([Official API - ProxyConfiguration](https://developer.apple.com/documentation/network/proxyconfiguration))
+  ///- macOS WKWebView 14.0+ ([Official API - ProxyConfiguration](https://developer.apple.com/documentation/network/proxyconfiguration))
   ProxySettings(
       {this.bypassRules = const [],
       this.bypassSimpleHostnames,
@@ -117,6 +127,20 @@ class ProxySettings {
     return instance;
   }
 
+  ///{@template flutter_inappwebview_platform_interface.ProxySettings.isClassSupported}
+  ///Check if the current class is supported by the [defaultTargetPlatform] or a specific [platform].
+  ///{@endtemplate}
+  static bool isClassSupported({TargetPlatform? platform}) =>
+      _ProxySettingsClassSupported.isClassSupported(platform: platform);
+
+  ///{@template flutter_inappwebview_platform_interface.ProxySettings.isPropertySupported}
+  ///Check if the current class is supported by the [defaultTargetPlatform] or a specific [platform].
+  ///{@endtemplate}
+  static bool isPropertySupported(ProxySettingsProperty property,
+          {TargetPlatform? platform}) =>
+      _ProxySettingsPropertySupported.isPropertySupported(property,
+          platform: platform);
+
   ///Converts instance to a map.
   Map<String, dynamic> toMap({EnumMethod? enumMethod}) {
     return {
@@ -143,5 +167,212 @@ class ProxySettings {
   @override
   String toString() {
     return 'ProxySettings{bypassRules: $bypassRules, bypassSimpleHostnames: $bypassSimpleHostnames, directs: $directs, proxyRules: $proxyRules, removeImplicitRules: $removeImplicitRules, reverseBypassEnabled: $reverseBypassEnabled}';
+  }
+}
+
+// **************************************************************************
+// SupportedPlatformsGenerator
+// **************************************************************************
+
+extension _PlatformProxyControllerCreationParamsClassSupported
+    on PlatformProxyControllerCreationParams {
+  ///{@template flutter_inappwebview_platform_interface.PlatformProxyControllerCreationParams.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Android WebView
+  ///- iOS WKWebView
+  ///- macOS WKWebView
+  ///
+  ///Use the [PlatformProxyControllerCreationParams.isClassSupported] method to check if this class is supported at runtime.
+  ///{@endtemplate}
+  static bool isClassSupported({TargetPlatform? platform}) {
+    return !kIsWeb &&
+        [TargetPlatform.android, TargetPlatform.iOS, TargetPlatform.macOS]
+            .contains(platform ?? defaultTargetPlatform);
+  }
+}
+
+extension _PlatformProxyControllerClassSupported on PlatformProxyController {
+  ///{@template flutter_inappwebview_platform_interface.PlatformProxyController.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Android WebView ([Official API - ProxyController](https://developer.android.com/reference/androidx/webkit/ProxyController))
+  ///- iOS WKWebView 17.0+ ([Official API - WKWebsiteDataStore.proxyConfigurations](https://developer.apple.com/documentation/webkit/wkwebsitedatastore/4264546-proxyconfigurations))
+  ///- macOS WKWebView 14.0+ ([Official API - WKWebsiteDataStore.proxyConfigurations](https://developer.apple.com/documentation/webkit/wkwebsitedatastore/4264546-proxyconfigurations))
+  ///
+  ///Use the [PlatformProxyController.isClassSupported] method to check if this class is supported at runtime.
+  ///{@endtemplate}
+  static bool isClassSupported({TargetPlatform? platform}) {
+    return !kIsWeb &&
+        [TargetPlatform.android, TargetPlatform.iOS, TargetPlatform.macOS]
+            .contains(platform ?? defaultTargetPlatform);
+  }
+}
+
+///List of [PlatformProxyController]'s methods that can be used to check if they are supported or not by the current platform.
+enum PlatformProxyControllerMethod {
+  ///Can be used to check if the [PlatformProxyController.clearProxyOverride] method is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.PlatformProxyController.clearProxyOverride.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Android WebView ([Official API - ProxyController.clearProxyOverride](https://developer.android.com/reference/androidx/webkit/ProxyController#clearProxyOverride(java.util.concurrent.Executor,%20java.lang.Runnable)))
+  ///- iOS WKWebView 17.0+ ([Official API - WKWebsiteDataStore.proxyConfigurations](https://developer.apple.com/documentation/webkit/wkwebsitedatastore/4264546-proxyconfigurations))
+  ///- macOS WKWebView 14.0+ ([Official API - WKWebsiteDataStore.proxyConfigurations](https://developer.apple.com/documentation/webkit/wkwebsitedatastore/4264546-proxyconfigurations))
+  ///
+  ///Use the [PlatformProxyController.isMethodSupported] method to check if this method is supported at runtime.
+  ///{@endtemplate}
+  clearProxyOverride,
+
+  ///Can be used to check if the [PlatformProxyController.setProxyOverride] method is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.PlatformProxyController.setProxyOverride.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Android WebView ([Official API - ProxyController.setProxyOverride](https://developer.android.com/reference/androidx/webkit/ProxyController#setProxyOverride(androidx.webkit.ProxyConfig,%20java.util.concurrent.Executor,%20java.lang.Runnable)))
+  ///- iOS WKWebView 17.0+ ([Official API - WKWebsiteDataStore.proxyConfigurations](https://developer.apple.com/documentation/webkit/wkwebsitedatastore/4264546-proxyconfigurations))
+  ///- macOS WKWebView 14.0+ ([Official API - WKWebsiteDataStore.proxyConfigurations](https://developer.apple.com/documentation/webkit/wkwebsitedatastore/4264546-proxyconfigurations))
+  ///
+  ///**Parameters - Officially Supported Platforms/Implementations**:
+  ///- [settings]: all platforms
+  ///
+  ///Use the [PlatformProxyController.isMethodSupported] method to check if this method is supported at runtime.
+  ///{@endtemplate}
+  setProxyOverride,
+}
+
+extension _PlatformProxyControllerMethodSupported on PlatformProxyController {
+  static bool isMethodSupported(PlatformProxyControllerMethod method,
+      {TargetPlatform? platform}) {
+    switch (method) {
+      case PlatformProxyControllerMethod.clearProxyOverride:
+        return !kIsWeb &&
+            [TargetPlatform.android, TargetPlatform.iOS, TargetPlatform.macOS]
+                .contains(platform ?? defaultTargetPlatform);
+      case PlatformProxyControllerMethod.setProxyOverride:
+        return !kIsWeb &&
+            [TargetPlatform.android, TargetPlatform.iOS, TargetPlatform.macOS]
+                .contains(platform ?? defaultTargetPlatform);
+    }
+  }
+}
+
+extension _ProxySettingsClassSupported on ProxySettings {
+  ///{@template flutter_inappwebview_platform_interface.ProxySettings.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Android WebView ([Official API - ProxyConfig](https://developer.android.com/reference/androidx/webkit/ProxyConfig))
+  ///- iOS WKWebView 17.0+ ([Official API - ProxyConfiguration](https://developer.apple.com/documentation/network/proxyconfiguration))
+  ///- macOS WKWebView 14.0+ ([Official API - ProxyConfiguration](https://developer.apple.com/documentation/network/proxyconfiguration))
+  ///
+  ///Use the [ProxySettings.isClassSupported] method to check if this class is supported at runtime.
+  ///{@endtemplate}
+  static bool isClassSupported({TargetPlatform? platform}) {
+    return !kIsWeb &&
+        [TargetPlatform.android, TargetPlatform.iOS, TargetPlatform.macOS]
+            .contains(platform ?? defaultTargetPlatform);
+  }
+}
+
+///List of [ProxySettings]'s properties that can be used to check i they are supported or not by the current platform.
+enum ProxySettingsProperty {
+  ///Can be used to check if the [ProxySettings.bypassRules] property is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.ProxySettings.bypassRules.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Android WebView
+  ///
+  ///Use the [ProxySettings.isPropertySupported] method to check if this property is supported at runtime.
+  ///{@endtemplate}
+  bypassRules,
+
+  ///Can be used to check if the [ProxySettings.bypassSimpleHostnames] property is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.ProxySettings.bypassSimpleHostnames.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Android WebView
+  ///
+  ///Use the [ProxySettings.isPropertySupported] method to check if this property is supported at runtime.
+  ///{@endtemplate}
+  bypassSimpleHostnames,
+
+  ///Can be used to check if the [ProxySettings.directs] property is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.ProxySettings.directs.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Android WebView
+  ///
+  ///Use the [ProxySettings.isPropertySupported] method to check if this property is supported at runtime.
+  ///{@endtemplate}
+  directs,
+
+  ///Can be used to check if the [ProxySettings.proxyRules] property is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.ProxySettings.proxyRules.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Android WebView
+  ///- iOS WKWebView
+  ///- macOS WKWebView
+  ///
+  ///Use the [ProxySettings.isPropertySupported] method to check if this property is supported at runtime.
+  ///{@endtemplate}
+  proxyRules,
+
+  ///Can be used to check if the [ProxySettings.removeImplicitRules] property is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.ProxySettings.removeImplicitRules.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Android WebView
+  ///
+  ///Use the [ProxySettings.isPropertySupported] method to check if this property is supported at runtime.
+  ///{@endtemplate}
+  removeImplicitRules,
+
+  ///Can be used to check if the [ProxySettings.reverseBypassEnabled] property is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.ProxySettings.reverseBypassEnabled.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Android WebView
+  ///
+  ///Use the [ProxySettings.isPropertySupported] method to check if this property is supported at runtime.
+  ///{@endtemplate}
+  reverseBypassEnabled,
+}
+
+extension _ProxySettingsPropertySupported on ProxySettings {
+  static bool isPropertySupported(ProxySettingsProperty property,
+      {TargetPlatform? platform}) {
+    switch (property) {
+      case ProxySettingsProperty.bypassRules:
+        return !kIsWeb &&
+            [TargetPlatform.android]
+                .contains(platform ?? defaultTargetPlatform);
+      case ProxySettingsProperty.bypassSimpleHostnames:
+        return !kIsWeb &&
+            [TargetPlatform.android]
+                .contains(platform ?? defaultTargetPlatform);
+      case ProxySettingsProperty.directs:
+        return !kIsWeb &&
+            [TargetPlatform.android]
+                .contains(platform ?? defaultTargetPlatform);
+      case ProxySettingsProperty.proxyRules:
+        return !kIsWeb &&
+            [TargetPlatform.android, TargetPlatform.iOS, TargetPlatform.macOS]
+                .contains(platform ?? defaultTargetPlatform);
+      case ProxySettingsProperty.removeImplicitRules:
+        return !kIsWeb &&
+            [TargetPlatform.android]
+                .contains(platform ?? defaultTargetPlatform);
+      case ProxySettingsProperty.reverseBypassEnabled:
+        return !kIsWeb &&
+            [TargetPlatform.android]
+                .contains(platform ?? defaultTargetPlatform);
+    }
   }
 }

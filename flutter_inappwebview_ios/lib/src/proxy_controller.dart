@@ -1,4 +1,5 @@
 import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_platform_interface.dart';
@@ -53,6 +54,15 @@ class IOSProxyController extends PlatformProxyController
     _instance = IOSProxyController(IOSProxyControllerCreationParams(
         const PlatformProxyControllerCreationParams()));
     return _instance!;
+  }
+
+  static final IOSProxyController _staticValue = IOSProxyController(
+      IOSProxyControllerCreationParams(
+          const PlatformProxyControllerCreationParams()));
+
+  /// Provide static access.
+  factory IOSProxyController.static() {
+    return _staticValue;
   }
 
   Future<dynamic> _handleMethod(MethodCall call) async {}

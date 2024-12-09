@@ -286,6 +286,15 @@ class MacOSInAppWebViewPlatform extends InAppWebViewPlatform {
     return MacOSProxyController(params);
   }
 
+  /// Creates a new empty [MacOSProxyController] to access static methods.
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [ProxyController] in `flutter_inappwebview` instead.
+  @override
+  MacOSProxyController createPlatformProxyControllerStatic() {
+    return MacOSProxyController.static();
+  }
+
   // ************************************************************************ //
   // Create static instances of unsupported classes to be able to call        //
   // isClassSupported, isMethodSupported, isPropertySupported, etc.           //

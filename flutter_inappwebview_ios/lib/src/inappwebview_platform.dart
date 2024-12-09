@@ -319,6 +319,15 @@ class IOSInAppWebViewPlatform extends InAppWebViewPlatform {
     return IOSProxyController(params);
   }
 
+  /// Creates a new empty [IOSProxyController] to access static methods.
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [ProxyController] in `flutter_inappwebview` instead.
+  @override
+  IOSProxyController createPlatformProxyControllerStatic() {
+    return IOSProxyController.static();
+  }
+
   // ************************************************************************ //
   // Create static instances of unsupported classes to be able to call        //
   // isClassSupported, isMethodSupported, isPropertySupported, etc.           //

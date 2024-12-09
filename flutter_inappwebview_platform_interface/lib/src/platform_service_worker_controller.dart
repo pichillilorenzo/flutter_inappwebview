@@ -30,8 +30,8 @@ class PlatformServiceWorkerControllerCreationParams {
   ///Check if the current class is supported by the [defaultTargetPlatform] or a specific [platform].
   ///{@endtemplate}
   bool isClassSupported({TargetPlatform? platform}) =>
-      _PlatformServiceWorkerControllerCreationParamsClassSupported.isClassSupported(
-          platform: platform);
+      _PlatformServiceWorkerControllerCreationParamsClassSupported
+          .isClassSupported(platform: platform);
 }
 
 ///{@template flutter_inappwebview_platform_interface.PlatformServiceWorkerController}
@@ -199,7 +199,7 @@ abstract class PlatformServiceWorkerController extends PlatformInterface {
     AndroidPlatform(
       apiName: 'ServiceWorkerWebSettingsCompat.setAllowContentAccess',
       apiUrl:
-      'https://developer.android.com/reference/androidx/webkit/ServiceWorkerWebSettingsCompat#setAllowContentAccess(boolean)',
+          'https://developer.android.com/reference/androidx/webkit/ServiceWorkerWebSettingsCompat#setAllowContentAccess(boolean)',
     ),
   ])
   Future<void> setAllowContentAccess(bool allow) {
@@ -217,7 +217,7 @@ abstract class PlatformServiceWorkerController extends PlatformInterface {
     AndroidPlatform(
       apiName: 'ServiceWorkerWebSettingsCompat.setAllowFileAccess',
       apiUrl:
-      'https://developer.android.com/reference/androidx/webkit/ServiceWorkerWebSettingsCompat#setAllowFileAccess(boolean)',
+          'https://developer.android.com/reference/androidx/webkit/ServiceWorkerWebSettingsCompat#setAllowFileAccess(boolean)',
     ),
   ])
   Future<void> setAllowFileAccess(bool allow) {
@@ -235,7 +235,7 @@ abstract class PlatformServiceWorkerController extends PlatformInterface {
     AndroidPlatform(
       apiName: 'ServiceWorkerWebSettingsCompat.setBlockNetworkLoads',
       apiUrl:
-      'https://developer.android.com/reference/androidx/webkit/ServiceWorkerWebSettingsCompat#setBlockNetworkLoads(boolean)',
+          'https://developer.android.com/reference/androidx/webkit/ServiceWorkerWebSettingsCompat#setBlockNetworkLoads(boolean)',
     ),
   ])
   Future<void> setBlockNetworkLoads(bool flag) {
@@ -253,7 +253,7 @@ abstract class PlatformServiceWorkerController extends PlatformInterface {
     AndroidPlatform(
       apiName: 'ServiceWorkerWebSettingsCompat.setCacheMode',
       apiUrl:
-      'https://developer.android.com/reference/androidx/webkit/ServiceWorkerWebSettingsCompat#setCacheMode(int)',
+          'https://developer.android.com/reference/androidx/webkit/ServiceWorkerWebSettingsCompat#setCacheMode(int)',
     ),
   ])
   Future<void> setCacheMode(CacheMode mode) {
@@ -269,7 +269,7 @@ abstract class PlatformServiceWorkerController extends PlatformInterface {
   ///Check if the given [method] is supported by the [defaultTargetPlatform] or a specific [platform].
   ///{@endtemplate}
   bool isMethodSupported(PlatformServiceWorkerControllerMethod method,
-      {TargetPlatform? platform}) =>
+          {TargetPlatform? platform}) =>
       _PlatformServiceWorkerControllerMethodSupported.isMethodSupported(method,
           platform: platform);
 }
@@ -283,7 +283,7 @@ abstract class PlatformServiceWorkerController extends PlatformInterface {
   AndroidPlatform(
     apiName: 'ServiceWorkerClientCompat',
     apiUrl:
-    'https://developer.android.com/reference/androidx/webkit/ServiceWorkerClientCompat',
+        'https://developer.android.com/reference/androidx/webkit/ServiceWorkerClientCompat',
   ),
 ])
 class ServiceWorkerClient {
@@ -303,7 +303,7 @@ class ServiceWorkerClient {
     AndroidPlatform(
       apiName: 'ServiceWorkerClientCompat.shouldInterceptRequest',
       apiUrl:
-      'https://developer.android.com/reference/androidx/webkit/ServiceWorkerClientCompat#shouldInterceptRequest(android.webkit.WebResourceRequest)',
+          'https://developer.android.com/reference/androidx/webkit/ServiceWorkerClientCompat#shouldInterceptRequest(android.webkit.WebResourceRequest)',
     ),
   ])
   final Future<WebResourceResponse?> Function(WebResourceRequest request)?
@@ -315,14 +315,14 @@ class ServiceWorkerClient {
   ///Check if the current class is supported by the [defaultTargetPlatform] or a specific [platform].
   ///{@endtemplate}
   static bool isClassSupported({TargetPlatform? platform}) =>
-      _PlatformServiceWorkerControllerCreationParamsClassSupported.isClassSupported(
-          platform: platform);
+      _PlatformServiceWorkerControllerCreationParamsClassSupported
+          .isClassSupported(platform: platform);
 
   ///{@template flutter_inappwebview_platform_interface.ServiceWorkerClient.isPropertySupported}
   ///Check if the given [method] is supported by the [defaultTargetPlatform] or a specific [platform].
   ///{@endtemplate}
   static bool isPropertySupported(ServiceWorkerClientProperty property,
-      {TargetPlatform? platform}) =>
+          {TargetPlatform? platform}) =>
       _ServiceWorkerClientPropertySupported.isPropertySupported(property,
           platform: platform);
 }

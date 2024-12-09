@@ -335,6 +335,15 @@ class AndroidInAppWebViewPlatform extends InAppWebViewPlatform {
     return AndroidTracingController(params);
   }
 
+  /// Creates a new empty [AndroidTracingController] to access static methods.
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [TracingController] in `flutter_inappwebview` instead.
+  @override
+  AndroidTracingController createPlatformTracingControllerStatic() {
+    return AndroidTracingController.static();
+  }
+
   /// Creates a new [AndroidAssetsPathHandler].
   ///
   /// This function should only be called by the app-facing package.

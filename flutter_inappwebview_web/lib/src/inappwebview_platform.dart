@@ -151,6 +151,15 @@ class WebPlatformInAppWebViewPlatform extends InAppWebViewPlatform {
   PlatformServiceWorkerController createPlatformServiceWorkerControllerStatic() {
     return _PlatformServiceWorkerController.static();
   }
+
+  /// Creates a new empty [PlatformTracingController] to access static methods.
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [TracingController] in `flutter_inappwebview` instead.
+  @override
+  PlatformTracingController createPlatformTracingControllerStatic() {
+    return _PlatformTracingController.static();
+  }
 }
 
 class _PlatformInAppBrowser extends PlatformInAppBrowser {
@@ -214,4 +223,14 @@ class _PlatformServiceWorkerController extends PlatformServiceWorkerController {
 
   @override
   ServiceWorkerClient? get serviceWorkerClient => throw UnimplementedError();
+}
+
+class _PlatformTracingController extends PlatformTracingController {
+  _PlatformTracingController(PlatformTracingControllerCreationParams params)
+      : super.implementation(params);
+  static final _PlatformTracingController _staticValue =
+  _PlatformTracingController(
+      const PlatformTracingControllerCreationParams());
+
+  factory _PlatformTracingController.static() => _staticValue;
 }

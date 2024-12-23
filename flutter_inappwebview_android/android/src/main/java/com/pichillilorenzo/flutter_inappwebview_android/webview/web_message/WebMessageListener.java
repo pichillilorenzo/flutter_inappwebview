@@ -1,7 +1,10 @@
 package com.pichillilorenzo.flutter_inappwebview_android.webview.web_message;
 
 import android.net.Uri;
+import android.os.Handler;
+import android.os.Looper;
 import android.text.TextUtils;
+import android.webkit.JavascriptInterface;
 import android.webkit.WebView;
 
 import androidx.annotation.NonNull;
@@ -21,6 +24,7 @@ import com.pichillilorenzo.flutter_inappwebview_android.types.UserScriptInjectio
 import com.pichillilorenzo.flutter_inappwebview_android.webview.in_app_webview.InAppWebView;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -170,6 +174,23 @@ public class WebMessageListener implements Disposable {
       index++;
     }
   }
+
+    // Suppressing unused warning as this is invoked from JavaScript.
+    @SuppressWarnings("unused")
+    @JavascriptInterface
+    public void postMessage(@NonNull final String message) {
+      System.out.println("postMessage " + message);
+    Map<String, Object> map = new HashMap<>();
+      map.put("data", message);
+      map.put("type", WebMessageCompat.TYPE_STRING);
+      WebMessageCompatExt webMessage = WebMessageCompatExt.fromMap(map);
+      if (channelDelegate != null) {
+        Handler mainHandler = new Handler(Looper.getMainLooper());
+        mainHandler.post(() -> channelDelegate.onPostMessage(webMessage,
+				null,
+				false));
+      }
+    }
 
   public void postMessageForInAppWebView(WebMessageCompatExt message, @NonNull MethodChannel.Result result) {
     if (replyProxy != null && WebViewFeature.isFeatureSupported(WebViewFeature.WEB_MESSAGE_LISTENER)) {

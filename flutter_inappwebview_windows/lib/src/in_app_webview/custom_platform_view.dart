@@ -295,12 +295,18 @@ class _CustomPlatformViewState extends State<CustomPlatformView>
 
     _controller.initialize(
         onPlatformViewCreated: (id) {
+          if (!mounted) {
+            return;
+          }
           widget.onPlatformViewCreated?.call(id);
           setState(() {});
         },
         arguments: widget.creationParams);
 
     _listener = AppLifecycleListener(onStateChange: (state) {
+      if (!mounted) {
+        return;
+      }
       if ([AppLifecycleState.resumed, AppLifecycleState.hidden]
           .contains(state)) {
         _reportSurfaceSize();

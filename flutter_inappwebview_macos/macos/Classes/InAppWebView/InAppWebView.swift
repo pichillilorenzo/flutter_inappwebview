@@ -2317,7 +2317,7 @@ public class InAppWebView: WKWebView, WKUIDelegate,
                         let jsonArgs = try? JSONSerialization.jsonObject(with: data, options: .mutableContainers) as? [[String: Any]]
                         if let jsonData = jsonArgs?.first, let jsObjectName = jsonData["jsObjectName"] as? String {
                             var webMessage: WebMessage? = nil
-                            if let webMessageMap = body["message"] as? [String : Any?] {
+                            if let webMessageMap = jsonData["message"] as? [String : Any?] {
                                 webMessage = WebMessage.fromMap(map: webMessageMap)
                             }
                             

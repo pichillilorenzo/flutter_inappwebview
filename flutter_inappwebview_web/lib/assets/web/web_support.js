@@ -304,87 +304,6 @@ window.flutter_inappwebview = {
 
                 webView.settings = newSettings;
             },
-            reload: function() {
-                var iframe = webView.iframe;
-                if (iframe != null && iframe.contentWindow != null) {
-                    try {
-                        iframe.contentWindow.location.reload();
-                    } catch (e) {
-                        console.log(e);
-                        iframe.contentWindow.location.href = iframe.src;
-                    }
-                }
-            },
-            goBack: function() {
-                var iframe = webView.iframe;
-                if (iframe != null) {
-                    try {
-                        iframe.contentWindow.history.back();
-                    } catch (e) {
-                        console.log(e);
-                    }
-                }
-            },
-            goForward: function() {
-                var iframe = webView.iframe;
-                if (iframe != null) {
-                    try {
-                        iframe.contentWindow.history.forward();
-                    } catch (e) {
-                        console.log(e);
-                    }
-                }
-            },
-            goBackOrForward: function(steps) {
-                var iframe = webView.iframe;
-                if (iframe != null) {
-                    try {
-                        iframe.contentWindow.history.go(steps);
-                    } catch (e) {
-                        console.log(e);
-                    }
-                }
-            },
-            evaluateJavascript: function(source) {
-                var iframe = webView.iframe;
-                var result = null;
-                if (iframe != null) {
-                    try {
-                        result = JSON.stringify(iframe.contentWindow.eval(source));
-                    } catch (e) {}
-                }
-                return result;
-            },
-            stopLoading: function(steps) {
-                var iframe = webView.iframe;
-                if (iframe != null) {
-                    try {
-                        iframe.contentWindow.stop();
-                    } catch (e) {
-                        console.log(e);
-                    }
-                }
-            },
-            getUrl: function() {
-                var iframe = webView.iframe;
-                var url = iframe.src;
-                try {
-                    url = iframe.contentWindow.location.href;
-                } catch (e) {
-                    console.log(e);
-                }
-                return url;
-            },
-            getTitle: function() {
-                var iframe = webView.iframe;
-                var title = null;
-                try {
-                    title = iframe.contentDocument.title;
-                } catch (e) {
-                    console.log(e);
-                }
-                return title;
-            },
             injectJavascriptFileFromUrl: function(urlFile, scriptHtmlTagAttributes) {
                 var iframe = webView.iframe;
                 try {
@@ -472,32 +391,6 @@ window.flutter_inappwebview = {
                     console.log(e);
                 }
             },
-            printCurrentPage: function() {
-                var iframe = webView.iframe;
-                try {
-                    iframe.contentWindow.print();
-                } catch (e) {
-                    console.log(e);
-                }
-            },
-            getContentHeight: function() {
-                var iframe = webView.iframe;
-                try {
-                    return iframe.contentDocument.documentElement.scrollHeight;
-                } catch (e) {
-                    console.log(e);
-                }
-                return null;
-            },
-            getContentWidth: function() {
-                var iframe = webView.iframe;
-                try {
-                    return iframe.contentDocument.documentElement.scrollWidth;
-                } catch (e) {
-                    console.log(e);
-                }
-                return null;
-            },
             getSelectedText: function() {
                 var iframe = webView.iframe;
                 try {
@@ -515,73 +408,6 @@ window.flutter_inappwebview = {
                     console.log(e);
                 }
                 return null;
-            },
-            getScrollX: function() {
-                var iframe = webView.iframe;
-                try {
-                    return iframe.contentWindow.scrollX;
-                } catch (e) {
-                    console.log(e);
-                }
-                return null;
-            },
-            getScrollY: function() {
-                var iframe = webView.iframe;
-                try {
-                    return iframe.contentWindow.scrollY;
-                } catch (e) {
-                    console.log(e);
-                }
-                return null;
-            },
-            isSecureContext: function() {
-                var iframe = webView.iframe;
-                try {
-                    return iframe.contentWindow.isSecureContext;
-                } catch (e) {
-                    console.log(e);
-                }
-                return false;
-            },
-            canScrollVertically: function() {
-                var iframe = webView.iframe;
-                try {
-                    return iframe.contentDocument.body.scrollHeight > iframe.contentWindow.innerHeight;
-                } catch (e) {
-                    console.log(e);
-                }
-                return false;
-            },
-            canScrollHorizontally: function() {
-                var iframe = webView.iframe;
-                try {
-                    return iframe.contentDocument.body.scrollWidth > iframe.contentWindow.innerWidth;
-                } catch (e) {
-                    console.log(e);
-                }
-                return false;
-            },
-            getSize: function() {
-                var iframeContainer = webView.iframeContainer;
-                var width = 0.0;
-                var height = 0.0;
-                if (iframeContainer.style.width != null && iframeContainer.style.width != '' && iframeContainer.style.width.indexOf('px') > 0) {
-                    width = parseFloat(iframeContainer.style.width);
-                }
-                if (width == null || width == 0.0) {
-                    width = iframeContainer.getBoundingClientRect().width;
-                }
-                if (iframeContainer.style.height != null && iframeContainer.style.height != '' && iframeContainer.style.height.indexOf('px') > 0) {
-                    height = parseFloat(iframeContainer.style.height);
-                }
-                if (height == null || height == 0.0) {
-                    height = iframeContainer.getBoundingClientRect().height;
-                }
-
-                return {
-                    width: width,
-                    height: height
-                };
             }
         };
 

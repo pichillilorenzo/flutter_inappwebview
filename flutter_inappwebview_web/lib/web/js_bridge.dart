@@ -13,14 +13,6 @@ extension type JSWebView._(JSObject _) implements JSObject {
   external HTMLDivElement get iframeContainer;
   external void prepare(JSAny? settings);
   external void setSettings(JSAny? newSettings);
-  external void reload();
-  external void goBack();
-  external void goForward();
-  external void goBackOrForward(JSNumber steps);
-  external JSString? evaluateJavascript(JSString source);
-  external void stopLoading();
-  external JSString? getUrl();
-  external JSString? getTitle();
   external void injectJavascriptFileFromUrl(
       JSString urlFile, JSAny? scriptHtmlTagAttributes);
   external void injectCSSCode(JSString source);
@@ -28,16 +20,7 @@ extension type JSWebView._(JSObject _) implements JSObject {
       JSString urlFile, JSAny? cssLinkHtmlTagAttributes);
   external void scrollTo(JSNumber x, JSNumber y, JSBoolean animated);
   external void scrollBy(JSNumber x, JSNumber y, JSBoolean animated);
-  external void printCurrentPage();
-  external JSNumber? getContentHeight();
-  external JSNumber? getContentWidth();
   external JSPromise<JSString?>? getSelectedText();
-  external JSNumber? getScrollX();
-  external JSNumber? getScrollY();
-  external JSBoolean isSecureContext();
-  external JSBoolean canScrollVertically();
-  external JSBoolean canScrollHorizontally();
-  external JSSize getSize();
 }
 
 @JS('window.flutter_inappwebview')

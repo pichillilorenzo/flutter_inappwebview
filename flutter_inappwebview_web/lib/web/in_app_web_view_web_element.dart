@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:developer';
 import 'dart:js_interop';
 
@@ -15,6 +16,10 @@ extension on HTMLIFrameElement {
   external set csp(String? value);
 
   external String? get csp;
+}
+
+extension on Window {
+  external dynamic eval(JSString str);
 }
 
 class InAppWebViewWebElement implements Disposable {
@@ -317,31 +322,67 @@ class InAppWebViewWebElement implements Disposable {
   }
 
   Future<void> reload() async {
-    jsWebView?.reload();
+    final iframeWindow = iframe.contentWindow;
+    if (iframeWindow != null) {
+      try {
+        iframeWindow.location.reload();
+      } catch (e) {
+        print(e);
+        iframeWindow.location.href = iframe.src;
+      }
+    }
   }
 
   Future<void> goBack() async {
-    jsWebView?.goBack();
+    try {
+      iframe.contentWindow?.history.back();
+    } catch (e) {
+      print(e);
+    }
   }
 
   Future<void> goForward() async {
-    jsWebView?.goForward();
+    try {
+      iframe.contentWindow?.history.forward();
+    } catch (e) {
+      print(e);
+    }
   }
 
   Future<void> goBackOrForward({required int steps}) async {
-    jsWebView?.goBackOrForward(steps.toJS);
+    try {
+      iframe.contentWindow?.history.go(steps);
+    } catch (e) {
+      print(e);
+    }
   }
 
-  Future<dynamic> evaluateJavascript({required String source}) async {
-    return jsWebView?.evaluateJavascript(source.toJS)?.toDart;
+  Future<String?> evaluateJavascript({required String source}) async {
+    var result = null;
+    final iframeWindow = iframe.contentWindow;
+    if (iframeWindow != null) {
+      try {
+        result = jsonEncode(iframeWindow.eval(source.toJS));
+      } catch (e) {}
+    }
+    return result;
   }
 
   Future<void> stopLoading() async {
-    jsWebView?.stopLoading();
+    try {
+      iframe.contentWindow?.stop();
+    } catch (e) {
+      print(e);
+    }
   }
 
   Future<String?> getUrl() async {
-    String? url = jsWebView?.getUrl()?.toDart;
+    String? url;
+    try {
+      url = iframe.contentWindow?.location.href;
+    } catch (e) {
+      print(e);
+    }
     if (url == null || url.isEmpty || url == 'about:blank') {
       url = iframe.src;
     }
@@ -349,7 +390,7 @@ class InAppWebViewWebElement implements Disposable {
   }
 
   Future<String?> getTitle() async {
-    return jsWebView?.getTitle()?.toDart;
+    return iframe.contentDocument?.title;
   }
 
   Future<void> postUrl(
@@ -388,15 +429,29 @@ class InAppWebViewWebElement implements Disposable {
   }
 
   Future<void> printCurrentPage() async {
-    jsWebView?.printCurrentPage();
+    try {
+      iframe.contentWindow?.print();
+    } catch (e) {
+      print(e);
+    }
   }
 
   Future<int?> getContentHeight() async {
-    return jsWebView?.getContentHeight()?.toDartInt;
+    try {
+      return iframe.contentDocument?.documentElement?.scrollHeight;
+    } catch (e) {
+      print(e);
+    }
+    return null;
   }
 
   Future<int?> getContentWidth() async {
-    return jsWebView?.getContentWidth()?.toDartInt;
+    try {
+      return iframe.contentDocument?.documentElement?.scrollWidth;
+    } catch (e) {
+      print(e);
+    }
+    return null;
   }
 
   Future<String?> getOriginalUrl() async {
@@ -412,23 +467,45 @@ class InAppWebViewWebElement implements Disposable {
   }
 
   Future<int?> getScrollX() async {
-    return jsWebView?.getScrollX()?.toDartInt;
+    try {
+      return iframe.contentWindow?.scrollX.toInt();
+    } catch (e) {
+      print(e);
+    }
+    return null;
   }
 
   Future<int?> getScrollY() async {
-    return jsWebView?.getScrollY()?.toDartInt;
+    try {
+      return iframe.contentWindow?.scrollY.toInt();
+    } catch (e) {
+      print(e);
+    }
+    return null;
   }
 
   Future<bool> isSecureContext() async {
-    return jsWebView?.isSecureContext().toDart ?? false;
+    return iframe.contentWindow?.isSecureContext ?? false;
   }
 
   Future<bool> canScrollVertically() async {
-    return jsWebView?.canScrollVertically().toDart ?? false;
+    try {
+      return (iframe.contentDocument?.body?.scrollHeight ?? 0) >
+          (iframe.contentWindow?.innerHeight ?? 0);
+    } catch (e) {
+      print(e);
+    }
+    return false;
   }
 
   Future<bool> canScrollHorizontally() async {
-    return jsWebView?.canScrollHorizontally().toDart ?? false;
+    try {
+      return (iframe.contentDocument?.body?.scrollWidth ?? 0) >
+          (iframe.contentWindow?.innerWidth ?? 0);
+    } catch (e) {
+      print(e);
+    }
+    return false;
   }
 
   Set<Sandbox> getSandbox() {
@@ -444,8 +521,22 @@ class InAppWebViewWebElement implements Disposable {
   }
 
   Size getSize() {
-    var size = jsWebView?.getSize();
-    return Size(size!.width!.toDartDouble, size.height!.toDartDouble);
+    double? width = 0.0;
+    double? height = 0.0;
+    if (iframeContainer.style.width.indexOf('px') > 0) {
+      width = double.tryParse(iframeContainer.style.width.split('px')[0]);
+    }
+    if (width == null || width == 0.0) {
+      width = iframeContainer.getBoundingClientRect().width;
+    }
+    if (iframeContainer.style.height.indexOf('px') > 0) {
+      height = double.tryParse(iframeContainer.style.height.split('px')[0]);
+    }
+    if (height == null || height == 0.0) {
+      height = iframeContainer.getBoundingClientRect().height;
+    }
+
+    return Size(width, height);
   }
 
   Future<void> setSettings(InAppWebViewSettings newSettings) async {

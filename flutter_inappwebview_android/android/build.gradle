@@ -26,14 +26,14 @@ android {
     if (project.android.hasProperty("namespace")) {
         namespace 'com.pichillilorenzo.flutter_inappwebview_android'
     }
-    compileSdkVersion 33
+    compileSdkVersion 34
 
     defaultConfig {
         minSdkVersion 19
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
         vectorDrawables.useSupportLibrary = true
-        consumerProguardFiles 'proguard-rules.pro'
+        
     }
     lintOptions {
         disable 'InvalidPackage'
@@ -44,7 +44,7 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
         release {
-            minifyEnabled true
+            minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }

@@ -27,7 +27,11 @@ dependencies:
       url: https://github.com/nubank/flutter_inappwebview.git
       ref: b0826c4efd2f2248a47679f94f4bbd1fefb57399
       path: flutter_inappwebview_ios
-  flutter_inappwebview_macos: ^1.0.11
+  flutter_inappwebview_macos:
+    git:
+      url: https://github.com/nubank/flutter_inappwebview.git
+      ref: b0826c4efd2f2248a47679f94f4bbd1fefb57399
+      path: flutter_inappwebview_macos
   flutter_inappwebview_web: ^1.0.8
 
 dev_dependencies:

@@ -8,6 +8,7 @@ set(WIL_VERSION "1.0.231216.1")
 set(WEBVIEW_VERSION "1.0.2849.39")
 set(NLOHMANN_JSON_VERSION "3.11.2")
 set(CPP_WINRT_VERSION "2.0.240405.15")
+include(FetchContent)
 
 message(VERBOSE "CMake system version is ${CMAKE_SYSTEM_VERSION} (using SDK ${CMAKE_VS_WINDOWS_TARGET_PLATFORM_VERSION})")
 
@@ -23,9 +24,17 @@ cmake_policy(VERSION 3.14...3.25)
 # not be changed
 set(PLUGIN_NAME "flutter_inappwebview_windows_plugin")
 
+FetchContent_Declare(nuget
+  URL "https://dist.nuget.org/win-x86-commandline/v6.0.0/nuget.exe"
+  URL_HASH SHA256=04eb6c4fe4213907e2773e1be1bbbd730e9a655a3c9c58387ce8d4a714a5b9e1
+  DOWNLOAD_NO_EXTRACT true
+)
+
 find_program(NUGET nuget)
-if(NOT NUGET)
-  message(NOTICE "Nuget is not installed! The flutter_inappwebview_windows plugin requires it. Check https://inappwebview.dev/docs/intro#setup-windows")
+if (NOT NUGET)
+    message("Nuget.exe not found, trying to download or use cached version.")
+    FetchContent_MakeAvailable(nuget)
+    set(NUGET ${nuget_SOURCE_DIR}/nuget.exe)
 endif()
 
 add_custom_target(${PROJECT_NAME}_DEPS ALL)

@@ -1,3 +1,31 @@
+## 1.3.0+1
+
+- Fixed `X509Certificate.toMap` method
+
+## 1.3.0
+
+- Added `WebViewEnvironment.customSchemeRegistrations` parameter for Windows
+- Added `CustomSchemeRegistration` type
+- Updated docs
+
+## 1.2.0
+
+- Updated `Uint8List` conversion inside `fromMap` methods
+
+## 1.1.1
+
+- Updated permission models for Windows platform
+
+## 1.1.0+1
+
+- Updated docs and pubspec.yaml
+
+## 1.1.0
+
+- Added `PlatformWebViewEnvironment` class
+- Updates minimum supported SDK version to Flutter 3.24/Dart 3.5.
+- Removed unsupported feature `WebViewFeature.SUPPRESS_ERROR_PAGE`
+
 ## 1.0.10
 
 - Merged "Added == operator and hashCode to WebUri" [#1941](https://github.com/pichillilorenzo/flutter_inappwebview/pull/1941) (thanks to [daisukeueta](https://github.com/daisukeueta))

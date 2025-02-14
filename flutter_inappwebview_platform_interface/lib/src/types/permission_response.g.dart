@@ -13,7 +13,7 @@ class PermissionResponse {
 
   ///Resources granted to be accessed by origin.
   ///
-  ///**NOTE for iOS**: not used. The [action] taken is based on the [PermissionRequest.resources].
+  ///**NOTE for iOS, macOS and Windows**: not used. The [action] taken is based on the [PermissionRequest.resources].
   List<PermissionResourceType> resources;
   PermissionResponse(
       {this.action = PermissionResponseAction.DENY, this.resources = const []});

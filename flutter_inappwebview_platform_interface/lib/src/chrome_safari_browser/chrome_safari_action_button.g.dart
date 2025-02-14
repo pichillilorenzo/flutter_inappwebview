@@ -52,7 +52,7 @@ class ChromeSafariBrowserActionButton {
     }
     final instance = ChromeSafariBrowserActionButton(
       description: map['description'],
-      icon: map['icon'],
+      icon: Uint8List.fromList(map['icon'].cast<int>()),
       id: map['id'],
     );
     instance.shouldTint = map['shouldTint'];

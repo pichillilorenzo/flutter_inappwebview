@@ -5,6 +5,7 @@ import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 
 import '../inappwebview_platform.dart';
 import '../types/disposable.dart';
+import '../webview_environment/platform_webview_environment.dart';
 import 'in_app_webview_keep_alive.dart';
 import 'platform_webview.dart';
 import 'platform_headless_in_app_webview.dart';
@@ -24,6 +25,7 @@ class PlatformInAppWebViewWidgetCreationParams
       this.headlessWebView,
       this.keepAlive,
       this.preventGestureDelay,
+      this.webViewEnvironment,
       super.controllerFromPlatform,
       super.windowId,
       super.onWebViewCreated,
@@ -165,6 +167,7 @@ class PlatformInAppWebViewWidgetCreationParams
   ///- Android native WebView
   ///- iOS
   ///- Web
+  ///- MacOS
   final PlatformHeadlessInAppWebView? headlessWebView;
 
   ///Used to keep alive this WebView.
@@ -174,6 +177,8 @@ class PlatformInAppWebViewWidgetCreationParams
   ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
+  ///- MacOS
+  ///- Windows
   final InAppWebViewKeepAlive? keepAlive;
 
   ///Used to prevent gesture delay on iOS caused by Flutter's gestures handling
@@ -182,6 +187,12 @@ class PlatformInAppWebViewWidgetCreationParams
   ///**Officially Supported Platforms/Implementations**:
   ///- iOS
   final bool? preventGestureDelay;
+
+  ///Used to create the [PlatformInAppWebViewWidget] using the specified environment.
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Windows
+  final PlatformWebViewEnvironment? webViewEnvironment;
 }
 
 /// Interface for a platform implementation of a web view widget.
@@ -193,6 +204,8 @@ class PlatformInAppWebViewWidgetCreationParams
 ///- Android native WebView
 ///- iOS
 ///- Web
+///- MacOS
+///- Windows
 ///{@endtemplate}
 abstract class PlatformInAppWebViewWidget extends PlatformInterface
     implements Disposable {

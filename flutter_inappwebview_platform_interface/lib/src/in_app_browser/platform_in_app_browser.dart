@@ -19,6 +19,7 @@ import '../in_app_webview/in_app_webview_settings.dart';
 
 import '../print_job/main.dart';
 import '../web_uri.dart';
+import '../webview_environment/platform_webview_environment.dart';
 import 'in_app_browser_menu_item.dart';
 import 'in_app_browser_settings.dart';
 import '../debug_logging_settings.dart';
@@ -31,12 +32,14 @@ import '../pull_to_refresh/platform_pull_to_refresh_controller.dart';
 @immutable
 class PlatformInAppBrowserCreationParams {
   /// Used by the platform implementation to create a new [PlatformInAppBrowser].
-  const PlatformInAppBrowserCreationParams(
-      {this.contextMenu,
-      this.pullToRefreshController,
-      this.findInteractionController,
-      this.initialUserScripts,
-      this.windowId});
+  const PlatformInAppBrowserCreationParams({
+    this.contextMenu,
+    this.pullToRefreshController,
+    this.findInteractionController,
+    this.initialUserScripts,
+    this.windowId,
+    this.webViewEnvironment,
+  });
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformInAppBrowser.contextMenu}
   final ContextMenu? contextMenu;
@@ -52,6 +55,12 @@ class PlatformInAppBrowserCreationParams {
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformInAppBrowser.windowId}
   final int? windowId;
+
+  ///Used to create the [PlatformInAppBrowser] using the specified environment.
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Windows
+  final PlatformWebViewEnvironment? webViewEnvironment;
 }
 
 ///{@template flutter_inappwebview_platform_interface.PlatformInAppBrowser}
@@ -64,6 +73,7 @@ class PlatformInAppBrowserCreationParams {
 ///- Android native WebView
 ///- iOS
 ///- MacOS
+///- Windows
 ///{@endtemplate}
 abstract class PlatformInAppBrowser extends PlatformInterface
     implements Disposable {
@@ -82,29 +92,53 @@ abstract class PlatformInAppBrowser extends PlatformInterface
 
   ///{@template flutter_inappwebview_platform_interface.PlatformInAppBrowser.contextMenu}
   ///Context menu used by the browser. It should be set before opening the browser.
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Android native WebView
+  ///- iOS
   ///{@endtemplate}
   ContextMenu? get contextMenu => params.contextMenu;
 
   ///{@template flutter_inappwebview_platform_interface.PlatformInAppBrowser.pullToRefreshController}
   ///Represents the pull-to-refresh feature controller.
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Android native WebView
+  ///- iOS
   ///{@endtemplate}
   PlatformPullToRefreshController? get pullToRefreshController =>
       params.pullToRefreshController;
 
   ///{@template flutter_inappwebview_platform_interface.PlatformInAppBrowser.findInteractionController}
   ///Represents the find interaction feature controller.
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Android native WebView
+  ///- iOS
+  ///- MacOS
   ///{@endtemplate}
   PlatformFindInteractionController? get findInteractionController =>
       params.findInteractionController;
 
   ///{@template flutter_inappwebview_platform_interface.PlatformInAppBrowser.initialUserScripts}
   ///Initial list of user scripts to be loaded at start or end of a page loading.
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Android native WebView
+  ///- iOS
+  ///- MacOS
+  ///- Windows
   ///{@endtemplate}
   UnmodifiableListView<UserScript>? get initialUserScripts =>
       params.initialUserScripts;
 
   ///{@template flutter_inappwebview_platform_interface.PlatformInAppBrowser.windowId}
   ///The window id of a [CreateWindowAction.windowId].
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Android native WebView
+  ///- iOS
+  ///- MacOS
   ///{@endtemplate}
   int? get windowId => params.windowId;
 
@@ -172,6 +206,7 @@ abstract class PlatformInAppBrowser extends PlatformInterface
   ///- Android native WebView
   ///- iOS
   ///- MacOS
+  ///- Windows
   ///{@endtemplate}
   Future<void> openUrlRequest(
       {required URLRequest urlRequest,
@@ -225,6 +260,7 @@ abstract class PlatformInAppBrowser extends PlatformInterface
   ///- Android native WebView
   ///- iOS
   ///- MacOS
+  ///- Windows
   ///{@endtemplate}
   Future<void> openFile(
       {required String assetFilePath,
@@ -252,6 +288,7 @@ abstract class PlatformInAppBrowser extends PlatformInterface
   ///- Android native WebView
   ///- iOS
   ///- MacOS
+  ///- Windows
   ///{@endtemplate}
   Future<void> openData(
       {required String data,
@@ -274,6 +311,7 @@ abstract class PlatformInAppBrowser extends PlatformInterface
   ///- Android native WebView
   ///- iOS
   ///- MacOS
+  ///- Windows
   ///{@endtemplate}
   Future<void> openWithSystemBrowser({required WebUri url}) {
     throw UnimplementedError(
@@ -288,6 +326,7 @@ abstract class PlatformInAppBrowser extends PlatformInterface
   ///**Officially Supported Platforms/Implementations**:
   ///- Android
   ///- iOS 14.0+
+  ///- macOS 10.15+
   ///{@endtemplate}
   void addMenuItem(InAppBrowserMenuItem menuItem) {
     throw UnimplementedError(
@@ -302,6 +341,7 @@ abstract class PlatformInAppBrowser extends PlatformInterface
   ///**Officially Supported Platforms/Implementations**:
   ///- Android
   ///- iOS 14.0+
+  ///- macOS 10.15+
   ///{@endtemplate}
   void addMenuItems(List<InAppBrowserMenuItem> menuItems) {
     throw UnimplementedError(
@@ -317,6 +357,7 @@ abstract class PlatformInAppBrowser extends PlatformInterface
   ///**Officially Supported Platforms/Implementations**:
   ///- Android
   ///- iOS 14.0+
+  ///- macOS 10.15+
   ///{@endtemplate}
   bool removeMenuItem(InAppBrowserMenuItem menuItem) {
     throw UnimplementedError(
@@ -331,6 +372,7 @@ abstract class PlatformInAppBrowser extends PlatformInterface
   ///**Officially Supported Platforms/Implementations**:
   ///- Android
   ///- iOS 14.0+
+  ///- macOS 10.15+
   ///{@endtemplate}
   void removeMenuItems(List<InAppBrowserMenuItem> menuItems) {
     throw UnimplementedError(
@@ -345,6 +387,7 @@ abstract class PlatformInAppBrowser extends PlatformInterface
   ///**Officially Supported Platforms/Implementations**:
   ///- Android
   ///- iOS 14.0+
+  ///- macOS 10.15+
   ///{@endtemplate}
   void removeAllMenuItem() {
     throw UnimplementedError(
@@ -357,6 +400,7 @@ abstract class PlatformInAppBrowser extends PlatformInterface
   ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS 14.0+
+  ///- macOS 10.15+
   ///{@endtemplate}
   bool hasMenuItem(InAppBrowserMenuItem menuItem) {
     throw UnimplementedError(
@@ -370,6 +414,7 @@ abstract class PlatformInAppBrowser extends PlatformInterface
   ///- Android native WebView
   ///- iOS
   ///- MacOS
+  ///- Windows
   ///{@endtemplate}
   Future<void> show() {
     throw UnimplementedError('show is not implemented on the current platform');
@@ -382,6 +427,7 @@ abstract class PlatformInAppBrowser extends PlatformInterface
   ///- Android native WebView
   ///- iOS
   ///- MacOS
+  ///- Windows
   ///{@endtemplate}
   Future<void> hide() {
     throw UnimplementedError('hide is not implemented on the current platform');
@@ -394,6 +440,7 @@ abstract class PlatformInAppBrowser extends PlatformInterface
   ///- Android native WebView
   ///- iOS
   ///- MacOS
+  ///- Windows
   ///{@endtemplate}
   Future<void> close() {
     throw UnimplementedError(
@@ -407,6 +454,7 @@ abstract class PlatformInAppBrowser extends PlatformInterface
   ///- Android native WebView
   ///- iOS
   ///- MacOS
+  ///- Windows
   ///{@endtemplate}
   Future<bool> isHidden() {
     throw UnimplementedError(
@@ -464,6 +512,7 @@ abstract class PlatformInAppBrowser extends PlatformInterface
   ///- Android native WebView
   ///- iOS
   ///- MacOS
+  ///- Windows
   ///{@endtemplate}
   bool isOpened() {
     throw UnimplementedError(
@@ -487,6 +536,7 @@ abstract class PlatformInAppBrowserEvents {
   ///- Android native WebView
   ///- iOS
   ///- MacOS
+  ///- Windows
   void onBrowserCreated() {}
 
   ///Event fired when the [PlatformInAppBrowser] window is closed.
@@ -495,6 +545,7 @@ abstract class PlatformInAppBrowserEvents {
   ///- Android native WebView
   ///- iOS
   ///- MacOS
+  ///- Windows
   void onExit() {}
 
   ///Event fired when the main window is about to close.
@@ -509,6 +560,7 @@ abstract class PlatformInAppBrowserEvents {
   ///- Android native WebView ([Official API - WebViewClient.onPageStarted](https://developer.android.com/reference/android/webkit/WebViewClient#onPageStarted(android.webkit.WebView,%20java.lang.String,%20android.graphics.Bitmap)))
   ///- iOS ([Official API - WKNavigationDelegate.webView](https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455621-webview))
   ///- MacOS ([Official API - WKNavigationDelegate.webView](https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455621-webview))
+  ///- Windows ([Official API - ICoreWebView2.add_NavigationStarting](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/iwebview2webview?view=webview2-0.8.355#add_navigationstarting))
   void onLoadStart(WebUri? url) {}
 
   ///Event fired when the [PlatformInAppBrowser] finishes loading an [url].
@@ -517,6 +569,7 @@ abstract class PlatformInAppBrowserEvents {
   ///- Android native WebView ([Official API - WebViewClient.onPageFinished](https://developer.android.com/reference/android/webkit/WebViewClient#onPageFinished(android.webkit.WebView,%20java.lang.String)))
   ///- iOS ([Official API - WKNavigationDelegate.webView](https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455629-webview))
   ///- MacOS ([Official API - WKNavigationDelegate.webView](https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455629-webview))
+  ///- Windows ([Official API - ICoreWebView2.add_NavigationCompleted](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/iwebview2webview?view=webview2-0.8.355#add_navigationcompleted))
   void onLoadStop(WebUri? url) {}
 
   ///Use [onReceivedError] instead.
@@ -529,6 +582,7 @@ abstract class PlatformInAppBrowserEvents {
   ///- Android native WebView ([Official API - WebViewClient.onReceivedError](https://developer.android.com/reference/android/webkit/WebViewClient#onReceivedError(android.webkit.WebView,%20android.webkit.WebResourceRequest,%20android.webkit.WebResourceError)))
   ///- iOS ([Official API - WKNavigationDelegate.webView](https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455623-webview))
   ///- MacOS ([Official API - WKNavigationDelegate.webView](https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455623-webview))
+  ///- Windows ([Official API - ICoreWebView2.add_NavigationCompleted](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/iwebview2webview?view=webview2-0.8.355#add_navigationcompleted))
   void onReceivedError(WebResourceRequest request, WebResourceError error) {}
 
   ///Use [onReceivedHttpError] instead.
@@ -547,6 +601,7 @@ abstract class PlatformInAppBrowserEvents {
   ///- Android native WebView ([Official API - WebViewClient.onReceivedHttpError](https://developer.android.com/reference/android/webkit/WebViewClient#onReceivedHttpError(android.webkit.WebView,%20android.webkit.WebResourceRequest,%20android.webkit.WebResourceResponse)))
   ///- iOS ([Official API - WKNavigationDelegate.webView](https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455643-webview))
   ///- MacOS ([Official API - WKNavigationDelegate.webView](https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455643-webview))
+  ///- Windows ([Official API - ICoreWebView2.add_NavigationCompleted](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/iwebview2webview?view=webview2-0.8.355#add_navigationcompleted))
   void onReceivedHttpError(
       WebResourceRequest request, WebResourceResponse errorResponse) {}
 
@@ -556,6 +611,7 @@ abstract class PlatformInAppBrowserEvents {
   ///- Android native WebView ([Official API - WebChromeClient.onProgressChanged](https://developer.android.com/reference/android/webkit/WebChromeClient#onProgressChanged(android.webkit.WebView,%20int)))
   ///- iOS
   ///- MacOS
+  ///- Windows
   void onProgressChanged(int progress) {}
 
   ///Event fired when the [PlatformInAppBrowser] webview receives a [ConsoleMessage].
@@ -564,6 +620,7 @@ abstract class PlatformInAppBrowserEvents {
   ///- Android native WebView ([Official API - WebChromeClient.onConsoleMessage](https://developer.android.com/reference/android/webkit/WebChromeClient#onConsoleMessage(android.webkit.ConsoleMessage)))
   ///- iOS
   ///- MacOS
+  ///- Windows
   void onConsoleMessage(ConsoleMessage consoleMessage) {}
 
   ///Give the host application a chance to take control when a URL is about to be loaded in the current WebView. This event is not called on the initial load of the WebView.
@@ -641,6 +698,7 @@ abstract class PlatformInAppBrowserEvents {
   ///- Android native WebView
   ///- iOS ([Official API - WKURLSchemeHandler](https://developer.apple.com/documentation/webkit/wkurlschemehandler))
   ///- MacOS ([Official API - WKURLSchemeHandler](https://developer.apple.com/documentation/webkit/wkurlschemehandler))
+  ///- Windows
   Future<CustomSchemeResponse?>? onLoadResourceWithCustomScheme(
       WebResourceRequest request) {
     return null;
@@ -678,6 +736,7 @@ abstract class PlatformInAppBrowserEvents {
   ///- Android native WebView ([Official API - WebChromeClient.onCreateWindow](https://developer.android.com/reference/android/webkit/WebChromeClient#onCreateWindow(android.webkit.WebView,%20boolean,%20boolean,%20android.os.Message)))
   ///- iOS ([Official API - WKUIDelegate.webView](https://developer.apple.com/documentation/webkit/wkuidelegate/1536907-webview))
   ///- MacOS ([Official API - WKUIDelegate.webView](https://developer.apple.com/documentation/webkit/wkuidelegate/1536907-webview))
+  ///- Windows ([Official API - ICoreWebView2.add_NewWindowRequested](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2?view=webview2-1.0.2210.55#add_newwindowrequested))
   Future<bool?>? onCreateWindow(CreateWindowAction createWindowAction) {
     return null;
   }
@@ -689,6 +748,7 @@ abstract class PlatformInAppBrowserEvents {
   ///- Android native WebView ([Official API - WebChromeClient.onCloseWindow](https://developer.android.com/reference/android/webkit/WebChromeClient#onCloseWindow(android.webkit.WebView)))
   ///- iOS ([Official API - WKUIDelegate.webViewDidClose](https://developer.apple.com/documentation/webkit/wkuidelegate/1537390-webviewdidclose))
   ///- MacOS ([Official API - WKUIDelegate.webViewDidClose](https://developer.apple.com/documentation/webkit/wkuidelegate/1537390-webviewdidclose))
+  ///- Windows ([Official API - ICoreWebView2.add_WindowCloseRequested](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2?view=webview2-1.0.2210.55#add_windowcloserequested))
   void onCloseWindow() {}
 
   ///Event fired when the JavaScript `window` object of the WebView has received focus.
@@ -886,6 +946,7 @@ abstract class PlatformInAppBrowserEvents {
   ///- Android native WebView ([Official API - WebViewClient.doUpdateVisitedHistory](https://developer.android.com/reference/android/webkit/WebViewClient#doUpdateVisitedHistory(android.webkit.WebView,%20java.lang.String,%20boolean)))
   ///- iOS
   ///- MacOS
+  ///- Windows ([Official API - ICoreWebView2.add_HistoryChanged](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2?view=webview2-1.0.2210.55#add_historychanged))
   void onUpdateVisitedHistory(WebUri? url, bool? isReload) {}
 
   ///Use [onPrintRequest] instead
@@ -955,6 +1016,7 @@ abstract class PlatformInAppBrowserEvents {
   ///- Android native WebView ([Official API - WebChromeClient.onReceivedTitle](https://developer.android.com/reference/android/webkit/WebChromeClient#onReceivedTitle(android.webkit.WebView,%20java.lang.String)))
   ///- iOS
   ///- MacOS
+  ///- Windows ([Official API - ICoreWebView2.add_DocumentTitleChanged](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2?view=webview2-1.0.2210.55#add_documenttitlechanged))
   void onTitleChanged(String? title) {}
 
   ///Event fired to respond to the results of an over-scroll operation.
@@ -1028,6 +1090,7 @@ abstract class PlatformInAppBrowserEvents {
   ///- Android native WebView ([Official API - WebChromeClient.onPermissionRequest](https://developer.android.com/reference/android/webkit/WebChromeClient#onPermissionRequest(android.webkit.PermissionRequest)))
   ///- iOS
   ///- MacOS
+  ///- Windows ([Official API - ICoreWebView2.add_PermissionRequested](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/iwebview2webview?view=webview2-0.8.355#add_permissionrequested))
   Future<PermissionResponse?>? onPermissionRequest(
       PermissionRequest permissionRequest) {
     return null;
@@ -1087,6 +1150,7 @@ abstract class PlatformInAppBrowserEvents {
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebViewClient.shouldInterceptRequest](https://developer.android.com/reference/android/webkit/WebViewClient#shouldInterceptRequest(android.webkit.WebView,%20android.webkit.WebResourceRequest)))
+  ///- Windows ([ICoreWebView2.add_WebResourceRequested](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2?view=webview2-1.0.2478.35#add_webresourcerequested))
   Future<WebResourceResponse?>? shouldInterceptRequest(
       WebResourceRequest request) {
     return null;

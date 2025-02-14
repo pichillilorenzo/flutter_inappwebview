@@ -1,3 +1,24 @@
+## 1.1.2
+
+- Updated flutter_inappwebview_platform_interface version to ^1.3.0
+
+## 1.1.1
+
+- Updated flutter_inappwebview_platform_interface version to ^1.2.0
+
+## 1.1.0+2
+
+- Updated flutter_inappwebview_platform_interface version
+
+## 1.1.0+1
+
+- Updated pubspec.yaml
+
+## 1.1.0
+ 
+- Migrates package to `package:web`.
+- Updates minimum supported SDK version to Flutter 3.24/Dart 3.5.
+
 ## 1.0.8
 
 - Updated `flutter_inappwebview_platform_interface` version dependency to `^1.0.10`

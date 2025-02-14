@@ -596,9 +596,6 @@ public class InAppWebViewSettings implements ISettings<InAppWebViewInterface> {
         rendererPriorityPolicy.put("waivedWhenNotVisible", webView.getRendererPriorityWaivedWhenNotVisible());
         realSettings.put("rendererPriorityPolicy", rendererPriorityPolicy);
       }
-      if (WebViewFeature.isFeatureSupported(WebViewFeature.SUPPRESS_ERROR_PAGE)) {
-        realSettings.put("disableDefaultErrorPage", WebSettingsCompat.willSuppressErrorPage(settings));
-      }
       if (WebViewFeature.isFeatureSupported(WebViewFeature.ALGORITHMIC_DARKENING) && Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
         realSettings.put("algorithmicDarkeningAllowed", WebSettingsCompat.isAlgorithmicDarkeningAllowed(settings));
       }

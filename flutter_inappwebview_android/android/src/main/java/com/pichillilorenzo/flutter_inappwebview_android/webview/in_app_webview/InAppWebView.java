@@ -71,7 +71,6 @@ import com.pichillilorenzo.flutter_inappwebview_android.content_blocker.ContentB
 import com.pichillilorenzo.flutter_inappwebview_android.content_blocker.ContentBlockerTrigger;
 import com.pichillilorenzo.flutter_inappwebview_android.find_interaction.FindInteractionController;
 import com.pichillilorenzo.flutter_inappwebview_android.in_app_browser.InAppBrowserDelegate;
-import com.pichillilorenzo.flutter_inappwebview_android.plugin_scripts_js.ConsoleLogJS;
 import com.pichillilorenzo.flutter_inappwebview_android.plugin_scripts_js.InterceptAjaxRequestJS;
 import com.pichillilorenzo.flutter_inappwebview_android.plugin_scripts_js.InterceptFetchRequestJS;
 import com.pichillilorenzo.flutter_inappwebview_android.plugin_scripts_js.JavaScriptBridgeJS;
@@ -389,10 +388,12 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
     settings.setSaveFormData(customSettings.saveFormData);
     if (customSettings.incognito)
       setIncognito(true);
-    if (customSettings.hardwareAcceleration)
-      setLayerType(View.LAYER_TYPE_HARDWARE, null);
-    else
-      setLayerType(View.LAYER_TYPE_SOFTWARE, null);
+    if (customSettings.useHybridComposition) {
+      if (customSettings.hardwareAcceleration)
+        setLayerType(View.LAYER_TYPE_HARDWARE, null);
+      else
+        setLayerType(View.LAYER_TYPE_NONE, null);
+    }
     if (customSettings.regexToCancelSubFramesLoading != null) {
       regexToCancelSubFramesLoadingCompiled = Pattern.compile(customSettings.regexToCancelSubFramesLoading);
     }
@@ -431,9 +432,6 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
               (boolean) customSettings.rendererPriorityPolicy.get("waivedWhenNotVisible"));
     }
 
-    if (WebViewFeature.isFeatureSupported(WebViewFeature.SUPPRESS_ERROR_PAGE)) {
-      WebSettingsCompat.setWillSuppressErrorPage(settings, customSettings.disableDefaultErrorPage);
-    }
     if (WebViewFeature.isFeatureSupported(WebViewFeature.ALGORITHMIC_DARKENING) && Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
       WebSettingsCompat.setAlgorithmicDarkeningAllowed(settings, customSettings.algorithmicDarkeningAllowed);
     }
@@ -564,7 +562,6 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
   public void prepareAndAddUserScripts() {
     userContentController.addPluginScript(PromisePolyfillJS.PROMISE_POLYFILL_JS_PLUGIN_SCRIPT);
     userContentController.addPluginScript(JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_JS_PLUGIN_SCRIPT);
-    userContentController.addPluginScript(ConsoleLogJS.CONSOLE_LOG_JS_PLUGIN_SCRIPT);
     userContentController.addPluginScript(PrintJS.PRINT_JS_PLUGIN_SCRIPT);
     userContentController.addPluginScript(OnWindowBlurEventJS.ON_WINDOW_BLUR_EVENT_JS_PLUGIN_SCRIPT);
     userContentController.addPluginScript(OnWindowFocusEventJS.ON_WINDOW_FOCUS_EVENT_JS_PLUGIN_SCRIPT);
@@ -1024,11 +1021,13 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
     if (newSettingsMap.get("incognito") != null && customSettings.incognito != newCustomSettings.incognito)
       setIncognito(newCustomSettings.incognito);
 
-    if (newSettingsMap.get("hardwareAcceleration") != null && customSettings.hardwareAcceleration != newCustomSettings.hardwareAcceleration) {
-      if (newCustomSettings.hardwareAcceleration)
-        setLayerType(View.LAYER_TYPE_HARDWARE, null);
-      else
-        setLayerType(View.LAYER_TYPE_SOFTWARE, null);
+    if (customSettings.useHybridComposition) {
+      if (newSettingsMap.get("hardwareAcceleration") != null && customSettings.hardwareAcceleration != newCustomSettings.hardwareAcceleration) {
+        if (newCustomSettings.hardwareAcceleration)
+          setLayerType(View.LAYER_TYPE_HARDWARE, null);
+        else
+          setLayerType(View.LAYER_TYPE_NONE, null);
+      }
     }
 
     if (newSettingsMap.get("regexToCancelSubFramesLoading") != null && (customSettings.regexToCancelSubFramesLoading == null ||
@@ -1101,11 +1100,6 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
         setHorizontalScrollbarTrackDrawable(new ColorDrawable(Color.parseColor(newCustomSettings.horizontalScrollbarTrackColor)));
     }
 
-    if (newSettingsMap.get("disableDefaultErrorPage") != null &&
-            !Util.objEquals(customSettings.disableDefaultErrorPage, newCustomSettings.disableDefaultErrorPage) &&
-            WebViewFeature.isFeatureSupported(WebViewFeature.SUPPRESS_ERROR_PAGE)) {
-      WebSettingsCompat.setWillSuppressErrorPage(settings, newCustomSettings.disableDefaultErrorPage);
-    }
     if (newSettingsMap.get("algorithmicDarkeningAllowed") != null &&
             !Util.objEquals(customSettings.algorithmicDarkeningAllowed, newCustomSettings.algorithmicDarkeningAllowed) &&
             WebViewFeature.isFeatureSupported(WebViewFeature.ALGORITHMIC_DARKENING) && Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {

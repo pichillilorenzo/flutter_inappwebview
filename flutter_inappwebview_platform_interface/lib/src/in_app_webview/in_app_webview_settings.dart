@@ -57,8 +57,12 @@ class InAppWebViewSettings_ {
   ///If the [PlatformWebViewCreationParams.shouldOverrideUrlLoading] event is implemented and this value is `null`,
   ///it will be automatically inferred as `true`, otherwise, the default value is `false`.
   ///This logic will not be applied for [PlatformInAppBrowser], where you must set the value manually.
-  @SupportedPlatforms(
-      platforms: [AndroidPlatform(), IOSPlatform(), MacOSPlatform()])
+  @SupportedPlatforms(platforms: [
+    AndroidPlatform(),
+    IOSPlatform(),
+    MacOSPlatform(),
+    WindowsPlatform()
+  ])
   bool? useShouldOverrideUrlLoading;
 
   ///Set to `true` to be able to listen at the [PlatformWebViewCreationParams.onLoadResource] event.
@@ -98,7 +102,11 @@ class InAppWebViewSettings_ {
     MacOSPlatform(
         apiName: "WKWebView.customUserAgent",
         apiUrl:
-            "https://developer.apple.com/documentation/webkit/wkwebview/1414950-customuseragent")
+            "https://developer.apple.com/documentation/webkit/wkwebview/1414950-customuseragent"),
+    WindowsPlatform(
+        apiName: 'ICoreWebView2Settings2.put_UserAgent',
+        apiUrl:
+            'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2settings2?view=webview2-1.0.2210.55#put_useragent')
   ])
   String? userAgent;
 
@@ -130,7 +138,11 @@ class InAppWebViewSettings_ {
         apiName: "WKWebpagePreferences.allowsContentJavaScript",
         apiUrl:
             "https://developer.apple.com/documentation/webkit/wkwebpagepreferences/3552422-allowscontentjavascript/"),
-    WebPlatform(requiresSameOrigin: false)
+    WebPlatform(requiresSameOrigin: false),
+    WindowsPlatform(
+        apiName: "ICoreWebView2Settings.put_IsScriptEnabled",
+        apiUrl:
+            "https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2settings?view=webview2-1.0.2210.55#put_isscriptenabled")
   ])
   bool? javaScriptEnabled;
 
@@ -294,7 +306,11 @@ class InAppWebViewSettings_ {
             """setting this to `true`, it will clear all the cookies of all WebView instances, 
 because there isn't any way to make the website data store non-persistent for the specific WebView instance such as on iOS."""),
     IOSPlatform(),
-    MacOSPlatform()
+    MacOSPlatform(),
+    WindowsPlatform(
+      apiName: "ICoreWebView2ControllerOptions.put_IsInPrivateModeEnabled",
+      apiUrl: "https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2controlleroptions?view=webview2-1.0.2792.45#put_isinprivatemodeenabled"
+    )
   ])
   bool? incognito;
 
@@ -307,7 +323,12 @@ because there isn't any way to make the website data store non-persistent for th
   @SupportedPlatforms(platforms: [
     AndroidPlatform(),
     IOSPlatform(),
-    MacOSPlatform(available: "12.0")
+    MacOSPlatform(available: "12.0"),
+    WindowsPlatform(
+        available: '1.0.774.44',
+        apiName: 'ICoreWebView2Controller2.put_DefaultBackgroundColor',
+        apiUrl:
+            'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2controller2?view=webview2-1.0.2210.55#put_defaultbackgroundcolor')
   ])
   bool? transparentBackground;
 
@@ -322,8 +343,15 @@ because there isn't any way to make the website data store non-persistent for th
   bool? disableHorizontalScroll;
 
   ///Set to `true` to disable context menu. The default value is `false`.
-  @SupportedPlatforms(
-      platforms: [AndroidPlatform(), IOSPlatform(), WebPlatform()])
+  @SupportedPlatforms(platforms: [
+    AndroidPlatform(),
+    IOSPlatform(),
+    WebPlatform(),
+    WindowsPlatform(
+        apiName: "ICoreWebView2Settings.put_AreDefaultContextMenusEnabled",
+        apiUrl:
+            "https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2settings?view=webview2-1.0.2210.55#put_aredefaultcontextmenusenabled")
+  ])
   bool? disableContextMenu;
 
   ///Set to `false` if the WebView should not support zooming using its on-screen zoom controls and gestures. The default value is `true`.
@@ -333,7 +361,11 @@ because there isn't any way to make the website data store non-persistent for th
         apiUrl:
             "https://developer.android.com/reference/android/webkit/WebSettings?hl=en#setSupportZoom(boolean)"),
     IOSPlatform(),
-    MacOSPlatform()
+    MacOSPlatform(),
+    WindowsPlatform(
+        apiName: "ICoreWebView2Settings.put_IsZoomControlEnabled",
+        apiUrl:
+            "https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2settings?view=webview2-1.0.2210.55#put_iszoomcontrolenabled")
   ])
   bool? supportZoom;
 
@@ -1537,7 +1569,11 @@ as it can cause framerate drops on animations in Android 9 and lower (see [Hybri
         available: "13.3",
         apiName: "WKWebView.isInspectable",
         apiUrl:
-            "https://developer.apple.com/documentation/webkit/wkwebview/4111163-isinspectable")
+            "https://developer.apple.com/documentation/webkit/wkwebview/4111163-isinspectable"),
+    WindowsPlatform(
+        apiName: "ICoreWebView2Settings.put_AreDevToolsEnabled",
+        apiUrl:
+            "https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2settings?view=webview2-1.0.2210.55#put_aredevtoolsenabled")
   ])
   bool? isInspectable;
 

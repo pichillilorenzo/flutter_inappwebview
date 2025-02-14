@@ -15,7 +15,7 @@ class PermissionRequest_ {
 
   ///List of resources the web content wants to access.
   ///
-  ///**NOTE for iOS**: this list will have only 1 element and will be used by the [PermissionResponse.action]
+  ///**NOTE for iOS, macOS and Windows**: this list will have only 1 element and will be used by the [PermissionResponse.action]
   ///as the resource to consider when applying the corresponding action.
   List<PermissionResourceType_> resources;
 

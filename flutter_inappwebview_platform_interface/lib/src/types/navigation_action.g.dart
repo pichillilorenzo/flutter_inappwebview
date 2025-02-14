@@ -23,8 +23,11 @@ class NavigationAction {
   ///
   ///**NOTE for Android native WebView**: On Android < 21, this is always `false`
   ///
+  ///**NOTE for Windows**: Available only if the request is associated to the [PlatformWebViewCreationParams.onCreateWindow] event
+  ///
   ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView 21+ ([Official API - WebResourceRequest.hasGesture](https://developer.android.com/reference/android/webkit/WebResourceRequest#hasGesture()))
+  ///- Windows
   bool? hasGesture;
 
   ///Use [sourceFrame] instead.
@@ -41,7 +44,7 @@ class NavigationAction {
 
   ///Indicates whether the request was made for the main frame.
   ///
-  ///**NOTE for Android**: If the request is associated to the [PlatformWebViewCreationParams.onCreateWindow] event, this is always `true`.
+  ///**NOTE for Android and Windows**: If the request is associated to the [PlatformWebViewCreationParams.onCreateWindow] event, this is always `true`.
   ///Also, on Android < 21, this is always `true`.
   bool isForMainFrame;
 
@@ -52,13 +55,15 @@ class NavigationAction {
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- Android native WebView 21+ ([Official API - WebResourceRequest.isRedirect](https://developer.android.com/reference/android/webkit/WebResourceRequest#isRedirect()))
+  ///- Windows
   bool? isRedirect;
 
-  ///The type of action triggering the navigation.ì
+  ///The type of action triggering the navigation.
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- iOS ([Official API - WKNavigationAction.navigationType](https://developer.apple.com/documentation/webkit/wknavigationaction/1401914-navigationtype))
   ///- MacOS ([Official API - WKNavigationAction.navigationType](https://developer.apple.com/documentation/webkit/wknavigationaction/1401914-navigationtype))
+  ///- Windows
   NavigationType? navigationType;
 
   ///The URL request object associated with the navigation action.

@@ -255,6 +255,19 @@ namespace flutter_inappwebview_plugin
     webViews.clear();
     keepAliveWebViews.clear();
     windowWebViews.clear();
+    if (compositor_) {
+      compositor_->Release();
+      compositor_ = nullptr;
+    }
+    if (graphics_context_) {
+      graphics_context_.reset();
+    }
+    if (dispatcher_queue_controller_) {
+      dispatcher_queue_controller_ = nullptr;
+    }
+    if (rohelper_) {
+      rohelper_ = nullptr;
+    }
     UnregisterClass(windowClass_.lpszClassName, nullptr);
     plugin = nullptr;
   }

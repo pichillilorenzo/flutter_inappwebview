@@ -121,6 +121,15 @@ abstract class InAppWebViewPlatform extends PlatformInterface {
         'createPlatformFindInteractionController is not implemented on the current platform.');
   }
 
+  /// Creates a new empty [PlatformFindInteractionController] to access static methods.
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [FindInteractionController] in `flutter_inappwebview` instead.
+  PlatformFindInteractionController createPlatformFindInteractionControllerStatic() {
+    throw UnimplementedError(
+        'createPlatformFindInteractionControllerStatic is not implemented on the current platform.');
+  }
+
   /// Creates a new [PlatformPrintJobController].
   ///
   /// This function should only be called by the app-facing package.

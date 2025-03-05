@@ -89,6 +89,15 @@ class MacOSInAppWebViewPlatform extends InAppWebViewPlatform {
     return MacOSFindInteractionController(params);
   }
 
+  /// Creates a new empty [MacOSFindInteractionController] to access static methods.
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [FindInteractionController] in `flutter_inappwebview` instead.
+  @override
+  MacOSFindInteractionController createPlatformFindInteractionControllerStatic() {
+    return MacOSFindInteractionController.static();
+  }
+
   /// Creates a new [MacOSPrintJobController].
   ///
   /// This function should only be called by the app-facing package.

@@ -91,6 +91,15 @@ class IOSInAppWebViewPlatform extends InAppWebViewPlatform {
     return IOSFindInteractionController(params);
   }
 
+  /// Creates a new empty [IOSFindInteractionController] to access static methods.
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [FindInteractionController] in `flutter_inappwebview` instead.
+  @override
+  IOSFindInteractionController createPlatformFindInteractionControllerStatic() {
+    return IOSFindInteractionController.static();
+  }
+
   /// Creates a new [IOSPrintJobController].
   ///
   /// This function should only be called by the app-facing package.

@@ -95,6 +95,15 @@ class AndroidInAppWebViewPlatform extends InAppWebViewPlatform {
     return AndroidFindInteractionController(params);
   }
 
+  /// Creates a new empty [AndroidFindInteractionController] to access static methods.
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [FindInteractionController] in `flutter_inappwebview` instead.
+  @override
+  AndroidFindInteractionController createPlatformFindInteractionControllerStatic() {
+    return AndroidFindInteractionController.static();
+  }
+
   /// Creates a new [AndroidPrintJobController].
   ///
   /// This function should only be called by the app-facing package.

@@ -228,6 +228,15 @@ class WindowsInAppWebViewPlatform extends InAppWebViewPlatform {
   PlatformTracingController createPlatformTracingControllerStatic() {
     return _PlatformTracingController.static();
   }
+
+  /// Creates a new empty [PlatformFindInteractionController] to access static methods.
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [FindInteractionController] in `flutter_inappwebview` instead.
+  @override
+  PlatformFindInteractionController createPlatformFindInteractionControllerStatic() {
+    return _PlatformFindInteractionController.static();
+  }
 }
 
 class _PlatformChromeSafariBrowser extends PlatformChromeSafariBrowser {
@@ -292,4 +301,14 @@ class _PlatformTracingController extends PlatformTracingController {
       const PlatformTracingControllerCreationParams());
 
   factory _PlatformTracingController.static() => _staticValue;
+}
+
+class _PlatformFindInteractionController extends PlatformFindInteractionController {
+  _PlatformFindInteractionController(PlatformFindInteractionControllerCreationParams params)
+      : super.implementation(params);
+  static final _PlatformFindInteractionController _staticValue =
+  _PlatformFindInteractionController(
+      const PlatformFindInteractionControllerCreationParams());
+
+  factory _PlatformFindInteractionController.static() => _staticValue;
 }

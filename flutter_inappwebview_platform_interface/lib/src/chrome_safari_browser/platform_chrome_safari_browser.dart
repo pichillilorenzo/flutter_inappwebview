@@ -589,7 +589,7 @@ abstract class PlatformChromeSafariBrowser extends PlatformInterface
           platform: platform);
 
   ///{@template flutter_inappwebview_platform_interface.PlatformChromeSafariBrowser.isMethodSupported}
-  ///Check if the given [property] is supported by the [defaultTargetPlatform] or a specific [platform].
+  ///Check if the given [method] is supported by the [defaultTargetPlatform] or a specific [platform].
   ///{@endtemplate}
   bool isMethodSupported(PlatformChromeSafariBrowserMethod method,
           {TargetPlatform? platform}) =>

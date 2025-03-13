@@ -23,6 +23,7 @@ apply plugin: 'com.android.library'
 
 android {
     compileSdkVersion 31
+    namespace 'com.pichillilorenzo.flutter_inappwebview'
 
     defaultConfig {
         minSdkVersion 17

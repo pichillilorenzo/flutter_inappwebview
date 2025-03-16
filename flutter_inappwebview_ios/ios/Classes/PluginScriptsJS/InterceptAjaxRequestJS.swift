@@ -16,7 +16,7 @@ let INTERCEPT_AJAX_REQUEST_JS_PLUGIN_SCRIPT = PluginScript(
     groupName: INTERCEPT_AJAX_REQUEST_JS_PLUGIN_SCRIPT_GROUP_NAME,
     source: INTERCEPT_AJAX_REQUEST_JS_SOURCE,
     injectionTime: .atDocumentStart,
-    forMainFrameOnly: false,
+    forMainFrameOnly: true,
     requiredInAllContentWorlds: true,
     messageHandlerNames: [])
 
@@ -24,7 +24,7 @@ func createInterceptOnlyAsyncAjaxRequestsPluginScript(onlyAsync: Bool) -> Plugin
     return PluginScript(groupName: INTERCEPT_AJAX_REQUEST_JS_PLUGIN_SCRIPT_GROUP_NAME,
         source: "\(FLAG_VARIABLE_FOR_INTERCEPT_ONLY_ASYNC_AJAX_REQUESTS_JS_SOURCE) = \(onlyAsync);",
         injectionTime: .atDocumentStart,
-        forMainFrameOnly: false,
+        forMainFrameOnly: true,
         requiredInAllContentWorlds: true,
         messageHandlerNames: []
     );

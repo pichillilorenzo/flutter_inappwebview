@@ -6,7 +6,7 @@ import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_inappwebview_example/chrome_safari_browser_example.screen.dart';
 import 'package:flutter_inappwebview_example/headless_in_app_webview.screen.dart';
 import 'package:flutter_inappwebview_example/in_app_browser_example.screen.dart';
-import 'package:flutter_inappwebview_example/in_app_webiew_example.screen.dart';
+import 'package:flutter_inappwebview_example/in_app_webview_example.screen.dart';
 import 'package:flutter_inappwebview_example/web_authentication_session_example.screen.dart';
 import 'package:pointer_interceptor/pointer_interceptor.dart';
 

@@ -122,7 +122,7 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                   pullToRefreshController: pullToRefreshController,
                   onWebViewCreated: (controller) =>
                       webViewController = controller,
-                  onLoadStart: (controller, url) {
+                  onLoadStart: (_, url) {
                     setState(() {
                       this.url = url.toString();
                       urlController.text = this.url;
@@ -131,8 +131,7 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                   onPermissionRequest: (_, request) => PermissionResponse(
                       resources: request.resources,
                       action: PermissionResponseAction.GRANT),
-                  shouldOverrideUrlLoading:
-                      (controller, navigationAction) async {
+                  shouldOverrideUrlLoading: (_, navigationAction) async {
                     var uri = navigationAction.request.url!;
 
                     if (![
@@ -156,7 +155,7 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
 
                     return NavigationActionPolicy.ALLOW;
                   },
-                  onLoadStop: (controller, url) {
+                  onLoadStop: (_, url) {
                     pullToRefreshController?.endRefreshing();
                     setState(() {
                       this.url = url.toString();
@@ -174,13 +173,13 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                       urlController.text = this.url;
                     });
                   },
-                  onUpdateVisitedHistory: (controller, url, isReload) {
+                  onUpdateVisitedHistory: (_, url, __) {
                     setState(() {
                       this.url = url.toString();
                       urlController.text = this.url;
                     });
                   },
-                  onConsoleMessage: (controller, consoleMessage) =>
+                  onConsoleMessage: (_, consoleMessage) =>
                       print(consoleMessage),
                 ),
                 progress < 1.0

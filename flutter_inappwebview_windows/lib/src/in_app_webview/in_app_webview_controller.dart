@@ -2728,6 +2728,13 @@ class WindowsInAppWebViewController extends PlatformInAppWebViewController
   }
 
   @override
+  Future<void> setThemeMode(String theme) async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    args.putIfAbsent('theme', () => theme);
+    await channel?.invokeMethod('setThemeMode', args);
+  }
+
+  @override
   Future<dynamic> callDevToolsProtocolMethod(
       {required String methodName, Map<String, dynamic>? parameters}) async {
     Map<String, dynamic> args = <String, dynamic>{};

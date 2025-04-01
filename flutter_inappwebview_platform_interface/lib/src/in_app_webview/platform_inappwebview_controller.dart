@@ -2140,6 +2140,11 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
         'openDevTools is not implemented on the current platform');
   }
 
+  Future<void> setThemeMode(String theme) {
+    throw UnimplementedError(
+        'setThemeMode is not implemented on the current platform');
+  }
+
   ///{@template flutter_inappwebview_platform_interface.PlatformInAppWebViewController.callDevToolsProtocolMethod}
   ///Runs an asynchronous `DevToolsProtocol` method.
   ///

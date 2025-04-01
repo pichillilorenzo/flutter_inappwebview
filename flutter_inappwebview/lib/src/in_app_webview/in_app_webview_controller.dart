@@ -500,6 +500,8 @@ class InAppWebViewController {
   ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.openDevTools}
   Future<void> openDevTools() => platform.openDevTools();
 
+  Future<void> setThemeMode(String theme) => platform.setThemeMode(theme);
+
   ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.callDevToolsProtocolMethod}
   Future<dynamic> callDevToolsProtocolMethod(
           {required String methodName, Map<String, dynamic>? parameters}) =>

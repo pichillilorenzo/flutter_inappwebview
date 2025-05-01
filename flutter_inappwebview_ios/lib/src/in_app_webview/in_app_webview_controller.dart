@@ -170,6 +170,10 @@ class IOSInAppWebViewController extends PlatformInAppWebViewController
               props.webMessageChannels as Set<IOSWebMessageChannel>;
           _webMessageListeners =
               props.webMessageListeners as Set<IOSWebMessageListener>;
+          // restore the last URL if available
+          if (props.currentUrl != null) {
+            loadUrl(urlRequest: URLRequest(url: props.currentUrl));
+          }
         }
       }
     }
@@ -212,6 +216,18 @@ class IOSInAppWebViewController extends PlatformInAppWebViewController
             _inAppBrowserEventHandler != null) {
           String? url = call.arguments["url"];
           WebUri? uri = url != null ? WebUri(url) : null;
+          
+          // Update the current URL in the keepAlive properties
+          final keepAlive = webviewParams is PlatformInAppWebViewWidgetCreationParams ?
+              (webviewParams as PlatformInAppWebViewWidgetCreationParams).keepAlive : null;
+          if (keepAlive != null && uri != null) {
+            InAppWebViewControllerKeepAliveProps? props = _keepAliveMap[keepAlive];
+            if (props != null) {
+              props.currentUrl = uri;
+              _keepAliveMap[keepAlive] = props;
+            }
+          }
+          
           if (webviewParams != null && webviewParams!.onLoadStop != null)
             webviewParams!.onLoadStop!(_controllerFromPlatform, uri);
           else
@@ -1605,7 +1621,7 @@ class IOSInAppWebViewController extends PlatformInAppWebViewController
         html =
             await (await htmlRequest.close()).transform(Utf8Decoder()).join();
       } catch (e) {
-        developer.log(e.toString(), name: this.runtimeType.toString());
+        developer.log(e.toString(), name: runtimeType.toString());
       }
     }
 

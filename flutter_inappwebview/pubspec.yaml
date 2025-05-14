@@ -20,15 +20,9 @@ dependencies:
     sdk: flutter
   flutter_inappwebview_platform_interface: ^1.0.10
   flutter_inappwebview_android:
-    git:
-      url: https://github.com/kirito0206/flutter_inappwebview.git
-      path: ./flutter_inappwebview_android
-      ref: release/v6.0.0
+    path: ../flutter_inappwebview_android
   flutter_inappwebview_ios:
-    git:
-      url: https://github.com/kirito0206/flutter_inappwebview.git
-      path: ./flutter_inappwebview_ios
-      ref: release/v6.0.0
+    path: ../flutter_inappwebview_ios
   flutter_inappwebview_macos: ^1.0.11
   flutter_inappwebview_web: ^1.0.8
 

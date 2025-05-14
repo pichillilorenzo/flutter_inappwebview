@@ -1895,6 +1895,8 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
     if (WebViewFeature.isFeatureSupported(WebViewFeature.WEB_MESSAGE_LISTENER)) {
       WebViewCompat.addWebMessageListener(this, webMessageListener.jsObjectName, webMessageListener.allowedOriginRules, webMessageListener.listener);
       webMessageListeners.add(webMessageListener);
+    } else {
+      addJavascriptInterface(webMessageListener, webMessageListener.jsObjectName);
     }
   }
 

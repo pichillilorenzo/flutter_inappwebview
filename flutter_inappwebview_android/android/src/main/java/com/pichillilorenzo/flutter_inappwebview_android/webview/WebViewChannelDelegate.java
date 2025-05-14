@@ -635,16 +635,12 @@ public class WebViewChannelDelegate extends ChannelDelegateImpl {
         if (webView != null) {
           Map<String, Object> webMessageListenerMap = (Map<String, Object>) call.argument("webMessageListener");
           WebMessageListener webMessageListener = WebMessageListener.fromMap(webView, webView.getPlugin().messenger, webMessageListenerMap);
-          if (webView instanceof InAppWebView && WebViewFeature.isFeatureSupported(WebViewFeature.WEB_MESSAGE_LISTENER)) {
             try {
               webView.addWebMessageListener(webMessageListener);
               result.success(true);
             } catch (Exception e) {
               result.error(LOG_TAG, e.getMessage(), null);
             }
-          } else {
-            result.success(true);
-          }
         } else {
           result.success(true);
         }

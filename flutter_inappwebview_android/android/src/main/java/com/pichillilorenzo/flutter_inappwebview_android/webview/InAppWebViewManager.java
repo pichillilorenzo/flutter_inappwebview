@@ -20,6 +20,7 @@ import com.pichillilorenzo.flutter_inappwebview_android.plugin_scripts_js.JavaSc
 import com.pichillilorenzo.flutter_inappwebview_android.types.ChannelDelegateImpl;
 import com.pichillilorenzo.flutter_inappwebview_android.webview.in_app_webview.FlutterWebView;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -199,7 +200,6 @@ public class InAppWebViewManager extends ChannelDelegateImpl {
     FlutterWebView flutterWebView = keepAliveWebViews.get(keepAliveId);
     if (flutterWebView != null) {
       flutterWebView.keepAliveId = null;
-      // be sure to remove the view from the previous parent.
       View view = flutterWebView.getView();
       if (view != null) {
         ViewGroup parent = (ViewGroup) view.getParent();
@@ -209,10 +209,11 @@ public class InAppWebViewManager extends ChannelDelegateImpl {
       }
       flutterWebView.dispose();
     }
-    if (keepAliveWebViews.containsKey(keepAliveId)) {
-      keepAliveWebViews.put(keepAliveId, null);
-    }
+
+    // null ile set etmek yerine doğrudan kaldır
+    keepAliveWebViews.remove(keepAliveId);
   }
+
 
   public void clearAllCache(@NonNull Context context, boolean includeDiskFiles) {
     WebView tempWebView = new WebView(context);
@@ -223,7 +224,7 @@ public class InAppWebViewManager extends ChannelDelegateImpl {
   @Override
   public void dispose() {
     super.dispose();
-    Collection<FlutterWebView> flutterWebViews = keepAliveWebViews.values();
+    Collection<FlutterWebView> flutterWebViews = new ArrayList<>(keepAliveWebViews.values());
     for (FlutterWebView flutterWebView : flutterWebViews) {
       if (flutterWebView != null) {
         String keepAliveId = flutterWebView.keepAliveId;

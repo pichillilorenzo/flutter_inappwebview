@@ -243,35 +243,6 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
         lastTouchPointTimestamp = Int64(Date().timeIntervalSince1970 * 1000)
         SharedLastTouchPointTimestamp[self] = lastTouchPointTimestamp
         
-        // re-build context menu items for the current webview
-        UIMenuController.shared.menuItems = []
-        if let menu = self.contextMenu {
-            if let menuItems = menu["menuItems"] as? [[String : Any]] {
-                for menuItem in menuItems {
-                    let id = menuItem["id"]!
-                    let title = menuItem["title"] as! String
-                    let targetMethodName = "onContextMenuActionItemClicked-" + String(self.hash) + "-" +
-                                            (id is Int64 ? String(id as! Int64) : id as! String)
-                    if !self.responds(to: Selector(targetMethodName)) {
-                        let customAction: () -> Void = {
-                            self.channelDelegate?.onContextMenuActionItemClicked(id: id, title: title)
-                            if #available(iOS 16.0, *) {
-                                if #unavailable(iOS 16.4) {
-                                    self.onHideContextMenu()
-                                }
-                            }
-                        }
-                        let castedCustomAction: AnyObject = unsafeBitCast(customAction as @convention(block) () -> Void, to: AnyObject.self)
-                        let swizzledImplementation = imp_implementationWithBlock(castedCustomAction)
-                        class_addMethod(InAppWebView.self, Selector(targetMethodName), swizzledImplementation, nil)
-                        self.customIMPs.append(swizzledImplementation)
-                    }
-                    let item = UIMenuItem(title: title, action: Selector(targetMethodName))
-                    UIMenuController.shared.menuItems!.append(item)
-                }
-            }
-        }
-        
         // https://github.com/pichillilorenzo/flutter_inappwebview/pull/1665
         if preventGestureDelay, let gestures = superview?.superview?.gestureRecognizers {
             for gesture in gestures {
@@ -287,7 +258,35 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
     @available(iOS 13.0, *)
     public override func buildMenu(with builder: UIMenuBuilder) {
         if #available(iOS 16.0, *) {
+            //fix(ios): context menu not updating when setContextMenu is called from Flutter
             if let menu = contextMenu {
+                UIMenuController.shared.menuItems = []
+                if let menu = self.contextMenu {
+                    if let menuItems = menu["menuItems"] as? [[String : Any]] {
+                        for menuItem in menuItems {
+                            let id = menuItem["id"]!
+                            let title = menuItem["title"] as! String
+                            let targetMethodName = "onContextMenuActionItemClicked-" + String(self.hash) + "-" +
+                                                    (id is Int64 ? String(id as! Int64) : id as! String)
+                            if !self.responds(to: Selector(targetMethodName)) {
+                                let customAction: () -> Void = {
+                                    self.channelDelegate?.onContextMenuActionItemClicked(id: id, title: title)
+                                    if #available(iOS 16.0, *) {
+                                        if #unavailable(iOS 16.4) {
+                                            self.onHideContextMenu()
+                                        }
+                                    }
+                                }
+                                let castedCustomAction: AnyObject = unsafeBitCast(customAction as @convention(block) () -> Void, to: AnyObject.self)
+                                let swizzledImplementation = imp_implementationWithBlock(castedCustomAction)
+                                class_addMethod(InAppWebView.self, Selector(targetMethodName), swizzledImplementation, nil)
+                                self.customIMPs.append(swizzledImplementation)
+                            }
+                            let item = UIMenuItem(title: title, action: Selector(targetMethodName))
+                            UIMenuController.shared.menuItems!.append(item)
+                        }
+                    }
+                }
                 let contextMenuSettings = ContextMenuSettings()
                 if let contextMenuSettingsMap = menu["settings"] as? [String: Any?] {
                     let _ = contextMenuSettings.parse(settings: contextMenuSettingsMap)

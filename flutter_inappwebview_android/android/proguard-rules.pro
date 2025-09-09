@@ -16,3 +16,7 @@
 }
 -keep class com.pichillilorenzo.flutter_inappwebview_android.** { *; }
 -dontwarn android.window.BackEvent
+-dontwarn android.window.**
+-dontnote android.window.**
+-dontwarn io.flutter.embedding.android.**
+-dontwarn com.pichillilorenzo.flutter_inappwebview_android.**

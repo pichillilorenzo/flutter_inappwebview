@@ -31,7 +31,8 @@ func createInterceptOnlyAsyncAjaxRequestsPluginScript(onlyAsync: Bool) -> Plugin
 }
 
 let INTERCEPT_AJAX_REQUEST_JS_SOURCE = """
-\(FLAG_VARIABLE_FOR_SHOULD_INTERCEPT_AJAX_REQUEST_JS_SOURCE) = true;
+var w = (window.top == null || window.top === window) ? window : window.top;
+w.\(FLAG_VARIABLE_FOR_SHOULD_INTERCEPT_AJAX_REQUEST_JS_SOURCE) = true;
 (function(ajax) {
   var send = ajax.prototype.send;
   var open = ajax.prototype.open;

@@ -10,9 +10,6 @@ namespace flutter_inappwebview_plugin
 {
   using namespace Microsoft::WRL;
 
-  // Static mutex definition
-  std::mutex WebViewEnvironment::com_init_mutex_;
-
   WebViewEnvironment::WebViewEnvironment(const FlutterInappwebviewWindowsPlugin* plugin, const std::string& id)
     : plugin(plugin), id(id),
     channelDelegate(std::make_unique<WebViewEnvironmentChannelDelegate>(this, plugin->registrar->messenger()))
@@ -91,45 +88,23 @@ namespace flutter_inappwebview_plugin
     // Ensure COM is initialized before calling CreateCoreWebView2EnvironmentWithOptions
     // This is required by WebView2 v140.0.3485.94 and later versions
     // Reference: https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl
-    
-    HRESULT comInitResult;
+    HRESULT comInitResult = CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED);
     bool comWasInitializedByUs = false;
     
-    // Use mutex to prevent race conditions during COM initialization
-    {
-      std::lock_guard<std::mutex> lock(com_init_mutex_);
-      
-      // First try COINIT_APARTMENTTHREADED as recommended by Microsoft
-      comInitResult = CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED);
-      
-      if (SUCCEEDED(comInitResult)) {
-        // S_OK means we initialized COM, S_FALSE means it was already initialized
-        comWasInitializedByUs = (comInitResult == S_OK);
-        debugLog("COM initialized successfully with COINIT_APARTMENTTHREADED");
-      } else if (comInitResult == RPC_E_CHANGED_MODE) {
-        // COM was already initialized with COINIT_MULTITHREADED
-        // Try to reinitialize with MULTITHREADED to match existing state
-        CoUninitialize(); // Clean up the failed attempt
-        comInitResult = CoInitializeEx(nullptr, COINIT_MULTITHREADED);
-        if (SUCCEEDED(comInitResult)) {
-          comWasInitializedByUs = (comInitResult == S_OK);
-          debugLog("COM reinitialized with COINIT_MULTITHREADED to match existing state");
-        } else {
-          debugLog("Failed to reinitialize COM with COINIT_MULTITHREADED");
-          if (completionHandler) {
-            completionHandler(comInitResult);
-          }
-          return;
-        }
-      } else {
-        // COM initialization failed with some other error
-        debugLog("COM initialization failed with HRESULT: " + std::to_string(comInitResult));
-        if (completionHandler) {
-          completionHandler(comInitResult);
-        }
-        return;
+    if (SUCCEEDED(comInitResult)) {
+      // S_OK means we initialized COM, S_FALSE means it was already initialized
+      comWasInitializedByUs = (comInitResult == S_OK);
+    } else if (comInitResult == RPC_E_CHANGED_MODE) {
+      // COM was already initialized with COINIT_MULTITHREADED
+      // This is acceptable for WebView2, continue without error
+      debugLog("COM already initialized with COINIT_MULTITHREADED");
+    } else {
+      // COM initialization failed with some other error
+      if (completionHandler) {
+        completionHandler(comInitResult);
       }
-    } // mutex scope ends here
+      return;
+    }
 
     auto hr = CreateCoreWebView2EnvironmentWithOptions(
       settings && settings->browserExecutableFolder.has_value() ? utf8_to_wide(settings->browserExecutableFolder.value()).c_str() : nullptr,

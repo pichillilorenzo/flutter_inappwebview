@@ -85,12 +85,33 @@ namespace flutter_inappwebview_plugin
       }
     }
 
+    // Ensure COM is initialized before calling CreateCoreWebView2EnvironmentWithOptions
+    // This is required by WebView2 v140.0.3485.94 and later versions
+    // Reference: https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl
+    HRESULT comInitResult = CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED);
+    bool comWasInitializedByUs = false;
+    
+    if (SUCCEEDED(comInitResult)) {
+      // S_OK means we initialized COM, S_FALSE means it was already initialized
+      comWasInitializedByUs = (comInitResult == S_OK);
+    } else if (comInitResult == RPC_E_CHANGED_MODE) {
+      // COM was already initialized with COINIT_MULTITHREADED
+      // This is acceptable for WebView2, continue without error
+      debugLog("COM already initialized with COINIT_MULTITHREADED");
+    } else {
+      // COM initialization failed with some other error
+      if (completionHandler) {
+        completionHandler(comInitResult);
+      }
+      return;
+    }
+
     auto hr = CreateCoreWebView2EnvironmentWithOptions(
       settings && settings->browserExecutableFolder.has_value() ? utf8_to_wide(settings->browserExecutableFolder.value()).c_str() : nullptr,
       settings && settings->userDataFolder.has_value() ? utf8_to_wide(settings->userDataFolder.value()).c_str() : nullptr,
       options.Get(),
       Callback<ICoreWebView2CreateCoreWebView2EnvironmentCompletedHandler>(
-        [this, hwnd, completionHandler](HRESULT result, wil::com_ptr<ICoreWebView2Environment> environment) -> HRESULT
+        [this, hwnd, completionHandler, comWasInitializedByUs](HRESULT result, wil::com_ptr<ICoreWebView2Environment> environment) -> HRESULT
         {
           if (succeededOrLog(result)) {
             environment_ = std::move(environment);
@@ -161,11 +182,23 @@ namespace flutter_inappwebview_plugin
           else if (completionHandler) {
             completionHandler(result);
           }
+
+          // Clean up COM if we initialized it
+          if (comWasInitializedByUs) {
+            CoUninitialize();
+          }
+
           return S_OK;
         }).Get());
 
-    if (failedAndLog(hr) && completionHandler) {
-      completionHandler(hr);
+    if (failedAndLog(hr)) {
+      if (completionHandler) {
+        completionHandler(hr);
+      }
+      // Clean up COM if we initialized it and the call failed immediately
+      if (comWasInitializedByUs) {
+        CoUninitialize();
+      }
     }
   }
 

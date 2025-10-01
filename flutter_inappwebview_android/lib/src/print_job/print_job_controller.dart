@@ -11,16 +11,14 @@ import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_pla
 class AndroidPrintJobControllerCreationParams
     extends PlatformPrintJobControllerCreationParams {
   /// Creates a new [AndroidPrintJobControllerCreationParams] instance.
-  const AndroidPrintJobControllerCreationParams(
-      {required super.id});
+  const AndroidPrintJobControllerCreationParams({required super.id});
 
   /// Creates a [AndroidPrintJobControllerCreationParams] instance based on [PlatformPrintJobControllerCreationParams].
   factory AndroidPrintJobControllerCreationParams.fromPlatformPrintJobControllerCreationParams(
       // Recommended placeholder to prevent being broken by platform interface.
       // ignore: avoid_unused_constructor_parameters
       PlatformPrintJobControllerCreationParams params) {
-    return AndroidPrintJobControllerCreationParams(
-        id: params.id);
+    return AndroidPrintJobControllerCreationParams(id: params.id);
   }
 }
 
@@ -39,6 +37,15 @@ class AndroidPrintJobController extends PlatformPrintJobController
         'com.pichillilorenzo/flutter_inappwebview_printjobcontroller_${params.id}');
     handler = _handleMethod;
     initMethodCallHandler();
+  }
+
+  static final AndroidPrintJobController _staticValue =
+      AndroidPrintJobController(
+          AndroidPrintJobControllerCreationParams(id: ''));
+
+  /// Provide static access.
+  factory AndroidPrintJobController.static() {
+    return _staticValue;
   }
 
   Future<dynamic> _handleMethod(MethodCall call) async {

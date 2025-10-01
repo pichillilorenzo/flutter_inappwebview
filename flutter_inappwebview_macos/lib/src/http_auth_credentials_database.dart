@@ -58,10 +58,9 @@ class MacOSHttpAuthCredentialDatabase extends PlatformHttpAuthCredentialDatabase
   }
 
   static final MacOSHttpAuthCredentialDatabase _staticValue =
-  MacOSHttpAuthCredentialDatabase(
-      MacOSHttpAuthCredentialDatabaseCreationParams(
-          const PlatformHttpAuthCredentialDatabaseCreationParams()
-      ));
+      MacOSHttpAuthCredentialDatabase(
+          MacOSHttpAuthCredentialDatabaseCreationParams(
+              const PlatformHttpAuthCredentialDatabaseCreationParams()));
 
   factory MacOSHttpAuthCredentialDatabase.static() {
     return _staticValue;

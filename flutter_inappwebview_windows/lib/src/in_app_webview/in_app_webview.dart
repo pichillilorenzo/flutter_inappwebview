@@ -286,8 +286,7 @@ class WindowsInAppWebViewWidget extends PlatformInAppWebViewWidget {
       params.headlessWebView as WindowsHeadlessInAppWebView?;
 
   static final WindowsInAppWebViewWidget _staticValue =
-  WindowsInAppWebViewWidget(
-      WindowsInAppWebViewWidgetCreationParams());
+      WindowsInAppWebViewWidget(WindowsInAppWebViewWidgetCreationParams());
 
   factory WindowsInAppWebViewWidget.static() {
     return _staticValue;

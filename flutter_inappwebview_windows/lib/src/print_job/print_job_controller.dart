@@ -11,16 +11,14 @@ import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_pla
 class WindowsPrintJobControllerCreationParams
     extends PlatformPrintJobControllerCreationParams {
   /// Creates a new [WindowsPrintJobControllerCreationParams] instance.
-  const WindowsPrintJobControllerCreationParams(
-      {required super.id});
+  const WindowsPrintJobControllerCreationParams({required super.id});
 
   /// Creates a [WindowsPrintJobControllerCreationParams] instance based on [PlatformPrintJobControllerCreationParams].
   factory WindowsPrintJobControllerCreationParams.fromPlatformPrintJobControllerCreationParams(
       // Recommended placeholder to prevent being broken by platform interface.
       // ignore: avoid_unused_constructor_parameters
       PlatformPrintJobControllerCreationParams params) {
-    return WindowsPrintJobControllerCreationParams(
-        id: params.id);
+    return WindowsPrintJobControllerCreationParams(id: params.id);
   }
 }
 

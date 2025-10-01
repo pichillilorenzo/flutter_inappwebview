@@ -665,33 +665,29 @@ class InAppBrowser implements PlatformInAppBrowserEvents {
   void onAcceleratorKeyPressed(AcceleratorKeyPressedDetail detail) {}
 
   @override
-  FutureOr<ShowFileChooserResponse?> onShowFileChooser(ShowFileChooserRequest request) {
+  FutureOr<ShowFileChooserResponse?> onShowFileChooser(
+      ShowFileChooserRequest request) {
     return null;
   }
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformInAppBrowser.isClassSupported}
   static bool isClassSupported({TargetPlatform? platform}) =>
-      PlatformInAppBrowser.static().isClassSupported(
-          platform: platform);
+      PlatformInAppBrowser.static().isClassSupported(platform: platform);
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformInAppBrowser.isPropertySupported}
   static bool isPropertySupported(PlatformInAppBrowserProperty property,
-      {TargetPlatform? platform}) =>
-      PlatformInAppBrowser.static().isPropertySupported(
-          property,
-          platform: platform);
+          {TargetPlatform? platform}) =>
+      PlatformInAppBrowser.static()
+          .isPropertySupported(property, platform: platform);
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformInAppBrowser.isMethodSupported}
   static bool isMethodSupported(PlatformInAppBrowserMethod property,
-      {TargetPlatform? platform}) =>
-      PlatformInAppBrowser.static().isMethodSupported(
-          property,
-          platform: platform);
+          {TargetPlatform? platform}) =>
+      PlatformInAppBrowser.static()
+          .isMethodSupported(property, platform: platform);
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformInAppBrowserEvents.isMethodSupported}
   static bool isEventMethodSupported(PlatformInAppBrowserEventsMethod method,
-      {TargetPlatform? platform}) =>
-      PlatformInAppBrowserEvents.isMethodSupported(
-          method,
-          platform: platform);
+          {TargetPlatform? platform}) =>
+      PlatformInAppBrowserEvents.isMethodSupported(method, platform: platform);
 }

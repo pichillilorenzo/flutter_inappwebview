@@ -27,7 +27,9 @@ part 'platform_webview.g.dart';
 ///{@endtemplate}
 ///
 ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewCreationParams.supported_platforms}
-@SupportedPlatforms(ignoreParameterNames: ['controller'], platforms: [
+@SupportedPlatforms(ignoreParameterNames: [
+  'controller'
+], platforms: [
   AndroidPlatform(),
   IOSPlatform(),
   MacOSPlatform(),
@@ -72,11 +74,29 @@ class PlatformWebViewCreationParams<T> {
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewCreationParams.onLoadStart.supported_platforms}
   @SupportedPlatforms(platforms: [
-    AndroidPlatform( apiName: 'WebViewClient.onPageStarted', apiUrl: 'https://developer.android.com/reference/android/webkit/WebViewClient#onPageStarted(android.webkit.WebView,%20java.lang.String,%20android.graphics.Bitmap)',),
-    IOSPlatform( apiName: 'WKNavigationDelegate.webView', apiUrl: 'https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455621-webview',),
-    MacOSPlatform( apiName: 'WKNavigationDelegate.webView', apiUrl: 'https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455621-webview',),
-    WebPlatform(note: "It will be dispatched at the same time of [onLoadStop] event because there isn't any way to capture the real load start event from an iframe. If `window.location.href` isn't accessible inside the iframe, the [url] parameter will have the current value of the `iframe.src` attribute."),
-    WindowsPlatform( apiName: 'ICoreWebView2.add_NavigationStarting', apiUrl: 'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/iwebview2webview?view=webview2-0.8.355#add_navigationstarting',),
+    AndroidPlatform(
+      apiName: 'WebViewClient.onPageStarted',
+      apiUrl:
+          'https://developer.android.com/reference/android/webkit/WebViewClient#onPageStarted(android.webkit.WebView,%20java.lang.String,%20android.graphics.Bitmap)',
+    ),
+    IOSPlatform(
+      apiName: 'WKNavigationDelegate.webView',
+      apiUrl:
+          'https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455621-webview',
+    ),
+    MacOSPlatform(
+      apiName: 'WKNavigationDelegate.webView',
+      apiUrl:
+          'https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455621-webview',
+    ),
+    WebPlatform(
+        note:
+            "It will be dispatched at the same time of [onLoadStop] event because there isn't any way to capture the real load start event from an iframe. If `window.location.href` isn't accessible inside the iframe, the [url] parameter will have the current value of the `iframe.src` attribute."),
+    WindowsPlatform(
+      apiName: 'ICoreWebView2.add_NavigationStarting',
+      apiUrl:
+          'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/iwebview2webview?view=webview2-0.8.355#add_navigationstarting',
+    ),
   ])
   final void Function(T controller, WebUri? url)? onLoadStart;
 
@@ -86,11 +106,32 @@ class PlatformWebViewCreationParams<T> {
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewCreationParams.onLoadStop.supported_platforms}
   @SupportedPlatforms(platforms: [
-    AndroidPlatform( apiName: 'WebViewClient.onPageFinished', apiUrl: 'https://developer.android.com/reference/android/webkit/WebViewClient#onPageFinished(android.webkit.WebView,%20java.lang.String)',),
-    IOSPlatform( apiName: 'WKNavigationDelegate.webView', apiUrl: 'https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455629-webview',),
-    MacOSPlatform( apiName: 'WKNavigationDelegate.webView', apiUrl: 'https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455629-webview',),
-    WebPlatform( apiName: 'Window.onload', apiUrl: 'https://developer.mozilla.org/en-US/docs/Web/API/Window/load_event', note: "If `window.location.href` isn't accessible inside the iframe, the [url] parameter will have the current value of the `iframe.src` attribute."),
-    WindowsPlatform( apiName: 'ICoreWebView2.add_NavigationCompleted', apiUrl: 'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/iwebview2webview?view=webview2-0.8.355#add_navigationcompleted',),
+    AndroidPlatform(
+      apiName: 'WebViewClient.onPageFinished',
+      apiUrl:
+          'https://developer.android.com/reference/android/webkit/WebViewClient#onPageFinished(android.webkit.WebView,%20java.lang.String)',
+    ),
+    IOSPlatform(
+      apiName: 'WKNavigationDelegate.webView',
+      apiUrl:
+          'https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455629-webview',
+    ),
+    MacOSPlatform(
+      apiName: 'WKNavigationDelegate.webView',
+      apiUrl:
+          'https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455629-webview',
+    ),
+    WebPlatform(
+        apiName: 'Window.onload',
+        apiUrl:
+            'https://developer.mozilla.org/en-US/docs/Web/API/Window/load_event',
+        note:
+            "If `window.location.href` isn't accessible inside the iframe, the [url] parameter will have the current value of the `iframe.src` attribute."),
+    WindowsPlatform(
+      apiName: 'ICoreWebView2.add_NavigationCompleted',
+      apiUrl:
+          'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/iwebview2webview?view=webview2-0.8.355#add_navigationcompleted',
+    ),
   ])
   final void Function(T controller, WebUri? url)? onLoadStop;
 
@@ -114,10 +155,26 @@ class PlatformWebViewCreationParams<T> {
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewCreationParams.onReceivedError.supported_platforms}
   @SupportedPlatforms(platforms: [
-    AndroidPlatform( apiName: 'WebViewClient.onReceivedError', apiUrl: 'https://developer.android.com/reference/android/webkit/WebViewClient#onReceivedError(android.webkit.WebView,%20android.webkit.WebResourceRequest,%20android.webkit.WebResourceError)',),
-    IOSPlatform( apiName: 'WKNavigationDelegate.webView', apiUrl: 'https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455623-webview',),
-    MacOSPlatform( apiName: 'WKNavigationDelegate.webView', apiUrl: 'https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455623-webview',),
-    WindowsPlatform( apiName: 'ICoreWebView2.add_NavigationCompleted', apiUrl: 'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/iwebview2webview?view=webview2-0.8.355#add_navigationcompleted',),
+    AndroidPlatform(
+      apiName: 'WebViewClient.onReceivedError',
+      apiUrl:
+          'https://developer.android.com/reference/android/webkit/WebViewClient#onReceivedError(android.webkit.WebView,%20android.webkit.WebResourceRequest,%20android.webkit.WebResourceError)',
+    ),
+    IOSPlatform(
+      apiName: 'WKNavigationDelegate.webView',
+      apiUrl:
+          'https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455623-webview',
+    ),
+    MacOSPlatform(
+      apiName: 'WKNavigationDelegate.webView',
+      apiUrl:
+          'https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455623-webview',
+    ),
+    WindowsPlatform(
+      apiName: 'ICoreWebView2.add_NavigationCompleted',
+      apiUrl:
+          'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/iwebview2webview?view=webview2-0.8.355#add_navigationcompleted',
+    ),
   ])
   final void Function(
           T controller, WebResourceRequest request, WebResourceError error)?
@@ -148,10 +205,26 @@ class PlatformWebViewCreationParams<T> {
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewCreationParams.onReceivedHttpError.supported_platforms}
   @SupportedPlatforms(platforms: [
-    AndroidPlatform( apiName: 'WebViewClient.onReceivedHttpError', apiUrl: 'https://developer.android.com/reference/android/webkit/WebViewClient#onReceivedHttpError(android.webkit.WebView,%20android.webkit.WebResourceRequest,%20android.webkit.WebResourceResponse)', available: '23'),
-    IOSPlatform( apiName: 'WKNavigationDelegate.webView', apiUrl: 'https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455643-webview',),
-    MacOSPlatform( apiName: 'WKNavigationDelegate.webView', apiUrl: 'https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455643-webview',),
-    WindowsPlatform( apiName: 'ICoreWebView2.add_NavigationCompleted', apiUrl: 'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/iwebview2webview?view=webview2-0.8.355#add_navigationcompleted',),
+    AndroidPlatform(
+        apiName: 'WebViewClient.onReceivedHttpError',
+        apiUrl:
+            'https://developer.android.com/reference/android/webkit/WebViewClient#onReceivedHttpError(android.webkit.WebView,%20android.webkit.WebResourceRequest,%20android.webkit.WebResourceResponse)',
+        available: '23'),
+    IOSPlatform(
+      apiName: 'WKNavigationDelegate.webView',
+      apiUrl:
+          'https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455643-webview',
+    ),
+    MacOSPlatform(
+      apiName: 'WKNavigationDelegate.webView',
+      apiUrl:
+          'https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455643-webview',
+    ),
+    WindowsPlatform(
+      apiName: 'ICoreWebView2.add_NavigationCompleted',
+      apiUrl:
+          'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/iwebview2webview?view=webview2-0.8.355#add_navigationcompleted',
+    ),
   ])
   final void Function(T controller, WebResourceRequest request,
       WebResourceResponse errorResponse)? onReceivedHttpError;
@@ -162,7 +235,11 @@ class PlatformWebViewCreationParams<T> {
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewCreationParams.onProgressChanged.supported_platforms}
   @SupportedPlatforms(platforms: [
-    AndroidPlatform( apiName: 'WebChromeClient.onProgressChanged', apiUrl: 'https://developer.android.com/reference/android/webkit/WebChromeClient#onProgressChanged(android.webkit.WebView,%20int)',),
+    AndroidPlatform(
+      apiName: 'WebChromeClient.onProgressChanged',
+      apiUrl:
+          'https://developer.android.com/reference/android/webkit/WebChromeClient#onProgressChanged(android.webkit.WebView,%20int)',
+    ),
     IOSPlatform(),
     MacOSPlatform(),
     WindowsPlatform(),
@@ -175,9 +252,17 @@ class PlatformWebViewCreationParams<T> {
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewCreationParams.onConsoleMessage.supported_platforms}
   @SupportedPlatforms(platforms: [
-    AndroidPlatform( apiName: 'WebChromeClient.onConsoleMessage', apiUrl: 'https://developer.android.com/reference/android/webkit/WebChromeClient#onConsoleMessage(android.webkit.ConsoleMessage)',),
-    IOSPlatform( note: 'This event is implemented using JavaScript.',),
-    MacOSPlatform( note: 'This event is implemented using JavaScript.',),
+    AndroidPlatform(
+      apiName: 'WebChromeClient.onConsoleMessage',
+      apiUrl:
+          'https://developer.android.com/reference/android/webkit/WebChromeClient#onConsoleMessage(android.webkit.ConsoleMessage)',
+    ),
+    IOSPlatform(
+      note: 'This event is implemented using JavaScript.',
+    ),
+    MacOSPlatform(
+      note: 'This event is implemented using JavaScript.',
+    ),
     WebPlatform(),
     WindowsPlatform(),
   ])
@@ -194,8 +279,12 @@ class PlatformWebViewCreationParams<T> {
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewCreationParams.shouldOverrideUrlLoading.supported_platforms}
   @SupportedPlatforms(platforms: [
-    AndroidPlatform( apiName: 'WebViewClient.shouldOverrideUrlLoading', apiUrl: 'https://developer.android.com/reference/android/webkit/WebViewClient#shouldOverrideUrlLoading(android.webkit.WebView,%20java.lang.String)',
-        note: """There isn't any way to load an URL for a frame that is not the main frame, so if the request is not for the main frame, the navigation is allowed by default.
+    AndroidPlatform(
+        apiName: 'WebViewClient.shouldOverrideUrlLoading',
+        apiUrl:
+            'https://developer.android.com/reference/android/webkit/WebViewClient#shouldOverrideUrlLoading(android.webkit.WebView,%20java.lang.String)',
+        note:
+            """There isn't any way to load an URL for a frame that is not the main frame, so if the request is not for the main frame, the navigation is allowed by default.
 However, if you want to cancel requests for subframes, you can use the [InAppWebViewSettings.regexToCancelSubFramesLoading] setting
 to write a Regular Expression that, if the url request of a subframe matches, then the request of that subframe is canceled.
 Instead, the [InAppWebViewSettings.regexToAllowSyncUrlLoading] setting could
@@ -203,8 +292,16 @@ be used to allow navigation requests synchronously, as this event is synchronous
 and the current plugin implementation will always cancel the current request and load a new request if
 this event returns [NavigationActionPolicy.ALLOW] because Flutter method channels work only asynchronously.
 Also, this event is not called for POST requests and is not called on the first page load."""),
-    IOSPlatform( apiName: 'WKNavigationDelegate.webView', apiUrl: 'https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455641-webview',),
-    MacOSPlatform( apiName: 'WKNavigationDelegate.webView', apiUrl: 'https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455641-webview',),
+    IOSPlatform(
+      apiName: 'WKNavigationDelegate.webView',
+      apiUrl:
+          'https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455641-webview',
+    ),
+    MacOSPlatform(
+      apiName: 'WKNavigationDelegate.webView',
+      apiUrl:
+          'https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455641-webview',
+    ),
     WindowsPlatform(),
   ])
   final FutureOr<NavigationActionPolicy?> Function(
@@ -219,9 +316,15 @@ Also, this event is not called for POST requests and is not called on the first 
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewCreationParams.onLoadResource.supported_platforms}
   @SupportedPlatforms(platforms: [
-    AndroidPlatform( note: 'This event is implemented using JavaScript.',),
-    IOSPlatform( note: 'This event is implemented using JavaScript.',),
-    MacOSPlatform( note: 'This event is implemented using JavaScript.',),
+    AndroidPlatform(
+      note: 'This event is implemented using JavaScript.',
+    ),
+    IOSPlatform(
+      note: 'This event is implemented using JavaScript.',
+    ),
+    MacOSPlatform(
+      note: 'This event is implemented using JavaScript.',
+    ),
   ])
   final void Function(T controller, LoadedResource resource)? onLoadResource;
 
@@ -235,10 +338,24 @@ Also, this event is not called for POST requests and is not called on the first 
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewCreationParams.onScrollChanged.supported_platforms}
   @SupportedPlatforms(platforms: [
-    AndroidPlatform( apiName: 'WebView.onScrollChanged', apiUrl: 'https://developer.android.com/reference/android/webkit/WebView#onScrollChanged(int,%20int,%20int,%20int)',),
-    IOSPlatform( apiName: 'UIScrollViewDelegate.scrollViewDidScroll', apiUrl: 'https://developer.apple.com/documentation/uikit/uiscrollviewdelegate/1619392-scrollviewdidscroll',),
-    MacOSPlatform( note: 'This event is implemented using JavaScript.',),
-    WebPlatform( apiName: 'Window.onscroll', apiUrl: 'https://developer.mozilla.org/en-US/docs/Web/API/GlobalEventHandlers/onscroll',),
+    AndroidPlatform(
+      apiName: 'WebView.onScrollChanged',
+      apiUrl:
+          'https://developer.android.com/reference/android/webkit/WebView#onScrollChanged(int,%20int,%20int,%20int)',
+    ),
+    IOSPlatform(
+      apiName: 'UIScrollViewDelegate.scrollViewDidScroll',
+      apiUrl:
+          'https://developer.apple.com/documentation/uikit/uiscrollviewdelegate/1619392-scrollviewdidscroll',
+    ),
+    MacOSPlatform(
+      note: 'This event is implemented using JavaScript.',
+    ),
+    WebPlatform(
+      apiName: 'Window.onscroll',
+      apiUrl:
+          'https://developer.mozilla.org/en-US/docs/Web/API/GlobalEventHandlers/onscroll',
+    ),
   ])
   final void Function(T controller, int x, int y)? onScrollChanged;
 
@@ -279,10 +396,18 @@ Also, this event is not called for POST requests and is not called on the first 
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewCreationParams.onDownloadStarting.supported_platforms}
   @SupportedPlatforms(platforms: [
-    AndroidPlatform( apiName: 'WebView.setDownloadListener', apiUrl: '(https://developer.android.com/reference/android/webkit/WebView#setDownloadListener(android.webkit.DownloadListener)',),
+    AndroidPlatform(
+      apiName: 'WebView.setDownloadListener',
+      apiUrl:
+          '(https://developer.android.com/reference/android/webkit/WebView#setDownloadListener(android.webkit.DownloadListener)',
+    ),
     IOSPlatform(),
     MacOSPlatform(),
-    WindowsPlatform( apiName: 'ICoreWebView2_4.add_DownloadStarting', apiUrl: 'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2_4?view=webview2-1.0.2849.39#add_downloadstarting',),
+    WindowsPlatform(
+      apiName: 'ICoreWebView2_4.add_DownloadStarting',
+      apiUrl:
+          'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2_4?view=webview2-1.0.2849.39#add_downloadstarting',
+    ),
   ])
   final FutureOr<DownloadStartResponse?> Function(
           T controller, DownloadStartRequest downloadStartRequest)?
@@ -310,8 +435,16 @@ Also, this event is not called for POST requests and is not called on the first 
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewCreationParams.onLoadResourceWithCustomScheme.supported_platforms}
   @SupportedPlatforms(platforms: [
     AndroidPlatform(),
-    IOSPlatform( apiName: 'WKURLSchemeHandler', apiUrl: 'https://developer.apple.com/documentation/webkit/wkurlschemehandler',),
-    MacOSPlatform( apiName: 'WKURLSchemeHandler', apiUrl: 'https://developer.apple.com/documentation/webkit/wkurlschemehandler',),
+    IOSPlatform(
+      apiName: 'WKURLSchemeHandler',
+      apiUrl:
+          'https://developer.apple.com/documentation/webkit/wkurlschemehandler',
+    ),
+    MacOSPlatform(
+      apiName: 'WKURLSchemeHandler',
+      apiUrl:
+          'https://developer.apple.com/documentation/webkit/wkurlschemehandler',
+    ),
     WindowsPlatform(),
   ])
   final FutureOr<CustomSchemeResponse?> Function(
@@ -331,10 +464,18 @@ Also, this event is not called for POST requests and is not called on the first 
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewCreationParams.onCreateWindow.supported_platforms}
   @SupportedPlatforms(platforms: [
-    AndroidPlatform( apiName: 'WebChromeClient.onCreateWindow', apiUrl: 'https://developer.android.com/reference/android/webkit/WebChromeClient#onCreateWindow(android.webkit.WebView,%20boolean,%20boolean,%20android.os.Message)',
-    note: 'You need to set [InAppWebViewSettings.supportMultipleWindows] setting to `true`. Also, if the request has been created using JavaScript (`window.open()`), then there are some limitation: check the [NavigationAction] class.'),
-    IOSPlatform( apiName: 'WKUIDelegate.webView', apiUrl: 'https://developer.apple.com/documentation/webkit/wkuidelegate/1536907-webview',
-    note: """Setting these initial settings [InAppWebViewSettings.supportZoom], [InAppWebViewSettings.useOnLoadResource], [InAppWebViewSettings.useShouldInterceptAjaxRequest],
+    AndroidPlatform(
+        apiName: 'WebChromeClient.onCreateWindow',
+        apiUrl:
+            'https://developer.android.com/reference/android/webkit/WebChromeClient#onCreateWindow(android.webkit.WebView,%20boolean,%20boolean,%20android.os.Message)',
+        note:
+            'You need to set [InAppWebViewSettings.supportMultipleWindows] setting to `true`. Also, if the request has been created using JavaScript (`window.open()`), then there are some limitation: check the [NavigationAction] class.'),
+    IOSPlatform(
+        apiName: 'WKUIDelegate.webView',
+        apiUrl:
+            'https://developer.apple.com/documentation/webkit/wkuidelegate/1536907-webview',
+        note:
+            """Setting these initial settings [InAppWebViewSettings.supportZoom], [InAppWebViewSettings.useOnLoadResource], [InAppWebViewSettings.useShouldInterceptAjaxRequest],
 [InAppWebViewSettings.useShouldInterceptFetchRequest], [InAppWebViewSettings.applicationNameForUserAgent], [InAppWebViewSettings.javaScriptCanOpenWindowsAutomatically],
 [InAppWebViewSettings.javaScriptEnabled], [InAppWebViewSettings.minimumFontSize], [InAppWebViewSettings.preferredContentMode], [InAppWebViewSettings.incognito],
 [InAppWebViewSettings.cacheEnabled], [InAppWebViewSettings.mediaPlaybackRequiresUserGesture],
@@ -349,8 +490,12 @@ with a different `WKWebViewConfiguration` instance (see https://developer.apple.
 So, these options will be inherited from the caller WebView.
 Also, note that calling [InAppWebViewController.setSettings] method using the controller of the new created WebView,
 it will update also the WebView options of the caller WebView."""),
-    MacOSPlatform( apiName: 'WKUIDelegate.webView', apiUrl: 'https://developer.apple.com/documentation/webkit/wkuidelegate/1536907-webview',
-        note: """Setting these initial settings [InAppWebViewSettings.supportZoom], [InAppWebViewSettings.useOnLoadResource], [InAppWebViewSettings.useShouldInterceptAjaxRequest],
+    MacOSPlatform(
+        apiName: 'WKUIDelegate.webView',
+        apiUrl:
+            'https://developer.apple.com/documentation/webkit/wkuidelegate/1536907-webview',
+        note:
+            """Setting these initial settings [InAppWebViewSettings.supportZoom], [InAppWebViewSettings.useOnLoadResource], [InAppWebViewSettings.useShouldInterceptAjaxRequest],
 [InAppWebViewSettings.useShouldInterceptFetchRequest], [InAppWebViewSettings.applicationNameForUserAgent], [InAppWebViewSettings.javaScriptCanOpenWindowsAutomatically],
 [InAppWebViewSettings.javaScriptEnabled], [InAppWebViewSettings.minimumFontSize], [InAppWebViewSettings.preferredContentMode], [InAppWebViewSettings.incognito],
 [InAppWebViewSettings.cacheEnabled], [InAppWebViewSettings.mediaPlaybackRequiresUserGesture],
@@ -365,8 +510,14 @@ with a different `WKWebViewConfiguration` instance (see https://developer.apple.
 So, these options will be inherited from the caller WebView.
 Also, note that calling [InAppWebViewController.setSettings] method using the controller of the new created WebView,
 it will update also the WebView options of the caller WebView."""),
-    WebPlatform( note: 'It works only for `window.open()` javascript calls. Also, there is no way to block the opening the window in a synchronous way, so returning `true` will just close it quickly.'),
-    WindowsPlatform( apiName: 'ICoreWebView2.add_NewWindowRequested', apiUrl: 'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2?view=webview2-1.0.2210.55#add_newwindowrequested',),
+    WebPlatform(
+        note:
+            'It works only for `window.open()` javascript calls. Also, there is no way to block the opening the window in a synchronous way, so returning `true` will just close it quickly.'),
+    WindowsPlatform(
+      apiName: 'ICoreWebView2.add_NewWindowRequested',
+      apiUrl:
+          'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2?view=webview2-1.0.2210.55#add_newwindowrequested',
+    ),
   ])
   final FutureOr<bool?> Function(
       T controller, CreateWindowAction createWindowAction)? onCreateWindow;
@@ -378,11 +529,27 @@ it will update also the WebView options of the caller WebView."""),
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewCreationParams.onCloseWindow.supported_platforms}
   @SupportedPlatforms(platforms: [
-    AndroidPlatform( apiName: 'WebChromeClient.onCloseWindow', apiUrl: 'https://developer.android.com/reference/android/webkit/WebChromeClient#onCloseWindow(android.webkit.WebView)',),
-    IOSPlatform( apiName: 'WKUIDelegate.webViewDidClose', apiUrl: 'https://developer.apple.com/documentation/webkit/wkuidelegate/1537390-webviewdidclose',),
-    MacOSPlatform( apiName: 'WKUIDelegate.webViewDidClose', apiUrl: 'https://developer.apple.com/documentation/webkit/wkuidelegate/1537390-webviewdidclose',),
+    AndroidPlatform(
+      apiName: 'WebChromeClient.onCloseWindow',
+      apiUrl:
+          'https://developer.android.com/reference/android/webkit/WebChromeClient#onCloseWindow(android.webkit.WebView)',
+    ),
+    IOSPlatform(
+      apiName: 'WKUIDelegate.webViewDidClose',
+      apiUrl:
+          'https://developer.apple.com/documentation/webkit/wkuidelegate/1537390-webviewdidclose',
+    ),
+    MacOSPlatform(
+      apiName: 'WKUIDelegate.webViewDidClose',
+      apiUrl:
+          'https://developer.apple.com/documentation/webkit/wkuidelegate/1537390-webviewdidclose',
+    ),
     WebPlatform(),
-    WindowsPlatform( apiName: 'ICoreWebView2.add_WindowCloseRequested', apiUrl: 'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2?view=webview2-1.0.2210.55#add_windowcloserequested',),
+    WindowsPlatform(
+      apiName: 'ICoreWebView2.add_WindowCloseRequested',
+      apiUrl:
+          'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2?view=webview2-1.0.2210.55#add_windowcloserequested',
+    ),
   ])
   final void Function(T controller)? onCloseWindow;
 
@@ -396,7 +563,11 @@ it will update also the WebView options of the caller WebView."""),
     AndroidPlatform(),
     IOSPlatform(),
     MacOSPlatform(),
-    WebPlatform( apiName: 'Window.onfocus', apiUrl: 'https://developer.mozilla.org/en-US/docs/Web/API/Window/focus_event',),
+    WebPlatform(
+      apiName: 'Window.onfocus',
+      apiUrl:
+          'https://developer.mozilla.org/en-US/docs/Web/API/Window/focus_event',
+    ),
   ])
   final void Function(T controller)? onWindowFocus;
 
@@ -410,7 +581,11 @@ it will update also the WebView options of the caller WebView."""),
     AndroidPlatform(),
     IOSPlatform(),
     MacOSPlatform(),
-    WebPlatform( apiName: 'Window.onblur', apiUrl: 'https://developer.mozilla.org/en-US/docs/Web/API/Window/blur_event',),
+    WebPlatform(
+      apiName: 'Window.onblur',
+      apiUrl:
+          'https://developer.mozilla.org/en-US/docs/Web/API/Window/blur_event',
+    ),
   ])
   final void Function(T controller)? onWindowBlur;
 
@@ -423,9 +598,21 @@ it will update also the WebView options of the caller WebView."""),
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewCreationParams.onJsAlert.supported_platforms}
   @SupportedPlatforms(platforms: [
-    AndroidPlatform( apiName: 'WebChromeClient.onJsAlert', apiUrl: 'https://developer.android.com/reference/android/webkit/WebChromeClient#onJsAlert(android.webkit.WebView,%20java.lang.String,%20java.lang.String,%20android.webkit.JsResult)',),
-    IOSPlatform( apiName: 'WKUIDelegate.webView', apiUrl: 'https://developer.apple.com/documentation/webkit/wkuidelegate/1537406-webview',),
-    MacOSPlatform( apiName: 'WKUIDelegate.webView', apiUrl: 'https://developer.apple.com/documentation/webkit/wkuidelegate/1537406-webview',),
+    AndroidPlatform(
+      apiName: 'WebChromeClient.onJsAlert',
+      apiUrl:
+          'https://developer.android.com/reference/android/webkit/WebChromeClient#onJsAlert(android.webkit.WebView,%20java.lang.String,%20java.lang.String,%20android.webkit.JsResult)',
+    ),
+    IOSPlatform(
+      apiName: 'WKUIDelegate.webView',
+      apiUrl:
+          'https://developer.apple.com/documentation/webkit/wkuidelegate/1537406-webview',
+    ),
+    MacOSPlatform(
+      apiName: 'WKUIDelegate.webView',
+      apiUrl:
+          'https://developer.apple.com/documentation/webkit/wkuidelegate/1537406-webview',
+    ),
   ])
   final FutureOr<JsAlertResponse?> Function(
       T controller, JsAlertRequest jsAlertRequest)? onJsAlert;
@@ -439,9 +626,21 @@ it will update also the WebView options of the caller WebView."""),
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewCreationParams.onJsConfirm.onJsConfirm}
   @SupportedPlatforms(platforms: [
-    AndroidPlatform( apiName: 'WebChromeClient.onJsConfirm', apiUrl: 'https://developer.android.com/reference/android/webkit/WebChromeClient#onJsConfirm(android.webkit.WebView,%20java.lang.String,%20java.lang.String,%20android.webkit.JsResult)',),
-    IOSPlatform( apiName: 'WKUIDelegate.webView', apiUrl: 'https://developer.apple.com/documentation/webkit/wkuidelegate/1536489-webview',),
-    MacOSPlatform( apiName: 'WKUIDelegate.webView', apiUrl: 'https://developer.apple.com/documentation/webkit/wkuidelegate/1536489-webview',),
+    AndroidPlatform(
+      apiName: 'WebChromeClient.onJsConfirm',
+      apiUrl:
+          'https://developer.android.com/reference/android/webkit/WebChromeClient#onJsConfirm(android.webkit.WebView,%20java.lang.String,%20java.lang.String,%20android.webkit.JsResult)',
+    ),
+    IOSPlatform(
+      apiName: 'WKUIDelegate.webView',
+      apiUrl:
+          'https://developer.apple.com/documentation/webkit/wkuidelegate/1536489-webview',
+    ),
+    MacOSPlatform(
+      apiName: 'WKUIDelegate.webView',
+      apiUrl:
+          'https://developer.apple.com/documentation/webkit/wkuidelegate/1536489-webview',
+    ),
   ])
   final FutureOr<JsConfirmResponse?> Function(
       T controller, JsConfirmRequest jsConfirmRequest)? onJsConfirm;
@@ -455,9 +654,21 @@ it will update also the WebView options of the caller WebView."""),
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewCreationParams.onJsPrompt.supported_platforms}
   @SupportedPlatforms(platforms: [
-    AndroidPlatform( apiName: 'WebChromeClient.onJsPrompt', apiUrl: 'https://developer.android.com/reference/android/webkit/WebChromeClient#onJsPrompt(android.webkit.WebView,%20java.lang.String,%20java.lang.String,%20java.lang.String,%20android.webkit.JsPromptResult)',),
-    IOSPlatform( apiName: 'WKUIDelegate.webView', apiUrl: 'https://developer.apple.com/documentation/webkit/wkuidelegate/1538086-webview',),
-    MacOSPlatform( apiName: 'WKUIDelegate.webView', apiUrl: 'https://developer.apple.com/documentation/webkit/wkuidelegate/1538086-webview',),
+    AndroidPlatform(
+      apiName: 'WebChromeClient.onJsPrompt',
+      apiUrl:
+          'https://developer.android.com/reference/android/webkit/WebChromeClient#onJsPrompt(android.webkit.WebView,%20java.lang.String,%20java.lang.String,%20java.lang.String,%20android.webkit.JsPromptResult)',
+    ),
+    IOSPlatform(
+      apiName: 'WKUIDelegate.webView',
+      apiUrl:
+          'https://developer.apple.com/documentation/webkit/wkuidelegate/1538086-webview',
+    ),
+    MacOSPlatform(
+      apiName: 'WKUIDelegate.webView',
+      apiUrl:
+          'https://developer.apple.com/documentation/webkit/wkuidelegate/1538086-webview',
+    ),
   ])
   final FutureOr<JsPromptResponse?> Function(
       T controller, JsPromptRequest jsPromptRequest)? onJsPrompt;
@@ -470,10 +681,26 @@ it will update also the WebView options of the caller WebView."""),
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewCreationParams.onReceivedHttpAuthRequest.supported_platforms}
   @SupportedPlatforms(platforms: [
-    AndroidPlatform( apiName: 'WebViewClient.onReceivedHttpAuthRequest', apiUrl: 'https://developer.android.com/reference/android/webkit/WebViewClient#onReceivedHttpAuthRequest(android.webkit.WebView,%20android.webkit.HttpAuthHandler,%20java.lang.String,%20java.lang.String)',),
-    IOSPlatform( apiName: 'WKNavigationDelegate.webView', apiUrl: 'https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455638-webview',),
-    MacOSPlatform( apiName: 'WKNavigationDelegate.webView', apiUrl: 'https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455638-webview',),
-    WindowsPlatform( apiName: 'ICoreWebView2_10.add_BasicAuthenticationRequested', apiUrl: 'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2_10?view=webview2-1.0.2849.39#add_basicauthenticationrequested',),
+    AndroidPlatform(
+      apiName: 'WebViewClient.onReceivedHttpAuthRequest',
+      apiUrl:
+          'https://developer.android.com/reference/android/webkit/WebViewClient#onReceivedHttpAuthRequest(android.webkit.WebView,%20android.webkit.HttpAuthHandler,%20java.lang.String,%20java.lang.String)',
+    ),
+    IOSPlatform(
+      apiName: 'WKNavigationDelegate.webView',
+      apiUrl:
+          'https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455638-webview',
+    ),
+    MacOSPlatform(
+      apiName: 'WKNavigationDelegate.webView',
+      apiUrl:
+          'https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455638-webview',
+    ),
+    WindowsPlatform(
+      apiName: 'ICoreWebView2_10.add_BasicAuthenticationRequested',
+      apiUrl:
+          'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2_10?view=webview2-1.0.2849.39#add_basicauthenticationrequested',
+    ),
   ])
   final FutureOr<HttpAuthResponse?> Function(
           T controller, HttpAuthenticationChallenge challenge)?
@@ -488,14 +715,30 @@ it will update also the WebView options of the caller WebView."""),
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewCreationParams.onReceivedServerTrustAuthRequest.supported_platforms}
   @SupportedPlatforms(platforms: [
-    AndroidPlatform( apiName: 'WebViewClient.onReceivedSslError', apiUrl: 'https://developer.android.com/reference/android/webkit/WebViewClient#onReceivedSslError(android.webkit.WebView,%20android.webkit.SslErrorHandler,%20android.net.http.SslError)',),
-    IOSPlatform( apiName: 'WKNavigationDelegate.webView', apiUrl: 'https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455638-webview',
-        note: """To override the certificate verification logic, you have to provide ATS (App Transport Security) exceptions in your iOS/macOS `Info.plist`.
+    AndroidPlatform(
+      apiName: 'WebViewClient.onReceivedSslError',
+      apiUrl:
+          'https://developer.android.com/reference/android/webkit/WebViewClient#onReceivedSslError(android.webkit.WebView,%20android.webkit.SslErrorHandler,%20android.net.http.SslError)',
+    ),
+    IOSPlatform(
+        apiName: 'WKNavigationDelegate.webView',
+        apiUrl:
+            'https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455638-webview',
+        note:
+            """To override the certificate verification logic, you have to provide ATS (App Transport Security) exceptions in your iOS/macOS `Info.plist`.
 See `NSAppTransportSecurity` in the [Information Property List Key Reference](https://developer.apple.com/library/content/documentation/General/Reference/InfoPlistKeyReference/Articles/CocoaKeys.html#//apple_ref/doc/uid/TP40009251-SW1) for details."""),
-    MacOSPlatform( apiName: 'WKNavigationDelegate.webView', apiUrl: 'https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455638-webview',
-        note: """To override the certificate verification logic, you have to provide ATS (App Transport Security) exceptions in your iOS/macOS `Info.plist`.
+    MacOSPlatform(
+        apiName: 'WKNavigationDelegate.webView',
+        apiUrl:
+            'https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455638-webview',
+        note:
+            """To override the certificate verification logic, you have to provide ATS (App Transport Security) exceptions in your iOS/macOS `Info.plist`.
 See `NSAppTransportSecurity` in the [Information Property List Key Reference](https://developer.apple.com/library/content/documentation/General/Reference/InfoPlistKeyReference/Articles/CocoaKeys.html#//apple_ref/doc/uid/TP40009251-SW1) for details."""),
-    WindowsPlatform( apiName: 'ICoreWebView2_14.add_ServerCertificateErrorDetected', apiUrl: 'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2_14?view=webview2-1.0.2792.45#add_servercertificateerrordetected',),
+    WindowsPlatform(
+      apiName: 'ICoreWebView2_14.add_ServerCertificateErrorDetected',
+      apiUrl:
+          'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2_14?view=webview2-1.0.2792.45#add_servercertificateerrordetected',
+    ),
   ])
   final FutureOr<ServerTrustAuthResponse?> Function(
           T controller, ServerTrustChallenge challenge)?
@@ -512,10 +755,26 @@ See `NSAppTransportSecurity` in the [Information Property List Key Reference](ht
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewCreationParams.onReceivedClientCertRequest.supported_platforms}
   @SupportedPlatforms(platforms: [
-    AndroidPlatform( apiName: 'WebViewClient.onReceivedClientCertRequest', apiUrl: 'https://developer.android.com/reference/android/webkit/WebViewClient#onReceivedClientCertRequest(android.webkit.WebView,%20android.webkit.ClientCertRequest)',),
-    IOSPlatform( apiName: 'WKNavigationDelegate.webView', apiUrl: 'https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455638-webview',),
-    MacOSPlatform( apiName: 'WKNavigationDelegate.webView', apiUrl: 'https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455638-webview',),
-    WindowsPlatform( apiName: 'ICoreWebView2_5.add_ClientCertificateRequested', apiUrl: 'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2_5?view=webview2-1.0.2849.39#add_clientcertificaterequested',),
+    AndroidPlatform(
+      apiName: 'WebViewClient.onReceivedClientCertRequest',
+      apiUrl:
+          'https://developer.android.com/reference/android/webkit/WebViewClient#onReceivedClientCertRequest(android.webkit.WebView,%20android.webkit.ClientCertRequest)',
+    ),
+    IOSPlatform(
+      apiName: 'WKNavigationDelegate.webView',
+      apiUrl:
+          'https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455638-webview',
+    ),
+    MacOSPlatform(
+      apiName: 'WKNavigationDelegate.webView',
+      apiUrl:
+          'https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455638-webview',
+    ),
+    WindowsPlatform(
+      apiName: 'ICoreWebView2_5.add_ClientCertificateRequested',
+      apiUrl:
+          'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2_5?view=webview2-1.0.2849.39#add_clientcertificaterequested',
+    ),
   ])
   final FutureOr<ClientCertResponse?> Function(
       T controller, ClientCertChallenge challenge)? onReceivedClientCertRequest;
@@ -549,7 +808,9 @@ See `NSAppTransportSecurity` in the [Information Property List Key Reference](ht
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewCreationParams.shouldInterceptAjaxRequest.supported_platforms}
   @SupportedPlatforms(platforms: [
-    AndroidPlatform(note: """In order to be able to listen this event, check the [InAppWebViewSettings.useShouldInterceptAjaxRequest] setting documentation.
+    AndroidPlatform(
+        note:
+            """In order to be able to listen this event, check the [InAppWebViewSettings.useShouldInterceptAjaxRequest] setting documentation.
 Also, on Android that doesn't support the [WebViewFeature.DOCUMENT_START_SCRIPT], unlike iOS that has [WKUserScript](https://developer.apple.com/documentation/webkit/wkuserscript) that
 can inject javascript code right after the document element is created but before any other content is loaded, in Android the javascript code
 used to intercept ajax requests is loaded as soon as possible so it won't be instantaneous as iOS.
@@ -575,7 +836,9 @@ In that case, after the `window.addEventListener("flutterInAppWebViewPlatformRea
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewCreationParams.onAjaxReadyStateChange.supported_platforms}
   @SupportedPlatforms(platforms: [
-    AndroidPlatform(note: """In order to be able to listen this event, check the [InAppWebViewSettings.useShouldInterceptAjaxRequest] and [InAppWebViewSettings.useOnAjaxReadyStateChange] settings documentation.
+    AndroidPlatform(
+        note:
+            """In order to be able to listen this event, check the [InAppWebViewSettings.useShouldInterceptAjaxRequest] and [InAppWebViewSettings.useOnAjaxReadyStateChange] settings documentation.
 Also, on Android that doesn't support the [WebViewFeature.DOCUMENT_START_SCRIPT], unlike iOS that has [WKUserScript](https://developer.apple.com/documentation/webkit/wkuserscript) that
 can inject javascript code right after the document element is created but before any other content is loaded, in Android the javascript code
 used to intercept ajax requests is loaded as soon as possible so it won't be instantaneous as iOS.
@@ -596,7 +859,9 @@ In that case, after the `window.addEventListener("flutterInAppWebViewPlatformRea
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewCreationParams.onAjaxProgress.supported_platforms}
   @SupportedPlatforms(platforms: [
-    AndroidPlatform(note: """In order to be able to listen this event, check the [InAppWebViewSettings.useShouldInterceptAjaxRequest] and [InAppWebViewSettings.useOnAjaxProgress] settings documentation.
+    AndroidPlatform(
+        note:
+            """In order to be able to listen this event, check the [InAppWebViewSettings.useShouldInterceptAjaxRequest] and [InAppWebViewSettings.useOnAjaxProgress] settings documentation.
 Also, on Android that doesn't support the [WebViewFeature.DOCUMENT_START_SCRIPT], unlike iOS that has [WKUserScript](https://developer.apple.com/documentation/webkit/wkuserscript) that
 can inject javascript code right after the document element is created but before any other content is loaded, in Android the javascript code
 used to intercept ajax requests is loaded as soon as possible so it won't be instantaneous as iOS.
@@ -617,7 +882,9 @@ In that case, after the `window.addEventListener("flutterInAppWebViewPlatformRea
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewCreationParams.shouldInterceptFetchRequest.supported_platforms}
   @SupportedPlatforms(platforms: [
-    AndroidPlatform(note: """In order to be able to listen this event, check the [InAppWebViewSettings.useShouldInterceptFetchRequest] setting documentation.
+    AndroidPlatform(
+        note:
+            """In order to be able to listen this event, check the [InAppWebViewSettings.useShouldInterceptFetchRequest] setting documentation.
 Also, on Android that doesn't support the [WebViewFeature.DOCUMENT_START_SCRIPT], unlike iOS that has [WKUserScript](https://developer.apple.com/documentation/webkit/wkuserscript) that
 can inject javascript code right after the document element is created but before any other content is loaded, in Android the javascript code
 used to intercept ajax requests is loaded as soon as possible so it won't be instantaneous as iOS.
@@ -641,11 +908,19 @@ In that case, after the `window.addEventListener("flutterInAppWebViewPlatformRea
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewCreationParams.onUpdateVisitedHistory.supported_platforms}
   @SupportedPlatforms(platforms: [
-    AndroidPlatform( apiName: 'WebViewClient.doUpdateVisitedHistory', apiUrl: 'https://developer.android.com/reference/android/webkit/WebViewClient#doUpdateVisitedHistory(android.webkit.WebView,%20java.lang.String,%20boolean)',),
+    AndroidPlatform(
+      apiName: 'WebViewClient.doUpdateVisitedHistory',
+      apiUrl:
+          'https://developer.android.com/reference/android/webkit/WebViewClient#doUpdateVisitedHistory(android.webkit.WebView,%20java.lang.String,%20boolean)',
+    ),
     IOSPlatform(),
     MacOSPlatform(),
     WebPlatform(),
-    WindowsPlatform( apiName: 'ICoreWebView2.add_HistoryChanged', apiUrl: 'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2?view=webview2-1.0.2210.55#add_historychanged',),
+    WindowsPlatform(
+      apiName: 'ICoreWebView2.add_HistoryChanged',
+      apiUrl:
+          'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2?view=webview2-1.0.2210.55#add_historychanged',
+    ),
   ], parameterPlatforms: {
     'isReload': [AndroidPlatform()],
   })
@@ -684,7 +959,7 @@ In that case, after the `window.addEventListener("flutterInAppWebViewPlatformRea
     'printJobController': [AndroidPlatform(), IOSPlatform(), MacOSPlatform()],
   })
   final FutureOr<bool?> Function(T controller, WebUri? url,
-    PlatformPrintJobController? printJobController)? onPrintRequest;
+      PlatformPrintJobController? printJobController)? onPrintRequest;
 
   ///{@template flutter_inappwebview_platform_interface.PlatformWebViewCreationParams.onLongPressHitTestResult}
   ///Event fired when an HTML element of the webview has been clicked and held.
@@ -694,8 +969,16 @@ In that case, after the `window.addEventListener("flutterInAppWebViewPlatformRea
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewCreationParams.onLongPressHitTestResult.supported_platforms}
   @SupportedPlatforms(platforms: [
-    AndroidPlatform( apiName: 'View.setOnLongClickListener', apiUrl: 'https://developer.android.com/reference/android/view/View#setOnLongClickListener(android.view.View.OnLongClickListener)',),
-    IOSPlatform( apiName: 'UILongPressGestureRecognizer', apiUrl: 'https://developer.apple.com/documentation/uikit/uilongpressgesturerecognizer',),
+    AndroidPlatform(
+      apiName: 'View.setOnLongClickListener',
+      apiUrl:
+          'https://developer.android.com/reference/android/view/View#setOnLongClickListener(android.view.View.OnLongClickListener)',
+    ),
+    IOSPlatform(
+      apiName: 'UILongPressGestureRecognizer',
+      apiUrl:
+          'https://developer.apple.com/documentation/uikit/uilongpressgesturerecognizer',
+    ),
   ])
   final void Function(T controller, InAppWebViewHitTestResult hitTestResult)?
       onLongPressHitTestResult;
@@ -706,10 +989,26 @@ In that case, after the `window.addEventListener("flutterInAppWebViewPlatformRea
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewCreationParams.onEnterFullscreen.supported_platforms}
   @SupportedPlatforms(platforms: [
-    AndroidPlatform( apiName: 'WebChromeClient.onShowCustomView', apiUrl: 'https://developer.android.com/reference/android/webkit/WebChromeClient#onShowCustomView(android.view.View,%20android.webkit.WebChromeClient.CustomViewCallback)',),
-    IOSPlatform( apiName: 'UIWindow.didBecomeVisibleNotification', apiUrl: 'https://developer.apple.com/documentation/uikit/uiwindow/1621621-didbecomevisiblenotification',),
-    MacOSPlatform( apiName: 'NSWindow.didEnterFullScreenNotification', apiUrl: 'https://developer.apple.com/documentation/appkit/nswindow/1419651-didenterfullscreennotification',),
-    WebPlatform( apiName: 'Document.onfullscreenchange', apiUrl: 'https://developer.mozilla.org/en-US/docs/Web/API/Document/fullscreenchange_event',),
+    AndroidPlatform(
+      apiName: 'WebChromeClient.onShowCustomView',
+      apiUrl:
+          'https://developer.android.com/reference/android/webkit/WebChromeClient#onShowCustomView(android.view.View,%20android.webkit.WebChromeClient.CustomViewCallback)',
+    ),
+    IOSPlatform(
+      apiName: 'UIWindow.didBecomeVisibleNotification',
+      apiUrl:
+          'https://developer.apple.com/documentation/uikit/uiwindow/1621621-didbecomevisiblenotification',
+    ),
+    MacOSPlatform(
+      apiName: 'NSWindow.didEnterFullScreenNotification',
+      apiUrl:
+          'https://developer.apple.com/documentation/appkit/nswindow/1419651-didenterfullscreennotification',
+    ),
+    WebPlatform(
+      apiName: 'Document.onfullscreenchange',
+      apiUrl:
+          'https://developer.mozilla.org/en-US/docs/Web/API/Document/fullscreenchange_event',
+    ),
   ])
   final void Function(T controller)? onEnterFullscreen;
 
@@ -719,10 +1018,26 @@ In that case, after the `window.addEventListener("flutterInAppWebViewPlatformRea
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewCreationParams.onExitFullscreen.supported_platforms}
   @SupportedPlatforms(platforms: [
-    AndroidPlatform( apiName: 'WebChromeClient.onHideCustomView', apiUrl: 'https://developer.android.com/reference/android/webkit/WebChromeClient#onHideCustomView()',),
-    IOSPlatform( apiName: 'UIWindow.didBecomeHiddenNotification', apiUrl: 'https://developer.apple.com/documentation/uikit/uiwindow/1621617-didbecomehiddennotification',),
-    MacOSPlatform( apiName: 'NSWindow.didExitFullScreenNotification', apiUrl: 'https://developer.apple.com/documentation/appkit/nswindow/1419177-didexitfullscreennotification',),
-    WebPlatform( apiName: 'Document.onfullscreenchange', apiUrl: 'https://developer.mozilla.org/en-US/docs/Web/API/Document/fullscreenchange_event',),
+    AndroidPlatform(
+      apiName: 'WebChromeClient.onHideCustomView',
+      apiUrl:
+          'https://developer.android.com/reference/android/webkit/WebChromeClient#onHideCustomView()',
+    ),
+    IOSPlatform(
+      apiName: 'UIWindow.didBecomeHiddenNotification',
+      apiUrl:
+          'https://developer.apple.com/documentation/uikit/uiwindow/1621617-didbecomehiddennotification',
+    ),
+    MacOSPlatform(
+      apiName: 'NSWindow.didExitFullScreenNotification',
+      apiUrl:
+          'https://developer.apple.com/documentation/appkit/nswindow/1419177-didexitfullscreennotification',
+    ),
+    WebPlatform(
+      apiName: 'Document.onfullscreenchange',
+      apiUrl:
+          'https://developer.mozilla.org/en-US/docs/Web/API/Document/fullscreenchange_event',
+    ),
   ])
   final void Function(T controller)? onExitFullscreen;
 
@@ -737,9 +1052,21 @@ In that case, after the `window.addEventListener("flutterInAppWebViewPlatformRea
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewCreationParams.onPageCommitVisible.supported_platforms}
   @SupportedPlatforms(platforms: [
-    AndroidPlatform( apiName: 'WebViewClient.onPageCommitVisible', apiUrl: 'https://developer.android.com/reference/android/webkit/WebViewClient#onPageCommitVisible(android.webkit.WebView,%20java.lang.String)',),
-    IOSPlatform( apiName: 'WKNavigationDelegate.webView', apiUrl: 'https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455635-webview',),
-    MacOSPlatform( apiName: 'WKNavigationDelegate.webView', apiUrl: 'https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455635-webview',),
+    AndroidPlatform(
+      apiName: 'WebViewClient.onPageCommitVisible',
+      apiUrl:
+          'https://developer.android.com/reference/android/webkit/WebViewClient#onPageCommitVisible(android.webkit.WebView,%20java.lang.String)',
+    ),
+    IOSPlatform(
+      apiName: 'WKNavigationDelegate.webView',
+      apiUrl:
+          'https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455635-webview',
+    ),
+    MacOSPlatform(
+      apiName: 'WKNavigationDelegate.webView',
+      apiUrl:
+          'https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455635-webview',
+    ),
   ])
   final void Function(T controller, WebUri? url)? onPageCommitVisible;
 
@@ -751,11 +1078,19 @@ In that case, after the `window.addEventListener("flutterInAppWebViewPlatformRea
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewCreationParams.onTitleChanged.supported_platforms}
   @SupportedPlatforms(platforms: [
-    AndroidPlatform( apiName: 'WebChromeClient.onReceivedTitle', apiUrl: 'https://developer.android.com/reference/android/webkit/WebChromeClient#onReceivedTitle(android.webkit.WebView,%20java.lang.String)',),
+    AndroidPlatform(
+      apiName: 'WebChromeClient.onReceivedTitle',
+      apiUrl:
+          'https://developer.android.com/reference/android/webkit/WebChromeClient#onReceivedTitle(android.webkit.WebView,%20java.lang.String)',
+    ),
     IOSPlatform(),
     MacOSPlatform(),
     WebPlatform(),
-    WindowsPlatform( apiName: 'ICoreWebView2.add_DocumentTitleChanged', apiUrl: 'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2?view=webview2-1.0.2210.55#add_documenttitlechanged',),
+    WindowsPlatform(
+      apiName: 'ICoreWebView2.add_DocumentTitleChanged',
+      apiUrl:
+          'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2?view=webview2-1.0.2210.55#add_documenttitlechanged',
+    ),
   ])
   final void Function(T controller, String? title)? onTitleChanged;
 
@@ -773,7 +1108,11 @@ In that case, after the `window.addEventListener("flutterInAppWebViewPlatformRea
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewCreationParams.onOverScrolled.supported_platforms}
   @SupportedPlatforms(platforms: [
-    AndroidPlatform( apiName: 'WebView.onOverScrolled', apiUrl: 'https://developer.android.com/reference/android/webkit/WebView#onOverScrolled(int,%20int,%20boolean,%20boolean)',),
+    AndroidPlatform(
+      apiName: 'WebView.onOverScrolled',
+      apiUrl:
+          'https://developer.android.com/reference/android/webkit/WebView#onOverScrolled(int,%20int,%20boolean,%20boolean)',
+    ),
     IOSPlatform(),
   ])
   final void Function(T controller, int x, int y, bool clampedX, bool clampedY)?
@@ -789,10 +1128,22 @@ In that case, after the `window.addEventListener("flutterInAppWebViewPlatformRea
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewCreationParams.onZoomScaleChanged.supported_platforms}
   @SupportedPlatforms(platforms: [
-    AndroidPlatform( apiName: 'WebViewClient.onScaleChanged', apiUrl: 'https://developer.android.com/reference/android/webkit/WebViewClient#onScaleChanged(android.webkit.WebView,%20float,%20float)',),
-    IOSPlatform( apiName: 'UIScrollViewDelegate.scrollViewDidZoom', apiUrl: 'https://developer.apple.com/documentation/uikit/uiscrollviewdelegate/1619409-scrollviewdidzoom',),
+    AndroidPlatform(
+      apiName: 'WebViewClient.onScaleChanged',
+      apiUrl:
+          'https://developer.android.com/reference/android/webkit/WebViewClient#onScaleChanged(android.webkit.WebView,%20float,%20float)',
+    ),
+    IOSPlatform(
+      apiName: 'UIScrollViewDelegate.scrollViewDidZoom',
+      apiUrl:
+          'https://developer.apple.com/documentation/uikit/uiscrollviewdelegate/1619409-scrollviewdidzoom',
+    ),
     WebPlatform(),
-    WindowsPlatform( apiName: 'ICoreWebView2Controller.add_ZoomFactorChanged', apiUrl: 'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2controller?view=webview2-1.0.2849.39#add_zoomfactorchanged',),
+    WindowsPlatform(
+      apiName: 'ICoreWebView2Controller.add_ZoomFactorChanged',
+      apiUrl:
+          'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2controller?view=webview2-1.0.2849.39#add_zoomfactorchanged',
+    ),
   ])
   final void Function(T controller, double oldScale, double newScale)?
       onZoomScaleChanged;
@@ -821,7 +1172,11 @@ In that case, after the `window.addEventListener("flutterInAppWebViewPlatformRea
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewCreationParams.onSafeBrowsingHit.supported_platforms}
   @SupportedPlatforms(platforms: [
-    AndroidPlatform( apiName: 'WebViewClient.onSafeBrowsingHit', apiUrl: 'https://developer.android.com/reference/android/webkit/WebViewClient#onSafeBrowsingHit(android.webkit.WebView,%20android.webkit.WebResourceRequest,%20int,%20android.webkit.SafeBrowsingResponse)', available: '27'),
+    AndroidPlatform(
+        apiName: 'WebViewClient.onSafeBrowsingHit',
+        apiUrl:
+            'https://developer.android.com/reference/android/webkit/WebViewClient#onSafeBrowsingHit(android.webkit.WebView,%20android.webkit.WebResourceRequest,%20int,%20android.webkit.SafeBrowsingResponse)',
+        available: '27'),
   ])
   final FutureOr<SafeBrowsingResponse?> Function(
           T controller, WebUri url, SafeBrowsingThreat? threatType)?
@@ -849,10 +1204,26 @@ In that case, after the `window.addEventListener("flutterInAppWebViewPlatformRea
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewCreationParams.onPermissionRequest.supported_platforms}
   @SupportedPlatforms(platforms: [
-    AndroidPlatform( apiName: 'WebChromeClient.onPermissionRequest', apiUrl: 'https://developer.android.com/reference/android/webkit/WebChromeClient#onPermissionRequest(android.webkit.PermissionRequest)', available: '21'),
-    IOSPlatform( available: '15.0', note: 'The default [PermissionResponse.action] is [PermissionResponseAction.PROMPT].',),
-    MacOSPlatform( available: '12.0', note: 'The default [PermissionResponse.action] is [PermissionResponseAction.PROMPT].',),
-    WindowsPlatform( apiName: 'ICoreWebView2.add_PermissionRequested', apiUrl: 'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2?view=webview2-1.0.2210.55#add_permissionrequested',),
+    AndroidPlatform(
+        apiName: 'WebChromeClient.onPermissionRequest',
+        apiUrl:
+            'https://developer.android.com/reference/android/webkit/WebChromeClient#onPermissionRequest(android.webkit.PermissionRequest)',
+        available: '21'),
+    IOSPlatform(
+      available: '15.0',
+      note:
+          'The default [PermissionResponse.action] is [PermissionResponseAction.PROMPT].',
+    ),
+    MacOSPlatform(
+      available: '12.0',
+      note:
+          'The default [PermissionResponse.action] is [PermissionResponseAction.PROMPT].',
+    ),
+    WindowsPlatform(
+      apiName: 'ICoreWebView2.add_PermissionRequested',
+      apiUrl:
+          'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2?view=webview2-1.0.2210.55#add_permissionrequested',
+    ),
   ])
   final FutureOr<PermissionResponse?> Function(
       T controller, PermissionRequest permissionRequest)? onPermissionRequest;
@@ -879,7 +1250,11 @@ In that case, after the `window.addEventListener("flutterInAppWebViewPlatformRea
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewCreationParams.onGeolocationPermissionsShowPrompt.supported_platforms}
   @SupportedPlatforms(platforms: [
-    AndroidPlatform( apiName: 'WebChromeClient.onGeolocationPermissionsShowPrompt', apiUrl: 'https://developer.android.com/reference/android/webkit/WebChromeClient#onGeolocationPermissionsShowPrompt(java.lang.String,%20android.webkit.GeolocationPermissions.Callback)',),
+    AndroidPlatform(
+      apiName: 'WebChromeClient.onGeolocationPermissionsShowPrompt',
+      apiUrl:
+          'https://developer.android.com/reference/android/webkit/WebChromeClient#onGeolocationPermissionsShowPrompt(java.lang.String,%20android.webkit.GeolocationPermissions.Callback)',
+    ),
   ])
   final FutureOr<GeolocationPermissionShowPromptResponse?> Function(
       T controller, String origin)? onGeolocationPermissionsShowPrompt;
@@ -902,7 +1277,11 @@ In that case, after the `window.addEventListener("flutterInAppWebViewPlatformRea
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewCreationParams.onGeolocationPermissionsHidePrompt.supported_platforms}
   @SupportedPlatforms(platforms: [
-    AndroidPlatform( apiName: 'WebChromeClient.onGeolocationPermissionsHidePrompt', apiUrl: 'https://developer.android.com/reference/android/webkit/WebChromeClient#onGeolocationPermissionsHidePrompt()',),
+    AndroidPlatform(
+      apiName: 'WebChromeClient.onGeolocationPermissionsHidePrompt',
+      apiUrl:
+          'https://developer.android.com/reference/android/webkit/WebChromeClient#onGeolocationPermissionsHidePrompt()',
+    ),
   ])
   final void Function(T controller)? onGeolocationPermissionsHidePrompt;
 
@@ -936,8 +1315,16 @@ In that case, after the `window.addEventListener("flutterInAppWebViewPlatformRea
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewCreationParams.shouldInterceptRequest.supported_platforms}
   @SupportedPlatforms(platforms: [
-    AndroidPlatform( apiName: 'WebViewClient.shouldInterceptRequest', apiUrl: 'https://developer.android.com/reference/android/webkit/WebViewClient#shouldInterceptRequest(android.webkit.WebView,%20android.webkit.WebResourceRequest)',),
-    WindowsPlatform( apiName: 'ICoreWebView2.add_WebResourceRequested', apiUrl: 'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2?view=webview2-1.0.2478.35#add_webresourcerequested',),
+    AndroidPlatform(
+      apiName: 'WebViewClient.shouldInterceptRequest',
+      apiUrl:
+          'https://developer.android.com/reference/android/webkit/WebViewClient#shouldInterceptRequest(android.webkit.WebView,%20android.webkit.WebResourceRequest)',
+    ),
+    WindowsPlatform(
+      apiName: 'ICoreWebView2.add_WebResourceRequested',
+      apiUrl:
+          'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2?view=webview2-1.0.2478.35#add_webresourcerequested',
+    ),
   ])
   final FutureOr<WebResourceResponse?> Function(
       T controller, WebResourceRequest request)? shouldInterceptRequest;
@@ -973,8 +1360,16 @@ In that case, after the `window.addEventListener("flutterInAppWebViewPlatformRea
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewCreationParams.onRenderProcessUnresponsive.supported_platforms}
   @SupportedPlatforms(platforms: [
-    AndroidPlatform( apiName: 'WebViewRenderProcessClient.onRenderProcessUnresponsive', apiUrl: 'https://developer.android.com/reference/android/webkit/WebViewRenderProcessClient#onRenderProcessUnresponsive(android.webkit.WebView,%20android.webkit.WebViewRenderProcess)', available: '29'),
-    WindowsPlatform( apiName: 'ICoreWebView2.add_ProcessFailed', apiUrl: 'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2?view=webview2-1.0.2849.39#add_processfailed',),
+    AndroidPlatform(
+        apiName: 'WebViewRenderProcessClient.onRenderProcessUnresponsive',
+        apiUrl:
+            'https://developer.android.com/reference/android/webkit/WebViewRenderProcessClient#onRenderProcessUnresponsive(android.webkit.WebView,%20android.webkit.WebViewRenderProcess)',
+        available: '29'),
+    WindowsPlatform(
+      apiName: 'ICoreWebView2.add_ProcessFailed',
+      apiUrl:
+          'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2?view=webview2-1.0.2849.39#add_processfailed',
+    ),
   ])
   final FutureOr<WebViewRenderProcessAction?> Function(
       T controller, WebUri? url)? onRenderProcessUnresponsive;
@@ -1003,7 +1398,11 @@ In that case, after the `window.addEventListener("flutterInAppWebViewPlatformRea
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewCreationParams.onRenderProcessResponsive.supported_platforms}
   @SupportedPlatforms(platforms: [
-    AndroidPlatform( apiName: 'WebViewRenderProcessClient.onRenderProcessResponsive', apiUrl: 'https://developer.android.com/reference/android/webkit/WebViewRenderProcessClient#onRenderProcessResponsive(android.webkit.WebView,%20android.webkit.WebViewRenderProcess)', available: '29'),
+    AndroidPlatform(
+        apiName: 'WebViewRenderProcessClient.onRenderProcessResponsive',
+        apiUrl:
+            'https://developer.android.com/reference/android/webkit/WebViewRenderProcessClient#onRenderProcessResponsive(android.webkit.WebView,%20android.webkit.WebViewRenderProcess)',
+        available: '29'),
   ])
   final FutureOr<WebViewRenderProcessAction?> Function(
       T controller, WebUri? url)? onRenderProcessResponsive;
@@ -1033,8 +1432,16 @@ In that case, after the `window.addEventListener("flutterInAppWebViewPlatformRea
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewCreationParams.onRenderProcessGone.supported_platforms}
   @SupportedPlatforms(platforms: [
-    AndroidPlatform( apiName: 'WebViewClient.onRenderProcessGone', apiUrl: 'https://developer.android.com/reference/android/webkit/WebViewClient#onRenderProcessGone(android.webkit.WebView,%20android.webkit.RenderProcessGoneDetail)', available: '26'),
-    WindowsPlatform( apiName: 'ICoreWebView2.add_ProcessFailed', apiUrl: 'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2?view=webview2-1.0.2849.39#add_processfailed',),
+    AndroidPlatform(
+        apiName: 'WebViewClient.onRenderProcessGone',
+        apiUrl:
+            'https://developer.android.com/reference/android/webkit/WebViewClient#onRenderProcessGone(android.webkit.WebView,%20android.webkit.RenderProcessGoneDetail)',
+        available: '26'),
+    WindowsPlatform(
+      apiName: 'ICoreWebView2.add_ProcessFailed',
+      apiUrl:
+          'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2?view=webview2-1.0.2849.39#add_processfailed',
+    ),
   ])
   final void Function(T controller, RenderProcessGoneDetail detail)?
       onRenderProcessGone;
@@ -1057,7 +1464,11 @@ In that case, after the `window.addEventListener("flutterInAppWebViewPlatformRea
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewCreationParams.onFormResubmission.supported_platforms}
   @SupportedPlatforms(platforms: [
-    AndroidPlatform( apiName: 'WebViewClient.onFormResubmission', apiUrl: 'https://developer.android.com/reference/android/webkit/WebViewClient#onFormResubmission(android.webkit.WebView,%20android.os.Message,%20android.os.Message)',),
+    AndroidPlatform(
+      apiName: 'WebViewClient.onFormResubmission',
+      apiUrl:
+          'https://developer.android.com/reference/android/webkit/WebViewClient#onFormResubmission(android.webkit.WebView,%20android.os.Message,%20android.os.Message)',
+    ),
   ])
   final FutureOr<FormResubmissionAction?> Function(T controller, WebUri? url)?
       onFormResubmission;
@@ -1093,7 +1504,11 @@ In that case, after the `window.addEventListener("flutterInAppWebViewPlatformRea
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewCreationParams.onReceivedIcon.supported_platforms}
   @SupportedPlatforms(platforms: [
-    AndroidPlatform( apiName: 'WebChromeClient.onReceivedIcon', apiUrl: 'https://developer.android.com/reference/android/webkit/WebChromeClient#onReceivedIcon(android.webkit.WebView,%20android.graphics.Bitmap)',),
+    AndroidPlatform(
+      apiName: 'WebChromeClient.onReceivedIcon',
+      apiUrl:
+          'https://developer.android.com/reference/android/webkit/WebChromeClient#onReceivedIcon(android.webkit.WebView,%20android.graphics.Bitmap)',
+    ),
   ])
   final void Function(T controller, Uint8List icon)? onReceivedIcon;
 
@@ -1119,7 +1534,11 @@ In that case, after the `window.addEventListener("flutterInAppWebViewPlatformRea
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewCreationParams.onReceivedTouchIconUrl.supported_platforms}
   @SupportedPlatforms(platforms: [
-    AndroidPlatform( apiName: 'WebChromeClient.onReceivedTouchIconUrl', apiUrl: 'https://developer.android.com/reference/android/webkit/WebChromeClient#onReceivedTouchIconUrl(android.webkit.WebView,%20java.lang.String,%20boolean)',),
+    AndroidPlatform(
+      apiName: 'WebChromeClient.onReceivedTouchIconUrl',
+      apiUrl:
+          'https://developer.android.com/reference/android/webkit/WebChromeClient#onReceivedTouchIconUrl(android.webkit.WebView,%20java.lang.String,%20boolean)',
+    ),
   ])
   final void Function(T controller, WebUri url, bool precomposed)?
       onReceivedTouchIconUrl;
@@ -1151,7 +1570,11 @@ In that case, after the `window.addEventListener("flutterInAppWebViewPlatformRea
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewCreationParams.onJsBeforeUnload.supported_platforms}
   @SupportedPlatforms(platforms: [
-    AndroidPlatform( apiName: 'WebChromeClient.onJsBeforeUnload', apiUrl: 'https://developer.android.com/reference/android/webkit/WebChromeClient#onJsBeforeUnload(android.webkit.WebView,%20java.lang.String,%20java.lang.String,%20android.webkit.JsResult)',),
+    AndroidPlatform(
+      apiName: 'WebChromeClient.onJsBeforeUnload',
+      apiUrl:
+          'https://developer.android.com/reference/android/webkit/WebChromeClient#onJsBeforeUnload(android.webkit.WebView,%20java.lang.String,%20java.lang.String,%20android.webkit.JsResult)',
+    ),
   ])
   final FutureOr<JsBeforeUnloadResponse?> Function(
           T controller, JsBeforeUnloadRequest jsBeforeUnloadRequest)?
@@ -1177,7 +1600,11 @@ In that case, after the `window.addEventListener("flutterInAppWebViewPlatformRea
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewCreationParams.onReceivedLoginRequest.supported_platforms}
   @SupportedPlatforms(platforms: [
-    AndroidPlatform( apiName: 'WebViewClient.onReceivedLoginRequest', apiUrl: 'https://developer.android.com/reference/android/webkit/WebViewClient#onReceivedLoginRequest(android.webkit.WebView,%20java.lang.String,%20java.lang.String,%20java.lang.String)',),
+    AndroidPlatform(
+      apiName: 'WebViewClient.onReceivedLoginRequest',
+      apiUrl:
+          'https://developer.android.com/reference/android/webkit/WebViewClient#onReceivedLoginRequest(android.webkit.WebView,%20java.lang.String,%20java.lang.String,%20java.lang.String)',
+    ),
   ])
   final void Function(T controller, LoginRequest loginRequest)?
       onReceivedLoginRequest;
@@ -1192,7 +1619,11 @@ In that case, after the `window.addEventListener("flutterInAppWebViewPlatformRea
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewCreationParams.onPermissionRequestCanceled.supported_platforms}
   @SupportedPlatforms(platforms: [
-    AndroidPlatform( apiName: 'WebChromeClient.onPermissionRequestCanceled', apiUrl: 'https://developer.android.com/reference/android/webkit/WebChromeClient#onPermissionRequestCanceled(android.webkit.PermissionRequest)', available: '21'),
+    AndroidPlatform(
+        apiName: 'WebChromeClient.onPermissionRequestCanceled',
+        apiUrl:
+            'https://developer.android.com/reference/android/webkit/WebChromeClient#onPermissionRequestCanceled(android.webkit.PermissionRequest)',
+        available: '21'),
   ])
   final void Function(T controller, PermissionRequest permissionRequest)?
       onPermissionRequestCanceled;
@@ -1207,7 +1638,11 @@ In that case, after the `window.addEventListener("flutterInAppWebViewPlatformRea
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewCreationParams.onRequestFocus.supported_platforms}
   @SupportedPlatforms(platforms: [
-    AndroidPlatform( apiName: 'WebChromeClient.onRequestFocus', apiUrl: 'https://developer.android.com/reference/android/webkit/WebChromeClient#onRequestFocus(android.webkit.WebView)',),
+    AndroidPlatform(
+      apiName: 'WebChromeClient.onRequestFocus',
+      apiUrl:
+          'https://developer.android.com/reference/android/webkit/WebChromeClient#onRequestFocus(android.webkit.WebView)',
+    ),
   ])
   final void Function(T controller)? onRequestFocus;
 
@@ -1229,9 +1664,21 @@ In that case, after the `window.addEventListener("flutterInAppWebViewPlatformRea
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewCreationParams.onWebContentProcessDidTerminate.supported_platforms}
   @SupportedPlatforms(platforms: [
-    IOSPlatform( apiName: 'WKNavigationDelegate.webViewWebContentProcessDidTerminate', apiUrl: 'https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455639-webviewwebcontentprocessdidtermi',),
-    MacOSPlatform( apiName: 'WKNavigationDelegate.webViewWebContentProcessDidTerminate', apiUrl: 'https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455639-webviewwebcontentprocessdidtermi',),
-    WindowsPlatform( apiName: 'ICoreWebView2.add_ProcessFailed', apiUrl: 'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2?view=webview2-1.0.2849.39#add_processfailed',),
+    IOSPlatform(
+      apiName: 'WKNavigationDelegate.webViewWebContentProcessDidTerminate',
+      apiUrl:
+          'https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455639-webviewwebcontentprocessdidtermi',
+    ),
+    MacOSPlatform(
+      apiName: 'WKNavigationDelegate.webViewWebContentProcessDidTerminate',
+      apiUrl:
+          'https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455639-webviewwebcontentprocessdidtermi',
+    ),
+    WindowsPlatform(
+      apiName: 'ICoreWebView2.add_ProcessFailed',
+      apiUrl:
+          'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2?view=webview2-1.0.2849.39#add_processfailed',
+    ),
   ])
   final void Function(T controller)? onWebContentProcessDidTerminate;
 
@@ -1253,8 +1700,16 @@ In that case, after the `window.addEventListener("flutterInAppWebViewPlatformRea
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewCreationParams.onDidReceiveServerRedirectForProvisionalNavigation.supported_platforms}
   @SupportedPlatforms(platforms: [
-    IOSPlatform( apiName: 'WKNavigationDelegate.webView', apiUrl: 'https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455627-webview',),
-    MacOSPlatform( apiName: 'WKNavigationDelegate.webView', apiUrl: 'https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455627-webview',),
+    IOSPlatform(
+      apiName: 'WKNavigationDelegate.webView',
+      apiUrl:
+          'https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455627-webview',
+    ),
+    MacOSPlatform(
+      apiName: 'WKNavigationDelegate.webView',
+      apiUrl:
+          'https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455627-webview',
+    ),
   ])
   final void Function(T controller)?
       onDidReceiveServerRedirectForProvisionalNavigation;
@@ -1282,8 +1737,16 @@ In that case, after the `window.addEventListener("flutterInAppWebViewPlatformRea
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewCreationParams.onNavigationResponse.supported_platforms}
   @SupportedPlatforms(platforms: [
-    IOSPlatform( apiName: 'WKNavigationDelegate.webView', apiUrl: 'https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455643-webview',),
-    MacOSPlatform( apiName: 'WKNavigationDelegate.webView', apiUrl: 'https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455643-webview',),
+    IOSPlatform(
+      apiName: 'WKNavigationDelegate.webView',
+      apiUrl:
+          'https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455643-webview',
+    ),
+    MacOSPlatform(
+      apiName: 'WKNavigationDelegate.webView',
+      apiUrl:
+          'https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455643-webview',
+    ),
   ])
   final FutureOr<NavigationResponseAction?> Function(
           T controller, NavigationResponse navigationResponse)?
@@ -1310,8 +1773,16 @@ In that case, after the `window.addEventListener("flutterInAppWebViewPlatformRea
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewCreationParams.shouldAllowDeprecatedTLS.supported_platforms}
   @SupportedPlatforms(platforms: [
-    IOSPlatform( apiName: 'WKNavigationDelegate.webView', apiUrl: 'https://developer.apple.com/documentation/webkit/wknavigationdelegate/3601237-webview', available: '14.0'),
-    MacOSPlatform( apiName: 'WKNavigationDelegate.webView', apiUrl: 'https://developer.apple.com/documentation/webkit/wknavigationdelegate/3601237-webview', available: '11.0'),
+    IOSPlatform(
+        apiName: 'WKNavigationDelegate.webView',
+        apiUrl:
+            'https://developer.apple.com/documentation/webkit/wknavigationdelegate/3601237-webview',
+        available: '14.0'),
+    MacOSPlatform(
+        apiName: 'WKNavigationDelegate.webView',
+        apiUrl:
+            'https://developer.apple.com/documentation/webkit/wknavigationdelegate/3601237-webview',
+        available: '11.0'),
   ])
   final FutureOr<ShouldAllowDeprecatedTLSAction?> Function(
           T controller, URLAuthenticationChallenge challenge)?
@@ -1323,8 +1794,12 @@ In that case, after the `window.addEventListener("flutterInAppWebViewPlatformRea
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewCreationParams.onCameraCaptureStateChanged.supported_platforms}
   @SupportedPlatforms(platforms: [
-    IOSPlatform( available: '15.0',),
-    MacOSPlatform( available: '12.0',),
+    IOSPlatform(
+      available: '15.0',
+    ),
+    MacOSPlatform(
+      available: '12.0',
+    ),
   ])
   final FutureOr<void> Function(
     T controller,
@@ -1338,8 +1813,12 @@ In that case, after the `window.addEventListener("flutterInAppWebViewPlatformRea
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewCreationParams.onMicrophoneCaptureStateChanged.supported_platforms}
   @SupportedPlatforms(platforms: [
-    IOSPlatform( available: '15.0',),
-    MacOSPlatform( available: '12.0',),
+    IOSPlatform(
+      available: '15.0',
+    ),
+    MacOSPlatform(
+      available: '12.0',
+    ),
   ])
   final FutureOr<void> Function(
     T controller,
@@ -1372,7 +1851,11 @@ In that case, after the `window.addEventListener("flutterInAppWebViewPlatformRea
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewCreationParams.onProcessFailed.supported_platforms}
   @SupportedPlatforms(platforms: [
-    WindowsPlatform( apiName: 'ICoreWebView2.add_ProcessFailed', apiUrl: 'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2?view=webview2-1.0.2849.39#add_processfailed',),
+    WindowsPlatform(
+      apiName: 'ICoreWebView2.add_ProcessFailed',
+      apiUrl:
+          'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2?view=webview2-1.0.2849.39#add_processfailed',
+    ),
   ])
   final void Function(T controller, ProcessFailedDetail detail)?
       onProcessFailed;
@@ -1395,7 +1878,11 @@ In that case, after the `window.addEventListener("flutterInAppWebViewPlatformRea
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewCreationParams.onAcceleratorKeyPressed.supported_platforms}
   @SupportedPlatforms(platforms: [
-    WindowsPlatform( apiName: 'ICoreWebView2Controller.add_AcceleratorKeyPressed', apiUrl: 'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2controller?view=webview2-1.0.2849.39#add_acceleratorkeypressed',),
+    WindowsPlatform(
+      apiName: 'ICoreWebView2Controller.add_AcceleratorKeyPressed',
+      apiUrl:
+          'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2controller?view=webview2-1.0.2849.39#add_acceleratorkeypressed',
+    ),
   ])
   final void Function(T controller, AcceleratorKeyPressedDetail detail)?
       onAcceleratorKeyPressed;
@@ -1415,9 +1902,14 @@ In that case, after the `window.addEventListener("flutterInAppWebViewPlatformRea
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewCreationParams.onShowFileChooser.supported_platforms}
   @SupportedPlatforms(platforms: [
-    AndroidPlatform( apiName: 'WebChromeClient.onShowFileChooser', apiUrl: 'https://developer.android.com/reference/android/webkit/WebChromeClient#onShowFileChooser(android.webkit.WebView,%20android.webkit.ValueCallback%3Candroid.net.Uri[]%3E,%20android.webkit.WebChromeClient.FileChooserParams)',),
+    AndroidPlatform(
+      apiName: 'WebChromeClient.onShowFileChooser',
+      apiUrl:
+          'https://developer.android.com/reference/android/webkit/WebChromeClient#onShowFileChooser(android.webkit.WebView,%20android.webkit.ValueCallback%3Candroid.net.Uri[]%3E,%20android.webkit.WebChromeClient.FileChooserParams)',
+    ),
   ])
-  final FutureOr<ShowFileChooserResponse?> Function(T controller, ShowFileChooserRequest request)? onShowFileChooser;
+  final FutureOr<ShowFileChooserResponse?> Function(
+      T controller, ShowFileChooserRequest request)? onShowFileChooser;
 
   ///{@template flutter_inappwebview_platform_interface.PlatformWebViewCreationParams.initialUrlRequest}
   ///Initial url request that will be loaded.
@@ -1425,7 +1917,9 @@ In that case, after the `window.addEventListener("flutterInAppWebViewPlatformRea
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewCreationParams.initialUrlRequest.supported_platforms}
   @SupportedPlatforms(platforms: [
-    AndroidPlatform(note: 'When loading an URL Request using "POST" method, headers are ignored.'),
+    AndroidPlatform(
+        note:
+            'When loading an URL Request using "POST" method, headers are ignored.'),
     IOSPlatform(),
     MacOSPlatform(),
     WebPlatform(requiresSameOrigin: false),
@@ -1507,10 +2001,14 @@ In that case, after the `window.addEventListener("flutterInAppWebViewPlatformRea
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewCreationParams.initialUserScripts.supported_platforms}
   @SupportedPlatforms(platforms: [
     AndroidPlatform(),
-    IOSPlatform(note: """This property will be ignored if the [PlatformWebViewCreationParams.windowId] has been set.
+    IOSPlatform(
+        note:
+            """This property will be ignored if the [PlatformWebViewCreationParams.windowId] has been set.
 There isn't any way to add/remove user scripts specific to iOS window WebViews.
 This is a limitation of the native WebKit APIs."""),
-    MacOSPlatform(note: """This property will be ignored if the [PlatformWebViewCreationParams.windowId] has been set.
+    MacOSPlatform(
+        note:
+            """This property will be ignored if the [PlatformWebViewCreationParams.windowId] has been set.
 There isn't any way to add/remove user scripts specific to iOS window WebViews.
 This is a limitation of the native WebKit APIs."""),
     WebPlatform(),
@@ -1524,7 +2022,9 @@ This is a limitation of the native WebKit APIs."""),
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewCreationParams.pullToRefreshController.supported_platforms}
   @SupportedPlatforms(platforms: [
-    AndroidPlatform(note: 'To be able to use the "pull-to-refresh" feature, [InAppWebViewSettings.useHybridComposition] must be `true`.'),
+    AndroidPlatform(
+        note:
+            'To be able to use the "pull-to-refresh" feature, [InAppWebViewSettings.useHybridComposition] must be `true`.'),
     IOSPlatform(),
   ])
   final PlatformPullToRefreshController? pullToRefreshController;
@@ -1671,7 +2171,7 @@ This is a limitation of the native WebKit APIs."""),
   ///Check if the given [property] is supported by the [defaultTargetPlatform] or a specific [platform].
   ///{@endtemplate}
   bool isPropertySupported(PlatformWebViewCreationParamsProperty property,
-      {TargetPlatform? platform}) =>
+          {TargetPlatform? platform}) =>
       _PlatformWebViewCreationParamsPropertySupported.isPropertySupported(
           property,
           platform: platform);

@@ -2301,8 +2301,9 @@ as it can cause framerate drops on animations in Android 9 and lower (see [Hybri
 
   ///Check if the given [property] is supported by the [defaultTargetPlatform] or a specific [platform].
   static bool isPropertySupported(InAppWebViewSettingsProperty property,
-      {TargetPlatform? platform}) =>
-      _InAppWebViewSettingsPropertySupported.isPropertySupported(property, platform: platform);
+          {TargetPlatform? platform}) =>
+      _InAppWebViewSettingsPropertySupported.isPropertySupported(property,
+          platform: platform);
 }
 
 ///Class that represents the options that can be used for a `WebView`.

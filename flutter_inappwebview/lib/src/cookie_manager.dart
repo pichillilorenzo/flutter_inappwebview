@@ -175,15 +175,17 @@ class CookieManager {
       PlatformCookieManager.static().isClassSupported(platform: platform);
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformCookieManagerCreationParams.isPropertySupported}
-  static bool isPropertySupported(PlatformCookieManagerCreationParamsProperty property, {TargetPlatform? platform}) =>
-      PlatformCookieManager.static().isPropertySupported(property, platform: platform);
+  static bool isPropertySupported(
+          PlatformCookieManagerCreationParamsProperty property,
+          {TargetPlatform? platform}) =>
+      PlatformCookieManager.static()
+          .isPropertySupported(property, platform: platform);
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformCookieManager.isMethodSupported}
   static bool isMethodSupported(PlatformCookieManagerMethod method,
-      {TargetPlatform? platform}) =>
-      PlatformCookieManager.static().isMethodSupported(
-          method,
-          platform: platform);
+          {TargetPlatform? platform}) =>
+      PlatformCookieManager.static()
+          .isMethodSupported(method, platform: platform);
 }
 
 ///Class that contains only iOS-specific methods of [CookieManager].

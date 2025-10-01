@@ -243,20 +243,18 @@ class ChromeSafariBrowser implements PlatformChromeSafariBrowserEvents {
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformChromeSafariBrowser.isClassSupported}
   static bool isClassSupported({TargetPlatform? platform}) =>
-      PlatformChromeSafariBrowser.static().isClassSupported(
-          platform: platform);
+      PlatformChromeSafariBrowser.static().isClassSupported(platform: platform);
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformChromeSafariBrowser.isMethodSupported}
   static bool isMethodSupported(PlatformChromeSafariBrowserMethod property,
-      {TargetPlatform? platform}) =>
-      PlatformChromeSafariBrowser.static().isMethodSupported(
-          property,
-          platform: platform);
+          {TargetPlatform? platform}) =>
+      PlatformChromeSafariBrowser.static()
+          .isMethodSupported(property, platform: platform);
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformChromeSafariBrowserEvents.isMethodSupported}
-  static bool isEventMethodSupported(PlatformChromeSafariBrowserEventsMethod method,
-      {TargetPlatform? platform}) =>
-      PlatformChromeSafariBrowserEvents.isMethodSupported(
-          method,
+  static bool isEventMethodSupported(
+          PlatformChromeSafariBrowserEventsMethod method,
+          {TargetPlatform? platform}) =>
+      PlatformChromeSafariBrowserEvents.isMethodSupported(method,
           platform: platform);
 }

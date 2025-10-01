@@ -280,8 +280,7 @@ class WindowsHeadlessInAppWebView extends PlatformHeadlessInAppWebView
   }
 
   static final WindowsHeadlessInAppWebView _staticValue =
-  WindowsHeadlessInAppWebView(
-      WindowsHeadlessInAppWebViewCreationParams());
+      WindowsHeadlessInAppWebView(WindowsHeadlessInAppWebViewCreationParams());
 
   factory WindowsHeadlessInAppWebView.static() {
     return _staticValue;

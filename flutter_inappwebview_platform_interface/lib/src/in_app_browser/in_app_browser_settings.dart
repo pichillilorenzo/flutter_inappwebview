@@ -289,8 +289,9 @@ class InAppBrowserSettings_
 
   ///Check if the given [property] is supported by the [defaultTargetPlatform] or a specific [platform].
   static bool isPropertySupported(InAppBrowserSettingsProperty property,
-      {TargetPlatform? platform}) =>
-      _InAppBrowserSettingsPropertySupported.isPropertySupported(property, platform: platform);
+          {TargetPlatform? platform}) =>
+      _InAppBrowserSettingsPropertySupported.isPropertySupported(property,
+          platform: platform);
 }
 
 ///Class that represents the options that can be used for an [InAppBrowser] WebView.

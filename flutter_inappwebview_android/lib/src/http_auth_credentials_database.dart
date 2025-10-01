@@ -58,10 +58,9 @@ class AndroidHttpAuthCredentialDatabase
   }
 
   static final AndroidHttpAuthCredentialDatabase _staticValue =
-  AndroidHttpAuthCredentialDatabase(
-      AndroidHttpAuthCredentialDatabaseCreationParams(
-          const PlatformHttpAuthCredentialDatabaseCreationParams()
-      ));
+      AndroidHttpAuthCredentialDatabase(
+          AndroidHttpAuthCredentialDatabaseCreationParams(
+              const PlatformHttpAuthCredentialDatabaseCreationParams()));
 
   factory AndroidHttpAuthCredentialDatabase.static() {
     return _staticValue;

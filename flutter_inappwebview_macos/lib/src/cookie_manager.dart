@@ -47,8 +47,7 @@ class MacOSCookieManager extends PlatformCookieManager with ChannelController {
   }
 
   static final MacOSCookieManager _staticValue = MacOSCookieManager(
-      MacOSCookieManagerCreationParams(
-          PlatformCookieManagerCreationParams()));
+      MacOSCookieManagerCreationParams(PlatformCookieManagerCreationParams()));
 
   factory MacOSCookieManager.static() {
     return _staticValue;

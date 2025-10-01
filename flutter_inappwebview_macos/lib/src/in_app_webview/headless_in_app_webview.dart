@@ -273,8 +273,7 @@ class MacOSHeadlessInAppWebView extends PlatformHeadlessInAppWebView
   }
 
   static final MacOSHeadlessInAppWebView _staticValue =
-  MacOSHeadlessInAppWebView(
-      MacOSHeadlessInAppWebViewCreationParams());
+      MacOSHeadlessInAppWebView(MacOSHeadlessInAppWebViewCreationParams());
 
   factory MacOSHeadlessInAppWebView.static() {
     return _staticValue;

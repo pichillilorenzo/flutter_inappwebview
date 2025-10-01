@@ -560,20 +560,19 @@ class HeadlessInAppWebView {
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformHeadlessInAppWebViewCreationParams.isClassSupported}
   static bool isClassSupported({TargetPlatform? platform}) =>
-      PlatformHeadlessInAppWebView.static().isClassSupported(
-          platform: platform);
+      PlatformHeadlessInAppWebView.static()
+          .isClassSupported(platform: platform);
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformHeadlessInAppWebViewCreationParams.isPropertySupported}
-  static bool isPropertySupported(PlatformHeadlessInAppWebViewCreationParamsProperty property,
-      {TargetPlatform? platform}) =>
-      PlatformHeadlessInAppWebView.static().isPropertySupported(
-          property,
-          platform: platform);
+  static bool isPropertySupported(
+          PlatformHeadlessInAppWebViewCreationParamsProperty property,
+          {TargetPlatform? platform}) =>
+      PlatformHeadlessInAppWebView.static()
+          .isPropertySupported(property, platform: platform);
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformHeadlessInAppWebViewCreationParams.isMethodSupported}
   static bool isMethodSupported(PlatformHeadlessInAppWebViewMethod method,
-      {TargetPlatform? platform}) =>
-      PlatformHeadlessInAppWebView.static().isMethodSupported(
-          method,
-          platform: platform);
+          {TargetPlatform? platform}) =>
+      PlatformHeadlessInAppWebView.static()
+          .isMethodSupported(method, platform: platform);
 }

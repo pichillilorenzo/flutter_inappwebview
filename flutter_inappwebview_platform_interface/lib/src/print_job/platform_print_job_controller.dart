@@ -26,8 +26,7 @@ part 'platform_print_job_controller.g.dart';
 @immutable
 class PlatformPrintJobControllerCreationParams {
   /// Used by the platform implementation to create a new [PlatformPrintJobController].
-  const PlatformPrintJobControllerCreationParams(
-      {required this.id});
+  const PlatformPrintJobControllerCreationParams({required this.id});
 
   ///{@template flutter_inappwebview_platform_interface.PlatformPrintJobControllerCreationParams.id}
   ///Print job ID.
@@ -52,8 +51,8 @@ class PlatformPrintJobControllerCreationParams {
   ///Check if the given [property] is supported by the [defaultTargetPlatform] or a specific [platform].
   ///{@endtemplate}
   bool isPropertySupported(
-      PlatformPrintJobControllerCreationParamsProperty property,
-      {TargetPlatform? platform}) =>
+          PlatformPrintJobControllerCreationParamsProperty property,
+          {TargetPlatform? platform}) =>
       _PlatformPrintJobControllerCreationParamsPropertySupported
           .isPropertySupported(property, platform: platform);
 }
@@ -100,8 +99,7 @@ abstract class PlatformPrintJobController extends PlatformInterface
       '`WebViewPlatform.instance` can be set with your own test implementation.',
     );
     final PlatformPrintJobController printJobControllerStatic =
-        InAppWebViewPlatform.instance!
-            .createPlatformPrintJobControllerStatic();
+        InAppWebViewPlatform.instance!.createPlatformPrintJobControllerStatic();
     PlatformInterface.verify(printJobControllerStatic, _token);
     return printJobControllerStatic;
   }
@@ -125,15 +123,23 @@ abstract class PlatformPrintJobController extends PlatformInterface
 
   ///{@template flutter_inappwebview_platform_interface.PlatformPrintJobController.onComplete}
   ///A completion handler used to handle the conclusion of the print job (for instance, to reset state) and to handle any errors encountered in printing.
-  ///
-  ///NOTE for Android: `completed` is always `true` and `error` is always `null`.
   ///{@endtemplate}
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformPrintJobController.onComplete.supported_platforms}
   @SupportedPlatforms(platforms: [
-    AndroidPlatform(apiName: 'PrintDocumentAdapter.onFinish', apiUrl: 'https://developer.android.com/reference/android/print/PrintDocumentAdapter#onFinish()'),
-    IOSPlatform(apiName: 'UIPrintInteractionController.CompletionHandler', apiUrl: 'https://developer.apple.com/documentation/uikit/uiprintinteractioncontroller/completionhandler'),
-    MacOSPlatform(apiName: 'NSPrintOperation.runModal', apiUrl: 'https://developer.apple.com/documentation/appkit/nsprintoperation/1532065-runmodal'),
+    AndroidPlatform(
+        apiName: 'PrintDocumentAdapter.onFinish',
+        apiUrl:
+            'https://developer.android.com/reference/android/print/PrintDocumentAdapter#onFinish()',
+        note: '`completed` is always `true` and `error` is always `null`.'),
+    IOSPlatform(
+        apiName: 'UIPrintInteractionController.CompletionHandler',
+        apiUrl:
+            'https://developer.apple.com/documentation/uikit/uiprintinteractioncontroller/completionhandler'),
+    MacOSPlatform(
+        apiName: 'NSPrintOperation.runModal',
+        apiUrl:
+            'https://developer.apple.com/documentation/appkit/nsprintoperation/1532065-runmodal'),
   ])
   PrintJobCompletionHandler? onComplete;
 
@@ -144,7 +150,10 @@ abstract class PlatformPrintJobController extends PlatformInterface
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformPrintJobController.cancel.supported_platforms}
   @SupportedPlatforms(platforms: [
-    AndroidPlatform(apiName: 'PrintJob.cancel', apiUrl: 'https://developer.android.com/reference/android/print/PrintJob#cancel()'),
+    AndroidPlatform(
+        apiName: 'PrintJob.cancel',
+        apiUrl:
+            'https://developer.android.com/reference/android/print/PrintJob#cancel()'),
   ])
   Future<void> cancel() {
     throw UnimplementedError(
@@ -158,7 +167,10 @@ abstract class PlatformPrintJobController extends PlatformInterface
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformPrintJobController.restart.supported_platforms}
   @SupportedPlatforms(platforms: [
-    AndroidPlatform(apiName: 'PrintJob.restart', apiUrl: 'https://developer.android.com/reference/android/print/PrintJob#restart()'),
+    AndroidPlatform(
+        apiName: 'PrintJob.restart',
+        apiUrl:
+            'https://developer.android.com/reference/android/print/PrintJob#restart()'),
   ])
   Future<void> restart() {
     throw UnimplementedError(
@@ -186,14 +198,17 @@ abstract class PlatformPrintJobController extends PlatformInterface
   ///{@template flutter_inappwebview_platform_interface.PlatformPrintJobController.getInfo}
   ///Gets the [PrintJobInfo] that describes this job.
   ///
-  ///NOTE: The returned info object is a snapshot of the
+  ///**NOTE**: The returned info object is a snapshot of the
   ///current print job state. Every call to this method returns a fresh
   ///info object that reflects the current print job state.
   ///{@endtemplate}
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformPrintJobController.getInfo.supported_platforms}
   @SupportedPlatforms(platforms: [
-    AndroidPlatform(apiName: 'PrintJob.getInfo', apiUrl: 'https://developer.android.com/reference/android/print/PrintJob#getInfo()'),
+    AndroidPlatform(
+        apiName: 'PrintJob.getInfo',
+        apiUrl:
+            'https://developer.android.com/reference/android/print/PrintJob#getInfo()'),
     IOSPlatform(),
     MacOSPlatform(),
   ])
@@ -230,13 +245,14 @@ abstract class PlatformPrintJobController extends PlatformInterface
       property is PlatformPrintJobControllerCreationParamsProperty
           ? params.isPropertySupported(property, platform: platform)
           : _PlatformPrintJobControllerPropertySupported.isPropertySupported(
-              property, platform: platform);
+              property,
+              platform: platform);
 
   ///{@template flutter_inappwebview_platform_interface.PlatformPrintJobController.isMethodSupported}
   ///Check if the given [method] is supported by the [defaultTargetPlatform] or a specific [platform].
   ///{@endtemplate}
   bool isMethodSupported(PlatformPrintJobControllerMethod method,
-      {TargetPlatform? platform}) =>
+          {TargetPlatform? platform}) =>
       _PlatformPrintJobControllerMethodSupported.isMethodSupported(method,
           platform: platform);
 }

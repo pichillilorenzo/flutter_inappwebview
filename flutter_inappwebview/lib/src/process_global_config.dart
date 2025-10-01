@@ -39,12 +39,11 @@ class ProcessGlobalConfig {
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformProcessGlobalConfigCreationParams.isClassSupported}
   static bool isClassSupported({TargetPlatform? platform}) =>
-      PlatformProcessGlobalConfig.static()
-          .isClassSupported(platform: platform);
+      PlatformProcessGlobalConfig.static().isClassSupported(platform: platform);
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformProcessGlobalConfig.isMethodSupported}
   static bool isMethodSupported(PlatformProcessGlobalConfigMethod method,
-      {TargetPlatform? platform}) =>
+          {TargetPlatform? platform}) =>
       PlatformProcessGlobalConfig.static()
           .isMethodSupported(method, platform: platform);
 }

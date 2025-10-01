@@ -273,8 +273,8 @@ class WebPlatformInAppWebViewWidget extends PlatformInAppWebViewWidget {
       _webPlatformParams.headlessWebView as WebPlatformHeadlessInAppWebView?;
 
   static final WebPlatformInAppWebViewWidget _staticValue =
-  WebPlatformInAppWebViewWidget(
-      WebPlatformInAppWebViewWidgetCreationParams());
+      WebPlatformInAppWebViewWidget(
+          WebPlatformInAppWebViewWidgetCreationParams());
 
   factory WebPlatformInAppWebViewWidget.static() {
     return _staticValue;

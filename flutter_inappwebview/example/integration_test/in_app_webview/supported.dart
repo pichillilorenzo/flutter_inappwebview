@@ -47,8 +47,8 @@ void supported() {
           [TargetPlatform.iOS, TargetPlatform.macOS, TargetPlatform.windows]
               .contains(defaultTargetPlatform));
       expect(
-          InAppWebView.isPropertySupported(PlatformWebViewCreationParamsProperty
-              .onAcceleratorKeyPressed),
+          InAppWebView.isPropertySupported(
+              PlatformWebViewCreationParamsProperty.onAcceleratorKeyPressed),
           defaultTargetPlatform == TargetPlatform.windows);
 
       expect(

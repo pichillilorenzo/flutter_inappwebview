@@ -94,7 +94,8 @@ class MacOSInAppWebViewPlatform extends InAppWebViewPlatform {
   /// This function should only be called by the app-facing package.
   /// Look at using [FindInteractionController] in `flutter_inappwebview` instead.
   @override
-  MacOSFindInteractionController createPlatformFindInteractionControllerStatic() {
+  MacOSFindInteractionController
+      createPlatformFindInteractionControllerStatic() {
     return MacOSFindInteractionController.static();
   }
 
@@ -114,8 +115,8 @@ class MacOSInAppWebViewPlatform extends InAppWebViewPlatform {
   /// This function should only be called by the app-facing package.
   /// Look at using [PrintJobController] in `flutter_inappwebview` instead.
   @override
-  PlatformPrintJobController createPlatformPrintJobControllerStatic() {
-    return _PlatformPrintJobController.static();
+  MacOSPrintJobController createPlatformPrintJobControllerStatic() {
+    return MacOSPrintJobController.static();
   }
 
   /// Creates a new [MacOSWebMessageChannel].
@@ -342,7 +343,8 @@ class MacOSInAppWebViewPlatform extends InAppWebViewPlatform {
   /// This function should only be called by the app-facing package.
   /// Look at using [ServiceWorkerController] in `flutter_inappwebview` instead.
   @override
-  PlatformServiceWorkerController createPlatformServiceWorkerControllerStatic() {
+  PlatformServiceWorkerController
+      createPlatformServiceWorkerControllerStatic() {
     return _PlatformServiceWorkerController.static();
   }
 
@@ -370,18 +372,19 @@ class _PlatformProcessGlobalConfig extends PlatformProcessGlobalConfig {
   _PlatformProcessGlobalConfig(PlatformProcessGlobalConfigCreationParams params)
       : super.implementation(params);
   static final _PlatformProcessGlobalConfig _staticValue =
-  _PlatformProcessGlobalConfig(
-      const PlatformProcessGlobalConfigCreationParams());
+      _PlatformProcessGlobalConfig(
+          const PlatformProcessGlobalConfigCreationParams());
 
   factory _PlatformProcessGlobalConfig.static() => _staticValue;
 }
 
 class _PlatformServiceWorkerController extends PlatformServiceWorkerController {
-  _PlatformServiceWorkerController(PlatformServiceWorkerControllerCreationParams params)
+  _PlatformServiceWorkerController(
+      PlatformServiceWorkerControllerCreationParams params)
       : super.implementation(params);
   static final _PlatformServiceWorkerController _staticValue =
-  _PlatformServiceWorkerController(
-      const PlatformServiceWorkerControllerCreationParams());
+      _PlatformServiceWorkerController(
+          const PlatformServiceWorkerControllerCreationParams());
 
   factory _PlatformServiceWorkerController.static() => _staticValue;
 
@@ -393,19 +396,8 @@ class _PlatformTracingController extends PlatformTracingController {
   _PlatformTracingController(PlatformTracingControllerCreationParams params)
       : super.implementation(params);
   static final _PlatformTracingController _staticValue =
-  _PlatformTracingController(
-      const PlatformTracingControllerCreationParams());
+      _PlatformTracingController(
+          const PlatformTracingControllerCreationParams());
 
   factory _PlatformTracingController.static() => _staticValue;
-}
-
-class _PlatformPrintJobController extends PlatformPrintJobController {
-  _PlatformPrintJobController(PlatformPrintJobControllerCreationParams params)
-      : super.implementation(params);
-
-  static final _PlatformPrintJobController _staticValue =
-      _PlatformPrintJobController(
-          const PlatformPrintJobControllerCreationParams(id: ''));
-
-  factory _PlatformPrintJobController.static() => _staticValue;
 }

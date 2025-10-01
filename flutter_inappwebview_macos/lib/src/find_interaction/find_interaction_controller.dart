@@ -38,8 +38,8 @@ class MacOSFindInteractionController extends PlatformFindInteractionController
         );
 
   static final MacOSFindInteractionController _staticValue =
-  MacOSFindInteractionController(
-      MacOSFindInteractionControllerCreationParams());
+      MacOSFindInteractionController(
+          MacOSFindInteractionControllerCreationParams());
 
   /// Provide static access.
   factory MacOSFindInteractionController.static() {

@@ -560,15 +560,13 @@ class InAppWebView extends StatefulWidget {
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewWidgetCreationParams.isClassSupported}
   static bool isClassSupported({TargetPlatform? platform}) =>
-      PlatformInAppWebViewWidget.static().isClassSupported(
-          platform: platform);
+      PlatformInAppWebViewWidget.static().isClassSupported(platform: platform);
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewWidgetCreationParams.isPropertySupported}
   static bool isPropertySupported(dynamic property,
-      {TargetPlatform? platform}) =>
-      PlatformInAppWebViewWidget.static().isPropertySupported(
-          property,
-          platform: platform);
+          {TargetPlatform? platform}) =>
+      PlatformInAppWebViewWidget.static()
+          .isPropertySupported(property, platform: platform);
 }
 
 class _InAppWebViewState extends State<InAppWebView> {

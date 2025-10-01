@@ -38,8 +38,8 @@ class IOSFindInteractionController extends PlatformFindInteractionController
         );
 
   static final IOSFindInteractionController _staticValue =
-  IOSFindInteractionController(
-      IOSFindInteractionControllerCreationParams());
+      IOSFindInteractionController(
+          IOSFindInteractionControllerCreationParams());
 
   /// Provide static access.
   factory IOSFindInteractionController.static() {

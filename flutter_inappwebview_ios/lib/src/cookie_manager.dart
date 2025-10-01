@@ -47,8 +47,7 @@ class IOSCookieManager extends PlatformCookieManager with ChannelController {
   }
 
   static final IOSCookieManager _staticValue = IOSCookieManager(
-      IOSCookieManagerCreationParams(
-          PlatformCookieManagerCreationParams()));
+      IOSCookieManagerCreationParams(PlatformCookieManagerCreationParams()));
 
   factory IOSCookieManager.static() {
     return _staticValue;

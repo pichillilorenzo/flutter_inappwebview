@@ -148,7 +148,8 @@ class WebPlatformInAppWebViewPlatform extends InAppWebViewPlatform {
   /// This function should only be called by the app-facing package.
   /// Look at using [ServiceWorkerController] in `flutter_inappwebview` instead.
   @override
-  PlatformServiceWorkerController createPlatformServiceWorkerControllerStatic() {
+  PlatformServiceWorkerController
+      createPlatformServiceWorkerControllerStatic() {
     return _PlatformServiceWorkerController.static();
   }
 
@@ -166,7 +167,8 @@ class WebPlatformInAppWebViewPlatform extends InAppWebViewPlatform {
   /// This function should only be called by the app-facing package.
   /// Look at using [FindInteractionController] in `flutter_inappwebview` instead.
   @override
-  PlatformFindInteractionController createPlatformFindInteractionControllerStatic() {
+  PlatformFindInteractionController
+      createPlatformFindInteractionControllerStatic() {
     return _PlatformFindInteractionController.static();
   }
 
@@ -231,11 +233,12 @@ class _PlatformProxyController extends PlatformProxyController {
 }
 
 class _PlatformServiceWorkerController extends PlatformServiceWorkerController {
-  _PlatformServiceWorkerController(PlatformServiceWorkerControllerCreationParams params)
+  _PlatformServiceWorkerController(
+      PlatformServiceWorkerControllerCreationParams params)
       : super.implementation(params);
   static final _PlatformServiceWorkerController _staticValue =
-  _PlatformServiceWorkerController(
-      const PlatformServiceWorkerControllerCreationParams());
+      _PlatformServiceWorkerController(
+          const PlatformServiceWorkerControllerCreationParams());
 
   factory _PlatformServiceWorkerController.static() => _staticValue;
 
@@ -247,18 +250,20 @@ class _PlatformTracingController extends PlatformTracingController {
   _PlatformTracingController(PlatformTracingControllerCreationParams params)
       : super.implementation(params);
   static final _PlatformTracingController _staticValue =
-  _PlatformTracingController(
-      const PlatformTracingControllerCreationParams());
+      _PlatformTracingController(
+          const PlatformTracingControllerCreationParams());
 
   factory _PlatformTracingController.static() => _staticValue;
 }
 
-class _PlatformFindInteractionController extends PlatformFindInteractionController {
-  _PlatformFindInteractionController(PlatformFindInteractionControllerCreationParams params)
+class _PlatformFindInteractionController
+    extends PlatformFindInteractionController {
+  _PlatformFindInteractionController(
+      PlatformFindInteractionControllerCreationParams params)
       : super.implementation(params);
   static final _PlatformFindInteractionController _staticValue =
-  _PlatformFindInteractionController(
-      const PlatformFindInteractionControllerCreationParams());
+      _PlatformFindInteractionController(
+          const PlatformFindInteractionControllerCreationParams());
 
   factory _PlatformFindInteractionController.static() => _staticValue;
 }

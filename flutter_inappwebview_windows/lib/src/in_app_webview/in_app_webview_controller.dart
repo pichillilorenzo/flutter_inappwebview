@@ -1559,9 +1559,9 @@ class WindowsInAppWebViewController extends PlatformInAppWebViewController
                         _controllerFromPlatform, request))
                     ?.toNativeValue());
               else
-                return jsonEncode((await _inAppBrowserEventHandler!
-                        .onAjaxProgress(request))
-                    ?.toNativeValue());
+                return jsonEncode(
+                    (await _inAppBrowserEventHandler!.onAjaxProgress(request))
+                        ?.toNativeValue());
             }
             return null;
           case "shouldInterceptFetchRequest":

@@ -298,8 +298,7 @@ class InAppWebViewWebElement implements Disposable {
   void makeInitialLoad() async {
     if (windowId != null) {
       if (InAppWebViewManager.windowActions.containsKey(windowId!)) {
-        final createWindowAction =
-            InAppWebViewManager.windowActions[windowId!];
+        final createWindowAction = InAppWebViewManager.windowActions[windowId!];
         loadUrl(urlRequest: createWindowAction!.request);
       }
     } else if (initialUrlRequest != null) {

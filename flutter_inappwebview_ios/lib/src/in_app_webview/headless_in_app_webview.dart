@@ -278,8 +278,7 @@ class IOSHeadlessInAppWebView extends PlatformHeadlessInAppWebView
   }
 
   static final IOSHeadlessInAppWebView _staticValue =
-  IOSHeadlessInAppWebView(
-      IOSHeadlessInAppWebViewCreationParams());
+      IOSHeadlessInAppWebView(IOSHeadlessInAppWebViewCreationParams());
 
   factory IOSHeadlessInAppWebView.static() {
     return _staticValue;
@@ -381,7 +380,8 @@ class IOSHeadlessInAppWebView extends PlatformHeadlessInAppWebView
       if (settings.useShouldInterceptAjaxRequest == null) {
         settings.useShouldInterceptAjaxRequest = true;
       }
-      if (params.onAjaxReadyStateChange != null && settings.useOnAjaxReadyStateChange == null) {
+      if (params.onAjaxReadyStateChange != null &&
+          settings.useOnAjaxReadyStateChange == null) {
         settings.useOnAjaxReadyStateChange = true;
       }
       if (params.onAjaxProgress != null && settings.useOnAjaxProgress == null) {

@@ -43,7 +43,10 @@ class PlatformTracingControllerCreationParams {
 ///
 ///{@macro flutter_inappwebview_platform_interface.PlatformTracingController.supported_platforms}
 @SupportedPlatforms(platforms: [
-  AndroidPlatform(apiName: 'TracingController', apiUrl: 'https://developer.android.com/reference/androidx/webkit/TracingController'),
+  AndroidPlatform(
+      apiName: 'TracingController',
+      apiUrl:
+          'https://developer.android.com/reference/androidx/webkit/TracingController'),
 ])
 abstract class PlatformTracingController extends PlatformInterface {
   /// Creates a new [PlatformTracingController]
@@ -65,15 +68,14 @@ abstract class PlatformTracingController extends PlatformInterface {
   /// Creates a new [PlatformTracingController]
   factory PlatformTracingController.static() {
     assert(
-    InAppWebViewPlatform.instance != null,
-    'A platform implementation for `flutter_inappwebview` has not been set. Please '
-        'ensure that an implementation of `InAppWebViewPlatform` has been set to '
-        '`WebViewPlatform.instance` before use. For unit testing, '
-        '`WebViewPlatform.instance` can be set with your own test implementation.',
+      InAppWebViewPlatform.instance != null,
+      'A platform implementation for `flutter_inappwebview` has not been set. Please '
+      'ensure that an implementation of `InAppWebViewPlatform` has been set to '
+      '`WebViewPlatform.instance` before use. For unit testing, '
+      '`WebViewPlatform.instance` can be set with your own test implementation.',
     );
     final PlatformTracingController tracingControllerStatic =
-    InAppWebViewPlatform.instance!
-        .createPlatformTracingControllerStatic();
+        InAppWebViewPlatform.instance!.createPlatformTracingControllerStatic();
     PlatformInterface.verify(tracingControllerStatic, _token);
     return tracingControllerStatic;
   }
@@ -101,7 +103,10 @@ abstract class PlatformTracingController extends PlatformInterface {
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformTracingController.start.supported_platforms}
   @SupportedPlatforms(platforms: [
-    AndroidPlatform(apiName: 'TracingController.start', apiUrl: 'https://developer.android.com/reference/android/webkit/TracingController#start(android.webkit.TracingConfig)'),
+    AndroidPlatform(
+        apiName: 'TracingController.start',
+        apiUrl:
+            'https://developer.android.com/reference/android/webkit/TracingController#start(android.webkit.TracingConfig)'),
   ])
   Future<void> start({required TracingSettings settings}) {
     throw UnimplementedError(
@@ -119,7 +124,10 @@ abstract class PlatformTracingController extends PlatformInterface {
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformTracingController.stop.supported_platforms}
   @SupportedPlatforms(platforms: [
-    AndroidPlatform(apiName: 'TracingController.stop', apiUrl: 'https://developer.android.com/reference/android/webkit/TracingController#stop(java.io.OutputStream,%20java.util.concurrent.Executor)'),
+    AndroidPlatform(
+        apiName: 'TracingController.stop',
+        apiUrl:
+            'https://developer.android.com/reference/android/webkit/TracingController#stop(java.io.OutputStream,%20java.util.concurrent.Executor)'),
   ])
   Future<bool> stop({String? filePath}) {
     throw UnimplementedError('stop is not implemented on the current platform');
@@ -131,7 +139,10 @@ abstract class PlatformTracingController extends PlatformInterface {
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformTracingController.isTracing.supported_platforms}
   @SupportedPlatforms(platforms: [
-    AndroidPlatform(apiName: 'TracingController.isTracing', apiUrl: 'https://developer.android.com/reference/android/webkit/TracingController#isTracing()'),
+    AndroidPlatform(
+        apiName: 'TracingController.isTracing',
+        apiUrl:
+            'https://developer.android.com/reference/android/webkit/TracingController#isTracing()'),
   ])
   Future<bool> isTracing() {
     throw UnimplementedError(
@@ -146,7 +157,7 @@ abstract class PlatformTracingController extends PlatformInterface {
   ///Check if the given [method] is supported by the [defaultTargetPlatform] or a specific [platform].
   ///{@endtemplate}
   bool isMethodSupported(PlatformTracingControllerMethod method,
-      {TargetPlatform? platform}) =>
+          {TargetPlatform? platform}) =>
       _PlatformTracingControllerMethodSupported.isMethodSupported(method,
           platform: platform);
 }
@@ -194,7 +205,10 @@ List<dynamic> _serializeCategories(List<dynamic> categories,
 ///
 ///{@macro flutter_inappwebview_platform_interface.TracingSettings.supported_platforms}
 @SupportedPlatforms(platforms: [
-  AndroidPlatform(apiName: 'TracingConfig', apiUrl: 'https://developer.android.com/reference/androidx/webkit/TracingConfig'),
+  AndroidPlatform(
+      apiName: 'TracingConfig',
+      apiUrl:
+          'https://developer.android.com/reference/androidx/webkit/TracingConfig'),
 ])
 @ExchangeableObject(copyMethod: true)
 class TracingSettings_ {
@@ -234,15 +248,13 @@ class TracingSettings_ {
   ///Check if the current class is supported by the [defaultTargetPlatform] or a specific [platform].
   ///{@endtemplate}
   static bool isClassSupported({TargetPlatform? platform}) =>
-      _TracingSettingsClassSupported.isClassSupported(
-          platform: platform);
+      _TracingSettingsClassSupported.isClassSupported(platform: platform);
 
   ///{@template flutter_inappwebview_platform_interface.TracingSettings.isPropertySupported}
   ///Check if the current class is supported by the [defaultTargetPlatform] or a specific [platform].
   ///{@endtemplate}
   static bool isPropertySupported(TracingSettingsProperty property,
-      {TargetPlatform? platform}) =>
-      _TracingSettingsPropertySupported.isPropertySupported(
-          property,
+          {TargetPlatform? platform}) =>
+      _TracingSettingsPropertySupported.isPropertySupported(property,
           platform: platform);
 }

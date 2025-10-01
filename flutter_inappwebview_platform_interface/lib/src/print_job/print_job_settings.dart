@@ -63,10 +63,8 @@ class PrintJobSettings_ {
   int? numberOfPages;
 
   ///Force rendering quality.
-  ///
-  ///**NOTE for iOS**: available only on iOS 14.5+.
   @SupportedPlatforms(platforms: [
-    IOSPlatform(),
+    IOSPlatform(available: '14.5'),
   ])
   PrintJobRenderingQuality_? forceRenderingQuality;
 
@@ -130,10 +128,8 @@ class PrintJobSettings_ {
 
   ///A Boolean value that determines whether the printing options include the paper orientation control when available.
   ///The default value is `true`.
-  ///
-  ///**NOTE for iOS**: available only on iOS 15.0+.
   @SupportedPlatforms(platforms: [
-    IOSPlatform(),
+    IOSPlatform(available: '15.0'),
     MacOSPlatform(),
   ])
   bool? showsPaperOrientation;

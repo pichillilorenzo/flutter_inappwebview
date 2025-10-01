@@ -73,13 +73,17 @@ class ChromeSafariBrowserOptions {
 class ChromeSafariBrowserSettings_ implements ChromeSafariBrowserOptions {
   ///The share state that should be applied to the custom tab. The default value is [CustomTabsShareState.SHARE_STATE_DEFAULT].
   @SupportedPlatforms(platforms: [
-    AndroidPlatform(note: 'Not available in a Trusted Web Activity.',),
+    AndroidPlatform(
+      note: 'Not available in a Trusted Web Activity.',
+    ),
   ])
   CustomTabsShareState_? shareState;
 
   ///Set to `false` if the title shouldn't be shown in the custom tab. The default value is `true`.
   @SupportedPlatforms(platforms: [
-    AndroidPlatform(note: 'Not available in a Trusted Web Activity.',),
+    AndroidPlatform(
+      note: 'Not available in a Trusted Web Activity.',
+    ),
   ])
   bool? showTitle;
 
@@ -109,13 +113,17 @@ class ChromeSafariBrowserSettings_ implements ChromeSafariBrowserOptions {
 
   ///Set to `true` to enable the url bar to hide as the user scrolls down on the page. The default value is `false`.
   @SupportedPlatforms(platforms: [
-    AndroidPlatform( note: 'Not available in a Trusted Web Activity.',),
+    AndroidPlatform(
+      note: 'Not available in a Trusted Web Activity.',
+    ),
   ])
   bool? enableUrlBarHiding;
 
   ///Set to `true` to enable Instant Apps. The default value is `false`.
   @SupportedPlatforms(platforms: [
-    AndroidPlatform( note: 'Not available in a Trusted Web Activity.',),
+    AndroidPlatform(
+      note: 'Not available in a Trusted Web Activity.',
+    ),
   ])
   bool? instantAppsEnabled;
 
@@ -155,20 +163,26 @@ class ChromeSafariBrowserSettings_ implements ChromeSafariBrowserOptions {
 
   ///Sets a list of additional trusted origins that the user may navigate or be redirected to from the starting uri.
   @SupportedPlatforms(platforms: [
-    AndroidPlatform(note: 'Not available in a Trusted Web Activity.',),
+    AndroidPlatform(
+      note: 'Not available in a Trusted Web Activity.',
+    ),
   ])
   List<String>? additionalTrustedOrigins;
 
   ///Sets a display mode of a Trusted Web Activity.
   @SupportedPlatforms(platforms: [
-    AndroidPlatform(note: 'Not available in a Trusted Web Activity.',),
+    AndroidPlatform(
+      note: 'Not available in a Trusted Web Activity.',
+    ),
   ])
   @ExchangeableObjectProperty(deserializer: _deserializeDisplayMode)
   TrustedWebActivityDisplayMode_? displayMode;
 
   ///Sets a screen orientation. This can be used e.g. to enable the locking of an orientation lock type.
   @SupportedPlatforms(platforms: [
-    AndroidPlatform(note: 'Not available in a Trusted Web Activity.',),
+    AndroidPlatform(
+      note: 'Not available in a Trusted Web Activity.',
+    ),
   ])
   TrustedWebActivityScreenOrientation_? screenOrientation;
 
@@ -313,8 +327,10 @@ class ChromeSafariBrowserSettings_ implements ChromeSafariBrowserOptions {
 
   ///Check if the given [property] is supported by the [defaultTargetPlatform] or a specific [platform].
   static bool isPropertySupported(ChromeSafariBrowserSettingsProperty property,
-      {TargetPlatform? platform}) =>
-      _ChromeSafariBrowserSettingsPropertySupported.isPropertySupported(property, platform: platform);
+          {TargetPlatform? platform}) =>
+      _ChromeSafariBrowserSettingsPropertySupported.isPropertySupported(
+          property,
+          platform: platform);
 }
 
 ///Class that represents the options that can be used for an [ChromeSafariBrowser] window.

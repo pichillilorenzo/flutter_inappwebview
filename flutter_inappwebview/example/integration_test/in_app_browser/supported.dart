@@ -10,16 +10,14 @@ void supported() {
           true);
       expect(
           InAppBrowser.isMethodSupported(
-              PlatformInAppBrowserMethod.openUrlRequest), true);
-      expect(
-          InAppBrowser.isMethodSupported(
-              PlatformInAppBrowserMethod.close), true);
-      expect(
-          InAppBrowser.isMethodSupported(
-              PlatformInAppBrowserMethod.hide), true);
-      expect(
-          InAppBrowser.isMethodSupported(
-              PlatformInAppBrowserMethod.show), true);
+              PlatformInAppBrowserMethod.openUrlRequest),
+          true);
+      expect(InAppBrowser.isMethodSupported(PlatformInAppBrowserMethod.close),
+          true);
+      expect(InAppBrowser.isMethodSupported(PlatformInAppBrowserMethod.hide),
+          true);
+      expect(InAppBrowser.isMethodSupported(PlatformInAppBrowserMethod.show),
+          true);
       expect(
           InAppBrowser.isEventMethodSupported(
               PlatformInAppBrowserEventsMethod.onWebContentProcessDidTerminate),
@@ -36,7 +34,8 @@ void supported() {
           defaultTargetPlatform == TargetPlatform.iOS);
       expect(
           InAppBrowserSettings.isPropertySupported(
-              InAppBrowserSettingsProperty.hidden), true);
+              InAppBrowserSettingsProperty.hidden),
+          true);
       expect(
           InAppBrowserSettings.isPropertySupported(
               InAppBrowserSettingsProperty.closeOnCannotGoBack),

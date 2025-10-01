@@ -100,7 +100,8 @@ class AndroidInAppWebViewPlatform extends InAppWebViewPlatform {
   /// This function should only be called by the app-facing package.
   /// Look at using [FindInteractionController] in `flutter_inappwebview` instead.
   @override
-  AndroidFindInteractionController createPlatformFindInteractionControllerStatic() {
+  AndroidFindInteractionController
+      createPlatformFindInteractionControllerStatic() {
     return AndroidFindInteractionController.static();
   }
 
@@ -120,8 +121,8 @@ class AndroidInAppWebViewPlatform extends InAppWebViewPlatform {
   /// This function should only be called by the app-facing package.
   /// Look at using [PrintJobController] in `flutter_inappwebview` instead.
   @override
-  PlatformPrintJobController createPlatformPrintJobControllerStatic() {
-    return _PlatformPrintJobController.static();
+  AndroidPrintJobController createPlatformPrintJobControllerStatic() {
+    return AndroidPrintJobController.static();
   }
 
   /// Creates a new [AndroidPullToRefreshController].
@@ -455,15 +456,4 @@ class AndroidInAppWebViewPlatform extends InAppWebViewPlatform {
       PlatformWebStorageManagerCreationParams params) {
     return AndroidWebStorageManager(params);
   }
-}
-
-class _PlatformPrintJobController extends PlatformPrintJobController {
-  _PlatformPrintJobController(PlatformPrintJobControllerCreationParams params)
-      : super.implementation(params);
-
-  static final _PlatformPrintJobController _staticValue =
-      _PlatformPrintJobController(
-          const PlatformPrintJobControllerCreationParams(id: ''));
-
-  factory _PlatformPrintJobController.static() => _staticValue;
 }

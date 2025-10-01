@@ -288,8 +288,7 @@ class AndroidInAppWebViewWidget extends PlatformInAppWebViewWidget {
       params.headlessWebView as AndroidHeadlessInAppWebView?;
 
   static final AndroidInAppWebViewWidget _staticValue =
-  AndroidInAppWebViewWidget(
-      AndroidInAppWebViewWidgetCreationParams());
+      AndroidInAppWebViewWidget(AndroidInAppWebViewWidgetCreationParams());
 
   factory AndroidInAppWebViewWidget.static() {
     return _staticValue;

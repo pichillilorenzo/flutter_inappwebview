@@ -5,10 +5,13 @@ void supported() {
     skippableTestWidgets('basic', (WidgetTester tester) async {
       expect(HeadlessInAppWebView.isClassSupported(), true);
       expect(
-          HeadlessInAppWebView.isPropertySupported(PlatformHeadlessInAppWebViewCreationParamsProperty.initialSize),
+          HeadlessInAppWebView.isPropertySupported(
+              PlatformHeadlessInAppWebViewCreationParamsProperty.initialSize),
           true);
       expect(
-          HeadlessInAppWebView.isPropertySupported(PlatformHeadlessInAppWebViewCreationParamsProperty.webViewEnvironment),
+          HeadlessInAppWebView.isPropertySupported(
+              PlatformHeadlessInAppWebViewCreationParamsProperty
+                  .webViewEnvironment),
           defaultTargetPlatform == TargetPlatform.windows);
       expect(
           HeadlessInAppWebView.isMethodSupported(

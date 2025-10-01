@@ -277,8 +277,7 @@ class AndroidHeadlessInAppWebView extends PlatformHeadlessInAppWebView
   }
 
   static final AndroidHeadlessInAppWebView _staticValue =
-  AndroidHeadlessInAppWebView(
-      AndroidHeadlessInAppWebViewCreationParams());
+      AndroidHeadlessInAppWebView(AndroidHeadlessInAppWebViewCreationParams());
 
   factory AndroidHeadlessInAppWebView.static() {
     return _staticValue;

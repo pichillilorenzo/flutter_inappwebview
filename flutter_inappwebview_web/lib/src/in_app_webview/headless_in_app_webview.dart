@@ -269,8 +269,8 @@ class WebPlatformHeadlessInAppWebView extends PlatformHeadlessInAppWebView
   }
 
   static final WebPlatformHeadlessInAppWebView _staticValue =
-  WebPlatformHeadlessInAppWebView(
-      WebPlatformHeadlessInAppWebViewCreationParams());
+      WebPlatformHeadlessInAppWebView(
+          WebPlatformHeadlessInAppWebViewCreationParams());
 
   factory WebPlatformHeadlessInAppWebView.static() {
     return _staticValue;

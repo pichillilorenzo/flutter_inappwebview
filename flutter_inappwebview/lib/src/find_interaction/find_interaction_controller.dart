@@ -69,17 +69,19 @@ class FindInteractionController {
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformFindInteractionControllerCreationParams.isClassSupported}
   static bool isClassSupported({TargetPlatform? platform}) =>
-      PlatformFindInteractionController.static().isClassSupported(platform: platform);
+      PlatformFindInteractionController.static()
+          .isClassSupported(platform: platform);
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformFindInteractionController.isPropertySupported}
-  static bool isPropertySupported(PlatformFindInteractionControllerCreationParamsProperty property,
-      {TargetPlatform? platform}) =>
+  static bool isPropertySupported(
+          PlatformFindInteractionControllerCreationParamsProperty property,
+          {TargetPlatform? platform}) =>
       PlatformFindInteractionController.static()
           .isPropertySupported(property, platform: platform);
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformFindInteractionController.isMethodSupported}
   static bool isMethodSupported(PlatformFindInteractionControllerMethod method,
-      {TargetPlatform? platform}) =>
+          {TargetPlatform? platform}) =>
       PlatformFindInteractionController.static()
           .isMethodSupported(method, platform: platform);
 }

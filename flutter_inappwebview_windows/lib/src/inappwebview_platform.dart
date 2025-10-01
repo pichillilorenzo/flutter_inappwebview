@@ -237,6 +237,15 @@ class WindowsInAppWebViewPlatform extends InAppWebViewPlatform {
   PlatformFindInteractionController createPlatformFindInteractionControllerStatic() {
     return _PlatformFindInteractionController.static();
   }
+
+  /// Creates a new empty [PlatformPrintJobController] to access static methods.
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [PrintJobController] in `flutter_inappwebview` instead.
+  @override
+  PlatformPrintJobController createPlatformPrintJobControllerStatic() {
+    return _PlatformPrintJobController.static();
+  }
 }
 
 class _PlatformChromeSafariBrowser extends PlatformChromeSafariBrowser {
@@ -311,4 +320,15 @@ class _PlatformFindInteractionController extends PlatformFindInteractionControll
       const PlatformFindInteractionControllerCreationParams());
 
   factory _PlatformFindInteractionController.static() => _staticValue;
+}
+
+class _PlatformPrintJobController extends PlatformPrintJobController {
+  _PlatformPrintJobController(PlatformPrintJobControllerCreationParams params)
+      : super.implementation(params);
+
+  static final _PlatformPrintJobController _staticValue =
+      _PlatformPrintJobController(
+          const PlatformPrintJobControllerCreationParams(id: ''));
+
+  factory _PlatformPrintJobController.static() => _staticValue;
 }

@@ -141,6 +141,15 @@ abstract class InAppWebViewPlatform extends PlatformInterface {
         'createPlatformPrintJobController is not implemented on the current platform.');
   }
 
+  /// Creates a new empty [PlatformPrintJobController] to access static methods.
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [PrintJobController] in `flutter_inappwebview` instead.
+  PlatformPrintJobController createPlatformPrintJobControllerStatic() {
+    throw UnimplementedError(
+        'createPlatformPrintJobControllerStatic is not implemented on the current platform.');
+  }
+
   /// Creates a new [PlatformPullToRefreshController].
   ///
   /// This function should only be called by the app-facing package.

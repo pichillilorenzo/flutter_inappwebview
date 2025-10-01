@@ -41,7 +41,7 @@
 - Implemented `onCloseWindow`, `onCallJsHandler` WebView events
 - Implemented `addJavaScriptHandler`, `removeJavaScriptHandler`, `hasJavaScriptHandler`, `addUserScript`, `addUserScripts`, `removeUserScript`, `removeUserScriptsByGroupName`, `removeUserScripts`, `hasUserScript` InAppWebViewController methods
 - Implemented `setJavaScriptBridgeName`, `getJavaScriptBridgeName`, `getDefaultUserAgent` InAppWebViewController static methods
-- Implemented `javaScriptHandlersOriginAllowList`, `javaScriptBridgeEnabled`, `javaScriptBridgeOriginAllowList`, `hasJavaScriptHandler`, `addUserScript`, `addUserScripts`, `removeUserScript` InAppWebViewSettings event
+- Implemented `javaScriptHandlersOriginAllowList`, `javaScriptBridgeEnabled`, `javaScriptBridgeOriginAllowList`, `hasJavaScriptHandler`, `addUserScript`, `addUserScripts`, `removeUserScript` of `InAppWebViewSettings`
 
 ## 6.2.0-beta.2
 

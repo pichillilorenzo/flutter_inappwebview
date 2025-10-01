@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_platform_interface.dart';
 
 ///{@macro flutter_inappwebview_platform_interface.PlatformPrintJobController}
@@ -46,4 +47,20 @@ class PrintJobController {
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformPrintJobController.dispose}
   void dispose() => platform.dispose();
+
+  ///{@macro flutter_inappwebview_platform_interface.PlatformPrintJobControllerCreationParams.isClassSupported}
+  static bool isClassSupported({TargetPlatform? platform}) =>
+      PlatformPrintJobController.static().isClassSupported(platform: platform);
+
+  ///{@macro flutter_inappwebview_platform_interface.PlatformPrintJobController.isPropertySupported}
+  static bool isPropertySupported(dynamic property,
+          {TargetPlatform? platform}) =>
+      PlatformPrintJobController.static()
+          .isPropertySupported(property, platform: platform);
+
+  ///{@macro flutter_inappwebview_platform_interface.PlatformPrintJobController.isMethodSupported}
+  static bool isMethodSupported(PlatformPrintJobControllerMethod method,
+          {TargetPlatform? platform}) =>
+      PlatformPrintJobController.static()
+          .isMethodSupported(method, platform: platform);
 }

@@ -115,6 +115,15 @@ class AndroidInAppWebViewPlatform extends InAppWebViewPlatform {
     return AndroidPrintJobController(params);
   }
 
+  /// Creates a new empty [PlatformPrintJobController] to access static methods.
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [PrintJobController] in `flutter_inappwebview` instead.
+  @override
+  PlatformPrintJobController createPlatformPrintJobControllerStatic() {
+    return _PlatformPrintJobController.static();
+  }
+
   /// Creates a new [AndroidPullToRefreshController].
   ///
   /// This function should only be called by the app-facing package.
@@ -446,4 +455,15 @@ class AndroidInAppWebViewPlatform extends InAppWebViewPlatform {
       PlatformWebStorageManagerCreationParams params) {
     return AndroidWebStorageManager(params);
   }
+}
+
+class _PlatformPrintJobController extends PlatformPrintJobController {
+  _PlatformPrintJobController(PlatformPrintJobControllerCreationParams params)
+      : super.implementation(params);
+
+  static final _PlatformPrintJobController _staticValue =
+      _PlatformPrintJobController(
+          const PlatformPrintJobControllerCreationParams(id: ''));
+
+  factory _PlatformPrintJobController.static() => _staticValue;
 }

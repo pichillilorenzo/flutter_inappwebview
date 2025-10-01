@@ -4,6 +4,7 @@
 #include <functional>
 #include <string>
 #include <vector>
+#include <mutex>
 #include <WebView2.h>
 #include <wil/com.h>
 
@@ -41,6 +42,7 @@ namespace flutter_inappwebview_plugin
   private:
     wil::com_ptr<ICoreWebView2Environment> environment_;
     WNDCLASS windowClass_ = {};
+    static std::mutex com_init_mutex_;
   };
 }
 #endif //FLUTTER_INAPPWEBVIEW_PLUGIN_WEBVIEW_ENVIRONMENT_H_

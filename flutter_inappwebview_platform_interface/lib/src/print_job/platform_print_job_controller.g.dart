@@ -79,7 +79,8 @@ enum PlatformPrintJobControllerProperty {
   ///{@template flutter_inappwebview_platform_interface.PlatformPrintJobController.onComplete.supported_platforms}
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Android WebView ([Official API - PrintDocumentAdapter.onFinish](https://developer.android.com/reference/android/print/PrintDocumentAdapter#onFinish()))
+  ///- Android WebView ([Official API - PrintDocumentAdapter.onFinish](https://developer.android.com/reference/android/print/PrintDocumentAdapter#onFinish())):
+  ///    - `completed` is always `true` and `error` is always `null`.
   ///- iOS WKWebView ([Official API - UIPrintInteractionController.CompletionHandler](https://developer.apple.com/documentation/uikit/uiprintinteractioncontroller/completionhandler))
   ///- macOS WKWebView ([Official API - NSPrintOperation.runModal](https://developer.apple.com/documentation/appkit/nsprintoperation/1532065-runmodal))
   ///

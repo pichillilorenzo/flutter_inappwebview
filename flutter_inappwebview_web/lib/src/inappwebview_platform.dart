@@ -180,6 +180,16 @@ class WebPlatformInAppWebViewPlatform extends InAppWebViewPlatform {
   PlatformPrintJobController createPlatformPrintJobControllerStatic() {
     return _PlatformPrintJobController.static();
   }
+
+  /// Creates a new empty [PlatformPullToRefreshController] to access static methods.
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [PullToRefreshController] in `flutter_inappwebview` instead.
+  @override
+  PlatformPullToRefreshController
+      createPlatformPullToRefreshControllerStatic() {
+    return _PlatformPullToRefreshController.static();
+  }
 }
 
 class _PlatformInAppBrowser extends PlatformInAppBrowser {
@@ -277,4 +287,16 @@ class _PlatformPrintJobController extends PlatformPrintJobController {
           const PlatformPrintJobControllerCreationParams(id: ''));
 
   factory _PlatformPrintJobController.static() => _staticValue;
+}
+
+class _PlatformPullToRefreshController extends PlatformPullToRefreshController {
+  _PlatformPullToRefreshController(
+      PlatformPullToRefreshControllerCreationParams params)
+      : super.implementation(params);
+
+  static final _PlatformPullToRefreshController _staticValue =
+      _PlatformPullToRefreshController(
+          PlatformPullToRefreshControllerCreationParams());
+
+  factory _PlatformPullToRefreshController.static() => _staticValue;
 }

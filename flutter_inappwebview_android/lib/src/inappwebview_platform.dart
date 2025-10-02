@@ -136,6 +136,15 @@ class AndroidInAppWebViewPlatform extends InAppWebViewPlatform {
     return AndroidPullToRefreshController(params);
   }
 
+  /// Creates a new empty [AndroidPullToRefreshController] to access static methods.
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [PullToRefreshController] in `flutter_inappwebview` instead.
+  @override
+  AndroidPullToRefreshController createPlatformPullToRefreshControllerStatic() {
+    return AndroidPullToRefreshController.static();
+  }
+
   /// Creates a new [AndroidWebMessageChannel].
   ///
   /// This function should only be called by the app-facing package.

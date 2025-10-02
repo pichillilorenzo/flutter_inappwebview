@@ -119,6 +119,16 @@ class MacOSInAppWebViewPlatform extends InAppWebViewPlatform {
     return MacOSPrintJobController.static();
   }
 
+  /// Creates a new empty [PlatformPullToRefreshController] to access static methods.
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [PullToRefreshController] in `flutter_inappwebview` instead.
+  @override
+  PlatformPullToRefreshController
+      createPlatformPullToRefreshControllerStatic() {
+    return _PlatformPullToRefreshController.static();
+  }
+
   /// Creates a new [MacOSWebMessageChannel].
   ///
   /// This function should only be called by the app-facing package.
@@ -400,4 +410,16 @@ class _PlatformTracingController extends PlatformTracingController {
           const PlatformTracingControllerCreationParams());
 
   factory _PlatformTracingController.static() => _staticValue;
+}
+
+class _PlatformPullToRefreshController extends PlatformPullToRefreshController {
+  _PlatformPullToRefreshController(
+      PlatformPullToRefreshControllerCreationParams params)
+      : super.implementation(params);
+
+  static final _PlatformPullToRefreshController _staticValue =
+      _PlatformPullToRefreshController(
+          PlatformPullToRefreshControllerCreationParams());
+
+  factory _PlatformPullToRefreshController.static() => _staticValue;
 }

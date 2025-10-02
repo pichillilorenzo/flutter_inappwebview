@@ -131,6 +131,15 @@ class IOSInAppWebViewPlatform extends InAppWebViewPlatform {
     return IOSPullToRefreshController(params);
   }
 
+  /// Creates a new empty [IOSPullToRefreshController] to access static methods.
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [PullToRefreshController] in `flutter_inappwebview` instead.
+  @override
+  IOSPullToRefreshController createPlatformPullToRefreshControllerStatic() {
+    return IOSPullToRefreshController.static();
+  }
+
   /// Creates a new [IOSWebMessageChannel].
   ///
   /// This function should only be called by the app-facing package.

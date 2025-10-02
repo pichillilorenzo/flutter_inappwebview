@@ -7,6 +7,11 @@ part of 'print_job_settings.dart';
 // **************************************************************************
 
 ///Class that represents the settings of a [PlatformPrintJobController].
+///
+///**Officially Supported Platforms/Implementations**:
+///- Android WebView
+///- iOS WKWebView
+///- macOS WKWebView
 class PrintJobSettings {
   ///`true` to animate the display of the sheet, `false` to display the sheet immediately.
   ///
@@ -72,10 +77,8 @@ class PrintJobSettings {
 
   ///Force rendering quality.
   ///
-  ///**NOTE for iOS**: available only on iOS 14.5+.
-  ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- iOS WKWebView
+  ///- iOS WKWebView 14.5+
   PrintJobRenderingQuality? forceRenderingQuality;
 
   ///Set this to `true` to handle the [PlatformPrintJobController].
@@ -276,10 +279,8 @@ class PrintJobSettings {
   ///A Boolean value that determines whether the printing options include the paper orientation control when available.
   ///The default value is `true`.
   ///
-  ///**NOTE for iOS**: available only on iOS 15.0+.
-  ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- iOS WKWebView
+  ///- iOS WKWebView 15.0+
   ///- macOS WKWebView
   bool? showsPaperOrientation;
 
@@ -353,6 +354,12 @@ class PrintJobSettings {
   ///**Officially Supported Platforms/Implementations**:
   ///- macOS WKWebView
   PrintJobPaginationMode? verticalPagination;
+
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Android WebView
+  ///- iOS WKWebView
+  ///- macOS WKWebView
   PrintJobSettings(
       {this.animated = true,
       this.canSpawnSeparateThread = true,
@@ -518,6 +525,12 @@ class PrintJobSettings {
     return instance;
   }
 
+  ///Check if the given [property] is supported by the [defaultTargetPlatform] or a specific [platform].
+  static bool isPropertySupported(PrintJobSettingsProperty property,
+          {TargetPlatform? platform}) =>
+      _PrintJobSettingsPropertySupported.isPropertySupported(property,
+          platform: platform);
+
   ///Converts instance to a map.
   Map<String, dynamic> toMap({EnumMethod? enumMethod}) {
     return {
@@ -620,5 +633,701 @@ class PrintJobSettings {
   @override
   String toString() {
     return 'PrintJobSettings{animated: $animated, canSpawnSeparateThread: $canSpawnSeparateThread, colorMode: $colorMode, copies: $copies, detailedErrorReporting: $detailedErrorReporting, duplexMode: $duplexMode, faxNumber: $faxNumber, firstPage: $firstPage, footerHeight: $footerHeight, forceRenderingQuality: $forceRenderingQuality, handledByClient: $handledByClient, headerAndFooter: $headerAndFooter, headerHeight: $headerHeight, horizontalPagination: $horizontalPagination, isHorizontallyCentered: $isHorizontallyCentered, isVerticallyCentered: $isVerticallyCentered, jobDisposition: $jobDisposition, jobName: $jobName, jobSavingURL: $jobSavingURL, lastPage: $lastPage, margins: $margins, maximumContentHeight: $maximumContentHeight, maximumContentWidth: $maximumContentWidth, mediaSize: $mediaSize, mustCollate: $mustCollate, numberOfPages: $numberOfPages, orientation: $orientation, outputType: $outputType, pageOrder: $pageOrder, pagesAcross: $pagesAcross, pagesDown: $pagesDown, paperName: $paperName, resolution: $resolution, scalingFactor: $scalingFactor, showsNumberOfCopies: $showsNumberOfCopies, showsPageRange: $showsPageRange, showsPageSetupAccessory: $showsPageSetupAccessory, showsPaperOrientation: $showsPaperOrientation, showsPaperSelectionForLoadedPapers: $showsPaperSelectionForLoadedPapers, showsPaperSize: $showsPaperSize, showsPreview: $showsPreview, showsPrintPanel: $showsPrintPanel, showsPrintSelection: $showsPrintSelection, showsProgressPanel: $showsProgressPanel, showsScaling: $showsScaling, time: $time, verticalPagination: $verticalPagination}';
+  }
+}
+
+// **************************************************************************
+// SupportedPlatformsGenerator
+// **************************************************************************
+
+///List of [PrintJobSettings]'s properties that can be used to check i they are supported or not by the current platform.
+enum PrintJobSettingsProperty {
+  ///Can be used to check if the [PrintJobSettings.animated] property is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.PrintJobSettings.animated.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- iOS WKWebView
+  ///
+  ///Use the [PrintJobSettings.isPropertySupported] method to check if this property is supported at runtime.
+  ///{@endtemplate}
+  animated,
+
+  ///Can be used to check if the [PrintJobSettings.canSpawnSeparateThread] property is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.PrintJobSettings.canSpawnSeparateThread.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- macOS WKWebView
+  ///
+  ///Use the [PrintJobSettings.isPropertySupported] method to check if this property is supported at runtime.
+  ///{@endtemplate}
+  canSpawnSeparateThread,
+
+  ///Can be used to check if the [PrintJobSettings.colorMode] property is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.PrintJobSettings.colorMode.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Android WebView
+  ///- macOS WKWebView
+  ///
+  ///Use the [PrintJobSettings.isPropertySupported] method to check if this property is supported at runtime.
+  ///{@endtemplate}
+  colorMode,
+
+  ///Can be used to check if the [PrintJobSettings.copies] property is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.PrintJobSettings.copies.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- macOS WKWebView
+  ///
+  ///Use the [PrintJobSettings.isPropertySupported] method to check if this property is supported at runtime.
+  ///{@endtemplate}
+  copies,
+
+  ///Can be used to check if the [PrintJobSettings.detailedErrorReporting] property is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.PrintJobSettings.detailedErrorReporting.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- macOS WKWebView
+  ///
+  ///Use the [PrintJobSettings.isPropertySupported] method to check if this property is supported at runtime.
+  ///{@endtemplate}
+  detailedErrorReporting,
+
+  ///Can be used to check if the [PrintJobSettings.duplexMode] property is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.PrintJobSettings.duplexMode.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Android WebView 23+
+  ///- iOS WKWebView
+  ///
+  ///Use the [PrintJobSettings.isPropertySupported] method to check if this property is supported at runtime.
+  ///{@endtemplate}
+  duplexMode,
+
+  ///Can be used to check if the [PrintJobSettings.faxNumber] property is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.PrintJobSettings.faxNumber.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- macOS WKWebView
+  ///
+  ///Use the [PrintJobSettings.isPropertySupported] method to check if this property is supported at runtime.
+  ///{@endtemplate}
+  faxNumber,
+
+  ///Can be used to check if the [PrintJobSettings.firstPage] property is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.PrintJobSettings.firstPage.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- macOS WKWebView
+  ///
+  ///Use the [PrintJobSettings.isPropertySupported] method to check if this property is supported at runtime.
+  ///{@endtemplate}
+  firstPage,
+
+  ///Can be used to check if the [PrintJobSettings.footerHeight] property is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.PrintJobSettings.footerHeight.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- iOS WKWebView
+  ///
+  ///Use the [PrintJobSettings.isPropertySupported] method to check if this property is supported at runtime.
+  ///{@endtemplate}
+  footerHeight,
+
+  ///Can be used to check if the [PrintJobSettings.forceRenderingQuality] property is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.PrintJobSettings.forceRenderingQuality.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- iOS WKWebView 14.5+
+  ///
+  ///Use the [PrintJobSettings.isPropertySupported] method to check if this property is supported at runtime.
+  ///{@endtemplate}
+  forceRenderingQuality,
+
+  ///Can be used to check if the [PrintJobSettings.handledByClient] property is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.PrintJobSettings.handledByClient.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Android WebView
+  ///- iOS WKWebView
+  ///- macOS WKWebView
+  ///
+  ///Use the [PrintJobSettings.isPropertySupported] method to check if this property is supported at runtime.
+  ///{@endtemplate}
+  handledByClient,
+
+  ///Can be used to check if the [PrintJobSettings.headerAndFooter] property is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.PrintJobSettings.headerAndFooter.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- macOS WKWebView
+  ///
+  ///Use the [PrintJobSettings.isPropertySupported] method to check if this property is supported at runtime.
+  ///{@endtemplate}
+  headerAndFooter,
+
+  ///Can be used to check if the [PrintJobSettings.headerHeight] property is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.PrintJobSettings.headerHeight.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- iOS WKWebView
+  ///
+  ///Use the [PrintJobSettings.isPropertySupported] method to check if this property is supported at runtime.
+  ///{@endtemplate}
+  headerHeight,
+
+  ///Can be used to check if the [PrintJobSettings.horizontalPagination] property is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.PrintJobSettings.horizontalPagination.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- macOS WKWebView
+  ///
+  ///Use the [PrintJobSettings.isPropertySupported] method to check if this property is supported at runtime.
+  ///{@endtemplate}
+  horizontalPagination,
+
+  ///Can be used to check if the [PrintJobSettings.isHorizontallyCentered] property is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.PrintJobSettings.isHorizontallyCentered.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- macOS WKWebView
+  ///
+  ///Use the [PrintJobSettings.isPropertySupported] method to check if this property is supported at runtime.
+  ///{@endtemplate}
+  isHorizontallyCentered,
+
+  ///Can be used to check if the [PrintJobSettings.isVerticallyCentered] property is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.PrintJobSettings.isVerticallyCentered.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- macOS WKWebView
+  ///
+  ///Use the [PrintJobSettings.isPropertySupported] method to check if this property is supported at runtime.
+  ///{@endtemplate}
+  isVerticallyCentered,
+
+  ///Can be used to check if the [PrintJobSettings.jobDisposition] property is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.PrintJobSettings.jobDisposition.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- macOS WKWebView
+  ///
+  ///Use the [PrintJobSettings.isPropertySupported] method to check if this property is supported at runtime.
+  ///{@endtemplate}
+  jobDisposition,
+
+  ///Can be used to check if the [PrintJobSettings.jobName] property is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.PrintJobSettings.jobName.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Android WebView
+  ///- iOS WKWebView
+  ///- macOS WKWebView
+  ///
+  ///Use the [PrintJobSettings.isPropertySupported] method to check if this property is supported at runtime.
+  ///{@endtemplate}
+  jobName,
+
+  ///Can be used to check if the [PrintJobSettings.jobSavingURL] property is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.PrintJobSettings.jobSavingURL.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- macOS WKWebView
+  ///
+  ///Use the [PrintJobSettings.isPropertySupported] method to check if this property is supported at runtime.
+  ///{@endtemplate}
+  jobSavingURL,
+
+  ///Can be used to check if the [PrintJobSettings.lastPage] property is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.PrintJobSettings.lastPage.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- macOS WKWebView
+  ///
+  ///Use the [PrintJobSettings.isPropertySupported] method to check if this property is supported at runtime.
+  ///{@endtemplate}
+  lastPage,
+
+  ///Can be used to check if the [PrintJobSettings.margins] property is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.PrintJobSettings.margins.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- iOS WKWebView
+  ///- macOS WKWebView
+  ///
+  ///Use the [PrintJobSettings.isPropertySupported] method to check if this property is supported at runtime.
+  ///{@endtemplate}
+  margins,
+
+  ///Can be used to check if the [PrintJobSettings.maximumContentHeight] property is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.PrintJobSettings.maximumContentHeight.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- iOS WKWebView
+  ///
+  ///Use the [PrintJobSettings.isPropertySupported] method to check if this property is supported at runtime.
+  ///{@endtemplate}
+  maximumContentHeight,
+
+  ///Can be used to check if the [PrintJobSettings.maximumContentWidth] property is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.PrintJobSettings.maximumContentWidth.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- iOS WKWebView
+  ///
+  ///Use the [PrintJobSettings.isPropertySupported] method to check if this property is supported at runtime.
+  ///{@endtemplate}
+  maximumContentWidth,
+
+  ///Can be used to check if the [PrintJobSettings.mediaSize] property is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.PrintJobSettings.mediaSize.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Android WebView
+  ///
+  ///Use the [PrintJobSettings.isPropertySupported] method to check if this property is supported at runtime.
+  ///{@endtemplate}
+  mediaSize,
+
+  ///Can be used to check if the [PrintJobSettings.mustCollate] property is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.PrintJobSettings.mustCollate.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- macOS WKWebView
+  ///
+  ///Use the [PrintJobSettings.isPropertySupported] method to check if this property is supported at runtime.
+  ///{@endtemplate}
+  mustCollate,
+
+  ///Can be used to check if the [PrintJobSettings.numberOfPages] property is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.PrintJobSettings.numberOfPages.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- iOS WKWebView
+  ///- macOS WKWebView
+  ///
+  ///Use the [PrintJobSettings.isPropertySupported] method to check if this property is supported at runtime.
+  ///{@endtemplate}
+  numberOfPages,
+
+  ///Can be used to check if the [PrintJobSettings.orientation] property is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.PrintJobSettings.orientation.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Android WebView
+  ///- iOS WKWebView
+  ///- macOS WKWebView
+  ///
+  ///Use the [PrintJobSettings.isPropertySupported] method to check if this property is supported at runtime.
+  ///{@endtemplate}
+  orientation,
+
+  ///Can be used to check if the [PrintJobSettings.outputType] property is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.PrintJobSettings.outputType.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- iOS WKWebView
+  ///
+  ///Use the [PrintJobSettings.isPropertySupported] method to check if this property is supported at runtime.
+  ///{@endtemplate}
+  outputType,
+
+  ///Can be used to check if the [PrintJobSettings.pageOrder] property is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.PrintJobSettings.pageOrder.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- macOS WKWebView
+  ///
+  ///Use the [PrintJobSettings.isPropertySupported] method to check if this property is supported at runtime.
+  ///{@endtemplate}
+  pageOrder,
+
+  ///Can be used to check if the [PrintJobSettings.pagesAcross] property is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.PrintJobSettings.pagesAcross.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- macOS WKWebView
+  ///
+  ///Use the [PrintJobSettings.isPropertySupported] method to check if this property is supported at runtime.
+  ///{@endtemplate}
+  pagesAcross,
+
+  ///Can be used to check if the [PrintJobSettings.pagesDown] property is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.PrintJobSettings.pagesDown.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- macOS WKWebView
+  ///
+  ///Use the [PrintJobSettings.isPropertySupported] method to check if this property is supported at runtime.
+  ///{@endtemplate}
+  pagesDown,
+
+  ///Can be used to check if the [PrintJobSettings.paperName] property is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.PrintJobSettings.paperName.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- macOS WKWebView
+  ///
+  ///Use the [PrintJobSettings.isPropertySupported] method to check if this property is supported at runtime.
+  ///{@endtemplate}
+  paperName,
+
+  ///Can be used to check if the [PrintJobSettings.resolution] property is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.PrintJobSettings.resolution.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Android WebView
+  ///
+  ///Use the [PrintJobSettings.isPropertySupported] method to check if this property is supported at runtime.
+  ///{@endtemplate}
+  resolution,
+
+  ///Can be used to check if the [PrintJobSettings.scalingFactor] property is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.PrintJobSettings.scalingFactor.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- macOS WKWebView
+  ///
+  ///Use the [PrintJobSettings.isPropertySupported] method to check if this property is supported at runtime.
+  ///{@endtemplate}
+  scalingFactor,
+
+  ///Can be used to check if the [PrintJobSettings.showsNumberOfCopies] property is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.PrintJobSettings.showsNumberOfCopies.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- iOS WKWebView
+  ///- macOS WKWebView
+  ///
+  ///Use the [PrintJobSettings.isPropertySupported] method to check if this property is supported at runtime.
+  ///{@endtemplate}
+  showsNumberOfCopies,
+
+  ///Can be used to check if the [PrintJobSettings.showsPageRange] property is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.PrintJobSettings.showsPageRange.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- macOS WKWebView
+  ///
+  ///Use the [PrintJobSettings.isPropertySupported] method to check if this property is supported at runtime.
+  ///{@endtemplate}
+  showsPageRange,
+
+  ///Can be used to check if the [PrintJobSettings.showsPageSetupAccessory] property is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.PrintJobSettings.showsPageSetupAccessory.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- macOS WKWebView
+  ///
+  ///Use the [PrintJobSettings.isPropertySupported] method to check if this property is supported at runtime.
+  ///{@endtemplate}
+  showsPageSetupAccessory,
+
+  ///Can be used to check if the [PrintJobSettings.showsPaperOrientation] property is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.PrintJobSettings.showsPaperOrientation.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- iOS WKWebView 15.0+
+  ///- macOS WKWebView
+  ///
+  ///Use the [PrintJobSettings.isPropertySupported] method to check if this property is supported at runtime.
+  ///{@endtemplate}
+  showsPaperOrientation,
+
+  ///Can be used to check if the [PrintJobSettings.showsPaperSelectionForLoadedPapers] property is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.PrintJobSettings.showsPaperSelectionForLoadedPapers.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- iOS WKWebView
+  ///
+  ///Use the [PrintJobSettings.isPropertySupported] method to check if this property is supported at runtime.
+  ///{@endtemplate}
+  showsPaperSelectionForLoadedPapers,
+
+  ///Can be used to check if the [PrintJobSettings.showsPaperSize] property is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.PrintJobSettings.showsPaperSize.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- macOS WKWebView
+  ///
+  ///Use the [PrintJobSettings.isPropertySupported] method to check if this property is supported at runtime.
+  ///{@endtemplate}
+  showsPaperSize,
+
+  ///Can be used to check if the [PrintJobSettings.showsPreview] property is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.PrintJobSettings.showsPreview.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- macOS WKWebView
+  ///
+  ///Use the [PrintJobSettings.isPropertySupported] method to check if this property is supported at runtime.
+  ///{@endtemplate}
+  showsPreview,
+
+  ///Can be used to check if the [PrintJobSettings.showsPrintPanel] property is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.PrintJobSettings.showsPrintPanel.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- macOS WKWebView
+  ///
+  ///Use the [PrintJobSettings.isPropertySupported] method to check if this property is supported at runtime.
+  ///{@endtemplate}
+  showsPrintPanel,
+
+  ///Can be used to check if the [PrintJobSettings.showsPrintSelection] property is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.PrintJobSettings.showsPrintSelection.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- macOS WKWebView
+  ///
+  ///Use the [PrintJobSettings.isPropertySupported] method to check if this property is supported at runtime.
+  ///{@endtemplate}
+  showsPrintSelection,
+
+  ///Can be used to check if the [PrintJobSettings.showsProgressPanel] property is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.PrintJobSettings.showsProgressPanel.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- macOS WKWebView
+  ///
+  ///Use the [PrintJobSettings.isPropertySupported] method to check if this property is supported at runtime.
+  ///{@endtemplate}
+  showsProgressPanel,
+
+  ///Can be used to check if the [PrintJobSettings.showsScaling] property is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.PrintJobSettings.showsScaling.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- macOS WKWebView
+  ///
+  ///Use the [PrintJobSettings.isPropertySupported] method to check if this property is supported at runtime.
+  ///{@endtemplate}
+  showsScaling,
+
+  ///Can be used to check if the [PrintJobSettings.time] property is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.PrintJobSettings.time.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- macOS WKWebView
+  ///
+  ///Use the [PrintJobSettings.isPropertySupported] method to check if this property is supported at runtime.
+  ///{@endtemplate}
+  time,
+
+  ///Can be used to check if the [PrintJobSettings.verticalPagination] property is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.PrintJobSettings.verticalPagination.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- macOS WKWebView
+  ///
+  ///Use the [PrintJobSettings.isPropertySupported] method to check if this property is supported at runtime.
+  ///{@endtemplate}
+  verticalPagination,
+}
+
+extension _PrintJobSettingsPropertySupported on PrintJobSettings {
+  static bool isPropertySupported(PrintJobSettingsProperty property,
+      {TargetPlatform? platform}) {
+    switch (property) {
+      case PrintJobSettingsProperty.animated:
+        return !kIsWeb &&
+            [TargetPlatform.iOS].contains(platform ?? defaultTargetPlatform);
+      case PrintJobSettingsProperty.canSpawnSeparateThread:
+        return !kIsWeb &&
+            [TargetPlatform.macOS].contains(platform ?? defaultTargetPlatform);
+      case PrintJobSettingsProperty.colorMode:
+        return !kIsWeb &&
+            [TargetPlatform.android, TargetPlatform.macOS]
+                .contains(platform ?? defaultTargetPlatform);
+      case PrintJobSettingsProperty.copies:
+        return !kIsWeb &&
+            [TargetPlatform.macOS].contains(platform ?? defaultTargetPlatform);
+      case PrintJobSettingsProperty.detailedErrorReporting:
+        return !kIsWeb &&
+            [TargetPlatform.macOS].contains(platform ?? defaultTargetPlatform);
+      case PrintJobSettingsProperty.duplexMode:
+        return !kIsWeb &&
+            [TargetPlatform.android, TargetPlatform.iOS]
+                .contains(platform ?? defaultTargetPlatform);
+      case PrintJobSettingsProperty.faxNumber:
+        return !kIsWeb &&
+            [TargetPlatform.macOS].contains(platform ?? defaultTargetPlatform);
+      case PrintJobSettingsProperty.firstPage:
+        return !kIsWeb &&
+            [TargetPlatform.macOS].contains(platform ?? defaultTargetPlatform);
+      case PrintJobSettingsProperty.footerHeight:
+        return !kIsWeb &&
+            [TargetPlatform.iOS].contains(platform ?? defaultTargetPlatform);
+      case PrintJobSettingsProperty.forceRenderingQuality:
+        return !kIsWeb &&
+            [TargetPlatform.iOS].contains(platform ?? defaultTargetPlatform);
+      case PrintJobSettingsProperty.handledByClient:
+        return !kIsWeb &&
+            [TargetPlatform.android, TargetPlatform.iOS, TargetPlatform.macOS]
+                .contains(platform ?? defaultTargetPlatform);
+      case PrintJobSettingsProperty.headerAndFooter:
+        return !kIsWeb &&
+            [TargetPlatform.macOS].contains(platform ?? defaultTargetPlatform);
+      case PrintJobSettingsProperty.headerHeight:
+        return !kIsWeb &&
+            [TargetPlatform.iOS].contains(platform ?? defaultTargetPlatform);
+      case PrintJobSettingsProperty.horizontalPagination:
+        return !kIsWeb &&
+            [TargetPlatform.macOS].contains(platform ?? defaultTargetPlatform);
+      case PrintJobSettingsProperty.isHorizontallyCentered:
+        return !kIsWeb &&
+            [TargetPlatform.macOS].contains(platform ?? defaultTargetPlatform);
+      case PrintJobSettingsProperty.isVerticallyCentered:
+        return !kIsWeb &&
+            [TargetPlatform.macOS].contains(platform ?? defaultTargetPlatform);
+      case PrintJobSettingsProperty.jobDisposition:
+        return !kIsWeb &&
+            [TargetPlatform.macOS].contains(platform ?? defaultTargetPlatform);
+      case PrintJobSettingsProperty.jobName:
+        return !kIsWeb &&
+            [TargetPlatform.android, TargetPlatform.iOS, TargetPlatform.macOS]
+                .contains(platform ?? defaultTargetPlatform);
+      case PrintJobSettingsProperty.jobSavingURL:
+        return !kIsWeb &&
+            [TargetPlatform.macOS].contains(platform ?? defaultTargetPlatform);
+      case PrintJobSettingsProperty.lastPage:
+        return !kIsWeb &&
+            [TargetPlatform.macOS].contains(platform ?? defaultTargetPlatform);
+      case PrintJobSettingsProperty.margins:
+        return !kIsWeb &&
+            [TargetPlatform.iOS, TargetPlatform.macOS]
+                .contains(platform ?? defaultTargetPlatform);
+      case PrintJobSettingsProperty.maximumContentHeight:
+        return !kIsWeb &&
+            [TargetPlatform.iOS].contains(platform ?? defaultTargetPlatform);
+      case PrintJobSettingsProperty.maximumContentWidth:
+        return !kIsWeb &&
+            [TargetPlatform.iOS].contains(platform ?? defaultTargetPlatform);
+      case PrintJobSettingsProperty.mediaSize:
+        return !kIsWeb &&
+            [TargetPlatform.android]
+                .contains(platform ?? defaultTargetPlatform);
+      case PrintJobSettingsProperty.mustCollate:
+        return !kIsWeb &&
+            [TargetPlatform.macOS].contains(platform ?? defaultTargetPlatform);
+      case PrintJobSettingsProperty.numberOfPages:
+        return !kIsWeb &&
+            [TargetPlatform.iOS, TargetPlatform.macOS]
+                .contains(platform ?? defaultTargetPlatform);
+      case PrintJobSettingsProperty.orientation:
+        return !kIsWeb &&
+            [TargetPlatform.android, TargetPlatform.iOS, TargetPlatform.macOS]
+                .contains(platform ?? defaultTargetPlatform);
+      case PrintJobSettingsProperty.outputType:
+        return !kIsWeb &&
+            [TargetPlatform.iOS].contains(platform ?? defaultTargetPlatform);
+      case PrintJobSettingsProperty.pageOrder:
+        return !kIsWeb &&
+            [TargetPlatform.macOS].contains(platform ?? defaultTargetPlatform);
+      case PrintJobSettingsProperty.pagesAcross:
+        return !kIsWeb &&
+            [TargetPlatform.macOS].contains(platform ?? defaultTargetPlatform);
+      case PrintJobSettingsProperty.pagesDown:
+        return !kIsWeb &&
+            [TargetPlatform.macOS].contains(platform ?? defaultTargetPlatform);
+      case PrintJobSettingsProperty.paperName:
+        return !kIsWeb &&
+            [TargetPlatform.macOS].contains(platform ?? defaultTargetPlatform);
+      case PrintJobSettingsProperty.resolution:
+        return !kIsWeb &&
+            [TargetPlatform.android]
+                .contains(platform ?? defaultTargetPlatform);
+      case PrintJobSettingsProperty.scalingFactor:
+        return !kIsWeb &&
+            [TargetPlatform.macOS].contains(platform ?? defaultTargetPlatform);
+      case PrintJobSettingsProperty.showsNumberOfCopies:
+        return !kIsWeb &&
+            [TargetPlatform.iOS, TargetPlatform.macOS]
+                .contains(platform ?? defaultTargetPlatform);
+      case PrintJobSettingsProperty.showsPageRange:
+        return !kIsWeb &&
+            [TargetPlatform.macOS].contains(platform ?? defaultTargetPlatform);
+      case PrintJobSettingsProperty.showsPageSetupAccessory:
+        return !kIsWeb &&
+            [TargetPlatform.macOS].contains(platform ?? defaultTargetPlatform);
+      case PrintJobSettingsProperty.showsPaperOrientation:
+        return !kIsWeb &&
+            [TargetPlatform.iOS, TargetPlatform.macOS]
+                .contains(platform ?? defaultTargetPlatform);
+      case PrintJobSettingsProperty.showsPaperSelectionForLoadedPapers:
+        return !kIsWeb &&
+            [TargetPlatform.iOS].contains(platform ?? defaultTargetPlatform);
+      case PrintJobSettingsProperty.showsPaperSize:
+        return !kIsWeb &&
+            [TargetPlatform.macOS].contains(platform ?? defaultTargetPlatform);
+      case PrintJobSettingsProperty.showsPreview:
+        return !kIsWeb &&
+            [TargetPlatform.macOS].contains(platform ?? defaultTargetPlatform);
+      case PrintJobSettingsProperty.showsPrintPanel:
+        return !kIsWeb &&
+            [TargetPlatform.macOS].contains(platform ?? defaultTargetPlatform);
+      case PrintJobSettingsProperty.showsPrintSelection:
+        return !kIsWeb &&
+            [TargetPlatform.macOS].contains(platform ?? defaultTargetPlatform);
+      case PrintJobSettingsProperty.showsProgressPanel:
+        return !kIsWeb &&
+            [TargetPlatform.macOS].contains(platform ?? defaultTargetPlatform);
+      case PrintJobSettingsProperty.showsScaling:
+        return !kIsWeb &&
+            [TargetPlatform.macOS].contains(platform ?? defaultTargetPlatform);
+      case PrintJobSettingsProperty.time:
+        return !kIsWeb &&
+            [TargetPlatform.macOS].contains(platform ?? defaultTargetPlatform);
+      case PrintJobSettingsProperty.verticalPagination:
+        return !kIsWeb &&
+            [TargetPlatform.macOS].contains(platform ?? defaultTargetPlatform);
+    }
   }
 }

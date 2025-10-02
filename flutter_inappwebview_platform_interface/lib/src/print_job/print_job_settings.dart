@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_internal_annotations.dart';
 
 import '../types/main.dart';
@@ -20,6 +21,11 @@ part 'print_job_settings.g.dart';
 
 ///Class that represents the settings of a [PlatformPrintJobController].
 @ExchangeableObject(copyMethod: true)
+@SupportedPlatforms(platforms: [
+  AndroidPlatform(),
+  IOSPlatform(),
+  MacOSPlatform(),
+])
 class PrintJobSettings_ {
   ///Set this to `true` to handle the [PlatformPrintJobController].
   ///Otherwise, it will be handled and disposed automatically by the system.
@@ -411,4 +417,10 @@ class PrintJobSettings_ {
       this.pagesAcross,
       this.pagesDown,
       this.time});
+
+  ///Check if the given [property] is supported by the [defaultTargetPlatform] or a specific [platform].
+  static bool isPropertySupported(PrintJobSettingsProperty property,
+          {TargetPlatform? platform}) =>
+      _PrintJobSettingsPropertySupported.isPropertySupported(property,
+          platform: platform);
 }

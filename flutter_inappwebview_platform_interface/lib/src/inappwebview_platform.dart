@@ -162,6 +162,16 @@ abstract class InAppWebViewPlatform extends PlatformInterface {
         'createPlatformPullToRefreshController is not implemented on the current platform.');
   }
 
+  /// Creates a new empty [PlatformPullToRefreshController] to access static methods.
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [PullToRefreshController] in `flutter_inappwebview` instead.
+  PlatformPullToRefreshController
+      createPlatformPullToRefreshControllerStatic() {
+    throw UnimplementedError(
+        'createPlatformPullToRefreshControllerStatic is not implemented on the current platform.');
+  }
+
   /// Creates a new [PlatformWebAuthenticationSession].
   ///
   /// This function should only be called by the app-facing package.

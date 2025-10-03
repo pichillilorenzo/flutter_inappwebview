@@ -465,4 +465,34 @@ class AndroidInAppWebViewPlatform extends InAppWebViewPlatform {
       PlatformWebStorageManagerCreationParams params) {
     return AndroidWebStorageManager(params);
   }
+
+  // ************************************************************************ //
+  // Create static instances of unsupported classes to be able to call        //
+  // isClassSupported, isMethodSupported, isPropertySupported, etc.           //
+  // static methods without throwing a missing platform implementation        //
+  // exception.                                                               //
+  // ************************************************************************ //
+
+  /// Creates a new empty [PlatformWebAuthenticationSession] to access static methods.
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [WebAuthenticationSession] in `flutter_inappwebview` instead.
+  @override
+  PlatformWebAuthenticationSession
+      createPlatformWebAuthenticationSessionStatic() {
+    return _PlatformWebAuthenticationSession.static();
+  }
+}
+
+class _PlatformWebAuthenticationSession
+    extends PlatformWebAuthenticationSession {
+  _PlatformWebAuthenticationSession(
+      PlatformWebAuthenticationSessionCreationParams params)
+      : super.implementation(params);
+
+  static final _PlatformWebAuthenticationSession _staticValue =
+      _PlatformWebAuthenticationSession(
+          const PlatformWebAuthenticationSessionCreationParams());
+
+  factory _PlatformWebAuthenticationSession.static() => _staticValue;
 }

@@ -258,6 +258,16 @@ class WindowsInAppWebViewPlatform extends InAppWebViewPlatform {
       createPlatformPullToRefreshControllerStatic() {
     return _PlatformPullToRefreshController.static();
   }
+
+  /// Creates a new empty [PlatformWebAuthenticationSession] to access static methods.
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [WebAuthenticationSession] in `flutter_inappwebview` instead.
+  @override
+  PlatformWebAuthenticationSession
+      createPlatformWebAuthenticationSessionStatic() {
+    return _PlatformWebAuthenticationSession.static();
+  }
 }
 
 class _PlatformChromeSafariBrowser extends PlatformChromeSafariBrowser {
@@ -358,4 +368,17 @@ class _PlatformPullToRefreshController extends PlatformPullToRefreshController {
           PlatformPullToRefreshControllerCreationParams());
 
   factory _PlatformPullToRefreshController.static() => _staticValue;
+}
+
+class _PlatformWebAuthenticationSession
+    extends PlatformWebAuthenticationSession {
+  _PlatformWebAuthenticationSession(
+      PlatformWebAuthenticationSessionCreationParams params)
+      : super.implementation(params);
+
+  static final _PlatformWebAuthenticationSession _staticValue =
+      _PlatformWebAuthenticationSession(
+          const PlatformWebAuthenticationSessionCreationParams());
+
+  factory _PlatformWebAuthenticationSession.static() => _staticValue;
 }

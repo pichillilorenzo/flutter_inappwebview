@@ -18,7 +18,7 @@ extension _PlatformPrintJobControllerCreationParamsClassSupported
   ///Use the [PlatformPrintJobControllerCreationParams.isClassSupported] method to check if this class is supported at runtime.
   ///{@endtemplate}
   static bool isClassSupported({TargetPlatform? platform}) {
-    return !kIsWeb &&
+    return ((kIsWeb && platform != null) || !kIsWeb) &&
         [TargetPlatform.android, TargetPlatform.iOS, TargetPlatform.macOS]
             .contains(platform ?? defaultTargetPlatform);
   }
@@ -47,7 +47,7 @@ extension _PlatformPrintJobControllerCreationParamsPropertySupported
       {TargetPlatform? platform}) {
     switch (property) {
       case PlatformPrintJobControllerCreationParamsProperty.id:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android, TargetPlatform.iOS, TargetPlatform.macOS]
                 .contains(platform ?? defaultTargetPlatform);
     }
@@ -66,7 +66,7 @@ extension _PlatformPrintJobControllerClassSupported
   ///Use the [PlatformPrintJobController.isClassSupported] method to check if this class is supported at runtime.
   ///{@endtemplate}
   static bool isClassSupported({TargetPlatform? platform}) {
-    return !kIsWeb &&
+    return ((kIsWeb && platform != null) || !kIsWeb) &&
         [TargetPlatform.android, TargetPlatform.iOS, TargetPlatform.macOS]
             .contains(platform ?? defaultTargetPlatform);
   }
@@ -99,7 +99,7 @@ extension _PlatformPrintJobControllerPropertySupported
       {TargetPlatform? platform}) {
     switch (property) {
       case PlatformPrintJobControllerProperty.onComplete:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android, TargetPlatform.iOS, TargetPlatform.macOS]
                 .contains(platform ?? defaultTargetPlatform);
     }
@@ -177,22 +177,22 @@ extension _PlatformPrintJobControllerMethodSupported
       {TargetPlatform? platform}) {
     switch (method) {
       case PlatformPrintJobControllerMethod.cancel:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android]
                 .contains(platform ?? defaultTargetPlatform);
       case PlatformPrintJobControllerMethod.dismiss:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.iOS].contains(platform ?? defaultTargetPlatform);
       case PlatformPrintJobControllerMethod.dispose:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android, TargetPlatform.iOS, TargetPlatform.macOS]
                 .contains(platform ?? defaultTargetPlatform);
       case PlatformPrintJobControllerMethod.getInfo:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android, TargetPlatform.iOS, TargetPlatform.macOS]
                 .contains(platform ?? defaultTargetPlatform);
       case PlatformPrintJobControllerMethod.restart:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android]
                 .contains(platform ?? defaultTargetPlatform);
     }

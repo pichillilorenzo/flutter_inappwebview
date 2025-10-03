@@ -17,7 +17,7 @@ extension _PlatformWebAuthenticationSessionCreationParamsClassSupported
   ///Use the [PlatformWebAuthenticationSessionCreationParams.isClassSupported] method to check if this class is supported at runtime.
   ///{@endtemplate}
   static bool isClassSupported({TargetPlatform? platform}) {
-    return !kIsWeb &&
+    return ((kIsWeb && platform != null) || !kIsWeb) &&
         [TargetPlatform.iOS, TargetPlatform.macOS]
             .contains(platform ?? defaultTargetPlatform);
   }
@@ -34,7 +34,7 @@ extension _PlatformWebAuthenticationSessionClassSupported
   ///Use the [PlatformWebAuthenticationSession.isClassSupported] method to check if this class is supported at runtime.
   ///{@endtemplate}
   static bool isClassSupported({TargetPlatform? platform}) {
-    return !kIsWeb &&
+    return ((kIsWeb && platform != null) || !kIsWeb) &&
         [TargetPlatform.iOS, TargetPlatform.macOS]
             .contains(platform ?? defaultTargetPlatform);
   }
@@ -114,23 +114,23 @@ extension _PlatformWebAuthenticationSessionPropertySupported
       {TargetPlatform? platform}) {
     switch (property) {
       case PlatformWebAuthenticationSessionProperty.callbackURLScheme:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.iOS, TargetPlatform.macOS]
                 .contains(platform ?? defaultTargetPlatform);
       case PlatformWebAuthenticationSessionProperty.id:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.iOS, TargetPlatform.macOS]
                 .contains(platform ?? defaultTargetPlatform);
       case PlatformWebAuthenticationSessionProperty.initialSettings:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.iOS, TargetPlatform.macOS]
                 .contains(platform ?? defaultTargetPlatform);
       case PlatformWebAuthenticationSessionProperty.onComplete:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.iOS, TargetPlatform.macOS]
                 .contains(platform ?? defaultTargetPlatform);
       case PlatformWebAuthenticationSessionProperty.url:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.iOS, TargetPlatform.macOS]
                 .contains(platform ?? defaultTargetPlatform);
     }
@@ -224,27 +224,27 @@ extension _PlatformWebAuthenticationSessionMethodSupported
       {TargetPlatform? platform}) {
     switch (method) {
       case PlatformWebAuthenticationSessionMethod.canStart:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.iOS, TargetPlatform.macOS]
                 .contains(platform ?? defaultTargetPlatform);
       case PlatformWebAuthenticationSessionMethod.cancel:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.iOS, TargetPlatform.macOS]
                 .contains(platform ?? defaultTargetPlatform);
       case PlatformWebAuthenticationSessionMethod.create:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.iOS, TargetPlatform.macOS]
                 .contains(platform ?? defaultTargetPlatform);
       case PlatformWebAuthenticationSessionMethod.dispose:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.iOS, TargetPlatform.macOS]
                 .contains(platform ?? defaultTargetPlatform);
       case PlatformWebAuthenticationSessionMethod.isAvailable:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.iOS, TargetPlatform.macOS]
                 .contains(platform ?? defaultTargetPlatform);
       case PlatformWebAuthenticationSessionMethod.start:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.iOS, TargetPlatform.macOS]
                 .contains(platform ?? defaultTargetPlatform);
     }

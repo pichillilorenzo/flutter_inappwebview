@@ -763,21 +763,21 @@ extension _InAppBrowserSettingsPropertySupported on InAppBrowserSettings {
       {TargetPlatform? platform}) {
     switch (property) {
       case InAppBrowserSettingsProperty.allowGoBackWithBackButton:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android]
                 .contains(platform ?? defaultTargetPlatform);
       case InAppBrowserSettingsProperty.closeButtonCaption:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.iOS].contains(platform ?? defaultTargetPlatform);
       case InAppBrowserSettingsProperty.closeButtonColor:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.iOS].contains(platform ?? defaultTargetPlatform);
       case InAppBrowserSettingsProperty.closeOnCannotGoBack:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android]
                 .contains(platform ?? defaultTargetPlatform);
       case InAppBrowserSettingsProperty.hidden:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [
               TargetPlatform.android,
               TargetPlatform.iOS,
@@ -785,89 +785,89 @@ extension _InAppBrowserSettingsPropertySupported on InAppBrowserSettings {
               TargetPlatform.windows
             ].contains(platform ?? defaultTargetPlatform);
       case InAppBrowserSettingsProperty.hideCloseButton:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.iOS].contains(platform ?? defaultTargetPlatform);
       case InAppBrowserSettingsProperty.hideDefaultMenuItems:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android, TargetPlatform.iOS, TargetPlatform.macOS]
                 .contains(platform ?? defaultTargetPlatform);
       case InAppBrowserSettingsProperty.hideProgressBar:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android, TargetPlatform.iOS, TargetPlatform.macOS]
                 .contains(platform ?? defaultTargetPlatform);
       case InAppBrowserSettingsProperty.hideTitleBar:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android]
                 .contains(platform ?? defaultTargetPlatform);
       case InAppBrowserSettingsProperty.hideToolbarBottom:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.iOS].contains(platform ?? defaultTargetPlatform);
       case InAppBrowserSettingsProperty.hideToolbarTop:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android, TargetPlatform.iOS, TargetPlatform.macOS]
                 .contains(platform ?? defaultTargetPlatform);
       case InAppBrowserSettingsProperty.hideUrlBar:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android, TargetPlatform.iOS, TargetPlatform.macOS]
                 .contains(platform ?? defaultTargetPlatform);
       case InAppBrowserSettingsProperty.menuButtonColor:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.iOS].contains(platform ?? defaultTargetPlatform);
       case InAppBrowserSettingsProperty.presentationStyle:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.iOS].contains(platform ?? defaultTargetPlatform);
       case InAppBrowserSettingsProperty.shouldCloseOnBackButtonPressed:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android]
                 .contains(platform ?? defaultTargetPlatform);
       case InAppBrowserSettingsProperty.toolbarBottomBackgroundColor:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.iOS].contains(platform ?? defaultTargetPlatform);
       case InAppBrowserSettingsProperty.toolbarBottomTintColor:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.iOS].contains(platform ?? defaultTargetPlatform);
       case InAppBrowserSettingsProperty.toolbarBottomTranslucent:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.iOS].contains(platform ?? defaultTargetPlatform);
       case InAppBrowserSettingsProperty.toolbarTopBackgroundColor:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android, TargetPlatform.iOS, TargetPlatform.macOS]
                 .contains(platform ?? defaultTargetPlatform);
       case InAppBrowserSettingsProperty.toolbarTopBarTintColor:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.iOS].contains(platform ?? defaultTargetPlatform);
       case InAppBrowserSettingsProperty.toolbarTopFixedTitle:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [
               TargetPlatform.android,
               TargetPlatform.macOS,
               TargetPlatform.windows
             ].contains(platform ?? defaultTargetPlatform);
       case InAppBrowserSettingsProperty.toolbarTopTintColor:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.iOS].contains(platform ?? defaultTargetPlatform);
       case InAppBrowserSettingsProperty.toolbarTopTranslucent:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.iOS].contains(platform ?? defaultTargetPlatform);
       case InAppBrowserSettingsProperty.transitionStyle:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.iOS].contains(platform ?? defaultTargetPlatform);
       case InAppBrowserSettingsProperty.windowAlphaValue:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.macOS, TargetPlatform.windows]
                 .contains(platform ?? defaultTargetPlatform);
       case InAppBrowserSettingsProperty.windowFrame:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.macOS, TargetPlatform.windows]
                 .contains(platform ?? defaultTargetPlatform);
       case InAppBrowserSettingsProperty.windowStyleMask:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.macOS].contains(platform ?? defaultTargetPlatform);
       case InAppBrowserSettingsProperty.windowTitlebarSeparatorStyle:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.macOS].contains(platform ?? defaultTargetPlatform);
       case InAppBrowserSettingsProperty.windowType:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.macOS, TargetPlatform.windows]
                 .contains(platform ?? defaultTargetPlatform);
     }

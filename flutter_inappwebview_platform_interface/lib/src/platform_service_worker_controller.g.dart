@@ -16,7 +16,7 @@ extension _PlatformServiceWorkerControllerCreationParamsClassSupported
   ///Use the [PlatformServiceWorkerControllerCreationParams.isClassSupported] method to check if this class is supported at runtime.
   ///{@endtemplate}
   static bool isClassSupported({TargetPlatform? platform}) {
-    return !kIsWeb &&
+    return ((kIsWeb && platform != null) || !kIsWeb) &&
         [TargetPlatform.android].contains(platform ?? defaultTargetPlatform);
   }
 }
@@ -31,7 +31,7 @@ extension _PlatformServiceWorkerControllerClassSupported
   ///Use the [PlatformServiceWorkerController.isClassSupported] method to check if this class is supported at runtime.
   ///{@endtemplate}
   static bool isClassSupported({TargetPlatform? platform}) {
-    return !kIsWeb &&
+    return ((kIsWeb && platform != null) || !kIsWeb) &&
         [TargetPlatform.android].contains(platform ?? defaultTargetPlatform);
   }
 }
@@ -159,39 +159,39 @@ extension _PlatformServiceWorkerControllerMethodSupported
       {TargetPlatform? platform}) {
     switch (method) {
       case PlatformServiceWorkerControllerMethod.getAllowContentAccess:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android]
                 .contains(platform ?? defaultTargetPlatform);
       case PlatformServiceWorkerControllerMethod.getAllowFileAccess:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android]
                 .contains(platform ?? defaultTargetPlatform);
       case PlatformServiceWorkerControllerMethod.getBlockNetworkLoads:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android]
                 .contains(platform ?? defaultTargetPlatform);
       case PlatformServiceWorkerControllerMethod.getCacheMode:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android]
                 .contains(platform ?? defaultTargetPlatform);
       case PlatformServiceWorkerControllerMethod.setAllowContentAccess:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android]
                 .contains(platform ?? defaultTargetPlatform);
       case PlatformServiceWorkerControllerMethod.setAllowFileAccess:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android]
                 .contains(platform ?? defaultTargetPlatform);
       case PlatformServiceWorkerControllerMethod.setBlockNetworkLoads:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android]
                 .contains(platform ?? defaultTargetPlatform);
       case PlatformServiceWorkerControllerMethod.setCacheMode:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android]
                 .contains(platform ?? defaultTargetPlatform);
       case PlatformServiceWorkerControllerMethod.setServiceWorkerClient:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android]
                 .contains(platform ?? defaultTargetPlatform);
     }
@@ -207,7 +207,7 @@ extension _ServiceWorkerClientClassSupported on ServiceWorkerClient {
   ///Use the [ServiceWorkerClient.isClassSupported] method to check if this class is supported at runtime.
   ///{@endtemplate}
   static bool isClassSupported({TargetPlatform? platform}) {
-    return !kIsWeb &&
+    return ((kIsWeb && platform != null) || !kIsWeb) &&
         [TargetPlatform.android].contains(platform ?? defaultTargetPlatform);
   }
 }
@@ -234,7 +234,7 @@ extension _ServiceWorkerClientPropertySupported on ServiceWorkerClient {
       {TargetPlatform? platform}) {
     switch (property) {
       case ServiceWorkerClientProperty.shouldInterceptRequest:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android]
                 .contains(platform ?? defaultTargetPlatform);
     }

@@ -304,7 +304,8 @@ abstract class PlatformWebAuthenticationSession extends PlatformInterface
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebAuthenticationSessionCreationParams.isClassSupported}
   bool isClassSupported({TargetPlatform? platform}) =>
-      _PlatformWebAuthenticationSessionClassSupported.isClassSupported(platform: platform);
+      _PlatformWebAuthenticationSessionClassSupported.isClassSupported(
+          platform: platform);
 
   ///{@template flutter_inappwebview_platform_interface.PlatformWebAuthenticationSession.isPropertySupported}
   ///Check if the given [property] is supported by the [defaultTargetPlatform] or a specific [platform].

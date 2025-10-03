@@ -1177,156 +1177,156 @@ extension _PrintJobSettingsPropertySupported on PrintJobSettings {
       {TargetPlatform? platform}) {
     switch (property) {
       case PrintJobSettingsProperty.animated:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.iOS].contains(platform ?? defaultTargetPlatform);
       case PrintJobSettingsProperty.canSpawnSeparateThread:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.macOS].contains(platform ?? defaultTargetPlatform);
       case PrintJobSettingsProperty.colorMode:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android, TargetPlatform.macOS]
                 .contains(platform ?? defaultTargetPlatform);
       case PrintJobSettingsProperty.copies:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.macOS].contains(platform ?? defaultTargetPlatform);
       case PrintJobSettingsProperty.detailedErrorReporting:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.macOS].contains(platform ?? defaultTargetPlatform);
       case PrintJobSettingsProperty.duplexMode:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android, TargetPlatform.iOS]
                 .contains(platform ?? defaultTargetPlatform);
       case PrintJobSettingsProperty.faxNumber:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.macOS].contains(platform ?? defaultTargetPlatform);
       case PrintJobSettingsProperty.firstPage:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.macOS].contains(platform ?? defaultTargetPlatform);
       case PrintJobSettingsProperty.footerHeight:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.iOS].contains(platform ?? defaultTargetPlatform);
       case PrintJobSettingsProperty.forceRenderingQuality:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.iOS].contains(platform ?? defaultTargetPlatform);
       case PrintJobSettingsProperty.handledByClient:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android, TargetPlatform.iOS, TargetPlatform.macOS]
                 .contains(platform ?? defaultTargetPlatform);
       case PrintJobSettingsProperty.headerAndFooter:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.macOS].contains(platform ?? defaultTargetPlatform);
       case PrintJobSettingsProperty.headerHeight:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.iOS].contains(platform ?? defaultTargetPlatform);
       case PrintJobSettingsProperty.horizontalPagination:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.macOS].contains(platform ?? defaultTargetPlatform);
       case PrintJobSettingsProperty.isHorizontallyCentered:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.macOS].contains(platform ?? defaultTargetPlatform);
       case PrintJobSettingsProperty.isVerticallyCentered:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.macOS].contains(platform ?? defaultTargetPlatform);
       case PrintJobSettingsProperty.jobDisposition:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.macOS].contains(platform ?? defaultTargetPlatform);
       case PrintJobSettingsProperty.jobName:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android, TargetPlatform.iOS, TargetPlatform.macOS]
                 .contains(platform ?? defaultTargetPlatform);
       case PrintJobSettingsProperty.jobSavingURL:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.macOS].contains(platform ?? defaultTargetPlatform);
       case PrintJobSettingsProperty.lastPage:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.macOS].contains(platform ?? defaultTargetPlatform);
       case PrintJobSettingsProperty.margins:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.iOS, TargetPlatform.macOS]
                 .contains(platform ?? defaultTargetPlatform);
       case PrintJobSettingsProperty.maximumContentHeight:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.iOS].contains(platform ?? defaultTargetPlatform);
       case PrintJobSettingsProperty.maximumContentWidth:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.iOS].contains(platform ?? defaultTargetPlatform);
       case PrintJobSettingsProperty.mediaSize:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android]
                 .contains(platform ?? defaultTargetPlatform);
       case PrintJobSettingsProperty.mustCollate:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.macOS].contains(platform ?? defaultTargetPlatform);
       case PrintJobSettingsProperty.numberOfPages:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.iOS, TargetPlatform.macOS]
                 .contains(platform ?? defaultTargetPlatform);
       case PrintJobSettingsProperty.orientation:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android, TargetPlatform.iOS, TargetPlatform.macOS]
                 .contains(platform ?? defaultTargetPlatform);
       case PrintJobSettingsProperty.outputType:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.iOS].contains(platform ?? defaultTargetPlatform);
       case PrintJobSettingsProperty.pageOrder:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.macOS].contains(platform ?? defaultTargetPlatform);
       case PrintJobSettingsProperty.pagesAcross:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.macOS].contains(platform ?? defaultTargetPlatform);
       case PrintJobSettingsProperty.pagesDown:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.macOS].contains(platform ?? defaultTargetPlatform);
       case PrintJobSettingsProperty.paperName:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.macOS].contains(platform ?? defaultTargetPlatform);
       case PrintJobSettingsProperty.resolution:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android]
                 .contains(platform ?? defaultTargetPlatform);
       case PrintJobSettingsProperty.scalingFactor:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.macOS].contains(platform ?? defaultTargetPlatform);
       case PrintJobSettingsProperty.showsNumberOfCopies:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.iOS, TargetPlatform.macOS]
                 .contains(platform ?? defaultTargetPlatform);
       case PrintJobSettingsProperty.showsPageRange:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.macOS].contains(platform ?? defaultTargetPlatform);
       case PrintJobSettingsProperty.showsPageSetupAccessory:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.macOS].contains(platform ?? defaultTargetPlatform);
       case PrintJobSettingsProperty.showsPaperOrientation:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.iOS, TargetPlatform.macOS]
                 .contains(platform ?? defaultTargetPlatform);
       case PrintJobSettingsProperty.showsPaperSelectionForLoadedPapers:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.iOS].contains(platform ?? defaultTargetPlatform);
       case PrintJobSettingsProperty.showsPaperSize:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.macOS].contains(platform ?? defaultTargetPlatform);
       case PrintJobSettingsProperty.showsPreview:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.macOS].contains(platform ?? defaultTargetPlatform);
       case PrintJobSettingsProperty.showsPrintPanel:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.macOS].contains(platform ?? defaultTargetPlatform);
       case PrintJobSettingsProperty.showsPrintSelection:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.macOS].contains(platform ?? defaultTargetPlatform);
       case PrintJobSettingsProperty.showsProgressPanel:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.macOS].contains(platform ?? defaultTargetPlatform);
       case PrintJobSettingsProperty.showsScaling:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.macOS].contains(platform ?? defaultTargetPlatform);
       case PrintJobSettingsProperty.time:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.macOS].contains(platform ?? defaultTargetPlatform);
       case PrintJobSettingsProperty.verticalPagination:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.macOS].contains(platform ?? defaultTargetPlatform);
     }
   }

@@ -753,107 +753,107 @@ extension _ChromeSafariBrowserSettingsPropertySupported
       {TargetPlatform? platform}) {
     switch (property) {
       case ChromeSafariBrowserSettingsProperty.activityButton:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.iOS].contains(platform ?? defaultTargetPlatform);
       case ChromeSafariBrowserSettingsProperty.additionalTrustedOrigins:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android]
                 .contains(platform ?? defaultTargetPlatform);
       case ChromeSafariBrowserSettingsProperty.alwaysUseBrowserUI:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android]
                 .contains(platform ?? defaultTargetPlatform);
       case ChromeSafariBrowserSettingsProperty.barCollapsingEnabled:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.iOS].contains(platform ?? defaultTargetPlatform);
       case ChromeSafariBrowserSettingsProperty.dismissButtonStyle:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.iOS].contains(platform ?? defaultTargetPlatform);
       case ChromeSafariBrowserSettingsProperty.displayMode:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android]
                 .contains(platform ?? defaultTargetPlatform);
       case ChromeSafariBrowserSettingsProperty.enableUrlBarHiding:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android]
                 .contains(platform ?? defaultTargetPlatform);
       case ChromeSafariBrowserSettingsProperty.entersReaderIfAvailable:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.iOS].contains(platform ?? defaultTargetPlatform);
       case ChromeSafariBrowserSettingsProperty.eventAttribution:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.iOS].contains(platform ?? defaultTargetPlatform);
       case ChromeSafariBrowserSettingsProperty.exitAnimations:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android]
                 .contains(platform ?? defaultTargetPlatform);
       case ChromeSafariBrowserSettingsProperty.instantAppsEnabled:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android]
                 .contains(platform ?? defaultTargetPlatform);
       case ChromeSafariBrowserSettingsProperty.isSingleInstance:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android]
                 .contains(platform ?? defaultTargetPlatform);
       case ChromeSafariBrowserSettingsProperty.isTrustedWebActivity:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android]
                 .contains(platform ?? defaultTargetPlatform);
       case ChromeSafariBrowserSettingsProperty.keepAliveEnabled:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android]
                 .contains(platform ?? defaultTargetPlatform);
       case ChromeSafariBrowserSettingsProperty.navigationBarColor:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android]
                 .contains(platform ?? defaultTargetPlatform);
       case ChromeSafariBrowserSettingsProperty.navigationBarDividerColor:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android]
                 .contains(platform ?? defaultTargetPlatform);
       case ChromeSafariBrowserSettingsProperty.noHistory:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android]
                 .contains(platform ?? defaultTargetPlatform);
       case ChromeSafariBrowserSettingsProperty.packageName:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android]
                 .contains(platform ?? defaultTargetPlatform);
       case ChromeSafariBrowserSettingsProperty.preferredBarTintColor:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.iOS].contains(platform ?? defaultTargetPlatform);
       case ChromeSafariBrowserSettingsProperty.preferredControlTintColor:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.iOS].contains(platform ?? defaultTargetPlatform);
       case ChromeSafariBrowserSettingsProperty.presentationStyle:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.iOS].contains(platform ?? defaultTargetPlatform);
       case ChromeSafariBrowserSettingsProperty.screenOrientation:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android]
                 .contains(platform ?? defaultTargetPlatform);
       case ChromeSafariBrowserSettingsProperty.secondaryToolbarColor:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android]
                 .contains(platform ?? defaultTargetPlatform);
       case ChromeSafariBrowserSettingsProperty.shareState:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android]
                 .contains(platform ?? defaultTargetPlatform);
       case ChromeSafariBrowserSettingsProperty.showTitle:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android]
                 .contains(platform ?? defaultTargetPlatform);
       case ChromeSafariBrowserSettingsProperty.startAnimations:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android]
                 .contains(platform ?? defaultTargetPlatform);
       case ChromeSafariBrowserSettingsProperty.toolbarBackgroundColor:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android]
                 .contains(platform ?? defaultTargetPlatform);
       case ChromeSafariBrowserSettingsProperty.transitionStyle:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.iOS].contains(platform ?? defaultTargetPlatform);
     }
   }

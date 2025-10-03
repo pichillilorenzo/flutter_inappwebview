@@ -18,7 +18,7 @@ extension _PlatformInAppBrowserClassSupported on PlatformInAppBrowser {
   ///Use the [PlatformInAppBrowser.isClassSupported] method to check if this class is supported at runtime.
   ///{@endtemplate}
   static bool isClassSupported({TargetPlatform? platform}) {
-    return !kIsWeb &&
+    return ((kIsWeb && platform != null) || !kIsWeb) &&
         [
           TargetPlatform.android,
           TargetPlatform.iOS,
@@ -128,15 +128,15 @@ extension _PlatformInAppBrowserPropertySupported on PlatformInAppBrowser {
       {TargetPlatform? platform}) {
     switch (property) {
       case PlatformInAppBrowserProperty.contextMenu:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android, TargetPlatform.iOS]
                 .contains(platform ?? defaultTargetPlatform);
       case PlatformInAppBrowserProperty.findInteractionController:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android, TargetPlatform.iOS, TargetPlatform.macOS]
                 .contains(platform ?? defaultTargetPlatform);
       case PlatformInAppBrowserProperty.id:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [
               TargetPlatform.android,
               TargetPlatform.iOS,
@@ -144,7 +144,7 @@ extension _PlatformInAppBrowserPropertySupported on PlatformInAppBrowser {
               TargetPlatform.windows
             ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppBrowserProperty.initialUserScripts:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [
               TargetPlatform.android,
               TargetPlatform.iOS,
@@ -152,15 +152,15 @@ extension _PlatformInAppBrowserPropertySupported on PlatformInAppBrowser {
               TargetPlatform.windows
             ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppBrowserProperty.pullToRefreshController:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android, TargetPlatform.iOS]
                 .contains(platform ?? defaultTargetPlatform);
       case PlatformInAppBrowserProperty.webViewEnvironment:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.windows]
                 .contains(platform ?? defaultTargetPlatform);
       case PlatformInAppBrowserProperty.windowId:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [
               TargetPlatform.android,
               TargetPlatform.iOS,
@@ -491,15 +491,15 @@ extension _PlatformInAppBrowserMethodSupported on PlatformInAppBrowser {
       {TargetPlatform? platform}) {
     switch (method) {
       case PlatformInAppBrowserMethod.addMenuItem:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android, TargetPlatform.iOS, TargetPlatform.macOS]
                 .contains(platform ?? defaultTargetPlatform);
       case PlatformInAppBrowserMethod.addMenuItems:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android, TargetPlatform.iOS, TargetPlatform.macOS]
                 .contains(platform ?? defaultTargetPlatform);
       case PlatformInAppBrowserMethod.close:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [
               TargetPlatform.android,
               TargetPlatform.iOS,
@@ -507,7 +507,7 @@ extension _PlatformInAppBrowserMethodSupported on PlatformInAppBrowser {
               TargetPlatform.windows
             ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppBrowserMethod.dispose:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [
               TargetPlatform.android,
               TargetPlatform.iOS,
@@ -515,11 +515,11 @@ extension _PlatformInAppBrowserMethodSupported on PlatformInAppBrowser {
               TargetPlatform.windows
             ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppBrowserMethod.getOptions:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android, TargetPlatform.iOS]
                 .contains(platform ?? defaultTargetPlatform);
       case PlatformInAppBrowserMethod.getSettings:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [
               TargetPlatform.android,
               TargetPlatform.iOS,
@@ -527,11 +527,11 @@ extension _PlatformInAppBrowserMethodSupported on PlatformInAppBrowser {
               TargetPlatform.windows
             ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppBrowserMethod.hasMenuItem:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android, TargetPlatform.iOS, TargetPlatform.macOS]
                 .contains(platform ?? defaultTargetPlatform);
       case PlatformInAppBrowserMethod.hide:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [
               TargetPlatform.android,
               TargetPlatform.iOS,
@@ -539,7 +539,7 @@ extension _PlatformInAppBrowserMethodSupported on PlatformInAppBrowser {
               TargetPlatform.windows
             ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppBrowserMethod.isHidden:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [
               TargetPlatform.android,
               TargetPlatform.iOS,
@@ -547,7 +547,7 @@ extension _PlatformInAppBrowserMethodSupported on PlatformInAppBrowser {
               TargetPlatform.windows
             ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppBrowserMethod.isOpened:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [
               TargetPlatform.android,
               TargetPlatform.iOS,
@@ -555,7 +555,7 @@ extension _PlatformInAppBrowserMethodSupported on PlatformInAppBrowser {
               TargetPlatform.windows
             ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppBrowserMethod.openData:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [
               TargetPlatform.android,
               TargetPlatform.iOS,
@@ -563,7 +563,7 @@ extension _PlatformInAppBrowserMethodSupported on PlatformInAppBrowser {
               TargetPlatform.windows
             ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppBrowserMethod.openFile:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [
               TargetPlatform.android,
               TargetPlatform.iOS,
@@ -571,7 +571,7 @@ extension _PlatformInAppBrowserMethodSupported on PlatformInAppBrowser {
               TargetPlatform.windows
             ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppBrowserMethod.openUrlRequest:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [
               TargetPlatform.android,
               TargetPlatform.iOS,
@@ -579,7 +579,7 @@ extension _PlatformInAppBrowserMethodSupported on PlatformInAppBrowser {
               TargetPlatform.windows
             ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppBrowserMethod.openWithSystemBrowser:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [
               TargetPlatform.android,
               TargetPlatform.iOS,
@@ -587,23 +587,23 @@ extension _PlatformInAppBrowserMethodSupported on PlatformInAppBrowser {
               TargetPlatform.windows
             ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppBrowserMethod.removeAllMenuItem:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android, TargetPlatform.iOS, TargetPlatform.macOS]
                 .contains(platform ?? defaultTargetPlatform);
       case PlatformInAppBrowserMethod.removeMenuItem:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android, TargetPlatform.iOS, TargetPlatform.macOS]
                 .contains(platform ?? defaultTargetPlatform);
       case PlatformInAppBrowserMethod.removeMenuItems:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android, TargetPlatform.iOS, TargetPlatform.macOS]
                 .contains(platform ?? defaultTargetPlatform);
       case PlatformInAppBrowserMethod.setOptions:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android, TargetPlatform.iOS]
                 .contains(platform ?? defaultTargetPlatform);
       case PlatformInAppBrowserMethod.setSettings:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [
               TargetPlatform.android,
               TargetPlatform.iOS,
@@ -611,7 +611,7 @@ extension _PlatformInAppBrowserMethodSupported on PlatformInAppBrowser {
               TargetPlatform.windows
             ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppBrowserMethod.show:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [
               TargetPlatform.android,
               TargetPlatform.iOS,
@@ -1974,90 +1974,90 @@ extension _PlatformInAppBrowserEventsMethodSupported
       {TargetPlatform? platform}) {
     switch (method) {
       case PlatformInAppBrowserEventsMethod.androidOnFormResubmission:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android]
                 .contains(platform ?? defaultTargetPlatform);
       case PlatformInAppBrowserEventsMethod
             .androidOnGeolocationPermissionsHidePrompt:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android]
                 .contains(platform ?? defaultTargetPlatform);
       case PlatformInAppBrowserEventsMethod
             .androidOnGeolocationPermissionsShowPrompt:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android]
                 .contains(platform ?? defaultTargetPlatform);
       case PlatformInAppBrowserEventsMethod.androidOnJsBeforeUnload:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android]
                 .contains(platform ?? defaultTargetPlatform);
       case PlatformInAppBrowserEventsMethod.androidOnPermissionRequest:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android]
                 .contains(platform ?? defaultTargetPlatform);
       case PlatformInAppBrowserEventsMethod.androidOnReceivedIcon:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android]
                 .contains(platform ?? defaultTargetPlatform);
       case PlatformInAppBrowserEventsMethod.androidOnReceivedLoginRequest:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android]
                 .contains(platform ?? defaultTargetPlatform);
       case PlatformInAppBrowserEventsMethod.androidOnReceivedTouchIconUrl:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android]
                 .contains(platform ?? defaultTargetPlatform);
       case PlatformInAppBrowserEventsMethod.androidOnRenderProcessGone:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android]
                 .contains(platform ?? defaultTargetPlatform);
       case PlatformInAppBrowserEventsMethod.androidOnRenderProcessResponsive:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android]
                 .contains(platform ?? defaultTargetPlatform);
       case PlatformInAppBrowserEventsMethod.androidOnRenderProcessUnresponsive:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android]
                 .contains(platform ?? defaultTargetPlatform);
       case PlatformInAppBrowserEventsMethod.androidOnSafeBrowsingHit:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android]
                 .contains(platform ?? defaultTargetPlatform);
       case PlatformInAppBrowserEventsMethod.androidOnScaleChanged:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android]
                 .contains(platform ?? defaultTargetPlatform);
       case PlatformInAppBrowserEventsMethod.androidShouldInterceptRequest:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android]
                 .contains(platform ?? defaultTargetPlatform);
       case PlatformInAppBrowserEventsMethod
             .iosOnDidReceiveServerRedirectForProvisionalNavigation:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.iOS].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppBrowserEventsMethod.iosOnNavigationResponse:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.iOS].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppBrowserEventsMethod.iosOnWebContentProcessDidTerminate:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.iOS].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppBrowserEventsMethod.iosShouldAllowDeprecatedTLS:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.iOS].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppBrowserEventsMethod.onAcceleratorKeyPressed:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.windows]
                 .contains(platform ?? defaultTargetPlatform);
       case PlatformInAppBrowserEventsMethod.onAjaxProgress:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android, TargetPlatform.iOS, TargetPlatform.macOS]
                 .contains(platform ?? defaultTargetPlatform);
       case PlatformInAppBrowserEventsMethod.onAjaxReadyStateChange:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android, TargetPlatform.iOS, TargetPlatform.macOS]
                 .contains(platform ?? defaultTargetPlatform);
       case PlatformInAppBrowserEventsMethod.onBrowserCreated:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [
               TargetPlatform.android,
               TargetPlatform.iOS,
@@ -2065,13 +2065,13 @@ extension _PlatformInAppBrowserEventsMethodSupported
               TargetPlatform.windows
             ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppBrowserEventsMethod.onCameraCaptureStateChanged:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.iOS, TargetPlatform.macOS]
                 .contains(platform ?? defaultTargetPlatform);
       case PlatformInAppBrowserEventsMethod.onCloseWindow:
-        return kIsWeb
+        return kIsWeb && platform == null
             ? true
-            : !kIsWeb &&
+            : ((kIsWeb && platform != null) || !kIsWeb) &&
                 [
                   TargetPlatform.android,
                   TargetPlatform.iOS,
@@ -2079,9 +2079,9 @@ extension _PlatformInAppBrowserEventsMethodSupported
                   TargetPlatform.windows
                 ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppBrowserEventsMethod.onConsoleMessage:
-        return kIsWeb
+        return kIsWeb && platform == null
             ? true
-            : !kIsWeb &&
+            : ((kIsWeb && platform != null) || !kIsWeb) &&
                 [
                   TargetPlatform.android,
                   TargetPlatform.iOS,
@@ -2089,10 +2089,10 @@ extension _PlatformInAppBrowserEventsMethodSupported
                   TargetPlatform.windows
                 ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppBrowserEventsMethod.onContentSizeChanged:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.iOS].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppBrowserEventsMethod.onCreateWindow:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [
               TargetPlatform.android,
               TargetPlatform.iOS,
@@ -2101,19 +2101,19 @@ extension _PlatformInAppBrowserEventsMethodSupported
             ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppBrowserEventsMethod
             .onDidReceiveServerRedirectForProvisionalNavigation:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.iOS, TargetPlatform.macOS]
                 .contains(platform ?? defaultTargetPlatform);
       case PlatformInAppBrowserEventsMethod.onDownloadStart:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android, TargetPlatform.iOS]
                 .contains(platform ?? defaultTargetPlatform);
       case PlatformInAppBrowserEventsMethod.onDownloadStartRequest:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android, TargetPlatform.iOS, TargetPlatform.macOS]
                 .contains(platform ?? defaultTargetPlatform);
       case PlatformInAppBrowserEventsMethod.onDownloadStarting:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [
               TargetPlatform.android,
               TargetPlatform.iOS,
@@ -2121,11 +2121,11 @@ extension _PlatformInAppBrowserEventsMethodSupported
               TargetPlatform.windows
             ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppBrowserEventsMethod.onEnterFullscreen:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android, TargetPlatform.iOS, TargetPlatform.macOS]
                 .contains(platform ?? defaultTargetPlatform);
       case PlatformInAppBrowserEventsMethod.onExit:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [
               TargetPlatform.android,
               TargetPlatform.iOS,
@@ -2133,55 +2133,55 @@ extension _PlatformInAppBrowserEventsMethodSupported
               TargetPlatform.windows
             ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppBrowserEventsMethod.onExitFullscreen:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android, TargetPlatform.iOS, TargetPlatform.macOS]
                 .contains(platform ?? defaultTargetPlatform);
       case PlatformInAppBrowserEventsMethod.onFindResultReceived:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android, TargetPlatform.iOS, TargetPlatform.macOS]
                 .contains(platform ?? defaultTargetPlatform);
       case PlatformInAppBrowserEventsMethod.onFormResubmission:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android]
                 .contains(platform ?? defaultTargetPlatform);
       case PlatformInAppBrowserEventsMethod.onGeolocationPermissionsHidePrompt:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android]
                 .contains(platform ?? defaultTargetPlatform);
       case PlatformInAppBrowserEventsMethod.onGeolocationPermissionsShowPrompt:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android]
                 .contains(platform ?? defaultTargetPlatform);
       case PlatformInAppBrowserEventsMethod.onJsAlert:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android, TargetPlatform.iOS, TargetPlatform.macOS]
                 .contains(platform ?? defaultTargetPlatform);
       case PlatformInAppBrowserEventsMethod.onJsConfirm:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android, TargetPlatform.iOS, TargetPlatform.macOS]
                 .contains(platform ?? defaultTargetPlatform);
       case PlatformInAppBrowserEventsMethod.onJsPrompt:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android, TargetPlatform.iOS, TargetPlatform.macOS]
                 .contains(platform ?? defaultTargetPlatform);
       case PlatformInAppBrowserEventsMethod.onLoadError:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android, TargetPlatform.iOS, TargetPlatform.macOS]
                 .contains(platform ?? defaultTargetPlatform);
       case PlatformInAppBrowserEventsMethod.onLoadHttpError:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android, TargetPlatform.iOS, TargetPlatform.macOS]
                 .contains(platform ?? defaultTargetPlatform);
       case PlatformInAppBrowserEventsMethod.onLoadResource:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android, TargetPlatform.iOS, TargetPlatform.macOS]
                 .contains(platform ?? defaultTargetPlatform);
       case PlatformInAppBrowserEventsMethod.onLoadResourceCustomScheme:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android, TargetPlatform.iOS, TargetPlatform.macOS]
                 .contains(platform ?? defaultTargetPlatform);
       case PlatformInAppBrowserEventsMethod.onLoadResourceWithCustomScheme:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [
               TargetPlatform.android,
               TargetPlatform.iOS,
@@ -2189,7 +2189,7 @@ extension _PlatformInAppBrowserEventsMethodSupported
               TargetPlatform.windows
             ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppBrowserEventsMethod.onLoadStart:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [
               TargetPlatform.android,
               TargetPlatform.iOS,
@@ -2197,7 +2197,7 @@ extension _PlatformInAppBrowserEventsMethodSupported
               TargetPlatform.windows
             ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppBrowserEventsMethod.onLoadStop:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [
               TargetPlatform.android,
               TargetPlatform.iOS,
@@ -2205,30 +2205,30 @@ extension _PlatformInAppBrowserEventsMethodSupported
               TargetPlatform.windows
             ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppBrowserEventsMethod.onLongPressHitTestResult:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android, TargetPlatform.iOS]
                 .contains(platform ?? defaultTargetPlatform);
       case PlatformInAppBrowserEventsMethod.onMainWindowWillClose:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.macOS].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppBrowserEventsMethod.onMicrophoneCaptureStateChanged:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.iOS, TargetPlatform.macOS]
                 .contains(platform ?? defaultTargetPlatform);
       case PlatformInAppBrowserEventsMethod.onNavigationResponse:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.iOS, TargetPlatform.macOS]
                 .contains(platform ?? defaultTargetPlatform);
       case PlatformInAppBrowserEventsMethod.onOverScrolled:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android, TargetPlatform.iOS]
                 .contains(platform ?? defaultTargetPlatform);
       case PlatformInAppBrowserEventsMethod.onPageCommitVisible:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android, TargetPlatform.iOS, TargetPlatform.macOS]
                 .contains(platform ?? defaultTargetPlatform);
       case PlatformInAppBrowserEventsMethod.onPermissionRequest:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [
               TargetPlatform.android,
               TargetPlatform.iOS,
@@ -2236,23 +2236,23 @@ extension _PlatformInAppBrowserEventsMethodSupported
               TargetPlatform.windows
             ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppBrowserEventsMethod.onPermissionRequestCanceled:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android]
                 .contains(platform ?? defaultTargetPlatform);
       case PlatformInAppBrowserEventsMethod.onPrint:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android, TargetPlatform.iOS]
                 .contains(platform ?? defaultTargetPlatform);
       case PlatformInAppBrowserEventsMethod.onPrintRequest:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android, TargetPlatform.iOS, TargetPlatform.macOS]
                 .contains(platform ?? defaultTargetPlatform);
       case PlatformInAppBrowserEventsMethod.onProcessFailed:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.windows]
                 .contains(platform ?? defaultTargetPlatform);
       case PlatformInAppBrowserEventsMethod.onProgressChanged:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [
               TargetPlatform.android,
               TargetPlatform.iOS,
@@ -2260,7 +2260,7 @@ extension _PlatformInAppBrowserEventsMethodSupported
               TargetPlatform.windows
             ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppBrowserEventsMethod.onReceivedClientCertRequest:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [
               TargetPlatform.android,
               TargetPlatform.iOS,
@@ -2268,7 +2268,7 @@ extension _PlatformInAppBrowserEventsMethodSupported
               TargetPlatform.windows
             ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppBrowserEventsMethod.onReceivedError:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [
               TargetPlatform.android,
               TargetPlatform.iOS,
@@ -2276,7 +2276,7 @@ extension _PlatformInAppBrowserEventsMethodSupported
               TargetPlatform.windows
             ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppBrowserEventsMethod.onReceivedHttpAuthRequest:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [
               TargetPlatform.android,
               TargetPlatform.iOS,
@@ -2284,7 +2284,7 @@ extension _PlatformInAppBrowserEventsMethodSupported
               TargetPlatform.windows
             ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppBrowserEventsMethod.onReceivedHttpError:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [
               TargetPlatform.android,
               TargetPlatform.iOS,
@@ -2292,15 +2292,15 @@ extension _PlatformInAppBrowserEventsMethodSupported
               TargetPlatform.windows
             ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppBrowserEventsMethod.onReceivedIcon:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android]
                 .contains(platform ?? defaultTargetPlatform);
       case PlatformInAppBrowserEventsMethod.onReceivedLoginRequest:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android]
                 .contains(platform ?? defaultTargetPlatform);
       case PlatformInAppBrowserEventsMethod.onReceivedServerTrustAuthRequest:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [
               TargetPlatform.android,
               TargetPlatform.iOS,
@@ -2308,39 +2308,39 @@ extension _PlatformInAppBrowserEventsMethodSupported
               TargetPlatform.windows
             ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppBrowserEventsMethod.onReceivedTouchIconUrl:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android]
                 .contains(platform ?? defaultTargetPlatform);
       case PlatformInAppBrowserEventsMethod.onRenderProcessGone:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android, TargetPlatform.windows]
                 .contains(platform ?? defaultTargetPlatform);
       case PlatformInAppBrowserEventsMethod.onRenderProcessResponsive:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android]
                 .contains(platform ?? defaultTargetPlatform);
       case PlatformInAppBrowserEventsMethod.onRenderProcessUnresponsive:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android, TargetPlatform.windows]
                 .contains(platform ?? defaultTargetPlatform);
       case PlatformInAppBrowserEventsMethod.onRequestFocus:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android]
                 .contains(platform ?? defaultTargetPlatform);
       case PlatformInAppBrowserEventsMethod.onSafeBrowsingHit:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android]
                 .contains(platform ?? defaultTargetPlatform);
       case PlatformInAppBrowserEventsMethod.onScrollChanged:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android, TargetPlatform.iOS, TargetPlatform.macOS]
                 .contains(platform ?? defaultTargetPlatform);
       case PlatformInAppBrowserEventsMethod.onShowFileChooser:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android]
                 .contains(platform ?? defaultTargetPlatform);
       case PlatformInAppBrowserEventsMethod.onTitleChanged:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [
               TargetPlatform.android,
               TargetPlatform.iOS,
@@ -2348,7 +2348,7 @@ extension _PlatformInAppBrowserEventsMethodSupported
               TargetPlatform.windows
             ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppBrowserEventsMethod.onUpdateVisitedHistory:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [
               TargetPlatform.android,
               TargetPlatform.iOS,
@@ -2356,39 +2356,39 @@ extension _PlatformInAppBrowserEventsMethodSupported
               TargetPlatform.windows
             ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppBrowserEventsMethod.onWebContentProcessDidTerminate:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.iOS, TargetPlatform.macOS, TargetPlatform.windows]
                 .contains(platform ?? defaultTargetPlatform);
       case PlatformInAppBrowserEventsMethod.onWindowBlur:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android, TargetPlatform.iOS, TargetPlatform.macOS]
                 .contains(platform ?? defaultTargetPlatform);
       case PlatformInAppBrowserEventsMethod.onWindowFocus:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android, TargetPlatform.iOS, TargetPlatform.macOS]
                 .contains(platform ?? defaultTargetPlatform);
       case PlatformInAppBrowserEventsMethod.onZoomScaleChanged:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android, TargetPlatform.iOS, TargetPlatform.windows]
                 .contains(platform ?? defaultTargetPlatform);
       case PlatformInAppBrowserEventsMethod.shouldAllowDeprecatedTLS:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.iOS, TargetPlatform.macOS]
                 .contains(platform ?? defaultTargetPlatform);
       case PlatformInAppBrowserEventsMethod.shouldInterceptAjaxRequest:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android, TargetPlatform.iOS, TargetPlatform.macOS]
                 .contains(platform ?? defaultTargetPlatform);
       case PlatformInAppBrowserEventsMethod.shouldInterceptFetchRequest:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android, TargetPlatform.iOS, TargetPlatform.macOS]
                 .contains(platform ?? defaultTargetPlatform);
       case PlatformInAppBrowserEventsMethod.shouldInterceptRequest:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android, TargetPlatform.windows]
                 .contains(platform ?? defaultTargetPlatform);
       case PlatformInAppBrowserEventsMethod.shouldOverrideUrlLoading:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [
               TargetPlatform.android,
               TargetPlatform.iOS,

@@ -106,7 +106,7 @@ extension _WebAuthenticationSessionSettingsPropertySupported
     switch (property) {
       case WebAuthenticationSessionSettingsProperty
             .prefersEphemeralWebBrowserSession:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.iOS, TargetPlatform.macOS]
                 .contains(platform ?? defaultTargetPlatform);
     }

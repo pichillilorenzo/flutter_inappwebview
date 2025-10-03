@@ -231,30 +231,30 @@ extension _PullToRefreshSettingsPropertySupported on PullToRefreshSettings {
       {TargetPlatform? platform}) {
     switch (property) {
       case PullToRefreshSettingsProperty.attributedTitle:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.iOS].contains(platform ?? defaultTargetPlatform);
       case PullToRefreshSettingsProperty.backgroundColor:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android, TargetPlatform.iOS]
                 .contains(platform ?? defaultTargetPlatform);
       case PullToRefreshSettingsProperty.color:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android, TargetPlatform.iOS]
                 .contains(platform ?? defaultTargetPlatform);
       case PullToRefreshSettingsProperty.distanceToTriggerSync:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android]
                 .contains(platform ?? defaultTargetPlatform);
       case PullToRefreshSettingsProperty.enabled:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android, TargetPlatform.iOS]
                 .contains(platform ?? defaultTargetPlatform);
       case PullToRefreshSettingsProperty.size:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android]
                 .contains(platform ?? defaultTargetPlatform);
       case PullToRefreshSettingsProperty.slingshotDistance:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android]
                 .contains(platform ?? defaultTargetPlatform);
     }

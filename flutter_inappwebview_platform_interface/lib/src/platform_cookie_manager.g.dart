@@ -20,9 +20,9 @@ extension _PlatformCookieManagerCreationParamsClassSupported
   ///Use the [PlatformCookieManagerCreationParams.isClassSupported] method to check if this class is supported at runtime.
   ///{@endtemplate}
   static bool isClassSupported({TargetPlatform? platform}) {
-    return kIsWeb
+    return kIsWeb && platform == null
         ? true
-        : !kIsWeb &&
+        : ((kIsWeb && platform != null) || !kIsWeb) &&
             [
               TargetPlatform.android,
               TargetPlatform.iOS,
@@ -53,7 +53,7 @@ extension _PlatformCookieManagerCreationParamsPropertySupported
       {TargetPlatform? platform}) {
     switch (property) {
       case PlatformCookieManagerCreationParamsProperty.webViewEnvironment:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.windows]
                 .contains(platform ?? defaultTargetPlatform);
     }
@@ -77,9 +77,9 @@ extension _PlatformCookieManagerClassSupported on PlatformCookieManager {
   ///Use the [PlatformCookieManager.isClassSupported] method to check if this class is supported at runtime.
   ///{@endtemplate}
   static bool isClassSupported({TargetPlatform? platform}) {
-    return kIsWeb
+    return kIsWeb && platform == null
         ? true
-        : !kIsWeb &&
+        : ((kIsWeb && platform != null) || !kIsWeb) &&
             [
               TargetPlatform.android,
               TargetPlatform.iOS,
@@ -297,7 +297,7 @@ extension _PlatformCookieManagerMethodSupported on PlatformCookieManager {
       {TargetPlatform? platform}) {
     switch (method) {
       case PlatformCookieManagerMethod.deleteAllCookies:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [
               TargetPlatform.android,
               TargetPlatform.iOS,
@@ -305,9 +305,9 @@ extension _PlatformCookieManagerMethodSupported on PlatformCookieManager {
               TargetPlatform.windows
             ].contains(platform ?? defaultTargetPlatform);
       case PlatformCookieManagerMethod.deleteCookie:
-        return kIsWeb
+        return kIsWeb && platform == null
             ? true
-            : !kIsWeb &&
+            : ((kIsWeb && platform != null) || !kIsWeb) &&
                 [
                   TargetPlatform.android,
                   TargetPlatform.iOS,
@@ -315,9 +315,9 @@ extension _PlatformCookieManagerMethodSupported on PlatformCookieManager {
                   TargetPlatform.windows
                 ].contains(platform ?? defaultTargetPlatform);
       case PlatformCookieManagerMethod.deleteCookies:
-        return kIsWeb
+        return kIsWeb && platform == null
             ? true
-            : !kIsWeb &&
+            : ((kIsWeb && platform != null) || !kIsWeb) &&
                 [
                   TargetPlatform.android,
                   TargetPlatform.iOS,
@@ -325,17 +325,17 @@ extension _PlatformCookieManagerMethodSupported on PlatformCookieManager {
                   TargetPlatform.windows
                 ].contains(platform ?? defaultTargetPlatform);
       case PlatformCookieManagerMethod.flush:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android]
                 .contains(platform ?? defaultTargetPlatform);
       case PlatformCookieManagerMethod.getAllCookies:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.iOS, TargetPlatform.macOS]
                 .contains(platform ?? defaultTargetPlatform);
       case PlatformCookieManagerMethod.getCookie:
-        return kIsWeb
+        return kIsWeb && platform == null
             ? true
-            : !kIsWeb &&
+            : ((kIsWeb && platform != null) || !kIsWeb) &&
                 [
                   TargetPlatform.android,
                   TargetPlatform.iOS,
@@ -343,9 +343,9 @@ extension _PlatformCookieManagerMethodSupported on PlatformCookieManager {
                   TargetPlatform.windows
                 ].contains(platform ?? defaultTargetPlatform);
       case PlatformCookieManagerMethod.getCookies:
-        return kIsWeb
+        return kIsWeb && platform == null
             ? true
-            : !kIsWeb &&
+            : ((kIsWeb && platform != null) || !kIsWeb) &&
                 [
                   TargetPlatform.android,
                   TargetPlatform.iOS,
@@ -353,13 +353,13 @@ extension _PlatformCookieManagerMethodSupported on PlatformCookieManager {
                   TargetPlatform.windows
                 ].contains(platform ?? defaultTargetPlatform);
       case PlatformCookieManagerMethod.removeSessionCookies:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android]
                 .contains(platform ?? defaultTargetPlatform);
       case PlatformCookieManagerMethod.setCookie:
-        return kIsWeb
+        return kIsWeb && platform == null
             ? true
-            : !kIsWeb &&
+            : ((kIsWeb && platform != null) || !kIsWeb) &&
                 [
                   TargetPlatform.android,
                   TargetPlatform.iOS,

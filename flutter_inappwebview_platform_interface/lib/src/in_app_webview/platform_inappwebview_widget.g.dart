@@ -20,9 +20,9 @@ extension _PlatformInAppWebViewWidgetCreationParamsClassSupported
   ///Use the [PlatformInAppWebViewWidgetCreationParams.isClassSupported] method to check if this class is supported at runtime.
   ///{@endtemplate}
   static bool isClassSupported({TargetPlatform? platform}) {
-    return kIsWeb
+    return kIsWeb && platform == null
         ? true
-        : !kIsWeb &&
+        : ((kIsWeb && platform != null) || !kIsWeb) &&
             [
               TargetPlatform.android,
               TargetPlatform.iOS,
@@ -93,9 +93,9 @@ extension _PlatformInAppWebViewWidgetCreationParamsPropertySupported
       {TargetPlatform? platform}) {
     switch (property) {
       case PlatformInAppWebViewWidgetCreationParamsProperty.headlessWebView:
-        return kIsWeb
+        return kIsWeb && platform == null
             ? true
-            : !kIsWeb &&
+            : ((kIsWeb && platform != null) || !kIsWeb) &&
                 [
                   TargetPlatform.android,
                   TargetPlatform.iOS,
@@ -103,7 +103,7 @@ extension _PlatformInAppWebViewWidgetCreationParamsPropertySupported
                   TargetPlatform.windows
                 ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewWidgetCreationParamsProperty.keepAlive:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [
               TargetPlatform.android,
               TargetPlatform.iOS,
@@ -111,10 +111,10 @@ extension _PlatformInAppWebViewWidgetCreationParamsPropertySupported
               TargetPlatform.windows
             ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewWidgetCreationParamsProperty.preventGestureDelay:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.iOS].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewWidgetCreationParamsProperty.webViewEnvironment:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.windows]
                 .contains(platform ?? defaultTargetPlatform);
     }

@@ -18,7 +18,7 @@ extension _PlatformHttpAuthCredentialDatabaseCreationParamsClassSupported
   ///Use the [PlatformHttpAuthCredentialDatabaseCreationParams.isClassSupported] method to check if this class is supported at runtime.
   ///{@endtemplate}
   static bool isClassSupported({TargetPlatform? platform}) {
-    return !kIsWeb &&
+    return ((kIsWeb && platform != null) || !kIsWeb) &&
         [TargetPlatform.android, TargetPlatform.iOS, TargetPlatform.macOS]
             .contains(platform ?? defaultTargetPlatform);
   }
@@ -39,7 +39,7 @@ extension _PlatformHttpAuthCredentialDatabaseClassSupported
   ///Use the [PlatformHttpAuthCredentialDatabase.isClassSupported] method to check if this class is supported at runtime.
   ///{@endtemplate}
   static bool isClassSupported({TargetPlatform? platform}) {
-    return !kIsWeb &&
+    return ((kIsWeb && platform != null) || !kIsWeb) &&
         [TargetPlatform.android, TargetPlatform.iOS, TargetPlatform.macOS]
             .contains(platform ?? defaultTargetPlatform);
   }
@@ -146,27 +146,27 @@ extension _PlatformHttpAuthCredentialDatabaseMethodSupported
       {TargetPlatform? platform}) {
     switch (method) {
       case PlatformHttpAuthCredentialDatabaseMethod.clearAllAuthCredentials:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android, TargetPlatform.iOS, TargetPlatform.macOS]
                 .contains(platform ?? defaultTargetPlatform);
       case PlatformHttpAuthCredentialDatabaseMethod.getAllAuthCredentials:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android, TargetPlatform.iOS, TargetPlatform.macOS]
                 .contains(platform ?? defaultTargetPlatform);
       case PlatformHttpAuthCredentialDatabaseMethod.getHttpAuthCredentials:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android, TargetPlatform.iOS, TargetPlatform.macOS]
                 .contains(platform ?? defaultTargetPlatform);
       case PlatformHttpAuthCredentialDatabaseMethod.removeHttpAuthCredential:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android, TargetPlatform.iOS, TargetPlatform.macOS]
                 .contains(platform ?? defaultTargetPlatform);
       case PlatformHttpAuthCredentialDatabaseMethod.removeHttpAuthCredentials:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android, TargetPlatform.iOS, TargetPlatform.macOS]
                 .contains(platform ?? defaultTargetPlatform);
       case PlatformHttpAuthCredentialDatabaseMethod.setHttpAuthCredential:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android, TargetPlatform.iOS, TargetPlatform.macOS]
                 .contains(platform ?? defaultTargetPlatform);
     }

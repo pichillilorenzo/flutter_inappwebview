@@ -124,7 +124,7 @@ extension _PlatformTracingControllerCreationParamsClassSupported
   ///Use the [PlatformTracingControllerCreationParams.isClassSupported] method to check if this class is supported at runtime.
   ///{@endtemplate}
   static bool isClassSupported({TargetPlatform? platform}) {
-    return !kIsWeb &&
+    return ((kIsWeb && platform != null) || !kIsWeb) &&
         [TargetPlatform.android].contains(platform ?? defaultTargetPlatform);
   }
 }
@@ -139,7 +139,7 @@ extension _PlatformTracingControllerClassSupported
   ///Use the [PlatformTracingController.isClassSupported] method to check if this class is supported at runtime.
   ///{@endtemplate}
   static bool isClassSupported({TargetPlatform? platform}) {
-    return !kIsWeb &&
+    return ((kIsWeb && platform != null) || !kIsWeb) &&
         [TargetPlatform.android].contains(platform ?? defaultTargetPlatform);
   }
 }
@@ -192,15 +192,15 @@ extension _PlatformTracingControllerMethodSupported
       {TargetPlatform? platform}) {
     switch (method) {
       case PlatformTracingControllerMethod.isTracing:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android]
                 .contains(platform ?? defaultTargetPlatform);
       case PlatformTracingControllerMethod.start:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android]
                 .contains(platform ?? defaultTargetPlatform);
       case PlatformTracingControllerMethod.stop:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android]
                 .contains(platform ?? defaultTargetPlatform);
     }
@@ -216,7 +216,7 @@ extension _TracingSettingsClassSupported on TracingSettings {
   ///Use the [TracingSettings.isClassSupported] method to check if this class is supported at runtime.
   ///{@endtemplate}
   static bool isClassSupported({TargetPlatform? platform}) {
-    return !kIsWeb &&
+    return ((kIsWeb && platform != null) || !kIsWeb) &&
         [TargetPlatform.android].contains(platform ?? defaultTargetPlatform);
   }
 }
@@ -240,7 +240,7 @@ extension _TracingSettingsPropertySupported on TracingSettings {
       {TargetPlatform? platform}) {
     switch (property) {
       case TracingSettingsProperty.tracingMode:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android]
                 .contains(platform ?? defaultTargetPlatform);
     }

@@ -20,9 +20,9 @@ extension _PlatformHeadlessInAppWebViewCreationParamsClassSupported
   ///Use the [PlatformHeadlessInAppWebViewCreationParams.isClassSupported] method to check if this class is supported at runtime.
   ///{@endtemplate}
   static bool isClassSupported({TargetPlatform? platform}) {
-    return kIsWeb
+    return kIsWeb && platform == null
         ? true
-        : !kIsWeb &&
+        : ((kIsWeb && platform != null) || !kIsWeb) &&
             [
               TargetPlatform.android,
               TargetPlatform.iOS,
@@ -69,9 +69,9 @@ extension _PlatformHeadlessInAppWebViewCreationParamsPropertySupported
       {TargetPlatform? platform}) {
     switch (property) {
       case PlatformHeadlessInAppWebViewCreationParamsProperty.initialSize:
-        return kIsWeb
+        return kIsWeb && platform == null
             ? true
-            : !kIsWeb &&
+            : ((kIsWeb && platform != null) || !kIsWeb) &&
                 [
                   TargetPlatform.android,
                   TargetPlatform.iOS,
@@ -80,7 +80,7 @@ extension _PlatformHeadlessInAppWebViewCreationParamsPropertySupported
                 ].contains(platform ?? defaultTargetPlatform);
       case PlatformHeadlessInAppWebViewCreationParamsProperty
             .webViewEnvironment:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.windows]
                 .contains(platform ?? defaultTargetPlatform);
     }
@@ -101,9 +101,9 @@ extension _PlatformHeadlessInAppWebViewClassSupported
   ///Use the [PlatformHeadlessInAppWebView.isClassSupported] method to check if this class is supported at runtime.
   ///{@endtemplate}
   static bool isClassSupported({TargetPlatform? platform}) {
-    return kIsWeb
+    return kIsWeb && platform == null
         ? true
-        : !kIsWeb &&
+        : ((kIsWeb && platform != null) || !kIsWeb) &&
             [
               TargetPlatform.android,
               TargetPlatform.iOS,
@@ -200,9 +200,9 @@ extension _PlatformHeadlessInAppWebViewMethodSupported
       {TargetPlatform? platform}) {
     switch (method) {
       case PlatformHeadlessInAppWebViewMethod.dispose:
-        return kIsWeb
+        return kIsWeb && platform == null
             ? true
-            : !kIsWeb &&
+            : ((kIsWeb && platform != null) || !kIsWeb) &&
                 [
                   TargetPlatform.android,
                   TargetPlatform.iOS,
@@ -210,18 +210,18 @@ extension _PlatformHeadlessInAppWebViewMethodSupported
                   TargetPlatform.windows
                 ].contains(platform ?? defaultTargetPlatform);
       case PlatformHeadlessInAppWebViewMethod.getSize:
-        return kIsWeb
+        return kIsWeb && platform == null
             ? true
-            : !kIsWeb &&
+            : ((kIsWeb && platform != null) || !kIsWeb) &&
                 [
                   TargetPlatform.android,
                   TargetPlatform.iOS,
                   TargetPlatform.macOS
                 ].contains(platform ?? defaultTargetPlatform);
       case PlatformHeadlessInAppWebViewMethod.isRunning:
-        return kIsWeb
+        return kIsWeb && platform == null
             ? true
-            : !kIsWeb &&
+            : ((kIsWeb && platform != null) || !kIsWeb) &&
                 [
                   TargetPlatform.android,
                   TargetPlatform.iOS,
@@ -229,9 +229,9 @@ extension _PlatformHeadlessInAppWebViewMethodSupported
                   TargetPlatform.windows
                 ].contains(platform ?? defaultTargetPlatform);
       case PlatformHeadlessInAppWebViewMethod.run:
-        return kIsWeb
+        return kIsWeb && platform == null
             ? true
-            : !kIsWeb &&
+            : ((kIsWeb && platform != null) || !kIsWeb) &&
                 [
                   TargetPlatform.android,
                   TargetPlatform.iOS,
@@ -239,9 +239,9 @@ extension _PlatformHeadlessInAppWebViewMethodSupported
                   TargetPlatform.windows
                 ].contains(platform ?? defaultTargetPlatform);
       case PlatformHeadlessInAppWebViewMethod.setSize:
-        return kIsWeb
+        return kIsWeb && platform == null
             ? true
-            : !kIsWeb &&
+            : ((kIsWeb && platform != null) || !kIsWeb) &&
                 [
                   TargetPlatform.android,
                   TargetPlatform.iOS,

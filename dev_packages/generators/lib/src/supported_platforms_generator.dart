@@ -118,10 +118,10 @@ class SupportedPlatformsGenerator
 
         classBuffer.writeln("return ");
         if (hasWebSupport) {
-          classBuffer.writeln("kIsWeb ? true :");
+          classBuffer.writeln("kIsWeb && platform == null ? true :");
         }
         classBuffer.writeln(
-            "!kIsWeb && [${targetPlatforms.where((e) => e != 'web').map((e) => "TargetPlatform.$e").join(', ')}].contains(platform ?? defaultTargetPlatform)");
+            "((kIsWeb && platform != null) || !kIsWeb) && [${targetPlatforms.where((e) => e != 'web').map((e) => "TargetPlatform.$e").join(', ')}].contains(platform ?? defaultTargetPlatform)");
         classBuffer.writeln(";");
       }
       classBuffer.writeln("""
@@ -215,10 +215,10 @@ class SupportedPlatformsGenerator
         classBuffer.writeln("case $enumClassName.$fieldName:");
         classBuffer.writeln("return ");
         if (hasWebSupport) {
-          classBuffer.writeln("kIsWeb ? true :");
+          classBuffer.writeln("kIsWeb && platform == null ? true :");
         }
         classBuffer.writeln(
-            "!kIsWeb && [${targetPlatforms.where((e) => e != 'web').map((e) => "TargetPlatform.$e").join(', ')}].contains(platform ?? defaultTargetPlatform)");
+            "((kIsWeb && platform != null) || !kIsWeb) && [${targetPlatforms.where((e) => e != 'web').map((e) => "TargetPlatform.$e").join(', ')}].contains(platform ?? defaultTargetPlatform)");
         classBuffer.writeln(";");
       }
       classBuffer.writeln("""
@@ -297,10 +297,10 @@ class SupportedPlatformsGenerator
         classBuffer.writeln("case $enumClassName.$methodName:");
         classBuffer.writeln("return ");
         if (hasWebSupport) {
-          classBuffer.writeln("kIsWeb ? true :");
+          classBuffer.writeln("kIsWeb && platform == null ? true :");
         }
         classBuffer.writeln(
-            "!kIsWeb && [${targetPlatforms.where((e) => e != 'web').map((e) => "TargetPlatform.$e").join(', ')}].contains(platform ?? defaultTargetPlatform)");
+            "((kIsWeb && platform != null) || !kIsWeb) && [${targetPlatforms.where((e) => e != 'web').map((e) => "TargetPlatform.$e").join(', ')}].contains(platform ?? defaultTargetPlatform)");
         classBuffer.writeln(";");
       }
       classBuffer.writeln("""

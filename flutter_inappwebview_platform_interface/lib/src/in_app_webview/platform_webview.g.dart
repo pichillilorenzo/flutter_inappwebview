@@ -20,9 +20,9 @@ extension _PlatformWebViewCreationParamsClassSupported
   ///Use the [PlatformWebViewCreationParams.isClassSupported] method to check if this class is supported at runtime.
   ///{@endtemplate}
   static bool isClassSupported({TargetPlatform? platform}) {
-    return kIsWeb
+    return kIsWeb && platform == null
         ? true
-        : !kIsWeb &&
+        : ((kIsWeb && platform != null) || !kIsWeb) &&
             [
               TargetPlatform.android,
               TargetPlatform.iOS,
@@ -1536,77 +1536,77 @@ extension _PlatformWebViewCreationParamsPropertySupported
       {TargetPlatform? platform}) {
     switch (property) {
       case PlatformWebViewCreationParamsProperty.androidOnFormResubmission:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android]
                 .contains(platform ?? defaultTargetPlatform);
       case PlatformWebViewCreationParamsProperty
             .androidOnGeolocationPermissionsHidePrompt:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android]
                 .contains(platform ?? defaultTargetPlatform);
       case PlatformWebViewCreationParamsProperty
             .androidOnGeolocationPermissionsShowPrompt:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android]
                 .contains(platform ?? defaultTargetPlatform);
       case PlatformWebViewCreationParamsProperty.androidOnJsBeforeUnload:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android]
                 .contains(platform ?? defaultTargetPlatform);
       case PlatformWebViewCreationParamsProperty.androidOnPermissionRequest:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android]
                 .contains(platform ?? defaultTargetPlatform);
       case PlatformWebViewCreationParamsProperty.androidOnReceivedIcon:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android]
                 .contains(platform ?? defaultTargetPlatform);
       case PlatformWebViewCreationParamsProperty.androidOnReceivedLoginRequest:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android]
                 .contains(platform ?? defaultTargetPlatform);
       case PlatformWebViewCreationParamsProperty.androidOnReceivedTouchIconUrl:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android]
                 .contains(platform ?? defaultTargetPlatform);
       case PlatformWebViewCreationParamsProperty.androidOnRenderProcessGone:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android]
                 .contains(platform ?? defaultTargetPlatform);
       case PlatformWebViewCreationParamsProperty
             .androidOnRenderProcessResponsive:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android]
                 .contains(platform ?? defaultTargetPlatform);
       case PlatformWebViewCreationParamsProperty
             .androidOnRenderProcessUnresponsive:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android]
                 .contains(platform ?? defaultTargetPlatform);
       case PlatformWebViewCreationParamsProperty.androidOnSafeBrowsingHit:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android]
                 .contains(platform ?? defaultTargetPlatform);
       case PlatformWebViewCreationParamsProperty.androidOnScaleChanged:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android]
                 .contains(platform ?? defaultTargetPlatform);
       case PlatformWebViewCreationParamsProperty.androidShouldInterceptRequest:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android]
                 .contains(platform ?? defaultTargetPlatform);
       case PlatformWebViewCreationParamsProperty.contextMenu:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android, TargetPlatform.iOS]
                 .contains(platform ?? defaultTargetPlatform);
       case PlatformWebViewCreationParamsProperty.findInteractionController:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android, TargetPlatform.iOS, TargetPlatform.macOS]
                 .contains(platform ?? defaultTargetPlatform);
       case PlatformWebViewCreationParamsProperty.initialData:
-        return kIsWeb
+        return kIsWeb && platform == null
             ? true
-            : !kIsWeb &&
+            : ((kIsWeb && platform != null) || !kIsWeb) &&
                 [
                   TargetPlatform.android,
                   TargetPlatform.iOS,
@@ -1614,9 +1614,9 @@ extension _PlatformWebViewCreationParamsPropertySupported
                   TargetPlatform.windows
                 ].contains(platform ?? defaultTargetPlatform);
       case PlatformWebViewCreationParamsProperty.initialFile:
-        return kIsWeb
+        return kIsWeb && platform == null
             ? true
-            : !kIsWeb &&
+            : ((kIsWeb && platform != null) || !kIsWeb) &&
                 [
                   TargetPlatform.android,
                   TargetPlatform.iOS,
@@ -1624,13 +1624,13 @@ extension _PlatformWebViewCreationParamsPropertySupported
                   TargetPlatform.windows
                 ].contains(platform ?? defaultTargetPlatform);
       case PlatformWebViewCreationParamsProperty.initialOptions:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android, TargetPlatform.iOS]
                 .contains(platform ?? defaultTargetPlatform);
       case PlatformWebViewCreationParamsProperty.initialSettings:
-        return kIsWeb
+        return kIsWeb && platform == null
             ? true
-            : !kIsWeb &&
+            : ((kIsWeb && platform != null) || !kIsWeb) &&
                 [
                   TargetPlatform.android,
                   TargetPlatform.iOS,
@@ -1638,9 +1638,9 @@ extension _PlatformWebViewCreationParamsPropertySupported
                   TargetPlatform.windows
                 ].contains(platform ?? defaultTargetPlatform);
       case PlatformWebViewCreationParamsProperty.initialUrlRequest:
-        return kIsWeb
+        return kIsWeb && platform == null
             ? true
-            : !kIsWeb &&
+            : ((kIsWeb && platform != null) || !kIsWeb) &&
                 [
                   TargetPlatform.android,
                   TargetPlatform.iOS,
@@ -1648,9 +1648,9 @@ extension _PlatformWebViewCreationParamsPropertySupported
                   TargetPlatform.windows
                 ].contains(platform ?? defaultTargetPlatform);
       case PlatformWebViewCreationParamsProperty.initialUserScripts:
-        return kIsWeb
+        return kIsWeb && platform == null
             ? true
-            : !kIsWeb &&
+            : ((kIsWeb && platform != null) || !kIsWeb) &&
                 [
                   TargetPlatform.android,
                   TargetPlatform.iOS,
@@ -1659,38 +1659,38 @@ extension _PlatformWebViewCreationParamsPropertySupported
                 ].contains(platform ?? defaultTargetPlatform);
       case PlatformWebViewCreationParamsProperty
             .iosOnDidReceiveServerRedirectForProvisionalNavigation:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.iOS].contains(platform ?? defaultTargetPlatform);
       case PlatformWebViewCreationParamsProperty.iosOnNavigationResponse:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.iOS].contains(platform ?? defaultTargetPlatform);
       case PlatformWebViewCreationParamsProperty
             .iosOnWebContentProcessDidTerminate:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.iOS].contains(platform ?? defaultTargetPlatform);
       case PlatformWebViewCreationParamsProperty.iosShouldAllowDeprecatedTLS:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.iOS].contains(platform ?? defaultTargetPlatform);
       case PlatformWebViewCreationParamsProperty.onAcceleratorKeyPressed:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.windows]
                 .contains(platform ?? defaultTargetPlatform);
       case PlatformWebViewCreationParamsProperty.onAjaxProgress:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android, TargetPlatform.iOS, TargetPlatform.macOS]
                 .contains(platform ?? defaultTargetPlatform);
       case PlatformWebViewCreationParamsProperty.onAjaxReadyStateChange:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android, TargetPlatform.iOS, TargetPlatform.macOS]
                 .contains(platform ?? defaultTargetPlatform);
       case PlatformWebViewCreationParamsProperty.onCameraCaptureStateChanged:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.iOS, TargetPlatform.macOS]
                 .contains(platform ?? defaultTargetPlatform);
       case PlatformWebViewCreationParamsProperty.onCloseWindow:
-        return kIsWeb
+        return kIsWeb && platform == null
             ? true
-            : !kIsWeb &&
+            : ((kIsWeb && platform != null) || !kIsWeb) &&
                 [
                   TargetPlatform.android,
                   TargetPlatform.iOS,
@@ -1698,9 +1698,9 @@ extension _PlatformWebViewCreationParamsPropertySupported
                   TargetPlatform.windows
                 ].contains(platform ?? defaultTargetPlatform);
       case PlatformWebViewCreationParamsProperty.onConsoleMessage:
-        return kIsWeb
+        return kIsWeb && platform == null
             ? true
-            : !kIsWeb &&
+            : ((kIsWeb && platform != null) || !kIsWeb) &&
                 [
                   TargetPlatform.android,
                   TargetPlatform.iOS,
@@ -1708,12 +1708,12 @@ extension _PlatformWebViewCreationParamsPropertySupported
                   TargetPlatform.windows
                 ].contains(platform ?? defaultTargetPlatform);
       case PlatformWebViewCreationParamsProperty.onContentSizeChanged:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.iOS].contains(platform ?? defaultTargetPlatform);
       case PlatformWebViewCreationParamsProperty.onCreateWindow:
-        return kIsWeb
+        return kIsWeb && platform == null
             ? true
-            : !kIsWeb &&
+            : ((kIsWeb && platform != null) || !kIsWeb) &&
                 [
                   TargetPlatform.android,
                   TargetPlatform.iOS,
@@ -1722,19 +1722,19 @@ extension _PlatformWebViewCreationParamsPropertySupported
                 ].contains(platform ?? defaultTargetPlatform);
       case PlatformWebViewCreationParamsProperty
             .onDidReceiveServerRedirectForProvisionalNavigation:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.iOS, TargetPlatform.macOS]
                 .contains(platform ?? defaultTargetPlatform);
       case PlatformWebViewCreationParamsProperty.onDownloadStart:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android, TargetPlatform.iOS]
                 .contains(platform ?? defaultTargetPlatform);
       case PlatformWebViewCreationParamsProperty.onDownloadStartRequest:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android, TargetPlatform.iOS, TargetPlatform.macOS]
                 .contains(platform ?? defaultTargetPlatform);
       case PlatformWebViewCreationParamsProperty.onDownloadStarting:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [
               TargetPlatform.android,
               TargetPlatform.iOS,
@@ -1742,75 +1742,75 @@ extension _PlatformWebViewCreationParamsPropertySupported
               TargetPlatform.windows
             ].contains(platform ?? defaultTargetPlatform);
       case PlatformWebViewCreationParamsProperty.onEnterFullscreen:
-        return kIsWeb
+        return kIsWeb && platform == null
             ? true
-            : !kIsWeb &&
+            : ((kIsWeb && platform != null) || !kIsWeb) &&
                 [
                   TargetPlatform.android,
                   TargetPlatform.iOS,
                   TargetPlatform.macOS
                 ].contains(platform ?? defaultTargetPlatform);
       case PlatformWebViewCreationParamsProperty.onExitFullscreen:
-        return kIsWeb
+        return kIsWeb && platform == null
             ? true
-            : !kIsWeb &&
+            : ((kIsWeb && platform != null) || !kIsWeb) &&
                 [
                   TargetPlatform.android,
                   TargetPlatform.iOS,
                   TargetPlatform.macOS
                 ].contains(platform ?? defaultTargetPlatform);
       case PlatformWebViewCreationParamsProperty.onFindResultReceived:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android, TargetPlatform.iOS, TargetPlatform.macOS]
                 .contains(platform ?? defaultTargetPlatform);
       case PlatformWebViewCreationParamsProperty.onFormResubmission:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android]
                 .contains(platform ?? defaultTargetPlatform);
       case PlatformWebViewCreationParamsProperty
             .onGeolocationPermissionsHidePrompt:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android]
                 .contains(platform ?? defaultTargetPlatform);
       case PlatformWebViewCreationParamsProperty
             .onGeolocationPermissionsShowPrompt:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android]
                 .contains(platform ?? defaultTargetPlatform);
       case PlatformWebViewCreationParamsProperty.onJsAlert:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android, TargetPlatform.iOS, TargetPlatform.macOS]
                 .contains(platform ?? defaultTargetPlatform);
       case PlatformWebViewCreationParamsProperty.onJsBeforeUnload:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android]
                 .contains(platform ?? defaultTargetPlatform);
       case PlatformWebViewCreationParamsProperty.onJsConfirm:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android, TargetPlatform.iOS, TargetPlatform.macOS]
                 .contains(platform ?? defaultTargetPlatform);
       case PlatformWebViewCreationParamsProperty.onJsPrompt:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android, TargetPlatform.iOS, TargetPlatform.macOS]
                 .contains(platform ?? defaultTargetPlatform);
       case PlatformWebViewCreationParamsProperty.onLoadError:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android, TargetPlatform.iOS, TargetPlatform.macOS]
                 .contains(platform ?? defaultTargetPlatform);
       case PlatformWebViewCreationParamsProperty.onLoadHttpError:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android, TargetPlatform.iOS, TargetPlatform.macOS]
                 .contains(platform ?? defaultTargetPlatform);
       case PlatformWebViewCreationParamsProperty.onLoadResource:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android, TargetPlatform.iOS, TargetPlatform.macOS]
                 .contains(platform ?? defaultTargetPlatform);
       case PlatformWebViewCreationParamsProperty.onLoadResourceCustomScheme:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android, TargetPlatform.iOS, TargetPlatform.macOS]
                 .contains(platform ?? defaultTargetPlatform);
       case PlatformWebViewCreationParamsProperty.onLoadResourceWithCustomScheme:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [
               TargetPlatform.android,
               TargetPlatform.iOS,
@@ -1818,9 +1818,9 @@ extension _PlatformWebViewCreationParamsPropertySupported
               TargetPlatform.windows
             ].contains(platform ?? defaultTargetPlatform);
       case PlatformWebViewCreationParamsProperty.onLoadStart:
-        return kIsWeb
+        return kIsWeb && platform == null
             ? true
-            : !kIsWeb &&
+            : ((kIsWeb && platform != null) || !kIsWeb) &&
                 [
                   TargetPlatform.android,
                   TargetPlatform.iOS,
@@ -1828,9 +1828,9 @@ extension _PlatformWebViewCreationParamsPropertySupported
                   TargetPlatform.windows
                 ].contains(platform ?? defaultTargetPlatform);
       case PlatformWebViewCreationParamsProperty.onLoadStop:
-        return kIsWeb
+        return kIsWeb && platform == null
             ? true
-            : !kIsWeb &&
+            : ((kIsWeb && platform != null) || !kIsWeb) &&
                 [
                   TargetPlatform.android,
                   TargetPlatform.iOS,
@@ -1838,28 +1838,28 @@ extension _PlatformWebViewCreationParamsPropertySupported
                   TargetPlatform.windows
                 ].contains(platform ?? defaultTargetPlatform);
       case PlatformWebViewCreationParamsProperty.onLongPressHitTestResult:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android, TargetPlatform.iOS]
                 .contains(platform ?? defaultTargetPlatform);
       case PlatformWebViewCreationParamsProperty
             .onMicrophoneCaptureStateChanged:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.iOS, TargetPlatform.macOS]
                 .contains(platform ?? defaultTargetPlatform);
       case PlatformWebViewCreationParamsProperty.onNavigationResponse:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.iOS, TargetPlatform.macOS]
                 .contains(platform ?? defaultTargetPlatform);
       case PlatformWebViewCreationParamsProperty.onOverScrolled:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android, TargetPlatform.iOS]
                 .contains(platform ?? defaultTargetPlatform);
       case PlatformWebViewCreationParamsProperty.onPageCommitVisible:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android, TargetPlatform.iOS, TargetPlatform.macOS]
                 .contains(platform ?? defaultTargetPlatform);
       case PlatformWebViewCreationParamsProperty.onPermissionRequest:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [
               TargetPlatform.android,
               TargetPlatform.iOS,
@@ -1867,28 +1867,28 @@ extension _PlatformWebViewCreationParamsPropertySupported
               TargetPlatform.windows
             ].contains(platform ?? defaultTargetPlatform);
       case PlatformWebViewCreationParamsProperty.onPermissionRequestCanceled:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android]
                 .contains(platform ?? defaultTargetPlatform);
       case PlatformWebViewCreationParamsProperty.onPrint:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android, TargetPlatform.iOS]
                 .contains(platform ?? defaultTargetPlatform);
       case PlatformWebViewCreationParamsProperty.onPrintRequest:
-        return kIsWeb
+        return kIsWeb && platform == null
             ? true
-            : !kIsWeb &&
+            : ((kIsWeb && platform != null) || !kIsWeb) &&
                 [
                   TargetPlatform.android,
                   TargetPlatform.iOS,
                   TargetPlatform.macOS
                 ].contains(platform ?? defaultTargetPlatform);
       case PlatformWebViewCreationParamsProperty.onProcessFailed:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.windows]
                 .contains(platform ?? defaultTargetPlatform);
       case PlatformWebViewCreationParamsProperty.onProgressChanged:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [
               TargetPlatform.android,
               TargetPlatform.iOS,
@@ -1896,7 +1896,7 @@ extension _PlatformWebViewCreationParamsPropertySupported
               TargetPlatform.windows
             ].contains(platform ?? defaultTargetPlatform);
       case PlatformWebViewCreationParamsProperty.onReceivedClientCertRequest:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [
               TargetPlatform.android,
               TargetPlatform.iOS,
@@ -1904,7 +1904,7 @@ extension _PlatformWebViewCreationParamsPropertySupported
               TargetPlatform.windows
             ].contains(platform ?? defaultTargetPlatform);
       case PlatformWebViewCreationParamsProperty.onReceivedError:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [
               TargetPlatform.android,
               TargetPlatform.iOS,
@@ -1912,7 +1912,7 @@ extension _PlatformWebViewCreationParamsPropertySupported
               TargetPlatform.windows
             ].contains(platform ?? defaultTargetPlatform);
       case PlatformWebViewCreationParamsProperty.onReceivedHttpAuthRequest:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [
               TargetPlatform.android,
               TargetPlatform.iOS,
@@ -1920,7 +1920,7 @@ extension _PlatformWebViewCreationParamsPropertySupported
               TargetPlatform.windows
             ].contains(platform ?? defaultTargetPlatform);
       case PlatformWebViewCreationParamsProperty.onReceivedHttpError:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [
               TargetPlatform.android,
               TargetPlatform.iOS,
@@ -1928,16 +1928,16 @@ extension _PlatformWebViewCreationParamsPropertySupported
               TargetPlatform.windows
             ].contains(platform ?? defaultTargetPlatform);
       case PlatformWebViewCreationParamsProperty.onReceivedIcon:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android]
                 .contains(platform ?? defaultTargetPlatform);
       case PlatformWebViewCreationParamsProperty.onReceivedLoginRequest:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android]
                 .contains(platform ?? defaultTargetPlatform);
       case PlatformWebViewCreationParamsProperty
             .onReceivedServerTrustAuthRequest:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [
               TargetPlatform.android,
               TargetPlatform.iOS,
@@ -1945,46 +1945,46 @@ extension _PlatformWebViewCreationParamsPropertySupported
               TargetPlatform.windows
             ].contains(platform ?? defaultTargetPlatform);
       case PlatformWebViewCreationParamsProperty.onReceivedTouchIconUrl:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android]
                 .contains(platform ?? defaultTargetPlatform);
       case PlatformWebViewCreationParamsProperty.onRenderProcessGone:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android, TargetPlatform.windows]
                 .contains(platform ?? defaultTargetPlatform);
       case PlatformWebViewCreationParamsProperty.onRenderProcessResponsive:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android]
                 .contains(platform ?? defaultTargetPlatform);
       case PlatformWebViewCreationParamsProperty.onRenderProcessUnresponsive:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android, TargetPlatform.windows]
                 .contains(platform ?? defaultTargetPlatform);
       case PlatformWebViewCreationParamsProperty.onRequestFocus:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android]
                 .contains(platform ?? defaultTargetPlatform);
       case PlatformWebViewCreationParamsProperty.onSafeBrowsingHit:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android]
                 .contains(platform ?? defaultTargetPlatform);
       case PlatformWebViewCreationParamsProperty.onScrollChanged:
-        return kIsWeb
+        return kIsWeb && platform == null
             ? true
-            : !kIsWeb &&
+            : ((kIsWeb && platform != null) || !kIsWeb) &&
                 [
                   TargetPlatform.android,
                   TargetPlatform.iOS,
                   TargetPlatform.macOS
                 ].contains(platform ?? defaultTargetPlatform);
       case PlatformWebViewCreationParamsProperty.onShowFileChooser:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android]
                 .contains(platform ?? defaultTargetPlatform);
       case PlatformWebViewCreationParamsProperty.onTitleChanged:
-        return kIsWeb
+        return kIsWeb && platform == null
             ? true
-            : !kIsWeb &&
+            : ((kIsWeb && platform != null) || !kIsWeb) &&
                 [
                   TargetPlatform.android,
                   TargetPlatform.iOS,
@@ -1992,9 +1992,9 @@ extension _PlatformWebViewCreationParamsPropertySupported
                   TargetPlatform.windows
                 ].contains(platform ?? defaultTargetPlatform);
       case PlatformWebViewCreationParamsProperty.onUpdateVisitedHistory:
-        return kIsWeb
+        return kIsWeb && platform == null
             ? true
-            : !kIsWeb &&
+            : ((kIsWeb && platform != null) || !kIsWeb) &&
                 [
                   TargetPlatform.android,
                   TargetPlatform.iOS,
@@ -2003,13 +2003,13 @@ extension _PlatformWebViewCreationParamsPropertySupported
                 ].contains(platform ?? defaultTargetPlatform);
       case PlatformWebViewCreationParamsProperty
             .onWebContentProcessDidTerminate:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.iOS, TargetPlatform.macOS, TargetPlatform.windows]
                 .contains(platform ?? defaultTargetPlatform);
       case PlatformWebViewCreationParamsProperty.onWebViewCreated:
-        return kIsWeb
+        return kIsWeb && platform == null
             ? true
-            : !kIsWeb &&
+            : ((kIsWeb && platform != null) || !kIsWeb) &&
                 [
                   TargetPlatform.android,
                   TargetPlatform.iOS,
@@ -2017,54 +2017,54 @@ extension _PlatformWebViewCreationParamsPropertySupported
                   TargetPlatform.windows
                 ].contains(platform ?? defaultTargetPlatform);
       case PlatformWebViewCreationParamsProperty.onWindowBlur:
-        return kIsWeb
+        return kIsWeb && platform == null
             ? true
-            : !kIsWeb &&
+            : ((kIsWeb && platform != null) || !kIsWeb) &&
                 [
                   TargetPlatform.android,
                   TargetPlatform.iOS,
                   TargetPlatform.macOS
                 ].contains(platform ?? defaultTargetPlatform);
       case PlatformWebViewCreationParamsProperty.onWindowFocus:
-        return kIsWeb
+        return kIsWeb && platform == null
             ? true
-            : !kIsWeb &&
+            : ((kIsWeb && platform != null) || !kIsWeb) &&
                 [
                   TargetPlatform.android,
                   TargetPlatform.iOS,
                   TargetPlatform.macOS
                 ].contains(platform ?? defaultTargetPlatform);
       case PlatformWebViewCreationParamsProperty.onZoomScaleChanged:
-        return kIsWeb
+        return kIsWeb && platform == null
             ? true
-            : !kIsWeb &&
+            : ((kIsWeb && platform != null) || !kIsWeb) &&
                 [
                   TargetPlatform.android,
                   TargetPlatform.iOS,
                   TargetPlatform.windows
                 ].contains(platform ?? defaultTargetPlatform);
       case PlatformWebViewCreationParamsProperty.pullToRefreshController:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android, TargetPlatform.iOS]
                 .contains(platform ?? defaultTargetPlatform);
       case PlatformWebViewCreationParamsProperty.shouldAllowDeprecatedTLS:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.iOS, TargetPlatform.macOS]
                 .contains(platform ?? defaultTargetPlatform);
       case PlatformWebViewCreationParamsProperty.shouldInterceptAjaxRequest:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android, TargetPlatform.iOS, TargetPlatform.macOS]
                 .contains(platform ?? defaultTargetPlatform);
       case PlatformWebViewCreationParamsProperty.shouldInterceptFetchRequest:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android, TargetPlatform.iOS, TargetPlatform.macOS]
                 .contains(platform ?? defaultTargetPlatform);
       case PlatformWebViewCreationParamsProperty.shouldInterceptRequest:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android, TargetPlatform.windows]
                 .contains(platform ?? defaultTargetPlatform);
       case PlatformWebViewCreationParamsProperty.shouldOverrideUrlLoading:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [
               TargetPlatform.android,
               TargetPlatform.iOS,
@@ -2072,9 +2072,9 @@ extension _PlatformWebViewCreationParamsPropertySupported
               TargetPlatform.windows
             ].contains(platform ?? defaultTargetPlatform);
       case PlatformWebViewCreationParamsProperty.windowId:
-        return kIsWeb
+        return kIsWeb && platform == null
             ? true
-            : !kIsWeb &&
+            : ((kIsWeb && platform != null) || !kIsWeb) &&
                 [
                   TargetPlatform.android,
                   TargetPlatform.iOS,

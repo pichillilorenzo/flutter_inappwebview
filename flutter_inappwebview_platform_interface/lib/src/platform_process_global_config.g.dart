@@ -190,7 +190,7 @@ extension _PlatformProcessGlobalConfigCreationParamsClassSupported
   ///Use the [PlatformProcessGlobalConfigCreationParams.isClassSupported] method to check if this class is supported at runtime.
   ///{@endtemplate}
   static bool isClassSupported({TargetPlatform? platform}) {
-    return !kIsWeb &&
+    return ((kIsWeb && platform != null) || !kIsWeb) &&
         [TargetPlatform.android].contains(platform ?? defaultTargetPlatform);
   }
 }
@@ -205,7 +205,7 @@ extension _PlatformProcessGlobalConfigClassSupported
   ///Use the [PlatformProcessGlobalConfig.isClassSupported] method to check if this class is supported at runtime.
   ///{@endtemplate}
   static bool isClassSupported({TargetPlatform? platform}) {
-    return !kIsWeb &&
+    return ((kIsWeb && platform != null) || !kIsWeb) &&
         [TargetPlatform.android].contains(platform ?? defaultTargetPlatform);
   }
 }
@@ -233,7 +233,7 @@ extension _PlatformProcessGlobalConfigMethodSupported
       {TargetPlatform? platform}) {
     switch (method) {
       case PlatformProcessGlobalConfigMethod.apply:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android]
                 .contains(platform ?? defaultTargetPlatform);
     }
@@ -250,7 +250,7 @@ extension _ProcessGlobalConfigSettingsClassSupported
   ///Use the [ProcessGlobalConfigSettings.isClassSupported] method to check if this class is supported at runtime.
   ///{@endtemplate}
   static bool isClassSupported({TargetPlatform? platform}) {
-    return !kIsWeb &&
+    return ((kIsWeb && platform != null) || !kIsWeb) &&
         [TargetPlatform.android].contains(platform ?? defaultTargetPlatform);
   }
 }
@@ -288,11 +288,11 @@ extension _ProcessGlobalConfigSettingsPropertySupported
       {TargetPlatform? platform}) {
     switch (property) {
       case ProcessGlobalConfigSettingsProperty.dataDirectorySuffix:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android]
                 .contains(platform ?? defaultTargetPlatform);
       case ProcessGlobalConfigSettingsProperty.directoryBasePaths:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android]
                 .contains(platform ?? defaultTargetPlatform);
     }

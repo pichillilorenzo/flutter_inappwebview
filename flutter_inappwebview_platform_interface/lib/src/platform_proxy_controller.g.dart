@@ -186,7 +186,7 @@ extension _PlatformProxyControllerCreationParamsClassSupported
   ///Use the [PlatformProxyControllerCreationParams.isClassSupported] method to check if this class is supported at runtime.
   ///{@endtemplate}
   static bool isClassSupported({TargetPlatform? platform}) {
-    return !kIsWeb &&
+    return ((kIsWeb && platform != null) || !kIsWeb) &&
         [TargetPlatform.android, TargetPlatform.iOS, TargetPlatform.macOS]
             .contains(platform ?? defaultTargetPlatform);
   }
@@ -203,7 +203,7 @@ extension _PlatformProxyControllerClassSupported on PlatformProxyController {
   ///Use the [PlatformProxyController.isClassSupported] method to check if this class is supported at runtime.
   ///{@endtemplate}
   static bool isClassSupported({TargetPlatform? platform}) {
-    return !kIsWeb &&
+    return ((kIsWeb && platform != null) || !kIsWeb) &&
         [TargetPlatform.android, TargetPlatform.iOS, TargetPlatform.macOS]
             .contains(platform ?? defaultTargetPlatform);
   }
@@ -246,11 +246,11 @@ extension _PlatformProxyControllerMethodSupported on PlatformProxyController {
       {TargetPlatform? platform}) {
     switch (method) {
       case PlatformProxyControllerMethod.clearProxyOverride:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android, TargetPlatform.iOS, TargetPlatform.macOS]
                 .contains(platform ?? defaultTargetPlatform);
       case PlatformProxyControllerMethod.setProxyOverride:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android, TargetPlatform.iOS, TargetPlatform.macOS]
                 .contains(platform ?? defaultTargetPlatform);
     }
@@ -268,7 +268,7 @@ extension _ProxySettingsClassSupported on ProxySettings {
   ///Use the [ProxySettings.isClassSupported] method to check if this class is supported at runtime.
   ///{@endtemplate}
   static bool isClassSupported({TargetPlatform? platform}) {
-    return !kIsWeb &&
+    return ((kIsWeb && platform != null) || !kIsWeb) &&
         [TargetPlatform.android, TargetPlatform.iOS, TargetPlatform.macOS]
             .contains(platform ?? defaultTargetPlatform);
   }
@@ -350,27 +350,27 @@ extension _ProxySettingsPropertySupported on ProxySettings {
       {TargetPlatform? platform}) {
     switch (property) {
       case ProxySettingsProperty.bypassRules:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android]
                 .contains(platform ?? defaultTargetPlatform);
       case ProxySettingsProperty.bypassSimpleHostnames:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android]
                 .contains(platform ?? defaultTargetPlatform);
       case ProxySettingsProperty.directs:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android]
                 .contains(platform ?? defaultTargetPlatform);
       case ProxySettingsProperty.proxyRules:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android, TargetPlatform.iOS, TargetPlatform.macOS]
                 .contains(platform ?? defaultTargetPlatform);
       case ProxySettingsProperty.removeImplicitRules:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android]
                 .contains(platform ?? defaultTargetPlatform);
       case ProxySettingsProperty.reverseBypassEnabled:
-        return !kIsWeb &&
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android]
                 .contains(platform ?? defaultTargetPlatform);
     }

@@ -171,6 +171,15 @@ class IOSInAppWebViewPlatform extends InAppWebViewPlatform {
     return IOSWebMessageListener(params);
   }
 
+  /// Creates a new empty [IOSWebMessageListener] to access static methods.
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [WebMessageListener] in `flutter_inappwebview` instead.
+  @override
+  IOSWebMessageListener createPlatformWebMessageListenerStatic() {
+    return IOSWebMessageListener.static();
+  }
+
   /// Creates a new [IOSJavaScriptReplyProxy].
   ///
   /// This function should only be called by the app-facing package.

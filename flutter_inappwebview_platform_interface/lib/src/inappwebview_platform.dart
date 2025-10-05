@@ -224,6 +224,15 @@ abstract class InAppWebViewPlatform extends PlatformInterface {
         'createPlatformWebMessageListener is not implemented on the current platform.');
   }
 
+  /// Creates a new empty [PlatformWebMessageListener] to access static methods.
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [WebMessageListener] in `flutter_inappwebview` instead.
+  PlatformWebMessageListener createPlatformWebMessageListenerStatic() {
+    throw UnimplementedError(
+        'createPlatformWebMessageListenerStatic is not implemented on the current platform.');
+  }
+
   /// Creates a new [PlatformJavaScriptReplyProxy].
   ///
   /// This function should only be called by the app-facing package.

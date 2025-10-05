@@ -160,6 +160,15 @@ class MacOSInAppWebViewPlatform extends InAppWebViewPlatform {
     return MacOSWebMessageListener(params);
   }
 
+  /// Creates a new empty [MacOSWebMessageListener] to access static methods.
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [WebMessageListener] in `flutter_inappwebview` instead.
+  @override
+  MacOSWebMessageListener createPlatformWebMessageListenerStatic() {
+    return MacOSWebMessageListener.static();
+  }
+
   /// Creates a new [MacOSJavaScriptReplyProxy].
   ///
   /// This function should only be called by the app-facing package.

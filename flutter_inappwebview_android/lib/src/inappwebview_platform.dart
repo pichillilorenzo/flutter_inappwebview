@@ -176,6 +176,15 @@ class AndroidInAppWebViewPlatform extends InAppWebViewPlatform {
     return AndroidWebMessageListener(params);
   }
 
+  /// Creates a new empty [AndroidWebMessageListener] to access static methods.
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [WebMessageListener] in `flutter_inappwebview` instead.
+  @override
+  AndroidWebMessageListener createPlatformWebMessageListenerStatic() {
+    return AndroidWebMessageListener.static();
+  }
+
   /// Creates a new [AndroidJavaScriptReplyProxy].
   ///
   /// This function should only be called by the app-facing package.

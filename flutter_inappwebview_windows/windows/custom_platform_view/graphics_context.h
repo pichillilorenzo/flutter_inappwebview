@@ -12,6 +12,7 @@ namespace flutter_inappwebview_plugin
   class GraphicsContext {
   public:
     GraphicsContext(rx::RoHelper* rohelper);
+    ~GraphicsContext();
 
     inline bool IsValid() const { return valid_; }
 

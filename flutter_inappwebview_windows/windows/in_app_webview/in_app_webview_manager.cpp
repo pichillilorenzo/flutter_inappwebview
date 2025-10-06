@@ -256,6 +256,26 @@ namespace flutter_inappwebview_plugin
     keepAliveWebViews.clear();
     windowWebViews.clear();
     UnregisterClass(windowClass_.lpszClassName, nullptr);
+    
+    // Properly cleanup static DirectX resources to prevent hanging process
+    if (compositor_) {
+      // Release the extra reference we added in constructor
+      compositor_->Release();
+      compositor_ = nullptr;
+    }
+    
+    // Reset graphics context to release DirectX resources
+    graphics_context_.reset();
+    
+    // Cleanup dispatcher queue controller
+    if (dispatcher_queue_controller_) {
+      dispatcher_queue_controller_ = nullptr;
+    }
+    
+    // Reset RoHelper
+    rohelper_.reset();
+    
+    valid_ = false;
     plugin = nullptr;
   }
 }

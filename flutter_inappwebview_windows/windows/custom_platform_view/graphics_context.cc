@@ -22,6 +22,20 @@ namespace flutter_inappwebview_plugin
     valid_ = true;
   }
 
+  GraphicsContext::~GraphicsContext()
+  {
+    // Explicitly release DirectX resources to prevent hanging process
+    if (device_context_) {
+      device_context_->ClearState();
+      device_context_->Flush();
+      device_context_ = nullptr;
+    }
+    
+    device_winrt_ = nullptr;
+    device_ = nullptr;
+    valid_ = false;
+  }
+
   winrt::com_ptr<ABI::Windows::UI::Composition::ICompositor>
     GraphicsContext::CreateCompositor()
   {

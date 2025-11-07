@@ -2656,8 +2656,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
             return !handledByClient
         }
         callback.defaultBehaviour = { [weak self] (handledByClient: Bool?) in
-            inAppWebViewManager?.windowWebViews.removeValue(forKey: windowId)
-            inAppWebViewManager?.cleanupWindowWebViews()
+            inAppWebViewManager?.removeWindowWebView(for: windowId)
             self?.loadUrl(urlRequest: navigationAction.request, allowingReadAccessTo: nil)
         }
         callback.error = { [weak callback] (code: String, message: String?, details: Any?) in
@@ -2715,7 +2714,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
         
         // Clean up the window webview from manager when it's closed
         if let wId = windowId {
-            plugin?.inAppWebViewManager?.windowWebViews.removeValue(forKey: wId)
+            plugin?.inAppWebViewManager?.removeWindowWebView(for: wId)
         }
         // Always cleanup to remove any stale references
         plugin?.inAppWebViewManager?.cleanupWindowWebViews()
@@ -2907,16 +2906,23 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
             return self
         }
         
-        // Clean up any invalid entries first
-        plugin?.inAppWebViewManager?.cleanupWindowWebViews()
-        
-        guard let webViewTransport = plugin?.inAppWebViewManager?.windowWebViews[wId],
-              let transportWebView = webViewTransport.webView,
-              transportWebView.plugin != nil else {
-            // If the webView is invalid, remove it from the manager
-            plugin?.inAppWebViewManager?.windowWebViews.removeValue(forKey: wId)
+        guard let webViewTransport = plugin?.inAppWebViewManager?.windowWebViews[wId] else {
+            // windowId not found in manager
             return self
         }
+        
+        guard let transportWebView = webViewTransport.webView else {
+            // webView has been deallocated, remove from manager
+            plugin?.inAppWebViewManager?.removeWindowWebView(for: wId)
+            return self
+        }
+        
+        guard transportWebView.plugin != nil else {
+            // webView plugin is nil, remove from manager
+            plugin?.inAppWebViewManager?.removeWindowWebView(for: wId)
+            return self
+        }
+        
         return transportWebView
     }
 
@@ -3543,8 +3549,7 @@ if(window.\(JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME())[\(_callHandlerID)] 
                 configuration.userContentController.removeAllContentRuleLists()
             }
         } else if let wId = windowId {
-            plugin?.inAppWebViewManager?.windowWebViews.removeValue(forKey: wId)
-            plugin?.inAppWebViewManager?.cleanupWindowWebViews()
+            plugin?.inAppWebViewManager?.removeWindowWebView(for: wId)
         }
         configuration.userContentController.dispose(windowId: windowId)
         NotificationCenter.default.removeObserver(self)

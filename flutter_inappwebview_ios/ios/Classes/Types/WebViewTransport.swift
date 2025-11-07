@@ -8,11 +8,16 @@
 import Foundation
 
 public class WebViewTransport: NSObject {
-    weak var webView: InAppWebView?
+    var webView: InAppWebView?
     var request: URLRequest
     
     init(webView: InAppWebView, request: URLRequest) {
         self.webView = webView
         self.request = request
+    }
+    
+    // Explicitly release the webView to break potential cycles
+    public func dispose() {
+        webView = nil
     }
 }

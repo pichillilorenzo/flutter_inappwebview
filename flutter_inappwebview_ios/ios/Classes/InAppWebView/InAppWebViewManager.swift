@@ -21,10 +21,23 @@ public class InAppWebViewManager: ChannelDelegate {
     // Clean up deallocated webviews from windowWebViews
     public func cleanupWindowWebViews() {
         let keysToRemove = windowWebViews.compactMap { (key, transport) -> Int64? in
-            return transport.webView == nil ? key : nil
+            if let webView = transport.webView, webView.plugin == nil {
+                // WebView is invalid, dispose transport and mark for removal
+                transport.dispose()
+                return key
+            }
+            return nil
         }
         for key in keysToRemove {
             windowWebViews.removeValue(forKey: key)
+        }
+    }
+    
+    // Remove and dispose a specific window webview
+    public func removeWindowWebView(for windowId: Int64) {
+        if let transport = windowWebViews[windowId] {
+            transport.dispose()
+            windowWebViews.removeValue(forKey: windowId)
         }
     }
     
@@ -134,6 +147,7 @@ public class InAppWebViewManager: ChannelDelegate {
             }
         }
         keepAliveWebViews.removeAll()
+        cleanupWindowWebViews()
         windowWebViews.removeAll()
         webViewForUserAgent = nil
         defaultUserAgent = nil

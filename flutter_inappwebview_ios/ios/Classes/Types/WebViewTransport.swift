@@ -8,7 +8,7 @@
 import Foundation
 
 public class WebViewTransport: NSObject {
-    var webView: InAppWebView
+    weak var webView: InAppWebView?
     var request: URLRequest
     
     init(webView: InAppWebView, request: URLRequest) {

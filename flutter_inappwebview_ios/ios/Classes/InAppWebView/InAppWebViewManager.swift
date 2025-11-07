@@ -18,6 +18,16 @@ public class InAppWebViewManager: ChannelDelegate {
     var windowWebViews: [Int64:WebViewTransport] = [:]
     var windowAutoincrementId: Int64 = 0
     
+    // Clean up deallocated webviews from windowWebViews
+    public func cleanupWindowWebViews() {
+        let keysToRemove = windowWebViews.compactMap { (key, transport) -> Int64? in
+            return transport.webView == nil ? key : nil
+        }
+        for key in keysToRemove {
+            windowWebViews.removeValue(forKey: key)
+        }
+    }
+    
     init(plugin: SwiftFlutterPlugin) {
         super.init(channel: FlutterMethodChannel(name: InAppWebViewManager.METHOD_CHANNEL_NAME, binaryMessenger: plugin.registrar.messenger()))
         self.plugin = plugin

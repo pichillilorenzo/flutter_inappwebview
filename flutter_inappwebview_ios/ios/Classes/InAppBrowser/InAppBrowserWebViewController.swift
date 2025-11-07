@@ -66,8 +66,10 @@ public class InAppBrowserWebViewController: UIViewController, InAppBrowserDelega
         }
         
         let preWebviewConfiguration = InAppWebView.preWKWebViewConfiguration(settings: webViewSettings)
-        if let wId = windowId, let webViewTransport = plugin.inAppWebViewManager?.windowWebViews[wId] {
-            webView = webViewTransport.webView
+        if let wId = windowId, 
+           let webViewTransport = plugin.inAppWebViewManager?.windowWebViews[wId],
+           let transportWebView = webViewTransport.webView {
+            webView = transportWebView
             webView!.contextMenu = contextMenu
             webView!.initialUserScripts = userScripts
         } else {

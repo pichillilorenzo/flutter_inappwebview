@@ -40,8 +40,10 @@ public class FlutterWebViewController: NSObject, FlutterPlatformView, Disposable
         
         var webView: InAppWebView?
         
-        if let wId = windowId, let webViewTransport = plugin.inAppWebViewManager?.windowWebViews[wId] {
-            webView = webViewTransport.webView
+        if let wId = windowId, 
+           let webViewTransport = plugin.inAppWebViewManager?.windowWebViews[wId],
+           let transportWebView = webViewTransport.webView {
+            webView = transportWebView
             webView!.id = viewId
             webView!.plugin = plugin
             let channel = FlutterMethodChannel(name: InAppWebView.METHOD_CHANNEL_NAME_PREFIX + String(describing: viewId),

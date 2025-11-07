@@ -2654,9 +2654,8 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
             return !handledByClient
         }
         callback.defaultBehaviour = { [weak self] (handledByClient: Bool?) in
-            if inAppWebViewManager?.windowWebViews[windowId] != nil {
-                inAppWebViewManager?.windowWebViews.removeValue(forKey: windowId)
-            }
+            inAppWebViewManager?.windowWebViews.removeValue(forKey: windowId)
+            inAppWebViewManager?.cleanupWindowWebViews()
             self?.loadUrl(urlRequest: navigationAction.request, allowingReadAccessTo: nil)
         }
         callback.error = { [weak callback] (code: String, message: String?, details: Any?) in
@@ -2946,8 +2945,11 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
             
             let _windowId = body["_windowId"] as? Int64
             var webView = self
-            if let wId = _windowId, let webViewTransport = plugin?.inAppWebViewManager?.windowWebViews[wId] {
-                webView = webViewTransport.webView
+            if let wId = _windowId, 
+               let webViewTransport = plugin?.inAppWebViewManager?.windowWebViews[wId],
+               let transportWebView = webViewTransport.webView,
+               transportWebView.plugin != nil {
+                webView = transportWebView
             }
             var isInternalHandler = true
             switch (handlerName) {
@@ -3510,8 +3512,9 @@ if(window.\(JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME())[\(_callHandlerID)] 
             if #available(iOS 11.0, *) {
                 configuration.userContentController.removeAllContentRuleLists()
             }
-        } else if let wId = windowId, plugin?.inAppWebViewManager?.windowWebViews[wId] != nil {
+        } else if let wId = windowId {
             plugin?.inAppWebViewManager?.windowWebViews.removeValue(forKey: wId)
+            plugin?.inAppWebViewManager?.cleanupWindowWebViews()
         }
         configuration.userContentController.dispose(windowId: windowId)
         NotificationCenter.default.removeObserver(self)

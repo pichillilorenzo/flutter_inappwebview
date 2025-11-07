@@ -2893,6 +2893,17 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
 //        channel?.invokeMethod("onContextMenuWillPresentForElement", arguments: arguments)
 //    }
     
+    private func getWebViewForWindowId(_ windowId: Int64?) -> InAppWebView {
+        guard let wId = windowId, 
+              let webViewTransport = plugin?.inAppWebViewManager?.windowWebViews[wId],
+              let transportWebView = webViewTransport.webView,
+              transportWebView.plugin != nil,
+              transportWebView.channelDelegate != nil else {
+            return self
+        }
+        return transportWebView
+    }
+
     public func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
         guard javaScriptBridgeEnabled else {
             return
@@ -2944,16 +2955,10 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
             }
             
             let _windowId = body["_windowId"] as? Int64
-            var webView = self
-            if let wId = _windowId, 
-               let webViewTransport = plugin?.inAppWebViewManager?.windowWebViews[wId],
-               let transportWebView = webViewTransport.webView,
-               transportWebView.plugin != nil {
-                webView = transportWebView
-            }
             var isInternalHandler = true
             switch (handlerName) {
                 case "onPrintRequest":
+                    let webView = getWebViewForWindowId(_windowId)
                     let settings = PrintJobSettings()
                     settings.handledByClient = true
                     if let printJobId = webView.printCurrentPage(settings: settings) {
@@ -3002,6 +3007,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
                             }
                             let consoleMessage = jsonData["message"] as? String ?? ""
                             
+                            let webView = getWebViewForWindowId(_windowId)
                             webView.channelDelegate?.onConsoleMessage(message: consoleMessage, messageLevel: messageLevel)
                         }
                     }
@@ -3014,6 +3020,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
                            let activeMatchOrdinal = findResult["activeMatchOrdinal"] as? Int,
                            let numberOfMatches = findResult["numberOfMatches"] as? Int,
                            let isDoneCounting = findResult["isDoneCounting"] as? Bool {
+                            let webView = getWebViewForWindowId(_windowId)
                             webView.findInteractionController?.channelDelegate?.onFindResultReceived(activeMatchOrdinal: activeMatchOrdinal, numberOfMatches: numberOfMatches, isDoneCounting: isDoneCounting)
                             webView.channelDelegate?.onFindResultReceived(activeMatchOrdinal: activeMatchOrdinal, numberOfMatches: numberOfMatches, isDoneCounting: isDoneCounting)
                         }
@@ -3023,13 +3030,15 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
                     if let args = body["args"] as? String, let data = args.data(using: .utf8) {
                         let jsonArgs = try? JSONSerialization.jsonObject(with: data, options: .mutableContainers) as? [[String: Any]]
                         if let jsonData = jsonArgs?.first,
-                           let resultUuid = jsonData["resultUuid"] as? String,
-                           let result = webView.callAsyncJavaScriptBelowIOS14Results[resultUuid] {
-                            result([
-                                "value": jsonData["value"],
-                                "error": jsonData["error"]
-                            ])
-                            webView.callAsyncJavaScriptBelowIOS14Results.removeValue(forKey: resultUuid)
+                           let resultUuid = jsonData["resultUuid"] as? String {
+                            let webView = getWebViewForWindowId(_windowId)
+                            if let result = webView.callAsyncJavaScriptBelowIOS14Results[resultUuid] {
+                                result([
+                                    "value": jsonData["value"],
+                                    "error": jsonData["error"]
+                                ])
+                                webView.callAsyncJavaScriptBelowIOS14Results.removeValue(forKey: resultUuid)
+                            }
                         }
                     }
                     break
@@ -3044,6 +3053,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
                                 webMessage = WebMessage.fromMap(map: webMessageMap)
                             }
                             
+                            let webView = getWebViewForWindowId(_windowId)
                             if let webMessageChannel = webView.webMessageChannels[webMessageChannelId] {
                                 webMessageChannel.channelDelegate?.onMessage(index: index, message: webMessage)
                             }
@@ -3059,6 +3069,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
                                 webMessage = WebMessage.fromMap(map: webMessageMap)
                             }
                             
+                            let webView = getWebViewForWindowId(_windowId)
                             if let webMessageListener = webView.webMessageListeners.first(where: ({($0.jsObjectName == jsObjectName)})) {
                                 let isMainFrame = message.frameInfo.isMainFrame
                                 
@@ -3108,25 +3119,27 @@ if(window.\(JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME())[\(_callHandlerID)] 
             
             let args = body["args"] as? String ?? ""
             
+            let webView = getWebViewForWindowId(_windowId)
+            
             let callback = WebViewChannelDelegate.CallJsHandlerCallback()
-            callback.defaultBehaviour = { (response: Any?) in
+            callback.defaultBehaviour = { [weak webView] (response: Any?) in
                 var json = "null"
                 if let r = response as? String {
                     json = r
                 }
                 
-                webView.evaluateJavaScript("""
+                webView?.evaluateJavaScript("""
 if(window.\(JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME())[\(_callHandlerID)] != null) {
     window.\(JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME())[\(_callHandlerID)].resolve(\(json));
     delete window.\(JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME())[\(_callHandlerID)];
 }
 """, completionHandler: nil)
             }
-            callback.error = { (code: String, message: String?, details: Any?) in
+            callback.error = { [weak webView] (code: String, message: String?, details: Any?) in
                 let errorMessage = code + (message != nil ? ", " + (message ?? "") : "")
                 print(errorMessage)
                 
-                webView.evaluateJavaScript("""
+                webView?.evaluateJavaScript("""
 if(window.\(JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME())[\(_callHandlerID)] != null) {
     window.\(JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME())[\(_callHandlerID)].reject(new Error('\(errorMessage.replacingOccurrences(of: "\'", with: "\\'"))'));
     delete window.\(JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME())[\(_callHandlerID)];

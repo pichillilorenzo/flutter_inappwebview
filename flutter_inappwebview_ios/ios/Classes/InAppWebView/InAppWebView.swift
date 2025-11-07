@@ -2637,8 +2637,10 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
             windowId = inAppWebViewManager.windowAutoincrementId
         }
         
-        let windowWebView = InAppWebView(id: nil, plugin: nil, frame: self.bounds, configuration: configuration, contextMenu: nil)
+        let windowWebView = InAppWebView(id: nil, plugin: plugin, frame: self.bounds, configuration: configuration, contextMenu: nil)
         windowWebView.windowId = windowId
+        // Ensure the window webview has proper lifecycle state
+        windowWebView.windowCreated = false
 
         let webViewTransport = WebViewTransport(
             webView: windowWebView,
@@ -2710,6 +2712,13 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
     
     public func webViewDidClose(_ webView: WKWebView) {
         channelDelegate?.onCloseWindow()
+        
+        // Clean up the window webview from manager when it's closed
+        if let wId = windowId {
+            plugin?.inAppWebViewManager?.windowWebViews.removeValue(forKey: wId)
+        }
+        // Always cleanup to remove any stale references
+        plugin?.inAppWebViewManager?.cleanupWindowWebViews()
     }
     
     public func webViewWebContentProcessDidTerminate(_ webView: WKWebView) {
@@ -2894,11 +2903,18 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
 //    }
     
     private func getWebViewForWindowId(_ windowId: Int64?) -> InAppWebView {
-        guard let wId = windowId, 
-              let webViewTransport = plugin?.inAppWebViewManager?.windowWebViews[wId],
+        guard let wId = windowId else {
+            return self
+        }
+        
+        // Clean up any invalid entries first
+        plugin?.inAppWebViewManager?.cleanupWindowWebViews()
+        
+        guard let webViewTransport = plugin?.inAppWebViewManager?.windowWebViews[wId],
               let transportWebView = webViewTransport.webView,
-              transportWebView.plugin != nil,
-              transportWebView.channelDelegate != nil else {
+              transportWebView.plugin != nil else {
+            // If the webView is invalid, remove it from the manager
+            plugin?.inAppWebViewManager?.windowWebViews.removeValue(forKey: wId)
             return self
         }
         return transportWebView
@@ -3496,7 +3512,8 @@ if(window.\(JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME())[\(_callHandlerID)] 
     public func dispose() {
         channelDelegate?.dispose()
         channelDelegate = nil
-        runWindowBeforeCreatedCallbacks()
+        // Clear callbacks without executing them during dispose to avoid crashes
+        windowBeforeCreatedCallbacks.removeAll()
         removeObserver(self, forKeyPath: #keyPath(WKWebView.estimatedProgress))
         removeObserver(self, forKeyPath: #keyPath(WKWebView.url))
         removeObserver(self, forKeyPath: #keyPath(WKWebView.title))

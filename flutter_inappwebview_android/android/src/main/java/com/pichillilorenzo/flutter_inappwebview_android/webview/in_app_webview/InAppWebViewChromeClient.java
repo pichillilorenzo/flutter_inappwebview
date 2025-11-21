@@ -641,6 +641,7 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
       Message href = view.getHandler().obtainMessage();
       view.requestFocusNodeHref(href);
       Bundle data = href.getData();
+      Log.e(LOG_TAG, "data: " + data);
       if (data != null) {
         String imageUrl = data.getString("url");
         if (imageUrl != null && !imageUrl.isEmpty()) {

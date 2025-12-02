@@ -183,6 +183,10 @@ class WebViewFeature {
   static const VISUAL_STATE_CALLBACK = WebViewFeature._internal(
       'VISUAL_STATE_CALLBACK', 'VISUAL_STATE_CALLBACK');
 
+  ///Feature for [isFeatureSupported]. This feature covers [InAppWebViewSettings.webAuthenticationSupport].
+  static const WEB_AUTHENTICATION =
+      WebViewFeature._internal('WEB_AUTHENTICATION', 'WEB_AUTHENTICATION');
+
   ///Feature for [isFeatureSupported]. This feature covers [WebMessagePort.postMessage] with `ArrayBuffer` type,
   ///[InAppWebViewController.postWebMessage] with `ArrayBuffer` type, and [JavaScriptReplyProxy.postMessage] with `ArrayBuffer` type.
   static const WEB_MESSAGE_ARRAY_BUFFER = WebViewFeature._internal(
@@ -273,6 +277,7 @@ class WebViewFeature {
     WebViewFeature.START_SAFE_BROWSING,
     WebViewFeature.TRACING_CONTROLLER_BASIC_USAGE,
     WebViewFeature.VISUAL_STATE_CALLBACK,
+    WebViewFeature.WEB_AUTHENTICATION,
     WebViewFeature.WEB_MESSAGE_ARRAY_BUFFER,
     WebViewFeature.WEB_MESSAGE_CALLBACK_ON_MESSAGE,
     WebViewFeature.WEB_MESSAGE_LISTENER,
@@ -439,6 +444,8 @@ class WebViewFeature {
         return 'TRACING_CONTROLLER_BASIC_USAGE';
       case 'VISUAL_STATE_CALLBACK':
         return 'VISUAL_STATE_CALLBACK';
+      case 'WEB_AUTHENTICATION':
+        return 'WEB_AUTHENTICATION';
       case 'WEB_MESSAGE_ARRAY_BUFFER':
         return 'WEB_MESSAGE_ARRAY_BUFFER';
       case 'WEB_MESSAGE_CALLBACK_ON_MESSAGE':
@@ -642,6 +649,10 @@ class AndroidWebViewFeature {
   static const VISUAL_STATE_CALLBACK = AndroidWebViewFeature._internal(
       'VISUAL_STATE_CALLBACK', 'VISUAL_STATE_CALLBACK');
 
+  ///Feature for [isFeatureSupported]. This feature covers [InAppWebViewSettings.webAuthenticationSupport].
+  static const WEB_AUTHENTICATION = AndroidWebViewFeature._internal(
+      'WEB_AUTHENTICATION', 'WEB_AUTHENTICATION');
+
   ///
   static const WEB_MESSAGE_CALLBACK_ON_MESSAGE =
       AndroidWebViewFeature._internal(
@@ -725,6 +736,7 @@ class AndroidWebViewFeature {
     AndroidWebViewFeature.SUPPRESS_ERROR_PAGE,
     AndroidWebViewFeature.TRACING_CONTROLLER_BASIC_USAGE,
     AndroidWebViewFeature.VISUAL_STATE_CALLBACK,
+    AndroidWebViewFeature.WEB_AUTHENTICATION,
     AndroidWebViewFeature.WEB_MESSAGE_CALLBACK_ON_MESSAGE,
     AndroidWebViewFeature.WEB_MESSAGE_LISTENER,
     AndroidWebViewFeature.WEB_MESSAGE_PORT_CLOSE,
@@ -883,6 +895,8 @@ class AndroidWebViewFeature {
         return 'TRACING_CONTROLLER_BASIC_USAGE';
       case 'VISUAL_STATE_CALLBACK':
         return 'VISUAL_STATE_CALLBACK';
+      case 'WEB_AUTHENTICATION':
+        return 'WEB_AUTHENTICATION';
       case 'WEB_MESSAGE_CALLBACK_ON_MESSAGE':
         return 'WEB_MESSAGE_CALLBACK_ON_MESSAGE';
       case 'WEB_MESSAGE_LISTENER':

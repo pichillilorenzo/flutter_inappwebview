@@ -469,6 +469,10 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
     if (WebViewFeature.isFeatureSupported(WebViewFeature.ALGORITHMIC_DARKENING) && Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
       WebSettingsCompat.setAlgorithmicDarkeningAllowed(settings, customSettings.algorithmicDarkeningAllowed);
     }
+    if (customSettings.webAuthenticationSupport != null &&
+            WebViewFeature.isFeatureSupported(WebViewFeature.WEB_AUTHENTICATION)) {
+      WebSettingsCompat.setWebAuthenticationSupport(settings, customSettings.webAuthenticationSupport);
+    }
     if (WebViewFeature.isFeatureSupported(WebViewFeature.ENTERPRISE_AUTHENTICATION_APP_LINK_POLICY)) {
       WebSettingsCompat.setEnterpriseAuthenticationAppLinkPolicyEnabled(settings, customSettings.enterpriseAuthenticationAppLinkPolicyEnabled);
     }
@@ -1176,6 +1180,11 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
             !Util.objEquals(customSettings.algorithmicDarkeningAllowed, newCustomSettings.algorithmicDarkeningAllowed) &&
             WebViewFeature.isFeatureSupported(WebViewFeature.ALGORITHMIC_DARKENING) && Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
       WebSettingsCompat.setAlgorithmicDarkeningAllowed(settings, newCustomSettings.algorithmicDarkeningAllowed);
+    }
+    if (newSettingsMap.get("webAuthenticationSupport") != null &&
+            !Util.objEquals(customSettings.webAuthenticationSupport, newCustomSettings.webAuthenticationSupport) &&
+            WebViewFeature.isFeatureSupported(WebViewFeature.WEB_AUTHENTICATION)) {
+      WebSettingsCompat.setWebAuthenticationSupport(settings, newCustomSettings.webAuthenticationSupport);
     }
     if (newSettingsMap.get("enterpriseAuthenticationAppLinkPolicyEnabled") != null &&
             !Util.objEquals(customSettings.enterpriseAuthenticationAppLinkPolicyEnabled, newCustomSettings.enterpriseAuthenticationAppLinkPolicyEnabled) &&

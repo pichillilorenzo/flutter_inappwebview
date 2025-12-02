@@ -23,6 +23,7 @@ import '../types/scrollview_deceleration_rate.dart';
 import '../types/selection_granularity.dart';
 import '../types/user_preferred_content_mode.dart';
 import '../types/vertical_scrollbar_position.dart';
+import '../types/web_authentication_support.dart';
 
 part 'in_app_webview_settings.g.dart';
 
@@ -1043,6 +1044,22 @@ as it can cause framerate drops on animations in Android 9 and lower (see [Hybri
             "available on Android only if [WebViewFeature.ALGORITHMIC_DARKENING] feature is supported.")
   ])
   bool? algorithmicDarkeningAllowed;
+
+  ///Sets the Web Authentication support level for the WebView. The default value is [WebAuthenticationSupport.NONE].
+  ///
+  ///**NOTE for Android native WebView**: available only if [WebViewFeature.WEB_AUTHENTICATION] feature is supported.
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Android native WebView ([Official API - WebSettingsCompat.setWebAuthenticationSupport](https://developer.android.com/reference/androidx/webkit/WebSettingsCompat#setWebAuthenticationSupport(android.webkit.WebSettings,int))
+  @SupportedPlatforms(platforms: [
+    AndroidPlatform(
+        apiName: "WebSettingsCompat.setWebAuthenticationSupport",
+        apiUrl:
+            "https://developer.android.com/reference/androidx/webkit/WebSettingsCompat#setWebAuthenticationSupport(android.webkit.WebSettings,int)",
+        note:
+            "available on Android only if [WebViewFeature.WEB_AUTHENTICATION] feature is supported.")
+  ])
+  WebAuthenticationSupport_? webAuthenticationSupport;
 
   ///Sets whether EnterpriseAuthenticationAppLinkPolicy if set by admin is allowed to have any
   ///effect on WebView.
@@ -2192,6 +2209,7 @@ as it can cause framerate drops on animations in Android 9 and lower (see [Hybri
     this.horizontalScrollbarThumbColor,
     this.horizontalScrollbarTrackColor,
     this.algorithmicDarkeningAllowed = false,
+    this.webAuthenticationSupport,
     this.enterpriseAuthenticationAppLinkPolicyEnabled = true,
     this.defaultVideoPoster,
     this.requestedWithHeaderOriginAllowList,

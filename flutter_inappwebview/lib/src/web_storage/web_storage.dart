@@ -29,19 +29,18 @@ class WebStorage {
 
   ///Check if the current class is supported by the [defaultTargetPlatform] or a specific [platform].
   static bool isClassSupported({TargetPlatform? platform}) =>
-    PlatformWebStorage.static().isClassSupported(platform: platform);
+      PlatformWebStorage.static().isClassSupported(platform: platform);
 
   ///Check if the given [property] is supported by the [defaultTargetPlatform] or a specific [platform].
   static bool isPropertySupported(dynamic property,
-      {TargetPlatform? platform}) =>
-    PlatformWebStorage.static()
-      .isPropertySupported(property, platform: platform);
+          {TargetPlatform? platform}) =>
+      PlatformWebStorage.static()
+          .isPropertySupported(property, platform: platform);
 
   ///Check if the given [method] is supported by the [defaultTargetPlatform] or a specific [platform].
   static bool isMethodSupported(PlatformWebStorageMethod method,
-      {TargetPlatform? platform}) =>
-    PlatformWebStorage.static()
-      .isMethodSupported(method, platform: platform);
+          {TargetPlatform? platform}) =>
+      PlatformWebStorage.static().isMethodSupported(method, platform: platform);
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebStorage.localStorage}
   LocalStorage get localStorage =>
@@ -123,19 +122,20 @@ class LocalStorage extends Storage {
 
   ///Check if the current class is supported by the [defaultTargetPlatform] or a specific [platform].
   static bool isClassSupported({TargetPlatform? platform}) =>
-    PlatformLocalStorage.static().isClassSupported(platform: platform);
+      PlatformLocalStorage.static().isClassSupported(platform: platform);
 
   ///Check if the given [property] is supported by the [defaultTargetPlatform] or a specific [platform].
-  static bool isPropertySupported(PlatformStorageCreationParamsProperty property,
-      {TargetPlatform? platform}) =>
-    PlatformLocalStorage.static()
-      .isPropertySupported(property, platform: platform);
+  static bool isPropertySupported(
+          PlatformStorageCreationParamsProperty property,
+          {TargetPlatform? platform}) =>
+      PlatformLocalStorage.static()
+          .isPropertySupported(property, platform: platform);
 
   ///Check if the given [method] is supported by the [defaultTargetPlatform] or a specific [platform].
   static bool isMethodSupported(PlatformLocalStorageMethod method,
-      {TargetPlatform? platform}) =>
-    PlatformLocalStorage.static()
-      .isMethodSupported(method, platform: platform);
+          {TargetPlatform? platform}) =>
+      PlatformLocalStorage.static()
+          .isMethodSupported(method, platform: platform);
 }
 
 ///{@macro flutter_inappwebview_platform_interface.PlatformSessionStorage}
@@ -165,17 +165,18 @@ class SessionStorage extends Storage {
 
   ///Check if the current class is supported by the [defaultTargetPlatform] or a specific [platform].
   static bool isClassSupported({TargetPlatform? platform}) =>
-    PlatformSessionStorage.static().isClassSupported(platform: platform);
+      PlatformSessionStorage.static().isClassSupported(platform: platform);
 
   ///Check if the given [property] is supported by the [defaultTargetPlatform] or a specific [platform].
-  static bool isPropertySupported(PlatformStorageCreationParamsProperty property,
-      {TargetPlatform? platform}) =>
-    PlatformSessionStorage.static()
-      .isPropertySupported(property, platform: platform);
+  static bool isPropertySupported(
+          PlatformStorageCreationParamsProperty property,
+          {TargetPlatform? platform}) =>
+      PlatformSessionStorage.static()
+          .isPropertySupported(property, platform: platform);
 
   ///Check if the given [method] is supported by the [defaultTargetPlatform] or a specific [platform].
   static bool isMethodSupported(PlatformSessionStorageMethod method,
-      {TargetPlatform? platform}) =>
-    PlatformSessionStorage.static()
-      .isMethodSupported(method, platform: platform);
+          {TargetPlatform? platform}) =>
+      PlatformSessionStorage.static()
+          .isMethodSupported(method, platform: platform);
 }

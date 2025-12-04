@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_internal_annotations.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 
 import '../debug_logging_settings.dart';
@@ -11,24 +12,48 @@ import '../types/browser_process_infos_changed_detail.dart';
 import '../types/webview_interface.dart';
 import 'webview_environment_settings.dart';
 
+part 'platform_webview_environment.g.dart';
+
 /// Object specifying creation parameters for creating a [PlatformWebViewEnvironment].
 ///
 /// Platform specific implementations can add additional fields by extending
 /// this class.
+@SupportedPlatforms(platforms: [WindowsPlatform()])
 @immutable
 class PlatformWebViewEnvironmentCreationParams {
   /// Used by the platform implementation to create a new [PlatformWebViewEnvironment].
   const PlatformWebViewEnvironmentCreationParams({this.settings});
 
-  ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewEnvironment.settings}
+  ///{@template flutter_inappwebview_platform_interface.PlatformWebViewEnvironmentCreationParams.settings}
+  /// WebView Environment settings.
+  ///{@endtemplate}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewEnvironmentCreationParams.settings.supported_platforms}
+  @SupportedPlatforms(platforms: [WindowsPlatform()])
   final WebViewEnvironmentSettings? settings;
+
+  ///{@template flutter_inappwebview_platform_interface.PlatformWebViewEnvironmentCreationParams.isClassSupported}
+  ///Check if the current class is supported by the [defaultTargetPlatform] or a specific [platform].
+  ///{@endtemplate}
+  bool isClassSupported({TargetPlatform? platform}) =>
+      _PlatformWebViewEnvironmentCreationParamsClassSupported.isClassSupported(
+          platform: platform);
+
+  ///{@template flutter_inappwebview_platform_interface.PlatformWebViewEnvironmentCreationParams.isPropertySupported}
+  ///Check if the given [property] is supported by the [defaultTargetPlatform] or a specific [platform].
+  ///{@endtemplate}
+  bool isPropertySupported(
+          PlatformWebViewEnvironmentCreationParamsProperty property,
+          {TargetPlatform? platform}) =>
+      _PlatformWebViewEnvironmentCreationParamsPropertySupported
+          .isPropertySupported(property, platform: platform);
 }
 
 ///Controls a WebView Environment used by WebView instances.
 ///Use [dispose] when not needed anymore to release references.
 ///
-///**Officially Supported Platforms/Implementations**:
-///- Windows
+///{@macro flutter_inappwebview_platform_interface.PlatformWebViewEnvironment.supported_platforms}
+@SupportedPlatforms(platforms: [WindowsPlatform()])
 abstract class PlatformWebViewEnvironment extends PlatformInterface
     implements Disposable {
   ///Debug settings used by [PlatformWebViewEnvironment].
@@ -81,22 +106,23 @@ abstract class PlatformWebViewEnvironment extends PlatformInterface
   ///{@template flutter_inappwebview_platform_interface.PlatformWebViewEnvironment.id}
   /// WebView Environment ID.
   ///{@endtemplate}
+  @SupportedPlatforms(platforms: [WindowsPlatform()])
   String get id =>
       throw UnimplementedError('id is not implemented on the current platform');
 
-  ///{@template flutter_inappwebview_platform_interface.PlatformWebViewEnvironment.settings}
-  /// WebView Environment settings.
-  ///{@endtemplate}
+  ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewEnvironmentCreationParams.settings}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewEnvironmentCreationParams.settings.supported_platforms}
   WebViewEnvironmentSettings? get settings => params.settings;
 
   ///{@template flutter_inappwebview_platform_interface.PlatformWebViewEnvironment.isInterfaceSupported}
   ///Returns `true` if the WebView Environment supports the specified [interface], otherwise `false`.
   ///Only the ones related to [WebViewInterface.ICoreWebView2Environment] are valid interfaces to check;
   ///otherwise, it will always return `false`.
-  ///
-  ///**Officially Supported Platforms/Implementations**:
-  ///- Windows
   ///{@endtemplate}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewEnvironment.isInterfaceSupported.supported_platforms}
+  @SupportedPlatforms(platforms: [WindowsPlatform()])
   Future<bool> isInterfaceSupported(WebViewInterface interface) async {
     throw UnimplementedError(
         'isInterfaceSupported is not implemented on the current platform');
@@ -104,10 +130,16 @@ abstract class PlatformWebViewEnvironment extends PlatformInterface
 
   ///{@template flutter_inappwebview_platform_interface.PlatformWebViewEnvironment.getProcessInfos}
   ///Returns a list of all process using same user data folder except for crashpad process.
-  ///
-  ///**Officially Supported Platforms/Implementations**:
-  ///- Windows 1.0.1108.44+ ([Official API - ICoreWebView2Environment8.GetProcessInfos](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2environment8?view=webview2-1.0.2849.39#getprocessinfos))
   ///{@endtemplate}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewEnvironment.getProcessInfos.supported_platforms}
+  @SupportedPlatforms(platforms: [
+    WindowsPlatform(
+        available: '1.0.1108.44+',
+        apiName: 'ICoreWebView2Environment8.GetProcessInfos',
+        apiUrl:
+            'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2environment8?view=webview2-1.0.2849.39#getprocessinfos')
+  ])
   Future<List<BrowserProcessInfo>> getProcessInfos() async {
     throw UnimplementedError(
         'getProcessInfos is not implemented on the current platform');
@@ -126,10 +158,16 @@ abstract class PlatformWebViewEnvironment extends PlatformInterface
   ///If there are multiple process failures at once, multiple minidump files could be generated.
   ///Thus [getFailureReportFolderPath] could contain old minidump files that are
   ///not associated with a specific [PlatformWebViewCreationParams.onProcessFailed] event.
-  ///
-  ///**Officially Supported Platforms/Implementations**:
-  ///- Windows 1.0.1518.46+ ([Official API - ICoreWebView2Environment11.get_FailureReportFolderPath](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2environment11?view=webview2-1.0.2849.39#get_failurereportfolderpath))
   ///{@endtemplate}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewEnvironment.getFailureReportFolderPath.supported_platforms}
+  @SupportedPlatforms(platforms: [
+    WindowsPlatform(
+        available: '1.0.1518.46+',
+        apiName: 'ICoreWebView2Environment11.get_FailureReportFolderPath',
+        apiUrl:
+            'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2environment11?view=webview2-1.0.2849.39#get_failurereportfolderpath')
+  ])
   Future<String?> getFailureReportFolderPath() async {
     throw UnimplementedError(
         'getFailureReportFolderPath is not implemented on the current platform');
@@ -140,10 +178,15 @@ abstract class PlatformWebViewEnvironment extends PlatformInterface
   ///
   ///Check https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2210.55#createcorewebview2environmentwithoptions
   ///for more info.
-  ///
-  ///**Officially Supported Platforms/Implementations**:
-  ///- Windows ([Official API - CreateCoreWebView2EnvironmentWithOptions](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2210.55#createcorewebview2environmentwithoptions))
   ///{@endtemplate}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewEnvironment.create.supported_platforms}
+  @SupportedPlatforms(platforms: [
+    WindowsPlatform(
+        apiName: 'CreateCoreWebView2EnvironmentWithOptions',
+        apiUrl:
+            'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2210.55#createcorewebview2environmentwithoptions')
+  ])
   Future<PlatformWebViewEnvironment> create(
       {WebViewEnvironmentSettings? settings}) {
     throw UnimplementedError(
@@ -157,10 +200,15 @@ abstract class PlatformWebViewEnvironment extends PlatformInterface
   ///If an override exists for the browserExecutableFolder or the channel preference, the override is used.
   ///If an override is not specified, then the parameter value passed to [getAvailableVersion] is used.
   ///Returns `null` if it fails to find an installed WebView2 runtime or non-stable Microsoft Edge installation.
-  ///
-  ///**Officially Supported Platforms/Implementations**:
-  ///- Windows ([Official API - GetAvailableCoreWebView2BrowserVersionString](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2210.55#comparebrowserversions))
   ///{@endtemplate}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewEnvironment.getAvailableVersion.supported_platforms}
+  @SupportedPlatforms(platforms: [
+    WindowsPlatform(
+        apiName: 'GetAvailableCoreWebView2BrowserVersionString',
+        apiUrl:
+            'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2849.39#getavailablecorewebview2browserversionstring')
+  ])
   Future<String?> getAvailableVersion({String? browserExecutableFolder}) {
     throw UnimplementedError(
         'getAvailableVersion is not implemented on the current platform');
@@ -173,10 +221,15 @@ abstract class PlatformWebViewEnvironment extends PlatformInterface
   ///Sets the value of result to `-1`, `0` or `1` if version1 is less than, equal or greater than version2 respectively.
   ///Returns `null` if it fails to parse any of the version strings.
   ///Directly use the version info obtained from [getAvailableVersion] with input, channel information is ignored.
-  ///
-  ///**Officially Supported Platforms/Implementations**:
-  ///- Windows ([Official API - CompareBrowserVersions](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2210.55#comparebrowserversions))
   ///{@endtemplate}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewEnvironment.compareBrowserVersions.supported_platforms}
+  @SupportedPlatforms(platforms: [
+    WindowsPlatform(
+        apiName: 'CompareBrowserVersions',
+        apiUrl:
+            'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2210.55#comparebrowserversions')
+  ])
   Future<int?> compareBrowserVersions(
       {required String version1, required String version2}) {
     throw UnimplementedError(
@@ -194,10 +247,15 @@ abstract class PlatformWebViewEnvironment extends PlatformInterface
   ///if you want to use the same user data folder in the WebView using the new version of the browser,
   ///you must close the environment and instance of WebView that are using the older version of the browser first.
   ///Or simply prompt the user to restart the app.
-  ///
-  ///**Officially Supported Platforms/Implementations**:
-  ///- Windows ([Official API - ICoreWebView2Environment.add_NewBrowserVersionAvailable](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2environment?view=webview2-1.0.2849.39#add_newbrowserversionavailable))
   ///{@endtemplate}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewEnvironment.onNewBrowserVersionAvailable.supported_platforms}
+  @SupportedPlatforms(platforms: [
+    WindowsPlatform(
+        apiName: 'ICoreWebView2Environment.add_NewBrowserVersionAvailable',
+        apiUrl:
+            'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2environment?view=webview2-1.0.2849.39#add_newbrowserversionavailable')
+  ])
   void Function()? onNewBrowserVersionAvailable;
 
   ///{@template flutter_inappwebview_platform_interface.PlatformWebViewEnvironment.onBrowserProcessExited}
@@ -234,25 +292,66 @@ abstract class PlatformWebViewEnvironment extends PlatformInterface
   ///It is up to the app to coordinate the handlers so they do not try to perform
   ///reliability recovery while also trying to move to a new WebView2 Runtime version
   ///or remove the user data folder.
-  ///
-  ///**Officially Supported Platforms/Implementations**:
-  ///- Windows 1.0.992.28+ ([Official API - ICoreWebView2Environment5.add_BrowserProcessExited](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2environment5?view=webview2-1.0.2849.39#add_browserprocessexited))
   ///{@endtemplate}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewEnvironment.onBrowserProcessExited.supported_platforms}
+  @SupportedPlatforms(platforms: [
+    WindowsPlatform(
+        available: '1.0.992.28+',
+        apiName: 'ICoreWebView2Environment5.add_BrowserProcessExited',
+        apiUrl:
+            'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2environment5?view=webview2-1.0.2849.39#add_browserprocessexited')
+  ])
   void Function(BrowserProcessExitedDetail detail)? onBrowserProcessExited;
 
   ///{@template flutter_inappwebview_platform_interface.PlatformWebViewEnvironment.onProcessInfosChanged}
   ///Event fired with a list of all process using same user data folder except for crashpad process.
-  ///
-  ///**Officially Supported Platforms/Implementations**:
-  ///- Windows 1.0.1108.44+ ([Official API - ICoreWebView2Environment8.add_ProcessInfosChanged](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2environment8?view=webview2-1.0.2849.39#add_processinfoschanged))
   ///{@endtemplate}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewEnvironment.onProcessInfosChanged.supported_platforms}
+  @SupportedPlatforms(platforms: [
+    WindowsPlatform(
+        available: '1.0.1108.44+',
+        apiName: 'ICoreWebView2Environment8.add_ProcessInfosChanged',
+        apiUrl:
+            'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2environment8?view=webview2-1.0.2849.39#add_processinfoschanged')
+  ])
   void Function(BrowserProcessInfosChangedDetail detail)? onProcessInfosChanged;
 
   ///{@template flutter_inappwebview_platform_interface.PlatformWebViewEnvironment.dispose}
   ///Disposes the WebView Environment reference.
   ///{@endtemplate}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewEnvironment.dispose.supported_platforms}
+  @SupportedPlatforms(platforms: [WindowsPlatform()])
   Future<void> dispose() {
     throw UnimplementedError(
         'dispose is not implemented on the current platform');
   }
+
+  ///{@template flutter_inappwebview_platform_interface.PlatformWebViewEnvironment.isClassSupported}
+  ///Check if the current class is supported by the [defaultTargetPlatform] or a specific [platform].
+  ///{@endtemplate}
+  bool isClassSupported({TargetPlatform? platform}) =>
+      _PlatformWebViewEnvironmentClassSupported.isClassSupported(
+          platform: platform);
+
+  ///{@template flutter_inappwebview_platform_interface.PlatformWebViewEnvironment.isPropertySupported}
+  ///Check if the given [property] is supported by the [defaultTargetPlatform] or a specific [platform].
+  ///The property should be one of the [PlatformWebViewEnvironmentProperty] or [PlatformWebViewEnvironmentCreationParamsProperty] values.
+  ///{@endtemplate}
+  bool isPropertySupported(dynamic property, {TargetPlatform? platform}) =>
+      property is PlatformWebViewEnvironmentCreationParamsProperty
+          ? params.isPropertySupported(property, platform: platform)
+          : _PlatformWebViewEnvironmentPropertySupported.isPropertySupported(
+              property,
+              platform: platform);
+
+  ///{@template flutter_inappwebview_platform_interface.PlatformWebViewEnvironment.isMethodSupported}
+  ///Check if the given [method] is supported by the [defaultTargetPlatform] or a specific [platform].
+  ///{@endtemplate}
+  bool isMethodSupported(PlatformWebViewEnvironmentMethod method,
+          {TargetPlatform? platform}) =>
+      _PlatformWebViewEnvironmentMethodSupported.isMethodSupported(method,
+          platform: platform);
 }

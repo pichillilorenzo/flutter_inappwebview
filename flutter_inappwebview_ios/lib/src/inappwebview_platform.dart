@@ -213,6 +213,17 @@ class IOSInAppWebViewPlatform extends InAppWebViewPlatform {
     return IOSWebStorage(params);
   }
 
+  /// Creates a new empty [IOSWebStorage] to access static methods.
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [WebStorage] in `flutter_inappwebview` instead.
+  @override
+  IOSWebStorage createPlatformWebStorageStatic() {
+    return IOSWebStorage(IOSWebStorageCreationParams(
+        localStorage: createPlatformLocalStorageStatic(),
+        sessionStorage: createPlatformSessionStorageStatic()));
+  }
+
   /// Creates a new [IOSLocalStorage].
   ///
   /// This function should only be called by the app-facing package.
@@ -224,6 +235,15 @@ class IOSInAppWebViewPlatform extends InAppWebViewPlatform {
     return IOSLocalStorage(params);
   }
 
+  /// Creates a new empty [IOSLocalStorage] to access static methods.
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [LocalStorage] in `flutter_inappwebview` instead.
+  @override
+  IOSLocalStorage createPlatformLocalStorageStatic() {
+    return IOSLocalStorage.defaultStorage(controller: null);
+  }
+
   /// Creates a new [IOSSessionStorage].
   ///
   /// This function should only be called by the app-facing package.
@@ -233,6 +253,15 @@ class IOSInAppWebViewPlatform extends InAppWebViewPlatform {
     PlatformSessionStorageCreationParams params,
   ) {
     return IOSSessionStorage(params);
+  }
+
+  /// Creates a new empty [IOSSessionStorage] to access static methods.
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [SessionStorage] in `flutter_inappwebview` instead.
+  @override
+  IOSSessionStorage createPlatformSessionStorageStatic() {
+    return IOSSessionStorage.defaultStorage(controller: null);
   }
 
   /// Creates a new [IOSHeadlessInAppWebView].
@@ -326,6 +355,15 @@ class IOSInAppWebViewPlatform extends InAppWebViewPlatform {
     return IOSWebStorageManager(params);
   }
 
+  /// Creates a new empty [IOSWebStorageManager] to access static methods.
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [WebStorageManager] in `flutter_inappwebview` instead.
+  @override
+  IOSWebStorageManager createPlatformWebStorageManagerStatic() {
+    return IOSWebStorageManager.static();
+  }
+
   /// Creates a new [IOSWebAuthenticationSession].
   ///
   /// This function should only be called by the app-facing package.
@@ -370,6 +408,15 @@ class IOSInAppWebViewPlatform extends InAppWebViewPlatform {
   // static methods without throwing a missing platform implementation        //
   // exception.                                                               //
   // ************************************************************************ //
+
+  /// Creates a new empty [PlatformWebViewEnvironment] to access static methods.
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [WebViewEnvironment] in `flutter_inappwebview` instead.
+  @override
+  PlatformWebViewEnvironment createPlatformWebViewEnvironmentStatic() {
+    return _PlatformWebViewEnvironment.static();
+  }
 
   /// Creates a new empty [PlatformProcessGlobalConfig] to access static methods.
   ///
@@ -432,4 +479,14 @@ class _PlatformTracingController extends PlatformTracingController {
           const PlatformTracingControllerCreationParams());
 
   factory _PlatformTracingController.static() => _staticValue;
+}
+
+class _PlatformWebViewEnvironment extends PlatformWebViewEnvironment {
+  _PlatformWebViewEnvironment(PlatformWebViewEnvironmentCreationParams params)
+      : super.implementation(params);
+  static final _PlatformWebViewEnvironment _staticValue =
+      _PlatformWebViewEnvironment(
+          const PlatformWebViewEnvironmentCreationParams());
+
+  factory _PlatformWebViewEnvironment.static() => _staticValue;
 }

@@ -266,6 +266,15 @@ abstract class InAppWebViewPlatform extends PlatformInterface {
         'createPlatformWebStorage is not implemented on the current platform.');
   }
 
+  /// Creates a new empty [PlatformWebStorage] to access static methods.
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [WebStorage] in `flutter_inappwebview` instead.
+  PlatformWebStorage createPlatformWebStorageStatic() {
+    throw UnimplementedError(
+        'createPlatformWebStorageStatic is not implemented on the current platform.');
+  }
+
   /// Creates a new [PlatformLocalStorage].
   ///
   /// This function should only be called by the app-facing package.
@@ -277,6 +286,15 @@ abstract class InAppWebViewPlatform extends PlatformInterface {
         'createPlatformLocalStorage is not implemented on the current platform.');
   }
 
+  /// Creates a new empty [PlatformLocalStorage] to access static methods.
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [LocalStorage] in `flutter_inappwebview` instead.
+  PlatformLocalStorage createPlatformLocalStorageStatic() {
+    throw UnimplementedError(
+        'createPlatformLocalStorageStatic is not implemented on the current platform.');
+  }
+
   /// Creates a new [PlatformSessionStorage].
   ///
   /// This function should only be called by the app-facing package.
@@ -286,6 +304,15 @@ abstract class InAppWebViewPlatform extends PlatformInterface {
   ) {
     throw UnimplementedError(
         'createPlatformSessionStorage is not implemented on the current platform.');
+  }
+
+  /// Creates a new empty [PlatformSessionStorage] to access static methods.
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [PlatformSessionStorage] in `flutter_inappwebview` instead.
+  PlatformSessionStorage createPlatformSessionStorageStatic() {
+    throw UnimplementedError(
+        'createPlatformSessionStorageStatic is not implemented on the current platform.');
   }
 
   /// Creates a new [PlatformHeadlessInAppWebView].
@@ -311,12 +338,21 @@ abstract class InAppWebViewPlatform extends PlatformInterface {
   /// Creates a new [PlatformWebStorageManager].
   ///
   /// This function should only be called by the app-facing package.
-  /// Look at using [CookieManager] in `flutter_inappwebview` instead.
+  /// Look at using [WebStorageManager] in `flutter_inappwebview` instead.
   PlatformWebStorageManager createPlatformWebStorageManager(
     PlatformWebStorageManagerCreationParams params,
   ) {
     throw UnimplementedError(
         'createPlatformWebStorageManager is not implemented on the current platform.');
+  }
+
+  /// Creates a new empty [PlatformWebStorageManager] to access static methods.
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [WebStorageManager] in `flutter_inappwebview` instead.
+  PlatformWebStorageManager createPlatformWebStorageManagerStatic() {
+    throw UnimplementedError(
+        'createPlatformWebStorageManagerStatic is not implemented on the current platform.');
   }
 
   /// Creates a new [PlatformHttpAuthCredentialDatabase].

@@ -218,6 +218,17 @@ class AndroidInAppWebViewPlatform extends InAppWebViewPlatform {
     return AndroidWebStorage(params);
   }
 
+  /// Creates a new empty [AndroidWebStorage] to access static methods.
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [WebStorage] in `flutter_inappwebview` instead.
+  @override
+  AndroidWebStorage createPlatformWebStorageStatic() {
+    return AndroidWebStorage(AndroidWebStorageCreationParams(
+        localStorage: createPlatformLocalStorageStatic(),
+        sessionStorage: createPlatformSessionStorageStatic()));
+  }
+
   /// Creates a new [AndroidLocalStorage].
   ///
   /// This function should only be called by the app-facing package.
@@ -229,6 +240,15 @@ class AndroidInAppWebViewPlatform extends InAppWebViewPlatform {
     return AndroidLocalStorage(params);
   }
 
+  /// Creates a new empty [AndroidLocalStorage] to access static methods.
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [LocalStorage] in `flutter_inappwebview` instead.
+  @override
+  AndroidLocalStorage createPlatformLocalStorageStatic() {
+    return AndroidLocalStorage.defaultStorage(controller: null);
+  }
+
   /// Creates a new [AndroidSessionStorage].
   ///
   /// This function should only be called by the app-facing package.
@@ -238,6 +258,15 @@ class AndroidInAppWebViewPlatform extends InAppWebViewPlatform {
     PlatformSessionStorageCreationParams params,
   ) {
     return AndroidSessionStorage(params);
+  }
+
+  /// Creates a new empty [AndroidSessionStorage] to access static methods.
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [SessionStorage] in `flutter_inappwebview` instead.
+  @override
+  AndroidSessionStorage createPlatformSessionStorageStatic() {
+    return AndroidSessionStorage.defaultStorage(controller: null);
   }
 
   /// Creates a new [AndroidHeadlessInAppWebView].
@@ -475,12 +504,30 @@ class AndroidInAppWebViewPlatform extends InAppWebViewPlatform {
     return AndroidWebStorageManager(params);
   }
 
+  /// Creates a new empty [AndroidWebStorageManager] to access static methods.
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [WebStorageManager] in `flutter_inappwebview` instead.
+  @override
+  AndroidWebStorageManager createPlatformWebStorageManagerStatic() {
+    return AndroidWebStorageManager.static();
+  }
+
   // ************************************************************************ //
   // Create static instances of unsupported classes to be able to call        //
   // isClassSupported, isMethodSupported, isPropertySupported, etc.           //
   // static methods without throwing a missing platform implementation        //
   // exception.                                                               //
   // ************************************************************************ //
+
+  /// Creates a new empty [PlatformWebViewEnvironment] to access static methods.
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [WebViewEnvironment] in `flutter_inappwebview` instead.
+  @override
+  PlatformWebViewEnvironment createPlatformWebViewEnvironmentStatic() {
+    return _PlatformWebViewEnvironment.static();
+  }
 
   /// Creates a new empty [PlatformWebAuthenticationSession] to access static methods.
   ///
@@ -504,4 +551,14 @@ class _PlatformWebAuthenticationSession
           const PlatformWebAuthenticationSessionCreationParams());
 
   factory _PlatformWebAuthenticationSession.static() => _staticValue;
+}
+
+class _PlatformWebViewEnvironment extends PlatformWebViewEnvironment {
+  _PlatformWebViewEnvironment(PlatformWebViewEnvironmentCreationParams params)
+      : super.implementation(params);
+  static final _PlatformWebViewEnvironment _staticValue =
+      _PlatformWebViewEnvironment(
+          const PlatformWebViewEnvironmentCreationParams());
+
+  factory _PlatformWebViewEnvironment.static() => _staticValue;
 }

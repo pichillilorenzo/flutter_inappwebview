@@ -146,6 +146,17 @@ class WindowsInAppWebViewPlatform extends InAppWebViewPlatform {
     return WindowsWebStorage(params);
   }
 
+  /// Creates a new empty [WindowsWebStorage] to access static methods.
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [WebStorage] in `flutter_inappwebview` instead.
+  @override
+  WindowsWebStorage createPlatformWebStorageStatic() {
+    return WindowsWebStorage(WindowsWebStorageCreationParams(
+        localStorage: createPlatformLocalStorageStatic(),
+        sessionStorage: createPlatformSessionStorageStatic()));
+  }
+
   /// Creates a new [WindowsLocalStorage].
   ///
   /// This function should only be called by the app-facing package.
@@ -157,6 +168,15 @@ class WindowsInAppWebViewPlatform extends InAppWebViewPlatform {
     return WindowsLocalStorage(params);
   }
 
+  /// Creates a new empty [WindowsLocalStorage] to access static methods.
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [LocalStorage] in `flutter_inappwebview` instead.
+  @override
+  WindowsLocalStorage createPlatformLocalStorageStatic() {
+    return WindowsLocalStorage.defaultStorage(controller: null);
+  }
+
   /// Creates a new [WindowsSessionStorage].
   ///
   /// This function should only be called by the app-facing package.
@@ -166,6 +186,24 @@ class WindowsInAppWebViewPlatform extends InAppWebViewPlatform {
     PlatformSessionStorageCreationParams params,
   ) {
     return WindowsSessionStorage(params);
+  }
+
+  /// Creates a new empty [WindowsSessionStorage] to access static methods.
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [SessionStorage] in `flutter_inappwebview` instead.
+  @override
+  WindowsSessionStorage createPlatformSessionStorageStatic() {
+    return WindowsSessionStorage.defaultStorage(controller: null);
+  }
+
+  /// Creates a new empty [PlatformWebStorageManager] to access static methods.
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [WebStorageManager] in `flutter_inappwebview` instead.
+  @override
+  PlatformWebStorageManager createPlatformWebStorageManagerStatic() {
+    return _PlatformWebStorageManager.static();
   }
 
   // ************************************************************************ //
@@ -460,4 +498,15 @@ class _PlatformWebMessagePort extends PlatformWebMessagePort {
   Map<String, dynamic> toMap({EnumMethod? enumMethod}) {
     throw UnimplementedError();
   }
+}
+
+class _PlatformWebStorageManager extends PlatformWebStorageManager {
+  _PlatformWebStorageManager(PlatformWebStorageManagerCreationParams params)
+      : super.implementation(params);
+
+  static final _PlatformWebStorageManager _staticValue =
+      _PlatformWebStorageManager(
+          const PlatformWebStorageManagerCreationParams());
+
+  factory _PlatformWebStorageManager.static() => _staticValue;
 }

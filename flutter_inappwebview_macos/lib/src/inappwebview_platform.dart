@@ -202,6 +202,17 @@ class MacOSInAppWebViewPlatform extends InAppWebViewPlatform {
     return MacOSWebStorage(params);
   }
 
+  /// Creates a new empty [MacOSWebStorage] to access static methods.
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [WebStorage] in `flutter_inappwebview` instead.
+  @override
+  MacOSWebStorage createPlatformWebStorageStatic() {
+    return MacOSWebStorage(MacOSWebStorageCreationParams(
+        localStorage: createPlatformLocalStorageStatic(),
+        sessionStorage: createPlatformSessionStorageStatic()));
+  }
+
   /// Creates a new [MacOSLocalStorage].
   ///
   /// This function should only be called by the app-facing package.
@@ -213,6 +224,15 @@ class MacOSInAppWebViewPlatform extends InAppWebViewPlatform {
     return MacOSLocalStorage(params);
   }
 
+  /// Creates a new empty [MacOSLocalStorage] to access static methods.
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [LocalStorage] in `flutter_inappwebview` instead.
+  @override
+  MacOSLocalStorage createPlatformLocalStorageStatic() {
+    return MacOSLocalStorage.defaultStorage(controller: null);
+  }
+
   /// Creates a new [MacOSSessionStorage].
   ///
   /// This function should only be called by the app-facing package.
@@ -222,6 +242,15 @@ class MacOSInAppWebViewPlatform extends InAppWebViewPlatform {
     PlatformSessionStorageCreationParams params,
   ) {
     return MacOSSessionStorage(params);
+  }
+
+  /// Creates a new empty [MacOSSessionStorage] to access static methods.
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [SessionStorage] in `flutter_inappwebview` instead.
+  @override
+  MacOSSessionStorage createPlatformSessionStorageStatic() {
+    return MacOSSessionStorage.defaultStorage(controller: null);
   }
 
   /// Creates a new [MacOSHeadlessInAppWebView].
@@ -295,6 +324,15 @@ class MacOSInAppWebViewPlatform extends InAppWebViewPlatform {
     return MacOSWebStorageManager(params);
   }
 
+  /// Creates a new empty [MacOSWebStorageManager] to access static methods.
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [WebStorageManager] in `flutter_inappwebview` instead.
+  @override
+  MacOSWebStorageManager createPlatformWebStorageManagerStatic() {
+    return MacOSWebStorageManager.static();
+  }
+
   /// Creates a new [MacOSWebAuthenticationSession].
   ///
   /// This function should only be called by the app-facing package.
@@ -339,6 +377,15 @@ class MacOSInAppWebViewPlatform extends InAppWebViewPlatform {
   // static methods without throwing a missing platform implementation        //
   // exception.                                                               //
   // ************************************************************************ //
+
+  /// Creates a new empty [PlatformWebViewEnvironment] to access static methods.
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [WebViewEnvironment] in `flutter_inappwebview` instead.
+  @override
+  PlatformWebViewEnvironment createPlatformWebViewEnvironmentStatic() {
+    return _PlatformWebViewEnvironment.static();
+  }
 
   /// Creates a new empty [PlatformChromeSafariBrowser] to access static methods.
   ///
@@ -431,4 +478,14 @@ class _PlatformPullToRefreshController extends PlatformPullToRefreshController {
           PlatformPullToRefreshControllerCreationParams());
 
   factory _PlatformPullToRefreshController.static() => _staticValue;
+}
+
+class _PlatformWebViewEnvironment extends PlatformWebViewEnvironment {
+  _PlatformWebViewEnvironment(PlatformWebViewEnvironmentCreationParams params)
+      : super.implementation(params);
+  static final _PlatformWebViewEnvironment _staticValue =
+      _PlatformWebViewEnvironment(
+          const PlatformWebViewEnvironmentCreationParams());
+
+  factory _PlatformWebViewEnvironment.static() => _staticValue;
 }

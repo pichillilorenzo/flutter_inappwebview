@@ -2,6 +2,7 @@ import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_pla
 
 import 'cookie_manager.dart';
 import 'in_app_webview/main.dart';
+import 'web_storage/web_storage.dart';
 
 /// Implementation of [InAppWebViewPlatform] using the Web API.
 class WebPlatformInAppWebViewPlatform extends InAppWebViewPlatform {
@@ -91,12 +92,92 @@ class WebPlatformInAppWebViewPlatform extends InAppWebViewPlatform {
     return WebPlatformHeadlessInAppWebView.static();
   }
 
+  /// Creates a new [WebPlatformWebStorage].
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [WebStorage] in `flutter_inappwebview` instead.
+  @override
+  WebPlatformWebStorage createPlatformWebStorage(
+    PlatformWebStorageCreationParams params,
+  ) {
+    return WebPlatformWebStorage(params);
+  }
+
+  /// Creates a new empty [WebPlatformWebStorage] to access static methods.
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [WebStorage] in `flutter_inappwebview` instead.
+  @override
+  WebPlatformWebStorage createPlatformWebStorageStatic() {
+    return WebPlatformWebStorage(WebPlatformWebStorageCreationParams(
+        localStorage: createPlatformLocalStorageStatic(),
+        sessionStorage: createPlatformSessionStorageStatic()));
+  }
+
+  /// Creates a new [WebPlatformLocalStorage].
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [LocalStorage] in `flutter_inappwebview` instead.
+  @override
+  WebPlatformLocalStorage createPlatformLocalStorage(
+    PlatformLocalStorageCreationParams params,
+  ) {
+    return WebPlatformLocalStorage(params);
+  }
+
+  /// Creates a new empty [WebPlatformLocalStorage] to access static methods.
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [LocalStorage] in `flutter_inappwebview` instead.
+  @override
+  WebPlatformLocalStorage createPlatformLocalStorageStatic() {
+    return WebPlatformLocalStorage.defaultStorage(controller: null);
+  }
+
+  /// Creates a new [WebPlatformSessionStorage].
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [SessionStorage] in `flutter_inappwebview` instead.
+  @override
+  WebPlatformSessionStorage createPlatformSessionStorage(
+    PlatformSessionStorageCreationParams params,
+  ) {
+    return WebPlatformSessionStorage(params);
+  }
+
+  /// Creates a new empty [WebPlatformSessionStorage] to access static methods.
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [SessionStorage] in `flutter_inappwebview` instead.
+  @override
+  WebPlatformSessionStorage createPlatformSessionStorageStatic() {
+    return WebPlatformSessionStorage.defaultStorage(controller: null);
+  }
+
+  /// Creates a new empty [PlatformWebStorageManager] to access static methods.
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [WebStorageManager] in `flutter_inappwebview` instead.
+  @override
+  PlatformWebStorageManager createPlatformWebStorageManagerStatic() {
+    return _PlatformWebStorageManager.static();
+  }
+
   // ************************************************************************ //
   // Create static instances of unsupported classes to be able to call        //
   // isClassSupported, isMethodSupported, isPropertySupported, etc.           //
   // static methods without throwing a missing platform implementation        //
   // exception.                                                               //
   // ************************************************************************ //
+
+  /// Creates a new empty [PlatformWebViewEnvironment] to access static methods.
+  ///
+  /// This function should only be called by the app-facing package.
+  /// Look at using [WebViewEnvironment] in `flutter_inappwebview` instead.
+  @override
+  PlatformWebViewEnvironment createPlatformWebViewEnvironmentStatic() {
+    return _PlatformWebViewEnvironment.static();
+  }
 
   /// Creates a new empty [PlatformInAppBrowser] to access static methods.
   ///
@@ -401,4 +482,25 @@ class _PlatformWebMessagePort extends PlatformWebMessagePort {
   Map<String, dynamic> toMap({EnumMethod? enumMethod}) {
     throw UnimplementedError();
   }
+}
+
+class _PlatformWebStorageManager extends PlatformWebStorageManager {
+  _PlatformWebStorageManager(PlatformWebStorageManagerCreationParams params)
+      : super.implementation(params);
+
+  static final _PlatformWebStorageManager _staticValue =
+      _PlatformWebStorageManager(
+          const PlatformWebStorageManagerCreationParams());
+
+  factory _PlatformWebStorageManager.static() => _staticValue;
+}
+
+class _PlatformWebViewEnvironment extends PlatformWebViewEnvironment {
+  _PlatformWebViewEnvironment(PlatformWebViewEnvironmentCreationParams params)
+      : super.implementation(params);
+  static final _PlatformWebViewEnvironment _staticValue =
+      _PlatformWebViewEnvironment(
+          const PlatformWebViewEnvironmentCreationParams());
+
+  factory _PlatformWebViewEnvironment.static() => _staticValue;
 }

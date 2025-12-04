@@ -41,8 +41,83 @@ This repository follows the **Federated Plugin** architecture:
     - `apiUrl`: URL to the official native documentation.
     - `note`: Special notes or restrictions.
 - **Support Checks**: Implement support-check helpers (`isClassSupported`, `isPropertySupported`, `isMethodSupported`) by deferring to the `platform_interface` static singleton (`PlatformX.static()`).
+- **Static-only Helpers**: If a class only exposes static helpers (no instance properties/methods), you can skip overriding `isPropertySupported`/`isMethodSupported` altogether; make sure the public wrapper still calls the static singleton when exposing support checks.
 - **Enums & Types**: Keep enums for methods/properties in the `platform_interface` package. The public package should use simple passthrough helpers.
 - **Propagation Order**: Add or change APIs in `flutter_inappwebview_platform_interface` first, then update every `flutter_inappwebview_<platform>` implementation, and finally wire the public `flutter_inappwebview` wrapper. Each touched package needs an aligned changelog entry.
+
+### Supported Platforms Pattern
+When implementing a new platform interface class (e.g., `PlatformWebViewEnvironment`), follow this strict pattern to ensure correct documentation generation and runtime support checks:
+
+1.  **Creation Params Class (`Platform*CreationParams`)**:
+    - Define the property documentation using `{@template ...}`.
+    - Apply the `@SupportedPlatforms` annotation to the property here.
+    - Implement `isClassSupported`, implement `isPropertySupported` if the class has properties, and `isMethodSupported` if the class has methods.
+    - **Crucial**: `isPropertySupported` must accept `dynamic property` and check if the property name exists in the `CreationParams` class first.
+
+    ```dart
+    @SupportedPlatforms(platforms: [WindowsPlatform()])
+    @immutable
+    class PlatformWebViewEnvironmentCreationParams {
+      const PlatformWebViewEnvironmentCreationParams({this.settings});
+
+      ///{@template flutter_inappwebview_platform_interface.PlatformWebViewEnvironmentCreationParams.settings}
+      /// WebView Environment settings.
+      ///{@endtemplate}
+      ///
+      ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewEnvironmentCreationParams.settings.supported_platforms}
+      @SupportedPlatforms(platforms: [WindowsPlatform()])
+      final WebViewEnvironmentSettings? settings;
+
+      bool isClassSupported({TargetPlatform? platform}) =>
+          PlatformWebViewEnvironment.isClassSupported(platform: platform);
+
+      bool isPropertySupported(dynamic property, {TargetPlatform? platform}) =>
+          PlatformWebViewEnvironment.isPropertySupported(property, platform: platform);
+    }
+    ```
+
+2.  **Main Interface Class (`Platform*`)**:
+    - Use `{@macro ...}` to reuse the documentation from `CreationParams`.
+    - **Do NOT** repeat `@SupportedPlatforms` on the getters/properties in this class. The macro will pull the supported platforms documentation.
+    - Implement `isClassSupported`, `isPropertySupported`, and `isMethodSupported` instance methods (which are called by the static singleton).
+    - **Crucial**: `isPropertySupported` and `isMethodSupported` should ONLY be implemented if the class actually has properties or methods to check. If the class has no properties, do not implement `isPropertySupported`. If it has no methods, do not implement `isMethodSupported`.
+    - **Crucial**: `isPropertySupported` must handle both `CreationParams` properties and the class's own properties (using the generated `*CreationParamsProperty` and `*PropertySupported` classes).
+    - **Crucial**: `isMethodSupported` delegates to the generated `_Platform*MethodSupported` class.
+  - **Reference Implementations**: `PlatformPrintJobController` shows the full property+method pattern, `PlatformFindInteractionController` shows params-only property forwarding, and `PlatformCookieManager` mixes environment-specific params with method support.
+
+    ```dart
+    @SupportedPlatforms(platforms: [WindowsPlatform()])
+    abstract class PlatformWebViewEnvironment extends PlatformInterface implements Disposable {
+      // ... factory constructors ...
+
+      ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewEnvironmentCreationParams.settings}
+      ///
+      ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewEnvironmentCreationParams.settings.supported_platforms}
+      WebViewEnvironmentSettings? get settings => params.settings;
+
+      ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewEnvironmentCreationParams.isClassSupported}
+      bool isClassSupported({TargetPlatform? platform}) =>
+          params.isClassSupported(platform: platform);
+
+      ///{@template flutter_inappwebview_platform_interface.PlatformWebViewEnvironment.isPropertySupported}
+      ///Check if the given [property] is supported by the [defaultTargetPlatform] or a specific [platform].
+      ///{@endtemplate}
+      bool isPropertySupported(dynamic property, {TargetPlatform? platform}) =>
+          property is PlatformWebViewEnvironmentCreationParamsProperty
+              ? params.isPropertySupported(property, platform: platform)
+              : _PlatformWebViewEnvironmentPropertySupported.isPropertySupported(
+                  property,
+                  platform: platform);
+
+      ///{@template flutter_inappwebview_platform_interface.PlatformWebViewEnvironment.isMethodSupported}
+      ///Check if the given [method] is supported by the [defaultTargetPlatform] or a specific [platform].
+      ///{@endtemplate}
+      bool isMethodSupported(PlatformWebViewEnvironmentMethod method,
+              {TargetPlatform? platform}) =>
+          _PlatformWebViewEnvironmentMethodSupported.isMethodSupported(method,
+              platform: platform);
+    }
+    ```
 
 ### Platform Implementations
 - **`inappwebview_platform.dart`**: This file in each platform package implements `InAppWebViewPlatform` and handles the creation of platform-specific classes (e.g., `createPlatformInAppWebViewController`).
@@ -53,6 +128,15 @@ This repository follows the **Federated Plugin** architecture:
   - **iOS**: Uses `UiKitView`.
 - **Method Channels**: Use `MethodChannel` for communication between Dart and native code, but ensure it's encapsulated within the platform implementation classes.
 
+### Feature Update Checklist
+1. Update or add the contract inside `flutter_inappwebview_platform_interface`.
+2. Run `npm run build` (or the equivalent `build_runner` command) to regenerate annotated files.
+3. Mirror the new contract in every federated implementation under `flutter_inappwebview_<platform>/lib/src/inappwebview_platform.dart` (returning stub implementations for unsupported platforms).
+4. Wire the public API in `flutter_inappwebview/` (controllers, widgets, helpers) and update the example app if the feature is user-facing.
+5. Add or update tests/analyzer coverage where possible.
+6. Update documentation (README, docs site) and add changelog entries for every package you touched (interface, each platform, public plugin, etc.).
+7. Re-run `dart analyze`/`flutter test` in the affected packages before sending the PR.
+
 ## Testing & Validation
 - **Run Tests**: Run `flutter test` inside the relevant package before suggesting changes.
 - **Analyze**: For analyzer-only updates, run `dart analyze` and ensure `analysis_options.yaml` lints stay satisfied.
@@ -62,9 +146,21 @@ This repository follows the **Federated Plugin** architecture:
 - **Update Docs**: Update `README.md`, `doc/`, or example apps when you expose new public APIs.
 - **Snippets**: Show simple snippets that exercise the new API on supported platforms only.
 - **Changelog**: Keep changelog entries scoped under the correct package (e.g., `flutter_inappwebview/CHANGELOG.md`).
+  - If a change spans multiple packages, add a short entry to each relevant `CHANGELOG.md` so consumers of standalone packages understand what changed.
 
 ## Pull Request Tips
 - **Title**: Reference the federated package you changed in the PR title (e.g., `[flutter_inappwebview] Add PrintJobController helpers`).
 - **Testing Instructions**: Call out any manual steps required for testers (running example app, enabling permissions, etc.).
 - **Platform Parity**: Mention unsupported platforms explicitly instead of assuming parity.
+
+## NPM Scripts
+
+The root `package.json` contains useful scripts for development and maintenance:
+
+- **`npm run build`**: Runs `build_runner build` in `flutter_inappwebview_platform_interface`. Use this when you change code that requires generation (e.g., `*.g.dart` files).
+- **`npm run watch`**: Runs `build_runner watch` in `flutter_inappwebview_platform_interface`.
+- **`npm run format`**: Formats code in all packages using `dart format`.
+- **`npm run docs:gen`**: Generates API documentation.
+- **`npm run docs:serve`**: Serves the generated API documentation locally.
+- **`npm run publish:dry`**: Runs a dry-run publish check.
 

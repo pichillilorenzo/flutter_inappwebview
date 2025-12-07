@@ -13,6 +13,7 @@ import 'in_app_browser/main.dart' as in_app_browser_tests;
 import 'chrome_safari_browser/main.dart' as chrome_safari_browser_tests;
 import 'in_app_localhost_server/main.dart' as in_app_localhost_server_tests;
 import 'tracing_controller/main.dart' as tracing_controller_tests;
+import 'support_methods/main.dart' as support_methods_tests;
 
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
@@ -45,4 +46,5 @@ void main() {
   in_app_browser_tests.main();
   chrome_safari_browser_tests.main();
   in_app_localhost_server_tests.main();
+  support_methods_tests.main();
 }

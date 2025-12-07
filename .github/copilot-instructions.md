@@ -20,6 +20,14 @@ This repository follows the **Federated Plugin** architecture:
   - Keep their APIs strictly aligned with the `platform_interface` layer.
 - **`dev_packages/` and `scripts/`**: Internal tooling, generators, and maintenance scripts.
 
+### Main App-Facing Classes (support checks available)
+- Web view: `InAppWebView`, `InAppWebViewController`, `HeadlessInAppWebView`
+- Browser shells: `InAppBrowser`, `ChromeSafariBrowser`, `WebAuthenticationSession`
+- Platform helpers: `WebViewEnvironment`, `ProcessGlobalConfig`, `ProxyController`, `ServiceWorkerController`, `TracingController`, `PrintJobController`, `PullToRefreshController`, `FindInteractionController`
+- Storage & messaging: `WebStorage`, `LocalStorage`, `SessionStorage`, `WebStorageManager`, `WebMessageChannel`, `WebMessageListener`
+- Cookies: `CookieManager`
+- Auth storage: `HttpAuthCredentialDatabase`
+
 ## Coding Guidelines
 
 ### General
@@ -124,8 +132,12 @@ When implementing a new platform interface class (e.g., `PlatformWebViewEnvironm
 - **Unsupported Features**: If a feature is NOT supported on a specific platform, you must still implement the creation method in `inappwebview_platform.dart`. Return an instance of a private empty class (e.g., `class _PlatformProcessGlobalConfig extends PlatformProcessGlobalConfig`) that extends the platform interface class. This ensures `isClassSupported`, `isPropertySupported`, `isMethodSupported` static methods works correctly via the `@SupportedPlatforms` annotation.
 - **Extending Params**: Platform implementations should extend `Platform*CreationParams` (e.g., `AndroidInAppWebViewWidgetCreationParams` extends `PlatformInAppWebViewWidgetCreationParams`) to add platform-specific fields.
 - **Platform Views**:
-  - **Android**: Uses `PlatformViewLink` and `AndroidViewSurface` (or `AndroidView` for simple cases) to render native views.
-  - **iOS**: Uses `UiKitView`.
+  - **Android**: Uses `PlatformViewLink` and `AndroidViewSurface` (or `AndroidView` for simple cases) to render native views; [android.webkit.WebView](https://developer.android.com/reference/android/webkit/WebView).
+  - **iOS**: Uses `UiKitView`; [WKWebView](https://developer.apple.com/documentation/webkit/wkwebview).
+  - **macOS**: Uses `AppKitView`; [WKWebView](https://developer.apple.com/documentation/webkit/wkwebview).
+  - **Windows**: Uses a custom platform view implementation using textures; [WebView2](https://learn.microsoft.com/en-us/microsoft-edge/webview2/).
+  - **Web**: Uses an `HtmlElementView` to embed an `<iframe>`; [HTMLIFrameElement](https://developer.mozilla.org/en-US/docs/Web/API/HTMLIFrameElement).
+  - **Linux**: Currently not supported.
 - **Method Channels**: Use `MethodChannel` for communication between Dart and native code, but ensure it's encapsulated within the platform implementation classes.
 
 ### Feature Update Checklist
@@ -141,6 +153,7 @@ When implementing a new platform interface class (e.g., `PlatformWebViewEnvironm
 - **Run Tests**: Run `flutter test` inside the relevant package before suggesting changes.
 - **Analyze**: For analyzer-only updates, run `dart analyze` and ensure `analysis_options.yaml` lints stay satisfied.
 - **Contract Updates**: When touching `platform_interface` contracts, explicitly explain how downstream packages must be updated and list the follow-up steps.
+- **Integration Tests**: Live under `flutter_inappwebview/example/integration_test` and can be executed via `scripts/test_and_log.sh` (accepts optional `NODE_SERVER_IP` and `DEVICE_ID`).
 
 ## Documentation & Examples
 - **Update Docs**: Update `README.md`, `doc/`, or example apps when you expose new public APIs.

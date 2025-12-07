@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_platform_interface.dart';
 
 ///{@macro flutter_inappwebview_platform_interface.PlatformFindInteractionController}
@@ -65,4 +66,22 @@ class FindInteractionController {
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformFindInteractionController.dispose}
   void dispose({bool isKeepAlive = false}) => platform.dispose();
+
+  ///{@macro flutter_inappwebview_platform_interface.PlatformFindInteractionControllerCreationParams.isClassSupported}
+  static bool isClassSupported({TargetPlatform? platform}) =>
+      PlatformFindInteractionController.static()
+          .isClassSupported(platform: platform);
+
+  ///{@macro flutter_inappwebview_platform_interface.PlatformFindInteractionController.isPropertySupported}
+  static bool isPropertySupported(
+          PlatformFindInteractionControllerCreationParamsProperty property,
+          {TargetPlatform? platform}) =>
+      PlatformFindInteractionController.static()
+          .isPropertySupported(property, platform: platform);
+
+  ///{@macro flutter_inappwebview_platform_interface.PlatformFindInteractionController.isMethodSupported}
+  static bool isMethodSupported(PlatformFindInteractionControllerMethod method,
+          {TargetPlatform? platform}) =>
+      PlatformFindInteractionController.static()
+          .isMethodSupported(method, platform: platform);
 }

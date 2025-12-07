@@ -10,6 +10,8 @@ import '../webview_environment/webview_environment.dart';
 import 'in_app_webview_controller.dart';
 
 ///{@macro flutter_inappwebview_platform_interface.PlatformHeadlessInAppWebView}
+///
+///{@macro flutter_inappwebview_platform_interface.PlatformHeadlessInAppWebView.supported_platforms}
 class HeadlessInAppWebView {
   /// Constructs a [HeadlessInAppWebView].
   ///
@@ -37,6 +39,9 @@ class HeadlessInAppWebView {
         platform: webViewControllerPlatform);
   }
 
+  ///{@macro flutter_inappwebview_platform_interface.PlatformHeadlessInAppWebView}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformHeadlessInAppWebView.supported_platforms}
   HeadlessInAppWebView(
       {Size initialSize = const Size(-1, -1),
       int? windowId,
@@ -529,17 +534,45 @@ class HeadlessInAppWebView {
         ));
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformHeadlessInAppWebView.run}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformHeadlessInAppWebView.run.supported_platforms}
   Future<void> run() => platform.run();
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformHeadlessInAppWebView.isRunning}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformHeadlessInAppWebView.isRunning.supported_platforms}
   bool isRunning() => platform.isRunning();
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformHeadlessInAppWebView.setSize}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformHeadlessInAppWebView.setSize.supported_platforms}
   Future<void> setSize(Size size) => platform.setSize(size);
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformHeadlessInAppWebView.getSize}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformHeadlessInAppWebView.getSize.supported_platforms}
   Future<Size?> getSize() => platform.getSize();
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformHeadlessInAppWebView.dispose}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformHeadlessInAppWebView.dispose.supported_platforms}
   Future<void> dispose() => platform.dispose();
+
+  ///{@macro flutter_inappwebview_platform_interface.PlatformHeadlessInAppWebViewCreationParams.isClassSupported}
+  static bool isClassSupported({TargetPlatform? platform}) =>
+      PlatformHeadlessInAppWebView.static()
+          .isClassSupported(platform: platform);
+
+  ///{@macro flutter_inappwebview_platform_interface.PlatformHeadlessInAppWebViewCreationParams.isPropertySupported}
+  static bool isPropertySupported(
+          PlatformHeadlessInAppWebViewCreationParamsProperty property,
+          {TargetPlatform? platform}) =>
+      PlatformHeadlessInAppWebView.static()
+          .isPropertySupported(property, platform: platform);
+
+  ///{@macro flutter_inappwebview_platform_interface.PlatformHeadlessInAppWebViewCreationParams.isMethodSupported}
+  static bool isMethodSupported(PlatformHeadlessInAppWebViewMethod method,
+          {TargetPlatform? platform}) =>
+      PlatformHeadlessInAppWebView.static()
+          .isMethodSupported(method, platform: platform);
 }

@@ -12,28 +12,28 @@ class PrintJobAttributes {
   ///The color mode.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Android native WebView
-  ///- MacOS
+  ///- Android WebView
+  ///- macOS WKWebView
   PrintJobColorMode? colorMode;
 
   ///If `true`, produce detailed reports when an error occurs.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- MacOS
+  ///- macOS WKWebView
   bool? detailedErrorReporting;
 
   ///The duplex mode to use for the print job.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Android native WebView 23+
-  ///- iOS
-  ///- MacOS
+  ///- Android WebView 23+
+  ///- iOS WKWebView
+  ///- macOS WKWebView
   PrintJobDuplexMode? duplex;
 
   ///A fax number.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- MacOS
+  ///- macOS WKWebView
   String? faxNumber;
 
   ///The height of the page footer.
@@ -42,13 +42,13 @@ class PrintJobAttributes {
   ///The default footer height is `0.0`.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- iOS
+  ///- iOS WKWebView
   double? footerHeight;
 
   ///If `true`, a standard header and footer are added outside the margins of each page.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- MacOS
+  ///- macOS WKWebView
   bool? headerAndFooter;
 
   ///The height of the page header.
@@ -57,49 +57,49 @@ class PrintJobAttributes {
   ///The default header height is `0.0`.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- iOS
+  ///- iOS WKWebView
   double? headerHeight;
 
   ///The horizontal pagination mode.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- MacOS
+  ///- macOS WKWebView
   PrintJobPaginationMode? horizontalPagination;
 
   ///Indicates whether the image is centered horizontally.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- MacOS
+  ///- macOS WKWebView
   bool? isHorizontallyCentered;
 
   ///Indicates whether only the currently selected contents should be printed.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- MacOS
+  ///- macOS WKWebView
   bool? isSelectionOnly;
 
   ///Indicates whether the image is centered vertically.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- MacOS
+  ///- macOS WKWebView
   bool? isVerticallyCentered;
 
   ///The action specified for the job.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- MacOS
+  ///- macOS WKWebView
   PrintJobDisposition? jobDisposition;
 
   ///An URL containing the location to which the job file will be saved when the [jobDisposition] is [PrintJobDisposition.SAVE].
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- MacOS
+  ///- macOS WKWebView
   WebUri? jobSavingURL;
 
   ///The human-readable name of the currently selected paper size, suitable for presentation in user interfaces.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- MacOS
+  ///- macOS WKWebView
   String? localizedPaperName;
 
   ///The margins for each printed page.
@@ -107,8 +107,8 @@ class PrintJobAttributes {
   ///the amount of white space on the left of the content and so on.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- iOS
-  ///- MacOS
+  ///- iOS WKWebView
+  ///- macOS WKWebView
   EdgeInsets? margins;
 
   ///The maximum height of the content area.
@@ -119,7 +119,7 @@ class PrintJobAttributes {
   ///The default value of this property is the maximum float value.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- iOS
+  ///- iOS WKWebView
   double? maximumContentHeight;
 
   ///The maximum width of the content area.
@@ -129,45 +129,45 @@ class PrintJobAttributes {
   ///The default value of this property is the maximum float value.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- iOS
+  ///- iOS WKWebView
   double? maximumContentWidth;
 
   ///The media size.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Android native WebView
+  ///- Android WebView
   PrintJobMediaSize? mediaSize;
 
   ///If `true`, collates output.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- MacOS
+  ///- macOS WKWebView
   bool? mustCollate;
 
   ///The orientation of the printed content, portrait or landscape.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Android native WebView
-  ///- iOS
-  ///- MacOS
+  ///- Android WebView
+  ///- iOS WKWebView
+  ///- macOS WKWebView
   PrintJobOrientation? orientation;
 
   ///The number of logical pages to be tiled horizontally on a physical sheet of paper.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- MacOS
+  ///- macOS WKWebView
   int? pagesAcross;
 
   ///The number of logical pages to be tiled vertically on a physical sheet of paper.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- MacOS
+  ///- macOS WKWebView
   int? pagesDown;
 
   ///The name of the currently selected paper size.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- MacOS
+  ///- macOS WKWebView
   String? paperName;
 
   ///The size of the paper used for printing.
@@ -176,8 +176,8 @@ class PrintJobAttributes {
   ///The origin is always (0,0).
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- iOS
-  ///- MacOS
+  ///- iOS WKWebView
+  ///- macOS WKWebView
   InAppWebViewRect? paperRect;
 
   ///The area in which printing can occur.
@@ -186,32 +186,32 @@ class PrintJobAttributes {
   ///Sometimes this is referred to as the imageable area of the paper.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- iOS
-  ///- MacOS
+  ///- iOS WKWebView
+  ///- macOS WKWebView
   InAppWebViewRect? printableRect;
 
   ///The supported resolution in DPI (dots per inch).
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Android native WebView
+  ///- Android WebView
   PrintJobResolution? resolution;
 
   ///The current scaling factor.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- MacOS
+  ///- macOS WKWebView
   double? scalingFactor;
 
   ///A timestamp that specifies the time at which printing should begin.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- MacOS
+  ///- macOS WKWebView
   int? time;
 
   ///The vertical pagination to the specified mode.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- MacOS
+  ///- macOS WKWebView
   PrintJobPaginationMode? verticalPagination;
   PrintJobAttributes(
       {this.colorMode,

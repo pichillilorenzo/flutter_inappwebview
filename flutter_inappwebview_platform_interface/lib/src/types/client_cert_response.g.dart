@@ -18,29 +18,29 @@ class ClientCertResponse {
   ///The certificate password.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Android native WebView
-  ///- iOS
-  ///- MacOS
+  ///- Android WebView
+  ///- iOS WKWebView
+  ///- macOS WKWebView
   String? certificatePassword;
 
   ///The file path of the certificate to use.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Android native WebView
-  ///- iOS
-  ///- MacOS
+  ///- Android WebView
+  ///- iOS WKWebView
+  ///- macOS WKWebView
   String certificatePath;
 
   ///An Android-specific property used by Java [KeyStore](https://developer.android.com/reference/java/security/KeyStore) class to get the instance.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Android native WebView
+  ///- Android WebView
   String? keyStoreType;
 
   ///The index of the selected certificate.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Windows
+  ///- Windows WebView2
   int selectedCertificate;
   ClientCertResponse(
       {this.certificatePath = "",

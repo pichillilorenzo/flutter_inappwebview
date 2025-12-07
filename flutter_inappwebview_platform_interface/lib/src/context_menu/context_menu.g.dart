@@ -8,11 +8,10 @@ part of 'context_menu.dart';
 
 ///Class that represents the WebView context menu. It used by [PlatformWebViewCreationParams.contextMenu].
 ///
-///**NOTE for Android native WebView**: To make it work properly on Android, JavaScript should be enabled!
-///
 ///**Officially Supported Platforms/Implementations**:
-///- Android native WebView
-///- iOS
+///- Android WebView:
+///    - To make it work properly on Android, JavaScript should be enabled!
+///- iOS WKWebView
 class ContextMenu {
   ///List of the custom [ContextMenuItem].
   final List<ContextMenuItem> menuItems;
@@ -38,11 +37,10 @@ class ContextMenu {
   final ContextMenuSettings? settings;
 
   ///
-  ///**NOTE for Android native WebView**: To make it work properly on Android, JavaScript should be enabled!
-  ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Android native WebView
-  ///- iOS
+  ///- Android WebView:
+  ///    - To make it work properly on Android, JavaScript should be enabled!
+  ///- iOS WKWebView
   ContextMenu(
       {this.menuItems = const [],
       this.onCreateContextMenu,

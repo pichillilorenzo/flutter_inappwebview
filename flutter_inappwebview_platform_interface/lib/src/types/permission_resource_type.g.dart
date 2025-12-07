@@ -23,7 +23,7 @@ class PermissionResourceType {
   ///for details.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Windows ([Official API - COREWEBVIEW2_PERMISSION_KIND_AUTOPLAY](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2792.45#corewebview2_permission_kind))
+  ///- Windows WebView2 ([Official API - COREWEBVIEW2_PERMISSION_KIND_AUTOPLAY](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2792.45#corewebview2_permission_kind))
   static final AUTOPLAY =
       PermissionResourceType._internalMultiPlatform('AUTOPLAY', () {
     switch (defaultTargetPlatform) {
@@ -38,10 +38,10 @@ class PermissionResourceType {
   ///Resource belongs to video capture device, like camera.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Android native WebView ([Official API - PermissionRequest.RESOURCE_VIDEO_CAPTURE](https://developer.android.com/reference/android/webkit/PermissionRequest#RESOURCE_VIDEO_CAPTURE))
-  ///- iOS 15.0+ ([Official API - WKMediaCaptureType.camera](https://developer.apple.com/documentation/webkit/wkmediacapturetype/camera))
-  ///- MacOS 12.0+ ([Official API - WKMediaCaptureType.camera](https://developer.apple.com/documentation/webkit/wkmediacapturetype/camera))
-  ///- Windows ([Official API - COREWEBVIEW2_PERMISSION_KIND_CAMERA](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2792.45#corewebview2_permission_kind))
+  ///- Android WebView ([Official API - PermissionRequest.RESOURCE_VIDEO_CAPTURE](https://developer.android.com/reference/android/webkit/PermissionRequest#RESOURCE_VIDEO_CAPTURE))
+  ///- iOS WKWebView 15.0+ ([Official API - WKMediaCaptureType.camera](https://developer.apple.com/documentation/webkit/wkmediacapturetype/camera))
+  ///- macOS WKWebView 12.0+ ([Official API - WKMediaCaptureType.camera](https://developer.apple.com/documentation/webkit/wkmediacapturetype/camera))
+  ///- Windows WebView2 ([Official API - COREWEBVIEW2_PERMISSION_KIND_CAMERA](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2792.45#corewebview2_permission_kind))
   static final CAMERA =
       PermissionResourceType._internalMultiPlatform('CAMERA', () {
     switch (defaultTargetPlatform) {
@@ -62,8 +62,8 @@ class PermissionResourceType {
   ///A media device or devices that can capture audio and video.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- iOS 15.0+ ([Official API - WKMediaCaptureType.cameraAndMicrophone](https://developer.apple.com/documentation/webkit/wkmediacapturetype/cameraandmicrophone))
-  ///- MacOS 12.0+ ([Official API - WKMediaCaptureType.cameraAndMicrophone](https://developer.apple.com/documentation/webkit/wkmediacapturetype/cameraandmicrophone))
+  ///- iOS WKWebView 15.0+ ([Official API - WKMediaCaptureType.cameraAndMicrophone](https://developer.apple.com/documentation/webkit/wkmediacapturetype/cameraandmicrophone))
+  ///- macOS WKWebView 12.0+ ([Official API - WKMediaCaptureType.cameraAndMicrophone](https://developer.apple.com/documentation/webkit/wkmediacapturetype/cameraandmicrophone))
   static final CAMERA_AND_MICROPHONE =
       PermissionResourceType._internalMultiPlatform('CAMERA_AND_MICROPHONE',
           () {
@@ -81,7 +81,7 @@ class PermissionResourceType {
   ///Indicates permission to read the system clipboard without a user gesture.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Windows ([Official API - COREWEBVIEW2_PERMISSION_KIND_CLIPBOARD_READ](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2792.45#corewebview2_permission_kind))
+  ///- Windows WebView2 ([Official API - COREWEBVIEW2_PERMISSION_KIND_CLIPBOARD_READ](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2792.45#corewebview2_permission_kind))
   static final CLIPBOARD_READ =
       PermissionResourceType._internalMultiPlatform('CLIPBOARD_READ', () {
     switch (defaultTargetPlatform) {
@@ -96,8 +96,8 @@ class PermissionResourceType {
   ///Resource belongs to the device’s orientation and motion.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- iOS 15.0+
-  ///- MacOS 12.0+
+  ///- iOS WKWebView 15.0+
+  ///- macOS WKWebView 12.0+
   static final DEVICE_ORIENTATION_AND_MOTION =
       PermissionResourceType._internalMultiPlatform(
           'DEVICE_ORIENTATION_AND_MOTION', () {
@@ -118,7 +118,7 @@ class PermissionResourceType {
   ///"readwrite" permission for the user's selection.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Windows ([Official API - COREWEBVIEW2_PERMISSION_KIND_FILE_READ_WRITE](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2792.45#corewebview2_permission_kind))
+  ///- Windows WebView2 ([Official API - COREWEBVIEW2_PERMISSION_KIND_FILE_READ_WRITE](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2792.45#corewebview2_permission_kind))
   static final FILE_READ_WRITE =
       PermissionResourceType._internalMultiPlatform('FILE_READ_WRITE', () {
     switch (defaultTargetPlatform) {
@@ -133,7 +133,7 @@ class PermissionResourceType {
   ///Indicates permission to access geolocation.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Windows ([Official API - COREWEBVIEW2_PERMISSION_KIND_GEOLOCATION](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2792.45#corewebview2_permission_kind))
+  ///- Windows WebView2 ([Official API - COREWEBVIEW2_PERMISSION_KIND_GEOLOCATION](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2792.45#corewebview2_permission_kind))
   static final GEOLOCATION =
       PermissionResourceType._internalMultiPlatform('GEOLOCATION', () {
     switch (defaultTargetPlatform) {
@@ -150,7 +150,7 @@ class PermissionResourceType {
   ///to query the system fonts available for styling web content.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Windows ([Official API - COREWEBVIEW2_PERMISSION_KIND_LOCAL_FONTS](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2792.45#corewebview2_permission_kind))
+  ///- Windows WebView2 ([Official API - COREWEBVIEW2_PERMISSION_KIND_LOCAL_FONTS](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2792.45#corewebview2_permission_kind))
   static final LOCAL_FONTS =
       PermissionResourceType._internalMultiPlatform('LOCAL_FONTS', () {
     switch (defaultTargetPlatform) {
@@ -165,10 +165,10 @@ class PermissionResourceType {
   ///Resource belongs to audio capture device, like microphone.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Android native WebView ([Official API - PermissionRequest.RESOURCE_AUDIO_CAPTURE](https://developer.android.com/reference/android/webkit/PermissionRequest#RESOURCE_AUDIO_CAPTURE))
-  ///- iOS 15.0+ ([Official API - WKMediaCaptureType.microphone](https://developer.apple.com/documentation/webkit/wkmediacapturetype/microphone))
-  ///- MacOS 12.0+ ([Official API - WKMediaCaptureType.microphone](https://developer.apple.com/documentation/webkit/wkmediacapturetype/microphone))
-  ///- Windows ([Official API - COREWEBVIEW2_PERMISSION_KIND_MICROPHONE](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2792.45#corewebview2_permission_kind))
+  ///- Android WebView ([Official API - PermissionRequest.RESOURCE_AUDIO_CAPTURE](https://developer.android.com/reference/android/webkit/PermissionRequest#RESOURCE_AUDIO_CAPTURE))
+  ///- iOS WKWebView 15.0+ ([Official API - WKMediaCaptureType.microphone](https://developer.apple.com/documentation/webkit/wkmediacapturetype/microphone))
+  ///- macOS WKWebView 12.0+ ([Official API - WKMediaCaptureType.microphone](https://developer.apple.com/documentation/webkit/wkmediacapturetype/microphone))
+  ///- Windows WebView2 ([Official API - COREWEBVIEW2_PERMISSION_KIND_MICROPHONE](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2792.45#corewebview2_permission_kind))
   static final MICROPHONE =
       PermissionResourceType._internalMultiPlatform('MICROPHONE', () {
     switch (defaultTargetPlatform) {
@@ -191,8 +191,8 @@ class PermissionResourceType {
   ///Permission may be requested for this resource in API levels 21 and above, if the Android device has been updated to WebView 45 or above.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Android native WebView ([Official API - PermissionRequest.RESOURCE_MIDI_SYSEX](https://developer.android.com/reference/android/webkit/PermissionRequest#RESOURCE_MIDI_SYSEX))
-  ///- Windows ([Official API - COREWEBVIEW2_PERMISSION_KIND_MIDI_SYSTEM_EXCLUSIVE_MESSAGES](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2792.45#corewebview2_permission_kind))
+  ///- Android WebView ([Official API - PermissionRequest.RESOURCE_MIDI_SYSEX](https://developer.android.com/reference/android/webkit/PermissionRequest#RESOURCE_MIDI_SYSEX))
+  ///- Windows WebView2 ([Official API - COREWEBVIEW2_PERMISSION_KIND_MIDI_SYSTEM_EXCLUSIVE_MESSAGES](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2792.45#corewebview2_permission_kind))
   static final MIDI_SYSEX =
       PermissionResourceType._internalMultiPlatform('MIDI_SYSEX', () {
     switch (defaultTargetPlatform) {
@@ -210,7 +210,7 @@ class PermissionResourceType {
   ///Permission is requested when multiple downloads are triggered in quick succession.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Windows ([Official API - COREWEBVIEW2_PERMISSION_KIND_MULTIPLE_AUTOMATIC_DOWNLOADS](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2792.45#corewebview2_permission_kind))
+  ///- Windows WebView2 ([Official API - COREWEBVIEW2_PERMISSION_KIND_MULTIPLE_AUTOMATIC_DOWNLOADS](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2792.45#corewebview2_permission_kind))
   static final MULTIPLE_AUTOMATIC_DOWNLOADS =
       PermissionResourceType._internalMultiPlatform(
           'MULTIPLE_AUTOMATIC_DOWNLOADS', () {
@@ -226,7 +226,7 @@ class PermissionResourceType {
   ///Indicates permission to send web notifications.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Windows ([Official API - COREWEBVIEW2_PERMISSION_KIND_NOTIFICATIONS](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2792.45#corewebview2_permission_kind))
+  ///- Windows WebView2 ([Official API - COREWEBVIEW2_PERMISSION_KIND_NOTIFICATIONS](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2792.45#corewebview2_permission_kind))
   static final NOTIFICATIONS =
       PermissionResourceType._internalMultiPlatform('NOTIFICATIONS', () {
     switch (defaultTargetPlatform) {
@@ -241,7 +241,7 @@ class PermissionResourceType {
   ///Indicates permission to access generic sensor. Generic Sensor covers ambient-light-sensor, accelerometer, gyroscope, and magnetometer.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Windows ([Official API - COREWEBVIEW2_PERMISSION_KIND_OTHER_SENSORS](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2792.45#corewebview2_permission_kind))
+  ///- Windows WebView2 ([Official API - COREWEBVIEW2_PERMISSION_KIND_OTHER_SENSORS](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2792.45#corewebview2_permission_kind))
   static final OTHER_SENSORS =
       PermissionResourceType._internalMultiPlatform('OTHER_SENSORS', () {
     switch (defaultTargetPlatform) {
@@ -256,7 +256,7 @@ class PermissionResourceType {
   ///Resource belongs to protected media identifier. After the user grants this resource, the origin can use EME APIs to generate the license requests.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Android native WebView ([Official API - PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID](https://developer.android.com/reference/android/webkit/PermissionRequest#RESOURCE_PROTECTED_MEDIA_ID))
+  ///- Android WebView ([Official API - PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID](https://developer.android.com/reference/android/webkit/PermissionRequest#RESOURCE_PROTECTED_MEDIA_ID))
   static final PROTECTED_MEDIA_ID =
       PermissionResourceType._internalMultiPlatform('PROTECTED_MEDIA_ID', () {
     switch (defaultTargetPlatform) {
@@ -271,7 +271,7 @@ class PermissionResourceType {
   ///Indicates an unknown permission.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Windows ([Official API - COREWEBVIEW2_PERMISSION_KIND_UNKNOWN_PERMISSION](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2792.45#corewebview2_permission_kind))
+  ///- Windows WebView2 ([Official API - COREWEBVIEW2_PERMISSION_KIND_UNKNOWN_PERMISSION](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2792.45#corewebview2_permission_kind))
   static final UNKNOWN =
       PermissionResourceType._internalMultiPlatform('UNKNOWN', () {
     switch (defaultTargetPlatform) {
@@ -288,7 +288,7 @@ class PermissionResourceType {
   ///to get screen details.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Windows ([Official API - COREWEBVIEW2_PERMISSION_KIND_WINDOW_MANAGEMENT](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2792.45#corewebview2_permission_kind))
+  ///- Windows WebView2 ([Official API - COREWEBVIEW2_PERMISSION_KIND_WINDOW_MANAGEMENT](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2792.45#corewebview2_permission_kind))
   static final WINDOW_MANAGEMENT =
       PermissionResourceType._internalMultiPlatform('WINDOW_MANAGEMENT', () {
     switch (defaultTargetPlatform) {
@@ -379,7 +379,7 @@ class PermissionResourceType {
   ///Gets [String] value.
   String toValue() => _value;
 
-  ///Gets [dynamic] native value.
+  ///Gets [dynamic] native value if supported by the current platform, otherwise `null`.
   dynamic toNativeValue() => _nativeValue;
 
   ///Gets the name of the value.
@@ -426,6 +426,11 @@ class PermissionResourceType {
 
   @override
   bool operator ==(value) => value == _value;
+
+  ///Checks if the value is supported by the [defaultTargetPlatform].
+  bool isSupported() {
+    return toNativeValue() != null;
+  }
 
   @override
   String toString() {

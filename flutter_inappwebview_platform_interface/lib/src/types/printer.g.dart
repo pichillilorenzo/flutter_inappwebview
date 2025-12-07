@@ -11,26 +11,26 @@ class Printer {
   ///The unique id of the printer.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Android native WebView
-  ///- iOS
+  ///- Android WebView
+  ///- iOS WKWebView
   String? id;
 
   ///The PostScript language level recognized by the printer.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- MacOS
+  ///- macOS WKWebView
   int? languageLevel;
 
   ///The printer’s name.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- MacOS
+  ///- macOS WKWebView
   String? name;
 
   ///A description of the printer’s make and model.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- MacOS
+  ///- macOS WKWebView
   String? type;
   Printer({this.id, this.languageLevel, this.name, this.type});
 

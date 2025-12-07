@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_internal_annotations.dart';
 
 import '../types/main.dart';
@@ -20,6 +21,11 @@ part 'print_job_settings.g.dart';
 
 ///Class that represents the settings of a [PlatformPrintJobController].
 @ExchangeableObject(copyMethod: true)
+@SupportedPlatforms(platforms: [
+  AndroidPlatform(),
+  IOSPlatform(),
+  MacOSPlatform(),
+])
 class PrintJobSettings_ {
   ///Set this to `true` to handle the [PlatformPrintJobController].
   ///Otherwise, it will be handled and disposed automatically by the system.
@@ -63,10 +69,8 @@ class PrintJobSettings_ {
   int? numberOfPages;
 
   ///Force rendering quality.
-  ///
-  ///**NOTE for iOS**: available only on iOS 14.5+.
   @SupportedPlatforms(platforms: [
-    IOSPlatform(),
+    IOSPlatform(available: '14.5'),
   ])
   PrintJobRenderingQuality_? forceRenderingQuality;
 
@@ -130,10 +134,8 @@ class PrintJobSettings_ {
 
   ///A Boolean value that determines whether the printing options include the paper orientation control when available.
   ///The default value is `true`.
-  ///
-  ///**NOTE for iOS**: available only on iOS 15.0+.
   @SupportedPlatforms(platforms: [
-    IOSPlatform(),
+    IOSPlatform(available: '15.0'),
     MacOSPlatform(),
   ])
   bool? showsPaperOrientation;
@@ -415,4 +417,10 @@ class PrintJobSettings_ {
       this.pagesAcross,
       this.pagesDown,
       this.time});
+
+  ///Check if the given [property] is supported by the [defaultTargetPlatform] or a specific [platform].
+  static bool isPropertySupported(PrintJobSettingsProperty property,
+          {TargetPlatform? platform}) =>
+      _PrintJobSettingsPropertySupported.isPropertySupported(property,
+          platform: platform);
 }

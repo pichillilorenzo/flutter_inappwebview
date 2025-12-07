@@ -9,7 +9,7 @@ part of 'process_failed_kind.dart';
 ///Class used to indicate the kind of process failure that has occurred.
 class ProcessFailedKind {
   final String _value;
-  final dynamic _nativeValue;
+  final int? _nativeValue;
   const ProcessFailedKind._internal(this._value, this._nativeValue);
 // ignore: unused_element
   factory ProcessFailedKind._internalMultiPlatform(
@@ -20,7 +20,7 @@ class ProcessFailedKind {
   ///The app has to recreate a new WebView to recover from this failure.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Windows ([Official API - COREWEBVIEW2_PROCESS_FAILED_KIND_BROWSER_PROCESS_EXITED](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2849.39#corewebview2_process_failed_kind))
+  ///- Windows WebView2 ([Official API - COREWEBVIEW2_PROCESS_FAILED_KIND_BROWSER_PROCESS_EXITED](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2849.39#corewebview2_process_failed_kind))
   static final BROWSER_PROCESS_EXITED =
       ProcessFailedKind._internalMultiPlatform('BROWSER_PROCESS_EXITED', () {
     switch (defaultTargetPlatform) {
@@ -37,7 +37,7 @@ class ProcessFailedKind {
   ///The content in these frames is replaced with an error page in the frame.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Windows ([Official API - COREWEBVIEW2_PROCESS_FAILED_KIND_FRAME_RENDER_PROCESS_EXITED](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2849.39#corewebview2_process_failed_kind))
+  ///- Windows WebView2 ([Official API - COREWEBVIEW2_PROCESS_FAILED_KIND_FRAME_RENDER_PROCESS_EXITED](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2849.39#corewebview2_process_failed_kind))
   static final FRAME_RENDER_PROCESS_EXITED =
       ProcessFailedKind._internalMultiPlatform('FRAME_RENDER_PROCESS_EXITED',
           () {
@@ -55,7 +55,7 @@ class ProcessFailedKind {
   ///Your application does not need to handle recovery for this event.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Windows ([Official API - COREWEBVIEW2_PROCESS_FAILED_KIND_GPU_PROCESS_EXITED](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2849.39#corewebview2_process_failed_kind))
+  ///- Windows WebView2 ([Official API - COREWEBVIEW2_PROCESS_FAILED_KIND_GPU_PROCESS_EXITED](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2849.39#corewebview2_process_failed_kind))
   static final GPU_PROCESS_EXITED =
       ProcessFailedKind._internalMultiPlatform('GPU_PROCESS_EXITED', () {
     switch (defaultTargetPlatform) {
@@ -72,7 +72,7 @@ class ProcessFailedKind {
   ///Your application does not need to handle recovery for this event.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Windows ([Official API - COREWEBVIEW2_PROCESS_FAILED_KIND_PPAPI_BROKER_PROCESS_EXITED](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2849.39#corewebview2_process_failed_kind))
+  ///- Windows WebView2 ([Official API - COREWEBVIEW2_PROCESS_FAILED_KIND_PPAPI_BROKER_PROCESS_EXITED](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2849.39#corewebview2_process_failed_kind))
   static final PPAPI_BROKER_PROCESS_EXITED =
       ProcessFailedKind._internalMultiPlatform('PPAPI_BROKER_PROCESS_EXITED',
           () {
@@ -90,7 +90,7 @@ class ProcessFailedKind {
   ///Your application does not need to handle recovery for this event.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Windows ([Official API - COREWEBVIEW2_PROCESS_FAILED_KIND_PPAPI_PLUGIN_PROCESS_EXITED](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2849.39#corewebview2_process_failed_kind))
+  ///- Windows WebView2 ([Official API - COREWEBVIEW2_PROCESS_FAILED_KIND_PPAPI_PLUGIN_PROCESS_EXITED](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2849.39#corewebview2_process_failed_kind))
   static final PPAPI_PLUGIN_PROCESS_EXITED =
       ProcessFailedKind._internalMultiPlatform('PPAPI_PLUGIN_PROCESS_EXITED',
           () {
@@ -108,7 +108,7 @@ class ProcessFailedKind {
   ///You can use the reload method to try to recover from this failure. Alternatively, you can close and recreate the WebView.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Windows ([Official API - COREWEBVIEW2_PROCESS_FAILED_KIND_RENDER_PROCESS_EXITED](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2849.39#corewebview2_process_failed_kind))
+  ///- Windows WebView2 ([Official API - COREWEBVIEW2_PROCESS_FAILED_KIND_RENDER_PROCESS_EXITED](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2849.39#corewebview2_process_failed_kind))
   static final RENDER_PROCESS_EXITED =
       ProcessFailedKind._internalMultiPlatform('RENDER_PROCESS_EXITED', () {
     switch (defaultTargetPlatform) {
@@ -135,7 +135,7 @@ class ProcessFailedKind {
   ///reload the page, or navigate away.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Windows ([Official API - COREWEBVIEW2_PROCESS_FAILED_KIND_RENDER_PROCESS_UNRESPONSIVE](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2849.39#corewebview2_process_failed_kind))
+  ///- Windows WebView2 ([Official API - COREWEBVIEW2_PROCESS_FAILED_KIND_RENDER_PROCESS_UNRESPONSIVE](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2849.39#corewebview2_process_failed_kind))
   static final RENDER_PROCESS_UNRESPONSIVE =
       ProcessFailedKind._internalMultiPlatform('RENDER_PROCESS_UNRESPONSIVE',
           () {
@@ -153,7 +153,7 @@ class ProcessFailedKind {
   ///Your application does not need to handle recovery for this event.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Windows ([Official API - COREWEBVIEW2_PROCESS_FAILED_KIND_SANDBOX_HELPER_PROCESS_EXITED](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2849.39#corewebview2_process_failed_kind))
+  ///- Windows WebView2 ([Official API - COREWEBVIEW2_PROCESS_FAILED_KIND_SANDBOX_HELPER_PROCESS_EXITED](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2849.39#corewebview2_process_failed_kind))
   static final SANDBOX_HELPER_PROCESS_EXITED =
       ProcessFailedKind._internalMultiPlatform('SANDBOX_HELPER_PROCESS_EXITED',
           () {
@@ -169,7 +169,7 @@ class ProcessFailedKind {
   ///Indicates that a process of unspecified kind ended unexpectedly.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Windows ([Official API - COREWEBVIEW2_PROCESS_FAILED_KIND_UNKNOWN_PROCESS_EXITED](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2849.39#corewebview2_process_failed_kind))
+  ///- Windows WebView2 ([Official API - COREWEBVIEW2_PROCESS_FAILED_KIND_UNKNOWN_PROCESS_EXITED](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2849.39#corewebview2_process_failed_kind))
   static final UNKNOWN_PROCESS_EXITED =
       ProcessFailedKind._internalMultiPlatform('UNKNOWN_PROCESS_EXITED', () {
     switch (defaultTargetPlatform) {
@@ -186,7 +186,7 @@ class ProcessFailedKind {
   ///Your application does not need to handle recovery for this event.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Windows ([Official API - COREWEBVIEW2_PROCESS_FAILED_KIND_UTILITY_PROCESS_EXITED](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2849.39#corewebview2_process_failed_kind))
+  ///- Windows WebView2 ([Official API - COREWEBVIEW2_PROCESS_FAILED_KIND_UTILITY_PROCESS_EXITED](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2849.39#corewebview2_process_failed_kind))
   static final UTILITY_PROCESS_EXITED =
       ProcessFailedKind._internalMultiPlatform('UTILITY_PROCESS_EXITED', () {
     switch (defaultTargetPlatform) {
@@ -226,7 +226,7 @@ class ProcessFailedKind {
   }
 
   ///Gets a possible [ProcessFailedKind] instance from a native value.
-  static ProcessFailedKind? fromNativeValue(dynamic value) {
+  static ProcessFailedKind? fromNativeValue(int? value) {
     if (value != null) {
       try {
         return ProcessFailedKind.values
@@ -271,8 +271,8 @@ class ProcessFailedKind {
   ///Gets [String] value.
   String toValue() => _value;
 
-  ///Gets [dynamic] native value.
-  dynamic toNativeValue() => _nativeValue;
+  ///Gets [int] native value if supported by the current platform, otherwise `null`.
+  int? toNativeValue() => _nativeValue;
 
   ///Gets the name of the value.
   String name() {
@@ -306,6 +306,11 @@ class ProcessFailedKind {
 
   @override
   bool operator ==(value) => value == _value;
+
+  ///Checks if the value is supported by the [defaultTargetPlatform].
+  bool isSupported() {
+    return toNativeValue() != null;
+  }
 
   @override
   String toString() {

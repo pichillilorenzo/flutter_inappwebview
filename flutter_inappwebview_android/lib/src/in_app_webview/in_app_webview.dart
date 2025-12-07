@@ -287,6 +287,13 @@ class AndroidInAppWebViewWidget extends PlatformInAppWebViewWidget {
   AndroidHeadlessInAppWebView? get _androidHeadlessInAppWebView =>
       params.headlessWebView as AndroidHeadlessInAppWebView?;
 
+  static final AndroidInAppWebViewWidget _staticValue =
+      AndroidInAppWebViewWidget(AndroidInAppWebViewWidgetCreationParams());
+
+  factory AndroidInAppWebViewWidget.static() {
+    return _staticValue;
+  }
+
   @override
   Widget build(BuildContext context) {
     final initialSettings = params.initialSettings ?? InAppWebViewSettings();

@@ -11,13 +11,13 @@ class BrowserProcessExitedDetail {
   ///The kind of browser process exit that has occurred.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Windows
+  ///- Windows WebView2
   BrowserProcessExitKind kind;
 
   ///The process ID of the browser process that has exited.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Windows
+  ///- Windows WebView2
   int? processId;
   BrowserProcessExitedDetail({required this.kind, this.processId});
 

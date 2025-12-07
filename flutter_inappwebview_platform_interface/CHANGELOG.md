@@ -1,7 +1,10 @@
 ## 1.4.0-beta.3
 
+- Added `isClassSupported`, `isPropertySupported`, `isMethodSupported` static methods for all main classes, such as `PlatformInAppWebViewController`, `InAppWebViewSettings`, `PlatformInAppBrowser`, etc., in order to check if a class, property, or method is supported by the platform at runtime
+- Added `isSupported` method to all custom enum classes
 - Added `saveState`, `restoreState` methods to `PlatformInAppWebViewController` class
 - Added `useOnAjaxReadyStateChange`, `useOnAjaxProgress`, `useOnShowFileChooser` properties to `InAppWebViewSettings`
+- Update code documentation
 
 ## 1.4.0-beta.2
 

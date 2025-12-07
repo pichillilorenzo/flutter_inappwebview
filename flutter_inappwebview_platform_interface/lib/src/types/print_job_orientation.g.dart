@@ -19,9 +19,9 @@ class PrintJobOrientation {
   ///Pages are printed in landscape orientation.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Android native WebView
-  ///- iOS
-  ///- MacOS
+  ///- Android WebView
+  ///- iOS WKWebView
+  ///- macOS WKWebView
   static final LANDSCAPE = PrintJobOrientation._internalMultiPlatform(1, () {
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
@@ -39,9 +39,9 @@ class PrintJobOrientation {
   ///Pages are printed in portrait orientation.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Android native WebView
-  ///- iOS
-  ///- MacOS
+  ///- Android WebView
+  ///- iOS WKWebView
+  ///- macOS WKWebView
   static final PORTRAIT = PrintJobOrientation._internalMultiPlatform(0, () {
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
@@ -140,6 +140,11 @@ class PrintJobOrientation {
 
   @override
   bool operator ==(value) => value == _value;
+
+  ///Checks if the value is supported by the [defaultTargetPlatform].
+  bool isSupported() {
+    return toNativeValue() != null;
+  }
 
   @override
   String toString() {

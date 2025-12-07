@@ -55,6 +55,15 @@ class MacOSProxyController extends PlatformProxyController
     return _instance!;
   }
 
+  static final MacOSProxyController _staticValue = MacOSProxyController(
+      MacOSProxyControllerCreationParams(
+          const PlatformProxyControllerCreationParams()));
+
+  /// Provide static access.
+  factory MacOSProxyController.static() {
+    return _staticValue;
+  }
+
   Future<dynamic> _handleMethod(MethodCall call) async {}
 
   @override

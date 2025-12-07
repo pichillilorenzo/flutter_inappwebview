@@ -10,7 +10,7 @@ builders:
     # 1
     import: "package:generators/builder.dart"
     # 2
-    builder_factories: ["generateExchangeableObject", "generateExchangeableEnum"]
+    builder_factories: ["generateExchangeableObject", "generateExchangeableEnum", "generateSupportedPlatforms"]
     # 3
     build_extensions: { ".dart": [".g.part"] }
     auto_apply: dependents

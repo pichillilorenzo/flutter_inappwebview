@@ -1,4 +1,6 @@
 import 'dart:async';
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_platform_interface.dart';
 
 ///{@macro flutter_inappwebview_platform_interface.PlatformHttpAuthCredentialDatabase}
@@ -62,4 +64,15 @@ class HttpAuthCredentialDatabase {
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformHttpAuthCredentialDatabase.clearAllAuthCredentials}
   Future<void> clearAllAuthCredentials() => platform.clearAllAuthCredentials();
+
+  ///{@macro flutter_inappwebview_platform_interface.PlatformHttpAuthCredentialDatabaseCreationParams.isClassSupported}
+  static bool isClassSupported({TargetPlatform? platform}) =>
+      PlatformHttpAuthCredentialDatabase.static()
+          .isClassSupported(platform: platform);
+
+  ///{@macro flutter_inappwebview_platform_interface.PlatformHttpAuthCredentialDatabase.isMethodSupported}
+  static bool isMethodSupported(PlatformHttpAuthCredentialDatabaseMethod method,
+          {TargetPlatform? platform}) =>
+      PlatformHttpAuthCredentialDatabase.static()
+          .isMethodSupported(method, platform: platform);
 }

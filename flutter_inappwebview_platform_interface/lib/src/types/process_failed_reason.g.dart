@@ -9,7 +9,7 @@ part of 'process_failed_reason.dart';
 ///Class used to indicate the kind of process failure that has occurred.
 class ProcessFailedReason {
   final String _value;
-  final dynamic _nativeValue;
+  final int? _nativeValue;
   const ProcessFailedReason._internal(this._value, this._nativeValue);
 // ignore: unused_element
   factory ProcessFailedReason._internalMultiPlatform(
@@ -19,7 +19,7 @@ class ProcessFailedReason {
   ///The process crashed.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Windows ([Official API - COREWEBVIEW2_PROCESS_FAILED_REASON_CRASHED](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2849.39#corewebview2_process_failed_reason))
+  ///- Windows WebView2 ([Official API - COREWEBVIEW2_PROCESS_FAILED_REASON_CRASHED](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2849.39#corewebview2_process_failed_reason))
   static final CRASHED =
       ProcessFailedReason._internalMultiPlatform('CRASHED', () {
     switch (defaultTargetPlatform) {
@@ -34,7 +34,7 @@ class ProcessFailedReason {
   ///The process failed to launch.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Windows ([Official API - COREWEBVIEW2_PROCESS_FAILED_REASON_LAUNCH_FAILED](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2849.39#corewebview2_process_failed_reason))
+  ///- Windows WebView2 ([Official API - COREWEBVIEW2_PROCESS_FAILED_REASON_LAUNCH_FAILED](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2849.39#corewebview2_process_failed_reason))
   static final LAUNCH_FAILED =
       ProcessFailedReason._internalMultiPlatform('LAUNCH_FAILED', () {
     switch (defaultTargetPlatform) {
@@ -49,7 +49,7 @@ class ProcessFailedReason {
   ///The process terminated due to running out of memory.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Windows ([Official API - COREWEBVIEW2_PROCESS_FAILED_REASON_OUT_OF_MEMORY](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2849.39#corewebview2_process_failed_reason))
+  ///- Windows WebView2 ([Official API - COREWEBVIEW2_PROCESS_FAILED_REASON_OUT_OF_MEMORY](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2849.39#corewebview2_process_failed_reason))
   static final OUT_OF_MEMORY =
       ProcessFailedReason._internalMultiPlatform('OUT_OF_MEMORY', () {
     switch (defaultTargetPlatform) {
@@ -64,7 +64,7 @@ class ProcessFailedReason {
   ///The process was terminated. For example, from Task Manager.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Windows ([Official API - COREWEBVIEW2_PROCESS_FAILED_REASON_TERMINATED](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2849.39#corewebview2_process_failed_reason))
+  ///- Windows WebView2 ([Official API - COREWEBVIEW2_PROCESS_FAILED_REASON_TERMINATED](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2849.39#corewebview2_process_failed_reason))
   static final TERMINATED =
       ProcessFailedReason._internalMultiPlatform('TERMINATED', () {
     switch (defaultTargetPlatform) {
@@ -79,7 +79,7 @@ class ProcessFailedReason {
   ///An unexpected process failure occurred.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Windows ([Official API - COREWEBVIEW2_PROCESS_FAILED_REASON_UNEXPECTED](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2849.39#corewebview2_process_failed_reason))
+  ///- Windows WebView2 ([Official API - COREWEBVIEW2_PROCESS_FAILED_REASON_UNEXPECTED](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2849.39#corewebview2_process_failed_reason))
   static final UNEXPECTED =
       ProcessFailedReason._internalMultiPlatform('UNEXPECTED', () {
     switch (defaultTargetPlatform) {
@@ -94,7 +94,7 @@ class ProcessFailedReason {
   ///The process became unresponsive. This only applies to the main frame's render process.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Windows ([Official API - COREWEBVIEW2_PROCESS_FAILED_REASON_UNRESPONSIVE](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2849.39#corewebview2_process_failed_reason))
+  ///- Windows WebView2 ([Official API - COREWEBVIEW2_PROCESS_FAILED_REASON_UNRESPONSIVE](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2849.39#corewebview2_process_failed_reason))
   static final UNRESPONSIVE =
       ProcessFailedReason._internalMultiPlatform('UNRESPONSIVE', () {
     switch (defaultTargetPlatform) {
@@ -130,7 +130,7 @@ class ProcessFailedReason {
   }
 
   ///Gets a possible [ProcessFailedReason] instance from a native value.
-  static ProcessFailedReason? fromNativeValue(dynamic value) {
+  static ProcessFailedReason? fromNativeValue(int? value) {
     if (value != null) {
       try {
         return ProcessFailedReason.values
@@ -175,8 +175,8 @@ class ProcessFailedReason {
   ///Gets [String] value.
   String toValue() => _value;
 
-  ///Gets [dynamic] native value.
-  dynamic toNativeValue() => _nativeValue;
+  ///Gets [int] native value if supported by the current platform, otherwise `null`.
+  int? toNativeValue() => _nativeValue;
 
   ///Gets the name of the value.
   String name() {
@@ -202,6 +202,11 @@ class ProcessFailedReason {
 
   @override
   bool operator ==(value) => value == _value;
+
+  ///Checks if the value is supported by the [defaultTargetPlatform].
+  bool isSupported() {
+    return toNativeValue() != null;
+  }
 
   @override
   String toString() {

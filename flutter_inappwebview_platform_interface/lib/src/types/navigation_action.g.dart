@@ -21,13 +21,11 @@ class NavigationAction {
   ///the sequence of events which caused the request to be created was initiated by a user
   ///gesture.
   ///
-  ///**NOTE for Android native WebView**: On Android < 21, this is always `false`
-  ///
-  ///**NOTE for Windows**: Available only if the request is associated to the [PlatformWebViewCreationParams.onCreateWindow] event
-  ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Android native WebView 21+ ([Official API - WebResourceRequest.hasGesture](https://developer.android.com/reference/android/webkit/WebResourceRequest#hasGesture()))
-  ///- Windows
+  ///- Android WebView 21+ ([Official API - WebResourceRequest.hasGesture](https://developer.android.com/reference/android/webkit/WebResourceRequest#hasGesture())):
+  ///    - On Android < 21, this is always `false`
+  ///- Windows WebView2:
+  ///    - Available only if the request is associated to the [PlatformWebViewCreationParams.onCreateWindow] event
   bool? hasGesture;
 
   ///Use [sourceFrame] instead.
@@ -54,16 +52,16 @@ class NavigationAction {
   ///Also, on Android < 21, this is always `false`.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Android native WebView 21+ ([Official API - WebResourceRequest.isRedirect](https://developer.android.com/reference/android/webkit/WebResourceRequest#isRedirect()))
-  ///- Windows
+  ///- Android WebView 21+ ([Official API - WebResourceRequest.isRedirect](https://developer.android.com/reference/android/webkit/WebResourceRequest#isRedirect()))
+  ///- Windows WebView2
   bool? isRedirect;
 
   ///The type of action triggering the navigation.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- iOS ([Official API - WKNavigationAction.navigationType](https://developer.apple.com/documentation/webkit/wknavigationaction/1401914-navigationtype))
-  ///- MacOS ([Official API - WKNavigationAction.navigationType](https://developer.apple.com/documentation/webkit/wknavigationaction/1401914-navigationtype))
-  ///- Windows
+  ///- iOS WKWebView ([Official API - WKNavigationAction.navigationType](https://developer.apple.com/documentation/webkit/wknavigationaction/1401914-navigationtype))
+  ///- macOS WKWebView ([Official API - WKNavigationAction.navigationType](https://developer.apple.com/documentation/webkit/wknavigationaction/1401914-navigationtype))
+  ///- Windows WebView2
   NavigationType? navigationType;
 
   ///The URL request object associated with the navigation action.
@@ -77,22 +75,22 @@ class NavigationAction {
   ///A value indicating whether the web content used a download attribute to indicate that this should be downloaded.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- iOS 14.5+ ([Official API - WKNavigationAction.shouldPerformDownload](https://developer.apple.com/documentation/webkit/wknavigationaction/3727357-shouldperformdownload))
-  ///- MacOS 11.3+ ([Official API - WKNavigationAction.shouldPerformDownload](https://developer.apple.com/documentation/webkit/wknavigationaction/3727357-shouldperformdownload))
+  ///- iOS WKWebView 14.5+ ([Official API - WKNavigationAction.shouldPerformDownload](https://developer.apple.com/documentation/webkit/wknavigationaction/3727357-shouldperformdownload))
+  ///- macOS WKWebView 11.3+ ([Official API - WKNavigationAction.shouldPerformDownload](https://developer.apple.com/documentation/webkit/wknavigationaction/3727357-shouldperformdownload))
   bool? shouldPerformDownload;
 
   ///The frame that requested the navigation.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- iOS ([Official API - WKNavigationAction.sourceFrame](https://developer.apple.com/documentation/webkit/wknavigationaction/1401926-sourceframe))
-  ///- MacOS ([Official API - WKNavigationAction.sourceFrame](https://developer.apple.com/documentation/webkit/wknavigationaction/1401926-sourceframe))
+  ///- iOS WKWebView ([Official API - WKNavigationAction.sourceFrame](https://developer.apple.com/documentation/webkit/wknavigationaction/1401926-sourceframe))
+  ///- macOS WKWebView ([Official API - WKNavigationAction.sourceFrame](https://developer.apple.com/documentation/webkit/wknavigationaction/1401926-sourceframe))
   FrameInfo? sourceFrame;
 
   ///The frame in which to display the new content.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- iOS ([Official API - WKNavigationAction.targetFrame](https://developer.apple.com/documentation/webkit/wknavigationaction/1401918-targetframe))
-  ///- MacOS ([Official API - WKNavigationAction.targetFrame](https://developer.apple.com/documentation/webkit/wknavigationaction/1401918-targetframe))
+  ///- iOS WKWebView ([Official API - WKNavigationAction.targetFrame](https://developer.apple.com/documentation/webkit/wknavigationaction/1401918-targetframe))
+  ///- macOS WKWebView ([Official API - WKNavigationAction.targetFrame](https://developer.apple.com/documentation/webkit/wknavigationaction/1401918-targetframe))
   FrameInfo? targetFrame;
   NavigationAction(
       {@Deprecated('Use hasGesture instead') this.androidHasGesture,

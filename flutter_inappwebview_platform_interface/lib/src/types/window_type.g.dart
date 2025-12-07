@@ -19,8 +19,8 @@ class WindowType {
   ///Adds the new browser window as a child window of the main window.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- MacOS
-  ///- Windows
+  ///- macOS WKWebView
+  ///- Windows WebView2
   static final CHILD = WindowType._internalMultiPlatform('CHILD', () {
     switch (defaultTargetPlatform) {
       case TargetPlatform.macOS:
@@ -36,7 +36,7 @@ class WindowType {
   ///Adds the new browser window as a new tab in a tabbed window of the main window.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- MacOS 10.12++
+  ///- macOS WKWebView 10.12++
   static final TABBED = WindowType._internalMultiPlatform('TABBED', () {
     switch (defaultTargetPlatform) {
       case TargetPlatform.macOS:
@@ -50,8 +50,8 @@ class WindowType {
   ///Adds the new browser window as a separate new window from the main window.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- MacOS
-  ///- Windows
+  ///- macOS WKWebView
+  ///- Windows WebView2
   static final WINDOW = WindowType._internalMultiPlatform('WINDOW', () {
     switch (defaultTargetPlatform) {
       case TargetPlatform.macOS:
@@ -150,6 +150,11 @@ class WindowType {
 
   @override
   bool operator ==(value) => value == _value;
+
+  ///Checks if the value is supported by the [defaultTargetPlatform].
+  bool isSupported() {
+    return toNativeValue() != null;
+  }
 
   @override
   String toString() {

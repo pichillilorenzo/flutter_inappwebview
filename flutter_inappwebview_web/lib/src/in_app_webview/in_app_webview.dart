@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_platform_interface.dart';
-import '../../web/web_platform_manager.dart';
+import '../../web/in_app_webview_manager.dart';
 import 'headless_in_app_webview.dart';
 
 import 'in_app_webview_controller.dart';
@@ -272,6 +272,14 @@ class WebPlatformInAppWebViewWidget extends PlatformInAppWebViewWidget {
   WebPlatformHeadlessInAppWebView? get _macosHeadlessInAppWebView =>
       _webPlatformParams.headlessWebView as WebPlatformHeadlessInAppWebView?;
 
+  static final WebPlatformInAppWebViewWidget _staticValue =
+      WebPlatformInAppWebViewWidget(
+          WebPlatformInAppWebViewWidgetCreationParams());
+
+  factory WebPlatformInAppWebViewWidget.static() {
+    return _staticValue;
+  }
+
   @override
   Widget build(BuildContext context) {
     final initialSettings =
@@ -290,16 +298,19 @@ class WebPlatformInAppWebViewWidget extends PlatformInAppWebViewWidget {
     return HtmlElementView(
       viewType: 'com.pichillilorenzo/flutter_inappwebview',
       onPlatformViewCreated: (int viewId) {
-        var webViewHtmlElement = WebPlatformManager.webViews[viewId]!;
+        var webViewHtmlElement = InAppWebViewManager.webViews[viewId]!;
         webViewHtmlElement.initialSettings = initialSettings;
         webViewHtmlElement.initialUrlRequest =
             _webPlatformParams.initialUrlRequest;
         webViewHtmlElement.initialFile = _webPlatformParams.initialFile;
         webViewHtmlElement.initialData = _webPlatformParams.initialData;
+        webViewHtmlElement.initialUserScripts =
+            _webPlatformParams.initialUserScripts;
         webViewHtmlElement.headlessWebViewId =
             _webPlatformParams.headlessWebView?.isRunning() ?? false
                 ? _webPlatformParams.headlessWebView?.id
                 : null;
+        webViewHtmlElement.windowId = _webPlatformParams.windowId;
         webViewHtmlElement.prepare();
         if (webViewHtmlElement.headlessWebViewId == null) {
           webViewHtmlElement.makeInitialLoad();

@@ -11,8 +11,8 @@ class URLProtectionSpace {
   ///The authentication method used by the receiver.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- iOS ([Official API - URLProtectionSpace.authenticationMethod](https://developer.apple.com/documentation/foundation/urlprotectionspace/1415028-authenticationmethod))
-  ///- MacOS ([Official API - URLProtectionSpace.authenticationMethod](https://developer.apple.com/documentation/foundation/urlprotectionspace/1415028-authenticationmethod))
+  ///- iOS WKWebView ([Official API - URLProtectionSpace.authenticationMethod](https://developer.apple.com/documentation/foundation/urlprotectionspace/1415028-authenticationmethod))
+  ///- macOS WKWebView ([Official API - URLProtectionSpace.authenticationMethod](https://developer.apple.com/documentation/foundation/urlprotectionspace/1415028-authenticationmethod))
   URLProtectionSpaceAuthenticationMethod? authenticationMethod;
 
   ///The acceptable certificate-issuing authorities for client certificate authentication.
@@ -20,8 +20,8 @@ class URLProtectionSpace {
   ///The returned issuing authorities are encoded with Distinguished Encoding Rules (DER).
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- iOS ([Official API - URLProtectionSpace.distinguishedNames](https://developer.apple.com/documentation/foundation/urlprotectionspace/1417061-distinguishednames))
-  ///- MacOS ([Official API - URLProtectionSpace.distinguishedNames](https://developer.apple.com/documentation/foundation/urlprotectionspace/1417061-distinguishednames))
+  ///- iOS WKWebView ([Official API - URLProtectionSpace.distinguishedNames](https://developer.apple.com/documentation/foundation/urlprotectionspace/1417061-distinguishednames))
+  ///- macOS WKWebView ([Official API - URLProtectionSpace.distinguishedNames](https://developer.apple.com/documentation/foundation/urlprotectionspace/1417061-distinguishednames))
   List<X509Certificate>? distinguishedNames;
 
   ///The hostname of the server.
@@ -54,8 +54,8 @@ class URLProtectionSpace {
   ///The supported proxy types are listed in [URLProtectionSpaceProxyType.values].
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- iOS ([Official API - URLProtectionSpace.proxyType](https://developer.apple.com/documentation/foundation/urlprotectionspace/1411924-proxytype))
-  ///- MacOS ([Official API - URLProtectionSpace.proxyType](https://developer.apple.com/documentation/foundation/urlprotectionspace/1411924-proxytype))
+  ///- iOS WKWebView ([Official API - URLProtectionSpace.proxyType](https://developer.apple.com/documentation/foundation/urlprotectionspace/1411924-proxytype))
+  ///- macOS WKWebView ([Official API - URLProtectionSpace.proxyType](https://developer.apple.com/documentation/foundation/urlprotectionspace/1411924-proxytype))
   URLProtectionSpaceProxyType? proxyType;
 
   ///A string indicating a protocol-specific subdivision of a single host.
@@ -67,8 +67,8 @@ class URLProtectionSpace {
   ///This value is `true` if the credentials for the protection space represented by the receiver can be sent securely, `false` otherwise.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- iOS ([Official API - URLProtectionSpace.receivesCredentialSecurely](https://developer.apple.com/documentation/foundation/urlprotectionspace/1415176-receivescredentialsecurely))
-  ///- MacOS ([Official API - URLProtectionSpace.receivesCredentialSecurely](https://developer.apple.com/documentation/foundation/urlprotectionspace/1415176-receivescredentialsecurely))
+  ///- iOS WKWebView ([Official API - URLProtectionSpace.receivesCredentialSecurely](https://developer.apple.com/documentation/foundation/urlprotectionspace/1415176-receivescredentialsecurely))
+  ///- macOS WKWebView ([Official API - URLProtectionSpace.receivesCredentialSecurely](https://developer.apple.com/documentation/foundation/urlprotectionspace/1415176-receivescredentialsecurely))
   bool? receivesCredentialSecurely;
 
   ///The SSL certificate used.

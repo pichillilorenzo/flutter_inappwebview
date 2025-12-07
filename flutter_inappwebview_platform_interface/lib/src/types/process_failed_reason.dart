@@ -9,7 +9,7 @@ class ProcessFailedReason_ {
   // ignore: unused_field
   final String _value;
   // ignore: unused_field
-  final dynamic _nativeValue = null;
+  final int? _nativeValue = null;
   const ProcessFailedReason_._internal(this._value);
 
   ///An unexpected process failure occurred.

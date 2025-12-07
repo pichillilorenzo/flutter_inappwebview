@@ -272,6 +272,13 @@ class MacOSHeadlessInAppWebView extends PlatformHeadlessInAppWebView
     id = IdGenerator.generate();
   }
 
+  static final MacOSHeadlessInAppWebView _staticValue =
+      MacOSHeadlessInAppWebView(MacOSHeadlessInAppWebViewCreationParams());
+
+  factory MacOSHeadlessInAppWebView.static() {
+    return _staticValue;
+  }
+
   @override
   MacOSInAppWebViewController? get webViewController => _webViewController;
 

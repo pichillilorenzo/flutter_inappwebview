@@ -39,6 +39,15 @@ class AndroidPullToRefreshController extends PlatformPullToRefreshController
                   .fromPlatformPullToRefreshControllerCreationParams(params),
         );
 
+  static final AndroidPullToRefreshController _staticValue =
+      AndroidPullToRefreshController(
+          AndroidPullToRefreshControllerCreationParams());
+
+  /// Provide static access.
+  factory AndroidPullToRefreshController.static() {
+    return _staticValue;
+  }
+
   _debugLog(String method, dynamic args) {
     debugLog(
         className: this.runtimeType.toString(),

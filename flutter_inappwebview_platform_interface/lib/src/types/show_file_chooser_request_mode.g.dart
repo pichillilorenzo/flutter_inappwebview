@@ -19,7 +19,7 @@ class ShowFileChooserRequestMode {
   ///Open single file. Requires that the file exists before allowing the user to pick it.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Android native WebView
+  ///- Android WebView
   static final OPEN = ShowFileChooserRequestMode._internalMultiPlatform(0, () {
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
@@ -35,7 +35,7 @@ class ShowFileChooserRequestMode {
   ///This feature is not supported at the moment.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Android native WebView
+  ///- Android WebView
   static final OPEN_FOLDER =
       ShowFileChooserRequestMode._internalMultiPlatform(2, () {
     switch (defaultTargetPlatform) {
@@ -50,7 +50,7 @@ class ShowFileChooserRequestMode {
   ///Like Open but allows multiple files to be selected.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Android native WebView
+  ///- Android WebView
   static final OPEN_MULTIPLE =
       ShowFileChooserRequestMode._internalMultiPlatform(1, () {
     switch (defaultTargetPlatform) {
@@ -65,7 +65,7 @@ class ShowFileChooserRequestMode {
   ///Allows picking a nonexistent file and saving it.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Android native WebView
+  ///- Android WebView
   static final SAVE = ShowFileChooserRequestMode._internalMultiPlatform(3, () {
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
@@ -144,7 +144,7 @@ class ShowFileChooserRequestMode {
   ///Gets [int] value.
   int toValue() => _value;
 
-  ///Gets [int?] native value.
+  ///Gets [int] native value if supported by the current platform, otherwise `null`.
   int? toNativeValue() => _nativeValue;
 
   ///Gets the name of the value.
@@ -167,6 +167,11 @@ class ShowFileChooserRequestMode {
 
   @override
   bool operator ==(value) => value == _value;
+
+  ///Checks if the value is supported by the [defaultTargetPlatform].
+  bool isSupported() {
+    return toNativeValue() != null;
+  }
 
   @override
   String toString() {

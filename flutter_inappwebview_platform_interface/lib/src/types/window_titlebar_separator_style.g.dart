@@ -19,7 +19,7 @@ class WindowTitlebarSeparatorStyle {
   ///A style indicating that the system determines the type of separator.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- MacOS
+  ///- macOS WKWebView
   static final AUTOMATIC =
       WindowTitlebarSeparatorStyle._internalMultiPlatform(0, () {
     switch (defaultTargetPlatform) {
@@ -34,7 +34,7 @@ class WindowTitlebarSeparatorStyle {
   ///A style indicating that there’s no title bar separator.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- MacOS
+  ///- macOS WKWebView
   static final LINE =
       WindowTitlebarSeparatorStyle._internalMultiPlatform(2, () {
     switch (defaultTargetPlatform) {
@@ -49,7 +49,7 @@ class WindowTitlebarSeparatorStyle {
   ///A style indicating that the title bar separator is a line.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- MacOS
+  ///- macOS WKWebView
   static final NONE =
       WindowTitlebarSeparatorStyle._internalMultiPlatform(1, () {
     switch (defaultTargetPlatform) {
@@ -64,7 +64,7 @@ class WindowTitlebarSeparatorStyle {
   ///A style indicating that the title bar separator is a shadow.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- MacOS
+  ///- macOS WKWebView
   static final SHADOW =
       WindowTitlebarSeparatorStyle._internalMultiPlatform(3, () {
     switch (defaultTargetPlatform) {
@@ -144,7 +144,7 @@ class WindowTitlebarSeparatorStyle {
   ///Gets [int] value.
   int toValue() => _value;
 
-  ///Gets [int?] native value.
+  ///Gets [int] native value if supported by the current platform, otherwise `null`.
   int? toNativeValue() => _nativeValue;
 
   ///Gets the name of the value.
@@ -167,6 +167,11 @@ class WindowTitlebarSeparatorStyle {
 
   @override
   bool operator ==(value) => value == _value;
+
+  ///Checks if the value is supported by the [defaultTargetPlatform].
+  bool isSupported() {
+    return toNativeValue() != null;
+  }
 
   @override
   String toString() {

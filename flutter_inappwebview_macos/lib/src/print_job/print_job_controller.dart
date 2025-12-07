@@ -11,16 +11,14 @@ import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_pla
 class MacOSPrintJobControllerCreationParams
     extends PlatformPrintJobControllerCreationParams {
   /// Creates a new [MacOSPrintJobControllerCreationParams] instance.
-  const MacOSPrintJobControllerCreationParams(
-      {required super.id});
+  const MacOSPrintJobControllerCreationParams({required super.id});
 
   /// Creates a [MacOSPrintJobControllerCreationParams] instance based on [PlatformPrintJobControllerCreationParams].
   factory MacOSPrintJobControllerCreationParams.fromPlatformPrintJobControllerCreationParams(
       // Recommended placeholder to prevent being broken by platform interface.
       // ignore: avoid_unused_constructor_parameters
       PlatformPrintJobControllerCreationParams params) {
-    return MacOSPrintJobControllerCreationParams(
-        id: params.id);
+    return MacOSPrintJobControllerCreationParams(id: params.id);
   }
 }
 
@@ -39,6 +37,14 @@ class MacOSPrintJobController extends PlatformPrintJobController
         'com.pichillilorenzo/flutter_inappwebview_printjobcontroller_${params.id}');
     handler = _handleMethod;
     initMethodCallHandler();
+  }
+
+  static final MacOSPrintJobController _staticValue =
+      MacOSPrintJobController(MacOSPrintJobControllerCreationParams(id: ''));
+
+  /// Provide static access.
+  factory MacOSPrintJobController.static() {
+    return _staticValue;
   }
 
   Future<dynamic> _handleMethod(MethodCall call) async {

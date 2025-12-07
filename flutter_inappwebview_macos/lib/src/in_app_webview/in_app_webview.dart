@@ -277,6 +277,13 @@ class MacOSInAppWebViewWidget extends PlatformInAppWebViewWidget {
   MacOSHeadlessInAppWebView? get _macosHeadlessInAppWebView =>
       params.headlessWebView as MacOSHeadlessInAppWebView?;
 
+  static final MacOSInAppWebViewWidget _staticValue =
+      MacOSInAppWebViewWidget(MacOSInAppWebViewWidgetCreationParams());
+
+  factory MacOSInAppWebViewWidget.static() {
+    return _staticValue;
+  }
+
   @override
   Widget build(BuildContext context) {
     final initialSettings = params.initialSettings ?? InAppWebViewSettings();

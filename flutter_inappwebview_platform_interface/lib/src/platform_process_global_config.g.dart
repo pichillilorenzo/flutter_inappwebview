@@ -6,10 +6,14 @@ part of 'platform_process_global_config.dart';
 // ExchangeableObjectGenerator
 // **************************************************************************
 
+///{@template flutter_inappwebview_platform_interface.ProcessGlobalConfigSettings}
 ///Class that represents the settings used to configure the [PlatformProcessGlobalConfig].
+///{@endtemplate}
+///
+///{@macro flutter_inappwebview_platform_interface.ProcessGlobalConfigSettings.supported_platforms}
 ///
 ///**Officially Supported Platforms/Implementations**:
-///- Android native WebView
+///- Android WebView ([Official API - ProcessGlobalConfig.apply](https://developer.android.com/reference/androidx/webkit/ProcessGlobalConfig#apply(androidx.webkit.ProcessGlobalConfig)))
 class ProcessGlobalConfigSettings {
   ///The directory name suffix to be used for the current process.
   ///Must not contain a path separator and should not be empty.
@@ -31,7 +35,11 @@ class ProcessGlobalConfigSettings {
   ///on WebView are in the same process, to avoid needing multiple data directories.
   ///The [PlatformInAppWebViewController.disableWebView] method can be used to ensure that the other processes do not use WebView by accident in this case.
   ///
-  ///**NOTE**: available only if [WebViewFeature.STARTUP_FEATURE_SET_DATA_DIRECTORY_SUFFIX] feature is supported.
+  ///{@macro flutter_inappwebview_platform_interface.ProcessGlobalConfigSettings.dataDirectorySuffix.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Android WebView:
+  ///    - Available only if [WebViewFeature.STARTUP_FEATURE_SET_DATA_DIRECTORY_SUFFIX] feature is supported.
   String? dataDirectorySuffix;
 
   ///Set the base directories that `WebView` will use for the current process.
@@ -52,8 +60,16 @@ class ProcessGlobalConfigSettings {
   ///If they do not already exist, `WebView` will attempt to create them during initialization, along with any missing parent directories.
   ///In such a case, the directory in which `WebView` creates missing directories must be readable and writable by the current process.
   ///
-  ///**NOTE**: available only if [WebViewFeature.STARTUP_FEATURE_SET_DIRECTORY_BASE_PATHS] feature is supported.
+  ///{@macro flutter_inappwebview_platform_interface.ProcessGlobalConfigSettings.directoryBasePaths.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Android WebView:
+  ///    - Available only if [WebViewFeature.STARTUP_FEATURE_SET_DIRECTORY_BASE_PATHS] feature is supported.
   ProcessGlobalConfigDirectoryBasePaths? directoryBasePaths;
+
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Android WebView ([Official API - ProcessGlobalConfig.apply](https://developer.android.com/reference/androidx/webkit/ProcessGlobalConfig#apply(androidx.webkit.ProcessGlobalConfig)))
   ProcessGlobalConfigSettings(
       {this.dataDirectorySuffix, this.directoryBasePaths});
 
@@ -71,6 +87,22 @@ class ProcessGlobalConfigSettings {
     );
     return instance;
   }
+
+  ///{@template flutter_inappwebview_platform_interface.ProcessGlobalConfigSettings.isClassSupported}
+  ///Check if the current class is supported by the [defaultTargetPlatform] or a specific [platform].
+  ///{@endtemplate}
+  static bool isClassSupported({TargetPlatform? platform}) =>
+      _ProcessGlobalConfigSettingsClassSupported.isClassSupported(
+          platform: platform);
+
+  ///{@template flutter_inappwebview_platform_interface.ProcessGlobalConfigSettings.isPropertySupported}
+  ///Check if the current class is supported by the [defaultTargetPlatform] or a specific [platform].
+  ///{@endtemplate}
+  static bool isPropertySupported(ProcessGlobalConfigSettingsProperty property,
+          {TargetPlatform? platform}) =>
+      _ProcessGlobalConfigSettingsPropertySupported.isPropertySupported(
+          property,
+          platform: platform);
 
   ///Converts instance to a map.
   Map<String, dynamic> toMap({EnumMethod? enumMethod}) {
@@ -141,5 +173,128 @@ class ProcessGlobalConfigDirectoryBasePaths {
   @override
   String toString() {
     return 'ProcessGlobalConfigDirectoryBasePaths{cacheDirectoryBasePath: $cacheDirectoryBasePath, dataDirectoryBasePath: $dataDirectoryBasePath}';
+  }
+}
+
+// **************************************************************************
+// SupportedPlatformsGenerator
+// **************************************************************************
+
+extension _PlatformProcessGlobalConfigCreationParamsClassSupported
+    on PlatformProcessGlobalConfigCreationParams {
+  ///{@template flutter_inappwebview_platform_interface.PlatformProcessGlobalConfigCreationParams.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Android WebView
+  ///
+  ///Use the [PlatformProcessGlobalConfigCreationParams.isClassSupported] method to check if this class is supported at runtime.
+  ///{@endtemplate}
+  static bool isClassSupported({TargetPlatform? platform}) {
+    return ((kIsWeb && platform != null) || !kIsWeb) &&
+        [TargetPlatform.android].contains(platform ?? defaultTargetPlatform);
+  }
+}
+
+extension _PlatformProcessGlobalConfigClassSupported
+    on PlatformProcessGlobalConfig {
+  ///{@template flutter_inappwebview_platform_interface.PlatformProcessGlobalConfig.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Android WebView ([Official API - ProcessGlobalConfig](https://developer.android.com/reference/androidx/webkit/ProcessGlobalConfig))
+  ///
+  ///Use the [PlatformProcessGlobalConfig.isClassSupported] method to check if this class is supported at runtime.
+  ///{@endtemplate}
+  static bool isClassSupported({TargetPlatform? platform}) {
+    return ((kIsWeb && platform != null) || !kIsWeb) &&
+        [TargetPlatform.android].contains(platform ?? defaultTargetPlatform);
+  }
+}
+
+///List of [PlatformProcessGlobalConfig]'s methods that can be used to check if they are supported or not by the current platform.
+enum PlatformProcessGlobalConfigMethod {
+  ///Can be used to check if the [PlatformProcessGlobalConfig.apply] method is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.PlatformProcessGlobalConfig.apply.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Android WebView ([Official API - ProcessGlobalConfig.apply](https://developer.android.com/reference/androidx/webkit/ProcessGlobalConfig#apply(androidx.webkit.ProcessGlobalConfig)))
+  ///
+  ///**Parameters - Officially Supported Platforms/Implementations**:
+  ///- [settings]: all platforms
+  ///
+  ///Use the [PlatformProcessGlobalConfig.isMethodSupported] method to check if this method is supported at runtime.
+  ///{@endtemplate}
+  apply,
+}
+
+extension _PlatformProcessGlobalConfigMethodSupported
+    on PlatformProcessGlobalConfig {
+  static bool isMethodSupported(PlatformProcessGlobalConfigMethod method,
+      {TargetPlatform? platform}) {
+    switch (method) {
+      case PlatformProcessGlobalConfigMethod.apply:
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
+            [TargetPlatform.android]
+                .contains(platform ?? defaultTargetPlatform);
+    }
+  }
+}
+
+extension _ProcessGlobalConfigSettingsClassSupported
+    on ProcessGlobalConfigSettings {
+  ///{@template flutter_inappwebview_platform_interface.ProcessGlobalConfigSettings.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Android WebView ([Official API - ProcessGlobalConfig.apply](https://developer.android.com/reference/androidx/webkit/ProcessGlobalConfig#apply(androidx.webkit.ProcessGlobalConfig)))
+  ///
+  ///Use the [ProcessGlobalConfigSettings.isClassSupported] method to check if this class is supported at runtime.
+  ///{@endtemplate}
+  static bool isClassSupported({TargetPlatform? platform}) {
+    return ((kIsWeb && platform != null) || !kIsWeb) &&
+        [TargetPlatform.android].contains(platform ?? defaultTargetPlatform);
+  }
+}
+
+///List of [ProcessGlobalConfigSettings]'s properties that can be used to check i they are supported or not by the current platform.
+enum ProcessGlobalConfigSettingsProperty {
+  ///Can be used to check if the [ProcessGlobalConfigSettings.dataDirectorySuffix] property is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.ProcessGlobalConfigSettings.dataDirectorySuffix.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Android WebView:
+  ///    - Available only if [WebViewFeature.STARTUP_FEATURE_SET_DATA_DIRECTORY_SUFFIX] feature is supported.
+  ///
+  ///Use the [ProcessGlobalConfigSettings.isPropertySupported] method to check if this property is supported at runtime.
+  ///{@endtemplate}
+  dataDirectorySuffix,
+
+  ///Can be used to check if the [ProcessGlobalConfigSettings.directoryBasePaths] property is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.ProcessGlobalConfigSettings.directoryBasePaths.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Android WebView:
+  ///    - Available only if [WebViewFeature.STARTUP_FEATURE_SET_DIRECTORY_BASE_PATHS] feature is supported.
+  ///
+  ///Use the [ProcessGlobalConfigSettings.isPropertySupported] method to check if this property is supported at runtime.
+  ///{@endtemplate}
+  directoryBasePaths,
+}
+
+extension _ProcessGlobalConfigSettingsPropertySupported
+    on ProcessGlobalConfigSettings {
+  static bool isPropertySupported(ProcessGlobalConfigSettingsProperty property,
+      {TargetPlatform? platform}) {
+    switch (property) {
+      case ProcessGlobalConfigSettingsProperty.dataDirectorySuffix:
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
+            [TargetPlatform.android]
+                .contains(platform ?? defaultTargetPlatform);
+      case ProcessGlobalConfigSettingsProperty.directoryBasePaths:
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
+            [TargetPlatform.android]
+                .contains(platform ?? defaultTargetPlatform);
+    }
   }
 }

@@ -9,7 +9,7 @@
     "publish:dry": ".fvm/flutter_sdk/bin/flutter pub publish --dry-run",
     "format": ".fvm/flutter_sdk/bin/dart format flutter_inappwebview/lib flutter_inappwebview/example/integration_test flutter_inappwebview_platform_interface/lib flutter_inappwebview_android/lib flutter_inappwebview_ios/lib flutter_inappwebview_macos/lib  flutter_inappwebview_web/lib  flutter_inappwebview_windows/lib",
 
-    "docs:gen": "cd flutter_inappwebview && ../.fvm/flutter_sdk/bin/dart doc ../",
+    "docs:gen": "cd flutter_inappwebview && ../.fvm/flutter_sdk/bin/dart doc --output=../doc/api .",
     "docs:serve": ".fvm/flutter_sdk/bin/flutter pub global activate dhttpd && .fvm/flutter_sdk/bin/flutter pub global run dhttpd:dhttpd --path doc/api",
 
     "publish:platform_interface": "cd flutter_inappwebview_platform_interface && ../.fvm/flutter_sdk/bin/flutter pub publish && cd ..",

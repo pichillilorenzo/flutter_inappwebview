@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_platform_interface.dart';
 
 ///{@macro flutter_inappwebview_platform_interface.PlatformProcessGlobalConfig}
@@ -35,4 +36,14 @@ class ProcessGlobalConfig {
   ///{@macro flutter_inappwebview_platform_interface.PlatformProcessGlobalConfig.apply}
   Future<void> apply({required ProcessGlobalConfigSettings settings}) =>
       platform.apply(settings: settings);
+
+  ///{@macro flutter_inappwebview_platform_interface.PlatformProcessGlobalConfigCreationParams.isClassSupported}
+  static bool isClassSupported({TargetPlatform? platform}) =>
+      PlatformProcessGlobalConfig.static().isClassSupported(platform: platform);
+
+  ///{@macro flutter_inappwebview_platform_interface.PlatformProcessGlobalConfig.isMethodSupported}
+  static bool isMethodSupported(PlatformProcessGlobalConfigMethod method,
+          {TargetPlatform? platform}) =>
+      PlatformProcessGlobalConfig.static()
+          .isMethodSupported(method, platform: platform);
 }

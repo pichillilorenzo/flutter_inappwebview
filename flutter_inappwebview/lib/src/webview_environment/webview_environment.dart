@@ -1,5 +1,6 @@
 import 'dart:core';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_platform_interface.dart';
 
 ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewEnvironment}
@@ -78,4 +79,20 @@ class WebViewEnvironment {
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewEnvironment.dispose}
   Future<void> dispose() => platform.dispose();
+
+  ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewEnvironmentCreationParams.isClassSupported}
+  static bool isClassSupported({TargetPlatform? platform}) =>
+      PlatformWebViewEnvironment.static().isClassSupported(platform: platform);
+
+  ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewEnvironment.isPropertySupported}
+  static bool isPropertySupported(dynamic property,
+          {TargetPlatform? platform}) =>
+      PlatformWebViewEnvironment.static()
+          .isPropertySupported(property, platform: platform);
+
+  ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewEnvironment.isMethodSupported}
+  static bool isMethodSupported(PlatformWebViewEnvironmentMethod method,
+          {TargetPlatform? platform}) =>
+      PlatformWebViewEnvironment.static()
+          .isMethodSupported(method, platform: platform);
 }

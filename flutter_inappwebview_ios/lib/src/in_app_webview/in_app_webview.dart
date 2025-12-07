@@ -282,6 +282,13 @@ class IOSInAppWebViewWidget extends PlatformInAppWebViewWidget {
   IOSHeadlessInAppWebView? get _iosHeadlessInAppWebView =>
       params.headlessWebView as IOSHeadlessInAppWebView?;
 
+  static final IOSInAppWebViewWidget _staticValue =
+      IOSInAppWebViewWidget(IOSInAppWebViewWidgetCreationParams());
+
+  factory IOSInAppWebViewWidget.static() {
+    return _staticValue;
+  }
+
   @override
   Widget build(BuildContext context) {
     final initialSettings = params.initialSettings ?? InAppWebViewSettings();

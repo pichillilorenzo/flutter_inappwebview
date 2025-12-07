@@ -1,21 +1,36 @@
-import 'dart:ui';
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_internal_annotations.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
+
 import '../inappwebview_platform.dart';
 import '../types/disposable.dart';
 import '../webview_environment/platform_webview_environment.dart';
 import 'platform_inappwebview_controller.dart';
 import 'platform_webview.dart';
 
-/// Object specifying creation parameters for creating a [PlatformInAppWebViewWidget].
+part 'platform_headless_in_app_webview.g.dart';
+
+///{@template flutter_inappwebview_platform_interface.PlatformHeadlessInAppWebViewCreationParams}
+///Object specifying creation parameters for creating a [PlatformInAppWebViewWidget].
 ///
-/// Platform specific implementations can add additional fields by extending
-/// this class.
+///Platform specific implementations can add additional fields by extending
+///this class.
+///{@endtemplate}
+///
+///{@macro flutter_inappwebview_platform_interface.PlatformHeadlessInAppWebViewCreationParams.supported_platforms}
+@SupportedPlatforms(platforms: [
+  AndroidPlatform(),
+  IOSPlatform(),
+  MacOSPlatform(),
+  WebPlatform(requiresSameOrigin: false),
+  WindowsPlatform(),
+])
 class PlatformHeadlessInAppWebViewCreationParams
     extends PlatformWebViewCreationParams {
-  /// Used by the platform implementation to create a new [PlatformHeadlessInAppWebView].
+  ///{@macro flutter_inappwebview_platform_interface.PlatformHeadlessInAppWebViewCreationParams}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformHeadlessInAppWebViewCreationParams.supported_platforms}
   const PlatformHeadlessInAppWebViewCreationParams(
       {this.initialSize = const Size(-1, -1),
       this.webViewEnvironment,
@@ -135,25 +150,53 @@ class PlatformHeadlessInAppWebViewCreationParams
       super.pullToRefreshController,
       super.findInteractionController});
 
+  ///{@template flutter_inappwebview_platform_interface.PlatformHeadlessInAppWebViewCreationParams.initialSize}
   ///The WebView initial size in pixels.
   ///
   ///Set `-1` to match the corresponding width or height of the current device screen size.
   ///`Size(-1, -1)` will match both width and height of the current device screen size.
+  ///{@endtemplate}
   ///
-  ///**NOTE for Android**: `Size` width and height values will be converted to `int` values because they cannot have `double` values.
-  ///
-  ///**Officially Supported Platforms/Implementations**:
-  ///- Android native WebView
-  ///- iOS
-  ///- Web
-  ///- MacOS
+  ///{@macro flutter_inappwebview_platform_interface.PlatformHeadlessInAppWebViewCreationParams.initialSize.supported_platforms}
+  @SupportedPlatforms(platforms: [
+    AndroidPlatform(
+        note:
+            '`Size` width and height values will be converted to `int` values because they cannot have `double` values.'),
+    IOSPlatform(),
+    MacOSPlatform(),
+    WebPlatform(requiresSameOrigin: false),
+    WindowsPlatform(),
+  ])
   final Size initialSize;
 
+  ///{@template flutter_inappwebview_platform_interface.PlatformHeadlessInAppWebViewCreationParams.webViewEnvironment}
   ///Used to create the [PlatformHeadlessInAppWebView] using the specified environment.
+  ///{@endtemplate}
   ///
-  ///**Officially Supported Platforms/Implementations**:
-  ///- Windows
+  ///{@macro flutter_inappwebview_platform_interface.PlatformHeadlessInAppWebViewCreationParams.webViewEnvironment.supported_platforms}
+  @SupportedPlatforms(platforms: [
+    WindowsPlatform(),
+  ])
   final PlatformWebViewEnvironment? webViewEnvironment;
+
+  ///{@template flutter_inappwebview_platform_interface.PlatformHeadlessInAppWebViewCreationParams.isClassSupported}
+  ///Check if the current class is supported by the [defaultTargetPlatform] or a specific [platform].
+  ///{@endtemplate}
+  @override
+  bool isClassSupported({TargetPlatform? platform}) =>
+      _PlatformHeadlessInAppWebViewCreationParamsClassSupported
+          .isClassSupported(platform: platform);
+
+  ///{@template flutter_inappwebview_platform_interface.PlatformHeadlessInAppWebViewCreationParams.isPropertySupported}
+  ///Check if the given [property] is supported by the [defaultTargetPlatform] or a specific [platform].
+  ///The property should be one of the [PlatformWebViewCreationParamsProperty] or [PlatformHeadlessInAppWebViewCreationParamsProperty] values.
+  ///{@endtemplate}
+  @override
+  bool isPropertySupported(dynamic property, {TargetPlatform? platform}) =>
+      property is PlatformWebViewCreationParamsProperty
+          ? super.isPropertySupported(property, platform: platform)
+          : _PlatformHeadlessInAppWebViewCreationParamsPropertySupported
+              .isPropertySupported(property, platform: platform);
 }
 
 ///{@template flutter_inappwebview_platform_interface.PlatformHeadlessInAppWebView}
@@ -161,14 +204,16 @@ class PlatformHeadlessInAppWebViewCreationParams
 ///It can be used to run a WebView in background without attaching an `InAppWebView` to the widget tree.
 ///
 ///**NOTE**: Remember to dispose it when you don't need it anymore.
-///
-///**Officially Supported Platforms/Implementations**:
-///- Android native WebView
-///- iOS
-///- Web
-///- MacOS
-///- Windows
 ///{@endtemplate}
+///
+///{@macro flutter_inappwebview_platform_interface.PlatformHeadlessInAppWebView.supported_platforms}
+@SupportedPlatforms(platforms: [
+  AndroidPlatform(),
+  IOSPlatform(),
+  MacOSPlatform(),
+  WebPlatform(requiresSameOrigin: false),
+  WindowsPlatform(),
+])
 abstract class PlatformHeadlessInAppWebView extends PlatformInterface
     implements Disposable {
   /// Creates a new [PlatformHeadlessInAppWebView]
@@ -186,6 +231,22 @@ abstract class PlatformHeadlessInAppWebView extends PlatformInterface
             .createPlatformHeadlessInAppWebView(params);
     PlatformInterface.verify(webViewControllerDelegate, _token);
     return webViewControllerDelegate;
+  }
+
+  /// Creates a new [PlatformHeadlessInAppWebView] to access static methods.
+  factory PlatformHeadlessInAppWebView.static() {
+    assert(
+      InAppWebViewPlatform.instance != null,
+      'A platform implementation for `flutter_inappwebview` has not been set. Please '
+      'ensure that an implementation of `InAppWebViewPlatform` has been set to '
+      '`InAppWebViewPlatform.instance` before use. For unit testing, '
+      '`InAppWebViewPlatform.instance` can be set with your own test implementation.',
+    );
+    final PlatformHeadlessInAppWebView headlessInAppWebViewStatic =
+        InAppWebViewPlatform.instance!
+            .createPlatformHeadlessInAppWebViewStatic();
+    PlatformInterface.verify(headlessInAppWebViewStatic, _token);
+    return headlessInAppWebViewStatic;
   }
 
   /// Used by the platform implementation to create a new [PlatformHeadlessInAppWebView].
@@ -216,28 +277,34 @@ abstract class PlatformHeadlessInAppWebView extends PlatformInterface
 
   ///{@template flutter_inappwebview_platform_interface.PlatformHeadlessInAppWebView.run}
   ///Runs the headless WebView.
-  ///
-  ///**NOTE for Web**: it will append a new `iframe` to the body.
-  ///
-  ///**Officially Supported Platforms/Implementations**:
-  ///- Android native WebView
-  ///- iOS
-  ///- Web
-  ///- MacOS
   ///{@endtemplate}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformHeadlessInAppWebView.run.supported_platforms}
+  @SupportedPlatforms(platforms: [
+    AndroidPlatform(),
+    IOSPlatform(),
+    MacOSPlatform(),
+    WebPlatform(
+        requiresSameOrigin: false,
+        note: 'It will append a new `iframe` to the body.'),
+    WindowsPlatform(),
+  ])
   Future<void> run() {
     throw UnimplementedError('run is not implemented on the current platform');
   }
 
   ///{@template flutter_inappwebview_platform_interface.PlatformHeadlessInAppWebView.isRunning}
   ///Indicates if the headless WebView is running or not.
-  ///
-  ///**Officially Supported Platforms/Implementations**:
-  ///- Android native WebView
-  ///- iOS
-  ///- Web
-  ///- MacOS
   ///{@endtemplate}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformHeadlessInAppWebView.isRunning.supported_platforms}
+  @SupportedPlatforms(platforms: [
+    AndroidPlatform(),
+    IOSPlatform(),
+    MacOSPlatform(),
+    WebPlatform(requiresSameOrigin: false),
+    WindowsPlatform(),
+  ])
   bool isRunning() {
     throw UnimplementedError(
         'isRunning is not implemented on the current platform');
@@ -250,15 +317,17 @@ abstract class PlatformHeadlessInAppWebView extends PlatformInterface
   ///`Size(-1, -1)` will match both width and height of the current device screen size.
   ///
   ///Note that if the [PlatformHeadlessInAppWebView] is not running, this method won't have effect.
-  ///
-  ///**NOTE for Android**: `Size` width and height values will be converted to `int` values because they cannot have `double` values.
-  ///
-  ///**Officially Supported Platforms/Implementations**:
-  ///- Android native WebView
-  ///- iOS
-  ///- Web
-  ///- MacOS
   ///{@endtemplate}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformHeadlessInAppWebView.setSize.supported_platforms}
+  @SupportedPlatforms(platforms: [
+    AndroidPlatform(
+        note:
+            '`Size` width and height values will be converted to `int` values because they cannot have `double` values.'),
+    IOSPlatform(),
+    MacOSPlatform(),
+    WebPlatform(requiresSameOrigin: false),
+  ])
   Future<void> setSize(Size size) {
     throw UnimplementedError(
         'setSize is not implemented on the current platform');
@@ -268,13 +337,15 @@ abstract class PlatformHeadlessInAppWebView extends PlatformInterface
   ///Gets the current size in pixels of the WebView.
   ///
   ///Note that if the [PlatformHeadlessInAppWebView] is not running, this method will return `null`.
-  ///
-  ///**Officially Supported Platforms/Implementations**:
-  ///- Android native WebView
-  ///- iOS
-  ///- Web
-  ///- MacOS
   ///{@endtemplate}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformHeadlessInAppWebView.getSize.supported_platforms}
+  @SupportedPlatforms(platforms: [
+    AndroidPlatform(),
+    IOSPlatform(),
+    MacOSPlatform(),
+    WebPlatform(requiresSameOrigin: false),
+  ])
   Future<Size?> getSize() {
     throw UnimplementedError(
         'getSize is not implemented on the current platform');
@@ -282,15 +353,34 @@ abstract class PlatformHeadlessInAppWebView extends PlatformInterface
 
   ///{@template flutter_inappwebview_platform_interface.PlatformHeadlessInAppWebView.dispose}
   ///Disposes the headless WebView.
-  ///
-  ///**Officially Supported Platforms/Implementations**:
-  ///- Android native WebView
-  ///- iOS
-  ///- Web
-  ///- MacOS
   ///{@endtemplate}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformHeadlessInAppWebView.dispose.supported_platforms}
+  @SupportedPlatforms(platforms: [
+    AndroidPlatform(),
+    IOSPlatform(),
+    MacOSPlatform(),
+    WebPlatform(requiresSameOrigin: false),
+    WindowsPlatform(),
+  ])
   Future<void> dispose() {
     throw UnimplementedError(
         'dispose is not implemented on the current platform');
   }
+
+  ///{@macro flutter_inappwebview_platform_interface.PlatformHeadlessInAppWebViewCreationParams.isClassSupported}
+  bool isClassSupported({TargetPlatform? platform}) =>
+      params.isClassSupported(platform: platform);
+
+  ///{@macro flutter_inappwebview_platform_interface.PlatformHeadlessInAppWebViewCreationParams.isPropertySupported}
+  bool isPropertySupported(dynamic property, {TargetPlatform? platform}) =>
+      params.isPropertySupported(property, platform: platform);
+
+  ///{@template flutter_inappwebview_platform_interface.PlatformHeadlessInAppWebView.isMethodSupported}
+  ///Check if the given [method] is supported by the [defaultTargetPlatform] or a specific [platform].
+  ///{@endtemplate}
+  bool isMethodSupported(PlatformHeadlessInAppWebViewMethod method,
+          {TargetPlatform? platform}) =>
+      _PlatformHeadlessInAppWebViewMethodSupported.isMethodSupported(method,
+          platform: platform);
 }

@@ -122,6 +122,12 @@ class ActionModeMenuItem {
   ActionModeMenuItem operator |(ActionModeMenuItem value) =>
       ActionModeMenuItem._internal(
           value.toValue() | _value, value.toNativeValue() | _nativeValue);
+
+  ///Checks if the value is supported by the [defaultTargetPlatform].
+  bool isSupported() {
+    return true;
+  }
+
   @override
   String toString() {
     return name();
@@ -251,6 +257,12 @@ class AndroidActionModeMenuItem {
   AndroidActionModeMenuItem operator |(AndroidActionModeMenuItem value) =>
       AndroidActionModeMenuItem._internal(
           value.toValue() | _value, value.toNativeValue() | _nativeValue);
+
+  ///Checks if the value is supported by the [defaultTargetPlatform].
+  bool isSupported() {
+    return true;
+  }
+
   @override
   String toString() {
     return name();

@@ -19,7 +19,7 @@ class PrintJobPageOrder {
   ///Ascending (back to front) page order.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- MacOS
+  ///- macOS WKWebView
   static final ASCENDING = PrintJobPageOrder._internalMultiPlatform(1, () {
     switch (defaultTargetPlatform) {
       case TargetPlatform.macOS:
@@ -33,7 +33,7 @@ class PrintJobPageOrder {
   ///Descending (front to back) page order.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- MacOS
+  ///- macOS WKWebView
   static final DESCENDING = PrintJobPageOrder._internalMultiPlatform(-1, () {
     switch (defaultTargetPlatform) {
       case TargetPlatform.macOS:
@@ -47,7 +47,7 @@ class PrintJobPageOrder {
   ///The spooler does not rearrange pages—they are printed in the order received by the spooler.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- MacOS
+  ///- macOS WKWebView
   static final SPECIAL = PrintJobPageOrder._internalMultiPlatform(0, () {
     switch (defaultTargetPlatform) {
       case TargetPlatform.macOS:
@@ -61,7 +61,7 @@ class PrintJobPageOrder {
   ///No page order specified.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- MacOS
+  ///- macOS WKWebView
   static final UNKNOWN = PrintJobPageOrder._internalMultiPlatform(2, () {
     switch (defaultTargetPlatform) {
       case TargetPlatform.macOS:
@@ -162,6 +162,11 @@ class PrintJobPageOrder {
 
   @override
   bool operator ==(value) => value == _value;
+
+  ///Checks if the value is supported by the [defaultTargetPlatform].
+  bool isSupported() {
+    return toNativeValue() != null;
+  }
 
   @override
   String toString() {

@@ -86,18 +86,17 @@ packages:
   flutter_inappwebview_platform_interface:
     dependency: transitive
     description:
-      name: flutter_inappwebview_platform_interface
-      sha256: "2c99bf767900ba029d825bc6f494d30169ee83cdaa038d86e85fe70571d0a655"
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.4.0-beta.2"
+      path: "../../flutter_inappwebview_platform_interface"
+      relative: true
+    source: path
+    version: "1.4.0-beta.3"
   flutter_inappwebview_web:
     dependency: "direct main"
     description:
       path: ".."
       relative: true
     source: path
-    version: "1.2.0-beta.2"
+    version: "1.2.0-beta.3"
   flutter_lints:
     dependency: "direct dev"
     description:

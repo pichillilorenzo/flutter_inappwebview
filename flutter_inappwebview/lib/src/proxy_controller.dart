@@ -1,4 +1,6 @@
 import 'dart:async';
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_platform_interface.dart';
 
 ///{@macro flutter_inappwebview_platform_interface.PlatformProxyController}
@@ -38,4 +40,14 @@ class ProxyController {
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformProxyController.clearProxyOverride}
   Future<void> clearProxyOverride() => platform.clearProxyOverride();
+
+  ///{@macro flutter_inappwebview_platform_interface.PlatformProxyControllerCreationParams.isClassSupported}
+  static bool isClassSupported({TargetPlatform? platform}) =>
+      PlatformProxyController.static().isClassSupported(platform: platform);
+
+  ///{@macro flutter_inappwebview_platform_interface.PlatformProxyController.isMethodSupported}
+  static bool isMethodSupported(PlatformProxyControllerMethod method,
+          {TargetPlatform? platform}) =>
+      PlatformProxyController.static()
+          .isMethodSupported(method, platform: platform);
 }

@@ -24,7 +24,7 @@ class InAppWebViewInitialData {
   ///The URL to use as the history entry. If `null` defaults to `about:blank`. If non-null, this must be a valid URL.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Android native WebView
+  ///- Android WebView
   WebUri? historyUrl;
 
   ///The MIME type of the data, e.g. "text/html". The default value is `"text/html"`.

@@ -15,8 +15,8 @@ class JsConfirmRequest {
   ///Indicates whether the request was made for the main frame.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- iOS
-  ///- MacOS
+  ///- iOS WKWebView
+  ///- macOS WKWebView
   bool? isMainFrame;
 
   ///Message to be displayed in the window.

@@ -20,7 +20,7 @@ class SslErrorType {
   ///Indicates that the SSL certificate common name does not match the web address.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Windows ([Official API - COREWEBVIEW2_WEB_ERROR_STATUS_CERTIFICATE_COMMON_NAME_IS_INCORRECT](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2849.39#corewebview2_web_error_status))
+  ///- Windows WebView2 ([Official API - COREWEBVIEW2_WEB_ERROR_STATUS_CERTIFICATE_COMMON_NAME_IS_INCORRECT](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2849.39#corewebview2_web_error_status))
   static final COMMON_NAME_IS_INCORRECT =
       SslErrorType._internalMultiPlatform('COMMON_NAME_IS_INCORRECT', () {
     switch (defaultTargetPlatform) {
@@ -35,7 +35,7 @@ class SslErrorType {
   ///The date of the certificate is invalid.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Android native WebView ([Official API - SslError.DATE_INVALID](https://developer.android.com/reference/android/net/http/SslError#SSL_DATE_INVALID))
+  ///- Android WebView ([Official API - SslError.DATE_INVALID](https://developer.android.com/reference/android/net/http/SslError#SSL_DATE_INVALID))
   static final DATE_INVALID =
       SslErrorType._internalMultiPlatform('DATE_INVALID', () {
     switch (defaultTargetPlatform) {
@@ -55,8 +55,8 @@ class SslErrorType {
   ///The Keychain Access utility refers to this value as "Never Trust."
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- iOS ([Official API - SecTrustResultType.deny](https://developer.apple.com/documentation/security/sectrustresulttype/deny))
-  ///- MacOS ([Official API - SecTrustResultType.deny](https://developer.apple.com/documentation/security/sectrustresulttype/deny))
+  ///- iOS WKWebView ([Official API - SecTrustResultType.deny](https://developer.apple.com/documentation/security/sectrustresulttype/deny))
+  ///- macOS WKWebView ([Official API - SecTrustResultType.deny](https://developer.apple.com/documentation/security/sectrustresulttype/deny))
   static final DENY = SslErrorType._internalMultiPlatform('DENY', () {
     switch (defaultTargetPlatform) {
       case TargetPlatform.iOS:
@@ -72,8 +72,8 @@ class SslErrorType {
   ///The certificate has expired.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Android native WebView ([Official API - SslError.SSL_EXPIRED](https://developer.android.com/reference/android/net/http/SslError#SSL_EXPIRED))
-  ///- Windows ([Official API - COREWEBVIEW2_WEB_ERROR_STATUS_CERTIFICATE_EXPIRED](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2849.39#corewebview2_web_error_status))
+  ///- Android WebView ([Official API - SslError.SSL_EXPIRED](https://developer.android.com/reference/android/net/http/SslError#SSL_EXPIRED))
+  ///- Windows WebView2 ([Official API - COREWEBVIEW2_WEB_ERROR_STATUS_CERTIFICATE_EXPIRED](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2849.39#corewebview2_web_error_status))
   static final EXPIRED = SslErrorType._internalMultiPlatform('EXPIRED', () {
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
@@ -94,8 +94,8 @@ class SslErrorType {
   ///Changing parameter values and reevaluating is unlikely to succeed unless you provide different certificates.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- iOS ([Official API - SecTrustResultType.fatalTrustFailure](https://developer.apple.com/documentation/security/sectrustresulttype/fataltrustfailure))
-  ///- MacOS ([Official API - SecTrustResultType.fatalTrustFailure](https://developer.apple.com/documentation/security/sectrustresulttype/fataltrustfailure))
+  ///- iOS WKWebView ([Official API - SecTrustResultType.fatalTrustFailure](https://developer.apple.com/documentation/security/sectrustresulttype/fataltrustfailure))
+  ///- macOS WKWebView ([Official API - SecTrustResultType.fatalTrustFailure](https://developer.apple.com/documentation/security/sectrustresulttype/fataltrustfailure))
   static final FATAL_TRUST_FAILURE =
       SslErrorType._internalMultiPlatform('FATAL_TRUST_FAILURE', () {
     switch (defaultTargetPlatform) {
@@ -112,7 +112,7 @@ class SslErrorType {
   ///Hostname mismatch.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Android native WebView ([Official API - SslError.SSL_IDMISMATCH](https://developer.android.com/reference/android/net/http/SslError#SSL_IDMISMATCH))
+  ///- Android WebView ([Official API - SslError.SSL_IDMISMATCH](https://developer.android.com/reference/android/net/http/SslError#SSL_IDMISMATCH))
   static final IDMISMATCH =
       SslErrorType._internalMultiPlatform('IDMISMATCH', () {
     switch (defaultTargetPlatform) {
@@ -127,10 +127,10 @@ class SslErrorType {
   ///Indicates an invalid setting or result. A generic error occurred.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Android native WebView ([Official API - SslError.SSL_INVALID](https://developer.android.com/reference/android/net/http/SslError#SSL_INVALID))
-  ///- iOS ([Official API - SecTrustResultType.invalid](https://developer.apple.com/documentation/security/sectrustresulttype/invalid))
-  ///- MacOS ([Official API - SecTrustResultType.invalid](https://developer.apple.com/documentation/security/sectrustresulttype/invalid))
-  ///- Windows ([Official API - COREWEBVIEW2_WEB_ERROR_STATUS_CERTIFICATE_IS_INVALID](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2849.39#corewebview2_web_error_status))
+  ///- Android WebView ([Official API - SslError.SSL_INVALID](https://developer.android.com/reference/android/net/http/SslError#SSL_INVALID))
+  ///- iOS WKWebView ([Official API - SecTrustResultType.invalid](https://developer.apple.com/documentation/security/sectrustresulttype/invalid))
+  ///- macOS WKWebView ([Official API - SecTrustResultType.invalid](https://developer.apple.com/documentation/security/sectrustresulttype/invalid))
+  ///- Windows WebView2 ([Official API - COREWEBVIEW2_WEB_ERROR_STATUS_CERTIFICATE_IS_INVALID](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2849.39#corewebview2_web_error_status))
   static final INVALID = SslErrorType._internalMultiPlatform('INVALID', () {
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
@@ -150,7 +150,7 @@ class SslErrorType {
   ///The certificate is not yet valid.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Android native WebView ([Official API - SslError.SSL_NOTYETVALID](https://developer.android.com/reference/android/net/http/SslError#SSL_NOTYETVALID))
+  ///- Android WebView ([Official API - SslError.SSL_NOTYETVALID](https://developer.android.com/reference/android/net/http/SslError#SSL_NOTYETVALID))
   static final NOT_YET_VALID =
       SslErrorType._internalMultiPlatform('NOT_YET_VALID', () {
     switch (defaultTargetPlatform) {
@@ -170,9 +170,9 @@ class SslErrorType {
   ///by OS-level errors that are unrelated to the certificates themselves.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- iOS ([Official API - SecTrustResultType.otherError](https://developer.apple.com/documentation/security/sectrustresulttype/othererror))
-  ///- MacOS ([Official API - SecTrustResultType.otherError](https://developer.apple.com/documentation/security/sectrustresulttype/othererror))
-  ///- Windows ([Official API - COREWEBVIEW2_WEB_ERROR_STATUS_CLIENT_CERTIFICATE_CONTAINS_ERRORS](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2849.39#corewebview2_web_error_status))
+  ///- iOS WKWebView ([Official API - SecTrustResultType.otherError](https://developer.apple.com/documentation/security/sectrustresulttype/othererror))
+  ///- macOS WKWebView ([Official API - SecTrustResultType.otherError](https://developer.apple.com/documentation/security/sectrustresulttype/othererror))
+  ///- Windows WebView2 ([Official API - COREWEBVIEW2_WEB_ERROR_STATUS_CLIENT_CERTIFICATE_CONTAINS_ERRORS](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2849.39#corewebview2_web_error_status))
   static final OTHER_ERROR =
       SslErrorType._internalMultiPlatform('OTHER_ERROR', () {
     switch (defaultTargetPlatform) {
@@ -199,8 +199,8 @@ class SslErrorType {
   ///you should check again using that date to see if the message was valid when you originally received it.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- iOS ([Official API - SecTrustResultType.recoverableTrustFailure](https://developer.apple.com/documentation/security/sectrustresulttype/recoverabletrustfailure))
-  ///- MacOS ([Official API - SecTrustResultType.recoverableTrustFailure](https://developer.apple.com/documentation/security/sectrustresulttype/recoverabletrustfailure))
+  ///- iOS WKWebView ([Official API - SecTrustResultType.recoverableTrustFailure](https://developer.apple.com/documentation/security/sectrustresulttype/recoverabletrustfailure))
+  ///- macOS WKWebView ([Official API - SecTrustResultType.recoverableTrustFailure](https://developer.apple.com/documentation/security/sectrustresulttype/recoverabletrustfailure))
   static final RECOVERABLE_TRUST_FAILURE =
       SslErrorType._internalMultiPlatform('RECOVERABLE_TRUST_FAILURE', () {
     switch (defaultTargetPlatform) {
@@ -217,7 +217,7 @@ class SslErrorType {
   ///Indicates that the SSL certificate has been revoked.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Windows ([Official API - COREWEBVIEW2_WEB_ERROR_STATUS_CERTIFICATE_REVOKED](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2849.39#corewebview2_web_error_status))
+  ///- Windows WebView2 ([Official API - COREWEBVIEW2_WEB_ERROR_STATUS_CERTIFICATE_REVOKED](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2849.39#corewebview2_web_error_status))
   static final REVOKED = SslErrorType._internalMultiPlatform('REVOKED', () {
     switch (defaultTargetPlatform) {
       case TargetPlatform.windows:
@@ -238,8 +238,8 @@ class SslErrorType {
   ///When receiving this value, most apps should trust the chain.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- iOS ([Official API - SecTrustResultType.unspecified](https://developer.apple.com/documentation/security/sectrustresulttype/unspecified))
-  ///- MacOS ([Official API - SecTrustResultType.unspecified](https://developer.apple.com/documentation/security/sectrustresulttype/unspecified))
+  ///- iOS WKWebView ([Official API - SecTrustResultType.unspecified](https://developer.apple.com/documentation/security/sectrustresulttype/unspecified))
+  ///- macOS WKWebView ([Official API - SecTrustResultType.unspecified](https://developer.apple.com/documentation/security/sectrustresulttype/unspecified))
   static final UNSPECIFIED =
       SslErrorType._internalMultiPlatform('UNSPECIFIED', () {
     switch (defaultTargetPlatform) {
@@ -256,7 +256,7 @@ class SslErrorType {
   ///The certificate authority is not trusted.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Android native WebView ([Official API - SslError.SSL_UNTRUSTED](https://developer.android.com/reference/android/net/http/SslError#SSL_UNTRUSTED))
+  ///- Android WebView ([Official API - SslError.SSL_UNTRUSTED](https://developer.android.com/reference/android/net/http/SslError#SSL_UNTRUSTED))
   static final UNTRUSTED = SslErrorType._internalMultiPlatform('UNTRUSTED', () {
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
@@ -342,7 +342,7 @@ class SslErrorType {
   ///Gets [String] value.
   String toValue() => _value;
 
-  ///Gets [int?] native value.
+  ///Gets [int] native value if supported by the current platform, otherwise `null`.
   int? toNativeValue() => _nativeValue;
 
   ///Gets the name of the value.
@@ -383,6 +383,11 @@ class SslErrorType {
 
   @override
   bool operator ==(value) => value == _value;
+
+  ///Checks if the value is supported by the [defaultTargetPlatform].
+  bool isSupported() {
+    return toNativeValue() != null;
+  }
 
   @override
   String toString() {
@@ -517,6 +522,11 @@ class AndroidSslError {
   @override
   bool operator ==(value) => value == _value;
 
+  ///Checks if the value is supported by the [defaultTargetPlatform].
+  bool isSupported() {
+    return true;
+  }
+
   @override
   String toString() {
     return name();
@@ -648,6 +658,11 @@ class IOSSslError {
 
   @override
   bool operator ==(value) => value == _value;
+
+  ///Checks if the value is supported by the [defaultTargetPlatform].
+  bool isSupported() {
+    return true;
+  }
 
   @override
   String toString() {

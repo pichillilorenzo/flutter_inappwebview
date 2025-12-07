@@ -19,8 +19,8 @@ class WebResourceErrorType {
   ///App Transport Security disallowed a connection because there is no secure network connection.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- iOS ([Official API - URLError.appTransportSecurityRequiresSecureConnection](https://developer.apple.com/documentation/foundation/urlerror/code/2882980-apptransportsecurityrequiressecu))
-  ///- MacOS ([Official API - URLError.appTransportSecurityRequiresSecureConnection](https://developer.apple.com/documentation/foundation/urlerror/code/2882980-apptransportsecurityrequiressecu))
+  ///- iOS WKWebView ([Official API - URLError.appTransportSecurityRequiresSecureConnection](https://developer.apple.com/documentation/foundation/urlerror/code/2882980-apptransportsecurityrequiressecu))
+  ///- macOS WKWebView ([Official API - URLError.appTransportSecurityRequiresSecureConnection](https://developer.apple.com/documentation/foundation/urlerror/code/2882980-apptransportsecurityrequiressecu))
   static final APP_TRANSPORT_SECURITY_REQUIRES_SECURE_CONNECTION =
       WebResourceErrorType._internalMultiPlatform(
           'APP_TRANSPORT_SECURITY_REQUIRES_SECURE_CONNECTION', () {
@@ -38,8 +38,8 @@ class WebResourceErrorType {
   ///An app or app extension attempted to connect to a background session that is already connected to a process.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- iOS ([Official API - URLError.backgroundSessionInUseByAnotherProcess](https://developer.apple.com/documentation/foundation/urlerror/code/2882923-backgroundsessioninusebyanotherp))
-  ///- MacOS ([Official API - URLError.backgroundSessionInUseByAnotherProcess](https://developer.apple.com/documentation/foundation/urlerror/code/2882923-backgroundsessioninusebyanotherp))
+  ///- iOS WKWebView ([Official API - URLError.backgroundSessionInUseByAnotherProcess](https://developer.apple.com/documentation/foundation/urlerror/code/2882923-backgroundsessioninusebyanotherp))
+  ///- macOS WKWebView ([Official API - URLError.backgroundSessionInUseByAnotherProcess](https://developer.apple.com/documentation/foundation/urlerror/code/2882923-backgroundsessioninusebyanotherp))
   static final BACKGROUND_SESSION_IN_USE_BY_ANOTHER_PROCESS =
       WebResourceErrorType._internalMultiPlatform(
           'BACKGROUND_SESSION_IN_USE_BY_ANOTHER_PROCESS', () {
@@ -57,8 +57,8 @@ class WebResourceErrorType {
   ///The shared container identifier of the URL session configuration is needed but has not been set.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- iOS ([Official API - URLError.backgroundSessionRequiresSharedContainer](https://developer.apple.com/documentation/foundation/urlerror/code/2883169-backgroundsessionrequiressharedc))
-  ///- MacOS ([Official API - URLError.backgroundSessionRequiresSharedContainer](https://developer.apple.com/documentation/foundation/urlerror/code/2883169-backgroundsessionrequiressharedc))
+  ///- iOS WKWebView ([Official API - URLError.backgroundSessionRequiresSharedContainer](https://developer.apple.com/documentation/foundation/urlerror/code/2883169-backgroundsessionrequiressharedc))
+  ///- macOS WKWebView ([Official API - URLError.backgroundSessionRequiresSharedContainer](https://developer.apple.com/documentation/foundation/urlerror/code/2883169-backgroundsessionrequiressharedc))
   static final BACKGROUND_SESSION_REQUIRES_SHARED_CONTAINER =
       WebResourceErrorType._internalMultiPlatform(
           'BACKGROUND_SESSION_REQUIRES_SHARED_CONTAINER', () {
@@ -76,8 +76,8 @@ class WebResourceErrorType {
   ///The app is suspended or exits while a background data task is processing.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- iOS ([Official API - URLError.backgroundSessionWasDisconnected](https://developer.apple.com/documentation/foundation/urlerror/code/2883075-backgroundsessionwasdisconnected))
-  ///- MacOS ([Official API - URLError.backgroundSessionWasDisconnected](https://developer.apple.com/documentation/foundation/urlerror/code/2883075-backgroundsessionwasdisconnected))
+  ///- iOS WKWebView ([Official API - URLError.backgroundSessionWasDisconnected](https://developer.apple.com/documentation/foundation/urlerror/code/2883075-backgroundsessionwasdisconnected))
+  ///- macOS WKWebView ([Official API - URLError.backgroundSessionWasDisconnected](https://developer.apple.com/documentation/foundation/urlerror/code/2883075-backgroundsessionwasdisconnected))
   static final BACKGROUND_SESSION_WAS_DISCONNECTED =
       WebResourceErrorType._internalMultiPlatform(
           'BACKGROUND_SESSION_WAS_DISCONNECTED', () {
@@ -95,9 +95,9 @@ class WebResourceErrorType {
   ///The URL Loading System received bad data from the server.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- iOS ([Official API - URLError.badServerResponse](https://developer.apple.com/documentation/foundation/urlerror/2293606-badserverresponse))
-  ///- MacOS ([Official API - URLError.badServerResponse](https://developer.apple.com/documentation/foundation/urlerror/2293606-badserverresponse))
-  ///- Windows ([Official API - COREWEBVIEW2_WEB_ERROR_STATUS_ERROR_HTTP_INVALID_SERVER_RESPONSE](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2210.55#corewebview2_web_error_status))
+  ///- iOS WKWebView ([Official API - URLError.badServerResponse](https://developer.apple.com/documentation/foundation/urlerror/2293606-badserverresponse))
+  ///- macOS WKWebView ([Official API - URLError.badServerResponse](https://developer.apple.com/documentation/foundation/urlerror/2293606-badserverresponse))
+  ///- Windows WebView2 ([Official API - COREWEBVIEW2_WEB_ERROR_STATUS_ERROR_HTTP_INVALID_SERVER_RESPONSE](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2210.55#corewebview2_web_error_status))
   static final BAD_SERVER_RESPONSE =
       WebResourceErrorType._internalMultiPlatform('BAD_SERVER_RESPONSE', () {
     switch (defaultTargetPlatform) {
@@ -116,9 +116,9 @@ class WebResourceErrorType {
   ///A malformed URL prevented a URL request from being initiated.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Android native WebView ([Official API - WebViewClient.ERROR_BAD_URL](https://developer.android.com/reference/android/webkit/WebViewClient#ERROR_BAD_URL))
-  ///- iOS ([Official API - URLError.badURL](https://developer.apple.com/documentation/foundation/urlerror/2293516-badurl))
-  ///- MacOS ([Official API - URLError.badURL](https://developer.apple.com/documentation/foundation/urlerror/2293516-badurl))
+  ///- Android WebView ([Official API - WebViewClient.ERROR_BAD_URL](https://developer.android.com/reference/android/webkit/WebViewClient#ERROR_BAD_URL))
+  ///- iOS WKWebView ([Official API - URLError.badURL](https://developer.apple.com/documentation/foundation/urlerror/2293516-badurl))
+  ///- macOS WKWebView ([Official API - URLError.badURL](https://developer.apple.com/documentation/foundation/urlerror/2293516-badurl))
   static final BAD_URL =
       WebResourceErrorType._internalMultiPlatform('BAD_URL', () {
     switch (defaultTargetPlatform) {
@@ -137,8 +137,8 @@ class WebResourceErrorType {
   ///A connection was attempted while a phone call is active on a network that does not support simultaneous phone and data communication (EDGE or GPRS).
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- iOS ([Official API - URLError.callIsActive](https://developer.apple.com/documentation/foundation/urlerror/code/2883170-callisactive))
-  ///- MacOS ([Official API - URLError.callIsActive](https://developer.apple.com/documentation/foundation/urlerror/code/2883170-callisactive))
+  ///- iOS WKWebView ([Official API - URLError.callIsActive](https://developer.apple.com/documentation/foundation/urlerror/code/2883170-callisactive))
+  ///- macOS WKWebView ([Official API - URLError.callIsActive](https://developer.apple.com/documentation/foundation/urlerror/code/2883170-callisactive))
   static final CALL_IS_ACTIVE =
       WebResourceErrorType._internalMultiPlatform('CALL_IS_ACTIVE', () {
     switch (defaultTargetPlatform) {
@@ -155,9 +155,9 @@ class WebResourceErrorType {
   ///An asynchronous load has been canceled.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- iOS ([Official API - URLError.cancelled](https://developer.apple.com/documentation/foundation/urlerror/code/2883178-cancelled))
-  ///- MacOS ([Official API - URLError.cancelled](https://developer.apple.com/documentation/foundation/urlerror/code/2883178-cancelled))
-  ///- Windows ([Official API - COREWEBVIEW2_WEB_ERROR_STATUS_OPERATION_CANCELED](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2210.55#corewebview2_web_error_status))
+  ///- iOS WKWebView ([Official API - URLError.cancelled](https://developer.apple.com/documentation/foundation/urlerror/code/2883178-cancelled))
+  ///- macOS WKWebView ([Official API - URLError.cancelled](https://developer.apple.com/documentation/foundation/urlerror/code/2883178-cancelled))
+  ///- Windows WebView2 ([Official API - COREWEBVIEW2_WEB_ERROR_STATUS_OPERATION_CANCELED](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2210.55#corewebview2_web_error_status))
   static final CANCELLED =
       WebResourceErrorType._internalMultiPlatform('CANCELLED', () {
     switch (defaultTargetPlatform) {
@@ -176,8 +176,8 @@ class WebResourceErrorType {
   ///A download task couldn’t close the downloaded file on disk.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- iOS ([Official API - URLError.cannotCloseFile](https://developer.apple.com/documentation/foundation/urlerror/code/2883215-cannotclosefile))
-  ///- MacOS ([Official API - URLError.cannotCloseFile](https://developer.apple.com/documentation/foundation/urlerror/code/2883215-cannotclosefile))
+  ///- iOS WKWebView ([Official API - URLError.cannotCloseFile](https://developer.apple.com/documentation/foundation/urlerror/code/2883215-cannotclosefile))
+  ///- macOS WKWebView ([Official API - URLError.cannotCloseFile](https://developer.apple.com/documentation/foundation/urlerror/code/2883215-cannotclosefile))
   static final CANNOT_CLOSE_FILE =
       WebResourceErrorType._internalMultiPlatform('CANNOT_CLOSE_FILE', () {
     switch (defaultTargetPlatform) {
@@ -194,10 +194,10 @@ class WebResourceErrorType {
   ///Failed to connect to the server.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Android native WebView ([Official API - WebViewClient.ERROR_CONNECT](https://developer.android.com/reference/android/webkit/WebViewClient#ERROR_CONNECT))
-  ///- iOS ([Official API - URLError.cannotConnectToHost](https://developer.apple.com/documentation/foundation/urlerror/code/2883001-cannotconnecttohost))
-  ///- MacOS ([Official API - URLError.cannotConnectToHost](https://developer.apple.com/documentation/foundation/urlerror/code/2883001-cannotconnecttohost))
-  ///- Windows ([Official API - COREWEBVIEW2_WEB_ERROR_STATUS_CANNOT_CONNECT](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2210.55#corewebview2_web_error_status))
+  ///- Android WebView ([Official API - WebViewClient.ERROR_CONNECT](https://developer.android.com/reference/android/webkit/WebViewClient#ERROR_CONNECT))
+  ///- iOS WKWebView ([Official API - URLError.cannotConnectToHost](https://developer.apple.com/documentation/foundation/urlerror/code/2883001-cannotconnecttohost))
+  ///- macOS WKWebView ([Official API - URLError.cannotConnectToHost](https://developer.apple.com/documentation/foundation/urlerror/code/2883001-cannotconnecttohost))
+  ///- Windows WebView2 ([Official API - COREWEBVIEW2_WEB_ERROR_STATUS_CANNOT_CONNECT](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2210.55#corewebview2_web_error_status))
   static final CANNOT_CONNECT_TO_HOST =
       WebResourceErrorType._internalMultiPlatform('CANNOT_CONNECT_TO_HOST', () {
     switch (defaultTargetPlatform) {
@@ -218,8 +218,8 @@ class WebResourceErrorType {
   ///A download task couldn’t create the downloaded file on disk because of an I/O failure.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- iOS ([Official API - URLError.cannotCreateFile](https://developer.apple.com/documentation/foundation/urlerror/code/2883204-cannotcreatefile))
-  ///- MacOS ([Official API - URLError.cannotCreateFile](https://developer.apple.com/documentation/foundation/urlerror/code/2883204-cannotcreatefile))
+  ///- iOS WKWebView ([Official API - URLError.cannotCreateFile](https://developer.apple.com/documentation/foundation/urlerror/code/2883204-cannotcreatefile))
+  ///- macOS WKWebView ([Official API - URLError.cannotCreateFile](https://developer.apple.com/documentation/foundation/urlerror/code/2883204-cannotcreatefile))
   static final CANNOT_CREATE_FILE =
       WebResourceErrorType._internalMultiPlatform('CANNOT_CREATE_FILE', () {
     switch (defaultTargetPlatform) {
@@ -236,8 +236,8 @@ class WebResourceErrorType {
   ///Content data received during a connection request couldn’t be decoded for a known content encoding.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- iOS ([Official API - URLError.cannotDecodeContentData](https://developer.apple.com/documentation/foundation/urlerror/2292983-cannotdecodecontentdata))
-  ///- MacOS ([Official API - URLError.cannotDecodeContentData](https://developer.apple.com/documentation/foundation/urlerror/2292983-cannotdecodecontentdata))
+  ///- iOS WKWebView ([Official API - URLError.cannotDecodeContentData](https://developer.apple.com/documentation/foundation/urlerror/2292983-cannotdecodecontentdata))
+  ///- macOS WKWebView ([Official API - URLError.cannotDecodeContentData](https://developer.apple.com/documentation/foundation/urlerror/2292983-cannotdecodecontentdata))
   static final CANNOT_DECODE_CONTENT_DATA =
       WebResourceErrorType._internalMultiPlatform('CANNOT_DECODE_CONTENT_DATA',
           () {
@@ -255,8 +255,8 @@ class WebResourceErrorType {
   ///Content data received during a connection request couldn’t be decoded for a known content encoding.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- iOS ([Official API - URLError.cannotDecodeRawData](https://developer.apple.com/documentation/foundation/urlerror/2293573-cannotdecoderawdata))
-  ///- MacOS ([Official API - URLError.cannotDecodeRawData](https://developer.apple.com/documentation/foundation/urlerror/2293573-cannotdecoderawdata))
+  ///- iOS WKWebView ([Official API - URLError.cannotDecodeRawData](https://developer.apple.com/documentation/foundation/urlerror/2293573-cannotdecoderawdata))
+  ///- macOS WKWebView ([Official API - URLError.cannotDecodeRawData](https://developer.apple.com/documentation/foundation/urlerror/2293573-cannotdecoderawdata))
   static final CANNOT_DECODE_RAW_DATA =
       WebResourceErrorType._internalMultiPlatform('CANNOT_DECODE_RAW_DATA', () {
     switch (defaultTargetPlatform) {
@@ -273,8 +273,8 @@ class WebResourceErrorType {
   ///A request to load an item only from the cache could not be satisfied.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- iOS ([Official API - URLError.cannotLoadFromNetwork](https://developer.apple.com/documentation/foundation/urlerror/code/2882968-cannotloadfromnetwork))
-  ///- MacOS ([Official API - URLError.cannotLoadFromNetwork](https://developer.apple.com/documentation/foundation/urlerror/code/2882968-cannotloadfromnetwork))
+  ///- iOS WKWebView ([Official API - URLError.cannotLoadFromNetwork](https://developer.apple.com/documentation/foundation/urlerror/code/2882968-cannotloadfromnetwork))
+  ///- macOS WKWebView ([Official API - URLError.cannotLoadFromNetwork](https://developer.apple.com/documentation/foundation/urlerror/code/2882968-cannotloadfromnetwork))
   static final CANNOT_LOAD_FROM_NETWORK =
       WebResourceErrorType._internalMultiPlatform('CANNOT_LOAD_FROM_NETWORK',
           () {
@@ -292,8 +292,8 @@ class WebResourceErrorType {
   ///A download task was unable to move a downloaded file on disk.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- iOS ([Official API - URLError.cannotMoveFile](https://developer.apple.com/documentation/foundation/urlerror/code/2883180-cannotmovefile))
-  ///- MacOS ([Official API - URLError.cannotMoveFile](https://developer.apple.com/documentation/foundation/urlerror/code/2883180-cannotmovefile))
+  ///- iOS WKWebView ([Official API - URLError.cannotMoveFile](https://developer.apple.com/documentation/foundation/urlerror/code/2883180-cannotmovefile))
+  ///- macOS WKWebView ([Official API - URLError.cannotMoveFile](https://developer.apple.com/documentation/foundation/urlerror/code/2883180-cannotmovefile))
   static final CANNOT_MOVE_FILE =
       WebResourceErrorType._internalMultiPlatform('CANNOT_MOVE_FILE', () {
     switch (defaultTargetPlatform) {
@@ -310,8 +310,8 @@ class WebResourceErrorType {
   ///A download task was unable to open the downloaded file on disk.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- iOS ([Official API - URLError.cannotOpenFile](https://developer.apple.com/documentation/foundation/urlerror/code/2883034-cannotopenfile))
-  ///- MacOS ([Official API - URLError.cannotOpenFile](https://developer.apple.com/documentation/foundation/urlerror/code/2883034-cannotopenfile))
+  ///- iOS WKWebView ([Official API - URLError.cannotOpenFile](https://developer.apple.com/documentation/foundation/urlerror/code/2883034-cannotopenfile))
+  ///- macOS WKWebView ([Official API - URLError.cannotOpenFile](https://developer.apple.com/documentation/foundation/urlerror/code/2883034-cannotopenfile))
   static final CANNOT_OPEN_FILE =
       WebResourceErrorType._internalMultiPlatform('CANNOT_OPEN_FILE', () {
     switch (defaultTargetPlatform) {
@@ -328,8 +328,8 @@ class WebResourceErrorType {
   ///A task could not parse a response.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- iOS ([Official API - URLError.cannotParseResponse](https://developer.apple.com/documentation/foundation/urlerror/code/2882919-cannotparseresponse))
-  ///- MacOS ([Official API - URLError.cannotParseResponse](https://developer.apple.com/documentation/foundation/urlerror/code/2882919-cannotparseresponse))
+  ///- iOS WKWebView ([Official API - URLError.cannotParseResponse](https://developer.apple.com/documentation/foundation/urlerror/code/2882919-cannotparseresponse))
+  ///- macOS WKWebView ([Official API - URLError.cannotParseResponse](https://developer.apple.com/documentation/foundation/urlerror/code/2882919-cannotparseresponse))
   static final CANNOT_PARSE_RESPONSE =
       WebResourceErrorType._internalMultiPlatform('CANNOT_PARSE_RESPONSE', () {
     switch (defaultTargetPlatform) {
@@ -346,8 +346,8 @@ class WebResourceErrorType {
   ///A download task was unable to remove a downloaded file from disk.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- iOS ([Official API - URLError.cannotRemoveFile](https://developer.apple.com/documentation/foundation/urlerror/code/2883202-cannotremovefile))
-  ///- MacOS ([Official API - URLError.cannotRemoveFile](https://developer.apple.com/documentation/foundation/urlerror/code/2883202-cannotremovefile))
+  ///- iOS WKWebView ([Official API - URLError.cannotRemoveFile](https://developer.apple.com/documentation/foundation/urlerror/code/2883202-cannotremovefile))
+  ///- macOS WKWebView ([Official API - URLError.cannotRemoveFile](https://developer.apple.com/documentation/foundation/urlerror/code/2883202-cannotremovefile))
   static final CANNOT_REMOVE_FILE =
       WebResourceErrorType._internalMultiPlatform('CANNOT_REMOVE_FILE', () {
     switch (defaultTargetPlatform) {
@@ -364,8 +364,8 @@ class WebResourceErrorType {
   ///A download task was unable to write to the downloaded file on disk.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- iOS ([Official API - URLError.cannotWriteToFile](https://developer.apple.com/documentation/foundation/urlerror/code/2883098-cannotwritetofile))
-  ///- MacOS ([Official API - URLError.cannotWriteToFile](https://developer.apple.com/documentation/foundation/urlerror/code/2883098-cannotwritetofile))
+  ///- iOS WKWebView ([Official API - URLError.cannotWriteToFile](https://developer.apple.com/documentation/foundation/urlerror/code/2883098-cannotwritetofile))
+  ///- macOS WKWebView ([Official API - URLError.cannotWriteToFile](https://developer.apple.com/documentation/foundation/urlerror/code/2883098-cannotwritetofile))
   static final CANNOT_WRITE_TO_FILE =
       WebResourceErrorType._internalMultiPlatform('CANNOT_WRITE_TO_FILE', () {
     switch (defaultTargetPlatform) {
@@ -382,8 +382,8 @@ class WebResourceErrorType {
   ///A server certificate was rejected.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- iOS ([Official API - URLError.clientCertificateRejected](https://developer.apple.com/documentation/foundation/urlerror/code/2883091-clientcertificaterejected))
-  ///- MacOS ([Official API - URLError.clientCertificateRejected](https://developer.apple.com/documentation/foundation/urlerror/code/2883091-clientcertificaterejected))
+  ///- iOS WKWebView ([Official API - URLError.clientCertificateRejected](https://developer.apple.com/documentation/foundation/urlerror/code/2883091-clientcertificaterejected))
+  ///- macOS WKWebView ([Official API - URLError.clientCertificateRejected](https://developer.apple.com/documentation/foundation/urlerror/code/2883091-clientcertificaterejected))
   static final CLIENT_CERTIFICATE_REJECTED =
       WebResourceErrorType._internalMultiPlatform('CLIENT_CERTIFICATE_REJECTED',
           () {
@@ -401,8 +401,8 @@ class WebResourceErrorType {
   ///A client certificate was required to authenticate an SSL connection during a request.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- iOS ([Official API - URLError.clientCertificateRequired](https://developer.apple.com/documentation/foundation/urlerror/code/2883199-clientcertificaterequired))
-  ///- MacOS ([Official API - URLError.clientCertificateRequired](https://developer.apple.com/documentation/foundation/urlerror/code/2883199-clientcertificaterequired))
+  ///- iOS WKWebView ([Official API - URLError.clientCertificateRequired](https://developer.apple.com/documentation/foundation/urlerror/code/2883199-clientcertificaterequired))
+  ///- macOS WKWebView ([Official API - URLError.clientCertificateRequired](https://developer.apple.com/documentation/foundation/urlerror/code/2883199-clientcertificaterequired))
   static final CLIENT_CERTIFICATE_REQUIRED =
       WebResourceErrorType._internalMultiPlatform('CLIENT_CERTIFICATE_REQUIRED',
           () {
@@ -420,7 +420,7 @@ class WebResourceErrorType {
   ///Indicates that the connection was stopped.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Windows ([Official API - COREWEBVIEW2_WEB_ERROR_STATUS_CONNECTION_ABORTED](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2210.55#corewebview2_web_error_status))
+  ///- Windows WebView2 ([Official API - COREWEBVIEW2_WEB_ERROR_STATUS_CONNECTION_ABORTED](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2210.55#corewebview2_web_error_status))
   static final CONNECTION_ABORTED =
       WebResourceErrorType._internalMultiPlatform('CONNECTION_ABORTED', () {
     switch (defaultTargetPlatform) {
@@ -435,8 +435,8 @@ class WebResourceErrorType {
   ///The length of the resource data exceeds the maximum allowed.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- iOS ([Official API - URLError.dataLengthExceedsMaximum](https://developer.apple.com/documentation/foundation/urlerror/code/2882930-datalengthexceedsmaximum))
-  ///- MacOS ([Official API - URLError.dataLengthExceedsMaximum](https://developer.apple.com/documentation/foundation/urlerror/code/2882930-datalengthexceedsmaximum))
+  ///- iOS WKWebView ([Official API - URLError.dataLengthExceedsMaximum](https://developer.apple.com/documentation/foundation/urlerror/code/2882930-datalengthexceedsmaximum))
+  ///- macOS WKWebView ([Official API - URLError.dataLengthExceedsMaximum](https://developer.apple.com/documentation/foundation/urlerror/code/2882930-datalengthexceedsmaximum))
   static final DATA_LENGTH_EXCEEDS_MAXIMUM =
       WebResourceErrorType._internalMultiPlatform('DATA_LENGTH_EXCEEDS_MAXIMUM',
           () {
@@ -454,8 +454,8 @@ class WebResourceErrorType {
   ///The cellular network disallowed a connection.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- iOS ([Official API - URLError.dataNotAllowed](https://developer.apple.com/documentation/foundation/urlerror/code/2883217-datanotallowed))
-  ///- MacOS ([Official API - URLError.dataNotAllowed](https://developer.apple.com/documentation/foundation/urlerror/code/2883217-datanotallowed))
+  ///- iOS WKWebView ([Official API - URLError.dataNotAllowed](https://developer.apple.com/documentation/foundation/urlerror/code/2883217-datanotallowed))
+  ///- macOS WKWebView ([Official API - URLError.dataNotAllowed](https://developer.apple.com/documentation/foundation/urlerror/code/2883217-datanotallowed))
   static final DATA_NOT_ALLOWED =
       WebResourceErrorType._internalMultiPlatform('DATA_NOT_ALLOWED', () {
     switch (defaultTargetPlatform) {
@@ -472,8 +472,8 @@ class WebResourceErrorType {
   ///A download task failed to decode an encoded file during the download.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- iOS ([Official API - URLError.downloadDecodingFailedMidStream](https://developer.apple.com/documentation/foundation/urlerror/code/2883224-downloaddecodingfailedmidstream))
-  ///- MacOS ([Official API - URLError.downloadDecodingFailedMidStream](https://developer.apple.com/documentation/foundation/urlerror/code/2883224-downloaddecodingfailedmidstream))
+  ///- iOS WKWebView ([Official API - URLError.downloadDecodingFailedMidStream](https://developer.apple.com/documentation/foundation/urlerror/code/2883224-downloaddecodingfailedmidstream))
+  ///- macOS WKWebView ([Official API - URLError.downloadDecodingFailedMidStream](https://developer.apple.com/documentation/foundation/urlerror/code/2883224-downloaddecodingfailedmidstream))
   static final DOWNLOAD_DECODING_FAILED_MID_STREAM =
       WebResourceErrorType._internalMultiPlatform(
           'DOWNLOAD_DECODING_FAILED_MID_STREAM', () {
@@ -491,8 +491,8 @@ class WebResourceErrorType {
   ///A download task failed to decode an encoded file after downloading.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- iOS ([Official API - URLError.downloadDecodingFailedToComplete](https://developer.apple.com/documentation/foundation/urlerror/code/2882936-downloaddecodingfailedtocomplete))
-  ///- MacOS ([Official API - URLError.downloadDecodingFailedToComplete](https://developer.apple.com/documentation/foundation/urlerror/code/2882936-downloaddecodingfailedtocomplete))
+  ///- iOS WKWebView ([Official API - URLError.downloadDecodingFailedToComplete](https://developer.apple.com/documentation/foundation/urlerror/code/2882936-downloaddecodingfailedtocomplete))
+  ///- macOS WKWebView ([Official API - URLError.downloadDecodingFailedToComplete](https://developer.apple.com/documentation/foundation/urlerror/code/2882936-downloaddecodingfailedtocomplete))
   static final DOWNLOAD_DECODING_FAILED_TO_COMPLETE =
       WebResourceErrorType._internalMultiPlatform(
           'DOWNLOAD_DECODING_FAILED_TO_COMPLETE', () {
@@ -510,7 +510,7 @@ class WebResourceErrorType {
   ///Failed to perform SSL handshake.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Android native WebView ([Official API - WebViewClient.ERROR_FAILED_SSL_HANDSHAKE](https://developer.android.com/reference/android/webkit/WebViewClient#ERROR_FAILED_SSL_HANDSHAKE))
+  ///- Android WebView ([Official API - WebViewClient.ERROR_FAILED_SSL_HANDSHAKE](https://developer.android.com/reference/android/webkit/WebViewClient#ERROR_FAILED_SSL_HANDSHAKE))
   static final FAILED_SSL_HANDSHAKE =
       WebResourceErrorType._internalMultiPlatform('FAILED_SSL_HANDSHAKE', () {
     switch (defaultTargetPlatform) {
@@ -525,8 +525,8 @@ class WebResourceErrorType {
   ///A request for an FTP file resulted in the server responding that the file is not a plain file, but a directory.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- iOS ([Official API - URLError.fileIsDirectory](https://developer.apple.com/documentation/foundation/urlerror/code/2883220-fileisdirectory))
-  ///- MacOS ([Official API - URLError.fileIsDirectory](https://developer.apple.com/documentation/foundation/urlerror/code/2883220-fileisdirectory))
+  ///- iOS WKWebView ([Official API - URLError.fileIsDirectory](https://developer.apple.com/documentation/foundation/urlerror/code/2883220-fileisdirectory))
+  ///- macOS WKWebView ([Official API - URLError.fileIsDirectory](https://developer.apple.com/documentation/foundation/urlerror/code/2883220-fileisdirectory))
   static final FILE_IS_DIRECTORY =
       WebResourceErrorType._internalMultiPlatform('FILE_IS_DIRECTORY', () {
     switch (defaultTargetPlatform) {
@@ -543,9 +543,9 @@ class WebResourceErrorType {
   ///File not found.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Android native WebView ([Official API - WebViewClient.ERROR_FILE_NOT_FOUND](https://developer.android.com/reference/android/webkit/WebViewClient#ERROR_FILE_NOT_FOUND))
-  ///- iOS ([Official API - URLError.fileDoesNotExist](https://developer.apple.com/documentation/foundation/urlerror/code/2883074-filedoesnotexist))
-  ///- MacOS ([Official API - URLError.fileDoesNotExist](https://developer.apple.com/documentation/foundation/urlerror/code/2883074-filedoesnotexist))
+  ///- Android WebView ([Official API - WebViewClient.ERROR_FILE_NOT_FOUND](https://developer.android.com/reference/android/webkit/WebViewClient#ERROR_FILE_NOT_FOUND))
+  ///- iOS WKWebView ([Official API - URLError.fileDoesNotExist](https://developer.apple.com/documentation/foundation/urlerror/code/2883074-filedoesnotexist))
+  ///- macOS WKWebView ([Official API - URLError.fileDoesNotExist](https://developer.apple.com/documentation/foundation/urlerror/code/2883074-filedoesnotexist))
   static final FILE_NOT_FOUND =
       WebResourceErrorType._internalMultiPlatform('FILE_NOT_FOUND', () {
     switch (defaultTargetPlatform) {
@@ -564,7 +564,7 @@ class WebResourceErrorType {
   ///Generic file error.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Android native WebView ([Official API - WebViewClient.ERROR_FILE](https://developer.android.com/reference/android/webkit/WebViewClient#ERROR_FILE))
+  ///- Android WebView ([Official API - WebViewClient.ERROR_FILE](https://developer.android.com/reference/android/webkit/WebViewClient#ERROR_FILE))
   static final GENERIC_FILE_ERROR =
       WebResourceErrorType._internalMultiPlatform('GENERIC_FILE_ERROR', () {
     switch (defaultTargetPlatform) {
@@ -579,10 +579,10 @@ class WebResourceErrorType {
   ///Server or proxy hostname lookup failed.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Android native WebView ([Official API - WebViewClient.ERROR_HOST_LOOKUP](https://developer.android.com/reference/android/webkit/WebViewClient#ERROR_HOST_LOOKUP))
-  ///- iOS ([Official API - URLError.cannotFindHost](https://developer.apple.com/documentation/foundation/urlerror/code/2883157-cannotfindhost))
-  ///- MacOS ([Official API - URLError.cannotFindHost](https://developer.apple.com/documentation/foundation/urlerror/code/2883157-cannotfindhost))
-  ///- Windows ([Official API - COREWEBVIEW2_WEB_ERROR_STATUS_HOST_NAME_NOT_RESOLVED](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2210.55#corewebview2_web_error_status))
+  ///- Android WebView ([Official API - WebViewClient.ERROR_HOST_LOOKUP](https://developer.android.com/reference/android/webkit/WebViewClient#ERROR_HOST_LOOKUP))
+  ///- iOS WKWebView ([Official API - URLError.cannotFindHost](https://developer.apple.com/documentation/foundation/urlerror/code/2883157-cannotfindhost))
+  ///- macOS WKWebView ([Official API - URLError.cannotFindHost](https://developer.apple.com/documentation/foundation/urlerror/code/2883157-cannotfindhost))
+  ///- Windows WebView2 ([Official API - COREWEBVIEW2_WEB_ERROR_STATUS_HOST_NAME_NOT_RESOLVED](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2210.55#corewebview2_web_error_status))
   static final HOST_LOOKUP =
       WebResourceErrorType._internalMultiPlatform('HOST_LOOKUP', () {
     switch (defaultTargetPlatform) {
@@ -603,8 +603,8 @@ class WebResourceErrorType {
   ///The attempted connection required activating a data context while roaming, but international roaming is disabled.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- iOS ([Official API - URLError.internationalRoamingOff](https://developer.apple.com/documentation/foundation/urlerror/code/2883134-internationalroamingoff))
-  ///- MacOS ([Official API - URLError.internationalRoamingOff](https://developer.apple.com/documentation/foundation/urlerror/code/2883134-internationalroamingoff))
+  ///- iOS WKWebView ([Official API - URLError.internationalRoamingOff](https://developer.apple.com/documentation/foundation/urlerror/code/2883134-internationalroamingoff))
+  ///- macOS WKWebView ([Official API - URLError.internationalRoamingOff](https://developer.apple.com/documentation/foundation/urlerror/code/2883134-internationalroamingoff))
   static final INTERNATIONAL_ROAMING_OFF =
       WebResourceErrorType._internalMultiPlatform('INTERNATIONAL_ROAMING_OFF',
           () {
@@ -622,7 +622,7 @@ class WebResourceErrorType {
   ///Failed to read or write to the server.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Android native WebView ([Official API - WebViewClient.ERROR_IO](https://developer.android.com/reference/android/webkit/WebViewClient#ERROR_IO))
+  ///- Android WebView ([Official API - WebViewClient.ERROR_IO](https://developer.android.com/reference/android/webkit/WebViewClient#ERROR_IO))
   static final IO = WebResourceErrorType._internalMultiPlatform('IO', () {
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
@@ -636,9 +636,9 @@ class WebResourceErrorType {
   ///A client or server connection was severed in the middle of an in-progress load.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- iOS ([Official API - URLError.networkConnectionLost](https://developer.apple.com/documentation/foundation/urlerror/2293759-networkconnectionlost))
-  ///- MacOS ([Official API - URLError.networkConnectionLost](https://developer.apple.com/documentation/foundation/urlerror/2293759-networkconnectionlost))
-  ///- Windows ([Official API - COREWEBVIEW2_WEB_ERROR_STATUS_DISCONNECTED](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2210.55#corewebview2_web_error_status))
+  ///- iOS WKWebView ([Official API - URLError.networkConnectionLost](https://developer.apple.com/documentation/foundation/urlerror/2293759-networkconnectionlost))
+  ///- macOS WKWebView ([Official API - URLError.networkConnectionLost](https://developer.apple.com/documentation/foundation/urlerror/2293759-networkconnectionlost))
+  ///- Windows WebView2 ([Official API - COREWEBVIEW2_WEB_ERROR_STATUS_DISCONNECTED](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2210.55#corewebview2_web_error_status))
   static final NETWORK_CONNECTION_LOST =
       WebResourceErrorType._internalMultiPlatform('NETWORK_CONNECTION_LOST',
           () {
@@ -658,8 +658,8 @@ class WebResourceErrorType {
   ///A network resource was requested, but an internet connection hasn’t been established and can’t be established automatically.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- iOS ([Official API - URLError.notConnectedToInternet](https://developer.apple.com/documentation/foundation/urlerror/2293104-notconnectedtointernet))
-  ///- MacOS ([Official API - URLError.notConnectedToInternet](https://developer.apple.com/documentation/foundation/urlerror/2293104-notconnectedtointernet))
+  ///- iOS WKWebView ([Official API - URLError.notConnectedToInternet](https://developer.apple.com/documentation/foundation/urlerror/2293104-notconnectedtointernet))
+  ///- macOS WKWebView ([Official API - URLError.notConnectedToInternet](https://developer.apple.com/documentation/foundation/urlerror/2293104-notconnectedtointernet))
   static final NOT_CONNECTED_TO_INTERNET =
       WebResourceErrorType._internalMultiPlatform('NOT_CONNECTED_TO_INTERNET',
           () {
@@ -677,8 +677,8 @@ class WebResourceErrorType {
   ///A resource couldn’t be read because of insufficient permissions.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- iOS ([Official API - URLError.noPermissionsToReadFile](https://developer.apple.com/documentation/foundation/urlerror/code/2882941-nopermissionstoreadfile))
-  ///- MacOS ([Official API - URLError.noPermissionsToReadFile](https://developer.apple.com/documentation/foundation/urlerror/code/2882941-nopermissionstoreadfile))
+  ///- iOS WKWebView ([Official API - URLError.noPermissionsToReadFile](https://developer.apple.com/documentation/foundation/urlerror/code/2882941-nopermissionstoreadfile))
+  ///- macOS WKWebView ([Official API - URLError.noPermissionsToReadFile](https://developer.apple.com/documentation/foundation/urlerror/code/2882941-nopermissionstoreadfile))
   static final NO_PERMISSIONS_TO_READ_FILE =
       WebResourceErrorType._internalMultiPlatform('NO_PERMISSIONS_TO_READ_FILE',
           () {
@@ -696,7 +696,7 @@ class WebResourceErrorType {
   ///User authentication failed on proxy.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Android native WebView ([Official API - WebViewClient.ERROR_PROXY_AUTHENTICATION](https://developer.android.com/reference/android/webkit/WebViewClient#ERROR_PROXY_AUTHENTICATION))
+  ///- Android WebView ([Official API - WebViewClient.ERROR_PROXY_AUTHENTICATION](https://developer.android.com/reference/android/webkit/WebViewClient#ERROR_PROXY_AUTHENTICATION))
   static final PROXY_AUTHENTICATION =
       WebResourceErrorType._internalMultiPlatform('PROXY_AUTHENTICATION', () {
     switch (defaultTargetPlatform) {
@@ -711,7 +711,7 @@ class WebResourceErrorType {
   ///Indicates that the request redirect failed.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Windows ([Official API - COREWEBVIEW2_WEB_ERROR_STATUS_REDIRECT_FAILED](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2210.55#corewebview2_web_error_status))
+  ///- Windows WebView2 ([Official API - COREWEBVIEW2_WEB_ERROR_STATUS_REDIRECT_FAILED](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2210.55#corewebview2_web_error_status))
   static final REDIRECT_FAILED =
       WebResourceErrorType._internalMultiPlatform('REDIRECT_FAILED', () {
     switch (defaultTargetPlatform) {
@@ -726,8 +726,8 @@ class WebResourceErrorType {
   ///A redirect was specified by way of server response code, but the server didn’t accompany this code with a redirect URL.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- iOS ([Official API - URLError.redirectToNonExistentLocation](https://developer.apple.com/documentation/foundation/urlerror/2293066-redirecttononexistentlocation))
-  ///- MacOS ([Official API - URLError.redirectToNonExistentLocation](https://developer.apple.com/documentation/foundation/urlerror/2293066-redirecttononexistentlocation))
+  ///- iOS WKWebView ([Official API - URLError.redirectToNonExistentLocation](https://developer.apple.com/documentation/foundation/urlerror/2293066-redirecttononexistentlocation))
+  ///- macOS WKWebView ([Official API - URLError.redirectToNonExistentLocation](https://developer.apple.com/documentation/foundation/urlerror/2293066-redirecttononexistentlocation))
   static final REDIRECT_TO_NON_EXISTENT_LOCATION =
       WebResourceErrorType._internalMultiPlatform(
           'REDIRECT_TO_NON_EXISTENT_LOCATION', () {
@@ -745,8 +745,8 @@ class WebResourceErrorType {
   ///A body stream is needed but the client did not provide one.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- iOS ([Official API - URLError.requestBodyStreamExhausted](https://developer.apple.com/documentation/foundation/urlerror/code/2883176-requestbodystreamexhausted))
-  ///- MacOS ([Official API - URLError.requestBodyStreamExhausted](https://developer.apple.com/documentation/foundation/urlerror/code/2883176-requestbodystreamexhausted))
+  ///- iOS WKWebView ([Official API - URLError.requestBodyStreamExhausted](https://developer.apple.com/documentation/foundation/urlerror/code/2883176-requestbodystreamexhausted))
+  ///- macOS WKWebView ([Official API - URLError.requestBodyStreamExhausted](https://developer.apple.com/documentation/foundation/urlerror/code/2883176-requestbodystreamexhausted))
   static final REQUEST_BODY_STREAM_EXHAUSTED =
       WebResourceErrorType._internalMultiPlatform(
           'REQUEST_BODY_STREAM_EXHAUSTED', () {
@@ -764,7 +764,7 @@ class WebResourceErrorType {
   ///Indicates that the connection was reset.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Windows ([Official API - COREWEBVIEW2_WEB_ERROR_STATUS_CONNECTION_RESET](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2210.55#corewebview2_web_error_status))
+  ///- Windows WebView2 ([Official API - COREWEBVIEW2_WEB_ERROR_STATUS_CONNECTION_RESET](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2210.55#corewebview2_web_error_status))
   static final RESET = WebResourceErrorType._internalMultiPlatform('RESET', () {
     switch (defaultTargetPlatform) {
       case TargetPlatform.windows:
@@ -779,8 +779,8 @@ class WebResourceErrorType {
   ///This error can indicate a file-not-found situation, or decoding problems that prevent data from being processed correctly.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- iOS ([Official API - URLError.resourceUnavailable](https://developer.apple.com/documentation/foundation/urlerror/2293555-resourceunavailable))
-  ///- MacOS ([Official API - URLError.resourceUnavailable](https://developer.apple.com/documentation/foundation/urlerror/2293555-resourceunavailable))
+  ///- iOS WKWebView ([Official API - URLError.resourceUnavailable](https://developer.apple.com/documentation/foundation/urlerror/2293555-resourceunavailable))
+  ///- macOS WKWebView ([Official API - URLError.resourceUnavailable](https://developer.apple.com/documentation/foundation/urlerror/2293555-resourceunavailable))
   static final RESOURCE_UNAVAILABLE =
       WebResourceErrorType._internalMultiPlatform('RESOURCE_UNAVAILABLE', () {
     switch (defaultTargetPlatform) {
@@ -797,8 +797,8 @@ class WebResourceErrorType {
   ///An attempt to establish a secure connection failed for reasons that can’t be expressed more specifically.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- iOS ([Official API - URLError.secureConnectionFailed](https://developer.apple.com/documentation/foundation/urlerror/code/2883122-secureconnectionfailed))
-  ///- MacOS ([Official API - URLError.secureConnectionFailed](https://developer.apple.com/documentation/foundation/urlerror/code/2883122-secureconnectionfailed))
+  ///- iOS WKWebView ([Official API - URLError.secureConnectionFailed](https://developer.apple.com/documentation/foundation/urlerror/code/2883122-secureconnectionfailed))
+  ///- macOS WKWebView ([Official API - URLError.secureConnectionFailed](https://developer.apple.com/documentation/foundation/urlerror/code/2883122-secureconnectionfailed))
   static final SECURE_CONNECTION_FAILED =
       WebResourceErrorType._internalMultiPlatform('SECURE_CONNECTION_FAILED',
           () {
@@ -816,8 +816,8 @@ class WebResourceErrorType {
   ///A server certificate had a date which indicates it has expired, or is not yet valid.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- iOS ([Official API - URLError.serverCertificateHasBadDate](https://developer.apple.com/documentation/foundation/urlerror/code/2883088-servercertificatehasbaddate))
-  ///- MacOS ([Official API - URLError.serverCertificateHasBadDate](https://developer.apple.com/documentation/foundation/urlerror/code/2883088-servercertificatehasbaddate))
+  ///- iOS WKWebView ([Official API - URLError.serverCertificateHasBadDate](https://developer.apple.com/documentation/foundation/urlerror/code/2883088-servercertificatehasbaddate))
+  ///- macOS WKWebView ([Official API - URLError.serverCertificateHasBadDate](https://developer.apple.com/documentation/foundation/urlerror/code/2883088-servercertificatehasbaddate))
   static final SERVER_CERTIFICATE_HAS_BAD_DATE =
       WebResourceErrorType._internalMultiPlatform(
           'SERVER_CERTIFICATE_HAS_BAD_DATE', () {
@@ -835,8 +835,8 @@ class WebResourceErrorType {
   ///A server certificate was not signed by any root server.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- iOS ([Official API - URLError.serverCertificateHasUnknownRoot](https://developer.apple.com/documentation/foundation/urlerror/code/2883085-servercertificatehasunknownroot))
-  ///- MacOS ([Official API - URLError.serverCertificateHasUnknownRoot](https://developer.apple.com/documentation/foundation/urlerror/code/2883085-servercertificatehasunknownroot))
+  ///- iOS WKWebView ([Official API - URLError.serverCertificateHasUnknownRoot](https://developer.apple.com/documentation/foundation/urlerror/code/2883085-servercertificatehasunknownroot))
+  ///- macOS WKWebView ([Official API - URLError.serverCertificateHasUnknownRoot](https://developer.apple.com/documentation/foundation/urlerror/code/2883085-servercertificatehasunknownroot))
   static final SERVER_CERTIFICATE_HAS_UNKNOWN_ROOT =
       WebResourceErrorType._internalMultiPlatform(
           'SERVER_CERTIFICATE_HAS_UNKNOWN_ROOT', () {
@@ -854,8 +854,8 @@ class WebResourceErrorType {
   ///A server certificate is not yet valid.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- iOS ([Official API - URLError.serverCertificateNotYetValid](https://developer.apple.com/documentation/foundation/urlerror/code/2882991-servercertificatenotyetvalid))
-  ///- MacOS ([Official API - URLError.serverCertificateNotYetValid](https://developer.apple.com/documentation/foundation/urlerror/code/2882991-servercertificatenotyetvalid))
+  ///- iOS WKWebView ([Official API - URLError.serverCertificateNotYetValid](https://developer.apple.com/documentation/foundation/urlerror/code/2882991-servercertificatenotyetvalid))
+  ///- macOS WKWebView ([Official API - URLError.serverCertificateNotYetValid](https://developer.apple.com/documentation/foundation/urlerror/code/2882991-servercertificatenotyetvalid))
   static final SERVER_CERTIFICATE_NOT_YET_VALID =
       WebResourceErrorType._internalMultiPlatform(
           'SERVER_CERTIFICATE_NOT_YET_VALID', () {
@@ -873,8 +873,8 @@ class WebResourceErrorType {
   ///A server certificate was signed by a root server that isn’t trusted.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- iOS ([Official API - URLError.serverCertificateUntrusted](https://developer.apple.com/documentation/foundation/urlerror/code/2882976-servercertificateuntrusted))
-  ///- MacOS ([Official API - URLError.serverCertificateUntrusted](https://developer.apple.com/documentation/foundation/urlerror/code/2882976-servercertificateuntrusted))
+  ///- iOS WKWebView ([Official API - URLError.serverCertificateUntrusted](https://developer.apple.com/documentation/foundation/urlerror/code/2882976-servercertificateuntrusted))
+  ///- macOS WKWebView ([Official API - URLError.serverCertificateUntrusted](https://developer.apple.com/documentation/foundation/urlerror/code/2882976-servercertificateuntrusted))
   static final SERVER_CERTIFICATE_UNTRUSTED =
       WebResourceErrorType._internalMultiPlatform(
           'SERVER_CERTIFICATE_UNTRUSTED', () {
@@ -892,7 +892,7 @@ class WebResourceErrorType {
   ///Indicates that the host is unreachable.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Windows ([Official API - COREWEBVIEW2_WEB_ERROR_STATUS_SERVER_UNREACHABLE](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2210.55#corewebview2_web_error_status))
+  ///- Windows WebView2 ([Official API - COREWEBVIEW2_WEB_ERROR_STATUS_SERVER_UNREACHABLE](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2210.55#corewebview2_web_error_status))
   static final SERVER_UNREACHABLE =
       WebResourceErrorType._internalMultiPlatform('SERVER_UNREACHABLE', () {
     switch (defaultTargetPlatform) {
@@ -907,10 +907,10 @@ class WebResourceErrorType {
   ///Connection timed out.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Android native WebView ([Official API - WebViewClient.ERROR_TIMEOUT](https://developer.android.com/reference/android/webkit/WebViewClient#ERROR_TIMEOUT))
-  ///- iOS ([Official API - URLError.timedOut](https://developer.apple.com/documentation/foundation/urlerror/code/2883027-timedout))
-  ///- MacOS ([Official API - URLError.timedOut](https://developer.apple.com/documentation/foundation/urlerror/code/2883027-timedout))
-  ///- Windows ([Official API - COREWEBVIEW2_WEB_ERROR_STATUS_TIMEOUT](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2210.55#corewebview2_web_error_status))
+  ///- Android WebView ([Official API - WebViewClient.ERROR_TIMEOUT](https://developer.android.com/reference/android/webkit/WebViewClient#ERROR_TIMEOUT))
+  ///- iOS WKWebView ([Official API - URLError.timedOut](https://developer.apple.com/documentation/foundation/urlerror/code/2883027-timedout))
+  ///- macOS WKWebView ([Official API - URLError.timedOut](https://developer.apple.com/documentation/foundation/urlerror/code/2883027-timedout))
+  ///- Windows WebView2 ([Official API - COREWEBVIEW2_WEB_ERROR_STATUS_TIMEOUT](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2210.55#corewebview2_web_error_status))
   static final TIMEOUT =
       WebResourceErrorType._internalMultiPlatform('TIMEOUT', () {
     switch (defaultTargetPlatform) {
@@ -931,9 +931,9 @@ class WebResourceErrorType {
   ///A redirect loop has been detected or the threshold for number of allowable redirects has been exceeded (currently `16` on iOS).
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Android native WebView ([Official API - WebViewClient.ERROR_REDIRECT_LOOP](https://developer.android.com/reference/android/webkit/WebViewClient#ERROR_REDIRECT_LOOP))
-  ///- iOS ([Official API - URLError.httpTooManyRedirects](https://developer.apple.com/documentation/foundation/urlerror/code/2883099-httptoomanyredirects))
-  ///- MacOS ([Official API - URLError.httpTooManyRedirects](https://developer.apple.com/documentation/foundation/urlerror/code/2883099-httptoomanyredirects))
+  ///- Android WebView ([Official API - WebViewClient.ERROR_REDIRECT_LOOP](https://developer.android.com/reference/android/webkit/WebViewClient#ERROR_REDIRECT_LOOP))
+  ///- iOS WKWebView ([Official API - URLError.httpTooManyRedirects](https://developer.apple.com/documentation/foundation/urlerror/code/2883099-httptoomanyredirects))
+  ///- macOS WKWebView ([Official API - URLError.httpTooManyRedirects](https://developer.apple.com/documentation/foundation/urlerror/code/2883099-httptoomanyredirects))
   static final TOO_MANY_REDIRECTS =
       WebResourceErrorType._internalMultiPlatform('TOO_MANY_REDIRECTS', () {
     switch (defaultTargetPlatform) {
@@ -952,7 +952,7 @@ class WebResourceErrorType {
   ///Too many requests during this load.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Android native WebView ([Official API - WebViewClient.ERROR_TOO_MANY_REQUESTS](https://developer.android.com/reference/android/webkit/WebViewClient#ERROR_TOO_MANY_REQUESTS))
+  ///- Android WebView ([Official API - WebViewClient.ERROR_TOO_MANY_REQUESTS](https://developer.android.com/reference/android/webkit/WebViewClient#ERROR_TOO_MANY_REQUESTS))
   static final TOO_MANY_REQUESTS =
       WebResourceErrorType._internalMultiPlatform('TOO_MANY_REQUESTS', () {
     switch (defaultTargetPlatform) {
@@ -967,7 +967,7 @@ class WebResourceErrorType {
   ///Indicates that an unexpected error occurred.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Windows ([Official API - COREWEBVIEW2_WEB_ERROR_STATUS_UNEXPECTED_ERROR](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2210.55#corewebview2_web_error_status))
+  ///- Windows WebView2 ([Official API - COREWEBVIEW2_WEB_ERROR_STATUS_UNEXPECTED_ERROR](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2210.55#corewebview2_web_error_status))
   static final UNEXPECTED_ERROR =
       WebResourceErrorType._internalMultiPlatform('UNEXPECTED_ERROR', () {
     switch (defaultTargetPlatform) {
@@ -982,10 +982,10 @@ class WebResourceErrorType {
   ///The URL Loading System encountered an error that it can’t interpret.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Android native WebView ([Official API - WebViewClient.ERROR_UNKNOWN](https://developer.android.com/reference/android/webkit/WebViewClient#ERROR_UNKNOWN))
-  ///- iOS ([Official API - URLError.unknown](https://developer.apple.com/documentation/foundation/urlerror/2293357-unknown))
-  ///- MacOS ([Official API - URLError.unknown](https://developer.apple.com/documentation/foundation/urlerror/2293357-unknown))
-  ///- Windows ([Official API - COREWEBVIEW2_WEB_ERROR_STATUS_UNKNOWN](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2210.55#corewebview2_web_error_status))
+  ///- Android WebView ([Official API - WebViewClient.ERROR_UNKNOWN](https://developer.android.com/reference/android/webkit/WebViewClient#ERROR_UNKNOWN))
+  ///- iOS WKWebView ([Official API - URLError.unknown](https://developer.apple.com/documentation/foundation/urlerror/2293357-unknown))
+  ///- macOS WKWebView ([Official API - URLError.unknown](https://developer.apple.com/documentation/foundation/urlerror/2293357-unknown))
+  ///- Windows WebView2 ([Official API - COREWEBVIEW2_WEB_ERROR_STATUS_UNKNOWN](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2210.55#corewebview2_web_error_status))
   static final UNKNOWN =
       WebResourceErrorType._internalMultiPlatform('UNKNOWN', () {
     switch (defaultTargetPlatform) {
@@ -1006,7 +1006,7 @@ class WebResourceErrorType {
   ///Resource load was canceled by Safe Browsing.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Android native WebView ([Official API - WebViewClient.ERROR_UNSAFE_RESOURCE](https://developer.android.com/reference/android/webkit/WebViewClient#ERROR_UNSAFE_RESOURCE))
+  ///- Android WebView ([Official API - WebViewClient.ERROR_UNSAFE_RESOURCE](https://developer.android.com/reference/android/webkit/WebViewClient#ERROR_UNSAFE_RESOURCE))
   static final UNSAFE_RESOURCE =
       WebResourceErrorType._internalMultiPlatform('UNSAFE_RESOURCE', () {
     switch (defaultTargetPlatform) {
@@ -1021,7 +1021,7 @@ class WebResourceErrorType {
   ///Unsupported authentication scheme (not basic or digest).
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Android native WebView ([Official API - WebViewClient.ERROR_UNSUPPORTED_AUTH_SCHEME](https://developer.android.com/reference/android/webkit/WebViewClient#ERROR_UNSUPPORTED_AUTH_SCHEME))
+  ///- Android WebView ([Official API - WebViewClient.ERROR_UNSUPPORTED_AUTH_SCHEME](https://developer.android.com/reference/android/webkit/WebViewClient#ERROR_UNSUPPORTED_AUTH_SCHEME))
   static final UNSUPPORTED_AUTH_SCHEME =
       WebResourceErrorType._internalMultiPlatform('UNSUPPORTED_AUTH_SCHEME',
           () {
@@ -1038,9 +1038,9 @@ class WebResourceErrorType {
   ///Typically this occurs when there is no available protocol handler for the URL.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Android native WebView ([Official API - WebViewClient.ERROR_UNSUPPORTED_SCHEME](https://developer.android.com/reference/android/webkit/WebViewClient#ERROR_UNSUPPORTED_SCHEME))
-  ///- iOS ([Official API - URLError.unsupportedURL](https://developer.apple.com/documentation/foundation/urlerror/code/2883043-unsupportedurl))
-  ///- MacOS ([Official API - URLError.unsupportedURL](https://developer.apple.com/documentation/foundation/urlerror/code/2883043-unsupportedurl))
+  ///- Android WebView ([Official API - WebViewClient.ERROR_UNSUPPORTED_SCHEME](https://developer.android.com/reference/android/webkit/WebViewClient#ERROR_UNSUPPORTED_SCHEME))
+  ///- iOS WKWebView ([Official API - URLError.unsupportedURL](https://developer.apple.com/documentation/foundation/urlerror/code/2883043-unsupportedurl))
+  ///- macOS WKWebView ([Official API - URLError.unsupportedURL](https://developer.apple.com/documentation/foundation/urlerror/code/2883043-unsupportedurl))
   static final UNSUPPORTED_SCHEME =
       WebResourceErrorType._internalMultiPlatform('UNSUPPORTED_SCHEME', () {
     switch (defaultTargetPlatform) {
@@ -1059,7 +1059,7 @@ class WebResourceErrorType {
   ///User authentication failed on server.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Android native WebView ([Official API - WebViewClient.ERROR_AUTHENTICATION](https://developer.android.com/reference/android/webkit/WebViewClient#ERROR_AUTHENTICATION))
+  ///- Android WebView ([Official API - WebViewClient.ERROR_AUTHENTICATION](https://developer.android.com/reference/android/webkit/WebViewClient#ERROR_AUTHENTICATION))
   static final USER_AUTHENTICATION_FAILED =
       WebResourceErrorType._internalMultiPlatform('USER_AUTHENTICATION_FAILED',
           () {
@@ -1075,9 +1075,9 @@ class WebResourceErrorType {
   ///Authentication is required to access a resource.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- iOS ([Official API - URLError.userAuthenticationRequired](https://developer.apple.com/documentation/foundation/urlerror/2293560-userauthenticationrequired))
-  ///- MacOS ([Official API - URLError.userAuthenticationRequired](https://developer.apple.com/documentation/foundation/urlerror/2293560-userauthenticationrequired))
-  ///- Windows ([Official API - COREWEBVIEW2_WEB_ERROR_STATUS_VALID_AUTHENTICATION_CREDENTIALS_REQUIRED](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2210.55#corewebview2_web_error_status))
+  ///- iOS WKWebView ([Official API - URLError.userAuthenticationRequired](https://developer.apple.com/documentation/foundation/urlerror/2293560-userauthenticationrequired))
+  ///- macOS WKWebView ([Official API - URLError.userAuthenticationRequired](https://developer.apple.com/documentation/foundation/urlerror/2293560-userauthenticationrequired))
+  ///- Windows WebView2 ([Official API - COREWEBVIEW2_WEB_ERROR_STATUS_VALID_AUTHENTICATION_CREDENTIALS_REQUIRED](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2210.55#corewebview2_web_error_status))
   static final USER_AUTHENTICATION_REQUIRED =
       WebResourceErrorType._internalMultiPlatform(
           'USER_AUTHENTICATION_REQUIRED', () {
@@ -1098,8 +1098,8 @@ class WebResourceErrorType {
   ///This error typically occurs when a user clicks a "Cancel" button in a username/password dialog, rather than attempting to authenticate.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- iOS ([Official API - URLError.userCancelledAuthentication](https://developer.apple.com/documentation/foundation/urlerror/2293330-usercancelledauthentication))
-  ///- MacOS ([Official API - URLError.userCancelledAuthentication](https://developer.apple.com/documentation/foundation/urlerror/2293330-usercancelledauthentication))
+  ///- iOS WKWebView ([Official API - URLError.userCancelledAuthentication](https://developer.apple.com/documentation/foundation/urlerror/2293330-usercancelledauthentication))
+  ///- macOS WKWebView ([Official API - URLError.userCancelledAuthentication](https://developer.apple.com/documentation/foundation/urlerror/2293330-usercancelledauthentication))
   static final USER_CANCELLED_AUTHENTICATION =
       WebResourceErrorType._internalMultiPlatform(
           'USER_CANCELLED_AUTHENTICATION', () {
@@ -1117,7 +1117,7 @@ class WebResourceErrorType {
   ///Indicates that user lacks proper authentication credentials for a proxy server.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Windows ([Official API - COREWEBVIEW2_WEB_ERROR_STATUS_VALID_PROXY_AUTHENTICATION_REQUIRED](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2210.55#corewebview2_web_error_status))
+  ///- Windows WebView2 ([Official API - COREWEBVIEW2_WEB_ERROR_STATUS_VALID_PROXY_AUTHENTICATION_REQUIRED](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2210.55#corewebview2_web_error_status))
   static final VALID_PROXY_AUTHENTICATION_REQUIRED =
       WebResourceErrorType._internalMultiPlatform(
           'VALID_PROXY_AUTHENTICATION_REQUIRED', () {
@@ -1133,8 +1133,8 @@ class WebResourceErrorType {
   ///A server reported that a URL has a non-zero content length, but terminated the network connection gracefully without sending any data.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- iOS ([Official API - URLError.zeroByteResource](https://developer.apple.com/documentation/foundation/urlerror/2293773-zerobyteresource))
-  ///- MacOS ([Official API - URLError.zeroByteResource](https://developer.apple.com/documentation/foundation/urlerror/2293773-zerobyteresource))
+  ///- iOS WKWebView ([Official API - URLError.zeroByteResource](https://developer.apple.com/documentation/foundation/urlerror/2293773-zerobyteresource))
+  ///- macOS WKWebView ([Official API - URLError.zeroByteResource](https://developer.apple.com/documentation/foundation/urlerror/2293773-zerobyteresource))
   static final ZERO_BYTE_RESOURCE =
       WebResourceErrorType._internalMultiPlatform('ZERO_BYTE_RESOURCE', () {
     switch (defaultTargetPlatform) {
@@ -1272,7 +1272,7 @@ class WebResourceErrorType {
   ///Gets [String] value.
   String toValue() => _value;
 
-  ///Gets [int?] native value.
+  ///Gets [int] native value if supported by the current platform, otherwise `null`.
   int? toNativeValue() => _nativeValue;
 
   ///Gets the name of the value.
@@ -1409,6 +1409,11 @@ class WebResourceErrorType {
 
   @override
   bool operator ==(value) => value == _value;
+
+  ///Checks if the value is supported by the [defaultTargetPlatform].
+  bool isSupported() {
+    return toNativeValue() != null;
+  }
 
   @override
   String toString() {

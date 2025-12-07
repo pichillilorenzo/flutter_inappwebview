@@ -1,8 +1,11 @@
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_internal_annotations.dart';
 import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_platform_interface.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
+
+part 'platform_chrome_safari_browser.g.dart';
 
 /// Object specifying creation parameters for creating a [PlatformChromeSafariBrowser].
 ///
@@ -19,18 +22,23 @@ class PlatformChromeSafariBrowserCreationParams {
 ///It presents a self-contained web interface inside your app.
 ///
 ///If you need to customize or interact with the web content, use the `InAppWebView` widget.
-///
-///This class uses native [Chrome Custom Tabs](https://developer.android.com/reference/android/support/customtabs/package-summary) on Android
-///and [SFSafariViewController](https://developer.apple.com/documentation/safariservices/sfsafariviewcontroller) on iOS.
-///
-///**NOTE**: If you want to use the `ChromeSafariBrowser` class on Android 11+ you need to specify your app querying for
-///`android.support.customtabs.action.CustomTabsService` in your `AndroidManifest.xml`
-///(you can read more about it here: https://developers.google.com/web/android/custom-tabs/best-practices#applications_targeting_android_11_api_level_30_or_above).
-///
-///**Officially Supported Platforms/Implementations**:
-///- Android
-///- iOS
 ///{@endtemplate}
+///
+///{@macro flutter_inappwebview_platform_interface.PlatformChromeSafariBrowser.supported_platforms}
+@SupportedPlatforms(platforms: [
+  AndroidPlatform(
+    note:
+        """This class uses native [Chrome Custom Tabs](https://developer.android.com/reference/android/support/customtabs/package-summary).
+If you want to use the `ChromeSafariBrowser` class on Android 11+ you need to specify your app querying for
+`android.support.customtabs.action.CustomTabsService` in your `AndroidManifest.xml`
+(you can read more about it here: https://developers.google.com/web/android/custom-tabs/best-practices#applications_targeting_android_11_api_level_30_or_above).""",
+    name: 'Android Chrome Custom Tabs',
+  ),
+  IOSPlatform(
+      note:
+          'This class uses native [SFSafariViewController](https://developer.apple.com/documentation/safariservices/sfsafariviewcontroller)',
+      name: 'iOS SFSafariViewController'),
+])
 abstract class PlatformChromeSafariBrowser extends PlatformInterface
     implements Disposable {
   ///Debug settings.
@@ -97,26 +105,37 @@ abstract class PlatformChromeSafariBrowser extends PlatformInterface
   ///
   ///[url] - The [url] to load. On iOS, the [url] is required and must use the `http` or `https` scheme.
   ///
-  ///[headers] (Supported only on Android) - [whitelisted](https://fetch.spec.whatwg.org/#cors-safelisted-request-header) cross-origin request headers.
+  ///[headers] - [whitelisted](https://fetch.spec.whatwg.org/#cors-safelisted-request-header) cross-origin request headers.
   ///It is possible to attach non-whitelisted headers to cross-origin requests, when the server and client are related using a
   ///[digital asset link](https://developers.google.com/digital-asset-links/v1/getting-started).
   ///
-  ///[otherLikelyURLs] - Other likely destinations, sorted in decreasing likelihood order. Supported only on Android.
+  ///[otherLikelyURLs] - Other likely destinations, sorted in decreasing likelihood order.
   ///
-  ///[referrer] - referrer header. Supported only on Android.
+  ///[referrer] - referrer header.
   ///
   ///[options] - Deprecated. Use `settings` instead.
   ///
   ///[settings] - Settings for the [PlatformChromeSafariBrowser].
-  ///
-  ///**Officially Supported Platforms/Implementations**:
-  ///- Android
-  ///- iOS
   ///{@endtemplate}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformChromeSafariBrowser.open.supported_platforms}
+  @SupportedPlatforms(platforms: [
+    AndroidPlatform(),
+    IOSPlatform(),
+  ])
   Future<void> open(
       {WebUri? url,
+      @SupportedPlatforms(platforms: [
+        AndroidPlatform(),
+      ])
       Map<String, String>? headers,
+      @SupportedPlatforms(platforms: [
+        AndroidPlatform(),
+      ])
       List<WebUri>? otherLikelyURLs,
+      @SupportedPlatforms(platforms: [
+        AndroidPlatform(),
+      ])
       WebUri? referrer,
       @Deprecated('Use settings instead')
       // ignore: deprecated_member_use_from_same_package
@@ -130,17 +149,19 @@ abstract class PlatformChromeSafariBrowser extends PlatformInterface
   ///
   ///[url] - initial url.
   ///
-  ///[headers] (Supported only on Android) - [whitelisted](https://fetch.spec.whatwg.org/#cors-safelisted-request-header) cross-origin request headers.
+  ///[headers] - [whitelisted](https://fetch.spec.whatwg.org/#cors-safelisted-request-header) cross-origin request headers.
   ///It is possible to attach non-whitelisted headers to cross-origin requests, when the server and client are related using a
   ///[digital asset link](https://developers.google.com/digital-asset-links/v1/getting-started).
   ///
   ///[otherLikelyURLs] - Other likely destinations, sorted in decreasing likelihood order.
   ///
-  ///[referrer] - referrer header. Supported only on Android.
-  ///
-  ///**Officially Supported Platforms/Implementations**:
-  ///- Android
+  ///[referrer] - referrer header.
   ///{@endtemplate}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformChromeSafariBrowser.launchUrl.supported_platforms}
+  @SupportedPlatforms(platforms: [
+    AndroidPlatform(),
+  ])
   Future<void> launchUrl({
     required WebUri url,
     Map<String, String>? headers,
@@ -161,10 +182,16 @@ abstract class PlatformChromeSafariBrowser extends PlatformInterface
   ///[url] - Most likely URL, may be null if otherLikelyBundles is provided.
   ///
   ///[otherLikelyURLs] - Other likely destinations, sorted in decreasing likelihood order.
-  ///
-  ///**Officially Supported Platforms/Implementations**:
-  ///- Android ([Official API - CustomTabsSession.mayLaunchUrl](https://developer.android.com/reference/androidx/browser/customtabs/CustomTabsSession#mayLaunchUrl(android.net.Uri,android.os.Bundle,java.util.List%3Candroid.os.Bundle%3E)))
   ///{@endtemplate}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformChromeSafariBrowser.mayLaunchUrl.supported_platforms}
+  @SupportedPlatforms(platforms: [
+    AndroidPlatform(
+      apiName: 'CustomTabsSession.mayLaunchUrl',
+      apiUrl:
+          'https://developer.android.com/reference/androidx/browser/customtabs/CustomTabsSession#mayLaunchUrl(android.net.Uri,android.os.Bundle,java.util.List%3Candroid.os.Bundle%3E)',
+    ),
+  ])
   Future<bool> mayLaunchUrl({WebUri? url, List<WebUri>? otherLikelyURLs}) {
     throw UnimplementedError(
         'mayLaunchUrl is not implemented on the current platform');
@@ -184,10 +211,16 @@ abstract class PlatformChromeSafariBrowser extends PlatformInterface
   ///[origin] – Origin.
   ///
   ///[extras] – Reserved for future use.
-  ///
-  ///**Officially Supported Platforms/Implementations**:
-  ///- Android ([Official API - CustomTabsSession.validateRelationship](https://developer.android.com/reference/androidx/browser/customtabs/CustomTabsSession#validateRelationship(int,android.net.Uri,android.os.Bundle)))
   ///{@endtemplate}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformChromeSafariBrowser.validateRelationship.supported_platforms}
+  @SupportedPlatforms(platforms: [
+    AndroidPlatform(
+      apiName: 'CustomTabsSession.validateRelationship',
+      apiUrl:
+          'https://developer.android.com/reference/androidx/browser/customtabs/CustomTabsSession#validateRelationship(int,android.net.Uri,android.os.Bundle)',
+    ),
+  ])
   Future<bool> validateRelationship(
       {required CustomTabsRelationType relation, required WebUri origin}) {
     throw UnimplementedError(
@@ -196,11 +229,13 @@ abstract class PlatformChromeSafariBrowser extends PlatformInterface
 
   ///{@template flutter_inappwebview_platform_interface.PlatformChromeSafariBrowser.close}
   ///Closes the [PlatformChromeSafariBrowser] instance.
-  ///
-  ///**Officially Supported Platforms/Implementations**:
-  ///- Android
-  ///- iOS
   ///{@endtemplate}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformChromeSafariBrowser.close.supported_platforms}
+  @SupportedPlatforms(platforms: [
+    AndroidPlatform(),
+    IOSPlatform(),
+  ])
   Future<void> close() {
     throw UnimplementedError(
         'close is not implemented on the current platform');
@@ -208,12 +243,17 @@ abstract class PlatformChromeSafariBrowser extends PlatformInterface
 
   ///{@template flutter_inappwebview_platform_interface.PlatformChromeSafariBrowser.setActionButton}
   ///Set a custom action button.
-  ///
-  ///**NOTE**: Not available in a Trusted Web Activity.
-  ///
-  ///**Officially Supported Platforms/Implementations**:
-  ///- Android ([Official API - CustomTabsIntent.Builder.setActionButton](https://developer.android.com/reference/androidx/browser/customtabs/CustomTabsIntent.Builder#setActionButton(android.graphics.Bitmap,%20java.lang.String,%20android.app.PendingIntent,%20boolean)))
   ///{@endtemplate}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformChromeSafariBrowser.setActionButton.supported_platforms}
+  @SupportedPlatforms(platforms: [
+    AndroidPlatform(
+      apiName: 'CustomTabsSession.setActionButton',
+      apiUrl:
+          'https://developer.android.com/reference/androidx/browser/customtabs/CustomTabsIntent.Builder#setActionButton(android.graphics.Bitmap,%20java.lang.String,%20android.app.PendingIntent,%20boolean)',
+      note: 'Not available in a Trusted Web Activity.',
+    ),
+  ])
   void setActionButton(ChromeSafariBrowserActionButton actionButton) {
     throw UnimplementedError(
         'setActionButton is not implemented on the current platform');
@@ -221,12 +261,17 @@ abstract class PlatformChromeSafariBrowser extends PlatformInterface
 
   ///{@template flutter_inappwebview_platform_interface.PlatformChromeSafariBrowser.updateActionButton}
   ///Updates the [ChromeSafariBrowserActionButton.icon] and [ChromeSafariBrowserActionButton.description].
-  ///
-  ///**NOTE**: Not available in a Trusted Web Activity.
-  ///
-  ///**Officially Supported Platforms/Implementations**:
-  ///- Android ([Official API - CustomTabsSession.setActionButton](https://developer.android.com/reference/androidx/browser/customtabs/CustomTabsSession#setActionButton(android.graphics.Bitmap,java.lang.String)))
   ///{@endtemplate}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformChromeSafariBrowser.updateActionButton.supported_platforms}
+  @SupportedPlatforms(platforms: [
+    AndroidPlatform(
+      apiName: 'CustomTabsSession.setActionButton',
+      apiUrl:
+          'https://developer.android.com/reference/androidx/browser/customtabs/CustomTabsIntent.Builder#setActionButton(android.graphics.Bitmap,%20java.lang.String,%20android.app.PendingIntent,%20boolean)',
+      note: 'Not available in a Trusted Web Activity.',
+    ),
+  ])
   Future<void> updateActionButton(
       {required Uint8List icon, required String description}) {
     throw UnimplementedError(
@@ -235,12 +280,17 @@ abstract class PlatformChromeSafariBrowser extends PlatformInterface
 
   ///{@template flutter_inappwebview_platform_interface.PlatformChromeSafariBrowser.setSecondaryToolbar}
   ///Sets the remote views displayed in the secondary toolbar in a custom tab.
-  ///
-  ///**NOTE**: Not available in a Trusted Web Activity.
-  ///
-  ///**Officially Supported Platforms/Implementations**:
-  ///- Android ([Official API - CustomTabsIntent.Builder.setSecondaryToolbarViews](https://developer.android.com/reference/androidx/browser/customtabs/CustomTabsIntent.Builder#setSecondaryToolbarViews(android.widget.RemoteViews,int[],android.app.PendingIntent)))
   ///{@endtemplate}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformChromeSafariBrowser.setSecondaryToolbar.supported_platforms}
+  @SupportedPlatforms(platforms: [
+    AndroidPlatform(
+      apiName: 'CustomTabsIntent.Builder.setSecondaryToolbarViews',
+      apiUrl:
+          'https://developer.android.com/reference/androidx/browser/customtabs/CustomTabsIntent.Builder#setSecondaryToolbarViews(android.widget.RemoteViews,int[],android.app.PendingIntent)',
+      note: 'Not available in a Trusted Web Activity.',
+    ),
+  ])
   void setSecondaryToolbar(
       ChromeSafariBrowserSecondaryToolbar secondaryToolbar) {
     throw UnimplementedError(
@@ -249,12 +299,17 @@ abstract class PlatformChromeSafariBrowser extends PlatformInterface
 
   ///{@template flutter_inappwebview_platform_interface.PlatformChromeSafariBrowser.updateSecondaryToolbar}
   ///Sets or updates (if already present) the Remote Views of the secondary toolbar in an existing custom tab session.
-  ///
-  ///**NOTE**: Not available in a Trusted Web Activity.
-  ///
-  ///**Officially Supported Platforms/Implementations**:
-  ///- Android ([Official API - CustomTabsSession.setSecondaryToolbarViews](https://developer.android.com/reference/androidx/browser/customtabs/CustomTabsSession#setSecondaryToolbarViews(android.widget.RemoteViews,int[],android.app.PendingIntent)))
   ///{@endtemplate}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformChromeSafariBrowser.updateSecondaryToolbar.supported_platforms}
+  @SupportedPlatforms(platforms: [
+    AndroidPlatform(
+      apiName: 'CustomTabsIntent.Builder.setSecondaryToolbarViews',
+      apiUrl:
+          'https://developer.android.com/reference/androidx/browser/customtabs/CustomTabsIntent.Builder#setSecondaryToolbarViews(android.widget.RemoteViews,int[],android.app.PendingIntent)',
+      note: 'Not available in a Trusted Web Activity.',
+    ),
+  ])
   Future<void> updateSecondaryToolbar(
       ChromeSafariBrowserSecondaryToolbar secondaryToolbar) {
     throw UnimplementedError(
@@ -263,13 +318,15 @@ abstract class PlatformChromeSafariBrowser extends PlatformInterface
 
   ///{@template flutter_inappwebview_platform_interface.PlatformChromeSafariBrowser.addMenuItem}
   ///Adds a [ChromeSafariBrowserMenuItem] to the menu.
-  ///
-  ///**NOTE**: Not available in an Android Trusted Web Activity.
-  ///
-  ///**Officially Supported Platforms/Implementations**:
-  ///- Android
-  ///- iOS
   ///{@endtemplate}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformChromeSafariBrowser.addMenuItem.supported_platforms}
+  @SupportedPlatforms(platforms: [
+    AndroidPlatform(
+      note: 'Not available in a Trusted Web Activity.',
+    ),
+    IOSPlatform(),
+  ])
   void addMenuItem(ChromeSafariBrowserMenuItem menuItem) {
     throw UnimplementedError(
         'addMenuItem is not implemented on the current platform');
@@ -277,13 +334,15 @@ abstract class PlatformChromeSafariBrowser extends PlatformInterface
 
   ///{@template flutter_inappwebview_platform_interface.PlatformChromeSafariBrowser.addMenuItems}
   ///Adds a list of [ChromeSafariBrowserMenuItem] to the menu.
-  ///
-  ///**NOTE**: Not available in an Android Trusted Web Activity.
-  ///
-  ///**Officially Supported Platforms/Implementations**:
-  ///- Android
-  ///- iOS
   ///{@endtemplate}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformChromeSafariBrowser.addMenuItems.supported_platforms}
+  @SupportedPlatforms(platforms: [
+    AndroidPlatform(
+      note: 'Not available in a Trusted Web Activity.',
+    ),
+    IOSPlatform(),
+  ])
   void addMenuItems(List<ChromeSafariBrowserMenuItem> menuItems) {
     throw UnimplementedError(
         'addMenuItems is not implemented on the current platform');
@@ -304,10 +363,16 @@ abstract class PlatformChromeSafariBrowser extends PlatformInterface
   ///Returns whether the implementation accepted the request.
   ///Note that returning true here doesn't mean an origin has already been
   ///assigned as the validation is asynchronous.
-  ///
-  ///**Officially Supported Platforms/Implementations**:
-  ///- Android ([Official API - CustomTabsSession.requestPostMessageChannel](https://developer.android.com/reference/androidx/browser/customtabs/CustomTabsSession#requestPostMessageChannel(android.net.Uri,android.net.Uri,android.os.Bundle)))
   ///{@endtemplate}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformChromeSafariBrowser.requestPostMessageChannel.supported_platforms}
+  @SupportedPlatforms(platforms: [
+    AndroidPlatform(
+      apiName: 'CustomTabsSession.requestPostMessageChannel',
+      apiUrl:
+          'https://developer.android.com/reference/androidx/browser/customtabs/CustomTabsSession#requestPostMessageChannel(android.net.Uri,android.net.Uri,android.os.Bundle)',
+    ),
+  ])
   Future<bool> requestPostMessageChannel(
       {required WebUri sourceOrigin, WebUri? targetOrigin}) {
     throw UnimplementedError(
@@ -321,11 +386,17 @@ abstract class PlatformChromeSafariBrowser extends PlatformInterface
   ///[message] – The message that is being sent.
   ///
   ///Returns an integer constant about the postMessage request result.
-  ///Will return CustomTabsService.RESULT_SUCCESS if successful.
-  ///
-  ///**Officially Supported Platforms/Implementations**:
-  ///- Android ([Official API - CustomTabsSession.postMessage](https://developer.android.com/reference/androidx/browser/customtabs/CustomTabsSession#postMessage(java.lang.String,android.os.Bundle)))
+  ///Will return [CustomTabsPostMessageResultType.SUCCESS] if successful.
   ///{@endtemplate}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformChromeSafariBrowser.postMessage.supported_platforms}
+  @SupportedPlatforms(platforms: [
+    AndroidPlatform(
+      apiName: 'CustomTabsSession.postMessage',
+      apiUrl:
+          'https://developer.android.com/reference/androidx/browser/customtabs/CustomTabsSession#postMessage(java.lang.String,android.os.Bundle)',
+    ),
+  ])
   Future<CustomTabsPostMessageResultType> postMessage(String message) {
     throw UnimplementedError(
         'postMessage is not implemented on the current platform');
@@ -338,10 +409,16 @@ abstract class PlatformChromeSafariBrowser extends PlatformInterface
   ///signal will be sent if the API becomes unavailable later.
   ///
   ///Returns whether the Engagement Signals API is available.
-  ///
-  ///**Officially Supported Platforms/Implementations**:
-  ///- Android ([Official API - CustomTabsSession.isEngagementSignalsApiAvailable](https://developer.android.com/reference/androidx/browser/customtabs/CustomTabsSession#isEngagementSignalsApiAvailable(android.os.Bundle)))
   ///{@endtemplate}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformChromeSafariBrowser.isEngagementSignalsApiAvailable.supported_platforms}
+  @SupportedPlatforms(platforms: [
+    AndroidPlatform(
+      apiName: 'CustomTabsSession.isEngagementSignalsApiAvailable',
+      apiUrl:
+          'https://developer.android.com/reference/androidx/browser/customtabs/CustomTabsSession#isEngagementSignalsApiAvailable(android.os.Bundle)',
+    ),
+  ])
   Future<bool> isEngagementSignalsApiAvailable() {
     throw UnimplementedError(
         'isEngagementSignalsApiAvailable is not implemented on the current platform');
@@ -349,11 +426,13 @@ abstract class PlatformChromeSafariBrowser extends PlatformInterface
 
   ///{@template flutter_inappwebview_platform_interface.PlatformChromeSafariBrowser.isOpened}
   ///Returns `true` if the [PlatformChromeSafariBrowser] instance is opened, otherwise `false`.
-  ///
-  ///**Officially Supported Platforms/Implementations**:
-  ///- Android
-  ///- iOS
   ///{@endtemplate}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformChromeSafariBrowser.isOpened.supported_platforms}
+  @SupportedPlatforms(platforms: [
+    AndroidPlatform(),
+    IOSPlatform(),
+  ])
   bool isOpened() {
     throw UnimplementedError(
         'isOpened is not implemented on the current platform');
@@ -363,11 +442,13 @@ abstract class PlatformChromeSafariBrowser extends PlatformInterface
   ///On Android, returns `true` if Chrome Custom Tabs is available.
   ///On iOS, returns `true` if SFSafariViewController is available.
   ///Otherwise returns `false`.
-  ///
-  ///**Officially Supported Platforms/Implementations**:
-  ///- Android
-  ///- iOS
   ///{@endtemplate}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformChromeSafariBrowser.isAvailable.supported_platforms}
+  @SupportedPlatforms(platforms: [
+    AndroidPlatform(),
+    IOSPlatform(),
+  ])
   Future<bool> isAvailable() {
     throw UnimplementedError(
         'isAvailable is not implemented on the current platform');
@@ -375,10 +456,12 @@ abstract class PlatformChromeSafariBrowser extends PlatformInterface
 
   ///{@template flutter_inappwebview_platform_interface.PlatformChromeSafariBrowser.getMaxToolbarItems}
   ///The maximum number of allowed secondary toolbar items.
-  ///
-  ///**Officially Supported Platforms/Implementations**:
-  ///- Android
   ///{@endtemplate}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformChromeSafariBrowser.getMaxToolbarItems.supported_platforms}
+  @SupportedPlatforms(platforms: [
+    AndroidPlatform(),
+  ])
   Future<int> getMaxToolbarItems() {
     throw UnimplementedError(
         'getMaxToolbarItems is not implemented on the current platform');
@@ -397,11 +480,17 @@ abstract class PlatformChromeSafariBrowser extends PlatformInterface
   ///
   ///[ignoreDefault] – If set, the default VIEW handler won't get priority over other browsers.
   ///
-  ///Returns the preferred package name for handling Custom Tabs, or null.
-  ///
-  ///**Officially Supported Platforms/Implementations**:
-  ///- Android ([Official API - CustomTabsClient.getPackageName](https://developer.android.com/reference/androidx/browser/customtabs/CustomTabsClient#getPackageName(android.content.Context,java.util.List%3Cjava.lang.String%3E,boolean))))
+  ///Returns the preferred package name for handling Custom Tabs, or `null`.
   ///{@endtemplate}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformChromeSafariBrowser.getPackageName.supported_platforms}
+  @SupportedPlatforms(platforms: [
+    AndroidPlatform(
+      apiName: 'CustomTabsClient.getPackageName',
+      apiUrl:
+          'https://developer.android.com/reference/androidx/browser/customtabs/CustomTabsClient#getPackageName(android.content.Context,java.util.List%3Cjava.lang.String%3E,boolean)',
+    ),
+  ])
   Future<String?> getPackageName(
       {List<String>? packages, bool ignoreDefault = false}) {
     throw UnimplementedError(
@@ -411,12 +500,17 @@ abstract class PlatformChromeSafariBrowser extends PlatformInterface
   ///{@template flutter_inappwebview_platform_interface.PlatformChromeSafariBrowser.clearWebsiteData}
   ///Clear associated website data accrued from browsing activity within your app.
   ///This includes all local storage, cached resources, and cookies.
-  ///
-  ///**NOTE for iOS**: available on iOS 16.0+.
-  ///
-  ///**Officially Supported Platforms/Implementations**:
-  ///- iOS ([Official API - SFSafariViewController.DataStore.clearWebsiteData](https://developer.apple.com/documentation/safariservices/sfsafariviewcontroller/datastore/3981117-clearwebsitedata))
   ///{@endtemplate}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformChromeSafariBrowser.clearWebsiteData.supported_platforms}
+  @SupportedPlatforms(platforms: [
+    IOSPlatform(
+      apiName: 'SFSafariViewController.DataStore.clearWebsiteData',
+      apiUrl:
+          'https://developer.apple.com/documentation/safariservices/sfsafariviewcontroller/datastore/3981117-clearwebsitedata',
+      available: '16.0',
+    ),
+  ])
   Future<void> clearWebsiteData() {
     throw UnimplementedError(
         'clearWebsiteData is not implemented on the current platform');
@@ -438,12 +532,17 @@ abstract class PlatformChromeSafariBrowser extends PlatformInterface
   ///
   ///[URLs] - the URLs of servers that the browser should prewarm connections to.
   ///Only supports URLs with `http://` or `https://` schemes.
-  ///
-  ///**NOTE for iOS**: available on iOS 15.0+.
-  ///
-  ///**Officially Supported Platforms/Implementations**:
-  ///- iOS ([Official API - SFSafariViewController.prewarmConnections](https://developer.apple.com/documentation/safariservices/sfsafariviewcontroller/3752133-prewarmconnections))
   ///{@endtemplate}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformChromeSafariBrowser.prewarmConnections.supported_platforms}
+  @SupportedPlatforms(platforms: [
+    IOSPlatform(
+      apiName: 'SFSafariViewController.prewarmConnections',
+      apiUrl:
+          'https://developer.apple.com/documentation/safariservices/sfsafariviewcontroller/3752133-prewarmconnections',
+      available: '15.0',
+    ),
+  ])
   Future<PrewarmingToken?> prewarmConnections(List<WebUri> URLs) {
     throw UnimplementedError(
         'prewarmConnections is not implemented on the current platform');
@@ -451,12 +550,17 @@ abstract class PlatformChromeSafariBrowser extends PlatformInterface
 
   ///{@template flutter_inappwebview_platform_interface.PlatformChromeSafariBrowser.invalidatePrewarmingToken}
   ///Ends all prewarmed connections associated with the token, except for connections that are also kept alive by other tokens.
-  ///
-  ///**NOTE for iOS**: available on iOS 15.0+.
-  ///
-  ///**Officially Supported Platforms/Implementations**:
-  ///- iOS ([Official API - SFSafariViewController.prewarmConnections](https://developer.apple.com/documentation/safariservices/sfsafariviewcontroller/3752133-prewarmconnections))
   ///{@endtemplate}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformChromeSafariBrowser.invalidatePrewarmingToken.supported_platforms}
+  @SupportedPlatforms(platforms: [
+    IOSPlatform(
+      apiName: 'SFSafariViewController.PrewarmingToken.invalidate',
+      apiUrl:
+          'https://developer.apple.com/documentation/safariservices/sfsafariviewcontroller/prewarmingtoken/invalidate()',
+      available: '15.0',
+    ),
+  ])
   Future<void> invalidatePrewarmingToken(PrewarmingToken prewarmingToken) {
     throw UnimplementedError(
         'invalidatePrewarmingToken is not implemented on the current platform');
@@ -465,59 +569,116 @@ abstract class PlatformChromeSafariBrowser extends PlatformInterface
   ///{@template flutter_inappwebview_platform_interface.PlatformChromeSafariBrowser.dispose}
   ///Disposes the channel and event handler.
   ///{@endtemplate}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformChromeSafariBrowser.dispose.supported_platforms}
+  @SupportedPlatforms(platforms: [
+    AndroidPlatform(),
+    IOSPlatform(),
+  ])
   @override
   @mustCallSuper
   void dispose() {
     eventHandler = null;
   }
+
+  ///{@template flutter_inappwebview_platform_interface.PlatformChromeSafariBrowser.isClassSupported}
+  ///Check if the current class is supported by the [defaultTargetPlatform] or a specific [platform].
+  ///{@endtemplate}
+  bool isClassSupported({TargetPlatform? platform}) =>
+      _PlatformChromeSafariBrowserClassSupported.isClassSupported(
+          platform: platform);
+
+  ///{@template flutter_inappwebview_platform_interface.PlatformChromeSafariBrowser.isMethodSupported}
+  ///Check if the given [method] is supported by the [defaultTargetPlatform] or a specific [platform].
+  ///{@endtemplate}
+  bool isMethodSupported(PlatformChromeSafariBrowserMethod method,
+          {TargetPlatform? platform}) =>
+      _PlatformChromeSafariBrowserMethodSupported.isMethodSupported(method,
+          platform: platform);
+
+  ///{@macro flutter_inappwebview_platform_interface.PlatformChromeSafariBrowserEvents.isMethodSupported}
+  bool isEventMethodSupported(PlatformChromeSafariBrowserEventsMethod method,
+          {TargetPlatform? platform}) =>
+      PlatformChromeSafariBrowserEvents.isMethodSupported(method,
+          platform: platform);
 }
 
+@SupportedPlatforms(platforms: [
+  AndroidPlatform(),
+  IOSPlatform(),
+])
 abstract class PlatformChromeSafariBrowserEvents {
-  ///{@template flutter_inappwebview_platform_interface.PlatformChromeSafariBrowser.onServiceConnected}
+  ///{@template flutter_inappwebview_platform_interface.PlatformChromeSafariBrowserEvents.onServiceConnected}
   ///Event fired when the when connecting from Android Custom Tabs Service.
-  ///
-  ///**Officially Supported Platforms/Implementations**:
-  ///- Android
   ///{@endtemplate}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformChromeSafariBrowserEvents.onServiceConnected.supported_platforms}
+  @SupportedPlatforms(platforms: [
+    AndroidPlatform(),
+  ])
   void onServiceConnected() {}
 
-  ///{@template flutter_inappwebview_platform_interface.PlatformChromeSafariBrowser.onOpened}
+  ///{@template flutter_inappwebview_platform_interface.PlatformChromeSafariBrowserEvents.onOpened}
   ///Event fired when the [PlatformChromeSafariBrowser] is opened.
-  ///
-  ///**Officially Supported Platforms/Implementations**:
-  ///- Android
-  ///- iOS
   ///{@endtemplate}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformChromeSafariBrowserEvents.onOpened.supported_platforms}
+  @SupportedPlatforms(platforms: [
+    AndroidPlatform(),
+    IOSPlatform(),
+  ])
   void onOpened() {}
 
-  ///{@template flutter_inappwebview_platform_interface.PlatformChromeSafariBrowser.onCompletedInitialLoad}
+  ///{@template flutter_inappwebview_platform_interface.PlatformChromeSafariBrowserEvents.onCompletedInitialLoad}
   ///Event fired when the initial URL load is complete.
   ///
-  ///[didLoadSuccessfully] - `true` if loading completed successfully; otherwise, `false`. Supported only on iOS.
-  ///
-  ///**Officially Supported Platforms/Implementations**:
-  ///- Android
-  ///- iOS ([Official API - SFSafariViewControllerDelegate.safariViewController](https://developer.apple.com/documentation/safariservices/sfsafariviewcontrollerdelegate/1621215-safariviewcontroller))
+  ///[didLoadSuccessfully] - `true` if loading completed successfully; otherwise, `false`.
   ///{@endtemplate}
-  void onCompletedInitialLoad(bool? didLoadSuccessfully) {}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformChromeSafariBrowserEvents.onCompletedInitialLoad.supported_platforms}
+  @SupportedPlatforms(platforms: [
+    AndroidPlatform(),
+    IOSPlatform(
+      apiName: 'SFSafariViewControllerDelegate.safariViewController',
+      apiUrl:
+          'https://developer.apple.com/documentation/safariservices/sfsafariviewcontrollerdelegate/1621215-safariviewcontroller',
+    ),
+  ])
+  void onCompletedInitialLoad(
+      @SupportedPlatforms(platforms: [
+        IOSPlatform(),
+      ])
+      bool? didLoadSuccessfully) {}
 
-  ///{@template flutter_inappwebview_platform_interface.PlatformChromeSafariBrowser.onInitialLoadDidRedirect}
+  ///{@template flutter_inappwebview_platform_interface.PlatformChromeSafariBrowserEvents.onInitialLoadDidRedirect}
   ///Event fired when the initial URL load is complete.
-  ///
-  ///**Officially Supported Platforms/Implementations**:
-  ///- iOS ([Official API - SFSafariViewControllerDelegate.safariViewController](https://developer.apple.com/documentation/safariservices/sfsafariviewcontrollerdelegate/2923545-safariviewcontroller))
   ///{@endtemplate}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformChromeSafariBrowserEvents.onInitialLoadDidRedirect.supported_platforms}
+  @SupportedPlatforms(platforms: [
+    IOSPlatform(
+      apiName: 'SFSafariViewControllerDelegate.safariViewController',
+      apiUrl:
+          'https://developer.apple.com/documentation/safariservices/sfsafariviewcontrollerdelegate/2923545-safariviewcontroller',
+    ),
+  ])
   void onInitialLoadDidRedirect(WebUri? url) {}
 
-  ///{@template flutter_inappwebview_platform_interface.PlatformChromeSafariBrowser.onNavigationEvent}
+  ///{@template flutter_inappwebview_platform_interface.PlatformChromeSafariBrowserEvents.onNavigationEvent}
   ///Event fired when a navigation event happens.
-  ///
-  ///**Officially Supported Platforms/Implementations**:
-  ///- Android ([Official API - CustomTabsCallback.onNavigationEvent](https://developer.android.com/reference/androidx/browser/customtabs/CustomTabsCallback#onNavigationEvent(int,android.os.Bundle)))
   ///{@endtemplate}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformChromeSafariBrowserEvents.onNavigationEvent.supported_platforms}
+  @SupportedPlatforms(platforms: [
+    AndroidPlatform(
+      apiName: 'CustomTabsCallback.onNavigationEvent',
+      apiUrl:
+          'https://developer.android.com/reference/androidx/browser/customtabs/CustomTabsCallback#onNavigationEvent(int,android.os.Bundle)',
+    ),
+  ])
   void onNavigationEvent(CustomTabsNavigationEventType? navigationEvent) {}
 
-  ///{@template flutter_inappwebview_platform_interface.PlatformChromeSafariBrowser.onRelationshipValidationResult}
+  ///{@template flutter_inappwebview_platform_interface.PlatformChromeSafariBrowserEvents.onRelationshipValidationResult}
   ///Event fired when a relationship validation result is available.
   ///
   ///[relation] - Relation for which the result is available. Value previously passed to [PlatformChromeSafariBrowser.validateRelationship].
@@ -525,56 +686,85 @@ abstract class PlatformChromeSafariBrowserEvents {
   ///[requestedOrigin] - Origin requested. Value previously passed to [PlatformChromeSafariBrowser.validateRelationship].
   ///
   ///[result] - Whether the relation was validated.
-  ///
-  ///**Officially Supported Platforms/Implementations**:
-  ///- Android ([Official API - CustomTabsCallback.onRelationshipValidationResult](https://developer.android.com/reference/androidx/browser/customtabs/CustomTabsCallback#onRelationshipValidationResult(int,android.net.Uri,boolean,android.os.Bundle)))
   ///{@endtemplate}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformChromeSafariBrowserEvents.onRelationshipValidationResult.supported_platforms}
+  @SupportedPlatforms(platforms: [
+    AndroidPlatform(
+      apiName: 'CustomTabsCallback.onRelationshipValidationResult',
+      apiUrl:
+          'https://developer.android.com/reference/androidx/browser/customtabs/CustomTabsCallback#onRelationshipValidationResult(int,android.net.Uri,boolean,android.os.Bundle)',
+    ),
+  ])
   void onRelationshipValidationResult(
       CustomTabsRelationType? relation, WebUri? requestedOrigin, bool result) {}
 
-  ///{@template flutter_inappwebview_platform_interface.PlatformChromeSafariBrowser.onWillOpenInBrowser}
+  ///{@template flutter_inappwebview_platform_interface.PlatformChromeSafariBrowserEvents.onWillOpenInBrowser}
   ///Event fired when the user opens the current page in the default browser by tapping the toolbar button.
-  ///
-  ///**NOTE for iOS**: available on iOS 14.0+.
-  ///
-  ///**Officially Supported Platforms/Implementations**:
-  ///- iOS ([Official API - SFSafariViewControllerDelegate.safariViewControllerWillOpenInBrowser](https://developer.apple.com/documentation/safariservices/sfsafariviewcontrollerdelegate/3650426-safariviewcontrollerwillopeninbr))
   ///{@endtemplate}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformChromeSafariBrowserEvents.onWillOpenInBrowser.supported_platforms}
+  @SupportedPlatforms(platforms: [
+    IOSPlatform(
+      apiName:
+          'SFSafariViewControllerDelegate.safariViewControllerWillOpenInBrowser',
+      apiUrl:
+          'https://developer.apple.com/documentation/safariservices/sfsafariviewcontrollerdelegate/3650426-safariviewcontrollerwillopeninbr',
+      available: '14.0',
+    ),
+  ])
   void onWillOpenInBrowser() {}
 
-  ///{@template flutter_inappwebview_platform_interface.PlatformChromeSafariBrowser.onMessageChannelReady}
+  ///{@template flutter_inappwebview_platform_interface.PlatformChromeSafariBrowserEvents.onMessageChannelReady}
   ///Called when the [PlatformChromeSafariBrowser] has requested a postMessage channel through
   ///[PlatformChromeSafariBrowser.requestPostMessageChannel] and the channel is ready for sending and receiving messages on both ends.
-  ///
-  ///**Officially Supported Platforms/Implementations**:
-  ///- Android ([Official API - CustomTabsCallback.onMessageChannelReady](https://developer.android.com/reference/androidx/browser/customtabs/CustomTabsCallback#onMessageChannelReady(android.os.Bundle)))
   ///{@endtemplate}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformChromeSafariBrowserEvents.onMessageChannelReady.supported_platforms}
+  @SupportedPlatforms(platforms: [
+    AndroidPlatform(
+      apiName: 'CustomTabsCallback.onMessageChannelReady',
+      apiUrl:
+          'https://developer.android.com/reference/androidx/browser/customtabs/CustomTabsCallback#onMessageChannelReady(android.os.Bundle)',
+    ),
+  ])
   void onMessageChannelReady() {}
 
-  ///{@template flutter_inappwebview_platform_interface.PlatformChromeSafariBrowser.onPostMessage}
+  ///{@template flutter_inappwebview_platform_interface.PlatformChromeSafariBrowserEvents.onPostMessage}
   ///Called when a tab controlled by this [PlatformChromeSafariBrowser] has sent a postMessage.
   ///If [PlatformChromeSafariBrowser.postMessage] is called from a single thread, then the messages will be posted in the same order.
   ///When received on the client side, it is the client's responsibility to preserve the ordering further.
-  ///
-  ///**Officially Supported Platforms/Implementations**:
-  ///- Android ([Official API - CustomTabsCallback.onPostMessage](https://developer.android.com/reference/androidx/browser/customtabs/CustomTabsCallback#onPostMessage(java.lang.String,android.os.Bundle)))
   ///{@endtemplate}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformChromeSafariBrowserEvents.onPostMessage.supported_platforms}
+  @SupportedPlatforms(platforms: [
+    AndroidPlatform(
+      apiName: 'CustomTabsCallback.onPostMessage',
+      apiUrl:
+          'https://developer.android.com/reference/androidx/browser/customtabs/CustomTabsCallback#onPostMessage(java.lang.String,android.os.Bundle)',
+    ),
+  ])
   void onPostMessage(String message) {}
 
-  ///{@template flutter_inappwebview_platform_interface.PlatformChromeSafariBrowser.onVerticalScrollEvent}
+  ///{@template flutter_inappwebview_platform_interface.PlatformChromeSafariBrowserEvents.onVerticalScrollEvent}
   ///Called when a user scrolls the tab.
   ///
   ///[isDirectionUp] - `false` when the user scrolls farther down the page,
   ///and `true` when the user scrolls back up toward the top of the page.
   ///
   ///**NOTE**: available only if [PlatformChromeSafariBrowser.isEngagementSignalsApiAvailable] returns `true`.
-  ///
-  ///**Officially Supported Platforms/Implementations**:
-  ///- Android ([Official API - EngagementSignalsCallback.onVerticalScrollEvent](https://developer.android.com/reference/androidx/browser/customtabs/EngagementSignalsCallback#onVerticalScrollEvent(boolean,android.os.Bundle)))
   ///{@endtemplate}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformChromeSafariBrowserEvents.onVerticalScrollEvent.supported_platforms}
+  @SupportedPlatforms(platforms: [
+    AndroidPlatform(
+        apiName: 'EngagementSignalsCallback.onVerticalScrollEvent',
+        apiUrl:
+            'https://developer.android.com/reference/androidx/browser/customtabs/EngagementSignalsCallback#onVerticalScrollEvent(boolean,android.os.Bundle)'),
+  ])
   void onVerticalScrollEvent(bool isDirectionUp) {}
 
-  ///{@template flutter_inappwebview_platform_interface.PlatformChromeSafariBrowser.onGreatestScrollPercentageIncreased}
+  ///{@template flutter_inappwebview_platform_interface.PlatformChromeSafariBrowserEvents.onGreatestScrollPercentageIncreased}
   ///Called when a user has reached a greater scroll percentage on the page. The greatest scroll
   ///percentage is reset if the user navigates to a different page. If the current page's total
   ///height changes, this method will be called again only if the scroll progress reaches a
@@ -584,31 +774,53 @@ abstract class PlatformChromeSafariBrowserEvents {
   ///the user hasmade down the current page.
   ///
   ///**NOTE**: available only if [PlatformChromeSafariBrowser.isEngagementSignalsApiAvailable] returns `true`.
-  ///
-  ///**Officially Supported Platforms/Implementations**:
-  ///- Android ([Official API - EngagementSignalsCallback.onGreatestScrollPercentageIncreased](https://developer.android.com/reference/androidx/browser/customtabs/EngagementSignalsCallback#onGreatestScrollPercentageIncreased(int,android.os.Bundle)))
   ///{@endtemplate}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformChromeSafariBrowserEvents.onGreatestScrollPercentageIncreased.supported_platforms}
+  @SupportedPlatforms(platforms: [
+    AndroidPlatform(
+        apiName:
+            'EngagementSignalsCallback.onGreatestScrollPercentageIncreased',
+        apiUrl:
+            'https://developer.android.com/reference/androidx/browser/customtabs/EngagementSignalsCallback#onGreatestScrollPercentageIncreased(int,android.os.Bundle)'),
+  ])
   void onGreatestScrollPercentageIncreased(int scrollPercentage) {}
 
-  ///{@template flutter_inappwebview_platform_interface.PlatformChromeSafariBrowser.onSessionEnded}
+  ///{@template flutter_inappwebview_platform_interface.PlatformChromeSafariBrowserEvents.onSessionEnded}
   ///Called when a `CustomTabsSession` is ending or when no further Engagement Signals
   ///callbacks are expected to report whether any user action has occurred during the session.
   ///
   ///[didUserInteract] - Whether the user has interacted with the page in any way, e.g. scrolling.
   ///
   ///**NOTE**: available only if [PlatformChromeSafariBrowser.isEngagementSignalsApiAvailable] returns `true`.
-  ///
-  ///**Officially Supported Platforms/Implementations**:
-  ///- Android ([Official API - EngagementSignalsCallback.onSessionEnded](https://developer.android.com/reference/androidx/browser/customtabs/EngagementSignalsCallback#onSessionEnded(boolean,android.os.Bundle)))
   ///{@endtemplate}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformChromeSafariBrowserEvents.onSessionEnded.supported_platforms}
+  @SupportedPlatforms(platforms: [
+    AndroidPlatform(
+        apiName: 'EngagementSignalsCallback.onSessionEnded',
+        apiUrl:
+            'https://developer.android.com/reference/androidx/browser/customtabs/EngagementSignalsCallback#onSessionEnded(boolean,android.os.Bundle)'),
+  ])
   void onSessionEnded(bool didUserInteract) {}
 
-  ///{@template flutter_inappwebview_platform_interface.PlatformChromeSafariBrowser.onClosed}
+  ///{@template flutter_inappwebview_platform_interface.PlatformChromeSafariBrowserEvents.onClosed}
   ///Event fired when the [PlatformChromeSafariBrowser] is closed.
-  ///
-  ///**Officially Supported Platforms/Implementations**:
-  ///- Android
-  ///- iOS
   ///{@endtemplate}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformChromeSafariBrowserEvents.onClosed.supported_platforms}
+  @SupportedPlatforms(platforms: [
+    AndroidPlatform(),
+    IOSPlatform(),
+  ])
   void onClosed() {}
+
+  ///{@template flutter_inappwebview_platform_interface.PlatformChromeSafariBrowserEvents.isMethodSupported}
+  ///Check if the given [method] is supported by the [defaultTargetPlatform] or a specific [platform].
+  ///{@endtemplate}
+  static bool isMethodSupported(PlatformChromeSafariBrowserEventsMethod method,
+          {TargetPlatform? platform}) =>
+      _PlatformChromeSafariBrowserEventsMethodSupported.isMethodSupported(
+          method,
+          platform: platform);
 }

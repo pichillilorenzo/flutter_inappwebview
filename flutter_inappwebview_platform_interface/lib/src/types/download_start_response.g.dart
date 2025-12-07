@@ -13,7 +13,7 @@ class DownloadStartResponse {
   ///If canceled, the download save dialog is not displayed regardless of the [handled] property.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Windows
+  ///- Windows WebView2
   DownloadStartResponseAction? action;
 
   ///Set this flag to `true` to hide the default download dialog for this download.
@@ -21,7 +21,7 @@ class DownloadStartResponse {
   ///The download will progress as normal if it is not canceled, there will just be no default UI shown.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Windows
+  ///- Windows WebView2
   bool handled;
 
   ///The path to the file.
@@ -32,7 +32,7 @@ class DownloadStartResponse {
   ///If the directory does not exist, it is created.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Windows
+  ///- Windows WebView2
   String? resultFilePath;
   DownloadStartResponse(
       {this.action, required this.handled, this.resultFilePath});

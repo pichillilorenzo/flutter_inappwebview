@@ -16,6 +16,8 @@ import 'headless_in_app_webview.dart';
 import 'in_app_webview_controller.dart';
 
 ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewWidget}
+///
+///{@macro flutter_inappwebview_platform_interface.PlatformWebViewCreationParams.supported_platforms}
 class InAppWebView extends StatefulWidget {
   /// Constructs a [InAppWebView].
   ///
@@ -34,6 +36,8 @@ class InAppWebView extends StatefulWidget {
   final PlatformInAppWebViewWidget platform;
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewWidget}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewCreationParams.supported_platforms}
   InAppWebView(
       {Key? key,
       Set<Factory<OneSequenceGestureRecognizer>>? gestureRecognizers,
@@ -553,6 +557,16 @@ class InAppWebView extends StatefulWidget {
 
   @override
   _InAppWebViewState createState() => _InAppWebViewState();
+
+  ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewWidgetCreationParams.isClassSupported}
+  static bool isClassSupported({TargetPlatform? platform}) =>
+      PlatformInAppWebViewWidget.static().isClassSupported(platform: platform);
+
+  ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewWidgetCreationParams.isPropertySupported}
+  static bool isPropertySupported(dynamic property,
+          {TargetPlatform? platform}) =>
+      PlatformInAppWebViewWidget.static()
+          .isPropertySupported(property, platform: platform);
 }
 
 class _InAppWebViewState extends State<InAppWebView> {

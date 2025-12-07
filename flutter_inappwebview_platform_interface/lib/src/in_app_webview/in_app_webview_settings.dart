@@ -1,5 +1,3 @@
-import 'dart:typed_data';
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_internal_annotations.dart';
@@ -41,8 +39,17 @@ List<ContentBlocker> _deserializeContentBlockers(
   return contentBlockers;
 }
 
+///{@template flutter_inappwebview_platform_interface.InAppWebViewSettings}
 ///This class represents all the WebView settings available.
+///{@endtemplate}
 @ExchangeableObject(copyMethod: true)
+@SupportedPlatforms(platforms: [
+  AndroidPlatform(),
+  IOSPlatform(),
+  MacOSPlatform(),
+  WebPlatform(requiresSameOrigin: false),
+  WindowsPlatform()
+])
 class InAppWebViewSettings_ {
   ///Set to `true` to be able to listen at the [PlatformWebViewCreationParams.shouldOverrideUrlLoading] event.
   ///
@@ -1682,6 +1689,7 @@ as it can cause framerate drops on animations in Android 9 and lower (see [Hybri
     IOSPlatform(),
     MacOSPlatform(),
     WindowsPlatform(),
+    WebPlatform(),
   ])
   Set<String>? javaScriptHandlersOriginAllowList;
 
@@ -1709,6 +1717,7 @@ as it can cause framerate drops on animations in Android 9 and lower (see [Hybri
     IOSPlatform(),
     MacOSPlatform(),
     WindowsPlatform(),
+    WebPlatform(),
   ])
   bool? javaScriptBridgeEnabled;
 
@@ -1735,6 +1744,7 @@ as it can cause framerate drops on animations in Android 9 and lower (see [Hybri
     IOSPlatform(),
     MacOSPlatform(),
     WindowsPlatform(),
+    WebPlatform(),
   ])
   Set<String>? javaScriptBridgeOriginAllowList;
 
@@ -2013,8 +2023,7 @@ as it can cause framerate drops on animations in Android 9 and lower (see [Hybri
   ///If the [PlatformWebViewCreationParams.onShowFileChooser] event is implemented and this value is `null`,
   ///it will be automatically inferred as `true`, otherwise, the default value is `false`.
   ///This logic will not be applied for [PlatformInAppBrowser], where you must set the value manually.
-  @SupportedPlatforms(
-      platforms: [AndroidPlatform()])
+  @SupportedPlatforms(platforms: [AndroidPlatform()])
   bool? useOnShowFileChooser;
 
   ///Specifies a feature policy for the `<iframe>`.
@@ -2289,6 +2298,12 @@ as it can cause framerate drops on animations in Android 9 and lower (see [Hybri
                     maximumViewportInset!.horizontal,
         "minimumViewportInset cannot be larger than maximumViewportInset");
   }
+
+  ///Check if the given [property] is supported by the [defaultTargetPlatform] or a specific [platform].
+  static bool isPropertySupported(InAppWebViewSettingsProperty property,
+          {TargetPlatform? platform}) =>
+      _InAppWebViewSettingsPropertySupported.isPropertySupported(property,
+          platform: platform);
 }
 
 ///Class that represents the options that can be used for a `WebView`.

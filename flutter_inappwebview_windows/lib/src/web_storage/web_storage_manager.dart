@@ -39,7 +39,7 @@ class WindowsWebStorageManager extends PlatformWebStorageManager
         ) {
     channel = const MethodChannel(
         'com.pichillilorenzo/flutter_inappwebview_webstoragemanager');
-    handler = handleMethod;
+    handler = _handleMethod;
     initMethodCallHandler();
   }
 
@@ -54,6 +54,15 @@ class WindowsWebStorageManager extends PlatformWebStorageManager
     _instance = WindowsWebStorageManager(WindowsWebStorageManagerCreationParams(
         const PlatformWebStorageManagerCreationParams()));
     return _instance!;
+  }
+
+  static WindowsWebStorageManager? _static;
+
+  /// Provide static access.
+  factory WindowsWebStorageManager.static() {
+    _static ??= WindowsWebStorageManager(WindowsWebStorageManagerCreationParams(
+        const PlatformWebStorageManagerCreationParams()));
+    return _static!;
   }
 
   Future<dynamic> _handleMethod(MethodCall call) async {}
@@ -127,8 +136,4 @@ class WindowsWebStorageManager extends PlatformWebStorageManager
   void dispose() {
     // empty
   }
-}
-
-extension InternalWebStorageManager on WindowsWebStorageManager {
-  get handleMethod => _handleMethod;
 }

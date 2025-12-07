@@ -20,7 +20,7 @@ class WebViewRenderProcessAction {
   ///Cause this renderer to terminate.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Android native WebView
+  ///- Android WebView
   static const TERMINATE = WebViewRenderProcessAction._internal(0, 0);
 
   ///Set of all values of [WebViewRenderProcessAction].
@@ -105,6 +105,11 @@ class WebViewRenderProcessAction {
 
   @override
   bool operator ==(value) => value == _value;
+
+  ///Checks if the value is supported by the [defaultTargetPlatform].
+  bool isSupported() {
+    return toNativeValue() != null;
+  }
 
   @override
   String toString() {

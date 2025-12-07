@@ -6,6 +6,7 @@ import 'package:flutter_test/flutter_test.dart';
 import '../constants.dart';
 import '../util.dart';
 
+part 'supported.dart';
 part 'open_data_and_close.dart';
 part 'open_file_and_close.dart';
 part 'open_url_and_close.dart';
@@ -17,6 +18,7 @@ void main() {
   final shouldSkip = kIsWeb;
 
   skippableGroup('InAppBrowser', () {
+    supported();
     openUrlAndClose();
     openFileAndClose();
     openDataAndClose();

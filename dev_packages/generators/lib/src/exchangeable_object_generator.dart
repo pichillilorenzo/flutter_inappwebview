@@ -225,10 +225,12 @@ class ExchangeableObjectGenerator
     if (!hasCustomConstructor && deprecatedFields.length > 0) {
       classBuffer.writeln(' {');
       for (final deprecatedField in deprecatedFields) {
-        final deprecatedUseNewFieldNameInConstructor = _coreCheckerObjectProperty
-            .firstAnnotationOf(deprecatedField)
-            ?.getField("deprecatedUseNewFieldNameInConstructor")
-            ?.toBoolValue() ?? true;
+        final deprecatedUseNewFieldNameInConstructor =
+            _coreCheckerObjectProperty
+                    .firstAnnotationOf(deprecatedField)
+                    ?.getField("deprecatedUseNewFieldNameInConstructor")
+                    ?.toBoolValue() ??
+                true;
         if (!deprecatedUseNewFieldNameInConstructor) {
           continue;
         }
@@ -236,7 +238,8 @@ class ExchangeableObjectGenerator
         final message = _coreCheckerDeprecated
             .firstAnnotationOfExact(deprecatedField)!
             .getField("message")!
-            .toStringValue()!.trim();
+            .toStringValue()!
+            .trim();
         if (!message.startsWith("Use ") && !message.endsWith(" instead")) {
           continue;
         }
@@ -342,15 +345,18 @@ class ExchangeableObjectGenerator
           var value = "map['$fieldName']";
 
           if (fieldElement.hasDeprecated) {
-            final deprecatedUseNewFieldNameInFromMapMethod = _coreCheckerObjectProperty
-                .firstAnnotationOf(fieldElement)
-                ?.getField("deprecatedUseNewFieldNameInFromMapMethod")
-                ?.toBoolValue() ?? true;
+            final deprecatedUseNewFieldNameInFromMapMethod =
+                _coreCheckerObjectProperty
+                        .firstAnnotationOf(fieldElement)
+                        ?.getField("deprecatedUseNewFieldNameInFromMapMethod")
+                        ?.toBoolValue() ??
+                    true;
 
             final deprecationMessage = _coreCheckerDeprecated
                 .firstAnnotationOfExact(fieldElement)
                 ?.getField("message")
-                ?.toStringValue()?.trim();
+                ?.toStringValue()
+                ?.trim();
             if (deprecationMessage != null &&
                 deprecationMessage.startsWith("Use ") &&
                 deprecationMessage.endsWith(" instead") &&
@@ -365,16 +371,16 @@ class ExchangeableObjectGenerator
                   (newFieldElement.type == fieldElement.type ||
                       (fieldElement.name.startsWith(RegExp(r'android|ios')) &&
                           fieldElement.name.toLowerCase().replaceFirst(
-                              RegExp(r'android|ioswk|ios'), "") ==
+                                  RegExp(r'android|ioswk|ios'), "") ==
                               newFieldName.toLowerCase()) ||
                       (newFieldElement.type.element != null &&
                           fieldElement.type.element != null &&
                           ((hasFromNativeValueMethod(
-                              newFieldElement.type.element!) &&
-                              hasFromNativeValueMethod(
-                                  fieldElement.type.element!) ||
+                                      newFieldElement.type.element!) &&
+                                  hasFromNativeValueMethod(
+                                      fieldElement.type.element!) ||
                               (hasFromMapMethod(
-                                  newFieldElement.type.element!) &&
+                                      newFieldElement.type.element!) &&
                                   hasFromMapMethod(
                                       fieldElement.type.element!))))));
               if (shouldUseNewFieldName) {
@@ -382,9 +388,10 @@ class ExchangeableObjectGenerator
               }
             } else {
               final leaveDeprecatedInFromMapMethod = _coreCheckerObjectProperty
-                  .firstAnnotationOf(fieldElement)
-                  ?.getField("leaveDeprecatedInFromMapMethod")
-                  ?.toBoolValue() ?? false;
+                      .firstAnnotationOf(fieldElement)
+                      ?.getField("leaveDeprecatedInFromMapMethod")
+                      ?.toBoolValue() ??
+                  false;
               if (!leaveDeprecatedInFromMapMethod) {
                 continue;
               }
@@ -469,7 +476,8 @@ class ExchangeableObjectGenerator
         (!visitor.methods.containsKey("toMap") ||
             Util.methodHasIgnore(visitor.methods['toMap']!))) {
       classBuffer.writeln('///Converts instance to a map.');
-      classBuffer.writeln('Map<String, dynamic> toMap({EnumMethod? enumMethod}) {');
+      classBuffer
+          .writeln('Map<String, dynamic> toMap({EnumMethod? enumMethod}) {');
       classBuffer.writeln('return {');
       final fieldElements = <FieldElement>[];
       if (superClass != null) {
@@ -498,9 +506,10 @@ class ExchangeableObjectGenerator
                 fieldElement.type is FunctionType)) {
           if (fieldElement.hasDeprecated) {
             final leaveDeprecatedInToMapMethod = _coreCheckerObjectProperty
-                .firstAnnotationOf(fieldElement)
-                ?.getField("leaveDeprecatedInToMapMethod")
-                ?.toBoolValue() ?? false;
+                    .firstAnnotationOf(fieldElement)
+                    ?.getField("leaveDeprecatedInToMapMethod")
+                    ?.toBoolValue() ??
+                false;
             if (!leaveDeprecatedInToMapMethod) {
               continue;
             }
@@ -518,7 +527,8 @@ class ExchangeableObjectGenerator
               mapValue =
                   "$serializerClassName.${customSerializer.name}($mapValue, enumMethod: enumMethod)";
             } else {
-              mapValue = "${customSerializer.name}($mapValue, enumMethod: enumMethod)";
+              mapValue =
+                  "${customSerializer.name}($mapValue, enumMethod: enumMethod)";
             }
           } else {
             mapValue = getToMapValue(fieldName, fieldElement.type);
@@ -534,7 +544,8 @@ class ExchangeableObjectGenerator
             ?.getField("toMapMergeWith")
             ?.toBoolValue();
         if (toMapMergeWith == true) {
-          classBuffer.writeln('...${methodElement.name}(enumMethod: enumMethod),');
+          classBuffer
+              .writeln('...${methodElement.name}(enumMethod: enumMethod),');
         }
       }
       classBuffer.writeln('};');
@@ -672,11 +683,18 @@ class ExchangeableObjectGenerator
       return classNameReference! +
           ".fromMap($value?.cast<String, dynamic>(), enumMethod: enumMethod)${!isNullable && hasNullableFromMap ? '!' : ''}";
     } else {
-      final hasFromValue = fieldTypeElement != null && hasFromValueMethod(fieldTypeElement);
-      final hasFromNativeValue = fieldTypeElement != null && hasFromNativeValueMethod(fieldTypeElement);
-      final hasByName = fieldTypeElement != null && hasByNameMethod(fieldTypeElement);
-      if (fieldTypeElement != null && (hasFromValue || hasFromNativeValue || hasByName)) {
-        if ([hasFromValue, hasFromNativeValue, hasByName].where((e) => e).length > 1) {
+      final hasFromValue =
+          fieldTypeElement != null && hasFromValueMethod(fieldTypeElement);
+      final hasFromNativeValue = fieldTypeElement != null &&
+          hasFromNativeValueMethod(fieldTypeElement);
+      final hasByName =
+          fieldTypeElement != null && hasByNameMethod(fieldTypeElement);
+      if (fieldTypeElement != null &&
+          (hasFromValue || hasFromNativeValue || hasByName)) {
+        if ([hasFromValue, hasFromNativeValue, hasByName]
+                .where((e) => e)
+                .length >
+            1) {
           String? defaultEnumMethodValue = null;
           if (hasFromNativeValue) {
             defaultEnumMethodValue = "EnumMethod.nativeValue";
@@ -686,9 +704,18 @@ class ExchangeableObjectGenerator
             defaultEnumMethodValue = "EnumMethod.name";
           }
           var wrapper = "switch (enumMethod ?? $defaultEnumMethodValue) {";
-          wrapper += "EnumMethod.nativeValue => " + (hasFromNativeValue ? classNameReference! + '.fromNativeValue($value)' : "null") + ", ";
-          wrapper += "EnumMethod.value => " + (hasFromValue ? classNameReference! + '.fromValue($value)' : "null") + ", ";
-          wrapper += "EnumMethod.name => " + (hasByName ? classNameReference! + '.byName($value)' : "null");
+          wrapper += "EnumMethod.nativeValue => " +
+              (hasFromNativeValue
+                  ? classNameReference! + '.fromNativeValue($value)'
+                  : "null") +
+              ", ";
+          wrapper += "EnumMethod.value => " +
+              (hasFromValue
+                  ? classNameReference! + '.fromValue($value)'
+                  : "null") +
+              ", ";
+          wrapper += "EnumMethod.name => " +
+              (hasByName ? classNameReference! + '.byName($value)' : "null");
           wrapper += "}";
           value = wrapper;
         } else {
@@ -745,11 +772,16 @@ class ExchangeableObjectGenerator
           (Util.typeIsNullable(elementType) ? '?' : '') +
           '.toMap(enumMethod: enumMethod)';
     } else {
-      final hasToValue = fieldTypeElement != null && hasToValueMethod(fieldTypeElement);
-      final hasToNativeValue = fieldTypeElement != null && hasToNativeValueMethod(fieldTypeElement);
-      final hasName = fieldTypeElement != null && hasNameMethod(fieldTypeElement);
-      if (fieldTypeElement != null && (hasToValue || hasToNativeValue || hasName)) {
-        if ([hasToValue, hasToNativeValue, hasName].where((e) => e).length > 1) {
+      final hasToValue =
+          fieldTypeElement != null && hasToValueMethod(fieldTypeElement);
+      final hasToNativeValue =
+          fieldTypeElement != null && hasToNativeValueMethod(fieldTypeElement);
+      final hasName =
+          fieldTypeElement != null && hasNameMethod(fieldTypeElement);
+      if (fieldTypeElement != null &&
+          (hasToValue || hasToNativeValue || hasName)) {
+        if ([hasToValue, hasToNativeValue, hasName].where((e) => e).length >
+            1) {
           String? defaultEnumMethodValue = null;
           if (hasToNativeValue) {
             defaultEnumMethodValue = "EnumMethod.nativeValue";
@@ -759,9 +791,20 @@ class ExchangeableObjectGenerator
             defaultEnumMethodValue = "EnumMethod.name";
           }
           var wrapper = "switch (enumMethod ?? $defaultEnumMethodValue) {";
-          wrapper += "EnumMethod.nativeValue => " + (hasToNativeValue ? (fieldName + (isNullable ? '?' : '') + '.toNativeValue()') : "null") + ", ";
-          wrapper += "EnumMethod.value => " + (hasToValue ? (fieldName + (isNullable ? '?' : '') + '.toValue()') : "null") + ", ";
-          wrapper += "EnumMethod.name => " + (hasName ? (fieldName + (isNullable ? '?' : '') + '.name()') : "null");
+          wrapper += "EnumMethod.nativeValue => " +
+              (hasToNativeValue
+                  ? (fieldName + (isNullable ? '?' : '') + '.toNativeValue()')
+                  : "null") +
+              ", ";
+          wrapper += "EnumMethod.value => " +
+              (hasToValue
+                  ? (fieldName + (isNullable ? '?' : '') + '.toValue()')
+                  : "null") +
+              ", ";
+          wrapper += "EnumMethod.name => " +
+              (hasName
+                  ? (fieldName + (isNullable ? '?' : '') + '.name()')
+                  : "null");
           wrapper += "}";
           return wrapper;
         } else {

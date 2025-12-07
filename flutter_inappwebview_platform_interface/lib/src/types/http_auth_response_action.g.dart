@@ -19,27 +19,27 @@ class HttpAuthResponseAction {
   ///Instructs the WebView to cancel the authentication request.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Android native WebView
-  ///- iOS
-  ///- MacOS
-  ///- Windows
+  ///- Android WebView
+  ///- iOS WKWebView
+  ///- macOS WKWebView
+  ///- Windows WebView2
   static const CANCEL = HttpAuthResponseAction._internal(0, 0);
 
   ///Instructs the WebView to proceed with the authentication with the given credentials.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Android native WebView
-  ///- iOS
-  ///- MacOS
-  ///- Windows
+  ///- Android WebView
+  ///- iOS WKWebView
+  ///- macOS WKWebView
+  ///- Windows WebView2
   static const PROCEED = HttpAuthResponseAction._internal(1, 1);
 
   ///Uses the credentials stored for the current host.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Android native WebView
-  ///- iOS
-  ///- MacOS
+  ///- Android WebView
+  ///- iOS WKWebView
+  ///- macOS WKWebView
   static const USE_SAVED_HTTP_AUTH_CREDENTIALS =
       HttpAuthResponseAction._internal(2, 2);
 
@@ -130,6 +130,11 @@ class HttpAuthResponseAction {
 
   @override
   bool operator ==(value) => value == _value;
+
+  ///Checks if the value is supported by the [defaultTargetPlatform].
+  bool isSupported() {
+    return toNativeValue() != null;
+  }
 
   @override
   String toString() {

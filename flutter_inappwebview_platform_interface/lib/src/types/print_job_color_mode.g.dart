@@ -19,8 +19,8 @@ class PrintJobColorMode {
   ///Color color scheme, for example many colors are used.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Android native WebView
-  ///- MacOS
+  ///- Android WebView
+  ///- macOS WKWebView
   static final COLOR = PrintJobColorMode._internalMultiPlatform(2, () {
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
@@ -36,8 +36,8 @@ class PrintJobColorMode {
   ///Monochrome color scheme, for example one color is used.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Android native WebView
-  ///- MacOS
+  ///- Android WebView
+  ///- macOS WKWebView
   static final MONOCHROME = PrintJobColorMode._internalMultiPlatform(1, () {
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
@@ -115,7 +115,7 @@ class PrintJobColorMode {
   ///Gets [int] value.
   int toValue() => _value;
 
-  ///Gets [dynamic] native value.
+  ///Gets [dynamic] native value if supported by the current platform, otherwise `null`.
   dynamic toNativeValue() => _nativeValue;
 
   ///Gets the name of the value.
@@ -134,6 +134,11 @@ class PrintJobColorMode {
 
   @override
   bool operator ==(value) => value == _value;
+
+  ///Checks if the value is supported by the [defaultTargetPlatform].
+  bool isSupported() {
+    return toNativeValue() != null;
+  }
 
   @override
   String toString() {

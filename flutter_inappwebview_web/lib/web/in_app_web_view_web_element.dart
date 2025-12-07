@@ -1,14 +1,18 @@
 import 'dart:async';
+import 'dart:collection';
+import 'dart:convert';
 import 'dart:developer';
 import 'dart:js_interop';
+import 'dart:typed_data' as typed_data;
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_platform_interface.dart';
 import 'package:web/web.dart';
 
 import 'headless_inappwebview_manager.dart';
+import 'in_app_webview_manager.dart';
 import 'js_bridge.dart';
-import 'web_platform_manager.dart';
 
 extension on HTMLIFrameElement {
   // https://developer.mozilla.org/en-US/docs/Web/API/HTMLIFrameElement/csp
@@ -26,12 +30,17 @@ class InAppWebViewWebElement implements Disposable {
   InAppWebViewSettings? initialSettings;
   URLRequest? initialUrlRequest;
   InAppWebViewInitialData? initialData;
+  UnmodifiableListView<UserScript>? initialUserScripts;
   String? initialFile;
   String? headlessWebViewId;
+  final UserContentController userContentController = UserContentController();
+  late final int? windowId;
 
   InAppWebViewSettings? settings;
   JSWebView? jsWebView;
   bool isLoading = false;
+
+  late final String _expectedBridgeSecret;
 
   InAppWebViewWebElement(
       {required dynamic viewId, required BinaryMessenger messenger}) {
@@ -64,10 +73,20 @@ class InAppWebViewWebElement implements Disposable {
       }
     });
 
+    try {
+      _expectedBridgeSecret = window.crypto.randomUUID();
+    } catch (e) {
+      _expectedBridgeSecret = (window.crypto
+              .getRandomValues(typed_data.Uint32List(5).toJS) as JSUint32Array)
+          .toDart
+          .join('-');
+    }
+
     jsWebView = flutterInAppWebView?.createFlutterInAppWebView(
         _viewId is int ? (_viewId as int).toJS : _viewId.toString().toJS,
         iframe,
-        iframeContainer);
+        iframeContainer,
+        _expectedBridgeSecret);
   }
 
   /// Handles method calls over the MethodChannel of this plugin.
@@ -178,6 +197,23 @@ class InAppWebViewWebElement implements Disposable {
         return await canScrollVertically();
       case "canScrollHorizontally":
         return await canScrollHorizontally();
+      case "addUserScript":
+        UserScript userScript = UserScript.fromMap(
+            call.arguments["userScript"].cast<String, dynamic>())!;
+        userContentController.addUserOnlyScript(userScript);
+        break;
+      case "removeUserScript":
+        UserScript userScript = UserScript.fromMap(
+            call.arguments["userScript"].cast<String, dynamic>())!;
+        userContentController.removeUserOnlyScript(userScript);
+        break;
+      case "removeUserScriptsByGroupName":
+        String groupName = call.arguments["groupName"];
+        userContentController.removeUserOnlyScriptsByGroupName(groupName);
+        break;
+      case "removeAllUserScripts":
+        userContentController.removeAllUserOnlyScripts();
+        break;
       case "dispose":
         dispose();
         break;
@@ -208,11 +244,13 @@ class InAppWebViewWebElement implements Disposable {
           initialUrlRequest = webView.initialUrlRequest;
           initialData = webView.initialData;
           initialFile = webView.initialFile;
+          initialUserScripts = webView.initialUserScripts;
 
           jsWebView = flutterInAppWebView?.createFlutterInAppWebView(
               _viewId is int ? (_viewId as int).toJS : _viewId.toString().toJS,
               iframe,
-              iframeContainer);
+              iframeContainer,
+              _expectedBridgeSecret);
         }
       }
     }
@@ -250,11 +288,20 @@ class InAppWebViewWebElement implements Disposable {
       }
     }
 
+    if (initialUserScripts != null) {
+      userContentController.addUserOnlyScripts(initialUserScripts!.toList());
+    }
+
     jsWebView?.prepare(settings?.toMap().jsify());
   }
 
   void makeInitialLoad() async {
-    if (initialUrlRequest != null) {
+    if (windowId != null) {
+      if (InAppWebViewManager.windowActions.containsKey(windowId!)) {
+        final createWindowAction = InAppWebViewManager.windowActions[windowId!];
+        loadUrl(urlRequest: createWindowAction!.request);
+      }
+    } else if (initialUrlRequest != null) {
       loadUrl(urlRequest: initialUrlRequest!);
     } else if (initialData != null) {
       loadData(data: initialData!.data, mimeType: initialData!.mimeType);
@@ -552,7 +599,7 @@ class InAppWebViewWebElement implements Disposable {
   }
 
   Future<bool?> onCreateWindow(
-      int windowId, String url, String? target, String? windowFeatures) async {
+      String url, String? target, String? windowFeatures) async {
     Map<String, dynamic> windowFeaturesMap = {};
     List<String> features = windowFeatures?.split(",") ?? [];
     for (var feature in features) {
@@ -568,13 +615,29 @@ class InAppWebViewWebElement implements Disposable {
       }
     }
 
-    var obj = {
+    final windowId = InAppWebViewManager.windowAutoincrementId;
+    InAppWebViewManager.windowAutoincrementId++;
+
+    final createWindowAction = CreateWindowAction.fromMap({
       "windowId": windowId,
       "isForMainFrame": true,
       "request": {"url": url, "method": "GET"},
       "windowFeatures": windowFeaturesMap
-    };
-    return await _channel?.invokeMethod("onCreateWindow", obj);
+    });
+
+    InAppWebViewManager.windowActions[windowId] = createWindowAction!;
+    final handledByClient = await _channel?.invokeMethod<bool>(
+            "onCreateWindow", createWindowAction.toMap()) ??
+        false;
+    if (!handledByClient &&
+        InAppWebViewManager.windowActions.containsKey(windowId)) {
+      InAppWebViewManager.windowActions.remove(windowId);
+    }
+    return handledByClient;
+  }
+
+  void onCloseWindow() async {
+    await _channel?.invokeMethod("onCloseWindow");
   }
 
   void onWindowFocus() async {
@@ -619,13 +682,106 @@ class InAppWebViewWebElement implements Disposable {
     await _channel?.invokeMethod("onInjectedScriptError", [id]);
   }
 
+  Future<dynamic> onCallJsHandler(
+      String handlerName, Map<String, dynamic> data) async {
+    final String bridgeSecret = data["_bridgeSecret"];
+    final String origin = data["origin"];
+
+    if (_expectedBridgeSecret != bridgeSecret) {
+      if (kDebugMode) {
+        print(
+            "Bridge access attempt with wrong secret token, possibly from malicious code from origin: " +
+                origin);
+      }
+      return null;
+    }
+
+    var isOriginAllowed = false;
+    var javaScriptHandlersOriginAllowList =
+        settings?.javaScriptHandlersOriginAllowList;
+    if (javaScriptHandlersOriginAllowList != null) {
+      for (String allowedOrigin in javaScriptHandlersOriginAllowList) {
+        if (RegExp(allowedOrigin).hasMatch(origin)) {
+          isOriginAllowed = true;
+          break;
+        }
+      }
+    } else {
+      // origin is by default allowed if the allow list is null
+      isOriginAllowed = true;
+    }
+    if (!isOriginAllowed) {
+      if (kDebugMode) {
+        print("Bridge access attempt from an origin not allowed: " + origin);
+      }
+      return null;
+    }
+
+    var obj = {"handlerName": handlerName, "data": data};
+    final result = await _channel?.invokeMethod<String>("onCallJsHandler", obj);
+    return result != null ? jsonDecode(result) : null;
+  }
+
   @override
   void dispose() {
     _channel?.setMethodCallHandler(null);
     _channel = null;
-    iframeContainer.remove();
-    if (WebPlatformManager.webViews.containsKey(_viewId)) {
-      WebPlatformManager.webViews.remove(_viewId);
+    if (windowId != null &&
+        InAppWebViewManager.windowActions.containsKey(windowId)) {
+      InAppWebViewManager.windowActions.remove(windowId);
     }
+    iframeContainer.remove();
+    if (InAppWebViewManager.webViews.containsKey(_viewId)) {
+      InAppWebViewManager.webViews.remove(_viewId);
+    }
+  }
+}
+
+class UserContentController implements Disposable {
+  final Map<UserScriptInjectionTime, List<UserScript>> _userOnlyScripts = {
+    UserScriptInjectionTime.AT_DOCUMENT_START: [],
+    UserScriptInjectionTime.AT_DOCUMENT_END: [],
+  };
+
+  UserContentController();
+
+  List<UserScript> getUserOnlyScriptsAt(UserScriptInjectionTime injectionTime) {
+    return _userOnlyScripts[injectionTime]!;
+  }
+
+  void addUserOnlyScript(UserScript userScript) {
+    _userOnlyScripts[userScript.injectionTime]!.add(userScript);
+  }
+
+  void addUserOnlyScripts(List<UserScript> userScripts) {
+    for (var userScript in userScripts) {
+      addUserOnlyScript(userScript);
+    }
+  }
+
+  bool removeUserOnlyScript(UserScript userScript) {
+    return _userOnlyScripts[userScript.injectionTime]!.remove(userScript);
+  }
+
+  UserScript removeUserOnlyScriptAt(
+      int index, UserScriptInjectionTime injectionTime) {
+    return _userOnlyScripts[injectionTime]!.removeAt(index);
+  }
+
+  void removeUserOnlyScriptsByGroupName(String groupName) {
+    for (var injectionTime in UserScriptInjectionTime.values) {
+      _userOnlyScripts[injectionTime]!
+          .removeWhere((userScript) => userScript.groupName == groupName);
+    }
+  }
+
+  removeAllUserOnlyScripts() {
+    _userOnlyScripts[UserScriptInjectionTime.AT_DOCUMENT_START]!.clear();
+    _userOnlyScripts[UserScriptInjectionTime.AT_DOCUMENT_END]!.clear();
+  }
+
+  @override
+  void dispose() {
+    removeAllUserOnlyScripts();
   }
 }

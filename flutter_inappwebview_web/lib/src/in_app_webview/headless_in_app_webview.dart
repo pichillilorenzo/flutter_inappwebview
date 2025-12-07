@@ -268,6 +268,14 @@ class WebPlatformHeadlessInAppWebView extends PlatformHeadlessInAppWebView
     id = IdGenerator.generate();
   }
 
+  static final WebPlatformHeadlessInAppWebView _staticValue =
+      WebPlatformHeadlessInAppWebView(
+          WebPlatformHeadlessInAppWebViewCreationParams());
+
+  factory WebPlatformHeadlessInAppWebView.static() {
+    return _staticValue;
+  }
+
   @override
   WebPlatformInAppWebViewController? get webViewController =>
       _webViewController;

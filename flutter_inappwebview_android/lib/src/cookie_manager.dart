@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
-
 import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_platform_interface.dart';
 
 /// Object specifying creation parameters for creating a [AndroidCookieManager].
@@ -42,6 +41,14 @@ class AndroidCookieManager extends PlatformCookieManager
         'com.pichillilorenzo/flutter_inappwebview_cookiemanager');
     handler = handleMethod;
     initMethodCallHandler();
+  }
+
+  static final AndroidCookieManager _staticValue = AndroidCookieManager(
+      AndroidCookieManagerCreationParams(
+          PlatformCookieManagerCreationParams()));
+
+  factory AndroidCookieManager.static() {
+    return _staticValue;
   }
 
   static AndroidCookieManager? _instance;

@@ -1,13 +1,18 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_platform_interface.dart';
 
 import 'in_app_webview/in_app_webview_controller.dart';
 import 'webview_environment/webview_environment.dart';
 
 ///{@macro flutter_inappwebview_platform_interface.PlatformCookieManager}
+///
+///{@macro flutter_inappwebview_platform_interface.PlatformCookieManager.supported_platforms}
 class CookieManager {
   ///{@macro flutter_inappwebview_platform_interface.PlatformCookieManager}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformCookieManager.supported_platforms}
   CookieManager()
       : this.fromPlatformCreationParams(
           const PlatformCookieManagerCreationParams(),
@@ -51,6 +56,8 @@ class CookieManager {
   }
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformCookieManager.setCookie}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformCookieManager.setCookie.supported_platforms}
   Future<bool> setCookie(
           {required WebUri url,
           required String name,
@@ -80,6 +87,8 @@ class CookieManager {
           webViewController: webViewController?.platform);
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformCookieManager.getCookies}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformCookieManager.getCookies.supported_platforms}
   Future<List<Cookie>> getCookies(
           {required WebUri url,
           @Deprecated("Use webViewController instead")
@@ -91,6 +100,8 @@ class CookieManager {
           webViewController: webViewController?.platform);
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformCookieManager.getCookie}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformCookieManager.getCookie.supported_platforms}
   Future<Cookie?> getCookie(
           {required WebUri url,
           required String name,
@@ -104,6 +115,8 @@ class CookieManager {
           webViewController: webViewController?.platform);
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformCookieManager.deleteCookie}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformCookieManager.deleteCookie.supported_platforms}
   Future<bool> deleteCookie(
           {required WebUri url,
           required String name,
@@ -121,6 +134,8 @@ class CookieManager {
           webViewController: webViewController?.platform);
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformCookieManager.deleteCookies}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformCookieManager.deleteCookies.supported_platforms}
   Future<bool> deleteCookies(
           {required WebUri url,
           String path = "/",
@@ -136,16 +151,41 @@ class CookieManager {
           webViewController: webViewController?.platform);
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformCookieManager.deleteAllCookies}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformCookieManager.deleteAllCookies.supported_platforms}
   Future<bool> deleteAllCookies() => platform.deleteAllCookies();
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformCookieManager.getAllCookies}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformCookieManager.getAllCookies.supported_platforms}
   Future<List<Cookie>> getAllCookies() => platform.getAllCookies();
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformCookieManager.removeSessionCookies}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformCookieManager.removeSessionCookies.supported_platforms}
   Future<bool> removeSessionCookies() => platform.removeSessionCookies();
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformCookieManager.flush}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformCookieManager.flush.supported_platforms}
   Future<void> flush() => platform.flush();
+
+  ///{@macro flutter_inappwebview_platform_interface.PlatformCookieManagerCreationParams.isClassSupported}
+  static bool isClassSupported({TargetPlatform? platform}) =>
+      PlatformCookieManager.static().isClassSupported(platform: platform);
+
+  ///{@macro flutter_inappwebview_platform_interface.PlatformCookieManagerCreationParams.isPropertySupported}
+  static bool isPropertySupported(
+          PlatformCookieManagerCreationParamsProperty property,
+          {TargetPlatform? platform}) =>
+      PlatformCookieManager.static()
+          .isPropertySupported(property, platform: platform);
+
+  ///{@macro flutter_inappwebview_platform_interface.PlatformCookieManager.isMethodSupported}
+  static bool isMethodSupported(PlatformCookieManagerMethod method,
+          {TargetPlatform? platform}) =>
+      PlatformCookieManager.static()
+          .isMethodSupported(method, platform: platform);
 }
 
 ///Class that contains only iOS-specific methods of [CookieManager].

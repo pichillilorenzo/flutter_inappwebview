@@ -279,6 +279,13 @@ class WindowsHeadlessInAppWebView extends PlatformHeadlessInAppWebView
     id = IdGenerator.generate();
   }
 
+  static final WindowsHeadlessInAppWebView _staticValue =
+      WindowsHeadlessInAppWebView(WindowsHeadlessInAppWebViewCreationParams());
+
+  factory WindowsHeadlessInAppWebView.static() {
+    return _staticValue;
+  }
+
   @override
   WindowsInAppWebViewController? get webViewController => _webViewController;
 

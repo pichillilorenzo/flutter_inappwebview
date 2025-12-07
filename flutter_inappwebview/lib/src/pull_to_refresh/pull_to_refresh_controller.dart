@@ -92,4 +92,22 @@ class PullToRefreshController {
   ///{@macro flutter_inappwebview_platform_interface.PlatformPullToRefreshController.dispose}
   void dispose({bool isKeepAlive = false}) =>
       platform.dispose(isKeepAlive: isKeepAlive);
+
+  ///{@macro flutter_inappwebview_platform_interface.PlatformPullToRefreshController.isClassSupported}
+  static bool isClassSupported({TargetPlatform? platform}) =>
+      PlatformPullToRefreshController.static()
+          .isClassSupported(platform: platform);
+
+  ///{@macro flutter_inappwebview_platform_interface.PlatformPullToRefreshController.isPropertySupported}
+  static bool isPropertySupported(
+          PlatformPullToRefreshControllerCreationParamsProperty property,
+          {TargetPlatform? platform}) =>
+      PlatformPullToRefreshController.static()
+          .isPropertySupported(property, platform: platform);
+
+  ///{@macro flutter_inappwebview_platform_interface.PlatformPullToRefreshController.isMethodSupported}
+  static bool isMethodSupported(PlatformPullToRefreshControllerMethod method,
+          {TargetPlatform? platform}) =>
+      PlatformPullToRefreshController.static()
+          .isMethodSupported(method, platform: platform);
 }

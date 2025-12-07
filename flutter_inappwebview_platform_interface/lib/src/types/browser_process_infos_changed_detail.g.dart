@@ -11,7 +11,7 @@ class BrowserProcessInfosChangedDetail {
   ///The kind of the process.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Windows
+  ///- Windows WebView2
   List<BrowserProcessInfo> infos;
   BrowserProcessInfosChangedDetail({this.infos = const []});
 

@@ -181,6 +181,12 @@ class PdfToolbarItems {
   PdfToolbarItems operator |(PdfToolbarItems value) =>
       PdfToolbarItems._internal(
           value.toValue() | _value, value.toNativeValue() | _nativeValue);
+
+  ///Checks if the value is supported by the [defaultTargetPlatform].
+  bool isSupported() {
+    return true;
+  }
+
   @override
   String toString() {
     return name();

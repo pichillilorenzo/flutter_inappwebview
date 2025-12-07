@@ -57,6 +57,14 @@ class IOSHttpAuthCredentialDatabase extends PlatformHttpAuthCredentialDatabase
     return _instance!;
   }
 
+  static final IOSHttpAuthCredentialDatabase _staticValue =
+      IOSHttpAuthCredentialDatabase(IOSHttpAuthCredentialDatabaseCreationParams(
+          const PlatformHttpAuthCredentialDatabaseCreationParams()));
+
+  factory IOSHttpAuthCredentialDatabase.static() {
+    return _staticValue;
+  }
+
   Future<dynamic> _handleMethod(MethodCall call) async {}
 
   @override

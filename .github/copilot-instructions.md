@@ -20,13 +20,21 @@ This repository follows the **Federated Plugin** architecture:
   - Keep their APIs strictly aligned with the `platform_interface` layer.
 - **`dev_packages/` and `scripts/`**: Internal tooling, generators, and maintenance scripts.
 
-### Main App-Facing Classes (support checks available)
+### Main App-Facing Classes
 - Web view: `InAppWebView`, `InAppWebViewController`, `HeadlessInAppWebView`
 - Browser shells: `InAppBrowser`, `ChromeSafariBrowser`, `WebAuthenticationSession`
 - Platform helpers: `WebViewEnvironment`, `ProcessGlobalConfig`, `ProxyController`, `ServiceWorkerController`, `TracingController`, `PrintJobController`, `PullToRefreshController`, `FindInteractionController`
 - Storage & messaging: `WebStorage`, `LocalStorage`, `SessionStorage`, `WebStorageManager`, `WebMessageChannel`, `WebMessageListener`
 - Cookies: `CookieManager`
 - Auth storage: `HttpAuthCredentialDatabase`
+
+### InAppWebViewSettings quick reference
+- Source of truth: `flutter_inappwebview_platform_interface/lib/src/in_app_webview/in_app_webview_settings.dart` (`InAppWebViewSettings_` with `@ExchangeableObject` → generated public `InAppWebViewSettings`). Always edit the annotated source, then run `npm run build` to regenerate `*.g.dart`.
+- Role: exhaustive configuration bag for `InAppWebView`/`InAppBrowser` creation params. Mirrors platform capabilities via `@SupportedPlatforms` on each field; no platform-specific logic belongs here.
+- Defaults/inference: several flags (e.g., `useShouldOverrideUrlLoading`, `useOnLoadResource`, `useShouldInterceptRequest`, AJAX/fetch hooks) auto-infer to `true` when the related callback is implemented and the flag is `null`. Set explicitly in browsers to avoid surprises.
+- Deprecated fields: keep deprecated properties tagged with `@ExchangeableObjectProperty(leaveDeprecatedInToMapMethod: true)` so serialization remains backward compatible. Prefer new alternatives (e.g., `algorithmicDarkeningAllowed` over `forceDark`).
+- Complex types: uses exchangeable enums/objects such as `MixedContentMode_`, `WebViewAssetLoader_`, `RendererPriorityPolicy_`, `ContentBlocker`. Add new fields only after defining the enum/object in `platform_interface` and regenerating code.
+- Support checks: rely on generated support helpers; when adding a field, annotate with `@SupportedPlatforms` and ensure downstream platform packages handle the field (or stub it) to preserve parity.
 
 ## Coding Guidelines
 

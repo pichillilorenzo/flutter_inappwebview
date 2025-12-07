@@ -215,6 +215,16 @@ void main() {
       );
     });
 
+    skippableTest('InAppWebViewSettings support methods are callable', () {
+      expect(
+        () => InAppWebViewSettings.isPropertySupported(
+          InAppWebViewSettingsProperty.values.first,
+          platform: defaultTargetPlatform,
+        ),
+        returnsNormally,
+      );
+    });
+
     skippableTest('InAppWebViewController support methods are callable', () {
       expect(
         () => InAppWebViewController.isClassSupported(

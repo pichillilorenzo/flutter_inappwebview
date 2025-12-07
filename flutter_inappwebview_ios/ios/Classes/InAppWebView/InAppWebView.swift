@@ -722,6 +722,15 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
             if #available(iOS 15.0, *) {
                 configuration.upgradeKnownHostsToHTTPS = settings.upgradeKnownHostsToHTTPS
             }
+            
+            if #available(iOS 17.0, *) {
+                let dataStore = WKWebsiteDataStore.default()
+                let newDataStore = WKWebsiteDataStore.nonPersistent()
+                newDataStore.proxyConfigurations = dataStore.proxyConfigurations
+                
+                // Set new websiteDataStore
+                configuration.websiteDataStore = newDataStore
+            }
         }
         
         return configuration

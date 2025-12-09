@@ -902,6 +902,22 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
       return true;
     }
 
+    // Excludes intents who want to obtain sandbox files.
+    // Fixes CVE-2020-6563.
+    if (data != null && data.getData().getPath() != null) {
+      final String path = data.getData().getPath();
+      final File file = new File(path);
+      String normalized;
+      try {
+        normalized = file.getCanonicalPath();
+      } catch (IOException e) {
+        normalized = path;
+      }
+      if (normalized.startsWith("/data")) {
+        data.setData(Uri.EMPTY);
+      }
+    }
+
     // based off of which button was pressed, we get an activity result and a file
     // the camera activity doesn't properly return the filename* (I think?) so we use
     // this filename instead

@@ -29,6 +29,7 @@ class InAppWebViewControllerKeepAliveProps {
   Set<PlatformWebMessageChannel> webMessageChannels = Set();
   Set<PlatformWebMessageListener> webMessageListeners = Set();
   Map<String, Function(dynamic data)> devToolsProtocolEventListenerMap;
+  WebUri? currentUrl;
 
   InAppWebViewControllerKeepAliveProps(
       {this.javaScriptHandlersMap = const {},
@@ -37,5 +38,6 @@ class InAppWebViewControllerKeepAliveProps {
       this.injectedScriptsFromURL = const {},
       this.webMessageChannels = const {},
       this.webMessageListeners = const {},
-      this.devToolsProtocolEventListenerMap = const {}});
+      this.devToolsProtocolEventListenerMap = const {},
+      this.currentUrl});
 }

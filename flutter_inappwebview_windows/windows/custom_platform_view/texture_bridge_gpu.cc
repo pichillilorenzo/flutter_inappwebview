@@ -19,6 +19,13 @@ namespace flutter_inappwebview_plugin
   void TextureBridgeGpu::ProcessFrame(
     winrt::com_ptr<ID3D11Texture2D> src_texture)
   {
+    if (!graphics_context_) {
+      return;
+    }
+    auto device_context = graphics_context_->d3d_device_context();
+    if (!device_context) {
+      return;
+    }
     D3D11_TEXTURE2D_DESC desc;
     src_texture->GetDesc(&desc);
 
@@ -26,8 +33,6 @@ namespace flutter_inappwebview_plugin
     const auto height = desc.Height;
 
     EnsureSurface(width, height);
-
-    auto device_context = graphics_context_->d3d_device_context();
 
     device_context->CopyResource(surface_.get(), src_texture.get());
     device_context->Flush();

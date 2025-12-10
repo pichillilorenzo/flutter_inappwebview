@@ -26,6 +26,7 @@
 #include "in_app_webview.h"
 #include "in_app_webview_manager.h"
 
+
 namespace flutter_inappwebview_plugin
 {
   using namespace Microsoft::WRL;
@@ -1993,6 +1994,26 @@ namespace flutter_inappwebview_plugin
     }
 
     failedLog(webView->OpenDevToolsWindow());
+  }
+
+  void InAppWebView::setThemeMode(const std::string& theme) const
+  {
+    if (!webView) {
+      return;
+    }
+    ComPtr<ICoreWebView2_13> coreWebView2_13;
+    if (SUCCEEDED(webView->QueryInterface(IID_ICoreWebView2_13, &coreWebView2_13))) {
+      ComPtr<ICoreWebView2Profile> profile;
+      if (SUCCEEDED(coreWebView2_13->get_Profile(&profile))) {
+        if (profile) {
+          if (theme == "dark") {
+            profile->put_PreferredColorScheme(COREWEBVIEW2_PREFERRED_COLOR_SCHEME_DARK);
+          } else if (theme == "light") {
+            profile->put_PreferredColorScheme(COREWEBVIEW2_PREFERRED_COLOR_SCHEME_LIGHT);
+          }
+        }
+      }
+    }
   }
 
   void InAppWebView::callDevToolsProtocolMethod(const std::string& methodName, const std::optional<std::string>& parametersAsJson, const std::function<void(const HRESULT& errorCode, const std::optional<std::string>&)> completionHandler) const

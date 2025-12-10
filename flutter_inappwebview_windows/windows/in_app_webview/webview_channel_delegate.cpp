@@ -262,6 +262,11 @@ namespace flutter_inappwebview_plugin
       webView->openDevTools();
       result->Success(true);
     }
+    else if (string_equals(methodName, "setThemeMode")) {
+      auto theme = get_fl_map_value<std::string>(arguments, "theme");
+      webView->setThemeMode(theme);
+      result->Success(true);
+    }
     else if (string_equals(methodName, "callDevToolsProtocolMethod")) {
       auto result_ = std::shared_ptr<flutter::MethodResult<flutter::EncodableValue>>(std::move(result));
       auto cdpMethodName = get_fl_map_value<std::string>(arguments, "methodName");

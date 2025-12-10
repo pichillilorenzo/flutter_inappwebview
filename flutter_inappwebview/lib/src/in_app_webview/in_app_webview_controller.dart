@@ -716,6 +716,8 @@ class InAppWebViewController {
   ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.openDevTools.supported_platforms}
   Future<void> openDevTools() => platform.openDevTools();
 
+  Future<void> setThemeMode(String theme) => platform.setThemeMode(theme);
+
   ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.callDevToolsProtocolMethod}
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.callDevToolsProtocolMethod.supported_platforms}

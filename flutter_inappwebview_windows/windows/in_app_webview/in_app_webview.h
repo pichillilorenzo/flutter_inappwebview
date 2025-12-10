@@ -171,6 +171,7 @@ namespace flutter_inappwebview_plugin
     void setSettings(const std::shared_ptr<InAppWebViewSettings> newSettings, const flutter::EncodableMap& newSettingsMap);
     flutter::EncodableValue getSettings() const;
     void openDevTools() const;
+    void setThemeMode(const std::string& theme) const;
     void callDevToolsProtocolMethod(const std::string& methodName, const std::optional<std::string>& parametersAsJson, const std::function<void(const HRESULT& errorCode, const std::optional<std::string>&)> completionHandler) const;
     void addDevToolsProtocolEventListener(const std::string& eventName);
     void removeDevToolsProtocolEventListener(const std::string& eventName);

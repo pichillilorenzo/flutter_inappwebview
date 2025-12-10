@@ -638,7 +638,7 @@ extension InternalChannelController on ChannelController {
 
   disposeChannel({bool removeMethodCallHandler = true}) {
     if (removeMethodCallHandler) {
-      channel?.setMethodCallHandler(null);
+      this._channel?.setMethodCallHandler(null);
     }
     channel = null;
     handler = null;

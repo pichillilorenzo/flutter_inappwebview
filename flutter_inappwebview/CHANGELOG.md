@@ -30,6 +30,7 @@
 - Fixed "[iOS] Webview opened with windowId does not receive javascript handler callback." [#2393](https://github.com/pichillilorenzo/flutter_inappwebview/issues/2393)
 - Fixed internal javascript callback handlers when the WebView has windowId not null
 - macos: Fixed crash of unhandled `onPrintRequest` WebView event
+- Merged "🐛 fix MacOS: when using the `WebMessageListener` `onPostMessage` method, the message parameter is unexpectedly empty" [#2481](https://github.com/pichillilorenzo/flutter_inappwebview/pull/2481) (thanks to [imoyakin](https://github.com/imoyakin))
 
 ### Windows
 - Merged "windows: fix WebViewEnvironment dispose crash" [#2433](https://github.com/pichillilorenzo/flutter_inappwebview/pull/2433) (thanks to [GooRingX](https://github.com/GooRingX))

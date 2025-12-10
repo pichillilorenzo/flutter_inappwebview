@@ -6,6 +6,7 @@
 - Fixed internal javascript callback handlers when the WebView has windowId not null
 - Fixed crash of unhandled `onPrintRequest` WebView event
 - Fixed "When useShouldInterceptAjaxRequest is true, some ajax requests doesn't work" [#2197](https://github.com/pichillilorenzo/flutter_inappwebview/issues/2197)
+- Merged "🐛 fix MacOS: when using the `WebMessageListener` `onPostMessage` method, the message parameter is unexpectedly empty" [#2481](https://github.com/pichillilorenzo/flutter_inappwebview/pull/2481) (thanks to [imoyakin](https://github.com/imoyakin))
 
 ## 1.2.0-beta.2
 

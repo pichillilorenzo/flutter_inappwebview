@@ -6,6 +6,7 @@
 - Implemented `addJavaScriptHandler`, `removeJavaScriptHandler`, `hasJavaScriptHandler`, `addUserScript`, `addUserScripts`, `removeUserScript`, `removeUserScriptsByGroupName`, `removeUserScripts`, `hasUserScript` InAppWebViewController methods
 - Implemented `setJavaScriptBridgeName`, `getJavaScriptBridgeName`, `getDefaultUserAgent` InAppWebViewController static methods
 - Implemented `javaScriptHandlersOriginAllowList`, `javaScriptBridgeEnabled`, `javaScriptBridgeOriginAllowList`, `hasJavaScriptHandler`, `addUserScript`, `addUserScripts`, `removeUserScript` InAppWebViewSettings event
+- Merged "fix #2484, Remove not-empty assert for Cookie.value" [#2486](https://github.com/pichillilorenzo/flutter_inappwebview/pull/2486) (thanks to [laishere](https://github.com/laishere))
 
 ## 1.2.0-beta.2
 

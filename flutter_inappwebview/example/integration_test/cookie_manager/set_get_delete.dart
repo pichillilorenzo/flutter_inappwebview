@@ -55,11 +55,19 @@ void setGetDelete() {
       expect(await cookieManager.removeSessionCookies(), isTrue);
     }
 
-    await cookieManager.setCookie(url: url, name: "myCookie", value: "myValue");
+    // Empty cookie-value is allowed according to https://datatracker.ietf.org/doc/html/rfc6265#section-4.1.1
+    await cookieManager.setCookie(url: url, name: "myCookie", value: "");
     List<Cookie> cookies = await cookieManager.getCookies(url: url);
     expect(cookies, isNotEmpty);
 
     Cookie? cookie = await cookieManager.getCookie(url: url, name: "myCookie");
+    expect(cookie?.value.toString(), "");
+
+    await cookieManager.setCookie(url: url, name: "myCookie", value: "myValue");
+    cookies = await cookieManager.getCookies(url: url);
+    expect(cookies, isNotEmpty);
+
+    cookie = await cookieManager.getCookie(url: url, name: "myCookie");
     expect(cookie?.value.toString(), "myValue");
 
     expect(

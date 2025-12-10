@@ -54,6 +54,7 @@ namespace flutter_inappwebview_plugin
 
     windowClass_.lpszClassName = CustomPlatformView::CLASS_NAME;
     windowClass_.lpfnWndProc = &DefWindowProc;
+    windowClass_.style |= CS_NOCLOSE;
 
     RegisterClass(&windowClass_);
   }

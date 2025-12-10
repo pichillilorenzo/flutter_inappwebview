@@ -87,7 +87,6 @@ class MacOSCookieManager extends PlatformCookieManager with ChannelController {
 
     assert(url.toString().isNotEmpty);
     assert(name.isNotEmpty);
-    assert(value.isNotEmpty);
     assert(path.isNotEmpty);
 
     if (await _shouldUseJavascript()) {

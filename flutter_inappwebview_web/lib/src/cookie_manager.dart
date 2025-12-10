@@ -89,7 +89,6 @@ class WebPlatformCookieManager extends PlatformCookieManager
 
     assert(url.toString().isNotEmpty);
     assert(name.isNotEmpty);
-    assert(value.isNotEmpty);
     assert(path.isNotEmpty);
 
     await _setCookieWithJavaScript(

@@ -195,7 +195,7 @@ class AndroidInternalStoragePathHandler
 
   @override
   Map<String, dynamic> toMap({EnumMethod? enumMethod}) {
-    return {...toMap(), 'directory': directory};
+    return {...super.toMap(), 'directory': directory};
   }
 }
 

@@ -162,6 +162,7 @@ public class InAppWebViewSettings implements ISettings<InAppWebViewInterface> {
   @Nullable
   public Double alpha;
   public Boolean useOnShowFileChooser = false;
+  public Boolean paymentRequestEnabled = false;
 
   @NonNull
   @Override
@@ -483,6 +484,9 @@ public class InAppWebViewSettings implements ISettings<InAppWebViewInterface> {
         case "useOnShowFileChooser":
           useOnShowFileChooser = (Boolean) value;
           break;
+        case "paymentRequestEnabled":
+          paymentRequestEnabled = (Boolean) value;
+          break;
       }
     }
 
@@ -602,6 +606,8 @@ public class InAppWebViewSettings implements ISettings<InAppWebViewInterface> {
     settings.put("isUserInteractionEnabled", isUserInteractionEnabled);
     settings.put("alpha", alpha);
     settings.put("useOnShowFileChooser", useOnShowFileChooser);
+    settings.put("paymentRequestEnabled", paymentRequestEnabled);
+
     return settings;
   }
 
@@ -698,6 +704,9 @@ public class InAppWebViewSettings implements ISettings<InAppWebViewInterface> {
       }
       if (WebViewFeature.isFeatureSupported(WebViewFeature.REQUESTED_WITH_HEADER_ALLOW_LIST)) {
         realSettings.put("requestedWithHeaderOriginAllowList", new ArrayList<>(WebSettingsCompat.getRequestedWithHeaderOriginAllowList(settings)));
+      }
+      if(WebViewFeature.isFeatureSupported(WebViewFeature.PAYMENT_REQUEST)) {
+        realSettings.put("paymentRequestEnabled", WebSettingsCompat.getPaymentRequestEnabled(settings));
       }
     }
     return realSettings;

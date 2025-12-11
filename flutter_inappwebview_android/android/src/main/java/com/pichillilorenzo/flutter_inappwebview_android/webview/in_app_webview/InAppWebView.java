@@ -477,6 +477,10 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
       WebSettingsCompat.setRequestedWithHeaderOriginAllowList(settings, customSettings.requestedWithHeaderOriginAllowList);
     }
 
+    if (customSettings.paymentRequestEnabled != null && WebViewFeature.isFeatureSupported(WebViewFeature.PAYMENT_REQUEST)) {
+      WebSettingsCompat.setPaymentRequestEnabled(settings, customSettings.paymentRequestEnabled);
+    }
+
     contentBlockerHandler.getRuleList().clear();
     for (Map<String, Map<String, Object>> contentBlocker : customSettings.contentBlockers) {
       // compile ContentBlockerTrigger urlFilter
@@ -1186,6 +1190,12 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
             !Util.objEquals(customSettings.requestedWithHeaderOriginAllowList, newCustomSettings.requestedWithHeaderOriginAllowList) &&
             WebViewFeature.isFeatureSupported(WebViewFeature.REQUESTED_WITH_HEADER_ALLOW_LIST)) {
       WebSettingsCompat.setRequestedWithHeaderOriginAllowList(settings, newCustomSettings.requestedWithHeaderOriginAllowList);
+    }
+
+    if (newSettingsMap.get("paymentRequestEnabled") != null &&
+            customSettings.paymentRequestEnabled != newCustomSettings.paymentRequestEnabled &&
+            WebViewFeature.isFeatureSupported(WebViewFeature.PAYMENT_REQUEST)) {
+      WebSettingsCompat.setPaymentRequestEnabled(settings, newCustomSettings.paymentRequestEnabled);
     }
 
     if (plugin != null) {

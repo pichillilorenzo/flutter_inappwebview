@@ -9,7 +9,7 @@ import WebKit
 @available(iOS 17.0, *)
 public class ProxyManager: ChannelDelegate {
     static let METHOD_CHANNEL_NAME = "com.pichillilorenzo/flutter_inappwebview_proxycontroller"
-
+    
     private var plugin: SwiftFlutterPlugin?
 
     init(plugin: SwiftFlutterPlugin) {
@@ -42,12 +42,10 @@ public class ProxyManager: ChannelDelegate {
     public func setProxyOverride(_ settings: ProxySettings) {
         let proxyConfigurations = settings.toProxyConfigurations()
         WKWebsiteDataStore.default().proxyConfigurations = proxyConfigurations
-        WKWebsiteDataStore.nonPersistent().proxyConfigurations = proxyConfigurations
     }
     
     public func clearProxyOverride() {
         WKWebsiteDataStore.default().proxyConfigurations = []
-        WKWebsiteDataStore.nonPersistent().proxyConfigurations = []
     }
 
     public override func dispose() {

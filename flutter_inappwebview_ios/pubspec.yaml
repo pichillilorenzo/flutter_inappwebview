@@ -20,9 +20,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-#  flutter_inappwebview_platform_interface: ^1.3.0
-  flutter_inappwebview_platform_interface:
-    path: ../flutter_inappwebview_platform_interface
+  flutter_inappwebview_platform_interface: ^1.3.0
 
 dev_dependencies:
   flutter_test:

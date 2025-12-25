@@ -1,0 +1,107 @@
+name: 🐛 Bug
+description: Something is crashing or not working as intended
+title: "Write the title here"
+labels:
+  - bug
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **Before you submit this issue, please make sure you have read the the [Getting Started](https://inappwebview.dev/docs/intro/) page.**
+
+        **Please fill out the following information:**
+  - type: checkboxes
+    attributes:
+      label: Is there an existing issue for this?
+      description: |
+        PLEASE! Make sure to check if this issue is a duplicate. 
+        
+        Search for it using the GitHub issue search box (check the closed issues too) or on the official [inappwebview.dev](https://inappwebview.dev/) website, or using Google, StackOverflow, etc. before posting a new one.
+        
+        You may already find an answer to your problem!
+      options:
+        - label: I have searched the existing issues
+          required: true
+  - type: textarea
+    attributes:
+      label: Current Behavior
+      description: Write what you are experiencing currently.
+      placeholder: |
+        The plugin isn't working as expected. It crashes when I do this...
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Expected Behavior
+      description: Write what you expected to happen.
+      placeholder: |
+        The plugin should do this when I do that...
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Steps with code example to reproduce
+      description: Steps with code example to reproduce the issue. A not well written description might lead to the delay in fixing the issue.
+      value: |
+        <details>
+        <summary>Steps with code example to reproduce</summary>
+        
+        ```dart
+        // Paste your code here
+        ```
+        </details>
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Stacktrace/Logs
+      description: |
+        If you have any stacktrace or logs, paste them here. Make sure to remove any sensitive information.
+      value: |
+        <details>
+        <summary>Stacktrace/Logs</summary>
+        
+        ```
+        <Replace this line by pasting your stacktrace or logs here>
+        ```
+        </details>
+    validations:
+      required: true
+  - type: input
+    attributes:
+      label: Flutter version
+      description: The Flutter version in which you used the plugin to face the issue.
+      placeholder: v3.22.0, v3.24.3, etc.
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Operating System, Device-specific and/or Tool
+      description: |
+        The Operating System, Device-specific and/or Tool in which you used the plugin to face the issue.
+        For example: All platforms, Android, iOS, XCode, macOS, Windows, Web, Chrome, etc.
+        Make sure to include the version too.
+      placeholder: Android 34+, iOS 17.0+, macOS, Windows, etc.
+    validations:
+      required: true
+  - type: input
+    attributes:
+      label: Plugin version
+      description: In which version of flutter_inappwebview did you encounter this bug?
+      placeholder: v6.1.0, v6.0.0, etc.
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Additional information
+      description: Anything else you'd like to include? Like screenshots or a video recording of the issue.
+    validations:
+      required: false
+  - type: checkboxes
+    attributes:
+      label: Self grab
+      description: If you are a developer and want to work on this issue yourself, you can check this box and wait for maintainer response. We welcome contributions!
+      options:
+        - label: I'm ready to work on this issue!
+          required: false

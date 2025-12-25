@@ -20,20 +20,12 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-#  flutter_inappwebview_platform_interface: ^1.0.10
-#  flutter_inappwebview_android: ^1.0.12
-#  flutter_inappwebview_ios: ^1.0.13
-#  flutter_inappwebview_macos: ^1.0.11
-#  flutter_inappwebview_web: ^1.0.8
-
-
-  flutter_inappwebview_platform_interface:
-    path: ../flutter_inappwebview_platform_interface
-  flutter_inappwebview_android:
-    path: ../flutter_inappwebview_android
-  flutter_inappwebview_internal_annotations: ^1.1.1
-  flutter_inappwebview_ios:
-    path: ../flutter_inappwebview_ios
+  flutter_inappwebview_platform_interface: ^1.3.0
+  flutter_inappwebview_android: ^1.1.3
+  flutter_inappwebview_ios: ^1.1.2
+  flutter_inappwebview_macos: ^1.1.2
+  flutter_inappwebview_web: ^1.1.2
+  flutter_inappwebview_windows: ^0.6.0
 
 dev_dependencies:
   flutter_test:
@@ -60,6 +52,8 @@ flutter:
         default_package: flutter_inappwebview_macos
       web:
         default_package: flutter_inappwebview_web
+      windows:
+        default_package: flutter_inappwebview_windows
 
   assets:
     - packages/flutter_inappwebview/assets/t_rex_runner/t-rex.html

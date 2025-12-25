@@ -877,18 +877,27 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     @Override
     public boolean onShowFileChooser(WebView view, ValueCallback<Uri[]> filePathCallback, FileChooserParams fileChooserParams) {
+        if (filePathCallbackForL != null) {
+          filePathCallbackForL.onReceiveValue(null);
+        }
         this.filePathCallbackForL = filePathCallback;
         String[] acceptTypes = fileChooserParams.getAcceptTypes();
         InAppWebView webView = (InAppWebView) view;
-        if (webView.channelDelegate != null) {
-            webView.channelDelegate.onShowFileChooser(acceptTypes[0], showFileChooserCallback);
-            return true;
+        try{
+            if (webView.channelDelegate != null) {
+                String acceptType = "*/*";
+                  if (acceptTypes != null && acceptTypes.length > 0 && !TextUtils.isEmpty(acceptTypes[0])) {
+                  acceptType = acceptTypes[0];
+                }
+                webView.channelDelegate.onShowFileChooser(acceptType, showFileChooserCallback);
+                return true;
+            }
+        }catch(Exception ignore){
+          
         }
-        return false;
-////
-//        boolean allowMultiple = fileChooserParams.getMode() == WebChromeClient.FileChooserParams.MODE_OPEN_MULTIPLE;
-//        boolean captureEnabled = fileChooserParams.isCaptureEnabled();
-//        return startPickerIntent(filePathCallback, acceptTypes, allowMultiple, captureEnabled);
+       boolean allowMultiple = fileChooserParams.getMode() == WebChromeClient.FileChooserParams.MODE_OPEN_MULTIPLE;
+       boolean captureEnabled = fileChooserParams.isCaptureEnabled();
+       return startPickerIntent(filePathCallback, acceptTypes, allowMultiple, captureEnabled);
     }
 
   @Override

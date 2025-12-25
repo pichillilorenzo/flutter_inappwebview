@@ -5,9 +5,6 @@ buildscript {
     repositories {
         google()
         mavenCentral()
-        maven {
-            url "https://storage.flutter-io.cn/download.flutter.io"
-        }
     }
 
     dependencies {
@@ -19,9 +16,6 @@ rootProject.allprojects {
     repositories {
         google()
         mavenCentral()
-        maven {
-            url "https://storage.flutter-io.cn/download.flutter.io"
-        }
     }
 }
 
@@ -32,10 +26,10 @@ android {
     if (project.android.hasProperty("namespace")) {
         namespace 'com.pichillilorenzo.flutter_inappwebview_android'
     }
-    compileSdkVersion 33
+    compileSdk 34
 
     defaultConfig {
-        minSdkVersion 23
+        minSdkVersion 19
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
         vectorDrawables.useSupportLibrary = true
@@ -59,7 +53,6 @@ android {
         implementation 'androidx.browser:browser:1.8.0'
         implementation 'androidx.appcompat:appcompat:1.6.1'
         implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'
-//        api 'io.flutter:flutter_embedding_debug:1.0.0-e76c956498841e1ab458577d3892003e553e4f3c'
 
     }
 }

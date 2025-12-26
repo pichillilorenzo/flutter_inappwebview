@@ -40,15 +40,23 @@ extension type JSWebView._(JSObject _) implements JSObject {
   external JSSize getSize();
 }
 
-@JS('window.flutter_inappwebview')
+@JS('window.flutter_inappwebview_plugin')
 external FlutterInAppWebViewBridge? get flutterInAppWebView;
 
 extension type FlutterInAppWebViewBridge._(JSObject _) implements JSObject {
-  external JSObject webViews;
   external JSWebView createFlutterInAppWebView(
-      JSAny viewId, HTMLIFrameElement iframe, HTMLDivElement iframeContainer);
+      JSAny viewId,
+      HTMLIFrameElement iframe,
+      HTMLDivElement iframeContainer,
+      String bridgeSecret);
   external JSString getCookieExpirationDate(num timestamp);
 
-  /// Allows assigning a function to be callable from `window.flutter_inappwebview.nativeCommunication()`
-  external JSFunction nativeCommunication;
+  external JSFunction nativeAsyncCommunication;
+  external JSFunction nativeSyncCommunication;
 }
+
+@JS('Object.freeze')
+external JSObject Object_freeze(JSObject obj);
+
+@JS('Object.isFrozen')
+external JSBoolean Object_isFrozen(JSObject obj);

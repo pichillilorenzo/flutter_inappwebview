@@ -19,7 +19,7 @@ class WindowTitlebarSeparatorStyle {
   ///A style indicating that the system determines the type of separator.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- MacOS
+  ///- macOS WKWebView
   static final AUTOMATIC =
       WindowTitlebarSeparatorStyle._internalMultiPlatform(0, () {
     switch (defaultTargetPlatform) {
@@ -34,7 +34,7 @@ class WindowTitlebarSeparatorStyle {
   ///A style indicating that there’s no title bar separator.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- MacOS
+  ///- macOS WKWebView
   static final LINE =
       WindowTitlebarSeparatorStyle._internalMultiPlatform(2, () {
     switch (defaultTargetPlatform) {
@@ -49,7 +49,7 @@ class WindowTitlebarSeparatorStyle {
   ///A style indicating that the title bar separator is a line.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- MacOS
+  ///- macOS WKWebView
   static final NONE =
       WindowTitlebarSeparatorStyle._internalMultiPlatform(1, () {
     switch (defaultTargetPlatform) {
@@ -64,7 +64,7 @@ class WindowTitlebarSeparatorStyle {
   ///A style indicating that the title bar separator is a shadow.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- MacOS
+  ///- macOS WKWebView
   static final SHADOW =
       WindowTitlebarSeparatorStyle._internalMultiPlatform(3, () {
     switch (defaultTargetPlatform) {
@@ -110,20 +110,45 @@ class WindowTitlebarSeparatorStyle {
     return null;
   }
 
+  /// Gets a possible [WindowTitlebarSeparatorStyle] instance value with name [name].
+  ///
+  /// Goes through [WindowTitlebarSeparatorStyle.values] looking for a value with
+  /// name [name], as reported by [WindowTitlebarSeparatorStyle.name].
+  /// Returns the first value with the given name, otherwise `null`.
+  static WindowTitlebarSeparatorStyle? byName(String? name) {
+    if (name != null) {
+      try {
+        return WindowTitlebarSeparatorStyle.values
+            .firstWhere((element) => element.name() == name);
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
+  }
+
+  /// Creates a map from the names of [WindowTitlebarSeparatorStyle] values to the values.
+  ///
+  /// The collection that this method is called on is expected to have
+  /// values with distinct names, like the `values` list of an enum class.
+  /// Only one value for each name can occur in the created map,
+  /// so if two or more values have the same name (either being the
+  /// same value, or being values of different enum type), at most one of
+  /// them will be represented in the returned map.
+  static Map<String, WindowTitlebarSeparatorStyle> asNameMap() =>
+      <String, WindowTitlebarSeparatorStyle>{
+        for (final value in WindowTitlebarSeparatorStyle.values)
+          value.name(): value
+      };
+
   ///Gets [int] value.
   int toValue() => _value;
 
-  ///Gets [int?] native value.
+  ///Gets [int] native value if supported by the current platform, otherwise `null`.
   int? toNativeValue() => _nativeValue;
 
-  @override
-  int get hashCode => _value.hashCode;
-
-  @override
-  bool operator ==(value) => value == _value;
-
-  @override
-  String toString() {
+  ///Gets the name of the value.
+  String name() {
     switch (_value) {
       case 0:
         return 'AUTOMATIC';
@@ -135,5 +160,21 @@ class WindowTitlebarSeparatorStyle {
         return 'SHADOW';
     }
     return _value.toString();
+  }
+
+  @override
+  int get hashCode => _value.hashCode;
+
+  @override
+  bool operator ==(value) => value == _value;
+
+  ///Checks if the value is supported by the [defaultTargetPlatform].
+  bool isSupported() {
+    return toNativeValue() != null;
+  }
+
+  @override
+  String toString() {
+    return name();
   }
 }

@@ -8,10 +8,9 @@ part of 'chrome_safari_action_button.dart';
 
 ///Class that represents a custom action button for a [PlatformChromeSafariBrowser] instance.
 ///
-///**NOTE for Android native WebView**: Not available in an Android Trusted Web Activity.
-///
 ///**Officially Supported Platforms/Implementations**:
-///- Android native WebView
+///- Android WebView:
+///    - Not available in an Android Trusted Web Activity.
 class ChromeSafariBrowserActionButton {
   ///Use onClick instead.
   @Deprecated('Use onClick instead')
@@ -33,10 +32,9 @@ class ChromeSafariBrowserActionButton {
   bool shouldTint;
 
   ///
-  ///**NOTE for Android native WebView**: Not available in an Android Trusted Web Activity.
-  ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Android native WebView
+  ///- Android WebView:
+  ///    - Not available in an Android Trusted Web Activity.
   ChromeSafariBrowserActionButton(
       {required this.id,
       required this.icon,
@@ -46,7 +44,8 @@ class ChromeSafariBrowserActionButton {
       this.shouldTint = false});
 
   ///Gets a possible [ChromeSafariBrowserActionButton] instance from a [Map] value.
-  static ChromeSafariBrowserActionButton? fromMap(Map<String, dynamic>? map) {
+  static ChromeSafariBrowserActionButton? fromMap(Map<String, dynamic>? map,
+      {EnumMethod? enumMethod}) {
     if (map == null) {
       return null;
     }
@@ -55,12 +54,14 @@ class ChromeSafariBrowserActionButton {
       icon: Uint8List.fromList(map['icon'].cast<int>()),
       id: map['id'],
     );
-    instance.shouldTint = map['shouldTint'];
+    if (map['shouldTint'] != null) {
+      instance.shouldTint = map['shouldTint'];
+    }
     return instance;
   }
 
   ///Converts instance to a map.
-  Map<String, dynamic> toMap() {
+  Map<String, dynamic> toMap({EnumMethod? enumMethod}) {
     return {
       "description": description,
       "icon": icon,

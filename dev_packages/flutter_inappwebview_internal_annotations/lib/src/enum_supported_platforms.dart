@@ -1,3 +1,4 @@
+import 'constants.dart';
 import 'supported_platforms.dart';
 
 abstract class EnumPlatform implements Platform {
@@ -5,13 +6,19 @@ abstract class EnumPlatform implements Platform {
   final String? apiName;
   final String? apiUrl;
   final String? note;
+  final String name;
+  final String targetPlatformName;
   final dynamic value;
 
-  const EnumPlatform(
-      {this.available, this.apiName, this.apiUrl, this.note, this.value});
-
-  final name = "";
-  final targetPlatformName = "";
+  const EnumPlatform({
+    this.available,
+    this.apiName,
+    this.apiUrl,
+    this.note,
+    this.name = '',
+    this.targetPlatformName = '',
+    this.value,
+  });
 }
 
 class EnumAndroidPlatform implements EnumPlatform, AndroidPlatform {
@@ -19,13 +26,19 @@ class EnumAndroidPlatform implements EnumPlatform, AndroidPlatform {
   final String? apiName;
   final String? apiUrl;
   final String? note;
+  final String name;
+  final String targetPlatformName;
   final dynamic value;
 
-  const EnumAndroidPlatform(
-      {this.available, this.apiName, this.apiUrl, this.note, this.value});
-
-  final name = "Android native WebView";
-  final targetPlatformName = "android";
+  const EnumAndroidPlatform({
+    this.available,
+    this.apiName,
+    this.apiUrl,
+    this.note,
+    this.name = kPlatformNameAndroid,
+    this.targetPlatformName = kTargetPlatformNameAndroid,
+    this.value,
+  });
 }
 
 class EnumIOSPlatform implements EnumPlatform, IOSPlatform {
@@ -33,13 +46,19 @@ class EnumIOSPlatform implements EnumPlatform, IOSPlatform {
   final String? apiName;
   final String? apiUrl;
   final String? note;
+  final String name;
+  final String targetPlatformName;
   final dynamic value;
 
-  const EnumIOSPlatform(
-      {this.available, this.apiName, this.apiUrl, this.note, this.value});
-
-  final name = "iOS";
-  final targetPlatformName = "iOS";
+  const EnumIOSPlatform({
+    this.available,
+    this.apiName,
+    this.apiUrl,
+    this.note,
+    this.name = kPlatformNameIOS,
+    this.targetPlatformName = kTargetPlatformNameIOS,
+    this.value,
+  });
 }
 
 class EnumMacOSPlatform implements EnumPlatform, MacOSPlatform {
@@ -47,13 +66,19 @@ class EnumMacOSPlatform implements EnumPlatform, MacOSPlatform {
   final String? apiName;
   final String? apiUrl;
   final String? note;
+  final String name;
+  final String targetPlatformName;
   final dynamic value;
 
-  const EnumMacOSPlatform(
-      {this.available, this.apiName, this.apiUrl, this.note, this.value});
-
-  final name = "MacOS";
-  final targetPlatformName = "macOS";
+  const EnumMacOSPlatform({
+    this.available,
+    this.apiName,
+    this.apiUrl,
+    this.note,
+    this.name = kPlatformNameMacOS,
+    this.targetPlatformName = kTargetPlatformNameMacOS,
+    this.value,
+  });
 }
 
 class EnumWindowsPlatform implements EnumPlatform, WindowsPlatform {
@@ -61,13 +86,19 @@ class EnumWindowsPlatform implements EnumPlatform, WindowsPlatform {
   final String? apiName;
   final String? apiUrl;
   final String? note;
+  final String name;
+  final String targetPlatformName;
   final dynamic value;
 
-  const EnumWindowsPlatform(
-      {this.available, this.apiName, this.apiUrl, this.note, this.value});
-
-  final name = "Windows";
-  final targetPlatformName = "windows";
+  const EnumWindowsPlatform({
+    this.available,
+    this.apiName,
+    this.apiUrl,
+    this.note,
+    this.name = kPlatformNameWindows,
+    this.targetPlatformName = kTargetPlatformNameWindows,
+    this.value,
+  });
 }
 
 class EnumLinuxPlatform implements EnumPlatform, LinuxPlatform {
@@ -75,13 +106,19 @@ class EnumLinuxPlatform implements EnumPlatform, LinuxPlatform {
   final String? apiName;
   final String? apiUrl;
   final String? note;
+  final String name;
+  final String targetPlatformName;
   final dynamic value;
 
-  const EnumLinuxPlatform(
-      {this.available, this.apiName, this.apiUrl, this.note, this.value});
-
-  final name = "Linux";
-  final targetPlatformName = "linux";
+  const EnumLinuxPlatform({
+    this.available,
+    this.apiName,
+    this.apiUrl,
+    this.note,
+    this.name = kPlatformNameLinux,
+    this.targetPlatformName = kTargetPlatformNameLinux,
+    this.value,
+  });
 }
 
 class EnumWebPlatform implements EnumPlatform, WebPlatform {
@@ -89,19 +126,20 @@ class EnumWebPlatform implements EnumPlatform, WebPlatform {
   final String? apiName;
   final String? apiUrl;
   final String? note;
+  final String name;
+  final String targetPlatformName;
   final dynamic value;
   final bool requiresSameOrigin;
 
   const EnumWebPlatform(
       {this.available,
-        this.apiName,
-        this.apiUrl,
-        this.note,
-        this.value,
-        this.requiresSameOrigin = true});
-
-  final name = "Web";
-  final targetPlatformName = "web";
+      this.apiName,
+      this.apiUrl,
+      this.note,
+      this.value,
+      this.name = kPlatformNameWeb,
+      this.targetPlatformName = kTargetPlatformNameWeb,
+      this.requiresSameOrigin = true});
 }
 
 class EnumSupportedPlatforms {

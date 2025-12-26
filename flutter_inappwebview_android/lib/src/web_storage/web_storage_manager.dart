@@ -39,7 +39,7 @@ class AndroidWebStorageManager extends PlatformWebStorageManager
         ) {
     channel = const MethodChannel(
         'com.pichillilorenzo/flutter_inappwebview_webstoragemanager');
-    handler = handleMethod;
+    handler = _handleMethod;
     initMethodCallHandler();
   }
 
@@ -54,6 +54,15 @@ class AndroidWebStorageManager extends PlatformWebStorageManager
     _instance = AndroidWebStorageManager(AndroidWebStorageManagerCreationParams(
         const PlatformWebStorageManagerCreationParams()));
     return _instance!;
+  }
+
+  static AndroidWebStorageManager? _static;
+
+  /// Provide static access.
+  factory AndroidWebStorageManager.static() {
+    _static ??= AndroidWebStorageManager(AndroidWebStorageManagerCreationParams(
+        const PlatformWebStorageManagerCreationParams()));
+    return _static!;
   }
 
   Future<dynamic> _handleMethod(MethodCall call) async {}
@@ -109,8 +118,4 @@ class AndroidWebStorageManager extends PlatformWebStorageManager
   void dispose() {
     // empty
   }
-}
-
-extension InternalWebStorageManager on AndroidWebStorageManager {
-  get handleMethod => _handleMethod;
 }

@@ -19,7 +19,7 @@ public class InAppWebViewManager: ChannelDelegate {
     var windowAutoincrementId: Int64 = 0
     
     init(plugin: SwiftFlutterPlugin) {
-        super.init(channel: FlutterMethodChannel(name: InAppWebViewManager.METHOD_CHANNEL_NAME, binaryMessenger: plugin.registrar!.messenger()))
+        super.init(channel: FlutterMethodChannel(name: InAppWebViewManager.METHOD_CHANNEL_NAME, binaryMessenger: plugin.registrar.messenger()))
         self.plugin = plugin
     }
     
@@ -50,6 +50,14 @@ public class InAppWebViewManager: ChannelDelegate {
                 clearAllCache(includeDiskFiles: includeDiskFiles, completionHandler: {
                     result(true)
                 })
+            case "setJavaScriptBridgeName":
+                let bridgeName = arguments!["bridgeName"] as! String
+                JavaScriptBridgeJS.set_JAVASCRIPT_BRIDGE_NAME(bridgeName: bridgeName)
+                result(true)
+                break
+            case "getJavaScriptBridgeName":
+                result(JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME())
+                break
             default:
                 result(FlutterMethodNotImplemented)
                 break

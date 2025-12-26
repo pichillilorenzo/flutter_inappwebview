@@ -47,7 +47,8 @@ class WebResourceRequest {
       required this.url});
 
   ///Gets a possible [WebResourceRequest] instance from a [Map] value.
-  static WebResourceRequest? fromMap(Map<String, dynamic>? map) {
+  static WebResourceRequest? fromMap(Map<String, dynamic>? map,
+      {EnumMethod? enumMethod}) {
     if (map == null) {
       return null;
     }
@@ -63,7 +64,7 @@ class WebResourceRequest {
   }
 
   ///Converts instance to a map.
-  Map<String, dynamic> toMap() {
+  Map<String, dynamic> toMap({EnumMethod? enumMethod}) {
     return {
       "hasGesture": hasGesture,
       "headers": headers,

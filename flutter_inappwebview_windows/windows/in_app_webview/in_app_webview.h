@@ -16,6 +16,7 @@
 #include "../types/ssl_certificate.h"
 #include "../types/url_request.h"
 #include "../types/web_history.h"
+#include "../utils/uuid.h"
 #include "../webview_environment/webview_environment.h"
 #include "in_app_webview_settings.h"
 #include "user_content_controller.h"
@@ -31,7 +32,7 @@ namespace flutter_inappwebview_plugin
 
   // custom_platform_view
   enum class InAppWebViewPointerButton { None, Primary, Secondary, Tertiary };
-  enum class InAppWebViewPointerEventKind { Activate, Down, Enter, Leave, Up, Update };
+  enum class InAppWebViewPointerEventKind { Activate, Down, Enter, Leave, Up, Update, Cancel };
   typedef std::function<void(size_t width, size_t height)>
     SurfaceSizeChangedCallback;
   typedef std::function<void(const HCURSOR)> CursorChangedCallback;
@@ -126,7 +127,7 @@ namespace flutter_inappwebview_plugin
     void setCursorPos(double x, double y);
     void setPointerUpdate(int32_t pointer, InAppWebViewPointerEventKind eventKind,
       double x, double y, double size, double pressure);
-    void setPointerButtonState(InAppWebViewPointerButton button, bool isDown);
+    void setPointerButtonState(InAppWebViewPointerEventKind kind, InAppWebViewPointerButton button);
     void sendScroll(double offset, bool horizontal);
     void setScrollDelta(double delta_x, double delta_y);
     void onSurfaceSizeChanged(SurfaceSizeChangedCallback callback)
@@ -176,6 +177,9 @@ namespace flutter_inappwebview_plugin
     void pause() const;
     void resume() const;
     void getCertificate(const std::function<void(const std::optional<std::unique_ptr<SslCertificate>>)> completionHandler) const;
+    void clearSslPreferences(const std::function<void()> completionHandler) const;
+    bool isInterfaceSupported(const std::string& interfaceName) const;
+    double getZoomScale() const;
 
     std::string pageFrameId() const
     {
@@ -192,14 +196,19 @@ namespace flutter_inappwebview_plugin
     POINT lastCursorPos_ = { 0, 0 };
     VirtualKeyState virtualKeys_;
 
+    const std::string expectedBridgeSecret = get_uuid();
+    bool javaScriptBridgeEnabled = true;
     std::map<UINT64, std::shared_ptr<NavigationAction>> navigationActions_ = {};
     std::shared_ptr<NavigationAction> lastNavigationAction_;
     bool isLoading_ = false;
     std::string pageFrameId_;
     std::map<std::string, std::pair<wil::com_ptr<ICoreWebView2DevToolsProtocolEventReceiver>, EventRegistrationToken>> devToolsProtocolEventListener_ = {};
+    int64_t previousAuthRequestFailureCount = 0;
+    double zoomScaleFactor_ = 1.0;
 
     void registerEventHandlers();
     void registerSurfaceEventHandlers();
+    HRESULT onCallJsHandler(const bool& isMainFrame, ICoreWebView2WebMessageReceivedEventArgs* args);
   };
 }
 #endif //FLUTTER_INAPPWEBVIEW_PLUGIN_IN_APP_WEBVIEW_H_

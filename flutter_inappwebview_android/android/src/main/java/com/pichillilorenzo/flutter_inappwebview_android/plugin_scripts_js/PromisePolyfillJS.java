@@ -1,18 +1,26 @@
 package com.pichillilorenzo.flutter_inappwebview_android.plugin_scripts_js;
 
+import androidx.annotation.Nullable;
+
 import com.pichillilorenzo.flutter_inappwebview_android.types.PluginScript;
 import com.pichillilorenzo.flutter_inappwebview_android.types.UserScriptInjectionTime;
 
+import java.util.Set;
+
 public class PromisePolyfillJS {
   public static final String PROMISE_POLYFILL_JS_PLUGIN_SCRIPT_GROUP_NAME = "IN_APP_WEBVIEW_PROMISE_POLYFILL_JS_PLUGIN_SCRIPT";
-  public static final PluginScript PROMISE_POLYFILL_JS_PLUGIN_SCRIPT = new PluginScript(
-          PromisePolyfillJS.PROMISE_POLYFILL_JS_PLUGIN_SCRIPT_GROUP_NAME,
-          PromisePolyfillJS.PROMISE_POLYFILL_JS_SOURCE,
-          UserScriptInjectionTime.AT_DOCUMENT_START,
-          null,
-          true,
-          null
-  );
+  public static final PluginScript PROMISE_POLYFILL_JS_PLUGIN_SCRIPT(@Nullable Set<String> allowedOriginRules,
+                                                                     boolean forMainFrameOnly) {
+    return new PluginScript(
+            PromisePolyfillJS.PROMISE_POLYFILL_JS_PLUGIN_SCRIPT_GROUP_NAME,
+            PromisePolyfillJS.PROMISE_POLYFILL_JS_SOURCE,
+            UserScriptInjectionTime.AT_DOCUMENT_START,
+            null,
+            true,
+            allowedOriginRules,
+            forMainFrameOnly
+    );
+  }
 
   // https://github.com/tildeio/rsvp.js
   public static final String PROMISE_POLYFILL_JS_SOURCE = "if (window.Promise == null) {" +

@@ -1,5 +1,6 @@
 import 'dart:core';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_platform_interface.dart';
 
 ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewEnvironment}
@@ -24,6 +25,18 @@ class WebViewEnvironment {
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewEnvironment.settings}
   WebViewEnvironmentSettings? get settings => platform.settings;
 
+  ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewEnvironment.isInterfaceSupported}
+  Future<bool> isInterfaceSupported(WebViewInterface interface) =>
+      platform.isInterfaceSupported(interface);
+
+  ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewEnvironment.getProcessInfos}
+  Future<List<BrowserProcessInfo>> getProcessInfos() =>
+      platform.getProcessInfos();
+
+  ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewEnvironment.getFailureReportFolderPath}
+  Future<String?> getFailureReportFolderPath() =>
+      platform.getFailureReportFolderPath();
+
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewEnvironment.create}
   static Future<WebViewEnvironment> create(
       {WebViewEnvironmentSettings? settings}) async {
@@ -44,6 +57,42 @@ class WebViewEnvironment {
       PlatformWebViewEnvironment.static()
           .compareBrowserVersions(version1: version1, version2: version2);
 
+  ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewEnvironment.onNewBrowserVersionAvailable}
+  void Function()? get onNewBrowserVersionAvailable =>
+      platform.onNewBrowserVersionAvailable;
+  set onNewBrowserVersionAvailable(void Function()? value) =>
+      platform.onNewBrowserVersionAvailable = value;
+
+  ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewEnvironment.onBrowserProcessExited}
+  void Function(BrowserProcessExitedDetail detail)?
+      get onBrowserProcessExited => platform.onBrowserProcessExited;
+  set onBrowserProcessExited(
+          void Function(BrowserProcessExitedDetail detail)? value) =>
+      platform.onBrowserProcessExited = value;
+
+  ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewEnvironment.onProcessInfosChanged}
+  void Function(BrowserProcessInfosChangedDetail detail)?
+      get onProcessInfosChanged => platform.onProcessInfosChanged;
+  set onProcessInfosChanged(
+          void Function(BrowserProcessInfosChangedDetail detail)? value) =>
+      platform.onProcessInfosChanged = value;
+
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewEnvironment.dispose}
   Future<void> dispose() => platform.dispose();
+
+  ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewEnvironmentCreationParams.isClassSupported}
+  static bool isClassSupported({TargetPlatform? platform}) =>
+      PlatformWebViewEnvironment.static().isClassSupported(platform: platform);
+
+  ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewEnvironment.isPropertySupported}
+  static bool isPropertySupported(dynamic property,
+          {TargetPlatform? platform}) =>
+      PlatformWebViewEnvironment.static()
+          .isPropertySupported(property, platform: platform);
+
+  ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewEnvironment.isMethodSupported}
+  static bool isMethodSupported(PlatformWebViewEnvironmentMethod method,
+          {TargetPlatform? platform}) =>
+      PlatformWebViewEnvironment.static()
+          .isMethodSupported(method, platform: platform);
 }

@@ -21,11 +21,9 @@ public class PullToRefreshControl: UIRefreshControl, Disposable {
         super.init()
         self.plugin = plugin
         self.settings = settings
-        if let registrar = plugin.registrar {
-            let channel = FlutterMethodChannel(name: PullToRefreshControl.METHOD_CHANNEL_NAME_PREFIX + String(describing: id),
-                                               binaryMessenger: registrar.messenger())
-            self.channelDelegate = PullToRefreshChannelDelegate(pullToRefreshControl: self, channel: channel)
-        }
+        let channel = FlutterMethodChannel(name: PullToRefreshControl.METHOD_CHANNEL_NAME_PREFIX + String(describing: id),
+                                           binaryMessenger: plugin.registrar.messenger())
+        self.channelDelegate = PullToRefreshChannelDelegate(pullToRefreshControl: self, channel: channel)
     }
     
     required init?(coder: NSCoder) {

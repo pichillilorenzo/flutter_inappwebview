@@ -13,7 +13,7 @@ public class PlatformUtil: ChannelDelegate {
     var plugin: InAppWebViewFlutterPlugin?
     
     init(plugin: InAppWebViewFlutterPlugin) {
-        super.init(channel: FlutterMethodChannel(name: PlatformUtil.METHOD_CHANNEL_NAME, binaryMessenger: plugin.registrar!.messenger))
+        super.init(channel: FlutterMethodChannel(name: PlatformUtil.METHOD_CHANNEL_NAME, binaryMessenger: plugin.registrar.messenger))
         self.plugin = plugin
     }
     
@@ -51,6 +51,7 @@ public class PlatformUtil: ChannelDelegate {
     
     static public func formatDate(date: Int64, format: String, locale: Locale, timezone: TimeZone) -> String {
         let formatter = DateFormatter()
+        formatter.locale = locale
         formatter.dateFormat = format
         formatter.timeZone = timezone
         return formatter.string(from: PlatformUtil.getDateFromMilliseconds(date: date))

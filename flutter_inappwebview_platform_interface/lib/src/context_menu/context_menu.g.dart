@@ -8,11 +8,10 @@ part of 'context_menu.dart';
 
 ///Class that represents the WebView context menu. It used by [PlatformWebViewCreationParams.contextMenu].
 ///
-///**NOTE for Android native WebView**: To make it work properly on Android, JavaScript should be enabled!
-///
 ///**Officially Supported Platforms/Implementations**:
-///- Android native WebView
-///- iOS
+///- Android WebView:
+///    - To make it work properly on Android, JavaScript should be enabled!
+///- iOS WKWebView
 class ContextMenu {
   ///List of the custom [ContextMenuItem].
   final List<ContextMenuItem> menuItems;
@@ -38,11 +37,10 @@ class ContextMenu {
   final ContextMenuSettings? settings;
 
   ///
-  ///**NOTE for Android native WebView**: To make it work properly on Android, JavaScript should be enabled!
-  ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Android native WebView
-  ///- iOS
+  ///- Android WebView:
+  ///    - To make it work properly on Android, JavaScript should be enabled!
+  ///- iOS WKWebView
   ContextMenu(
       {this.menuItems = const [],
       this.onCreateContextMenu,
@@ -52,34 +50,41 @@ class ContextMenu {
       this.onContextMenuActionItemClicked});
 
   ///Gets a possible [ContextMenu] instance from a [Map] value.
-  static ContextMenu? fromMap(Map<String, dynamic>? map) {
+  static ContextMenu? fromMap(Map<String, dynamic>? map,
+      {EnumMethod? enumMethod}) {
     if (map == null) {
       return null;
     }
     final instance = ContextMenu(
-      menuItems: List<ContextMenuItem>.from(map['menuItems']
-          .map((e) => ContextMenuItem.fromMap(e?.cast<String, dynamic>())!)),
-      options: map['settings'],
-      settings:
-          ContextMenuSettings.fromMap(map['settings']?.cast<String, dynamic>()),
+      menuItems: List<ContextMenuItem>.from(map['menuItems'].map((e) =>
+          ContextMenuItem.fromMap(e?.cast<String, dynamic>(),
+              enumMethod: enumMethod)!)),
+      options: ContextMenuOptions.fromMap(
+          map['settings']?.cast<String, dynamic>(),
+          enumMethod: enumMethod),
+      settings: ContextMenuSettings.fromMap(
+          map['settings']?.cast<String, dynamic>(),
+          enumMethod: enumMethod),
     );
     return instance;
   }
 
   @ExchangeableObjectMethod(toMapMergeWith: true)
-  Map<String, dynamic> _toMapMergeWith() {
+  Map<String, dynamic> _toMapMergeWith({EnumMethod? enumMethod}) {
     return {
       "settings":
-          (settings as ContextMenuSettings?)?.toMap() ?? options?.toMap()
+          (settings as ContextMenuSettings?)?.toMap(enumMethod: enumMethod) ??
+              (options as ContextMenuOptions?)?.toMap(enumMethod: enumMethod)
     };
   }
 
   ///Converts instance to a map.
-  Map<String, dynamic> toMap() {
+  Map<String, dynamic> toMap({EnumMethod? enumMethod}) {
     return {
-      "menuItems": menuItems.map((e) => e.toMap()).toList(),
-      "settings": settings?.toMap(),
-      ..._toMapMergeWith(),
+      "menuItems":
+          menuItems.map((e) => e.toMap(enumMethod: enumMethod)).toList(),
+      "settings": settings?.toMap(enumMethod: enumMethod),
+      ..._toMapMergeWith(enumMethod: enumMethod),
     };
   }
 

@@ -54,7 +54,7 @@ namespace flutter_inappwebview_plugin
   {
     decodeResult = [](const flutter::EncodableValue* value)
       {
-        return std::make_shared<PermissionResponse>(std::get<flutter::EncodableMap>(*value));
+        return value == nullptr || value->IsNull() ? std::optional<std::shared_ptr<PermissionResponse>>{} : std::make_shared<PermissionResponse>(std::get<flutter::EncodableMap>(*value));
       };
   }
 
@@ -71,6 +71,38 @@ namespace flutter_inappwebview_plugin
     decodeResult = [](const flutter::EncodableValue* value)
       {
         return value == nullptr || value->IsNull() ? std::optional<std::shared_ptr<CustomSchemeResponse>>{} : std::make_shared<CustomSchemeResponse>(std::get<flutter::EncodableMap>(*value));
+      };
+  }
+
+  WebViewChannelDelegate::ReceivedHttpAuthRequestCallback::ReceivedHttpAuthRequestCallback()
+  {
+    decodeResult = [](const flutter::EncodableValue* value)
+      {
+        return value == nullptr || value->IsNull() ? std::optional<std::shared_ptr<HttpAuthResponse>>{} : std::make_shared<HttpAuthResponse>(std::get<flutter::EncodableMap>(*value));
+      };
+  }
+
+  WebViewChannelDelegate::ReceivedClientCertRequestCallback::ReceivedClientCertRequestCallback()
+  {
+    decodeResult = [](const flutter::EncodableValue* value)
+      {
+        return value == nullptr || value->IsNull() ? std::optional<std::shared_ptr<ClientCertResponse>>{} : std::make_shared<ClientCertResponse>(std::get<flutter::EncodableMap>(*value));
+      };
+  }
+
+  WebViewChannelDelegate::ReceivedServerTrustAuthRequestCallback::ReceivedServerTrustAuthRequestCallback()
+  {
+    decodeResult = [](const flutter::EncodableValue* value)
+      {
+        return value == nullptr || value->IsNull() ? std::optional<std::shared_ptr<ServerTrustAuthResponse>>{} : std::make_shared<ServerTrustAuthResponse>(std::get<flutter::EncodableMap>(*value));
+      };
+  }
+
+  WebViewChannelDelegate::DownloadStartRequestCallback::DownloadStartRequestCallback()
+  {
+    decodeResult = [](const flutter::EncodableValue* value)
+      {
+        return value == nullptr || value->IsNull() ? std::optional<std::shared_ptr<DownloadStartResponse>>{} : std::make_shared<DownloadStartResponse>(std::get<flutter::EncodableMap>(*value));
       };
   }
 
@@ -269,6 +301,20 @@ namespace flutter_inappwebview_plugin
           result_->Success(data.has_value() ? data.value()->toEncodableMap() : make_fl_value());
         });
     }
+    else if (string_equals(methodName, "clearSslPreferences")) {
+      auto result_ = std::shared_ptr<flutter::MethodResult<flutter::EncodableValue>>(std::move(result));
+      webView->clearSslPreferences([result_ = std::move(result_)]()
+        {
+          result_->Success();
+        });
+    }
+    else if (string_equals(methodName, "isInterfaceSupported")) {
+      auto interfaceName = get_fl_map_value<std::string>(arguments, "interface");
+      result->Success(webView->isInterfaceSupported(interfaceName));
+    }
+    else if (string_equals(methodName, "getZoomScale")) {
+      result->Success(webView->getZoomScale());
+    }
     // for inAppBrowser
     else if (webView->inAppBrowser && string_equals(methodName, "show")) {
       webView->inAppBrowser->show();
@@ -377,7 +423,7 @@ namespace flutter_inappwebview_plugin
     channel->InvokeMethod("onUpdateVisitedHistory", std::move(arguments));
   }
 
-  void WebViewChannelDelegate::onCallJsHandler(const std::string& handlerName, const std::string& args, std::unique_ptr<CallJsHandlerCallback> callback) const
+  void WebViewChannelDelegate::onCallJsHandler(const std::string& handlerName, const std::unique_ptr<JavaScriptHandlerFunctionData> data, std::unique_ptr<CallJsHandlerCallback> callback) const
   {
     if (!channel) {
       callback->defaultBehaviour(std::nullopt);
@@ -386,7 +432,7 @@ namespace flutter_inappwebview_plugin
 
     auto arguments = std::make_unique<flutter::EncodableValue>(flutter::EncodableMap{
       {"handlerName", handlerName},
-      {"args", args}
+      {"data", data->toEncodableMap()}
       });
     channel->InvokeMethod("onCallJsHandler", std::move(arguments), std::move(callback));
   }
@@ -486,6 +532,114 @@ namespace flutter_inappwebview_plugin
       {"request", request->toEncodableMap()},
       });
     channel->InvokeMethod("onLoadResourceWithCustomScheme", std::move(arguments), std::move(callback));
+  }
+
+  void WebViewChannelDelegate::onReceivedHttpAuthRequest(std::shared_ptr<HttpAuthenticationChallenge> challenge, std::unique_ptr<ReceivedHttpAuthRequestCallback> callback) const
+  {
+    if (!channel) {
+      callback->defaultBehaviour(std::nullopt);
+      return;
+    }
+
+    auto arguments = std::make_unique<flutter::EncodableValue>(challenge->toEncodableMap());
+    channel->InvokeMethod("onReceivedHttpAuthRequest", std::move(arguments), std::move(callback));
+  }
+
+  void WebViewChannelDelegate::onReceivedClientCertRequest(std::shared_ptr<ClientCertChallenge> challenge, std::unique_ptr<ReceivedClientCertRequestCallback> callback) const
+  {
+    if (!channel) {
+      callback->defaultBehaviour(std::nullopt);
+      return;
+    }
+
+    auto arguments = std::make_unique<flutter::EncodableValue>(challenge->toEncodableMap());
+    channel->InvokeMethod("onReceivedClientCertRequest", std::move(arguments), std::move(callback));
+  }
+
+  void WebViewChannelDelegate::onReceivedServerTrustAuthRequest(std::shared_ptr<ServerTrustChallenge> challenge, std::unique_ptr<ReceivedServerTrustAuthRequestCallback> callback) const
+  {
+    if (!channel) {
+      callback->defaultBehaviour(std::nullopt);
+      return;
+    }
+
+    auto arguments = std::make_unique<flutter::EncodableValue>(challenge->toEncodableMap());
+    channel->InvokeMethod("onReceivedServerTrustAuthRequest", std::move(arguments), std::move(callback));
+  }
+
+  void WebViewChannelDelegate::onRenderProcessGone(const std::shared_ptr<RenderProcessGoneDetail> detail) const
+  {
+    if (!channel) {
+      return;
+    }
+
+    auto arguments = std::make_unique<flutter::EncodableValue>(detail->toEncodableMap());
+    channel->InvokeMethod("onDevToolsProtocolEventReceived", std::move(arguments));
+  }
+
+  void WebViewChannelDelegate::onRenderProcessUnresponsive(const std::optional<std::string>& url) const
+  {
+    if (!channel) {
+      return;
+    }
+
+    auto arguments = std::make_unique<flutter::EncodableValue>(flutter::EncodableMap{
+      {"url", make_fl_value(url)},
+      });
+    channel->InvokeMethod("onRenderProcessUnresponsive", std::move(arguments));
+  }
+  void WebViewChannelDelegate::onWebContentProcessDidTerminate() const
+  {
+    if (!channel) {
+      return;
+    }
+
+    auto arguments = std::make_unique<flutter::EncodableValue>();
+    channel->InvokeMethod("onWebContentProcessDidTerminate", std::move(arguments));
+  }
+
+  void WebViewChannelDelegate::onProcessFailed(const std::shared_ptr<ProcessFailedDetail> detail) const
+  {
+    if (!channel) {
+      return;
+    }
+
+    auto arguments = std::make_unique<flutter::EncodableValue>(detail->toEncodableMap());
+    channel->InvokeMethod("onProcessFailed", std::move(arguments));
+  }
+
+  void WebViewChannelDelegate::onDownloadStarting(std::shared_ptr<DownloadStartRequest> request, std::unique_ptr<DownloadStartRequestCallback> callback) const
+  {
+    if (!channel) {
+      callback->defaultBehaviour(std::nullopt);
+      return;
+    }
+
+    auto arguments = std::make_unique<flutter::EncodableValue>(request->toEncodableMap());
+    channel->InvokeMethod("onDownloadStarting", std::move(arguments), std::move(callback));
+  }
+
+  void WebViewChannelDelegate::onAcceleratorKeyPressed(std::shared_ptr<AcceleratorKeyPressedDetail> detail) const
+  {
+    if (!channel) {
+      return;
+    }
+
+    auto arguments = std::make_unique<flutter::EncodableValue>(detail->toEncodableMap());
+    channel->InvokeMethod("onAcceleratorKeyPressed", std::move(arguments));
+  }
+
+  void WebViewChannelDelegate::onZoomScaleChanged(const double& oldScale, const double& newScale) const
+  {
+    if (!channel) {
+      return;
+    }
+
+    auto arguments = std::make_unique<flutter::EncodableValue>(flutter::EncodableMap{
+      {"oldScale", make_fl_value(oldScale)},
+      {"newScale", make_fl_value(newScale)},
+      });
+    channel->InvokeMethod("onZoomScaleChanged", std::move(arguments));
   }
 
   WebViewChannelDelegate::~WebViewChannelDelegate()

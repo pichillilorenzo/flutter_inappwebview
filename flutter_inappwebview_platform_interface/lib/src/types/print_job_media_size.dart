@@ -1,6 +1,7 @@
 import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_internal_annotations.dart';
 
 import '../print_job/main.dart';
+import 'enum_method.dart';
 
 part 'print_job_media_size.g.dart';
 

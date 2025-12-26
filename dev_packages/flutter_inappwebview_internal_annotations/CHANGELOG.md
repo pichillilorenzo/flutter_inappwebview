@@ -1,3 +1,7 @@
+## 1.2.0
+
+- Updated `ExchangeableEnum` and `ExchangeableObjectProperty`.
+
 ## 1.1.1
 
 - Added `ExchangeableObject.fromMapForceAllInline`.

@@ -51,7 +51,7 @@ import io.flutter.plugin.common.MethodChannel;
 public class InAppBrowserActivity extends AppCompatActivity implements InAppBrowserDelegate, Disposable {
   protected static final String LOG_TAG = "InAppBrowserActivity";
   public static final String METHOD_CHANNEL_NAME_PREFIX = "com.pichillilorenzo/flutter_inappbrowser_";
-  
+
   @Nullable
   public Integer windowId;
   public String id;
@@ -77,19 +77,29 @@ public class InAppBrowserActivity extends AppCompatActivity implements InAppBrow
   @Nullable
   public InAppBrowserChannelDelegate channelDelegate;
   public List<InAppBrowserMenuItem> menuItems = new ArrayList<>();
-  
+
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
 
     Bundle b = getIntent().getExtras();
-    if (b == null) return;
-    
+    if (b == null) {
+      if (savedInstanceState != null) {
+        finish();
+      }
+      return;
+    }
+
     id = b.getString("id");
 
     String managerId = b.getString("managerId");
     manager = InAppBrowserManager.shared.get(managerId);
-    if (manager == null || manager.plugin == null|| manager.plugin.messenger == null) return;
+    if (manager == null || manager.plugin == null || manager.plugin.messenger == null) {
+      if (savedInstanceState != null) {
+        finish();
+      }
+      return;
+    }
 
     Map<String, Object> settingsMap = (Map<String, Object>) b.getSerializable("settings");
     customSettings.parse(settingsMap);
@@ -106,10 +116,12 @@ public class InAppBrowserActivity extends AppCompatActivity implements InAppBrow
     pullToRefreshLayout.channelDelegate = new PullToRefreshChannelDelegate(pullToRefreshLayout, pullToRefreshLayoutChannel);
     pullToRefreshLayout.settings = pullToRefreshSettings;
     pullToRefreshLayout.prepare();
-    
+
     webView = findViewById(R.id.webView);
     webView.id = id;
-    webView.windowId = windowId;
+    if (windowId != -1) {
+      webView.windowId = windowId;
+    }
     webView.inAppBrowserDelegate = this;
     webView.plugin = manager.plugin;
 
@@ -166,15 +178,13 @@ public class InAppBrowserActivity extends AppCompatActivity implements InAppBrow
           Log.e(LOG_TAG, initialFile + " asset file cannot be found!", e);
           return;
         }
-      }
-      else if (initialData != null) {
+      } else if (initialData != null) {
         String mimeType = b.getString("initialMimeType");
         String encoding = b.getString("initialEncoding");
         String baseUrl = b.getString("initialBaseUrl");
         String historyUrl = b.getString("initialHistoryUrl");
         webView.loadDataWithBaseURL(baseUrl, initialData, mimeType, encoding, historyUrl);
-      }
-      else if (initialUrlRequest != null) {
+      } else if (initialUrlRequest != null) {
         URLRequest urlRequest = URLRequest.fromMap(initialUrlRequest);
         if (urlRequest != null) {
           webView.loadUrl(urlRequest);
@@ -237,8 +247,15 @@ public class InAppBrowserActivity extends AppCompatActivity implements InAppBrow
     }
 
     MenuInflater inflater = getMenuInflater();
-    // Inflate menu to add items to action bar if it is present.
-    inflater.inflate(R.menu.menu_main, menu);
+    try {
+      // Inflate menu to add items to action bar if it is present.
+      inflater.inflate(R.menu.menu_main, menu);
+    } catch (Exception e) {
+      e.printStackTrace();
+      Log.e(LOG_TAG, "Cannot inflate com.pichillilorenzo.flutter_inappwebview_android.R.menu.menu_main." +
+              "To make it work, you need to set minifyEnabled false and shrinkResources false in your build.gradle file.");
+      return super.onCreateOptionsMenu(m);
+    }
 
     MenuItem menuSearchItem = menu.findItem(R.id.menu_search);
     if (menuSearchItem != null) {
@@ -526,8 +543,8 @@ public class InAppBrowserActivity extends AppCompatActivity implements InAppBrow
     customSettings = newSettings;
   }
 
-  public Map<String, Object> getCustomSettings() {
-    Map<String, Object> webViewSettingsMap = webView != null ? webView.getCustomSettings() : null;
+  public Map<String, Object> getCustomSettingsMap() {
+    Map<String, Object> webViewSettingsMap = webView != null ? webView.getCustomSettingsMap() : null;
     if (customSettings == null || webViewSettingsMap == null)
       return null;
 
@@ -602,9 +619,9 @@ public class InAppBrowserActivity extends AppCompatActivity implements InAppBrow
   }
 
   @Override
-  protected void onActivityResult (int requestCode,
-                                   int resultCode,
-                                   Intent data) {
+  protected void onActivityResult(int requestCode,
+                                  int resultCode,
+                                  Intent data) {
     for (ActivityResultListener listener : activityResultListeners) {
       if (listener.onActivityResult(requestCode, resultCode, data)) {
         return;

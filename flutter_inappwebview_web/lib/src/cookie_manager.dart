@@ -47,6 +47,14 @@ class WebPlatformCookieManager extends PlatformCookieManager
     initMethodCallHandler();
   }
 
+  static final WebPlatformCookieManager _staticValue = WebPlatformCookieManager(
+      WebPlatformCookieManagerCreationParams(
+          PlatformCookieManagerCreationParams()));
+
+  factory WebPlatformCookieManager.static() {
+    return _staticValue;
+  }
+
   static WebPlatformCookieManager? _instance;
 
   ///Gets the [WebPlatformCookieManager] shared instance.
@@ -81,7 +89,6 @@ class WebPlatformCookieManager extends PlatformCookieManager
 
     assert(url.toString().isNotEmpty);
     assert(name.isNotEmpty);
-    assert(value.isNotEmpty);
     assert(path.isNotEmpty);
 
     await _setCookieWithJavaScript(

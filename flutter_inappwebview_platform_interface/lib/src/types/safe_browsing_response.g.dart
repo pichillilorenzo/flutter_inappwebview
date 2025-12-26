@@ -19,20 +19,32 @@ class SafeBrowsingResponse {
       this.report = true});
 
   ///Gets a possible [SafeBrowsingResponse] instance from a [Map] value.
-  static SafeBrowsingResponse? fromMap(Map<String, dynamic>? map) {
+  static SafeBrowsingResponse? fromMap(Map<String, dynamic>? map,
+      {EnumMethod? enumMethod}) {
     if (map == null) {
       return null;
     }
     final instance = SafeBrowsingResponse();
-    instance.action = SafeBrowsingResponseAction.fromNativeValue(map['action']);
-    instance.report = map['report'];
+    instance.action = switch (enumMethod ?? EnumMethod.nativeValue) {
+      EnumMethod.nativeValue =>
+        SafeBrowsingResponseAction.fromNativeValue(map['action']),
+      EnumMethod.value => SafeBrowsingResponseAction.fromValue(map['action']),
+      EnumMethod.name => SafeBrowsingResponseAction.byName(map['action'])
+    };
+    if (map['report'] != null) {
+      instance.report = map['report'];
+    }
     return instance;
   }
 
   ///Converts instance to a map.
-  Map<String, dynamic> toMap() {
+  Map<String, dynamic> toMap({EnumMethod? enumMethod}) {
     return {
-      "action": action?.toNativeValue(),
+      "action": switch (enumMethod ?? EnumMethod.nativeValue) {
+        EnumMethod.nativeValue => action?.toNativeValue(),
+        EnumMethod.value => action?.toValue(),
+        EnumMethod.name => action?.name()
+      },
       "report": report,
     };
   }

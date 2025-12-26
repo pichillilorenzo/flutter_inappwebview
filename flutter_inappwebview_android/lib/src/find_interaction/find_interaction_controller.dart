@@ -37,6 +37,15 @@ class AndroidFindInteractionController extends PlatformFindInteractionController
                   .fromPlatformFindInteractionControllerCreationParams(params),
         );
 
+  static final AndroidFindInteractionController _staticValue =
+      AndroidFindInteractionController(
+          AndroidFindInteractionControllerCreationParams());
+
+  /// Provide static access.
+  factory AndroidFindInteractionController.static() {
+    return _staticValue;
+  }
+
   _debugLog(String method, dynamic args) {
     debugLog(
         className: this.runtimeType.toString(),

@@ -40,6 +40,8 @@ public class PullToRefreshLayout extends SwipeRefreshLayout implements Disposabl
   }
 
   public void prepare() {
+    setFocusable(true);
+
     final PullToRefreshLayout self = this;
 
     setEnabled(settings.enabled);

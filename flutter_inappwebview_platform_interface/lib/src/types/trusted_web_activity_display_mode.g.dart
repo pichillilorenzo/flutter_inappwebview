@@ -11,7 +11,7 @@ abstract class TrustedWebActivityDisplayMode {
   TrustedWebActivityDisplayMode();
 
   ///Converts instance to a map.
-  Map<String, dynamic> toMap() {
+  Map<String, dynamic> toMap({EnumMethod? enumMethod}) {
     return {};
   }
 

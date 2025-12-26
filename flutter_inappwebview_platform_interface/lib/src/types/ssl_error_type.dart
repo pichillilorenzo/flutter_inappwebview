@@ -32,7 +32,12 @@ class SslErrorType_ {
         apiName: 'SslError.SSL_EXPIRED',
         apiUrl:
             'https://developer.android.com/reference/android/net/http/SslError#SSL_EXPIRED',
-        value: 1)
+        value: 1),
+    EnumWindowsPlatform(
+        apiName: 'COREWEBVIEW2_WEB_ERROR_STATUS_CERTIFICATE_EXPIRED',
+        apiUrl:
+            'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2849.39#corewebview2_web_error_status',
+        value: 2)
   ])
   static const EXPIRED = SslErrorType_._internal('EXPIRED');
 
@@ -82,7 +87,12 @@ class SslErrorType_ {
         apiName: 'SecTrustResultType.invalid',
         apiUrl:
             'https://developer.apple.com/documentation/security/sectrustresulttype/invalid',
-        value: 0)
+        value: 0),
+    EnumWindowsPlatform(
+        apiName: 'COREWEBVIEW2_WEB_ERROR_STATUS_CERTIFICATE_IS_INVALID',
+        apiUrl:
+            'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2849.39#corewebview2_web_error_status',
+        value: 5)
   ])
   static const INVALID = SslErrorType_._internal('INVALID');
 
@@ -176,7 +186,9 @@ class SslErrorType_ {
   ///Indicates a failure other than that of trust evaluation.
   ///
   ///This value indicates that evaluation failed for some other reason.
-  ///This can be caused by either a revoked certificate or by OS-level errors that are unrelated to the certificates themselves.
+  ///
+  ///On iOS and macOS, this can be caused by either a revoked certificate or
+  ///by OS-level errors that are unrelated to the certificates themselves.
   @EnumSupportedPlatforms(platforms: [
     EnumIOSPlatform(
         apiName: 'SecTrustResultType.otherError',
@@ -187,9 +199,37 @@ class SslErrorType_ {
         apiName: 'SecTrustResultType.otherError',
         apiUrl:
             'https://developer.apple.com/documentation/security/sectrustresulttype/othererror',
-        value: 7)
+        value: 7),
+    EnumWindowsPlatform(
+        apiName:
+            'COREWEBVIEW2_WEB_ERROR_STATUS_CLIENT_CERTIFICATE_CONTAINS_ERRORS',
+        apiUrl:
+            'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2849.39#corewebview2_web_error_status',
+        value: 3)
   ])
   static const OTHER_ERROR = SslErrorType_._internal('OTHER_ERROR');
+
+  ///Indicates that the SSL certificate common name does not match the web address.
+  @EnumSupportedPlatforms(platforms: [
+    EnumWindowsPlatform(
+        apiName:
+            'COREWEBVIEW2_WEB_ERROR_STATUS_CERTIFICATE_COMMON_NAME_IS_INCORRECT',
+        apiUrl:
+            'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2849.39#corewebview2_web_error_status',
+        value: 1)
+  ])
+  static const COMMON_NAME_IS_INCORRECT =
+      SslErrorType_._internal('COMMON_NAME_IS_INCORRECT');
+
+  ///Indicates that the SSL certificate has been revoked.
+  @EnumSupportedPlatforms(platforms: [
+    EnumWindowsPlatform(
+        apiName: 'COREWEBVIEW2_WEB_ERROR_STATUS_CERTIFICATE_REVOKED',
+        apiUrl:
+            'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2849.39#corewebview2_web_error_status',
+        value: 4)
+  ])
+  static const REVOKED = SslErrorType_._internal('REVOKED');
 }
 
 ///Class that represents the Android-specific primary error associated to the server SSL certificate.

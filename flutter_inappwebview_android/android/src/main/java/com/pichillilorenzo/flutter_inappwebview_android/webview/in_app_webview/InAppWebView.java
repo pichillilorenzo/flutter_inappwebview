@@ -18,10 +18,14 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.IBinder;
 import android.os.Looper;
 import android.os.Message;
+import android.os.Parcel;
+import android.print.InAppWebViewPrintDocumentAdapter;
 import android.print.PrintAttributes;
 import android.print.PrintDocumentAdapter;
+import android.print.PrintJob;
 import android.print.PrintManager;
 import android.text.TextUtils;
 import android.util.AttributeSet;
@@ -107,13 +111,13 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
-import java.util.regex.Pattern;
 
 import io.flutter.plugin.common.MethodChannel;
 
 final public class InAppWebView extends InputAwareWebView implements InAppWebViewInterface {
-  protected static final String LOG_TAG = "InAppWebView";
+  private static final String LOG_TAG = "InAppWebView";
   public static final String METHOD_CHANNEL_NAME_PREFIX = "com.pichillilorenzo/flutter_inappwebview_";
 
   @Nullable
@@ -140,7 +144,6 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
   private boolean inFullscreen = false;
   public float zoomScale = 1.0f;
   public ContentBlockerHandler contentBlockerHandler = new ContentBlockerHandler();
-  public Pattern regexToCancelSubFramesLoadingCompiled;
   @Nullable
   public GestureDetector gestureDetector = null;
   @Nullable
@@ -175,6 +178,10 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
 
   @Nullable
   private PluginScript interceptOnlyAsyncAjaxRequestsPluginScript;
+
+  @NonNull
+  private final String expectedBridgeSecret = UUID.randomUUID().toString();
+  private boolean javaScriptBridgeEnabled = true;
 
   public InAppWebView(Context context) {
     super(context);
@@ -215,8 +222,8 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
     }
 
     boolean isChromiumWebView = "com.android.webview".equals(packageInfo.packageName) ||
-                                "com.google.android.webview".equals(packageInfo.packageName) ||
-                                "com.android.chrome".equals(packageInfo.packageName);
+            "com.google.android.webview".equals(packageInfo.packageName) ||
+            "com.android.chrome".equals(packageInfo.packageName);
     boolean isChromiumWebViewBugFixed = false;
     if (isChromiumWebView) {
       String versionName = packageInfo.versionName != null ? packageInfo.versionName : "";
@@ -224,7 +231,8 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
         int majorVersion = versionName.contains(".") ?
                 Integer.parseInt(versionName.split("\\.")[0]) : 0;
         isChromiumWebViewBugFixed = majorVersion >= 73;
-      } catch (NumberFormatException ignored) {}
+      } catch (NumberFormatException ignored) {
+      }
     }
 
     if (isChromiumWebViewBugFixed || !isChromiumWebView) {
@@ -236,14 +244,36 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
     }
   }
 
+  @Override
+  public void setAlpha(float alpha) {
+    ViewParent parent = getParent();
+    if (parent instanceof PullToRefreshLayout) {
+      ((PullToRefreshLayout) parent).setAlpha(alpha);
+    } else {
+      super.setAlpha(alpha);
+    }
+  }
+
   @SuppressLint("RestrictedApi")
   public void prepare() {
+    if (customSettings.alpha != null) {
+      setAlpha(customSettings.alpha.floatValue());
+    }
+
+    javaScriptBridgeEnabled = customSettings.javaScriptBridgeEnabled;
+    if (customSettings.javaScriptBridgeOriginAllowList != null && customSettings.javaScriptBridgeOriginAllowList.isEmpty()) {
+      // an empty list means that the JavaScript Bridge is not allowed for any origin.
+      javaScriptBridgeEnabled = false;
+    }
+
     if (plugin != null) {
       webViewAssetLoaderExt = WebViewAssetLoaderExt.fromMap(customSettings.webViewAssetLoader, plugin, getContext());
     }
 
-    javaScriptBridgeInterface = new JavaScriptBridgeInterface(this);
-    addJavascriptInterface(javaScriptBridgeInterface, JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME);
+    if (javaScriptBridgeEnabled) {
+      javaScriptBridgeInterface = new JavaScriptBridgeInterface(this, expectedBridgeSecret);
+      addJavascriptInterface(javaScriptBridgeInterface, JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME());
+    }
 
     inAppWebViewChromeClient = new InAppWebViewChromeClient(plugin, this, inAppBrowserDelegate);
     setWebChromeClient(inAppWebViewChromeClient);
@@ -315,7 +345,8 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
     settings.setLoadWithOverviewMode(customSettings.loadWithOverviewMode);
     settings.setUseWideViewPort(customSettings.useWideViewPort);
     settings.setSupportZoom(customSettings.supportZoom);
-    settings.setTextZoom(customSettings.textZoom);
+    if (customSettings.textZoom != null)
+      settings.setTextZoom(customSettings.textZoom);
 
     setVerticalScrollBarEnabled(!customSettings.disableVerticalScroll && customSettings.verticalScrollBarEnabled);
     setHorizontalScrollBarEnabled(!customSettings.disableHorizontalScroll && customSettings.horizontalScrollBarEnabled);
@@ -359,7 +390,13 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
         settings.setForceDark(customSettings.forceDark);
     }
     if (customSettings.forceDarkStrategy != null && WebViewFeature.isFeatureSupported(WebViewFeature.FORCE_DARK_STRATEGY)) {
-      WebSettingsCompat.setForceDarkStrategy(settings, customSettings.forceDarkStrategy);
+      try {
+        // for some reason the setForceDarkStrategy method could throw a ClassCastException
+        // from the Android WebView Chromium library.
+        WebSettingsCompat.setForceDarkStrategy(settings, customSettings.forceDarkStrategy);
+      } catch (Exception e) {
+        e.printStackTrace();
+      }
     }
     settings.setGeolocationEnabled(customSettings.geolocationEnabled);
     if (customSettings.layoutAlgorithm != null) {
@@ -393,9 +430,6 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
         setLayerType(View.LAYER_TYPE_HARDWARE, null);
       else
         setLayerType(View.LAYER_TYPE_NONE, null);
-    }
-    if (customSettings.regexToCancelSubFramesLoading != null) {
-      regexToCancelSubFramesLoadingCompiled = Pattern.compile(customSettings.regexToCancelSubFramesLoading);
     }
     setScrollBarStyle(customSettings.scrollBarStyle);
     if (customSettings.scrollBarDefaultDelayBeforeFade != null) {
@@ -560,24 +594,44 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
   }
 
   public void prepareAndAddUserScripts() {
-    userContentController.addPluginScript(PromisePolyfillJS.PROMISE_POLYFILL_JS_PLUGIN_SCRIPT);
-    userContentController.addPluginScript(JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_JS_PLUGIN_SCRIPT);
-    userContentController.addPluginScript(PrintJS.PRINT_JS_PLUGIN_SCRIPT);
-    userContentController.addPluginScript(OnWindowBlurEventJS.ON_WINDOW_BLUR_EVENT_JS_PLUGIN_SCRIPT);
-    userContentController.addPluginScript(OnWindowFocusEventJS.ON_WINDOW_FOCUS_EVENT_JS_PLUGIN_SCRIPT);
-    interceptOnlyAsyncAjaxRequestsPluginScript = InterceptAjaxRequestJS.createInterceptOnlyAsyncAjaxRequestsPluginScript(customSettings.interceptOnlyAsyncAjaxRequests);
-    if (customSettings.useShouldInterceptAjaxRequest) {
-      userContentController.addPluginScript(interceptOnlyAsyncAjaxRequestsPluginScript);
-      userContentController.addPluginScript(InterceptAjaxRequestJS.INTERCEPT_AJAX_REQUEST_JS_PLUGIN_SCRIPT);
-    }
-    if (customSettings.useShouldInterceptFetchRequest) {
-      userContentController.addPluginScript(InterceptFetchRequestJS.INTERCEPT_FETCH_REQUEST_JS_PLUGIN_SCRIPT);
-    }
-    if (customSettings.useOnLoadResource) {
-      userContentController.addPluginScript(OnLoadResourceJS.ON_LOAD_RESOURCE_JS_PLUGIN_SCRIPT);
-    }
-    if (!customSettings.useHybridComposition) {
-      userContentController.addPluginScript(PluginScriptsUtil.CHECK_GLOBAL_KEY_DOWN_EVENT_TO_HIDE_CONTEXT_MENU_JS_PLUGIN_SCRIPT);
+    if (javaScriptBridgeEnabled) {
+      // all the plugin scripts are using the JavaScript Bridge to work
+      userContentController.addPluginScript(PromisePolyfillJS.PROMISE_POLYFILL_JS_PLUGIN_SCRIPT(customSettings.pluginScriptsOriginAllowList,
+              customSettings.pluginScriptsForMainFrameOnly));
+
+      final Set<String> javaScriptBridgeOriginAllowList = customSettings.javaScriptBridgeOriginAllowList != null ?
+              customSettings.javaScriptBridgeOriginAllowList : customSettings.pluginScriptsOriginAllowList;
+      final boolean javaScriptBridgeForMainFrameOnly = customSettings.javaScriptBridgeForMainFrameOnly != null ?
+              customSettings.javaScriptBridgeForMainFrameOnly : customSettings.pluginScriptsForMainFrameOnly;
+      userContentController.addPluginScript(JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_JS_PLUGIN_SCRIPT(expectedBridgeSecret,
+              javaScriptBridgeOriginAllowList,
+              javaScriptBridgeForMainFrameOnly));
+
+      userContentController.addPluginScript(PrintJS.PRINT_JS_PLUGIN_SCRIPT(customSettings.pluginScriptsOriginAllowList,
+              customSettings.pluginScriptsForMainFrameOnly));
+      userContentController.addPluginScript(OnWindowBlurEventJS.ON_WINDOW_BLUR_EVENT_JS_PLUGIN_SCRIPT(customSettings.pluginScriptsOriginAllowList));
+      userContentController.addPluginScript(OnWindowFocusEventJS.ON_WINDOW_FOCUS_EVENT_JS_PLUGIN_SCRIPT(customSettings.pluginScriptsOriginAllowList));
+      interceptOnlyAsyncAjaxRequestsPluginScript = InterceptAjaxRequestJS.createInterceptOnlyAsyncAjaxRequestsPluginScript(customSettings.interceptOnlyAsyncAjaxRequests);
+      if (customSettings.useShouldInterceptAjaxRequest) {
+        userContentController.addPluginScript(interceptOnlyAsyncAjaxRequestsPluginScript);
+        userContentController.addPluginScript(InterceptAjaxRequestJS.INTERCEPT_AJAX_REQUEST_JS_PLUGIN_SCRIPT(
+                customSettings.pluginScriptsOriginAllowList,
+                customSettings.pluginScriptsForMainFrameOnly,
+                customSettings.useOnAjaxReadyStateChange,
+                customSettings.useOnAjaxProgress));
+      }
+      if (customSettings.useShouldInterceptFetchRequest) {
+        userContentController.addPluginScript(InterceptFetchRequestJS.INTERCEPT_FETCH_REQUEST_JS_PLUGIN_SCRIPT(customSettings.pluginScriptsOriginAllowList,
+                customSettings.pluginScriptsForMainFrameOnly));
+      }
+      if (customSettings.useOnLoadResource) {
+        userContentController.addPluginScript(OnLoadResourceJS.ON_LOAD_RESOURCE_JS_PLUGIN_SCRIPT(customSettings.pluginScriptsOriginAllowList,
+                customSettings.pluginScriptsForMainFrameOnly));
+      }
+      if (!customSettings.useHybridComposition) {
+        userContentController.addPluginScript(PluginScriptsUtil.CHECK_GLOBAL_KEY_DOWN_EVENT_TO_HIDE_CONTEXT_MENU_JS_PLUGIN_SCRIPT(customSettings.pluginScriptsOriginAllowList,
+                customSettings.pluginScriptsForMainFrameOnly));
+      }
     }
     this.userContentController.addUserOnlyScripts(this.initialUserOnlyScripts);
   }
@@ -704,36 +758,21 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
       @Override
       public void run() {
         try {
-          Bitmap screenshotBitmap = Bitmap.createBitmap(getMeasuredWidth(), getMeasuredHeight(), Bitmap.Config.ARGB_8888);
-          Canvas c = new Canvas(screenshotBitmap);
-          c.translate(-getScrollX(), -getScrollY());
-          draw(c);
+          int bitmapWidth = getMeasuredWidth();
+          int bitmapHeight = getMeasuredHeight();
+          int bitmapScrollX = getScrollX();
+          int bitmapScrollY = getScrollY();
 
-          ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
           Bitmap.CompressFormat compressFormat = Bitmap.CompressFormat.PNG;
           int quality = 100;
 
           if (screenshotConfiguration != null) {
             Map<String, Double> rect = (Map<String, Double>) screenshotConfiguration.get("rect");
             if (rect != null) {
-              int rectX = (int) Math.floor(rect.get("x") * pixelDensity + 0.5);
-              int rectY = (int) Math.floor(rect.get("y") * pixelDensity + 0.5);
-              int rectWidth = Math.min(screenshotBitmap.getWidth(), (int) Math.floor(rect.get("width") * pixelDensity + 0.5));
-              int rectHeight = Math.min(screenshotBitmap.getHeight(), (int) Math.floor(rect.get("height") * pixelDensity + 0.5));
-              screenshotBitmap = Bitmap.createBitmap(
-                      screenshotBitmap,
-                      rectX,
-                      rectY,
-                      rectWidth,
-                      rectHeight);
-            }
-
-            Double snapshotWidth = (Double) screenshotConfiguration.get("snapshotWidth");
-            if (snapshotWidth != null) {
-              int dstWidth = (int) Math.floor(snapshotWidth * pixelDensity + 0.5);
-              float ratioBitmap = (float) screenshotBitmap.getWidth() / (float) screenshotBitmap.getHeight();
-              int dstHeight = (int) ((float) dstWidth / ratioBitmap);
-              screenshotBitmap = Bitmap.createScaledBitmap(screenshotBitmap, dstWidth, dstHeight, true);
+              bitmapScrollX = (int) Math.floor(rect.get("x") * pixelDensity + 0.5);
+              bitmapScrollY = (int) Math.floor(rect.get("y") * pixelDensity + 0.5);
+              bitmapWidth = (int) Math.floor(rect.get("width") * pixelDensity + 0.5);
+              bitmapHeight = (int) Math.floor(rect.get("height") * pixelDensity + 0.5);
             }
 
             try {
@@ -745,10 +784,31 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
             quality = (Integer) screenshotConfiguration.get("quality");
           }
 
-          screenshotBitmap.compress(
+          Bitmap screenshotBitmap = Bitmap.createBitmap(bitmapWidth, bitmapHeight, Bitmap.Config.ARGB_8888);
+          Canvas c = new Canvas(screenshotBitmap);
+          c.translate(-bitmapScrollX, -bitmapScrollY);
+          draw(c);
+
+          ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+
+          if (screenshotConfiguration != null) {
+            Double snapshotWidth = (Double) screenshotConfiguration.get("snapshotWidth");
+            if (snapshotWidth != null) {
+              int dstWidth = (int) Math.floor(snapshotWidth * pixelDensity + 0.5);
+              float ratioBitmap = (float) screenshotBitmap.getWidth() / (float) screenshotBitmap.getHeight();
+              int dstHeight = (int) ((float) dstWidth / ratioBitmap);
+              screenshotBitmap = Bitmap.createScaledBitmap(screenshotBitmap, dstWidth, dstHeight, true);
+            }
+          }
+
+          final boolean compressed = screenshotBitmap.compress(
                   compressFormat,
                   quality,
                   byteArrayOutputStream);
+          if (!compressed) {
+            Log.e(LOG_TAG, "Screenshot cannot be compressed using compressFormat " +
+                    compressFormat.name() + " with quality " + quality, null);
+          }
 
           try {
             byteArrayOutputStream.close();
@@ -776,15 +836,27 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
 
     if (newSettingsMap.get("useShouldInterceptAjaxRequest") != null && customSettings.useShouldInterceptAjaxRequest != newCustomSettings.useShouldInterceptAjaxRequest) {
       enablePluginScriptAtRuntime(
-              InterceptAjaxRequestJS.FLAG_VARIABLE_FOR_SHOULD_INTERCEPT_AJAX_REQUEST_JS_SOURCE,
+              InterceptAjaxRequestJS.FLAG_VARIABLE_FOR_SHOULD_INTERCEPT_AJAX_REQUEST_JS_SOURCE(),
               newCustomSettings.useShouldInterceptAjaxRequest,
-              InterceptAjaxRequestJS.INTERCEPT_AJAX_REQUEST_JS_PLUGIN_SCRIPT
+              InterceptAjaxRequestJS.INTERCEPT_AJAX_REQUEST_JS_PLUGIN_SCRIPT(
+                      customSettings.pluginScriptsOriginAllowList,
+                      customSettings.pluginScriptsForMainFrameOnly,
+                      newCustomSettings.useOnAjaxReadyStateChange,
+                      newCustomSettings.useOnAjaxProgress)
       );
+    }
+
+    if (newSettingsMap.get("useOnAjaxReadyStateChange") != null && customSettings.useOnAjaxReadyStateChange != newCustomSettings.useOnAjaxReadyStateChange) {
+      evaluateJavascript("((window.top == null || window.top === window) ? window : window.top)." + InterceptAjaxRequestJS.FLAG_VARIABLE_FOR_ON_AJAX_READY_STATE_CHANGE() + " = " + newCustomSettings.useOnAjaxReadyStateChange + ";", null);
+    }
+
+    if (newSettingsMap.get("useOnAjaxProgress") != null && customSettings.useOnAjaxProgress != newCustomSettings.useOnAjaxProgress) {
+      evaluateJavascript("((window.top == null || window.top === window) ? window : window.top)." + InterceptAjaxRequestJS.FLAG_VARIABLE_FOR_ON_AJAX_PROGRESS() + " = " + newCustomSettings.useOnAjaxProgress + ";", null);
     }
 
     if (newSettingsMap.get("interceptOnlyAsyncAjaxRequests") != null && customSettings.interceptOnlyAsyncAjaxRequests != newCustomSettings.interceptOnlyAsyncAjaxRequests) {
       enablePluginScriptAtRuntime(
-              InterceptAjaxRequestJS.FLAG_VARIABLE_FOR_INTERCEPT_ONLY_ASYNC_AJAX_REQUESTS_JS_SOURCE,
+              InterceptAjaxRequestJS.FLAG_VARIABLE_FOR_INTERCEPT_ONLY_ASYNC_AJAX_REQUESTS_JS_SOURCE(),
               newCustomSettings.interceptOnlyAsyncAjaxRequests,
               interceptOnlyAsyncAjaxRequestsPluginScript
       );
@@ -792,17 +864,19 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
 
     if (newSettingsMap.get("useShouldInterceptFetchRequest") != null && customSettings.useShouldInterceptFetchRequest != newCustomSettings.useShouldInterceptFetchRequest) {
       enablePluginScriptAtRuntime(
-              InterceptFetchRequestJS.FLAG_VARIABLE_FOR_SHOULD_INTERCEPT_FETCH_REQUEST_JS_SOURCE,
+              InterceptFetchRequestJS.FLAG_VARIABLE_FOR_SHOULD_INTERCEPT_FETCH_REQUEST_JS_SOURCE(),
               newCustomSettings.useShouldInterceptFetchRequest,
-              InterceptFetchRequestJS.INTERCEPT_FETCH_REQUEST_JS_PLUGIN_SCRIPT
+              InterceptFetchRequestJS.INTERCEPT_FETCH_REQUEST_JS_PLUGIN_SCRIPT(customSettings.pluginScriptsOriginAllowList,
+                      customSettings.pluginScriptsForMainFrameOnly)
       );
     }
 
     if (newSettingsMap.get("useOnLoadResource") != null && customSettings.useOnLoadResource != newCustomSettings.useOnLoadResource) {
       enablePluginScriptAtRuntime(
-              OnLoadResourceJS.FLAG_VARIABLE_FOR_ON_LOAD_RESOURCE_JS_SOURCE,
+              OnLoadResourceJS.FLAG_VARIABLE_FOR_ON_LOAD_RESOURCE_JS_SOURCE(),
               newCustomSettings.useOnLoadResource,
-              OnLoadResourceJS.ON_LOAD_RESOURCE_JS_PLUGIN_SCRIPT
+              OnLoadResourceJS.ON_LOAD_RESOURCE_JS_PLUGIN_SCRIPT(customSettings.pluginScriptsOriginAllowList,
+                      customSettings.pluginScriptsForMainFrameOnly)
       );
     }
 
@@ -856,7 +930,7 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
     if (newSettingsMap.get("supportZoom") != null && customSettings.supportZoom != newCustomSettings.supportZoom)
       settings.setSupportZoom(newCustomSettings.supportZoom);
 
-    if (newSettingsMap.get("textZoom") != null && !customSettings.textZoom.equals(newCustomSettings.textZoom))
+    if (newSettingsMap.get("textZoom") != null && (customSettings.textZoom == null || !customSettings.textZoom.equals(newCustomSettings.textZoom)))
       settings.setTextZoom(newCustomSettings.textZoom);
 
     if (newSettingsMap.get("verticalScrollBarEnabled") != null && customSettings.verticalScrollBarEnabled != newCustomSettings.verticalScrollBarEnabled)
@@ -932,7 +1006,7 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
 
     if (newSettingsMap.get("disabledActionModeMenuItems") != null &&
             (customSettings.disabledActionModeMenuItems == null ||
-            !customSettings.disabledActionModeMenuItems.equals(newCustomSettings.disabledActionModeMenuItems))) {
+                    !customSettings.disabledActionModeMenuItems.equals(newCustomSettings.disabledActionModeMenuItems))) {
       if (WebViewFeature.isFeatureSupported(WebViewFeature.DISABLED_ACTION_MODE_MENU_ITEMS))
         WebSettingsCompat.setDisabledActionModeMenuItems(settings, newCustomSettings.disabledActionModeMenuItems);
       else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
@@ -955,7 +1029,13 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
     if (newSettingsMap.get("forceDarkStrategy") != null &&
             !customSettings.forceDarkStrategy.equals(newCustomSettings.forceDarkStrategy) &&
             WebViewFeature.isFeatureSupported(WebViewFeature.FORCE_DARK_STRATEGY)) {
-      WebSettingsCompat.setForceDarkStrategy(settings, newCustomSettings.forceDarkStrategy);
+      try {
+        // for some reason the setForceDarkStrategy method could throw a ClassCastException
+        // from the Android WebView Chromium library.
+        WebSettingsCompat.setForceDarkStrategy(settings, newCustomSettings.forceDarkStrategy);
+      } catch (Exception e) {
+        e.printStackTrace();
+      }
     }
 
     if (newSettingsMap.get("geolocationEnabled") != null && customSettings.geolocationEnabled != newCustomSettings.geolocationEnabled)
@@ -1028,14 +1108,6 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
         else
           setLayerType(View.LAYER_TYPE_NONE, null);
       }
-    }
-
-    if (newSettingsMap.get("regexToCancelSubFramesLoading") != null && (customSettings.regexToCancelSubFramesLoading == null ||
-            !customSettings.regexToCancelSubFramesLoading.equals(newCustomSettings.regexToCancelSubFramesLoading))) {
-      if (newCustomSettings.regexToCancelSubFramesLoading == null)
-        regexToCancelSubFramesLoadingCompiled = null;
-      else
-        regexToCancelSubFramesLoadingCompiled = Pattern.compile(customSettings.regexToCancelSubFramesLoading);
     }
 
     if (newCustomSettings.contentBlockers != null) {
@@ -1126,24 +1198,24 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
     customSettings = newCustomSettings;
   }
 
-  public Map<String, Object> getCustomSettings() {
+  public Map<String, Object> getCustomSettingsMap() {
     return (customSettings != null) ? customSettings.getRealSettings(this) : null;
   }
 
   public void enablePluginScriptAtRuntime(final String flagVariable,
                                           final boolean enable,
                                           final PluginScript pluginScript) {
-    evaluateJavascript("window." + flagVariable, null, new ValueCallback<String>() {
+    evaluateJavascript("((window.top == null || window.top === window) ? window : window.top)." + flagVariable, null, new ValueCallback<String>() {
       @Override
       public void onReceiveValue(String value) {
         boolean alreadyLoaded = value != null && !value.equalsIgnoreCase("null");
         if (alreadyLoaded) {
-          String enableSource = "window." + flagVariable + " = " + enable + ";";
+          String enableSource = "((window.top == null || window.top === window) ? window : window.top)." + flagVariable + " = " + enable + ";";
           evaluateJavascript(enableSource, null, null);
           if (!enable) {
             userContentController.removePluginScript(pluginScript);
           }
-        } else if (enable) {
+        } else if (enable && javaScriptBridgeEnabled) {
           evaluateJavascript(pluginScript.getSource(), null, null);
           userContentController.addPluginScript(pluginScript);
         }
@@ -1163,8 +1235,8 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
     }
     if (resultUuid != null && resultCallback != null) {
       evaluateJavaScriptContentWorldCallbacks.put(resultUuid, resultCallback);
-      scriptToInject = Util.replaceAll(PluginScriptsUtil.EVALUATE_JAVASCRIPT_WITH_CONTENT_WORLD_WRAPPER_JS_SOURCE,
-              PluginScriptsUtil.VAR_RANDOM_NAME, "_" + JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME + "_" + Math.round(Math.random() * 1000000))
+      scriptToInject = Util.replaceAll(PluginScriptsUtil.EVALUATE_JAVASCRIPT_WITH_CONTENT_WORLD_WRAPPER_JS_SOURCE(),
+                      PluginScriptsUtil.VAR_RANDOM_NAME, "_" + JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME() + "_" + Math.round(Math.random() * 1000000))
               .replace(PluginScriptsUtil.VAR_PLACEHOLDER_VALUE, UserContentController.escapeCode(source))
               .replace(PluginScriptsUtil.VAR_RESULT_UUID, resultUuid);
     }
@@ -1173,22 +1245,14 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
       @Override
       public void run() {
         String scriptToInject = userContentController.generateCodeForScriptEvaluation(finalScriptToInject, contentWorld);
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {
-          // This action will have the side-effect of blurring the currently focused element
-          loadUrl("javascript:" + scriptToInject.replaceAll("[\r\n]+", ""));
-          if (contentWorld != null && resultCallback != null) {
-            resultCallback.onReceiveValue("");
+        evaluateJavascript(scriptToInject, new ValueCallback<String>() {
+          @Override
+          public void onReceiveValue(String s) {
+            if (resultUuid != null || resultCallback == null)
+              return;
+            resultCallback.onReceiveValue(s);
           }
-        } else {
-          evaluateJavascript(scriptToInject, new ValueCallback<String>() {
-            @Override
-            public void onReceiveValue(String s) {
-              if (resultUuid != null || resultCallback == null)
-                return;
-              resultCallback.onReceiveValue(s);
-            }
-          });
-        }
+        });
       }
     });
   }
@@ -1209,15 +1273,15 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
         String scriptIdEscaped = idAttr.replaceAll("'", "\\\\'");
         scriptAttributes += " script.id = '" + scriptIdEscaped + "'; ";
         scriptAttributes += " script.onload = function() {" +
-        "  if (window." + JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME + " != null) {" +
-        "    window." + JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME + ".callHandler('onInjectedScriptLoaded', '" + scriptIdEscaped + "');" +
-        "  }" +
-        "};";
+                "  if (window." + JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME() + " != null) {" +
+                "    window." + JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME() + ".callHandler('onInjectedScriptLoaded', '" + scriptIdEscaped + "');" +
+                "  }" +
+                "};";
         scriptAttributes += " script.onerror = function() {" +
-        "  if (window." + JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME + " != null) {" +
-        "    window." + JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME + ".callHandler('onInjectedScriptError', '" + scriptIdEscaped + "');" +
-        "  }" +
-        "};";
+                "  if (window." + JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME() + " != null) {" +
+                "    window." + JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME() + ".callHandler('onInjectedScriptError', '" + scriptIdEscaped + "');" +
+                "  }" +
+                "};";
       }
       Boolean asyncAttr = (Boolean) scriptHtmlTagAttributes.get("async");
       if (asyncAttr != null && asyncAttr) {
@@ -1368,15 +1432,15 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
     @Override
     public void onDownloadStart(String url, String userAgent, String contentDisposition, String mimeType, long contentLength) {
       DownloadStartRequest downloadStartRequest = new DownloadStartRequest(
-        url,
-        userAgent,
-        contentDisposition,
-        mimeType,
-        contentLength,
-        URLUtil.guessFileName(url, contentDisposition, mimeType),
-        null
+              url,
+              userAgent,
+              contentDisposition,
+              mimeType,
+              contentLength,
+              URLUtil.guessFileName(url, contentDisposition, mimeType),
+              null
       );
-      if (channelDelegate != null) channelDelegate.onDownloadStartRequest(downloadStartRequest);
+      if (channelDelegate != null) channelDelegate.onDownloadStarting(downloadStartRequest);
     }
   }
 
@@ -1397,7 +1461,6 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
     webSettings.setBuiltInZoomControls(enabled);
   }
 
-  @RequiresApi(api = Build.VERSION_CODES.KITKAT)
   @Nullable
   public String printCurrentPage(@Nullable PrintJobSettings settings) {
     if (plugin != null && plugin.activity != null) {
@@ -1452,15 +1515,27 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
           printAdapter = createPrintDocumentAdapter();
         }
 
-        // Create a printCurrentPage job with name and adapter instance
-        android.print.PrintJob job = printManager.print(jobName, printAdapter, builder.build());
+        PrintJobController printJobController = null;
+        String id = null;
 
         if (settings != null && settings.handledByClient && plugin.printJobManager != null) {
-          String id = UUID.randomUUID().toString();
-          PrintJobController printJobController = new PrintJobController(id, job, settings, plugin);
+          id = UUID.randomUUID().toString();
+          printJobController = new PrintJobController(id, settings, plugin);
           plugin.printJobManager.jobs.put(printJobController.id, printJobController);
-          return id;
+          final PrintJobController finalPrintJobController = printJobController;
+          printAdapter = new InAppWebViewPrintDocumentAdapter(printAdapter, new InAppWebViewPrintDocumentAdapter.PrintDocumentAdapterCallback() {
+            @Override
+            public void onFinish() {
+              finalPrintJobController.onComplete(true, null);
+            }
+          });
         }
+
+        // Create a printCurrentPage job with name and adapter instance
+        PrintJob job = printManager.print(jobName, printAdapter, builder.build());
+        if (printJobController != null) printJobController.setJob(job);
+
+        return id;
       } else {
         Log.e(LOG_TAG, "No PrintManager available");
       }
@@ -1485,6 +1560,10 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
 
   @Override
   public boolean onTouchEvent(MotionEvent ev) {
+    if (!customSettings.isUserInteractionEnabled) {
+      return true;
+    }
+
     lastTouch = new Point((int) ev.getX(), (int) ev.getY());
 
     ViewParent parent = getParent();
@@ -1516,7 +1595,8 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
     }
 
     if (overScrolledHorizontally || overScrolledVertically) {
-      if (channelDelegate != null) channelDelegate.onOverScrolled(scrollX, scrollY, overScrolledHorizontally, overScrolledVertically);
+      if (channelDelegate != null)
+        channelDelegate.onOverScrolled(scrollX, scrollY, overScrolledHorizontally, overScrolledVertically);
     }
   }
 
@@ -1639,7 +1719,8 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
             hideContextMenu();
             callback.onActionItemClicked(actionMode, menuItem);
 
-            if (channelDelegate != null) channelDelegate.onContextMenuActionItemClicked(itemId, itemTitle);
+            if (channelDelegate != null)
+              channelDelegate.onContextMenuActionItemClicked(itemId, itemTitle);
           }
         });
         if (floatingContextMenu != null) {
@@ -1659,7 +1740,8 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
         public void onClick(View v) {
           hideContextMenu();
 
-          if (channelDelegate != null) channelDelegate.onContextMenuActionItemClicked(itemId, itemTitle);
+          if (channelDelegate != null)
+            channelDelegate.onContextMenuActionItemClicked(itemId, itemTitle);
         }
       });
       if (floatingContextMenu != null) {
@@ -1836,7 +1918,7 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
     String functionArgumentValues = TextUtils.join(", ", functionArgumentValuesList);
     String functionArgumentsObj = Util.JSONStringify(arguments);
 
-    String sourceToInject = PluginScriptsUtil.CALL_ASYNC_JAVA_SCRIPT_WRAPPER_JS_SOURCE
+    String sourceToInject = PluginScriptsUtil.CALL_ASYNC_JAVA_SCRIPT_WRAPPER_JS_SOURCE()
             .replace(PluginScriptsUtil.VAR_FUNCTION_ARGUMENT_NAMES, functionArgumentNames)
             .replace(PluginScriptsUtil.VAR_FUNCTION_ARGUMENT_VALUES, functionArgumentValues)
             .replace(PluginScriptsUtil.VAR_FUNCTION_ARGUMENTS_OBJ, functionArgumentsObj)
@@ -2027,6 +2109,69 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
   }
 
   @Override
+  public InAppWebViewSettings getCustomSettings() {
+    return customSettings;
+  }
+
+  @Override
+  public void showInputMethod() {
+    if (plugin == null || plugin.activity == null) {
+      return;
+    }
+    InputMethodManager imm = (InputMethodManager) plugin.activity.getSystemService(INPUT_METHOD_SERVICE);
+    if (imm != null) {
+      imm.showSoftInput(this, 0);
+    }
+  }
+
+  @Override
+  public void hideInputMethod() {
+    if (plugin == null || plugin.activity == null) {
+      return;
+    }
+    InputMethodManager imm = (InputMethodManager) plugin.activity.getSystemService(INPUT_METHOD_SERVICE);
+    if (imm != null) {
+      IBinder windowToken = getWindowToken();
+      if (!customSettings.useHybridComposition && containerView != null) {
+        windowToken = containerView.getWindowToken();
+      }
+      imm.hideSoftInputFromWindow(windowToken, 0);
+    }
+  }
+
+  @Override
+  @Nullable
+  public byte[] saveState() {
+    Bundle bundle = new Bundle();
+    if (saveState(bundle) != null) {
+      Parcel parcel = Parcel.obtain();
+      bundle.writeToParcel(parcel, 0);
+      byte[] bytes = parcel.marshall();
+      parcel.recycle();
+      return bytes;
+    }
+    return null;
+  }
+
+  @Override
+  public boolean restoreState(byte[] state) {
+    boolean restored = false;
+    Parcel parcel = Parcel.obtain();
+    try {
+      parcel.unmarshall(state, 0, state.length);
+      parcel.setDataPosition(0);
+      Bundle bundle = Bundle.CREATOR.createFromParcel(parcel);
+      restored = restoreState(bundle) != null;
+    } catch (Exception e) {
+      e.printStackTrace();
+    } finally {
+      parcel.recycle();
+    }
+    return restored;
+  }
+
+
+  @Override
   public void dispose() {
     if (channelDelegate != null) {
       channelDelegate.dispose();
@@ -2035,7 +2180,7 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
     super.dispose();
     WebSettings settings = getSettings();
     settings.setJavaScriptEnabled(false);
-    removeJavascriptInterface(JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME);
+    removeJavascriptInterface(JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME());
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && WebViewFeature.isFeatureSupported(WebViewFeature.WEB_VIEW_RENDERER_CLIENT_BASIC_USAGE)) {
       WebViewCompat.setWebViewRenderProcessClient(this, null);
     }

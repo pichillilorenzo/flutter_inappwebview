@@ -19,8 +19,8 @@ class PrintJobColorMode {
   ///Color color scheme, for example many colors are used.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Android native WebView
-  ///- MacOS
+  ///- Android WebView
+  ///- macOS WKWebView
   static final COLOR = PrintJobColorMode._internalMultiPlatform(2, () {
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
@@ -36,8 +36,8 @@ class PrintJobColorMode {
   ///Monochrome color scheme, for example one color is used.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Android native WebView
-  ///- MacOS
+  ///- Android WebView
+  ///- macOS WKWebView
   static final MONOCHROME = PrintJobColorMode._internalMultiPlatform(1, () {
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
@@ -82,20 +82,44 @@ class PrintJobColorMode {
     return null;
   }
 
+  /// Gets a possible [PrintJobColorMode] instance value with name [name].
+  ///
+  /// Goes through [PrintJobColorMode.values] looking for a value with
+  /// name [name], as reported by [PrintJobColorMode.name].
+  /// Returns the first value with the given name, otherwise `null`.
+  static PrintJobColorMode? byName(String? name) {
+    if (name != null) {
+      try {
+        return PrintJobColorMode.values
+            .firstWhere((element) => element.name() == name);
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
+  }
+
+  /// Creates a map from the names of [PrintJobColorMode] values to the values.
+  ///
+  /// The collection that this method is called on is expected to have
+  /// values with distinct names, like the `values` list of an enum class.
+  /// Only one value for each name can occur in the created map,
+  /// so if two or more values have the same name (either being the
+  /// same value, or being values of different enum type), at most one of
+  /// them will be represented in the returned map.
+  static Map<String, PrintJobColorMode> asNameMap() =>
+      <String, PrintJobColorMode>{
+        for (final value in PrintJobColorMode.values) value.name(): value
+      };
+
   ///Gets [int] value.
   int toValue() => _value;
 
-  ///Gets [dynamic] native value.
+  ///Gets [dynamic] native value if supported by the current platform, otherwise `null`.
   dynamic toNativeValue() => _nativeValue;
 
-  @override
-  int get hashCode => _value.hashCode;
-
-  @override
-  bool operator ==(value) => value == _value;
-
-  @override
-  String toString() {
+  ///Gets the name of the value.
+  String name() {
     switch (_value) {
       case 2:
         return 'COLOR';
@@ -103,5 +127,21 @@ class PrintJobColorMode {
         return 'MONOCHROME';
     }
     return _value.toString();
+  }
+
+  @override
+  int get hashCode => _value.hashCode;
+
+  @override
+  bool operator ==(value) => value == _value;
+
+  ///Checks if the value is supported by the [defaultTargetPlatform].
+  bool isSupported() {
+    return toNativeValue() != null;
+  }
+
+  @override
+  String toString() {
+    return name();
   }
 }

@@ -19,7 +19,7 @@ class CustomTabsRelationType {
   ///Requests the ability to handle all URLs from a given origin.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Android native WebView
+  ///- Android WebView
   static final HANDLE_ALL_URLS =
       CustomTabsRelationType._internalMultiPlatform(2, () {
     switch (defaultTargetPlatform) {
@@ -34,7 +34,7 @@ class CustomTabsRelationType {
   ///For App -> Web transitions, requests the app to use the declared origin to be used as origin for the client app in the web APIs context.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Android native WebView
+  ///- Android WebView
   static final USE_AS_ORIGIN =
       CustomTabsRelationType._internalMultiPlatform(1, () {
     switch (defaultTargetPlatform) {
@@ -78,20 +78,44 @@ class CustomTabsRelationType {
     return null;
   }
 
+  /// Gets a possible [CustomTabsRelationType] instance value with name [name].
+  ///
+  /// Goes through [CustomTabsRelationType.values] looking for a value with
+  /// name [name], as reported by [CustomTabsRelationType.name].
+  /// Returns the first value with the given name, otherwise `null`.
+  static CustomTabsRelationType? byName(String? name) {
+    if (name != null) {
+      try {
+        return CustomTabsRelationType.values
+            .firstWhere((element) => element.name() == name);
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
+  }
+
+  /// Creates a map from the names of [CustomTabsRelationType] values to the values.
+  ///
+  /// The collection that this method is called on is expected to have
+  /// values with distinct names, like the `values` list of an enum class.
+  /// Only one value for each name can occur in the created map,
+  /// so if two or more values have the same name (either being the
+  /// same value, or being values of different enum type), at most one of
+  /// them will be represented in the returned map.
+  static Map<String, CustomTabsRelationType> asNameMap() =>
+      <String, CustomTabsRelationType>{
+        for (final value in CustomTabsRelationType.values) value.name(): value
+      };
+
   ///Gets [int] value.
   int toValue() => _value;
 
-  ///Gets [int?] native value.
+  ///Gets [int] native value if supported by the current platform, otherwise `null`.
   int? toNativeValue() => _nativeValue;
 
-  @override
-  int get hashCode => _value.hashCode;
-
-  @override
-  bool operator ==(value) => value == _value;
-
-  @override
-  String toString() {
+  ///Gets the name of the value.
+  String name() {
     switch (_value) {
       case 2:
         return 'HANDLE_ALL_URLS';
@@ -99,5 +123,21 @@ class CustomTabsRelationType {
         return 'USE_AS_ORIGIN';
     }
     return _value.toString();
+  }
+
+  @override
+  int get hashCode => _value.hashCode;
+
+  @override
+  bool operator ==(value) => value == _value;
+
+  ///Checks if the value is supported by the [defaultTargetPlatform].
+  bool isSupported() {
+    return toNativeValue() != null;
+  }
+
+  @override
+  String toString() {
+    return name();
   }
 }

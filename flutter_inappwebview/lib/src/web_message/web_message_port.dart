@@ -31,7 +31,8 @@ class WebMessagePort implements IWebMessagePort {
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebMessagePort.close}
   Future<void> close() => platform.close();
 
-  Map<String, dynamic> toMap() => platform.toMap();
+  Map<String, dynamic> toMap({EnumMethod? enumMethod}) =>
+      platform.toMap(enumMethod: enumMethod);
 
   Map<String, dynamic> toJson() => platform.toJson();
 

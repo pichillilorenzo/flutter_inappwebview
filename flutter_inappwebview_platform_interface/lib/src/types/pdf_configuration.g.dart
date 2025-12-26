@@ -15,20 +15,22 @@ class PDFConfiguration {
   PDFConfiguration({this.rect});
 
   ///Gets a possible [PDFConfiguration] instance from a [Map] value.
-  static PDFConfiguration? fromMap(Map<String, dynamic>? map) {
+  static PDFConfiguration? fromMap(Map<String, dynamic>? map,
+      {EnumMethod? enumMethod}) {
     if (map == null) {
       return null;
     }
     final instance = PDFConfiguration(
-      rect: InAppWebViewRect.fromMap(map['rect']?.cast<String, dynamic>()),
+      rect: InAppWebViewRect.fromMap(map['rect']?.cast<String, dynamic>(),
+          enumMethod: enumMethod),
     );
     return instance;
   }
 
   ///Converts instance to a map.
-  Map<String, dynamic> toMap() {
+  Map<String, dynamic> toMap({EnumMethod? enumMethod}) {
     return {
-      "rect": rect?.toMap(),
+      "rect": rect?.toMap(enumMethod: enumMethod),
     };
   }
 
@@ -57,20 +59,22 @@ class IOSWKPDFConfiguration {
   IOSWKPDFConfiguration({this.rect});
 
   ///Gets a possible [IOSWKPDFConfiguration] instance from a [Map] value.
-  static IOSWKPDFConfiguration? fromMap(Map<String, dynamic>? map) {
+  static IOSWKPDFConfiguration? fromMap(Map<String, dynamic>? map,
+      {EnumMethod? enumMethod}) {
     if (map == null) {
       return null;
     }
     final instance = IOSWKPDFConfiguration(
-      rect: InAppWebViewRect.fromMap(map['rect']?.cast<String, dynamic>()),
+      rect: InAppWebViewRect.fromMap(map['rect']?.cast<String, dynamic>(),
+          enumMethod: enumMethod),
     );
     return instance;
   }
 
   ///Converts instance to a map.
-  Map<String, dynamic> toMap() {
+  Map<String, dynamic> toMap({EnumMethod? enumMethod}) {
     return {
-      "rect": rect?.toMap(),
+      "rect": rect?.toMap(enumMethod: enumMethod),
     };
   }
 

@@ -6,6 +6,7 @@ import 'url_request.dart';
 import 'frame_info.dart';
 import 'navigation_type.dart';
 import '../in_app_webview/platform_webview.dart';
+import 'enum_method.dart';
 
 part 'create_window_action.g.dart';
 

@@ -17,10 +17,25 @@ class SslErrorType {
           String value, Function nativeValue) =>
       SslErrorType._internal(value, nativeValue());
 
+  ///Indicates that the SSL certificate common name does not match the web address.
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Windows WebView2 ([Official API - COREWEBVIEW2_WEB_ERROR_STATUS_CERTIFICATE_COMMON_NAME_IS_INCORRECT](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2849.39#corewebview2_web_error_status))
+  static final COMMON_NAME_IS_INCORRECT =
+      SslErrorType._internalMultiPlatform('COMMON_NAME_IS_INCORRECT', () {
+    switch (defaultTargetPlatform) {
+      case TargetPlatform.windows:
+        return 1;
+      default:
+        break;
+    }
+    return null;
+  });
+
   ///The date of the certificate is invalid.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Android native WebView ([Official API - SslError.DATE_INVALID](https://developer.android.com/reference/android/net/http/SslError#SSL_DATE_INVALID))
+  ///- Android WebView ([Official API - SslError.DATE_INVALID](https://developer.android.com/reference/android/net/http/SslError#SSL_DATE_INVALID))
   static final DATE_INVALID =
       SslErrorType._internalMultiPlatform('DATE_INVALID', () {
     switch (defaultTargetPlatform) {
@@ -40,8 +55,8 @@ class SslErrorType {
   ///The Keychain Access utility refers to this value as "Never Trust."
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- iOS ([Official API - SecTrustResultType.deny](https://developer.apple.com/documentation/security/sectrustresulttype/deny))
-  ///- MacOS ([Official API - SecTrustResultType.deny](https://developer.apple.com/documentation/security/sectrustresulttype/deny))
+  ///- iOS WKWebView ([Official API - SecTrustResultType.deny](https://developer.apple.com/documentation/security/sectrustresulttype/deny))
+  ///- macOS WKWebView ([Official API - SecTrustResultType.deny](https://developer.apple.com/documentation/security/sectrustresulttype/deny))
   static final DENY = SslErrorType._internalMultiPlatform('DENY', () {
     switch (defaultTargetPlatform) {
       case TargetPlatform.iOS:
@@ -57,11 +72,14 @@ class SslErrorType {
   ///The certificate has expired.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Android native WebView ([Official API - SslError.SSL_EXPIRED](https://developer.android.com/reference/android/net/http/SslError#SSL_EXPIRED))
+  ///- Android WebView ([Official API - SslError.SSL_EXPIRED](https://developer.android.com/reference/android/net/http/SslError#SSL_EXPIRED))
+  ///- Windows WebView2 ([Official API - COREWEBVIEW2_WEB_ERROR_STATUS_CERTIFICATE_EXPIRED](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2849.39#corewebview2_web_error_status))
   static final EXPIRED = SslErrorType._internalMultiPlatform('EXPIRED', () {
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
         return 1;
+      case TargetPlatform.windows:
+        return 2;
       default:
         break;
     }
@@ -76,8 +94,8 @@ class SslErrorType {
   ///Changing parameter values and reevaluating is unlikely to succeed unless you provide different certificates.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- iOS ([Official API - SecTrustResultType.fatalTrustFailure](https://developer.apple.com/documentation/security/sectrustresulttype/fataltrustfailure))
-  ///- MacOS ([Official API - SecTrustResultType.fatalTrustFailure](https://developer.apple.com/documentation/security/sectrustresulttype/fataltrustfailure))
+  ///- iOS WKWebView ([Official API - SecTrustResultType.fatalTrustFailure](https://developer.apple.com/documentation/security/sectrustresulttype/fataltrustfailure))
+  ///- macOS WKWebView ([Official API - SecTrustResultType.fatalTrustFailure](https://developer.apple.com/documentation/security/sectrustresulttype/fataltrustfailure))
   static final FATAL_TRUST_FAILURE =
       SslErrorType._internalMultiPlatform('FATAL_TRUST_FAILURE', () {
     switch (defaultTargetPlatform) {
@@ -94,7 +112,7 @@ class SslErrorType {
   ///Hostname mismatch.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Android native WebView ([Official API - SslError.SSL_IDMISMATCH](https://developer.android.com/reference/android/net/http/SslError#SSL_IDMISMATCH))
+  ///- Android WebView ([Official API - SslError.SSL_IDMISMATCH](https://developer.android.com/reference/android/net/http/SslError#SSL_IDMISMATCH))
   static final IDMISMATCH =
       SslErrorType._internalMultiPlatform('IDMISMATCH', () {
     switch (defaultTargetPlatform) {
@@ -109,9 +127,10 @@ class SslErrorType {
   ///Indicates an invalid setting or result. A generic error occurred.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Android native WebView ([Official API - SslError.SSL_INVALID](https://developer.android.com/reference/android/net/http/SslError#SSL_INVALID))
-  ///- iOS ([Official API - SecTrustResultType.invalid](https://developer.apple.com/documentation/security/sectrustresulttype/invalid))
-  ///- MacOS ([Official API - SecTrustResultType.invalid](https://developer.apple.com/documentation/security/sectrustresulttype/invalid))
+  ///- Android WebView ([Official API - SslError.SSL_INVALID](https://developer.android.com/reference/android/net/http/SslError#SSL_INVALID))
+  ///- iOS WKWebView ([Official API - SecTrustResultType.invalid](https://developer.apple.com/documentation/security/sectrustresulttype/invalid))
+  ///- macOS WKWebView ([Official API - SecTrustResultType.invalid](https://developer.apple.com/documentation/security/sectrustresulttype/invalid))
+  ///- Windows WebView2 ([Official API - COREWEBVIEW2_WEB_ERROR_STATUS_CERTIFICATE_IS_INVALID](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2849.39#corewebview2_web_error_status))
   static final INVALID = SslErrorType._internalMultiPlatform('INVALID', () {
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
@@ -120,6 +139,8 @@ class SslErrorType {
         return 0;
       case TargetPlatform.macOS:
         return 0;
+      case TargetPlatform.windows:
+        return 5;
       default:
         break;
     }
@@ -129,7 +150,7 @@ class SslErrorType {
   ///The certificate is not yet valid.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Android native WebView ([Official API - SslError.SSL_NOTYETVALID](https://developer.android.com/reference/android/net/http/SslError#SSL_NOTYETVALID))
+  ///- Android WebView ([Official API - SslError.SSL_NOTYETVALID](https://developer.android.com/reference/android/net/http/SslError#SSL_NOTYETVALID))
   static final NOT_YET_VALID =
       SslErrorType._internalMultiPlatform('NOT_YET_VALID', () {
     switch (defaultTargetPlatform) {
@@ -144,11 +165,14 @@ class SslErrorType {
   ///Indicates a failure other than that of trust evaluation.
   ///
   ///This value indicates that evaluation failed for some other reason.
-  ///This can be caused by either a revoked certificate or by OS-level errors that are unrelated to the certificates themselves.
+  ///
+  ///On iOS and macOS, this can be caused by either a revoked certificate or
+  ///by OS-level errors that are unrelated to the certificates themselves.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- iOS ([Official API - SecTrustResultType.otherError](https://developer.apple.com/documentation/security/sectrustresulttype/othererror))
-  ///- MacOS ([Official API - SecTrustResultType.otherError](https://developer.apple.com/documentation/security/sectrustresulttype/othererror))
+  ///- iOS WKWebView ([Official API - SecTrustResultType.otherError](https://developer.apple.com/documentation/security/sectrustresulttype/othererror))
+  ///- macOS WKWebView ([Official API - SecTrustResultType.otherError](https://developer.apple.com/documentation/security/sectrustresulttype/othererror))
+  ///- Windows WebView2 ([Official API - COREWEBVIEW2_WEB_ERROR_STATUS_CLIENT_CERTIFICATE_CONTAINS_ERRORS](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2849.39#corewebview2_web_error_status))
   static final OTHER_ERROR =
       SslErrorType._internalMultiPlatform('OTHER_ERROR', () {
     switch (defaultTargetPlatform) {
@@ -156,6 +180,8 @@ class SslErrorType {
         return 7;
       case TargetPlatform.macOS:
         return 7;
+      case TargetPlatform.windows:
+        return 3;
       default:
         break;
     }
@@ -173,8 +199,8 @@ class SslErrorType {
   ///you should check again using that date to see if the message was valid when you originally received it.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- iOS ([Official API - SecTrustResultType.recoverableTrustFailure](https://developer.apple.com/documentation/security/sectrustresulttype/recoverabletrustfailure))
-  ///- MacOS ([Official API - SecTrustResultType.recoverableTrustFailure](https://developer.apple.com/documentation/security/sectrustresulttype/recoverabletrustfailure))
+  ///- iOS WKWebView ([Official API - SecTrustResultType.recoverableTrustFailure](https://developer.apple.com/documentation/security/sectrustresulttype/recoverabletrustfailure))
+  ///- macOS WKWebView ([Official API - SecTrustResultType.recoverableTrustFailure](https://developer.apple.com/documentation/security/sectrustresulttype/recoverabletrustfailure))
   static final RECOVERABLE_TRUST_FAILURE =
       SslErrorType._internalMultiPlatform('RECOVERABLE_TRUST_FAILURE', () {
     switch (defaultTargetPlatform) {
@@ -182,6 +208,20 @@ class SslErrorType {
         return 5;
       case TargetPlatform.macOS:
         return 5;
+      default:
+        break;
+    }
+    return null;
+  });
+
+  ///Indicates that the SSL certificate has been revoked.
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Windows WebView2 ([Official API - COREWEBVIEW2_WEB_ERROR_STATUS_CERTIFICATE_REVOKED](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2849.39#corewebview2_web_error_status))
+  static final REVOKED = SslErrorType._internalMultiPlatform('REVOKED', () {
+    switch (defaultTargetPlatform) {
+      case TargetPlatform.windows:
+        return 4;
       default:
         break;
     }
@@ -198,8 +238,8 @@ class SslErrorType {
   ///When receiving this value, most apps should trust the chain.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- iOS ([Official API - SecTrustResultType.unspecified](https://developer.apple.com/documentation/security/sectrustresulttype/unspecified))
-  ///- MacOS ([Official API - SecTrustResultType.unspecified](https://developer.apple.com/documentation/security/sectrustresulttype/unspecified))
+  ///- iOS WKWebView ([Official API - SecTrustResultType.unspecified](https://developer.apple.com/documentation/security/sectrustresulttype/unspecified))
+  ///- macOS WKWebView ([Official API - SecTrustResultType.unspecified](https://developer.apple.com/documentation/security/sectrustresulttype/unspecified))
   static final UNSPECIFIED =
       SslErrorType._internalMultiPlatform('UNSPECIFIED', () {
     switch (defaultTargetPlatform) {
@@ -216,7 +256,7 @@ class SslErrorType {
   ///The certificate authority is not trusted.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Android native WebView ([Official API - SslError.SSL_UNTRUSTED](https://developer.android.com/reference/android/net/http/SslError#SSL_UNTRUSTED))
+  ///- Android WebView ([Official API - SslError.SSL_UNTRUSTED](https://developer.android.com/reference/android/net/http/SslError#SSL_UNTRUSTED))
   static final UNTRUSTED = SslErrorType._internalMultiPlatform('UNTRUSTED', () {
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
@@ -229,6 +269,7 @@ class SslErrorType {
 
   ///Set of all values of [SslErrorType].
   static final Set<SslErrorType> values = [
+    SslErrorType.COMMON_NAME_IS_INCORRECT,
     SslErrorType.DATE_INVALID,
     SslErrorType.DENY,
     SslErrorType.EXPIRED,
@@ -238,6 +279,7 @@ class SslErrorType {
     SslErrorType.NOT_YET_VALID,
     SslErrorType.OTHER_ERROR,
     SslErrorType.RECOVERABLE_TRUST_FAILURE,
+    SslErrorType.REVOKED,
     SslErrorType.UNSPECIFIED,
     SslErrorType.UNTRUSTED,
   ].toSet();
@@ -268,17 +310,84 @@ class SslErrorType {
     return null;
   }
 
+  /// Gets a possible [SslErrorType] instance value with name [name].
+  ///
+  /// Goes through [SslErrorType.values] looking for a value with
+  /// name [name], as reported by [SslErrorType.name].
+  /// Returns the first value with the given name, otherwise `null`.
+  static SslErrorType? byName(String? name) {
+    if (name != null) {
+      try {
+        return SslErrorType.values
+            .firstWhere((element) => element.name() == name);
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
+  }
+
+  /// Creates a map from the names of [SslErrorType] values to the values.
+  ///
+  /// The collection that this method is called on is expected to have
+  /// values with distinct names, like the `values` list of an enum class.
+  /// Only one value for each name can occur in the created map,
+  /// so if two or more values have the same name (either being the
+  /// same value, or being values of different enum type), at most one of
+  /// them will be represented in the returned map.
+  static Map<String, SslErrorType> asNameMap() => <String, SslErrorType>{
+        for (final value in SslErrorType.values) value.name(): value
+      };
+
   ///Gets [String] value.
   String toValue() => _value;
 
-  ///Gets [int?] native value.
+  ///Gets [int] native value if supported by the current platform, otherwise `null`.
   int? toNativeValue() => _nativeValue;
+
+  ///Gets the name of the value.
+  String name() {
+    switch (_value) {
+      case 'COMMON_NAME_IS_INCORRECT':
+        return 'COMMON_NAME_IS_INCORRECT';
+      case 'DATE_INVALID':
+        return 'DATE_INVALID';
+      case 'DENY':
+        return 'DENY';
+      case 'EXPIRED':
+        return 'EXPIRED';
+      case 'FATAL_TRUST_FAILURE':
+        return 'FATAL_TRUST_FAILURE';
+      case 'IDMISMATCH':
+        return 'IDMISMATCH';
+      case 'INVALID':
+        return 'INVALID';
+      case 'NOT_YET_VALID':
+        return 'NOT_YET_VALID';
+      case 'OTHER_ERROR':
+        return 'OTHER_ERROR';
+      case 'RECOVERABLE_TRUST_FAILURE':
+        return 'RECOVERABLE_TRUST_FAILURE';
+      case 'REVOKED':
+        return 'REVOKED';
+      case 'UNSPECIFIED':
+        return 'UNSPECIFIED';
+      case 'UNTRUSTED':
+        return 'UNTRUSTED';
+    }
+    return _value.toString();
+  }
 
   @override
   int get hashCode => _value.hashCode;
 
   @override
   bool operator ==(value) => value == _value;
+
+  ///Checks if the value is supported by the [defaultTargetPlatform].
+  bool isSupported() {
+    return toNativeValue() != null;
+  }
 
   @override
   String toString() {
@@ -353,20 +462,43 @@ class AndroidSslError {
     return null;
   }
 
+  /// Gets a possible [AndroidSslError] instance value with name [name].
+  ///
+  /// Goes through [AndroidSslError.values] looking for a value with
+  /// name [name], as reported by [AndroidSslError.name].
+  /// Returns the first value with the given name, otherwise `null`.
+  static AndroidSslError? byName(String? name) {
+    if (name != null) {
+      try {
+        return AndroidSslError.values
+            .firstWhere((element) => element.name() == name);
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
+  }
+
+  /// Creates a map from the names of [AndroidSslError] values to the values.
+  ///
+  /// The collection that this method is called on is expected to have
+  /// values with distinct names, like the `values` list of an enum class.
+  /// Only one value for each name can occur in the created map,
+  /// so if two or more values have the same name (either being the
+  /// same value, or being values of different enum type), at most one of
+  /// them will be represented in the returned map.
+  static Map<String, AndroidSslError> asNameMap() => <String, AndroidSslError>{
+        for (final value in AndroidSslError.values) value.name(): value
+      };
+
   ///Gets [int] value.
   int toValue() => _value;
 
   ///Gets [int] native value.
   int toNativeValue() => _nativeValue;
 
-  @override
-  int get hashCode => _value.hashCode;
-
-  @override
-  bool operator ==(value) => value == _value;
-
-  @override
-  String toString() {
+  ///Gets the name of the value.
+  String name() {
     switch (_value) {
       case 4:
         return 'SSL_DATE_INVALID';
@@ -382,6 +514,22 @@ class AndroidSslError {
         return 'SSL_UNTRUSTED';
     }
     return _value.toString();
+  }
+
+  @override
+  int get hashCode => _value.hashCode;
+
+  @override
+  bool operator ==(value) => value == _value;
+
+  ///Checks if the value is supported by the [defaultTargetPlatform].
+  bool isSupported() {
+    return true;
+  }
+
+  @override
+  String toString() {
+    return name();
   }
 }
 
@@ -451,20 +599,43 @@ class IOSSslError {
     return null;
   }
 
+  /// Gets a possible [IOSSslError] instance value with name [name].
+  ///
+  /// Goes through [IOSSslError.values] looking for a value with
+  /// name [name], as reported by [IOSSslError.name].
+  /// Returns the first value with the given name, otherwise `null`.
+  static IOSSslError? byName(String? name) {
+    if (name != null) {
+      try {
+        return IOSSslError.values
+            .firstWhere((element) => element.name() == name);
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
+  }
+
+  /// Creates a map from the names of [IOSSslError] values to the values.
+  ///
+  /// The collection that this method is called on is expected to have
+  /// values with distinct names, like the `values` list of an enum class.
+  /// Only one value for each name can occur in the created map,
+  /// so if two or more values have the same name (either being the
+  /// same value, or being values of different enum type), at most one of
+  /// them will be represented in the returned map.
+  static Map<String, IOSSslError> asNameMap() => <String, IOSSslError>{
+        for (final value in IOSSslError.values) value.name(): value
+      };
+
   ///Gets [int] value.
   int toValue() => _value;
 
   ///Gets [int] native value.
   int toNativeValue() => _nativeValue;
 
-  @override
-  int get hashCode => _value.hashCode;
-
-  @override
-  bool operator ==(value) => value == _value;
-
-  @override
-  String toString() {
+  ///Gets the name of the value.
+  String name() {
     switch (_value) {
       case 3:
         return 'DENY';
@@ -480,5 +651,21 @@ class IOSSslError {
         return 'UNSPECIFIED';
     }
     return _value.toString();
+  }
+
+  @override
+  int get hashCode => _value.hashCode;
+
+  @override
+  bool operator ==(value) => value == _value;
+
+  ///Checks if the value is supported by the [defaultTargetPlatform].
+  bool isSupported() {
+    return true;
+  }
+
+  @override
+  String toString() {
+    return name();
   }
 }

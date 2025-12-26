@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:typed_data';
 
+import '../types/enum_method.dart';
 import 'asn1_decoder.dart';
 import 'asn1_object.dart';
 import 'oid.dart';
@@ -86,7 +87,7 @@ class X509Certificate {
 
       Uint8List? derDataDecoded;
       try {
-        derDataDecoded = Uint8List.fromList(utf8.encode(base64buffer));
+        derDataDecoded = Uint8List.fromList(base64Decode(base64buffer));
       } catch (e) {}
       if (derDataDecoded != null) {
         return derDataDecoded;
@@ -402,9 +403,9 @@ class X509Certificate {
     return description;
   }
 
-  Map<String, dynamic> toMap() {
+  Map<String, dynamic> toMap({EnumMethod? enumMethod}) {
     return {
-      "basicConstraints": basicConstraints?.toMap(),
+      "basicConstraints": basicConstraints?.toMap(enumMethod: enumMethod),
       "subjectAlternativeNames": subjectAlternativeNames,
       "issuerAlternativeNames": issuerAlternativeNames,
       "extendedKeyUsage": extendedKeyUsage,
@@ -422,12 +423,15 @@ class X509Certificate {
       "criticalExtensionOIDs": criticalExtensionOIDs,
       "nonCriticalExtensionOIDs": nonCriticalExtensionOIDs,
       "encoded": encoded,
-      "publicKey": publicKey?.toMap(),
-      "subjectKeyIdentifier": subjectKeyIdentifier?.toMap(),
-      "authorityKeyIdentifier": authorityKeyIdentifier?.toMap(),
-      "certificatePolicies": certificatePolicies?.toMap(),
-      "cRLDistributionPoints": cRLDistributionPoints?.toMap(),
-      "authorityInfoAccess": authorityInfoAccess?.toMap(),
+      "publicKey": publicKey?.toMap(enumMethod: enumMethod),
+      "subjectKeyIdentifier":
+          subjectKeyIdentifier?.toMap(enumMethod: enumMethod),
+      "authorityKeyIdentifier":
+          authorityKeyIdentifier?.toMap(enumMethod: enumMethod),
+      "certificatePolicies": certificatePolicies?.toMap(enumMethod: enumMethod),
+      "cRLDistributionPoints":
+          cRLDistributionPoints?.toMap(enumMethod: enumMethod),
+      "authorityInfoAccess": authorityInfoAccess?.toMap(enumMethod: enumMethod),
     };
   }
 

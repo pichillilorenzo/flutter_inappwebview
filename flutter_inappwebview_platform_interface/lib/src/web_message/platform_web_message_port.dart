@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 
 import '../inappwebview_platform.dart';
+import '../types/enum_method.dart';
 import '../types/web_message_callback.dart';
 import 'web_message.dart';
 
@@ -103,7 +104,7 @@ abstract class IWebMessagePort {
         'close is not implemented on the current platform');
   }
 
-  Map<String, dynamic> toMap() {
+  Map<String, dynamic> toMap({EnumMethod? enumMethod}) {
     throw UnimplementedError(
         'toMap is not implemented on the current platform');
   }

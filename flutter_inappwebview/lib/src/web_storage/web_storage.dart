@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_platform_interface.dart';
 
 import '../in_app_webview/in_app_webview_controller.dart';
@@ -25,6 +26,21 @@ class WebStorage {
 
   /// Implementation of [PlatformWebStorage] for the current platform.
   final PlatformWebStorage platform;
+
+  ///Check if the current class is supported by the [defaultTargetPlatform] or a specific [platform].
+  static bool isClassSupported({TargetPlatform? platform}) =>
+      PlatformWebStorage.static().isClassSupported(platform: platform);
+
+  ///Check if the given [property] is supported by the [defaultTargetPlatform] or a specific [platform].
+  static bool isPropertySupported(dynamic property,
+          {TargetPlatform? platform}) =>
+      PlatformWebStorage.static()
+          .isPropertySupported(property, platform: platform);
+
+  ///Check if the given [method] is supported by the [defaultTargetPlatform] or a specific [platform].
+  static bool isMethodSupported(PlatformWebStorageMethod method,
+          {TargetPlatform? platform}) =>
+      PlatformWebStorage.static().isMethodSupported(method, platform: platform);
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebStorage.localStorage}
   LocalStorage get localStorage =>
@@ -103,6 +119,23 @@ class LocalStorage extends Storage {
 
   /// Implementation of [PlatformLocalStorage] for the current platform.
   final PlatformLocalStorage platform;
+
+  ///Check if the current class is supported by the [defaultTargetPlatform] or a specific [platform].
+  static bool isClassSupported({TargetPlatform? platform}) =>
+      PlatformLocalStorage.static().isClassSupported(platform: platform);
+
+  ///Check if the given [property] is supported by the [defaultTargetPlatform] or a specific [platform].
+  static bool isPropertySupported(
+          PlatformStorageCreationParamsProperty property,
+          {TargetPlatform? platform}) =>
+      PlatformLocalStorage.static()
+          .isPropertySupported(property, platform: platform);
+
+  ///Check if the given [method] is supported by the [defaultTargetPlatform] or a specific [platform].
+  static bool isMethodSupported(PlatformLocalStorageMethod method,
+          {TargetPlatform? platform}) =>
+      PlatformLocalStorage.static()
+          .isMethodSupported(method, platform: platform);
 }
 
 ///{@macro flutter_inappwebview_platform_interface.PlatformSessionStorage}
@@ -129,4 +162,21 @@ class SessionStorage extends Storage {
 
   /// Implementation of [PlatformSessionStorage] for the current platform.
   final PlatformSessionStorage platform;
+
+  ///Check if the current class is supported by the [defaultTargetPlatform] or a specific [platform].
+  static bool isClassSupported({TargetPlatform? platform}) =>
+      PlatformSessionStorage.static().isClassSupported(platform: platform);
+
+  ///Check if the given [property] is supported by the [defaultTargetPlatform] or a specific [platform].
+  static bool isPropertySupported(
+          PlatformStorageCreationParamsProperty property,
+          {TargetPlatform? platform}) =>
+      PlatformSessionStorage.static()
+          .isPropertySupported(property, platform: platform);
+
+  ///Check if the given [method] is supported by the [defaultTargetPlatform] or a specific [platform].
+  static bool isMethodSupported(PlatformSessionStorageMethod method,
+          {TargetPlatform? platform}) =>
+      PlatformSessionStorage.static()
+          .isMethodSupported(method, platform: platform);
 }

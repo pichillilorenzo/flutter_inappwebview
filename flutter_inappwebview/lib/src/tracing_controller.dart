@@ -1,4 +1,6 @@
 import 'dart:async';
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_platform_interface.dart';
 
 ///{@macro flutter_inappwebview_platform_interface.PlatformTracingController}
@@ -41,4 +43,14 @@ class TracingController {
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformTracingController.isTracing}
   Future<bool> isTracing() => platform.isTracing();
+
+  ///{@macro flutter_inappwebview_platform_interface.PlatformTracingControllerCreationParams.isClassSupported}
+  static bool isClassSupported({TargetPlatform? platform}) =>
+      PlatformTracingController.static().isClassSupported(platform: platform);
+
+  ///{@macro flutter_inappwebview_platform_interface.PlatformTracingController.isMethodSupported}
+  static bool isMethodSupported(PlatformTracingControllerMethod method,
+          {TargetPlatform? platform}) =>
+      PlatformTracingController.static()
+          .isMethodSupported(method, platform: platform);
 }

@@ -12,28 +12,28 @@ class PrintJobAttributes {
   ///The color mode.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Android native WebView
-  ///- MacOS
+  ///- Android WebView
+  ///- macOS WKWebView
   PrintJobColorMode? colorMode;
 
   ///If `true`, produce detailed reports when an error occurs.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- MacOS
+  ///- macOS WKWebView
   bool? detailedErrorReporting;
 
   ///The duplex mode to use for the print job.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Android native WebView 23+
-  ///- iOS
-  ///- MacOS
+  ///- Android WebView 23+
+  ///- iOS WKWebView
+  ///- macOS WKWebView
   PrintJobDuplexMode? duplex;
 
   ///A fax number.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- MacOS
+  ///- macOS WKWebView
   String? faxNumber;
 
   ///The height of the page footer.
@@ -42,13 +42,13 @@ class PrintJobAttributes {
   ///The default footer height is `0.0`.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- iOS
+  ///- iOS WKWebView
   double? footerHeight;
 
   ///If `true`, a standard header and footer are added outside the margins of each page.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- MacOS
+  ///- macOS WKWebView
   bool? headerAndFooter;
 
   ///The height of the page header.
@@ -57,49 +57,49 @@ class PrintJobAttributes {
   ///The default header height is `0.0`.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- iOS
+  ///- iOS WKWebView
   double? headerHeight;
 
   ///The horizontal pagination mode.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- MacOS
+  ///- macOS WKWebView
   PrintJobPaginationMode? horizontalPagination;
 
   ///Indicates whether the image is centered horizontally.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- MacOS
+  ///- macOS WKWebView
   bool? isHorizontallyCentered;
 
   ///Indicates whether only the currently selected contents should be printed.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- MacOS
+  ///- macOS WKWebView
   bool? isSelectionOnly;
 
   ///Indicates whether the image is centered vertically.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- MacOS
+  ///- macOS WKWebView
   bool? isVerticallyCentered;
 
   ///The action specified for the job.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- MacOS
+  ///- macOS WKWebView
   PrintJobDisposition? jobDisposition;
 
   ///An URL containing the location to which the job file will be saved when the [jobDisposition] is [PrintJobDisposition.SAVE].
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- MacOS
+  ///- macOS WKWebView
   WebUri? jobSavingURL;
 
   ///The human-readable name of the currently selected paper size, suitable for presentation in user interfaces.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- MacOS
+  ///- macOS WKWebView
   String? localizedPaperName;
 
   ///The margins for each printed page.
@@ -107,8 +107,8 @@ class PrintJobAttributes {
   ///the amount of white space on the left of the content and so on.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- iOS
-  ///- MacOS
+  ///- iOS WKWebView
+  ///- macOS WKWebView
   EdgeInsets? margins;
 
   ///The maximum height of the content area.
@@ -119,7 +119,7 @@ class PrintJobAttributes {
   ///The default value of this property is the maximum float value.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- iOS
+  ///- iOS WKWebView
   double? maximumContentHeight;
 
   ///The maximum width of the content area.
@@ -129,40 +129,45 @@ class PrintJobAttributes {
   ///The default value of this property is the maximum float value.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- iOS
+  ///- iOS WKWebView
   double? maximumContentWidth;
 
   ///The media size.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Android native WebView
+  ///- Android WebView
   PrintJobMediaSize? mediaSize;
 
   ///If `true`, collates output.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- MacOS
+  ///- macOS WKWebView
   bool? mustCollate;
 
   ///The orientation of the printed content, portrait or landscape.
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Android WebView
+  ///- iOS WKWebView
+  ///- macOS WKWebView
   PrintJobOrientation? orientation;
 
   ///The number of logical pages to be tiled horizontally on a physical sheet of paper.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- MacOS
+  ///- macOS WKWebView
   int? pagesAcross;
 
   ///The number of logical pages to be tiled vertically on a physical sheet of paper.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- MacOS
+  ///- macOS WKWebView
   int? pagesDown;
 
   ///The name of the currently selected paper size.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- MacOS
+  ///- macOS WKWebView
   String? paperName;
 
   ///The size of the paper used for printing.
@@ -171,8 +176,8 @@ class PrintJobAttributes {
   ///The origin is always (0,0).
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- iOS
-  ///- MacOS
+  ///- iOS WKWebView
+  ///- macOS WKWebView
   InAppWebViewRect? paperRect;
 
   ///The area in which printing can occur.
@@ -181,32 +186,32 @@ class PrintJobAttributes {
   ///Sometimes this is referred to as the imageable area of the paper.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- iOS
-  ///- MacOS
+  ///- iOS WKWebView
+  ///- macOS WKWebView
   InAppWebViewRect? printableRect;
 
   ///The supported resolution in DPI (dots per inch).
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Android native WebView
+  ///- Android WebView
   PrintJobResolution? resolution;
 
   ///The current scaling factor.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- MacOS
+  ///- macOS WKWebView
   double? scalingFactor;
 
   ///A timestamp that specifies the time at which printing should begin.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- MacOS
+  ///- macOS WKWebView
   int? time;
 
   ///The vertical pagination to the specified mode.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- MacOS
+  ///- macOS WKWebView
   PrintJobPaginationMode? verticalPagination;
   PrintJobAttributes(
       {this.colorMode,
@@ -240,84 +245,145 @@ class PrintJobAttributes {
       this.verticalPagination});
 
   ///Gets a possible [PrintJobAttributes] instance from a [Map] value.
-  static PrintJobAttributes? fromMap(Map<String, dynamic>? map) {
+  static PrintJobAttributes? fromMap(Map<String, dynamic>? map,
+      {EnumMethod? enumMethod}) {
     if (map == null) {
       return null;
     }
     final instance = PrintJobAttributes(
-      colorMode: PrintJobColorMode.fromNativeValue(map['colorMode']),
+      colorMode: switch (enumMethod ?? EnumMethod.nativeValue) {
+        EnumMethod.nativeValue =>
+          PrintJobColorMode.fromNativeValue(map['colorMode']),
+        EnumMethod.value => PrintJobColorMode.fromValue(map['colorMode']),
+        EnumMethod.name => PrintJobColorMode.byName(map['colorMode'])
+      },
       detailedErrorReporting: map['detailedErrorReporting'],
-      duplex: PrintJobDuplexMode.fromNativeValue(map['duplex']),
+      duplex: switch (enumMethod ?? EnumMethod.nativeValue) {
+        EnumMethod.nativeValue =>
+          PrintJobDuplexMode.fromNativeValue(map['duplex']),
+        EnumMethod.value => PrintJobDuplexMode.fromValue(map['duplex']),
+        EnumMethod.name => PrintJobDuplexMode.byName(map['duplex'])
+      },
       faxNumber: map['faxNumber'],
       footerHeight: map['footerHeight'],
       headerAndFooter: map['headerAndFooter'],
       headerHeight: map['headerHeight'],
-      horizontalPagination:
+      horizontalPagination: switch (enumMethod ?? EnumMethod.nativeValue) {
+        EnumMethod.nativeValue =>
           PrintJobPaginationMode.fromNativeValue(map['horizontalPagination']),
+        EnumMethod.value =>
+          PrintJobPaginationMode.fromValue(map['horizontalPagination']),
+        EnumMethod.name =>
+          PrintJobPaginationMode.byName(map['horizontalPagination'])
+      },
       isHorizontallyCentered: map['isHorizontallyCentered'],
       isSelectionOnly: map['isSelectionOnly'],
       isVerticallyCentered: map['isVerticallyCentered'],
-      jobDisposition:
+      jobDisposition: switch (enumMethod ?? EnumMethod.nativeValue) {
+        EnumMethod.nativeValue =>
           PrintJobDisposition.fromNativeValue(map['jobDisposition']),
+        EnumMethod.value =>
+          PrintJobDisposition.fromValue(map['jobDisposition']),
+        EnumMethod.name => PrintJobDisposition.byName(map['jobDisposition'])
+      },
       jobSavingURL:
           map['jobSavingURL'] != null ? WebUri(map['jobSavingURL']) : null,
       localizedPaperName: map['localizedPaperName'],
       margins: MapEdgeInsets.fromMap(map['margins']?.cast<String, dynamic>()),
       maximumContentHeight: map['maximumContentHeight'],
       maximumContentWidth: map['maximumContentWidth'],
-      mediaSize:
-          PrintJobMediaSize.fromMap(map['mediaSize']?.cast<String, dynamic>()),
+      mediaSize: PrintJobMediaSize.fromMap(
+          map['mediaSize']?.cast<String, dynamic>(),
+          enumMethod: enumMethod),
       mustCollate: map['mustCollate'],
-      orientation: PrintJobOrientation.fromNativeValue(map['orientation']),
+      orientation: switch (enumMethod ?? EnumMethod.nativeValue) {
+        EnumMethod.nativeValue =>
+          PrintJobOrientation.fromNativeValue(map['orientation']),
+        EnumMethod.value => PrintJobOrientation.fromValue(map['orientation']),
+        EnumMethod.name => PrintJobOrientation.byName(map['orientation'])
+      },
       pagesAcross: map['pagesAcross'],
       pagesDown: map['pagesDown'],
       paperName: map['paperName'],
-      paperRect:
-          InAppWebViewRect.fromMap(map['paperRect']?.cast<String, dynamic>()),
+      paperRect: InAppWebViewRect.fromMap(
+          map['paperRect']?.cast<String, dynamic>(),
+          enumMethod: enumMethod),
       printableRect: InAppWebViewRect.fromMap(
-          map['printableRect']?.cast<String, dynamic>()),
+          map['printableRect']?.cast<String, dynamic>(),
+          enumMethod: enumMethod),
       resolution: PrintJobResolution.fromMap(
-          map['resolution']?.cast<String, dynamic>()),
+          map['resolution']?.cast<String, dynamic>(),
+          enumMethod: enumMethod),
       scalingFactor: map['scalingFactor'],
       time: map['time'],
-      verticalPagination:
+      verticalPagination: switch (enumMethod ?? EnumMethod.nativeValue) {
+        EnumMethod.nativeValue =>
           PrintJobPaginationMode.fromNativeValue(map['verticalPagination']),
+        EnumMethod.value =>
+          PrintJobPaginationMode.fromValue(map['verticalPagination']),
+        EnumMethod.name =>
+          PrintJobPaginationMode.byName(map['verticalPagination'])
+      },
     );
     return instance;
   }
 
   ///Converts instance to a map.
-  Map<String, dynamic> toMap() {
+  Map<String, dynamic> toMap({EnumMethod? enumMethod}) {
     return {
-      "colorMode": colorMode?.toNativeValue(),
+      "colorMode": switch (enumMethod ?? EnumMethod.nativeValue) {
+        EnumMethod.nativeValue => colorMode?.toNativeValue(),
+        EnumMethod.value => colorMode?.toValue(),
+        EnumMethod.name => colorMode?.name()
+      },
       "detailedErrorReporting": detailedErrorReporting,
-      "duplex": duplex?.toNativeValue(),
+      "duplex": switch (enumMethod ?? EnumMethod.nativeValue) {
+        EnumMethod.nativeValue => duplex?.toNativeValue(),
+        EnumMethod.value => duplex?.toValue(),
+        EnumMethod.name => duplex?.name()
+      },
       "faxNumber": faxNumber,
       "footerHeight": footerHeight,
       "headerAndFooter": headerAndFooter,
       "headerHeight": headerHeight,
-      "horizontalPagination": horizontalPagination?.toNativeValue(),
+      "horizontalPagination": switch (enumMethod ?? EnumMethod.nativeValue) {
+        EnumMethod.nativeValue => horizontalPagination?.toNativeValue(),
+        EnumMethod.value => horizontalPagination?.toValue(),
+        EnumMethod.name => horizontalPagination?.name()
+      },
       "isHorizontallyCentered": isHorizontallyCentered,
       "isSelectionOnly": isSelectionOnly,
       "isVerticallyCentered": isVerticallyCentered,
-      "jobDisposition": jobDisposition?.toNativeValue(),
+      "jobDisposition": switch (enumMethod ?? EnumMethod.nativeValue) {
+        EnumMethod.nativeValue => jobDisposition?.toNativeValue(),
+        EnumMethod.value => jobDisposition?.toValue(),
+        EnumMethod.name => jobDisposition?.name()
+      },
       "jobSavingURL": jobSavingURL?.toString(),
       "localizedPaperName": localizedPaperName,
       "margins": margins?.toMap(),
       "maximumContentHeight": maximumContentHeight,
       "maximumContentWidth": maximumContentWidth,
-      "mediaSize": mediaSize?.toMap(),
+      "mediaSize": mediaSize?.toMap(enumMethod: enumMethod),
       "mustCollate": mustCollate,
-      "orientation": orientation?.toNativeValue(),
+      "orientation": switch (enumMethod ?? EnumMethod.nativeValue) {
+        EnumMethod.nativeValue => orientation?.toNativeValue(),
+        EnumMethod.value => orientation?.toValue(),
+        EnumMethod.name => orientation?.name()
+      },
       "pagesAcross": pagesAcross,
       "pagesDown": pagesDown,
       "paperName": paperName,
-      "paperRect": paperRect?.toMap(),
-      "printableRect": printableRect?.toMap(),
-      "resolution": resolution?.toMap(),
+      "paperRect": paperRect?.toMap(enumMethod: enumMethod),
+      "printableRect": printableRect?.toMap(enumMethod: enumMethod),
+      "resolution": resolution?.toMap(enumMethod: enumMethod),
       "scalingFactor": scalingFactor,
       "time": time,
-      "verticalPagination": verticalPagination?.toNativeValue(),
+      "verticalPagination": switch (enumMethod ?? EnumMethod.nativeValue) {
+        EnumMethod.nativeValue => verticalPagination?.toNativeValue(),
+        EnumMethod.value => verticalPagination?.toValue(),
+        EnumMethod.name => verticalPagination?.name()
+      },
     };
   }
 

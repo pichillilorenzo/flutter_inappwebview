@@ -24,15 +24,15 @@ class UIImage {
   ///The name of the system symbol image.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- iOS 13.0+
-  ///- MacOS 11.0+
+  ///- iOS WKWebView 13.0+
+  ///- macOS WKWebView 11.0+
   String? systemName;
   UIImage({this.name, this.systemName, this.data}) {
     assert(this.name != null || this.systemName != null || this.data != null);
   }
 
   ///Gets a possible [UIImage] instance from a [Map] value.
-  static UIImage? fromMap(Map<String, dynamic>? map) {
+  static UIImage? fromMap(Map<String, dynamic>? map, {EnumMethod? enumMethod}) {
     if (map == null) {
       return null;
     }
@@ -47,7 +47,7 @@ class UIImage {
   }
 
   ///Converts instance to a map.
-  Map<String, dynamic> toMap() {
+  Map<String, dynamic> toMap({EnumMethod? enumMethod}) {
     return {
       "data": data,
       "name": name,

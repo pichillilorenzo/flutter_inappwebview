@@ -19,7 +19,7 @@ class CustomTabsNavigationEventType {
   ///Sent when loading was aborted by a user action before it finishes like clicking on a link or refreshing the page.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Android native WebView
+  ///- Android WebView
   static final ABORTED =
       CustomTabsNavigationEventType._internalMultiPlatform(4, () {
     switch (defaultTargetPlatform) {
@@ -34,7 +34,7 @@ class CustomTabsNavigationEventType {
   ///Sent when the tab couldn't finish loading due to a failure.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Android native WebView
+  ///- Android WebView
   static final FAILED =
       CustomTabsNavigationEventType._internalMultiPlatform(3, () {
     switch (defaultTargetPlatform) {
@@ -49,7 +49,7 @@ class CustomTabsNavigationEventType {
   ///Sent when the tab has finished loading a page.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Android native WebView
+  ///- Android WebView
   static final FINISHED =
       CustomTabsNavigationEventType._internalMultiPlatform(2, () {
     switch (defaultTargetPlatform) {
@@ -64,7 +64,7 @@ class CustomTabsNavigationEventType {
   ///Sent when the tab has started loading a page.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Android native WebView
+  ///- Android WebView
   static final STARTED =
       CustomTabsNavigationEventType._internalMultiPlatform(1, () {
     switch (defaultTargetPlatform) {
@@ -79,7 +79,7 @@ class CustomTabsNavigationEventType {
   ///Sent when the tab becomes hidden.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Android native WebView
+  ///- Android WebView
   static final TAB_HIDDEN =
       CustomTabsNavigationEventType._internalMultiPlatform(6, () {
     switch (defaultTargetPlatform) {
@@ -94,7 +94,7 @@ class CustomTabsNavigationEventType {
   ///Sent when the tab becomes visible.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Android native WebView
+  ///- Android WebView
   static final TAB_SHOWN =
       CustomTabsNavigationEventType._internalMultiPlatform(5, () {
     switch (defaultTargetPlatform) {
@@ -142,20 +142,45 @@ class CustomTabsNavigationEventType {
     return null;
   }
 
+  /// Gets a possible [CustomTabsNavigationEventType] instance value with name [name].
+  ///
+  /// Goes through [CustomTabsNavigationEventType.values] looking for a value with
+  /// name [name], as reported by [CustomTabsNavigationEventType.name].
+  /// Returns the first value with the given name, otherwise `null`.
+  static CustomTabsNavigationEventType? byName(String? name) {
+    if (name != null) {
+      try {
+        return CustomTabsNavigationEventType.values
+            .firstWhere((element) => element.name() == name);
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
+  }
+
+  /// Creates a map from the names of [CustomTabsNavigationEventType] values to the values.
+  ///
+  /// The collection that this method is called on is expected to have
+  /// values with distinct names, like the `values` list of an enum class.
+  /// Only one value for each name can occur in the created map,
+  /// so if two or more values have the same name (either being the
+  /// same value, or being values of different enum type), at most one of
+  /// them will be represented in the returned map.
+  static Map<String, CustomTabsNavigationEventType> asNameMap() =>
+      <String, CustomTabsNavigationEventType>{
+        for (final value in CustomTabsNavigationEventType.values)
+          value.name(): value
+      };
+
   ///Gets [int] value.
   int toValue() => _value;
 
-  ///Gets [int?] native value.
+  ///Gets [int] native value if supported by the current platform, otherwise `null`.
   int? toNativeValue() => _nativeValue;
 
-  @override
-  int get hashCode => _value.hashCode;
-
-  @override
-  bool operator ==(value) => value == _value;
-
-  @override
-  String toString() {
+  ///Gets the name of the value.
+  String name() {
     switch (_value) {
       case 4:
         return 'ABORTED';
@@ -171,5 +196,21 @@ class CustomTabsNavigationEventType {
         return 'TAB_SHOWN';
     }
     return _value.toString();
+  }
+
+  @override
+  int get hashCode => _value.hashCode;
+
+  @override
+  bool operator ==(value) => value == _value;
+
+  ///Checks if the value is supported by the [defaultTargetPlatform].
+  bool isSupported() {
+    return toNativeValue() != null;
+  }
+
+  @override
+  String toString() {
+    return name();
   }
 }

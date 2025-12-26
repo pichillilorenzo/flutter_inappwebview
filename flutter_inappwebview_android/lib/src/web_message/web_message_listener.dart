@@ -55,6 +55,15 @@ class AndroidWebMessageListener extends PlatformWebMessageListener
     initMethodCallHandler();
   }
 
+  static final AndroidWebMessageListener _staticValue =
+      AndroidWebMessageListener(AndroidWebMessageListenerCreationParams(
+          jsObjectName: '', allowedOriginRules: Set.from(["*"])));
+
+  /// Provide static access.
+  factory AndroidWebMessageListener.static() {
+    return _staticValue;
+  }
+
   ///Message Listener ID used internally.
   final String _id = IdGenerator.generate();
 

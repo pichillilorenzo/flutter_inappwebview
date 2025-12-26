@@ -25,7 +25,7 @@ import SafariServices
 
 public class InAppWebViewFlutterPlugin: NSObject, FlutterPlugin {
     
-    var registrar: FlutterPluginRegistrar?
+    var registrar: FlutterPluginRegistrar
     var platformUtil: PlatformUtil?
     var inAppWebViewManager: InAppWebViewManager?
     var myCookieManager: Any?
@@ -35,13 +35,14 @@ public class InAppWebViewFlutterPlugin: NSObject, FlutterPlugin {
     var headlessInAppWebViewManager: HeadlessInAppWebViewManager?
     var webAuthenticationSessionManager: WebAuthenticationSessionManager?
     var printJobManager: PrintJobManager?
+    var proxyManager: Any?
     
     var webViewControllers: [String: InAppBrowserWebViewController?] = [:]
     var safariViewControllers: [String: Any?] = [:]
     
     public init(with registrar: FlutterPluginRegistrar) {
-        super.init()
         self.registrar = registrar
+        super.init()
         registrar.register(FlutterWebViewFactory(plugin: self) as FlutterPlatformViewFactory, withId: FlutterWebViewFactory.VIEW_TYPE_ID)
         
         platformUtil = PlatformUtil(plugin: self)
@@ -55,6 +56,9 @@ public class InAppWebViewFlutterPlugin: NSObject, FlutterPlugin {
         myWebStorageManager = MyWebStorageManager(plugin: self)
         webAuthenticationSessionManager = WebAuthenticationSessionManager(plugin: self)
         printJobManager = PrintJobManager(plugin: self)
+        if #available(macOS 14.0, *) {
+            proxyManager = ProxyManager(plugin: self)
+        }
     }
     
     public static func register(with registrar: FlutterPluginRegistrar) {
@@ -73,7 +77,7 @@ public class InAppWebViewFlutterPlugin: NSObject, FlutterPlugin {
         credentialDatabase?.dispose()
         credentialDatabase = nil
         if #available(macOS 10.13, *) {
-            (myCookieManager as! MyCookieManager?)?.dispose()
+            (myCookieManager as? MyCookieManager)?.dispose()
             myCookieManager = nil
         }
         myWebStorageManager?.dispose()
@@ -82,5 +86,9 @@ public class InAppWebViewFlutterPlugin: NSObject, FlutterPlugin {
         webAuthenticationSessionManager = nil
         printJobManager?.dispose()
         printJobManager = nil
+        if #available(macOS 14.0, *) {
+            (proxyManager as? ProxyManager)?.dispose()
+            proxyManager = nil
+        }
     }
 }

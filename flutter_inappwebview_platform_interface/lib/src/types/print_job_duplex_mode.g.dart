@@ -20,9 +20,9 @@ class PrintJobDuplexMode {
   ///Pages are turned sideways along the long edge - like a book.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Android native WebView
-  ///- iOS
-  ///- MacOS
+  ///- Android WebView
+  ///- iOS WKWebView
+  ///- macOS WKWebView
   static final LONG_EDGE =
       PrintJobDuplexMode._internalMultiPlatform('LONG_EDGE', () {
     switch (defaultTargetPlatform) {
@@ -41,9 +41,9 @@ class PrintJobDuplexMode {
   ///No double-sided (duplex) printing; single-sided printing only.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Android native WebView
-  ///- iOS
-  ///- MacOS
+  ///- Android WebView
+  ///- iOS WKWebView
+  ///- macOS WKWebView
   static final NONE = PrintJobDuplexMode._internalMultiPlatform('NONE', () {
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
@@ -62,9 +62,9 @@ class PrintJobDuplexMode {
   ///Pages are turned upwards along the short edge - like a notepad.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Android native WebView
-  ///- iOS
-  ///- MacOS
+  ///- Android WebView
+  ///- iOS WKWebView
+  ///- macOS WKWebView
   static final SHORT_EDGE =
       PrintJobDuplexMode._internalMultiPlatform('SHORT_EDGE', () {
     switch (defaultTargetPlatform) {
@@ -113,17 +113,65 @@ class PrintJobDuplexMode {
     return null;
   }
 
+  /// Gets a possible [PrintJobDuplexMode] instance value with name [name].
+  ///
+  /// Goes through [PrintJobDuplexMode.values] looking for a value with
+  /// name [name], as reported by [PrintJobDuplexMode.name].
+  /// Returns the first value with the given name, otherwise `null`.
+  static PrintJobDuplexMode? byName(String? name) {
+    if (name != null) {
+      try {
+        return PrintJobDuplexMode.values
+            .firstWhere((element) => element.name() == name);
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
+  }
+
+  /// Creates a map from the names of [PrintJobDuplexMode] values to the values.
+  ///
+  /// The collection that this method is called on is expected to have
+  /// values with distinct names, like the `values` list of an enum class.
+  /// Only one value for each name can occur in the created map,
+  /// so if two or more values have the same name (either being the
+  /// same value, or being values of different enum type), at most one of
+  /// them will be represented in the returned map.
+  static Map<String, PrintJobDuplexMode> asNameMap() =>
+      <String, PrintJobDuplexMode>{
+        for (final value in PrintJobDuplexMode.values) value.name(): value
+      };
+
   ///Gets [String] value.
   String toValue() => _value;
 
-  ///Gets [int?] native value.
+  ///Gets [int] native value if supported by the current platform, otherwise `null`.
   int? toNativeValue() => _nativeValue;
+
+  ///Gets the name of the value.
+  String name() {
+    switch (_value) {
+      case 'LONG_EDGE':
+        return 'LONG_EDGE';
+      case 'NONE':
+        return 'NONE';
+      case 'SHORT_EDGE':
+        return 'SHORT_EDGE';
+    }
+    return _value.toString();
+  }
 
   @override
   int get hashCode => _value.hashCode;
 
   @override
   bool operator ==(value) => value == _value;
+
+  ///Checks if the value is supported by the [defaultTargetPlatform].
+  bool isSupported() {
+    return toNativeValue() != null;
+  }
 
   @override
   String toString() {

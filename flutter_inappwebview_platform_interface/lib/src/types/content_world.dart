@@ -1,3 +1,5 @@
+import 'enum_method.dart';
+
 final _contentWorldNameRegExp = RegExp(r'[\s]');
 
 ///Class that represents an object that defines a scope of execution for JavaScript code and which you use to prevent conflicts between different scripts.
@@ -33,8 +35,17 @@ class ContentWorld {
   ///If you modify a variable with the same name as one the webpage uses, you may unintentionally disrupt the normal operation of that page.
   static final ContentWorld PAGE = ContentWorld.world(name: "page");
 
+  ///Gets a possible [ContentWorld] instance from a [Map] value.
+  static ContentWorld? fromMap(Map<String, dynamic>? map,
+      {EnumMethod? enumMethod}) {
+    if (map == null) {
+      return null;
+    }
+    return ContentWorld.world(name: map["name"]);
+  }
+
   ///Converts instance to a map.
-  Map<String, dynamic> toMap() {
+  Map<String, dynamic> toMap({EnumMethod? enumMethod}) {
     return {"name": name};
   }
 

@@ -57,6 +57,15 @@ class AndroidHttpAuthCredentialDatabase
     return _instance!;
   }
 
+  static final AndroidHttpAuthCredentialDatabase _staticValue =
+      AndroidHttpAuthCredentialDatabase(
+          AndroidHttpAuthCredentialDatabaseCreationParams(
+              const PlatformHttpAuthCredentialDatabaseCreationParams()));
+
+  factory AndroidHttpAuthCredentialDatabase.static() {
+    return _staticValue;
+  }
+
   Future<dynamic> _handleMethod(MethodCall call) async {}
 
   @override

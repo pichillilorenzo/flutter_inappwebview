@@ -345,8 +345,10 @@ public class WebViewChannelDelegate: ChannelDelegate {
             }
             break
         case .clearFocus:
-            webView?.clearFocus()
-            result(true)
+            result(webView?.clearFocus())
+            break
+        case .requestFocus:
+            result(webView?.requestFocus())
             break
         case .setContextMenu:
             if let webView = webView {
@@ -675,6 +677,36 @@ public class WebViewChannelDelegate: ChannelDelegate {
             } else {
                 result(false)
             }
+            break
+        case .setInputMethodEnabled:
+            if let webView = webView {
+                let enabled = arguments!["enabled"] as! Bool
+                webView.setInputMethodEnabled(enabled: enabled)
+            }
+            result(true)
+            break
+        case .hideInputMethod:
+            if let webView = webView {
+                webView.hideInputMethod()
+            }
+            result(true)
+            break
+        case .saveState:
+            if let webView = webView, #available(iOS 15.0, *) {
+                result(webView.saveState())
+            } else {
+                result(nil)
+            }
+            break
+        case .restoreState:
+            if let webView = webView, #available(iOS 15.0, *) {
+                let state = arguments!["state"] as! FlutterStandardTypedData
+                webView.restoreState(state: state.data)
+                result(true)
+            } else {
+                result(false)
+            }
+            break
         }
     }
     
@@ -705,8 +737,8 @@ public class WebViewChannelDelegate: ChannelDelegate {
         channel?.invokeMethod("onContentSizeChanged", arguments: arguments)
     }
     
-    public func onDownloadStartRequest(request: DownloadStartRequest) {
-        channel?.invokeMethod("onDownloadStartRequest", arguments: request.toMap())
+    public func onDownloadStarting(request: DownloadStartRequest) {
+        channel?.invokeMethod("onDownloadStarting", arguments: request.toMap())
     }
     
     public func onCreateContextMenu(hitTestResult: HitTestResult) {
@@ -965,7 +997,7 @@ public class WebViewChannelDelegate: ChannelDelegate {
         }
         // workaround for ProtectionSpace.toMap() SSL Certificate
         // https://github.com/pichillilorenzo/flutter_inappwebview/issues/1678
-        DispatchQueue.global(qos: .background).async {
+        DispatchQueue.global().async {
             let arguments = challenge.toMap()
             DispatchQueue.main.async { [weak self] in
                 if self?.channel == nil {
@@ -997,7 +1029,7 @@ public class WebViewChannelDelegate: ChannelDelegate {
         }
         // workaround for ProtectionSpace.toMap() SSL Certificate
         // https://github.com/pichillilorenzo/flutter_inappwebview/issues/1678
-        DispatchQueue.global(qos: .background).async {
+        DispatchQueue.global().async {
             let arguments = challenge.toMap()
             DispatchQueue.main.async { [weak self] in
                 if self?.channel == nil {
@@ -1029,7 +1061,7 @@ public class WebViewChannelDelegate: ChannelDelegate {
         }
         // workaround for ProtectionSpace.toMap() SSL Certificate
         // https://github.com/pichillilorenzo/flutter_inappwebview/issues/1678
-        DispatchQueue.global(qos: .background).async {
+        DispatchQueue.global().async {
             let arguments = challenge.toMap()
             DispatchQueue.main.async { [weak self] in
                 if self?.channel == nil {
@@ -1083,14 +1115,14 @@ public class WebViewChannelDelegate: ChannelDelegate {
         }
     }
     
-    public func onCallJsHandler(handlerName: String, args: String, callback: CallJsHandlerCallback) {
+    public func onCallJsHandler(handlerName: String, data: JavaScriptHandlerFunctionData, callback: CallJsHandlerCallback) {
         if channel == nil {
             callback.defaultBehaviour(nil)
             return
         }
         let arguments: [String: Any?] = [
             "handlerName": handlerName,
-            "args": args
+            "data": data.toMap()
         ]
         channel?.invokeMethod("onCallJsHandler", arguments: arguments, callback: callback)
     }
@@ -1142,7 +1174,7 @@ public class WebViewChannelDelegate: ChannelDelegate {
         }
         // workaround for ProtectionSpace.toMap() SSL Certificate
         // https://github.com/pichillilorenzo/flutter_inappwebview/issues/1678
-        DispatchQueue.global(qos: .background).async {
+        DispatchQueue.global().async {
             let arguments = challenge.toMap()
             DispatchQueue.main.async { [weak self] in
                 if self?.channel == nil {

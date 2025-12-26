@@ -53,7 +53,7 @@ public class UserContentController implements Disposable {
   @Nullable
   public WebView webView;
 
-  public UserContentController(WebView webView) {
+  public UserContentController(@Nullable WebView webView) {
     this.webView = webView;
   }
 
@@ -73,7 +73,7 @@ public class UserContentController implements Disposable {
     }
     js += generatePluginScriptsCodeAt(injectionTime);
     js += generateUserOnlyScriptsCodeAt(injectionTime);
-    js = USER_SCRIPTS_AT_DOCUMENT_END_WRAPPER_JS_SOURCE.replace(PluginScriptsUtil.VAR_PLACEHOLDER_VALUE, js);
+    js = USER_SCRIPTS_AT_DOCUMENT_END_WRAPPER_JS_SOURCE().replace(PluginScriptsUtil.VAR_PLACEHOLDER_VALUE, js);
     return js;
   }
 
@@ -83,7 +83,7 @@ public class UserContentController implements Disposable {
     js += generatePluginScriptsCodeAt(injectionTime);
     js += generateContentWorldsCreatorCode();
     js += generateUserOnlyScriptsCodeAt(injectionTime);
-    js = USER_SCRIPTS_AT_DOCUMENT_START_WRAPPER_JS_SOURCE.replace(PluginScriptsUtil.VAR_PLACEHOLDER_VALUE, js);
+    js = USER_SCRIPTS_AT_DOCUMENT_START_WRAPPER_JS_SOURCE().replace(PluginScriptsUtil.VAR_PLACEHOLDER_VALUE, js);
     return js;
   }
 
@@ -105,7 +105,7 @@ public class UserContentController implements Disposable {
       contentWorldsNames.add("'" + escapeContentWorldName(contentWorld.getName()) + "'");
     }
 
-    return CONTENT_WORLDS_GENERATOR_JS_SOURCE
+    return CONTENT_WORLDS_GENERATOR_JS_SOURCE()
             .replace(PluginScriptsUtil.VAR_CONTENT_WORLD_NAME_ARRAY, TextUtils.join(", ", contentWorldsNames))
             .replace(PluginScriptsUtil.VAR_JSON_SOURCE_ENCODED, escapeCode(source.toString()));
 
@@ -117,6 +117,7 @@ public class UserContentController implements Disposable {
     for (PluginScript script : scripts) {
       String source = ";" + script.getSource();
       source = wrapSourceCodeInContentWorld(script.getContentWorld(), source);
+      source = wrapSourceCodeAddChecks(source, script);
       js.append(source);
     }
     return js.toString();
@@ -128,6 +129,7 @@ public class UserContentController implements Disposable {
     for (UserScript script : scripts) {
       String source = ";" + script.getSource();
       source = wrapSourceCodeInContentWorld(script.getContentWorld(), source);
+      source = wrapSourceCodeAddChecks(source, script);
       js.append(source);
     }
     return js.toString();
@@ -144,7 +146,7 @@ public class UserContentController implements Disposable {
         for (PluginScript script : pluginScriptsRequired) {
           pluginScriptsSource.append(script.getSource());
         }
-        String contentWorldCreatorCode = CONTENT_WORLDS_GENERATOR_JS_SOURCE
+        String contentWorldCreatorCode = CONTENT_WORLDS_GENERATOR_JS_SOURCE()
                 .replace(PluginScriptsUtil.VAR_CONTENT_WORLD_NAME_ARRAY, "'" + escapeContentWorldName(contentWorld.getName()) + "'")
                 .replace(PluginScriptsUtil.VAR_JSON_SOURCE_ENCODED, escapeCode(pluginScriptsSource.toString()));
         sourceWrapped.append(contentWorldCreatorCode).append(";");
@@ -156,7 +158,7 @@ public class UserContentController implements Disposable {
 
   public String wrapSourceCodeInContentWorld(@Nullable ContentWorld contentWorld, String source) {
     String sourceWrapped = contentWorld == null || contentWorld.equals(ContentWorld.PAGE) ? source :
-            CONTENT_WORLD_WRAPPER_JS_SOURCE
+            CONTENT_WORLD_WRAPPER_JS_SOURCE()
                     .replace(PluginScriptsUtil.VAR_CONTENT_WORLD_NAME, escapeContentWorldName(contentWorld.getName()))
                     .replace(PluginScriptsUtil.VAR_JSON_SOURCE_ENCODED, escapeCode(source));
 
@@ -201,11 +203,16 @@ public class UserContentController implements Disposable {
       contentWorlds.add(contentWorld);
     }
     this.updateContentWorldsCreatorScript();
-    if (webView != null && userOnlyScript.getInjectionTime() == UserScriptInjectionTime.AT_DOCUMENT_START
-            && WebViewFeature.isFeatureSupported(WebViewFeature.DOCUMENT_START_SCRIPT)) {
+    if (webView != null && WebViewFeature.isFeatureSupported(WebViewFeature.DOCUMENT_START_SCRIPT)) {
+      String source = userOnlyScript.getSource();
+      if (userOnlyScript.getInjectionTime() == UserScriptInjectionTime.AT_DOCUMENT_END) {
+        source = "if (document.readyState === 'complete') { " + source + "} else { window.addEventListener('load', function() { " + source + " }); }";
+      }
+      source = wrapSourceCodeAddChecks(source, userOnlyScript);
+
       ScriptHandler scriptHandler = WebViewCompat.addDocumentStartJavaScript(
               webView,
-              wrapSourceCodeInContentWorld(userOnlyScript.getContentWorld(), userOnlyScript.getSource()),
+              wrapSourceCodeInContentWorld(userOnlyScript.getContentWorld(), source),
               userOnlyScript.getAllowedOriginRules()
       );
       this.scriptHandlerMap.put(userOnlyScript, scriptHandler);
@@ -245,6 +252,13 @@ public class UserContentController implements Disposable {
           this.scriptHandlerMap.remove(userOnlyScript);
         }
       }
+      for (UserScript userOnlyScript : this.userOnlyScripts.get(UserScriptInjectionTime.AT_DOCUMENT_END)) {
+        ScriptHandler scriptHandler = this.scriptHandlerMap.get(userOnlyScript);
+        if (scriptHandler != null) {
+          scriptHandler.remove();
+          this.scriptHandlerMap.remove(userOnlyScript);
+        }
+      }
     }
     this.userOnlyScripts.get(UserScriptInjectionTime.AT_DOCUMENT_START).clear();
     this.userOnlyScripts.get(UserScriptInjectionTime.AT_DOCUMENT_END).clear();
@@ -271,11 +285,16 @@ public class UserContentController implements Disposable {
       contentWorlds.add(contentWorld);
     }
     this.updateContentWorldsCreatorScript();
-    if (webView != null && pluginScript.getInjectionTime() == UserScriptInjectionTime.AT_DOCUMENT_START
-            && WebViewFeature.isFeatureSupported(WebViewFeature.DOCUMENT_START_SCRIPT)) {
+    if (webView != null && WebViewFeature.isFeatureSupported(WebViewFeature.DOCUMENT_START_SCRIPT)) {
+      String source = pluginScript.getSource();
+      if (pluginScript.getInjectionTime() == UserScriptInjectionTime.AT_DOCUMENT_END) {
+        source = "if (document.readyState === 'complete') { " + source + "} else { window.addEventListener('load', function() { " + source + " }); }";
+      }
+      source = wrapSourceCodeAddChecks(source, pluginScript);
+
       ScriptHandler scriptHandler = WebViewCompat.addDocumentStartJavaScript(
               webView,
-              wrapSourceCodeInContentWorld(pluginScript.getContentWorld(), pluginScript.getSource()),
+              wrapSourceCodeInContentWorld(pluginScript.getContentWorld(), source),
               pluginScript.getAllowedOriginRules()
       );
       this.scriptHandlerMap.put(pluginScript, scriptHandler);
@@ -304,6 +323,13 @@ public class UserContentController implements Disposable {
   public void removeAllPluginScripts() {
     if (WebViewFeature.isFeatureSupported(WebViewFeature.DOCUMENT_START_SCRIPT)) {
       for (PluginScript pluginScript : this.pluginScripts.get(UserScriptInjectionTime.AT_DOCUMENT_START)) {
+        ScriptHandler scriptHandler = this.scriptHandlerMap.get(pluginScript);
+        if (scriptHandler != null) {
+          scriptHandler.remove();
+          this.scriptHandlerMap.remove(pluginScript);
+        }
+      }
+      for (PluginScript pluginScript : this.pluginScripts.get(UserScriptInjectionTime.AT_DOCUMENT_END)) {
         ScriptHandler scriptHandler = this.scriptHandlerMap.get(pluginScript);
         if (scriptHandler != null) {
           scriptHandler.remove();
@@ -402,60 +428,99 @@ public class UserContentController implements Disposable {
     return new LinkedHashSet<>(this.contentWorlds);
   }
 
-  private static final String USER_SCRIPTS_AT_DOCUMENT_START_WRAPPER_JS_SOURCE = "if (window." + JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME + " != null && (window." + JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME + "._userScriptsAtDocumentStartLoaded == null || !window." + JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME + "._userScriptsAtDocumentStartLoaded)) {" +
-          "  window." + JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME + "._userScriptsAtDocumentStartLoaded = true;" +
-          "  " + PluginScriptsUtil.VAR_PLACEHOLDER_VALUE +
-          "}";
+  static private String wrapSourceCodeAddChecks(String source, UserScript userScript) {
+    StringBuilder ifStatement = new StringBuilder("if (");
+    Set<String> allowedOriginRules = userScript.getAllowedOriginRules();
+    boolean forMainFrameOnly = userScript.isForMainFrameOnly();
+    if (!WebViewFeature.isFeatureSupported(WebViewFeature.DOCUMENT_START_SCRIPT) && !allowedOriginRules.contains("*")) {
+      if (allowedOriginRules.isEmpty()) {
+        // return empty source string if allowedOriginRules is an empty list.
+        // an empty list means that this UserScript is not allowed for any origin.
+        return "";
+      }
+      StringBuilder jsRegExpArray = new StringBuilder("[");
+      for (String allowedOriginRule : allowedOriginRules) {
+        if (jsRegExpArray.length() > 1) {
+          jsRegExpArray.append(", ");
+        }
+        jsRegExpArray.append("new RegExp(").append(UserContentController.escapeCode(allowedOriginRule)).append(")");
+      }
+      if (jsRegExpArray.length() > 1) {
+        jsRegExpArray.append("]");
+        ifStatement.append(jsRegExpArray).append(".some(function(rx) { return rx.test(window.location.origin); })");
+      }
+    }
+    if (forMainFrameOnly) {
+      if (ifStatement.length() > 4) {
+        ifStatement.append(" && ");
+      }
+      ifStatement.append("window === window.top");
+    }
+    return ifStatement.length() > 4 ? ifStatement.append(") {").append(source).append("}").toString() : source;
+  }
 
-  private static final String USER_SCRIPTS_AT_DOCUMENT_END_WRAPPER_JS_SOURCE = "if (window." + JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME + " != null && (window." + JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME + "._userScriptsAtDocumentEndLoaded == null || !window." + JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME + "._userScriptsAtDocumentEndLoaded)) {" +
-          "  window." + JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME + "._userScriptsAtDocumentEndLoaded = true;" +
-          "  " + PluginScriptsUtil.VAR_PLACEHOLDER_VALUE +
-          "}";
+  private static String USER_SCRIPTS_AT_DOCUMENT_START_WRAPPER_JS_SOURCE() {
+    return "if (window._" + JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME() + "_userScriptsAtDocumentStartLoaded == null || !window._" + JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME() + "_userScriptsAtDocumentStartLoaded) {" +
+            "  window._" + JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME() + "_userScriptsAtDocumentStartLoaded = true;" +
+            "  " + PluginScriptsUtil.VAR_PLACEHOLDER_VALUE +
+            "}";
+  }
 
-  private static final String CONTENT_WORLDS_GENERATOR_JS_SOURCE = "(function() {" +
-          "  var interval = setInterval(function() {" +
-          "    if (document.body == null) {return;}" +
-          "    var contentWorldNames = [" + PluginScriptsUtil.VAR_CONTENT_WORLD_NAME_ARRAY + "];" +
-          "    for (var contentWorldName of contentWorldNames) {" +
-          "      var iframeId = '" + JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME + "_' + contentWorldName;" +
-          "      var iframe = document.getElementById(iframeId);" +
-          "      if (iframe == null) {" +
-          "        iframe = document.createElement('iframe');" +
-          "        iframe.id = iframeId;" +
-          "        iframe.style = 'display: none; z-index: 0; position: absolute; width: 0px; height: 0px';" +
-          "        document.body.append(iframe);" +
-          "      }" +
-          "      if (iframe.contentWindow.document.getElementById('" + JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME + "_plugin_scripts') == null) {" +
-          "        var script = iframe.contentWindow.document.createElement('script');" +
-          "        script.id = '" + JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME + "_plugin_scripts';" +
-          "        script.innerHTML = " + PluginScriptsUtil.VAR_JSON_SOURCE_ENCODED + ";" +
-          "        iframe.contentWindow.document.body.append(script);" +
-          "      }" +
-          "    }" +
-          "    clearInterval(interval);" +
-          "  });" +
-          "})();";
+  private static String USER_SCRIPTS_AT_DOCUMENT_END_WRAPPER_JS_SOURCE() {
+      return "if (window._" + JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME() + "_userScriptsAtDocumentEndLoaded == null || !window._" + JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME() + "_userScriptsAtDocumentEndLoaded) {" +
+              "  window._" + JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME() + "_userScriptsAtDocumentEndLoaded = true;" +
+              "  " + PluginScriptsUtil.VAR_PLACEHOLDER_VALUE +
+              "}";
+    }
 
-  private static final String CONTENT_WORLD_WRAPPER_JS_SOURCE = "(function() {" +
-          "  var interval = setInterval(function() {" +
-          "    if (document.body == null) {return;}" +
-          "    var iframeId = '" + JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME + "_" + PluginScriptsUtil.VAR_CONTENT_WORLD_NAME + "';" +
-          "    var iframe = document.getElementById(iframeId);" +
-          "    if (iframe == null) {" +
-          "      iframe = document.createElement('iframe');" +
-          "      iframe.id = iframeId;" +
-          "      iframe.style = 'display: none; z-index: 0; position: absolute; width: 0px; height: 0px';" +
-          "      document.body.append(iframe);" +
-          "    }" +
-          "    if (iframe.contentWindow.document.querySelector('#" + JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME + "_plugin_scripts') == null) {" +
-          "      return;" +
-          "    }" +
-          "    var script = iframe.contentWindow.document.createElement('script');" +
-          "    script.innerHTML = " + PluginScriptsUtil.VAR_JSON_SOURCE_ENCODED + ";" +
-          "    iframe.contentWindow.document.body.append(script);" +
-          "    clearInterval(interval);" +
-          "  });" +
-          "})();";
+  private static String CONTENT_WORLDS_GENERATOR_JS_SOURCE() {
+        return "(function() {" +
+                "  var interval = setInterval(function() {" +
+                "    if (document.body == null) {return;}" +
+                "    var contentWorldNames = [" + PluginScriptsUtil.VAR_CONTENT_WORLD_NAME_ARRAY + "];" +
+                "    for (var contentWorldName of contentWorldNames) {" +
+                "      var iframeId = '" + JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME() + "_' + contentWorldName;" +
+                "      var iframe = document.getElementById(iframeId);" +
+                "      if (iframe == null) {" +
+                "        iframe = document.createElement('iframe');" +
+                "        iframe.id = iframeId;" +
+                "        iframe.style = 'display: none; z-index: 0; position: absolute; width: 0px; height: 0px';" +
+                "        document.body.append(iframe);" +
+                "      }" +
+                "      if (iframe.contentWindow.document.getElementById('" + JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME() + "_plugin_scripts') == null) {" +
+                "        var script = iframe.contentWindow.document.createElement('script');" +
+                "        script.id = '" + JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME() + "_plugin_scripts';" +
+                "        script.innerHTML = " + PluginScriptsUtil.VAR_JSON_SOURCE_ENCODED + ";" +
+                "        iframe.contentWindow.document.body.append(script);" +
+                "      }" +
+                "    }" +
+                "    clearInterval(interval);" +
+                "  });" +
+                "})();";
+      }
+
+  private static String CONTENT_WORLD_WRAPPER_JS_SOURCE() {
+          return "(function() {" +
+                  "  var interval = setInterval(function() {" +
+                  "    if (document.body == null) {return;}" +
+                  "    var iframeId = '" + JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME() + "_" + PluginScriptsUtil.VAR_CONTENT_WORLD_NAME + "';" +
+                  "    var iframe = document.getElementById(iframeId);" +
+                  "    if (iframe == null) {" +
+                  "      iframe = document.createElement('iframe');" +
+                  "      iframe.id = iframeId;" +
+                  "      iframe.style = 'display: none; z-index: 0; position: absolute; width: 0px; height: 0px';" +
+                  "      document.body.append(iframe);" +
+                  "    }" +
+                  "    if (iframe.contentWindow.document.querySelector('#" + JavaScriptBridgeJS.get_JAVASCRIPT_BRIDGE_NAME() + "_plugin_scripts') == null) {" +
+                  "      return;" +
+                  "    }" +
+                  "    var script = iframe.contentWindow.document.createElement('script');" +
+                  "    script.innerHTML = " + PluginScriptsUtil.VAR_JSON_SOURCE_ENCODED + ";" +
+                  "    iframe.contentWindow.document.body.append(script);" +
+                  "    clearInterval(interval);" +
+                  "  });" +
+                  "})();";
+        }
 
   private static final String DOCUMENT_READY_WRAPPER_JS_SOURCE = "if (document.readyState === 'interactive' || document.readyState === 'complete') { " +
           "  " + PluginScriptsUtil.VAR_PLACEHOLDER_VALUE +

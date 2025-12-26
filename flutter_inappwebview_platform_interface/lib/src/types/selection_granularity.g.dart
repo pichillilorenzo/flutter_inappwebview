@@ -54,20 +54,44 @@ class SelectionGranularity {
     return null;
   }
 
+  /// Gets a possible [SelectionGranularity] instance value with name [name].
+  ///
+  /// Goes through [SelectionGranularity.values] looking for a value with
+  /// name [name], as reported by [SelectionGranularity.name].
+  /// Returns the first value with the given name, otherwise `null`.
+  static SelectionGranularity? byName(String? name) {
+    if (name != null) {
+      try {
+        return SelectionGranularity.values
+            .firstWhere((element) => element.name() == name);
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
+  }
+
+  /// Creates a map from the names of [SelectionGranularity] values to the values.
+  ///
+  /// The collection that this method is called on is expected to have
+  /// values with distinct names, like the `values` list of an enum class.
+  /// Only one value for each name can occur in the created map,
+  /// so if two or more values have the same name (either being the
+  /// same value, or being values of different enum type), at most one of
+  /// them will be represented in the returned map.
+  static Map<String, SelectionGranularity> asNameMap() =>
+      <String, SelectionGranularity>{
+        for (final value in SelectionGranularity.values) value.name(): value
+      };
+
   ///Gets [int] value.
   int toValue() => _value;
 
   ///Gets [int] native value.
   int toNativeValue() => _nativeValue;
 
-  @override
-  int get hashCode => _value.hashCode;
-
-  @override
-  bool operator ==(value) => value == _value;
-
-  @override
-  String toString() {
+  ///Gets the name of the value.
+  String name() {
     switch (_value) {
       case 1:
         return 'CHARACTER';
@@ -75,6 +99,22 @@ class SelectionGranularity {
         return 'DYNAMIC';
     }
     return _value.toString();
+  }
+
+  @override
+  int get hashCode => _value.hashCode;
+
+  @override
+  bool operator ==(value) => value == _value;
+
+  ///Checks if the value is supported by the [defaultTargetPlatform].
+  bool isSupported() {
+    return true;
+  }
+
+  @override
+  String toString() {
+    return name();
   }
 }
 
@@ -128,20 +168,45 @@ class IOSWKSelectionGranularity {
     return null;
   }
 
+  /// Gets a possible [IOSWKSelectionGranularity] instance value with name [name].
+  ///
+  /// Goes through [IOSWKSelectionGranularity.values] looking for a value with
+  /// name [name], as reported by [IOSWKSelectionGranularity.name].
+  /// Returns the first value with the given name, otherwise `null`.
+  static IOSWKSelectionGranularity? byName(String? name) {
+    if (name != null) {
+      try {
+        return IOSWKSelectionGranularity.values
+            .firstWhere((element) => element.name() == name);
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
+  }
+
+  /// Creates a map from the names of [IOSWKSelectionGranularity] values to the values.
+  ///
+  /// The collection that this method is called on is expected to have
+  /// values with distinct names, like the `values` list of an enum class.
+  /// Only one value for each name can occur in the created map,
+  /// so if two or more values have the same name (either being the
+  /// same value, or being values of different enum type), at most one of
+  /// them will be represented in the returned map.
+  static Map<String, IOSWKSelectionGranularity> asNameMap() =>
+      <String, IOSWKSelectionGranularity>{
+        for (final value in IOSWKSelectionGranularity.values)
+          value.name(): value
+      };
+
   ///Gets [int] value.
   int toValue() => _value;
 
   ///Gets [int] native value.
   int toNativeValue() => _nativeValue;
 
-  @override
-  int get hashCode => _value.hashCode;
-
-  @override
-  bool operator ==(value) => value == _value;
-
-  @override
-  String toString() {
+  ///Gets the name of the value.
+  String name() {
     switch (_value) {
       case 1:
         return 'CHARACTER';
@@ -149,5 +214,21 @@ class IOSWKSelectionGranularity {
         return 'DYNAMIC';
     }
     return _value.toString();
+  }
+
+  @override
+  int get hashCode => _value.hashCode;
+
+  @override
+  bool operator ==(value) => value == _value;
+
+  ///Checks if the value is supported by the [defaultTargetPlatform].
+  bool isSupported() {
+    return true;
+  }
+
+  @override
+  String toString() {
+    return name();
   }
 }

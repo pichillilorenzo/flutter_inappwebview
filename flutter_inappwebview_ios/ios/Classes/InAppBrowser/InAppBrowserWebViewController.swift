@@ -47,18 +47,17 @@ public class InAppBrowserWebViewController: UIViewController, InAppBrowserDelega
     var initialMimeType: String?
     var initialEncoding: String?
     var initialBaseUrl: String?
-    var previousStatusBarStyle = -1
     var initialUserScripts: [[String: Any]] = []
     var pullToRefreshInitialSettings: [String: Any?] = [:]
     var isHidden = false
     var menuItems: [InAppBrowserMenuItem] = []
 
     public override func loadView() {
-        guard let plugin = plugin, let registrar = plugin.registrar else {
+        guard let plugin = plugin else {
             return
         }
         
-        let channel = FlutterMethodChannel(name: InAppBrowserWebViewController.METHOD_CHANNEL_NAME_PREFIX + id, binaryMessenger: registrar.messenger())
+        let channel = FlutterMethodChannel(name: InAppBrowserWebViewController.METHOD_CHANNEL_NAME_PREFIX + id, binaryMessenger: plugin.registrar.messenger())
         channelDelegate = InAppBrowserChannelDelegate(channel: channel)
         
         var userScripts: [UserScript] = []
@@ -214,7 +213,9 @@ public class InAppBrowserWebViewController: UIViewController, InAppBrowserDelega
     }
     
     public override func viewDidDisappear(_ animated: Bool) {
-        dispose()
+        if !isHidden {
+            dispose()
+        }
         super.viewDidDisappear(animated)
     }
     
@@ -411,31 +412,27 @@ public class InAppBrowserWebViewController: UIViewController, InAppBrowserDelega
     }
     
     public func show(completion: (() -> Void)? = nil) {
-        if let navController = navigationController as? InAppBrowserNavigationController, let window = navController.tmpWindow {
+        if let visibleViewController = UIApplication.shared.visibleViewController,
+           let navigationController = navigationController {
             isHidden = false
-            window.alpha = 0.0
-            window.isHidden = false
-            window.makeKeyAndVisible()
-            UIView.animate(withDuration: 0.2) {
-                window.alpha = 1.0
+            visibleViewController.present(navigationController, animated: true) {
                 completion?()
             }
+        } else {
+            completion?()
         }
     }
 
     public func hide(completion: (() -> Void)? = nil) {
-        if let navController = navigationController as? InAppBrowserNavigationController, let window = navController.tmpWindow {
+        if let navigationController = navigationController {
             isHidden = true
-            window.alpha = 1.0
-            UIView.animate(withDuration: 0.2) {
-                window.alpha = 0.0
-            } completion: { (finished) in
-                if finished {
-                    window.isHidden = true
-                    UIApplication.shared.delegate?.window??.makeKeyAndVisible()
-                    completion?()
-                }
+            navigationController.dismiss(animated: true) {
+                completion?()
+                UIApplication.shared.delegate?.window??.makeKeyAndVisible()
             }
+        } else {
+            completion?()
+            UIApplication.shared.delegate?.window??.makeKeyAndVisible()
         }
     }
     
@@ -451,24 +448,31 @@ public class InAppBrowserWebViewController: UIViewController, InAppBrowserDelega
     
     public func close(completion: (() -> Void)? = nil) {
         if (navigationController?.responds(to: #selector(getter: navigationController?.presentingViewController)))! {
-            navigationController?.presentingViewController?.dismiss(animated: true, completion: {() -> Void in
+            if let presentingViewController = navigationController?.presentingViewController {
+                presentingViewController.dismiss(animated: true, completion: {() -> Void in
+                    completion?()
+                    self.dispose()
+                })
+            } else {
                 completion?()
-            })
+                dispose()
+            }
         }
         else {
-            navigationController?.parent?.dismiss(animated: true, completion: {() -> Void in
+            if let parent = navigationController?.parent {
+                parent.dismiss(animated: true, completion: {() -> Void in
+                    completion?()
+                    self.dispose()
+                })
+            } else {
                 completion?()
-            })
+                dispose()
+            }
         }
     }
     
     @objc public func close() {
-        if (navigationController?.responds(to: #selector(getter: navigationController?.presentingViewController)))! {
-            navigationController?.presentingViewController?.dismiss(animated: true, completion: nil)
-        }
-        else {
-            navigationController?.parent?.dismiss(animated: true, completion: nil)
-        }
+        close(completion: nil)
     }
     
     @objc public func goBack() {
@@ -633,9 +637,6 @@ public class InAppBrowserWebViewController: UIViewController, InAppBrowserDelega
         webView?.removeFromSuperview()
         webView = nil
         view = nil
-        if previousStatusBarStyle != -1, let statusBarStyle = UIStatusBarStyle(rawValue: previousStatusBarStyle) {
-            UIApplication.shared.statusBarStyle = statusBarStyle
-        }
         transitioningDelegate = nil
         searchBar?.delegate = nil
         closeButton?.target = nil
@@ -644,6 +645,7 @@ public class InAppBrowserWebViewController: UIViewController, InAppBrowserDelega
         reloadButton?.target = nil
         shareButton?.target = nil
         menuButton?.target = nil
+        plugin?.inAppBrowserManager?.navControllers[id] = nil
         plugin = nil
     }
     

@@ -1,4 +1,5 @@
 import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_platform_interface.dart';
@@ -54,6 +55,15 @@ class AndroidProcessGlobalConfig extends PlatformProcessGlobalConfig
         AndroidProcessGlobalConfigCreationParams(
             const PlatformProcessGlobalConfigCreationParams()));
     return _instance!;
+  }
+
+  static final AndroidProcessGlobalConfig _staticValue =
+      AndroidProcessGlobalConfig(AndroidProcessGlobalConfigCreationParams(
+          const PlatformProcessGlobalConfigCreationParams()));
+
+  /// Provide static access.
+  factory AndroidProcessGlobalConfig.static() {
+    return _staticValue;
   }
 
   Future<dynamic> _handleMethod(MethodCall call) async {}

@@ -55,6 +55,15 @@ class MacOSWebMessageListener extends PlatformWebMessageListener
     initMethodCallHandler();
   }
 
+  static final MacOSWebMessageListener _staticValue = MacOSWebMessageListener(
+      MacOSWebMessageListenerCreationParams(
+          jsObjectName: '', allowedOriginRules: Set.from(["*"])));
+
+  /// Provide static access.
+  factory MacOSWebMessageListener.static() {
+    return _staticValue;
+  }
+
   ///Message Listener ID used internally.
   final String _id = IdGenerator.generate();
 

@@ -39,7 +39,7 @@ class MacOSWebStorageManager extends PlatformWebStorageManager
         ) {
     channel = const MethodChannel(
         'com.pichillilorenzo/flutter_inappwebview_webstoragemanager');
-    handler = handleMethod;
+    handler = _handleMethod;
     initMethodCallHandler();
   }
 
@@ -54,6 +54,15 @@ class MacOSWebStorageManager extends PlatformWebStorageManager
     _instance = MacOSWebStorageManager(MacOSWebStorageManagerCreationParams(
         const PlatformWebStorageManagerCreationParams()));
     return _instance!;
+  }
+
+  static MacOSWebStorageManager? _static;
+
+  /// Provide static access.
+  factory MacOSWebStorageManager.static() {
+    _static ??= MacOSWebStorageManager(MacOSWebStorageManagerCreationParams(
+        const PlatformWebStorageManagerCreationParams()));
+    return _static!;
   }
 
   Future<dynamic> _handleMethod(MethodCall call) async {}
@@ -127,8 +136,4 @@ class MacOSWebStorageManager extends PlatformWebStorageManager
   void dispose() {
     // empty
   }
-}
-
-extension InternalWebStorageManager on MacOSWebStorageManager {
-  get handleMethod => _handleMethod;
 }

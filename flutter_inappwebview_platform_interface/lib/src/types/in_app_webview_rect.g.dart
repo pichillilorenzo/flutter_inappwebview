@@ -28,7 +28,8 @@ class InAppWebViewRect {
   }
 
   ///Gets a possible [InAppWebViewRect] instance from a [Map] value.
-  static InAppWebViewRect? fromMap(Map<String, dynamic>? map) {
+  static InAppWebViewRect? fromMap(Map<String, dynamic>? map,
+      {EnumMethod? enumMethod}) {
     if (map == null) {
       return null;
     }
@@ -42,7 +43,7 @@ class InAppWebViewRect {
   }
 
   ///Converts instance to a map.
-  Map<String, dynamic> toMap() {
+  Map<String, dynamic> toMap({EnumMethod? enumMethod}) {
     return {
       "height": height,
       "width": width,

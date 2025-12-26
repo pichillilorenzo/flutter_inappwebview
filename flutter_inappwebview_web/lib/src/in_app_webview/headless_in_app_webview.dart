@@ -30,8 +30,10 @@ class WebPlatformHeadlessInAppWebViewCreationParams
       super.shouldOverrideUrlLoading,
       super.onLoadResource,
       super.onScrollChanged,
-      @Deprecated('Use onDownloadStartRequest instead') super.onDownloadStart,
+      @Deprecated('Use onDownloadStarting instead') super.onDownloadStart,
+      @Deprecated('Use onDownloadStarting instead')
       super.onDownloadStartRequest,
+      super.onDownloadStarting,
       @Deprecated('Use onLoadResourceWithCustomScheme instead')
       super.onLoadResourceCustomScheme,
       super.onLoadResourceWithCustomScheme,
@@ -148,6 +150,7 @@ class WebPlatformHeadlessInAppWebViewCreationParams
             onScrollChanged: params.onScrollChanged,
             onDownloadStart: params.onDownloadStart,
             onDownloadStartRequest: params.onDownloadStartRequest,
+            onDownloadStarting: params.onDownloadStarting,
             onLoadResourceCustomScheme: params.onLoadResourceCustomScheme,
             onLoadResourceWithCustomScheme:
                 params.onLoadResourceWithCustomScheme,
@@ -265,6 +268,14 @@ class WebPlatformHeadlessInAppWebView extends PlatformHeadlessInAppWebView
     id = IdGenerator.generate();
   }
 
+  static final WebPlatformHeadlessInAppWebView _staticValue =
+      WebPlatformHeadlessInAppWebView(
+          WebPlatformHeadlessInAppWebViewCreationParams());
+
+  factory WebPlatformHeadlessInAppWebView.static() {
+    return _staticValue;
+  }
+
   @override
   WebPlatformInAppWebViewController? get webViewController =>
       _webViewController;
@@ -350,7 +361,8 @@ class WebPlatformHeadlessInAppWebView extends PlatformHeadlessInAppWebView
     if (params.onLoadResource != null && settings.useOnLoadResource == null) {
       settings.useOnLoadResource = true;
     }
-    if (params.onDownloadStartRequest != null &&
+    if ((params.onDownloadStartRequest != null ||
+            params.onDownloadStarting != null) &&
         settings.useOnDownloadStart == null) {
       settings.useOnDownloadStart = true;
     }

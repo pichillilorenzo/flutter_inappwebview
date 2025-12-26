@@ -6,6 +6,7 @@ import 'print_job_rendering_quality.dart';
 import 'print_job_state.dart';
 import 'print_job_page_order.dart';
 import 'printer.dart';
+import 'enum_method.dart';
 
 part 'print_job_info.g.dart';
 

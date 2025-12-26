@@ -25,6 +25,8 @@ public class InAppWebViewSettings: ISettings<InAppWebView> {
     var contentBlockers: [[String: [String : Any]]] = []
     var minimumFontSize = 0
     var useShouldInterceptAjaxRequest = false
+    var useOnAjaxReadyStateChange = false
+    var useOnAjaxProgress = false
     var interceptOnlyAsyncAjaxRequests = true
     var useShouldInterceptFetchRequest = false
     var incognito = false
@@ -55,12 +57,26 @@ public class InAppWebViewSettings: ISettings<InAppWebView> {
     var isElementFullscreenEnabled = true
     var isInspectable = false
     var shouldPrintBackgrounds = false
+    var javaScriptHandlersOriginAllowList: [String]? = nil
+    var javaScriptBridgeEnabled = true
+    var javaScriptBridgeOriginAllowList: [String]? = nil
+    var javaScriptBridgeForMainFrameOnly = false
+    var pluginScriptsOriginAllowList: [String]? = nil
+    var pluginScriptsForMainFrameOnly = false
+    var alpha: Double? = nil
     
     override init(){
         super.init()
     }
     
     override func parse(settings: [String: Any?]) -> InAppWebViewSettings {
+        var settings = settings // re-assing to be able to use removeValue
+        // nullable values with primitive type (Int, Double, etc.)
+        // must be handled here as super.parse will not work
+        if let alphaValue = settings["alpha"] as? Double {
+            alpha = alphaValue
+            settings.removeValue(forKey: "alpha")
+        }
         let _ = super.parse(settings: settings)
         if #available(macOS 10.15, *) {} else {
             applePayAPIEnabled = false

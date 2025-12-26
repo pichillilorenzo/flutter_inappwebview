@@ -1,3 +1,29 @@
+## 1.2.0-beta.3
+
+- Updated flutter_inappwebview_platform_interface version to ^1.4.0-beta.3
+- Implemented `saveState`, `restoreState` InAppWebViewController methods
+- Implemented `PlatformProxyController` class
+- Fixed internal javascript callback handlers when the WebView has windowId not null
+- Fixed crash of unhandled `onPrintRequest` WebView event
+- Fixed "When useShouldInterceptAjaxRequest is true, some ajax requests doesn't work" [#2197](https://github.com/pichillilorenzo/flutter_inappwebview/issues/2197)
+- Merged "🐛 fix MacOS: when using the `WebMessageListener` `onPostMessage` method, the message parameter is unexpectedly empty" [#2481](https://github.com/pichillilorenzo/flutter_inappwebview/pull/2481) (thanks to [imoyakin](https://github.com/imoyakin))
+- Merged "fix #2484, Remove not-empty assert for Cookie.value" [#2486](https://github.com/pichillilorenzo/flutter_inappwebview/pull/2486) (thanks to [laishere](https://github.com/laishere))
+
+## 1.2.0-beta.2
+
+- Updated flutter_inappwebview_platform_interface version to ^1.4.0-beta.2
+- Implemented `alpha` property of `InAppWebViewSettings`
+
+## 1.2.0-beta.1
+
+- Updated flutter_inappwebview_platform_interface version to ^1.4.0-beta.1
+- Implemented `requestFocus`, `clearFocus` WebView methods
+- Updated ConsoleLogJS internal PluginScript to main-frame only as using it on non-main frames could cause issues such as [#1738](https://github.com/pichillilorenzo/flutter_inappwebview/issues/1738)
+- Added support for `UserScript.allowedOriginRules` parameter
+- Moved `WKUserContentController` initialization on `preWKWebViewConfiguration` to fix possible `undefined is not an object (evaluating 'window.webkit.messageHandlers')` javascript error
+- Merged "change priority of DispatchQueue" [#2322](https://github.com/pichillilorenzo/flutter_inappwebview/pull/2322) (thanks to [nnnlog](https://github.com/nnnlog))
+- Implemented workaround for "[macOS] Copy Shortcut does not work if TextField outside of WebView has focus" [#2380](https://github.com/pichillilorenzo/flutter_inappwebview/issues/2380)
+
 ## 1.1.2
 
 - Updated flutter_inappwebview_platform_interface version to ^1.3.0

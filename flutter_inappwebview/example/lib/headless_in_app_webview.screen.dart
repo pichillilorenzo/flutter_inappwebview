@@ -35,12 +35,12 @@ class _HeadlessInAppWebViewExampleScreenState
       onConsoleMessage: (controller, consoleMessage) {
         print("CONSOLE MESSAGE: " + consoleMessage.message);
       },
-      onLoadStart: (controller, url) async {
+      onLoadStart: (controller, url) {
         setState(() {
           this.url = url.toString();
         });
       },
-      onLoadStop: (controller, url) async {
+      onLoadStop: (controller, url) {
         setState(() {
           this.url = url.toString();
         });

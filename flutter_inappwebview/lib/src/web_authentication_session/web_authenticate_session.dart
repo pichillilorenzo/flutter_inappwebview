@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_platform_interface.dart';
 
 ///{@macro flutter_inappwebview_platform_interface.PlatformWebAuthenticationSession}
@@ -69,4 +70,28 @@ class WebAuthenticationSession {
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebAuthenticationSession.isAvailable}
   static Future<bool> isAvailable() =>
       PlatformWebAuthenticationSession.static().isAvailable();
+
+  ///{@template flutter_inappwebview.WebAuthenticationSession.isClassSupported}
+  ///Check if the current class is supported by the [defaultTargetPlatform] or a specific [platform].
+  ///{@endtemplate}
+  static bool isClassSupported({TargetPlatform? platform}) =>
+      PlatformWebAuthenticationSession.static()
+          .isClassSupported(platform: platform);
+
+  ///{@template flutter_inappwebview.WebAuthenticationSession.isPropertySupported}
+  ///Check if the given [property] is supported by the [defaultTargetPlatform] or a specific [platform].
+  ///The property should be one of the [PlatformWebAuthenticationSessionProperty] or [PlatformWebAuthenticationSessionCreationParamsProperty] values.
+  ///{@endtemplate}
+  static bool isPropertySupported(dynamic property,
+          {TargetPlatform? platform}) =>
+      PlatformWebAuthenticationSession.static()
+          .isPropertySupported(property, platform: platform);
+
+  ///{@template flutter_inappwebview.WebAuthenticationSession.isMethodSupported}
+  ///Check if the given [method] is supported by the [defaultTargetPlatform] or a specific [platform].
+  ///{@endtemplate}
+  static bool isMethodSupported(PlatformWebAuthenticationSessionMethod method,
+          {TargetPlatform? platform}) =>
+      PlatformWebAuthenticationSession.static()
+          .isMethodSupported(method, platform: platform);
 }

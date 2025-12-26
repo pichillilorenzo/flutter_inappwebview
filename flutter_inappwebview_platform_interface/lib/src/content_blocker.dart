@@ -16,16 +16,22 @@ class ContentBlocker {
 
   ContentBlocker({required this.trigger, required this.action});
 
-  Map<String, Map<String, dynamic>> toMap() {
-    return {"trigger": trigger.toMap(), "action": action.toMap()};
+  Map<String, Map<String, dynamic>> toMap({EnumMethod? enumMethod}) {
+    return {
+      "trigger": trigger.toMap(enumMethod: enumMethod),
+      "action": action.toMap(enumMethod: enumMethod)
+    };
   }
 
-  static ContentBlocker fromMap(Map<dynamic, Map<dynamic, dynamic>> map) {
+  static ContentBlocker fromMap(Map<dynamic, Map<dynamic, dynamic>> map,
+      {EnumMethod? enumMethod}) {
     return ContentBlocker(
         trigger: ContentBlockerTrigger.fromMap(
-            Map<String, dynamic>.from(map["trigger"]!)),
+            Map<String, dynamic>.from(map["trigger"]!),
+            enumMethod: enumMethod),
         action: ContentBlockerAction.fromMap(
-            Map<String, dynamic>.from(map["action"]!)));
+            Map<String, dynamic>.from(map["action"]!),
+            enumMethod: enumMethod));
   }
 
   @override
@@ -138,18 +144,30 @@ class ContentBlockerTrigger {
     assert(!(this.ifTopUrl.isEmpty || this.unlessTopUrl.isEmpty) == false);
   }
 
-  Map<String, dynamic> toMap() {
+  Map<String, dynamic> toMap({EnumMethod? enumMethod}) {
     List<String> resourceTypeStringList = [];
     resourceType.forEach((type) {
-      resourceTypeStringList.add(type.toNativeValue());
+      resourceTypeStringList.add(switch (enumMethod ?? EnumMethod.nativeValue) {
+        EnumMethod.nativeValue => type.toNativeValue(),
+        EnumMethod.value => type.toValue(),
+        EnumMethod.name => type.name()
+      });
     });
     List<String> loadTypeStringList = [];
     loadType.forEach((type) {
-      loadTypeStringList.add(type.toNativeValue());
+      loadTypeStringList.add(switch (enumMethod ?? EnumMethod.nativeValue) {
+        EnumMethod.nativeValue => type.toNativeValue(),
+        EnumMethod.value => type.toValue(),
+        EnumMethod.name => type.name()
+      });
     });
     List<String> loadContextStringList = [];
     loadContext.forEach((type) {
-      loadContextStringList.add(type.toNativeValue());
+      loadContextStringList.add(switch (enumMethod ?? EnumMethod.nativeValue) {
+        EnumMethod.nativeValue => type.toNativeValue(),
+        EnumMethod.value => type.toValue(),
+        EnumMethod.name => type.name()
+      });
     });
 
     Map<String, dynamic> map = {
@@ -175,7 +193,8 @@ class ContentBlockerTrigger {
     return map;
   }
 
-  static ContentBlockerTrigger fromMap(Map<String, dynamic> map) {
+  static ContentBlockerTrigger fromMap(Map<String, dynamic> map,
+      {EnumMethod? enumMethod}) {
     List<ContentBlockerTriggerResourceType> resourceType = [];
     List<ContentBlockerTriggerLoadType> loadType = [];
     List<ContentBlockerTriggerLoadContext> loadContext = [];
@@ -183,7 +202,13 @@ class ContentBlockerTrigger {
     List<String> resourceTypeStringList =
         List<String>.from(map["resource-type"] ?? []);
     resourceTypeStringList.forEach((typeValue) {
-      var type = ContentBlockerTriggerResourceType.fromNativeValue(typeValue);
+      var type = switch (enumMethod ?? EnumMethod.nativeValue) {
+        EnumMethod.nativeValue =>
+          ContentBlockerTriggerResourceType.fromNativeValue(typeValue),
+        EnumMethod.value =>
+          ContentBlockerTriggerResourceType.fromValue(typeValue),
+        EnumMethod.name => ContentBlockerTriggerResourceType.byName(typeValue),
+      };
       if (type != null) {
         resourceType.add(type);
       }
@@ -191,7 +216,12 @@ class ContentBlockerTrigger {
 
     List<String> loadTypeStringList = List<String>.from(map["load-type"] ?? []);
     loadTypeStringList.forEach((typeValue) {
-      var type = ContentBlockerTriggerLoadType.fromNativeValue(typeValue);
+      var type = switch (enumMethod ?? EnumMethod.nativeValue) {
+        EnumMethod.nativeValue =>
+          ContentBlockerTriggerLoadType.fromNativeValue(typeValue),
+        EnumMethod.value => ContentBlockerTriggerLoadType.fromValue(typeValue),
+        EnumMethod.name => ContentBlockerTriggerLoadType.byName(typeValue),
+      };
       if (type != null) {
         loadType.add(type);
       }
@@ -200,7 +230,13 @@ class ContentBlockerTrigger {
     List<String> loadContextStringList =
         List<String>.from(map["load-context"] ?? []);
     loadContextStringList.forEach((typeValue) {
-      var context = ContentBlockerTriggerLoadContext.fromNativeValue(typeValue);
+      var context = switch (enumMethod ?? EnumMethod.nativeValue) {
+        EnumMethod.nativeValue =>
+          ContentBlockerTriggerLoadContext.fromNativeValue(typeValue),
+        EnumMethod.value =>
+          ContentBlockerTriggerLoadContext.fromValue(typeValue),
+        EnumMethod.name => ContentBlockerTriggerLoadContext.byName(typeValue),
+      };
       if (context != null) {
         loadContext.add(context);
       }
@@ -244,9 +280,13 @@ class ContentBlockerAction {
     }
   }
 
-  Map<String, dynamic> toMap() {
+  Map<String, dynamic> toMap({EnumMethod? enumMethod}) {
     Map<String, dynamic> map = {
-      "type": type.toNativeValue(),
+      "type": switch (enumMethod ?? EnumMethod.nativeValue) {
+        EnumMethod.nativeValue => type.toNativeValue(),
+        EnumMethod.value => type.toValue(),
+        EnumMethod.name => type.name()
+      },
       "selector": selector
     };
 
@@ -260,9 +300,15 @@ class ContentBlockerAction {
     return map;
   }
 
-  static ContentBlockerAction fromMap(Map<String, dynamic> map) {
+  static ContentBlockerAction fromMap(Map<String, dynamic> map,
+      {EnumMethod? enumMethod}) {
     return ContentBlockerAction(
-        type: ContentBlockerActionType.fromNativeValue(map["type"])!,
+        type: switch (enumMethod ?? EnumMethod.nativeValue) {
+          EnumMethod.nativeValue =>
+            ContentBlockerActionType.fromNativeValue(map["type"]),
+          EnumMethod.value => ContentBlockerActionType.fromValue(map["type"]),
+          EnumMethod.name => ContentBlockerActionType.byName(map["type"])
+        }!,
         selector: map["selector"]);
   }
 

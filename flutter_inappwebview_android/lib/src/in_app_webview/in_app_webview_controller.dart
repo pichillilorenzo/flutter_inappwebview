@@ -1,39 +1,19 @@
-import 'dart:io';
 import 'dart:collection';
 import 'dart:convert';
 import 'dart:core';
 import 'dart:developer' as developer;
-import 'dart:typed_data';
-import 'dart:ui';
+import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_platform_interface.dart';
 
-import '../web_message/main.dart';
-
 import '../in_app_browser/in_app_browser.dart';
-import '../web_storage/web_storage.dart';
-
-import 'headless_in_app_webview.dart';
-import '_static_channel.dart';
-
 import '../print_job/main.dart';
-
-///List of forbidden names for JavaScript handlers.
-// ignore: non_constant_identifier_names
-final _JAVASCRIPT_HANDLER_FORBIDDEN_NAMES = UnmodifiableListView<String>([
-  "onLoadResource",
-  "shouldInterceptAjaxRequest",
-  "onAjaxReadyStateChange",
-  "onAjaxProgress",
-  "shouldInterceptFetchRequest",
-  "onPrintRequest",
-  "onWindowFocus",
-  "onWindowBlur",
-  "callAsyncJavaScript",
-  "evaluateJavaScriptWithContentWorld"
-]);
+import '../web_message/main.dart';
+import '../web_storage/web_storage.dart';
+import '_static_channel.dart';
+import 'headless_in_app_webview.dart';
 
 /// Object specifying creation parameters for creating a [AndroidInAppWebViewController].
 ///
@@ -66,8 +46,7 @@ class AndroidInAppWebViewController extends PlatformInAppWebViewController
   static final MethodChannel _staticChannel = IN_APP_WEBVIEW_STATIC_CHANNEL;
 
   // List of properties to be saved and restored for keep alive feature
-  Map<String, JavaScriptHandlerCallback> _javaScriptHandlersMap =
-      HashMap<String, JavaScriptHandlerCallback>();
+  Map<String, Function> _javaScriptHandlersMap = HashMap<String, Function>();
   Map<UserScriptInjectionTime, List<UserScript>> _userScripts = {
     UserScriptInjectionTime.AT_DOCUMENT_START: <UserScript>[],
     UserScriptInjectionTime.AT_DOCUMENT_END: <UserScript>[]
@@ -363,11 +342,11 @@ class AndroidInAppWebViewController extends PlatformInAppWebViewController
             _inAppBrowserEventHandler!.onScrollChanged(x, y);
         }
         break;
-      case "onDownloadStartRequest":
+      case "onDownloadStarting":
         if ((webviewParams != null &&
-                // ignore: deprecated_member_use_from_same_package
                 (webviewParams!.onDownloadStart != null ||
-                    webviewParams!.onDownloadStartRequest != null)) ||
+                    webviewParams!.onDownloadStartRequest != null ||
+                    webviewParams!.onDownloadStarting != null)) ||
             _inAppBrowserEventHandler != null) {
           Map<String, dynamic> arguments =
               call.arguments.cast<String, dynamic>();
@@ -375,20 +354,25 @@ class AndroidInAppWebViewController extends PlatformInAppWebViewController
               DownloadStartRequest.fromMap(arguments)!;
 
           if (webviewParams != null) {
-            if (webviewParams!.onDownloadStartRequest != null)
+            if (webviewParams!.onDownloadStarting != null)
+              return (await webviewParams!.onDownloadStarting!(
+                      _controllerFromPlatform, downloadStartRequest))
+                  ?.toMap();
+            else if (webviewParams!.onDownloadStartRequest != null)
               webviewParams!.onDownloadStartRequest!(
                   _controllerFromPlatform, downloadStartRequest);
             else {
-              // ignore: deprecated_member_use_from_same_package
               webviewParams!.onDownloadStart!(
                   _controllerFromPlatform, downloadStartRequest.url);
             }
           } else {
-            // ignore: deprecated_member_use_from_same_package
             _inAppBrowserEventHandler!
                 .onDownloadStart(downloadStartRequest.url);
             _inAppBrowserEventHandler!
                 .onDownloadStartRequest(downloadStartRequest);
+            return (await _inAppBrowserEventHandler!
+                    .onDownloadStarting(downloadStartRequest))
+                ?.toMap();
           }
         }
         break;
@@ -1406,19 +1390,42 @@ class AndroidInAppWebViewController extends PlatformInAppWebViewController
                 .onContentSizeChanged(oldContentSize, newContentSize);
         }
         break;
+      case "onShowFileChooser":
+        if ((webviewParams != null &&
+                webviewParams!.onShowFileChooser != null) ||
+            _inAppBrowserEventHandler != null) {
+          Map<String, dynamic> arguments =
+              call.arguments.cast<String, dynamic>();
+          ShowFileChooserRequest request =
+              ShowFileChooserRequest.fromMap(arguments)!;
+
+          if (webviewParams != null && webviewParams!.onShowFileChooser != null)
+            return (await webviewParams!.onShowFileChooser!(
+                    _controllerFromPlatform, request))
+                ?.toMap();
+          else
+            return (await _inAppBrowserEventHandler!.onShowFileChooser(request))
+                ?.toMap();
+        }
+        break;
       case "onCallJsHandler":
         String handlerName = call.arguments["handlerName"];
+        Map<String, dynamic> handlerDataMap =
+            call.arguments["data"].cast<String, dynamic>();
         // decode args to json
-        List<dynamic> args = jsonDecode(call.arguments["args"]);
+        handlerDataMap["args"] = jsonDecode(handlerDataMap["args"]);
+        final handlerData =
+            JavaScriptHandlerFunctionData.fromMap(handlerDataMap)!;
 
-        _debugLog(handlerName, args);
+        _debugLog(handlerName, handlerData);
 
         switch (handlerName) {
           case "onLoadResource":
             if ((webviewParams != null &&
                     webviewParams!.onLoadResource != null) ||
                 _inAppBrowserEventHandler != null) {
-              Map<String, dynamic> arguments = args[0].cast<String, dynamic>();
+              Map<String, dynamic> arguments =
+                  handlerData.args[0].cast<String, dynamic>();
               arguments["startTime"] = arguments["startTime"] is int
                   ? arguments["startTime"].toDouble()
                   : arguments["startTime"];
@@ -1440,7 +1447,8 @@ class AndroidInAppWebViewController extends PlatformInAppWebViewController
             if ((webviewParams != null &&
                     webviewParams!.shouldInterceptAjaxRequest != null) ||
                 _inAppBrowserEventHandler != null) {
-              Map<String, dynamic> arguments = args[0].cast<String, dynamic>();
+              Map<String, dynamic> arguments =
+                  handlerData.args[0].cast<String, dynamic>();
               AjaxRequest request = AjaxRequest.fromMap(arguments)!;
 
               if (webviewParams != null &&
@@ -1457,43 +1465,46 @@ class AndroidInAppWebViewController extends PlatformInAppWebViewController
             if ((webviewParams != null &&
                     webviewParams!.onAjaxReadyStateChange != null) ||
                 _inAppBrowserEventHandler != null) {
-              Map<String, dynamic> arguments = args[0].cast<String, dynamic>();
+              Map<String, dynamic> arguments =
+                  handlerData.args[0].cast<String, dynamic>();
               AjaxRequest request = AjaxRequest.fromMap(arguments)!;
 
               if (webviewParams != null &&
                   webviewParams!.onAjaxReadyStateChange != null)
-                return (await webviewParams!.onAjaxReadyStateChange!(
+                return jsonEncode((await webviewParams!.onAjaxReadyStateChange!(
                         _controllerFromPlatform, request))
-                    ?.toNativeValue();
+                    ?.toNativeValue());
               else
-                return (await _inAppBrowserEventHandler!
+                return jsonEncode((await _inAppBrowserEventHandler!
                         .onAjaxReadyStateChange(request))
-                    ?.toNativeValue();
+                    ?.toNativeValue());
             }
             return null;
           case "onAjaxProgress":
             if ((webviewParams != null &&
                     webviewParams!.onAjaxProgress != null) ||
                 _inAppBrowserEventHandler != null) {
-              Map<String, dynamic> arguments = args[0].cast<String, dynamic>();
+              Map<String, dynamic> arguments =
+                  handlerData.args[0].cast<String, dynamic>();
               AjaxRequest request = AjaxRequest.fromMap(arguments)!;
 
               if (webviewParams != null &&
                   webviewParams!.onAjaxProgress != null)
-                return (await webviewParams!.onAjaxProgress!(
+                return jsonEncode((await webviewParams!.onAjaxProgress!(
                         _controllerFromPlatform, request))
-                    ?.toNativeValue();
+                    ?.toNativeValue());
               else
-                return (await _inAppBrowserEventHandler!
-                        .onAjaxProgress(request))
-                    ?.toNativeValue();
+                return jsonEncode(
+                    (await _inAppBrowserEventHandler!.onAjaxProgress(request))
+                        ?.toNativeValue());
             }
             return null;
           case "shouldInterceptFetchRequest":
             if ((webviewParams != null &&
                     webviewParams!.shouldInterceptFetchRequest != null) ||
                 _inAppBrowserEventHandler != null) {
-              Map<String, dynamic> arguments = args[0].cast<String, dynamic>();
+              Map<String, dynamic> arguments =
+                  handlerData.args[0].cast<String, dynamic>();
               FetchRequest request = FetchRequest.fromMap(arguments)!;
 
               if (webviewParams != null &&
@@ -1519,7 +1530,7 @@ class AndroidInAppWebViewController extends PlatformInAppWebViewController
               _inAppBrowserEventHandler!.onWindowBlur();
             return null;
           case "onInjectedScriptLoaded":
-            String id = args[0];
+            String id = handlerData.args[0];
             var onLoadCallback = _injectedScriptsFromURL[id]?.onLoad;
             if ((webviewParams != null || _inAppBrowserEventHandler != null) &&
                 onLoadCallback != null) {
@@ -1527,7 +1538,7 @@ class AndroidInAppWebViewController extends PlatformInAppWebViewController
             }
             return null;
           case "onInjectedScriptError":
-            String id = args[0];
+            String id = handlerData.args[0];
             var onErrorCallback = _injectedScriptsFromURL[id]?.onError;
             if ((webviewParams != null || _inAppBrowserEventHandler != null) &&
                 onErrorCallback != null) {
@@ -1539,7 +1550,19 @@ class AndroidInAppWebViewController extends PlatformInAppWebViewController
         if (_javaScriptHandlersMap.containsKey(handlerName)) {
           // convert result to json
           try {
-            return jsonEncode(await _javaScriptHandlersMap[handlerName]!(args));
+            var jsHandlerResult = null;
+            if (_javaScriptHandlersMap[handlerName]
+                is JavaScriptHandlerCallback) {
+              jsHandlerResult = await (_javaScriptHandlersMap[handlerName]
+                  as JavaScriptHandlerCallback)(handlerData.args);
+            } else if (_javaScriptHandlersMap[handlerName]
+                is JavaScriptHandlerFunction) {
+              jsHandlerResult = await (_javaScriptHandlersMap[handlerName]
+                  as JavaScriptHandlerFunction)(handlerData);
+            } else {
+              jsHandlerResult = await _javaScriptHandlersMap[handlerName]!();
+            }
+            return jsonEncode(jsHandlerResult);
           } catch (error, stacktrace) {
             developer.log(error.toString() + '\n' + stacktrace.toString(),
                 name: 'JavaScript Handler "$handlerName"');
@@ -1986,16 +2009,14 @@ class AndroidInAppWebViewController extends PlatformInAppWebViewController
 
   @override
   void addJavaScriptHandler(
-      {required String handlerName,
-      required JavaScriptHandlerCallback callback}) {
-    assert(!_JAVASCRIPT_HANDLER_FORBIDDEN_NAMES.contains(handlerName),
+      {required String handlerName, required Function callback}) {
+    assert(!kJavaScriptHandlerForbiddenNames.contains(handlerName),
         '"$handlerName" is a forbidden name!');
     this._javaScriptHandlersMap[handlerName] = (callback);
   }
 
   @override
-  JavaScriptHandlerCallback? removeJavaScriptHandler(
-      {required String handlerName}) {
+  Function? removeJavaScriptHandler({required String handlerName}) {
     return this._javaScriptHandlersMap.remove(handlerName);
   }
 
@@ -2242,9 +2263,32 @@ class AndroidInAppWebViewController extends PlatformInAppWebViewController
   }
 
   @override
+  Future<bool?> requestFocus(
+      {FocusDirection? direction,
+      InAppWebViewRect? previouslyFocusedRect}) async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    args.putIfAbsent("direction", () => direction?.toNativeValue());
+    args.putIfAbsent(
+        "previouslyFocusedRect", () => previouslyFocusedRect?.toMap());
+    return await channel?.invokeMethod<bool>('requestFocus', args);
+  }
+
+  @override
   Future<void> clearFocus() async {
     Map<String, dynamic> args = <String, dynamic>{};
     return await channel?.invokeMethod('clearFocus', args);
+  }
+
+  @override
+  Future<void> showInputMethod() async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    return await channel?.invokeMethod('showInputMethod', args);
+  }
+
+  @override
+  Future<void> hideInputMethod() async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    return await channel?.invokeMethod('hideInputMethod', args);
   }
 
   @override
@@ -2649,6 +2693,19 @@ class AndroidInAppWebViewController extends PlatformInAppWebViewController
   }
 
   @override
+  Future<Uint8List?> saveState() async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    return await channel?.invokeMethod<Uint8List?>('saveState', args);
+  }
+
+  @override
+  Future<bool> restoreState(Uint8List? state) async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    args.putIfAbsent('state', () => state);
+    return await channel?.invokeMethod<bool>('restoreState', args) ?? false;
+  }
+
+  @override
   Future<String> getDefaultUserAgent() async {
     Map<String, dynamic> args = <String, dynamic>{};
     return await _staticChannel.invokeMethod<String>(
@@ -2736,6 +2793,29 @@ class AndroidInAppWebViewController extends PlatformInAppWebViewController
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('includeDiskFiles', () => includeDiskFiles);
     await _staticChannel.invokeMethod('clearAllCache', args);
+  }
+
+  @override
+  Future<void> enableSlowWholeDocumentDraw() async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    await _staticChannel.invokeMethod('enableSlowWholeDocumentDraw', args);
+  }
+
+  @override
+  Future<void> setJavaScriptBridgeName(String bridgeName) async {
+    assert(RegExp(r'^[a-zA-Z_]\w*$').hasMatch(bridgeName),
+        'bridgeName must be a non-empty string with only alphanumeric and underscore characters. It can\'t start with a number.');
+    Map<String, dynamic> args = <String, dynamic>{};
+    args.putIfAbsent('bridgeName', () => bridgeName);
+    await _staticChannel.invokeMethod('setJavaScriptBridgeName', args);
+  }
+
+  @override
+  Future<String> getJavaScriptBridgeName() async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    return await _staticChannel.invokeMethod<String>(
+            'getJavaScriptBridgeName', args) ??
+        '';
   }
 
   @override

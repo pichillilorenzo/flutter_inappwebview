@@ -9,7 +9,7 @@ part of 'custom_scheme_registration.dart';
 ///Class that represents the registration of a custom scheme for [WebViewEnvironmentSettings] method.
 ///
 ///**Officially Supported Platforms/Implementations**:
-///- Windows
+///- Windows WebView2
 class CustomSchemeRegistration {
   ///List of origins that are allowed to issue requests with the custom scheme, such as XHRs and subresource requests that have an Origin header.
   List<String>? allowedOrigins;
@@ -27,7 +27,7 @@ class CustomSchemeRegistration {
 
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Windows
+  ///- Windows WebView2
   CustomSchemeRegistration(
       {this.allowedOrigins,
       this.hasAuthorityComponent,
@@ -35,7 +35,8 @@ class CustomSchemeRegistration {
       this.treatAsSecure});
 
   ///Gets a possible [CustomSchemeRegistration] instance from a [Map] value.
-  static CustomSchemeRegistration? fromMap(Map<String, dynamic>? map) {
+  static CustomSchemeRegistration? fromMap(Map<String, dynamic>? map,
+      {EnumMethod? enumMethod}) {
     if (map == null) {
       return null;
     }
@@ -51,7 +52,7 @@ class CustomSchemeRegistration {
   }
 
   ///Converts instance to a map.
-  Map<String, dynamic> toMap() {
+  Map<String, dynamic> toMap({EnumMethod? enumMethod}) {
     return {
       "allowedOrigins": allowedOrigins,
       "hasAuthorityComponent": hasAuthorityComponent,

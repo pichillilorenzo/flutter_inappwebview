@@ -39,6 +39,14 @@ class IOSPullToRefreshController extends PlatformPullToRefreshController
                   .fromPlatformPullToRefreshControllerCreationParams(params),
         );
 
+  static final IOSPullToRefreshController _staticValue =
+      IOSPullToRefreshController(IOSPullToRefreshControllerCreationParams());
+
+  /// Provide static access.
+  factory IOSPullToRefreshController.static() {
+    return _staticValue;
+  }
+
   _debugLog(String method, dynamic args) {
     debugLog(
         className: this.runtimeType.toString(),

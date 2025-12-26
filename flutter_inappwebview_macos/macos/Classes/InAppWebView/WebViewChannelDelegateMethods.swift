@@ -58,6 +58,8 @@ public enum WebViewChannelDelegateMethods: String {
     case getSelectedText = "getSelectedText"
     case getScrollX = "getScrollX"
     case getScrollY = "getScrollY"
+    case clearFocus = "clearFocus"
+    case requestFocus = "requestFocus"
     case getCertificate = "getCertificate"
     case addUserScript = "addUserScript"
     case removeUserScript = "removeUserScript"
@@ -84,4 +86,6 @@ public enum WebViewChannelDelegateMethods: String {
     case getMicrophoneCaptureState = "getMicrophoneCaptureState"
     case setMicrophoneCaptureState = "setMicrophoneCaptureState"
     case loadSimulatedRequest = "loadSimulatedRequest"
+    case saveState = "saveState"
+    case restoreState = "restoreState"
 }

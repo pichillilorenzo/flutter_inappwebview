@@ -1,16 +1,15 @@
 import 'package:flutter/foundation.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_platform_interface.dart';
-import 'headless_in_app_webview.dart';
 
 import '../find_interaction/find_interaction_controller.dart';
-import 'in_app_webview_controller.dart';
-import '../pull_to_refresh/main.dart';
 import '../pull_to_refresh/pull_to_refresh_controller.dart';
+import 'headless_in_app_webview.dart';
+import 'in_app_webview_controller.dart';
 
 /// Object specifying creation parameters for creating a [PlatformInAppWebViewWidget].
 ///
@@ -39,8 +38,10 @@ class AndroidInAppWebViewWidgetCreationParams
       super.shouldOverrideUrlLoading,
       super.onLoadResource,
       super.onScrollChanged,
-      @Deprecated('Use onDownloadStartRequest instead') super.onDownloadStart,
+      @Deprecated('Use onDownloadStarting instead') super.onDownloadStart,
+      @Deprecated('Use onDownloadStarting instead')
       super.onDownloadStartRequest,
+      super.onDownloadStarting,
       @Deprecated('Use onLoadResourceWithCustomScheme instead')
       super.onLoadResourceCustomScheme,
       super.onLoadResourceWithCustomScheme,
@@ -126,6 +127,7 @@ class AndroidInAppWebViewWidgetCreationParams
       super.onCameraCaptureStateChanged,
       super.onMicrophoneCaptureStateChanged,
       super.onContentSizeChanged,
+      super.onShowFileChooser,
       super.initialUrlRequest,
       super.initialFile,
       super.initialData,
@@ -163,6 +165,7 @@ class AndroidInAppWebViewWidgetCreationParams
             onScrollChanged: params.onScrollChanged,
             onDownloadStart: params.onDownloadStart,
             onDownloadStartRequest: params.onDownloadStartRequest,
+            onDownloadStarting: params.onDownloadStarting,
             onLoadResourceCustomScheme: params.onLoadResourceCustomScheme,
             onLoadResourceWithCustomScheme:
                 params.onLoadResourceWithCustomScheme,
@@ -243,6 +246,7 @@ class AndroidInAppWebViewWidgetCreationParams
             onMicrophoneCaptureStateChanged:
                 params.onMicrophoneCaptureStateChanged,
             onContentSizeChanged: params.onContentSizeChanged,
+            onShowFileChooser: params.onShowFileChooser,
             initialUrlRequest: params.initialUrlRequest,
             initialFile: params.initialFile,
             initialData: params.initialData,
@@ -282,6 +286,13 @@ class AndroidInAppWebViewWidget extends PlatformInAppWebViewWidget {
 
   AndroidHeadlessInAppWebView? get _androidHeadlessInAppWebView =>
       params.headlessWebView as AndroidHeadlessInAppWebView?;
+
+  static final AndroidInAppWebViewWidget _staticValue =
+      AndroidInAppWebViewWidget(AndroidInAppWebViewWidgetCreationParams());
+
+  factory AndroidInAppWebViewWidget.static() {
+    return _staticValue;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -422,15 +433,24 @@ class AndroidInAppWebViewWidget extends PlatformInAppWebViewWidget {
     if (params.onLoadResource != null && settings.useOnLoadResource == null) {
       settings.useOnLoadResource = true;
     }
-    if (params.onDownloadStartRequest != null &&
+    if ((params.onDownloadStartRequest != null ||
+            params.onDownloadStarting != null) &&
         settings.useOnDownloadStart == null) {
       settings.useOnDownloadStart = true;
     }
     if ((params.shouldInterceptAjaxRequest != null ||
-            params.onAjaxProgress != null ||
-            params.onAjaxReadyStateChange != null) &&
-        settings.useShouldInterceptAjaxRequest == null) {
-      settings.useShouldInterceptAjaxRequest = true;
+        params.onAjaxProgress != null ||
+        params.onAjaxReadyStateChange != null)) {
+      if (settings.useShouldInterceptAjaxRequest == null) {
+        settings.useShouldInterceptAjaxRequest = true;
+      }
+      if (params.onAjaxReadyStateChange != null &&
+          settings.useOnAjaxReadyStateChange == null) {
+        settings.useOnAjaxReadyStateChange = true;
+      }
+      if (params.onAjaxProgress != null && settings.useOnAjaxProgress == null) {
+        settings.useOnAjaxProgress = true;
+      }
     }
     if (params.shouldInterceptFetchRequest != null &&
         settings.useShouldInterceptFetchRequest == null) {
@@ -447,6 +467,10 @@ class AndroidInAppWebViewWidget extends PlatformInAppWebViewWidget {
     if (params.onNavigationResponse != null &&
         settings.useOnNavigationResponse == null) {
       settings.useOnNavigationResponse = true;
+    }
+    if (params.onShowFileChooser != null &&
+        settings.useOnShowFileChooser == null) {
+      settings.useOnShowFileChooser = true;
     }
   }
 

@@ -3,6 +3,7 @@ import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_i
 import '../util.dart';
 import '../x509_certificate/x509_certificate.dart';
 import '../x509_certificate/asn1_distinguished_names.dart';
+import 'enum_method.dart';
 
 import 'ssl_certificate_dname.dart';
 
@@ -34,7 +35,8 @@ class SslCertificate_ {
       this.x509Certificate});
 
   ///Gets a possible [SslCertificate] instance from a [Map] value.
-  static SslCertificate? fromMap(Map<String, dynamic>? map) {
+  static SslCertificate? fromMap(Map<String, dynamic>? map,
+      {EnumMethod? enumMethod}) {
     if (map == null) {
       return null;
     }
@@ -81,10 +83,12 @@ class SslCertificate_ {
     }
 
     return SslCertificate(
-      issuedBy:
-          SslCertificateDName.fromMap(map["issuedBy"]?.cast<String, dynamic>()),
-      issuedTo:
-          SslCertificateDName.fromMap(map["issuedTo"]?.cast<String, dynamic>()),
+      issuedBy: SslCertificateDName.fromMap(
+          map["issuedBy"]?.cast<String, dynamic>(),
+          enumMethod: enumMethod),
+      issuedTo: SslCertificateDName.fromMap(
+          map["issuedTo"]?.cast<String, dynamic>(),
+          enumMethod: enumMethod),
       validNotAfterDate: map["validNotAfterDate"] != null
           ? DateTime.fromMillisecondsSinceEpoch(map["validNotAfterDate"])
           : null,

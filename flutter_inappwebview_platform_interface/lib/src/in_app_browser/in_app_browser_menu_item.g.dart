@@ -9,9 +9,9 @@ part of 'in_app_browser_menu_item.dart';
 ///Class that represents a custom menu item for a [PlatformInAppBrowser] instance.
 ///
 ///**Officially Supported Platforms/Implementations**:
-///- Android native WebView
-///- iOS
-///- MacOS
+///- Android WebView
+///- iOS WKWebView
+///- macOS WKWebView
 class InAppBrowserMenuItem {
   ///Item icon.
   dynamic icon;
@@ -19,9 +19,9 @@ class InAppBrowserMenuItem {
   ///Icon color.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Android native WebView
-  ///- iOS 13.0+
-  ///- MacOS
+  ///- Android WebView
+  ///- iOS WKWebView 13.0+
+  ///- macOS WKWebView
   Color? iconColor;
 
   ///The menu item id.
@@ -41,9 +41,9 @@ class InAppBrowserMenuItem {
 
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Android native WebView
-  ///- iOS
-  ///- MacOS
+  ///- Android WebView
+  ///- iOS WKWebView
+  ///- macOS WKWebView
   InAppBrowserMenuItem(
       {this.icon,
       this.iconColor,
@@ -54,12 +54,13 @@ class InAppBrowserMenuItem {
       required this.title});
 
   ///Gets a possible [InAppBrowserMenuItem] instance from a [Map] value.
-  static InAppBrowserMenuItem? fromMap(Map<String, dynamic>? map) {
+  static InAppBrowserMenuItem? fromMap(Map<String, dynamic>? map,
+      {EnumMethod? enumMethod}) {
     if (map == null) {
       return null;
     }
     final instance = InAppBrowserMenuItem(
-      icon: _deserializeIcon(map['icon']),
+      icon: _deserializeIcon(map['icon'], enumMethod: enumMethod),
       iconColor: map['iconColor'] != null
           ? UtilColor.fromStringRepresentation(map['iconColor'])
           : null,
@@ -67,14 +68,16 @@ class InAppBrowserMenuItem {
       order: map['order'],
       title: map['title'],
     );
-    instance.showAsAction = map['showAsAction'];
+    if (map['showAsAction'] != null) {
+      instance.showAsAction = map['showAsAction'];
+    }
     return instance;
   }
 
   ///Converts instance to a map.
-  Map<String, dynamic> toMap() {
+  Map<String, dynamic> toMap({EnumMethod? enumMethod}) {
     return {
-      "icon": _serializeIcon(icon),
+      "icon": _serializeIcon(icon, enumMethod: enumMethod),
       "iconColor": iconColor?.toHex(),
       "id": id,
       "order": order,

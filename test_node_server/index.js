@@ -12,6 +12,7 @@
 // - Overwrite certificate.pfx to example/test_assets/certificate.pfx
 const express = require('express');
 const http = require('http');
+const net = require('net');
 const https = require('https');
 const cors = require('cors');
 const auth = require('basic-auth');
@@ -224,19 +225,41 @@ app.get("/test-download-file", (req, res) => {
 app.listen(8082)
 
 // Proxy server
-http.createServer(function (req, res) {
-    res.setHeader('Content-type', 'text/html');
-    res.write(`
-        <html>
-          <head>
-          </head>
-          <body>
-            <h1>Proxy Works</h1>
-            <p id="url">${req.url}</p>
-            <p id="method">${req.method}</p>
-            <p id="headers">${JSON.stringify(req.headers)}</p>
-          </body>
-        </html>
-      `);
-    res.end();
-}).listen(8083);
+// Create an HTTP tunneling proxy
+const proxy = http.createServer((req, res) => {
+  console.log('proxy response', req.url);
+  res.writeHead(200, { 'Content-Type': 'text/html' });
+  res.end(`
+    <html>
+      <head>
+      </head>
+      <body>
+        <h1>Proxy Works</h1>
+        <p id="url">${req.url}</p>
+        <p id="method">${req.method}</p>
+        <p id="headers">${JSON.stringify(req.headers)}</p>
+      </body>
+    </html>
+  `);
+});
+proxy.on('connect', (req, clientSocket, head) => {
+  console.log('proxy connect request');
+  // Connect to an origin server
+  // const { port, hostname } = new URL(`http://${req.url}`);
+  const { port, hostname } = new URL(`http://127.0.0.1:8083`);
+  const serverSocket = net.connect(port || 80, hostname, () => {
+    clientSocket.write('HTTP/1.1 200 Connection Established\r\n' +
+                    'Proxy-agent: Node.js-Proxy\r\n' +
+                    '\r\n');
+    serverSocket.write(head);
+    serverSocket.pipe(clientSocket);
+    clientSocket.pipe(serverSocket);
+  });
+});
+proxy.listen(8083, null, () => {
+  console.log('proxy server listening on port 8083');
+});
+
+process.on('uncaughtException', function (err) {
+  console.error(err);
+});

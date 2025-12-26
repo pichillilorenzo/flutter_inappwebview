@@ -10,96 +10,90 @@ part of 'cookie.dart';
 class Cookie {
   ///The cookie domain.
   ///
-  ///**NOTE for Android native WebView**: available on Android only if [WebViewFeature.GET_COOKIE_INFO] feature is supported.
-  ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- iOS
-  ///- MacOS
-  ///- Android native WebView
-  ///- Windows
+  ///- iOS WKWebView
+  ///- macOS WKWebView
+  ///- Android WebView:
+  ///    - available on Android only if [WebViewFeature.GET_COOKIE_INFO] feature is supported.
+  ///- Windows WebView2
   String? domain;
 
   ///The cookie expiration date in milliseconds.
   ///
-  ///**NOTE for Android native WebView**: available on Android only if [WebViewFeature.GET_COOKIE_INFO] feature is supported.
-  ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- iOS
-  ///- MacOS
-  ///- Android native WebView
-  ///- Windows
+  ///- iOS WKWebView
+  ///- macOS WKWebView
+  ///- Android WebView:
+  ///    - available on Android only if [WebViewFeature.GET_COOKIE_INFO] feature is supported.
+  ///- Windows WebView2
   int? expiresDate;
 
   ///Indicates if the cookie is a http only cookie.
   ///
-  ///**NOTE for Android native WebView**: available on Android only if [WebViewFeature.GET_COOKIE_INFO] feature is supported.
-  ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- iOS
-  ///- MacOS
-  ///- Android native WebView
-  ///- Windows
+  ///- iOS WKWebView
+  ///- macOS WKWebView
+  ///- Android WebView:
+  ///    - available on Android only if [WebViewFeature.GET_COOKIE_INFO] feature is supported.
+  ///- Windows WebView2
   bool? isHttpOnly;
 
   ///Indicates if the cookie is secure or not.
   ///
-  ///**NOTE for Android native WebView**: available on Android only if [WebViewFeature.GET_COOKIE_INFO] feature is supported.
-  ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- iOS
-  ///- MacOS
-  ///- Android native WebView
-  ///- Windows
+  ///- iOS WKWebView
+  ///- macOS WKWebView
+  ///- Android WebView:
+  ///    - available on Android only if [WebViewFeature.GET_COOKIE_INFO] feature is supported.
+  ///- Windows WebView2
   bool? isSecure;
 
   ///Indicates if the cookie is a session only cookie.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- iOS
-  ///- MacOS
-  ///- Windows
+  ///- iOS WKWebView
+  ///- macOS WKWebView
+  ///- Windows WebView2
   bool? isSessionOnly;
 
   ///The cookie name.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- iOS
-  ///- MacOS
-  ///- Android native WebView
-  ///- Web but iframe requires same origin
-  ///- Windows
+  ///- iOS WKWebView
+  ///- macOS WKWebView
+  ///- Android WebView
+  ///- Web \<iframe\> but requires same origin
+  ///- Windows WebView2
   String name;
 
   ///The cookie path.
   ///
-  ///**NOTE for Android native WebView**: available on Android only if [WebViewFeature.GET_COOKIE_INFO] feature is supported.
-  ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- iOS
-  ///- MacOS
-  ///- Android native WebView
-  ///- Windows
+  ///- iOS WKWebView
+  ///- macOS WKWebView
+  ///- Android WebView:
+  ///    - available on Android only if [WebViewFeature.GET_COOKIE_INFO] feature is supported.
+  ///- Windows WebView2
   String? path;
 
   ///The cookie same site policy.
   ///
-  ///**NOTE for Android native WebView**: available on Android only if [WebViewFeature.GET_COOKIE_INFO] feature is supported.
-  ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- iOS
-  ///- MacOS
-  ///- Android native WebView
-  ///- Windows
+  ///- iOS WKWebView
+  ///- macOS WKWebView
+  ///- Android WebView:
+  ///    - available on Android only if [WebViewFeature.GET_COOKIE_INFO] feature is supported.
+  ///- Windows WebView2
   HTTPCookieSameSitePolicy? sameSite;
 
   ///The cookie value.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- iOS
-  ///- MacOS
-  ///- Android native WebView
-  ///- Web but iframe requires same origin
-  ///- Windows
+  ///- iOS WKWebView
+  ///- macOS WKWebView
+  ///- Android WebView
+  ///- Web \<iframe\> but requires same origin
+  ///- Windows WebView2
   dynamic value;
   Cookie(
       {this.domain,
@@ -113,7 +107,7 @@ class Cookie {
       this.value});
 
   ///Gets a possible [Cookie] instance from a [Map] value.
-  static Cookie? fromMap(Map<String, dynamic>? map) {
+  static Cookie? fromMap(Map<String, dynamic>? map, {EnumMethod? enumMethod}) {
     if (map == null) {
       return null;
     }
@@ -125,14 +119,19 @@ class Cookie {
       isSessionOnly: map['isSessionOnly'],
       name: map['name'],
       path: map['path'],
-      sameSite: HTTPCookieSameSitePolicy.fromNativeValue(map['sameSite']),
+      sameSite: switch (enumMethod ?? EnumMethod.nativeValue) {
+        EnumMethod.nativeValue =>
+          HTTPCookieSameSitePolicy.fromNativeValue(map['sameSite']),
+        EnumMethod.value => HTTPCookieSameSitePolicy.fromValue(map['sameSite']),
+        EnumMethod.name => HTTPCookieSameSitePolicy.byName(map['sameSite'])
+      },
       value: map['value'],
     );
     return instance;
   }
 
   ///Converts instance to a map.
-  Map<String, dynamic> toMap() {
+  Map<String, dynamic> toMap({EnumMethod? enumMethod}) {
     return {
       "domain": domain,
       "expiresDate": expiresDate,
@@ -141,7 +140,11 @@ class Cookie {
       "isSessionOnly": isSessionOnly,
       "name": name,
       "path": path,
-      "sameSite": sameSite?.toNativeValue(),
+      "sameSite": switch (enumMethod ?? EnumMethod.nativeValue) {
+        EnumMethod.nativeValue => sameSite?.toNativeValue(),
+        EnumMethod.value => sameSite?.toValue(),
+        EnumMethod.name => sameSite?.name()
+      },
       "value": value,
     };
   }

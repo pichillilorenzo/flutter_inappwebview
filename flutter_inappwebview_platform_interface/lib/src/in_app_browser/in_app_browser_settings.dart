@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_internal_annotations.dart';
 
 import '../types/in_app_webview_rect.dart';
@@ -17,6 +18,7 @@ import '../in_app_webview/android/in_app_webview_options.dart';
 
 import 'apple/in_app_browser_options.dart';
 import '../in_app_webview/apple/in_app_webview_options.dart';
+import '../types/enum_method.dart';
 
 part 'in_app_browser_settings.g.dart';
 
@@ -53,14 +55,16 @@ class InAppBrowserClassSettings {
   }
 
   factory InAppBrowserClassSettings.fromMap(Map<String, dynamic> options,
-      {InAppBrowserClassSettings? instance}) {
+      {InAppBrowserClassSettings? instance, EnumMethod? enumMethod}) {
     if (instance == null) {
       instance = InAppBrowserClassSettings();
     }
     instance.browserSettings =
-        InAppBrowserSettings.fromMap(options) ?? InAppBrowserSettings();
+        InAppBrowserSettings.fromMap(options, enumMethod: enumMethod) ??
+            InAppBrowserSettings();
     instance.webViewSettings =
-        InAppWebViewSettings.fromMap(options) ?? InAppWebViewSettings();
+        InAppWebViewSettings.fromMap(options, enumMethod: enumMethod) ??
+            InAppWebViewSettings();
     return instance;
   }
 
@@ -92,8 +96,16 @@ class BrowserOptions {
   }
 }
 
+///{@template flutter_inappwebview_platform_interface.InAppWebViewSettings}
 ///This class represents all [InAppBrowser] settings available.
+///{@endtemplate}
 @ExchangeableObject(copyMethod: true)
+@SupportedPlatforms(platforms: [
+  AndroidPlatform(),
+  IOSPlatform(),
+  MacOSPlatform(),
+  WindowsPlatform()
+])
 class InAppBrowserSettings_
     implements BrowserOptions, AndroidOptions, IosOptions {
   ///Set to `true` to create the browser and load the page, but not show it. Omit or set to `false` to have the browser open and load normally.
@@ -274,6 +286,12 @@ class InAppBrowserSettings_
   Map<String, dynamic> toMap() {
     throw UnimplementedError();
   }
+
+  ///Check if the given [property] is supported by the [defaultTargetPlatform] or a specific [platform].
+  static bool isPropertySupported(InAppBrowserSettingsProperty property,
+          {TargetPlatform? platform}) =>
+      _InAppBrowserSettingsPropertySupported.isPropertySupported(property,
+          platform: platform);
 }
 
 ///Class that represents the options that can be used for an [InAppBrowser] WebView.
@@ -329,7 +347,8 @@ class InAppBrowserClassOptions {
     return toMap().toString();
   }
 
-  static InAppBrowserClassOptions fromMap(Map<String, dynamic> options) {
+  static InAppBrowserClassOptions fromMap(Map<String, dynamic> options,
+      {EnumMethod? enumMethod}) {
     InAppBrowserClassOptions inAppBrowserClassOptions =
         InAppBrowserClassOptions();
 

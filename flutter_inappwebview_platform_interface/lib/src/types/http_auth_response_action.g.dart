@@ -17,12 +17,29 @@ class HttpAuthResponseAction {
       HttpAuthResponseAction._internal(value, nativeValue());
 
   ///Instructs the WebView to cancel the authentication request.
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Android WebView
+  ///- iOS WKWebView
+  ///- macOS WKWebView
+  ///- Windows WebView2
   static const CANCEL = HttpAuthResponseAction._internal(0, 0);
 
   ///Instructs the WebView to proceed with the authentication with the given credentials.
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Android WebView
+  ///- iOS WKWebView
+  ///- macOS WKWebView
+  ///- Windows WebView2
   static const PROCEED = HttpAuthResponseAction._internal(1, 1);
 
   ///Uses the credentials stored for the current host.
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Android WebView
+  ///- iOS WKWebView
+  ///- macOS WKWebView
   static const USE_SAVED_HTTP_AUTH_CREDENTIALS =
       HttpAuthResponseAction._internal(2, 2);
 
@@ -59,20 +76,44 @@ class HttpAuthResponseAction {
     return null;
   }
 
+  /// Gets a possible [HttpAuthResponseAction] instance value with name [name].
+  ///
+  /// Goes through [HttpAuthResponseAction.values] looking for a value with
+  /// name [name], as reported by [HttpAuthResponseAction.name].
+  /// Returns the first value with the given name, otherwise `null`.
+  static HttpAuthResponseAction? byName(String? name) {
+    if (name != null) {
+      try {
+        return HttpAuthResponseAction.values
+            .firstWhere((element) => element.name() == name);
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
+  }
+
+  /// Creates a map from the names of [HttpAuthResponseAction] values to the values.
+  ///
+  /// The collection that this method is called on is expected to have
+  /// values with distinct names, like the `values` list of an enum class.
+  /// Only one value for each name can occur in the created map,
+  /// so if two or more values have the same name (either being the
+  /// same value, or being values of different enum type), at most one of
+  /// them will be represented in the returned map.
+  static Map<String, HttpAuthResponseAction> asNameMap() =>
+      <String, HttpAuthResponseAction>{
+        for (final value in HttpAuthResponseAction.values) value.name(): value
+      };
+
   ///Gets [int] value.
   int toValue() => _value;
 
   ///Gets [int] native value.
   int toNativeValue() => _nativeValue;
 
-  @override
-  int get hashCode => _value.hashCode;
-
-  @override
-  bool operator ==(value) => value == _value;
-
-  @override
-  String toString() {
+  ///Gets the name of the value.
+  String name() {
     switch (_value) {
       case 0:
         return 'CANCEL';
@@ -82,5 +123,21 @@ class HttpAuthResponseAction {
         return 'USE_SAVED_HTTP_AUTH_CREDENTIALS';
     }
     return _value.toString();
+  }
+
+  @override
+  int get hashCode => _value.hashCode;
+
+  @override
+  bool operator ==(value) => value == _value;
+
+  ///Checks if the value is supported by the [defaultTargetPlatform].
+  bool isSupported() {
+    return toNativeValue() != null;
+  }
+
+  @override
+  String toString() {
+    return name();
   }
 }

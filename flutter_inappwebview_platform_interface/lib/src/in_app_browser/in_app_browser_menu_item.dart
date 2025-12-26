@@ -7,24 +7,25 @@ import '../util.dart';
 
 import 'platform_in_app_browser.dart';
 import '../types/main.dart';
+import '../types/enum_method.dart';
 
 part 'in_app_browser_menu_item.g.dart';
 
-dynamic _serializeIcon(dynamic icon) {
-  return icon is Uint8List ? icon : icon?.toMap();
+dynamic _serializeIcon(dynamic icon, {EnumMethod? enumMethod}) {
+  return icon is Uint8List ? icon : icon?.toMap(enumMethod: enumMethod);
 }
 
-dynamic _deserializeIcon(dynamic icon) {
+dynamic _deserializeIcon(dynamic icon, {EnumMethod? enumMethod}) {
   if (icon is Uint8List) {
     return icon;
   }
   if (icon is Map<String, dynamic>) {
     final iconMap = icon as Map<String, dynamic>;
     if (iconMap.containsKey('defType')) {
-      return AndroidResource.fromMap(iconMap);
+      return AndroidResource.fromMap(iconMap, enumMethod: enumMethod);
     }
     if (iconMap.containsKey('systemName')) {
-      return UIImage.fromMap(iconMap);
+      return UIImage.fromMap(iconMap, enumMethod: enumMethod);
     }
   }
   return null;

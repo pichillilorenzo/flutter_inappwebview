@@ -1,3 +1,33 @@
+## 1.2.0-beta.3
+
+- Updated flutter_inappwebview_platform_interface version to ^1.4.0-beta.3
+- Implemented `saveState`, `restoreState` InAppWebViewController methods
+- Implemented `PlatformProxyController` class
+- Merged "Add proxy support for iOS" [#2362](https://github.com/pichillilorenzo/flutter_inappwebview/pull/2362) (thanks to [yerkejs](https://github.com/yerkejs))
+- Fixed "[iOS] Webview opened with windowId does not receive javascript handler callback." [#2393](https://github.com/pichillilorenzo/flutter_inappwebview/issues/2393)
+- Fixed internal javascript callback handlers when the WebView has windowId not null
+- Fixed "When useShouldInterceptAjaxRequest is true, some ajax requests doesn't work" [#2197](https://github.com/pichillilorenzo/flutter_inappwebview/issues/2197)
+- Merged "fix #2484, Remove not-empty assert for Cookie.value" [#2486](https://github.com/pichillilorenzo/flutter_inappwebview/pull/2486) (thanks to [laishere](https://github.com/laishere))
+- Merged "Fix gesture recognition delay prevention for latest Flutter versions" [#2538](https://github.com/pichillilorenzo/flutter_inappwebview/pull/2538) (thanks to [muccy-timeware](https://github.com/muccy-timeware))
+
+## 1.2.0-beta.2
+
+- Updated flutter_inappwebview_platform_interface version to ^1.4.0-beta.2
+- Implemented `setInputMethodEnabled`, `hideInputMethod` InAppWebViewController methods
+- Implemented `isUserInteractionEnabled`, `alpha` properties of `InAppWebViewSettings`
+- Merged "Show / Hide / Disable / Enable soft Keyboard Input (Android & iOS)" [#2408](https://github.com/pichillilorenzo/flutter_inappwebview/pull/2408) (thanks to [Mecharyry](https://github.com/Mecharyry))
+- Fixed "In iOS version 17.2, when moving the input focus in a WebView, an unknown area appears at the top of the screen." [#1947](https://github.com/pichillilorenzo/flutter_inappwebview/issues/1947)
+
+## 1.2.0-beta.1
+
+- Updated flutter_inappwebview_platform_interface version to ^1.4.0-beta.1
+- Implemented `requestFocus` WebView method
+- Updated ConsoleLogJS internal PluginScript to main-frame only as using it on non-main frames could cause issues such as [#1738](https://github.com/pichillilorenzo/flutter_inappwebview/issues/1738)
+- Added support for `UserScript.allowedOriginRules` parameter
+- Moved `WKUserContentController` initialization on `preWKWebViewConfiguration` to fix possible `undefined is not an object (evaluating 'window.webkit.messageHandlers')` javascript error
+- Merged "change priority of DispatchQueue" [#2322](https://github.com/pichillilorenzo/flutter_inappwebview/pull/2322) (thanks to [nnnlog](https://github.com/nnnlog))
+- Fixed `show`, `hide` methods and `hidden` setting for `InAppBrowser`
+
 ## 1.1.2
 
 - Updated flutter_inappwebview_platform_interface version to ^1.3.0

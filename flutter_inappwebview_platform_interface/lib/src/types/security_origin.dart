@@ -1,5 +1,7 @@
 import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_internal_annotations.dart';
 
+import 'enum_method.dart';
+
 part 'security_origin.g.dart';
 
 ///An object that identifies the origin of a particular resource.

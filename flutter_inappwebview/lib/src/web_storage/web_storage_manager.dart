@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_platform_interface.dart';
 
 import 'android/web_storage_manager.dart';
@@ -27,6 +28,16 @@ class WebStorageManager {
   final PlatformWebStorageManager platform;
 
   static WebStorageManager? _instance;
+
+  ///Check if the current class is supported by the [defaultTargetPlatform] or a specific [platform].
+  static bool isClassSupported({TargetPlatform? platform}) =>
+      PlatformWebStorageManager.static().isClassSupported(platform: platform);
+
+  ///Check if the given [method] is supported by the [defaultTargetPlatform] or a specific [platform].
+  static bool isMethodSupported(PlatformWebStorageManagerMethod method,
+          {TargetPlatform? platform}) =>
+      PlatformWebStorageManager.static()
+          .isMethodSupported(method, platform: platform);
 
   ///Use [WebStorageManager] instead.
   @Deprecated("Use WebStorageManager instead")

@@ -188,6 +188,14 @@ namespace flutter_inappwebview_plugin
   {
     return str.size() >= suffix.size() && str.compare(str.size() - suffix.size(), suffix.size(), suffix) == 0;
   }
+
+  constexpr uint32_t string_hash(const std::string_view data) noexcept
+  {
+    uint32_t hash = 5381;
+    for (const auto& e : data)
+      hash = ((hash << 5) + hash) + e;
+    return hash;
+  };
 }
 
 #endif //FLUTTER_INAPPWEBVIEW_PLUGIN_UTIL_STRING_H_

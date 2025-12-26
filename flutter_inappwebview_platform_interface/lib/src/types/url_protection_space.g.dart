@@ -11,8 +11,8 @@ class URLProtectionSpace {
   ///The authentication method used by the receiver.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- iOS ([Official API - URLProtectionSpace.authenticationMethod](https://developer.apple.com/documentation/foundation/urlprotectionspace/1415028-authenticationmethod))
-  ///- MacOS ([Official API - URLProtectionSpace.authenticationMethod](https://developer.apple.com/documentation/foundation/urlprotectionspace/1415028-authenticationmethod))
+  ///- iOS WKWebView ([Official API - URLProtectionSpace.authenticationMethod](https://developer.apple.com/documentation/foundation/urlprotectionspace/1415028-authenticationmethod))
+  ///- macOS WKWebView ([Official API - URLProtectionSpace.authenticationMethod](https://developer.apple.com/documentation/foundation/urlprotectionspace/1415028-authenticationmethod))
   URLProtectionSpaceAuthenticationMethod? authenticationMethod;
 
   ///The acceptable certificate-issuing authorities for client certificate authentication.
@@ -20,8 +20,8 @@ class URLProtectionSpace {
   ///The returned issuing authorities are encoded with Distinguished Encoding Rules (DER).
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- iOS ([Official API - URLProtectionSpace.distinguishedNames](https://developer.apple.com/documentation/foundation/urlprotectionspace/1417061-distinguishednames))
-  ///- MacOS ([Official API - URLProtectionSpace.distinguishedNames](https://developer.apple.com/documentation/foundation/urlprotectionspace/1417061-distinguishednames))
+  ///- iOS WKWebView ([Official API - URLProtectionSpace.distinguishedNames](https://developer.apple.com/documentation/foundation/urlprotectionspace/1417061-distinguishednames))
+  ///- macOS WKWebView ([Official API - URLProtectionSpace.distinguishedNames](https://developer.apple.com/documentation/foundation/urlprotectionspace/1417061-distinguishednames))
   List<X509Certificate>? distinguishedNames;
 
   ///The hostname of the server.
@@ -54,8 +54,8 @@ class URLProtectionSpace {
   ///The supported proxy types are listed in [URLProtectionSpaceProxyType.values].
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- iOS ([Official API - URLProtectionSpace.proxyType](https://developer.apple.com/documentation/foundation/urlprotectionspace/1411924-proxytype))
-  ///- MacOS ([Official API - URLProtectionSpace.proxyType](https://developer.apple.com/documentation/foundation/urlprotectionspace/1411924-proxytype))
+  ///- iOS WKWebView ([Official API - URLProtectionSpace.proxyType](https://developer.apple.com/documentation/foundation/urlprotectionspace/1411924-proxytype))
+  ///- macOS WKWebView ([Official API - URLProtectionSpace.proxyType](https://developer.apple.com/documentation/foundation/urlprotectionspace/1411924-proxytype))
   URLProtectionSpaceProxyType? proxyType;
 
   ///A string indicating a protocol-specific subdivision of a single host.
@@ -67,8 +67,8 @@ class URLProtectionSpace {
   ///This value is `true` if the credentials for the protection space represented by the receiver can be sent securely, `false` otherwise.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- iOS ([Official API - URLProtectionSpace.receivesCredentialSecurely](https://developer.apple.com/documentation/foundation/urlprotectionspace/1415176-receivescredentialsecurely))
-  ///- MacOS ([Official API - URLProtectionSpace.receivesCredentialSecurely](https://developer.apple.com/documentation/foundation/urlprotectionspace/1415176-receivescredentialsecurely))
+  ///- iOS WKWebView ([Official API - URLProtectionSpace.receivesCredentialSecurely](https://developer.apple.com/documentation/foundation/urlprotectionspace/1415176-receivescredentialsecurely))
+  ///- macOS WKWebView ([Official API - URLProtectionSpace.receivesCredentialSecurely](https://developer.apple.com/documentation/foundation/urlprotectionspace/1415176-receivescredentialsecurely))
   bool? receivesCredentialSecurely;
 
   ///The SSL certificate used.
@@ -105,50 +105,90 @@ class URLProtectionSpace {
   }
 
   ///Gets a possible [URLProtectionSpace] instance from a [Map] value.
-  static URLProtectionSpace? fromMap(Map<String, dynamic>? map) {
+  static URLProtectionSpace? fromMap(Map<String, dynamic>? map,
+      {EnumMethod? enumMethod}) {
     if (map == null) {
       return null;
     }
     final instance = URLProtectionSpace(
-      authenticationMethod:
+      authenticationMethod: switch (enumMethod ?? EnumMethod.nativeValue) {
+        EnumMethod.nativeValue =>
           URLProtectionSpaceAuthenticationMethod.fromNativeValue(
               map['authenticationMethod']),
-      distinguishedNames:
-          _distinguishedNamesDeserializer(map['distinguishedNames']),
+        EnumMethod.value => URLProtectionSpaceAuthenticationMethod.fromValue(
+            map['authenticationMethod']),
+        EnumMethod.name => URLProtectionSpaceAuthenticationMethod.byName(
+            map['authenticationMethod'])
+      },
+      distinguishedNames: _distinguishedNamesDeserializer(
+          map['distinguishedNames'],
+          enumMethod: enumMethod),
       host: map['host'],
-      iosAuthenticationMethod:
+      iosAuthenticationMethod: switch (enumMethod ?? EnumMethod.nativeValue) {
+        EnumMethod.nativeValue =>
           IOSNSURLProtectionSpaceAuthenticationMethod.fromNativeValue(
               map['authenticationMethod']),
-      iosDistinguishedNames:
-          _distinguishedNamesDeserializer(map['distinguishedNames']),
-      iosProxyType:
+        EnumMethod.value =>
+          IOSNSURLProtectionSpaceAuthenticationMethod.fromValue(
+              map['authenticationMethod']),
+        EnumMethod.name => IOSNSURLProtectionSpaceAuthenticationMethod.byName(
+            map['authenticationMethod'])
+      },
+      iosDistinguishedNames: _distinguishedNamesDeserializer(
+          map['distinguishedNames'],
+          enumMethod: enumMethod),
+      iosProxyType: switch (enumMethod ?? EnumMethod.nativeValue) {
+        EnumMethod.nativeValue =>
           IOSNSURLProtectionSpaceProxyType.fromNativeValue(map['proxyType']),
+        EnumMethod.value =>
+          IOSNSURLProtectionSpaceProxyType.fromValue(map['proxyType']),
+        EnumMethod.name =>
+          IOSNSURLProtectionSpaceProxyType.byName(map['proxyType'])
+      },
       iosReceivesCredentialSecurely: map['receivesCredentialSecurely'],
       port: map['port'],
       protocol: map['protocol'],
-      proxyType: URLProtectionSpaceProxyType.fromNativeValue(map['proxyType']),
+      proxyType: switch (enumMethod ?? EnumMethod.nativeValue) {
+        EnumMethod.nativeValue =>
+          URLProtectionSpaceProxyType.fromNativeValue(map['proxyType']),
+        EnumMethod.value =>
+          URLProtectionSpaceProxyType.fromValue(map['proxyType']),
+        EnumMethod.name => URLProtectionSpaceProxyType.byName(map['proxyType'])
+      },
       realm: map['realm'],
       receivesCredentialSecurely: map['receivesCredentialSecurely'],
       sslCertificate: SslCertificate.fromMap(
-          map['sslCertificate']?.cast<String, dynamic>()),
-      sslError: SslError.fromMap(map['sslError']?.cast<String, dynamic>()),
+          map['sslCertificate']?.cast<String, dynamic>(),
+          enumMethod: enumMethod),
+      sslError: SslError.fromMap(map['sslError']?.cast<String, dynamic>(),
+          enumMethod: enumMethod),
     );
     return instance;
   }
 
   ///Converts instance to a map.
-  Map<String, dynamic> toMap() {
+  Map<String, dynamic> toMap({EnumMethod? enumMethod}) {
     return {
-      "authenticationMethod": authenticationMethod?.toNativeValue(),
-      "distinguishedNames": distinguishedNames?.map((e) => e.toMap()).toList(),
+      "authenticationMethod": switch (enumMethod ?? EnumMethod.nativeValue) {
+        EnumMethod.nativeValue => authenticationMethod?.toNativeValue(),
+        EnumMethod.value => authenticationMethod?.toValue(),
+        EnumMethod.name => authenticationMethod?.name()
+      },
+      "distinguishedNames": distinguishedNames
+          ?.map((e) => e.toMap(enumMethod: enumMethod))
+          .toList(),
       "host": host,
       "port": port,
       "protocol": protocol,
-      "proxyType": proxyType?.toNativeValue(),
+      "proxyType": switch (enumMethod ?? EnumMethod.nativeValue) {
+        EnumMethod.nativeValue => proxyType?.toNativeValue(),
+        EnumMethod.value => proxyType?.toValue(),
+        EnumMethod.name => proxyType?.name()
+      },
       "realm": realm,
       "receivesCredentialSecurely": receivesCredentialSecurely,
-      "sslCertificate": sslCertificate?.toMap(),
-      "sslError": sslError?.toMap(),
+      "sslCertificate": sslCertificate?.toMap(enumMethod: enumMethod),
+      "sslError": sslError?.toMap(enumMethod: enumMethod),
     };
   }
 

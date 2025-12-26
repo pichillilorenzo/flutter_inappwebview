@@ -370,6 +370,12 @@ public class WebViewChannelDelegate: ChannelDelegate {
                 result(nil)
             }
             break
+        case .clearFocus:
+            result(webView?.clearFocus())
+            break
+        case .requestFocus:
+            result(webView?.requestFocus())
+            break
         case .getCertificate:
             result(webView?.getCertificate()?.toMap())
             break
@@ -658,6 +664,23 @@ public class WebViewChannelDelegate: ChannelDelegate {
             } else {
                 result(false)
             }
+            break
+        case .saveState:
+            if let webView = webView, #available(macOS 12.0, *) {
+                result(webView.saveState())
+            } else {
+                result(nil)
+            }
+            break
+        case .restoreState:
+            if let webView = webView, #available(macOS 12.0, *) {
+                let state = arguments!["state"] as! FlutterStandardTypedData
+                webView.restoreState(state: state.data)
+                result(true)
+            } else {
+                result(false)
+            }
+            break
         }
     }
     
@@ -680,8 +703,8 @@ public class WebViewChannelDelegate: ChannelDelegate {
         channel?.invokeMethod("onScrollChanged", arguments: arguments)
     }
     
-    public func onDownloadStartRequest(request: DownloadStartRequest) {
-        channel?.invokeMethod("onDownloadStartRequest", arguments: request.toMap())
+    public func onDownloadStarting(request: DownloadStartRequest) {
+        channel?.invokeMethod("onDownloadStarting", arguments: request.toMap())
     }
     
     public func onCreateContextMenu(hitTestResult: HitTestResult) {
@@ -928,7 +951,7 @@ public class WebViewChannelDelegate: ChannelDelegate {
         }
         // workaround for ProtectionSpace.toMap() SSL Certificate
         // https://github.com/pichillilorenzo/flutter_inappwebview/issues/1678
-        DispatchQueue.global(qos: .background).async {
+        DispatchQueue.global().async {
             let arguments = challenge.toMap()
             DispatchQueue.main.async { [weak self] in
                 if self?.channel == nil {
@@ -960,7 +983,7 @@ public class WebViewChannelDelegate: ChannelDelegate {
         }
         // workaround for ProtectionSpace.toMap() SSL Certificate
         // https://github.com/pichillilorenzo/flutter_inappwebview/issues/1678
-        DispatchQueue.global(qos: .background).async {
+        DispatchQueue.global().async {
             let arguments = challenge.toMap()
             DispatchQueue.main.async { [weak self] in
                 if self?.channel == nil {
@@ -992,7 +1015,7 @@ public class WebViewChannelDelegate: ChannelDelegate {
         }
         // workaround for ProtectionSpace.toMap() SSL Certificate
         // https://github.com/pichillilorenzo/flutter_inappwebview/issues/1678
-        DispatchQueue.global(qos: .background).async {
+        DispatchQueue.global().async {
             let arguments = challenge.toMap()
             DispatchQueue.main.async { [weak self] in
                 if self?.channel == nil {
@@ -1046,14 +1069,14 @@ public class WebViewChannelDelegate: ChannelDelegate {
         }
     }
     
-    public func onCallJsHandler(handlerName: String, args: String, callback: CallJsHandlerCallback) {
+    public func onCallJsHandler(handlerName: String, data: JavaScriptHandlerFunctionData, callback: CallJsHandlerCallback) {
         if channel == nil {
             callback.defaultBehaviour(nil)
             return
         }
         let arguments: [String: Any?] = [
             "handlerName": handlerName,
-            "args": args
+            "data": data.toMap()
         ]
         channel?.invokeMethod("onCallJsHandler", arguments: arguments, callback: callback)
     }
@@ -1105,7 +1128,7 @@ public class WebViewChannelDelegate: ChannelDelegate {
         }
         // workaround for ProtectionSpace.toMap() SSL Certificate
         // https://github.com/pichillilorenzo/flutter_inappwebview/issues/1678
-        DispatchQueue.global(qos: .background).async {
+        DispatchQueue.global().async {
             let arguments = challenge.toMap()
             DispatchQueue.main.async { [weak self] in
                 if self?.channel == nil {
@@ -1164,6 +1187,16 @@ public class WebViewChannelDelegate: ChannelDelegate {
             "printJobId": printJobId,
         ]
         channel?.invokeMethod("onPrintRequest", arguments: arguments, callback: callback)
+    }
+    
+    internal func _onMouseDown(callback: @escaping () -> Void) {
+        if channel == nil {
+            return
+        }
+        let arguments: [String:Any] = [:];
+        channel?.invokeMethod("_onMouseDown", arguments: arguments) {(result) -> Void in
+            callback()
+        }
     }
     
     public override func dispose() {

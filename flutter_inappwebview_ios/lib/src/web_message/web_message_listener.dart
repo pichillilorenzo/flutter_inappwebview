@@ -55,6 +55,15 @@ class IOSWebMessageListener extends PlatformWebMessageListener
     initMethodCallHandler();
   }
 
+  static final IOSWebMessageListener _staticValue = IOSWebMessageListener(
+      IOSWebMessageListenerCreationParams(
+          jsObjectName: '', allowedOriginRules: Set.from(["*"])));
+
+  /// Provide static access.
+  factory IOSWebMessageListener.static() {
+    return _staticValue;
+  }
+
   ///Message Listener ID used internally.
   final String _id = IdGenerator.generate();
 

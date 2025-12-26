@@ -80,7 +80,7 @@ abstract class PlatformPathHandler {
     throw UnimplementedError('path is not implemented on the current platform');
   }
 
-  Map<String, dynamic> toMap() {
+  Map<String, dynamic> toMap({EnumMethod? enumMethod}) {
     throw UnimplementedError(
         'toMap is not implemented on the current platform');
   }

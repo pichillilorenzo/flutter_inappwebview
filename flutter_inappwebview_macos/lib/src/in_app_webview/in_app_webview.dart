@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_platform_interface.dart';
-import 'headless_in_app_webview.dart';
 
 import '../find_interaction/find_interaction_controller.dart';
+import 'headless_in_app_webview.dart';
 import 'in_app_webview_controller.dart';
 
 /// Object specifying creation parameters for creating a [PlatformInAppWebViewWidget].
@@ -34,8 +34,10 @@ class MacOSInAppWebViewWidgetCreationParams
       super.shouldOverrideUrlLoading,
       super.onLoadResource,
       super.onScrollChanged,
-      @Deprecated('Use onDownloadStartRequest instead') super.onDownloadStart,
+      @Deprecated('Use onDownloadStarting instead') super.onDownloadStart,
+      @Deprecated('Use onDownloadStarting instead')
       super.onDownloadStartRequest,
+      super.onDownloadStarting,
       @Deprecated('Use onLoadResourceWithCustomScheme instead')
       super.onLoadResourceCustomScheme,
       super.onLoadResourceWithCustomScheme,
@@ -158,6 +160,7 @@ class MacOSInAppWebViewWidgetCreationParams
             onScrollChanged: params.onScrollChanged,
             onDownloadStart: params.onDownloadStart,
             onDownloadStartRequest: params.onDownloadStartRequest,
+            onDownloadStarting: params.onDownloadStarting,
             onLoadResourceCustomScheme: params.onLoadResourceCustomScheme,
             onLoadResourceWithCustomScheme:
                 params.onLoadResourceWithCustomScheme,
@@ -274,6 +277,13 @@ class MacOSInAppWebViewWidget extends PlatformInAppWebViewWidget {
   MacOSHeadlessInAppWebView? get _macosHeadlessInAppWebView =>
       params.headlessWebView as MacOSHeadlessInAppWebView?;
 
+  static final MacOSInAppWebViewWidget _staticValue =
+      MacOSInAppWebViewWidget(MacOSInAppWebViewWidgetCreationParams());
+
+  factory MacOSInAppWebViewWidget.static() {
+    return _staticValue;
+  }
+
   @override
   Widget build(BuildContext context) {
     final initialSettings = params.initialSettings ?? InAppWebViewSettings();
@@ -356,15 +366,24 @@ class MacOSInAppWebViewWidget extends PlatformInAppWebViewWidget {
     if (params.onLoadResource != null && settings.useOnLoadResource == null) {
       settings.useOnLoadResource = true;
     }
-    if (params.onDownloadStartRequest != null &&
+    if ((params.onDownloadStartRequest != null ||
+            params.onDownloadStarting != null) &&
         settings.useOnDownloadStart == null) {
       settings.useOnDownloadStart = true;
     }
     if ((params.shouldInterceptAjaxRequest != null ||
-            params.onAjaxProgress != null ||
-            params.onAjaxReadyStateChange != null) &&
-        settings.useShouldInterceptAjaxRequest == null) {
-      settings.useShouldInterceptAjaxRequest = true;
+        params.onAjaxProgress != null ||
+        params.onAjaxReadyStateChange != null)) {
+      if (settings.useShouldInterceptAjaxRequest == null) {
+        settings.useShouldInterceptAjaxRequest = true;
+      }
+      if (params.onAjaxReadyStateChange != null &&
+          settings.useOnAjaxReadyStateChange == null) {
+        settings.useOnAjaxReadyStateChange = true;
+      }
+      if (params.onAjaxProgress != null && settings.useOnAjaxProgress == null) {
+        settings.useOnAjaxProgress = true;
+      }
     }
     if (params.shouldInterceptFetchRequest != null &&
         settings.useShouldInterceptFetchRequest == null) {

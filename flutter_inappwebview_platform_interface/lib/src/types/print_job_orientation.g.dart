@@ -19,10 +19,13 @@ class PrintJobOrientation {
   ///Pages are printed in landscape orientation.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- iOS
-  ///- MacOS
+  ///- Android WebView
+  ///- iOS WKWebView
+  ///- macOS WKWebView
   static final LANDSCAPE = PrintJobOrientation._internalMultiPlatform(1, () {
     switch (defaultTargetPlatform) {
+      case TargetPlatform.android:
+        return 1;
       case TargetPlatform.iOS:
         return 1;
       case TargetPlatform.macOS:
@@ -36,10 +39,13 @@ class PrintJobOrientation {
   ///Pages are printed in portrait orientation.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- iOS
-  ///- MacOS
+  ///- Android WebView
+  ///- iOS WKWebView
+  ///- macOS WKWebView
   static final PORTRAIT = PrintJobOrientation._internalMultiPlatform(0, () {
     switch (defaultTargetPlatform) {
+      case TargetPlatform.android:
+        return 0;
       case TargetPlatform.iOS:
         return 0;
       case TargetPlatform.macOS:
@@ -82,20 +88,44 @@ class PrintJobOrientation {
     return null;
   }
 
+  /// Gets a possible [PrintJobOrientation] instance value with name [name].
+  ///
+  /// Goes through [PrintJobOrientation.values] looking for a value with
+  /// name [name], as reported by [PrintJobOrientation.name].
+  /// Returns the first value with the given name, otherwise `null`.
+  static PrintJobOrientation? byName(String? name) {
+    if (name != null) {
+      try {
+        return PrintJobOrientation.values
+            .firstWhere((element) => element.name() == name);
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
+  }
+
+  /// Creates a map from the names of [PrintJobOrientation] values to the values.
+  ///
+  /// The collection that this method is called on is expected to have
+  /// values with distinct names, like the `values` list of an enum class.
+  /// Only one value for each name can occur in the created map,
+  /// so if two or more values have the same name (either being the
+  /// same value, or being values of different enum type), at most one of
+  /// them will be represented in the returned map.
+  static Map<String, PrintJobOrientation> asNameMap() =>
+      <String, PrintJobOrientation>{
+        for (final value in PrintJobOrientation.values) value.name(): value
+      };
+
   ///Gets [int] value.
   int toValue() => _value;
 
   ///Gets [int] native value.
   int toNativeValue() => _nativeValue;
 
-  @override
-  int get hashCode => _value.hashCode;
-
-  @override
-  bool operator ==(value) => value == _value;
-
-  @override
-  String toString() {
+  ///Gets the name of the value.
+  String name() {
     switch (_value) {
       case 1:
         return 'LANDSCAPE';
@@ -103,5 +133,21 @@ class PrintJobOrientation {
         return 'PORTRAIT';
     }
     return _value.toString();
+  }
+
+  @override
+  int get hashCode => _value.hashCode;
+
+  @override
+  bool operator ==(value) => value == _value;
+
+  ///Checks if the value is supported by the [defaultTargetPlatform].
+  bool isSupported() {
+    return toNativeValue() != null;
+  }
+
+  @override
+  String toString() {
+    return name();
   }
 }

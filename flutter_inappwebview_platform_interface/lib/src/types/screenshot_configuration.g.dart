@@ -13,18 +13,18 @@ class ScreenshotConfiguration {
   ///If you change the value to `false`, the `WebView` takes the snapshot immediately, and before incorporating any new changes.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- iOS 13.0+
-  ///- MacOS 10.15+
+  ///- iOS WKWebView 13.0+
+  ///- macOS WKWebView 10.15+
   bool afterScreenUpdates;
 
   ///The compression format of the captured image.
   ///The default value is [CompressFormat.PNG].
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Android native WebView
-  ///- iOS
-  ///- MacOS
-  ///- Windows
+  ///- Android WebView
+  ///- iOS WKWebView
+  ///- macOS WKWebView
+  ///- Windows WebView2
   CompressFormat compressFormat;
 
   ///Use [afterScreenUpdates] instead.
@@ -35,10 +35,10 @@ class ScreenshotConfiguration {
   ///[CompressFormat.PNG] is lossless, so this value is ignored.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Android native WebView
-  ///- iOS
-  ///- MacOS
-  ///- Windows
+  ///- Android WebView
+  ///- iOS WKWebView
+  ///- macOS WKWebView
+  ///- Windows WebView2
   int quality;
 
   ///The portion of your web view to capture, specified as a rectangle in the view’s coordinate system.
@@ -46,10 +46,10 @@ class ScreenshotConfiguration {
   ///If you specify a custom rectangle, it must lie within the bounds rectangle of the `WebView` object.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Android native WebView
-  ///- iOS
-  ///- MacOS
-  ///- Windows
+  ///- Android WebView
+  ///- iOS WKWebView
+  ///- macOS WKWebView
+  ///- Windows WebView2
   InAppWebViewRect? rect;
 
   ///The width of the captured image, in points.
@@ -59,9 +59,9 @@ class ScreenshotConfiguration {
   ///The default value of this property is `null`, which returns an image whose size matches the original size of the captured rectangle.
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Android native WebView
-  ///- iOS
-  ///- MacOS
+  ///- Android WebView
+  ///- iOS WKWebView
+  ///- macOS WKWebView
   double? snapshotWidth;
   ScreenshotConfiguration(
       {this.rect,
@@ -77,29 +77,45 @@ class ScreenshotConfiguration {
   }
 
   ///Gets a possible [ScreenshotConfiguration] instance from a [Map] value.
-  static ScreenshotConfiguration? fromMap(Map<String, dynamic>? map) {
+  static ScreenshotConfiguration? fromMap(Map<String, dynamic>? map,
+      {EnumMethod? enumMethod}) {
     if (map == null) {
       return null;
     }
     final instance = ScreenshotConfiguration(
       iosAfterScreenUpdates: map['afterScreenUpdates'],
-      rect: InAppWebViewRect.fromMap(map['rect']?.cast<String, dynamic>()),
+      rect: InAppWebViewRect.fromMap(map['rect']?.cast<String, dynamic>(),
+          enumMethod: enumMethod),
       snapshotWidth: map['snapshotWidth'],
     );
-    instance.afterScreenUpdates = map['afterScreenUpdates'];
-    instance.compressFormat =
-        CompressFormat.fromNativeValue(map['compressFormat'])!;
-    instance.quality = map['quality'];
+    if (map['afterScreenUpdates'] != null) {
+      instance.afterScreenUpdates = map['afterScreenUpdates'];
+    }
+    if (map['compressFormat'] != null) {
+      instance.compressFormat = switch (enumMethod ?? EnumMethod.nativeValue) {
+        EnumMethod.nativeValue =>
+          CompressFormat.fromNativeValue(map['compressFormat']),
+        EnumMethod.value => CompressFormat.fromValue(map['compressFormat']),
+        EnumMethod.name => CompressFormat.byName(map['compressFormat'])
+      }!;
+    }
+    if (map['quality'] != null) {
+      instance.quality = map['quality'];
+    }
     return instance;
   }
 
   ///Converts instance to a map.
-  Map<String, dynamic> toMap() {
+  Map<String, dynamic> toMap({EnumMethod? enumMethod}) {
     return {
       "afterScreenUpdates": afterScreenUpdates,
-      "compressFormat": compressFormat.toNativeValue(),
+      "compressFormat": switch (enumMethod ?? EnumMethod.nativeValue) {
+        EnumMethod.nativeValue => compressFormat.toNativeValue(),
+        EnumMethod.value => compressFormat.toValue(),
+        EnumMethod.name => compressFormat.name()
+      },
       "quality": quality,
-      "rect": rect?.toMap(),
+      "rect": rect?.toMap(enumMethod: enumMethod),
       "snapshotWidth": snapshotWidth,
     };
   }

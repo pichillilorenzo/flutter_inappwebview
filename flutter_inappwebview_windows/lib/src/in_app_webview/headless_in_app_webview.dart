@@ -33,8 +33,10 @@ class WindowsHeadlessInAppWebViewCreationParams
       super.shouldOverrideUrlLoading,
       super.onLoadResource,
       super.onScrollChanged,
-      @Deprecated('Use onDownloadStartRequest instead') super.onDownloadStart,
+      @Deprecated('Use onDownloadStarting instead') super.onDownloadStart,
+      @Deprecated('Use onDownloadStarting instead')
       super.onDownloadStartRequest,
+      super.onDownloadStarting,
       @Deprecated('Use onLoadResourceWithCustomScheme instead')
       super.onLoadResourceCustomScheme,
       super.onLoadResourceWithCustomScheme,
@@ -153,6 +155,7 @@ class WindowsHeadlessInAppWebViewCreationParams
             onScrollChanged: params.onScrollChanged,
             onDownloadStart: params.onDownloadStart,
             onDownloadStartRequest: params.onDownloadStartRequest,
+            onDownloadStarting: params.onDownloadStarting,
             onLoadResourceCustomScheme: params.onLoadResourceCustomScheme,
             onLoadResourceWithCustomScheme:
                 params.onLoadResourceWithCustomScheme,
@@ -276,6 +279,13 @@ class WindowsHeadlessInAppWebView extends PlatformHeadlessInAppWebView
     id = IdGenerator.generate();
   }
 
+  static final WindowsHeadlessInAppWebView _staticValue =
+      WindowsHeadlessInAppWebView(WindowsHeadlessInAppWebViewCreationParams());
+
+  factory WindowsHeadlessInAppWebView.static() {
+    return _staticValue;
+  }
+
   @override
   WindowsInAppWebViewController? get webViewController => _webViewController;
 
@@ -368,13 +378,24 @@ class WindowsHeadlessInAppWebView extends PlatformHeadlessInAppWebView
     if (params.onLoadResource != null && settings.useOnLoadResource == null) {
       settings.useOnLoadResource = true;
     }
-    if (params.onDownloadStartRequest != null &&
+    if ((params.onDownloadStartRequest != null ||
+            params.onDownloadStarting != null) &&
         settings.useOnDownloadStart == null) {
       settings.useOnDownloadStart = true;
     }
-    if (params.shouldInterceptAjaxRequest != null &&
-        settings.useShouldInterceptAjaxRequest == null) {
-      settings.useShouldInterceptAjaxRequest = true;
+    if ((params.shouldInterceptAjaxRequest != null ||
+        params.onAjaxProgress != null ||
+        params.onAjaxReadyStateChange != null)) {
+      if (settings.useShouldInterceptAjaxRequest == null) {
+        settings.useShouldInterceptAjaxRequest = true;
+      }
+      if (params.onAjaxReadyStateChange != null &&
+          settings.useOnAjaxReadyStateChange == null) {
+        settings.useOnAjaxReadyStateChange = true;
+      }
+      if (params.onAjaxProgress != null && settings.useOnAjaxProgress == null) {
+        settings.useOnAjaxProgress = true;
+      }
     }
     if (params.shouldInterceptFetchRequest != null &&
         settings.useShouldInterceptFetchRequest == null) {

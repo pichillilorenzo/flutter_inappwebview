@@ -1,6 +1,7 @@
 import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_internal_annotations.dart';
 
 import 'ajax_request.dart';
+import 'enum_method.dart';
 
 part 'ajax_request_headers.g.dart';
 
@@ -14,7 +15,8 @@ class AjaxRequestHeaders_ {
   AjaxRequestHeaders_(this._headers);
 
   ///Gets a possible [AjaxRequestHeaders] instance from a [Map] value.
-  static AjaxRequestHeaders_? fromMap(Map<String, dynamic>? map) {
+  static AjaxRequestHeaders_? fromMap(Map<String, dynamic>? map,
+      {EnumMethod? enumMethod}) {
     if (map == null) {
       return null;
     }
@@ -36,7 +38,7 @@ class AjaxRequestHeaders_ {
   }
 
   ///Converts instance to a map.
-  Map<String, dynamic> toMap() {
+  Map<String, dynamic> toMap({EnumMethod? enumMethod}) {
     return _newHeaders;
   }
 

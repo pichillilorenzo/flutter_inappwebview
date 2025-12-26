@@ -37,6 +37,15 @@ class MacOSFindInteractionController extends PlatformFindInteractionController
                   .fromPlatformFindInteractionControllerCreationParams(params),
         );
 
+  static final MacOSFindInteractionController _staticValue =
+      MacOSFindInteractionController(
+          MacOSFindInteractionControllerCreationParams());
+
+  /// Provide static access.
+  factory MacOSFindInteractionController.static() {
+    return _staticValue;
+  }
+
   _debugLog(String method, dynamic args) {
     debugLog(
         className: this.runtimeType.toString(),

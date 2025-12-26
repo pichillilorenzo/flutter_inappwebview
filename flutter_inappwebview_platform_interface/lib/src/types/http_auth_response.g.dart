@@ -26,22 +26,38 @@ class HttpAuthResponse {
       this.username = ""});
 
   ///Gets a possible [HttpAuthResponse] instance from a [Map] value.
-  static HttpAuthResponse? fromMap(Map<String, dynamic>? map) {
+  static HttpAuthResponse? fromMap(Map<String, dynamic>? map,
+      {EnumMethod? enumMethod}) {
     if (map == null) {
       return null;
     }
     final instance = HttpAuthResponse();
-    instance.action = HttpAuthResponseAction.fromNativeValue(map['action']);
-    instance.password = map['password'];
-    instance.permanentPersistence = map['permanentPersistence'];
-    instance.username = map['username'];
+    instance.action = switch (enumMethod ?? EnumMethod.nativeValue) {
+      EnumMethod.nativeValue =>
+        HttpAuthResponseAction.fromNativeValue(map['action']),
+      EnumMethod.value => HttpAuthResponseAction.fromValue(map['action']),
+      EnumMethod.name => HttpAuthResponseAction.byName(map['action'])
+    };
+    if (map['password'] != null) {
+      instance.password = map['password'];
+    }
+    if (map['permanentPersistence'] != null) {
+      instance.permanentPersistence = map['permanentPersistence'];
+    }
+    if (map['username'] != null) {
+      instance.username = map['username'];
+    }
     return instance;
   }
 
   ///Converts instance to a map.
-  Map<String, dynamic> toMap() {
+  Map<String, dynamic> toMap({EnumMethod? enumMethod}) {
     return {
-      "action": action?.toNativeValue(),
+      "action": switch (enumMethod ?? EnumMethod.nativeValue) {
+        EnumMethod.nativeValue => action?.toNativeValue(),
+        EnumMethod.value => action?.toValue(),
+        EnumMethod.name => action?.name()
+      },
       "password": password,
       "permanentPersistence": permanentPersistence,
       "username": username,

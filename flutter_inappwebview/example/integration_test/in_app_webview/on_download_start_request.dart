@@ -1,6 +1,6 @@
 part of 'main.dart';
 
-void onDownloadStartRequest() {
+void onDownloadStarting() {
   final shouldSkip = kIsWeb
       ? true
       : ![
@@ -9,7 +9,7 @@ void onDownloadStartRequest() {
           TargetPlatform.macOS,
         ].contains(defaultTargetPlatform);
 
-  skippableTestWidgets('onDownloadStartRequest', (WidgetTester tester) async {
+  skippableTestWidgets('onDownloadStarting', (WidgetTester tester) async {
     final Completer<InAppWebViewController> controllerCompleter =
         Completer<InAppWebViewController>();
     final Completer<String> onDownloadStartCompleter = Completer<String>();
@@ -41,8 +41,9 @@ void onDownloadStartRequest() {
           onWebViewCreated: (controller) {
             controllerCompleter.complete(controller);
           },
-          onDownloadStartRequest: (controller, request) {
+          onDownloadStarting: (controller, request) {
             onDownloadStartCompleter.complete(request.url.toString());
+            return null;
           },
         ),
       ),

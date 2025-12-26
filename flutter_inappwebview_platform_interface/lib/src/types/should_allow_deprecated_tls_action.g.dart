@@ -56,20 +56,45 @@ class ShouldAllowDeprecatedTLSAction {
     return null;
   }
 
+  /// Gets a possible [ShouldAllowDeprecatedTLSAction] instance value with name [name].
+  ///
+  /// Goes through [ShouldAllowDeprecatedTLSAction.values] looking for a value with
+  /// name [name], as reported by [ShouldAllowDeprecatedTLSAction.name].
+  /// Returns the first value with the given name, otherwise `null`.
+  static ShouldAllowDeprecatedTLSAction? byName(String? name) {
+    if (name != null) {
+      try {
+        return ShouldAllowDeprecatedTLSAction.values
+            .firstWhere((element) => element.name() == name);
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
+  }
+
+  /// Creates a map from the names of [ShouldAllowDeprecatedTLSAction] values to the values.
+  ///
+  /// The collection that this method is called on is expected to have
+  /// values with distinct names, like the `values` list of an enum class.
+  /// Only one value for each name can occur in the created map,
+  /// so if two or more values have the same name (either being the
+  /// same value, or being values of different enum type), at most one of
+  /// them will be represented in the returned map.
+  static Map<String, ShouldAllowDeprecatedTLSAction> asNameMap() =>
+      <String, ShouldAllowDeprecatedTLSAction>{
+        for (final value in ShouldAllowDeprecatedTLSAction.values)
+          value.name(): value
+      };
+
   ///Gets [int] value.
   int toValue() => _value;
 
   ///Gets [int] native value.
   int toNativeValue() => _nativeValue;
 
-  @override
-  int get hashCode => _value.hashCode;
-
-  @override
-  bool operator ==(value) => value == _value;
-
-  @override
-  String toString() {
+  ///Gets the name of the value.
+  String name() {
     switch (_value) {
       case 1:
         return 'ALLOW';
@@ -77,6 +102,22 @@ class ShouldAllowDeprecatedTLSAction {
         return 'CANCEL';
     }
     return _value.toString();
+  }
+
+  @override
+  int get hashCode => _value.hashCode;
+
+  @override
+  bool operator ==(value) => value == _value;
+
+  ///Checks if the value is supported by the [defaultTargetPlatform].
+  bool isSupported() {
+    return true;
+  }
+
+  @override
+  String toString() {
+    return name();
   }
 }
 
@@ -132,20 +173,45 @@ class IOSShouldAllowDeprecatedTLSAction {
     return null;
   }
 
+  /// Gets a possible [IOSShouldAllowDeprecatedTLSAction] instance value with name [name].
+  ///
+  /// Goes through [IOSShouldAllowDeprecatedTLSAction.values] looking for a value with
+  /// name [name], as reported by [IOSShouldAllowDeprecatedTLSAction.name].
+  /// Returns the first value with the given name, otherwise `null`.
+  static IOSShouldAllowDeprecatedTLSAction? byName(String? name) {
+    if (name != null) {
+      try {
+        return IOSShouldAllowDeprecatedTLSAction.values
+            .firstWhere((element) => element.name() == name);
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
+  }
+
+  /// Creates a map from the names of [IOSShouldAllowDeprecatedTLSAction] values to the values.
+  ///
+  /// The collection that this method is called on is expected to have
+  /// values with distinct names, like the `values` list of an enum class.
+  /// Only one value for each name can occur in the created map,
+  /// so if two or more values have the same name (either being the
+  /// same value, or being values of different enum type), at most one of
+  /// them will be represented in the returned map.
+  static Map<String, IOSShouldAllowDeprecatedTLSAction> asNameMap() =>
+      <String, IOSShouldAllowDeprecatedTLSAction>{
+        for (final value in IOSShouldAllowDeprecatedTLSAction.values)
+          value.name(): value
+      };
+
   ///Gets [int] value.
   int toValue() => _value;
 
   ///Gets [int] native value.
   int toNativeValue() => _nativeValue;
 
-  @override
-  int get hashCode => _value.hashCode;
-
-  @override
-  bool operator ==(value) => value == _value;
-
-  @override
-  String toString() {
+  ///Gets the name of the value.
+  String name() {
     switch (_value) {
       case 1:
         return 'ALLOW';
@@ -153,5 +219,21 @@ class IOSShouldAllowDeprecatedTLSAction {
         return 'CANCEL';
     }
     return _value.toString();
+  }
+
+  @override
+  int get hashCode => _value.hashCode;
+
+  @override
+  bool operator ==(value) => value == _value;
+
+  ///Checks if the value is supported by the [defaultTargetPlatform].
+  bool isSupported() {
+    return true;
+  }
+
+  @override
+  String toString() {
+    return name();
   }
 }

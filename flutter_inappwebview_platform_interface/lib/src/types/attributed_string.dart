@@ -6,6 +6,7 @@ import '../pull_to_refresh/main.dart';
 import 'underline_style.dart';
 import 'attributed_string_text_effect_style.dart';
 import '../util.dart';
+import 'enum_method.dart';
 
 part 'attributed_string.g.dart';
 

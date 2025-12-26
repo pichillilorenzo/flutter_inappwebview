@@ -21,23 +21,34 @@ class RenderProcessGoneDetail {
       {required this.didCrash, this.rendererPriorityAtExit});
 
   ///Gets a possible [RenderProcessGoneDetail] instance from a [Map] value.
-  static RenderProcessGoneDetail? fromMap(Map<String, dynamic>? map) {
+  static RenderProcessGoneDetail? fromMap(Map<String, dynamic>? map,
+      {EnumMethod? enumMethod}) {
     if (map == null) {
       return null;
     }
     final instance = RenderProcessGoneDetail(
       didCrash: map['didCrash'],
-      rendererPriorityAtExit:
+      rendererPriorityAtExit: switch (enumMethod ?? EnumMethod.nativeValue) {
+        EnumMethod.nativeValue =>
           RendererPriority.fromNativeValue(map['rendererPriorityAtExit']),
+        EnumMethod.value =>
+          RendererPriority.fromValue(map['rendererPriorityAtExit']),
+        EnumMethod.name =>
+          RendererPriority.byName(map['rendererPriorityAtExit'])
+      },
     );
     return instance;
   }
 
   ///Converts instance to a map.
-  Map<String, dynamic> toMap() {
+  Map<String, dynamic> toMap({EnumMethod? enumMethod}) {
     return {
       "didCrash": didCrash,
-      "rendererPriorityAtExit": rendererPriorityAtExit?.toNativeValue(),
+      "rendererPriorityAtExit": switch (enumMethod ?? EnumMethod.nativeValue) {
+        EnumMethod.nativeValue => rendererPriorityAtExit?.toNativeValue(),
+        EnumMethod.value => rendererPriorityAtExit?.toValue(),
+        EnumMethod.name => rendererPriorityAtExit?.name()
+      },
     };
   }
 

@@ -32,10 +32,14 @@ void userScripts() {
               UserScript(
                   source: "var bar = 2;",
                   injectionTime: UserScriptInjectionTime.AT_DOCUMENT_END,
+                  forMainFrameOnly:
+                      defaultTargetPlatform != TargetPlatform.android,
                   contentWorld: ContentWorld.DEFAULT_CLIENT),
               UserScript(
                   source: "var bar2 = 12;",
                   injectionTime: UserScriptInjectionTime.AT_DOCUMENT_END,
+                  forMainFrameOnly:
+                      defaultTargetPlatform != TargetPlatform.android,
                   contentWorld: ContentWorld.world(name: "test")),
             ]),
             onWebViewCreated: (controller) {

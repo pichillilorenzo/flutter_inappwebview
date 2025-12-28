@@ -1,0 +1,6 @@
+framework module WebGPU {
+  umbrella header "WebGPU.h"
+  header "WebGPUExt.h"
+  export *
+  module * { export * }
+}

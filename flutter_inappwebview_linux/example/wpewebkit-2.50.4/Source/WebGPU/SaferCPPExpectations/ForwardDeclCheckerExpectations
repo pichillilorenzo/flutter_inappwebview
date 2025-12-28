@@ -1,0 +1,9 @@
+ComputePipeline.mm
+Pipeline.mm
+WGSL/AST/ASTExpression.h
+WGSL/AST/ASTStringDumper.h
+WGSL/CallGraph.h
+WGSL/Types.h
+WGSL/WGSL.h
+WebGPU.h
+WebGPUExt.h

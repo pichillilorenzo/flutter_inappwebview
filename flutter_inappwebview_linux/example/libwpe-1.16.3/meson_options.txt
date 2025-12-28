@@ -1,0 +1,15 @@
+option('default-backend',
+	type: 'string',
+	value: '',
+	description: 'Name of the backend library to load, instead of libWPEBackend-default.so'
+)
+option('enable-xkb',
+	type: 'boolean',
+	value: true,
+	description: 'Enable use of libxkbcommon for keyboard input'
+)
+option('build-docs',
+	type: 'boolean',
+	value: false,
+	description: 'Build reference documentation (needs HotDoc)'
+)

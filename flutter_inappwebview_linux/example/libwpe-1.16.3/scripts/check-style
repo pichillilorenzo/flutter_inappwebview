@@ -1,0 +1,131 @@
+#! /usr/bin/env bash
+set -eu -o pipefail
+
+FILE=
+BASE=
+HEAD=HEAD
+
+declare -a args=()
+diff_input=false
+show_help=false
+
+for opt in "$@" ; do
+    case "${opt}" in
+        -h | --help)
+            show_help=true
+            ;;
+        -d | --diff)
+            diff_input=true
+            ;;
+        -o*)
+            FILE=${opt#-o}
+            ;;
+        *)
+            args+=("${opt}")
+            ;;
+    esac
+done
+declare -r diff_input show_help
+
+show_help ()
+{
+    echo "Usage: $0 [-o<file>] [-d|--diff] [<committish> [<committish>]]"
+}
+
+if ${show_help} ; then
+    show_help
+    exit
+fi
+
+if [[ ${#args[@]} -eq 1 ]] ; then
+    BASE=${args[0]}
+elif [[ ${#args[@]} -eq 2 ]] ; then
+    BASE=${args[0]}
+    HEAD=${args[1]}
+elif [[ ${#args[@]} -eq 0 ]] && ${diff_input} ; then
+    : no-op
+else
+    show_help 1>&2
+    exit 1
+fi
+declare -r BASE HEAD
+
+declare -ra clang_format_diff_candidates=(
+    # Search in $PATH (Ubuntu, Debian, maybe others)
+    clang-format-diff-13
+    clang-format-diff-13.py
+    clang-format-diff
+    clang-format-diff.py
+    # Arch Linux, Fedora.
+    /usr/share/clang/clang-format-diff.py
+)
+
+find_program ()
+{
+    local candidate path
+    for candidate in "$@" ; do
+        path=$(type -P "${candidate}")
+        if [[ -x ${path} ]] ; then
+            echo "${path}"
+            return
+        fi
+    done
+
+    # Not found.
+    return 1
+}
+
+clang_format_diff=$(find_program "${clang_format_diff_candidates[@]}")
+clang_format=$(find_program clang-format-11 clang-format)
+declare -r clang_format_diff clang_format
+
+if [[ ! -x ${clang_format_diff} ]] ; then
+    echo "$0: clang-format-diff does not seem to be installed" 1>&2
+    exit 1
+fi
+
+if [[ ! -x ${clang_format} ]] ; then
+    echo "$0: clang-format does not seem to be installed" 1>&2
+    exit 1
+fi
+
+#
+# Check the version of clang-format, to make sure that it will support the
+# configuration file. The output of "clang-format --version" is formatted
+# as follows:
+#
+#   clang-format version X.Y.Z
+#
+declare -r clang_format_min_version=11
+
+clang_format_version=$("${clang_format}" --version)
+if [[ ${clang_format_version} =~ clang-format[[:space:]]+version[[:space:]]+([[:digit:]]+)\. ]] ; then
+    clang_format_version=${BASH_REMATCH[1]}
+    if [[ ${clang_format_version} -lt ${clang_format_min_version} ]] ; then
+        echo "$0: clang-format ${clang_format_min_version}+ is needed, ${clang_format_version} detected" 1>&2
+        exit 1
+    fi
+else
+    echo "$0: clang-format did not report its version number"
+    exit 1
+fi
+
+if [[ -z ${FILE} ]] ; then
+    FILE=$(mktemp)
+    trap 'rm -f "${FILE}"' EXIT
+else
+    trap '[[ -s ${FILE} ]] || rm -f "${FILE}"' EXIT
+fi
+
+declare -a input_cmd
+if ${diff_input} ; then
+    input_cmd=(cat)
+else
+    input_cmd=(git diff --no-color -U0 "${BASE}" "${HEAD}")
+fi
+
+"${input_cmd[@]}" \
+    | "${clang_format_diff}" -p1 -style=file -regex='.+\.(c|h)' \
+    | tee "${FILE}"
+
+[[ ! -s ${FILE} ]]

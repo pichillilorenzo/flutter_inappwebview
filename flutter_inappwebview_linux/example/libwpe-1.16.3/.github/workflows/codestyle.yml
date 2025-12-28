@@ -1,0 +1,31 @@
+---
+name: Code Style
+on: [pull_request]
+
+jobs:
+  check:
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Checkout Head
+        uses: actions/checkout@v3
+      - name: Fetch Git History
+        run: |
+          git fetch --no-tags --prune --depth=1 \
+            origin +refs/heads/master:refs/remotes/origin/master
+      - name: Install Tools
+        run: |
+          curl -sL https://apt.llvm.org/llvm-snapshot.gpg.key | \
+            sudo apt-key add -
+          sudo add-apt-repository \
+            'deb http://apt.llvm.org/focal/ llvm-toolchain-focal-13 main'
+          sudo apt update
+          sudo apt install -y clang-format-13 diffutils
+      - name: Check
+        run: |
+          scripts/check-style -ocode-style.diff origin/master
+      - name: Archive Diff
+        uses: actions/upload-artifact@v3
+        if: failure()
+        with:
+          name: diff
+          path: code-style.diff

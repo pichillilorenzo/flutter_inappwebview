@@ -1,0 +1,17 @@
+{
+    "domain": "BidiSession",
+    "exposedAs": "session",
+    "condition": "ENABLE(WEBDRIVER_BIDI)",
+    "description": "The session module contains commands and events for monitoring the status of the remote end.",
+    "spec": "https://w3c.github.io/webdriver-bidi/#module-session",
+    "wpt": "https://github.com/web-platform-tests/wpt/tree/master/webdriver/tests/bidi/session",
+    "types": [
+        {
+            "id": "UserPromptHandlerType",
+            "description": "A type that represents the behavior of the user prompt handler.",
+            "spec": "https://w3c.github.io/webdriver-bidi/#type-script-Target",
+            "type": "string",
+            "enum": [ "accept", "dismiss", "ignore" ]
+        }
+    ]
+}

@@ -1,0 +1,25 @@
+---
+
+name: CI Source Formatting
+
+on:
+  pull_request:
+    branches:
+    - master
+
+jobs:
+  format-cmake:
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Format CMake files
+        id: cmake-format
+        uses: PuneetMatharu/cmake-format-lint-action@v1.0.1
+        with:
+          args: --config-files cmake-format.py
+      - name: Commit changes
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_user_name: cmake-format-bot
+          commit_message: 'Automated commit of cmake-format changes.'

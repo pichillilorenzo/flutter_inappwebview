@@ -1,0 +1,21 @@
+load("//bazel:skia_rules.bzl", "skia_filegroup")
+
+package(
+    default_applicable_licenses = ["//:license"],
+)
+
+licenses(["notice"])
+
+skia_filegroup(
+    name = "public_hdrs",
+    srcs = [
+        "MtlBackendContext.h",
+        "MtlGraphiteTypes.h",
+        "MtlGraphiteTypesUtils.h",
+        "MtlGraphiteTypes_cpp.h",
+        "MtlGraphiteUtils.h",
+    ],
+    visibility = [
+        "//src/gpu/graphite/mtl:__pkg__",
+    ],
+)

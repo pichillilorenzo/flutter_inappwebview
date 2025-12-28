@@ -1,0 +1,112 @@
+==========================
+1.16.1 - November 17, 2025
+==========================
+
+- Support newer versions of Mesa where format/modifier events have been
+  deprecated by implementing the needed parts of the DMA-BUF feedback
+  protocol in the nested compositor.
+
+=======================
+1.16.0 - March 13, 2025
+=======================
+
+- Fix the build with GCC 15.
+
+============================
+1.15.90 - September 13, 2024
+============================
+
+- Changed minimum Meson version to 0.52.1
+- Fix build issues in some configurations that require an explicit cast
+  to EGLNativeWindowType.
+- Fix WebKit no longer repainting after provisional navigation with
+  PSON enabled.
+- Fix graphics buffer leaks by always freeing them in buffer destroy
+  listener callbacks.
+- Fix a crash caused by a wrong assertion, which was typically triggered
+  in debug builds when using the NVidia drivers.
+- Fix memory leak when the view backend wl_resource is destroyed.
+- Fix wpe_dmabuf_pool object leak.
+
+=======================
+1.13.1 - August 9, 2022
+=======================
+
+- Fixed a crash caused by trying to deallocate already freed graphics
+  buffers in certain situations.
+
+========================
+1.9.1 - February 3, 2021
+========================
+
+- Added API to query whether receiving rendered audio has been configured.
+- The CMake build system has been removed in favor of Meson.
+- Fixed memory leak on the second (and subsequent) use of
+  wpe_fdo_initialize_shm().
+- Fixed memory leak when releasing exportable view backends.
+
+=====================
+1.7.1 - July 29, 2020
+=====================
+
+- Added new API for the audio rendering protocol, which allows embedders to
+  receive audio samples instead of letting WPE WebKit handle their playback.
+- Added support to export frames using EGLStreams, which can be used e.g.
+  with Nvidia GPUs.
+- New build configuration system based on Meson. The existing CMake-based
+  system is still maintained, and both produce the same outputs.
+- Expose symbols for the version retrieval functions.
+- Use libepoxy for EGL operations.
+
+=====================
+1.3.1 - June 13, 2019
+=====================
+
+- New macros in the API to check the version at compilation time.
+- Added support for detaching and attaching new ones for a view backend.
+- Improved handling of Wayland events.
+- Improved how CMake searches for wayland-scanner, making it friendlier for
+  cross-compilation.
+- Fixed double-free of callback resources during destruction of view backends.
+
+===================
+1.3.0 - May 8, 2019
+===================
+
+- Do not include EGL headers in libwpe public headers.
+- New API for exported images which allows querying their dimension their
+  backing EGLImageKHR.
+- Use the default priority for the GLib event sources.
+
+=========================
+1.1.0 - December 14, 2018
+=========================
+
+- Use the new libwpe API to notify when frames have been displayed.
+- Allow calling wpe_fdo_initialize_for_egl_display() multiple times, with
+  a warning printed to the standard error output when trying to switch
+  displays (which is unsupported).
+- Provide a dummy implementation of the EGL offscreen target interface, to
+  let WebKit use Pbuffer-based offscreen contexts as fallback, instead of
+  crashing.
+- Minor cleanups in headers and function prototypes.
+
+=======================
+1.0.0 - August 21, 2018
+=======================
+
+- Updated to use libwpe 1.0.0.
+- The libWPEBackend-fdo library now uses the libtool versioning convention.
+- New API which supports exporting frames as EGL images. This provides
+  applications with a ready to to render EGLImage, and has the advantage
+  that the library hides the actual protocol used by the backend's nested
+  compositor from the application.
+- Improved dispatching of Wayland events.
+- Support using DMA-BUF Wayland surfaces.
+- Support using Wayland versions older than 1.10
+
+====================
+0.1 - April 26, 2018
+====================
+
+- Initial release

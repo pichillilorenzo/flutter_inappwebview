@@ -1,0 +1,161 @@
+/*
+ * Copyright 2021 Google LLC
+ *
+ * Use of this source code is governed by a BSD-style license that can be
+ * found in the LICENSE file.
+ */
+
+#ifndef skgpu_graphite_DrawContext_DEFINED
+#define skgpu_graphite_DrawContext_DEFINED
+
+#include "include/core/SkImageInfo.h"
+#include "include/core/SkRefCnt.h"
+#include "include/core/SkSurfaceProps.h"
+#include "include/private/base/SkTArray.h"
+
+#include "src/gpu/graphite/DrawList.h"
+#include "src/gpu/graphite/DrawOrder.h"
+#include "src/gpu/graphite/DrawTypes.h"
+#include "src/gpu/graphite/ResourceTypes.h"
+#include "src/gpu/graphite/TextureProxyView.h"
+#include "src/gpu/graphite/task/UploadTask.h"
+
+#include <vector>
+
+class SkPixmap;
+
+namespace skgpu::graphite {
+
+class Geometry;
+class Recorder;
+class Transform;
+
+class Caps;
+class ComputePathAtlas;
+class DrawTask;
+class PathAtlas;
+class Task;
+class TextureProxy;
+
+/**
+ * DrawContext records draw commands into a specific Surface, via a general task graph
+ * representing GPU work and their inter-dependencies.
+ */
+class DrawContext final : public SkRefCnt {
+public:
+    static sk_sp<DrawContext> Make(const Caps* caps,
+                                   sk_sp<TextureProxy> target,
+                                   SkISize deviceSize,
+                                   const SkColorInfo&,
+                                   const SkSurfaceProps&);
+
+    ~DrawContext() override;
+
+    const SkImageInfo& imageInfo() const { return fImageInfo;    }
+    const SkColorInfo& colorInfo() const { return fImageInfo.colorInfo(); }
+    TextureProxy* target()                { return fTarget.get(); }
+    const TextureProxy* target()    const { return fTarget.get(); }
+    sk_sp<TextureProxy> refTarget() const { return fTarget; }
+
+    // May be null if the target is not texturable.
+    const TextureProxyView& readSurfaceView() const { return fReadView; }
+
+    const SkSurfaceProps& surfaceProps() const { return fSurfaceProps; }
+
+    int pendingRenderSteps() const { return fPendingDraws->renderStepCount(); }
+
+    void clear(const SkColor4f& clearColor);
+    void discard();
+
+    void recordDraw(const Renderer* renderer,
+                    const Transform& localToDevice,
+                    const Geometry& geometry,
+                    const Clip& clip,
+                    DrawOrder ordering,
+                    const PaintParams* paint,
+                    const StrokeStyle* stroke);
+
+    bool recordUpload(Recorder* recorder,
+                      sk_sp<TextureProxy> targetProxy,
+                      const SkColorInfo& srcColorInfo,
+                      const SkColorInfo& dstColorInfo,
+                      const std::vector<MipLevel>& levels,
+                      const SkIRect& dstRect,
+                      std::unique_ptr<ConditionalUploadContext>);
+
+    // Add a Task that will be executed *before* any of the pending draws and uploads are
+    // executed as part of the next flush(). Dependency
+    void recordDependency(sk_sp<Task>);
+
+    // Returns the transient path atlas that uses compute to accumulate coverage masks for atlas
+    // draws recorded to this SDC. The atlas gets created lazily upon request. Returns nullptr
+    // if compute path generation is not supported.
+    PathAtlas* getComputePathAtlas(Recorder*);
+
+    // Moves all accumulated pending recorded operations (draws and uploads), and any other
+    // dependent tasks into the DrawTask currently being built.
+    void flush(Recorder*);
+
+    // Flushes (if needed) and completes the current DrawTask, returning it to the caller.
+    // Subsequent recorded operations will be added to a new DrawTask.
+    sk_sp<Task> snapDrawTask(Recorder*);
+
+    // Returns the dst read strategy to use when/if a paint requires a dst read
+    DstReadStrategy dstReadStrategy(bool requiresMSAA) const {
+        return requiresMSAA ? fMSAADstReadStrategy : fSingleSampleDstReadStrategy;
+    }
+
+private:
+    DrawContext(const Caps*, sk_sp<TextureProxy>, const SkImageInfo&, const SkSurfaceProps&);
+
+    sk_sp<TextureProxy> fTarget;
+    TextureProxyView fReadView;
+    SkImageInfo fImageInfo;
+    const SkSurfaceProps fSurfaceProps;
+
+    // Does *not* reflect whether a dst read is needed by the DrawLists - simply specifies the
+    // strategies to use should any encountered paint require it.
+    // TODO(b/390458117): Until reading MSAA textures as input attachments is implemented for the
+    // Vulkan backend, we must have distinct strategies for multisampled versus single-sampled
+    // targets. Once that is supported, these can be combined into 1 member attribute. We do this
+    // at the graphite level insted of in VulkanCaps::getDstReadStrategy() because not all callers
+    // to that method have target sample count information. It also aids in ensuring that the chosen
+    // strategy for a given draw aligns throughout the DrawPass, RenderPassDesc, and Device.
+    const DstReadStrategy fSingleSampleDstReadStrategy;
+    const DstReadStrategy fMSAADstReadStrategy;
+
+    // The in-progress DrawTask that will be snapped and returned when some external requirement
+    // must depend on the contents of this DrawContext's target. As higher-level Skia operations
+    // are recorded, it can be necessary to flush pending draws and uploads into the task list.
+    // This provides a place to reset scratch textures or buffers as their previous state will have
+    // been consumed by the flushed tasks rendering to this DrawContext's target.
+    sk_sp<DrawTask> fCurrentDrawTask;
+
+    // Stores the most immediately recorded draws and uploads into the DrawContext's target. These
+    // are collected outside of the DrawTask so that encoder switches can be minimized when
+    // flushing.
+    std::unique_ptr<DrawList> fPendingDraws;
+    std::unique_ptr<UploadList> fPendingUploads;
+    // Load and store information for the current pending draws.
+    LoadOp fPendingLoadOp = LoadOp::kLoad;
+    StoreOp fPendingStoreOp = StoreOp::kStore;
+    std::array<float, 4> fPendingClearColor = { 0, 0, 0, 0 };
+
+    // Accumulates atlas coverage masks generated by compute dispatches that are required by one or
+    // more entries in `fPendingDraws`. When pending draws are snapped into a new DrawPass, a
+    // compute dispatch group gets recorded which schedules the accumulated masks to get drawn into
+    // an atlas texture. The accumulated masks are then cleared which frees up the atlas for
+    // future draws.
+    //
+    // TODO: Currently every PathAtlas contains a single texture. If multiple snapped draw
+    // passes resulted in multiple ComputePathAtlas dispatch groups, the later dispatches would
+    // overwrite the atlas texture since all compute tasks are scheduled before render tasks. This
+    // is currently not an issue since there is only one DrawPass per flush but we may want to
+    // either support one atlas texture per DrawPass or record the dispatches once per
+    // RenderPassTask rather than DrawPass.
+    std::unique_ptr<ComputePathAtlas> fComputePathAtlas;
+};
+
+} // namespace skgpu::graphite
+
+#endif // skgpu_graphite_DrawContext_DEFINED

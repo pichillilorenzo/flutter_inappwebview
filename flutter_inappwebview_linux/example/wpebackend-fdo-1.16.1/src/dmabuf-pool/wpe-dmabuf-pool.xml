@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<protocol name="wpe_dmabuf_pool">
+  <copyright>
+    Copyright © 2020 Igalia S.L.
+
+    Permission to use, copy, modify, distribute, and sell this
+    software and its documentation for any purpose is hereby granted
+    without fee, provided that the above copyright notice appear in
+    all copies and that both that copyright notice and this permission
+    notice appear in supporting documentation, and that the name of
+    the copyright holders not be used in advertising or publicity
+    pertaining to distribution of the software without specific,
+    written prior permission.  The copyright holders make no
+    representations about the suitability of this software for any
+    purpose.  It is provided "as is" without express or implied
+    warranty.
+
+    THE COPYRIGHT HOLDERS DISCLAIM ALL WARRANTIES WITH REGARD TO THIS
+    SOFTWARE, INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND
+    FITNESS, IN NO EVENT SHALL THE COPYRIGHT HOLDERS BE LIABLE FOR ANY
+    SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+    WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN
+    AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION,
+    ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF
+    THIS SOFTWARE.
+  </copyright>
+
+  <interface name="wpe_dmabuf_pool_manager" version="1">
+    <request name="create_pool">
+      <arg name="id" type="new_id" interface="wpe_dmabuf_pool"/>
+      <arg name="surface" type="object" interface="wl_surface"/>
+    </request>
+  </interface>
+
+  <interface name="wpe_dmabuf_pool" version="1">
+    <request name="create_buffer">
+      <arg name="buffer_id" type="new_id" interface="wl_buffer"/>
+      <arg name="width" type="uint"/>
+      <arg name="height" type="uint"/>
+    </request>
+
+    <request name="get_dmabuf_data">
+      <arg name="dmabuf_data_id" type="new_id" interface="wpe_dmabuf_data"/>
+      <arg name="buffer" type="object" interface="wl_buffer"/>
+    </request>
+  </interface>
+
+  <interface name="wpe_dmabuf_data" version="1">
+    <request name="request">
+    </request>
+
+    <event name="attributes">
+      <arg name="width" type="uint" />
+      <arg name="height" type="uint" />
+      <arg name="format" type="uint" />
+      <arg name="num_planes" type="uint" />
+    </event>
+
+    <event name="plane">
+      <arg name="id" type="uint" />
+      <arg name="fd" type="fd" />
+      <arg name="stride" type="uint" />
+      <arg name="offset" type="uint" />
+      <arg name="modifier_hi" type="uint" />
+      <arg name="modifier_lo" type="uint" />
+    </event>
+
+    <event name="complete">
+    </event>
+  </interface>
+</protocol>

@@ -1,0 +1,164 @@
+/*
+ * Copyright (C) 2020-2023 Apple Inc. All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ *
+ * THIS SOFTWARE IS PROVIDED BY APPLE INC. AND ITS CONTRIBUTORS ``AS IS''
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+ * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+ * PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL APPLE INC. OR ITS CONTRIBUTORS
+ * BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+ * THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
+#include "config.h"
+#include "RemoteResourceCache.h"
+
+#if ENABLE(GPU_PROCESS)
+
+#include <WebCore/DecomposedGlyphs.h>
+#include <WebCore/Filter.h>
+#include <WebCore/Font.h>
+#include <WebCore/FontCustomPlatformData.h>
+#include <WebCore/Gradient.h>
+#include <WebCore/ImageBuffer.h>
+#include <WebCore/NativeImage.h>
+
+namespace WebKit {
+using namespace WebCore;
+
+RemoteResourceCache::RemoteResourceCache() = default;
+
+RemoteResourceCache::~RemoteResourceCache() = default;
+
+void RemoteResourceCache::cacheNativeImage(Ref<NativeImage>&& image)
+{
+    auto identifier = image->renderingResourceIdentifier();
+    m_nativeImages.add(identifier, WTFMove(image));
+}
+
+bool RemoteResourceCache::releaseNativeImage(RenderingResourceIdentifier identifier)
+{
+    return m_nativeImages.remove(identifier);
+}
+
+RefPtr<NativeImage> RemoteResourceCache::cachedNativeImage(RenderingResourceIdentifier identifier) const
+{
+    return m_nativeImages.get(identifier);
+}
+
+void RemoteResourceCache::cacheDecomposedGlyphs(Ref<DecomposedGlyphs>&& decomposedGlyphs)
+{
+    auto identifier = decomposedGlyphs->renderingResourceIdentifier();
+    m_decomposedGlyphs.add(identifier, WTFMove(decomposedGlyphs));
+}
+
+bool RemoteResourceCache::releaseDecomposedGlyphs(RenderingResourceIdentifier identifier)
+{
+    return m_decomposedGlyphs.remove(identifier);
+}
+
+RefPtr<DecomposedGlyphs> RemoteResourceCache::cachedDecomposedGlyphs(RenderingResourceIdentifier identifier) const
+{
+    return m_decomposedGlyphs.get(identifier);
+}
+
+bool RemoteResourceCache::cacheGradient(RenderingResourceIdentifier identifier, Ref<Gradient>&& gradient)
+{
+    return m_gradients.add(identifier, WTFMove(gradient)).isNewEntry;
+}
+
+bool RemoteResourceCache::releaseGradient(RenderingResourceIdentifier identifier)
+{
+    return m_gradients.remove(identifier);
+}
+
+RefPtr<Gradient> RemoteResourceCache::cachedGradient(RenderingResourceIdentifier identifier) const
+{
+    return m_gradients.get(identifier);
+}
+
+void RemoteResourceCache::cacheFilter(Ref<Filter>&& filter)
+{
+    auto identifier = filter->renderingResourceIdentifier();
+    m_filters.add(identifier, WTFMove(filter));
+}
+
+bool RemoteResourceCache::releaseFilter(RenderingResourceIdentifier identifier)
+{
+    return m_filters.remove(identifier);
+}
+
+RefPtr<Filter> RemoteResourceCache::cachedFilter(RenderingResourceIdentifier identifier) const
+{
+    return m_filters.get(identifier);
+}
+
+void RemoteResourceCache::cacheFont(Ref<Font>&& font)
+{
+    auto identifier = font->renderingResourceIdentifier();
+    m_fonts.add(identifier, WTFMove(font));
+}
+
+bool RemoteResourceCache::releaseFont(RenderingResourceIdentifier identifier)
+{
+    return m_fonts.remove(identifier);
+}
+
+RefPtr<Font> RemoteResourceCache::cachedFont(RenderingResourceIdentifier identifier) const
+{
+    return m_fonts.get(identifier);
+}
+
+void RemoteResourceCache::cacheFontCustomPlatformData(Ref<FontCustomPlatformData>&& customPlatformData)
+{
+    auto identifier = customPlatformData->m_renderingResourceIdentifier;
+    m_fontCustomPlatformDatas.add(identifier, WTFMove(customPlatformData));
+}
+
+bool RemoteResourceCache::releaseFontCustomPlatformData(RenderingResourceIdentifier identifier)
+{
+    return m_fontCustomPlatformDatas.remove(identifier);
+}
+
+RefPtr<FontCustomPlatformData> RemoteResourceCache::cachedFontCustomPlatformData(RenderingResourceIdentifier identifier) const
+{
+    return m_fontCustomPlatformDatas.get(identifier);
+}
+
+void RemoteResourceCache::releaseAllResources()
+{
+    m_imageBuffers.clear();
+    releaseMemory();
+}
+
+void RemoteResourceCache::releaseMemory()
+{
+    m_nativeImages.clear();
+    m_gradients.clear();
+    m_decomposedGlyphs.clear();
+    m_filters.clear();
+    m_fonts.clear();
+    m_fontCustomPlatformDatas.clear();
+}
+
+void RemoteResourceCache::releaseNativeImages()
+{
+    m_nativeImages.clear();
+}
+
+} // namespace WebKit
+
+#endif // ENABLE(GPU_PROCESS)

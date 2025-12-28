@@ -1,0 +1,42 @@
+load("//bazel:skia_rules.bzl", "generate_cpp_files_for_headers", "split_srcs_and_hdrs")
+
+package(
+    default_applicable_licenses = ["//:license"],
+)
+
+licenses(["notice"])
+
+TESSELLATE_FILES = [
+    "AffineMatrix.h",
+    "CullTest.h",
+    "FixedCountBufferUtils.cpp",
+    "FixedCountBufferUtils.h",
+    "LinearTolerances.h",
+    "MiddleOutPolygonTriangulator.h",
+    "MidpointContourParser.h",
+    "PatchWriter.h",
+    "StrokeIterator.h",
+    "Tessellation.cpp",
+    "Tessellation.h",
+    "WangsFormula.h",
+]
+
+split_srcs_and_hdrs(
+    name = "tessellate",
+    files = TESSELLATE_FILES,
+    visibility = ["//src/gpu:__pkg__"],
+)
+
+generate_cpp_files_for_headers(
+    name = "headers_to_compile",
+    headers = [
+        "AffineMatrix.h",
+        "CullTest.h",
+        "LinearTolerances.h",
+        "MiddleOutPolygonTriangulator.h",
+        "MidpointContourParser.h",
+        "PatchWriter.h",
+        "StrokeIterator.h",
+        "WangsFormula.h",
+    ],
+)

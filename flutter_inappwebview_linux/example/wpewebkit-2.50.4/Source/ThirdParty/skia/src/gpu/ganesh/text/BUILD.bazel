@@ -1,0 +1,24 @@
+load("//bazel:skia_rules.bzl", "skia_filegroup")
+
+package(
+    default_applicable_licenses = ["//:license"],
+)
+
+licenses(["notice"])
+
+skia_filegroup(
+    name = "srcs",
+    srcs = [
+        "GaneshVertexFiller.cpp",
+        "GrAtlasManager.cpp",
+    ],
+    visibility = ["//src/gpu/ganesh:__pkg__"],
+)
+
+skia_filegroup(
+    name = "private_hdrs",
+    srcs = [
+        "GrAtlasManager.h",
+    ],
+    visibility = ["//src/gpu/ganesh:__pkg__"],
+)

@@ -1,0 +1,68 @@
+#ifndef FLUTTER_INAPPWEBVIEW_PLUGIN_CUSTOM_PLATFORM_VIEW_H_
+#define FLUTTER_INAPPWEBVIEW_PLUGIN_CUSTOM_PLATFORM_VIEW_H_
+
+#include <flutter_linux/flutter_linux.h>
+
+#include <memory>
+#include <string>
+
+// Include the appropriate backend
+#ifdef USE_WPE_WEBKIT
+#include "in_app_webview_wpe.h"
+#else
+#include "in_app_webview.h"
+#endif
+
+namespace flutter_inappwebview_plugin {
+
+// Define WebViewType based on backend
+#ifdef USE_WPE_WEBKIT
+using WebViewType = InAppWebViewWpe;
+#else
+using WebViewType = InAppWebView;
+#endif
+
+/// CustomPlatformView handles the method channel communication for
+/// pointer/mouse events, sizing, and other platform view operations.
+/// This is similar to the Windows implementation.
+class CustomPlatformView {
+ public:
+  CustomPlatformView(FlBinaryMessenger* messenger,
+                     FlTextureRegistrar* texture_registrar,
+                     std::shared_ptr<WebViewType> webview);
+  ~CustomPlatformView();
+
+  int64_t texture_id() const { return texture_id_; }
+  WebViewType* webview() const { return webview_.get(); }
+
+  void MarkTextureFrameAvailable();
+
+ private:
+  std::shared_ptr<WebViewType> webview_;
+  FlTextureRegistrar* texture_registrar_;
+  FlTexture* texture_ = nullptr;
+  int64_t texture_id_ = -1;
+
+  FlMethodChannel* method_channel_ = nullptr;
+  FlEventChannel* event_channel_ = nullptr;
+  bool event_sink_active_ = false;
+
+  // Method call handler
+  static void HandleMethodCall(FlMethodChannel* channel,
+                               FlMethodCall* method_call, gpointer user_data);
+  void HandleMethodCallImpl(FlMethodCall* method_call);
+
+  // Event channel handlers
+  static FlMethodErrorResponse* OnListen(FlEventChannel* channel,
+                                         FlValue* args,
+                                         gpointer user_data);
+  static FlMethodErrorResponse* OnCancel(FlEventChannel* channel,
+                                         FlValue* args,
+                                         gpointer user_data);
+
+  void EmitCursorChanged(const std::string& cursor_name);
+};
+
+}  // namespace flutter_inappwebview_plugin
+
+#endif  // FLUTTER_INAPPWEBVIEW_PLUGIN_CUSTOM_PLATFORM_VIEW_H_

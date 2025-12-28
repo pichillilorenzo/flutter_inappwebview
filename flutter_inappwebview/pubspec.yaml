@@ -56,6 +56,8 @@ flutter:
         default_package: flutter_inappwebview_ios
       macos:
         default_package: flutter_inappwebview_macos
+      linux:
+        default_package: flutter_inappwebview_linux
       web:
         default_package: flutter_inappwebview_web
       windows:

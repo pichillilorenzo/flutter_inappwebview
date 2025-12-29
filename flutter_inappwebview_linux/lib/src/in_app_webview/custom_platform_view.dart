@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
 import '_static_channel.dart';
+import 'key_mappings.dart';
 
 const Map<String, SystemMouseCursor> _cursors = {
   'none': SystemMouseCursors.none,
@@ -335,101 +336,28 @@ class _CustomPlatformViewState extends State<CustomPlatformView> {
       return KeyEventResult.ignored;
     }
 
-    // Build modifiers bitmask first - we need this for keyCode logic
+    // Build modifiers bitmask matching WPE's wpe_input_modifier enum:
+    // Control = bit 0, Shift = bit 1, Alt = bit 2, Meta = bit 3
     int modifiers = 0;
-    if (HardwareKeyboard.instance.isShiftPressed) modifiers |= 1;
-    if (HardwareKeyboard.instance.isControlPressed) modifiers |= 2;
-    if (HardwareKeyboard.instance.isAltPressed) modifiers |= 4;
-    if (HardwareKeyboard.instance.isMetaPressed) modifiers |= 8;
+    if (HardwareKeyboard.instance.isControlPressed) modifiers |= 1;  // wpe_input_keyboard_modifier_control
+    if (HardwareKeyboard.instance.isShiftPressed) modifiers |= 2;    // wpe_input_keyboard_modifier_shift
+    if (HardwareKeyboard.instance.isAltPressed) modifiers |= 4;      // wpe_input_keyboard_modifier_alt
+    if (HardwareKeyboard.instance.isMetaPressed) modifiers |= 8;     // wpe_input_keyboard_modifier_meta
 
-    // Get key information
-    // For WPE, we need X11 keysym values. Flutter's logicalKey.keyId uses a different scheme.
-    int keyCode;
-    String? characters = event.character;
+    // For Ctrl/Meta combinations, don't send the character
+    final hasControlOrMeta = (modifiers & 0x9) != 0;  // Ctrl=1 or Meta=8
+    String? characters = hasControlOrMeta ? null : event.character;
     
-    // For Ctrl/Meta combinations, use the base key code without the character
-    // This ensures shortcuts like Ctrl+A, Ctrl+C work correctly
-    final hasControlOrMeta = (modifiers & 0xA) != 0;  // Ctrl=2 or Meta=8
+    // Get X11 keysym for the key
+    final keyCode = getX11Keysym(event.logicalKey, event.character);
     
-    // Check for special keys first - these should always use X11 keysyms
-    final specialKeysym = _flutterKeyToX11Keysym(event.logicalKey);
-    final isSpecialKey = specialKeysym >= 0xff00 || specialKeysym < 0x20;
-    
-    if (hasControlOrMeta || isSpecialKey) {
-      // For shortcuts or special keys, use the X11 keysym
-      keyCode = specialKeysym;
-      if (hasControlOrMeta) {
-        characters = null;  // Don't send character for shortcuts
-      }
-    } else if (event.character != null && event.character!.isNotEmpty && 
-               event.character!.codeUnitAt(0) >= 0x20) {
-      // Use the character's Unicode code point as keysym (valid for printable chars)
-      keyCode = event.character!.codeUnitAt(0);
-    } else {
-      // Fallback to key mapping
-      keyCode = specialKeysym;
-    }
-    
-    // Use physical key's USB HID usage - the C++ side will convert if needed
-    final scanCode = event.physicalKey.usbHidUsage & 0xFFFF;
+    // Get X11 keycode from physical key (USB HID -> evdev -> X11)
+    final usbHid = event.physicalKey.usbHidUsage & 0xFFFF;
+    final scanCode = usbHidToX11Keycode(usbHid);
 
     _controller._sendKeyEvent(type, keyCode, scanCode, modifiers, characters);
 
     return KeyEventResult.handled;
-  }
-
-  /// Map Flutter LogicalKeyboardKey to X11 keysym
-  int _flutterKeyToX11Keysym(LogicalKeyboardKey key) {
-    // Use keyId-based lookup since LogicalKeyboardKey can't be used as const map key
-    final keyId = key.keyId;
-    
-    // Common special keys mapping to X11 keysyms (using keyId values)
-    // These keyIds are from Flutter's LogicalKeyboardKey constants
-    if (keyId == LogicalKeyboardKey.backspace.keyId) return 0xff08;
-    if (keyId == LogicalKeyboardKey.tab.keyId) return 0xff09;
-    if (keyId == LogicalKeyboardKey.enter.keyId) return 0xff0d;
-    if (keyId == LogicalKeyboardKey.escape.keyId) return 0xff1b;
-    if (keyId == LogicalKeyboardKey.delete.keyId) return 0xffff;
-    if (keyId == LogicalKeyboardKey.home.keyId) return 0xff50;
-    if (keyId == LogicalKeyboardKey.arrowLeft.keyId) return 0xff51;
-    if (keyId == LogicalKeyboardKey.arrowUp.keyId) return 0xff52;
-    if (keyId == LogicalKeyboardKey.arrowRight.keyId) return 0xff53;
-    if (keyId == LogicalKeyboardKey.arrowDown.keyId) return 0xff54;
-    if (keyId == LogicalKeyboardKey.pageUp.keyId) return 0xff55;
-    if (keyId == LogicalKeyboardKey.pageDown.keyId) return 0xff56;
-    if (keyId == LogicalKeyboardKey.end.keyId) return 0xff57;
-    if (keyId == LogicalKeyboardKey.insert.keyId) return 0xff63;
-    if (keyId == LogicalKeyboardKey.f1.keyId) return 0xffbe;
-    if (keyId == LogicalKeyboardKey.f2.keyId) return 0xffbf;
-    if (keyId == LogicalKeyboardKey.f3.keyId) return 0xffc0;
-    if (keyId == LogicalKeyboardKey.f4.keyId) return 0xffc1;
-    if (keyId == LogicalKeyboardKey.f5.keyId) return 0xffc2;
-    if (keyId == LogicalKeyboardKey.f6.keyId) return 0xffc3;
-    if (keyId == LogicalKeyboardKey.f7.keyId) return 0xffc4;
-    if (keyId == LogicalKeyboardKey.f8.keyId) return 0xffc5;
-    if (keyId == LogicalKeyboardKey.f9.keyId) return 0xffc6;
-    if (keyId == LogicalKeyboardKey.f10.keyId) return 0xffc7;
-    if (keyId == LogicalKeyboardKey.f11.keyId) return 0xffc8;
-    if (keyId == LogicalKeyboardKey.f12.keyId) return 0xffc9;
-    if (keyId == LogicalKeyboardKey.shiftLeft.keyId) return 0xffe1;
-    if (keyId == LogicalKeyboardKey.shiftRight.keyId) return 0xffe2;
-    if (keyId == LogicalKeyboardKey.controlLeft.keyId) return 0xffe3;
-    if (keyId == LogicalKeyboardKey.controlRight.keyId) return 0xffe4;
-    if (keyId == LogicalKeyboardKey.capsLock.keyId) return 0xffe5;
-    if (keyId == LogicalKeyboardKey.altLeft.keyId) return 0xffe9;
-    if (keyId == LogicalKeyboardKey.altRight.keyId) return 0xffea;
-    if (keyId == LogicalKeyboardKey.metaLeft.keyId) return 0xffeb;
-    if (keyId == LogicalKeyboardKey.metaRight.keyId) return 0xffec;
-    if (keyId == LogicalKeyboardKey.space.keyId) return 0x0020;
-    
-    // For letter keys (a-z), return lowercase ASCII value
-    // Flutter keyId for 'a' is 0x00000061 which matches ASCII
-    if (keyId >= 0x61 && keyId <= 0x7a) return keyId;  // a-z
-    if (keyId >= 0x41 && keyId <= 0x5a) return keyId + 0x20;  // A-Z -> a-z
-    if (keyId >= 0x30 && keyId <= 0x39) return keyId;  // 0-9
-    
-    // Fallback: use lower 16 bits of keyId
-    return keyId & 0xFFFF;
   }
 
   Widget _buildInner() {

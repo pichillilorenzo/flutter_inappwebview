@@ -1,11 +1,15 @@
+import 'dart:async';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview_linux/flutter_inappwebview_linux.dart';
 import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_platform_interface.dart';
 
-void main() {
+Future main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
   LinuxInAppWebViewPlatform.registerWith();
-  runApp(const MyApp());
+
+  runApp(const MaterialApp(home: MyApp()));
 }
 
 class MyApp extends StatefulWidget {
@@ -16,106 +20,129 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  LinuxInAppWebViewController? _controller;
+  final GlobalKey webViewKey = GlobalKey();
+
+  LinuxInAppWebViewController? webViewController;
+  InAppWebViewSettings settings = InAppWebViewSettings(
+      isInspectable: kDebugMode,
+      mediaPlaybackRequiresUserGesture: false,
+      allowsInlineMediaPlayback: true,
+      iframeAllow: "camera; microphone",
+      iframeAllowFullscreen: true);
+
+  String url = "";
+  double progress = 0;
+  final urlController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: Scaffold(
-        appBar: AppBar(
-          title: const Text('InAppWebView Linux Example'),
-        ),
-        body: Column(
-          children: [
-            Expanded(
-              child: LinuxInAppWebViewWidget(
-                LinuxInAppWebViewWidgetCreationParams(
-                  initialUrlRequest: URLRequest(url: WebUri('https://flutter.dev')),
-                  initialSettings: InAppWebViewSettings(
-                    useShouldOverrideUrlLoading: true,
-                    javaScriptEnabled: true,
-                    javaScriptBridgeEnabled: true,
-                    javaScriptCanOpenWindowsAutomatically: true
-                  ),
+    return Scaffold(
+        appBar: AppBar(title: const Text("Official InAppWebView website")),
+        body: SafeArea(
+            child: Column(children: <Widget>[
+          TextField(
+            decoration: const InputDecoration(prefixIcon: Icon(Icons.search)),
+            controller: urlController,
+            keyboardType: TextInputType.url,
+            onSubmitted: (value) {
+              var url = WebUri(value);
+              if (url.scheme.isEmpty) {
+                url = WebUri("https://www.google.com/search?q=$value");
+              }
+              webViewController?.loadUrl(urlRequest: URLRequest(url: url));
+            },
+          ),
+          Expanded(
+            child: Stack(
+              children: [
+                LinuxInAppWebViewWidget( LinuxInAppWebViewWidgetCreationParams(
+                  key: webViewKey,
+                  initialUrlRequest:
+                      URLRequest(url: WebUri("https://developer.mozilla.org/en-US/docs/Web/API/Element/keypress_event#examples")),
+                  initialSettings: settings,
                   onWebViewCreated: (controller) {
-                    _controller = controller as LinuxInAppWebViewController;
+                    webViewController = controller;
                   },
                   onLoadStart: (controller, url) {
-                    debugPrint('onLoadStart: $url');
+                    setState(() {
+                      this.url = url.toString();
+                      urlController.text = this.url;
+                    });
                   },
-                  onLoadStop: (controller, url) {
-                    debugPrint('onLoadStop: $url');
+                  onPermissionRequest: (controller, request) async {
+                    return PermissionResponse(
+                        resources: request.resources,
+                        action: PermissionResponseAction.GRANT);
                   },
-                  shouldOverrideUrlLoading: (controller, navigationAction) async {
-                    debugPrint('shouldOverrideUrlLoading: ${navigationAction.request.url}');
+                  shouldOverrideUrlLoading:
+                      (controller, navigationAction) async {
+                    var uri = navigationAction.request.url!;
                     return NavigationActionPolicy.ALLOW;
                   },
-                  onCreateWindow: (controller, createWindowAction) async {
-                    debugPrint('onCreateWindow: ${createWindowAction.request.url}');
+                  onLoadStop: (controller, url) async {
+                    setState(() {
+                      this.url = url.toString();
+                      urlController.text = this.url;
+                    });
+                  },
+                  onReceivedError: (controller, request, error) {
+                    
+                  },
+                  onProgressChanged: (controller, progress) {
+                    if (progress == 100) {
+                      
+                    }
+                    setState(() {
+                      this.progress = progress / 100;
+                      urlController.text = url;
+                    });
+                  },
+                  onUpdateVisitedHistory: (controller, url, androidIsReload) {
+                    setState(() {
+                      this.url = url.toString();
+                      urlController.text = this.url;
+                    });
                   },
                   onConsoleMessage: (controller, consoleMessage) {
-                    debugPrint('Console Message: ${consoleMessage.message}');
+                    if (kDebugMode) {
+                      print(consoleMessage);
+                    }
                   },
-                ),
-              ).build(context),
+                )).build(context),
+                progress < 1.0
+                    ? LinearProgressIndicator(value: progress)
+                    : Container(),
+              ],
             ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  ElevatedButton(
-                    onPressed: () => _controller?.goBack(),
-                    child: const Text('Back'),
-                  ),
-                  ElevatedButton(
-                    onPressed: () => _controller?.goForward(),
-                    child: const Text('Forward'),
-                  ),
-                  ElevatedButton(
-                    onPressed: () => _controller?.reload(),
-                    child: const Text('Reload'),
-                  ),
-                  ElevatedButton(
-                    onPressed: () async {
-                      // Test console.log and JS bridge - check if console is wrapped
-                      final result = await _controller?.evaluateJavascript(source: '''
-                        (function() {
-                          var results = [];
-                          results.push("flutter_inappwebview: " + (typeof window.flutter_inappwebview));
-                          results.push("callHandler: " + (typeof window.flutter_inappwebview?.callHandler));
-                          
-                          // Check if console.log has been wrapped (native function vs our wrapper)
-                          var consoleLogStr = console.log.toString();
-                          results.push("console.log wrapped: " + (consoleLogStr.indexOf('native') === -1));
-                          
-                          // Test console.log directly (should be intercepted by console_log_js)
-                          console.log("Test 1: Direct console.log");
-                          console.warn("Test 2: console.warn");
-                          console.error("Test 3: console.error");
-                          
-                          // Test via callHandler (should also work as it goes through the bridge)
-                          try {
-                            window.flutter_inappwebview.callHandler('onConsoleMessage', {level: 'log', message: 'Test 4: Via callHandler'});
-                            results.push("callHandler: sent");
-                          } catch(e) {
-                            results.push("callHandler error: " + e.message);
-                          }
-                          
-                          return results.join(", ");
-                        })();
-                      ''');
-                      debugPrint('JS Bridge test result: $result');
-                    },
-                    child: const Text('Test JS'),
-                  ),
-                ],
+          ),
+          ButtonBar(
+            alignment: MainAxisAlignment.center,
+            children: <Widget>[
+              ElevatedButton(
+                child: const Icon(Icons.arrow_back),
+                onPressed: () {
+                  webViewController?.goBack();
+                },
               ),
-            ),
-          ],
-        ),
-      ),
-    );
+              ElevatedButton(
+                child: const Icon(Icons.arrow_forward),
+                onPressed: () {
+                  webViewController?.goForward();
+                },
+              ),
+              ElevatedButton(
+                child: const Icon(Icons.refresh),
+                onPressed: () {
+                  webViewController?.reload();
+                },
+              ),
+            ],
+          ),
+        ])));
   }
 }
-

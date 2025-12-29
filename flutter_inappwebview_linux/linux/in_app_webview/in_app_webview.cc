@@ -60,12 +60,9 @@ namespace flutter_inappwebview_plugin {
 
 namespace {
 
-// Simple modifier mask for WPE keyboard/pointer events.
-// libwpe does not define symbolic constants, so we keep a local set.
-constexpr uint32_t kModShift   = 1u << 0;
-constexpr uint32_t kModControl = 1u << 1;
-constexpr uint32_t kModAlt     = 1u << 2;
-constexpr uint32_t kModMeta    = 1u << 3;
+// WPE modifier mask - matches wpe_input_modifier enum from wpe/input.h
+// Control = bit 0 (1), Shift = bit 1 (2), Alt = bit 2 (4), Meta = bit 3 (8)
+// These are not used directly in C++ code - modifiers come from Dart already in WPE format
 
 // Generate a random hex string for the JS bridge secret
 std::string GenerateRandomSecret(size_t length = 32) {
@@ -977,22 +974,26 @@ void InAppWebView::SetPointerButton(int kind, int button, int clickCount) {
   event.modifiers = current_modifiers_;
 
   // Map event type based on kind
+  // WPE button state uses high bits: button1=1<<20, button2=1<<21, button3=1<<22
+  // See wpe_input_pointer_modifier_button* in wpe/input.h
+  const uint32_t button_modifier_bit = 1u << (19 + wpe_button);
+  
   switch (static_cast<WpePointerEventKind>(kind)) {
     case WpePointerEventKind::Down:
       event.type = wpe_input_pointer_event_type_button;
-      button_state_ |= (1 << wpe_button);
+      button_state_ |= button_modifier_bit;
       event.state = button_state_;  // Button mask
       if (DebugLogEnabled()) {
-        g_message("InAppWebView[%ld]: button DOWN at (%d,%d) button=%d state=%d",
+        g_message("InAppWebView[%ld]: button DOWN at (%d,%d) button=%d state=0x%x",
                   static_cast<long>(id_), scaled_x, scaled_y, wpe_button, event.state);
       }
       break;
     case WpePointerEventKind::Up:
       event.type = wpe_input_pointer_event_type_button;
-      button_state_ &= ~(1 << wpe_button);
+      button_state_ &= ~button_modifier_bit;
       event.state = button_state_;  // Button mask after release
       if (DebugLogEnabled()) {
-        g_message("InAppWebView[%ld]: button UP at (%d,%d) button=%d state=%d",
+        g_message("InAppWebView[%ld]: button UP at (%d,%d) button=%d state=0x%x",
                   static_cast<long>(id_), scaled_x, scaled_y, wpe_button, event.state);
       }
       break;
@@ -1043,12 +1044,9 @@ void InAppWebView::SendKeyEvent(int type, int64_t keyCode, int scanCode,
   // type: 0=down, 1=up, 2=repeat
   event.pressed = (type == 0 || type == 2);
 
-  // Map Flutter modifiers (Shift=1, Ctrl=2, Alt=4, Meta=8) to WPE mask
-  current_modifiers_ = 0;
-  if (modifiers & 1) current_modifiers_ |= kModShift;
-  if (modifiers & 2) current_modifiers_ |= kModControl;
-  if (modifiers & 4) current_modifiers_ |= kModAlt;
-  if (modifiers & 8) current_modifiers_ |= kModMeta;
+  // Modifiers from Dart are already in WPE format:
+  // Control=1, Shift=2, Alt=4, Meta=8
+  current_modifiers_ = static_cast<uint32_t>(modifiers);
   event.modifiers = current_modifiers_;
 
   if (DebugLogEnabled()) {

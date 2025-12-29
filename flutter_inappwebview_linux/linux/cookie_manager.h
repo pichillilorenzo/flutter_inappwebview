@@ -2,13 +2,7 @@
 #define FLUTTER_INAPPWEBVIEW_PLUGIN_COOKIE_MANAGER_H_
 
 #include <flutter_linux/flutter_linux.h>
-
-// Use the appropriate WebKit header based on backend
-#ifdef USE_WPE_WEBKIT
 #include <wpe/webkit.h>
-#else
-#include <webkit2/webkit2.h>
-#endif
 
 #include <functional>
 #include <memory>

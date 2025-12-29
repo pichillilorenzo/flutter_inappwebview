@@ -6,21 +6,11 @@
 #include <memory>
 #include <string>
 
-// Include the appropriate backend
-#ifdef USE_WPE_WEBKIT
-#include "in_app_webview_wpe.h"
-#else
 #include "in_app_webview.h"
-#endif
 
 namespace flutter_inappwebview_plugin {
 
-// Define WebViewType based on backend
-#ifdef USE_WPE_WEBKIT
-using WebViewType = InAppWebViewWpe;
-#else
 using WebViewType = InAppWebView;
-#endif
 
 /// CustomPlatformView handles the method channel communication for
 /// pointer/mouse events, sizing, and other platform view operations.

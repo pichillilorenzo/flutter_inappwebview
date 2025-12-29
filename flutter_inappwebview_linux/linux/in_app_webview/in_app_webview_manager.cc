@@ -4,11 +4,8 @@
 
 #include "../utils/flutter.h"
 #include "../utils/log.h"
-
-#ifdef USE_WPE_WEBKIT
-#include "in_app_webview_wpe.h"
-#include "in_app_webview_settings_wpe.h"
-#endif
+#include "in_app_webview.h"
+#include "in_app_webview_settings.h"
 
 namespace flutter_inappwebview_plugin {
 
@@ -93,65 +90,6 @@ void InAppWebViewManager::CreateInAppWebView(FlMethodCall* method_call) {
     return;
   }
 
-#ifdef USE_WPE_WEBKIT
-  // WPE WebKit path
-  InAppWebViewWpeCreationParams params;
-  params.id = next_id_++;
-
-  // Parse initial settings
-  FlValue* initial_settings = fl_value_lookup_string(args, "initialSettings");
-  if (initial_settings != nullptr &&
-      fl_value_get_type(initial_settings) == FL_VALUE_TYPE_MAP) {
-    params.initialSettings = std::make_shared<InAppWebViewSettingsWpe>(initial_settings);
-  } else {
-    params.initialSettings = std::make_shared<InAppWebViewSettingsWpe>();
-  }
-
-  // Parse initial URL request
-  FlValue* initial_url_request = fl_value_lookup_string(args, "initialUrlRequest");
-  if (initial_url_request != nullptr &&
-      fl_value_get_type(initial_url_request) == FL_VALUE_TYPE_MAP) {
-    params.initialUrlRequest = std::make_shared<URLRequest>(initial_url_request);
-  }
-
-  // Parse initial data
-  FlValue* initial_data = fl_value_lookup_string(args, "initialData");
-  if (initial_data != nullptr &&
-      fl_value_get_type(initial_data) == FL_VALUE_TYPE_MAP) {
-    FlValue* data_value = fl_value_lookup_string(initial_data, "data");
-    if (data_value != nullptr &&
-        fl_value_get_type(data_value) == FL_VALUE_TYPE_STRING) {
-      params.initialData = std::string(fl_value_get_string(data_value));
-    }
-    FlValue* base_url_value = fl_value_lookup_string(initial_data, "baseUrl");
-    if (base_url_value != nullptr &&
-        fl_value_get_type(base_url_value) == FL_VALUE_TYPE_STRING) {
-      params.initialDataBaseUrl = std::string(fl_value_get_string(base_url_value));
-    }
-    FlValue* mime_type_value = fl_value_lookup_string(initial_data, "mimeType");
-    if (mime_type_value != nullptr &&
-        fl_value_get_type(mime_type_value) == FL_VALUE_TYPE_STRING) {
-      params.initialDataMimeType = std::string(fl_value_get_string(mime_type_value));
-    }
-    FlValue* encoding_value = fl_value_lookup_string(initial_data, "encoding");
-    if (encoding_value != nullptr &&
-        fl_value_get_type(encoding_value) == FL_VALUE_TYPE_STRING) {
-      params.initialDataEncoding = std::string(fl_value_get_string(encoding_value));
-    }
-  }
-
-  // Parse initial file
-  FlValue* initial_file = fl_value_lookup_string(args, "initialFile");
-  if (initial_file != nullptr &&
-      fl_value_get_type(initial_file) == FL_VALUE_TYPE_STRING) {
-    params.initialFile = std::string(fl_value_get_string(initial_file));
-  }
-
-  // Create the WPE-based InAppWebView
-  auto webview = std::make_shared<InAppWebViewWpe>(messenger_, params.id, params);
-
-#else
-  // WebKitGTK path
   InAppWebViewCreationParams params;
   params.id = next_id_++;
 
@@ -204,9 +142,8 @@ void InAppWebViewManager::CreateInAppWebView(FlMethodCall* method_call) {
     params.initialFile = std::string(fl_value_get_string(initial_file));
   }
 
-  // Create the WebKitGTK-based InAppWebView
+  // Create the InAppWebView
   auto webview = std::make_shared<InAppWebView>(messenger_, params.id, params);
-#endif
 
   // Create the CustomPlatformView which handles textures and input
   auto platform_view = std::make_unique<CustomPlatformView>(

@@ -2,13 +2,7 @@
 #define FLUTTER_INAPPWEBVIEW_PLUGIN_IN_APP_WEBVIEW_SETTINGS_H_
 
 #include <flutter_linux/flutter_linux.h>
-
-// Use the appropriate WebKit header based on backend
-#ifdef USE_WPE_WEBKIT
 #include <wpe/webkit.h>
-#else
-#include <webkit2/webkit2.h>
-#endif
 
 #include <optional>
 #include <string>
@@ -19,10 +13,11 @@ namespace flutter_inappwebview_plugin {
 class InAppWebView;
 
 /**
- * InAppWebViewSettings for Linux (WebKitGTK)
+ * InAppWebViewSettings for Linux (WPE WebKit)
  *
- * This class maps Dart-side InAppWebViewSettings to WebKitGTK settings.
- * Settings are parsed from FlValue maps received via method channels.
+ * This class maps Dart-side InAppWebViewSettings to WPE WebKit settings.
+ * WPE WebKit shares most of its API with WebKitGTK, but this separate class
+ * allows for WPE-specific optimizations and settings.
  */
 class InAppWebViewSettings {
  public:
@@ -55,8 +50,8 @@ class InAppWebViewSettings {
       std::optional<std::vector<std::string>>{};
   bool pluginScriptsForMainFrameOnly = false;
 
-  // === WebKitGTK specific settings ===
-  bool enableDeveloperExtras = true;  // Enable web inspector
+  // === WPE WebKit specific settings ===
+  bool enableDeveloperExtras = true;
   bool enableWriteConsoleMessagesToStdout = false;
   bool enableMediaStream = true;
   bool enableMediaSource = true;
@@ -70,14 +65,12 @@ class InAppWebViewSettings {
   bool enableFullscreen = true;
   bool enableHtml5LocalStorage = true;
   bool enableHtml5Database = true;
-  bool enableXssAuditor = true;
   bool enablePageCache = true;
   bool drawCompositingIndicators = false;
   bool enableResizableTextAreas = true;
   bool enableTabsToLinks = true;
   bool loadImagesAutomatically = true;
   bool enableSiteSpecificQuirks = true;
-  bool enableJavaApplet = false;
   bool printBackgrounds = true;
   bool enableSpatialNavigation = false;
   std::string defaultCharset = "UTF-8";
@@ -92,10 +85,17 @@ class InAppWebViewSettings {
   int defaultMonospaceFontSize = 13;
   int minimumLogicalFontSize = 0;
 
-  // === Hardware acceleration ===
-  bool hardwareAccelerationEnabled = true;  // Read from environment
+  // === WPE-specific rendering settings ===
+  // WPE always uses hardware acceleration via its backend
+  bool useDmaBufExport = true;  // Use DMA-BUF for zero-copy texture sharing
+  bool enableWebInspector = false;  // Remote web inspector
+  int webInspectorPort = 9222;  // Default inspector port
+  
+  // === Frame rate and performance settings ===
+  int targetFrameRate = 60;  // Target FPS for rendering
+  bool enableOffscreenRendering = true;  // Always true for WPE in Flutter
 
-  // === Snapshot/texture settings ===
+  // === Scroll settings ===
   int64_t scrollMultiplier = 1;
 
   InAppWebViewSettings();
@@ -103,7 +103,7 @@ class InAppWebViewSettings {
   ~InAppWebViewSettings();
 
   /**
-   * Apply these settings to a WebKitWebView.
+   * Apply these settings to a WPE WebKitWebView.
    */
   void applyToWebView(WebKitWebView* webview) const;
 

@@ -64,12 +64,7 @@ std::vector<PermissionResourceType> PermissionRequest::getResourceTypes(
       types.push_back(PermissionResourceType::CAMERA);
     }
   }
-#ifndef USE_WPE_WEBKIT
-  // WEBKIT_IS_POINTER_LOCK_PERMISSION_REQUEST is not available in WPE WebKit
-  else if (WEBKIT_IS_POINTER_LOCK_PERMISSION_REQUEST(request)) {
-    types.push_back(PermissionResourceType::POINTER_LOCK);
-  }
-#endif
+  // Note: WEBKIT_IS_POINTER_LOCK_PERMISSION_REQUEST is not available in WPE WebKit
   else if (WEBKIT_IS_DEVICE_INFO_PERMISSION_REQUEST(request)) {
     types.push_back(PermissionResourceType::DEVICE_INFO);
   }

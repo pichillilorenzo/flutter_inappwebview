@@ -1,23 +1,23 @@
 # WPE WebKit Backend for flutter_inappwebview_linux
 
-This document describes how to use WPE WebKit instead of WebKitGTK for offscreen web rendering in the flutter_inappwebview Linux plugin.
+This document describes how to install and configure WPE WebKit for the flutter_inappwebview Linux plugin.
 
-## Why WPE WebKit?
+## Overview
 
-WPE WebKit is the official WebKit port for embedded systems. Unlike WebKitGTK, it:
+This plugin uses WPE WebKit for offscreen web rendering. WPE WebKit is the official WebKit port for embedded systems:
 
-1. **Doesn't require GTK widgets** - Designed from the ground up for headless/offscreen rendering
-2. **Better GPU integration** - Uses DMA-BUF for zero-copy texture sharing with Flutter
-3. **Lower memory footprint** - No GTK widget hierarchy overhead
-4. **Better suited for embedded systems** - Raspberry Pi, set-top boxes, etc.
+1. **Designed for headless/offscreen rendering** - No GTK widget hierarchy required
+2. **Excellent GPU integration** - Uses DMA-BUF for zero-copy texture sharing with Flutter
+3. **Lower memory footprint** - No widget hierarchy overhead
+4. **Perfect for embedded systems** - Raspberry Pi, set-top boxes, kiosks, etc.
 
-The WebKitGTK backend uses `GtkOffscreenWindow` and Cairo snapshots, which works but involves CPU copies. WPE can export frames directly as GPU textures via DMA-BUF.
+The WPE backend exports frames directly as GPU textures via DMA-BUF or SHM buffers.
 
 ## Installation Options
 
 You can either:
 1. **Use pre-built packages** from your distribution (if available)
-2. **Build from source** using official tarball releases (recommended)
+2. **Build from source** using official tarball releases (recommended for latest features)
 
 ### Option 1: Install from Distribution Packages
 
@@ -41,8 +41,7 @@ Install all required build dependencies:
 # Core build tools
 sudo apt-get install -y \
   build-essential cmake ninja-build meson pkg-config \
-  python3 python3-pip \
-  ruby ruby-dev \
+  ruby ruby-dev python3 python3-pip \
   gperf unifdef
 
 # GLib and GObject introspection
@@ -53,16 +52,15 @@ sudo apt-get install -y \
 # Networking and security
 sudo apt-get install -y \
   libsoup-3.0-dev \
+  libssl-dev libgnutls28-dev \
   libsecret-1-dev \
-  libtasn1-6-dev \
   libgcrypt20-dev
 
 # Graphics and rendering
 sudo apt-get install -y \
   libepoxy-dev \
-  libegl-dev libgl-dev libgles-dev \
+  libegl1-mesa-dev libgles2-mesa-dev \
   libdrm-dev libgbm-dev \
-  libwayland-dev wayland-protocols \
   libxkbcommon-dev
 
 # Image and font processing
@@ -165,16 +163,13 @@ cmake -B build -G Ninja \
   -DCMAKE_BUILD_TYPE=Release \
   -DCMAKE_INSTALL_PREFIX=$WPE_PREFIX \
   -DPORT=WPE \
-  -DENABLE_BUBBLEWRAP_SANDBOX=ON \
   -DENABLE_DOCUMENTATION=OFF \
-  -DENABLE_INTROSPECTION=ON \
-  -DENABLE_JOURNALD_LOG=ON \
-  -DENABLE_MINIBROWSER=OFF \
-  -DENABLE_WEB_CRYPTO=ON \
+  -DENABLE_INTROSPECTION=OFF \
+  -DENABLE_BUBBLEWRAP_SANDBOX=ON \
   -DENABLE_WEBDRIVER=OFF \
-  -DUSE_AVIF=ON \
-  -DUSE_JPEGXL=OFF \
+  -DENABLE_MINIBROWSER=OFF \
   -DUSE_SOUP2=OFF \
+  -DUSE_AVIF=ON \
   -DUSE_WOFF2=ON
 
 # Build (use -j to limit parallelism if you have limited RAM)
@@ -221,22 +216,13 @@ If pkg-config doesn't find the libraries, add the installation path:
 export PKG_CONFIG_PATH=$WPE_PREFIX/lib/pkgconfig:$WPE_PREFIX/lib/$(uname -m)-linux-gnu/pkgconfig:$PKG_CONFIG_PATH
 ```
 
-## Building the Flutter Plugin with WPE
+## Building the Flutter Plugin
 
-The plugin automatically detects WPE libraries via pkg-config. When WPE is found and enabled, it:
+The plugin automatically detects WPE libraries via pkg-config. When WPE is found, it:
 
-1. **Compiles with WPE backend** instead of WebKitGTK
+1. **Compiles with the WPE backend**
 2. **Bundles WPE libraries** into the Flutter app's `lib/` directory
 3. **Creates necessary symlinks** so the app runs without `LD_LIBRARY_PATH`
-
-### Enable WPE Backend
-
-The example app has WPE enabled by default. For your own app, add this to your `linux/CMakeLists.txt` before including Flutter plugins:
-
-```cmake
-# Enable WPE WebKit backend
-set(USE_WPE_WEBKIT ON CACHE BOOL "Use WPE WebKit backend" FORCE)
-```
 
 ### Build Your App
 
@@ -307,18 +293,15 @@ flutter_inappwebview Dart layer
 Method Channel
     │
     ▼
-InAppWebViewWpe (C++)
+InAppWebView (C++)
     │
-    ├─── WebKitWebView (WPE WebKit)
+    ├──► WebKitWebView (WPE WebKit)
     │         │
     │         ▼
-    │    wpe_view_backend
+    │    WPE Backend (FDO)
     │         │
     │         ▼
-    │    wpebackend-fdo
-    │         │
-    ▼         ▼
- Flutter Texture ◄──── SHM Buffer / DMA-BUF
+    └──► Flutter Texture ◄──── SHM Buffer / DMA-BUF
 ```
 
 ### Frame Export Flow
@@ -346,19 +329,6 @@ The plugin detects cursor changes via:
 - JavaScript injection for CSS `cursor` property detection
 
 Cursor types are mapped to Flutter's cursor system: pointer, text, grab, resize, forbidden, etc.
-
-## Comparison: WebKitGTK vs WPE
-
-| Feature | WebKitGTK | WPE WebKit |
-|---------|-----------|------------|
-| Widget Hierarchy | GTK required | None |
-| Offscreen Method | GtkOffscreenWindow + Cairo | Native offscreen |
-| Frame Export | CPU snapshot → texture upload | SHM/DMA-BUF (lower overhead) |
-| GPU Sharing | Indirect | Can be direct |
-| Memory Overhead | Higher | Lower |
-| Distro Packages | Widely available | Limited |
-| X11 Support | Yes | Via FDO backend |
-| Wayland Support | Yes | Via FDO backend |
 
 ## Troubleshooting
 
@@ -428,8 +398,7 @@ sudo apt-get install gobject-introspection libgirepository1.0-dev
 If libraries aren't being bundled, check:
 
 1. CMake output for "Will bundle" messages
-2. That `USE_WPE_WEBKIT=ON` is set before plugins are included
-3. Library paths are correct in pkg-config
+2. Library paths are correct in pkg-config
 
 ### App crashes on startup
 
@@ -457,12 +426,12 @@ Create `.vscode/launch.json` in your project:
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Flutter Linux (debug)",
-      "request": "launch",
+      "name": "Flutter Linux (Debug)",
       "type": "dart",
+      "request": "launch",
       "program": "lib/main.dart",
       "env": {
-        "LD_LIBRARY_PATH": "${workspaceFolder}/build/linux/arm64/debug/bundle/lib:${env:LD_LIBRARY_PATH}"
+        "LD_LIBRARY_PATH": "${workspaceFolder}/build/linux/arm64/debug/bundle/lib"
       }
     }
   ]
@@ -501,6 +470,3 @@ This makes the libraries findable system-wide, so debug mode works without extra
 - [WPE WebKit API Reference](https://webkitgtk.org/reference/wpe-webkit-2.0/stable/)
 - [Release Downloads](https://wpewebkit.org/release/)
 - [Release Schedule](https://wpewebkit.org/release/schedule/)
-- [libwpe GitHub](https://github.com/WebPlatformForEmbedded/libwpe)
-- [WPEBackend-fdo GitHub](https://github.com/Igalia/WPEBackend-fdo)
-- [WebKit Container SDK](https://github.com/Igalia/webkit-container-sdk)

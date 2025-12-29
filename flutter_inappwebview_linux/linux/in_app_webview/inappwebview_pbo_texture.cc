@@ -3,12 +3,7 @@
 #include <epoxy/gl.h>
 #include <cstring>
 
-// Include the appropriate backend
-#ifdef USE_WPE_WEBKIT
-#include "in_app_webview_wpe.h"
-#else
 #include "in_app_webview.h"
-#endif
 
 /**
  * PBO-optimized GL texture for efficient WebView rendering.

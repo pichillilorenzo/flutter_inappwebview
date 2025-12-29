@@ -1,14 +1,32 @@
 #ifndef FLUTTER_INAPPWEBVIEW_PLUGIN_IN_APP_WEBVIEW_H_
 #define FLUTTER_INAPPWEBVIEW_PLUGIN_IN_APP_WEBVIEW_H_
 
+// WPE WebKit-based InAppWebView implementation
+// 
+// Uses WPE WebKit for offscreen web rendering with the FDO backend.
+// WPE WebKit is designed for embedded systems and offers excellent offscreen rendering
+// capabilities through its backend system.
+//
+// Key features:
+// - No GTK widget hierarchy required
+// - Uses WPEBackend-fdo for DMA-BUF based buffer sharing
+// - Better suited for headless/offscreen rendering scenarios
+// - Direct OpenGL texture export (when using fdo backend)
+//
+// Required packages (Ubuntu/Debian):
+//   - libwpe-1.0-dev (or build from source)
+//   - wpewebkit (build from source or use Flatpak)
+//   - wpebackend-fdo-1.0-dev
+//
+// Build from source:
+//   See WPE_BACKEND.md or https://wpewebkit.org/about/get-wpe.html
+
 #include <flutter_linux/flutter_linux.h>
 
-// Use the appropriate WebKit header based on backend
-#ifdef USE_WPE_WEBKIT
+// WPE WebKit includes
 #include <wpe/webkit.h>
-#else
-#include <webkit2/webkit2.h>
-#endif
+#include <wpe/fdo.h>
+#include <wpe/fdo-egl.h>
 
 #include <array>
 #include <atomic>
@@ -25,19 +43,12 @@
 #include "../types/user_script.h"
 #include "in_app_webview_settings.h"
 
+// Forward declaration of WPE types in global scope to avoid namespace conflicts
+struct wpe_fdo_egl_exported_image;
+
 namespace flutter_inappwebview_plugin {
 
 class UserContentController;
-
-// Backend type detected at runtime
-enum class GdkBackendType {
-  Unknown = 0,
-  X11 = 1,
-  Wayland = 2,
-  Broadway = 3,  // Web-based backend
-};
-
-class InAppWebViewManager;
 class WebViewChannelDelegate;
 
 struct InAppWebViewCreationParams {
@@ -52,7 +63,7 @@ struct InAppWebViewCreationParams {
 };
 
 // Pointer event kind (matches Dart side)
-enum class PointerEventKind {
+enum class WpePointerEventKind {
   Activate = 0,
   Down = 1,
   Enter = 2,
@@ -63,15 +74,20 @@ enum class PointerEventKind {
 };
 
 // Pointer button type (matches Dart side)
-enum class PointerButton { None = 0, Primary = 1, Secondary = 2, Tertiary = 3 };
+enum class WpePointerButton { None = 0, Primary = 1, Secondary = 2, Tertiary = 3 };
 
+/// InAppWebView - WPE WebKit based implementation
+///
+/// This class provides offscreen web rendering using WPE WebKit.
+/// Unlike WebKitGTK, WPE doesn't require a GTK widget hierarchy
+/// and can render directly to GPU textures via the FDO backend.
 class InAppWebView {
  public:
   static constexpr const char* METHOD_CHANNEL_NAME_PREFIX =
       "com.pichillilorenzo/flutter_inappwebview_";
 
   InAppWebView(FlBinaryMessenger* messenger, int64_t id,
-               const InAppWebViewCreationParams& params);
+                  const InAppWebViewCreationParams& params);
   ~InAppWebView();
 
   int64_t id() const { return id_; }
@@ -81,7 +97,6 @@ class InAppWebView {
   }
 
   // Attach/recreate the Dart method channel using the given [channel_id].
-  // This must match the id used on the Dart side for `MethodChannel('com.pichillilorenzo/flutter_inappwebview_$id')`.
   void AttachChannel(FlBinaryMessenger* messenger, int64_t channel_id);
 
   int64_t channel_id() const { return channel_id_; }
@@ -137,7 +152,6 @@ class InAppWebView {
   FlValue* getSettings() const;
   void setSettings(const std::shared_ptr<InAppWebViewSettings> newSettings,
                    FlValue* newSettingsMap = nullptr);
-  void setSettingsFromMap(const std::map<std::string, FlValue*>& settingsMap);
 
   // User content controller
   UserContentController* userContentController() const {
@@ -148,32 +162,45 @@ class InAppWebView {
   void setSize(int width, int height);
   void setScaleFactor(double scale_factor);
 
-  // Input handling (called by CustomPlatformView)
+  // Input handling
   void SetCursorPos(double x, double y);
   void SetPointerButton(int kind, int button, int clickCount = 1);
   void SetScrollDelta(double dx, double dy);
-  void SendKeyEvent(int type, int64_t keyCode, int scanCode, int modifiers, const std::string& characters);
+  void SendKeyEvent(int type, int64_t keyCode, int scanCode, int modifiers, 
+                    const std::string& characters);
 
-  // Texture pixel buffer access (called by InAppWebViewTexture)
-  // These APIs are safe to call from the render thread.
+  // Texture pixel buffer access (called by texture classes)
   size_t GetPixelBufferSize(uint32_t* out_width, uint32_t* out_height) const;
   bool CopyPixelBufferTo(uint8_t* dst, size_t dst_size, uint32_t* out_width,
                          uint32_t* out_height) const;
 
+  // DMA-BUF export (WPE-specific, for zero-copy GPU texture sharing)
+  bool HasDmaBufExport() const;
+  bool GetDmaBufFd(int* fd, uint32_t* stride, uint32_t* width, uint32_t* height) const;
+
   // Frame available callback (called when new frame is ready)
   void SetOnFrameAvailable(std::function<void()> callback);
 
-  // Cursor change callback (called when cursor style changes)
+  // Cursor change callback
   void SetOnCursorChanged(std::function<void(const std::string&)> callback);
 
   // Called from Dart when shouldOverrideUrlLoading decision is made
   void OnShouldOverrideUrlLoadingDecision(int64_t decision_id, bool allow);
 
- // Get the detected GDK backend type (cached at initialization)
-  static GdkBackendType GetBackendType();
+  // Check if WPE WebKit is available on the system
+  static bool IsWpeWebKitAvailable();
+
+  // === Multi-Window Support (matches iOS) ===
   
-  // Returns true if the backend supports cursor warping (X11 does, Wayland doesn't)
-  static bool SupportsCursorWarp();
+  // Set the window ID for this webview (used in window.open scenarios)
+  void setWindowId(int64_t windowId) { window_id_ = windowId; }
+  
+  // Get the window ID (null if not set)
+  std::optional<int64_t> getWindowId() const { return window_id_; }
+  
+  // Initialize the window ID JavaScript variable in the webview
+  // This injects JS to set window._flutter_inappwebview_windowId
+  void initializeWindowIdJS();
 
  private:
   int64_t id_ = 0;
@@ -182,17 +209,24 @@ class InAppWebView {
   // Settings
   std::shared_ptr<InAppWebViewSettings> settings_;
 
-  // WebKit / GTK container (hidden window to host the webview)
-  // NOTE: We use a minimal window approach that avoids forcing backend-specific
-  // surfaces. The window is never mapped to the screen - we only use it as a
-  // container for WebKitWebView which requires a parent widget.
-  GtkWidget* container_window_ = nullptr;
+  // WPE WebKit view
   WebKitWebView* webview_ = nullptr;
+  
+  // WPE Backend (using FDO for DMA-BUF export)
+  WebKitWebViewBackend* backend_ = nullptr;
+  struct wpe_view_backend* wpe_backend_ = nullptr;
+  
+  // WPE FDO exportable (for DMA-BUF buffer export)
+  struct wpe_view_backend_exportable_fdo* exportable_ = nullptr;
+  ::wpe_fdo_egl_exported_image* exported_image_ = nullptr;
 
-  // Triple buffering for pixel data
-  // Buffer 0: being written by snapshot callback
-  // Buffer 1: ready for Flutter to read
-  // Buffer 2: being read by Flutter (in-flight)
+  // EGL context for reading back pixels
+  void* egl_display_ = nullptr;  // EGLDisplay
+  void* egl_context_ = nullptr;  // EGLContext for readback
+  unsigned int fbo_ = 0;         // Framebuffer object for EGL image binding
+  unsigned int readback_texture_ = 0;  // Texture for EGL image
+
+  // Triple buffering for pixel data (fallback when DMA-BUF not available)
   static constexpr size_t kNumBuffers = 3;
   struct PixelBuffer {
     std::vector<uint8_t> data;
@@ -203,17 +237,8 @@ class InAppWebView {
   std::atomic<size_t> write_buffer_index_{0};
   std::atomic<size_t> read_buffer_index_{1};
   mutable std::mutex buffer_swap_mutex_;
-  
-  // Legacy single-buffer for compatibility (will be removed)
-  std::vector<uint8_t> rgba_;
-  size_t pixel_buffer_width_ = 0;
-  size_t pixel_buffer_height_ = 0;
-  mutable std::mutex pixel_buffer_mutex_;
 
-  // Snapshot scheduling
-  guint snapshot_timer_id_ = 0;
-  int fps_limit_ = 60;  // Target FPS for snapshot-based rendering
-  std::atomic<bool> frame_pending_{false};
+  // View dimensions
   int width_ = 800;
   int height_ = 600;
   double scale_factor_ = 1.0;
@@ -221,17 +246,23 @@ class InAppWebView {
   // Channel delegate
   std::unique_ptr<WebViewChannelDelegate> channel_delegate_;
 
-  // User content controller (handles user scripts and JS bridge)
+  // User content controller
   std::unique_ptr<UserContentController> user_content_controller_;
 
   // JavaScript bridge secret for security
   std::string js_bridge_secret_;
+  
+  // Window ID for multi-window support (matches iOS windowId)
+  std::optional<int64_t> window_id_;
+  
+  // Flag to track if javaScriptBridgeEnabled
+  bool java_script_bridge_enabled_ = true;
 
-  // Pending policy decisions for async shouldOverrideUrlLoading
+  // Pending policy decisions
   std::map<int64_t, WebKitPolicyDecision*> pending_policy_decisions_;
   int64_t next_decision_id_ = 0;
 
-  // Pending script dialogs for async handling
+  // Pending script dialogs
   std::map<int64_t, WebKitScriptDialog*> pending_script_dialogs_;
   int64_t next_dialog_id_ = 0;
 
@@ -243,38 +274,43 @@ class InAppWebView {
   std::map<int64_t, WebKitAuthenticationRequest*> pending_auth_requests_;
   int64_t next_auth_id_ = 0;
 
-  // Window ID for child windows
-  std::optional<int64_t> window_id_;
-
   // Frame available callback
   std::function<void()> on_frame_available_;
 
   // Cursor change callback
   std::function<void(const std::string&)> on_cursor_changed_;
-  std::string last_cursor_name_;  // Track last cursor to avoid duplicate events
+  std::string last_cursor_name_;
 
-  // Mouse state for input simulation
+  // Mouse state
   double cursor_x_ = 0;
   double cursor_y_ = 0;
-  guint32 button_state_ = 0;
+  uint32_t button_state_ = 0;
+  uint32_t current_modifiers_ = 0;  // Current keyboard modifiers (shift, ctrl, alt, meta)
 
-  // Scroll multiplier (matches Windows implementation)
+  // Scroll multiplier
   double scroll_multiplier_ = 1.0;
 
   // Progress tracking
   double last_progress_ = 0.0;
 
-  // Cached backend type (detected once)
-  static GdkBackendType cached_backend_type_;
-  static bool backend_type_detected_;
-
   // === Initialization ===
+  void InitWpeBackend();
   void InitWebView(const InAppWebViewCreationParams& params);
   void RegisterEventHandlers();
-  void StartSnapshotTimer();
-  static void DetectBackendType();
 
-  // === WebKit signals ===
+ public:  
+  // === WPE backend callbacks ===
+  // Instance method called from C callback (must be public)
+  void OnExportDmaBuf(::wpe_fdo_egl_exported_image* image);
+  void OnExportShmBuffer(struct wpe_fdo_shm_exported_buffer* buffer);
+
+ private:
+  static void OnFrameDisplayed(void* data);
+  
+  // Read pixels from EGL image to CPU buffer
+  void ReadPixelsFromEglImage(void* egl_image, uint32_t width, uint32_t height);
+
+  // === WebKit signals (same as WebKitGTK) ===
   static void OnLoadChanged(WebKitWebView* web_view,
                             WebKitLoadEvent load_event, gpointer user_data);
 
@@ -282,14 +318,6 @@ class InAppWebView {
                                  WebKitPolicyDecision* decision,
                                  WebKitPolicyDecisionType decision_type,
                                  gpointer user_data);
-
-  static gboolean OnMotionNotify(GtkWidget* widget, GdkEventMotion* event,
-                                 gpointer user_data);
-
-  static void OnMouseTargetChanged(WebKitWebView* web_view,
-                                   WebKitHitTestResult* hit_test_result,
-                                   guint modifiers,
-                                   gpointer user_data);
 
   static void OnNotifyEstimatedLoadProgress(GObject* object,
                                              GParamSpec* pspec,
@@ -313,11 +341,9 @@ class InAppWebView {
 
   static void OnCloseRequest(WebKitWebView* web_view, gpointer user_data);
 
-  static GtkWidget* OnCreateWebView(WebKitWebView* web_view,
+  static WebKitWebView* OnCreateWebView(WebKitWebView* web_view,
                                     WebKitNavigationAction* navigation_action,
                                     gpointer user_data);
-
-  static void OnReadyToShow(WebKitWebView* web_view, gpointer user_data);
 
   static gboolean OnScriptDialog(WebKitWebView* web_view,
                                  WebKitScriptDialog* dialog,
@@ -333,7 +359,6 @@ class InAppWebView {
 
   static gboolean OnContextMenu(WebKitWebView* web_view,
                                 WebKitContextMenu* context_menu,
-                                GdkEvent* event,
                                 WebKitHitTestResult* hit_test_result,
                                 gpointer user_data);
 
@@ -341,25 +366,23 @@ class InAppWebView {
 
   static gboolean OnLeaveFullscreen(WebKitWebView* web_view, gpointer user_data);
 
-  static void OnNotifyFavicon(GObject* object, GParamSpec* pspec, gpointer user_data);
-
-  // === Snapshot ===
-  static gboolean SnapshotTick(gpointer user_data);
-  void RequestSnapshot();
-  void SwapBuffers();
+  static void OnMouseTargetChanged(WebKitWebView* web_view,
+                                   WebKitHitTestResult* hit_test_result,
+                                   guint modifiers,
+                                   gpointer user_data);
 
   // === Input helpers ===
-  void SendMouseEvent(GdkEventType type, double x, double y, guint button,
-                      guint state);
-  void SendScrollEvent(double x, double y, double dx, double dy);
-
-  GdkDevice* GetPointerDevice() const;
-  GdkDevice* GetKeyboardDevice() const;
-  void EnsureFocused();
+  void SendWpePointerEvent(uint32_t type, double x, double y, uint32_t button);
+  void SendWpeAxisEvent(double x, double y, double dx, double dy);
+  void SendWpeKeyboardEvent(uint32_t key, uint32_t state, uint32_t modifiers);
 
   // === JavaScript bridge ===
   void handleScriptMessage(const std::string& name, const std::string& body);
   void dispatchPlatformReady();
+  
+  // === Cursor detection ===
+  void injectCursorDetectionScript();
+  void updateCursorFromCssStyle(const std::string& cursor_style);
 };
 
 }  // namespace flutter_inappwebview_plugin

@@ -10,15 +10,8 @@
 
 #include "../types/url_request.h"
 #include "custom_platform_view.h"
-
-// Include backend-specific headers based on build configuration
-#ifdef USE_WPE_WEBKIT
-#include "in_app_webview_wpe.h"
-#include "in_app_webview_settings_wpe.h"
-#else
 #include "in_app_webview.h"
 #include "in_app_webview_settings.h"
-#endif
 
 namespace flutter_inappwebview_plugin {
 

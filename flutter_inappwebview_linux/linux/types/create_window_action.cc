@@ -9,7 +9,6 @@ WindowFeatures::WindowFeatures(WebKitWindowProperties* properties) {
     return;
   }
 
-#ifdef USE_WPE_WEBKIT
   // WPE WebKit doesn't have window geometry API - use defaults
   // WPE is headless so window properties aren't meaningful
   menuBarVisible = false;
@@ -19,23 +18,6 @@ WindowFeatures::WindowFeatures(WebKitWindowProperties* properties) {
   locationbarVisible = false;
   fullscreen = false;
   resizable = true;
-#else
-  GdkRectangle geometry;
-  webkit_window_properties_get_geometry(properties, &geometry);
-  
-  if (geometry.x >= 0) x = static_cast<double>(geometry.x);
-  if (geometry.y >= 0) y = static_cast<double>(geometry.y);
-  if (geometry.width > 0) width = static_cast<double>(geometry.width);
-  if (geometry.height > 0) height = static_cast<double>(geometry.height);
-  
-  menuBarVisible = webkit_window_properties_get_menubar_visible(properties);
-  statusBarVisible = webkit_window_properties_get_statusbar_visible(properties);
-  toolbarsVisible = webkit_window_properties_get_toolbar_visible(properties);
-  scrollbarsVisible = webkit_window_properties_get_scrollbars_visible(properties);
-  locationbarVisible = webkit_window_properties_get_locationbar_visible(properties);
-  fullscreen = webkit_window_properties_get_fullscreen(properties);
-  resizable = webkit_window_properties_get_resizable(properties);
-#endif
 }
 
 FlValue* WindowFeatures::toFlValue() const {

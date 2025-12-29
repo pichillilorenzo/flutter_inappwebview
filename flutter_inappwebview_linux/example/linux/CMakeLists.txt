@@ -34,10 +34,6 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
     "Debug" "Profile" "Release")
 endif()
 
-# Enable WPE WebKit backend for the example app
-# WPE provides better offscreen rendering through DMA-BUF export
-set(USE_WPE_WEBKIT ON CACHE BOOL "Use WPE WebKit backend" FORCE)
-
 # Compilation settings that should be applied to most targets.
 #
 # Be cautious about adding new options here, as plugins use this function by
@@ -113,12 +109,10 @@ foreach(bundled_library ${PLUGIN_BUNDLED_LIBRARIES})
 endforeach(bundled_library)
 
 # === WPE Library Symlink Creation ===
-# When using WPE WebKit, create the necessary soname symlinks so the
-# libraries can find each other at runtime without LD_LIBRARY_PATH
-if(USE_WPE_WEBKIT)
-  install(CODE "
-    # Create symlinks for WPE libraries in the lib directory
-    set(LIB_DIR \"${INSTALL_BUNDLE_LIB_DIR}\")
+# Create the necessary soname symlinks so the WPE libraries can find each other at runtime
+install(CODE "
+  # Create symlinks for WPE libraries in the lib directory
+  set(LIB_DIR \"${INSTALL_BUNDLE_LIB_DIR}\")
     
     # Function to create soname symlinks for a library
     macro(create_lib_symlinks LIB_PATTERN SONAME_BASE)
@@ -175,7 +169,6 @@ exec \\\"\\\${SCRIPT_DIR}/${BINARY_NAME}\\\" \\\"\\\$@\\\"
     execute_process(COMMAND chmod +x \"\${LAUNCHER_SCRIPT}\")
     message(STATUS \"Created launcher script: \${LAUNCHER_SCRIPT}\")
   " COMPONENT Runtime)
-endif()
 
 # Copy the native assets provided by the build.dart from all packages.
 set(NATIVE_ASSETS_DIR "${PROJECT_BUILD_DIR}native_assets/linux/")

@@ -2,12 +2,7 @@
 
 #include <cstring>
 
-// Include the appropriate backend
-#ifdef USE_WPE_WEBKIT
-#include "in_app_webview_wpe.h"
-#else
 #include "in_app_webview.h"
-#endif
 
 // Private structure
 struct _InAppWebViewTexture {

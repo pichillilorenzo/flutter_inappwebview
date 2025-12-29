@@ -226,6 +226,39 @@ class WebViewChannelDelegate : public ChannelDelegate {
   void onExitFullscreen() const;
 
   void onFaviconChanged(const std::optional<std::string>& faviconUrl) const;
+
+ private:
+  // Method call handlers
+  void HandleLoadUrl(FlMethodCall* method_call);
+  void HandleLoadData(FlMethodCall* method_call);
+  void HandleLoadFile(FlMethodCall* method_call);
+  void HandleReload(FlMethodCall* method_call);
+  void HandleGoBack(FlMethodCall* method_call);
+  void HandleGoForward(FlMethodCall* method_call);
+  void HandleCanGoBack(FlMethodCall* method_call);
+  void HandleCanGoForward(FlMethodCall* method_call);
+  void HandleStopLoading(FlMethodCall* method_call);
+  void HandleIsLoading(FlMethodCall* method_call);
+  void HandleGetUrl(FlMethodCall* method_call);
+  void HandleGetTitle(FlMethodCall* method_call);
+  void HandleGetProgress(FlMethodCall* method_call);
+  void HandleEvaluateJavascript(FlMethodCall* method_call);
+  void HandleInjectJavascriptFileFromUrl(FlMethodCall* method_call);
+  void HandleInjectCSSCode(FlMethodCall* method_call);
+  void HandleInjectCSSFileFromUrl(FlMethodCall* method_call);
+  void HandleAddUserScript(FlMethodCall* method_call);
+  void HandleRemoveUserScript(FlMethodCall* method_call);
+  void HandleRemoveUserScriptsByGroupName(FlMethodCall* method_call);
+  void HandleRemoveAllUserScripts(FlMethodCall* method_call);
+  void HandleGetHtml(FlMethodCall* method_call);
+  void HandleGetZoomScale(FlMethodCall* method_call);
+  void HandleSetZoomScale(FlMethodCall* method_call);
+  void HandleScrollTo(FlMethodCall* method_call);
+  void HandleScrollBy(FlMethodCall* method_call);
+  void HandleGetScrollX(FlMethodCall* method_call);
+  void HandleGetScrollY(FlMethodCall* method_call);
+  void HandleGetSettings(FlMethodCall* method_call);
+  void HandleSetSettings(FlMethodCall* method_call);
 };
 
 }  // namespace flutter_inappwebview_plugin

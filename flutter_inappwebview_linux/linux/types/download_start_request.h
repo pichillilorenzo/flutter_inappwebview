@@ -2,16 +2,10 @@
 #define FLUTTER_INAPPWEBVIEW_PLUGIN_DOWNLOAD_START_REQUEST_H_
 
 #include <flutter_linux/flutter_linux.h>
+#include <wpe/webkit.h>
 
 #include <optional>
 #include <string>
-
-// Use the appropriate WebKit header based on backend
-#ifdef USE_WPE_WEBKIT
-#include <wpe/webkit.h>
-#else
-#include <webkit2/webkit2.h>
-#endif
 
 namespace flutter_inappwebview_plugin {
 

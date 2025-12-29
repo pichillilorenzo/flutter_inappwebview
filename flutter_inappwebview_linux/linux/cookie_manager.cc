@@ -193,16 +193,11 @@ CookieManager::~CookieManager() {
 
 WebKitCookieManager* CookieManager::getCookieManager() {
   if (cookie_manager_ == nullptr) {
-#ifdef USE_WPE_WEBKIT
     // WPE WebKit 2.x uses NetworkSession API instead of WebContext
     WebKitNetworkSession* session = webkit_network_session_get_default();
     if (session != nullptr) {
       cookie_manager_ = webkit_network_session_get_cookie_manager(session);
     }
-#else
-    WebKitWebContext* context = webkit_web_context_get_default();
-    cookie_manager_ = webkit_web_context_get_cookie_manager(context);
-#endif
   }
   return cookie_manager_;
 }
@@ -500,15 +495,10 @@ void CookieManager::deleteCookies(const std::string& url,
 }
 
 void CookieManager::deleteAllCookies(std::function<void(bool)> callback) {
-#ifdef USE_WPE_WEBKIT
   // WPE WebKit 2.x uses NetworkSession API
   WebKitNetworkSession* session = webkit_network_session_get_default();
   WebKitWebsiteDataManager* manager = session != nullptr ? 
       webkit_network_session_get_website_data_manager(session) : nullptr;
-#else
-  WebKitWebContext* context = webkit_web_context_get_default();
-  WebKitWebsiteDataManager* manager = webkit_web_context_get_website_data_manager(context);
-#endif
   
   if (manager == nullptr) {
     callback(false);

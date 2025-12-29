@@ -2,13 +2,7 @@
 #define FLUTTER_INAPPWEBVIEW_PLUGIN_PERMISSION_TYPES_H_
 
 #include <flutter_linux/flutter_linux.h>
-
-// Use the appropriate WebKit header based on backend
-#ifdef USE_WPE_WEBKIT
 #include <wpe/webkit.h>
-#else
-#include <webkit2/webkit2.h>
-#endif
 
 #include <cstdint>
 #include <optional>

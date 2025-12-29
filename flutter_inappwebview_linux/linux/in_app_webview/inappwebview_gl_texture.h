@@ -11,18 +11,11 @@ G_BEGIN_DECLS
 G_DECLARE_FINAL_TYPE(InAppWebViewGLTexture, inappwebview_gl_texture, INAPPWEBVIEW,
                      GL_TEXTURE, FlTextureGL)
 
-// Forward declaration - use WebViewType based on backend
-#ifdef USE_WPE_WEBKIT
-namespace flutter_inappwebview_plugin {
-class InAppWebViewWpe;
-using WebViewType = InAppWebViewWpe;
-}
-#else
+// Forward declaration
 namespace flutter_inappwebview_plugin {
 class InAppWebView;
 using WebViewType = InAppWebView;
 }
-#endif
 
 // Create a new InAppWebViewGLTexture
 InAppWebViewGLTexture* inappwebview_gl_texture_new(

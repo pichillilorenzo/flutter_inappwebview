@@ -11,16 +11,15 @@
 
 namespace flutter_inappwebview_plugin {
 
+// Forward declaration to avoid circular dependency
+class WindowIdJS;
+
 /**
  * JavaScript bridge for communication between web content and native code.
  * 
- * WebKitGTK uses a different approach than WKWebView:
- * - We inject JavaScript that captures calls
- * - JavaScript calls are sent via webkit.messageHandlers (using WKUserScript)
- * - Or we can use webkit_web_view_run_javascript_in_world with custom URI schemes
- * 
- * For WebKitGTK, we use webkit_user_content_manager to register script message handlers
- * and inject JavaScript that sends messages to these handlers.
+ * This implementation matches iOS JavaScriptBridgeJS.swift for consistency.
+ * It uses webkit.messageHandlers to communicate with native code and includes
+ * support for multi-window scenarios via _windowId.
  */
 class JavaScriptBridgeJS {
  public:
@@ -39,33 +38,31 @@ class JavaScriptBridgeJS {
       "$IN_APP_WEBVIEW_JAVASCRIPT_BRIDGE_BRIDGE_SECRET";
 
   /**
+   * Returns the JavaScript variable name for the window ID.
+   * Match iOS WindowIdJS: "window._flutter_inappwebview_windowId"
+   */
+  static std::string WINDOW_ID_VARIABLE_JS_SOURCE() {
+    return "window._" + get_JAVASCRIPT_BRIDGE_NAME() + "_windowId";
+  }
+
+  /**
    * JavaScript source code for the bridge.
    * This code sets up window.flutter_inappwebview.callHandler() function
    * which communicates with native code via webkit.messageHandlers.
+   * 
+   * Matches iOS JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_JS_SOURCE()
    */
   static std::string JAVASCRIPT_BRIDGE_JS_SOURCE() {
     return R"JS(
 window.)JS" + get_JAVASCRIPT_BRIDGE_NAME() + R"JS( = {};
 (function(window) {
   var bridgeSecret = ')JS" + VAR_JAVASCRIPT_BRIDGE_BRIDGE_SECRET + R"JS(';
-  var origin = '';
-  var requestUrl = '';
-  var isMainFrame = false;
   var _JSON_stringify;
   var _Array_slice;
   var _setTimeout;
   var _Promise;
+  var _UserMessageHandler;
   var _postMessage;
-  
-  try {
-    origin = window.location.origin;
-  } catch (_) {}
-  try {
-    requestUrl = window.location.href;
-  } catch (_) {}
-  try {
-    isMainFrame = window === window.top;
-  } catch (_) {}
   
   try {
     _JSON_stringify = window.JSON.stringify;
@@ -73,29 +70,28 @@ window.)JS" + get_JAVASCRIPT_BRIDGE_NAME() + R"JS( = {};
     _Array_slice.call = window.Function.prototype.call;
     _setTimeout = window.setTimeout;
     _Promise = window.Promise;
-    _postMessage = window.webkit.messageHandlers.callHandler.postMessage;
+    _UserMessageHandler = window.webkit.messageHandlers['callHandler'];
+    _postMessage = _UserMessageHandler.postMessage;
+    _postMessage.call = window.Function.prototype.call;
   } catch (_) { return; }
   
   window.)JS" + get_JAVASCRIPT_BRIDGE_NAME() + R"JS(.callHandler = function() {
-    try {
-      requestUrl = window.location.href;
-    } catch (_) {}
-    
-    var _callHandlerID = _setTimeout(function() {});
-    _postMessage({
+    var _windowId = )JS" + WINDOW_ID_VARIABLE_JS_SOURCE() + R"JS(;
+    var _callHandlerID = _setTimeout(function(){});
+    _postMessage.call(_UserMessageHandler, {
       'handlerName': arguments[0],
       '_callHandlerID': _callHandlerID,
       '_bridgeSecret': bridgeSecret,
-      'origin': origin,
-      'requestUrl': requestUrl,
-      'isMainFrame': isMainFrame,
-      'args': _JSON_stringify(_Array_slice.call(arguments, 1))
+      'args': _JSON_stringify(_Array_slice.call(arguments, 1)),
+      '_windowId': _windowId
     });
     
     return new _Promise(function(resolve, reject) {
       try {
-        (isMainFrame ? window : window.top).)JS" + get_JAVASCRIPT_BRIDGE_NAME() + R"JS([_callHandlerID] = { resolve: resolve, reject: reject };
-      } catch(e) { resolve(); }
+        (window.top === window ? window : window.top).)JS" + get_JAVASCRIPT_BRIDGE_NAME() + R"JS([_callHandlerID] = {resolve: resolve, reject: reject};
+      } catch (e) {
+        resolve();
+      }
     });
   };
 })(window);

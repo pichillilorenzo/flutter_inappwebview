@@ -100,11 +100,11 @@ void InAppWebViewManager::CreateInAppWebView(FlMethodCall* method_call) {
 
   // Parse initial settings
   FlValue* initial_settings = fl_value_lookup_string(args, "initialSettings");
-  params.initialSettings = std::make_shared<InAppWebViewSettingsWpe>();
   if (initial_settings != nullptr &&
       fl_value_get_type(initial_settings) == FL_VALUE_TYPE_MAP) {
-    // InAppWebViewSettingsWpe doesn't have fromMap, use constructor defaults
-    // TODO: Add settings parsing for WPE
+    params.initialSettings = std::make_shared<InAppWebViewSettingsWpe>(initial_settings);
+  } else {
+    params.initialSettings = std::make_shared<InAppWebViewSettingsWpe>();
   }
 
   // Parse initial URL request

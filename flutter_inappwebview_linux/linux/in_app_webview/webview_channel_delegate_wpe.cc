@@ -27,6 +27,133 @@ bool string_equals(const gchar* a, const char* b) {
 }
 }  // namespace
 
+// === Callback implementations (copied from GTK delegate so WPE builds have definitions) ===
+
+WebViewChannelDelegate::ShouldOverrideUrlLoadingCallback::ShouldOverrideUrlLoadingCallback() {
+  decodeResult = [](FlValue* value) -> std::optional<NavigationActionPolicy> {
+    if (value == nullptr || fl_value_get_type(value) == FL_VALUE_TYPE_NULL) {
+      return NavigationActionPolicy::cancel;
+    }
+    if (fl_value_get_type(value) == FL_VALUE_TYPE_INT) {
+      auto navigationPolicy = static_cast<int>(fl_value_get_int(value));
+      return static_cast<NavigationActionPolicy>(navigationPolicy);
+    }
+    return NavigationActionPolicy::cancel;
+  };
+}
+
+WebViewChannelDelegate::CallJsHandlerCallback::CallJsHandlerCallback() {
+  decodeResult = [](FlValue* value) -> std::optional<FlValue*> { return value; };
+}
+
+WebViewChannelDelegate::CreateWindowCallback::CreateWindowCallback() {
+  decodeResult = [](FlValue* value) -> std::optional<bool> {
+    if (value == nullptr || fl_value_get_type(value) == FL_VALUE_TYPE_NULL) {
+      return false;
+    }
+    if (fl_value_get_type(value) == FL_VALUE_TYPE_BOOL) {
+      return fl_value_get_bool(value);
+    }
+    return false;
+  };
+}
+
+WebViewChannelDelegate::ShouldInterceptRequestCallback::ShouldInterceptRequestCallback() {
+  decodeResult = [](FlValue* value) -> std::optional<std::shared_ptr<WebResourceResponse>> {
+    if (value == nullptr || fl_value_get_type(value) == FL_VALUE_TYPE_NULL) {
+      return std::nullopt;
+    }
+    if (fl_value_get_type(value) == FL_VALUE_TYPE_MAP) {
+      return std::make_shared<WebResourceResponse>(value);
+    }
+    return std::nullopt;
+  };
+}
+
+WebViewChannelDelegate::JsAlertCallback::JsAlertCallback() {
+  decodeResult = [](FlValue* value) -> std::optional<JsAlertResponse> {
+    if (value == nullptr || fl_value_get_type(value) == FL_VALUE_TYPE_NULL) {
+      return std::nullopt;
+    }
+    if (fl_value_get_type(value) == FL_VALUE_TYPE_MAP) {
+      return JsAlertResponse(value);
+    }
+    return std::nullopt;
+  };
+}
+
+WebViewChannelDelegate::JsConfirmCallback::JsConfirmCallback() {
+  decodeResult = [](FlValue* value) -> std::optional<JsConfirmResponse> {
+    if (value == nullptr || fl_value_get_type(value) == FL_VALUE_TYPE_NULL) {
+      return std::nullopt;
+    }
+    if (fl_value_get_type(value) == FL_VALUE_TYPE_MAP) {
+      return JsConfirmResponse(value);
+    }
+    return std::nullopt;
+  };
+}
+
+WebViewChannelDelegate::JsPromptCallback::JsPromptCallback() {
+  decodeResult = [](FlValue* value) -> std::optional<JsPromptResponse> {
+    if (value == nullptr || fl_value_get_type(value) == FL_VALUE_TYPE_NULL) {
+      return std::nullopt;
+    }
+    if (fl_value_get_type(value) == FL_VALUE_TYPE_MAP) {
+      return JsPromptResponse(value);
+    }
+    return std::nullopt;
+  };
+}
+
+WebViewChannelDelegate::JsBeforeUnloadCallback::JsBeforeUnloadCallback() {
+  decodeResult = [](FlValue* value) -> std::optional<JsBeforeUnloadResponse> {
+    if (value == nullptr || fl_value_get_type(value) == FL_VALUE_TYPE_NULL) {
+      return std::nullopt;
+    }
+    if (fl_value_get_type(value) == FL_VALUE_TYPE_MAP) {
+      return JsBeforeUnloadResponse(value);
+    }
+    return std::nullopt;
+  };
+}
+
+WebViewChannelDelegate::PermissionRequestCallback::PermissionRequestCallback() {
+  decodeResult = [](FlValue* value) -> std::optional<PermissionResponse> {
+    if (value == nullptr || fl_value_get_type(value) == FL_VALUE_TYPE_NULL) {
+      return std::nullopt;
+    }
+    if (fl_value_get_type(value) == FL_VALUE_TYPE_MAP) {
+      return PermissionResponse(value);
+    }
+    return std::nullopt;
+  };
+}
+
+WebViewChannelDelegate::HttpAuthRequestCallback::HttpAuthRequestCallback() {
+  decodeResult = [](FlValue* value) -> std::optional<HttpAuthResponse> {
+    if (value == nullptr || fl_value_get_type(value) == FL_VALUE_TYPE_NULL) {
+      return std::nullopt;
+    }
+    if (fl_value_get_type(value) == FL_VALUE_TYPE_MAP) {
+      return HttpAuthResponse(value);
+    }
+    return std::nullopt;
+  };
+}
+
+WebViewChannelDelegate::DownloadStartCallback::DownloadStartCallback() {
+  decodeResult = [](FlValue* value) -> std::optional<DownloadStartResponse> {
+    if (value == nullptr || fl_value_get_type(value) == FL_VALUE_TYPE_NULL) {
+      return std::nullopt;
+    }
+    if (fl_value_get_type(value) == FL_VALUE_TYPE_MAP) {
+      return DownloadStartResponse(value);
+    }
+    return std::nullopt;
+  };
+}
+
 WebViewChannelDelegateWpe::WebViewChannelDelegateWpe(
     InAppWebViewWpe* webView,
     FlBinaryMessenger* messenger,
@@ -82,42 +209,371 @@ void WebViewChannelDelegateWpe::onTitleChanged(const std::string& title) {
   invokeMethod("onTitleChanged", args);
 }
 
-void WebViewChannelDelegateWpe::onCallJsHandler(const std::string& handlerName,
-                                                 const std::string& args) {
-  g_autoptr(FlValue) flArgs = fl_value_new_map();
-  fl_value_set_string_take(flArgs, "handlerName", 
-                           fl_value_new_string(handlerName.c_str()));
-  fl_value_set_string_take(flArgs, "args", fl_value_new_string(args.c_str()));
-  invokeMethod("onCallJsHandler", flArgs);
-}
-
-void WebViewChannelDelegateWpe::shouldOverrideUrlLoading(
-    int64_t decisionId, 
-    const std::string& url) {
-  if (DebugLogEnabled()) {
-    g_message("WebViewChannelDelegateWpe: shouldOverrideUrlLoading url=%s mainFrame=true", 
-              url.c_str());
+void WebViewChannelDelegateWpe::onCallJsHandler(
+    const std::string& handlerName,
+    std::unique_ptr<JavaScriptHandlerFunctionData> data,
+    std::unique_ptr<WebViewChannelDelegate::CallJsHandlerCallback> callback) {
+  if (!channel_) {
+    if (callback) callback->defaultBehaviour(std::nullopt);
+    return;
   }
 
   g_autoptr(FlValue) args = fl_value_new_map();
-  
-  // Create navigation action
-  g_autoptr(FlValue) navigationAction = fl_value_new_map();
-  
-  // Create request
-  g_autoptr(FlValue) request = fl_value_new_map();
-  fl_value_set_string_take(request, "url", fl_value_new_string(url.c_str()));
-  fl_value_set_string_take(request, "method", fl_value_new_string("GET"));
-  fl_value_set_string(navigationAction, "request", request);
-  
-  fl_value_set_string_take(navigationAction, "isForMainFrame", fl_value_new_bool(true));
-  fl_value_set_string_take(navigationAction, "hasGesture", fl_value_new_bool(false));
-  fl_value_set_string_take(navigationAction, "isRedirect", fl_value_new_bool(false));
-  
-  fl_value_set_string(args, "navigationAction", navigationAction);
-  fl_value_set_string_take(args, "decisionId", fl_value_new_int(decisionId));
+  fl_value_set_string_take(args, "handlerName", fl_value_new_string(handlerName.c_str()));
+  fl_value_set_string_take(args, "data", data->toFlValue());
 
-  invokeMethod("shouldOverrideUrlLoading", args);
+  auto* cb = callback.release();
+
+  invokeMethodWithResult(
+      "onCallJsHandler", args,
+      [](GObject* source, GAsyncResult* result, gpointer user_data) {
+        auto* cb = static_cast<WebViewChannelDelegate::CallJsHandlerCallback*>(user_data);
+        FlMethodChannel* ch = FL_METHOD_CHANNEL(source);
+
+        g_autoptr(GError) error = nullptr;
+        g_autoptr(FlMethodResponse) response =
+            fl_method_channel_invoke_method_finish(ch, result, &error);
+
+        if (error != nullptr) {
+          cb->handleError("CHANNEL_ERROR", error->message);
+        } else if (FL_IS_METHOD_SUCCESS_RESPONSE(response)) {
+          FlValue* returnValue = fl_method_success_response_get_result(FL_METHOD_SUCCESS_RESPONSE(response));
+          cb->handleResult(returnValue);
+        } else if (FL_IS_METHOD_ERROR_RESPONSE(response)) {
+          FlMethodErrorResponse* errorResponse = FL_METHOD_ERROR_RESPONSE(response);
+          cb->handleError(fl_method_error_response_get_code(errorResponse), fl_method_error_response_get_message(errorResponse));
+        } else {
+          cb->handleNotImplemented();
+        }
+
+        delete cb;
+      },
+      cb);
+}
+
+void WebViewChannelDelegateWpe::shouldOverrideUrlLoading(
+    std::shared_ptr<NavigationAction> navigationAction,
+    std::unique_ptr<WebViewChannelDelegate::ShouldOverrideUrlLoadingCallback> callback) {
+  if (!channel_) {
+    if (callback) callback->defaultBehaviour(std::nullopt);
+    return;
+  }
+
+  if (DebugLogEnabled()) {
+    std::string url = navigationAction->request ? navigationAction->request->url.value_or("") : "";
+    g_message("WebViewChannelDelegateWpe: shouldOverrideUrlLoading url=%s mainFrame=%s",
+              url.c_str(), navigationAction->isForMainFrame ? "true" : "false");
+  }
+
+  FlValue* args = navigationAction->toFlValue();
+
+  auto* cb = callback.release();
+
+  invokeMethodWithResult(
+      "shouldOverrideUrlLoading", args,
+      [](GObject* source, GAsyncResult* result, gpointer user_data) {
+        auto* cb = static_cast<WebViewChannelDelegate::ShouldOverrideUrlLoadingCallback*>(user_data);
+        FlMethodChannel* ch = FL_METHOD_CHANNEL(source);
+
+        g_autoptr(GError) error = nullptr;
+        g_autoptr(FlMethodResponse) response = fl_method_channel_invoke_method_finish(ch, result, &error);
+
+        if (error != nullptr) {
+          cb->handleError("CHANNEL_ERROR", error->message);
+        } else if (FL_IS_METHOD_SUCCESS_RESPONSE(response)) {
+          FlValue* returnValue = fl_method_success_response_get_result(FL_METHOD_SUCCESS_RESPONSE(response));
+          cb->handleResult(returnValue);
+        } else if (FL_IS_METHOD_ERROR_RESPONSE(response)) {
+          FlMethodErrorResponse* errorResponse = FL_METHOD_ERROR_RESPONSE(response);
+          cb->handleError(fl_method_error_response_get_code(errorResponse), fl_method_error_response_get_message(errorResponse));
+        } else {
+          cb->handleNotImplemented();
+        }
+
+        delete cb;
+      },
+      cb);
+}
+
+void WebViewChannelDelegateWpe::onJsAlert(
+    std::unique_ptr<JsAlertRequest> request,
+    std::unique_ptr<WebViewChannelDelegate::JsAlertCallback> callback) {
+  if (!channel_) {
+    if (callback) callback->defaultBehaviour(std::nullopt);
+    return;
+  }
+
+  g_autoptr(FlValue) args = fl_value_new_map();
+  fl_value_set_string_take(args, "request", request->toFlValue());
+
+  auto* cb = callback.release();
+
+  invokeMethodWithResult(
+      "onJsAlert", args,
+      [](GObject* source, GAsyncResult* result, gpointer user_data) {
+        auto* cb = static_cast<WebViewChannelDelegate::JsAlertCallback*>(user_data);
+        FlMethodChannel* ch = FL_METHOD_CHANNEL(source);
+
+        g_autoptr(GError) error = nullptr;
+        g_autoptr(FlMethodResponse) response = fl_method_channel_invoke_method_finish(ch, result, &error);
+
+        if (error != nullptr) {
+          cb->handleError("CHANNEL_ERROR", error->message);
+        } else if (FL_IS_METHOD_SUCCESS_RESPONSE(response)) {
+          FlValue* returnValue = fl_method_success_response_get_result(FL_METHOD_SUCCESS_RESPONSE(response));
+          cb->handleResult(returnValue);
+        } else if (FL_IS_METHOD_ERROR_RESPONSE(response)) {
+          FlMethodErrorResponse* errorResponse = FL_METHOD_ERROR_RESPONSE(response);
+          cb->handleError(fl_method_error_response_get_code(errorResponse), fl_method_error_response_get_message(errorResponse));
+        } else {
+          cb->handleNotImplemented();
+        }
+
+        delete cb;
+      },
+      cb);
+}
+
+void WebViewChannelDelegateWpe::onJsConfirm(
+    std::unique_ptr<JsConfirmRequest> request,
+    std::unique_ptr<WebViewChannelDelegate::JsConfirmCallback> callback) {
+  if (!channel_) {
+    if (callback) callback->defaultBehaviour(std::nullopt);
+    return;
+  }
+
+  g_autoptr(FlValue) args = fl_value_new_map();
+  fl_value_set_string_take(args, "request", request->toFlValue());
+
+  auto* cb = callback.release();
+
+  invokeMethodWithResult(
+      "onJsConfirm", args,
+      [](GObject* source, GAsyncResult* result, gpointer user_data) {
+        auto* cb = static_cast<WebViewChannelDelegate::JsConfirmCallback*>(user_data);
+        FlMethodChannel* ch = FL_METHOD_CHANNEL(source);
+
+        g_autoptr(GError) error = nullptr;
+        g_autoptr(FlMethodResponse) response = fl_method_channel_invoke_method_finish(ch, result, &error);
+
+        if (error != nullptr) {
+          cb->handleError("CHANNEL_ERROR", error->message);
+        } else if (FL_IS_METHOD_SUCCESS_RESPONSE(response)) {
+          FlValue* returnValue = fl_method_success_response_get_result(FL_METHOD_SUCCESS_RESPONSE(response));
+          cb->handleResult(returnValue);
+        } else if (FL_IS_METHOD_ERROR_RESPONSE(response)) {
+          FlMethodErrorResponse* errorResponse = FL_METHOD_ERROR_RESPONSE(response);
+          cb->handleError(fl_method_error_response_get_code(errorResponse), fl_method_error_response_get_message(errorResponse));
+        } else {
+          cb->handleNotImplemented();
+        }
+
+        delete cb;
+      },
+      cb);
+}
+
+void WebViewChannelDelegateWpe::onJsPrompt(
+    std::unique_ptr<JsPromptRequest> request,
+    std::unique_ptr<WebViewChannelDelegate::JsPromptCallback> callback) {
+  if (!channel_) {
+    if (callback) callback->defaultBehaviour(std::nullopt);
+    return;
+  }
+
+  g_autoptr(FlValue) args = fl_value_new_map();
+  fl_value_set_string_take(args, "request", request->toFlValue());
+
+  auto* cb = callback.release();
+
+  invokeMethodWithResult(
+      "onJsPrompt", args,
+      [](GObject* source, GAsyncResult* result, gpointer user_data) {
+        auto* cb = static_cast<WebViewChannelDelegate::JsPromptCallback*>(user_data);
+        FlMethodChannel* ch = FL_METHOD_CHANNEL(source);
+
+        g_autoptr(GError) error = nullptr;
+        g_autoptr(FlMethodResponse) response = fl_method_channel_invoke_method_finish(ch, result, &error);
+
+        if (error != nullptr) {
+          cb->handleError("CHANNEL_ERROR", error->message);
+        } else if (FL_IS_METHOD_SUCCESS_RESPONSE(response)) {
+          FlValue* returnValue = fl_method_success_response_get_result(FL_METHOD_SUCCESS_RESPONSE(response));
+          cb->handleResult(returnValue);
+        } else if (FL_IS_METHOD_ERROR_RESPONSE(response)) {
+          FlMethodErrorResponse* errorResponse = FL_METHOD_ERROR_RESPONSE(response);
+          cb->handleError(fl_method_error_response_get_code(errorResponse), fl_method_error_response_get_message(errorResponse));
+        } else {
+          cb->handleNotImplemented();
+        }
+
+        delete cb;
+      },
+      cb);
+}
+
+void WebViewChannelDelegateWpe::onJsBeforeUnload(
+    const std::optional<std::string>& url,
+    const std::optional<std::string>& message,
+    std::unique_ptr<WebViewChannelDelegate::JsBeforeUnloadCallback> callback) {
+  if (!channel_) {
+    if (callback) callback->defaultBehaviour(std::nullopt);
+    return;
+  }
+
+  g_autoptr(FlValue) args = fl_value_new_map();
+  if (url.has_value()) {
+    fl_value_set_string_take(args, "url", fl_value_new_string(url->c_str()));
+  } else {
+    fl_value_set_string_take(args, "url", fl_value_new_null());
+  }
+  if (message.has_value()) {
+    fl_value_set_string_take(args, "message", fl_value_new_string(message->c_str()));
+  } else {
+    fl_value_set_string_take(args, "message", fl_value_new_null());
+  }
+
+  auto* cb = callback.release();
+
+  invokeMethodWithResult(
+      "onJsBeforeUnload", args,
+      [](GObject* source, GAsyncResult* result, gpointer user_data) {
+        auto* cb = static_cast<WebViewChannelDelegate::JsBeforeUnloadCallback*>(user_data);
+        FlMethodChannel* ch = FL_METHOD_CHANNEL(source);
+
+        g_autoptr(GError) error = nullptr;
+        g_autoptr(FlMethodResponse) response = fl_method_channel_invoke_method_finish(ch, result, &error);
+
+        if (error != nullptr) {
+          cb->handleError("CHANNEL_ERROR", error->message);
+        } else if (FL_IS_METHOD_SUCCESS_RESPONSE(response)) {
+          FlValue* returnValue = fl_method_success_response_get_result(FL_METHOD_SUCCESS_RESPONSE(response));
+          cb->handleResult(returnValue);
+        } else if (FL_IS_METHOD_ERROR_RESPONSE(response)) {
+          FlMethodErrorResponse* errorResponse = FL_METHOD_ERROR_RESPONSE(response);
+          cb->handleError(fl_method_error_response_get_code(errorResponse), fl_method_error_response_get_message(errorResponse));
+        } else {
+          cb->handleNotImplemented();
+        }
+
+        delete cb;
+      },
+      cb);
+}
+
+void WebViewChannelDelegateWpe::onPermissionRequest(
+    std::unique_ptr<PermissionRequest> request,
+    std::unique_ptr<WebViewChannelDelegate::PermissionRequestCallback> callback) {
+  if (!channel_) {
+    if (callback) callback->defaultBehaviour(std::nullopt);
+    return;
+  }
+
+  g_autoptr(FlValue) args = fl_value_new_map();
+  fl_value_set_string_take(args, "request", request->toFlValue());
+
+  auto* cb = callback.release();
+
+  invokeMethodWithResult(
+      "onPermissionRequest", args,
+      [](GObject* source, GAsyncResult* result, gpointer user_data) {
+        auto* cb = static_cast<WebViewChannelDelegate::PermissionRequestCallback*>(user_data);
+        FlMethodChannel* ch = FL_METHOD_CHANNEL(source);
+
+        g_autoptr(GError) error = nullptr;
+        g_autoptr(FlMethodResponse) response = fl_method_channel_invoke_method_finish(ch, result, &error);
+
+        if (error != nullptr) {
+          cb->handleError("CHANNEL_ERROR", error->message);
+        } else if (FL_IS_METHOD_SUCCESS_RESPONSE(response)) {
+          FlValue* returnValue = fl_method_success_response_get_result(FL_METHOD_SUCCESS_RESPONSE(response));
+          cb->handleResult(returnValue);
+        } else if (FL_IS_METHOD_ERROR_RESPONSE(response)) {
+          FlMethodErrorResponse* errorResponse = FL_METHOD_ERROR_RESPONSE(response);
+          cb->handleError(fl_method_error_response_get_code(errorResponse), fl_method_error_response_get_message(errorResponse));
+        } else {
+          cb->handleNotImplemented();
+        }
+
+        delete cb;
+      },
+      cb);
+}
+
+void WebViewChannelDelegateWpe::onReceivedHttpAuthRequest(
+    std::unique_ptr<HttpAuthenticationChallenge> challenge,
+    std::unique_ptr<WebViewChannelDelegate::HttpAuthRequestCallback> callback) {
+  if (!channel_) {
+    if (callback) callback->defaultBehaviour(std::nullopt);
+    return;
+  }
+
+  g_autoptr(FlValue) args = fl_value_new_map();
+  fl_value_set_string_take(args, "challenge", challenge->toFlValue());
+
+  auto* cb = callback.release();
+
+  invokeMethodWithResult(
+      "onReceivedHttpAuthRequest", args,
+      [](GObject* source, GAsyncResult* result, gpointer user_data) {
+        auto* cb = static_cast<WebViewChannelDelegate::HttpAuthRequestCallback*>(user_data);
+        FlMethodChannel* ch = FL_METHOD_CHANNEL(source);
+
+        g_autoptr(GError) error = nullptr;
+        g_autoptr(FlMethodResponse) response = fl_method_channel_invoke_method_finish(ch, result, &error);
+
+        if (error != nullptr) {
+          cb->handleError("CHANNEL_ERROR", error->message);
+        } else if (FL_IS_METHOD_SUCCESS_RESPONSE(response)) {
+          FlValue* returnValue = fl_method_success_response_get_result(FL_METHOD_SUCCESS_RESPONSE(response));
+          cb->handleResult(returnValue);
+        } else if (FL_IS_METHOD_ERROR_RESPONSE(response)) {
+          FlMethodErrorResponse* errorResponse = FL_METHOD_ERROR_RESPONSE(response);
+          cb->handleError(fl_method_error_response_get_code(errorResponse), fl_method_error_response_get_message(errorResponse));
+        } else {
+          cb->handleNotImplemented();
+        }
+
+        delete cb;
+      },
+      cb);
+}
+
+void WebViewChannelDelegateWpe::onCreateWindow(
+    std::unique_ptr<CreateWindowAction> createWindowAction,
+    std::unique_ptr<WebViewChannelDelegate::CreateWindowCallback> callback) {
+  if (!channel_) {
+    if (callback) callback->defaultBehaviour(std::nullopt);
+    return;
+  }
+
+  FlValue* args = createWindowAction->toFlValue();
+  auto* cb = callback.release();
+
+  invokeMethodWithResult(
+      "onCreateWindow", args,
+      [](GObject* source, GAsyncResult* result, gpointer user_data) {
+        auto* cb = static_cast<WebViewChannelDelegate::CreateWindowCallback*>(user_data);
+        FlMethodChannel* ch = FL_METHOD_CHANNEL(source);
+
+        g_autoptr(GError) error = nullptr;
+        g_autoptr(FlMethodResponse) response = fl_method_channel_invoke_method_finish(ch, result, &error);
+
+        if (error != nullptr) {
+          cb->handleError("CHANNEL_ERROR", error->message);
+        } else if (FL_IS_METHOD_SUCCESS_RESPONSE(response)) {
+          FlValue* returnValue = fl_method_success_response_get_result(FL_METHOD_SUCCESS_RESPONSE(response));
+          cb->handleResult(returnValue);
+        } else if (FL_IS_METHOD_ERROR_RESPONSE(response)) {
+          FlMethodErrorResponse* errorResponse = FL_METHOD_ERROR_RESPONSE(response);
+          cb->handleError(fl_method_error_response_get_code(errorResponse), fl_method_error_response_get_message(errorResponse));
+        } else {
+          cb->handleNotImplemented();
+        }
+
+        delete cb;
+      },
+      cb);
 }
 
 void WebViewChannelDelegateWpe::onCloseWindow() {
@@ -130,6 +586,76 @@ void WebViewChannelDelegateWpe::onEnterFullscreen() {
 
 void WebViewChannelDelegateWpe::onExitFullscreen() {
   invokeMethod("onExitFullscreen", nullptr);
+}
+
+void WebViewChannelDelegateWpe::onFaviconChanged(const std::optional<std::string>& faviconUrl) {
+  g_autoptr(FlValue) args = fl_value_new_map();
+  if (faviconUrl.has_value()) {
+    fl_value_set_string_take(args, "url",
+                             fl_value_new_string(faviconUrl.value().c_str()));
+  } else {
+    fl_value_set_string_take(args, "url", fl_value_new_null());
+  }
+
+  invokeMethod("onReceivedIcon", args);
+}
+
+void WebViewChannelDelegateWpe::onConsoleMessage(const std::string& message,
+                                                  int64_t messageLevel) {
+  g_autoptr(FlValue) args = fl_value_new_map();
+  fl_value_set_string_take(args, "message", fl_value_new_string(message.c_str()));
+  fl_value_set_string_take(args, "messageLevel", fl_value_new_int(messageLevel));
+
+  invokeMethod("onConsoleMessage", args);
+}
+
+void WebViewChannelDelegateWpe::onUpdateVisitedHistory(
+    const std::optional<std::string>& url,
+    const std::optional<bool>& isReload) {
+  g_autoptr(FlValue) args = fl_value_new_map();
+  if (url.has_value()) {
+    fl_value_set_string_take(args, "url", fl_value_new_string(url->c_str()));
+  } else {
+    fl_value_set_string_take(args, "url", fl_value_new_null());
+  }
+  if (isReload.has_value()) {
+    fl_value_set_string_take(args, "isReload", fl_value_new_bool(isReload.value()));
+  } else {
+    fl_value_set_string_take(args, "isReload", fl_value_new_null());
+  }
+
+  invokeMethod("onUpdateVisitedHistory", args);
+}
+
+void WebViewChannelDelegateWpe::onPageCommitVisible(const std::optional<std::string>& url) {
+  g_autoptr(FlValue) args = fl_value_new_map();
+  if (url.has_value()) {
+    fl_value_set_string_take(args, "url", fl_value_new_string(url->c_str()));
+  } else {
+    fl_value_set_string_take(args, "url", fl_value_new_null());
+  }
+
+  invokeMethod("onPageCommitVisible", args);
+}
+
+void WebViewChannelDelegateWpe::onZoomScaleChanged(double newScale, double oldScale) {
+  g_autoptr(FlValue) args = fl_value_new_map();
+  fl_value_set_string_take(args, "newScale", fl_value_new_float(newScale));
+  fl_value_set_string_take(args, "oldScale", fl_value_new_float(oldScale));
+
+  invokeMethod("onZoomScaleChanged", args);
+}
+
+void WebViewChannelDelegateWpe::onScrollChanged(int64_t x, int64_t y) {
+  g_autoptr(FlValue) args = fl_value_new_map();
+  fl_value_set_string_take(args, "x", fl_value_new_int(x));
+  fl_value_set_string_take(args, "y", fl_value_new_int(y));
+
+  invokeMethod("onScrollChanged", args);
+}
+
+void WebViewChannelDelegateWpe::onWebViewCreated() {
+  invokeMethod("onWebViewCreated", nullptr);
 }
 
 // === Method call handler ===
@@ -169,8 +695,6 @@ void WebViewChannelDelegateWpe::HandleMethodCall(FlMethodCall* method_call) {
     HandleGetProgress(method_call);
   } else if (string_equals(method, "evaluateJavascript")) {
     HandleEvaluateJavascript(method_call);
-  } else if (string_equals(method, "shouldOverrideUrlLoadingResponse")) {
-    HandleShouldOverrideUrlLoadingDecision(method_call);
   } else {
     fl_method_call_respond_not_implemented(method_call, nullptr);
   }
@@ -317,25 +841,7 @@ void WebViewChannelDelegateWpe::HandleEvaluateJavascript(FlMethodCall* method_ca
   fl_method_call_respond_success(method_call, fl_value_new_null(), nullptr);
 }
 
-void WebViewChannelDelegateWpe::HandleShouldOverrideUrlLoadingDecision(
-    FlMethodCall* method_call) {
-  FlValue* args = fl_method_call_get_args(method_call);
-  
-  auto decisionId = get_fl_map_value<int64_t>(args, "decisionId", -1);
-  auto action = get_fl_map_value<int64_t>(args, "action", 0);
-  bool allow = (action == 1);  // 1 = ALLOW
-  
-  if (DebugLogEnabled()) {
-    g_message("WebViewChannelDelegateWpe: shouldOverrideUrlLoadingResponse decisionId=%ld action=%ld",
-              static_cast<long>(decisionId), static_cast<long>(action));
-  }
-  
-  if (webview_ != nullptr && decisionId >= 0) {
-    webview_->OnShouldOverrideUrlLoadingDecision(decisionId, allow);
-  }
-  
-  fl_method_call_respond_success(method_call, fl_value_new_null(), nullptr);
-}
+
 
 }  // namespace flutter_inappwebview_plugin
 

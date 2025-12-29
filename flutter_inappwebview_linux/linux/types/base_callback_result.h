@@ -76,9 +76,9 @@ class BaseCallbackResult {
 
     if (result.has_value()) {
       shouldRunDefaultBehaviour =
-          nonNullSuccess ? nonNullSuccess(result.value()) : false;
+          nonNullSuccess ? nonNullSuccess(result.value()) : shouldRunDefaultBehaviour;
     } else {
-      shouldRunDefaultBehaviour = nullSuccess ? nullSuccess() : false;
+      shouldRunDefaultBehaviour = nullSuccess ? nullSuccess() : shouldRunDefaultBehaviour;
     }
 
     if (shouldRunDefaultBehaviour && defaultBehaviour) {
@@ -92,9 +92,6 @@ class BaseCallbackResult {
   void handleError(const std::string& code, const std::string& message) {
     if (error) {
       error(code, message);
-    }
-    if (defaultBehaviour) {
-      defaultBehaviour(std::nullopt);
     }
   }
 

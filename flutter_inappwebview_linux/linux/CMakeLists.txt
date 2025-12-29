@@ -14,6 +14,9 @@ set(PLUGIN_NAME "flutter_inappwebview_linux_plugin")
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+# nlohmann/json version for JSON parsing
+set(NLOHMANN_JSON_VERSION "3.11.3")
+
 # === Backend Selection ===
 # By default, use WebKitGTK. Set USE_WPE_WEBKIT=ON to use WPE WebKit instead.
 # WPE WebKit is designed for embedded systems and provides better offscreen
@@ -102,6 +105,19 @@ elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "x86_64|AMD64|amd64")
   endif()
 endif()
 
+# === nlohmann/json dependency for JSON parsing ===
+include(FetchContent)
+FetchContent_Declare(
+  nlohmann_json
+  URL https://github.com/nlohmann/json/releases/download/v${NLOHMANN_JSON_VERSION}/json.tar.xz
+)
+# Don't build tests/examples
+set(JSON_BuildTests OFF CACHE INTERNAL "")
+FetchContent_MakeAvailable(nlohmann_json)
+# Suppress deprecated literal operator warnings from nlohmann_json
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-deprecated-literal-operator")
+message(STATUS "flutter_inappwebview_linux: nlohmann/json ${NLOHMANN_JSON_VERSION} configured")
+
 # Any new source files that you add to the plugin should be added here.
 list(APPEND PLUGIN_SOURCES
   "flutter_inappwebview_linux_plugin.cc"
@@ -114,7 +130,8 @@ list(APPEND PLUGIN_SOURCES
   "types/channel_delegate.cc"
   "types/content_world.cc"
   "types/create_window_action.cc"
-  "types/download_types.cc"
+  "types/download_start_request.cc"
+  "types/download_start_response.cc"
   "types/http_auth_types.cc"
   "types/javascript_handler_function_data.cc"
   "types/js_dialog_types.cc"
@@ -176,6 +193,7 @@ target_include_directories(${PLUGIN_NAME} PRIVATE
 target_link_libraries(${PLUGIN_NAME} PRIVATE flutter)
 target_link_libraries(${PLUGIN_NAME} PRIVATE PkgConfig::GTK)
 target_link_libraries(${PLUGIN_NAME} PRIVATE PkgConfig::EPOXY)
+target_link_libraries(${PLUGIN_NAME} PRIVATE nlohmann_json::nlohmann_json)
 
 # Backend-specific includes and libraries
 if(USE_WPE_WEBKIT)
@@ -320,6 +338,7 @@ target_include_directories(${TEST_RUNNER} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}" 
 target_link_libraries(${TEST_RUNNER} PRIVATE flutter)
 target_link_libraries(${TEST_RUNNER} PRIVATE PkgConfig::GTK)
 target_link_libraries(${TEST_RUNNER} PRIVATE PkgConfig::EPOXY)
+target_link_libraries(${TEST_RUNNER} PRIVATE nlohmann_json::nlohmann_json)
 
 # Backend-specific test configuration
 if(USE_WPE_WEBKIT)

@@ -586,30 +586,6 @@ void WebViewChannelDelegate::HandleMethodCall(FlMethodCall* method_call) {
     return;
   }
 
-  // Handle shouldOverrideUrlLoading response
-  if (string_equals(methodName, "shouldOverrideUrlLoadingResponse")) {
-    if (fl_value_get_type(args) == FL_VALUE_TYPE_MAP) {
-      FlValue* decision_id_value = fl_value_lookup_string(args, "decisionId");
-      FlValue* action_value = fl_value_lookup_string(args, "action");
-
-      if (decision_id_value != nullptr &&
-          fl_value_get_type(decision_id_value) == FL_VALUE_TYPE_INT &&
-          action_value != nullptr &&
-          fl_value_get_type(action_value) == FL_VALUE_TYPE_INT) {
-        int64_t decision_id = fl_value_get_int(decision_id_value);
-        int action = static_cast<int>(fl_value_get_int(action_value));
-        // action: 0 = cancel, 1 = allow
-        if (DebugLogEnabled()) {
-          g_message("WebViewChannelDelegate: shouldOverrideUrlLoadingResponse decisionId=%ld action=%d",
-                    static_cast<long>(decision_id), action);
-        }
-        webView->OnShouldOverrideUrlLoadingDecision(decision_id, action == 1);
-      }
-    }
-    fl_method_call_respond_success(method_call, nullptr, nullptr);
-    return;
-  }
-
   fl_method_call_respond_not_implemented(method_call, nullptr);
 }
 

@@ -176,13 +176,7 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController
               await webviewParams!.shouldOverrideUrlLoading!(
                   _controllerFromPlatform, navigationAction);
 
-          // Send the decision back to native
-          int decisionId = arguments["decisionId"] ?? 0;
-          await channel?.invokeMethod('shouldOverrideUrlLoadingResponse', {
-            'decisionId': decisionId,
-            'action': result?.toNativeValue() ?? 1, // Default to allow
-          });
-
+          // Return the decision directly to native (supports invokeMethodWithResult pattern)
           return result?.toNativeValue();
         }
         break;

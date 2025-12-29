@@ -13,13 +13,18 @@
 
 #include <wpe/webkit.h>
 
+#include <functional>
 #include <memory>
 #include <string>
 #include <vector>
 
 #include "../types/user_script.h"
+#include "../types/plugin_script.h"
 
 namespace flutter_inappwebview_plugin {
+
+// Script message handler callback type
+using ScriptMessageHandler = std::function<void(const std::string&, const std::string&)>;
 
 class UserContentControllerWpe {
  public:
@@ -32,6 +37,13 @@ class UserContentControllerWpe {
   void removeUserScriptsByGroupName(const std::string& groupName);
   void removeAllUserScripts();
 
+  // Plugin script management (for internal scripts like JS bridge)
+  void addPluginScript(std::unique_ptr<PluginScript> pluginScript);
+
+  // Script message handler
+  void setScriptMessageHandler(ScriptMessageHandler handler);
+  void registerScriptMessageHandler(const std::string& name);
+
   // Get all user scripts
   const std::vector<std::shared_ptr<UserScript>>& getUserScripts(
       UserScriptInjectionTime injectionTime) const;
@@ -42,6 +54,10 @@ class UserContentControllerWpe {
   
   std::vector<std::shared_ptr<UserScript>> document_start_scripts_;
   std::vector<std::shared_ptr<UserScript>> document_end_scripts_;
+  std::vector<std::unique_ptr<PluginScript>> plugin_scripts_;
+  std::vector<std::string> registered_message_handlers_;
+  
+  ScriptMessageHandler script_message_handler_;
 
   // Helper to convert UserScript to WebKitUserScript
   WebKitUserScript* createWebKitUserScript(
@@ -49,6 +65,11 @@ class UserContentControllerWpe {
   
   // Rebuild all scripts (called after add/remove)
   void rebuildScripts();
+
+  // Static callback for script message received signal
+  static void onScriptMessageReceived(WebKitUserContentManager* manager,
+                                      JSCValue* value,
+                                      gpointer user_data);
 };
 
 }  // namespace flutter_inappwebview_plugin

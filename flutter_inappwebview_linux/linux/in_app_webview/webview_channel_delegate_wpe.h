@@ -17,6 +17,12 @@
 #include <string>
 
 #include "../types/channel_delegate.h"
+#include "webview_channel_delegate.h"
+#include "../types/javascript_handler_function_data.h"
+#include "../types/navigation_action.h"
+#include "../types/js_dialog_types.h"
+#include "../types/permission_types.h"
+#include "../types/http_auth_types.h"
 
 namespace flutter_inappwebview_plugin {
 
@@ -37,16 +43,55 @@ class WebViewChannelDelegateWpe : public ChannelDelegate {
   void onProgressChanged(int progress);
   void onTitleChanged(const std::string& title);
 
-  // JavaScript handler callback
-  void onCallJsHandler(const std::string& handlerName, const std::string& args);
+  // JavaScript handler callback (async)
+  void onCallJsHandler(const std::string& handlerName,
+                       std::unique_ptr<JavaScriptHandlerFunctionData> data,
+                       std::unique_ptr<WebViewChannelDelegate::CallJsHandlerCallback> callback);
 
-  // URL loading decision
-  void shouldOverrideUrlLoading(int64_t decisionId, const std::string& url);
+  // URL loading decision (async)
+  void shouldOverrideUrlLoading(
+      std::shared_ptr<NavigationAction> navigationAction,
+      std::unique_ptr<WebViewChannelDelegate::ShouldOverrideUrlLoadingCallback> callback);
+
+  // JS dialogs (async)
+  void onJsAlert(std::unique_ptr<JsAlertRequest> request,
+                 std::unique_ptr<WebViewChannelDelegate::JsAlertCallback> callback);
+  void onJsConfirm(std::unique_ptr<JsConfirmRequest> request,
+                   std::unique_ptr<WebViewChannelDelegate::JsConfirmCallback> callback);
+  void onJsPrompt(std::unique_ptr<JsPromptRequest> request,
+                  std::unique_ptr<WebViewChannelDelegate::JsPromptCallback> callback);
+  void onJsBeforeUnload(const std::optional<std::string>& url,
+                        const std::optional<std::string>& message,
+                        std::unique_ptr<WebViewChannelDelegate::JsBeforeUnloadCallback> callback);
+
+  // Permission and auth (async)
+  void onPermissionRequest(std::unique_ptr<PermissionRequest> request,
+                           std::unique_ptr<WebViewChannelDelegate::PermissionRequestCallback> callback);
+  void onReceivedHttpAuthRequest(std::unique_ptr<HttpAuthenticationChallenge> challenge,
+                                 std::unique_ptr<WebViewChannelDelegate::HttpAuthRequestCallback> callback);
+
+  // Create window (async)
+  void onCreateWindow(std::unique_ptr<CreateWindowAction> createWindowAction,
+                      std::unique_ptr<WebViewChannelDelegate::CreateWindowCallback> callback);
 
   // Window events
   void onCloseWindow();
   void onEnterFullscreen();
   void onExitFullscreen();
+
+  // Favicon changed
+  void onFaviconChanged(const std::optional<std::string>& faviconUrl);
+
+  // Console messages (captured via JavaScript injection)
+  void onConsoleMessage(const std::string& message, int64_t messageLevel);
+
+  // Additional events (matching GTK implementation)
+  void onUpdateVisitedHistory(const std::optional<std::string>& url,
+                              const std::optional<bool>& isReload);
+  void onPageCommitVisible(const std::optional<std::string>& url);
+  void onZoomScaleChanged(double newScale, double oldScale);
+  void onScrollChanged(int64_t x, int64_t y);
+  void onWebViewCreated();
 
  protected:
   void HandleMethodCall(FlMethodCall* method_call) override;
@@ -85,7 +130,6 @@ class WebViewChannelDelegateWpe : public ChannelDelegate {
   void HandleGetScrollY(FlMethodCall* method_call);
   void HandleGetSettings(FlMethodCall* method_call);
   void HandleSetSettings(FlMethodCall* method_call);
-  void HandleShouldOverrideUrlLoadingDecision(FlMethodCall* method_call);
 };
 
 }  // namespace flutter_inappwebview_plugin

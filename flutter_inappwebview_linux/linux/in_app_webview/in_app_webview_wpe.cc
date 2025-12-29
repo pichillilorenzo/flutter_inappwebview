@@ -10,6 +10,7 @@
 #include <algorithm>
 #include <cstring>
 #include <random>
+#include <nlohmann/json.hpp>
 
 // Use epoxy for OpenGL/EGL instead of direct headers to avoid conflicts
 #include <epoxy/egl.h>
@@ -19,6 +20,7 @@
 #include <wayland-server.h>
 
 #include "../plugin_scripts_js/javascript_bridge_js.h"
+#include "../plugin_scripts_js/console_log_js.h"
 #include "../types/navigation_action.h"
 #include "../types/web_resource_error.h"
 #include "../types/web_resource_request.h"
@@ -26,6 +28,9 @@
 #include "../utils/log.h"
 #include "user_content_controller_wpe.h"
 #include "webview_channel_delegate_wpe.h"
+#include "../types/create_window_action.h"
+
+using json = nlohmann::json;
 
 // GDK for EGL display access
 #include <gdk/gdk.h>
@@ -350,6 +355,31 @@ void InAppWebViewWpe::RegisterEventHandlers() {
     return;
   }
 
+  // Set up the script message handler callback
+  if (user_content_controller_) {
+    user_content_controller_->setScriptMessageHandler(
+        [this](const std::string& name, const std::string& body) {
+          handleScriptMessage(name, body);
+        });
+    
+    // Add the JavaScript bridge plugin script
+    auto jsBridgeScript = JavaScriptBridgeJS::JAVASCRIPT_BRIDGE_JS_PLUGIN_SCRIPT(
+        js_bridge_secret_,
+        std::nullopt,  // allowedOriginRules - allow all
+        false          // forMainFrameOnly - inject in all frames
+    );
+    user_content_controller_->addPluginScript(std::move(jsBridgeScript));
+    
+    // Add the console log interception script
+    auto consoleLogScript = ConsoleLogJS::CONSOLE_LOG_JS_PLUGIN_SCRIPT(std::nullopt);
+    user_content_controller_->addPluginScript(std::move(consoleLogScript));
+    
+    if (DebugLogEnabled()) {
+      g_message("InAppWebViewWpe[%ld]: JavaScript bridge and console log initialized",
+                static_cast<long>(id_));
+    }
+  }
+
   // Connect to load-changed signal
   g_signal_connect(webview_, "load-changed",
                    G_CALLBACK(OnLoadChanged), this);
@@ -405,6 +435,10 @@ void InAppWebViewWpe::RegisterEventHandlers() {
   // Connect to mouse-target-changed for cursor type detection
   g_signal_connect(webview_, "mouse-target-changed",
                    G_CALLBACK(OnMouseTargetChanged), this);
+
+  // Connect to create signal for window.open() / target="_blank"
+  g_signal_connect(webview_, "create",
+                   G_CALLBACK(OnCreateWebView), this);
 
   // Add frame displayed callback (WPE-specific)
   webkit_web_view_add_frame_displayed_callback(
@@ -1149,7 +1183,15 @@ gboolean InAppWebViewWpe::OnDecidePolicy(WebKitWebView* web_view,
   auto* self = static_cast<InAppWebViewWpe*>(user_data);
   
   if (decision_type != WEBKIT_POLICY_DECISION_TYPE_NAVIGATION_ACTION) {
+    if (DebugLogEnabled()) {
+      g_message("InAppWebViewWpe[%ld]: OnDecidePolicy ignored type=%d",
+                static_cast<long>(self->id_), static_cast<int>(decision_type));
+    }
     return FALSE;  // Let WebKit handle other decision types
+  }
+
+  if (DebugLogEnabled()) {
+    g_message("InAppWebViewWpe[%ld]: OnDecidePolicy invoked (navigation_action)", static_cast<long>(self->id_));
   }
 
   auto* nav_decision = WEBKIT_NAVIGATION_POLICY_DECISION(decision);
@@ -1163,11 +1205,63 @@ gboolean InAppWebViewWpe::OnDecidePolicy(WebKitWebView* web_view,
       int64_t decision_id = self->next_decision_id_++;
       g_object_ref(decision);
       self->pending_policy_decisions_[decision_id] = decision;
-      
-      // Notify Dart side - it will call OnShouldOverrideUrlLoadingDecision
-      self->channel_delegate_->shouldOverrideUrlLoading(
-          decision_id, std::string(uri ? uri : ""));
-      
+
+      // Best-effort main frame detection: frame name is usually null/empty for main frame.
+      bool is_for_main_frame = true;
+      const gchar* frame_name = webkit_navigation_action_get_frame_name(nav_action);
+      if (frame_name != nullptr && frame_name[0] != '\0') {
+        is_for_main_frame = false;
+      }
+
+      // Create URLRequest
+      auto urlRequest = std::make_shared<URLRequest>(
+          uri != nullptr ? std::optional<std::string>(uri) : std::nullopt,
+          std::optional<std::string>("GET"),
+          std::nullopt,  // headers
+          std::nullopt   // body
+      );
+
+      // Map WebKit navigation type to our enum
+      WebKitNavigationType nav_type = webkit_navigation_action_get_navigation_type(nav_action);
+      std::optional<NavigationActionType> navActionType;
+      switch (nav_type) {
+        case WEBKIT_NAVIGATION_TYPE_LINK_CLICKED:
+          navActionType = NavigationActionType::linkActivated;
+          break;
+        case WEBKIT_NAVIGATION_TYPE_BACK_FORWARD:
+          navActionType = NavigationActionType::backForward;
+          break;
+        case WEBKIT_NAVIGATION_TYPE_RELOAD:
+          navActionType = NavigationActionType::reload;
+          break;
+        default:
+          navActionType = NavigationActionType::other;
+          break;
+      }
+
+      // Create NavigationAction
+      auto navigationAction = std::make_shared<NavigationAction>(
+          urlRequest,
+          is_for_main_frame,
+          std::nullopt,  // isRedirect - not easily available in WebKit
+          navActionType
+      );
+
+      // Create callback to handle the response
+      auto callback = std::make_unique<WebViewChannelDelegate::ShouldOverrideUrlLoadingCallback>();
+      callback->defaultBehaviour = [self, decision_id](const std::optional<NavigationActionPolicy> result) {
+        bool allow = result.has_value() && result.value() == NavigationActionPolicy::allow;
+        self->OnShouldOverrideUrlLoadingDecision(decision_id, allow);
+      };
+
+      // Notify Dart side with callback
+      self->channel_delegate_->shouldOverrideUrlLoading(navigationAction, std::move(callback));
+
+      if (DebugLogEnabled()) {
+        g_message("InAppWebViewWpe[%ld]: deferring policy decision id=%ld", 
+                  static_cast<long>(self->id_), static_cast<long>(decision_id));
+      }
+
       return TRUE;  // We're handling this asynchronously
     }
   }
@@ -1237,41 +1331,378 @@ void InAppWebViewWpe::OnCloseRequest(WebKitWebView* web_view, gpointer user_data
   }
 }
 
-GtkWidget* InAppWebViewWpe::OnCreateWebView(WebKitWebView* web_view,
+// WPE WebKit create signal handler - returns WebKitWebView* (not GtkWidget*)
+WebKitWebView* InAppWebViewWpe::OnCreateWebView(WebKitWebView* web_view,
                                              WebKitNavigationAction* navigation_action,
                                              gpointer user_data) {
-  // WPE doesn't use GtkWidget, so this signal handler is different
+  auto* self = static_cast<InAppWebViewWpe*>(user_data);
+
+  if (DebugLogEnabled()) {
+    g_message("InAppWebViewWpe[%ld]: create (new window requested)", static_cast<long>(self->id_));
+  }
+
+  // Check if JavaScript can open windows automatically
+  if (!self->settings_ || !self->settings_->javaScriptCanOpenWindowsAutomatically) {
+    // Default to allowing navigation in current window
+    WebKitURIRequest* request = webkit_navigation_action_get_request(navigation_action);
+    if (request != nullptr) {
+      const gchar* uri = webkit_uri_request_get_uri(request);
+      if (uri != nullptr && self->webview_ != nullptr) {
+        webkit_web_view_load_uri(self->webview_, uri);
+      }
+    }
+    return nullptr;
+  }
+
+  if (self->channel_delegate_) {
+    static int64_t window_autoincrement_id = 0;
+    int64_t windowId = ++window_autoincrement_id;
+
+    auto createWindowAction = std::make_unique<CreateWindowAction>(
+        navigation_action, windowId, nullptr);
+
+    auto callback = std::make_unique<WebViewChannelDelegate::CreateWindowCallback>();
+
+    // Capture necessary data for callback
+    WebKitURIRequest* request = webkit_navigation_action_get_request(navigation_action);
+    std::string url_to_load;
+    if (request != nullptr) {
+      const gchar* uri = webkit_uri_request_get_uri(request);
+      if (uri != nullptr) {
+        url_to_load = std::string(uri);
+      }
+    }
+
+    callback->nonNullSuccess = [](bool handledByClient) {
+      return !handledByClient;
+    };
+
+    std::string captured_url = url_to_load;
+    auto* webview_ptr = self->webview_;
+    callback->defaultBehaviour = [webview_ptr, captured_url](std::optional<bool>) {
+      if (!captured_url.empty() && webview_ptr != nullptr) {
+        webkit_web_view_load_uri(webview_ptr, captured_url.c_str());
+      }
+    };
+
+    self->channel_delegate_->onCreateWindow(std::move(createWindowAction), std::move(callback));
+  }
+
+  // Return nullptr - we don't actually create a new WebView
+  // The Dart side handles the window creation
   return nullptr;
 }
 
 gboolean InAppWebViewWpe::OnScriptDialog(WebKitWebView* web_view,
                                           WebKitScriptDialog* dialog,
                                           gpointer user_data) {
-  (void)web_view;
-  (void)dialog;
-  (void)user_data;
-  // Handle script dialogs (alert, confirm, prompt)
-  return FALSE;
+  auto* self = static_cast<InAppWebViewWpe*>(user_data);
+
+  WebKitScriptDialogType dialogType = webkit_script_dialog_get_dialog_type(dialog);
+  const gchar* message = webkit_script_dialog_get_message(dialog);
+
+  if (DebugLogEnabled()) {
+    g_message("InAppWebViewWpe[%ld]: script-dialog type=%d message=%.50s...",
+              static_cast<long>(self->id_), dialogType, message ? message : "null");
+  }
+
+  if (!self->channel_delegate_) {
+    return FALSE;  // Use default WebKit dialog handling
+  }
+
+  std::optional<std::string> url;
+  const gchar* uri = webkit_web_view_get_uri(web_view);
+  if (uri != nullptr) {
+    url = std::string(uri);
+  }
+
+  std::string messageStr = message ? std::string(message) : "";
+
+  // Keep a reference to the dialog for async handling
+  webkit_script_dialog_ref(dialog);
+  int64_t dialogId = self->next_dialog_id_++;
+  self->pending_script_dialogs_[dialogId] = dialog;
+
+  switch (dialogType) {
+    case WEBKIT_SCRIPT_DIALOG_ALERT: {
+      auto request = std::make_unique<JsAlertRequest>(url, messageStr, true);
+      auto callback = std::make_unique<WebViewChannelDelegate::JsAlertCallback>();
+
+      auto* pendingDialogs = &self->pending_script_dialogs_;
+      int64_t capturedId = dialogId;
+
+      callback->nonNullSuccess = [](JsAlertResponse response) {
+        return !response.handledByClient;
+      };
+
+      callback->defaultBehaviour = [pendingDialogs, capturedId](std::optional<JsAlertResponse>) {
+        auto it = pendingDialogs->find(capturedId);
+        if (it != pendingDialogs->end()) {
+          webkit_script_dialog_close(it->second);
+          webkit_script_dialog_unref(it->second);
+          pendingDialogs->erase(it);
+        }
+      };
+
+      self->channel_delegate_->onJsAlert(std::move(request), std::move(callback));
+      break;
+    }
+
+    case WEBKIT_SCRIPT_DIALOG_CONFIRM: {
+      auto request = std::make_unique<JsConfirmRequest>(url, messageStr, true);
+      auto callback = std::make_unique<WebViewChannelDelegate::JsConfirmCallback>();
+
+      auto* pendingDialogs = &self->pending_script_dialogs_;
+      int64_t capturedId = dialogId;
+
+      callback->nonNullSuccess = [pendingDialogs, capturedId](JsConfirmResponse response) {
+        auto it = pendingDialogs->find(capturedId);
+        if (it != pendingDialogs->end()) {
+          webkit_script_dialog_confirm_set_confirmed(
+              it->second, response.action == JsConfirmResponseAction::CONFIRM);
+          webkit_script_dialog_close(it->second);
+          webkit_script_dialog_unref(it->second);
+          pendingDialogs->erase(it);
+        }
+        return false;
+      };
+
+      callback->defaultBehaviour = [pendingDialogs, capturedId](std::optional<JsConfirmResponse>) {
+        auto it = pendingDialogs->find(capturedId);
+        if (it != pendingDialogs->end()) {
+          webkit_script_dialog_confirm_set_confirmed(it->second, FALSE);
+          webkit_script_dialog_close(it->second);
+          webkit_script_dialog_unref(it->second);
+          pendingDialogs->erase(it);
+        }
+      };
+
+      self->channel_delegate_->onJsConfirm(std::move(request), std::move(callback));
+      break;
+    }
+
+    case WEBKIT_SCRIPT_DIALOG_PROMPT: {
+      const gchar* defaultValue = webkit_script_dialog_prompt_get_default_text(dialog);
+      std::optional<std::string> defaultValueStr;
+      if (defaultValue != nullptr) {
+        defaultValueStr = std::string(defaultValue);
+      }
+
+      auto request = std::make_unique<JsPromptRequest>(url, messageStr, defaultValueStr, true);
+      auto callback = std::make_unique<WebViewChannelDelegate::JsPromptCallback>();
+
+      auto* pendingDialogs = &self->pending_script_dialogs_;
+      int64_t capturedId = dialogId;
+
+      callback->nonNullSuccess = [pendingDialogs, capturedId](JsPromptResponse response) {
+        auto it = pendingDialogs->find(capturedId);
+        if (it != pendingDialogs->end()) {
+          if (response.action == JsPromptResponseAction::CONFIRM && response.value.has_value()) {
+            webkit_script_dialog_prompt_set_text(it->second, response.value.value().c_str());
+          }
+          webkit_script_dialog_close(it->second);
+          webkit_script_dialog_unref(it->second);
+          pendingDialogs->erase(it);
+        }
+        return false;
+      };
+
+      callback->defaultBehaviour = [pendingDialogs, capturedId](std::optional<JsPromptResponse>) {
+        auto it = pendingDialogs->find(capturedId);
+        if (it != pendingDialogs->end()) {
+          webkit_script_dialog_close(it->second);
+          webkit_script_dialog_unref(it->second);
+          pendingDialogs->erase(it);
+        }
+      };
+
+      self->channel_delegate_->onJsPrompt(std::move(request), std::move(callback));
+      break;
+    }
+
+    case WEBKIT_SCRIPT_DIALOG_BEFORE_UNLOAD_CONFIRM: {
+      auto callback = std::make_unique<WebViewChannelDelegate::JsBeforeUnloadCallback>();
+
+      auto* pendingDialogs = &self->pending_script_dialogs_;
+      int64_t capturedId = dialogId;
+
+      callback->nonNullSuccess = [pendingDialogs, capturedId](JsBeforeUnloadResponse response) {
+        auto it = pendingDialogs->find(capturedId);
+        if (it != pendingDialogs->end()) {
+          webkit_script_dialog_confirm_set_confirmed(it->second, response.shouldAllowNavigation);
+          webkit_script_dialog_close(it->second);
+          webkit_script_dialog_unref(it->second);
+          pendingDialogs->erase(it);
+        }
+        return false;
+      };
+
+      callback->defaultBehaviour = [pendingDialogs, capturedId](std::optional<JsBeforeUnloadResponse>) {
+        auto it = pendingDialogs->find(capturedId);
+        if (it != pendingDialogs->end()) {
+          webkit_script_dialog_confirm_set_confirmed(it->second, TRUE);
+          webkit_script_dialog_close(it->second);
+          webkit_script_dialog_unref(it->second);
+          pendingDialogs->erase(it);
+        }
+      };
+
+      self->channel_delegate_->onJsBeforeUnload(url, messageStr.empty() ? std::nullopt : std::make_optional(messageStr),
+                                                 std::move(callback));
+      break;
+    }
+
+    default:
+      // Unknown dialog type, let WebKit handle it
+      webkit_script_dialog_unref(dialog);
+      self->pending_script_dialogs_.erase(dialogId);
+      return FALSE;
+  }
+
+  return TRUE;  // We're handling the dialog
 }
 
 gboolean InAppWebViewWpe::OnPermissionRequest(WebKitWebView* web_view,
                                                WebKitPermissionRequest* request,
                                                gpointer user_data) {
-  (void)web_view;
-  (void)request;
-  (void)user_data;
-  // Handle permission requests
-  return FALSE;
+  auto* self = static_cast<InAppWebViewWpe*>(user_data);
+
+  if (DebugLogEnabled()) {
+    g_message("InAppWebViewWpe[%ld]: permission-request", static_cast<long>(self->id_));
+  }
+
+  if (!self->channel_delegate_) {
+    webkit_permission_request_deny(request);
+    return TRUE;
+  }
+
+  auto resourceTypes = PermissionRequest::getResourceTypes(request);
+  if (resourceTypes.empty()) {
+    webkit_permission_request_deny(request);
+    return TRUE;
+  }
+
+  std::optional<std::string> origin;
+  const gchar* uri = webkit_web_view_get_uri(web_view);
+  if (uri != nullptr) {
+    origin = std::string(uri);
+  }
+
+  auto permRequest = std::make_unique<PermissionRequest>(origin, resourceTypes);
+
+  // Keep reference to the WebKit request
+  g_object_ref(request);
+  int64_t requestId = self->next_permission_id_++;
+  self->pending_permission_requests_[requestId] = request;
+
+  auto callback = std::make_unique<WebViewChannelDelegate::PermissionRequestCallback>();
+
+  auto* pendingRequests = &self->pending_permission_requests_;
+  int64_t capturedId = requestId;
+
+  callback->nonNullSuccess = [pendingRequests, capturedId](PermissionResponse response) {
+    auto it = pendingRequests->find(capturedId);
+    if (it != pendingRequests->end()) {
+      if (response.action == PermissionResponseAction::GRANT) {
+        webkit_permission_request_allow(it->second);
+      } else {
+        webkit_permission_request_deny(it->second);
+      }
+      g_object_unref(it->second);
+      pendingRequests->erase(it);
+    }
+    return false;
+  };
+
+  callback->defaultBehaviour = [pendingRequests, capturedId](std::optional<PermissionResponse>) {
+    auto it = pendingRequests->find(capturedId);
+    if (it != pendingRequests->end()) {
+      webkit_permission_request_deny(it->second);
+      g_object_unref(it->second);
+      pendingRequests->erase(it);
+    }
+  };
+
+  self->channel_delegate_->onPermissionRequest(std::move(permRequest), std::move(callback));
+
+  return TRUE;  // We're handling the request
 }
 
 gboolean InAppWebViewWpe::OnAuthenticate(WebKitWebView* web_view,
                                           WebKitAuthenticationRequest* request,
                                           gpointer user_data) {
-  (void)web_view;
-  (void)request;
-  (void)user_data;
-  // Handle HTTP authentication
-  return FALSE;
+  auto* self = static_cast<InAppWebViewWpe*>(user_data);
+
+  if (DebugLogEnabled()) {
+    g_message("InAppWebViewWpe[%ld]: authenticate", static_cast<long>(self->id_));
+  }
+
+  if (!self->channel_delegate_) {
+    webkit_authentication_request_cancel(request);
+    return TRUE;
+  }
+
+  const gchar* host = webkit_authentication_request_get_host(request);
+  guint port = webkit_authentication_request_get_port(request);
+  const gchar* realm = webkit_authentication_request_get_realm(request);
+  WebKitAuthenticationScheme scheme = webkit_authentication_request_get_scheme(request);
+  gboolean isProxy = webkit_authentication_request_is_for_proxy(request);
+  gboolean isRetry = webkit_authentication_request_is_retry(request);
+
+  URLProtectionSpace protectionSpace(
+      host ? std::string(host) : "",
+      static_cast<int64_t>(port),
+      std::nullopt,  // protocol not directly available
+      realm ? std::make_optional(std::string(realm)) : std::nullopt,
+      URLProtectionSpace::fromWebKitScheme(scheme),
+      isProxy);
+
+  auto challenge = std::make_unique<HttpAuthenticationChallenge>(protectionSpace, isRetry);
+
+  // Keep reference to the request
+  g_object_ref(request);
+  int64_t requestId = self->next_auth_id_++;
+  self->pending_auth_requests_[requestId] = request;
+
+  auto callback = std::make_unique<WebViewChannelDelegate::HttpAuthRequestCallback>();
+
+  auto* pendingRequests = &self->pending_auth_requests_;
+  int64_t capturedId = requestId;
+
+  callback->nonNullSuccess = [pendingRequests, capturedId](HttpAuthResponse response) {
+    auto it = pendingRequests->find(capturedId);
+    if (it != pendingRequests->end()) {
+      if (response.action == HttpAuthResponseAction::PROCEED &&
+          response.username.has_value() && response.password.has_value()) {
+        WebKitCredential* credential = webkit_credential_new(
+            response.username.value().c_str(),
+            response.password.value().c_str(),
+            response.permanentPersistence
+                ? WEBKIT_CREDENTIAL_PERSISTENCE_PERMANENT
+                : WEBKIT_CREDENTIAL_PERSISTENCE_FOR_SESSION);
+        webkit_authentication_request_authenticate(it->second, credential);
+        webkit_credential_free(credential);
+      } else {
+        webkit_authentication_request_cancel(it->second);
+      }
+      g_object_unref(it->second);
+      pendingRequests->erase(it);
+    }
+    return false;
+  };
+
+  callback->defaultBehaviour = [pendingRequests, capturedId](std::optional<HttpAuthResponse>) {
+    auto it = pendingRequests->find(capturedId);
+    if (it != pendingRequests->end()) {
+      webkit_authentication_request_cancel(it->second);
+      g_object_unref(it->second);
+      pendingRequests->erase(it);
+    }
+  };
+
+  self->channel_delegate_->onReceivedHttpAuthRequest(std::move(challenge), std::move(callback));
+
+  return TRUE;  // We're handling the request
 }
 
 gboolean InAppWebViewWpe::OnContextMenu(WebKitWebView* web_view,
@@ -1346,6 +1777,11 @@ void InAppWebViewWpe::OnMouseTargetChanged(WebKitWebView* web_view,
     }
   }
 }
+
+// NOTE: OnMotionNotify and OnNotifyFavicon have been removed because:
+// - motion-notify-event is a GTK widget signal (WPE WebView is NOT a GTK widget)
+// - notify::favicon property does not exist in WPE WebKit (GTK-only)
+// Cursor detection in WPE is handled via mouse-target-changed and JS injection.
 
 // === Cursor Detection ===
 
@@ -1443,19 +1879,369 @@ void InAppWebViewWpe::updateCursorFromCssStyle(const std::string& cursor_style) 
 
 void InAppWebViewWpe::handleScriptMessage(const std::string& name, 
                                            const std::string& body) {
-  // Handle internal cursor change messages
+  // Handle internal cursor change messages (sent directly via messageHandlers)
   if (name == "_cursorChanged") {
     updateCursorFromCssStyle(body);
     return;
   }
+
+  // === Security Check 1: javaScriptBridgeEnabled ===
+  // Match iOS: guard javaScriptBridgeEnabled else { return }
+  if (settings_ && !settings_->javaScriptBridgeEnabled) {
+    if (DebugLogEnabled()) {
+      g_message("InAppWebViewWpe[%ld]: JavaScript bridge is disabled",
+                static_cast<long>(id_));
+    }
+    return;
+  }
+
+  // Parse the body as JSON using nlohmann/json
+  json bodyJson;
+  try {
+    bodyJson = json::parse(body);
+  } catch (const json::parse_error& e) {
+    if (DebugLogEnabled()) {
+      g_message("InAppWebViewWpe[%ld]: Failed to parse script message JSON: %s",
+                static_cast<long>(id_), e.what());
+    }
+    return;
+  }
+
+  // === Security Check 2: Bridge Secret Validation ===
+  // Match iOS: guard bridgeSecret == exceptedBridgeSecret
+  std::string receivedSecret = "";
+  if (bodyJson.contains("_bridgeSecret") && bodyJson["_bridgeSecret"].is_string()) {
+    receivedSecret = bodyJson["_bridgeSecret"].get<std::string>();
+  }
   
-  if (channel_delegate_) {
-    channel_delegate_->onCallJsHandler(name, body);
+  if (receivedSecret != js_bridge_secret_) {
+    // Get origin for logging
+    std::string securityOrigin = "unknown";
+    const gchar* uri = webkit_web_view_get_uri(webview_);
+    if (uri != nullptr) {
+      securityOrigin = std::string(uri);
+    }
+    g_warning("InAppWebViewWpe[%ld]: Bridge access attempt with wrong secret token, "
+              "possibly from malicious code from origin %s",
+              static_cast<long>(id_), securityOrigin.c_str());
+    return;
+  }
+
+  // === Build Source Origin (matches iOS securityOrigin handling) ===
+  std::string sourceOrigin = "";
+  std::string requestUrl = "";
+  bool isMainFrame = true;  // Main frame by default for WPE
+  
+  // Get current URL from webview - this is the "request URL"
+  const gchar* uri = webkit_web_view_get_uri(webview_);
+  if (uri != nullptr) {
+    requestUrl = std::string(uri);
+    // Extract origin from URL (scheme://host:port)
+    // This matches iOS: URL(string: "\(scheme)://\(host)\(port != 0 ? ":" + String(port) : "")")
+    try {
+      size_t schemeEnd = requestUrl.find("://");
+      if (schemeEnd != std::string::npos) {
+        size_t hostStart = schemeEnd + 3;
+        size_t hostEnd = requestUrl.find('/', hostStart);
+        if (hostEnd == std::string::npos) {
+          hostEnd = requestUrl.length();
+        }
+        sourceOrigin = requestUrl.substr(0, hostEnd);
+      }
+    } catch (...) {}
+  }
+
+  // === Security Check 3: Origin Allow List ===
+  // Match iOS: javaScriptHandlersOriginAllowList check
+  bool isOriginAllowed = true;
+  if (settings_ && settings_->javaScriptHandlersOriginAllowList.has_value()) {
+    const auto& allowList = settings_->javaScriptHandlersOriginAllowList.value();
+    if (!allowList.empty()) {
+      isOriginAllowed = false;
+      for (const auto& allowedOrigin : allowList) {
+        // Simple substring/regex-like matching (iOS uses regex)
+        if (!sourceOrigin.empty() && sourceOrigin.find(allowedOrigin) != std::string::npos) {
+          isOriginAllowed = true;
+          break;
+        }
+      }
+    }
+    // If allowList is empty, origin is allowed by default
+  }
+  // If javaScriptHandlersOriginAllowList is nullopt, origin is allowed by default (matches iOS)
+  
+  if (!isOriginAllowed) {
+    g_warning("InAppWebViewWpe[%ld]: Bridge access attempt from an origin not allowed: %s",
+              static_cast<long>(id_), sourceOrigin.c_str());
+    return;
+  }
+
+  // === Multi-Window Support: Extract _windowId ===
+  // Match iOS: let _windowId = body["_windowId"] as? Int64
+  // The _windowId allows routing callbacks to the correct webview in multi-window scenarios
+  std::optional<int64_t> windowId;
+  if (bodyJson.contains("_windowId") && bodyJson["_windowId"].is_number()) {
+    windowId = bodyJson["_windowId"].get<int64_t>();
+  }
+  
+  // Get the target webview for this message
+  // Match iOS: if let wId = _windowId, let webViewTransport = plugin?.inAppWebViewManager?.windowWebViews[wId]
+  // For now, we use 'this' webview. When window management is implemented,
+  // this should look up the webview by windowId from a global registry.
+  InAppWebViewWpe* targetWebView = this;
+  // TODO: When multi-window is fully implemented:
+  // if (windowId.has_value()) {
+  //   auto* manager = InAppWebViewManager::getInstance();
+  //   if (manager && manager->hasWindowWebView(windowId.value())) {
+  //     targetWebView = manager->getWindowWebView(windowId.value());
+  //   }
+  // }
+
+  // For callHandler messages, extract the actual handler name from body
+  std::string handlerName = name;
+  if (name == "callHandler") {
+    if (bodyJson.contains("handlerName") && bodyJson["handlerName"].is_string()) {
+      handlerName = bodyJson["handlerName"].get<std::string>();
+    }
+    
+    if (DebugLogEnabled()) {
+      g_message("InAppWebViewWpe[%ld]: handleScriptMessage handlerName='%s' windowId=%s",
+                static_cast<long>(id_), handlerName.c_str(),
+                windowId.has_value() ? std::to_string(windowId.value()).c_str() : "null");
+    }
+  }
+
+  // Extract _callHandlerID for callback
+  int64_t callHandlerId = 0;
+  if (bodyJson.contains("_callHandlerID") && bodyJson["_callHandlerID"].is_number()) {
+    callHandlerId = bodyJson["_callHandlerID"].get<int64_t>();
+  }
+
+  // Extract args - it's already a JSON string
+  std::string argsJsonStr = "";
+  if (bodyJson.contains("args") && bodyJson["args"].is_string()) {
+    argsJsonStr = bodyJson["args"].get<std::string>();
+  }
+
+  // === Handle Internal Handlers ===
+  // Match iOS: switch(handlerName) for internal handlers
+  // Use targetWebView for multi-window support
+  bool isInternalHandler = true;
+  
+  if (handlerName == "onConsoleMessage") {
+    // Handle console message interception (from console_log_js.h script)
+    std::string message = "";
+    std::string level = "log";
+    
+    // The args field contains a JSON-encoded string: [{"level":"log","message":"..."}]
+    if (!argsJsonStr.empty()) {
+      try {
+        json argsJson = json::parse(argsJsonStr);
+        // args is an array with a single object
+        if (argsJson.is_array() && !argsJson.empty()) {
+          json firstArg = argsJson[0];
+          if (firstArg.contains("level") && firstArg["level"].is_string()) {
+            level = firstArg["level"].get<std::string>();
+          }
+          if (firstArg.contains("message") && firstArg["message"].is_string()) {
+            message = firstArg["message"].get<std::string>();
+          }
+        }
+      } catch (const json::parse_error& e) {
+        if (DebugLogEnabled()) {
+          g_message("InAppWebViewWpe[%ld]: Failed to parse console args JSON: %s",
+                    static_cast<long>(targetWebView->id_), e.what());
+        }
+      }
+    }
+    
+    // Map level string to numeric value
+    // Match iOS: case "log" -> 1, "debug" -> 0 (TIP), "error" -> 3, "info" -> 1, "warn" -> 2
+    int64_t messageLevel = 1;  // LOG
+    if (level == "debug") {
+      messageLevel = 0;  // TIP (on Android, console.debug is TIP)
+    } else if (level == "info" || level == "log") {
+      messageLevel = 1;  // LOG
+    } else if (level == "warn") {
+      messageLevel = 2;  // WARNING
+    } else if (level == "error") {
+      messageLevel = 3;  // ERROR
+    }
+    
+    if (DebugLogEnabled()) {
+      g_message("InAppWebViewWpe[%ld]: console.%s: %s",
+                static_cast<long>(targetWebView->id_), level.c_str(), message.c_str());
+    }
+    
+    // Use targetWebView's channel delegate (for multi-window support)
+    if (targetWebView->channel_delegate_) {
+      targetWebView->channel_delegate_->onConsoleMessage(message, messageLevel);
+    }
+    // Fall through to resolve the internal handler
+    
+  } else if (handlerName == "onPrintRequest") {
+    // TODO: Implement print request handling (matches iOS)
+    if (DebugLogEnabled()) {
+      g_message("InAppWebViewWpe[%ld]: onPrintRequest (not yet implemented)",
+                static_cast<long>(targetWebView->id_));
+    }
+    
+  } else if (handlerName == "onFindResultReceived") {
+    // TODO: Implement find result handling (matches iOS)
+    if (DebugLogEnabled()) {
+      g_message("InAppWebViewWpe[%ld]: onFindResultReceived (not yet implemented)",
+                static_cast<long>(targetWebView->id_));
+    }
+    
+  } else {
+    // Not an internal handler - will be sent to Dart
+    isInternalHandler = false;
+  }
+
+  // === Resolve Internal Handlers ===
+  // Match iOS: if isInternalHandler { evaluateJavaScript to resolve }
+  if (isInternalHandler) {
+    if (callHandlerId > 0) {
+      std::string script =
+          "if(window." + JavaScriptBridgeJS::get_JAVASCRIPT_BRIDGE_NAME() + 
+          "[" + std::to_string(callHandlerId) + "] != null) {\n"
+          "    window." + JavaScriptBridgeJS::get_JAVASCRIPT_BRIDGE_NAME() + 
+          "[" + std::to_string(callHandlerId) + "].resolve();\n"
+          "    delete window." + JavaScriptBridgeJS::get_JAVASCRIPT_BRIDGE_NAME() + 
+          "[" + std::to_string(callHandlerId) + "];\n"
+          "}";
+
+      // Resolve on the target webview
+      webkit_web_view_evaluate_javascript(
+          targetWebView->webview_, script.c_str(), static_cast<gssize>(script.length()),
+          nullptr, nullptr, nullptr, nullptr, nullptr);
+    }
+    return;
+  }
+
+  // === External Handler - Send to Dart ===
+  // Use targetWebView for multi-window support (matches iOS webView variable)
+  if (DebugLogEnabled()) {
+    g_message("InAppWebViewWpe[%ld]: callHandler '%s' origin=%s mainFrame=%d windowId=%s args=%.50s...",
+              static_cast<long>(targetWebView->id_), handlerName.c_str(), sourceOrigin.c_str(), 
+              isMainFrame, 
+              windowId.has_value() ? std::to_string(windowId.value()).c_str() : "null",
+              argsJsonStr.c_str());
+  }
+
+  // Notify Dart side via channel delegate
+  // Use targetWebView's channel delegate for multi-window support
+  if (targetWebView->channel_delegate_) {
+    // Match iOS: JavaScriptHandlerFunctionData(args:, isMainFrame:, origin:, requestUrl:)
+    auto data = std::make_unique<JavaScriptHandlerFunctionData>(
+        sourceOrigin,
+        requestUrl,
+        isMainFrame,
+        argsJsonStr);
+    
+    // Create callback to send response back to JavaScript
+    // Match iOS: CallJsHandlerCallback with defaultBehaviour and error
+    auto callback = std::make_unique<WebViewChannelDelegate::CallJsHandlerCallback>();
+    
+    int64_t capturedCallHandlerId = callHandlerId;
+    InAppWebViewWpe* capturedTargetWebView = targetWebView;
+    
+    // Match iOS: callback.defaultBehaviour = { (response: Any?) in ... }
+    callback->defaultBehaviour = [capturedTargetWebView, capturedCallHandlerId](const std::optional<FlValue*>& response) {
+      if (capturedTargetWebView->webview_ == nullptr) return;
+
+      std::string jsonResult = "null";
+      if (response.has_value() && response.value() != nullptr) {
+        FlValue* val = response.value();
+        if (fl_value_get_type(val) == FL_VALUE_TYPE_STRING) {
+          jsonResult = fl_value_get_string(val);
+        }
+      }
+
+      // Match iOS: window.flutter_inappwebview[_callHandlerID].resolve(json)
+      std::string script =
+          "if(window." + JavaScriptBridgeJS::get_JAVASCRIPT_BRIDGE_NAME() + 
+          "[" + std::to_string(capturedCallHandlerId) + "] != null) {\n"
+          "    window." + JavaScriptBridgeJS::get_JAVASCRIPT_BRIDGE_NAME() + 
+          "[" + std::to_string(capturedCallHandlerId) + "].resolve(" + jsonResult + ");\n"
+          "    delete window." + JavaScriptBridgeJS::get_JAVASCRIPT_BRIDGE_NAME() + 
+          "[" + std::to_string(capturedCallHandlerId) + "];\n"
+          "}";
+
+      webkit_web_view_evaluate_javascript(
+          capturedTargetWebView->webview_, script.c_str(), static_cast<gssize>(script.length()),
+          nullptr, nullptr, nullptr, nullptr, nullptr);
+    };
+    
+    // Match iOS: callback.error = { (code: String, message: String?, details: Any?) in ... }
+    callback->error = [capturedTargetWebView, capturedCallHandlerId](const std::string& code,
+                                                     const std::string& message) {
+      if (capturedTargetWebView->webview_ == nullptr) return;
+
+      // Match iOS: let errorMessage = code + (message != nil ? ", " + (message ?? "") : "")
+      std::string errorMessage = code;
+      if (!message.empty()) {
+        errorMessage += ", " + message;
+      }
+      
+      // Escape single quotes (match iOS: replacingOccurrences(of: "\'", with: "\\'"))
+      std::string escapedMessage;
+      for (char c : errorMessage) {
+        if (c == '\'') {
+          escapedMessage += "\\'";
+        } else {
+          escapedMessage += c;
+        }
+      }
+
+      // Match iOS: window.flutter_inappwebview[_callHandlerID].reject(new Error(...))
+      std::string script =
+          "if(window." + JavaScriptBridgeJS::get_JAVASCRIPT_BRIDGE_NAME() + 
+          "[" + std::to_string(capturedCallHandlerId) + "] != null) {\n"
+          "    window." + JavaScriptBridgeJS::get_JAVASCRIPT_BRIDGE_NAME() + 
+          "[" + std::to_string(capturedCallHandlerId) + "].reject(new Error('" + escapedMessage + "'));\n"
+          "    delete window." + JavaScriptBridgeJS::get_JAVASCRIPT_BRIDGE_NAME() + 
+          "[" + std::to_string(capturedCallHandlerId) + "];\n"
+          "}";
+
+      webkit_web_view_evaluate_javascript(
+          capturedTargetWebView->webview_, script.c_str(), static_cast<gssize>(script.length()),
+          nullptr, nullptr, nullptr, nullptr, nullptr);
+    };
+    
+    // Match iOS: channelDelegate.onCallJsHandler(handlerName:, data:, callback:)
+    targetWebView->channel_delegate_->onCallJsHandler(handlerName, std::move(data), std::move(callback));
   }
 }
 
 void InAppWebViewWpe::dispatchPlatformReady() {
   std::string script = "window.dispatchEvent(new Event('flutterInAppWebViewPlatformReady'));";
+  evaluateJavascript(script, nullptr);
+}
+
+void InAppWebViewWpe::initializeWindowIdJS() {
+  // Match iOS: initializeWindowIdJS()
+  // Injects JavaScript to set the window ID variable for multi-window support
+  if (!window_id_.has_value()) {
+    return;
+  }
+  
+  int64_t windowId = window_id_.value();
+  
+  // Build the JavaScript to initialize the window ID
+  // Match iOS: WindowIdJS.WINDOW_ID_INITIALIZE_JS_SOURCE().replacingOccurrences(of: VAR_PLACEHOLDER_VALUE, with: String(windowId))
+  std::string script = R"JS(
+(function() {
+    )JS" + JavaScriptBridgeJS::WINDOW_ID_VARIABLE_JS_SOURCE() + R"JS( = )JS" + std::to_string(windowId) + R"JS(;
+    return )JS" + JavaScriptBridgeJS::WINDOW_ID_VARIABLE_JS_SOURCE() + R"JS(;
+})()
+)JS";
+  
+  if (DebugLogEnabled()) {
+    g_message("InAppWebViewWpe[%ld]: initializeWindowIdJS windowId=%ld",
+              static_cast<long>(id_), static_cast<long>(windowId));
+  }
+  
   evaluateJavascript(script, nullptr);
 }
 

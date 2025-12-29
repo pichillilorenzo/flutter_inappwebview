@@ -195,6 +195,18 @@ class InAppWebViewWpe {
   // Check if WPE WebKit is available on the system
   static bool IsWpeWebKitAvailable();
 
+  // === Multi-Window Support (matches iOS) ===
+  
+  // Set the window ID for this webview (used in window.open scenarios)
+  void setWindowId(int64_t windowId) { window_id_ = windowId; }
+  
+  // Get the window ID (null if not set)
+  std::optional<int64_t> getWindowId() const { return window_id_; }
+  
+  // Initialize the window ID JavaScript variable in the webview
+  // This injects JS to set window._flutter_inappwebview_windowId
+  void initializeWindowIdJS();
+
  private:
   int64_t id_ = 0;
   int64_t channel_id_ = -1;
@@ -244,6 +256,12 @@ class InAppWebViewWpe {
 
   // JavaScript bridge secret for security
   std::string js_bridge_secret_;
+  
+  // Window ID for multi-window support (matches iOS windowId)
+  std::optional<int64_t> window_id_;
+  
+  // Flag to track if javaScriptBridgeEnabled
+  bool java_script_bridge_enabled_ = true;
 
   // Pending policy decisions
   std::map<int64_t, WebKitPolicyDecision*> pending_policy_decisions_;
@@ -328,7 +346,7 @@ class InAppWebViewWpe {
 
   static void OnCloseRequest(WebKitWebView* web_view, gpointer user_data);
 
-  static GtkWidget* OnCreateWebView(WebKitWebView* web_view,
+  static WebKitWebView* OnCreateWebView(WebKitWebView* web_view,
                                     WebKitNavigationAction* navigation_action,
                                     gpointer user_data);
 
@@ -357,10 +375,6 @@ class InAppWebViewWpe {
                                    WebKitHitTestResult* hit_test_result,
                                    guint modifiers,
                                    gpointer user_data);
-
-  // === Buffer management ===
-  void SwapBuffers();
-  void RequestFrame();
 
   // === Input helpers ===
   void SendWpePointerEvent(uint32_t type, double x, double y, uint32_t button);

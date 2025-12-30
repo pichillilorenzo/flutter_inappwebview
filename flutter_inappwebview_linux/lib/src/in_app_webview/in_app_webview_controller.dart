@@ -369,6 +369,76 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController
           }
         }
         break;
+      case "onCreateContextMenu":
+        ContextMenu? contextMenu = webviewParams?.contextMenu;
+        if (contextMenu != null && contextMenu.onCreateContextMenu != null) {
+          Map<String, dynamic> arguments =
+              call.arguments.cast<String, dynamic>();
+          String typeStr = arguments["type"] ?? "UNKNOWN_TYPE";
+          String extra = arguments["extra"] ?? "";
+          
+          // Map type string to InAppWebViewHitTestResultType
+          InAppWebViewHitTestResultType type;
+          switch (typeStr) {
+            case "SRC_ANCHOR_TYPE":
+              type = InAppWebViewHitTestResultType.SRC_ANCHOR_TYPE;
+              break;
+            case "IMAGE_TYPE":
+              type = InAppWebViewHitTestResultType.IMAGE_TYPE;
+              break;
+            case "SRC_IMAGE_ANCHOR_TYPE":
+              type = InAppWebViewHitTestResultType.SRC_IMAGE_ANCHOR_TYPE;
+              break;
+            case "EDIT_TEXT_TYPE":
+              type = InAppWebViewHitTestResultType.EDIT_TEXT_TYPE;
+              break;
+            default:
+              type = InAppWebViewHitTestResultType.UNKNOWN_TYPE;
+          }
+          
+          InAppWebViewHitTestResult hitTestResult = InAppWebViewHitTestResult(
+            type: type,
+            extra: extra.isNotEmpty ? extra : null,
+          );
+          contextMenu.onCreateContextMenu!(hitTestResult);
+        }
+        break;
+      case "onHideContextMenu":
+        ContextMenu? contextMenu = webviewParams?.contextMenu;
+        if (contextMenu != null && contextMenu.onHideContextMenu != null) {
+          contextMenu.onHideContextMenu!();
+        }
+        break;
+      case "onContextMenuActionItemClicked":
+        ContextMenu? contextMenu = webviewParams?.contextMenu;
+        if (contextMenu != null) {
+          Map<String, dynamic> arguments =
+              call.arguments.cast<String, dynamic>();
+          String id = arguments["id"] ?? "";
+          String title = arguments["title"] ?? "";
+          
+          ContextMenuItem menuItemClicked = ContextMenuItem(
+            id: id,
+            title: title,
+            action: null,
+          );
+          
+          // Check if this matches any custom menu items
+          for (var menuItem in contextMenu.menuItems) {
+            if (menuItem.id == id) {
+              menuItemClicked = menuItem;
+              if (menuItem.action != null) {
+                menuItem.action!();
+              }
+              break;
+            }
+          }
+          
+          if (contextMenu.onContextMenuActionItemClicked != null) {
+            contextMenu.onContextMenuActionItemClicked!(menuItemClicked);
+          }
+        }
+        break;
       case "onCallJsHandler":
         if (webviewParams != null) {
           String handlerName = call.arguments["handlerName"];

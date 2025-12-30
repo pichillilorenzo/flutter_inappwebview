@@ -1307,4 +1307,43 @@ void WebViewChannelDelegate::onFaviconChanged(
   invokeMethod("onReceivedIcon", args);
 }
 
+void WebViewChannelDelegate::onCreateContextMenu(
+    const std::string& hitTestResultType,
+    const std::string& extra) const {
+  if (!channel_) {
+    return;
+  }
+
+  g_autoptr(FlValue) args = fl_value_new_map();
+  fl_value_set_string_take(args, "type",
+                           fl_value_new_string(hitTestResultType.c_str()));
+  fl_value_set_string_take(args, "extra",
+                           fl_value_new_string(extra.c_str()));
+
+  invokeMethod("onCreateContextMenu", args);
+}
+
+void WebViewChannelDelegate::onHideContextMenu() const {
+  if (!channel_) {
+    return;
+  }
+
+  g_autoptr(FlValue) args = fl_value_new_map();
+  invokeMethod("onHideContextMenu", args);
+}
+
+void WebViewChannelDelegate::onContextMenuActionItemClicked(
+    const std::string& id,
+    const std::string& title) const {
+  if (!channel_) {
+    return;
+  }
+
+  g_autoptr(FlValue) args = fl_value_new_map();
+  fl_value_set_string_take(args, "id", fl_value_new_string(id.c_str()));
+  fl_value_set_string_take(args, "title", fl_value_new_string(title.c_str()));
+
+  invokeMethod("onContextMenuActionItemClicked", args);
+}
+
 }  // namespace flutter_inappwebview_plugin

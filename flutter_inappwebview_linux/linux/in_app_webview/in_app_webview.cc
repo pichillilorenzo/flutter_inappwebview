@@ -929,8 +929,8 @@ void InAppWebView::SetCursorPos(double x, double y) {
     // Scale coordinates from logical to physical pixels
     event.x = static_cast<int>(x * scale_factor_);
     event.y = static_cast<int>(y * scale_factor_);
-    event.state = button_state_;
-    event.modifiers = current_modifiers_;
+    event.state = 0;  // No button state change for motion events
+    event.modifiers = current_modifiers_ | button_state_;  // Include pressed button modifiers
     wpe_view_backend_dispatch_pointer_event(wpe_backend_, &event);
   }
 }
@@ -943,12 +943,13 @@ void InAppWebView::SetPointerButton(int kind, int button, int clickCount) {
   int scaled_y = static_cast<int>(cursor_y_ * scale_factor_);
 
   // Map button: Flutter uses 0=none, 1=primary, 2=secondary, 3=tertiary
-  // WPE uses Linux evdev button codes: 1=BTN_LEFT, 2=BTN_MIDDLE, 3=BTN_RIGHT
+  // WPE/WebKit uses: 1=Left, 2=Right, 3=Middle (see WebEventFactory.cpp)
+  // This is a 1:1 mapping for Flutter -> WPE
   uint32_t wpe_button;
   switch (button) {
-    case 1: wpe_button = 1; break;  // Primary -> BTN_LEFT
-    case 2: wpe_button = 3; break;  // Secondary -> BTN_RIGHT
-    case 3: wpe_button = 2; break;  // Tertiary -> BTN_MIDDLE
+    case 1: wpe_button = 1; break;  // Primary -> Left
+    case 2: wpe_button = 2; break;  // Secondary -> Right (context menu)
+    case 3: wpe_button = 3; break;  // Tertiary -> Middle
     default: wpe_button = 1; break; // Default to primary
   }
 
@@ -961,8 +962,8 @@ void InAppWebView::SetPointerButton(int kind, int button, int clickCount) {
     motion_event.x = scaled_x;
     motion_event.y = scaled_y;
     motion_event.button = 0;
-    motion_event.state = button_state_;
-    motion_event.modifiers = current_modifiers_;
+    motion_event.state = 0;
+    motion_event.modifiers = current_modifiers_ | button_state_;
     wpe_view_backend_dispatch_pointer_event(wpe_backend_, &motion_event);
   }
 
@@ -971,30 +972,32 @@ void InAppWebView::SetPointerButton(int kind, int button, int clickCount) {
   event.x = scaled_x;
   event.y = scaled_y;
   event.button = wpe_button;
-  event.modifiers = current_modifiers_;
 
-  // Map event type based on kind
-  // WPE button state uses high bits: button1=1<<20, button2=1<<21, button3=1<<22
-  // See wpe_input_pointer_modifier_button* in wpe/input.h
+  // WPE button modifier bits for tracking pressed buttons in modifiers field
+  // See wpe_input_pointer_modifier_button* in wpe/input.h: button1=1<<20, button2=1<<21, button3=1<<22
   const uint32_t button_modifier_bit = 1u << (19 + wpe_button);
   
   switch (static_cast<WpePointerEventKind>(kind)) {
     case WpePointerEventKind::Down:
       event.type = wpe_input_pointer_event_type_button;
+      // state=1 means button is pressed (see WebEventFactory: event->state ? MouseDown : MouseUp)
+      event.state = 1;
       button_state_ |= button_modifier_bit;
-      event.state = button_state_;  // Button mask
+      event.modifiers = current_modifiers_ | button_state_;
       if (DebugLogEnabled()) {
-        g_message("InAppWebView[%ld]: button DOWN at (%d,%d) button=%d state=0x%x",
-                  static_cast<long>(id_), scaled_x, scaled_y, wpe_button, event.state);
+        g_message("InAppWebView[%ld]: button DOWN at (%d,%d) button=%d state=%d modifiers=0x%x",
+                  static_cast<long>(id_), scaled_x, scaled_y, wpe_button, event.state, event.modifiers);
       }
       break;
     case WpePointerEventKind::Up:
       event.type = wpe_input_pointer_event_type_button;
+      // state=0 means button is released
+      event.state = 0;
       button_state_ &= ~button_modifier_bit;
-      event.state = button_state_;  // Button mask after release
+      event.modifiers = current_modifiers_ | button_state_;
       if (DebugLogEnabled()) {
-        g_message("InAppWebView[%ld]: button UP at (%d,%d) button=%d state=0x%x",
-                  static_cast<long>(id_), scaled_x, scaled_y, wpe_button, event.state);
+        g_message("InAppWebView[%ld]: button UP at (%d,%d) button=%d state=%d modifiers=0x%x",
+                  static_cast<long>(id_), scaled_x, scaled_y, wpe_button, event.state, event.modifiers);
       }
       break;
     default:
@@ -1036,6 +1039,47 @@ void InAppWebView::SetScrollDelta(double dx, double dy) {
 void InAppWebView::SendKeyEvent(int type, int64_t keyCode, int scanCode, 
                                     int modifiers, const std::string& characters) {
   if (wpe_backend_ == nullptr) return;
+
+  // Intercept clipboard shortcuts on key down (type=0)
+  // Modifiers: Control=1, Shift=2, Alt=4, Meta=8
+  const bool isCtrl = (modifiers & 1) != 0;
+  const bool isKeyDown = (type == 0);
+  
+  if (isCtrl && isKeyDown && webview_ != nullptr) {
+    // Check for clipboard and common editing shortcuts
+    // keyCode is XKB keysym, lowercase letters are 0x61-0x7a
+    const char* editingCommand = nullptr;
+    
+    switch (keyCode) {
+      case 0x63:  // 'c' - Copy
+        editingCommand = WEBKIT_EDITING_COMMAND_COPY;
+        break;
+      case 0x78:  // 'x' - Cut
+        editingCommand = WEBKIT_EDITING_COMMAND_CUT;
+        break;
+      case 0x76:  // 'v' - Paste
+        editingCommand = WEBKIT_EDITING_COMMAND_PASTE;
+        break;
+      case 0x61:  // 'a' - Select All
+        editingCommand = WEBKIT_EDITING_COMMAND_SELECT_ALL;
+        break;
+      case 0x7a:  // 'z' - Undo
+        editingCommand = WEBKIT_EDITING_COMMAND_UNDO;
+        break;
+      case 0x79:  // 'y' - Redo
+        editingCommand = WEBKIT_EDITING_COMMAND_REDO;
+        break;
+    }
+    
+    if (editingCommand != nullptr) {
+      if (DebugLogEnabled()) {
+        g_message("InAppWebView[%ld]: executing editing command: %s",
+                  static_cast<long>(id_), editingCommand);
+      }
+      webkit_web_view_execute_editing_command(webview_, editingCommand);
+      return;  // Don't send the key event to WebKit
+    }
+  }
 
   struct wpe_input_keyboard_event event = {};
   event.time = g_get_monotonic_time() / 1000;
@@ -1713,6 +1757,10 @@ gboolean InAppWebView::OnAuthenticate(WebKitWebView* web_view,
   return TRUE;  // We're handling the request
 }
 
+// NOTE: GTK popup menu code has been removed because WPE WebKit renders offscreen
+// without a GDK window. Context menu display is handled by the Dart side via
+// onCreateContextMenu callback.
+
 gboolean InAppWebView::OnContextMenu(WebKitWebView* web_view,
                                          WebKitContextMenu* context_menu,
                                          WebKitHitTestResult* hit_test_result,
@@ -1724,7 +1772,48 @@ gboolean InAppWebView::OnContextMenu(WebKitWebView* web_view,
     return TRUE;  // Suppress context menu
   }
   
-  return FALSE;
+  // Build hit test result info for Dart callback
+  if (self->channel_delegate_ && hit_test_result != nullptr) {
+    std::string type = "UNKNOWN_TYPE";
+    std::string extra;
+    
+    if (webkit_hit_test_result_context_is_link(hit_test_result)) {
+      type = "SRC_ANCHOR_TYPE";
+      const char* uri = webkit_hit_test_result_get_link_uri(hit_test_result);
+      if (uri) extra = uri;
+    } else if (webkit_hit_test_result_context_is_image(hit_test_result)) {
+      type = "IMAGE_TYPE";
+      const char* uri = webkit_hit_test_result_get_image_uri(hit_test_result);
+      if (uri) extra = uri;
+    } else if (webkit_hit_test_result_context_is_media(hit_test_result)) {
+      type = "SRC_IMAGE_ANCHOR_TYPE";
+      const char* uri = webkit_hit_test_result_get_media_uri(hit_test_result);
+      if (uri) extra = uri;
+    } else if (webkit_hit_test_result_context_is_editable(hit_test_result)) {
+      type = "EDIT_TEXT_TYPE";
+    } else if (webkit_hit_test_result_context_is_selection(hit_test_result)) {
+      type = "UNKNOWN_TYPE";  // Selection doesn't have a specific type
+    }
+    
+    self->channel_delegate_->onCreateContextMenu(type, extra);
+    
+    if (DebugLogEnabled()) {
+      g_message("InAppWebView[%ld]: Context menu triggered, type=%s extra=%s",
+                static_cast<long>(self->id_), type.c_str(), extra.c_str());
+    }
+  }
+  
+  // NOTE: We do NOT show a GTK popup menu here because:
+  // 1. WPE WebKit renders offscreen - there's no GDK window for GTK menus
+  // 2. The Dart side will handle displaying the context menu via onCreateContextMenu
+  // 
+  // The gtk_menu_popup_at_pointer() call would fail with:
+  // "Gtk-WARNING: no trigger event for menu popup"
+  // "Gtk-CRITICAL: gtk_menu_popup_at_rect: assertion 'GDK_IS_WINDOW' failed"
+  
+  // Return TRUE to suppress WebKit's default context menu handling
+  // The Dart side is responsible for showing the context menu
+  return TRUE;
 }
 
 gboolean InAppWebView::OnEnterFullscreen(WebKitWebView* web_view, 

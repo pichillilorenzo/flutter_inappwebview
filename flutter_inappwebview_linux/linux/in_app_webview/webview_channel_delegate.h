@@ -227,6 +227,13 @@ class WebViewChannelDelegate : public ChannelDelegate {
 
   void onFaviconChanged(const std::optional<std::string>& faviconUrl) const;
 
+  // Context menu callbacks
+  void onCreateContextMenu(const std::string& hitTestResultType,
+                           const std::string& extra) const;
+  void onHideContextMenu() const;
+  void onContextMenuActionItemClicked(const std::string& id,
+                                      const std::string& title) const;
+
  private:
   // Method call handlers
   void HandleLoadUrl(FlMethodCall* method_call);

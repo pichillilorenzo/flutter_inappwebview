@@ -28,6 +28,7 @@ part 'platform_inappwebview_widget.g.dart';
   MacOSPlatform(),
   WebPlatform(requiresSameOrigin: false),
   WindowsPlatform(),
+  LinuxPlatform(),
 ])
 class PlatformInAppWebViewWidgetCreationParams
     extends PlatformWebViewCreationParams {

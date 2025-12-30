@@ -152,23 +152,6 @@ install(CODE "
       message(STATUS \"Created symlink: \${DEFAULT_BACKEND_LINK} -> libWPEBackend-fdo-1.0.so.1\")
     endif()
   " COMPONENT Runtime)
-  
-  # Create a launcher script that sets LD_LIBRARY_PATH for the bundled WPE libraries
-  # This is needed because libwpe uses dlopen() to load the backend
-  install(CODE "
-    set(LAUNCHER_SCRIPT \"${CMAKE_INSTALL_PREFIX}/${BINARY_NAME}.sh\")
-    file(WRITE \"\${LAUNCHER_SCRIPT}\" \"#!/bin/bash
-# Launcher script for ${BINARY_NAME}
-# This script sets LD_LIBRARY_PATH to include the bundled WPE libraries
-# which are required because libwpe uses dlopen() to load the backend.
-
-SCRIPT_DIR=\\\"\\\$(cd \\\"\\\$(dirname \\\"\\\${BASH_SOURCE[0]}\\\")\\\"; pwd)\\\"
-export LD_LIBRARY_PATH=\\\"\\\${SCRIPT_DIR}/lib:\\\${LD_LIBRARY_PATH}\\\"
-exec \\\"\\\${SCRIPT_DIR}/${BINARY_NAME}\\\" \\\"\\\$@\\\"
-\")
-    execute_process(COMMAND chmod +x \"\${LAUNCHER_SCRIPT}\")
-    message(STATUS \"Created launcher script: \${LAUNCHER_SCRIPT}\")
-  " COMPONENT Runtime)
 
 # Copy the native assets provided by the build.dart from all packages.
 set(NATIVE_ASSETS_DIR "${PROJECT_BUILD_DIR}native_assets/linux/")

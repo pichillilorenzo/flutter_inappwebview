@@ -35,6 +35,7 @@ part 'platform_webview.g.dart';
   MacOSPlatform(),
   WebPlatform(requiresSameOrigin: false),
   WindowsPlatform(),
+  LinuxPlatform()
 ])
 class PlatformWebViewCreationParams<T> {
   final T Function(PlatformInAppWebViewController controller)?

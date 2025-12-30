@@ -37,6 +37,7 @@
 #include <mutex>
 #include <optional>
 #include <string>
+#include <tuple>
 #include <vector>
 
 #include "../types/url_request.h"
@@ -162,12 +163,33 @@ class InAppWebView {
   void setSize(int width, int height);
   void setScaleFactor(double scale_factor);
 
+  // Focus/Activity state management (from WPE view-backend API)
+  void setFocused(bool focused);
+  void setVisible(bool visible);
+  uint32_t getActivityState() const;
+
+  // Refresh rate management (from WPE view-backend API)
+  void setTargetRefreshRate(uint32_t rate);
+  uint32_t getTargetRefreshRate() const;
+
+  // Fullscreen control (from WPE view-backend API)
+  void requestEnterFullscreen();
+  void requestExitFullscreen();
+  bool isInFullscreen() const { return is_fullscreen_; }
+
+  // Pointer lock support (from WPE view-backend API) - for games/immersive apps
+  void setPointerLockHandler(std::function<bool(bool)> handler);
+  bool requestPointerLock();
+  bool requestPointerUnlock();
+
   // Input handling
   void SetCursorPos(double x, double y);
   void SetPointerButton(int kind, int button, int clickCount = 1);
   void SetScrollDelta(double dx, double dy);
   void SendKeyEvent(int type, int64_t keyCode, int scanCode, int modifiers, 
                     const std::string& characters);
+  void SendTouchEvent(int type, int id, double x, double y, 
+                      const std::vector<std::tuple<int, double, double, int>>& touchPoints);
 
   // Texture pixel buffer access (called by texture classes)
   size_t GetPixelBufferSize(uint32_t* out_width, uint32_t* out_height) const;
@@ -293,6 +315,21 @@ class InAppWebView {
   // Progress tracking
   double last_progress_ = 0.0;
 
+  // Fullscreen state (for DOM fullscreen requests)
+  bool is_fullscreen_ = false;
+  bool waiting_fullscreen_notify_ = false;
+
+  // Activity/focus state
+  bool is_focused_ = true;
+  bool is_visible_ = true;
+
+  // Target refresh rate (0 = default)
+  uint32_t target_refresh_rate_ = 0;
+
+  // Pointer lock handler
+  std::function<bool(bool)> pointer_lock_handler_;
+  bool pointer_locked_ = false;
+
   // === Initialization ===
   void InitWpeBackend();
   void InitWebView(const InAppWebViewCreationParams& params);
@@ -303,6 +340,12 @@ class InAppWebView {
   // Instance method called from C callback (must be public)
   void OnExportDmaBuf(::wpe_fdo_egl_exported_image* image);
   void OnExportShmBuffer(struct wpe_fdo_shm_exported_buffer* buffer);
+
+  // DOM fullscreen request handler (called from WPE backend)
+  bool OnDomFullscreenRequest(bool fullscreen);
+
+  // Pointer lock handler (called from WPE backend)
+  bool OnPointerLockRequest(bool lock);
 
  private:
   static void OnFrameDisplayed(void* data);

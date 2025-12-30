@@ -426,6 +426,207 @@ void CustomPlatformView::HandleMethodCallImpl(FlMethodCall* method_call) {
     return;
   }
 
+  // sendTouchEvent: {"type": int, "id": int, "x": double, "y": double, "touchPoints": list}
+  if (strcmp(method, "sendTouchEvent") == 0) {
+    if (fl_value_get_type(args) == FL_VALUE_TYPE_MAP) {
+      FlValue* type_value = fl_value_lookup_string(args, "type");
+      FlValue* id_value = fl_value_lookup_string(args, "id");
+      FlValue* x_value = fl_value_lookup_string(args, "x");
+      FlValue* y_value = fl_value_lookup_string(args, "y");
+      FlValue* touchPoints_value = fl_value_lookup_string(args, "touchPoints");
+
+      int type = 0, id = 0;
+      double x = 0, y = 0;
+      std::vector<std::tuple<int, double, double, int>> touchPoints;
+
+      if (type_value != nullptr && fl_value_get_type(type_value) == FL_VALUE_TYPE_INT) {
+        type = static_cast<int>(fl_value_get_int(type_value));
+      }
+      if (id_value != nullptr && fl_value_get_type(id_value) == FL_VALUE_TYPE_INT) {
+        id = static_cast<int>(fl_value_get_int(id_value));
+      }
+      if (x_value != nullptr && fl_value_get_type(x_value) == FL_VALUE_TYPE_FLOAT) {
+        x = fl_value_get_float(x_value);
+      }
+      if (y_value != nullptr && fl_value_get_type(y_value) == FL_VALUE_TYPE_FLOAT) {
+        y = fl_value_get_float(y_value);
+      }
+      
+      // Parse touch points list
+      if (touchPoints_value != nullptr && fl_value_get_type(touchPoints_value) == FL_VALUE_TYPE_LIST) {
+        size_t len = fl_value_get_length(touchPoints_value);
+        for (size_t i = 0; i < len; i++) {
+          FlValue* point = fl_value_get_list_value(touchPoints_value, i);
+          if (fl_value_get_type(point) == FL_VALUE_TYPE_MAP) {
+            int point_id = 0, point_type = 0;
+            double point_x = 0, point_y = 0;
+            
+            FlValue* pid = fl_value_lookup_string(point, "id");
+            FlValue* px = fl_value_lookup_string(point, "x");
+            FlValue* py = fl_value_lookup_string(point, "y");
+            FlValue* ptype = fl_value_lookup_string(point, "type");
+            
+            if (pid && fl_value_get_type(pid) == FL_VALUE_TYPE_INT) {
+              point_id = static_cast<int>(fl_value_get_int(pid));
+            }
+            if (px && fl_value_get_type(px) == FL_VALUE_TYPE_FLOAT) {
+              point_x = fl_value_get_float(px);
+            }
+            if (py && fl_value_get_type(py) == FL_VALUE_TYPE_FLOAT) {
+              point_y = fl_value_get_float(py);
+            }
+            if (ptype && fl_value_get_type(ptype) == FL_VALUE_TYPE_INT) {
+              point_type = static_cast<int>(fl_value_get_int(ptype));
+            }
+            
+            touchPoints.emplace_back(point_id, point_x, point_y, point_type);
+          }
+        }
+      }
+
+      if (webview_) {
+        webview_->SendTouchEvent(type, id, x, y, touchPoints);
+        if (DebugLogEnabled()) {
+          g_message("CustomPlatformView[%ld]: sendTouchEvent type=%d id=%d at (%.0f,%.0f) points=%zu", 
+                    static_cast<long>(texture_id_), type, id, x, y, touchPoints.size());
+        }
+      }
+    }
+    fl_method_call_respond_success(method_call, nullptr, nullptr);
+    return;
+  }
+
+  // setFocused: bool focused
+  if (strcmp(method, "setFocused") == 0) {
+    bool focused = false;
+    if (fl_value_get_type(args) == FL_VALUE_TYPE_BOOL) {
+      focused = fl_value_get_bool(args);
+    } else if (fl_value_get_type(args) == FL_VALUE_TYPE_INT) {
+      focused = fl_value_get_int(args) != 0;
+    }
+
+    if (webview_) {
+      webview_->setFocused(focused);
+      if (DebugLogEnabled()) {
+        g_message("CustomPlatformView[%ld]: setFocused %s", 
+                  static_cast<long>(texture_id_), focused ? "true" : "false");
+      }
+    }
+    fl_method_call_respond_success(method_call, nullptr, nullptr);
+    return;
+  }
+
+  // setVisible: bool visible
+  if (strcmp(method, "setVisible") == 0) {
+    bool visible = true;
+    if (fl_value_get_type(args) == FL_VALUE_TYPE_BOOL) {
+      visible = fl_value_get_bool(args);
+    } else if (fl_value_get_type(args) == FL_VALUE_TYPE_INT) {
+      visible = fl_value_get_int(args) != 0;
+    }
+
+    if (webview_) {
+      webview_->setVisible(visible);
+      if (DebugLogEnabled()) {
+        g_message("CustomPlatformView[%ld]: setVisible %s", 
+                  static_cast<long>(texture_id_), visible ? "true" : "false");
+      }
+    }
+    fl_method_call_respond_success(method_call, nullptr, nullptr);
+    return;
+  }
+
+  // getActivityState: returns uint32
+  if (strcmp(method, "getActivityState") == 0) {
+    uint32_t state = 0;
+    if (webview_) {
+      state = webview_->getActivityState();
+    }
+    g_autoptr(FlValue) result = fl_value_new_int(static_cast<int64_t>(state));
+    fl_method_call_respond_success(method_call, result, nullptr);
+    return;
+  }
+
+  // setTargetRefreshRate: int rate
+  if (strcmp(method, "setTargetRefreshRate") == 0) {
+    uint32_t rate = 0;
+    if (fl_value_get_type(args) == FL_VALUE_TYPE_INT) {
+      rate = static_cast<uint32_t>(fl_value_get_int(args));
+    }
+
+    if (webview_) {
+      webview_->setTargetRefreshRate(rate);
+      if (DebugLogEnabled()) {
+        g_message("CustomPlatformView[%ld]: setTargetRefreshRate %u", 
+                  static_cast<long>(texture_id_), rate);
+      }
+    }
+    fl_method_call_respond_success(method_call, nullptr, nullptr);
+    return;
+  }
+
+  // getTargetRefreshRate: returns uint32
+  if (strcmp(method, "getTargetRefreshRate") == 0) {
+    uint32_t rate = 0;
+    if (webview_) {
+      rate = webview_->getTargetRefreshRate();
+    }
+    g_autoptr(FlValue) result = fl_value_new_int(static_cast<int64_t>(rate));
+    fl_method_call_respond_success(method_call, result, nullptr);
+    return;
+  }
+
+  // requestEnterFullscreen
+  if (strcmp(method, "requestEnterFullscreen") == 0) {
+    if (webview_) {
+      webview_->requestEnterFullscreen();
+    }
+    fl_method_call_respond_success(method_call, nullptr, nullptr);
+    return;
+  }
+
+  // requestExitFullscreen
+  if (strcmp(method, "requestExitFullscreen") == 0) {
+    if (webview_) {
+      webview_->requestExitFullscreen();
+    }
+    fl_method_call_respond_success(method_call, nullptr, nullptr);
+    return;
+  }
+
+  // isInFullscreen: returns bool
+  if (strcmp(method, "isInFullscreen") == 0) {
+    bool fullscreen = false;
+    if (webview_) {
+      fullscreen = webview_->isInFullscreen();
+    }
+    g_autoptr(FlValue) result = fl_value_new_bool(fullscreen);
+    fl_method_call_respond_success(method_call, result, nullptr);
+    return;
+  }
+
+  // requestPointerLock: returns bool
+  if (strcmp(method, "requestPointerLock") == 0) {
+    bool success = false;
+    if (webview_) {
+      success = webview_->requestPointerLock();
+    }
+    g_autoptr(FlValue) result = fl_value_new_bool(success);
+    fl_method_call_respond_success(method_call, result, nullptr);
+    return;
+  }
+
+  // requestPointerUnlock: returns bool
+  if (strcmp(method, "requestPointerUnlock") == 0) {
+    bool success = false;
+    if (webview_) {
+      success = webview_->requestPointerUnlock();
+    }
+    g_autoptr(FlValue) result = fl_value_new_bool(success);
+    fl_method_call_respond_success(method_call, result, nullptr);
+    return;
+  }
+
   fl_method_call_respond_not_implemented(method_call, nullptr);
 }
 

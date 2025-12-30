@@ -162,6 +162,14 @@ set_target_properties(${PLUGIN_NAME} PROPERTIES
   CXX_VISIBILITY_PRESET hidden)
 target_compile_definitions(${PLUGIN_NAME} PRIVATE FLUTTER_PLUGIN_IMPL)
 
+# Set RPATH so the plugin loads bundled WPE libraries from the same directory.
+# $ORIGIN refers to the directory containing the plugin shared library.
+# This eliminates the need for LD_LIBRARY_PATH or launcher scripts.
+set_target_properties(${PLUGIN_NAME} PROPERTIES
+  INSTALL_RPATH "$ORIGIN"
+  BUILD_RPATH "$ORIGIN"
+  BUILD_WITH_INSTALL_RPATH TRUE)
+
 # Source include directories and library dependencies
 target_include_directories(${PLUGIN_NAME} INTERFACE
   "${CMAKE_CURRENT_SOURCE_DIR}/include")

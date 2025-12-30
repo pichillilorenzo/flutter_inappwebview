@@ -16,6 +16,7 @@ extension _PlatformInAppWebViewControllerClassSupported
   ///- macOS WKWebView
   ///- Web \<iframe\>
   ///- Windows WebView2
+  ///- Linux WebKitGTK
   ///
   ///Use the [PlatformInAppWebViewController.isClassSupported] method to check if this class is supported at runtime.
   ///{@endtemplate}
@@ -27,7 +28,8 @@ extension _PlatformInAppWebViewControllerClassSupported
               TargetPlatform.android,
               TargetPlatform.iOS,
               TargetPlatform.macOS,
-              TargetPlatform.windows
+              TargetPlatform.windows,
+              TargetPlatform.linux
             ].contains(platform ?? defaultTargetPlatform);
   }
 }
@@ -596,6 +598,17 @@ enum PlatformInAppWebViewControllerMethod {
   @Deprecated('Use FindInteractionController.findNext instead')
   findNext,
 
+  ///Can be used to check if the [PlatformInAppWebViewController.getActivityState] method is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.PlatformInAppWebViewController.getActivityState.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Linux WebKitGTK
+  ///
+  ///Use the [PlatformInAppWebViewController.isMethodSupported] method to check if this method is supported at runtime.
+  ///{@endtemplate}
+  getActivityState,
+
   ///Can be used to check if the [PlatformInAppWebViewController.getCameraCaptureState] method is supported at runtime.
   ///
   ///{@template flutter_inappwebview_platform_interface.PlatformInAppWebViewController.getCameraCaptureState.supported_platforms}
@@ -978,6 +991,17 @@ enum PlatformInAppWebViewControllerMethod {
   @Deprecated('Use tRexRunnerHtml instead')
   getTRexRunnerHtml,
 
+  ///Can be used to check if the [PlatformInAppWebViewController.getTargetRefreshRate] method is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.PlatformInAppWebViewController.getTargetRefreshRate.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Linux WebKitGTK
+  ///
+  ///Use the [PlatformInAppWebViewController.isMethodSupported] method to check if this method is supported at runtime.
+  ///{@endtemplate}
+  getTargetRefreshRate,
+
   ///Can be used to check if the [PlatformInAppWebViewController.getTitle] method is supported at runtime.
   ///
   ///{@template flutter_inappwebview_platform_interface.PlatformInAppWebViewController.getTitle.supported_platforms}
@@ -1302,6 +1326,7 @@ enum PlatformInAppWebViewControllerMethod {
   ///- Android WebView
   ///- iOS WKWebView
   ///- macOS WKWebView
+  ///- Linux WebKitGTK
   ///
   ///Use the [PlatformInAppWebViewController.isMethodSupported] method to check if this method is supported at runtime.
   ///{@endtemplate}
@@ -1739,6 +1764,28 @@ enum PlatformInAppWebViewControllerMethod {
   ///{@endtemplate}
   removeUserScriptsByGroupName,
 
+  ///Can be used to check if the [PlatformInAppWebViewController.requestEnterFullscreen] method is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.PlatformInAppWebViewController.requestEnterFullscreen.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Linux WebKitGTK
+  ///
+  ///Use the [PlatformInAppWebViewController.isMethodSupported] method to check if this method is supported at runtime.
+  ///{@endtemplate}
+  requestEnterFullscreen,
+
+  ///Can be used to check if the [PlatformInAppWebViewController.requestExitFullscreen] method is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.PlatformInAppWebViewController.requestExitFullscreen.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Linux WebKitGTK
+  ///
+  ///Use the [PlatformInAppWebViewController.isMethodSupported] method to check if this method is supported at runtime.
+  ///{@endtemplate}
+  requestExitFullscreen,
+
   ///Can be used to check if the [PlatformInAppWebViewController.requestFocus] method is supported at runtime.
   ///
   ///{@template flutter_inappwebview_platform_interface.PlatformInAppWebViewController.requestFocus.supported_platforms}
@@ -1795,6 +1842,28 @@ enum PlatformInAppWebViewControllerMethod {
   ///Use the [PlatformInAppWebViewController.isMethodSupported] method to check if this method is supported at runtime.
   ///{@endtemplate}
   requestMediaPlaybackState,
+
+  ///Can be used to check if the [PlatformInAppWebViewController.requestPointerLock] method is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.PlatformInAppWebViewController.requestPointerLock.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Linux WebKitGTK
+  ///
+  ///Use the [PlatformInAppWebViewController.isMethodSupported] method to check if this method is supported at runtime.
+  ///{@endtemplate}
+  requestPointerLock,
+
+  ///Can be used to check if the [PlatformInAppWebViewController.requestPointerUnlock] method is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.PlatformInAppWebViewController.requestPointerUnlock.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Linux WebKitGTK
+  ///
+  ///Use the [PlatformInAppWebViewController.isMethodSupported] method to check if this method is supported at runtime.
+  ///{@endtemplate}
+  requestPointerUnlock,
 
   ///Can be used to check if the [PlatformInAppWebViewController.restoreState] method is supported at runtime.
   ///
@@ -2072,6 +2141,34 @@ enum PlatformInAppWebViewControllerMethod {
   ///Use the [PlatformInAppWebViewController.isMethodSupported] method to check if this method is supported at runtime.
   ///{@endtemplate}
   setSettings,
+
+  ///Can be used to check if the [PlatformInAppWebViewController.setTargetRefreshRate] method is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.PlatformInAppWebViewController.setTargetRefreshRate.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Linux WebKitGTK
+  ///
+  ///**Parameters - Officially Supported Platforms/Implementations**:
+  ///- [rate]: all platforms
+  ///
+  ///Use the [PlatformInAppWebViewController.isMethodSupported] method to check if this method is supported at runtime.
+  ///{@endtemplate}
+  setTargetRefreshRate,
+
+  ///Can be used to check if the [PlatformInAppWebViewController.setVisible] method is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.PlatformInAppWebViewController.setVisible.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Linux WebKitGTK
+  ///
+  ///**Parameters - Officially Supported Platforms/Implementations**:
+  ///- [visible]: all platforms
+  ///
+  ///Use the [PlatformInAppWebViewController.isMethodSupported] method to check if this method is supported at runtime.
+  ///{@endtemplate}
+  setVisible,
 
   ///Can be used to check if the [PlatformInAppWebViewController.setWebContentsDebuggingEnabled] method is supported at runtime.
   ///
@@ -2373,6 +2470,9 @@ extension _PlatformInAppWebViewControllerMethodSupported
         return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android, TargetPlatform.iOS, TargetPlatform.macOS]
                 .contains(platform ?? defaultTargetPlatform);
+      case PlatformInAppWebViewControllerMethod.getActivityState:
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
+            [TargetPlatform.linux].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.getCameraCaptureState:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.iOS, TargetPlatform.macOS]
@@ -2575,6 +2675,9 @@ extension _PlatformInAppWebViewControllerMethodSupported
                   TargetPlatform.macOS,
                   TargetPlatform.windows
                 ].contains(platform ?? defaultTargetPlatform);
+      case PlatformInAppWebViewControllerMethod.getTargetRefreshRate:
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
+            [TargetPlatform.linux].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.getTitle:
         return kIsWeb && platform == null
             ? true
@@ -2737,8 +2840,12 @@ extension _PlatformInAppWebViewControllerMethodSupported
                 ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.isInFullscreen:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.android, TargetPlatform.iOS, TargetPlatform.macOS]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.android,
+              TargetPlatform.iOS,
+              TargetPlatform.macOS,
+              TargetPlatform.linux
+            ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.isInterfaceSupported:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.windows]
@@ -2916,6 +3023,12 @@ extension _PlatformInAppWebViewControllerMethodSupported
                   TargetPlatform.macOS,
                   TargetPlatform.windows
                 ].contains(platform ?? defaultTargetPlatform);
+      case PlatformInAppWebViewControllerMethod.requestEnterFullscreen:
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
+            [TargetPlatform.linux].contains(platform ?? defaultTargetPlatform);
+      case PlatformInAppWebViewControllerMethod.requestExitFullscreen:
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
+            [TargetPlatform.linux].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.requestFocus:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android, TargetPlatform.iOS, TargetPlatform.macOS]
@@ -2932,6 +3045,12 @@ extension _PlatformInAppWebViewControllerMethodSupported
         return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.iOS, TargetPlatform.macOS]
                 .contains(platform ?? defaultTargetPlatform);
+      case PlatformInAppWebViewControllerMethod.requestPointerLock:
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
+            [TargetPlatform.linux].contains(platform ?? defaultTargetPlatform);
+      case PlatformInAppWebViewControllerMethod.requestPointerUnlock:
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
+            [TargetPlatform.linux].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.restoreState:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android, TargetPlatform.iOS, TargetPlatform.macOS]
@@ -3027,6 +3146,12 @@ extension _PlatformInAppWebViewControllerMethodSupported
                   TargetPlatform.macOS,
                   TargetPlatform.windows
                 ].contains(platform ?? defaultTargetPlatform);
+      case PlatformInAppWebViewControllerMethod.setTargetRefreshRate:
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
+            [TargetPlatform.linux].contains(platform ?? defaultTargetPlatform);
+      case PlatformInAppWebViewControllerMethod.setVisible:
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
+            [TargetPlatform.linux].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.setWebContentsDebuggingEnabled:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.android]

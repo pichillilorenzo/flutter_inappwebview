@@ -235,6 +235,33 @@ class CustomPlatformViewController
       'characters': characters,
     });
   }
+
+  /// Sends a touch event to the webview.
+  /// [type]: 0=down, 1=up, 2=move, 3=cancel
+  /// [touchPoints]: List of touch point maps with {id, x, y, type}
+  Future<void> _sendTouchEvent(int type, int id, double x, double y, List<Map<String, dynamic>> touchPoints) async {
+    if (_isDisposed) {
+      return;
+    }
+    assert(value.isInitialized);
+    return _methodChannel.invokeMethod('sendTouchEvent', <String, dynamic>{
+      'type': type,
+      'id': id,
+      'x': x,
+      'y': y,
+      'touchPoints': touchPoints,
+    });
+  }
+
+  /// Sets the focus state of the webview.
+  /// This is called when the Flutter widget gains or loses focus.
+  Future<void> _setFocused(bool focused) async {
+    if (_isDisposed) {
+      return;
+    }
+    assert(value.isInitialized);
+    return _methodChannel.invokeMethod('setFocused', focused);
+  }
 }
 
 class CustomPlatformView extends StatefulWidget {
@@ -283,6 +310,9 @@ class _CustomPlatformViewState extends State<CustomPlatformView> {
   static const _doubleClickTimeout = Duration(milliseconds: 400);
   static const _doubleClickDistance = 5.0;
 
+  // Track active touch points for multi-touch support
+  final _activeTouchPoints = <int, Offset>{};
+
   @override
   void initState() {
     super.initState();
@@ -313,7 +343,15 @@ class _CustomPlatformViewState extends State<CustomPlatformView> {
       focusNode: _focusNode,
       canRequestFocus: true,
       debugLabel: "flutter_inappwebview_linux_custom_platform_view",
-      onFocusChange: (focused) {},
+      onFocusChange: (focused) {
+        // Notify the native webview when focus changes.
+        // This is important for proper text input handling - without this,
+        // clicking inside text fields requires double-click because the
+        // webview doesn't know it has focus.
+        if (_controller.value.isInitialized) {
+          _controller._setFocused(focused);
+        }
+      },
       onKeyEvent: _handleKeyEvent,
       child: SizedBox.expand(key: _key, child: _buildInner()),
     );
@@ -376,15 +414,27 @@ class _CustomPlatformViewState extends State<CustomPlatformView> {
                       }
                       _controller._setCursorPos(ev.localPosition);
                     },
-                    onPointerDown: (ev) {
+                    onPointerDown: (ev) async {
                       _reportSurfaceSize();
 
-                      if (!_focusNode.hasFocus) {
+                      final needsFocus = !_focusNode.hasFocus;
+                      if (needsFocus) {
+                        // IMPORTANT: Set the native focus state BEFORE sending the click
+                        // and AWAIT it to ensure WebKit has processed the focus change.
+                        // Without awaiting, WebKit may receive the click before it has
+                        // the focused activity state, causing the click to only activate
+                        // the view rather than focusing the clicked element.
+                        if (_controller.value.isInitialized) {
+                          await _controller._setFocused(true);
+                        }
                         _focusNode.requestFocus();
                       }
 
                       _pointerKind = ev.kind;
                       if (ev.kind == PointerDeviceKind.touch) {
+                        // Handle touch event
+                        _activeTouchPoints[ev.pointer] = ev.localPosition;
+                        _sendTouchEvent(0, ev.pointer, ev.localPosition); // 0 = down
                         return;
                       }
                       
@@ -421,6 +471,10 @@ class _CustomPlatformViewState extends State<CustomPlatformView> {
                     onPointerUp: (ev) {
                       _pointerKind = ev.kind;
                       if (ev.kind == PointerDeviceKind.touch) {
+                        // Handle touch event
+                        _activeTouchPoints[ev.pointer] = ev.localPosition;
+                        _sendTouchEvent(1, ev.pointer, ev.localPosition); // 1 = up
+                        _activeTouchPoints.remove(ev.pointer);
                         return;
                       }
                       final button = _downButtons.remove(ev.pointer);
@@ -431,6 +485,12 @@ class _CustomPlatformViewState extends State<CustomPlatformView> {
                     },
                     onPointerCancel: (ev) {
                       _pointerKind = ev.kind;
+                      if (ev.kind == PointerDeviceKind.touch) {
+                        // Handle touch cancel
+                        _activeTouchPoints.remove(ev.pointer);
+                        _sendTouchEvent(3, ev.pointer, ev.localPosition); // 3 = cancel
+                        return;
+                      }
                       final button = _downButtons.remove(ev.pointer);
                       if (button != null) {
                         _controller._setPointerButtonState(
@@ -439,9 +499,13 @@ class _CustomPlatformViewState extends State<CustomPlatformView> {
                     },
                     onPointerMove: (ev) {
                       _pointerKind = ev.kind;
-                      if (ev.kind != PointerDeviceKind.touch) {
-                        _controller._setCursorPos(ev.localPosition);
+                      if (ev.kind == PointerDeviceKind.touch) {
+                        // Handle touch move
+                        _activeTouchPoints[ev.pointer] = ev.localPosition;
+                        _sendTouchEvent(2, ev.pointer, ev.localPosition); // 2 = move
+                        return;
                       }
+                      _controller._setCursorPos(ev.localPosition);
                     },
                     onPointerSignal: (signal) {
                       if (signal is PointerScrollEvent) {
@@ -471,6 +535,24 @@ class _CustomPlatformViewState extends State<CustomPlatformView> {
                         )),
                   )
                 : const SizedBox()));
+  }
+
+  /// Sends a touch event to the webview with all active touch points
+  void _sendTouchEvent(int type, int pointerId, Offset position) {
+    // Build list of all active touch points for multi-touch support
+    final touchPoints = _activeTouchPoints.entries.map((entry) {
+      // Determine the type for each touch point in the event
+      // The main touch point uses the event type, others are motion
+      int pointType = entry.key == pointerId ? type : 2; // 2 = motion
+      return <String, dynamic>{
+        'id': entry.key,
+        'x': entry.value.dx,
+        'y': entry.value.dy,
+        'type': pointType,
+      };
+    }).toList();
+    
+    _controller._sendTouchEvent(type, pointerId, position.dx, position.dy, touchPoints);
   }
 
   void _reportSurfaceSize() async {

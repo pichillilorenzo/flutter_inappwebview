@@ -9,6 +9,8 @@
 #include <algorithm>
 #include <cstring>
 #include <random>
+#include <unistd.h>
+#include <linux/limits.h>
 #include <nlohmann/json.hpp>
 
 // Use epoxy for OpenGL/EGL instead of direct headers to avoid conflicts
@@ -86,6 +88,21 @@ bool DebugLogEnabled() {
 
 }  // namespace
 
+// Get the directory where the executable is located
+static std::string GetExecutableDir() {
+  char path[PATH_MAX];
+  ssize_t len = readlink("/proc/self/exe", path, sizeof(path) - 1);
+  if (len != -1) {
+    path[len] = '\0';
+    std::string exe_path(path);
+    size_t last_slash = exe_path.rfind('/');
+    if (last_slash != std::string::npos) {
+      return exe_path.substr(0, last_slash);
+    }
+  }
+  return "";
+}
+
 bool InAppWebView::IsWpeWebKitAvailable() {
   // Check if WPE FDO is available
   static bool checked = false;
@@ -96,10 +113,53 @@ bool InAppWebView::IsWpeWebKitAvailable() {
   }
   checked = true;
   
-  // Try to initialize WPE FDO
-  // Note: wpe_fdo_initialize_for_egl_display should be called with a valid EGL display
-  // For now, we just check if the library is loaded
-  available = wpe_loader_init("libWPEBackend-fdo-1.0.so.1") != 0;
+  // Try to load the WPE backend library
+  // First, try to load from the bundled lib/ directory using the full path.
+  // This allows the app to run without setting LD_LIBRARY_PATH.
+  std::string exe_dir = GetExecutableDir();
+  if (!exe_dir.empty()) {
+    std::string bundled_lib_path = exe_dir + "/lib/libWPEBackend-fdo-1.0.so.1";
+    std::string bundled_lib_dir = exe_dir + "/lib";
+    
+    if (DebugLogEnabled()) {
+      g_message("InAppWebView: Trying bundled WPE backend: %s", bundled_lib_path.c_str());
+    }
+    
+    // Check if the bundled library exists
+    if (access(bundled_lib_path.c_str(), F_OK) == 0) {
+      // Set environment variables for the WPE WebProcess child process.
+      // The web process spawned by WebKit also needs to find the backend library.
+      setenv("WPE_BACKEND_LIBRARY", bundled_lib_path.c_str(), 0);
+      
+      // Also prepend the lib directory to LD_LIBRARY_PATH so the web process
+      // can find all bundled WPE libraries.
+      const char* current_ld_path = getenv("LD_LIBRARY_PATH");
+      std::string new_ld_path = bundled_lib_dir;
+      if (current_ld_path != nullptr && strlen(current_ld_path) > 0) {
+        new_ld_path += ":";
+        new_ld_path += current_ld_path;
+      }
+      setenv("LD_LIBRARY_PATH", new_ld_path.c_str(), 1);
+      
+      if (DebugLogEnabled()) {
+        g_message("InAppWebView: Set WPE_BACKEND_LIBRARY=%s", bundled_lib_path.c_str());
+        g_message("InAppWebView: Set LD_LIBRARY_PATH=%s", new_ld_path.c_str());
+      }
+      
+      available = wpe_loader_init(bundled_lib_path.c_str()) != 0;
+      if (available && DebugLogEnabled()) {
+        g_message("InAppWebView: Loaded bundled WPE backend successfully");
+      }
+    }
+  }
+  
+  // Fall back to system library if bundled version not found or failed to load
+  if (!available) {
+    if (DebugLogEnabled()) {
+      g_message("InAppWebView: Falling back to system WPE backend");
+    }
+    available = wpe_loader_init("libWPEBackend-fdo-1.0.so.1") != 0;
+  }
   
   if (DebugLogEnabled()) {
     g_message("InAppWebView: WPE WebKit %s", 
@@ -193,6 +253,12 @@ void InAppWebView::InitWpeBackend() {
   if (DebugLogEnabled()) {
     g_message("InAppWebView[%ld]: InitWpeBackend %dx%d (scale=%0.2f)",
               static_cast<long>(id_), width_, height_, scale_factor_);
+  }
+
+  // Initialize WPE loader first - this must be done before wpe_fdo_initialize_for_egl_display
+  if (!IsWpeWebKitAvailable()) {
+    g_warning("InAppWebView[%ld]: WPE WebKit not available", static_cast<long>(id_));
+    return;
   }
 
   // Get EGL display from GDK
@@ -297,6 +363,35 @@ void InAppWebView::InitWpeBackend() {
         wpe_view_backend_exportable_fdo_destroy(exportable);
       },
       exportable_);
+
+  // Set initial device scale factor (like Cog browser does)
+  wpe_view_backend_dispatch_set_device_scale_factor(wpe_backend_, scale_factor_);
+
+  // Set initial activity state - mark the view as visible, in-window, and focused
+  // This is required for WebKit to properly process input events
+  wpe_view_backend_add_activity_state(wpe_backend_, wpe_view_activity_state_visible);
+  wpe_view_backend_add_activity_state(wpe_backend_, wpe_view_activity_state_in_window);
+  wpe_view_backend_add_activity_state(wpe_backend_, wpe_view_activity_state_focused);
+
+  // Set up fullscreen handler for DOM fullscreen requests (e.g., video fullscreen)
+  // This callback is invoked when JavaScript requests fullscreen via requestFullscreen()
+  wpe_view_backend_set_fullscreen_handler(
+      wpe_backend_,
+      [](void* data, bool fullscreen) -> bool {
+        auto* self = static_cast<InAppWebView*>(data);
+        return self->OnDomFullscreenRequest(fullscreen);
+      },
+      this);
+
+  // Set up pointer lock handler for games/immersive applications
+  // This callback is invoked when JavaScript requests pointer lock via requestPointerLock()
+  wpe_view_backend_set_pointer_lock_handler(
+      wpe_backend_,
+      [](void* data, bool lock) -> bool {
+        auto* self = static_cast<InAppWebView*>(data);
+        return self->OnPointerLockRequest(lock);
+      },
+      this);
 
   if (DebugLogEnabled()) {
     g_message("InAppWebView[%ld]: WPE backend created successfully",
@@ -914,6 +1009,221 @@ void InAppWebView::setScaleFactor(double scale_factor) {
   }
 }
 
+// === Activity State Management (like Cog browser) ===
+
+void InAppWebView::setFocused(bool focused) {
+  if (focused == is_focused_) return;
+  is_focused_ = focused;
+  
+  if (wpe_backend_ != nullptr) {
+    if (focused) {
+      // Add focused state - also ensure visible and in_window are set
+      wpe_view_backend_add_activity_state(wpe_backend_, wpe_view_activity_state_focused);
+      wpe_view_backend_add_activity_state(wpe_backend_, wpe_view_activity_state_visible);
+      wpe_view_backend_add_activity_state(wpe_backend_, wpe_view_activity_state_in_window);
+      if (DebugLogEnabled()) {
+        g_message("InAppWebView[%ld]: gained focus", static_cast<long>(id_));
+      }
+    } else {
+      // Remove only the focused state, keep visible and in_window so the webview
+      // continues to render and process basic events
+      wpe_view_backend_remove_activity_state(wpe_backend_, wpe_view_activity_state_focused);
+      if (DebugLogEnabled()) {
+        g_message("InAppWebView[%ld]: lost focus", static_cast<long>(id_));
+      }
+    }
+  }
+}
+
+void InAppWebView::setVisible(bool visible) {
+  if (visible == is_visible_) return;
+  is_visible_ = visible;
+  
+  if (wpe_backend_ != nullptr) {
+    if (visible) {
+      wpe_view_backend_add_activity_state(wpe_backend_, wpe_view_activity_state_visible);
+      wpe_view_backend_add_activity_state(wpe_backend_, wpe_view_activity_state_in_window);
+      if (DebugLogEnabled()) {
+        g_message("InAppWebView[%ld]: became visible", static_cast<long>(id_));
+      }
+    } else {
+      wpe_view_backend_remove_activity_state(wpe_backend_, wpe_view_activity_state_visible);
+      wpe_view_backend_remove_activity_state(wpe_backend_, wpe_view_activity_state_in_window);
+      if (DebugLogEnabled()) {
+        g_message("InAppWebView[%ld]: became hidden", static_cast<long>(id_));
+      }
+    }
+  }
+}
+
+uint32_t InAppWebView::getActivityState() const {
+  if (wpe_backend_ != nullptr) {
+    return wpe_view_backend_get_activity_state(wpe_backend_);
+  }
+  return 0;
+}
+
+// === Refresh Rate Management ===
+
+void InAppWebView::setTargetRefreshRate(uint32_t rate) {
+  target_refresh_rate_ = rate;
+  if (wpe_backend_ != nullptr) {
+    wpe_view_backend_set_target_refresh_rate(wpe_backend_, rate);
+    if (DebugLogEnabled()) {
+      g_message("InAppWebView[%ld]: set target refresh rate: %u Hz", 
+                static_cast<long>(id_), rate);
+    }
+  }
+}
+
+uint32_t InAppWebView::getTargetRefreshRate() const {
+  if (wpe_backend_ != nullptr) {
+    return wpe_view_backend_get_target_refresh_rate(wpe_backend_);
+  }
+  return target_refresh_rate_;
+}
+
+// === Fullscreen Control ===
+
+void InAppWebView::requestEnterFullscreen() {
+  if (wpe_backend_ != nullptr) {
+    wpe_view_backend_dispatch_request_enter_fullscreen(wpe_backend_);
+    if (DebugLogEnabled()) {
+      g_message("InAppWebView[%ld]: requested enter fullscreen", static_cast<long>(id_));
+    }
+  }
+}
+
+void InAppWebView::requestExitFullscreen() {
+  if (wpe_backend_ != nullptr) {
+    wpe_view_backend_dispatch_request_exit_fullscreen(wpe_backend_);
+    if (DebugLogEnabled()) {
+      g_message("InAppWebView[%ld]: requested exit fullscreen", static_cast<long>(id_));
+    }
+  }
+}
+
+// === Pointer Lock Support (for games/immersive apps) ===
+
+void InAppWebView::setPointerLockHandler(std::function<bool(bool)> handler) {
+  pointer_lock_handler_ = std::move(handler);
+  
+  if (wpe_backend_ != nullptr) {
+    wpe_view_backend_set_pointer_lock_handler(
+        wpe_backend_,
+        [](void* data, bool lock) -> bool {
+          auto* self = static_cast<InAppWebView*>(data);
+          return self->OnPointerLockRequest(lock);
+        },
+        this);
+  }
+}
+
+bool InAppWebView::OnPointerLockRequest(bool lock) {
+  if (pointer_lock_handler_) {
+    bool result = pointer_lock_handler_(lock);
+    if (result) {
+      pointer_locked_ = lock;
+    }
+    if (DebugLogEnabled()) {
+      g_message("InAppWebView[%ld]: pointer lock %s: %s", 
+                static_cast<long>(id_), lock ? "request" : "release",
+                result ? "granted" : "denied");
+    }
+    return result;
+  }
+  // Default: allow pointer lock
+  pointer_locked_ = lock;
+  return true;
+}
+
+bool InAppWebView::requestPointerLock() {
+  if (wpe_backend_ != nullptr) {
+    bool result = wpe_view_backend_request_pointer_lock(wpe_backend_);
+    if (result) {
+      pointer_locked_ = true;
+    }
+    if (DebugLogEnabled()) {
+      g_message("InAppWebView[%ld]: request pointer lock: %s", 
+                static_cast<long>(id_), result ? "granted" : "denied");
+    }
+    return result;
+  }
+  return false;
+}
+
+bool InAppWebView::requestPointerUnlock() {
+  if (wpe_backend_ != nullptr) {
+    bool result = wpe_view_backend_request_pointer_unlock(wpe_backend_);
+    if (result) {
+      pointer_locked_ = false;
+    }
+    if (DebugLogEnabled()) {
+      g_message("InAppWebView[%ld]: request pointer unlock: %s", 
+                static_cast<long>(id_), result ? "granted" : "denied");
+    }
+    return result;
+  }
+  return false;
+}
+
+// === DOM Fullscreen Handler (like Cog browser on_dom_fullscreen_request) ===
+
+bool InAppWebView::OnDomFullscreenRequest(bool fullscreen) {
+  // This is called when JavaScript requests fullscreen via Element.requestFullscreen()
+  // or exits via Document.exitFullscreen()
+  
+  if (waiting_fullscreen_notify_) {
+    // Already processing a fullscreen transition
+    return false;
+  }
+  
+  if (fullscreen == is_fullscreen_) {
+    // Already in the requested state - dispatch the event immediately
+    // This handles cases where DOM fullscreen requests are mixed with
+    // system fullscreen commands
+    if (wpe_backend_ != nullptr) {
+      if (is_fullscreen_) {
+        wpe_view_backend_dispatch_did_enter_fullscreen(wpe_backend_);
+      } else {
+        wpe_view_backend_dispatch_did_exit_fullscreen(wpe_backend_);
+      }
+    }
+    return true;
+  }
+  
+  waiting_fullscreen_notify_ = true;
+  is_fullscreen_ = fullscreen;
+  
+  // Notify the Dart side about the fullscreen request
+  // The Dart side should handle the actual fullscreen transition
+  if (channel_delegate_) {
+    if (fullscreen) {
+      channel_delegate_->onEnterFullscreen();
+    } else {
+      channel_delegate_->onExitFullscreen();
+    }
+  }
+  
+  // Dispatch the fullscreen state to WPE
+  if (wpe_backend_ != nullptr) {
+    if (fullscreen) {
+      wpe_view_backend_dispatch_did_enter_fullscreen(wpe_backend_);
+    } else {
+      wpe_view_backend_dispatch_did_exit_fullscreen(wpe_backend_);
+    }
+  }
+  
+  waiting_fullscreen_notify_ = false;
+  
+  if (DebugLogEnabled()) {
+    g_message("InAppWebView[%ld]: DOM fullscreen request: %s",
+              static_cast<long>(id_), fullscreen ? "enter" : "exit");
+  }
+  
+  return true;
+}
+
 // === Input Handling ===
 
 void InAppWebView::SetCursorPos(double x, double y) {
@@ -1102,6 +1412,63 @@ void InAppWebView::SendKeyEvent(int type, int64_t keyCode, int scanCode,
   }
 
   wpe_view_backend_dispatch_keyboard_event(wpe_backend_, &event);
+}
+
+void InAppWebView::SendTouchEvent(int type, int id, double x, double y,
+                                      const std::vector<std::tuple<int, double, double, int>>& touchPoints) {
+  if (wpe_backend_ == nullptr) return;
+
+  // Map Dart touch event types to WPE types
+  // Dart: 0=down, 1=up, 2=move, 3=cancel
+  // WPE: wpe_input_touch_event_type_down=1, up=3, motion=2
+  enum wpe_input_touch_event_type wpe_type;
+  switch (type) {
+    case 0: wpe_type = wpe_input_touch_event_type_down; break;
+    case 1: wpe_type = wpe_input_touch_event_type_up; break;
+    case 2: wpe_type = wpe_input_touch_event_type_motion; break;
+    default: wpe_type = wpe_input_touch_event_type_null; break;  // cancel
+  }
+
+  // Build the raw touchpoints array
+  std::vector<struct wpe_input_touch_event_raw> raw_points;
+  raw_points.reserve(touchPoints.size());
+  
+  for (const auto& point : touchPoints) {
+    struct wpe_input_touch_event_raw raw = {};
+    raw.id = std::get<0>(point);
+    raw.x = static_cast<int32_t>(std::get<1>(point) * scale_factor_);
+    raw.y = static_cast<int32_t>(std::get<2>(point) * scale_factor_);
+    
+    // Map point type
+    int pointType = std::get<3>(point);
+    switch (pointType) {
+      case 0: raw.type = wpe_input_touch_event_type_down; break;
+      case 1: raw.type = wpe_input_touch_event_type_up; break;
+      case 2: raw.type = wpe_input_touch_event_type_motion; break;
+      default: raw.type = wpe_input_touch_event_type_null; break;
+    }
+    raw.time = g_get_monotonic_time() / 1000;
+    
+    raw_points.push_back(raw);
+  }
+
+  // Build the touch event
+  struct wpe_input_touch_event event = {};
+  event.touchpoints = raw_points.data();
+  event.touchpoints_length = raw_points.size();
+  event.type = wpe_type;
+  event.id = id;
+  event.time = g_get_monotonic_time() / 1000;
+  event.modifiers = current_modifiers_;
+
+  if (DebugLogEnabled()) {
+    g_message("InAppWebView[%ld]: touch %s id=%d at (%.0f,%.0f) points=%zu",
+              static_cast<long>(id_),
+              type == 0 ? "DOWN" : type == 1 ? "UP" : type == 2 ? "MOVE" : "CANCEL",
+              id, x * scale_factor_, y * scale_factor_, raw_points.size());
+  }
+
+  wpe_view_backend_dispatch_touch_event(wpe_backend_, &event);
 }
 
 // === Pixel Buffer Access ===
@@ -1819,19 +2186,33 @@ gboolean InAppWebView::OnContextMenu(WebKitWebView* web_view,
 gboolean InAppWebView::OnEnterFullscreen(WebKitWebView* web_view, 
                                              gpointer user_data) {
   auto* self = static_cast<InAppWebView*>(user_data);
+  self->is_fullscreen_ = true;
+  
+  // Notify WPE backend that we entered fullscreen
+  if (self->wpe_backend_ != nullptr) {
+    wpe_view_backend_dispatch_did_enter_fullscreen(self->wpe_backend_);
+  }
+  
   if (self->channel_delegate_) {
     self->channel_delegate_->onEnterFullscreen();
   }
-  return FALSE;
+  return TRUE;  // We handled the fullscreen request
 }
 
 gboolean InAppWebView::OnLeaveFullscreen(WebKitWebView* web_view, 
                                              gpointer user_data) {
   auto* self = static_cast<InAppWebView*>(user_data);
+  self->is_fullscreen_ = false;
+  
+  // Notify WPE backend that we exited fullscreen
+  if (self->wpe_backend_ != nullptr) {
+    wpe_view_backend_dispatch_did_exit_fullscreen(self->wpe_backend_);
+  }
+  
   if (self->channel_delegate_) {
     self->channel_delegate_->onExitFullscreen();
   }
-  return FALSE;
+  return TRUE;  // We handled the fullscreen exit
 }
 
 void InAppWebView::OnMouseTargetChanged(WebKitWebView* web_view,

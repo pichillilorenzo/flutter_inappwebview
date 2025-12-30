@@ -77,6 +77,7 @@ class PlatformInAppWebViewControllerCreationParams {
   MacOSPlatform(),
   WebPlatform(requiresSameOrigin: false),
   WindowsPlatform(),
+  LinuxPlatform(),
 ])
 abstract class PlatformInAppWebViewController extends PlatformInterface
     implements Disposable {
@@ -2813,10 +2814,123 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
     AndroidPlatform(),
     IOSPlatform(),
     MacOSPlatform(),
+    LinuxPlatform(),
   ])
   Future<bool> isInFullscreen() {
     throw UnimplementedError(
         '${PlatformInAppWebViewControllerMethod.isInFullscreen.name} is not implemented on the current platform');
+  }
+
+  ///{@template flutter_inappwebview_platform_interface.PlatformInAppWebViewController.requestEnterFullscreen}
+  ///Requests the WebView to enter fullscreen mode.
+  ///This dispatches a fullscreen request to the WPE backend.
+  ///{@endtemplate}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.requestEnterFullscreen.supported_platforms}
+  @SupportedPlatforms(platforms: [
+    LinuxPlatform(),
+  ])
+  Future<void> requestEnterFullscreen() {
+    throw UnimplementedError(
+        '${PlatformInAppWebViewControllerMethod.requestEnterFullscreen.name} is not implemented on the current platform');
+  }
+
+  ///{@template flutter_inappwebview_platform_interface.PlatformInAppWebViewController.requestExitFullscreen}
+  ///Requests the WebView to exit fullscreen mode.
+  ///This dispatches an exit fullscreen request to the WPE backend.
+  ///{@endtemplate}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.requestExitFullscreen.supported_platforms}
+  @SupportedPlatforms(platforms: [
+    LinuxPlatform(),
+  ])
+  Future<void> requestExitFullscreen() {
+    throw UnimplementedError(
+        '${PlatformInAppWebViewControllerMethod.requestExitFullscreen.name} is not implemented on the current platform');
+  }
+
+  ///{@template flutter_inappwebview_platform_interface.PlatformInAppWebViewController.setVisible}
+  ///Sets the visibility state of the WebView.
+  ///When set to `false`, the WebView is marked as hidden which may reduce resource usage.
+  ///{@endtemplate}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.setVisible.supported_platforms}
+  @SupportedPlatforms(platforms: [
+    LinuxPlatform(),
+  ])
+  Future<void> setVisible({required bool visible}) {
+    throw UnimplementedError(
+        '${PlatformInAppWebViewControllerMethod.setVisible.name} is not implemented on the current platform');
+  }
+
+  ///{@template flutter_inappwebview_platform_interface.PlatformInAppWebViewController.getActivityState}
+  ///Gets the current activity state bitmask of the WebView.
+  ///The state includes flags for visibility, in-window status, and focus.
+  ///{@endtemplate}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.getActivityState.supported_platforms}
+  @SupportedPlatforms(platforms: [
+    LinuxPlatform(),
+  ])
+  Future<int> getActivityState() {
+    throw UnimplementedError(
+        '${PlatformInAppWebViewControllerMethod.getActivityState.name} is not implemented on the current platform');
+  }
+
+  ///{@template flutter_inappwebview_platform_interface.PlatformInAppWebViewController.setTargetRefreshRate}
+  ///Sets the target refresh rate for the WebView in Hz.
+  ///A value of 0 means the default rate.
+  ///{@endtemplate}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.setTargetRefreshRate.supported_platforms}
+  @SupportedPlatforms(platforms: [
+    LinuxPlatform(),
+  ])
+  Future<void> setTargetRefreshRate({required int rate}) {
+    throw UnimplementedError(
+        '${PlatformInAppWebViewControllerMethod.setTargetRefreshRate.name} is not implemented on the current platform');
+  }
+
+  ///{@template flutter_inappwebview_platform_interface.PlatformInAppWebViewController.getTargetRefreshRate}
+  ///Gets the current target refresh rate for the WebView in Hz.
+  ///{@endtemplate}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.getTargetRefreshRate.supported_platforms}
+  @SupportedPlatforms(platforms: [
+    LinuxPlatform(),
+  ])
+  Future<int> getTargetRefreshRate() {
+    throw UnimplementedError(
+        '${PlatformInAppWebViewControllerMethod.getTargetRefreshRate.name} is not implemented on the current platform');
+  }
+
+  ///{@template flutter_inappwebview_platform_interface.PlatformInAppWebViewController.requestPointerLock}
+  ///Requests pointer lock for the WebView.
+  ///Pointer lock is useful for games and immersive applications.
+  ///Returns `true` if the request was granted, `false` otherwise.
+  ///{@endtemplate}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.requestPointerLock.supported_platforms}
+  @SupportedPlatforms(platforms: [
+    LinuxPlatform(),
+  ])
+  Future<bool> requestPointerLock() {
+    throw UnimplementedError(
+        '${PlatformInAppWebViewControllerMethod.requestPointerLock.name} is not implemented on the current platform');
+  }
+
+  ///{@template flutter_inappwebview_platform_interface.PlatformInAppWebViewController.requestPointerUnlock}
+  ///Releases the pointer lock for the WebView.
+  ///Returns `true` if the unlock was successful, `false` otherwise.
+  ///{@endtemplate}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.requestPointerUnlock.supported_platforms}
+  @SupportedPlatforms(platforms: [
+    LinuxPlatform(),
+  ])
+  Future<bool> requestPointerUnlock() {
+    throw UnimplementedError(
+        '${PlatformInAppWebViewControllerMethod.requestPointerUnlock.name} is not implemented on the current platform');
   }
 
   ///{@template flutter_inappwebview_platform_interface.PlatformInAppWebViewController.getCameraCaptureState}

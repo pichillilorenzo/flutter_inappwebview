@@ -17,13 +17,17 @@ class GeolocationPermissionShowPromptResponse {
   ///Whether the permission should be retained beyond the lifetime of a page currently being displayed by a WebView
   ///The default value is `false`.
   bool retain;
-  GeolocationPermissionShowPromptResponse(
-      {required this.allow, required this.origin, this.retain = false});
+  GeolocationPermissionShowPromptResponse({
+    required this.allow,
+    required this.origin,
+    this.retain = false,
+  });
 
   ///Gets a possible [GeolocationPermissionShowPromptResponse] instance from a [Map] value.
   static GeolocationPermissionShowPromptResponse? fromMap(
-      Map<String, dynamic>? map,
-      {EnumMethod? enumMethod}) {
+    Map<String, dynamic>? map, {
+    EnumMethod? enumMethod,
+  }) {
     if (map == null) {
       return null;
     }
@@ -39,11 +43,7 @@ class GeolocationPermissionShowPromptResponse {
 
   ///Converts instance to a map.
   Map<String, dynamic> toMap({EnumMethod? enumMethod}) {
-    return {
-      "allow": allow,
-      "origin": origin,
-      "retain": retain,
-    };
+    return {"allow": allow, "origin": origin, "retain": retain};
   }
 
   ///Converts instance to a map.

@@ -4,7 +4,7 @@ import 'cookie_manager/cookie_manager.dart';
 import 'in_app_webview/in_app_webview.dart';
 import 'in_app_webview/in_app_webview_controller.dart';
 
-/// Implementation of [InAppWebViewPlatform] using WebKitGTK.
+/// Implementation of [InAppWebViewPlatform] using WPE WebKit.
 class LinuxInAppWebViewPlatform extends InAppWebViewPlatform {
   /// Registers this class as the default instance of [InAppWebViewPlatform].
   static void registerWith() {
@@ -51,13 +51,6 @@ class LinuxInAppWebViewPlatform extends InAppWebViewPlatform {
     return LinuxInAppWebViewWidget.static();
   }
 
-  // ************************************************************************ //
-  // Create static instances of unsupported classes to be able to call        //
-  // isClassSupported, isMethodSupported, isPropertySupported, etc.           //
-  // static methods without throwing a missing platform implementation        //
-  // exception.                                                               //
-  // ************************************************************************ //
-
   /// Creates a new empty [PlatformCookieManager] to access static methods.
   @override
   PlatformCookieManager createPlatformCookieManagerStatic() {
@@ -71,6 +64,13 @@ class LinuxInAppWebViewPlatform extends InAppWebViewPlatform {
   ) {
     return LinuxCookieManager(params);
   }
+
+  // ************************************************************************ //
+  // Create static instances of unsupported classes to be able to call        //
+  // isClassSupported, isMethodSupported, isPropertySupported, etc.           //
+  // static methods without throwing a missing platform implementation        //
+  // exception.                                                               //
+  // ************************************************************************ //
 
   /// Creates a new empty [PlatformChromeSafariBrowser] to access static methods.
   @override

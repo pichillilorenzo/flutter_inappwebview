@@ -11,10 +11,11 @@ class FrameKind {
   final String _value;
   final int? _nativeValue;
   const FrameKind._internal(this._value, this._nativeValue);
-// ignore: unused_element
+  // ignore: unused_element
   factory FrameKind._internalMultiPlatform(
-          String value, Function nativeValue) =>
-      FrameKind._internal(value, nativeValue());
+    String value,
+    Function nativeValue,
+  ) => FrameKind._internal(value, nativeValue());
 
   ///Indicates that the frame is an embed element.
   ///
@@ -99,8 +100,9 @@ class FrameKind {
   static FrameKind? fromValue(String? value) {
     if (value != null) {
       try {
-        return FrameKind.values
-            .firstWhere((element) => element.toValue() == value);
+        return FrameKind.values.firstWhere(
+          (element) => element.toValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -112,8 +114,9 @@ class FrameKind {
   static FrameKind? fromNativeValue(int? value) {
     if (value != null) {
       try {
-        return FrameKind.values
-            .firstWhere((element) => element.toNativeValue() == value);
+        return FrameKind.values.firstWhere(
+          (element) => element.toNativeValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -146,8 +149,8 @@ class FrameKind {
   /// same value, or being values of different enum type), at most one of
   /// them will be represented in the returned map.
   static Map<String, FrameKind> asNameMap() => <String, FrameKind>{
-        for (final value in FrameKind.values) value.name(): value
-      };
+    for (final value in FrameKind.values) value.name(): value,
+  };
 
   ///Gets [String] value.
   String toValue() => _value;

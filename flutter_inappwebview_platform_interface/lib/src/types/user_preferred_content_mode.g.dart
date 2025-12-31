@@ -11,10 +11,11 @@ class UserPreferredContentMode {
   final int _value;
   final int _nativeValue;
   const UserPreferredContentMode._internal(this._value, this._nativeValue);
-// ignore: unused_element
+  // ignore: unused_element
   factory UserPreferredContentMode._internalMultiPlatform(
-          int value, Function nativeValue) =>
-      UserPreferredContentMode._internal(value, nativeValue());
+    int value,
+    Function nativeValue,
+  ) => UserPreferredContentMode._internal(value, nativeValue());
 
   ///Represents content targeting desktop browsers.
   static const DESKTOP = UserPreferredContentMode._internal(2, 2);
@@ -36,8 +37,9 @@ class UserPreferredContentMode {
   static UserPreferredContentMode? fromValue(int? value) {
     if (value != null) {
       try {
-        return UserPreferredContentMode.values
-            .firstWhere((element) => element.toValue() == value);
+        return UserPreferredContentMode.values.firstWhere(
+          (element) => element.toValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -49,8 +51,9 @@ class UserPreferredContentMode {
   static UserPreferredContentMode? fromNativeValue(int? value) {
     if (value != null) {
       try {
-        return UserPreferredContentMode.values
-            .firstWhere((element) => element.toNativeValue() == value);
+        return UserPreferredContentMode.values.firstWhere(
+          (element) => element.toNativeValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -66,8 +69,9 @@ class UserPreferredContentMode {
   static UserPreferredContentMode? byName(String? name) {
     if (name != null) {
       try {
-        return UserPreferredContentMode.values
-            .firstWhere((element) => element.name() == name);
+        return UserPreferredContentMode.values.firstWhere(
+          (element) => element.name() == name,
+        );
       } catch (e) {
         return null;
       }
@@ -85,7 +89,8 @@ class UserPreferredContentMode {
   /// them will be represented in the returned map.
   static Map<String, UserPreferredContentMode> asNameMap() =>
       <String, UserPreferredContentMode>{
-        for (final value in UserPreferredContentMode.values) value.name(): value
+        for (final value in UserPreferredContentMode.values)
+          value.name(): value,
       };
 
   ///Gets [int] value.

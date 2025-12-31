@@ -11,10 +11,11 @@ class PrintJobState {
   final int _value;
   final int? _nativeValue;
   const PrintJobState._internal(this._value, this._nativeValue);
-// ignore: unused_element
+  // ignore: unused_element
   factory PrintJobState._internalMultiPlatform(
-          int value, Function nativeValue) =>
-      PrintJobState._internal(value, nativeValue());
+    int value,
+    Function nativeValue,
+  ) => PrintJobState._internal(value, nativeValue());
 
   ///Print job state: The print job is blocked.
   ///
@@ -170,8 +171,9 @@ class PrintJobState {
   static PrintJobState? fromValue(int? value) {
     if (value != null) {
       try {
-        return PrintJobState.values
-            .firstWhere((element) => element.toValue() == value);
+        return PrintJobState.values.firstWhere(
+          (element) => element.toValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -183,8 +185,9 @@ class PrintJobState {
   static PrintJobState? fromNativeValue(int? value) {
     if (value != null) {
       try {
-        return PrintJobState.values
-            .firstWhere((element) => element.toNativeValue() == value);
+        return PrintJobState.values.firstWhere(
+          (element) => element.toNativeValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -200,8 +203,9 @@ class PrintJobState {
   static PrintJobState? byName(String? name) {
     if (name != null) {
       try {
-        return PrintJobState.values
-            .firstWhere((element) => element.name() == name);
+        return PrintJobState.values.firstWhere(
+          (element) => element.name() == name,
+        );
       } catch (e) {
         return null;
       }
@@ -218,8 +222,8 @@ class PrintJobState {
   /// same value, or being values of different enum type), at most one of
   /// them will be represented in the returned map.
   static Map<String, PrintJobState> asNameMap() => <String, PrintJobState>{
-        for (final value in PrintJobState.values) value.name(): value
-      };
+    for (final value in PrintJobState.values) value.name(): value,
+  };
 
   ///Gets [int] value.
   int toValue() => _value;

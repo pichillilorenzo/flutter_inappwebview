@@ -16,22 +16,27 @@ class NavigationResponse {
 
   ///The URL for the response.
   URLResponse? response;
-  NavigationResponse(
-      {required this.canShowMIMEType,
-      required this.isForMainFrame,
-      this.response});
+  NavigationResponse({
+    required this.canShowMIMEType,
+    required this.isForMainFrame,
+    this.response,
+  });
 
   ///Gets a possible [NavigationResponse] instance from a [Map] value.
-  static NavigationResponse? fromMap(Map<String, dynamic>? map,
-      {EnumMethod? enumMethod}) {
+  static NavigationResponse? fromMap(
+    Map<String, dynamic>? map, {
+    EnumMethod? enumMethod,
+  }) {
     if (map == null) {
       return null;
     }
     final instance = NavigationResponse(
       canShowMIMEType: map['canShowMIMEType'],
       isForMainFrame: map['isForMainFrame'],
-      response: URLResponse.fromMap(map['response']?.cast<String, dynamic>(),
-          enumMethod: enumMethod),
+      response: URLResponse.fromMap(
+        map['response']?.cast<String, dynamic>(),
+        enumMethod: enumMethod,
+      ),
     );
     return instance;
   }
@@ -68,22 +73,27 @@ class IOSWKNavigationResponse {
 
   ///The URL for the response.
   IOSURLResponse? response;
-  IOSWKNavigationResponse(
-      {required this.canShowMIMEType,
-      required this.isForMainFrame,
-      this.response});
+  IOSWKNavigationResponse({
+    required this.canShowMIMEType,
+    required this.isForMainFrame,
+    this.response,
+  });
 
   ///Gets a possible [IOSWKNavigationResponse] instance from a [Map] value.
-  static IOSWKNavigationResponse? fromMap(Map<String, dynamic>? map,
-      {EnumMethod? enumMethod}) {
+  static IOSWKNavigationResponse? fromMap(
+    Map<String, dynamic>? map, {
+    EnumMethod? enumMethod,
+  }) {
     if (map == null) {
       return null;
     }
     final instance = IOSWKNavigationResponse(
       canShowMIMEType: map['canShowMIMEType'],
       isForMainFrame: map['isForMainFrame'],
-      response: IOSURLResponse.fromMap(map['response']?.cast<String, dynamic>(),
-          enumMethod: enumMethod),
+      response: IOSURLResponse.fromMap(
+        map['response']?.cast<String, dynamic>(),
+        enumMethod: enumMethod,
+      ),
     );
     return instance;
   }

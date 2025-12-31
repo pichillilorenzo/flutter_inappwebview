@@ -11,10 +11,11 @@ class PrintJobPageOrder {
   final int _value;
   final int _nativeValue;
   const PrintJobPageOrder._internal(this._value, this._nativeValue);
-// ignore: unused_element
+  // ignore: unused_element
   factory PrintJobPageOrder._internalMultiPlatform(
-          int value, Function nativeValue) =>
-      PrintJobPageOrder._internal(value, nativeValue());
+    int value,
+    Function nativeValue,
+  ) => PrintJobPageOrder._internal(value, nativeValue());
 
   ///Ascending (back to front) page order.
   ///
@@ -84,8 +85,9 @@ class PrintJobPageOrder {
   static PrintJobPageOrder? fromValue(int? value) {
     if (value != null) {
       try {
-        return PrintJobPageOrder.values
-            .firstWhere((element) => element.toValue() == value);
+        return PrintJobPageOrder.values.firstWhere(
+          (element) => element.toValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -97,8 +99,9 @@ class PrintJobPageOrder {
   static PrintJobPageOrder? fromNativeValue(int? value) {
     if (value != null) {
       try {
-        return PrintJobPageOrder.values
-            .firstWhere((element) => element.toNativeValue() == value);
+        return PrintJobPageOrder.values.firstWhere(
+          (element) => element.toNativeValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -114,8 +117,9 @@ class PrintJobPageOrder {
   static PrintJobPageOrder? byName(String? name) {
     if (name != null) {
       try {
-        return PrintJobPageOrder.values
-            .firstWhere((element) => element.name() == name);
+        return PrintJobPageOrder.values.firstWhere(
+          (element) => element.name() == name,
+        );
       } catch (e) {
         return null;
       }
@@ -133,7 +137,7 @@ class PrintJobPageOrder {
   /// them will be represented in the returned map.
   static Map<String, PrintJobPageOrder> asNameMap() =>
       <String, PrintJobPageOrder>{
-        for (final value in PrintJobPageOrder.values) value.name(): value
+        for (final value in PrintJobPageOrder.values) value.name(): value,
       };
 
   ///Gets [int] value.

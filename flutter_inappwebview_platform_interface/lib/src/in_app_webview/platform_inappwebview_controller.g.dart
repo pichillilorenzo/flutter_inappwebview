@@ -24,13 +24,13 @@ extension _PlatformInAppWebViewControllerClassSupported
     return kIsWeb && platform == null
         ? true
         : ((kIsWeb && platform != null) || !kIsWeb) &&
-            [
-              TargetPlatform.android,
-              TargetPlatform.iOS,
-              TargetPlatform.macOS,
-              TargetPlatform.windows,
-              TargetPlatform.linux
-            ].contains(platform ?? defaultTargetPlatform);
+              [
+                TargetPlatform.android,
+                TargetPlatform.iOS,
+                TargetPlatform.macOS,
+                TargetPlatform.windows,
+                TargetPlatform.linux,
+              ].contains(platform ?? defaultTargetPlatform);
   }
 }
 
@@ -85,39 +85,40 @@ enum PlatformInAppWebViewControllerProperty {
 extension _PlatformInAppWebViewControllerPropertySupported
     on PlatformInAppWebViewController {
   static bool isPropertySupported(
-      PlatformInAppWebViewControllerProperty property,
-      {TargetPlatform? platform}) {
+    PlatformInAppWebViewControllerProperty property, {
+    TargetPlatform? platform,
+  }) {
     switch (property) {
       case PlatformInAppWebViewControllerProperty.tRexRunnerCss:
         return kIsWeb && platform == null
             ? true
             : ((kIsWeb && platform != null) || !kIsWeb) &&
-                [
-                  TargetPlatform.android,
-                  TargetPlatform.iOS,
-                  TargetPlatform.macOS,
-                  TargetPlatform.windows
-                ].contains(platform ?? defaultTargetPlatform);
+                  [
+                    TargetPlatform.android,
+                    TargetPlatform.iOS,
+                    TargetPlatform.macOS,
+                    TargetPlatform.windows,
+                  ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerProperty.tRexRunnerHtml:
         return kIsWeb && platform == null
             ? true
             : ((kIsWeb && platform != null) || !kIsWeb) &&
-                [
-                  TargetPlatform.android,
-                  TargetPlatform.iOS,
-                  TargetPlatform.macOS,
-                  TargetPlatform.windows
-                ].contains(platform ?? defaultTargetPlatform);
+                  [
+                    TargetPlatform.android,
+                    TargetPlatform.iOS,
+                    TargetPlatform.macOS,
+                    TargetPlatform.windows,
+                  ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerProperty.webStorage:
         return kIsWeb && platform == null
             ? true
             : ((kIsWeb && platform != null) || !kIsWeb) &&
-                [
-                  TargetPlatform.android,
-                  TargetPlatform.iOS,
-                  TargetPlatform.macOS,
-                  TargetPlatform.windows
-                ].contains(platform ?? defaultTargetPlatform);
+                  [
+                    TargetPlatform.android,
+                    TargetPlatform.iOS,
+                    TargetPlatform.macOS,
+                    TargetPlatform.windows,
+                  ].contains(platform ?? defaultTargetPlatform);
     }
   }
 }
@@ -597,17 +598,6 @@ enum PlatformInAppWebViewControllerMethod {
   ///{@endtemplate}
   @Deprecated('Use FindInteractionController.findNext instead')
   findNext,
-
-  ///Can be used to check if the [PlatformInAppWebViewController.getActivityState] method is supported at runtime.
-  ///
-  ///{@template flutter_inappwebview_platform_interface.PlatformInAppWebViewController.getActivityState.supported_platforms}
-  ///
-  ///**Officially Supported Platforms/Implementations**:
-  ///- Linux WebKitGTK
-  ///
-  ///Use the [PlatformInAppWebViewController.isMethodSupported] method to check if this method is supported at runtime.
-  ///{@endtemplate}
-  getActivityState,
 
   ///Can be used to check if the [PlatformInAppWebViewController.getCameraCaptureState] method is supported at runtime.
   ///
@@ -2282,67 +2272,74 @@ enum PlatformInAppWebViewControllerMethod {
 
 extension _PlatformInAppWebViewControllerMethodSupported
     on PlatformInAppWebViewController {
-  static bool isMethodSupported(PlatformInAppWebViewControllerMethod method,
-      {TargetPlatform? platform}) {
+  static bool isMethodSupported(
+    PlatformInAppWebViewControllerMethod method, {
+    TargetPlatform? platform,
+  }) {
     switch (method) {
       case PlatformInAppWebViewControllerMethod
-            .addDevToolsProtocolEventListener:
+          .addDevToolsProtocolEventListener:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.windows]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.windows,
+            ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.addJavaScriptHandler:
         return kIsWeb && platform == null
             ? true
             : ((kIsWeb && platform != null) || !kIsWeb) &&
-                [
-                  TargetPlatform.android,
-                  TargetPlatform.iOS,
-                  TargetPlatform.macOS,
-                  TargetPlatform.windows
-                ].contains(platform ?? defaultTargetPlatform);
+                  [
+                    TargetPlatform.android,
+                    TargetPlatform.iOS,
+                    TargetPlatform.macOS,
+                    TargetPlatform.windows,
+                  ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.addUserScript:
         return kIsWeb && platform == null
             ? true
             : ((kIsWeb && platform != null) || !kIsWeb) &&
-                [
-                  TargetPlatform.android,
-                  TargetPlatform.iOS,
-                  TargetPlatform.macOS,
-                  TargetPlatform.windows
-                ].contains(platform ?? defaultTargetPlatform);
+                  [
+                    TargetPlatform.android,
+                    TargetPlatform.iOS,
+                    TargetPlatform.macOS,
+                    TargetPlatform.windows,
+                  ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.addUserScripts:
         return kIsWeb && platform == null
             ? true
             : ((kIsWeb && platform != null) || !kIsWeb) &&
-                [
-                  TargetPlatform.android,
-                  TargetPlatform.iOS,
-                  TargetPlatform.macOS,
-                  TargetPlatform.windows
-                ].contains(platform ?? defaultTargetPlatform);
+                  [
+                    TargetPlatform.android,
+                    TargetPlatform.iOS,
+                    TargetPlatform.macOS,
+                    TargetPlatform.windows,
+                  ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.addWebMessageListener:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.android, TargetPlatform.iOS, TargetPlatform.macOS]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.android,
+              TargetPlatform.iOS,
+              TargetPlatform.macOS,
+            ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.callAsyncJavaScript:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
             [
               TargetPlatform.android,
               TargetPlatform.iOS,
               TargetPlatform.macOS,
-              TargetPlatform.windows
+              TargetPlatform.windows,
             ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.callDevToolsProtocolMethod:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.windows]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.windows,
+            ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.canGoBack:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
             [
               TargetPlatform.android,
               TargetPlatform.iOS,
               TargetPlatform.macOS,
-              TargetPlatform.windows
+              TargetPlatform.windows,
             ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.canGoBackOrForward:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
@@ -2350,7 +2347,7 @@ extension _PlatformInAppWebViewControllerMethodSupported
               TargetPlatform.android,
               TargetPlatform.iOS,
               TargetPlatform.macOS,
-              TargetPlatform.windows
+              TargetPlatform.windows,
             ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.canGoForward:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
@@ -2358,323 +2355,368 @@ extension _PlatformInAppWebViewControllerMethodSupported
               TargetPlatform.android,
               TargetPlatform.iOS,
               TargetPlatform.macOS,
-              TargetPlatform.windows
+              TargetPlatform.windows,
             ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.canScrollHorizontally:
         return kIsWeb && platform == null
             ? true
             : ((kIsWeb && platform != null) || !kIsWeb) &&
-                [
-                  TargetPlatform.android,
-                  TargetPlatform.iOS,
-                  TargetPlatform.macOS
-                ].contains(platform ?? defaultTargetPlatform);
+                  [
+                    TargetPlatform.android,
+                    TargetPlatform.iOS,
+                    TargetPlatform.macOS,
+                  ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.canScrollVertically:
         return kIsWeb && platform == null
             ? true
             : ((kIsWeb && platform != null) || !kIsWeb) &&
-                [
-                  TargetPlatform.android,
-                  TargetPlatform.iOS,
-                  TargetPlatform.macOS
-                ].contains(platform ?? defaultTargetPlatform);
+                  [
+                    TargetPlatform.android,
+                    TargetPlatform.iOS,
+                    TargetPlatform.macOS,
+                  ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.clearAllCache:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.android, TargetPlatform.iOS, TargetPlatform.macOS]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.android,
+              TargetPlatform.iOS,
+              TargetPlatform.macOS,
+            ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.clearCache:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.android, TargetPlatform.iOS, TargetPlatform.macOS]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.android,
+              TargetPlatform.iOS,
+              TargetPlatform.macOS,
+            ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.clearClientCertPreferences:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.android]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.android,
+            ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.clearFocus:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.android, TargetPlatform.iOS, TargetPlatform.macOS]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.android,
+              TargetPlatform.iOS,
+              TargetPlatform.macOS,
+            ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.clearFormData:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.android]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.android,
+            ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.clearHistory:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.android]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.android,
+            ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.clearMatches:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.android, TargetPlatform.iOS, TargetPlatform.macOS]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.android,
+              TargetPlatform.iOS,
+              TargetPlatform.macOS,
+            ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.clearSslPreferences:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.android, TargetPlatform.windows]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.android,
+              TargetPlatform.windows,
+            ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.closeAllMediaPresentations:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.iOS, TargetPlatform.macOS]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.iOS,
+              TargetPlatform.macOS,
+            ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.createPdf:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.iOS, TargetPlatform.macOS]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.iOS,
+              TargetPlatform.macOS,
+            ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.createWebArchiveData:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.iOS, TargetPlatform.macOS]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.iOS,
+              TargetPlatform.macOS,
+            ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.createWebMessageChannel:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.android, TargetPlatform.iOS, TargetPlatform.macOS]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.android,
+              TargetPlatform.iOS,
+              TargetPlatform.macOS,
+            ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.disableWebView:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.android]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.android,
+            ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.dispose:
         return kIsWeb && platform == null
             ? true
             : ((kIsWeb && platform != null) || !kIsWeb) &&
-                [
-                  TargetPlatform.android,
-                  TargetPlatform.iOS,
-                  TargetPlatform.macOS,
-                  TargetPlatform.windows
-                ].contains(platform ?? defaultTargetPlatform);
+                  [
+                    TargetPlatform.android,
+                    TargetPlatform.iOS,
+                    TargetPlatform.macOS,
+                    TargetPlatform.windows,
+                  ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.disposeKeepAlive:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
             [
               TargetPlatform.android,
               TargetPlatform.iOS,
               TargetPlatform.macOS,
-              TargetPlatform.windows
+              TargetPlatform.windows,
             ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.enableSlowWholeDocumentDraw:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.android]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.android,
+            ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.evaluateJavascript:
         return kIsWeb && platform == null
             ? true
             : ((kIsWeb && platform != null) || !kIsWeb) &&
-                [
-                  TargetPlatform.android,
-                  TargetPlatform.iOS,
-                  TargetPlatform.macOS,
-                  TargetPlatform.windows
-                ].contains(platform ?? defaultTargetPlatform);
+                  [
+                    TargetPlatform.android,
+                    TargetPlatform.iOS,
+                    TargetPlatform.macOS,
+                    TargetPlatform.windows,
+                  ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.findAllAsync:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.android, TargetPlatform.iOS, TargetPlatform.macOS]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.android,
+              TargetPlatform.iOS,
+              TargetPlatform.macOS,
+            ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.findNext:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.android, TargetPlatform.iOS, TargetPlatform.macOS]
-                .contains(platform ?? defaultTargetPlatform);
-      case PlatformInAppWebViewControllerMethod.getActivityState:
-        return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.linux].contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.android,
+              TargetPlatform.iOS,
+              TargetPlatform.macOS,
+            ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.getCameraCaptureState:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.iOS, TargetPlatform.macOS]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.iOS,
+              TargetPlatform.macOS,
+            ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.getCertificate:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
             [
               TargetPlatform.android,
               TargetPlatform.iOS,
               TargetPlatform.macOS,
-              TargetPlatform.windows
+              TargetPlatform.windows,
             ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.getContentHeight:
         return kIsWeb && platform == null
             ? true
             : ((kIsWeb && platform != null) || !kIsWeb) &&
-                [
-                  TargetPlatform.android,
-                  TargetPlatform.iOS,
-                  TargetPlatform.macOS
-                ].contains(platform ?? defaultTargetPlatform);
+                  [
+                    TargetPlatform.android,
+                    TargetPlatform.iOS,
+                    TargetPlatform.macOS,
+                  ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.getContentWidth:
         return kIsWeb && platform == null
             ? true
             : ((kIsWeb && platform != null) || !kIsWeb) &&
-                [
-                  TargetPlatform.android,
-                  TargetPlatform.iOS,
-                  TargetPlatform.macOS
-                ].contains(platform ?? defaultTargetPlatform);
+                  [
+                    TargetPlatform.android,
+                    TargetPlatform.iOS,
+                    TargetPlatform.macOS,
+                  ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.getCopyBackForwardList:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
             [
               TargetPlatform.android,
               TargetPlatform.iOS,
               TargetPlatform.macOS,
-              TargetPlatform.windows
+              TargetPlatform.windows,
             ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.getCurrentWebViewPackage:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.android]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.android,
+            ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.getDefaultUserAgent:
         return kIsWeb && platform == null
             ? true
             : ((kIsWeb && platform != null) || !kIsWeb) &&
-                [
-                  TargetPlatform.android,
-                  TargetPlatform.iOS,
-                  TargetPlatform.macOS
-                ].contains(platform ?? defaultTargetPlatform);
+                  [
+                    TargetPlatform.android,
+                    TargetPlatform.iOS,
+                    TargetPlatform.macOS,
+                  ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.getFavicons:
         return kIsWeb && platform == null
             ? true
             : ((kIsWeb && platform != null) || !kIsWeb) &&
-                [
-                  TargetPlatform.android,
-                  TargetPlatform.iOS,
-                  TargetPlatform.macOS,
-                  TargetPlatform.windows
-                ].contains(platform ?? defaultTargetPlatform);
+                  [
+                    TargetPlatform.android,
+                    TargetPlatform.iOS,
+                    TargetPlatform.macOS,
+                    TargetPlatform.windows,
+                  ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.getHitTestResult:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.android, TargetPlatform.iOS]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.android,
+              TargetPlatform.iOS,
+            ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.getHtml:
         return kIsWeb && platform == null
             ? true
             : ((kIsWeb && platform != null) || !kIsWeb) &&
-                [
-                  TargetPlatform.android,
-                  TargetPlatform.iOS,
-                  TargetPlatform.macOS,
-                  TargetPlatform.windows
-                ].contains(platform ?? defaultTargetPlatform);
+                  [
+                    TargetPlatform.android,
+                    TargetPlatform.iOS,
+                    TargetPlatform.macOS,
+                    TargetPlatform.windows,
+                  ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.getIFrameId:
         return kIsWeb && platform == null
             ? true
             : ((kIsWeb && platform != null) || !kIsWeb) &&
-                [].contains(platform ?? defaultTargetPlatform);
+                  [].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.getJavaScriptBridgeName:
         return kIsWeb && platform == null
             ? true
             : ((kIsWeb && platform != null) || !kIsWeb) &&
-                [
-                  TargetPlatform.android,
-                  TargetPlatform.iOS,
-                  TargetPlatform.macOS,
-                  TargetPlatform.windows
-                ].contains(platform ?? defaultTargetPlatform);
+                  [
+                    TargetPlatform.android,
+                    TargetPlatform.iOS,
+                    TargetPlatform.macOS,
+                    TargetPlatform.windows,
+                  ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.getMetaTags:
         return kIsWeb && platform == null
             ? true
             : ((kIsWeb && platform != null) || !kIsWeb) &&
-                [
-                  TargetPlatform.android,
-                  TargetPlatform.iOS,
-                  TargetPlatform.macOS,
-                  TargetPlatform.windows
-                ].contains(platform ?? defaultTargetPlatform);
+                  [
+                    TargetPlatform.android,
+                    TargetPlatform.iOS,
+                    TargetPlatform.macOS,
+                    TargetPlatform.windows,
+                  ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.getMetaThemeColor:
         return kIsWeb && platform == null
             ? true
             : ((kIsWeb && platform != null) || !kIsWeb) &&
-                [
-                  TargetPlatform.android,
-                  TargetPlatform.iOS,
-                  TargetPlatform.macOS,
-                  TargetPlatform.windows
-                ].contains(platform ?? defaultTargetPlatform);
+                  [
+                    TargetPlatform.android,
+                    TargetPlatform.iOS,
+                    TargetPlatform.macOS,
+                    TargetPlatform.windows,
+                  ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.getMicrophoneCaptureState:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.iOS, TargetPlatform.macOS]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.iOS,
+              TargetPlatform.macOS,
+            ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.getOptions:
         return kIsWeb && platform == null
             ? true
             : ((kIsWeb && platform != null) || !kIsWeb) &&
-                [
-                  TargetPlatform.android,
-                  TargetPlatform.iOS,
-                  TargetPlatform.macOS,
-                  TargetPlatform.windows
-                ].contains(platform ?? defaultTargetPlatform);
+                  [
+                    TargetPlatform.android,
+                    TargetPlatform.iOS,
+                    TargetPlatform.macOS,
+                    TargetPlatform.windows,
+                  ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.getOriginalUrl:
         return kIsWeb && platform == null
             ? true
             : ((kIsWeb && platform != null) || !kIsWeb) &&
-                [
-                  TargetPlatform.android,
-                  TargetPlatform.iOS,
-                  TargetPlatform.macOS
-                ].contains(platform ?? defaultTargetPlatform);
+                  [
+                    TargetPlatform.android,
+                    TargetPlatform.iOS,
+                    TargetPlatform.macOS,
+                  ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.getProgress:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.android, TargetPlatform.iOS, TargetPlatform.macOS]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.android,
+              TargetPlatform.iOS,
+              TargetPlatform.macOS,
+            ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.getSafeBrowsingPrivacyPolicyUrl:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.android]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.android,
+            ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.getScale:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.android, TargetPlatform.iOS, TargetPlatform.macOS]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.android,
+              TargetPlatform.iOS,
+              TargetPlatform.macOS,
+            ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.getScrollX:
         return kIsWeb && platform == null
             ? true
             : ((kIsWeb && platform != null) || !kIsWeb) &&
-                [
-                  TargetPlatform.android,
-                  TargetPlatform.iOS,
-                  TargetPlatform.macOS
-                ].contains(platform ?? defaultTargetPlatform);
+                  [
+                    TargetPlatform.android,
+                    TargetPlatform.iOS,
+                    TargetPlatform.macOS,
+                  ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.getScrollY:
         return kIsWeb && platform == null
             ? true
             : ((kIsWeb && platform != null) || !kIsWeb) &&
-                [
-                  TargetPlatform.android,
-                  TargetPlatform.iOS,
-                  TargetPlatform.macOS
-                ].contains(platform ?? defaultTargetPlatform);
+                  [
+                    TargetPlatform.android,
+                    TargetPlatform.iOS,
+                    TargetPlatform.macOS,
+                  ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.getSelectedText:
         return kIsWeb && platform == null
             ? true
             : ((kIsWeb && platform != null) || !kIsWeb) &&
-                [
-                  TargetPlatform.android,
-                  TargetPlatform.iOS,
-                  TargetPlatform.macOS
-                ].contains(platform ?? defaultTargetPlatform);
+                  [
+                    TargetPlatform.android,
+                    TargetPlatform.iOS,
+                    TargetPlatform.macOS,
+                  ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.getSettings:
         return kIsWeb && platform == null
             ? true
             : ((kIsWeb && platform != null) || !kIsWeb) &&
-                [
-                  TargetPlatform.android,
-                  TargetPlatform.iOS,
-                  TargetPlatform.macOS,
-                  TargetPlatform.windows
-                ].contains(platform ?? defaultTargetPlatform);
+                  [
+                    TargetPlatform.android,
+                    TargetPlatform.iOS,
+                    TargetPlatform.macOS,
+                    TargetPlatform.windows,
+                  ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.getTRexRunnerCss:
         return kIsWeb && platform == null
             ? true
             : ((kIsWeb && platform != null) || !kIsWeb) &&
-                [
-                  TargetPlatform.android,
-                  TargetPlatform.iOS,
-                  TargetPlatform.macOS,
-                  TargetPlatform.windows
-                ].contains(platform ?? defaultTargetPlatform);
+                  [
+                    TargetPlatform.android,
+                    TargetPlatform.iOS,
+                    TargetPlatform.macOS,
+                    TargetPlatform.windows,
+                  ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.getTRexRunnerHtml:
         return kIsWeb && platform == null
             ? true
             : ((kIsWeb && platform != null) || !kIsWeb) &&
-                [
-                  TargetPlatform.android,
-                  TargetPlatform.iOS,
-                  TargetPlatform.macOS,
-                  TargetPlatform.windows
-                ].contains(platform ?? defaultTargetPlatform);
+                  [
+                    TargetPlatform.android,
+                    TargetPlatform.iOS,
+                    TargetPlatform.macOS,
+                    TargetPlatform.windows,
+                  ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.getTargetRefreshRate:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.linux].contains(platform ?? defaultTargetPlatform);
@@ -2682,347 +2724,380 @@ extension _PlatformInAppWebViewControllerMethodSupported
         return kIsWeb && platform == null
             ? true
             : ((kIsWeb && platform != null) || !kIsWeb) &&
-                [
-                  TargetPlatform.android,
-                  TargetPlatform.iOS,
-                  TargetPlatform.macOS,
-                  TargetPlatform.windows
-                ].contains(platform ?? defaultTargetPlatform);
+                  [
+                    TargetPlatform.android,
+                    TargetPlatform.iOS,
+                    TargetPlatform.macOS,
+                    TargetPlatform.windows,
+                  ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.getUrl:
         return kIsWeb && platform == null
             ? true
             : ((kIsWeb && platform != null) || !kIsWeb) &&
-                [
-                  TargetPlatform.android,
-                  TargetPlatform.iOS,
-                  TargetPlatform.macOS,
-                  TargetPlatform.windows
-                ].contains(platform ?? defaultTargetPlatform);
+                  [
+                    TargetPlatform.android,
+                    TargetPlatform.iOS,
+                    TargetPlatform.macOS,
+                    TargetPlatform.windows,
+                  ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.getVariationsHeader:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.android]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.android,
+            ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.getViewId:
         return kIsWeb && platform == null
             ? true
             : ((kIsWeb && platform != null) || !kIsWeb) &&
-                [
-                  TargetPlatform.android,
-                  TargetPlatform.iOS,
-                  TargetPlatform.macOS,
-                  TargetPlatform.windows
-                ].contains(platform ?? defaultTargetPlatform);
+                  [
+                    TargetPlatform.android,
+                    TargetPlatform.iOS,
+                    TargetPlatform.macOS,
+                    TargetPlatform.windows,
+                  ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.getZoomScale:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.android, TargetPlatform.iOS, TargetPlatform.windows]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.android,
+              TargetPlatform.iOS,
+              TargetPlatform.windows,
+            ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.goBack:
         return kIsWeb && platform == null
             ? true
             : ((kIsWeb && platform != null) || !kIsWeb) &&
-                [
-                  TargetPlatform.android,
-                  TargetPlatform.iOS,
-                  TargetPlatform.macOS,
-                  TargetPlatform.windows
-                ].contains(platform ?? defaultTargetPlatform);
+                  [
+                    TargetPlatform.android,
+                    TargetPlatform.iOS,
+                    TargetPlatform.macOS,
+                    TargetPlatform.windows,
+                  ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.goBackOrForward:
         return kIsWeb && platform == null
             ? true
             : ((kIsWeb && platform != null) || !kIsWeb) &&
-                [
-                  TargetPlatform.android,
-                  TargetPlatform.iOS,
-                  TargetPlatform.macOS,
-                  TargetPlatform.windows
-                ].contains(platform ?? defaultTargetPlatform);
+                  [
+                    TargetPlatform.android,
+                    TargetPlatform.iOS,
+                    TargetPlatform.macOS,
+                    TargetPlatform.windows,
+                  ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.goForward:
         return kIsWeb && platform == null
             ? true
             : ((kIsWeb && platform != null) || !kIsWeb) &&
-                [
-                  TargetPlatform.android,
-                  TargetPlatform.iOS,
-                  TargetPlatform.macOS,
-                  TargetPlatform.windows
-                ].contains(platform ?? defaultTargetPlatform);
+                  [
+                    TargetPlatform.android,
+                    TargetPlatform.iOS,
+                    TargetPlatform.macOS,
+                    TargetPlatform.windows,
+                  ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.goTo:
         return kIsWeb && platform == null
             ? true
             : ((kIsWeb && platform != null) || !kIsWeb) &&
-                [
-                  TargetPlatform.android,
-                  TargetPlatform.iOS,
-                  TargetPlatform.macOS,
-                  TargetPlatform.windows
-                ].contains(platform ?? defaultTargetPlatform);
+                  [
+                    TargetPlatform.android,
+                    TargetPlatform.iOS,
+                    TargetPlatform.macOS,
+                    TargetPlatform.windows,
+                  ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.handlesURLScheme:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.iOS, TargetPlatform.macOS]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.iOS,
+              TargetPlatform.macOS,
+            ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.hasJavaScriptHandler:
         return kIsWeb && platform == null
             ? true
             : ((kIsWeb && platform != null) || !kIsWeb) &&
-                [
-                  TargetPlatform.android,
-                  TargetPlatform.iOS,
-                  TargetPlatform.macOS,
-                  TargetPlatform.windows
-                ].contains(platform ?? defaultTargetPlatform);
+                  [
+                    TargetPlatform.android,
+                    TargetPlatform.iOS,
+                    TargetPlatform.macOS,
+                    TargetPlatform.windows,
+                  ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.hasOnlySecureContent:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.iOS, TargetPlatform.macOS]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.iOS,
+              TargetPlatform.macOS,
+            ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.hasUserScript:
         return kIsWeb && platform == null
             ? true
             : ((kIsWeb && platform != null) || !kIsWeb) &&
-                [
-                  TargetPlatform.android,
-                  TargetPlatform.iOS,
-                  TargetPlatform.macOS,
-                  TargetPlatform.windows
-                ].contains(platform ?? defaultTargetPlatform);
+                  [
+                    TargetPlatform.android,
+                    TargetPlatform.iOS,
+                    TargetPlatform.macOS,
+                    TargetPlatform.windows,
+                  ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.hasWebMessageListener:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.android, TargetPlatform.iOS, TargetPlatform.macOS]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.android,
+              TargetPlatform.iOS,
+              TargetPlatform.macOS,
+            ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.hideInputMethod:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.android, TargetPlatform.iOS]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.android,
+              TargetPlatform.iOS,
+            ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.injectCSSCode:
         return kIsWeb && platform == null
             ? true
             : ((kIsWeb && platform != null) || !kIsWeb) &&
-                [
-                  TargetPlatform.android,
-                  TargetPlatform.iOS,
-                  TargetPlatform.macOS
-                ].contains(platform ?? defaultTargetPlatform);
+                  [
+                    TargetPlatform.android,
+                    TargetPlatform.iOS,
+                    TargetPlatform.macOS,
+                  ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.injectCSSFileFromAsset:
         return kIsWeb && platform == null
             ? true
             : ((kIsWeb && platform != null) || !kIsWeb) &&
-                [
-                  TargetPlatform.android,
-                  TargetPlatform.iOS,
-                  TargetPlatform.macOS
-                ].contains(platform ?? defaultTargetPlatform);
+                  [
+                    TargetPlatform.android,
+                    TargetPlatform.iOS,
+                    TargetPlatform.macOS,
+                  ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.injectCSSFileFromUrl:
         return kIsWeb && platform == null
             ? true
             : ((kIsWeb && platform != null) || !kIsWeb) &&
-                [
-                  TargetPlatform.android,
-                  TargetPlatform.iOS,
-                  TargetPlatform.macOS
-                ].contains(platform ?? defaultTargetPlatform);
+                  [
+                    TargetPlatform.android,
+                    TargetPlatform.iOS,
+                    TargetPlatform.macOS,
+                  ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.injectJavascriptFileFromAsset:
         return kIsWeb && platform == null
             ? true
             : ((kIsWeb && platform != null) || !kIsWeb) &&
-                [
-                  TargetPlatform.android,
-                  TargetPlatform.iOS,
-                  TargetPlatform.macOS,
-                  TargetPlatform.windows
-                ].contains(platform ?? defaultTargetPlatform);
+                  [
+                    TargetPlatform.android,
+                    TargetPlatform.iOS,
+                    TargetPlatform.macOS,
+                    TargetPlatform.windows,
+                  ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.injectJavascriptFileFromUrl:
         return kIsWeb && platform == null
             ? true
             : ((kIsWeb && platform != null) || !kIsWeb) &&
-                [
-                  TargetPlatform.android,
-                  TargetPlatform.iOS,
-                  TargetPlatform.macOS
-                ].contains(platform ?? defaultTargetPlatform);
+                  [
+                    TargetPlatform.android,
+                    TargetPlatform.iOS,
+                    TargetPlatform.macOS,
+                  ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.isInFullscreen:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
             [
               TargetPlatform.android,
               TargetPlatform.iOS,
               TargetPlatform.macOS,
-              TargetPlatform.linux
+              TargetPlatform.linux,
             ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.isInterfaceSupported:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.windows]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.windows,
+            ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.isLoading:
         return kIsWeb && platform == null
             ? true
             : ((kIsWeb && platform != null) || !kIsWeb) &&
-                [
-                  TargetPlatform.android,
-                  TargetPlatform.iOS,
-                  TargetPlatform.macOS,
-                  TargetPlatform.windows
-                ].contains(platform ?? defaultTargetPlatform);
+                  [
+                    TargetPlatform.android,
+                    TargetPlatform.iOS,
+                    TargetPlatform.macOS,
+                    TargetPlatform.windows,
+                  ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.isMultiProcessEnabled:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.android]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.android,
+            ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.isSecureContext:
         return kIsWeb && platform == null
             ? true
             : ((kIsWeb && platform != null) || !kIsWeb) &&
-                [
-                  TargetPlatform.android,
-                  TargetPlatform.iOS,
-                  TargetPlatform.macOS
-                ].contains(platform ?? defaultTargetPlatform);
+                  [
+                    TargetPlatform.android,
+                    TargetPlatform.iOS,
+                    TargetPlatform.macOS,
+                  ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.loadData:
         return kIsWeb && platform == null
             ? true
             : ((kIsWeb && platform != null) || !kIsWeb) &&
-                [
-                  TargetPlatform.android,
-                  TargetPlatform.iOS,
-                  TargetPlatform.macOS,
-                  TargetPlatform.windows
-                ].contains(platform ?? defaultTargetPlatform);
+                  [
+                    TargetPlatform.android,
+                    TargetPlatform.iOS,
+                    TargetPlatform.macOS,
+                    TargetPlatform.windows,
+                  ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.loadFile:
         return kIsWeb && platform == null
             ? true
             : ((kIsWeb && platform != null) || !kIsWeb) &&
-                [
-                  TargetPlatform.android,
-                  TargetPlatform.iOS,
-                  TargetPlatform.macOS,
-                  TargetPlatform.windows
-                ].contains(platform ?? defaultTargetPlatform);
+                  [
+                    TargetPlatform.android,
+                    TargetPlatform.iOS,
+                    TargetPlatform.macOS,
+                    TargetPlatform.windows,
+                  ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.loadSimulatedRequest:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.iOS, TargetPlatform.macOS]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.iOS,
+              TargetPlatform.macOS,
+            ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.loadUrl:
         return kIsWeb && platform == null
             ? true
             : ((kIsWeb && platform != null) || !kIsWeb) &&
-                [
-                  TargetPlatform.android,
-                  TargetPlatform.iOS,
-                  TargetPlatform.macOS,
-                  TargetPlatform.windows
-                ].contains(platform ?? defaultTargetPlatform);
+                  [
+                    TargetPlatform.android,
+                    TargetPlatform.iOS,
+                    TargetPlatform.macOS,
+                    TargetPlatform.windows,
+                  ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.openDevTools:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.windows]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.windows,
+            ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.pageDown:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.android]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.android,
+            ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.pageUp:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.android]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.android,
+            ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.pause:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.android, TargetPlatform.windows]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.android,
+              TargetPlatform.windows,
+            ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.pauseAllMediaPlayback:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.iOS, TargetPlatform.macOS]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.iOS,
+              TargetPlatform.macOS,
+            ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.pauseTimers:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.android, TargetPlatform.iOS, TargetPlatform.macOS]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.android,
+              TargetPlatform.iOS,
+              TargetPlatform.macOS,
+            ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.postUrl:
         return kIsWeb && platform == null
             ? true
             : ((kIsWeb && platform != null) || !kIsWeb) &&
-                [
-                  TargetPlatform.android,
-                  TargetPlatform.iOS,
-                  TargetPlatform.macOS,
-                  TargetPlatform.windows
-                ].contains(platform ?? defaultTargetPlatform);
+                  [
+                    TargetPlatform.android,
+                    TargetPlatform.iOS,
+                    TargetPlatform.macOS,
+                    TargetPlatform.windows,
+                  ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.postWebMessage:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.android, TargetPlatform.iOS, TargetPlatform.macOS]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.android,
+              TargetPlatform.iOS,
+              TargetPlatform.macOS,
+            ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.printCurrentPage:
         return kIsWeb && platform == null
             ? true
             : ((kIsWeb && platform != null) || !kIsWeb) &&
-                [
-                  TargetPlatform.android,
-                  TargetPlatform.iOS,
-                  TargetPlatform.macOS
-                ].contains(platform ?? defaultTargetPlatform);
+                  [
+                    TargetPlatform.android,
+                    TargetPlatform.iOS,
+                    TargetPlatform.macOS,
+                  ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.reload:
         return kIsWeb && platform == null
             ? true
             : ((kIsWeb && platform != null) || !kIsWeb) &&
-                [
-                  TargetPlatform.android,
-                  TargetPlatform.iOS,
-                  TargetPlatform.macOS,
-                  TargetPlatform.windows
-                ].contains(platform ?? defaultTargetPlatform);
+                  [
+                    TargetPlatform.android,
+                    TargetPlatform.iOS,
+                    TargetPlatform.macOS,
+                    TargetPlatform.windows,
+                  ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.reloadFromOrigin:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.iOS, TargetPlatform.macOS]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.iOS,
+              TargetPlatform.macOS,
+            ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.removeAllUserScripts:
         return kIsWeb && platform == null
             ? true
             : ((kIsWeb && platform != null) || !kIsWeb) &&
-                [
-                  TargetPlatform.android,
-                  TargetPlatform.iOS,
-                  TargetPlatform.macOS,
-                  TargetPlatform.windows
-                ].contains(platform ?? defaultTargetPlatform);
+                  [
+                    TargetPlatform.android,
+                    TargetPlatform.iOS,
+                    TargetPlatform.macOS,
+                    TargetPlatform.windows,
+                  ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod
-            .removeDevToolsProtocolEventListener:
+          .removeDevToolsProtocolEventListener:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.windows]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.windows,
+            ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.removeJavaScriptHandler:
         return kIsWeb && platform == null
             ? true
             : ((kIsWeb && platform != null) || !kIsWeb) &&
-                [
-                  TargetPlatform.android,
-                  TargetPlatform.iOS,
-                  TargetPlatform.macOS,
-                  TargetPlatform.windows
-                ].contains(platform ?? defaultTargetPlatform);
+                  [
+                    TargetPlatform.android,
+                    TargetPlatform.iOS,
+                    TargetPlatform.macOS,
+                    TargetPlatform.windows,
+                  ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.removeUserScript:
         return kIsWeb && platform == null
             ? true
             : ((kIsWeb && platform != null) || !kIsWeb) &&
-                [
-                  TargetPlatform.android,
-                  TargetPlatform.iOS,
-                  TargetPlatform.macOS,
-                  TargetPlatform.windows
-                ].contains(platform ?? defaultTargetPlatform);
+                  [
+                    TargetPlatform.android,
+                    TargetPlatform.iOS,
+                    TargetPlatform.macOS,
+                    TargetPlatform.windows,
+                  ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.removeUserScripts:
         return kIsWeb && platform == null
             ? true
             : ((kIsWeb && platform != null) || !kIsWeb) &&
-                [
-                  TargetPlatform.android,
-                  TargetPlatform.iOS,
-                  TargetPlatform.macOS,
-                  TargetPlatform.windows
-                ].contains(platform ?? defaultTargetPlatform);
+                  [
+                    TargetPlatform.android,
+                    TargetPlatform.iOS,
+                    TargetPlatform.macOS,
+                    TargetPlatform.windows,
+                  ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.removeUserScriptsByGroupName:
         return kIsWeb && platform == null
             ? true
             : ((kIsWeb && platform != null) || !kIsWeb) &&
-                [
-                  TargetPlatform.android,
-                  TargetPlatform.iOS,
-                  TargetPlatform.macOS,
-                  TargetPlatform.windows
-                ].contains(platform ?? defaultTargetPlatform);
+                  [
+                    TargetPlatform.android,
+                    TargetPlatform.iOS,
+                    TargetPlatform.macOS,
+                    TargetPlatform.windows,
+                  ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.requestEnterFullscreen:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.linux].contains(platform ?? defaultTargetPlatform);
@@ -3031,20 +3106,29 @@ extension _PlatformInAppWebViewControllerMethodSupported
             [TargetPlatform.linux].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.requestFocus:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.android, TargetPlatform.iOS, TargetPlatform.macOS]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.android,
+              TargetPlatform.iOS,
+              TargetPlatform.macOS,
+            ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.requestFocusNodeHref:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.android, TargetPlatform.iOS]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.android,
+              TargetPlatform.iOS,
+            ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.requestImageRef:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.android, TargetPlatform.iOS]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.android,
+              TargetPlatform.iOS,
+            ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.requestMediaPlaybackState:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.iOS, TargetPlatform.macOS]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.iOS,
+              TargetPlatform.macOS,
+            ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.requestPointerLock:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.linux].contains(platform ?? defaultTargetPlatform);
@@ -3053,54 +3137,74 @@ extension _PlatformInAppWebViewControllerMethodSupported
             [TargetPlatform.linux].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.restoreState:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.android, TargetPlatform.iOS, TargetPlatform.macOS]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.android,
+              TargetPlatform.iOS,
+              TargetPlatform.macOS,
+            ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.resume:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.android, TargetPlatform.windows]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.android,
+              TargetPlatform.windows,
+            ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.resumeTimers:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.android, TargetPlatform.iOS, TargetPlatform.macOS]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.android,
+              TargetPlatform.iOS,
+              TargetPlatform.macOS,
+            ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.saveState:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.android, TargetPlatform.iOS, TargetPlatform.macOS]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.android,
+              TargetPlatform.iOS,
+              TargetPlatform.macOS,
+            ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.saveWebArchive:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.android, TargetPlatform.iOS, TargetPlatform.macOS]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.android,
+              TargetPlatform.iOS,
+              TargetPlatform.macOS,
+            ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.scrollBy:
         return kIsWeb && platform == null
             ? true
             : ((kIsWeb && platform != null) || !kIsWeb) &&
-                [
-                  TargetPlatform.android,
-                  TargetPlatform.iOS,
-                  TargetPlatform.macOS
-                ].contains(platform ?? defaultTargetPlatform);
+                  [
+                    TargetPlatform.android,
+                    TargetPlatform.iOS,
+                    TargetPlatform.macOS,
+                  ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.scrollTo:
         return kIsWeb && platform == null
             ? true
             : ((kIsWeb && platform != null) || !kIsWeb) &&
-                [
-                  TargetPlatform.android,
-                  TargetPlatform.iOS,
-                  TargetPlatform.macOS
-                ].contains(platform ?? defaultTargetPlatform);
+                  [
+                    TargetPlatform.android,
+                    TargetPlatform.iOS,
+                    TargetPlatform.macOS,
+                  ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.setAllMediaPlaybackSuspended:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.iOS, TargetPlatform.macOS]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.iOS,
+              TargetPlatform.macOS,
+            ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.setCameraCaptureState:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.iOS, TargetPlatform.macOS]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.iOS,
+              TargetPlatform.macOS,
+            ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.setContextMenu:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.android, TargetPlatform.iOS]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.android,
+              TargetPlatform.iOS,
+            ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.setInputMethodEnabled:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.iOS].contains(platform ?? defaultTargetPlatform);
@@ -3108,44 +3212,48 @@ extension _PlatformInAppWebViewControllerMethodSupported
         return kIsWeb && platform == null
             ? true
             : ((kIsWeb && platform != null) || !kIsWeb) &&
-                [
-                  TargetPlatform.android,
-                  TargetPlatform.iOS,
-                  TargetPlatform.macOS,
-                  TargetPlatform.windows
-                ].contains(platform ?? defaultTargetPlatform);
+                  [
+                    TargetPlatform.android,
+                    TargetPlatform.iOS,
+                    TargetPlatform.macOS,
+                    TargetPlatform.windows,
+                  ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.setMicrophoneCaptureState:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.iOS, TargetPlatform.macOS]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.iOS,
+              TargetPlatform.macOS,
+            ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.setOptions:
         return kIsWeb && platform == null
             ? true
             : ((kIsWeb && platform != null) || !kIsWeb) &&
-                [
-                  TargetPlatform.android,
-                  TargetPlatform.iOS,
-                  TargetPlatform.macOS,
-                  TargetPlatform.windows
-                ].contains(platform ?? defaultTargetPlatform);
+                  [
+                    TargetPlatform.android,
+                    TargetPlatform.iOS,
+                    TargetPlatform.macOS,
+                    TargetPlatform.windows,
+                  ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.setSafeBrowsingAllowlist:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.android]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.android,
+            ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.setSafeBrowsingWhitelist:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.android]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.android,
+            ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.setSettings:
         return kIsWeb && platform == null
             ? true
             : ((kIsWeb && platform != null) || !kIsWeb) &&
-                [
-                  TargetPlatform.android,
-                  TargetPlatform.iOS,
-                  TargetPlatform.macOS,
-                  TargetPlatform.windows
-                ].contains(platform ?? defaultTargetPlatform);
+                  [
+                    TargetPlatform.android,
+                    TargetPlatform.iOS,
+                    TargetPlatform.macOS,
+                    TargetPlatform.windows,
+                  ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.setTargetRefreshRate:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.linux].contains(platform ?? defaultTargetPlatform);
@@ -3154,46 +3262,53 @@ extension _PlatformInAppWebViewControllerMethodSupported
             [TargetPlatform.linux].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.setWebContentsDebuggingEnabled:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.android]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.android,
+            ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.showInputMethod:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.android]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.android,
+            ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.startSafeBrowsing:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.android]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.android,
+            ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.stopLoading:
         return kIsWeb && platform == null
             ? true
             : ((kIsWeb && platform != null) || !kIsWeb) &&
-                [
-                  TargetPlatform.android,
-                  TargetPlatform.iOS,
-                  TargetPlatform.macOS,
-                  TargetPlatform.windows
-                ].contains(platform ?? defaultTargetPlatform);
+                  [
+                    TargetPlatform.android,
+                    TargetPlatform.iOS,
+                    TargetPlatform.macOS,
+                    TargetPlatform.windows,
+                  ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.takeScreenshot:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
             [
               TargetPlatform.android,
               TargetPlatform.iOS,
               TargetPlatform.macOS,
-              TargetPlatform.windows
+              TargetPlatform.windows,
             ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.zoomBy:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.android, TargetPlatform.iOS]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.android,
+              TargetPlatform.iOS,
+            ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.zoomIn:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.android]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.android,
+            ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.zoomOut:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.android]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.android,
+            ].contains(platform ?? defaultTargetPlatform);
     }
   }
 }

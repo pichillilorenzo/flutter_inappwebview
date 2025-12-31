@@ -70,20 +70,25 @@ class ProcessGlobalConfigSettings {
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- Android WebView ([Official API - ProcessGlobalConfig.apply](https://developer.android.com/reference/androidx/webkit/ProcessGlobalConfig#apply(androidx.webkit.ProcessGlobalConfig)))
-  ProcessGlobalConfigSettings(
-      {this.dataDirectorySuffix, this.directoryBasePaths});
+  ProcessGlobalConfigSettings({
+    this.dataDirectorySuffix,
+    this.directoryBasePaths,
+  });
 
   ///Gets a possible [ProcessGlobalConfigSettings] instance from a [Map] value.
-  static ProcessGlobalConfigSettings? fromMap(Map<String, dynamic>? map,
-      {EnumMethod? enumMethod}) {
+  static ProcessGlobalConfigSettings? fromMap(
+    Map<String, dynamic>? map, {
+    EnumMethod? enumMethod,
+  }) {
     if (map == null) {
       return null;
     }
     final instance = ProcessGlobalConfigSettings(
       dataDirectorySuffix: map['dataDirectorySuffix'],
       directoryBasePaths: ProcessGlobalConfigDirectoryBasePaths.fromMap(
-          map['directoryBasePaths']?.cast<String, dynamic>(),
-          enumMethod: enumMethod),
+        map['directoryBasePaths']?.cast<String, dynamic>(),
+        enumMethod: enumMethod,
+      ),
     );
     return instance;
   }
@@ -93,16 +98,19 @@ class ProcessGlobalConfigSettings {
   ///{@endtemplate}
   static bool isClassSupported({TargetPlatform? platform}) =>
       _ProcessGlobalConfigSettingsClassSupported.isClassSupported(
-          platform: platform);
+        platform: platform,
+      );
 
   ///{@template flutter_inappwebview_platform_interface.ProcessGlobalConfigSettings.isPropertySupported}
   ///Check if the current class is supported by the [defaultTargetPlatform] or a specific [platform].
   ///{@endtemplate}
-  static bool isPropertySupported(ProcessGlobalConfigSettingsProperty property,
-          {TargetPlatform? platform}) =>
-      _ProcessGlobalConfigSettingsPropertySupported.isPropertySupported(
-          property,
-          platform: platform);
+  static bool isPropertySupported(
+    ProcessGlobalConfigSettingsProperty property, {
+    TargetPlatform? platform,
+  }) => _ProcessGlobalConfigSettingsPropertySupported.isPropertySupported(
+    property,
+    platform: platform,
+  );
 
   ///Converts instance to a map.
   Map<String, dynamic> toMap({EnumMethod? enumMethod}) {
@@ -139,14 +147,16 @@ class ProcessGlobalConfigDirectoryBasePaths {
 
   ///The absolute base path for the WebView data directory.
   String dataDirectoryBasePath;
-  ProcessGlobalConfigDirectoryBasePaths(
-      {required this.cacheDirectoryBasePath,
-      required this.dataDirectoryBasePath});
+  ProcessGlobalConfigDirectoryBasePaths({
+    required this.cacheDirectoryBasePath,
+    required this.dataDirectoryBasePath,
+  });
 
   ///Gets a possible [ProcessGlobalConfigDirectoryBasePaths] instance from a [Map] value.
   static ProcessGlobalConfigDirectoryBasePaths? fromMap(
-      Map<String, dynamic>? map,
-      {EnumMethod? enumMethod}) {
+    Map<String, dynamic>? map, {
+    EnumMethod? enumMethod,
+  }) {
     if (map == null) {
       return null;
     }
@@ -229,13 +239,16 @@ enum PlatformProcessGlobalConfigMethod {
 
 extension _PlatformProcessGlobalConfigMethodSupported
     on PlatformProcessGlobalConfig {
-  static bool isMethodSupported(PlatformProcessGlobalConfigMethod method,
-      {TargetPlatform? platform}) {
+  static bool isMethodSupported(
+    PlatformProcessGlobalConfigMethod method, {
+    TargetPlatform? platform,
+  }) {
     switch (method) {
       case PlatformProcessGlobalConfigMethod.apply:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.android]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.android,
+            ].contains(platform ?? defaultTargetPlatform);
     }
   }
 }
@@ -284,17 +297,21 @@ enum ProcessGlobalConfigSettingsProperty {
 
 extension _ProcessGlobalConfigSettingsPropertySupported
     on ProcessGlobalConfigSettings {
-  static bool isPropertySupported(ProcessGlobalConfigSettingsProperty property,
-      {TargetPlatform? platform}) {
+  static bool isPropertySupported(
+    ProcessGlobalConfigSettingsProperty property, {
+    TargetPlatform? platform,
+  }) {
     switch (property) {
       case ProcessGlobalConfigSettingsProperty.dataDirectorySuffix:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.android]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.android,
+            ].contains(platform ?? defaultTargetPlatform);
       case ProcessGlobalConfigSettingsProperty.directoryBasePaths:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.android]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.android,
+            ].contains(platform ?? defaultTargetPlatform);
     }
   }
 }

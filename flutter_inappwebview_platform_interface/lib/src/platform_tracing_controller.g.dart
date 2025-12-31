@@ -39,31 +39,37 @@ class TracingSettings {
   ///- Android WebView ([Official API - TracingConfig](https://developer.android.com/reference/androidx/webkit/TracingConfig))
   TracingSettings({this.categories = const [], this.tracingMode}) {
     assert(
-        this
-            .categories
-            .map((e) =>
-                e.runtimeType is String || e.runtimeType is TracingCategory)
-            .contains(false),
-        "categories must contain only String or TracingCategory items");
+      this.categories
+          .map(
+            (e) => e.runtimeType is String || e.runtimeType is TracingCategory,
+          )
+          .contains(false),
+      "categories must contain only String or TracingCategory items",
+    );
   }
 
   ///Gets a possible [TracingSettings] instance from a [Map] value.
-  static TracingSettings? fromMap(Map<String, dynamic>? map,
-      {EnumMethod? enumMethod}) {
+  static TracingSettings? fromMap(
+    Map<String, dynamic>? map, {
+    EnumMethod? enumMethod,
+  }) {
     if (map == null) {
       return null;
     }
     final instance = TracingSettings(
       tracingMode: switch (enumMethod ?? EnumMethod.nativeValue) {
-        EnumMethod.nativeValue =>
-          TracingMode.fromNativeValue(map['tracingMode']),
+        EnumMethod.nativeValue => TracingMode.fromNativeValue(
+          map['tracingMode'],
+        ),
         EnumMethod.value => TracingMode.fromValue(map['tracingMode']),
-        EnumMethod.name => TracingMode.byName(map['tracingMode'])
+        EnumMethod.name => TracingMode.byName(map['tracingMode']),
       },
     );
     if (map['categories'] != null) {
-      instance.categories =
-          _deserializeCategories(map['categories'], enumMethod: enumMethod);
+      instance.categories = _deserializeCategories(
+        map['categories'],
+        enumMethod: enumMethod,
+      );
     }
     return instance;
   }
@@ -77,10 +83,13 @@ class TracingSettings {
   ///{@template flutter_inappwebview_platform_interface.TracingSettings.isPropertySupported}
   ///Check if the current class is supported by the [defaultTargetPlatform] or a specific [platform].
   ///{@endtemplate}
-  static bool isPropertySupported(TracingSettingsProperty property,
-          {TargetPlatform? platform}) =>
-      _TracingSettingsPropertySupported.isPropertySupported(property,
-          platform: platform);
+  static bool isPropertySupported(
+    TracingSettingsProperty property, {
+    TargetPlatform? platform,
+  }) => _TracingSettingsPropertySupported.isPropertySupported(
+    property,
+    platform: platform,
+  );
 
   ///Converts instance to a map.
   Map<String, dynamic> toMap({EnumMethod? enumMethod}) {
@@ -89,7 +98,7 @@ class TracingSettings {
       "tracingMode": switch (enumMethod ?? EnumMethod.nativeValue) {
         EnumMethod.nativeValue => tracingMode?.toNativeValue(),
         EnumMethod.value => tracingMode?.toValue(),
-        EnumMethod.name => tracingMode?.name()
+        EnumMethod.name => tracingMode?.name(),
       },
     };
   }
@@ -188,21 +197,26 @@ enum PlatformTracingControllerMethod {
 
 extension _PlatformTracingControllerMethodSupported
     on PlatformTracingController {
-  static bool isMethodSupported(PlatformTracingControllerMethod method,
-      {TargetPlatform? platform}) {
+  static bool isMethodSupported(
+    PlatformTracingControllerMethod method, {
+    TargetPlatform? platform,
+  }) {
     switch (method) {
       case PlatformTracingControllerMethod.isTracing:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.android]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.android,
+            ].contains(platform ?? defaultTargetPlatform);
       case PlatformTracingControllerMethod.start:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.android]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.android,
+            ].contains(platform ?? defaultTargetPlatform);
       case PlatformTracingControllerMethod.stop:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.android]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.android,
+            ].contains(platform ?? defaultTargetPlatform);
     }
   }
 }
@@ -236,13 +250,16 @@ enum TracingSettingsProperty {
 }
 
 extension _TracingSettingsPropertySupported on TracingSettings {
-  static bool isPropertySupported(TracingSettingsProperty property,
-      {TargetPlatform? platform}) {
+  static bool isPropertySupported(
+    TracingSettingsProperty property, {
+    TargetPlatform? platform,
+  }) {
     switch (property) {
       case TracingSettingsProperty.tracingMode:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.android]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.android,
+            ].contains(platform ?? defaultTargetPlatform);
     }
   }
 }

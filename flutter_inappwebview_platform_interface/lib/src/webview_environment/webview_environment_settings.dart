@@ -31,13 +31,16 @@ class WebViewEnvironmentSettings_ {
   ///The default channel search order is the WebView2 Runtime, Beta, Dev, and Canary.
   ///When an override `WEBVIEW2_RELEASE_CHANNEL_PREFERENCE` environment variable or
   ///applicable `releaseChannelPreference` registry value is set to `1`, the channel search order is reversed.
-  @SupportedPlatforms(platforms: [
-    WindowsPlatform(
+  @SupportedPlatforms(
+    platforms: [
+      WindowsPlatform(
         apiName:
             'CreateCoreWebView2EnvironmentWithOptions.browserExecutableFolder',
         apiUrl:
-            'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2210.55#createcorewebview2environmentwithoptions')
-  ])
+            'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2210.55#createcorewebview2environmentwithoptions',
+      ),
+    ],
+  )
   final String? browserExecutableFolder;
 
   ///You may specify the [userDataFolder] to change the default user data folder location for WebView2.
@@ -54,80 +57,101 @@ class WebViewEnvironmentSettings_ {
   ///WebView creation fails with `HRESULT_FROM_WIN32(ERROR_INVALID_STATE)` if the specified
   ///options does not match the options of the WebViews that are currently
   ///running in the shared browser process.
-  @SupportedPlatforms(platforms: [
-    WindowsPlatform(
+  @SupportedPlatforms(
+    platforms: [
+      WindowsPlatform(
         apiName: 'CreateCoreWebView2EnvironmentWithOptions.userDataFolder',
         apiUrl:
-            'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2210.55#createcorewebview2environmentwithoptions')
-  ])
+            'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2210.55#createcorewebview2environmentwithoptions',
+      ),
+    ],
+  )
   final String? userDataFolder;
 
   ///If there are multiple switches, there should be a space in between them.
   ///The one exception is if multiple features are being enabled/disabled for a single switch,
   ///in which case the features should be comma-seperated.
   ///Example: `"--disable-features=feature1,feature2 --some-other-switch --do-something"`
-  @SupportedPlatforms(platforms: [
-    WindowsPlatform(
+  @SupportedPlatforms(
+    platforms: [
+      WindowsPlatform(
         apiName:
             'ICoreWebView2EnvironmentOptions.put_AdditionalBrowserArguments',
         apiUrl:
-            'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2environmentoptions?view=webview2-1.0.2210.55#put_additionalbrowserarguments')
-  ])
+            'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2environmentoptions?view=webview2-1.0.2210.55#put_additionalbrowserarguments',
+      ),
+    ],
+  )
   final String? additionalBrowserArguments;
 
   ///This property is used to enable single sign on with Azure Active Directory (AAD)
   ///and personal Microsoft Account (MSA) resources inside WebView.
-  @SupportedPlatforms(platforms: [
-    WindowsPlatform(
+  @SupportedPlatforms(
+    platforms: [
+      WindowsPlatform(
         apiName:
             'ICoreWebView2EnvironmentOptions.put_AllowSingleSignOnUsingOSPrimaryAccount',
         apiUrl:
-            'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2environmentoptions?view=webview2-1.0.2210.55#put_allowsinglesignonusingosprimaryaccount')
-  ])
+            'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2environmentoptions?view=webview2-1.0.2210.55#put_allowsinglesignonusingosprimaryaccount',
+      ),
+    ],
+  )
   final bool? allowSingleSignOnUsingOSPrimaryAccount;
 
   ///The default display language for WebView.
-  @SupportedPlatforms(platforms: [
-    WindowsPlatform(
+  @SupportedPlatforms(
+    platforms: [
+      WindowsPlatform(
         apiName: 'ICoreWebView2EnvironmentOptions.put_Language',
         apiUrl:
-            'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2environmentoptions?view=webview2-1.0.2210.55#put_language')
-  ])
+            'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2environmentoptions?view=webview2-1.0.2210.55#put_language',
+      ),
+    ],
+  )
   final String? language;
 
   ///Specifies the version of the WebView2 Runtime binaries required to be compatible with your app.
-  @SupportedPlatforms(platforms: [
-    WindowsPlatform(
+  @SupportedPlatforms(
+    platforms: [
+      WindowsPlatform(
         apiName:
             'ICoreWebView2EnvironmentOptions.put_TargetCompatibleBrowserVersion',
         apiUrl:
-            'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2environmentoptions?view=webview2-1.0.2210.55#put_targetcompatiblebrowserversion')
-  ])
+            'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2environmentoptions?view=webview2-1.0.2210.55#put_targetcompatiblebrowserversion',
+      ),
+    ],
+  )
   final String? targetCompatibleBrowserVersion;
 
   ///Set the array of custom scheme registrations to be used.
-  @SupportedPlatforms(platforms: [
-    WindowsPlatform(
+  @SupportedPlatforms(
+    platforms: [
+      WindowsPlatform(
         available: '1.0.1587.40',
         apiName:
             'ICoreWebView2EnvironmentOptions4.SetCustomSchemeRegistrations',
         apiUrl:
-            'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2environmentoptions4?view=webview2-1.0.2739.15#setcustomschemeregistrations')
-  ])
+            'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2environmentoptions4?view=webview2-1.0.2739.15#setcustomschemeregistrations',
+      ),
+    ],
+  )
   final List<CustomSchemeRegistration_>? customSchemeRegistrations;
 
   ///Whether other processes can create WebView2 from WebView2Environment created
   ///with the same user data folder and therefore sharing the same WebView browser process instance.
   ///
   ///The default value is `false`.
-  @SupportedPlatforms(platforms: [
-    WindowsPlatform(
+  @SupportedPlatforms(
+    platforms: [
+      WindowsPlatform(
         available: '1.0.1185.39',
         apiName:
             'ICoreWebView2EnvironmentOptions2.put_ExclusiveUserDataFolderAccess',
         apiUrl:
-            'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2environmentoptions2?view=webview2-1.0.2849.39#put_exclusiveuserdatafolderaccess')
-  ])
+            'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2environmentoptions2?view=webview2-1.0.2849.39#put_exclusiveuserdatafolderaccess',
+      ),
+    ],
+  )
   final bool? exclusiveUserDataFolderAccess;
 
   ///When IsCustomCrashReportingEnabled is set to `true`,
@@ -135,14 +159,17 @@ class WebViewEnvironmentSettings_ {
   ///
   ///The default value is `false`.
   ///In this case, WebView will respect OS consent.
-  @SupportedPlatforms(platforms: [
-    WindowsPlatform(
+  @SupportedPlatforms(
+    platforms: [
+      WindowsPlatform(
         available: '1.0.1518.46',
         apiName:
             'ICoreWebView2EnvironmentOptions3.put_IsCustomCrashReportingEnabled',
         apiUrl:
-            'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2environmentoptions3?view=webview2-1.0.2849.39#put_iscustomcrashreportingenabled')
-  ])
+            'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2environmentoptions3?view=webview2-1.0.2849.39#put_iscustomcrashreportingenabled',
+      ),
+    ],
+  )
   final bool? isCustomCrashReportingEnabled;
 
   ///This property is used to enable/disable tracking prevention feature in WebView2.
@@ -160,14 +187,17 @@ class WebViewEnvironmentSettings_ {
   ///Tracking prevention protects users from online tracking by restricting the ability
   ///of trackers to access browser-based storage as well as the network.
   ///See [Tracking prevention](https://learn.microsoft.com/en-us/microsoft-edge/web-platform/tracking-prevention).
-  @SupportedPlatforms(platforms: [
-    WindowsPlatform(
+  @SupportedPlatforms(
+    platforms: [
+      WindowsPlatform(
         available: '1.0.1661.34',
         apiName:
             'ICoreWebView2EnvironmentOptions5.put_EnableTrackingPrevention',
         apiUrl:
-            'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2environmentoptions5?view=webview2-1.0.2849.39#put_enabletrackingprevention')
-  ])
+            'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2environmentoptions5?view=webview2-1.0.2849.39#put_enabletrackingprevention',
+      ),
+    ],
+  )
   final bool? enableTrackingPrevention;
 
   ///When this property is set to `true` new extensions can be added to user profile and used.
@@ -176,14 +206,17 @@ class WebViewEnvironmentSettings_ {
   ///and already installed extension won't be available to use in user profile.
   ///If connecting to an already running environment with a different value for
   ///[areBrowserExtensionsEnabled] property, it will fail with `HRESULT_FROM_WIN32(ERROR_INVALID_STATE)`.
-  @SupportedPlatforms(platforms: [
-    WindowsPlatform(
+  @SupportedPlatforms(
+    platforms: [
+      WindowsPlatform(
         available: '1.0.2210.55',
         apiName:
             'ICoreWebView2EnvironmentOptions6.put_AreBrowserExtensionsEnabled',
         apiUrl:
-            'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2environmentoptions6?view=webview2-1.0.2849.39#put_arebrowserextensionsenabled')
-  ])
+            'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2environmentoptions6?view=webview2-1.0.2849.39#put_arebrowserextensionsenabled',
+      ),
+    ],
+  )
   final bool? areBrowserExtensionsEnabled;
 
   ///This property is [EnvironmentChannelSearchKind.MOST_STABLE] by default;
@@ -199,13 +232,16 @@ class WebViewEnvironmentSettings_ {
   ///This property can be overridden by the corresponding registry key [channelSearchKind]
   ///or the environment variable `WEBVIEW2_CHANNEL_SEARCH_KIND`.
   ///Set the value to `1` to set the search kind to [EnvironmentChannelSearchKind.LEAST_STABLE].
-  @SupportedPlatforms(platforms: [
-    WindowsPlatform(
+  @SupportedPlatforms(
+    platforms: [
+      WindowsPlatform(
         available: '1.0.2478.35',
         apiName: 'ICoreWebView2EnvironmentOptions7.put_ChannelSearchKind',
         apiUrl:
-            'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2environmentoptions7?view=webview2-1.0.2849.39#put_channelsearchkind')
-  ])
+            'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2environmentoptions7?view=webview2-1.0.2849.39#put_channelsearchkind',
+      ),
+    ],
+  )
   final EnvironmentChannelSearchKind_? channelSearchKind;
 
   ///Sets the [releaseChannels], which is a mask of one or more [EnvironmentReleaseChannels]
@@ -242,13 +278,16 @@ class WebViewEnvironmentSettings_ {
   ///For example, the values "0,2" and "2,0" indicate that environment creation should only search for
   ///Dev channel and the WebView2 Runtime, using the order indicated by [channelSearchKind].
   ///[PlatformWebViewEnvironment] creation attempts to interpret each integer and treats any invalid entry as Stable channel.
-  @SupportedPlatforms(platforms: [
-    WindowsPlatform(
+  @SupportedPlatforms(
+    platforms: [
+      WindowsPlatform(
         available: '1.0.2478.35',
         apiName: 'ICoreWebView2EnvironmentOptions7.put_ReleaseChannels',
         apiUrl:
-            'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2environmentoptions7?view=webview2-1.0.2849.39#put_releasechannels')
-  ])
+            'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2environmentoptions7?view=webview2-1.0.2849.39#put_releasechannels',
+      ),
+    ],
+  )
   final EnvironmentReleaseChannels_? releaseChannels;
 
   ///The ScrollBar style being set on the WebView2 Environment.
@@ -258,13 +297,16 @@ class WebViewEnvironmentSettings_ {
   ///page to allow ScrollBar to follow light or dark theme.
   ///Please see [color-scheme](https://developer.mozilla.org/docs/Web/CSS/color-scheme#declaring_color_scheme_preferences) for how `color-scheme` can be set.
   ///CSS styles that modify the ScrollBar applied on top of native ScrollBar styling that is selected with [scrollbarStyle].
-  @SupportedPlatforms(platforms: [
-    WindowsPlatform(
+  @SupportedPlatforms(
+    platforms: [
+      WindowsPlatform(
         available: '1.0.2535.41',
         apiName: 'ICoreWebView2EnvironmentOptions8.put_ScrollBarStyle',
         apiUrl:
-            'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2environmentoptions8?view=webview2-1.0.2849.39#put_scrollbarstyle')
-  ])
+            'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2environmentoptions8?view=webview2-1.0.2849.39#put_scrollbarstyle',
+      ),
+    ],
+  )
   final EnvironmentScrollbarStyle_? scrollbarStyle;
 
   WebViewEnvironmentSettings_({

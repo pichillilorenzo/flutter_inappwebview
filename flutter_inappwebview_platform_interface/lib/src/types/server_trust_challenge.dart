@@ -11,5 +11,5 @@ part 'server_trust_challenge.g.dart';
 @ExchangeableObject()
 class ServerTrustChallenge_ extends URLAuthenticationChallenge_ {
   ServerTrustChallenge_({required URLProtectionSpace_ protectionSpace})
-      : super(protectionSpace: protectionSpace);
+    : super(protectionSpace: protectionSpace);
 }

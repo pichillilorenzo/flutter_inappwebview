@@ -12,19 +12,24 @@ class WebStorageType {
   final String _value;
   final String _nativeValue;
   const WebStorageType._internal(this._value, this._nativeValue);
-// ignore: unused_element
+  // ignore: unused_element
   factory WebStorageType._internalMultiPlatform(
-          String value, Function nativeValue) =>
-      WebStorageType._internal(value, nativeValue());
+    String value,
+    Function nativeValue,
+  ) => WebStorageType._internal(value, nativeValue());
 
   ///`window.localStorage`: same as [SESSION_STORAGE], but persists even when the browser is closed and reopened.
-  static const LOCAL_STORAGE =
-      WebStorageType._internal('localStorage', 'localStorage');
+  static const LOCAL_STORAGE = WebStorageType._internal(
+    'localStorage',
+    'localStorage',
+  );
 
   ///`window.sessionStorage`: maintains a separate storage area for each given origin that's available for the duration
   ///of the page session (as long as the browser is open, including page reloads and restores).
-  static const SESSION_STORAGE =
-      WebStorageType._internal('sessionStorage', 'sessionStorage');
+  static const SESSION_STORAGE = WebStorageType._internal(
+    'sessionStorage',
+    'sessionStorage',
+  );
 
   ///Set of all values of [WebStorageType].
   static final Set<WebStorageType> values = [
@@ -36,8 +41,9 @@ class WebStorageType {
   static WebStorageType? fromValue(String? value) {
     if (value != null) {
       try {
-        return WebStorageType.values
-            .firstWhere((element) => element.toValue() == value);
+        return WebStorageType.values.firstWhere(
+          (element) => element.toValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -49,8 +55,9 @@ class WebStorageType {
   static WebStorageType? fromNativeValue(String? value) {
     if (value != null) {
       try {
-        return WebStorageType.values
-            .firstWhere((element) => element.toNativeValue() == value);
+        return WebStorageType.values.firstWhere(
+          (element) => element.toNativeValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -66,8 +73,9 @@ class WebStorageType {
   static WebStorageType? byName(String? name) {
     if (name != null) {
       try {
-        return WebStorageType.values
-            .firstWhere((element) => element.name() == name);
+        return WebStorageType.values.firstWhere(
+          (element) => element.name() == name,
+        );
       } catch (e) {
         return null;
       }
@@ -84,8 +92,8 @@ class WebStorageType {
   /// same value, or being values of different enum type), at most one of
   /// them will be represented in the returned map.
   static Map<String, WebStorageType> asNameMap() => <String, WebStorageType>{
-        for (final value in WebStorageType.values) value.name(): value
-      };
+    for (final value in WebStorageType.values) value.name(): value,
+  };
 
   ///Gets [String] value.
   String toValue() => _value;

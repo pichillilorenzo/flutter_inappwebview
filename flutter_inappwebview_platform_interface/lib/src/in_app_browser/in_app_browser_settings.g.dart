@@ -219,39 +219,42 @@ class InAppBrowserSettings
   ///- iOS WKWebView
   ///- macOS WKWebView
   ///- Windows WebView2
-  InAppBrowserSettings(
-      {this.allowGoBackWithBackButton = true,
-      this.closeButtonCaption,
-      this.closeButtonColor,
-      this.closeOnCannotGoBack = true,
-      this.hidden = false,
-      this.hideCloseButton = false,
-      this.hideDefaultMenuItems = false,
-      this.hideProgressBar = false,
-      this.hideTitleBar = false,
-      this.hideToolbarBottom = false,
-      this.hideToolbarTop = false,
-      this.hideUrlBar = false,
-      this.menuButtonColor,
-      this.presentationStyle = ModalPresentationStyle.FULL_SCREEN,
-      this.shouldCloseOnBackButtonPressed = false,
-      this.toolbarBottomBackgroundColor,
-      this.toolbarBottomTintColor,
-      this.toolbarBottomTranslucent = true,
-      this.toolbarTopBackgroundColor,
-      this.toolbarTopFixedTitle,
-      this.toolbarTopTintColor,
-      this.toolbarTopTranslucent = true,
-      this.transitionStyle = ModalTransitionStyle.COVER_VERTICAL,
-      this.windowAlphaValue = 1.0,
-      this.windowFrame,
-      this.windowStyleMask,
-      this.windowTitlebarSeparatorStyle,
-      this.windowType});
+  InAppBrowserSettings({
+    this.allowGoBackWithBackButton = true,
+    this.closeButtonCaption,
+    this.closeButtonColor,
+    this.closeOnCannotGoBack = true,
+    this.hidden = false,
+    this.hideCloseButton = false,
+    this.hideDefaultMenuItems = false,
+    this.hideProgressBar = false,
+    this.hideTitleBar = false,
+    this.hideToolbarBottom = false,
+    this.hideToolbarTop = false,
+    this.hideUrlBar = false,
+    this.menuButtonColor,
+    this.presentationStyle = ModalPresentationStyle.FULL_SCREEN,
+    this.shouldCloseOnBackButtonPressed = false,
+    this.toolbarBottomBackgroundColor,
+    this.toolbarBottomTintColor,
+    this.toolbarBottomTranslucent = true,
+    this.toolbarTopBackgroundColor,
+    this.toolbarTopFixedTitle,
+    this.toolbarTopTintColor,
+    this.toolbarTopTranslucent = true,
+    this.transitionStyle = ModalTransitionStyle.COVER_VERTICAL,
+    this.windowAlphaValue = 1.0,
+    this.windowFrame,
+    this.windowStyleMask,
+    this.windowTitlebarSeparatorStyle,
+    this.windowType,
+  });
 
   ///Gets a possible [InAppBrowserSettings] instance from a [Map] value.
-  static InAppBrowserSettings? fromMap(Map<String, dynamic>? map,
-      {EnumMethod? enumMethod}) {
+  static InAppBrowserSettings? fromMap(
+    Map<String, dynamic>? map, {
+    EnumMethod? enumMethod,
+  }) {
     if (map == null) {
       return null;
     }
@@ -265,7 +268,8 @@ class InAppBrowserSettings
           : null,
       toolbarBottomBackgroundColor: map['toolbarBottomBackgroundColor'] != null
           ? UtilColor.fromStringRepresentation(
-              map['toolbarBottomBackgroundColor'])
+              map['toolbarBottomBackgroundColor'],
+            )
           : null,
       toolbarBottomTintColor: map['toolbarBottomTintColor'] != null
           ? UtilColor.fromStringRepresentation(map['toolbarBottomTintColor'])
@@ -278,27 +282,32 @@ class InAppBrowserSettings
           ? UtilColor.fromStringRepresentation(map['toolbarTopTintColor'])
           : null,
       windowFrame: InAppWebViewRect.fromMap(
-          map['windowFrame']?.cast<String, dynamic>(),
-          enumMethod: enumMethod),
+        map['windowFrame']?.cast<String, dynamic>(),
+        enumMethod: enumMethod,
+      ),
       windowStyleMask: switch (enumMethod ?? EnumMethod.nativeValue) {
-        EnumMethod.nativeValue =>
-          WindowStyleMask.fromNativeValue(map['windowStyleMask']),
+        EnumMethod.nativeValue => WindowStyleMask.fromNativeValue(
+          map['windowStyleMask'],
+        ),
         EnumMethod.value => WindowStyleMask.fromValue(map['windowStyleMask']),
-        EnumMethod.name => WindowStyleMask.byName(map['windowStyleMask'])
+        EnumMethod.name => WindowStyleMask.byName(map['windowStyleMask']),
       },
-      windowTitlebarSeparatorStyle: switch (
-          enumMethod ?? EnumMethod.nativeValue) {
+      windowTitlebarSeparatorStyle: switch (enumMethod ??
+          EnumMethod.nativeValue) {
         EnumMethod.nativeValue => WindowTitlebarSeparatorStyle.fromNativeValue(
-            map['windowTitlebarSeparatorStyle']),
+          map['windowTitlebarSeparatorStyle'],
+        ),
         EnumMethod.value => WindowTitlebarSeparatorStyle.fromValue(
-            map['windowTitlebarSeparatorStyle']),
+          map['windowTitlebarSeparatorStyle'],
+        ),
         EnumMethod.name => WindowTitlebarSeparatorStyle.byName(
-            map['windowTitlebarSeparatorStyle'])
+          map['windowTitlebarSeparatorStyle'],
+        ),
       },
       windowType: switch (enumMethod ?? EnumMethod.nativeValue) {
         EnumMethod.nativeValue => WindowType.fromNativeValue(map['windowType']),
         EnumMethod.value => WindowType.fromValue(map['windowType']),
-        EnumMethod.name => WindowType.byName(map['windowType'])
+        EnumMethod.name => WindowType.byName(map['windowType']),
       },
     );
     instance.allowGoBackWithBackButton = map['allowGoBackWithBackButton'];
@@ -312,11 +321,15 @@ class InAppBrowserSettings
     instance.hideToolbarTop = map['hideToolbarTop'];
     instance.hideUrlBar = map['hideUrlBar'];
     instance.presentationStyle = switch (enumMethod ?? EnumMethod.nativeValue) {
-      EnumMethod.nativeValue =>
-        ModalPresentationStyle.fromNativeValue(map['presentationStyle']),
-      EnumMethod.value =>
-        ModalPresentationStyle.fromValue(map['presentationStyle']),
-      EnumMethod.name => ModalPresentationStyle.byName(map['presentationStyle'])
+      EnumMethod.nativeValue => ModalPresentationStyle.fromNativeValue(
+        map['presentationStyle'],
+      ),
+      EnumMethod.value => ModalPresentationStyle.fromValue(
+        map['presentationStyle'],
+      ),
+      EnumMethod.name => ModalPresentationStyle.byName(
+        map['presentationStyle'],
+      ),
     };
     instance.shouldCloseOnBackButtonPressed =
         map['shouldCloseOnBackButtonPressed'];
@@ -326,21 +339,26 @@ class InAppBrowserSettings
         : null;
     instance.toolbarTopTranslucent = map['toolbarTopTranslucent'];
     instance.transitionStyle = switch (enumMethod ?? EnumMethod.nativeValue) {
-      EnumMethod.nativeValue =>
-        ModalTransitionStyle.fromNativeValue(map['transitionStyle']),
-      EnumMethod.value =>
-        ModalTransitionStyle.fromValue(map['transitionStyle']),
-      EnumMethod.name => ModalTransitionStyle.byName(map['transitionStyle'])
+      EnumMethod.nativeValue => ModalTransitionStyle.fromNativeValue(
+        map['transitionStyle'],
+      ),
+      EnumMethod.value => ModalTransitionStyle.fromValue(
+        map['transitionStyle'],
+      ),
+      EnumMethod.name => ModalTransitionStyle.byName(map['transitionStyle']),
     };
     instance.windowAlphaValue = map['windowAlphaValue'];
     return instance;
   }
 
   ///Check if the given [property] is supported by the [defaultTargetPlatform] or a specific [platform].
-  static bool isPropertySupported(InAppBrowserSettingsProperty property,
-          {TargetPlatform? platform}) =>
-      _InAppBrowserSettingsPropertySupported.isPropertySupported(property,
-          platform: platform);
+  static bool isPropertySupported(
+    InAppBrowserSettingsProperty property, {
+    TargetPlatform? platform,
+  }) => _InAppBrowserSettingsPropertySupported.isPropertySupported(
+    property,
+    platform: platform,
+  );
 
   ///Converts instance to a map.
   Map<String, dynamic> toMap({EnumMethod? enumMethod}) {
@@ -361,7 +379,7 @@ class InAppBrowserSettings
       "presentationStyle": switch (enumMethod ?? EnumMethod.nativeValue) {
         EnumMethod.nativeValue => presentationStyle?.toNativeValue(),
         EnumMethod.value => presentationStyle?.toValue(),
-        EnumMethod.name => presentationStyle?.name()
+        EnumMethod.name => presentationStyle?.name(),
       },
       "shouldCloseOnBackButtonPressed": shouldCloseOnBackButtonPressed,
       "toolbarBottomBackgroundColor": toolbarBottomBackgroundColor?.toHex(),
@@ -375,25 +393,25 @@ class InAppBrowserSettings
       "transitionStyle": switch (enumMethod ?? EnumMethod.nativeValue) {
         EnumMethod.nativeValue => transitionStyle?.toNativeValue(),
         EnumMethod.value => transitionStyle?.toValue(),
-        EnumMethod.name => transitionStyle?.name()
+        EnumMethod.name => transitionStyle?.name(),
       },
       "windowAlphaValue": windowAlphaValue,
       "windowFrame": windowFrame?.toMap(enumMethod: enumMethod),
       "windowStyleMask": switch (enumMethod ?? EnumMethod.nativeValue) {
         EnumMethod.nativeValue => windowStyleMask?.toNativeValue(),
         EnumMethod.value => windowStyleMask?.toValue(),
-        EnumMethod.name => windowStyleMask?.name()
+        EnumMethod.name => windowStyleMask?.name(),
       },
-      "windowTitlebarSeparatorStyle": switch (
-          enumMethod ?? EnumMethod.nativeValue) {
+      "windowTitlebarSeparatorStyle": switch (enumMethod ??
+          EnumMethod.nativeValue) {
         EnumMethod.nativeValue => windowTitlebarSeparatorStyle?.toNativeValue(),
         EnumMethod.value => windowTitlebarSeparatorStyle?.toValue(),
-        EnumMethod.name => windowTitlebarSeparatorStyle?.name()
+        EnumMethod.name => windowTitlebarSeparatorStyle?.name(),
       },
       "windowType": switch (enumMethod ?? EnumMethod.nativeValue) {
         EnumMethod.nativeValue => windowType?.toNativeValue(),
         EnumMethod.value => windowType?.toValue(),
-        EnumMethod.name => windowType?.name()
+        EnumMethod.name => windowType?.name(),
       },
     };
   }
@@ -759,13 +777,16 @@ enum InAppBrowserSettingsProperty {
 }
 
 extension _InAppBrowserSettingsPropertySupported on InAppBrowserSettings {
-  static bool isPropertySupported(InAppBrowserSettingsProperty property,
-      {TargetPlatform? platform}) {
+  static bool isPropertySupported(
+    InAppBrowserSettingsProperty property, {
+    TargetPlatform? platform,
+  }) {
     switch (property) {
       case InAppBrowserSettingsProperty.allowGoBackWithBackButton:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.android]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.android,
+            ].contains(platform ?? defaultTargetPlatform);
       case InAppBrowserSettingsProperty.closeButtonCaption:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.iOS].contains(platform ?? defaultTargetPlatform);
@@ -774,42 +795,56 @@ extension _InAppBrowserSettingsPropertySupported on InAppBrowserSettings {
             [TargetPlatform.iOS].contains(platform ?? defaultTargetPlatform);
       case InAppBrowserSettingsProperty.closeOnCannotGoBack:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.android]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.android,
+            ].contains(platform ?? defaultTargetPlatform);
       case InAppBrowserSettingsProperty.hidden:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
             [
               TargetPlatform.android,
               TargetPlatform.iOS,
               TargetPlatform.macOS,
-              TargetPlatform.windows
+              TargetPlatform.windows,
             ].contains(platform ?? defaultTargetPlatform);
       case InAppBrowserSettingsProperty.hideCloseButton:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.iOS].contains(platform ?? defaultTargetPlatform);
       case InAppBrowserSettingsProperty.hideDefaultMenuItems:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.android, TargetPlatform.iOS, TargetPlatform.macOS]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.android,
+              TargetPlatform.iOS,
+              TargetPlatform.macOS,
+            ].contains(platform ?? defaultTargetPlatform);
       case InAppBrowserSettingsProperty.hideProgressBar:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.android, TargetPlatform.iOS, TargetPlatform.macOS]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.android,
+              TargetPlatform.iOS,
+              TargetPlatform.macOS,
+            ].contains(platform ?? defaultTargetPlatform);
       case InAppBrowserSettingsProperty.hideTitleBar:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.android]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.android,
+            ].contains(platform ?? defaultTargetPlatform);
       case InAppBrowserSettingsProperty.hideToolbarBottom:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.iOS].contains(platform ?? defaultTargetPlatform);
       case InAppBrowserSettingsProperty.hideToolbarTop:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.android, TargetPlatform.iOS, TargetPlatform.macOS]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.android,
+              TargetPlatform.iOS,
+              TargetPlatform.macOS,
+            ].contains(platform ?? defaultTargetPlatform);
       case InAppBrowserSettingsProperty.hideUrlBar:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.android, TargetPlatform.iOS, TargetPlatform.macOS]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.android,
+              TargetPlatform.iOS,
+              TargetPlatform.macOS,
+            ].contains(platform ?? defaultTargetPlatform);
       case InAppBrowserSettingsProperty.menuButtonColor:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.iOS].contains(platform ?? defaultTargetPlatform);
@@ -818,8 +853,9 @@ extension _InAppBrowserSettingsPropertySupported on InAppBrowserSettings {
             [TargetPlatform.iOS].contains(platform ?? defaultTargetPlatform);
       case InAppBrowserSettingsProperty.shouldCloseOnBackButtonPressed:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.android]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.android,
+            ].contains(platform ?? defaultTargetPlatform);
       case InAppBrowserSettingsProperty.toolbarBottomBackgroundColor:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.iOS].contains(platform ?? defaultTargetPlatform);
@@ -831,8 +867,11 @@ extension _InAppBrowserSettingsPropertySupported on InAppBrowserSettings {
             [TargetPlatform.iOS].contains(platform ?? defaultTargetPlatform);
       case InAppBrowserSettingsProperty.toolbarTopBackgroundColor:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.android, TargetPlatform.iOS, TargetPlatform.macOS]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.android,
+              TargetPlatform.iOS,
+              TargetPlatform.macOS,
+            ].contains(platform ?? defaultTargetPlatform);
       case InAppBrowserSettingsProperty.toolbarTopBarTintColor:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.iOS].contains(platform ?? defaultTargetPlatform);
@@ -841,7 +880,7 @@ extension _InAppBrowserSettingsPropertySupported on InAppBrowserSettings {
             [
               TargetPlatform.android,
               TargetPlatform.macOS,
-              TargetPlatform.windows
+              TargetPlatform.windows,
             ].contains(platform ?? defaultTargetPlatform);
       case InAppBrowserSettingsProperty.toolbarTopTintColor:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
@@ -854,12 +893,16 @@ extension _InAppBrowserSettingsPropertySupported on InAppBrowserSettings {
             [TargetPlatform.iOS].contains(platform ?? defaultTargetPlatform);
       case InAppBrowserSettingsProperty.windowAlphaValue:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.macOS, TargetPlatform.windows]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.macOS,
+              TargetPlatform.windows,
+            ].contains(platform ?? defaultTargetPlatform);
       case InAppBrowserSettingsProperty.windowFrame:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.macOS, TargetPlatform.windows]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.macOS,
+              TargetPlatform.windows,
+            ].contains(platform ?? defaultTargetPlatform);
       case InAppBrowserSettingsProperty.windowStyleMask:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.macOS].contains(platform ?? defaultTargetPlatform);
@@ -868,8 +911,10 @@ extension _InAppBrowserSettingsPropertySupported on InAppBrowserSettings {
             [TargetPlatform.macOS].contains(platform ?? defaultTargetPlatform);
       case InAppBrowserSettingsProperty.windowType:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.macOS, TargetPlatform.windows]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.macOS,
+              TargetPlatform.windows,
+            ].contains(platform ?? defaultTargetPlatform);
     }
   }
 }

@@ -21,13 +21,16 @@ class ContentWorld {
   ///Returns the custom content world with the specified name.
   ContentWorld.world({required this.name}) {
     // WINDOW-ID- is used internally by the plugin!
-    assert(!this.name.startsWith("WINDOW-ID-") &&
-        !this.name.contains(_contentWorldNameRegExp));
+    assert(
+      !this.name.startsWith("WINDOW-ID-") &&
+          !this.name.contains(_contentWorldNameRegExp),
+    );
   }
 
   ///The default world for clients.
-  static final ContentWorld DEFAULT_CLIENT =
-      ContentWorld.world(name: "defaultClient");
+  static final ContentWorld DEFAULT_CLIENT = ContentWorld.world(
+    name: "defaultClient",
+  );
 
   ///The content world for the current webpage’s content.
   ///This property contains the content world for scripts that the current webpage executes.
@@ -36,8 +39,10 @@ class ContentWorld {
   static final ContentWorld PAGE = ContentWorld.world(name: "page");
 
   ///Gets a possible [ContentWorld] instance from a [Map] value.
-  static ContentWorld? fromMap(Map<String, dynamic>? map,
-      {EnumMethod? enumMethod}) {
+  static ContentWorld? fromMap(
+    Map<String, dynamic>? map, {
+    EnumMethod? enumMethod,
+  }) {
     if (map == null) {
       return null;
     }

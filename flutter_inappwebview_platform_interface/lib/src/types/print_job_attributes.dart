@@ -25,19 +25,19 @@ class PrintJobAttributes_ {
   PrintJobColorMode_? colorMode;
 
   ///The duplex mode to use for the print job.
-  @SupportedPlatforms(platforms: [
-    AndroidPlatform(available: "23"),
-    IOSPlatform(),
-    MacOSPlatform()
-  ])
+  @SupportedPlatforms(
+    platforms: [
+      AndroidPlatform(available: "23"),
+      IOSPlatform(),
+      MacOSPlatform(),
+    ],
+  )
   PrintJobDuplexMode_? duplex;
 
   ///The orientation of the printed content, portrait or landscape.
-  @SupportedPlatforms(platforms: [
-    AndroidPlatform(),
-    IOSPlatform(),
-    MacOSPlatform(),
-  ])
+  @SupportedPlatforms(
+    platforms: [AndroidPlatform(), IOSPlatform(), MacOSPlatform()],
+  )
   PrintJobOrientation_? orientation;
 
   ///The media size.
@@ -167,34 +167,35 @@ class PrintJobAttributes_ {
   @SupportedPlatforms(platforms: [MacOSPlatform()])
   int? time;
 
-  PrintJobAttributes_(
-      {this.colorMode,
-      this.duplex,
-      this.orientation,
-      this.mediaSize,
-      this.resolution,
-      this.margins,
-      this.maximumContentHeight,
-      this.maximumContentWidth,
-      this.footerHeight,
-      this.headerHeight,
-      this.paperRect,
-      this.printableRect,
-      this.paperName,
-      this.localizedPaperName,
-      this.horizontalPagination,
-      this.verticalPagination,
-      this.jobDisposition,
-      this.isHorizontallyCentered,
-      this.isVerticallyCentered,
-      this.isSelectionOnly,
-      this.scalingFactor,
-      this.jobSavingURL,
-      this.detailedErrorReporting,
-      this.faxNumber,
-      this.headerAndFooter,
-      this.mustCollate,
-      this.pagesAcross,
-      this.pagesDown,
-      this.time});
+  PrintJobAttributes_({
+    this.colorMode,
+    this.duplex,
+    this.orientation,
+    this.mediaSize,
+    this.resolution,
+    this.margins,
+    this.maximumContentHeight,
+    this.maximumContentWidth,
+    this.footerHeight,
+    this.headerHeight,
+    this.paperRect,
+    this.printableRect,
+    this.paperName,
+    this.localizedPaperName,
+    this.horizontalPagination,
+    this.verticalPagination,
+    this.jobDisposition,
+    this.isHorizontallyCentered,
+    this.isVerticallyCentered,
+    this.isSelectionOnly,
+    this.scalingFactor,
+    this.jobSavingURL,
+    this.detailedErrorReporting,
+    this.faxNumber,
+    this.headerAndFooter,
+    this.mustCollate,
+    this.pagesAcross,
+    this.pagesDown,
+    this.time,
+  });
 }

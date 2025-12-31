@@ -16,27 +16,26 @@ part 'platform_web_message_channel.g.dart';
 ///{@endtemplate}
 ///
 ///{@macro flutter_inappwebview_platform_interface.PlatformWebMessageChannelCreationParams.supported_platforms}
-@SupportedPlatforms(platforms: [
-  AndroidPlatform(),
-  IOSPlatform(),
-  MacOSPlatform(),
-])
+@SupportedPlatforms(
+  platforms: [AndroidPlatform(), IOSPlatform(), MacOSPlatform()],
+)
 @immutable
 class PlatformWebMessageChannelCreationParams {
   /// Used by the platform implementation to create a new [PlatformWebMessageChannel].
-  const PlatformWebMessageChannelCreationParams(
-      {required this.id, required this.port1, required this.port2});
+  const PlatformWebMessageChannelCreationParams({
+    required this.id,
+    required this.port1,
+    required this.port2,
+  });
 
   ///{@template flutter_inappwebview_platform_interface.PlatformWebMessageChannelCreationParams.id}
   ///Message Channel ID used internally.
   ///{@endtemplate}
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebMessageChannelCreationParams.id.supported_platforms}
-  @SupportedPlatforms(platforms: [
-    AndroidPlatform(),
-    IOSPlatform(),
-    MacOSPlatform(),
-  ])
+  @SupportedPlatforms(
+    platforms: [AndroidPlatform(), IOSPlatform(), MacOSPlatform()],
+  )
   final String id;
 
   ///{@template flutter_inappwebview_platform_interface.PlatformWebMessageChannelCreationParams.port1}
@@ -44,11 +43,9 @@ class PlatformWebMessageChannelCreationParams {
   ///{@endtemplate}
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebMessageChannelCreationParams.port1.supported_platforms}
-  @SupportedPlatforms(platforms: [
-    AndroidPlatform(),
-    IOSPlatform(),
-    MacOSPlatform(),
-  ])
+  @SupportedPlatforms(
+    platforms: [AndroidPlatform(), IOSPlatform(), MacOSPlatform()],
+  )
   final PlatformWebMessagePort port1;
 
   ///{@template flutter_inappwebview_platform_interface.PlatformWebMessageChannelCreationParams.port2}
@@ -56,11 +53,9 @@ class PlatformWebMessageChannelCreationParams {
   ///{@endtemplate}
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebMessageChannelCreationParams.port2.supported_platforms}
-  @SupportedPlatforms(platforms: [
-    AndroidPlatform(),
-    IOSPlatform(),
-    MacOSPlatform(),
-  ])
+  @SupportedPlatforms(
+    platforms: [AndroidPlatform(), IOSPlatform(), MacOSPlatform()],
+  )
   final PlatformWebMessagePort port2;
 
   ///{@template flutter_inappwebview_platform_interface.PlatformWebMessageChannelCreationParams.isClassSupported}
@@ -68,16 +63,20 @@ class PlatformWebMessageChannelCreationParams {
   ///{@endtemplate}
   bool isClassSupported({TargetPlatform? platform}) =>
       _PlatformWebMessageChannelCreationParamsClassSupported.isClassSupported(
-          platform: platform);
+        platform: platform,
+      );
 
   ///{@template flutter_inappwebview_platform_interface.PlatformWebMessageChannelCreationParams.isPropertySupported}
   ///Check if the given [property] is supported by the [defaultTargetPlatform] or a specific [platform].
   ///{@endtemplate}
   bool isPropertySupported(
-          PlatformWebMessageChannelCreationParamsProperty property,
-          {TargetPlatform? platform}) =>
-      _PlatformWebMessageChannelCreationParamsPropertySupported
-          .isPropertySupported(property, platform: platform);
+    PlatformWebMessageChannelCreationParamsProperty property, {
+    TargetPlatform? platform,
+  }) =>
+      _PlatformWebMessageChannelCreationParamsPropertySupported.isPropertySupported(
+        property,
+        platform: platform,
+      );
 
   @override
   String toString() {
@@ -90,16 +89,15 @@ class PlatformWebMessageChannelCreationParams {
 ///{@endtemplate}
 ///
 ///{@macro flutter_inappwebview_platform_interface.PlatformWebMessageChannel.supported_platforms}
-@SupportedPlatforms(platforms: [
-  AndroidPlatform(),
-  IOSPlatform(),
-  MacOSPlatform(),
-])
+@SupportedPlatforms(
+  platforms: [AndroidPlatform(), IOSPlatform(), MacOSPlatform()],
+)
 abstract class PlatformWebMessageChannel extends PlatformInterface
     implements Disposable {
   /// Creates a new [PlatformWebMessageChannel]
   factory PlatformWebMessageChannel(
-      PlatformWebMessageChannelCreationParams params) {
+    PlatformWebMessageChannelCreationParams params,
+  ) {
     assert(
       InAppWebViewPlatform.instance != null,
       'A platform implementation for `flutter_inappwebview` has not been set. Please '
@@ -107,8 +105,9 @@ abstract class PlatformWebMessageChannel extends PlatformInterface
       '`InAppWebViewPlatform.instance` before use. For unit testing, '
       '`InAppWebViewPlatform.instance` can be set with your own test implementation.',
     );
-    final PlatformWebMessageChannel webMessageChannel =
-        InAppWebViewPlatform.instance!.createPlatformWebMessageChannel(params);
+    final PlatformWebMessageChannel webMessageChannel = InAppWebViewPlatform
+        .instance!
+        .createPlatformWebMessageChannel(params);
     PlatformInterface.verify(webMessageChannel, _token);
     return webMessageChannel;
   }
@@ -157,7 +156,8 @@ abstract class PlatformWebMessageChannel extends PlatformInterface
 
   PlatformWebMessageChannel? fromMap(Map<String, dynamic>? map) {
     throw UnimplementedError(
-        'fromMap is not implemented on the current platform');
+      'fromMap is not implemented on the current platform',
+    );
   }
 
   ///{@template flutter_inappwebview_platform_interface.PlatformWebMessageChannel.dispose}
@@ -165,37 +165,40 @@ abstract class PlatformWebMessageChannel extends PlatformInterface
   ///{@endtemplate}
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebMessageChannel.dispose.supported_platforms}
-  @SupportedPlatforms(platforms: [
-    AndroidPlatform(),
-    IOSPlatform(),
-    MacOSPlatform(),
-  ])
+  @SupportedPlatforms(
+    platforms: [AndroidPlatform(), IOSPlatform(), MacOSPlatform()],
+  )
   @override
   void dispose() {
     throw UnimplementedError(
-        'dispose is not implemented on the current platform');
+      'dispose is not implemented on the current platform',
+    );
   }
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebMessageChannelCreationParams.isClassSupported}
   bool isClassSupported({TargetPlatform? platform}) =>
       _PlatformWebMessageChannelClassSupported.isClassSupported(
-          platform: platform);
+        platform: platform,
+      );
 
   ///{@template flutter_inappwebview_platform_interface.PlatformWebMessageChannel.isPropertySupported}
   ///Check if the given [property] is supported by the [defaultTargetPlatform] or a specific [platform].
   ///{@endtemplate}
   bool isPropertySupported(
-          PlatformWebMessageChannelCreationParamsProperty property,
-          {TargetPlatform? platform}) =>
-      params.isPropertySupported(property, platform: platform);
+    PlatformWebMessageChannelCreationParamsProperty property, {
+    TargetPlatform? platform,
+  }) => params.isPropertySupported(property, platform: platform);
 
   ///{@template flutter_inappwebview_platform_interface.PlatformWebMessageChannel.isMethodSupported}
   ///Check if the given [method] is supported by the [defaultTargetPlatform] or a specific [platform].
   ///{@endtemplate}
-  bool isMethodSupported(PlatformWebMessageChannelMethod method,
-          {TargetPlatform? platform}) =>
-      _PlatformWebMessageChannelMethodSupported.isMethodSupported(method,
-          platform: platform);
+  bool isMethodSupported(
+    PlatformWebMessageChannelMethod method, {
+    TargetPlatform? platform,
+  }) => _PlatformWebMessageChannelMethodSupported.isMethodSupported(
+    method,
+    platform: platform,
+  );
 
   @override
   String toString() {

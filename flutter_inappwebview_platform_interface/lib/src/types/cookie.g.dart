@@ -95,16 +95,17 @@ class Cookie {
   ///- Web \<iframe\> but requires same origin
   ///- Windows WebView2
   dynamic value;
-  Cookie(
-      {this.domain,
-      this.expiresDate,
-      this.isHttpOnly,
-      this.isSecure,
-      this.isSessionOnly,
-      required this.name,
-      this.path,
-      this.sameSite,
-      this.value});
+  Cookie({
+    this.domain,
+    this.expiresDate,
+    this.isHttpOnly,
+    this.isSecure,
+    this.isSessionOnly,
+    required this.name,
+    this.path,
+    this.sameSite,
+    this.value,
+  });
 
   ///Gets a possible [Cookie] instance from a [Map] value.
   static Cookie? fromMap(Map<String, dynamic>? map, {EnumMethod? enumMethod}) {
@@ -120,10 +121,11 @@ class Cookie {
       name: map['name'],
       path: map['path'],
       sameSite: switch (enumMethod ?? EnumMethod.nativeValue) {
-        EnumMethod.nativeValue =>
-          HTTPCookieSameSitePolicy.fromNativeValue(map['sameSite']),
+        EnumMethod.nativeValue => HTTPCookieSameSitePolicy.fromNativeValue(
+          map['sameSite'],
+        ),
         EnumMethod.value => HTTPCookieSameSitePolicy.fromValue(map['sameSite']),
-        EnumMethod.name => HTTPCookieSameSitePolicy.byName(map['sameSite'])
+        EnumMethod.name => HTTPCookieSameSitePolicy.byName(map['sameSite']),
       },
       value: map['value'],
     );
@@ -143,7 +145,7 @@ class Cookie {
       "sameSite": switch (enumMethod ?? EnumMethod.nativeValue) {
         EnumMethod.nativeValue => sameSite?.toNativeValue(),
         EnumMethod.value => sameSite?.toValue(),
-        EnumMethod.name => sameSite?.name()
+        EnumMethod.name => sameSite?.name(),
       },
       "value": value,
     };

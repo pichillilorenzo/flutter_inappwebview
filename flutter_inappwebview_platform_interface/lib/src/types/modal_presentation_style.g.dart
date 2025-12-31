@@ -11,10 +11,11 @@ class ModalPresentationStyle {
   final int _value;
   final int _nativeValue;
   const ModalPresentationStyle._internal(this._value, this._nativeValue);
-// ignore: unused_element
+  // ignore: unused_element
   factory ModalPresentationStyle._internalMultiPlatform(
-          int value, Function nativeValue) =>
-      ModalPresentationStyle._internal(value, nativeValue());
+    int value,
+    Function nativeValue,
+  ) => ModalPresentationStyle._internal(value, nativeValue());
 
   ///The default presentation style chosen by the system.
   ///
@@ -66,8 +67,9 @@ class ModalPresentationStyle {
   static ModalPresentationStyle? fromValue(int? value) {
     if (value != null) {
       try {
-        return ModalPresentationStyle.values
-            .firstWhere((element) => element.toValue() == value);
+        return ModalPresentationStyle.values.firstWhere(
+          (element) => element.toValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -79,8 +81,9 @@ class ModalPresentationStyle {
   static ModalPresentationStyle? fromNativeValue(int? value) {
     if (value != null) {
       try {
-        return ModalPresentationStyle.values
-            .firstWhere((element) => element.toNativeValue() == value);
+        return ModalPresentationStyle.values.firstWhere(
+          (element) => element.toNativeValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -96,8 +99,9 @@ class ModalPresentationStyle {
   static ModalPresentationStyle? byName(String? name) {
     if (name != null) {
       try {
-        return ModalPresentationStyle.values
-            .firstWhere((element) => element.name() == name);
+        return ModalPresentationStyle.values.firstWhere(
+          (element) => element.name() == name,
+        );
       } catch (e) {
         return null;
       }
@@ -115,7 +119,7 @@ class ModalPresentationStyle {
   /// them will be represented in the returned map.
   static Map<String, ModalPresentationStyle> asNameMap() =>
       <String, ModalPresentationStyle>{
-        for (final value in ModalPresentationStyle.values) value.name(): value
+        for (final value in ModalPresentationStyle.values) value.name(): value,
       };
 
   ///Gets [int] value.
@@ -175,10 +179,11 @@ class IOSUIModalPresentationStyle {
   final int _value;
   final int _nativeValue;
   const IOSUIModalPresentationStyle._internal(this._value, this._nativeValue);
-// ignore: unused_element
+  // ignore: unused_element
   factory IOSUIModalPresentationStyle._internalMultiPlatform(
-          int value, Function nativeValue) =>
-      IOSUIModalPresentationStyle._internal(value, nativeValue());
+    int value,
+    Function nativeValue,
+  ) => IOSUIModalPresentationStyle._internal(value, nativeValue());
 
   ///The default presentation style chosen by the system.
   ///
@@ -201,8 +206,10 @@ class IOSUIModalPresentationStyle {
   static const NONE = IOSUIModalPresentationStyle._internal(8, 8);
 
   ///A presentation style where the content is displayed over another view controller’s content.
-  static const OVER_CURRENT_CONTEXT =
-      IOSUIModalPresentationStyle._internal(6, 6);
+  static const OVER_CURRENT_CONTEXT = IOSUIModalPresentationStyle._internal(
+    6,
+    6,
+  );
 
   ///A view presentation style in which the presented view covers the screen.
   static const OVER_FULL_SCREEN = IOSUIModalPresentationStyle._internal(5, 5);
@@ -231,8 +238,9 @@ class IOSUIModalPresentationStyle {
   static IOSUIModalPresentationStyle? fromValue(int? value) {
     if (value != null) {
       try {
-        return IOSUIModalPresentationStyle.values
-            .firstWhere((element) => element.toValue() == value);
+        return IOSUIModalPresentationStyle.values.firstWhere(
+          (element) => element.toValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -244,8 +252,9 @@ class IOSUIModalPresentationStyle {
   static IOSUIModalPresentationStyle? fromNativeValue(int? value) {
     if (value != null) {
       try {
-        return IOSUIModalPresentationStyle.values
-            .firstWhere((element) => element.toNativeValue() == value);
+        return IOSUIModalPresentationStyle.values.firstWhere(
+          (element) => element.toNativeValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -261,8 +270,9 @@ class IOSUIModalPresentationStyle {
   static IOSUIModalPresentationStyle? byName(String? name) {
     if (name != null) {
       try {
-        return IOSUIModalPresentationStyle.values
-            .firstWhere((element) => element.name() == name);
+        return IOSUIModalPresentationStyle.values.firstWhere(
+          (element) => element.name() == name,
+        );
       } catch (e) {
         return null;
       }
@@ -281,7 +291,7 @@ class IOSUIModalPresentationStyle {
   static Map<String, IOSUIModalPresentationStyle> asNameMap() =>
       <String, IOSUIModalPresentationStyle>{
         for (final value in IOSUIModalPresentationStyle.values)
-          value.name(): value
+          value.name(): value,
       };
 
   ///Gets [int] value.

@@ -15,9 +15,9 @@ class ChromeSafariBrowser implements PlatformChromeSafariBrowserEvents {
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformChromeSafariBrowser.supported_platforms}
   ChromeSafariBrowser()
-      : this.fromPlatformCreationParams(
-          PlatformChromeSafariBrowserCreationParams(),
-        );
+    : this.fromPlatformCreationParams(
+        PlatformChromeSafariBrowserCreationParams(),
+      );
 
   /// Constructs a [ChromeSafariBrowser] from creation params for a specific
   /// platform.
@@ -40,22 +40,24 @@ class ChromeSafariBrowser implements PlatformChromeSafariBrowserEvents {
   ///{@macro flutter_inappwebview_platform_interface.PlatformChromeSafariBrowser.open}
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformChromeSafariBrowser.open.supported_platforms}
-  Future<void> open(
-      {WebUri? url,
-      Map<String, String>? headers,
-      List<WebUri>? otherLikelyURLs,
-      WebUri? referrer,
-      @Deprecated('Use settings instead')
-      // ignore: deprecated_member_use_from_same_package
-      ChromeSafariBrowserClassOptions? options,
-      ChromeSafariBrowserSettings? settings}) {
+  Future<void> open({
+    WebUri? url,
+    Map<String, String>? headers,
+    List<WebUri>? otherLikelyURLs,
+    WebUri? referrer,
+    @Deprecated('Use settings instead')
+    // ignore: deprecated_member_use_from_same_package
+    ChromeSafariBrowserClassOptions? options,
+    ChromeSafariBrowserSettings? settings,
+  }) {
     this.platform.eventHandler = this;
     return platform.open(
-        url: url,
-        headers: headers,
-        otherLikelyURLs: otherLikelyURLs,
-        options: options,
-        settings: settings);
+      url: url,
+      headers: headers,
+      otherLikelyURLs: otherLikelyURLs,
+      options: options,
+      settings: settings,
+    );
   }
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformChromeSafariBrowser.launchUrl}
@@ -66,12 +68,12 @@ class ChromeSafariBrowser implements PlatformChromeSafariBrowserEvents {
     Map<String, String>? headers,
     List<WebUri>? otherLikelyURLs,
     WebUri? referrer,
-  }) =>
-      platform.launchUrl(
-          url: url,
-          headers: headers,
-          otherLikelyURLs: otherLikelyURLs,
-          referrer: referrer);
+  }) => platform.launchUrl(
+    url: url,
+    headers: headers,
+    otherLikelyURLs: otherLikelyURLs,
+    referrer: referrer,
+  );
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformChromeSafariBrowser.mayLaunchUrl}
   ///
@@ -82,9 +84,10 @@ class ChromeSafariBrowser implements PlatformChromeSafariBrowserEvents {
   ///{@macro flutter_inappwebview_platform_interface.PlatformChromeSafariBrowser.validateRelationship}
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformChromeSafariBrowser.validateRelationship.supported_platforms}
-  Future<bool> validateRelationship(
-          {required CustomTabsRelationType relation, required WebUri origin}) =>
-      platform.validateRelationship(relation: relation, origin: origin);
+  Future<bool> validateRelationship({
+    required CustomTabsRelationType relation,
+    required WebUri origin,
+  }) => platform.validateRelationship(relation: relation, origin: origin);
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformChromeSafariBrowser.close}
   ///
@@ -105,23 +108,24 @@ class ChromeSafariBrowser implements PlatformChromeSafariBrowserEvents {
   ///{@macro flutter_inappwebview_platform_interface.PlatformChromeSafariBrowser.updateActionButton}
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformChromeSafariBrowser.updateActionButton.supported_platforms}
-  Future<void> updateActionButton(
-          {required Uint8List icon, required String description}) =>
-      platform.updateActionButton(icon: icon, description: description);
+  Future<void> updateActionButton({
+    required Uint8List icon,
+    required String description,
+  }) => platform.updateActionButton(icon: icon, description: description);
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformChromeSafariBrowser.setSecondaryToolbar}
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformChromeSafariBrowser.setSecondaryToolbar.supported_platforms}
   void setSecondaryToolbar(
-          ChromeSafariBrowserSecondaryToolbar secondaryToolbar) =>
-      platform.setSecondaryToolbar(secondaryToolbar);
+    ChromeSafariBrowserSecondaryToolbar secondaryToolbar,
+  ) => platform.setSecondaryToolbar(secondaryToolbar);
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformChromeSafariBrowser.updateSecondaryToolbar}
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformChromeSafariBrowser.updateSecondaryToolbar.supported_platforms}
   Future<void> updateSecondaryToolbar(
-          ChromeSafariBrowserSecondaryToolbar secondaryToolbar) =>
-      platform.updateSecondaryToolbar(secondaryToolbar);
+    ChromeSafariBrowserSecondaryToolbar secondaryToolbar,
+  ) => platform.updateSecondaryToolbar(secondaryToolbar);
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformChromeSafariBrowser.addMenuItem}
   ///
@@ -138,10 +142,13 @@ class ChromeSafariBrowser implements PlatformChromeSafariBrowserEvents {
   ///{@macro flutter_inappwebview_platform_interface.PlatformChromeSafariBrowser.requestPostMessageChannel}
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformChromeSafariBrowser.requestPostMessageChannel.supported_platforms}
-  Future<bool> requestPostMessageChannel(
-          {required WebUri sourceOrigin, WebUri? targetOrigin}) =>
-      platform.requestPostMessageChannel(
-          sourceOrigin: sourceOrigin, targetOrigin: targetOrigin);
+  Future<bool> requestPostMessageChannel({
+    required WebUri sourceOrigin,
+    WebUri? targetOrigin,
+  }) => platform.requestPostMessageChannel(
+    sourceOrigin: sourceOrigin,
+    targetOrigin: targetOrigin,
+  );
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformChromeSafariBrowser.postMessage}
   ///
@@ -170,10 +177,13 @@ class ChromeSafariBrowser implements PlatformChromeSafariBrowserEvents {
   ///{@macro flutter_inappwebview_platform_interface.PlatformChromeSafariBrowser.getPackageName}
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformChromeSafariBrowser.getPackageName.supported_platforms}
-  static Future<String?> getPackageName(
-          {List<String>? packages, bool ignoreDefault = false}) =>
-      PlatformChromeSafariBrowser.static()
-          .getPackageName(packages: packages, ignoreDefault: ignoreDefault);
+  static Future<String?> getPackageName({
+    List<String>? packages,
+    bool ignoreDefault = false,
+  }) => PlatformChromeSafariBrowser.static().getPackageName(
+    packages: packages,
+    ignoreDefault: ignoreDefault,
+  );
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformChromeSafariBrowser.clearWebsiteData}
   ///
@@ -191,9 +201,10 @@ class ChromeSafariBrowser implements PlatformChromeSafariBrowserEvents {
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformChromeSafariBrowser.invalidatePrewarmingToken.supported_platforms}
   static Future<void> invalidatePrewarmingToken(
-          PrewarmingToken prewarmingToken) =>
-      PlatformChromeSafariBrowser.static()
-          .invalidatePrewarmingToken(prewarmingToken);
+    PrewarmingToken prewarmingToken,
+  ) => PlatformChromeSafariBrowser.static().invalidatePrewarmingToken(
+    prewarmingToken,
+  );
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformChromeSafariBrowser.dispose}
   ///
@@ -227,7 +238,10 @@ class ChromeSafariBrowser implements PlatformChromeSafariBrowserEvents {
 
   @override
   void onRelationshipValidationResult(
-      CustomTabsRelationType? relation, WebUri? requestedOrigin, bool result) {}
+    CustomTabsRelationType? relation,
+    WebUri? requestedOrigin,
+    bool result,
+  ) {}
 
   @override
   void onServiceConnected() {}
@@ -246,15 +260,20 @@ class ChromeSafariBrowser implements PlatformChromeSafariBrowserEvents {
       PlatformChromeSafariBrowser.static().isClassSupported(platform: platform);
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformChromeSafariBrowser.isMethodSupported}
-  static bool isMethodSupported(PlatformChromeSafariBrowserMethod property,
-          {TargetPlatform? platform}) =>
-      PlatformChromeSafariBrowser.static()
-          .isMethodSupported(property, platform: platform);
+  static bool isMethodSupported(
+    PlatformChromeSafariBrowserMethod property, {
+    TargetPlatform? platform,
+  }) => PlatformChromeSafariBrowser.static().isMethodSupported(
+    property,
+    platform: platform,
+  );
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformChromeSafariBrowserEvents.isMethodSupported}
   static bool isEventMethodSupported(
-          PlatformChromeSafariBrowserEventsMethod method,
-          {TargetPlatform? platform}) =>
-      PlatformChromeSafariBrowserEvents.isMethodSupported(method,
-          platform: platform);
+    PlatformChromeSafariBrowserEventsMethod method, {
+    TargetPlatform? platform,
+  }) => PlatformChromeSafariBrowserEvents.isMethodSupported(
+    method,
+    platform: platform,
+  );
 }

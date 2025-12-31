@@ -39,11 +39,12 @@ class WebResourceRequest_ {
   ///**NOTE**: available on Android 21+. For Android < 21 it will be always `false`.
   bool? isRedirect;
 
-  WebResourceRequest_(
-      {required this.url,
-      this.headers,
-      this.method,
-      this.hasGesture,
-      this.isForMainFrame,
-      this.isRedirect});
+  WebResourceRequest_({
+    required this.url,
+    this.headers,
+    this.method,
+    this.hasGesture,
+    this.isForMainFrame,
+    this.isRedirect,
+  });
 }

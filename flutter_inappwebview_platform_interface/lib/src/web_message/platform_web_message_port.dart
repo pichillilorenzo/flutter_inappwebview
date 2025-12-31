@@ -55,8 +55,8 @@ abstract class PlatformWebMessagePort extends PlatformInterface
       '`InAppWebViewPlatform.instance` before use. For unit testing, '
       '`InAppWebViewPlatform.instance` can be set with your own test implementation.',
     );
-    final PlatformWebMessagePort webMessagePort =
-        InAppWebViewPlatform.instance!.createPlatformWebMessagePort(params);
+    final PlatformWebMessagePort webMessagePort = InAppWebViewPlatform.instance!
+        .createPlatformWebMessagePort(params);
     PlatformInterface.verify(webMessagePort, _token);
     return webMessagePort;
   }
@@ -85,7 +85,8 @@ abstract class IWebMessagePort {
   ///{@endtemplate}
   Future<void> setWebMessageCallback(WebMessageCallback? onMessage) {
     throw UnimplementedError(
-        'setWebMessageCallback is not implemented on the current platform');
+      'setWebMessageCallback is not implemented on the current platform',
+    );
   }
 
   ///{@template flutter_inappwebview_platform_interface.PlatformWebMessagePort.postMessage}
@@ -93,7 +94,8 @@ abstract class IWebMessagePort {
   ///{@endtemplate}
   Future<void> postMessage(WebMessage message) {
     throw UnimplementedError(
-        'postMessage is not implemented on the current platform');
+      'postMessage is not implemented on the current platform',
+    );
   }
 
   ///{@template flutter_inappwebview_platform_interface.PlatformWebMessagePort.close}
@@ -101,16 +103,19 @@ abstract class IWebMessagePort {
   ///{@endtemplate}
   Future<void> close() {
     throw UnimplementedError(
-        'close is not implemented on the current platform');
+      'close is not implemented on the current platform',
+    );
   }
 
   Map<String, dynamic> toMap({EnumMethod? enumMethod}) {
     throw UnimplementedError(
-        'toMap is not implemented on the current platform');
+      'toMap is not implemented on the current platform',
+    );
   }
 
   Map<String, dynamic> toJson() {
     throw UnimplementedError(
-        'toJson is not implemented on the current platform');
+      'toJson is not implemented on the current platform',
+    );
   }
 }

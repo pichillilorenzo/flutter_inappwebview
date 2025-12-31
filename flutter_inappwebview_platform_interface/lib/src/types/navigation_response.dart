@@ -18,10 +18,11 @@ class NavigationResponse_ {
   ///A Boolean value that indicates whether WebKit is capable of displaying the response’s MIME type natively.
   bool canShowMIMEType;
 
-  NavigationResponse_(
-      {this.response,
-      required this.isForMainFrame,
-      required this.canShowMIMEType});
+  NavigationResponse_({
+    this.response,
+    required this.isForMainFrame,
+    required this.canShowMIMEType,
+  });
 }
 
 ///An iOS-specific Class that represents the navigation response used by the [PlatformWebViewCreationParams.onNavigationResponse] event.
@@ -38,8 +39,9 @@ class IOSWKNavigationResponse_ {
   ///A Boolean value that indicates whether WebKit is capable of displaying the response’s MIME type natively.
   bool canShowMIMEType;
 
-  IOSWKNavigationResponse_(
-      {this.response,
-      required this.isForMainFrame,
-      required this.canShowMIMEType});
+  IOSWKNavigationResponse_({
+    this.response,
+    required this.isForMainFrame,
+    required this.canShowMIMEType,
+  });
 }

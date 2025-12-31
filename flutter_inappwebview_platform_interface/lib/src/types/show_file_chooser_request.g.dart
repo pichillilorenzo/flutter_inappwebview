@@ -27,16 +27,19 @@ class ShowFileChooserRequest {
   ///The title to use for this file selector.
   ///If `null` a default title should be used.
   final String? title;
-  ShowFileChooserRequest(
-      {required this.acceptTypes,
-      this.filenameHint,
-      required this.isCaptureEnabled,
-      required this.mode,
-      this.title});
+  ShowFileChooserRequest({
+    required this.acceptTypes,
+    this.filenameHint,
+    required this.isCaptureEnabled,
+    required this.mode,
+    this.title,
+  });
 
   ///Gets a possible [ShowFileChooserRequest] instance from a [Map] value.
-  static ShowFileChooserRequest? fromMap(Map<String, dynamic>? map,
-      {EnumMethod? enumMethod}) {
+  static ShowFileChooserRequest? fromMap(
+    Map<String, dynamic>? map, {
+    EnumMethod? enumMethod,
+  }) {
     if (map == null) {
       return null;
     }
@@ -45,10 +48,11 @@ class ShowFileChooserRequest {
       filenameHint: map['filenameHint'],
       isCaptureEnabled: map['isCaptureEnabled'],
       mode: switch (enumMethod ?? EnumMethod.nativeValue) {
-        EnumMethod.nativeValue =>
-          ShowFileChooserRequestMode.fromNativeValue(map['mode']),
+        EnumMethod.nativeValue => ShowFileChooserRequestMode.fromNativeValue(
+          map['mode'],
+        ),
         EnumMethod.value => ShowFileChooserRequestMode.fromValue(map['mode']),
-        EnumMethod.name => ShowFileChooserRequestMode.byName(map['mode'])
+        EnumMethod.name => ShowFileChooserRequestMode.byName(map['mode']),
       }!,
       title: map['title'],
     );
@@ -64,7 +68,7 @@ class ShowFileChooserRequest {
       "mode": switch (enumMethod ?? EnumMethod.nativeValue) {
         EnumMethod.nativeValue => mode.toNativeValue(),
         EnumMethod.value => mode.toValue(),
-        EnumMethod.name => mode.name()
+        EnumMethod.name => mode.name(),
       },
       "title": title,
     };

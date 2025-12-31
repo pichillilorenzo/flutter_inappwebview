@@ -12,8 +12,9 @@ class TrustedWebActivityScreenOrientation_ {
 
   /// The default screen orientation is the set of orientations to which the screen is locked when
   /// there is no current orientation lock.
-  static const DEFAULT =
-      const TrustedWebActivityScreenOrientation_._internal(0);
+  static const DEFAULT = const TrustedWebActivityScreenOrientation_._internal(
+    0,
+  );
 
   ///  Portrait-primary is an orientation where the screen width is less than or equal to the
   ///  screen height. If the device's natural orientation is portrait, then it is in
@@ -46,18 +47,21 @@ class TrustedWebActivityScreenOrientation_ {
   /// Landscape is an orientation where the screen width is greater than the screen height and
   /// depending on platform convention locking the screen to landscape can represent
   /// landscape-primary, landscape-secondary or both.
-  static const LANDSCAPE =
-      const TrustedWebActivityScreenOrientation_._internal(6);
+  static const LANDSCAPE = const TrustedWebActivityScreenOrientation_._internal(
+    6,
+  );
 
   /// Portrait is an orientation where the screen width is less than or equal to the screen height
   /// and depending on platform convention locking the screen to portrait can represent
   /// portrait-primary, portrait-secondary or both.
-  static const PORTRAIT =
-      const TrustedWebActivityScreenOrientation_._internal(7);
+  static const PORTRAIT = const TrustedWebActivityScreenOrientation_._internal(
+    7,
+  );
 
   /// Natural is an orientation that refers to either portrait-primary or landscape-primary
   /// depending on the device's usual orientation. This orientation is usually provided by
   /// the underlying operating system.
-  static const NATURAL =
-      const TrustedWebActivityScreenOrientation_._internal(8);
+  static const NATURAL = const TrustedWebActivityScreenOrientation_._internal(
+    8,
+  );
 }

@@ -17,8 +17,9 @@ class FindSession_ {
   /// Defines how results are reported through the find panel's UI.
   SearchResultDisplayStyle_ searchResultDisplayStyle;
 
-  FindSession_(
-      {required this.resultCount,
-      required this.highlightedResultIndex,
-      required this.searchResultDisplayStyle});
+  FindSession_({
+    required this.resultCount,
+    required this.highlightedResultIndex,
+    required this.searchResultDisplayStyle,
+  });
 }

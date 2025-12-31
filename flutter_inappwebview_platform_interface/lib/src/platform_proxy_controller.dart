@@ -19,11 +19,9 @@ part 'platform_proxy_controller.g.dart';
 ///{@endtemplate}
 ///
 ///{@macro flutter_inappwebview_platform_interface.PlatformProxyControllerCreationParams.supported_platforms}
-@SupportedPlatforms(platforms: [
-  AndroidPlatform(),
-  IOSPlatform(),
-  MacOSPlatform(),
-])
+@SupportedPlatforms(
+  platforms: [AndroidPlatform(), IOSPlatform(), MacOSPlatform()],
+)
 @immutable
 class PlatformProxyControllerCreationParams {
   /// Used by the platform implementation to create a new [PlatformProxyController].
@@ -34,7 +32,8 @@ class PlatformProxyControllerCreationParams {
   ///{@endtemplate}
   bool isClassSupported({TargetPlatform? platform}) =>
       _PlatformProxyControllerCreationParamsClassSupported.isClassSupported(
-          platform: platform);
+        platform: platform,
+      );
 }
 
 ///{@template flutter_inappwebview_platform_interface.PlatformProxyController}
@@ -48,27 +47,32 @@ class PlatformProxyControllerCreationParams {
 ///{@endtemplate}
 ///
 ///{@macro flutter_inappwebview_platform_interface.PlatformProxyController.supported_platforms}
-@SupportedPlatforms(platforms: [
-  AndroidPlatform(
-    apiName: 'ProxyController',
-    apiUrl:
-        'https://developer.android.com/reference/androidx/webkit/ProxyController',
-  ),
-  IOSPlatform(
+@SupportedPlatforms(
+  platforms: [
+    AndroidPlatform(
+      apiName: 'ProxyController',
+      apiUrl:
+          'https://developer.android.com/reference/androidx/webkit/ProxyController',
+    ),
+    IOSPlatform(
       apiName: 'WKWebsiteDataStore.proxyConfigurations',
       apiUrl:
           'https://developer.apple.com/documentation/webkit/wkwebsitedatastore/4264546-proxyconfigurations',
-      available: '17.0'),
-  MacOSPlatform(
+      available: '17.0',
+    ),
+    MacOSPlatform(
       apiName: 'WKWebsiteDataStore.proxyConfigurations',
       apiUrl:
           'https://developer.apple.com/documentation/webkit/wkwebsitedatastore/4264546-proxyconfigurations',
-      available: '14.0'),
-])
+      available: '14.0',
+    ),
+  ],
+)
 abstract class PlatformProxyController extends PlatformInterface {
   /// Creates a new [PlatformProxyController]
   factory PlatformProxyController(
-      PlatformProxyControllerCreationParams params) {
+    PlatformProxyControllerCreationParams params,
+  ) {
     assert(
       InAppWebViewPlatform.instance != null,
       'A platform implementation for `flutter_inappwebview` has not been set. Please '
@@ -76,8 +80,9 @@ abstract class PlatformProxyController extends PlatformInterface {
       '`WebViewPlatform.instance` before use. For unit testing, '
       '`WebViewPlatform.instance` can be set with your own test implementation.',
     );
-    final PlatformProxyController proxyController =
-        InAppWebViewPlatform.instance!.createPlatformProxyController(params);
+    final PlatformProxyController proxyController = InAppWebViewPlatform
+        .instance!
+        .createPlatformProxyController(params);
     PlatformInterface.verify(proxyController, _token);
     return proxyController;
   }
@@ -91,8 +96,9 @@ abstract class PlatformProxyController extends PlatformInterface {
       '`InAppWebViewPlatform.instance` before use. For unit testing, '
       '`InAppWebViewPlatform.instance` can be set with your own test implementation.',
     );
-    final PlatformProxyController proxyControllerStatic =
-        InAppWebViewPlatform.instance!.createPlatformProxyControllerStatic();
+    final PlatformProxyController proxyControllerStatic = InAppWebViewPlatform
+        .instance!
+        .createPlatformProxyControllerStatic();
     PlatformInterface.verify(proxyControllerStatic, _token);
     return proxyControllerStatic;
   }
@@ -118,27 +124,31 @@ abstract class PlatformProxyController extends PlatformInterface {
   ///{@endtemplate}
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformProxyController.setProxyOverride.supported_platforms}
-  @SupportedPlatforms(platforms: [
-    AndroidPlatform(
+  @SupportedPlatforms(
+    platforms: [
+      AndroidPlatform(
         apiName: 'ProxyController.setProxyOverride',
         apiUrl:
-            'https://developer.android.com/reference/androidx/webkit/ProxyController#setProxyOverride(androidx.webkit.ProxyConfig,%20java.util.concurrent.Executor,%20java.lang.Runnable)'),
-    IOSPlatform(
-      apiName: 'WKWebsiteDataStore.proxyConfigurations',
-      apiUrl:
-          'https://developer.apple.com/documentation/webkit/wkwebsitedatastore/4264546-proxyconfigurations',
-      available: '17.0',
-    ),
-    MacOSPlatform(
-      apiName: 'WKWebsiteDataStore.proxyConfigurations',
-      apiUrl:
-          'https://developer.apple.com/documentation/webkit/wkwebsitedatastore/4264546-proxyconfigurations',
-      available: '14.0',
-    ),
-  ])
+            'https://developer.android.com/reference/androidx/webkit/ProxyController#setProxyOverride(androidx.webkit.ProxyConfig,%20java.util.concurrent.Executor,%20java.lang.Runnable)',
+      ),
+      IOSPlatform(
+        apiName: 'WKWebsiteDataStore.proxyConfigurations',
+        apiUrl:
+            'https://developer.apple.com/documentation/webkit/wkwebsitedatastore/4264546-proxyconfigurations',
+        available: '17.0',
+      ),
+      MacOSPlatform(
+        apiName: 'WKWebsiteDataStore.proxyConfigurations',
+        apiUrl:
+            'https://developer.apple.com/documentation/webkit/wkwebsitedatastore/4264546-proxyconfigurations',
+        available: '14.0',
+      ),
+    ],
+  )
   Future<void> setProxyOverride({required ProxySettings settings}) {
     throw UnimplementedError(
-        'setProxyOverride is not implemented on the current platform');
+      'setProxyOverride is not implemented on the current platform',
+    );
   }
 
   ///{@template flutter_inappwebview_platform_interface.PlatformProxyController.clearProxyOverride}
@@ -148,27 +158,31 @@ abstract class PlatformProxyController extends PlatformInterface {
   ///{@endtemplate}
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformProxyController.clearProxyOverride.supported_platforms}
-  @SupportedPlatforms(platforms: [
-    AndroidPlatform(
+  @SupportedPlatforms(
+    platforms: [
+      AndroidPlatform(
         apiName: 'ProxyController.clearProxyOverride',
         apiUrl:
-            'https://developer.android.com/reference/androidx/webkit/ProxyController#clearProxyOverride(java.util.concurrent.Executor,%20java.lang.Runnable)'),
-    IOSPlatform(
-      apiName: 'WKWebsiteDataStore.proxyConfigurations',
-      apiUrl:
-          'https://developer.apple.com/documentation/webkit/wkwebsitedatastore/4264546-proxyconfigurations',
-      available: '17.0',
-    ),
-    MacOSPlatform(
-      apiName: 'WKWebsiteDataStore.proxyConfigurations',
-      apiUrl:
-          'https://developer.apple.com/documentation/webkit/wkwebsitedatastore/4264546-proxyconfigurations',
-      available: '14.0',
-    ),
-  ])
+            'https://developer.android.com/reference/androidx/webkit/ProxyController#clearProxyOverride(java.util.concurrent.Executor,%20java.lang.Runnable)',
+      ),
+      IOSPlatform(
+        apiName: 'WKWebsiteDataStore.proxyConfigurations',
+        apiUrl:
+            'https://developer.apple.com/documentation/webkit/wkwebsitedatastore/4264546-proxyconfigurations',
+        available: '17.0',
+      ),
+      MacOSPlatform(
+        apiName: 'WKWebsiteDataStore.proxyConfigurations',
+        apiUrl:
+            'https://developer.apple.com/documentation/webkit/wkwebsitedatastore/4264546-proxyconfigurations',
+        available: '14.0',
+      ),
+    ],
+  )
   Future<void> clearProxyOverride() {
     throw UnimplementedError(
-        'clearProxyOverride is not implemented on the current platform');
+      'clearProxyOverride is not implemented on the current platform',
+    );
   }
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformProxyControllerCreationParams.isClassSupported}
@@ -178,10 +192,13 @@ abstract class PlatformProxyController extends PlatformInterface {
   ///{@template flutter_inappwebview_platform_interface.PlatformProxyController.isMethodSupported}
   ///Check if the given [method] is supported by the [defaultTargetPlatform] or a specific [platform].
   ///{@endtemplate}
-  bool isMethodSupported(PlatformProxyControllerMethod method,
-          {TargetPlatform? platform}) =>
-      _PlatformProxyControllerMethodSupported.isMethodSupported(method,
-          platform: platform);
+  bool isMethodSupported(
+    PlatformProxyControllerMethod method, {
+    TargetPlatform? platform,
+  }) => _PlatformProxyControllerMethodSupported.isMethodSupported(
+    method,
+    platform: platform,
+  );
 }
 
 ///{@template flutter_inappwebview_platform_interface.ProxySettings}
@@ -189,24 +206,27 @@ abstract class PlatformProxyController extends PlatformInterface {
 ///{@endtemplate}
 ///
 ///{@macro flutter_inappwebview_platform_interface.ProxySettings.supported_platforms}
-@SupportedPlatforms(platforms: [
-  AndroidPlatform(
+@SupportedPlatforms(
+  platforms: [
+    AndroidPlatform(
       apiName: 'ProxyConfig',
       apiUrl:
-          'https://developer.android.com/reference/androidx/webkit/ProxyConfig'),
-  IOSPlatform(
-    apiName: 'ProxyConfiguration',
-    apiUrl:
-        'https://developer.apple.com/documentation/network/proxyconfiguration',
-    available: '17.0',
-  ),
-  MacOSPlatform(
-    apiName: 'ProxyConfiguration',
-    apiUrl:
-        'https://developer.apple.com/documentation/network/proxyconfiguration',
-    available: '14.0',
-  ),
-])
+          'https://developer.android.com/reference/androidx/webkit/ProxyConfig',
+    ),
+    IOSPlatform(
+      apiName: 'ProxyConfiguration',
+      apiUrl:
+          'https://developer.apple.com/documentation/network/proxyconfiguration',
+      available: '17.0',
+    ),
+    MacOSPlatform(
+      apiName: 'ProxyConfiguration',
+      apiUrl:
+          'https://developer.apple.com/documentation/network/proxyconfiguration',
+      available: '14.0',
+    ),
+  ],
+)
 @ExchangeableObject(copyMethod: true)
 class ProxySettings_ {
   ///List of bypass rules.
@@ -214,17 +234,13 @@ class ProxySettings_ {
   ///A bypass rule describes URLs that should skip proxy override settings and make a direct connection instead. These can be URLs or IP addresses. Wildcards are accepted.
   ///For instance, the rule "*example.com" would mean that requests to "http://example.com" and "www.example.com" would not be directed to any proxy,
   ///instead, would be made directly to the origin specified by the URL.
-  @SupportedPlatforms(platforms: [
-    AndroidPlatform(),
-  ])
+  @SupportedPlatforms(platforms: [AndroidPlatform()])
   List<String> bypassRules;
 
   ///List of scheme filters.
   ///
   ///URLs that match these scheme filters are connected to directly instead of using a proxy server.
-  @SupportedPlatforms(platforms: [
-    AndroidPlatform(),
-  ])
+  @SupportedPlatforms(platforms: [AndroidPlatform()])
   List<String> directs;
 
   ///List of proxy rules to be used for all URLs. Additional rules have decreasing precedence.
@@ -235,19 +251,15 @@ class ProxySettings_ {
   ///Port number is optional and defaults to `80` for `HTTP`, `443` for `HTTPS` and `1080` for `SOCKS`.
   ///
   ///The correct syntax for hosts is defined by [RFC 3986](https://tools.ietf.org/html/rfc3986#section-3.2.2).
-  @SupportedPlatforms(platforms: [
-    AndroidPlatform(),
-    IOSPlatform(),
-    MacOSPlatform(),
-  ])
+  @SupportedPlatforms(
+    platforms: [AndroidPlatform(), IOSPlatform(), MacOSPlatform()],
+  )
   List<ProxyRule_> proxyRules;
 
   ///Hostnames without a period in them (and that are not IP literals) will skip proxy settings and be connected to directly instead. Examples: `"abc"`, `"local"`, `"some-domain"`.
   ///
   ///Hostnames with a trailing dot are not considered simple by this definition.
-  @SupportedPlatforms(platforms: [
-    AndroidPlatform(),
-  ])
+  @SupportedPlatforms(platforms: [AndroidPlatform()])
   bool? bypassSimpleHostnames;
 
   ///By default, certain hostnames implicitly bypass the proxy if they are link-local IPs, or localhost addresses.
@@ -259,9 +271,7 @@ class ProxySettings_ {
   ///- 169.254/16
   ///- [FE80::]/10
   ///Set this to `true` to override the default behavior and force localhost and link-local URLs to be sent through the proxy.
-  @SupportedPlatforms(platforms: [
-    AndroidPlatform(),
-  ])
+  @SupportedPlatforms(platforms: [AndroidPlatform()])
   bool? removeImplicitRules;
 
   ///Reverse the bypass list.
@@ -273,18 +283,17 @@ class ProxySettings_ {
   ///Use [bypassRules] to add bypass rules.
   ///
   ///**NOTE**: available only if [WebViewFeature.PROXY_OVERRIDE_REVERSE_BYPASS] feature is supported.
-  @SupportedPlatforms(platforms: [
-    AndroidPlatform(),
-  ])
+  @SupportedPlatforms(platforms: [AndroidPlatform()])
   bool reverseBypassEnabled;
 
-  ProxySettings_(
-      {this.bypassRules = const [],
-      this.directs = const [],
-      this.proxyRules = const [],
-      this.bypassSimpleHostnames,
-      this.removeImplicitRules,
-      this.reverseBypassEnabled = false});
+  ProxySettings_({
+    this.bypassRules = const [],
+    this.directs = const [],
+    this.proxyRules = const [],
+    this.bypassSimpleHostnames,
+    this.removeImplicitRules,
+    this.reverseBypassEnabled = false,
+  });
 
   ///{@template flutter_inappwebview_platform_interface.ProxySettings.isClassSupported}
   ///Check if the current class is supported by the [defaultTargetPlatform] or a specific [platform].
@@ -295,8 +304,11 @@ class ProxySettings_ {
   ///{@template flutter_inappwebview_platform_interface.ProxySettings.isPropertySupported}
   ///Check if the current class is supported by the [defaultTargetPlatform] or a specific [platform].
   ///{@endtemplate}
-  static bool isPropertySupported(ProxySettingsProperty property,
-          {TargetPlatform? platform}) =>
-      _ProxySettingsPropertySupported.isPropertySupported(property,
-          platform: platform);
+  static bool isPropertySupported(
+    ProxySettingsProperty property, {
+    TargetPlatform? platform,
+  }) => _ProxySettingsPropertySupported.isPropertySupported(
+    property,
+    platform: platform,
+  );
 }

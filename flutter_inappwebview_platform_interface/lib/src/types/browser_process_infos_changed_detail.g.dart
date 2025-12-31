@@ -16,16 +16,23 @@ class BrowserProcessInfosChangedDetail {
   BrowserProcessInfosChangedDetail({this.infos = const []});
 
   ///Gets a possible [BrowserProcessInfosChangedDetail] instance from a [Map] value.
-  static BrowserProcessInfosChangedDetail? fromMap(Map<String, dynamic>? map,
-      {EnumMethod? enumMethod}) {
+  static BrowserProcessInfosChangedDetail? fromMap(
+    Map<String, dynamic>? map, {
+    EnumMethod? enumMethod,
+  }) {
     if (map == null) {
       return null;
     }
     final instance = BrowserProcessInfosChangedDetail();
     if (map['infos'] != null) {
-      instance.infos = List<BrowserProcessInfo>.from(map['infos'].map((e) =>
-          BrowserProcessInfo.fromMap(e?.cast<String, dynamic>(),
-              enumMethod: enumMethod)!));
+      instance.infos = List<BrowserProcessInfo>.from(
+        map['infos'].map(
+          (e) => BrowserProcessInfo.fromMap(
+            e?.cast<String, dynamic>(),
+            enumMethod: enumMethod,
+          )!,
+        ),
+      );
     }
     return instance;
   }

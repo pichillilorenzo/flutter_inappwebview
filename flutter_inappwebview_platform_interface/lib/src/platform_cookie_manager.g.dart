@@ -23,12 +23,12 @@ extension _PlatformCookieManagerCreationParamsClassSupported
     return kIsWeb && platform == null
         ? true
         : ((kIsWeb && platform != null) || !kIsWeb) &&
-            [
-              TargetPlatform.android,
-              TargetPlatform.iOS,
-              TargetPlatform.macOS,
-              TargetPlatform.windows
-            ].contains(platform ?? defaultTargetPlatform);
+              [
+                TargetPlatform.android,
+                TargetPlatform.iOS,
+                TargetPlatform.macOS,
+                TargetPlatform.windows,
+              ].contains(platform ?? defaultTargetPlatform);
   }
 }
 
@@ -49,13 +49,15 @@ enum PlatformCookieManagerCreationParamsProperty {
 extension _PlatformCookieManagerCreationParamsPropertySupported
     on PlatformCookieManagerCreationParams {
   static bool isPropertySupported(
-      PlatformCookieManagerCreationParamsProperty property,
-      {TargetPlatform? platform}) {
+    PlatformCookieManagerCreationParamsProperty property, {
+    TargetPlatform? platform,
+  }) {
     switch (property) {
       case PlatformCookieManagerCreationParamsProperty.webViewEnvironment:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.windows]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.windows,
+            ].contains(platform ?? defaultTargetPlatform);
     }
   }
 }
@@ -80,12 +82,12 @@ extension _PlatformCookieManagerClassSupported on PlatformCookieManager {
     return kIsWeb && platform == null
         ? true
         : ((kIsWeb && platform != null) || !kIsWeb) &&
-            [
-              TargetPlatform.android,
-              TargetPlatform.iOS,
-              TargetPlatform.macOS,
-              TargetPlatform.windows
-            ].contains(platform ?? defaultTargetPlatform);
+              [
+                TargetPlatform.android,
+                TargetPlatform.iOS,
+                TargetPlatform.macOS,
+                TargetPlatform.windows,
+              ].contains(platform ?? defaultTargetPlatform);
   }
 }
 
@@ -293,8 +295,10 @@ enum PlatformCookieManagerMethod {
 }
 
 extension _PlatformCookieManagerMethodSupported on PlatformCookieManager {
-  static bool isMethodSupported(PlatformCookieManagerMethod method,
-      {TargetPlatform? platform}) {
+  static bool isMethodSupported(
+    PlatformCookieManagerMethod method, {
+    TargetPlatform? platform,
+  }) {
     switch (method) {
       case PlatformCookieManagerMethod.deleteAllCookies:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
@@ -302,70 +306,74 @@ extension _PlatformCookieManagerMethodSupported on PlatformCookieManager {
               TargetPlatform.android,
               TargetPlatform.iOS,
               TargetPlatform.macOS,
-              TargetPlatform.windows
+              TargetPlatform.windows,
             ].contains(platform ?? defaultTargetPlatform);
       case PlatformCookieManagerMethod.deleteCookie:
         return kIsWeb && platform == null
             ? true
             : ((kIsWeb && platform != null) || !kIsWeb) &&
-                [
-                  TargetPlatform.android,
-                  TargetPlatform.iOS,
-                  TargetPlatform.macOS,
-                  TargetPlatform.windows
-                ].contains(platform ?? defaultTargetPlatform);
+                  [
+                    TargetPlatform.android,
+                    TargetPlatform.iOS,
+                    TargetPlatform.macOS,
+                    TargetPlatform.windows,
+                  ].contains(platform ?? defaultTargetPlatform);
       case PlatformCookieManagerMethod.deleteCookies:
         return kIsWeb && platform == null
             ? true
             : ((kIsWeb && platform != null) || !kIsWeb) &&
-                [
-                  TargetPlatform.android,
-                  TargetPlatform.iOS,
-                  TargetPlatform.macOS,
-                  TargetPlatform.windows
-                ].contains(platform ?? defaultTargetPlatform);
+                  [
+                    TargetPlatform.android,
+                    TargetPlatform.iOS,
+                    TargetPlatform.macOS,
+                    TargetPlatform.windows,
+                  ].contains(platform ?? defaultTargetPlatform);
       case PlatformCookieManagerMethod.flush:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.android]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.android,
+            ].contains(platform ?? defaultTargetPlatform);
       case PlatformCookieManagerMethod.getAllCookies:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.iOS, TargetPlatform.macOS]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.iOS,
+              TargetPlatform.macOS,
+            ].contains(platform ?? defaultTargetPlatform);
       case PlatformCookieManagerMethod.getCookie:
         return kIsWeb && platform == null
             ? true
             : ((kIsWeb && platform != null) || !kIsWeb) &&
-                [
-                  TargetPlatform.android,
-                  TargetPlatform.iOS,
-                  TargetPlatform.macOS,
-                  TargetPlatform.windows
-                ].contains(platform ?? defaultTargetPlatform);
+                  [
+                    TargetPlatform.android,
+                    TargetPlatform.iOS,
+                    TargetPlatform.macOS,
+                    TargetPlatform.windows,
+                  ].contains(platform ?? defaultTargetPlatform);
       case PlatformCookieManagerMethod.getCookies:
         return kIsWeb && platform == null
             ? true
             : ((kIsWeb && platform != null) || !kIsWeb) &&
-                [
-                  TargetPlatform.android,
-                  TargetPlatform.iOS,
-                  TargetPlatform.macOS,
-                  TargetPlatform.windows
-                ].contains(platform ?? defaultTargetPlatform);
+                  [
+                    TargetPlatform.android,
+                    TargetPlatform.iOS,
+                    TargetPlatform.macOS,
+                    TargetPlatform.windows,
+                  ].contains(platform ?? defaultTargetPlatform);
       case PlatformCookieManagerMethod.removeSessionCookies:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.android]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.android,
+            ].contains(platform ?? defaultTargetPlatform);
       case PlatformCookieManagerMethod.setCookie:
         return kIsWeb && platform == null
             ? true
             : ((kIsWeb && platform != null) || !kIsWeb) &&
-                [
-                  TargetPlatform.android,
-                  TargetPlatform.iOS,
-                  TargetPlatform.macOS,
-                  TargetPlatform.windows
-                ].contains(platform ?? defaultTargetPlatform);
+                  [
+                    TargetPlatform.android,
+                    TargetPlatform.iOS,
+                    TargetPlatform.macOS,
+                    TargetPlatform.windows,
+                  ].contains(platform ?? defaultTargetPlatform);
     }
   }
 }

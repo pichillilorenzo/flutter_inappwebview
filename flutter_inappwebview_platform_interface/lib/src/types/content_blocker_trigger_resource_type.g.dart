@@ -11,28 +11,45 @@ class ContentBlockerTriggerResourceType {
   final String _value;
   final String _nativeValue;
   const ContentBlockerTriggerResourceType._internal(
-      this._value, this._nativeValue);
-// ignore: unused_element
+    this._value,
+    this._nativeValue,
+  );
+  // ignore: unused_element
   factory ContentBlockerTriggerResourceType._internalMultiPlatform(
-          String value, Function nativeValue) =>
-      ContentBlockerTriggerResourceType._internal(value, nativeValue());
-  static const DOCUMENT =
-      ContentBlockerTriggerResourceType._internal('document', 'document');
-  static const FONT =
-      ContentBlockerTriggerResourceType._internal('font', 'font');
-  static const IMAGE =
-      ContentBlockerTriggerResourceType._internal('image', 'image');
-  static const MEDIA =
-      ContentBlockerTriggerResourceType._internal('media', 'media');
+    String value,
+    Function nativeValue,
+  ) => ContentBlockerTriggerResourceType._internal(value, nativeValue());
+  static const DOCUMENT = ContentBlockerTriggerResourceType._internal(
+    'document',
+    'document',
+  );
+  static const FONT = ContentBlockerTriggerResourceType._internal(
+    'font',
+    'font',
+  );
+  static const IMAGE = ContentBlockerTriggerResourceType._internal(
+    'image',
+    'image',
+  );
+  static const MEDIA = ContentBlockerTriggerResourceType._internal(
+    'media',
+    'media',
+  );
 
   ///Any untyped load
   static const RAW = ContentBlockerTriggerResourceType._internal('raw', 'raw');
-  static const SCRIPT =
-      ContentBlockerTriggerResourceType._internal('script', 'script');
-  static const STYLE_SHEET =
-      ContentBlockerTriggerResourceType._internal('style-sheet', 'style-sheet');
+  static const SCRIPT = ContentBlockerTriggerResourceType._internal(
+    'script',
+    'script',
+  );
+  static const STYLE_SHEET = ContentBlockerTriggerResourceType._internal(
+    'style-sheet',
+    'style-sheet',
+  );
   static const SVG_DOCUMENT = ContentBlockerTriggerResourceType._internal(
-      'svg-document', 'svg-document');
+    'svg-document',
+    'svg-document',
+  );
 
   ///Set of all values of [ContentBlockerTriggerResourceType].
   static final Set<ContentBlockerTriggerResourceType> values = [
@@ -50,8 +67,9 @@ class ContentBlockerTriggerResourceType {
   static ContentBlockerTriggerResourceType? fromValue(String? value) {
     if (value != null) {
       try {
-        return ContentBlockerTriggerResourceType.values
-            .firstWhere((element) => element.toValue() == value);
+        return ContentBlockerTriggerResourceType.values.firstWhere(
+          (element) => element.toValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -63,8 +81,9 @@ class ContentBlockerTriggerResourceType {
   static ContentBlockerTriggerResourceType? fromNativeValue(String? value) {
     if (value != null) {
       try {
-        return ContentBlockerTriggerResourceType.values
-            .firstWhere((element) => element.toNativeValue() == value);
+        return ContentBlockerTriggerResourceType.values.firstWhere(
+          (element) => element.toNativeValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -80,8 +99,9 @@ class ContentBlockerTriggerResourceType {
   static ContentBlockerTriggerResourceType? byName(String? name) {
     if (name != null) {
       try {
-        return ContentBlockerTriggerResourceType.values
-            .firstWhere((element) => element.name() == name);
+        return ContentBlockerTriggerResourceType.values.firstWhere(
+          (element) => element.name() == name,
+        );
       } catch (e) {
         return null;
       }
@@ -100,7 +120,7 @@ class ContentBlockerTriggerResourceType {
   static Map<String, ContentBlockerTriggerResourceType> asNameMap() =>
       <String, ContentBlockerTriggerResourceType>{
         for (final value in ContentBlockerTriggerResourceType.values)
-          value.name(): value
+          value.name(): value,
       };
 
   ///Gets [String] value.

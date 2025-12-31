@@ -24,10 +24,11 @@ class JsConfirmResponse_ {
   ///Action used to confirm that the user hit confirm or cancel button.
   JsConfirmResponseAction_? action;
 
-  JsConfirmResponse_(
-      {this.message = "",
-      this.handledByClient = false,
-      this.confirmButtonTitle = "",
-      this.cancelButtonTitle = "",
-      this.action = JsConfirmResponseAction_.CANCEL});
+  JsConfirmResponse_({
+    this.message = "",
+    this.handledByClient = false,
+    this.confirmButtonTitle = "",
+    this.cancelButtonTitle = "",
+    this.action = JsConfirmResponseAction_.CANCEL,
+  });
 }

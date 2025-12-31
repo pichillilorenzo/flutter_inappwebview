@@ -11,128 +11,239 @@ class WebViewInterface {
   final String _value;
   final String _nativeValue;
   const WebViewInterface._internal(this._value, this._nativeValue);
-// ignore: unused_element
+  // ignore: unused_element
   factory WebViewInterface._internalMultiPlatform(
-          String value, Function nativeValue) =>
-      WebViewInterface._internal(value, nativeValue());
-  static const ICoreWebView2 =
-      WebViewInterface._internal('ICoreWebView2', 'ICoreWebView2');
+    String value,
+    Function nativeValue,
+  ) => WebViewInterface._internal(value, nativeValue());
+  static const ICoreWebView2 = WebViewInterface._internal(
+    'ICoreWebView2',
+    'ICoreWebView2',
+  );
   static const ICoreWebView2CompositionController = WebViewInterface._internal(
-      'ICoreWebView2CompositionController',
-      'ICoreWebView2CompositionController');
+    'ICoreWebView2CompositionController',
+    'ICoreWebView2CompositionController',
+  );
   static const ICoreWebView2CompositionController2 = WebViewInterface._internal(
-      'ICoreWebView2CompositionController2',
-      'ICoreWebView2CompositionController2');
+    'ICoreWebView2CompositionController2',
+    'ICoreWebView2CompositionController2',
+  );
   static const ICoreWebView2CompositionController3 = WebViewInterface._internal(
-      'ICoreWebView2CompositionController3',
-      'ICoreWebView2CompositionController3');
+    'ICoreWebView2CompositionController3',
+    'ICoreWebView2CompositionController3',
+  );
   static const ICoreWebView2CompositionController4 = WebViewInterface._internal(
-      'ICoreWebView2CompositionController4',
-      'ICoreWebView2CompositionController4');
+    'ICoreWebView2CompositionController4',
+    'ICoreWebView2CompositionController4',
+  );
   static const ICoreWebView2Controller = WebViewInterface._internal(
-      'ICoreWebView2Controller', 'ICoreWebView2Controller');
+    'ICoreWebView2Controller',
+    'ICoreWebView2Controller',
+  );
   static const ICoreWebView2Controller2 = WebViewInterface._internal(
-      'ICoreWebView2Controller2', 'ICoreWebView2Controller2');
+    'ICoreWebView2Controller2',
+    'ICoreWebView2Controller2',
+  );
   static const ICoreWebView2Controller3 = WebViewInterface._internal(
-      'ICoreWebView2Controller3', 'ICoreWebView2Controller3');
+    'ICoreWebView2Controller3',
+    'ICoreWebView2Controller3',
+  );
   static const ICoreWebView2Controller4 = WebViewInterface._internal(
-      'ICoreWebView2Controller4', 'ICoreWebView2Controller4');
+    'ICoreWebView2Controller4',
+    'ICoreWebView2Controller4',
+  );
   static const ICoreWebView2Environment = WebViewInterface._internal(
-      'ICoreWebView2Environment', 'ICoreWebView2Environment');
+    'ICoreWebView2Environment',
+    'ICoreWebView2Environment',
+  );
   static const ICoreWebView2Environment10 = WebViewInterface._internal(
-      'ICoreWebView2Environment10', 'ICoreWebView2Environment10');
+    'ICoreWebView2Environment10',
+    'ICoreWebView2Environment10',
+  );
   static const ICoreWebView2Environment11 = WebViewInterface._internal(
-      'ICoreWebView2Environment11', 'ICoreWebView2Environment11');
+    'ICoreWebView2Environment11',
+    'ICoreWebView2Environment11',
+  );
   static const ICoreWebView2Environment12 = WebViewInterface._internal(
-      'ICoreWebView2Environment12', 'ICoreWebView2Environment12');
+    'ICoreWebView2Environment12',
+    'ICoreWebView2Environment12',
+  );
   static const ICoreWebView2Environment13 = WebViewInterface._internal(
-      'ICoreWebView2Environment13', 'ICoreWebView2Environment13');
+    'ICoreWebView2Environment13',
+    'ICoreWebView2Environment13',
+  );
   static const ICoreWebView2Environment14 = WebViewInterface._internal(
-      'ICoreWebView2Environment14', 'ICoreWebView2Environment14');
+    'ICoreWebView2Environment14',
+    'ICoreWebView2Environment14',
+  );
   static const ICoreWebView2Environment2 = WebViewInterface._internal(
-      'ICoreWebView2Environment2', 'ICoreWebView2Environment2');
+    'ICoreWebView2Environment2',
+    'ICoreWebView2Environment2',
+  );
   static const ICoreWebView2Environment3 = WebViewInterface._internal(
-      'ICoreWebView2Environment3', 'ICoreWebView2Environment3');
+    'ICoreWebView2Environment3',
+    'ICoreWebView2Environment3',
+  );
   static const ICoreWebView2Environment4 = WebViewInterface._internal(
-      'ICoreWebView2Environment4', 'ICoreWebView2Environment4');
+    'ICoreWebView2Environment4',
+    'ICoreWebView2Environment4',
+  );
   static const ICoreWebView2Environment5 = WebViewInterface._internal(
-      'ICoreWebView2Environment5', 'ICoreWebView2Environment5');
+    'ICoreWebView2Environment5',
+    'ICoreWebView2Environment5',
+  );
   static const ICoreWebView2Environment6 = WebViewInterface._internal(
-      'ICoreWebView2Environment6', 'ICoreWebView2Environment6');
+    'ICoreWebView2Environment6',
+    'ICoreWebView2Environment6',
+  );
   static const ICoreWebView2Environment7 = WebViewInterface._internal(
-      'ICoreWebView2Environment7', 'ICoreWebView2Environment7');
+    'ICoreWebView2Environment7',
+    'ICoreWebView2Environment7',
+  );
   static const ICoreWebView2Environment8 = WebViewInterface._internal(
-      'ICoreWebView2Environment8', 'ICoreWebView2Environment8');
+    'ICoreWebView2Environment8',
+    'ICoreWebView2Environment8',
+  );
   static const ICoreWebView2Environment9 = WebViewInterface._internal(
-      'ICoreWebView2Environment9', 'ICoreWebView2Environment9');
+    'ICoreWebView2Environment9',
+    'ICoreWebView2Environment9',
+  );
   static const ICoreWebView2Settings = WebViewInterface._internal(
-      'ICoreWebView2Settings', 'ICoreWebView2Settings');
+    'ICoreWebView2Settings',
+    'ICoreWebView2Settings',
+  );
   static const ICoreWebView2Settings2 = WebViewInterface._internal(
-      'ICoreWebView2Settings2', 'ICoreWebView2Settings2');
+    'ICoreWebView2Settings2',
+    'ICoreWebView2Settings2',
+  );
   static const ICoreWebView2Settings3 = WebViewInterface._internal(
-      'ICoreWebView2Settings3', 'ICoreWebView2Settings3');
+    'ICoreWebView2Settings3',
+    'ICoreWebView2Settings3',
+  );
   static const ICoreWebView2Settings4 = WebViewInterface._internal(
-      'ICoreWebView2Settings4', 'ICoreWebView2Settings4');
+    'ICoreWebView2Settings4',
+    'ICoreWebView2Settings4',
+  );
   static const ICoreWebView2Settings5 = WebViewInterface._internal(
-      'ICoreWebView2Settings5', 'ICoreWebView2Settings5');
+    'ICoreWebView2Settings5',
+    'ICoreWebView2Settings5',
+  );
   static const ICoreWebView2Settings6 = WebViewInterface._internal(
-      'ICoreWebView2Settings6', 'ICoreWebView2Settings6');
+    'ICoreWebView2Settings6',
+    'ICoreWebView2Settings6',
+  );
   static const ICoreWebView2Settings7 = WebViewInterface._internal(
-      'ICoreWebView2Settings7', 'ICoreWebView2Settings7');
+    'ICoreWebView2Settings7',
+    'ICoreWebView2Settings7',
+  );
   static const ICoreWebView2Settings8 = WebViewInterface._internal(
-      'ICoreWebView2Settings8', 'ICoreWebView2Settings8');
+    'ICoreWebView2Settings8',
+    'ICoreWebView2Settings8',
+  );
   static const ICoreWebView2Settings9 = WebViewInterface._internal(
-      'ICoreWebView2Settings9', 'ICoreWebView2Settings9');
-  static const ICoreWebView2_10 =
-      WebViewInterface._internal('ICoreWebView2_10', 'ICoreWebView2_10');
-  static const ICoreWebView2_11 =
-      WebViewInterface._internal('ICoreWebView2_11', 'ICoreWebView2_11');
-  static const ICoreWebView2_12 =
-      WebViewInterface._internal('ICoreWebView2_12', 'ICoreWebView2_12');
-  static const ICoreWebView2_13 =
-      WebViewInterface._internal('ICoreWebView2_13', 'ICoreWebView2_13');
-  static const ICoreWebView2_14 =
-      WebViewInterface._internal('ICoreWebView2_14', 'ICoreWebView2_14');
-  static const ICoreWebView2_15 =
-      WebViewInterface._internal('ICoreWebView2_15', 'ICoreWebView2_15');
-  static const ICoreWebView2_16 =
-      WebViewInterface._internal('ICoreWebView2_16', 'ICoreWebView2_16');
-  static const ICoreWebView2_17 =
-      WebViewInterface._internal('ICoreWebView2_17', 'ICoreWebView2_17');
-  static const ICoreWebView2_18 =
-      WebViewInterface._internal('ICoreWebView2_18', 'ICoreWebView2_18');
-  static const ICoreWebView2_19 =
-      WebViewInterface._internal('ICoreWebView2_19', 'ICoreWebView2_19');
-  static const ICoreWebView2_2 =
-      WebViewInterface._internal('ICoreWebView2_2', 'ICoreWebView2_2');
-  static const ICoreWebView2_20 =
-      WebViewInterface._internal('ICoreWebView2_20', 'ICoreWebView2_20');
-  static const ICoreWebView2_21 =
-      WebViewInterface._internal('ICoreWebView2_21', 'ICoreWebView2_21');
-  static const ICoreWebView2_22 =
-      WebViewInterface._internal('ICoreWebView2_22', 'ICoreWebView2_22');
-  static const ICoreWebView2_23 =
-      WebViewInterface._internal('ICoreWebView2_23', 'ICoreWebView2_23');
-  static const ICoreWebView2_24 =
-      WebViewInterface._internal('ICoreWebView2_24', 'ICoreWebView2_24');
-  static const ICoreWebView2_25 =
-      WebViewInterface._internal('ICoreWebView2_25', 'ICoreWebView2_25');
-  static const ICoreWebView2_26 =
-      WebViewInterface._internal('ICoreWebView2_26', 'ICoreWebView2_26');
-  static const ICoreWebView2_3 =
-      WebViewInterface._internal('ICoreWebView2_3', 'ICoreWebView2_3');
-  static const ICoreWebView2_4 =
-      WebViewInterface._internal('ICoreWebView2_4', 'ICoreWebView2_4');
-  static const ICoreWebView2_5 =
-      WebViewInterface._internal('ICoreWebView2_5', 'ICoreWebView2_5');
-  static const ICoreWebView2_6 =
-      WebViewInterface._internal('ICoreWebView2_6', 'ICoreWebView2_6');
-  static const ICoreWebView2_7 =
-      WebViewInterface._internal('ICoreWebView2_7', 'ICoreWebView2_7');
-  static const ICoreWebView2_8 =
-      WebViewInterface._internal('ICoreWebView2_8', 'ICoreWebView2_8');
-  static const ICoreWebView2_9 =
-      WebViewInterface._internal('ICoreWebView2_9', 'ICoreWebView2_9');
+    'ICoreWebView2Settings9',
+    'ICoreWebView2Settings9',
+  );
+  static const ICoreWebView2_10 = WebViewInterface._internal(
+    'ICoreWebView2_10',
+    'ICoreWebView2_10',
+  );
+  static const ICoreWebView2_11 = WebViewInterface._internal(
+    'ICoreWebView2_11',
+    'ICoreWebView2_11',
+  );
+  static const ICoreWebView2_12 = WebViewInterface._internal(
+    'ICoreWebView2_12',
+    'ICoreWebView2_12',
+  );
+  static const ICoreWebView2_13 = WebViewInterface._internal(
+    'ICoreWebView2_13',
+    'ICoreWebView2_13',
+  );
+  static const ICoreWebView2_14 = WebViewInterface._internal(
+    'ICoreWebView2_14',
+    'ICoreWebView2_14',
+  );
+  static const ICoreWebView2_15 = WebViewInterface._internal(
+    'ICoreWebView2_15',
+    'ICoreWebView2_15',
+  );
+  static const ICoreWebView2_16 = WebViewInterface._internal(
+    'ICoreWebView2_16',
+    'ICoreWebView2_16',
+  );
+  static const ICoreWebView2_17 = WebViewInterface._internal(
+    'ICoreWebView2_17',
+    'ICoreWebView2_17',
+  );
+  static const ICoreWebView2_18 = WebViewInterface._internal(
+    'ICoreWebView2_18',
+    'ICoreWebView2_18',
+  );
+  static const ICoreWebView2_19 = WebViewInterface._internal(
+    'ICoreWebView2_19',
+    'ICoreWebView2_19',
+  );
+  static const ICoreWebView2_2 = WebViewInterface._internal(
+    'ICoreWebView2_2',
+    'ICoreWebView2_2',
+  );
+  static const ICoreWebView2_20 = WebViewInterface._internal(
+    'ICoreWebView2_20',
+    'ICoreWebView2_20',
+  );
+  static const ICoreWebView2_21 = WebViewInterface._internal(
+    'ICoreWebView2_21',
+    'ICoreWebView2_21',
+  );
+  static const ICoreWebView2_22 = WebViewInterface._internal(
+    'ICoreWebView2_22',
+    'ICoreWebView2_22',
+  );
+  static const ICoreWebView2_23 = WebViewInterface._internal(
+    'ICoreWebView2_23',
+    'ICoreWebView2_23',
+  );
+  static const ICoreWebView2_24 = WebViewInterface._internal(
+    'ICoreWebView2_24',
+    'ICoreWebView2_24',
+  );
+  static const ICoreWebView2_25 = WebViewInterface._internal(
+    'ICoreWebView2_25',
+    'ICoreWebView2_25',
+  );
+  static const ICoreWebView2_26 = WebViewInterface._internal(
+    'ICoreWebView2_26',
+    'ICoreWebView2_26',
+  );
+  static const ICoreWebView2_3 = WebViewInterface._internal(
+    'ICoreWebView2_3',
+    'ICoreWebView2_3',
+  );
+  static const ICoreWebView2_4 = WebViewInterface._internal(
+    'ICoreWebView2_4',
+    'ICoreWebView2_4',
+  );
+  static const ICoreWebView2_5 = WebViewInterface._internal(
+    'ICoreWebView2_5',
+    'ICoreWebView2_5',
+  );
+  static const ICoreWebView2_6 = WebViewInterface._internal(
+    'ICoreWebView2_6',
+    'ICoreWebView2_6',
+  );
+  static const ICoreWebView2_7 = WebViewInterface._internal(
+    'ICoreWebView2_7',
+    'ICoreWebView2_7',
+  );
+  static const ICoreWebView2_8 = WebViewInterface._internal(
+    'ICoreWebView2_8',
+    'ICoreWebView2_8',
+  );
+  static const ICoreWebView2_9 = WebViewInterface._internal(
+    'ICoreWebView2_9',
+    'ICoreWebView2_9',
+  );
 
   ///Set of all values of [WebViewInterface].
   static final Set<WebViewInterface> values = [
@@ -199,8 +310,9 @@ class WebViewInterface {
   static WebViewInterface? fromValue(String? value) {
     if (value != null) {
       try {
-        return WebViewInterface.values
-            .firstWhere((element) => element.toValue() == value);
+        return WebViewInterface.values.firstWhere(
+          (element) => element.toValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -212,8 +324,9 @@ class WebViewInterface {
   static WebViewInterface? fromNativeValue(String? value) {
     if (value != null) {
       try {
-        return WebViewInterface.values
-            .firstWhere((element) => element.toNativeValue() == value);
+        return WebViewInterface.values.firstWhere(
+          (element) => element.toNativeValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -229,8 +342,9 @@ class WebViewInterface {
   static WebViewInterface? byName(String? name) {
     if (name != null) {
       try {
-        return WebViewInterface.values
-            .firstWhere((element) => element.name() == name);
+        return WebViewInterface.values.firstWhere(
+          (element) => element.name() == name,
+        );
       } catch (e) {
         return null;
       }
@@ -248,7 +362,7 @@ class WebViewInterface {
   /// them will be represented in the returned map.
   static Map<String, WebViewInterface> asNameMap() =>
       <String, WebViewInterface>{
-        for (final value in WebViewInterface.values) value.name(): value
+        for (final value in WebViewInterface.values) value.name(): value,
       };
 
   ///Gets [String] value.

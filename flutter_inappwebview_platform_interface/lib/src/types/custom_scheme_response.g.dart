@@ -17,14 +17,17 @@ class CustomSchemeResponse {
 
   ///Data enconded to 'base64'.
   Uint8List data;
-  CustomSchemeResponse(
-      {this.contentEncoding = 'utf-8',
-      required this.contentType,
-      required this.data});
+  CustomSchemeResponse({
+    this.contentEncoding = 'utf-8',
+    required this.contentType,
+    required this.data,
+  });
 
   ///Gets a possible [CustomSchemeResponse] instance from a [Map] value.
-  static CustomSchemeResponse? fromMap(Map<String, dynamic>? map,
-      {EnumMethod? enumMethod}) {
+  static CustomSchemeResponse? fromMap(
+    Map<String, dynamic>? map, {
+    EnumMethod? enumMethod,
+  }) {
     if (map == null) {
       return null;
     }

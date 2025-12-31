@@ -11,10 +11,11 @@ class ContentBlockerActionType {
   final String _value;
   final String _nativeValue;
   const ContentBlockerActionType._internal(this._value, this._nativeValue);
-// ignore: unused_element
+  // ignore: unused_element
   factory ContentBlockerActionType._internalMultiPlatform(
-          String value, Function nativeValue) =>
-      ContentBlockerActionType._internal(value, nativeValue());
+    String value,
+    Function nativeValue,
+  ) => ContentBlockerActionType._internal(value, nativeValue());
 
   ///Stops loading of the resource. If the resource was cached, the cache is ignored.
   ///
@@ -22,20 +23,22 @@ class ContentBlockerActionType {
   ///- Android WebView
   ///- iOS WKWebView
   ///- macOS WKWebView
-  static final BLOCK =
-      ContentBlockerActionType._internalMultiPlatform('block', () {
-    switch (defaultTargetPlatform) {
-      case TargetPlatform.android:
-        return 'block';
-      case TargetPlatform.iOS:
-        return 'block';
-      case TargetPlatform.macOS:
-        return 'block';
-      default:
-        break;
-    }
-    return null;
-  });
+  static final BLOCK = ContentBlockerActionType._internalMultiPlatform(
+    'block',
+    () {
+      switch (defaultTargetPlatform) {
+        case TargetPlatform.android:
+          return 'block';
+        case TargetPlatform.iOS:
+          return 'block';
+        case TargetPlatform.macOS:
+          return 'block';
+        default:
+          break;
+      }
+      return null;
+    },
+  );
 
   ///Strips cookies from the header before sending it to the server.
   ///This only blocks cookies otherwise acceptable to WebView's privacy policy.
@@ -44,18 +47,20 @@ class ContentBlockerActionType {
   ///**Officially Supported Platforms/Implementations**:
   ///- iOS WKWebView
   ///- macOS WKWebView
-  static final BLOCK_COOKIES =
-      ContentBlockerActionType._internalMultiPlatform('block-cookies', () {
-    switch (defaultTargetPlatform) {
-      case TargetPlatform.iOS:
-        return 'block-cookies';
-      case TargetPlatform.macOS:
-        return 'block-cookies';
-      default:
-        break;
-    }
-    return null;
-  });
+  static final BLOCK_COOKIES = ContentBlockerActionType._internalMultiPlatform(
+    'block-cookies',
+    () {
+      switch (defaultTargetPlatform) {
+        case TargetPlatform.iOS:
+          return 'block-cookies';
+        case TargetPlatform.macOS:
+          return 'block-cookies';
+        default:
+          break;
+      }
+      return null;
+    },
+  );
 
   ///Hides elements of the page based on a CSS selector.
   ///A selector field contains the selector list.
@@ -69,18 +74,18 @@ class ContentBlockerActionType {
   ///- macOS WKWebView
   static final CSS_DISPLAY_NONE =
       ContentBlockerActionType._internalMultiPlatform('css-display-none', () {
-    switch (defaultTargetPlatform) {
-      case TargetPlatform.android:
-        return 'css-display-none';
-      case TargetPlatform.iOS:
-        return 'css-display-none';
-      case TargetPlatform.macOS:
-        return 'css-display-none';
-      default:
-        break;
-    }
-    return null;
-  });
+        switch (defaultTargetPlatform) {
+          case TargetPlatform.android:
+            return 'css-display-none';
+          case TargetPlatform.iOS:
+            return 'css-display-none';
+          case TargetPlatform.macOS:
+            return 'css-display-none';
+          default:
+            break;
+        }
+        return null;
+      });
 
   ///Ignores previously triggered actions.
   ///
@@ -88,18 +93,20 @@ class ContentBlockerActionType {
   ///- iOS WKWebView
   ///- macOS WKWebView
   static final IGNORE_PREVIOUS_RULES =
-      ContentBlockerActionType._internalMultiPlatform('ignore-previous-rules',
-          () {
-    switch (defaultTargetPlatform) {
-      case TargetPlatform.iOS:
-        return 'ignore-previous-rules';
-      case TargetPlatform.macOS:
-        return 'ignore-previous-rules';
-      default:
-        break;
-    }
-    return null;
-  });
+      ContentBlockerActionType._internalMultiPlatform(
+        'ignore-previous-rules',
+        () {
+          switch (defaultTargetPlatform) {
+            case TargetPlatform.iOS:
+              return 'ignore-previous-rules';
+            case TargetPlatform.macOS:
+              return 'ignore-previous-rules';
+            default:
+              break;
+          }
+          return null;
+        },
+      );
 
   ///Changes a URL from http to https.
   ///URLs with a specified (nondefault) port and links using other protocols are unaffected.
@@ -108,20 +115,22 @@ class ContentBlockerActionType {
   ///- Android WebView
   ///- iOS WKWebView
   ///- macOS WKWebView
-  static final MAKE_HTTPS =
-      ContentBlockerActionType._internalMultiPlatform('make-https', () {
-    switch (defaultTargetPlatform) {
-      case TargetPlatform.android:
-        return 'make-https';
-      case TargetPlatform.iOS:
-        return 'make-https';
-      case TargetPlatform.macOS:
-        return 'make-https';
-      default:
-        break;
-    }
-    return null;
-  });
+  static final MAKE_HTTPS = ContentBlockerActionType._internalMultiPlatform(
+    'make-https',
+    () {
+      switch (defaultTargetPlatform) {
+        case TargetPlatform.android:
+          return 'make-https';
+        case TargetPlatform.iOS:
+          return 'make-https';
+        case TargetPlatform.macOS:
+          return 'make-https';
+        default:
+          break;
+      }
+      return null;
+    },
+  );
 
   ///Set of all values of [ContentBlockerActionType].
   static final Set<ContentBlockerActionType> values = [
@@ -136,8 +145,9 @@ class ContentBlockerActionType {
   static ContentBlockerActionType? fromValue(String? value) {
     if (value != null) {
       try {
-        return ContentBlockerActionType.values
-            .firstWhere((element) => element.toValue() == value);
+        return ContentBlockerActionType.values.firstWhere(
+          (element) => element.toValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -149,8 +159,9 @@ class ContentBlockerActionType {
   static ContentBlockerActionType? fromNativeValue(String? value) {
     if (value != null) {
       try {
-        return ContentBlockerActionType.values
-            .firstWhere((element) => element.toNativeValue() == value);
+        return ContentBlockerActionType.values.firstWhere(
+          (element) => element.toNativeValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -166,8 +177,9 @@ class ContentBlockerActionType {
   static ContentBlockerActionType? byName(String? name) {
     if (name != null) {
       try {
-        return ContentBlockerActionType.values
-            .firstWhere((element) => element.name() == name);
+        return ContentBlockerActionType.values.firstWhere(
+          (element) => element.name() == name,
+        );
       } catch (e) {
         return null;
       }
@@ -185,7 +197,8 @@ class ContentBlockerActionType {
   /// them will be represented in the returned map.
   static Map<String, ContentBlockerActionType> asNameMap() =>
       <String, ContentBlockerActionType>{
-        for (final value in ContentBlockerActionType.values) value.name(): value
+        for (final value in ContentBlockerActionType.values)
+          value.name(): value,
       };
 
   ///Gets [String] value.

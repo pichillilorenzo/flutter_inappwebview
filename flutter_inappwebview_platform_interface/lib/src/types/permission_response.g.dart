@@ -15,30 +15,37 @@ class PermissionResponse {
   ///
   ///**NOTE for iOS, macOS and Windows**: not used. The [action] taken is based on the [PermissionRequest.resources].
   List<PermissionResourceType> resources;
-  PermissionResponse(
-      {this.action = PermissionResponseAction.DENY, this.resources = const []});
+  PermissionResponse({
+    this.action = PermissionResponseAction.DENY,
+    this.resources = const [],
+  });
 
   ///Gets a possible [PermissionResponse] instance from a [Map] value.
-  static PermissionResponse? fromMap(Map<String, dynamic>? map,
-      {EnumMethod? enumMethod}) {
+  static PermissionResponse? fromMap(
+    Map<String, dynamic>? map, {
+    EnumMethod? enumMethod,
+  }) {
     if (map == null) {
       return null;
     }
     final instance = PermissionResponse();
     instance.action = switch (enumMethod ?? EnumMethod.nativeValue) {
-      EnumMethod.nativeValue =>
-        PermissionResponseAction.fromNativeValue(map['action']),
+      EnumMethod.nativeValue => PermissionResponseAction.fromNativeValue(
+        map['action'],
+      ),
       EnumMethod.value => PermissionResponseAction.fromValue(map['action']),
-      EnumMethod.name => PermissionResponseAction.byName(map['action'])
+      EnumMethod.name => PermissionResponseAction.byName(map['action']),
     };
     if (map['resources'] != null) {
-      instance.resources = List<PermissionResourceType>.from(map['resources']
-          .map((e) => switch (enumMethod ?? EnumMethod.nativeValue) {
-                EnumMethod.nativeValue =>
-                  PermissionResourceType.fromNativeValue(e),
-                EnumMethod.value => PermissionResourceType.fromValue(e),
-                EnumMethod.name => PermissionResourceType.byName(e)
-              }!));
+      instance.resources = List<PermissionResourceType>.from(
+        map['resources'].map(
+          (e) => switch (enumMethod ?? EnumMethod.nativeValue) {
+            EnumMethod.nativeValue => PermissionResourceType.fromNativeValue(e),
+            EnumMethod.value => PermissionResourceType.fromValue(e),
+            EnumMethod.name => PermissionResourceType.byName(e),
+          }!,
+        ),
+      );
     }
     return instance;
   }
@@ -49,14 +56,16 @@ class PermissionResponse {
       "action": switch (enumMethod ?? EnumMethod.nativeValue) {
         EnumMethod.nativeValue => action?.toNativeValue(),
         EnumMethod.value => action?.toValue(),
-        EnumMethod.name => action?.name()
+        EnumMethod.name => action?.name(),
       },
       "resources": resources
-          .map((e) => switch (enumMethod ?? EnumMethod.nativeValue) {
-                EnumMethod.nativeValue => e.toNativeValue(),
-                EnumMethod.value => e.toValue(),
-                EnumMethod.name => e.name()
-              })
+          .map(
+            (e) => switch (enumMethod ?? EnumMethod.nativeValue) {
+              EnumMethod.nativeValue => e.toNativeValue(),
+              EnumMethod.value => e.toValue(),
+              EnumMethod.name => e.name(),
+            },
+          )
           .toList(),
     };
   }
@@ -81,23 +90,28 @@ class PermissionRequestResponse {
 
   ///Resources granted to be accessed by origin.
   List<String> resources;
-  PermissionRequestResponse(
-      {this.action = PermissionRequestResponseAction.DENY,
-      this.resources = const []});
+  PermissionRequestResponse({
+    this.action = PermissionRequestResponseAction.DENY,
+    this.resources = const [],
+  });
 
   ///Gets a possible [PermissionRequestResponse] instance from a [Map] value.
-  static PermissionRequestResponse? fromMap(Map<String, dynamic>? map,
-      {EnumMethod? enumMethod}) {
+  static PermissionRequestResponse? fromMap(
+    Map<String, dynamic>? map, {
+    EnumMethod? enumMethod,
+  }) {
     if (map == null) {
       return null;
     }
     final instance = PermissionRequestResponse();
     instance.action = switch (enumMethod ?? EnumMethod.nativeValue) {
-      EnumMethod.nativeValue =>
-        PermissionRequestResponseAction.fromNativeValue(map['action']),
-      EnumMethod.value =>
-        PermissionRequestResponseAction.fromValue(map['action']),
-      EnumMethod.name => PermissionRequestResponseAction.byName(map['action'])
+      EnumMethod.nativeValue => PermissionRequestResponseAction.fromNativeValue(
+        map['action'],
+      ),
+      EnumMethod.value => PermissionRequestResponseAction.fromValue(
+        map['action'],
+      ),
+      EnumMethod.name => PermissionRequestResponseAction.byName(map['action']),
     };
     if (map['resources'] != null) {
       instance.resources = List<String>.from(map['resources']!.cast<String>());
@@ -111,7 +125,7 @@ class PermissionRequestResponse {
       "action": switch (enumMethod ?? EnumMethod.nativeValue) {
         EnumMethod.nativeValue => action?.toNativeValue(),
         EnumMethod.value => action?.toValue(),
-        EnumMethod.name => action?.name()
+        EnumMethod.name => action?.name(),
       },
       "resources": resources,
     };

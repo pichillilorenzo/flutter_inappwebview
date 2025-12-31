@@ -25,6 +25,10 @@ class AjaxRequestEvent_ {
   ///When downloading a resource using HTTP, this only represent the content itself, not headers and other overhead.
   int? total;
 
-  AjaxRequestEvent_(
-      {this.type, this.lengthComputable, this.loaded, this.total});
+  AjaxRequestEvent_({
+    this.type,
+    this.lengthComputable,
+    this.loaded,
+    this.total,
+  });
 }

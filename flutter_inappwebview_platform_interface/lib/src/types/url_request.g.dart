@@ -139,58 +139,65 @@ class URLRequest {
 
   ///The URL of the request. Setting this to `null` will load `about:blank`.
   WebUri? url;
-  URLRequest(
-      {this.allowsCellularAccess,
-      this.allowsConstrainedNetworkAccess,
-      this.allowsExpensiveNetworkAccess,
-      this.assumesHTTP3Capable,
-      this.attribution,
-      this.body,
-      this.cachePolicy,
-      this.headers,
-      this.httpShouldHandleCookies,
-      this.httpShouldUsePipelining,
-      @Deprecated('Use allowsCellularAccess instead')
-      this.iosAllowsCellularAccess,
-      @Deprecated('Use allowsConstrainedNetworkAccess instead')
-      this.iosAllowsConstrainedNetworkAccess,
-      @Deprecated('Use allowsExpensiveNetworkAccess instead')
-      this.iosAllowsExpensiveNetworkAccess,
-      @Deprecated('Use cachePolicy instead') this.iosCachePolicy,
-      @Deprecated('Use httpShouldHandleCookies instead')
-      this.iosHttpShouldHandleCookies,
-      @Deprecated('Use httpShouldUsePipelining instead')
-      this.iosHttpShouldUsePipelining,
-      @Deprecated('Use mainDocumentURL instead') this.iosMainDocumentURL,
-      @Deprecated('Use networkServiceType instead') this.iosNetworkServiceType,
-      @Deprecated('Use timeoutInterval instead') this.iosTimeoutInterval,
-      this.mainDocumentURL,
-      this.method,
-      this.networkServiceType,
-      this.timeoutInterval,
-      this.url}) {
+  URLRequest({
+    this.allowsCellularAccess,
+    this.allowsConstrainedNetworkAccess,
+    this.allowsExpensiveNetworkAccess,
+    this.assumesHTTP3Capable,
+    this.attribution,
+    this.body,
+    this.cachePolicy,
+    this.headers,
+    this.httpShouldHandleCookies,
+    this.httpShouldUsePipelining,
+    @Deprecated('Use allowsCellularAccess instead')
+    this.iosAllowsCellularAccess,
+    @Deprecated('Use allowsConstrainedNetworkAccess instead')
+    this.iosAllowsConstrainedNetworkAccess,
+    @Deprecated('Use allowsExpensiveNetworkAccess instead')
+    this.iosAllowsExpensiveNetworkAccess,
+    @Deprecated('Use cachePolicy instead') this.iosCachePolicy,
+    @Deprecated('Use httpShouldHandleCookies instead')
+    this.iosHttpShouldHandleCookies,
+    @Deprecated('Use httpShouldUsePipelining instead')
+    this.iosHttpShouldUsePipelining,
+    @Deprecated('Use mainDocumentURL instead') this.iosMainDocumentURL,
+    @Deprecated('Use networkServiceType instead') this.iosNetworkServiceType,
+    @Deprecated('Use timeoutInterval instead') this.iosTimeoutInterval,
+    this.mainDocumentURL,
+    this.method,
+    this.networkServiceType,
+    this.timeoutInterval,
+    this.url,
+  }) {
     allowsCellularAccess = allowsCellularAccess ?? iosAllowsCellularAccess;
     allowsConstrainedNetworkAccess =
         allowsConstrainedNetworkAccess ?? iosAllowsConstrainedNetworkAccess;
     allowsExpensiveNetworkAccess =
         allowsExpensiveNetworkAccess ?? iosAllowsExpensiveNetworkAccess;
-    cachePolicy = cachePolicy ??
+    cachePolicy =
+        cachePolicy ??
         URLRequestCachePolicy.fromNativeValue(iosCachePolicy?.toNativeValue());
     httpShouldHandleCookies =
         httpShouldHandleCookies ?? iosHttpShouldHandleCookies;
     httpShouldUsePipelining =
         httpShouldUsePipelining ?? iosHttpShouldUsePipelining;
-    mainDocumentURL = mainDocumentURL ??
+    mainDocumentURL =
+        mainDocumentURL ??
         (iosMainDocumentURL != null ? WebUri.uri(iosMainDocumentURL!) : null);
-    networkServiceType = networkServiceType ??
+    networkServiceType =
+        networkServiceType ??
         URLRequestNetworkServiceType.fromNativeValue(
-            iosNetworkServiceType?.toNativeValue());
+          iosNetworkServiceType?.toNativeValue(),
+        );
     timeoutInterval = timeoutInterval ?? iosTimeoutInterval;
   }
 
   ///Gets a possible [URLRequest] instance from a [Map] value.
-  static URLRequest? fromMap(Map<String, dynamic>? map,
-      {EnumMethod? enumMethod}) {
+  static URLRequest? fromMap(
+    Map<String, dynamic>? map, {
+    EnumMethod? enumMethod,
+  }) {
     if (map == null) {
       return null;
     }
@@ -200,19 +207,21 @@ class URLRequest {
       allowsExpensiveNetworkAccess: map['allowsExpensiveNetworkAccess'],
       assumesHTTP3Capable: map['assumesHTTP3Capable'],
       attribution: switch (enumMethod ?? EnumMethod.nativeValue) {
-        EnumMethod.nativeValue =>
-          URLRequestAttribution.fromNativeValue(map['attribution']),
+        EnumMethod.nativeValue => URLRequestAttribution.fromNativeValue(
+          map['attribution'],
+        ),
         EnumMethod.value => URLRequestAttribution.fromValue(map['attribution']),
-        EnumMethod.name => URLRequestAttribution.byName(map['attribution'])
+        EnumMethod.name => URLRequestAttribution.byName(map['attribution']),
       },
       body: map['body'] != null
           ? Uint8List.fromList(map['body'].cast<int>())
           : null,
       cachePolicy: switch (enumMethod ?? EnumMethod.nativeValue) {
-        EnumMethod.nativeValue =>
-          URLRequestCachePolicy.fromNativeValue(map['cachePolicy']),
+        EnumMethod.nativeValue => URLRequestCachePolicy.fromNativeValue(
+          map['cachePolicy'],
+        ),
         EnumMethod.value => URLRequestCachePolicy.fromValue(map['cachePolicy']),
-        EnumMethod.name => URLRequestCachePolicy.byName(map['cachePolicy'])
+        EnumMethod.name => URLRequestCachePolicy.byName(map['cachePolicy']),
       },
       headers: map['headers']?.cast<String, String>(),
       httpShouldHandleCookies: map['httpShouldHandleCookies'],
@@ -221,11 +230,13 @@ class URLRequest {
       iosAllowsConstrainedNetworkAccess: map['allowsConstrainedNetworkAccess'],
       iosAllowsExpensiveNetworkAccess: map['allowsExpensiveNetworkAccess'],
       iosCachePolicy: switch (enumMethod ?? EnumMethod.nativeValue) {
-        EnumMethod.nativeValue =>
-          IOSURLRequestCachePolicy.fromNativeValue(map['cachePolicy']),
-        EnumMethod.value =>
-          IOSURLRequestCachePolicy.fromValue(map['cachePolicy']),
-        EnumMethod.name => IOSURLRequestCachePolicy.byName(map['cachePolicy'])
+        EnumMethod.nativeValue => IOSURLRequestCachePolicy.fromNativeValue(
+          map['cachePolicy'],
+        ),
+        EnumMethod.value => IOSURLRequestCachePolicy.fromValue(
+          map['cachePolicy'],
+        ),
+        EnumMethod.name => IOSURLRequestCachePolicy.byName(map['cachePolicy']),
       },
       iosHttpShouldHandleCookies: map['httpShouldHandleCookies'],
       iosHttpShouldUsePipelining: map['httpShouldUsePipelining'],
@@ -235,11 +246,14 @@ class URLRequest {
       iosNetworkServiceType: switch (enumMethod ?? EnumMethod.nativeValue) {
         EnumMethod.nativeValue =>
           IOSURLRequestNetworkServiceType.fromNativeValue(
-              map['networkServiceType']),
-        EnumMethod.value =>
-          IOSURLRequestNetworkServiceType.fromValue(map['networkServiceType']),
-        EnumMethod.name =>
-          IOSURLRequestNetworkServiceType.byName(map['networkServiceType'])
+            map['networkServiceType'],
+          ),
+        EnumMethod.value => IOSURLRequestNetworkServiceType.fromValue(
+          map['networkServiceType'],
+        ),
+        EnumMethod.name => IOSURLRequestNetworkServiceType.byName(
+          map['networkServiceType'],
+        ),
       },
       iosTimeoutInterval: map['timeoutInterval'],
       mainDocumentURL: map['mainDocumentURL'] != null
@@ -248,11 +262,14 @@ class URLRequest {
       method: map['method'],
       networkServiceType: switch (enumMethod ?? EnumMethod.nativeValue) {
         EnumMethod.nativeValue => URLRequestNetworkServiceType.fromNativeValue(
-            map['networkServiceType']),
-        EnumMethod.value =>
-          URLRequestNetworkServiceType.fromValue(map['networkServiceType']),
-        EnumMethod.name =>
-          URLRequestNetworkServiceType.byName(map['networkServiceType'])
+          map['networkServiceType'],
+        ),
+        EnumMethod.value => URLRequestNetworkServiceType.fromValue(
+          map['networkServiceType'],
+        ),
+        EnumMethod.name => URLRequestNetworkServiceType.byName(
+          map['networkServiceType'],
+        ),
       },
       timeoutInterval: map['timeoutInterval'],
       url: map['url'] != null ? WebUri(map['url']) : null,
@@ -270,13 +287,13 @@ class URLRequest {
       "attribution": switch (enumMethod ?? EnumMethod.nativeValue) {
         EnumMethod.nativeValue => attribution?.toNativeValue(),
         EnumMethod.value => attribution?.toValue(),
-        EnumMethod.name => attribution?.name()
+        EnumMethod.name => attribution?.name(),
       },
       "body": body,
       "cachePolicy": switch (enumMethod ?? EnumMethod.nativeValue) {
         EnumMethod.nativeValue => cachePolicy?.toNativeValue(),
         EnumMethod.value => cachePolicy?.toValue(),
-        EnumMethod.name => cachePolicy?.name()
+        EnumMethod.name => cachePolicy?.name(),
       },
       "headers": headers,
       "httpShouldHandleCookies": httpShouldHandleCookies,
@@ -286,7 +303,7 @@ class URLRequest {
       "networkServiceType": switch (enumMethod ?? EnumMethod.nativeValue) {
         EnumMethod.nativeValue => networkServiceType?.toNativeValue(),
         EnumMethod.value => networkServiceType?.toValue(),
-        EnumMethod.name => networkServiceType?.name()
+        EnumMethod.name => networkServiceType?.name(),
       },
       "timeoutInterval": timeoutInterval,
       "url": url?.toString(),

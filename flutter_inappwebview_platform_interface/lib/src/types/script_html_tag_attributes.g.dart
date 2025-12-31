@@ -67,37 +67,43 @@ class ScriptHtmlTagAttributes {
   ///This attribute indicates the type of script represented. The value of this attribute will be in one of the following categories.
   ///The default value is `text/javascript`.
   String type;
-  ScriptHtmlTagAttributes(
-      {this.type = "text/javascript",
-      this.id,
-      this.async,
-      this.defer,
-      this.crossOrigin,
-      this.integrity,
-      this.noModule,
-      this.nonce,
-      this.referrerPolicy,
-      this.onLoad,
-      this.onError}) {
+  ScriptHtmlTagAttributes({
+    this.type = "text/javascript",
+    this.id,
+    this.async,
+    this.defer,
+    this.crossOrigin,
+    this.integrity,
+    this.noModule,
+    this.nonce,
+    this.referrerPolicy,
+    this.onLoad,
+    this.onError,
+  }) {
     if (this.onLoad != null || this.onError != null) {
-      assert(this.id != null,
-          'onLoad and onError callbacks require the id property to be set.');
+      assert(
+        this.id != null,
+        'onLoad and onError callbacks require the id property to be set.',
+      );
     }
   }
 
   ///Gets a possible [ScriptHtmlTagAttributes] instance from a [Map] value.
-  static ScriptHtmlTagAttributes? fromMap(Map<String, dynamic>? map,
-      {EnumMethod? enumMethod}) {
+  static ScriptHtmlTagAttributes? fromMap(
+    Map<String, dynamic>? map, {
+    EnumMethod? enumMethod,
+  }) {
     if (map == null) {
       return null;
     }
     final instance = ScriptHtmlTagAttributes(
       async: map['async'],
       crossOrigin: switch (enumMethod ?? EnumMethod.nativeValue) {
-        EnumMethod.nativeValue =>
-          CrossOrigin.fromNativeValue(map['crossOrigin']),
+        EnumMethod.nativeValue => CrossOrigin.fromNativeValue(
+          map['crossOrigin'],
+        ),
         EnumMethod.value => CrossOrigin.fromValue(map['crossOrigin']),
-        EnumMethod.name => CrossOrigin.byName(map['crossOrigin'])
+        EnumMethod.name => CrossOrigin.byName(map['crossOrigin']),
       },
       defer: map['defer'],
       id: map['id'],
@@ -105,10 +111,11 @@ class ScriptHtmlTagAttributes {
       noModule: map['noModule'],
       nonce: map['nonce'],
       referrerPolicy: switch (enumMethod ?? EnumMethod.nativeValue) {
-        EnumMethod.nativeValue =>
-          ReferrerPolicy.fromNativeValue(map['referrerPolicy']),
+        EnumMethod.nativeValue => ReferrerPolicy.fromNativeValue(
+          map['referrerPolicy'],
+        ),
         EnumMethod.value => ReferrerPolicy.fromValue(map['referrerPolicy']),
-        EnumMethod.name => ReferrerPolicy.byName(map['referrerPolicy'])
+        EnumMethod.name => ReferrerPolicy.byName(map['referrerPolicy']),
       },
     );
     if (map['type'] != null) {
@@ -124,7 +131,7 @@ class ScriptHtmlTagAttributes {
       "crossOrigin": switch (enumMethod ?? EnumMethod.nativeValue) {
         EnumMethod.nativeValue => crossOrigin?.toNativeValue(),
         EnumMethod.value => crossOrigin?.toValue(),
-        EnumMethod.name => crossOrigin?.name()
+        EnumMethod.name => crossOrigin?.name(),
       },
       "defer": defer,
       "id": id,
@@ -134,7 +141,7 @@ class ScriptHtmlTagAttributes {
       "referrerPolicy": switch (enumMethod ?? EnumMethod.nativeValue) {
         EnumMethod.nativeValue => referrerPolicy?.toNativeValue(),
         EnumMethod.value => referrerPolicy?.toValue(),
-        EnumMethod.name => referrerPolicy?.name()
+        EnumMethod.name => referrerPolicy?.name(),
       },
       "type": type,
     };

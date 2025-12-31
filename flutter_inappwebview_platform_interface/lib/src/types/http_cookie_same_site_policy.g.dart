@@ -11,10 +11,11 @@ class HTTPCookieSameSitePolicy {
   final String _value;
   final String _nativeValue;
   const HTTPCookieSameSitePolicy._internal(this._value, this._nativeValue);
-// ignore: unused_element
+  // ignore: unused_element
   factory HTTPCookieSameSitePolicy._internalMultiPlatform(
-          String value, Function nativeValue) =>
-      HTTPCookieSameSitePolicy._internal(value, nativeValue());
+    String value,
+    Function nativeValue,
+  ) => HTTPCookieSameSitePolicy._internal(value, nativeValue());
 
   ///SameSite=Lax;
   ///
@@ -44,8 +45,9 @@ class HTTPCookieSameSitePolicy {
   static HTTPCookieSameSitePolicy? fromValue(String? value) {
     if (value != null) {
       try {
-        return HTTPCookieSameSitePolicy.values
-            .firstWhere((element) => element.toValue() == value);
+        return HTTPCookieSameSitePolicy.values.firstWhere(
+          (element) => element.toValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -57,8 +59,9 @@ class HTTPCookieSameSitePolicy {
   static HTTPCookieSameSitePolicy? fromNativeValue(String? value) {
     if (value != null) {
       try {
-        return HTTPCookieSameSitePolicy.values
-            .firstWhere((element) => element.toNativeValue() == value);
+        return HTTPCookieSameSitePolicy.values.firstWhere(
+          (element) => element.toNativeValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -74,8 +77,9 @@ class HTTPCookieSameSitePolicy {
   static HTTPCookieSameSitePolicy? byName(String? name) {
     if (name != null) {
       try {
-        return HTTPCookieSameSitePolicy.values
-            .firstWhere((element) => element.name() == name);
+        return HTTPCookieSameSitePolicy.values.firstWhere(
+          (element) => element.name() == name,
+        );
       } catch (e) {
         return null;
       }
@@ -93,7 +97,8 @@ class HTTPCookieSameSitePolicy {
   /// them will be represented in the returned map.
   static Map<String, HTTPCookieSameSitePolicy> asNameMap() =>
       <String, HTTPCookieSameSitePolicy>{
-        for (final value in HTTPCookieSameSitePolicy.values) value.name(): value
+        for (final value in HTTPCookieSameSitePolicy.values)
+          value.name(): value,
       };
 
   ///Gets [String] value.

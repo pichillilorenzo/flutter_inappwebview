@@ -38,13 +38,15 @@ enum PlatformWebViewEnvironmentCreationParamsProperty {
 extension _PlatformWebViewEnvironmentCreationParamsPropertySupported
     on PlatformWebViewEnvironmentCreationParams {
   static bool isPropertySupported(
-      PlatformWebViewEnvironmentCreationParamsProperty property,
-      {TargetPlatform? platform}) {
+    PlatformWebViewEnvironmentCreationParamsProperty property, {
+    TargetPlatform? platform,
+  }) {
     switch (property) {
       case PlatformWebViewEnvironmentCreationParamsProperty.settings:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.windows]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.windows,
+            ].contains(platform ?? defaultTargetPlatform);
     }
   }
 }
@@ -119,25 +121,31 @@ enum PlatformWebViewEnvironmentProperty {
 
 extension _PlatformWebViewEnvironmentPropertySupported
     on PlatformWebViewEnvironment {
-  static bool isPropertySupported(PlatformWebViewEnvironmentProperty property,
-      {TargetPlatform? platform}) {
+  static bool isPropertySupported(
+    PlatformWebViewEnvironmentProperty property, {
+    TargetPlatform? platform,
+  }) {
     switch (property) {
       case PlatformWebViewEnvironmentProperty.id:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.windows]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.windows,
+            ].contains(platform ?? defaultTargetPlatform);
       case PlatformWebViewEnvironmentProperty.onBrowserProcessExited:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.windows]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.windows,
+            ].contains(platform ?? defaultTargetPlatform);
       case PlatformWebViewEnvironmentProperty.onNewBrowserVersionAvailable:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.windows]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.windows,
+            ].contains(platform ?? defaultTargetPlatform);
       case PlatformWebViewEnvironmentProperty.onProcessInfosChanged:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.windows]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.windows,
+            ].contains(platform ?? defaultTargetPlatform);
     }
   }
 }
@@ -237,37 +245,46 @@ enum PlatformWebViewEnvironmentMethod {
 
 extension _PlatformWebViewEnvironmentMethodSupported
     on PlatformWebViewEnvironment {
-  static bool isMethodSupported(PlatformWebViewEnvironmentMethod method,
-      {TargetPlatform? platform}) {
+  static bool isMethodSupported(
+    PlatformWebViewEnvironmentMethod method, {
+    TargetPlatform? platform,
+  }) {
     switch (method) {
       case PlatformWebViewEnvironmentMethod.compareBrowserVersions:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.windows]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.windows,
+            ].contains(platform ?? defaultTargetPlatform);
       case PlatformWebViewEnvironmentMethod.create:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.windows]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.windows,
+            ].contains(platform ?? defaultTargetPlatform);
       case PlatformWebViewEnvironmentMethod.dispose:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.windows]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.windows,
+            ].contains(platform ?? defaultTargetPlatform);
       case PlatformWebViewEnvironmentMethod.getAvailableVersion:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.windows]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.windows,
+            ].contains(platform ?? defaultTargetPlatform);
       case PlatformWebViewEnvironmentMethod.getFailureReportFolderPath:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.windows]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.windows,
+            ].contains(platform ?? defaultTargetPlatform);
       case PlatformWebViewEnvironmentMethod.getProcessInfos:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.windows]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.windows,
+            ].contains(platform ?? defaultTargetPlatform);
       case PlatformWebViewEnvironmentMethod.isInterfaceSupported:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.windows]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.windows,
+            ].contains(platform ?? defaultTargetPlatform);
     }
   }
 }

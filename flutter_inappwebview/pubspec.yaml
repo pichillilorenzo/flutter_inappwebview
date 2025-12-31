@@ -14,8 +14,8 @@ topics:
   - browser
 
 environment:
-  sdk: ^3.5.0
-  flutter: ">=3.24.0"
+  sdk: ^3.8.0
+  flutter: ">=3.32.0"
 
 dependencies:
   flutter:
@@ -32,13 +32,15 @@ dependencies:
     path: ../flutter_inappwebview_web
   flutter_inappwebview_windows: #^0.7.0-beta.3
     path: ../flutter_inappwebview_windows
+  flutter_inappwebview_linux: #^0.1.0-beta.1
+    path: ../flutter_inappwebview_linux
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_driver:
     sdk: flutter
-  flutter_lints: ^4.0.0
+  flutter_lints: ^6.0.0
   build_runner: ^2.4.12
   generators:
     path: ../dev_packages/generators
@@ -56,12 +58,12 @@ flutter:
         default_package: flutter_inappwebview_ios
       macos:
         default_package: flutter_inappwebview_macos
-      linux:
-        default_package: flutter_inappwebview_linux
       web:
         default_package: flutter_inappwebview_web
       windows:
         default_package: flutter_inappwebview_windows
+      linux:
+        default_package: flutter_inappwebview_linux
 
   assets:
     - packages/flutter_inappwebview/assets/t_rex_runner/t-rex.html

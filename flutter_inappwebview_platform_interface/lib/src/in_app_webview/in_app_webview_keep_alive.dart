@@ -30,12 +30,13 @@ class InAppWebViewControllerKeepAliveProps {
   Set<PlatformWebMessageListener> webMessageListeners = Set();
   Map<String, Function(dynamic data)> devToolsProtocolEventListenerMap;
 
-  InAppWebViewControllerKeepAliveProps(
-      {this.javaScriptHandlersMap = const {},
-      this.userScripts = const {},
-      this.webMessageListenerObjNames = const {},
-      this.injectedScriptsFromURL = const {},
-      this.webMessageChannels = const {},
-      this.webMessageListeners = const {},
-      this.devToolsProtocolEventListenerMap = const {}});
+  InAppWebViewControllerKeepAliveProps({
+    this.javaScriptHandlersMap = const {},
+    this.userScripts = const {},
+    this.webMessageListenerObjNames = const {},
+    this.injectedScriptsFromURL = const {},
+    this.webMessageChannels = const {},
+    this.webMessageListeners = const {},
+    this.devToolsProtocolEventListenerMap = const {},
+  });
 }

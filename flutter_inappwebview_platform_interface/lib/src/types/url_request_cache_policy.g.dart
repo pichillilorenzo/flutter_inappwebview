@@ -11,10 +11,11 @@ class URLRequestCachePolicy {
   final int _value;
   final int _nativeValue;
   const URLRequestCachePolicy._internal(this._value, this._nativeValue);
-// ignore: unused_element
+  // ignore: unused_element
   factory URLRequestCachePolicy._internalMultiPlatform(
-          int value, Function nativeValue) =>
-      URLRequestCachePolicy._internal(value, nativeValue());
+    int value,
+    Function nativeValue,
+  ) => URLRequestCachePolicy._internal(value, nativeValue());
 
   ///Ignore local cache data, and instruct proxies and other intermediates to disregard their caches so far as the protocol allows.
   ///
@@ -32,25 +33,33 @@ class URLRequestCachePolicy {
   ///Use cache data if the origin source can validate it; otherwise, load from the origin.
   ///
   ///**NOTE**: Versions earlier than macOS 15, iOS 13, watchOS 6, and tvOS 13 don’t implement this constant.
-  static const RELOAD_REVALIDATING_CACHE_DATA =
-      URLRequestCachePolicy._internal(5, 5);
+  static const RELOAD_REVALIDATING_CACHE_DATA = URLRequestCachePolicy._internal(
+    5,
+    5,
+  );
 
   ///Use existing cache data, regardless or age or expiration date, and fail if no cached data is available.
   ///
   ///If there is no existing data in the cache corresponding to a URL load request,
   ///no attempt is made to load the data from the originating source, and the load is considered to have failed.
   ///This constant specifies a behavior that is similar to an “offline” mode.
-  static const RETURN_CACHE_DATA_DONT_LOAD =
-      URLRequestCachePolicy._internal(3, 3);
+  static const RETURN_CACHE_DATA_DONT_LOAD = URLRequestCachePolicy._internal(
+    3,
+    3,
+  );
 
   ///Use existing cache data, regardless or age or expiration date, loading from originating source only if there is no cached data.
-  static const RETURN_CACHE_DATA_ELSE_LOAD =
-      URLRequestCachePolicy._internal(2, 2);
+  static const RETURN_CACHE_DATA_ELSE_LOAD = URLRequestCachePolicy._internal(
+    2,
+    2,
+  );
 
   ///Use the caching logic defined in the protocol implementation, if any, for a particular URL load request.
   ///This is the default policy for URL load requests.
-  static const USE_PROTOCOL_CACHE_POLICY =
-      URLRequestCachePolicy._internal(0, 0);
+  static const USE_PROTOCOL_CACHE_POLICY = URLRequestCachePolicy._internal(
+    0,
+    0,
+  );
 
   ///Set of all values of [URLRequestCachePolicy].
   static final Set<URLRequestCachePolicy> values = [
@@ -66,8 +75,9 @@ class URLRequestCachePolicy {
   static URLRequestCachePolicy? fromValue(int? value) {
     if (value != null) {
       try {
-        return URLRequestCachePolicy.values
-            .firstWhere((element) => element.toValue() == value);
+        return URLRequestCachePolicy.values.firstWhere(
+          (element) => element.toValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -79,8 +89,9 @@ class URLRequestCachePolicy {
   static URLRequestCachePolicy? fromNativeValue(int? value) {
     if (value != null) {
       try {
-        return URLRequestCachePolicy.values
-            .firstWhere((element) => element.toNativeValue() == value);
+        return URLRequestCachePolicy.values.firstWhere(
+          (element) => element.toNativeValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -96,8 +107,9 @@ class URLRequestCachePolicy {
   static URLRequestCachePolicy? byName(String? name) {
     if (name != null) {
       try {
-        return URLRequestCachePolicy.values
-            .firstWhere((element) => element.name() == name);
+        return URLRequestCachePolicy.values.firstWhere(
+          (element) => element.name() == name,
+        );
       } catch (e) {
         return null;
       }
@@ -115,7 +127,7 @@ class URLRequestCachePolicy {
   /// them will be represented in the returned map.
   static Map<String, URLRequestCachePolicy> asNameMap() =>
       <String, URLRequestCachePolicy>{
-        for (final value in URLRequestCachePolicy.values) value.name(): value
+        for (final value in URLRequestCachePolicy.values) value.name(): value,
       };
 
   ///Gets [int] value.
@@ -167,10 +179,11 @@ class IOSURLRequestCachePolicy {
   final int _value;
   final int _nativeValue;
   const IOSURLRequestCachePolicy._internal(this._value, this._nativeValue);
-// ignore: unused_element
+  // ignore: unused_element
   factory IOSURLRequestCachePolicy._internalMultiPlatform(
-          int value, Function nativeValue) =>
-      IOSURLRequestCachePolicy._internal(value, nativeValue());
+    int value,
+    Function nativeValue,
+  ) => IOSURLRequestCachePolicy._internal(value, nativeValue());
 
   ///Ignore local cache data, and instruct proxies and other intermediates to disregard their caches so far as the protocol allows.
   ///
@@ -196,17 +209,23 @@ class IOSURLRequestCachePolicy {
   ///If there is no existing data in the cache corresponding to a URL load request,
   ///no attempt is made to load the data from the originating source, and the load is considered to have failed.
   ///This constant specifies a behavior that is similar to an “offline” mode.
-  static const RETURN_CACHE_DATA_DONT_LOAD =
-      IOSURLRequestCachePolicy._internal(3, 3);
+  static const RETURN_CACHE_DATA_DONT_LOAD = IOSURLRequestCachePolicy._internal(
+    3,
+    3,
+  );
 
   ///Use existing cache data, regardless or age or expiration date, loading from originating source only if there is no cached data.
-  static const RETURN_CACHE_DATA_ELSE_LOAD =
-      IOSURLRequestCachePolicy._internal(2, 2);
+  static const RETURN_CACHE_DATA_ELSE_LOAD = IOSURLRequestCachePolicy._internal(
+    2,
+    2,
+  );
 
   ///Use the caching logic defined in the protocol implementation, if any, for a particular URL load request.
   ///This is the default policy for URL load requests.
-  static const USE_PROTOCOL_CACHE_POLICY =
-      IOSURLRequestCachePolicy._internal(0, 0);
+  static const USE_PROTOCOL_CACHE_POLICY = IOSURLRequestCachePolicy._internal(
+    0,
+    0,
+  );
 
   ///Set of all values of [IOSURLRequestCachePolicy].
   static final Set<IOSURLRequestCachePolicy> values = [
@@ -222,8 +241,9 @@ class IOSURLRequestCachePolicy {
   static IOSURLRequestCachePolicy? fromValue(int? value) {
     if (value != null) {
       try {
-        return IOSURLRequestCachePolicy.values
-            .firstWhere((element) => element.toValue() == value);
+        return IOSURLRequestCachePolicy.values.firstWhere(
+          (element) => element.toValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -235,8 +255,9 @@ class IOSURLRequestCachePolicy {
   static IOSURLRequestCachePolicy? fromNativeValue(int? value) {
     if (value != null) {
       try {
-        return IOSURLRequestCachePolicy.values
-            .firstWhere((element) => element.toNativeValue() == value);
+        return IOSURLRequestCachePolicy.values.firstWhere(
+          (element) => element.toNativeValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -252,8 +273,9 @@ class IOSURLRequestCachePolicy {
   static IOSURLRequestCachePolicy? byName(String? name) {
     if (name != null) {
       try {
-        return IOSURLRequestCachePolicy.values
-            .firstWhere((element) => element.name() == name);
+        return IOSURLRequestCachePolicy.values.firstWhere(
+          (element) => element.name() == name,
+        );
       } catch (e) {
         return null;
       }
@@ -271,7 +293,8 @@ class IOSURLRequestCachePolicy {
   /// them will be represented in the returned map.
   static Map<String, IOSURLRequestCachePolicy> asNameMap() =>
       <String, IOSURLRequestCachePolicy>{
-        for (final value in IOSURLRequestCachePolicy.values) value.name(): value
+        for (final value in IOSURLRequestCachePolicy.values)
+          value.name(): value,
       };
 
   ///Gets [int] value.

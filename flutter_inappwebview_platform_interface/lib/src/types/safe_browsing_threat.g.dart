@@ -11,29 +11,38 @@ class SafeBrowsingThreat {
   final int _value;
   final int _nativeValue;
   const SafeBrowsingThreat._internal(this._value, this._nativeValue);
-// ignore: unused_element
+  // ignore: unused_element
   factory SafeBrowsingThreat._internalMultiPlatform(
-          int value, Function nativeValue) =>
-      SafeBrowsingThreat._internal(value, nativeValue());
+    int value,
+    Function nativeValue,
+  ) => SafeBrowsingThreat._internal(value, nativeValue());
 
   ///The resource was blocked because it may trick the user into a billing agreement.
   ///
   ///This constant is only used when `targetSdkVersion` is at least Android 29.
   ///Otherwise, [SAFE_BROWSING_THREAT_UNKNOWN] is used instead.
-  static const SAFE_BROWSING_THREAT_BILLING =
-      SafeBrowsingThreat._internal(4, 4);
+  static const SAFE_BROWSING_THREAT_BILLING = SafeBrowsingThreat._internal(
+    4,
+    4,
+  );
 
   ///The resource was blocked because it contains malware.
-  static const SAFE_BROWSING_THREAT_MALWARE =
-      SafeBrowsingThreat._internal(1, 1);
+  static const SAFE_BROWSING_THREAT_MALWARE = SafeBrowsingThreat._internal(
+    1,
+    1,
+  );
 
   ///The resource was blocked because it contains deceptive content.
-  static const SAFE_BROWSING_THREAT_PHISHING =
-      SafeBrowsingThreat._internal(2, 2);
+  static const SAFE_BROWSING_THREAT_PHISHING = SafeBrowsingThreat._internal(
+    2,
+    2,
+  );
 
   ///The resource was blocked for an unknown reason.
-  static const SAFE_BROWSING_THREAT_UNKNOWN =
-      SafeBrowsingThreat._internal(0, 0);
+  static const SAFE_BROWSING_THREAT_UNKNOWN = SafeBrowsingThreat._internal(
+    0,
+    0,
+  );
 
   ///The resource was blocked because it contains unwanted software.
   static const SAFE_BROWSING_THREAT_UNWANTED_SOFTWARE =
@@ -52,8 +61,9 @@ class SafeBrowsingThreat {
   static SafeBrowsingThreat? fromValue(int? value) {
     if (value != null) {
       try {
-        return SafeBrowsingThreat.values
-            .firstWhere((element) => element.toValue() == value);
+        return SafeBrowsingThreat.values.firstWhere(
+          (element) => element.toValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -65,8 +75,9 @@ class SafeBrowsingThreat {
   static SafeBrowsingThreat? fromNativeValue(int? value) {
     if (value != null) {
       try {
-        return SafeBrowsingThreat.values
-            .firstWhere((element) => element.toNativeValue() == value);
+        return SafeBrowsingThreat.values.firstWhere(
+          (element) => element.toNativeValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -82,8 +93,9 @@ class SafeBrowsingThreat {
   static SafeBrowsingThreat? byName(String? name) {
     if (name != null) {
       try {
-        return SafeBrowsingThreat.values
-            .firstWhere((element) => element.name() == name);
+        return SafeBrowsingThreat.values.firstWhere(
+          (element) => element.name() == name,
+        );
       } catch (e) {
         return null;
       }
@@ -101,7 +113,7 @@ class SafeBrowsingThreat {
   /// them will be represented in the returned map.
   static Map<String, SafeBrowsingThreat> asNameMap() =>
       <String, SafeBrowsingThreat>{
-        for (final value in SafeBrowsingThreat.values) value.name(): value
+        for (final value in SafeBrowsingThreat.values) value.name(): value,
       };
 
   ///Gets [int] value.

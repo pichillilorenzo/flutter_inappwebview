@@ -32,11 +32,9 @@ dynamic _deserializeIcon(dynamic icon, {EnumMethod? enumMethod}) {
 }
 
 ///Class that represents a custom menu item for a [PlatformInAppBrowser] instance.
-@SupportedPlatforms(platforms: [
-  AndroidPlatform(),
-  IOSPlatform(),
-  MacOSPlatform(),
-])
+@SupportedPlatforms(
+  platforms: [AndroidPlatform(), IOSPlatform(), MacOSPlatform()],
+)
 @ExchangeableObject()
 class InAppBrowserMenuItem_ {
   ///The menu item id.
@@ -47,15 +45,19 @@ class InAppBrowserMenuItem_ {
 
   ///Item icon.
   @ExchangeableObjectProperty(
-      serializer: _serializeIcon, deserializer: _deserializeIcon)
+    serializer: _serializeIcon,
+    deserializer: _deserializeIcon,
+  )
   dynamic icon;
 
   ///Icon color.
-  @SupportedPlatforms(platforms: [
-    AndroidPlatform(),
-    IOSPlatform(available: "13.0"),
-    MacOSPlatform(),
-  ])
+  @SupportedPlatforms(
+    platforms: [
+      AndroidPlatform(),
+      IOSPlatform(available: "13.0"),
+      MacOSPlatform(),
+    ],
+  )
   Color_? iconColor;
 
   ///Item order.
@@ -67,17 +69,20 @@ class InAppBrowserMenuItem_ {
   ///Callback function to be invoked when the menu item is clicked
   void Function()? onClick;
 
-  InAppBrowserMenuItem_(
-      {required this.id,
-      required this.title,
-      this.icon,
-      this.iconColor,
-      this.onClick,
-      this.order,
-      this.showAsAction = false}) {
-    assert(this.icon == null ||
-        this.icon is Uint8List ||
-        this.icon is UIImage ||
-        this.icon is AndroidResource);
+  InAppBrowserMenuItem_({
+    required this.id,
+    required this.title,
+    this.icon,
+    this.iconColor,
+    this.onClick,
+    this.order,
+    this.showAsAction = false,
+  }) {
+    assert(
+      this.icon == null ||
+          this.icon is Uint8List ||
+          this.icon is UIImage ||
+          this.icon is AndroidResource,
+    );
   }
 }

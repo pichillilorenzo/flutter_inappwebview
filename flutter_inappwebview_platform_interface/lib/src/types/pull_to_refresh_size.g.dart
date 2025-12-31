@@ -11,10 +11,11 @@ class PullToRefreshSize {
   final int _value;
   final int _nativeValue;
   const PullToRefreshSize._internal(this._value, this._nativeValue);
-// ignore: unused_element
+  // ignore: unused_element
   factory PullToRefreshSize._internalMultiPlatform(
-          int value, Function nativeValue) =>
-      PullToRefreshSize._internal(value, nativeValue());
+    int value,
+    Function nativeValue,
+  ) => PullToRefreshSize._internal(value, nativeValue());
 
   ///Default size.
   static const DEFAULT = PullToRefreshSize._internal(1, 1);
@@ -32,8 +33,9 @@ class PullToRefreshSize {
   static PullToRefreshSize? fromValue(int? value) {
     if (value != null) {
       try {
-        return PullToRefreshSize.values
-            .firstWhere((element) => element.toValue() == value);
+        return PullToRefreshSize.values.firstWhere(
+          (element) => element.toValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -45,8 +47,9 @@ class PullToRefreshSize {
   static PullToRefreshSize? fromNativeValue(int? value) {
     if (value != null) {
       try {
-        return PullToRefreshSize.values
-            .firstWhere((element) => element.toNativeValue() == value);
+        return PullToRefreshSize.values.firstWhere(
+          (element) => element.toNativeValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -62,8 +65,9 @@ class PullToRefreshSize {
   static PullToRefreshSize? byName(String? name) {
     if (name != null) {
       try {
-        return PullToRefreshSize.values
-            .firstWhere((element) => element.name() == name);
+        return PullToRefreshSize.values.firstWhere(
+          (element) => element.name() == name,
+        );
       } catch (e) {
         return null;
       }
@@ -81,7 +85,7 @@ class PullToRefreshSize {
   /// them will be represented in the returned map.
   static Map<String, PullToRefreshSize> asNameMap() =>
       <String, PullToRefreshSize>{
-        for (final value in PullToRefreshSize.values) value.name(): value
+        for (final value in PullToRefreshSize.values) value.name(): value,
       };
 
   ///Gets [int] value.
@@ -125,10 +129,11 @@ class AndroidPullToRefreshSize {
   final int _value;
   final int _nativeValue;
   const AndroidPullToRefreshSize._internal(this._value, this._nativeValue);
-// ignore: unused_element
+  // ignore: unused_element
   factory AndroidPullToRefreshSize._internalMultiPlatform(
-          int value, Function nativeValue) =>
-      AndroidPullToRefreshSize._internal(value, nativeValue());
+    int value,
+    Function nativeValue,
+  ) => AndroidPullToRefreshSize._internal(value, nativeValue());
 
   ///Default size.
   static const DEFAULT = AndroidPullToRefreshSize._internal(1, 1);
@@ -146,8 +151,9 @@ class AndroidPullToRefreshSize {
   static AndroidPullToRefreshSize? fromValue(int? value) {
     if (value != null) {
       try {
-        return AndroidPullToRefreshSize.values
-            .firstWhere((element) => element.toValue() == value);
+        return AndroidPullToRefreshSize.values.firstWhere(
+          (element) => element.toValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -159,8 +165,9 @@ class AndroidPullToRefreshSize {
   static AndroidPullToRefreshSize? fromNativeValue(int? value) {
     if (value != null) {
       try {
-        return AndroidPullToRefreshSize.values
-            .firstWhere((element) => element.toNativeValue() == value);
+        return AndroidPullToRefreshSize.values.firstWhere(
+          (element) => element.toNativeValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -176,8 +183,9 @@ class AndroidPullToRefreshSize {
   static AndroidPullToRefreshSize? byName(String? name) {
     if (name != null) {
       try {
-        return AndroidPullToRefreshSize.values
-            .firstWhere((element) => element.name() == name);
+        return AndroidPullToRefreshSize.values.firstWhere(
+          (element) => element.name() == name,
+        );
       } catch (e) {
         return null;
       }
@@ -195,7 +203,8 @@ class AndroidPullToRefreshSize {
   /// them will be represented in the returned map.
   static Map<String, AndroidPullToRefreshSize> asNameMap() =>
       <String, AndroidPullToRefreshSize>{
-        for (final value in AndroidPullToRefreshSize.values) value.name(): value
+        for (final value in AndroidPullToRefreshSize.values)
+          value.name(): value,
       };
 
   ///Gets [int] value.

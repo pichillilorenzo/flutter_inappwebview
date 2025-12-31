@@ -8,7 +8,7 @@ import 'in_app_webview/in_app_webview_controller.dart';
 import 'web_storage/web_storage.dart';
 import 'webview_environment/webview_environment.dart';
 
-/// Implementation of [InAppWebViewPlatform] using the WebKit API.
+/// Implementation of [InAppWebViewPlatform] using the WebView2 API.
 class WindowsInAppWebViewPlatform extends InAppWebViewPlatform {
   /// Registers this class as the default instance of [InAppWebViewPlatform].
   static void registerWith() {

@@ -11,10 +11,11 @@ class NavigationType {
   final String _value;
   final int? _nativeValue;
   const NavigationType._internal(this._value, this._nativeValue);
-// ignore: unused_element
+  // ignore: unused_element
   factory NavigationType._internalMultiPlatform(
-          String value, Function nativeValue) =>
-      NavigationType._internal(value, nativeValue());
+    String value,
+    Function nativeValue,
+  ) => NavigationType._internal(value, nativeValue());
 
   ///An item from the back-forward list was requested.
   ///
@@ -22,56 +23,62 @@ class NavigationType {
   ///- iOS WKWebView ([Official API - WKNavigationType.formSubmitted](https://developer.apple.com/documentation/webkit/wknavigationtype/formsubmitted))
   ///- macOS WKWebView ([Official API - WKNavigationType.formSubmitted](https://developer.apple.com/documentation/webkit/wknavigationtype/formsubmitted))
   ///- Windows WebView2 ([Official API - COREWEBVIEW2_NAVIGATION_KIND_BACK_OR_FORWARD](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2210.55#corewebview2_navigation_kind))
-  static final BACK_FORWARD =
-      NavigationType._internalMultiPlatform('BACK_FORWARD', () {
-    switch (defaultTargetPlatform) {
-      case TargetPlatform.iOS:
-        return 2;
-      case TargetPlatform.macOS:
-        return 2;
-      case TargetPlatform.windows:
-        return 1;
-      default:
-        break;
-    }
-    return null;
-  });
+  static final BACK_FORWARD = NavigationType._internalMultiPlatform(
+    'BACK_FORWARD',
+    () {
+      switch (defaultTargetPlatform) {
+        case TargetPlatform.iOS:
+          return 2;
+        case TargetPlatform.macOS:
+          return 2;
+        case TargetPlatform.windows:
+          return 1;
+        default:
+          break;
+      }
+      return null;
+    },
+  );
 
   ///A form was resubmitted (for example by going back, going forward, or reloading).
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- iOS WKWebView ([Official API - WKNavigationType.formSubmitted](https://developer.apple.com/documentation/webkit/wknavigationtype/formresubmitted))
   ///- macOS WKWebView ([Official API - WKNavigationType.formSubmitted](https://developer.apple.com/documentation/webkit/wknavigationtype/formresubmitted))
-  static final FORM_RESUBMITTED =
-      NavigationType._internalMultiPlatform('FORM_RESUBMITTED', () {
-    switch (defaultTargetPlatform) {
-      case TargetPlatform.iOS:
-        return 4;
-      case TargetPlatform.macOS:
-        return 4;
-      default:
-        break;
-    }
-    return null;
-  });
+  static final FORM_RESUBMITTED = NavigationType._internalMultiPlatform(
+    'FORM_RESUBMITTED',
+    () {
+      switch (defaultTargetPlatform) {
+        case TargetPlatform.iOS:
+          return 4;
+        case TargetPlatform.macOS:
+          return 4;
+        default:
+          break;
+      }
+      return null;
+    },
+  );
 
   ///A form was submitted.
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- iOS WKWebView ([Official API - WKNavigationType.formSubmitted](https://developer.apple.com/documentation/webkit/wknavigationtype/formsubmitted))
   ///- macOS WKWebView ([Official API - WKNavigationType.formSubmitted](https://developer.apple.com/documentation/webkit/wknavigationtype/formsubmitted))
-  static final FORM_SUBMITTED =
-      NavigationType._internalMultiPlatform('FORM_SUBMITTED', () {
-    switch (defaultTargetPlatform) {
-      case TargetPlatform.iOS:
-        return 1;
-      case TargetPlatform.macOS:
-        return 1;
-      default:
-        break;
-    }
-    return null;
-  });
+  static final FORM_SUBMITTED = NavigationType._internalMultiPlatform(
+    'FORM_SUBMITTED',
+    () {
+      switch (defaultTargetPlatform) {
+        case TargetPlatform.iOS:
+          return 1;
+        case TargetPlatform.macOS:
+          return 1;
+        default:
+          break;
+      }
+      return null;
+    },
+  );
 
   ///A link with an href attribute was activated by the user.
   ///
@@ -79,20 +86,22 @@ class NavigationType {
   ///- iOS WKWebView ([Official API - WKNavigationType.linkActivated](https://developer.apple.com/documentation/webkit/wknavigationtype/linkactivated))
   ///- macOS WKWebView ([Official API - WKNavigationType.linkActivated](https://developer.apple.com/documentation/webkit/wknavigationtype/linkactivated))
   ///- Windows WebView2
-  static final LINK_ACTIVATED =
-      NavigationType._internalMultiPlatform('LINK_ACTIVATED', () {
-    switch (defaultTargetPlatform) {
-      case TargetPlatform.iOS:
-        return 0;
-      case TargetPlatform.macOS:
-        return 0;
-      case TargetPlatform.windows:
-        return 0;
-      default:
-        break;
-    }
-    return null;
-  });
+  static final LINK_ACTIVATED = NavigationType._internalMultiPlatform(
+    'LINK_ACTIVATED',
+    () {
+      switch (defaultTargetPlatform) {
+        case TargetPlatform.iOS:
+          return 0;
+        case TargetPlatform.macOS:
+          return 0;
+        case TargetPlatform.windows:
+          return 0;
+        default:
+          break;
+      }
+      return null;
+    },
+  );
 
   ///Navigation is taking place for some other reason.
   ///
@@ -148,8 +157,9 @@ class NavigationType {
   static NavigationType? fromValue(String? value) {
     if (value != null) {
       try {
-        return NavigationType.values
-            .firstWhere((element) => element.toValue() == value);
+        return NavigationType.values.firstWhere(
+          (element) => element.toValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -161,8 +171,9 @@ class NavigationType {
   static NavigationType? fromNativeValue(int? value) {
     if (value != null) {
       try {
-        return NavigationType.values
-            .firstWhere((element) => element.toNativeValue() == value);
+        return NavigationType.values.firstWhere(
+          (element) => element.toNativeValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -178,8 +189,9 @@ class NavigationType {
   static NavigationType? byName(String? name) {
     if (name != null) {
       try {
-        return NavigationType.values
-            .firstWhere((element) => element.name() == name);
+        return NavigationType.values.firstWhere(
+          (element) => element.name() == name,
+        );
       } catch (e) {
         return null;
       }
@@ -196,8 +208,8 @@ class NavigationType {
   /// same value, or being values of different enum type), at most one of
   /// them will be represented in the returned map.
   static Map<String, NavigationType> asNameMap() => <String, NavigationType>{
-        for (final value in NavigationType.values) value.name(): value
-      };
+    for (final value in NavigationType.values) value.name(): value,
+  };
 
   ///Gets [String] value.
   String toValue() => _value;
@@ -248,10 +260,11 @@ class IOSWKNavigationType {
   final int _value;
   final int _nativeValue;
   const IOSWKNavigationType._internal(this._value, this._nativeValue);
-// ignore: unused_element
+  // ignore: unused_element
   factory IOSWKNavigationType._internalMultiPlatform(
-          int value, Function nativeValue) =>
-      IOSWKNavigationType._internal(value, nativeValue());
+    int value,
+    Function nativeValue,
+  ) => IOSWKNavigationType._internal(value, nativeValue());
 
   ///An item from the back-forward list was requested.
   static const BACK_FORWARD = IOSWKNavigationType._internal(2, 2);
@@ -285,8 +298,9 @@ class IOSWKNavigationType {
   static IOSWKNavigationType? fromValue(int? value) {
     if (value != null) {
       try {
-        return IOSWKNavigationType.values
-            .firstWhere((element) => element.toValue() == value);
+        return IOSWKNavigationType.values.firstWhere(
+          (element) => element.toValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -298,8 +312,9 @@ class IOSWKNavigationType {
   static IOSWKNavigationType? fromNativeValue(int? value) {
     if (value != null) {
       try {
-        return IOSWKNavigationType.values
-            .firstWhere((element) => element.toNativeValue() == value);
+        return IOSWKNavigationType.values.firstWhere(
+          (element) => element.toNativeValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -315,8 +330,9 @@ class IOSWKNavigationType {
   static IOSWKNavigationType? byName(String? name) {
     if (name != null) {
       try {
-        return IOSWKNavigationType.values
-            .firstWhere((element) => element.name() == name);
+        return IOSWKNavigationType.values.firstWhere(
+          (element) => element.name() == name,
+        );
       } catch (e) {
         return null;
       }
@@ -334,7 +350,7 @@ class IOSWKNavigationType {
   /// them will be represented in the returned map.
   static Map<String, IOSWKNavigationType> asNameMap() =>
       <String, IOSWKNavigationType>{
-        for (final value in IOSWKNavigationType.values) value.name(): value
+        for (final value in IOSWKNavigationType.values) value.name(): value,
       };
 
   ///Gets [int] value.

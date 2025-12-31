@@ -18,12 +18,14 @@ part 'platform_find_interaction_controller.g.dart';
 ///
 ///{@macro flutter_inappwebview_platform_interface.PlatformFindInteractionControllerCreationParams.supported_platforms}
 @SupportedPlatforms(
-    platforms: [AndroidPlatform(), IOSPlatform(), MacOSPlatform()])
+  platforms: [AndroidPlatform(), IOSPlatform(), MacOSPlatform()],
+)
 @immutable
 class PlatformFindInteractionControllerCreationParams {
   /// Used by the platform implementation to create a new [PlatformFindInteractionController].
-  const PlatformFindInteractionControllerCreationParams(
-      {this.onFindResultReceived});
+  const PlatformFindInteractionControllerCreationParams({
+    this.onFindResultReceived,
+  });
 
   ///{@template flutter_inappwebview_platform_interface.PlatformFindInteractionControllerCreationParams.onFindResultReceived}
   ///Event fired as find-on-page operations progress.
@@ -37,37 +39,47 @@ class PlatformFindInteractionControllerCreationParams {
   ///{@endtemplate}
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformFindInteractionControllerCreationParams.onFindResultReceived.supported_platforms}
-  @SupportedPlatforms(platforms: [
-    AndroidPlatform(
+  @SupportedPlatforms(
+    platforms: [
+      AndroidPlatform(
         apiName: 'WebView.FindListener.onFindResultReceived',
         apiUrl:
-            'https://developer.android.com/reference/android/webkit/WebView.FindListener#onFindResultReceived(int,%20int,%20boolean)'),
-    IOSPlatform(
+            'https://developer.android.com/reference/android/webkit/WebView.FindListener#onFindResultReceived(int,%20int,%20boolean)',
+      ),
+      IOSPlatform(
         note:
-            'If [InAppWebViewSettings.isFindInteractionEnabled] is `true`, this event will not be called.'),
-    MacOSPlatform()
-  ])
+            'If [InAppWebViewSettings.isFindInteractionEnabled] is `true`, this event will not be called.',
+      ),
+      MacOSPlatform(),
+    ],
+  )
   final void Function(
-      PlatformFindInteractionController controller,
-      int activeMatchOrdinal,
-      int numberOfMatches,
-      bool isDoneCounting)? onFindResultReceived;
+    PlatformFindInteractionController controller,
+    int activeMatchOrdinal,
+    int numberOfMatches,
+    bool isDoneCounting,
+  )?
+  onFindResultReceived;
 
   ///{@template flutter_inappwebview_platform_interface.PlatformFindInteractionControllerCreationParams.isClassSupported}
   ///Check if the current class is supported by the [defaultTargetPlatform] or a specific [platform].
   ///{@endtemplate}
   bool isClassSupported({TargetPlatform? platform}) =>
-      _PlatformFindInteractionControllerCreationParamsClassSupported
-          .isClassSupported(platform: platform);
+      _PlatformFindInteractionControllerCreationParamsClassSupported.isClassSupported(
+        platform: platform,
+      );
 
   ///{@template flutter_inappwebview_platform_interface.PlatformFindInteractionControllerCreationParams.isPropertySupported}
   ///Check if the given [property] is supported by the [defaultTargetPlatform] or a specific [platform].
   ///{@endtemplate}
   bool isPropertySupported(
-          PlatformFindInteractionControllerCreationParamsProperty property,
-          {TargetPlatform? platform}) =>
-      _PlatformFindInteractionControllerCreationParamsPropertySupported
-          .isPropertySupported(property, platform: platform);
+    PlatformFindInteractionControllerCreationParamsProperty property, {
+    TargetPlatform? platform,
+  }) =>
+      _PlatformFindInteractionControllerCreationParamsPropertySupported.isPropertySupported(
+        property,
+        platform: platform,
+      );
 }
 
 ///{@template flutter_inappwebview_platform_interface.PlatformFindInteractionController}
@@ -77,7 +89,8 @@ class PlatformFindInteractionControllerCreationParams {
 ///
 ///{@macro flutter_inappwebview_platform_interface.PlatformFindInteractionController.supported_platforms}
 @SupportedPlatforms(
-    platforms: [AndroidPlatform(), IOSPlatform(), MacOSPlatform()])
+  platforms: [AndroidPlatform(), IOSPlatform(), MacOSPlatform()],
+)
 abstract class PlatformFindInteractionController extends PlatformInterface
     implements Disposable {
   ///Debug settings.
@@ -85,7 +98,8 @@ abstract class PlatformFindInteractionController extends PlatformInterface
 
   /// Creates a new [PlatformFindInteractionController]
   factory PlatformFindInteractionController(
-      PlatformFindInteractionControllerCreationParams params) {
+    PlatformFindInteractionControllerCreationParams params,
+  ) {
     assert(
       InAppWebViewPlatform.instance != null,
       'A platform implementation for `flutter_inappwebview` has not been set. Please '
@@ -94,8 +108,9 @@ abstract class PlatformFindInteractionController extends PlatformInterface
       '`InAppWebViewPlatform.instance` can be set with your own test implementation.',
     );
     final PlatformFindInteractionController webViewControllerDelegate =
-        InAppWebViewPlatform.instance!
-            .createPlatformFindInteractionController(params);
+        InAppWebViewPlatform.instance!.createPlatformFindInteractionController(
+          params,
+        );
     PlatformInterface.verify(webViewControllerDelegate, _token);
     return webViewControllerDelegate;
   }
@@ -122,7 +137,7 @@ abstract class PlatformFindInteractionController extends PlatformInterface
   /// a class that only contains a factory constructor.
   @protected
   PlatformFindInteractionController.implementation(this.params)
-      : super(token: _token);
+    : super(token: _token);
 
   static final Object _token = Object();
 
@@ -132,9 +147,13 @@ abstract class PlatformFindInteractionController extends PlatformInterface
   ///{@macro flutter_inappwebview_platform_interface.PlatformFindInteractionControllerCreationParams.onFindResultReceived}
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformFindInteractionControllerCreationParams.onFindResultReceived.supported_platforms}
-  void Function(PlatformFindInteractionController controller,
-          int activeMatchOrdinal, int numberOfMatches, bool isDoneCounting)?
-      get onFindResultReceived => params.onFindResultReceived;
+  void Function(
+    PlatformFindInteractionController controller,
+    int activeMatchOrdinal,
+    int numberOfMatches,
+    bool isDoneCounting,
+  )?
+  get onFindResultReceived => params.onFindResultReceived;
 
   ///{@template flutter_inappwebview_platform_interface.PlatformFindInteractionController.findAll}
   ///Finds all instances of find on the page and highlights them. Notifies [PlatformFindInteractionController.onFindResultReceived] listener.
@@ -143,21 +162,26 @@ abstract class PlatformFindInteractionController extends PlatformInterface
   ///{@endtemplate}
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformFindInteractionController.findAll.supported_platforms}
-  @SupportedPlatforms(platforms: [
-    AndroidPlatform(
+  @SupportedPlatforms(
+    platforms: [
+      AndroidPlatform(
         apiName: 'WebView.findAllAsync',
         apiUrl:
             'https://developer.android.com/reference/android/webkit/WebView#findAllAsync(java.lang.String)',
         note:
-            'It finds all instances asynchronously. Successive calls to this will cancel any pending searches.'),
-    IOSPlatform(
+            'It finds all instances asynchronously. Successive calls to this will cancel any pending searches.',
+      ),
+      IOSPlatform(
         note:
-            'If [InAppWebViewSettings.isFindInteractionEnabled] is `true`, it uses the built-in find interaction native UI, otherwise this is implemented using CSS and Javascript. In this case, it will use the [Official API - UIFindInteraction.presentFindNavigator](https://developer.apple.com/documentation/uikit/uifindinteraction/3975832-presentfindnavigator?changes=_2) with [Official API - UIFindInteraction.searchText](https://developer.apple.com/documentation/uikit/uifindinteraction/3975834-searchtext?changes=_2)'),
-    MacOSPlatform()
-  ])
+            'If [InAppWebViewSettings.isFindInteractionEnabled] is `true`, it uses the built-in find interaction native UI, otherwise this is implemented using CSS and Javascript. In this case, it will use the [Official API - UIFindInteraction.presentFindNavigator](https://developer.apple.com/documentation/uikit/uifindinteraction/3975832-presentfindnavigator?changes=_2) with [Official API - UIFindInteraction.searchText](https://developer.apple.com/documentation/uikit/uifindinteraction/3975834-searchtext?changes=_2)',
+      ),
+      MacOSPlatform(),
+    ],
+  )
   Future<void> findAll({String? find}) {
     throw UnimplementedError(
-        'findAll is not implemented on the current platform');
+      'findAll is not implemented on the current platform',
+    );
   }
 
   ///{@template flutter_inappwebview_platform_interface.PlatformFindInteractionController.findNext}
@@ -167,19 +191,24 @@ abstract class PlatformFindInteractionController extends PlatformInterface
   ///{@endtemplate}
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformFindInteractionController.findNext.supported_platforms}
-  @SupportedPlatforms(platforms: [
-    AndroidPlatform(
+  @SupportedPlatforms(
+    platforms: [
+      AndroidPlatform(
         apiName: 'WebView.findNext',
         apiUrl:
-            'https://developer.android.com/reference/android/webkit/WebView#findNext(boolean)'),
-    IOSPlatform(
+            'https://developer.android.com/reference/android/webkit/WebView#findNext(boolean)',
+      ),
+      IOSPlatform(
         note:
-            'If [InAppWebViewSettings.isFindInteractionEnabled] is `true`, it uses the built-in find interaction native UI, otherwise this is implemented using CSS and Javascript. In this case, it will use the [Official API - UIFindInteraction.findNext](https://developer.apple.com/documentation/uikit/uifindinteraction/3975829-findnext?changes=_2) and ([Official API - UIFindInteraction.findPrevious](https://developer.apple.com/documentation/uikit/uifindinteraction/3975830-findprevious?changes=_2)'),
-    MacOSPlatform()
-  ])
+            'If [InAppWebViewSettings.isFindInteractionEnabled] is `true`, it uses the built-in find interaction native UI, otherwise this is implemented using CSS and Javascript. In this case, it will use the [Official API - UIFindInteraction.findNext](https://developer.apple.com/documentation/uikit/uifindinteraction/3975829-findnext?changes=_2) and ([Official API - UIFindInteraction.findPrevious](https://developer.apple.com/documentation/uikit/uifindinteraction/3975830-findprevious?changes=_2)',
+      ),
+      MacOSPlatform(),
+    ],
+  )
   Future<void> findNext({bool forward = true}) {
     throw UnimplementedError(
-        'findNext is not implemented on the current platform');
+      'findNext is not implemented on the current platform',
+    );
   }
 
   ///{@template flutter_inappwebview_platform_interface.PlatformFindInteractionController.clearMatches}
@@ -187,19 +216,24 @@ abstract class PlatformFindInteractionController extends PlatformInterface
   ///{@endtemplate}
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformFindInteractionController.clearMatches.supported_platforms}
-  @SupportedPlatforms(platforms: [
-    AndroidPlatform(
+  @SupportedPlatforms(
+    platforms: [
+      AndroidPlatform(
         apiName: 'WebView.clearMatches',
         apiUrl:
-            'https://developer.android.com/reference/android/webkit/WebView#clearMatches()'),
-    IOSPlatform(
+            'https://developer.android.com/reference/android/webkit/WebView#clearMatches()',
+      ),
+      IOSPlatform(
         note:
-            'If [InAppWebViewSettings.isFindInteractionEnabled] is `true`, it uses the built-in find interaction native UI, otherwise this is implemented using CSS and Javascript. In this case, it will use the [Official API - UIFindInteraction.dismissFindNavigator](https://developer.apple.com/documentation/uikit/uifindinteraction/3975827-dismissfindnavigator?changes=_2)'),
-    MacOSPlatform()
-  ])
+            'If [InAppWebViewSettings.isFindInteractionEnabled] is `true`, it uses the built-in find interaction native UI, otherwise this is implemented using CSS and Javascript. In this case, it will use the [Official API - UIFindInteraction.dismissFindNavigator](https://developer.apple.com/documentation/uikit/uifindinteraction/3975827-dismissfindnavigator?changes=_2)',
+      ),
+      MacOSPlatform(),
+    ],
+  )
   Future<void> clearMatches() {
     throw UnimplementedError(
-        'clearMatches is not implemented on the current platform');
+      'clearMatches is not implemented on the current platform',
+    );
   }
 
   ///{@template flutter_inappwebview_platform_interface.PlatformFindInteractionController.setSearchText}
@@ -207,19 +241,23 @@ abstract class PlatformFindInteractionController extends PlatformInterface
   ///{@endtemplate}
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformFindInteractionController.setSearchText.supported_platforms}
-  @SupportedPlatforms(platforms: [
-    AndroidPlatform(),
-    IOSPlatform(
+  @SupportedPlatforms(
+    platforms: [
+      AndroidPlatform(),
+      IOSPlatform(
         apiName: 'UIFindInteraction.searchText',
         apiUrl:
             'https://developer.apple.com/documentation/uikit/uifindinteraction/3975834-searchtext?changes=_2',
         note:
-            'If [InAppWebViewSettings.isFindInteractionEnabled] is `true`, it will pre-populate the system find panel\'s search text field with a search query.'),
-    MacOSPlatform()
-  ])
+            'If [InAppWebViewSettings.isFindInteractionEnabled] is `true`, it will pre-populate the system find panel\'s search text field with a search query.',
+      ),
+      MacOSPlatform(),
+    ],
+  )
   Future<void> setSearchText(String? searchText) {
     throw UnimplementedError(
-        'setSearchText is not implemented on the current platform');
+      'setSearchText is not implemented on the current platform',
+    );
   }
 
   ///{@template flutter_inappwebview_platform_interface.PlatformFindInteractionController.getSearchText}
@@ -227,19 +265,23 @@ abstract class PlatformFindInteractionController extends PlatformInterface
   ///{@endtemplate}
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformFindInteractionController.getSearchText.supported_platforms}
-  @SupportedPlatforms(platforms: [
-    AndroidPlatform(),
-    IOSPlatform(
+  @SupportedPlatforms(
+    platforms: [
+      AndroidPlatform(),
+      IOSPlatform(
         apiName: 'UIFindInteraction.getSearchText',
         apiUrl:
             'https://developer.apple.com/documentation/uikit/uifindinteraction/3975834-searchtext?changes=_2',
         note:
-            'If [InAppWebViewSettings.isFindInteractionEnabled] is `true`, it will get the system find panel\'s search text field value.'),
-    MacOSPlatform()
-  ])
+            'If [InAppWebViewSettings.isFindInteractionEnabled] is `true`, it will get the system find panel\'s search text field value.',
+      ),
+      MacOSPlatform(),
+    ],
+  )
   Future<String?> getSearchText() {
     throw UnimplementedError(
-        'getSearchText is not implemented on the current platform');
+      'getSearchText is not implemented on the current platform',
+    );
   }
 
   ///{@template flutter_inappwebview_platform_interface.PlatformFindInteractionController.isFindNavigatorVisible}
@@ -247,17 +289,21 @@ abstract class PlatformFindInteractionController extends PlatformInterface
   ///{@endtemplate}
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformFindInteractionController.isFindNavigatorVisible.supported_platforms}
-  @SupportedPlatforms(platforms: [
-    IOSPlatform(
+  @SupportedPlatforms(
+    platforms: [
+      IOSPlatform(
         apiName: 'UIFindInteraction.isFindNavigatorVisible',
         apiUrl:
             'https://developer.apple.com/documentation/uikit/uifindinteraction/3975828-isfindnavigatorvisible?changes=_2',
         note:
-            'Available only if [InAppWebViewSettings.isFindInteractionEnabled] is `true`.'),
-  ])
+            'Available only if [InAppWebViewSettings.isFindInteractionEnabled] is `true`.',
+      ),
+    ],
+  )
   Future<bool?> isFindNavigatorVisible() {
     throw UnimplementedError(
-        'isFindNavigatorVisible is not implemented on the current platform');
+      'isFindNavigatorVisible is not implemented on the current platform',
+    );
   }
 
   ///{@template flutter_inappwebview_platform_interface.PlatformFindInteractionController.updateResultCount}
@@ -265,17 +311,21 @@ abstract class PlatformFindInteractionController extends PlatformInterface
   ///{@endtemplate}
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformFindInteractionController.updateResultCount.supported_platforms}
-  @SupportedPlatforms(platforms: [
-    IOSPlatform(
+  @SupportedPlatforms(
+    platforms: [
+      IOSPlatform(
         apiName: 'UIFindInteraction.updateResultCount',
         apiUrl:
             'https://developer.apple.com/documentation/uikit/uifindinteraction/3975835-updateresultcount?changes=_2',
         note:
-            'Available only if [InAppWebViewSettings.isFindInteractionEnabled] is `true`.'),
-  ])
+            'Available only if [InAppWebViewSettings.isFindInteractionEnabled] is `true`.',
+      ),
+    ],
+  )
   Future<void> updateResultCount() {
     throw UnimplementedError(
-        'updateResultCount is not implemented on the current platform');
+      'updateResultCount is not implemented on the current platform',
+    );
   }
 
   ///{@template flutter_inappwebview_platform_interface.PlatformFindInteractionController.presentFindNavigator}
@@ -283,17 +333,21 @@ abstract class PlatformFindInteractionController extends PlatformInterface
   ///{@endtemplate}
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformFindInteractionController.presentFindNavigator.supported_platforms}
-  @SupportedPlatforms(platforms: [
-    IOSPlatform(
+  @SupportedPlatforms(
+    platforms: [
+      IOSPlatform(
         apiName: 'UIFindInteraction.presentFindNavigator',
         apiUrl:
             'https://developer.apple.com/documentation/uikit/uifindinteraction/3975832-presentfindnavigator?changes=_2',
         note:
-            'Available only if [InAppWebViewSettings.isFindInteractionEnabled] is `true`.'),
-  ])
+            'Available only if [InAppWebViewSettings.isFindInteractionEnabled] is `true`.',
+      ),
+    ],
+  )
   Future<void> presentFindNavigator() {
     throw UnimplementedError(
-        'presentFindNavigator is not implemented on the current platform');
+      'presentFindNavigator is not implemented on the current platform',
+    );
   }
 
   ///{@template flutter_inappwebview_platform_interface.PlatformFindInteractionController.dismissFindNavigator}
@@ -301,17 +355,21 @@ abstract class PlatformFindInteractionController extends PlatformInterface
   ///{@endtemplate}
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformFindInteractionController.dismissFindNavigator.supported_platforms}
-  @SupportedPlatforms(platforms: [
-    IOSPlatform(
+  @SupportedPlatforms(
+    platforms: [
+      IOSPlatform(
         apiName: 'UIFindInteraction.dismissFindNavigator',
         apiUrl:
             'https://developer.apple.com/documentation/uikit/uifindinteraction/3975827-dismissfindnavigator?changes=_2',
         note:
-            'Available only if [InAppWebViewSettings.isFindInteractionEnabled] is `true`.'),
-  ])
+            'Available only if [InAppWebViewSettings.isFindInteractionEnabled] is `true`.',
+      ),
+    ],
+  )
   Future<void> dismissFindNavigator() {
     throw UnimplementedError(
-        'dismissFindNavigator is not implemented on the current platform');
+      'dismissFindNavigator is not implemented on the current platform',
+    );
   }
 
   ///{@template flutter_inappwebview_platform_interface.PlatformFindInteractionController.getActiveFindSession}
@@ -319,17 +377,21 @@ abstract class PlatformFindInteractionController extends PlatformInterface
   ///{@endtemplate}
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformFindInteractionController.getActiveFindSession.supported_platforms}
-  @SupportedPlatforms(platforms: [
-    AndroidPlatform(),
-    IOSPlatform(
+  @SupportedPlatforms(
+    platforms: [
+      AndroidPlatform(),
+      IOSPlatform(
         apiName: 'UIFindInteraction.activeFindSession',
         apiUrl:
-            'https://developer.apple.com/documentation/uikit/uifindinteraction/3975825-activefindsession?changes=_7____4_8&language=objc'),
-    MacOSPlatform()
-  ])
+            'https://developer.apple.com/documentation/uikit/uifindinteraction/3975825-activefindsession?changes=_7____4_8&language=objc',
+      ),
+      MacOSPlatform(),
+    ],
+  )
   Future<FindSession?> getActiveFindSession() {
     throw UnimplementedError(
-        'getActiveFindSession is not implemented on the current platform');
+      'getActiveFindSession is not implemented on the current platform',
+    );
   }
 
   ///{@template flutter_inappwebview_platform_interface.PlatformFindInteractionController.dispose}
@@ -338,11 +400,13 @@ abstract class PlatformFindInteractionController extends PlatformInterface
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformFindInteractionController.dispose.supported_platforms}
   @SupportedPlatforms(
-      platforms: [AndroidPlatform(), IOSPlatform(), MacOSPlatform()])
+    platforms: [AndroidPlatform(), IOSPlatform(), MacOSPlatform()],
+  )
   @override
   void dispose({bool isKeepAlive = false}) {
     throw UnimplementedError(
-        'dispose is not implemented on the current platform');
+      'dispose is not implemented on the current platform',
+    );
   }
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformFindInteractionControllerCreationParams.isClassSupported}
@@ -351,16 +415,18 @@ abstract class PlatformFindInteractionController extends PlatformInterface
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformFindInteractionControllerCreationParams.isPropertySupported}
   bool isPropertySupported(
-          PlatformFindInteractionControllerCreationParamsProperty property,
-          {TargetPlatform? platform}) =>
-      params.isPropertySupported(property, platform: platform);
+    PlatformFindInteractionControllerCreationParamsProperty property, {
+    TargetPlatform? platform,
+  }) => params.isPropertySupported(property, platform: platform);
 
   ///{@template flutter_inappwebview_platform_interface.PlatformFindInteractionController.isMethodSupported}
   ///Check if the given [method] is supported by the [defaultTargetPlatform] or a specific [platform].
   ///{@endtemplate}
-  bool isMethodSupported(PlatformFindInteractionControllerMethod method,
-          {TargetPlatform? platform}) =>
-      _PlatformFindInteractionControllerMethodSupported.isMethodSupported(
-          method,
-          platform: platform);
+  bool isMethodSupported(
+    PlatformFindInteractionControllerMethod method, {
+    TargetPlatform? platform,
+  }) => _PlatformFindInteractionControllerMethodSupported.isMethodSupported(
+    method,
+    platform: platform,
+  );
 }

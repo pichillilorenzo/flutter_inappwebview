@@ -74,55 +74,63 @@ class AjaxRequest {
   ///Setting withCredentials has no effect on same-site requests.
   ///In addition, this flag is also used to indicate when cookies are to be ignored in the response. The default is false.
   bool? withCredentials;
-  AjaxRequest(
-      {this.action = AjaxRequestAction.PROCEED,
-      this.data,
-      this.event,
-      this.headers,
-      this.isAsync,
-      this.method,
-      this.password,
-      this.readyState,
-      this.response,
-      this.responseHeaders,
-      this.responseText,
-      this.responseType,
-      this.responseURL,
-      this.responseXML,
-      this.status,
-      this.statusText,
-      this.url,
-      this.user,
-      this.withCredentials});
+  AjaxRequest({
+    this.action = AjaxRequestAction.PROCEED,
+    this.data,
+    this.event,
+    this.headers,
+    this.isAsync,
+    this.method,
+    this.password,
+    this.readyState,
+    this.response,
+    this.responseHeaders,
+    this.responseText,
+    this.responseType,
+    this.responseURL,
+    this.responseXML,
+    this.status,
+    this.statusText,
+    this.url,
+    this.user,
+    this.withCredentials,
+  });
 
   ///Gets a possible [AjaxRequest] instance from a [Map] value.
-  static AjaxRequest? fromMap(Map<String, dynamic>? map,
-      {EnumMethod? enumMethod}) {
+  static AjaxRequest? fromMap(
+    Map<String, dynamic>? map, {
+    EnumMethod? enumMethod,
+  }) {
     if (map == null) {
       return null;
     }
     final instance = AjaxRequest(
       data: map['data'],
-      event: AjaxRequestEvent.fromMap(map['event']?.cast<String, dynamic>(),
-          enumMethod: enumMethod),
+      event: AjaxRequestEvent.fromMap(
+        map['event']?.cast<String, dynamic>(),
+        enumMethod: enumMethod,
+      ),
       headers: AjaxRequestHeaders.fromMap(
-          map['headers']?.cast<String, dynamic>(),
-          enumMethod: enumMethod),
+        map['headers']?.cast<String, dynamic>(),
+        enumMethod: enumMethod,
+      ),
       isAsync: map['isAsync'],
       method: map['method'],
       password: map['password'],
       readyState: switch (enumMethod ?? EnumMethod.nativeValue) {
-        EnumMethod.nativeValue =>
-          AjaxRequestReadyState.fromNativeValue(map['readyState']),
+        EnumMethod.nativeValue => AjaxRequestReadyState.fromNativeValue(
+          map['readyState'],
+        ),
         EnumMethod.value => AjaxRequestReadyState.fromValue(map['readyState']),
-        EnumMethod.name => AjaxRequestReadyState.byName(map['readyState'])
+        EnumMethod.name => AjaxRequestReadyState.byName(map['readyState']),
       },
       response: map['response'],
       responseHeaders: map['responseHeaders']?.cast<String, dynamic>(),
       responseText: map['responseText'],
       responseType: map['responseType'],
-      responseURL:
-          map['responseURL'] != null ? WebUri(map['responseURL']) : null,
+      responseURL: map['responseURL'] != null
+          ? WebUri(map['responseURL'])
+          : null,
       responseXML: map['responseXML'],
       status: map['status'],
       statusText: map['statusText'],
@@ -131,10 +139,11 @@ class AjaxRequest {
       withCredentials: map['withCredentials'],
     );
     instance.action = switch (enumMethod ?? EnumMethod.nativeValue) {
-      EnumMethod.nativeValue =>
-        AjaxRequestAction.fromNativeValue(map['action']),
+      EnumMethod.nativeValue => AjaxRequestAction.fromNativeValue(
+        map['action'],
+      ),
       EnumMethod.value => AjaxRequestAction.fromValue(map['action']),
-      EnumMethod.name => AjaxRequestAction.byName(map['action'])
+      EnumMethod.name => AjaxRequestAction.byName(map['action']),
     };
     return instance;
   }
@@ -145,7 +154,7 @@ class AjaxRequest {
       "action": switch (enumMethod ?? EnumMethod.nativeValue) {
         EnumMethod.nativeValue => action?.toNativeValue(),
         EnumMethod.value => action?.toValue(),
-        EnumMethod.name => action?.name()
+        EnumMethod.name => action?.name(),
       },
       "data": data,
       "event": event?.toMap(enumMethod: enumMethod),
@@ -156,7 +165,7 @@ class AjaxRequest {
       "readyState": switch (enumMethod ?? EnumMethod.nativeValue) {
         EnumMethod.nativeValue => readyState?.toNativeValue(),
         EnumMethod.value => readyState?.toValue(),
-        EnumMethod.name => readyState?.name()
+        EnumMethod.name => readyState?.name(),
       },
       "response": response,
       "responseHeaders": responseHeaders,

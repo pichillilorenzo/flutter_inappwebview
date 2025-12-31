@@ -38,24 +38,31 @@ class WebViewEnvironment {
       platform.getFailureReportFolderPath();
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewEnvironment.create}
-  static Future<WebViewEnvironment> create(
-      {WebViewEnvironmentSettings? settings}) async {
+  static Future<WebViewEnvironment> create({
+    WebViewEnvironmentSettings? settings,
+  }) async {
     return WebViewEnvironment.fromPlatform(
-        platform: await PlatformWebViewEnvironment.static()
-            .create(settings: settings));
+      platform: await PlatformWebViewEnvironment.static().create(
+        settings: settings,
+      ),
+    );
   }
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewEnvironment.getAvailableVersion}
-  static Future<String?> getAvailableVersion(
-          {String? browserExecutableFolder}) =>
-      PlatformWebViewEnvironment.static().getAvailableVersion(
-          browserExecutableFolder: browserExecutableFolder);
+  static Future<String?> getAvailableVersion({
+    String? browserExecutableFolder,
+  }) => PlatformWebViewEnvironment.static().getAvailableVersion(
+    browserExecutableFolder: browserExecutableFolder,
+  );
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewEnvironment.getAvailableVersion}
-  static Future<int?> compareBrowserVersions(
-          {required String version1, required String version2}) =>
-      PlatformWebViewEnvironment.static()
-          .compareBrowserVersions(version1: version1, version2: version2);
+  static Future<int?> compareBrowserVersions({
+    required String version1,
+    required String version2,
+  }) => PlatformWebViewEnvironment.static().compareBrowserVersions(
+    version1: version1,
+    version2: version2,
+  );
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewEnvironment.onNewBrowserVersionAvailable}
   void Function()? get onNewBrowserVersionAvailable =>
@@ -65,17 +72,17 @@ class WebViewEnvironment {
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewEnvironment.onBrowserProcessExited}
   void Function(BrowserProcessExitedDetail detail)?
-      get onBrowserProcessExited => platform.onBrowserProcessExited;
+  get onBrowserProcessExited => platform.onBrowserProcessExited;
   set onBrowserProcessExited(
-          void Function(BrowserProcessExitedDetail detail)? value) =>
-      platform.onBrowserProcessExited = value;
+    void Function(BrowserProcessExitedDetail detail)? value,
+  ) => platform.onBrowserProcessExited = value;
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewEnvironment.onProcessInfosChanged}
   void Function(BrowserProcessInfosChangedDetail detail)?
-      get onProcessInfosChanged => platform.onProcessInfosChanged;
+  get onProcessInfosChanged => platform.onProcessInfosChanged;
   set onProcessInfosChanged(
-          void Function(BrowserProcessInfosChangedDetail detail)? value) =>
-      platform.onProcessInfosChanged = value;
+    void Function(BrowserProcessInfosChangedDetail detail)? value,
+  ) => platform.onProcessInfosChanged = value;
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewEnvironment.dispose}
   Future<void> dispose() => platform.dispose();
@@ -85,14 +92,20 @@ class WebViewEnvironment {
       PlatformWebViewEnvironment.static().isClassSupported(platform: platform);
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewEnvironment.isPropertySupported}
-  static bool isPropertySupported(dynamic property,
-          {TargetPlatform? platform}) =>
-      PlatformWebViewEnvironment.static()
-          .isPropertySupported(property, platform: platform);
+  static bool isPropertySupported(
+    dynamic property, {
+    TargetPlatform? platform,
+  }) => PlatformWebViewEnvironment.static().isPropertySupported(
+    property,
+    platform: platform,
+  );
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewEnvironment.isMethodSupported}
-  static bool isMethodSupported(PlatformWebViewEnvironmentMethod method,
-          {TargetPlatform? platform}) =>
-      PlatformWebViewEnvironment.static()
-          .isMethodSupported(method, platform: platform);
+  static bool isMethodSupported(
+    PlatformWebViewEnvironmentMethod method, {
+    TargetPlatform? platform,
+  }) => PlatformWebViewEnvironment.static().isMethodSupported(
+    method,
+    platform: platform,
+  );
 }

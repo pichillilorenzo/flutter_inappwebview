@@ -4,13 +4,19 @@ import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_pla
 ///{@macro flutter_inappwebview_platform_interface.PlatformFindInteractionController}
 class FindInteractionController {
   ///{@macro flutter_inappwebview_platform_interface.PlatformFindInteractionController}
-  FindInteractionController(
-      {void Function(PlatformFindInteractionController controller,
-              int activeMatchOrdinal, int numberOfMatches, bool isDoneCounting)?
-          onFindResultReceived})
-      : this.fromPlatformCreationParams(
-            params: PlatformFindInteractionControllerCreationParams(
-                onFindResultReceived: onFindResultReceived));
+  FindInteractionController({
+    void Function(
+      PlatformFindInteractionController controller,
+      int activeMatchOrdinal,
+      int numberOfMatches,
+      bool isDoneCounting,
+    )?
+    onFindResultReceived,
+  }) : this.fromPlatformCreationParams(
+         params: PlatformFindInteractionControllerCreationParams(
+           onFindResultReceived: onFindResultReceived,
+         ),
+       );
 
   /// Constructs a [FindInteractionController].
   ///
@@ -27,9 +33,13 @@ class FindInteractionController {
   final PlatformFindInteractionController platform;
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformFindInteractionController.onFindResultReceived}
-  void Function(PlatformFindInteractionController controller,
-          int activeMatchOrdinal, int numberOfMatches, bool isDoneCounting)?
-      get onFindResultReceived => platform.onFindResultReceived;
+  void Function(
+    PlatformFindInteractionController controller,
+    int activeMatchOrdinal,
+    int numberOfMatches,
+    bool isDoneCounting,
+  )?
+  get onFindResultReceived => platform.onFindResultReceived;
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformFindInteractionController.findAll}
   Future<void> findAll({String? find}) => platform.findAll(find: find);
@@ -69,19 +79,25 @@ class FindInteractionController {
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformFindInteractionControllerCreationParams.isClassSupported}
   static bool isClassSupported({TargetPlatform? platform}) =>
-      PlatformFindInteractionController.static()
-          .isClassSupported(platform: platform);
+      PlatformFindInteractionController.static().isClassSupported(
+        platform: platform,
+      );
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformFindInteractionController.isPropertySupported}
   static bool isPropertySupported(
-          PlatformFindInteractionControllerCreationParamsProperty property,
-          {TargetPlatform? platform}) =>
-      PlatformFindInteractionController.static()
-          .isPropertySupported(property, platform: platform);
+    PlatformFindInteractionControllerCreationParamsProperty property, {
+    TargetPlatform? platform,
+  }) => PlatformFindInteractionController.static().isPropertySupported(
+    property,
+    platform: platform,
+  );
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformFindInteractionController.isMethodSupported}
-  static bool isMethodSupported(PlatformFindInteractionControllerMethod method,
-          {TargetPlatform? platform}) =>
-      PlatformFindInteractionController.static()
-          .isMethodSupported(method, platform: platform);
+  static bool isMethodSupported(
+    PlatformFindInteractionControllerMethod method, {
+    TargetPlatform? platform,
+  }) => PlatformFindInteractionController.static().isMethodSupported(
+    method,
+    platform: platform,
+  );
 }

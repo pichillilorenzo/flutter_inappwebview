@@ -209,25 +209,28 @@ class WebViewEnvironmentSettings {
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- Windows WebView2
-  WebViewEnvironmentSettings(
-      {this.additionalBrowserArguments,
-      this.allowSingleSignOnUsingOSPrimaryAccount,
-      this.areBrowserExtensionsEnabled,
-      this.browserExecutableFolder,
-      this.channelSearchKind,
-      this.customSchemeRegistrations,
-      this.enableTrackingPrevention,
-      this.exclusiveUserDataFolderAccess,
-      this.isCustomCrashReportingEnabled,
-      this.language,
-      this.releaseChannels,
-      this.scrollbarStyle,
-      this.targetCompatibleBrowserVersion,
-      this.userDataFolder});
+  WebViewEnvironmentSettings({
+    this.additionalBrowserArguments,
+    this.allowSingleSignOnUsingOSPrimaryAccount,
+    this.areBrowserExtensionsEnabled,
+    this.browserExecutableFolder,
+    this.channelSearchKind,
+    this.customSchemeRegistrations,
+    this.enableTrackingPrevention,
+    this.exclusiveUserDataFolderAccess,
+    this.isCustomCrashReportingEnabled,
+    this.language,
+    this.releaseChannels,
+    this.scrollbarStyle,
+    this.targetCompatibleBrowserVersion,
+    this.userDataFolder,
+  });
 
   ///Gets a possible [WebViewEnvironmentSettings] instance from a [Map] value.
-  static WebViewEnvironmentSettings? fromMap(Map<String, dynamic>? map,
-      {EnumMethod? enumMethod}) {
+  static WebViewEnvironmentSettings? fromMap(
+    Map<String, dynamic>? map, {
+    EnumMethod? enumMethod,
+  }) {
     if (map == null) {
       return null;
     }
@@ -239,37 +242,50 @@ class WebViewEnvironmentSettings {
       browserExecutableFolder: map['browserExecutableFolder'],
       channelSearchKind: switch (enumMethod ?? EnumMethod.nativeValue) {
         EnumMethod.nativeValue => EnvironmentChannelSearchKind.fromNativeValue(
-            map['channelSearchKind']),
-        EnumMethod.value =>
-          EnvironmentChannelSearchKind.fromValue(map['channelSearchKind']),
-        EnumMethod.name =>
-          EnvironmentChannelSearchKind.byName(map['channelSearchKind'])
+          map['channelSearchKind'],
+        ),
+        EnumMethod.value => EnvironmentChannelSearchKind.fromValue(
+          map['channelSearchKind'],
+        ),
+        EnumMethod.name => EnvironmentChannelSearchKind.byName(
+          map['channelSearchKind'],
+        ),
       },
       customSchemeRegistrations: map['customSchemeRegistrations'] != null
-          ? List<CustomSchemeRegistration>.from(map['customSchemeRegistrations']
-              .map((e) => CustomSchemeRegistration.fromMap(
+          ? List<CustomSchemeRegistration>.from(
+              map['customSchemeRegistrations'].map(
+                (e) => CustomSchemeRegistration.fromMap(
                   e?.cast<String, dynamic>(),
-                  enumMethod: enumMethod)!))
+                  enumMethod: enumMethod,
+                )!,
+              ),
+            )
           : null,
       enableTrackingPrevention: map['enableTrackingPrevention'],
       exclusiveUserDataFolderAccess: map['exclusiveUserDataFolderAccess'],
       isCustomCrashReportingEnabled: map['isCustomCrashReportingEnabled'],
       language: map['language'],
       releaseChannels: switch (enumMethod ?? EnumMethod.nativeValue) {
-        EnumMethod.nativeValue =>
-          EnvironmentReleaseChannels.fromNativeValue(map['releaseChannels']),
-        EnumMethod.value =>
-          EnvironmentReleaseChannels.fromValue(map['releaseChannels']),
-        EnumMethod.name =>
-          EnvironmentReleaseChannels.byName(map['releaseChannels'])
+        EnumMethod.nativeValue => EnvironmentReleaseChannels.fromNativeValue(
+          map['releaseChannels'],
+        ),
+        EnumMethod.value => EnvironmentReleaseChannels.fromValue(
+          map['releaseChannels'],
+        ),
+        EnumMethod.name => EnvironmentReleaseChannels.byName(
+          map['releaseChannels'],
+        ),
       },
       scrollbarStyle: switch (enumMethod ?? EnumMethod.nativeValue) {
-        EnumMethod.nativeValue =>
-          EnvironmentScrollbarStyle.fromNativeValue(map['scrollbarStyle']),
-        EnumMethod.value =>
-          EnvironmentScrollbarStyle.fromValue(map['scrollbarStyle']),
-        EnumMethod.name =>
-          EnvironmentScrollbarStyle.byName(map['scrollbarStyle'])
+        EnumMethod.nativeValue => EnvironmentScrollbarStyle.fromNativeValue(
+          map['scrollbarStyle'],
+        ),
+        EnumMethod.value => EnvironmentScrollbarStyle.fromValue(
+          map['scrollbarStyle'],
+        ),
+        EnumMethod.name => EnvironmentScrollbarStyle.byName(
+          map['scrollbarStyle'],
+        ),
       },
       targetCompatibleBrowserVersion: map['targetCompatibleBrowserVersion'],
       userDataFolder: map['userDataFolder'],
@@ -288,7 +304,7 @@ class WebViewEnvironmentSettings {
       "channelSearchKind": switch (enumMethod ?? EnumMethod.nativeValue) {
         EnumMethod.nativeValue => channelSearchKind?.toNativeValue(),
         EnumMethod.value => channelSearchKind?.toValue(),
-        EnumMethod.name => channelSearchKind?.name()
+        EnumMethod.name => channelSearchKind?.name(),
       },
       "customSchemeRegistrations": customSchemeRegistrations
           ?.map((e) => e.toMap(enumMethod: enumMethod))
@@ -300,12 +316,12 @@ class WebViewEnvironmentSettings {
       "releaseChannels": switch (enumMethod ?? EnumMethod.nativeValue) {
         EnumMethod.nativeValue => releaseChannels?.toNativeValue(),
         EnumMethod.value => releaseChannels?.toValue(),
-        EnumMethod.name => releaseChannels?.name()
+        EnumMethod.name => releaseChannels?.name(),
       },
       "scrollbarStyle": switch (enumMethod ?? EnumMethod.nativeValue) {
         EnumMethod.nativeValue => scrollbarStyle?.toNativeValue(),
         EnumMethod.value => scrollbarStyle?.toValue(),
-        EnumMethod.name => scrollbarStyle?.name()
+        EnumMethod.name => scrollbarStyle?.name(),
       },
       "targetCompatibleBrowserVersion": targetCompatibleBrowserVersion,
       "userDataFolder": userDataFolder,

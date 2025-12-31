@@ -13,8 +13,10 @@ class ContextMenuSettings {
   ContextMenuSettings({this.hideDefaultSystemContextMenuItems = false});
 
   ///Gets a possible [ContextMenuSettings] instance from a [Map] value.
-  static ContextMenuSettings? fromMap(Map<String, dynamic>? map,
-      {EnumMethod? enumMethod}) {
+  static ContextMenuSettings? fromMap(
+    Map<String, dynamic>? map, {
+    EnumMethod? enumMethod,
+  }) {
     if (map == null) {
       return null;
     }
@@ -57,8 +59,10 @@ class ContextMenuOptions {
   ContextMenuOptions({this.hideDefaultSystemContextMenuItems = false});
 
   ///Gets a possible [ContextMenuOptions] instance from a [Map] value.
-  static ContextMenuOptions? fromMap(Map<String, dynamic>? map,
-      {EnumMethod? enumMethod}) {
+  static ContextMenuOptions? fromMap(
+    Map<String, dynamic>? map, {
+    EnumMethod? enumMethod,
+  }) {
     if (map == null) {
       return null;
     }

@@ -11,10 +11,11 @@ class ShowFileChooserRequestMode {
   final int _value;
   final int? _nativeValue;
   const ShowFileChooserRequestMode._internal(this._value, this._nativeValue);
-// ignore: unused_element
+  // ignore: unused_element
   factory ShowFileChooserRequestMode._internalMultiPlatform(
-          int value, Function nativeValue) =>
-      ShowFileChooserRequestMode._internal(value, nativeValue());
+    int value,
+    Function nativeValue,
+  ) => ShowFileChooserRequestMode._internal(value, nativeValue());
 
   ///Open single file. Requires that the file exists before allowing the user to pick it.
   ///
@@ -36,16 +37,18 @@ class ShowFileChooserRequestMode {
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- Android WebView
-  static final OPEN_FOLDER =
-      ShowFileChooserRequestMode._internalMultiPlatform(2, () {
-    switch (defaultTargetPlatform) {
-      case TargetPlatform.android:
-        return 2;
-      default:
-        break;
-    }
-    return null;
-  });
+  static final OPEN_FOLDER = ShowFileChooserRequestMode._internalMultiPlatform(
+    2,
+    () {
+      switch (defaultTargetPlatform) {
+        case TargetPlatform.android:
+          return 2;
+        default:
+          break;
+      }
+      return null;
+    },
+  );
 
   ///Like Open but allows multiple files to be selected.
   ///
@@ -53,14 +56,14 @@ class ShowFileChooserRequestMode {
   ///- Android WebView
   static final OPEN_MULTIPLE =
       ShowFileChooserRequestMode._internalMultiPlatform(1, () {
-    switch (defaultTargetPlatform) {
-      case TargetPlatform.android:
-        return 1;
-      default:
-        break;
-    }
-    return null;
-  });
+        switch (defaultTargetPlatform) {
+          case TargetPlatform.android:
+            return 1;
+          default:
+            break;
+        }
+        return null;
+      });
 
   ///Allows picking a nonexistent file and saving it.
   ///
@@ -88,8 +91,9 @@ class ShowFileChooserRequestMode {
   static ShowFileChooserRequestMode? fromValue(int? value) {
     if (value != null) {
       try {
-        return ShowFileChooserRequestMode.values
-            .firstWhere((element) => element.toValue() == value);
+        return ShowFileChooserRequestMode.values.firstWhere(
+          (element) => element.toValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -101,8 +105,9 @@ class ShowFileChooserRequestMode {
   static ShowFileChooserRequestMode? fromNativeValue(int? value) {
     if (value != null) {
       try {
-        return ShowFileChooserRequestMode.values
-            .firstWhere((element) => element.toNativeValue() == value);
+        return ShowFileChooserRequestMode.values.firstWhere(
+          (element) => element.toNativeValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -118,8 +123,9 @@ class ShowFileChooserRequestMode {
   static ShowFileChooserRequestMode? byName(String? name) {
     if (name != null) {
       try {
-        return ShowFileChooserRequestMode.values
-            .firstWhere((element) => element.name() == name);
+        return ShowFileChooserRequestMode.values.firstWhere(
+          (element) => element.name() == name,
+        );
       } catch (e) {
         return null;
       }
@@ -138,7 +144,7 @@ class ShowFileChooserRequestMode {
   static Map<String, ShowFileChooserRequestMode> asNameMap() =>
       <String, ShowFileChooserRequestMode>{
         for (final value in ShowFileChooserRequestMode.values)
-          value.name(): value
+          value.name(): value,
       };
 
   ///Gets [int] value.

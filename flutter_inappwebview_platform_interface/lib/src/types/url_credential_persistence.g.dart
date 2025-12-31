@@ -11,10 +11,11 @@ class URLCredentialPersistence {
   final int _value;
   final int _nativeValue;
   const URLCredentialPersistence._internal(this._value, this._nativeValue);
-// ignore: unused_element
+  // ignore: unused_element
   factory URLCredentialPersistence._internalMultiPlatform(
-          int value, Function nativeValue) =>
-      URLCredentialPersistence._internal(value, nativeValue());
+    int value,
+    Function nativeValue,
+  ) => URLCredentialPersistence._internal(value, nativeValue());
 
   ///The credential should be stored only for this session
   static const FOR_SESSION = URLCredentialPersistence._internal(1, 1);
@@ -41,8 +42,9 @@ class URLCredentialPersistence {
   static URLCredentialPersistence? fromValue(int? value) {
     if (value != null) {
       try {
-        return URLCredentialPersistence.values
-            .firstWhere((element) => element.toValue() == value);
+        return URLCredentialPersistence.values.firstWhere(
+          (element) => element.toValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -54,8 +56,9 @@ class URLCredentialPersistence {
   static URLCredentialPersistence? fromNativeValue(int? value) {
     if (value != null) {
       try {
-        return URLCredentialPersistence.values
-            .firstWhere((element) => element.toNativeValue() == value);
+        return URLCredentialPersistence.values.firstWhere(
+          (element) => element.toNativeValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -71,8 +74,9 @@ class URLCredentialPersistence {
   static URLCredentialPersistence? byName(String? name) {
     if (name != null) {
       try {
-        return URLCredentialPersistence.values
-            .firstWhere((element) => element.name() == name);
+        return URLCredentialPersistence.values.firstWhere(
+          (element) => element.name() == name,
+        );
       } catch (e) {
         return null;
       }
@@ -90,7 +94,8 @@ class URLCredentialPersistence {
   /// them will be represented in the returned map.
   static Map<String, URLCredentialPersistence> asNameMap() =>
       <String, URLCredentialPersistence>{
-        for (final value in URLCredentialPersistence.values) value.name(): value
+        for (final value in URLCredentialPersistence.values)
+          value.name(): value,
       };
 
   ///Gets [int] value.
@@ -138,10 +143,11 @@ class IOSURLCredentialPersistence {
   final int _value;
   final int _nativeValue;
   const IOSURLCredentialPersistence._internal(this._value, this._nativeValue);
-// ignore: unused_element
+  // ignore: unused_element
   factory IOSURLCredentialPersistence._internalMultiPlatform(
-          int value, Function nativeValue) =>
-      IOSURLCredentialPersistence._internal(value, nativeValue());
+    int value,
+    Function nativeValue,
+  ) => IOSURLCredentialPersistence._internal(value, nativeValue());
 
   ///The credential should be stored only for this session
   static const FOR_SESSION = IOSURLCredentialPersistence._internal(1, 1);
@@ -168,8 +174,9 @@ class IOSURLCredentialPersistence {
   static IOSURLCredentialPersistence? fromValue(int? value) {
     if (value != null) {
       try {
-        return IOSURLCredentialPersistence.values
-            .firstWhere((element) => element.toValue() == value);
+        return IOSURLCredentialPersistence.values.firstWhere(
+          (element) => element.toValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -181,8 +188,9 @@ class IOSURLCredentialPersistence {
   static IOSURLCredentialPersistence? fromNativeValue(int? value) {
     if (value != null) {
       try {
-        return IOSURLCredentialPersistence.values
-            .firstWhere((element) => element.toNativeValue() == value);
+        return IOSURLCredentialPersistence.values.firstWhere(
+          (element) => element.toNativeValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -198,8 +206,9 @@ class IOSURLCredentialPersistence {
   static IOSURLCredentialPersistence? byName(String? name) {
     if (name != null) {
       try {
-        return IOSURLCredentialPersistence.values
-            .firstWhere((element) => element.name() == name);
+        return IOSURLCredentialPersistence.values.firstWhere(
+          (element) => element.name() == name,
+        );
       } catch (e) {
         return null;
       }
@@ -218,7 +227,7 @@ class IOSURLCredentialPersistence {
   static Map<String, IOSURLCredentialPersistence> asNameMap() =>
       <String, IOSURLCredentialPersistence>{
         for (final value in IOSURLCredentialPersistence.values)
-          value.name(): value
+          value.name(): value,
       };
 
   ///Gets [int] value.

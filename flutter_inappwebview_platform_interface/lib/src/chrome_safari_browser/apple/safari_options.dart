@@ -39,14 +39,15 @@ class IOSSafariOptions implements ChromeSafariBrowserOptions, IosOptions {
   ///Set to the custom transition style when presenting the WebView. The default value is [IOSUIModalTransitionStyle.COVER_VERTICAL].
   IOSUIModalTransitionStyle transitionStyle;
 
-  IOSSafariOptions(
-      {this.entersReaderIfAvailable = false,
-      this.barCollapsingEnabled = false,
-      this.dismissButtonStyle = IOSSafariDismissButtonStyle.DONE,
-      this.preferredBarTintColor,
-      this.preferredControlTintColor,
-      this.presentationStyle = IOSUIModalPresentationStyle.FULL_SCREEN,
-      this.transitionStyle = IOSUIModalTransitionStyle.COVER_VERTICAL});
+  IOSSafariOptions({
+    this.entersReaderIfAvailable = false,
+    this.barCollapsingEnabled = false,
+    this.dismissButtonStyle = IOSSafariDismissButtonStyle.DONE,
+    this.preferredBarTintColor,
+    this.preferredControlTintColor,
+    this.presentationStyle = IOSUIModalPresentationStyle.FULL_SCREEN,
+    this.transitionStyle = IOSUIModalTransitionStyle.COVER_VERTICAL,
+  });
 
   @override
   Map<String, dynamic> toMap() {
@@ -57,7 +58,7 @@ class IOSSafariOptions implements ChromeSafariBrowserOptions, IosOptions {
       "preferredBarTintColor": preferredBarTintColor?.toHex(),
       "preferredControlTintColor": preferredControlTintColor?.toHex(),
       "presentationStyle": presentationStyle.toNativeValue(),
-      "transitionStyle": transitionStyle.toNativeValue()
+      "transitionStyle": transitionStyle.toNativeValue(),
     };
   }
 
@@ -65,16 +66,21 @@ class IOSSafariOptions implements ChromeSafariBrowserOptions, IosOptions {
     IOSSafariOptions options = IOSSafariOptions();
     options.entersReaderIfAvailable = map["entersReaderIfAvailable"];
     options.barCollapsingEnabled = map["barCollapsingEnabled"];
-    options.dismissButtonStyle =
-        IOSSafariDismissButtonStyle.fromNativeValue(map["dismissButtonStyle"])!;
-    options.preferredBarTintColor =
-        UtilColor.fromHex(map["preferredBarTintColor"]);
-    options.preferredControlTintColor =
-        UtilColor.fromHex(map["preferredControlTintColor"]);
-    options.presentationStyle =
-        IOSUIModalPresentationStyle.fromNativeValue(map["presentationStyle"])!;
-    options.transitionStyle =
-        IOSUIModalTransitionStyle.fromNativeValue(map["transitionStyle"])!;
+    options.dismissButtonStyle = IOSSafariDismissButtonStyle.fromNativeValue(
+      map["dismissButtonStyle"],
+    )!;
+    options.preferredBarTintColor = UtilColor.fromHex(
+      map["preferredBarTintColor"],
+    );
+    options.preferredControlTintColor = UtilColor.fromHex(
+      map["preferredControlTintColor"],
+    );
+    options.presentationStyle = IOSUIModalPresentationStyle.fromNativeValue(
+      map["presentationStyle"],
+    )!;
+    options.transitionStyle = IOSUIModalTransitionStyle.fromNativeValue(
+      map["transitionStyle"],
+    )!;
     return options;
   }
 

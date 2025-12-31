@@ -16,8 +16,10 @@ class JsBeforeUnloadRequest {
   JsBeforeUnloadRequest({this.message, this.url});
 
   ///Gets a possible [JsBeforeUnloadRequest] instance from a [Map] value.
-  static JsBeforeUnloadRequest? fromMap(Map<String, dynamic>? map,
-      {EnumMethod? enumMethod}) {
+  static JsBeforeUnloadRequest? fromMap(
+    Map<String, dynamic>? map, {
+    EnumMethod? enumMethod,
+  }) {
     if (map == null) {
       return null;
     }
@@ -30,10 +32,7 @@ class JsBeforeUnloadRequest {
 
   ///Converts instance to a map.
   Map<String, dynamic> toMap({EnumMethod? enumMethod}) {
-    return {
-      "message": message,
-      "url": url?.toString(),
-    };
+    return {"message": message, "url": url?.toString()};
   }
 
   ///Converts instance to a map.

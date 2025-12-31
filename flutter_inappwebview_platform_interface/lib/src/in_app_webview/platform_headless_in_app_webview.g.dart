@@ -23,12 +23,12 @@ extension _PlatformHeadlessInAppWebViewCreationParamsClassSupported
     return kIsWeb && platform == null
         ? true
         : ((kIsWeb && platform != null) || !kIsWeb) &&
-            [
-              TargetPlatform.android,
-              TargetPlatform.iOS,
-              TargetPlatform.macOS,
-              TargetPlatform.windows
-            ].contains(platform ?? defaultTargetPlatform);
+              [
+                TargetPlatform.android,
+                TargetPlatform.iOS,
+                TargetPlatform.macOS,
+                TargetPlatform.windows,
+              ].contains(platform ?? defaultTargetPlatform);
   }
 }
 
@@ -65,24 +65,26 @@ enum PlatformHeadlessInAppWebViewCreationParamsProperty {
 extension _PlatformHeadlessInAppWebViewCreationParamsPropertySupported
     on PlatformHeadlessInAppWebViewCreationParams {
   static bool isPropertySupported(
-      PlatformHeadlessInAppWebViewCreationParamsProperty property,
-      {TargetPlatform? platform}) {
+    PlatformHeadlessInAppWebViewCreationParamsProperty property, {
+    TargetPlatform? platform,
+  }) {
     switch (property) {
       case PlatformHeadlessInAppWebViewCreationParamsProperty.initialSize:
         return kIsWeb && platform == null
             ? true
             : ((kIsWeb && platform != null) || !kIsWeb) &&
-                [
-                  TargetPlatform.android,
-                  TargetPlatform.iOS,
-                  TargetPlatform.macOS,
-                  TargetPlatform.windows
-                ].contains(platform ?? defaultTargetPlatform);
+                  [
+                    TargetPlatform.android,
+                    TargetPlatform.iOS,
+                    TargetPlatform.macOS,
+                    TargetPlatform.windows,
+                  ].contains(platform ?? defaultTargetPlatform);
       case PlatformHeadlessInAppWebViewCreationParamsProperty
-            .webViewEnvironment:
+          .webViewEnvironment:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.windows]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.windows,
+            ].contains(platform ?? defaultTargetPlatform);
     }
   }
 }
@@ -104,12 +106,12 @@ extension _PlatformHeadlessInAppWebViewClassSupported
     return kIsWeb && platform == null
         ? true
         : ((kIsWeb && platform != null) || !kIsWeb) &&
-            [
-              TargetPlatform.android,
-              TargetPlatform.iOS,
-              TargetPlatform.macOS,
-              TargetPlatform.windows
-            ].contains(platform ?? defaultTargetPlatform);
+              [
+                TargetPlatform.android,
+                TargetPlatform.iOS,
+                TargetPlatform.macOS,
+                TargetPlatform.windows,
+              ].contains(platform ?? defaultTargetPlatform);
   }
 }
 
@@ -196,57 +198,59 @@ enum PlatformHeadlessInAppWebViewMethod {
 
 extension _PlatformHeadlessInAppWebViewMethodSupported
     on PlatformHeadlessInAppWebView {
-  static bool isMethodSupported(PlatformHeadlessInAppWebViewMethod method,
-      {TargetPlatform? platform}) {
+  static bool isMethodSupported(
+    PlatformHeadlessInAppWebViewMethod method, {
+    TargetPlatform? platform,
+  }) {
     switch (method) {
       case PlatformHeadlessInAppWebViewMethod.dispose:
         return kIsWeb && platform == null
             ? true
             : ((kIsWeb && platform != null) || !kIsWeb) &&
-                [
-                  TargetPlatform.android,
-                  TargetPlatform.iOS,
-                  TargetPlatform.macOS,
-                  TargetPlatform.windows
-                ].contains(platform ?? defaultTargetPlatform);
+                  [
+                    TargetPlatform.android,
+                    TargetPlatform.iOS,
+                    TargetPlatform.macOS,
+                    TargetPlatform.windows,
+                  ].contains(platform ?? defaultTargetPlatform);
       case PlatformHeadlessInAppWebViewMethod.getSize:
         return kIsWeb && platform == null
             ? true
             : ((kIsWeb && platform != null) || !kIsWeb) &&
-                [
-                  TargetPlatform.android,
-                  TargetPlatform.iOS,
-                  TargetPlatform.macOS
-                ].contains(platform ?? defaultTargetPlatform);
+                  [
+                    TargetPlatform.android,
+                    TargetPlatform.iOS,
+                    TargetPlatform.macOS,
+                  ].contains(platform ?? defaultTargetPlatform);
       case PlatformHeadlessInAppWebViewMethod.isRunning:
         return kIsWeb && platform == null
             ? true
             : ((kIsWeb && platform != null) || !kIsWeb) &&
-                [
-                  TargetPlatform.android,
-                  TargetPlatform.iOS,
-                  TargetPlatform.macOS,
-                  TargetPlatform.windows
-                ].contains(platform ?? defaultTargetPlatform);
+                  [
+                    TargetPlatform.android,
+                    TargetPlatform.iOS,
+                    TargetPlatform.macOS,
+                    TargetPlatform.windows,
+                  ].contains(platform ?? defaultTargetPlatform);
       case PlatformHeadlessInAppWebViewMethod.run:
         return kIsWeb && platform == null
             ? true
             : ((kIsWeb && platform != null) || !kIsWeb) &&
-                [
-                  TargetPlatform.android,
-                  TargetPlatform.iOS,
-                  TargetPlatform.macOS,
-                  TargetPlatform.windows
-                ].contains(platform ?? defaultTargetPlatform);
+                  [
+                    TargetPlatform.android,
+                    TargetPlatform.iOS,
+                    TargetPlatform.macOS,
+                    TargetPlatform.windows,
+                  ].contains(platform ?? defaultTargetPlatform);
       case PlatformHeadlessInAppWebViewMethod.setSize:
         return kIsWeb && platform == null
             ? true
             : ((kIsWeb && platform != null) || !kIsWeb) &&
-                [
-                  TargetPlatform.android,
-                  TargetPlatform.iOS,
-                  TargetPlatform.macOS
-                ].contains(platform ?? defaultTargetPlatform);
+                  [
+                    TargetPlatform.android,
+                    TargetPlatform.iOS,
+                    TargetPlatform.macOS,
+                  ].contains(platform ?? defaultTargetPlatform);
     }
   }
 }

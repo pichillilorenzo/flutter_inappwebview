@@ -18,6 +18,8 @@ class ConsoleMessage_ {
   ///Console message level
   ConsoleMessageLevel_ messageLevel;
 
-  ConsoleMessage_(
-      {this.message = "", this.messageLevel = ConsoleMessageLevel_.LOG});
+  ConsoleMessage_({
+    this.message = "",
+    this.messageLevel = ConsoleMessageLevel_.LOG,
+  });
 }

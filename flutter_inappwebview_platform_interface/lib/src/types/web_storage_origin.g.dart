@@ -20,8 +20,10 @@ class WebStorageOrigin {
   WebStorageOrigin({this.origin, this.quota, this.usage});
 
   ///Gets a possible [WebStorageOrigin] instance from a [Map] value.
-  static WebStorageOrigin? fromMap(Map<String, dynamic>? map,
-      {EnumMethod? enumMethod}) {
+  static WebStorageOrigin? fromMap(
+    Map<String, dynamic>? map, {
+    EnumMethod? enumMethod,
+  }) {
     if (map == null) {
       return null;
     }
@@ -35,11 +37,7 @@ class WebStorageOrigin {
 
   ///Converts instance to a map.
   Map<String, dynamic> toMap({EnumMethod? enumMethod}) {
-    return {
-      "origin": origin,
-      "quota": quota,
-      "usage": usage,
-    };
+    return {"origin": origin, "quota": quota, "usage": usage};
   }
 
   ///Converts instance to a map.
@@ -69,8 +67,10 @@ class AndroidWebStorageOrigin {
   AndroidWebStorageOrigin({this.origin, this.quota, this.usage});
 
   ///Gets a possible [AndroidWebStorageOrigin] instance from a [Map] value.
-  static AndroidWebStorageOrigin? fromMap(Map<String, dynamic>? map,
-      {EnumMethod? enumMethod}) {
+  static AndroidWebStorageOrigin? fromMap(
+    Map<String, dynamic>? map, {
+    EnumMethod? enumMethod,
+  }) {
     if (map == null) {
       return null;
     }
@@ -84,11 +84,7 @@ class AndroidWebStorageOrigin {
 
   ///Converts instance to a map.
   Map<String, dynamic> toMap({EnumMethod? enumMethod}) {
-    return {
-      "origin": origin,
-      "quota": quota,
-      "usage": usage,
-    };
+    return {"origin": origin, "quota": quota, "usage": usage};
   }
 
   ///Converts instance to a map.

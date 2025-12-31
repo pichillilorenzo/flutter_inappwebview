@@ -15,8 +15,5 @@ class ShowFileChooserResponse_ {
   ///Each file path must be a valid file URI using the "file:" scheme.
   final List<String>? filePaths;
 
-  ShowFileChooserResponse_({
-    required this.handledByClient,
-    this.filePaths,
-  });
+  ShowFileChooserResponse_({required this.handledByClient, this.filePaths});
 }

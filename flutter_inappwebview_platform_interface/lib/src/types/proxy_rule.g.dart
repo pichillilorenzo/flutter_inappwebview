@@ -59,18 +59,21 @@ class ProxyRule {
   ///- iOS WKWebView
   ///- macOS WKWebView
   String? username;
-  ProxyRule(
-      {this.allowFailover,
-      this.excludedDomains,
-      this.matchDomains,
-      this.password,
-      this.schemeFilter,
-      required this.url,
-      this.username});
+  ProxyRule({
+    this.allowFailover,
+    this.excludedDomains,
+    this.matchDomains,
+    this.password,
+    this.schemeFilter,
+    required this.url,
+    this.username,
+  });
 
   ///Gets a possible [ProxyRule] instance from a [Map] value.
-  static ProxyRule? fromMap(Map<String, dynamic>? map,
-      {EnumMethod? enumMethod}) {
+  static ProxyRule? fromMap(
+    Map<String, dynamic>? map, {
+    EnumMethod? enumMethod,
+  }) {
     if (map == null) {
       return null;
     }
@@ -84,10 +87,11 @@ class ProxyRule {
           : null,
       password: map['password'],
       schemeFilter: switch (enumMethod ?? EnumMethod.nativeValue) {
-        EnumMethod.nativeValue =>
-          ProxySchemeFilter.fromNativeValue(map['schemeFilter']),
+        EnumMethod.nativeValue => ProxySchemeFilter.fromNativeValue(
+          map['schemeFilter'],
+        ),
         EnumMethod.value => ProxySchemeFilter.fromValue(map['schemeFilter']),
-        EnumMethod.name => ProxySchemeFilter.byName(map['schemeFilter'])
+        EnumMethod.name => ProxySchemeFilter.byName(map['schemeFilter']),
       },
       url: map['url'],
       username: map['username'],
@@ -105,7 +109,7 @@ class ProxyRule {
       "schemeFilter": switch (enumMethod ?? EnumMethod.nativeValue) {
         EnumMethod.nativeValue => schemeFilter?.toNativeValue(),
         EnumMethod.value => schemeFilter?.toValue(),
-        EnumMethod.name => schemeFilter?.name()
+        EnumMethod.name => schemeFilter?.name(),
       },
       "url": url,
       "username": username,

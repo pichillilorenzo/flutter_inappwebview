@@ -28,15 +28,18 @@ class CustomSchemeRegistration {
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- Windows WebView2
-  CustomSchemeRegistration(
-      {this.allowedOrigins,
-      this.hasAuthorityComponent,
-      required this.scheme,
-      this.treatAsSecure});
+  CustomSchemeRegistration({
+    this.allowedOrigins,
+    this.hasAuthorityComponent,
+    required this.scheme,
+    this.treatAsSecure,
+  });
 
   ///Gets a possible [CustomSchemeRegistration] instance from a [Map] value.
-  static CustomSchemeRegistration? fromMap(Map<String, dynamic>? map,
-      {EnumMethod? enumMethod}) {
+  static CustomSchemeRegistration? fromMap(
+    Map<String, dynamic>? map, {
+    EnumMethod? enumMethod,
+  }) {
     if (map == null) {
       return null;
     }

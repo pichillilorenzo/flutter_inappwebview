@@ -30,6 +30,9 @@ class DownloadStartResponse_ {
   @SupportedPlatforms(platforms: [WindowsPlatform()])
   String? resultFilePath;
 
-  DownloadStartResponse_(
-      {required this.handled, this.action, this.resultFilePath});
+  DownloadStartResponse_({
+    required this.handled,
+    this.action,
+    this.resultFilePath,
+  });
 }

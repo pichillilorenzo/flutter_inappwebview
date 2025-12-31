@@ -11,10 +11,11 @@ class ProcessFailedKind {
   final String _value;
   final int? _nativeValue;
   const ProcessFailedKind._internal(this._value, this._nativeValue);
-// ignore: unused_element
+  // ignore: unused_element
   factory ProcessFailedKind._internalMultiPlatform(
-          String value, Function nativeValue) =>
-      ProcessFailedKind._internal(value, nativeValue());
+    String value,
+    Function nativeValue,
+  ) => ProcessFailedKind._internal(value, nativeValue());
 
   ///Indicates that the browser process ended unexpectedly. The WebView automatically moves to the Closed state.
   ///The app has to recreate a new WebView to recover from this failure.
@@ -23,14 +24,14 @@ class ProcessFailedKind {
   ///- Windows WebView2 ([Official API - COREWEBVIEW2_PROCESS_FAILED_KIND_BROWSER_PROCESS_EXITED](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2849.39#corewebview2_process_failed_kind))
   static final BROWSER_PROCESS_EXITED =
       ProcessFailedKind._internalMultiPlatform('BROWSER_PROCESS_EXITED', () {
-    switch (defaultTargetPlatform) {
-      case TargetPlatform.windows:
-        return 0;
-      default:
-        break;
-    }
-    return null;
-  });
+        switch (defaultTargetPlatform) {
+          case TargetPlatform.windows:
+            return 0;
+          default:
+            break;
+        }
+        return null;
+      });
 
   ///Indicates that a frame-only render process ended unexpectedly.
   ///The process exit does not affect the top-level document, only a subset of the subframes within it.
@@ -39,16 +40,18 @@ class ProcessFailedKind {
   ///**Officially Supported Platforms/Implementations**:
   ///- Windows WebView2 ([Official API - COREWEBVIEW2_PROCESS_FAILED_KIND_FRAME_RENDER_PROCESS_EXITED](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2849.39#corewebview2_process_failed_kind))
   static final FRAME_RENDER_PROCESS_EXITED =
-      ProcessFailedKind._internalMultiPlatform('FRAME_RENDER_PROCESS_EXITED',
-          () {
-    switch (defaultTargetPlatform) {
-      case TargetPlatform.windows:
-        return 3;
-      default:
-        break;
-    }
-    return null;
-  });
+      ProcessFailedKind._internalMultiPlatform(
+        'FRAME_RENDER_PROCESS_EXITED',
+        () {
+          switch (defaultTargetPlatform) {
+            case TargetPlatform.windows:
+              return 3;
+            default:
+              break;
+          }
+          return null;
+        },
+      );
 
   ///Indicates that the GPU process ended unexpectedly.
   ///The failed process is recreated automatically.
@@ -56,16 +59,18 @@ class ProcessFailedKind {
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- Windows WebView2 ([Official API - COREWEBVIEW2_PROCESS_FAILED_KIND_GPU_PROCESS_EXITED](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2849.39#corewebview2_process_failed_kind))
-  static final GPU_PROCESS_EXITED =
-      ProcessFailedKind._internalMultiPlatform('GPU_PROCESS_EXITED', () {
-    switch (defaultTargetPlatform) {
-      case TargetPlatform.windows:
-        return 6;
-      default:
-        break;
-    }
-    return null;
-  });
+  static final GPU_PROCESS_EXITED = ProcessFailedKind._internalMultiPlatform(
+    'GPU_PROCESS_EXITED',
+    () {
+      switch (defaultTargetPlatform) {
+        case TargetPlatform.windows:
+          return 6;
+        default:
+          break;
+      }
+      return null;
+    },
+  );
 
   ///Indicates that a PPAPI plugin broker process ended unexpectedly.
   ///This failure is not fatal.
@@ -74,16 +79,18 @@ class ProcessFailedKind {
   ///**Officially Supported Platforms/Implementations**:
   ///- Windows WebView2 ([Official API - COREWEBVIEW2_PROCESS_FAILED_KIND_PPAPI_BROKER_PROCESS_EXITED](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2849.39#corewebview2_process_failed_kind))
   static final PPAPI_BROKER_PROCESS_EXITED =
-      ProcessFailedKind._internalMultiPlatform('PPAPI_BROKER_PROCESS_EXITED',
-          () {
-    switch (defaultTargetPlatform) {
-      case TargetPlatform.windows:
-        return 8;
-      default:
-        break;
-    }
-    return null;
-  });
+      ProcessFailedKind._internalMultiPlatform(
+        'PPAPI_BROKER_PROCESS_EXITED',
+        () {
+          switch (defaultTargetPlatform) {
+            case TargetPlatform.windows:
+              return 8;
+            default:
+              break;
+          }
+          return null;
+        },
+      );
 
   ///Indicates that a PPAPI plugin process ended unexpectedly.
   ///This failure is not fatal.
@@ -92,16 +99,18 @@ class ProcessFailedKind {
   ///**Officially Supported Platforms/Implementations**:
   ///- Windows WebView2 ([Official API - COREWEBVIEW2_PROCESS_FAILED_KIND_PPAPI_PLUGIN_PROCESS_EXITED](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2849.39#corewebview2_process_failed_kind))
   static final PPAPI_PLUGIN_PROCESS_EXITED =
-      ProcessFailedKind._internalMultiPlatform('PPAPI_PLUGIN_PROCESS_EXITED',
-          () {
-    switch (defaultTargetPlatform) {
-      case TargetPlatform.windows:
-        return 7;
-      default:
-        break;
-    }
-    return null;
-  });
+      ProcessFailedKind._internalMultiPlatform(
+        'PPAPI_PLUGIN_PROCESS_EXITED',
+        () {
+          switch (defaultTargetPlatform) {
+            case TargetPlatform.windows:
+              return 7;
+            default:
+              break;
+          }
+          return null;
+        },
+      );
 
   ///Indicates that the main frame's render process ended unexpectedly. Any subframes in the WebView will be gone too.
   ///A new render process is created automatically and navigated to an error page.
@@ -109,16 +118,18 @@ class ProcessFailedKind {
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- Windows WebView2 ([Official API - COREWEBVIEW2_PROCESS_FAILED_KIND_RENDER_PROCESS_EXITED](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2849.39#corewebview2_process_failed_kind))
-  static final RENDER_PROCESS_EXITED =
-      ProcessFailedKind._internalMultiPlatform('RENDER_PROCESS_EXITED', () {
-    switch (defaultTargetPlatform) {
-      case TargetPlatform.windows:
-        return 1;
-      default:
-        break;
-    }
-    return null;
-  });
+  static final RENDER_PROCESS_EXITED = ProcessFailedKind._internalMultiPlatform(
+    'RENDER_PROCESS_EXITED',
+    () {
+      switch (defaultTargetPlatform) {
+        case TargetPlatform.windows:
+          return 1;
+        default:
+          break;
+      }
+      return null;
+    },
+  );
 
   ///Indicates that the main frame's render process is unresponsive.
   ///Renderer process unresponsiveness can happen for the following reasons:
@@ -137,16 +148,18 @@ class ProcessFailedKind {
   ///**Officially Supported Platforms/Implementations**:
   ///- Windows WebView2 ([Official API - COREWEBVIEW2_PROCESS_FAILED_KIND_RENDER_PROCESS_UNRESPONSIVE](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2849.39#corewebview2_process_failed_kind))
   static final RENDER_PROCESS_UNRESPONSIVE =
-      ProcessFailedKind._internalMultiPlatform('RENDER_PROCESS_UNRESPONSIVE',
-          () {
-    switch (defaultTargetPlatform) {
-      case TargetPlatform.windows:
-        return 2;
-      default:
-        break;
-    }
-    return null;
-  });
+      ProcessFailedKind._internalMultiPlatform(
+        'RENDER_PROCESS_UNRESPONSIVE',
+        () {
+          switch (defaultTargetPlatform) {
+            case TargetPlatform.windows:
+              return 2;
+            default:
+              break;
+          }
+          return null;
+        },
+      );
 
   ///Indicates that a sandbox helper process ended unexpectedly.
   ///This failure is not fatal.
@@ -155,16 +168,18 @@ class ProcessFailedKind {
   ///**Officially Supported Platforms/Implementations**:
   ///- Windows WebView2 ([Official API - COREWEBVIEW2_PROCESS_FAILED_KIND_SANDBOX_HELPER_PROCESS_EXITED](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2849.39#corewebview2_process_failed_kind))
   static final SANDBOX_HELPER_PROCESS_EXITED =
-      ProcessFailedKind._internalMultiPlatform('SANDBOX_HELPER_PROCESS_EXITED',
-          () {
-    switch (defaultTargetPlatform) {
-      case TargetPlatform.windows:
-        return 5;
-      default:
-        break;
-    }
-    return null;
-  });
+      ProcessFailedKind._internalMultiPlatform(
+        'SANDBOX_HELPER_PROCESS_EXITED',
+        () {
+          switch (defaultTargetPlatform) {
+            case TargetPlatform.windows:
+              return 5;
+            default:
+              break;
+          }
+          return null;
+        },
+      );
 
   ///Indicates that a process of unspecified kind ended unexpectedly.
   ///
@@ -172,14 +187,14 @@ class ProcessFailedKind {
   ///- Windows WebView2 ([Official API - COREWEBVIEW2_PROCESS_FAILED_KIND_UNKNOWN_PROCESS_EXITED](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2849.39#corewebview2_process_failed_kind))
   static final UNKNOWN_PROCESS_EXITED =
       ProcessFailedKind._internalMultiPlatform('UNKNOWN_PROCESS_EXITED', () {
-    switch (defaultTargetPlatform) {
-      case TargetPlatform.windows:
-        return 9;
-      default:
-        break;
-    }
-    return null;
-  });
+        switch (defaultTargetPlatform) {
+          case TargetPlatform.windows:
+            return 9;
+          default:
+            break;
+        }
+        return null;
+      });
 
   ///Indicates that a utility process ended unexpectedly.
   ///The failed process is recreated automatically.
@@ -189,14 +204,14 @@ class ProcessFailedKind {
   ///- Windows WebView2 ([Official API - COREWEBVIEW2_PROCESS_FAILED_KIND_UTILITY_PROCESS_EXITED](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2849.39#corewebview2_process_failed_kind))
   static final UTILITY_PROCESS_EXITED =
       ProcessFailedKind._internalMultiPlatform('UTILITY_PROCESS_EXITED', () {
-    switch (defaultTargetPlatform) {
-      case TargetPlatform.windows:
-        return 4;
-      default:
-        break;
-    }
-    return null;
-  });
+        switch (defaultTargetPlatform) {
+          case TargetPlatform.windows:
+            return 4;
+          default:
+            break;
+        }
+        return null;
+      });
 
   ///Set of all values of [ProcessFailedKind].
   static final Set<ProcessFailedKind> values = [
@@ -216,8 +231,9 @@ class ProcessFailedKind {
   static ProcessFailedKind? fromValue(String? value) {
     if (value != null) {
       try {
-        return ProcessFailedKind.values
-            .firstWhere((element) => element.toValue() == value);
+        return ProcessFailedKind.values.firstWhere(
+          (element) => element.toValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -229,8 +245,9 @@ class ProcessFailedKind {
   static ProcessFailedKind? fromNativeValue(int? value) {
     if (value != null) {
       try {
-        return ProcessFailedKind.values
-            .firstWhere((element) => element.toNativeValue() == value);
+        return ProcessFailedKind.values.firstWhere(
+          (element) => element.toNativeValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -246,8 +263,9 @@ class ProcessFailedKind {
   static ProcessFailedKind? byName(String? name) {
     if (name != null) {
       try {
-        return ProcessFailedKind.values
-            .firstWhere((element) => element.name() == name);
+        return ProcessFailedKind.values.firstWhere(
+          (element) => element.name() == name,
+        );
       } catch (e) {
         return null;
       }
@@ -265,7 +283,7 @@ class ProcessFailedKind {
   /// them will be represented in the returned map.
   static Map<String, ProcessFailedKind> asNameMap() =>
       <String, ProcessFailedKind>{
-        for (final value in ProcessFailedKind.values) value.name(): value
+        for (final value in ProcessFailedKind.values) value.name(): value,
       };
 
   ///Gets [String] value.

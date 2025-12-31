@@ -4,8 +4,9 @@ import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_pla
 class WebMessagePort implements IWebMessagePort {
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebMessagePort}
   WebMessagePort({required int index})
-      : this.fromPlatformCreationParams(
-            params: PlatformWebMessagePortCreationParams(index: index));
+    : this.fromPlatformCreationParams(
+        params: PlatformWebMessagePortCreationParams(index: index),
+      );
 
   /// Constructs a [WebMessagePort].
   ///

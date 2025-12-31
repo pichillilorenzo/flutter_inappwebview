@@ -135,40 +135,51 @@ class OID {
   static const ecdsaWithSHA256 = const OID._internal("1.2.840.10045.4.3.2");
   static const ecdsaWithSHA512 = const OID._internal("1.2.840.10045.4.3.4");
   static const rsaEncryption = const OID._internal("1.2.840.113549.1.1.1");
-  static const md2WithRSAEncryption =
-      const OID._internal("1.2.840.113549.1.1.2");
-  static const md4WithRSAEncryption =
-      const OID._internal("1.2.840.113549.1.1.3");
-  static const md5WithRSAEncryption =
-      const OID._internal("1.2.840.113549.1.1.4");
-  static const sha1WithRSAEncryption =
-      const OID._internal("1.2.840.113549.1.1.5");
+  static const md2WithRSAEncryption = const OID._internal(
+    "1.2.840.113549.1.1.2",
+  );
+  static const md4WithRSAEncryption = const OID._internal(
+    "1.2.840.113549.1.1.3",
+  );
+  static const md5WithRSAEncryption = const OID._internal(
+    "1.2.840.113549.1.1.4",
+  );
+  static const sha1WithRSAEncryption = const OID._internal(
+    "1.2.840.113549.1.1.5",
+  );
   static const RSAES_OAEP = const OID._internal("1.2.840.113549.1.1.7");
   static const mgf1 = const OID._internal(".2.840.113549.1.1.8");
   static const pSpecified = const OID._internal(".2.840.113549.1.1.9");
   static const RSASSA_PSS = const OID._internal(".2.840.113549.1.1.10");
-  static const sha256WithRSAEncryption =
-      const OID._internal("1.2.840.113549.1.1.11");
-  static const sha384WithRSAEncryption =
-      const OID._internal("1.2.840.113549.1.1.12");
-  static const sha512WithRSAEncryption =
-      const OID._internal("1.2.840.113549.1.1.13");
+  static const sha256WithRSAEncryption = const OID._internal(
+    "1.2.840.113549.1.1.11",
+  );
+  static const sha384WithRSAEncryption = const OID._internal(
+    "1.2.840.113549.1.1.12",
+  );
+  static const sha512WithRSAEncryption = const OID._internal(
+    "1.2.840.113549.1.1.13",
+  );
   static const pkcs7data = const OID._internal("1.2.840.113549.1.7.1");
   static const pkcs7signedData = const OID._internal("1.2.840.113549.1.7.2");
   static const pkcs7envelopedData = const OID._internal("1.2.840.113549.1.7.3");
   static const emailAddress = const OID._internal("1.2.840.113549.1.9.1");
-  static const signingCertificateV2 =
-      const OID._internal("1.2.840.113549.1.9.16.2.47");
+  static const signingCertificateV2 = const OID._internal(
+    "1.2.840.113549.1.9.16.2.47",
+  );
   static const contentType = const OID._internal("1.2.840.113549.1.9.3");
   static const messageDigest = const OID._internal("1.2.840.113549.1.9.4");
   static const signingTime = const OID._internal("1.2.840.113549.1.9.5");
   static const dsaWithSha1 = const OID._internal("1.2.840.10040.4.3");
-  static const certificateExtension =
-      const OID._internal("1.3.6.1.4.1.11129.2.4.2");
-  static const jurisdictionOfIncorporationSP =
-      const OID._internal("1.3.6.1.4.1.311.60.2.1.2");
-  static const jurisdictionOfIncorporationC =
-      const OID._internal("1.3.6.1.4.1.311.60.2.1.3");
+  static const certificateExtension = const OID._internal(
+    "1.3.6.1.4.1.11129.2.4.2",
+  );
+  static const jurisdictionOfIncorporationSP = const OID._internal(
+    "1.3.6.1.4.1.311.60.2.1.2",
+  );
+  static const jurisdictionOfIncorporationC = const OID._internal(
+    "1.3.6.1.4.1.311.60.2.1.3",
+  );
   static const authorityInfoAccess = const OID._internal("1.3.6.1.5.5.7.1.1");
   static const qcStatements = const OID._internal("1.3.6.1.5.5.7.1.3");
   static const cps = const OID._internal("1.3.6.1.5.5.7.2.1");
@@ -189,8 +200,9 @@ class OID {
   static const sha256 = const OID._internal("2.16.840.1.101.3.4.2.1");
   static const sha384 = const OID._internal("2.16.840.1.101.3.4.2.2");
   static const sha512 = const OID._internal("2.16.840.1.101.3.4.2.3");
-  static const VeriSignEVpolicy =
-      const OID._internal("2.16.840.1.113733.1.7.23.6");
+  static const VeriSignEVpolicy = const OID._internal(
+    "2.16.840.1.113733.1.7.23.6",
+  );
   static const extendedValidation = const OID._internal("2.23.140.1.1");
   static const organizationValidated = const OID._internal("2.23.140.1.2.2");
   static const subjectKeyIdentifier = const OID._internal("2.5.29.14");

@@ -29,26 +29,35 @@ class ChromeSafariBrowserSecondaryToolbar {
   ///**Officially Supported Platforms/Implementations**:
   ///- Android WebView:
   ///    - Not available in an Android Trusted Web Activity.
-  ChromeSafariBrowserSecondaryToolbar(
-      {this.clickableIDs = const [], required this.layout});
+  ChromeSafariBrowserSecondaryToolbar({
+    this.clickableIDs = const [],
+    required this.layout,
+  });
 
   ///Gets a possible [ChromeSafariBrowserSecondaryToolbar] instance from a [Map] value.
-  static ChromeSafariBrowserSecondaryToolbar? fromMap(Map<String, dynamic>? map,
-      {EnumMethod? enumMethod}) {
+  static ChromeSafariBrowserSecondaryToolbar? fromMap(
+    Map<String, dynamic>? map, {
+    EnumMethod? enumMethod,
+  }) {
     if (map == null) {
       return null;
     }
     final instance = ChromeSafariBrowserSecondaryToolbar(
-      layout: AndroidResource.fromMap(map['layout']?.cast<String, dynamic>(),
-          enumMethod: enumMethod)!,
+      layout: AndroidResource.fromMap(
+        map['layout']?.cast<String, dynamic>(),
+        enumMethod: enumMethod,
+      )!,
     );
     if (map['clickableIDs'] != null) {
       instance.clickableIDs =
           List<ChromeSafariBrowserSecondaryToolbarClickableID>.from(
-              map['clickableIDs'].map((e) =>
-                  ChromeSafariBrowserSecondaryToolbarClickableID.fromMap(
-                      e?.cast<String, dynamic>(),
-                      enumMethod: enumMethod)!));
+            map['clickableIDs'].map(
+              (e) => ChromeSafariBrowserSecondaryToolbarClickableID.fromMap(
+                e?.cast<String, dynamic>(),
+                enumMethod: enumMethod,
+              )!,
+            ),
+          );
     }
     return instance;
   }
@@ -56,8 +65,9 @@ class ChromeSafariBrowserSecondaryToolbar {
   ///Converts instance to a map.
   Map<String, dynamic> toMap({EnumMethod? enumMethod}) {
     return {
-      "clickableIDs":
-          clickableIDs.map((e) => e.toMap(enumMethod: enumMethod)).toList(),
+      "clickableIDs": clickableIDs
+          .map((e) => e.toMap(enumMethod: enumMethod))
+          .toList(),
       "layout": layout.toMap(enumMethod: enumMethod),
     };
   }
@@ -89,28 +99,31 @@ class ChromeSafariBrowserSecondaryToolbarClickableID {
   ///**Officially Supported Platforms/Implementations**:
   ///- Android WebView:
   ///    - Not available in an Android Trusted Web Activity.
-  ChromeSafariBrowserSecondaryToolbarClickableID(
-      {required this.id, this.onClick});
+  ChromeSafariBrowserSecondaryToolbarClickableID({
+    required this.id,
+    this.onClick,
+  });
 
   ///Gets a possible [ChromeSafariBrowserSecondaryToolbarClickableID] instance from a [Map] value.
   static ChromeSafariBrowserSecondaryToolbarClickableID? fromMap(
-      Map<String, dynamic>? map,
-      {EnumMethod? enumMethod}) {
+    Map<String, dynamic>? map, {
+    EnumMethod? enumMethod,
+  }) {
     if (map == null) {
       return null;
     }
     final instance = ChromeSafariBrowserSecondaryToolbarClickableID(
-      id: AndroidResource.fromMap(map['id']?.cast<String, dynamic>(),
-          enumMethod: enumMethod)!,
+      id: AndroidResource.fromMap(
+        map['id']?.cast<String, dynamic>(),
+        enumMethod: enumMethod,
+      )!,
     );
     return instance;
   }
 
   ///Converts instance to a map.
   Map<String, dynamic> toMap({EnumMethod? enumMethod}) {
-    return {
-      "id": id.toMap(enumMethod: enumMethod),
-    };
+    return {"id": id.toMap(enumMethod: enumMethod)};
   }
 
   ///Converts instance to a map.

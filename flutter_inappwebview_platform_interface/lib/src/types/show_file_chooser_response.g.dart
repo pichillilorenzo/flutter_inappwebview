@@ -17,8 +17,10 @@ class ShowFileChooserResponse {
   ShowFileChooserResponse({this.filePaths, required this.handledByClient});
 
   ///Gets a possible [ShowFileChooserResponse] instance from a [Map] value.
-  static ShowFileChooserResponse? fromMap(Map<String, dynamic>? map,
-      {EnumMethod? enumMethod}) {
+  static ShowFileChooserResponse? fromMap(
+    Map<String, dynamic>? map, {
+    EnumMethod? enumMethod,
+  }) {
     if (map == null) {
       return null;
     }
@@ -33,10 +35,7 @@ class ShowFileChooserResponse {
 
   ///Converts instance to a map.
   Map<String, dynamic> toMap({EnumMethod? enumMethod}) {
-    return {
-      "filePaths": filePaths,
-      "handledByClient": handledByClient,
-    };
+    return {"filePaths": filePaths, "handledByClient": handledByClient};
   }
 
   ///Converts instance to a map.

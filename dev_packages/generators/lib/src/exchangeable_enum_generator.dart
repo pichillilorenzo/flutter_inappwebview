@@ -1,4 +1,4 @@
-import 'package:build/src/builder/build_step.dart';
+import 'package:build/build.dart';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/analysis/results.dart';
 import 'package:collection/collection.dart';
@@ -9,11 +9,13 @@ import 'package:analyzer/dart/constant/value.dart';
 import 'model_visitor.dart';
 import 'util.dart';
 
+const _annotationsPackage = 'flutter_inappwebview_internal_annotations';
+
 final _coreCheckerEnumSupportedPlatforms =
-    const TypeChecker.fromRuntime(EnumSupportedPlatforms);
-final _coreCheckerDeprecated = const TypeChecker.fromRuntime(Deprecated);
+    TypeChecker.typeNamedLiterally('EnumSupportedPlatforms', inPackage: _annotationsPackage);
+final _coreCheckerDeprecated = TypeChecker.typeNamedLiterally('Deprecated', inSdk: true);
 final _coreCheckerEnumCustomValue =
-    const TypeChecker.fromRuntime(ExchangeableEnumCustomValue);
+    TypeChecker.typeNamedLiterally('ExchangeableEnumCustomValue', inPackage: _annotationsPackage);
 
 class ExchangeableEnumGenerator
     extends GeneratorForAnnotation<ExchangeableEnum> {
@@ -24,7 +26,7 @@ class ExchangeableEnumGenerator
     // Visits all the children of element in no particular order.
     element.visitChildren(visitor);
 
-    final className = visitor.constructor.returnType.element.name;
+    final className = visitor.constructor.returnType.element.name ?? '';
     // remove "_" to generate the correct class name
     final extClassName = className.replaceFirst("_", "");
 
@@ -40,7 +42,7 @@ class ExchangeableEnumGenerator
     if (classSupportedDocs != null) {
       classBuffer.writeln(classSupportedDocs);
     }
-    if (visitor.constructor.returnType.element.hasDeprecated) {
+    if (visitor.constructor.returnType.element.metadata.hasDeprecated) {
       classBuffer.writeln(
           "@Deprecated('${_coreCheckerDeprecated.firstAnnotationOfExact(visitor.constructor.returnType.element)?.getField("message")?.toStringValue()}')");
     }
@@ -78,32 +80,35 @@ class ExchangeableEnumGenerator
       final isEnumCustomValue = _coreCheckerEnumCustomValue
           .firstAnnotationOf(fieldElement) != null;
       if (isEnumCustomValue) {
-        ParsedLibraryResult parsed = fieldElement.session
-            ?.getParsedLibraryByElement(fieldElement.library)
-            as ParsedLibraryResult;
-        final fieldBody = parsed
-            .getElementDeclaration(fieldElement)
-            ?.node
-            .toString()
-            .replaceAll(className, extClassName);
-        if (fieldBody != null) {
-          final docs = fieldElement.documentationComment;
-          if (docs != null) {
-            classBuffer.writeln(docs);
+        final fieldLibrary = fieldElement.library;
+        if (fieldLibrary != null) {
+          ParsedLibraryResult parsed = fieldLibrary.session
+              .getParsedLibraryByElement(fieldLibrary)
+              as ParsedLibraryResult;
+          final fieldBody = parsed
+              .getFragmentDeclaration(fieldElement.firstFragment)
+              ?.node
+              .toString()
+              .replaceAll(className, extClassName);
+          if (fieldBody != null) {
+            final docs = fieldElement.documentationComment;
+            if (docs != null) {
+              classBuffer.writeln(docs);
+            }
+            if (fieldElement.isStatic) {
+              classBuffer.write("static ");
+            }
+            if (fieldElement.isLate) {
+              classBuffer.write("late ");
+            }
+            if (fieldElement.isFinal) {
+              classBuffer.write("final ");
+            }
+            if (fieldElement.isConst) {
+              classBuffer.write("const ");
+            }
+            classBuffer.writeln("$fieldBody;");
           }
-          if (fieldElement.isStatic) {
-            classBuffer.write("static ");
-          }
-          if (fieldElement.isLate) {
-            classBuffer.write("late ");
-          }
-          if (fieldElement.isFinal) {
-            classBuffer.write("final ");
-          }
-          if (fieldElement.isConst) {
-            classBuffer.write("const ");
-          }
-          classBuffer.writeln("$fieldBody;");
         }
         continue;
       }
@@ -287,8 +292,10 @@ class ExchangeableEnumGenerator
       if (Util.methodHasIgnore(methodElement)) {
         continue;
       }
-      ParsedLibraryResult parsed = methodElement.session?.getParsedLibraryByElement(methodElement.library) as ParsedLibraryResult;
-      final methodBody = parsed.getElementDeclaration(methodElement)?.node
+      final methodLibrary = methodElement.library;
+      if (methodLibrary == null) continue;
+      ParsedLibraryResult parsed = methodLibrary.session.getParsedLibraryByElement(methodLibrary) as ParsedLibraryResult;
+      final methodBody = parsed.getFragmentDeclaration(methodElement.firstFragment)?.node
           .toString()
           .replaceAll(className, extClassName);
       if (methodBody != null) {

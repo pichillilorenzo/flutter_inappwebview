@@ -12,11 +12,14 @@ class TrustedWebActivityScreenOrientation {
   final int _value;
   final int _nativeValue;
   const TrustedWebActivityScreenOrientation._internal(
-      this._value, this._nativeValue);
-// ignore: unused_element
+    this._value,
+    this._nativeValue,
+  );
+  // ignore: unused_element
   factory TrustedWebActivityScreenOrientation._internalMultiPlatform(
-          int value, Function nativeValue) =>
-      TrustedWebActivityScreenOrientation._internal(value, nativeValue());
+    int value,
+    Function nativeValue,
+  ) => TrustedWebActivityScreenOrientation._internal(value, nativeValue());
 
   /// Any is an orientation that means the screen can be locked to any one of portrait-primary,
   /// portrait-secondary, landscape-primary and landscape-secondary.
@@ -56,8 +59,10 @@ class TrustedWebActivityScreenOrientation {
   ///  Portrait-primary is an orientation where the screen width is less than or equal to the
   ///  screen height. If the device's natural orientation is portrait, then it is in
   ///  portrait-primary when held in that position.
-  static const PORTRAIT_PRIMARY =
-      TrustedWebActivityScreenOrientation._internal(1, 1);
+  static const PORTRAIT_PRIMARY = TrustedWebActivityScreenOrientation._internal(
+    1,
+    1,
+  );
 
   /// Portrait-secondary is an orientation where the screen width is less than or equal to the
   /// screen height. If the device's natural orientation is portrait, then it is in
@@ -82,8 +87,9 @@ class TrustedWebActivityScreenOrientation {
   static TrustedWebActivityScreenOrientation? fromValue(int? value) {
     if (value != null) {
       try {
-        return TrustedWebActivityScreenOrientation.values
-            .firstWhere((element) => element.toValue() == value);
+        return TrustedWebActivityScreenOrientation.values.firstWhere(
+          (element) => element.toValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -95,8 +101,9 @@ class TrustedWebActivityScreenOrientation {
   static TrustedWebActivityScreenOrientation? fromNativeValue(int? value) {
     if (value != null) {
       try {
-        return TrustedWebActivityScreenOrientation.values
-            .firstWhere((element) => element.toNativeValue() == value);
+        return TrustedWebActivityScreenOrientation.values.firstWhere(
+          (element) => element.toNativeValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -112,8 +119,9 @@ class TrustedWebActivityScreenOrientation {
   static TrustedWebActivityScreenOrientation? byName(String? name) {
     if (name != null) {
       try {
-        return TrustedWebActivityScreenOrientation.values
-            .firstWhere((element) => element.name() == name);
+        return TrustedWebActivityScreenOrientation.values.firstWhere(
+          (element) => element.name() == name,
+        );
       } catch (e) {
         return null;
       }
@@ -132,7 +140,7 @@ class TrustedWebActivityScreenOrientation {
   static Map<String, TrustedWebActivityScreenOrientation> asNameMap() =>
       <String, TrustedWebActivityScreenOrientation>{
         for (final value in TrustedWebActivityScreenOrientation.values)
-          value.name(): value
+          value.name(): value,
       };
 
   ///Gets [int] value.

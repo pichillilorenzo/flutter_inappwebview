@@ -16,11 +16,9 @@ part 'platform_http_auth_credentials_database.g.dart';
 ///{@endtemplate}
 ///
 ///{@macro flutter_inappwebview_platform_interface.PlatformHttpAuthCredentialDatabaseCreationParams.supported_platforms}
-@SupportedPlatforms(platforms: [
-  AndroidPlatform(),
-  IOSPlatform(),
-  MacOSPlatform(),
-])
+@SupportedPlatforms(
+  platforms: [AndroidPlatform(), IOSPlatform(), MacOSPlatform()],
+)
 @immutable
 class PlatformHttpAuthCredentialDatabaseCreationParams {
   /// Used by the platform implementation to create a new [PlatformHttpAuthCredentialDatabase].
@@ -30,8 +28,9 @@ class PlatformHttpAuthCredentialDatabaseCreationParams {
   ///Check if the current class is supported by the [defaultTargetPlatform] or a specific [platform].
   ///{@endtemplate}
   bool isClassSupported({TargetPlatform? platform}) =>
-      _PlatformHttpAuthCredentialDatabaseCreationParamsClassSupported
-          .isClassSupported(platform: platform);
+      _PlatformHttpAuthCredentialDatabaseCreationParamsClassSupported.isClassSupported(
+        platform: platform,
+      );
 }
 
 ///{@template flutter_inappwebview_platform_interface.PlatformHttpAuthCredentialDatabase}
@@ -39,21 +38,27 @@ class PlatformHttpAuthCredentialDatabaseCreationParams {
 ///{@endtemplate}
 ///
 ///{@macro flutter_inappwebview_platform_interface.PlatformHttpAuthCredentialDatabase.supported_platforms}
-@SupportedPlatforms(platforms: [
-  AndroidPlatform(
+@SupportedPlatforms(
+  platforms: [
+    AndroidPlatform(
       note:
-          'It has a custom implementation using `android.database.sqlite.SQLiteDatabase` because [WebViewDatabase](https://developer.android.com/reference/android/webkit/WebViewDatabase) doesn\'t offer the same functionalities as iOS/macOS `URLCredentialStorage`.'),
-  IOSPlatform(
+          'It has a custom implementation using `android.database.sqlite.SQLiteDatabase` because [WebViewDatabase](https://developer.android.com/reference/android/webkit/WebViewDatabase) doesn\'t offer the same functionalities as iOS/macOS `URLCredentialStorage`.',
+    ),
+    IOSPlatform(
       note:
-          'It is implemented using the [URLCredentialStorage](https://developer.apple.com/documentation/foundation/urlcredentialstorage) class.'),
-  MacOSPlatform(
+          'It is implemented using the [URLCredentialStorage](https://developer.apple.com/documentation/foundation/urlcredentialstorage) class.',
+    ),
+    MacOSPlatform(
       note:
-          'It is implemented using the [URLCredentialStorage](https://developer.apple.com/documentation/foundation/urlcredentialstorage) class.'),
-])
+          'It is implemented using the [URLCredentialStorage](https://developer.apple.com/documentation/foundation/urlcredentialstorage) class.',
+    ),
+  ],
+)
 abstract class PlatformHttpAuthCredentialDatabase extends PlatformInterface {
   /// Creates a new [PlatformHttpAuthCredentialDatabase]
   factory PlatformHttpAuthCredentialDatabase(
-      PlatformHttpAuthCredentialDatabaseCreationParams params) {
+    PlatformHttpAuthCredentialDatabaseCreationParams params,
+  ) {
     assert(
       InAppWebViewPlatform.instance != null,
       'A platform implementation for `flutter_inappwebview` has not been set. Please '
@@ -62,8 +67,9 @@ abstract class PlatformHttpAuthCredentialDatabase extends PlatformInterface {
       '`WebViewPlatform.instance` can be set with your own test implementation.',
     );
     final PlatformHttpAuthCredentialDatabase cookieManager =
-        InAppWebViewPlatform.instance!
-            .createPlatformHttpAuthCredentialDatabase(params);
+        InAppWebViewPlatform.instance!.createPlatformHttpAuthCredentialDatabase(
+          params,
+        );
     PlatformInterface.verify(cookieManager, _token);
     return cookieManager;
   }
@@ -91,7 +97,7 @@ abstract class PlatformHttpAuthCredentialDatabase extends PlatformInterface {
   /// a class that only contains a factory constructor.
   @protected
   PlatformHttpAuthCredentialDatabase.implementation(this.params)
-      : super(token: _token);
+    : super(token: _token);
 
   static final Object _token = Object();
 
@@ -105,22 +111,25 @@ abstract class PlatformHttpAuthCredentialDatabase extends PlatformInterface {
   ///{@endtemplate}
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformHttpAuthCredentialDatabase.getAllAuthCredentials.supported_platforms}
-  @SupportedPlatforms(platforms: [
-    AndroidPlatform(),
-    IOSPlatform(
-      apiName: 'URLCredentialStorage.allCredentials',
-      apiUrl:
-          'https://developer.apple.com/documentation/foundation/urlcredentialstorage/1413859-allcredentials',
-    ),
-    MacOSPlatform(
-      apiName: 'URLCredentialStorage.allCredentials',
-      apiUrl:
-          'https://developer.apple.com/documentation/foundation/urlcredentialstorage/1413859-allcredentials',
-    ),
-  ])
+  @SupportedPlatforms(
+    platforms: [
+      AndroidPlatform(),
+      IOSPlatform(
+        apiName: 'URLCredentialStorage.allCredentials',
+        apiUrl:
+            'https://developer.apple.com/documentation/foundation/urlcredentialstorage/1413859-allcredentials',
+      ),
+      MacOSPlatform(
+        apiName: 'URLCredentialStorage.allCredentials',
+        apiUrl:
+            'https://developer.apple.com/documentation/foundation/urlcredentialstorage/1413859-allcredentials',
+      ),
+    ],
+  )
   Future<List<URLProtectionSpaceHttpAuthCredentials>> getAllAuthCredentials() {
     throw UnimplementedError(
-        'getAllAuthCredentials is not implemented on the current platform');
+      'getAllAuthCredentials is not implemented on the current platform',
+    );
   }
 
   ///{@template flutter_inappwebview_platform_interface.PlatformHttpAuthCredentialDatabase.getHttpAuthCredentials}
@@ -128,15 +137,15 @@ abstract class PlatformHttpAuthCredentialDatabase extends PlatformInterface {
   ///{@endtemplate}
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformHttpAuthCredentialDatabase.getHttpAuthCredentials.supported_platforms}
-  @SupportedPlatforms(platforms: [
-    AndroidPlatform(),
-    IOSPlatform(),
-    MacOSPlatform(),
-  ])
-  Future<List<URLCredential>> getHttpAuthCredentials(
-      {required URLProtectionSpace protectionSpace}) {
+  @SupportedPlatforms(
+    platforms: [AndroidPlatform(), IOSPlatform(), MacOSPlatform()],
+  )
+  Future<List<URLCredential>> getHttpAuthCredentials({
+    required URLProtectionSpace protectionSpace,
+  }) {
     throw UnimplementedError(
-        'getHttpAuthCredentials is not implemented on the current platform');
+      'getHttpAuthCredentials is not implemented on the current platform',
+    );
   }
 
   ///{@template flutter_inappwebview_platform_interface.PlatformHttpAuthCredentialDatabase.setHttpAuthCredential}
@@ -144,24 +153,28 @@ abstract class PlatformHttpAuthCredentialDatabase extends PlatformInterface {
   ///{@endtemplate}
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformHttpAuthCredentialDatabase.setHttpAuthCredential.supported_platforms}
-  @SupportedPlatforms(platforms: [
-    AndroidPlatform(),
-    IOSPlatform(
-      apiName: 'URLCredentialStorage.set',
-      apiUrl:
-          'https://developer.apple.com/documentation/foundation/urlcredentialstorage/1407227-set',
-    ),
-    MacOSPlatform(
-      apiName: 'URLCredentialStorage.set',
-      apiUrl:
-          'https://developer.apple.com/documentation/foundation/urlcredentialstorage/1407227-set',
-    ),
-  ])
-  Future<void> setHttpAuthCredential(
-      {required URLProtectionSpace protectionSpace,
-      required URLCredential credential}) {
+  @SupportedPlatforms(
+    platforms: [
+      AndroidPlatform(),
+      IOSPlatform(
+        apiName: 'URLCredentialStorage.set',
+        apiUrl:
+            'https://developer.apple.com/documentation/foundation/urlcredentialstorage/1407227-set',
+      ),
+      MacOSPlatform(
+        apiName: 'URLCredentialStorage.set',
+        apiUrl:
+            'https://developer.apple.com/documentation/foundation/urlcredentialstorage/1407227-set',
+      ),
+    ],
+  )
+  Future<void> setHttpAuthCredential({
+    required URLProtectionSpace protectionSpace,
+    required URLCredential credential,
+  }) {
     throw UnimplementedError(
-        'setHttpAuthCredential is not implemented on the current platform');
+      'setHttpAuthCredential is not implemented on the current platform',
+    );
   }
 
   ///{@template flutter_inappwebview_platform_interface.PlatformHttpAuthCredentialDatabase.removeHttpAuthCredential}
@@ -169,24 +182,28 @@ abstract class PlatformHttpAuthCredentialDatabase extends PlatformInterface {
   ///{@endtemplate}
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformHttpAuthCredentialDatabase.removeHttpAuthCredential.supported_platforms}
-  @SupportedPlatforms(platforms: [
-    AndroidPlatform(),
-    IOSPlatform(
-      apiName: 'URLCredentialStorage.remove',
-      apiUrl:
-          'https://developer.apple.com/documentation/foundation/urlcredentialstorage/1408664-remove',
-    ),
-    MacOSPlatform(
-      apiName: 'URLCredentialStorage.remove',
-      apiUrl:
-          'https://developer.apple.com/documentation/foundation/urlcredentialstorage/1408664-remove',
-    ),
-  ])
-  Future<void> removeHttpAuthCredential(
-      {required URLProtectionSpace protectionSpace,
-      required URLCredential credential}) {
+  @SupportedPlatforms(
+    platforms: [
+      AndroidPlatform(),
+      IOSPlatform(
+        apiName: 'URLCredentialStorage.remove',
+        apiUrl:
+            'https://developer.apple.com/documentation/foundation/urlcredentialstorage/1408664-remove',
+      ),
+      MacOSPlatform(
+        apiName: 'URLCredentialStorage.remove',
+        apiUrl:
+            'https://developer.apple.com/documentation/foundation/urlcredentialstorage/1408664-remove',
+      ),
+    ],
+  )
+  Future<void> removeHttpAuthCredential({
+    required URLProtectionSpace protectionSpace,
+    required URLCredential credential,
+  }) {
     throw UnimplementedError(
-        'removeHttpAuthCredential is not implemented on the current platform');
+      'removeHttpAuthCredential is not implemented on the current platform',
+    );
   }
 
   ///{@template flutter_inappwebview_platform_interface.PlatformHttpAuthCredentialDatabase.removeHttpAuthCredentials}
@@ -194,15 +211,15 @@ abstract class PlatformHttpAuthCredentialDatabase extends PlatformInterface {
   ///{@endtemplate}
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformHttpAuthCredentialDatabase.removeHttpAuthCredentials.supported_platforms}
-  @SupportedPlatforms(platforms: [
-    AndroidPlatform(),
-    IOSPlatform(),
-    MacOSPlatform(),
-  ])
-  Future<void> removeHttpAuthCredentials(
-      {required URLProtectionSpace protectionSpace}) {
+  @SupportedPlatforms(
+    platforms: [AndroidPlatform(), IOSPlatform(), MacOSPlatform()],
+  )
+  Future<void> removeHttpAuthCredentials({
+    required URLProtectionSpace protectionSpace,
+  }) {
     throw UnimplementedError(
-        'removeHttpAuthCredentials is not implemented on the current platform');
+      'removeHttpAuthCredentials is not implemented on the current platform',
+    );
   }
 
   ///{@template flutter_inappwebview_platform_interface.PlatformHttpAuthCredentialDatabase.clearAllAuthCredentials}
@@ -210,14 +227,13 @@ abstract class PlatformHttpAuthCredentialDatabase extends PlatformInterface {
   ///{@endtemplate}
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformHttpAuthCredentialDatabase.clearAllAuthCredentials.supported_platforms}
-  @SupportedPlatforms(platforms: [
-    AndroidPlatform(),
-    IOSPlatform(),
-    MacOSPlatform(),
-  ])
+  @SupportedPlatforms(
+    platforms: [AndroidPlatform(), IOSPlatform(), MacOSPlatform()],
+  )
   Future<void> clearAllAuthCredentials() {
     throw UnimplementedError(
-        'clearAllAuthCredentials is not implemented on the current platform');
+      'clearAllAuthCredentials is not implemented on the current platform',
+    );
   }
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformHttpAuthCredentialDatabaseCreationParams.isClassSupported}
@@ -227,9 +243,11 @@ abstract class PlatformHttpAuthCredentialDatabase extends PlatformInterface {
   ///{@template flutter_inappwebview_platform_interface.PlatformHttpAuthCredentialDatabase.isMethodSupported}
   ///Check if the given [method] is supported by the [defaultTargetPlatform] or a specific [platform].
   ///{@endtemplate}
-  bool isMethodSupported(PlatformHttpAuthCredentialDatabaseMethod method,
-          {TargetPlatform? platform}) =>
-      _PlatformHttpAuthCredentialDatabaseMethodSupported.isMethodSupported(
-          method,
-          platform: platform);
+  bool isMethodSupported(
+    PlatformHttpAuthCredentialDatabaseMethod method, {
+    TargetPlatform? platform,
+  }) => _PlatformHttpAuthCredentialDatabaseMethodSupported.isMethodSupported(
+    method,
+    platform: platform,
+  );
 }

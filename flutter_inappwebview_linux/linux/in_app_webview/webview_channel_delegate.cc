@@ -586,6 +586,68 @@ void WebViewChannelDelegate::HandleMethodCall(FlMethodCall* method_call) {
     return;
   }
 
+  if (string_equals(methodName, "isInFullscreen")) {
+    bool fullscreen = webView->isInFullscreen();
+    g_autoptr(FlValue) result = fl_value_new_bool(fullscreen);
+    fl_method_call_respond_success(method_call, result, nullptr);
+    return;
+  }
+
+  if (string_equals(methodName, "requestEnterFullscreen")) {
+    webView->requestEnterFullscreen();
+    fl_method_call_respond_success(method_call, nullptr, nullptr);
+    return;
+  }
+
+  if (string_equals(methodName, "requestExitFullscreen")) {
+    webView->requestExitFullscreen();
+    fl_method_call_respond_success(method_call, nullptr, nullptr);
+    return;
+  }
+
+  if (string_equals(methodName, "setVisible")) {
+    bool visible = true;
+    if (fl_value_get_type(args) == FL_VALUE_TYPE_BOOL) {
+      visible = fl_value_get_bool(args);
+    } else if (fl_value_get_type(args) == FL_VALUE_TYPE_INT) {
+      visible = fl_value_get_int(args) != 0;
+    }
+    webView->setVisible(visible);
+    fl_method_call_respond_success(method_call, nullptr, nullptr);
+    return;
+  }
+
+  if (string_equals(methodName, "setTargetRefreshRate")) {
+    uint32_t rate = 0;
+    if (fl_value_get_type(args) == FL_VALUE_TYPE_INT) {
+      rate = static_cast<uint32_t>(fl_value_get_int(args));
+    }
+    webView->setTargetRefreshRate(rate);
+    fl_method_call_respond_success(method_call, nullptr, nullptr);
+    return;
+  }
+
+  if (string_equals(methodName, "getTargetRefreshRate")) {
+    uint32_t rate = webView->getTargetRefreshRate();
+    g_autoptr(FlValue) result = fl_value_new_int(static_cast<int64_t>(rate));
+    fl_method_call_respond_success(method_call, result, nullptr);
+    return;
+  }
+
+  if (string_equals(methodName, "requestPointerLock")) {
+    bool success = webView->requestPointerLock();
+    g_autoptr(FlValue) result = fl_value_new_bool(success);
+    fl_method_call_respond_success(method_call, result, nullptr);
+    return;
+  }
+
+  if (string_equals(methodName, "requestPointerUnlock")) {
+    bool success = webView->requestPointerUnlock();
+    g_autoptr(FlValue) result = fl_value_new_bool(success);
+    fl_method_call_respond_success(method_call, result, nullptr);
+    return;
+  }
+
   fl_method_call_respond_not_implemented(method_call, nullptr);
 }
 

@@ -16,17 +16,24 @@ class WebHistory {
   WebHistory({this.currentIndex, this.list});
 
   ///Gets a possible [WebHistory] instance from a [Map] value.
-  static WebHistory? fromMap(Map<String, dynamic>? map,
-      {EnumMethod? enumMethod}) {
+  static WebHistory? fromMap(
+    Map<String, dynamic>? map, {
+    EnumMethod? enumMethod,
+  }) {
     if (map == null) {
       return null;
     }
     final instance = WebHistory(
       currentIndex: map['currentIndex'],
       list: map['list'] != null
-          ? List<WebHistoryItem>.from(map['list'].map((e) =>
-              WebHistoryItem.fromMap(e?.cast<String, dynamic>(),
-                  enumMethod: enumMethod)!))
+          ? List<WebHistoryItem>.from(
+              map['list'].map(
+                (e) => WebHistoryItem.fromMap(
+                  e?.cast<String, dynamic>(),
+                  enumMethod: enumMethod,
+                )!,
+              ),
+            )
           : null,
     );
     return instance;

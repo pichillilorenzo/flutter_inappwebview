@@ -98,7 +98,9 @@ class X509Certificate {
 
   String get description =>
       asn1?.fold(
-          "", (value, element) => (value ?? '') + element.description + '\n') ??
+        "",
+        (value, element) => (value ?? '') + element.description + '\n',
+      ) ??
       '';
 
   ///Checks that the given date is within the certificate's validity period.
@@ -222,15 +224,19 @@ class X509Certificate {
 
   ///Gets the notBefore date from the validity period of the certificate.
   DateTime? get notBefore {
-    var data =
-        block1?.atIndex(X509BlockPosition.dateValidity)?.subAtIndex(0)?.value;
+    var data = block1
+        ?.atIndex(X509BlockPosition.dateValidity)
+        ?.subAtIndex(0)
+        ?.value;
     return data is DateTime ? data : null;
   }
 
   ///Gets the notAfter date from the validity period of the certificate.
   DateTime? get notAfter {
-    var data =
-        block1?.atIndex(X509BlockPosition.dateValidity)?.subAtIndex(1)?.value;
+    var data = block1
+        ?.atIndex(X509BlockPosition.dateValidity)
+        ?.subAtIndex(1)
+        ?.value;
     return data is DateTime ? data : null;
   }
 
@@ -424,13 +430,16 @@ class X509Certificate {
       "nonCriticalExtensionOIDs": nonCriticalExtensionOIDs,
       "encoded": encoded,
       "publicKey": publicKey?.toMap(enumMethod: enumMethod),
-      "subjectKeyIdentifier":
-          subjectKeyIdentifier?.toMap(enumMethod: enumMethod),
-      "authorityKeyIdentifier":
-          authorityKeyIdentifier?.toMap(enumMethod: enumMethod),
+      "subjectKeyIdentifier": subjectKeyIdentifier?.toMap(
+        enumMethod: enumMethod,
+      ),
+      "authorityKeyIdentifier": authorityKeyIdentifier?.toMap(
+        enumMethod: enumMethod,
+      ),
       "certificatePolicies": certificatePolicies?.toMap(enumMethod: enumMethod),
-      "cRLDistributionPoints":
-          cRLDistributionPoints?.toMap(enumMethod: enumMethod),
+      "cRLDistributionPoints": cRLDistributionPoints?.toMap(
+        enumMethod: enumMethod,
+      ),
       "authorityInfoAccess": authorityInfoAccess?.toMap(enumMethod: enumMethod),
     };
   }
@@ -462,5 +471,5 @@ enum X509BlockPosition {
   dateValidity,
   subject,
   publicKey,
-  extensions
+  extensions,
 }

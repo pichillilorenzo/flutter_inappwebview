@@ -16,20 +16,24 @@ class WebsiteDataRecord {
   WebsiteDataRecord({this.dataTypes, this.displayName});
 
   ///Gets a possible [WebsiteDataRecord] instance from a [Map] value.
-  static WebsiteDataRecord? fromMap(Map<String, dynamic>? map,
-      {EnumMethod? enumMethod}) {
+  static WebsiteDataRecord? fromMap(
+    Map<String, dynamic>? map, {
+    EnumMethod? enumMethod,
+  }) {
     if (map == null) {
       return null;
     }
     final instance = WebsiteDataRecord(
       dataTypes: map['dataTypes'] != null
-          ? Set<WebsiteDataType>.from(map['dataTypes']
-              .map((e) => switch (enumMethod ?? EnumMethod.nativeValue) {
-                    EnumMethod.nativeValue =>
-                      WebsiteDataType.fromNativeValue(e),
-                    EnumMethod.value => WebsiteDataType.fromValue(e),
-                    EnumMethod.name => WebsiteDataType.byName(e)
-                  }!))
+          ? Set<WebsiteDataType>.from(
+              map['dataTypes'].map(
+                (e) => switch (enumMethod ?? EnumMethod.nativeValue) {
+                  EnumMethod.nativeValue => WebsiteDataType.fromNativeValue(e),
+                  EnumMethod.value => WebsiteDataType.fromValue(e),
+                  EnumMethod.name => WebsiteDataType.byName(e),
+                }!,
+              ),
+            )
           : null,
       displayName: map['displayName'],
     );
@@ -40,11 +44,13 @@ class WebsiteDataRecord {
   Map<String, dynamic> toMap({EnumMethod? enumMethod}) {
     return {
       "dataTypes": dataTypes
-          ?.map((e) => switch (enumMethod ?? EnumMethod.nativeValue) {
-                EnumMethod.nativeValue => e.toNativeValue(),
-                EnumMethod.value => e.toValue(),
-                EnumMethod.name => e.name()
-              })
+          ?.map(
+            (e) => switch (enumMethod ?? EnumMethod.nativeValue) {
+              EnumMethod.nativeValue => e.toNativeValue(),
+              EnumMethod.value => e.toValue(),
+              EnumMethod.name => e.name(),
+            },
+          )
           .toList(),
       "displayName": displayName,
     };
@@ -76,20 +82,25 @@ class IOSWKWebsiteDataRecord {
   IOSWKWebsiteDataRecord({this.dataTypes, this.displayName});
 
   ///Gets a possible [IOSWKWebsiteDataRecord] instance from a [Map] value.
-  static IOSWKWebsiteDataRecord? fromMap(Map<String, dynamic>? map,
-      {EnumMethod? enumMethod}) {
+  static IOSWKWebsiteDataRecord? fromMap(
+    Map<String, dynamic>? map, {
+    EnumMethod? enumMethod,
+  }) {
     if (map == null) {
       return null;
     }
     final instance = IOSWKWebsiteDataRecord(
       dataTypes: map['dataTypes'] != null
-          ? Set<IOSWKWebsiteDataType>.from(map['dataTypes']
-              .map((e) => switch (enumMethod ?? EnumMethod.nativeValue) {
-                    EnumMethod.nativeValue =>
-                      IOSWKWebsiteDataType.fromNativeValue(e),
-                    EnumMethod.value => IOSWKWebsiteDataType.fromValue(e),
-                    EnumMethod.name => IOSWKWebsiteDataType.byName(e)
-                  }!))
+          ? Set<IOSWKWebsiteDataType>.from(
+              map['dataTypes'].map(
+                (e) => switch (enumMethod ?? EnumMethod.nativeValue) {
+                  EnumMethod.nativeValue =>
+                    IOSWKWebsiteDataType.fromNativeValue(e),
+                  EnumMethod.value => IOSWKWebsiteDataType.fromValue(e),
+                  EnumMethod.name => IOSWKWebsiteDataType.byName(e),
+                }!,
+              ),
+            )
           : null,
       displayName: map['displayName'],
     );
@@ -100,11 +111,13 @@ class IOSWKWebsiteDataRecord {
   Map<String, dynamic> toMap({EnumMethod? enumMethod}) {
     return {
       "dataTypes": dataTypes
-          ?.map((e) => switch (enumMethod ?? EnumMethod.nativeValue) {
-                EnumMethod.nativeValue => e.toNativeValue(),
-                EnumMethod.value => e.toValue(),
-                EnumMethod.name => e.name()
-              })
+          ?.map(
+            (e) => switch (enumMethod ?? EnumMethod.nativeValue) {
+              EnumMethod.nativeValue => e.toNativeValue(),
+              EnumMethod.value => e.toValue(),
+              EnumMethod.name => e.name(),
+            },
+          )
           .toList(),
       "displayName": displayName,
     };

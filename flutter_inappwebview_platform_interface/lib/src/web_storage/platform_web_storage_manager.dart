@@ -17,11 +17,13 @@ part 'platform_web_storage_manager.g.dart';
 ///{@endtemplate}
 ///
 ///{@macro flutter_inappwebview_platform_interface.PlatformWebStorageManagerCreationParams.supported_platforms}
-@SupportedPlatforms(platforms: [
-  AndroidPlatform(),
-  IOSPlatform(available: '9.0'),
-  MacOSPlatform(),
-])
+@SupportedPlatforms(
+  platforms: [
+    AndroidPlatform(),
+    IOSPlatform(available: '9.0'),
+    MacOSPlatform(),
+  ],
+)
 @immutable
 class PlatformWebStorageManagerCreationParams {
   /// Used by the platform implementation to create a new [PlatformWebStorageManager].
@@ -32,7 +34,8 @@ class PlatformWebStorageManagerCreationParams {
   ///{@endtemplate}
   bool isClassSupported({TargetPlatform? platform}) =>
       _PlatformWebStorageManagerCreationParamsClassSupported.isClassSupported(
-          platform: platform);
+        platform: platform,
+      );
 }
 
 ///{@template flutter_inappwebview_platform_interface.PlatformWebStorageManager}
@@ -40,25 +43,31 @@ class PlatformWebStorageManagerCreationParams {
 ///{@endtemplate}
 ///
 ///{@macro flutter_inappwebview_platform_interface.PlatformWebStorageManager.supported_platforms}
-@SupportedPlatforms(platforms: [
-  AndroidPlatform(
+@SupportedPlatforms(
+  platforms: [
+    AndroidPlatform(
       apiName: 'WebStorage',
       apiUrl:
-          'https://developer.android.com/reference/android/webkit/WebStorage.html'),
-  IOSPlatform(
+          'https://developer.android.com/reference/android/webkit/WebStorage.html',
+    ),
+    IOSPlatform(
       apiName: 'WKWebsiteDataStore',
       apiUrl:
           'https://developer.apple.com/documentation/webkit/wkwebsitedatastore',
-      available: '9.0'),
-  MacOSPlatform(
+      available: '9.0',
+    ),
+    MacOSPlatform(
       apiName: 'WKWebsiteDataStore',
       apiUrl:
-          'https://developer.apple.com/documentation/webkit/wkwebsitedatastore'),
-])
+          'https://developer.apple.com/documentation/webkit/wkwebsitedatastore',
+    ),
+  ],
+)
 abstract class PlatformWebStorageManager extends PlatformInterface {
   /// Creates a new [PlatformWebStorageManager]
   factory PlatformWebStorageManager(
-      PlatformWebStorageManagerCreationParams params) {
+    PlatformWebStorageManagerCreationParams params,
+  ) {
     assert(
       InAppWebViewPlatform.instance != null,
       'A platform implementation for `flutter_inappwebview` has not been set. Please '
@@ -66,8 +75,9 @@ abstract class PlatformWebStorageManager extends PlatformInterface {
       '`WebViewPlatform.instance` before use. For unit testing, '
       '`WebViewPlatform.instance` can be set with your own test implementation.',
     );
-    final PlatformWebStorageManager webStorageManager =
-        InAppWebViewPlatform.instance!.createPlatformWebStorageManager(params);
+    final PlatformWebStorageManager webStorageManager = InAppWebViewPlatform
+        .instance!
+        .createPlatformWebStorageManager(params);
     PlatformInterface.verify(webStorageManager, _token);
     return webStorageManager;
   }
@@ -105,15 +115,19 @@ abstract class PlatformWebStorageManager extends PlatformInterface {
   ///{@endtemplate}
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebStorageManager.getOrigins.supported_platforms}
-  @SupportedPlatforms(platforms: [
-    AndroidPlatform(
+  @SupportedPlatforms(
+    platforms: [
+      AndroidPlatform(
         apiName: 'WebStorage.getOrigins',
         apiUrl:
-            'https://developer.android.com/reference/android/webkit/WebStorage#getOrigins(android.webkit.ValueCallback%3Cjava.util.Map%3E)')
-  ])
+            'https://developer.android.com/reference/android/webkit/WebStorage#getOrigins(android.webkit.ValueCallback%3Cjava.util.Map%3E)',
+      ),
+    ],
+  )
   Future<List<WebStorageOrigin>> getOrigins() {
     throw UnimplementedError(
-        'getOrigins is not implemented on the current platform');
+      'getOrigins is not implemented on the current platform',
+    );
   }
 
   ///{@template flutter_inappwebview_platform_interface.PlatformWebStorageManager.deleteAllData}
@@ -122,15 +136,19 @@ abstract class PlatformWebStorageManager extends PlatformInterface {
   ///{@endtemplate}
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebStorageManager.deleteAllData.supported_platforms}
-  @SupportedPlatforms(platforms: [
-    AndroidPlatform(
+  @SupportedPlatforms(
+    platforms: [
+      AndroidPlatform(
         apiName: 'WebStorage.deleteAllData',
         apiUrl:
-            'https://developer.android.com/reference/android/webkit/WebStorage#deleteAllData()')
-  ])
+            'https://developer.android.com/reference/android/webkit/WebStorage#deleteAllData()',
+      ),
+    ],
+  )
   Future<void> deleteAllData() {
     throw UnimplementedError(
-        'deleteAllData is not implemented on the current platform');
+      'deleteAllData is not implemented on the current platform',
+    );
   }
 
   ///{@template flutter_inappwebview_platform_interface.PlatformWebStorageManager.deleteOrigin}
@@ -139,15 +157,19 @@ abstract class PlatformWebStorageManager extends PlatformInterface {
   ///{@endtemplate}
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebStorageManager.deleteOrigin.supported_platforms}
-  @SupportedPlatforms(platforms: [
-    AndroidPlatform(
+  @SupportedPlatforms(
+    platforms: [
+      AndroidPlatform(
         apiName: 'WebStorage.deleteOrigin',
         apiUrl:
-            'https://developer.android.com/reference/android/webkit/WebStorage#deleteOrigin(java.lang.String)')
-  ])
+            'https://developer.android.com/reference/android/webkit/WebStorage#deleteOrigin(java.lang.String)',
+      ),
+    ],
+  )
   Future<void> deleteOrigin({required String origin}) {
     throw UnimplementedError(
-        'deleteOrigin is not implemented on the current platform');
+      'deleteOrigin is not implemented on the current platform',
+    );
   }
 
   ///{@template flutter_inappwebview_platform_interface.PlatformWebStorageManager.getQuotaForOrigin}
@@ -157,15 +179,19 @@ abstract class PlatformWebStorageManager extends PlatformInterface {
   ///{@endtemplate}
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebStorageManager.getQuotaForOrigin.supported_platforms}
-  @SupportedPlatforms(platforms: [
-    AndroidPlatform(
+  @SupportedPlatforms(
+    platforms: [
+      AndroidPlatform(
         apiName: 'WebStorage.getQuotaForOrigin',
         apiUrl:
-            'https://developer.android.com/reference/android/webkit/WebStorage#getQuotaForOrigin(java.lang.String,%20android.webkit.ValueCallback%3Cjava.lang.Long%3E)')
-  ])
+            'https://developer.android.com/reference/android/webkit/WebStorage#getQuotaForOrigin(java.lang.String,%20android.webkit.ValueCallback%3Cjava.lang.Long%3E)',
+      ),
+    ],
+  )
   Future<int> getQuotaForOrigin({required String origin}) {
     throw UnimplementedError(
-        'getQuotaForOrigin is not implemented on the current platform');
+      'getQuotaForOrigin is not implemented on the current platform',
+    );
   }
 
   ///{@template flutter_inappwebview_platform_interface.PlatformWebStorageManager.getUsageForOrigin}
@@ -174,15 +200,19 @@ abstract class PlatformWebStorageManager extends PlatformInterface {
   ///{@endtemplate}
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebStorageManager.getUsageForOrigin.supported_platforms}
-  @SupportedPlatforms(platforms: [
-    AndroidPlatform(
+  @SupportedPlatforms(
+    platforms: [
+      AndroidPlatform(
         apiName: 'WebStorage.getUsageForOrigin',
         apiUrl:
-            'https://developer.android.com/reference/android/webkit/WebStorage#getUsageForOrigin(java.lang.String,%20android.webkit.ValueCallback%3Cjava.lang.Long%3E)')
-  ])
+            'https://developer.android.com/reference/android/webkit/WebStorage#getUsageForOrigin(java.lang.String,%20android.webkit.ValueCallback%3Cjava.lang.Long%3E)',
+      ),
+    ],
+  )
   Future<int> getUsageForOrigin({required String origin}) {
     throw UnimplementedError(
-        'getUsageForOrigin is not implemented on the current platform');
+      'getUsageForOrigin is not implemented on the current platform',
+    );
   }
 
   ///{@template flutter_inappwebview_platform_interface.PlatformWebStorageManager.fetchDataRecords}
@@ -192,21 +222,27 @@ abstract class PlatformWebStorageManager extends PlatformInterface {
   ///{@endtemplate}
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebStorageManager.fetchDataRecords.supported_platforms}
-  @SupportedPlatforms(platforms: [
-    IOSPlatform(
+  @SupportedPlatforms(
+    platforms: [
+      IOSPlatform(
         available: '9.0',
         apiName: 'WKWebsiteDataStore.fetchDataRecords',
         apiUrl:
-            'https://developer.apple.com/documentation/webkit/wkwebsitedatastore/1532932-fetchdatarecords'),
-    MacOSPlatform(
+            'https://developer.apple.com/documentation/webkit/wkwebsitedatastore/1532932-fetchdatarecords',
+      ),
+      MacOSPlatform(
         apiName: 'WKWebsiteDataStore.fetchDataRecords',
         apiUrl:
-            'https://developer.apple.com/documentation/webkit/wkwebsitedatastore/1532932-fetchdatarecords'),
-  ])
-  Future<List<WebsiteDataRecord>> fetchDataRecords(
-      {required Set<WebsiteDataType> dataTypes}) {
+            'https://developer.apple.com/documentation/webkit/wkwebsitedatastore/1532932-fetchdatarecords',
+      ),
+    ],
+  )
+  Future<List<WebsiteDataRecord>> fetchDataRecords({
+    required Set<WebsiteDataType> dataTypes,
+  }) {
     throw UnimplementedError(
-        'fetchDataRecords is not implemented on the current platform');
+      'fetchDataRecords is not implemented on the current platform',
+    );
   }
 
   ///{@template flutter_inappwebview_platform_interface.PlatformWebStorageManager.removeDataFor}
@@ -218,22 +254,28 @@ abstract class PlatformWebStorageManager extends PlatformInterface {
   ///{@endtemplate}
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebStorageManager.removeDataFor.supported_platforms}
-  @SupportedPlatforms(platforms: [
-    IOSPlatform(
+  @SupportedPlatforms(
+    platforms: [
+      IOSPlatform(
         available: '9.0',
         apiName: 'WKWebsiteDataStore.removeData',
         apiUrl:
-            'https://developer.apple.com/documentation/webkit/wkwebsitedatastore/1532936-removedata'),
-    MacOSPlatform(
+            'https://developer.apple.com/documentation/webkit/wkwebsitedatastore/1532936-removedata',
+      ),
+      MacOSPlatform(
         apiName: 'WKWebsiteDataStore.removeData',
         apiUrl:
-            'https://developer.apple.com/documentation/webkit/wkwebsitedatastore/1532936-removedata'),
-  ])
-  Future<void> removeDataFor(
-      {required Set<WebsiteDataType> dataTypes,
-      required List<WebsiteDataRecord> dataRecords}) {
+            'https://developer.apple.com/documentation/webkit/wkwebsitedatastore/1532936-removedata',
+      ),
+    ],
+  )
+  Future<void> removeDataFor({
+    required Set<WebsiteDataType> dataTypes,
+    required List<WebsiteDataRecord> dataRecords,
+  }) {
     throw UnimplementedError(
-        'removeDataFor is not implemented on the current platform');
+      'removeDataFor is not implemented on the current platform',
+    );
   }
 
   ///{@template flutter_inappwebview_platform_interface.PlatformWebStorageManager.removeDataModifiedSince}
@@ -245,21 +287,28 @@ abstract class PlatformWebStorageManager extends PlatformInterface {
   ///{@endtemplate}
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebStorageManager.removeDataModifiedSince.supported_platforms}
-  @SupportedPlatforms(platforms: [
-    IOSPlatform(
+  @SupportedPlatforms(
+    platforms: [
+      IOSPlatform(
         available: '9.0',
         apiName: 'WKWebsiteDataStore.removeData',
         apiUrl:
-            'https://developer.apple.com/documentation/webkit/wkwebsitedatastore/1532938-removedata'),
-    MacOSPlatform(
+            'https://developer.apple.com/documentation/webkit/wkwebsitedatastore/1532938-removedata',
+      ),
+      MacOSPlatform(
         apiName: 'WKWebsiteDataStore.removeData',
         apiUrl:
-            'https://developer.apple.com/documentation/webkit/wkwebsitedatastore/1532938-removedata'),
-  ])
-  Future<void> removeDataModifiedSince(
-      {required Set<WebsiteDataType> dataTypes, required DateTime date}) {
+            'https://developer.apple.com/documentation/webkit/wkwebsitedatastore/1532938-removedata',
+      ),
+    ],
+  )
+  Future<void> removeDataModifiedSince({
+    required Set<WebsiteDataType> dataTypes,
+    required DateTime date,
+  }) {
     throw UnimplementedError(
-        'removeDataModifiedSince is not implemented on the current platform');
+      'removeDataModifiedSince is not implemented on the current platform',
+    );
   }
 
   ///{@template flutter_inappwebview_platform_interface.PlatformWebStorageManager.isClassSupported}
@@ -267,13 +316,17 @@ abstract class PlatformWebStorageManager extends PlatformInterface {
   ///{@endtemplate}
   bool isClassSupported({TargetPlatform? platform}) =>
       _PlatformWebStorageManagerClassSupported.isClassSupported(
-          platform: platform);
+        platform: platform,
+      );
 
   ///{@template flutter_inappwebview_platform_interface.PlatformWebStorageManager.isMethodSupported}
   ///Check if the given [method] is supported by the [defaultTargetPlatform] or a specific [platform].
   ///{@endtemplate}
-  bool isMethodSupported(PlatformWebStorageManagerMethod method,
-          {TargetPlatform? platform}) =>
-      _PlatformWebStorageManagerMethodSupported.isMethodSupported(method,
-          platform: platform);
+  bool isMethodSupported(
+    PlatformWebStorageManagerMethod method, {
+    TargetPlatform? platform,
+  }) => _PlatformWebStorageManagerMethodSupported.isMethodSupported(
+    method,
+    platform: platform,
+  );
 }

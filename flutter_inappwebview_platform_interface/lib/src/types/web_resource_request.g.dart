@@ -38,17 +38,20 @@ class WebResourceRequest {
 
   ///The URL for which the resource request was made.
   WebUri url;
-  WebResourceRequest(
-      {this.hasGesture,
-      this.headers,
-      this.isForMainFrame,
-      this.isRedirect,
-      this.method,
-      required this.url});
+  WebResourceRequest({
+    this.hasGesture,
+    this.headers,
+    this.isForMainFrame,
+    this.isRedirect,
+    this.method,
+    required this.url,
+  });
 
   ///Gets a possible [WebResourceRequest] instance from a [Map] value.
-  static WebResourceRequest? fromMap(Map<String, dynamic>? map,
-      {EnumMethod? enumMethod}) {
+  static WebResourceRequest? fromMap(
+    Map<String, dynamic>? map, {
+    EnumMethod? enumMethod,
+  }) {
     if (map == null) {
       return null;
     }

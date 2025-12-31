@@ -91,17 +91,20 @@ class ProxySettings {
   ///- Android WebView ([Official API - ProxyConfig](https://developer.android.com/reference/androidx/webkit/ProxyConfig))
   ///- iOS WKWebView 17.0+ ([Official API - ProxyConfiguration](https://developer.apple.com/documentation/network/proxyconfiguration))
   ///- macOS WKWebView 14.0+ ([Official API - ProxyConfiguration](https://developer.apple.com/documentation/network/proxyconfiguration))
-  ProxySettings(
-      {this.bypassRules = const [],
-      this.bypassSimpleHostnames,
-      this.directs = const [],
-      this.proxyRules = const [],
-      this.removeImplicitRules,
-      this.reverseBypassEnabled = false});
+  ProxySettings({
+    this.bypassRules = const [],
+    this.bypassSimpleHostnames,
+    this.directs = const [],
+    this.proxyRules = const [],
+    this.removeImplicitRules,
+    this.reverseBypassEnabled = false,
+  });
 
   ///Gets a possible [ProxySettings] instance from a [Map] value.
-  static ProxySettings? fromMap(Map<String, dynamic>? map,
-      {EnumMethod? enumMethod}) {
+  static ProxySettings? fromMap(
+    Map<String, dynamic>? map, {
+    EnumMethod? enumMethod,
+  }) {
     if (map == null) {
       return null;
     }
@@ -110,16 +113,22 @@ class ProxySettings {
       removeImplicitRules: map['removeImplicitRules'],
     );
     if (map['bypassRules'] != null) {
-      instance.bypassRules =
-          List<String>.from(map['bypassRules']!.cast<String>());
+      instance.bypassRules = List<String>.from(
+        map['bypassRules']!.cast<String>(),
+      );
     }
     if (map['directs'] != null) {
       instance.directs = List<String>.from(map['directs']!.cast<String>());
     }
     if (map['proxyRules'] != null) {
-      instance.proxyRules = List<ProxyRule>.from(map['proxyRules'].map((e) =>
-          ProxyRule.fromMap(e?.cast<String, dynamic>(),
-              enumMethod: enumMethod)!));
+      instance.proxyRules = List<ProxyRule>.from(
+        map['proxyRules'].map(
+          (e) => ProxyRule.fromMap(
+            e?.cast<String, dynamic>(),
+            enumMethod: enumMethod,
+          )!,
+        ),
+      );
     }
     if (map['reverseBypassEnabled'] != null) {
       instance.reverseBypassEnabled = map['reverseBypassEnabled'];
@@ -136,10 +145,13 @@ class ProxySettings {
   ///{@template flutter_inappwebview_platform_interface.ProxySettings.isPropertySupported}
   ///Check if the current class is supported by the [defaultTargetPlatform] or a specific [platform].
   ///{@endtemplate}
-  static bool isPropertySupported(ProxySettingsProperty property,
-          {TargetPlatform? platform}) =>
-      _ProxySettingsPropertySupported.isPropertySupported(property,
-          platform: platform);
+  static bool isPropertySupported(
+    ProxySettingsProperty property, {
+    TargetPlatform? platform,
+  }) => _ProxySettingsPropertySupported.isPropertySupported(
+    property,
+    platform: platform,
+  );
 
   ///Converts instance to a map.
   Map<String, dynamic> toMap({EnumMethod? enumMethod}) {
@@ -147,8 +159,9 @@ class ProxySettings {
       "bypassRules": bypassRules,
       "bypassSimpleHostnames": bypassSimpleHostnames,
       "directs": directs,
-      "proxyRules":
-          proxyRules.map((e) => e.toMap(enumMethod: enumMethod)).toList(),
+      "proxyRules": proxyRules
+          .map((e) => e.toMap(enumMethod: enumMethod))
+          .toList(),
       "removeImplicitRules": removeImplicitRules,
       "reverseBypassEnabled": reverseBypassEnabled,
     };
@@ -187,8 +200,11 @@ extension _PlatformProxyControllerCreationParamsClassSupported
   ///{@endtemplate}
   static bool isClassSupported({TargetPlatform? platform}) {
     return ((kIsWeb && platform != null) || !kIsWeb) &&
-        [TargetPlatform.android, TargetPlatform.iOS, TargetPlatform.macOS]
-            .contains(platform ?? defaultTargetPlatform);
+        [
+          TargetPlatform.android,
+          TargetPlatform.iOS,
+          TargetPlatform.macOS,
+        ].contains(platform ?? defaultTargetPlatform);
   }
 }
 
@@ -204,8 +220,11 @@ extension _PlatformProxyControllerClassSupported on PlatformProxyController {
   ///{@endtemplate}
   static bool isClassSupported({TargetPlatform? platform}) {
     return ((kIsWeb && platform != null) || !kIsWeb) &&
-        [TargetPlatform.android, TargetPlatform.iOS, TargetPlatform.macOS]
-            .contains(platform ?? defaultTargetPlatform);
+        [
+          TargetPlatform.android,
+          TargetPlatform.iOS,
+          TargetPlatform.macOS,
+        ].contains(platform ?? defaultTargetPlatform);
   }
 }
 
@@ -242,17 +261,25 @@ enum PlatformProxyControllerMethod {
 }
 
 extension _PlatformProxyControllerMethodSupported on PlatformProxyController {
-  static bool isMethodSupported(PlatformProxyControllerMethod method,
-      {TargetPlatform? platform}) {
+  static bool isMethodSupported(
+    PlatformProxyControllerMethod method, {
+    TargetPlatform? platform,
+  }) {
     switch (method) {
       case PlatformProxyControllerMethod.clearProxyOverride:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.android, TargetPlatform.iOS, TargetPlatform.macOS]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.android,
+              TargetPlatform.iOS,
+              TargetPlatform.macOS,
+            ].contains(platform ?? defaultTargetPlatform);
       case PlatformProxyControllerMethod.setProxyOverride:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.android, TargetPlatform.iOS, TargetPlatform.macOS]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.android,
+              TargetPlatform.iOS,
+              TargetPlatform.macOS,
+            ].contains(platform ?? defaultTargetPlatform);
     }
   }
 }
@@ -269,8 +296,11 @@ extension _ProxySettingsClassSupported on ProxySettings {
   ///{@endtemplate}
   static bool isClassSupported({TargetPlatform? platform}) {
     return ((kIsWeb && platform != null) || !kIsWeb) &&
-        [TargetPlatform.android, TargetPlatform.iOS, TargetPlatform.macOS]
-            .contains(platform ?? defaultTargetPlatform);
+        [
+          TargetPlatform.android,
+          TargetPlatform.iOS,
+          TargetPlatform.macOS,
+        ].contains(platform ?? defaultTargetPlatform);
   }
 }
 
@@ -346,33 +376,43 @@ enum ProxySettingsProperty {
 }
 
 extension _ProxySettingsPropertySupported on ProxySettings {
-  static bool isPropertySupported(ProxySettingsProperty property,
-      {TargetPlatform? platform}) {
+  static bool isPropertySupported(
+    ProxySettingsProperty property, {
+    TargetPlatform? platform,
+  }) {
     switch (property) {
       case ProxySettingsProperty.bypassRules:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.android]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.android,
+            ].contains(platform ?? defaultTargetPlatform);
       case ProxySettingsProperty.bypassSimpleHostnames:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.android]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.android,
+            ].contains(platform ?? defaultTargetPlatform);
       case ProxySettingsProperty.directs:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.android]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.android,
+            ].contains(platform ?? defaultTargetPlatform);
       case ProxySettingsProperty.proxyRules:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.android, TargetPlatform.iOS, TargetPlatform.macOS]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.android,
+              TargetPlatform.iOS,
+              TargetPlatform.macOS,
+            ].contains(platform ?? defaultTargetPlatform);
       case ProxySettingsProperty.removeImplicitRules:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.android]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.android,
+            ].contains(platform ?? defaultTargetPlatform);
       case ProxySettingsProperty.reverseBypassEnabled:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.android]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.android,
+            ].contains(platform ?? defaultTargetPlatform);
     }
   }
 }

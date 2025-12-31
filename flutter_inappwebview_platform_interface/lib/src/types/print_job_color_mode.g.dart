@@ -11,10 +11,11 @@ class PrintJobColorMode {
   final int _value;
   final dynamic _nativeValue;
   const PrintJobColorMode._internal(this._value, this._nativeValue);
-// ignore: unused_element
+  // ignore: unused_element
   factory PrintJobColorMode._internalMultiPlatform(
-          int value, Function nativeValue) =>
-      PrintJobColorMode._internal(value, nativeValue());
+    int value,
+    Function nativeValue,
+  ) => PrintJobColorMode._internal(value, nativeValue());
 
   ///Color color scheme, for example many colors are used.
   ///
@@ -60,8 +61,9 @@ class PrintJobColorMode {
   static PrintJobColorMode? fromValue(int? value) {
     if (value != null) {
       try {
-        return PrintJobColorMode.values
-            .firstWhere((element) => element.toValue() == value);
+        return PrintJobColorMode.values.firstWhere(
+          (element) => element.toValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -73,8 +75,9 @@ class PrintJobColorMode {
   static PrintJobColorMode? fromNativeValue(dynamic value) {
     if (value != null) {
       try {
-        return PrintJobColorMode.values
-            .firstWhere((element) => element.toNativeValue() == value);
+        return PrintJobColorMode.values.firstWhere(
+          (element) => element.toNativeValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -90,8 +93,9 @@ class PrintJobColorMode {
   static PrintJobColorMode? byName(String? name) {
     if (name != null) {
       try {
-        return PrintJobColorMode.values
-            .firstWhere((element) => element.name() == name);
+        return PrintJobColorMode.values.firstWhere(
+          (element) => element.name() == name,
+        );
       } catch (e) {
         return null;
       }
@@ -109,7 +113,7 @@ class PrintJobColorMode {
   /// them will be represented in the returned map.
   static Map<String, PrintJobColorMode> asNameMap() =>
       <String, PrintJobColorMode>{
-        for (final value in PrintJobColorMode.values) value.name(): value
+        for (final value in PrintJobColorMode.values) value.name(): value,
       };
 
   ///Gets [int] value.

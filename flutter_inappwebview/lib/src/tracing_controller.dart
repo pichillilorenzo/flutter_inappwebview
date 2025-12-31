@@ -7,9 +7,9 @@ import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_pla
 class TracingController {
   ///{@macro flutter_inappwebview_platform_interface.PlatformTracingController}
   TracingController()
-      : this.fromPlatformCreationParams(
-          const PlatformTracingControllerCreationParams(),
-        );
+    : this.fromPlatformCreationParams(
+        const PlatformTracingControllerCreationParams(),
+      );
 
   /// Constructs a [TracingController] from creation params for a specific
   /// platform.
@@ -49,8 +49,11 @@ class TracingController {
       PlatformTracingController.static().isClassSupported(platform: platform);
 
   ///{@macro flutter_inappwebview_platform_interface.PlatformTracingController.isMethodSupported}
-  static bool isMethodSupported(PlatformTracingControllerMethod method,
-          {TargetPlatform? platform}) =>
-      PlatformTracingController.static()
-          .isMethodSupported(method, platform: platform);
+  static bool isMethodSupported(
+    PlatformTracingControllerMethod method, {
+    TargetPlatform? platform,
+  }) => PlatformTracingController.static().isMethodSupported(
+    method,
+    platform: platform,
+  );
 }

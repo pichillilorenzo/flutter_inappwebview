@@ -45,17 +45,18 @@ class IOSInAppBrowserOptions implements BrowserOptions, IosOptions {
   ///Set to the custom transition style when presenting the WebView. The default value is [IOSUIModalTransitionStyle.COVER_VERTICAL].
   IOSUIModalTransitionStyle transitionStyle;
 
-  IOSInAppBrowserOptions(
-      {this.toolbarTopTranslucent = true,
-      this.toolbarTopTintColor,
-      this.hideToolbarBottom = false,
-      this.toolbarBottomBackgroundColor,
-      this.toolbarBottomTintColor,
-      this.toolbarBottomTranslucent = true,
-      this.closeButtonCaption,
-      this.closeButtonColor,
-      this.presentationStyle = IOSUIModalPresentationStyle.FULL_SCREEN,
-      this.transitionStyle = IOSUIModalTransitionStyle.COVER_VERTICAL});
+  IOSInAppBrowserOptions({
+    this.toolbarTopTranslucent = true,
+    this.toolbarTopTintColor,
+    this.hideToolbarBottom = false,
+    this.toolbarBottomBackgroundColor,
+    this.toolbarBottomTintColor,
+    this.toolbarBottomTranslucent = true,
+    this.closeButtonCaption,
+    this.closeButtonColor,
+    this.presentationStyle = IOSUIModalPresentationStyle.FULL_SCREEN,
+    this.transitionStyle = IOSUIModalTransitionStyle.COVER_VERTICAL,
+  });
 
   @override
   Map<String, dynamic> toMap() {
@@ -76,20 +77,25 @@ class IOSInAppBrowserOptions implements BrowserOptions, IosOptions {
   static IOSInAppBrowserOptions fromMap(Map<String, dynamic> map) {
     var instance = IOSInAppBrowserOptions();
     instance.toolbarTopTranslucent = map["toolbarTopTranslucent"];
-    instance.toolbarTopTintColor =
-        UtilColor.fromHex(map["toolbarTopTintColor"]);
+    instance.toolbarTopTintColor = UtilColor.fromHex(
+      map["toolbarTopTintColor"],
+    );
     instance.hideToolbarBottom = map["hideToolbarBottom"];
-    instance.toolbarBottomBackgroundColor =
-        UtilColor.fromHex(map["toolbarBottomBackgroundColor"]);
-    instance.toolbarBottomTintColor =
-        UtilColor.fromHex(map["toolbarBottomTintColor"]);
+    instance.toolbarBottomBackgroundColor = UtilColor.fromHex(
+      map["toolbarBottomBackgroundColor"],
+    );
+    instance.toolbarBottomTintColor = UtilColor.fromHex(
+      map["toolbarBottomTintColor"],
+    );
     instance.toolbarBottomTranslucent = map["toolbarBottomTranslucent"];
     instance.closeButtonCaption = map["closeButtonCaption"];
     instance.closeButtonColor = UtilColor.fromHex(map["closeButtonColor"]);
-    instance.presentationStyle =
-        IOSUIModalPresentationStyle.fromNativeValue(map["presentationStyle"])!;
-    instance.transitionStyle =
-        IOSUIModalTransitionStyle.fromNativeValue(map["transitionStyle"])!;
+    instance.presentationStyle = IOSUIModalPresentationStyle.fromNativeValue(
+      map["presentationStyle"],
+    )!;
+    instance.transitionStyle = IOSUIModalTransitionStyle.fromNativeValue(
+      map["transitionStyle"],
+    )!;
     return instance;
   }
 

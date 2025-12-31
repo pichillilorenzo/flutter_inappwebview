@@ -18,23 +18,30 @@ class RendererPriorityPolicy {
 
   ///If `true`, this flag specifies that when this WebView is not visible, it will be treated as if it had requested a priority of [RendererPriority.RENDERER_PRIORITY_WAIVED].
   bool waivedWhenNotVisible;
-  RendererPriorityPolicy(
-      {this.rendererRequestedPriority, required this.waivedWhenNotVisible});
+  RendererPriorityPolicy({
+    this.rendererRequestedPriority,
+    required this.waivedWhenNotVisible,
+  });
 
   ///Gets a possible [RendererPriorityPolicy] instance from a [Map] value.
-  static RendererPriorityPolicy? fromMap(Map<String, dynamic>? map,
-      {EnumMethod? enumMethod}) {
+  static RendererPriorityPolicy? fromMap(
+    Map<String, dynamic>? map, {
+    EnumMethod? enumMethod,
+  }) {
     if (map == null) {
       return null;
     }
     final instance = RendererPriorityPolicy(
       rendererRequestedPriority: switch (enumMethod ?? EnumMethod.nativeValue) {
-        EnumMethod.nativeValue =>
-          RendererPriority.fromNativeValue(map['rendererRequestedPriority']),
-        EnumMethod.value =>
-          RendererPriority.fromValue(map['rendererRequestedPriority']),
-        EnumMethod.name =>
-          RendererPriority.byName(map['rendererRequestedPriority'])
+        EnumMethod.nativeValue => RendererPriority.fromNativeValue(
+          map['rendererRequestedPriority'],
+        ),
+        EnumMethod.value => RendererPriority.fromValue(
+          map['rendererRequestedPriority'],
+        ),
+        EnumMethod.name => RendererPriority.byName(
+          map['rendererRequestedPriority'],
+        ),
       },
       waivedWhenNotVisible: map['waivedWhenNotVisible'],
     );
@@ -44,11 +51,11 @@ class RendererPriorityPolicy {
   ///Converts instance to a map.
   Map<String, dynamic> toMap({EnumMethod? enumMethod}) {
     return {
-      "rendererRequestedPriority": switch (
-          enumMethod ?? EnumMethod.nativeValue) {
+      "rendererRequestedPriority": switch (enumMethod ??
+          EnumMethod.nativeValue) {
         EnumMethod.nativeValue => rendererRequestedPriority?.toNativeValue(),
         EnumMethod.value => rendererRequestedPriority?.toValue(),
-        EnumMethod.name => rendererRequestedPriority?.name()
+        EnumMethod.name => rendererRequestedPriority?.name(),
       },
       "waivedWhenNotVisible": waivedWhenNotVisible,
     };

@@ -11,17 +11,20 @@ class WebArchiveFormat {
   final String _value;
   final String _nativeValue;
   const WebArchiveFormat._internal(this._value, this._nativeValue);
-// ignore: unused_element
+  // ignore: unused_element
   factory WebArchiveFormat._internalMultiPlatform(
-          String value, Function nativeValue) =>
-      WebArchiveFormat._internal(value, nativeValue());
+    String value,
+    Function nativeValue,
+  ) => WebArchiveFormat._internal(value, nativeValue());
 
   ///Web Archive format used only by Android.
   static const MHT = WebArchiveFormat._internal('mht', 'mht');
 
   ///Web Archive format used only by iOS.
-  static const WEBARCHIVE =
-      WebArchiveFormat._internal('webarchive', 'webarchive');
+  static const WEBARCHIVE = WebArchiveFormat._internal(
+    'webarchive',
+    'webarchive',
+  );
 
   ///Set of all values of [WebArchiveFormat].
   static final Set<WebArchiveFormat> values = [
@@ -33,8 +36,9 @@ class WebArchiveFormat {
   static WebArchiveFormat? fromValue(String? value) {
     if (value != null) {
       try {
-        return WebArchiveFormat.values
-            .firstWhere((element) => element.toValue() == value);
+        return WebArchiveFormat.values.firstWhere(
+          (element) => element.toValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -46,8 +50,9 @@ class WebArchiveFormat {
   static WebArchiveFormat? fromNativeValue(String? value) {
     if (value != null) {
       try {
-        return WebArchiveFormat.values
-            .firstWhere((element) => element.toNativeValue() == value);
+        return WebArchiveFormat.values.firstWhere(
+          (element) => element.toNativeValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -63,8 +68,9 @@ class WebArchiveFormat {
   static WebArchiveFormat? byName(String? name) {
     if (name != null) {
       try {
-        return WebArchiveFormat.values
-            .firstWhere((element) => element.name() == name);
+        return WebArchiveFormat.values.firstWhere(
+          (element) => element.name() == name,
+        );
       } catch (e) {
         return null;
       }
@@ -82,7 +88,7 @@ class WebArchiveFormat {
   /// them will be represented in the returned map.
   static Map<String, WebArchiveFormat> asNameMap() =>
       <String, WebArchiveFormat>{
-        for (final value in WebArchiveFormat.values) value.name(): value
+        for (final value in WebArchiveFormat.values) value.name(): value,
       };
 
   ///Gets [String] value.

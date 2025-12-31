@@ -11,10 +11,11 @@ class PrintJobDuplexMode {
   final String _value;
   final int? _nativeValue;
   const PrintJobDuplexMode._internal(this._value, this._nativeValue);
-// ignore: unused_element
+  // ignore: unused_element
   factory PrintJobDuplexMode._internalMultiPlatform(
-          String value, Function nativeValue) =>
-      PrintJobDuplexMode._internal(value, nativeValue());
+    String value,
+    Function nativeValue,
+  ) => PrintJobDuplexMode._internal(value, nativeValue());
 
   ///Duplex printing that flips the back page along the long edge of the paper.
   ///Pages are turned sideways along the long edge - like a book.
@@ -23,20 +24,22 @@ class PrintJobDuplexMode {
   ///- Android WebView
   ///- iOS WKWebView
   ///- macOS WKWebView
-  static final LONG_EDGE =
-      PrintJobDuplexMode._internalMultiPlatform('LONG_EDGE', () {
-    switch (defaultTargetPlatform) {
-      case TargetPlatform.android:
-        return 2;
-      case TargetPlatform.iOS:
-        return 1;
-      case TargetPlatform.macOS:
-        return 2;
-      default:
-        break;
-    }
-    return null;
-  });
+  static final LONG_EDGE = PrintJobDuplexMode._internalMultiPlatform(
+    'LONG_EDGE',
+    () {
+      switch (defaultTargetPlatform) {
+        case TargetPlatform.android:
+          return 2;
+        case TargetPlatform.iOS:
+          return 1;
+        case TargetPlatform.macOS:
+          return 2;
+        default:
+          break;
+      }
+      return null;
+    },
+  );
 
   ///No double-sided (duplex) printing; single-sided printing only.
   ///
@@ -65,20 +68,22 @@ class PrintJobDuplexMode {
   ///- Android WebView
   ///- iOS WKWebView
   ///- macOS WKWebView
-  static final SHORT_EDGE =
-      PrintJobDuplexMode._internalMultiPlatform('SHORT_EDGE', () {
-    switch (defaultTargetPlatform) {
-      case TargetPlatform.android:
-        return 4;
-      case TargetPlatform.iOS:
-        return 2;
-      case TargetPlatform.macOS:
-        return 3;
-      default:
-        break;
-    }
-    return null;
-  });
+  static final SHORT_EDGE = PrintJobDuplexMode._internalMultiPlatform(
+    'SHORT_EDGE',
+    () {
+      switch (defaultTargetPlatform) {
+        case TargetPlatform.android:
+          return 4;
+        case TargetPlatform.iOS:
+          return 2;
+        case TargetPlatform.macOS:
+          return 3;
+        default:
+          break;
+      }
+      return null;
+    },
+  );
 
   ///Set of all values of [PrintJobDuplexMode].
   static final Set<PrintJobDuplexMode> values = [
@@ -91,8 +96,9 @@ class PrintJobDuplexMode {
   static PrintJobDuplexMode? fromValue(String? value) {
     if (value != null) {
       try {
-        return PrintJobDuplexMode.values
-            .firstWhere((element) => element.toValue() == value);
+        return PrintJobDuplexMode.values.firstWhere(
+          (element) => element.toValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -104,8 +110,9 @@ class PrintJobDuplexMode {
   static PrintJobDuplexMode? fromNativeValue(int? value) {
     if (value != null) {
       try {
-        return PrintJobDuplexMode.values
-            .firstWhere((element) => element.toNativeValue() == value);
+        return PrintJobDuplexMode.values.firstWhere(
+          (element) => element.toNativeValue() == value,
+        );
       } catch (e) {
         return null;
       }
@@ -121,8 +128,9 @@ class PrintJobDuplexMode {
   static PrintJobDuplexMode? byName(String? name) {
     if (name != null) {
       try {
-        return PrintJobDuplexMode.values
-            .firstWhere((element) => element.name() == name);
+        return PrintJobDuplexMode.values.firstWhere(
+          (element) => element.name() == name,
+        );
       } catch (e) {
         return null;
       }
@@ -140,7 +148,7 @@ class PrintJobDuplexMode {
   /// them will be represented in the returned map.
   static Map<String, PrintJobDuplexMode> asNameMap() =>
       <String, PrintJobDuplexMode>{
-        for (final value in PrintJobDuplexMode.values) value.name(): value
+        for (final value in PrintJobDuplexMode.values) value.name(): value,
       };
 
   ///Gets [String] value.

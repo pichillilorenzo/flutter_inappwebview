@@ -4,8 +4,10 @@ import 'asn1_identifier.dart';
 class ASN1DEREncoder {
   static Uint8List encodeSequence({required Uint8List content}) {
     var encoded = Uint8List.fromList([]);
-    encoded.add(ASN1Identifier.constructedTag |
-        ASN1IdentifierTagNumber.SEQUENCE.toValue());
+    encoded.add(
+      ASN1Identifier.constructedTag |
+          ASN1IdentifierTagNumber.SEQUENCE.toValue(),
+    );
     encoded.addAll(contentLength(size: content.length));
     encoded.addAll(content);
     return Uint8List.fromList(encoded);

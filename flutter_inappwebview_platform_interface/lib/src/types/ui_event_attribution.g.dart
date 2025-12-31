@@ -28,15 +28,18 @@ class UIEventAttribution {
 
   ///An 8-bit number that identifies the source of the click for attribution. Value must be between 0 and 255.
   int sourceIdentifier;
-  UIEventAttribution(
-      {required this.sourceIdentifier,
-      required this.destinationURL,
-      required this.sourceDescription,
-      required this.purchaser});
+  UIEventAttribution({
+    required this.sourceIdentifier,
+    required this.destinationURL,
+    required this.sourceDescription,
+    required this.purchaser,
+  });
 
   ///Gets a possible [UIEventAttribution] instance from a [Map] value.
-  static UIEventAttribution? fromMap(Map<String, dynamic>? map,
-      {EnumMethod? enumMethod}) {
+  static UIEventAttribution? fromMap(
+    Map<String, dynamic>? map, {
+    EnumMethod? enumMethod,
+  }) {
     if (map == null) {
       return null;
     }

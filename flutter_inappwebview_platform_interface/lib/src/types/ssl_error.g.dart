@@ -22,18 +22,21 @@ class SslError {
 
   ///The message associated to the [code].
   String? message;
-  SslError(
-      {@Deprecated('Use code instead') this.androidError,
-      this.code,
-      @Deprecated('Use code instead') this.iosError,
-      this.message}) {
+  SslError({
+    @Deprecated('Use code instead') this.androidError,
+    this.code,
+    @Deprecated('Use code instead') this.iosError,
+    this.message,
+  }) {
     code = code ?? SslErrorType.fromNativeValue(androidError?.toNativeValue());
     code = code ?? SslErrorType.fromNativeValue(iosError?.toNativeValue());
   }
 
   ///Gets a possible [SslError] instance from a [Map] value.
-  static SslError? fromMap(Map<String, dynamic>? map,
-      {EnumMethod? enumMethod}) {
+  static SslError? fromMap(
+    Map<String, dynamic>? map, {
+    EnumMethod? enumMethod,
+  }) {
     if (map == null) {
       return null;
     }
@@ -41,17 +44,17 @@ class SslError {
       androidError: switch (enumMethod ?? EnumMethod.nativeValue) {
         EnumMethod.nativeValue => AndroidSslError.fromNativeValue(map['code']),
         EnumMethod.value => AndroidSslError.fromValue(map['code']),
-        EnumMethod.name => AndroidSslError.byName(map['code'])
+        EnumMethod.name => AndroidSslError.byName(map['code']),
       },
       code: switch (enumMethod ?? EnumMethod.nativeValue) {
         EnumMethod.nativeValue => SslErrorType.fromNativeValue(map['code']),
         EnumMethod.value => SslErrorType.fromValue(map['code']),
-        EnumMethod.name => SslErrorType.byName(map['code'])
+        EnumMethod.name => SslErrorType.byName(map['code']),
       },
       iosError: switch (enumMethod ?? EnumMethod.nativeValue) {
         EnumMethod.nativeValue => IOSSslError.fromNativeValue(map['code']),
         EnumMethod.value => IOSSslError.fromValue(map['code']),
-        EnumMethod.name => IOSSslError.byName(map['code'])
+        EnumMethod.name => IOSSslError.byName(map['code']),
       },
       message: map['message'],
     );
@@ -64,7 +67,7 @@ class SslError {
       "code": switch (enumMethod ?? EnumMethod.nativeValue) {
         EnumMethod.nativeValue => code?.toNativeValue(),
         EnumMethod.value => code?.toValue(),
-        EnumMethod.name => code?.name()
+        EnumMethod.name => code?.name(),
       },
       "message": message,
     };

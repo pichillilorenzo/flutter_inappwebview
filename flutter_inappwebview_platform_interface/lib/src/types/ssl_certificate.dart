@@ -27,16 +27,19 @@ class SslCertificate_ {
   ///The original source certificate, if available.
   X509Certificate? x509Certificate;
 
-  SslCertificate_(
-      {this.issuedBy,
-      this.issuedTo,
-      this.validNotAfterDate,
-      this.validNotBeforeDate,
-      this.x509Certificate});
+  SslCertificate_({
+    this.issuedBy,
+    this.issuedTo,
+    this.validNotAfterDate,
+    this.validNotBeforeDate,
+    this.x509Certificate,
+  });
 
   ///Gets a possible [SslCertificate] instance from a [Map] value.
-  static SslCertificate? fromMap(Map<String, dynamic>? map,
-      {EnumMethod? enumMethod}) {
+  static SslCertificate? fromMap(
+    Map<String, dynamic>? map, {
+    EnumMethod? enumMethod,
+  }) {
     if (map == null) {
       return null;
     }
@@ -53,27 +56,41 @@ class SslCertificate_ {
       if (x509Certificate != null) {
         return SslCertificate(
           issuedBy: SslCertificateDName(
-              CName: x509Certificate.issuer(
-                      dn: ASN1DistinguishedNames.COMMON_NAME) ??
-                  "",
-              DName: x509Certificate.issuerDistinguishedName ?? "",
-              OName: x509Certificate.issuer(
-                      dn: ASN1DistinguishedNames.ORGANIZATION_NAME) ??
-                  "",
-              UName: x509Certificate.issuer(
-                      dn: ASN1DistinguishedNames.ORGANIZATIONAL_UNIT_NAME) ??
-                  ""),
+            CName:
+                x509Certificate.issuer(
+                  dn: ASN1DistinguishedNames.COMMON_NAME,
+                ) ??
+                "",
+            DName: x509Certificate.issuerDistinguishedName ?? "",
+            OName:
+                x509Certificate.issuer(
+                  dn: ASN1DistinguishedNames.ORGANIZATION_NAME,
+                ) ??
+                "",
+            UName:
+                x509Certificate.issuer(
+                  dn: ASN1DistinguishedNames.ORGANIZATIONAL_UNIT_NAME,
+                ) ??
+                "",
+          ),
           issuedTo: SslCertificateDName(
-              CName: x509Certificate.subject(
-                      dn: ASN1DistinguishedNames.COMMON_NAME) ??
-                  "",
-              DName: x509Certificate.subjectDistinguishedName ?? "",
-              OName: x509Certificate.subject(
-                      dn: ASN1DistinguishedNames.ORGANIZATION_NAME) ??
-                  "",
-              UName: x509Certificate.subject(
-                      dn: ASN1DistinguishedNames.ORGANIZATIONAL_UNIT_NAME) ??
-                  ""),
+            CName:
+                x509Certificate.subject(
+                  dn: ASN1DistinguishedNames.COMMON_NAME,
+                ) ??
+                "",
+            DName: x509Certificate.subjectDistinguishedName ?? "",
+            OName:
+                x509Certificate.subject(
+                  dn: ASN1DistinguishedNames.ORGANIZATION_NAME,
+                ) ??
+                "",
+            UName:
+                x509Certificate.subject(
+                  dn: ASN1DistinguishedNames.ORGANIZATIONAL_UNIT_NAME,
+                ) ??
+                "",
+          ),
           validNotAfterDate: x509Certificate.notAfter,
           validNotBeforeDate: x509Certificate.notBefore,
           x509Certificate: x509Certificate,
@@ -84,11 +101,13 @@ class SslCertificate_ {
 
     return SslCertificate(
       issuedBy: SslCertificateDName.fromMap(
-          map["issuedBy"]?.cast<String, dynamic>(),
-          enumMethod: enumMethod),
+        map["issuedBy"]?.cast<String, dynamic>(),
+        enumMethod: enumMethod,
+      ),
       issuedTo: SslCertificateDName.fromMap(
-          map["issuedTo"]?.cast<String, dynamic>(),
-          enumMethod: enumMethod),
+        map["issuedTo"]?.cast<String, dynamic>(),
+        enumMethod: enumMethod,
+      ),
       validNotAfterDate: map["validNotAfterDate"] != null
           ? DateTime.fromMillisecondsSinceEpoch(map["validNotAfterDate"])
           : null,

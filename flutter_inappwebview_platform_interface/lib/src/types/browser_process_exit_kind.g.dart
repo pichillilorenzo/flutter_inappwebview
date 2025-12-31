@@ -11,10 +11,11 @@ class BrowserProcessExitKind {
   final int _value;
   final int _nativeValue;
   const BrowserProcessExitKind._internal(this._value, this._nativeValue);
-// ignore: unused_element
+  // ignore: unused_element
   factory BrowserProcessExitKind._internalMultiPlatform(
-          int value, Function nativeValue) =>
-      BrowserProcessExitKind._internal(value, nativeValue());
+    int value,
+    Function nativeValue,
+  ) => BrowserProcessExitKind._internal(value, nativeValue());
 
   ///Indicates that the browser process ended unexpectedly.
   ///A [PlatformWebViewCreationParams.onProcessFailed] event will also be
@@ -56,8 +57,9 @@ class BrowserProcessExitKind {
   static BrowserProcessExitKind? fromValue(int? value) {
     if (value != null) {
       try {
-        return BrowserProcessExitKind.values
-            .firstWhere((element) => element.toValue() == value);
+        return BrowserProcessExitKind.values.firstWhere(
+          (element) => element.toValue() == value,
+        );
       } catch (e) {
         return BrowserProcessExitKind._internal(value, value);
       }
@@ -69,8 +71,9 @@ class BrowserProcessExitKind {
   static BrowserProcessExitKind? fromNativeValue(int? value) {
     if (value != null) {
       try {
-        return BrowserProcessExitKind.values
-            .firstWhere((element) => element.toNativeValue() == value);
+        return BrowserProcessExitKind.values.firstWhere(
+          (element) => element.toNativeValue() == value,
+        );
       } catch (e) {
         return BrowserProcessExitKind._internal(value, value);
       }
@@ -86,8 +89,9 @@ class BrowserProcessExitKind {
   static BrowserProcessExitKind? byName(String? name) {
     if (name != null) {
       try {
-        return BrowserProcessExitKind.values
-            .firstWhere((element) => element.name() == name);
+        return BrowserProcessExitKind.values.firstWhere(
+          (element) => element.name() == name,
+        );
       } catch (e) {
         return null;
       }
@@ -105,7 +109,7 @@ class BrowserProcessExitKind {
   /// them will be represented in the returned map.
   static Map<String, BrowserProcessExitKind> asNameMap() =>
       <String, BrowserProcessExitKind>{
-        for (final value in BrowserProcessExitKind.values) value.name(): value
+        for (final value in BrowserProcessExitKind.values) value.name(): value,
       };
 
   ///Gets [int] value.
@@ -133,7 +137,9 @@ class BrowserProcessExitKind {
 
   BrowserProcessExitKind operator |(BrowserProcessExitKind value) =>
       BrowserProcessExitKind._internal(
-          value.toValue() | _value, value.toNativeValue() | _nativeValue);
+        value.toValue() | _value,
+        value.toNativeValue() | _nativeValue,
+      );
 
   ///Checks if the value is supported by the [defaultTargetPlatform].
   bool isSupported() {

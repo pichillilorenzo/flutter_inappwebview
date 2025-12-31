@@ -360,146 +360,168 @@ class PrintJobSettings {
   ///- Android WebView
   ///- iOS WKWebView
   ///- macOS WKWebView
-  PrintJobSettings(
-      {this.animated = true,
-      this.canSpawnSeparateThread = true,
-      this.colorMode,
-      this.copies = 1,
-      this.detailedErrorReporting = false,
-      this.duplexMode,
-      this.faxNumber,
-      this.firstPage,
-      this.footerHeight,
-      this.forceRenderingQuality,
-      this.handledByClient = false,
-      this.headerAndFooter = true,
-      this.headerHeight,
-      this.horizontalPagination,
-      this.isHorizontallyCentered = true,
-      this.isVerticallyCentered = true,
-      this.jobDisposition,
-      this.jobName,
-      this.jobSavingURL,
-      this.lastPage,
-      this.margins,
-      this.maximumContentHeight,
-      this.maximumContentWidth,
-      this.mediaSize,
-      this.mustCollate,
-      this.numberOfPages,
-      this.orientation,
-      this.outputType,
-      this.pageOrder,
-      this.pagesAcross,
-      this.pagesDown,
-      this.paperName,
-      this.resolution,
-      this.scalingFactor,
-      this.showsNumberOfCopies = true,
-      this.showsPageRange = true,
-      this.showsPageSetupAccessory = true,
-      this.showsPaperOrientation = true,
-      this.showsPaperSelectionForLoadedPapers = false,
-      this.showsPaperSize = true,
-      this.showsPreview = true,
-      this.showsPrintPanel = true,
-      this.showsPrintSelection = true,
-      this.showsProgressPanel = true,
-      this.showsScaling = true,
-      this.time,
-      this.verticalPagination});
+  PrintJobSettings({
+    this.animated = true,
+    this.canSpawnSeparateThread = true,
+    this.colorMode,
+    this.copies = 1,
+    this.detailedErrorReporting = false,
+    this.duplexMode,
+    this.faxNumber,
+    this.firstPage,
+    this.footerHeight,
+    this.forceRenderingQuality,
+    this.handledByClient = false,
+    this.headerAndFooter = true,
+    this.headerHeight,
+    this.horizontalPagination,
+    this.isHorizontallyCentered = true,
+    this.isVerticallyCentered = true,
+    this.jobDisposition,
+    this.jobName,
+    this.jobSavingURL,
+    this.lastPage,
+    this.margins,
+    this.maximumContentHeight,
+    this.maximumContentWidth,
+    this.mediaSize,
+    this.mustCollate,
+    this.numberOfPages,
+    this.orientation,
+    this.outputType,
+    this.pageOrder,
+    this.pagesAcross,
+    this.pagesDown,
+    this.paperName,
+    this.resolution,
+    this.scalingFactor,
+    this.showsNumberOfCopies = true,
+    this.showsPageRange = true,
+    this.showsPageSetupAccessory = true,
+    this.showsPaperOrientation = true,
+    this.showsPaperSelectionForLoadedPapers = false,
+    this.showsPaperSize = true,
+    this.showsPreview = true,
+    this.showsPrintPanel = true,
+    this.showsPrintSelection = true,
+    this.showsProgressPanel = true,
+    this.showsScaling = true,
+    this.time,
+    this.verticalPagination,
+  });
 
   ///Gets a possible [PrintJobSettings] instance from a [Map] value.
-  static PrintJobSettings? fromMap(Map<String, dynamic>? map,
-      {EnumMethod? enumMethod}) {
+  static PrintJobSettings? fromMap(
+    Map<String, dynamic>? map, {
+    EnumMethod? enumMethod,
+  }) {
     if (map == null) {
       return null;
     }
     final instance = PrintJobSettings(
       colorMode: switch (enumMethod ?? EnumMethod.nativeValue) {
-        EnumMethod.nativeValue =>
-          PrintJobColorMode.fromNativeValue(map['colorMode']),
+        EnumMethod.nativeValue => PrintJobColorMode.fromNativeValue(
+          map['colorMode'],
+        ),
         EnumMethod.value => PrintJobColorMode.fromValue(map['colorMode']),
-        EnumMethod.name => PrintJobColorMode.byName(map['colorMode'])
+        EnumMethod.name => PrintJobColorMode.byName(map['colorMode']),
       },
       duplexMode: switch (enumMethod ?? EnumMethod.nativeValue) {
-        EnumMethod.nativeValue =>
-          PrintJobDuplexMode.fromNativeValue(map['duplexMode']),
+        EnumMethod.nativeValue => PrintJobDuplexMode.fromNativeValue(
+          map['duplexMode'],
+        ),
         EnumMethod.value => PrintJobDuplexMode.fromValue(map['duplexMode']),
-        EnumMethod.name => PrintJobDuplexMode.byName(map['duplexMode'])
+        EnumMethod.name => PrintJobDuplexMode.byName(map['duplexMode']),
       },
       faxNumber: map['faxNumber'],
       firstPage: map['firstPage'],
       footerHeight: map['footerHeight'],
       forceRenderingQuality: switch (enumMethod ?? EnumMethod.nativeValue) {
         EnumMethod.nativeValue => PrintJobRenderingQuality.fromNativeValue(
-            map['forceRenderingQuality']),
-        EnumMethod.value =>
-          PrintJobRenderingQuality.fromValue(map['forceRenderingQuality']),
-        EnumMethod.name =>
-          PrintJobRenderingQuality.byName(map['forceRenderingQuality'])
+          map['forceRenderingQuality'],
+        ),
+        EnumMethod.value => PrintJobRenderingQuality.fromValue(
+          map['forceRenderingQuality'],
+        ),
+        EnumMethod.name => PrintJobRenderingQuality.byName(
+          map['forceRenderingQuality'],
+        ),
       },
       headerHeight: map['headerHeight'],
       horizontalPagination: switch (enumMethod ?? EnumMethod.nativeValue) {
-        EnumMethod.nativeValue =>
-          PrintJobPaginationMode.fromNativeValue(map['horizontalPagination']),
-        EnumMethod.value =>
-          PrintJobPaginationMode.fromValue(map['horizontalPagination']),
-        EnumMethod.name =>
-          PrintJobPaginationMode.byName(map['horizontalPagination'])
+        EnumMethod.nativeValue => PrintJobPaginationMode.fromNativeValue(
+          map['horizontalPagination'],
+        ),
+        EnumMethod.value => PrintJobPaginationMode.fromValue(
+          map['horizontalPagination'],
+        ),
+        EnumMethod.name => PrintJobPaginationMode.byName(
+          map['horizontalPagination'],
+        ),
       },
       jobDisposition: switch (enumMethod ?? EnumMethod.nativeValue) {
-        EnumMethod.nativeValue =>
-          PrintJobDisposition.fromNativeValue(map['jobDisposition']),
-        EnumMethod.value =>
-          PrintJobDisposition.fromValue(map['jobDisposition']),
-        EnumMethod.name => PrintJobDisposition.byName(map['jobDisposition'])
+        EnumMethod.nativeValue => PrintJobDisposition.fromNativeValue(
+          map['jobDisposition'],
+        ),
+        EnumMethod.value => PrintJobDisposition.fromValue(
+          map['jobDisposition'],
+        ),
+        EnumMethod.name => PrintJobDisposition.byName(map['jobDisposition']),
       },
       jobName: map['jobName'],
-      jobSavingURL:
-          map['jobSavingURL'] != null ? WebUri(map['jobSavingURL']) : null,
+      jobSavingURL: map['jobSavingURL'] != null
+          ? WebUri(map['jobSavingURL'])
+          : null,
       lastPage: map['lastPage'],
       margins: MapEdgeInsets.fromMap(map['margins']?.cast<String, dynamic>()),
       maximumContentHeight: map['maximumContentHeight'],
       maximumContentWidth: map['maximumContentWidth'],
       mediaSize: PrintJobMediaSize.fromMap(
-          map['mediaSize']?.cast<String, dynamic>(),
-          enumMethod: enumMethod),
+        map['mediaSize']?.cast<String, dynamic>(),
+        enumMethod: enumMethod,
+      ),
       mustCollate: map['mustCollate'],
       numberOfPages: map['numberOfPages'],
       orientation: switch (enumMethod ?? EnumMethod.nativeValue) {
-        EnumMethod.nativeValue =>
-          PrintJobOrientation.fromNativeValue(map['orientation']),
+        EnumMethod.nativeValue => PrintJobOrientation.fromNativeValue(
+          map['orientation'],
+        ),
         EnumMethod.value => PrintJobOrientation.fromValue(map['orientation']),
-        EnumMethod.name => PrintJobOrientation.byName(map['orientation'])
+        EnumMethod.name => PrintJobOrientation.byName(map['orientation']),
       },
       outputType: switch (enumMethod ?? EnumMethod.nativeValue) {
-        EnumMethod.nativeValue =>
-          PrintJobOutputType.fromNativeValue(map['outputType']),
+        EnumMethod.nativeValue => PrintJobOutputType.fromNativeValue(
+          map['outputType'],
+        ),
         EnumMethod.value => PrintJobOutputType.fromValue(map['outputType']),
-        EnumMethod.name => PrintJobOutputType.byName(map['outputType'])
+        EnumMethod.name => PrintJobOutputType.byName(map['outputType']),
       },
       pageOrder: switch (enumMethod ?? EnumMethod.nativeValue) {
-        EnumMethod.nativeValue =>
-          PrintJobPageOrder.fromNativeValue(map['pageOrder']),
+        EnumMethod.nativeValue => PrintJobPageOrder.fromNativeValue(
+          map['pageOrder'],
+        ),
         EnumMethod.value => PrintJobPageOrder.fromValue(map['pageOrder']),
-        EnumMethod.name => PrintJobPageOrder.byName(map['pageOrder'])
+        EnumMethod.name => PrintJobPageOrder.byName(map['pageOrder']),
       },
       pagesAcross: map['pagesAcross'],
       pagesDown: map['pagesDown'],
       paperName: map['paperName'],
       resolution: PrintJobResolution.fromMap(
-          map['resolution']?.cast<String, dynamic>(),
-          enumMethod: enumMethod),
+        map['resolution']?.cast<String, dynamic>(),
+        enumMethod: enumMethod,
+      ),
       scalingFactor: map['scalingFactor'],
       time: map['time'],
       verticalPagination: switch (enumMethod ?? EnumMethod.nativeValue) {
-        EnumMethod.nativeValue =>
-          PrintJobPaginationMode.fromNativeValue(map['verticalPagination']),
-        EnumMethod.value =>
-          PrintJobPaginationMode.fromValue(map['verticalPagination']),
-        EnumMethod.name =>
-          PrintJobPaginationMode.byName(map['verticalPagination'])
+        EnumMethod.nativeValue => PrintJobPaginationMode.fromNativeValue(
+          map['verticalPagination'],
+        ),
+        EnumMethod.value => PrintJobPaginationMode.fromValue(
+          map['verticalPagination'],
+        ),
+        EnumMethod.name => PrintJobPaginationMode.byName(
+          map['verticalPagination'],
+        ),
       },
     );
     instance.animated = map['animated'];
@@ -526,10 +548,13 @@ class PrintJobSettings {
   }
 
   ///Check if the given [property] is supported by the [defaultTargetPlatform] or a specific [platform].
-  static bool isPropertySupported(PrintJobSettingsProperty property,
-          {TargetPlatform? platform}) =>
-      _PrintJobSettingsPropertySupported.isPropertySupported(property,
-          platform: platform);
+  static bool isPropertySupported(
+    PrintJobSettingsProperty property, {
+    TargetPlatform? platform,
+  }) => _PrintJobSettingsPropertySupported.isPropertySupported(
+    property,
+    platform: platform,
+  );
 
   ///Converts instance to a map.
   Map<String, dynamic> toMap({EnumMethod? enumMethod}) {
@@ -539,14 +564,14 @@ class PrintJobSettings {
       "colorMode": switch (enumMethod ?? EnumMethod.nativeValue) {
         EnumMethod.nativeValue => colorMode?.toNativeValue(),
         EnumMethod.value => colorMode?.toValue(),
-        EnumMethod.name => colorMode?.name()
+        EnumMethod.name => colorMode?.name(),
       },
       "copies": copies,
       "detailedErrorReporting": detailedErrorReporting,
       "duplexMode": switch (enumMethod ?? EnumMethod.nativeValue) {
         EnumMethod.nativeValue => duplexMode?.toNativeValue(),
         EnumMethod.value => duplexMode?.toValue(),
-        EnumMethod.name => duplexMode?.name()
+        EnumMethod.name => duplexMode?.name(),
       },
       "faxNumber": faxNumber,
       "firstPage": firstPage,
@@ -554,7 +579,7 @@ class PrintJobSettings {
       "forceRenderingQuality": switch (enumMethod ?? EnumMethod.nativeValue) {
         EnumMethod.nativeValue => forceRenderingQuality?.toNativeValue(),
         EnumMethod.value => forceRenderingQuality?.toValue(),
-        EnumMethod.name => forceRenderingQuality?.name()
+        EnumMethod.name => forceRenderingQuality?.name(),
       },
       "handledByClient": handledByClient,
       "headerAndFooter": headerAndFooter,
@@ -562,14 +587,14 @@ class PrintJobSettings {
       "horizontalPagination": switch (enumMethod ?? EnumMethod.nativeValue) {
         EnumMethod.nativeValue => horizontalPagination?.toNativeValue(),
         EnumMethod.value => horizontalPagination?.toValue(),
-        EnumMethod.name => horizontalPagination?.name()
+        EnumMethod.name => horizontalPagination?.name(),
       },
       "isHorizontallyCentered": isHorizontallyCentered,
       "isVerticallyCentered": isVerticallyCentered,
       "jobDisposition": switch (enumMethod ?? EnumMethod.nativeValue) {
         EnumMethod.nativeValue => jobDisposition?.toNativeValue(),
         EnumMethod.value => jobDisposition?.toValue(),
-        EnumMethod.name => jobDisposition?.name()
+        EnumMethod.name => jobDisposition?.name(),
       },
       "jobName": jobName,
       "jobSavingURL": jobSavingURL?.toString(),
@@ -583,17 +608,17 @@ class PrintJobSettings {
       "orientation": switch (enumMethod ?? EnumMethod.nativeValue) {
         EnumMethod.nativeValue => orientation?.toNativeValue(),
         EnumMethod.value => orientation?.toValue(),
-        EnumMethod.name => orientation?.name()
+        EnumMethod.name => orientation?.name(),
       },
       "outputType": switch (enumMethod ?? EnumMethod.nativeValue) {
         EnumMethod.nativeValue => outputType?.toNativeValue(),
         EnumMethod.value => outputType?.toValue(),
-        EnumMethod.name => outputType?.name()
+        EnumMethod.name => outputType?.name(),
       },
       "pageOrder": switch (enumMethod ?? EnumMethod.nativeValue) {
         EnumMethod.nativeValue => pageOrder?.toNativeValue(),
         EnumMethod.value => pageOrder?.toValue(),
-        EnumMethod.name => pageOrder?.name()
+        EnumMethod.name => pageOrder?.name(),
       },
       "pagesAcross": pagesAcross,
       "pagesDown": pagesDown,
@@ -615,7 +640,7 @@ class PrintJobSettings {
       "verticalPagination": switch (enumMethod ?? EnumMethod.nativeValue) {
         EnumMethod.nativeValue => verticalPagination?.toNativeValue(),
         EnumMethod.value => verticalPagination?.toValue(),
-        EnumMethod.name => verticalPagination?.name()
+        EnumMethod.name => verticalPagination?.name(),
       },
     };
   }
@@ -1173,8 +1198,10 @@ enum PrintJobSettingsProperty {
 }
 
 extension _PrintJobSettingsPropertySupported on PrintJobSettings {
-  static bool isPropertySupported(PrintJobSettingsProperty property,
-      {TargetPlatform? platform}) {
+  static bool isPropertySupported(
+    PrintJobSettingsProperty property, {
+    TargetPlatform? platform,
+  }) {
     switch (property) {
       case PrintJobSettingsProperty.animated:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
@@ -1184,8 +1211,10 @@ extension _PrintJobSettingsPropertySupported on PrintJobSettings {
             [TargetPlatform.macOS].contains(platform ?? defaultTargetPlatform);
       case PrintJobSettingsProperty.colorMode:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.android, TargetPlatform.macOS]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.android,
+              TargetPlatform.macOS,
+            ].contains(platform ?? defaultTargetPlatform);
       case PrintJobSettingsProperty.copies:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.macOS].contains(platform ?? defaultTargetPlatform);
@@ -1194,8 +1223,10 @@ extension _PrintJobSettingsPropertySupported on PrintJobSettings {
             [TargetPlatform.macOS].contains(platform ?? defaultTargetPlatform);
       case PrintJobSettingsProperty.duplexMode:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.android, TargetPlatform.iOS]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.android,
+              TargetPlatform.iOS,
+            ].contains(platform ?? defaultTargetPlatform);
       case PrintJobSettingsProperty.faxNumber:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.macOS].contains(platform ?? defaultTargetPlatform);
@@ -1210,8 +1241,11 @@ extension _PrintJobSettingsPropertySupported on PrintJobSettings {
             [TargetPlatform.iOS].contains(platform ?? defaultTargetPlatform);
       case PrintJobSettingsProperty.handledByClient:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.android, TargetPlatform.iOS, TargetPlatform.macOS]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.android,
+              TargetPlatform.iOS,
+              TargetPlatform.macOS,
+            ].contains(platform ?? defaultTargetPlatform);
       case PrintJobSettingsProperty.headerAndFooter:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.macOS].contains(platform ?? defaultTargetPlatform);
@@ -1232,8 +1266,11 @@ extension _PrintJobSettingsPropertySupported on PrintJobSettings {
             [TargetPlatform.macOS].contains(platform ?? defaultTargetPlatform);
       case PrintJobSettingsProperty.jobName:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.android, TargetPlatform.iOS, TargetPlatform.macOS]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.android,
+              TargetPlatform.iOS,
+              TargetPlatform.macOS,
+            ].contains(platform ?? defaultTargetPlatform);
       case PrintJobSettingsProperty.jobSavingURL:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.macOS].contains(platform ?? defaultTargetPlatform);
@@ -1242,8 +1279,10 @@ extension _PrintJobSettingsPropertySupported on PrintJobSettings {
             [TargetPlatform.macOS].contains(platform ?? defaultTargetPlatform);
       case PrintJobSettingsProperty.margins:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.iOS, TargetPlatform.macOS]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.iOS,
+              TargetPlatform.macOS,
+            ].contains(platform ?? defaultTargetPlatform);
       case PrintJobSettingsProperty.maximumContentHeight:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.iOS].contains(platform ?? defaultTargetPlatform);
@@ -1252,19 +1291,25 @@ extension _PrintJobSettingsPropertySupported on PrintJobSettings {
             [TargetPlatform.iOS].contains(platform ?? defaultTargetPlatform);
       case PrintJobSettingsProperty.mediaSize:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.android]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.android,
+            ].contains(platform ?? defaultTargetPlatform);
       case PrintJobSettingsProperty.mustCollate:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.macOS].contains(platform ?? defaultTargetPlatform);
       case PrintJobSettingsProperty.numberOfPages:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.iOS, TargetPlatform.macOS]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.iOS,
+              TargetPlatform.macOS,
+            ].contains(platform ?? defaultTargetPlatform);
       case PrintJobSettingsProperty.orientation:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.android, TargetPlatform.iOS, TargetPlatform.macOS]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.android,
+              TargetPlatform.iOS,
+              TargetPlatform.macOS,
+            ].contains(platform ?? defaultTargetPlatform);
       case PrintJobSettingsProperty.outputType:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.iOS].contains(platform ?? defaultTargetPlatform);
@@ -1282,15 +1327,18 @@ extension _PrintJobSettingsPropertySupported on PrintJobSettings {
             [TargetPlatform.macOS].contains(platform ?? defaultTargetPlatform);
       case PrintJobSettingsProperty.resolution:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.android]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.android,
+            ].contains(platform ?? defaultTargetPlatform);
       case PrintJobSettingsProperty.scalingFactor:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.macOS].contains(platform ?? defaultTargetPlatform);
       case PrintJobSettingsProperty.showsNumberOfCopies:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.iOS, TargetPlatform.macOS]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.iOS,
+              TargetPlatform.macOS,
+            ].contains(platform ?? defaultTargetPlatform);
       case PrintJobSettingsProperty.showsPageRange:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.macOS].contains(platform ?? defaultTargetPlatform);
@@ -1299,8 +1347,10 @@ extension _PrintJobSettingsPropertySupported on PrintJobSettings {
             [TargetPlatform.macOS].contains(platform ?? defaultTargetPlatform);
       case PrintJobSettingsProperty.showsPaperOrientation:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.iOS, TargetPlatform.macOS]
-                .contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.iOS,
+              TargetPlatform.macOS,
+            ].contains(platform ?? defaultTargetPlatform);
       case PrintJobSettingsProperty.showsPaperSelectionForLoadedPapers:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.iOS].contains(platform ?? defaultTargetPlatform);

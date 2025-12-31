@@ -766,6 +766,46 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController
   }
 
   @override
+  Future<bool> isInFullscreen() async {
+    return await channel?.invokeMethod<bool>('isInFullscreen', {}) ?? false;
+  }
+
+  @override
+  Future<void> requestEnterFullscreen() async {
+    await channel?.invokeMethod('requestEnterFullscreen', {});
+  }
+
+  @override
+  Future<void> requestExitFullscreen() async {
+    await channel?.invokeMethod('requestExitFullscreen', {});
+  }
+
+  @override
+  Future<void> setVisible({required bool visible}) async {
+    await channel?.invokeMethod('setVisible', visible);
+  }
+
+  @override
+  Future<void> setTargetRefreshRate({required int rate}) async {
+    await channel?.invokeMethod('setTargetRefreshRate', rate);
+  }
+
+  @override
+  Future<int> getTargetRefreshRate() async {
+    return await channel?.invokeMethod<int>('getTargetRefreshRate', {}) ?? 0;
+  }
+
+  @override
+  Future<bool> requestPointerLock() async {
+    return await channel?.invokeMethod<bool>('requestPointerLock', {}) ?? false;
+  }
+
+  @override
+  Future<bool> requestPointerUnlock() async {
+    return await channel?.invokeMethod<bool>('requestPointerUnlock', {}) ?? false;
+  }
+
+  @override
   void dispose({bool isKeepAlive = false}) {
     disposeChannel(removeMethodCallHandler: !isKeepAlive);
   }

@@ -28,8 +28,7 @@ class BaseCallbackResult {
   /**
    * Error handler - called when an error response is received.
    */
-  std::function<void(const std::string& code, const std::string& message)>
-      error;
+  std::function<void(const std::string& code, const std::string& message)> error;
 
   /**
    * Not implemented handler - called when method is not implemented.
@@ -40,9 +39,7 @@ class BaseCallbackResult {
    * Called when result is non-null.
    * Returns true if defaultBehaviour should run.
    */
-  std::function<bool(const T result)> nonNullSuccess = [](const T) {
-    return true;
-  };
+  std::function<bool(const T result)> nonNullSuccess = [](const T) { return true; };
 
   /**
    * Called when result is null.
@@ -53,15 +50,16 @@ class BaseCallbackResult {
   /**
    * Default behaviour to run after success handling.
    */
-  std::function<void(const std::optional<T> result)> defaultBehaviour =
-      [](const std::optional<T>) {};
+  std::function<void(const std::optional<T> result)> defaultBehaviour = [](const std::optional<T>) {
+  };
 
   /**
    * Decode the FlValue result into type T.
    * Must be set by subclasses.
    */
-  std::function<std::optional<T>(FlValue* result)> decodeResult =
-      [](FlValue*) { return std::nullopt; };
+  std::function<std::optional<T>(FlValue* result)> decodeResult = [](FlValue*) {
+    return std::nullopt;
+  };
 
   BaseCallbackResult() = default;
   virtual ~BaseCallbackResult() = default;

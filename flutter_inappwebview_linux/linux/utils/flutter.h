@@ -75,8 +75,7 @@ static inline FlValue* make_fl_value(const std::map<K, V>& map) {
 
 template <typename T>
 static inline FlValue* make_fl_value(const std::optional<T>& optional) {
-  return optional.has_value() ? make_fl_value(optional.value())
-                               : fl_value_new_null();
+  return optional.has_value() ? make_fl_value(optional.value()) : fl_value_new_null();
 }
 
 // ============================================================================
@@ -122,7 +121,8 @@ inline bool get_fl_map_value<bool>(FlValue* map, const char* key, const bool& de
 
 // Specialization for int64_t
 template <>
-inline int64_t get_fl_map_value<int64_t>(FlValue* map, const char* key, const int64_t& defaultValue) {
+inline int64_t get_fl_map_value<int64_t>(FlValue* map, const char* key,
+                                         const int64_t& defaultValue) {
   if (!fl_map_contains_not_null(map, key)) {
     return defaultValue;
   }
@@ -135,7 +135,8 @@ inline int64_t get_fl_map_value<int64_t>(FlValue* map, const char* key, const in
 
 // Specialization for int32_t (uses int64_t internally)
 template <>
-inline int32_t get_fl_map_value<int32_t>(FlValue* map, const char* key, const int32_t& defaultValue) {
+inline int32_t get_fl_map_value<int32_t>(FlValue* map, const char* key,
+                                         const int32_t& defaultValue) {
   if (!fl_map_contains_not_null(map, key)) {
     return defaultValue;
   }
@@ -164,7 +165,8 @@ inline double get_fl_map_value<double>(FlValue* map, const char* key, const doub
 
 // Specialization for std::string
 template <>
-inline std::string get_fl_map_value<std::string>(FlValue* map, const char* key, const std::string& defaultValue) {
+inline std::string get_fl_map_value<std::string>(FlValue* map, const char* key,
+                                                 const std::string& defaultValue) {
   if (!fl_map_contains_not_null(map, key)) {
     return defaultValue;
   }
@@ -177,7 +179,8 @@ inline std::string get_fl_map_value<std::string>(FlValue* map, const char* key, 
 
 // Specialization for std::vector<std::string>
 template <>
-inline std::vector<std::string> get_fl_map_value<std::vector<std::string>>(FlValue* map, const char* key, const std::vector<std::string>& defaultValue) {
+inline std::vector<std::string> get_fl_map_value<std::vector<std::string>>(
+    FlValue* map, const char* key, const std::vector<std::string>& defaultValue) {
   if (!fl_map_contains_not_null(map, key)) {
     return defaultValue;
   }
@@ -261,7 +264,8 @@ inline std::optional<double> get_optional_fl_map_value<double>(FlValue* map, con
 
 // Specialization for std::string
 template <>
-inline std::optional<std::string> get_optional_fl_map_value<std::string>(FlValue* map, const char* key) {
+inline std::optional<std::string> get_optional_fl_map_value<std::string>(FlValue* map,
+                                                                         const char* key) {
   if (!fl_map_contains_not_null(map, key)) {
     return std::nullopt;
   }
@@ -274,7 +278,8 @@ inline std::optional<std::string> get_optional_fl_map_value<std::string>(FlValue
 
 // Specialization for std::vector<std::string>
 template <>
-inline std::optional<std::vector<std::string>> get_optional_fl_map_value<std::vector<std::string>>(FlValue* map, const char* key) {
+inline std::optional<std::vector<std::string>> get_optional_fl_map_value<std::vector<std::string>>(
+    FlValue* map, const char* key) {
   if (!fl_map_contains_not_null(map, key)) {
     return std::nullopt;
   }
@@ -296,7 +301,8 @@ inline std::optional<std::vector<std::string>> get_optional_fl_map_value<std::ve
 
 // Specialization for std::vector<uint8_t>
 template <>
-inline std::optional<std::vector<uint8_t>> get_optional_fl_map_value<std::vector<uint8_t>>(FlValue* map, const char* key) {
+inline std::optional<std::vector<uint8_t>> get_optional_fl_map_value<std::vector<uint8_t>>(
+    FlValue* map, const char* key) {
   if (!fl_map_contains_not_null(map, key)) {
     return std::nullopt;
   }
@@ -311,7 +317,8 @@ inline std::optional<std::vector<uint8_t>> get_optional_fl_map_value<std::vector
 
 // Specialization for std::map<std::string, std::string>
 template <>
-inline std::optional<std::map<std::string, std::string>> get_optional_fl_map_value<std::map<std::string, std::string>>(FlValue* map, const char* key) {
+inline std::optional<std::map<std::string, std::string>>
+get_optional_fl_map_value<std::map<std::string, std::string>>(FlValue* map, const char* key) {
   if (!fl_map_contains_not_null(map, key)) {
     return std::nullopt;
   }

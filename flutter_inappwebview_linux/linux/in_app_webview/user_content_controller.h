@@ -2,7 +2,7 @@
 #define FLUTTER_INAPPWEBVIEW_PLUGIN_USER_CONTENT_CONTROLLER_H_
 
 // WPE WebKit User Content Controller
-// 
+//
 // Manages user scripts and plugin scripts for a WebKitWebView.
 // This is analogous to WKUserContentController in WKWebView.
 
@@ -13,8 +13,8 @@
 #include <string>
 #include <vector>
 
-#include "../types/user_script.h"
 #include "../types/plugin_script.h"
+#include "../types/user_script.h"
 
 namespace flutter_inappwebview_plugin {
 
@@ -46,24 +46,22 @@ class UserContentController {
  private:
   WebKitWebView* webview_ = nullptr;
   WebKitUserContentManager* content_manager_ = nullptr;
-  
+
   std::vector<std::shared_ptr<UserScript>> document_start_scripts_;
   std::vector<std::shared_ptr<UserScript>> document_end_scripts_;
   std::vector<std::unique_ptr<PluginScript>> plugin_scripts_;
   std::vector<std::string> registered_message_handlers_;
-  
+
   ScriptMessageHandler script_message_handler_;
 
   // Helper to convert UserScript to WebKitUserScript
-  WebKitUserScript* createWebKitUserScript(
-      const std::shared_ptr<UserScript>& userScript) const;
-  
+  WebKitUserScript* createWebKitUserScript(const std::shared_ptr<UserScript>& userScript) const;
+
   // Rebuild all scripts (called after add/remove)
   void rebuildScripts();
 
   // Static callback for script message received signal
-  static void onScriptMessageReceived(WebKitUserContentManager* manager,
-                                      JSCValue* value,
+  static void onScriptMessageReceived(WebKitUserContentManager* manager, JSCValue* value,
                                       gpointer user_data);
 };
 

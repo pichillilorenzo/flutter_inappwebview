@@ -29,10 +29,8 @@ class UserScript {
   std::optional<std::vector<std::string>> allowedOriginRules;
   std::shared_ptr<ContentWorld> contentWorld;
 
-  UserScript(const std::optional<std::string>& groupName,
-             const std::string& source,
-             UserScriptInjectionTime injectionTime,
-             bool forMainFrameOnly,
+  UserScript(const std::optional<std::string>& groupName, const std::string& source,
+             UserScriptInjectionTime injectionTime, bool forMainFrameOnly,
              const std::optional<std::vector<std::string>>& allowedOriginRules = std::nullopt,
              std::shared_ptr<ContentWorld> contentWorld = nullptr);
 

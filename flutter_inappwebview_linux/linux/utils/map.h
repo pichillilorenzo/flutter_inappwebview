@@ -14,8 +14,8 @@ struct is_mappish_impl : std::false_type {};
 template <typename T>
 struct is_mappish_impl<
     T, std::void_t<typename T::key_type, typename T::mapped_type,
-                   decltype(std::declval<T&>()[std::declval<
-                       const typename T::key_type&>()])>> : std::true_type {};
+                   decltype(std::declval<T&>()[std::declval<const typename T::key_type&>()])>>
+    : std::true_type {};
 
 template <typename T>
 struct is_mappish : is_mappish_impl<T>::type {};
@@ -32,8 +32,7 @@ static inline T map_at_or_null(const std::map<K, T>& map, const K& key) {
 }
 
 template <typename K, typename T>
-static inline std::optional<T> map_at_optional(const std::map<K, T>& map,
-                                                const K& key) {
+static inline std::optional<T> map_at_optional(const std::map<K, T>& map, const K& key) {
   auto itr = map.find(key);
   return itr != map.end() ? std::make_optional(itr->second) : std::nullopt;
 }

@@ -16,7 +16,7 @@ class WindowIdJS;
 
 /**
  * JavaScript bridge for communication between web content and native code.
- * 
+ *
  * This implementation matches iOS JavaScriptBridgeJS.swift for consistency.
  * It uses webkit.messageHandlers to communicate with native code and includes
  * support for multi-window scenarios via _windowId.
@@ -27,9 +27,7 @@ class JavaScriptBridgeJS {
     _JAVASCRIPT_BRIDGE_NAME = bridgeName;
   }
 
-  static std::string get_JAVASCRIPT_BRIDGE_NAME() {
-    return _JAVASCRIPT_BRIDGE_NAME;
-  }
+  static std::string get_JAVASCRIPT_BRIDGE_NAME() { return _JAVASCRIPT_BRIDGE_NAME; }
 
   inline static const std::string JAVASCRIPT_BRIDGE_JS_PLUGIN_SCRIPT_GROUP_NAME =
       "IN_APP_WEBVIEW_JAVASCRIPT_BRIDGE_JS_PLUGIN_SCRIPT";
@@ -49,14 +47,16 @@ class JavaScriptBridgeJS {
    * JavaScript source code for the bridge.
    * This code sets up window.flutter_inappwebview.callHandler() function
    * which communicates with native code via webkit.messageHandlers.
-   * 
+   *
    * Matches iOS JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_JS_SOURCE()
    */
   static std::string JAVASCRIPT_BRIDGE_JS_SOURCE() {
     return R"JS(
-window.)JS" + get_JAVASCRIPT_BRIDGE_NAME() + R"JS( = {};
+window.)JS" +
+           get_JAVASCRIPT_BRIDGE_NAME() + R"JS( = {};
 (function(window) {
-  var bridgeSecret = ')JS" + VAR_JAVASCRIPT_BRIDGE_BRIDGE_SECRET + R"JS(';
+  var bridgeSecret = ')JS" +
+           VAR_JAVASCRIPT_BRIDGE_BRIDGE_SECRET + R"JS(';
   var _JSON_stringify;
   var _Array_slice;
   var _setTimeout;
@@ -75,8 +75,10 @@ window.)JS" + get_JAVASCRIPT_BRIDGE_NAME() + R"JS( = {};
     _postMessage.call = window.Function.prototype.call;
   } catch (_) { return; }
   
-  window.)JS" + get_JAVASCRIPT_BRIDGE_NAME() + R"JS(.callHandler = function() {
-    var _windowId = )JS" + WINDOW_ID_VARIABLE_JS_SOURCE() + R"JS(;
+  window.)JS" +
+           get_JAVASCRIPT_BRIDGE_NAME() + R"JS(.callHandler = function() {
+    var _windowId = )JS" +
+           WINDOW_ID_VARIABLE_JS_SOURCE() + R"JS(;
     var _callHandlerID = _setTimeout(function(){});
     _postMessage.call(_UserMessageHandler, {
       'handlerName': arguments[0],
@@ -88,7 +90,9 @@ window.)JS" + get_JAVASCRIPT_BRIDGE_NAME() + R"JS( = {};
     
     return new _Promise(function(resolve, reject) {
       try {
-        (window.top === window ? window : window.top).)JS" + get_JAVASCRIPT_BRIDGE_NAME() + R"JS([_callHandlerID] = {resolve: resolve, reject: reject};
+        (window.top === window ? window : window.top).)JS" +
+           get_JAVASCRIPT_BRIDGE_NAME() +
+           R"JS([_callHandlerID] = {resolve: resolve, reject: reject};
       } catch (e) {
         resolve();
       }
@@ -105,10 +109,13 @@ window.)JS" + get_JAVASCRIPT_BRIDGE_NAME() + R"JS( = {};
     return R"JS(
 (function() {
   if ((window.top == null || window.top === window) && 
-      window.)JS" + get_JAVASCRIPT_BRIDGE_NAME() + R"JS( != null && 
-      window.)JS" + get_JAVASCRIPT_BRIDGE_NAME() + R"JS(._platformReady == null) {
+      window.)JS" +
+           get_JAVASCRIPT_BRIDGE_NAME() + R"JS( != null && 
+      window.)JS" +
+           get_JAVASCRIPT_BRIDGE_NAME() + R"JS(._platformReady == null) {
     window.dispatchEvent(new Event('flutterInAppWebViewPlatformReady'));
-    window.)JS" + get_JAVASCRIPT_BRIDGE_NAME() + R"JS(._platformReady = true;
+    window.)JS" +
+           get_JAVASCRIPT_BRIDGE_NAME() + R"JS(._platformReady = true;
   }
 })();
 )JS";
@@ -119,23 +126,19 @@ window.)JS" + get_JAVASCRIPT_BRIDGE_NAME() + R"JS( = {};
    */
   static std::unique_ptr<PluginScript> JAVASCRIPT_BRIDGE_JS_PLUGIN_SCRIPT(
       const std::string& expectedBridgeSecret,
-      const std::optional<std::vector<std::string>>& allowedOriginRules,
-      bool forMainFrameOnly) {
+      const std::optional<std::vector<std::string>>& allowedOriginRules, bool forMainFrameOnly) {
     std::string source = JAVASCRIPT_BRIDGE_JS_SOURCE();
     // Replace the placeholder with the actual secret
     size_t pos = source.find(VAR_JAVASCRIPT_BRIDGE_BRIDGE_SECRET);
     if (pos != std::string::npos) {
       source.replace(pos, VAR_JAVASCRIPT_BRIDGE_BRIDGE_SECRET.length(), expectedBridgeSecret);
     }
-    
+
     return std::make_unique<PluginScript>(
-        JAVASCRIPT_BRIDGE_JS_PLUGIN_SCRIPT_GROUP_NAME,
-        source,
-        UserScriptInjectionTime::atDocumentStart,
-        forMainFrameOnly,
-        allowedOriginRules,
-        nullptr,  // contentWorld
-        true,     // requiredInAllContentWorlds
+        JAVASCRIPT_BRIDGE_JS_PLUGIN_SCRIPT_GROUP_NAME, source,
+        UserScriptInjectionTime::atDocumentStart, forMainFrameOnly, allowedOriginRules,
+        nullptr,                                 // contentWorld
+        true,                                    // requiredInAllContentWorlds
         std::vector<std::string>{"callHandler"}  // messageHandlerNames
     );
   }

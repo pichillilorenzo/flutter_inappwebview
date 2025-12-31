@@ -6,8 +6,7 @@ namespace flutter_inappwebview_plugin {
 
 WebResourceResponse::WebResourceResponse(
     const std::optional<std::string>& contentType,
-    const std::optional<std::string>& contentEncoding,
-    const std::optional<int64_t>& statusCode,
+    const std::optional<std::string>& contentEncoding, const std::optional<int64_t>& statusCode,
     const std::optional<std::string>& reasonPhrase,
     const std::optional<std::map<std::string, std::string>>& headers,
     const std::optional<std::vector<uint8_t>>& data)

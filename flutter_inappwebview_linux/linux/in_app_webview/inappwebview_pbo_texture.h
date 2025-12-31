@@ -8,22 +8,22 @@ G_BEGIN_DECLS
 // Declare the PBO-optimized GL texture type
 #define INAPPWEBVIEW_TYPE_PBO_TEXTURE (inappwebview_pbo_texture_get_type())
 
-G_DECLARE_FINAL_TYPE(InAppWebViewPBOTexture, inappwebview_pbo_texture, INAPPWEBVIEW,
-                     PBO_TEXTURE, FlTextureGL)
+G_DECLARE_FINAL_TYPE(InAppWebViewPBOTexture, inappwebview_pbo_texture, INAPPWEBVIEW, PBO_TEXTURE,
+                     FlTextureGL)
 
 // Forward declaration
 namespace flutter_inappwebview_plugin {
 class InAppWebView;
 using WebViewType = InAppWebView;
-}
+}  // namespace flutter_inappwebview_plugin
 
 /**
  * Create a new InAppWebViewPBOTexture.
- * 
+ *
  * This texture implementation uses OpenGL Pixel Buffer Objects (PBOs) for
  * asynchronous DMA texture uploads, providing better performance than
  * synchronous glTexImage2D calls.
- * 
+ *
  * Features:
  * - Double-buffered PBOs for async upload
  * - glTexSubImage2D for faster updates when size unchanged

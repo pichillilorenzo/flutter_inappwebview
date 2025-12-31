@@ -5,8 +5,7 @@
 namespace flutter_inappwebview_plugin {
 
 WebResourceRequest::WebResourceRequest(
-    const std::optional<std::string>& url,
-    const std::optional<std::string>& method,
+    const std::optional<std::string>& url, const std::optional<std::string>& method,
     const std::optional<std::map<std::string, std::string>>& headers,
     const std::optional<bool>& isForMainFrame)
     : url(url), method(method), headers(headers), isForMainFrame(isForMainFrame) {}

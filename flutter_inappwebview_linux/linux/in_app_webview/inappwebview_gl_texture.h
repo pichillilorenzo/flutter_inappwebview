@@ -8,14 +8,14 @@ G_BEGIN_DECLS
 // Declare the custom GL texture type
 #define INAPPWEBVIEW_TYPE_GL_TEXTURE (inappwebview_gl_texture_get_type())
 
-G_DECLARE_FINAL_TYPE(InAppWebViewGLTexture, inappwebview_gl_texture, INAPPWEBVIEW,
-                     GL_TEXTURE, FlTextureGL)
+G_DECLARE_FINAL_TYPE(InAppWebViewGLTexture, inappwebview_gl_texture, INAPPWEBVIEW, GL_TEXTURE,
+                     FlTextureGL)
 
 // Forward declaration
 namespace flutter_inappwebview_plugin {
 class InAppWebView;
 using WebViewType = InAppWebView;
-}
+}  // namespace flutter_inappwebview_plugin
 
 // Create a new InAppWebViewGLTexture
 InAppWebViewGLTexture* inappwebview_gl_texture_new(

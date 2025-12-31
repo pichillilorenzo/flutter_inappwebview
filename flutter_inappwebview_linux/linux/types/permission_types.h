@@ -42,7 +42,7 @@ class PermissionRequest {
  public:
   std::optional<std::string> origin;
   std::vector<int64_t> resources;
-  
+
   // Reference to the WebKit request to allow/deny later
   WebKitPermissionRequest* webkitRequest;
 
@@ -51,12 +51,11 @@ class PermissionRequest {
   ~PermissionRequest() = default;
 
   FlValue* toFlValue() const;
-  
+
   /**
    * Determine the permission resource type from a WebKitPermissionRequest.
    */
-  static std::vector<PermissionResourceType> getResourceTypes(
-      WebKitPermissionRequest* request);
+  static std::vector<PermissionResourceType> getResourceTypes(WebKitPermissionRequest* request);
 };
 
 /**

@@ -17,8 +17,7 @@ using WebViewType = InAppWebView;
 /// This is similar to the Windows implementation.
 class CustomPlatformView {
  public:
-  CustomPlatformView(FlBinaryMessenger* messenger,
-                     FlTextureRegistrar* texture_registrar,
+  CustomPlatformView(FlBinaryMessenger* messenger, FlTextureRegistrar* texture_registrar,
                      std::shared_ptr<WebViewType> webview);
   ~CustomPlatformView();
 
@@ -38,16 +37,14 @@ class CustomPlatformView {
   bool event_sink_active_ = false;
 
   // Method call handler
-  static void HandleMethodCall(FlMethodChannel* channel,
-                               FlMethodCall* method_call, gpointer user_data);
+  static void HandleMethodCall(FlMethodChannel* channel, FlMethodCall* method_call,
+                               gpointer user_data);
   void HandleMethodCallImpl(FlMethodCall* method_call);
 
   // Event channel handlers
-  static FlMethodErrorResponse* OnListen(FlEventChannel* channel,
-                                         FlValue* args,
+  static FlMethodErrorResponse* OnListen(FlEventChannel* channel, FlValue* args,
                                          gpointer user_data);
-  static FlMethodErrorResponse* OnCancel(FlEventChannel* channel,
-                                         FlValue* args,
+  static FlMethodErrorResponse* OnCancel(FlEventChannel* channel, FlValue* args,
                                          gpointer user_data);
 
   void EmitCursorChanged(const std::string& cursor_name);

@@ -14,10 +14,8 @@ class JavaScriptHandlerFunctionData {
   const bool isMainFrame;
   const std::string args;
 
-  JavaScriptHandlerFunctionData(const std::string& origin,
-                                 const std::string& requestUrl,
-                                 bool isMainFrame,
-                                 const std::string& args);
+  JavaScriptHandlerFunctionData(const std::string& origin, const std::string& requestUrl,
+                                bool isMainFrame, const std::string& args);
   JavaScriptHandlerFunctionData(FlValue* map);
   ~JavaScriptHandlerFunctionData() = default;
 

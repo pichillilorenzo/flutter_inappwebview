@@ -17,8 +17,7 @@ class JsAlertRequest {
   std::string message;
   bool isMainFrame;
 
-  JsAlertRequest(const std::optional<std::string>& url,
-                 const std::string& message,
+  JsAlertRequest(const std::optional<std::string>& url, const std::string& message,
                  bool isMainFrame);
   ~JsAlertRequest() = default;
 
@@ -34,8 +33,7 @@ class JsConfirmRequest {
   std::string message;
   bool isMainFrame;
 
-  JsConfirmRequest(const std::optional<std::string>& url,
-                   const std::string& message,
+  JsConfirmRequest(const std::optional<std::string>& url, const std::string& message,
                    bool isMainFrame);
   ~JsConfirmRequest() = default;
 
@@ -52,10 +50,8 @@ class JsPromptRequest {
   std::optional<std::string> defaultValue;
   bool isMainFrame;
 
-  JsPromptRequest(const std::optional<std::string>& url,
-                  const std::string& message,
-                  const std::optional<std::string>& defaultValue,
-                  bool isMainFrame);
+  JsPromptRequest(const std::optional<std::string>& url, const std::string& message,
+                  const std::optional<std::string>& defaultValue, bool isMainFrame);
   ~JsPromptRequest() = default;
 
   FlValue* toFlValue() const;
@@ -64,19 +60,11 @@ class JsPromptRequest {
 /**
  * Response action for JS dialogs.
  */
-enum class JsAlertResponseAction {
-  CONFIRM = 0
-};
+enum class JsAlertResponseAction { CONFIRM = 0 };
 
-enum class JsConfirmResponseAction {
-  CANCEL = 0,
-  CONFIRM = 1
-};
+enum class JsConfirmResponseAction { CANCEL = 0, CONFIRM = 1 };
 
-enum class JsPromptResponseAction {
-  CANCEL = 0,
-  CONFIRM = 1
-};
+enum class JsPromptResponseAction { CANCEL = 0, CONFIRM = 1 };
 
 /**
  * Response to a JavaScript alert() dialog.

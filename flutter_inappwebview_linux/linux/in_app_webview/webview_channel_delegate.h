@@ -39,8 +39,7 @@ class WebViewChannelDelegate : public ChannelDelegate {
    * Callback for shouldOverrideUrlLoading.
    * Decodes the integer result to NavigationActionPolicy.
    */
-  class ShouldOverrideUrlLoadingCallback
-      : public BaseCallbackResult<NavigationActionPolicy> {
+  class ShouldOverrideUrlLoadingCallback : public BaseCallbackResult<NavigationActionPolicy> {
    public:
     ShouldOverrideUrlLoadingCallback();
     ~ShouldOverrideUrlLoadingCallback() = default;
@@ -107,8 +106,7 @@ class WebViewChannelDelegate : public ChannelDelegate {
   /**
    * Callback for onJsBeforeUnload.
    */
-  class JsBeforeUnloadCallback
-      : public BaseCallbackResult<JsBeforeUnloadResponse> {
+  class JsBeforeUnloadCallback : public BaseCallbackResult<JsBeforeUnloadResponse> {
    public:
     JsBeforeUnloadCallback();
     ~JsBeforeUnloadCallback() = default;
@@ -117,8 +115,7 @@ class WebViewChannelDelegate : public ChannelDelegate {
   /**
    * Callback for onPermissionRequest.
    */
-  class PermissionRequestCallback
-      : public BaseCallbackResult<PermissionResponse> {
+  class PermissionRequestCallback : public BaseCallbackResult<PermissionResponse> {
    public:
     PermissionRequestCallback();
     ~PermissionRequestCallback() = default;
@@ -136,8 +133,7 @@ class WebViewChannelDelegate : public ChannelDelegate {
   /**
    * Callback for onDownloadStarting.
    */
-  class DownloadStartCallback
-      : public BaseCallbackResult<DownloadStartResponse> {
+  class DownloadStartCallback : public BaseCallbackResult<DownloadStartResponse> {
    public:
     DownloadStartCallback();
     ~DownloadStartCallback() = default;
@@ -161,23 +157,20 @@ class WebViewChannelDelegate : public ChannelDelegate {
   void onUpdateVisitedHistory(const std::optional<std::string>& url,
                               const std::optional<bool>& isReload) const;
 
-  void shouldOverrideUrlLoading(
-      std::shared_ptr<NavigationAction> navigationAction,
-      std::unique_ptr<ShouldOverrideUrlLoadingCallback> callback) const;
+  void shouldOverrideUrlLoading(std::shared_ptr<NavigationAction> navigationAction,
+                                std::unique_ptr<ShouldOverrideUrlLoadingCallback> callback) const;
 
   void onReceivedError(std::shared_ptr<WebResourceRequest> request,
                        std::shared_ptr<WebResourceError> error) const;
 
-  void onReceivedHttpError(
-      std::shared_ptr<WebResourceRequest> request,
-      std::shared_ptr<WebResourceResponse> errorResponse) const;
+  void onReceivedHttpError(std::shared_ptr<WebResourceRequest> request,
+                           std::shared_ptr<WebResourceResponse> errorResponse) const;
 
   void onConsoleMessage(const std::string& message, int64_t messageLevel) const;
 
-  void onCallJsHandler(
-      const std::string& handlerName,
-      std::unique_ptr<JavaScriptHandlerFunctionData> data,
-      std::unique_ptr<CallJsHandlerCallback> callback) const;
+  void onCallJsHandler(const std::string& handlerName,
+                       std::unique_ptr<JavaScriptHandlerFunctionData> data,
+                       std::unique_ptr<CallJsHandlerCallback> callback) const;
 
   void onCloseWindow() const;
 
@@ -187,9 +180,8 @@ class WebViewChannelDelegate : public ChannelDelegate {
 
   void onScrollChanged(int64_t x, int64_t y) const;
 
-  void shouldInterceptRequest(
-      std::shared_ptr<WebResourceRequest> request,
-      std::unique_ptr<ShouldInterceptRequestCallback> callback) const;
+  void shouldInterceptRequest(std::shared_ptr<WebResourceRequest> request,
+                              std::unique_ptr<ShouldInterceptRequestCallback> callback) const;
 
   void onWebViewCreated() const;
 
@@ -214,9 +206,8 @@ class WebViewChannelDelegate : public ChannelDelegate {
   void onPermissionRequest(std::unique_ptr<PermissionRequest> request,
                            std::unique_ptr<PermissionRequestCallback> callback) const;
 
-  void onReceivedHttpAuthRequest(
-      std::unique_ptr<HttpAuthenticationChallenge> challenge,
-      std::unique_ptr<HttpAuthRequestCallback> callback) const;
+  void onReceivedHttpAuthRequest(std::unique_ptr<HttpAuthenticationChallenge> challenge,
+                                 std::unique_ptr<HttpAuthRequestCallback> callback) const;
 
   void onDownloadStarting(std::unique_ptr<DownloadStartRequest> request,
                           std::unique_ptr<DownloadStartCallback> callback) const;
@@ -228,11 +219,9 @@ class WebViewChannelDelegate : public ChannelDelegate {
   void onFaviconChanged(const std::optional<std::string>& faviconUrl) const;
 
   // Context menu callbacks
-  void onCreateContextMenu(const std::string& hitTestResultType,
-                           const std::string& extra) const;
+  void onCreateContextMenu(const std::string& hitTestResultType, const std::string& extra) const;
   void onHideContextMenu() const;
-  void onContextMenuActionItemClicked(const std::string& id,
-                                      const std::string& title) const;
+  void onContextMenuActionItemClicked(const std::string& id, const std::string& title) const;
 
  private:
   // Method call handlers

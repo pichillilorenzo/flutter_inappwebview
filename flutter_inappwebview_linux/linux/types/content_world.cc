@@ -8,15 +8,14 @@ namespace flutter_inappwebview_plugin {
 std::shared_ptr<ContentWorld> ContentWorld::pageWorld_;
 std::shared_ptr<ContentWorld> ContentWorld::defaultClientWorld_;
 
-ContentWorld::ContentWorld(const std::string& name)
-    : name(name) {}
+ContentWorld::ContentWorld(const std::string& name) : name(name) {}
 
 ContentWorld::ContentWorld(FlValue* map) {
   if (map == nullptr || fl_value_get_type(map) != FL_VALUE_TYPE_MAP) {
     name = "page";
     return;
   }
-  
+
   name = get_fl_map_value<std::string>(map, "name", "page");
 }
 

@@ -10,17 +10,11 @@
 
 namespace flutter_inappwebview_plugin {
 
-enum class NavigationActionType {
-  linkActivated = 0,
-  backForward,
-  reload,
-  other
-};
+enum class NavigationActionType { linkActivated = 0, backForward, reload, other };
 
 inline std::optional<int64_t> NavigationActionTypeToInteger(
     const std::optional<NavigationActionType>& action) {
-  return action.has_value() ? static_cast<int64_t>(action.value())
-                            : std::optional<int64_t>{};
+  return action.has_value() ? static_cast<int64_t>(action.value()) : std::optional<int64_t>{};
 }
 
 class NavigationAction {

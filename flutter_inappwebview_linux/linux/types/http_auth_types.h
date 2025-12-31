@@ -39,13 +39,12 @@ class URLProtectionSpace {
 
   URLProtectionSpace(const std::string& host, int64_t port,
                      const std::optional<std::string>& protocol,
-                     const std::optional<std::string>& realm,
-                     HttpAuthScheme authenticationMethod,
+                     const std::optional<std::string>& realm, HttpAuthScheme authenticationMethod,
                      bool isProxy);
   ~URLProtectionSpace() = default;
 
   FlValue* toFlValue() const;
-  
+
   static HttpAuthScheme fromWebKitScheme(WebKitAuthenticationScheme scheme);
 };
 
@@ -58,8 +57,7 @@ class HttpAuthenticationChallenge {
   std::optional<std::string> previousFailureCount;  // Number of retry attempts
   bool isRetry;
 
-  HttpAuthenticationChallenge(const URLProtectionSpace& protectionSpace,
-                              bool isRetry);
+  HttpAuthenticationChallenge(const URLProtectionSpace& protectionSpace, bool isRetry);
   ~HttpAuthenticationChallenge() = default;
 
   FlValue* toFlValue() const;
@@ -68,11 +66,7 @@ class HttpAuthenticationChallenge {
 /**
  * HTTP authentication response action.
  */
-enum class HttpAuthResponseAction {
-  CANCEL = 0,
-  PROCEED = 1,
-  USE_SAVED_CREDENTIAL = 2
-};
+enum class HttpAuthResponseAction { CANCEL = 0, PROCEED = 1, USE_SAVED_CREDENTIAL = 2 };
 
 /**
  * Response to an HTTP authentication challenge.

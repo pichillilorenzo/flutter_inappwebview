@@ -1,8 +1,10 @@
 #include "inappwebview_gl_texture.h"
 
 #include <epoxy/gl.h>
+
 #include <cstring>
 
+#include "../utils/log.h"
 #include "in_app_webview.h"
 
 // Private structure for the OpenGL texture
@@ -30,23 +32,12 @@ struct _InAppWebViewGLTexture {
   GMutex mutex;
 };
 
-G_DEFINE_TYPE(InAppWebViewGLTexture, inappwebview_gl_texture,
-              fl_texture_gl_get_type())
-
-namespace {
-bool DebugLogEnabled() {
-  static bool enabled = g_getenv("FLUTTER_INAPPWEBVIEW_LINUX_DEBUG_TEXTURE") != nullptr;
-  return enabled;
-}
-}  // namespace
+G_DEFINE_TYPE(InAppWebViewGLTexture, inappwebview_gl_texture, fl_texture_gl_get_type())
 
 // Populate callback - called by Flutter to get the OpenGL texture
-static gboolean inappwebview_gl_texture_populate(FlTextureGL* texture,
-                                                  uint32_t* target,
-                                                  uint32_t* name,
-                                                  uint32_t* width,
-                                                  uint32_t* height,
-                                                  GError** error) {
+static gboolean inappwebview_gl_texture_populate(FlTextureGL* texture, uint32_t* target,
+                                                 uint32_t* name, uint32_t* width, uint32_t* height,
+                                                 GError** error) {
   InAppWebViewGLTexture* self = INAPPWEBVIEW_GL_TEXTURE(texture);
 
   g_mutex_lock(&self->mutex);
@@ -54,9 +45,6 @@ static gboolean inappwebview_gl_texture_populate(FlTextureGL* texture,
   // Check if we have a valid webview and can get frame data
   if (self->webview == nullptr) {
     g_mutex_unlock(&self->mutex);
-    if (DebugLogEnabled()) {
-      g_message("InAppWebViewGLTexture: populate failed - no webview");
-    }
     return FALSE;
   }
 
@@ -70,18 +58,18 @@ static gboolean inappwebview_gl_texture_populate(FlTextureGL* texture,
     if (!self->default_texture_initialized) {
       glGenTextures(1, &self->default_texture_id);
       glBindTexture(GL_TEXTURE_2D, self->default_texture_id);
-      uint8_t pixel[4] = {0, 0, 0, 0}; // Transparent
+      uint8_t pixel[4] = {0, 0, 0, 0};  // Transparent
       glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, 1, 1, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixel);
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
       self->default_texture_initialized = TRUE;
     }
-    
+
     *target = GL_TEXTURE_2D;
     *name = self->default_texture_id;
     *width = 1;
     *height = 1;
-    
+
     g_mutex_unlock(&self->mutex);
     return TRUE;
   }
@@ -92,10 +80,6 @@ static gboolean inappwebview_gl_texture_populate(FlTextureGL* texture,
     self->frame_buffer = static_cast<uint8_t*>(g_malloc(required_size));
     self->width = buf_width;
     self->height = buf_height;
-    if (DebugLogEnabled()) {
-      g_message("InAppWebViewGLTexture: resized frame buffer to %ux%u (%zu bytes)",
-                buf_width, buf_height, required_size);
-    }
   }
 
   if (self->frame_buffer == nullptr) {
@@ -106,12 +90,9 @@ static gboolean inappwebview_gl_texture_populate(FlTextureGL* texture,
   }
 
   // Copy the pixel data from the webview
-  if (!self->webview->CopyPixelBufferTo(self->frame_buffer, required_size,
-                                        &buf_width, &buf_height)) {
+  if (!self->webview->CopyPixelBufferTo(self->frame_buffer, required_size, &buf_width,
+                                        &buf_height)) {
     g_mutex_unlock(&self->mutex);
-    if (DebugLogEnabled()) {
-      g_message("InAppWebViewGLTexture: failed to copy pixel buffer");
-    }
     return FALSE;
   }
 
@@ -119,9 +100,6 @@ static gboolean inappwebview_gl_texture_populate(FlTextureGL* texture,
   if (!self->texture_initialized) {
     glGenTextures(1, &self->texture_id);
     self->texture_initialized = TRUE;
-    if (DebugLogEnabled()) {
-      g_message("InAppWebViewGLTexture: created GL texture id=%u", self->texture_id);
-    }
   }
 
   // Bind the texture
@@ -129,10 +107,8 @@ static gboolean inappwebview_gl_texture_populate(FlTextureGL* texture,
 
   // Upload frame data to the GPU texture
   // Flutter expects GL_RGBA8 format
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8,
-               static_cast<GLsizei>(self->width),
-               static_cast<GLsizei>(self->height),
-               0, GL_RGBA, GL_UNSIGNED_BYTE,
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, static_cast<GLsizei>(self->width),
+               static_cast<GLsizei>(self->height), 0, GL_RGBA, GL_UNSIGNED_BYTE,
                self->frame_buffer);
 
   // Set texture parameters for proper rendering
@@ -148,13 +124,6 @@ static gboolean inappwebview_gl_texture_populate(FlTextureGL* texture,
   *height = self->height;
 
   g_mutex_unlock(&self->mutex);
-
-  static bool did_log_first_success = false;
-  if (!did_log_first_success && DebugLogEnabled()) {
-    did_log_first_success = true;
-    g_message("InAppWebViewGLTexture: first successful populate %ux%u texture_id=%u",
-              self->width, self->height, self->texture_id);
-  }
 
   return TRUE;
 }
@@ -185,8 +154,8 @@ static void inappwebview_gl_texture_dispose(GObject* object) {
 }
 
 static void inappwebview_gl_texture_class_init(InAppWebViewGLTextureClass* klass) {
-  G_OBJECT_CLASS(klass)->dispose = inappwebview_gl_texture_dispose;
   FL_TEXTURE_GL_CLASS(klass)->populate = inappwebview_gl_texture_populate;
+  G_OBJECT_CLASS(klass)->dispose = inappwebview_gl_texture_dispose;
 }
 
 static void inappwebview_gl_texture_init(InAppWebViewGLTexture* self) {
@@ -204,8 +173,9 @@ static void inappwebview_gl_texture_init(InAppWebViewGLTexture* self) {
 
 InAppWebViewGLTexture* inappwebview_gl_texture_new(
     flutter_inappwebview_plugin::WebViewType* webview) {
-  InAppWebViewGLTexture* self = INAPPWEBVIEW_GL_TEXTURE(
-      g_object_new(INAPPWEBVIEW_TYPE_GL_TEXTURE, nullptr));
+  InAppWebViewGLTexture* self =
+      INAPPWEBVIEW_GL_TEXTURE(g_object_new(INAPPWEBVIEW_TYPE_GL_TEXTURE, nullptr));
   self->webview = webview;
+  flutter_inappwebview_plugin::debugLog("InAppWebViewGLTexture: created");
   return self;
 }

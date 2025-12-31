@@ -22,43 +22,36 @@ template <typename T>
 using is_basic_string = is_string<std::remove_cv_t<T>>;
 
 template <typename T>
-static inline bool string_equals(const std::basic_string<T>& s1,
-                                 const std::basic_string<T>& s2) {
+static inline bool string_equals(const std::basic_string<T>& s1, const std::basic_string<T>& s2) {
   return s1.compare(s2) == 0;
 }
 
 template <typename T>
-static inline bool string_equals(const std::basic_string<T>& s1,
-                                 const char* s2) {
+static inline bool string_equals(const std::basic_string<T>& s1, const char* s2) {
   return s1.compare(s2) == 0;
 }
 
 template <typename T>
-static inline bool string_equals(const char* s1,
-                                 const std::basic_string<T>& s2) {
+static inline bool string_equals(const char* s1, const std::basic_string<T>& s2) {
   return s2.compare(s1) == 0;
 }
 
 template <typename T>
-static inline bool string_equals(
-    const std::optional<std::basic_string<T>>& s1,
-    const std::basic_string<T>& s2) {
+static inline bool string_equals(const std::optional<std::basic_string<T>>& s1,
+                                 const std::basic_string<T>& s2) {
   return s1.has_value() ? string_equals(s1.value(), s2) : false;
 }
 
 template <typename T>
-static inline bool string_equals(
-    const std::basic_string<T>& s1,
-    const std::optional<std::basic_string<T>>& s2) {
+static inline bool string_equals(const std::basic_string<T>& s1,
+                                 const std::optional<std::basic_string<T>>& s2) {
   return s2.has_value() ? string_equals(s1, s2.value()) : false;
 }
 
 template <typename T>
-static inline bool string_equals(
-    const std::optional<std::basic_string<T>>& s1,
-    const std::optional<std::basic_string<T>>& s2) {
-  return s1.has_value() && s2.has_value() ? string_equals(s1.value(), s2.value())
-                                          : true;
+static inline bool string_equals(const std::optional<std::basic_string<T>>& s1,
+                                 const std::optional<std::basic_string<T>>& s2) {
+  return s1.has_value() && s2.has_value() ? string_equals(s1.value(), s2.value()) : true;
 }
 
 static inline void replace_all(std::string& source, const std::string& from,
@@ -81,8 +74,7 @@ static inline void replace_all(std::string& source, const std::string& from,
   source.swap(newString);
 }
 
-static inline std::string replace_all_copy(const std::string& source,
-                                           const std::string& from,
+static inline std::string replace_all_copy(const std::string& source, const std::string& from,
                                            const std::string& to) {
   std::string newString;
   newString.reserve(source.length());  // avoids a few memory allocations
@@ -103,31 +95,27 @@ static inline std::string replace_all_copy(const std::string& source,
 }
 
 template <typename T>
-static inline std::basic_string<T> join(
-    const std::vector<std::basic_string<T>>& vec,
-    const std::basic_string<T>& delim) {
-  return vec.empty()
-             ? std::basic_string<T>{""}
-             : std::accumulate(
-                   ++vec.begin(), vec.end(), *vec.begin(),
-                   [&delim](auto& a, auto& b) { return a + delim + b; });
+static inline std::basic_string<T> join(const std::vector<std::basic_string<T>>& vec,
+                                        const std::basic_string<T>& delim) {
+  return vec.empty() ? std::basic_string<T>{""}
+                     : std::accumulate(++vec.begin(), vec.end(), *vec.begin(),
+                                       [&delim](auto& a, auto& b) { return a + delim + b; });
 }
 
 template <typename T>
-static inline std::basic_string<T> join(
-    const std::vector<std::basic_string<T>>& vec, const char* delim) {
+static inline std::basic_string<T> join(const std::vector<std::basic_string<T>>& vec,
+                                        const char* delim) {
   return join(vec, std::basic_string<T>{delim});
 }
 
 template <typename T>
-static inline std::vector<std::basic_string<T>> split(
-    const std::basic_string<T>& s, std::basic_string<T> delimiter) {
+static inline std::vector<std::basic_string<T>> split(const std::basic_string<T>& s,
+                                                      std::basic_string<T> delimiter) {
   size_t pos_start = 0, pos_end, delim_len = delimiter.length();
   std::basic_string<T> token;
   std::vector<std::basic_string<T>> res;
 
-  while ((pos_end = s.find(delimiter, pos_start)) !=
-         std::basic_string<T>::npos) {
+  while ((pos_end = s.find(delimiter, pos_start)) != std::basic_string<T>::npos) {
     token = s.substr(pos_start, pos_end - pos_start);
     pos_start = pos_end + delim_len;
     res.push_back(token);
@@ -166,22 +154,20 @@ std::basic_string<T> to_uppercase_copy(const std::basic_string<T>& s) {
 }
 
 template <typename T>
-bool starts_with(const std::basic_string<T>& str,
-                 const std::basic_string<T>& prefix) {
-  return str.size() >= prefix.size() &&
-         str.compare(0, prefix.size(), prefix) == 0;
+bool starts_with(const std::basic_string<T>& str, const std::basic_string<T>& prefix) {
+  return str.size() >= prefix.size() && str.compare(0, prefix.size(), prefix) == 0;
 }
 
 template <typename T>
-bool ends_with(const std::basic_string<T>& str,
-               const std::basic_string<T>& suffix) {
+bool ends_with(const std::basic_string<T>& str, const std::basic_string<T>& suffix) {
   return str.size() >= suffix.size() &&
          str.compare(str.size() - suffix.size(), suffix.size(), suffix) == 0;
 }
 
 constexpr uint32_t string_hash(const std::string_view data) noexcept {
   uint32_t hash = 5381;
-  for (const auto& e : data) hash = ((hash << 5) + hash) + e;
+  for (const auto& e : data)
+    hash = ((hash << 5) + hash) + e;
   return hash;
 };
 

@@ -28,8 +28,8 @@ class InAppWebViewManager {
   CustomPlatformView* GetPlatformView(int64_t id) const;
 
   // Handle method calls from Flutter
-  static void HandleMethodCall(FlMethodChannel* channel,
-                               FlMethodCall* method_call, gpointer user_data);
+  static void HandleMethodCall(FlMethodChannel* channel, FlMethodCall* method_call,
+                               gpointer user_data);
 
  private:
   FlPluginRegistrar* registrar_ = nullptr;

@@ -9,11 +9,11 @@ namespace flutter_inappwebview_plugin {
 
 /**
  * JavaScript for managing window IDs in multi-window scenarios.
- * 
+ *
  * This matches the iOS WindowIdJS.swift implementation.
  * Window IDs are used to route JavaScript bridge calls to the correct
  * webview when using window.open() or similar multi-window features.
- * 
+ *
  * Note: The WINDOW_ID_VARIABLE_JS_SOURCE() function is now in JavaScriptBridgeJS
  * to avoid circular dependencies. This class provides the initialization script.
  */
@@ -35,8 +35,10 @@ class WindowIdJS {
   static std::string WINDOW_ID_INITIALIZE_JS_SOURCE() {
     return R"JS(
 (function() {
-    )JS" + JavaScriptBridgeJS::WINDOW_ID_VARIABLE_JS_SOURCE() + R"JS( = )JS" + VAR_PLACEHOLDER_VALUE + R"JS(;
-    return )JS" + JavaScriptBridgeJS::WINDOW_ID_VARIABLE_JS_SOURCE() + R"JS(;
+    )JS" + JavaScriptBridgeJS::WINDOW_ID_VARIABLE_JS_SOURCE() +
+           R"JS( = )JS" + VAR_PLACEHOLDER_VALUE + R"JS(;
+    return )JS" +
+           JavaScriptBridgeJS::WINDOW_ID_VARIABLE_JS_SOURCE() + R"JS(;
 })()
 )JS";
   }

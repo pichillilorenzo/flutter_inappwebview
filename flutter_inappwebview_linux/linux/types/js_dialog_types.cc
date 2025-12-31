@@ -6,63 +6,55 @@ namespace flutter_inappwebview_plugin {
 
 // === JsAlertRequest ===
 
-JsAlertRequest::JsAlertRequest(const std::optional<std::string>& url,
-                               const std::string& message,
+JsAlertRequest::JsAlertRequest(const std::optional<std::string>& url, const std::string& message,
                                bool isMainFrame)
     : url(url), message(message), isMainFrame(isMainFrame) {}
 
 FlValue* JsAlertRequest::toFlValue() const {
   FlValue* map = fl_value_new_map();
-  
+
   if (url.has_value()) {
-    fl_value_set_string_take(map, "url",
-                             fl_value_new_string(url.value().c_str()));
+    fl_value_set_string_take(map, "url", fl_value_new_string(url.value().c_str()));
   } else {
     fl_value_set_string_take(map, "url", fl_value_new_null());
   }
   fl_value_set_string_take(map, "message", fl_value_new_string(message.c_str()));
   fl_value_set_string_take(map, "isMainFrame", fl_value_new_bool(isMainFrame));
-  
+
   return map;
 }
 
 // === JsConfirmRequest ===
 
 JsConfirmRequest::JsConfirmRequest(const std::optional<std::string>& url,
-                                   const std::string& message,
-                                   bool isMainFrame)
+                                   const std::string& message, bool isMainFrame)
     : url(url), message(message), isMainFrame(isMainFrame) {}
 
 FlValue* JsConfirmRequest::toFlValue() const {
   FlValue* map = fl_value_new_map();
-  
+
   if (url.has_value()) {
-    fl_value_set_string_take(map, "url",
-                             fl_value_new_string(url.value().c_str()));
+    fl_value_set_string_take(map, "url", fl_value_new_string(url.value().c_str()));
   } else {
     fl_value_set_string_take(map, "url", fl_value_new_null());
   }
   fl_value_set_string_take(map, "message", fl_value_new_string(message.c_str()));
   fl_value_set_string_take(map, "isMainFrame", fl_value_new_bool(isMainFrame));
-  
+
   return map;
 }
 
 // === JsPromptRequest ===
 
-JsPromptRequest::JsPromptRequest(const std::optional<std::string>& url,
-                                 const std::string& message,
-                                 const std::optional<std::string>& defaultValue,
-                                 bool isMainFrame)
-    : url(url), message(message), defaultValue(defaultValue),
-      isMainFrame(isMainFrame) {}
+JsPromptRequest::JsPromptRequest(const std::optional<std::string>& url, const std::string& message,
+                                 const std::optional<std::string>& defaultValue, bool isMainFrame)
+    : url(url), message(message), defaultValue(defaultValue), isMainFrame(isMainFrame) {}
 
 FlValue* JsPromptRequest::toFlValue() const {
   FlValue* map = fl_value_new_map();
-  
+
   if (url.has_value()) {
-    fl_value_set_string_take(map, "url",
-                             fl_value_new_string(url.value().c_str()));
+    fl_value_set_string_take(map, "url", fl_value_new_string(url.value().c_str()));
   } else {
     fl_value_set_string_take(map, "url", fl_value_new_null());
   }
@@ -74,7 +66,7 @@ FlValue* JsPromptRequest::toFlValue() const {
     fl_value_set_string_take(map, "defaultValue", fl_value_new_null());
   }
   fl_value_set_string_take(map, "isMainFrame", fl_value_new_bool(isMainFrame));
-  
+
   return map;
 }
 
@@ -88,7 +80,7 @@ JsAlertResponse::JsAlertResponse(FlValue* map)
   if (map == nullptr || fl_value_get_type(map) != FL_VALUE_TYPE_MAP) {
     return;
   }
-  
+
   handledByClient = get_fl_map_value(map, "handledByClient", handledByClient);
   int64_t actionInt = get_fl_map_value<int64_t>(map, "action", 0);
   action = static_cast<JsAlertResponseAction>(actionInt);
@@ -105,7 +97,7 @@ JsConfirmResponse::JsConfirmResponse(FlValue* map)
   if (map == nullptr || fl_value_get_type(map) != FL_VALUE_TYPE_MAP) {
     return;
   }
-  
+
   handledByClient = get_fl_map_value(map, "handledByClient", handledByClient);
   int64_t actionInt = get_fl_map_value<int64_t>(map, "action", 0);
   action = static_cast<JsConfirmResponseAction>(actionInt);
@@ -121,7 +113,7 @@ JsPromptResponse::JsPromptResponse(FlValue* map)
   if (map == nullptr || fl_value_get_type(map) != FL_VALUE_TYPE_MAP) {
     return;
   }
-  
+
   handledByClient = get_fl_map_value(map, "handledByClient", handledByClient);
   int64_t actionInt = get_fl_map_value<int64_t>(map, "action", 0);
   action = static_cast<JsPromptResponseAction>(actionInt);
@@ -138,7 +130,7 @@ JsBeforeUnloadResponse::JsBeforeUnloadResponse(FlValue* map)
   if (map == nullptr || fl_value_get_type(map) != FL_VALUE_TYPE_MAP) {
     return;
   }
-  
+
   handledByClient = get_fl_map_value(map, "handledByClient", handledByClient);
   // Action 1 = allow navigation
   int64_t actionInt = get_fl_map_value<int64_t>(map, "action", 1);

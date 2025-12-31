@@ -5,23 +5,24 @@
 
 #include "in_app_webview.h"
 
+#include <linux/limits.h>
+#include <unistd.h>
 
 #include <algorithm>
 #include <cstring>
-#include <random>
-#include <unistd.h>
-#include <linux/limits.h>
 #include <nlohmann/json.hpp>
+#include <random>
 
 // Use epoxy for OpenGL/EGL instead of direct headers to avoid conflicts
 #include <epoxy/egl.h>
 #include <epoxy/gl.h>
+#include <wayland-server.h>
 #include <wpe/fdo-egl.h>
 #include <wpe/unstable/fdo-shm.h>
-#include <wayland-server.h>
 
-#include "../plugin_scripts_js/javascript_bridge_js.h"
 #include "../plugin_scripts_js/console_log_js.h"
+#include "../plugin_scripts_js/javascript_bridge_js.h"
+#include "../types/create_window_action.h"
 #include "../types/navigation_action.h"
 #include "../types/web_resource_error.h"
 #include "../types/web_resource_request.h"
@@ -29,7 +30,6 @@
 #include "../utils/log.h"
 #include "user_content_controller.h"
 #include "webview_channel_delegate.h"
-#include "../types/create_window_action.h"
 
 using json = nlohmann::json;
 
@@ -49,13 +49,9 @@ class InAppWebView;
 
 // C-style callback functions outside the namespace for C API compatibility
 extern "C" {
-static void wpe_export_fdo_egl_image_callback(
-    void* data, 
-    struct wpe_fdo_egl_exported_image* image);
+static void wpe_export_fdo_egl_image_callback(void* data, struct wpe_fdo_egl_exported_image* image);
 
-static void wpe_export_shm_buffer_callback(
-    void* data,
-    struct wpe_fdo_shm_exported_buffer* buffer);
+static void wpe_export_shm_buffer_callback(void* data, struct wpe_fdo_shm_exported_buffer* buffer);
 }
 
 namespace flutter_inappwebview_plugin {
@@ -72,18 +68,13 @@ std::string GenerateRandomSecret(size_t length = 32) {
   std::random_device rd;
   std::mt19937 gen(rd());
   std::uniform_int_distribution<> dis(0, 15);
-  
+
   std::string result;
   result.reserve(length);
   for (size_t i = 0; i < length; ++i) {
     result += hex_chars[dis(gen)];
   }
   return result;
-}
-
-bool DebugLogEnabled() {
-  static bool enabled = g_getenv("FLUTTER_INAPPWEBVIEW_LINUX_DEBUG") != nullptr;
-  return enabled;
 }
 
 }  // namespace
@@ -107,12 +98,12 @@ bool InAppWebView::IsWpeWebKitAvailable() {
   // Check if WPE FDO is available
   static bool checked = false;
   static bool available = false;
-  
+
   if (checked) {
     return available;
   }
   checked = true;
-  
+
   // Try to load the WPE backend library
   // First, try to load from the bundled lib/ directory using the full path.
   // This allows the app to run without setting LD_LIBRARY_PATH.
@@ -120,17 +111,13 @@ bool InAppWebView::IsWpeWebKitAvailable() {
   if (!exe_dir.empty()) {
     std::string bundled_lib_path = exe_dir + "/lib/libWPEBackend-fdo-1.0.so.1";
     std::string bundled_lib_dir = exe_dir + "/lib";
-    
-    if (DebugLogEnabled()) {
-      g_message("InAppWebView: Trying bundled WPE backend: %s", bundled_lib_path.c_str());
-    }
-    
+
     // Check if the bundled library exists
     if (access(bundled_lib_path.c_str(), F_OK) == 0) {
       // Set environment variables for the WPE WebProcess child process.
       // The web process spawned by WebKit also needs to find the backend library.
       setenv("WPE_BACKEND_LIBRARY", bundled_lib_path.c_str(), 0);
-      
+
       // Also prepend the lib directory to LD_LIBRARY_PATH so the web process
       // can find all bundled WPE libraries.
       const char* current_ld_path = getenv("LD_LIBRARY_PATH");
@@ -140,45 +127,24 @@ bool InAppWebView::IsWpeWebKitAvailable() {
         new_ld_path += current_ld_path;
       }
       setenv("LD_LIBRARY_PATH", new_ld_path.c_str(), 1);
-      
-      if (DebugLogEnabled()) {
-        g_message("InAppWebView: Set WPE_BACKEND_LIBRARY=%s", bundled_lib_path.c_str());
-        g_message("InAppWebView: Set LD_LIBRARY_PATH=%s", new_ld_path.c_str());
-      }
-      
+
       available = wpe_loader_init(bundled_lib_path.c_str()) != 0;
-      if (available && DebugLogEnabled()) {
-        g_message("InAppWebView: Loaded bundled WPE backend successfully");
-      }
     }
   }
-  
+
   // Fall back to system library if bundled version not found or failed to load
   if (!available) {
-    if (DebugLogEnabled()) {
-      g_message("InAppWebView: Falling back to system WPE backend");
-    }
     available = wpe_loader_init("libWPEBackend-fdo-1.0.so.1") != 0;
   }
-  
-  if (DebugLogEnabled()) {
-    g_message("InAppWebView: WPE WebKit %s", 
-              available ? "available" : "not available");
-  }
-  
+
   return available;
 }
 
 InAppWebView::InAppWebView(FlBinaryMessenger* messenger, int64_t id,
-                                 const InAppWebViewCreationParams& params)
-    : id_(id),
-      settings_(params.initialSettings) {
-  if (DebugLogEnabled()) {
-    g_message("InAppWebView[%ld]: ctor", static_cast<long>(id_));
-  }
-  
+                           const InAppWebViewCreationParams& params)
+    : id_(id), settings_(params.initialSettings) {
   js_bridge_secret_ = GenerateRandomSecret();
-  
+
   InitWpeBackend();
   InitWebView(params);
   RegisterEventHandlers();
@@ -191,11 +157,6 @@ InAppWebView::InAppWebView(FlBinaryMessenger* messenger, int64_t id,
   // Load initial content
   if (params.initialUrlRequest.has_value()) {
     auto& urlRequest = params.initialUrlRequest.value();
-    if (DebugLogEnabled()) {
-      g_message("InAppWebView[%ld]: initialUrlRequest url=%s",
-                static_cast<long>(id_),
-                urlRequest->url.value_or("").c_str());
-    }
     loadUrl(urlRequest);
   } else if (params.initialData.has_value()) {
     std::string mimeType = params.initialDataMimeType.value_or("text/html");
@@ -207,27 +168,19 @@ InAppWebView::InAppWebView(FlBinaryMessenger* messenger, int64_t id,
   }
 }
 
-void InAppWebView::AttachChannel(FlBinaryMessenger* messenger,
-                                    int64_t channel_id) {
+void InAppWebView::AttachChannel(FlBinaryMessenger* messenger, int64_t channel_id) {
   channel_id_ = channel_id;
   if (messenger == nullptr) {
-    g_warning("InAppWebView[%ld]: AttachChannel messenger is null", 
-              static_cast<long>(id_));
+    errorLog("InAppWebView: AttachChannel messenger is null");
     return;
   }
-  
-  std::string channelName = std::string(METHOD_CHANNEL_NAME_PREFIX) + 
-                            std::to_string(channel_id_);
-  channel_delegate_ = std::make_unique<WebViewChannelDelegate>(
-      this, messenger, channelName);
-  
-  if (DebugLogEnabled()) {
-    g_message("InAppWebView[%ld]: attached channel id=%ld", 
-              static_cast<long>(id_), static_cast<long>(channel_id_));
-  }
+
+  std::string channelName = std::string(METHOD_CHANNEL_NAME_PREFIX) + std::to_string(channel_id_);
+  channel_delegate_ = std::make_unique<WebViewChannelDelegate>(this, messenger, channelName);
 }
 
 InAppWebView::~InAppWebView() {
+  debugLog("dealloc InAppWebView");
   // IMPORTANT: Clean up user content controller FIRST while webview is still valid
   // The UserContentController destructor needs access to WebKit's user content manager
   // which becomes invalid after we unref the webview
@@ -241,8 +194,8 @@ InAppWebView::~InAppWebView() {
 
   // Clean up exported image (use global namespace for C API)
   if (exported_image_ != nullptr && exportable_ != nullptr) {
-    ::wpe_view_backend_exportable_fdo_egl_dispatch_release_exported_image(
-        exportable_, exported_image_);
+    ::wpe_view_backend_exportable_fdo_egl_dispatch_release_exported_image(exportable_,
+                                                                          exported_image_);
     exported_image_ = nullptr;
   }
 
@@ -254,30 +207,22 @@ InAppWebView::~InAppWebView() {
 }
 
 void InAppWebView::InitWpeBackend() {
-  if (DebugLogEnabled()) {
-    g_message("InAppWebView[%ld]: InitWpeBackend %dx%d (scale=%0.2f)",
-              static_cast<long>(id_), width_, height_, scale_factor_);
-  }
-
   // Initialize WPE loader first - this must be done before wpe_fdo_initialize_for_egl_display
   if (!IsWpeWebKitAvailable()) {
-    g_warning("InAppWebView[%ld]: WPE WebKit not available", static_cast<long>(id_));
+    errorLog("InAppWebView: WPE WebKit not available");
     return;
   }
 
   // Get EGL display from GDK
   EGLDisplay egl_display = EGL_NO_DISPLAY;
   GdkDisplay* gdk_display = gdk_display_get_default();
-  
+
   if (gdk_display != nullptr) {
 #ifdef GDK_WINDOWING_WAYLAND
     if (GDK_IS_WAYLAND_DISPLAY(gdk_display)) {
       struct wl_display* wl_display = gdk_wayland_display_get_wl_display(gdk_display);
       if (wl_display != nullptr) {
         egl_display = eglGetDisplay((EGLNativeDisplayType)wl_display);
-        if (DebugLogEnabled()) {
-          g_message("InAppWebView[%ld]: Using Wayland EGL display", static_cast<long>(id_));
-        }
       }
     }
 #endif
@@ -286,9 +231,6 @@ void InAppWebView::InitWpeBackend() {
       Display* x11_display = gdk_x11_display_get_xdisplay(gdk_display);
       if (x11_display != nullptr) {
         egl_display = eglGetDisplay((EGLNativeDisplayType)x11_display);
-        if (DebugLogEnabled()) {
-          g_message("InAppWebView[%ld]: Using X11 EGL display", static_cast<long>(id_));
-        }
       }
     }
 #endif
@@ -297,21 +239,14 @@ void InAppWebView::InitWpeBackend() {
   // If we couldn't get an EGL display, try the default
   if (egl_display == EGL_NO_DISPLAY) {
     egl_display = eglGetDisplay(EGL_DEFAULT_DISPLAY);
-    if (DebugLogEnabled()) {
-      g_message("InAppWebView[%ld]: Using default EGL display", static_cast<long>(id_));
-    }
   }
 
   // Initialize EGL if needed
   if (egl_display != EGL_NO_DISPLAY) {
     EGLint major, minor;
     if (!eglInitialize(egl_display, &major, &minor)) {
-      g_warning("InAppWebView[%ld]: Failed to initialize EGL: 0x%x", 
-                static_cast<long>(id_), eglGetError());
+      errorLog("InAppWebView: Failed to initialize EGL");
       egl_display = EGL_NO_DISPLAY;
-    } else if (DebugLogEnabled()) {
-      g_message("InAppWebView[%ld]: EGL initialized: %d.%d", 
-                static_cast<long>(id_), major, minor);
     }
   }
 
@@ -320,44 +255,35 @@ void InAppWebView::InitWpeBackend() {
 
   // Initialize WPE FDO with the EGL display
   if (!wpe_fdo_initialize_for_egl_display(egl_display)) {
-    g_warning("InAppWebView[%ld]: Failed to initialize WPE FDO (display=%p)", 
-              static_cast<long>(id_), (void*)egl_display);
+    errorLog("InAppWebView: Failed to initialize WPE FDO");
     // Try again with headless mode
     if (!wpe_fdo_initialize_for_egl_display(EGL_NO_DISPLAY)) {
-      g_warning("InAppWebView[%ld]: Failed to initialize WPE FDO in headless mode", 
-                static_cast<long>(id_));
-      return;
-    }
-    if (DebugLogEnabled()) {
-      g_message("InAppWebView[%ld]: Using WPE FDO in headless mode", static_cast<long>(id_));
+      errorLog("InAppWebView: Failed to initialize WPE FDO in headless mode");
     }
   }
 
   // Create the exportable backend for DMA-BUF export
   // Note: The callbacks use the void* data parameter to access 'this'
   static struct wpe_view_backend_exportable_fdo_egl_client exportable_client = {
-    // export_egl_image callback (legacy)
-    nullptr,
-    // export_fdo_egl_image callback (C function outside namespace)
-    wpe_export_fdo_egl_image_callback,
-    // export_shm_buffer callback for software rendering fallback
-    wpe_export_shm_buffer_callback,
-    // reserved
-    nullptr,
-    nullptr
-  };
+      // export_egl_image callback (legacy)
+      nullptr,
+      // export_fdo_egl_image callback (C function outside namespace)
+      wpe_export_fdo_egl_image_callback,
+      // export_shm_buffer callback for software rendering fallback
+      wpe_export_shm_buffer_callback,
+      // reserved
+      nullptr, nullptr};
 
-  exportable_ = wpe_view_backend_exportable_fdo_egl_create(
-      &exportable_client, this, width_, height_);
-  
+  exportable_ =
+      wpe_view_backend_exportable_fdo_egl_create(&exportable_client, this, width_, height_);
+
   if (exportable_ == nullptr) {
-    g_warning("InAppWebView[%ld]: Failed to create WPE exportable backend",
-              static_cast<long>(id_));
+    errorLog("InAppWebView: Failed to create WPE exportable backend");
     return;
   }
 
   wpe_backend_ = wpe_view_backend_exportable_fdo_get_view_backend(exportable_);
-  
+
   // Create WebKit backend wrapper
   backend_ = webkit_web_view_backend_new(
       wpe_backend_,
@@ -396,17 +322,11 @@ void InAppWebView::InitWpeBackend() {
         return self->OnPointerLockRequest(lock);
       },
       this);
-
-  if (DebugLogEnabled()) {
-    g_message("InAppWebView[%ld]: WPE backend created successfully",
-              static_cast<long>(id_));
-  }
 }
 
 void InAppWebView::InitWebView(const InAppWebViewCreationParams& params) {
   if (backend_ == nullptr) {
-    g_warning("InAppWebView[%ld]: Cannot create webview without backend",
-              static_cast<long>(id_));
+    errorLog("InAppWebView: Cannot create webview without backend");
     return;
   }
 
@@ -421,10 +341,9 @@ void InAppWebView::InitWebView(const InAppWebViewCreationParams& params) {
   // Create the web view with the WPE backend
   // WPE 2.0 API: webkit_web_view_new takes the backend
   webview_ = webkit_web_view_new(backend_);
-  
+
   if (webview_ == nullptr) {
-    g_warning("InAppWebView[%ld]: Failed to create WebKitWebView",
-              static_cast<long>(id_));
+    errorLog("InAppWebView: Failed to create WebKitWebView");
     return;
   }
 
@@ -433,16 +352,11 @@ void InAppWebView::InitWebView(const InAppWebViewCreationParams& params) {
   g_object_unref(settings);
 
   // Set background color
-  WebKitColor bg = { 1.0, 1.0, 1.0, 1.0 };
+  WebKitColor bg = {1.0, 1.0, 1.0, 1.0};
   webkit_web_view_set_background_color(webview_, &bg);
 
   // Create user content controller
   user_content_controller_ = std::make_unique<UserContentController>(webview_);
-
-  if (DebugLogEnabled()) {
-    g_message("InAppWebView[%ld]: WebView created with WPE backend",
-              static_cast<long>(id_));
-  }
 }
 
 void InAppWebView::RegisterEventHandlers() {
@@ -456,7 +370,7 @@ void InAppWebView::RegisterEventHandlers() {
         [this](const std::string& name, const std::string& body) {
           handleScriptMessage(name, body);
         });
-    
+
     // Add the JavaScript bridge plugin script
     auto jsBridgeScript = JavaScriptBridgeJS::JAVASCRIPT_BRIDGE_JS_PLUGIN_SCRIPT(
         js_bridge_secret_,
@@ -464,76 +378,58 @@ void InAppWebView::RegisterEventHandlers() {
         false          // forMainFrameOnly - inject in all frames
     );
     user_content_controller_->addPluginScript(std::move(jsBridgeScript));
-    
+
     // Add the console log interception script
     auto consoleLogScript = ConsoleLogJS::CONSOLE_LOG_JS_PLUGIN_SCRIPT(std::nullopt);
     user_content_controller_->addPluginScript(std::move(consoleLogScript));
-    
-    if (DebugLogEnabled()) {
-      g_message("InAppWebView[%ld]: JavaScript bridge and console log initialized",
-                static_cast<long>(id_));
-    }
   }
 
   // Connect to load-changed signal
-  g_signal_connect(webview_, "load-changed",
-                   G_CALLBACK(OnLoadChanged), this);
+  g_signal_connect(webview_, "load-changed", G_CALLBACK(OnLoadChanged), this);
 
   // Connect to decide-policy signal
-  g_signal_connect(webview_, "decide-policy",
-                   G_CALLBACK(OnDecidePolicy), this);
+  g_signal_connect(webview_, "decide-policy", G_CALLBACK(OnDecidePolicy), this);
 
   // Connect to notify::estimated-load-progress signal
   g_signal_connect(webview_, "notify::estimated-load-progress",
                    G_CALLBACK(OnNotifyEstimatedLoadProgress), this);
 
   // Connect to notify::title signal
-  g_signal_connect(webview_, "notify::title",
-                   G_CALLBACK(OnNotifyTitle), this);
+  g_signal_connect(webview_, "notify::title", G_CALLBACK(OnNotifyTitle), this);
 
   // Connect to load-failed signal
-  g_signal_connect(webview_, "load-failed",
-                   G_CALLBACK(OnLoadFailed), this);
+  g_signal_connect(webview_, "load-failed", G_CALLBACK(OnLoadFailed), this);
 
   // Connect to load-failed-with-tls-errors signal
-  g_signal_connect(webview_, "load-failed-with-tls-errors",
-                   G_CALLBACK(OnLoadFailedWithTlsErrors), this);
+  g_signal_connect(webview_, "load-failed-with-tls-errors", G_CALLBACK(OnLoadFailedWithTlsErrors),
+                   this);
 
   // Connect to close signal
-  g_signal_connect(webview_, "close",
-                   G_CALLBACK(OnCloseRequest), this);
+  g_signal_connect(webview_, "close", G_CALLBACK(OnCloseRequest), this);
 
   // Connect to script-dialog signal
-  g_signal_connect(webview_, "script-dialog",
-                   G_CALLBACK(OnScriptDialog), this);
+  g_signal_connect(webview_, "script-dialog", G_CALLBACK(OnScriptDialog), this);
 
   // Connect to permission-request signal
-  g_signal_connect(webview_, "permission-request",
-                   G_CALLBACK(OnPermissionRequest), this);
+  g_signal_connect(webview_, "permission-request", G_CALLBACK(OnPermissionRequest), this);
 
   // Connect to authenticate signal
-  g_signal_connect(webview_, "authenticate",
-                   G_CALLBACK(OnAuthenticate), this);
+  g_signal_connect(webview_, "authenticate", G_CALLBACK(OnAuthenticate), this);
 
   // Connect to context-menu signal
-  g_signal_connect(webview_, "context-menu",
-                   G_CALLBACK(OnContextMenu), this);
+  g_signal_connect(webview_, "context-menu", G_CALLBACK(OnContextMenu), this);
 
   // Connect to enter-fullscreen signal
-  g_signal_connect(webview_, "enter-fullscreen",
-                   G_CALLBACK(OnEnterFullscreen), this);
+  g_signal_connect(webview_, "enter-fullscreen", G_CALLBACK(OnEnterFullscreen), this);
 
   // Connect to leave-fullscreen signal
-  g_signal_connect(webview_, "leave-fullscreen",
-                   G_CALLBACK(OnLeaveFullscreen), this);
+  g_signal_connect(webview_, "leave-fullscreen", G_CALLBACK(OnLeaveFullscreen), this);
 
   // Connect to mouse-target-changed for cursor type detection
-  g_signal_connect(webview_, "mouse-target-changed",
-                   G_CALLBACK(OnMouseTargetChanged), this);
+  g_signal_connect(webview_, "mouse-target-changed", G_CALLBACK(OnMouseTargetChanged), this);
 
   // Connect to create signal for window.open() / target="_blank"
-  g_signal_connect(webview_, "create",
-                   G_CALLBACK(OnCreateWebView), this);
+  g_signal_connect(webview_, "create", G_CALLBACK(OnCreateWebView), this);
 
   // Add frame displayed callback (WPE-specific)
   webkit_web_view_add_frame_displayed_callback(
@@ -542,20 +438,14 @@ void InAppWebView::RegisterEventHandlers() {
         auto* self = static_cast<InAppWebView*>(data);
         self->OnFrameDisplayed(data);
       },
-      this,
-      nullptr);
-
-  if (DebugLogEnabled()) {
-    g_message("InAppWebView[%ld]: Event handlers registered",
-              static_cast<long>(id_));
-  }
+      this, nullptr);
 }
 
 // === WPE Backend Callbacks ===
 
 void InAppWebView::OnFrameDisplayed(void* data) {
   auto* self = static_cast<InAppWebView*>(data);
-  
+
   if (self->on_frame_available_) {
     self->on_frame_available_();
   }
@@ -563,27 +453,16 @@ void InAppWebView::OnFrameDisplayed(void* data) {
 
 void InAppWebView::OnExportDmaBuf(::wpe_fdo_egl_exported_image* image) {
   if (image == nullptr) {
-    if (DebugLogEnabled()) {
-      g_message("InAppWebView[%ld]: OnExportDmaBuf called with null image",
-                static_cast<long>(id_));
-    }
     return;
   }
 
   // Get image dimensions
   uint32_t img_width = wpe_fdo_egl_exported_image_get_width(image);
   uint32_t img_height = wpe_fdo_egl_exported_image_get_height(image);
-  
-  static int frame_count = 0;
-  frame_count++;
-  if (DebugLogEnabled() && frame_count % 60 == 0) {
-    g_message("InAppWebView[%ld]: OnExportDmaBuf frame %d (%ux%u)",
-              static_cast<long>(id_), frame_count, img_width, img_height);
-  }
 
   // Get the EGL image from the exported image
   EGLImageKHR egl_image = wpe_fdo_egl_exported_image_get_egl_image(image);
-  
+
   if (egl_image != EGL_NO_IMAGE_KHR && egl_display_ != nullptr) {
     // Read pixels from the EGL image using OpenGL
     ReadPixelsFromEglImage(egl_image, img_width, img_height);
@@ -591,27 +470,26 @@ void InAppWebView::OnExportDmaBuf(::wpe_fdo_egl_exported_image* image) {
 
   // Release previous exported image
   if (exported_image_ != nullptr && exportable_ != nullptr) {
-    ::wpe_view_backend_exportable_fdo_egl_dispatch_release_exported_image(
-        exportable_, exported_image_);
+    ::wpe_view_backend_exportable_fdo_egl_dispatch_release_exported_image(exportable_,
+                                                                          exported_image_);
   }
-  
+
   exported_image_ = image;
-  
+
   // Dispatch frame complete to allow WebKit to render next frame
   if (exportable_ != nullptr) {
     wpe_view_backend_exportable_fdo_dispatch_frame_complete(exportable_);
   }
-  
+
   if (on_frame_available_) {
     on_frame_available_();
   }
 }
 
-void InAppWebView::ReadPixelsFromEglImage(void* egl_image, 
-                                              uint32_t width, uint32_t height) {
+void InAppWebView::ReadPixelsFromEglImage(void* egl_image, uint32_t width, uint32_t height) {
   EGLDisplay display = static_cast<EGLDisplay>(egl_display_);
   EGLImageKHR image = static_cast<EGLImageKHR>(egl_image);
-  
+
   if (display == EGL_NO_DISPLAY || image == EGL_NO_IMAGE_KHR) {
     return;
   }
@@ -620,7 +498,7 @@ void InAppWebView::ReadPixelsFromEglImage(void* egl_image,
   if (readback_texture_ == 0) {
     glGenTextures(1, &readback_texture_);
   }
-  
+
   // Create FBO if needed
   if (fbo_ == 0) {
     glGenFramebuffers(1, &fbo_);
@@ -628,14 +506,14 @@ void InAppWebView::ReadPixelsFromEglImage(void* egl_image,
 
   // Bind the EGL image to our texture
   glBindTexture(GL_TEXTURE_2D, readback_texture_);
-  
+
   // Use the OES_EGL_image extension to create texture from EGL image
   static PFNGLEGLIMAGETARGETTEXTURE2DOESPROC glEGLImageTargetTexture2DOES = nullptr;
   if (glEGLImageTargetTexture2DOES == nullptr) {
-    glEGLImageTargetTexture2DOES = (PFNGLEGLIMAGETARGETTEXTURE2DOESPROC)
-        eglGetProcAddress("glEGLImageTargetTexture2DOES");
+    glEGLImageTargetTexture2DOES =
+        (PFNGLEGLIMAGETARGETTEXTURE2DOESPROC)eglGetProcAddress("glEGLImageTargetTexture2DOES");
   }
-  
+
   if (glEGLImageTargetTexture2DOES != nullptr) {
     glEGLImageTargetTexture2DOES(GL_TEXTURE_2D, image);
   } else {
@@ -645,16 +523,11 @@ void InAppWebView::ReadPixelsFromEglImage(void* egl_image,
 
   // Set up FBO to read from texture
   glBindFramebuffer(GL_FRAMEBUFFER, fbo_);
-  glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, 
-                         GL_TEXTURE_2D, readback_texture_, 0);
+  glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, readback_texture_, 0);
 
   // Check FBO status
   GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
   if (status != GL_FRAMEBUFFER_COMPLETE) {
-    if (DebugLogEnabled()) {
-      g_warning("InAppWebView[%ld]: FBO incomplete: 0x%x", 
-                static_cast<long>(id_), status);
-    }
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glBindTexture(GL_TEXTURE_2D, 0);
     return;
@@ -662,20 +535,20 @@ void InAppWebView::ReadPixelsFromEglImage(void* egl_image,
 
   // Read pixels
   size_t buffer_size = width * height * 4;  // RGBA
-  
+
   // Use triple buffering
   size_t write_idx = write_buffer_index_.load(std::memory_order_relaxed);
   auto& buffer = pixel_buffers_[write_idx];
-  
+
   if (buffer.data.size() != buffer_size) {
     buffer.data.resize(buffer_size);
   }
-  
+
   buffer.width = width;
   buffer.height = height;
-  
+
   glReadPixels(0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, buffer.data.data());
-  
+
   // Swap buffers
   {
     std::lock_guard<std::mutex> lock(buffer_swap_mutex_);
@@ -691,168 +564,182 @@ void InAppWebView::ReadPixelsFromEglImage(void* egl_image,
 // === Navigation Methods ===
 
 void InAppWebView::loadUrl(const std::string& url) {
-  if (webview_ == nullptr) return;
+  if (webview_ == nullptr)
+    return;
   webkit_web_view_load_uri(webview_, url.c_str());
 }
 
 void InAppWebView::loadUrl(const std::shared_ptr<URLRequest>& urlRequest) {
-  if (webview_ == nullptr || !urlRequest) return;
-  
+  if (webview_ == nullptr || !urlRequest)
+    return;
+
   if (!urlRequest->url.has_value()) {
     return;
   }
 
   std::string method = urlRequest->method.value_or("GET");
-  
-  if (method == "GET" && !urlRequest->body.has_value() && 
-      !urlRequest->headers.has_value()) {
+
+  if (method == "GET" && !urlRequest->body.has_value() && !urlRequest->headers.has_value()) {
     webkit_web_view_load_uri(webview_, urlRequest->url.value().c_str());
     return;
   }
 
   // Create a WebKitURIRequest for more complex requests
   WebKitURIRequest* request = webkit_uri_request_new(urlRequest->url.value().c_str());
-  
+
   // Set headers
   if (urlRequest->headers.has_value()) {
     SoupMessageHeaders* headers = webkit_uri_request_get_http_headers(request);
     for (const auto& header : urlRequest->headers.value()) {
-      soup_message_headers_append(headers, header.first.c_str(), 
-                                  header.second.c_str());
+      soup_message_headers_append(headers, header.first.c_str(), header.second.c_str());
     }
   }
-  
+
   webkit_web_view_load_request(webview_, request);
   g_object_unref(request);
 }
 
-void InAppWebView::loadData(const std::string& data,
-                               const std::string& mime_type,
-                               const std::string& encoding,
-                               const std::string& base_url) {
-  if (webview_ == nullptr) return;
-  
+void InAppWebView::loadData(const std::string& data, const std::string& mime_type,
+                            const std::string& encoding, const std::string& base_url) {
+  if (webview_ == nullptr)
+    return;
+
   GBytes* bytes = g_bytes_new(data.data(), data.size());
-  webkit_web_view_load_bytes(webview_, bytes, mime_type.c_str(),
-                              encoding.c_str(), base_url.c_str());
+  webkit_web_view_load_bytes(webview_, bytes, mime_type.c_str(), encoding.c_str(),
+                             base_url.c_str());
   g_bytes_unref(bytes);
 }
 
 void InAppWebView::loadFile(const std::string& asset_file_path) {
-  if (webview_ == nullptr) return;
-  
+  if (webview_ == nullptr)
+    return;
+
   std::string file_url = "file://" + asset_file_path;
   webkit_web_view_load_uri(webview_, file_url.c_str());
 }
 
 void InAppWebView::reload() {
-  if (webview_ == nullptr) return;
+  if (webview_ == nullptr)
+    return;
   webkit_web_view_reload(webview_);
 }
 
 void InAppWebView::goBack() {
-  if (webview_ == nullptr) return;
+  if (webview_ == nullptr)
+    return;
   webkit_web_view_go_back(webview_);
 }
 
 void InAppWebView::goForward() {
-  if (webview_ == nullptr) return;
+  if (webview_ == nullptr)
+    return;
   webkit_web_view_go_forward(webview_);
 }
 
 bool InAppWebView::canGoBack() const {
-  if (webview_ == nullptr) return false;
+  if (webview_ == nullptr)
+    return false;
   return webkit_web_view_can_go_back(webview_);
 }
 
 bool InAppWebView::canGoForward() const {
-  if (webview_ == nullptr) return false;
+  if (webview_ == nullptr)
+    return false;
   return webkit_web_view_can_go_forward(webview_);
 }
 
 void InAppWebView::stopLoading() {
-  if (webview_ == nullptr) return;
+  if (webview_ == nullptr)
+    return;
   webkit_web_view_stop_loading(webview_);
 }
 
 bool InAppWebView::isLoading() const {
-  if (webview_ == nullptr) return false;
+  if (webview_ == nullptr)
+    return false;
   return webkit_web_view_is_loading(webview_);
 }
 
 // === Getters ===
 
 std::optional<std::string> InAppWebView::getUrl() const {
-  if (webview_ == nullptr) return std::nullopt;
+  if (webview_ == nullptr)
+    return std::nullopt;
   const gchar* uri = webkit_web_view_get_uri(webview_);
-  if (uri == nullptr) return std::nullopt;
+  if (uri == nullptr)
+    return std::nullopt;
   return std::string(uri);
 }
 
 std::optional<std::string> InAppWebView::getTitle() const {
-  if (webview_ == nullptr) return std::nullopt;
+  if (webview_ == nullptr)
+    return std::nullopt;
   const gchar* title = webkit_web_view_get_title(webview_);
-  if (title == nullptr) return std::nullopt;
+  if (title == nullptr)
+    return std::nullopt;
   return std::string(title);
 }
 
 int64_t InAppWebView::getProgress() const {
-  if (webview_ == nullptr) return 0;
-  return static_cast<int64_t>(
-      webkit_web_view_get_estimated_load_progress(webview_) * 100);
+  if (webview_ == nullptr)
+    return 0;
+  return static_cast<int64_t>(webkit_web_view_get_estimated_load_progress(webview_) * 100);
 }
 
 // === JavaScript ===
 
 void InAppWebView::evaluateJavascript(
-    const std::string& source,
-    std::function<void(const std::optional<std::string>&)> callback) {
+    const std::string& source, std::function<void(const std::optional<std::string>&)> callback) {
   if (webview_ == nullptr) {
-    if (callback) callback(std::nullopt);
+    if (callback)
+      callback(std::nullopt);
     return;
   }
 
   struct CallbackData {
     std::function<void(const std::optional<std::string>&)> callback;
   };
-  
+
   auto* cb_data = new CallbackData{std::move(callback)};
-  
+
   webkit_web_view_evaluate_javascript(
-      webview_,
-      source.c_str(),
-      source.length(),
+      webview_, source.c_str(), source.length(),
       nullptr,  // world name
       nullptr,  // source URI
       nullptr,  // cancellable
       [](GObject* source, GAsyncResult* result, gpointer user_data) {
         auto* data = static_cast<CallbackData*>(user_data);
         GError* error = nullptr;
-        JSCValue* js_result = webkit_web_view_evaluate_javascript_finish(
-            WEBKIT_WEB_VIEW(source), result, &error);
-        
+        JSCValue* js_result =
+            webkit_web_view_evaluate_javascript_finish(WEBKIT_WEB_VIEW(source), result, &error);
+
         if (error != nullptr) {
-          if (data->callback) data->callback(std::nullopt);
+          if (data->callback)
+            data->callback(std::nullopt);
           g_error_free(error);
         } else if (js_result != nullptr) {
           gchar* str = jsc_value_to_string(js_result);
-          if (data->callback) data->callback(std::string(str));
+          if (data->callback)
+            data->callback(std::string(str));
           g_free(str);
           g_object_unref(js_result);
         } else {
-          if (data->callback) data->callback(std::nullopt);
+          if (data->callback)
+            data->callback(std::nullopt);
         }
-        
+
         delete data;
       },
       cb_data);
 }
 
 void InAppWebView::injectJavascriptFileFromUrl(const std::string& urlFile) {
-  std::string script = 
+  std::string script =
       "(function() {"
       "  var script = document.createElement('script');"
-      "  script.src = '" + urlFile + "';"
+      "  script.src = '" +
+      urlFile +
+      "';"
       "  document.head.appendChild(script);"
       "})();";
   evaluateJavascript(script, nullptr);
@@ -875,7 +762,9 @@ void InAppWebView::injectCSSCode(const std::string& source) {
   std::string script =
       "(function() {"
       "  var style = document.createElement('style');"
-      "  style.textContent = '" + escaped_source + "';"
+      "  style.textContent = '" +
+      escaped_source +
+      "';"
       "  document.head.appendChild(style);"
       "})();";
   evaluateJavascript(script, nullptr);
@@ -886,7 +775,9 @@ void InAppWebView::injectCSSFileFromUrl(const std::string& urlFile) {
       "(function() {"
       "  var link = document.createElement('link');"
       "  link.rel = 'stylesheet';"
-      "  link.href = '" + urlFile + "';"
+      "  link.href = '" +
+      urlFile +
+      "';"
       "  document.head.appendChild(link);"
       "})();";
   evaluateJavascript(script, nullptr);
@@ -900,8 +791,7 @@ void InAppWebView::addUserScript(std::shared_ptr<UserScript> userScript) {
   }
 }
 
-void InAppWebView::removeUserScriptAt(size_t index, 
-                                          UserScriptInjectionTime injectionTime) {
+void InAppWebView::removeUserScriptAt(size_t index, UserScriptInjectionTime injectionTime) {
   if (user_content_controller_) {
     user_content_controller_->removeUserScriptAt(index, injectionTime);
   }
@@ -921,38 +811,39 @@ void InAppWebView::removeAllUserScripts() {
 
 // === HTML Content ===
 
-void InAppWebView::getHtml(
-    std::function<void(const std::optional<std::string>&)> callback) {
+void InAppWebView::getHtml(std::function<void(const std::optional<std::string>&)> callback) {
   evaluateJavascript("document.documentElement.outerHTML", callback);
 }
 
 // === Zoom ===
 
 double InAppWebView::getZoomScale() const {
-  if (webview_ == nullptr) return 1.0;
+  if (webview_ == nullptr)
+    return 1.0;
   return webkit_web_view_get_zoom_level(webview_);
 }
 
 void InAppWebView::setZoomScale(double zoomScale) {
-  if (webview_ == nullptr) return;
+  if (webview_ == nullptr)
+    return;
   webkit_web_view_set_zoom_level(webview_, zoomScale);
 }
 
 // === Scroll ===
 
 void InAppWebView::scrollTo(int64_t x, int64_t y, bool animated) {
-  std::string script = animated
-      ? "window.scrollTo({top: " + std::to_string(y) + 
-        ", left: " + std::to_string(x) + ", behavior: 'smooth'});"
-      : "window.scrollTo(" + std::to_string(x) + ", " + std::to_string(y) + ");";
+  std::string script =
+      animated ? "window.scrollTo({top: " + std::to_string(y) + ", left: " + std::to_string(x) +
+                     ", behavior: 'smooth'});"
+               : "window.scrollTo(" + std::to_string(x) + ", " + std::to_string(y) + ");";
   evaluateJavascript(script, nullptr);
 }
 
 void InAppWebView::scrollBy(int64_t x, int64_t y, bool animated) {
-  std::string script = animated
-      ? "window.scrollBy({top: " + std::to_string(y) + 
-        ", left: " + std::to_string(x) + ", behavior: 'smooth'});"
-      : "window.scrollBy(" + std::to_string(x) + ", " + std::to_string(y) + ");";
+  std::string script =
+      animated ? "window.scrollBy({top: " + std::to_string(y) + ", left: " + std::to_string(x) +
+                     ", behavior: 'smooth'});"
+               : "window.scrollBy(" + std::to_string(x) + ", " + std::to_string(y) + ");";
   evaluateJavascript(script, nullptr);
 }
 
@@ -975,9 +866,8 @@ FlValue* InAppWebView::getSettings() const {
   return fl_value_new_null();
 }
 
-void InAppWebView::setSettings(
-    const std::shared_ptr<InAppWebViewSettings> newSettings,
-    FlValue* newSettingsMap) {
+void InAppWebView::setSettings(const std::shared_ptr<InAppWebViewSettings> newSettings,
+                               FlValue* newSettingsMap) {
   if (newSettings && webview_) {
     settings_ = newSettings;
     settings_->applyToWebView(webview_);
@@ -987,8 +877,9 @@ void InAppWebView::setSettings(
 // === Size Management ===
 
 void InAppWebView::setSize(int width, int height) {
-  if (width == width_ && height == height_) return;
-  
+  if (width == width_ && height == height_)
+    return;
+
   width_ = width;
   height_ = height;
 
@@ -996,15 +887,11 @@ void InAppWebView::setSize(int width, int height) {
   if (wpe_backend_ != nullptr) {
     wpe_view_backend_dispatch_set_size(wpe_backend_, width_, height_);
   }
-
-  if (DebugLogEnabled()) {
-    g_message("InAppWebView[%ld]: setSize %dx%d",
-              static_cast<long>(id_), width_, height_);
-  }
 }
 
 void InAppWebView::setScaleFactor(double scale_factor) {
-  if (scale_factor == scale_factor_) return;
+  if (scale_factor == scale_factor_)
+    return;
   scale_factor_ = scale_factor;
 
   // WPE uses device scale factor
@@ -1016,46 +903,36 @@ void InAppWebView::setScaleFactor(double scale_factor) {
 // === Activity State Management (like Cog browser) ===
 
 void InAppWebView::setFocused(bool focused) {
-  if (focused == is_focused_) return;
+  if (focused == is_focused_)
+    return;
   is_focused_ = focused;
-  
+
   if (wpe_backend_ != nullptr) {
     if (focused) {
       // Add focused state - also ensure visible and in_window are set
       wpe_view_backend_add_activity_state(wpe_backend_, wpe_view_activity_state_focused);
       wpe_view_backend_add_activity_state(wpe_backend_, wpe_view_activity_state_visible);
       wpe_view_backend_add_activity_state(wpe_backend_, wpe_view_activity_state_in_window);
-      if (DebugLogEnabled()) {
-        g_message("InAppWebView[%ld]: gained focus", static_cast<long>(id_));
-      }
     } else {
       // Remove only the focused state, keep visible and in_window so the webview
       // continues to render and process basic events
       wpe_view_backend_remove_activity_state(wpe_backend_, wpe_view_activity_state_focused);
-      if (DebugLogEnabled()) {
-        g_message("InAppWebView[%ld]: lost focus", static_cast<long>(id_));
-      }
     }
   }
 }
 
 void InAppWebView::setVisible(bool visible) {
-  if (visible == is_visible_) return;
+  if (visible == is_visible_)
+    return;
   is_visible_ = visible;
-  
+
   if (wpe_backend_ != nullptr) {
     if (visible) {
       wpe_view_backend_add_activity_state(wpe_backend_, wpe_view_activity_state_visible);
       wpe_view_backend_add_activity_state(wpe_backend_, wpe_view_activity_state_in_window);
-      if (DebugLogEnabled()) {
-        g_message("InAppWebView[%ld]: became visible", static_cast<long>(id_));
-      }
     } else {
       wpe_view_backend_remove_activity_state(wpe_backend_, wpe_view_activity_state_visible);
       wpe_view_backend_remove_activity_state(wpe_backend_, wpe_view_activity_state_in_window);
-      if (DebugLogEnabled()) {
-        g_message("InAppWebView[%ld]: became hidden", static_cast<long>(id_));
-      }
     }
   }
 }
@@ -1073,10 +950,6 @@ void InAppWebView::setTargetRefreshRate(uint32_t rate) {
   target_refresh_rate_ = rate;
   if (wpe_backend_ != nullptr) {
     wpe_view_backend_set_target_refresh_rate(wpe_backend_, rate);
-    if (DebugLogEnabled()) {
-      g_message("InAppWebView[%ld]: set target refresh rate: %u Hz", 
-                static_cast<long>(id_), rate);
-    }
   }
 }
 
@@ -1092,18 +965,12 @@ uint32_t InAppWebView::getTargetRefreshRate() const {
 void InAppWebView::requestEnterFullscreen() {
   if (wpe_backend_ != nullptr) {
     wpe_view_backend_dispatch_request_enter_fullscreen(wpe_backend_);
-    if (DebugLogEnabled()) {
-      g_message("InAppWebView[%ld]: requested enter fullscreen", static_cast<long>(id_));
-    }
   }
 }
 
 void InAppWebView::requestExitFullscreen() {
   if (wpe_backend_ != nullptr) {
     wpe_view_backend_dispatch_request_exit_fullscreen(wpe_backend_);
-    if (DebugLogEnabled()) {
-      g_message("InAppWebView[%ld]: requested exit fullscreen", static_cast<long>(id_));
-    }
   }
 }
 
@@ -1111,7 +978,7 @@ void InAppWebView::requestExitFullscreen() {
 
 void InAppWebView::setPointerLockHandler(std::function<bool(bool)> handler) {
   pointer_lock_handler_ = std::move(handler);
-  
+
   if (wpe_backend_ != nullptr) {
     wpe_view_backend_set_pointer_lock_handler(
         wpe_backend_,
@@ -1129,11 +996,6 @@ bool InAppWebView::OnPointerLockRequest(bool lock) {
     if (result) {
       pointer_locked_ = lock;
     }
-    if (DebugLogEnabled()) {
-      g_message("InAppWebView[%ld]: pointer lock %s: %s", 
-                static_cast<long>(id_), lock ? "request" : "release",
-                result ? "granted" : "denied");
-    }
     return result;
   }
   // Default: allow pointer lock
@@ -1147,10 +1009,6 @@ bool InAppWebView::requestPointerLock() {
     if (result) {
       pointer_locked_ = true;
     }
-    if (DebugLogEnabled()) {
-      g_message("InAppWebView[%ld]: request pointer lock: %s", 
-                static_cast<long>(id_), result ? "granted" : "denied");
-    }
     return result;
   }
   return false;
@@ -1162,10 +1020,6 @@ bool InAppWebView::requestPointerUnlock() {
     if (result) {
       pointer_locked_ = false;
     }
-    if (DebugLogEnabled()) {
-      g_message("InAppWebView[%ld]: request pointer unlock: %s", 
-                static_cast<long>(id_), result ? "granted" : "denied");
-    }
     return result;
   }
   return false;
@@ -1176,12 +1030,12 @@ bool InAppWebView::requestPointerUnlock() {
 bool InAppWebView::OnDomFullscreenRequest(bool fullscreen) {
   // This is called when JavaScript requests fullscreen via Element.requestFullscreen()
   // or exits via Document.exitFullscreen()
-  
+
   if (waiting_fullscreen_notify_) {
     // Already processing a fullscreen transition
     return false;
   }
-  
+
   if (fullscreen == is_fullscreen_) {
     // Already in the requested state - dispatch the event immediately
     // This handles cases where DOM fullscreen requests are mixed with
@@ -1195,10 +1049,10 @@ bool InAppWebView::OnDomFullscreenRequest(bool fullscreen) {
     }
     return true;
   }
-  
+
   waiting_fullscreen_notify_ = true;
   is_fullscreen_ = fullscreen;
-  
+
   // Notify the Dart side about the fullscreen request
   // The Dart side should handle the actual fullscreen transition
   if (channel_delegate_) {
@@ -1208,7 +1062,7 @@ bool InAppWebView::OnDomFullscreenRequest(bool fullscreen) {
       channel_delegate_->onExitFullscreen();
     }
   }
-  
+
   // Dispatch the fullscreen state to WPE
   if (wpe_backend_ != nullptr) {
     if (fullscreen) {
@@ -1217,14 +1071,9 @@ bool InAppWebView::OnDomFullscreenRequest(bool fullscreen) {
       wpe_view_backend_dispatch_did_exit_fullscreen(wpe_backend_);
     }
   }
-  
+
   waiting_fullscreen_notify_ = false;
-  
-  if (DebugLogEnabled()) {
-    g_message("InAppWebView[%ld]: DOM fullscreen request: %s",
-              static_cast<long>(id_), fullscreen ? "enter" : "exit");
-  }
-  
+
   return true;
 }
 
@@ -1234,7 +1083,7 @@ void InAppWebView::SetCursorPos(double x, double y) {
   // Store logical coordinates
   cursor_x_ = x;
   cursor_y_ = y;
-  
+
   // Send pointer motion event with scaled coordinates (logical -> physical)
   if (wpe_backend_ != nullptr) {
     struct wpe_input_pointer_event event = {};
@@ -1250,7 +1099,8 @@ void InAppWebView::SetCursorPos(double x, double y) {
 }
 
 void InAppWebView::SetPointerButton(int kind, int button, int clickCount) {
-  if (wpe_backend_ == nullptr) return;
+  if (wpe_backend_ == nullptr)
+    return;
 
   // Scale coordinates from logical to physical pixels
   int scaled_x = static_cast<int>(cursor_x_ * scale_factor_);
@@ -1261,10 +1111,18 @@ void InAppWebView::SetPointerButton(int kind, int button, int clickCount) {
   // This is a 1:1 mapping for Flutter -> WPE
   uint32_t wpe_button;
   switch (button) {
-    case 1: wpe_button = 1; break;  // Primary -> Left
-    case 2: wpe_button = 2; break;  // Secondary -> Right (context menu)
-    case 3: wpe_button = 3; break;  // Tertiary -> Middle
-    default: wpe_button = 1; break; // Default to primary
+    case 1:
+      wpe_button = 1;
+      break;  // Primary -> Left
+    case 2:
+      wpe_button = 2;
+      break;  // Secondary -> Right (context menu)
+    case 3:
+      wpe_button = 3;
+      break;  // Tertiary -> Middle
+    default:
+      wpe_button = 1;
+      break;  // Default to primary
   }
 
   // First send a motion event to ensure WebKit has the correct cursor position
@@ -1288,9 +1146,10 @@ void InAppWebView::SetPointerButton(int kind, int button, int clickCount) {
   event.button = wpe_button;
 
   // WPE button modifier bits for tracking pressed buttons in modifiers field
-  // See wpe_input_pointer_modifier_button* in wpe/input.h: button1=1<<20, button2=1<<21, button3=1<<22
+  // See wpe_input_pointer_modifier_button* in wpe/input.h: button1=1<<20, button2=1<<21,
+  // button3=1<<22
   const uint32_t button_modifier_bit = 1u << (19 + wpe_button);
-  
+
   switch (static_cast<WpePointerEventKind>(kind)) {
     case WpePointerEventKind::Down:
       event.type = wpe_input_pointer_event_type_button;
@@ -1298,10 +1157,6 @@ void InAppWebView::SetPointerButton(int kind, int button, int clickCount) {
       event.state = 1;
       button_state_ |= button_modifier_bit;
       event.modifiers = current_modifiers_ | button_state_;
-      if (DebugLogEnabled()) {
-        g_message("InAppWebView[%ld]: button DOWN at (%d,%d) button=%d state=%d modifiers=0x%x",
-                  static_cast<long>(id_), scaled_x, scaled_y, wpe_button, event.state, event.modifiers);
-      }
       break;
     case WpePointerEventKind::Up:
       event.type = wpe_input_pointer_event_type_button;
@@ -1309,10 +1164,6 @@ void InAppWebView::SetPointerButton(int kind, int button, int clickCount) {
       event.state = 0;
       button_state_ &= ~button_modifier_bit;
       event.modifiers = current_modifiers_ | button_state_;
-      if (DebugLogEnabled()) {
-        g_message("InAppWebView[%ld]: button UP at (%d,%d) button=%d state=%d modifiers=0x%x",
-                  static_cast<long>(id_), scaled_x, scaled_y, wpe_button, event.state, event.modifiers);
-      }
       break;
     default:
       // Ignore enter/leave/cancel etc for button events
@@ -1323,47 +1174,49 @@ void InAppWebView::SetPointerButton(int kind, int button, int clickCount) {
 }
 
 void InAppWebView::SetScrollDelta(double dx, double dy) {
-  if (wpe_backend_ == nullptr) return;
+  if (wpe_backend_ == nullptr)
+    return;
 
   // Scale coordinates from logical to physical pixels
   int scaled_x = static_cast<int>(cursor_x_ * scale_factor_);
   int scaled_y = static_cast<int>(cursor_y_ * scale_factor_);
-  
+
   // Use the 2D axis event with smooth scrolling for proper pixel-based scrolling
   // The wpe_input_axis_2d_event provides x_axis and y_axis as doubles
   // With wpe_input_axis_event_type_motion_smooth | wpe_input_axis_event_type_mask_2d,
   // WebKit will use the raw pixel values for smooth scrolling
-  
+
   struct wpe_input_axis_2d_event event = {};
-  event.base.type = static_cast<wpe_input_axis_event_type>(
-      wpe_input_axis_event_type_motion_smooth | wpe_input_axis_event_type_mask_2d);
+  event.base.type = static_cast<wpe_input_axis_event_type>(wpe_input_axis_event_type_motion_smooth |
+                                                           wpe_input_axis_event_type_mask_2d);
   event.base.time = g_get_monotonic_time() / 1000;
   event.base.x = scaled_x;
   event.base.y = scaled_y;
   event.base.modifiers = current_modifiers_;
-  
+
   // Flutter provides delta in logical pixels, scale to physical and apply sensitivity
   // The scale factor converts logical to physical pixels
   event.x_axis = dx * scale_factor_;
   event.y_axis = dy * scale_factor_;
-  
+
   wpe_view_backend_dispatch_axis_event(wpe_backend_, &event.base);
 }
 
-void InAppWebView::SendKeyEvent(int type, int64_t keyCode, int scanCode, 
-                                    int modifiers, const std::string& characters) {
-  if (wpe_backend_ == nullptr) return;
+void InAppWebView::SendKeyEvent(int type, int64_t keyCode, int scanCode, int modifiers,
+                                const std::string& characters) {
+  if (wpe_backend_ == nullptr)
+    return;
 
   // Intercept clipboard shortcuts on key down (type=0)
   // Modifiers: Control=1, Shift=2, Alt=4, Meta=8
   const bool isCtrl = (modifiers & 1) != 0;
   const bool isKeyDown = (type == 0);
-  
+
   if (isCtrl && isKeyDown && webview_ != nullptr) {
     // Check for clipboard and common editing shortcuts
     // keyCode is XKB keysym, lowercase letters are 0x61-0x7a
     const char* editingCommand = nullptr;
-    
+
     switch (keyCode) {
       case 0x63:  // 'c' - Copy
         editingCommand = WEBKIT_EDITING_COMMAND_COPY;
@@ -1384,12 +1237,8 @@ void InAppWebView::SendKeyEvent(int type, int64_t keyCode, int scanCode,
         editingCommand = WEBKIT_EDITING_COMMAND_REDO;
         break;
     }
-    
+
     if (editingCommand != nullptr) {
-      if (DebugLogEnabled()) {
-        g_message("InAppWebView[%ld]: executing editing command: %s",
-                  static_cast<long>(id_), editingCommand);
-      }
       webkit_web_view_execute_editing_command(webview_, editingCommand);
       return;  // Don't send the key event to WebKit
     }
@@ -1407,52 +1256,62 @@ void InAppWebView::SendKeyEvent(int type, int64_t keyCode, int scanCode,
   current_modifiers_ = static_cast<uint32_t>(modifiers);
   event.modifiers = current_modifiers_;
 
-  if (DebugLogEnabled()) {
-    g_message("InAppWebView[%ld]: key %s keyCode=0x%x scanCode=%d mods=0x%x char='%s'",
-              static_cast<long>(id_),
-              event.pressed ? "DOWN" : "UP",
-              event.key_code, event.hardware_key_code, event.modifiers,
-              characters.c_str());
-  }
-
   wpe_view_backend_dispatch_keyboard_event(wpe_backend_, &event);
 }
 
-void InAppWebView::SendTouchEvent(int type, int id, double x, double y,
-                                      const std::vector<std::tuple<int, double, double, int>>& touchPoints) {
-  if (wpe_backend_ == nullptr) return;
+void InAppWebView::SendTouchEvent(
+    int type, int id, double x, double y,
+    const std::vector<std::tuple<int, double, double, int>>& touchPoints) {
+  if (wpe_backend_ == nullptr)
+    return;
 
   // Map Dart touch event types to WPE types
   // Dart: 0=down, 1=up, 2=move, 3=cancel
   // WPE: wpe_input_touch_event_type_down=1, up=3, motion=2
   enum wpe_input_touch_event_type wpe_type;
   switch (type) {
-    case 0: wpe_type = wpe_input_touch_event_type_down; break;
-    case 1: wpe_type = wpe_input_touch_event_type_up; break;
-    case 2: wpe_type = wpe_input_touch_event_type_motion; break;
-    default: wpe_type = wpe_input_touch_event_type_null; break;  // cancel
+    case 0:
+      wpe_type = wpe_input_touch_event_type_down;
+      break;
+    case 1:
+      wpe_type = wpe_input_touch_event_type_up;
+      break;
+    case 2:
+      wpe_type = wpe_input_touch_event_type_motion;
+      break;
+    default:
+      wpe_type = wpe_input_touch_event_type_null;
+      break;  // cancel
   }
 
   // Build the raw touchpoints array
   std::vector<struct wpe_input_touch_event_raw> raw_points;
   raw_points.reserve(touchPoints.size());
-  
+
   for (const auto& point : touchPoints) {
     struct wpe_input_touch_event_raw raw = {};
     raw.id = std::get<0>(point);
     raw.x = static_cast<int32_t>(std::get<1>(point) * scale_factor_);
     raw.y = static_cast<int32_t>(std::get<2>(point) * scale_factor_);
-    
+
     // Map point type
     int pointType = std::get<3>(point);
     switch (pointType) {
-      case 0: raw.type = wpe_input_touch_event_type_down; break;
-      case 1: raw.type = wpe_input_touch_event_type_up; break;
-      case 2: raw.type = wpe_input_touch_event_type_motion; break;
-      default: raw.type = wpe_input_touch_event_type_null; break;
+      case 0:
+        raw.type = wpe_input_touch_event_type_down;
+        break;
+      case 1:
+        raw.type = wpe_input_touch_event_type_up;
+        break;
+      case 2:
+        raw.type = wpe_input_touch_event_type_motion;
+        break;
+      default:
+        raw.type = wpe_input_touch_event_type_null;
+        break;
     }
     raw.time = g_get_monotonic_time() / 1000;
-    
+
     raw_points.push_back(raw);
   }
 
@@ -1465,50 +1324,45 @@ void InAppWebView::SendTouchEvent(int type, int id, double x, double y,
   event.time = g_get_monotonic_time() / 1000;
   event.modifiers = current_modifiers_;
 
-  if (DebugLogEnabled()) {
-    g_message("InAppWebView[%ld]: touch %s id=%d at (%.0f,%.0f) points=%zu",
-              static_cast<long>(id_),
-              type == 0 ? "DOWN" : type == 1 ? "UP" : type == 2 ? "MOVE" : "CANCEL",
-              id, x * scale_factor_, y * scale_factor_, raw_points.size());
-  }
-
   wpe_view_backend_dispatch_touch_event(wpe_backend_, &event);
 }
 
 // === Pixel Buffer Access ===
 
-size_t InAppWebView::GetPixelBufferSize(uint32_t* out_width, 
-                                            uint32_t* out_height) const {
+size_t InAppWebView::GetPixelBufferSize(uint32_t* out_width, uint32_t* out_height) const {
   // With WPE + FDO, we typically use DMA-BUF export instead of CPU copy
   // This is a fallback for when DMA-BUF is not available
   std::lock_guard<std::mutex> lock(buffer_swap_mutex_);
-  
+
   size_t read_idx = read_buffer_index_.load(std::memory_order_acquire);
   const auto& buffer = pixel_buffers_[read_idx];
-  
-  if (out_width) *out_width = static_cast<uint32_t>(buffer.width);
-  if (out_height) *out_height = static_cast<uint32_t>(buffer.height);
-  
+
+  if (out_width)
+    *out_width = static_cast<uint32_t>(buffer.width);
+  if (out_height)
+    *out_height = static_cast<uint32_t>(buffer.height);
+
   return buffer.data.size();
 }
 
-bool InAppWebView::CopyPixelBufferTo(uint8_t* dst, size_t dst_size,
-                                         uint32_t* out_width,
-                                         uint32_t* out_height) const {
+bool InAppWebView::CopyPixelBufferTo(uint8_t* dst, size_t dst_size, uint32_t* out_width,
+                                     uint32_t* out_height) const {
   std::lock_guard<std::mutex> lock(buffer_swap_mutex_);
-  
+
   size_t read_idx = read_buffer_index_.load(std::memory_order_acquire);
   const auto& buffer = pixel_buffers_[read_idx];
-  
+
   if (buffer.data.empty() || dst_size < buffer.data.size()) {
     return false;
   }
-  
+
   std::memcpy(dst, buffer.data.data(), buffer.data.size());
-  
-  if (out_width) *out_width = static_cast<uint32_t>(buffer.width);
-  if (out_height) *out_height = static_cast<uint32_t>(buffer.height);
-  
+
+  if (out_width)
+    *out_width = static_cast<uint32_t>(buffer.width);
+  if (out_height)
+    *out_height = static_cast<uint32_t>(buffer.height);
+
   return true;
 }
 
@@ -1516,20 +1370,21 @@ bool InAppWebView::HasDmaBufExport() const {
   return exported_image_ != nullptr;
 }
 
-bool InAppWebView::GetDmaBufFd(int* fd, uint32_t* stride, 
-                                   uint32_t* width, uint32_t* height) const {
+bool InAppWebView::GetDmaBufFd(int* fd, uint32_t* stride, uint32_t* width, uint32_t* height) const {
   if (exported_image_ == nullptr) {
     return false;
   }
-  
+
   // Get DMA-BUF file descriptor from the exported image
   // This allows zero-copy sharing with Flutter's texture system
   // Note: The actual API depends on the WPE version
   // This is a simplified version
-  
-  if (width) *width = static_cast<uint32_t>(width_);
-  if (height) *height = static_cast<uint32_t>(height_);
-  
+
+  if (width)
+    *width = static_cast<uint32_t>(width_);
+  if (height)
+    *height = static_cast<uint32_t>(height_);
+
   // In a real implementation, you'd get the DMA-BUF FD from the EGL image
   // For now, return false to indicate not implemented
   return false;
@@ -1539,76 +1394,61 @@ void InAppWebView::SetOnFrameAvailable(std::function<void()> callback) {
   on_frame_available_ = std::move(callback);
 }
 
-void InAppWebView::SetOnCursorChanged(
-    std::function<void(const std::string&)> callback) {
+void InAppWebView::SetOnCursorChanged(std::function<void(const std::string&)> callback) {
   on_cursor_changed_ = std::move(callback);
 }
 
-void InAppWebView::OnShouldOverrideUrlLoadingDecision(int64_t decision_id, 
-                                                          bool allow) {
+void InAppWebView::OnShouldOverrideUrlLoadingDecision(int64_t decision_id, bool allow) {
   auto it = pending_policy_decisions_.find(decision_id);
   if (it == pending_policy_decisions_.end()) {
     return;
   }
-  
+
   WebKitPolicyDecision* decision = it->second;
   if (allow) {
     webkit_policy_decision_use(decision);
   } else {
     webkit_policy_decision_ignore(decision);
   }
-  
+
   g_object_unref(decision);
   pending_policy_decisions_.erase(it);
 }
 
 // === WebKit Signal Handlers ===
 
-void InAppWebView::OnLoadChanged(WebKitWebView* web_view,
-                                     WebKitLoadEvent load_event,
-                                     gpointer user_data) {
+void InAppWebView::OnLoadChanged(WebKitWebView* web_view, WebKitLoadEvent load_event,
+                                 gpointer user_data) {
   auto* self = static_cast<InAppWebView*>(user_data);
-  if (self->channel_delegate_ == nullptr) return;
+  if (self->channel_delegate_ == nullptr)
+    return;
 
   switch (load_event) {
     case WEBKIT_LOAD_STARTED:
-      self->channel_delegate_->onLoadStart(
-          self->getUrl().value_or(""));
+      self->channel_delegate_->onLoadStart(self->getUrl().value_or(""));
       break;
     case WEBKIT_LOAD_COMMITTED:
       // Inject cursor detection script when page content starts loading
       self->injectCursorDetectionScript();
       break;
     case WEBKIT_LOAD_FINISHED:
-      self->channel_delegate_->onLoadStop(
-          self->getUrl().value_or(""));
+      self->channel_delegate_->onLoadStop(self->getUrl().value_or(""));
       break;
     default:
       break;
   }
 }
 
-gboolean InAppWebView::OnDecidePolicy(WebKitWebView* web_view,
-                                          WebKitPolicyDecision* decision,
-                                          WebKitPolicyDecisionType decision_type,
-                                          gpointer user_data) {
+gboolean InAppWebView::OnDecidePolicy(WebKitWebView* web_view, WebKitPolicyDecision* decision,
+                                      WebKitPolicyDecisionType decision_type, gpointer user_data) {
   auto* self = static_cast<InAppWebView*>(user_data);
-  
+
   if (decision_type != WEBKIT_POLICY_DECISION_TYPE_NAVIGATION_ACTION) {
-    if (DebugLogEnabled()) {
-      g_message("InAppWebView[%ld]: OnDecidePolicy ignored type=%d",
-                static_cast<long>(self->id_), static_cast<int>(decision_type));
-    }
     return FALSE;  // Let WebKit handle other decision types
   }
 
-  if (DebugLogEnabled()) {
-    g_message("InAppWebView[%ld]: OnDecidePolicy invoked (navigation_action)", static_cast<long>(self->id_));
-  }
-
   auto* nav_decision = WEBKIT_NAVIGATION_POLICY_DECISION(decision);
-  auto* nav_action = webkit_navigation_policy_decision_get_navigation_action(
-      nav_decision);
+  auto* nav_action = webkit_navigation_policy_decision_get_navigation_action(nav_decision);
   auto* request = webkit_navigation_action_get_request(nav_action);
   const gchar* uri = webkit_uri_request_get_uri(request);
 
@@ -1653,26 +1493,20 @@ gboolean InAppWebView::OnDecidePolicy(WebKitWebView* web_view,
 
       // Create NavigationAction
       auto navigationAction = std::make_shared<NavigationAction>(
-          urlRequest,
-          is_for_main_frame,
+          urlRequest, is_for_main_frame,
           std::nullopt,  // isRedirect - not easily available in WebKit
-          navActionType
-      );
+          navActionType);
 
       // Create callback to handle the response
       auto callback = std::make_unique<WebViewChannelDelegate::ShouldOverrideUrlLoadingCallback>();
-      callback->defaultBehaviour = [self, decision_id](const std::optional<NavigationActionPolicy> result) {
-        bool allow = result.has_value() && result.value() == NavigationActionPolicy::allow;
-        self->OnShouldOverrideUrlLoadingDecision(decision_id, allow);
-      };
+      callback->defaultBehaviour =
+          [self, decision_id](const std::optional<NavigationActionPolicy> result) {
+            bool allow = result.has_value() && result.value() == NavigationActionPolicy::allow;
+            self->OnShouldOverrideUrlLoadingDecision(decision_id, allow);
+          };
 
       // Notify Dart side with callback
       self->channel_delegate_->shouldOverrideUrlLoading(navigationAction, std::move(callback));
-
-      if (DebugLogEnabled()) {
-        g_message("InAppWebView[%ld]: deferring policy decision id=%ld", 
-                  static_cast<long>(self->id_), static_cast<long>(decision_id));
-      }
 
       return TRUE;  // We're handling this asynchronously
     }
@@ -1681,24 +1515,22 @@ gboolean InAppWebView::OnDecidePolicy(WebKitWebView* web_view,
   return FALSE;  // Let WebKit proceed with navigation
 }
 
-void InAppWebView::OnNotifyEstimatedLoadProgress(GObject* object,
-                                                     GParamSpec* pspec,
-                                                     gpointer user_data) {
+void InAppWebView::OnNotifyEstimatedLoadProgress(GObject* object, GParamSpec* pspec,
+                                                 gpointer user_data) {
   auto* self = static_cast<InAppWebView*>(user_data);
-  if (self->channel_delegate_ == nullptr) return;
+  if (self->channel_delegate_ == nullptr)
+    return;
 
-  double progress = webkit_web_view_get_estimated_load_progress(
-      WEBKIT_WEB_VIEW(object));
+  double progress = webkit_web_view_get_estimated_load_progress(WEBKIT_WEB_VIEW(object));
   int progress_percent = static_cast<int>(progress * 100);
-  
+
   self->channel_delegate_->onProgressChanged(progress_percent);
 }
 
-void InAppWebView::OnNotifyTitle(GObject* object,
-                                     GParamSpec* pspec,
-                                     gpointer user_data) {
+void InAppWebView::OnNotifyTitle(GObject* object, GParamSpec* pspec, gpointer user_data) {
   auto* self = static_cast<InAppWebView*>(user_data);
-  if (self->channel_delegate_ == nullptr) return;
+  if (self->channel_delegate_ == nullptr)
+    return;
 
   const gchar* title = webkit_web_view_get_title(WEBKIT_WEB_VIEW(object));
   if (title != nullptr) {
@@ -1706,38 +1538,33 @@ void InAppWebView::OnNotifyTitle(GObject* object,
   }
 }
 
-gboolean InAppWebView::OnLoadFailed(WebKitWebView* web_view,
-                                        WebKitLoadEvent load_event,
-                                        gchar* failing_uri,
-                                        GError* error,
-                                        gpointer user_data) {
+gboolean InAppWebView::OnLoadFailed(WebKitWebView* web_view, WebKitLoadEvent load_event,
+                                    gchar* failing_uri, GError* error, gpointer user_data) {
   auto* self = static_cast<InAppWebView*>(user_data);
-  if (self->channel_delegate_ == nullptr) return FALSE;
+  if (self->channel_delegate_ == nullptr)
+    return FALSE;
 
   // Create WebResourceRequest for the failing URL
   auto request = std::make_shared<WebResourceRequest>(
       failing_uri ? std::optional<std::string>(failing_uri) : std::nullopt,
       std::optional<std::string>("GET"),  // Default method
-      std::nullopt,  // headers
-      std::optional<bool>(true)  // isForMainFrame - load failures are typically main frame
+      std::nullopt,                       // headers
+      std::optional<bool>(true)           // isForMainFrame - load failures are typically main frame
   );
 
   // Create WebResourceError from GError
-  auto webError = std::make_shared<WebResourceError>(
-      error ? std::string(error->message) : "Unknown error",
-      error ? static_cast<int64_t>(error->code) : -1
-  );
+  auto webError =
+      std::make_shared<WebResourceError>(error ? std::string(error->message) : "Unknown error",
+                                         error ? static_cast<int64_t>(error->code) : -1);
 
   self->channel_delegate_->onReceivedError(request, webError);
 
   return FALSE;
 }
 
-gboolean InAppWebView::OnLoadFailedWithTlsErrors(WebKitWebView* web_view,
-                                                     gchar* failing_uri,
-                                                     GTlsCertificate* certificate,
-                                                     GTlsCertificateFlags errors,
-                                                     gpointer user_data) {
+gboolean InAppWebView::OnLoadFailedWithTlsErrors(WebKitWebView* web_view, gchar* failing_uri,
+                                                 GTlsCertificate* certificate,
+                                                 GTlsCertificateFlags errors, gpointer user_data) {
   (void)web_view;
   (void)failing_uri;
   (void)certificate;
@@ -1760,10 +1587,6 @@ WebKitWebView* InAppWebView::OnCreateWebView(WebKitWebView* web_view,
                                              gpointer user_data) {
   auto* self = static_cast<InAppWebView*>(user_data);
 
-  if (DebugLogEnabled()) {
-    g_message("InAppWebView[%ld]: create (new window requested)", static_cast<long>(self->id_));
-  }
-
   // Check if JavaScript can open windows automatically
   if (!self->settings_ || !self->settings_->javaScriptCanOpenWindowsAutomatically) {
     // Default to allowing navigation in current window
@@ -1781,8 +1604,8 @@ WebKitWebView* InAppWebView::OnCreateWebView(WebKitWebView* web_view,
     static int64_t window_autoincrement_id = 0;
     int64_t windowId = ++window_autoincrement_id;
 
-    auto createWindowAction = std::make_unique<CreateWindowAction>(
-        navigation_action, windowId, nullptr);
+    auto createWindowAction =
+        std::make_unique<CreateWindowAction>(navigation_action, windowId, nullptr);
 
     auto callback = std::make_unique<WebViewChannelDelegate::CreateWindowCallback>();
 
@@ -1796,9 +1619,7 @@ WebKitWebView* InAppWebView::OnCreateWebView(WebKitWebView* web_view,
       }
     }
 
-    callback->nonNullSuccess = [](bool handledByClient) {
-      return !handledByClient;
-    };
+    callback->nonNullSuccess = [](bool handledByClient) { return !handledByClient; };
 
     std::string captured_url = url_to_load;
     auto* webview_ptr = self->webview_;
@@ -1816,18 +1637,12 @@ WebKitWebView* InAppWebView::OnCreateWebView(WebKitWebView* web_view,
   return nullptr;
 }
 
-gboolean InAppWebView::OnScriptDialog(WebKitWebView* web_view,
-                                          WebKitScriptDialog* dialog,
-                                          gpointer user_data) {
+gboolean InAppWebView::OnScriptDialog(WebKitWebView* web_view, WebKitScriptDialog* dialog,
+                                      gpointer user_data) {
   auto* self = static_cast<InAppWebView*>(user_data);
 
   WebKitScriptDialogType dialogType = webkit_script_dialog_get_dialog_type(dialog);
   const gchar* message = webkit_script_dialog_get_message(dialog);
-
-  if (DebugLogEnabled()) {
-    g_message("InAppWebView[%ld]: script-dialog type=%d message=%.50s...",
-              static_cast<long>(self->id_), dialogType, message ? message : "null");
-  }
 
   if (!self->channel_delegate_) {
     return FALSE;  // Use default WebKit dialog handling
@@ -1854,9 +1669,7 @@ gboolean InAppWebView::OnScriptDialog(WebKitWebView* web_view,
       auto* pendingDialogs = &self->pending_script_dialogs_;
       int64_t capturedId = dialogId;
 
-      callback->nonNullSuccess = [](JsAlertResponse response) {
-        return !response.handledByClient;
-      };
+      callback->nonNullSuccess = [](JsAlertResponse response) { return !response.handledByClient; };
 
       callback->defaultBehaviour = [pendingDialogs, capturedId](std::optional<JsAlertResponse>) {
         auto it = pendingDialogs->find(capturedId);
@@ -1960,7 +1773,8 @@ gboolean InAppWebView::OnScriptDialog(WebKitWebView* web_view,
         return false;
       };
 
-      callback->defaultBehaviour = [pendingDialogs, capturedId](std::optional<JsBeforeUnloadResponse>) {
+      callback->defaultBehaviour = [pendingDialogs,
+                                    capturedId](std::optional<JsBeforeUnloadResponse>) {
         auto it = pendingDialogs->find(capturedId);
         if (it != pendingDialogs->end()) {
           webkit_script_dialog_confirm_set_confirmed(it->second, TRUE);
@@ -1970,8 +1784,9 @@ gboolean InAppWebView::OnScriptDialog(WebKitWebView* web_view,
         }
       };
 
-      self->channel_delegate_->onJsBeforeUnload(url, messageStr.empty() ? std::nullopt : std::make_optional(messageStr),
-                                                 std::move(callback));
+      self->channel_delegate_->onJsBeforeUnload(
+          url, messageStr.empty() ? std::nullopt : std::make_optional(messageStr),
+          std::move(callback));
       break;
     }
 
@@ -1986,13 +1801,8 @@ gboolean InAppWebView::OnScriptDialog(WebKitWebView* web_view,
 }
 
 gboolean InAppWebView::OnPermissionRequest(WebKitWebView* web_view,
-                                               WebKitPermissionRequest* request,
-                                               gpointer user_data) {
+                                           WebKitPermissionRequest* request, gpointer user_data) {
   auto* self = static_cast<InAppWebView*>(user_data);
-
-  if (DebugLogEnabled()) {
-    g_message("InAppWebView[%ld]: permission-request", static_cast<long>(self->id_));
-  }
 
   if (!self->channel_delegate_) {
     webkit_permission_request_deny(request);
@@ -2051,14 +1861,9 @@ gboolean InAppWebView::OnPermissionRequest(WebKitWebView* web_view,
   return TRUE;  // We're handling the request
 }
 
-gboolean InAppWebView::OnAuthenticate(WebKitWebView* web_view,
-                                          WebKitAuthenticationRequest* request,
-                                          gpointer user_data) {
+gboolean InAppWebView::OnAuthenticate(WebKitWebView* web_view, WebKitAuthenticationRequest* request,
+                                      gpointer user_data) {
   auto* self = static_cast<InAppWebView*>(user_data);
-
-  if (DebugLogEnabled()) {
-    g_message("InAppWebView[%ld]: authenticate", static_cast<long>(self->id_));
-  }
 
   if (!self->channel_delegate_) {
     webkit_authentication_request_cancel(request);
@@ -2072,13 +1877,10 @@ gboolean InAppWebView::OnAuthenticate(WebKitWebView* web_view,
   gboolean isProxy = webkit_authentication_request_is_for_proxy(request);
   gboolean isRetry = webkit_authentication_request_is_retry(request);
 
-  URLProtectionSpace protectionSpace(
-      host ? std::string(host) : "",
-      static_cast<int64_t>(port),
-      std::nullopt,  // protocol not directly available
-      realm ? std::make_optional(std::string(realm)) : std::nullopt,
-      URLProtectionSpace::fromWebKitScheme(scheme),
-      isProxy);
+  URLProtectionSpace protectionSpace(host ? std::string(host) : "", static_cast<int64_t>(port),
+                                     std::nullopt,  // protocol not directly available
+                                     realm ? std::make_optional(std::string(realm)) : std::nullopt,
+                                     URLProtectionSpace::fromWebKitScheme(scheme), isProxy);
 
   auto challenge = std::make_unique<HttpAuthenticationChallenge>(protectionSpace, isRetry);
 
@@ -2095,14 +1897,12 @@ gboolean InAppWebView::OnAuthenticate(WebKitWebView* web_view,
   callback->nonNullSuccess = [pendingRequests, capturedId](HttpAuthResponse response) {
     auto it = pendingRequests->find(capturedId);
     if (it != pendingRequests->end()) {
-      if (response.action == HttpAuthResponseAction::PROCEED &&
-          response.username.has_value() && response.password.has_value()) {
+      if (response.action == HttpAuthResponseAction::PROCEED && response.username.has_value() &&
+          response.password.has_value()) {
         WebKitCredential* credential = webkit_credential_new(
-            response.username.value().c_str(),
-            response.password.value().c_str(),
-            response.permanentPersistence
-                ? WEBKIT_CREDENTIAL_PERSISTENCE_PERMANENT
-                : WEBKIT_CREDENTIAL_PERSISTENCE_FOR_SESSION);
+            response.username.value().c_str(), response.password.value().c_str(),
+            response.permanentPersistence ? WEBKIT_CREDENTIAL_PERSISTENCE_PERMANENT
+                                          : WEBKIT_CREDENTIAL_PERSISTENCE_FOR_SESSION);
         webkit_authentication_request_authenticate(it->second, credential);
         webkit_credential_free(credential);
       } else {
@@ -2132,87 +1932,81 @@ gboolean InAppWebView::OnAuthenticate(WebKitWebView* web_view,
 // without a GDK window. Context menu display is handled by the Dart side via
 // onCreateContextMenu callback.
 
-gboolean InAppWebView::OnContextMenu(WebKitWebView* web_view,
-                                         WebKitContextMenu* context_menu,
-                                         WebKitHitTestResult* hit_test_result,
-                                         gpointer user_data) {
+gboolean InAppWebView::OnContextMenu(WebKitWebView* web_view, WebKitContextMenu* context_menu,
+                                     WebKitHitTestResult* hit_test_result, gpointer user_data) {
   auto* self = static_cast<InAppWebView*>(user_data);
-  
+
   // Disable context menu if setting is enabled
   if (self->settings_ && self->settings_->disableContextMenu) {
     return TRUE;  // Suppress context menu
   }
-  
+
   // Build hit test result info for Dart callback
   if (self->channel_delegate_ && hit_test_result != nullptr) {
     std::string type = "UNKNOWN_TYPE";
     std::string extra;
-    
+
     if (webkit_hit_test_result_context_is_link(hit_test_result)) {
       type = "SRC_ANCHOR_TYPE";
       const char* uri = webkit_hit_test_result_get_link_uri(hit_test_result);
-      if (uri) extra = uri;
+      if (uri)
+        extra = uri;
     } else if (webkit_hit_test_result_context_is_image(hit_test_result)) {
       type = "IMAGE_TYPE";
       const char* uri = webkit_hit_test_result_get_image_uri(hit_test_result);
-      if (uri) extra = uri;
+      if (uri)
+        extra = uri;
     } else if (webkit_hit_test_result_context_is_media(hit_test_result)) {
       type = "SRC_IMAGE_ANCHOR_TYPE";
       const char* uri = webkit_hit_test_result_get_media_uri(hit_test_result);
-      if (uri) extra = uri;
+      if (uri)
+        extra = uri;
     } else if (webkit_hit_test_result_context_is_editable(hit_test_result)) {
       type = "EDIT_TEXT_TYPE";
     } else if (webkit_hit_test_result_context_is_selection(hit_test_result)) {
       type = "UNKNOWN_TYPE";  // Selection doesn't have a specific type
     }
-    
+
     self->channel_delegate_->onCreateContextMenu(type, extra);
-    
-    if (DebugLogEnabled()) {
-      g_message("InAppWebView[%ld]: Context menu triggered, type=%s extra=%s",
-                static_cast<long>(self->id_), type.c_str(), extra.c_str());
-    }
   }
-  
+
   // NOTE: We do NOT show a GTK popup menu here because:
   // 1. WPE WebKit renders offscreen - there's no GDK window for GTK menus
   // 2. The Dart side will handle displaying the context menu via onCreateContextMenu
-  // 
+  //
   // The gtk_menu_popup_at_pointer() call would fail with:
   // "Gtk-WARNING: no trigger event for menu popup"
   // "Gtk-CRITICAL: gtk_menu_popup_at_rect: assertion 'GDK_IS_WINDOW' failed"
-  
+
   // Return TRUE to suppress WebKit's default context menu handling
   // The Dart side is responsible for showing the context menu
   return TRUE;
 }
 
-gboolean InAppWebView::OnEnterFullscreen(WebKitWebView* web_view, 
-                                             gpointer user_data) {
+gboolean InAppWebView::OnEnterFullscreen(WebKitWebView* web_view, gpointer user_data) {
   auto* self = static_cast<InAppWebView*>(user_data);
   self->is_fullscreen_ = true;
-  
+
   // Notify WPE backend that we entered fullscreen
   if (self->wpe_backend_ != nullptr) {
     wpe_view_backend_dispatch_did_enter_fullscreen(self->wpe_backend_);
   }
-  
+
   if (self->channel_delegate_) {
     self->channel_delegate_->onEnterFullscreen();
   }
   return TRUE;  // We handled the fullscreen request
 }
 
-gboolean InAppWebView::OnLeaveFullscreen(WebKitWebView* web_view, 
-                                             gpointer user_data) {
+gboolean InAppWebView::OnLeaveFullscreen(WebKitWebView* web_view, gpointer user_data) {
   auto* self = static_cast<InAppWebView*>(user_data);
   self->is_fullscreen_ = false;
-  
+
   // Notify WPE backend that we exited fullscreen
   if (self->wpe_backend_ != nullptr) {
     wpe_view_backend_dispatch_did_exit_fullscreen(self->wpe_backend_);
   }
-  
+
   if (self->channel_delegate_) {
     self->channel_delegate_->onExitFullscreen();
   }
@@ -2220,14 +2014,13 @@ gboolean InAppWebView::OnLeaveFullscreen(WebKitWebView* web_view,
 }
 
 void InAppWebView::OnMouseTargetChanged(WebKitWebView* web_view,
-                                            WebKitHitTestResult* hit_test_result,
-                                            guint modifiers,
-                                            gpointer user_data) {
+                                        WebKitHitTestResult* hit_test_result, guint modifiers,
+                                        gpointer user_data) {
   auto* self = static_cast<InAppWebView*>(user_data);
-  
+
   // Determine cursor based on hit test result
   std::string cursor_name = "basic";
-  
+
   if (hit_test_result == nullptr) {
     // No hit test result, use default cursor
   } else if (webkit_hit_test_result_context_is_link(hit_test_result)) {
@@ -2246,16 +2039,12 @@ void InAppWebView::OnMouseTargetChanged(WebKitWebView* web_view,
   } else if (webkit_hit_test_result_context_is_scrollbar(hit_test_result)) {
     cursor_name = "basic";
   }
-  
+
   // Only emit if cursor changed
   if (cursor_name != self->last_cursor_name_) {
     self->last_cursor_name_ = cursor_name;
     if (self->on_cursor_changed_) {
       self->on_cursor_changed_(cursor_name);
-    }
-    if (DebugLogEnabled()) {
-      g_message("InAppWebView[%ld]: cursor changed to '%s'",
-                static_cast<long>(self->id_), cursor_name.c_str());
     }
   }
 }
@@ -2297,7 +2086,7 @@ void InAppWebView::injectCursorDetectionScript() {
 void InAppWebView::updateCursorFromCssStyle(const std::string& cursor_style) {
   // Map CSS cursor values to Flutter cursor names
   std::string cursor_name = "basic";
-  
+
   if (cursor_style == "pointer" || cursor_style == "hand") {
     cursor_name = "click";
   } else if (cursor_style == "text" || cursor_style == "vertical-text") {
@@ -2334,7 +2123,7 @@ void InAppWebView::updateCursorFromCssStyle(const std::string& cursor_style) {
     cursor_name = "resizeRow";
   } else if (cursor_style == "n-resize" || cursor_style == "ns-resize") {
     cursor_name = "resizeUpDown";
-  } else if (cursor_style == "e-resize" || cursor_style == "ew-resize" || 
+  } else if (cursor_style == "e-resize" || cursor_style == "ew-resize" ||
              cursor_style == "w-resize") {
     cursor_name = "resizeLeftRight";
   } else if (cursor_style == "ne-resize" || cursor_style == "sw-resize") {
@@ -2348,7 +2137,7 @@ void InAppWebView::updateCursorFromCssStyle(const std::string& cursor_style) {
     cursor_name = "zoomOut";
   }
   // default, auto, inherit -> "basic"
-  
+
   if (cursor_name != last_cursor_name_) {
     last_cursor_name_ = cursor_name;
     if (on_cursor_changed_) {
@@ -2359,8 +2148,7 @@ void InAppWebView::updateCursorFromCssStyle(const std::string& cursor_style) {
 
 // === JavaScript Bridge ===
 
-void InAppWebView::handleScriptMessage(const std::string& name, 
-                                           const std::string& body) {
+void InAppWebView::handleScriptMessage(const std::string& name, const std::string& body) {
   // Handle internal cursor change messages (sent directly via messageHandlers)
   if (name == "_cursorChanged") {
     updateCursorFromCssStyle(body);
@@ -2370,10 +2158,6 @@ void InAppWebView::handleScriptMessage(const std::string& name,
   // === Security Check 1: javaScriptBridgeEnabled ===
   // Match iOS: guard javaScriptBridgeEnabled else { return }
   if (settings_ && !settings_->javaScriptBridgeEnabled) {
-    if (DebugLogEnabled()) {
-      g_message("InAppWebView[%ld]: JavaScript bridge is disabled",
-                static_cast<long>(id_));
-    }
     return;
   }
 
@@ -2382,10 +2166,6 @@ void InAppWebView::handleScriptMessage(const std::string& name,
   try {
     bodyJson = json::parse(body);
   } catch (const json::parse_error& e) {
-    if (DebugLogEnabled()) {
-      g_message("InAppWebView[%ld]: Failed to parse script message JSON: %s",
-                static_cast<long>(id_), e.what());
-    }
     return;
   }
 
@@ -2395,7 +2175,7 @@ void InAppWebView::handleScriptMessage(const std::string& name,
   if (bodyJson.contains("_bridgeSecret") && bodyJson["_bridgeSecret"].is_string()) {
     receivedSecret = bodyJson["_bridgeSecret"].get<std::string>();
   }
-  
+
   if (receivedSecret != js_bridge_secret_) {
     // Get origin for logging
     std::string securityOrigin = "unknown";
@@ -2403,9 +2183,8 @@ void InAppWebView::handleScriptMessage(const std::string& name,
     if (uri != nullptr) {
       securityOrigin = std::string(uri);
     }
-    g_warning("InAppWebView[%ld]: Bridge access attempt with wrong secret token, "
-              "possibly from malicious code from origin %s",
-              static_cast<long>(id_), securityOrigin.c_str());
+    errorLog("InAppWebView: Bridge access attempt with wrong secret token from origin " +
+             securityOrigin);
     return;
   }
 
@@ -2413,7 +2192,7 @@ void InAppWebView::handleScriptMessage(const std::string& name,
   std::string sourceOrigin = "";
   std::string requestUrl = "";
   bool isMainFrame = true;  // Main frame by default for WPE
-  
+
   // Get current URL from webview - this is the "request URL"
   const gchar* uri = webkit_web_view_get_uri(webview_);
   if (uri != nullptr) {
@@ -2451,10 +2230,9 @@ void InAppWebView::handleScriptMessage(const std::string& name,
     // If allowList is empty, origin is allowed by default
   }
   // If javaScriptHandlersOriginAllowList is nullopt, origin is allowed by default (matches iOS)
-  
+
   if (!isOriginAllowed) {
-    g_warning("InAppWebView[%ld]: Bridge access attempt from an origin not allowed: %s",
-              static_cast<long>(id_), sourceOrigin.c_str());
+    errorLog("InAppWebView: Bridge access attempt from an origin not allowed: " + sourceOrigin);
     return;
   }
 
@@ -2465,11 +2243,11 @@ void InAppWebView::handleScriptMessage(const std::string& name,
   if (bodyJson.contains("_windowId") && bodyJson["_windowId"].is_number()) {
     windowId = bodyJson["_windowId"].get<int64_t>();
   }
-  
+
   // Get the target webview for this message
-  // Match iOS: if let wId = _windowId, let webViewTransport = plugin?.inAppWebViewManager?.windowWebViews[wId]
-  // For now, we use 'this' webview. When window management is implemented,
-  // this should look up the webview by windowId from a global registry.
+  // Match iOS: if let wId = _windowId, let webViewTransport =
+  // plugin?.inAppWebViewManager?.windowWebViews[wId] For now, we use 'this' webview. When window
+  // management is implemented, this should look up the webview by windowId from a global registry.
   InAppWebView* targetWebView = this;
   // TODO: When multi-window is fully implemented:
   // if (windowId.has_value()) {
@@ -2484,12 +2262,6 @@ void InAppWebView::handleScriptMessage(const std::string& name,
   if (name == "callHandler") {
     if (bodyJson.contains("handlerName") && bodyJson["handlerName"].is_string()) {
       handlerName = bodyJson["handlerName"].get<std::string>();
-    }
-    
-    if (DebugLogEnabled()) {
-      g_message("InAppWebView[%ld]: handleScriptMessage handlerName='%s' windowId=%s",
-                static_cast<long>(id_), handlerName.c_str(),
-                windowId.has_value() ? std::to_string(windowId.value()).c_str() : "null");
     }
   }
 
@@ -2509,12 +2281,12 @@ void InAppWebView::handleScriptMessage(const std::string& name,
   // Match iOS: switch(handlerName) for internal handlers
   // Use targetWebView for multi-window support
   bool isInternalHandler = true;
-  
+
   if (handlerName == "onConsoleMessage") {
     // Handle console message interception (from console_log_js.h script)
     std::string message = "";
     std::string level = "log";
-    
+
     // The args field contains a JSON-encoded string: [{"level":"log","message":"..."}]
     if (!argsJsonStr.empty()) {
       try {
@@ -2529,14 +2301,9 @@ void InAppWebView::handleScriptMessage(const std::string& name,
             message = firstArg["message"].get<std::string>();
           }
         }
-      } catch (const json::parse_error& e) {
-        if (DebugLogEnabled()) {
-          g_message("InAppWebView[%ld]: Failed to parse console args JSON: %s",
-                    static_cast<long>(targetWebView->id_), e.what());
-        }
-      }
+      } catch (const json::parse_error& e) {}
     }
-    
+
     // Map level string to numeric value
     // Match iOS: case "log" -> 1, "debug" -> 0 (TIP), "error" -> 3, "info" -> 1, "warn" -> 2
     int64_t messageLevel = 1;  // LOG
@@ -2549,32 +2316,19 @@ void InAppWebView::handleScriptMessage(const std::string& name,
     } else if (level == "error") {
       messageLevel = 3;  // ERROR
     }
-    
-    if (DebugLogEnabled()) {
-      g_message("InAppWebView[%ld]: console.%s: %s",
-                static_cast<long>(targetWebView->id_), level.c_str(), message.c_str());
-    }
-    
+
     // Use targetWebView's channel delegate (for multi-window support)
     if (targetWebView->channel_delegate_) {
       targetWebView->channel_delegate_->onConsoleMessage(message, messageLevel);
     }
     // Fall through to resolve the internal handler
-    
+
   } else if (handlerName == "onPrintRequest") {
     // TODO: Implement print request handling (matches iOS)
-    if (DebugLogEnabled()) {
-      g_message("InAppWebView[%ld]: onPrintRequest (not yet implemented)",
-                static_cast<long>(targetWebView->id_));
-    }
-    
+
   } else if (handlerName == "onFindResultReceived") {
     // TODO: Implement find result handling (matches iOS)
-    if (DebugLogEnabled()) {
-      g_message("InAppWebView[%ld]: onFindResultReceived (not yet implemented)",
-                static_cast<long>(targetWebView->id_));
-    }
-    
+
   } else {
     // Not an internal handler - will be sent to Dart
     isInternalHandler = false;
@@ -2585,52 +2339,47 @@ void InAppWebView::handleScriptMessage(const std::string& name,
   if (isInternalHandler) {
     if (callHandlerId > 0) {
       std::string script =
-          "if(window." + JavaScriptBridgeJS::get_JAVASCRIPT_BRIDGE_NAME() + 
-          "[" + std::to_string(callHandlerId) + "] != null) {\n"
-          "    window." + JavaScriptBridgeJS::get_JAVASCRIPT_BRIDGE_NAME() + 
-          "[" + std::to_string(callHandlerId) + "].resolve();\n"
-          "    delete window." + JavaScriptBridgeJS::get_JAVASCRIPT_BRIDGE_NAME() + 
-          "[" + std::to_string(callHandlerId) + "];\n"
+          "if(window." + JavaScriptBridgeJS::get_JAVASCRIPT_BRIDGE_NAME() + "[" +
+          std::to_string(callHandlerId) +
+          "] != null) {\n"
+          "    window." +
+          JavaScriptBridgeJS::get_JAVASCRIPT_BRIDGE_NAME() + "[" + std::to_string(callHandlerId) +
+          "].resolve();\n"
+          "    delete window." +
+          JavaScriptBridgeJS::get_JAVASCRIPT_BRIDGE_NAME() + "[" + std::to_string(callHandlerId) +
+          "];\n"
           "}";
 
       // Resolve on the target webview
-      webkit_web_view_evaluate_javascript(
-          targetWebView->webview_, script.c_str(), static_cast<gssize>(script.length()),
-          nullptr, nullptr, nullptr, nullptr, nullptr);
+      webkit_web_view_evaluate_javascript(targetWebView->webview_, script.c_str(),
+                                          static_cast<gssize>(script.length()), nullptr, nullptr,
+                                          nullptr, nullptr, nullptr);
     }
     return;
   }
 
   // === External Handler - Send to Dart ===
   // Use targetWebView for multi-window support (matches iOS webView variable)
-  if (DebugLogEnabled()) {
-    g_message("InAppWebView[%ld]: callHandler '%s' origin=%s mainFrame=%d windowId=%s args=%.50s...",
-              static_cast<long>(targetWebView->id_), handlerName.c_str(), sourceOrigin.c_str(), 
-              isMainFrame, 
-              windowId.has_value() ? std::to_string(windowId.value()).c_str() : "null",
-              argsJsonStr.c_str());
-  }
 
   // Notify Dart side via channel delegate
   // Use targetWebView's channel delegate for multi-window support
   if (targetWebView->channel_delegate_) {
     // Match iOS: JavaScriptHandlerFunctionData(args:, isMainFrame:, origin:, requestUrl:)
-    auto data = std::make_unique<JavaScriptHandlerFunctionData>(
-        sourceOrigin,
-        requestUrl,
-        isMainFrame,
-        argsJsonStr);
-    
+    auto data = std::make_unique<JavaScriptHandlerFunctionData>(sourceOrigin, requestUrl,
+                                                                isMainFrame, argsJsonStr);
+
     // Create callback to send response back to JavaScript
     // Match iOS: CallJsHandlerCallback with defaultBehaviour and error
     auto callback = std::make_unique<WebViewChannelDelegate::CallJsHandlerCallback>();
-    
+
     int64_t capturedCallHandlerId = callHandlerId;
     InAppWebView* capturedTargetWebView = targetWebView;
-    
+
     // Match iOS: callback.defaultBehaviour = { (response: Any?) in ... }
-    callback->defaultBehaviour = [capturedTargetWebView, capturedCallHandlerId](const std::optional<FlValue*>& response) {
-      if (capturedTargetWebView->webview_ == nullptr) return;
+    callback->defaultBehaviour = [capturedTargetWebView,
+                                  capturedCallHandlerId](const std::optional<FlValue*>& response) {
+      if (capturedTargetWebView->webview_ == nullptr)
+        return;
 
       std::string jsonResult = "null";
       if (response.has_value() && response.value() != nullptr) {
@@ -2641,31 +2390,36 @@ void InAppWebView::handleScriptMessage(const std::string& name,
       }
 
       // Match iOS: window.flutter_inappwebview[_callHandlerID].resolve(json)
-      std::string script =
-          "if(window." + JavaScriptBridgeJS::get_JAVASCRIPT_BRIDGE_NAME() + 
-          "[" + std::to_string(capturedCallHandlerId) + "] != null) {\n"
-          "    window." + JavaScriptBridgeJS::get_JAVASCRIPT_BRIDGE_NAME() + 
-          "[" + std::to_string(capturedCallHandlerId) + "].resolve(" + jsonResult + ");\n"
-          "    delete window." + JavaScriptBridgeJS::get_JAVASCRIPT_BRIDGE_NAME() + 
-          "[" + std::to_string(capturedCallHandlerId) + "];\n"
-          "}";
+      std::string script = "if(window." + JavaScriptBridgeJS::get_JAVASCRIPT_BRIDGE_NAME() + "[" +
+                           std::to_string(capturedCallHandlerId) +
+                           "] != null) {\n"
+                           "    window." +
+                           JavaScriptBridgeJS::get_JAVASCRIPT_BRIDGE_NAME() + "[" +
+                           std::to_string(capturedCallHandlerId) + "].resolve(" + jsonResult +
+                           ");\n"
+                           "    delete window." +
+                           JavaScriptBridgeJS::get_JAVASCRIPT_BRIDGE_NAME() + "[" +
+                           std::to_string(capturedCallHandlerId) +
+                           "];\n"
+                           "}";
 
-      webkit_web_view_evaluate_javascript(
-          capturedTargetWebView->webview_, script.c_str(), static_cast<gssize>(script.length()),
-          nullptr, nullptr, nullptr, nullptr, nullptr);
+      webkit_web_view_evaluate_javascript(capturedTargetWebView->webview_, script.c_str(),
+                                          static_cast<gssize>(script.length()), nullptr, nullptr,
+                                          nullptr, nullptr, nullptr);
     };
-    
+
     // Match iOS: callback.error = { (code: String, message: String?, details: Any?) in ... }
     callback->error = [capturedTargetWebView, capturedCallHandlerId](const std::string& code,
-                                                     const std::string& message) {
-      if (capturedTargetWebView->webview_ == nullptr) return;
+                                                                     const std::string& message) {
+      if (capturedTargetWebView->webview_ == nullptr)
+        return;
 
       // Match iOS: let errorMessage = code + (message != nil ? ", " + (message ?? "") : "")
       std::string errorMessage = code;
       if (!message.empty()) {
         errorMessage += ", " + message;
       }
-      
+
       // Escape single quotes (match iOS: replacingOccurrences(of: "\'", with: "\\'"))
       std::string escapedMessage;
       for (char c : errorMessage) {
@@ -2677,22 +2431,28 @@ void InAppWebView::handleScriptMessage(const std::string& name,
       }
 
       // Match iOS: window.flutter_inappwebview[_callHandlerID].reject(new Error(...))
-      std::string script =
-          "if(window." + JavaScriptBridgeJS::get_JAVASCRIPT_BRIDGE_NAME() + 
-          "[" + std::to_string(capturedCallHandlerId) + "] != null) {\n"
-          "    window." + JavaScriptBridgeJS::get_JAVASCRIPT_BRIDGE_NAME() + 
-          "[" + std::to_string(capturedCallHandlerId) + "].reject(new Error('" + escapedMessage + "'));\n"
-          "    delete window." + JavaScriptBridgeJS::get_JAVASCRIPT_BRIDGE_NAME() + 
-          "[" + std::to_string(capturedCallHandlerId) + "];\n"
-          "}";
+      std::string script = "if(window." + JavaScriptBridgeJS::get_JAVASCRIPT_BRIDGE_NAME() + "[" +
+                           std::to_string(capturedCallHandlerId) +
+                           "] != null) {\n"
+                           "    window." +
+                           JavaScriptBridgeJS::get_JAVASCRIPT_BRIDGE_NAME() + "[" +
+                           std::to_string(capturedCallHandlerId) + "].reject(new Error('" +
+                           escapedMessage +
+                           "'));\n"
+                           "    delete window." +
+                           JavaScriptBridgeJS::get_JAVASCRIPT_BRIDGE_NAME() + "[" +
+                           std::to_string(capturedCallHandlerId) +
+                           "];\n"
+                           "}";
 
-      webkit_web_view_evaluate_javascript(
-          capturedTargetWebView->webview_, script.c_str(), static_cast<gssize>(script.length()),
-          nullptr, nullptr, nullptr, nullptr, nullptr);
+      webkit_web_view_evaluate_javascript(capturedTargetWebView->webview_, script.c_str(),
+                                          static_cast<gssize>(script.length()), nullptr, nullptr,
+                                          nullptr, nullptr, nullptr);
     };
-    
+
     // Match iOS: channelDelegate.onCallJsHandler(handlerName:, data:, callback:)
-    targetWebView->channel_delegate_->onCallJsHandler(handlerName, std::move(data), std::move(callback));
+    targetWebView->channel_delegate_->onCallJsHandler(handlerName, std::move(data),
+                                                      std::move(callback));
   }
 }
 
@@ -2707,41 +2467,32 @@ void InAppWebView::initializeWindowIdJS() {
   if (!window_id_.has_value()) {
     return;
   }
-  
+
   int64_t windowId = window_id_.value();
-  
+
   // Build the JavaScript to initialize the window ID
-  // Match iOS: WindowIdJS.WINDOW_ID_INITIALIZE_JS_SOURCE().replacingOccurrences(of: VAR_PLACEHOLDER_VALUE, with: String(windowId))
+  // Match iOS: WindowIdJS.WINDOW_ID_INITIALIZE_JS_SOURCE().replacingOccurrences(of:
+  // VAR_PLACEHOLDER_VALUE, with: String(windowId))
   std::string script = R"JS(
 (function() {
-    )JS" + JavaScriptBridgeJS::WINDOW_ID_VARIABLE_JS_SOURCE() + R"JS( = )JS" + std::to_string(windowId) + R"JS(;
-    return )JS" + JavaScriptBridgeJS::WINDOW_ID_VARIABLE_JS_SOURCE() + R"JS(;
+    )JS" + JavaScriptBridgeJS::WINDOW_ID_VARIABLE_JS_SOURCE() +
+                       R"JS( = )JS" + std::to_string(windowId) + R"JS(;
+    return )JS" + JavaScriptBridgeJS::WINDOW_ID_VARIABLE_JS_SOURCE() +
+                       R"JS(;
 })()
 )JS";
-  
-  if (DebugLogEnabled()) {
-    g_message("InAppWebView[%ld]: initializeWindowIdJS windowId=%ld",
-              static_cast<long>(id_), static_cast<long>(windowId));
-  }
-  
+
   evaluateJavascript(script, nullptr);
 }
 
 void InAppWebView::OnExportShmBuffer(struct wpe_fdo_shm_exported_buffer* buffer) {
   if (buffer == nullptr) {
-    if (DebugLogEnabled()) {
-      g_message("InAppWebView[%ld]: OnExportShmBuffer called with null buffer",
-                static_cast<long>(id_));
-    }
     return;
   }
 
   // Get the wl_shm_buffer from the exported buffer
   struct wl_shm_buffer* shm_buffer = wpe_fdo_shm_exported_buffer_get_shm_buffer(buffer);
   if (shm_buffer == nullptr) {
-    if (DebugLogEnabled()) {
-      g_warning("InAppWebView[%ld]: Failed to get wl_shm_buffer", static_cast<long>(id_));
-    }
     // Release the buffer
     if (exportable_ != nullptr) {
       wpe_view_backend_exportable_fdo_dispatch_release_shm_exported_buffer(exportable_, buffer);
@@ -2753,16 +2504,7 @@ void InAppWebView::OnExportShmBuffer(struct wpe_fdo_shm_exported_buffer* buffer)
   int32_t width = wl_shm_buffer_get_width(shm_buffer);
   int32_t height = wl_shm_buffer_get_height(shm_buffer);
   int32_t stride = wl_shm_buffer_get_stride(shm_buffer);
-  uint32_t format = wl_shm_buffer_get_format(shm_buffer);
-
-  if (DebugLogEnabled()) {
-    static int shm_frame_count = 0;
-    shm_frame_count++;
-    if (shm_frame_count <= 5 || shm_frame_count % 60 == 0) {
-      g_message("InAppWebView[%ld]: OnExportShmBuffer frame %d (%dx%d stride=%d format=0x%x)",
-                static_cast<long>(id_), shm_frame_count, width, height, stride, format);
-    }
-  }
+  (void)wl_shm_buffer_get_format(shm_buffer);  // format not used
 
   // Begin access to buffer data
   wl_shm_buffer_begin_access(shm_buffer);
@@ -2771,37 +2513,37 @@ void InAppWebView::OnExportShmBuffer(struct wpe_fdo_shm_exported_buffer* buffer)
   if (data != nullptr && width > 0 && height > 0) {
     // Copy to our pixel buffer
     // Note: stride is the row pitch in bytes (may include padding)
-    
+
     size_t write_idx = write_buffer_index_.load(std::memory_order_relaxed);
     auto& pixel_buffer = pixel_buffers_[write_idx];
-    
+
     // Use width*4 for tightly packed RGBA output (no stride padding)
     size_t output_row_size = static_cast<size_t>(width) * 4;
     size_t output_size = static_cast<size_t>(height) * output_row_size;
-    
+
     if (pixel_buffer.data.size() != output_size) {
       pixel_buffer.data.resize(output_size);
     }
-    
+
     pixel_buffer.width = static_cast<size_t>(width);
     pixel_buffer.height = static_cast<size_t>(height);
-    
+
     // Convert from BGRA (WL_SHM_FORMAT_ARGB8888 in memory) to RGBA
     // Also handle stride properly
     uint8_t* src = static_cast<uint8_t*>(data);
     uint8_t* dst = pixel_buffer.data.data();
-    
+
     for (int32_t y = 0; y < height; ++y) {
       uint8_t* src_row = src + y * stride;
       uint8_t* dst_row = dst + y * output_row_size;
-      
+
       for (int32_t x = 0; x < width; ++x) {
         // Source is BGRA (WL_SHM_FORMAT_ARGB8888 on little-endian)
         uint8_t b = src_row[x * 4 + 0];
         uint8_t g = src_row[x * 4 + 1];
         uint8_t r = src_row[x * 4 + 2];
         uint8_t a = src_row[x * 4 + 3];
-        
+
         // Destination is RGBA for Flutter
         dst_row[x * 4 + 0] = r;
         dst_row[x * 4 + 1] = g;
@@ -2809,7 +2551,7 @@ void InAppWebView::OnExportShmBuffer(struct wpe_fdo_shm_exported_buffer* buffer)
         dst_row[x * 4 + 3] = a;
       }
     }
-    
+
     // Swap buffers
     {
       std::lock_guard<std::mutex> lock(buffer_swap_mutex_);
@@ -2838,18 +2580,14 @@ void InAppWebView::OnExportShmBuffer(struct wpe_fdo_shm_exported_buffer* buffer)
 // C-style callback implementation for WPE FDO EGL export
 // Must be outside the namespace for C API compatibility
 extern "C" {
-static void wpe_export_fdo_egl_image_callback(
-    void* data, 
-    struct wpe_fdo_egl_exported_image* image) {
+static void wpe_export_fdo_egl_image_callback(void* data,
+                                              struct wpe_fdo_egl_exported_image* image) {
   auto* self = static_cast<flutter_inappwebview_plugin::InAppWebView*>(data);
   self->OnExportDmaBuf(image);
 }
 
-static void wpe_export_shm_buffer_callback(
-    void* data,
-    struct wpe_fdo_shm_exported_buffer* buffer) {
+static void wpe_export_shm_buffer_callback(void* data, struct wpe_fdo_shm_exported_buffer* buffer) {
   auto* self = static_cast<flutter_inappwebview_plugin::InAppWebView*>(data);
   self->OnExportShmBuffer(buffer);
 }
 }
-

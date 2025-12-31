@@ -14,16 +14,15 @@ template <typename T = void, typename = void>
 struct is_vector_impl : std::false_type {};
 
 template <typename T>
-struct is_vector_impl<
-    T, std::enable_if_t<std::is_same<
-           T, typename std::vector<std::string>>::value>> : std::true_type {};
+struct is_vector_impl<T,
+                      std::enable_if_t<std::is_same<T, typename std::vector<std::string>>::value>>
+    : std::true_type {};
 
 template <typename T>
 struct is_vector_impl<
     T, std::enable_if_t<std::is_same<
-           T, typename std::vector<
-                  typename std::iterator_traits<T>::value_type>::iterator>::
-                            value>> : std::true_type {};
+           T, typename std::vector<typename std::iterator_traits<T>::value_type>::iterator>::value>>
+    : std::true_type {};
 
 template <typename T>
 struct is_vector : is_vector_impl<T>::type {};
@@ -34,11 +33,9 @@ static inline void vector_remove(std::vector<T>& vec, const T& el) {
 }
 
 template <typename T, typename UnaryPredicate>
-static inline void vector_remove_if(std::vector<T>& vec,
-                                    UnaryPredicate&& predicate) {
-  vec.erase(
-      std::remove_if(vec.begin(), vec.end(), std::forward<UnaryPredicate>(predicate)),
-      vec.end());
+static inline void vector_remove_if(std::vector<T>& vec, UnaryPredicate&& predicate) {
+  vec.erase(std::remove_if(vec.begin(), vec.end(), std::forward<UnaryPredicate>(predicate)),
+            vec.end());
 }
 
 template <typename T>
@@ -47,10 +44,8 @@ static inline void vector_remove_erase(std::vector<T>& vec, const T& el) {
 }
 
 template <typename T, typename UnaryPredicate>
-static inline void vector_remove_erase_if(std::vector<T>& vec,
-                                          UnaryPredicate&& predicate) {
-  vec.erase(std::remove_if(vec.begin(), vec.end(),
-                           std::forward<UnaryPredicate>(predicate)),
+static inline void vector_remove_erase_if(std::vector<T>& vec, UnaryPredicate&& predicate) {
+  vec.erase(std::remove_if(vec.begin(), vec.end(), std::forward<UnaryPredicate>(predicate)),
             vec.end());
 }
 
@@ -60,23 +55,19 @@ static inline bool vector_contains(const std::vector<T>& vec, const T& value) {
 }
 
 template <typename T, typename UnaryPredicate>
-static inline bool vector_contains_if(const std::vector<T>& vec,
-                                      UnaryPredicate&& predicate) {
-  return std::find_if(vec.begin(), vec.end(),
-                      std::forward<UnaryPredicate>(predicate)) != vec.end();
+static inline bool vector_contains_if(const std::vector<T>& vec, UnaryPredicate&& predicate) {
+  return std::find_if(vec.begin(), vec.end(), std::forward<UnaryPredicate>(predicate)) != vec.end();
 }
 
 template <typename Iterator, typename Func>
 static inline auto functional_map(Iterator begin, Iterator end, Func&& func)
     -> std::vector<decltype(func(std::declval<typename Iterator::value_type>()))> {
-  using value_type =
-      decltype(func(std::declval<typename Iterator::value_type>()));
+  using value_type = decltype(func(std::declval<typename Iterator::value_type>()));
 
   std::vector<value_type> out_vector;
   out_vector.reserve(std::distance(begin, end));
 
-  std::transform(begin, end, std::back_inserter(out_vector),
-                 std::forward<Func>(func));
+  std::transform(begin, end, std::back_inserter(out_vector), std::forward<Func>(func));
 
   return out_vector;
 }
@@ -84,8 +75,7 @@ static inline auto functional_map(Iterator begin, Iterator end, Func&& func)
 template <typename T, typename Func>
 static inline auto functional_map(const T& iterable, Func&& func)
     -> std::vector<decltype(func(std::declval<typename T::value_type>()))> {
-  return functional_map(std::begin(iterable), std::end(iterable),
-                        std::forward<Func>(func));
+  return functional_map(std::begin(iterable), std::end(iterable), std::forward<Func>(func));
 }
 
 template <typename T, typename Func>

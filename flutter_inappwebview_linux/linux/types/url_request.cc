@@ -4,11 +4,10 @@
 
 namespace flutter_inappwebview_plugin {
 
-URLRequest::URLRequest(
-    const std::optional<std::string>& url,
-    const std::optional<std::string>& method,
-    const std::optional<std::map<std::string, std::string>>& headers,
-    const std::optional<std::vector<uint8_t>>& body)
+URLRequest::URLRequest(const std::optional<std::string>& url,
+                       const std::optional<std::string>& method,
+                       const std::optional<std::map<std::string, std::string>>& headers,
+                       const std::optional<std::vector<uint8_t>>& body)
     : url(url), method(method), headers(headers), body(body) {}
 
 URLRequest::URLRequest(FlValue* map)

@@ -18,8 +18,7 @@ class ScopeGuard {
  public:
   explicit ScopeGuard(Func&& func) : func_(std::move(func)), active_(true) {}
 
-  ScopeGuard(ScopeGuard&& other) noexcept
-      : func_(std::move(other.func_)), active_(other.active_) {
+  ScopeGuard(ScopeGuard&& other) noexcept : func_(std::move(other.func_)), active_(other.active_) {
     other.dismiss();
   }
 

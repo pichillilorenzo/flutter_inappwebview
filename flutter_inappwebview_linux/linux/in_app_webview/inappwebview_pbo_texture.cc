@@ -1,16 +1,18 @@
 #include "inappwebview_pbo_texture.h"
 
 #include <epoxy/gl.h>
+
 #include <cstring>
 
+#include "../utils/log.h"
 #include "in_app_webview.h"
 
 /**
  * PBO-optimized GL texture for efficient WebView rendering.
- * 
+ *
  * This implementation uses the double-buffered PBO streaming technique
  * described at https://www.songho.ca/opengl/gl_pbo.html
- * 
+ *
  * Benefits:
  * 1. Asynchronous DMA transfer - GPU handles data copy while CPU continues
  * 2. Double buffering - one PBO uploads while the other receives new data
@@ -61,14 +63,9 @@ struct _InAppWebViewPBOTexture {
   GMutex mutex;
 };
 
-G_DEFINE_TYPE(InAppWebViewPBOTexture, inappwebview_pbo_texture,
-              fl_texture_gl_get_type())
+G_DEFINE_TYPE(InAppWebViewPBOTexture, inappwebview_pbo_texture, fl_texture_gl_get_type())
 
 namespace {
-bool DebugLogEnabled() {
-  static bool enabled = g_getenv("FLUTTER_INAPPWEBVIEW_LINUX_DEBUG_TEXTURE") != nullptr;
-  return enabled;
-}
 
 // Check if PBOs are supported - must be called with GL context current
 bool ArePBOsSupported() {
@@ -76,9 +73,8 @@ bool ArePBOsSupported() {
   // epoxy should handle the extension check automatically
   // Note: This must be called when GL context is current
   int gl_version = epoxy_gl_version();
-  bool supported = gl_version >= 21 || 
-              epoxy_has_gl_extension("GL_ARB_pixel_buffer_object") ||
-              epoxy_has_gl_extension("GL_EXT_pixel_buffer_object");
+  bool supported = gl_version >= 21 || epoxy_has_gl_extension("GL_ARB_pixel_buffer_object") ||
+                   epoxy_has_gl_extension("GL_EXT_pixel_buffer_object");
   return supported;
 }
 }  // namespace
@@ -96,34 +92,26 @@ static gboolean init_pbos(InAppWebViewPBOTexture* self, size_t size) {
   }
 
   glGenBuffers(NUM_PBOS, self->pbo_ids);
-  
+
   for (int i = 0; i < NUM_PBOS; i++) {
     glBindBuffer(GL_PIXEL_UNPACK_BUFFER, self->pbo_ids[i]);
     // Use GL_STREAM_DRAW for streaming texture uploads
     glBufferData(GL_PIXEL_UNPACK_BUFFER, size, nullptr, GL_STREAM_DRAW);
   }
-  
+
   glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
-  
+
   self->pbo_size = size;
   self->pbos_initialized = TRUE;
   self->current_pbo_index = 0;
-  
-  if (DebugLogEnabled()) {
-    g_message("InAppWebViewPBOTexture: initialized %d PBOs, size=%zu", 
-              NUM_PBOS, size);
-  }
-  
+
   return TRUE;
 }
 
 // Populate callback - called by Flutter to get the OpenGL texture
-static gboolean inappwebview_pbo_texture_populate(FlTextureGL* texture,
-                                                   uint32_t* target,
-                                                   uint32_t* name,
-                                                   uint32_t* width,
-                                                   uint32_t* height,
-                                                   GError** error) {
+static gboolean inappwebview_pbo_texture_populate(FlTextureGL* texture, uint32_t* target,
+                                                  uint32_t* name, uint32_t* width, uint32_t* height,
+                                                  GError** error) {
   InAppWebViewPBOTexture* self = INAPPWEBVIEW_PBO_TEXTURE(texture);
 
   g_mutex_lock(&self->mutex);
@@ -131,9 +119,6 @@ static gboolean inappwebview_pbo_texture_populate(FlTextureGL* texture,
   // Check if we have a valid webview
   if (self->webview == nullptr) {
     g_mutex_unlock(&self->mutex);
-    if (DebugLogEnabled()) {
-      g_message("InAppWebViewPBOTexture: populate failed - no webview");
-    }
     return FALSE;
   }
 
@@ -147,18 +132,18 @@ static gboolean inappwebview_pbo_texture_populate(FlTextureGL* texture,
     if (!self->default_texture_initialized) {
       glGenTextures(1, &self->default_texture_id);
       glBindTexture(GL_TEXTURE_2D, self->default_texture_id);
-      uint8_t pixel[4] = {255, 255, 255, 255}; // White opaque
+      uint8_t pixel[4] = {255, 255, 255, 255};  // White opaque
       glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, 1, 1, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixel);
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
       self->default_texture_initialized = TRUE;
     }
-    
+
     *target = GL_TEXTURE_2D;
     *name = self->default_texture_id;
     *width = 1;
     *height = 1;
-    
+
     g_mutex_unlock(&self->mutex);
     return TRUE;
   }
@@ -167,12 +152,8 @@ static gboolean inappwebview_pbo_texture_populate(FlTextureGL* texture,
   if (!self->pbo_support_checked) {
     self->pbo_support_checked = TRUE;
     self->pbo_supported = ArePBOsSupported();
-    if (DebugLogEnabled()) {
-      g_message("InAppWebViewPBOTexture: PBO support = %s (GL version %d)",
-                self->pbo_supported ? "yes" : "no", epoxy_gl_version());
-    }
   }
-  
+
   if (!self->pbo_supported) {
     // Fall back to direct texture upload
     if (self->staging_buffer_size < required_size) {
@@ -181,8 +162,8 @@ static gboolean inappwebview_pbo_texture_populate(FlTextureGL* texture,
       self->staging_buffer_size = required_size;
     }
 
-    if (!self->webview->CopyPixelBufferTo(self->staging_buffer, required_size,
-                                          &buf_width, &buf_height)) {
+    if (!self->webview->CopyPixelBufferTo(self->staging_buffer, required_size, &buf_width,
+                                          &buf_height)) {
       g_mutex_unlock(&self->mutex);
       return FALSE;
     }
@@ -193,15 +174,15 @@ static gboolean inappwebview_pbo_texture_populate(FlTextureGL* texture,
     }
 
     glBindTexture(GL_TEXTURE_2D, self->texture_id);
-    
+
     if (buf_width != self->texture_width || buf_height != self->texture_height) {
-      glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, buf_width, buf_height,
-                   0, GL_RGBA, GL_UNSIGNED_BYTE, self->staging_buffer);
+      glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, buf_width, buf_height, 0, GL_RGBA, GL_UNSIGNED_BYTE,
+                   self->staging_buffer);
       self->texture_width = buf_width;
       self->texture_height = buf_height;
     } else {
-      glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, buf_width, buf_height,
-                      GL_RGBA, GL_UNSIGNED_BYTE, self->staging_buffer);
+      glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, buf_width, buf_height, GL_RGBA, GL_UNSIGNED_BYTE,
+                      self->staging_buffer);
     }
 
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -219,7 +200,7 @@ static gboolean inappwebview_pbo_texture_populate(FlTextureGL* texture,
   }
 
   // === PBO-optimized path ===
-  
+
   // Initialize or resize PBOs
   if (!init_pbos(self, required_size)) {
     g_mutex_unlock(&self->mutex);
@@ -232,8 +213,8 @@ static gboolean inappwebview_pbo_texture_populate(FlTextureGL* texture,
   if (!self->texture_initialized) {
     glGenTextures(1, &self->texture_id);
     glBindTexture(GL_TEXTURE_2D, self->texture_id);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, buf_width, buf_height,
-                 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, buf_width, buf_height, 0, GL_RGBA, GL_UNSIGNED_BYTE,
+                 nullptr);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -241,16 +222,12 @@ static gboolean inappwebview_pbo_texture_populate(FlTextureGL* texture,
     self->texture_initialized = TRUE;
     self->texture_width = buf_width;
     self->texture_height = buf_height;
-    if (DebugLogEnabled()) {
-      g_message("InAppWebViewPBOTexture: created texture %u (%ux%u)",
-                self->texture_id, buf_width, buf_height);
-    }
   }
 
   // Use double-buffered PBO streaming:
   // - Bind PBO[index] for texture upload (this triggers DMA from previous frame)
   // - Map PBO[nextIndex] and copy new frame data into it
-  
+
   int upload_index = self->current_pbo_index;
   int fill_index = (self->current_pbo_index + 1) % NUM_PBOS;
 
@@ -258,34 +235,32 @@ static gboolean inappwebview_pbo_texture_populate(FlTextureGL* texture,
   // This should be fast because the DMA transfer happened asynchronously
   glBindTexture(GL_TEXTURE_2D, self->texture_id);
   glBindBuffer(GL_PIXEL_UNPACK_BUFFER, self->pbo_ids[upload_index]);
-  
+
   // Check if texture needs to be resized
   if (buf_width != self->texture_width || buf_height != self->texture_height) {
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, buf_width, buf_height,
-                 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);  // nullptr = use PBO
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, buf_width, buf_height, 0, GL_RGBA, GL_UNSIGNED_BYTE,
+                 nullptr);  // nullptr = use PBO
     self->texture_width = buf_width;
     self->texture_height = buf_height;
   } else {
     // Use glTexSubImage2D for faster updates (no reallocation)
-    glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, buf_width, buf_height,
-                    GL_RGBA, GL_UNSIGNED_BYTE, nullptr);  // nullptr = use PBO
+    glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, buf_width, buf_height, GL_RGBA, GL_UNSIGNED_BYTE,
+                    nullptr);  // nullptr = use PBO
   }
 
   // Step 2: Fill the "fill" PBO with new frame data
   glBindBuffer(GL_PIXEL_UNPACK_BUFFER, self->pbo_ids[fill_index]);
-  
+
   // Orphan the buffer to avoid GPU stall
   // This tells OpenGL we don't care about the old data anymore
   glBufferData(GL_PIXEL_UNPACK_BUFFER, required_size, nullptr, GL_STREAM_DRAW);
-  
+
   // Map the buffer for writing
-  GLubyte* ptr = static_cast<GLubyte*>(
-      glMapBuffer(GL_PIXEL_UNPACK_BUFFER, GL_WRITE_ONLY));
-  
+  GLubyte* ptr = static_cast<GLubyte*>(glMapBuffer(GL_PIXEL_UNPACK_BUFFER, GL_WRITE_ONLY));
+
   if (ptr != nullptr) {
     // Copy pixel data directly into the PBO
-    if (!self->webview->CopyPixelBufferTo(ptr, required_size,
-                                          &buf_width, &buf_height)) {
+    if (!self->webview->CopyPixelBufferTo(ptr, required_size, &buf_width, &buf_height)) {
       glUnmapBuffer(GL_PIXEL_UNPACK_BUFFER);
       glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
       g_mutex_unlock(&self->mutex);
@@ -299,26 +274,21 @@ static gboolean inappwebview_pbo_texture_populate(FlTextureGL* texture,
       self->staging_buffer = static_cast<uint8_t*>(g_malloc(required_size));
       self->staging_buffer_size = required_size;
     }
-    
-    if (self->webview->CopyPixelBufferTo(self->staging_buffer, required_size,
-                                         &buf_width, &buf_height)) {
+
+    if (self->webview->CopyPixelBufferTo(self->staging_buffer, required_size, &buf_width,
+                                         &buf_height)) {
       glBufferSubData(GL_PIXEL_UNPACK_BUFFER, 0, required_size, self->staging_buffer);
     }
   }
-  
+
   // Unbind PBO
   glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
-  
+
   // Swap PBO indices for next frame
   self->current_pbo_index = fill_index;
-  
+
   // Update frame counter
   self->frame_count++;
-  
-  if (DebugLogEnabled() && (self->frame_count % 60) == 0) {
-    g_message("InAppWebViewPBOTexture: frame %u, %ux%u, PBO upload",
-              self->frame_count, buf_width, buf_height);
-  }
 
   *target = GL_TEXTURE_2D;
   *name = self->texture_id;
@@ -326,7 +296,7 @@ static gboolean inappwebview_pbo_texture_populate(FlTextureGL* texture,
   *height = buf_height;
 
   g_mutex_unlock(&self->mutex);
-  
+
   return TRUE;
 }
 
@@ -341,7 +311,7 @@ static void inappwebview_pbo_texture_dispose(GObject* object) {
   self->texture_initialized = FALSE;
   self->default_texture_id = 0;
   self->default_texture_initialized = FALSE;
-  
+
   // Note: PBOs would need to be deleted, but again, no GL context guarantee
   self->pbos_initialized = FALSE;
 
@@ -366,7 +336,7 @@ static void inappwebview_pbo_texture_init(InAppWebViewPBOTexture* self) {
   self->texture_initialized = FALSE;
   self->texture_width = 0;
   self->texture_height = 0;
-  
+
   for (int i = 0; i < NUM_PBOS; i++) {
     self->pbo_ids[i] = 0;
   }
@@ -375,29 +345,25 @@ static void inappwebview_pbo_texture_init(InAppWebViewPBOTexture* self) {
   self->pbo_supported = FALSE;
   self->current_pbo_index = 0;
   self->pbo_size = 0;
-  
+
   self->default_texture_id = 0;
   self->default_texture_initialized = FALSE;
-  
+
   self->staging_buffer = nullptr;
   self->staging_buffer_size = 0;
-  
+
   self->last_width = 0;
   self->last_height = 0;
   self->frame_count = 0;
-  
+
   g_mutex_init(&self->mutex);
 }
 
 InAppWebViewPBOTexture* inappwebview_pbo_texture_new(
     flutter_inappwebview_plugin::WebViewType* webview) {
-  InAppWebViewPBOTexture* self = INAPPWEBVIEW_PBO_TEXTURE(
-      g_object_new(INAPPWEBVIEW_TYPE_PBO_TEXTURE, nullptr));
+  InAppWebViewPBOTexture* self =
+      INAPPWEBVIEW_PBO_TEXTURE(g_object_new(INAPPWEBVIEW_TYPE_PBO_TEXTURE, nullptr));
   self->webview = webview;
-  
-  if (DebugLogEnabled()) {
-    g_message("InAppWebViewPBOTexture: created new PBO texture (support check deferred to GL context)");
-  }
-  
+  flutter_inappwebview_plugin::debugLog("InAppWebViewPBOTexture: created");
   return self;
 }

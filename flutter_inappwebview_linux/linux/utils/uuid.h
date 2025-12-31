@@ -1,10 +1,10 @@
 #ifndef FLUTTER_INAPPWEBVIEW_PLUGIN_UUID_UTIL_H_
 #define FLUTTER_INAPPWEBVIEW_PLUGIN_UUID_UTIL_H_
 
+#include <iomanip>
 #include <random>
 #include <sstream>
 #include <string>
-#include <iomanip>
 
 namespace flutter_inappwebview_plugin {
 
@@ -22,13 +22,9 @@ static inline std::string get_uuid() {
   uint16_t data5_lo = static_cast<uint16_t>(dis(gen) & 0xFFFF);
 
   std::ostringstream oss;
-  oss << std::hex << std::setfill('0')
-      << std::setw(8) << data1 << "-"
-      << std::setw(4) << data2 << "-"
-      << std::setw(4) << data3 << "-"
-      << std::setw(4) << data4 << "-"
-      << std::setw(8) << data5_hi
-      << std::setw(4) << data5_lo;
+  oss << std::hex << std::setfill('0') << std::setw(8) << data1 << "-" << std::setw(4) << data2
+      << "-" << std::setw(4) << data3 << "-" << std::setw(4) << data4 << "-" << std::setw(8)
+      << data5_hi << std::setw(4) << data5_lo;
 
   return oss.str();
 }

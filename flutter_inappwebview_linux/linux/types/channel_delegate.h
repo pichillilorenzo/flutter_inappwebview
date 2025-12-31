@@ -31,11 +31,8 @@ class ChannelDelegate {
   /**
    * Invoke a method on the Dart side with a result callback.
    */
-  void invokeMethodWithResult(
-      const std::string& method,
-      FlValue* arguments,
-      GAsyncReadyCallback callback,
-      gpointer user_data) const;
+  void invokeMethodWithResult(const std::string& method, FlValue* arguments,
+                              GAsyncReadyCallback callback, gpointer user_data) const;
 
   /**
    * Unregister the method call handler.
@@ -50,8 +47,7 @@ class ChannelDelegate {
   FlMethodChannel* channel_ = nullptr;
 
  private:
-  static void HandleMethodCallStatic(FlMethodChannel* channel,
-                                     FlMethodCall* method_call,
+  static void HandleMethodCallStatic(FlMethodChannel* channel, FlMethodCall* method_call,
                                      gpointer user_data);
 };
 

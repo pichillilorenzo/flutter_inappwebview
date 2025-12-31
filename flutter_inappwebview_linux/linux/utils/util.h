@@ -16,8 +16,7 @@ static inline std::optional<T> make_pointer_optional(const T* value) {
   return value == nullptr ? std::nullopt : std::make_optional<T>(*value);
 }
 
-static inline std::string variant_to_string(
-    const std::variant<std::string, int64_t>& var) {
+static inline std::string variant_to_string(const std::variant<std::string, int64_t>& var) {
   return std::visit(
       [](auto&& arg) {
         using T = std::decay_t<decltype(arg)>;

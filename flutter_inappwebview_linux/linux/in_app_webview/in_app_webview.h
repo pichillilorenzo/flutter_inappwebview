@@ -2,7 +2,7 @@
 #define FLUTTER_INAPPWEBVIEW_PLUGIN_IN_APP_WEBVIEW_H_
 
 // WPE WebKit-based InAppWebView implementation
-// 
+//
 // Uses WPE WebKit for offscreen web rendering with the FDO backend.
 // WPE WebKit is designed for embedded systems and offers excellent offscreen rendering
 // capabilities through its backend system.
@@ -24,9 +24,9 @@
 #include <flutter_linux/flutter_linux.h>
 
 // WPE WebKit includes
-#include <wpe/webkit.h>
-#include <wpe/fdo.h>
 #include <wpe/fdo-egl.h>
+#include <wpe/fdo.h>
+#include <wpe/webkit.h>
 
 #include <array>
 #include <atomic>
@@ -87,15 +87,12 @@ class InAppWebView {
   static constexpr const char* METHOD_CHANNEL_NAME_PREFIX =
       "com.pichillilorenzo/flutter_inappwebview_";
 
-  InAppWebView(FlBinaryMessenger* messenger, int64_t id,
-                  const InAppWebViewCreationParams& params);
+  InAppWebView(FlBinaryMessenger* messenger, int64_t id, const InAppWebViewCreationParams& params);
   ~InAppWebView();
 
   int64_t id() const { return id_; }
   WebKitWebView* webview() const { return webview_; }
-  WebViewChannelDelegate* channel_delegate() const {
-    return channel_delegate_.get();
-  }
+  WebViewChannelDelegate* channel_delegate() const { return channel_delegate_.get(); }
 
   // Attach/recreate the Dart method channel using the given [channel_id].
   void AttachChannel(FlBinaryMessenger* messenger, int64_t channel_id);
@@ -105,8 +102,8 @@ class InAppWebView {
   // Navigation methods
   void loadUrl(const std::string& url);
   void loadUrl(const std::shared_ptr<URLRequest>& urlRequest);
-  void loadData(const std::string& data, const std::string& mime_type,
-                const std::string& encoding, const std::string& base_url);
+  void loadData(const std::string& data, const std::string& mime_type, const std::string& encoding,
+                const std::string& base_url);
   void loadFile(const std::string& asset_file_path);
   void reload();
   void goBack();
@@ -122,9 +119,8 @@ class InAppWebView {
   int64_t getProgress() const;
 
   // JavaScript execution
-  void evaluateJavascript(
-      const std::string& source,
-      std::function<void(const std::optional<std::string>&)> callback);
+  void evaluateJavascript(const std::string& source,
+                          std::function<void(const std::optional<std::string>&)> callback);
   void injectJavascriptFileFromUrl(const std::string& urlFile);
   void injectCSSCode(const std::string& source);
   void injectCSSFileFromUrl(const std::string& urlFile);
@@ -155,9 +151,7 @@ class InAppWebView {
                    FlValue* newSettingsMap = nullptr);
 
   // User content controller
-  UserContentController* userContentController() const {
-    return user_content_controller_.get();
-  }
+  UserContentController* userContentController() const { return user_content_controller_.get(); }
 
   // Size management
   void setSize(int width, int height);
@@ -186,9 +180,9 @@ class InAppWebView {
   void SetCursorPos(double x, double y);
   void SetPointerButton(int kind, int button, int clickCount = 1);
   void SetScrollDelta(double dx, double dy);
-  void SendKeyEvent(int type, int64_t keyCode, int scanCode, int modifiers, 
+  void SendKeyEvent(int type, int64_t keyCode, int scanCode, int modifiers,
                     const std::string& characters);
-  void SendTouchEvent(int type, int id, double x, double y, 
+  void SendTouchEvent(int type, int id, double x, double y,
                       const std::vector<std::tuple<int, double, double, int>>& touchPoints);
 
   // Texture pixel buffer access (called by texture classes)
@@ -213,13 +207,13 @@ class InAppWebView {
   static bool IsWpeWebKitAvailable();
 
   // === Multi-Window Support (matches iOS) ===
-  
+
   // Set the window ID for this webview (used in window.open scenarios)
   void setWindowId(int64_t windowId) { window_id_ = windowId; }
-  
+
   // Get the window ID (null if not set)
   std::optional<int64_t> getWindowId() const { return window_id_; }
-  
+
   // Initialize the window ID JavaScript variable in the webview
   // This injects JS to set window._flutter_inappwebview_windowId
   void initializeWindowIdJS();
@@ -233,19 +227,19 @@ class InAppWebView {
 
   // WPE WebKit view
   WebKitWebView* webview_ = nullptr;
-  
+
   // WPE Backend (using FDO for DMA-BUF export)
   WebKitWebViewBackend* backend_ = nullptr;
   struct wpe_view_backend* wpe_backend_ = nullptr;
-  
+
   // WPE FDO exportable (for DMA-BUF buffer export)
   struct wpe_view_backend_exportable_fdo* exportable_ = nullptr;
   ::wpe_fdo_egl_exported_image* exported_image_ = nullptr;
 
   // EGL context for reading back pixels
-  void* egl_display_ = nullptr;  // EGLDisplay
-  void* egl_context_ = nullptr;  // EGLContext for readback
-  unsigned int fbo_ = 0;         // Framebuffer object for EGL image binding
+  void* egl_display_ = nullptr;        // EGLDisplay
+  void* egl_context_ = nullptr;        // EGLContext for readback
+  unsigned int fbo_ = 0;               // Framebuffer object for EGL image binding
   unsigned int readback_texture_ = 0;  // Texture for EGL image
 
   // Triple buffering for pixel data (fallback when DMA-BUF not available)
@@ -273,10 +267,10 @@ class InAppWebView {
 
   // JavaScript bridge secret for security
   std::string js_bridge_secret_;
-  
+
   // Window ID for multi-window support (matches iOS windowId)
   std::optional<int64_t> window_id_;
-  
+
   // Flag to track if javaScriptBridgeEnabled
   bool java_script_bridge_enabled_ = true;
 
@@ -335,7 +329,7 @@ class InAppWebView {
   void InitWebView(const InAppWebViewCreationParams& params);
   void RegisterEventHandlers();
 
- public:  
+ public:
   // === WPE backend callbacks ===
   // Instance method called from C callback (must be public)
   void OnExportDmaBuf(::wpe_fdo_egl_exported_image* image);
@@ -349,70 +343,52 @@ class InAppWebView {
 
  private:
   static void OnFrameDisplayed(void* data);
-  
+
   // Read pixels from EGL image to CPU buffer
   void ReadPixelsFromEglImage(void* egl_image, uint32_t width, uint32_t height);
 
   // === WebKit signals (same as WebKitGTK) ===
-  static void OnLoadChanged(WebKitWebView* web_view,
-                            WebKitLoadEvent load_event, gpointer user_data);
-
-  static gboolean OnDecidePolicy(WebKitWebView* web_view,
-                                 WebKitPolicyDecision* decision,
-                                 WebKitPolicyDecisionType decision_type,
-                                 gpointer user_data);
-
-  static void OnNotifyEstimatedLoadProgress(GObject* object,
-                                             GParamSpec* pspec,
-                                             gpointer user_data);
-
-  static void OnNotifyTitle(GObject* object,
-                            GParamSpec* pspec,
+  static void OnLoadChanged(WebKitWebView* web_view, WebKitLoadEvent load_event,
                             gpointer user_data);
 
-  static gboolean OnLoadFailed(WebKitWebView* web_view,
-                               WebKitLoadEvent load_event,
-                               gchar* failing_uri,
-                               GError* error,
-                               gpointer user_data);
+  static gboolean OnDecidePolicy(WebKitWebView* web_view, WebKitPolicyDecision* decision,
+                                 WebKitPolicyDecisionType decision_type, gpointer user_data);
 
-  static gboolean OnLoadFailedWithTlsErrors(WebKitWebView* web_view,
-                                             gchar* failing_uri,
-                                             GTlsCertificate* certificate,
-                                             GTlsCertificateFlags errors,
-                                             gpointer user_data);
+  static void OnNotifyEstimatedLoadProgress(GObject* object, GParamSpec* pspec, gpointer user_data);
+
+  static void OnNotifyTitle(GObject* object, GParamSpec* pspec, gpointer user_data);
+
+  static gboolean OnLoadFailed(WebKitWebView* web_view, WebKitLoadEvent load_event,
+                               gchar* failing_uri, GError* error, gpointer user_data);
+
+  static gboolean OnLoadFailedWithTlsErrors(WebKitWebView* web_view, gchar* failing_uri,
+                                            GTlsCertificate* certificate,
+                                            GTlsCertificateFlags errors, gpointer user_data);
 
   static void OnCloseRequest(WebKitWebView* web_view, gpointer user_data);
 
   static WebKitWebView* OnCreateWebView(WebKitWebView* web_view,
-                                    WebKitNavigationAction* navigation_action,
-                                    gpointer user_data);
+                                        WebKitNavigationAction* navigation_action,
+                                        gpointer user_data);
 
-  static gboolean OnScriptDialog(WebKitWebView* web_view,
-                                 WebKitScriptDialog* dialog,
+  static gboolean OnScriptDialog(WebKitWebView* web_view, WebKitScriptDialog* dialog,
                                  gpointer user_data);
 
-  static gboolean OnPermissionRequest(WebKitWebView* web_view,
-                                      WebKitPermissionRequest* request,
+  static gboolean OnPermissionRequest(WebKitWebView* web_view, WebKitPermissionRequest* request,
                                       gpointer user_data);
 
-  static gboolean OnAuthenticate(WebKitWebView* web_view,
-                                 WebKitAuthenticationRequest* request,
+  static gboolean OnAuthenticate(WebKitWebView* web_view, WebKitAuthenticationRequest* request,
                                  gpointer user_data);
 
-  static gboolean OnContextMenu(WebKitWebView* web_view,
-                                WebKitContextMenu* context_menu,
-                                WebKitHitTestResult* hit_test_result,
-                                gpointer user_data);
+  static gboolean OnContextMenu(WebKitWebView* web_view, WebKitContextMenu* context_menu,
+                                WebKitHitTestResult* hit_test_result, gpointer user_data);
 
   static gboolean OnEnterFullscreen(WebKitWebView* web_view, gpointer user_data);
 
   static gboolean OnLeaveFullscreen(WebKitWebView* web_view, gpointer user_data);
 
-  static void OnMouseTargetChanged(WebKitWebView* web_view,
-                                   WebKitHitTestResult* hit_test_result,
-                                   guint modifiers,
-                                   gpointer user_data);
+  static void OnMouseTargetChanged(WebKitWebView* web_view, WebKitHitTestResult* hit_test_result,
+                                   guint modifiers, gpointer user_data);
 
   // === Input helpers ===
   void SendWpePointerEvent(uint32_t type, double x, double y, uint32_t button);
@@ -422,7 +398,7 @@ class InAppWebView {
   // === JavaScript bridge ===
   void handleScriptMessage(const std::string& name, const std::string& body);
   void dispatchPlatformReady();
-  
+
   // === Cursor detection ===
   void injectCursorDetectionScript();
   void updateCursorFromCssStyle(const std::string& cursor_style);

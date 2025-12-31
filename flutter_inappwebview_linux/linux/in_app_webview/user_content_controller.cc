@@ -1,13 +1,13 @@
 // WPE WebKit User Content Controller implementation
-// 
+//
 // The WPE WebKit API for user content management is identical to WebKitGTK,
 // so this implementation follows the same patterns.
 
 #include "user_content_controller.h"
 
+#include <jsc/jsc.h>
 
 #include <algorithm>
-#include <jsc/jsc.h>
 #include <nlohmann/json.hpp>
 
 #include "../utils/log.h"
@@ -16,47 +16,33 @@ namespace flutter_inappwebview_plugin {
 
 using json = nlohmann::json;
 
-namespace {
-bool DebugLogEnabled() {
-  static bool enabled = g_getenv("FLUTTER_INAPPWEBVIEW_LINUX_DEBUG") != nullptr;
-  return enabled;
-}
-}  // namespace
-
-UserContentController::UserContentController(WebKitWebView* webview)
-    : webview_(webview) {
+UserContentController::UserContentController(WebKitWebView* webview) : webview_(webview) {
   if (webview_ != nullptr) {
     content_manager_ = webkit_web_view_get_user_content_manager(webview_);
-  }
-  
-  if (DebugLogEnabled()) {
-    g_message("UserContentController: initialized (manager=%p)", 
-              static_cast<void*>(content_manager_));
   }
 }
 
 UserContentController::~UserContentController() {
   // Check if webview is still valid - the content manager becomes invalid
   // when the webview is destroyed
-  bool manager_valid = content_manager_ != nullptr && 
-                       webview_ != nullptr && 
+  bool manager_valid = content_manager_ != nullptr && webview_ != nullptr &&
                        WEBKIT_IS_WEB_VIEW(webview_) &&
                        WEBKIT_IS_USER_CONTENT_MANAGER(content_manager_);
-  
+
   // Unregister all message handlers
   if (manager_valid) {
     for (const auto& name : registered_message_handlers_) {
-      webkit_user_content_manager_unregister_script_message_handler(
-          content_manager_, name.c_str(), nullptr);
+      webkit_user_content_manager_unregister_script_message_handler(content_manager_, name.c_str(),
+                                                                    nullptr);
     }
   }
   registered_message_handlers_.clear();
-  
+
   // Clear all scripts when destroyed
   if (manager_valid) {
     webkit_user_content_manager_remove_all_scripts(content_manager_);
   }
-  
+
   document_start_scripts_.clear();
   document_end_scripts_.clear();
   plugin_scripts_.clear();
@@ -80,16 +66,10 @@ void UserContentController::addUserScript(std::shared_ptr<UserScript> userScript
     webkit_user_content_manager_add_script(content_manager_, wkScript);
     webkit_user_script_unref(wkScript);
   }
-
-  if (DebugLogEnabled()) {
-    g_message("UserContentController: added user script (time=%s)",
-              userScript->injectionTime == UserScriptInjectionTime::atDocumentStart
-                  ? "start" : "end");
-  }
 }
 
 void UserContentController::removeUserScriptAt(size_t index,
-                                                   UserScriptInjectionTime injectionTime) {
+                                               UserScriptInjectionTime injectionTime) {
   auto& scripts = injectionTime == UserScriptInjectionTime::atDocumentStart
                       ? document_start_scripts_
                       : document_end_scripts_;
@@ -102,13 +82,12 @@ void UserContentController::removeUserScriptAt(size_t index,
 
 void UserContentController::removeUserScriptsByGroupName(const std::string& groupName) {
   auto removeFromVector = [&groupName](std::vector<std::shared_ptr<UserScript>>& scripts) {
-    scripts.erase(
-        std::remove_if(scripts.begin(), scripts.end(),
-                       [&groupName](const std::shared_ptr<UserScript>& script) {
-                         return script->groupName.has_value() &&
-                                script->groupName.value() == groupName;
-                       }),
-        scripts.end());
+    scripts.erase(std::remove_if(scripts.begin(), scripts.end(),
+                                 [&groupName](const std::shared_ptr<UserScript>& script) {
+                                   return script->groupName.has_value() &&
+                                          script->groupName.value() == groupName;
+                                 }),
+                  scripts.end());
   };
 
   removeFromVector(document_start_scripts_);
@@ -119,11 +98,11 @@ void UserContentController::removeUserScriptsByGroupName(const std::string& grou
 void UserContentController::removeAllUserScripts() {
   document_start_scripts_.clear();
   document_end_scripts_.clear();
-  
+
   if (content_manager_ != nullptr) {
     // Remove all scripts from WebKit (this also removes plugin scripts)
     webkit_user_content_manager_remove_all_scripts(content_manager_);
-    
+
     // Re-add plugin scripts (they should persist)
     for (const auto& pluginScript : plugin_scripts_) {
       WebKitUserScriptInjectionTime webkitTime =
@@ -131,32 +110,25 @@ void UserContentController::removeAllUserScripts() {
               ? WEBKIT_USER_SCRIPT_INJECT_AT_DOCUMENT_START
               : WEBKIT_USER_SCRIPT_INJECT_AT_DOCUMENT_END;
 
-      WebKitUserContentInjectedFrames frames =
-          pluginScript->forMainFrameOnly ? WEBKIT_USER_CONTENT_INJECT_TOP_FRAME
-                                         : WEBKIT_USER_CONTENT_INJECT_ALL_FRAMES;
+      WebKitUserContentInjectedFrames frames = pluginScript->forMainFrameOnly
+                                                   ? WEBKIT_USER_CONTENT_INJECT_TOP_FRAME
+                                                   : WEBKIT_USER_CONTENT_INJECT_ALL_FRAMES;
 
-      WebKitUserScript* wkScript = webkit_user_script_new(
-          pluginScript->source.c_str(),
-          frames,
-          webkitTime,
-          nullptr,  // allow_list
-          nullptr   // block_list
-      );
+      WebKitUserScript* wkScript =
+          webkit_user_script_new(pluginScript->source.c_str(), frames, webkitTime,
+                                 nullptr,  // allow_list
+                                 nullptr   // block_list
+          );
       if (wkScript != nullptr) {
         webkit_user_content_manager_add_script(content_manager_, wkScript);
         webkit_user_script_unref(wkScript);
       }
     }
   }
-
-  if (DebugLogEnabled()) {
-    g_message("UserContentController: removed all user scripts (preserved %zu plugin scripts)",
-              plugin_scripts_.size());
-  }
 }
 
-const std::vector<std::shared_ptr<UserScript>>& 
-UserContentController::getUserScripts(UserScriptInjectionTime injectionTime) const {
+const std::vector<std::shared_ptr<UserScript>>& UserContentController::getUserScripts(
+    UserScriptInjectionTime injectionTime) const {
   if (injectionTime == UserScriptInjectionTime::atDocumentStart) {
     return document_start_scripts_;
   }
@@ -183,26 +155,18 @@ void UserContentController::registerScriptMessageHandler(const std::string& name
   std::string signalName = "script-message-received::" + name;
 
   // Connect the signal
-  g_signal_connect(
-      content_manager_,
-      signalName.c_str(),
-      G_CALLBACK(onScriptMessageReceived),
-      this);
+  g_signal_connect(content_manager_, signalName.c_str(), G_CALLBACK(onScriptMessageReceived), this);
 
   // Register the handler with WebKit (WPE API since 2.40)
   gboolean success = webkit_user_content_manager_register_script_message_handler(
       content_manager_, name.c_str(), nullptr);
 
   if (!success) {
-    g_warning("UserContentController: Failed to register message handler %s", name.c_str());
+    errorLog("UserContentController: Failed to register message handler " + name);
     return;
   }
 
   registered_message_handlers_.push_back(name);
-
-  if (DebugLogEnabled()) {
-    g_message("UserContentController: registered message handler '%s'", name.c_str());
-  }
 }
 
 void UserContentController::addPluginScript(std::unique_ptr<PluginScript> pluginScript) {
@@ -216,13 +180,11 @@ void UserContentController::addPluginScript(std::unique_ptr<PluginScript> plugin
   }
 
   // Create a UserScript from the PluginScript
-  // Constructor: groupName, source, injectionTime, forMainFrameOnly, allowedOriginRules, contentWorld
+  // Constructor: groupName, source, injectionTime, forMainFrameOnly, allowedOriginRules,
+  // contentWorld
   auto userScript = std::make_shared<UserScript>(
-      pluginScript->groupName,
-      pluginScript->source,
-      pluginScript->injectionTime,
-      pluginScript->forMainFrameOnly,
-      pluginScript->allowedOriginRules,
+      pluginScript->groupName, pluginScript->source, pluginScript->injectionTime,
+      pluginScript->forMainFrameOnly, pluginScript->allowedOriginRules,
       nullptr  // contentWorld
   );
 
@@ -234,27 +196,13 @@ void UserContentController::addPluginScript(std::unique_ptr<PluginScript> plugin
   }
 
   plugin_scripts_.push_back(std::move(pluginScript));
-
-  if (DebugLogEnabled()) {
-    g_message("UserContentController: added plugin script");
-  }
 }
 
-void UserContentController::onScriptMessageReceived(
-    WebKitUserContentManager* manager,
-    JSCValue* value,
-    gpointer user_data) {
+void UserContentController::onScriptMessageReceived(WebKitUserContentManager* manager,
+                                                    JSCValue* value, gpointer user_data) {
   auto* self = static_cast<UserContentController*>(user_data);
-  
-  if (DebugLogEnabled()) {
-    g_message("UserContentController: onScriptMessageReceived called (value=%p)",
-              static_cast<void*>(value));
-  }
-  
+
   if (self == nullptr || self->script_message_handler_ == nullptr) {
-    if (DebugLogEnabled()) {
-      g_message("UserContentController: onScriptMessageReceived - no handler set");
-    }
     return;
   }
 
@@ -264,7 +212,7 @@ void UserContentController::onScriptMessageReceived(
 
   // Convert JSC value to string (JSON)
   gchar* jsonStr = nullptr;
-  
+
   if (jsc_value_is_object(value)) {
     // Get the context and use JSON.stringify
     JSCContext* context = jsc_value_get_context(value);
@@ -272,22 +220,23 @@ void UserContentController::onScriptMessageReceived(
       // Evaluate JSON.stringify(value) properly
       // First, create a reference to the value in a global variable
       jsc_context_set_value(context, "__inappwebview_temp_value", value);
-      
+
       // Then stringify it
-      JSCValue* jsonResult = jsc_context_evaluate(context, 
-          "JSON.stringify(__inappwebview_temp_value)", -1);
-      
+      JSCValue* jsonResult =
+          jsc_context_evaluate(context, "JSON.stringify(__inappwebview_temp_value)", -1);
+
       if (jsonResult != nullptr && jsc_value_is_string(jsonResult)) {
         jsonStr = jsc_value_to_string(jsonResult);
       }
-      
+
       // Clean up
       if (jsonResult != nullptr) {
         g_object_unref(jsonResult);
       }
-      
+
       // Remove the temp variable (ignore result)
-      JSCValue* deleteResult = jsc_context_evaluate(context, "delete __inappwebview_temp_value", -1);
+      JSCValue* deleteResult =
+          jsc_context_evaluate(context, "delete __inappwebview_temp_value", -1);
       if (deleteResult != nullptr) {
         g_object_unref(deleteResult);
       }
@@ -297,18 +246,11 @@ void UserContentController::onScriptMessageReceived(
   }
 
   if (jsonStr != nullptr) {
-    if (DebugLogEnabled()) {
-      g_message("UserContentController: received message: %.100s%s",
-                jsonStr, strlen(jsonStr) > 100 ? "..." : "");
-    }
     // The handler name is extracted from the signal name by WebKit,
     // but for our purposes we need to get it from the message body
     self->script_message_handler_("callHandler", std::string(jsonStr));
     g_free(jsonStr);
   } else {
-    if (DebugLogEnabled()) {
-      g_message("UserContentController: failed to convert JSC value to string");
-    }
   }
 }
 
@@ -323,16 +265,13 @@ WebKitUserScript* UserContentController::createWebKitUserScript(
           ? WEBKIT_USER_SCRIPT_INJECT_AT_DOCUMENT_START
           : WEBKIT_USER_SCRIPT_INJECT_AT_DOCUMENT_END;
 
-  WebKitUserContentInjectedFrames frames =
-      userScript->forMainFrameOnly ? WEBKIT_USER_CONTENT_INJECT_TOP_FRAME
-                                   : WEBKIT_USER_CONTENT_INJECT_ALL_FRAMES;
+  WebKitUserContentInjectedFrames frames = userScript->forMainFrameOnly
+                                               ? WEBKIT_USER_CONTENT_INJECT_TOP_FRAME
+                                               : WEBKIT_USER_CONTENT_INJECT_ALL_FRAMES;
 
-  return webkit_user_script_new(
-      userScript->source.c_str(),
-      frames,
-      webkitTime,
-      nullptr,  // allow_list
-      nullptr   // block_list
+  return webkit_user_script_new(userScript->source.c_str(), frames, webkitTime,
+                                nullptr,  // allow_list
+                                nullptr   // block_list
   );
 }
 
@@ -351,17 +290,15 @@ void UserContentController::rebuildScripts() {
             ? WEBKIT_USER_SCRIPT_INJECT_AT_DOCUMENT_START
             : WEBKIT_USER_SCRIPT_INJECT_AT_DOCUMENT_END;
 
-    WebKitUserContentInjectedFrames frames =
-        pluginScript->forMainFrameOnly ? WEBKIT_USER_CONTENT_INJECT_TOP_FRAME
-                                       : WEBKIT_USER_CONTENT_INJECT_ALL_FRAMES;
+    WebKitUserContentInjectedFrames frames = pluginScript->forMainFrameOnly
+                                                 ? WEBKIT_USER_CONTENT_INJECT_TOP_FRAME
+                                                 : WEBKIT_USER_CONTENT_INJECT_ALL_FRAMES;
 
-    WebKitUserScript* wkScript = webkit_user_script_new(
-        pluginScript->source.c_str(),
-        frames,
-        webkitTime,
-        nullptr,  // allow_list
-        nullptr   // block_list
-    );
+    WebKitUserScript* wkScript =
+        webkit_user_script_new(pluginScript->source.c_str(), frames, webkitTime,
+                               nullptr,  // allow_list
+                               nullptr   // block_list
+        );
     if (wkScript != nullptr) {
       webkit_user_content_manager_add_script(content_manager_, wkScript);
       webkit_user_script_unref(wkScript);
@@ -386,4 +323,3 @@ void UserContentController::rebuildScripts() {
 }
 
 }  // namespace flutter_inappwebview_plugin
-

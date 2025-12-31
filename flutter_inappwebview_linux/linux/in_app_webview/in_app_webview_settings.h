@@ -87,12 +87,12 @@ class InAppWebViewSettings {
 
   // === WPE-specific rendering settings ===
   // WPE always uses hardware acceleration via its backend
-  bool useDmaBufExport = true;  // Use DMA-BUF for zero-copy texture sharing
+  bool useDmaBufExport = true;      // Use DMA-BUF for zero-copy texture sharing
   bool enableWebInspector = false;  // Remote web inspector
-  int webInspectorPort = 9222;  // Default inspector port
-  
+  int webInspectorPort = 9222;      // Default inspector port
+
   // === Frame rate and performance settings ===
-  int targetFrameRate = 60;  // Target FPS for rendering
+  int targetFrameRate = 60;              // Target FPS for rendering
   bool enableOffscreenRendering = true;  // Always true for WPE in Flutter
 
   // === Scroll settings ===

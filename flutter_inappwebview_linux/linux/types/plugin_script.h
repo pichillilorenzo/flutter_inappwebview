@@ -20,10 +20,8 @@ class PluginScript : public UserScript {
   bool requiredInAllContentWorlds;
   std::vector<std::string> messageHandlerNames;
 
-  PluginScript(const std::string& groupName,
-               const std::string& source,
-               UserScriptInjectionTime injectionTime,
-               bool forMainFrameOnly,
+  PluginScript(const std::string& groupName, const std::string& source,
+               UserScriptInjectionTime injectionTime, bool forMainFrameOnly,
                const std::optional<std::vector<std::string>>& allowedOriginRules = std::nullopt,
                std::shared_ptr<ContentWorld> contentWorld = nullptr,
                bool requiredInAllContentWorlds = false,

@@ -13,8 +13,7 @@ WebResourceError::WebResourceError(FlValue* map)
 
 FlValue* WebResourceError::toFlValue() const {
   FlValue* map = fl_value_new_map();
-  fl_value_set_string_take(map, "description",
-                           fl_value_new_string(description.c_str()));
+  fl_value_set_string_take(map, "description", fl_value_new_string(description.c_str()));
   fl_value_set_string_take(map, "type", fl_value_new_int(type));
   return map;
 }

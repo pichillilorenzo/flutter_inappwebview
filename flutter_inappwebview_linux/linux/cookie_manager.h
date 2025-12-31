@@ -53,33 +53,24 @@ class CookieManager : public ChannelDelegate {
   void HandleMethodCall(FlMethodCall* method_call) override;
 
   // Cookie operations
-  void setCookie(const std::string& url,
-                 const Cookie& cookie,
-                 std::function<void(bool)> callback);
+  void setCookie(const std::string& url, const Cookie& cookie, std::function<void(bool)> callback);
 
-  void getCookies(const std::string& url,
-                  std::function<void(std::vector<Cookie>)> callback);
+  void getCookies(const std::string& url, std::function<void(std::vector<Cookie>)> callback);
 
-  void getCookie(const std::string& url,
-                 const std::string& name,
+  void getCookie(const std::string& url, const std::string& name,
                  std::function<void(std::optional<Cookie>)> callback);
 
-  void deleteCookie(const std::string& url,
-                    const std::string& name,
-                    const std::string& domain,
-                    const std::string& path,
-                    std::function<void(bool)> callback);
+  void deleteCookie(const std::string& url, const std::string& name, const std::string& domain,
+                    const std::string& path, std::function<void(bool)> callback);
 
-  void deleteCookies(const std::string& url,
-                     const std::string& domain,
-                     const std::string& path,
+  void deleteCookies(const std::string& url, const std::string& domain, const std::string& path,
                      std::function<void(bool)> callback);
 
   void deleteAllCookies(std::function<void(bool)> callback);
 
  private:
   WebKitCookieManager* cookie_manager_;
-  
+
   WebKitCookieManager* getCookieManager();
 };
 

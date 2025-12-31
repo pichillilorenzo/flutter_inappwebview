@@ -17,8 +17,7 @@ class URLRequest {
   const std::optional<std::map<std::string, std::string>> headers;
   const std::optional<std::vector<uint8_t>> body;
 
-  URLRequest(const std::optional<std::string>& url,
-             const std::optional<std::string>& method,
+  URLRequest(const std::optional<std::string>& url, const std::optional<std::string>& method,
              const std::optional<std::map<std::string, std::string>>& headers,
              const std::optional<std::vector<uint8_t>>& body);
 

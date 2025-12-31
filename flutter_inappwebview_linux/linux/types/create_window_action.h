@@ -44,33 +44,32 @@ class CreateWindowAction {
  public:
   // The window id assigned to the new window
   int64_t windowId;
-  
+
   // Whether this is a dialog window
   std::optional<bool> isDialog;
-  
+
   // The navigation action that triggered this
   std::shared_ptr<URLRequest> request;
-  
+
   // Navigation type (same as NavigationAction)
   int64_t navigationType;
-  
+
   // Whether the navigation was triggered by a user gesture
   bool isUserGesture;
-  
+
   // Whether it's for the main frame
   bool isForMainFrame;
-  
+
   // Target frame name (e.g., "_blank")
   std::optional<std::string> targetFrame;
-  
+
   // Source URL (the URL of the page that initiated the request)
   std::optional<std::string> sourceUrl;
-  
+
   // Window features
   std::optional<WindowFeatures> windowFeatures;
 
-  CreateWindowAction(WebKitNavigationAction* navigationAction,
-                     int64_t windowId,
+  CreateWindowAction(WebKitNavigationAction* navigationAction, int64_t windowId,
                      WebKitWindowProperties* windowProperties = nullptr);
   ~CreateWindowAction() = default;
 

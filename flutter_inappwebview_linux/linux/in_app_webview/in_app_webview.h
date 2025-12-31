@@ -40,6 +40,8 @@
 #include <tuple>
 #include <vector>
 
+#include "../types/context_menu.h"
+#include "../types/context_menu_popup.h"
 #include "../types/url_request.h"
 #include "../types/user_script.h"
 #include "in_app_webview_settings.h"
@@ -54,6 +56,7 @@ class WebViewChannelDelegate;
 
 struct InAppWebViewCreationParams {
   int64_t id;
+  GtkWindow* gtkWindow = nullptr;  // Cached GTK window from manager
   std::optional<std::shared_ptr<URLRequest>> initialUrlRequest;
   std::optional<std::string> initialFile;
   std::optional<std::string> initialData;
@@ -61,6 +64,7 @@ struct InAppWebViewCreationParams {
   std::optional<std::string> initialDataMimeType;
   std::optional<std::string> initialDataEncoding;
   std::shared_ptr<InAppWebViewSettings> initialSettings;
+  std::optional<std::shared_ptr<ContextMenu>> contextMenu;
 };
 
 // Pointer event kind (matches Dart side)
@@ -87,12 +91,14 @@ class InAppWebView {
   static constexpr const char* METHOD_CHANNEL_NAME_PREFIX =
       "com.pichillilorenzo/flutter_inappwebview_";
 
-  InAppWebView(FlBinaryMessenger* messenger, int64_t id, const InAppWebViewCreationParams& params);
+  InAppWebView(FlPluginRegistrar* registrar, FlBinaryMessenger* messenger, int64_t id,
+               const InAppWebViewCreationParams& params);
   ~InAppWebView();
 
   int64_t id() const { return id_; }
   WebKitWebView* webview() const { return webview_; }
   WebViewChannelDelegate* channel_delegate() const { return channel_delegate_.get(); }
+  FlPluginRegistrar* registrar() const { return registrar_; }
 
   // Attach/recreate the Dart method channel using the given [channel_id].
   void AttachChannel(FlBinaryMessenger* messenger, int64_t channel_id);
@@ -177,6 +183,7 @@ class InAppWebView {
   bool requestPointerUnlock();
 
   // Input handling
+  void SetTextureOffset(double x, double y);
   void SetCursorPos(double x, double y);
   void SetPointerButton(int kind, int button, int clickCount = 1);
   void SetScrollDelta(double dx, double dy);
@@ -203,6 +210,27 @@ class InAppWebView {
   // Called from Dart when shouldOverrideUrlLoading decision is made
   void OnShouldOverrideUrlLoadingDecision(int64_t decision_id, bool allow);
 
+  // Context menu methods
+  // Show the native GTK context menu using pending WebKit menu and custom items
+  void ShowNativeContextMenu();
+  // Hide and cleanup any visible context menu
+  void HideContextMenu();
+
+  // Clipboard operations (syncs WPE WebKit clipboard with system clipboard)
+  void copyToClipboard();
+  void cutToClipboard();
+  void pasteFromClipboard();
+  void pasteAsPlainText();
+  void copyTextToClipboard(const std::string& text);  // Copy arbitrary text to both clipboards
+  void getSelectedText(std::function<void(const std::optional<std::string>&)> callback);
+
+  // Editing commands (WebKit editing commands)
+  void selectAll();
+  void undo();
+  void redo();
+  void insertImage(const std::string& imageUri);
+  void createLink(const std::string& linkUri);
+
   // Check if WPE WebKit is available on the system
   static bool IsWpeWebKitAvailable();
 
@@ -219,11 +247,16 @@ class InAppWebView {
   void initializeWindowIdJS();
 
  private:
+  FlPluginRegistrar* registrar_ = nullptr;
+  GtkWindow* gtk_window_ = nullptr;  // Cached GTK window for context menu display
   int64_t id_ = 0;
   int64_t channel_id_ = -1;
 
   // Settings
   std::shared_ptr<InAppWebViewSettings> settings_;
+
+  // Context menu configuration
+  std::shared_ptr<ContextMenu> context_menu_config_;
 
   // WPE WebKit view
   WebKitWebView* webview_ = nullptr;
@@ -320,6 +353,19 @@ class InAppWebView {
   // Target refresh rate (0 = default)
   uint32_t target_refresh_rate_ = 0;
 
+  // Monitor change tracking for refresh rate updates
+  gulong monitors_changed_handler_id_ = 0;
+  gulong configure_event_handler_id_ = 0;
+
+  // Context menu state
+  std::unique_ptr<ContextMenuPopup> context_menu_popup_;
+  WebKitContextMenu* pending_context_menu_ = nullptr;
+  WebKitHitTestResult* pending_hit_test_result_ = nullptr;
+  double context_menu_x_ = 0;  // Mouse position when context menu was requested
+  double context_menu_y_ = 0;
+  double texture_offset_x_ = 0;  // Texture offset within the Flutter window
+  double texture_offset_y_ = 0;
+
   // Pointer lock handler
   std::function<bool(bool)> pointer_lock_handler_;
   bool pointer_locked_ = false;
@@ -328,6 +374,9 @@ class InAppWebView {
   void InitWpeBackend();
   void InitWebView(const InAppWebViewCreationParams& params);
   void RegisterEventHandlers();
+  void SetupMonitorChangeHandlers();
+  void CleanupMonitorChangeHandlers();
+  void UpdateMonitorRefreshRate();
 
  public:
   // === WPE backend callbacks ===
@@ -382,6 +431,8 @@ class InAppWebView {
 
   static gboolean OnContextMenu(WebKitWebView* web_view, WebKitContextMenu* context_menu,
                                 WebKitHitTestResult* hit_test_result, gpointer user_data);
+
+  static void OnContextMenuDismissed(WebKitWebView* web_view, gpointer user_data);
 
   static gboolean OnEnterFullscreen(WebKitWebView* web_view, gpointer user_data);
 

@@ -80,6 +80,12 @@ class WebResourceErrorType_ {
             'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2210.55#corewebview2_web_error_status',
         value: 12,
       ),
+      EnumLinuxPlatform(
+        apiName: 'WEBKIT_NETWORK_ERROR_TRANSPORT',
+        apiUrl:
+            'https://wpewebkit.org/reference/stable/wpe-webkit-2.0/error.NetworkError.html',
+        value: 300,
+      ),
     ],
   )
   static const CANNOT_CONNECT_TO_HOST = WebResourceErrorType_._internal(
@@ -136,6 +142,12 @@ class WebResourceErrorType_ {
         apiUrl:
             'https://developer.apple.com/documentation/foundation/urlerror/code/2883074-filedoesnotexist',
         value: -1100,
+      ),
+      EnumLinuxPlatform(
+        apiName: 'WEBKIT_NETWORK_ERROR_FILE_DOES_NOT_EXIST',
+        apiUrl:
+            'https://wpewebkit.org/reference/stable/wpe-webkit-2.0/error.NetworkError.html',
+        value: 303,
       ),
     ],
   )
@@ -302,6 +314,12 @@ class WebResourceErrorType_ {
             'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2210.55#corewebview2_web_error_status',
         value: 0,
       ),
+      EnumLinuxPlatform(
+        apiName: 'WEBKIT_NETWORK_ERROR_FAILED',
+        apiUrl:
+            'https://wpewebkit.org/reference/stable/wpe-webkit-2.0/error.NetworkError.html',
+        value: 399,
+      ),
     ],
   )
   static const UNKNOWN = WebResourceErrorType_._internal("UNKNOWN");
@@ -358,6 +376,12 @@ class WebResourceErrorType_ {
             'https://developer.apple.com/documentation/foundation/urlerror/code/2883043-unsupportedurl',
         value: -1002,
       ),
+      EnumLinuxPlatform(
+        apiName: 'WEBKIT_NETWORK_ERROR_UNKNOWN_PROTOCOL',
+        apiUrl:
+            'https://wpewebkit.org/reference/stable/wpe-webkit-2.0/error.NetworkError.html',
+        value: 301,
+      ),
     ],
   )
   static const UNSUPPORTED_SCHEME = WebResourceErrorType_._internal(
@@ -384,6 +408,12 @@ class WebResourceErrorType_ {
         apiUrl:
             'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2210.55#corewebview2_web_error_status',
         value: 14,
+      ),
+      EnumLinuxPlatform(
+        apiName: 'WEBKIT_NETWORK_ERROR_CANCELLED',
+        apiUrl:
+            'https://wpewebkit.org/reference/stable/wpe-webkit-2.0/error.NetworkError.html',
+        value: 302,
       ),
     ],
   )
@@ -1292,4 +1322,81 @@ class WebResourceErrorType_ {
   )
   static const VALID_PROXY_AUTHENTICATION_REQUIRED =
       WebResourceErrorType_._internal("VALID_PROXY_AUTHENTICATION_REQUIRED");
+
+  ///Generic policy error.
+  @EnumSupportedPlatforms(
+    platforms: [
+      EnumLinuxPlatform(
+        apiName: 'WEBKIT_POLICY_ERROR_FAILED',
+        apiUrl:
+            'https://wpewebkit.org/reference/stable/wpe-webkit-2.0/error.PolicyError.html',
+        value: 199,
+      ),
+    ],
+  )
+  static const WEBKIT_POLICY_FAILED = WebResourceErrorType_._internal(
+    "WEBKIT_POLICY_FAILED",
+  );
+
+  ///The MIME type of the resource is not supported.
+  @EnumSupportedPlatforms(
+    platforms: [
+      EnumLinuxPlatform(
+        apiName: 'WEBKIT_POLICY_ERROR_CANNOT_SHOW_MIME_TYPE',
+        apiUrl:
+            'https://wpewebkit.org/reference/stable/wpe-webkit-2.0/error.PolicyError.html',
+        value: 100,
+      ),
+    ],
+  )
+  static const WEBKIT_CANNOT_SHOW_MIME_TYPE = WebResourceErrorType_._internal(
+    "WEBKIT_CANNOT_SHOW_MIME_TYPE",
+  );
+
+  ///The URI cannot be shown.
+  @EnumSupportedPlatforms(
+    platforms: [
+      EnumLinuxPlatform(
+        apiName: 'WEBKIT_POLICY_ERROR_CANNOT_SHOW_URI',
+        apiUrl:
+            'https://wpewebkit.org/reference/stable/wpe-webkit-2.0/error.PolicyError.html',
+        value: 101,
+      ),
+    ],
+  )
+  static const WEBKIT_CANNOT_SHOW_URI = WebResourceErrorType_._internal(
+    "WEBKIT_CANNOT_SHOW_URI",
+  );
+
+  ///Frame load was interrupted by a policy change.
+  @EnumSupportedPlatforms(
+    platforms: [
+      EnumLinuxPlatform(
+        apiName: 'WEBKIT_POLICY_ERROR_FRAME_LOAD_INTERRUPTED_BY_POLICY_CHANGE',
+        apiUrl:
+            'https://wpewebkit.org/reference/stable/wpe-webkit-2.0/error.PolicyError.html',
+        value: 102,
+      ),
+    ],
+  )
+  static const WEBKIT_FRAME_LOAD_INTERRUPTED_BY_POLICY_CHANGE =
+      WebResourceErrorType_._internal(
+    "WEBKIT_FRAME_LOAD_INTERRUPTED_BY_POLICY_CHANGE",
+  );
+
+  ///The port is restricted.
+  @EnumSupportedPlatforms(
+    platforms: [
+      EnumLinuxPlatform(
+        apiName: 'WEBKIT_POLICY_ERROR_CANNOT_USE_RESTRICTED_PORT',
+        apiUrl:
+            'https://wpewebkit.org/reference/stable/wpe-webkit-2.0/error.PolicyError.html',
+        value: 103,
+      ),
+    ],
+  )
+  static const WEBKIT_CANNOT_USE_RESTRICTED_PORT =
+      WebResourceErrorType_._internal(
+    "WEBKIT_CANNOT_USE_RESTRICTED_PORT",
+  );
 }

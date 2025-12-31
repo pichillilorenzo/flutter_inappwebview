@@ -1,6 +1,9 @@
 #include "include/flutter_inappwebview_linux/flutter_inappwebview_linux_plugin.h"
 
+#include "flutter_inappwebview_linux_plugin_private.h"
+
 #include <flutter_linux/flutter_linux.h>
+#include <gdk/gdk.h>
 #include <gtk/gtk.h>
 
 #include <cstring>
@@ -60,3 +63,62 @@ void flutter_inappwebview_linux_plugin_register_with_registrar(FlPluginRegistrar
   // for the lifetime of the application
   g_object_ref(plugin);
 }
+
+// === Helper functions for accessing Flutter view and window ===
+
+FlView* flutter_inappwebview_linux_plugin_get_view(FlPluginRegistrar* registrar) {
+  if (registrar == nullptr) {
+    return nullptr;
+  }
+  return fl_plugin_registrar_get_view(registrar);
+}
+
+GtkWindow* flutter_inappwebview_linux_plugin_get_window(FlPluginRegistrar* registrar) {
+  FlView* view = flutter_inappwebview_linux_plugin_get_view(registrar);
+  if (view == nullptr) {
+    return nullptr;
+  }
+
+  GtkWidget* widget = GTK_WIDGET(view);
+  if (widget == nullptr) {
+    return nullptr;
+  }
+
+  GtkWidget* toplevel = gtk_widget_get_toplevel(widget);
+  if (toplevel == nullptr || !GTK_IS_WINDOW(toplevel)) {
+    return nullptr;
+  }
+
+  return GTK_WINDOW(toplevel);
+}
+
+int flutter_inappwebview_linux_plugin_get_monitor_refresh_rate(FlPluginRegistrar* registrar) {
+  GtkWindow* window = flutter_inappwebview_linux_plugin_get_window(registrar);
+  return flutter_inappwebview_linux_plugin_get_monitor_refresh_rate_for_window(window);
+}
+
+int flutter_inappwebview_linux_plugin_get_monitor_refresh_rate_for_window(GtkWindow* window) {
+  if (window == nullptr) {
+    return 0;
+  }
+
+  GdkWindow* gdk_window = gtk_widget_get_window(GTK_WIDGET(window));
+  if (gdk_window == nullptr) {
+    return 0;
+  }
+
+  GdkDisplay* display = gdk_display_get_default();
+  if (display == nullptr) {
+    return 0;
+  }
+
+  GdkMonitor* monitor = gdk_display_get_monitor_at_window(display, gdk_window);
+  if (monitor == nullptr) {
+    return 0;
+  }
+
+  // gdk_monitor_get_refresh_rate returns the refresh rate in millihertz
+  // (e.g., 60000 for 60 Hz)
+  return gdk_monitor_get_refresh_rate(monitor);
+}
+

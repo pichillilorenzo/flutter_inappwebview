@@ -171,6 +171,7 @@ class WebResourceErrorType {
   ///- iOS WKWebView ([Official API - URLError.cancelled](https://developer.apple.com/documentation/foundation/urlerror/code/2883178-cancelled))
   ///- macOS WKWebView ([Official API - URLError.cancelled](https://developer.apple.com/documentation/foundation/urlerror/code/2883178-cancelled))
   ///- Windows WebView2 ([Official API - COREWEBVIEW2_WEB_ERROR_STATUS_OPERATION_CANCELED](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2210.55#corewebview2_web_error_status))
+  ///- Linux WebKitGTK ([Official API - WEBKIT_NETWORK_ERROR_CANCELLED](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/error.NetworkError.html))
   static final CANCELLED = WebResourceErrorType._internalMultiPlatform(
     'CANCELLED',
     () {
@@ -181,6 +182,8 @@ class WebResourceErrorType {
           return -999;
         case TargetPlatform.windows:
           return 14;
+        case TargetPlatform.linux:
+          return 302;
         default:
           break;
       }
@@ -215,6 +218,7 @@ class WebResourceErrorType {
   ///- iOS WKWebView ([Official API - URLError.cannotConnectToHost](https://developer.apple.com/documentation/foundation/urlerror/code/2883001-cannotconnecttohost))
   ///- macOS WKWebView ([Official API - URLError.cannotConnectToHost](https://developer.apple.com/documentation/foundation/urlerror/code/2883001-cannotconnecttohost))
   ///- Windows WebView2 ([Official API - COREWEBVIEW2_WEB_ERROR_STATUS_CANNOT_CONNECT](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2210.55#corewebview2_web_error_status))
+  ///- Linux WebKitGTK ([Official API - WEBKIT_NETWORK_ERROR_TRANSPORT](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/error.NetworkError.html))
   static final CANNOT_CONNECT_TO_HOST =
       WebResourceErrorType._internalMultiPlatform('CANNOT_CONNECT_TO_HOST', () {
         switch (defaultTargetPlatform) {
@@ -226,6 +230,8 @@ class WebResourceErrorType {
             return -1004;
           case TargetPlatform.windows:
             return 12;
+          case TargetPlatform.linux:
+            return 300;
           default:
             break;
         }
@@ -591,6 +597,7 @@ class WebResourceErrorType {
   ///- Android WebView ([Official API - WebViewClient.ERROR_FILE_NOT_FOUND](https://developer.android.com/reference/android/webkit/WebViewClient#ERROR_FILE_NOT_FOUND))
   ///- iOS WKWebView ([Official API - URLError.fileDoesNotExist](https://developer.apple.com/documentation/foundation/urlerror/code/2883074-filedoesnotexist))
   ///- macOS WKWebView ([Official API - URLError.fileDoesNotExist](https://developer.apple.com/documentation/foundation/urlerror/code/2883074-filedoesnotexist))
+  ///- Linux WebKitGTK ([Official API - WEBKIT_NETWORK_ERROR_FILE_DOES_NOT_EXIST](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/error.NetworkError.html))
   static final FILE_NOT_FOUND = WebResourceErrorType._internalMultiPlatform(
     'FILE_NOT_FOUND',
     () {
@@ -601,6 +608,8 @@ class WebResourceErrorType {
           return -1100;
         case TargetPlatform.macOS:
           return -1100;
+        case TargetPlatform.linux:
+          return 303;
         default:
           break;
       }
@@ -1071,6 +1080,7 @@ class WebResourceErrorType {
   ///- iOS WKWebView ([Official API - URLError.unknown](https://developer.apple.com/documentation/foundation/urlerror/2293357-unknown))
   ///- macOS WKWebView ([Official API - URLError.unknown](https://developer.apple.com/documentation/foundation/urlerror/2293357-unknown))
   ///- Windows WebView2 ([Official API - COREWEBVIEW2_WEB_ERROR_STATUS_UNKNOWN](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2210.55#corewebview2_web_error_status))
+  ///- Linux WebKitGTK ([Official API - WEBKIT_NETWORK_ERROR_FAILED](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/error.NetworkError.html))
   static final UNKNOWN = WebResourceErrorType._internalMultiPlatform(
     'UNKNOWN',
     () {
@@ -1083,6 +1093,8 @@ class WebResourceErrorType {
           return -1;
         case TargetPlatform.windows:
           return 0;
+        case TargetPlatform.linux:
+          return 399;
         default:
           break;
       }
@@ -1132,6 +1144,7 @@ class WebResourceErrorType {
   ///- Android WebView ([Official API - WebViewClient.ERROR_UNSUPPORTED_SCHEME](https://developer.android.com/reference/android/webkit/WebViewClient#ERROR_UNSUPPORTED_SCHEME))
   ///- iOS WKWebView ([Official API - URLError.unsupportedURL](https://developer.apple.com/documentation/foundation/urlerror/code/2883043-unsupportedurl))
   ///- macOS WKWebView ([Official API - URLError.unsupportedURL](https://developer.apple.com/documentation/foundation/urlerror/code/2883043-unsupportedurl))
+  ///- Linux WebKitGTK ([Official API - WEBKIT_NETWORK_ERROR_UNKNOWN_PROTOCOL](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/error.NetworkError.html))
   static final UNSUPPORTED_SCHEME = WebResourceErrorType._internalMultiPlatform(
     'UNSUPPORTED_SCHEME',
     () {
@@ -1142,6 +1155,8 @@ class WebResourceErrorType {
           return -1002;
         case TargetPlatform.macOS:
           return -1002;
+        case TargetPlatform.linux:
+          return 301;
         default:
           break;
       }
@@ -1231,6 +1246,90 @@ class WebResourceErrorType {
         },
       );
 
+  ///The MIME type of the resource is not supported.
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Linux WebKitGTK ([Official API - WEBKIT_POLICY_ERROR_CANNOT_SHOW_MIME_TYPE](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/error.PolicyError.html))
+  static final WEBKIT_CANNOT_SHOW_MIME_TYPE =
+      WebResourceErrorType._internalMultiPlatform(
+        'WEBKIT_CANNOT_SHOW_MIME_TYPE',
+        () {
+          switch (defaultTargetPlatform) {
+            case TargetPlatform.linux:
+              return 100;
+            default:
+              break;
+          }
+          return null;
+        },
+      );
+
+  ///The URI cannot be shown.
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Linux WebKitGTK ([Official API - WEBKIT_POLICY_ERROR_CANNOT_SHOW_URI](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/error.PolicyError.html))
+  static final WEBKIT_CANNOT_SHOW_URI =
+      WebResourceErrorType._internalMultiPlatform('WEBKIT_CANNOT_SHOW_URI', () {
+        switch (defaultTargetPlatform) {
+          case TargetPlatform.linux:
+            return 101;
+          default:
+            break;
+        }
+        return null;
+      });
+
+  ///The port is restricted.
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Linux WebKitGTK ([Official API - WEBKIT_POLICY_ERROR_CANNOT_USE_RESTRICTED_PORT](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/error.PolicyError.html))
+  static final WEBKIT_CANNOT_USE_RESTRICTED_PORT =
+      WebResourceErrorType._internalMultiPlatform(
+        'WEBKIT_CANNOT_USE_RESTRICTED_PORT',
+        () {
+          switch (defaultTargetPlatform) {
+            case TargetPlatform.linux:
+              return 103;
+            default:
+              break;
+          }
+          return null;
+        },
+      );
+
+  ///Frame load was interrupted by a policy change.
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Linux WebKitGTK ([Official API - WEBKIT_POLICY_ERROR_FRAME_LOAD_INTERRUPTED_BY_POLICY_CHANGE](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/error.PolicyError.html))
+  static final WEBKIT_FRAME_LOAD_INTERRUPTED_BY_POLICY_CHANGE =
+      WebResourceErrorType._internalMultiPlatform(
+        'WEBKIT_FRAME_LOAD_INTERRUPTED_BY_POLICY_CHANGE',
+        () {
+          switch (defaultTargetPlatform) {
+            case TargetPlatform.linux:
+              return 102;
+            default:
+              break;
+          }
+          return null;
+        },
+      );
+
+  ///Generic policy error.
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Linux WebKitGTK ([Official API - WEBKIT_POLICY_ERROR_FAILED](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/error.PolicyError.html))
+  static final WEBKIT_POLICY_FAILED =
+      WebResourceErrorType._internalMultiPlatform('WEBKIT_POLICY_FAILED', () {
+        switch (defaultTargetPlatform) {
+          case TargetPlatform.linux:
+            return 199;
+          default:
+            break;
+        }
+        return null;
+      });
+
   ///A server reported that a URL has a non-zero content length, but terminated the network connection gracefully without sending any data.
   ///
   ///**Officially Supported Platforms/Implementations**:
@@ -1313,6 +1412,11 @@ class WebResourceErrorType {
     WebResourceErrorType.USER_AUTHENTICATION_REQUIRED,
     WebResourceErrorType.USER_CANCELLED_AUTHENTICATION,
     WebResourceErrorType.VALID_PROXY_AUTHENTICATION_REQUIRED,
+    WebResourceErrorType.WEBKIT_CANNOT_SHOW_MIME_TYPE,
+    WebResourceErrorType.WEBKIT_CANNOT_SHOW_URI,
+    WebResourceErrorType.WEBKIT_CANNOT_USE_RESTRICTED_PORT,
+    WebResourceErrorType.WEBKIT_FRAME_LOAD_INTERRUPTED_BY_POLICY_CHANGE,
+    WebResourceErrorType.WEBKIT_POLICY_FAILED,
     WebResourceErrorType.ZERO_BYTE_RESOURCE,
   ].toSet();
 
@@ -1504,6 +1608,16 @@ class WebResourceErrorType {
         return 'USER_CANCELLED_AUTHENTICATION';
       case 'VALID_PROXY_AUTHENTICATION_REQUIRED':
         return 'VALID_PROXY_AUTHENTICATION_REQUIRED';
+      case 'WEBKIT_CANNOT_SHOW_MIME_TYPE':
+        return 'WEBKIT_CANNOT_SHOW_MIME_TYPE';
+      case 'WEBKIT_CANNOT_SHOW_URI':
+        return 'WEBKIT_CANNOT_SHOW_URI';
+      case 'WEBKIT_CANNOT_USE_RESTRICTED_PORT':
+        return 'WEBKIT_CANNOT_USE_RESTRICTED_PORT';
+      case 'WEBKIT_FRAME_LOAD_INTERRUPTED_BY_POLICY_CHANGE':
+        return 'WEBKIT_FRAME_LOAD_INTERRUPTED_BY_POLICY_CHANGE';
+      case 'WEBKIT_POLICY_FAILED':
+        return 'WEBKIT_POLICY_FAILED';
       case 'ZERO_BYTE_RESOURCE':
         return 'ZERO_BYTE_RESOURCE';
     }

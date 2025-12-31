@@ -2,6 +2,8 @@
 
 #include <cstring>
 
+#include "../flutter_inappwebview_linux_plugin_private.h"
+#include "../types/context_menu.h"
 #include "../utils/flutter.h"
 #include "../utils/log.h"
 #include "in_app_webview.h"
@@ -12,6 +14,10 @@ namespace flutter_inappwebview_plugin {
 InAppWebViewManager::InAppWebViewManager(FlPluginRegistrar* registrar) : registrar_(registrar) {
   texture_registrar_ = fl_plugin_registrar_get_texture_registrar(registrar);
   messenger_ = fl_plugin_registrar_get_messenger(registrar);
+
+  // Cache the GTK window now while the registrar is still fully valid
+  // This is needed for context menus and monitor refresh rate later
+  gtk_window_ = flutter_inappwebview_linux_plugin_get_window(registrar);
 
   // Create the method channel
   g_autoptr(FlStandardMethodCodec) codec = fl_standard_method_codec_new();
@@ -86,6 +92,7 @@ void InAppWebViewManager::CreateInAppWebView(FlMethodCall* method_call) {
 
   InAppWebViewCreationParams params;
   params.id = next_id_++;
+  params.gtkWindow = gtk_window_;  // Pass the cached GTK window
 
   // Parse initial settings
   FlValue* initial_settings = fl_value_lookup_string(args, "initialSettings");
@@ -129,8 +136,14 @@ void InAppWebViewManager::CreateInAppWebView(FlMethodCall* method_call) {
     params.initialFile = std::string(fl_value_get_string(initial_file));
   }
 
+  // Parse context menu
+  FlValue* context_menu = fl_value_lookup_string(args, "contextMenu");
+  if (context_menu != nullptr && fl_value_get_type(context_menu) == FL_VALUE_TYPE_MAP) {
+    params.contextMenu = std::make_shared<ContextMenu>(context_menu);
+  }
+
   // Create the InAppWebView
-  auto webview = std::make_shared<InAppWebView>(messenger_, params.id, params);
+  auto webview = std::make_shared<InAppWebView>(registrar_, messenger_, params.id, params);
 
   // Create the CustomPlatformView which handles textures and input
   auto platform_view =

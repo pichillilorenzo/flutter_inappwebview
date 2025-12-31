@@ -609,6 +609,12 @@ void WebViewChannelDelegate::HandleMethodCall(FlMethodCall* method_call) {
     return;
   }
 
+  if (string_equals(methodName, "hideContextMenu")) {
+    webView->HideContextMenu();
+    fl_method_call_respond_success(method_call, nullptr, nullptr);
+    return;
+  }
+
   fl_method_call_respond_not_implemented(method_call, nullptr);
 }
 

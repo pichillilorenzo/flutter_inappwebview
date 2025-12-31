@@ -128,6 +128,7 @@ list(APPEND PLUGIN_SOURCES
   "in_app_webview/webview_channel_delegate.cc"
   "types/channel_delegate.cc"
   "types/content_world.cc"
+  "types/context_menu_popup.cc"
   "types/create_window_action.cc"
   "types/download_start_request.cc"
   "types/download_start_response.cc"

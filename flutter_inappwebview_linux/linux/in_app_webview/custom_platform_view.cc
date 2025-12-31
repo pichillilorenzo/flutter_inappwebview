@@ -255,6 +255,33 @@ void CustomPlatformView::HandleMethodCallImpl(FlMethodCall* method_call) {
     return;
   }
 
+  // setTextureOffset: [double x, double y]
+  if (strcmp(method, "setTextureOffset") == 0) {
+    if (fl_value_get_type(args) == FL_VALUE_TYPE_LIST && fl_value_get_length(args) >= 2) {
+      FlValue* x_value = fl_value_get_list_value(args, 0);
+      FlValue* y_value = fl_value_get_list_value(args, 1);
+      double x = 0, y = 0;
+
+      if (fl_value_get_type(x_value) == FL_VALUE_TYPE_FLOAT) {
+        x = fl_value_get_float(x_value);
+      } else if (fl_value_get_type(x_value) == FL_VALUE_TYPE_INT) {
+        x = static_cast<double>(fl_value_get_int(x_value));
+      }
+
+      if (fl_value_get_type(y_value) == FL_VALUE_TYPE_FLOAT) {
+        y = fl_value_get_float(y_value);
+      } else if (fl_value_get_type(y_value) == FL_VALUE_TYPE_INT) {
+        y = static_cast<double>(fl_value_get_int(y_value));
+      }
+
+      if (webview_) {
+        webview_->SetTextureOffset(x, y);
+      }
+    }
+    fl_method_call_respond_success(method_call, nullptr, nullptr);
+    return;
+  }
+
   // setCursorPos: [double x, double y]
   if (strcmp(method, "setCursorPos") == 0) {
     if (fl_value_get_type(args) == FL_VALUE_TYPE_LIST && fl_value_get_length(args) >= 2) {

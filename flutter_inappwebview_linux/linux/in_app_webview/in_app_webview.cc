@@ -26,6 +26,7 @@
 #include "../types/navigation_action.h"
 #include "../types/web_resource_error.h"
 #include "../types/web_resource_request.h"
+#include "../flutter_inappwebview_linux_plugin_private.h"
 #include "../utils/flutter.h"
 #include "../utils/log.h"
 #include "user_content_controller.h"
@@ -140,14 +141,24 @@ bool InAppWebView::IsWpeWebKitAvailable() {
   return available;
 }
 
-InAppWebView::InAppWebView(FlBinaryMessenger* messenger, int64_t id,
+InAppWebView::InAppWebView(FlPluginRegistrar* registrar, FlBinaryMessenger* messenger, int64_t id,
                            const InAppWebViewCreationParams& params)
-    : id_(id), settings_(params.initialSettings) {
+    : registrar_(registrar), gtk_window_(params.gtkWindow), id_(id), settings_(params.initialSettings) {
   js_bridge_secret_ = GenerateRandomSecret();
+
+  // Store context menu configuration
+  if (params.contextMenu.has_value()) {
+    context_menu_config_ = params.contextMenu.value();
+  }
 
   InitWpeBackend();
   InitWebView(params);
   RegisterEventHandlers();
+
+  // Set up monitor change handlers and initial refresh rate (like Cog browser does)
+  // This helps WPE synchronize frame production with the display
+  SetupMonitorChangeHandlers();
+  UpdateMonitorRefreshRate();
 
   // Apply initial settings
   if (settings_) {
@@ -181,6 +192,23 @@ void InAppWebView::AttachChannel(FlBinaryMessenger* messenger, int64_t channel_i
 
 InAppWebView::~InAppWebView() {
   debugLog("dealloc InAppWebView");
+
+  // Clean up monitor change handlers
+  CleanupMonitorChangeHandlers();
+
+  // Clean up context menu popup
+  context_menu_popup_.reset();
+
+  // Clean up context menu references
+  if (pending_context_menu_ != nullptr) {
+    g_object_unref(pending_context_menu_);
+    pending_context_menu_ = nullptr;
+  }
+  if (pending_hit_test_result_ != nullptr) {
+    g_object_unref(pending_hit_test_result_);
+    pending_hit_test_result_ = nullptr;
+  }
+
   // IMPORTANT: Clean up user content controller FIRST while webview is still valid
   // The UserContentController destructor needs access to WebKit's user content manager
   // which becomes invalid after we unref the webview
@@ -419,6 +447,9 @@ void InAppWebView::RegisterEventHandlers() {
   // Connect to context-menu signal
   g_signal_connect(webview_, "context-menu", G_CALLBACK(OnContextMenu), this);
 
+  // Connect to context-menu-dismissed signal
+  g_signal_connect(webview_, "context-menu-dismissed", G_CALLBACK(OnContextMenuDismissed), this);
+
   // Connect to enter-fullscreen signal
   g_signal_connect(webview_, "enter-fullscreen", G_CALLBACK(OnEnterFullscreen), this);
 
@@ -439,6 +470,85 @@ void InAppWebView::RegisterEventHandlers() {
         self->OnFrameDisplayed(data);
       },
       this, nullptr);
+}
+
+// === Monitor Change Handlers ===
+
+void InAppWebView::SetupMonitorChangeHandlers() {
+  if (registrar_ == nullptr) {
+    return;
+  }
+
+  // Get the GdkDisplay to connect to monitors-changed signal
+  GdkDisplay* display = gdk_display_get_default();
+  if (display != nullptr) {
+    // Connect to monitors-changed signal on the display
+    // This fires when monitors are added, removed, or their properties change
+    monitors_changed_handler_id_ = g_signal_connect(
+        display, "monitor-added",
+        G_CALLBACK(+[](GdkDisplay*, GdkMonitor*, gpointer user_data) {
+          auto* self = static_cast<InAppWebView*>(user_data);
+          self->UpdateMonitorRefreshRate();
+        }),
+        this);
+
+    // Also connect to monitor-removed in case the window moves to another monitor
+    g_signal_connect(
+        display, "monitor-removed",
+        G_CALLBACK(+[](GdkDisplay*, GdkMonitor*, gpointer user_data) {
+          auto* self = static_cast<InAppWebView*>(user_data);
+          self->UpdateMonitorRefreshRate();
+        }),
+        this);
+  }
+
+  // Connect to configure-event on the toplevel window to detect window moves/resizes
+  // This helps us detect when the window moves between monitors
+  if (gtk_window_ != nullptr) {
+    configure_event_handler_id_ = g_signal_connect(
+        gtk_window_, "configure-event",
+        G_CALLBACK(+[](GtkWidget*, GdkEventConfigure*, gpointer user_data) -> gboolean {
+          auto* self = static_cast<InAppWebView*>(user_data);
+          self->UpdateMonitorRefreshRate();
+          return FALSE;  // Continue event propagation
+        }),
+        this);
+  }
+}
+
+void InAppWebView::CleanupMonitorChangeHandlers() {
+  // Disconnect monitors-changed signal
+  if (monitors_changed_handler_id_ != 0) {
+    GdkDisplay* display = gdk_display_get_default();
+    if (display != nullptr) {
+      g_signal_handler_disconnect(display, monitors_changed_handler_id_);
+    }
+    monitors_changed_handler_id_ = 0;
+  }
+
+  // Disconnect configure-event signal
+  if (configure_event_handler_id_ != 0 && gtk_window_ != nullptr) {
+    g_signal_handler_disconnect(gtk_window_, configure_event_handler_id_);
+    configure_event_handler_id_ = 0;
+  }
+}
+
+void InAppWebView::UpdateMonitorRefreshRate() {
+  if (gtk_window_ == nullptr || wpe_backend_ == nullptr) {
+    return;
+  }
+
+  int refresh_rate_mhz = flutter_inappwebview_linux_plugin_get_monitor_refresh_rate_for_window(gtk_window_);
+  if (refresh_rate_mhz > 0) {
+    uint32_t new_rate = static_cast<uint32_t>(refresh_rate_mhz);
+    // Only update if the rate has actually changed
+    if (new_rate != target_refresh_rate_) {
+      wpe_view_backend_set_target_refresh_rate(wpe_backend_, new_rate);
+      target_refresh_rate_ = new_rate;
+      debugLog("InAppWebView: Monitor refresh rate updated to " +
+               std::to_string(refresh_rate_mhz / 1000) + " Hz");
+    }
+  }
 }
 
 // === WPE Backend Callbacks ===
@@ -880,6 +990,9 @@ void InAppWebView::setSize(int width, int height) {
   if (width == width_ && height == height_)
     return;
 
+  // Hide context menu on resize
+  HideContextMenu();
+
   width_ = width;
   height_ = height;
 
@@ -906,6 +1019,11 @@ void InAppWebView::setFocused(bool focused) {
   if (focused == is_focused_)
     return;
   is_focused_ = focused;
+
+  // Hide context menu when WebView loses focus
+  if (!focused) {
+    HideContextMenu();
+  }
 
   if (wpe_backend_ != nullptr) {
     if (focused) {
@@ -1079,6 +1197,11 @@ bool InAppWebView::OnDomFullscreenRequest(bool fullscreen) {
 
 // === Input Handling ===
 
+void InAppWebView::SetTextureOffset(double x, double y) {
+  texture_offset_x_ = x;
+  texture_offset_y_ = y;
+}
+
 void InAppWebView::SetCursorPos(double x, double y) {
   // Store logical coordinates
   cursor_x_ = x;
@@ -1101,6 +1224,11 @@ void InAppWebView::SetCursorPos(double x, double y) {
 void InAppWebView::SetPointerButton(int kind, int button, int clickCount) {
   if (wpe_backend_ == nullptr)
     return;
+
+  // Hide context menu on any button DOWN (kind=1 is Down per WpePointerEventKind enum)
+  if (kind == static_cast<int>(WpePointerEventKind::Down) && context_menu_popup_ && context_menu_popup_->IsVisible()) {
+    HideContextMenu();
+  }
 
   // Scale coordinates from logical to physical pixels
   int scaled_x = static_cast<int>(cursor_x_ * scale_factor_);
@@ -1177,6 +1305,9 @@ void InAppWebView::SetScrollDelta(double dx, double dy) {
   if (wpe_backend_ == nullptr)
     return;
 
+  // Hide context menu when scrolling
+  HideContextMenu();
+
   // Scale coordinates from logical to physical pixels
   int scaled_x = static_cast<int>(cursor_x_ * scale_factor_);
   int scaled_y = static_cast<int>(cursor_y_ * scale_factor_);
@@ -1210,37 +1341,39 @@ void InAppWebView::SendKeyEvent(int type, int64_t keyCode, int scanCode, int mod
   // Intercept clipboard shortcuts on key down (type=0)
   // Modifiers: Control=1, Shift=2, Alt=4, Meta=8
   const bool isCtrl = (modifiers & 1) != 0;
+  const bool isShift = (modifiers & 2) != 0;
   const bool isKeyDown = (type == 0);
 
   if (isCtrl && isKeyDown && webview_ != nullptr) {
     // Check for clipboard and common editing shortcuts
     // keyCode is XKB keysym, lowercase letters are 0x61-0x7a
-    const char* editingCommand = nullptr;
-
     switch (keyCode) {
       case 0x63:  // 'c' - Copy
-        editingCommand = WEBKIT_EDITING_COMMAND_COPY;
-        break;
+        copyToClipboard();
+        return;  // Don't send the key event to WebKit
       case 0x78:  // 'x' - Cut
-        editingCommand = WEBKIT_EDITING_COMMAND_CUT;
-        break;
-      case 0x76:  // 'v' - Paste
-        editingCommand = WEBKIT_EDITING_COMMAND_PASTE;
-        break;
+        cutToClipboard();
+        return;
+      case 0x76:  // 'v' - Paste (Ctrl+Shift+V = paste as plain text)
+        if (isShift) {
+          pasteAsPlainText();
+        } else {
+          pasteFromClipboard();
+        }
+        return;
       case 0x61:  // 'a' - Select All
-        editingCommand = WEBKIT_EDITING_COMMAND_SELECT_ALL;
-        break;
-      case 0x7a:  // 'z' - Undo
-        editingCommand = WEBKIT_EDITING_COMMAND_UNDO;
-        break;
+        selectAll();
+        return;
+      case 0x7a:  // 'z' - Undo (Ctrl+Shift+Z = Redo on some systems)
+        if (isShift) {
+          redo();
+        } else {
+          undo();
+        }
+        return;
       case 0x79:  // 'y' - Redo
-        editingCommand = WEBKIT_EDITING_COMMAND_REDO;
-        break;
-    }
-
-    if (editingCommand != nullptr) {
-      webkit_web_view_execute_editing_command(webview_, editingCommand);
-      return;  // Don't send the key event to WebKit
+        redo();
+        return;
     }
   }
 
@@ -1425,6 +1558,8 @@ void InAppWebView::OnLoadChanged(WebKitWebView* web_view, WebKitLoadEvent load_e
 
   switch (load_event) {
     case WEBKIT_LOAD_STARTED:
+      // Hide context menu when a new page starts loading
+      self->HideContextMenu();
       self->channel_delegate_->onLoadStart(self->getUrl().value_or(""));
       break;
     case WEBKIT_LOAD_COMMITTED:
@@ -1928,9 +2063,8 @@ gboolean InAppWebView::OnAuthenticate(WebKitWebView* web_view, WebKitAuthenticat
   return TRUE;  // We're handling the request
 }
 
-// NOTE: GTK popup menu code has been removed because WPE WebKit renders offscreen
-// without a GDK window. Context menu display is handled by the Dart side via
-// onCreateContextMenu callback.
+// NOTE: WPE WebKit renders offscreen without a GDK window.
+// We use the Flutter window's GDK window to display the native GTK context menu.
 
 gboolean InAppWebView::OnContextMenu(WebKitWebView* web_view, WebKitContextMenu* context_menu,
                                      WebKitHitTestResult* hit_test_result, gpointer user_data) {
@@ -1941,11 +2075,27 @@ gboolean InAppWebView::OnContextMenu(WebKitWebView* web_view, WebKitContextMenu*
     return TRUE;  // Suppress context menu
   }
 
-  // Build hit test result info for Dart callback
-  if (self->channel_delegate_ && hit_test_result != nullptr) {
-    std::string type = "UNKNOWN_TYPE";
-    std::string extra;
+  // Store the context menu and hit test result for native menu display
+  // We need to ref these because WebKit may release them after this callback returns
+  if (self->pending_context_menu_ != nullptr) {
+    g_object_unref(self->pending_context_menu_);
+  }
+  self->pending_context_menu_ = context_menu;
+  g_object_ref(context_menu);
 
+  if (self->pending_hit_test_result_ != nullptr) {
+    g_object_unref(self->pending_hit_test_result_);
+  }
+  self->pending_hit_test_result_ = hit_test_result;
+  if (hit_test_result != nullptr) {
+    g_object_ref(hit_test_result);
+  }
+
+  // Build hit test result info for Dart callback
+  std::string type = "UNKNOWN_TYPE";
+  std::string extra;
+
+  if (hit_test_result != nullptr) {
     if (webkit_hit_test_result_context_is_link(hit_test_result)) {
       type = "SRC_ANCHOR_TYPE";
       const char* uri = webkit_hit_test_result_get_link_uri(hit_test_result);
@@ -1966,21 +2116,745 @@ gboolean InAppWebView::OnContextMenu(WebKitWebView* web_view, WebKitContextMenu*
     } else if (webkit_hit_test_result_context_is_selection(hit_test_result)) {
       type = "UNKNOWN_TYPE";  // Selection doesn't have a specific type
     }
+  }
 
+  // Notify Dart side that context menu is being created
+  if (self->channel_delegate_) {
     self->channel_delegate_->onCreateContextMenu(type, extra);
   }
 
-  // NOTE: We do NOT show a GTK popup menu here because:
-  // 1. WPE WebKit renders offscreen - there's no GDK window for GTK menus
-  // 2. The Dart side will handle displaying the context menu via onCreateContextMenu
-  //
-  // The gtk_menu_popup_at_pointer() call would fail with:
-  // "Gtk-WARNING: no trigger event for menu popup"
-  // "Gtk-CRITICAL: gtk_menu_popup_at_rect: assertion 'GDK_IS_WINDOW' failed"
+  // Store the current cursor position for the context menu
+  self->context_menu_x_ = self->cursor_x_;
+  self->context_menu_y_ = self->cursor_y_;
+
+  // Show the context menu
+  self->ShowNativeContextMenu();
 
   // Return TRUE to suppress WebKit's default context menu handling
-  // The Dart side is responsible for showing the context menu
   return TRUE;
+}
+
+void InAppWebView::OnContextMenuDismissed(WebKitWebView* web_view, gpointer user_data) {
+  auto* self = static_cast<InAppWebView*>(user_data);
+
+  // Hide our custom context menu popup when WebKit signals dismissal
+  self->HideContextMenu();
+}
+
+void InAppWebView::ShowNativeContextMenu() {
+  // Use cached GTK window for the popup menu
+  if (gtk_window_ == nullptr) {
+    errorLog("InAppWebView: Cannot show context menu - no window available");
+    return;
+  }
+
+  // Create context menu popup if needed
+  if (!context_menu_popup_) {
+    context_menu_popup_ = std::make_unique<ContextMenuPopup>(gtk_window_);
+
+    // Set up callbacks
+    context_menu_popup_->SetItemCallback(
+        [this](const std::string& id, const std::string& title) {
+          // Try to execute the action directly using WebKit APIs
+          int action_id = 0;
+          try {
+            action_id = std::stoi(id);
+          } catch (...) {
+            action_id = 0;
+          }
+
+          if (action_id > 0 && webview_ != nullptr) {
+            // Execute stock actions directly via WebKit API
+            WebKitContextMenuAction action = static_cast<WebKitContextMenuAction>(action_id);
+            switch (action) {
+              case WEBKIT_CONTEXT_MENU_ACTION_NO_ACTION:
+                // No action, used by separator menu items
+                break;
+
+              // === Link Actions ===
+              case WEBKIT_CONTEXT_MENU_ACTION_OPEN_LINK:
+                // Open the link in current view
+                if (pending_hit_test_result_ != nullptr) {
+                  const gchar* uri = webkit_hit_test_result_get_link_uri(pending_hit_test_result_);
+                  if (uri != nullptr) {
+                    webkit_web_view_load_uri(webview_, uri);
+                  }
+                }
+                break;
+
+              case WEBKIT_CONTEXT_MENU_ACTION_OPEN_LINK_IN_NEW_WINDOW:
+                // Open link in new window - notify Dart side to handle
+                if (pending_hit_test_result_ != nullptr && channel_delegate_) {
+                  const gchar* uri = webkit_hit_test_result_get_link_uri(pending_hit_test_result_);
+                  if (uri != nullptr) {
+                    // For now, just open in current view (Dart can handle new window logic)
+                    webkit_web_view_load_uri(webview_, uri);
+                  }
+                }
+                break;
+
+              case WEBKIT_CONTEXT_MENU_ACTION_DOWNLOAD_LINK_TO_DISK:
+                // Download link - trigger download
+                if (pending_hit_test_result_ != nullptr) {
+                  const gchar* uri = webkit_hit_test_result_get_link_uri(pending_hit_test_result_);
+                  if (uri != nullptr) {
+                    webkit_web_view_download_uri(webview_, uri);
+                  }
+                }
+                break;
+
+              case WEBKIT_CONTEXT_MENU_ACTION_COPY_LINK_TO_CLIPBOARD:
+                // Copy link URI to both system and WebView clipboard
+                if (pending_hit_test_result_ != nullptr) {
+                  const gchar* uri = webkit_hit_test_result_get_link_uri(pending_hit_test_result_);
+                  if (uri != nullptr) {
+                    copyTextToClipboard(uri);
+                  }
+                }
+                break;
+
+              // === Image Actions ===
+              case WEBKIT_CONTEXT_MENU_ACTION_OPEN_IMAGE_IN_NEW_WINDOW:
+                // Open image in new window
+                if (pending_hit_test_result_ != nullptr) {
+                  const gchar* uri = webkit_hit_test_result_get_image_uri(pending_hit_test_result_);
+                  if (uri != nullptr) {
+                    webkit_web_view_load_uri(webview_, uri);
+                  }
+                }
+                break;
+
+              case WEBKIT_CONTEXT_MENU_ACTION_DOWNLOAD_IMAGE_TO_DISK:
+                // Download image
+                if (pending_hit_test_result_ != nullptr) {
+                  const gchar* uri = webkit_hit_test_result_get_image_uri(pending_hit_test_result_);
+                  if (uri != nullptr) {
+                    webkit_web_view_download_uri(webview_, uri);
+                  }
+                }
+                break;
+
+              case WEBKIT_CONTEXT_MENU_ACTION_COPY_IMAGE_TO_CLIPBOARD:
+                // Copy image URI to both system and WebView clipboard
+                if (pending_hit_test_result_ != nullptr) {
+                  const gchar* uri = webkit_hit_test_result_get_image_uri(pending_hit_test_result_);
+                  if (uri != nullptr) {
+                    copyTextToClipboard(uri);
+                  }
+                }
+                break;
+
+              // === Frame Actions ===
+              case WEBKIT_CONTEXT_MENU_ACTION_OPEN_FRAME_IN_NEW_WINDOW:
+                // Open frame in new window - use GAction fallback
+                break;
+
+              // === Navigation Actions ===
+              case WEBKIT_CONTEXT_MENU_ACTION_GO_BACK:
+                webkit_web_view_go_back(webview_);
+                break;
+
+              case WEBKIT_CONTEXT_MENU_ACTION_GO_FORWARD:
+                webkit_web_view_go_forward(webview_);
+                break;
+
+              case WEBKIT_CONTEXT_MENU_ACTION_STOP:
+                webkit_web_view_stop_loading(webview_);
+                break;
+
+              case WEBKIT_CONTEXT_MENU_ACTION_RELOAD:
+                webkit_web_view_reload(webview_);
+                break;
+
+              // === Editing Actions ===
+              // These use the clipboard methods that sync WPE WebKit with system clipboard
+              case WEBKIT_CONTEXT_MENU_ACTION_COPY:
+                copyToClipboard();
+                break;
+
+              case WEBKIT_CONTEXT_MENU_ACTION_CUT:
+                cutToClipboard();
+                break;
+
+              case WEBKIT_CONTEXT_MENU_ACTION_PASTE:
+                pasteFromClipboard();
+                break;
+
+              // === Spelling Actions ===
+              case WEBKIT_CONTEXT_MENU_ACTION_SPELLING_GUESS:
+                // Spelling suggestion - use GAction fallback
+                break;
+
+              case WEBKIT_CONTEXT_MENU_ACTION_NO_GUESSES_FOUND:
+                // No spelling guesses - informational only
+                break;
+
+              case WEBKIT_CONTEXT_MENU_ACTION_IGNORE_SPELLING:
+                // Ignore spelling - use GAction fallback
+                break;
+
+              case WEBKIT_CONTEXT_MENU_ACTION_LEARN_SPELLING:
+                // Learn spelling - use GAction fallback
+                break;
+
+              case WEBKIT_CONTEXT_MENU_ACTION_IGNORE_GRAMMAR:
+                // Ignore grammar - use GAction fallback
+                break;
+
+              // === Font Actions ===
+              case WEBKIT_CONTEXT_MENU_ACTION_FONT_MENU:
+                // Font submenu - use GAction fallback
+                break;
+
+              case WEBKIT_CONTEXT_MENU_ACTION_BOLD:
+                webkit_web_view_execute_editing_command(webview_, "Bold");
+                break;
+
+              case WEBKIT_CONTEXT_MENU_ACTION_ITALIC:
+                webkit_web_view_execute_editing_command(webview_, "Italic");
+                break;
+
+              case WEBKIT_CONTEXT_MENU_ACTION_UNDERLINE:
+                webkit_web_view_execute_editing_command(webview_, "Underline");
+                break;
+
+              case WEBKIT_CONTEXT_MENU_ACTION_OUTLINE:
+                // Outline - use GAction fallback
+                break;
+
+              // === Developer Tools ===
+              case WEBKIT_CONTEXT_MENU_ACTION_INSPECT_ELEMENT:
+                // Inspect element - not available in WPE WebKit without GTK inspector
+                // Fall through to GAction fallback
+                break;
+
+              // === Video Actions ===
+              case WEBKIT_CONTEXT_MENU_ACTION_OPEN_VIDEO_IN_NEW_WINDOW:
+                if (pending_hit_test_result_ != nullptr) {
+                  const gchar* uri = webkit_hit_test_result_get_media_uri(pending_hit_test_result_);
+                  if (uri != nullptr) {
+                    webkit_web_view_load_uri(webview_, uri);
+                  }
+                }
+                break;
+
+              case WEBKIT_CONTEXT_MENU_ACTION_COPY_VIDEO_LINK_TO_CLIPBOARD:
+                // Copy video URI to both system and WebView clipboard
+                if (pending_hit_test_result_ != nullptr) {
+                  const gchar* uri = webkit_hit_test_result_get_media_uri(pending_hit_test_result_);
+                  if (uri != nullptr) {
+                    copyTextToClipboard(uri);
+                  }
+                }
+                break;
+
+              case WEBKIT_CONTEXT_MENU_ACTION_DOWNLOAD_VIDEO_TO_DISK:
+                if (pending_hit_test_result_ != nullptr) {
+                  const gchar* uri = webkit_hit_test_result_get_media_uri(pending_hit_test_result_);
+                  if (uri != nullptr) {
+                    webkit_web_view_download_uri(webview_, uri);
+                  }
+                }
+                break;
+
+              // === Audio Actions ===
+              case WEBKIT_CONTEXT_MENU_ACTION_OPEN_AUDIO_IN_NEW_WINDOW:
+                if (pending_hit_test_result_ != nullptr) {
+                  const gchar* uri = webkit_hit_test_result_get_media_uri(pending_hit_test_result_);
+                  if (uri != nullptr) {
+                    webkit_web_view_load_uri(webview_, uri);
+                  }
+                }
+                break;
+
+              case WEBKIT_CONTEXT_MENU_ACTION_COPY_AUDIO_LINK_TO_CLIPBOARD:
+                // Copy audio URI to both system and WebView clipboard
+                if (pending_hit_test_result_ != nullptr) {
+                  const gchar* uri = webkit_hit_test_result_get_media_uri(pending_hit_test_result_);
+                  if (uri != nullptr) {
+                    copyTextToClipboard(uri);
+                  }
+                }
+                break;
+
+              case WEBKIT_CONTEXT_MENU_ACTION_DOWNLOAD_AUDIO_TO_DISK:
+                if (pending_hit_test_result_ != nullptr) {
+                  const gchar* uri = webkit_hit_test_result_get_media_uri(pending_hit_test_result_);
+                  if (uri != nullptr) {
+                    webkit_web_view_download_uri(webview_, uri);
+                  }
+                }
+                break;
+
+              // === Media Control Actions ===
+              case WEBKIT_CONTEXT_MENU_ACTION_TOGGLE_MEDIA_CONTROLS:
+                // Toggle media controls - use JavaScript
+                evaluateJavascript(
+                    "if(document.activeElement && document.activeElement.controls !== undefined) {"
+                    "  document.activeElement.controls = !document.activeElement.controls;"
+                    "}",
+                    nullptr);
+                break;
+
+              case WEBKIT_CONTEXT_MENU_ACTION_TOGGLE_MEDIA_LOOP:
+                // Toggle media loop - use JavaScript
+                evaluateJavascript(
+                    "if(document.activeElement && document.activeElement.loop !== undefined) {"
+                    "  document.activeElement.loop = !document.activeElement.loop;"
+                    "}",
+                    nullptr);
+                break;
+
+              case WEBKIT_CONTEXT_MENU_ACTION_ENTER_VIDEO_FULLSCREEN:
+                // Enter video fullscreen - use JavaScript
+                evaluateJavascript(
+                    "if(document.activeElement && document.activeElement.requestFullscreen) {"
+                    "  document.activeElement.requestFullscreen();"
+                    "} else if(document.activeElement && document.activeElement.webkitEnterFullscreen) {"
+                    "  document.activeElement.webkitEnterFullscreen();"
+                    "}",
+                    nullptr);
+                break;
+
+              case WEBKIT_CONTEXT_MENU_ACTION_MEDIA_PLAY:
+                // Play media - use JavaScript
+                evaluateJavascript(
+                    "if(document.activeElement && document.activeElement.play) {"
+                    "  document.activeElement.play();"
+                    "}",
+                    nullptr);
+                break;
+
+              case WEBKIT_CONTEXT_MENU_ACTION_MEDIA_PAUSE:
+                // Pause media - use JavaScript
+                evaluateJavascript(
+                    "if(document.activeElement && document.activeElement.pause) {"
+                    "  document.activeElement.pause();"
+                    "}",
+                    nullptr);
+                break;
+
+              case WEBKIT_CONTEXT_MENU_ACTION_MEDIA_MUTE:
+                // Toggle mute - use JavaScript
+                evaluateJavascript(
+                    "if(document.activeElement && document.activeElement.muted !== undefined) {"
+                    "  document.activeElement.muted = !document.activeElement.muted;"
+                    "}",
+                    nullptr);
+                break;
+
+              // === Custom Actions ===
+              case WEBKIT_CONTEXT_MENU_ACTION_CUSTOM:
+                // Custom action - handled by Dart side
+                break;
+
+              default:
+                // For any unhandled actions, try the GAction approach as fallback
+                if (pending_context_menu_ != nullptr) {
+                  GList* items = webkit_context_menu_get_items(pending_context_menu_);
+                  for (GList* l = items; l != nullptr; l = l->next) {
+                    WebKitContextMenuItem* webkit_item = WEBKIT_CONTEXT_MENU_ITEM(l->data);
+                    WebKitContextMenuAction stock_action =
+                        webkit_context_menu_item_get_stock_action(webkit_item);
+                    if (static_cast<int>(stock_action) == action_id) {
+                      GAction* gaction = webkit_context_menu_item_get_gaction(webkit_item);
+                      if (gaction != nullptr && g_action_get_enabled(gaction)) {
+                        g_action_activate(gaction, nullptr);
+                      }
+                      break;
+                    }
+                  }
+                }
+                break;
+            }
+          }
+
+          // Notify Dart side about the menu item click
+          if (channel_delegate_) {
+            channel_delegate_->onContextMenuActionItemClicked(id, title);
+          }
+        });
+
+    context_menu_popup_->SetDismissedCallback([this]() {
+      if (channel_delegate_) {
+        channel_delegate_->onHideContextMenu();
+      }
+    });
+  }
+
+  // Clear and rebuild the menu
+  context_menu_popup_->Clear();
+
+  // Get context menu settings
+  bool hideDefaultItems = false;
+  if (context_menu_config_ != nullptr) {
+    hideDefaultItems = context_menu_config_->settings.hideDefaultSystemContextMenuItems;
+  }
+
+  bool hasItems = false;
+
+  // Add items from the WebKit context menu if available and not hiding default items
+  if (pending_context_menu_ != nullptr && !hideDefaultItems) {
+    GList* items = webkit_context_menu_get_items(pending_context_menu_);
+    for (GList* l = items; l != nullptr; l = l->next) {
+      WebKitContextMenuItem* webkit_item = WEBKIT_CONTEXT_MENU_ITEM(l->data);
+
+      // Get the stock action to determine the menu item type
+      WebKitContextMenuAction stock_action = webkit_context_menu_item_get_stock_action(webkit_item);
+
+      // Skip separator and custom actions for now
+      if (stock_action == WEBKIT_CONTEXT_MENU_ACTION_NO_ACTION) {
+        context_menu_popup_->AddSeparator();
+        continue;
+      }
+
+      // Get action using GAction API (WPE WebKit uses GAction, not GtkAction)
+      GAction* gaction = webkit_context_menu_item_get_gaction(webkit_item);
+      bool enabled = (gaction != nullptr) ? g_action_get_enabled(gaction) : true;
+
+      // Map stock actions to labels
+      const char* stock_label = nullptr;
+      switch (stock_action) {
+        case WEBKIT_CONTEXT_MENU_ACTION_OPEN_LINK:
+          stock_label = "Open Link";
+          break;
+        case WEBKIT_CONTEXT_MENU_ACTION_OPEN_LINK_IN_NEW_WINDOW:
+          stock_label = "Open Link in New Window";
+          break;
+        case WEBKIT_CONTEXT_MENU_ACTION_DOWNLOAD_LINK_TO_DISK:
+          stock_label = "Download Link";
+          break;
+        case WEBKIT_CONTEXT_MENU_ACTION_COPY_LINK_TO_CLIPBOARD:
+          stock_label = "Copy Link";
+          break;
+        case WEBKIT_CONTEXT_MENU_ACTION_OPEN_IMAGE_IN_NEW_WINDOW:
+          stock_label = "Open Image in New Window";
+          break;
+        case WEBKIT_CONTEXT_MENU_ACTION_DOWNLOAD_IMAGE_TO_DISK:
+          stock_label = "Download Image";
+          break;
+        case WEBKIT_CONTEXT_MENU_ACTION_COPY_IMAGE_TO_CLIPBOARD:
+          stock_label = "Copy Image";
+          break;
+        case WEBKIT_CONTEXT_MENU_ACTION_GO_BACK:
+          stock_label = "Back";
+          break;
+        case WEBKIT_CONTEXT_MENU_ACTION_GO_FORWARD:
+          stock_label = "Forward";
+          break;
+        case WEBKIT_CONTEXT_MENU_ACTION_STOP:
+          stock_label = "Stop";
+          break;
+        case WEBKIT_CONTEXT_MENU_ACTION_RELOAD:
+          stock_label = "Reload";
+          break;
+        case WEBKIT_CONTEXT_MENU_ACTION_COPY:
+          stock_label = "Copy";
+          break;
+        case WEBKIT_CONTEXT_MENU_ACTION_CUT:
+          stock_label = "Cut";
+          break;
+        case WEBKIT_CONTEXT_MENU_ACTION_PASTE:
+          stock_label = "Paste";
+          break;
+        case WEBKIT_CONTEXT_MENU_ACTION_INSPECT_ELEMENT:
+          stock_label = "Inspect Element";
+          break;
+        default:
+          continue;
+      }
+
+      if (stock_label != nullptr) {
+        context_menu_popup_->AddItem(std::to_string(static_cast<int>(stock_action)), stock_label,
+                                     enabled);
+        hasItems = true;
+      }
+    }
+  }
+
+  // Add custom menu items from context_menu_config_
+  if (context_menu_config_ != nullptr && !context_menu_config_->menuItems.empty()) {
+    if (hasItems) {
+      context_menu_popup_->AddSeparator();
+    }
+
+    for (const auto& customItem : context_menu_config_->menuItems) {
+      if (!customItem.title.empty()) {
+        context_menu_popup_->AddItem(customItem.getIdAsString(), customItem.title, true);
+        hasItems = true;
+      }
+    }
+  }
+
+  if (!hasItems) {
+    return;
+  }
+
+  // Get screen position of the cursor
+  // The context menu position needs to account for:
+  // 1. The Flutter window position on screen (win_x, win_y)
+  // 2. The texture widget offset within the Flutter window (texture_offset_x_, texture_offset_y_)
+  // 3. The cursor position within the texture (context_menu_x_, context_menu_y_)
+  gint win_x, win_y;
+  gtk_window_get_position(gtk_window_, &win_x, &win_y);
+
+  int screen_x = win_x + static_cast<int>(texture_offset_x_) + static_cast<int>(context_menu_x_);
+  int screen_y = win_y + static_cast<int>(texture_offset_y_) + static_cast<int>(context_menu_y_);
+
+  context_menu_popup_->Show(screen_x, screen_y);
+}
+
+void InAppWebView::HideContextMenu() {
+  // Hide the context menu popup
+  if (context_menu_popup_) {
+    context_menu_popup_->Hide();
+  }
+
+  // Clean up pending menu references
+  if (pending_context_menu_ != nullptr) {
+    g_object_unref(pending_context_menu_);
+    pending_context_menu_ = nullptr;
+  }
+
+  if (pending_hit_test_result_ != nullptr) {
+    g_object_unref(pending_hit_test_result_);
+    pending_hit_test_result_ = nullptr;
+  }
+
+  // Notify Dart side
+  if (channel_delegate_) {
+    channel_delegate_->onHideContextMenu();
+  }
+}
+
+// === Clipboard Operations ===
+// WPE WebKit runs offscreen and doesn't share clipboard with the system by default.
+// These methods sync WebKit's internal clipboard with the GTK/system clipboard.
+
+void InAppWebView::getSelectedText(std::function<void(const std::optional<std::string>&)> callback) {
+  if (webview_ == nullptr || callback == nullptr) {
+    if (callback) callback(std::nullopt);
+    return;
+  }
+
+  evaluateJavascript(
+      "window.getSelection().toString()",
+      [callback](const std::optional<std::string>& result) {
+        if (!result.has_value() || result->empty() || *result == "null") {
+          callback(std::nullopt);
+          return;
+        }
+
+        std::string text = *result;
+        
+        // Parse JSON string result using nlohmann/json
+        try {
+          auto parsed = json::parse(text);
+          if (parsed.is_string()) {
+            text = parsed.get<std::string>();
+          }
+        } catch (const json::exception&) {
+          // If parsing fails, try manual unquoting for simple cases
+          if (text.size() >= 2 && text.front() == '"' && text.back() == '"') {
+            text = text.substr(1, text.size() - 2);
+          }
+        }
+
+        if (text.empty()) {
+          callback(std::nullopt);
+        } else {
+          callback(text);
+        }
+      });
+}
+
+void InAppWebView::copyToClipboard() {
+  if (webview_ == nullptr) return;
+
+  getSelectedText([this](const std::optional<std::string>& text) {
+    if (text.has_value() && !text->empty()) {
+      copyTextToClipboard(*text);
+    }
+  });
+
+  // Also execute WebKit's copy command for internal state
+  webkit_web_view_execute_editing_command(webview_, WEBKIT_EDITING_COMMAND_COPY);
+}
+
+void InAppWebView::cutToClipboard() {
+  if (webview_ == nullptr) return;
+
+  getSelectedText([this](const std::optional<std::string>& text) {
+    if (text.has_value() && !text->empty()) {
+      copyTextToClipboard(*text);
+    }
+  });
+
+  // Execute WebKit's cut command to remove the selection
+  webkit_web_view_execute_editing_command(webview_, WEBKIT_EDITING_COMMAND_CUT);
+}
+
+void InAppWebView::pasteFromClipboard() {
+  if (webview_ == nullptr) return;
+
+  // Check if JavaScript is disabled - use WebKit's paste command as fallback
+  bool jsEnabled = settings_ ? settings_->javaScriptEnabled : true;
+
+  // Get text from system clipboard
+  GtkClipboard* clipboard = gtk_clipboard_get(GDK_SELECTION_CLIPBOARD);
+  gchar* text = gtk_clipboard_wait_for_text(clipboard);
+  
+  if (text != nullptr && strlen(text) > 0) {
+    if (jsEnabled) {
+      // Use JavaScript to insert text
+      std::string escaped;
+      escaped.reserve(strlen(text) * 2);
+      for (const char* p = text; *p; ++p) {
+        switch (*p) {
+          case '\\': escaped += "\\\\"; break;
+          case '"': escaped += "\\\""; break;
+          case '\n': escaped += "\\n"; break;
+          case '\r': escaped += "\\r"; break;
+          case '\t': escaped += "\\t"; break;
+          default: escaped += *p; break;
+        }
+      }
+      g_free(text);
+      
+      // Insert text at current cursor position using execCommand
+      std::string js = "document.execCommand('insertText', false, \"" + escaped + "\")";
+      evaluateJavascript(js, nullptr);
+    } else {
+      // JavaScript disabled - use WebKit's paste command
+      g_free(text);
+      webkit_web_view_execute_editing_command(webview_, WEBKIT_EDITING_COMMAND_PASTE);
+    }
+  } else {
+    if (text) g_free(text);
+    // If system clipboard is empty, try WebKit's paste (may have its own content)
+    webkit_web_view_execute_editing_command(webview_, WEBKIT_EDITING_COMMAND_PASTE);
+  }
+}
+
+void InAppWebView::copyTextToClipboard(const std::string& text) {
+  if (text.empty()) return;
+
+  // 1. Copy to GTK/system clipboard
+  GtkClipboard* clipboard = gtk_clipboard_get(GDK_SELECTION_CLIPBOARD);
+  gtk_clipboard_set_text(clipboard, text.c_str(), -1);
+  gtk_clipboard_store(clipboard);
+
+  // 2. Copy to WebView's internal clipboard using the Clipboard API
+  // This ensures the text is available for paste within the webview
+  if (webview_ != nullptr) {
+    // Escape text for JavaScript
+    std::string escaped;
+    escaped.reserve(text.size() * 2);
+    for (char c : text) {
+      switch (c) {
+        case '\\': escaped += "\\\\"; break;
+        case '"': escaped += "\\\""; break;
+        case '\n': escaped += "\\n"; break;
+        case '\r': escaped += "\\r"; break;
+        case '\t': escaped += "\\t"; break;
+        case '`': escaped += "\\`"; break;
+        case '$': escaped += "\\$"; break;
+        default: escaped += c; break;
+      }
+    }
+
+    // Use the modern Clipboard API with fallback
+    std::string js = R"(
+      (async function() {
+        const text = ")" + escaped + R"(";
+        try {
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            await navigator.clipboard.writeText(text);
+          }
+        } catch (e) {
+          // Fallback: create temporary textarea and use execCommand
+          const textarea = document.createElement('textarea');
+          textarea.value = text;
+          textarea.style.position = 'fixed';
+          textarea.style.opacity = '0';
+          document.body.appendChild(textarea);
+          textarea.select();
+          document.execCommand('copy');
+          document.body.removeChild(textarea);
+        }
+      })();
+    )";
+    evaluateJavascript(js, nullptr);
+  }
+}
+
+void InAppWebView::pasteAsPlainText() {
+  if (webview_ == nullptr) return;
+
+  // Check if JavaScript is disabled - use WebKit's paste as plain text command as fallback
+  bool jsEnabled = settings_ ? settings_->javaScriptEnabled : true;
+
+  // Get text from system clipboard
+  GtkClipboard* clipboard = gtk_clipboard_get(GDK_SELECTION_CLIPBOARD);
+  gchar* text = gtk_clipboard_wait_for_text(clipboard);
+  
+  if (text != nullptr && strlen(text) > 0) {
+    if (jsEnabled) {
+      // Use JavaScript to insert text (already plain text from gtk_clipboard_wait_for_text)
+      std::string escaped;
+      escaped.reserve(strlen(text) * 2);
+      for (const char* p = text; *p; ++p) {
+        switch (*p) {
+          case '\\': escaped += "\\\\"; break;
+          case '"': escaped += "\\\""; break;
+          case '\n': escaped += "\\n"; break;
+          case '\r': escaped += "\\r"; break;
+          case '\t': escaped += "\\t"; break;
+          default: escaped += *p; break;
+        }
+      }
+      g_free(text);
+      
+      // Insert text at current cursor position using execCommand
+      std::string js = "document.execCommand('insertText', false, \"" + escaped + "\")";
+      evaluateJavascript(js, nullptr);
+    } else {
+      // JavaScript disabled - use WebKit's paste as plain text command
+      g_free(text);
+      webkit_web_view_execute_editing_command(webview_, WEBKIT_EDITING_COMMAND_PASTE_AS_PLAIN_TEXT);
+    }
+  } else {
+    if (text) g_free(text);
+    // If system clipboard is empty, try WebKit's paste as plain text
+    webkit_web_view_execute_editing_command(webview_, WEBKIT_EDITING_COMMAND_PASTE_AS_PLAIN_TEXT);
+  }
+}
+
+void InAppWebView::selectAll() {
+  if (webview_ == nullptr) return;
+  webkit_web_view_execute_editing_command(webview_, WEBKIT_EDITING_COMMAND_SELECT_ALL);
+}
+
+void InAppWebView::undo() {
+  if (webview_ == nullptr) return;
+  webkit_web_view_execute_editing_command(webview_, WEBKIT_EDITING_COMMAND_UNDO);
+}
+
+void InAppWebView::redo() {
+  if (webview_ == nullptr) return;
+  webkit_web_view_execute_editing_command(webview_, WEBKIT_EDITING_COMMAND_REDO);
+}
+
+void InAppWebView::insertImage(const std::string& imageUri) {
+  if (webview_ == nullptr || imageUri.empty()) return;
+  webkit_web_view_execute_editing_command_with_argument(
+      webview_, WEBKIT_EDITING_COMMAND_INSERT_IMAGE, imageUri.c_str());
+}
+
+void InAppWebView::createLink(const std::string& linkUri) {
+  if (webview_ == nullptr || linkUri.empty()) return;
+  webkit_web_view_execute_editing_command_with_argument(
+      webview_, WEBKIT_EDITING_COMMAND_CREATE_LINK, linkUri.c_str());
 }
 
 gboolean InAppWebView::OnEnterFullscreen(WebKitWebView* web_view, gpointer user_data) {

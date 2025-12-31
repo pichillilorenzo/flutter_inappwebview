@@ -24,6 +24,7 @@ class InAppWebViewManager {
   ~InAppWebViewManager();
 
   FlPluginRegistrar* registrar() const { return registrar_; }
+  GtkWindow* gtk_window() const { return gtk_window_; }
 
   CustomPlatformView* GetPlatformView(int64_t id) const;
 
@@ -33,6 +34,7 @@ class InAppWebViewManager {
 
  private:
   FlPluginRegistrar* registrar_ = nullptr;
+  GtkWindow* gtk_window_ = nullptr;  // Cached during plugin registration
   FlMethodChannel* method_channel_ = nullptr;
   FlTextureRegistrar* texture_registrar_ = nullptr;
   FlBinaryMessenger* messenger_ = nullptr;

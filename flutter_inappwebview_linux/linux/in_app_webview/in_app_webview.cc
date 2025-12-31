@@ -228,6 +228,10 @@ void InAppWebView::AttachChannel(FlBinaryMessenger* messenger,
 }
 
 InAppWebView::~InAppWebView() {
+  // IMPORTANT: Clean up user content controller FIRST while webview is still valid
+  // The UserContentController destructor needs access to WebKit's user content manager
+  // which becomes invalid after we unref the webview
+  user_content_controller_.reset();
   // Clean up pending policy decisions
   for (auto& pair : pending_policy_decisions_) {
     webkit_policy_decision_ignore(pair.second);

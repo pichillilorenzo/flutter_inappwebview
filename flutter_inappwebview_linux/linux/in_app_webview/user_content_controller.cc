@@ -36,13 +36,16 @@ UserContentController::UserContentController(WebKitWebView* webview)
 }
 
 UserContentController::~UserContentController() {
-  if (DebugLogEnabled()) {
-    g_message("UserContentController: destructor");
-  }
+  // Check if webview is still valid - the content manager becomes invalid
+  // when the webview is destroyed
+  bool manager_valid = content_manager_ != nullptr && 
+                       webview_ != nullptr && 
+                       WEBKIT_IS_WEB_VIEW(webview_) &&
+                       WEBKIT_IS_USER_CONTENT_MANAGER(content_manager_);
   
   // Unregister all message handlers
-  for (const auto& name : registered_message_handlers_) {
-    if (content_manager_ != nullptr) {
+  if (manager_valid) {
+    for (const auto& name : registered_message_handlers_) {
       webkit_user_content_manager_unregister_script_message_handler(
           content_manager_, name.c_str(), nullptr);
     }
@@ -50,7 +53,7 @@ UserContentController::~UserContentController() {
   registered_message_handlers_.clear();
   
   // Clear all scripts when destroyed
-  if (content_manager_ != nullptr) {
+  if (manager_valid) {
     webkit_user_content_manager_remove_all_scripts(content_manager_);
   }
   

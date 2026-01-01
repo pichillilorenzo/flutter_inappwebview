@@ -5,31 +5,19 @@
 #include <cstring>
 
 #include "../utils/log.h"
-#include "inappwebview_gl_texture.h"
-#include "inappwebview_pbo_texture.h"
+#include "inappwebview_egl_texture.h"
 #include "inappwebview_texture.h"
 
 namespace flutter_inappwebview_plugin {
 
 namespace {
 // Check if GL textures should be used (enabled by default, can be disabled)
+// Disable with FLUTTER_INAPPWEBVIEW_LINUX_DISABLE_GL=1 to force software rendering.
 bool UseGLTextureEnvOverride() {
-  // User can force disable GL texture with this env var
   if (g_getenv("FLUTTER_INAPPWEBVIEW_LINUX_DISABLE_GL") != nullptr) {
     return false;
   }
   return true;
-}
-
-// Check if PBO texture should be used (disabled by default due to resize issues)
-// PBO provides async DMA transfers but has synchronization issues during resize.
-// Enable with FLUTTER_INAPPWEBVIEW_LINUX_USE_PBO=1 for testing.
-bool UsePBOTexture() {
-  // PBO is opt-in due to resize artifacts
-  if (g_getenv("FLUTTER_INAPPWEBVIEW_LINUX_USE_PBO") != nullptr) {
-    return true;
-  }
-  return false;
 }
 
 // Check if OpenGL is actually available in the current GDK backend
@@ -104,16 +92,17 @@ CustomPlatformView::CustomPlatformView(FlBinaryMessenger* messenger,
     return;
   }
 
-  // Create texture - prefer PBO texture for best performance (async DMA),
-  // fall back to basic GL texture, then pixel buffer texture if GL not available
+  // Create texture - two modes:
+  // 1. EGL/GL texture (hardware accelerated) - uses zero-copy EGL when available,
+  //    falls back to pixel buffer upload when EGL is not available (e.g., in VMs)
+  // 2. Pixel buffer texture (software) - pure software fallback when GL is disabled
+  //
+  // The EGL texture handles both EGL and SHM modes internally, providing the best
+  // performance for each environment.
   if (UseGLTexture()) {
-    if (UsePBOTexture()) {
-      texture_ = FL_TEXTURE(inappwebview_pbo_texture_new(webview_.get()));
-      debugLog("CustomPlatformView: using PBO texture (async DMA, hardware accelerated)");
-    } else {
-      texture_ = FL_TEXTURE(inappwebview_gl_texture_new(webview_.get()));
-      debugLog("CustomPlatformView: using OpenGL texture (hardware accelerated)");
-    }
+    texture_ = FL_TEXTURE(inappwebview_egl_texture_new(webview_.get()));
+    egl_texture_ = INAPPWEBVIEW_EGL_TEXTURE(texture_);
+    debugLog("CustomPlatformView: using GL texture (hardware accelerated)");
   } else {
     texture_ = FL_TEXTURE(inappwebview_texture_new(webview_.get()));
     debugLog("CustomPlatformView: using pixel buffer texture (software)");
@@ -144,7 +133,19 @@ CustomPlatformView::CustomPlatformView(FlBinaryMessenger* messenger,
   }
 
   // Set up the webview's callback to mark frame available
-  webview_->SetOnFrameAvailable([this]() { MarkTextureFrameAvailable(); });
+  // For EGL texture, we also update the EGL image reference
+  webview_->SetOnFrameAvailable([this]() {
+    // If using EGL texture, update the EGL image reference before marking available
+    if (egl_texture_ != nullptr && webview_ != nullptr) {
+      uint32_t width = 0;
+      uint32_t height = 0;
+      void* egl_image = webview_->GetCurrentEglImage(&width, &height);
+      if (egl_image != nullptr) {
+        inappwebview_egl_texture_set_egl_image(egl_texture_, egl_image, width, height);
+      }
+    }
+    MarkTextureFrameAvailable();
+  });
 
   // Set up cursor change callback
   webview_->SetOnCursorChanged(

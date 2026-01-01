@@ -7,6 +7,7 @@
 #include <string>
 
 #include "in_app_webview.h"
+#include "inappwebview_egl_texture.h"
 
 namespace flutter_inappwebview_plugin {
 
@@ -30,6 +31,7 @@ class CustomPlatformView {
   std::shared_ptr<WebViewType> webview_;
   FlTextureRegistrar* texture_registrar_;
   FlTexture* texture_ = nullptr;
+  InAppWebViewEGLTexture* egl_texture_ = nullptr;  // Pointer to EGL texture if using zero-copy mode
   int64_t texture_id_ = -1;
 
   FlMethodChannel* method_channel_ = nullptr;

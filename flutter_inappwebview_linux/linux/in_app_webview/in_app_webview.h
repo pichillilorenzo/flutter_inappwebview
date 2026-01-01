@@ -202,6 +202,11 @@ class InAppWebView {
   bool HasDmaBufExport() const;
   bool GetDmaBufFd(int* fd, uint32_t* stride, uint32_t* width, uint32_t* height) const;
 
+  // EGL image access (for zero-copy texture sharing with Flutter)
+  // Returns the current EGL image handle (EGLImageKHR) and dimensions.
+  // The EGL image is owned by WPE and remains valid until the next frame.
+  void* GetCurrentEglImage(uint32_t* out_width, uint32_t* out_height) const;
+
   // Frame available callback (called when new frame is ready)
   void SetOnFrameAvailable(std::function<void()> callback);
 

@@ -30,6 +30,7 @@
 #include "../flutter_inappwebview_linux_plugin_private.h"
 #include "../utils/flutter.h"
 #include "../utils/log.h"
+#include "simd_convert.h"
 #include "user_content_controller.h"
 #include "webview_channel_delegate.h"
 
@@ -634,8 +635,11 @@ void InAppWebView::OnExportDmaBuf(::wpe_fdo_egl_exported_image* image) {
   // Get the EGL image from the exported image
   EGLImageKHR egl_image = wpe_fdo_egl_exported_image_get_egl_image(image);
 
+  // Only do pixel readback if egl_display_ is available AND we're not using zero-copy EGL texture
+  // The zero-copy path passes the EGL image directly to Flutter, avoiding glReadPixels
   if (egl_image != EGL_NO_IMAGE_KHR && egl_display_ != nullptr) {
     // Read pixels from the EGL image using OpenGL
+    // This is only needed for the pixel buffer fallback path
     ReadPixelsFromEglImage(egl_image, img_width, img_height);
   }
 
@@ -647,13 +651,16 @@ void InAppWebView::OnExportDmaBuf(::wpe_fdo_egl_exported_image* image) {
 
   exported_image_ = image;
 
-  // Dispatch frame complete to allow WebKit to render next frame
-  if (exportable_ != nullptr) {
-    wpe_view_backend_exportable_fdo_dispatch_frame_complete(exportable_);
-  }
-
+  // Call on_frame_available BEFORE dispatch_frame_complete
+  // This ensures the EGL image is captured before we signal WPE we're ready for more
   if (on_frame_available_) {
     on_frame_available_();
+  }
+
+  // Dispatch frame complete to allow WebKit to render next frame
+  // Note: This is moved AFTER on_frame_available to ensure the EGL image is used first
+  if (exportable_ != nullptr) {
+    wpe_view_backend_exportable_fdo_dispatch_frame_complete(exportable_);
   }
 }
 
@@ -1550,7 +1557,8 @@ bool InAppWebView::CopyPixelBufferTo(uint8_t* dst, size_t dst_size, uint32_t* ou
     return false;
   }
 
-  std::memcpy(dst, buffer.data.data(), buffer.data.size());
+  // Use SIMD-optimized memory copy for better performance
+  FastMemcpy(dst, buffer.data.data(), buffer.data.size());
 
   if (out_width)
     *out_width = static_cast<uint32_t>(buffer.width);
@@ -1582,6 +1590,28 @@ bool InAppWebView::GetDmaBufFd(int* fd, uint32_t* stride, uint32_t* width, uint3
   // In a real implementation, you'd get the DMA-BUF FD from the EGL image
   // For now, return false to indicate not implemented
   return false;
+}
+
+void* InAppWebView::GetCurrentEglImage(uint32_t* out_width, uint32_t* out_height) const {
+  if (exported_image_ == nullptr) {
+    if (out_width)
+      *out_width = 0;
+    if (out_height)
+      *out_height = 0;
+    return nullptr;
+  }
+
+  // Get dimensions from the exported image
+  uint32_t img_width = wpe_fdo_egl_exported_image_get_width(exported_image_);
+  uint32_t img_height = wpe_fdo_egl_exported_image_get_height(exported_image_);
+
+  if (out_width)
+    *out_width = img_width;
+  if (out_height)
+    *out_height = img_height;
+
+  // Return the EGL image handle (EGLImageKHR)
+  return wpe_fdo_egl_exported_image_get_egl_image(exported_image_);
 }
 
 void InAppWebView::SetOnFrameAvailable(std::function<void()> callback) {
@@ -3563,6 +3593,12 @@ void InAppWebView::initializeWindowIdJS() {
 }
 
 void InAppWebView::OnExportShmBuffer(struct wpe_fdo_shm_exported_buffer* buffer) {
+  static bool first_shm_frame = true;
+  if (first_shm_frame) {
+    debugLog("InAppWebView::OnExportShmBuffer: SHM mode active (software rendering)");
+    first_shm_frame = false;
+  }
+
   if (buffer == nullptr) {
     return;
   }
@@ -3606,28 +3642,11 @@ void InAppWebView::OnExportShmBuffer(struct wpe_fdo_shm_exported_buffer* buffer)
     pixel_buffer.height = static_cast<size_t>(height);
 
     // Convert from BGRA (WL_SHM_FORMAT_ARGB8888 in memory) to RGBA
-    // Also handle stride properly
+    // Using SIMD-optimized conversion for better performance on ARM (NEON) and x86 (SSE2/SSSE3)
     uint8_t* src = static_cast<uint8_t*>(data);
     uint8_t* dst = pixel_buffer.data.data();
 
-    for (int32_t y = 0; y < height; ++y) {
-      uint8_t* src_row = src + y * stride;
-      uint8_t* dst_row = dst + y * output_row_size;
-
-      for (int32_t x = 0; x < width; ++x) {
-        // Source is BGRA (WL_SHM_FORMAT_ARGB8888 on little-endian)
-        uint8_t b = src_row[x * 4 + 0];
-        uint8_t g = src_row[x * 4 + 1];
-        uint8_t r = src_row[x * 4 + 2];
-        uint8_t a = src_row[x * 4 + 3];
-
-        // Destination is RGBA for Flutter
-        dst_row[x * 4 + 0] = r;
-        dst_row[x * 4 + 1] = g;
-        dst_row[x * 4 + 2] = b;
-        dst_row[x * 4 + 3] = a;
-      }
-    }
+    ConvertARGB32ToRGBA(src, dst, width, height, stride);
 
     // Swap buffers
     {

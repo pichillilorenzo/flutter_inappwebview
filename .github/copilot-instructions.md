@@ -14,7 +14,7 @@ This repository follows the **Federated Plugin** architecture:
   - Contains pure Dart contracts, typedefs, enums, and shared utilities.
   - Defines the `PlatformInterface` that all platform packages must implement.
   - **Crucial**: Anything added to the public API (`flutter_inappwebview`) MUST rely on or extend these definitions. DO NOT duplicate platform logic in the public package.
-- **`flutter_inappwebview_<platform>/`**: The **platform implementation packages** (Android, iOS, macOS, Windows, Web).
+- **`flutter_inappwebview_<platform>/`**: The **platform implementation packages** (Android, iOS, macOS, Windows, Linux, Web).
   - These packages implement the abstract classes defined in `flutter_inappwebview_platform_interface`.
   - They contain platform-specific code (Dart and native: Java/Kotlin, Obj-C/Swift, C++, JavaScript).
   - Keep their APIs strictly aligned with the `platform_interface` layer.
@@ -143,9 +143,9 @@ When implementing a new platform interface class (e.g., `PlatformWebViewEnvironm
   - **Android**: Uses `PlatformViewLink` and `AndroidViewSurface` (or `AndroidView` for simple cases) to render native views; [android.webkit.WebView](https://developer.android.com/reference/android/webkit/WebView).
   - **iOS**: Uses `UiKitView`; [WKWebView](https://developer.apple.com/documentation/webkit/wkwebview).
   - **macOS**: Uses `AppKitView`; [WKWebView](https://developer.apple.com/documentation/webkit/wkwebview).
-  - **Windows**: Uses a custom platform view implementation using textures; [WebView2](https://learn.microsoft.com/en-us/microsoft-edge/webview2/).
+  - **Windows**: Uses a custom platform view implementation using textures; [WebView2](https://learn.microsoft.com/en-us/microsoft-edge/webview2/). Native code is written in C++; prefer **standard C++17** over Windows-specific APIs where possible for maintainability.
+  - **Linux**: Uses a custom platform view implementation using textures with WPE WebKit for offscreen rendering; [WPE WebKit](https://wpewebkit.org/). Native code is written in C++; prefer **standard C++17** over platform-specific APIs where possible for maintainability.
   - **Web**: Uses an `HtmlElementView` to embed an `<iframe>`; [HTMLIFrameElement](https://developer.mozilla.org/en-US/docs/Web/API/HTMLIFrameElement).
-  - **Linux**: Currently not supported.
 - **Method Channels**: Use `MethodChannel` for communication between Dart and native code, but ensure it's encapsulated within the platform implementation classes.
 
 ### Feature Update Checklist

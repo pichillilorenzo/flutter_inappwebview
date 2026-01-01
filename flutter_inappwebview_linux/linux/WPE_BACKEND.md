@@ -244,22 +244,14 @@ During build, you should see messages like:
 
 ### Run Your App
 
-The built app includes all WPE libraries bundled in the `lib/` directory. A launcher script is automatically generated that sets the required `LD_LIBRARY_PATH`:
+The built app includes all WPE libraries bundled in the `lib/` directory and can be run directly:
 
 ```bash
-# Use the launcher script (recommended)
-./build/linux/x64/release/bundle/your_app.sh
+# x64 architecture
+./build/linux/x64/release/bundle/your_app
 
-# Or on ARM64:
-./build/linux/arm64/release/bundle/your_app.sh
-```
-
-> **Note:** The launcher script is required because `libwpe` uses `dlopen()` to dynamically load the WPE backend library (`libWPEBackend-default.so`), which doesn't respect RPATH. The script sets `LD_LIBRARY_PATH` to include the bundled libraries.
-
-Alternatively, you can run the binary directly by setting the environment variable:
-
-```bash
-LD_LIBRARY_PATH=./lib:$LD_LIBRARY_PATH ./your_app
+# ARM64 architecture
+./build/linux/arm64/release/bundle/your_app
 ```
 
 ### What Gets Bundled
@@ -270,8 +262,6 @@ The following files are automatically copied to your app's `lib/` directory:
 - `libwpe-1.0.so.*` - libwpe library
 - `libWPEBackend-fdo-1.0.so.*` - FDO backend library
 - `libWPEBackend-default.so` - Symlink to FDO backend
-
-Additionally, a launcher script (`your_app.sh`) is created in the bundle directory that sets the library path automatically.
 
 ## Runtime Environment Variables
 
@@ -412,57 +402,6 @@ Common issues:
 - Missing library symlinks in `lib/`
 - Mismatched library versions
 - Missing `libWPEBackend-default.so`
-
-### Debug mode fails with "could not load the impl library"
-
-When running in Flutter debug mode via VS Code or `flutter run`, the app runs without the launcher script, so `LD_LIBRARY_PATH` is not set. The `libwpe` library uses `dlopen()` to load the backend, which doesn't find the bundled libraries.
-
-**Solution 1: Use VS Code launch configuration**
-
-Create `.vscode/launch.json` in your project:
-
-```json
-{
-  "version": "0.2.0",
-  "configurations": [
-    {
-      "name": "Flutter Linux (Debug)",
-      "type": "dart",
-      "request": "launch",
-      "program": "lib/main.dart",
-      "env": {
-        "LD_LIBRARY_PATH": "${workspaceFolder}/build/linux/arm64/debug/bundle/lib"
-      }
-    }
-  ]
-}
-```
-
-> **Note:** Adjust `arm64` to `x64` on x86_64 systems.
-
-**Solution 2: Run from terminal with environment variable**
-
-```bash
-cd your_flutter_app
-flutter build linux --debug
-LD_LIBRARY_PATH=./build/linux/arm64/debug/bundle/lib:$LD_LIBRARY_PATH flutter run -d linux
-```
-
-**Solution 3: Install WPE libraries system-wide**
-
-If you installed WPE to `/usr/local`, ensure the library cache is updated:
-
-```bash
-# Update library cache
-sudo ldconfig
-
-# Create symlink in system path if not already done
-sudo ln -sf /usr/local/lib/libWPEBackend-fdo-1.0.so.1 /usr/local/lib/libWPEBackend-default.so
-# Or for arch-specific path:
-sudo ln -sf /usr/local/lib/aarch64-linux-gnu/libWPEBackend-fdo-1.0.so.1 /usr/local/lib/libWPEBackend-default.so
-```
-
-This makes the libraries findable system-wide, so debug mode works without extra configuration.
 
 ## Resources
 

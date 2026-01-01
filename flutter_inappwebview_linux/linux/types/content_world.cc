@@ -20,9 +20,9 @@ ContentWorld::ContentWorld(FlValue* map) {
 }
 
 FlValue* ContentWorld::toFlValue() const {
-  FlValue* map = fl_value_new_map();
-  fl_value_set_string_take(map, "name", fl_value_new_string(name.c_str()));
-  return map;
+  return to_fl_map({
+      {"name", make_fl_value(name)},
+  });
 }
 
 bool ContentWorld::operator==(const ContentWorld& other) const {

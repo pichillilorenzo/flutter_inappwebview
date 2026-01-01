@@ -17,12 +17,12 @@ WebResourceRequest::WebResourceRequest(FlValue* map)
       isForMainFrame(get_optional_fl_map_value<bool>(map, "isForMainFrame")) {}
 
 FlValue* WebResourceRequest::toFlValue() const {
-  FlValue* map = fl_value_new_map();
-  fl_value_set_string_take(map, "url", make_fl_value(url));
-  fl_value_set_string_take(map, "method", make_fl_value(method));
-  fl_value_set_string_take(map, "headers", make_fl_value(headers));
-  fl_value_set_string_take(map, "isForMainFrame", make_fl_value(isForMainFrame));
-  return map;
+  return to_fl_map({
+      {"url", make_fl_value(url)},
+      {"method", make_fl_value(method)},
+      {"headers", make_fl_value(headers)},
+      {"isForMainFrame", make_fl_value(isForMainFrame)},
+  });
 }
 
 }  // namespace flutter_inappwebview_plugin

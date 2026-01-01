@@ -12,10 +12,10 @@ WebResourceError::WebResourceError(FlValue* map)
       type(get_fl_map_value<int64_t>(map, "type", 0)) {}
 
 FlValue* WebResourceError::toFlValue() const {
-  FlValue* map = fl_value_new_map();
-  fl_value_set_string_take(map, "description", fl_value_new_string(description.c_str()));
-  fl_value_set_string_take(map, "type", fl_value_new_int(type));
-  return map;
+  return to_fl_map({
+      {"description", make_fl_value(description)},
+      {"type", make_fl_value(type)},
+  });
 }
 
 }  // namespace flutter_inappwebview_plugin

@@ -16,6 +16,37 @@
 namespace flutter_inappwebview_plugin {
 
 // ============================================================================
+// Type aliases for FlValue map building (similar to Windows EncodableMap)
+// ============================================================================
+
+/**
+ * Type alias for building FlValue maps using standard C++ initializer lists.
+ * This allows a consistent pattern similar to Windows' flutter::EncodableMap.
+ *
+ * Usage:
+ *   FlValueMap map = {
+ *     {"key1", make_fl_value("value1")},
+ *     {"key2", make_fl_value(42)},
+ *     {"key3", make_fl_value(optionalValue)},  // auto handles std::optional
+ *   };
+ *   return to_fl_map(map);
+ */
+using FlValueMap = std::initializer_list<std::pair<const char*, FlValue*>>;
+
+/**
+ * Converts an FlValueMap initializer list to an FlValue* map.
+ * All values are taken (ownership transferred), so they should be created
+ * with make_fl_value() or fl_value_new_*() functions.
+ */
+static inline FlValue* to_fl_map(FlValueMap entries) {
+  FlValue* map = fl_value_new_map();
+  for (const auto& [key, value] : entries) {
+    fl_value_set_string_take(map, key, value);
+  }
+  return map;
+}
+
+// ============================================================================
 // FlValue creation helpers (make_fl_value)
 // ============================================================================
 

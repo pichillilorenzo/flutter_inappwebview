@@ -21,45 +21,19 @@ WindowFeatures::WindowFeatures(WebKitWindowProperties* properties) {
 }
 
 FlValue* WindowFeatures::toFlValue() const {
-  FlValue* map = fl_value_new_map();
-
-  if (menuBarVisible.has_value()) {
-    fl_value_set_string_take(map, "menuBarVisible", fl_value_new_bool(menuBarVisible.value()));
-  }
-  if (statusBarVisible.has_value()) {
-    fl_value_set_string_take(map, "statusBarVisible", fl_value_new_bool(statusBarVisible.value()));
-  }
-  if (toolbarsVisible.has_value()) {
-    fl_value_set_string_take(map, "toolbarsVisible", fl_value_new_bool(toolbarsVisible.value()));
-  }
-  if (scrollbarsVisible.has_value()) {
-    fl_value_set_string_take(map, "scrollbarsVisible",
-                             fl_value_new_bool(scrollbarsVisible.value()));
-  }
-  if (locationbarVisible.has_value()) {
-    fl_value_set_string_take(map, "locationbarVisible",
-                             fl_value_new_bool(locationbarVisible.value()));
-  }
-  if (fullscreen.has_value()) {
-    fl_value_set_string_take(map, "fullscreen", fl_value_new_bool(fullscreen.value()));
-  }
-  if (resizable.has_value()) {
-    fl_value_set_string_take(map, "resizable", fl_value_new_bool(resizable.value()));
-  }
-  if (x.has_value()) {
-    fl_value_set_string_take(map, "x", fl_value_new_float(x.value()));
-  }
-  if (y.has_value()) {
-    fl_value_set_string_take(map, "y", fl_value_new_float(y.value()));
-  }
-  if (width.has_value()) {
-    fl_value_set_string_take(map, "width", fl_value_new_float(width.value()));
-  }
-  if (height.has_value()) {
-    fl_value_set_string_take(map, "height", fl_value_new_float(height.value()));
-  }
-
-  return map;
+  return to_fl_map({
+      {"menuBarVisible", make_fl_value(menuBarVisible)},
+      {"statusBarVisible", make_fl_value(statusBarVisible)},
+      {"toolbarsVisible", make_fl_value(toolbarsVisible)},
+      {"scrollbarsVisible", make_fl_value(scrollbarsVisible)},
+      {"locationbarVisible", make_fl_value(locationbarVisible)},
+      {"fullscreen", make_fl_value(fullscreen)},
+      {"resizable", make_fl_value(resizable)},
+      {"x", make_fl_value(x)},
+      {"y", make_fl_value(y)},
+      {"width", make_fl_value(width)},
+      {"height", make_fl_value(height)},
+  });
 }
 
 CreateWindowAction::CreateWindowAction(WebKitNavigationAction* navigationAction, int64_t windowId,
@@ -97,35 +71,17 @@ CreateWindowAction::CreateWindowAction(WebKitNavigationAction* navigationAction,
 }
 
 FlValue* CreateWindowAction::toFlValue() const {
-  FlValue* map = fl_value_new_map();
-
-  fl_value_set_string_take(map, "windowId", fl_value_new_int(windowId));
-
-  if (isDialog.has_value()) {
-    fl_value_set_string_take(map, "isDialog", fl_value_new_bool(isDialog.value()));
-  }
-
-  if (request != nullptr) {
-    fl_value_set_string_take(map, "request", request->toFlValue());
-  }
-
-  fl_value_set_string_take(map, "navigationType", fl_value_new_int(navigationType));
-  fl_value_set_string_take(map, "isForMainFrame", fl_value_new_bool(isForMainFrame));
-  fl_value_set_string_take(map, "hasGesture", fl_value_new_bool(isUserGesture));
-
-  if (targetFrame.has_value()) {
-    fl_value_set_string_take(map, "targetFrame", fl_value_new_string(targetFrame.value().c_str()));
-  }
-
-  if (sourceUrl.has_value()) {
-    fl_value_set_string_take(map, "sourceUrl", fl_value_new_string(sourceUrl.value().c_str()));
-  }
-
-  if (windowFeatures.has_value()) {
-    fl_value_set_string_take(map, "windowFeatures", windowFeatures.value().toFlValue());
-  }
-
-  return map;
+  return to_fl_map({
+      {"windowId", make_fl_value(windowId)},
+      {"isDialog", make_fl_value(isDialog)},
+      {"request", request ? request->toFlValue() : make_fl_value()},
+      {"navigationType", make_fl_value(navigationType)},
+      {"isForMainFrame", make_fl_value(isForMainFrame)},
+      {"hasGesture", make_fl_value(isUserGesture)},
+      {"targetFrame", make_fl_value(targetFrame)},
+      {"sourceUrl", make_fl_value(sourceUrl)},
+      {"windowFeatures", windowFeatures.has_value() ? windowFeatures->toFlValue() : make_fl_value()},
+  });
 }
 
 }  // namespace flutter_inappwebview_plugin

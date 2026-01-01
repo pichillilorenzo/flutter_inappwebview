@@ -51,36 +51,14 @@ UserScript::UserScript(FlValue* map)
 }
 
 FlValue* UserScript::toFlValue() const {
-  FlValue* map = fl_value_new_map();
-
-  if (groupName.has_value()) {
-    fl_value_set_string_take(map, "groupName", fl_value_new_string(groupName->c_str()));
-  } else {
-    fl_value_set_string_take(map, "groupName", fl_value_new_null());
-  }
-
-  fl_value_set_string_take(map, "source", fl_value_new_string(source.c_str()));
-  fl_value_set_string_take(map, "injectionTime",
-                           fl_value_new_int(static_cast<int64_t>(injectionTime)));
-  fl_value_set_string_take(map, "forMainFrameOnly", fl_value_new_bool(forMainFrameOnly));
-
-  if (allowedOriginRules.has_value()) {
-    FlValue* rulesArray = fl_value_new_list();
-    for (const auto& rule : *allowedOriginRules) {
-      fl_value_append_take(rulesArray, fl_value_new_string(rule.c_str()));
-    }
-    fl_value_set_string_take(map, "allowedOriginRules", rulesArray);
-  } else {
-    fl_value_set_string_take(map, "allowedOriginRules", fl_value_new_null());
-  }
-
-  if (contentWorld) {
-    fl_value_set_string_take(map, "contentWorld", contentWorld->toFlValue());
-  } else {
-    fl_value_set_string_take(map, "contentWorld", fl_value_new_null());
-  }
-
-  return map;
+  return to_fl_map({
+      {"groupName", make_fl_value(groupName)},
+      {"source", make_fl_value(source)},
+      {"injectionTime", make_fl_value(static_cast<int64_t>(injectionTime))},
+      {"forMainFrameOnly", make_fl_value(forMainFrameOnly)},
+      {"allowedOriginRules", make_fl_value(allowedOriginRules)},
+      {"contentWorld", contentWorld ? contentWorld->toFlValue() : make_fl_value()},
+  });
 }
 
 bool UserScript::operator==(const UserScript& other) const {

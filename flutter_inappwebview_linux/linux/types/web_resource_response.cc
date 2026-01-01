@@ -26,14 +26,14 @@ WebResourceResponse::WebResourceResponse(FlValue* map)
       data(get_optional_fl_map_value<std::vector<uint8_t>>(map, "data")) {}
 
 FlValue* WebResourceResponse::toFlValue() const {
-  FlValue* map = fl_value_new_map();
-  fl_value_set_string_take(map, "contentType", make_fl_value(contentType));
-  fl_value_set_string_take(map, "contentEncoding", make_fl_value(contentEncoding));
-  fl_value_set_string_take(map, "statusCode", make_fl_value(statusCode));
-  fl_value_set_string_take(map, "reasonPhrase", make_fl_value(reasonPhrase));
-  fl_value_set_string_take(map, "headers", make_fl_value(headers));
-  fl_value_set_string_take(map, "data", make_fl_value(data));
-  return map;
+  return to_fl_map({
+      {"contentType", make_fl_value(contentType)},
+      {"contentEncoding", make_fl_value(contentEncoding)},
+      {"statusCode", make_fl_value(statusCode)},
+      {"reasonPhrase", make_fl_value(reasonPhrase)},
+      {"headers", make_fl_value(headers)},
+      {"data", make_fl_value(data)},
+  });
 }
 
 }  // namespace flutter_inappwebview_plugin

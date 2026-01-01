@@ -17,12 +17,12 @@ URLRequest::URLRequest(FlValue* map)
       body(get_optional_fl_map_value<std::vector<uint8_t>>(map, "body")) {}
 
 FlValue* URLRequest::toFlValue() const {
-  FlValue* map = fl_value_new_map();
-  fl_value_set_string_take(map, "url", make_fl_value(url));
-  fl_value_set_string_take(map, "method", make_fl_value(method));
-  fl_value_set_string_take(map, "headers", make_fl_value(headers));
-  fl_value_set_string_take(map, "body", make_fl_value(body));
-  return map;
+  return to_fl_map({
+      {"url", make_fl_value(url)},
+      {"method", make_fl_value(method)},
+      {"headers", make_fl_value(headers)},
+      {"body", make_fl_value(body)},
+  });
 }
 
 }  // namespace flutter_inappwebview_plugin

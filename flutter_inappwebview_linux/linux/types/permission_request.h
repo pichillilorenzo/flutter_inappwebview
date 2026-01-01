@@ -1,5 +1,5 @@
-#ifndef FLUTTER_INAPPWEBVIEW_PLUGIN_PERMISSION_TYPES_H_
-#define FLUTTER_INAPPWEBVIEW_PLUGIN_PERMISSION_TYPES_H_
+#ifndef FLUTTER_INAPPWEBVIEW_PLUGIN_PERMISSION_REQUEST_H_
+#define FLUTTER_INAPPWEBVIEW_PLUGIN_PERMISSION_REQUEST_H_
 
 #include <flutter_linux/flutter_linux.h>
 #include <wpe/webkit.h>
@@ -27,15 +27,6 @@ enum class PermissionResourceType {
 };
 
 /**
- * Permission response actions.
- */
-enum class PermissionResponseAction {
-  DENY = 0,
-  GRANT = 1,
-  PROMPT = 2  // Not used on Linux - will default to deny
-};
-
-/**
  * Represents a permission request from web content.
  */
 class PermissionRequest {
@@ -58,19 +49,6 @@ class PermissionRequest {
   static std::vector<PermissionResourceType> getResourceTypes(WebKitPermissionRequest* request);
 };
 
-/**
- * Response to a permission request.
- */
-class PermissionResponse {
- public:
-  std::vector<int64_t> resources;
-  PermissionResponseAction action;
-
-  PermissionResponse();
-  PermissionResponse(FlValue* map);
-  ~PermissionResponse() = default;
-};
-
 }  // namespace flutter_inappwebview_plugin
 
-#endif  // FLUTTER_INAPPWEBVIEW_PLUGIN_PERMISSION_TYPES_H_
+#endif  // FLUTTER_INAPPWEBVIEW_PLUGIN_PERMISSION_REQUEST_H_

@@ -55,43 +55,14 @@ DownloadStartRequest::DownloadStartRequest(WebKitDownload* download) : contentLe
 }
 
 FlValue* DownloadStartRequest::toFlValue() const {
-  FlValue* map = fl_value_new_map();
-
-  if (url.has_value()) {
-    fl_value_set_string_take(map, "url", fl_value_new_string(url.value().c_str()));
-  } else {
-    fl_value_set_string_take(map, "url", fl_value_new_null());
-  }
-
-  if (suggestedFilename.has_value()) {
-    fl_value_set_string_take(map, "suggestedFilename",
-                             fl_value_new_string(suggestedFilename.value().c_str()));
-  } else {
-    fl_value_set_string_take(map, "suggestedFilename", fl_value_new_null());
-  }
-
-  if (mimeType.has_value()) {
-    fl_value_set_string_take(map, "mimeType", fl_value_new_string(mimeType.value().c_str()));
-  } else {
-    fl_value_set_string_take(map, "mimeType", fl_value_new_null());
-  }
-
-  fl_value_set_string_take(map, "contentLength", fl_value_new_int(contentLength));
-
-  if (contentDisposition.has_value()) {
-    fl_value_set_string_take(map, "contentDisposition",
-                             fl_value_new_string(contentDisposition.value().c_str()));
-  } else {
-    fl_value_set_string_take(map, "contentDisposition", fl_value_new_null());
-  }
-
-  if (userAgent.has_value()) {
-    fl_value_set_string_take(map, "userAgent", fl_value_new_string(userAgent.value().c_str()));
-  } else {
-    fl_value_set_string_take(map, "userAgent", fl_value_new_null());
-  }
-
-  return map;
+  return to_fl_map({
+      {"url", make_fl_value(url)},
+      {"suggestedFilename", make_fl_value(suggestedFilename)},
+      {"mimeType", make_fl_value(mimeType)},
+      {"contentLength", make_fl_value(contentLength)},
+      {"contentDisposition", make_fl_value(contentDisposition)},
+      {"userAgent", make_fl_value(userAgent)},
+  });
 }
 
 }  // namespace flutter_inappwebview_plugin

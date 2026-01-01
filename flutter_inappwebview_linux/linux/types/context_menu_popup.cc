@@ -161,42 +161,61 @@ void ContextMenuPopup::Show(int x, int y) {
 
   UpdateSize();
 
-  // Get screen dimensions to ensure menu stays on screen
+  // Get display for monitor geometry
   GdkDisplay* display = gdk_display_get_default();
-  GdkMonitor* monitor = gdk_display_get_primary_monitor(display);
-  if (monitor == nullptr) {
-    monitor = gdk_display_get_monitor(display, 0);
-  }
 
-  int screen_width = 1920;  // Default fallback
-  int screen_height = 1080;
+  // Get screen/monitor geometry for boundary checks
+  GdkMonitor* monitor = nullptr;
+  int screen_x = 0, screen_y = 0;
+  int screen_width = 1920, screen_height = 1080;
+
+  if (display != nullptr) {
+    monitor = gdk_display_get_monitor_at_point(display, x, y);
+    if (monitor == nullptr) {
+      monitor = gdk_display_get_primary_monitor(display);
+    }
+    if (monitor == nullptr) {
+      monitor = gdk_display_get_monitor(display, 0);
+    }
+  }
 
   if (monitor != nullptr) {
     GdkRectangle geometry;
     gdk_monitor_get_geometry(monitor, &geometry);
-    screen_width = geometry.width;
-    screen_height = geometry.height;
+    screen_x = geometry.x;
+    screen_y = geometry.y;
+    screen_width = geometry.x + geometry.width;
+    screen_height = geometry.y + geometry.height;
   }
 
-  // Adjust position if menu would go off screen
+  // Position menu so its top-left corner is at (x, y), adjusted for screen bounds
+  // If it would go off the right edge, flip to show on the left of cursor
   if (x + width_ > screen_width) {
-    x = screen_width - width_;
+    x = x - width_;
   }
+  // If it would go off the bottom, flip to show above cursor
   if (y + height_ > screen_height) {
-    y = screen_height - height_;
+    y = y - height_;
   }
-  if (x < 0) x = 0;
-  if (y < 0) y = 0;
+  // Ensure it stays within screen bounds
+  if (x < screen_x) {
+    x = screen_x;
+  }
+  if (y < screen_y) {
+    y = screen_y;
+  }
 
   // Store menu position for outside click detection
   menu_x_ = x;
   menu_y_ = y;
 
   gtk_widget_set_size_request(drawing_area_, width_, height_);
-  gtk_window_move(GTK_WINDOW(popup_window_), x, y);
   gtk_window_resize(GTK_WINDOW(popup_window_), width_, height_);
-
+  gtk_window_move(GTK_WINDOW(popup_window_), x, y);
+  gtk_window_set_position(GTK_WINDOW(popup_window_), GTK_WIN_POS_NONE);
   gtk_widget_show(popup_window_);
+  gtk_window_move(GTK_WINDOW(popup_window_), x, y);
+  
   visible_ = true;
 
   // Connect to parent window as fallback for clicks outside Flutter area

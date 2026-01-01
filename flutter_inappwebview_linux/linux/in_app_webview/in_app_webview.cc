@@ -20,6 +20,7 @@
 #include <wpe/fdo-egl.h>
 #include <wpe/unstable/fdo-shm.h>
 
+#include "../plugin_scripts_js/color_input_js.h"
 #include "../plugin_scripts_js/console_log_js.h"
 #include "../plugin_scripts_js/javascript_bridge_js.h"
 #include "../types/create_window_action.h"
@@ -198,6 +199,9 @@ InAppWebView::~InAppWebView() {
 
   // Clean up context menu popup
   context_menu_popup_.reset();
+
+  // Clean up color picker popup
+  color_picker_popup_.reset();
 
   // Clean up context menu references
   if (pending_context_menu_ != nullptr) {
@@ -399,17 +403,8 @@ void InAppWebView::RegisterEventHandlers() {
           handleScriptMessage(name, body);
         });
 
-    // Add the JavaScript bridge plugin script
-    auto jsBridgeScript = JavaScriptBridgeJS::JAVASCRIPT_BRIDGE_JS_PLUGIN_SCRIPT(
-        js_bridge_secret_,
-        std::nullopt,  // allowedOriginRules - allow all
-        false          // forMainFrameOnly - inject in all frames
-    );
-    user_content_controller_->addPluginScript(std::move(jsBridgeScript));
-
-    // Add the console log interception script
-    auto consoleLogScript = ConsoleLogJS::CONSOLE_LOG_JS_PLUGIN_SCRIPT(std::nullopt);
-    user_content_controller_->addPluginScript(std::move(consoleLogScript));
+    // Add plugin scripts based on settings (similar to iOS/Android)
+    PrepareAndAddUserScripts();
   }
 
   // Connect to load-changed signal
@@ -470,6 +465,72 @@ void InAppWebView::RegisterEventHandlers() {
         self->OnFrameDisplayed(data);
       },
       this, nullptr);
+}
+
+void InAppWebView::PrepareAndAddUserScripts() {
+  if (user_content_controller_ == nullptr) {
+    return;
+  }
+
+  // Check if JavaScript bridge is enabled (matches iOS/Android behavior)
+  bool javaScriptBridgeEnabled = java_script_bridge_enabled_;
+  if (settings_) {
+    javaScriptBridgeEnabled = settings_->javaScriptBridgeEnabled;
+  }
+
+  if (!javaScriptBridgeEnabled) {
+    return;
+  }
+
+  // Get plugin scripts settings (similar to iOS pluginScriptsOriginAllowList/ForMainFrameOnly)
+  std::optional<std::vector<std::string>> pluginScriptsOriginAllowList = std::nullopt;
+  bool pluginScriptsForMainFrameOnly = false;
+
+  if (settings_) {
+    pluginScriptsOriginAllowList = settings_->pluginScriptsOriginAllowList;
+    pluginScriptsForMainFrameOnly = settings_->pluginScriptsForMainFrameOnly;
+  }
+
+  // Get JavaScript bridge-specific settings
+  // If javaScriptBridgeOriginAllowList is not set, fall back to pluginScriptsOriginAllowList
+  std::optional<std::vector<std::string>> javaScriptBridgeOriginAllowList = pluginScriptsOriginAllowList;
+  bool javaScriptBridgeForMainFrameOnly = pluginScriptsForMainFrameOnly;
+
+  if (settings_) {
+    if (settings_->javaScriptBridgeOriginAllowList.has_value()) {
+      javaScriptBridgeOriginAllowList = settings_->javaScriptBridgeOriginAllowList;
+    }
+    if (settings_->javaScriptBridgeForMainFrameOnly.has_value()) {
+      javaScriptBridgeForMainFrameOnly = settings_->javaScriptBridgeForMainFrameOnly.value();
+    }
+  }
+
+  // === Add JavaScript Bridge Plugin Script ===
+  // This is the core bridge for communication between web content and native code
+  auto jsBridgeScript = JavaScriptBridgeJS::JAVASCRIPT_BRIDGE_JS_PLUGIN_SCRIPT(
+      js_bridge_secret_, javaScriptBridgeOriginAllowList, javaScriptBridgeForMainFrameOnly);
+  user_content_controller_->addPluginScript(std::move(jsBridgeScript));
+
+  // === Add Console Log Interception Script ===
+  // Note: Console log is always for main frame only to avoid issues
+  // (see https://github.com/pichillilorenzo/flutter_inappwebview/issues/1738)
+  auto consoleLogScript = ConsoleLogJS::CONSOLE_LOG_JS_PLUGIN_SCRIPT(pluginScriptsOriginAllowList);
+  user_content_controller_->addPluginScript(std::move(consoleLogScript));
+
+  // === Add Color Input Interception Script ===
+  // WPE WebKit doesn't have the run-color-chooser signal, so we handle <input type="color">
+  // via JavaScript interception
+  auto colorInputScript =
+      ColorInputJS::COLOR_INPUT_JS_PLUGIN_SCRIPT(pluginScriptsOriginAllowList, pluginScriptsForMainFrameOnly);
+  user_content_controller_->addPluginScript(std::move(colorInputScript));
+
+  // TODO: Add additional plugin scripts as needed, similar to iOS/Android:
+  // - InterceptAjaxRequestJS (if settings_->useShouldInterceptAjaxRequest)
+  // - InterceptFetchRequestJS (if settings_->useShouldInterceptFetchRequest)
+  // - OnLoadResourceJS (if settings_->useOnLoadResource)
+  // - PrintJS
+  // - FindTextHighlightJS
+  // - etc.
 }
 
 // === Monitor Change Handlers ===
@@ -990,8 +1051,8 @@ void InAppWebView::setSize(int width, int height) {
   if (width == width_ && height == height_)
     return;
 
-  // Hide context menu on resize
-  HideContextMenu();
+  // Hide all popups on resize
+  HideAllPopups();
 
   width_ = width;
   height_ = height;
@@ -1020,9 +1081,9 @@ void InAppWebView::setFocused(bool focused) {
     return;
   is_focused_ = focused;
 
-  // Hide context menu when WebView loses focus
+  // Hide all popups when WebView loses focus
   if (!focused) {
-    HideContextMenu();
+    HideAllPopups();
   }
 
   if (wpe_backend_ != nullptr) {
@@ -1225,9 +1286,9 @@ void InAppWebView::SetPointerButton(int kind, int button, int clickCount) {
   if (wpe_backend_ == nullptr)
     return;
 
-  // Hide context menu on any button DOWN (kind=1 is Down per WpePointerEventKind enum)
-  if (kind == static_cast<int>(WpePointerEventKind::Down) && context_menu_popup_ && context_menu_popup_->IsVisible()) {
-    HideContextMenu();
+  // Hide all popups on any button DOWN (kind=1 is Down per WpePointerEventKind enum)
+  if (kind == static_cast<int>(WpePointerEventKind::Down)) {
+    HideAllPopups();
   }
 
   // Scale coordinates from logical to physical pixels
@@ -1305,8 +1366,8 @@ void InAppWebView::SetScrollDelta(double dx, double dy) {
   if (wpe_backend_ == nullptr)
     return;
 
-  // Hide context menu when scrolling
-  HideContextMenu();
+  // Hide all popups when scrolling
+  HideAllPopups();
 
   // Scale coordinates from logical to physical pixels
   int scaled_x = static_cast<int>(cursor_x_ * scale_factor_);
@@ -1558,8 +1619,8 @@ void InAppWebView::OnLoadChanged(WebKitWebView* web_view, WebKitLoadEvent load_e
 
   switch (load_event) {
     case WEBKIT_LOAD_STARTED:
-      // Hide context menu when a new page starts loading
-      self->HideContextMenu();
+      // Hide all popups when a new page starts loading
+      self->HideAllPopups();
       self->channel_delegate_->onLoadStart(self->getUrl().value_or(""));
       break;
     case WEBKIT_LOAD_COMMITTED:
@@ -2590,16 +2651,20 @@ void InAppWebView::ShowNativeContextMenu() {
     return;
   }
 
-  // Get screen position of the cursor
-  // The context menu position needs to account for:
-  // 1. The Flutter window position on screen (win_x, win_y)
-  // 2. The texture widget offset within the Flutter window (texture_offset_x_, texture_offset_y_)
-  // 3. The cursor position within the texture (context_menu_x_, context_menu_y_)
-  gint win_x, win_y;
-  gtk_window_get_position(gtk_window_, &win_x, &win_y);
-
-  int screen_x = win_x + static_cast<int>(texture_offset_x_) + static_cast<int>(context_menu_x_);
-  int screen_y = win_y + static_cast<int>(texture_offset_y_) + static_cast<int>(context_menu_y_);
+  // Get screen position of the cursor using the pointer device
+  // This works reliably on both X11 and Wayland
+  gint screen_x = 0, screen_y = 0;
+  
+  GdkDisplay* gdk_display = gdk_display_get_default();
+  if (gdk_display != nullptr) {
+    GdkSeat* seat = gdk_display_get_default_seat(gdk_display);
+    if (seat != nullptr) {
+      GdkDevice* pointer = gdk_seat_get_pointer(seat);
+      if (pointer != nullptr) {
+        gdk_device_get_position(pointer, nullptr, &screen_x, &screen_y);
+      }
+    }
+  }
 
   context_menu_popup_->Show(screen_x, screen_y);
 }
@@ -2625,6 +2690,89 @@ void InAppWebView::HideContextMenu() {
   if (channel_delegate_) {
     channel_delegate_->onHideContextMenu();
   }
+}
+
+// === Color Picker for <input type="color"> ===
+// WPE WebKit doesn't have the run-color-chooser signal that WebKitGTK has,
+// so we implement color input support via JavaScript interception and a custom popup.
+
+void InAppWebView::ShowColorPicker(const std::string& initialColor, int x, int y,
+                                   const std::vector<std::string>& predefinedColors,
+                                   bool alphaEnabled,
+                                   const std::string& colorSpace) {
+  if (gtk_window_ == nullptr) {
+    errorLog("InAppWebView: Cannot show color picker - no window available");
+    return;
+  }
+
+  // Create color picker popup if needed
+  if (!color_picker_popup_) {
+    color_picker_popup_ = std::make_unique<ColorPickerPopup>(gtk_window_);
+
+    // Set up color selected callback
+    color_picker_popup_->SetColorSelectedCallback([this](const std::string& hexColor) {
+      SetColorInputValue(hexColor);
+    });
+
+    // Set up cancelled callback
+    color_picker_popup_->SetColorCancelledCallback([this]() {
+      CancelColorInput();
+    });
+  }
+
+  // Store the initial color for cancel restoration
+  pending_color_input_value_ = initialColor;
+
+  // Set the initial color and all attributes from HTML
+  color_picker_popup_->SetInitialColor(initialColor);
+  color_picker_popup_->SetPredefinedColors(predefinedColors);
+  color_picker_popup_->SetAlphaEnabled(alphaEnabled);
+  color_picker_popup_->SetColorSpace(colorSpace);
+  color_picker_popup_->Show(x, y);
+}
+
+void InAppWebView::HideColorPicker() {
+  if (color_picker_popup_) {
+    color_picker_popup_->Hide();
+  }
+}
+
+void InAppWebView::HideAllPopups() {
+  // Hide all custom popups - add new popup types here as they are implemented
+  HideContextMenu();
+  HideColorPicker();
+}
+
+void InAppWebView::SetColorInputValue(const std::string& hexColor) {
+  if (webview_ == nullptr) {
+    return;
+  }
+
+  // Call the JavaScript function to set the color value
+  std::string script =
+      "if (window._flutterInAppWebViewSetColorInputValue) {"
+      "  window._flutterInAppWebViewSetColorInputValue('" + hexColor + "');"
+      "}";
+
+  webkit_web_view_evaluate_javascript(webview_, script.c_str(),
+                                      static_cast<gssize>(script.length()), nullptr, nullptr,
+                                      nullptr, nullptr, nullptr);
+}
+
+void InAppWebView::CancelColorInput() {
+  if (webview_ == nullptr) {
+    return;
+  }
+
+  // Call the JavaScript function to cancel the color selection
+  std::string script =
+      "if (window._flutterInAppWebViewCancelColorInput) {"
+      "  window._flutterInAppWebViewCancelColorInput();"
+      "}";
+
+  webkit_web_view_evaluate_javascript(webview_, script.c_str(),
+                                      static_cast<gssize>(script.length()), nullptr, nullptr,
+                                      nullptr, nullptr, nullptr);
 }
 
 // === Clipboard Operations ===
@@ -3202,6 +3350,61 @@ void InAppWebView::handleScriptMessage(const std::string& name, const std::strin
 
   } else if (handlerName == "onFindResultReceived") {
     // TODO: Implement find result handling (matches iOS)
+
+  } else if (handlerName == "_onColorInputClicked") {
+    // Handle color input click - show native color picker
+    // This is a WPE-specific handler since WPE doesn't have run-color-chooser signal
+    std::string currentColor = "#000000";
+    std::vector<std::string> predefinedColors;
+    bool alphaEnabled = false;
+    std::string colorSpace = "limited-srgb";
+
+    if (!argsJsonStr.empty()) {
+      try {
+        json argsJson = json::parse(argsJsonStr);
+        if (argsJson.is_array() && !argsJson.empty()) {
+          json firstArg = argsJson[0];
+          if (firstArg.contains("color") && firstArg["color"].is_string()) {
+            currentColor = firstArg["color"].get<std::string>();
+          }
+          // Parse predefined colors from HTML datalist (list attribute)
+          if (firstArg.contains("predefinedColors") && firstArg["predefinedColors"].is_array()) {
+            for (const auto& color : firstArg["predefinedColors"]) {
+              if (color.is_string()) {
+                predefinedColors.push_back(color.get<std::string>());
+              }
+            }
+          }
+          // Parse alpha attribute (boolean)
+          if (firstArg.contains("alpha") && firstArg["alpha"].is_boolean()) {
+            alphaEnabled = firstArg["alpha"].get<bool>();
+          }
+          // Parse colorspace attribute
+          if (firstArg.contains("colorSpace") && firstArg["colorSpace"].is_string()) {
+            colorSpace = firstArg["colorSpace"].get<std::string>();
+          }
+        }
+      } catch (const json::parse_error& e) {}
+    }
+
+    // Get screen position of the cursor using the pointer device
+    // This works reliably on both X11 and Wayland
+    gint screenX = 0, screenY = 0;
+    
+    GdkDisplay* gdk_display = gdk_display_get_default();
+    if (gdk_display != nullptr) {
+      GdkSeat* seat = gdk_display_get_default_seat(gdk_display);
+      if (seat != nullptr) {
+        GdkDevice* pointer = gdk_seat_get_pointer(seat);
+        if (pointer != nullptr) {
+          gdk_device_get_position(pointer, nullptr, &screenX, &screenY);
+        }
+      }
+    }
+
+    // Show the color picker with all attributes
+    targetWebView->ShowColorPicker(currentColor, screenX, screenY, predefinedColors,
+                                   alphaEnabled, colorSpace);
 
   } else {
     // Not an internal handler - will be sent to Dart

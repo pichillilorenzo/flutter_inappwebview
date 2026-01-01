@@ -62,12 +62,12 @@ class _MyAppState extends State<MyApp> {
             Expanded(
               child: Stack(
                 children: [
-                  LinuxInAppWebViewWidget(
+                  Padding(padding: const EdgeInsets.all(50.0), child: LinuxInAppWebViewWidget(
                     LinuxInAppWebViewWidgetCreationParams(
                       key: webViewKey,
                       initialUrlRequest: URLRequest(
                         url: WebUri(
-                          "https://developer.mozilla.org/en-US/docs/Web/API/Element/keypress_event#examples",
+                          "https://thepaciellogroup.github.io/AT-browser-tests/test-files/input-color.html",
                         ),
                       ),
                       initialSettings: settings,
@@ -118,7 +118,7 @@ class _MyAppState extends State<MyApp> {
                         }
                       },
                     ),
-                  ).build(context),
+                  ).build(context)),
                   progress < 1.0
                       ? LinearProgressIndicator(value: progress)
                       : Container(),

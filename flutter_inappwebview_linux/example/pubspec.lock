@@ -88,7 +88,7 @@ packages:
       path: ".."
       relative: true
     source: path
-    version: "0.0.1"
+    version: "0.1.0-beta.1"
   flutter_inappwebview_platform_interface:
     dependency: "direct main"
     description:
@@ -294,4 +294,4 @@ packages:
     version: "3.1.0"
 sdks:
   dart: ">=3.10.4 <4.0.0"
-  flutter: ">=3.24.0"
+  flutter: ">=3.32.0"

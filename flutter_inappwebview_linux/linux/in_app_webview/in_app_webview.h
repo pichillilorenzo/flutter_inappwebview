@@ -40,6 +40,7 @@
 #include <tuple>
 #include <vector>
 
+#include "../types/color_picker_popup.h"
 #include "../types/context_menu.h"
 #include "../types/context_menu_popup.h"
 #include "../types/url_request.h"
@@ -211,10 +212,28 @@ class InAppWebView {
   void OnShouldOverrideUrlLoadingDecision(int64_t decision_id, bool allow);
 
   // Context menu methods
+  // Context menu methods
   // Show the native GTK context menu using pending WebKit menu and custom items
   void ShowNativeContextMenu();
   // Hide and cleanup any visible context menu
   void HideContextMenu();
+
+  // Color picker methods (for <input type="color"> support in WPE)
+  // Show the native color picker popup with optional predefined colors and alpha support
+  void ShowColorPicker(const std::string& initialColor, int x, int y,
+                       const std::vector<std::string>& predefinedColors = {},
+                       bool alphaEnabled = false,
+                       const std::string& colorSpace = "limited-srgb");
+  // Hide and cleanup any visible color picker
+  void HideColorPicker();
+  // Set the color input value via JavaScript
+  void SetColorInputValue(const std::string& hexColor);
+  // Cancel the color input selection via JavaScript
+  void CancelColorInput();
+
+  // Hide all custom popups (context menu, color picker, etc.)
+  // Use this when the webview state changes (resize, scroll, load, focus loss, etc.)
+  void HideAllPopups();
 
   // Clipboard operations (syncs WPE WebKit clipboard with system clipboard)
   void copyToClipboard();
@@ -366,6 +385,10 @@ class InAppWebView {
   double texture_offset_x_ = 0;  // Texture offset within the Flutter window
   double texture_offset_y_ = 0;
 
+  // Color picker state (for <input type="color"> support in WPE)
+  std::unique_ptr<ColorPickerPopup> color_picker_popup_;
+  std::string pending_color_input_value_;  // Current color from the input
+
   // Pointer lock handler
   std::function<bool(bool)> pointer_lock_handler_;
   bool pointer_locked_ = false;
@@ -374,6 +397,7 @@ class InAppWebView {
   void InitWpeBackend();
   void InitWebView(const InAppWebViewCreationParams& params);
   void RegisterEventHandlers();
+  void PrepareAndAddUserScripts();  // Add plugin scripts based on settings
   void SetupMonitorChangeHandlers();
   void CleanupMonitorChangeHandlers();
   void UpdateMonitorRefreshRate();

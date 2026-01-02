@@ -700,6 +700,43 @@ class InAppWebViewController {
   ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.isInFullscreen.supported_platforms}
   Future<bool> isInFullscreen() => platform.isInFullscreen();
 
+  ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.requestEnterFullscreen}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.requestEnterFullscreen.supported_platforms}
+  Future<void> requestEnterFullscreen() => platform.requestEnterFullscreen();
+
+  ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.requestExitFullscreen}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.requestExitFullscreen.supported_platforms}
+  Future<void> requestExitFullscreen() => platform.requestExitFullscreen();
+
+  ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.setVisible}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.setVisible.supported_platforms}
+  Future<void> setVisible({required bool visible}) =>
+      platform.setVisible(visible: visible);
+
+  ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.setTargetRefreshRate}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.setTargetRefreshRate.supported_platforms}
+  Future<void> setTargetRefreshRate({required int rate}) =>
+      platform.setTargetRefreshRate(rate: rate);
+
+  ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.getTargetRefreshRate}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.getTargetRefreshRate.supported_platforms}
+  Future<int> getTargetRefreshRate() => platform.getTargetRefreshRate();
+
+  ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.requestPointerLock}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.requestPointerLock.supported_platforms}
+  Future<bool> requestPointerLock() => platform.requestPointerLock();
+
+  ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.requestPointerUnlock}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.requestPointerUnlock.supported_platforms}
+  Future<bool> requestPointerUnlock() => platform.requestPointerUnlock();
+
   ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.clearFormData}
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.clearFormData.supported_platforms}

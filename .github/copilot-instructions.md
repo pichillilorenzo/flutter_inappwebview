@@ -1,193 +1,84 @@
-# Copilot Coding Agent Instructions — flutter_inappwebview
+# Subagent Instructions
 
-You are an expert Flutter and Dart plugin developer working on this federated WebView plugin.
+## Agent Role: ORCHESTRATOR ONLY
 
-## Repository Summary
-
-**flutter_inappwebview** is a multi-platform Flutter plugin providing inline WebView, headless WebView, and in-app browser capabilities across Android, iOS, macOS, Windows, Linux, and Web.
-
-| Aspect | Details |
-|--------|---------|
-| Languages | Dart, Java/Kotlin (Android), Swift/Obj-C (iOS/macOS), C++ (Windows/Linux), JavaScript (Web) |
-| Framework | Flutter ≥3.32.0, Dart SDK ^3.8.0 |
-| Build Tools | `flutter`, `dart`, `build_runner`, npm scripts |
+You are the **orchestrating agent**. You **NEVER** read files or edit code yourself. ALL work is done via subagents.
 
 ---
 
-## Quick Reference: Build & Validation Commands
+### ⚠️ ABSOLUTE RULES
 
-### Dependencies (Always Run First)
-```bash
-cd flutter_inappwebview_platform_interface && flutter pub get
-cd ../flutter_inappwebview && flutter pub get
-# Repeat for any platform package you modify
+1. **NEVER read files yourself** — spawn a subagent to do it
+2. **NEVER edit/create code yourself** — spawn a subagent to do it
+3. **ALWAYS use default subagent** — NEVER use `agentName: "Plan"` (omit `agentName` entirely)
+
+---
+
+### Mandatory Workflow (NO EXCEPTIONS)
+
 ```
-
-### Code Generation (After Modifying Annotated Files)
-```bash
-# From repo root - REQUIRED after editing @ExchangeableObject/@ExchangeableEnum files
-npm run build
-# Or directly:
-cd flutter_inappwebview_platform_interface && flutter pub run build_runner build --delete-conflicting-outputs
-```
-
-### Static Analysis (Validation)
-```bash
-cd flutter_inappwebview_platform_interface && dart analyze
-cd flutter_inappwebview && dart analyze
-```
-**Expected**: Only `info`-level `constant_identifier_names` warnings (intentional for API naming).
-
-### Code Formatting
-```bash
-npm run format
-```
-
-### Unit Tests
-```bash
-cd flutter_inappwebview && flutter test
-```
-
-### Integration Tests (Requires Device + Node Server)
-```bash
-cd flutter_inappwebview/example
-NODE_SERVER_IP=<ip> flutter driver --driver=test_driver/integration_test.dart --target=integration_test/webview_flutter_test.dart
+User Request
+    ↓
+SUBAGENT #1: Research & Spec
+    - Reads files, analyzes codebase
+    - Creates spec/analysis doc in docs/SubAgent docs/
+    - Returns summary to you
+    ↓
+YOU: Receive results, spawn next subagent
+    ↓
+SUBAGENT #2: Implementation (FRESH context)
+    - Receives the spec file path
+    - Implements/codes based on spec
+    - Returns completion summary
 ```
 
 ---
 
-## Architecture Overview
+### runSubagent Tool Usage
 
-This repository follows the **Federated Plugin** architecture:
+```
+runSubagent(
+  description: "3-5 word summary",  // REQUIRED
+  prompt: "Detailed instructions"   // REQUIRED
+)
+```
 
-- **`flutter_inappwebview/`**: The **app-facing package**. This is the public API that developers depend on.
-  - Files here usually wrap platform implementations via `Platform*` classes (e.g., `PlatformInAppWebViewWidget`).
-  - It delegates logic to the platform interface or specific platform implementations.
-- **`flutter_inappwebview_platform_interface/`**: The **platform interface package**.
-  - Contains pure Dart contracts, typedefs, enums, and shared utilities.
-  - Defines the `PlatformInterface` that all platform packages must implement.
-  - **Crucial**: Anything added to the public API (`flutter_inappwebview`) MUST rely on or extend these definitions. DO NOT duplicate platform logic in the public package.
-- **`flutter_inappwebview_<platform>/`**: The **platform implementation packages** (Android, iOS, macOS, Windows, Linux, Web).
-  - These packages implement the abstract classes defined in `flutter_inappwebview_platform_interface`.
-  - They contain platform-specific code (Dart and native: Java/Kotlin, Obj-C/Swift, C++, JavaScript).
-  - Keep their APIs strictly aligned with the `platform_interface` layer.
-- **`dev_packages/` and `scripts/`**: Internal tooling, generators, and maintenance scripts.
+**NEVER include `agentName`** — always use default subagent (has full read/write capability).
 
-### Main App-Facing Classes
-- Web view: `InAppWebView`, `InAppWebViewController`, `HeadlessInAppWebView`
-- Browser shells: `InAppBrowser`, `ChromeSafariBrowser`, `WebAuthenticationSession`
-- Platform helpers: `WebViewEnvironment`, `ProcessGlobalConfig`, `ProxyController`, `ServiceWorkerController`, `TracingController`, `PrintJobController`, `PullToRefreshController`, `FindInteractionController`
-- Storage & messaging: `WebStorage`, `LocalStorage`, `SessionStorage`, `WebStorageManager`, `WebMessageChannel`, `WebMessageListener`
-- Cookies: `CookieManager`
-- Auth storage: `HttpAuthCredentialDatabase`
-
-## Coding Guidelines
-
-### General
-- **Stay Dart-side unless explicitly working inside a platform package.** Never touch native (`.java`, `.kt`, `.mm`, `.swift`, `.cpp`, `.cs`) code when an issue only concerns the shared Dart API.
-- **Null Safety**: Strictly adhere to null safety. Do not introduce nullable APIs unless absolutely necessary.
-- **Avoid Breaking Changes**: Any API change requires updating the `platform_interface`, all federated implementations, and changelog entries.
-- **Code Generation**: Use `@ExchangeableObject`, `@ExchangeableEnum` annotations. Run `npm run build` to regenerate files.
-- **Generated Files**: Never hand-edit `*.g.dart` files. Update the annotated source instead.
-
-### Platform Interface & Public API
-- **Propagation Order**: Add or change APIs in `flutter_inappwebview_platform_interface` first, then update every platform implementation, and finally wire the public `flutter_inappwebview` wrapper.
-- **Documentation Macros**: Respect `{@macro ...}` and keep comments synchronized with `platform_interface`.
-- **`@SupportedPlatforms`**: Add annotations to document platform availability. Only mark supported when implementation exists.
-- **Support Checks**: Implement `isClassSupported`, `isPropertySupported`, `isMethodSupported` by deferring to `platform_interface` static singleton.
-
-> **Detailed patterns**: See `.github/instructions/platform-interface.instructions.md` for the full `Supported Platforms Pattern` with code examples.
-
-### Platform Implementations
-- **`inappwebview_platform.dart`**: Each platform package implements `InAppWebViewPlatform` with factory methods.
-- **Unsupported Features**: Return stub classes for unsupported features to ensure `isClassSupported` works correctly.
-- **Extending Params**: Platform implementations extend `Platform*CreationParams` for platform-specific fields.
-
-> **Platform-specific details**: See `.github/instructions/<platform>.instructions.md` for native code structure and implemented classes.
-
-### Feature Update Checklist
-1. Update or add the contract inside `flutter_inappwebview_platform_interface`.
-2. Run `npm run build` (or the equivalent `build_runner` command) to regenerate annotated files.
-3. Mirror the new contract in every federated implementation under `flutter_inappwebview_<platform>/lib/src/inappwebview_platform.dart` (returning stub implementations for unsupported platforms).
-4. Wire the public API in `flutter_inappwebview/` (controllers, widgets, helpers) and update the example app if the feature is user-facing.
-5. Add or update tests/analyzer coverage where possible.
-6. Update documentation (README, docs site) and add changelog entries for every package you touched (interface, each platform, public plugin, etc.).
-7. Re-run `dart analyze`/`flutter test` in the affected packages before sending the PR.
-
-## Testing & Validation
-- **Run Tests**: Run `flutter test` inside the relevant package before suggesting changes.
-- **Analyze**: For analyzer-only updates, run `dart analyze` and ensure `analysis_options.yaml` lints stay satisfied.
-- **Contract Updates**: When touching `platform_interface` contracts, explicitly explain how downstream packages must be updated and list the follow-up steps.
-- **Integration Tests**: Live under `flutter_inappwebview/example/integration_test` and can be executed via `scripts/test_and_log.sh` (accepts optional `NODE_SERVER_IP` and `DEVICE_ID`).
-
-## Documentation & Examples
-- **Update Docs**: Update `README.md`, `doc/`, or example apps when you expose new public APIs.
-- **Snippets**: Show simple snippets that exercise the new API on supported platforms only.
-- **Changelog**: Keep changelog entries scoped under the correct package (e.g., `flutter_inappwebview/CHANGELOG.md`).
-  - If a change spans multiple packages, add a short entry to each relevant `CHANGELOG.md` so consumers of standalone packages understand what changed.
-
-## Pull Request Tips
-- **Title**: Reference the federated package you changed in the PR title (e.g., `[flutter_inappwebview] Add PrintJobController helpers`).
-- **Testing Instructions**: Call out any manual steps required for testers (running example app, enabling permissions, etc.).
-- **Platform Parity**: Mention unsupported platforms explicitly instead of assuming parity.
-
-## NPM Scripts
-
-The root `package.json` contains useful scripts for development and maintenance:
-
-- **`npm run build`**: Runs `build_runner build` in `flutter_inappwebview_platform_interface`. Use this when you change code that requires generation (e.g., `*.g.dart` files).
-- **`npm run watch`**: Runs `build_runner watch` in `flutter_inappwebview_platform_interface`.
-- **`npm run format`**: Formats code in all packages using `dart format`.
-- **`npm run docs:gen`**: Generates API documentation.
-- **`npm run docs:serve`**: Serves the generated API documentation locally.
-- **`npm run publish:dry`**: Runs a dry-run publish check.
+**If you get errors:**
+- "disabled by user" → You may have included `agentName`. Remove it.
+- "missing required property" → Include BOTH `description` and `prompt`
 
 ---
 
-## Development Workflow (CRITICAL: Propagation Order)
+### Subagent Prompt Templates
 
-**ALWAYS follow this order when adding/changing APIs:**
+**Research Subagent:**
+```
+Research [topic]. Analyze relevant files in the codebase.
+Create a spec/analysis doc at: docs/SubAgent docs/[NAME].md
+Return: summary of findings and the spec file path.
+```
 
-1. **`flutter_inappwebview_platform_interface/`** - Define contracts, types, enums first
-2. Run `npm run build` to regenerate `*.g.dart` files
-3. **`flutter_inappwebview_<platform>/`** - Implement in each platform package
-4. **`flutter_inappwebview/`** - Wire the public API wrapper last
-5. Update `CHANGELOG.md` in EACH touched package
-
-### Critical Rules
-- **Never hand-edit `*.g.dart` files** - modify the source and regenerate
-- **Never touch native code** (`.java`, `.kt`, `.swift`, `.mm`, `.cpp`) for Dart-only API changes
-- **Always create stub implementations** for unsupported platforms in `inappwebview_platform.dart`
-- **Always run `dart analyze`** before considering work complete
-
----
-
-## Common Errors & Solutions
-
-| Error | Solution |
-|-------|----------|
-| "Platform implementation not found" | Check `pubspec.yaml` has correct `implements` and `dartPluginClass` |
-| Build runner conflicts | Add `--delete-conflicting-outputs` flag |
-| Missing generated file | Run `npm run build` from repo root |
-| Import errors after interface changes | Run `flutter pub get` in dependent packages |
+**Implementation Subagent:**
+```
+Read the spec at: docs/SubAgent docs/[NAME].md
+Implement according to the spec.
+Return: summary of changes made.
+```
 
 ---
 
-## Validation Checklist Before Submitting
+### What YOU Do (Orchestrator)
 
-- [ ] `flutter pub get` in all modified packages
-- [ ] `npm run build` if annotated files were modified
-- [ ] `dart analyze` passes (only info-level warnings acceptable)
-- [ ] `npm run format` applied
-- [ ] CHANGELOG.md updated in each modified package
-- [ ] Platform stub implementations added for unsupported features
+✅ Receive user requests  
+✅ Spawn subagents with clear prompts  
+✅ Pass spec paths between subagents  
+✅ Run terminal commands  
 
----
+### What YOU DON'T Do
 
-## Trust These Instructions
-
-This document contains validated workflows. Only search the codebase if:
-- Information appears outdated or incorrect
-- Implementation details are not covered here
-- Working on native platform code (see `.github/instructions/` for platform-specific guidance)
-
+❌ Read files (use subagent)  
+❌ Edit/create code (use subagent)  
+❌ Use `agentName: "Plan"` (always omit it)  
+❌ "Quick look" at files before delegating  

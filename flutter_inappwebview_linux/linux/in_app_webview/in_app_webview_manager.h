@@ -2,6 +2,7 @@
 #define FLUTTER_INAPPWEBVIEW_PLUGIN_IN_APP_WEBVIEW_MANAGER_H_
 
 #include <flutter_linux/flutter_linux.h>
+#include <wpe/webkit.h>
 
 #include <cstdint>
 #include <map>
@@ -9,6 +10,7 @@
 #include <string>
 
 #include "../types/url_request.h"
+#include "../types/web_view_transport.h"
 #include "custom_platform_view.h"
 #include "in_app_webview.h"
 #include "in_app_webview_settings.h"
@@ -32,6 +34,16 @@ class InAppWebViewManager {
   static void HandleMethodCall(FlMethodChannel* channel, FlMethodCall* method_call,
                                gpointer user_data);
 
+  // Keep-alive management
+  // Store a WebView for later reuse when widget is disposed but keepAliveId is set
+  void StoreKeepAliveWebView(const std::string& keepAliveId, std::unique_ptr<CustomPlatformView> view);
+  // Get a keep-alive WebView by its ID (returns nullptr if not found)
+  CustomPlatformView* GetKeepAliveWebView(const std::string& keepAliveId) const;
+  // Take ownership of a keep-alive WebView (removes from map and returns)
+  std::unique_ptr<CustomPlatformView> TakeKeepAliveWebView(const std::string& keepAliveId);
+  // Dispose a keep-alive WebView by its ID
+  void DisposeKeepAlive(const std::string& keepAliveId);
+
  private:
   FlPluginRegistrar* registrar_ = nullptr;
   GtkWindow* gtk_window_ = nullptr;  // Cached during plugin registration
@@ -42,6 +54,17 @@ class InAppWebViewManager {
   // Map of texture id to CustomPlatformView instance
   std::map<int64_t, std::unique_ptr<CustomPlatformView>> platform_views_;
 
+  // Map of keepAliveId to CustomPlatformView instance
+  // These are WebViews that persist when their widget is disposed
+  std::map<std::string, std::unique_ptr<CustomPlatformView>> keepAliveWebViews_;
+
+  // Map of window id to WebViewTransport for popup windows
+  // Used to track WebViews created via onCreateWindow
+  std::map<int64_t, std::unique_ptr<WebViewTransport>> windowWebViews_;
+  
+  // Auto-incrementing ID for window webviews  
+  int64_t windowAutoincrementId_ = 0;
+
   // Auto-incrementing ID for webviews
   int64_t next_id_ = 0;
 
@@ -49,6 +72,14 @@ class InAppWebViewManager {
   void HandleMethodCallImpl(FlMethodCall* method_call);
   void CreateInAppWebView(FlMethodCall* method_call);
   void DisposeWebView(int64_t texture_id);
+  void ClearAllCache(FlMethodCall* method_call, bool includeDiskFiles);
+
+ public:
+  // Window webview management for multi-window support
+  int64_t GetNextWindowId() { return ++windowAutoincrementId_; }
+  void AddWindowWebView(int64_t windowId, std::unique_ptr<WebViewTransport> transport);
+  WebViewTransport* GetWindowWebView(int64_t windowId);
+  void RemoveWindowWebView(int64_t windowId);
 };
 
 }  // namespace flutter_inappwebview_plugin

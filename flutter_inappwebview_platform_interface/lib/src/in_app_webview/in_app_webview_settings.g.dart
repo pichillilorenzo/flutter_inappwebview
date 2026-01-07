@@ -364,6 +364,7 @@ class InAppWebViewSettings {
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- Android WebView ([Official API - WebSettings.setCursiveFontFamily](https://developer.android.com/reference/android/webkit/WebSettings#setCursiveFontFamily(java.lang.String)))
+  ///- Linux WPE WebKit ([Official API - WebKitSettings.cursive-font-family](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/property.Settings.cursive-font-family.html))
   String? cursiveFontFamily;
 
   ///Specifying a dataDetectoryTypes value adds interactivity to web content that matches the value.
@@ -378,6 +379,7 @@ class InAppWebViewSettings {
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- Android WebView ([Official API - WebSettings.setDatabaseEnabled](https://developer.android.com/reference/android/webkit/WebSettings?hl=en#setDatabaseEnabled(boolean)))
+  ///- Linux WPE WebKit ([Official API - WebKitSettings.enable-html5-database](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/property.Settings.enable-html5-database.html))
   bool? databaseEnabled;
 
   ///A [ScrollViewDecelerationRate] value that determines the rate of deceleration after the user lifts their finger.
@@ -391,18 +393,21 @@ class InAppWebViewSettings {
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- Android WebView ([Official API - WebSettings.setDefaultFixedFontSize](https://developer.android.com/reference/android/webkit/WebSettings#setDefaultFixedFontSize(int)))
+  ///- Linux WPE WebKit ([Official API - WebKitSettings.default-monospace-font-size](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/property.Settings.default-monospace-font-size.html))
   int? defaultFixedFontSize;
 
   ///Sets the default font size. The default value is `16`.
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- Android WebView ([Official API - WebSettings.setDefaultFontSize](https://developer.android.com/reference/android/webkit/WebSettings#setDefaultFontSize(int)))
+  ///- Linux WPE WebKit ([Official API - WebKitSettings.default-font-size](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/property.Settings.default-font-size.html))
   int? defaultFontSize;
 
   ///Sets the default text encoding name to use when decoding html pages. The default value is `"UTF-8"`.
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- Android WebView ([Official API - WebSettings.setDefaultTextEncodingName](https://developer.android.com/reference/android/webkit/WebSettings#setDefaultTextEncodingName(java.lang.String)))
+  ///- Linux WPE WebKit ([Official API - WebKitSettings.default-charset](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/property.Settings.default-charset.html))
   String? defaultTextEncodingName;
 
   ///When not playing, video elements are represented by a 'poster' image.
@@ -484,7 +489,74 @@ class InAppWebViewSettings {
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- Android WebView ([Official API - WebSettings.setDomStorageEnabled](https://developer.android.com/reference/android/webkit/WebSettings?hl=en#setDomStorageEnabled(boolean)))
+  ///- Linux WPE WebKit ([Official API - WebKitSettings.enable-html5-local-storage](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/property.Settings.enable-html5-local-storage.html))
   bool? domStorageEnabled;
+
+  ///Sets whether compositing indicators are drawn.
+  ///When enabled, visual indicators are shown for compositing layers.
+  ///This is primarily useful for debugging rendering performance.
+  ///
+  ///The default value is `false`.
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Linux WPE WebKit ([Official API - WebKitSettings.draw-compositing-indicators](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/property.Settings.draw-compositing-indicators.html))
+  bool? drawCompositingIndicators;
+
+  ///Sets whether caret browsing mode is enabled.
+  ///Caret browsing mode allows users to navigate through web pages using the keyboard,
+  ///with a visible caret (text cursor) that can be moved through the content.
+  ///
+  ///The default value is `false`.
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Linux WPE WebKit ([Official API - WebKitSettings.enable-caret-browsing](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/property.Settings.enable-caret-browsing.html))
+  bool? enableCaretBrowsing;
+
+  ///Sets whether the page cache is enabled.
+  ///The page cache allows for faster back/forward navigation by keeping pages in memory.
+  ///
+  ///The default value is `true`.
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Linux WPE WebKit ([Official API - WebKitSettings.enable-page-cache](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/property.Settings.enable-page-cache.html))
+  bool? enablePageCache;
+
+  ///Sets whether text areas are resizable.
+  ///When enabled, text areas can be resized by the user.
+  ///
+  ///The default value is `true`.
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Linux WPE WebKit ([Official API - WebKitSettings.enable-resizable-text-areas](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/property.Settings.enable-resizable-text-areas.html))
+  bool? enableResizableTextAreas;
+
+  ///Sets whether smooth scrolling is enabled.
+  ///When enabled, scrolling animations are smooth instead of jumping instantly.
+  ///
+  ///The default value is `true`.
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Linux WPE WebKit ([Official API - WebKitSettings.enable-smooth-scrolling](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/property.Settings.enable-smooth-scrolling.html))
+  bool? enableSmoothScrolling;
+
+  ///Sets whether spatial navigation is enabled.
+  ///Spatial navigation allows users to navigate between focusable elements
+  ///using arrow keys instead of Tab.
+  ///
+  ///The default value is `false`.
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Linux WPE WebKit ([Official API - WebKitSettings.enable-spatial-navigation](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/property.Settings.enable-spatial-navigation.html))
+  bool? enableSpatialNavigation;
+
+  ///Sets whether tab key can be used to navigate to links.
+  ///When enabled, pressing Tab will focus on links in the page.
+  ///
+  ///The default value is `true`.
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Linux WPE WebKit ([Official API - WebKitSettings.enable-tabs-to-links](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/property.Settings.enable-tabs-to-links.html))
+  bool? enableTabsToLinks;
 
   ///Set to `true` to allow a viewport meta tag to either disable or restrict the range of user scaling. The default value is `false`.
   ///
@@ -492,6 +564,16 @@ class InAppWebViewSettings {
   ///- iOS WKWebView
   ///- macOS WKWebView
   bool? enableViewportScale;
+
+  ///Sets whether console messages are written to stdout.
+  ///When enabled, console messages from the web page will be written to the standard output.
+  ///This is useful for debugging purposes.
+  ///
+  ///The default value is `false`.
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Linux WPE WebKit ([Official API - WebKitSettings.enable-write-console-messages-to-stdout](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/property.Settings.enable-write-console-messages-to-stdout.html))
+  bool? enableWriteConsoleMessagesToStdout;
 
   ///Sets whether EnterpriseAuthenticationAppLinkPolicy if set by admin is allowed to have any
   ///effect on WebView.
@@ -511,12 +593,14 @@ class InAppWebViewSettings {
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- Android WebView ([Official API - WebSettings.setFantasyFontFamily](https://developer.android.com/reference/android/webkit/WebSettings#setFantasyFontFamily(java.lang.String)))
+  ///- Linux WPE WebKit ([Official API - WebKitSettings.fantasy-font-family](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/property.Settings.fantasy-font-family.html))
   String? fantasyFontFamily;
 
   ///Sets the fixed font family name. The default value is `"monospace"`.
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- Android WebView ([Official API - WebSettings.setFixedFontFamily](https://developer.android.com/reference/android/webkit/WebSettings#setFixedFontFamily(java.lang.String)))
+  ///- Linux WPE WebKit ([Official API - WebKitSettings.monospace-font-family](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/property.Settings.monospace-font-family.html))
   String? fixedFontFamily;
 
   ///Use [algorithmicDarkeningAllowed] instead.
@@ -728,6 +812,7 @@ class InAppWebViewSettings {
   ///**Officially Supported Platforms/Implementations**:
   ///- iOS WKWebView 15.4+ ([Official API - WKPreferences.isElementFullscreenEnabled](https://developer.apple.com/documentation/webkit/wkpreferences/3917769-iselementfullscreenenabled))
   ///- macOS WKWebView 12.3+ ([Official API - WKPreferences.isElementFullscreenEnabled](https://developer.apple.com/documentation/webkit/wkpreferences/3917769-iselementfullscreenenabled))
+  ///- Linux WPE WebKit ([Official API - WebKitSettings.enable-fullscreen](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/property.Settings.enable-fullscreen.html))
   bool? isElementFullscreenEnabled;
 
   ///Sets whether the web view's built-in find interaction native UI is enabled or not.
@@ -926,6 +1011,7 @@ class InAppWebViewSettings {
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- Android WebView ([Official API - WebSettings.setLoadsImagesAutomatically](https://developer.android.com/reference/android/webkit/WebSettings?hl=en#setLoadsImagesAutomatically(boolean)))
+  ///- Linux WPE WebKit ([Official API - WebKitSettings.auto-load-images](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/property.Settings.auto-load-images.html))
   bool? loadsImagesAutomatically;
 
   ///Set maximum viewport inset to the largest inset a webpage may experience in your app's maximally expanded UI configuration.
@@ -1071,6 +1157,13 @@ class InAppWebViewSettings {
   ///- Windows WebView2 1.0.902.49+ ([Official API - ICoreWebView2Settings4.put_IsPasswordAutosaveEnabled](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2settings4?view=webview2-1.0.2849.39#put_ispasswordautosaveenabled))
   bool? passwordAutosaveEnabled;
 
+  ///Sets the pictograph font family name.
+  ///The pictograph font family is used for rendering pictograph characters (emoji).
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Linux WPE WebKit ([Official API - WebKitSettings.pictograph-font-family](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/property.Settings.pictograph-font-family.html))
+  String? pictographFontFamily;
+
   ///Pinch-zoom, referred to as "Page Scale" zoom, is performed as a post-rendering step,
   ///it changes the page scale factor property and scales the surface the web page
   ///is rendered onto when user performs a pinch zooming action.
@@ -1215,6 +1308,7 @@ class InAppWebViewSettings {
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- Android WebView ([Official API - WebSettings.setSansSerifFontFamily](https://developer.android.com/reference/android/webkit/WebSettings?hl=en#setSansSerifFontFamily(java.lang.String)))
+  ///- Linux WPE WebKit ([Official API - WebKitSettings.sans-serif-font-family](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/property.Settings.sans-serif-font-family.html))
   String? sansSerifFontFamily;
 
   ///Sets whether the WebView should save form data. In Android O, the platform has implemented a fully functional Autofill feature to store form data.
@@ -1287,6 +1381,7 @@ class InAppWebViewSettings {
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- Android WebView ([Official API - WebSettings.setSerifFontFamily](https://developer.android.com/reference/android/webkit/WebSettings?hl=en#setSerifFontFamily(java.lang.String)))
+  ///- Linux WPE WebKit ([Official API - WebKitSettings.serif-font-family](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/property.Settings.serif-font-family.html))
   String? serifFontFamily;
 
   ///Set `true` if shared cookies from `HTTPCookieStorage.shared` should used for every load request in the WebView.
@@ -1310,6 +1405,7 @@ class InAppWebViewSettings {
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- Android WebView ([Official API - WebSettings.setStandardFontFamily](https://developer.android.com/reference/android/webkit/WebSettings?hl=en#setStandardFontFamily(java.lang.String)))
+  ///- Linux WPE WebKit ([Official API - WebKitSettings.default-font-family](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/property.Settings.default-font-family.html))
   String? standardFontFamily;
 
   ///Specifies whether the status bar is displayed.
@@ -1455,6 +1551,7 @@ class InAppWebViewSettings {
   ///- Android WebView
   ///- iOS WKWebView
   ///- macOS WKWebView
+  ///- Linux WPE WebKit
   bool? useOnLoadResource;
 
   ///Set to `true` to be able to listen to the [PlatformWebViewCreationParams.onNavigationResponse] event.
@@ -1769,6 +1866,15 @@ class InAppWebViewSettings {
     this.iframeCsp,
     this.iframeRole,
     this.iframeAriaHidden,
+    this.enableWriteConsoleMessagesToStdout = false,
+    this.enableSmoothScrolling = true,
+    this.enableCaretBrowsing = false,
+    this.enablePageCache = true,
+    this.drawCompositingIndicators = false,
+    this.enableResizableTextAreas = true,
+    this.enableTabsToLinks = true,
+    this.enableSpatialNavigation = false,
+    this.pictographFontFamily,
   }) {
     if (this.minimumFontSize == null)
       this.minimumFontSize = Util.isAndroid ? 8 : 0;
@@ -1914,6 +2020,7 @@ class InAppWebViewSettings {
         EnumMethod.name => MixedContentMode.byName(map['mixedContentMode']),
       },
       networkAvailable: map['networkAvailable'],
+      pictographFontFamily: map['pictographFontFamily'],
       pluginScriptsOriginAllowList: map['pluginScriptsOriginAllowList'] != null
           ? Set<String>.from(
               map['pluginScriptsOriginAllowList']!.cast<String>(),
@@ -2053,7 +2160,16 @@ class InAppWebViewSettings {
     instance.disallowOverScroll = map['disallowOverScroll'];
     instance.displayZoomControls = map['displayZoomControls'];
     instance.domStorageEnabled = map['domStorageEnabled'];
+    instance.drawCompositingIndicators = map['drawCompositingIndicators'];
+    instance.enableCaretBrowsing = map['enableCaretBrowsing'];
+    instance.enablePageCache = map['enablePageCache'];
+    instance.enableResizableTextAreas = map['enableResizableTextAreas'];
+    instance.enableSmoothScrolling = map['enableSmoothScrolling'];
+    instance.enableSpatialNavigation = map['enableSpatialNavigation'];
+    instance.enableTabsToLinks = map['enableTabsToLinks'];
     instance.enableViewportScale = map['enableViewportScale'];
+    instance.enableWriteConsoleMessagesToStdout =
+        map['enableWriteConsoleMessagesToStdout'];
     instance.enterpriseAuthenticationAppLinkPolicyEnabled =
         map['enterpriseAuthenticationAppLinkPolicyEnabled'];
     instance.fantasyFontFamily = map['fantasyFontFamily'];
@@ -2282,7 +2398,15 @@ class InAppWebViewSettings {
       "disallowOverScroll": disallowOverScroll,
       "displayZoomControls": displayZoomControls,
       "domStorageEnabled": domStorageEnabled,
+      "drawCompositingIndicators": drawCompositingIndicators,
+      "enableCaretBrowsing": enableCaretBrowsing,
+      "enablePageCache": enablePageCache,
+      "enableResizableTextAreas": enableResizableTextAreas,
+      "enableSmoothScrolling": enableSmoothScrolling,
+      "enableSpatialNavigation": enableSpatialNavigation,
+      "enableTabsToLinks": enableTabsToLinks,
       "enableViewportScale": enableViewportScale,
+      "enableWriteConsoleMessagesToStdout": enableWriteConsoleMessagesToStdout,
       "enterpriseAuthenticationAppLinkPolicyEnabled":
           enterpriseAuthenticationAppLinkPolicyEnabled,
       "fantasyFontFamily": fantasyFontFamily,
@@ -2384,6 +2508,7 @@ class InAppWebViewSettings {
       },
       "pageZoom": pageZoom,
       "passwordAutosaveEnabled": passwordAutosaveEnabled,
+      "pictographFontFamily": pictographFontFamily,
       "pinchZoomEnabled": pinchZoomEnabled,
       "pluginScriptsForMainFrameOnly": pluginScriptsForMainFrameOnly,
       "pluginScriptsOriginAllowList": pluginScriptsOriginAllowList?.toList(),
@@ -2471,7 +2596,7 @@ class InAppWebViewSettings {
 
   @override
   String toString() {
-    return 'InAppWebViewSettings{accessibilityIgnoresInvertColors: $accessibilityIgnoresInvertColors, algorithmicDarkeningAllowed: $algorithmicDarkeningAllowed, allowBackgroundAudioPlaying: $allowBackgroundAudioPlaying, allowContentAccess: $allowContentAccess, allowFileAccess: $allowFileAccess, allowFileAccessFromFileURLs: $allowFileAccessFromFileURLs, allowUniversalAccessFromFileURLs: $allowUniversalAccessFromFileURLs, allowingReadAccessTo: $allowingReadAccessTo, allowsAirPlayForMediaPlayback: $allowsAirPlayForMediaPlayback, allowsBackForwardNavigationGestures: $allowsBackForwardNavigationGestures, allowsInlineMediaPlayback: $allowsInlineMediaPlayback, allowsLinkPreview: $allowsLinkPreview, allowsPictureInPictureMediaPlayback: $allowsPictureInPictureMediaPlayback, alpha: $alpha, alwaysBounceHorizontal: $alwaysBounceHorizontal, alwaysBounceVertical: $alwaysBounceVertical, appCachePath: $appCachePath, applePayAPIEnabled: $applePayAPIEnabled, applicationNameForUserAgent: $applicationNameForUserAgent, automaticallyAdjustsScrollIndicatorInsets: $automaticallyAdjustsScrollIndicatorInsets, blockNetworkImage: $blockNetworkImage, blockNetworkLoads: $blockNetworkLoads, browserAcceleratorKeysEnabled: $browserAcceleratorKeysEnabled, builtInZoomControls: $builtInZoomControls, cacheEnabled: $cacheEnabled, cacheMode: $cacheMode, contentBlockers: $contentBlockers, contentInsetAdjustmentBehavior: $contentInsetAdjustmentBehavior, cursiveFontFamily: $cursiveFontFamily, dataDetectorTypes: $dataDetectorTypes, databaseEnabled: $databaseEnabled, decelerationRate: $decelerationRate, defaultFixedFontSize: $defaultFixedFontSize, defaultFontSize: $defaultFontSize, defaultTextEncodingName: $defaultTextEncodingName, defaultVideoPoster: $defaultVideoPoster, disableContextMenu: $disableContextMenu, disableDefaultErrorPage: $disableDefaultErrorPage, disableHorizontalScroll: $disableHorizontalScroll, disableInputAccessoryView: $disableInputAccessoryView, disableLongPressContextMenuOnLinks: $disableLongPressContextMenuOnLinks, disableVerticalScroll: $disableVerticalScroll, disabledActionModeMenuItems: $disabledActionModeMenuItems, disallowOverScroll: $disallowOverScroll, displayZoomControls: $displayZoomControls, domStorageEnabled: $domStorageEnabled, enableViewportScale: $enableViewportScale, enterpriseAuthenticationAppLinkPolicyEnabled: $enterpriseAuthenticationAppLinkPolicyEnabled, fantasyFontFamily: $fantasyFontFamily, fixedFontFamily: $fixedFontFamily, generalAutofillEnabled: $generalAutofillEnabled, geolocationEnabled: $geolocationEnabled, handleAcceleratorKeyPressed: $handleAcceleratorKeyPressed, hardwareAcceleration: $hardwareAcceleration, hiddenPdfToolbarItems: $hiddenPdfToolbarItems, horizontalScrollBarEnabled: $horizontalScrollBarEnabled, horizontalScrollbarThumbColor: $horizontalScrollbarThumbColor, horizontalScrollbarTrackColor: $horizontalScrollbarTrackColor, iframeAllow: $iframeAllow, iframeAllowFullscreen: $iframeAllowFullscreen, iframeAriaHidden: $iframeAriaHidden, iframeCsp: $iframeCsp, iframeName: $iframeName, iframeReferrerPolicy: $iframeReferrerPolicy, iframeRole: $iframeRole, iframeSandbox: $iframeSandbox, ignoresViewportScaleLimits: $ignoresViewportScaleLimits, incognito: $incognito, initialScale: $initialScale, interceptOnlyAsyncAjaxRequests: $interceptOnlyAsyncAjaxRequests, isDirectionalLockEnabled: $isDirectionalLockEnabled, isElementFullscreenEnabled: $isElementFullscreenEnabled, isFindInteractionEnabled: $isFindInteractionEnabled, isFraudulentWebsiteWarningEnabled: $isFraudulentWebsiteWarningEnabled, isInspectable: $isInspectable, isPagingEnabled: $isPagingEnabled, isSiteSpecificQuirksModeEnabled: $isSiteSpecificQuirksModeEnabled, isTextInteractionEnabled: $isTextInteractionEnabled, isUserInteractionEnabled: $isUserInteractionEnabled, javaScriptBridgeEnabled: $javaScriptBridgeEnabled, javaScriptBridgeForMainFrameOnly: $javaScriptBridgeForMainFrameOnly, javaScriptBridgeOriginAllowList: $javaScriptBridgeOriginAllowList, javaScriptCanOpenWindowsAutomatically: $javaScriptCanOpenWindowsAutomatically, javaScriptEnabled: $javaScriptEnabled, javaScriptHandlersForMainFrameOnly: $javaScriptHandlersForMainFrameOnly, javaScriptHandlersOriginAllowList: $javaScriptHandlersOriginAllowList, layoutAlgorithm: $layoutAlgorithm, limitsNavigationsToAppBoundDomains: $limitsNavigationsToAppBoundDomains, loadWithOverviewMode: $loadWithOverviewMode, loadsImagesAutomatically: $loadsImagesAutomatically, maximumViewportInset: $maximumViewportInset, maximumZoomScale: $maximumZoomScale, mediaPlaybackRequiresUserGesture: $mediaPlaybackRequiresUserGesture, mediaType: $mediaType, minimumFontSize: $minimumFontSize, minimumLogicalFontSize: $minimumLogicalFontSize, minimumViewportInset: $minimumViewportInset, minimumZoomScale: $minimumZoomScale, mixedContentMode: $mixedContentMode, needInitialFocus: $needInitialFocus, networkAvailable: $networkAvailable, nonClientRegionSupportEnabled: $nonClientRegionSupportEnabled, offscreenPreRaster: $offscreenPreRaster, overScrollMode: $overScrollMode, pageZoom: $pageZoom, passwordAutosaveEnabled: $passwordAutosaveEnabled, pinchZoomEnabled: $pinchZoomEnabled, pluginScriptsForMainFrameOnly: $pluginScriptsForMainFrameOnly, pluginScriptsOriginAllowList: $pluginScriptsOriginAllowList, preferredContentMode: $preferredContentMode, regexToAllowSyncUrlLoading: $regexToAllowSyncUrlLoading, regexToCancelSubFramesLoading: $regexToCancelSubFramesLoading, rendererPriorityPolicy: $rendererPriorityPolicy, reputationCheckingRequired: $reputationCheckingRequired, requestedWithHeaderOriginAllowList: $requestedWithHeaderOriginAllowList, resourceCustomSchemes: $resourceCustomSchemes, safeBrowsingEnabled: $safeBrowsingEnabled, sansSerifFontFamily: $sansSerifFontFamily, scrollBarDefaultDelayBeforeFade: $scrollBarDefaultDelayBeforeFade, scrollBarFadeDuration: $scrollBarFadeDuration, scrollBarStyle: $scrollBarStyle, scrollMultiplier: $scrollMultiplier, scrollbarFadingEnabled: $scrollbarFadingEnabled, scrollsToTop: $scrollsToTop, selectionGranularity: $selectionGranularity, serifFontFamily: $serifFontFamily, sharedCookiesEnabled: $sharedCookiesEnabled, shouldPrintBackgrounds: $shouldPrintBackgrounds, standardFontFamily: $standardFontFamily, statusBarEnabled: $statusBarEnabled, supportMultipleWindows: $supportMultipleWindows, supportZoom: $supportZoom, suppressesIncrementalRendering: $suppressesIncrementalRendering, textZoom: $textZoom, thirdPartyCookiesEnabled: $thirdPartyCookiesEnabled, transparentBackground: $transparentBackground, underPageBackgroundColor: $underPageBackgroundColor, upgradeKnownHostsToHTTPS: $upgradeKnownHostsToHTTPS, useHybridComposition: $useHybridComposition, useOnAjaxProgress: $useOnAjaxProgress, useOnAjaxReadyStateChange: $useOnAjaxReadyStateChange, useOnDownloadStart: $useOnDownloadStart, useOnLoadResource: $useOnLoadResource, useOnNavigationResponse: $useOnNavigationResponse, useOnRenderProcessGone: $useOnRenderProcessGone, useOnShowFileChooser: $useOnShowFileChooser, useShouldInterceptAjaxRequest: $useShouldInterceptAjaxRequest, useShouldInterceptFetchRequest: $useShouldInterceptFetchRequest, useShouldInterceptRequest: $useShouldInterceptRequest, useShouldOverrideUrlLoading: $useShouldOverrideUrlLoading, useWideViewPort: $useWideViewPort, userAgent: $userAgent, verticalScrollBarEnabled: $verticalScrollBarEnabled, verticalScrollbarPosition: $verticalScrollbarPosition, verticalScrollbarThumbColor: $verticalScrollbarThumbColor, verticalScrollbarTrackColor: $verticalScrollbarTrackColor, webViewAssetLoader: $webViewAssetLoader}';
+    return 'InAppWebViewSettings{accessibilityIgnoresInvertColors: $accessibilityIgnoresInvertColors, algorithmicDarkeningAllowed: $algorithmicDarkeningAllowed, allowBackgroundAudioPlaying: $allowBackgroundAudioPlaying, allowContentAccess: $allowContentAccess, allowFileAccess: $allowFileAccess, allowFileAccessFromFileURLs: $allowFileAccessFromFileURLs, allowUniversalAccessFromFileURLs: $allowUniversalAccessFromFileURLs, allowingReadAccessTo: $allowingReadAccessTo, allowsAirPlayForMediaPlayback: $allowsAirPlayForMediaPlayback, allowsBackForwardNavigationGestures: $allowsBackForwardNavigationGestures, allowsInlineMediaPlayback: $allowsInlineMediaPlayback, allowsLinkPreview: $allowsLinkPreview, allowsPictureInPictureMediaPlayback: $allowsPictureInPictureMediaPlayback, alpha: $alpha, alwaysBounceHorizontal: $alwaysBounceHorizontal, alwaysBounceVertical: $alwaysBounceVertical, appCachePath: $appCachePath, applePayAPIEnabled: $applePayAPIEnabled, applicationNameForUserAgent: $applicationNameForUserAgent, automaticallyAdjustsScrollIndicatorInsets: $automaticallyAdjustsScrollIndicatorInsets, blockNetworkImage: $blockNetworkImage, blockNetworkLoads: $blockNetworkLoads, browserAcceleratorKeysEnabled: $browserAcceleratorKeysEnabled, builtInZoomControls: $builtInZoomControls, cacheEnabled: $cacheEnabled, cacheMode: $cacheMode, contentBlockers: $contentBlockers, contentInsetAdjustmentBehavior: $contentInsetAdjustmentBehavior, cursiveFontFamily: $cursiveFontFamily, dataDetectorTypes: $dataDetectorTypes, databaseEnabled: $databaseEnabled, decelerationRate: $decelerationRate, defaultFixedFontSize: $defaultFixedFontSize, defaultFontSize: $defaultFontSize, defaultTextEncodingName: $defaultTextEncodingName, defaultVideoPoster: $defaultVideoPoster, disableContextMenu: $disableContextMenu, disableDefaultErrorPage: $disableDefaultErrorPage, disableHorizontalScroll: $disableHorizontalScroll, disableInputAccessoryView: $disableInputAccessoryView, disableLongPressContextMenuOnLinks: $disableLongPressContextMenuOnLinks, disableVerticalScroll: $disableVerticalScroll, disabledActionModeMenuItems: $disabledActionModeMenuItems, disallowOverScroll: $disallowOverScroll, displayZoomControls: $displayZoomControls, domStorageEnabled: $domStorageEnabled, drawCompositingIndicators: $drawCompositingIndicators, enableCaretBrowsing: $enableCaretBrowsing, enablePageCache: $enablePageCache, enableResizableTextAreas: $enableResizableTextAreas, enableSmoothScrolling: $enableSmoothScrolling, enableSpatialNavigation: $enableSpatialNavigation, enableTabsToLinks: $enableTabsToLinks, enableViewportScale: $enableViewportScale, enableWriteConsoleMessagesToStdout: $enableWriteConsoleMessagesToStdout, enterpriseAuthenticationAppLinkPolicyEnabled: $enterpriseAuthenticationAppLinkPolicyEnabled, fantasyFontFamily: $fantasyFontFamily, fixedFontFamily: $fixedFontFamily, generalAutofillEnabled: $generalAutofillEnabled, geolocationEnabled: $geolocationEnabled, handleAcceleratorKeyPressed: $handleAcceleratorKeyPressed, hardwareAcceleration: $hardwareAcceleration, hiddenPdfToolbarItems: $hiddenPdfToolbarItems, horizontalScrollBarEnabled: $horizontalScrollBarEnabled, horizontalScrollbarThumbColor: $horizontalScrollbarThumbColor, horizontalScrollbarTrackColor: $horizontalScrollbarTrackColor, iframeAllow: $iframeAllow, iframeAllowFullscreen: $iframeAllowFullscreen, iframeAriaHidden: $iframeAriaHidden, iframeCsp: $iframeCsp, iframeName: $iframeName, iframeReferrerPolicy: $iframeReferrerPolicy, iframeRole: $iframeRole, iframeSandbox: $iframeSandbox, ignoresViewportScaleLimits: $ignoresViewportScaleLimits, incognito: $incognito, initialScale: $initialScale, interceptOnlyAsyncAjaxRequests: $interceptOnlyAsyncAjaxRequests, isDirectionalLockEnabled: $isDirectionalLockEnabled, isElementFullscreenEnabled: $isElementFullscreenEnabled, isFindInteractionEnabled: $isFindInteractionEnabled, isFraudulentWebsiteWarningEnabled: $isFraudulentWebsiteWarningEnabled, isInspectable: $isInspectable, isPagingEnabled: $isPagingEnabled, isSiteSpecificQuirksModeEnabled: $isSiteSpecificQuirksModeEnabled, isTextInteractionEnabled: $isTextInteractionEnabled, isUserInteractionEnabled: $isUserInteractionEnabled, javaScriptBridgeEnabled: $javaScriptBridgeEnabled, javaScriptBridgeForMainFrameOnly: $javaScriptBridgeForMainFrameOnly, javaScriptBridgeOriginAllowList: $javaScriptBridgeOriginAllowList, javaScriptCanOpenWindowsAutomatically: $javaScriptCanOpenWindowsAutomatically, javaScriptEnabled: $javaScriptEnabled, javaScriptHandlersForMainFrameOnly: $javaScriptHandlersForMainFrameOnly, javaScriptHandlersOriginAllowList: $javaScriptHandlersOriginAllowList, layoutAlgorithm: $layoutAlgorithm, limitsNavigationsToAppBoundDomains: $limitsNavigationsToAppBoundDomains, loadWithOverviewMode: $loadWithOverviewMode, loadsImagesAutomatically: $loadsImagesAutomatically, maximumViewportInset: $maximumViewportInset, maximumZoomScale: $maximumZoomScale, mediaPlaybackRequiresUserGesture: $mediaPlaybackRequiresUserGesture, mediaType: $mediaType, minimumFontSize: $minimumFontSize, minimumLogicalFontSize: $minimumLogicalFontSize, minimumViewportInset: $minimumViewportInset, minimumZoomScale: $minimumZoomScale, mixedContentMode: $mixedContentMode, needInitialFocus: $needInitialFocus, networkAvailable: $networkAvailable, nonClientRegionSupportEnabled: $nonClientRegionSupportEnabled, offscreenPreRaster: $offscreenPreRaster, overScrollMode: $overScrollMode, pageZoom: $pageZoom, passwordAutosaveEnabled: $passwordAutosaveEnabled, pictographFontFamily: $pictographFontFamily, pinchZoomEnabled: $pinchZoomEnabled, pluginScriptsForMainFrameOnly: $pluginScriptsForMainFrameOnly, pluginScriptsOriginAllowList: $pluginScriptsOriginAllowList, preferredContentMode: $preferredContentMode, regexToAllowSyncUrlLoading: $regexToAllowSyncUrlLoading, regexToCancelSubFramesLoading: $regexToCancelSubFramesLoading, rendererPriorityPolicy: $rendererPriorityPolicy, reputationCheckingRequired: $reputationCheckingRequired, requestedWithHeaderOriginAllowList: $requestedWithHeaderOriginAllowList, resourceCustomSchemes: $resourceCustomSchemes, safeBrowsingEnabled: $safeBrowsingEnabled, sansSerifFontFamily: $sansSerifFontFamily, scrollBarDefaultDelayBeforeFade: $scrollBarDefaultDelayBeforeFade, scrollBarFadeDuration: $scrollBarFadeDuration, scrollBarStyle: $scrollBarStyle, scrollMultiplier: $scrollMultiplier, scrollbarFadingEnabled: $scrollbarFadingEnabled, scrollsToTop: $scrollsToTop, selectionGranularity: $selectionGranularity, serifFontFamily: $serifFontFamily, sharedCookiesEnabled: $sharedCookiesEnabled, shouldPrintBackgrounds: $shouldPrintBackgrounds, standardFontFamily: $standardFontFamily, statusBarEnabled: $statusBarEnabled, supportMultipleWindows: $supportMultipleWindows, supportZoom: $supportZoom, suppressesIncrementalRendering: $suppressesIncrementalRendering, textZoom: $textZoom, thirdPartyCookiesEnabled: $thirdPartyCookiesEnabled, transparentBackground: $transparentBackground, underPageBackgroundColor: $underPageBackgroundColor, upgradeKnownHostsToHTTPS: $upgradeKnownHostsToHTTPS, useHybridComposition: $useHybridComposition, useOnAjaxProgress: $useOnAjaxProgress, useOnAjaxReadyStateChange: $useOnAjaxReadyStateChange, useOnDownloadStart: $useOnDownloadStart, useOnLoadResource: $useOnLoadResource, useOnNavigationResponse: $useOnNavigationResponse, useOnRenderProcessGone: $useOnRenderProcessGone, useOnShowFileChooser: $useOnShowFileChooser, useShouldInterceptAjaxRequest: $useShouldInterceptAjaxRequest, useShouldInterceptFetchRequest: $useShouldInterceptFetchRequest, useShouldInterceptRequest: $useShouldInterceptRequest, useShouldOverrideUrlLoading: $useShouldOverrideUrlLoading, useWideViewPort: $useWideViewPort, userAgent: $userAgent, verticalScrollBarEnabled: $verticalScrollBarEnabled, verticalScrollbarPosition: $verticalScrollbarPosition, verticalScrollbarThumbColor: $verticalScrollbarThumbColor, verticalScrollbarTrackColor: $verticalScrollbarTrackColor, webViewAssetLoader: $webViewAssetLoader}';
   }
 }
 
@@ -2840,6 +2965,7 @@ enum InAppWebViewSettingsProperty {
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- Android WebView ([Official API - WebSettings.setCursiveFontFamily](https://developer.android.com/reference/android/webkit/WebSettings#setCursiveFontFamily(java.lang.String)))
+  ///- Linux WPE WebKit ([Official API - WebKitSettings.cursive-font-family](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/property.Settings.cursive-font-family.html))
   ///
   ///Use the [InAppWebViewSettings.isPropertySupported] method to check if this property is supported at runtime.
   ///{@endtemplate}
@@ -2862,6 +2988,7 @@ enum InAppWebViewSettingsProperty {
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- Android WebView ([Official API - WebSettings.setDatabaseEnabled](https://developer.android.com/reference/android/webkit/WebSettings?hl=en#setDatabaseEnabled(boolean)))
+  ///- Linux WPE WebKit ([Official API - WebKitSettings.enable-html5-database](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/property.Settings.enable-html5-database.html))
   ///
   ///Use the [InAppWebViewSettings.isPropertySupported] method to check if this property is supported at runtime.
   ///{@endtemplate}
@@ -2884,6 +3011,7 @@ enum InAppWebViewSettingsProperty {
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- Android WebView ([Official API - WebSettings.setDefaultFixedFontSize](https://developer.android.com/reference/android/webkit/WebSettings#setDefaultFixedFontSize(int)))
+  ///- Linux WPE WebKit ([Official API - WebKitSettings.default-monospace-font-size](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/property.Settings.default-monospace-font-size.html))
   ///
   ///Use the [InAppWebViewSettings.isPropertySupported] method to check if this property is supported at runtime.
   ///{@endtemplate}
@@ -2895,6 +3023,7 @@ enum InAppWebViewSettingsProperty {
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- Android WebView ([Official API - WebSettings.setDefaultFontSize](https://developer.android.com/reference/android/webkit/WebSettings#setDefaultFontSize(int)))
+  ///- Linux WPE WebKit ([Official API - WebKitSettings.default-font-size](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/property.Settings.default-font-size.html))
   ///
   ///Use the [InAppWebViewSettings.isPropertySupported] method to check if this property is supported at runtime.
   ///{@endtemplate}
@@ -2906,6 +3035,7 @@ enum InAppWebViewSettingsProperty {
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- Android WebView ([Official API - WebSettings.setDefaultTextEncodingName](https://developer.android.com/reference/android/webkit/WebSettings#setDefaultTextEncodingName(java.lang.String)))
+  ///- Linux WPE WebKit ([Official API - WebKitSettings.default-charset](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/property.Settings.default-charset.html))
   ///
   ///Use the [InAppWebViewSettings.isPropertySupported] method to check if this property is supported at runtime.
   ///{@endtemplate}
@@ -3035,10 +3165,88 @@ enum InAppWebViewSettingsProperty {
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- Android WebView ([Official API - WebSettings.setDomStorageEnabled](https://developer.android.com/reference/android/webkit/WebSettings?hl=en#setDomStorageEnabled(boolean)))
+  ///- Linux WPE WebKit ([Official API - WebKitSettings.enable-html5-local-storage](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/property.Settings.enable-html5-local-storage.html))
   ///
   ///Use the [InAppWebViewSettings.isPropertySupported] method to check if this property is supported at runtime.
   ///{@endtemplate}
   domStorageEnabled,
+
+  ///Can be used to check if the [InAppWebViewSettings.drawCompositingIndicators] property is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.InAppWebViewSettings.drawCompositingIndicators.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Linux WPE WebKit ([Official API - WebKitSettings.draw-compositing-indicators](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/property.Settings.draw-compositing-indicators.html))
+  ///
+  ///Use the [InAppWebViewSettings.isPropertySupported] method to check if this property is supported at runtime.
+  ///{@endtemplate}
+  drawCompositingIndicators,
+
+  ///Can be used to check if the [InAppWebViewSettings.enableCaretBrowsing] property is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.InAppWebViewSettings.enableCaretBrowsing.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Linux WPE WebKit ([Official API - WebKitSettings.enable-caret-browsing](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/property.Settings.enable-caret-browsing.html))
+  ///
+  ///Use the [InAppWebViewSettings.isPropertySupported] method to check if this property is supported at runtime.
+  ///{@endtemplate}
+  enableCaretBrowsing,
+
+  ///Can be used to check if the [InAppWebViewSettings.enablePageCache] property is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.InAppWebViewSettings.enablePageCache.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Linux WPE WebKit ([Official API - WebKitSettings.enable-page-cache](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/property.Settings.enable-page-cache.html))
+  ///
+  ///Use the [InAppWebViewSettings.isPropertySupported] method to check if this property is supported at runtime.
+  ///{@endtemplate}
+  enablePageCache,
+
+  ///Can be used to check if the [InAppWebViewSettings.enableResizableTextAreas] property is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.InAppWebViewSettings.enableResizableTextAreas.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Linux WPE WebKit ([Official API - WebKitSettings.enable-resizable-text-areas](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/property.Settings.enable-resizable-text-areas.html))
+  ///
+  ///Use the [InAppWebViewSettings.isPropertySupported] method to check if this property is supported at runtime.
+  ///{@endtemplate}
+  enableResizableTextAreas,
+
+  ///Can be used to check if the [InAppWebViewSettings.enableSmoothScrolling] property is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.InAppWebViewSettings.enableSmoothScrolling.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Linux WPE WebKit ([Official API - WebKitSettings.enable-smooth-scrolling](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/property.Settings.enable-smooth-scrolling.html))
+  ///
+  ///Use the [InAppWebViewSettings.isPropertySupported] method to check if this property is supported at runtime.
+  ///{@endtemplate}
+  enableSmoothScrolling,
+
+  ///Can be used to check if the [InAppWebViewSettings.enableSpatialNavigation] property is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.InAppWebViewSettings.enableSpatialNavigation.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Linux WPE WebKit ([Official API - WebKitSettings.enable-spatial-navigation](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/property.Settings.enable-spatial-navigation.html))
+  ///
+  ///Use the [InAppWebViewSettings.isPropertySupported] method to check if this property is supported at runtime.
+  ///{@endtemplate}
+  enableSpatialNavigation,
+
+  ///Can be used to check if the [InAppWebViewSettings.enableTabsToLinks] property is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.InAppWebViewSettings.enableTabsToLinks.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Linux WPE WebKit ([Official API - WebKitSettings.enable-tabs-to-links](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/property.Settings.enable-tabs-to-links.html))
+  ///
+  ///Use the [InAppWebViewSettings.isPropertySupported] method to check if this property is supported at runtime.
+  ///{@endtemplate}
+  enableTabsToLinks,
 
   ///Can be used to check if the [InAppWebViewSettings.enableViewportScale] property is supported at runtime.
   ///
@@ -3051,6 +3259,17 @@ enum InAppWebViewSettingsProperty {
   ///Use the [InAppWebViewSettings.isPropertySupported] method to check if this property is supported at runtime.
   ///{@endtemplate}
   enableViewportScale,
+
+  ///Can be used to check if the [InAppWebViewSettings.enableWriteConsoleMessagesToStdout] property is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.InAppWebViewSettings.enableWriteConsoleMessagesToStdout.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Linux WPE WebKit ([Official API - WebKitSettings.enable-write-console-messages-to-stdout](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/property.Settings.enable-write-console-messages-to-stdout.html))
+  ///
+  ///Use the [InAppWebViewSettings.isPropertySupported] method to check if this property is supported at runtime.
+  ///{@endtemplate}
+  enableWriteConsoleMessagesToStdout,
 
   ///Can be used to check if the [InAppWebViewSettings.enterpriseAuthenticationAppLinkPolicyEnabled] property is supported at runtime.
   ///
@@ -3070,6 +3289,7 @@ enum InAppWebViewSettingsProperty {
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- Android WebView ([Official API - WebSettings.setFantasyFontFamily](https://developer.android.com/reference/android/webkit/WebSettings#setFantasyFontFamily(java.lang.String)))
+  ///- Linux WPE WebKit ([Official API - WebKitSettings.fantasy-font-family](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/property.Settings.fantasy-font-family.html))
   ///
   ///Use the [InAppWebViewSettings.isPropertySupported] method to check if this property is supported at runtime.
   ///{@endtemplate}
@@ -3081,6 +3301,7 @@ enum InAppWebViewSettingsProperty {
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- Android WebView ([Official API - WebSettings.setFixedFontFamily](https://developer.android.com/reference/android/webkit/WebSettings#setFixedFontFamily(java.lang.String)))
+  ///- Linux WPE WebKit ([Official API - WebKitSettings.monospace-font-family](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/property.Settings.monospace-font-family.html))
   ///
   ///Use the [InAppWebViewSettings.isPropertySupported] method to check if this property is supported at runtime.
   ///{@endtemplate}
@@ -3359,6 +3580,7 @@ enum InAppWebViewSettingsProperty {
   ///**Officially Supported Platforms/Implementations**:
   ///- iOS WKWebView 15.4+ ([Official API - WKPreferences.isElementFullscreenEnabled](https://developer.apple.com/documentation/webkit/wkpreferences/3917769-iselementfullscreenenabled))
   ///- macOS WKWebView 12.3+ ([Official API - WKPreferences.isElementFullscreenEnabled](https://developer.apple.com/documentation/webkit/wkpreferences/3917769-iselementfullscreenenabled))
+  ///- Linux WPE WebKit ([Official API - WebKitSettings.enable-fullscreen](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/property.Settings.enable-fullscreen.html))
   ///
   ///Use the [InAppWebViewSettings.isPropertySupported] method to check if this property is supported at runtime.
   ///{@endtemplate}
@@ -3589,6 +3811,7 @@ enum InAppWebViewSettingsProperty {
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- Android WebView ([Official API - WebSettings.setLoadsImagesAutomatically](https://developer.android.com/reference/android/webkit/WebSettings?hl=en#setLoadsImagesAutomatically(boolean)))
+  ///- Linux WPE WebKit ([Official API - WebKitSettings.auto-load-images](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/property.Settings.auto-load-images.html))
   ///
   ///Use the [InAppWebViewSettings.isPropertySupported] method to check if this property is supported at runtime.
   ///{@endtemplate}
@@ -3776,6 +3999,17 @@ enum InAppWebViewSettingsProperty {
   ///{@endtemplate}
   passwordAutosaveEnabled,
 
+  ///Can be used to check if the [InAppWebViewSettings.pictographFontFamily] property is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.InAppWebViewSettings.pictographFontFamily.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Linux WPE WebKit ([Official API - WebKitSettings.pictograph-font-family](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/property.Settings.pictograph-font-family.html))
+  ///
+  ///Use the [InAppWebViewSettings.isPropertySupported] method to check if this property is supported at runtime.
+  ///{@endtemplate}
+  pictographFontFamily,
+
   ///Can be used to check if the [InAppWebViewSettings.pinchZoomEnabled] property is supported at runtime.
   ///
   ///{@template flutter_inappwebview_platform_interface.InAppWebViewSettings.pinchZoomEnabled.supported_platforms}
@@ -3914,6 +4148,7 @@ enum InAppWebViewSettingsProperty {
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- Android WebView ([Official API - WebSettings.setSansSerifFontFamily](https://developer.android.com/reference/android/webkit/WebSettings?hl=en#setSansSerifFontFamily(java.lang.String)))
+  ///- Linux WPE WebKit ([Official API - WebKitSettings.sans-serif-font-family](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/property.Settings.sans-serif-font-family.html))
   ///
   ///Use the [InAppWebViewSettings.isPropertySupported] method to check if this property is supported at runtime.
   ///{@endtemplate}
@@ -4014,6 +4249,7 @@ enum InAppWebViewSettingsProperty {
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- Android WebView ([Official API - WebSettings.setSerifFontFamily](https://developer.android.com/reference/android/webkit/WebSettings?hl=en#setSerifFontFamily(java.lang.String)))
+  ///- Linux WPE WebKit ([Official API - WebKitSettings.serif-font-family](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/property.Settings.serif-font-family.html))
   ///
   ///Use the [InAppWebViewSettings.isPropertySupported] method to check if this property is supported at runtime.
   ///{@endtemplate}
@@ -4049,6 +4285,7 @@ enum InAppWebViewSettingsProperty {
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- Android WebView ([Official API - WebSettings.setStandardFontFamily](https://developer.android.com/reference/android/webkit/WebSettings?hl=en#setStandardFontFamily(java.lang.String)))
+  ///- Linux WPE WebKit ([Official API - WebKitSettings.default-font-family](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/property.Settings.default-font-family.html))
   ///
   ///Use the [InAppWebViewSettings.isPropertySupported] method to check if this property is supported at runtime.
   ///{@endtemplate}
@@ -4221,6 +4458,7 @@ enum InAppWebViewSettingsProperty {
   ///- Android WebView
   ///- iOS WKWebView
   ///- macOS WKWebView
+  ///- Linux WPE WebKit
   ///
   ///Use the [InAppWebViewSettings.isPropertySupported] method to check if this property is supported at runtime.
   ///{@endtemplate}
@@ -4562,6 +4800,7 @@ extension _InAppWebViewSettingsPropertySupported on InAppWebViewSettings {
         return ((kIsWeb && platform != null) || !kIsWeb) &&
             [
               TargetPlatform.android,
+              TargetPlatform.linux,
             ].contains(platform ?? defaultTargetPlatform);
       case InAppWebViewSettingsProperty.dataDetectorTypes:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
@@ -4570,6 +4809,7 @@ extension _InAppWebViewSettingsPropertySupported on InAppWebViewSettings {
         return ((kIsWeb && platform != null) || !kIsWeb) &&
             [
               TargetPlatform.android,
+              TargetPlatform.linux,
             ].contains(platform ?? defaultTargetPlatform);
       case InAppWebViewSettingsProperty.decelerationRate:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
@@ -4578,16 +4818,19 @@ extension _InAppWebViewSettingsPropertySupported on InAppWebViewSettings {
         return ((kIsWeb && platform != null) || !kIsWeb) &&
             [
               TargetPlatform.android,
+              TargetPlatform.linux,
             ].contains(platform ?? defaultTargetPlatform);
       case InAppWebViewSettingsProperty.defaultFontSize:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
             [
               TargetPlatform.android,
+              TargetPlatform.linux,
             ].contains(platform ?? defaultTargetPlatform);
       case InAppWebViewSettingsProperty.defaultTextEncodingName:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
             [
               TargetPlatform.android,
+              TargetPlatform.linux,
             ].contains(platform ?? defaultTargetPlatform);
       case InAppWebViewSettingsProperty.defaultVideoPoster:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
@@ -4648,13 +4891,38 @@ extension _InAppWebViewSettingsPropertySupported on InAppWebViewSettings {
         return ((kIsWeb && platform != null) || !kIsWeb) &&
             [
               TargetPlatform.android,
+              TargetPlatform.linux,
             ].contains(platform ?? defaultTargetPlatform);
+      case InAppWebViewSettingsProperty.drawCompositingIndicators:
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
+            [TargetPlatform.linux].contains(platform ?? defaultTargetPlatform);
+      case InAppWebViewSettingsProperty.enableCaretBrowsing:
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
+            [TargetPlatform.linux].contains(platform ?? defaultTargetPlatform);
+      case InAppWebViewSettingsProperty.enablePageCache:
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
+            [TargetPlatform.linux].contains(platform ?? defaultTargetPlatform);
+      case InAppWebViewSettingsProperty.enableResizableTextAreas:
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
+            [TargetPlatform.linux].contains(platform ?? defaultTargetPlatform);
+      case InAppWebViewSettingsProperty.enableSmoothScrolling:
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
+            [TargetPlatform.linux].contains(platform ?? defaultTargetPlatform);
+      case InAppWebViewSettingsProperty.enableSpatialNavigation:
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
+            [TargetPlatform.linux].contains(platform ?? defaultTargetPlatform);
+      case InAppWebViewSettingsProperty.enableTabsToLinks:
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
+            [TargetPlatform.linux].contains(platform ?? defaultTargetPlatform);
       case InAppWebViewSettingsProperty.enableViewportScale:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
             [
               TargetPlatform.iOS,
               TargetPlatform.macOS,
             ].contains(platform ?? defaultTargetPlatform);
+      case InAppWebViewSettingsProperty.enableWriteConsoleMessagesToStdout:
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
+            [TargetPlatform.linux].contains(platform ?? defaultTargetPlatform);
       case InAppWebViewSettingsProperty
           .enterpriseAuthenticationAppLinkPolicyEnabled:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
@@ -4665,11 +4933,13 @@ extension _InAppWebViewSettingsPropertySupported on InAppWebViewSettings {
         return ((kIsWeb && platform != null) || !kIsWeb) &&
             [
               TargetPlatform.android,
+              TargetPlatform.linux,
             ].contains(platform ?? defaultTargetPlatform);
       case InAppWebViewSettingsProperty.fixedFontFamily:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
             [
               TargetPlatform.android,
+              TargetPlatform.linux,
             ].contains(platform ?? defaultTargetPlatform);
       case InAppWebViewSettingsProperty.forceDark:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
@@ -4795,6 +5065,7 @@ extension _InAppWebViewSettingsPropertySupported on InAppWebViewSettings {
             [
               TargetPlatform.iOS,
               TargetPlatform.macOS,
+              TargetPlatform.linux,
             ].contains(platform ?? defaultTargetPlatform);
       case InAppWebViewSettingsProperty.isFindInteractionEnabled:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
@@ -4918,6 +5189,7 @@ extension _InAppWebViewSettingsPropertySupported on InAppWebViewSettings {
         return ((kIsWeb && platform != null) || !kIsWeb) &&
             [
               TargetPlatform.android,
+              TargetPlatform.linux,
             ].contains(platform ?? defaultTargetPlatform);
       case InAppWebViewSettingsProperty.maximumViewportInset:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
@@ -4997,6 +5269,9 @@ extension _InAppWebViewSettingsPropertySupported on InAppWebViewSettings {
             [
               TargetPlatform.windows,
             ].contains(platform ?? defaultTargetPlatform);
+      case InAppWebViewSettingsProperty.pictographFontFamily:
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
+            [TargetPlatform.linux].contains(platform ?? defaultTargetPlatform);
       case InAppWebViewSettingsProperty.pinchZoomEnabled:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
             [
@@ -5066,6 +5341,7 @@ extension _InAppWebViewSettingsPropertySupported on InAppWebViewSettings {
         return ((kIsWeb && platform != null) || !kIsWeb) &&
             [
               TargetPlatform.android,
+              TargetPlatform.linux,
             ].contains(platform ?? defaultTargetPlatform);
       case InAppWebViewSettingsProperty.saveFormData:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
@@ -5107,6 +5383,7 @@ extension _InAppWebViewSettingsPropertySupported on InAppWebViewSettings {
         return ((kIsWeb && platform != null) || !kIsWeb) &&
             [
               TargetPlatform.android,
+              TargetPlatform.linux,
             ].contains(platform ?? defaultTargetPlatform);
       case InAppWebViewSettingsProperty.sharedCookiesEnabled:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
@@ -5124,6 +5401,7 @@ extension _InAppWebViewSettingsPropertySupported on InAppWebViewSettings {
         return ((kIsWeb && platform != null) || !kIsWeb) &&
             [
               TargetPlatform.android,
+              TargetPlatform.linux,
             ].contains(platform ?? defaultTargetPlatform);
       case InAppWebViewSettingsProperty.statusBarEnabled:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
@@ -5211,6 +5489,7 @@ extension _InAppWebViewSettingsPropertySupported on InAppWebViewSettings {
               TargetPlatform.android,
               TargetPlatform.iOS,
               TargetPlatform.macOS,
+              TargetPlatform.linux,
             ].contains(platform ?? defaultTargetPlatform);
       case InAppWebViewSettingsProperty.useOnNavigationResponse:
         return ((kIsWeb && platform != null) || !kIsWeb) &&

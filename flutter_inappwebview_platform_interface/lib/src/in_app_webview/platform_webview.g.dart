@@ -16,7 +16,7 @@ extension _PlatformWebViewCreationParamsClassSupported
   ///- macOS WKWebView
   ///- Web \<iframe\>
   ///- Windows WebView2
-  ///- Linux WebKitGTK
+  ///- Linux WPE WebKit
   ///
   ///Use the [PlatformWebViewCreationParams.isClassSupported] method to check if this class is supported at runtime.
   ///{@endtemplate}
@@ -267,6 +267,7 @@ enum PlatformWebViewCreationParamsProperty {
   ///- Android WebView
   ///- iOS WKWebView
   ///- macOS WKWebView
+  ///- Linux WPE WebKit ([Official API - WebKitFindController](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/class.FindController.html))
   ///
   ///Use the [PlatformWebViewCreationParams.isPropertySupported] method to check if this property is supported at runtime.
   ///{@endtemplate}
@@ -282,6 +283,7 @@ enum PlatformWebViewCreationParamsProperty {
   ///- macOS WKWebView
   ///- Web \<iframe\>
   ///- Windows WebView2
+  ///- Linux WPE WebKit
   ///
   ///Use the [PlatformWebViewCreationParams.isPropertySupported] method to check if this property is supported at runtime.
   ///{@endtemplate}
@@ -297,6 +299,7 @@ enum PlatformWebViewCreationParamsProperty {
   ///- macOS WKWebView
   ///- Web \<iframe\>
   ///- Windows WebView2
+  ///- Linux WPE WebKit
   ///
   ///Use the [PlatformWebViewCreationParams.isPropertySupported] method to check if this property is supported at runtime.
   ///{@endtemplate}
@@ -325,6 +328,7 @@ enum PlatformWebViewCreationParamsProperty {
   ///- macOS WKWebView
   ///- Web \<iframe\>
   ///- Windows WebView2
+  ///- Linux WPE WebKit
   ///
   ///Use the [PlatformWebViewCreationParams.isPropertySupported] method to check if this property is supported at runtime.
   ///{@endtemplate}
@@ -341,6 +345,7 @@ enum PlatformWebViewCreationParamsProperty {
   ///- macOS WKWebView
   ///- Web \<iframe\>
   ///- Windows WebView2
+  ///- Linux WPE WebKit
   ///
   ///Use the [PlatformWebViewCreationParams.isPropertySupported] method to check if this property is supported at runtime.
   ///{@endtemplate}
@@ -358,6 +363,7 @@ enum PlatformWebViewCreationParamsProperty {
   ///    - This property will be ignored if the [PlatformWebViewCreationParams.windowId] has been set. There isn't any way to add/remove user scripts specific to iOS window WebViews. This is a limitation of the native WebKit APIs.
   ///- Web \<iframe\> but requires same origin
   ///- Windows WebView2
+  ///- Linux WPE WebKit ([Official API - WebKitUserContentManager](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/class.UserContentManager.html))
   ///
   ///Use the [PlatformWebViewCreationParams.isPropertySupported] method to check if this property is supported at runtime.
   ///{@endtemplate}
@@ -491,6 +497,7 @@ enum PlatformWebViewCreationParamsProperty {
   ///- macOS WKWebView ([Official API - WKUIDelegate.webViewDidClose](https://developer.apple.com/documentation/webkit/wkuidelegate/1537390-webviewdidclose))
   ///- Web \<iframe\> but requires same origin
   ///- Windows WebView2 ([Official API - ICoreWebView2.add_WindowCloseRequested](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2?view=webview2-1.0.2210.55#add_windowcloserequested))
+  ///- Linux WPE WebKit ([Official API - WebKitWebView::close](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/signal.WebView.close.html))
   ///
   ///Use the [PlatformWebViewCreationParams.isPropertySupported] method to check if this property is supported at runtime.
   ///{@endtemplate}
@@ -508,6 +515,8 @@ enum PlatformWebViewCreationParamsProperty {
   ///    - This event is implemented using JavaScript.
   ///- Web \<iframe\> but requires same origin
   ///- Windows WebView2
+  ///- Linux WPE WebKit:
+  ///    - This event is implemented using JavaScript.
   ///
   ///**Parameters - Officially Supported Platforms/Implementations**:
   ///- [consoleMessage]: all platforms
@@ -522,6 +531,8 @@ enum PlatformWebViewCreationParamsProperty {
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- iOS WKWebView
+  ///- Linux WPE WebKit:
+  ///    - This event is implemented using JavaScript.
   ///
   ///**Parameters - Officially Supported Platforms/Implementations**:
   ///- [oldContentSize]: all platforms
@@ -545,6 +556,8 @@ enum PlatformWebViewCreationParamsProperty {
   ///- Web \<iframe\> but requires same origin:
   ///    - It works only for `window.open()` javascript calls. Also, there is no way to block the opening the window in a synchronous way, so returning `true` will just close it quickly.
   ///- Windows WebView2 ([Official API - ICoreWebView2.add_NewWindowRequested](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2?view=webview2-1.0.2210.55#add_newwindowrequested))
+  ///- Linux WPE WebKit ([Official API - WebKitWebView::create](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/signal.WebView.create.html)):
+  ///    - Creates a new InAppWebView with related-view for multi-window support.
   ///
   ///**Parameters - Officially Supported Platforms/Implementations**:
   ///- [createWindowAction]: all platforms
@@ -607,6 +620,8 @@ enum PlatformWebViewCreationParamsProperty {
   ///- iOS WKWebView
   ///- macOS WKWebView
   ///- Windows WebView2 ([Official API - ICoreWebView2_4.add_DownloadStarting](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2_4?view=webview2-1.0.2849.39#add_downloadstarting))
+  ///- Linux WPE WebKit ([Official API - WebKitWebView::decide-policy](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/signal.WebView.decide-policy.html)):
+  ///    - Downloads are detected via WEBKIT_POLICY_DECISION_TYPE_RESPONSE.
   ///
   ///**Parameters - Officially Supported Platforms/Implementations**:
   ///- [downloadStartRequest]: all platforms
@@ -624,6 +639,7 @@ enum PlatformWebViewCreationParamsProperty {
   ///- iOS WKWebView ([Official API - UIWindow.didBecomeVisibleNotification](https://developer.apple.com/documentation/uikit/uiwindow/1621621-didbecomevisiblenotification))
   ///- macOS WKWebView ([Official API - NSWindow.didEnterFullScreenNotification](https://developer.apple.com/documentation/appkit/nswindow/1419651-didenterfullscreennotification))
   ///- Web \<iframe\> but requires same origin ([Official API - Document.onfullscreenchange](https://developer.mozilla.org/en-US/docs/Web/API/Document/fullscreenchange_event))
+  ///- Linux WPE WebKit ([Official API - WebKitWebView::enter-fullscreen](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/signal.WebView.enter-fullscreen.html))
   ///
   ///Use the [PlatformWebViewCreationParams.isPropertySupported] method to check if this property is supported at runtime.
   ///{@endtemplate}
@@ -638,6 +654,7 @@ enum PlatformWebViewCreationParamsProperty {
   ///- iOS WKWebView ([Official API - UIWindow.didBecomeHiddenNotification](https://developer.apple.com/documentation/uikit/uiwindow/1621617-didbecomehiddennotification))
   ///- macOS WKWebView ([Official API - NSWindow.didExitFullScreenNotification](https://developer.apple.com/documentation/appkit/nswindow/1419177-didexitfullscreennotification))
   ///- Web \<iframe\> but requires same origin ([Official API - Document.onfullscreenchange](https://developer.mozilla.org/en-US/docs/Web/API/Document/fullscreenchange_event))
+  ///- Linux WPE WebKit ([Official API - WebKitWebView::leave-fullscreen](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/signal.WebView.leave-fullscreen.html))
   ///
   ///Use the [PlatformWebViewCreationParams.isPropertySupported] method to check if this property is supported at runtime.
   ///{@endtemplate}
@@ -709,6 +726,8 @@ enum PlatformWebViewCreationParamsProperty {
   ///- Android WebView ([Official API - WebChromeClient.onJsAlert](https://developer.android.com/reference/android/webkit/WebChromeClient#onJsAlert(android.webkit.WebView,%20java.lang.String,%20java.lang.String,%20android.webkit.JsResult)))
   ///- iOS WKWebView ([Official API - WKUIDelegate.webView](https://developer.apple.com/documentation/webkit/wkuidelegate/1537406-webview))
   ///- macOS WKWebView ([Official API - WKUIDelegate.webView](https://developer.apple.com/documentation/webkit/wkuidelegate/1537406-webview))
+  ///- Linux WPE WebKit ([Official API - WebKitWebView::script-dialog](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/signal.WebView.script-dialog.html)):
+  ///    - Handles WEBKIT_SCRIPT_DIALOG_ALERT dialog type.
   ///
   ///**Parameters - Officially Supported Platforms/Implementations**:
   ///- [jsAlertRequest]: all platforms
@@ -723,6 +742,8 @@ enum PlatformWebViewCreationParamsProperty {
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- Android WebView ([Official API - WebChromeClient.onJsBeforeUnload](https://developer.android.com/reference/android/webkit/WebChromeClient#onJsBeforeUnload(android.webkit.WebView,%20java.lang.String,%20java.lang.String,%20android.webkit.JsResult)))
+  ///- Linux WPE WebKit ([Official API - WebKitWebView::script-dialog](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/signal.WebView.script-dialog.html)):
+  ///    - Handles WEBKIT_SCRIPT_DIALOG_BEFORE_UNLOAD_CONFIRM dialog type.
   ///
   ///**Parameters - Officially Supported Platforms/Implementations**:
   ///- [jsBeforeUnloadRequest]: all platforms
@@ -739,6 +760,8 @@ enum PlatformWebViewCreationParamsProperty {
   ///- Android WebView ([Official API - WebChromeClient.onJsConfirm](https://developer.android.com/reference/android/webkit/WebChromeClient#onJsConfirm(android.webkit.WebView,%20java.lang.String,%20java.lang.String,%20android.webkit.JsResult)))
   ///- iOS WKWebView ([Official API - WKUIDelegate.webView](https://developer.apple.com/documentation/webkit/wkuidelegate/1536489-webview))
   ///- macOS WKWebView ([Official API - WKUIDelegate.webView](https://developer.apple.com/documentation/webkit/wkuidelegate/1536489-webview))
+  ///- Linux WPE WebKit ([Official API - WebKitWebView::script-dialog](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/signal.WebView.script-dialog.html)):
+  ///    - Handles WEBKIT_SCRIPT_DIALOG_CONFIRM dialog type.
   ///
   ///**Parameters - Officially Supported Platforms/Implementations**:
   ///- [jsConfirmRequest]: all platforms
@@ -755,6 +778,8 @@ enum PlatformWebViewCreationParamsProperty {
   ///- Android WebView ([Official API - WebChromeClient.onJsPrompt](https://developer.android.com/reference/android/webkit/WebChromeClient#onJsPrompt(android.webkit.WebView,%20java.lang.String,%20java.lang.String,%20java.lang.String,%20android.webkit.JsPromptResult)))
   ///- iOS WKWebView ([Official API - WKUIDelegate.webView](https://developer.apple.com/documentation/webkit/wkuidelegate/1538086-webview))
   ///- macOS WKWebView ([Official API - WKUIDelegate.webView](https://developer.apple.com/documentation/webkit/wkuidelegate/1538086-webview))
+  ///- Linux WPE WebKit ([Official API - WebKitWebView::script-dialog](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/signal.WebView.script-dialog.html)):
+  ///    - Handles WEBKIT_SCRIPT_DIALOG_PROMPT dialog type.
   ///
   ///**Parameters - Officially Supported Platforms/Implementations**:
   ///- [jsPromptRequest]: all platforms
@@ -812,6 +837,8 @@ enum PlatformWebViewCreationParamsProperty {
   ///    - This event is implemented using JavaScript.
   ///- macOS WKWebView:
   ///    - This event is implemented using JavaScript.
+  ///- Linux WPE WebKit:
+  ///    - This event is implemented using JavaScript.
   ///
   ///**Parameters - Officially Supported Platforms/Implementations**:
   ///- [resource]: all platforms
@@ -846,6 +873,7 @@ enum PlatformWebViewCreationParamsProperty {
   ///- iOS WKWebView ([Official API - WKURLSchemeHandler](https://developer.apple.com/documentation/webkit/wkurlschemehandler))
   ///- macOS WKWebView ([Official API - WKURLSchemeHandler](https://developer.apple.com/documentation/webkit/wkurlschemehandler))
   ///- Windows WebView2
+  ///- Linux WPE WebKit ([Official API - WebKitURISchemeRequest](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/class.URISchemeRequest.html))
   ///
   ///**Parameters - Officially Supported Platforms/Implementations**:
   ///- [request]: all platforms
@@ -865,6 +893,8 @@ enum PlatformWebViewCreationParamsProperty {
   ///- Web \<iframe\> but requires same origin:
   ///    - It will be dispatched at the same time of [onLoadStop] event because there isn't any way to capture the real load start event from an iframe. If `window.location.href` isn't accessible inside the iframe, the [url] parameter will have the current value of the `iframe.src` attribute.
   ///- Windows WebView2 ([Official API - ICoreWebView2.add_NavigationStarting](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/iwebview2webview?view=webview2-0.8.355#add_navigationstarting))
+  ///- Linux WPE WebKit ([Official API - WebKitWebView::load-changed](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/signal.WebView.load-changed.html)):
+  ///    - Fired when WebKitLoadEvent is WEBKIT_LOAD_STARTED.
   ///
   ///**Parameters - Officially Supported Platforms/Implementations**:
   ///- [url]: all platforms
@@ -884,6 +914,8 @@ enum PlatformWebViewCreationParamsProperty {
   ///- Web \<iframe\> but requires same origin ([Official API - Window.onload](https://developer.mozilla.org/en-US/docs/Web/API/Window/load_event)):
   ///    - If `window.location.href` isn't accessible inside the iframe, the [url] parameter will have the current value of the `iframe.src` attribute.
   ///- Windows WebView2 ([Official API - ICoreWebView2.add_NavigationCompleted](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/iwebview2webview?view=webview2-0.8.355#add_navigationcompleted))
+  ///- Linux WPE WebKit ([Official API - WebKitWebView::load-changed](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/signal.WebView.load-changed.html)):
+  ///    - Fired when WebKitLoadEvent is WEBKIT_LOAD_FINISHED.
   ///
   ///**Parameters - Officially Supported Platforms/Implementations**:
   ///- [url]: all platforms
@@ -964,6 +996,8 @@ enum PlatformWebViewCreationParamsProperty {
   ///- Android WebView ([Official API - WebViewClient.onPageCommitVisible](https://developer.android.com/reference/android/webkit/WebViewClient#onPageCommitVisible(android.webkit.WebView,%20java.lang.String)))
   ///- iOS WKWebView ([Official API - WKNavigationDelegate.webView](https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455635-webview))
   ///- macOS WKWebView ([Official API - WKNavigationDelegate.webView](https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455635-webview))
+  ///- Linux WPE WebKit ([Official API - WebKitWebView::load-changed](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/signal.WebView.load-changed.html)):
+  ///    - Fired when WebKitLoadEvent is WEBKIT_LOAD_COMMITTED.
   ///
   ///**Parameters - Officially Supported Platforms/Implementations**:
   ///- [url]: all platforms
@@ -983,6 +1017,7 @@ enum PlatformWebViewCreationParamsProperty {
   ///- macOS WKWebView 12.0+:
   ///    - The default [PermissionResponse.action] is [PermissionResponseAction.PROMPT].
   ///- Windows WebView2 ([Official API - ICoreWebView2.add_PermissionRequested](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2?view=webview2-1.0.2210.55#add_permissionrequested))
+  ///- Linux WPE WebKit ([Official API - WebKitWebView::permission-request](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/signal.WebView.permission-request.html))
   ///
   ///**Parameters - Officially Supported Platforms/Implementations**:
   ///- [permissionRequest]: all platforms
@@ -1065,6 +1100,7 @@ enum PlatformWebViewCreationParamsProperty {
   ///- iOS WKWebView
   ///- macOS WKWebView
   ///- Windows WebView2
+  ///- Linux WPE WebKit ([Official API - WebKitWebView::notify::estimated-load-progress](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/property.WebView.estimated-load-progress.html))
   ///
   ///**Parameters - Officially Supported Platforms/Implementations**:
   ///- [progress]: all platforms
@@ -1099,6 +1135,7 @@ enum PlatformWebViewCreationParamsProperty {
   ///- iOS WKWebView ([Official API - WKNavigationDelegate.webView](https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455623-webview))
   ///- macOS WKWebView ([Official API - WKNavigationDelegate.webView](https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455623-webview))
   ///- Windows WebView2 ([Official API - ICoreWebView2.add_NavigationCompleted](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/iwebview2webview?view=webview2-0.8.355#add_navigationcompleted))
+  ///- Linux WPE WebKit ([Official API - WebKitWebView::load-failed](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/signal.WebView.load-failed.html))
   ///
   ///**Parameters - Officially Supported Platforms/Implementations**:
   ///- [request]: all platforms
@@ -1117,6 +1154,7 @@ enum PlatformWebViewCreationParamsProperty {
   ///- iOS WKWebView ([Official API - WKNavigationDelegate.webView](https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455638-webview))
   ///- macOS WKWebView ([Official API - WKNavigationDelegate.webView](https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455638-webview))
   ///- Windows WebView2 ([Official API - ICoreWebView2_10.add_BasicAuthenticationRequested](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2_10?view=webview2-1.0.2849.39#add_basicauthenticationrequested))
+  ///- Linux WPE WebKit ([Official API - WebKitWebView::authenticate](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/signal.WebView.authenticate.html))
   ///
   ///**Parameters - Officially Supported Platforms/Implementations**:
   ///- [challenge]: all platforms
@@ -1134,6 +1172,8 @@ enum PlatformWebViewCreationParamsProperty {
   ///- iOS WKWebView ([Official API - WKNavigationDelegate.webView](https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455643-webview))
   ///- macOS WKWebView ([Official API - WKNavigationDelegate.webView](https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455643-webview))
   ///- Windows WebView2 ([Official API - ICoreWebView2.add_NavigationCompleted](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/iwebview2webview?view=webview2-0.8.355#add_navigationcompleted))
+  ///- Linux WPE WebKit ([Official API - WebKitWebView::load-failed](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/signal.WebView.load-failed.html)):
+  ///    - HTTP errors are detected during the load-failed signal handling.
   ///
   ///**Parameters - Officially Supported Platforms/Implementations**:
   ///- [request]: all platforms
@@ -1182,6 +1222,8 @@ enum PlatformWebViewCreationParamsProperty {
   ///- macOS WKWebView ([Official API - WKNavigationDelegate.webView](https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455638-webview)):
   ///    - To override the certificate verification logic, you have to provide ATS (App Transport Security) exceptions in your iOS/macOS `Info.plist`. See `NSAppTransportSecurity` in the [Information Property List Key Reference](https://developer.apple.com/library/content/documentation/General/Reference/InfoPlistKeyReference/Articles/CocoaKeys.html#//apple_ref/doc/uid/TP40009251-SW1) for details.
   ///- Windows WebView2 ([Official API - ICoreWebView2_14.add_ServerCertificateErrorDetected](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2_14?view=webview2-1.0.2792.45#add_servercertificateerrordetected))
+  ///- Linux WPE WebKit ([Official API - WebKitWebView::load-failed-with-tls-errors](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/signal.WebView.load-failed-with-tls-errors.html)):
+  ///    - Uses webkit_web_context_allow_tls_certificate_for_host() to allow proceeding with an invalid certificate.
   ///
   ///**Parameters - Officially Supported Platforms/Implementations**:
   ///- [challenge]: all platforms
@@ -1212,6 +1254,7 @@ enum PlatformWebViewCreationParamsProperty {
   ///**Officially Supported Platforms/Implementations**:
   ///- Android WebView 26+ ([Official API - WebViewClient.onRenderProcessGone](https://developer.android.com/reference/android/webkit/WebViewClient#onRenderProcessGone(android.webkit.WebView,%20android.webkit.RenderProcessGoneDetail)))
   ///- Windows WebView2 ([Official API - ICoreWebView2.add_ProcessFailed](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2?view=webview2-1.0.2849.39#add_processfailed))
+  ///- Linux WPE WebKit ([Official API - WebView.web-process-terminated](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/WebKitWebView.html#WebKitWebView-web-process-terminated))
   ///
   ///**Parameters - Officially Supported Platforms/Implementations**:
   ///- [detail]: all platforms
@@ -1285,6 +1328,8 @@ enum PlatformWebViewCreationParamsProperty {
   ///- macOS WKWebView:
   ///    - This event is implemented using JavaScript.
   ///- Web \<iframe\> but requires same origin ([Official API - Window.onscroll](https://developer.mozilla.org/en-US/docs/Web/API/GlobalEventHandlers/onscroll))
+  ///- Linux WPE WebKit:
+  ///    - This event is implemented using JavaScript.
   ///
   ///**Parameters - Officially Supported Platforms/Implementations**:
   ///- [x]: all platforms
@@ -1300,6 +1345,7 @@ enum PlatformWebViewCreationParamsProperty {
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- Android WebView ([Official API - WebChromeClient.onShowFileChooser](https://developer.android.com/reference/android/webkit/WebChromeClient#onShowFileChooser(android.webkit.WebView,%20android.webkit.ValueCallback%3Candroid.net.Uri[]%3E,%20android.webkit.WebChromeClient.FileChooserParams)))
+  ///- Linux WPE WebKit ([Official API - WebKitWebView::run-file-chooser](https://webkitgtk.org/reference/webkit2gtk/stable/signal.WebView.run-file-chooser.html))
   ///
   ///**Parameters - Officially Supported Platforms/Implementations**:
   ///- [request]: all platforms
@@ -1318,6 +1364,7 @@ enum PlatformWebViewCreationParamsProperty {
   ///- macOS WKWebView
   ///- Web \<iframe\> but requires same origin
   ///- Windows WebView2 ([Official API - ICoreWebView2.add_DocumentTitleChanged](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2?view=webview2-1.0.2210.55#add_documenttitlechanged))
+  ///- Linux WPE WebKit ([Official API - WebKitWebView::notify::title](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/property.WebView.title.html))
   ///
   ///**Parameters - Officially Supported Platforms/Implementations**:
   ///- [title]: all platforms
@@ -1336,6 +1383,8 @@ enum PlatformWebViewCreationParamsProperty {
   ///- macOS WKWebView
   ///- Web \<iframe\> but requires same origin
   ///- Windows WebView2 ([Official API - ICoreWebView2.add_HistoryChanged](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2?view=webview2-1.0.2210.55#add_historychanged))
+  ///- Linux WPE WebKit:
+  ///    - Tracked via load-changed signal and History API JavaScript events.
   ///
   ///**Parameters - Officially Supported Platforms/Implementations**:
   ///- [url]: all platforms
@@ -1369,6 +1418,7 @@ enum PlatformWebViewCreationParamsProperty {
   ///- macOS WKWebView
   ///- Web \<iframe\> but requires same origin
   ///- Windows WebView2
+  ///- Linux WPE WebKit
   ///
   ///Use the [PlatformWebViewCreationParams.isPropertySupported] method to check if this property is supported at runtime.
   ///{@endtemplate}
@@ -1411,6 +1461,7 @@ enum PlatformWebViewCreationParamsProperty {
   ///- iOS WKWebView ([Official API - UIScrollViewDelegate.scrollViewDidZoom](https://developer.apple.com/documentation/uikit/uiscrollviewdelegate/1619409-scrollviewdidzoom))
   ///- Web \<iframe\> but requires same origin
   ///- Windows WebView2 ([Official API - ICoreWebView2Controller.add_ZoomFactorChanged](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2controller?view=webview2-1.0.2849.39#add_zoomfactorchanged))
+  ///- Linux WPE WebKit ([Official API - WebKitWebView::notify::zoom-level](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/property.WebView.zoom-level.html))
   ///
   ///**Parameters - Officially Supported Platforms/Implementations**:
   ///- [oldScale]: all platforms
@@ -1489,6 +1540,8 @@ enum PlatformWebViewCreationParamsProperty {
   ///**Officially Supported Platforms/Implementations**:
   ///- Android WebView ([Official API - WebViewClient.shouldInterceptRequest](https://developer.android.com/reference/android/webkit/WebViewClient#shouldInterceptRequest(android.webkit.WebView,%20android.webkit.WebResourceRequest)))
   ///- Windows WebView2 ([Official API - ICoreWebView2.add_WebResourceRequested](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2?view=webview2-1.0.2478.35#add_webresourcerequested))
+  ///- Linux WPE WebKit ([Official API - webkit_web_context_register_uri_scheme](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/method.WebContext.register_uri_scheme.html)):
+  ///    - Request interception is implemented via custom URI scheme handlers.
   ///
   ///**Parameters - Officially Supported Platforms/Implementations**:
   ///- [request]: all platforms
@@ -1507,6 +1560,7 @@ enum PlatformWebViewCreationParamsProperty {
   ///- iOS WKWebView ([Official API - WKNavigationDelegate.webView](https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455641-webview))
   ///- macOS WKWebView ([Official API - WKNavigationDelegate.webView](https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455641-webview))
   ///- Windows WebView2
+  ///- Linux WPE WebKit ([Official API - WebKitWebView::decide-policy](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/signal.WebView.decide-policy.html))
   ///
   ///**Parameters - Officially Supported Platforms/Implementations**:
   ///- [navigationAction]: all platforms
@@ -1624,6 +1678,7 @@ extension _PlatformWebViewCreationParamsPropertySupported
               TargetPlatform.android,
               TargetPlatform.iOS,
               TargetPlatform.macOS,
+              TargetPlatform.linux,
             ].contains(platform ?? defaultTargetPlatform);
       case PlatformWebViewCreationParamsProperty.initialData:
         return kIsWeb && platform == null
@@ -1634,6 +1689,7 @@ extension _PlatformWebViewCreationParamsPropertySupported
                     TargetPlatform.iOS,
                     TargetPlatform.macOS,
                     TargetPlatform.windows,
+                    TargetPlatform.linux,
                   ].contains(platform ?? defaultTargetPlatform);
       case PlatformWebViewCreationParamsProperty.initialFile:
         return kIsWeb && platform == null
@@ -1644,6 +1700,7 @@ extension _PlatformWebViewCreationParamsPropertySupported
                     TargetPlatform.iOS,
                     TargetPlatform.macOS,
                     TargetPlatform.windows,
+                    TargetPlatform.linux,
                   ].contains(platform ?? defaultTargetPlatform);
       case PlatformWebViewCreationParamsProperty.initialOptions:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
@@ -1660,6 +1717,7 @@ extension _PlatformWebViewCreationParamsPropertySupported
                     TargetPlatform.iOS,
                     TargetPlatform.macOS,
                     TargetPlatform.windows,
+                    TargetPlatform.linux,
                   ].contains(platform ?? defaultTargetPlatform);
       case PlatformWebViewCreationParamsProperty.initialUrlRequest:
         return kIsWeb && platform == null
@@ -1670,6 +1728,7 @@ extension _PlatformWebViewCreationParamsPropertySupported
                     TargetPlatform.iOS,
                     TargetPlatform.macOS,
                     TargetPlatform.windows,
+                    TargetPlatform.linux,
                   ].contains(platform ?? defaultTargetPlatform);
       case PlatformWebViewCreationParamsProperty.initialUserScripts:
         return kIsWeb && platform == null
@@ -1680,6 +1739,7 @@ extension _PlatformWebViewCreationParamsPropertySupported
                     TargetPlatform.iOS,
                     TargetPlatform.macOS,
                     TargetPlatform.windows,
+                    TargetPlatform.linux,
                   ].contains(platform ?? defaultTargetPlatform);
       case PlatformWebViewCreationParamsProperty
           .iosOnDidReceiveServerRedirectForProvisionalNavigation:
@@ -1729,6 +1789,7 @@ extension _PlatformWebViewCreationParamsPropertySupported
                     TargetPlatform.iOS,
                     TargetPlatform.macOS,
                     TargetPlatform.windows,
+                    TargetPlatform.linux,
                   ].contains(platform ?? defaultTargetPlatform);
       case PlatformWebViewCreationParamsProperty.onConsoleMessage:
         return kIsWeb && platform == null
@@ -1739,10 +1800,14 @@ extension _PlatformWebViewCreationParamsPropertySupported
                     TargetPlatform.iOS,
                     TargetPlatform.macOS,
                     TargetPlatform.windows,
+                    TargetPlatform.linux,
                   ].contains(platform ?? defaultTargetPlatform);
       case PlatformWebViewCreationParamsProperty.onContentSizeChanged:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.iOS].contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.iOS,
+              TargetPlatform.linux,
+            ].contains(platform ?? defaultTargetPlatform);
       case PlatformWebViewCreationParamsProperty.onCreateWindow:
         return kIsWeb && platform == null
             ? true
@@ -1752,6 +1817,7 @@ extension _PlatformWebViewCreationParamsPropertySupported
                     TargetPlatform.iOS,
                     TargetPlatform.macOS,
                     TargetPlatform.windows,
+                    TargetPlatform.linux,
                   ].contains(platform ?? defaultTargetPlatform);
       case PlatformWebViewCreationParamsProperty
           .onDidReceiveServerRedirectForProvisionalNavigation:
@@ -1780,6 +1846,7 @@ extension _PlatformWebViewCreationParamsPropertySupported
               TargetPlatform.iOS,
               TargetPlatform.macOS,
               TargetPlatform.windows,
+              TargetPlatform.linux,
             ].contains(platform ?? defaultTargetPlatform);
       case PlatformWebViewCreationParamsProperty.onEnterFullscreen:
         return kIsWeb && platform == null
@@ -1789,6 +1856,7 @@ extension _PlatformWebViewCreationParamsPropertySupported
                     TargetPlatform.android,
                     TargetPlatform.iOS,
                     TargetPlatform.macOS,
+                    TargetPlatform.linux,
                   ].contains(platform ?? defaultTargetPlatform);
       case PlatformWebViewCreationParamsProperty.onExitFullscreen:
         return kIsWeb && platform == null
@@ -1798,6 +1866,7 @@ extension _PlatformWebViewCreationParamsPropertySupported
                     TargetPlatform.android,
                     TargetPlatform.iOS,
                     TargetPlatform.macOS,
+                    TargetPlatform.linux,
                   ].contains(platform ?? defaultTargetPlatform);
       case PlatformWebViewCreationParamsProperty.onFindResultReceived:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
@@ -1829,11 +1898,13 @@ extension _PlatformWebViewCreationParamsPropertySupported
               TargetPlatform.android,
               TargetPlatform.iOS,
               TargetPlatform.macOS,
+              TargetPlatform.linux,
             ].contains(platform ?? defaultTargetPlatform);
       case PlatformWebViewCreationParamsProperty.onJsBeforeUnload:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
             [
               TargetPlatform.android,
+              TargetPlatform.linux,
             ].contains(platform ?? defaultTargetPlatform);
       case PlatformWebViewCreationParamsProperty.onJsConfirm:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
@@ -1841,6 +1912,7 @@ extension _PlatformWebViewCreationParamsPropertySupported
               TargetPlatform.android,
               TargetPlatform.iOS,
               TargetPlatform.macOS,
+              TargetPlatform.linux,
             ].contains(platform ?? defaultTargetPlatform);
       case PlatformWebViewCreationParamsProperty.onJsPrompt:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
@@ -1848,6 +1920,7 @@ extension _PlatformWebViewCreationParamsPropertySupported
               TargetPlatform.android,
               TargetPlatform.iOS,
               TargetPlatform.macOS,
+              TargetPlatform.linux,
             ].contains(platform ?? defaultTargetPlatform);
       case PlatformWebViewCreationParamsProperty.onLoadError:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
@@ -1869,6 +1942,7 @@ extension _PlatformWebViewCreationParamsPropertySupported
               TargetPlatform.android,
               TargetPlatform.iOS,
               TargetPlatform.macOS,
+              TargetPlatform.linux,
             ].contains(platform ?? defaultTargetPlatform);
       case PlatformWebViewCreationParamsProperty.onLoadResourceCustomScheme:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
@@ -1884,6 +1958,7 @@ extension _PlatformWebViewCreationParamsPropertySupported
               TargetPlatform.iOS,
               TargetPlatform.macOS,
               TargetPlatform.windows,
+              TargetPlatform.linux,
             ].contains(platform ?? defaultTargetPlatform);
       case PlatformWebViewCreationParamsProperty.onLoadStart:
         return kIsWeb && platform == null
@@ -1894,6 +1969,7 @@ extension _PlatformWebViewCreationParamsPropertySupported
                     TargetPlatform.iOS,
                     TargetPlatform.macOS,
                     TargetPlatform.windows,
+                    TargetPlatform.linux,
                   ].contains(platform ?? defaultTargetPlatform);
       case PlatformWebViewCreationParamsProperty.onLoadStop:
         return kIsWeb && platform == null
@@ -1904,6 +1980,7 @@ extension _PlatformWebViewCreationParamsPropertySupported
                     TargetPlatform.iOS,
                     TargetPlatform.macOS,
                     TargetPlatform.windows,
+                    TargetPlatform.linux,
                   ].contains(platform ?? defaultTargetPlatform);
       case PlatformWebViewCreationParamsProperty.onLongPressHitTestResult:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
@@ -1936,6 +2013,7 @@ extension _PlatformWebViewCreationParamsPropertySupported
               TargetPlatform.android,
               TargetPlatform.iOS,
               TargetPlatform.macOS,
+              TargetPlatform.linux,
             ].contains(platform ?? defaultTargetPlatform);
       case PlatformWebViewCreationParamsProperty.onPermissionRequest:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
@@ -1944,6 +2022,7 @@ extension _PlatformWebViewCreationParamsPropertySupported
               TargetPlatform.iOS,
               TargetPlatform.macOS,
               TargetPlatform.windows,
+              TargetPlatform.linux,
             ].contains(platform ?? defaultTargetPlatform);
       case PlatformWebViewCreationParamsProperty.onPermissionRequestCanceled:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
@@ -1977,6 +2056,7 @@ extension _PlatformWebViewCreationParamsPropertySupported
               TargetPlatform.iOS,
               TargetPlatform.macOS,
               TargetPlatform.windows,
+              TargetPlatform.linux,
             ].contains(platform ?? defaultTargetPlatform);
       case PlatformWebViewCreationParamsProperty.onReceivedClientCertRequest:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
@@ -1993,6 +2073,7 @@ extension _PlatformWebViewCreationParamsPropertySupported
               TargetPlatform.iOS,
               TargetPlatform.macOS,
               TargetPlatform.windows,
+              TargetPlatform.linux,
             ].contains(platform ?? defaultTargetPlatform);
       case PlatformWebViewCreationParamsProperty.onReceivedHttpAuthRequest:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
@@ -2001,6 +2082,7 @@ extension _PlatformWebViewCreationParamsPropertySupported
               TargetPlatform.iOS,
               TargetPlatform.macOS,
               TargetPlatform.windows,
+              TargetPlatform.linux,
             ].contains(platform ?? defaultTargetPlatform);
       case PlatformWebViewCreationParamsProperty.onReceivedHttpError:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
@@ -2009,6 +2091,7 @@ extension _PlatformWebViewCreationParamsPropertySupported
               TargetPlatform.iOS,
               TargetPlatform.macOS,
               TargetPlatform.windows,
+              TargetPlatform.linux,
             ].contains(platform ?? defaultTargetPlatform);
       case PlatformWebViewCreationParamsProperty.onReceivedIcon:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
@@ -2028,6 +2111,7 @@ extension _PlatformWebViewCreationParamsPropertySupported
               TargetPlatform.iOS,
               TargetPlatform.macOS,
               TargetPlatform.windows,
+              TargetPlatform.linux,
             ].contains(platform ?? defaultTargetPlatform);
       case PlatformWebViewCreationParamsProperty.onReceivedTouchIconUrl:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
@@ -2039,6 +2123,7 @@ extension _PlatformWebViewCreationParamsPropertySupported
             [
               TargetPlatform.android,
               TargetPlatform.windows,
+              TargetPlatform.linux,
             ].contains(platform ?? defaultTargetPlatform);
       case PlatformWebViewCreationParamsProperty.onRenderProcessResponsive:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
@@ -2069,11 +2154,13 @@ extension _PlatformWebViewCreationParamsPropertySupported
                     TargetPlatform.android,
                     TargetPlatform.iOS,
                     TargetPlatform.macOS,
+                    TargetPlatform.linux,
                   ].contains(platform ?? defaultTargetPlatform);
       case PlatformWebViewCreationParamsProperty.onShowFileChooser:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
             [
               TargetPlatform.android,
+              TargetPlatform.linux,
             ].contains(platform ?? defaultTargetPlatform);
       case PlatformWebViewCreationParamsProperty.onTitleChanged:
         return kIsWeb && platform == null
@@ -2084,6 +2171,7 @@ extension _PlatformWebViewCreationParamsPropertySupported
                     TargetPlatform.iOS,
                     TargetPlatform.macOS,
                     TargetPlatform.windows,
+                    TargetPlatform.linux,
                   ].contains(platform ?? defaultTargetPlatform);
       case PlatformWebViewCreationParamsProperty.onUpdateVisitedHistory:
         return kIsWeb && platform == null
@@ -2094,6 +2182,7 @@ extension _PlatformWebViewCreationParamsPropertySupported
                     TargetPlatform.iOS,
                     TargetPlatform.macOS,
                     TargetPlatform.windows,
+                    TargetPlatform.linux,
                   ].contains(platform ?? defaultTargetPlatform);
       case PlatformWebViewCreationParamsProperty
           .onWebContentProcessDidTerminate:
@@ -2112,6 +2201,7 @@ extension _PlatformWebViewCreationParamsPropertySupported
                     TargetPlatform.iOS,
                     TargetPlatform.macOS,
                     TargetPlatform.windows,
+                    TargetPlatform.linux,
                   ].contains(platform ?? defaultTargetPlatform);
       case PlatformWebViewCreationParamsProperty.onWindowBlur:
         return kIsWeb && platform == null
@@ -2139,6 +2229,7 @@ extension _PlatformWebViewCreationParamsPropertySupported
                     TargetPlatform.android,
                     TargetPlatform.iOS,
                     TargetPlatform.windows,
+                    TargetPlatform.linux,
                   ].contains(platform ?? defaultTargetPlatform);
       case PlatformWebViewCreationParamsProperty.pullToRefreshController:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
@@ -2171,6 +2262,7 @@ extension _PlatformWebViewCreationParamsPropertySupported
             [
               TargetPlatform.android,
               TargetPlatform.windows,
+              TargetPlatform.linux,
             ].contains(platform ?? defaultTargetPlatform);
       case PlatformWebViewCreationParamsProperty.shouldOverrideUrlLoading:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
@@ -2179,6 +2271,7 @@ extension _PlatformWebViewCreationParamsPropertySupported
               TargetPlatform.iOS,
               TargetPlatform.macOS,
               TargetPlatform.windows,
+              TargetPlatform.linux,
             ].contains(platform ?? defaultTargetPlatform);
       case PlatformWebViewCreationParamsProperty.windowId:
         return kIsWeb && platform == null

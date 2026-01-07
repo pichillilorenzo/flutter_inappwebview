@@ -68,6 +68,8 @@ class CookieManager : public ChannelDelegate {
 
   void deleteAllCookies(std::function<void(bool)> callback);
 
+  void getAllCookies(std::function<void(std::vector<Cookie>)> callback);
+
  private:
   WebKitCookieManager* cookie_manager_;
 

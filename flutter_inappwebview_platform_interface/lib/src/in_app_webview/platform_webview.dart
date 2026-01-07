@@ -70,6 +70,7 @@ class PlatformWebViewCreationParams<T> {
       MacOSPlatform(),
       WebPlatform(),
       WindowsPlatform(),
+      LinuxPlatform(),
     ],
   )
   final void Function(T controller)? onWebViewCreated;
@@ -104,6 +105,12 @@ class PlatformWebViewCreationParams<T> {
         apiName: 'ICoreWebView2.add_NavigationStarting',
         apiUrl:
             'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/iwebview2webview?view=webview2-0.8.355#add_navigationstarting',
+      ),
+      LinuxPlatform(
+        apiName: 'WebKitWebView::load-changed',
+        apiUrl:
+            'https://wpewebkit.org/reference/stable/wpe-webkit-2.0/signal.WebView.load-changed.html',
+        note: 'Fired when WebKitLoadEvent is WEBKIT_LOAD_STARTED.',
       ),
     ],
   )
@@ -142,6 +149,12 @@ class PlatformWebViewCreationParams<T> {
         apiName: 'ICoreWebView2.add_NavigationCompleted',
         apiUrl:
             'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/iwebview2webview?view=webview2-0.8.355#add_navigationcompleted',
+      ),
+      LinuxPlatform(
+        apiName: 'WebKitWebView::load-changed',
+        apiUrl:
+            'https://wpewebkit.org/reference/stable/wpe-webkit-2.0/signal.WebView.load-changed.html',
+        note: 'Fired when WebKitLoadEvent is WEBKIT_LOAD_FINISHED.',
       ),
     ],
   )
@@ -185,6 +198,11 @@ class PlatformWebViewCreationParams<T> {
         apiName: 'ICoreWebView2.add_NavigationCompleted',
         apiUrl:
             'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/iwebview2webview?view=webview2-0.8.355#add_navigationcompleted',
+      ),
+      LinuxPlatform(
+        apiName: 'WebKitWebView::load-failed',
+        apiUrl:
+            'https://wpewebkit.org/reference/stable/wpe-webkit-2.0/signal.WebView.load-failed.html',
       ),
     ],
   )
@@ -244,6 +262,12 @@ class PlatformWebViewCreationParams<T> {
         apiUrl:
             'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/iwebview2webview?view=webview2-0.8.355#add_navigationcompleted',
       ),
+      LinuxPlatform(
+        apiName: 'WebKitWebView::load-failed',
+        apiUrl:
+            'https://wpewebkit.org/reference/stable/wpe-webkit-2.0/signal.WebView.load-failed.html',
+        note: 'HTTP errors are detected during the load-failed signal handling.',
+      ),
     ],
   )
   final void Function(
@@ -268,6 +292,11 @@ class PlatformWebViewCreationParams<T> {
       IOSPlatform(),
       MacOSPlatform(),
       WindowsPlatform(),
+      LinuxPlatform(
+        apiName: 'WebKitWebView::notify::estimated-load-progress',
+        apiUrl:
+            'https://wpewebkit.org/reference/stable/wpe-webkit-2.0/property.WebView.estimated-load-progress.html',
+      ),
     ],
   )
   final void Function(T controller, int progress)? onProgressChanged;
@@ -288,6 +317,9 @@ class PlatformWebViewCreationParams<T> {
       MacOSPlatform(note: 'This event is implemented using JavaScript.'),
       WebPlatform(),
       WindowsPlatform(),
+      LinuxPlatform(
+        note: 'This event is implemented using JavaScript.',
+      ),
     ],
   )
   final void Function(T controller, ConsoleMessage consoleMessage)?
@@ -329,6 +361,11 @@ Also, this event is not called for POST requests and is not called on the first 
             'https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455641-webview',
       ),
       WindowsPlatform(),
+      LinuxPlatform(
+        apiName: 'WebKitWebView::decide-policy',
+        apiUrl:
+            'https://wpewebkit.org/reference/stable/wpe-webkit-2.0/signal.WebView.decide-policy.html',
+      ),
     ],
   )
   final FutureOr<NavigationActionPolicy?> Function(
@@ -349,6 +386,7 @@ Also, this event is not called for POST requests and is not called on the first 
       AndroidPlatform(note: 'This event is implemented using JavaScript.'),
       IOSPlatform(note: 'This event is implemented using JavaScript.'),
       MacOSPlatform(note: 'This event is implemented using JavaScript.'),
+      LinuxPlatform(note: 'This event is implemented using JavaScript.'),
     ],
   )
   final void Function(T controller, LoadedResource resource)? onLoadResource;
@@ -379,6 +417,9 @@ Also, this event is not called for POST requests and is not called on the first 
         apiName: 'Window.onscroll',
         apiUrl:
             'https://developer.mozilla.org/en-US/docs/Web/API/GlobalEventHandlers/onscroll',
+      ),
+      LinuxPlatform(
+        note: 'This event is implemented using JavaScript.',
       ),
     ],
   )
@@ -429,6 +470,12 @@ Also, this event is not called for POST requests and is not called on the first 
         apiUrl:
             'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2_4?view=webview2-1.0.2849.39#add_downloadstarting',
       ),
+      LinuxPlatform(
+        apiName: 'WebKitWebView::decide-policy',
+        apiUrl:
+            'https://wpewebkit.org/reference/stable/wpe-webkit-2.0/signal.WebView.decide-policy.html',
+        note: 'Downloads are detected via WEBKIT_POLICY_DECISION_TYPE_RESPONSE.',
+      ),
     ],
   )
   final FutureOr<DownloadStartResponse?> Function(
@@ -469,6 +516,11 @@ Also, this event is not called for POST requests and is not called on the first 
             'https://developer.apple.com/documentation/webkit/wkurlschemehandler',
       ),
       WindowsPlatform(),
+      LinuxPlatform(
+        apiName: 'WebKitURISchemeRequest',
+        apiUrl:
+            'https://wpewebkit.org/reference/stable/wpe-webkit-2.0/class.URISchemeRequest.html',
+      ),
     ],
   )
   final FutureOr<CustomSchemeResponse?> Function(
@@ -550,6 +602,12 @@ it will update also the WebView options of the caller WebView.""",
         apiUrl:
             'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2?view=webview2-1.0.2210.55#add_newwindowrequested',
       ),
+      LinuxPlatform(
+        apiName: 'WebKitWebView::create',
+        apiUrl:
+            'https://wpewebkit.org/reference/stable/wpe-webkit-2.0/signal.WebView.create.html',
+        note: 'Creates a new InAppWebView with related-view for multi-window support.',
+      ),
     ],
   )
   final FutureOr<bool?> Function(
@@ -586,6 +644,11 @@ it will update also the WebView options of the caller WebView.""",
         apiName: 'ICoreWebView2.add_WindowCloseRequested',
         apiUrl:
             'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2?view=webview2-1.0.2210.55#add_windowcloserequested',
+      ),
+      LinuxPlatform(
+        apiName: 'WebKitWebView::close',
+        apiUrl:
+            'https://wpewebkit.org/reference/stable/wpe-webkit-2.0/signal.WebView.close.html',
       ),
     ],
   )
@@ -656,6 +719,12 @@ it will update also the WebView options of the caller WebView.""",
         apiUrl:
             'https://developer.apple.com/documentation/webkit/wkuidelegate/1537406-webview',
       ),
+      LinuxPlatform(
+        apiName: 'WebKitWebView::script-dialog',
+        apiUrl:
+            'https://wpewebkit.org/reference/stable/wpe-webkit-2.0/signal.WebView.script-dialog.html',
+        note: 'Handles WEBKIT_SCRIPT_DIALOG_ALERT dialog type.',
+      ),
     ],
   )
   final FutureOr<JsAlertResponse?> Function(
@@ -689,6 +758,12 @@ it will update also the WebView options of the caller WebView.""",
         apiUrl:
             'https://developer.apple.com/documentation/webkit/wkuidelegate/1536489-webview',
       ),
+      LinuxPlatform(
+        apiName: 'WebKitWebView::script-dialog',
+        apiUrl:
+            'https://wpewebkit.org/reference/stable/wpe-webkit-2.0/signal.WebView.script-dialog.html',
+        note: 'Handles WEBKIT_SCRIPT_DIALOG_CONFIRM dialog type.',
+      ),
     ],
   )
   final FutureOr<JsConfirmResponse?> Function(
@@ -721,6 +796,12 @@ it will update also the WebView options of the caller WebView.""",
         apiName: 'WKUIDelegate.webView',
         apiUrl:
             'https://developer.apple.com/documentation/webkit/wkuidelegate/1538086-webview',
+      ),
+      LinuxPlatform(
+        apiName: 'WebKitWebView::script-dialog',
+        apiUrl:
+            'https://wpewebkit.org/reference/stable/wpe-webkit-2.0/signal.WebView.script-dialog.html',
+        note: 'Handles WEBKIT_SCRIPT_DIALOG_PROMPT dialog type.',
       ),
     ],
   )
@@ -758,6 +839,11 @@ it will update also the WebView options of the caller WebView.""",
         apiName: 'ICoreWebView2_10.add_BasicAuthenticationRequested',
         apiUrl:
             'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2_10?view=webview2-1.0.2849.39#add_basicauthenticationrequested',
+      ),
+      LinuxPlatform(
+        apiName: 'WebKitWebView::authenticate',
+        apiUrl:
+            'https://wpewebkit.org/reference/stable/wpe-webkit-2.0/signal.WebView.authenticate.html',
       ),
     ],
   )
@@ -802,6 +888,13 @@ See `NSAppTransportSecurity` in the [Information Property List Key Reference](ht
         apiName: 'ICoreWebView2_14.add_ServerCertificateErrorDetected',
         apiUrl:
             'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2_14?view=webview2-1.0.2792.45#add_servercertificateerrordetected',
+      ),
+      LinuxPlatform(
+        apiName: 'WebKitWebView::load-failed-with-tls-errors',
+        apiUrl:
+            'https://wpewebkit.org/reference/stable/wpe-webkit-2.0/signal.WebView.load-failed-with-tls-errors.html',
+        note:
+            'Uses webkit_web_context_allow_tls_certificate_for_host() to allow proceeding with an invalid certificate.',
       ),
     ],
   )
@@ -1018,6 +1111,9 @@ In that case, after the `window.addEventListener("flutterInAppWebViewPlatformRea
         apiUrl:
             'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2?view=webview2-1.0.2210.55#add_historychanged',
       ),
+      LinuxPlatform(
+        note: 'Tracked via load-changed signal and History API JavaScript events.',
+      ),
     ],
     parameterPlatforms: {
       'isReload': [AndroidPlatform()],
@@ -1115,6 +1211,11 @@ In that case, after the `window.addEventListener("flutterInAppWebViewPlatformRea
         apiUrl:
             'https://developer.mozilla.org/en-US/docs/Web/API/Document/fullscreenchange_event',
       ),
+      LinuxPlatform(
+        apiName: 'WebKitWebView::enter-fullscreen',
+        apiUrl:
+            'https://wpewebkit.org/reference/stable/wpe-webkit-2.0/signal.WebView.enter-fullscreen.html',
+      ),
     ],
   )
   final void Function(T controller)? onEnterFullscreen;
@@ -1145,6 +1246,11 @@ In that case, after the `window.addEventListener("flutterInAppWebViewPlatformRea
         apiName: 'Document.onfullscreenchange',
         apiUrl:
             'https://developer.mozilla.org/en-US/docs/Web/API/Document/fullscreenchange_event',
+      ),
+      LinuxPlatform(
+        apiName: 'WebKitWebView::leave-fullscreen',
+        apiUrl:
+            'https://wpewebkit.org/reference/stable/wpe-webkit-2.0/signal.WebView.leave-fullscreen.html',
       ),
     ],
   )
@@ -1177,6 +1283,12 @@ In that case, after the `window.addEventListener("flutterInAppWebViewPlatformRea
         apiUrl:
             'https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455635-webview',
       ),
+      LinuxPlatform(
+        apiName: 'WebKitWebView::load-changed',
+        apiUrl:
+            'https://wpewebkit.org/reference/stable/wpe-webkit-2.0/signal.WebView.load-changed.html',
+        note: 'Fired when WebKitLoadEvent is WEBKIT_LOAD_COMMITTED.',
+      ),
     ],
   )
   final void Function(T controller, WebUri? url)? onPageCommitVisible;
@@ -1202,6 +1314,11 @@ In that case, after the `window.addEventListener("flutterInAppWebViewPlatformRea
         apiName: 'ICoreWebView2.add_DocumentTitleChanged',
         apiUrl:
             'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2?view=webview2-1.0.2210.55#add_documenttitlechanged',
+      ),
+      LinuxPlatform(
+        apiName: 'WebKitWebView::notify::title',
+        apiUrl:
+            'https://wpewebkit.org/reference/stable/wpe-webkit-2.0/property.WebView.title.html',
       ),
     ],
   )
@@ -1259,6 +1376,11 @@ In that case, after the `window.addEventListener("flutterInAppWebViewPlatformRea
         apiName: 'ICoreWebView2Controller.add_ZoomFactorChanged',
         apiUrl:
             'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2controller?view=webview2-1.0.2849.39#add_zoomfactorchanged',
+      ),
+      LinuxPlatform(
+        apiName: 'WebKitWebView::notify::zoom-level',
+        apiUrl:
+            'https://wpewebkit.org/reference/stable/wpe-webkit-2.0/property.WebView.zoom-level.html',
       ),
     ],
   )
@@ -1350,6 +1472,11 @@ In that case, after the `window.addEventListener("flutterInAppWebViewPlatformRea
         apiName: 'ICoreWebView2.add_PermissionRequested',
         apiUrl:
             'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2?view=webview2-1.0.2210.55#add_permissionrequested',
+      ),
+      LinuxPlatform(
+        apiName: 'WebKitWebView::permission-request',
+        apiUrl:
+            'https://wpewebkit.org/reference/stable/wpe-webkit-2.0/signal.WebView.permission-request.html',
       ),
     ],
   )
@@ -1463,6 +1590,12 @@ In that case, after the `window.addEventListener("flutterInAppWebViewPlatformRea
         apiName: 'ICoreWebView2.add_WebResourceRequested',
         apiUrl:
             'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2?view=webview2-1.0.2478.35#add_webresourcerequested',
+      ),
+      LinuxPlatform(
+        apiName: 'webkit_web_context_register_uri_scheme',
+        apiUrl:
+            'https://wpewebkit.org/reference/stable/wpe-webkit-2.0/method.WebContext.register_uri_scheme.html',
+        note: 'Request interception is implemented via custom URI scheme handlers.',
       ),
     ],
   )
@@ -1592,6 +1725,11 @@ In that case, after the `window.addEventListener("flutterInAppWebViewPlatformRea
         apiName: 'ICoreWebView2.add_ProcessFailed',
         apiUrl:
             'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2?view=webview2-1.0.2849.39#add_processfailed',
+      ),
+      LinuxPlatform(
+        apiName: 'WebView.web-process-terminated',
+        apiUrl:
+            'https://wpewebkit.org/reference/stable/wpe-webkit-2.0/WebKitWebView.html#WebKitWebView-web-process-terminated',
       ),
     ],
   )
@@ -1725,6 +1863,12 @@ In that case, after the `window.addEventListener("flutterInAppWebViewPlatformRea
         apiName: 'WebChromeClient.onJsBeforeUnload',
         apiUrl:
             'https://developer.android.com/reference/android/webkit/WebChromeClient#onJsBeforeUnload(android.webkit.WebView,%20java.lang.String,%20java.lang.String,%20android.webkit.JsResult)',
+      ),
+      LinuxPlatform(
+        apiName: 'WebKitWebView::script-dialog',
+        apiUrl:
+            'https://wpewebkit.org/reference/stable/wpe-webkit-2.0/signal.WebView.script-dialog.html',
+        note: 'Handles WEBKIT_SCRIPT_DIALOG_BEFORE_UNLOAD_CONFIRM dialog type.',
       ),
     ],
   )
@@ -2002,7 +2146,14 @@ In that case, after the `window.addEventListener("flutterInAppWebViewPlatformRea
   ///{@endtemplate}
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewCreationParams.onContentSizeChanged.supported_platforms}
-  @SupportedPlatforms(platforms: [IOSPlatform()])
+  @SupportedPlatforms(
+    platforms: [
+      IOSPlatform(),
+      LinuxPlatform(
+        note: 'This event is implemented using JavaScript.',
+      ),
+    ],
+  )
   final void Function(T controller, Size oldContentSize, Size newContentSize)?
   onContentSizeChanged;
 
@@ -2077,6 +2228,11 @@ In that case, after the `window.addEventListener("flutterInAppWebViewPlatformRea
         apiUrl:
             'https://developer.android.com/reference/android/webkit/WebChromeClient#onShowFileChooser(android.webkit.WebView,%20android.webkit.ValueCallback%3Candroid.net.Uri[]%3E,%20android.webkit.WebChromeClient.FileChooserParams)',
       ),
+      LinuxPlatform(
+        apiName: 'WebKitWebView::run-file-chooser',
+        apiUrl:
+            'https://webkitgtk.org/reference/webkit2gtk/stable/signal.WebView.run-file-chooser.html',
+      ),
     ],
   )
   final FutureOr<ShowFileChooserResponse?> Function(
@@ -2100,6 +2256,7 @@ In that case, after the `window.addEventListener("flutterInAppWebViewPlatformRea
       MacOSPlatform(),
       WebPlatform(requiresSameOrigin: false),
       WindowsPlatform(),
+      LinuxPlatform(),
     ],
   )
   final URLRequest? initialUrlRequest;
@@ -2116,6 +2273,7 @@ In that case, after the `window.addEventListener("flutterInAppWebViewPlatformRea
       MacOSPlatform(),
       WebPlatform(requiresSameOrigin: false),
       WindowsPlatform(),
+      LinuxPlatform(),
     ],
   )
   final String? initialFile;
@@ -2132,6 +2290,7 @@ In that case, after the `window.addEventListener("flutterInAppWebViewPlatformRea
       MacOSPlatform(),
       WebPlatform(requiresSameOrigin: false),
       WindowsPlatform(),
+      LinuxPlatform(),
     ],
   )
   final InAppWebViewInitialData? initialData;
@@ -2157,6 +2316,7 @@ In that case, after the `window.addEventListener("flutterInAppWebViewPlatformRea
       MacOSPlatform(),
       WebPlatform(requiresSameOrigin: false),
       WindowsPlatform(),
+      LinuxPlatform(),
     ],
   )
   final InAppWebViewSettings? initialSettings;
@@ -2193,6 +2353,11 @@ This is a limitation of the native WebKit APIs.""",
       ),
       WebPlatform(),
       WindowsPlatform(),
+      LinuxPlatform(
+        apiName: 'WebKitUserContentManager',
+        apiUrl:
+            'https://wpewebkit.org/reference/stable/wpe-webkit-2.0/class.UserContentManager.html',
+      ),
     ],
   )
   final UnmodifiableListView<UserScript>? initialUserScripts;
@@ -2219,7 +2384,16 @@ This is a limitation of the native WebKit APIs.""",
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewCreationParams.findInteractionController.supported_platforms}
   @SupportedPlatforms(
-    platforms: [AndroidPlatform(), IOSPlatform(), MacOSPlatform()],
+    platforms: [
+      AndroidPlatform(),
+      IOSPlatform(),
+      MacOSPlatform(),
+      LinuxPlatform(
+        apiName: 'WebKitFindController',
+        apiUrl:
+            'https://wpewebkit.org/reference/stable/wpe-webkit-2.0/class.FindController.html',
+      ),
+    ],
   )
   final PlatformFindInteractionController? findInteractionController;
 

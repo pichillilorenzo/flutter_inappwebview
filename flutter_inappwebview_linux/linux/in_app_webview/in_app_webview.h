@@ -43,6 +43,9 @@
 #include "../types/color_picker_popup.h"
 #include "../types/context_menu.h"
 #include "../types/context_menu_popup.h"
+#include "../types/find_session.h"
+#include "../types/hit_test_result.h"
+#include "../types/ssl_certificate.h"
 #include "../types/url_request.h"
 #include "../types/user_script.h"
 #include "in_app_webview_settings.h"
@@ -52,12 +55,14 @@ struct wpe_fdo_egl_exported_image;
 
 namespace flutter_inappwebview_plugin {
 
+class InAppWebViewManager;
 class UserContentController;
 class WebViewChannelDelegate;
 
 struct InAppWebViewCreationParams {
   int64_t id;
   GtkWindow* gtkWindow = nullptr;  // Cached GTK window from manager
+  InAppWebViewManager* manager = nullptr;  // Manager reference for multi-window support
   std::optional<std::shared_ptr<URLRequest>> initialUrlRequest;
   std::optional<std::string> initialFile;
   std::optional<std::string> initialData;
@@ -66,6 +71,9 @@ struct InAppWebViewCreationParams {
   std::optional<std::string> initialDataEncoding;
   std::shared_ptr<InAppWebViewSettings> initialSettings;
   std::optional<std::shared_ptr<ContextMenu>> contextMenu;
+  std::optional<int64_t> windowId;  // For windows created via onCreateWindow
+  WebKitWebView* relatedWebView = nullptr;  // For creating related WebViews (shares web process)
+  std::vector<std::shared_ptr<UserScript>> initialUserScripts;  // User scripts to inject
 };
 
 // Pointer event kind (matches Dart side)
@@ -103,8 +111,13 @@ class InAppWebView {
 
   // Attach/recreate the Dart method channel using the given [channel_id].
   void AttachChannel(FlBinaryMessenger* messenger, int64_t channel_id);
+  
+  // Attach/recreate the Dart method channel using a string-based channel ID.
+  // This is used for HeadlessInAppWebView where the ID is a long string from Dart.
+  void AttachChannel(FlBinaryMessenger* messenger, const std::string& channel_id);
 
   int64_t channel_id() const { return channel_id_; }
+  const std::string& string_channel_id() const { return string_channel_id_; }
 
   // Navigation methods
   void loadUrl(const std::string& url);
@@ -113,17 +126,31 @@ class InAppWebView {
                 const std::string& base_url);
   void loadFile(const std::string& asset_file_path);
   void reload();
+  void reloadFromOrigin();
   void goBack();
   void goForward();
+  void goBackOrForward(int steps);
   bool canGoBack() const;
   bool canGoForward() const;
+  bool canGoBackOrForward(int steps) const;
   void stopLoading();
   bool isLoading() const;
+
+  // Navigation history
+  FlValue* getCopyBackForwardList() const;
 
   // Getters
   std::optional<std::string> getUrl() const;
   std::optional<std::string> getTitle() const;
   int64_t getProgress() const;
+
+  // TLS/SSL certificate
+  // Returns the SSL certificate info for the current page (or nullopt if not HTTPS)
+  std::optional<SslCertificate> getCertificate() const;
+
+  // Hit test result
+  // Returns the last hit test result from mouse-target-changed signal
+  HitTestResult getHitTestResult() const;
 
   // JavaScript execution
   void evaluateJavascript(const std::string& source,
@@ -138,8 +165,19 @@ class InAppWebView {
   void removeUserScriptsByGroupName(const std::string& groupName);
   void removeAllUserScripts();
 
+  // Web Message Listener
+  void addWebMessageListener(const std::string& jsObjectName,
+                              const std::vector<std::string>& allowedOriginRules);
+
   // HTML content
   void getHtml(std::function<void(const std::optional<std::string>&)> callback);
+
+  // Screenshot - captures the current visible content as PNG data
+  void takeScreenshot(std::function<void(const std::optional<std::vector<uint8_t>>&)> callback);
+
+  // Session state - save and restore navigation state
+  std::optional<std::vector<uint8_t>> saveState() const;
+  bool restoreState(const std::vector<uint8_t>& stateData);
 
   // Zoom
   double getZoomScale() const;
@@ -148,8 +186,22 @@ class InAppWebView {
   // Scroll
   void scrollTo(int64_t x, int64_t y, bool animated);
   void scrollBy(int64_t x, int64_t y, bool animated);
-  int64_t getScrollX() const;
-  int64_t getScrollY() const;
+  void getScrollX(std::function<void(int64_t)> callback);
+  void getScrollY(std::function<void(int64_t)> callback);
+  void canScrollVertically(std::function<void(bool)> callback);
+  void canScrollHorizontally(std::function<void(bool)> callback);
+
+  // Content dimensions (async - via JavaScript)
+  void getContentHeight(std::function<void(int64_t)> callback);
+  void getContentWidth(std::function<void(int64_t)> callback);
+
+  // Find interaction
+  void findAll(const std::string& find);
+  void findNext(bool forward);
+  void clearMatches();
+  void setSearchText(const std::string& searchText);
+  std::optional<std::string> getSearchText() const;
+  std::optional<FindSession> getActiveFindSession() const;
 
   // Settings
   std::shared_ptr<InAppWebViewSettings> settings() const { return settings_; }
@@ -247,6 +299,38 @@ class InAppWebView {
   void pasteAsPlainText();
   void copyTextToClipboard(const std::string& text);  // Copy arbitrary text to both clipboards
   void getSelectedText(std::function<void(const std::optional<std::string>&)> callback);
+  void isSecureContext(std::function<void(bool)> callback);
+
+  // Media playback control
+  void pauseAllMediaPlayback();
+  void setAllMediaPlaybackSuspended(bool suspended);
+  void closeAllMediaPresentations();
+  void requestMediaPlaybackState(std::function<void(int)> callback);
+
+  // Media capture state (camera and microphone)
+  int getCameraCaptureState() const;
+  void setCameraCaptureState(int state);
+  int getMicrophoneCaptureState() const;
+  void setMicrophoneCaptureState(int state);
+
+  // Theme color (from <meta name="theme-color"> tag)
+  std::optional<std::string> getMetaThemeColor() const;
+
+  // Audio state (mute and playback)
+  bool isPlayingAudio() const;
+  bool isMuted() const;
+  void setMuted(bool muted);
+
+  // Web process control
+  void terminateWebProcess();
+
+  // Focus control
+  bool clearFocus();
+  bool requestFocus();
+
+  // Web archive (save page to file)
+  void saveWebArchive(const std::string& filePath, bool autoname,
+                      std::function<void(const std::optional<std::string>&)> callback);
 
   // Editing commands (WebKit editing commands)
   void selectAll();
@@ -273,8 +357,10 @@ class InAppWebView {
  private:
   FlPluginRegistrar* registrar_ = nullptr;
   GtkWindow* gtk_window_ = nullptr;  // Cached GTK window for context menu display
+  InAppWebViewManager* manager_ = nullptr;  // Manager reference for multi-window support
   int64_t id_ = 0;
   int64_t channel_id_ = -1;
+  std::string string_channel_id_;  // String-based channel ID for headless webviews
 
   // Settings
   std::shared_ptr<InAppWebViewSettings> settings_;
@@ -322,6 +408,9 @@ class InAppWebView {
   // User content controller
   std::unique_ptr<UserContentController> user_content_controller_;
 
+  // Initial user scripts from params
+  std::vector<std::shared_ptr<UserScript>> initial_user_scripts_;
+
   // JavaScript bridge secret for security
   std::string js_bridge_secret_;
 
@@ -347,12 +436,19 @@ class InAppWebView {
   std::map<int64_t, WebKitAuthenticationRequest*> pending_auth_requests_;
   int64_t next_auth_id_ = 0;
 
+  // Pending custom scheme requests (for async handling)
+  std::map<WebKitURISchemeRequest*, int64_t> pending_custom_scheme_requests_;
+
   // Frame available callback
   std::function<void()> on_frame_available_;
 
   // Cursor change callback
   std::function<void(const std::string&)> on_cursor_changed_;
   std::string last_cursor_name_;
+
+  // Last hit test result from mouse-target-changed signal
+  // Used by getHitTestResult() to return the current element under the cursor
+  WebKitHitTestResult* last_hit_test_result_ = nullptr;
 
   // Mouse state
   double cursor_x_ = 0;
@@ -436,6 +532,8 @@ class InAppWebView {
 
   static void OnNotifyTitle(GObject* object, GParamSpec* pspec, gpointer user_data);
 
+  static void OnNotifyUri(GObject* object, GParamSpec* pspec, gpointer user_data);
+
   static gboolean OnLoadFailed(WebKitWebView* web_view, WebKitLoadEvent load_event,
                                gchar* failing_uri, GError* error, gpointer user_data);
 
@@ -470,6 +568,21 @@ class InAppWebView {
   static void OnMouseTargetChanged(WebKitWebView* web_view, WebKitHitTestResult* hit_test_result,
                                    guint modifiers, gpointer user_data);
 
+  static void OnWebProcessTerminated(WebKitWebView* web_view,
+                                     WebKitWebProcessTerminationReason reason,
+                                     gpointer user_data);
+
+  static gboolean OnRunFileChooser(WebKitWebView* web_view,
+                                   WebKitFileChooserRequest* request,
+                                   gpointer user_data);
+
+  // === Find Controller signals ===
+  static void OnCountedMatches(WebKitFindController* find_controller, guint match_count,
+                               gpointer user_data);
+  static void OnFoundText(WebKitFindController* find_controller, guint match_count,
+                          gpointer user_data);
+  static void OnFailedToFindText(WebKitFindController* find_controller, gpointer user_data);
+
   // === Input helpers ===
   void SendWpePointerEvent(uint32_t type, double x, double y, uint32_t button);
   void SendWpeAxisEvent(double x, double y, double dx, double dy);
@@ -478,6 +591,10 @@ class InAppWebView {
   // === JavaScript bridge ===
   void handleScriptMessage(const std::string& name, const std::string& body);
   void dispatchPlatformReady();
+
+  // === Custom Scheme Handler ===
+  void RegisterCustomSchemes();
+  static void OnCustomSchemeRequest(WebKitURISchemeRequest* request, gpointer user_data);
 
   // === Cursor detection ===
   void injectCursorDetectionScript();

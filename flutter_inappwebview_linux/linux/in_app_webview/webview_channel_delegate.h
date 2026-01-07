@@ -4,6 +4,7 @@
 #include <flutter_linux/flutter_linux.h>
 
 #include <cstdint>
+#include <functional>
 #include <memory>
 #include <optional>
 #include <string>
@@ -12,11 +13,14 @@
 #include "../types/base_callback_result.h"
 #include "../types/channel_delegate.h"
 #include "../types/create_window_action.h"
+#include "../types/custom_scheme_response.h"
 #include "../types/download_start_request.h"
 #include "../types/download_start_response.h"
 #include "../types/http_auth_response.h"
 #include "../types/http_authentication_challenge.h"
 #include "../types/javascript_handler_function_data.h"
+#include "../types/server_trust_auth_response.h"
+#include "../types/server_trust_challenge.h"
 #include "../types/js_alert_request.h"
 #include "../types/js_alert_response.h"
 #include "../types/js_before_unload_response.h"
@@ -139,12 +143,33 @@ class WebViewChannelDelegate : public ChannelDelegate {
   };
 
   /**
+   * Callback for onReceivedServerTrustAuthRequest.
+   * Returns ServerTrustAuthResponse indicating whether to proceed or cancel.
+   */
+  class ServerTrustAuthRequestCallback : public BaseCallbackResult<ServerTrustAuthResponse> {
+   public:
+    ServerTrustAuthRequestCallback();
+    ~ServerTrustAuthRequestCallback() = default;
+  };
+
+  /**
    * Callback for onDownloadStarting.
    */
   class DownloadStartCallback : public BaseCallbackResult<DownloadStartResponse> {
    public:
     DownloadStartCallback();
     ~DownloadStartCallback() = default;
+  };
+
+  /**
+   * Callback for onLoadResourceWithCustomScheme.
+   * Returns optional CustomSchemeResponse to use for the request.
+   */
+  class LoadResourceWithCustomSchemeCallback
+      : public BaseCallbackResult<std::shared_ptr<CustomSchemeResponse>> {
+   public:
+    LoadResourceWithCustomSchemeCallback();
+    ~LoadResourceWithCustomSchemeCallback() = default;
   };
 
   // === Constructors/Destructor ===
@@ -175,6 +200,11 @@ class WebViewChannelDelegate : public ChannelDelegate {
                            std::shared_ptr<WebResourceResponse> errorResponse) const;
 
   void onConsoleMessage(const std::string& message, int64_t messageLevel) const;
+
+  void onLoadResource(const std::string& url,
+                      const std::string& initiatorType,
+                      double startTime,
+                      double duration) const;
 
   void onCallJsHandler(const std::string& handlerName,
                        std::unique_ptr<JavaScriptHandlerFunctionData> data,
@@ -217,6 +247,9 @@ class WebViewChannelDelegate : public ChannelDelegate {
   void onReceivedHttpAuthRequest(std::unique_ptr<HttpAuthenticationChallenge> challenge,
                                  std::unique_ptr<HttpAuthRequestCallback> callback) const;
 
+  void onReceivedServerTrustAuthRequest(std::unique_ptr<ServerTrustChallenge> challenge,
+                                        std::unique_ptr<ServerTrustAuthRequestCallback> callback) const;
+
   void onDownloadStarting(std::unique_ptr<DownloadStartRequest> request,
                           std::unique_ptr<DownloadStartCallback> callback) const;
 
@@ -225,6 +258,23 @@ class WebViewChannelDelegate : public ChannelDelegate {
   void onExitFullscreen() const;
 
   void onFaviconChanged(const std::optional<std::string>& faviconUrl) const;
+
+  void onRenderProcessGone(bool didCrash) const;
+
+  void onShowFileChooser(int mode,
+                         const std::vector<std::string>& acceptTypes,
+                         bool isCaptureEnabled,
+                         const std::optional<std::string>& title,
+                         const std::optional<std::string>& filenameHint,
+                         std::function<void(std::optional<std::vector<std::string>>)> callback) const;
+
+  void onFindResultReceived(int32_t activeMatchOrdinal, int32_t numberOfMatches,
+                            bool isDoneCounting) const;
+
+  // Custom scheme handler callback
+  void onLoadResourceWithCustomScheme(
+      std::shared_ptr<WebResourceRequest> request,
+      std::unique_ptr<LoadResourceWithCustomSchemeCallback> callback) const;
 
   // Context menu callbacks
   void onCreateContextMenu(const std::string& hitTestResultType, const std::string& extra) const;

@@ -25,6 +25,12 @@ class CustomPlatformView {
   int64_t texture_id() const { return texture_id_; }
   WebViewType* webview() const { return webview_.get(); }
 
+  // Keep-alive ID management
+  // When set, this WebView should be preserved when disposed and stored in keepAliveWebViews_
+  void set_keep_alive_id(const std::string& id) { keepAliveId_ = id; }
+  const std::string& keep_alive_id() const { return keepAliveId_; }
+  bool has_keep_alive_id() const { return !keepAliveId_.empty(); }
+
   void MarkTextureFrameAvailable();
 
  private:
@@ -33,6 +39,7 @@ class CustomPlatformView {
   FlTexture* texture_ = nullptr;
   InAppWebViewEGLTexture* egl_texture_ = nullptr;  // Pointer to EGL texture if using zero-copy mode
   int64_t texture_id_ = -1;
+  std::string keepAliveId_;  // Keep-alive ID for preserving WebView across widget disposal
 
   FlMethodChannel* method_channel_ = nullptr;
   FlEventChannel* event_channel_ = nullptr;

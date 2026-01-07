@@ -204,6 +204,11 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
         apiUrl:
             'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2?view=webview2-1.0.2210.55#get_source',
       ),
+      LinuxPlatform(
+        apiName: 'webkit_web_view_get_uri',
+        apiUrl:
+            'https://wpewebkit.org/reference/stable/wpe-webkit-2.0/method.WebView.get_uri.html',
+      ),
     ],
   )
   Future<WebUri?> getUrl() {
@@ -240,6 +245,11 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
         apiUrl:
             'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2?view=webview2-1.0.2210.55#get_documenttitle',
       ),
+      LinuxPlatform(
+        apiName: 'webkit_web_view_get_title',
+        apiUrl:
+            'https://wpewebkit.org/reference/stable/wpe-webkit-2.0/method.WebView.get_title.html',
+      ),
     ],
   )
   Future<String?> getTitle() {
@@ -270,6 +280,11 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
         apiUrl:
             'https://developer.apple.com/documentation/webkit/wkwebview/1415007-estimatedprogress',
       ),
+      LinuxPlatform(
+        apiName: 'webkit_web_view_get_estimated_load_progress',
+        apiUrl:
+            'https://wpewebkit.org/reference/stable/wpe-webkit-2.0/method.WebView.get_estimated_load_progress.html',
+      ),
     ],
   )
   Future<int?> getProgress() {
@@ -292,6 +307,7 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
     platforms: [
       AndroidPlatform(),
       IOSPlatform(),
+      LinuxPlatform(note: 'This method is implemented using JavaScript.'),
       MacOSPlatform(),
       WebPlatform(),
       WindowsPlatform(),
@@ -315,6 +331,7 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
       MacOSPlatform(),
       WebPlatform(),
       WindowsPlatform(),
+      LinuxPlatform(),
     ],
   )
   Future<List<Favicon>> getFavicons() {
@@ -365,6 +382,11 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
         apiName: 'ICoreWebView2_2.NavigateWithWebResourceRequest',
         apiUrl:
             'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2_2?view=webview2-1.0.2210.55#navigatewithwebresourcerequest',
+      ),
+      LinuxPlatform(
+        apiName: 'webkit_web_view_load_uri',
+        apiUrl:
+            'https://wpewebkit.org/reference/stable/wpe-webkit-2.0/method.WebView.load_uri.html',
       ),
     ],
   )
@@ -453,6 +475,11 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
         apiName: 'ICoreWebView2.NavigateToString',
         apiUrl:
             'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2?view=webview2-1.0.2210.55#navigatetostring',
+      ),
+      LinuxPlatform(
+        apiName: 'webkit_web_view_load_html',
+        apiUrl:
+            'https://wpewebkit.org/reference/stable/wpe-webkit-2.0/method.WebView.load_html.html',
       ),
     ],
   )
@@ -543,6 +570,11 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
         apiUrl:
             'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2?view=webview2-1.0.2210.55#navigate',
       ),
+      LinuxPlatform(
+        apiName: 'webkit_web_view_load_uri',
+        apiUrl:
+            'https://wpewebkit.org/reference/stable/wpe-webkit-2.0/method.WebView.load_uri.html',
+      ),
     ],
   )
   Future<void> loadFile({required String assetFilePath}) {
@@ -585,6 +617,11 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
         apiUrl:
             'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2?view=webview2-1.0.2210.55#reload',
       ),
+      LinuxPlatform(
+        apiName: 'webkit_web_view_reload',
+        apiUrl:
+            'https://wpewebkit.org/reference/stable/wpe-webkit-2.0/method.WebView.reload.html',
+      ),
     ],
   )
   Future<void> reload() {
@@ -624,6 +661,11 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
         apiUrl:
             'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2?view=webview2-1.0.2210.55#goback',
       ),
+      LinuxPlatform(
+        apiName: 'webkit_web_view_go_back',
+        apiUrl:
+            'https://wpewebkit.org/reference/stable/wpe-webkit-2.0/method.WebView.go_back.html',
+      ),
     ],
   )
   Future<void> goBack() {
@@ -658,6 +700,11 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
         apiName: 'ICoreWebView2.get_CanGoBack',
         apiUrl:
             'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2?view=webview2-1.0.2210.55#get_cangoback',
+      ),
+      LinuxPlatform(
+        apiName: 'webkit_web_view_can_go_back',
+        apiUrl:
+            'https://wpewebkit.org/reference/stable/wpe-webkit-2.0/method.WebView.can_go_back.html',
       ),
     ],
   )
@@ -699,6 +746,11 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
         apiUrl:
             'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2?view=webview2-1.0.2210.55#goforward',
       ),
+      LinuxPlatform(
+        apiName: 'webkit_web_view_go_forward',
+        apiUrl:
+            'https://wpewebkit.org/reference/stable/wpe-webkit-2.0/method.WebView.go_forward.html',
+      ),
     ],
   )
   Future<void> goForward() {
@@ -733,6 +785,11 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
         apiName: 'ICoreWebView2.get_CanGoForward',
         apiUrl:
             'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2?view=webview2-1.0.2210.55#get_cangoforward',
+      ),
+      LinuxPlatform(
+        apiName: 'webkit_web_view_can_go_forward',
+        apiUrl:
+            'https://wpewebkit.org/reference/stable/wpe-webkit-2.0/method.WebView.can_go_forward.html',
       ),
     ],
   )
@@ -769,6 +826,7 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
         apiUrl: 'https://developer.mozilla.org/en-US/docs/Web/API/History/go',
       ),
       WindowsPlatform(),
+      LinuxPlatform(),
     ],
   )
   Future<void> goBackOrForward({required int steps}) {
@@ -792,6 +850,7 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
       ),
       IOSPlatform(),
       MacOSPlatform(),
+      LinuxPlatform(),
       WindowsPlatform(),
     ],
   )
@@ -830,6 +889,11 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
     platforms: [
       AndroidPlatform(),
       IOSPlatform(),
+      LinuxPlatform(
+        apiName: 'webkit_web_view_is_loading',
+        apiUrl:
+            'https://wpewebkit.org/reference/stable/wpe-webkit-2.0/method.WebView.is_loading.html',
+      ),
       MacOSPlatform(),
       WebPlatform(requiresSameOrigin: false),
       WindowsPlatform(),
@@ -871,6 +935,11 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
         apiName: 'ICoreWebView2.Stop',
         apiUrl:
             'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2?view=webview2-1.0.2210.55#stop',
+      ),
+      LinuxPlatform(
+        apiName: 'webkit_web_view_stop_loading',
+        apiUrl:
+            'https://wpewebkit.org/reference/stable/wpe-webkit-2.0/method.WebView.stop_loading.html',
       ),
     ],
   )
@@ -919,6 +988,11 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
             'https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/eval',
       ),
       WindowsPlatform(),
+      LinuxPlatform(
+        apiName: 'webkit_web_view_evaluate_javascript',
+        apiUrl:
+            'https://wpewebkit.org/reference/stable/wpe-webkit-2.0/method.WebView.evaluate_javascript.html',
+      ),
     ],
   )
   Future<dynamic> evaluateJavascript({
@@ -954,6 +1028,7 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
     platforms: [
       AndroidPlatform(),
       IOSPlatform(),
+      LinuxPlatform(note: 'This method is implemented using JavaScript.'),
       MacOSPlatform(),
       WebPlatform(),
     ],
@@ -1008,6 +1083,7 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
     platforms: [
       AndroidPlatform(),
       IOSPlatform(),
+      LinuxPlatform(note: 'This method is implemented using JavaScript.'),
       MacOSPlatform(),
       WebPlatform(),
     ],
@@ -1034,6 +1110,7 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
     platforms: [
       AndroidPlatform(),
       IOSPlatform(),
+      LinuxPlatform(note: 'This method is implemented using JavaScript.'),
       MacOSPlatform(),
       WebPlatform(),
     ],
@@ -1214,6 +1291,7 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
         available: '10.13',
       ),
       WindowsPlatform(),
+      LinuxPlatform(),
     ],
   )
   Future<Uint8List?> takeScreenshot({
@@ -1233,6 +1311,7 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
     platforms: [
       AndroidPlatform(),
       IOSPlatform(),
+      LinuxPlatform(),
       MacOSPlatform(),
       WebPlatform(),
       WindowsPlatform(),
@@ -1253,6 +1332,7 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
     platforms: [
       AndroidPlatform(),
       IOSPlatform(),
+      LinuxPlatform(),
       MacOSPlatform(),
       WebPlatform(),
       WindowsPlatform(),
@@ -1290,6 +1370,7 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
             'https://developer.apple.com/documentation/webkit/wkwebview/1414977-backforwardlist',
       ),
       WindowsPlatform(),
+      LinuxPlatform(),
     ],
   )
   Future<WebHistory?> getCopyBackForwardList() {
@@ -1517,6 +1598,7 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
         apiUrl:
             'https://developer.mozilla.org/en-US/docs/Web/API/Element/scrollHeight',
       ),
+      LinuxPlatform(),
     ],
   )
   Future<int?> getContentHeight() {
@@ -1544,6 +1626,7 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
         apiUrl:
             'https://developer.mozilla.org/en-US/docs/Web/API/Element/scrollWidth',
       ),
+      LinuxPlatform(),
     ],
   )
   Future<int?> getContentWidth() {
@@ -1574,6 +1657,11 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
         apiUrl:
             'https://developer.apple.com/documentation/uikit/uiscrollview/1619412-setzoomscale',
       ),
+      LinuxPlatform(
+        apiName: 'webkit_web_view_set_zoom_level',
+        apiUrl:
+            'https://wpewebkit.org/reference/stable/wpe-webkit-2.0/method.WebView.set_zoom_level.html',
+      ),
     ],
   )
   Future<void> zoomBy({
@@ -1601,6 +1689,12 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
             'https://developer.android.com/reference/android/webkit/WebView#getOriginalUrl()',
       ),
       IOSPlatform(),
+      LinuxPlatform(
+        apiName: 'webkit_web_view_get_uri',
+        apiUrl:
+            'https://wpewebkit.org/reference/stable/wpe-webkit-2.0/method.WebView.get_uri.html',
+        note: 'Returns the current URL. WPE WebKit does not distinguish between original and current URL.',
+      ),
       MacOSPlatform(),
       WebPlatform(
         note: 'It will return the current value of the `iframe.src` attribute.',
@@ -1626,6 +1720,11 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
         apiUrl:
             'https://developer.apple.com/documentation/uikit/uiscrollview/1619419-zoomscale',
       ),
+      LinuxPlatform(
+        apiName: 'webkit_web_view_get_zoom_level',
+        apiUrl:
+            'https://wpewebkit.org/reference/stable/wpe-webkit-2.0/method.WebView.get_zoom_level.html',
+      ),
       WindowsPlatform(
         apiName: 'ICoreWebView2Controller.get_ZoomFactor',
         apiUrl:
@@ -1648,6 +1747,7 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
     platforms: [
       AndroidPlatform(note: 'This method is implemented using JavaScript.'),
       IOSPlatform(note: 'This method is implemented using JavaScript.'),
+      LinuxPlatform(note: 'This method is implemented using JavaScript.'),
       MacOSPlatform(note: 'This method is implemented using JavaScript.'),
       WebPlatform(note: 'This method is implemented using JavaScript.'),
     ],
@@ -1671,6 +1771,11 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
             'https://developer.android.com/reference/android/webkit/WebView#getHitTestResult()',
       ),
       IOSPlatform(note: 'This method is implemented using JavaScript.'),
+      LinuxPlatform(
+        apiName: 'WebKitHitTestResult',
+        apiUrl: 'https://webkitgtk.org/reference/webkit2gtk/stable/WebKitHitTestResult.html',
+        note: 'This method uses native WebKitHitTestResult from the mouse-target-changed signal.',
+      ),
     ],
   )
   Future<InAppWebViewHitTestResult?> getHitTestResult() {
@@ -1708,6 +1813,12 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
         apiUrl:
             'https://developer.apple.com/documentation/appkit/nswindow/1419366-makefirstresponder',
       ),
+      LinuxPlatform(
+        apiName: 'wpe_view_backend_add_activity_state',
+        apiUrl:
+            'https://wpewebkit.org/reference/stable/wpe-platform-2.0/func.view_backend_add_activity_state.html',
+        note: 'Adds focused state to WPE backend',
+      ),
     ],
   )
   Future<bool?> requestFocus({
@@ -1742,6 +1853,12 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
         apiName: 'NSWindow.makeFirstResponder',
         apiUrl:
             'https://developer.apple.com/documentation/appkit/nswindow/1419366-makefirstresponder',
+      ),
+      LinuxPlatform(
+        apiName: 'wpe_view_backend_remove_activity_state',
+        apiUrl:
+            'https://wpewebkit.org/reference/stable/wpe-platform-2.0/func.view_backend_remove_activity_state.html',
+        note: 'Removes focused state from WPE backend and blurs active element via JavaScript',
       ),
     ],
   )
@@ -1905,6 +2022,11 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
             'https://developer.apple.com/documentation/webkit/wkwebview/3794258-themecolor',
         note: 'On iOS < 15.0, this method is implemented using JavaScript.',
       ),
+      LinuxPlatform(
+        apiName: 'webkit_web_view_get_theme_color',
+        apiUrl:
+            'https://wpewebkit.org/reference/stable/wpe-webkit-2.0/method.WebView.get_theme_color.html',
+      ),
       MacOSPlatform(
         apiName: 'WKWebView.themeColor',
         apiUrl:
@@ -1998,6 +2120,11 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
       IOSPlatform(),
       MacOSPlatform(),
       WindowsPlatform(),
+      LinuxPlatform(
+        apiName: 'webkit_web_view_get_tls_info',
+        apiUrl:
+            'https://wpewebkit.org/reference/stable/wpe-webkit-2.0/method.WebView.get_tls_info.html',
+      ),
     ],
   )
   Future<SslCertificate?> getCertificate() {
@@ -2020,6 +2147,11 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
             'https://developer.apple.com/documentation/webkit/wkusercontentcontroller/1537448-adduserscript',
         note:
             "This method will throw an error if the [PlatformWebViewCreationParams.windowId] has been set. There isn't any way to add/remove user scripts specific to window WebViews. This is a limitation of the native WebKit APIs.",
+      ),
+      LinuxPlatform(
+        apiName: 'webkit_user_content_manager_add_script',
+        apiUrl:
+            'https://wpewebkit.org/reference/stable/wpe-webkit-2.0/method.UserContentManager.add_script.html',
       ),
       MacOSPlatform(
         apiName: 'WKUserContentController.addUserScript',
@@ -2050,6 +2182,7 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
         note:
             "This method will throw an error if the [PlatformWebViewCreationParams.windowId] has been set. There isn't any way to add/remove user scripts specific to window WebViews. This is a limitation of the native WebKit APIs.",
       ),
+      LinuxPlatform(),
       MacOSPlatform(
         note:
             "This method will throw an error if the [PlatformWebViewCreationParams.windowId] has been set. There isn't any way to add/remove user scripts specific to window WebViews. This is a limitation of the native WebKit APIs.",
@@ -2078,6 +2211,7 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
         note:
             "This method will throw an error if the [PlatformWebViewCreationParams.windowId] has been set. There isn't any way to add/remove user scripts specific to window WebViews. This is a limitation of the native WebKit APIs.",
       ),
+      LinuxPlatform(),
       MacOSPlatform(
         note:
             "This method will throw an error if the [PlatformWebViewCreationParams.windowId] has been set. There isn't any way to add/remove user scripts specific to window WebViews. This is a limitation of the native WebKit APIs.",
@@ -2105,6 +2239,7 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
         note:
             "This method will throw an error if the [PlatformWebViewCreationParams.windowId] has been set. There isn't any way to add/remove user scripts specific to window WebViews. This is a limitation of the native WebKit APIs.",
       ),
+      LinuxPlatform(),
       MacOSPlatform(
         note:
             "This method will throw an error if the [PlatformWebViewCreationParams.windowId] has been set. There isn't any way to add/remove user scripts specific to window WebViews. This is a limitation of the native WebKit APIs.",
@@ -2132,6 +2267,7 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
         note:
             "This method will throw an error if the [PlatformWebViewCreationParams.windowId] has been set. There isn't any way to add/remove user scripts specific to window WebViews. This is a limitation of the native WebKit APIs.",
       ),
+      LinuxPlatform(),
       MacOSPlatform(
         note:
             "This method will throw an error if the [PlatformWebViewCreationParams.windowId] has been set. There isn't any way to add/remove user scripts specific to window WebViews. This is a limitation of the native WebKit APIs.",
@@ -2160,6 +2296,11 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
             'https://developer.apple.com/documentation/webkit/wkusercontentcontroller/1536540-removealluserscripts',
         note:
             "This method will throw an error if the [PlatformWebViewCreationParams.windowId] has been set. There isn't any way to add/remove user scripts specific to window WebViews. This is a limitation of the native WebKit APIs.",
+      ),
+      LinuxPlatform(
+        apiName: 'webkit_user_content_manager_remove_all_scripts',
+        apiUrl:
+            'https://wpewebkit.org/reference/stable/wpe-webkit-2.0/method.UserContentManager.remove_all_scripts.html',
       ),
       MacOSPlatform(
         apiName: 'WKUserContentController.removeAllUserScripts',
@@ -2278,6 +2419,13 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
         note:
             'If [autoname] is `false`, the [filePath] must ends with the [WebArchiveFormat.WEBARCHIVE] file extension.',
       ),
+      LinuxPlatform(
+        apiName: 'webkit_web_view_save_to_file',
+        apiUrl:
+            'https://wpewebkit.org/reference/stable/wpe-webkit-2.0/method.WebView.save_to_file.html',
+        note:
+            'Saves as MHTML format. If [autoname] is `false`, the [filePath] must end with the .mht extension.',
+      ),
       MacOSPlatform(
         available: '11.0',
         note:
@@ -2306,6 +2454,7 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
         note: 'This method is implemented using JavaScript.',
       ),
       IOSPlatform(note: 'This method is implemented using JavaScript.'),
+      LinuxPlatform(note: 'This method is implemented using JavaScript.'),
       MacOSPlatform(note: 'This method is implemented using JavaScript.'),
       WebPlatform(
         apiName: 'Window.isSecureContext',
@@ -2546,6 +2695,11 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
             'This method should only be called if [WebViewFeature.isFeatureSupported] returns `true` for [WebViewFeature.WEB_MESSAGE_LISTENER].',
       ),
       IOSPlatform(note: 'This method is implemented using JavaScript.'),
+      LinuxPlatform(
+        note: 'This method is implemented using JavaScript.',
+        apiName: 'webkit_user_content_manager_add_script',
+        apiUrl: 'https://webkitgtk.org/reference/webkit2gtk/stable/method.UserContentManager.add_script.html',
+      ),
       MacOSPlatform(note: 'This method is implemented using JavaScript.'),
     ],
   )
@@ -2563,7 +2717,7 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.hasWebMessageListener.supported_platforms}
   @SupportedPlatforms(
-    platforms: [AndroidPlatform(), IOSPlatform(), MacOSPlatform()],
+    platforms: [AndroidPlatform(), IOSPlatform(), LinuxPlatform(), MacOSPlatform()],
   )
   bool hasWebMessageListener(PlatformWebMessageListener webMessageListener) {
     throw UnimplementedError(
@@ -2580,6 +2734,7 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
     platforms: [
       AndroidPlatform(),
       IOSPlatform(),
+      LinuxPlatform(note: 'This method is implemented using JavaScript.'),
       MacOSPlatform(note: 'This method is implemented using JavaScript.'),
       WebPlatform(),
     ],
@@ -2599,6 +2754,7 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
     platforms: [
       AndroidPlatform(),
       IOSPlatform(),
+      LinuxPlatform(note: 'This method is implemented using JavaScript.'),
       MacOSPlatform(note: 'This method is implemented using JavaScript.'),
       WebPlatform(),
     ],
@@ -2860,6 +3016,11 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
         apiUrl:
             'https://developer.apple.com/documentation/webkit/wkwebview/1414956-reloadfromorigin',
       ),
+      LinuxPlatform(
+        apiName: 'webkit_web_view_reload_bypass_cache',
+        apiUrl:
+            'https://wpewebkit.org/reference/stable/wpe-webkit-2.0/method.WebView.reload_bypass_cache.html',
+      ),
     ],
   )
   Future<void> reloadFromOrigin() {
@@ -2975,6 +3136,12 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
             'https://developer.apple.com/documentation/webkit/wkwebview/3752240-pauseallmediaplayback',
         available: '12.0',
       ),
+      LinuxPlatform(
+        apiName: 'JavaScript HTMLMediaElement.pause()',
+        apiUrl:
+            'https://developer.mozilla.org/en-US/docs/Web/API/HTMLMediaElement/pause',
+        note: 'Uses JavaScript to pause all audio and video elements',
+      ),
     ],
   )
   Future<void> pauseAllMediaPlayback() {
@@ -3005,6 +3172,12 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
             'https://developer.apple.com/documentation/webkit/wkwebview/3752242-setallmediaplaybacksuspended',
         available: '12.0',
       ),
+      LinuxPlatform(
+        apiName: 'JavaScript HTMLMediaElement.pause()/play()',
+        apiUrl:
+            'https://developer.mozilla.org/en-US/docs/Web/API/HTMLMediaElement',
+        note: 'Uses JavaScript to suspend/resume all media elements',
+      ),
     ],
   )
   Future<void> setAllMediaPlaybackSuspended({required bool suspended}) {
@@ -3031,6 +3204,12 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
         apiUrl:
             'https://developer.apple.com/documentation/webkit/wkwebview/3752235-closeallmediapresentations',
         available: '11.3',
+      ),
+      LinuxPlatform(
+        apiName: 'JavaScript Document.exitFullscreen()/exitPictureInPicture()',
+        apiUrl:
+            'https://developer.mozilla.org/en-US/docs/Web/API/Document/exitFullscreen',
+        note: 'Uses JavaScript to exit fullscreen and picture-in-picture modes',
       ),
     ],
   )
@@ -3060,6 +3239,12 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
         apiUrl:
             'https://developer.apple.com/documentation/webkit/wkwebview/3752241-requestmediaplaybackstate',
         available: '12.0',
+      ),
+      LinuxPlatform(
+        apiName: 'JavaScript HTMLMediaElement.paused',
+        apiUrl:
+            'https://developer.mozilla.org/en-US/docs/Web/API/HTMLMediaElement/paused',
+        note: 'Uses JavaScript to query media playback state',
       ),
     ],
   )
@@ -3192,6 +3377,12 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
             'https://developer.apple.com/documentation/webkit/wkwebview/3763093-cameracapturestate',
         available: '15.0',
       ),
+      LinuxPlatform(
+        apiName: 'webkit_web_view_get_camera_capture_state',
+        apiUrl:
+            'https://wpewebkit.org/reference/stable/wpe-webkit-2.0/method.WebView.get_camera_capture_state.html',
+        available: '2.34',
+      ),
       MacOSPlatform(
         apiName: 'WKWebView.cameraCaptureState',
         apiUrl:
@@ -3218,6 +3409,13 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
         apiUrl:
             'https://developer.apple.com/documentation/webkit/wkwebview/3763097-setcameracapturestate',
         available: '15.0',
+      ),
+      LinuxPlatform(
+        apiName: 'webkit_web_view_set_camera_capture_state',
+        apiUrl:
+            'https://wpewebkit.org/reference/stable/wpe-webkit-2.0/method.WebView.set_camera_capture_state.html',
+        available: '2.34',
+        note: 'Once state is set to NONE, it cannot be changed back. The page can request capture again using the mediaDevices API.',
       ),
       MacOSPlatform(
         apiName: 'WKWebView.setCameraCaptureState',
@@ -3246,6 +3444,12 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
             'https://developer.apple.com/documentation/webkit/wkwebview/3763096-microphonecapturestate',
         available: '15.0',
       ),
+      LinuxPlatform(
+        apiName: 'webkit_web_view_get_microphone_capture_state',
+        apiUrl:
+            'https://wpewebkit.org/reference/stable/wpe-webkit-2.0/method.WebView.get_microphone_capture_state.html',
+        available: '2.34',
+      ),
       MacOSPlatform(
         apiName: 'WKWebView.microphoneCaptureState',
         apiUrl:
@@ -3273,6 +3477,13 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
             'https://developer.apple.com/documentation/webkit/wkwebview/3763098-setmicrophonecapturestate',
         available: '15.0',
       ),
+      LinuxPlatform(
+        apiName: 'webkit_web_view_set_microphone_capture_state',
+        apiUrl:
+            'https://wpewebkit.org/reference/stable/wpe-webkit-2.0/method.WebView.set_microphone_capture_state.html',
+        available: '2.34',
+        note: 'Once state is set to NONE, it cannot be changed back. The page can request capture again using the mediaDevices API.',
+      ),
       MacOSPlatform(
         apiName: 'WKWebView.setMicrophoneCaptureState',
         apiUrl:
@@ -3284,6 +3495,106 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   Future<void> setMicrophoneCaptureState({required MediaCaptureState state}) {
     throw UnimplementedError(
       '${PlatformInAppWebViewControllerMethod.setMicrophoneCaptureState.name} is not implemented on the current platform',
+    );
+  }
+
+  ///{@template flutter_inappwebview_platform_interface.PlatformInAppWebViewController.isPlayingAudio}
+  ///Returns whether the webpage is playing audio.
+  ///
+  ///Returns `true` if the page is playing audio, `false` otherwise.
+  ///This is useful for providing visual feedback when a page is producing sound.
+  ///{@endtemplate}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.isPlayingAudio.supported_platforms}
+  @SupportedPlatforms(
+    platforms: [
+      LinuxPlatform(
+        apiName: 'webkit_web_view_is_playing_audio',
+        apiUrl:
+            'https://wpewebkit.org/reference/stable/wpe-webkit-2.0/method.WebView.is_playing_audio.html',
+        available: '2.8',
+      ),
+    ],
+  )
+  Future<bool> isPlayingAudio() {
+    throw UnimplementedError(
+      '${PlatformInAppWebViewControllerMethod.isPlayingAudio.name} is not implemented on the current platform',
+    );
+  }
+
+  ///{@template flutter_inappwebview_platform_interface.PlatformInAppWebViewController.isMuted}
+  ///Returns whether the webpage audio is muted.
+  ///
+  ///Returns `true` if the page audio is muted, `false` otherwise.
+  ///{@endtemplate}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.isMuted.supported_platforms}
+  @SupportedPlatforms(
+    platforms: [
+      LinuxPlatform(
+        apiName: 'webkit_web_view_get_is_muted',
+        apiUrl:
+            'https://wpewebkit.org/reference/stable/wpe-webkit-2.0/method.WebView.get_is_muted.html',
+        available: '2.30',
+      ),
+    ],
+  )
+  Future<bool> isMuted() {
+    throw UnimplementedError(
+      '${PlatformInAppWebViewControllerMethod.isMuted.name} is not implemented on the current platform',
+    );
+  }
+
+  ///{@template flutter_inappwebview_platform_interface.PlatformInAppWebViewController.setMuted}
+  ///Sets the mute state of the webpage.
+  ///
+  ///When [muted] is `true`, the webpage audio will be muted.
+  ///When [muted] is `false`, the webpage audio will be unmuted.
+  ///{@endtemplate}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.setMuted.supported_platforms}
+  @SupportedPlatforms(
+    platforms: [
+      LinuxPlatform(
+        apiName: 'webkit_web_view_set_is_muted',
+        apiUrl:
+            'https://wpewebkit.org/reference/stable/wpe-webkit-2.0/method.WebView.set_is_muted.html',
+        available: '2.30',
+      ),
+    ],
+  )
+  Future<void> setMuted({required bool muted}) {
+    throw UnimplementedError(
+      '${PlatformInAppWebViewControllerMethod.setMuted.name} is not implemented on the current platform',
+    );
+  }
+
+  ///{@template flutter_inappwebview_platform_interface.PlatformInAppWebViewController.terminateWebProcess}
+  ///Terminates the web process associated to the WebView.
+  ///
+  ///When the web process is terminated using this method, the
+  ///[PlatformWebViewCreationParams.onRenderProcessGone] callback is invoked
+  ///with the reason set to indicate the process was terminated by the API.
+  ///
+  ///**Note**: This is a destructive operation that will crash the web content.
+  ///Use this only when you need to forcefully kill an unresponsive or
+  ///misbehaving web process.
+  ///{@endtemplate}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.terminateWebProcess.supported_platforms}
+  @SupportedPlatforms(
+    platforms: [
+      LinuxPlatform(
+        apiName: 'webkit_web_view_terminate_web_process',
+        apiUrl:
+            'https://wpewebkit.org/reference/stable/wpe-webkit-2.0/method.WebView.terminate_web_process.html',
+        available: '2.34',
+      ),
+    ],
+  )
+  Future<void> terminateWebProcess() {
+    throw UnimplementedError(
+      '${PlatformInAppWebViewControllerMethod.terminateWebProcess.name} is not implemented on the current platform',
     );
   }
 
@@ -3478,6 +3789,7 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
             'https://developer.apple.com/documentation/webkit/wkwebview/3752236-interactionstate',
         available: '12.0',
       ),
+      LinuxPlatform(),
     ],
   )
   Future<Uint8List?> saveState() {
@@ -3515,6 +3827,7 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
             'https://developer.apple.com/documentation/webkit/wkwebview/3752236-interactionstate',
         available: '12.0',
       ),
+      LinuxPlatform(),
     ],
   )
   Future<bool> restoreState(Uint8List state) {
@@ -3818,6 +4131,9 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
             'https://developer.apple.com/documentation/webkit/wkwebview/2875370-handlesurlscheme',
         available: '10.13',
       ),
+      LinuxPlatform(
+        note: 'Returns true for built-in schemes (http, https, file, ftp, data, blob, about, javascript).',
+      ),
     ],
   )
   Future<bool> handlesURLScheme(String urlScheme) {
@@ -3837,6 +4153,7 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
       IOSPlatform(),
       MacOSPlatform(),
       WindowsPlatform(),
+      LinuxPlatform(),
     ],
   )
   Future<void> disposeKeepAlive(InAppWebViewKeepAlive keepAlive) {
@@ -3853,7 +4170,7 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.clearAllCache.supported_platforms}
   @SupportedPlatforms(
-    platforms: [AndroidPlatform(), IOSPlatform(), MacOSPlatform()],
+    platforms: [AndroidPlatform(), IOSPlatform(), MacOSPlatform(), LinuxPlatform()],
   )
   Future<void> clearAllCache({bool includeDiskFiles = true}) {
     throw UnimplementedError(
@@ -3908,6 +4225,7 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
       MacOSPlatform(),
       WebPlatform(),
       WindowsPlatform(),
+      LinuxPlatform(),
     ],
   )
   Future<void> setJavaScriptBridgeName(String bridgeName) {
@@ -3930,6 +4248,7 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
       MacOSPlatform(),
       WebPlatform(),
       WindowsPlatform(),
+      LinuxPlatform(),
     ],
   )
   Future<String> getJavaScriptBridgeName() {
@@ -3950,6 +4269,7 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
       MacOSPlatform(),
       WebPlatform(),
       WindowsPlatform(),
+      LinuxPlatform(),
     ],
   )
   Future<String> get tRexRunnerHtml => throw UnimplementedError(
@@ -3968,6 +4288,7 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
       MacOSPlatform(),
       WebPlatform(),
       WindowsPlatform(),
+      LinuxPlatform(),
     ],
   )
   Future<String> get tRexRunnerCss => throw UnimplementedError(

@@ -1,12 +1,16 @@
 import 'dart:collection';
 import 'dart:convert';
 import 'dart:core';
+import 'dart:io';
 import 'dart:typed_data';
+import 'dart:developer' as developer;
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_platform_interface.dart';
 
+import '../find_interaction/find_interaction_controller.dart';
+import '../web_message/web_message_listener.dart';
 import '_static_channel.dart';
 
 /// Object specifying creation parameters for creating a [LinuxInAppWebViewController].
@@ -18,14 +22,19 @@ import '_static_channel.dart';
 class LinuxInAppWebViewControllerCreationParams
     extends PlatformInAppWebViewControllerCreationParams {
   /// Creates a new [LinuxInAppWebViewControllerCreationParams] instance.
-  const LinuxInAppWebViewControllerCreationParams(
-      {required super.id, super.webviewParams});
+  const LinuxInAppWebViewControllerCreationParams({
+    required super.id,
+    super.webviewParams,
+  });
 
   /// Creates a [LinuxInAppWebViewControllerCreationParams] instance based on [PlatformInAppWebViewControllerCreationParams].
   factory LinuxInAppWebViewControllerCreationParams.fromPlatformInAppWebViewControllerCreationParams(
-      PlatformInAppWebViewControllerCreationParams params) {
+    PlatformInAppWebViewControllerCreationParams params,
+  ) {
     return LinuxInAppWebViewControllerCreationParams(
-        id: params.id, webviewParams: params.webviewParams);
+      id: params.id,
+      webviewParams: params.webviewParams,
+    );
   }
 }
 
@@ -41,24 +50,34 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController
   Map<String, Function> _javaScriptHandlersMap = HashMap<String, Function>();
   Map<UserScriptInjectionTime, List<UserScript>> _userScripts = {
     UserScriptInjectionTime.AT_DOCUMENT_START: <UserScript>[],
-    UserScriptInjectionTime.AT_DOCUMENT_END: <UserScript>[]
+    UserScriptInjectionTime.AT_DOCUMENT_END: <UserScript>[],
   };
+  Set<LinuxWebMessageListener> _webMessageListeners = Set();
   Set<String> _webMessageListenerObjNames = Set();
   Map<String, ScriptHtmlTagAttributes> _injectedScriptsFromURL = {};
 
   // static map that contains the properties to be saved and restored for keep alive feature
   static final Map<InAppWebViewKeepAlive, InAppWebViewControllerKeepAliveProps?>
-      _keepAliveMap = {};
+  _keepAliveMap = {};
 
   dynamic _controllerFromPlatform;
 
+  late LinuxFindInteractionController findInteractionController;
+
   LinuxInAppWebViewController(
-      PlatformInAppWebViewControllerCreationParams params)
-      : super.implementation(
-            params is LinuxInAppWebViewControllerCreationParams
-                ? params
-                : LinuxInAppWebViewControllerCreationParams
-                    .fromPlatformInAppWebViewControllerCreationParams(params)) {
+    PlatformInAppWebViewControllerCreationParams params,
+  ) : super.implementation(
+        params is LinuxInAppWebViewControllerCreationParams
+            ? params
+            : LinuxInAppWebViewControllerCreationParams.fromPlatformInAppWebViewControllerCreationParams(
+                params,
+              ),
+      ) {
+    findInteractionController = LinuxFindInteractionController(
+      PlatformFindInteractionControllerCreationParams(),
+    );
+    findInteractionController.setController(this);
+
     channel = MethodChannel('com.pichillilorenzo/flutter_inappwebview_$id');
     handler = _handleMethod;
     initMethodCallHandler();
@@ -68,13 +87,13 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController
       for (final userScript in initialUserScripts) {
         if (userScript.injectionTime ==
             UserScriptInjectionTime.AT_DOCUMENT_START) {
-          this
-              ._userScripts[UserScriptInjectionTime.AT_DOCUMENT_START]
-              ?.add(userScript);
+          this._userScripts[UserScriptInjectionTime.AT_DOCUMENT_START]?.add(
+            userScript,
+          );
         } else {
-          this
-              ._userScripts[UserScriptInjectionTime.AT_DOCUMENT_END]
-              ?.add(userScript);
+          this._userScripts[UserScriptInjectionTime.AT_DOCUMENT_END]?.add(
+            userScript,
+          );
         }
       }
     }
@@ -84,7 +103,8 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController
 
   static final LinuxInAppWebViewController _staticValue =
       LinuxInAppWebViewController(
-          LinuxInAppWebViewControllerCreationParams(id: null));
+        LinuxInAppWebViewControllerCreationParams(id: null),
+      );
 
   factory LinuxInAppWebViewController.static() {
     return _staticValue;
@@ -103,10 +123,11 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController
         if (props == null) {
           // save controller properties to restore it later
           _keepAliveMap[keepAlive] = InAppWebViewControllerKeepAliveProps(
-              injectedScriptsFromURL: _injectedScriptsFromURL,
-              javaScriptHandlersMap: _javaScriptHandlersMap,
-              userScripts: _userScripts,
-              webMessageListenerObjNames: _webMessageListenerObjNames);
+            injectedScriptsFromURL: _injectedScriptsFromURL,
+            javaScriptHandlersMap: _javaScriptHandlersMap,
+            userScripts: _userScripts,
+            webMessageListenerObjNames: _webMessageListenerObjNames,
+          );
         } else {
           // restore controller properties
           _injectedScriptsFromURL = props.injectedScriptsFromURL;
@@ -120,13 +141,13 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController
 
   _debugLog(String method, dynamic args) {
     debugLog(
-        className: this.runtimeType.toString(),
-        name: "WebView",
-        id: id?.toString(),
-        debugLoggingSettings:
-            PlatformInAppWebViewController.debugLoggingSettings,
-        method: method,
-        args: args);
+      className: this.runtimeType.toString(),
+      name: "WebView",
+      id: id?.toString(),
+      debugLoggingSettings: PlatformInAppWebViewController.debugLoggingSettings,
+      method: method,
+      args: args,
+    );
   }
 
   Future<dynamic> _handleMethod(MethodCall call) async {
@@ -154,12 +175,12 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController
       case "shouldOverrideUrlLoading":
         if (webviewParams != null &&
             webviewParams!.shouldOverrideUrlLoading != null) {
-          Map<String, dynamic> arguments =
-              call.arguments.cast<String, dynamic>();
+          Map<String, dynamic> arguments = call.arguments
+              .cast<String, dynamic>();
 
           // Build NavigationAction from arguments
-          Map<String, dynamic>? requestMap =
-              arguments["request"]?.cast<String, dynamic>();
+          Map<String, dynamic>? requestMap = arguments["request"]
+              ?.cast<String, dynamic>();
           WebUri? url;
           if (requestMap != null && requestMap["url"] != null) {
             url = WebUri(requestMap["url"]);
@@ -169,31 +190,48 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController
             request: URLRequest(url: url),
             isForMainFrame: arguments["isForMainFrame"] ?? true,
             navigationType: NavigationType.fromNativeValue(
-                arguments["navigationType"] ?? 0),
+              arguments["navigationType"] ?? 0,
+            ),
           );
 
           NavigationActionPolicy? result =
               await webviewParams!.shouldOverrideUrlLoading!(
-                  _controllerFromPlatform, navigationAction);
+                _controllerFromPlatform,
+                navigationAction,
+              );
 
           // Return the decision directly to native (supports invokeMethodWithResult pattern)
           return result?.toNativeValue();
         }
         break;
       case "onProgressChanged":
-        if (webviewParams != null &&
-            webviewParams!.onProgressChanged != null) {
+        if (webviewParams != null && webviewParams!.onProgressChanged != null) {
           int progress = call.arguments["progress"];
           webviewParams!.onProgressChanged!(_controllerFromPlatform, progress);
         }
         break;
       case "onConsoleMessage":
         if (webviewParams != null && webviewParams!.onConsoleMessage != null) {
-          Map<String, dynamic> arguments =
-              call.arguments.cast<String, dynamic>();
+          Map<String, dynamic> arguments = call.arguments
+              .cast<String, dynamic>();
           ConsoleMessage consoleMessage = ConsoleMessage.fromMap(arguments)!;
           webviewParams!.onConsoleMessage!(
-              _controllerFromPlatform, consoleMessage);
+            _controllerFromPlatform,
+            consoleMessage,
+          );
+        }
+        break;
+      case "onLoadResource":
+        if (webviewParams != null && webviewParams!.onLoadResource != null) {
+          Map<String, dynamic> arguments = call.arguments
+              .cast<String, dynamic>();
+          LoadedResource resource = LoadedResource(
+            url: arguments["url"] != null ? WebUri(arguments["url"]) : null,
+            initiatorType: arguments["initiatorType"],
+            startTime: arguments["startTime"]?.toDouble(),
+            duration: arguments["duration"]?.toDouble(),
+          );
+          webviewParams!.onLoadResource!(_controllerFromPlatform, resource);
         }
         break;
       case "onTitleChanged":
@@ -209,32 +247,45 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController
           WebUri? uri = url != null ? WebUri(url) : null;
           bool? isReload = call.arguments["isReload"];
           webviewParams!.onUpdateVisitedHistory!(
-              _controllerFromPlatform, uri, isReload);
+            _controllerFromPlatform,
+            uri,
+            isReload,
+          );
         }
         break;
       case "onReceivedError":
         if (webviewParams != null && webviewParams!.onReceivedError != null) {
-          Map<String, dynamic> arguments =
-              call.arguments.cast<String, dynamic>();
+          Map<String, dynamic> arguments = call.arguments
+              .cast<String, dynamic>();
           WebResourceRequest request = WebResourceRequest.fromMap(
-              arguments["request"]?.cast<String, dynamic>())!;
+            arguments["request"]?.cast<String, dynamic>(),
+          )!;
           WebResourceError error = WebResourceError.fromMap(
-              arguments["error"]?.cast<String, dynamic>())!;
+            arguments["error"]?.cast<String, dynamic>(),
+          )!;
           webviewParams!.onReceivedError!(
-              _controllerFromPlatform, request, error);
+            _controllerFromPlatform,
+            request,
+            error,
+          );
         }
         break;
       case "onReceivedHttpError":
         if (webviewParams != null &&
             webviewParams!.onReceivedHttpError != null) {
-          Map<String, dynamic> arguments =
-              call.arguments.cast<String, dynamic>();
+          Map<String, dynamic> arguments = call.arguments
+              .cast<String, dynamic>();
           WebResourceRequest request = WebResourceRequest.fromMap(
-              arguments["request"]?.cast<String, dynamic>())!;
+            arguments["request"]?.cast<String, dynamic>(),
+          )!;
           WebResourceResponse errorResponse = WebResourceResponse.fromMap(
-              arguments["errorResponse"]?.cast<String, dynamic>())!;
+            arguments["errorResponse"]?.cast<String, dynamic>(),
+          )!;
           webviewParams!.onReceivedHttpError!(
-              _controllerFromPlatform, request, errorResponse);
+            _controllerFromPlatform,
+            request,
+            errorResponse,
+          );
         }
         break;
       case "onPageCommitVisible":
@@ -251,7 +302,10 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController
           double oldScale = call.arguments["oldScale"];
           double newScale = call.arguments["newScale"];
           webviewParams!.onZoomScaleChanged!(
-              _controllerFromPlatform, oldScale, newScale);
+            _controllerFromPlatform,
+            oldScale,
+            newScale,
+          );
         }
         break;
       case "onScrollChanged":
@@ -268,86 +322,112 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController
         break;
       case "onCreateWindow":
         if (webviewParams != null && webviewParams!.onCreateWindow != null) {
-          Map<String, dynamic> arguments =
-              call.arguments.cast<String, dynamic>();
-          CreateWindowAction createWindowAction =
-              CreateWindowAction.fromMap(arguments)!;
+          Map<String, dynamic> arguments = call.arguments
+              .cast<String, dynamic>();
+          CreateWindowAction createWindowAction = CreateWindowAction.fromMap(
+            arguments,
+          )!;
           return await webviewParams!.onCreateWindow!(
-              _controllerFromPlatform, createWindowAction);
+            _controllerFromPlatform,
+            createWindowAction,
+          );
         }
         return false;
       case "onJsAlert":
         if (webviewParams != null && webviewParams!.onJsAlert != null) {
-          Map<String, dynamic> arguments =
-              call.arguments.cast<String, dynamic>();
+          Map<String, dynamic> arguments = call.arguments
+              .cast<String, dynamic>();
           JsAlertRequest jsAlertRequest = JsAlertRequest.fromMap(arguments)!;
           JsAlertResponse? response = await webviewParams!.onJsAlert!(
-              _controllerFromPlatform, jsAlertRequest);
+            _controllerFromPlatform,
+            jsAlertRequest,
+          );
           return response?.toMap();
         }
         return null;
       case "onJsConfirm":
         if (webviewParams != null && webviewParams!.onJsConfirm != null) {
-          Map<String, dynamic> arguments =
-              call.arguments.cast<String, dynamic>();
-          JsConfirmRequest jsConfirmRequest =
-              JsConfirmRequest.fromMap(arguments)!;
+          Map<String, dynamic> arguments = call.arguments
+              .cast<String, dynamic>();
+          JsConfirmRequest jsConfirmRequest = JsConfirmRequest.fromMap(
+            arguments,
+          )!;
           JsConfirmResponse? response = await webviewParams!.onJsConfirm!(
-              _controllerFromPlatform, jsConfirmRequest);
+            _controllerFromPlatform,
+            jsConfirmRequest,
+          );
           return response?.toMap();
         }
         return null;
       case "onJsPrompt":
         if (webviewParams != null && webviewParams!.onJsPrompt != null) {
-          Map<String, dynamic> arguments =
-              call.arguments.cast<String, dynamic>();
+          Map<String, dynamic> arguments = call.arguments
+              .cast<String, dynamic>();
           JsPromptRequest jsPromptRequest = JsPromptRequest.fromMap(arguments)!;
           JsPromptResponse? response = await webviewParams!.onJsPrompt!(
-              _controllerFromPlatform, jsPromptRequest);
+            _controllerFromPlatform,
+            jsPromptRequest,
+          );
           return response?.toMap();
         }
         return null;
       case "onJsBeforeUnload":
         if (webviewParams != null && webviewParams!.onJsBeforeUnload != null) {
-          Map<String, dynamic> arguments =
-              call.arguments.cast<String, dynamic>();
+          Map<String, dynamic> arguments = call.arguments
+              .cast<String, dynamic>();
           JsBeforeUnloadRequest jsBeforeUnloadRequest =
               JsBeforeUnloadRequest.fromMap(arguments)!;
           JsBeforeUnloadResponse? response =
               await webviewParams!.onJsBeforeUnload!(
-                  _controllerFromPlatform, jsBeforeUnloadRequest);
+                _controllerFromPlatform,
+                jsBeforeUnloadRequest,
+              );
           return response?.toMap();
         }
         return null;
       case "onPermissionRequest":
         if (webviewParams != null &&
             webviewParams!.onPermissionRequest != null) {
-          Map<String, dynamic> arguments =
-              call.arguments.cast<String, dynamic>();
-          PermissionRequest permissionRequest =
-              PermissionRequest.fromMap(arguments)!;
-          PermissionResponse? response =
-              await webviewParams!.onPermissionRequest!(
-                  _controllerFromPlatform, permissionRequest);
+          Map<String, dynamic> arguments = call.arguments
+              .cast<String, dynamic>();
+          PermissionRequest permissionRequest = PermissionRequest.fromMap(
+            arguments,
+          )!;
+          PermissionResponse? response = await webviewParams!
+              .onPermissionRequest!(_controllerFromPlatform, permissionRequest);
           return response?.toMap();
         }
         return null;
       case "onReceivedHttpAuthRequest":
         if (webviewParams != null &&
             webviewParams!.onReceivedHttpAuthRequest != null) {
-          Map<String, dynamic> arguments =
-              call.arguments.cast<String, dynamic>();
+          Map<String, dynamic> arguments = call.arguments
+              .cast<String, dynamic>();
           HttpAuthenticationChallenge challenge =
               HttpAuthenticationChallenge.fromMap(arguments)!;
-          HttpAuthResponse? response =
-              await webviewParams!.onReceivedHttpAuthRequest!(
-                  _controllerFromPlatform, challenge);
+          HttpAuthResponse? response = await webviewParams!
+              .onReceivedHttpAuthRequest!(_controllerFromPlatform, challenge);
+          return response?.toMap();
+        }
+        return null;
+      case "onReceivedServerTrustAuthRequest":
+        if (webviewParams != null &&
+            webviewParams!.onReceivedServerTrustAuthRequest != null) {
+          Map<String, dynamic> arguments = call.arguments
+              .cast<String, dynamic>();
+          ServerTrustChallenge challenge = ServerTrustChallenge.fromMap(
+            arguments,
+          )!;
+          ServerTrustAuthResponse? response =
+              await webviewParams!.onReceivedServerTrustAuthRequest!(
+                _controllerFromPlatform,
+                challenge,
+              );
           return response?.toMap();
         }
         return null;
       case "onEnterFullscreen":
-        if (webviewParams != null &&
-            webviewParams!.onEnterFullscreen != null) {
+        if (webviewParams != null && webviewParams!.onEnterFullscreen != null) {
           webviewParams!.onEnterFullscreen!(_controllerFromPlatform);
         }
         break;
@@ -365,18 +445,20 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController
             // Create a placeholder Uint8List since we don't have the actual icon
             // The favicon URL could be used to download the icon if needed
             webviewParams!.onReceivedIcon!(
-                _controllerFromPlatform, Uint8List(0));
+              _controllerFromPlatform,
+              Uint8List(0),
+            );
           }
         }
         break;
       case "onCreateContextMenu":
         ContextMenu? contextMenu = webviewParams?.contextMenu;
         if (contextMenu != null && contextMenu.onCreateContextMenu != null) {
-          Map<String, dynamic> arguments =
-              call.arguments.cast<String, dynamic>();
+          Map<String, dynamic> arguments = call.arguments
+              .cast<String, dynamic>();
           String typeStr = arguments["type"] ?? "UNKNOWN_TYPE";
           String extra = arguments["extra"] ?? "";
-          
+
           // Map type string to InAppWebViewHitTestResultType
           InAppWebViewHitTestResultType type;
           switch (typeStr) {
@@ -395,7 +477,7 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController
             default:
               type = InAppWebViewHitTestResultType.UNKNOWN_TYPE;
           }
-          
+
           InAppWebViewHitTestResult hitTestResult = InAppWebViewHitTestResult(
             type: type,
             extra: extra.isNotEmpty ? extra : null,
@@ -412,17 +494,17 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController
       case "onContextMenuActionItemClicked":
         ContextMenu? contextMenu = webviewParams?.contextMenu;
         if (contextMenu != null) {
-          Map<String, dynamic> arguments =
-              call.arguments.cast<String, dynamic>();
+          Map<String, dynamic> arguments = call.arguments
+              .cast<String, dynamic>();
           String id = arguments["id"] ?? "";
           String title = arguments["title"] ?? "";
-          
+
           ContextMenuItem menuItemClicked = ContextMenuItem(
             id: id,
             title: title,
             action: null,
           );
-          
+
           // Check if this matches any custom menu items
           for (var menuItem in contextMenu.menuItems) {
             if (menuItem.id == id) {
@@ -433,31 +515,239 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController
               break;
             }
           }
-          
+
           if (contextMenu.onContextMenuActionItemClicked != null) {
             contextMenu.onContextMenuActionItemClicked!(menuItemClicked);
           }
         }
         break;
-      case "onCallJsHandler":
-        if (webviewParams != null) {
-          String handlerName = call.arguments["handlerName"];
-          // Arguments are passed as a JSON string
-          Map<String, dynamic>? data =
-              call.arguments["data"]?.cast<String, dynamic>();
-          Function? jsHandler = _javaScriptHandlersMap[handlerName];
-          if (jsHandler != null) {
-            // Decode args from JSON string
-            List<dynamic> args = [];
-            if (data != null && data["args"] != null) {
-              try {
-                args = jsonDecode(data["args"]);
-              } catch (_) {}
-            }
-            return await jsHandler(args);
+
+      case "onRenderProcessGone":
+        if (webviewParams != null &&
+            webviewParams!.onRenderProcessGone != null) {
+          Map<String, dynamic> arguments = call.arguments
+              .cast<String, dynamic>();
+          RenderProcessGoneDetail detail = RenderProcessGoneDetail.fromMap(
+            arguments,
+          )!;
+          webviewParams!.onRenderProcessGone!(_controllerFromPlatform, detail);
+        }
+        break;
+      case "onShowFileChooser":
+        if (webviewParams != null && webviewParams!.onShowFileChooser != null) {
+          Map<String, dynamic> arguments = call.arguments
+              .cast<String, dynamic>();
+          ShowFileChooserRequest request = ShowFileChooserRequest.fromMap(
+            arguments,
+          )!;
+          ShowFileChooserResponse? response = await webviewParams!
+              .onShowFileChooser!(_controllerFromPlatform, request);
+          // Return file paths list or null
+          return response?.filePaths;
+        }
+        return null;
+      case "onFindResultReceived":
+        if (webviewParams != null &&
+            webviewParams!.onFindResultReceived != null) {
+          int activeMatchOrdinal = call.arguments["activeMatchOrdinal"];
+          int numberOfMatches = call.arguments["numberOfMatches"];
+          bool isDoneCounting = call.arguments["isDoneCounting"];
+          webviewParams!.onFindResultReceived!(
+            _controllerFromPlatform,
+            activeMatchOrdinal,
+            numberOfMatches,
+            isDoneCounting,
+          );
+        }
+        break;
+      case "onLoadResourceWithCustomScheme":
+        if (webviewParams != null &&
+            (webviewParams!.onLoadResourceWithCustomScheme != null ||
+                // ignore: deprecated_member_use_from_same_package
+                webviewParams!.onLoadResourceCustomScheme != null)) {
+          Map<String, dynamic> requestMap = call.arguments
+              .cast<String, dynamic>();
+          WebResourceRequest request = WebResourceRequest.fromMap(requestMap)!;
+
+          if (webviewParams!.onLoadResourceWithCustomScheme != null) {
+            return (await webviewParams!.onLoadResourceWithCustomScheme!(
+              _controllerFromPlatform,
+              request,
+            ))?.toMap();
+          } else {
+            return (await webviewParams!
+                    // ignore: deprecated_member_use_from_same_package
+                    .onLoadResourceCustomScheme!(
+                  _controllerFromPlatform,
+                  request.url,
+                ))
+                ?.toMap();
           }
         }
         break;
+      case "onCallJsHandler":
+        String handlerName = call.arguments["handlerName"];
+        Map<String, dynamic> handlerDataMap = call.arguments["data"]
+            .cast<String, dynamic>();
+        // decode args to json
+        handlerDataMap["args"] = jsonDecode(handlerDataMap["args"]);
+        final handlerData = JavaScriptHandlerFunctionData.fromMap(
+          handlerDataMap,
+        )!;
+
+        _debugLog(handlerName, handlerData);
+
+        switch (handlerName) {
+          case "onLoadResource":
+            if (webviewParams != null &&
+                webviewParams!.onLoadResource != null) {
+              Map<String, dynamic> arguments = handlerData.args[0]
+                  .cast<String, dynamic>();
+              arguments["startTime"] = arguments["startTime"] is int
+                  ? arguments["startTime"].toDouble()
+                  : arguments["startTime"];
+              arguments["duration"] = arguments["duration"] is int
+                  ? arguments["duration"].toDouble()
+                  : arguments["duration"];
+
+              var response = LoadedResource.fromMap(arguments)!;
+              webviewParams!.onLoadResource!(_controllerFromPlatform, response);
+            }
+            return null;
+          case "shouldInterceptAjaxRequest":
+            if (webviewParams != null &&
+                webviewParams!.shouldInterceptAjaxRequest != null) {
+              Map<String, dynamic> arguments = handlerData.args[0]
+                  .cast<String, dynamic>();
+              AjaxRequest request = AjaxRequest.fromMap(arguments)!;
+              return jsonEncode(
+                await webviewParams!.shouldInterceptAjaxRequest!(
+                  _controllerFromPlatform,
+                  request,
+                ),
+              );
+            }
+            return null;
+          case "onAjaxReadyStateChange":
+            if (webviewParams != null &&
+                webviewParams!.onAjaxReadyStateChange != null) {
+              Map<String, dynamic> arguments = handlerData.args[0]
+                  .cast<String, dynamic>();
+              AjaxRequest request = AjaxRequest.fromMap(arguments)!;
+              return jsonEncode(
+                (await webviewParams!.onAjaxReadyStateChange!(
+                  _controllerFromPlatform,
+                  request,
+                ))?.toNativeValue(),
+              );
+            }
+            return null;
+          case "onAjaxProgress":
+            if (webviewParams != null &&
+                webviewParams!.onAjaxProgress != null) {
+              Map<String, dynamic> arguments = handlerData.args[0]
+                  .cast<String, dynamic>();
+              AjaxRequest request = AjaxRequest.fromMap(arguments)!;
+              return jsonEncode(
+                (await webviewParams!.onAjaxProgress!(
+                  _controllerFromPlatform,
+                  request,
+                ))?.toNativeValue(),
+              );
+            }
+            return null;
+          case "shouldInterceptFetchRequest":
+            if (webviewParams != null &&
+                webviewParams!.shouldInterceptFetchRequest != null) {
+              Map<String, dynamic> arguments = handlerData.args[0]
+                  .cast<String, dynamic>();
+              FetchRequest request = FetchRequest.fromMap(arguments)!;
+              return jsonEncode(
+                await webviewParams!.shouldInterceptFetchRequest!(
+                  _controllerFromPlatform,
+                  request,
+                ),
+              );
+            }
+            return null;
+          case "onWindowFocus":
+            if (webviewParams != null && webviewParams!.onWindowFocus != null)
+              webviewParams!.onWindowFocus!(_controllerFromPlatform);
+            return null;
+          case "onWindowBlur":
+            if (webviewParams != null && webviewParams!.onWindowBlur != null)
+              webviewParams!.onWindowBlur!(_controllerFromPlatform);
+            return null;
+          case "onInjectedScriptLoaded":
+            String id = handlerData.args[0];
+            var onLoadCallback = _injectedScriptsFromURL[id]?.onLoad;
+            if (webviewParams != null && onLoadCallback != null) {
+              onLoadCallback();
+            }
+            return null;
+          case "onInjectedScriptError":
+            String id = handlerData.args[0];
+            var onErrorCallback = _injectedScriptsFromURL[id]?.onError;
+            if (webviewParams != null && onErrorCallback != null) {
+              onErrorCallback();
+            }
+            return null;
+          case "onWebMessageListenerPostMessageReceived":
+            Map<String, dynamic> arguments = handlerData.args[0]
+                .cast<String, dynamic>();
+            String jsObjectName = arguments["jsObjectName"];
+            // Find the corresponding web message listener
+            for (var listener in _webMessageListeners) {
+              if (listener.params.jsObjectName == jsObjectName) {
+                // Forward to the listener's channel
+                Map<String, dynamic>? messageMap = arguments["message"]
+                    ?.cast<String, dynamic>();
+                WebMessage? message = messageMap != null
+                    ? WebMessage.fromMap(messageMap)
+                    : null;
+                String? sourceOrigin = arguments["sourceOrigin"];
+                bool isMainFrame = arguments["isMainFrame"] ?? true;
+                // Call the listener's onPostMessage callback via channel
+                listener.channel?.invokeMethod("onPostMessage", {
+                  "message": message?.toMap(),
+                  "sourceOrigin": sourceOrigin,
+                  "isMainFrame": isMainFrame,
+                });
+                break;
+              }
+            }
+            return null;
+        }
+
+        if (_javaScriptHandlersMap.containsKey(handlerName)) {
+          // convert result to json
+          try {
+            var jsHandlerResult = null;
+            if (_javaScriptHandlersMap[handlerName]
+                is JavaScriptHandlerCallback) {
+              jsHandlerResult =
+                  await (_javaScriptHandlersMap[handlerName]
+                      as JavaScriptHandlerCallback)(handlerData.args);
+            } else if (_javaScriptHandlersMap[handlerName]
+                is JavaScriptHandlerFunction) {
+              jsHandlerResult =
+                  await (_javaScriptHandlersMap[handlerName]
+                      as JavaScriptHandlerFunction)(handlerData);
+            } else {
+              jsHandlerResult = await _javaScriptHandlersMap[handlerName]!();
+            }
+            return jsonEncode(jsHandlerResult);
+          } catch (error, stacktrace) {
+            developer.log(
+              error.toString() + '\n' + stacktrace.toString(),
+              name: 'JavaScript Handler "$handlerName"',
+            );
+            throw Exception(error.toString().replaceFirst('Exception: ', ''));
+          }
+        }
+        break;
+      default:
+        throw UnimplementedError("Unimplemented ${call.method} method");
     }
     return null;
   }
@@ -476,29 +766,35 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController
   }
 
   @override
-  Future<void> loadUrl(
-      {required URLRequest urlRequest,
-      @Deprecated('Use allowingReadAccessTo instead')
-      Uri? iosAllowingReadAccessTo,
-      WebUri? allowingReadAccessTo}) async {
+  Future<void> loadUrl({
+    required URLRequest urlRequest,
+    @Deprecated('Use allowingReadAccessTo instead')
+    Uri? iosAllowingReadAccessTo,
+    WebUri? allowingReadAccessTo,
+  }) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('urlRequest', () => urlRequest.toMap());
-    args.putIfAbsent('allowingReadAccessTo',
-        () => allowingReadAccessTo?.toString() ?? iosAllowingReadAccessTo?.toString());
+    args.putIfAbsent(
+      'allowingReadAccessTo',
+      () =>
+          allowingReadAccessTo?.toString() ??
+          iosAllowingReadAccessTo?.toString(),
+    );
     await channel?.invokeMethod('loadUrl', args);
   }
 
   @override
-  Future<void> loadData(
-      {required String data,
-      String mimeType = "text/html",
-      String encoding = "utf8",
-      WebUri? baseUrl,
-      @Deprecated('Use historyUrl instead') Uri? androidHistoryUrl,
-      WebUri? historyUrl,
-      @Deprecated('Use allowingReadAccessTo instead')
-      Uri? iosAllowingReadAccessTo,
-      WebUri? allowingReadAccessTo}) async {
+  Future<void> loadData({
+    required String data,
+    String mimeType = "text/html",
+    String encoding = "utf8",
+    WebUri? baseUrl,
+    @Deprecated('Use historyUrl instead') Uri? androidHistoryUrl,
+    WebUri? historyUrl,
+    @Deprecated('Use allowingReadAccessTo instead')
+    Uri? iosAllowingReadAccessTo,
+    WebUri? allowingReadAccessTo,
+  }) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('data', () => data);
     args.putIfAbsent('mimeType', () => mimeType);
@@ -511,6 +807,12 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController
   Future<void> reload() async {
     Map<String, dynamic> args = <String, dynamic>{};
     await channel?.invokeMethod('reload', args);
+  }
+
+  @override
+  Future<void> reloadFromOrigin() async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    await channel?.invokeMethod('reloadFromOrigin', args);
   }
 
   @override
@@ -563,8 +865,10 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController
   }
 
   @override
-  Future<dynamic> evaluateJavascript(
-      {required String source, ContentWorld? contentWorld}) async {
+  Future<dynamic> evaluateJavascript({
+    required String source,
+    ContentWorld? contentWorld,
+  }) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('source', () => source);
     if (contentWorld != null) {
@@ -580,13 +884,16 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController
   }
 
   @override
-  Future<void> injectJavascriptFileFromUrl(
-      {required WebUri urlFile,
-      ScriptHtmlTagAttributes? scriptHtmlTagAttributes}) async {
+  Future<void> injectJavascriptFileFromUrl({
+    required WebUri urlFile,
+    ScriptHtmlTagAttributes? scriptHtmlTagAttributes,
+  }) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('urlFile', () => urlFile.toString());
     args.putIfAbsent(
-        'scriptHtmlTagAttributes', () => scriptHtmlTagAttributes?.toMap());
+      'scriptHtmlTagAttributes',
+      () => scriptHtmlTagAttributes?.toMap(),
+    );
     await channel?.invokeMethod('injectJavascriptFileFromUrl', args);
   }
 
@@ -598,13 +905,16 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController
   }
 
   @override
-  Future<void> injectCSSFileFromUrl(
-      {required WebUri urlFile,
-      CSSLinkHtmlTagAttributes? cssLinkHtmlTagAttributes}) async {
+  Future<void> injectCSSFileFromUrl({
+    required WebUri urlFile,
+    CSSLinkHtmlTagAttributes? cssLinkHtmlTagAttributes,
+  }) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('urlFile', () => urlFile.toString());
     args.putIfAbsent(
-        'cssLinkHtmlTagAttributes', () => cssLinkHtmlTagAttributes?.toMap());
+      'cssLinkHtmlTagAttributes',
+      () => cssLinkHtmlTagAttributes?.toMap(),
+    );
     await channel?.invokeMethod('injectCSSFileFromUrl', args);
   }
 
@@ -615,26 +925,134 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController
   }
 
   @override
+  Future<String?> getSelectedText() async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    return await channel?.invokeMethod<String?>('getSelectedText', args);
+  }
+
+  @override
+  Future<bool> isSecureContext() async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    return await channel?.invokeMethod<bool?>('isSecureContext', args) ?? false;
+  }
+
+  @override
+  Future<SslCertificate?> getCertificate() async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    Map<dynamic, dynamic>? result = await channel?.invokeMethod(
+      'getCertificate',
+      args,
+    );
+    if (result != null) {
+      return SslCertificate.fromMap(result.cast<String, dynamic>());
+    }
+    return null;
+  }
+
+  @override
+  Future<InAppWebViewHitTestResult?> getHitTestResult() async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    Map<dynamic, dynamic>? result = await channel?.invokeMethod(
+      'getHitTestResult',
+      args,
+    );
+    if (result != null) {
+      return InAppWebViewHitTestResult.fromMap(result.cast<String, dynamic>());
+    }
+    return null;
+  }
+
+  @override
+  Future<void> clearAllCache({bool includeDiskFiles = true}) async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    args.putIfAbsent('includeDiskFiles', () => includeDiskFiles);
+    await _staticChannel.invokeMethod('clearAllCache', args);
+  }
+
+  @override
+  Future<void> setJavaScriptBridgeName(String bridgeName) async {
+    assert(
+      RegExp(r'^[a-zA-Z_]\w*$').hasMatch(bridgeName),
+      'bridgeName must be a non-empty string with only alphanumeric and underscore characters. It can\'t start with a number.',
+    );
+    Map<String, dynamic> args = <String, dynamic>{};
+    args.putIfAbsent('bridgeName', () => bridgeName);
+    await _staticChannel.invokeMethod('setJavaScriptBridgeName', args);
+  }
+
+  @override
+  Future<String> getJavaScriptBridgeName() async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    return await _staticChannel.invokeMethod<String>(
+          'getJavaScriptBridgeName',
+          args,
+        ) ??
+        'flutter_inappwebview';
+  }
+
+  @override
+  Future<void> disposeKeepAlive(InAppWebViewKeepAlive keepAlive) async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    args.putIfAbsent('keepAliveId', () => keepAlive.id);
+    await _staticChannel.invokeMethod('disposeKeepAlive', args);
+    _keepAliveMap[keepAlive] = null;
+  }
+
+  @override
+  Future<String> get tRexRunnerHtml async => await rootBundle.loadString(
+    'packages/flutter_inappwebview/assets/t_rex_runner/t-rex.html',
+  );
+
+  @override
+  Future<String> get tRexRunnerCss async => await rootBundle.loadString(
+    'packages/flutter_inappwebview/assets/t_rex_runner/t-rex.css',
+  );
+
+  @override
+  Future<bool> handlesURLScheme(String urlScheme) async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    args.putIfAbsent('urlScheme', () => urlScheme);
+    return await _staticChannel.invokeMethod<bool>('handlesURLScheme', args) ??
+        false;
+  }
+
+  @override
+  Future<bool> canScrollVertically() async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    return await channel?.invokeMethod<bool?>('canScrollVertically', args) ??
+        false;
+  }
+
+  @override
+  Future<bool> canScrollHorizontally() async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    return await channel?.invokeMethod<bool?>('canScrollHorizontally', args) ??
+        false;
+  }
+
+  @override
   Future<double?> getZoomScale() async {
     Map<String, dynamic> args = <String, dynamic>{};
     return await channel?.invokeMethod<double?>('getZoomScale', args);
   }
 
   @override
-  Future<void> zoomBy(
-      {required double zoomFactor,
-      @Deprecated('Use animated instead') bool? iosAnimated,
-      bool animated = false}) async {
+  Future<void> zoomBy({
+    required double zoomFactor,
+    @Deprecated('Use animated instead') bool? iosAnimated,
+    bool animated = false,
+  }) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('zoomFactor', () => zoomFactor);
     await channel?.invokeMethod('setZoomScale', args);
   }
 
   @override
-  Future<void> scrollTo(
-      {required int x,
-      required int y,
-      bool animated = false}) async {
+  Future<void> scrollTo({
+    required int x,
+    required int y,
+    bool animated = false,
+  }) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('x', () => x);
     args.putIfAbsent('y', () => y);
@@ -643,10 +1061,11 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController
   }
 
   @override
-  Future<void> scrollBy(
-      {required int x,
-      required int y,
-      bool animated = false}) async {
+  Future<void> scrollBy({
+    required int x,
+    required int y,
+    bool animated = false,
+  }) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('x', () => x);
     args.putIfAbsent('y', () => y);
@@ -669,8 +1088,10 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController
   @override
   Future<InAppWebViewSettings?> getSettings() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    Map<dynamic, dynamic>? settings =
-        await channel?.invokeMethod('getSettings', args);
+    Map<dynamic, dynamic>? settings = await channel?.invokeMethod(
+      'getSettings',
+      args,
+    );
     if (settings != null) {
       settings = settings.cast<String, dynamic>();
       return InAppWebViewSettings.fromMap(settings as Map<String, dynamic>);
@@ -686,17 +1107,19 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController
   }
 
   @override
-  void addJavaScriptHandler(
-      {required String handlerName,
-      required Function callback}) {
-    assert(!kJavaScriptHandlerForbiddenNames.contains(handlerName),
-        '"$handlerName" is a reserved name and cannot be used as a JavaScript handler name.');
+  void addJavaScriptHandler({
+    required String handlerName,
+    required Function callback,
+  }) {
+    assert(
+      !kJavaScriptHandlerForbiddenNames.contains(handlerName),
+      '"$handlerName" is a reserved name and cannot be used as a JavaScript handler name.',
+    );
     _javaScriptHandlersMap[handlerName] = callback;
   }
 
   @override
-  Function? removeJavaScriptHandler(
-      {required String handlerName}) {
+  Function? removeJavaScriptHandler({required String handlerName}) {
     return _javaScriptHandlersMap.remove(handlerName);
   }
 
@@ -712,7 +1135,7 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('userScript', () => userScript.toMap());
     await channel?.invokeMethod('addUserScript', args);
-    
+
     _userScripts[userScript.injectionTime]?.add(userScript);
   }
 
@@ -725,14 +1148,18 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController
 
   @override
   Future<bool> removeUserScript({required UserScript userScript}) async {
-    var index = _userScripts[userScript.injectionTime]?.indexOf(userScript) ?? -1;
+    var index =
+        _userScripts[userScript.injectionTime]?.indexOf(userScript) ?? -1;
     if (index == -1) {
       return false;
     }
 
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('index', () => index);
-    args.putIfAbsent('injectionTime', () => userScript.injectionTime.toNativeValue());
+    args.putIfAbsent(
+      'injectionTime',
+      () => userScript.injectionTime.toNativeValue(),
+    );
     await channel?.invokeMethod('removeUserScript', args);
 
     _userScripts[userScript.injectionTime]?.remove(userScript);
@@ -745,14 +1172,18 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController
     args.putIfAbsent('groupName', () => groupName);
     await channel?.invokeMethod('removeUserScriptsByGroupName', args);
 
-    _userScripts[UserScriptInjectionTime.AT_DOCUMENT_START]
-        ?.removeWhere((element) => element.groupName == groupName);
-    _userScripts[UserScriptInjectionTime.AT_DOCUMENT_END]
-        ?.removeWhere((element) => element.groupName == groupName);
+    _userScripts[UserScriptInjectionTime.AT_DOCUMENT_START]?.removeWhere(
+      (element) => element.groupName == groupName,
+    );
+    _userScripts[UserScriptInjectionTime.AT_DOCUMENT_END]?.removeWhere(
+      (element) => element.groupName == groupName,
+    );
   }
 
   @override
-  Future<void> removeUserScripts({required List<UserScript> userScripts}) async {
+  Future<void> removeUserScripts({
+    required List<UserScript> userScripts,
+  }) async {
     for (var userScript in userScripts) {
       await removeUserScript(userScript: userScript);
     }
@@ -763,6 +1194,68 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController
     await channel?.invokeMethod('removeAllUserScripts', {});
     _userScripts[UserScriptInjectionTime.AT_DOCUMENT_START]?.clear();
     _userScripts[UserScriptInjectionTime.AT_DOCUMENT_END]?.clear();
+  }
+
+  /// Returns all user scripts that have been added.
+  /// This is a Linux-specific method for accessing the user scripts cache.
+  Future<List<UserScript>> getUserScripts() async {
+    List<UserScript> result = [];
+    result.addAll(
+      _userScripts[UserScriptInjectionTime.AT_DOCUMENT_START] ?? [],
+    );
+    result.addAll(_userScripts[UserScriptInjectionTime.AT_DOCUMENT_END] ?? []);
+    return result;
+  }
+
+  @override
+  Future<void> addWebMessageListener(
+    PlatformWebMessageListener webMessageListener,
+  ) async {
+    assert(
+      !_webMessageListeners.contains(webMessageListener),
+      "${webMessageListener} was already added.",
+    );
+    assert(
+      !_webMessageListenerObjNames.contains(
+        webMessageListener.params.jsObjectName,
+      ),
+      "jsObjectName ${webMessageListener.params.jsObjectName} was already added.",
+    );
+    _webMessageListeners.add(webMessageListener as LinuxWebMessageListener);
+    _webMessageListenerObjNames.add(webMessageListener.params.jsObjectName);
+
+    Map<String, dynamic> args = <String, dynamic>{};
+    args.putIfAbsent('webMessageListener', () => webMessageListener.toMap());
+    await channel?.invokeMethod('addWebMessageListener', args);
+  }
+
+  @override
+  bool hasWebMessageListener(PlatformWebMessageListener webMessageListener) {
+    return _webMessageListeners.contains(webMessageListener) ||
+        _webMessageListenerObjNames.contains(
+          webMessageListener.params.jsObjectName,
+        );
+  }
+
+  @override
+  Future<WebUri?> getOriginalUrl() async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    String? url = await channel?.invokeMethod<String?>('getOriginalUrl', args);
+    return url != null ? WebUri(url) : null;
+  }
+
+  /// Sets the zoom level of the WebView.
+  /// This is a Linux-specific method that directly sets the zoom level.
+  /// For cross-platform code, use [zoomBy] instead.
+  Future<void> setZoomScale({
+    required double zoomScale,
+    @Deprecated('Use animated instead') bool? iosAnimated,
+    bool animated = false,
+  }) async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    args.putIfAbsent('zoomScale', () => zoomScale);
+    args.putIfAbsent('animated', () => animated);
+    await channel?.invokeMethod('setZoomScale', args);
   }
 
   @override
@@ -802,11 +1295,471 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController
 
   @override
   Future<bool> requestPointerUnlock() async {
-    return await channel?.invokeMethod<bool>('requestPointerUnlock', {}) ?? false;
+    return await channel?.invokeMethod<bool>('requestPointerUnlock', {}) ??
+        false;
+  }
+
+  @override
+  Future<Uint8List?> takeScreenshot({
+    ScreenshotConfiguration? screenshotConfiguration,
+  }) async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    args.putIfAbsent(
+      'screenshotConfiguration',
+      () => screenshotConfiguration?.toMap(),
+    );
+    return await channel?.invokeMethod<Uint8List?>('takeScreenshot', args);
+  }
+
+  @override
+  Future<Uint8List?> saveState() async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    return await channel?.invokeMethod<Uint8List?>('saveState', args);
+  }
+
+  @override
+  Future<bool> restoreState(Uint8List state) async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    args.putIfAbsent('state', () => state);
+    return await channel?.invokeMethod<bool>('restoreState', args) ?? false;
+  }
+
+  @override
+  Future<String?> saveWebArchive({
+    required String filePath,
+    bool autoname = false,
+  }) async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    args.putIfAbsent('filePath', () => filePath);
+    args.putIfAbsent('autoname', () => autoname);
+    return await channel?.invokeMethod<String?>('saveWebArchive', args);
+  }
+
+  @override
+  Future<int?> getContentHeight() async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    return await channel?.invokeMethod<int?>('getContentHeight', args);
+  }
+
+  @override
+  Future<int?> getContentWidth() async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    return await channel?.invokeMethod<int?>('getContentWidth', args);
+  }
+
+  @override
+  Future<WebHistory?> getCopyBackForwardList() async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    Map<dynamic, dynamic>? result = await channel?.invokeMethod(
+      'getCopyBackForwardList',
+      args,
+    );
+    if (result != null) {
+      return WebHistory.fromMap(result.cast<String, dynamic>());
+    }
+    return null;
+  }
+
+  @override
+  Future<void> goBackOrForward({required int steps}) async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    args.putIfAbsent('steps', () => steps);
+    await channel?.invokeMethod('goBackOrForward', args);
+  }
+
+  @override
+  Future<bool> canGoBackOrForward({required int steps}) async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    args.putIfAbsent('steps', () => steps);
+    return await channel?.invokeMethod<bool>('canGoBackOrForward', args) ??
+        false;
+  }
+
+  Future<void> findAll({String? find}) async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    args.putIfAbsent('find', () => find);
+    await channel?.invokeMethod('findAll', args);
+  }
+
+  @override
+  Future<void> findNext({bool forward = true}) async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    args.putIfAbsent('forward', () => forward);
+    await channel?.invokeMethod('findNext', args);
+  }
+
+  @override
+  Future<void> clearMatches() async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    await channel?.invokeMethod('clearMatches', args);
+  }
+
+  Future<void> setSearchText(String? searchText) async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    args.putIfAbsent('searchText', () => searchText);
+    await channel?.invokeMethod('setSearchText', args);
+  }
+
+  Future<String?> getSearchText() async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    return await channel?.invokeMethod<String?>('getSearchText', args);
+  }
+
+  Future<FindSession?> getActiveFindSession() async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    Map<String, dynamic>? result = (await channel?.invokeMethod(
+      'getActiveFindSession',
+      args,
+    ))?.cast<String, dynamic>();
+    return FindSession.fromMap(result);
+  }
+
+  @override
+  Future<List<Favicon>> getFavicons() async {
+    List<Favicon> favicons = [];
+
+    var webviewUrl = await getUrl();
+
+    if (webviewUrl == null) {
+      return favicons;
+    }
+
+    String? manifestUrl;
+
+    var html = await getHtml();
+    if (html == null || html.isEmpty) {
+      return favicons;
+    }
+    var assetPathBase;
+
+    if (webviewUrl.isScheme("file")) {
+      var assetPathSplit = webviewUrl.toString().split("/flutter_assets/");
+      assetPathBase = assetPathSplit[0] + "/flutter_assets/";
+    }
+
+    InAppWebViewSettings? settings = await getSettings();
+    if (settings != null && settings.javaScriptEnabled == true) {
+      var jsResult = await evaluateJavascript(
+        source: """
+(function() {
+  var linkNodes = document.head.getElementsByTagName("link");
+  var links = [];
+  for (var i = 0; i < linkNodes.length; i++) {
+    var linkNode = linkNodes[i];
+    if (linkNode.rel === 'manifest') {
+      links.push(
+        {
+          rel: linkNode.rel,
+          href: linkNode.href,
+          sizes: null
+        }
+      );
+    } else if (linkNode.rel != null && linkNode.rel.indexOf('icon') >= 0) {
+      links.push(
+        {
+          rel: linkNode.rel,
+          href: linkNode.href,
+          sizes: linkNode.sizes != null && linkNode.sizes.value != "" ? linkNode.sizes.value : null
+        }
+      );
+    }
+  }
+  return links;
+})();
+""",
+      );
+      List<Map<dynamic, dynamic>> links = [];
+      if (jsResult is List) {
+        links = jsResult.cast<Map<dynamic, dynamic>>();
+      }
+      for (var link in links) {
+        if (link["rel"] == "manifest") {
+          manifestUrl = link["href"];
+          if (!_isUrlAbsolute(manifestUrl!)) {
+            if (manifestUrl.startsWith("/")) {
+              manifestUrl = manifestUrl.substring(1);
+            }
+            manifestUrl =
+                ((assetPathBase == null)
+                    ? webviewUrl.scheme + "://" + webviewUrl.host + "/"
+                    : assetPathBase) +
+                manifestUrl;
+          }
+          continue;
+        }
+        favicons.addAll(
+          _createFavicons(
+            webviewUrl,
+            assetPathBase,
+            link["href"],
+            link["rel"],
+            link["sizes"],
+            false,
+          ),
+        );
+      }
+    }
+
+    // try to get /favicon.ico
+    try {
+      HttpClient client = HttpClient();
+      var faviconUrl =
+          webviewUrl.scheme + "://" + webviewUrl.host + "/favicon.ico";
+      var faviconUri = WebUri(faviconUrl);
+      var headRequest = await client.headUrl(faviconUri);
+      var headResponse = await headRequest.close();
+      if (headResponse.statusCode == 200) {
+        favicons.add(Favicon(url: faviconUri, rel: "shortcut icon"));
+      }
+    } catch (e) {
+      developer.log(
+        "/favicon.ico file not found: " + e.toString(),
+        name: runtimeType.toString(),
+      );
+    }
+
+    // try to get the manifest file
+    HttpClientRequest? manifestRequest;
+    HttpClientResponse? manifestResponse;
+    bool manifestFound = false;
+    if (manifestUrl == null) {
+      manifestUrl =
+          webviewUrl.scheme + "://" + webviewUrl.host + "/manifest.json";
+    }
+    try {
+      HttpClient client = HttpClient();
+      manifestRequest = await client.getUrl(Uri.parse(manifestUrl));
+      manifestResponse = await manifestRequest.close();
+      manifestFound =
+          manifestResponse.statusCode == 200 &&
+          manifestResponse.headers.contentType?.mimeType == "application/json";
+    } catch (e) {
+      developer.log(
+        "Manifest file not found: " + e.toString(),
+        name: this.runtimeType.toString(),
+      );
+    }
+
+    if (manifestFound) {
+      try {
+        Map<String, dynamic> manifest = json.decode(
+          await manifestResponse!.transform(Utf8Decoder()).join(),
+        );
+        if (manifest.containsKey("icons")) {
+          for (Map<String, dynamic> icon in manifest["icons"]) {
+            favicons.addAll(
+              _createFavicons(
+                webviewUrl,
+                assetPathBase,
+                icon["src"],
+                icon["rel"],
+                icon["sizes"],
+                true,
+              ),
+            );
+          }
+        }
+      } catch (e) {
+        developer.log(
+          "Cannot get favicons from Manifest file. It might not have a valid format: " +
+              e.toString(),
+          error: e,
+          name: runtimeType.toString(),
+        );
+      }
+    }
+
+    return favicons;
+  }
+
+  bool _isUrlAbsolute(String url) {
+    return url.startsWith("http://") || url.startsWith("https://");
+  }
+
+  List<Favicon> _createFavicons(
+    WebUri url,
+    String? assetPathBase,
+    String urlIcon,
+    String? rel,
+    String? sizes,
+    bool isManifest,
+  ) {
+    List<Favicon> favicons = [];
+
+    List<String> urlSplit = urlIcon.split("/");
+    if (!_isUrlAbsolute(urlIcon)) {
+      if (urlIcon.startsWith("/")) {
+        urlIcon = urlIcon.substring(1);
+      }
+      urlIcon =
+          ((assetPathBase == null)
+              ? url.scheme + "://" + url.host + "/"
+              : assetPathBase) +
+          urlIcon;
+    }
+    if (isManifest) {
+      rel = (sizes != null)
+          ? urlSplit[urlSplit.length - 1]
+                .replaceFirst("-" + sizes, "")
+                .split(" ")[0]
+                .split(".")[0]
+          : null;
+    }
+    if (sizes != null && sizes.isNotEmpty && sizes != "any") {
+      List<String> sizesSplit = sizes.split(" ");
+      for (String size in sizesSplit) {
+        int width = int.parse(size.split("x")[0]);
+        int height = int.parse(size.split("x")[1]);
+        favicons.add(
+          Favicon(url: WebUri(urlIcon), rel: rel, width: width, height: height),
+        );
+      }
+    } else {
+      favicons.add(
+        Favicon(url: WebUri(urlIcon), rel: rel, width: null, height: null),
+      );
+    }
+
+    return favicons;
+  }
+
+  @override
+  Future<void> pauseAllMediaPlayback() async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    await channel?.invokeMethod('pauseAllMediaPlayback', args);
+  }
+
+  @override
+  Future<void> setAllMediaPlaybackSuspended({required bool suspended}) async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    args.putIfAbsent('suspended', () => suspended);
+    await channel?.invokeMethod('setAllMediaPlaybackSuspended', args);
+  }
+
+  @override
+  Future<void> closeAllMediaPresentations() async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    await channel?.invokeMethod('closeAllMediaPresentations', args);
+  }
+
+  @override
+  Future<MediaPlaybackState?> requestMediaPlaybackState() async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    int? result = await channel?.invokeMethod<int?>(
+      'requestMediaPlaybackState',
+      args,
+    );
+    if (result != null) {
+      return MediaPlaybackState.fromNativeValue(result);
+    }
+    return null;
+  }
+
+  @override
+  Future<MediaCaptureState?> getCameraCaptureState() async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    int? result = await channel?.invokeMethod<int?>(
+      'getCameraCaptureState',
+      args,
+    );
+    if (result != null) {
+      return MediaCaptureState.fromNativeValue(result);
+    }
+    return null;
+  }
+
+  @override
+  Future<void> setCameraCaptureState({required MediaCaptureState state}) async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    args.putIfAbsent('state', () => state.toNativeValue());
+    await channel?.invokeMethod('setCameraCaptureState', args);
+  }
+
+  @override
+  Future<MediaCaptureState?> getMicrophoneCaptureState() async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    int? result = await channel?.invokeMethod<int?>(
+      'getMicrophoneCaptureState',
+      args,
+    );
+    if (result != null) {
+      return MediaCaptureState.fromNativeValue(result);
+    }
+    return null;
+  }
+
+  @override
+  Future<void> setMicrophoneCaptureState({
+    required MediaCaptureState state,
+  }) async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    args.putIfAbsent('state', () => state.toNativeValue());
+    await channel?.invokeMethod('setMicrophoneCaptureState', args);
+  }
+
+  @override
+  Future<Color?> getMetaThemeColor() async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    String? hexColor = await channel?.invokeMethod<String?>(
+      'getMetaThemeColor',
+      args,
+    );
+    if (hexColor == null || hexColor.isEmpty) {
+      return null;
+    }
+    // Parse hex color string like #RRGGBB or #RRGGBBAA
+    return UtilColor.fromHex(hexColor);
+  }
+
+  @override
+  Future<bool> isPlayingAudio() async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    return await channel?.invokeMethod<bool>('isPlayingAudio', args) ?? false;
+  }
+
+  @override
+  Future<bool> isMuted() async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    return await channel?.invokeMethod<bool>('isMuted', args) ?? false;
+  }
+
+  @override
+  Future<void> setMuted({required bool muted}) async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    args.putIfAbsent('muted', () => muted);
+    await channel?.invokeMethod('setMuted', args);
+  }
+
+  @override
+  Future<void> terminateWebProcess() async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    await channel?.invokeMethod('terminateWebProcess', args);
+  }
+
+  @override
+  Future<void> clearFocus() async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    await channel?.invokeMethod('clearFocus', args);
+  }
+
+  @override
+  Future<bool?> requestFocus({
+    FocusDirection? direction,
+    InAppWebViewRect? previouslyFocusedRect,
+  }) async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    return await channel?.invokeMethod<bool?>('requestFocus', args);
   }
 
   @override
   void dispose({bool isKeepAlive = false}) {
+    if (!isKeepAlive) {
+      for (final webMessageListener in _webMessageListeners) {
+        webMessageListener.dispose();
+      }
+      _webMessageListeners.clear();
+      _webMessageListenerObjNames.clear();
+    }
     disposeChannel(removeMethodCallHandler: !isKeepAlive);
   }
 }

@@ -25,6 +25,7 @@ part 'platform_cookie_manager.g.dart';
   platforms: [
     AndroidPlatform(),
     IOSPlatform(),
+    LinuxPlatform(),
     MacOSPlatform(),
     WebPlatform(),
     WindowsPlatform(),
@@ -80,6 +81,13 @@ class PlatformCookieManagerCreationParams {
           """It is implemented using [WKHTTPCookieStore](https://developer.apple.com/documentation/webkit/wkhttpcookiestore).
 On iOS below 11.0, it is implemented using JavaScript. See https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies#restrict_access_to_cookies for JavaScript restrictions.
   """,
+    ),
+    LinuxPlatform(
+      apiName: 'WebKitCookieManager',
+      apiUrl:
+          'https://wpewebkit.org/reference/stable/wpe-webkit-2.0/class.CookieManager.html',
+      note:
+          'It is implemented using WebKitCookieManager from WPE WebKit.',
     ),
     MacOSPlatform(
       note:
@@ -192,6 +200,11 @@ In this case, this method will return always `true`.""",
         note:
             'The [webViewController] could be used to access cookies accessible only on the WebView managed by that controller, such as cookie with partition key.',
       ),
+      LinuxPlatform(
+        apiName: 'webkit_cookie_manager_add_cookie',
+        apiUrl:
+            'https://wpewebkit.org/reference/stable/wpe-webkit-2.0/method.CookieManager.add_cookie.html',
+      ),
     ],
   )
   Future<bool> setCookie({
@@ -273,6 +286,11 @@ to get the cookies (session-only cookies and cookies with `isHttpOnly` enabled w
         note:
             'The [webViewController] could be used to access cookies accessible only on the WebView managed by that controller, such as cookie with partition key.',
       ),
+      LinuxPlatform(
+        apiName: 'webkit_cookie_manager_get_cookies',
+        apiUrl:
+            'https://wpewebkit.org/reference/stable/wpe-webkit-2.0/method.CookieManager.get_cookies.html',
+      ),
     ],
   )
   Future<List<Cookie>> getCookies({
@@ -344,6 +362,11 @@ to get the cookie (session-only cookie and cookie with `isHttpOnly` enabled won'
       WindowsPlatform(
         note:
             'The [webViewController] could be used to access cookies accessible only on the WebView managed by that controller, such as cookie with partition key.',
+      ),
+      LinuxPlatform(
+        apiName: 'webkit_cookie_manager_get_cookies',
+        apiUrl:
+            'https://wpewebkit.org/reference/stable/wpe-webkit-2.0/method.CookieManager.get_cookies.html',
       ),
     ],
   )
@@ -422,6 +445,11 @@ In this case, this method will return always `true`.""",
       WindowsPlatform(
         note:
             'The [webViewController] could be used to access cookies accessible only on the WebView managed by that controller, such as cookie with partition key.',
+      ),
+      LinuxPlatform(
+        apiName: 'webkit_cookie_manager_delete_cookie',
+        apiUrl:
+            'https://wpewebkit.org/reference/stable/wpe-webkit-2.0/method.CookieManager.delete_cookie.html',
       ),
     ],
   )
@@ -503,6 +531,11 @@ In this case, this method will return always `true`.""",
         note:
             'The [webViewController] could be used to access cookies accessible only on the WebView managed by that controller, such as cookie with partition key.',
       ),
+      LinuxPlatform(
+        apiName: 'webkit_cookie_manager_delete_cookie',
+        apiUrl:
+            'https://wpewebkit.org/reference/stable/wpe-webkit-2.0/method.CookieManager.delete_cookie.html',
+      ),
     ],
   )
   Future<bool> deleteCookies({
@@ -555,6 +588,12 @@ In this case, this method will return always `true`.""",
         note: """It will return always `true`.""",
       ),
       WindowsPlatform(),
+      LinuxPlatform(
+        apiName: 'webkit_website_data_manager_clear',
+        apiUrl:
+            'https://wpewebkit.org/reference/stable/wpe-webkit-2.0/method.WebsiteDataManager.clear.html',
+        note: 'Uses WebsiteDataManager to clear all cookie data.',
+      ),
     ],
   )
   Future<bool> deleteAllCookies() {
@@ -581,6 +620,11 @@ In this case, this method will return always `true`.""",
         apiUrl:
             'https://developer.apple.com/documentation/webkit/wkhttpcookiestore/2882005-getallcookies',
         available: '10.13',
+      ),
+      LinuxPlatform(
+        apiName: 'webkit_cookie_manager_get_all_cookies',
+        apiUrl:
+            'https://wpewebkit.org/reference/stable/wpe-webkit-2.0/method.CookieManager.get_all_cookies.html',
       ),
     ],
   )

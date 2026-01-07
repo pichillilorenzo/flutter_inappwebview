@@ -10,6 +10,7 @@
 namespace flutter_inappwebview_plugin {
 class InAppWebViewManager;
 class CookieManager;
+class HeadlessInAppWebViewManager;
 }  // namespace flutter_inappwebview_plugin
 
 G_BEGIN_DECLS

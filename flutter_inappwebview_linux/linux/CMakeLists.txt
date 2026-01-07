@@ -117,6 +117,9 @@ message(STATUS "flutter_inappwebview_linux: nlohmann/json ${NLOHMANN_JSON_VERSIO
 list(APPEND PLUGIN_SOURCES
   "flutter_inappwebview_linux_plugin.cc"
   "cookie_manager.cc"
+  "web_storage_manager.cc"
+  "headless_in_app_webview/headless_in_app_webview.cc"
+  "headless_in_app_webview/headless_in_app_webview_manager.cc"
   "in_app_webview/in_app_webview_manager.cc"
   "in_app_webview/custom_platform_view.cc"
   "in_app_webview/inappwebview_texture.cc"
@@ -130,8 +133,10 @@ list(APPEND PLUGIN_SOURCES
   "types/content_world.cc"
   "types/context_menu_popup.cc"
   "types/create_window_action.cc"
+  "types/custom_scheme_response.cc"
   "types/download_start_request.cc"
   "types/download_start_response.cc"
+  "types/find_session.cc"
   "types/http_auth_response.cc"
   "types/http_authentication_challenge.cc"
   "types/javascript_handler_function_data.cc"
@@ -142,10 +147,14 @@ list(APPEND PLUGIN_SOURCES
   "types/js_confirm_response.cc"
   "types/js_prompt_request.cc"
   "types/js_prompt_response.cc"
+  "types/hit_test_result.cc"
   "types/navigation_action.cc"
   "types/permission_request.cc"
   "types/permission_response.cc"
   "types/plugin_script.cc"
+  "types/server_trust_auth_response.cc"
+  "types/server_trust_challenge.cc"
+  "types/ssl_certificate.cc"
   "types/url_credential.cc"
   "types/url_protection_space.cc"
   "types/url_request.cc"
@@ -153,6 +162,7 @@ list(APPEND PLUGIN_SOURCES
   "types/web_resource_error.cc"
   "types/web_resource_request.cc"
   "types/web_resource_response.cc"
+  "types/web_view_transport.cc"
 )
 
 # Define the plugin library target. Its name must not be changed (see comment

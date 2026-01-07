@@ -16,7 +16,7 @@ extension _PlatformInAppWebViewWidgetCreationParamsClassSupported
   ///- macOS WKWebView
   ///- Web \<iframe\>
   ///- Windows WebView2
-  ///- Linux WebKitGTK
+  ///- Linux WPE WebKit
   ///
   ///Use the [PlatformInAppWebViewWidgetCreationParams.isClassSupported] method to check if this class is supported at runtime.
   ///{@endtemplate}

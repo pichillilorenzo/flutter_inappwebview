@@ -18,7 +18,7 @@ part 'platform_find_interaction_controller.g.dart';
 ///
 ///{@macro flutter_inappwebview_platform_interface.PlatformFindInteractionControllerCreationParams.supported_platforms}
 @SupportedPlatforms(
-  platforms: [AndroidPlatform(), IOSPlatform(), MacOSPlatform()],
+  platforms: [AndroidPlatform(), IOSPlatform(), MacOSPlatform(), LinuxPlatform()],
 )
 @immutable
 class PlatformFindInteractionControllerCreationParams {
@@ -51,6 +51,11 @@ class PlatformFindInteractionControllerCreationParams {
             'If [InAppWebViewSettings.isFindInteractionEnabled] is `true`, this event will not be called.',
       ),
       MacOSPlatform(),
+      LinuxPlatform(
+        apiName: 'WebKitFindController::counted-matches',
+        apiUrl:
+            'https://wpewebkit.org/reference/stable/wpe-webkit-2.0/signal.FindController.counted-matches.html',
+      ),
     ],
   )
   final void Function(
@@ -89,7 +94,7 @@ class PlatformFindInteractionControllerCreationParams {
 ///
 ///{@macro flutter_inappwebview_platform_interface.PlatformFindInteractionController.supported_platforms}
 @SupportedPlatforms(
-  platforms: [AndroidPlatform(), IOSPlatform(), MacOSPlatform()],
+  platforms: [AndroidPlatform(), IOSPlatform(), MacOSPlatform(), LinuxPlatform()],
 )
 abstract class PlatformFindInteractionController extends PlatformInterface
     implements Disposable {
@@ -176,6 +181,11 @@ abstract class PlatformFindInteractionController extends PlatformInterface
             'If [InAppWebViewSettings.isFindInteractionEnabled] is `true`, it uses the built-in find interaction native UI, otherwise this is implemented using CSS and Javascript. In this case, it will use the [Official API - UIFindInteraction.presentFindNavigator](https://developer.apple.com/documentation/uikit/uifindinteraction/3975832-presentfindnavigator?changes=_2) with [Official API - UIFindInteraction.searchText](https://developer.apple.com/documentation/uikit/uifindinteraction/3975834-searchtext?changes=_2)',
       ),
       MacOSPlatform(),
+      LinuxPlatform(
+        apiName: 'webkit_find_controller_search',
+        apiUrl:
+            'https://wpewebkit.org/reference/stable/wpe-webkit-2.0/method.FindController.search.html',
+      ),
     ],
   )
   Future<void> findAll({String? find}) {
@@ -203,6 +213,11 @@ abstract class PlatformFindInteractionController extends PlatformInterface
             'If [InAppWebViewSettings.isFindInteractionEnabled] is `true`, it uses the built-in find interaction native UI, otherwise this is implemented using CSS and Javascript. In this case, it will use the [Official API - UIFindInteraction.findNext](https://developer.apple.com/documentation/uikit/uifindinteraction/3975829-findnext?changes=_2) and ([Official API - UIFindInteraction.findPrevious](https://developer.apple.com/documentation/uikit/uifindinteraction/3975830-findprevious?changes=_2)',
       ),
       MacOSPlatform(),
+      LinuxPlatform(
+        apiName: 'webkit_find_controller_search_next',
+        apiUrl:
+            'https://wpewebkit.org/reference/stable/wpe-webkit-2.0/method.FindController.search_next.html',
+      ),
     ],
   )
   Future<void> findNext({bool forward = true}) {
@@ -228,6 +243,11 @@ abstract class PlatformFindInteractionController extends PlatformInterface
             'If [InAppWebViewSettings.isFindInteractionEnabled] is `true`, it uses the built-in find interaction native UI, otherwise this is implemented using CSS and Javascript. In this case, it will use the [Official API - UIFindInteraction.dismissFindNavigator](https://developer.apple.com/documentation/uikit/uifindinteraction/3975827-dismissfindnavigator?changes=_2)',
       ),
       MacOSPlatform(),
+      LinuxPlatform(
+        apiName: 'webkit_find_controller_search_finish',
+        apiUrl:
+            'https://wpewebkit.org/reference/stable/wpe-webkit-2.0/method.FindController.search_finish.html',
+      ),
     ],
   )
   Future<void> clearMatches() {
@@ -252,6 +272,11 @@ abstract class PlatformFindInteractionController extends PlatformInterface
             'If [InAppWebViewSettings.isFindInteractionEnabled] is `true`, it will pre-populate the system find panel\'s search text field with a search query.',
       ),
       MacOSPlatform(),
+      LinuxPlatform(
+        apiName: 'webkit_find_controller_search',
+        apiUrl:
+            'https://wpewebkit.org/reference/stable/wpe-webkit-2.0/method.FindController.search.html',
+      ),
     ],
   )
   Future<void> setSearchText(String? searchText) {
@@ -276,6 +301,11 @@ abstract class PlatformFindInteractionController extends PlatformInterface
             'If [InAppWebViewSettings.isFindInteractionEnabled] is `true`, it will get the system find panel\'s search text field value.',
       ),
       MacOSPlatform(),
+      LinuxPlatform(
+        apiName: 'webkit_find_controller_get_search_text',
+        apiUrl:
+            'https://wpewebkit.org/reference/stable/wpe-webkit-2.0/method.FindController.get_search_text.html',
+      ),
     ],
   )
   Future<String?> getSearchText() {
@@ -386,6 +416,11 @@ abstract class PlatformFindInteractionController extends PlatformInterface
             'https://developer.apple.com/documentation/uikit/uifindinteraction/3975825-activefindsession?changes=_7____4_8&language=objc',
       ),
       MacOSPlatform(),
+      LinuxPlatform(
+        apiName: 'WebKitFindController',
+        apiUrl:
+            'https://wpewebkit.org/reference/stable/wpe-webkit-2.0/class.FindController.html',
+      ),
     ],
   )
   Future<FindSession?> getActiveFindSession() {
@@ -400,7 +435,7 @@ abstract class PlatformFindInteractionController extends PlatformInterface
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformFindInteractionController.dispose.supported_platforms}
   @SupportedPlatforms(
-    platforms: [AndroidPlatform(), IOSPlatform(), MacOSPlatform()],
+    platforms: [AndroidPlatform(), IOSPlatform(), MacOSPlatform(), LinuxPlatform()],
   )
   @override
   void dispose({bool isKeepAlive = false}) {

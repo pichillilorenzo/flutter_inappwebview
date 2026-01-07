@@ -1,6 +1,7 @@
 #ifndef FLUTTER_INAPPWEBVIEW_PLUGIN_URI_UTIL_H_
 #define FLUTTER_INAPPWEBVIEW_PLUGIN_URI_UTIL_H_
 
+#include <iomanip>
 #include <regex>
 #include <string>
 

@@ -13,6 +13,7 @@ extension _PlatformCookieManagerCreationParamsClassSupported
   ///**Officially Supported Platforms/Implementations**:
   ///- Android WebView
   ///- iOS WKWebView
+  ///- Linux WPE WebKit
   ///- macOS WKWebView
   ///- Web \<iframe\> but requires same origin
   ///- Windows WebView2
@@ -26,6 +27,7 @@ extension _PlatformCookieManagerCreationParamsClassSupported
               [
                 TargetPlatform.android,
                 TargetPlatform.iOS,
+                TargetPlatform.linux,
                 TargetPlatform.macOS,
                 TargetPlatform.windows,
               ].contains(platform ?? defaultTargetPlatform);
@@ -70,6 +72,8 @@ extension _PlatformCookieManagerClassSupported on PlatformCookieManager {
   ///    - It is implemented using [CookieManager](https://developer.android.com/reference/android/webkit/CookieManager).
   ///- iOS WKWebView:
   ///    - It is implemented using [WKHTTPCookieStore](https://developer.apple.com/documentation/webkit/wkhttpcookiestore). On iOS below 11.0, it is implemented using JavaScript. See https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies#restrict_access_to_cookies for JavaScript restrictions.
+  ///- Linux WPE WebKit ([Official API - WebKitCookieManager](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/class.CookieManager.html)):
+  ///    - It is implemented using WebKitCookieManager from WPE WebKit.
   ///- macOS WKWebView:
   ///    - It is implemented using [WKHTTPCookieStore](https://developer.apple.com/documentation/webkit/wkhttpcookiestore).
   ///- Web \<iframe\> but requires same origin:
@@ -85,6 +89,7 @@ extension _PlatformCookieManagerClassSupported on PlatformCookieManager {
               [
                 TargetPlatform.android,
                 TargetPlatform.iOS,
+                TargetPlatform.linux,
                 TargetPlatform.macOS,
                 TargetPlatform.windows,
               ].contains(platform ?? defaultTargetPlatform);
@@ -104,6 +109,8 @@ enum PlatformCookieManagerMethod {
   ///- macOS WKWebView 10.13+ ([Official API - WKWebsiteDataStore.removeData](https://developer.apple.com/documentation/webkit/wkwebsitedatastore/1532938-removedata)):
   ///    - It will return always `true`.
   ///- Windows WebView2
+  ///- Linux WPE WebKit ([Official API - webkit_website_data_manager_clear](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/method.WebsiteDataManager.clear.html)):
+  ///    - Uses WebsiteDataManager to clear all cookie data.
   ///
   ///Use the [PlatformCookieManager.isMethodSupported] method to check if this method is supported at runtime.
   ///{@endtemplate}
@@ -123,6 +130,7 @@ enum PlatformCookieManagerMethod {
   ///    - The [webViewController] is used for deleting the cookie (also session-only cookie) using JavaScript (cookie with `isHttpOnly` enabled cannot be deleted, see: https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies#restrict_access_to_cookies) from the current context of the `WebView` managed by that controller. JavaScript must be enabled in order to work. In this case the [url] parameter is ignored. If [webViewController] is `null` or JavaScript is disabled for it, it will try to use a [PlatformHeadlessInAppWebView] to delete the cookie (session-only cookie and cookie with `isHttpOnly` enabled won't be deleted!). In this case, this method will return always `true`.
   ///- Windows WebView2:
   ///    - The [webViewController] could be used to access cookies accessible only on the WebView managed by that controller, such as cookie with partition key.
+  ///- Linux WPE WebKit ([Official API - webkit_cookie_manager_delete_cookie](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/method.CookieManager.delete_cookie.html))
   ///
   ///**Parameters - Officially Supported Platforms/Implementations**:
   ///- [url]: all platforms
@@ -153,6 +161,7 @@ enum PlatformCookieManagerMethod {
   ///    - The [webViewController] is used for deleting the cookies (also session-only cookies) using JavaScript (cookies with `isHttpOnly` enabled cannot be deleted, see: https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies#restrict_access_to_cookies) from the current context of the `WebView` managed by that controller. JavaScript must be enabled in order to work. In this case the [url] parameter is ignored. If [webViewController] is `null` or JavaScript is disabled for it, it will try to use a [PlatformHeadlessInAppWebView] to delete the cookies (session-only cookies and cookies with `isHttpOnly` enabled won't be deleted!). In this case, this method will return always `true`.
   ///- Windows WebView2:
   ///    - The [webViewController] could be used to access cookies accessible only on the WebView managed by that controller, such as cookie with partition key.
+  ///- Linux WPE WebKit ([Official API - webkit_cookie_manager_delete_cookie](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/method.CookieManager.delete_cookie.html))
   ///
   ///**Parameters - Officially Supported Platforms/Implementations**:
   ///- [url]: all platforms
@@ -186,6 +195,7 @@ enum PlatformCookieManagerMethod {
   ///**Officially Supported Platforms/Implementations**:
   ///- iOS WKWebView 11.0+ ([Official API - WKHTTPCookieStore.getAllCookies](https://developer.apple.com/documentation/webkit/wkhttpcookiestore/2882005-getallcookies))
   ///- macOS WKWebView 10.13+ ([Official API - WKHTTPCookieStore.getAllCookies](https://developer.apple.com/documentation/webkit/wkhttpcookiestore/2882005-getallcookies))
+  ///- Linux WPE WebKit ([Official API - webkit_cookie_manager_get_all_cookies](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/method.CookieManager.get_all_cookies.html))
   ///
   ///Use the [PlatformCookieManager.isMethodSupported] method to check if this method is supported at runtime.
   ///{@endtemplate}
@@ -205,6 +215,7 @@ enum PlatformCookieManagerMethod {
   ///    - The [webViewController] is used for getting the cookie (also session-only cookie) using JavaScript (cookie with `isHttpOnly` enabled cannot be found, see: https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies#restrict_access_to_cookies) from the current context of the `WebView` managed by that controller. JavaScript must be enabled in order to work. In this case the [url] parameter is ignored. If [webViewController] is `null` or JavaScript is disabled for it, it will try to use a [PlatformHeadlessInAppWebView] to get the cookie (session-only cookie and cookie with `isHttpOnly` enabled won't be found!).
   ///- Windows WebView2:
   ///    - The [webViewController] could be used to access cookies accessible only on the WebView managed by that controller, such as cookie with partition key.
+  ///- Linux WPE WebKit ([Official API - webkit_cookie_manager_get_cookies](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/method.CookieManager.get_cookies.html))
   ///
   ///**Parameters - Officially Supported Platforms/Implementations**:
   ///- [url]: all platforms
@@ -233,6 +244,7 @@ enum PlatformCookieManagerMethod {
   ///    - The [webViewController] is used for getting the cookies (also session-only cookies) using JavaScript (cookies with `isHttpOnly` enabled cannot be found, see: https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies#restrict_access_to_cookies) from the current context of the `WebView` managed by that controller. JavaScript must be enabled in order to work. In this case the [url] parameter is ignored. If [webViewController] is `null` or JavaScript is disabled for it, it will try to use a [PlatformHeadlessInAppWebView] to get the cookies (session-only cookies and cookies with `isHttpOnly` enabled won't be found!).
   ///- Windows WebView2:
   ///    - The [webViewController] could be used to access cookies accessible only on the WebView managed by that controller, such as cookie with partition key.
+  ///- Linux WPE WebKit ([Official API - webkit_cookie_manager_get_cookies](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/method.CookieManager.get_cookies.html))
   ///
   ///**Parameters - Officially Supported Platforms/Implementations**:
   ///- [url]: all platforms
@@ -271,6 +283,7 @@ enum PlatformCookieManagerMethod {
   ///    - The [webViewController] could be used if you need to set a session-only cookie using JavaScript (so [isHttpOnly] cannot be set, see: https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies#restrict_access_to_cookies) on the current URL of the `WebView` managed by that controller. JavaScript must be enabled in order to work. If [webViewController] is `null` or JavaScript is disabled for it, it will try to use a [PlatformHeadlessInAppWebView] to set the cookie (session-only cookie won't work! In that case, you should set also [expiresDate] or [maxAge]). In this case, this method will return always `true`.
   ///- Windows WebView2:
   ///    - The [webViewController] could be used to access cookies accessible only on the WebView managed by that controller, such as cookie with partition key.
+  ///- Linux WPE WebKit ([Official API - webkit_cookie_manager_add_cookie](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/method.CookieManager.add_cookie.html))
   ///
   ///**Parameters - Officially Supported Platforms/Implementations**:
   ///- [url]: all platforms
@@ -307,6 +320,7 @@ extension _PlatformCookieManagerMethodSupported on PlatformCookieManager {
               TargetPlatform.iOS,
               TargetPlatform.macOS,
               TargetPlatform.windows,
+              TargetPlatform.linux,
             ].contains(platform ?? defaultTargetPlatform);
       case PlatformCookieManagerMethod.deleteCookie:
         return kIsWeb && platform == null
@@ -317,6 +331,7 @@ extension _PlatformCookieManagerMethodSupported on PlatformCookieManager {
                     TargetPlatform.iOS,
                     TargetPlatform.macOS,
                     TargetPlatform.windows,
+                    TargetPlatform.linux,
                   ].contains(platform ?? defaultTargetPlatform);
       case PlatformCookieManagerMethod.deleteCookies:
         return kIsWeb && platform == null
@@ -327,6 +342,7 @@ extension _PlatformCookieManagerMethodSupported on PlatformCookieManager {
                     TargetPlatform.iOS,
                     TargetPlatform.macOS,
                     TargetPlatform.windows,
+                    TargetPlatform.linux,
                   ].contains(platform ?? defaultTargetPlatform);
       case PlatformCookieManagerMethod.flush:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
@@ -338,6 +354,7 @@ extension _PlatformCookieManagerMethodSupported on PlatformCookieManager {
             [
               TargetPlatform.iOS,
               TargetPlatform.macOS,
+              TargetPlatform.linux,
             ].contains(platform ?? defaultTargetPlatform);
       case PlatformCookieManagerMethod.getCookie:
         return kIsWeb && platform == null
@@ -348,6 +365,7 @@ extension _PlatformCookieManagerMethodSupported on PlatformCookieManager {
                     TargetPlatform.iOS,
                     TargetPlatform.macOS,
                     TargetPlatform.windows,
+                    TargetPlatform.linux,
                   ].contains(platform ?? defaultTargetPlatform);
       case PlatformCookieManagerMethod.getCookies:
         return kIsWeb && platform == null
@@ -358,6 +376,7 @@ extension _PlatformCookieManagerMethodSupported on PlatformCookieManager {
                     TargetPlatform.iOS,
                     TargetPlatform.macOS,
                     TargetPlatform.windows,
+                    TargetPlatform.linux,
                   ].contains(platform ?? defaultTargetPlatform);
       case PlatformCookieManagerMethod.removeSessionCookies:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
@@ -373,6 +392,7 @@ extension _PlatformCookieManagerMethodSupported on PlatformCookieManager {
                     TargetPlatform.iOS,
                     TargetPlatform.macOS,
                     TargetPlatform.windows,
+                    TargetPlatform.linux,
                   ].contains(platform ?? defaultTargetPlatform);
     }
   }

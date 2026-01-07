@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_platform_interface.dart';
 
+import '../find_interaction/find_interaction_controller.dart';
 import 'in_app_webview_controller.dart';
 import 'custom_platform_view.dart';
 
@@ -271,6 +272,12 @@ class LinuxInAppWebViewWidget extends PlatformInAppWebViewWidget {
     _controller = LinuxInAppWebViewController(
         PlatformInAppWebViewControllerCreationParams(
             id: viewId, webviewParams: params));
+
+    if (_linuxParams.findInteractionController != null) {
+      var findInteractionController = _linuxParams
+          .findInteractionController as LinuxFindInteractionController;
+      findInteractionController.setController(_controller!);
+    }
 
     debugLog(
         className: runtimeType.toString(),

@@ -1,8 +1,12 @@
 import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_platform_interface.dart';
 
 import 'cookie_manager/cookie_manager.dart';
+import 'find_interaction/find_interaction_controller.dart';
 import 'in_app_webview/in_app_webview.dart';
 import 'in_app_webview/in_app_webview_controller.dart';
+import 'in_app_webview/headless_in_app_webview.dart';
+import 'web_message/web_message_listener.dart';
+import 'web_storage/web_storage_manager.dart';
 
 /// Implementation of [InAppWebViewPlatform] using WPE WebKit.
 class LinuxInAppWebViewPlatform extends InAppWebViewPlatform {
@@ -94,7 +98,15 @@ class LinuxInAppWebViewPlatform extends InAppWebViewPlatform {
   /// Creates a new empty [PlatformHeadlessInAppWebView] to access static methods.
   @override
   PlatformHeadlessInAppWebView createPlatformHeadlessInAppWebViewStatic() {
-    return _PlatformHeadlessInAppWebView.static();
+    return LinuxHeadlessInAppWebView.static();
+  }
+
+  /// Creates a new [LinuxHeadlessInAppWebView].
+  @override
+  LinuxHeadlessInAppWebView createPlatformHeadlessInAppWebView(
+    PlatformHeadlessInAppWebViewCreationParams params,
+  ) {
+    return LinuxHeadlessInAppWebView(params);
   }
 
   /// Creates a new empty [PlatformProcessGlobalConfig] to access static methods.
@@ -126,7 +138,15 @@ class LinuxInAppWebViewPlatform extends InAppWebViewPlatform {
   @override
   PlatformFindInteractionController
       createPlatformFindInteractionControllerStatic() {
-    return _PlatformFindInteractionController.static();
+    return LinuxFindInteractionController.static();
+  }
+
+  /// Creates a new [LinuxFindInteractionController].
+  @override
+  LinuxFindInteractionController createPlatformFindInteractionController(
+    PlatformFindInteractionControllerCreationParams params,
+  ) {
+    return LinuxFindInteractionController(params);
   }
 
   /// Creates a new empty [PlatformPrintJobController] to access static methods.
@@ -158,13 +178,29 @@ class LinuxInAppWebViewPlatform extends InAppWebViewPlatform {
   /// Creates a new empty [PlatformWebMessageListener] to access static methods.
   @override
   PlatformWebMessageListener createPlatformWebMessageListenerStatic() {
-    return _PlatformWebMessageListener.static();
+    return LinuxWebMessageListener.static();
+  }
+
+  /// Creates a new [LinuxWebMessageListener].
+  @override
+  LinuxWebMessageListener createPlatformWebMessageListener(
+    PlatformWebMessageListenerCreationParams params,
+  ) {
+    return LinuxWebMessageListener(params);
   }
 
   /// Creates a new empty [PlatformWebStorageManager] to access static methods.
   @override
   PlatformWebStorageManager createPlatformWebStorageManagerStatic() {
-    return _PlatformWebStorageManager.static();
+    return LinuxWebStorageManager.static();
+  }
+
+  /// Creates a new [LinuxWebStorageManager].
+  @override
+  LinuxWebStorageManager createPlatformWebStorageManager(
+    PlatformWebStorageManagerCreationParams params,
+  ) {
+    return LinuxWebStorageManager(params);
   }
 }
 
@@ -199,17 +235,6 @@ class _PlatformInAppBrowser extends PlatformInAppBrowser {
       _PlatformInAppBrowser(const PlatformInAppBrowserCreationParams());
 
   factory _PlatformInAppBrowser.static() => _staticValue;
-}
-
-class _PlatformHeadlessInAppWebView extends PlatformHeadlessInAppWebView {
-  _PlatformHeadlessInAppWebView(
-      PlatformHeadlessInAppWebViewCreationParams params)
-      : super.implementation(params);
-  static final _PlatformHeadlessInAppWebView _staticValue =
-      _PlatformHeadlessInAppWebView(
-          const PlatformHeadlessInAppWebViewCreationParams());
-
-  factory _PlatformHeadlessInAppWebView.static() => _staticValue;
 }
 
 class _PlatformProcessGlobalConfig extends PlatformProcessGlobalConfig {
@@ -253,18 +278,6 @@ class _PlatformTracingController extends PlatformTracingController {
           const PlatformTracingControllerCreationParams());
 
   factory _PlatformTracingController.static() => _staticValue;
-}
-
-class _PlatformFindInteractionController
-    extends PlatformFindInteractionController {
-  _PlatformFindInteractionController(
-      PlatformFindInteractionControllerCreationParams params)
-      : super.implementation(params);
-  static final _PlatformFindInteractionController _staticValue =
-      _PlatformFindInteractionController(
-          const PlatformFindInteractionControllerCreationParams());
-
-  factory _PlatformFindInteractionController.static() => _staticValue;
 }
 
 class _PlatformPrintJobController extends PlatformPrintJobController {
@@ -318,17 +331,6 @@ class _PlatformWebMessageChannel extends PlatformWebMessageChannel {
   factory _PlatformWebMessageChannel.static() => _staticValue;
 }
 
-class _PlatformWebMessageListener extends PlatformWebMessageListener {
-  _PlatformWebMessageListener(PlatformWebMessageListenerCreationParams params)
-      : super.implementation(params);
-
-  static final _PlatformWebMessageListener _staticValue =
-      _PlatformWebMessageListener(
-          const PlatformWebMessageListenerCreationParams(jsObjectName: ''));
-
-  factory _PlatformWebMessageListener.static() => _staticValue;
-}
-
 class _PlatformWebMessagePort extends PlatformWebMessagePort {
   _PlatformWebMessagePort(PlatformWebMessagePortCreationParams params)
       : super.implementation(params);
@@ -364,13 +366,3 @@ class _PlatformWebMessagePort extends PlatformWebMessagePort {
   }
 }
 
-class _PlatformWebStorageManager extends PlatformWebStorageManager {
-  _PlatformWebStorageManager(PlatformWebStorageManagerCreationParams params)
-      : super.implementation(params);
-
-  static final _PlatformWebStorageManager _staticValue =
-      _PlatformWebStorageManager(
-          const PlatformWebStorageManagerCreationParams());
-
-  factory _PlatformWebStorageManager.static() => _staticValue;
-}

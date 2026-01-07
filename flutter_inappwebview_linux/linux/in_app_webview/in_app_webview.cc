@@ -10,8 +10,10 @@
 
 #include <algorithm>
 #include <cstring>
+#include <filesystem>
 #include <nlohmann/json.hpp>
 #include <random>
+#include <set>
 
 // Use epoxy for OpenGL/EGL instead of direct headers to avoid conflicts
 #include <epoxy/egl.h>
@@ -20,19 +22,30 @@
 #include <wpe/fdo-egl.h>
 #include <wpe/unstable/fdo-shm.h>
 
+// Cairo for PNG encoding (used by takeScreenshot)
+#include <cairo.h>
+
 #include "../plugin_scripts_js/color_input_js.h"
 #include "../plugin_scripts_js/console_log_js.h"
 #include "../plugin_scripts_js/javascript_bridge_js.h"
+#include "../plugin_scripts_js/on_load_resource_js.h"
+#include "../plugin_scripts_js/web_message_listener_js.h"
 #include "../types/create_window_action.h"
+#include "../types/custom_scheme_response.h"
 #include "../types/navigation_action.h"
+#include "../types/server_trust_challenge.h"
 #include "../types/web_resource_error.h"
 #include "../types/web_resource_request.h"
+#include "../types/web_view_transport.h"
 #include "../flutter_inappwebview_linux_plugin_private.h"
 #include "../utils/flutter.h"
 #include "../utils/log.h"
+#include "../utils/uri.h"
+#include "in_app_webview_manager.h"
 #include "simd_convert.h"
 #include "user_content_controller.h"
 #include "webview_channel_delegate.h"
+#include "../types/find_session.h"
 
 using json = nlohmann::json;
 
@@ -145,8 +158,14 @@ bool InAppWebView::IsWpeWebKitAvailable() {
 
 InAppWebView::InAppWebView(FlPluginRegistrar* registrar, FlBinaryMessenger* messenger, int64_t id,
                            const InAppWebViewCreationParams& params)
-    : registrar_(registrar), gtk_window_(params.gtkWindow), id_(id), settings_(params.initialSettings) {
+    : registrar_(registrar), gtk_window_(params.gtkWindow), manager_(params.manager), id_(id), settings_(params.initialSettings),
+      initial_user_scripts_(params.initialUserScripts) {
   js_bridge_secret_ = GenerateRandomSecret();
+  
+  // Store window ID if this is a popup window
+  if (params.windowId.has_value()) {
+    window_id_ = params.windowId.value();
+  }
 
   // Store context menu configuration
   if (params.contextMenu.has_value()) {
@@ -166,6 +185,9 @@ InAppWebView::InAppWebView(FlPluginRegistrar* registrar, FlBinaryMessenger* mess
   if (settings_) {
     settings_->applyToWebView(webview_);
   }
+
+  // Register custom URI schemes (before loading content)
+  RegisterCustomSchemes();
 
   // Load initial content
   if (params.initialUrlRequest.has_value()) {
@@ -192,6 +214,17 @@ void InAppWebView::AttachChannel(FlBinaryMessenger* messenger, int64_t channel_i
   channel_delegate_ = std::make_unique<WebViewChannelDelegate>(this, messenger, channelName);
 }
 
+void InAppWebView::AttachChannel(FlBinaryMessenger* messenger, const std::string& channel_id) {
+  string_channel_id_ = channel_id;
+  if (messenger == nullptr) {
+    errorLog("InAppWebView: AttachChannel messenger is null");
+    return;
+  }
+
+  std::string channelName = std::string(METHOD_CHANNEL_NAME_PREFIX) + channel_id;
+  channel_delegate_ = std::make_unique<WebViewChannelDelegate>(this, messenger, channelName);
+}
+
 InAppWebView::~InAppWebView() {
   debugLog("dealloc InAppWebView");
 
@@ -212,6 +245,12 @@ InAppWebView::~InAppWebView() {
   if (pending_hit_test_result_ != nullptr) {
     g_object_unref(pending_hit_test_result_);
     pending_hit_test_result_ = nullptr;
+  }
+
+  // Clean up last hit test result from mouse-target-changed
+  if (last_hit_test_result_ != nullptr) {
+    g_object_unref(last_hit_test_result_);
+    last_hit_test_result_ = nullptr;
   }
 
   // IMPORTANT: Clean up user content controller FIRST while webview is still valid
@@ -363,26 +402,43 @@ void InAppWebView::InitWebView(const InAppWebViewCreationParams& params) {
     return;
   }
 
-  // Create WebKit settings
-  WebKitSettings* settings = webkit_settings_new();
-  if (settings != nullptr) {
-    webkit_settings_set_enable_javascript(settings, TRUE);
-    webkit_settings_set_enable_developer_extras(settings, TRUE);
-    // WPE always uses hardware acceleration
+  // Check if we're creating a related webview (for multi-window support)
+  if (params.relatedWebView != nullptr) {
+    // Create a new WebView that shares the web process with the related view
+    // This is used for window.open() popups - they share session/cookies with parent
+    // In WPE WebKit 2022 API, we use g_object_new() with the "related-view" property
+    // since webkit_web_view_new_with_related_view() is not available
+    webview_ = WEBKIT_WEB_VIEW(g_object_new(WEBKIT_TYPE_WEB_VIEW,
+        "backend", backend_,
+        "user-content-manager", webkit_web_view_get_user_content_manager(params.relatedWebView),
+        "settings", webkit_web_view_get_settings(params.relatedWebView),
+        "related-view", params.relatedWebView,
+        nullptr));
+    
+    if (webview_ == nullptr) {
+      errorLog("InAppWebView: Failed to create related WebKitWebView");
+      return;
+    }
+  } else {
+    // Create WebKit settings for a standalone webview
+    WebKitSettings* settings = webkit_settings_new();
+
+    // Create the web view with the WPE backend
+    // WPE 2.0 API: webkit_web_view_new takes the backend
+    webview_ = webkit_web_view_new(backend_);
+
+    if (webview_ == nullptr) {
+      errorLog("InAppWebView: Failed to create WebKitWebView");
+      if (settings != nullptr) {
+        g_object_unref(settings);
+      }
+      return;
+    }
+
+    // Apply settings
+    webkit_web_view_set_settings(webview_, settings);
+    g_object_unref(settings);
   }
-
-  // Create the web view with the WPE backend
-  // WPE 2.0 API: webkit_web_view_new takes the backend
-  webview_ = webkit_web_view_new(backend_);
-
-  if (webview_ == nullptr) {
-    errorLog("InAppWebView: Failed to create WebKitWebView");
-    return;
-  }
-
-  // Apply settings
-  webkit_web_view_set_settings(webview_, settings);
-  g_object_unref(settings);
 
   // Set background color
   WebKitColor bg = {1.0, 1.0, 1.0, 1.0};
@@ -421,6 +477,9 @@ void InAppWebView::RegisterEventHandlers() {
   // Connect to notify::title signal
   g_signal_connect(webview_, "notify::title", G_CALLBACK(OnNotifyTitle), this);
 
+  // Connect to notify::uri signal for onUpdateVisitedHistory
+  g_signal_connect(webview_, "notify::uri", G_CALLBACK(OnNotifyUri), this);
+
   // Connect to load-failed signal
   g_signal_connect(webview_, "load-failed", G_CALLBACK(OnLoadFailed), this);
 
@@ -457,6 +516,20 @@ void InAppWebView::RegisterEventHandlers() {
 
   // Connect to create signal for window.open() / target="_blank"
   g_signal_connect(webview_, "create", G_CALLBACK(OnCreateWebView), this);
+
+  // Connect to web-process-terminated signal for onRenderProcessGone
+  g_signal_connect(webview_, "web-process-terminated", G_CALLBACK(OnWebProcessTerminated), this);
+
+  // Connect to run-file-chooser signal for file input handling
+  g_signal_connect(webview_, "run-file-chooser", G_CALLBACK(OnRunFileChooser), this);
+
+  // Connect to find controller signals
+  WebKitFindController* find_controller = webkit_web_view_get_find_controller(webview_);
+  if (find_controller) {
+    g_signal_connect(find_controller, "counted-matches", G_CALLBACK(OnCountedMatches), this);
+    g_signal_connect(find_controller, "found-text", G_CALLBACK(OnFoundText), this);
+    g_signal_connect(find_controller, "failed-to-find-text", G_CALLBACK(OnFailedToFindText), this);
+  }
 
   // Add frame displayed callback (WPE-specific)
   webkit_web_view_add_frame_displayed_callback(
@@ -525,13 +598,26 @@ void InAppWebView::PrepareAndAddUserScripts() {
       ColorInputJS::COLOR_INPUT_JS_PLUGIN_SCRIPT(pluginScriptsOriginAllowList, pluginScriptsForMainFrameOnly);
   user_content_controller_->addPluginScript(std::move(colorInputScript));
 
+  // === Add OnLoadResource Script ===
+  // Uses PerformanceObserver API to track resource loading
+  if (settings_ != nullptr && settings_->useOnLoadResource) {
+    auto onLoadResourceScript = OnLoadResourceJS::ON_LOAD_RESOURCE_JS_PLUGIN_SCRIPT(
+        pluginScriptsOriginAllowList, pluginScriptsForMainFrameOnly);
+    user_content_controller_->addPluginScript(std::move(onLoadResourceScript));
+  }
+
   // TODO: Add additional plugin scripts as needed, similar to iOS/Android:
   // - InterceptAjaxRequestJS (if settings_->useShouldInterceptAjaxRequest)
   // - InterceptFetchRequestJS (if settings_->useShouldInterceptFetchRequest)
-  // - OnLoadResourceJS (if settings_->useOnLoadResource)
   // - PrintJS
   // - FindTextHighlightJS
   // - etc.
+
+  // === Add Initial User Scripts ===
+  // These are scripts passed via initialUserScripts parameter from Dart
+  for (const auto& userScript : initial_user_scripts_) {
+    user_content_controller_->addUserScript(userScript);
+  }
 }
 
 // === Monitor Change Handlers ===
@@ -792,7 +878,26 @@ void InAppWebView::loadFile(const std::string& asset_file_path) {
   if (webview_ == nullptr)
     return;
 
-  std::string file_url = "file://" + asset_file_path;
+  // Get the path to the running executable
+  char exe_path[PATH_MAX];
+  ssize_t len = readlink("/proc/self/exe", exe_path, sizeof(exe_path) - 1);
+  if (len == -1) {
+    debugLog("Failed to get executable path for loadFile");
+    return;
+  }
+  exe_path[len] = '\0';
+
+  // Build the absolute path to the Flutter asset
+  std::filesystem::path exe_dir = std::filesystem::path(exe_path).parent_path();
+  std::filesystem::path flutter_asset_path =
+      exe_dir / "data" / "flutter_assets" / asset_file_path;
+
+  if (!std::filesystem::exists(flutter_asset_path)) {
+    debugLog("Asset file not found: " + flutter_asset_path.string());
+    return;
+  }
+
+  std::string file_url = "file://" + flutter_asset_path.string();
   webkit_web_view_load_uri(webview_, file_url.c_str());
 }
 
@@ -800,6 +905,12 @@ void InAppWebView::reload() {
   if (webview_ == nullptr)
     return;
   webkit_web_view_reload(webview_);
+}
+
+void InAppWebView::reloadFromOrigin() {
+  if (webview_ == nullptr)
+    return;
+  webkit_web_view_reload_bypass_cache(webview_);
 }
 
 void InAppWebView::goBack() {
@@ -838,6 +949,119 @@ bool InAppWebView::isLoading() const {
   return webkit_web_view_is_loading(webview_);
 }
 
+// === Navigation History ===
+
+FlValue* InAppWebView::getCopyBackForwardList() const {
+  if (webview_ == nullptr) {
+    return fl_value_new_null();
+  }
+
+  WebKitBackForwardList* bfList = webkit_web_view_get_back_forward_list(webview_);
+  if (bfList == nullptr) {
+    return fl_value_new_null();
+  }
+
+  // Get back list, current item, and forward list
+  GList* backList = webkit_back_forward_list_get_back_list(bfList);
+  WebKitBackForwardListItem* currentItem = webkit_back_forward_list_get_current_item(bfList);
+  GList* forwardList = webkit_back_forward_list_get_forward_list(bfList);
+
+  // Calculate current index (size of back list)
+  int currentIndex = g_list_length(backList);
+
+  // Build the complete history list
+  FlValue* historyList = fl_value_new_list();
+
+  // Add back list items
+  for (GList* l = backList; l != nullptr; l = l->next) {
+    WebKitBackForwardListItem* item = WEBKIT_BACK_FORWARD_LIST_ITEM(l->data);
+    FlValue* itemMap = fl_value_new_map();
+
+    const gchar* originalUri = webkit_back_forward_list_item_get_original_uri(item);
+    const gchar* title = webkit_back_forward_list_item_get_title(item);
+    const gchar* uri = webkit_back_forward_list_item_get_uri(item);
+
+    fl_value_set_string_take(itemMap, "originalUrl",
+                             fl_value_new_string(originalUri ? originalUri : ""));
+    fl_value_set_string_take(itemMap, "title",
+                             fl_value_new_string(title ? title : ""));
+    fl_value_set_string_take(itemMap, "url",
+                             fl_value_new_string(uri ? uri : ""));
+
+    fl_value_append_take(historyList, itemMap);
+  }
+
+  // Add current item
+  if (currentItem != nullptr) {
+    FlValue* itemMap = fl_value_new_map();
+
+    const gchar* originalUri = webkit_back_forward_list_item_get_original_uri(currentItem);
+    const gchar* title = webkit_back_forward_list_item_get_title(currentItem);
+    const gchar* uri = webkit_back_forward_list_item_get_uri(currentItem);
+
+    fl_value_set_string_take(itemMap, "originalUrl",
+                             fl_value_new_string(originalUri ? originalUri : ""));
+    fl_value_set_string_take(itemMap, "title",
+                             fl_value_new_string(title ? title : ""));
+    fl_value_set_string_take(itemMap, "url",
+                             fl_value_new_string(uri ? uri : ""));
+
+    fl_value_append_take(historyList, itemMap);
+  }
+
+  // Add forward list items
+  for (GList* l = forwardList; l != nullptr; l = l->next) {
+    WebKitBackForwardListItem* item = WEBKIT_BACK_FORWARD_LIST_ITEM(l->data);
+    FlValue* itemMap = fl_value_new_map();
+
+    const gchar* originalUri = webkit_back_forward_list_item_get_original_uri(item);
+    const gchar* title = webkit_back_forward_list_item_get_title(item);
+    const gchar* uri = webkit_back_forward_list_item_get_uri(item);
+
+    fl_value_set_string_take(itemMap, "originalUrl",
+                             fl_value_new_string(originalUri ? originalUri : ""));
+    fl_value_set_string_take(itemMap, "title",
+                             fl_value_new_string(title ? title : ""));
+    fl_value_set_string_take(itemMap, "url",
+                             fl_value_new_string(uri ? uri : ""));
+
+    fl_value_append_take(historyList, itemMap);
+  }
+
+  // Build result map
+  FlValue* result = fl_value_new_map();
+  fl_value_set_string_take(result, "list", historyList);
+  fl_value_set_string_take(result, "currentIndex", fl_value_new_int(currentIndex));
+
+  return result;
+}
+
+void InAppWebView::goBackOrForward(int steps) {
+  if (webview_ == nullptr)
+    return;
+
+  WebKitBackForwardList* bfList = webkit_web_view_get_back_forward_list(webview_);
+  if (bfList == nullptr)
+    return;
+
+  WebKitBackForwardListItem* item = webkit_back_forward_list_get_nth_item(bfList, steps);
+  if (item != nullptr) {
+    webkit_web_view_go_to_back_forward_list_item(webview_, item);
+  }
+}
+
+bool InAppWebView::canGoBackOrForward(int steps) const {
+  if (webview_ == nullptr)
+    return false;
+
+  WebKitBackForwardList* bfList = webkit_web_view_get_back_forward_list(webview_);
+  if (bfList == nullptr)
+    return false;
+
+  WebKitBackForwardListItem* item = webkit_back_forward_list_get_nth_item(bfList, steps);
+  return item != nullptr;
+}
+
 // === Getters ===
 
 std::optional<std::string> InAppWebView::getUrl() const {
@@ -862,6 +1086,50 @@ int64_t InAppWebView::getProgress() const {
   if (webview_ == nullptr)
     return 0;
   return static_cast<int64_t>(webkit_web_view_get_estimated_load_progress(webview_) * 100);
+}
+
+// === TLS/SSL Certificate ===
+
+std::optional<SslCertificate> InAppWebView::getCertificate() const {
+  if (webview_ == nullptr) {
+    return std::nullopt;
+  }
+
+  GTlsCertificate* certificate = nullptr;
+  GTlsCertificateFlags errors = static_cast<GTlsCertificateFlags>(0);
+  
+  // Get TLS info - returns FALSE if not HTTPS
+  if (!webkit_web_view_get_tls_info(webview_, &certificate, &errors)) {
+    return std::nullopt;
+  }
+
+  if (certificate == nullptr) {
+    return std::nullopt;
+  }
+
+  // Get the certificate in DER format (X.509)
+  GByteArray* der_data = nullptr;
+  g_object_get(certificate, "certificate", &der_data, nullptr);
+  
+  if (der_data == nullptr || der_data->len == 0) {
+    if (der_data != nullptr) {
+      g_byte_array_unref(der_data);
+    }
+    return std::nullopt;
+  }
+
+  // Create certificate data vector
+  std::vector<uint8_t> certData(der_data->data, der_data->data + der_data->len);
+  g_byte_array_unref(der_data);
+  
+  return SslCertificate(certData);
+}
+
+HitTestResult InAppWebView::getHitTestResult() const {
+  if (last_hit_test_result_ == nullptr) {
+    return HitTestResult(HitTestResultType::UNKNOWN_TYPE);
+  }
+  return HitTestResult::fromWebKitHitTestResult(last_hit_test_result_);
 }
 
 // === JavaScript ===
@@ -987,10 +1255,249 @@ void InAppWebView::removeAllUserScripts() {
   }
 }
 
+// === Web Message Listener ===
+
+void InAppWebView::addWebMessageListener(const std::string& jsObjectName,
+                                          const std::vector<std::string>& allowedOriginRules) {
+  if (webview_ == nullptr || jsObjectName.empty()) {
+    return;
+  }
+
+  // Build the allowed origin rules JSON array
+  std::string allowedOriginRulesJs = "[";
+  for (size_t i = 0; i < allowedOriginRules.size(); ++i) {
+    const std::string& rule = allowedOriginRules[i];
+    if (rule == "*") {
+      allowedOriginRulesJs += "'*'";
+    } else {
+      // Parse the rule to extract scheme, host, port
+      // Format: scheme://host[:port]
+      std::string scheme, host;
+      int port = 0;
+
+      size_t schemeEnd = rule.find("://");
+      if (schemeEnd != std::string::npos) {
+        scheme = rule.substr(0, schemeEnd);
+        std::string rest = rule.substr(schemeEnd + 3);
+
+        size_t portStart = rest.find(':');
+        if (portStart != std::string::npos) {
+          host = rest.substr(0, portStart);
+          try {
+            port = std::stoi(rest.substr(portStart + 1));
+          } catch (...) {
+            port = 0;
+          }
+        } else {
+          host = rest;
+        }
+      }
+
+      // Escape single quotes in host
+      std::string hostEscaped = host;
+      size_t pos = 0;
+      while ((pos = hostEscaped.find("'", pos)) != std::string::npos) {
+        hostEscaped.replace(pos, 1, "\\'");
+        pos += 2;
+      }
+
+      allowedOriginRulesJs += "{scheme: '" + scheme + "', host: ";
+      if (host.empty()) {
+        allowedOriginRulesJs += "null";
+      } else {
+        allowedOriginRulesJs += "'" + hostEscaped + "'";
+      }
+      allowedOriginRulesJs += ", port: ";
+      if (port == 0) {
+        allowedOriginRulesJs += "null";
+      } else {
+        allowedOriginRulesJs += std::to_string(port);
+      }
+      allowedOriginRulesJs += "}";
+    }
+    if (i < allowedOriginRules.size() - 1) {
+      allowedOriginRulesJs += ", ";
+    }
+  }
+  allowedOriginRulesJs += "]";
+
+  // Create the JavaScript to inject
+  std::string jsSource = WebMessageListenerJS::createWebMessageListenerInjectionJs(
+      jsObjectName, allowedOriginRulesJs);
+
+  // Create a user script for this web message listener
+  // We use a unique group name to allow removal if needed
+  std::string groupName = "WebMessageListener-" + jsObjectName;
+
+  auto userScript = std::make_shared<UserScript>(
+      groupName,
+      jsSource,
+      UserScriptInjectionTime::atDocumentStart,
+      true,  // forMainFrameOnly
+      std::nullopt  // allowedOriginRules (already handled in JS)
+  );
+
+  // Add the script to the user content controller
+  if (user_content_controller_) {
+    user_content_controller_->addUserScript(userScript);
+  }
+}
+
 // === HTML Content ===
 
 void InAppWebView::getHtml(std::function<void(const std::optional<std::string>&)> callback) {
   evaluateJavascript("document.documentElement.outerHTML", callback);
+}
+
+// === Screenshot ===
+
+void InAppWebView::takeScreenshot(std::function<void(const std::optional<std::vector<uint8_t>>&)> callback) {
+  if (webview_ == nullptr || callback == nullptr) {
+    if (callback) {
+      callback(std::nullopt);
+    }
+    return;
+  }
+
+  // Get the current pixel buffer dimensions
+  uint32_t width = 0;
+  uint32_t height = 0;
+  size_t buffer_size = GetPixelBufferSize(&width, &height);
+
+  if (buffer_size == 0 || width == 0 || height == 0) {
+    callback(std::nullopt);
+    return;
+  }
+
+  // Allocate a temporary buffer for the pixel data
+  std::vector<uint8_t> pixel_data(buffer_size);
+
+  if (!CopyPixelBufferTo(pixel_data.data(), buffer_size, &width, &height)) {
+    callback(std::nullopt);
+    return;
+  }
+
+  // Create a Cairo surface from the RGBA pixel data
+  // Note: WPE provides RGBA data, but Cairo uses ARGB (pre-multiplied alpha in native byte order)
+  // We need to convert RGBA -> ARGB32 format
+
+  // Allocate buffer for Cairo ARGB32 format (same size)
+  std::vector<uint8_t> argb_data(width * height * 4);
+
+  // Convert RGBA -> ARGB32 (Cairo's native format)
+  // Cairo ARGB32 format on little-endian: BGRA in memory
+  for (uint32_t i = 0; i < width * height; ++i) {
+    uint8_t r = pixel_data[i * 4 + 0];
+    uint8_t g = pixel_data[i * 4 + 1];
+    uint8_t b = pixel_data[i * 4 + 2];
+    uint8_t a = pixel_data[i * 4 + 3];
+
+    // Cairo ARGB32 on little-endian = BGRA in memory
+    argb_data[i * 4 + 0] = b;
+    argb_data[i * 4 + 1] = g;
+    argb_data[i * 4 + 2] = r;
+    argb_data[i * 4 + 3] = a;
+  }
+
+  // Create Cairo surface from the ARGB data
+  cairo_surface_t* surface = cairo_image_surface_create_for_data(
+      argb_data.data(),
+      CAIRO_FORMAT_ARGB32,
+      static_cast<int>(width),
+      static_cast<int>(height),
+      static_cast<int>(width * 4)  // stride
+  );
+
+  if (cairo_surface_status(surface) != CAIRO_STATUS_SUCCESS) {
+    cairo_surface_destroy(surface);
+    callback(std::nullopt);
+    return;
+  }
+
+  // Write PNG to a memory buffer using cairo_surface_write_to_png_stream
+  std::vector<uint8_t> png_data;
+
+  cairo_status_t status = cairo_surface_write_to_png_stream(
+      surface,
+      [](void* closure, const unsigned char* data, unsigned int length) -> cairo_status_t {
+        auto* output = static_cast<std::vector<uint8_t>*>(closure);
+        output->insert(output->end(), data, data + length);
+        return CAIRO_STATUS_SUCCESS;
+      },
+      &png_data
+  );
+
+  cairo_surface_destroy(surface);
+
+  if (status != CAIRO_STATUS_SUCCESS || png_data.empty()) {
+    callback(std::nullopt);
+    return;
+  }
+
+  callback(png_data);
+}
+
+// === Session State ===
+
+std::optional<std::vector<uint8_t>> InAppWebView::saveState() const {
+  if (webview_ == nullptr) {
+    return std::nullopt;
+  }
+
+  // Get the current session state from WPE WebKit
+  WebKitWebViewSessionState* session_state = webkit_web_view_get_session_state(webview_);
+  if (session_state == nullptr) {
+    return std::nullopt;
+  }
+
+  // Serialize the session state to GBytes
+  GBytes* bytes = webkit_web_view_session_state_serialize(session_state);
+  webkit_web_view_session_state_unref(session_state);
+
+  if (bytes == nullptr) {
+    return std::nullopt;
+  }
+
+  // Copy the data to a vector
+  gsize size = 0;
+  gconstpointer data = g_bytes_get_data(bytes, &size);
+
+  if (data == nullptr || size == 0) {
+    g_bytes_unref(bytes);
+    return std::nullopt;
+  }
+
+  std::vector<uint8_t> result(static_cast<const uint8_t*>(data),
+                               static_cast<const uint8_t*>(data) + size);
+
+  g_bytes_unref(bytes);
+  return result;
+}
+
+bool InAppWebView::restoreState(const std::vector<uint8_t>& stateData) {
+  if (webview_ == nullptr || stateData.empty()) {
+    return false;
+  }
+
+  // Create GBytes from the state data
+  GBytes* bytes = g_bytes_new(stateData.data(), stateData.size());
+  if (bytes == nullptr) {
+    return false;
+  }
+
+  // Create session state from the serialized data
+  WebKitWebViewSessionState* session_state = webkit_web_view_session_state_new(bytes);
+  g_bytes_unref(bytes);
+
+  if (session_state == nullptr) {
+    return false;
+  }
+
+  // Restore the session state
+  webkit_web_view_restore_session_state(webview_, session_state);
+  webkit_web_view_session_state_unref(session_state);
+
+  return true;
 }
 
 // === Zoom ===
@@ -1025,14 +1532,126 @@ void InAppWebView::scrollBy(int64_t x, int64_t y, bool animated) {
   evaluateJavascript(script, nullptr);
 }
 
-int64_t InAppWebView::getScrollX() const {
-  // This would need to be async in a real implementation
-  return 0;
+void InAppWebView::getScrollX(std::function<void(int64_t)> callback) {
+  if (webview_ == nullptr || callback == nullptr) {
+    if (callback) callback(0);
+    return;
+  }
+
+  evaluateJavascript(
+      "window.scrollX || window.pageXOffset || document.documentElement.scrollLeft || 0",
+      [callback](const std::optional<std::string>& result) {
+        int64_t scrollX = 0;
+        if (result.has_value()) {
+          try {
+            scrollX = std::stoll(*result);
+          } catch (...) {
+            scrollX = 0;
+          }
+        }
+        callback(scrollX);
+      });
 }
 
-int64_t InAppWebView::getScrollY() const {
-  // This would need to be async in a real implementation
-  return 0;
+void InAppWebView::getScrollY(std::function<void(int64_t)> callback) {
+  if (webview_ == nullptr || callback == nullptr) {
+    if (callback) callback(0);
+    return;
+  }
+
+  evaluateJavascript(
+      "window.scrollY || window.pageYOffset || document.documentElement.scrollTop || 0",
+      [callback](const std::optional<std::string>& result) {
+        int64_t scrollY = 0;
+        if (result.has_value()) {
+          try {
+            scrollY = std::stoll(*result);
+          } catch (...) {
+            scrollY = 0;
+          }
+        }
+        callback(scrollY);
+      });
+}
+
+void InAppWebView::canScrollVertically(std::function<void(bool)> callback) {
+  if (webview_ == nullptr || callback == nullptr) {
+    if (callback) callback(false);
+    return;
+  }
+
+  evaluateJavascript(
+      "document.documentElement.scrollHeight > document.documentElement.clientHeight",
+      [callback](const std::optional<std::string>& result) {
+        bool canScroll = false;
+        if (result.has_value() && *result == "true") {
+          canScroll = true;
+        }
+        callback(canScroll);
+      });
+}
+
+void InAppWebView::canScrollHorizontally(std::function<void(bool)> callback) {
+  if (webview_ == nullptr || callback == nullptr) {
+    if (callback) callback(false);
+    return;
+  }
+
+  evaluateJavascript(
+      "document.documentElement.scrollWidth > document.documentElement.clientWidth",
+      [callback](const std::optional<std::string>& result) {
+        bool canScroll = false;
+        if (result.has_value() && *result == "true") {
+          canScroll = true;
+        }
+        callback(canScroll);
+      });
+}
+
+// === Content Dimensions ===
+
+void InAppWebView::getContentHeight(std::function<void(int64_t)> callback) {
+  if (callback == nullptr) {
+    return;
+  }
+
+  // Use JavaScript to get the document's scroll height
+  evaluateJavascript(
+      "Math.max(document.body.scrollHeight, document.documentElement.scrollHeight)",
+      [callback](const std::optional<std::string>& result) {
+        if (result.has_value()) {
+          try {
+            int64_t height = std::stoll(result.value());
+            callback(height);
+            return;
+          } catch (...) {
+            // Fall through to default
+          }
+        }
+        callback(0);
+      });
+}
+
+void InAppWebView::getContentWidth(std::function<void(int64_t)> callback) {
+  if (callback == nullptr) {
+    return;
+  }
+
+  // Use JavaScript to get the document's scroll width
+  evaluateJavascript(
+      "Math.max(document.body.scrollWidth, document.documentElement.scrollWidth)",
+      [callback](const std::optional<std::string>& result) {
+        if (result.has_value()) {
+          try {
+            int64_t width = std::stoll(result.value());
+            callback(width);
+            return;
+          } catch (...) {
+            // Fall through to default
+          }
+        }
+        callback(0);
+      });
 }
 
 // === Settings ===
@@ -1656,6 +2275,8 @@ void InAppWebView::OnLoadChanged(WebKitWebView* web_view, WebKitLoadEvent load_e
     case WEBKIT_LOAD_COMMITTED:
       // Inject cursor detection script when page content starts loading
       self->injectCursorDetectionScript();
+      // Notify that page content is starting to be visible
+      self->channel_delegate_->onPageCommitVisible(self->getUrl().value_or(""));
       break;
     case WEBKIT_LOAD_FINISHED:
       self->channel_delegate_->onLoadStop(self->getUrl().value_or(""));
@@ -1764,6 +2385,18 @@ void InAppWebView::OnNotifyTitle(GObject* object, GParamSpec* pspec, gpointer us
   }
 }
 
+void InAppWebView::OnNotifyUri(GObject* object, GParamSpec* pspec, gpointer user_data) {
+  auto* self = static_cast<InAppWebView*>(user_data);
+  if (self->channel_delegate_ == nullptr)
+    return;
+
+  const gchar* uri = webkit_web_view_get_uri(WEBKIT_WEB_VIEW(object));
+  std::optional<std::string> url = uri ? std::optional<std::string>(uri) : std::nullopt;
+  
+  // isReload is not easily detectable - pass false by default
+  self->channel_delegate_->onUpdateVisitedHistory(url, false);
+}
+
 gboolean InAppWebView::OnLoadFailed(WebKitWebView* web_view, WebKitLoadEvent load_event,
                                     gchar* failing_uri, GError* error, gpointer user_data) {
   auto* self = static_cast<InAppWebView*>(user_data);
@@ -1791,13 +2424,57 @@ gboolean InAppWebView::OnLoadFailed(WebKitWebView* web_view, WebKitLoadEvent loa
 gboolean InAppWebView::OnLoadFailedWithTlsErrors(WebKitWebView* web_view, gchar* failing_uri,
                                                  GTlsCertificate* certificate,
                                                  GTlsCertificateFlags errors, gpointer user_data) {
-  (void)web_view;
-  (void)failing_uri;
-  (void)certificate;
-  (void)errors;
-  (void)user_data;
-  // Handle TLS errors
-  return FALSE;
+  auto* self = static_cast<InAppWebView*>(user_data);
+
+  if (!self->channel_delegate_) {
+    return FALSE;
+  }
+
+  // Create the challenge from TLS error info
+  auto challenge = ServerTrustChallenge::fromTlsError(
+      std::string(failing_uri != nullptr ? failing_uri : ""),
+      certificate, errors);
+
+  // Keep a reference to the certificate and web view for later use
+  g_object_ref(certificate);
+  g_object_ref(web_view);
+
+  auto callback = std::make_unique<WebViewChannelDelegate::ServerTrustAuthRequestCallback>();
+  callback->nonNullSuccess = [web_view, failing_uri, certificate](
+      const ServerTrustAuthResponse& response) -> bool {
+    if (response.action == ServerTrustAuthResponseAction::PROCEED) {
+      // Allow the certificate for this host
+      // Extract host from failing_uri
+      std::string host = get_host_from_url(std::string(failing_uri != nullptr ? failing_uri : ""));
+      if (!host.empty()) {
+        // Get the network session from the web view
+        WebKitNetworkSession* network_session = webkit_web_view_get_network_session(web_view);
+        webkit_network_session_allow_tls_certificate_for_host(network_session, certificate, host.c_str());
+        // Reload the page to retry with the allowed certificate
+        webkit_web_view_reload(web_view);
+      }
+    }
+    g_object_unref(certificate);
+    g_object_unref(web_view);
+    return true;
+  };
+
+  callback->defaultBehaviour = [certificate, web_view](const std::optional<ServerTrustAuthResponse>& response) {
+    // Default: cancel the request (do nothing, WebKit will handle the error)
+    g_object_unref(certificate);
+    g_object_unref(web_view);
+  };
+
+  callback->error = [certificate, web_view](const std::string& code, const std::string& message) {
+    debugLog("Error in onReceivedServerTrustAuthRequest: " + code + " - " + message);
+    g_object_unref(certificate);
+    g_object_unref(web_view);
+  };
+
+  self->channel_delegate_->onReceivedServerTrustAuthRequest(std::move(challenge), std::move(callback));
+
+  // Return TRUE to indicate we're handling this asynchronously
+  return TRUE;
 }
 
 void InAppWebView::OnCloseRequest(WebKitWebView* web_view, gpointer user_data) {
@@ -1808,6 +2485,25 @@ void InAppWebView::OnCloseRequest(WebKitWebView* web_view, gpointer user_data) {
 }
 
 // WPE WebKit create signal handler - returns WebKitWebView* (not GtkWidget*)
+// 
+// In WPE WebKit, creating a new WebView requires a WebKitWebViewBackend which
+// is tightly coupled with the WPE FDO exportable pipeline. Unlike WebKitGTK or
+// iOS WKWebView, we cannot easily create a related view without the full backend setup.
+// 
+// Multi-Window Support (matches iOS pattern)
+//
+// When JavaScript calls window.open() or a link has target="_blank", WebKit emits
+// the "create" signal. We must create a new WebView that shares the web process
+// with the parent (for session/cookies) and return it to WebKit.
+//
+// The pattern used here (matching iOS):
+// 1. Get a window ID from the manager
+// 2. Create a new InAppWebView with the parent webview as "related view"
+// 3. Store the InAppWebView in windowWebViews for later attachment by Dart
+// 4. Notify Dart via onCreateWindow callback
+// 5. Return the new WebKitWebView* to WebKit (so window.open() returns a real window)
+//
+// If Dart doesn't handle it, the default behaviour loads the URL in the parent view.
 WebKitWebView* InAppWebView::OnCreateWebView(WebKitWebView* web_view,
                                              WebKitNavigationAction* navigation_action,
                                              gpointer user_data) {
@@ -1826,41 +2522,92 @@ WebKitWebView* InAppWebView::OnCreateWebView(WebKitWebView* web_view,
     return nullptr;
   }
 
-  if (self->channel_delegate_) {
+  // Get window ID from manager
+  int64_t windowId = 0;
+  if (self->manager_ != nullptr) {
+    windowId = self->manager_->GetNextWindowId();
+  } else {
+    // Fallback to static counter if no manager
     static int64_t window_autoincrement_id = 0;
-    int64_t windowId = ++window_autoincrement_id;
-
-    auto createWindowAction =
-        std::make_unique<CreateWindowAction>(navigation_action, windowId, nullptr);
-
-    auto callback = std::make_unique<WebViewChannelDelegate::CreateWindowCallback>();
-
-    // Capture necessary data for callback
-    WebKitURIRequest* request = webkit_navigation_action_get_request(navigation_action);
-    std::string url_to_load;
-    if (request != nullptr) {
-      const gchar* uri = webkit_uri_request_get_uri(request);
-      if (uri != nullptr) {
-        url_to_load = std::string(uri);
-      }
-    }
-
-    callback->nonNullSuccess = [](bool handledByClient) { return !handledByClient; };
-
-    std::string captured_url = url_to_load;
-    auto* webview_ptr = self->webview_;
-    callback->defaultBehaviour = [webview_ptr, captured_url](std::optional<bool>) {
-      if (!captured_url.empty() && webview_ptr != nullptr) {
-        webkit_web_view_load_uri(webview_ptr, captured_url.c_str());
-      }
-    };
-
-    self->channel_delegate_->onCreateWindow(std::move(createWindowAction), std::move(callback));
+    windowId = ++window_autoincrement_id;
   }
 
-  // Return nullptr - we don't actually create a new WebView
-  // The Dart side handles the window creation
-  return nullptr;
+  // Get the URL from the navigation action
+  WebKitURIRequest* request = webkit_navigation_action_get_request(navigation_action);
+  std::optional<std::string> url_to_load;
+  if (request != nullptr) {
+    const gchar* uri = webkit_uri_request_get_uri(request);
+    if (uri != nullptr) {
+      url_to_load = std::string(uri);
+    }
+  }
+
+  // Create a new InAppWebView that shares the web process with the parent
+  // This is the key difference from the old implementation - we actually create
+  // a real WebView that WebKit can use for the popup window
+  InAppWebViewCreationParams windowParams;
+  windowParams.id = windowId;
+  windowParams.gtkWindow = self->gtk_window_;
+  windowParams.manager = self->manager_;
+  windowParams.initialSettings = self->settings_;  // Share parent settings
+  windowParams.windowId = windowId;
+  windowParams.relatedWebView = self->webview_;  // Share web process with parent
+  
+  // Create the new InAppWebView for the popup window
+  auto windowWebView = std::make_unique<InAppWebView>(
+      self->registrar_, nullptr, windowId, windowParams);
+  
+  // Get the WebKitWebView* to return to WebKit BEFORE moving the unique_ptr
+  WebKitWebView* newWebKitWebView = windowWebView->webview();
+  
+  if (newWebKitWebView == nullptr) {
+    errorLog("InAppWebView::OnCreateWebView: Failed to create popup WebView");
+    // Fall back to loading in parent
+    if (url_to_load.has_value() && self->webview_ != nullptr) {
+      webkit_web_view_load_uri(self->webview_, url_to_load.value().c_str());
+    }
+    return nullptr;
+  }
+
+  // Store the InAppWebView in the manager for later attachment by Dart
+  if (self->manager_ != nullptr) {
+    auto transport = std::make_unique<WebViewTransport>(std::move(windowWebView), url_to_load);
+    self->manager_->AddWindowWebView(windowId, std::move(transport));
+  }
+
+  auto createWindowAction =
+      std::make_unique<CreateWindowAction>(navigation_action, windowId, nullptr);
+
+  auto callback = std::make_unique<WebViewChannelDelegate::CreateWindowCallback>();
+
+  callback->nonNullSuccess = [](bool handledByClient) { return !handledByClient; };
+
+  // Capture for cleanup on default behaviour
+  auto* manager = self->manager_;
+  auto* parentWebview = self->webview_;
+  std::string captured_url = url_to_load.value_or("");
+  int64_t capturedWindowId = windowId;
+  
+  callback->defaultBehaviour = [manager, parentWebview, captured_url, capturedWindowId](std::optional<bool>) {
+    // If the Dart side doesn't handle the window, clean up and load in current view
+    if (manager != nullptr) {
+      manager->RemoveWindowWebView(capturedWindowId);
+    }
+    // Load the URL in the parent view instead
+    if (!captured_url.empty() && parentWebview != nullptr) {
+      webkit_web_view_load_uri(parentWebview, captured_url.c_str());
+    }
+  };
+
+  if (self->channel_delegate_) {
+    self->channel_delegate_->onCreateWindow(std::move(createWindowAction), std::move(callback));
+  } else {
+    callback->defaultBehaviour(std::nullopt);
+  }
+
+  // Return the new WebKitWebView* to WebKit
+  // This allows window.open() to return a real window object to JavaScript
+  return newWebKitWebView;
 }
 
 gboolean InAppWebView::OnScriptDialog(WebKitWebView* web_view, WebKitScriptDialog* dialog,
@@ -2846,6 +3593,372 @@ void InAppWebView::getSelectedText(std::function<void(const std::optional<std::s
       });
 }
 
+void InAppWebView::isSecureContext(std::function<void(bool)> callback) {
+  if (webview_ == nullptr || callback == nullptr) {
+    if (callback) callback(false);
+    return;
+  }
+
+  evaluateJavascript("window.isSecureContext",
+                     [callback](const std::optional<std::string>& result) {
+                       bool isSecure = false;
+                       if (result.has_value() && *result == "true") {
+                         isSecure = true;
+                       }
+                       callback(isSecure);
+                     });
+}
+
+// === Media Playback Control ===
+
+void InAppWebView::pauseAllMediaPlayback() {
+  if (webview_ == nullptr) return;
+  
+  // Pause all audio and video elements in the page
+  const char* script = R"(
+    (function() {
+      var mediaElements = document.querySelectorAll('audio, video');
+      mediaElements.forEach(function(el) {
+        if (!el.paused) {
+          el.pause();
+        }
+      });
+    })();
+  )";
+  evaluateJavascript(script, nullptr);
+}
+
+void InAppWebView::setAllMediaPlaybackSuspended(bool suspended) {
+  if (webview_ == nullptr) return;
+  
+  // Suspend or resume all media elements
+  // When suspended=true, pause all and mark with a data attribute
+  // When suspended=false, resume only those that were playing before
+  std::string script;
+  if (suspended) {
+    script = R"(
+      (function() {
+        var mediaElements = document.querySelectorAll('audio, video');
+        mediaElements.forEach(function(el) {
+          if (!el.paused) {
+            el.dataset.wasPlaying = 'true';
+            el.pause();
+          } else {
+            el.dataset.wasPlaying = 'false';
+          }
+        });
+      })();
+    )";
+  } else {
+    script = R"(
+      (function() {
+        var mediaElements = document.querySelectorAll('audio, video');
+        mediaElements.forEach(function(el) {
+          if (el.dataset.wasPlaying === 'true') {
+            el.play().catch(function() {});
+            delete el.dataset.wasPlaying;
+          }
+        });
+      })();
+    )";
+  }
+  evaluateJavascript(script, nullptr);
+}
+
+void InAppWebView::closeAllMediaPresentations() {
+  if (webview_ == nullptr) return;
+  
+  // Exit fullscreen if any media is in fullscreen, and exit picture-in-picture
+  const char* script = R"(
+    (function() {
+      // Exit fullscreen
+      if (document.fullscreenElement) {
+        document.exitFullscreen().catch(function() {});
+      }
+      // Exit picture-in-picture
+      if (document.pictureInPictureElement) {
+        document.exitPictureInPicture().catch(function() {});
+      }
+      // Also pause all media
+      var mediaElements = document.querySelectorAll('audio, video');
+      mediaElements.forEach(function(el) {
+        if (!el.paused) {
+          el.pause();
+        }
+      });
+    })();
+  )";
+  evaluateJavascript(script, nullptr);
+}
+
+void InAppWebView::requestMediaPlaybackState(std::function<void(int)> callback) {
+  if (webview_ == nullptr || callback == nullptr) {
+    if (callback) callback(0);  // NONE
+    return;
+  }
+  
+  // Use native WPE WebKit API for PLAYING detection (webkit_web_view_is_playing_audio)
+  // This is more accurate than JavaScript as it's tracked at the browser level
+  // Returns: 0 = NONE, 1 = PAUSED, 2 = SUSPENDED, 3 = PLAYING
+  
+  gboolean isPlayingAudio = webkit_web_view_is_playing_audio(webview_);
+  
+  if (isPlayingAudio) {
+    // Native API confirms audio is playing - return PLAYING immediately
+    callback(3);  // PLAYING
+    return;
+  }
+  
+  // If not playing, use JavaScript to determine if we have media elements
+  // and whether they are paused normally or suspended via our API
+  const char* script = R"(
+    (function() {
+      var mediaElements = document.querySelectorAll('audio, video');
+      if (mediaElements.length === 0) {
+        return 0; // NONE - no media elements
+      }
+      var hasSuspended = false;
+      var hasPaused = false;
+      mediaElements.forEach(function(el) {
+        if (el.dataset.wasPlaying === 'true') {
+          hasSuspended = true;
+        } else if (el.paused || el.ended) {
+          hasPaused = true;
+        }
+      });
+      if (hasSuspended) return 2; // SUSPENDED (paused via setAllMediaPlaybackSuspended)
+      if (hasPaused) return 1; // PAUSED (normal pause)
+      return 0; // NONE
+    })();
+  )";
+  
+  evaluateJavascript(script, [callback](const std::optional<std::string>& result) {
+    int state = 0;  // NONE
+    if (result.has_value()) {
+      try {
+        state = std::stoi(*result);
+      } catch (...) {
+        state = 0;
+      }
+    }
+    callback(state);
+  });
+}
+
+// === Media Capture State (Camera and Microphone) ===
+
+int InAppWebView::getCameraCaptureState() const {
+  if (webview_ == nullptr) return 0;  // NONE
+  
+  // WPE WebKit returns WebKitMediaCaptureState enum:
+  // WEBKIT_MEDIA_CAPTURE_STATE_NONE = 0
+  // WEBKIT_MEDIA_CAPTURE_STATE_ACTIVE = 1
+  // WEBKIT_MEDIA_CAPTURE_STATE_MUTED = 2
+  WebKitMediaCaptureState state = webkit_web_view_get_camera_capture_state(webview_);
+  return static_cast<int>(state);
+}
+
+void InAppWebView::setCameraCaptureState(int state) {
+  if (webview_ == nullptr) return;
+  
+  // state: 0 = NONE, 1 = ACTIVE, 2 = MUTED
+  // Note: Once state is set to NONE, it cannot be changed back (per WPE docs)
+  // The page can request capture again using mediaDevices API
+  WebKitMediaCaptureState captureState = static_cast<WebKitMediaCaptureState>(state);
+  webkit_web_view_set_camera_capture_state(webview_, captureState);
+}
+
+int InAppWebView::getMicrophoneCaptureState() const {
+  if (webview_ == nullptr) return 0;  // NONE
+  
+  WebKitMediaCaptureState state = webkit_web_view_get_microphone_capture_state(webview_);
+  return static_cast<int>(state);
+}
+
+void InAppWebView::setMicrophoneCaptureState(int state) {
+  if (webview_ == nullptr) return;
+  
+  WebKitMediaCaptureState captureState = static_cast<WebKitMediaCaptureState>(state);
+  webkit_web_view_set_microphone_capture_state(webview_, captureState);
+}
+
+// === Theme Color ===
+
+std::optional<std::string> InAppWebView::getMetaThemeColor() const {
+  if (webview_ == nullptr) return std::nullopt;
+  
+  WebKitColor color;
+  gboolean hasColor = webkit_web_view_get_theme_color(webview_, &color);
+  
+  if (!hasColor) {
+    return std::nullopt;
+  }
+  
+  // Convert WebKitColor (RGBA in 0.0-1.0 range) to hex string format #RRGGBBAA
+  // Note: WebKitColor has red, green, blue, alpha as gdouble (0.0-1.0)
+  int r = static_cast<int>(color.red * 255.0 + 0.5);
+  int g = static_cast<int>(color.green * 255.0 + 0.5);
+  int b = static_cast<int>(color.blue * 255.0 + 0.5);
+  int a = static_cast<int>(color.alpha * 255.0 + 0.5);
+  
+  // Clamp values to 0-255
+  r = std::max(0, std::min(255, r));
+  g = std::max(0, std::min(255, g));
+  b = std::max(0, std::min(255, b));
+  a = std::max(0, std::min(255, a));
+  
+  char hexColor[10];
+  if (a == 255) {
+    snprintf(hexColor, sizeof(hexColor), "#%02X%02X%02X", r, g, b);
+  } else {
+    snprintf(hexColor, sizeof(hexColor), "#%02X%02X%02X%02X", r, g, b, a);
+  }
+  
+  return std::string(hexColor);
+}
+
+// === Audio State (Playing and Mute) ===
+
+bool InAppWebView::isPlayingAudio() const {
+  if (webview_ == nullptr) return false;
+  
+  // WPE WebKit 2.8+
+  return webkit_web_view_is_playing_audio(webview_) == TRUE;
+}
+
+bool InAppWebView::isMuted() const {
+  if (webview_ == nullptr) return false;
+  
+  // WPE WebKit 2.30+
+  return webkit_web_view_get_is_muted(webview_) == TRUE;
+}
+
+void InAppWebView::setMuted(bool muted) {
+  if (webview_ == nullptr) return;
+  
+  // WPE WebKit 2.30+
+  webkit_web_view_set_is_muted(webview_, muted ? TRUE : FALSE);
+}
+
+// === Web Process Control ===
+
+void InAppWebView::terminateWebProcess() {
+  if (webview_ == nullptr) return;
+  
+  // WPE WebKit 2.34+
+  // Terminates the web process. The web-process-terminated signal will be emitted
+  // with WEBKIT_WEB_PROCESS_TERMINATED_BY_API as the reason.
+  webkit_web_view_terminate_web_process(webview_);
+}
+
+// === Focus Control ===
+
+bool InAppWebView::clearFocus() {
+  if (webview_ == nullptr) return false;
+  
+  // Remove focused state from WPE backend
+  setFocused(false);
+  
+  return true;
+}
+
+bool InAppWebView::requestFocus() {
+  if (webview_ == nullptr) return false;
+  
+  // Add focused state to WPE backend
+  setFocused(true);
+  
+  return true;
+}
+
+// === Web Archive ===
+
+void InAppWebView::saveWebArchive(const std::string& filePath, bool autoname,
+                                   std::function<void(const std::optional<std::string>&)> callback) {
+  if (webview_ == nullptr || callback == nullptr) {
+    if (callback) callback(std::nullopt);
+    return;
+  }
+  
+  std::string finalPath = filePath;
+  
+  // If autoname is true, generate a filename based on the current URL
+  if (autoname) {
+    const gchar* uri = webkit_web_view_get_uri(webview_);
+    if (uri == nullptr) {
+      callback(std::nullopt);
+      return;
+    }
+    
+    // Clean the URL to create a valid filename
+    std::string urlStr(uri);
+    // Replace invalid filename characters
+    std::string filename;
+    for (char c : urlStr) {
+      if (c == '/' || c == '\\' || c == ':' || c == '*' || 
+          c == '?' || c == '"' || c == '<' || c == '>' || c == '|') {
+        filename += '_';
+      } else {
+        filename += c;
+      }
+    }
+    
+    // Limit filename length
+    if (filename.length() > 200) {
+      filename = filename.substr(0, 200);
+    }
+    
+    // Append .mht extension (WPE WebKit saves as MHTML)
+    finalPath = filePath + "/" + filename + ".mht";
+  }
+  
+  // Create GFile for the destination
+  GFile* file = g_file_new_for_path(finalPath.c_str());
+  if (file == nullptr) {
+    callback(std::nullopt);
+    return;
+  }
+  
+  // Create callback data structure
+  struct SaveCallbackData {
+    std::function<void(const std::optional<std::string>&)> callback;
+    std::string filePath;
+    InAppWebView* self;
+  };
+  
+  auto* data = new SaveCallbackData{callback, finalPath, this};
+  
+  // Use webkit_web_view_save_to_file with MHTML format
+  webkit_web_view_save_to_file(
+      webview_,
+      file,
+      WEBKIT_SAVE_MODE_MHTML,
+      nullptr,  // GCancellable
+      [](GObject* source_object, GAsyncResult* result, gpointer user_data) {
+        auto* callbackData = static_cast<SaveCallbackData*>(user_data);
+        WebKitWebView* webView = WEBKIT_WEB_VIEW(source_object);
+        
+        GError* error = nullptr;
+        gboolean success = webkit_web_view_save_to_file_finish(webView, result, &error);
+        
+        if (success) {
+          callbackData->callback(callbackData->filePath);
+        } else {
+          if (error != nullptr) {
+            debugLog("InAppWebView::saveWebArchive failed: " + std::string(error->message));
+            g_error_free(error);
+          }
+          callbackData->callback(std::nullopt);
+        }
+        
+        delete callbackData;
+      },
+      data
+  );
+  
+  g_object_unref(file);
+}
+
 void InAppWebView::copyToClipboard() {
   if (webview_ == nullptr) return;
 
@@ -3070,6 +4183,17 @@ void InAppWebView::OnMouseTargetChanged(WebKitWebView* web_view,
                                         gpointer user_data) {
   auto* self = static_cast<InAppWebView*>(user_data);
 
+  // Store the hit test result for getHitTestResult()
+  // Release previous result and ref new one (if not null)
+  if (self->last_hit_test_result_ != nullptr) {
+    g_object_unref(self->last_hit_test_result_);
+    self->last_hit_test_result_ = nullptr;
+  }
+  if (hit_test_result != nullptr) {
+    self->last_hit_test_result_ = hit_test_result;
+    g_object_ref(hit_test_result);
+  }
+
   // Determine cursor based on hit test result
   std::string cursor_name = "basic";
 
@@ -3099,6 +4223,77 @@ void InAppWebView::OnMouseTargetChanged(WebKitWebView* web_view,
       self->on_cursor_changed_(cursor_name);
     }
   }
+}
+
+void InAppWebView::OnWebProcessTerminated(WebKitWebView* web_view,
+                                          WebKitWebProcessTerminationReason reason,
+                                          gpointer user_data) {
+  auto* self = static_cast<InAppWebView*>(user_data);
+
+  // Determine if this was a crash or a kill
+  // - WEBKIT_WEB_PROCESS_CRASHED: The web process crashed -> didCrash = true
+  // - WEBKIT_WEB_PROCESS_EXCEEDED_MEMORY_LIMIT: Killed by system due to memory -> didCrash = false
+  // - WEBKIT_WEB_PROCESS_TERMINATED_BY_API: Terminated via API call -> didCrash = false
+  bool didCrash = (reason == WEBKIT_WEB_PROCESS_CRASHED);
+
+  debugLog("InAppWebView: Web process terminated, reason=" + std::to_string(static_cast<int>(reason)) +
+           ", didCrash=" + (didCrash ? "true" : "false"));
+
+  if (self->channel_delegate_) {
+    self->channel_delegate_->onRenderProcessGone(didCrash);
+  }
+}
+
+gboolean InAppWebView::OnRunFileChooser(WebKitWebView* web_view,
+                                        WebKitFileChooserRequest* request,
+                                        gpointer user_data) {
+  auto* self = static_cast<InAppWebView*>(user_data);
+  
+  if (!self->channel_delegate_) {
+    return FALSE;  // Let default handler run
+  }
+
+  // Keep request alive during async callback
+  g_object_ref(request);
+
+  // Get file chooser properties
+  gboolean select_multiple = webkit_file_chooser_request_get_select_multiple(request);
+  const gchar* const* mime_types = webkit_file_chooser_request_get_mime_types(request);
+
+  // Build accept types list
+  std::vector<std::string> acceptTypes;
+  if (mime_types) {
+    for (int i = 0; mime_types[i] != nullptr; i++) {
+      acceptTypes.push_back(mime_types[i]);
+    }
+  }
+
+  // Determine mode: OPEN or OPEN_MULTIPLE (WPE doesn't have folder/save modes in this API)
+  int mode = select_multiple ? 1 : 0;  // 0 = OPEN, 1 = OPEN_MULTIPLE
+
+  self->channel_delegate_->onShowFileChooser(
+      mode,
+      acceptTypes,
+      false,  // isCaptureEnabled - not exposed by WPE API
+      std::nullopt,  // title
+      std::nullopt,  // filenameHint
+      [request](const std::optional<std::vector<std::string>>& filePaths) {
+        if (filePaths.has_value() && !filePaths->empty()) {
+          // Convert to gchar** format
+          std::vector<const gchar*> files;
+          for (const auto& path : *filePaths) {
+            files.push_back(path.c_str());
+          }
+          files.push_back(nullptr);  // NULL-terminated
+          webkit_file_chooser_request_select_files(request, files.data());
+        } else {
+          // User cancelled or no files selected
+          webkit_file_chooser_request_cancel(request);
+        }
+        g_object_unref(request);
+      });
+
+  return TRUE;  // We handled it
 }
 
 // NOTE: OnMotionNotify and OnNotifyFavicon have been removed because:
@@ -3375,6 +4570,40 @@ void InAppWebView::handleScriptMessage(const std::string& name, const std::strin
     }
     // Fall through to resolve the internal handler
 
+  } else if (handlerName == "onLoadResource") {
+    // Handle resource load tracking (from on_load_resource_js.h script)
+    std::string url = "";
+    std::string initiatorType = "";
+    double startTime = 0.0;
+    double duration = 0.0;
+
+    // The args field contains a JSON-encoded string: [{"url":"...","initiatorType":"...","startTime":0,"duration":0}]
+    if (!argsJsonStr.empty()) {
+      try {
+        json argsJson = json::parse(argsJsonStr);
+        if (argsJson.is_array() && !argsJson.empty()) {
+          json firstArg = argsJson[0];
+          if (firstArg.contains("url") && firstArg["url"].is_string()) {
+            url = firstArg["url"].get<std::string>();
+          }
+          if (firstArg.contains("initiatorType") && firstArg["initiatorType"].is_string()) {
+            initiatorType = firstArg["initiatorType"].get<std::string>();
+          }
+          if (firstArg.contains("startTime") && firstArg["startTime"].is_number()) {
+            startTime = firstArg["startTime"].get<double>();
+          }
+          if (firstArg.contains("duration") && firstArg["duration"].is_number()) {
+            duration = firstArg["duration"].get<double>();
+          }
+        }
+      } catch (const json::parse_error& e) {}
+    }
+
+    // Use targetWebView's channel delegate (for multi-window support)
+    if (targetWebView->channel_delegate_) {
+      targetWebView->channel_delegate_->onLoadResource(url, initiatorType, startTime, duration);
+    }
+
   } else if (handlerName == "onPrintRequest") {
     // TODO: Implement print request handling (matches iOS)
 
@@ -3592,6 +4821,70 @@ void InAppWebView::initializeWindowIdJS() {
   evaluateJavascript(script, nullptr);
 }
 
+void InAppWebView::findAll(const std::string& find) {
+  WebKitFindController* find_controller = webkit_web_view_get_find_controller(webview_);
+  webkit_find_controller_search(find_controller, find.c_str(),
+                                WEBKIT_FIND_OPTIONS_CASE_INSENSITIVE, G_MAXUINT);
+}
+
+void InAppWebView::findNext(bool forward) {
+  WebKitFindController* find_controller = webkit_web_view_get_find_controller(webview_);
+  if (forward) {
+    webkit_find_controller_search_next(find_controller);
+  } else {
+    webkit_find_controller_search_previous(find_controller);
+  }
+}
+
+void InAppWebView::clearMatches() {
+  WebKitFindController* find_controller = webkit_web_view_get_find_controller(webview_);
+  webkit_find_controller_search_finish(find_controller);
+}
+
+void InAppWebView::setSearchText(const std::string& searchText) {
+  WebKitFindController* find_controller = webkit_web_view_get_find_controller(webview_);
+  webkit_find_controller_search(find_controller, searchText.c_str(),
+                                WEBKIT_FIND_OPTIONS_CASE_INSENSITIVE, G_MAXUINT);
+}
+
+std::optional<std::string> InAppWebView::getSearchText() const {
+  WebKitFindController* find_controller = webkit_web_view_get_find_controller(webview_);
+  const gchar* text = webkit_find_controller_get_search_text(find_controller);
+  if (text) {
+    return std::string(text);
+  }
+  return std::nullopt;
+}
+
+std::optional<FindSession> InAppWebView::getActiveFindSession() const {
+  // Not fully supported in WebKitGTK/WPE as we don't track the active match index manually
+  return std::nullopt;
+}
+
+void InAppWebView::OnCountedMatches(WebKitFindController* find_controller, guint match_count,
+                                    gpointer user_data) {
+  auto* web_view = static_cast<InAppWebView*>(user_data);
+  if (web_view->channel_delegate_) {
+    web_view->channel_delegate_->onFindResultReceived(-1, match_count, true);
+  }
+}
+
+void InAppWebView::OnFoundText(WebKitFindController* find_controller, guint match_count,
+                               gpointer user_data) {
+  auto* web_view = static_cast<InAppWebView*>(user_data);
+  if (web_view->channel_delegate_) {
+    web_view->channel_delegate_->onFindResultReceived(-1, match_count, false);
+  }
+}
+
+void InAppWebView::OnFailedToFindText(WebKitFindController* find_controller,
+                                      gpointer user_data) {
+  auto* web_view = static_cast<InAppWebView*>(user_data);
+  if (web_view->channel_delegate_) {
+    web_view->channel_delegate_->onFindResultReceived(0, 0, true);
+  }
+}
+
 void InAppWebView::OnExportShmBuffer(struct wpe_fdo_shm_exported_buffer* buffer) {
   static bool first_shm_frame = true;
   if (first_shm_frame) {
@@ -3669,6 +4962,142 @@ void InAppWebView::OnExportShmBuffer(struct wpe_fdo_shm_exported_buffer* buffer)
   if (on_frame_available_) {
     on_frame_available_();
   }
+}
+
+// === Custom Scheme Handler ===
+
+void InAppWebView::RegisterCustomSchemes() {
+  if (webview_ == nullptr || settings_ == nullptr) {
+    return;
+  }
+
+  const auto& schemes = settings_->resourceCustomSchemes;
+  if (schemes.empty()) {
+    return;
+  }
+
+  WebKitWebContext* context = webkit_web_view_get_context(webview_);
+  if (context == nullptr) {
+    errorLog("InAppWebView: Could not get WebKitWebContext for custom scheme registration");
+    return;
+  }
+
+  // Built-in schemes that cannot be overridden per WebKit API
+  // WPE WebKit explicitly prohibits registering these - the warning says:
+  // "Registering special URI scheme https is no longer allowed"
+  static const std::set<std::string> builtInSchemes = {
+    "http", "https", "file", "data", "about", "blob"
+  };
+
+  for (const auto& scheme : schemes) {
+    if (scheme.empty()) {
+      continue;
+    }
+
+    // Don't allow overriding built-in schemes - WebKit will reject them
+    if (builtInSchemes.find(scheme) != builtInSchemes.end()) {
+      debugLog("InAppWebView: Skipping built-in scheme (not allowed by WebKit): " + scheme);
+      continue;
+    }
+
+    debugLog("InAppWebView: Registering custom scheme: " + scheme);
+
+    // Register the custom URI scheme with the web context
+    webkit_web_context_register_uri_scheme(
+        context, scheme.c_str(), InAppWebView::OnCustomSchemeRequest, this, nullptr);
+  }
+}
+
+void InAppWebView::OnCustomSchemeRequest(WebKitURISchemeRequest* request, gpointer user_data) {
+  auto* self = static_cast<InAppWebView*>(user_data);
+  if (self == nullptr || self->webview_ == nullptr || self->channel_delegate_ == nullptr) {
+    // Finish with error if we can't handle it
+    g_autoptr(GError) error =
+        g_error_new(G_IO_ERROR, G_IO_ERROR_FAILED, "WebView not available");
+    webkit_uri_scheme_request_finish_error(request, error);
+    return;
+  }
+
+  // Get request details
+  const gchar* uri = webkit_uri_scheme_request_get_uri(request);
+  const gchar* http_method = webkit_uri_scheme_request_get_http_method(request);
+
+  // Build WebResourceRequest
+  std::optional<std::string> url_str =
+      uri != nullptr ? std::optional<std::string>(uri) : std::nullopt;
+  std::optional<std::string> method_str =
+      http_method != nullptr ? std::optional<std::string>(http_method) : std::nullopt;
+
+  // Get HTTP headers if available
+  std::optional<std::map<std::string, std::string>> headers_map = std::nullopt;
+  SoupMessageHeaders* headers = webkit_uri_scheme_request_get_http_headers(request);
+  if (headers != nullptr) {
+    std::map<std::string, std::string> hdrs;
+    SoupMessageHeadersIter iter;
+    const char* name;
+    const char* value;
+    soup_message_headers_iter_init(&iter, headers);
+    while (soup_message_headers_iter_next(&iter, &name, &value)) {
+      if (name != nullptr && value != nullptr) {
+        hdrs[name] = value;
+      }
+    }
+    if (!hdrs.empty()) {
+      headers_map = hdrs;
+    }
+  }
+
+  auto webResourceRequest =
+      std::make_shared<WebResourceRequest>(url_str, method_str, headers_map, true);
+
+  // Hold a reference to the request while we wait for the Dart callback
+  g_object_ref(request);
+
+  // Create callback to handle response from Dart
+  auto callback = std::make_unique<WebViewChannelDelegate::LoadResourceWithCustomSchemeCallback>();
+
+  // Set up the nonNullSuccess handler to process the response
+  callback->nonNullSuccess = [request](const std::shared_ptr<CustomSchemeResponse>& response) -> bool {
+    if (response == nullptr || response->data.empty()) {
+      // No response provided - finish with error
+      g_autoptr(GError) error =
+          g_error_new(G_IO_ERROR, G_IO_ERROR_NOT_FOUND, "Resource not found");
+      webkit_uri_scheme_request_finish_error(request, error);
+    } else {
+      // Create input stream from response data
+      GInputStream* stream =
+          g_memory_input_stream_new_from_data(g_memdup2(response->data.data(), response->data.size()),
+                                              response->data.size(), g_free);
+
+      // Finish the request with the response data
+      webkit_uri_scheme_request_finish(request, stream, response->data.size(),
+                                       response->contentType.c_str());
+
+      g_object_unref(stream);
+    }
+    g_object_unref(request);
+    return false;  // Don't run defaultBehaviour
+  };
+
+  // Set up the nullSuccess handler for when Dart returns null
+  callback->nullSuccess = [request]() -> bool {
+    g_autoptr(GError) error =
+        g_error_new(G_IO_ERROR, G_IO_ERROR_NOT_FOUND, "Resource not found");
+    webkit_uri_scheme_request_finish_error(request, error);
+    g_object_unref(request);
+    return false;  // Don't run defaultBehaviour
+  };
+
+  // Set up the error handler
+  callback->error = [request](const std::string& code, const std::string& message) {
+    g_autoptr(GError) error =
+        g_error_new(G_IO_ERROR, G_IO_ERROR_FAILED, "%s: %s", code.c_str(), message.c_str());
+    webkit_uri_scheme_request_finish_error(request, error);
+    g_object_unref(request);
+  };
+
+  // Invoke the Dart callback
+  self->channel_delegate_->onLoadResourceWithCustomScheme(webResourceRequest, std::move(callback));
 }
 
 }  // namespace flutter_inappwebview_plugin

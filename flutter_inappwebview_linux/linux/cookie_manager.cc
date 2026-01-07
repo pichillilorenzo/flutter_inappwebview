@@ -199,8 +199,10 @@ void CookieManager::HandleMethodCall(FlMethodCall* method_call) {
 
     Cookie cookie(cookieMap);
 
+    g_object_ref(method_call);
     setCookie(url, cookie, [method_call](bool success) {
       fl_method_call_respond_success(method_call, fl_value_new_bool(success), nullptr);
+      g_object_unref(method_call);
     });
   } else if (string_equals(method, "getCookies")) {
     std::string url = get_fl_map_value<std::string>(args, "url", "");
@@ -210,12 +212,14 @@ void CookieManager::HandleMethodCall(FlMethodCall* method_call) {
       return;
     }
 
+    g_object_ref(method_call);
     getCookies(url, [method_call](std::vector<Cookie> cookies) {
       g_autoptr(FlValue) result = fl_value_new_list();
       for (const auto& cookie : cookies) {
         fl_value_append_take(result, cookie.toFlValue());
       }
       fl_method_call_respond_success(method_call, result, nullptr);
+      g_object_unref(method_call);
     });
   } else if (string_equals(method, "getCookie")) {
     std::string url = get_fl_map_value<std::string>(args, "url", "");
@@ -226,12 +230,14 @@ void CookieManager::HandleMethodCall(FlMethodCall* method_call) {
       return;
     }
 
+    g_object_ref(method_call);
     getCookie(url, name, [method_call](std::optional<Cookie> cookie) {
       if (cookie.has_value()) {
         fl_method_call_respond_success(method_call, cookie.value().toFlValue(), nullptr);
       } else {
         fl_method_call_respond_success(method_call, fl_value_new_null(), nullptr);
       }
+      g_object_unref(method_call);
     });
   } else if (string_equals(method, "deleteCookie")) {
     std::string url = get_fl_map_value<std::string>(args, "url", "");
@@ -239,20 +245,36 @@ void CookieManager::HandleMethodCall(FlMethodCall* method_call) {
     std::string domain = get_fl_map_value<std::string>(args, "domain", "");
     std::string path = get_fl_map_value<std::string>(args, "path", "/");
 
+    g_object_ref(method_call);
     deleteCookie(url, name, domain, path, [method_call](bool success) {
       fl_method_call_respond_success(method_call, fl_value_new_bool(success), nullptr);
+      g_object_unref(method_call);
     });
   } else if (string_equals(method, "deleteCookies")) {
     std::string url = get_fl_map_value<std::string>(args, "url", "");
     std::string domain = get_fl_map_value<std::string>(args, "domain", "");
     std::string path = get_fl_map_value<std::string>(args, "path", "/");
 
+    g_object_ref(method_call);
     deleteCookies(url, domain, path, [method_call](bool success) {
       fl_method_call_respond_success(method_call, fl_value_new_bool(success), nullptr);
+      g_object_unref(method_call);
     });
   } else if (string_equals(method, "deleteAllCookies")) {
+    g_object_ref(method_call);
     deleteAllCookies([method_call](bool success) {
       fl_method_call_respond_success(method_call, fl_value_new_bool(success), nullptr);
+      g_object_unref(method_call);
+    });
+  } else if (string_equals(method, "getAllCookies")) {
+    g_object_ref(method_call);
+    getAllCookies([method_call](std::vector<Cookie> cookies) {
+      g_autoptr(FlValue) result = fl_value_new_list();
+      for (const auto& cookie : cookies) {
+        fl_value_append_take(result, cookie.toFlValue());
+      }
+      fl_method_call_respond_success(method_call, result, nullptr);
+      g_object_unref(method_call);
     });
   } else {
     fl_method_call_respond_not_implemented(method_call, nullptr);
@@ -360,9 +382,9 @@ void CookieManager::deleteCookie(const std::string& url, const std::string& name
     return;
   }
 
-  // Create a cookie with the name to delete
+  // Determine the domain to use for fetching cookies
   std::string cookieDomain = domain;
-  if (cookieDomain.empty()) {
+  if (cookieDomain.empty() && !url.empty()) {
     GUri* guri = g_uri_parse(url.c_str(), G_URI_FLAGS_NONE, nullptr);
     if (guri != nullptr) {
       const char* host = g_uri_get_host(guri);
@@ -373,40 +395,103 @@ void CookieManager::deleteCookie(const std::string& url, const std::string& name
     }
   }
 
-  SoupCookie* soupCookie = soup_cookie_new(name.c_str(),
-                                           "",  // value doesn't matter for deletion
-                                           cookieDomain.c_str(), path.c_str(),
-                                           0  // expired
-  );
-
-  if (soupCookie == nullptr) {
-    callback(false);
-    return;
-  }
-
+  // WPE WebKit requires the EXACT SoupCookie object to delete, not a minimal one.
+  // We must first fetch all cookies and find the matching one with all its attributes.
   auto* callbackPtr = new std::function<void(bool)>(std::move(callback));
+  
+  // Capture parameters for the callback
+  struct DeleteContext {
+    WebKitCookieManager* manager;
+    std::string name;
+    std::string domain;
+    std::string path;
+    std::function<void(bool)>* callback;
+  };
+  
+  auto* ctx = new DeleteContext{manager, name, cookieDomain, path, callbackPtr};
 
-  webkit_cookie_manager_delete_cookie(
-      manager, soupCookie,
+  webkit_cookie_manager_get_all_cookies(
+      manager,
       nullptr,  // cancellable
       [](GObject* source, GAsyncResult* result, gpointer user_data) {
-        auto* cb = static_cast<std::function<void(bool)>*>(user_data);
-
+        auto* ctx = static_cast<DeleteContext*>(user_data);
+        
         GError* error = nullptr;
-        gboolean success = webkit_cookie_manager_delete_cookie_finish(WEBKIT_COOKIE_MANAGER(source),
-                                                                      result, &error);
-
+        GList* cookies = webkit_cookie_manager_get_all_cookies_finish(
+            WEBKIT_COOKIE_MANAGER(source), result, &error);
+        
         if (error != nullptr) {
-          errorLog(std::string("CookieManager: deleteCookie failed: ") + error->message);
+          errorLog(std::string("CookieManager: deleteCookie fetch failed: ") + error->message);
           g_error_free(error);
+          (*(ctx->callback))(false);
+          delete ctx->callback;
+          delete ctx;
+          return;
         }
-
-        (*cb)(success);
-        delete cb;
+        
+        // Find the matching cookie
+        SoupCookie* matchingCookie = nullptr;
+        for (GList* l = cookies; l != nullptr; l = l->next) {
+          SoupCookie* soupCookie = static_cast<SoupCookie*>(l->data);
+          const char* cookieName = soup_cookie_get_name(soupCookie);
+          const char* cookieDomain = soup_cookie_get_domain(soupCookie);
+          const char* cookiePath = soup_cookie_get_path(soupCookie);
+          
+          if (cookieName != nullptr && strcmp(cookieName, ctx->name.c_str()) == 0) {
+            // Check domain match (if specified)
+            bool domainMatch = ctx->domain.empty() ||
+                               (cookieDomain != nullptr && 
+                                (strcmp(cookieDomain, ctx->domain.c_str()) == 0 ||
+                                 // Also match with leading dot (e.g., ".example.com" matches "example.com")
+                                 (cookieDomain[0] == '.' && strcmp(cookieDomain + 1, ctx->domain.c_str()) == 0) ||
+                                 (ctx->domain[0] == '.' && strcmp(cookieDomain, ctx->domain.c_str() + 1) == 0)));
+            
+            // Check path match (if not default)
+            bool pathMatch = ctx->path == "/" || 
+                             (cookiePath != nullptr && strcmp(cookiePath, ctx->path.c_str()) == 0);
+            
+            if (domainMatch && pathMatch) {
+              matchingCookie = soup_cookie_copy(soupCookie);
+              break;
+            }
+          }
+        }
+        
+        g_list_free_full(cookies, reinterpret_cast<GDestroyNotify>(soup_cookie_free));
+        
+        if (matchingCookie == nullptr) {
+          // Cookie not found - consider this a success (nothing to delete)
+          (*(ctx->callback))(true);
+          delete ctx->callback;
+          delete ctx;
+          return;
+        }
+        
+        // Now delete the actual cookie with all its attributes
+        webkit_cookie_manager_delete_cookie(
+            ctx->manager, matchingCookie,
+            nullptr,  // cancellable
+            [](GObject* source, GAsyncResult* result, gpointer user_data) {
+              auto* ctx = static_cast<DeleteContext*>(user_data);
+              
+              GError* error = nullptr;
+              gboolean success = webkit_cookie_manager_delete_cookie_finish(
+                  WEBKIT_COOKIE_MANAGER(source), result, &error);
+              
+              if (error != nullptr) {
+                errorLog(std::string("CookieManager: deleteCookie failed: ") + error->message);
+                g_error_free(error);
+              }
+              
+              (*(ctx->callback))(success);
+              delete ctx->callback;
+              delete ctx;
+            },
+            ctx);
+        
+        soup_cookie_free(matchingCookie);
       },
-      callbackPtr);
-
-  soup_cookie_free(soupCookie);
+      ctx);
 }
 
 void CookieManager::deleteCookies(const std::string& url, const std::string& domain,
@@ -486,6 +571,44 @@ void CookieManager::deleteAllCookies(std::function<void(bool)> callback) {
         }
 
         (*cb)(success);
+        delete cb;
+      },
+      callbackPtr);
+}
+
+void CookieManager::getAllCookies(std::function<void(std::vector<Cookie>)> callback) {
+  WebKitCookieManager* manager = getCookieManager();
+  if (manager == nullptr) {
+    callback({});
+    return;
+  }
+
+  auto* callbackPtr = new std::function<void(std::vector<Cookie>)>(std::move(callback));
+
+  webkit_cookie_manager_get_all_cookies(
+      manager,
+      nullptr,  // cancellable
+      [](GObject* source, GAsyncResult* result, gpointer user_data) {
+        auto* cb = static_cast<std::function<void(std::vector<Cookie>)>*>(user_data);
+
+        GError* error = nullptr;
+        GList* cookies = webkit_cookie_manager_get_all_cookies_finish(
+            WEBKIT_COOKIE_MANAGER(source), result, &error);
+
+        std::vector<Cookie> cookieList;
+
+        if (error != nullptr) {
+          errorLog(std::string("CookieManager: getAllCookies failed: ") + error->message);
+          g_error_free(error);
+        } else if (cookies != nullptr) {
+          for (GList* l = cookies; l != nullptr; l = l->next) {
+            SoupCookie* soupCookie = static_cast<SoupCookie*>(l->data);
+            cookieList.emplace_back(soupCookie);
+          }
+          g_list_free_full(cookies, reinterpret_cast<GDestroyNotify>(soup_cookie_free));
+        }
+
+        (*cb)(cookieList);
         delete cb;
       },
       callbackPtr);

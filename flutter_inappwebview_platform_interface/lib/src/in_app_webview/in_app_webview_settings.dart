@@ -79,7 +79,7 @@ class InAppWebViewSettings_ {
   ///it will be automatically inferred as `true`, otherwise, the default value is `false`.
   ///This logic will not be applied for [PlatformInAppBrowser], where you must set the value manually.
   @SupportedPlatforms(
-    platforms: [AndroidPlatform(), IOSPlatform(), MacOSPlatform()],
+    platforms: [AndroidPlatform(), IOSPlatform(), MacOSPlatform(), LinuxPlatform()],
   )
   bool? useOnLoadResource;
 
@@ -592,6 +592,11 @@ because there isn't any way to make the website data store non-persistent for th
         apiUrl:
             "https://developer.android.com/reference/android/webkit/WebSettings?hl=en#setDatabaseEnabled(boolean)",
       ),
+      LinuxPlatform(
+        apiName: "WebKitSettings.enable-html5-database",
+        apiUrl:
+            "https://wpewebkit.org/reference/stable/wpe-webkit-2.0/property.Settings.enable-html5-database.html",
+      ),
     ],
   )
   bool? databaseEnabled;
@@ -603,6 +608,11 @@ because there isn't any way to make the website data store non-persistent for th
         apiName: "WebSettings.setDomStorageEnabled",
         apiUrl:
             "https://developer.android.com/reference/android/webkit/WebSettings?hl=en#setDomStorageEnabled(boolean)",
+      ),
+      LinuxPlatform(
+        apiName: "WebKitSettings.enable-html5-local-storage",
+        apiUrl:
+            "https://wpewebkit.org/reference/stable/wpe-webkit-2.0/property.Settings.enable-html5-local-storage.html",
       ),
     ],
   )
@@ -727,6 +737,11 @@ because there isn't any way to make the website data store non-persistent for th
         apiUrl:
             "https://developer.android.com/reference/android/webkit/WebSettings#setCursiveFontFamily(java.lang.String)",
       ),
+      LinuxPlatform(
+        apiName: "WebKitSettings.cursive-font-family",
+        apiUrl:
+            "https://wpewebkit.org/reference/stable/wpe-webkit-2.0/property.Settings.cursive-font-family.html",
+      ),
     ],
   )
   String? cursiveFontFamily;
@@ -738,6 +753,11 @@ because there isn't any way to make the website data store non-persistent for th
         apiName: "WebSettings.setDefaultFixedFontSize",
         apiUrl:
             "https://developer.android.com/reference/android/webkit/WebSettings#setDefaultFixedFontSize(int)",
+      ),
+      LinuxPlatform(
+        apiName: "WebKitSettings.default-monospace-font-size",
+        apiUrl:
+            "https://wpewebkit.org/reference/stable/wpe-webkit-2.0/property.Settings.default-monospace-font-size.html",
       ),
     ],
   )
@@ -751,6 +771,11 @@ because there isn't any way to make the website data store non-persistent for th
         apiUrl:
             "https://developer.android.com/reference/android/webkit/WebSettings#setDefaultFontSize(int)",
       ),
+      LinuxPlatform(
+        apiName: "WebKitSettings.default-font-size",
+        apiUrl:
+            "https://wpewebkit.org/reference/stable/wpe-webkit-2.0/property.Settings.default-font-size.html",
+      ),
     ],
   )
   int? defaultFontSize;
@@ -762,6 +787,11 @@ because there isn't any way to make the website data store non-persistent for th
         apiName: "WebSettings.setDefaultTextEncodingName",
         apiUrl:
             "https://developer.android.com/reference/android/webkit/WebSettings#setDefaultTextEncodingName(java.lang.String)",
+      ),
+      LinuxPlatform(
+        apiName: "WebKitSettings.default-charset",
+        apiUrl:
+            "https://wpewebkit.org/reference/stable/wpe-webkit-2.0/property.Settings.default-charset.html",
       ),
     ],
   )
@@ -788,6 +818,11 @@ because there isn't any way to make the website data store non-persistent for th
         apiUrl:
             "https://developer.android.com/reference/android/webkit/WebSettings#setFantasyFontFamily(java.lang.String)",
       ),
+      LinuxPlatform(
+        apiName: "WebKitSettings.fantasy-font-family",
+        apiUrl:
+            "https://wpewebkit.org/reference/stable/wpe-webkit-2.0/property.Settings.fantasy-font-family.html",
+      ),
     ],
   )
   String? fantasyFontFamily;
@@ -799,6 +834,11 @@ because there isn't any way to make the website data store non-persistent for th
         apiName: "WebSettings.setFixedFontFamily",
         apiUrl:
             "https://developer.android.com/reference/android/webkit/WebSettings#setFixedFontFamily(java.lang.String)",
+      ),
+      LinuxPlatform(
+        apiName: "WebKitSettings.monospace-font-family",
+        apiUrl:
+            "https://wpewebkit.org/reference/stable/wpe-webkit-2.0/property.Settings.monospace-font-family.html",
       ),
     ],
   )
@@ -904,6 +944,11 @@ because there isn't any way to make the website data store non-persistent for th
         apiUrl:
             "https://developer.android.com/reference/android/webkit/WebSettings?hl=en#setLoadsImagesAutomatically(boolean)",
       ),
+      LinuxPlatform(
+        apiName: "WebKitSettings.auto-load-images",
+        apiUrl:
+            "https://wpewebkit.org/reference/stable/wpe-webkit-2.0/property.Settings.auto-load-images.html",
+      ),
     ],
   )
   bool? loadsImagesAutomatically;
@@ -972,6 +1017,11 @@ because there isn't any way to make the website data store non-persistent for th
         apiUrl:
             "https://developer.android.com/reference/android/webkit/WebSettings?hl=en#setSansSerifFontFamily(java.lang.String)",
       ),
+      LinuxPlatform(
+        apiName: "WebKitSettings.sans-serif-font-family",
+        apiUrl:
+            "https://wpewebkit.org/reference/stable/wpe-webkit-2.0/property.Settings.sans-serif-font-family.html",
+      ),
     ],
   )
   String? sansSerifFontFamily;
@@ -984,6 +1034,11 @@ because there isn't any way to make the website data store non-persistent for th
         apiUrl:
             "https://developer.android.com/reference/android/webkit/WebSettings?hl=en#setSerifFontFamily(java.lang.String)",
       ),
+      LinuxPlatform(
+        apiName: "WebKitSettings.serif-font-family",
+        apiUrl:
+            "https://wpewebkit.org/reference/stable/wpe-webkit-2.0/property.Settings.serif-font-family.html",
+      ),
     ],
   )
   String? serifFontFamily;
@@ -995,6 +1050,11 @@ because there isn't any way to make the website data store non-persistent for th
         apiName: "WebSettings.setStandardFontFamily",
         apiUrl:
             "https://developer.android.com/reference/android/webkit/WebSettings?hl=en#setStandardFontFamily(java.lang.String)",
+      ),
+      LinuxPlatform(
+        apiName: "WebKitSettings.default-font-family",
+        apiUrl:
+            "https://wpewebkit.org/reference/stable/wpe-webkit-2.0/property.Settings.default-font-family.html",
       ),
     ],
   )
@@ -1960,6 +2020,11 @@ as it can cause framerate drops on animations in Android 9 and lower (see [Hybri
         apiUrl:
             "https://developer.apple.com/documentation/webkit/wkpreferences/3917769-iselementfullscreenenabled",
       ),
+      LinuxPlatform(
+        apiName: "WebKitSettings.enable-fullscreen",
+        apiUrl:
+            "https://wpewebkit.org/reference/stable/wpe-webkit-2.0/property.Settings.enable-fullscreen.html",
+      ),
     ],
   )
   bool? isElementFullscreenEnabled;
@@ -2551,6 +2616,143 @@ as it can cause framerate drops on animations in Android 9 and lower (see [Hybri
   )
   String? iframeAriaHidden;
 
+  ///Sets whether console messages are written to stdout.
+  ///When enabled, console messages from the web page will be written to the standard output.
+  ///This is useful for debugging purposes.
+  ///
+  ///The default value is `false`.
+  @SupportedPlatforms(
+    platforms: [
+      LinuxPlatform(
+        apiName: "WebKitSettings.enable-write-console-messages-to-stdout",
+        apiUrl:
+            "https://wpewebkit.org/reference/stable/wpe-webkit-2.0/property.Settings.enable-write-console-messages-to-stdout.html",
+      ),
+    ],
+  )
+  bool? enableWriteConsoleMessagesToStdout;
+
+  ///Sets whether smooth scrolling is enabled.
+  ///When enabled, scrolling animations are smooth instead of jumping instantly.
+  ///
+  ///The default value is `true`.
+  @SupportedPlatforms(
+    platforms: [
+      LinuxPlatform(
+        apiName: "WebKitSettings.enable-smooth-scrolling",
+        apiUrl:
+            "https://wpewebkit.org/reference/stable/wpe-webkit-2.0/property.Settings.enable-smooth-scrolling.html",
+      ),
+    ],
+  )
+  bool? enableSmoothScrolling;
+
+  ///Sets whether caret browsing mode is enabled.
+  ///Caret browsing mode allows users to navigate through web pages using the keyboard,
+  ///with a visible caret (text cursor) that can be moved through the content.
+  ///
+  ///The default value is `false`.
+  @SupportedPlatforms(
+    platforms: [
+      LinuxPlatform(
+        apiName: "WebKitSettings.enable-caret-browsing",
+        apiUrl:
+            "https://wpewebkit.org/reference/stable/wpe-webkit-2.0/property.Settings.enable-caret-browsing.html",
+      ),
+    ],
+  )
+  bool? enableCaretBrowsing;
+
+  ///Sets whether the page cache is enabled.
+  ///The page cache allows for faster back/forward navigation by keeping pages in memory.
+  ///
+  ///The default value is `true`.
+  @SupportedPlatforms(
+    platforms: [
+      LinuxPlatform(
+        apiName: "WebKitSettings.enable-page-cache",
+        apiUrl:
+            "https://wpewebkit.org/reference/stable/wpe-webkit-2.0/property.Settings.enable-page-cache.html",
+      ),
+    ],
+  )
+  bool? enablePageCache;
+
+  ///Sets whether compositing indicators are drawn.
+  ///When enabled, visual indicators are shown for compositing layers.
+  ///This is primarily useful for debugging rendering performance.
+  ///
+  ///The default value is `false`.
+  @SupportedPlatforms(
+    platforms: [
+      LinuxPlatform(
+        apiName: "WebKitSettings.draw-compositing-indicators",
+        apiUrl:
+            "https://wpewebkit.org/reference/stable/wpe-webkit-2.0/property.Settings.draw-compositing-indicators.html",
+      ),
+    ],
+  )
+  bool? drawCompositingIndicators;
+
+  ///Sets whether text areas are resizable.
+  ///When enabled, text areas can be resized by the user.
+  ///
+  ///The default value is `true`.
+  @SupportedPlatforms(
+    platforms: [
+      LinuxPlatform(
+        apiName: "WebKitSettings.enable-resizable-text-areas",
+        apiUrl:
+            "https://wpewebkit.org/reference/stable/wpe-webkit-2.0/property.Settings.enable-resizable-text-areas.html",
+      ),
+    ],
+  )
+  bool? enableResizableTextAreas;
+
+  ///Sets whether tab key can be used to navigate to links.
+  ///When enabled, pressing Tab will focus on links in the page.
+  ///
+  ///The default value is `true`.
+  @SupportedPlatforms(
+    platforms: [
+      LinuxPlatform(
+        apiName: "WebKitSettings.enable-tabs-to-links",
+        apiUrl:
+            "https://wpewebkit.org/reference/stable/wpe-webkit-2.0/property.Settings.enable-tabs-to-links.html",
+      ),
+    ],
+  )
+  bool? enableTabsToLinks;
+
+  ///Sets whether spatial navigation is enabled.
+  ///Spatial navigation allows users to navigate between focusable elements
+  ///using arrow keys instead of Tab.
+  ///
+  ///The default value is `false`.
+  @SupportedPlatforms(
+    platforms: [
+      LinuxPlatform(
+        apiName: "WebKitSettings.enable-spatial-navigation",
+        apiUrl:
+            "https://wpewebkit.org/reference/stable/wpe-webkit-2.0/property.Settings.enable-spatial-navigation.html",
+      ),
+    ],
+  )
+  bool? enableSpatialNavigation;
+
+  ///Sets the pictograph font family name.
+  ///The pictograph font family is used for rendering pictograph characters (emoji).
+  @SupportedPlatforms(
+    platforms: [
+      LinuxPlatform(
+        apiName: "WebKitSettings.pictograph-font-family",
+        apiUrl:
+            "https://wpewebkit.org/reference/stable/wpe-webkit-2.0/property.Settings.pictograph-font-family.html",
+      ),
+    ],
+  )
+  String? pictographFontFamily;
+
   @ExchangeableObjectConstructor()
   InAppWebViewSettings_({
     this.useShouldOverrideUrlLoading,
@@ -2720,6 +2922,15 @@ as it can cause framerate drops on animations in Android 9 and lower (see [Hybri
     this.iframeCsp,
     this.iframeRole,
     this.iframeAriaHidden,
+    this.enableWriteConsoleMessagesToStdout = false,
+    this.enableSmoothScrolling = true,
+    this.enableCaretBrowsing = false,
+    this.enablePageCache = true,
+    this.drawCompositingIndicators = false,
+    this.enableResizableTextAreas = true,
+    this.enableTabsToLinks = true,
+    this.enableSpatialNavigation = false,
+    this.pictographFontFamily,
   }) {
     if (this.minimumFontSize == null)
       this.minimumFontSize = Util.isAndroid ? 8 : 0;

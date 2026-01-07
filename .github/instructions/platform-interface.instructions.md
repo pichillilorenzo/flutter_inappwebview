@@ -5,6 +5,8 @@ applyTo: "flutter_inappwebview_platform_interface/**"
 # Platform Interface Package Instructions
 
 This is the **source of truth** for the entire plugin. All types, enums, and platform contracts are defined here.
+Used by all platform implementations and the main plugin-facing-API package.
+When adding new features here, you must propagate them also to the main `flutter_inappwebview` package.
 
 ## Main Platform Contracts
 

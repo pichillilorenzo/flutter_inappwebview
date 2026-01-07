@@ -161,4 +161,18 @@ class LinuxCookieManager extends PlatformCookieManager {
     final result = await _channel.invokeMethod<bool>('deleteAllCookies');
     return result ?? false;
   }
+
+  @override
+  Future<List<Cookie>> getAllCookies() async {
+    final result = await _channel.invokeMethod<List<dynamic>>('getAllCookies');
+
+    if (result == null) {
+      return [];
+    }
+
+    return result
+        .cast<Map<dynamic, dynamic>>()
+        .map((cookieMap) => Cookie.fromMap(cookieMap.cast<String, dynamic>())!)
+        .toList();
+  }
 }

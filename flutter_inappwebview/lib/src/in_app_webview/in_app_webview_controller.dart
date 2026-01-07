@@ -766,6 +766,27 @@ class InAppWebViewController {
   Future<void> setMicrophoneCaptureState({required MediaCaptureState state}) =>
       platform.setMicrophoneCaptureState(state: state);
 
+  ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.isPlayingAudio}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.isPlayingAudio.supported_platforms}
+  Future<bool> isPlayingAudio() => platform.isPlayingAudio();
+
+  ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.isMuted}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.isMuted.supported_platforms}
+  Future<bool> isMuted() => platform.isMuted();
+
+  ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.setMuted}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.setMuted.supported_platforms}
+  Future<void> setMuted({required bool muted}) =>
+      platform.setMuted(muted: muted);
+
+  ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.terminateWebProcess}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.terminateWebProcess.supported_platforms}
+  Future<void> terminateWebProcess() => platform.terminateWebProcess();
+
   ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.loadSimulatedRequest}
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.loadSimulatedRequest.supported_platforms}

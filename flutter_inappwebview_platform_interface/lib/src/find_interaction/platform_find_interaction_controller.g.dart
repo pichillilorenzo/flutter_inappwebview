@@ -14,6 +14,7 @@ extension _PlatformFindInteractionControllerCreationParamsClassSupported
   ///- Android WebView
   ///- iOS WKWebView
   ///- macOS WKWebView
+  ///- Linux WPE WebKit
   ///
   ///Use the [PlatformFindInteractionControllerCreationParams.isClassSupported] method to check if this class is supported at runtime.
   ///{@endtemplate}
@@ -23,6 +24,7 @@ extension _PlatformFindInteractionControllerCreationParamsClassSupported
           TargetPlatform.android,
           TargetPlatform.iOS,
           TargetPlatform.macOS,
+          TargetPlatform.linux,
         ].contains(platform ?? defaultTargetPlatform);
   }
 }
@@ -38,6 +40,7 @@ enum PlatformFindInteractionControllerCreationParamsProperty {
   ///- iOS WKWebView:
   ///    - If [InAppWebViewSettings.isFindInteractionEnabled] is `true`, this event will not be called.
   ///- macOS WKWebView
+  ///- Linux WPE WebKit ([Official API - WebKitFindController::counted-matches](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/signal.FindController.counted-matches.html))
   ///
   ///**Parameters - Officially Supported Platforms/Implementations**:
   ///- [controller]: all platforms
@@ -64,6 +67,7 @@ extension _PlatformFindInteractionControllerCreationParamsPropertySupported
               TargetPlatform.android,
               TargetPlatform.iOS,
               TargetPlatform.macOS,
+              TargetPlatform.linux,
             ].contains(platform ?? defaultTargetPlatform);
     }
   }
@@ -77,6 +81,7 @@ extension _PlatformFindInteractionControllerClassSupported
   ///- Android WebView
   ///- iOS WKWebView
   ///- macOS WKWebView
+  ///- Linux WPE WebKit
   ///
   ///Use the [PlatformFindInteractionController.isClassSupported] method to check if this class is supported at runtime.
   ///{@endtemplate}
@@ -86,6 +91,7 @@ extension _PlatformFindInteractionControllerClassSupported
           TargetPlatform.android,
           TargetPlatform.iOS,
           TargetPlatform.macOS,
+          TargetPlatform.linux,
         ].contains(platform ?? defaultTargetPlatform);
   }
 }
@@ -101,6 +107,7 @@ enum PlatformFindInteractionControllerMethod {
   ///- iOS WKWebView:
   ///    - If [InAppWebViewSettings.isFindInteractionEnabled] is `true`, it uses the built-in find interaction native UI, otherwise this is implemented using CSS and Javascript. In this case, it will use the [Official API - UIFindInteraction.dismissFindNavigator](https://developer.apple.com/documentation/uikit/uifindinteraction/3975827-dismissfindnavigator?changes=_2)
   ///- macOS WKWebView
+  ///- Linux WPE WebKit ([Official API - webkit_find_controller_search_finish](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/method.FindController.search_finish.html))
   ///
   ///Use the [PlatformFindInteractionController.isMethodSupported] method to check if this method is supported at runtime.
   ///{@endtemplate}
@@ -126,6 +133,7 @@ enum PlatformFindInteractionControllerMethod {
   ///- Android WebView
   ///- iOS WKWebView
   ///- macOS WKWebView
+  ///- Linux WPE WebKit
   ///
   ///**Parameters - Officially Supported Platforms/Implementations**:
   ///- [isKeepAlive]: all platforms
@@ -144,6 +152,7 @@ enum PlatformFindInteractionControllerMethod {
   ///- iOS WKWebView:
   ///    - If [InAppWebViewSettings.isFindInteractionEnabled] is `true`, it uses the built-in find interaction native UI, otherwise this is implemented using CSS and Javascript. In this case, it will use the [Official API - UIFindInteraction.presentFindNavigator](https://developer.apple.com/documentation/uikit/uifindinteraction/3975832-presentfindnavigator?changes=_2) with [Official API - UIFindInteraction.searchText](https://developer.apple.com/documentation/uikit/uifindinteraction/3975834-searchtext?changes=_2)
   ///- macOS WKWebView
+  ///- Linux WPE WebKit ([Official API - webkit_find_controller_search](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/method.FindController.search.html))
   ///
   ///**Parameters - Officially Supported Platforms/Implementations**:
   ///- [find]: all platforms
@@ -161,6 +170,7 @@ enum PlatformFindInteractionControllerMethod {
   ///- iOS WKWebView:
   ///    - If [InAppWebViewSettings.isFindInteractionEnabled] is `true`, it uses the built-in find interaction native UI, otherwise this is implemented using CSS and Javascript. In this case, it will use the [Official API - UIFindInteraction.findNext](https://developer.apple.com/documentation/uikit/uifindinteraction/3975829-findnext?changes=_2) and ([Official API - UIFindInteraction.findPrevious](https://developer.apple.com/documentation/uikit/uifindinteraction/3975830-findprevious?changes=_2)
   ///- macOS WKWebView
+  ///- Linux WPE WebKit ([Official API - webkit_find_controller_search_next](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/method.FindController.search_next.html))
   ///
   ///**Parameters - Officially Supported Platforms/Implementations**:
   ///- [forward]: all platforms
@@ -177,6 +187,7 @@ enum PlatformFindInteractionControllerMethod {
   ///- Android WebView
   ///- iOS WKWebView ([Official API - UIFindInteraction.activeFindSession](https://developer.apple.com/documentation/uikit/uifindinteraction/3975825-activefindsession?changes=_7____4_8&language=objc))
   ///- macOS WKWebView
+  ///- Linux WPE WebKit ([Official API - WebKitFindController](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/class.FindController.html))
   ///
   ///Use the [PlatformFindInteractionController.isMethodSupported] method to check if this method is supported at runtime.
   ///{@endtemplate}
@@ -191,6 +202,7 @@ enum PlatformFindInteractionControllerMethod {
   ///- iOS WKWebView ([Official API - UIFindInteraction.getSearchText](https://developer.apple.com/documentation/uikit/uifindinteraction/3975834-searchtext?changes=_2)):
   ///    - If [InAppWebViewSettings.isFindInteractionEnabled] is `true`, it will get the system find panel's search text field value.
   ///- macOS WKWebView
+  ///- Linux WPE WebKit ([Official API - webkit_find_controller_get_search_text](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/method.FindController.get_search_text.html))
   ///
   ///Use the [PlatformFindInteractionController.isMethodSupported] method to check if this method is supported at runtime.
   ///{@endtemplate}
@@ -229,6 +241,7 @@ enum PlatformFindInteractionControllerMethod {
   ///- iOS WKWebView ([Official API - UIFindInteraction.searchText](https://developer.apple.com/documentation/uikit/uifindinteraction/3975834-searchtext?changes=_2)):
   ///    - If [InAppWebViewSettings.isFindInteractionEnabled] is `true`, it will pre-populate the system find panel's search text field with a search query.
   ///- macOS WKWebView
+  ///- Linux WPE WebKit ([Official API - webkit_find_controller_search](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/method.FindController.search.html))
   ///
   ///**Parameters - Officially Supported Platforms/Implementations**:
   ///- [searchText]: all platforms
@@ -263,6 +276,7 @@ extension _PlatformFindInteractionControllerMethodSupported
               TargetPlatform.android,
               TargetPlatform.iOS,
               TargetPlatform.macOS,
+              TargetPlatform.linux,
             ].contains(platform ?? defaultTargetPlatform);
       case PlatformFindInteractionControllerMethod.dismissFindNavigator:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
@@ -273,6 +287,7 @@ extension _PlatformFindInteractionControllerMethodSupported
               TargetPlatform.android,
               TargetPlatform.iOS,
               TargetPlatform.macOS,
+              TargetPlatform.linux,
             ].contains(platform ?? defaultTargetPlatform);
       case PlatformFindInteractionControllerMethod.findAll:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
@@ -280,6 +295,7 @@ extension _PlatformFindInteractionControllerMethodSupported
               TargetPlatform.android,
               TargetPlatform.iOS,
               TargetPlatform.macOS,
+              TargetPlatform.linux,
             ].contains(platform ?? defaultTargetPlatform);
       case PlatformFindInteractionControllerMethod.findNext:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
@@ -287,6 +303,7 @@ extension _PlatformFindInteractionControllerMethodSupported
               TargetPlatform.android,
               TargetPlatform.iOS,
               TargetPlatform.macOS,
+              TargetPlatform.linux,
             ].contains(platform ?? defaultTargetPlatform);
       case PlatformFindInteractionControllerMethod.getActiveFindSession:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
@@ -294,6 +311,7 @@ extension _PlatformFindInteractionControllerMethodSupported
               TargetPlatform.android,
               TargetPlatform.iOS,
               TargetPlatform.macOS,
+              TargetPlatform.linux,
             ].contains(platform ?? defaultTargetPlatform);
       case PlatformFindInteractionControllerMethod.getSearchText:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
@@ -301,6 +319,7 @@ extension _PlatformFindInteractionControllerMethodSupported
               TargetPlatform.android,
               TargetPlatform.iOS,
               TargetPlatform.macOS,
+              TargetPlatform.linux,
             ].contains(platform ?? defaultTargetPlatform);
       case PlatformFindInteractionControllerMethod.isFindNavigatorVisible:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
@@ -314,6 +333,7 @@ extension _PlatformFindInteractionControllerMethodSupported
               TargetPlatform.android,
               TargetPlatform.iOS,
               TargetPlatform.macOS,
+              TargetPlatform.linux,
             ].contains(platform ?? defaultTargetPlatform);
       case PlatformFindInteractionControllerMethod.updateResultCount:
         return ((kIsWeb && platform != null) || !kIsWeb) &&

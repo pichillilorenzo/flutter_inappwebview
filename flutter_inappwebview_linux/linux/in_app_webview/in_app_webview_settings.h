@@ -58,31 +58,31 @@ class InAppWebViewSettings {
   bool enableWebAudio = true;
   bool enableWebGL = true;
   bool enableSmoothScrolling = true;
-  bool enableBackForwardNavigationGestures = false;
+  bool allowsBackForwardNavigationGestures = false;
   bool enableHyperlinkAuditing = false;
   bool enableDnsPrefetching = true;
   bool enableCaretBrowsing = false;
-  bool enableFullscreen = true;
+  bool isElementFullscreenEnabled = true;
   bool enableHtml5LocalStorage = true;
   bool enableHtml5Database = true;
   bool enablePageCache = true;
   bool drawCompositingIndicators = false;
   bool enableResizableTextAreas = true;
   bool enableTabsToLinks = true;
-  bool loadImagesAutomatically = true;
-  bool enableSiteSpecificQuirks = true;
+  bool loadsImagesAutomatically = true;
+  bool isSiteSpecificQuirksModeEnabled = true;
   bool printBackgrounds = true;
   bool enableSpatialNavigation = false;
-  std::string defaultCharset = "UTF-8";
-  std::string defaultFontFamily;
-  std::string monospaceFontFamily;
+  std::string defaultTextEncodingName = "UTF-8";
+  std::string standardFontFamily;
+  std::string fixedFontFamily;
   std::string serifFontFamily;
   std::string sansSerifFontFamily;
   std::string cursiveFontFamily;
   std::string fantasyFontFamily;
   std::string pictographFontFamily;
   int defaultFontSize = 16;
-  int defaultMonospaceFontSize = 13;
+  int defaultFixedFontSize = 13;
   int minimumLogicalFontSize = 0;
 
   // === WPE-specific rendering settings ===
@@ -97,6 +97,9 @@ class InAppWebViewSettings {
 
   // === Scroll settings ===
   int64_t scrollMultiplier = 1;
+
+  // === Custom Scheme Handler settings ===
+  std::vector<std::string> resourceCustomSchemes;
 
   InAppWebViewSettings();
   explicit InAppWebViewSettings(FlValue* map);

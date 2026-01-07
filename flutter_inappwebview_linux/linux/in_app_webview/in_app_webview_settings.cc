@@ -90,32 +90,32 @@ InAppWebViewSettings::InAppWebViewSettings(FlValue* map) : InAppWebViewSettings(
   enableWebAudio = get_fl_map_value(map, "enableWebAudio", enableWebAudio);
   enableWebGL = get_fl_map_value(map, "enableWebGL", enableWebGL);
   enableSmoothScrolling = get_fl_map_value(map, "enableSmoothScrolling", enableSmoothScrolling);
-  enableBackForwardNavigationGestures = get_fl_map_value(map, "enableBackForwardNavigationGestures",
-                                                         enableBackForwardNavigationGestures);
+  allowsBackForwardNavigationGestures = get_fl_map_value(map, "allowsBackForwardNavigationGestures",
+                                                         allowsBackForwardNavigationGestures);
   enableHyperlinkAuditing =
       get_fl_map_value(map, "enableHyperlinkAuditing", enableHyperlinkAuditing);
   enableDnsPrefetching = get_fl_map_value(map, "enableDnsPrefetching", enableDnsPrefetching);
   enableCaretBrowsing = get_fl_map_value(map, "enableCaretBrowsing", enableCaretBrowsing);
-  enableFullscreen = get_fl_map_value(map, "enableFullscreen", enableFullscreen);
+  isElementFullscreenEnabled = get_fl_map_value(map, "isElementFullscreenEnabled", isElementFullscreenEnabled);
   enableHtml5LocalStorage =
-      get_fl_map_value(map, "enableHtml5LocalStorage", enableHtml5LocalStorage);
-  enableHtml5Database = get_fl_map_value(map, "enableHtml5Database", enableHtml5Database);
+      get_fl_map_value(map, "domStorageEnabled", enableHtml5LocalStorage);
+  enableHtml5Database = get_fl_map_value(map, "databaseEnabled", enableHtml5Database);
   enablePageCache = get_fl_map_value(map, "enablePageCache", enablePageCache);
   drawCompositingIndicators =
       get_fl_map_value(map, "drawCompositingIndicators", drawCompositingIndicators);
   enableResizableTextAreas =
       get_fl_map_value(map, "enableResizableTextAreas", enableResizableTextAreas);
   enableTabsToLinks = get_fl_map_value(map, "enableTabsToLinks", enableTabsToLinks);
-  loadImagesAutomatically =
-      get_fl_map_value(map, "loadImagesAutomatically", loadImagesAutomatically);
-  enableSiteSpecificQuirks =
-      get_fl_map_value(map, "enableSiteSpecificQuirks", enableSiteSpecificQuirks);
+  loadsImagesAutomatically =
+      get_fl_map_value(map, "loadsImagesAutomatically", loadsImagesAutomatically);
+  isSiteSpecificQuirksModeEnabled =
+      get_fl_map_value(map, "isSiteSpecificQuirksModeEnabled", isSiteSpecificQuirksModeEnabled);
   printBackgrounds = get_fl_map_value(map, "printBackgrounds", printBackgrounds);
   enableSpatialNavigation =
       get_fl_map_value(map, "enableSpatialNavigation", enableSpatialNavigation);
-  defaultCharset = get_fl_map_value(map, "defaultCharset", defaultCharset);
-  defaultFontFamily = get_fl_map_value(map, "defaultFontFamily", defaultFontFamily);
-  monospaceFontFamily = get_fl_map_value(map, "monospaceFontFamily", monospaceFontFamily);
+  defaultTextEncodingName = get_fl_map_value(map, "defaultTextEncodingName", defaultTextEncodingName);
+  standardFontFamily = get_fl_map_value(map, "standardFontFamily", standardFontFamily);
+  fixedFontFamily = get_fl_map_value(map, "fixedFontFamily", fixedFontFamily);
   serifFontFamily = get_fl_map_value(map, "serifFontFamily", serifFontFamily);
   sansSerifFontFamily = get_fl_map_value(map, "sansSerifFontFamily", sansSerifFontFamily);
   cursiveFontFamily = get_fl_map_value(map, "cursiveFontFamily", cursiveFontFamily);
@@ -123,8 +123,8 @@ InAppWebViewSettings::InAppWebViewSettings(FlValue* map) : InAppWebViewSettings(
   pictographFontFamily = get_fl_map_value(map, "pictographFontFamily", pictographFontFamily);
   defaultFontSize = static_cast<int>(
       get_fl_map_value<int64_t>(map, "defaultFontSize", static_cast<int64_t>(defaultFontSize)));
-  defaultMonospaceFontSize = static_cast<int>(get_fl_map_value<int64_t>(
-      map, "defaultMonospaceFontSize", static_cast<int64_t>(defaultMonospaceFontSize)));
+  defaultFixedFontSize = static_cast<int>(get_fl_map_value<int64_t>(
+      map, "defaultFixedFontSize", static_cast<int64_t>(defaultFixedFontSize)));
   minimumLogicalFontSize = static_cast<int>(get_fl_map_value<int64_t>(
       map, "minimumLogicalFontSize", static_cast<int64_t>(minimumLogicalFontSize)));
 
@@ -138,6 +138,12 @@ InAppWebViewSettings::InAppWebViewSettings(FlValue* map) : InAppWebViewSettings(
 
   // === Scroll settings ===
   scrollMultiplier = get_fl_map_value<int64_t>(map, "scrollMultiplier", scrollMultiplier);
+
+  // === Custom Scheme Handler settings ===
+  if (fl_map_contains_not_null(map, "resourceCustomSchemes")) {
+    resourceCustomSchemes =
+        get_fl_map_value<std::vector<std::string>>(map, "resourceCustomSchemes", {});
+  }
 }
 
 void InAppWebViewSettings::applyToWebView(WebKitWebView* webview) const {
@@ -169,17 +175,17 @@ void InAppWebViewSettings::applyToWebView(WebKitWebView* webview) const {
   if (defaultFontSize > 0) {
     webkit_settings_set_default_font_size(settings, defaultFontSize);
   }
-  if (defaultMonospaceFontSize > 0) {
-    webkit_settings_set_default_monospace_font_size(settings, defaultMonospaceFontSize);
+  if (defaultFixedFontSize > 0) {
+    webkit_settings_set_default_monospace_font_size(settings, defaultFixedFontSize);
   }
   // Note: webkit_settings_set_minimum_logical_font_size is not available in WPE 2.0 API
 
   // Font families
-  if (!defaultFontFamily.empty()) {
-    webkit_settings_set_default_font_family(settings, defaultFontFamily.c_str());
+  if (!standardFontFamily.empty()) {
+    webkit_settings_set_default_font_family(settings, standardFontFamily.c_str());
   }
-  if (!monospaceFontFamily.empty()) {
-    webkit_settings_set_monospace_font_family(settings, monospaceFontFamily.c_str());
+  if (!fixedFontFamily.empty()) {
+    webkit_settings_set_monospace_font_family(settings, fixedFontFamily.c_str());
   }
   if (!serifFontFamily.empty()) {
     webkit_settings_set_serif_font_family(settings, serifFontFamily.c_str());
@@ -198,8 +204,8 @@ void InAppWebViewSettings::applyToWebView(WebKitWebView* webview) const {
   }
 
   // Charset
-  if (!defaultCharset.empty()) {
-    webkit_settings_set_default_charset(settings, defaultCharset.c_str());
+  if (!defaultTextEncodingName.empty()) {
+    webkit_settings_set_default_charset(settings, defaultTextEncodingName.c_str());
   }
 
   // Media settings
@@ -221,11 +227,11 @@ void InAppWebViewSettings::applyToWebView(WebKitWebView* webview) const {
   // Note: DNS prefetching and hyperlink auditing are deprecated in WPE 2.50+
 
   // Content settings
-  webkit_settings_set_enable_fullscreen(settings, enableFullscreen);
-  webkit_settings_set_auto_load_images(settings, loadImagesAutomatically);
+  webkit_settings_set_enable_fullscreen(settings, isElementFullscreenEnabled);
+  webkit_settings_set_auto_load_images(settings, loadsImagesAutomatically);
   webkit_settings_set_enable_resizable_text_areas(settings, enableResizableTextAreas);
   webkit_settings_set_enable_tabs_to_links(settings, enableTabsToLinks);
-  webkit_settings_set_enable_site_specific_quirks(settings, enableSiteSpecificQuirks);
+  webkit_settings_set_enable_site_specific_quirks(settings, isSiteSpecificQuirksModeEnabled);
   webkit_settings_set_print_backgrounds(settings, printBackgrounds);
   webkit_settings_set_enable_page_cache(settings, enablePageCache);
 
@@ -288,34 +294,34 @@ FlValue* InAppWebViewSettings::toFlValue() const {
   fl_value_set_string_take(map, "enableWebAudio", fl_value_new_bool(enableWebAudio));
   fl_value_set_string_take(map, "enableWebGL", fl_value_new_bool(enableWebGL));
   fl_value_set_string_take(map, "enableSmoothScrolling", fl_value_new_bool(enableSmoothScrolling));
-  fl_value_set_string_take(map, "enableBackForwardNavigationGestures",
-                           fl_value_new_bool(enableBackForwardNavigationGestures));
+  fl_value_set_string_take(map, "allowsBackForwardNavigationGestures",
+                           fl_value_new_bool(allowsBackForwardNavigationGestures));
   fl_value_set_string_take(map, "enableHyperlinkAuditing",
                            fl_value_new_bool(enableHyperlinkAuditing));
   fl_value_set_string_take(map, "enableDnsPrefetching", fl_value_new_bool(enableDnsPrefetching));
   fl_value_set_string_take(map, "enableCaretBrowsing", fl_value_new_bool(enableCaretBrowsing));
-  fl_value_set_string_take(map, "enableFullscreen", fl_value_new_bool(enableFullscreen));
-  fl_value_set_string_take(map, "enableHtml5LocalStorage",
+  fl_value_set_string_take(map, "isElementFullscreenEnabled", fl_value_new_bool(isElementFullscreenEnabled));
+  fl_value_set_string_take(map, "domStorageEnabled",
                            fl_value_new_bool(enableHtml5LocalStorage));
-  fl_value_set_string_take(map, "enableHtml5Database", fl_value_new_bool(enableHtml5Database));
+  fl_value_set_string_take(map, "databaseEnabled", fl_value_new_bool(enableHtml5Database));
   fl_value_set_string_take(map, "enablePageCache", fl_value_new_bool(enablePageCache));
   fl_value_set_string_take(map, "drawCompositingIndicators",
                            fl_value_new_bool(drawCompositingIndicators));
   fl_value_set_string_take(map, "enableResizableTextAreas",
                            fl_value_new_bool(enableResizableTextAreas));
   fl_value_set_string_take(map, "enableTabsToLinks", fl_value_new_bool(enableTabsToLinks));
-  fl_value_set_string_take(map, "loadImagesAutomatically",
-                           fl_value_new_bool(loadImagesAutomatically));
-  fl_value_set_string_take(map, "enableSiteSpecificQuirks",
-                           fl_value_new_bool(enableSiteSpecificQuirks));
+  fl_value_set_string_take(map, "loadsImagesAutomatically",
+                           fl_value_new_bool(loadsImagesAutomatically));
+  fl_value_set_string_take(map, "isSiteSpecificQuirksModeEnabled",
+                           fl_value_new_bool(isSiteSpecificQuirksModeEnabled));
   fl_value_set_string_take(map, "printBackgrounds", fl_value_new_bool(printBackgrounds));
   fl_value_set_string_take(map, "enableSpatialNavigation",
                            fl_value_new_bool(enableSpatialNavigation));
-  fl_value_set_string_take(map, "defaultCharset", fl_value_new_string(defaultCharset.c_str()));
-  fl_value_set_string_take(map, "defaultFontFamily",
-                           fl_value_new_string(defaultFontFamily.c_str()));
-  fl_value_set_string_take(map, "monospaceFontFamily",
-                           fl_value_new_string(monospaceFontFamily.c_str()));
+  fl_value_set_string_take(map, "defaultTextEncodingName", fl_value_new_string(defaultTextEncodingName.c_str()));
+  fl_value_set_string_take(map, "standardFontFamily",
+                           fl_value_new_string(standardFontFamily.c_str()));
+  fl_value_set_string_take(map, "fixedFontFamily",
+                           fl_value_new_string(fixedFontFamily.c_str()));
   fl_value_set_string_take(map, "serifFontFamily", fl_value_new_string(serifFontFamily.c_str()));
   fl_value_set_string_take(map, "sansSerifFontFamily",
                            fl_value_new_string(sansSerifFontFamily.c_str()));
@@ -326,8 +332,8 @@ FlValue* InAppWebViewSettings::toFlValue() const {
   fl_value_set_string_take(map, "pictographFontFamily",
                            fl_value_new_string(pictographFontFamily.c_str()));
   fl_value_set_string_take(map, "defaultFontSize", fl_value_new_int(defaultFontSize));
-  fl_value_set_string_take(map, "defaultMonospaceFontSize",
-                           fl_value_new_int(defaultMonospaceFontSize));
+  fl_value_set_string_take(map, "defaultFixedFontSize",
+                           fl_value_new_int(defaultFixedFontSize));
   fl_value_set_string_take(map, "minimumLogicalFontSize", fl_value_new_int(minimumLogicalFontSize));
 
   // === WPE-specific rendering settings ===

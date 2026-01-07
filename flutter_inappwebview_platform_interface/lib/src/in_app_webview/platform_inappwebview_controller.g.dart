@@ -16,7 +16,7 @@ extension _PlatformInAppWebViewControllerClassSupported
   ///- macOS WKWebView
   ///- Web \<iframe\>
   ///- Windows WebView2
-  ///- Linux WebKitGTK
+  ///- Linux WPE WebKit
   ///
   ///Use the [PlatformInAppWebViewController.isClassSupported] method to check if this class is supported at runtime.
   ///{@endtemplate}
@@ -46,6 +46,7 @@ enum PlatformInAppWebViewControllerProperty {
   ///- macOS WKWebView
   ///- Web \<iframe\> but requires same origin
   ///- Windows WebView2
+  ///- Linux WPE WebKit
   ///
   ///Use the [PlatformInAppWebViewController.isPropertySupported] method to check if this property is supported at runtime.
   ///{@endtemplate}
@@ -61,6 +62,7 @@ enum PlatformInAppWebViewControllerProperty {
   ///- macOS WKWebView
   ///- Web \<iframe\> but requires same origin
   ///- Windows WebView2
+  ///- Linux WPE WebKit
   ///
   ///Use the [PlatformInAppWebViewController.isPropertySupported] method to check if this property is supported at runtime.
   ///{@endtemplate}
@@ -98,6 +100,7 @@ extension _PlatformInAppWebViewControllerPropertySupported
                     TargetPlatform.iOS,
                     TargetPlatform.macOS,
                     TargetPlatform.windows,
+                    TargetPlatform.linux,
                   ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerProperty.tRexRunnerHtml:
         return kIsWeb && platform == null
@@ -108,6 +111,7 @@ extension _PlatformInAppWebViewControllerPropertySupported
                     TargetPlatform.iOS,
                     TargetPlatform.macOS,
                     TargetPlatform.windows,
+                    TargetPlatform.linux,
                   ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerProperty.webStorage:
         return kIsWeb && platform == null
@@ -167,6 +171,7 @@ enum PlatformInAppWebViewControllerMethod {
   ///- Android WebView
   ///- iOS WKWebView ([Official API - WKUserContentController.addUserScript](https://developer.apple.com/documentation/webkit/wkusercontentcontroller/1537448-adduserscript)):
   ///    - This method will throw an error if the [PlatformWebViewCreationParams.windowId] has been set. There isn't any way to add/remove user scripts specific to window WebViews. This is a limitation of the native WebKit APIs.
+  ///- Linux WPE WebKit ([Official API - webkit_user_content_manager_add_script](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/method.UserContentManager.add_script.html))
   ///- macOS WKWebView ([Official API - WKUserContentController.addUserScript](https://developer.apple.com/documentation/webkit/wkusercontentcontroller/1537448-adduserscript)):
   ///    - This method will throw an error if the [PlatformWebViewCreationParams.windowId] has been set. There isn't any way to add/remove user scripts specific to window WebViews. This is a limitation of the native WebKit APIs.
   ///- Web \<iframe\> but requires same origin
@@ -187,6 +192,7 @@ enum PlatformInAppWebViewControllerMethod {
   ///- Android WebView
   ///- iOS WKWebView:
   ///    - This method will throw an error if the [PlatformWebViewCreationParams.windowId] has been set. There isn't any way to add/remove user scripts specific to window WebViews. This is a limitation of the native WebKit APIs.
+  ///- Linux WPE WebKit
   ///- macOS WKWebView:
   ///    - This method will throw an error if the [PlatformWebViewCreationParams.windowId] has been set. There isn't any way to add/remove user scripts specific to window WebViews. This is a limitation of the native WebKit APIs.
   ///- Web \<iframe\> but requires same origin
@@ -207,6 +213,8 @@ enum PlatformInAppWebViewControllerMethod {
   ///- Android WebView ([Official API - WebViewCompat.WebMessageListener](https://developer.android.com/reference/androidx/webkit/WebViewCompat#addWebMessageListener(android.webkit.WebView,%20java.lang.String,%20java.util.Set%3Cjava.lang.String%3E,%20androidx.webkit.WebViewCompat.WebMessageListener))):
   ///    - This method should only be called if [WebViewFeature.isFeatureSupported] returns `true` for [WebViewFeature.WEB_MESSAGE_LISTENER].
   ///- iOS WKWebView:
+  ///    - This method is implemented using JavaScript.
+  ///- Linux WPE WebKit ([Official API - webkit_user_content_manager_add_script](https://webkitgtk.org/reference/webkit2gtk/stable/method.UserContentManager.add_script.html)):
   ///    - This method is implemented using JavaScript.
   ///- macOS WKWebView:
   ///    - This method is implemented using JavaScript.
@@ -261,6 +269,7 @@ enum PlatformInAppWebViewControllerMethod {
   ///- iOS WKWebView ([Official API - WKWebView.canGoBack](https://developer.apple.com/documentation/webkit/wkwebview/1414966-cangoback))
   ///- macOS WKWebView ([Official API - WKWebView.canGoBack](https://developer.apple.com/documentation/webkit/wkwebview/1414966-cangoback))
   ///- Windows WebView2 ([Official API - ICoreWebView2.get_CanGoBack](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2?view=webview2-1.0.2210.55#get_cangoback))
+  ///- Linux WPE WebKit ([Official API - webkit_web_view_can_go_back](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/method.WebView.can_go_back.html))
   ///
   ///Use the [PlatformInAppWebViewController.isMethodSupported] method to check if this method is supported at runtime.
   ///{@endtemplate}
@@ -274,6 +283,7 @@ enum PlatformInAppWebViewControllerMethod {
   ///- Android WebView ([Official API - WebView.canGoBackOrForward](https://developer.android.com/reference/android/webkit/WebView#canGoBackOrForward(int)))
   ///- iOS WKWebView
   ///- macOS WKWebView
+  ///- Linux WPE WebKit
   ///- Windows WebView2
   ///
   ///**Parameters - Officially Supported Platforms/Implementations**:
@@ -292,6 +302,7 @@ enum PlatformInAppWebViewControllerMethod {
   ///- iOS WKWebView ([Official API - WKWebView.canGoForward](https://developer.apple.com/documentation/webkit/wkwebview/1414962-cangoforward))
   ///- macOS WKWebView ([Official API - WKWebView.canGoForward](https://developer.apple.com/documentation/webkit/wkwebview/1414962-cangoforward))
   ///- Windows WebView2 ([Official API - ICoreWebView2.get_CanGoForward](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2?view=webview2-1.0.2210.55#get_cangoforward))
+  ///- Linux WPE WebKit ([Official API - webkit_web_view_can_go_forward](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/method.WebView.can_go_forward.html))
   ///
   ///Use the [PlatformInAppWebViewController.isMethodSupported] method to check if this method is supported at runtime.
   ///{@endtemplate}
@@ -304,6 +315,8 @@ enum PlatformInAppWebViewControllerMethod {
   ///**Officially Supported Platforms/Implementations**:
   ///- Android WebView
   ///- iOS WKWebView
+  ///- Linux WPE WebKit:
+  ///    - This method is implemented using JavaScript.
   ///- macOS WKWebView:
   ///    - This method is implemented using JavaScript.
   ///- Web \<iframe\> but requires same origin
@@ -319,6 +332,8 @@ enum PlatformInAppWebViewControllerMethod {
   ///**Officially Supported Platforms/Implementations**:
   ///- Android WebView
   ///- iOS WKWebView
+  ///- Linux WPE WebKit:
+  ///    - This method is implemented using JavaScript.
   ///- macOS WKWebView:
   ///    - This method is implemented using JavaScript.
   ///- Web \<iframe\> but requires same origin
@@ -335,6 +350,7 @@ enum PlatformInAppWebViewControllerMethod {
   ///- Android WebView
   ///- iOS WKWebView
   ///- macOS WKWebView
+  ///- Linux WPE WebKit
   ///
   ///**Parameters - Officially Supported Platforms/Implementations**:
   ///- [includeDiskFiles]: all platforms
@@ -376,6 +392,8 @@ enum PlatformInAppWebViewControllerMethod {
   ///- Android WebView ([Official API - ViewGroup.clearFocus](https://developer.android.com/reference/android/view/ViewGroup#clearFocus()))
   ///- iOS WKWebView ([Official API - UIResponder.resignFirstResponder](https://developer.apple.com/documentation/uikit/uiresponder/1621097-resignfirstresponder))
   ///- macOS WKWebView ([Official API - NSWindow.makeFirstResponder](https://developer.apple.com/documentation/appkit/nswindow/1419366-makefirstresponder))
+  ///- Linux WPE WebKit ([Official API - wpe_view_backend_remove_activity_state](https://wpewebkit.org/reference/stable/wpe-platform-2.0/func.view_backend_remove_activity_state.html)):
+  ///    - Removes focused state from WPE backend and blurs active element via JavaScript
   ///
   ///Use the [PlatformInAppWebViewController.isMethodSupported] method to check if this method is supported at runtime.
   ///{@endtemplate}
@@ -436,6 +454,8 @@ enum PlatformInAppWebViewControllerMethod {
   ///**Officially Supported Platforms/Implementations**:
   ///- iOS WKWebView 14.5+ ([Official API - WKWebView.closeAllMediaPresentations](https://developer.apple.com/documentation/webkit/wkwebview/3752235-closeallmediapresentations))
   ///- macOS WKWebView 11.3+ ([Official API - WKWebView.closeAllMediaPresentations](https://developer.apple.com/documentation/webkit/wkwebview/3752235-closeallmediapresentations))
+  ///- Linux WPE WebKit ([Official API - JavaScript Document.exitFullscreen()/exitPictureInPicture()](https://developer.mozilla.org/en-US/docs/Web/API/Document/exitFullscreen)):
+  ///    - Uses JavaScript to exit fullscreen and picture-in-picture modes
   ///
   ///Use the [PlatformInAppWebViewController.isMethodSupported] method to check if this method is supported at runtime.
   ///{@endtemplate}
@@ -522,6 +542,7 @@ enum PlatformInAppWebViewControllerMethod {
   ///- iOS WKWebView
   ///- macOS WKWebView
   ///- Windows WebView2
+  ///- Linux WPE WebKit
   ///
   ///**Parameters - Officially Supported Platforms/Implementations**:
   ///- [keepAlive]: all platforms
@@ -552,6 +573,7 @@ enum PlatformInAppWebViewControllerMethod {
   ///- macOS WKWebView ([Official API - WKWebView.evaluateJavaScript](https://developer.apple.com/documentation/webkit/wkwebview/3656442-evaluatejavascript))
   ///- Web \<iframe\> but requires same origin ([Official API - Window.eval](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/eval))
   ///- Windows WebView2
+  ///- Linux WPE WebKit ([Official API - webkit_web_view_evaluate_javascript](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/method.WebView.evaluate_javascript.html))
   ///
   ///**Parameters - Officially Supported Platforms/Implementations**:
   ///- [source]: all platforms
@@ -605,6 +627,7 @@ enum PlatformInAppWebViewControllerMethod {
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- iOS WKWebView 15.0+ ([Official API - WKWebView.cameraCaptureState](https://developer.apple.com/documentation/webkit/wkwebview/3763093-cameracapturestate))
+  ///- Linux WPE WebKit 2.34+ ([Official API - webkit_web_view_get_camera_capture_state](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/method.WebView.get_camera_capture_state.html))
   ///- macOS WKWebView 12.0+ ([Official API - WKWebView.cameraCaptureState](https://developer.apple.com/documentation/webkit/wkwebview/3763093-cameracapturestate))
   ///
   ///Use the [PlatformInAppWebViewController.isMethodSupported] method to check if this method is supported at runtime.
@@ -620,6 +643,7 @@ enum PlatformInAppWebViewControllerMethod {
   ///- iOS WKWebView
   ///- macOS WKWebView
   ///- Windows WebView2
+  ///- Linux WPE WebKit ([Official API - webkit_web_view_get_tls_info](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/method.WebView.get_tls_info.html))
   ///
   ///Use the [PlatformInAppWebViewController.isMethodSupported] method to check if this method is supported at runtime.
   ///{@endtemplate}
@@ -635,6 +659,7 @@ enum PlatformInAppWebViewControllerMethod {
   ///- macOS WKWebView:
   ///    - This method is implemented using JavaScript.
   ///- Web \<iframe\> but requires same origin ([Official API - Document.documentElement.scrollHeight](https://developer.mozilla.org/en-US/docs/Web/API/Element/scrollHeight))
+  ///- Linux WPE WebKit
   ///
   ///Use the [PlatformInAppWebViewController.isMethodSupported] method to check if this method is supported at runtime.
   ///{@endtemplate}
@@ -651,6 +676,7 @@ enum PlatformInAppWebViewControllerMethod {
   ///- macOS WKWebView:
   ///    - This method is implemented using JavaScript.
   ///- Web \<iframe\> but requires same origin ([Official API - Document.documentElement.scrollWidth](https://developer.mozilla.org/en-US/docs/Web/API/Element/scrollWidth))
+  ///- Linux WPE WebKit
   ///
   ///Use the [PlatformInAppWebViewController.isMethodSupported] method to check if this method is supported at runtime.
   ///{@endtemplate}
@@ -665,6 +691,7 @@ enum PlatformInAppWebViewControllerMethod {
   ///- iOS WKWebView ([Official API - WKWebView.backForwardList](https://developer.apple.com/documentation/webkit/wkwebview/1414977-backforwardlist))
   ///- macOS WKWebView ([Official API - WKWebView.backForwardList](https://developer.apple.com/documentation/webkit/wkwebview/1414977-backforwardlist))
   ///- Windows WebView2
+  ///- Linux WPE WebKit
   ///
   ///Use the [PlatformInAppWebViewController.isMethodSupported] method to check if this method is supported at runtime.
   ///{@endtemplate}
@@ -705,6 +732,7 @@ enum PlatformInAppWebViewControllerMethod {
   ///- macOS WKWebView
   ///- Web \<iframe\> but requires same origin
   ///- Windows WebView2
+  ///- Linux WPE WebKit
   ///
   ///Use the [PlatformInAppWebViewController.isMethodSupported] method to check if this method is supported at runtime.
   ///{@endtemplate}
@@ -718,6 +746,8 @@ enum PlatformInAppWebViewControllerMethod {
   ///- Android WebView ([Official API - WebView.getHitTestResult](https://developer.android.com/reference/android/webkit/WebView#getHitTestResult()))
   ///- iOS WKWebView:
   ///    - This method is implemented using JavaScript.
+  ///- Linux WPE WebKit ([Official API - WebKitHitTestResult](https://webkitgtk.org/reference/webkit2gtk/stable/WebKitHitTestResult.html)):
+  ///    - This method uses native WebKitHitTestResult from the mouse-target-changed signal.
   ///
   ///Use the [PlatformInAppWebViewController.isMethodSupported] method to check if this method is supported at runtime.
   ///{@endtemplate}
@@ -730,6 +760,8 @@ enum PlatformInAppWebViewControllerMethod {
   ///**Officially Supported Platforms/Implementations**:
   ///- Android WebView
   ///- iOS WKWebView
+  ///- Linux WPE WebKit:
+  ///    - This method is implemented using JavaScript.
   ///- macOS WKWebView
   ///- Web \<iframe\> but requires same origin
   ///- Windows WebView2
@@ -759,6 +791,7 @@ enum PlatformInAppWebViewControllerMethod {
   ///- macOS WKWebView
   ///- Web \<iframe\> but requires same origin
   ///- Windows WebView2
+  ///- Linux WPE WebKit
   ///
   ///Use the [PlatformInAppWebViewController.isMethodSupported] method to check if this method is supported at runtime.
   ///{@endtemplate}
@@ -793,6 +826,7 @@ enum PlatformInAppWebViewControllerMethod {
   ///    - This method is implemented using JavaScript.
   ///- iOS WKWebView ([Official API - WKWebView.themeColor](https://developer.apple.com/documentation/webkit/wkwebview/3794258-themecolor)):
   ///    - On iOS < 15.0, this method is implemented using JavaScript.
+  ///- Linux WPE WebKit ([Official API - webkit_web_view_get_theme_color](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/method.WebView.get_theme_color.html))
   ///- macOS WKWebView ([Official API - WKWebView.themeColor](https://developer.apple.com/documentation/webkit/wkwebview/3794258-themecolor)):
   ///    - On iOS < 12.0, this method is implemented using JavaScript.
   ///- Web \<iframe\> but requires same origin:
@@ -810,6 +844,7 @@ enum PlatformInAppWebViewControllerMethod {
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- iOS WKWebView 15.0+ ([Official API - WKWebView.microphoneCaptureState](https://developer.apple.com/documentation/webkit/wkwebview/3763096-microphonecapturestate))
+  ///- Linux WPE WebKit 2.34+ ([Official API - webkit_web_view_get_microphone_capture_state](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/method.WebView.get_microphone_capture_state.html))
   ///- macOS WKWebView 12.0+ ([Official API - WKWebView.microphoneCaptureState](https://developer.apple.com/documentation/webkit/wkwebview/3763096-microphonecapturestate))
   ///
   ///Use the [PlatformInAppWebViewController.isMethodSupported] method to check if this method is supported at runtime.
@@ -839,6 +874,8 @@ enum PlatformInAppWebViewControllerMethod {
   ///**Officially Supported Platforms/Implementations**:
   ///- Android WebView ([Official API - WebView.getOriginalUrl](https://developer.android.com/reference/android/webkit/WebView#getOriginalUrl()))
   ///- iOS WKWebView
+  ///- Linux WPE WebKit ([Official API - webkit_web_view_get_uri](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/method.WebView.get_uri.html)):
+  ///    - Returns the current URL. WPE WebKit does not distinguish between original and current URL.
   ///- macOS WKWebView
   ///- Web \<iframe\> but requires same origin:
   ///    - It will return the current value of the `iframe.src` attribute.
@@ -855,6 +892,7 @@ enum PlatformInAppWebViewControllerMethod {
   ///- Android WebView ([Official API - WebView.getProgress](https://developer.android.com/reference/android/webkit/WebView#getProgress()))
   ///- iOS WKWebView ([Official API - WKWebView.estimatedProgress](https://developer.apple.com/documentation/webkit/wkwebview/1415007-estimatedprogress))
   ///- macOS WKWebView ([Official API - WKWebView.estimatedProgress](https://developer.apple.com/documentation/webkit/wkwebview/1415007-estimatedprogress))
+  ///- Linux WPE WebKit ([Official API - webkit_web_view_get_estimated_load_progress](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/method.WebView.get_estimated_load_progress.html))
   ///
   ///Use the [PlatformInAppWebViewController.isMethodSupported] method to check if this method is supported at runtime.
   ///{@endtemplate}
@@ -925,6 +963,8 @@ enum PlatformInAppWebViewControllerMethod {
   ///    - This method is implemented using JavaScript.
   ///- iOS WKWebView:
   ///    - This method is implemented using JavaScript.
+  ///- Linux WPE WebKit:
+  ///    - This method is implemented using JavaScript.
   ///- macOS WKWebView:
   ///    - This method is implemented using JavaScript.
   ///- Web \<iframe\> but requires same origin:
@@ -941,6 +981,7 @@ enum PlatformInAppWebViewControllerMethod {
   ///**Officially Supported Platforms/Implementations**:
   ///- Android WebView
   ///- iOS WKWebView
+  ///- Linux WPE WebKit
   ///- macOS WKWebView
   ///- Web \<iframe\> but requires same origin
   ///- Windows WebView2
@@ -986,7 +1027,7 @@ enum PlatformInAppWebViewControllerMethod {
   ///{@template flutter_inappwebview_platform_interface.PlatformInAppWebViewController.getTargetRefreshRate.supported_platforms}
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Linux WebKitGTK
+  ///- Linux WPE WebKit
   ///
   ///Use the [PlatformInAppWebViewController.isMethodSupported] method to check if this method is supported at runtime.
   ///{@endtemplate}
@@ -1002,6 +1043,7 @@ enum PlatformInAppWebViewControllerMethod {
   ///- macOS WKWebView ([Official API - WKWebView.title](https://developer.apple.com/documentation/webkit/wkwebview/1415015-title))
   ///- Web \<iframe\> but requires same origin
   ///- Windows WebView2 ([Official API - ICoreWebView2.get_DocumentTitle](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2?view=webview2-1.0.2210.55#get_documenttitle))
+  ///- Linux WPE WebKit ([Official API - webkit_web_view_get_title](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/method.WebView.get_title.html))
   ///
   ///Use the [PlatformInAppWebViewController.isMethodSupported] method to check if this method is supported at runtime.
   ///{@endtemplate}
@@ -1018,6 +1060,7 @@ enum PlatformInAppWebViewControllerMethod {
   ///- Web \<iframe\> but requires same origin:
   ///    - If `window.location.href` isn't accessible inside the iframe, it will return the current value of the `iframe.src` attribute.
   ///- Windows WebView2 ([Official API - ICoreWebView2.get_Source](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2?view=webview2-1.0.2210.55#get_source))
+  ///- Linux WPE WebKit ([Official API - webkit_web_view_get_uri](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/method.WebView.get_uri.html))
   ///
   ///Use the [PlatformInAppWebViewController.isMethodSupported] method to check if this method is supported at runtime.
   ///{@endtemplate}
@@ -1057,6 +1100,7 @@ enum PlatformInAppWebViewControllerMethod {
   ///**Officially Supported Platforms/Implementations**:
   ///- Android WebView
   ///- iOS WKWebView ([Official API - UIScrollView.zoomScale](https://developer.apple.com/documentation/uikit/uiscrollview/1619419-zoomscale))
+  ///- Linux WPE WebKit ([Official API - webkit_web_view_get_zoom_level](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/method.WebView.get_zoom_level.html))
   ///- Windows WebView2 ([Official API - ICoreWebView2Controller.get_ZoomFactor](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2controller?view=webview2-1.0.2849.39#get_zoomfactor))
   ///
   ///Use the [PlatformInAppWebViewController.isMethodSupported] method to check if this method is supported at runtime.
@@ -1073,6 +1117,7 @@ enum PlatformInAppWebViewControllerMethod {
   ///- macOS WKWebView ([Official API - WKWebView.goBack](https://developer.apple.com/documentation/webkit/wkwebview/1414952-goback))
   ///- Web \<iframe\> but requires same origin ([Official API - History.back](https://developer.mozilla.org/en-US/docs/Web/API/History/back))
   ///- Windows WebView2 ([Official API - ICoreWebView2.GoBack](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2?view=webview2-1.0.2210.55#goback))
+  ///- Linux WPE WebKit ([Official API - webkit_web_view_go_back](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/method.WebView.go_back.html))
   ///
   ///Use the [PlatformInAppWebViewController.isMethodSupported] method to check if this method is supported at runtime.
   ///{@endtemplate}
@@ -1088,6 +1133,7 @@ enum PlatformInAppWebViewControllerMethod {
   ///- macOS WKWebView ([Official API - WKWebView.go](https://developer.apple.com/documentation/webkit/wkwebview/1414991-go))
   ///- Web \<iframe\> but requires same origin ([Official API - History.go](https://developer.mozilla.org/en-US/docs/Web/API/History/go))
   ///- Windows WebView2
+  ///- Linux WPE WebKit
   ///
   ///**Parameters - Officially Supported Platforms/Implementations**:
   ///- [steps]: all platforms
@@ -1106,6 +1152,7 @@ enum PlatformInAppWebViewControllerMethod {
   ///- macOS WKWebView ([Official API - WKWebView.goForward](https://developer.apple.com/documentation/webkit/wkwebview/1414993-goforward))
   ///- Web \<iframe\> but requires same origin ([Official API - History.forward](https://developer.mozilla.org/en-US/docs/Web/API/History/forward))
   ///- Windows WebView2 ([Official API - ICoreWebView2.GoForward](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2?view=webview2-1.0.2210.55#goforward))
+  ///- Linux WPE WebKit ([Official API - webkit_web_view_go_forward](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/method.WebView.go_forward.html))
   ///
   ///Use the [PlatformInAppWebViewController.isMethodSupported] method to check if this method is supported at runtime.
   ///{@endtemplate}
@@ -1136,6 +1183,8 @@ enum PlatformInAppWebViewControllerMethod {
   ///**Officially Supported Platforms/Implementations**:
   ///- iOS WKWebView 11.0+ ([Official API - WKWebView.handlesURLScheme](https://developer.apple.com/documentation/webkit/wkwebview/2875370-handlesurlscheme))
   ///- macOS WKWebView 10.13+ ([Official API - WKWebView.handlesURLScheme](https://developer.apple.com/documentation/webkit/wkwebview/2875370-handlesurlscheme))
+  ///- Linux WPE WebKit:
+  ///    - Returns true for built-in schemes (http, https, file, ftp, data, blob, about, javascript).
   ///
   ///**Parameters - Officially Supported Platforms/Implementations**:
   ///- [urlScheme]: all platforms
@@ -1199,6 +1248,7 @@ enum PlatformInAppWebViewControllerMethod {
   ///**Officially Supported Platforms/Implementations**:
   ///- Android WebView
   ///- iOS WKWebView
+  ///- Linux WPE WebKit
   ///- macOS WKWebView
   ///
   ///**Parameters - Officially Supported Platforms/Implementations**:
@@ -1227,6 +1277,8 @@ enum PlatformInAppWebViewControllerMethod {
   ///**Officially Supported Platforms/Implementations**:
   ///- Android WebView
   ///- iOS WKWebView
+  ///- Linux WPE WebKit:
+  ///    - This method is implemented using JavaScript.
   ///- macOS WKWebView
   ///- Web \<iframe\> but requires same origin
   ///
@@ -1261,6 +1313,8 @@ enum PlatformInAppWebViewControllerMethod {
   ///**Officially Supported Platforms/Implementations**:
   ///- Android WebView
   ///- iOS WKWebView
+  ///- Linux WPE WebKit:
+  ///    - This method is implemented using JavaScript.
   ///- macOS WKWebView
   ///- Web \<iframe\> but requires same origin
   ///
@@ -1297,6 +1351,8 @@ enum PlatformInAppWebViewControllerMethod {
   ///**Officially Supported Platforms/Implementations**:
   ///- Android WebView
   ///- iOS WKWebView
+  ///- Linux WPE WebKit:
+  ///    - This method is implemented using JavaScript.
   ///- macOS WKWebView
   ///- Web \<iframe\> but requires same origin
   ///
@@ -1316,7 +1372,7 @@ enum PlatformInAppWebViewControllerMethod {
   ///- Android WebView
   ///- iOS WKWebView
   ///- macOS WKWebView
-  ///- Linux WebKitGTK
+  ///- Linux WPE WebKit
   ///
   ///Use the [PlatformInAppWebViewController.isMethodSupported] method to check if this method is supported at runtime.
   ///{@endtemplate}
@@ -1343,6 +1399,7 @@ enum PlatformInAppWebViewControllerMethod {
   ///**Officially Supported Platforms/Implementations**:
   ///- Android WebView
   ///- iOS WKWebView
+  ///- Linux WPE WebKit ([Official API - webkit_web_view_is_loading](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/method.WebView.is_loading.html))
   ///- macOS WKWebView
   ///- Web \<iframe\>
   ///- Windows WebView2
@@ -1363,6 +1420,28 @@ enum PlatformInAppWebViewControllerMethod {
   ///{@endtemplate}
   isMultiProcessEnabled,
 
+  ///Can be used to check if the [PlatformInAppWebViewController.isMuted] method is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.PlatformInAppWebViewController.isMuted.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Linux WPE WebKit 2.30+ ([Official API - webkit_web_view_get_is_muted](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/method.WebView.get_is_muted.html))
+  ///
+  ///Use the [PlatformInAppWebViewController.isMethodSupported] method to check if this method is supported at runtime.
+  ///{@endtemplate}
+  isMuted,
+
+  ///Can be used to check if the [PlatformInAppWebViewController.isPlayingAudio] method is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.PlatformInAppWebViewController.isPlayingAudio.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Linux WPE WebKit 2.8+ ([Official API - webkit_web_view_is_playing_audio](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/method.WebView.is_playing_audio.html))
+  ///
+  ///Use the [PlatformInAppWebViewController.isMethodSupported] method to check if this method is supported at runtime.
+  ///{@endtemplate}
+  isPlayingAudio,
+
   ///Can be used to check if the [PlatformInAppWebViewController.isSecureContext] method is supported at runtime.
   ///
   ///{@template flutter_inappwebview_platform_interface.PlatformInAppWebViewController.isSecureContext.supported_platforms}
@@ -1371,6 +1450,8 @@ enum PlatformInAppWebViewControllerMethod {
   ///- Android WebView 21+:
   ///    - This method is implemented using JavaScript.
   ///- iOS WKWebView:
+  ///    - This method is implemented using JavaScript.
+  ///- Linux WPE WebKit:
   ///    - This method is implemented using JavaScript.
   ///- macOS WKWebView:
   ///    - This method is implemented using JavaScript.
@@ -1392,6 +1473,7 @@ enum PlatformInAppWebViewControllerMethod {
   ///    - or [Official API - WKWebView.load](https://developer.apple.com/documentation/webkit/wkwebview/1415011-load)
   ///- Web \<iframe\> but requires same origin
   ///- Windows WebView2 ([Official API - ICoreWebView2.NavigateToString](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2?view=webview2-1.0.2210.55#navigatetostring))
+  ///- Linux WPE WebKit ([Official API - webkit_web_view_load_html](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/method.WebView.load_html.html))
   ///
   ///**Parameters - Officially Supported Platforms/Implementations**:
   ///- [data]: all platforms
@@ -1428,6 +1510,7 @@ enum PlatformInAppWebViewControllerMethod {
   ///- macOS WKWebView ([Official API - WKWebView.load](https://developer.apple.com/documentation/webkit/wkwebview/1414954-load))
   ///- Web \<iframe\> but requires same origin
   ///- Windows WebView2 ([Official API - ICoreWebView2.Navigate](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2?view=webview2-1.0.2210.55#navigate))
+  ///- Linux WPE WebKit ([Official API - webkit_web_view_load_uri](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/method.WebView.load_uri.html))
   ///
   ///**Parameters - Officially Supported Platforms/Implementations**:
   ///- [assetFilePath]: all platforms
@@ -1469,6 +1552,7 @@ enum PlatformInAppWebViewControllerMethod {
   ///- Web \<iframe\> but requires same origin:
   ///    - If method is "GET" and headers are empty, it will change the `src` of the iframe. For all other cases it will try to create an XMLHttpRequest and load the result inside the iframe.
   ///- Windows WebView2 ([Official API - ICoreWebView2_2.NavigateWithWebResourceRequest](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2_2?view=webview2-1.0.2210.55#navigatewithwebresourcerequest))
+  ///- Linux WPE WebKit ([Official API - webkit_web_view_load_uri](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/method.WebView.load_uri.html))
   ///
   ///**Parameters - Officially Supported Platforms/Implementations**:
   ///- [urlRequest]: all platforms
@@ -1538,6 +1622,8 @@ enum PlatformInAppWebViewControllerMethod {
   ///**Officially Supported Platforms/Implementations**:
   ///- iOS WKWebView 15.0+ ([Official API - WKWebView.pauseAllMediaPlayback](https://developer.apple.com/documentation/webkit/wkwebview/3752240-pauseallmediaplayback))
   ///- macOS WKWebView 12.0+ ([Official API - WKWebView.pauseAllMediaPlayback](https://developer.apple.com/documentation/webkit/wkwebview/3752240-pauseallmediaplayback))
+  ///- Linux WPE WebKit ([Official API - JavaScript HTMLMediaElement.pause()](https://developer.mozilla.org/en-US/docs/Web/API/HTMLMediaElement/pause)):
+  ///    - Uses JavaScript to pause all audio and video elements
   ///
   ///Use the [PlatformInAppWebViewController.isMethodSupported] method to check if this method is supported at runtime.
   ///{@endtemplate}
@@ -1628,6 +1714,7 @@ enum PlatformInAppWebViewControllerMethod {
   ///- Web \<iframe\> but requires same origin ([Official API - Location.reload](https://developer.mozilla.org/en-US/docs/Web/API/Location/reload)):
   ///    - if `window.location.reload()` is not accessible inside the iframe, it will reload using the iframe `src` attribute.
   ///- Windows WebView2 ([Official API - ICoreWebView2.Reload](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2?view=webview2-1.0.2210.55#reload))
+  ///- Linux WPE WebKit ([Official API - webkit_web_view_reload](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/method.WebView.reload.html))
   ///
   ///Use the [PlatformInAppWebViewController.isMethodSupported] method to check if this method is supported at runtime.
   ///{@endtemplate}
@@ -1640,6 +1727,7 @@ enum PlatformInAppWebViewControllerMethod {
   ///**Officially Supported Platforms/Implementations**:
   ///- iOS WKWebView ([Official API - WKWebView.reloadFromOrigin](https://developer.apple.com/documentation/webkit/wkwebview/1414956-reloadfromorigin))
   ///- macOS WKWebView ([Official API - WKWebView.reloadFromOrigin](https://developer.apple.com/documentation/webkit/wkwebview/1414956-reloadfromorigin))
+  ///- Linux WPE WebKit ([Official API - webkit_web_view_reload_bypass_cache](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/method.WebView.reload_bypass_cache.html))
   ///
   ///Use the [PlatformInAppWebViewController.isMethodSupported] method to check if this method is supported at runtime.
   ///{@endtemplate}
@@ -1653,6 +1741,7 @@ enum PlatformInAppWebViewControllerMethod {
   ///- Android WebView
   ///- iOS WKWebView ([Official API - WKUserContentController.removeAllUserScripts](https://developer.apple.com/documentation/webkit/wkusercontentcontroller/1536540-removealluserscripts)):
   ///    - This method will throw an error if the [PlatformWebViewCreationParams.windowId] has been set. There isn't any way to add/remove user scripts specific to window WebViews. This is a limitation of the native WebKit APIs.
+  ///- Linux WPE WebKit ([Official API - webkit_user_content_manager_remove_all_scripts](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/method.UserContentManager.remove_all_scripts.html))
   ///- macOS WKWebView ([Official API - WKUserContentController.removeAllUserScripts](https://developer.apple.com/documentation/webkit/wkusercontentcontroller/1536540-removealluserscripts)):
   ///    - This method will throw an error if the [PlatformWebViewCreationParams.windowId] has been set. There isn't any way to add/remove user scripts specific to window WebViews. This is a limitation of the native WebKit APIs.
   ///- Web \<iframe\> but requires same origin
@@ -1702,6 +1791,7 @@ enum PlatformInAppWebViewControllerMethod {
   ///- Android WebView
   ///- iOS WKWebView:
   ///    - This method will throw an error if the [PlatformWebViewCreationParams.windowId] has been set. There isn't any way to add/remove user scripts specific to window WebViews. This is a limitation of the native WebKit APIs.
+  ///- Linux WPE WebKit
   ///- macOS WKWebView:
   ///    - This method will throw an error if the [PlatformWebViewCreationParams.windowId] has been set. There isn't any way to add/remove user scripts specific to window WebViews. This is a limitation of the native WebKit APIs.
   ///- Web \<iframe\> but requires same origin
@@ -1722,6 +1812,7 @@ enum PlatformInAppWebViewControllerMethod {
   ///- Android WebView
   ///- iOS WKWebView:
   ///    - This method will throw an error if the [PlatformWebViewCreationParams.windowId] has been set. There isn't any way to add/remove user scripts specific to window WebViews. This is a limitation of the native WebKit APIs.
+  ///- Linux WPE WebKit
   ///- macOS WKWebView:
   ///    - This method will throw an error if the [PlatformWebViewCreationParams.windowId] has been set. There isn't any way to add/remove user scripts specific to window WebViews. This is a limitation of the native WebKit APIs.
   ///- Web \<iframe\> but requires same origin
@@ -1742,6 +1833,7 @@ enum PlatformInAppWebViewControllerMethod {
   ///- Android WebView
   ///- iOS WKWebView:
   ///    - This method will throw an error if the [PlatformWebViewCreationParams.windowId] has been set. There isn't any way to add/remove user scripts specific to window WebViews. This is a limitation of the native WebKit APIs.
+  ///- Linux WPE WebKit
   ///- macOS WKWebView:
   ///    - This method will throw an error if the [PlatformWebViewCreationParams.windowId] has been set. There isn't any way to add/remove user scripts specific to window WebViews. This is a limitation of the native WebKit APIs.
   ///- Web \<iframe\> but requires same origin
@@ -1759,7 +1851,7 @@ enum PlatformInAppWebViewControllerMethod {
   ///{@template flutter_inappwebview_platform_interface.PlatformInAppWebViewController.requestEnterFullscreen.supported_platforms}
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Linux WebKitGTK
+  ///- Linux WPE WebKit
   ///
   ///Use the [PlatformInAppWebViewController.isMethodSupported] method to check if this method is supported at runtime.
   ///{@endtemplate}
@@ -1770,7 +1862,7 @@ enum PlatformInAppWebViewControllerMethod {
   ///{@template flutter_inappwebview_platform_interface.PlatformInAppWebViewController.requestExitFullscreen.supported_platforms}
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Linux WebKitGTK
+  ///- Linux WPE WebKit
   ///
   ///Use the [PlatformInAppWebViewController.isMethodSupported] method to check if this method is supported at runtime.
   ///{@endtemplate}
@@ -1784,6 +1876,8 @@ enum PlatformInAppWebViewControllerMethod {
   ///- Android WebView ([Official API - WebView.requestFocus](https://developer.android.com/reference/android/webkit/WebView#requestFocus(int,%20android.graphics.Rect)))
   ///- iOS WKWebView ([Official API - UIResponder.becomeFirstResponder](https://developer.apple.com/documentation/uikit/uiresponder/1621113-becomefirstresponder))
   ///- macOS WKWebView ([Official API - NSWindow.makeFirstResponder](https://developer.apple.com/documentation/appkit/nswindow/1419366-makefirstresponder))
+  ///- Linux WPE WebKit ([Official API - wpe_view_backend_add_activity_state](https://wpewebkit.org/reference/stable/wpe-platform-2.0/func.view_backend_add_activity_state.html)):
+  ///    - Adds focused state to WPE backend
   ///
   ///**Parameters - Officially Supported Platforms/Implementations**:
   ///- [direction]:
@@ -1828,6 +1922,8 @@ enum PlatformInAppWebViewControllerMethod {
   ///**Officially Supported Platforms/Implementations**:
   ///- iOS WKWebView 15.0+ ([Official API - WKWebView.requestMediaPlaybackState](https://developer.apple.com/documentation/webkit/wkwebview/3752241-requestmediaplaybackstate))
   ///- macOS WKWebView 12.0+ ([Official API - WKWebView.requestMediaPlaybackState](https://developer.apple.com/documentation/webkit/wkwebview/3752241-requestmediaplaybackstate))
+  ///- Linux WPE WebKit ([Official API - JavaScript HTMLMediaElement.paused](https://developer.mozilla.org/en-US/docs/Web/API/HTMLMediaElement/paused)):
+  ///    - Uses JavaScript to query media playback state
   ///
   ///Use the [PlatformInAppWebViewController.isMethodSupported] method to check if this method is supported at runtime.
   ///{@endtemplate}
@@ -1838,7 +1934,7 @@ enum PlatformInAppWebViewControllerMethod {
   ///{@template flutter_inappwebview_platform_interface.PlatformInAppWebViewController.requestPointerLock.supported_platforms}
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Linux WebKitGTK
+  ///- Linux WPE WebKit
   ///
   ///Use the [PlatformInAppWebViewController.isMethodSupported] method to check if this method is supported at runtime.
   ///{@endtemplate}
@@ -1849,7 +1945,7 @@ enum PlatformInAppWebViewControllerMethod {
   ///{@template flutter_inappwebview_platform_interface.PlatformInAppWebViewController.requestPointerUnlock.supported_platforms}
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Linux WebKitGTK
+  ///- Linux WPE WebKit
   ///
   ///Use the [PlatformInAppWebViewController.isMethodSupported] method to check if this method is supported at runtime.
   ///{@endtemplate}
@@ -1864,6 +1960,7 @@ enum PlatformInAppWebViewControllerMethod {
   ///    - This method doesn't restore the display data for this WebView.
   ///- iOS WKWebView 15.0+ ([Official API - WKWebView.interactionState](https://developer.apple.com/documentation/webkit/wkwebview/3752236-interactionstate))
   ///- macOS WKWebView 12.0+ ([Official API - WKWebView.interactionState](https://developer.apple.com/documentation/webkit/wkwebview/3752236-interactionstate))
+  ///- Linux WPE WebKit
   ///
   ///**Parameters - Officially Supported Platforms/Implementations**:
   ///- [state]: all platforms
@@ -1908,6 +2005,7 @@ enum PlatformInAppWebViewControllerMethod {
   ///    - This method doesn't store the display data for this WebView.
   ///- iOS WKWebView 15.0+ ([Official API - WKWebView.interactionState](https://developer.apple.com/documentation/webkit/wkwebview/3752236-interactionstate))
   ///- macOS WKWebView 12.0+ ([Official API - WKWebView.interactionState](https://developer.apple.com/documentation/webkit/wkwebview/3752236-interactionstate))
+  ///- Linux WPE WebKit
   ///
   ///Use the [PlatformInAppWebViewController.isMethodSupported] method to check if this method is supported at runtime.
   ///{@endtemplate}
@@ -1922,6 +2020,8 @@ enum PlatformInAppWebViewControllerMethod {
   ///    - if [autoname] is `false`, the [filePath] must ends with the [WebArchiveFormat.MHT] file extension.
   ///- iOS WKWebView 14.0+:
   ///    - If [autoname] is `false`, the [filePath] must ends with the [WebArchiveFormat.WEBARCHIVE] file extension.
+  ///- Linux WPE WebKit ([Official API - webkit_web_view_save_to_file](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/method.WebView.save_to_file.html)):
+  ///    - Saves as MHTML format. If [autoname] is `false`, the [filePath] must end with the .mht extension.
   ///- macOS WKWebView 11.0+:
   ///    - If [autoname] is `false`, the [filePath] must ends with the [WebArchiveFormat.WEBARCHIVE] file extension.
   ///
@@ -1980,6 +2080,8 @@ enum PlatformInAppWebViewControllerMethod {
   ///**Officially Supported Platforms/Implementations**:
   ///- iOS WKWebView 15.0+ ([Official API - WKWebView.setAllMediaPlaybackSuspended](https://developer.apple.com/documentation/webkit/wkwebview/3752242-setallmediaplaybacksuspended))
   ///- macOS WKWebView 12.0+ ([Official API - WKWebView.setAllMediaPlaybackSuspended](https://developer.apple.com/documentation/webkit/wkwebview/3752242-setallmediaplaybacksuspended))
+  ///- Linux WPE WebKit ([Official API - JavaScript HTMLMediaElement.pause()/play()](https://developer.mozilla.org/en-US/docs/Web/API/HTMLMediaElement)):
+  ///    - Uses JavaScript to suspend/resume all media elements
   ///
   ///**Parameters - Officially Supported Platforms/Implementations**:
   ///- [suspended]: all platforms
@@ -1994,6 +2096,8 @@ enum PlatformInAppWebViewControllerMethod {
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- iOS WKWebView 15.0+ ([Official API - WKWebView.setCameraCaptureState](https://developer.apple.com/documentation/webkit/wkwebview/3763097-setcameracapturestate))
+  ///- Linux WPE WebKit 2.34+ ([Official API - webkit_web_view_set_camera_capture_state](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/method.WebView.set_camera_capture_state.html)):
+  ///    - Once state is set to NONE, it cannot be changed back. The page can request capture again using the mediaDevices API.
   ///- macOS WKWebView 12.0+ ([Official API - WKWebView.setCameraCaptureState](https://developer.apple.com/documentation/webkit/wkwebview/3763097-setcameracapturestate))
   ///
   ///**Parameters - Officially Supported Platforms/Implementations**:
@@ -2042,6 +2146,7 @@ enum PlatformInAppWebViewControllerMethod {
   ///- macOS WKWebView
   ///- Web \<iframe\> but requires same origin
   ///- Windows WebView2
+  ///- Linux WPE WebKit
   ///
   ///**Parameters - Officially Supported Platforms/Implementations**:
   ///- [bridgeName]: all platforms
@@ -2056,6 +2161,8 @@ enum PlatformInAppWebViewControllerMethod {
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- iOS WKWebView 15.0+ ([Official API - WKWebView.setMicrophoneCaptureState](https://developer.apple.com/documentation/webkit/wkwebview/3763098-setmicrophonecapturestate))
+  ///- Linux WPE WebKit 2.34+ ([Official API - webkit_web_view_set_microphone_capture_state](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/method.WebView.set_microphone_capture_state.html)):
+  ///    - Once state is set to NONE, it cannot be changed back. The page can request capture again using the mediaDevices API.
   ///- macOS WKWebView 12.0+ ([Official API - WKWebView.setMicrophoneCaptureState](https://developer.apple.com/documentation/webkit/wkwebview/3763098-setmicrophonecapturestate))
   ///
   ///**Parameters - Officially Supported Platforms/Implementations**:
@@ -2064,6 +2171,20 @@ enum PlatformInAppWebViewControllerMethod {
   ///Use the [PlatformInAppWebViewController.isMethodSupported] method to check if this method is supported at runtime.
   ///{@endtemplate}
   setMicrophoneCaptureState,
+
+  ///Can be used to check if the [PlatformInAppWebViewController.setMuted] method is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.PlatformInAppWebViewController.setMuted.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Linux WPE WebKit 2.30+ ([Official API - webkit_web_view_set_is_muted](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/method.WebView.set_is_muted.html))
+  ///
+  ///**Parameters - Officially Supported Platforms/Implementations**:
+  ///- [muted]: all platforms
+  ///
+  ///Use the [PlatformInAppWebViewController.isMethodSupported] method to check if this method is supported at runtime.
+  ///{@endtemplate}
+  setMuted,
 
   ///Can be used to check if the [PlatformInAppWebViewController.setOptions] method is supported at runtime.
   ///
@@ -2121,6 +2242,7 @@ enum PlatformInAppWebViewControllerMethod {
   ///**Officially Supported Platforms/Implementations**:
   ///- Android WebView
   ///- iOS WKWebView
+  ///- Linux WPE WebKit
   ///- macOS WKWebView
   ///- Web \<iframe\> but requires same origin
   ///- Windows WebView2
@@ -2137,7 +2259,7 @@ enum PlatformInAppWebViewControllerMethod {
   ///{@template flutter_inappwebview_platform_interface.PlatformInAppWebViewController.setTargetRefreshRate.supported_platforms}
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Linux WebKitGTK
+  ///- Linux WPE WebKit
   ///
   ///**Parameters - Officially Supported Platforms/Implementations**:
   ///- [rate]: all platforms
@@ -2151,7 +2273,7 @@ enum PlatformInAppWebViewControllerMethod {
   ///{@template flutter_inappwebview_platform_interface.PlatformInAppWebViewController.setVisible.supported_platforms}
   ///
   ///**Officially Supported Platforms/Implementations**:
-  ///- Linux WebKitGTK
+  ///- Linux WPE WebKit
   ///
   ///**Parameters - Officially Supported Platforms/Implementations**:
   ///- [visible]: all platforms
@@ -2207,6 +2329,7 @@ enum PlatformInAppWebViewControllerMethod {
   ///- macOS WKWebView ([Official API - WKWebView.stopLoading](https://developer.apple.com/documentation/webkit/wkwebview/1414981-stoploading))
   ///- Web \<iframe\> but requires same origin ([Official API - Window.stop](https://developer.mozilla.org/en-US/docs/Web/API/Window/stop))
   ///- Windows WebView2 ([Official API - ICoreWebView2.Stop](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2?view=webview2-1.0.2210.55#stop))
+  ///- Linux WPE WebKit ([Official API - webkit_web_view_stop_loading](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/method.WebView.stop_loading.html))
   ///
   ///Use the [PlatformInAppWebViewController.isMethodSupported] method to check if this method is supported at runtime.
   ///{@endtemplate}
@@ -2222,6 +2345,7 @@ enum PlatformInAppWebViewControllerMethod {
   ///- iOS WKWebView 11.0+ ([Official API - WKWebView.takeSnapshot](https://developer.apple.com/documentation/webkit/wkwebview/2873260-takesnapshot))
   ///- macOS WKWebView 10.13+ ([Official API - WKWebView.takeSnapshot](https://developer.apple.com/documentation/webkit/wkwebview/2873260-takesnapshot))
   ///- Windows WebView2
+  ///- Linux WPE WebKit
   ///
   ///**Parameters - Officially Supported Platforms/Implementations**:
   ///- [screenshotConfiguration]: all platforms
@@ -2230,6 +2354,17 @@ enum PlatformInAppWebViewControllerMethod {
   ///{@endtemplate}
   takeScreenshot,
 
+  ///Can be used to check if the [PlatformInAppWebViewController.terminateWebProcess] method is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.PlatformInAppWebViewController.terminateWebProcess.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Linux WPE WebKit 2.34+ ([Official API - webkit_web_view_terminate_web_process](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/method.WebView.terminate_web_process.html))
+  ///
+  ///Use the [PlatformInAppWebViewController.isMethodSupported] method to check if this method is supported at runtime.
+  ///{@endtemplate}
+  terminateWebProcess,
+
   ///Can be used to check if the [PlatformInAppWebViewController.zoomBy] method is supported at runtime.
   ///
   ///{@template flutter_inappwebview_platform_interface.PlatformInAppWebViewController.zoomBy.supported_platforms}
@@ -2237,6 +2372,7 @@ enum PlatformInAppWebViewControllerMethod {
   ///**Officially Supported Platforms/Implementations**:
   ///- Android WebView 21+ ([Official API - WebView.zoomBy](https://developer.android.com/reference/android/webkit/WebView#zoomBy(float)))
   ///- iOS WKWebView ([Official API - UIScrollView.setZoomScale](https://developer.apple.com/documentation/uikit/uiscrollview/1619412-setzoomscale))
+  ///- Linux WPE WebKit ([Official API - webkit_web_view_set_zoom_level](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/method.WebView.set_zoom_level.html))
   ///
   ///**Parameters - Officially Supported Platforms/Implementations**:
   ///- [zoomFactor]: all platforms
@@ -2300,6 +2436,7 @@ extension _PlatformInAppWebViewControllerMethodSupported
                   [
                     TargetPlatform.android,
                     TargetPlatform.iOS,
+                    TargetPlatform.linux,
                     TargetPlatform.macOS,
                     TargetPlatform.windows,
                   ].contains(platform ?? defaultTargetPlatform);
@@ -2310,6 +2447,7 @@ extension _PlatformInAppWebViewControllerMethodSupported
                   [
                     TargetPlatform.android,
                     TargetPlatform.iOS,
+                    TargetPlatform.linux,
                     TargetPlatform.macOS,
                     TargetPlatform.windows,
                   ].contains(platform ?? defaultTargetPlatform);
@@ -2318,6 +2456,7 @@ extension _PlatformInAppWebViewControllerMethodSupported
             [
               TargetPlatform.android,
               TargetPlatform.iOS,
+              TargetPlatform.linux,
               TargetPlatform.macOS,
             ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.callAsyncJavaScript:
@@ -2340,6 +2479,7 @@ extension _PlatformInAppWebViewControllerMethodSupported
               TargetPlatform.iOS,
               TargetPlatform.macOS,
               TargetPlatform.windows,
+              TargetPlatform.linux,
             ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.canGoBackOrForward:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
@@ -2347,6 +2487,7 @@ extension _PlatformInAppWebViewControllerMethodSupported
               TargetPlatform.android,
               TargetPlatform.iOS,
               TargetPlatform.macOS,
+              TargetPlatform.linux,
               TargetPlatform.windows,
             ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.canGoForward:
@@ -2356,6 +2497,7 @@ extension _PlatformInAppWebViewControllerMethodSupported
               TargetPlatform.iOS,
               TargetPlatform.macOS,
               TargetPlatform.windows,
+              TargetPlatform.linux,
             ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.canScrollHorizontally:
         return kIsWeb && platform == null
@@ -2364,6 +2506,7 @@ extension _PlatformInAppWebViewControllerMethodSupported
                   [
                     TargetPlatform.android,
                     TargetPlatform.iOS,
+                    TargetPlatform.linux,
                     TargetPlatform.macOS,
                   ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.canScrollVertically:
@@ -2373,6 +2516,7 @@ extension _PlatformInAppWebViewControllerMethodSupported
                   [
                     TargetPlatform.android,
                     TargetPlatform.iOS,
+                    TargetPlatform.linux,
                     TargetPlatform.macOS,
                   ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.clearAllCache:
@@ -2381,6 +2525,7 @@ extension _PlatformInAppWebViewControllerMethodSupported
               TargetPlatform.android,
               TargetPlatform.iOS,
               TargetPlatform.macOS,
+              TargetPlatform.linux,
             ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.clearCache:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
@@ -2400,6 +2545,7 @@ extension _PlatformInAppWebViewControllerMethodSupported
               TargetPlatform.android,
               TargetPlatform.iOS,
               TargetPlatform.macOS,
+              TargetPlatform.linux,
             ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.clearFormData:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
@@ -2429,6 +2575,7 @@ extension _PlatformInAppWebViewControllerMethodSupported
             [
               TargetPlatform.iOS,
               TargetPlatform.macOS,
+              TargetPlatform.linux,
             ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.createPdf:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
@@ -2471,6 +2618,7 @@ extension _PlatformInAppWebViewControllerMethodSupported
               TargetPlatform.iOS,
               TargetPlatform.macOS,
               TargetPlatform.windows,
+              TargetPlatform.linux,
             ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.enableSlowWholeDocumentDraw:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
@@ -2486,6 +2634,7 @@ extension _PlatformInAppWebViewControllerMethodSupported
                     TargetPlatform.iOS,
                     TargetPlatform.macOS,
                     TargetPlatform.windows,
+                    TargetPlatform.linux,
                   ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.findAllAsync:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
@@ -2505,6 +2654,7 @@ extension _PlatformInAppWebViewControllerMethodSupported
         return ((kIsWeb && platform != null) || !kIsWeb) &&
             [
               TargetPlatform.iOS,
+              TargetPlatform.linux,
               TargetPlatform.macOS,
             ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.getCertificate:
@@ -2514,6 +2664,7 @@ extension _PlatformInAppWebViewControllerMethodSupported
               TargetPlatform.iOS,
               TargetPlatform.macOS,
               TargetPlatform.windows,
+              TargetPlatform.linux,
             ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.getContentHeight:
         return kIsWeb && platform == null
@@ -2523,6 +2674,7 @@ extension _PlatformInAppWebViewControllerMethodSupported
                     TargetPlatform.android,
                     TargetPlatform.iOS,
                     TargetPlatform.macOS,
+                    TargetPlatform.linux,
                   ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.getContentWidth:
         return kIsWeb && platform == null
@@ -2532,6 +2684,7 @@ extension _PlatformInAppWebViewControllerMethodSupported
                     TargetPlatform.android,
                     TargetPlatform.iOS,
                     TargetPlatform.macOS,
+                    TargetPlatform.linux,
                   ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.getCopyBackForwardList:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
@@ -2540,6 +2693,7 @@ extension _PlatformInAppWebViewControllerMethodSupported
               TargetPlatform.iOS,
               TargetPlatform.macOS,
               TargetPlatform.windows,
+              TargetPlatform.linux,
             ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.getCurrentWebViewPackage:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
@@ -2564,12 +2718,14 @@ extension _PlatformInAppWebViewControllerMethodSupported
                     TargetPlatform.iOS,
                     TargetPlatform.macOS,
                     TargetPlatform.windows,
+                    TargetPlatform.linux,
                   ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.getHitTestResult:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
             [
               TargetPlatform.android,
               TargetPlatform.iOS,
+              TargetPlatform.linux,
             ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.getHtml:
         return kIsWeb && platform == null
@@ -2578,6 +2734,7 @@ extension _PlatformInAppWebViewControllerMethodSupported
                   [
                     TargetPlatform.android,
                     TargetPlatform.iOS,
+                    TargetPlatform.linux,
                     TargetPlatform.macOS,
                     TargetPlatform.windows,
                   ].contains(platform ?? defaultTargetPlatform);
@@ -2595,6 +2752,7 @@ extension _PlatformInAppWebViewControllerMethodSupported
                     TargetPlatform.iOS,
                     TargetPlatform.macOS,
                     TargetPlatform.windows,
+                    TargetPlatform.linux,
                   ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.getMetaTags:
         return kIsWeb && platform == null
@@ -2613,6 +2771,7 @@ extension _PlatformInAppWebViewControllerMethodSupported
                   [
                     TargetPlatform.android,
                     TargetPlatform.iOS,
+                    TargetPlatform.linux,
                     TargetPlatform.macOS,
                     TargetPlatform.windows,
                   ].contains(platform ?? defaultTargetPlatform);
@@ -2620,6 +2779,7 @@ extension _PlatformInAppWebViewControllerMethodSupported
         return ((kIsWeb && platform != null) || !kIsWeb) &&
             [
               TargetPlatform.iOS,
+              TargetPlatform.linux,
               TargetPlatform.macOS,
             ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.getOptions:
@@ -2639,6 +2799,7 @@ extension _PlatformInAppWebViewControllerMethodSupported
                   [
                     TargetPlatform.android,
                     TargetPlatform.iOS,
+                    TargetPlatform.linux,
                     TargetPlatform.macOS,
                   ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.getProgress:
@@ -2647,6 +2808,7 @@ extension _PlatformInAppWebViewControllerMethodSupported
               TargetPlatform.android,
               TargetPlatform.iOS,
               TargetPlatform.macOS,
+              TargetPlatform.linux,
             ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.getSafeBrowsingPrivacyPolicyUrl:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
@@ -2685,6 +2847,7 @@ extension _PlatformInAppWebViewControllerMethodSupported
                   [
                     TargetPlatform.android,
                     TargetPlatform.iOS,
+                    TargetPlatform.linux,
                     TargetPlatform.macOS,
                   ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.getSettings:
@@ -2694,6 +2857,7 @@ extension _PlatformInAppWebViewControllerMethodSupported
                   [
                     TargetPlatform.android,
                     TargetPlatform.iOS,
+                    TargetPlatform.linux,
                     TargetPlatform.macOS,
                     TargetPlatform.windows,
                   ].contains(platform ?? defaultTargetPlatform);
@@ -2729,6 +2893,7 @@ extension _PlatformInAppWebViewControllerMethodSupported
                     TargetPlatform.iOS,
                     TargetPlatform.macOS,
                     TargetPlatform.windows,
+                    TargetPlatform.linux,
                   ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.getUrl:
         return kIsWeb && platform == null
@@ -2739,6 +2904,7 @@ extension _PlatformInAppWebViewControllerMethodSupported
                     TargetPlatform.iOS,
                     TargetPlatform.macOS,
                     TargetPlatform.windows,
+                    TargetPlatform.linux,
                   ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.getVariationsHeader:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
@@ -2760,6 +2926,7 @@ extension _PlatformInAppWebViewControllerMethodSupported
             [
               TargetPlatform.android,
               TargetPlatform.iOS,
+              TargetPlatform.linux,
               TargetPlatform.windows,
             ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.goBack:
@@ -2771,6 +2938,7 @@ extension _PlatformInAppWebViewControllerMethodSupported
                     TargetPlatform.iOS,
                     TargetPlatform.macOS,
                     TargetPlatform.windows,
+                    TargetPlatform.linux,
                   ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.goBackOrForward:
         return kIsWeb && platform == null
@@ -2781,6 +2949,7 @@ extension _PlatformInAppWebViewControllerMethodSupported
                     TargetPlatform.iOS,
                     TargetPlatform.macOS,
                     TargetPlatform.windows,
+                    TargetPlatform.linux,
                   ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.goForward:
         return kIsWeb && platform == null
@@ -2791,6 +2960,7 @@ extension _PlatformInAppWebViewControllerMethodSupported
                     TargetPlatform.iOS,
                     TargetPlatform.macOS,
                     TargetPlatform.windows,
+                    TargetPlatform.linux,
                   ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.goTo:
         return kIsWeb && platform == null
@@ -2807,6 +2977,7 @@ extension _PlatformInAppWebViewControllerMethodSupported
             [
               TargetPlatform.iOS,
               TargetPlatform.macOS,
+              TargetPlatform.linux,
             ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.hasJavaScriptHandler:
         return kIsWeb && platform == null
@@ -2839,6 +3010,7 @@ extension _PlatformInAppWebViewControllerMethodSupported
             [
               TargetPlatform.android,
               TargetPlatform.iOS,
+              TargetPlatform.linux,
               TargetPlatform.macOS,
             ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.hideInputMethod:
@@ -2854,6 +3026,7 @@ extension _PlatformInAppWebViewControllerMethodSupported
                   [
                     TargetPlatform.android,
                     TargetPlatform.iOS,
+                    TargetPlatform.linux,
                     TargetPlatform.macOS,
                   ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.injectCSSFileFromAsset:
@@ -2872,6 +3045,7 @@ extension _PlatformInAppWebViewControllerMethodSupported
                   [
                     TargetPlatform.android,
                     TargetPlatform.iOS,
+                    TargetPlatform.linux,
                     TargetPlatform.macOS,
                   ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.injectJavascriptFileFromAsset:
@@ -2891,6 +3065,7 @@ extension _PlatformInAppWebViewControllerMethodSupported
                   [
                     TargetPlatform.android,
                     TargetPlatform.iOS,
+                    TargetPlatform.linux,
                     TargetPlatform.macOS,
                   ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.isInFullscreen:
@@ -2913,6 +3088,7 @@ extension _PlatformInAppWebViewControllerMethodSupported
                   [
                     TargetPlatform.android,
                     TargetPlatform.iOS,
+                    TargetPlatform.linux,
                     TargetPlatform.macOS,
                     TargetPlatform.windows,
                   ].contains(platform ?? defaultTargetPlatform);
@@ -2921,6 +3097,12 @@ extension _PlatformInAppWebViewControllerMethodSupported
             [
               TargetPlatform.android,
             ].contains(platform ?? defaultTargetPlatform);
+      case PlatformInAppWebViewControllerMethod.isMuted:
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
+            [TargetPlatform.linux].contains(platform ?? defaultTargetPlatform);
+      case PlatformInAppWebViewControllerMethod.isPlayingAudio:
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
+            [TargetPlatform.linux].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.isSecureContext:
         return kIsWeb && platform == null
             ? true
@@ -2928,6 +3110,7 @@ extension _PlatformInAppWebViewControllerMethodSupported
                   [
                     TargetPlatform.android,
                     TargetPlatform.iOS,
+                    TargetPlatform.linux,
                     TargetPlatform.macOS,
                   ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.loadData:
@@ -2939,6 +3122,7 @@ extension _PlatformInAppWebViewControllerMethodSupported
                     TargetPlatform.iOS,
                     TargetPlatform.macOS,
                     TargetPlatform.windows,
+                    TargetPlatform.linux,
                   ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.loadFile:
         return kIsWeb && platform == null
@@ -2949,6 +3133,7 @@ extension _PlatformInAppWebViewControllerMethodSupported
                     TargetPlatform.iOS,
                     TargetPlatform.macOS,
                     TargetPlatform.windows,
+                    TargetPlatform.linux,
                   ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.loadSimulatedRequest:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
@@ -2965,6 +3150,7 @@ extension _PlatformInAppWebViewControllerMethodSupported
                     TargetPlatform.iOS,
                     TargetPlatform.macOS,
                     TargetPlatform.windows,
+                    TargetPlatform.linux,
                   ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.openDevTools:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
@@ -2992,6 +3178,7 @@ extension _PlatformInAppWebViewControllerMethodSupported
             [
               TargetPlatform.iOS,
               TargetPlatform.macOS,
+              TargetPlatform.linux,
             ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.pauseTimers:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
@@ -3035,12 +3222,14 @@ extension _PlatformInAppWebViewControllerMethodSupported
                     TargetPlatform.iOS,
                     TargetPlatform.macOS,
                     TargetPlatform.windows,
+                    TargetPlatform.linux,
                   ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.reloadFromOrigin:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
             [
               TargetPlatform.iOS,
               TargetPlatform.macOS,
+              TargetPlatform.linux,
             ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.removeAllUserScripts:
         return kIsWeb && platform == null
@@ -3049,6 +3238,7 @@ extension _PlatformInAppWebViewControllerMethodSupported
                   [
                     TargetPlatform.android,
                     TargetPlatform.iOS,
+                    TargetPlatform.linux,
                     TargetPlatform.macOS,
                     TargetPlatform.windows,
                   ].contains(platform ?? defaultTargetPlatform);
@@ -3075,6 +3265,7 @@ extension _PlatformInAppWebViewControllerMethodSupported
                   [
                     TargetPlatform.android,
                     TargetPlatform.iOS,
+                    TargetPlatform.linux,
                     TargetPlatform.macOS,
                     TargetPlatform.windows,
                   ].contains(platform ?? defaultTargetPlatform);
@@ -3085,6 +3276,7 @@ extension _PlatformInAppWebViewControllerMethodSupported
                   [
                     TargetPlatform.android,
                     TargetPlatform.iOS,
+                    TargetPlatform.linux,
                     TargetPlatform.macOS,
                     TargetPlatform.windows,
                   ].contains(platform ?? defaultTargetPlatform);
@@ -3095,6 +3287,7 @@ extension _PlatformInAppWebViewControllerMethodSupported
                   [
                     TargetPlatform.android,
                     TargetPlatform.iOS,
+                    TargetPlatform.linux,
                     TargetPlatform.macOS,
                     TargetPlatform.windows,
                   ].contains(platform ?? defaultTargetPlatform);
@@ -3110,6 +3303,7 @@ extension _PlatformInAppWebViewControllerMethodSupported
               TargetPlatform.android,
               TargetPlatform.iOS,
               TargetPlatform.macOS,
+              TargetPlatform.linux,
             ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.requestFocusNodeHref:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
@@ -3128,6 +3322,7 @@ extension _PlatformInAppWebViewControllerMethodSupported
             [
               TargetPlatform.iOS,
               TargetPlatform.macOS,
+              TargetPlatform.linux,
             ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.requestPointerLock:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
@@ -3141,6 +3336,7 @@ extension _PlatformInAppWebViewControllerMethodSupported
               TargetPlatform.android,
               TargetPlatform.iOS,
               TargetPlatform.macOS,
+              TargetPlatform.linux,
             ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.resume:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
@@ -3161,12 +3357,14 @@ extension _PlatformInAppWebViewControllerMethodSupported
               TargetPlatform.android,
               TargetPlatform.iOS,
               TargetPlatform.macOS,
+              TargetPlatform.linux,
             ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.saveWebArchive:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
             [
               TargetPlatform.android,
               TargetPlatform.iOS,
+              TargetPlatform.linux,
               TargetPlatform.macOS,
             ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.scrollBy:
@@ -3192,11 +3390,13 @@ extension _PlatformInAppWebViewControllerMethodSupported
             [
               TargetPlatform.iOS,
               TargetPlatform.macOS,
+              TargetPlatform.linux,
             ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.setCameraCaptureState:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
             [
               TargetPlatform.iOS,
+              TargetPlatform.linux,
               TargetPlatform.macOS,
             ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.setContextMenu:
@@ -3217,13 +3417,18 @@ extension _PlatformInAppWebViewControllerMethodSupported
                     TargetPlatform.iOS,
                     TargetPlatform.macOS,
                     TargetPlatform.windows,
+                    TargetPlatform.linux,
                   ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.setMicrophoneCaptureState:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
             [
               TargetPlatform.iOS,
+              TargetPlatform.linux,
               TargetPlatform.macOS,
             ].contains(platform ?? defaultTargetPlatform);
+      case PlatformInAppWebViewControllerMethod.setMuted:
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
+            [TargetPlatform.linux].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.setOptions:
         return kIsWeb && platform == null
             ? true
@@ -3251,6 +3456,7 @@ extension _PlatformInAppWebViewControllerMethodSupported
                   [
                     TargetPlatform.android,
                     TargetPlatform.iOS,
+                    TargetPlatform.linux,
                     TargetPlatform.macOS,
                     TargetPlatform.windows,
                   ].contains(platform ?? defaultTargetPlatform);
@@ -3284,6 +3490,7 @@ extension _PlatformInAppWebViewControllerMethodSupported
                     TargetPlatform.iOS,
                     TargetPlatform.macOS,
                     TargetPlatform.windows,
+                    TargetPlatform.linux,
                   ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.takeScreenshot:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
@@ -3292,12 +3499,17 @@ extension _PlatformInAppWebViewControllerMethodSupported
               TargetPlatform.iOS,
               TargetPlatform.macOS,
               TargetPlatform.windows,
+              TargetPlatform.linux,
             ].contains(platform ?? defaultTargetPlatform);
+      case PlatformInAppWebViewControllerMethod.terminateWebProcess:
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
+            [TargetPlatform.linux].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.zoomBy:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
             [
               TargetPlatform.android,
               TargetPlatform.iOS,
+              TargetPlatform.linux,
             ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.zoomIn:
         return ((kIsWeb && platform != null) || !kIsWeb) &&

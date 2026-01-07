@@ -17,7 +17,7 @@ void openDataAndClose() {
     }, throwsAssertionError);
 
     await inAppBrowser.openData(
-        data: """
+      data: """
 <!doctype html>
 <html lang="en">
     <head>
@@ -32,15 +32,17 @@ void openDataAndClose() {
     </body>
 </html>
 """,
-        encoding: 'utf-8',
-        mimeType: 'text/html',
-        historyUrl: TEST_CROSS_PLATFORM_URL_1,
-        baseUrl: TEST_CROSS_PLATFORM_URL_1);
+      encoding: 'utf-8',
+      mimeType: 'text/html',
+      historyUrl: TEST_CROSS_PLATFORM_URL_1,
+      baseUrl: TEST_CROSS_PLATFORM_URL_1,
+    );
     await inAppBrowser.browserCreated.future;
     expect(inAppBrowser.isOpened(), true);
     expect(() async {
       await inAppBrowser.openUrlRequest(
-          urlRequest: URLRequest(url: TEST_URL_1));
+        urlRequest: URLRequest(url: TEST_URL_1),
+      );
     }, throwsAssertionError);
 
     await inAppBrowser.firstPageLoaded.future;

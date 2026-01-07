@@ -25,6 +25,7 @@ class _MyAppState extends State<MyApp> {
   final GlobalKey webViewKey = GlobalKey();
 
   LinuxInAppWebViewController? webViewController;
+  late LinuxFindInteractionController findInteractionController;
   InAppWebViewSettings settings = InAppWebViewSettings(
     isInspectable: kDebugMode,
     mediaPlaybackRequiresUserGesture: false,
@@ -52,12 +53,28 @@ class _MyAppState extends State<MyApp> {
   bool _shouldOverrideUrlLoadingCalled = false;
   bool _onUpdateVisitedHistoryCalled = false;
   bool _onPageCommitVisibleCalled = false;
+  bool _onFindResultReceivedCalled = false;
   String? _lastTitle;
   int? _lastProgress;
 
   @override
   void initState() {
     super.initState();
+    findInteractionController = LinuxFindInteractionController(
+      LinuxFindInteractionControllerCreationParams(
+        onFindResultReceived: (
+          controller,
+          activeMatchOrdinal,
+          numberOfMatches,
+          isDoneCounting,
+        ) {
+          _onFindResultReceivedCalled = true;
+          print(
+            '[TEST] onFindResultReceived: activeMatchOrdinal=$activeMatchOrdinal, numberOfMatches=$numberOfMatches, isDoneCounting=$isDoneCounting',
+          );
+        },
+      ),
+    );
   }
 
   @override
@@ -91,6 +108,7 @@ class _MyAppState extends State<MyApp> {
                           url: WebUri("about:blank"),
                         ),
                         initialSettings: settings,
+                        findInteractionController: findInteractionController,
                         // Test initialUserScripts
                         initialUserScripts: UnmodifiableListView([
                           UserScript(
@@ -262,9 +280,9 @@ class _MyAppState extends State<MyApp> {
                             return;
                           }
 
-                          // Stage 1: Test page loaded - run API tests
-                          if (_testStage == 1) {
-                            _testStage = 2;
+                          // Stage 2: Test page loaded - run API tests
+                          if (_testStage == 2) {
+                            _testStage = 3;
                             print(
                               '[TEST] Test page loaded - running API tests...',
                             );
@@ -576,6 +594,30 @@ class _MyAppState extends State<MyApp> {
                               print('[TEST] setZoomScale() error: $e');
                             }
 
+                            // === Test FindInteractionController ===
+                            print('[TEST]');
+                            print(
+                              '[TEST] === FindInteractionController Test ===',
+                            );
+                            await findInteractionController.findAll(find: "API Test Page");
+                            await Future.delayed(
+                              const Duration(milliseconds: 1000),
+                            );
+                            print('[TEST] findAll("API Test Page") called');
+
+                            if (_onFindResultReceivedCalled) {
+                              print(
+                                '[TEST] ✅ onFindResultReceived callback working!',
+                              );
+                            } else {
+                              print(
+                                '[TEST] ❌ onFindResultReceived callback NOT called',
+                              );
+                            }
+
+                            await findInteractionController.clearMatches();
+                            print('[TEST] clearMatches() called');
+
                             // === Print Summary ===
                             print('[TEST]');
                             print('[TEST] ================================');
@@ -616,6 +658,9 @@ class _MyAppState extends State<MyApp> {
                             print('[TEST]   ✅ getOriginalUrl() - tested');
                             print('[TEST]   ✅ isLoading() - tested');
                             print('[TEST]   ✅ setZoomScale() - tested');
+                            print(
+                              '[TEST]   ${_onFindResultReceivedCalled ? "✅" : "❌"} FindInteractionController',
+                            );
                             print('[TEST] ================================');
                             print('[TEST] ALL TESTS COMPLETE!');
                             print('[TEST] ================================');

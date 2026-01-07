@@ -16,13 +16,14 @@ void setGetDelete() {
     final Completer<String> pageLoaded = Completer<String>();
 
     var headlessWebView = new HeadlessInAppWebView(
-        initialUrlRequest: URLRequest(url: TEST_CROSS_PLATFORM_URL_1),
-        onWebViewCreated: (controller) {
-          controllerCompleter.complete(controller);
-        },
-        onLoadStop: (controller, url) async {
-          pageLoaded.complete(url!.toString());
-        });
+      initialUrlRequest: URLRequest(url: TEST_CROSS_PLATFORM_URL_1),
+      onWebViewCreated: (controller) {
+        controllerCompleter.complete(controller);
+      },
+      onLoadStop: (controller, url) async {
+        pageLoaded.complete(url!.toString());
+      },
+    );
 
     if (defaultTargetPlatform == TargetPlatform.macOS) {
       await headlessWebView.run();
@@ -36,9 +37,7 @@ void setGetDelete() {
             onWebViewCreated: (controller) {
               controllerCompleter.complete(controller);
             },
-            initialSettings: InAppWebViewSettings(
-              clearCache: true,
-            ),
+            initialSettings: InAppWebViewSettings(clearCache: true),
             onLoadStop: (controller, url) {
               pageLoaded.complete(url!.toString());
             },
@@ -51,7 +50,10 @@ void setGetDelete() {
 
     if (defaultTargetPlatform == TargetPlatform.android) {
       await cookieManager.setCookie(
-          url: url, name: "myCookie", value: "myValue");
+        url: url,
+        name: "myCookie",
+        value: "myValue",
+      );
       expect(await cookieManager.removeSessionCookies(), isTrue);
     }
 
@@ -71,14 +73,19 @@ void setGetDelete() {
     expect(cookie?.value.toString(), "myValue");
 
     expect(
-        await cookieManager.deleteCookie(url: url, name: "myCookie"), isTrue);
+      await cookieManager.deleteCookie(url: url, name: "myCookie"),
+      isTrue,
+    );
     cookie = await cookieManager.getCookie(url: url, name: "myCookie");
     expect(cookie, isNull);
 
     expect(
-        await cookieManager.deleteCookies(
-            url: url, domain: ".${TEST_CROSS_PLATFORM_URL_1.host}"),
-        isTrue);
+      await cookieManager.deleteCookies(
+        url: url,
+        domain: ".${TEST_CROSS_PLATFORM_URL_1.host}",
+      ),
+      isTrue,
+    );
     cookies = await cookieManager.getCookies(url: url);
     expect(cookies, isEmpty);
 

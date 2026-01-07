@@ -54,11 +54,12 @@ void loadData() {
     final mimeType = 'text/html';
 
     await controller.loadData(
-        data: data,
-        encoding: 'utf-8',
-        mimeType: mimeType,
-        historyUrl: TEST_CROSS_PLATFORM_URL_1,
-        baseUrl: TEST_CROSS_PLATFORM_URL_1);
+      data: data,
+      encoding: 'utf-8',
+      mimeType: mimeType,
+      historyUrl: TEST_CROSS_PLATFORM_URL_1,
+      baseUrl: TEST_CROSS_PLATFORM_URL_1,
+    );
     await pageLoads.stream.first;
 
     final String? currentUrl = (await controller.getUrl())?.toString();

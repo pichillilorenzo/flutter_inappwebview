@@ -18,7 +18,12 @@ part 'platform_find_interaction_controller.g.dart';
 ///
 ///{@macro flutter_inappwebview_platform_interface.PlatformFindInteractionControllerCreationParams.supported_platforms}
 @SupportedPlatforms(
-  platforms: [AndroidPlatform(), IOSPlatform(), MacOSPlatform(), LinuxPlatform()],
+  platforms: [
+    AndroidPlatform(),
+    IOSPlatform(),
+    MacOSPlatform(),
+    LinuxPlatform(),
+  ],
 )
 @immutable
 class PlatformFindInteractionControllerCreationParams {
@@ -94,7 +99,12 @@ class PlatformFindInteractionControllerCreationParams {
 ///
 ///{@macro flutter_inappwebview_platform_interface.PlatformFindInteractionController.supported_platforms}
 @SupportedPlatforms(
-  platforms: [AndroidPlatform(), IOSPlatform(), MacOSPlatform(), LinuxPlatform()],
+  platforms: [
+    AndroidPlatform(),
+    IOSPlatform(),
+    MacOSPlatform(),
+    LinuxPlatform(),
+  ],
 )
 abstract class PlatformFindInteractionController extends PlatformInterface
     implements Disposable {
@@ -435,7 +445,12 @@ abstract class PlatformFindInteractionController extends PlatformInterface
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformFindInteractionController.dispose.supported_platforms}
   @SupportedPlatforms(
-    platforms: [AndroidPlatform(), IOSPlatform(), MacOSPlatform(), LinuxPlatform()],
+    platforms: [
+      AndroidPlatform(),
+      IOSPlatform(),
+      MacOSPlatform(),
+      LinuxPlatform(),
+    ],
   )
   @override
   void dispose({bool isKeepAlive = false}) {

@@ -21,7 +21,8 @@ void openUrlAndClose() {
     expect(inAppBrowser.isOpened(), true);
     expect(() async {
       await inAppBrowser.openUrlRequest(
-          urlRequest: URLRequest(url: TEST_CROSS_PLATFORM_URL_1));
+        urlRequest: URLRequest(url: TEST_CROSS_PLATFORM_URL_1),
+      );
     }, throwsAssertionError);
 
     await inAppBrowser.firstPageLoaded.future;

@@ -17,7 +17,8 @@ void applePayAPI() {
         textDirection: TextDirection.ltr,
         child: InAppWebView(
           key: GlobalKey(),
-          initialData: InAppWebViewInitialData(data: """
+          initialData: InAppWebViewInitialData(
+            data: """
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -32,10 +33,9 @@ void applePayAPI() {
     </script>
 </body>
 </html>
-                  """),
-          initialSettings: InAppWebViewSettings(
-            applePayAPIEnabled: true,
+                  """,
           ),
+          initialSettings: InAppWebViewSettings(applePayAPIEnabled: true),
           onLoadStop: (controller, url) {
             pageLoaded.complete();
           },

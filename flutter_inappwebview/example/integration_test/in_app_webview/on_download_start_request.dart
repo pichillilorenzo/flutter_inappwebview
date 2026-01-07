@@ -18,7 +18,9 @@ void onDownloadStarting() {
         textDirection: TextDirection.ltr,
         child: InAppWebView(
           key: GlobalKey(),
-          initialData: InAppWebViewInitialData(data: """
+          initialData: InAppWebViewInitialData(
+            data:
+                """
 <!doctype html>
 <html lang="en">
     <head>
@@ -37,7 +39,8 @@ void onDownloadStarting() {
         </script>
     </body>
 </html>
-          """),
+          """,
+          ),
           onWebViewCreated: (controller) {
             controllerCompleter.complete(controller);
           },
@@ -51,6 +54,8 @@ void onDownloadStarting() {
 
     final String url = await onDownloadStartCompleter.future;
     expect(
-        url, "http://${environment["NODE_SERVER_IP"]}:8082/test-download-file");
+      url,
+      "http://${environment["NODE_SERVER_IP"]}:8082/test-download-file",
+    );
   }, skip: shouldSkip);
 }

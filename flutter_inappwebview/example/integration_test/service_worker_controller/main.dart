@@ -13,9 +13,7 @@ part 'should_intercept_request.dart';
 void main() {
   final shouldSkip = kIsWeb
       ? true
-      : ![
-          TargetPlatform.android,
-        ].contains(defaultTargetPlatform);
+      : ![TargetPlatform.android].contains(defaultTargetPlatform);
 
   skippableGroup('Service Worker Controller', () {
     shouldInterceptRequest();

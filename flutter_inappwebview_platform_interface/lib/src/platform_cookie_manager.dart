@@ -86,8 +86,7 @@ On iOS below 11.0, it is implemented using JavaScript. See https://developer.moz
       apiName: 'WebKitCookieManager',
       apiUrl:
           'https://wpewebkit.org/reference/stable/wpe-webkit-2.0/class.CookieManager.html',
-      note:
-          'It is implemented using WebKitCookieManager from WPE WebKit.',
+      note: 'It is implemented using WebKitCookieManager from WPE WebKit.',
     ),
     MacOSPlatform(
       note:

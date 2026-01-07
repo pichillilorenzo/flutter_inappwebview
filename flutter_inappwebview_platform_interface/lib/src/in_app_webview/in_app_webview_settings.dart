@@ -79,7 +79,12 @@ class InAppWebViewSettings_ {
   ///it will be automatically inferred as `true`, otherwise, the default value is `false`.
   ///This logic will not be applied for [PlatformInAppBrowser], where you must set the value manually.
   @SupportedPlatforms(
-    platforms: [AndroidPlatform(), IOSPlatform(), MacOSPlatform(), LinuxPlatform()],
+    platforms: [
+      AndroidPlatform(),
+      IOSPlatform(),
+      MacOSPlatform(),
+      LinuxPlatform(),
+    ],
   )
   bool? useOnLoadResource;
 

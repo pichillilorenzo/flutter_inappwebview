@@ -101,7 +101,7 @@ class AndroidInAppWebViewPlatform extends InAppWebViewPlatform {
   /// Look at using [FindInteractionController] in `flutter_inappwebview` instead.
   @override
   AndroidFindInteractionController
-      createPlatformFindInteractionControllerStatic() {
+  createPlatformFindInteractionControllerStatic() {
     return AndroidFindInteractionController.static();
   }
 
@@ -224,9 +224,12 @@ class AndroidInAppWebViewPlatform extends InAppWebViewPlatform {
   /// Look at using [WebStorage] in `flutter_inappwebview` instead.
   @override
   AndroidWebStorage createPlatformWebStorageStatic() {
-    return AndroidWebStorage(AndroidWebStorageCreationParams(
+    return AndroidWebStorage(
+      AndroidWebStorageCreationParams(
         localStorage: createPlatformLocalStorageStatic(),
-        sessionStorage: createPlatformSessionStorageStatic()));
+        sessionStorage: createPlatformSessionStorageStatic(),
+      ),
+    );
   }
 
   /// Creates a new [AndroidLocalStorage].
@@ -306,7 +309,7 @@ class AndroidInAppWebViewPlatform extends InAppWebViewPlatform {
   /// Look at using [HttpAuthCredentialDatabase] in `flutter_inappwebview` instead.
   @override
   AndroidHttpAuthCredentialDatabase
-      createPlatformHttpAuthCredentialDatabaseStatic() {
+  createPlatformHttpAuthCredentialDatabaseStatic() {
     return AndroidHttpAuthCredentialDatabase.static();
   }
 
@@ -500,7 +503,8 @@ class AndroidInAppWebViewPlatform extends InAppWebViewPlatform {
   /// Look at using [WebStorageManager] in `flutter_inappwebview` instead.
   @override
   AndroidWebStorageManager createPlatformWebStorageManager(
-      PlatformWebStorageManagerCreationParams params) {
+    PlatformWebStorageManagerCreationParams params,
+  ) {
     return AndroidWebStorageManager(params);
   }
 
@@ -535,7 +539,7 @@ class AndroidInAppWebViewPlatform extends InAppWebViewPlatform {
   /// Look at using [WebAuthenticationSession] in `flutter_inappwebview` instead.
   @override
   PlatformWebAuthenticationSession
-      createPlatformWebAuthenticationSessionStatic() {
+  createPlatformWebAuthenticationSessionStatic() {
     return _PlatformWebAuthenticationSession.static();
   }
 }
@@ -543,22 +547,24 @@ class AndroidInAppWebViewPlatform extends InAppWebViewPlatform {
 class _PlatformWebAuthenticationSession
     extends PlatformWebAuthenticationSession {
   _PlatformWebAuthenticationSession(
-      PlatformWebAuthenticationSessionCreationParams params)
-      : super.implementation(params);
+    PlatformWebAuthenticationSessionCreationParams params,
+  ) : super.implementation(params);
 
   static final _PlatformWebAuthenticationSession _staticValue =
       _PlatformWebAuthenticationSession(
-          const PlatformWebAuthenticationSessionCreationParams());
+        const PlatformWebAuthenticationSessionCreationParams(),
+      );
 
   factory _PlatformWebAuthenticationSession.static() => _staticValue;
 }
 
 class _PlatformWebViewEnvironment extends PlatformWebViewEnvironment {
   _PlatformWebViewEnvironment(PlatformWebViewEnvironmentCreationParams params)
-      : super.implementation(params);
+    : super.implementation(params);
   static final _PlatformWebViewEnvironment _staticValue =
       _PlatformWebViewEnvironment(
-          const PlatformWebViewEnvironmentCreationParams());
+        const PlatformWebViewEnvironmentCreationParams(),
+      );
 
   factory _PlatformWebViewEnvironment.static() => _staticValue;
 }

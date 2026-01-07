@@ -19,8 +19,11 @@ class _NullOrEmpty extends Matcher {
       description.add('null or empty');
 }
 
-void skippableGroup(Object description, void Function() body,
-    {bool skip = false}) {
+void skippableGroup(
+  Object description,
+  void Function() body, {
+  bool skip = false,
+}) {
   if (!skip) {
     group(description.toString(), body, skip: skip);
   }
@@ -60,12 +63,15 @@ void skippableTestWidgets(
   dynamic tags,
 }) {
   if (!skip) {
-    testWidgets(description, callback,
-        skip: skip,
-        timeout: timeout,
-        semanticsEnabled: semanticsEnabled,
-        variant: variant,
-        tags: tags);
+    testWidgets(
+      description,
+      callback,
+      skip: skip,
+      timeout: timeout,
+      semanticsEnabled: semanticsEnabled,
+      variant: variant,
+      tags: tags,
+    );
   }
 }
 
@@ -85,9 +91,10 @@ class MyInAppBrowser extends InAppBrowser {
   final Completer<void> firstPageLoaded = Completer<void>();
   final Completer<void> browserClosed = Completer<void>();
 
-  MyInAppBrowser(
-      {int? windowId, UnmodifiableListView<UserScript>? initialUserScripts})
-      : super(windowId: windowId, initialUserScripts: initialUserScripts);
+  MyInAppBrowser({
+    int? windowId,
+    UnmodifiableListView<UserScript>? initialUserScripts,
+  }) : super(windowId: windowId, initialUserScripts: initialUserScripts);
 
   @override
   Future onBrowserCreated() async {
@@ -165,7 +172,10 @@ class MyChromeSafariBrowser extends ChromeSafariBrowser {
 
   @override
   void onRelationshipValidationResult(
-      CustomTabsRelationType? relation, Uri? requestedOrigin, bool result) {
+    CustomTabsRelationType? relation,
+    Uri? requestedOrigin,
+    bool result,
+  ) {
     relationshipValidationResult.complete(result);
   }
 

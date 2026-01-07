@@ -21,7 +21,7 @@ User Request
     ↓
 SUBAGENT #1: Research & Spec
     - Reads files, analyzes codebase
-    - Creates spec/analysis doc in docs/SubAgent docs/
+    - Creates spec/analysis doc in SubAgent_docs/
     - Returns summary to you
     ↓
 YOU: Receive results, spawn next subagent
@@ -56,13 +56,13 @@ runSubagent(
 **Research Subagent:**
 ```
 Research [topic]. Analyze relevant files in the codebase.
-Create a spec/analysis doc at: docs/SubAgent docs/[NAME].md
+Create a spec/analysis doc at: SubAgent_docs/[NAME].md
 Return: summary of findings and the spec file path.
 ```
 
 **Implementation Subagent:**
 ```
-Read the spec at: docs/SubAgent docs/[NAME].md
+Read the spec at: SubAgent_docs/[NAME].md
 Implement according to the spec.
 Return: summary of changes made.
 ```

@@ -23,24 +23,28 @@ void userScripts() {
             initialUrlRequest: URLRequest(url: TEST_CROSS_PLATFORM_URL_1),
             initialUserScripts: UnmodifiableListView<UserScript>([
               UserScript(
-                  source: "var foo = 49;",
-                  injectionTime: UserScriptInjectionTime.AT_DOCUMENT_START),
+                source: "var foo = 49;",
+                injectionTime: UserScriptInjectionTime.AT_DOCUMENT_START,
+              ),
               UserScript(
-                  source: "var foo2 = 19;",
-                  injectionTime: UserScriptInjectionTime.AT_DOCUMENT_START,
-                  contentWorld: ContentWorld.PAGE),
+                source: "var foo2 = 19;",
+                injectionTime: UserScriptInjectionTime.AT_DOCUMENT_START,
+                contentWorld: ContentWorld.PAGE,
+              ),
               UserScript(
-                  source: "var bar = 2;",
-                  injectionTime: UserScriptInjectionTime.AT_DOCUMENT_END,
-                  forMainFrameOnly:
-                      defaultTargetPlatform != TargetPlatform.android,
-                  contentWorld: ContentWorld.DEFAULT_CLIENT),
+                source: "var bar = 2;",
+                injectionTime: UserScriptInjectionTime.AT_DOCUMENT_END,
+                forMainFrameOnly:
+                    defaultTargetPlatform != TargetPlatform.android,
+                contentWorld: ContentWorld.DEFAULT_CLIENT,
+              ),
               UserScript(
-                  source: "var bar2 = 12;",
-                  injectionTime: UserScriptInjectionTime.AT_DOCUMENT_END,
-                  forMainFrameOnly:
-                      defaultTargetPlatform != TargetPlatform.android,
-                  contentWorld: ContentWorld.world(name: "test")),
+                source: "var bar2 = 12;",
+                injectionTime: UserScriptInjectionTime.AT_DOCUMENT_END,
+                forMainFrameOnly:
+                    defaultTargetPlatform != TargetPlatform.android,
+                contentWorld: ContentWorld.world(name: "test"),
+              ),
             ]),
             onWebViewCreated: (controller) {
               controllerCompleter.complete(controller);
@@ -58,23 +62,33 @@ void userScripts() {
       expect(await controller.evaluateJavascript(source: "foo;"), 49);
       expect(await controller.evaluateJavascript(source: "foo2;"), 19);
       expect(
-          await controller.evaluateJavascript(
-              source: "foo2;", contentWorld: ContentWorld.PAGE),
-          19);
+        await controller.evaluateJavascript(
+          source: "foo2;",
+          contentWorld: ContentWorld.PAGE,
+        ),
+        19,
+      );
       expect(await controller.evaluateJavascript(source: "bar;"), isNull);
       expect(await controller.evaluateJavascript(source: "bar2;"), isNull);
       expect(
-          await controller.evaluateJavascript(
-              source: "bar;", contentWorld: ContentWorld.DEFAULT_CLIENT),
-          2);
+        await controller.evaluateJavascript(
+          source: "bar;",
+          contentWorld: ContentWorld.DEFAULT_CLIENT,
+        ),
+        2,
+      );
       expect(
-          await controller.evaluateJavascript(
-              source: "bar2;", contentWorld: ContentWorld.world(name: "test")),
-          12);
+        await controller.evaluateJavascript(
+          source: "bar2;",
+          contentWorld: ContentWorld.world(name: "test"),
+        ),
+        12,
+      );
     });
 
-    skippableTestWidgets('add/remove user scripts',
-        (WidgetTester tester) async {
+    skippableTestWidgets('add/remove user scripts', (
+      WidgetTester tester,
+    ) async {
       final Completer<InAppWebViewController> controllerCompleter =
           Completer<InAppWebViewController>();
       final StreamController<String> pageLoads =
@@ -101,11 +115,13 @@ void userScripts() {
       await pageLoads.stream.first;
 
       var userScript1 = UserScript(
-          source: "window.foo = 49;",
-          injectionTime: UserScriptInjectionTime.AT_DOCUMENT_START);
+        source: "window.foo = 49;",
+        injectionTime: UserScriptInjectionTime.AT_DOCUMENT_START,
+      );
       var userScript2 = UserScript(
-          source: "window.bar = 19;",
-          injectionTime: UserScriptInjectionTime.AT_DOCUMENT_END);
+        source: "window.bar = 19;",
+        injectionTime: UserScriptInjectionTime.AT_DOCUMENT_END,
+      );
       await controller.addUserScripts(userScripts: [userScript1, userScript2]);
       await controller.reload();
       await pageLoads.stream.first;

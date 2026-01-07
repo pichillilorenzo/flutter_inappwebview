@@ -12,9 +12,11 @@ void setGetSettings() {
   skippableTest('set/get settings', () async {
     var inAppBrowser = new MyInAppBrowser();
     await inAppBrowser.openUrlRequest(
-        urlRequest: URLRequest(url: TEST_URL_1),
-        settings: InAppBrowserClassSettings(
-            browserSettings: InAppBrowserSettings(hideToolbarTop: true)));
+      urlRequest: URLRequest(url: TEST_URL_1),
+      settings: InAppBrowserClassSettings(
+        browserSettings: InAppBrowserSettings(hideToolbarTop: true),
+      ),
+    );
     await inAppBrowser.browserCreated.future;
     await inAppBrowser.firstPageLoaded.future;
 
@@ -23,8 +25,10 @@ void setGetSettings() {
     expect(settings!.browserSettings.hideToolbarTop, true);
 
     await inAppBrowser.setSettings(
-        settings: InAppBrowserClassSettings(
-            browserSettings: InAppBrowserSettings(hideToolbarTop: false)));
+      settings: InAppBrowserClassSettings(
+        browserSettings: InAppBrowserSettings(hideToolbarTop: false),
+      ),
+    );
 
     settings = await inAppBrowser.getSettings();
     expect(settings, isNotNull);

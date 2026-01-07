@@ -18,8 +18,9 @@ void webHistory() {
             TargetPlatform.macOS,
           ].contains(defaultTargetPlatform);
 
-    skippableTestWidgets('get history list and go back/forward',
-        (WidgetTester tester) async {
+    skippableTestWidgets('get history list and go back/forward', (
+      WidgetTester tester,
+    ) async {
       final Completer<InAppWebViewController> controllerCompleter =
           Completer<InAppWebViewController>();
 
@@ -48,8 +49,10 @@ void webHistory() {
       expect(url, TEST_CROSS_PLATFORM_URL_1.toString());
       expect(webHistory!.currentIndex, 0);
       expect(webHistory.list!.length, 1);
-      expect(webHistory.list![0].url.toString(),
-          TEST_CROSS_PLATFORM_URL_1.toString());
+      expect(
+        webHistory.list![0].url.toString(),
+        TEST_CROSS_PLATFORM_URL_1.toString(),
+      );
 
       await controller.loadUrl(urlRequest: URLRequest(url: TEST_URL_1));
       await Future.delayed(Duration(seconds: 1));
@@ -62,8 +65,10 @@ void webHistory() {
       expect(await controller.canGoBackOrForward(steps: 1), false);
       expect(webHistory!.currentIndex, 1);
       expect(webHistory.list!.length, 2);
-      expect(webHistory.list![0].url.toString(),
-          TEST_CROSS_PLATFORM_URL_1.toString());
+      expect(
+        webHistory.list![0].url.toString(),
+        TEST_CROSS_PLATFORM_URL_1.toString(),
+      );
       expect(webHistory.list![1].url.toString(), TEST_URL_1.toString());
 
       await Future.delayed(Duration(seconds: 1));
@@ -78,8 +83,10 @@ void webHistory() {
       expect(await controller.canGoBackOrForward(steps: 1), true);
       expect(webHistory!.currentIndex, 0);
       expect(webHistory.list!.length, 2);
-      expect(webHistory.list![0].url.toString(),
-          TEST_CROSS_PLATFORM_URL_1.toString());
+      expect(
+        webHistory.list![0].url.toString(),
+        TEST_CROSS_PLATFORM_URL_1.toString(),
+      );
       expect(webHistory.list![1].url.toString(), TEST_URL_1.toString());
 
       await Future.delayed(Duration(seconds: 1));
@@ -94,8 +101,10 @@ void webHistory() {
       expect(await controller.canGoBackOrForward(steps: 1), false);
       expect(webHistory!.currentIndex, 1);
       expect(webHistory.list!.length, 2);
-      expect(webHistory.list![0].url.toString(),
-          TEST_CROSS_PLATFORM_URL_1.toString());
+      expect(
+        webHistory.list![0].url.toString(),
+        TEST_CROSS_PLATFORM_URL_1.toString(),
+      );
       expect(webHistory.list![1].url.toString(), TEST_URL_1.toString());
 
       await Future.delayed(Duration(seconds: 1));
@@ -110,15 +119,18 @@ void webHistory() {
       expect(await controller.canGoBackOrForward(steps: 1), true);
       expect(webHistory!.currentIndex, 0);
       expect(webHistory.list!.length, 2);
-      expect(webHistory.list![0].url.toString(),
-          TEST_CROSS_PLATFORM_URL_1.toString());
+      expect(
+        webHistory.list![0].url.toString(),
+        TEST_CROSS_PLATFORM_URL_1.toString(),
+      );
       expect(webHistory.list![1].url.toString(), TEST_URL_1.toString());
     }, skip: shouldSkipTest1);
 
     final shouldSkipTest2 = !kIsWeb;
 
-    skippableTestWidgets('go back/forward on web platform',
-        (WidgetTester tester) async {
+    skippableTestWidgets('go back/forward on web platform', (
+      WidgetTester tester,
+    ) async {
       final Completer<InAppWebViewController> controllerCompleter =
           Completer<InAppWebViewController>();
       final StreamController<String> pageLoads =
@@ -149,7 +161,8 @@ void webHistory() {
       expect(url, TEST_WEB_PLATFORM_URL_1.toString());
 
       await controller.evaluateJavascript(
-          source: "document.getElementById('link-page-2').click();");
+        source: "document.getElementById('link-page-2').click();",
+      );
       url = await pageLoads.stream.first;
       expect(url, TEST_WEB_PLATFORM_URL_2.toString());
 
@@ -173,9 +186,7 @@ void webHistory() {
 
     final shouldSkipTest3 = kIsWeb
         ? true
-        : ![
-            TargetPlatform.android,
-          ].contains(defaultTargetPlatform);
+        : ![TargetPlatform.android].contains(defaultTargetPlatform);
 
     skippableTestWidgets('clearHistory', (WidgetTester tester) async {
       final Completer<InAppWebViewController> controllerCompleter =

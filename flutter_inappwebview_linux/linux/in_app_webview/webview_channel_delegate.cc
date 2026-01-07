@@ -714,61 +714,6 @@ void WebViewChannelDelegate::HandleMethodCall(FlMethodCall* method_call) {
     return;
   }
 
-  if (string_equals(methodName, "findAll")) {
-    std::string find = get_fl_map_value<std::string>(args, "find", "");
-    if (!find.empty()) {
-      webView->findAll(find);
-    }
-    g_autoptr(FlValue) result = fl_value_new_bool(true);
-    fl_method_call_respond_success(method_call, result, nullptr);
-    return;
-  }
-
-  if (string_equals(methodName, "findNext")) {
-    bool forward = get_fl_map_value<bool>(args, "forward", true);
-    webView->findNext(forward);
-    g_autoptr(FlValue) result = fl_value_new_bool(true);
-    fl_method_call_respond_success(method_call, result, nullptr);
-    return;
-  }
-
-  if (string_equals(methodName, "clearMatches")) {
-    webView->clearMatches();
-    g_autoptr(FlValue) result = fl_value_new_bool(true);
-    fl_method_call_respond_success(method_call, result, nullptr);
-    return;
-  }
-
-  if (string_equals(methodName, "setSearchText")) {
-    std::string searchText = get_fl_map_value<std::string>(args, "searchText", "");
-    webView->setSearchText(searchText);
-    g_autoptr(FlValue) result = fl_value_new_bool(true);
-    fl_method_call_respond_success(method_call, result, nullptr);
-    return;
-  }
-
-  if (string_equals(methodName, "getSearchText")) {
-    auto searchText = webView->getSearchText();
-    if (searchText.has_value()) {
-      g_autoptr(FlValue) result = fl_value_new_string(searchText->c_str());
-      fl_method_call_respond_success(method_call, result, nullptr);
-    } else {
-      fl_method_call_respond_success(method_call, nullptr, nullptr);
-    }
-    return;
-  }
-
-  if (string_equals(methodName, "getActiveFindSession")) {
-    auto findSession = webView->getActiveFindSession();
-    if (findSession.has_value()) {
-      g_autoptr(FlValue) result = findSession->toFlValue();
-      fl_method_call_respond_success(method_call, result, nullptr);
-    } else {
-      fl_method_call_respond_success(method_call, nullptr, nullptr);
-    }
-    return;
-  }
-
   if (string_equals(methodName, "isInFullscreen")) {
     bool fullscreen = webView->isInFullscreen();
     g_autoptr(FlValue) result = fl_value_new_bool(fullscreen);
@@ -1762,20 +1707,6 @@ void WebViewChannelDelegate::onContextMenuActionItemClicked(const std::string& i
       to_fl_map({{"id", make_fl_value(id)}, {"title", make_fl_value(title)}});
 
   invokeMethod("onContextMenuActionItemClicked", args);
-}
-
-void WebViewChannelDelegate::onFindResultReceived(int activeMatchOrdinal, int numberOfMatches,
-                                                  bool isDoneCounting) const {
-  if (!channel_) {
-    return;
-  }
-
-  g_autoptr(FlValue) args = to_fl_map(
-      {{"activeMatchOrdinal", make_fl_value(static_cast<int64_t>(activeMatchOrdinal))},
-       {"numberOfMatches", make_fl_value(static_cast<int64_t>(numberOfMatches))},
-       {"isDoneCounting", make_fl_value(isDoneCounting)}});
-
-  invokeMethod("onFindResultReceived", args);
 }
 
 void WebViewChannelDelegate::onLoadResourceWithCustomScheme(

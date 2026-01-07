@@ -48,6 +48,7 @@
 #include "../types/ssl_certificate.h"
 #include "../types/url_request.h"
 #include "../types/user_script.h"
+#include "../find_interaction/find_interaction_controller.h"
 #include "in_app_webview_settings.h"
 
 // Forward declaration of WPE types in global scope to avoid namespace conflicts
@@ -195,13 +196,8 @@ class InAppWebView {
   void getContentHeight(std::function<void(int64_t)> callback);
   void getContentWidth(std::function<void(int64_t)> callback);
 
-  // Find interaction
-  void findAll(const std::string& find);
-  void findNext(bool forward);
-  void clearMatches();
-  void setSearchText(const std::string& searchText);
-  std::optional<std::string> getSearchText() const;
-  std::optional<FindSession> getActiveFindSession() const;
+  // Find interaction controller (now managed separately)
+  FindInteractionController* findInteractionController() const { return findInteractionController_.get(); }
 
   // Settings
   std::shared_ptr<InAppWebViewSettings> settings() const { return settings_; }
@@ -356,6 +352,7 @@ class InAppWebView {
 
  private:
   FlPluginRegistrar* registrar_ = nullptr;
+  FlBinaryMessenger* messenger_ = nullptr;  // Cached messenger from constructor
   GtkWindow* gtk_window_ = nullptr;  // Cached GTK window for context menu display
   InAppWebViewManager* manager_ = nullptr;  // Manager reference for multi-window support
   int64_t id_ = 0;
@@ -407,6 +404,9 @@ class InAppWebView {
 
   // User content controller
   std::unique_ptr<UserContentController> user_content_controller_;
+
+  // Find interaction controller
+  std::unique_ptr<FindInteractionController> findInteractionController_;
 
   // Initial user scripts from params
   std::vector<std::shared_ptr<UserScript>> initial_user_scripts_;
@@ -575,13 +575,6 @@ class InAppWebView {
   static gboolean OnRunFileChooser(WebKitWebView* web_view,
                                    WebKitFileChooserRequest* request,
                                    gpointer user_data);
-
-  // === Find Controller signals ===
-  static void OnCountedMatches(WebKitFindController* find_controller, guint match_count,
-                               gpointer user_data);
-  static void OnFoundText(WebKitFindController* find_controller, guint match_count,
-                          gpointer user_data);
-  static void OnFailedToFindText(WebKitFindController* find_controller, gpointer user_data);
 
   // === Input helpers ===
   void SendWpePointerEvent(uint32_t type, double x, double y, uint32_t button);

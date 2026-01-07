@@ -9,19 +9,21 @@ void pullToRefresh() {
           TargetPlatform.macOS,
         ].contains(defaultTargetPlatform);
 
-  skippableTestWidgets('launches with pull-to-refresh feature',
-      (WidgetTester tester) async {
+  skippableTestWidgets('launches with pull-to-refresh feature', (
+    WidgetTester tester,
+  ) async {
     final Completer<InAppWebViewController> controllerCompleter =
         Completer<InAppWebViewController>();
     final pullToRefreshController = PullToRefreshController(
       settings: PullToRefreshSettings(
-          color: Colors.blue,
-          size: PullToRefreshSize.DEFAULT,
-          backgroundColor: Colors.grey,
-          enabled: true,
-          slingshotDistance: 150,
-          distanceToTriggerSync: 150,
-          attributedTitle: AttributedString(string: "test")),
+        color: Colors.blue,
+        size: PullToRefreshSize.DEFAULT,
+        backgroundColor: Colors.grey,
+        enabled: true,
+        slingshotDistance: 150,
+        distanceToTriggerSync: 150,
+        attributedTitle: AttributedString(string: "test"),
+      ),
       onRefresh: () {},
     );
 

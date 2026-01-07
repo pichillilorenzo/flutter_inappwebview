@@ -40,7 +40,8 @@ void isSecureContext() {
 
     if (!kIsWeb) {
       await controller.loadUrl(
-          urlRequest: URLRequest(url: WebUri('http://example.com/')));
+        urlRequest: URLRequest(url: WebUri('http://example.com/')),
+      );
       await pageLoads.stream.first;
       expect(await controller.isSecureContext(), false);
     }

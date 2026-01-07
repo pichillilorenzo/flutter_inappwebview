@@ -266,7 +266,8 @@ class PlatformWebViewCreationParams<T> {
         apiName: 'WebKitWebView::load-failed',
         apiUrl:
             'https://wpewebkit.org/reference/stable/wpe-webkit-2.0/signal.WebView.load-failed.html',
-        note: 'HTTP errors are detected during the load-failed signal handling.',
+        note:
+            'HTTP errors are detected during the load-failed signal handling.',
       ),
     ],
   )
@@ -317,9 +318,7 @@ class PlatformWebViewCreationParams<T> {
       MacOSPlatform(note: 'This event is implemented using JavaScript.'),
       WebPlatform(),
       WindowsPlatform(),
-      LinuxPlatform(
-        note: 'This event is implemented using JavaScript.',
-      ),
+      LinuxPlatform(note: 'This event is implemented using JavaScript.'),
     ],
   )
   final void Function(T controller, ConsoleMessage consoleMessage)?
@@ -418,9 +417,7 @@ Also, this event is not called for POST requests and is not called on the first 
         apiUrl:
             'https://developer.mozilla.org/en-US/docs/Web/API/GlobalEventHandlers/onscroll',
       ),
-      LinuxPlatform(
-        note: 'This event is implemented using JavaScript.',
-      ),
+      LinuxPlatform(note: 'This event is implemented using JavaScript.'),
     ],
   )
   final void Function(T controller, int x, int y)? onScrollChanged;
@@ -474,7 +471,8 @@ Also, this event is not called for POST requests and is not called on the first 
         apiName: 'WebKitWebView::decide-policy',
         apiUrl:
             'https://wpewebkit.org/reference/stable/wpe-webkit-2.0/signal.WebView.decide-policy.html',
-        note: 'Downloads are detected via WEBKIT_POLICY_DECISION_TYPE_RESPONSE.',
+        note:
+            'Downloads are detected via WEBKIT_POLICY_DECISION_TYPE_RESPONSE.',
       ),
     ],
   )
@@ -606,7 +604,8 @@ it will update also the WebView options of the caller WebView.""",
         apiName: 'WebKitWebView::create',
         apiUrl:
             'https://wpewebkit.org/reference/stable/wpe-webkit-2.0/signal.WebView.create.html',
-        note: 'Creates a new InAppWebView with related-view for multi-window support.',
+        note:
+            'Creates a new InAppWebView with related-view for multi-window support.',
       ),
     ],
   )
@@ -1112,7 +1111,8 @@ In that case, after the `window.addEventListener("flutterInAppWebViewPlatformRea
             'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2?view=webview2-1.0.2210.55#add_historychanged',
       ),
       LinuxPlatform(
-        note: 'Tracked via load-changed signal and History API JavaScript events.',
+        note:
+            'Tracked via load-changed signal and History API JavaScript events.',
       ),
     ],
     parameterPlatforms: {
@@ -1595,7 +1595,8 @@ In that case, after the `window.addEventListener("flutterInAppWebViewPlatformRea
         apiName: 'webkit_web_context_register_uri_scheme',
         apiUrl:
             'https://wpewebkit.org/reference/stable/wpe-webkit-2.0/method.WebContext.register_uri_scheme.html',
-        note: 'Request interception is implemented via custom URI scheme handlers.',
+        note:
+            'Request interception is implemented via custom URI scheme handlers.',
       ),
     ],
   )
@@ -2149,9 +2150,7 @@ In that case, after the `window.addEventListener("flutterInAppWebViewPlatformRea
   @SupportedPlatforms(
     platforms: [
       IOSPlatform(),
-      LinuxPlatform(
-        note: 'This event is implemented using JavaScript.',
-      ),
+      LinuxPlatform(note: 'This event is implemented using JavaScript.'),
     ],
   )
   final void Function(T controller, Size oldContentSize, Size newContentSize)?

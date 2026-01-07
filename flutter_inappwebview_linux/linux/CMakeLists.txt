@@ -118,6 +118,8 @@ list(APPEND PLUGIN_SOURCES
   "flutter_inappwebview_linux_plugin.cc"
   "cookie_manager.cc"
   "web_storage_manager.cc"
+  "find_interaction/find_interaction_controller.cc"
+  "find_interaction/find_interaction_channel_delegate.cc"
   "headless_in_app_webview/headless_in_app_webview.cc"
   "headless_in_app_webview/headless_in_app_webview_manager.cc"
   "in_app_webview/in_app_webview_manager.cc"

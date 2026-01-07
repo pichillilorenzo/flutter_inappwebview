@@ -219,9 +219,12 @@ class IOSInAppWebViewPlatform extends InAppWebViewPlatform {
   /// Look at using [WebStorage] in `flutter_inappwebview` instead.
   @override
   IOSWebStorage createPlatformWebStorageStatic() {
-    return IOSWebStorage(IOSWebStorageCreationParams(
+    return IOSWebStorage(
+      IOSWebStorageCreationParams(
         localStorage: createPlatformLocalStorageStatic(),
-        sessionStorage: createPlatformSessionStorageStatic()));
+        sessionStorage: createPlatformSessionStorageStatic(),
+      ),
+    );
   }
 
   /// Creates a new [IOSLocalStorage].
@@ -301,7 +304,7 @@ class IOSInAppWebViewPlatform extends InAppWebViewPlatform {
   /// Look at using [HttpAuthCredentialDatabase] in `flutter_inappwebview` instead.
   @override
   IOSHttpAuthCredentialDatabase
-      createPlatformHttpAuthCredentialDatabaseStatic() {
+  createPlatformHttpAuthCredentialDatabaseStatic() {
     return IOSHttpAuthCredentialDatabase.static();
   }
 
@@ -351,7 +354,8 @@ class IOSInAppWebViewPlatform extends InAppWebViewPlatform {
   /// Look at using [WebStorageManager] in `flutter_inappwebview` instead.
   @override
   IOSWebStorageManager createPlatformWebStorageManager(
-      PlatformWebStorageManagerCreationParams params) {
+    PlatformWebStorageManagerCreationParams params,
+  ) {
     return IOSWebStorageManager(params);
   }
 
@@ -370,7 +374,8 @@ class IOSInAppWebViewPlatform extends InAppWebViewPlatform {
   /// Look at using [WebAuthenticationSession] in `flutter_inappwebview` instead.
   @override
   IOSWebAuthenticationSession createPlatformWebAuthenticationSession(
-      PlatformWebAuthenticationSessionCreationParams params) {
+    PlatformWebAuthenticationSessionCreationParams params,
+  ) {
     return IOSWebAuthenticationSession(params);
   }
 
@@ -389,7 +394,8 @@ class IOSInAppWebViewPlatform extends InAppWebViewPlatform {
   /// Look at using [ProxyController] in `flutter_inappwebview` instead.
   @override
   PlatformProxyController createPlatformProxyController(
-      PlatformProxyControllerCreationParams params) {
+    PlatformProxyControllerCreationParams params,
+  ) {
     return IOSProxyController(params);
   }
 
@@ -433,7 +439,7 @@ class IOSInAppWebViewPlatform extends InAppWebViewPlatform {
   /// Look at using [ServiceWorkerController] in `flutter_inappwebview` instead.
   @override
   PlatformServiceWorkerController
-      createPlatformServiceWorkerControllerStatic() {
+  createPlatformServiceWorkerControllerStatic() {
     return _PlatformServiceWorkerController.static();
   }
 
@@ -449,21 +455,23 @@ class IOSInAppWebViewPlatform extends InAppWebViewPlatform {
 
 class _PlatformProcessGlobalConfig extends PlatformProcessGlobalConfig {
   _PlatformProcessGlobalConfig(PlatformProcessGlobalConfigCreationParams params)
-      : super.implementation(params);
+    : super.implementation(params);
   static final _PlatformProcessGlobalConfig _staticValue =
       _PlatformProcessGlobalConfig(
-          const PlatformProcessGlobalConfigCreationParams());
+        const PlatformProcessGlobalConfigCreationParams(),
+      );
 
   factory _PlatformProcessGlobalConfig.static() => _staticValue;
 }
 
 class _PlatformServiceWorkerController extends PlatformServiceWorkerController {
   _PlatformServiceWorkerController(
-      PlatformServiceWorkerControllerCreationParams params)
-      : super.implementation(params);
+    PlatformServiceWorkerControllerCreationParams params,
+  ) : super.implementation(params);
   static final _PlatformServiceWorkerController _staticValue =
       _PlatformServiceWorkerController(
-          const PlatformServiceWorkerControllerCreationParams());
+        const PlatformServiceWorkerControllerCreationParams(),
+      );
 
   factory _PlatformServiceWorkerController.static() => _staticValue;
 
@@ -473,20 +481,22 @@ class _PlatformServiceWorkerController extends PlatformServiceWorkerController {
 
 class _PlatformTracingController extends PlatformTracingController {
   _PlatformTracingController(PlatformTracingControllerCreationParams params)
-      : super.implementation(params);
+    : super.implementation(params);
   static final _PlatformTracingController _staticValue =
       _PlatformTracingController(
-          const PlatformTracingControllerCreationParams());
+        const PlatformTracingControllerCreationParams(),
+      );
 
   factory _PlatformTracingController.static() => _staticValue;
 }
 
 class _PlatformWebViewEnvironment extends PlatformWebViewEnvironment {
   _PlatformWebViewEnvironment(PlatformWebViewEnvironmentCreationParams params)
-      : super.implementation(params);
+    : super.implementation(params);
   static final _PlatformWebViewEnvironment _staticValue =
       _PlatformWebViewEnvironment(
-          const PlatformWebViewEnvironmentCreationParams());
+        const PlatformWebViewEnvironmentCreationParams(),
+      );
 
   factory _PlatformWebViewEnvironment.static() => _staticValue;
 }

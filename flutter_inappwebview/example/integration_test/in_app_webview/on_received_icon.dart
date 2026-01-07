@@ -3,9 +3,7 @@ part of 'main.dart';
 void onReceivedIcon() {
   final shouldSkip = kIsWeb
       ? true
-      : ![
-          TargetPlatform.android,
-        ].contains(defaultTargetPlatform);
+      : ![TargetPlatform.android].contains(defaultTargetPlatform);
 
   skippableTestWidgets('onReceivedIcon', (WidgetTester tester) async {
     final Completer<InAppWebViewController> controllerCompleter =

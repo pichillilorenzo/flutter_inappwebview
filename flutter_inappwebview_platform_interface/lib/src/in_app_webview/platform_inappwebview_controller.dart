@@ -1693,7 +1693,8 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
         apiName: 'webkit_web_view_get_uri',
         apiUrl:
             'https://wpewebkit.org/reference/stable/wpe-webkit-2.0/method.WebView.get_uri.html',
-        note: 'Returns the current URL. WPE WebKit does not distinguish between original and current URL.',
+        note:
+            'Returns the current URL. WPE WebKit does not distinguish between original and current URL.',
       ),
       MacOSPlatform(),
       WebPlatform(
@@ -1773,8 +1774,10 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
       IOSPlatform(note: 'This method is implemented using JavaScript.'),
       LinuxPlatform(
         apiName: 'WebKitHitTestResult',
-        apiUrl: 'https://webkitgtk.org/reference/webkit2gtk/stable/WebKitHitTestResult.html',
-        note: 'This method uses native WebKitHitTestResult from the mouse-target-changed signal.',
+        apiUrl:
+            'https://webkitgtk.org/reference/webkit2gtk/stable/WebKitHitTestResult.html',
+        note:
+            'This method uses native WebKitHitTestResult from the mouse-target-changed signal.',
       ),
     ],
   )
@@ -1858,7 +1861,8 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
         apiName: 'wpe_view_backend_remove_activity_state',
         apiUrl:
             'https://wpewebkit.org/reference/stable/wpe-platform-2.0/func.view_backend_remove_activity_state.html',
-        note: 'Removes focused state from WPE backend and blurs active element via JavaScript',
+        note:
+            'Removes focused state from WPE backend and blurs active element via JavaScript',
       ),
     ],
   )
@@ -2698,7 +2702,8 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
       LinuxPlatform(
         note: 'This method is implemented using JavaScript.',
         apiName: 'webkit_user_content_manager_add_script',
-        apiUrl: 'https://webkitgtk.org/reference/webkit2gtk/stable/method.UserContentManager.add_script.html',
+        apiUrl:
+            'https://webkitgtk.org/reference/webkit2gtk/stable/method.UserContentManager.add_script.html',
       ),
       MacOSPlatform(note: 'This method is implemented using JavaScript.'),
     ],
@@ -2717,7 +2722,12 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.hasWebMessageListener.supported_platforms}
   @SupportedPlatforms(
-    platforms: [AndroidPlatform(), IOSPlatform(), LinuxPlatform(), MacOSPlatform()],
+    platforms: [
+      AndroidPlatform(),
+      IOSPlatform(),
+      LinuxPlatform(),
+      MacOSPlatform(),
+    ],
   )
   bool hasWebMessageListener(PlatformWebMessageListener webMessageListener) {
     throw UnimplementedError(
@@ -3415,7 +3425,8 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
         apiUrl:
             'https://wpewebkit.org/reference/stable/wpe-webkit-2.0/method.WebView.set_camera_capture_state.html',
         available: '2.34',
-        note: 'Once state is set to NONE, it cannot be changed back. The page can request capture again using the mediaDevices API.',
+        note:
+            'Once state is set to NONE, it cannot be changed back. The page can request capture again using the mediaDevices API.',
       ),
       MacOSPlatform(
         apiName: 'WKWebView.setCameraCaptureState',
@@ -3482,7 +3493,8 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
         apiUrl:
             'https://wpewebkit.org/reference/stable/wpe-webkit-2.0/method.WebView.set_microphone_capture_state.html',
         available: '2.34',
-        note: 'Once state is set to NONE, it cannot be changed back. The page can request capture again using the mediaDevices API.',
+        note:
+            'Once state is set to NONE, it cannot be changed back. The page can request capture again using the mediaDevices API.',
       ),
       MacOSPlatform(
         apiName: 'WKWebView.setMicrophoneCaptureState',
@@ -4132,7 +4144,8 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
         available: '10.13',
       ),
       LinuxPlatform(
-        note: 'Returns true for built-in schemes (http, https, file, ftp, data, blob, about, javascript).',
+        note:
+            'Returns true for built-in schemes (http, https, file, ftp, data, blob, about, javascript).',
       ),
     ],
   )
@@ -4170,7 +4183,12 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.clearAllCache.supported_platforms}
   @SupportedPlatforms(
-    platforms: [AndroidPlatform(), IOSPlatform(), MacOSPlatform(), LinuxPlatform()],
+    platforms: [
+      AndroidPlatform(),
+      IOSPlatform(),
+      MacOSPlatform(),
+      LinuxPlatform(),
+    ],
   )
   Future<void> clearAllCache({bool includeDiskFiles = true}) {
     throw UnimplementedError(

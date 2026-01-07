@@ -12,16 +12,23 @@ import 'web_message_port.dart';
 class MacOSWebMessageChannelCreationParams
     extends PlatformWebMessageChannelCreationParams {
   /// Creates a new [MacOSWebMessageChannelCreationParams] instance.
-  const MacOSWebMessageChannelCreationParams(
-      {required super.id, required super.port1, required super.port2});
+  const MacOSWebMessageChannelCreationParams({
+    required super.id,
+    required super.port1,
+    required super.port2,
+  });
 
   /// Creates a [MacOSWebMessageChannelCreationParams] instance based on [PlatformWebMessageChannelCreationParams].
   factory MacOSWebMessageChannelCreationParams.fromPlatformWebMessageChannelCreationParams(
-      // Recommended placeholder to prevent being broken by platform interface.
-      // ignore: avoid_unused_constructor_parameters
-      PlatformWebMessageChannelCreationParams params) {
+    // Recommended placeholder to prevent being broken by platform interface.
+    // ignore: avoid_unused_constructor_parameters
+    PlatformWebMessageChannelCreationParams params,
+  ) {
     return MacOSWebMessageChannelCreationParams(
-        id: params.id, port1: params.port1, port2: params.port2);
+      id: params.id,
+      port1: params.port1,
+      port2: params.port2,
+    );
   }
 
   @override
@@ -35,25 +42,27 @@ class MacOSWebMessageChannel extends PlatformWebMessageChannel
     with ChannelController {
   /// Constructs a [MacOSWebMessageChannel].
   MacOSWebMessageChannel(PlatformWebMessageChannelCreationParams params)
-      : super.implementation(
-          params is MacOSWebMessageChannelCreationParams
-              ? params
-              : MacOSWebMessageChannelCreationParams
-                  .fromPlatformWebMessageChannelCreationParams(params),
-        ) {
+    : super.implementation(
+        params is MacOSWebMessageChannelCreationParams
+            ? params
+            : MacOSWebMessageChannelCreationParams.fromPlatformWebMessageChannelCreationParams(
+                params,
+              ),
+      ) {
     channel = MethodChannel(
-        'com.pichillilorenzo/flutter_inappwebview_web_message_channel_${params.id}');
+      'com.pichillilorenzo/flutter_inappwebview_web_message_channel_${params.id}',
+    );
     handler = _handleMethod;
     initMethodCallHandler();
   }
 
   static final MacOSWebMessageChannel _staticValue = MacOSWebMessageChannel(
-      MacOSWebMessageChannelCreationParams(
-          id: '',
-          port1:
-              MacOSWebMessagePort(MacOSWebMessagePortCreationParams(index: 0)),
-          port2: MacOSWebMessagePort(
-              MacOSWebMessagePortCreationParams(index: 1))));
+    MacOSWebMessageChannelCreationParams(
+      id: '',
+      port1: MacOSWebMessagePort(MacOSWebMessagePortCreationParams(index: 0)),
+      port2: MacOSWebMessagePort(MacOSWebMessagePortCreationParams(index: 1)),
+    ),
+  );
 
   /// Provide static access.
   factory MacOSWebMessageChannel.static() {
@@ -69,12 +78,12 @@ class MacOSWebMessageChannel extends PlatformWebMessageChannel
       return null;
     }
     var webMessageChannel = MacOSWebMessageChannel(
-        MacOSWebMessageChannelCreationParams(
-            id: map["id"],
-            port1: MacOSWebMessagePort(
-                MacOSWebMessagePortCreationParams(index: 0)),
-            port2: MacOSWebMessagePort(
-                MacOSWebMessagePortCreationParams(index: 1))));
+      MacOSWebMessageChannelCreationParams(
+        id: map["id"],
+        port1: MacOSWebMessagePort(MacOSWebMessagePortCreationParams(index: 0)),
+        port2: MacOSWebMessagePort(MacOSWebMessagePortCreationParams(index: 1)),
+      ),
+    );
     webMessageChannel._macosPort1.webMessageChannel = webMessageChannel;
     webMessageChannel._macosPort2.webMessageChannel = webMessageChannel;
     return webMessageChannel;
@@ -88,7 +97,8 @@ class MacOSWebMessageChannel extends PlatformWebMessageChannel
         if (port.onMessage != null) {
           WebMessage? message = call.arguments["message"] != null
               ? WebMessage.fromMap(
-                  call.arguments["message"].cast<String, dynamic>())
+                  call.arguments["message"].cast<String, dynamic>(),
+                )
               : null;
           port.onMessage!(message);
         }

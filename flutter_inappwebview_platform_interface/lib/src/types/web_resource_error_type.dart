@@ -1381,8 +1381,8 @@ class WebResourceErrorType_ {
   )
   static const WEBKIT_FRAME_LOAD_INTERRUPTED_BY_POLICY_CHANGE =
       WebResourceErrorType_._internal(
-    "WEBKIT_FRAME_LOAD_INTERRUPTED_BY_POLICY_CHANGE",
-  );
+        "WEBKIT_FRAME_LOAD_INTERRUPTED_BY_POLICY_CHANGE",
+      );
 
   ///The port is restricted.
   @EnumSupportedPlatforms(
@@ -1396,7 +1396,5 @@ class WebResourceErrorType_ {
     ],
   )
   static const WEBKIT_CANNOT_USE_RESTRICTED_PORT =
-      WebResourceErrorType_._internal(
-    "WEBKIT_CANNOT_USE_RESTRICTED_PORT",
-  );
+      WebResourceErrorType_._internal("WEBKIT_CANNOT_USE_RESTRICTED_PORT");
 }

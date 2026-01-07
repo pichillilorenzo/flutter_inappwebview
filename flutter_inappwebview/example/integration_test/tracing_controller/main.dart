@@ -14,9 +14,7 @@ part 'start_and_stop.dart';
 void main() {
   final shouldSkip = kIsWeb
       ? true
-      : ![
-          TargetPlatform.android,
-        ].contains(defaultTargetPlatform);
+      : ![TargetPlatform.android].contains(defaultTargetPlatform);
 
   skippableGroup('Tracing Controller', () {
     startAndStop();

@@ -18,8 +18,9 @@ void programmaticScroll() {
             TargetPlatform.macOS,
           ].contains(defaultTargetPlatform);
 
-    skippableTestWidgets('set and get scroll position',
-        (WidgetTester tester) async {
+    skippableTestWidgets('set and get scroll position', (
+      WidgetTester tester,
+    ) async {
       final String scrollTestPage = '''
         <!DOCTYPE html>
         <html>
@@ -41,8 +42,9 @@ void programmaticScroll() {
         </html>
       ''';
 
-      final String scrollTestPageBase64 =
-          base64Encode(const Utf8Encoder().convert(scrollTestPage));
+      final String scrollTestPageBase64 = base64Encode(
+        const Utf8Encoder().convert(scrollTestPage),
+      );
 
       var url = !kIsWeb
           ? WebUri('data:text/html;charset=utf-8;base64,$scrollTestPageBase64')
@@ -94,14 +96,12 @@ void programmaticScroll() {
 
     final shouldSkipTest2 = kIsWeb
         ? true
-        : ![
-            TargetPlatform.android,
-          ].contains(defaultTargetPlatform);
+        : ![TargetPlatform.android].contains(defaultTargetPlatform);
 
     testWidgets(
-        'set and get scroll position on Android without Hybrid Composition',
-        (WidgetTester tester) async {
-      final String scrollTestPage = '''
+      'set and get scroll position on Android without Hybrid Composition',
+      (WidgetTester tester) async {
+        final String scrollTestPage = '''
         <!DOCTYPE html>
         <html>
           <head>
@@ -122,56 +122,63 @@ void programmaticScroll() {
         </html>
       ''';
 
-      final String scrollTestPageBase64 =
-          base64Encode(const Utf8Encoder().convert(scrollTestPage));
+        final String scrollTestPageBase64 = base64Encode(
+          const Utf8Encoder().convert(scrollTestPage),
+        );
 
-      final Completer<void> pageLoaded = Completer<void>();
-      final Completer<InAppWebViewController> controllerCompleter =
-          Completer<InAppWebViewController>();
+        final Completer<void> pageLoaded = Completer<void>();
+        final Completer<InAppWebViewController> controllerCompleter =
+            Completer<InAppWebViewController>();
 
-      await tester.pumpWidget(
-        Directionality(
-          textDirection: TextDirection.ltr,
-          child: InAppWebView(
-            initialUrlRequest: URLRequest(
+        await tester.pumpWidget(
+          Directionality(
+            textDirection: TextDirection.ltr,
+            child: InAppWebView(
+              initialUrlRequest: URLRequest(
                 url: WebUri(
-                    'data:text/html;charset=utf-8;base64,$scrollTestPageBase64')),
-            onWebViewCreated: (controller) {
-              controllerCompleter.complete(controller);
-            },
-            initialSettings: InAppWebViewSettings(useHybridComposition: false),
-            onLoadStop: (controller, url) {
-              pageLoaded.complete();
-            },
+                  'data:text/html;charset=utf-8;base64,$scrollTestPageBase64',
+                ),
+              ),
+              onWebViewCreated: (controller) {
+                controllerCompleter.complete(controller);
+              },
+              initialSettings: InAppWebViewSettings(
+                useHybridComposition: false,
+              ),
+              onLoadStop: (controller, url) {
+                pageLoaded.complete();
+              },
+            ),
           ),
-        ),
-      );
+        );
 
-      final InAppWebViewController controller =
-          await controllerCompleter.future;
-      await pageLoaded.future;
-      await controller.scrollTo(x: 0, y: 0);
+        final InAppWebViewController controller =
+            await controllerCompleter.future;
+        await pageLoaded.future;
+        await controller.scrollTo(x: 0, y: 0);
 
-      await tester.pumpAndSettle(Duration(seconds: 3));
+        await tester.pumpAndSettle(Duration(seconds: 3));
 
-      // Check scrollTo()
-      const int X_SCROLL = 123;
-      const int Y_SCROLL = 321;
+        // Check scrollTo()
+        const int X_SCROLL = 123;
+        const int Y_SCROLL = 321;
 
-      await controller.scrollTo(x: X_SCROLL, y: Y_SCROLL);
-      await tester.pumpAndSettle(Duration(seconds: 2));
-      int? scrollPosX = await controller.getScrollX();
-      int? scrollPosY = await controller.getScrollY();
-      expect(scrollPosX, X_SCROLL);
-      expect(scrollPosY, Y_SCROLL);
+        await controller.scrollTo(x: X_SCROLL, y: Y_SCROLL);
+        await tester.pumpAndSettle(Duration(seconds: 2));
+        int? scrollPosX = await controller.getScrollX();
+        int? scrollPosY = await controller.getScrollY();
+        expect(scrollPosX, X_SCROLL);
+        expect(scrollPosY, Y_SCROLL);
 
-      // Check scrollBy() (on top of scrollTo())
-      await controller.scrollBy(x: X_SCROLL, y: Y_SCROLL);
-      await tester.pumpAndSettle(Duration(seconds: 2));
-      scrollPosX = await controller.getScrollX();
-      scrollPosY = await controller.getScrollY();
-      expect(scrollPosX, X_SCROLL * 2);
-      expect(scrollPosY, Y_SCROLL * 2);
-    }, skip: shouldSkipTest2);
+        // Check scrollBy() (on top of scrollTo())
+        await controller.scrollBy(x: X_SCROLL, y: Y_SCROLL);
+        await tester.pumpAndSettle(Duration(seconds: 2));
+        scrollPosX = await controller.getScrollX();
+        scrollPosY = await controller.getScrollY();
+        expect(scrollPosX, X_SCROLL * 2);
+        expect(scrollPosY, Y_SCROLL * 2);
+      },
+      skip: shouldSkipTest2,
+    );
   }, skip: shouldSkip);
 }

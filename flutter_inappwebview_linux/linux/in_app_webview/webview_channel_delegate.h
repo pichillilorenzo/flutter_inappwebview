@@ -268,9 +268,6 @@ class WebViewChannelDelegate : public ChannelDelegate {
                          const std::optional<std::string>& filenameHint,
                          std::function<void(std::optional<std::vector<std::string>>)> callback) const;
 
-  void onFindResultReceived(int32_t activeMatchOrdinal, int32_t numberOfMatches,
-                            bool isDoneCounting) const;
-
   // Custom scheme handler callback
   void onLoadResourceWithCustomScheme(
       std::shared_ptr<WebResourceRequest> request,

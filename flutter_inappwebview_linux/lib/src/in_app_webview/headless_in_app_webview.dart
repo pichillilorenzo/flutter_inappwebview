@@ -294,8 +294,8 @@ class LinuxHeadlessInAppWebView extends PlatformHeadlessInAppWebView
     _controllerFromPlatform =
         params.controllerFromPlatform?.call(_webViewController!) ??
             _webViewController!;
-    // Connect the find interaction controller to this webview controller
-    _linuxParams.findInteractionController?.setController(_webViewController!);
+    // Initialize the find interaction controller with the same ID
+    _linuxParams.findInteractionController?.init(id);
     channel =
         MethodChannel('com.pichillilorenzo/flutter_headless_inappwebview_$id');
     handler = _handleMethod;

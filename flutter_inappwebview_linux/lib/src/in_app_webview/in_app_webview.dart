@@ -273,10 +273,11 @@ class LinuxInAppWebViewWidget extends PlatformInAppWebViewWidget {
         PlatformInAppWebViewControllerCreationParams(
             id: viewId, webviewParams: params));
 
+    // Initialize the find interaction controller with the same view ID
     if (_linuxParams.findInteractionController != null) {
       var findInteractionController = _linuxParams
           .findInteractionController as LinuxFindInteractionController;
-      findInteractionController.setController(_controller!);
+      findInteractionController.init(viewId);
     }
 
     debugLog(

@@ -22,18 +22,24 @@ void contentBlocker() {
           onWebViewCreated: (controller) {
             controllerCompleter.complete(controller);
           },
-          initialSettings:
-              InAppWebViewSettings(clearCache: true, contentBlockers: [
-            ContentBlocker(
-                trigger: ContentBlockerTrigger(urlFilter: ".*", resourceType: [
-                  ContentBlockerTriggerResourceType.IMAGE,
-                  ContentBlockerTriggerResourceType.STYLE_SHEET
-                ], ifTopUrl: [
-                  TEST_CROSS_PLATFORM_URL_1.toString()
-                ]),
-                action:
-                    ContentBlockerAction(type: ContentBlockerActionType.BLOCK))
-          ]),
+          initialSettings: InAppWebViewSettings(
+            clearCache: true,
+            contentBlockers: [
+              ContentBlocker(
+                trigger: ContentBlockerTrigger(
+                  urlFilter: ".*",
+                  resourceType: [
+                    ContentBlockerTriggerResourceType.IMAGE,
+                    ContentBlockerTriggerResourceType.STYLE_SHEET,
+                  ],
+                  ifTopUrl: [TEST_CROSS_PLATFORM_URL_1.toString()],
+                ),
+                action: ContentBlockerAction(
+                  type: ContentBlockerActionType.BLOCK,
+                ),
+              ),
+            ],
+          ),
           onLoadStop: (controller, url) {
             pageLoaded.complete();
           },

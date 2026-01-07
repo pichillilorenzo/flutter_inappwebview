@@ -95,7 +95,7 @@ class MacOSInAppWebViewPlatform extends InAppWebViewPlatform {
   /// Look at using [FindInteractionController] in `flutter_inappwebview` instead.
   @override
   MacOSFindInteractionController
-      createPlatformFindInteractionControllerStatic() {
+  createPlatformFindInteractionControllerStatic() {
     return MacOSFindInteractionController.static();
   }
 
@@ -125,7 +125,7 @@ class MacOSInAppWebViewPlatform extends InAppWebViewPlatform {
   /// Look at using [PullToRefreshController] in `flutter_inappwebview` instead.
   @override
   PlatformPullToRefreshController
-      createPlatformPullToRefreshControllerStatic() {
+  createPlatformPullToRefreshControllerStatic() {
     return _PlatformPullToRefreshController.static();
   }
 
@@ -208,9 +208,12 @@ class MacOSInAppWebViewPlatform extends InAppWebViewPlatform {
   /// Look at using [WebStorage] in `flutter_inappwebview` instead.
   @override
   MacOSWebStorage createPlatformWebStorageStatic() {
-    return MacOSWebStorage(MacOSWebStorageCreationParams(
+    return MacOSWebStorage(
+      MacOSWebStorageCreationParams(
         localStorage: createPlatformLocalStorageStatic(),
-        sessionStorage: createPlatformSessionStorageStatic()));
+        sessionStorage: createPlatformSessionStorageStatic(),
+      ),
+    );
   }
 
   /// Creates a new [MacOSLocalStorage].
@@ -290,7 +293,7 @@ class MacOSInAppWebViewPlatform extends InAppWebViewPlatform {
   /// Look at using [HttpAuthCredentialDatabase] in `flutter_inappwebview` instead.
   @override
   MacOSHttpAuthCredentialDatabase
-      createPlatformHttpAuthCredentialDatabaseStatic() {
+  createPlatformHttpAuthCredentialDatabaseStatic() {
     return MacOSHttpAuthCredentialDatabase.static();
   }
 
@@ -320,7 +323,8 @@ class MacOSInAppWebViewPlatform extends InAppWebViewPlatform {
   /// Look at using [WebStorageManager] in `flutter_inappwebview` instead.
   @override
   MacOSWebStorageManager createPlatformWebStorageManager(
-      PlatformWebStorageManagerCreationParams params) {
+    PlatformWebStorageManagerCreationParams params,
+  ) {
     return MacOSWebStorageManager(params);
   }
 
@@ -339,7 +343,8 @@ class MacOSInAppWebViewPlatform extends InAppWebViewPlatform {
   /// Look at using [WebAuthenticationSession] in `flutter_inappwebview` instead.
   @override
   MacOSWebAuthenticationSession createPlatformWebAuthenticationSession(
-      PlatformWebAuthenticationSessionCreationParams params) {
+    PlatformWebAuthenticationSessionCreationParams params,
+  ) {
     return MacOSWebAuthenticationSession(params);
   }
 
@@ -358,7 +363,8 @@ class MacOSInAppWebViewPlatform extends InAppWebViewPlatform {
   /// Look at using [ProxyController] in `flutter_inappwebview` instead.
   @override
   PlatformProxyController createPlatformProxyController(
-      PlatformProxyControllerCreationParams params) {
+    PlatformProxyControllerCreationParams params,
+  ) {
     return MacOSProxyController(params);
   }
 
@@ -410,7 +416,7 @@ class MacOSInAppWebViewPlatform extends InAppWebViewPlatform {
   /// Look at using [ServiceWorkerController] in `flutter_inappwebview` instead.
   @override
   PlatformServiceWorkerController
-      createPlatformServiceWorkerControllerStatic() {
+  createPlatformServiceWorkerControllerStatic() {
     return _PlatformServiceWorkerController.static();
   }
 
@@ -426,31 +432,34 @@ class MacOSInAppWebViewPlatform extends InAppWebViewPlatform {
 
 class _PlatformChromeSafariBrowser extends PlatformChromeSafariBrowser {
   _PlatformChromeSafariBrowser(PlatformChromeSafariBrowserCreationParams params)
-      : super.implementation(params);
+    : super.implementation(params);
   static final _PlatformChromeSafariBrowser _staticValue =
       _PlatformChromeSafariBrowser(
-          const PlatformChromeSafariBrowserCreationParams());
+        const PlatformChromeSafariBrowserCreationParams(),
+      );
 
   factory _PlatformChromeSafariBrowser.static() => _staticValue;
 }
 
 class _PlatformProcessGlobalConfig extends PlatformProcessGlobalConfig {
   _PlatformProcessGlobalConfig(PlatformProcessGlobalConfigCreationParams params)
-      : super.implementation(params);
+    : super.implementation(params);
   static final _PlatformProcessGlobalConfig _staticValue =
       _PlatformProcessGlobalConfig(
-          const PlatformProcessGlobalConfigCreationParams());
+        const PlatformProcessGlobalConfigCreationParams(),
+      );
 
   factory _PlatformProcessGlobalConfig.static() => _staticValue;
 }
 
 class _PlatformServiceWorkerController extends PlatformServiceWorkerController {
   _PlatformServiceWorkerController(
-      PlatformServiceWorkerControllerCreationParams params)
-      : super.implementation(params);
+    PlatformServiceWorkerControllerCreationParams params,
+  ) : super.implementation(params);
   static final _PlatformServiceWorkerController _staticValue =
       _PlatformServiceWorkerController(
-          const PlatformServiceWorkerControllerCreationParams());
+        const PlatformServiceWorkerControllerCreationParams(),
+      );
 
   factory _PlatformServiceWorkerController.static() => _staticValue;
 
@@ -460,32 +469,35 @@ class _PlatformServiceWorkerController extends PlatformServiceWorkerController {
 
 class _PlatformTracingController extends PlatformTracingController {
   _PlatformTracingController(PlatformTracingControllerCreationParams params)
-      : super.implementation(params);
+    : super.implementation(params);
   static final _PlatformTracingController _staticValue =
       _PlatformTracingController(
-          const PlatformTracingControllerCreationParams());
+        const PlatformTracingControllerCreationParams(),
+      );
 
   factory _PlatformTracingController.static() => _staticValue;
 }
 
 class _PlatformPullToRefreshController extends PlatformPullToRefreshController {
   _PlatformPullToRefreshController(
-      PlatformPullToRefreshControllerCreationParams params)
-      : super.implementation(params);
+    PlatformPullToRefreshControllerCreationParams params,
+  ) : super.implementation(params);
 
   static final _PlatformPullToRefreshController _staticValue =
       _PlatformPullToRefreshController(
-          PlatformPullToRefreshControllerCreationParams());
+        PlatformPullToRefreshControllerCreationParams(),
+      );
 
   factory _PlatformPullToRefreshController.static() => _staticValue;
 }
 
 class _PlatformWebViewEnvironment extends PlatformWebViewEnvironment {
   _PlatformWebViewEnvironment(PlatformWebViewEnvironmentCreationParams params)
-      : super.implementation(params);
+    : super.implementation(params);
   static final _PlatformWebViewEnvironment _staticValue =
       _PlatformWebViewEnvironment(
-          const PlatformWebViewEnvironmentCreationParams());
+        const PlatformWebViewEnvironmentCreationParams(),
+      );
 
   factory _PlatformWebViewEnvironment.static() => _staticValue;
 }

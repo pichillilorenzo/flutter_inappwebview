@@ -9,7 +9,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_platform_interface.dart';
 
-import '../find_interaction/find_interaction_controller.dart';
 import '../web_message/web_message_listener.dart';
 import '_static_channel.dart';
 
@@ -62,8 +61,6 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController
 
   dynamic _controllerFromPlatform;
 
-  late LinuxFindInteractionController findInteractionController;
-
   LinuxInAppWebViewController(
     PlatformInAppWebViewControllerCreationParams params,
   ) : super.implementation(
@@ -73,11 +70,6 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController
                 params,
               ),
       ) {
-    findInteractionController = LinuxFindInteractionController(
-      PlatformFindInteractionControllerCreationParams(),
-    );
-    findInteractionController.setController(this);
-
     channel = MethodChannel('com.pichillilorenzo/flutter_inappwebview_$id');
     handler = _handleMethod;
     initMethodCallHandler();
@@ -546,20 +538,7 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController
           return response?.filePaths;
         }
         return null;
-      case "onFindResultReceived":
-        if (webviewParams != null &&
-            webviewParams!.onFindResultReceived != null) {
-          int activeMatchOrdinal = call.arguments["activeMatchOrdinal"];
-          int numberOfMatches = call.arguments["numberOfMatches"];
-          bool isDoneCounting = call.arguments["isDoneCounting"];
-          webviewParams!.onFindResultReceived!(
-            _controllerFromPlatform,
-            activeMatchOrdinal,
-            numberOfMatches,
-            isDoneCounting,
-          );
-        }
-        break;
+      // onFindResultReceived is now handled by FindInteractionController
       case "onLoadResourceWithCustomScheme":
         if (webviewParams != null &&
             (webviewParams!.onLoadResourceWithCustomScheme != null ||
@@ -1373,45 +1352,6 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController
     args.putIfAbsent('steps', () => steps);
     return await channel?.invokeMethod<bool>('canGoBackOrForward', args) ??
         false;
-  }
-
-  Future<void> findAll({String? find}) async {
-    Map<String, dynamic> args = <String, dynamic>{};
-    args.putIfAbsent('find', () => find);
-    await channel?.invokeMethod('findAll', args);
-  }
-
-  @override
-  Future<void> findNext({bool forward = true}) async {
-    Map<String, dynamic> args = <String, dynamic>{};
-    args.putIfAbsent('forward', () => forward);
-    await channel?.invokeMethod('findNext', args);
-  }
-
-  @override
-  Future<void> clearMatches() async {
-    Map<String, dynamic> args = <String, dynamic>{};
-    await channel?.invokeMethod('clearMatches', args);
-  }
-
-  Future<void> setSearchText(String? searchText) async {
-    Map<String, dynamic> args = <String, dynamic>{};
-    args.putIfAbsent('searchText', () => searchText);
-    await channel?.invokeMethod('setSearchText', args);
-  }
-
-  Future<String?> getSearchText() async {
-    Map<String, dynamic> args = <String, dynamic>{};
-    return await channel?.invokeMethod<String?>('getSearchText', args);
-  }
-
-  Future<FindSession?> getActiveFindSession() async {
-    Map<String, dynamic> args = <String, dynamic>{};
-    Map<String, dynamic>? result = (await channel?.invokeMethod(
-      'getActiveFindSession',
-      args,
-    ))?.cast<String, dynamic>();
-    return FindSession.fromMap(result);
   }
 
   @override

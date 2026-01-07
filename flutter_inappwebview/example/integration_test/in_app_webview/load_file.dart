@@ -37,14 +37,17 @@ void loadFile() {
     await pageLoads.stream.first;
 
     await controller.loadFile(
-        assetFilePath: "test_assets/in_app_webview_initial_file_test.html");
+      assetFilePath: "test_assets/in_app_webview_initial_file_test.html",
+    );
     await pageLoads.stream.first;
 
     final Uri? url = await controller.getUrl();
     expect(url, isNotNull);
     expect(url!.scheme, kIsWeb ? 'http' : 'file');
-    expect(url.path,
-        endsWith("test_assets/in_app_webview_initial_file_test.html"));
+    expect(
+      url.path,
+      endsWith("test_assets/in_app_webview_initial_file_test.html"),
+    );
 
     pageLoads.close();
   }, skip: shouldSkip);

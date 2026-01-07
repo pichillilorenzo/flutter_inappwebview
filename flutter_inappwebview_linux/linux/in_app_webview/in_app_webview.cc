@@ -158,7 +158,7 @@ bool InAppWebView::IsWpeWebKitAvailable() {
 
 InAppWebView::InAppWebView(FlPluginRegistrar* registrar, FlBinaryMessenger* messenger, int64_t id,
                            const InAppWebViewCreationParams& params)
-    : registrar_(registrar), gtk_window_(params.gtkWindow), manager_(params.manager), id_(id), settings_(params.initialSettings),
+    : registrar_(registrar), messenger_(messenger), gtk_window_(params.gtkWindow), manager_(params.manager), id_(id), settings_(params.initialSettings),
       initial_user_scripts_(params.initialUserScripts) {
   js_bridge_secret_ = GenerateRandomSecret();
   
@@ -212,6 +212,11 @@ void InAppWebView::AttachChannel(FlBinaryMessenger* messenger, int64_t channel_i
 
   std::string channelName = std::string(METHOD_CHANNEL_NAME_PREFIX) + std::to_string(channel_id_);
   channel_delegate_ = std::make_unique<WebViewChannelDelegate>(this, messenger, channelName);
+
+  // Attach FindInteractionController channel with the same ID
+  if (findInteractionController_) {
+    findInteractionController_->attachChannel(messenger, std::to_string(channel_id_));
+  }
 }
 
 void InAppWebView::AttachChannel(FlBinaryMessenger* messenger, const std::string& channel_id) {
@@ -223,6 +228,11 @@ void InAppWebView::AttachChannel(FlBinaryMessenger* messenger, const std::string
 
   std::string channelName = std::string(METHOD_CHANNEL_NAME_PREFIX) + channel_id;
   channel_delegate_ = std::make_unique<WebViewChannelDelegate>(this, messenger, channelName);
+
+  // Attach FindInteractionController channel with the same ID
+  if (findInteractionController_) {
+    findInteractionController_->attachChannel(messenger, channel_id);
+  }
 }
 
 InAppWebView::~InAppWebView() {
@@ -236,6 +246,12 @@ InAppWebView::~InAppWebView() {
 
   // Clean up color picker popup
   color_picker_popup_.reset();
+
+  // Clean up find interaction controller
+  if (findInteractionController_) {
+    findInteractionController_->dispose();
+    findInteractionController_.reset();
+  }
 
   // Clean up context menu references
   if (pending_context_menu_ != nullptr) {
@@ -446,6 +462,9 @@ void InAppWebView::InitWebView(const InAppWebViewCreationParams& params) {
 
   // Create user content controller
   user_content_controller_ = std::make_unique<UserContentController>(webview_);
+
+  // Create find interaction controller (channel will be attached later in AttachChannel)
+  findInteractionController_ = std::make_unique<FindInteractionController>(this);
 }
 
 void InAppWebView::RegisterEventHandlers() {
@@ -522,14 +541,6 @@ void InAppWebView::RegisterEventHandlers() {
 
   // Connect to run-file-chooser signal for file input handling
   g_signal_connect(webview_, "run-file-chooser", G_CALLBACK(OnRunFileChooser), this);
-
-  // Connect to find controller signals
-  WebKitFindController* find_controller = webkit_web_view_get_find_controller(webview_);
-  if (find_controller) {
-    g_signal_connect(find_controller, "counted-matches", G_CALLBACK(OnCountedMatches), this);
-    g_signal_connect(find_controller, "found-text", G_CALLBACK(OnFoundText), this);
-    g_signal_connect(find_controller, "failed-to-find-text", G_CALLBACK(OnFailedToFindText), this);
-  }
 
   // Add frame displayed callback (WPE-specific)
   webkit_web_view_add_frame_displayed_callback(
@@ -4819,70 +4830,6 @@ void InAppWebView::initializeWindowIdJS() {
 )JS";
 
   evaluateJavascript(script, nullptr);
-}
-
-void InAppWebView::findAll(const std::string& find) {
-  WebKitFindController* find_controller = webkit_web_view_get_find_controller(webview_);
-  webkit_find_controller_search(find_controller, find.c_str(),
-                                WEBKIT_FIND_OPTIONS_CASE_INSENSITIVE, G_MAXUINT);
-}
-
-void InAppWebView::findNext(bool forward) {
-  WebKitFindController* find_controller = webkit_web_view_get_find_controller(webview_);
-  if (forward) {
-    webkit_find_controller_search_next(find_controller);
-  } else {
-    webkit_find_controller_search_previous(find_controller);
-  }
-}
-
-void InAppWebView::clearMatches() {
-  WebKitFindController* find_controller = webkit_web_view_get_find_controller(webview_);
-  webkit_find_controller_search_finish(find_controller);
-}
-
-void InAppWebView::setSearchText(const std::string& searchText) {
-  WebKitFindController* find_controller = webkit_web_view_get_find_controller(webview_);
-  webkit_find_controller_search(find_controller, searchText.c_str(),
-                                WEBKIT_FIND_OPTIONS_CASE_INSENSITIVE, G_MAXUINT);
-}
-
-std::optional<std::string> InAppWebView::getSearchText() const {
-  WebKitFindController* find_controller = webkit_web_view_get_find_controller(webview_);
-  const gchar* text = webkit_find_controller_get_search_text(find_controller);
-  if (text) {
-    return std::string(text);
-  }
-  return std::nullopt;
-}
-
-std::optional<FindSession> InAppWebView::getActiveFindSession() const {
-  // Not fully supported in WebKitGTK/WPE as we don't track the active match index manually
-  return std::nullopt;
-}
-
-void InAppWebView::OnCountedMatches(WebKitFindController* find_controller, guint match_count,
-                                    gpointer user_data) {
-  auto* web_view = static_cast<InAppWebView*>(user_data);
-  if (web_view->channel_delegate_) {
-    web_view->channel_delegate_->onFindResultReceived(-1, match_count, true);
-  }
-}
-
-void InAppWebView::OnFoundText(WebKitFindController* find_controller, guint match_count,
-                               gpointer user_data) {
-  auto* web_view = static_cast<InAppWebView*>(user_data);
-  if (web_view->channel_delegate_) {
-    web_view->channel_delegate_->onFindResultReceived(-1, match_count, false);
-  }
-}
-
-void InAppWebView::OnFailedToFindText(WebKitFindController* find_controller,
-                                      gpointer user_data) {
-  auto* web_view = static_cast<InAppWebView*>(user_data);
-  if (web_view->channel_delegate_) {
-    web_view->channel_delegate_->onFindResultReceived(0, 0, true);
-  }
 }
 
 void InAppWebView::OnExportShmBuffer(struct wpe_fdo_shm_exported_buffer* buffer) {

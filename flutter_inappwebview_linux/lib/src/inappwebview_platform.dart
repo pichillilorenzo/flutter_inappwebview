@@ -2,6 +2,7 @@ import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_pla
 
 import 'cookie_manager/cookie_manager.dart';
 import 'find_interaction/find_interaction_controller.dart';
+import 'http_auth_credentials_database.dart';
 import 'in_app_webview/in_app_webview.dart';
 import 'in_app_webview/in_app_webview_controller.dart';
 import 'in_app_webview/headless_in_app_webview.dart';
@@ -98,11 +99,19 @@ class LinuxInAppWebViewPlatform extends InAppWebViewPlatform {
     return _PlatformChromeSafariBrowser.static();
   }
 
-  /// Creates a new empty [PlatformHttpAuthCredentialDatabase] to access static methods.
+  /// Creates a new [LinuxHttpAuthCredentialDatabase].
   @override
-  PlatformHttpAuthCredentialDatabase
-      createPlatformHttpAuthCredentialDatabaseStatic() {
-    return _PlatformHttpAuthCredentialDatabase.static();
+  LinuxHttpAuthCredentialDatabase createPlatformHttpAuthCredentialDatabase(
+    PlatformHttpAuthCredentialDatabaseCreationParams params,
+  ) {
+    return LinuxHttpAuthCredentialDatabase(params);
+  }
+
+  /// Creates a new empty [LinuxHttpAuthCredentialDatabase] to access static methods.
+  @override
+  LinuxHttpAuthCredentialDatabase
+  createPlatformHttpAuthCredentialDatabaseStatic() {
+    return LinuxHttpAuthCredentialDatabase.static();
   }
 
   /// Creates a new empty [PlatformInAppBrowser] to access static methods.
@@ -148,7 +157,7 @@ class LinuxInAppWebViewPlatform extends InAppWebViewPlatform {
   /// Creates a new empty [PlatformServiceWorkerController] to access static methods.
   @override
   PlatformServiceWorkerController
-      createPlatformServiceWorkerControllerStatic() {
+  createPlatformServiceWorkerControllerStatic() {
     return _PlatformServiceWorkerController.static();
   }
 
@@ -161,7 +170,7 @@ class LinuxInAppWebViewPlatform extends InAppWebViewPlatform {
   /// Creates a new empty [PlatformFindInteractionController] to access static methods.
   @override
   PlatformFindInteractionController
-      createPlatformFindInteractionControllerStatic() {
+  createPlatformFindInteractionControllerStatic() {
     return LinuxFindInteractionController.static();
   }
 
@@ -182,14 +191,14 @@ class LinuxInAppWebViewPlatform extends InAppWebViewPlatform {
   /// Creates a new empty [PlatformPullToRefreshController] to access static methods.
   @override
   PlatformPullToRefreshController
-      createPlatformPullToRefreshControllerStatic() {
+  createPlatformPullToRefreshControllerStatic() {
     return _PlatformPullToRefreshController.static();
   }
 
   /// Creates a new empty [PlatformWebAuthenticationSession] to access static methods.
   @override
   PlatformWebAuthenticationSession
-      createPlatformWebAuthenticationSessionStatic() {
+  createPlatformWebAuthenticationSessionStatic() {
     return _PlatformWebAuthenticationSession.static();
   }
 
@@ -232,52 +241,44 @@ class LinuxInAppWebViewPlatform extends InAppWebViewPlatform {
 
 class _PlatformChromeSafariBrowser extends PlatformChromeSafariBrowser {
   _PlatformChromeSafariBrowser(PlatformChromeSafariBrowserCreationParams params)
-      : super.implementation(params);
+    : super.implementation(params);
   static final _PlatformChromeSafariBrowser _staticValue =
       _PlatformChromeSafariBrowser(
-          const PlatformChromeSafariBrowserCreationParams());
+        const PlatformChromeSafariBrowserCreationParams(),
+      );
 
   factory _PlatformChromeSafariBrowser.static() => _staticValue;
 }
 
-class _PlatformHttpAuthCredentialDatabase
-    extends PlatformHttpAuthCredentialDatabase {
-  _PlatformHttpAuthCredentialDatabase(
-      PlatformHttpAuthCredentialDatabaseCreationParams params)
-      : super.implementation(params);
-  static final _PlatformHttpAuthCredentialDatabase _staticValue =
-      _PlatformHttpAuthCredentialDatabase(
-          const PlatformHttpAuthCredentialDatabaseCreationParams());
-
-  factory _PlatformHttpAuthCredentialDatabase.static() => _staticValue;
-}
-
 class _PlatformInAppBrowser extends PlatformInAppBrowser {
   _PlatformInAppBrowser(PlatformInAppBrowserCreationParams params)
-      : super.implementation(params);
-  static final _PlatformInAppBrowser _staticValue =
-      _PlatformInAppBrowser(const PlatformInAppBrowserCreationParams());
+    : super.implementation(params);
+  static final _PlatformInAppBrowser _staticValue = _PlatformInAppBrowser(
+    const PlatformInAppBrowserCreationParams(),
+  );
 
   factory _PlatformInAppBrowser.static() => _staticValue;
 }
 
 class _PlatformProcessGlobalConfig extends PlatformProcessGlobalConfig {
   _PlatformProcessGlobalConfig(PlatformProcessGlobalConfigCreationParams params)
-      : super.implementation(params);
+    : super.implementation(params);
   static final _PlatformProcessGlobalConfig _staticValue =
       _PlatformProcessGlobalConfig(
-          const PlatformProcessGlobalConfigCreationParams());
+        const PlatformProcessGlobalConfigCreationParams(),
+      );
 
   factory _PlatformProcessGlobalConfig.static() => _staticValue;
 }
 
 class _PlatformServiceWorkerController extends PlatformServiceWorkerController {
   _PlatformServiceWorkerController(
-      PlatformServiceWorkerControllerCreationParams params)
-      : super.implementation(params);
+    PlatformServiceWorkerControllerCreationParams params,
+  ) : super.implementation(params);
   static final _PlatformServiceWorkerController _staticValue =
       _PlatformServiceWorkerController(
-          const PlatformServiceWorkerControllerCreationParams());
+        const PlatformServiceWorkerControllerCreationParams(),
+      );
 
   factory _PlatformServiceWorkerController.static() => _staticValue;
 
@@ -287,33 +288,36 @@ class _PlatformServiceWorkerController extends PlatformServiceWorkerController {
 
 class _PlatformTracingController extends PlatformTracingController {
   _PlatformTracingController(PlatformTracingControllerCreationParams params)
-      : super.implementation(params);
+    : super.implementation(params);
   static final _PlatformTracingController _staticValue =
       _PlatformTracingController(
-          const PlatformTracingControllerCreationParams());
+        const PlatformTracingControllerCreationParams(),
+      );
 
   factory _PlatformTracingController.static() => _staticValue;
 }
 
 class _PlatformPrintJobController extends PlatformPrintJobController {
   _PlatformPrintJobController(PlatformPrintJobControllerCreationParams params)
-      : super.implementation(params);
+    : super.implementation(params);
 
   static final _PlatformPrintJobController _staticValue =
       _PlatformPrintJobController(
-          const PlatformPrintJobControllerCreationParams(id: ''));
+        const PlatformPrintJobControllerCreationParams(id: ''),
+      );
 
   factory _PlatformPrintJobController.static() => _staticValue;
 }
 
 class _PlatformPullToRefreshController extends PlatformPullToRefreshController {
   _PlatformPullToRefreshController(
-      PlatformPullToRefreshControllerCreationParams params)
-      : super.implementation(params);
+    PlatformPullToRefreshControllerCreationParams params,
+  ) : super.implementation(params);
 
   static final _PlatformPullToRefreshController _staticValue =
       _PlatformPullToRefreshController(
-          PlatformPullToRefreshControllerCreationParams());
+        PlatformPullToRefreshControllerCreationParams(),
+      );
 
   factory _PlatformPullToRefreshController.static() => _staticValue;
 }
@@ -321,37 +325,44 @@ class _PlatformPullToRefreshController extends PlatformPullToRefreshController {
 class _PlatformWebAuthenticationSession
     extends PlatformWebAuthenticationSession {
   _PlatformWebAuthenticationSession(
-      PlatformWebAuthenticationSessionCreationParams params)
-      : super.implementation(params);
+    PlatformWebAuthenticationSessionCreationParams params,
+  ) : super.implementation(params);
 
   static final _PlatformWebAuthenticationSession _staticValue =
       _PlatformWebAuthenticationSession(
-          const PlatformWebAuthenticationSessionCreationParams());
+        const PlatformWebAuthenticationSessionCreationParams(),
+      );
 
   factory _PlatformWebAuthenticationSession.static() => _staticValue;
 }
 
 class _PlatformWebMessageChannel extends PlatformWebMessageChannel {
   _PlatformWebMessageChannel(PlatformWebMessageChannelCreationParams params)
-      : super.implementation(params);
+    : super.implementation(params);
 
   static final _PlatformWebMessageChannel _staticValue =
-      _PlatformWebMessageChannel(PlatformWebMessageChannelCreationParams(
+      _PlatformWebMessageChannel(
+        PlatformWebMessageChannelCreationParams(
           id: '',
           port1: _PlatformWebMessagePort(
-              const PlatformWebMessagePortCreationParams(index: 0)),
+            const PlatformWebMessagePortCreationParams(index: 0),
+          ),
           port2: _PlatformWebMessagePort(
-              const PlatformWebMessagePortCreationParams(index: 1))));
+            const PlatformWebMessagePortCreationParams(index: 1),
+          ),
+        ),
+      );
 
   factory _PlatformWebMessageChannel.static() => _staticValue;
 }
 
 class _PlatformWebMessagePort extends PlatformWebMessagePort {
   _PlatformWebMessagePort(PlatformWebMessagePortCreationParams params)
-      : super.implementation(params);
+    : super.implementation(params);
 
   static final _PlatformWebMessagePort _staticValue = _PlatformWebMessagePort(
-      const PlatformWebMessagePortCreationParams(index: 0));
+    const PlatformWebMessagePortCreationParams(index: 0),
+  );
 
   factory _PlatformWebMessagePort.static() => _staticValue;
 
@@ -380,4 +391,3 @@ class _PlatformWebMessagePort extends PlatformWebMessagePort {
     throw UnimplementedError();
   }
 }
-

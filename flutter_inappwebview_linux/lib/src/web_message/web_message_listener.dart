@@ -11,18 +11,21 @@ import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_pla
 class LinuxWebMessageListenerCreationParams
     extends PlatformWebMessageListenerCreationParams {
   /// Creates a new [LinuxWebMessageListenerCreationParams] instance.
-  const LinuxWebMessageListenerCreationParams(
-      {required this.allowedOriginRules,
-      required super.jsObjectName,
-      super.onPostMessage});
+  const LinuxWebMessageListenerCreationParams({
+    required this.allowedOriginRules,
+    required super.jsObjectName,
+    super.onPostMessage,
+  });
 
   /// Creates a [LinuxWebMessageListenerCreationParams] instance based on [PlatformWebMessageListenerCreationParams].
   factory LinuxWebMessageListenerCreationParams.fromPlatformWebMessageListenerCreationParams(
-      PlatformWebMessageListenerCreationParams params) {
+    PlatformWebMessageListenerCreationParams params,
+  ) {
     return LinuxWebMessageListenerCreationParams(
-        allowedOriginRules: params.allowedOriginRules ?? Set.from(["*"]),
-        jsObjectName: params.jsObjectName,
-        onPostMessage: params.onPostMessage);
+      allowedOriginRules: params.allowedOriginRules ?? Set.from(["*"]),
+      jsObjectName: params.jsObjectName,
+      onPostMessage: params.onPostMessage,
+    );
   }
 
   @override
@@ -39,23 +42,30 @@ class LinuxWebMessageListener extends PlatformWebMessageListener
     with ChannelController {
   /// Constructs a [LinuxWebMessageListener].
   LinuxWebMessageListener(PlatformWebMessageListenerCreationParams params)
-      : super.implementation(
-          params is LinuxWebMessageListenerCreationParams
-              ? params
-              : LinuxWebMessageListenerCreationParams
-                  .fromPlatformWebMessageListenerCreationParams(params),
-        ) {
-    assert(!this._linuxParams.allowedOriginRules.contains(""),
-        "allowedOriginRules cannot contain empty strings");
+    : super.implementation(
+        params is LinuxWebMessageListenerCreationParams
+            ? params
+            : LinuxWebMessageListenerCreationParams.fromPlatformWebMessageListenerCreationParams(
+                params,
+              ),
+      ) {
+    assert(
+      !this._linuxParams.allowedOriginRules.contains(""),
+      "allowedOriginRules cannot contain empty strings",
+    );
     channel = MethodChannel(
-        'com.pichillilorenzo/flutter_inappwebview_web_message_listener_${_id}_${params.jsObjectName}');
+      'com.pichillilorenzo/flutter_inappwebview_web_message_listener_${_id}_${params.jsObjectName}',
+    );
     handler = _handleMethod;
     initMethodCallHandler();
   }
 
   static final LinuxWebMessageListener _staticValue = LinuxWebMessageListener(
-      LinuxWebMessageListenerCreationParams(
-          jsObjectName: '', allowedOriginRules: Set.from(["*"])));
+    LinuxWebMessageListenerCreationParams(
+      jsObjectName: '',
+      allowedOriginRules: Set.from(["*"]),
+    ),
+  );
 
   /// Provide static access.
   factory LinuxWebMessageListener.static() {
@@ -75,13 +85,16 @@ class LinuxWebMessageListener extends PlatformWebMessageListener
       case "onPostMessage":
         if (_replyProxy == null) {
           _replyProxy = LinuxJavaScriptReplyProxy(
-              PlatformJavaScriptReplyProxyCreationParams(
-                  webMessageListener: this));
+            PlatformJavaScriptReplyProxyCreationParams(
+              webMessageListener: this,
+            ),
+          );
         }
         if (onPostMessage != null) {
           WebMessage? message = call.arguments["message"] != null
               ? WebMessage.fromMap(
-                  call.arguments["message"].cast<String, dynamic>())
+                  call.arguments["message"].cast<String, dynamic>(),
+                )
               : null;
           WebUri? sourceOrigin = call.arguments["sourceOrigin"] != null
               ? WebUri(call.arguments["sourceOrigin"])
@@ -130,14 +143,17 @@ class LinuxWebMessageListener extends PlatformWebMessageListener
 class LinuxJavaScriptReplyProxyCreationParams
     extends PlatformJavaScriptReplyProxyCreationParams {
   /// Creates a new [LinuxJavaScriptReplyProxyCreationParams] instance.
-  const LinuxJavaScriptReplyProxyCreationParams(
-      {required super.webMessageListener});
+  const LinuxJavaScriptReplyProxyCreationParams({
+    required super.webMessageListener,
+  });
 
   /// Creates a [LinuxJavaScriptReplyProxyCreationParams] instance based on [PlatformJavaScriptReplyProxyCreationParams].
   factory LinuxJavaScriptReplyProxyCreationParams.fromPlatformJavaScriptReplyProxyCreationParams(
-      PlatformJavaScriptReplyProxyCreationParams params) {
+    PlatformJavaScriptReplyProxyCreationParams params,
+  ) {
     return LinuxJavaScriptReplyProxyCreationParams(
-        webMessageListener: params.webMessageListener);
+      webMessageListener: params.webMessageListener,
+    );
   }
 }
 
@@ -145,12 +161,13 @@ class LinuxJavaScriptReplyProxyCreationParams
 class LinuxJavaScriptReplyProxy extends PlatformJavaScriptReplyProxy {
   /// Constructs a [LinuxWebMessageListener].
   LinuxJavaScriptReplyProxy(PlatformJavaScriptReplyProxyCreationParams params)
-      : super.implementation(
-          params is LinuxJavaScriptReplyProxyCreationParams
-              ? params
-              : LinuxJavaScriptReplyProxyCreationParams
-                  .fromPlatformJavaScriptReplyProxyCreationParams(params),
-        );
+    : super.implementation(
+        params is LinuxJavaScriptReplyProxyCreationParams
+            ? params
+            : LinuxJavaScriptReplyProxyCreationParams.fromPlatformJavaScriptReplyProxyCreationParams(
+                params,
+              ),
+      );
 
   LinuxWebMessageListener get _linuxWebMessageListener =>
       params.webMessageListener as LinuxWebMessageListener;

@@ -10,6 +10,7 @@
 #include <memory>
 
 #include "cookie_manager.h"
+#include "credential_database.h"
 #include "headless_in_app_webview/headless_in_app_webview_manager.h"
 #include "in_app_webview/in_app_webview_manager.h"
 #include "proxy_manager.h"
@@ -26,6 +27,7 @@ struct _FlutterInappwebviewLinuxPlugin {
   std::unique_ptr<flutter_inappwebview_plugin::InAppWebViewManager> in_app_webview_manager;
   std::unique_ptr<flutter_inappwebview_plugin::HeadlessInAppWebViewManager> headless_in_app_webview_manager;
   std::unique_ptr<flutter_inappwebview_plugin::CookieManager> cookie_manager;
+  std::unique_ptr<flutter_inappwebview_plugin::CredentialDatabase> credential_database;
   std::unique_ptr<flutter_inappwebview_plugin::ProxyManager> proxy_manager;
   std::unique_ptr<flutter_inappwebview_plugin::WebStorageManager> web_storage_manager;
   std::unique_ptr<flutter_inappwebview_plugin::WebViewEnvironment> webview_environment;
@@ -41,6 +43,7 @@ static void flutter_inappwebview_linux_plugin_dispose(GObject* object) {
   self->in_app_webview_manager.reset();
   self->headless_in_app_webview_manager.reset();
   self->cookie_manager.reset();
+  self->credential_database.reset();
   self->proxy_manager.reset();
   self->web_storage_manager.reset();
   self->webview_environment.reset();
@@ -74,6 +77,10 @@ void flutter_inappwebview_linux_plugin_register_with_registrar(FlPluginRegistrar
 
   // Create the CookieManager
   plugin->cookie_manager = std::make_unique<flutter_inappwebview_plugin::CookieManager>(registrar);
+
+  // Create the CredentialDatabase
+  plugin->credential_database =
+      std::make_unique<flutter_inappwebview_plugin::CredentialDatabase>(registrar);
 
   // Create the ProxyManager
   plugin->proxy_manager = std::make_unique<flutter_inappwebview_plugin::ProxyManager>(registrar);

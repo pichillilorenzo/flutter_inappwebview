@@ -13,23 +13,27 @@ class LinuxCookieManagerCreationParams
 
   /// Creates a [LinuxCookieManagerCreationParams] instance based on [PlatformCookieManagerCreationParams].
   factory LinuxCookieManagerCreationParams.fromPlatformCookieManagerCreationParams(
-      PlatformCookieManagerCreationParams params) {
+    PlatformCookieManagerCreationParams params,
+  ) {
     return const LinuxCookieManagerCreationParams();
   }
 }
 
 /// Implementation of [PlatformCookieManager] for Linux using WebKitGTK.
 class LinuxCookieManager extends PlatformCookieManager {
-  static const MethodChannel _channel =
-      MethodChannel('com.pichillilorenzo/flutter_inappwebview_cookiemanager');
+  static const MethodChannel _channel = MethodChannel(
+    'com.pichillilorenzo/flutter_inappwebview_cookiemanager',
+  );
 
   /// Constructs a [LinuxCookieManager].
   LinuxCookieManager(PlatformCookieManagerCreationParams params)
-      : super.implementation(
-            params is LinuxCookieManagerCreationParams
-                ? params
-                : LinuxCookieManagerCreationParams
-                    .fromPlatformCookieManagerCreationParams(params));
+    : super.implementation(
+        params is LinuxCookieManagerCreationParams
+            ? params
+            : LinuxCookieManagerCreationParams.fromPlatformCookieManagerCreationParams(
+                params,
+              ),
+      );
 
   static final LinuxCookieManager _instance = LinuxCookieManager(
     const LinuxCookieManagerCreationParams(),
@@ -106,10 +110,10 @@ class LinuxCookieManager extends PlatformCookieManager {
     PlatformInAppWebViewController? iosBelow11WebViewController,
     PlatformInAppWebViewController? webViewController,
   }) async {
-    final result = await _channel.invokeMethod<Map<dynamic, dynamic>?>('getCookie', {
-      'url': url.toString(),
-      'name': name,
-    });
+    final result = await _channel.invokeMethod<Map<dynamic, dynamic>?>(
+      'getCookie',
+      {'url': url.toString(), 'name': name},
+    );
 
     if (result == null) {
       return null;

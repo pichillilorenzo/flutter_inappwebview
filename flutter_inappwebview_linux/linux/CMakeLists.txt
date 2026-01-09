@@ -76,6 +76,10 @@ if(NOT LIBWPE_FOUND)
   message(FATAL_ERROR "libwpe (wpe-1.0) not found. Please install libwpe-1.0-dev.")
 endif()
 
+# Check for libsecret for secure credential storage
+pkg_check_modules(LIBSECRET REQUIRED IMPORTED_TARGET libsecret-1)
+message(STATUS "flutter_inappwebview_linux: Found libsecret-1 (${LIBSECRET_VERSION})")
+
 # Find wayland-server for SHM buffer handling
 pkg_check_modules(WAYLAND_SERVER REQUIRED IMPORTED_TARGET wayland-server)
 
@@ -117,6 +121,7 @@ message(STATUS "flutter_inappwebview_linux: nlohmann/json ${NLOHMANN_JSON_VERSIO
 list(APPEND PLUGIN_SOURCES
   "flutter_inappwebview_linux_plugin.cc"
   "cookie_manager.cc"
+  "credential_database.cc"
   "proxy_manager.cc"
   "web_storage_manager.cc"
   "webview_environment.cc"
@@ -211,6 +216,7 @@ target_link_libraries(${PLUGIN_NAME} PRIVATE PkgConfig::WPE_WEBKIT)
 target_link_libraries(${PLUGIN_NAME} PRIVATE PkgConfig::LIBWPE)
 target_link_libraries(${PLUGIN_NAME} PRIVATE PkgConfig::WAYLAND_SERVER)
 target_link_libraries(${PLUGIN_NAME} PRIVATE PkgConfig::WPE_FDO)
+target_link_libraries(${PLUGIN_NAME} PRIVATE PkgConfig::LIBSECRET)
 
 # === Library Bundling ===
 # Collect WPE libraries to bundle with the application
@@ -327,6 +333,7 @@ target_link_libraries(${TEST_RUNNER} PRIVATE PkgConfig::WPE_WEBKIT)
 target_link_libraries(${TEST_RUNNER} PRIVATE PkgConfig::LIBWPE)
 target_link_libraries(${TEST_RUNNER} PRIVATE PkgConfig::WAYLAND_SERVER)
 target_link_libraries(${TEST_RUNNER} PRIVATE PkgConfig::WPE_FDO)
+target_link_libraries(${TEST_RUNNER} PRIVATE PkgConfig::LIBSECRET)
 target_link_libraries(${TEST_RUNNER} PRIVATE gtest_main gmock)
 
 # Enable automatic test discovery.

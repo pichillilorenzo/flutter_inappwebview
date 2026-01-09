@@ -43,6 +43,7 @@
 #include "../types/web_resource_error.h"
 #include "../types/web_resource_request.h"
 #include "../types/web_view_transport.h"
+#include "../credential_database.h"
 #include "../flutter_inappwebview_linux_plugin_private.h"
 #include "../utils/flutter.h"
 #include "../utils/log.h"
@@ -3147,10 +3148,23 @@ gboolean InAppWebView::OnAuthenticate(WebKitWebView* web_view, WebKitAuthenticat
   gboolean isProxy = webkit_authentication_request_is_for_proxy(request);
   gboolean isRetry = webkit_authentication_request_is_retry(request);
 
+  // Build protection space for URL credential lookup
   URLProtectionSpace protectionSpace(host ? std::string(host) : "", static_cast<int64_t>(port),
                                      std::nullopt,  // protocol not directly available
                                      realm ? std::make_optional(std::string(realm)) : std::nullopt,
                                      URLProtectionSpace::fromWebKitScheme(scheme), isProxy);
+
+  // Build ProtectionSpace for libsecret lookup
+  ProtectionSpace credProtectionSpace;
+  credProtectionSpace.host = host ? std::string(host) : "";
+  credProtectionSpace.port = static_cast<int>(port);
+  credProtectionSpace.realm = realm ? std::make_optional(std::string(realm)) : std::nullopt;
+  // Map scheme to protocol for libsecret
+  if (scheme == WEBKIT_AUTHENTICATION_SCHEME_HTTP_BASIC ||
+      scheme == WEBKIT_AUTHENTICATION_SCHEME_HTTP_DIGEST ||
+      scheme == WEBKIT_AUTHENTICATION_SCHEME_DEFAULT) {
+    credProtectionSpace.protocol = "http";
+  }
 
   auto challenge = std::make_unique<HttpAuthenticationChallenge>(protectionSpace, isRetry);
 
@@ -3163,21 +3177,78 @@ gboolean InAppWebView::OnAuthenticate(WebKitWebView* web_view, WebKitAuthenticat
 
   auto* pendingRequests = &self->pending_auth_requests_;
   int64_t capturedId = requestId;
+  ProtectionSpace capturedPs = credProtectionSpace;
 
-  callback->nonNullSuccess = [pendingRequests, capturedId](HttpAuthResponse response) {
+  callback->nonNullSuccess = [pendingRequests, capturedId, capturedPs](HttpAuthResponse response) {
     auto it = pendingRequests->find(capturedId);
     if (it != pendingRequests->end()) {
-      if (response.action == HttpAuthResponseAction::PROCEED && response.username.has_value() &&
-          response.password.has_value()) {
-        WebKitCredential* credential = webkit_credential_new(
-            response.username.value().c_str(), response.password.value().c_str(),
-            response.permanentPersistence ? WEBKIT_CREDENTIAL_PERSISTENCE_PERMANENT
-                                          : WEBKIT_CREDENTIAL_PERSISTENCE_FOR_SESSION);
-        webkit_authentication_request_authenticate(it->second, credential);
-        webkit_credential_free(credential);
-      } else {
-        webkit_authentication_request_cancel(it->second);
+      switch (response.action) {
+        case HttpAuthResponseAction::PROCEED:
+          if (response.username.has_value() && response.password.has_value()) {
+            WebKitCredential* credential = webkit_credential_new(
+                response.username.value().c_str(), response.password.value().c_str(),
+                response.permanentPersistence ? WEBKIT_CREDENTIAL_PERSISTENCE_PERMANENT
+                                              : WEBKIT_CREDENTIAL_PERSISTENCE_FOR_SESSION);
+            webkit_authentication_request_authenticate(it->second, credential);
+            
+            // Save credential to libsecret if permanent persistence requested
+            if (response.permanentPersistence) {
+              auto* credDb = CredentialDatabase::instance();
+              if (credDb != nullptr) {
+                Credential cred(response.username.value(), response.password.value());
+                credDb->setHttpAuthCredential(capturedPs, cred);
+              }
+            }
+            
+            webkit_credential_free(credential);
+          } else {
+            webkit_authentication_request_cancel(it->second);
+          }
+          break;
+
+        case HttpAuthResponseAction::USE_SAVED_CREDENTIAL: {
+          // Look up credential from our secure storage
+          auto* credDb = CredentialDatabase::instance();
+          std::optional<Credential> savedCred = std::nullopt;
+          
+          if (credDb != nullptr) {
+            // Try to get a saved credential
+            savedCred = credDb->lookupFirstCredential(capturedPs);
+          }
+
+          // Fall back to WebKit's proposed credential if we don't have one
+          if (!savedCred.has_value()) {
+            WebKitCredential* proposed = webkit_authentication_request_get_proposed_credential(it->second);
+            if (proposed != nullptr) {
+              const gchar* username = webkit_credential_get_username(proposed);
+              const gchar* password = webkit_credential_get_password(proposed);
+              if (username != nullptr && password != nullptr) {
+                savedCred = Credential(username, password);
+              }
+              webkit_credential_free(proposed);
+            }
+          }
+
+          if (savedCred.has_value()) {
+            WebKitCredential* credential = webkit_credential_new(
+                savedCred->username.c_str(),
+                savedCred->password.c_str(),
+                WEBKIT_CREDENTIAL_PERSISTENCE_FOR_SESSION);
+            webkit_authentication_request_authenticate(it->second, credential);
+            webkit_credential_free(credential);
+          } else {
+            // No saved credential found, cancel (matches iOS behavior)
+            webkit_authentication_request_cancel(it->second);
+          }
+          break;
+        }
+
+        case HttpAuthResponseAction::CANCEL:
+        default:
+          webkit_authentication_request_cancel(it->second);
+          break;
       }
+      
       g_object_unref(it->second);
       pendingRequests->erase(it);
     }

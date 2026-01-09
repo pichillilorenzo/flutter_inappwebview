@@ -16,8 +16,7 @@ class LinuxFindInteractionControllerCreationParams
   });
 
   /// Creates a [LinuxFindInteractionControllerCreationParams] instance based on [PlatformFindInteractionControllerCreationParams].
-  factory LinuxFindInteractionControllerCreationParams
-      .fromPlatformFindInteractionControllerCreationParams(
+  factory LinuxFindInteractionControllerCreationParams.fromPlatformFindInteractionControllerCreationParams(
     PlatformFindInteractionControllerCreationParams params,
   ) {
     return LinuxFindInteractionControllerCreationParams(
@@ -33,15 +32,17 @@ class LinuxFindInteractionController extends PlatformFindInteractionController
   LinuxFindInteractionController(
     PlatformFindInteractionControllerCreationParams params,
   ) : super.implementation(
-          params is LinuxFindInteractionControllerCreationParams
-              ? params
-              : LinuxFindInteractionControllerCreationParams
-                  .fromPlatformFindInteractionControllerCreationParams(params),
-        );
+        params is LinuxFindInteractionControllerCreationParams
+            ? params
+            : LinuxFindInteractionControllerCreationParams.fromPlatformFindInteractionControllerCreationParams(
+                params,
+              ),
+      );
 
   static final LinuxFindInteractionController _staticValue =
       LinuxFindInteractionController(
-          LinuxFindInteractionControllerCreationParams());
+        LinuxFindInteractionControllerCreationParams(),
+      );
 
   /// Provide static access.
   factory LinuxFindInteractionController.static() {
@@ -50,11 +51,12 @@ class LinuxFindInteractionController extends PlatformFindInteractionController
 
   _debugLog(String method, dynamic args) {
     debugLog(
-        className: this.runtimeType.toString(),
-        debugLoggingSettings:
-            PlatformFindInteractionController.debugLoggingSettings,
-        method: method,
-        args: args);
+      className: this.runtimeType.toString(),
+      debugLoggingSettings:
+          PlatformFindInteractionController.debugLoggingSettings,
+      method: method,
+      args: args,
+    );
   }
 
   Future<dynamic> _handleMethod(MethodCall call) async {
@@ -67,7 +69,11 @@ class LinuxFindInteractionController extends PlatformFindInteractionController
           int numberOfMatches = call.arguments["numberOfMatches"];
           bool isDoneCounting = call.arguments["isDoneCounting"];
           onFindResultReceived!(
-              this, activeMatchOrdinal, numberOfMatches, isDoneCounting);
+            this,
+            activeMatchOrdinal,
+            numberOfMatches,
+            isDoneCounting,
+          );
         }
         break;
       default:
@@ -118,9 +124,10 @@ class LinuxFindInteractionController extends PlatformFindInteractionController
   @override
   Future<FindSession?> getActiveFindSession() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    Map<String, dynamic>? result =
-        (await channel?.invokeMethod('getActiveFindSession', args))
-            ?.cast<String, dynamic>();
+    Map<String, dynamic>? result = (await channel?.invokeMethod(
+      'getActiveFindSession',
+      args,
+    ))?.cast<String, dynamic>();
     return FindSession.fromMap(result);
   }
 
@@ -134,7 +141,8 @@ class LinuxFindInteractionController extends PlatformFindInteractionController
 extension InternalFindInteractionController on LinuxFindInteractionController {
   void init(dynamic id) {
     channel = MethodChannel(
-        'com.pichillilorenzo/flutter_inappwebview_find_interaction_$id');
+      'com.pichillilorenzo/flutter_inappwebview_find_interaction_$id',
+    );
     handler = _handleMethod;
     initMethodCallHandler();
   }

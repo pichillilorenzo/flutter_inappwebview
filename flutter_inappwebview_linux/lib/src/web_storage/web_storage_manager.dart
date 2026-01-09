@@ -13,7 +13,8 @@ class LinuxWebStorageManagerCreationParams
 
   /// Creates a [LinuxWebStorageManagerCreationParams] instance based on [PlatformWebStorageManagerCreationParams].
   factory LinuxWebStorageManagerCreationParams.fromPlatformWebStorageManagerCreationParams(
-      PlatformWebStorageManagerCreationParams params) {
+    PlatformWebStorageManagerCreationParams params,
+  ) {
     return const LinuxWebStorageManagerCreationParams();
   }
 }
@@ -24,15 +25,18 @@ class LinuxWebStorageManagerCreationParams
 /// to manage website data.
 class LinuxWebStorageManager extends PlatformWebStorageManager {
   static const MethodChannel _channel = MethodChannel(
-      'com.pichillilorenzo/flutter_inappwebview_webstoragemanager');
+    'com.pichillilorenzo/flutter_inappwebview_webstoragemanager',
+  );
 
   /// Constructs a [LinuxWebStorageManager].
   LinuxWebStorageManager(PlatformWebStorageManagerCreationParams params)
-      : super.implementation(
-            params is LinuxWebStorageManagerCreationParams
-                ? params
-                : LinuxWebStorageManagerCreationParams
-                    .fromPlatformWebStorageManagerCreationParams(params));
+    : super.implementation(
+        params is LinuxWebStorageManagerCreationParams
+            ? params
+            : LinuxWebStorageManagerCreationParams.fromPlatformWebStorageManagerCreationParams(
+                params,
+              ),
+      );
 
   static final LinuxWebStorageManager _instance = LinuxWebStorageManager(
     const LinuxWebStorageManagerCreationParams(),
@@ -50,7 +54,8 @@ class LinuxWebStorageManager extends PlatformWebStorageManager {
       return 'WEBKIT_WEBSITE_DATA_DISK_CACHE';
     } else if (type == WebsiteDataType.WKWebsiteDataTypeMemoryCache) {
       return 'WEBKIT_WEBSITE_DATA_MEMORY_CACHE';
-    } else if (type == WebsiteDataType.WKWebsiteDataTypeOfflineWebApplicationCache) {
+    } else if (type ==
+        WebsiteDataType.WKWebsiteDataTypeOfflineWebApplicationCache) {
       return 'WEBKIT_WEBSITE_DATA_OFFLINE_APPLICATION_CACHE';
     } else if (type == WebsiteDataType.WKWebsiteDataTypeCookies) {
       return 'WEBKIT_WEBSITE_DATA_COOKIES';
@@ -60,7 +65,8 @@ class LinuxWebStorageManager extends PlatformWebStorageManager {
       return 'WEBKIT_WEBSITE_DATA_LOCAL_STORAGE';
     } else if (type == WebsiteDataType.WKWebsiteDataTypeIndexedDBDatabases) {
       return 'WEBKIT_WEBSITE_DATA_INDEXEDDB_DATABASES';
-    } else if (type == WebsiteDataType.WKWebsiteDataTypeServiceWorkerRegistrations) {
+    } else if (type ==
+        WebsiteDataType.WKWebsiteDataTypeServiceWorkerRegistrations) {
       return 'WEBKIT_WEBSITE_DATA_SERVICE_WORKER_REGISTRATIONS';
     } else if (type == WebsiteDataType.WKWebsiteDataTypeFetchCache) {
       // WPE uses same as disk cache for fetch cache
@@ -99,12 +105,14 @@ class LinuxWebStorageManager extends PlatformWebStorageManager {
   Future<List<WebsiteDataRecord>> fetchDataRecords({
     required Set<WebsiteDataType> dataTypes,
   }) async {
-    final List<String> wpeDataTypes =
-        dataTypes.map((type) => _toWpeDataType(type)).toList();
+    final List<String> wpeDataTypes = dataTypes
+        .map((type) => _toWpeDataType(type))
+        .toList();
 
-    final result = await _channel.invokeMethod<List<dynamic>>('fetchDataRecords', {
-      'dataTypes': wpeDataTypes,
-    });
+    final result = await _channel.invokeMethod<List<dynamic>>(
+      'fetchDataRecords',
+      {'dataTypes': wpeDataTypes},
+    );
 
     if (result == null) {
       return [];
@@ -112,7 +120,8 @@ class LinuxWebStorageManager extends PlatformWebStorageManager {
 
     return result.cast<Map<dynamic, dynamic>>().map((recordMap) {
       final String? displayName = recordMap['displayName'] as String?;
-      final List<dynamic>? dataTypesRaw = recordMap['dataTypes'] as List<dynamic>?;
+      final List<dynamic>? dataTypesRaw =
+          recordMap['dataTypes'] as List<dynamic>?;
 
       Set<WebsiteDataType>? dataTypesSet;
       if (dataTypesRaw != null) {
@@ -135,8 +144,9 @@ class LinuxWebStorageManager extends PlatformWebStorageManager {
     required Set<WebsiteDataType> dataTypes,
     required List<WebsiteDataRecord> dataRecords,
   }) async {
-    final List<String> wpeDataTypes =
-        dataTypes.map((type) => _toWpeDataType(type)).toList();
+    final List<String> wpeDataTypes = dataTypes
+        .map((type) => _toWpeDataType(type))
+        .toList();
 
     final List<Map<String, dynamic>> recordList = dataRecords.map((record) {
       return {
@@ -158,8 +168,9 @@ class LinuxWebStorageManager extends PlatformWebStorageManager {
     required Set<WebsiteDataType> dataTypes,
     required DateTime date,
   }) async {
-    final List<String> wpeDataTypes =
-        dataTypes.map((type) => _toWpeDataType(type)).toList();
+    final List<String> wpeDataTypes = dataTypes
+        .map((type) => _toWpeDataType(type))
+        .toList();
 
     // Convert DateTime to Unix timestamp (seconds since epoch)
     final int timestamp = date.millisecondsSinceEpoch ~/ 1000;

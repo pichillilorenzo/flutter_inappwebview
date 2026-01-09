@@ -1,5 +1,5 @@
 /// Key mapping tables for WPE WebKit keyboard input
-/// 
+///
 /// WPE WebKit expects:
 /// - key_code: XKB keysym (Unicode for printable chars, 0xFF00+ for special keys)
 /// - hardware_key_code: X11 keycode (evdev scancode + 8)
@@ -20,16 +20,16 @@ const kUsbHidToEvdev = <int, int>{
   0x1e: 2, 0x1f: 3, 0x20: 4, 0x21: 5, 0x22: 6,
   0x23: 7, 0x24: 8, 0x25: 9, 0x26: 10, 0x27: 11,
   // Common keys
-  0x28: 28,  // Enter
-  0x29: 1,   // Escape
-  0x2a: 14,  // Backspace
-  0x2b: 15,  // Tab
-  0x2c: 57,  // Space
+  0x28: 28, // Enter
+  0x29: 1, // Escape
+  0x2a: 14, // Backspace
+  0x2b: 15, // Tab
+  0x2c: 57, // Space
   // Symbols
   0x2d: 12, 0x2e: 13, 0x2f: 26, 0x30: 27, 0x31: 43,
   0x33: 39, 0x34: 40, 0x35: 41, 0x36: 51, 0x37: 52, 0x38: 53,
   // Lock keys
-  0x39: 58,  // CapsLock
+  0x39: 58, // CapsLock
   // Function keys (F1-F12)
   0x3a: 59, 0x3b: 60, 0x3c: 61, 0x3d: 62, 0x3e: 63, 0x3f: 64,
   0x40: 65, 0x41: 66, 0x42: 67, 0x43: 68, 0x44: 87, 0x45: 88,
@@ -62,37 +62,37 @@ int getX11Keysym(LogicalKeyboardKey key, String? character) {
   if (character != null && character.isNotEmpty) {
     final codeUnit = character.codeUnitAt(0);
     if (codeUnit >= 0x20 && codeUnit < 0x7f) {
-      return codeUnit;  // ASCII printable -> Unicode keysym
+      return codeUnit; // ASCII printable -> Unicode keysym
     }
   }
-  
+
   // Special keys use X11 keysym constants
   final keyId = key.keyId;
-  
+
   // Function keys (F1-F12): XK_F1 = 0xffbe
-  if (keyId >= LogicalKeyboardKey.f1.keyId && 
+  if (keyId >= LogicalKeyboardKey.f1.keyId &&
       keyId <= LogicalKeyboardKey.f12.keyId) {
     return 0xffbe + (keyId - LogicalKeyboardKey.f1.keyId);
   }
-  
+
   // Special key mapping
   return _specialKeyToKeysym[keyId] ?? (keyId & 0xFFFF);
 }
 
 const _specialKeyToKeysym = <int, int>{
-  0x100000008: 0xff08,  // Backspace
-  0x100000009: 0xff09,  // Tab
-  0x10000000d: 0xff0d,  // Enter
-  0x10000001b: 0xff1b,  // Escape
-  0x10000007f: 0xffff,  // Delete
-  0x100000301: 0xff50,  // Home
-  0x100000302: 0xff57,  // End
-  0x100000304: 0xff51,  // ArrowLeft
-  0x100000305: 0xff52,  // ArrowUp
-  0x100000306: 0xff53,  // ArrowRight
-  0x100000307: 0xff54,  // ArrowDown
-  0x100000308: 0xff55,  // PageUp
-  0x100000309: 0xff56,  // PageDown
-  0x100000407: 0xff63,  // Insert
-  0x20: 0x0020,         // Space
+  0x100000008: 0xff08, // Backspace
+  0x100000009: 0xff09, // Tab
+  0x10000000d: 0xff0d, // Enter
+  0x10000001b: 0xff1b, // Escape
+  0x10000007f: 0xffff, // Delete
+  0x100000301: 0xff50, // Home
+  0x100000302: 0xff57, // End
+  0x100000304: 0xff51, // ArrowLeft
+  0x100000305: 0xff52, // ArrowUp
+  0x100000306: 0xff53, // ArrowRight
+  0x100000307: 0xff54, // ArrowDown
+  0x100000308: 0xff55, // PageUp
+  0x100000309: 0xff56, // PageDown
+  0x100000407: 0xff63, // Insert
+  0x20: 0x0020, // Space
 };

@@ -62,7 +62,7 @@ enum InAppWebViewPointerEventKind {
   leave,
   up,
   update,
-  cancel
+  cancel,
 }
 
 /// Attempts to translate a button constant such as [kPrimaryMouseButton]
@@ -83,24 +83,17 @@ PointerButton _getButton(int value) {
 const MethodChannel _pluginChannel = IN_APP_WEBVIEW_STATIC_CHANNEL;
 
 class CustomFlutterViewControllerValue {
-  const CustomFlutterViewControllerValue({
-    required this.isInitialized,
-  });
+  const CustomFlutterViewControllerValue({required this.isInitialized});
 
   final bool isInitialized;
 
-  CustomFlutterViewControllerValue copyWith({
-    bool? isInitialized,
-  }) {
+  CustomFlutterViewControllerValue copyWith({bool? isInitialized}) {
     return CustomFlutterViewControllerValue(
       isInitialized: isInitialized ?? this.isInitialized,
     );
   }
 
-  CustomFlutterViewControllerValue.uninitialized()
-      : this(
-          isInitialized: false,
-        );
+  CustomFlutterViewControllerValue.uninitialized() : this(isInitialized: false);
 }
 
 /// Controls a WebView and provides streams for various change events.
@@ -123,23 +116,30 @@ class CustomPlatformViewController
   Stream<SystemMouseCursor> get _cursor => _cursorStreamController.stream;
 
   CustomPlatformViewController()
-      : super(CustomFlutterViewControllerValue.uninitialized());
+    : super(CustomFlutterViewControllerValue.uninitialized());
 
   /// Initializes the underlying platform view.
-  Future<void> initialize(
-      {Function(int id)? onPlatformViewCreated, dynamic arguments}) async {
+  Future<void> initialize({
+    Function(int id)? onPlatformViewCreated,
+    dynamic arguments,
+  }) async {
     if (_isDisposed) {
       return;
     }
     _textureId = (await _pluginChannel.invokeMethod<int>(
-        'createInAppWebView', arguments))!;
+      'createInAppWebView',
+      arguments,
+    ))!;
 
-    _methodChannel =
-        MethodChannel('com.pichillilorenzo/custom_platform_view_$_textureId');
+    _methodChannel = MethodChannel(
+      'com.pichillilorenzo/custom_platform_view_$_textureId',
+    );
     _eventChannel = EventChannel(
-        'com.pichillilorenzo/custom_platform_view_${_textureId}_events');
-    _eventStreamSubscription =
-        _eventChannel.receiveBroadcastStream().listen((event) {
+      'com.pichillilorenzo/custom_platform_view_${_textureId}_events',
+    );
+    _eventStreamSubscription = _eventChannel.receiveBroadcastStream().listen((
+      event,
+    ) {
       final map = event as Map<dynamic, dynamic>;
       switch (map['type']) {
         case 'cursorChanged':
@@ -176,8 +176,11 @@ class CustomPlatformViewController
       return;
     }
     assert(value.isInitialized);
-    return _methodChannel
-        .invokeMethod('setSize', [size.width, size.height, scaleFactor]);
+    return _methodChannel.invokeMethod('setSize', [
+      size.width,
+      size.height,
+      scaleFactor,
+    ]);
   }
 
   /// Sets the texture offset (position within the Flutter window).
@@ -186,8 +189,10 @@ class CustomPlatformViewController
       return;
     }
     assert(value.isInitialized);
-    return _methodChannel
-        .invokeMethod('setTextureOffset', [offset.dx, offset.dy]);
+    return _methodChannel.invokeMethod('setTextureOffset', [
+      offset.dx,
+      offset.dy,
+    ]);
   }
 
   /// Moves the virtual cursor to [position].
@@ -196,30 +201,43 @@ class CustomPlatformViewController
       return;
     }
     assert(value.isInitialized);
-    return _methodChannel
-        .invokeMethod('setCursorPos', [position.dx, position.dy]);
+    return _methodChannel.invokeMethod('setCursorPos', [
+      position.dx,
+      position.dy,
+    ]);
   }
 
   /// Indicates whether the specified [button] is currently down.
   Future<void> _setPointerButtonState(
-      InAppWebViewPointerEventKind kind, PointerButton button) async {
+    InAppWebViewPointerEventKind kind,
+    PointerButton button,
+  ) async {
     if (_isDisposed) {
       return;
     }
     assert(value.isInitialized);
-    return _methodChannel.invokeMethod('setPointerButton',
-        <String, dynamic>{'kind': kind.index, 'button': button.index, 'clickCount': 1});
+    return _methodChannel.invokeMethod('setPointerButton', <String, dynamic>{
+      'kind': kind.index,
+      'button': button.index,
+      'clickCount': 1,
+    });
   }
 
   /// Indicates whether the specified [button] is currently down with click count.
   Future<void> _setPointerButtonStateWithClickCount(
-      InAppWebViewPointerEventKind kind, PointerButton button, int clickCount) async {
+    InAppWebViewPointerEventKind kind,
+    PointerButton button,
+    int clickCount,
+  ) async {
     if (_isDisposed) {
       return;
     }
     assert(value.isInitialized);
-    return _methodChannel.invokeMethod('setPointerButton',
-        <String, dynamic>{'kind': kind.index, 'button': button.index, 'clickCount': clickCount});
+    return _methodChannel.invokeMethod('setPointerButton', <String, dynamic>{
+      'kind': kind.index,
+      'button': button.index,
+      'clickCount': clickCount,
+    });
   }
 
   /// Sets the horizontal and vertical scroll delta.
@@ -232,13 +250,19 @@ class CustomPlatformViewController
   }
 
   /// Sends a key event to the webview.
-  Future<void> _sendKeyEvent(int type, int keyCode, int scanCode, int modifiers, String? characters) async {
+  Future<void> _sendKeyEvent(
+    int type,
+    int keyCode,
+    int scanCode,
+    int modifiers,
+    String? characters,
+  ) async {
     if (_isDisposed) {
       return;
     }
     assert(value.isInitialized);
     return _methodChannel.invokeMethod('sendKeyEvent', <String, dynamic>{
-      'type': type,  // 0=press, 1=release
+      'type': type, // 0=press, 1=release
       'keyCode': keyCode,
       'scanCode': scanCode,
       'modifiers': modifiers,
@@ -249,7 +273,13 @@ class CustomPlatformViewController
   /// Sends a touch event to the webview.
   /// [type]: 0=down, 1=up, 2=move, 3=cancel
   /// [touchPoints]: List of touch point maps with {id, x, y, type}
-  Future<void> _sendTouchEvent(int type, int id, double x, double y, List<Map<String, dynamic>> touchPoints) async {
+  Future<void> _sendTouchEvent(
+    int type,
+    int id,
+    double x,
+    double y,
+    List<Map<String, dynamic>> touchPoints,
+  ) async {
     if (_isDisposed) {
       return;
     }
@@ -288,13 +318,13 @@ class CustomPlatformView extends StatefulWidget {
 
   final Function(int id)? onPlatformViewCreated;
 
-  const CustomPlatformView(
-      {this.creationParams,
-      this.onPlatformViewCreated,
-      this.scaleFactor,
-      this.filterQuality = FilterQuality.none,
-      Key? key})
-      : super(key: key);
+  const CustomPlatformView({
+    this.creationParams,
+    this.onPlatformViewCreated,
+    this.scaleFactor,
+    this.filterQuality = FilterQuality.none,
+    Key? key,
+  }) : super(key: key);
 
   @override
   _CustomPlatformViewState createState() => _CustomPlatformViewState();
@@ -328,11 +358,12 @@ class _CustomPlatformViewState extends State<CustomPlatformView> {
     super.initState();
 
     _controller.initialize(
-        onPlatformViewCreated: (id) {
-          widget.onPlatformViewCreated?.call(id);
-          setState(() {});
-        },
-        arguments: widget.creationParams);
+      onPlatformViewCreated: (id) {
+        widget.onPlatformViewCreated?.call(id);
+        setState(() {});
+      },
+      arguments: widget.creationParams,
+    );
 
     // Report initial surface size
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -379,7 +410,7 @@ class _CustomPlatformViewState extends State<CustomPlatformView> {
     } else if (event is KeyUpEvent) {
       type = 1;
     } else if (event is KeyRepeatEvent) {
-      type = 2;  // Repeat event
+      type = 2; // Repeat event
     } else {
       return KeyEventResult.ignored;
     }
@@ -387,18 +418,22 @@ class _CustomPlatformViewState extends State<CustomPlatformView> {
     // Build modifiers bitmask matching WPE's wpe_input_modifier enum:
     // Control = bit 0, Shift = bit 1, Alt = bit 2, Meta = bit 3
     int modifiers = 0;
-    if (HardwareKeyboard.instance.isControlPressed) modifiers |= 1;  // wpe_input_keyboard_modifier_control
-    if (HardwareKeyboard.instance.isShiftPressed) modifiers |= 2;    // wpe_input_keyboard_modifier_shift
-    if (HardwareKeyboard.instance.isAltPressed) modifiers |= 4;      // wpe_input_keyboard_modifier_alt
-    if (HardwareKeyboard.instance.isMetaPressed) modifiers |= 8;     // wpe_input_keyboard_modifier_meta
+    if (HardwareKeyboard.instance.isControlPressed)
+      modifiers |= 1; // wpe_input_keyboard_modifier_control
+    if (HardwareKeyboard.instance.isShiftPressed)
+      modifiers |= 2; // wpe_input_keyboard_modifier_shift
+    if (HardwareKeyboard.instance.isAltPressed)
+      modifiers |= 4; // wpe_input_keyboard_modifier_alt
+    if (HardwareKeyboard.instance.isMetaPressed)
+      modifiers |= 8; // wpe_input_keyboard_modifier_meta
 
     // For Ctrl/Meta combinations, don't send the character
-    final hasControlOrMeta = (modifiers & 0x9) != 0;  // Ctrl=1 or Meta=8
+    final hasControlOrMeta = (modifiers & 0x9) != 0; // Ctrl=1 or Meta=8
     String? characters = hasControlOrMeta ? null : event.character;
-    
+
     // Get X11 keysym for the key
     final keyCode = getX11Keysym(event.logicalKey, event.character);
-    
+
     // Get X11 keycode from physical key (USB HID -> evdev -> X11)
     final usbHid = event.physicalKey.usbHidUsage & 0xFFFF;
     final scanCode = usbHidToX11Keycode(usbHid);
@@ -410,141 +445,168 @@ class _CustomPlatformViewState extends State<CustomPlatformView> {
 
   Widget _buildInner() {
     return NotificationListener<SizeChangedLayoutNotification>(
-        onNotification: (notification) {
-          _reportSurfaceSize();
-          return true;
-        },
-        child: SizeChangedLayoutNotifier(
-            child: _controller.value.isInitialized
-                ? Listener(
-                    behavior: HitTestBehavior.opaque,
-                    onPointerHover: (ev) {
-                      if (_pointerKind == PointerDeviceKind.touch) {
-                        return;
-                      }
-                      _controller._setCursorPos(ev.localPosition);
-                    },
-                    onPointerDown: (ev) async {
-                      _reportSurfaceSize();
+      onNotification: (notification) {
+        _reportSurfaceSize();
+        return true;
+      },
+      child: SizeChangedLayoutNotifier(
+        child: _controller.value.isInitialized
+            ? Listener(
+                behavior: HitTestBehavior.opaque,
+                onPointerHover: (ev) {
+                  if (_pointerKind == PointerDeviceKind.touch) {
+                    return;
+                  }
+                  _controller._setCursorPos(ev.localPosition);
+                },
+                onPointerDown: (ev) async {
+                  _reportSurfaceSize();
 
-                      final needsFocus = !_focusNode.hasFocus;
-                      if (needsFocus) {
-                        // IMPORTANT: Set the native focus state BEFORE sending the click
-                        // and AWAIT it to ensure WebKit has processed the focus change.
-                        // Without awaiting, WebKit may receive the click before it has
-                        // the focused activity state, causing the click to only activate
-                        // the view rather than focusing the clicked element.
-                        if (_controller.value.isInitialized) {
-                          await _controller._setFocused(true);
-                        }
-                        _focusNode.requestFocus();
-                      }
+                  final needsFocus = !_focusNode.hasFocus;
+                  if (needsFocus) {
+                    // IMPORTANT: Set the native focus state BEFORE sending the click
+                    // and AWAIT it to ensure WebKit has processed the focus change.
+                    // Without awaiting, WebKit may receive the click before it has
+                    // the focused activity state, causing the click to only activate
+                    // the view rather than focusing the clicked element.
+                    if (_controller.value.isInitialized) {
+                      await _controller._setFocused(true);
+                    }
+                    _focusNode.requestFocus();
+                  }
 
-                      _pointerKind = ev.kind;
-                      if (ev.kind == PointerDeviceKind.touch) {
-                        // Handle touch event
-                        _activeTouchPoints[ev.pointer] = ev.localPosition;
-                        _sendTouchEvent(0, ev.pointer, ev.localPosition); // 0 = down
-                        return;
-                      }
-                      
-                      // Update cursor position first
-                      _controller._setCursorPos(ev.localPosition);
-                      
-                      final button = _getButton(ev.buttons);
-                      _downButtons[ev.pointer] = button;
-                      
-                      // Detect double/triple click
-                      final now = DateTime.now();
-                      final timeSinceLastClick = _lastClickTime != null 
-                          ? now.difference(_lastClickTime!)
-                          : const Duration(days: 1);
-                      final distanceFromLastClick = _lastClickPosition != null
-                          ? (ev.localPosition - _lastClickPosition!).distance
-                          : double.infinity;
-                      
-                      if (timeSinceLastClick < _doubleClickTimeout &&
-                          distanceFromLastClick < _doubleClickDistance) {
-                        _clickCount++;
-                        if (_clickCount > 3) _clickCount = 1;
-                      } else {
-                        _clickCount = 1;
-                      }
-                      
-                      _lastClickTime = now;
-                      _lastClickPosition = ev.localPosition;
-                      
-                      // Send click with count for double/triple click
-                      _controller._setPointerButtonStateWithClickCount(
-                          InAppWebViewPointerEventKind.down, button, _clickCount);
-                    },
-                    onPointerUp: (ev) {
-                      _pointerKind = ev.kind;
-                      if (ev.kind == PointerDeviceKind.touch) {
-                        // Handle touch event
-                        _activeTouchPoints[ev.pointer] = ev.localPosition;
-                        _sendTouchEvent(1, ev.pointer, ev.localPosition); // 1 = up
-                        _activeTouchPoints.remove(ev.pointer);
-                        return;
-                      }
-                      final button = _downButtons.remove(ev.pointer);
-                      if (button != null) {
-                        _controller._setPointerButtonState(
-                            InAppWebViewPointerEventKind.up, button);
-                      }
-                    },
-                    onPointerCancel: (ev) {
-                      _pointerKind = ev.kind;
-                      if (ev.kind == PointerDeviceKind.touch) {
-                        // Handle touch cancel
-                        _activeTouchPoints.remove(ev.pointer);
-                        _sendTouchEvent(3, ev.pointer, ev.localPosition); // 3 = cancel
-                        return;
-                      }
-                      final button = _downButtons.remove(ev.pointer);
-                      if (button != null) {
-                        _controller._setPointerButtonState(
-                            InAppWebViewPointerEventKind.cancel, button);
-                      }
-                    },
-                    onPointerMove: (ev) {
-                      _pointerKind = ev.kind;
-                      if (ev.kind == PointerDeviceKind.touch) {
-                        // Handle touch move
-                        _activeTouchPoints[ev.pointer] = ev.localPosition;
-                        _sendTouchEvent(2, ev.pointer, ev.localPosition); // 2 = move
-                        return;
-                      }
-                      _controller._setCursorPos(ev.localPosition);
-                    },
-                    onPointerSignal: (signal) {
-                      if (signal is PointerScrollEvent) {
-                        _controller._setScrollDelta(
-                            -signal.scrollDelta.dx, -signal.scrollDelta.dy);
-                      }
-                    },
-                    onPointerPanZoomUpdate: (ev) {
-                      _controller._setScrollDelta(
-                          ev.panDelta.dx, ev.panDelta.dy);
-                    },
-                    child: MouseRegion(
-                        cursor: _cursor,
-                        onEnter: (ev) {
-                          final button = _getButton(ev.buttons);
-                          _controller._setPointerButtonState(
-                              InAppWebViewPointerEventKind.enter, button);
-                        },
-                        onExit: (ev) {
-                          final button = _getButton(ev.buttons);
-                          _controller._setPointerButtonState(
-                              InAppWebViewPointerEventKind.leave, button);
-                        },
-                        child: Texture(
-                          textureId: _controller._textureId,
-                          filterQuality: widget.filterQuality,
-                        )),
-                  )
-                : const SizedBox()));
+                  _pointerKind = ev.kind;
+                  if (ev.kind == PointerDeviceKind.touch) {
+                    // Handle touch event
+                    _activeTouchPoints[ev.pointer] = ev.localPosition;
+                    _sendTouchEvent(
+                      0,
+                      ev.pointer,
+                      ev.localPosition,
+                    ); // 0 = down
+                    return;
+                  }
+
+                  // Update cursor position first
+                  _controller._setCursorPos(ev.localPosition);
+
+                  final button = _getButton(ev.buttons);
+                  _downButtons[ev.pointer] = button;
+
+                  // Detect double/triple click
+                  final now = DateTime.now();
+                  final timeSinceLastClick = _lastClickTime != null
+                      ? now.difference(_lastClickTime!)
+                      : const Duration(days: 1);
+                  final distanceFromLastClick = _lastClickPosition != null
+                      ? (ev.localPosition - _lastClickPosition!).distance
+                      : double.infinity;
+
+                  if (timeSinceLastClick < _doubleClickTimeout &&
+                      distanceFromLastClick < _doubleClickDistance) {
+                    _clickCount++;
+                    if (_clickCount > 3) _clickCount = 1;
+                  } else {
+                    _clickCount = 1;
+                  }
+
+                  _lastClickTime = now;
+                  _lastClickPosition = ev.localPosition;
+
+                  // Send click with count for double/triple click
+                  _controller._setPointerButtonStateWithClickCount(
+                    InAppWebViewPointerEventKind.down,
+                    button,
+                    _clickCount,
+                  );
+                },
+                onPointerUp: (ev) {
+                  _pointerKind = ev.kind;
+                  if (ev.kind == PointerDeviceKind.touch) {
+                    // Handle touch event
+                    _activeTouchPoints[ev.pointer] = ev.localPosition;
+                    _sendTouchEvent(1, ev.pointer, ev.localPosition); // 1 = up
+                    _activeTouchPoints.remove(ev.pointer);
+                    return;
+                  }
+                  final button = _downButtons.remove(ev.pointer);
+                  if (button != null) {
+                    _controller._setPointerButtonState(
+                      InAppWebViewPointerEventKind.up,
+                      button,
+                    );
+                  }
+                },
+                onPointerCancel: (ev) {
+                  _pointerKind = ev.kind;
+                  if (ev.kind == PointerDeviceKind.touch) {
+                    // Handle touch cancel
+                    _activeTouchPoints.remove(ev.pointer);
+                    _sendTouchEvent(
+                      3,
+                      ev.pointer,
+                      ev.localPosition,
+                    ); // 3 = cancel
+                    return;
+                  }
+                  final button = _downButtons.remove(ev.pointer);
+                  if (button != null) {
+                    _controller._setPointerButtonState(
+                      InAppWebViewPointerEventKind.cancel,
+                      button,
+                    );
+                  }
+                },
+                onPointerMove: (ev) {
+                  _pointerKind = ev.kind;
+                  if (ev.kind == PointerDeviceKind.touch) {
+                    // Handle touch move
+                    _activeTouchPoints[ev.pointer] = ev.localPosition;
+                    _sendTouchEvent(
+                      2,
+                      ev.pointer,
+                      ev.localPosition,
+                    ); // 2 = move
+                    return;
+                  }
+                  _controller._setCursorPos(ev.localPosition);
+                },
+                onPointerSignal: (signal) {
+                  if (signal is PointerScrollEvent) {
+                    _controller._setScrollDelta(
+                      -signal.scrollDelta.dx,
+                      -signal.scrollDelta.dy,
+                    );
+                  }
+                },
+                onPointerPanZoomUpdate: (ev) {
+                  _controller._setScrollDelta(ev.panDelta.dx, ev.panDelta.dy);
+                },
+                child: MouseRegion(
+                  cursor: _cursor,
+                  onEnter: (ev) {
+                    final button = _getButton(ev.buttons);
+                    _controller._setPointerButtonState(
+                      InAppWebViewPointerEventKind.enter,
+                      button,
+                    );
+                  },
+                  onExit: (ev) {
+                    final button = _getButton(ev.buttons);
+                    _controller._setPointerButtonState(
+                      InAppWebViewPointerEventKind.leave,
+                      button,
+                    );
+                  },
+                  child: Texture(
+                    textureId: _controller._textureId,
+                    filterQuality: widget.filterQuality,
+                  ),
+                ),
+              )
+            : const SizedBox(),
+      ),
+    );
   }
 
   /// Sends a touch event to the webview with all active touch points
@@ -561,17 +623,27 @@ class _CustomPlatformViewState extends State<CustomPlatformView> {
         'type': pointType,
       };
     }).toList();
-    
-    _controller._sendTouchEvent(type, pointerId, position.dx, position.dy, touchPoints);
+
+    _controller._sendTouchEvent(
+      type,
+      pointerId,
+      position.dx,
+      position.dy,
+      touchPoints,
+    );
   }
 
   void _reportSurfaceSize() async {
     final box = _key.currentContext?.findRenderObject() as RenderBox?;
     if (box != null) {
       await _controller.ready;
-      unawaited(_controller._setSize(
-          box.size, widget.scaleFactor ?? window.devicePixelRatio));
-      
+      unawaited(
+        _controller._setSize(
+          box.size,
+          widget.scaleFactor ?? window.devicePixelRatio,
+        ),
+      );
+
       // Also report the texture offset (position within the window)
       final globalPosition = box.localToGlobal(Offset.zero);
       unawaited(_controller._setTextureOffset(globalPosition));

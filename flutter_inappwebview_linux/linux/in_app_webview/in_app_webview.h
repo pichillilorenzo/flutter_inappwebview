@@ -126,6 +126,7 @@ class InAppWebView {
   void loadData(const std::string& data, const std::string& mime_type, const std::string& encoding,
                 const std::string& base_url);
   void loadFile(const std::string& asset_file_path);
+  void postUrl(const std::string& url, const std::vector<uint8_t>& postData);
   void reload();
   void reloadFromOrigin();
   void goBack();
@@ -155,7 +156,14 @@ class InAppWebView {
 
   // JavaScript execution
   void evaluateJavascript(const std::string& source,
+                          const std::optional<std::string>& worldName,
                           std::function<void(const std::optional<std::string>&)> callback);
+  void callAsyncJavaScript(
+      const std::string& functionBody,
+      const std::string& argumentsJson,
+      const std::vector<std::string>& argumentKeys,
+      const std::optional<std::string>& worldName,
+      std::function<void(const std::string&)> callback);
   void injectJavascriptFileFromUrl(const std::string& urlFile);
   void injectCSSCode(const std::string& source);
   void injectCSSFileFromUrl(const std::string& urlFile);
@@ -477,6 +485,9 @@ class InAppWebView {
   gulong monitors_changed_handler_id_ = 0;
   gulong configure_event_handler_id_ = 0;
 
+  // Download signal handler ID
+  gulong download_started_handler_id_ = 0;
+
   // Context menu state
   std::unique_ptr<ContextMenuPopup> context_menu_popup_;
   WebKitContextMenu* pending_context_menu_ = nullptr;
@@ -575,6 +586,11 @@ class InAppWebView {
   static gboolean OnRunFileChooser(WebKitWebView* web_view,
                                    WebKitFileChooserRequest* request,
                                    gpointer user_data);
+
+  // === Download Signals ===
+  static void OnDownloadStarted(WebKitNetworkSession* network_session,
+                                WebKitDownload* download,
+                                gpointer user_data);
 
   // === Input helpers ===
   void SendWpePointerEvent(uint32_t type, double x, double y, uint32_t button);

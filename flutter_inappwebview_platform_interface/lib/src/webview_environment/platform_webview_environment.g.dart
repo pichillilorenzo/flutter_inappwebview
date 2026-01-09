@@ -12,12 +12,16 @@ extension _PlatformWebViewEnvironmentCreationParamsClassSupported
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- Windows WebView2
+  ///- Linux WPE WebKit
   ///
   ///Use the [PlatformWebViewEnvironmentCreationParams.isClassSupported] method to check if this class is supported at runtime.
   ///{@endtemplate}
   static bool isClassSupported({TargetPlatform? platform}) {
     return ((kIsWeb && platform != null) || !kIsWeb) &&
-        [TargetPlatform.windows].contains(platform ?? defaultTargetPlatform);
+        [
+          TargetPlatform.windows,
+          TargetPlatform.linux,
+        ].contains(platform ?? defaultTargetPlatform);
   }
 }
 
@@ -57,12 +61,16 @@ extension _PlatformWebViewEnvironmentClassSupported
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- Windows WebView2
+  ///- Linux WPE WebKit
   ///
   ///Use the [PlatformWebViewEnvironment.isClassSupported] method to check if this class is supported at runtime.
   ///{@endtemplate}
   static bool isClassSupported({TargetPlatform? platform}) {
     return ((kIsWeb && platform != null) || !kIsWeb) &&
-        [TargetPlatform.windows].contains(platform ?? defaultTargetPlatform);
+        [
+          TargetPlatform.windows,
+          TargetPlatform.linux,
+        ].contains(platform ?? defaultTargetPlatform);
   }
 }
 
@@ -198,6 +206,8 @@ enum PlatformWebViewEnvironmentMethod {
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- Windows WebView2 ([Official API - GetAvailableCoreWebView2BrowserVersionString](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2849.39#getavailablecorewebview2browserversionstring))
+  ///- Linux WPE WebKit ([Official API - webkit_get_major_version](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/func.get_major_version.html)):
+  ///    - Returns WPE WebKit version string composed of major.minor.micro versions.
   ///
   ///**Parameters - Officially Supported Platforms/Implementations**:
   ///- [browserExecutableFolder]: all platforms
@@ -269,6 +279,7 @@ extension _PlatformWebViewEnvironmentMethodSupported
         return ((kIsWeb && platform != null) || !kIsWeb) &&
             [
               TargetPlatform.windows,
+              TargetPlatform.linux,
             ].contains(platform ?? defaultTargetPlatform);
       case PlatformWebViewEnvironmentMethod.getFailureReportFolderPath:
         return ((kIsWeb && platform != null) || !kIsWeb) &&

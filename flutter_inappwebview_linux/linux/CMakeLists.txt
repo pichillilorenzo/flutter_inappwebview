@@ -117,7 +117,9 @@ message(STATUS "flutter_inappwebview_linux: nlohmann/json ${NLOHMANN_JSON_VERSIO
 list(APPEND PLUGIN_SOURCES
   "flutter_inappwebview_linux_plugin.cc"
   "cookie_manager.cc"
+  "proxy_manager.cc"
   "web_storage_manager.cc"
+  "webview_environment.cc"
   "find_interaction/find_interaction_controller.cc"
   "find_interaction/find_interaction_channel_delegate.cc"
   "headless_in_app_webview/headless_in_app_webview.cc"

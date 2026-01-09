@@ -169,22 +169,9 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController
             webviewParams!.shouldOverrideUrlLoading != null) {
           Map<String, dynamic> arguments = call.arguments
               .cast<String, dynamic>();
-
-          // Build NavigationAction from arguments
-          Map<String, dynamic>? requestMap = arguments["request"]
-              ?.cast<String, dynamic>();
-          WebUri? url;
-          if (requestMap != null && requestMap["url"] != null) {
-            url = WebUri(requestMap["url"]);
-          }
-
-          NavigationAction navigationAction = NavigationAction(
-            request: URLRequest(url: url),
-            isForMainFrame: arguments["isForMainFrame"] ?? true,
-            navigationType: NavigationType.fromNativeValue(
-              arguments["navigationType"] ?? 0,
-            ),
-          );
+          NavigationAction navigationAction = NavigationAction.fromMap(
+            arguments,
+          )!;
 
           NavigationActionPolicy? result =
               await webviewParams!.shouldOverrideUrlLoading!(
@@ -217,12 +204,7 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController
         if (webviewParams != null && webviewParams!.onLoadResource != null) {
           Map<String, dynamic> arguments = call.arguments
               .cast<String, dynamic>();
-          LoadedResource resource = LoadedResource(
-            url: arguments["url"] != null ? WebUri(arguments["url"]) : null,
-            initiatorType: arguments["initiatorType"],
-            startTime: arguments["startTime"]?.toDouble(),
-            duration: arguments["duration"]?.toDouble(),
-          );
+          LoadedResource resource = LoadedResource.fromMap(arguments)!;
           webviewParams!.onLoadResource!(_controllerFromPlatform, resource);
         }
         break;
@@ -418,6 +400,34 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController
           return response?.toMap();
         }
         return null;
+      case "onDownloadStarting":
+        if (webviewParams != null &&
+            (webviewParams!.onDownloadStart != null ||
+                webviewParams!.onDownloadStartRequest != null ||
+                webviewParams!.onDownloadStarting != null)) {
+          Map<String, dynamic> arguments = call.arguments
+              .cast<String, dynamic>();
+          DownloadStartRequest downloadStartRequest =
+              DownloadStartRequest.fromMap(arguments)!;
+
+          if (webviewParams!.onDownloadStarting != null) {
+            return (await webviewParams!.onDownloadStarting!(
+              _controllerFromPlatform,
+              downloadStartRequest,
+            ))?.toMap();
+          } else if (webviewParams!.onDownloadStartRequest != null) {
+            webviewParams!.onDownloadStartRequest!(
+              _controllerFromPlatform,
+              downloadStartRequest,
+            );
+          } else {
+            webviewParams!.onDownloadStart!(
+              _controllerFromPlatform,
+              downloadStartRequest.url,
+            );
+          }
+        }
+        return null;
       case "onEnterFullscreen":
         if (webviewParams != null && webviewParams!.onEnterFullscreen != null) {
           webviewParams!.onEnterFullscreen!(_controllerFromPlatform);
@@ -448,32 +458,8 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController
         if (contextMenu != null && contextMenu.onCreateContextMenu != null) {
           Map<String, dynamic> arguments = call.arguments
               .cast<String, dynamic>();
-          String typeStr = arguments["type"] ?? "UNKNOWN_TYPE";
-          String extra = arguments["extra"] ?? "";
-
-          // Map type string to InAppWebViewHitTestResultType
-          InAppWebViewHitTestResultType type;
-          switch (typeStr) {
-            case "SRC_ANCHOR_TYPE":
-              type = InAppWebViewHitTestResultType.SRC_ANCHOR_TYPE;
-              break;
-            case "IMAGE_TYPE":
-              type = InAppWebViewHitTestResultType.IMAGE_TYPE;
-              break;
-            case "SRC_IMAGE_ANCHOR_TYPE":
-              type = InAppWebViewHitTestResultType.SRC_IMAGE_ANCHOR_TYPE;
-              break;
-            case "EDIT_TEXT_TYPE":
-              type = InAppWebViewHitTestResultType.EDIT_TEXT_TYPE;
-              break;
-            default:
-              type = InAppWebViewHitTestResultType.UNKNOWN_TYPE;
-          }
-
-          InAppWebViewHitTestResult hitTestResult = InAppWebViewHitTestResult(
-            type: type,
-            extra: extra.isNotEmpty ? extra : null,
-          );
+          InAppWebViewHitTestResult hitTestResult =
+              InAppWebViewHitTestResult.fromMap(arguments)!;
           contextMenu.onCreateContextMenu!(hitTestResult);
         }
         break;
@@ -783,6 +769,17 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController
   }
 
   @override
+  Future<void> postUrl({
+    required WebUri url,
+    required Uint8List postData,
+  }) async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    args.putIfAbsent('url', () => url.toString());
+    args.putIfAbsent('postData', () => postData);
+    await channel?.invokeMethod('postUrl', args);
+  }
+
+  @override
   Future<void> reload() async {
     Map<String, dynamic> args = <String, dynamic>{};
     await channel?.invokeMethod('reload', args);
@@ -860,6 +857,45 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController
       } catch (e) {}
     }
     return result;
+  }
+
+  @override
+  Future<CallAsyncJavaScriptResult?> callAsyncJavaScript({
+    required String functionBody,
+    Map<String, dynamic> arguments = const <String, dynamic>{},
+    ContentWorld? contentWorld,
+  }) async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    args.putIfAbsent('functionBody', () => functionBody);
+    // JSON encode arguments to handle complex types (arrays, nested objects)
+    // that WPE WebKit's GVariant a{sv} format doesn't support directly
+    args.putIfAbsent('arguments', () => jsonEncode(arguments));
+    args.putIfAbsent('argumentKeys', () => arguments.keys.toList());
+    if (contentWorld != null) {
+      args.putIfAbsent('contentWorld', () => contentWorld.toMap());
+    }
+
+    // Native returns a JSON string: {"value": ..., "error": ...}
+    String? jsonResult = await channel?.invokeMethod<String?>(
+      'callAsyncJavaScript',
+      args,
+    );
+
+    if (jsonResult != null) {
+      try {
+        Map<String, dynamic> result = jsonDecode(jsonResult);
+        return CallAsyncJavaScriptResult(
+          value: result['value'],
+          error: result['error'],
+        );
+      } catch (e) {
+        return CallAsyncJavaScriptResult(
+          value: null,
+          error: 'Failed to decode result: $e',
+        );
+      }
+    }
+    return null;
   }
 
   @override

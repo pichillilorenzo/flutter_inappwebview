@@ -768,6 +768,7 @@ class InAppWebViewSettings {
   ///- iOS WKWebView
   ///- macOS WKWebView
   ///- Windows WebView2 ([Official API - ICoreWebView2ControllerOptions.put_IsInPrivateModeEnabled](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2controlleroptions?view=webview2-1.0.2792.45#put_isinprivatemodeenabled))
+  ///- Linux WPE WebKit ([Official API - webkit_network_session_new_ephemeral](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/ctor.NetworkSession.new_ephemeral.html))
   bool? incognito;
 
   ///Sets the initial scale for this WebView. 0 means default. The behavior for the default scale depends on the state of [useWideViewPort] and [loadWithOverviewMode].
@@ -3533,6 +3534,7 @@ enum InAppWebViewSettingsProperty {
   ///- iOS WKWebView
   ///- macOS WKWebView
   ///- Windows WebView2 ([Official API - ICoreWebView2ControllerOptions.put_IsInPrivateModeEnabled](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2controlleroptions?view=webview2-1.0.2792.45#put_isinprivatemodeenabled))
+  ///- Linux WPE WebKit ([Official API - webkit_network_session_new_ephemeral](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/ctor.NetworkSession.new_ephemeral.html))
   ///
   ///Use the [InAppWebViewSettings.isPropertySupported] method to check if this property is supported at runtime.
   ///{@endtemplate}
@@ -5044,6 +5046,7 @@ extension _InAppWebViewSettingsPropertySupported on InAppWebViewSettings {
               TargetPlatform.iOS,
               TargetPlatform.macOS,
               TargetPlatform.windows,
+              TargetPlatform.linux,
             ].contains(platform ?? defaultTargetPlatform);
       case InAppWebViewSettingsProperty.initialScale:
         return ((kIsWeb && platform != null) || !kIsWeb) &&

@@ -42,6 +42,13 @@ InAppWebViewSettings::InAppWebViewSettings(FlValue* map) : InAppWebViewSettings(
   useOnDownloadStart = get_fl_map_value(map, "useOnDownloadStart", useOnDownloadStart);
   useShouldInterceptRequest =
       get_fl_map_value(map, "useShouldInterceptRequest", useShouldInterceptRequest);
+  useShouldInterceptAjaxRequest =
+      get_fl_map_value(map, "useShouldInterceptAjaxRequest", useShouldInterceptAjaxRequest);
+  useOnAjaxReadyStateChange =
+      get_fl_map_value(map, "useOnAjaxReadyStateChange", useOnAjaxReadyStateChange);
+  useOnAjaxProgress = get_fl_map_value(map, "useOnAjaxProgress", useOnAjaxProgress);
+  useShouldInterceptFetchRequest =
+      get_fl_map_value(map, "useShouldInterceptFetchRequest", useShouldInterceptFetchRequest);
 
   // === WebKit settings ===
   userAgent = get_fl_map_value(map, "userAgent", userAgent);
@@ -144,6 +151,9 @@ InAppWebViewSettings::InAppWebViewSettings(FlValue* map) : InAppWebViewSettings(
     resourceCustomSchemes =
         get_fl_map_value<std::vector<std::string>>(map, "resourceCustomSchemes", {});
   }
+
+  // === Incognito mode ===
+  incognito = get_fl_map_value(map, "incognito", incognito);
 }
 
 void InAppWebViewSettings::applyToWebView(WebKitWebView* webview) const {
@@ -263,6 +273,13 @@ FlValue* InAppWebViewSettings::toFlValue() const {
   fl_value_set_string_take(map, "useOnDownloadStart", fl_value_new_bool(useOnDownloadStart));
   fl_value_set_string_take(map, "useShouldInterceptRequest",
                            fl_value_new_bool(useShouldInterceptRequest));
+  fl_value_set_string_take(map, "useShouldInterceptAjaxRequest",
+                           fl_value_new_bool(useShouldInterceptAjaxRequest));
+  fl_value_set_string_take(map, "useOnAjaxReadyStateChange",
+                           fl_value_new_bool(useOnAjaxReadyStateChange));
+  fl_value_set_string_take(map, "useOnAjaxProgress", fl_value_new_bool(useOnAjaxProgress));
+  fl_value_set_string_take(map, "useShouldInterceptFetchRequest",
+                           fl_value_new_bool(useShouldInterceptFetchRequest));
 
   // === WebKit settings ===
   fl_value_set_string_take(map, "userAgent", fl_value_new_string(userAgent.c_str()));
@@ -346,6 +363,9 @@ FlValue* InAppWebViewSettings::toFlValue() const {
 
   // === Scroll settings ===
   fl_value_set_string_take(map, "scrollMultiplier", fl_value_new_int(scrollMultiplier));
+
+  // === Incognito mode ===
+  fl_value_set_string_take(map, "incognito", fl_value_new_bool(incognito));
 
   return map;
 }

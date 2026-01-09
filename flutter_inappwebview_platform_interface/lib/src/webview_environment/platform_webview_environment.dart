@@ -18,7 +18,7 @@ part 'platform_webview_environment.g.dart';
 ///
 /// Platform specific implementations can add additional fields by extending
 /// this class.
-@SupportedPlatforms(platforms: [WindowsPlatform()])
+@SupportedPlatforms(platforms: [WindowsPlatform(), LinuxPlatform()])
 @immutable
 class PlatformWebViewEnvironmentCreationParams {
   /// Used by the platform implementation to create a new [PlatformWebViewEnvironment].
@@ -57,7 +57,7 @@ class PlatformWebViewEnvironmentCreationParams {
 ///Use [dispose] when not needed anymore to release references.
 ///
 ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewEnvironment.supported_platforms}
-@SupportedPlatforms(platforms: [WindowsPlatform()])
+@SupportedPlatforms(platforms: [WindowsPlatform(), LinuxPlatform()])
 abstract class PlatformWebViewEnvironment extends PlatformInterface
     implements Disposable {
   ///Debug settings used by [PlatformWebViewEnvironment].
@@ -231,6 +231,13 @@ abstract class PlatformWebViewEnvironment extends PlatformInterface
         apiName: 'GetAvailableCoreWebView2BrowserVersionString',
         apiUrl:
             'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2849.39#getavailablecorewebview2browserversionstring',
+      ),
+      LinuxPlatform(
+        apiName: 'webkit_get_major_version',
+        apiUrl:
+            'https://wpewebkit.org/reference/stable/wpe-webkit-2.0/func.get_major_version.html',
+        note:
+            'Returns WPE WebKit version string composed of major.minor.micro versions.',
       ),
     ],
   )

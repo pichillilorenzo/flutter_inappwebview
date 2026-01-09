@@ -16,6 +16,7 @@
 #include "../types/custom_scheme_response.h"
 #include "../types/download_start_request.h"
 #include "../types/download_start_response.h"
+#include "../types/hit_test_result.h"
 #include "../types/http_auth_response.h"
 #include "../types/http_authentication_challenge.h"
 #include "../types/javascript_handler_function_data.h"
@@ -274,7 +275,7 @@ class WebViewChannelDelegate : public ChannelDelegate {
       std::unique_ptr<LoadResourceWithCustomSchemeCallback> callback) const;
 
   // Context menu callbacks
-  void onCreateContextMenu(const std::string& hitTestResultType, const std::string& extra) const;
+  void onCreateContextMenu(const HitTestResult& hitTestResult) const;
   void onHideContextMenu() const;
   void onContextMenuActionItemClicked(const std::string& id, const std::string& title) const;
 

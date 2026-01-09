@@ -416,6 +416,11 @@ because there isn't any way to make the website data store non-persistent for th
         apiUrl:
             "https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2controlleroptions?view=webview2-1.0.2792.45#put_isinprivatemodeenabled",
       ),
+      LinuxPlatform(
+        apiName: "webkit_network_session_new_ephemeral",
+        apiUrl:
+            "https://wpewebkit.org/reference/stable/wpe-webkit-2.0/ctor.NetworkSession.new_ephemeral.html",
+      ),
     ],
   )
   bool? incognito;

@@ -986,6 +986,10 @@ In that case, after the `window.addEventListener("flutterInAppWebViewPlatformRea
       ),
       IOSPlatform(),
       MacOSPlatform(),
+      LinuxPlatform(
+        note:
+            'This event is implemented using JavaScript. In order to be able to listen to this event, check the [InAppWebViewSettings.useShouldInterceptAjaxRequest] setting documentation.',
+      ),
     ],
   )
   final FutureOr<AjaxRequest?> Function(T controller, AjaxRequest ajaxRequest)?
@@ -1017,6 +1021,10 @@ In that case, after the `window.addEventListener("flutterInAppWebViewPlatformRea
       ),
       IOSPlatform(),
       MacOSPlatform(),
+      LinuxPlatform(
+        note:
+            'This event is implemented using JavaScript. In order to be able to listen to this event, check the [InAppWebViewSettings.useShouldInterceptAjaxRequest] and [InAppWebViewSettings.useOnAjaxReadyStateChange] settings documentation.',
+      ),
     ],
   )
   final FutureOr<AjaxRequestAction?> Function(
@@ -1046,6 +1054,10 @@ In that case, after the `window.addEventListener("flutterInAppWebViewPlatformRea
       ),
       IOSPlatform(),
       MacOSPlatform(),
+      LinuxPlatform(
+        note:
+            'This event is implemented using JavaScript. In order to be able to listen to this event, check the [InAppWebViewSettings.useShouldInterceptAjaxRequest] and [InAppWebViewSettings.useOnAjaxProgress] settings documentation.',
+      ),
     ],
   )
   final FutureOr<AjaxRequestAction?> Function(
@@ -1075,6 +1087,10 @@ In that case, after the `window.addEventListener("flutterInAppWebViewPlatformRea
       ),
       IOSPlatform(),
       MacOSPlatform(),
+      LinuxPlatform(
+        note:
+            'This event is implemented using JavaScript. In order to be able to listen to this event, check the [InAppWebViewSettings.useShouldInterceptFetchRequest] setting documentation.',
+      ),
     ],
   )
   final FutureOr<FetchRequest?> Function(

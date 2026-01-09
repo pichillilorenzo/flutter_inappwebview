@@ -9,12 +9,28 @@ part 'proxy_rule.g.dart';
 @ExchangeableObject()
 class ProxyRule_ {
   ///Represents the scheme filter.
-  @SupportedPlatforms(platforms: [AndroidPlatform()])
+  @SupportedPlatforms(
+    platforms: [
+      AndroidPlatform(),
+      LinuxPlatform(
+        apiName: 'webkit_network_proxy_settings_add_proxy_for_scheme',
+        apiUrl:
+            'https://wpewebkit.org/reference/stable/wpe-webkit-2.0/method.NetworkProxySettings.add_proxy_for_scheme.html',
+        note:
+            "Linux accepts scheme filters: '*', 'http', 'https', 'socks', 'socks4', 'socks5' (case-insensitive). '*' is treated as the default proxy.",
+      ),
+    ],
+  )
   ProxySchemeFilter_? schemeFilter;
 
   ///Represents the proxy URL.
   @SupportedPlatforms(
-    platforms: [AndroidPlatform(), IOSPlatform(), MacOSPlatform()],
+    platforms: [
+      AndroidPlatform(),
+      IOSPlatform(),
+      MacOSPlatform(),
+      LinuxPlatform(),
+    ],
   )
   String url;
 

@@ -21,11 +21,14 @@ class DownloadStartResponseAction {
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- Windows WebView2
+  ///- Linux WPE WebKit
   static final CANCEL = DownloadStartResponseAction._internalMultiPlatform(
     0,
     () {
       switch (defaultTargetPlatform) {
         case TargetPlatform.windows:
+          return 0;
+        case TargetPlatform.linux:
           return 0;
         default:
           break;

@@ -5,8 +5,10 @@ import 'find_interaction/find_interaction_controller.dart';
 import 'in_app_webview/in_app_webview.dart';
 import 'in_app_webview/in_app_webview_controller.dart';
 import 'in_app_webview/headless_in_app_webview.dart';
+import 'proxy_controller/proxy_controller.dart';
 import 'web_message/web_message_listener.dart';
 import 'web_storage/web_storage_manager.dart';
+import 'webview_environment/webview_environment.dart';
 
 /// Implementation of [InAppWebViewPlatform] using WPE WebKit.
 class LinuxInAppWebViewPlatform extends InAppWebViewPlatform {
@@ -69,6 +71,20 @@ class LinuxInAppWebViewPlatform extends InAppWebViewPlatform {
     return LinuxCookieManager(params);
   }
 
+  /// Creates a new empty [PlatformWebViewEnvironment] to access static methods.
+  @override
+  PlatformWebViewEnvironment createPlatformWebViewEnvironmentStatic() {
+    return LinuxWebViewEnvironment.static();
+  }
+
+  /// Creates a new [LinuxWebViewEnvironment].
+  @override
+  LinuxWebViewEnvironment createPlatformWebViewEnvironment(
+    PlatformWebViewEnvironmentCreationParams params,
+  ) {
+    return LinuxWebViewEnvironment(params);
+  }
+
   // ************************************************************************ //
   // Create static instances of unsupported classes to be able to call        //
   // isClassSupported, isMethodSupported, isPropertySupported, etc.           //
@@ -118,7 +134,15 @@ class LinuxInAppWebViewPlatform extends InAppWebViewPlatform {
   /// Creates a new empty [PlatformProxyController] to access static methods.
   @override
   PlatformProxyController createPlatformProxyControllerStatic() {
-    return _PlatformProxyController.static();
+    return LinuxProxyController.static();
+  }
+
+  /// Creates a new [LinuxProxyController].
+  @override
+  LinuxProxyController createPlatformProxyController(
+    PlatformProxyControllerCreationParams params,
+  ) {
+    return LinuxProxyController(params);
   }
 
   /// Creates a new empty [PlatformServiceWorkerController] to access static methods.
@@ -245,15 +269,6 @@ class _PlatformProcessGlobalConfig extends PlatformProcessGlobalConfig {
           const PlatformProcessGlobalConfigCreationParams());
 
   factory _PlatformProcessGlobalConfig.static() => _staticValue;
-}
-
-class _PlatformProxyController extends PlatformProxyController {
-  _PlatformProxyController(PlatformProxyControllerCreationParams params)
-      : super.implementation(params);
-  static final _PlatformProxyController _staticValue =
-      _PlatformProxyController(const PlatformProxyControllerCreationParams());
-
-  factory _PlatformProxyController.static() => _staticValue;
 }
 
 class _PlatformServiceWorkerController extends PlatformServiceWorkerController {

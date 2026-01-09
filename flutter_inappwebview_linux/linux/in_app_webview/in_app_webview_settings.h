@@ -26,6 +26,10 @@ class InAppWebViewSettings {
   bool useOnLoadResource = false;
   bool useOnDownloadStart = false;
   bool useShouldInterceptRequest = false;
+  bool useShouldInterceptAjaxRequest = false;
+  bool useOnAjaxReadyStateChange = false;
+  bool useOnAjaxProgress = false;
+  bool useShouldInterceptFetchRequest = false;
 
   // === WebKit settings ===
   std::string userAgent;
@@ -100,6 +104,10 @@ class InAppWebViewSettings {
 
   // === Custom Scheme Handler settings ===
   std::vector<std::string> resourceCustomSchemes;
+
+  // === Incognito mode ===
+  // When true, creates an ephemeral network session (no persistent storage)
+  bool incognito = false;
 
   InAppWebViewSettings();
   explicit InAppWebViewSettings(FlValue* map);

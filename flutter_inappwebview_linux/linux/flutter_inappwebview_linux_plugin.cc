@@ -12,7 +12,9 @@
 #include "cookie_manager.h"
 #include "headless_in_app_webview/headless_in_app_webview_manager.h"
 #include "in_app_webview/in_app_webview_manager.h"
+#include "proxy_manager.h"
 #include "web_storage_manager.h"
+#include "webview_environment.h"
 
 #define FLUTTER_INAPPWEBVIEW_LINUX_PLUGIN(obj)                                     \
   (G_TYPE_CHECK_INSTANCE_CAST((obj), flutter_inappwebview_linux_plugin_get_type(), \
@@ -24,7 +26,9 @@ struct _FlutterInappwebviewLinuxPlugin {
   std::unique_ptr<flutter_inappwebview_plugin::InAppWebViewManager> in_app_webview_manager;
   std::unique_ptr<flutter_inappwebview_plugin::HeadlessInAppWebViewManager> headless_in_app_webview_manager;
   std::unique_ptr<flutter_inappwebview_plugin::CookieManager> cookie_manager;
+  std::unique_ptr<flutter_inappwebview_plugin::ProxyManager> proxy_manager;
   std::unique_ptr<flutter_inappwebview_plugin::WebStorageManager> web_storage_manager;
+  std::unique_ptr<flutter_inappwebview_plugin::WebViewEnvironment> webview_environment;
 };
 
 G_DEFINE_TYPE(FlutterInappwebviewLinuxPlugin, flutter_inappwebview_linux_plugin,
@@ -37,7 +41,9 @@ static void flutter_inappwebview_linux_plugin_dispose(GObject* object) {
   self->in_app_webview_manager.reset();
   self->headless_in_app_webview_manager.reset();
   self->cookie_manager.reset();
+  self->proxy_manager.reset();
   self->web_storage_manager.reset();
+  self->webview_environment.reset();
 
   G_OBJECT_CLASS(flutter_inappwebview_linux_plugin_parent_class)->dispose(object);
 }
@@ -69,8 +75,14 @@ void flutter_inappwebview_linux_plugin_register_with_registrar(FlPluginRegistrar
   // Create the CookieManager
   plugin->cookie_manager = std::make_unique<flutter_inappwebview_plugin::CookieManager>(registrar);
 
+  // Create the ProxyManager
+  plugin->proxy_manager = std::make_unique<flutter_inappwebview_plugin::ProxyManager>(registrar);
+
   // Create the WebStorageManager
   plugin->web_storage_manager = std::make_unique<flutter_inappwebview_plugin::WebStorageManager>(registrar);
+
+  // Create the WebViewEnvironment
+  plugin->webview_environment = std::make_unique<flutter_inappwebview_plugin::WebViewEnvironment>(registrar);
 
   // Note: We don't unref the plugin here as it needs to stay alive
   // for the lifetime of the application

@@ -253,6 +253,17 @@ void WebViewChannelDelegate::HandleMethodCall(FlMethodCall* method_call) {
     return;
   }
 
+  if (string_equals(methodName, "postUrl")) {
+    std::string url = get_fl_map_value<std::string>(args, "url", "");
+    auto postData = get_optional_fl_map_value<std::vector<uint8_t>>(args, "postData");
+    if (!url.empty() && postData.has_value()) {
+      webView->postUrl(url, postData.value());
+    }
+    g_autoptr(FlValue) result = fl_value_new_bool(true);
+    fl_method_call_respond_success(method_call, result, nullptr);
+    return;
+  }
+
   if (string_equals(methodName, "reload")) {
     webView->reload();
     g_autoptr(FlValue) result = fl_value_new_bool(true);
@@ -374,11 +385,21 @@ void WebViewChannelDelegate::HandleMethodCall(FlMethodCall* method_call) {
   if (string_equals(methodName, "evaluateJavascript")) {
     std::string source = get_fl_map_value<std::string>(args, "source", "");
     if (!source.empty()) {
+      // Extract contentWorld if provided
+      FlValue* contentWorld = fl_value_lookup_string(args, "contentWorld");
+      std::optional<std::string> worldName = std::nullopt;
+      if (contentWorld != nullptr && fl_value_get_type(contentWorld) == FL_VALUE_TYPE_MAP) {
+        FlValue* name = fl_value_lookup_string(contentWorld, "name");
+        if (name != nullptr && fl_value_get_type(name) == FL_VALUE_TYPE_STRING) {
+          worldName = fl_value_get_string(name);
+        }
+      }
+
       // Capture method_call for async callback
       g_object_ref(method_call);
 
       webView->evaluateJavascript(
-          source, [method_call](const std::optional<std::string>& result) {
+          source, worldName, [method_call](const std::optional<std::string>& result) {
             if (result.has_value()) {
               g_autoptr(FlValue) val = fl_value_new_string(result->c_str());
               fl_method_call_respond_success(method_call, val, nullptr);
@@ -390,6 +411,36 @@ void WebViewChannelDelegate::HandleMethodCall(FlMethodCall* method_call) {
       return;
     }
     fl_method_call_respond_success(method_call, nullptr, nullptr);
+    return;
+  }
+
+  if (string_equals(methodName, "callAsyncJavaScript")) {
+    std::string functionBody = get_fl_map_value<std::string>(args, "functionBody", "");
+    // Arguments are now passed as a JSON-encoded string from Dart
+    std::string argumentsJson = get_fl_map_value<std::string>(args, "arguments", "{}");
+    // Get the list of argument keys for destructuring
+    std::vector<std::string> argumentKeys = get_fl_map_value<std::vector<std::string>>(args, "argumentKeys", {});
+    FlValue* contentWorld = fl_value_lookup_string(args, "contentWorld");
+
+    std::optional<std::string> worldName = std::nullopt;
+    if (contentWorld != nullptr && fl_value_get_type(contentWorld) == FL_VALUE_TYPE_MAP) {
+      FlValue* name = fl_value_lookup_string(contentWorld, "name");
+      if (name != nullptr && fl_value_get_type(name) == FL_VALUE_TYPE_STRING) {
+        worldName = fl_value_get_string(name);
+      }
+    }
+
+    // Keep method call alive for async response
+    g_object_ref(method_call);
+
+    webView->callAsyncJavaScript(
+        functionBody, argumentsJson, argumentKeys, worldName,
+        [method_call](const std::string& jsonResult) {
+          // Return the JSON string directly - Dart side will decode it
+          g_autoptr(FlValue) result = fl_value_new_string(jsonResult.c_str());
+          fl_method_call_respond_success(method_call, result, nullptr);
+          g_object_unref(method_call);
+        });
     return;
   }
 
@@ -1676,15 +1727,12 @@ void WebViewChannelDelegate::onShowFileChooser(
       callbackData);
 }
 
-void WebViewChannelDelegate::onCreateContextMenu(const std::string& hitTestResultType,
-                                                 const std::string& extra) const {
+void WebViewChannelDelegate::onCreateContextMenu(const HitTestResult& hitTestResult) const {
   if (!channel_) {
     return;
   }
 
-  g_autoptr(FlValue) args =
-      to_fl_map({{"type", make_fl_value(hitTestResultType)}, {"extra", make_fl_value(extra)}});
-
+  g_autoptr(FlValue) args = hitTestResult.toFlValue();
   invokeMethod("onCreateContextMenu", args);
 }
 

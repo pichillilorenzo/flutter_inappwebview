@@ -43,6 +43,8 @@ class ProxyRule {
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- Android WebView
+  ///- Linux WPE WebKit ([Official API - webkit_network_proxy_settings_add_proxy_for_scheme](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/method.NetworkProxySettings.add_proxy_for_scheme.html)):
+  ///    - Linux accepts scheme filters: '*', 'http', 'https', 'socks', 'socks4', 'socks5' (case-insensitive). '*' is treated as the default proxy.
   ProxySchemeFilter? schemeFilter;
 
   ///Represents the proxy URL.
@@ -51,6 +53,7 @@ class ProxyRule {
   ///- Android WebView
   ///- iOS WKWebView
   ///- macOS WKWebView
+  ///- Linux WPE WebKit
   String url;
 
   ///Sets a username to use as authentication for a proxy configuration.

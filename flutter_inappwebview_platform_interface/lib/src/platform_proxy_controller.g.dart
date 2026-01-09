@@ -16,6 +16,7 @@ part of 'platform_proxy_controller.dart';
 ///- Android WebView ([Official API - ProxyConfig](https://developer.android.com/reference/androidx/webkit/ProxyConfig))
 ///- iOS WKWebView 17.0+ ([Official API - ProxyConfiguration](https://developer.apple.com/documentation/network/proxyconfiguration))
 ///- macOS WKWebView 14.0+ ([Official API - ProxyConfiguration](https://developer.apple.com/documentation/network/proxyconfiguration))
+///- Linux WPE WebKit ([Official API - WebKitNetworkProxySettings](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/struct.NetworkProxySettings.html))
 class ProxySettings {
   ///List of bypass rules.
   ///
@@ -25,6 +26,8 @@ class ProxySettings {
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- Android WebView
+  ///- Linux WPE WebKit ([Official API - webkit_network_proxy_settings_new (ignore_hosts)](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/ctor.NetworkProxySettings.new.html)):
+  ///    - Mapped to ignore_hosts; bypass rules are passed as host patterns to WebKitNetworkProxySettings.
   List<String> bypassRules;
 
   ///Hostnames without a period in them (and that are not IP literals) will skip proxy settings and be connected to directly instead. Examples: `"abc"`, `"local"`, `"some-domain"`.
@@ -56,6 +59,7 @@ class ProxySettings {
   ///- Android WebView
   ///- iOS WKWebView
   ///- macOS WKWebView
+  ///- Linux WPE WebKit
   List<ProxyRule> proxyRules;
 
   ///By default, certain hostnames implicitly bypass the proxy if they are link-local IPs, or localhost addresses.
@@ -91,6 +95,7 @@ class ProxySettings {
   ///- Android WebView ([Official API - ProxyConfig](https://developer.android.com/reference/androidx/webkit/ProxyConfig))
   ///- iOS WKWebView 17.0+ ([Official API - ProxyConfiguration](https://developer.apple.com/documentation/network/proxyconfiguration))
   ///- macOS WKWebView 14.0+ ([Official API - ProxyConfiguration](https://developer.apple.com/documentation/network/proxyconfiguration))
+  ///- Linux WPE WebKit ([Official API - WebKitNetworkProxySettings](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/struct.NetworkProxySettings.html))
   ProxySettings({
     this.bypassRules = const [],
     this.bypassSimpleHostnames,
@@ -195,6 +200,7 @@ extension _PlatformProxyControllerCreationParamsClassSupported
   ///- Android WebView
   ///- iOS WKWebView
   ///- macOS WKWebView
+  ///- Linux WPE WebKit
   ///
   ///Use the [PlatformProxyControllerCreationParams.isClassSupported] method to check if this class is supported at runtime.
   ///{@endtemplate}
@@ -204,6 +210,7 @@ extension _PlatformProxyControllerCreationParamsClassSupported
           TargetPlatform.android,
           TargetPlatform.iOS,
           TargetPlatform.macOS,
+          TargetPlatform.linux,
         ].contains(platform ?? defaultTargetPlatform);
   }
 }
@@ -215,6 +222,7 @@ extension _PlatformProxyControllerClassSupported on PlatformProxyController {
   ///- Android WebView ([Official API - ProxyController](https://developer.android.com/reference/androidx/webkit/ProxyController))
   ///- iOS WKWebView 17.0+ ([Official API - WKWebsiteDataStore.proxyConfigurations](https://developer.apple.com/documentation/webkit/wkwebsitedatastore/4264546-proxyconfigurations))
   ///- macOS WKWebView 14.0+ ([Official API - WKWebsiteDataStore.proxyConfigurations](https://developer.apple.com/documentation/webkit/wkwebsitedatastore/4264546-proxyconfigurations))
+  ///- Linux WPE WebKit ([Official API - WebKitNetworkProxySettings](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/struct.NetworkProxySettings.html))
   ///
   ///Use the [PlatformProxyController.isClassSupported] method to check if this class is supported at runtime.
   ///{@endtemplate}
@@ -224,6 +232,7 @@ extension _PlatformProxyControllerClassSupported on PlatformProxyController {
           TargetPlatform.android,
           TargetPlatform.iOS,
           TargetPlatform.macOS,
+          TargetPlatform.linux,
         ].contains(platform ?? defaultTargetPlatform);
   }
 }
@@ -238,6 +247,7 @@ enum PlatformProxyControllerMethod {
   ///- Android WebView ([Official API - ProxyController.clearProxyOverride](https://developer.android.com/reference/androidx/webkit/ProxyController#clearProxyOverride(java.util.concurrent.Executor,%20java.lang.Runnable)))
   ///- iOS WKWebView 17.0+ ([Official API - WKWebsiteDataStore.proxyConfigurations](https://developer.apple.com/documentation/webkit/wkwebsitedatastore/4264546-proxyconfigurations))
   ///- macOS WKWebView 14.0+ ([Official API - WKWebsiteDataStore.proxyConfigurations](https://developer.apple.com/documentation/webkit/wkwebsitedatastore/4264546-proxyconfigurations))
+  ///- Linux WPE WebKit ([Official API - webkit_network_session_set_proxy_settings](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/method.NetworkSession.set_proxy_settings.html))
   ///
   ///Use the [PlatformProxyController.isMethodSupported] method to check if this method is supported at runtime.
   ///{@endtemplate}
@@ -251,6 +261,7 @@ enum PlatformProxyControllerMethod {
   ///- Android WebView ([Official API - ProxyController.setProxyOverride](https://developer.android.com/reference/androidx/webkit/ProxyController#setProxyOverride(androidx.webkit.ProxyConfig,%20java.util.concurrent.Executor,%20java.lang.Runnable)))
   ///- iOS WKWebView 17.0+ ([Official API - WKWebsiteDataStore.proxyConfigurations](https://developer.apple.com/documentation/webkit/wkwebsitedatastore/4264546-proxyconfigurations))
   ///- macOS WKWebView 14.0+ ([Official API - WKWebsiteDataStore.proxyConfigurations](https://developer.apple.com/documentation/webkit/wkwebsitedatastore/4264546-proxyconfigurations))
+  ///- Linux WPE WebKit ([Official API - webkit_network_session_set_proxy_settings](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/method.NetworkSession.set_proxy_settings.html))
   ///
   ///**Parameters - Officially Supported Platforms/Implementations**:
   ///- [settings]: all platforms
@@ -272,6 +283,7 @@ extension _PlatformProxyControllerMethodSupported on PlatformProxyController {
               TargetPlatform.android,
               TargetPlatform.iOS,
               TargetPlatform.macOS,
+              TargetPlatform.linux,
             ].contains(platform ?? defaultTargetPlatform);
       case PlatformProxyControllerMethod.setProxyOverride:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
@@ -279,6 +291,7 @@ extension _PlatformProxyControllerMethodSupported on PlatformProxyController {
               TargetPlatform.android,
               TargetPlatform.iOS,
               TargetPlatform.macOS,
+              TargetPlatform.linux,
             ].contains(platform ?? defaultTargetPlatform);
     }
   }
@@ -291,6 +304,7 @@ extension _ProxySettingsClassSupported on ProxySettings {
   ///- Android WebView ([Official API - ProxyConfig](https://developer.android.com/reference/androidx/webkit/ProxyConfig))
   ///- iOS WKWebView 17.0+ ([Official API - ProxyConfiguration](https://developer.apple.com/documentation/network/proxyconfiguration))
   ///- macOS WKWebView 14.0+ ([Official API - ProxyConfiguration](https://developer.apple.com/documentation/network/proxyconfiguration))
+  ///- Linux WPE WebKit ([Official API - WebKitNetworkProxySettings](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/struct.NetworkProxySettings.html))
   ///
   ///Use the [ProxySettings.isClassSupported] method to check if this class is supported at runtime.
   ///{@endtemplate}
@@ -300,6 +314,7 @@ extension _ProxySettingsClassSupported on ProxySettings {
           TargetPlatform.android,
           TargetPlatform.iOS,
           TargetPlatform.macOS,
+          TargetPlatform.linux,
         ].contains(platform ?? defaultTargetPlatform);
   }
 }
@@ -312,6 +327,8 @@ enum ProxySettingsProperty {
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- Android WebView
+  ///- Linux WPE WebKit ([Official API - webkit_network_proxy_settings_new (ignore_hosts)](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/ctor.NetworkProxySettings.new.html)):
+  ///    - Mapped to ignore_hosts; bypass rules are passed as host patterns to WebKitNetworkProxySettings.
   ///
   ///Use the [ProxySettings.isPropertySupported] method to check if this property is supported at runtime.
   ///{@endtemplate}
@@ -347,6 +364,7 @@ enum ProxySettingsProperty {
   ///- Android WebView
   ///- iOS WKWebView
   ///- macOS WKWebView
+  ///- Linux WPE WebKit
   ///
   ///Use the [ProxySettings.isPropertySupported] method to check if this property is supported at runtime.
   ///{@endtemplate}
@@ -385,6 +403,7 @@ extension _ProxySettingsPropertySupported on ProxySettings {
         return ((kIsWeb && platform != null) || !kIsWeb) &&
             [
               TargetPlatform.android,
+              TargetPlatform.linux,
             ].contains(platform ?? defaultTargetPlatform);
       case ProxySettingsProperty.bypassSimpleHostnames:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
@@ -402,6 +421,7 @@ extension _ProxySettingsPropertySupported on ProxySettings {
               TargetPlatform.android,
               TargetPlatform.iOS,
               TargetPlatform.macOS,
+              TargetPlatform.linux,
             ].contains(platform ?? defaultTargetPlatform);
       case ProxySettingsProperty.removeImplicitRules:
         return ((kIsWeb && platform != null) || !kIsWeb) &&

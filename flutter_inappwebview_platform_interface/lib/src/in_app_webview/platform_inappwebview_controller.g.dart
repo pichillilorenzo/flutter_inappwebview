@@ -235,6 +235,8 @@ enum PlatformInAppWebViewControllerMethod {
   ///- iOS WKWebView 10.3+ ([Official API - WKWebView.callAsyncJavaScript](https://developer.apple.com/documentation/webkit/wkwebview/3656441-callasyncjavascript))
   ///- macOS WKWebView ([Official API - WKWebView.callAsyncJavaScript](https://developer.apple.com/documentation/webkit/wkwebview/3656441-callasyncjavascript))
   ///- Windows WebView2
+  ///- Linux WPE WebKit 2.40+ ([Official API - webkit_web_view_call_async_javascript_function](https://webkitgtk.org/reference/webkit2gtk/stable/method.WebView.call_async_javascript_function.html)):
+  ///    - Uses WPE WebKit call_async_javascript_function API which handles JavaScript Promises automatically.
   ///
   ///**Parameters - Officially Supported Platforms/Implementations**:
   ///- [functionBody]: all platforms
@@ -1655,6 +1657,8 @@ enum PlatformInAppWebViewControllerMethod {
   ///- Web \<iframe\> but requires same origin:
   ///    - It will try to create an XMLHttpRequest and load the result inside the iframe.
   ///- Windows WebView2
+  ///- Linux WPE WebKit:
+  ///    - Uses JavaScript to create an XMLHttpRequest and load the result.
   ///
   ///**Parameters - Officially Supported Platforms/Implementations**:
   ///- [url]: all platforms
@@ -2466,6 +2470,7 @@ extension _PlatformInAppWebViewControllerMethodSupported
               TargetPlatform.iOS,
               TargetPlatform.macOS,
               TargetPlatform.windows,
+              TargetPlatform.linux,
             ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.callDevToolsProtocolMethod:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
@@ -3196,6 +3201,7 @@ extension _PlatformInAppWebViewControllerMethodSupported
                     TargetPlatform.iOS,
                     TargetPlatform.macOS,
                     TargetPlatform.windows,
+                    TargetPlatform.linux,
                   ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.postWebMessage:
         return ((kIsWeb && platform != null) || !kIsWeb) &&

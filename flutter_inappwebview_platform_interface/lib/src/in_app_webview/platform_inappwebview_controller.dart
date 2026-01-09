@@ -427,6 +427,10 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
             'It will try to create an XMLHttpRequest and load the result inside the iframe.',
       ),
       WindowsPlatform(),
+      LinuxPlatform(
+        note:
+            'Uses JavaScript to create an XMLHttpRequest and load the result.',
+      ),
     ],
   )
   Future<void> postUrl({required WebUri url, required Uint8List postData}) {
@@ -2386,6 +2390,14 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
             'https://developer.apple.com/documentation/webkit/wkwebview/3656441-callasyncjavascript',
       ),
       WindowsPlatform(),
+      LinuxPlatform(
+        apiName: 'webkit_web_view_call_async_javascript_function',
+        apiUrl:
+            'https://webkitgtk.org/reference/webkit2gtk/stable/method.WebView.call_async_javascript_function.html',
+        available: '2.40',
+        note:
+            'Uses WPE WebKit call_async_javascript_function API which handles JavaScript Promises automatically.',
+      ),
     ],
   )
   Future<CallAsyncJavaScriptResult?> callAsyncJavaScript({

@@ -90,6 +90,8 @@ void flutter_inappwebview_linux_plugin_register_with_registrar(FlPluginRegistrar
 
   // Create the WebViewEnvironment
   plugin->webview_environment = std::make_unique<flutter_inappwebview_plugin::WebViewEnvironment>(registrar);
+  // Set the singleton for static access from other managers
+  flutter_inappwebview_plugin::WebViewEnvironment::setInstance(plugin->webview_environment.get());
 
   // Note: We don't unref the plugin here as it needs to stay alive
   // for the lifetime of the application

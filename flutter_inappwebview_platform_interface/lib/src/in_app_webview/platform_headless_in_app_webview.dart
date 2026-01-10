@@ -179,7 +179,16 @@ class PlatformHeadlessInAppWebViewCreationParams
   ///{@endtemplate}
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformHeadlessInAppWebViewCreationParams.webViewEnvironment.supported_platforms}
-  @SupportedPlatforms(platforms: [WindowsPlatform()])
+  @SupportedPlatforms(
+    platforms: [
+      WindowsPlatform(),
+      LinuxPlatform(
+        apiName: 'WebKitWebContext',
+        apiUrl:
+            'https://wpewebkit.org/reference/stable/wpe-webkit-2.0/class.WebContext.html',
+      ),
+    ],
+  )
   final PlatformWebViewEnvironment? webViewEnvironment;
 
   ///{@template flutter_inappwebview_platform_interface.PlatformHeadlessInAppWebViewCreationParams.isClassSupported}

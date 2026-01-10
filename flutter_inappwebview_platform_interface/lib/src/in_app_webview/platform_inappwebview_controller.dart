@@ -2506,6 +2506,9 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
       ),
       IOSPlatform(note: 'This method is implemented using JavaScript.'),
       MacOSPlatform(note: 'This method is implemented using JavaScript.'),
+      LinuxPlatform(
+        note: 'Implemented via JavaScript MessageChannel API.',
+      ),
     ],
   )
   Future<PlatformWebMessageChannel?> createWebMessageChannel() {
@@ -2533,6 +2536,9 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
       ),
       IOSPlatform(note: 'This method is implemented using JavaScript.'),
       MacOSPlatform(note: 'This method is implemented using JavaScript.'),
+      LinuxPlatform(
+        note: 'Implemented via JavaScript MessageChannel API.',
+      ),
     ],
   )
   Future<void> postWebMessage({

@@ -34,6 +34,7 @@
 #include "../plugin_scripts_js/intercept_fetch_request_js.h"
 #include "../plugin_scripts_js/javascript_bridge_js.h"
 #include "../plugin_scripts_js/on_load_resource_js.h"
+#include "../plugin_scripts_js/web_message_channel_js.h"
 #include "../plugin_scripts_js/web_message_listener_js.h"
 #include "../types/create_window_action.h"
 #include "../types/custom_scheme_response.h"
@@ -53,6 +54,7 @@
 #include "user_content_controller.h"
 #include "webview_channel_delegate.h"
 #include "../types/find_session.h"
+#include "../web_message/web_message_channel.h"
 
 using json = nlohmann::json;
 
@@ -285,6 +287,14 @@ InAppWebView::~InAppWebView() {
     download_started_handler_id_ = 0;
   }
 
+  // Clean up WebMessageChannels
+  for (auto& pair : web_message_channels_) {
+    if (pair.second) {
+      pair.second->dispose();
+    }
+  }
+  web_message_channels_.clear();
+
   // IMPORTANT: Clean up user content controller FIRST while webview is still valid
   // The UserContentController destructor needs access to WebKit's user content manager
   // which becomes invalid after we unref the webview
@@ -466,7 +476,30 @@ void InAppWebView::InitWebView(const InAppWebViewCreationParams& params) {
       debugLog("InAppWebView: Creating WebView with ephemeral (incognito) network session");
     }
 
-    if (networkSession != nullptr) {
+    // Check if a custom WebKitWebContext is provided via WebViewEnvironment
+    WebKitWebContext* webContext = params.webContext;
+
+    if (webContext != nullptr) {
+      // Create WebView with custom WebContext using g_object_new
+      // The "web-context" property allows us to use a custom context from WebViewEnvironment
+      // This enables features like spell checking, custom cache settings, etc.
+      debugLog("InAppWebView: Creating WebView with custom WebKitWebContext from WebViewEnvironment");
+      
+      if (networkSession != nullptr) {
+        // Both custom context and ephemeral session (incognito with environment)
+        webview_ = WEBKIT_WEB_VIEW(g_object_new(WEBKIT_TYPE_WEB_VIEW,
+            "backend", backend_,
+            "web-context", webContext,
+            "network-session", networkSession,
+            nullptr));
+      } else {
+        // Custom context only
+        webview_ = WEBKIT_WEB_VIEW(g_object_new(WEBKIT_TYPE_WEB_VIEW,
+            "backend", backend_,
+            "web-context", webContext,
+            nullptr));
+      }
+    } else if (networkSession != nullptr) {
       // Create WebView with custom network session using g_object_new
       // This is required because webkit_web_view_new() doesn't accept a network-session parameter
       webview_ = WEBKIT_WEB_VIEW(g_object_new(WEBKIT_TYPE_WEB_VIEW,
@@ -1611,6 +1644,139 @@ void InAppWebView::addWebMessageListener(const std::string& jsObjectName,
   if (user_content_controller_) {
     user_content_controller_->addUserScript(userScript);
   }
+}
+
+// === Web Message Channel ===
+
+void InAppWebView::createWebMessageChannel(
+    std::function<void(const std::optional<std::string>&)> callback) {
+  if (webview_ == nullptr || messenger_ == nullptr) {
+    if (callback) callback(std::nullopt);
+    return;
+  }
+
+  // Generate a unique channel ID using timestamp and random number
+  static int64_t channel_counter = 0;
+  std::string channelId = std::to_string(g_get_monotonic_time()) + "_" +
+                          std::to_string(++channel_counter);
+
+  // Create the JavaScript to create the MessageChannel
+  std::string js = WebMessageChannelJS::createWebMessageChannelJs(channelId);
+
+  // Capture variables for the callback
+  InAppWebView* self = this;
+  FlBinaryMessenger* messenger = messenger_;
+
+  // Execute JavaScript to create the channel
+  evaluateJavascript(js, std::nullopt, [self, callback, channelId, messenger](const std::optional<std::string>& result) {
+    // If we got a result, the channel was created successfully
+    if (result.has_value()) {
+      // Create and store the WebMessageChannel object
+      auto channel = std::make_unique<WebMessageChannel>(messenger, channelId, self);
+      self->web_message_channels_[channelId] = std::move(channel);
+      
+      callback(channelId);
+    } else {
+      callback(std::nullopt);
+    }
+  });
+}
+
+WebMessageChannel* InAppWebView::getWebMessageChannel(const std::string& channelId) const {
+  auto it = web_message_channels_.find(channelId);
+  if (it != web_message_channels_.end()) {
+    return it->second.get();
+  }
+  return nullptr;
+}
+
+void InAppWebView::postWebMessage(const std::string& messageData,
+                                  const std::string& targetOrigin,
+                                  int64_t messageType) {
+  if (webview_ == nullptr) return;
+
+  // Convert message data to JavaScript expression
+  std::string messageDataJs;
+  if (messageType == 1) {
+    // ArrayBuffer - messageData contains comma-separated byte values
+    messageDataJs = "new Uint8Array([" + messageData + "]).buffer";
+  } else {
+    // String - escape for JavaScript
+    std::string escaped;
+    escaped.reserve(messageData.size() * 2);
+    for (char c : messageData) {
+      switch (c) {
+        case '\\': escaped += "\\\\"; break;
+        case '"': escaped += "\\\""; break;
+        case '\n': escaped += "\\n"; break;
+        case '\r': escaped += "\\r"; break;
+        case '\t': escaped += "\\t"; break;
+        default: escaped += c; break;
+      }
+    }
+    messageDataJs = "\"" + escaped + "\"";
+  }
+
+  // Post message to window (no ports for now - ports are handled via channel)
+  std::string js = WebMessageChannelJS::postWebMessageJs(messageDataJs, targetOrigin, "");
+  evaluateJavascript(js, std::nullopt, nullptr);
+}
+
+void InAppWebView::setWebMessageCallback(const std::string& channelId, int portIndex) {
+  if (webview_ == nullptr || channelId.empty()) return;
+
+  std::string js = WebMessageChannelJS::setWebMessageCallbackJs(channelId, portIndex);
+  evaluateJavascript(js, std::nullopt, nullptr);
+}
+
+void InAppWebView::postWebMessageOnPort(const std::string& channelId, int portIndex,
+                                         const std::string& messageData, int64_t messageType) {
+  if (webview_ == nullptr || channelId.empty()) return;
+
+  // Convert message data to JavaScript expression
+  std::string messageDataJs;
+  if (messageType == 1) {
+    // ArrayBuffer - messageData contains comma-separated byte values
+    messageDataJs = "new Uint8Array([" + messageData + "]).buffer";
+  } else {
+    // String - escape for JavaScript
+    std::string escaped;
+    escaped.reserve(messageData.size() * 2);
+    for (char c : messageData) {
+      switch (c) {
+        case '\\': escaped += "\\\\"; break;
+        case '"': escaped += "\\\""; break;
+        case '\n': escaped += "\\n"; break;
+        case '\r': escaped += "\\r"; break;
+        case '\t': escaped += "\\t"; break;
+        default: escaped += c; break;
+      }
+    }
+    messageDataJs = "\"" + escaped + "\"";
+  }
+
+  std::string js = WebMessageChannelJS::postMessageJs(channelId, portIndex, messageDataJs);
+  evaluateJavascript(js, std::nullopt, nullptr);
+}
+
+void InAppWebView::closeWebMessagePort(const std::string& channelId, int portIndex) {
+  if (webview_ == nullptr || channelId.empty()) return;
+
+  std::string js = WebMessageChannelJS::closePortJs(channelId, portIndex);
+  evaluateJavascript(js, std::nullopt, nullptr);
+}
+
+void InAppWebView::disposeWebMessageChannel(const std::string& channelId) {
+  if (channelId.empty()) return;
+
+  // Execute JavaScript to clean up the channel
+  if (webview_ != nullptr) {
+    std::string js = WebMessageChannelJS::disposeChannelJs(channelId);
+    evaluateJavascript(js, std::nullopt, nullptr);
+  }
+
+  // Remove the channel from our map
+  web_message_channels_.erase(channelId);
 }
 
 // === HTML Content ===
@@ -5011,6 +5177,60 @@ void InAppWebView::handleScriptMessage(const std::string& name, const std::strin
 
   } else if (handlerName == "onFindResultReceived") {
     // TODO: Implement find result handling (matches iOS)
+
+  } else if (handlerName == "onWebMessagePortMessageReceived") {
+    // Handle WebMessageChannel port message
+    // This is called when JavaScript sends a message through a MessagePort
+    std::string webMessageChannelId = "";
+    int portIndex = 0;
+    std::string messageData = "";
+    int64_t messageType = 0;
+
+    if (!argsJsonStr.empty()) {
+      try {
+        json argsJson = json::parse(argsJsonStr);
+        if (argsJson.is_array() && !argsJson.empty()) {
+          json firstArg = argsJson[0];
+          if (firstArg.contains("webMessageChannelId") && firstArg["webMessageChannelId"].is_string()) {
+            webMessageChannelId = firstArg["webMessageChannelId"].get<std::string>();
+          }
+          if (firstArg.contains("index") && firstArg["index"].is_number()) {
+            portIndex = firstArg["index"].get<int>();
+          }
+          if (firstArg.contains("message") && firstArg["message"].is_object()) {
+            json messageObj = firstArg["message"];
+            if (messageObj.contains("type") && messageObj["type"].is_number()) {
+              messageType = messageObj["type"].get<int64_t>();
+            }
+            if (messageObj.contains("data")) {
+              if (messageType == 1 && messageObj["data"].is_array()) {
+                // ArrayBuffer - convert byte array to comma-separated string
+                std::string bytes;
+                for (auto& byte : messageObj["data"]) {
+                  if (!bytes.empty()) bytes += ",";
+                  bytes += std::to_string(byte.get<int>());
+                }
+                messageData = bytes;
+              } else if (messageObj["data"].is_string()) {
+                messageData = messageObj["data"].get<std::string>();
+              } else if (!messageObj["data"].is_null()) {
+                messageData = messageObj["data"].dump();
+              }
+            }
+          }
+        }
+      } catch (const json::parse_error& e) {
+        debugLog("onWebMessagePortMessageReceived: Failed to parse args: " + std::string(e.what()));
+      }
+    }
+
+    // Find the channel and forward the message
+    if (!webMessageChannelId.empty()) {
+      WebMessageChannel* channel = targetWebView->getWebMessageChannel(webMessageChannelId);
+      if (channel != nullptr) {
+        channel->onMessage(portIndex, messageData.empty() ? nullptr : &messageData, messageType);
+      }
+    }
 
   } else if (handlerName == "_onColorInputClicked") {
     // Handle color input click - show native color picker

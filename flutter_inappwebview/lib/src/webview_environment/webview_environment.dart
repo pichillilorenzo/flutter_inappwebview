@@ -84,6 +84,22 @@ class WebViewEnvironment {
     void Function(BrowserProcessInfosChangedDetail detail)? value,
   ) => platform.onProcessInfosChanged = value;
 
+  ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewEnvironment.getCacheModel}
+  Future<CacheModel?> getCacheModel() => platform.getCacheModel();
+
+  ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewEnvironment.getTlsErrorsPolicy}
+  Future<TLSErrorsPolicy?> getTlsErrorsPolicy() => platform.getTlsErrorsPolicy();
+
+  ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewEnvironment.isSpellCheckingEnabled}
+  Future<bool> isSpellCheckingEnabled() => platform.isSpellCheckingEnabled();
+
+  ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewEnvironment.getSpellCheckingLanguages}
+  Future<List<String>> getSpellCheckingLanguages() =>
+      platform.getSpellCheckingLanguages();
+
+  ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewEnvironment.isAutomationAllowed}
+  Future<bool> isAutomationAllowed() => platform.isAutomationAllowed();
+
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewEnvironment.dispose}
   Future<void> dispose() => platform.dispose();
 

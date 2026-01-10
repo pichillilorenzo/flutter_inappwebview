@@ -8,6 +8,7 @@
 #include "../types/context_menu.h"
 #include "../utils/flutter.h"
 #include "../utils/log.h"
+#include "../webview_environment.h"
 #include "in_app_webview.h"
 #include "in_app_webview_settings.h"
 
@@ -228,6 +229,18 @@ void InAppWebViewManager::CreateInAppWebView(FlMethodCall* method_call) {
       if (script_value != nullptr && fl_value_get_type(script_value) == FL_VALUE_TYPE_MAP) {
         params.initialUserScripts.push_back(std::make_shared<UserScript>(script_value));
       }
+    }
+  }
+
+  // Parse webViewEnvironmentId and look up the custom WebKitWebContext
+  auto webViewEnvironmentIdOpt = get_optional_fl_map_value<std::string>(args, "webViewEnvironmentId");
+  if (webViewEnvironmentIdOpt.has_value() && !webViewEnvironmentIdOpt->empty()) {
+    WebKitWebContext* webContext = WebViewEnvironment::getWebContext(webViewEnvironmentIdOpt.value());
+    if (webContext != nullptr) {
+      params.webContext = webContext;
+      debugLog("InAppWebViewManager: Using custom WebKitWebContext from WebViewEnvironment id=" + webViewEnvironmentIdOpt.value());
+    } else {
+      debugLog("InAppWebViewManager: WebViewEnvironment not found for id=" + webViewEnvironmentIdOpt.value());
     }
   }
 

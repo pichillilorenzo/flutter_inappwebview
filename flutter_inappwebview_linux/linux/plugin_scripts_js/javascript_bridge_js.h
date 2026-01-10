@@ -54,6 +54,8 @@ class JavaScriptBridgeJS {
     return R"JS(
 window.)JS" +
            get_JAVASCRIPT_BRIDGE_NAME() + R"JS( = {};
+window.)JS" +
+           get_JAVASCRIPT_BRIDGE_NAME() + R"JS(._webMessageChannels = {};
 (function(window) {
   var bridgeSecret = ')JS" +
            VAR_JAVASCRIPT_BRIDGE_BRIDGE_SECRET + R"JS(';

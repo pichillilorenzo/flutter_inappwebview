@@ -9,6 +9,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_platform_interface.dart';
 
+import '../web_message/web_message_channel.dart';
 import '../web_message/web_message_listener.dart';
 import '_static_channel.dart';
 
@@ -53,6 +54,7 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController
   };
   Set<LinuxWebMessageListener> _webMessageListeners = Set();
   Set<String> _webMessageListenerObjNames = Set();
+  Set<LinuxWebMessageChannel> _webMessageChannels = Set();
   Map<String, ScriptHtmlTagAttributes> _injectedScriptsFromURL = {};
 
   // static map that contains the properties to be saved and restored for keep alive feature
@@ -682,6 +684,27 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController
               }
             }
             return null;
+          case "onWebMessagePortMessageReceived":
+            Map<String, dynamic> arguments = handlerData.args[0]
+                .cast<String, dynamic>();
+            String webMessageChannelId = arguments["webMessageChannelId"];
+            int index = arguments["index"];
+            // Find the channel and forward the message
+            for (var webMessageChannel in _webMessageChannels) {
+              if (webMessageChannel.id == webMessageChannelId) {
+                Map<String, dynamic>? messageMap = arguments["message"]
+                    ?.cast<String, dynamic>();
+                WebMessage? message = messageMap != null
+                    ? WebMessage.fromMap(messageMap)
+                    : null;
+                webMessageChannel.internalChannel?.invokeMethod("onMessage", {
+                  "index": index,
+                  "message": message?.toMap(),
+                });
+                break;
+              }
+            }
+            return null;
         }
 
         if (_javaScriptHandlersMap.containsKey(handlerName)) {
@@ -1253,6 +1276,34 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController
   }
 
   @override
+  Future<LinuxWebMessageChannel?> createWebMessageChannel() async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    Map<String, dynamic>? result = (await channel?.invokeMethod(
+      'createWebMessageChannel',
+      args,
+    ))?.cast<String, dynamic>();
+    final webMessageChannel = LinuxWebMessageChannel.static().fromMap(result);
+    if (webMessageChannel != null) {
+      _webMessageChannels.add(webMessageChannel);
+    }
+    return webMessageChannel;
+  }
+
+  @override
+  Future<void> postWebMessage({
+    required WebMessage message,
+    WebUri? targetOrigin,
+  }) async {
+    if (targetOrigin == null) {
+      targetOrigin = WebUri('');
+    }
+    Map<String, dynamic> args = <String, dynamic>{};
+    args.putIfAbsent('message', () => message.toMap());
+    args.putIfAbsent('targetOrigin', () => targetOrigin.toString());
+    await channel?.invokeMethod('postWebMessage', args);
+  }
+
+  @override
   Future<WebUri?> getOriginalUrl() async {
     Map<String, dynamic> args = <String, dynamic>{};
     String? url = await channel?.invokeMethod<String?>('getOriginalUrl', args);
@@ -1735,6 +1786,10 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController
       }
       _webMessageListeners.clear();
       _webMessageListenerObjNames.clear();
+      for (final webMessageChannel in _webMessageChannels) {
+        webMessageChannel.dispose();
+      }
+      _webMessageChannels.clear();
     }
     disposeChannel(removeMethodCallHandler: !isKeepAlive);
   }

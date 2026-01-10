@@ -3,6 +3,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_platform_interface.dart';
 
 import '../find_interaction/find_interaction_controller.dart';
+import '../webview_environment/webview_environment.dart';
 import 'in_app_webview_controller.dart';
 import 'custom_platform_view.dart';
 
@@ -21,6 +22,7 @@ class LinuxInAppWebViewWidgetCreationParams
     super.keepAlive,
     super.preventGestureDelay,
     super.windowId,
+    this.webViewEnvironment,
     super.onWebViewCreated,
     super.onLoadStart,
     super.onLoadStop,
@@ -111,6 +113,8 @@ class LinuxInAppWebViewWidgetCreationParams
         keepAlive: params.keepAlive,
         preventGestureDelay: params.preventGestureDelay,
         windowId: params.windowId,
+        webViewEnvironment:
+            params.webViewEnvironment as LinuxWebViewEnvironment?,
         onWebViewCreated: params.onWebViewCreated,
         onLoadStart: params.onLoadStart,
         onLoadStop: params.onLoadStop,
@@ -189,6 +193,9 @@ class LinuxInAppWebViewWidgetCreationParams
         pullToRefreshController: params.pullToRefreshController,
         findInteractionController: params.findInteractionController,
       );
+
+  @override
+  final LinuxWebViewEnvironment? webViewEnvironment;
 }
 
 ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewWidget}
@@ -259,6 +266,7 @@ class LinuxInAppWebViewWidget extends PlatformInAppWebViewWidget {
         'initialUserScripts':
             params.initialUserScripts?.map((e) => e.toMap()).toList() ?? [],
         'keepAliveId': params.keepAlive?.id,
+        'webViewEnvironmentId': params.webViewEnvironment?.id,
       },
     );
   }

@@ -82,6 +82,7 @@ enum PlatformInAppWebViewWidgetCreationParamsProperty {
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- Windows WebView2
+  ///- Linux WPE WebKit ([Official API - WebKitWebContext](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/class.WebContext.html))
   ///
   ///Use the [PlatformInAppWebViewWidgetCreationParams.isPropertySupported] method to check if this property is supported at runtime.
   ///{@endtemplate}
@@ -120,6 +121,7 @@ extension _PlatformInAppWebViewWidgetCreationParamsPropertySupported
         return ((kIsWeb && platform != null) || !kIsWeb) &&
             [
               TargetPlatform.windows,
+              TargetPlatform.linux,
             ].contains(platform ?? defaultTargetPlatform);
     }
   }

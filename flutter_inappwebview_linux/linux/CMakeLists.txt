@@ -172,6 +172,7 @@ list(APPEND PLUGIN_SOURCES
   "types/web_resource_request.cc"
   "types/web_resource_response.cc"
   "types/web_view_transport.cc"
+  "web_message/web_message_channel.cc"
 )
 
 # Define the plugin library target. Its name must not be changed (see comment

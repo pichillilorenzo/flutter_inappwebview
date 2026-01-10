@@ -765,6 +765,50 @@ void WebViewChannelDelegate::HandleMethodCall(FlMethodCall* method_call) {
     return;
   }
 
+  // === Web Message Channel Methods ===
+  if (string_equals(methodName, "createWebMessageChannel")) {
+    // Ref the method call for async response
+    g_object_ref(method_call);
+    
+    webView->createWebMessageChannel([method_call](const std::optional<std::string>& channelId) {
+      if (channelId.has_value()) {
+        g_autoptr(FlValue) result = fl_value_new_map();
+        fl_value_set_string_take(result, "id", fl_value_new_string(channelId->c_str()));
+        fl_method_call_respond_success(method_call, result, nullptr);
+      } else {
+        fl_method_call_respond_success(method_call, fl_value_new_null(), nullptr);
+      }
+      g_object_unref(method_call);
+    });
+    return;
+  }
+
+  if (string_equals(methodName, "postWebMessage")) {
+    FlValue* message_value = get_fl_map_value_raw(args, "message");
+    std::string targetOrigin = get_fl_map_value<std::string>(args, "targetOrigin", "*");
+    
+    if (message_value != nullptr && fl_value_get_type(message_value) == FL_VALUE_TYPE_MAP) {
+      // Extract message data
+      std::string data = "";
+      int64_t type = 0;  // 0 = string, 1 = arrayBuffer
+      
+      FlValue* data_value = fl_value_lookup_string(message_value, "data");
+      FlValue* type_value = fl_value_lookup_string(message_value, "type");
+      
+      if (data_value != nullptr && fl_value_get_type(data_value) == FL_VALUE_TYPE_STRING) {
+        data = fl_value_get_string(data_value);
+      }
+      if (type_value != nullptr && fl_value_get_type(type_value) == FL_VALUE_TYPE_INT) {
+        type = fl_value_get_int(type_value);
+      }
+      
+      webView->postWebMessage(data, targetOrigin, type);
+    }
+    g_autoptr(FlValue) result = fl_value_new_bool(true);
+    fl_method_call_respond_success(method_call, result, nullptr);
+    return;
+  }
+
   if (string_equals(methodName, "isInFullscreen")) {
     bool fullscreen = webView->isInFullscreen();
     g_autoptr(FlValue) result = fl_value_new_bool(fullscreen);

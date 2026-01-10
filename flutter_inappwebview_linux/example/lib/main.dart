@@ -46,13 +46,13 @@ class _MyAppState extends State<MyApp> {
     super.initState();
     findInteractionController = LinuxFindInteractionController(
       LinuxFindInteractionControllerCreationParams(
-        onFindResultReceived: (
-          controller,
-          activeMatchOrdinal,
-          numberOfMatches,
-          isDoneCounting,
-        ) {
-        },
+        onFindResultReceived:
+            (
+              controller,
+              activeMatchOrdinal,
+              numberOfMatches,
+              isDoneCounting,
+            ) {},
       ),
     );
   }
@@ -85,7 +85,7 @@ class _MyAppState extends State<MyApp> {
                       LinuxInAppWebViewWidgetCreationParams(
                         key: webViewKey,
                         initialUrlRequest: URLRequest(
-                          url: WebUri("about:blank"),
+                          url: WebUri("https://www.google.com/search?client=ubuntu-sn&channel=fs&q=current+timezone"),
                         ),
                         initialSettings: settings,
                         onWebViewCreated: (controller) {
@@ -114,9 +114,10 @@ class _MyAppState extends State<MyApp> {
                         onCloseWindow: (controller) {
                           print('[TEST] onCloseWindow called');
                         },
-                        shouldOverrideUrlLoading: (controller, navigationAction) async {
-                          return NavigationActionPolicy.ALLOW;
-                        },
+                        shouldOverrideUrlLoading:
+                            (controller, navigationAction) async {
+                              return NavigationActionPolicy.ALLOW;
+                            },
                         onProgressChanged: (controller, progress) {
                           setState(() {
                             this.progress = progress / 100;
@@ -129,18 +130,15 @@ class _MyAppState extends State<MyApp> {
                             urlController.text = this.url;
                           });
                         },
-                        onPageCommitVisible: (controller, url) {
-                        },
+                        onPageCommitVisible: (controller, url) {},
                         onLoadStop: (controller, url) async {
                           setState(() {
                             this.url = url.toString();
                             urlController.text = this.url;
                           });
                         },
-                        onReceivedError: (controller, request, error) {
-                        },
-                        onReceivedHttpError: (controller, request, response) {
-                        },
+                        onReceivedError: (controller, request, error) {},
+                        onReceivedHttpError: (controller, request, response) {},
                         onConsoleMessage: (controller, consoleMessage) {
                           if (kDebugMode) {
                             print('[CONSOLE] ${consoleMessage.message}');

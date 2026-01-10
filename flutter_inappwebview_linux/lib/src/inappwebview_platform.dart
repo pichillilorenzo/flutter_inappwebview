@@ -7,7 +7,9 @@ import 'in_app_webview/in_app_webview.dart';
 import 'in_app_webview/in_app_webview_controller.dart';
 import 'in_app_webview/headless_in_app_webview.dart';
 import 'proxy_controller/proxy_controller.dart';
+import 'web_message/web_message_channel.dart';
 import 'web_message/web_message_listener.dart';
+import 'web_message/web_message_port.dart';
 import 'web_storage/web_storage_manager.dart';
 import 'webview_environment/webview_environment.dart';
 
@@ -202,10 +204,26 @@ class LinuxInAppWebViewPlatform extends InAppWebViewPlatform {
     return _PlatformWebAuthenticationSession.static();
   }
 
-  /// Creates a new empty [PlatformWebMessageChannel] to access static methods.
+  /// Creates a new empty [LinuxWebMessageChannel] to access static methods.
   @override
-  PlatformWebMessageChannel createPlatformWebMessageChannelStatic() {
-    return _PlatformWebMessageChannel.static();
+  LinuxWebMessageChannel createPlatformWebMessageChannelStatic() {
+    return LinuxWebMessageChannel.static();
+  }
+
+  /// Creates a new [LinuxWebMessageChannel].
+  @override
+  LinuxWebMessageChannel createPlatformWebMessageChannel(
+    PlatformWebMessageChannelCreationParams params,
+  ) {
+    return LinuxWebMessageChannel(params);
+  }
+
+  /// Creates a new [LinuxWebMessagePort].
+  @override
+  LinuxWebMessagePort createPlatformWebMessagePort(
+    PlatformWebMessagePortCreationParams params,
+  ) {
+    return LinuxWebMessagePort(params);
   }
 
   /// Creates a new empty [PlatformWebMessageListener] to access static methods.
@@ -334,60 +352,4 @@ class _PlatformWebAuthenticationSession
       );
 
   factory _PlatformWebAuthenticationSession.static() => _staticValue;
-}
-
-class _PlatformWebMessageChannel extends PlatformWebMessageChannel {
-  _PlatformWebMessageChannel(PlatformWebMessageChannelCreationParams params)
-    : super.implementation(params);
-
-  static final _PlatformWebMessageChannel _staticValue =
-      _PlatformWebMessageChannel(
-        PlatformWebMessageChannelCreationParams(
-          id: '',
-          port1: _PlatformWebMessagePort(
-            const PlatformWebMessagePortCreationParams(index: 0),
-          ),
-          port2: _PlatformWebMessagePort(
-            const PlatformWebMessagePortCreationParams(index: 1),
-          ),
-        ),
-      );
-
-  factory _PlatformWebMessageChannel.static() => _staticValue;
-}
-
-class _PlatformWebMessagePort extends PlatformWebMessagePort {
-  _PlatformWebMessagePort(PlatformWebMessagePortCreationParams params)
-    : super.implementation(params);
-
-  static final _PlatformWebMessagePort _staticValue = _PlatformWebMessagePort(
-    const PlatformWebMessagePortCreationParams(index: 0),
-  );
-
-  factory _PlatformWebMessagePort.static() => _staticValue;
-
-  @override
-  Future<void> close() {
-    throw UnimplementedError();
-  }
-
-  @override
-  Future<void> postMessage(WebMessage message) {
-    throw UnimplementedError();
-  }
-
-  @override
-  Future<void> setWebMessageCallback(WebMessageCallback? onMessage) {
-    throw UnimplementedError();
-  }
-
-  @override
-  Map<String, dynamic> toJson() {
-    throw UnimplementedError();
-  }
-
-  @override
-  Map<String, dynamic> toMap({EnumMethod? enumMethod}) {
-    throw UnimplementedError();
-  }
 }

@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_platform_interface.dart';
 import '../find_interaction/find_interaction_controller.dart';
+import '../webview_environment/webview_environment.dart';
 import 'in_app_webview_controller.dart';
 
 /// Object specifying creation parameters for creating a [LinuxHeadlessInAppWebView].
@@ -19,6 +20,7 @@ class LinuxHeadlessInAppWebViewCreationParams
     super.controllerFromPlatform,
     super.initialSize,
     super.windowId,
+    this.webViewEnvironment,
     super.onWebViewCreated,
     super.onLoadStart,
     super.onLoadStop,
@@ -137,6 +139,8 @@ class LinuxHeadlessInAppWebViewCreationParams
         controllerFromPlatform: params.controllerFromPlatform,
         initialSize: params.initialSize,
         windowId: params.windowId,
+        webViewEnvironment:
+            params.webViewEnvironment as LinuxWebViewEnvironment?,
         onWebViewCreated: params.onWebViewCreated,
         onLoadStart: params.onLoadStart,
         onLoadStop: params.onLoadStop,
@@ -240,6 +244,9 @@ class LinuxHeadlessInAppWebViewCreationParams
         findInteractionController:
             params.findInteractionController as LinuxFindInteractionController?,
       );
+
+  @override
+  final LinuxWebViewEnvironment? webViewEnvironment;
 
   @override
   final LinuxFindInteractionController? findInteractionController;
@@ -347,6 +354,7 @@ class LinuxHeadlessInAppWebView extends PlatformHeadlessInAppWebView
         'initialUserScripts':
             params.initialUserScripts?.map((e) => e.toMap()).toList() ?? [],
         'initialSize': params.initialSize.toMap(),
+        'webViewEnvironmentId': params.webViewEnvironment?.id,
       },
     );
     try {

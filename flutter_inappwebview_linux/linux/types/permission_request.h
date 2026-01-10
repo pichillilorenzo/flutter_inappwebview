@@ -20,7 +20,7 @@ enum class PermissionResourceType {
   CAMERA_AND_MICROPHONE = 2,
   GEOLOCATION = 3,
   NOTIFICATIONS = 4,
-  PROTECTED_MEDIA_ID = 5,  // Not supported on Linux
+  PROTECTED_MEDIA_ID = 5,  // EME/DRM permission (WebKitMediaKeySystemPermissionRequest)
   MIDI_SYSEX = 6,          // Not directly supported
   DEVICE_INFO = 7,
   POINTER_LOCK = 8

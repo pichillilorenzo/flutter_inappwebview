@@ -7,6 +7,7 @@
 #include "../types/url_request.h"
 #include "../utils/flutter.h"
 #include "../utils/log.h"
+#include "../webview_environment.h"
 
 namespace flutter_inappwebview_plugin {
 
@@ -147,6 +148,18 @@ void HeadlessInAppWebViewManager::Run(FlMethodCall* method_call) {
   FlValue* initial_file = fl_value_lookup_string(params, "initialFile");
   if (initial_file != nullptr && fl_value_get_type(initial_file) == FL_VALUE_TYPE_STRING) {
     webviewParams.initialFile = std::string(fl_value_get_string(initial_file));
+  }
+
+  // Parse webViewEnvironmentId and look up the custom WebKitWebContext
+  auto webViewEnvironmentIdOpt = get_optional_fl_map_value<std::string>(params, "webViewEnvironmentId");
+  if (webViewEnvironmentIdOpt.has_value() && !webViewEnvironmentIdOpt->empty()) {
+    WebKitWebContext* webContext = WebViewEnvironment::getWebContext(webViewEnvironmentIdOpt.value());
+    if (webContext != nullptr) {
+      webviewParams.webContext = webContext;
+      debugLog("HeadlessInAppWebViewManager: Using custom WebKitWebContext from WebViewEnvironment id=" + webViewEnvironmentIdOpt.value());
+    } else {
+      debugLog("HeadlessInAppWebViewManager: WebViewEnvironment not found for id=" + webViewEnvironmentIdOpt.value());
+    }
   }
 
   // Create the headless webview

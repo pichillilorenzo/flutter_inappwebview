@@ -13,6 +13,7 @@ part of 'webview_environment_settings.dart';
 ///
 ///**Officially Supported Platforms/Implementations**:
 ///- Windows WebView2
+///- Linux WPE WebKit
 class WebViewEnvironmentSettings {
   ///If there are multiple switches, there should be a space in between them.
   ///The one exception is if multiple features are being enabled/disabled for a single switch,
@@ -41,6 +42,15 @@ class WebViewEnvironmentSettings {
   ///- Windows WebView2 1.0.2210.55+ ([Official API - ICoreWebView2EnvironmentOptions6.put_AreBrowserExtensionsEnabled](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2environmentoptions6?view=webview2-1.0.2849.39#put_arebrowserextensionsenabled))
   final bool? areBrowserExtensionsEnabled;
 
+  ///Enable or disable automation mode in the WebContext.
+  ///
+  ///When automation is allowed, web pages can use the WebDriver API to automate
+  ///interaction with the WebView. This is useful for testing and automation scenarios.
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Linux WPE WebKit ([Official API - webkit_web_context_set_automation_allowed](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/method.WebContext.set_automation_allowed.html))
+  final bool? automationAllowed;
+
   ///Use [browserExecutableFolder] to specify whether WebView2 controls use a fixed
   ///or installed version of the WebView2 Runtime that exists on a user machine.
   ///To use a fixed version of the WebView2 Runtime, pass the folder path that contains
@@ -60,6 +70,15 @@ class WebViewEnvironmentSettings {
   ///**Officially Supported Platforms/Implementations**:
   ///- Windows WebView2 ([Official API - CreateCoreWebView2EnvironmentWithOptions.browserExecutableFolder](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2210.55#createcorewebview2environmentwithoptions))
   final String? browserExecutableFolder;
+
+  ///Set the cache model for the WebContext.
+  ///
+  ///Specifies the caching behavior. Different models optimize for different
+  ///use cases like web browsing, document viewing, etc.
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Linux WPE WebKit ([Official API - webkit_web_context_set_cache_model](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/method.WebContext.set_cache_model.html))
+  final CacheModel? cacheModel;
 
   ///This property is [EnvironmentChannelSearchKind.MOST_STABLE] by default;
   ///environment creation searches for a release channel on the machine from
@@ -130,6 +149,16 @@ class WebViewEnvironmentSettings {
   ///- Windows WebView2 ([Official API - ICoreWebView2EnvironmentOptions.put_Language](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2environmentoptions?view=webview2-1.0.2210.55#put_language))
   final String? language;
 
+  ///Set the list of preferred languages for the WebContext.
+  ///
+  ///This will be used for the `Accept-Language` HTTP header and to set `navigator.language`.
+  ///Languages should be specified in order of preference.
+  ///For example, `["en-US", "en", "fr"]`.
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Linux WPE WebKit ([Official API - webkit_web_context_set_preferred_languages](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/method.WebContext.set_preferred_languages.html))
+  final List<String>? preferredLanguages;
+
   ///Sets the [releaseChannels], which is a mask of one or more [EnvironmentReleaseChannels]
   ///indicating which channels environment creation should search for.
   ///
@@ -169,6 +198,15 @@ class WebViewEnvironmentSettings {
   ///- Windows WebView2 1.0.2478.35+ ([Official API - ICoreWebView2EnvironmentOptions7.put_ReleaseChannels](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2environmentoptions7?view=webview2-1.0.2849.39#put_releasechannels))
   final EnvironmentReleaseChannels? releaseChannels;
 
+  ///Set additional paths that should be accessible when running in sandbox mode.
+  ///
+  ///Each path will be added to the sandbox to allow web processes to access those directories.
+  ///This is useful when the WebView needs access to specific local files or directories.
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Linux WPE WebKit ([Official API - webkit_web_context_add_path_to_sandbox](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/method.WebContext.add_path_to_sandbox.html))
+  final List<String>? sandboxPaths;
+
   ///The ScrollBar style being set on the WebView2 Environment.
   ///
   ///The default value is [EnvironmentScrollbarStyle.DEFAULT] which specifies the default browser ScrollBar style.
@@ -181,11 +219,49 @@ class WebViewEnvironmentSettings {
   ///- Windows WebView2 1.0.2535.41+ ([Official API - ICoreWebView2EnvironmentOptions8.put_ScrollBarStyle](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2environmentoptions8?view=webview2-1.0.2849.39#put_scrollbarstyle))
   final EnvironmentScrollbarStyle? scrollbarStyle;
 
+  ///Enable or disable spell checking in the WebContext.
+  ///
+  ///When enabled, text entered by the user will be checked for spelling errors.
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Linux WPE WebKit ([Official API - webkit_web_context_set_spell_checking_enabled](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/method.WebContext.set_spell_checking_enabled.html))
+  final bool? spellCheckingEnabled;
+
+  ///Set the list of spell checking languages to use.
+  ///
+  ///The locale string typically has the form `lang_COUNTRY` where `lang` is an
+  ///ISO-639 language code and `COUNTRY` is an ISO-3166 country code.
+  ///For example, `"en_US"`, `"es_ES"`, or `"pt_BR"`.
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Linux WPE WebKit ([Official API - webkit_web_context_set_spell_checking_languages](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/method.WebContext.set_spell_checking_languages.html))
+  final List<String>? spellCheckingLanguages;
+
   ///Specifies the version of the WebView2 Runtime binaries required to be compatible with your app.
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- Windows WebView2 ([Official API - ICoreWebView2EnvironmentOptions.put_TargetCompatibleBrowserVersion](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2environmentoptions?view=webview2-1.0.2210.55#put_targetcompatiblebrowserversion))
   final String? targetCompatibleBrowserVersion;
+
+  ///Set a timezone override for web pages loaded in this WebContext.
+  ///
+  ///This allows overriding the system timezone for web content.
+  ///The value should be a valid IANA timezone identifier like `"America/New_York"`,
+  ///`"Europe/London"`, or `"Asia/Tokyo"`.
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Linux WPE WebKit ([Official API - time-zone-override](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/class.WebContext.html)):
+  ///    - This property must be set at WebContext construction time.
+  final String? timeZoneOverride;
+
+  ///Set the TLS errors policy for the WebContext.
+  ///
+  ///Determines how TLS certificate errors are handled.
+  ///The default is [TLSErrorsPolicy.FAIL] which is the secure option.
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Linux WPE WebKit ([Official API - webkit_web_context_set_tls_errors_policy](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/method.WebContext.set_tls_errors_policy.html))
+  final TLSErrorsPolicy? tlsErrorsPolicy;
 
   ///You may specify the [userDataFolder] to change the default user data folder location for WebView2.
   ///The path is either an absolute file path or a relative file path that is interpreted as relative
@@ -206,24 +282,43 @@ class WebViewEnvironmentSettings {
   ///- Windows WebView2 ([Official API - CreateCoreWebView2EnvironmentWithOptions.userDataFolder](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2210.55#createcorewebview2environmentwithoptions))
   final String? userDataFolder;
 
+  ///Set the directory where web process extension modules are located.
+  ///
+  ///Web process extensions allow extending the functionality of the web process
+  ///with custom code. This is an advanced feature for specialized use cases.
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Linux WPE WebKit ([Official API - webkit_web_context_set_web_process_extensions_directory](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/method.WebContext.set_web_process_extensions_directory.html))
+  final String? webProcessExtensionsDirectory;
+
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- Windows WebView2
+  ///- Linux WPE WebKit
   WebViewEnvironmentSettings({
     this.additionalBrowserArguments,
     this.allowSingleSignOnUsingOSPrimaryAccount,
     this.areBrowserExtensionsEnabled,
+    this.automationAllowed,
     this.browserExecutableFolder,
+    this.cacheModel,
     this.channelSearchKind,
     this.customSchemeRegistrations,
     this.enableTrackingPrevention,
     this.exclusiveUserDataFolderAccess,
     this.isCustomCrashReportingEnabled,
     this.language,
+    this.preferredLanguages,
     this.releaseChannels,
+    this.sandboxPaths,
     this.scrollbarStyle,
+    this.spellCheckingEnabled,
+    this.spellCheckingLanguages,
     this.targetCompatibleBrowserVersion,
+    this.timeZoneOverride,
+    this.tlsErrorsPolicy,
     this.userDataFolder,
+    this.webProcessExtensionsDirectory,
   });
 
   ///Gets a possible [WebViewEnvironmentSettings] instance from a [Map] value.
@@ -239,7 +334,13 @@ class WebViewEnvironmentSettings {
       allowSingleSignOnUsingOSPrimaryAccount:
           map['allowSingleSignOnUsingOSPrimaryAccount'],
       areBrowserExtensionsEnabled: map['areBrowserExtensionsEnabled'],
+      automationAllowed: map['automationAllowed'],
       browserExecutableFolder: map['browserExecutableFolder'],
+      cacheModel: switch (enumMethod ?? EnumMethod.nativeValue) {
+        EnumMethod.nativeValue => CacheModel.fromNativeValue(map['cacheModel']),
+        EnumMethod.value => CacheModel.fromValue(map['cacheModel']),
+        EnumMethod.name => CacheModel.byName(map['cacheModel']),
+      },
       channelSearchKind: switch (enumMethod ?? EnumMethod.nativeValue) {
         EnumMethod.nativeValue => EnvironmentChannelSearchKind.fromNativeValue(
           map['channelSearchKind'],
@@ -265,6 +366,9 @@ class WebViewEnvironmentSettings {
       exclusiveUserDataFolderAccess: map['exclusiveUserDataFolderAccess'],
       isCustomCrashReportingEnabled: map['isCustomCrashReportingEnabled'],
       language: map['language'],
+      preferredLanguages: map['preferredLanguages'] != null
+          ? List<String>.from(map['preferredLanguages']!.cast<String>())
+          : null,
       releaseChannels: switch (enumMethod ?? EnumMethod.nativeValue) {
         EnumMethod.nativeValue => EnvironmentReleaseChannels.fromNativeValue(
           map['releaseChannels'],
@@ -276,6 +380,9 @@ class WebViewEnvironmentSettings {
           map['releaseChannels'],
         ),
       },
+      sandboxPaths: map['sandboxPaths'] != null
+          ? List<String>.from(map['sandboxPaths']!.cast<String>())
+          : null,
       scrollbarStyle: switch (enumMethod ?? EnumMethod.nativeValue) {
         EnumMethod.nativeValue => EnvironmentScrollbarStyle.fromNativeValue(
           map['scrollbarStyle'],
@@ -287,8 +394,21 @@ class WebViewEnvironmentSettings {
           map['scrollbarStyle'],
         ),
       },
+      spellCheckingEnabled: map['spellCheckingEnabled'],
+      spellCheckingLanguages: map['spellCheckingLanguages'] != null
+          ? List<String>.from(map['spellCheckingLanguages']!.cast<String>())
+          : null,
       targetCompatibleBrowserVersion: map['targetCompatibleBrowserVersion'],
+      timeZoneOverride: map['timeZoneOverride'],
+      tlsErrorsPolicy: switch (enumMethod ?? EnumMethod.nativeValue) {
+        EnumMethod.nativeValue => TLSErrorsPolicy.fromNativeValue(
+          map['tlsErrorsPolicy'],
+        ),
+        EnumMethod.value => TLSErrorsPolicy.fromValue(map['tlsErrorsPolicy']),
+        EnumMethod.name => TLSErrorsPolicy.byName(map['tlsErrorsPolicy']),
+      },
       userDataFolder: map['userDataFolder'],
+      webProcessExtensionsDirectory: map['webProcessExtensionsDirectory'],
     );
     return instance;
   }
@@ -300,7 +420,13 @@ class WebViewEnvironmentSettings {
       "allowSingleSignOnUsingOSPrimaryAccount":
           allowSingleSignOnUsingOSPrimaryAccount,
       "areBrowserExtensionsEnabled": areBrowserExtensionsEnabled,
+      "automationAllowed": automationAllowed,
       "browserExecutableFolder": browserExecutableFolder,
+      "cacheModel": switch (enumMethod ?? EnumMethod.nativeValue) {
+        EnumMethod.nativeValue => cacheModel?.toNativeValue(),
+        EnumMethod.value => cacheModel?.toValue(),
+        EnumMethod.name => cacheModel?.name(),
+      },
       "channelSearchKind": switch (enumMethod ?? EnumMethod.nativeValue) {
         EnumMethod.nativeValue => channelSearchKind?.toNativeValue(),
         EnumMethod.value => channelSearchKind?.toValue(),
@@ -313,18 +439,29 @@ class WebViewEnvironmentSettings {
       "exclusiveUserDataFolderAccess": exclusiveUserDataFolderAccess,
       "isCustomCrashReportingEnabled": isCustomCrashReportingEnabled,
       "language": language,
+      "preferredLanguages": preferredLanguages,
       "releaseChannels": switch (enumMethod ?? EnumMethod.nativeValue) {
         EnumMethod.nativeValue => releaseChannels?.toNativeValue(),
         EnumMethod.value => releaseChannels?.toValue(),
         EnumMethod.name => releaseChannels?.name(),
       },
+      "sandboxPaths": sandboxPaths,
       "scrollbarStyle": switch (enumMethod ?? EnumMethod.nativeValue) {
         EnumMethod.nativeValue => scrollbarStyle?.toNativeValue(),
         EnumMethod.value => scrollbarStyle?.toValue(),
         EnumMethod.name => scrollbarStyle?.name(),
       },
+      "spellCheckingEnabled": spellCheckingEnabled,
+      "spellCheckingLanguages": spellCheckingLanguages,
       "targetCompatibleBrowserVersion": targetCompatibleBrowserVersion,
+      "timeZoneOverride": timeZoneOverride,
+      "tlsErrorsPolicy": switch (enumMethod ?? EnumMethod.nativeValue) {
+        EnumMethod.nativeValue => tlsErrorsPolicy?.toNativeValue(),
+        EnumMethod.value => tlsErrorsPolicy?.toValue(),
+        EnumMethod.name => tlsErrorsPolicy?.name(),
+      },
       "userDataFolder": userDataFolder,
+      "webProcessExtensionsDirectory": webProcessExtensionsDirectory,
     };
   }
 
@@ -341,6 +478,6 @@ class WebViewEnvironmentSettings {
 
   @override
   String toString() {
-    return 'WebViewEnvironmentSettings{additionalBrowserArguments: $additionalBrowserArguments, allowSingleSignOnUsingOSPrimaryAccount: $allowSingleSignOnUsingOSPrimaryAccount, areBrowserExtensionsEnabled: $areBrowserExtensionsEnabled, browserExecutableFolder: $browserExecutableFolder, channelSearchKind: $channelSearchKind, customSchemeRegistrations: $customSchemeRegistrations, enableTrackingPrevention: $enableTrackingPrevention, exclusiveUserDataFolderAccess: $exclusiveUserDataFolderAccess, isCustomCrashReportingEnabled: $isCustomCrashReportingEnabled, language: $language, releaseChannels: $releaseChannels, scrollbarStyle: $scrollbarStyle, targetCompatibleBrowserVersion: $targetCompatibleBrowserVersion, userDataFolder: $userDataFolder}';
+    return 'WebViewEnvironmentSettings{additionalBrowserArguments: $additionalBrowserArguments, allowSingleSignOnUsingOSPrimaryAccount: $allowSingleSignOnUsingOSPrimaryAccount, areBrowserExtensionsEnabled: $areBrowserExtensionsEnabled, automationAllowed: $automationAllowed, browserExecutableFolder: $browserExecutableFolder, cacheModel: $cacheModel, channelSearchKind: $channelSearchKind, customSchemeRegistrations: $customSchemeRegistrations, enableTrackingPrevention: $enableTrackingPrevention, exclusiveUserDataFolderAccess: $exclusiveUserDataFolderAccess, isCustomCrashReportingEnabled: $isCustomCrashReportingEnabled, language: $language, preferredLanguages: $preferredLanguages, releaseChannels: $releaseChannels, sandboxPaths: $sandboxPaths, scrollbarStyle: $scrollbarStyle, spellCheckingEnabled: $spellCheckingEnabled, spellCheckingLanguages: $spellCheckingLanguages, targetCompatibleBrowserVersion: $targetCompatibleBrowserVersion, timeZoneOverride: $timeZoneOverride, tlsErrorsPolicy: $tlsErrorsPolicy, userDataFolder: $userDataFolder, webProcessExtensionsDirectory: $webProcessExtensionsDirectory}';
   }
 }

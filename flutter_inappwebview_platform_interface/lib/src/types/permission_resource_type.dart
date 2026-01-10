@@ -75,6 +75,11 @@ class PermissionResourceType_ {
             'https://developer.android.com/reference/android/webkit/PermissionRequest#RESOURCE_PROTECTED_MEDIA_ID',
         value: 'android.webkit.resource.PROTECTED_MEDIA_ID',
       ),
+      EnumLinuxPlatform(
+        apiName: 'WebKitMediaKeySystemPermissionRequest',
+        apiUrl:
+            'https://wpewebkit.org/reference/stable/wpe-webkit-2.0/class.MediaKeySystemPermissionRequest.html',
+      ),
     ],
   )
   static const PROTECTED_MEDIA_ID = PermissionResourceType_._internal(

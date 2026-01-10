@@ -58,6 +58,7 @@ namespace flutter_inappwebview_plugin {
 
 class InAppWebViewManager;
 class UserContentController;
+class WebMessageChannel;
 class WebViewChannelDelegate;
 
 struct InAppWebViewCreationParams {
@@ -75,6 +76,7 @@ struct InAppWebViewCreationParams {
   std::optional<int64_t> windowId;  // For windows created via onCreateWindow
   WebKitWebView* relatedWebView = nullptr;  // For creating related WebViews (shares web process)
   std::vector<std::shared_ptr<UserScript>> initialUserScripts;  // User scripts to inject
+  WebKitWebContext* webContext = nullptr;  // Custom WebKitWebContext from WebViewEnvironment
 };
 
 // Pointer event kind (matches Dart side)
@@ -177,6 +179,16 @@ class InAppWebView {
   // Web Message Listener
   void addWebMessageListener(const std::string& jsObjectName,
                               const std::vector<std::string>& allowedOriginRules);
+
+  // Web Message Channel
+  void createWebMessageChannel(std::function<void(const std::optional<std::string>&)> callback);
+  void postWebMessage(const std::string& messageData, const std::string& targetOrigin, int64_t messageType);
+  void setWebMessageCallback(const std::string& channelId, int portIndex);
+  void postWebMessageOnPort(const std::string& channelId, int portIndex,
+                            const std::string& messageData, int64_t messageType);
+  void closeWebMessagePort(const std::string& channelId, int portIndex);
+  void disposeWebMessageChannel(const std::string& channelId);
+  WebMessageChannel* getWebMessageChannel(const std::string& channelId) const;
 
   // HTML content
   void getHtml(std::function<void(const std::optional<std::string>&)> callback);
@@ -415,6 +427,9 @@ class InAppWebView {
 
   // Find interaction controller
   std::unique_ptr<FindInteractionController> findInteractionController_;
+
+  // Web message channels (for WebMessageChannel support)
+  std::map<std::string, std::unique_ptr<WebMessageChannel>> web_message_channels_;
 
   // Initial user scripts from params
   std::vector<std::shared_ptr<UserScript>> initial_user_scripts_;

@@ -284,11 +284,14 @@ class PermissionResourceType {
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- Android WebView ([Official API - PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID](https://developer.android.com/reference/android/webkit/PermissionRequest#RESOURCE_PROTECTED_MEDIA_ID))
+  ///- Linux WPE WebKit ([Official API - WebKitMediaKeySystemPermissionRequest](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/class.MediaKeySystemPermissionRequest.html))
   static final PROTECTED_MEDIA_ID =
       PermissionResourceType._internalMultiPlatform('PROTECTED_MEDIA_ID', () {
         switch (defaultTargetPlatform) {
           case TargetPlatform.android:
             return 'android.webkit.resource.PROTECTED_MEDIA_ID';
+          case TargetPlatform.linux:
+            return null;
           default:
             break;
         }

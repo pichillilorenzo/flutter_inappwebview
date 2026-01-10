@@ -6,9 +6,11 @@ import '../debug_logging_settings.dart';
 import '../inappwebview_platform.dart';
 import '../in_app_webview/platform_webview.dart';
 import '../types/browser_process_info.dart';
+import '../types/cache_model.dart';
 import '../types/disposable.dart';
 import '../types/browser_process_exited_detail.dart';
 import '../types/browser_process_infos_changed_detail.dart';
+import '../types/tls_errors_policy.dart';
 import '../types/webview_interface.dart';
 import 'webview_environment_settings.dart';
 
@@ -114,7 +116,7 @@ abstract class PlatformWebViewEnvironment extends PlatformInterface
   ///{@template flutter_inappwebview_platform_interface.PlatformWebViewEnvironment.id}
   /// WebView Environment ID.
   ///{@endtemplate}
-  @SupportedPlatforms(platforms: [WindowsPlatform()])
+  @SupportedPlatforms(platforms: [WindowsPlatform(), LinuxPlatform()])
   String get id =>
       throw UnimplementedError('id is not implemented on the current platform');
 
@@ -204,6 +206,13 @@ abstract class PlatformWebViewEnvironment extends PlatformInterface
         apiName: 'CreateCoreWebView2EnvironmentWithOptions',
         apiUrl:
             'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2210.55#createcorewebview2environmentwithoptions',
+      ),
+      LinuxPlatform(
+        apiName: 'WebKitWebContext',
+        apiUrl:
+            'https://webkitgtk.org/reference/webkit2gtk/stable/class.WebContext.html',
+        note:
+            'Creates a new WebKitWebContext for shared WebView configuration.',
       ),
     ],
   )
@@ -366,12 +375,117 @@ abstract class PlatformWebViewEnvironment extends PlatformInterface
   )
   void Function(BrowserProcessInfosChangedDetail detail)? onProcessInfosChanged;
 
+  ///{@template flutter_inappwebview_platform_interface.PlatformWebViewEnvironment.isSpellCheckingEnabled}
+  ///Returns whether spell checking is enabled for this WebContext.
+  ///{@endtemplate}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewEnvironment.isSpellCheckingEnabled.supported_platforms}
+  @SupportedPlatforms(
+    platforms: [
+      LinuxPlatform(
+        apiName: 'webkit_web_context_get_spell_checking_enabled',
+        apiUrl:
+            'https://wpewebkit.org/reference/stable/wpe-webkit-2.0/method.WebContext.get_spell_checking_enabled.html',
+      ),
+    ],
+  )
+  Future<bool> isSpellCheckingEnabled() {
+    throw UnimplementedError(
+      'isSpellCheckingEnabled is not implemented on the current platform',
+    );
+  }
+
+  ///{@template flutter_inappwebview_platform_interface.PlatformWebViewEnvironment.getSpellCheckingLanguages}
+  ///Returns the list of spell checking languages currently configured for this WebContext.
+  ///
+  ///The locale strings are in the form `lang_COUNTRY` where `lang` is an
+  ///ISO-639 language code and `COUNTRY` is an ISO-3166 country code.
+  ///{@endtemplate}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewEnvironment.getSpellCheckingLanguages.supported_platforms}
+  @SupportedPlatforms(
+    platforms: [
+      LinuxPlatform(
+        apiName: 'webkit_web_context_get_spell_checking_languages',
+        apiUrl:
+            'https://wpewebkit.org/reference/stable/wpe-webkit-2.0/method.WebContext.get_spell_checking_languages.html',
+      ),
+    ],
+  )
+  Future<List<String>> getSpellCheckingLanguages() {
+    throw UnimplementedError(
+      'getSpellCheckingLanguages is not implemented on the current platform',
+    );
+  }
+
+  ///{@template flutter_inappwebview_platform_interface.PlatformWebViewEnvironment.getCacheModel}
+  ///Returns the current cache model for this WebContext.
+  ///{@endtemplate}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewEnvironment.getCacheModel.supported_platforms}
+  @SupportedPlatforms(
+    platforms: [
+      LinuxPlatform(
+        apiName: 'webkit_web_context_get_cache_model',
+        apiUrl:
+            'https://wpewebkit.org/reference/stable/wpe-webkit-2.0/method.WebContext.get_cache_model.html',
+      ),
+    ],
+  )
+  Future<CacheModel?> getCacheModel() {
+    throw UnimplementedError(
+      'getCacheModel is not implemented on the current platform',
+    );
+  }
+
+  ///{@template flutter_inappwebview_platform_interface.PlatformWebViewEnvironment.getTlsErrorsPolicy}
+  ///Returns the current TLS errors policy for this WebContext.
+  ///{@endtemplate}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewEnvironment.getTlsErrorsPolicy.supported_platforms}
+  @SupportedPlatforms(
+    platforms: [
+      LinuxPlatform(
+        apiName: 'webkit_web_context_get_tls_errors_policy',
+        apiUrl:
+            'https://wpewebkit.org/reference/stable/wpe-webkit-2.0/method.WebContext.get_tls_errors_policy.html',
+      ),
+    ],
+  )
+  Future<TLSErrorsPolicy?> getTlsErrorsPolicy() {
+    throw UnimplementedError(
+      'getTlsErrorsPolicy is not implemented on the current platform',
+    );
+  }
+
+  ///{@template flutter_inappwebview_platform_interface.PlatformWebViewEnvironment.isAutomationAllowed}
+  ///Returns whether automation is allowed for this WebContext.
+  ///
+  ///When automation is allowed, web pages can use the WebDriver API.
+  ///{@endtemplate}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewEnvironment.isAutomationAllowed.supported_platforms}
+  @SupportedPlatforms(
+    platforms: [
+      LinuxPlatform(
+        apiName: 'webkit_web_context_is_automation_allowed',
+        apiUrl:
+            'https://wpewebkit.org/reference/stable/wpe-webkit-2.0/method.WebContext.is_automation_allowed.html',
+      ),
+    ],
+  )
+  Future<bool> isAutomationAllowed() {
+    throw UnimplementedError(
+      'isAutomationAllowed is not implemented on the current platform',
+    );
+  }
+
   ///{@template flutter_inappwebview_platform_interface.PlatformWebViewEnvironment.dispose}
   ///Disposes the WebView Environment reference.
   ///{@endtemplate}
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewEnvironment.dispose.supported_platforms}
-  @SupportedPlatforms(platforms: [WindowsPlatform()])
+  @SupportedPlatforms(platforms: [WindowsPlatform(), LinuxPlatform()])
   Future<void> dispose() {
     throw UnimplementedError(
       'dispose is not implemented on the current platform',

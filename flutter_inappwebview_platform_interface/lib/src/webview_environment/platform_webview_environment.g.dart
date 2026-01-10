@@ -82,6 +82,7 @@ enum PlatformWebViewEnvironmentProperty {
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- Windows WebView2
+  ///- Linux WPE WebKit
   ///
   ///Use the [PlatformWebViewEnvironment.isPropertySupported] method to check if this property is supported at runtime.
   ///{@endtemplate}
@@ -138,6 +139,7 @@ extension _PlatformWebViewEnvironmentPropertySupported
         return ((kIsWeb && platform != null) || !kIsWeb) &&
             [
               TargetPlatform.windows,
+              TargetPlatform.linux,
             ].contains(platform ?? defaultTargetPlatform);
       case PlatformWebViewEnvironmentProperty.onBrowserProcessExited:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
@@ -181,6 +183,8 @@ enum PlatformWebViewEnvironmentMethod {
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- Windows WebView2 ([Official API - CreateCoreWebView2EnvironmentWithOptions](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/webview2-idl?view=webview2-1.0.2210.55#createcorewebview2environmentwithoptions))
+  ///- Linux WPE WebKit ([Official API - WebKitWebContext](https://webkitgtk.org/reference/webkit2gtk/stable/class.WebContext.html)):
+  ///    - Creates a new WebKitWebContext for shared WebView configuration.
   ///
   ///**Parameters - Officially Supported Platforms/Implementations**:
   ///- [settings]: all platforms
@@ -195,6 +199,7 @@ enum PlatformWebViewEnvironmentMethod {
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- Windows WebView2
+  ///- Linux WPE WebKit
   ///
   ///Use the [PlatformWebViewEnvironment.isMethodSupported] method to check if this method is supported at runtime.
   ///{@endtemplate}
@@ -215,6 +220,17 @@ enum PlatformWebViewEnvironmentMethod {
   ///Use the [PlatformWebViewEnvironment.isMethodSupported] method to check if this method is supported at runtime.
   ///{@endtemplate}
   getAvailableVersion,
+
+  ///Can be used to check if the [PlatformWebViewEnvironment.getCacheModel] method is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.PlatformWebViewEnvironment.getCacheModel.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Linux WPE WebKit ([Official API - webkit_web_context_get_cache_model](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/method.WebContext.get_cache_model.html))
+  ///
+  ///Use the [PlatformWebViewEnvironment.isMethodSupported] method to check if this method is supported at runtime.
+  ///{@endtemplate}
+  getCacheModel,
 
   ///Can be used to check if the [PlatformWebViewEnvironment.getFailureReportFolderPath] method is supported at runtime.
   ///
@@ -238,6 +254,39 @@ enum PlatformWebViewEnvironmentMethod {
   ///{@endtemplate}
   getProcessInfos,
 
+  ///Can be used to check if the [PlatformWebViewEnvironment.getSpellCheckingLanguages] method is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.PlatformWebViewEnvironment.getSpellCheckingLanguages.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Linux WPE WebKit ([Official API - webkit_web_context_get_spell_checking_languages](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/method.WebContext.get_spell_checking_languages.html))
+  ///
+  ///Use the [PlatformWebViewEnvironment.isMethodSupported] method to check if this method is supported at runtime.
+  ///{@endtemplate}
+  getSpellCheckingLanguages,
+
+  ///Can be used to check if the [PlatformWebViewEnvironment.getTlsErrorsPolicy] method is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.PlatformWebViewEnvironment.getTlsErrorsPolicy.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Linux WPE WebKit ([Official API - webkit_web_context_get_tls_errors_policy](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/method.WebContext.get_tls_errors_policy.html))
+  ///
+  ///Use the [PlatformWebViewEnvironment.isMethodSupported] method to check if this method is supported at runtime.
+  ///{@endtemplate}
+  getTlsErrorsPolicy,
+
+  ///Can be used to check if the [PlatformWebViewEnvironment.isAutomationAllowed] method is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.PlatformWebViewEnvironment.isAutomationAllowed.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Linux WPE WebKit ([Official API - webkit_web_context_is_automation_allowed](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/method.WebContext.is_automation_allowed.html))
+  ///
+  ///Use the [PlatformWebViewEnvironment.isMethodSupported] method to check if this method is supported at runtime.
+  ///{@endtemplate}
+  isAutomationAllowed,
+
   ///Can be used to check if the [PlatformWebViewEnvironment.isInterfaceSupported] method is supported at runtime.
   ///
   ///{@template flutter_inappwebview_platform_interface.PlatformWebViewEnvironment.isInterfaceSupported.supported_platforms}
@@ -251,6 +300,17 @@ enum PlatformWebViewEnvironmentMethod {
   ///Use the [PlatformWebViewEnvironment.isMethodSupported] method to check if this method is supported at runtime.
   ///{@endtemplate}
   isInterfaceSupported,
+
+  ///Can be used to check if the [PlatformWebViewEnvironment.isSpellCheckingEnabled] method is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.PlatformWebViewEnvironment.isSpellCheckingEnabled.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Linux WPE WebKit ([Official API - webkit_web_context_get_spell_checking_enabled](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/method.WebContext.get_spell_checking_enabled.html))
+  ///
+  ///Use the [PlatformWebViewEnvironment.isMethodSupported] method to check if this method is supported at runtime.
+  ///{@endtemplate}
+  isSpellCheckingEnabled,
 }
 
 extension _PlatformWebViewEnvironmentMethodSupported
@@ -269,11 +329,13 @@ extension _PlatformWebViewEnvironmentMethodSupported
         return ((kIsWeb && platform != null) || !kIsWeb) &&
             [
               TargetPlatform.windows,
+              TargetPlatform.linux,
             ].contains(platform ?? defaultTargetPlatform);
       case PlatformWebViewEnvironmentMethod.dispose:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
             [
               TargetPlatform.windows,
+              TargetPlatform.linux,
             ].contains(platform ?? defaultTargetPlatform);
       case PlatformWebViewEnvironmentMethod.getAvailableVersion:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
@@ -281,6 +343,9 @@ extension _PlatformWebViewEnvironmentMethodSupported
               TargetPlatform.windows,
               TargetPlatform.linux,
             ].contains(platform ?? defaultTargetPlatform);
+      case PlatformWebViewEnvironmentMethod.getCacheModel:
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
+            [TargetPlatform.linux].contains(platform ?? defaultTargetPlatform);
       case PlatformWebViewEnvironmentMethod.getFailureReportFolderPath:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
             [
@@ -291,11 +356,23 @@ extension _PlatformWebViewEnvironmentMethodSupported
             [
               TargetPlatform.windows,
             ].contains(platform ?? defaultTargetPlatform);
+      case PlatformWebViewEnvironmentMethod.getSpellCheckingLanguages:
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
+            [TargetPlatform.linux].contains(platform ?? defaultTargetPlatform);
+      case PlatformWebViewEnvironmentMethod.getTlsErrorsPolicy:
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
+            [TargetPlatform.linux].contains(platform ?? defaultTargetPlatform);
+      case PlatformWebViewEnvironmentMethod.isAutomationAllowed:
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
+            [TargetPlatform.linux].contains(platform ?? defaultTargetPlatform);
       case PlatformWebViewEnvironmentMethod.isInterfaceSupported:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
             [
               TargetPlatform.windows,
             ].contains(platform ?? defaultTargetPlatform);
+      case PlatformWebViewEnvironmentMethod.isSpellCheckingEnabled:
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
+            [TargetPlatform.linux].contains(platform ?? defaultTargetPlatform);
     }
   }
 }

@@ -46,6 +46,8 @@ std::vector<PermissionResourceType> PermissionRequest::getResourceTypes(
   // Note: WEBKIT_IS_POINTER_LOCK_PERMISSION_REQUEST is not available in WPE WebKit
   else if (WEBKIT_IS_DEVICE_INFO_PERMISSION_REQUEST(request)) {
     types.push_back(PermissionResourceType::DEVICE_INFO);
+  } else if (WEBKIT_IS_MEDIA_KEY_SYSTEM_PERMISSION_REQUEST(request)) {
+    types.push_back(PermissionResourceType::PROTECTED_MEDIA_ID);
   }
 
   return types;

@@ -501,6 +501,8 @@ enum PlatformInAppWebViewControllerMethod {
   ///    - This method is implemented using JavaScript.
   ///- macOS WKWebView:
   ///    - This method is implemented using JavaScript.
+  ///- Linux WPE WebKit:
+  ///    - Implemented via JavaScript MessageChannel API.
   ///
   ///Use the [PlatformInAppWebViewController.isMethodSupported] method to check if this method is supported at runtime.
   ///{@endtemplate}
@@ -1679,6 +1681,8 @@ enum PlatformInAppWebViewControllerMethod {
   ///    - This method is implemented using JavaScript.
   ///- macOS WKWebView:
   ///    - This method is implemented using JavaScript.
+  ///- Linux WPE WebKit:
+  ///    - Implemented via JavaScript MessageChannel API.
   ///
   ///**Parameters - Officially Supported Platforms/Implementations**:
   ///- [message]: all platforms
@@ -2600,6 +2604,7 @@ extension _PlatformInAppWebViewControllerMethodSupported
               TargetPlatform.android,
               TargetPlatform.iOS,
               TargetPlatform.macOS,
+              TargetPlatform.linux,
             ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.disableWebView:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
@@ -3209,6 +3214,7 @@ extension _PlatformInAppWebViewControllerMethodSupported
               TargetPlatform.android,
               TargetPlatform.iOS,
               TargetPlatform.macOS,
+              TargetPlatform.linux,
             ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.printCurrentPage:
         return kIsWeb && platform == null

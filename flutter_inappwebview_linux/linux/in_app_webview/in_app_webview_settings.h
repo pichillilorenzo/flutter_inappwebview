@@ -109,6 +109,11 @@ class InAppWebViewSettings {
   // When true, creates an ephemeral network session (no persistent storage)
   bool incognito = false;
 
+  // === CORS allowlist ===
+  // List of URI patterns for which CORS checks are disabled
+  // Pattern format: [protocol]://[host]:[port]
+  std::optional<std::vector<std::string>> corsAllowlist;
+
   InAppWebViewSettings();
   explicit InAppWebViewSettings(FlValue* map);
   ~InAppWebViewSettings();

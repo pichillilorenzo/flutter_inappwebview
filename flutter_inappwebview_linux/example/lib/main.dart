@@ -85,7 +85,7 @@ class _MyAppState extends State<MyApp> {
                       LinuxInAppWebViewWidgetCreationParams(
                         key: webViewKey,
                         initialUrlRequest: URLRequest(
-                          url: WebUri("https://www.google.com/search?client=ubuntu-sn&channel=fs&q=current+timezone"),
+                          url: WebUri("https://badssl.com/"),
                         ),
                         initialSettings: settings,
                         onWebViewCreated: (controller) {
@@ -139,6 +139,19 @@ class _MyAppState extends State<MyApp> {
                         },
                         onReceivedError: (controller, request, error) {},
                         onReceivedHttpError: (controller, request, response) {},
+                        onReceivedClientCertRequest: (controller, challenge) async {
+                          // This callback is triggered when a server requests a client certificate
+                          print('[TEST] onReceivedClientCertRequest: ${challenge.protectionSpace.host}:${challenge.protectionSpace.port}');
+                          // For testing, we just cancel the request
+                          // In a real app, you might load a certificate from a file:
+                          // return ClientCertResponse(
+                          //   certificatePath: '/path/to/client.pem',
+                          //   action: ClientCertResponseAction.PROCEED,
+                          // );
+                          return ClientCertResponse(
+                            action: ClientCertResponseAction.CANCEL,
+                          );
+                        },
                         onConsoleMessage: (controller, consoleMessage) {
                           if (kDebugMode) {
                             print('[CONSOLE] ${consoleMessage.message}');

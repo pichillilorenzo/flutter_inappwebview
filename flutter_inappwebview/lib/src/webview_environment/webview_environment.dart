@@ -87,9 +87,6 @@ class WebViewEnvironment {
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewEnvironment.getCacheModel}
   Future<CacheModel?> getCacheModel() => platform.getCacheModel();
 
-  ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewEnvironment.getTlsErrorsPolicy}
-  Future<TLSErrorsPolicy?> getTlsErrorsPolicy() => platform.getTlsErrorsPolicy();
-
   ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewEnvironment.isSpellCheckingEnabled}
   Future<bool> isSpellCheckingEnabled() => platform.isSpellCheckingEnabled();
 

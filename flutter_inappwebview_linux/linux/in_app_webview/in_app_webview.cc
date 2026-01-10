@@ -36,6 +36,8 @@
 #include "../plugin_scripts_js/on_load_resource_js.h"
 #include "../plugin_scripts_js/web_message_channel_js.h"
 #include "../plugin_scripts_js/web_message_listener_js.h"
+#include "../types/client_cert_challenge.h"
+#include "../types/client_cert_response.h"
 #include "../types/create_window_action.h"
 #include "../types/custom_scheme_response.h"
 #include "../types/hit_test_result.h"
@@ -55,6 +57,7 @@
 #include "webview_channel_delegate.h"
 #include "../types/find_session.h"
 #include "../web_message/web_message_channel.h"
+#include "../web_message/web_message_listener.h"
 
 using json = nlohmann::json;
 
@@ -294,6 +297,14 @@ InAppWebView::~InAppWebView() {
     }
   }
   web_message_channels_.clear();
+
+  // Clean up WebMessageListeners
+  for (auto& pair : web_message_listeners_) {
+    if (pair.second) {
+      pair.second->dispose();
+    }
+  }
+  web_message_listeners_.clear();
 
   // IMPORTANT: Clean up user content controller FIRST while webview is still valid
   // The UserContentController destructor needs access to WebKit's user content manager
@@ -1562,11 +1573,25 @@ void InAppWebView::removeAllUserScripts() {
 
 void InAppWebView::addWebMessageListener(const std::string& jsObjectName,
                                           const std::vector<std::string>& allowedOriginRules) {
-  if (webview_ == nullptr || jsObjectName.empty()) {
+  if (webview_ == nullptr || jsObjectName.empty() || messenger_ == nullptr) {
     return;
   }
 
-  // Build the allowed origin rules JSON array
+  // Generate a unique ID for this listener
+  static int64_t listener_counter = 0;
+  std::string listenerId = std::to_string(g_get_monotonic_time()) + "_" +
+                           std::to_string(++listener_counter);
+
+  // Create the native WebMessageListener with its dedicated channel
+  // This follows the federated plugin pattern (matching iOS/Android)
+  std::set<std::string> originRulesSet(allowedOriginRules.begin(), allowedOriginRules.end());
+  auto listener = std::make_unique<WebMessageListener>(
+      messenger_, listenerId, jsObjectName, originRulesSet, this);
+
+  // Store the listener by jsObjectName (so we can find it when JS posts a message)
+  web_message_listeners_[jsObjectName] = std::move(listener);
+
+  // Build the allowed origin rules JSON array for JavaScript injection
   std::string allowedOriginRulesJs = "[";
   for (size_t i = 0; i < allowedOriginRules.size(); ++i) {
     const std::string& rule = allowedOriginRules[i];
@@ -3320,7 +3345,131 @@ gboolean InAppWebView::OnAuthenticate(WebKitWebView* web_view, WebKitAuthenticat
                                      realm ? std::make_optional(std::string(realm)) : std::nullopt,
                                      URLProtectionSpace::fromWebKitScheme(scheme), isProxy);
 
-  // Build ProtectionSpace for libsecret lookup
+  // Check if this is a client certificate request
+  if (scheme == WEBKIT_AUTHENTICATION_SCHEME_CLIENT_CERTIFICATE_REQUESTED) {
+    // Handle client certificate request
+    auto challenge = std::make_unique<ClientCertChallenge>(protectionSpace, isProxy);
+    
+    // Keep reference to the request
+    g_object_ref(request);
+    int64_t requestId = self->next_auth_id_++;
+    self->pending_auth_requests_[requestId] = request;
+    
+    auto callback = std::make_unique<WebViewChannelDelegate::ClientCertRequestCallback>();
+    
+    auto* pendingRequests = &self->pending_auth_requests_;
+    int64_t capturedId = requestId;
+    
+    callback->nonNullSuccess = [pendingRequests, capturedId](ClientCertResponse response) {
+      auto it = pendingRequests->find(capturedId);
+      if (it != pendingRequests->end()) {
+        switch (response.action) {
+          case ClientCertResponseAction::PROCEED: {
+            // WPE WebKit's webkit_credential_new_for_certificate() API (since 2.34)
+            // allows providing a client certificate.
+            // GTlsCertificate constructors (from docs.gtk.org/gio/class.TlsCertificate.html):
+            // - g_tls_certificate_new_from_file: PEM file containing cert + optionally private key
+            // - g_tls_certificate_new_from_file_with_password: Password-protected file (since 2.72)
+            // - g_tls_certificate_new_from_files: Separate cert and key files
+            // - g_tls_certificate_new_from_pkcs12: PKCS#12 data with password (since 2.72)
+            if (response.certificatePath.has_value() && !response.certificatePath->empty()) {
+              GError* error = nullptr;
+              GTlsCertificate* cert = nullptr;
+              
+              std::string keyStoreType = response.keyStoreType.value_or("");
+              std::string certPath = response.certificatePath.value();
+              std::optional<std::string> password = response.certificatePassword;
+              
+              if (keyStoreType == "PKCS12" || keyStoreType == "pkcs12") {
+                // For PKCS12, we need to read the file and use g_tls_certificate_new_from_pkcs12
+                // which requires GLib 2.72+
+                #if GLIB_CHECK_VERSION(2, 72, 0)
+                // Read the PKCS12 file
+                gchar* data = nullptr;
+                gsize length = 0;
+                if (g_file_get_contents(certPath.c_str(), &data, &length, &error)) {
+                  cert = g_tls_certificate_new_from_pkcs12(
+                      reinterpret_cast<const guint8*>(data),
+                      length,
+                      password.has_value() ? password->c_str() : nullptr,
+                      &error);
+                  g_free(data);
+                }
+                #else
+                debugLog("PKCS12 certificates require GLib 2.72+. Trying PEM fallback...");
+                // Fallback to trying as PEM
+                cert = g_tls_certificate_new_from_file(certPath.c_str(), &error);
+                #endif
+              } else if (password.has_value() && !password->empty()) {
+                // Password-protected file (e.g., encrypted PEM) - requires GLib 2.72+
+                #if GLIB_CHECK_VERSION(2, 72, 0)
+                cert = g_tls_certificate_new_from_file_with_password(
+                    certPath.c_str(),
+                    password->c_str(),
+                    &error);
+                #else
+                debugLog("Password-protected certificates require GLib 2.72+. Trying without password...");
+                cert = g_tls_certificate_new_from_file(certPath.c_str(), &error);
+                #endif
+              } else {
+                // Standard PEM file (certificate + optional private key in same file)
+                cert = g_tls_certificate_new_from_file(certPath.c_str(), &error);
+              }
+              
+              if (cert != nullptr) {
+                // Create credential from certificate
+                WebKitCredential* credential = webkit_credential_new_for_certificate(
+                    cert, WEBKIT_CREDENTIAL_PERSISTENCE_FOR_SESSION);
+                webkit_authentication_request_authenticate(it->second, credential);
+                webkit_credential_free(credential);
+                g_object_unref(cert);
+              } else {
+                if (error != nullptr) {
+                  debugLog("Failed to load client certificate: " + std::string(error->message));
+                  g_error_free(error);
+                }
+                webkit_authentication_request_cancel(it->second);
+              }
+            } else {
+              // No certificate path provided, cancel
+              debugLog("Client certificate PROCEED without certificate path - canceling");
+              webkit_authentication_request_cancel(it->second);
+            }
+            break;
+          }
+          
+          case ClientCertResponseAction::IGNORE:
+            // Ignore means don't handle this request (let WebKit handle or retry later)
+            webkit_authentication_request_cancel(it->second);
+            break;
+          
+          case ClientCertResponseAction::CANCEL:
+          default:
+            webkit_authentication_request_cancel(it->second);
+            break;
+        }
+        
+        g_object_unref(it->second);
+        pendingRequests->erase(it);
+      }
+      return false;
+    };
+    
+    callback->defaultBehaviour = [pendingRequests, capturedId](std::optional<ClientCertResponse>) {
+      auto it = pendingRequests->find(capturedId);
+      if (it != pendingRequests->end()) {
+        webkit_authentication_request_cancel(it->second);
+        g_object_unref(it->second);
+        pendingRequests->erase(it);
+      }
+    };
+    
+    self->channel_delegate_->onReceivedClientCertRequest(std::move(challenge), std::move(callback));
+    
+    return TRUE;  // We're handling the request
+  }
+
+  // Build ProtectionSpace for libsecret lookup (for HTTP auth)
   ProtectionSpace credProtectionSpace;
   credProtectionSpace.host = host ? std::string(host) : "";
   credProtectionSpace.port = static_cast<int>(port);
@@ -5229,6 +5378,71 @@ void InAppWebView::handleScriptMessage(const std::string& name, const std::strin
       WebMessageChannel* channel = targetWebView->getWebMessageChannel(webMessageChannelId);
       if (channel != nullptr) {
         channel->onMessage(portIndex, messageData.empty() ? nullptr : &messageData, messageType);
+      }
+    }
+
+  } else if (handlerName == "onWebMessageListenerPostMessageReceived") {
+    // Handle WebMessageListener post message
+    // This is called when JavaScript calls webMessageListener.postMessage()
+    // Route the callback through the dedicated WebMessageListener channel (federated plugin pattern)
+    std::string jsObjectName = "";
+    std::string messageData = "";
+    int64_t messageType = 0;
+    std::string sourceOriginStr = "";
+    bool isMainFrame = true;
+
+    if (!argsJsonStr.empty()) {
+      try {
+        json argsJson = json::parse(argsJsonStr);
+        if (argsJson.is_array() && !argsJson.empty()) {
+          json firstArg = argsJson[0];
+          if (firstArg.contains("jsObjectName") && firstArg["jsObjectName"].is_string()) {
+            jsObjectName = firstArg["jsObjectName"].get<std::string>();
+          }
+          if (firstArg.contains("sourceOrigin") && firstArg["sourceOrigin"].is_string()) {
+            sourceOriginStr = firstArg["sourceOrigin"].get<std::string>();
+          }
+          if (firstArg.contains("isMainFrame") && firstArg["isMainFrame"].is_boolean()) {
+            isMainFrame = firstArg["isMainFrame"].get<bool>();
+          }
+          if (firstArg.contains("message") && firstArg["message"].is_object()) {
+            json messageObj = firstArg["message"];
+            if (messageObj.contains("type") && messageObj["type"].is_number()) {
+              messageType = messageObj["type"].get<int64_t>();
+            }
+            if (messageObj.contains("data")) {
+              if (messageType == 1 && messageObj["data"].is_array()) {
+                // ArrayBuffer - convert byte array to comma-separated string
+                std::string bytes;
+                for (auto& byte : messageObj["data"]) {
+                  if (!bytes.empty()) bytes += ",";
+                  bytes += std::to_string(byte.get<int>());
+                }
+                messageData = bytes;
+              } else if (messageObj["data"].is_string()) {
+                messageData = messageObj["data"].get<std::string>();
+              } else if (messageObj["data"].is_null()) {
+                // null data
+              } else {
+                messageData = messageObj["data"].dump();
+              }
+            }
+          }
+        }
+      } catch (const json::parse_error& e) {
+        debugLog("onWebMessageListenerPostMessageReceived: Failed to parse args: " + std::string(e.what()));
+      }
+    }
+
+    // Find the WebMessageListener and route the callback through its dedicated channel
+    if (!jsObjectName.empty()) {
+      auto it = targetWebView->web_message_listeners_.find(jsObjectName);
+      if (it != targetWebView->web_message_listeners_.end() && it->second) {
+        it->second->onPostMessage(
+            messageData.empty() ? nullptr : &messageData,
+            messageType,
+            sourceOriginStr,
+            isMainFrame);
       }
     }
 

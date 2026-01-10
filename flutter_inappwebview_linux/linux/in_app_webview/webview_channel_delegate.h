@@ -12,6 +12,8 @@
 
 #include "../types/base_callback_result.h"
 #include "../types/channel_delegate.h"
+#include "../types/client_cert_challenge.h"
+#include "../types/client_cert_response.h"
 #include "../types/create_window_action.h"
 #include "../types/custom_scheme_response.h"
 #include "../types/download_start_request.h"
@@ -154,6 +156,16 @@ class WebViewChannelDelegate : public ChannelDelegate {
   };
 
   /**
+   * Callback for onReceivedClientCertRequest.
+   * Returns ClientCertResponse indicating how to handle the client certificate request.
+   */
+  class ClientCertRequestCallback : public BaseCallbackResult<ClientCertResponse> {
+   public:
+    ClientCertRequestCallback();
+    ~ClientCertRequestCallback() = default;
+  };
+
+  /**
    * Callback for onDownloadStarting.
    */
   class DownloadStartCallback : public BaseCallbackResult<DownloadStartResponse> {
@@ -250,6 +262,9 @@ class WebViewChannelDelegate : public ChannelDelegate {
 
   void onReceivedServerTrustAuthRequest(std::unique_ptr<ServerTrustChallenge> challenge,
                                         std::unique_ptr<ServerTrustAuthRequestCallback> callback) const;
+
+  void onReceivedClientCertRequest(std::unique_ptr<ClientCertChallenge> challenge,
+                                   std::unique_ptr<ClientCertRequestCallback> callback) const;
 
   void onDownloadStarting(std::unique_ptr<DownloadStartRequest> request,
                           std::unique_ptr<DownloadStartCallback> callback) const;

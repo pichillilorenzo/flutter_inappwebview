@@ -59,6 +59,7 @@ namespace flutter_inappwebview_plugin {
 class InAppWebViewManager;
 class UserContentController;
 class WebMessageChannel;
+class WebMessageListener;
 class WebViewChannelDelegate;
 
 struct InAppWebViewCreationParams {
@@ -430,6 +431,10 @@ class InAppWebView {
 
   // Web message channels (for WebMessageChannel support)
   std::map<std::string, std::unique_ptr<WebMessageChannel>> web_message_channels_;
+
+  // Web message listeners (for WebMessageListener support - federated plugin pattern)
+  // Key is jsObjectName, value is the WebMessageListener
+  std::map<std::string, std::unique_ptr<WebMessageListener>> web_message_listeners_;
 
   // Initial user scripts from params
   std::vector<std::shared_ptr<UserScript>> initial_user_scripts_;

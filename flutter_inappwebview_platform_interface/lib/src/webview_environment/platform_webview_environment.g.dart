@@ -265,17 +265,6 @@ enum PlatformWebViewEnvironmentMethod {
   ///{@endtemplate}
   getSpellCheckingLanguages,
 
-  ///Can be used to check if the [PlatformWebViewEnvironment.getTlsErrorsPolicy] method is supported at runtime.
-  ///
-  ///{@template flutter_inappwebview_platform_interface.PlatformWebViewEnvironment.getTlsErrorsPolicy.supported_platforms}
-  ///
-  ///**Officially Supported Platforms/Implementations**:
-  ///- Linux WPE WebKit ([Official API - webkit_web_context_get_tls_errors_policy](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/method.WebContext.get_tls_errors_policy.html))
-  ///
-  ///Use the [PlatformWebViewEnvironment.isMethodSupported] method to check if this method is supported at runtime.
-  ///{@endtemplate}
-  getTlsErrorsPolicy,
-
   ///Can be used to check if the [PlatformWebViewEnvironment.isAutomationAllowed] method is supported at runtime.
   ///
   ///{@template flutter_inappwebview_platform_interface.PlatformWebViewEnvironment.isAutomationAllowed.supported_platforms}
@@ -357,9 +346,6 @@ extension _PlatformWebViewEnvironmentMethodSupported
               TargetPlatform.windows,
             ].contains(platform ?? defaultTargetPlatform);
       case PlatformWebViewEnvironmentMethod.getSpellCheckingLanguages:
-        return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.linux].contains(platform ?? defaultTargetPlatform);
-      case PlatformWebViewEnvironmentMethod.getTlsErrorsPolicy:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.linux].contains(platform ?? defaultTargetPlatform);
       case PlatformWebViewEnvironmentMethod.isAutomationAllowed:

@@ -257,4 +257,3 @@ export 'show_file_chooser_request_mode.dart' show ShowFileChooserRequestMode;
 export 'show_file_chooser_request.dart' show ShowFileChooserRequest;
 export 'show_file_chooser_response.dart' show ShowFileChooserResponse;
 export 'cache_model.dart' show CacheModel;
-export 'tls_errors_policy.dart' show TLSErrorsPolicy;

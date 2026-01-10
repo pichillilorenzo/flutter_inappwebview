@@ -27,6 +27,34 @@ class URLProtectionSpaceAuthenticationMethod {
         'NSURLAuthenticationMethodClientCertificate',
       );
 
+  ///Use the default authentication method for a protocol.
+  static const NSURL_AUTHENTICATION_METHOD_DEFAULT =
+      URLProtectionSpaceAuthenticationMethod._internal(
+        'NSURLAuthenticationMethodDefault',
+        'NSURLAuthenticationMethodDefault',
+      );
+
+  ///Use HTML form authentication for this protection space.
+  static const NSURL_AUTHENTICATION_METHOD_HTML_FORM =
+      URLProtectionSpaceAuthenticationMethod._internal(
+        'NSURLAuthenticationMethodHTMLForm',
+        'NSURLAuthenticationMethodHTMLForm',
+      );
+
+  ///Use HTTP basic authentication for this protection space.
+  static const NSURL_AUTHENTICATION_METHOD_HTTP_BASIC =
+      URLProtectionSpaceAuthenticationMethod._internal(
+        'NSURLAuthenticationMethodHTTPBasic',
+        'NSURLAuthenticationMethodHTTPBasic',
+      );
+
+  ///Use HTTP digest authentication for this protection space.
+  static const NSURL_AUTHENTICATION_METHOD_HTTP_DIGEST =
+      URLProtectionSpaceAuthenticationMethod._internal(
+        'NSURLAuthenticationMethodHTTPDigest',
+        'NSURLAuthenticationMethodHTTPDigest',
+      );
+
   ///Negotiate whether to use Kerberos or NTLM authentication for this protection space.
   static const NSURL_AUTHENTICATION_METHOD_NEGOTIATE =
       URLProtectionSpaceAuthenticationMethod._internal(
@@ -52,6 +80,13 @@ class URLProtectionSpaceAuthenticationMethod {
   static final Set<URLProtectionSpaceAuthenticationMethod> values = [
     URLProtectionSpaceAuthenticationMethod
         .NSURL_AUTHENTICATION_METHOD_CLIENT_CERTIFICATE,
+    URLProtectionSpaceAuthenticationMethod.NSURL_AUTHENTICATION_METHOD_DEFAULT,
+    URLProtectionSpaceAuthenticationMethod
+        .NSURL_AUTHENTICATION_METHOD_HTML_FORM,
+    URLProtectionSpaceAuthenticationMethod
+        .NSURL_AUTHENTICATION_METHOD_HTTP_BASIC,
+    URLProtectionSpaceAuthenticationMethod
+        .NSURL_AUTHENTICATION_METHOD_HTTP_DIGEST,
     URLProtectionSpaceAuthenticationMethod
         .NSURL_AUTHENTICATION_METHOD_NEGOTIATE,
     URLProtectionSpaceAuthenticationMethod.NSURL_AUTHENTICATION_METHOD_NTLM,
@@ -132,6 +167,14 @@ class URLProtectionSpaceAuthenticationMethod {
     switch (_value) {
       case 'NSURLAuthenticationMethodClientCertificate':
         return 'NSURL_AUTHENTICATION_METHOD_CLIENT_CERTIFICATE';
+      case 'NSURLAuthenticationMethodDefault':
+        return 'NSURL_AUTHENTICATION_METHOD_DEFAULT';
+      case 'NSURLAuthenticationMethodHTMLForm':
+        return 'NSURL_AUTHENTICATION_METHOD_HTML_FORM';
+      case 'NSURLAuthenticationMethodHTTPBasic':
+        return 'NSURL_AUTHENTICATION_METHOD_HTTP_BASIC';
+      case 'NSURLAuthenticationMethodHTTPDigest':
+        return 'NSURL_AUTHENTICATION_METHOD_HTTP_DIGEST';
       case 'NSURLAuthenticationMethodNegotiate':
         return 'NSURL_AUTHENTICATION_METHOD_NEGOTIATE';
       case 'NSURLAuthenticationMethodNTLM':
@@ -185,6 +228,34 @@ class IOSNSURLProtectionSpaceAuthenticationMethod {
         'NSURLAuthenticationMethodClientCertificate',
       );
 
+  ///Use the default authentication method for a protocol.
+  static const NSURL_AUTHENTICATION_METHOD_DEFAULT =
+      IOSNSURLProtectionSpaceAuthenticationMethod._internal(
+        'NSURLAuthenticationMethodDefault',
+        'NSURLAuthenticationMethodDefault',
+      );
+
+  ///Use HTML form authentication for this protection space.
+  static const NSURL_AUTHENTICATION_METHOD_HTML_FORM =
+      IOSNSURLProtectionSpaceAuthenticationMethod._internal(
+        'NSURLAuthenticationMethodHTMLForm',
+        'NSURLAuthenticationMethodHTMLForm',
+      );
+
+  ///Use HTTP basic authentication for this protection space.
+  static const NSURL_AUTHENTICATION_METHOD_HTTP_BASIC =
+      IOSNSURLProtectionSpaceAuthenticationMethod._internal(
+        'NSURLAuthenticationMethodHTTPBasic',
+        'NSURLAuthenticationMethodHTTPBasic',
+      );
+
+  ///Use HTTP digest authentication for this protection space.
+  static const NSURL_AUTHENTICATION_METHOD_HTTP_DIGEST =
+      IOSNSURLProtectionSpaceAuthenticationMethod._internal(
+        'NSURLAuthenticationMethodHTTPDigest',
+        'NSURLAuthenticationMethodHTTPDigest',
+      );
+
   ///Negotiate whether to use Kerberos or NTLM authentication for this protection space.
   static const NSURL_AUTHENTICATION_METHOD_NEGOTIATE =
       IOSNSURLProtectionSpaceAuthenticationMethod._internal(
@@ -210,6 +281,14 @@ class IOSNSURLProtectionSpaceAuthenticationMethod {
   static final Set<IOSNSURLProtectionSpaceAuthenticationMethod> values = [
     IOSNSURLProtectionSpaceAuthenticationMethod
         .NSURL_AUTHENTICATION_METHOD_CLIENT_CERTIFICATE,
+    IOSNSURLProtectionSpaceAuthenticationMethod
+        .NSURL_AUTHENTICATION_METHOD_DEFAULT,
+    IOSNSURLProtectionSpaceAuthenticationMethod
+        .NSURL_AUTHENTICATION_METHOD_HTML_FORM,
+    IOSNSURLProtectionSpaceAuthenticationMethod
+        .NSURL_AUTHENTICATION_METHOD_HTTP_BASIC,
+    IOSNSURLProtectionSpaceAuthenticationMethod
+        .NSURL_AUTHENTICATION_METHOD_HTTP_DIGEST,
     IOSNSURLProtectionSpaceAuthenticationMethod
         .NSURL_AUTHENTICATION_METHOD_NEGOTIATE,
     IOSNSURLProtectionSpaceAuthenticationMethod
@@ -291,6 +370,14 @@ class IOSNSURLProtectionSpaceAuthenticationMethod {
     switch (_value) {
       case 'NSURLAuthenticationMethodClientCertificate':
         return 'NSURL_AUTHENTICATION_METHOD_CLIENT_CERTIFICATE';
+      case 'NSURLAuthenticationMethodDefault':
+        return 'NSURL_AUTHENTICATION_METHOD_DEFAULT';
+      case 'NSURLAuthenticationMethodHTMLForm':
+        return 'NSURL_AUTHENTICATION_METHOD_HTML_FORM';
+      case 'NSURLAuthenticationMethodHTTPBasic':
+        return 'NSURL_AUTHENTICATION_METHOD_HTTP_BASIC';
+      case 'NSURLAuthenticationMethodHTTPDigest':
+        return 'NSURL_AUTHENTICATION_METHOD_HTTP_DIGEST';
       case 'NSURLAuthenticationMethodNegotiate':
         return 'NSURL_AUTHENTICATION_METHOD_NEGOTIATE';
       case 'NSURLAuthenticationMethodNTLM':

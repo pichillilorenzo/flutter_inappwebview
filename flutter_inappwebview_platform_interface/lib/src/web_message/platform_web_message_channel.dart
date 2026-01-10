@@ -21,9 +21,7 @@ part 'platform_web_message_channel.g.dart';
     AndroidPlatform(),
     IOSPlatform(),
     MacOSPlatform(),
-    LinuxPlatform(
-      note: 'Implemented via JavaScript MessageChannel API.',
-    ),
+    LinuxPlatform(note: 'Implemented via JavaScript MessageChannel API.'),
   ],
 )
 @immutable
@@ -45,9 +43,7 @@ class PlatformWebMessageChannelCreationParams {
       AndroidPlatform(),
       IOSPlatform(),
       MacOSPlatform(),
-      LinuxPlatform(
-        note: 'Implemented via JavaScript MessageChannel API.',
-      ),
+      LinuxPlatform(note: 'Implemented via JavaScript MessageChannel API.'),
     ],
   )
   final String id;
@@ -62,9 +58,7 @@ class PlatformWebMessageChannelCreationParams {
       AndroidPlatform(),
       IOSPlatform(),
       MacOSPlatform(),
-      LinuxPlatform(
-        note: 'Implemented via JavaScript MessageChannel API.',
-      ),
+      LinuxPlatform(note: 'Implemented via JavaScript MessageChannel API.'),
     ],
   )
   final PlatformWebMessagePort port1;
@@ -79,9 +73,7 @@ class PlatformWebMessageChannelCreationParams {
       AndroidPlatform(),
       IOSPlatform(),
       MacOSPlatform(),
-      LinuxPlatform(
-        note: 'Implemented via JavaScript MessageChannel API.',
-      ),
+      LinuxPlatform(note: 'Implemented via JavaScript MessageChannel API.'),
     ],
   )
   final PlatformWebMessagePort port2;
@@ -122,9 +114,7 @@ class PlatformWebMessageChannelCreationParams {
     AndroidPlatform(),
     IOSPlatform(),
     MacOSPlatform(),
-    LinuxPlatform(
-      note: 'Implemented via JavaScript MessageChannel API.',
-    ),
+    LinuxPlatform(note: 'Implemented via JavaScript MessageChannel API.'),
   ],
 )
 abstract class PlatformWebMessageChannel extends PlatformInterface
@@ -205,9 +195,7 @@ abstract class PlatformWebMessageChannel extends PlatformInterface
       AndroidPlatform(),
       IOSPlatform(),
       MacOSPlatform(),
-      LinuxPlatform(
-        note: 'Implemented via JavaScript MessageChannel API.',
-      ),
+      LinuxPlatform(note: 'Implemented via JavaScript MessageChannel API.'),
     ],
   )
   @override

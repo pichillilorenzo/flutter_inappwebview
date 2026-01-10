@@ -154,6 +154,12 @@ InAppWebViewSettings::InAppWebViewSettings(FlValue* map) : InAppWebViewSettings(
 
   // === Incognito mode ===
   incognito = get_fl_map_value(map, "incognito", incognito);
+
+  // === CORS allowlist ===
+  if (fl_map_contains_not_null(map, "corsAllowlist")) {
+    corsAllowlist =
+        get_fl_map_value<std::vector<std::string>>(map, "corsAllowlist", {});
+  }
 }
 
 void InAppWebViewSettings::applyToWebView(WebKitWebView* webview) const {
@@ -261,6 +267,23 @@ void InAppWebViewSettings::applyToWebView(WebKitWebView* webview) const {
     WebKitColor bg = {0.0, 0.0, 0.0, 0.0};
     webkit_web_view_set_background_color(webview, &bg);
   }
+
+  // Apply CORS allowlist
+  if (corsAllowlist.has_value()) {
+    if (corsAllowlist->empty()) {
+      // Empty list clears the allowlist
+      webkit_web_view_set_cors_allowlist(webview, nullptr);
+    } else {
+      // Convert std::vector<std::string> to null-terminated array of C strings
+      std::vector<const char*> allowlist_ptrs;
+      allowlist_ptrs.reserve(corsAllowlist->size() + 1);
+      for (const auto& pattern : *corsAllowlist) {
+        allowlist_ptrs.push_back(pattern.c_str());
+      }
+      allowlist_ptrs.push_back(nullptr);  // NULL terminator
+      webkit_web_view_set_cors_allowlist(webview, allowlist_ptrs.data());
+    }
+  }
 }
 
 FlValue* InAppWebViewSettings::toFlValue() const {
@@ -366,6 +389,17 @@ FlValue* InAppWebViewSettings::toFlValue() const {
 
   // === Incognito mode ===
   fl_value_set_string_take(map, "incognito", fl_value_new_bool(incognito));
+
+  // === CORS allowlist ===
+  if (corsAllowlist.has_value()) {
+    FlValue* allowlist = fl_value_new_list();
+    for (const auto& pattern : *corsAllowlist) {
+      fl_value_append_take(allowlist, fl_value_new_string(pattern.c_str()));
+    }
+    fl_value_set_string_take(map, "corsAllowlist", allowlist);
+  } else {
+    fl_value_set_string_take(map, "corsAllowlist", fl_value_new_null());
+  }
 
   return map;
 }

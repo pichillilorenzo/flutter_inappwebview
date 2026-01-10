@@ -1122,6 +1122,8 @@ enum PlatformWebViewCreationParamsProperty {
   ///- iOS WKWebView ([Official API - WKNavigationDelegate.webView](https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455638-webview))
   ///- macOS WKWebView ([Official API - WKNavigationDelegate.webView](https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455638-webview))
   ///- Windows WebView2 ([Official API - ICoreWebView2_5.add_ClientCertificateRequested](https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2_5?view=webview2-1.0.2849.39#add_clientcertificaterequested))
+  ///- Linux WPE WebKit ([Official API - WebKitAuthenticationRequest with WEBKIT_AUTHENTICATION_SCHEME_CLIENT_CERTIFICATE_REQUESTED](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/signal.WebView.authenticate.html)):
+  ///    - WPE WebKit supports client certificate requests via the authenticate signal. Providing a certificate programmatically requires WebKit 2.34+ and the certificate must be loaded from a PEM file. PKCS12 format may not be fully supported. If the certificate cannot be loaded, PROCEED will behave like CANCEL.
   ///
   ///**Parameters - Officially Supported Platforms/Implementations**:
   ///- [challenge]: all platforms
@@ -2075,6 +2077,7 @@ extension _PlatformWebViewCreationParamsPropertySupported
               TargetPlatform.iOS,
               TargetPlatform.macOS,
               TargetPlatform.windows,
+              TargetPlatform.linux,
             ].contains(platform ?? defaultTargetPlatform);
       case PlatformWebViewCreationParamsProperty.onReceivedError:
         return ((kIsWeb && platform != null) || !kIsWeb) &&

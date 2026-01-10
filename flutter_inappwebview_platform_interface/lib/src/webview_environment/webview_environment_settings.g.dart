@@ -254,15 +254,6 @@ class WebViewEnvironmentSettings {
   ///    - This property must be set at WebContext construction time.
   final String? timeZoneOverride;
 
-  ///Set the TLS errors policy for the WebContext.
-  ///
-  ///Determines how TLS certificate errors are handled.
-  ///The default is [TLSErrorsPolicy.FAIL] which is the secure option.
-  ///
-  ///**Officially Supported Platforms/Implementations**:
-  ///- Linux WPE WebKit ([Official API - webkit_web_context_set_tls_errors_policy](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/method.WebContext.set_tls_errors_policy.html))
-  final TLSErrorsPolicy? tlsErrorsPolicy;
-
   ///You may specify the [userDataFolder] to change the default user data folder location for WebView2.
   ///The path is either an absolute file path or a relative file path that is interpreted as relative
   ///to the compiled code for the current process.
@@ -316,7 +307,6 @@ class WebViewEnvironmentSettings {
     this.spellCheckingLanguages,
     this.targetCompatibleBrowserVersion,
     this.timeZoneOverride,
-    this.tlsErrorsPolicy,
     this.userDataFolder,
     this.webProcessExtensionsDirectory,
   });
@@ -400,13 +390,6 @@ class WebViewEnvironmentSettings {
           : null,
       targetCompatibleBrowserVersion: map['targetCompatibleBrowserVersion'],
       timeZoneOverride: map['timeZoneOverride'],
-      tlsErrorsPolicy: switch (enumMethod ?? EnumMethod.nativeValue) {
-        EnumMethod.nativeValue => TLSErrorsPolicy.fromNativeValue(
-          map['tlsErrorsPolicy'],
-        ),
-        EnumMethod.value => TLSErrorsPolicy.fromValue(map['tlsErrorsPolicy']),
-        EnumMethod.name => TLSErrorsPolicy.byName(map['tlsErrorsPolicy']),
-      },
       userDataFolder: map['userDataFolder'],
       webProcessExtensionsDirectory: map['webProcessExtensionsDirectory'],
     );
@@ -455,11 +438,6 @@ class WebViewEnvironmentSettings {
       "spellCheckingLanguages": spellCheckingLanguages,
       "targetCompatibleBrowserVersion": targetCompatibleBrowserVersion,
       "timeZoneOverride": timeZoneOverride,
-      "tlsErrorsPolicy": switch (enumMethod ?? EnumMethod.nativeValue) {
-        EnumMethod.nativeValue => tlsErrorsPolicy?.toNativeValue(),
-        EnumMethod.value => tlsErrorsPolicy?.toValue(),
-        EnumMethod.name => tlsErrorsPolicy?.name(),
-      },
       "userDataFolder": userDataFolder,
       "webProcessExtensionsDirectory": webProcessExtensionsDirectory,
     };
@@ -478,6 +456,6 @@ class WebViewEnvironmentSettings {
 
   @override
   String toString() {
-    return 'WebViewEnvironmentSettings{additionalBrowserArguments: $additionalBrowserArguments, allowSingleSignOnUsingOSPrimaryAccount: $allowSingleSignOnUsingOSPrimaryAccount, areBrowserExtensionsEnabled: $areBrowserExtensionsEnabled, automationAllowed: $automationAllowed, browserExecutableFolder: $browserExecutableFolder, cacheModel: $cacheModel, channelSearchKind: $channelSearchKind, customSchemeRegistrations: $customSchemeRegistrations, enableTrackingPrevention: $enableTrackingPrevention, exclusiveUserDataFolderAccess: $exclusiveUserDataFolderAccess, isCustomCrashReportingEnabled: $isCustomCrashReportingEnabled, language: $language, preferredLanguages: $preferredLanguages, releaseChannels: $releaseChannels, sandboxPaths: $sandboxPaths, scrollbarStyle: $scrollbarStyle, spellCheckingEnabled: $spellCheckingEnabled, spellCheckingLanguages: $spellCheckingLanguages, targetCompatibleBrowserVersion: $targetCompatibleBrowserVersion, timeZoneOverride: $timeZoneOverride, tlsErrorsPolicy: $tlsErrorsPolicy, userDataFolder: $userDataFolder, webProcessExtensionsDirectory: $webProcessExtensionsDirectory}';
+    return 'WebViewEnvironmentSettings{additionalBrowserArguments: $additionalBrowserArguments, allowSingleSignOnUsingOSPrimaryAccount: $allowSingleSignOnUsingOSPrimaryAccount, areBrowserExtensionsEnabled: $areBrowserExtensionsEnabled, automationAllowed: $automationAllowed, browserExecutableFolder: $browserExecutableFolder, cacheModel: $cacheModel, channelSearchKind: $channelSearchKind, customSchemeRegistrations: $customSchemeRegistrations, enableTrackingPrevention: $enableTrackingPrevention, exclusiveUserDataFolderAccess: $exclusiveUserDataFolderAccess, isCustomCrashReportingEnabled: $isCustomCrashReportingEnabled, language: $language, preferredLanguages: $preferredLanguages, releaseChannels: $releaseChannels, sandboxPaths: $sandboxPaths, scrollbarStyle: $scrollbarStyle, spellCheckingEnabled: $spellCheckingEnabled, spellCheckingLanguages: $spellCheckingLanguages, targetCompatibleBrowserVersion: $targetCompatibleBrowserVersion, timeZoneOverride: $timeZoneOverride, userDataFolder: $userDataFolder, webProcessExtensionsDirectory: $webProcessExtensionsDirectory}';
   }
 }

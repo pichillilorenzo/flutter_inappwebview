@@ -58,9 +58,6 @@ void WebViewEnvironmentInstanceChannelDelegate::HandleMethodCall(FlMethodCall* m
   } else if (string_equals(method, "getCacheModel")) {
     int model = getCacheModel();
     fl_method_call_respond_success(method_call, fl_value_new_int(model), nullptr);
-  } else if (string_equals(method, "getTlsErrorsPolicy")) {
-    int policy = getTlsErrorsPolicy();
-    fl_method_call_respond_success(method_call, fl_value_new_int(policy), nullptr);
   } else if (string_equals(method, "isAutomationAllowed")) {
     bool allowed = isAutomationAllowed();
     fl_method_call_respond_success(method_call, fl_value_new_bool(allowed), nullptr);
@@ -95,13 +92,6 @@ int WebViewEnvironmentInstanceChannelDelegate::getCacheModel() const {
     return 1; // Default: WEBKIT_CACHE_MODEL_WEB_BROWSER
   }
   return static_cast<int>(webkit_web_context_get_cache_model(context_));
-}
-
-int WebViewEnvironmentInstanceChannelDelegate::getTlsErrorsPolicy() const {
-  // TLS errors policy is now managed via WebKitNetworkSession, not WebKitWebContext.
-  // WebKitWebContext no longer supports this API in WPE WebKit 2.40+.
-  // Return the default value (FAIL = 1) since we can't query it from the context.
-  return 1; // Default: WEBKIT_TLS_ERRORS_POLICY_FAIL
 }
 
 bool WebViewEnvironmentInstanceChannelDelegate::isAutomationAllowed() const {
@@ -207,11 +197,6 @@ void WebViewEnvironment::create(const std::string& id, FlValue* settings) {
       webkit_web_context_set_cache_model(context, 
           static_cast<WebKitCacheModel>(cacheModel.value()));
     }
-
-    // tlsErrorsPolicy - No longer supported on WebKitWebContext in WPE WebKit 2.40+
-    // TLS errors policy is now managed via WebKitNetworkSession, which is per-WebView.
-    // Ignoring this setting at WebViewEnvironment level.
-    // auto tlsErrorsPolicy = get_optional_fl_map_value<int64_t>(settings, "tlsErrorsPolicy");
 
     // spellCheckingEnabled
     auto spellCheckingEnabled = get_optional_fl_map_value<bool>(settings, "spellCheckingEnabled");

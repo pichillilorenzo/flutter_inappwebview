@@ -2,6 +2,8 @@
 
 #include <cstring>
 
+#include "../types/client_cert_challenge.h"
+#include "../types/client_cert_response.h"
 #include "../types/custom_scheme_response.h"
 #include "../types/hit_test_result.h"
 #include "../types/ssl_certificate.h"
@@ -142,6 +144,12 @@ WebViewChannelDelegate::HttpAuthRequestCallback::HttpAuthRequestCallback() {
 WebViewChannelDelegate::ServerTrustAuthRequestCallback::ServerTrustAuthRequestCallback() {
   decodeResult = [](FlValue* value) -> std::optional<ServerTrustAuthResponse> {
     return ServerTrustAuthResponse::fromFlValue(value);
+  };
+}
+
+WebViewChannelDelegate::ClientCertRequestCallback::ClientCertRequestCallback() {
+  decodeResult = [](FlValue* value) -> std::optional<ClientCertResponse> {
+    return ClientCertResponse::fromFlValue(value);
   };
 }
 
@@ -1594,6 +1602,46 @@ void WebViewChannelDelegate::onReceivedServerTrustAuthRequest(
       "onReceivedServerTrustAuthRequest", args,
       [](GObject* source, GAsyncResult* result, gpointer user_data) {
         auto* cb = static_cast<ServerTrustAuthRequestCallback*>(user_data);
+        FlMethodChannel* ch = FL_METHOD_CHANNEL(source);
+
+        g_autoptr(GError) error = nullptr;
+        g_autoptr(FlMethodResponse) response =
+            fl_method_channel_invoke_method_finish(ch, result, &error);
+
+        if (error != nullptr) {
+          cb->handleError("CHANNEL_ERROR", error->message);
+        } else if (FL_IS_METHOD_SUCCESS_RESPONSE(response)) {
+          FlValue* returnValue =
+              fl_method_success_response_get_result(FL_METHOD_SUCCESS_RESPONSE(response));
+          cb->handleResult(returnValue);
+        } else if (FL_IS_METHOD_ERROR_RESPONSE(response)) {
+          FlMethodErrorResponse* errorResponse = FL_METHOD_ERROR_RESPONSE(response);
+          cb->handleError(fl_method_error_response_get_code(errorResponse),
+                          fl_method_error_response_get_message(errorResponse));
+        } else {
+          cb->handleNotImplemented();
+        }
+
+        delete cb;
+      },
+      callbackPtr);
+}
+
+void WebViewChannelDelegate::onReceivedClientCertRequest(
+    std::unique_ptr<ClientCertChallenge> challenge,
+    std::unique_ptr<ClientCertRequestCallback> callback) const {
+  if (!channel_) {
+    callback->defaultBehaviour(std::nullopt);
+    return;
+  }
+
+  FlValue* args = challenge->toFlValue();
+  auto* callbackPtr = callback.release();
+
+  invokeMethodWithResult(
+      "onReceivedClientCertRequest", args,
+      [](GObject* source, GAsyncResult* result, gpointer user_data) {
+        auto* cb = static_cast<ClientCertRequestCallback*>(user_data);
         FlMethodChannel* ch = FL_METHOD_CHANNEL(source);
 
         g_autoptr(GError) error = nullptr;

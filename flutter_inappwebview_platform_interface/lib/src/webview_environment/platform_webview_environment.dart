@@ -10,7 +10,6 @@ import '../types/cache_model.dart';
 import '../types/disposable.dart';
 import '../types/browser_process_exited_detail.dart';
 import '../types/browser_process_infos_changed_detail.dart';
-import '../types/tls_errors_policy.dart';
 import '../types/webview_interface.dart';
 import 'webview_environment_settings.dart';
 
@@ -435,26 +434,6 @@ abstract class PlatformWebViewEnvironment extends PlatformInterface
   Future<CacheModel?> getCacheModel() {
     throw UnimplementedError(
       'getCacheModel is not implemented on the current platform',
-    );
-  }
-
-  ///{@template flutter_inappwebview_platform_interface.PlatformWebViewEnvironment.getTlsErrorsPolicy}
-  ///Returns the current TLS errors policy for this WebContext.
-  ///{@endtemplate}
-  ///
-  ///{@macro flutter_inappwebview_platform_interface.PlatformWebViewEnvironment.getTlsErrorsPolicy.supported_platforms}
-  @SupportedPlatforms(
-    platforms: [
-      LinuxPlatform(
-        apiName: 'webkit_web_context_get_tls_errors_policy',
-        apiUrl:
-            'https://wpewebkit.org/reference/stable/wpe-webkit-2.0/method.WebContext.get_tls_errors_policy.html',
-      ),
-    ],
-  )
-  Future<TLSErrorsPolicy?> getTlsErrorsPolicy() {
-    throw UnimplementedError(
-      'getTlsErrorsPolicy is not implemented on the current platform',
     );
   }
 

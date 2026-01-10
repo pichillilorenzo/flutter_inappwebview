@@ -402,6 +402,22 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController
           return response?.toMap();
         }
         return null;
+      case "onReceivedClientCertRequest":
+        if (webviewParams != null &&
+            webviewParams!.onReceivedClientCertRequest != null) {
+          Map<String, dynamic> arguments = call.arguments
+              .cast<String, dynamic>();
+          ClientCertChallenge challenge = ClientCertChallenge.fromMap(
+            arguments,
+          )!;
+          ClientCertResponse? response =
+              await webviewParams!.onReceivedClientCertRequest!(
+                _controllerFromPlatform,
+                challenge,
+              );
+          return response?.toMap();
+        }
+        return null;
       case "onDownloadStarting":
         if (webviewParams != null &&
             (webviewParams!.onDownloadStart != null ||

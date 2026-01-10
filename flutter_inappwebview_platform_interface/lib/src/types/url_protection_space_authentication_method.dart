@@ -11,6 +11,30 @@ class URLProtectionSpaceAuthenticationMethod_ {
   final String _value;
   const URLProtectionSpaceAuthenticationMethod_._internal(this._value);
 
+  ///Use the default authentication method for a protocol.
+  static const NSURL_AUTHENTICATION_METHOD_DEFAULT =
+      const URLProtectionSpaceAuthenticationMethod_._internal(
+        "NSURLAuthenticationMethodDefault",
+      );
+
+  ///Use HTTP basic authentication for this protection space.
+  static const NSURL_AUTHENTICATION_METHOD_HTTP_BASIC =
+      const URLProtectionSpaceAuthenticationMethod_._internal(
+        "NSURLAuthenticationMethodHTTPBasic",
+      );
+
+  ///Use HTTP digest authentication for this protection space.
+  static const NSURL_AUTHENTICATION_METHOD_HTTP_DIGEST =
+      const URLProtectionSpaceAuthenticationMethod_._internal(
+        "NSURLAuthenticationMethodHTTPDigest",
+      );
+
+  ///Use HTML form authentication for this protection space.
+  static const NSURL_AUTHENTICATION_METHOD_HTML_FORM =
+      const URLProtectionSpaceAuthenticationMethod_._internal(
+        "NSURLAuthenticationMethodHTMLForm",
+      );
+
   ///Use client certificate authentication for this protection space.
   static const NSURL_AUTHENTICATION_METHOD_CLIENT_CERTIFICATE =
       const URLProtectionSpaceAuthenticationMethod_._internal(
@@ -44,6 +68,30 @@ class IOSNSURLProtectionSpaceAuthenticationMethod_ {
   // ignore: unused_field
   final String _value;
   const IOSNSURLProtectionSpaceAuthenticationMethod_._internal(this._value);
+
+  ///Use the default authentication method for a protocol.
+  static const NSURL_AUTHENTICATION_METHOD_DEFAULT =
+      const IOSNSURLProtectionSpaceAuthenticationMethod_._internal(
+        "NSURLAuthenticationMethodDefault",
+      );
+
+  ///Use HTTP basic authentication for this protection space.
+  static const NSURL_AUTHENTICATION_METHOD_HTTP_BASIC =
+      const IOSNSURLProtectionSpaceAuthenticationMethod_._internal(
+        "NSURLAuthenticationMethodHTTPBasic",
+      );
+
+  ///Use HTTP digest authentication for this protection space.
+  static const NSURL_AUTHENTICATION_METHOD_HTTP_DIGEST =
+      const IOSNSURLProtectionSpaceAuthenticationMethod_._internal(
+        "NSURLAuthenticationMethodHTTPDigest",
+      );
+
+  ///Use HTML form authentication for this protection space.
+  static const NSURL_AUTHENTICATION_METHOD_HTML_FORM =
+      const IOSNSURLProtectionSpaceAuthenticationMethod_._internal(
+        "NSURLAuthenticationMethodHTMLForm",
+      );
 
   ///Use client certificate authentication for this protection space.
   static const NSURL_AUTHENTICATION_METHOD_CLIENT_CERTIFICATE =

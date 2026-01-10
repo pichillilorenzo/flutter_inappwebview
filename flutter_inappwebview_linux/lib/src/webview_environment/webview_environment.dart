@@ -139,13 +139,6 @@ class LinuxWebViewEnvironment extends PlatformWebViewEnvironment
     return CacheModel.fromNativeValue(result);
   }
 
-  /// {@macro flutter_inappwebview_platform_interface.PlatformWebViewEnvironment.getTlsErrorsPolicy}
-  @override
-  Future<TLSErrorsPolicy?> getTlsErrorsPolicy() async {
-    final result = await channel?.invokeMethod<int>('getTlsErrorsPolicy');
-    return TLSErrorsPolicy.fromNativeValue(result);
-  }
-
   /// {@macro flutter_inappwebview_platform_interface.PlatformWebViewEnvironment.isAutomationAllowed}
   @override
   Future<bool> isAutomationAllowed() async {

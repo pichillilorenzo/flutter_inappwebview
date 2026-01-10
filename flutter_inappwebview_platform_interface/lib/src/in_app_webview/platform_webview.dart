@@ -935,6 +935,16 @@ See `NSAppTransportSecurity` in the [Information Property List Key Reference](ht
         apiUrl:
             'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2_5?view=webview2-1.0.2849.39#add_clientcertificaterequested',
       ),
+      LinuxPlatform(
+        apiName:
+            'WebKitAuthenticationRequest with WEBKIT_AUTHENTICATION_SCHEME_CLIENT_CERTIFICATE_REQUESTED',
+        apiUrl:
+            'https://wpewebkit.org/reference/stable/wpe-webkit-2.0/signal.WebView.authenticate.html',
+        note:
+            'WPE WebKit supports client certificate requests via the authenticate signal. '
+            'Providing a certificate programmatically requires WebKit 2.34+ and the certificate must be loaded from a PEM file. '
+            'PKCS12 format may not be fully supported. If the certificate cannot be loaded, PROCEED will behave like CANCEL.',
+      ),
     ],
   )
   final FutureOr<ClientCertResponse?> Function(

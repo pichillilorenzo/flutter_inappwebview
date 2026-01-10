@@ -7,7 +7,6 @@ import '../types/enum_method.dart';
 import '../types/environment_channel_search_kind.dart';
 import '../types/environment_release_channels.dart';
 import '../types/environment_scrollbar_style.dart';
-import '../types/tls_errors_policy.dart';
 
 part 'webview_environment_settings.g.dart';
 
@@ -326,21 +325,6 @@ class WebViewEnvironmentSettings_ {
   )
   final CacheModel_? cacheModel;
 
-  ///Set the TLS errors policy for the WebContext.
-  ///
-  ///Determines how TLS certificate errors are handled.
-  ///The default is [TLSErrorsPolicy.FAIL] which is the secure option.
-  @SupportedPlatforms(
-    platforms: [
-      LinuxPlatform(
-        apiName: 'webkit_web_context_set_tls_errors_policy',
-        apiUrl:
-            'https://wpewebkit.org/reference/stable/wpe-webkit-2.0/method.WebContext.set_tls_errors_policy.html',
-      ),
-    ],
-  )
-  final TLSErrorsPolicy_? tlsErrorsPolicy;
-
   ///Enable or disable spell checking in the WebContext.
   ///
   ///When enabled, text entered by the user will be checked for spelling errors.
@@ -465,7 +449,6 @@ class WebViewEnvironmentSettings_ {
     this.releaseChannels,
     this.scrollbarStyle,
     this.cacheModel,
-    this.tlsErrorsPolicy,
     this.spellCheckingEnabled,
     this.spellCheckingLanguages,
     this.preferredLanguages,

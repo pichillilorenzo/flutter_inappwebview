@@ -33,7 +33,6 @@ class WebViewEnvironmentInstanceChannelDelegate : public ChannelDelegate {
   bool isSpellCheckingEnabled() const;
   std::vector<std::string> getSpellCheckingLanguages() const;
   int getCacheModel() const;
-  int getTlsErrorsPolicy() const;
   bool isAutomationAllowed() const;
 
  private:

@@ -138,6 +138,8 @@ list(APPEND PLUGIN_SOURCES
   "in_app_webview/user_content_controller.cc"
   "in_app_webview/webview_channel_delegate.cc"
   "types/channel_delegate.cc"
+  "types/client_cert_challenge.cc"
+  "types/client_cert_response.cc"
   "types/color_picker_popup.cc"
   "types/content_world.cc"
   "types/context_menu_popup.cc"
@@ -173,6 +175,8 @@ list(APPEND PLUGIN_SOURCES
   "types/web_resource_response.cc"
   "types/web_view_transport.cc"
   "web_message/web_message_channel.cc"
+  "web_message/web_message_listener.cc"
+  "web_message/web_message_listener_channel_delegate.cc"
 )
 
 # Define the plugin library target. Its name must not be changed (see comment

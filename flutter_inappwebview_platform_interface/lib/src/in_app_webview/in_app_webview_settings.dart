@@ -2763,6 +2763,36 @@ as it can cause framerate drops on animations in Android 9 and lower (see [Hybri
   )
   String? pictographFontFamily;
 
+  ///Sets the CORS allowlist for this WebView.
+  ///
+  ///URI patterns must be of the form `[protocol]://[host]:[port]`, where each
+  ///component may contain the wildcard character (`*`) to match zero or more
+  ///characters. All three components are required.
+  ///
+  ///Disabling CORS checks permits resources from other origins to load
+  ///allowlisted resources. It does NOT permit the allowlisted resources
+  ///to load resources from other origins.
+  ///
+  ///Setting to `null` or an empty list clears the allowlist.
+  ///
+  ///Example patterns:
+  ///- `https://example.com:*` - All ports on example.com over HTTPS
+  ///- `*://api.myservice.com:*` - Any protocol on api.myservice.com
+  ///- `https://*.example.com:443` - HTTPS port 443 on any subdomain
+  @SupportedPlatforms(
+    platforms: [
+      LinuxPlatform(
+        available: "2.34",
+        apiName: "webkit_web_view_set_cors_allowlist",
+        apiUrl:
+            "https://wpewebkit.org/reference/stable/wpe-webkit-2.0/method.WebView.set_cors_allowlist.html",
+        note:
+            "Pattern format: [protocol]://[host]:[port]. All three components are required.",
+      ),
+    ],
+  )
+  List<String>? corsAllowlist;
+
   @ExchangeableObjectConstructor()
   InAppWebViewSettings_({
     this.useShouldOverrideUrlLoading,
@@ -2941,6 +2971,7 @@ as it can cause framerate drops on animations in Android 9 and lower (see [Hybri
     this.enableTabsToLinks = true,
     this.enableSpatialNavigation = false,
     this.pictographFontFamily,
+    this.corsAllowlist,
   }) {
     if (this.minimumFontSize == null)
       this.minimumFontSize = Util.isAndroid ? 8 : 0;

@@ -9,7 +9,7 @@ WebResourceError::WebResourceError(const std::string& description, int64_t type)
 
 WebResourceError::WebResourceError(FlValue* map)
     : description(get_fl_map_value<std::string>(map, "description", "")),
-      type(get_fl_map_value<int64_t>(map, "type", 0)) {}
+      type(get_fl_map_value<int64_t>(map, "type", 399)) {}
 
 FlValue* WebResourceError::toFlValue() const {
   return to_fl_map({

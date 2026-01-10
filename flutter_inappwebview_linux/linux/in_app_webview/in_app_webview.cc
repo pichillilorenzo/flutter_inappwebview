@@ -3388,12 +3388,12 @@ gboolean InAppWebView::OnAuthenticate(WebKitWebView* web_view, WebKitAuthenticat
                 gchar* data = nullptr;
                 gsize length = 0;
                 if (g_file_get_contents(certPath.c_str(), &data, &length, &error)) {
+                  GBytes* pkcs12Data = g_bytes_new_take(data, length);
                   cert = g_tls_certificate_new_from_pkcs12(
-                      reinterpret_cast<const guint8*>(data),
-                      length,
+                      pkcs12Data,
                       password.has_value() ? password->c_str() : nullptr,
                       &error);
-                  g_free(data);
+                  g_bytes_unref(pkcs12Data);
                 }
                 #else
                 debugLog("PKCS12 certificates require GLib 2.72+. Trying PEM fallback...");

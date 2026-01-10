@@ -771,6 +771,12 @@ class WebResourceErrorType_ {
             'https://developer.apple.com/documentation/foundation/urlerror/code/2883122-secureconnectionfailed',
         value: -1200,
       ),
+      EnumLinuxPlatform(
+        apiName: 'G_TLS_CERTIFICATE_INSECURE',
+        apiUrl:
+            'https://docs.gtk.org/gio/flags.TlsCertificateFlags.html',
+        value: 32,
+      ),
     ],
   )
   static const SECURE_CONNECTION_FAILED = WebResourceErrorType_._internal(
@@ -792,6 +798,12 @@ class WebResourceErrorType_ {
             'https://developer.apple.com/documentation/foundation/urlerror/code/2883088-servercertificatehasbaddate',
         value: -1201,
       ),
+      EnumLinuxPlatform(
+        apiName: 'G_TLS_CERTIFICATE_EXPIRED',
+        apiUrl:
+            'https://docs.gtk.org/gio/flags.TlsCertificateFlags.html',
+        value: 8,
+      ),
     ],
   )
   static const SERVER_CERTIFICATE_HAS_BAD_DATE =
@@ -811,6 +823,12 @@ class WebResourceErrorType_ {
         apiUrl:
             'https://developer.apple.com/documentation/foundation/urlerror/code/2882976-servercertificateuntrusted',
         value: -1202,
+      ),
+      EnumLinuxPlatform(
+        apiName: 'G_TLS_CERTIFICATE_UNKNOWN_CA',
+        apiUrl:
+            'https://docs.gtk.org/gio/flags.TlsCertificateFlags.html',
+        value: 1,
       ),
     ],
   )
@@ -852,6 +870,12 @@ class WebResourceErrorType_ {
         apiUrl:
             'https://developer.apple.com/documentation/foundation/urlerror/code/2882991-servercertificatenotyetvalid',
         value: -1204,
+      ),
+      EnumLinuxPlatform(
+        apiName: 'G_TLS_CERTIFICATE_NOT_ACTIVATED',
+        apiUrl:
+            'https://docs.gtk.org/gio/flags.TlsCertificateFlags.html',
+        value: 4,
       ),
     ],
   )
@@ -1334,8 +1358,8 @@ class WebResourceErrorType_ {
       ),
     ],
   )
-  static const WEBKIT_POLICY_FAILED = WebResourceErrorType_._internal(
-    "WEBKIT_POLICY_FAILED",
+  static const POLICY_FAILED = WebResourceErrorType_._internal(
+    "POLICY_FAILED",
   );
 
   ///The MIME type of the resource is not supported.
@@ -1349,8 +1373,8 @@ class WebResourceErrorType_ {
       ),
     ],
   )
-  static const WEBKIT_CANNOT_SHOW_MIME_TYPE = WebResourceErrorType_._internal(
-    "WEBKIT_CANNOT_SHOW_MIME_TYPE",
+  static const CANNOT_SHOW_MIME_TYPE = WebResourceErrorType_._internal(
+    "CANNOT_SHOW_MIME_TYPE",
   );
 
   ///The URI cannot be shown.
@@ -1364,8 +1388,8 @@ class WebResourceErrorType_ {
       ),
     ],
   )
-  static const WEBKIT_CANNOT_SHOW_URI = WebResourceErrorType_._internal(
-    "WEBKIT_CANNOT_SHOW_URI",
+  static const CANNOT_SHOW_URI = WebResourceErrorType_._internal(
+    "CANNOT_SHOW_URI",
   );
 
   ///Frame load was interrupted by a policy change.
@@ -1379,9 +1403,9 @@ class WebResourceErrorType_ {
       ),
     ],
   )
-  static const WEBKIT_FRAME_LOAD_INTERRUPTED_BY_POLICY_CHANGE =
+  static const FRAME_LOAD_INTERRUPTED_BY_POLICY_CHANGE =
       WebResourceErrorType_._internal(
-        "WEBKIT_FRAME_LOAD_INTERRUPTED_BY_POLICY_CHANGE",
+        "FRAME_LOAD_INTERRUPTED_BY_POLICY_CHANGE",
       );
 
   ///The port is restricted.
@@ -1395,6 +1419,91 @@ class WebResourceErrorType_ {
       ),
     ],
   )
-  static const WEBKIT_CANNOT_USE_RESTRICTED_PORT =
-      WebResourceErrorType_._internal("WEBKIT_CANNOT_USE_RESTRICTED_PORT");
+  static const CANNOT_USE_RESTRICTED_PORT =
+      WebResourceErrorType_._internal("CANNOT_USE_RESTRICTED_PORT");
+
+  ///Download failure due to network error.
+  @EnumSupportedPlatforms(
+    platforms: [
+      EnumLinuxPlatform(
+        apiName: 'WEBKIT_DOWNLOAD_ERROR_NETWORK',
+        apiUrl:
+            'https://wpewebkit.org/reference/stable/wpe-webkit-2.0/error.DownloadError.html',
+        value: 499,
+      ),
+    ],
+  )
+  static const DOWNLOAD_NETWORK_FAILED = WebResourceErrorType_._internal(
+    "DOWNLOAD_NETWORK_FAILED",
+  );
+
+  ///Download was cancelled by user.
+  @EnumSupportedPlatforms(
+    platforms: [
+      EnumLinuxPlatform(
+        apiName: 'WEBKIT_DOWNLOAD_ERROR_CANCELLED_BY_USER',
+        apiUrl:
+            'https://wpewebkit.org/reference/stable/wpe-webkit-2.0/error.DownloadError.html',
+        value: 400,
+      ),
+    ],
+  )
+  static const DOWNLOAD_CANCELLED_BY_USER =
+      WebResourceErrorType_._internal("DOWNLOAD_CANCELLED_BY_USER");
+
+  ///Download failure due to destination error.
+  @EnumSupportedPlatforms(
+    platforms: [
+      EnumLinuxPlatform(
+        apiName: 'WEBKIT_DOWNLOAD_ERROR_DESTINATION',
+        apiUrl:
+            'https://wpewebkit.org/reference/stable/wpe-webkit-2.0/error.DownloadError.html',
+        value: 401,
+      ),
+    ],
+  )
+  static const DOWNLOAD_DESTINATION_FAILED =
+      WebResourceErrorType_._internal("DOWNLOAD_DESTINATION_FAILED");
+
+  ///The certificate does not match the expected identity of the site.
+  @EnumSupportedPlatforms(
+    platforms: [
+      EnumLinuxPlatform(
+        apiName: 'G_TLS_CERTIFICATE_BAD_IDENTITY',
+        apiUrl:
+            'https://docs.gtk.org/gio/flags.TlsCertificateFlags.html',
+        value: 2,
+      ),
+    ],
+  )
+  static const SERVER_CERTIFICATE_BAD_IDENTITY =
+      WebResourceErrorType_._internal("SERVER_CERTIFICATE_BAD_IDENTITY");
+
+  ///The certificate has been revoked.
+  @EnumSupportedPlatforms(
+    platforms: [
+      EnumLinuxPlatform(
+        apiName: 'G_TLS_CERTIFICATE_REVOKED',
+        apiUrl:
+            'https://docs.gtk.org/gio/flags.TlsCertificateFlags.html',
+        value: 16,
+      ),
+    ],
+  )
+  static const SERVER_CERTIFICATE_REVOKED =
+      WebResourceErrorType_._internal("SERVER_CERTIFICATE_REVOKED");
+
+  ///Some other error occurred validating the certificate.
+  @EnumSupportedPlatforms(
+    platforms: [
+      EnumLinuxPlatform(
+        apiName: 'G_TLS_CERTIFICATE_GENERIC_ERROR',
+        apiUrl:
+            'https://docs.gtk.org/gio/flags.TlsCertificateFlags.html',
+        value: 64,
+      ),
+    ],
+  )
+  static const TLS_CERTIFICATE_GENERIC_ERROR =
+      WebResourceErrorType_._internal("TLS_CERTIFICATE_GENERIC_ERROR");
 }

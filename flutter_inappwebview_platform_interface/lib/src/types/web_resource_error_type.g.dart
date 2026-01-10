@@ -396,6 +396,56 @@ class WebResourceErrorType {
     },
   );
 
+  ///The MIME type of the resource is not supported.
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Linux WPE WebKit ([Official API - WEBKIT_POLICY_ERROR_CANNOT_SHOW_MIME_TYPE](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/error.PolicyError.html))
+  static final CANNOT_SHOW_MIME_TYPE =
+      WebResourceErrorType._internalMultiPlatform('CANNOT_SHOW_MIME_TYPE', () {
+        switch (defaultTargetPlatform) {
+          case TargetPlatform.linux:
+            return 100;
+          default:
+            break;
+        }
+        return null;
+      });
+
+  ///The URI cannot be shown.
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Linux WPE WebKit ([Official API - WEBKIT_POLICY_ERROR_CANNOT_SHOW_URI](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/error.PolicyError.html))
+  static final CANNOT_SHOW_URI = WebResourceErrorType._internalMultiPlatform(
+    'CANNOT_SHOW_URI',
+    () {
+      switch (defaultTargetPlatform) {
+        case TargetPlatform.linux:
+          return 101;
+        default:
+          break;
+      }
+      return null;
+    },
+  );
+
+  ///The port is restricted.
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Linux WPE WebKit ([Official API - WEBKIT_POLICY_ERROR_CANNOT_USE_RESTRICTED_PORT](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/error.PolicyError.html))
+  static final CANNOT_USE_RESTRICTED_PORT =
+      WebResourceErrorType._internalMultiPlatform(
+        'CANNOT_USE_RESTRICTED_PORT',
+        () {
+          switch (defaultTargetPlatform) {
+            case TargetPlatform.linux:
+              return 103;
+            default:
+              break;
+          }
+          return null;
+        },
+      );
+
   ///A download task was unable to write to the downloaded file on disk.
   ///
   ///**Officially Supported Platforms/Implementations**:
@@ -514,6 +564,24 @@ class WebResourceErrorType {
     },
   );
 
+  ///Download was cancelled by user.
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Linux WPE WebKit ([Official API - WEBKIT_DOWNLOAD_ERROR_CANCELLED_BY_USER](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/error.DownloadError.html))
+  static final DOWNLOAD_CANCELLED_BY_USER =
+      WebResourceErrorType._internalMultiPlatform(
+        'DOWNLOAD_CANCELLED_BY_USER',
+        () {
+          switch (defaultTargetPlatform) {
+            case TargetPlatform.linux:
+              return 400;
+            default:
+              break;
+          }
+          return null;
+        },
+      );
+
   ///A download task failed to decode an encoded file during the download.
   ///
   ///**Officially Supported Platforms/Implementations**:
@@ -549,6 +617,42 @@ class WebResourceErrorType {
               return -3007;
             case TargetPlatform.macOS:
               return -3007;
+            default:
+              break;
+          }
+          return null;
+        },
+      );
+
+  ///Download failure due to destination error.
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Linux WPE WebKit ([Official API - WEBKIT_DOWNLOAD_ERROR_DESTINATION](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/error.DownloadError.html))
+  static final DOWNLOAD_DESTINATION_FAILED =
+      WebResourceErrorType._internalMultiPlatform(
+        'DOWNLOAD_DESTINATION_FAILED',
+        () {
+          switch (defaultTargetPlatform) {
+            case TargetPlatform.linux:
+              return 401;
+            default:
+              break;
+          }
+          return null;
+        },
+      );
+
+  ///Download failure due to network error.
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Linux WPE WebKit ([Official API - WEBKIT_DOWNLOAD_ERROR_NETWORK](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/error.DownloadError.html))
+  static final DOWNLOAD_NETWORK_FAILED =
+      WebResourceErrorType._internalMultiPlatform(
+        'DOWNLOAD_NETWORK_FAILED',
+        () {
+          switch (defaultTargetPlatform) {
+            case TargetPlatform.linux:
+              return 499;
             default:
               break;
           }
@@ -616,6 +720,24 @@ class WebResourceErrorType {
       return null;
     },
   );
+
+  ///Frame load was interrupted by a policy change.
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Linux WPE WebKit ([Official API - WEBKIT_POLICY_ERROR_FRAME_LOAD_INTERRUPTED_BY_POLICY_CHANGE](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/error.PolicyError.html))
+  static final FRAME_LOAD_INTERRUPTED_BY_POLICY_CHANGE =
+      WebResourceErrorType._internalMultiPlatform(
+        'FRAME_LOAD_INTERRUPTED_BY_POLICY_CHANGE',
+        () {
+          switch (defaultTargetPlatform) {
+            case TargetPlatform.linux:
+              return 102;
+            default:
+              break;
+          }
+          return null;
+        },
+      );
 
   ///Generic file error.
   ///
@@ -761,6 +883,23 @@ class WebResourceErrorType {
         },
       );
 
+  ///Generic policy error.
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Linux WPE WebKit ([Official API - WEBKIT_POLICY_ERROR_FAILED](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/error.PolicyError.html))
+  static final POLICY_FAILED = WebResourceErrorType._internalMultiPlatform(
+    'POLICY_FAILED',
+    () {
+      switch (defaultTargetPlatform) {
+        case TargetPlatform.linux:
+          return 199;
+        default:
+          break;
+      }
+      return null;
+    },
+  );
+
   ///User authentication failed on proxy.
   ///
   ///**Officially Supported Platforms/Implementations**:
@@ -873,6 +1012,7 @@ class WebResourceErrorType {
   ///**Officially Supported Platforms/Implementations**:
   ///- iOS WKWebView ([Official API - URLError.secureConnectionFailed](https://developer.apple.com/documentation/foundation/urlerror/code/2883122-secureconnectionfailed))
   ///- macOS WKWebView ([Official API - URLError.secureConnectionFailed](https://developer.apple.com/documentation/foundation/urlerror/code/2883122-secureconnectionfailed))
+  ///- Linux WPE WebKit ([Official API - G_TLS_CERTIFICATE_INSECURE](https://docs.gtk.org/gio/flags.TlsCertificateFlags.html))
   static final SECURE_CONNECTION_FAILED =
       WebResourceErrorType._internalMultiPlatform(
         'SECURE_CONNECTION_FAILED',
@@ -882,6 +1022,26 @@ class WebResourceErrorType {
               return -1200;
             case TargetPlatform.macOS:
               return -1200;
+            case TargetPlatform.linux:
+              return 32;
+            default:
+              break;
+          }
+          return null;
+        },
+      );
+
+  ///The certificate does not match the expected identity of the site.
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Linux WPE WebKit ([Official API - G_TLS_CERTIFICATE_BAD_IDENTITY](https://docs.gtk.org/gio/flags.TlsCertificateFlags.html))
+  static final SERVER_CERTIFICATE_BAD_IDENTITY =
+      WebResourceErrorType._internalMultiPlatform(
+        'SERVER_CERTIFICATE_BAD_IDENTITY',
+        () {
+          switch (defaultTargetPlatform) {
+            case TargetPlatform.linux:
+              return 2;
             default:
               break;
           }
@@ -894,6 +1054,7 @@ class WebResourceErrorType {
   ///**Officially Supported Platforms/Implementations**:
   ///- iOS WKWebView ([Official API - URLError.serverCertificateHasBadDate](https://developer.apple.com/documentation/foundation/urlerror/code/2883088-servercertificatehasbaddate))
   ///- macOS WKWebView ([Official API - URLError.serverCertificateHasBadDate](https://developer.apple.com/documentation/foundation/urlerror/code/2883088-servercertificatehasbaddate))
+  ///- Linux WPE WebKit ([Official API - G_TLS_CERTIFICATE_EXPIRED](https://docs.gtk.org/gio/flags.TlsCertificateFlags.html))
   static final SERVER_CERTIFICATE_HAS_BAD_DATE =
       WebResourceErrorType._internalMultiPlatform(
         'SERVER_CERTIFICATE_HAS_BAD_DATE',
@@ -903,6 +1064,8 @@ class WebResourceErrorType {
               return -1201;
             case TargetPlatform.macOS:
               return -1201;
+            case TargetPlatform.linux:
+              return 8;
             default:
               break;
           }
@@ -936,6 +1099,7 @@ class WebResourceErrorType {
   ///**Officially Supported Platforms/Implementations**:
   ///- iOS WKWebView ([Official API - URLError.serverCertificateNotYetValid](https://developer.apple.com/documentation/foundation/urlerror/code/2882991-servercertificatenotyetvalid))
   ///- macOS WKWebView ([Official API - URLError.serverCertificateNotYetValid](https://developer.apple.com/documentation/foundation/urlerror/code/2882991-servercertificatenotyetvalid))
+  ///- Linux WPE WebKit ([Official API - G_TLS_CERTIFICATE_NOT_ACTIVATED](https://docs.gtk.org/gio/flags.TlsCertificateFlags.html))
   static final SERVER_CERTIFICATE_NOT_YET_VALID =
       WebResourceErrorType._internalMultiPlatform(
         'SERVER_CERTIFICATE_NOT_YET_VALID',
@@ -945,6 +1109,26 @@ class WebResourceErrorType {
               return -1204;
             case TargetPlatform.macOS:
               return -1204;
+            case TargetPlatform.linux:
+              return 4;
+            default:
+              break;
+          }
+          return null;
+        },
+      );
+
+  ///The certificate has been revoked.
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Linux WPE WebKit ([Official API - G_TLS_CERTIFICATE_REVOKED](https://docs.gtk.org/gio/flags.TlsCertificateFlags.html))
+  static final SERVER_CERTIFICATE_REVOKED =
+      WebResourceErrorType._internalMultiPlatform(
+        'SERVER_CERTIFICATE_REVOKED',
+        () {
+          switch (defaultTargetPlatform) {
+            case TargetPlatform.linux:
+              return 16;
             default:
               break;
           }
@@ -957,6 +1141,7 @@ class WebResourceErrorType {
   ///**Officially Supported Platforms/Implementations**:
   ///- iOS WKWebView ([Official API - URLError.serverCertificateUntrusted](https://developer.apple.com/documentation/foundation/urlerror/code/2882976-servercertificateuntrusted))
   ///- macOS WKWebView ([Official API - URLError.serverCertificateUntrusted](https://developer.apple.com/documentation/foundation/urlerror/code/2882976-servercertificateuntrusted))
+  ///- Linux WPE WebKit ([Official API - G_TLS_CERTIFICATE_UNKNOWN_CA](https://docs.gtk.org/gio/flags.TlsCertificateFlags.html))
   static final SERVER_CERTIFICATE_UNTRUSTED =
       WebResourceErrorType._internalMultiPlatform(
         'SERVER_CERTIFICATE_UNTRUSTED',
@@ -966,6 +1151,8 @@ class WebResourceErrorType {
               return -1202;
             case TargetPlatform.macOS:
               return -1202;
+            case TargetPlatform.linux:
+              return 1;
             default:
               break;
           }
@@ -1015,6 +1202,24 @@ class WebResourceErrorType {
       return null;
     },
   );
+
+  ///Some other error occurred validating the certificate.
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Linux WPE WebKit ([Official API - G_TLS_CERTIFICATE_GENERIC_ERROR](https://docs.gtk.org/gio/flags.TlsCertificateFlags.html))
+  static final TLS_CERTIFICATE_GENERIC_ERROR =
+      WebResourceErrorType._internalMultiPlatform(
+        'TLS_CERTIFICATE_GENERIC_ERROR',
+        () {
+          switch (defaultTargetPlatform) {
+            case TargetPlatform.linux:
+              return 64;
+            default:
+              break;
+          }
+          return null;
+        },
+      );
 
   ///A redirect loop has been detected or the threshold for number of allowable redirects has been exceeded (currently `16` on iOS).
   ///
@@ -1246,90 +1451,6 @@ class WebResourceErrorType {
         },
       );
 
-  ///The MIME type of the resource is not supported.
-  ///
-  ///**Officially Supported Platforms/Implementations**:
-  ///- Linux WPE WebKit ([Official API - WEBKIT_POLICY_ERROR_CANNOT_SHOW_MIME_TYPE](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/error.PolicyError.html))
-  static final WEBKIT_CANNOT_SHOW_MIME_TYPE =
-      WebResourceErrorType._internalMultiPlatform(
-        'WEBKIT_CANNOT_SHOW_MIME_TYPE',
-        () {
-          switch (defaultTargetPlatform) {
-            case TargetPlatform.linux:
-              return 100;
-            default:
-              break;
-          }
-          return null;
-        },
-      );
-
-  ///The URI cannot be shown.
-  ///
-  ///**Officially Supported Platforms/Implementations**:
-  ///- Linux WPE WebKit ([Official API - WEBKIT_POLICY_ERROR_CANNOT_SHOW_URI](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/error.PolicyError.html))
-  static final WEBKIT_CANNOT_SHOW_URI =
-      WebResourceErrorType._internalMultiPlatform('WEBKIT_CANNOT_SHOW_URI', () {
-        switch (defaultTargetPlatform) {
-          case TargetPlatform.linux:
-            return 101;
-          default:
-            break;
-        }
-        return null;
-      });
-
-  ///The port is restricted.
-  ///
-  ///**Officially Supported Platforms/Implementations**:
-  ///- Linux WPE WebKit ([Official API - WEBKIT_POLICY_ERROR_CANNOT_USE_RESTRICTED_PORT](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/error.PolicyError.html))
-  static final WEBKIT_CANNOT_USE_RESTRICTED_PORT =
-      WebResourceErrorType._internalMultiPlatform(
-        'WEBKIT_CANNOT_USE_RESTRICTED_PORT',
-        () {
-          switch (defaultTargetPlatform) {
-            case TargetPlatform.linux:
-              return 103;
-            default:
-              break;
-          }
-          return null;
-        },
-      );
-
-  ///Frame load was interrupted by a policy change.
-  ///
-  ///**Officially Supported Platforms/Implementations**:
-  ///- Linux WPE WebKit ([Official API - WEBKIT_POLICY_ERROR_FRAME_LOAD_INTERRUPTED_BY_POLICY_CHANGE](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/error.PolicyError.html))
-  static final WEBKIT_FRAME_LOAD_INTERRUPTED_BY_POLICY_CHANGE =
-      WebResourceErrorType._internalMultiPlatform(
-        'WEBKIT_FRAME_LOAD_INTERRUPTED_BY_POLICY_CHANGE',
-        () {
-          switch (defaultTargetPlatform) {
-            case TargetPlatform.linux:
-              return 102;
-            default:
-              break;
-          }
-          return null;
-        },
-      );
-
-  ///Generic policy error.
-  ///
-  ///**Officially Supported Platforms/Implementations**:
-  ///- Linux WPE WebKit ([Official API - WEBKIT_POLICY_ERROR_FAILED](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/error.PolicyError.html))
-  static final WEBKIT_POLICY_FAILED =
-      WebResourceErrorType._internalMultiPlatform('WEBKIT_POLICY_FAILED', () {
-        switch (defaultTargetPlatform) {
-          case TargetPlatform.linux:
-            return 199;
-          default:
-            break;
-        }
-        return null;
-      });
-
   ///A server reported that a URL has a non-zero content length, but terminated the network connection gracefully without sending any data.
   ///
   ///**Officially Supported Platforms/Implementations**:
@@ -1370,17 +1491,24 @@ class WebResourceErrorType {
     WebResourceErrorType.CANNOT_OPEN_FILE,
     WebResourceErrorType.CANNOT_PARSE_RESPONSE,
     WebResourceErrorType.CANNOT_REMOVE_FILE,
+    WebResourceErrorType.CANNOT_SHOW_MIME_TYPE,
+    WebResourceErrorType.CANNOT_SHOW_URI,
+    WebResourceErrorType.CANNOT_USE_RESTRICTED_PORT,
     WebResourceErrorType.CANNOT_WRITE_TO_FILE,
     WebResourceErrorType.CLIENT_CERTIFICATE_REJECTED,
     WebResourceErrorType.CLIENT_CERTIFICATE_REQUIRED,
     WebResourceErrorType.CONNECTION_ABORTED,
     WebResourceErrorType.DATA_LENGTH_EXCEEDS_MAXIMUM,
     WebResourceErrorType.DATA_NOT_ALLOWED,
+    WebResourceErrorType.DOWNLOAD_CANCELLED_BY_USER,
     WebResourceErrorType.DOWNLOAD_DECODING_FAILED_MID_STREAM,
     WebResourceErrorType.DOWNLOAD_DECODING_FAILED_TO_COMPLETE,
+    WebResourceErrorType.DOWNLOAD_DESTINATION_FAILED,
+    WebResourceErrorType.DOWNLOAD_NETWORK_FAILED,
     WebResourceErrorType.FAILED_SSL_HANDSHAKE,
     WebResourceErrorType.FILE_IS_DIRECTORY,
     WebResourceErrorType.FILE_NOT_FOUND,
+    WebResourceErrorType.FRAME_LOAD_INTERRUPTED_BY_POLICY_CHANGE,
     WebResourceErrorType.GENERIC_FILE_ERROR,
     WebResourceErrorType.HOST_LOOKUP,
     WebResourceErrorType.INTERNATIONAL_ROAMING_OFF,
@@ -1388,6 +1516,7 @@ class WebResourceErrorType {
     WebResourceErrorType.NETWORK_CONNECTION_LOST,
     WebResourceErrorType.NOT_CONNECTED_TO_INTERNET,
     WebResourceErrorType.NO_PERMISSIONS_TO_READ_FILE,
+    WebResourceErrorType.POLICY_FAILED,
     WebResourceErrorType.PROXY_AUTHENTICATION,
     WebResourceErrorType.REDIRECT_FAILED,
     WebResourceErrorType.REDIRECT_TO_NON_EXISTENT_LOCATION,
@@ -1395,12 +1524,15 @@ class WebResourceErrorType {
     WebResourceErrorType.RESET,
     WebResourceErrorType.RESOURCE_UNAVAILABLE,
     WebResourceErrorType.SECURE_CONNECTION_FAILED,
+    WebResourceErrorType.SERVER_CERTIFICATE_BAD_IDENTITY,
     WebResourceErrorType.SERVER_CERTIFICATE_HAS_BAD_DATE,
     WebResourceErrorType.SERVER_CERTIFICATE_HAS_UNKNOWN_ROOT,
     WebResourceErrorType.SERVER_CERTIFICATE_NOT_YET_VALID,
+    WebResourceErrorType.SERVER_CERTIFICATE_REVOKED,
     WebResourceErrorType.SERVER_CERTIFICATE_UNTRUSTED,
     WebResourceErrorType.SERVER_UNREACHABLE,
     WebResourceErrorType.TIMEOUT,
+    WebResourceErrorType.TLS_CERTIFICATE_GENERIC_ERROR,
     WebResourceErrorType.TOO_MANY_REDIRECTS,
     WebResourceErrorType.TOO_MANY_REQUESTS,
     WebResourceErrorType.UNEXPECTED_ERROR,
@@ -1412,11 +1544,6 @@ class WebResourceErrorType {
     WebResourceErrorType.USER_AUTHENTICATION_REQUIRED,
     WebResourceErrorType.USER_CANCELLED_AUTHENTICATION,
     WebResourceErrorType.VALID_PROXY_AUTHENTICATION_REQUIRED,
-    WebResourceErrorType.WEBKIT_CANNOT_SHOW_MIME_TYPE,
-    WebResourceErrorType.WEBKIT_CANNOT_SHOW_URI,
-    WebResourceErrorType.WEBKIT_CANNOT_USE_RESTRICTED_PORT,
-    WebResourceErrorType.WEBKIT_FRAME_LOAD_INTERRUPTED_BY_POLICY_CHANGE,
-    WebResourceErrorType.WEBKIT_POLICY_FAILED,
     WebResourceErrorType.ZERO_BYTE_RESOURCE,
   ].toSet();
 
@@ -1524,6 +1651,12 @@ class WebResourceErrorType {
         return 'CANNOT_PARSE_RESPONSE';
       case 'CANNOT_REMOVE_FILE':
         return 'CANNOT_REMOVE_FILE';
+      case 'CANNOT_SHOW_MIME_TYPE':
+        return 'CANNOT_SHOW_MIME_TYPE';
+      case 'CANNOT_SHOW_URI':
+        return 'CANNOT_SHOW_URI';
+      case 'CANNOT_USE_RESTRICTED_PORT':
+        return 'CANNOT_USE_RESTRICTED_PORT';
       case 'CANNOT_WRITE_TO_FILE':
         return 'CANNOT_WRITE_TO_FILE';
       case 'CLIENT_CERTIFICATE_REJECTED':
@@ -1536,16 +1669,24 @@ class WebResourceErrorType {
         return 'DATA_LENGTH_EXCEEDS_MAXIMUM';
       case 'DATA_NOT_ALLOWED':
         return 'DATA_NOT_ALLOWED';
+      case 'DOWNLOAD_CANCELLED_BY_USER':
+        return 'DOWNLOAD_CANCELLED_BY_USER';
       case 'DOWNLOAD_DECODING_FAILED_MID_STREAM':
         return 'DOWNLOAD_DECODING_FAILED_MID_STREAM';
       case 'DOWNLOAD_DECODING_FAILED_TO_COMPLETE':
         return 'DOWNLOAD_DECODING_FAILED_TO_COMPLETE';
+      case 'DOWNLOAD_DESTINATION_FAILED':
+        return 'DOWNLOAD_DESTINATION_FAILED';
+      case 'DOWNLOAD_NETWORK_FAILED':
+        return 'DOWNLOAD_NETWORK_FAILED';
       case 'FAILED_SSL_HANDSHAKE':
         return 'FAILED_SSL_HANDSHAKE';
       case 'FILE_IS_DIRECTORY':
         return 'FILE_IS_DIRECTORY';
       case 'FILE_NOT_FOUND':
         return 'FILE_NOT_FOUND';
+      case 'FRAME_LOAD_INTERRUPTED_BY_POLICY_CHANGE':
+        return 'FRAME_LOAD_INTERRUPTED_BY_POLICY_CHANGE';
       case 'GENERIC_FILE_ERROR':
         return 'GENERIC_FILE_ERROR';
       case 'HOST_LOOKUP':
@@ -1560,6 +1701,8 @@ class WebResourceErrorType {
         return 'NOT_CONNECTED_TO_INTERNET';
       case 'NO_PERMISSIONS_TO_READ_FILE':
         return 'NO_PERMISSIONS_TO_READ_FILE';
+      case 'POLICY_FAILED':
+        return 'POLICY_FAILED';
       case 'PROXY_AUTHENTICATION':
         return 'PROXY_AUTHENTICATION';
       case 'REDIRECT_FAILED':
@@ -1574,18 +1717,24 @@ class WebResourceErrorType {
         return 'RESOURCE_UNAVAILABLE';
       case 'SECURE_CONNECTION_FAILED':
         return 'SECURE_CONNECTION_FAILED';
+      case 'SERVER_CERTIFICATE_BAD_IDENTITY':
+        return 'SERVER_CERTIFICATE_BAD_IDENTITY';
       case 'SERVER_CERTIFICATE_HAS_BAD_DATE':
         return 'SERVER_CERTIFICATE_HAS_BAD_DATE';
       case 'SERVER_CERTIFICATE_HAS_UNKNOWN_ROOT':
         return 'SERVER_CERTIFICATE_HAS_UNKNOWN_ROOT';
       case 'SERVER_CERTIFICATE_NOT_YET_VALID':
         return 'SERVER_CERTIFICATE_NOT_YET_VALID';
+      case 'SERVER_CERTIFICATE_REVOKED':
+        return 'SERVER_CERTIFICATE_REVOKED';
       case 'SERVER_CERTIFICATE_UNTRUSTED':
         return 'SERVER_CERTIFICATE_UNTRUSTED';
       case 'SERVER_UNREACHABLE':
         return 'SERVER_UNREACHABLE';
       case 'TIMEOUT':
         return 'TIMEOUT';
+      case 'TLS_CERTIFICATE_GENERIC_ERROR':
+        return 'TLS_CERTIFICATE_GENERIC_ERROR';
       case 'TOO_MANY_REDIRECTS':
         return 'TOO_MANY_REDIRECTS';
       case 'TOO_MANY_REQUESTS':
@@ -1608,16 +1757,6 @@ class WebResourceErrorType {
         return 'USER_CANCELLED_AUTHENTICATION';
       case 'VALID_PROXY_AUTHENTICATION_REQUIRED':
         return 'VALID_PROXY_AUTHENTICATION_REQUIRED';
-      case 'WEBKIT_CANNOT_SHOW_MIME_TYPE':
-        return 'WEBKIT_CANNOT_SHOW_MIME_TYPE';
-      case 'WEBKIT_CANNOT_SHOW_URI':
-        return 'WEBKIT_CANNOT_SHOW_URI';
-      case 'WEBKIT_CANNOT_USE_RESTRICTED_PORT':
-        return 'WEBKIT_CANNOT_USE_RESTRICTED_PORT';
-      case 'WEBKIT_FRAME_LOAD_INTERRUPTED_BY_POLICY_CHANGE':
-        return 'WEBKIT_FRAME_LOAD_INTERRUPTED_BY_POLICY_CHANGE';
-      case 'WEBKIT_POLICY_FAILED':
-        return 'WEBKIT_POLICY_FAILED';
       case 'ZERO_BYTE_RESOURCE':
         return 'ZERO_BYTE_RESOURCE';
     }

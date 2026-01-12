@@ -40,7 +40,6 @@
 #include <tuple>
 #include <vector>
 
-#include "../types/color_picker_popup.h"
 #include "../types/context_menu.h"
 #include "../types/context_menu_popup.h"
 #include "../types/find_session.h"
@@ -300,12 +299,14 @@ class InAppWebView {
                        const std::string& colorSpace = "limited-srgb");
   // Hide and cleanup any visible color picker
   void HideColorPicker();
+  // Hide and cleanup any visible file chooser dialog
+  void HideFileChooser();
   // Set the color input value via JavaScript
   void SetColorInputValue(const std::string& hexColor);
   // Cancel the color input selection via JavaScript
   void CancelColorInput();
 
-  // Hide all custom popups (context menu, color picker, etc.)
+  // Hide all custom popups (context menu, color picker, file chooser, etc.)
   // Use this when the webview state changes (resize, scroll, load, focus loss, etc.)
   void HideAllPopups();
 
@@ -517,10 +518,6 @@ class InAppWebView {
   double texture_offset_x_ = 0;  // Texture offset within the Flutter window
   double texture_offset_y_ = 0;
 
-  // Color picker state (for <input type="color"> support in WPE)
-  std::unique_ptr<ColorPickerPopup> color_picker_popup_;
-  std::string pending_color_input_value_;  // Current color from the input
-
   // Pointer lock handler
   std::function<bool(bool)> pointer_lock_handler_;
   bool pointer_locked_ = false;
@@ -542,6 +539,19 @@ class InAppWebView {
 
   // DOM fullscreen request handler (called from WPE backend)
   bool OnDomFullscreenRequest(bool fullscreen);
+  
+  // Color picker state (for <input type="color"> support in WPE)
+  // Public because accessed from C-style GTK callback
+  std::string pending_color_input_value_;  // Current color from the input
+  GtkWidget* active_color_dialog_ = nullptr;  // Active color picker dialog (non-blocking)
+  bool active_color_alpha_enabled_ = false;   // Alpha enabled for active dialog
+  int64_t color_dialog_show_time_ = 0;         // Time when dialog was shown (to prevent immediate close)
+
+  // File chooser state (for <input type="file"> support)
+  // Public because accessed from C-style GTK callback
+  GtkWidget* active_file_dialog_ = nullptr;   // Active file chooser dialog (non-blocking)
+  int64_t file_dialog_show_time_ = 0;          // Time when dialog was shown (to prevent immediate close)
+  void* file_chooser_context_ = nullptr;       // Opaque pointer to FileChooserContext (for cleanup)
 
   // Pointer lock handler (called from WPE backend)
   bool OnPointerLockRequest(bool lock);

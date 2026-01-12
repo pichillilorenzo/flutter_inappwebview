@@ -140,7 +140,6 @@ list(APPEND PLUGIN_SOURCES
   "types/channel_delegate.cc"
   "types/client_cert_challenge.cc"
   "types/client_cert_response.cc"
-  "types/color_picker_popup.cc"
   "types/content_world.cc"
   "types/context_menu_popup.cc"
   "types/create_window_action.cc"

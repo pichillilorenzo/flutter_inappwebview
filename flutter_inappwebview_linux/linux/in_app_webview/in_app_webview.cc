@@ -62,6 +62,30 @@
 
 using json = nlohmann::json;
 
+// Forward declaration of InAppWebView for FileChooserContext
+namespace flutter_inappwebview_plugin {
+class InAppWebView;
+}
+
+// Context data for non-blocking file chooser dialog
+// Defined early because HideFileChooser() needs access to members
+struct FileChooserContext {
+  WebKitFileChooserRequest* request;
+  bool selectMultiple;
+  flutter_inappwebview_plugin::InAppWebView* webview;  // Pointer to webview for tracking active dialog
+  gulong response_handler_id;  // Signal handler ID for cleanup
+  
+  FileChooserContext(WebKitFileChooserRequest* req, bool multi, 
+                     flutter_inappwebview_plugin::InAppWebView* wv)
+      : request(req), selectMultiple(multi), webview(wv), response_handler_id(0) {
+    g_object_ref(request);  // Keep request alive
+  }
+  
+  ~FileChooserContext() {
+    g_object_unref(request);
+  }
+};
+
 // GDK for EGL display access
 #include <gdk/gdk.h>
 #ifdef GDK_WINDOWING_WAYLAND
@@ -70,11 +94,6 @@ using json = nlohmann::json;
 #ifdef GDK_WINDOWING_X11
 #include <gdk/gdkx.h>
 #endif
-
-// Forward declaration of the class in the namespace
-namespace flutter_inappwebview_plugin {
-class InAppWebView;
-}
 
 // C-style callback functions outside the namespace for C API compatibility
 extern "C" {
@@ -256,9 +275,6 @@ InAppWebView::~InAppWebView() {
 
   // Clean up context menu popup
   context_menu_popup_.reset();
-
-  // Clean up color picker popup
-  color_picker_popup_.reset();
 
   // Clean up find interaction controller
   if (findInteractionController_) {
@@ -4140,46 +4156,211 @@ void InAppWebView::HideContextMenu() {
 
 // === Color Picker for <input type="color"> ===
 // WPE WebKit doesn't have the run-color-chooser signal that WebKitGTK has,
-// so we implement color input support via JavaScript interception and a custom popup.
+// so we implement color input support via JavaScript interception and a native GTK3 dialog.
+
+// Helper function to parse hex color string to GdkRGBA
+static bool ParseHexColor(const std::string& hexColor, GdkRGBA* rgba) {
+  if (hexColor.empty() || hexColor[0] != '#') {
+    return false;
+  }
+
+  std::string hex = hexColor.substr(1);  // Remove '#'
+  
+  unsigned int r = 0, g = 0, b = 0, a = 255;
+  
+  if (hex.length() == 6) {
+    // #RRGGBB
+    if (sscanf(hex.c_str(), "%02x%02x%02x", &r, &g, &b) != 3) {
+      return false;
+    }
+  } else if (hex.length() == 8) {
+    // #RRGGBBAA
+    if (sscanf(hex.c_str(), "%02x%02x%02x%02x", &r, &g, &b, &a) != 4) {
+      return false;
+    }
+  } else if (hex.length() == 3) {
+    // #RGB (shorthand)
+    if (sscanf(hex.c_str(), "%1x%1x%1x", &r, &g, &b) != 3) {
+      return false;
+    }
+    r = r * 17;  // Expand 0-15 to 0-255
+    g = g * 17;
+    b = b * 17;
+  } else {
+    return false;
+  }
+  
+  rgba->red = r / 255.0;
+  rgba->green = g / 255.0;
+  rgba->blue = b / 255.0;
+  rgba->alpha = a / 255.0;
+  
+  return true;
+}
+
+// Helper function to convert GdkRGBA to hex color string
+static std::string RgbaToHexColor(const GdkRGBA* rgba, bool includeAlpha) {
+  int r = static_cast<int>(rgba->red * 255.0 + 0.5);
+  int g = static_cast<int>(rgba->green * 255.0 + 0.5);
+  int b = static_cast<int>(rgba->blue * 255.0 + 0.5);
+  int a = static_cast<int>(rgba->alpha * 255.0 + 0.5);
+  
+  // Clamp values
+  r = std::max(0, std::min(255, r));
+  g = std::max(0, std::min(255, g));
+  b = std::max(0, std::min(255, b));
+  a = std::max(0, std::min(255, a));
+  
+  char hexColor[10];
+  if (includeAlpha && a != 255) {
+    snprintf(hexColor, sizeof(hexColor), "#%02X%02X%02X%02X", r, g, b, a);
+  } else {
+    snprintf(hexColor, sizeof(hexColor), "#%02X%02X%02X", r, g, b);
+  }
+  
+  return std::string(hexColor);
+}
+
+// Static callback for non-blocking color dialog response
+static void OnColorDialogResponse(GtkDialog* dialog, gint response_id, gpointer user_data) {
+  auto* self = static_cast<InAppWebView*>(user_data);
+  
+  if (response_id == GTK_RESPONSE_OK) {
+    // User selected a color
+    GdkRGBA selectedRgba;
+    gtk_color_chooser_get_rgba(GTK_COLOR_CHOOSER(dialog), &selectedRgba);
+    
+    std::string hexColor = RgbaToHexColor(&selectedRgba, self->active_color_alpha_enabled_);
+    self->SetColorInputValue(hexColor);
+  } else {
+    // User cancelled or closed the dialog
+    self->CancelColorInput();
+  }
+  
+  gtk_widget_destroy(GTK_WIDGET(dialog));
+  g_object_unref(dialog);  // Release our extra reference
+  self->active_color_dialog_ = nullptr;
+  self->color_dialog_show_time_ = 0;
+}
 
 void InAppWebView::ShowColorPicker(const std::string& initialColor, int x, int y,
                                    const std::vector<std::string>& predefinedColors,
                                    bool alphaEnabled,
                                    const std::string& colorSpace) {
-  if (gtk_window_ == nullptr) {
-    errorLog("InAppWebView: Cannot show color picker - no window available");
-    return;
+  (void)x;  // Position not used for non-modal dialog
+  (void)y;
+  (void)colorSpace;  // GTK3 color chooser doesn't support color spaces
+  
+  // Close any existing color dialog first
+  if (active_color_dialog_ != nullptr) {
+    gtk_widget_destroy(active_color_dialog_);
+    g_object_unref(active_color_dialog_);
+    active_color_dialog_ = nullptr;
   }
-
-  // Create color picker popup if needed
-  if (!color_picker_popup_) {
-    color_picker_popup_ = std::make_unique<ColorPickerPopup>(gtk_window_);
-
-    // Set up color selected callback
-    color_picker_popup_->SetColorSelectedCallback([this](const std::string& hexColor) {
-      SetColorInputValue(hexColor);
-    });
-
-    // Set up cancelled callback
-    color_picker_popup_->SetColorCancelledCallback([this]() {
-      CancelColorInput();
-    });
-  }
-
+  
   // Store the initial color for cancel restoration
   pending_color_input_value_ = initialColor;
-
-  // Set the initial color and all attributes from HTML
-  color_picker_popup_->SetInitialColor(initialColor);
-  color_picker_popup_->SetPredefinedColors(predefinedColors);
-  color_picker_popup_->SetAlphaEnabled(alphaEnabled);
-  color_picker_popup_->SetColorSpace(colorSpace);
-  color_picker_popup_->Show(x, y);
+  active_color_alpha_enabled_ = alphaEnabled;
+  
+  // Create the color chooser dialog with parent window
+  GtkWidget* dialog = gtk_color_chooser_dialog_new("Select Color", gtk_window_);
+  active_color_dialog_ = dialog;
+  
+  // Set dialog as transient for parent (floats above but doesn't block)
+  if (gtk_window_) {
+    gtk_window_set_transient_for(GTK_WINDOW(dialog), gtk_window_);
+  }
+  
+  // Take an extra reference to prevent premature destruction
+  g_object_ref(dialog);
+  
+  GtkColorChooser* chooser = GTK_COLOR_CHOOSER(dialog);
+  
+  // Set the initial color
+  GdkRGBA initialRgba = {0.0, 0.0, 0.0, 1.0};  // Default to black
+  if (ParseHexColor(initialColor, &initialRgba)) {
+    gtk_color_chooser_set_rgba(chooser, &initialRgba);
+  }
+  
+  // Enable/disable alpha channel
+  gtk_color_chooser_set_use_alpha(chooser, alphaEnabled ? TRUE : FALSE);
+  
+  // Add predefined colors if provided
+  if (!predefinedColors.empty()) {
+    std::vector<GdkRGBA> rgbaColors;
+    rgbaColors.reserve(predefinedColors.size());
+    
+    for (const auto& hexColor : predefinedColors) {
+      GdkRGBA rgba;
+      if (ParseHexColor(hexColor, &rgba)) {
+        rgbaColors.push_back(rgba);
+      }
+    }
+    
+    if (!rgbaColors.empty()) {
+      gtk_color_chooser_add_palette(chooser, GTK_ORIENTATION_HORIZONTAL,
+                                    static_cast<gint>(rgbaColors.size()),
+                                    static_cast<gint>(rgbaColors.size()),
+                                    rgbaColors.data());
+    }
+  }
+  
+  // Connect to response signal for non-blocking behavior
+  g_signal_connect(dialog, "response", G_CALLBACK(OnColorDialogResponse), this);
+  
+  // Show the dialog and all its children (non-blocking)
+  gtk_widget_show_all(dialog);
+  
+  // Record show time to prevent immediate close by pointer events
+  color_dialog_show_time_ = g_get_monotonic_time();
 }
 
 void InAppWebView::HideColorPicker() {
-  if (color_picker_popup_) {
-    color_picker_popup_->Hide();
+  if (active_color_dialog_ != nullptr) {
+    // Don't close the dialog if it was just shown (within 200ms)
+    // This prevents the click that triggered the color picker from immediately closing it
+    int64_t now = g_get_monotonic_time();
+    int64_t elapsed_us = now - color_dialog_show_time_;
+    if (elapsed_us < 200000) {
+      return;
+    }
+    
+    CancelColorInput();
+    gtk_widget_destroy(active_color_dialog_);
+    g_object_unref(active_color_dialog_);
+    active_color_dialog_ = nullptr;
+    color_dialog_show_time_ = 0;
+  }
+}
+
+void InAppWebView::HideFileChooser() {
+  if (active_file_dialog_ != nullptr) {
+    // Don't close the dialog if it was just shown (within 200ms)
+    // This prevents the click that triggered the file chooser from immediately closing it
+    int64_t now = g_get_monotonic_time();
+    int64_t elapsed_us = now - file_dialog_show_time_;
+    if (elapsed_us < 200000) {
+      return;
+    }
+    
+    // Cancel the WebKit request if we have context
+    if (file_chooser_context_ != nullptr) {
+      auto* context = static_cast<FileChooserContext*>(file_chooser_context_);
+      // Disconnect the signal handler to prevent callback from being called
+      if (context->response_handler_id != 0) {
+        g_signal_handler_disconnect(active_file_dialog_, context->response_handler_id);
+        context->response_handler_id = 0;
+      }
+      // Cancel the WebKit request so future file chooser signals work
+      webkit_file_chooser_request_cancel(context->request);
+      delete context;
+      file_chooser_context_ = nullptr;
+    }
+    
+    gtk_widget_destroy(active_file_dialog_);
+    g_object_unref(active_file_dialog_);
+    active_file_dialog_ = nullptr;
+    file_dialog_show_time_ = 0;
   }
 }
 
@@ -4187,6 +4368,7 @@ void InAppWebView::HideAllPopups() {
   // Hide all custom popups - add new popup types here as they are implemented
   HideContextMenu();
   HideColorPicker();
+  HideFileChooser();
 }
 
 void InAppWebView::SetColorInputValue(const std::string& hexColor) {
@@ -4915,45 +5097,21 @@ void InAppWebView::OnWebProcessTerminated(WebKitWebView* web_view,
   }
 }
 
-// Helper function to show native GTK file chooser dialog
-static void ShowNativeFileChooser(WebKitFileChooserRequest* request,
-                                   bool selectMultiple,
-                                   const std::vector<std::string>& mimeTypes) {
-  // Create the file chooser dialog
-  GtkWidget* dialog = gtk_file_chooser_dialog_new(
-      "Select File",
-      nullptr,  // No parent window
-      GTK_FILE_CHOOSER_ACTION_OPEN,
-      "_Cancel", GTK_RESPONSE_CANCEL,
-      "_Open", GTK_RESPONSE_ACCEPT,
-      nullptr);
-
+// Static callback for non-blocking file chooser dialog response
+static void OnFileChooserDialogResponse(GtkDialog* dialog, gint response_id, gpointer user_data) {
+  auto* context = static_cast<FileChooserContext*>(user_data);
+  
+  // Check if this dialog is still the active one (prevents double-cleanup)
+  if (context->webview && context->webview->active_file_dialog_ != GTK_WIDGET(dialog)) {
+    // Dialog was already cleaned up by HideFileChooser(), just delete context
+    delete context;
+    return;
+  }
+  
   GtkFileChooser* chooser = GTK_FILE_CHOOSER(dialog);
 
-  // Enable multiple selection if requested
-  gtk_file_chooser_set_select_multiple(chooser, selectMultiple ? TRUE : FALSE);
-
-  // Add file filters based on MIME types
-  if (!mimeTypes.empty()) {
-    GtkFileFilter* filter = gtk_file_filter_new();
-    gtk_file_filter_set_name(filter, "Allowed files");
-    for (const auto& mimeType : mimeTypes) {
-      gtk_file_filter_add_mime_type(filter, mimeType.c_str());
-    }
-    gtk_file_chooser_add_filter(chooser, filter);
-
-    // Also add an "All files" filter
-    GtkFileFilter* allFilter = gtk_file_filter_new();
-    gtk_file_filter_set_name(allFilter, "All files");
-    gtk_file_filter_add_pattern(allFilter, "*");
-    gtk_file_chooser_add_filter(chooser, allFilter);
-  }
-
-  // Run the dialog
-  gint result = gtk_dialog_run(GTK_DIALOG(dialog));
-
-  if (result == GTK_RESPONSE_ACCEPT) {
-    if (selectMultiple) {
+  if (response_id == GTK_RESPONSE_ACCEPT) {
+    if (context->selectMultiple) {
       // Get multiple files
       GSList* files = gtk_file_chooser_get_filenames(chooser);
       if (files != nullptr) {
@@ -4978,9 +5136,9 @@ static void ShowNativeFileChooser(WebKitFileChooserRequest* request,
           uris.push_back(path.c_str());
         }
         uris.push_back(nullptr);  // NULL-terminated
-        webkit_file_chooser_request_select_files(request, uris.data());
+        webkit_file_chooser_request_select_files(context->request, uris.data());
       } else {
-        webkit_file_chooser_request_cancel(request);
+        webkit_file_chooser_request_cancel(context->request);
       }
     } else {
       // Get single file
@@ -4989,22 +5147,118 @@ static void ShowNativeFileChooser(WebKitFileChooserRequest* request,
         gchar* uri = g_filename_to_uri(filename, nullptr, nullptr);
         if (uri != nullptr) {
           const gchar* uris[] = {uri, nullptr};
-          webkit_file_chooser_request_select_files(request, uris);
+          webkit_file_chooser_request_select_files(context->request, uris);
           g_free(uri);
         } else {
-          webkit_file_chooser_request_cancel(request);
+          webkit_file_chooser_request_cancel(context->request);
         }
         g_free(filename);
       } else {
-        webkit_file_chooser_request_cancel(request);
+        webkit_file_chooser_request_cancel(context->request);
       }
     }
   } else {
-    // User cancelled
-    webkit_file_chooser_request_cancel(request);
+    // User cancelled (Cancel button, X button, or Escape key)
+    webkit_file_chooser_request_cancel(context->request);
   }
 
-  gtk_widget_destroy(dialog);
+  // Clear tracking in webview
+  if (context->webview) {
+    context->webview->active_file_dialog_ = nullptr;
+    context->webview->file_dialog_show_time_ = 0;
+    context->webview->file_chooser_context_ = nullptr;
+  }
+
+  gtk_widget_destroy(GTK_WIDGET(dialog));
+  g_object_unref(dialog);  // Release our extra reference
+  delete context;
+}
+
+// Helper function to show native GTK file chooser dialog (non-blocking)
+static void ShowNativeFileChooser(InAppWebView* webview,
+                                   WebKitFileChooserRequest* request,
+                                   bool selectMultiple,
+                                   const std::vector<std::string>& mimeTypes,
+                                   GtkWindow* parentWindow) {
+  // Close any existing file dialog first
+  if (webview && webview->active_file_dialog_ != nullptr) {
+    // Clean up old context if it exists
+    if (webview->file_chooser_context_ != nullptr) {
+      auto* old_context = static_cast<FileChooserContext*>(webview->file_chooser_context_);
+      if (old_context->response_handler_id != 0) {
+        g_signal_handler_disconnect(webview->active_file_dialog_, old_context->response_handler_id);
+      }
+      webkit_file_chooser_request_cancel(old_context->request);
+      delete old_context;
+      webview->file_chooser_context_ = nullptr;
+    }
+    gtk_widget_destroy(webview->active_file_dialog_);
+    g_object_unref(webview->active_file_dialog_);
+    webview->active_file_dialog_ = nullptr;
+  }
+
+  // Create the file chooser dialog with parent window
+  GtkWidget* dialog = gtk_file_chooser_dialog_new(
+      "Select File",
+      parentWindow,
+      GTK_FILE_CHOOSER_ACTION_OPEN,
+      "_Cancel", GTK_RESPONSE_CANCEL,
+      "_Open", GTK_RESPONSE_ACCEPT,
+      nullptr);
+
+  // Track the dialog in webview
+  if (webview) {
+    webview->active_file_dialog_ = dialog;
+  }
+
+  // Set dialog as transient for parent (floats above but doesn't block)
+  if (parentWindow) {
+    gtk_window_set_transient_for(GTK_WINDOW(dialog), parentWindow);
+  }
+
+  // Take an extra reference to prevent premature destruction
+  g_object_ref(dialog);
+
+  GtkFileChooser* chooser = GTK_FILE_CHOOSER(dialog);
+
+  // Enable multiple selection if requested
+  gtk_file_chooser_set_select_multiple(chooser, selectMultiple ? TRUE : FALSE);
+
+  // Add file filters based on MIME types
+  if (!mimeTypes.empty()) {
+    GtkFileFilter* filter = gtk_file_filter_new();
+    gtk_file_filter_set_name(filter, "Allowed files");
+    for (const auto& mimeType : mimeTypes) {
+      gtk_file_filter_add_mime_type(filter, mimeType.c_str());
+    }
+    gtk_file_chooser_add_filter(chooser, filter);
+
+    // Also add an "All files" filter
+    GtkFileFilter* allFilter = gtk_file_filter_new();
+    gtk_file_filter_set_name(allFilter, "All files");
+    gtk_file_filter_add_pattern(allFilter, "*");
+    gtk_file_chooser_add_filter(chooser, allFilter);
+  }
+
+  // Create context for the callback
+  auto* context = new FileChooserContext(request, selectMultiple, webview);
+  
+  // Store context pointer in webview for cleanup in HideFileChooser
+  if (webview) {
+    webview->file_chooser_context_ = context;
+  }
+  
+  // Connect to response signal for non-blocking behavior
+  context->response_handler_id = g_signal_connect(dialog, "response", 
+      G_CALLBACK(OnFileChooserDialogResponse), context);
+  
+  // Show the dialog and all its children (non-blocking)
+  gtk_widget_show_all(dialog);
+
+  // Record show time to prevent immediate close by pointer events
+  if (webview) {
+    webview->file_dialog_show_time_ = g_get_monotonic_time();
+  }
 }
 
 gboolean InAppWebView::OnRunFileChooser(WebKitWebView* web_view,
@@ -5026,7 +5280,7 @@ gboolean InAppWebView::OnRunFileChooser(WebKitWebView* web_view,
 
   // If no channel delegate, show native dialog directly
   if (!self->channel_delegate_) {
-    ShowNativeFileChooser(request, select_multiple, acceptTypes);
+    ShowNativeFileChooser(self, request, select_multiple, acceptTypes, self->gtk_window_);
     return TRUE;
   }
 
@@ -5039,6 +5293,7 @@ gboolean InAppWebView::OnRunFileChooser(WebKitWebView* web_view,
   // Capture variables for the lambda
   bool selectMultipleCopy = select_multiple;
   std::vector<std::string> acceptTypesCopy = acceptTypes;
+  GtkWindow* parentWindow = self->gtk_window_;
 
   self->channel_delegate_->onShowFileChooser(
       mode,
@@ -5046,7 +5301,7 @@ gboolean InAppWebView::OnRunFileChooser(WebKitWebView* web_view,
       false,  // isCaptureEnabled - not exposed by WPE API
       std::nullopt,  // title
       std::nullopt,  // filenameHint
-      [request, selectMultipleCopy, acceptTypesCopy](ShowFileChooserResponse response) {
+      [self, request, selectMultipleCopy, acceptTypesCopy, parentWindow](ShowFileChooserResponse response) {
         if (response.handledByClient) {
           // Client handled it - use the file paths from Dart
           if (response.filePaths.has_value() && !response.filePaths->empty()) {
@@ -5063,7 +5318,7 @@ gboolean InAppWebView::OnRunFileChooser(WebKitWebView* web_view,
           }
         } else {
           // Client didn't handle it - show native GTK file chooser
-          ShowNativeFileChooser(request, selectMultipleCopy, acceptTypesCopy);
+          ShowNativeFileChooser(self, request, selectMultipleCopy, acceptTypesCopy, parentWindow);
         }
         g_object_unref(request);
       });

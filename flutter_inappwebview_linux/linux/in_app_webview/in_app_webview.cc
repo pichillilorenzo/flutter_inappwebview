@@ -190,7 +190,7 @@ bool InAppWebView::IsWpeWebKitAvailable() {
 
 InAppWebView::InAppWebView(FlPluginRegistrar* registrar, FlBinaryMessenger* messenger, int64_t id,
                            const InAppWebViewCreationParams& params)
-    : registrar_(registrar), messenger_(messenger), gtk_window_(params.gtkWindow), manager_(params.manager), id_(id), settings_(params.initialSettings),
+    : registrar_(registrar), messenger_(messenger), gtk_window_(params.gtkWindow), fl_view_(params.flView), manager_(params.manager), id_(id), settings_(params.initialSettings),
       initial_user_scripts_(params.initialUserScripts) {
   js_bridge_secret_ = GenerateRandomSecret();
   
@@ -642,6 +642,9 @@ void InAppWebView::RegisterEventHandlers() {
 
   // Connect to run-file-chooser signal for file input handling
   g_signal_connect(webview_, "run-file-chooser", G_CALLBACK(OnRunFileChooser), this);
+
+  // Connect to show-option-menu signal for HTML <select> element handling
+  g_signal_connect(webview_, "show-option-menu", G_CALLBACK(OnShowOptionMenu), this);
 
   // Connect to download-started signal on NetworkSession (WPE WebKit 2.40+ API)
   // Note: In WPE WebKit, download-started is on NetworkSession, not WebView
@@ -3059,6 +3062,7 @@ WebKitWebView* InAppWebView::OnCreateWebView(WebKitWebView* web_view,
   InAppWebViewCreationParams windowParams;
   windowParams.id = windowId;
   windowParams.gtkWindow = self->gtk_window_;
+  windowParams.flView = self->fl_view_;  // Pass FlView for focus restoration
   windowParams.manager = self->manager_;
   windowParams.initialSettings = self->settings_;  // Share parent settings
   windowParams.windowId = windowId;
@@ -4364,11 +4368,18 @@ void InAppWebView::HideFileChooser() {
   }
 }
 
+void InAppWebView::HideOptionMenu() {
+  if (option_menu_popup_ && option_menu_popup_->IsVisible()) {
+    option_menu_popup_->Hide();
+  }
+}
+
 void InAppWebView::HideAllPopups() {
   // Hide all custom popups - add new popup types here as they are implemented
   HideContextMenu();
   HideColorPicker();
   HideFileChooser();
+  HideOptionMenu();
 }
 
 void InAppWebView::SetColorInputValue(const std::string& hexColor) {
@@ -5323,6 +5334,95 @@ gboolean InAppWebView::OnRunFileChooser(WebKitWebView* web_view,
         g_object_unref(request);
       });
 
+  return TRUE;  // We handled it
+}
+
+// === Option Menu (HTML <select>) Handler ===
+
+gboolean InAppWebView::OnShowOptionMenu(WebKitWebView* web_view,
+                                        WebKitOptionMenu* menu,
+                                        WebKitRectangle* rectangle,
+                                        gpointer user_data) {
+  auto* self = static_cast<InAppWebView*>(user_data);
+  
+  // Hide any existing option menu first
+  if (self->option_menu_popup_) {
+    self->option_menu_popup_->Hide();
+  }
+  
+  // Get the parent GTK window
+  GtkWindow* parent_window = self->gtk_window_;
+  if (parent_window == nullptr) {
+    debugLog("InAppWebView: No parent GTK window for option menu");
+    return FALSE;
+  }
+  
+  // Create the popup if needed
+  if (!self->option_menu_popup_) {
+    self->option_menu_popup_ = std::make_unique<OptionMenuPopup>(parent_window);
+  }
+  
+  // Take a reference to the WebKit option menu to keep it alive
+  g_object_ref(menu);
+  self->webkit_option_menu_ = menu;
+  
+  // Set the option menu data
+  self->option_menu_popup_->SetOptionMenu(menu);
+  
+  // Set callbacks
+  self->option_menu_popup_->SetItemSelectedCallback([self](guint index) {
+    // Activate the selected item
+    if (self->webkit_option_menu_ != nullptr) {
+      webkit_option_menu_activate_item(self->webkit_option_menu_, index);
+      debugLog("InAppWebView: Option menu item " + std::to_string(index) + " activated");
+    }
+  });
+  
+  self->option_menu_popup_->SetDismissedCallback([self]() {
+    // Close the WebKit option menu
+    if (self->webkit_option_menu_ != nullptr) {
+      webkit_option_menu_close(self->webkit_option_menu_);
+      g_object_unref(self->webkit_option_menu_);
+      self->webkit_option_menu_ = nullptr;
+      debugLog("InAppWebView: Option menu dismissed");
+    }
+  });
+  
+  // Calculate popup position
+  // On Wayland, absolute window positions aren't available (gdk_window_get_origin returns 0,0).
+  // Instead, we use the current pointer screen position and calculate the offset needed
+  // to position the popup at the bottom-left of the select element.
+  //
+  // The rectangle is in web content coordinates.
+  // cursor_x_/cursor_y_ contains where the click happened in WebView coordinates.
+  // We calculate where the popup should appear relative to the click position.
+  
+  // Get the current pointer screen position (where user clicked)
+  gint pointer_x = 0, pointer_y = 0;
+  GdkDisplay* gdk_display = gdk_display_get_default();
+  if (gdk_display != nullptr) {
+    GdkSeat* seat = gdk_display_get_default_seat(gdk_display);
+    if (seat != nullptr) {
+      GdkDevice* pointer = gdk_seat_get_pointer(seat);
+      if (pointer != nullptr) {
+        gdk_device_get_position(pointer, nullptr, &pointer_x, &pointer_y);
+      }
+    }
+  }
+  
+  // The click was at (cursor_x_, cursor_y_) in WebView coordinates
+  // The rectangle is in web content coordinates (same as WebView coordinates for our purpose)
+  // Calculate how far the click was from the left edge and bottom of the element
+  double click_offset_from_left = self->cursor_x_ - rectangle->x;
+  double click_offset_from_bottom = (rectangle->y + rectangle->height) - self->cursor_y_;
+  
+  // Position popup: left-aligned with element, just below element
+  int popup_x = pointer_x - static_cast<int>(click_offset_from_left);
+  int popup_y = pointer_y + static_cast<int>(click_offset_from_bottom);
+  
+  // Show the popup - use rectangle->width as the exact width to match the select element
+  self->option_menu_popup_->Show(popup_x, popup_y, rectangle->width);
+  
   return TRUE;  // We handled it
 }
 

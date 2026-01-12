@@ -18,9 +18,10 @@ InAppWebViewManager::InAppWebViewManager(FlPluginRegistrar* registrar) : registr
   texture_registrar_ = fl_plugin_registrar_get_texture_registrar(registrar);
   messenger_ = fl_plugin_registrar_get_messenger(registrar);
 
-  // Cache the GTK window now while the registrar is still fully valid
-  // This is needed for context menus and monitor refresh rate later
+  // Cache the GTK window and FlView now while the registrar is still fully valid
+  // This is needed for context menus, monitor refresh rate, and focus restoration
   gtk_window_ = flutter_inappwebview_linux_plugin_get_window(registrar);
+  fl_view_ = flutter_inappwebview_linux_plugin_get_view(registrar);
 
   // Create the method channel
   g_autoptr(FlStandardMethodCodec) codec = fl_standard_method_codec_new();
@@ -182,6 +183,7 @@ void InAppWebViewManager::CreateInAppWebView(FlMethodCall* method_call) {
   InAppWebViewCreationParams params;
   params.id = next_id_++;
   params.gtkWindow = gtk_window_;  // Pass the cached GTK window
+  params.flView = fl_view_;  // Pass the cached FlView for focus restoration
   params.manager = this;  // Pass manager for multi-window support
 
   // Parse initial settings

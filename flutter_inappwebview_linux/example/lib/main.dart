@@ -85,7 +85,7 @@ class _MyAppState extends State<MyApp> {
                       LinuxInAppWebViewWidgetCreationParams(
                         key: webViewKey,
                         initialUrlRequest: URLRequest(
-                          url: WebUri("https://brianhaines.com/test-color-input/"),
+                          url: WebUri("https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/select"),
                         ),
                         initialSettings: settings,
                         onWebViewCreated: (controller) {

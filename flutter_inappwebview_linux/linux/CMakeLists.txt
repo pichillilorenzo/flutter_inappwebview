@@ -159,6 +159,7 @@ list(APPEND PLUGIN_SOURCES
   "types/js_prompt_response.cc"
   "types/hit_test_result.cc"
   "types/navigation_action.cc"
+  "types/option_menu_popup.cc"
   "types/permission_request.cc"
   "types/permission_response.cc"
   "types/plugin_script.cc"

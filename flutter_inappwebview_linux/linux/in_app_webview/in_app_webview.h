@@ -42,6 +42,7 @@
 
 #include "../types/context_menu.h"
 #include "../types/context_menu_popup.h"
+#include "../types/option_menu_popup.h"
 #include "../types/find_session.h"
 #include "../types/hit_test_result.h"
 #include "../types/ssl_certificate.h"
@@ -64,6 +65,7 @@ class WebViewChannelDelegate;
 struct InAppWebViewCreationParams {
   int64_t id;
   GtkWindow* gtkWindow = nullptr;  // Cached GTK window from manager
+  FlView* flView = nullptr;  // Cached FlView for focus restoration
   InAppWebViewManager* manager = nullptr;  // Manager reference for multi-window support
   std::optional<std::shared_ptr<URLRequest>> initialUrlRequest;
   std::optional<std::string> initialFile;
@@ -301,12 +303,14 @@ class InAppWebView {
   void HideColorPicker();
   // Hide and cleanup any visible file chooser dialog
   void HideFileChooser();
+  // Hide and cleanup any visible option menu (HTML <select>)
+  void HideOptionMenu();
   // Set the color input value via JavaScript
   void SetColorInputValue(const std::string& hexColor);
   // Cancel the color input selection via JavaScript
   void CancelColorInput();
 
-  // Hide all custom popups (context menu, color picker, file chooser, etc.)
+  // Hide all custom popups (context menu, color picker, file chooser, option menu, etc.)
   // Use this when the webview state changes (resize, scroll, load, focus loss, etc.)
   void HideAllPopups();
 
@@ -372,10 +376,17 @@ class InAppWebView {
   // This injects JS to set window._flutter_inappwebview_windowId
   void initializeWindowIdJS();
 
+  // Get the GTK window (for focus restoration after popup dialogs)
+  GtkWindow* getGtkWindow() const { return gtk_window_; }
+
+  // Get the FlView (for focus restoration after popup dialogs)
+  FlView* getFlView() const { return fl_view_; }
+
  private:
   FlPluginRegistrar* registrar_ = nullptr;
   FlBinaryMessenger* messenger_ = nullptr;  // Cached messenger from constructor
   GtkWindow* gtk_window_ = nullptr;  // Cached GTK window for context menu display
+  FlView* fl_view_ = nullptr;  // Cached FlView for focus restoration
   InAppWebViewManager* manager_ = nullptr;  // Manager reference for multi-window support
   int64_t id_ = 0;
   int64_t channel_id_ = -1;
@@ -518,6 +529,9 @@ class InAppWebView {
   double texture_offset_x_ = 0;  // Texture offset within the Flutter window
   double texture_offset_y_ = 0;
 
+  // Option menu state (for HTML <select> dropdowns)
+  std::unique_ptr<OptionMenuPopup> option_menu_popup_;
+
   // Pointer lock handler
   std::function<bool(bool)> pointer_lock_handler_;
   bool pointer_locked_ = false;
@@ -552,6 +566,9 @@ class InAppWebView {
   GtkWidget* active_file_dialog_ = nullptr;   // Active file chooser dialog (non-blocking)
   int64_t file_dialog_show_time_ = 0;          // Time when dialog was shown (to prevent immediate close)
   void* file_chooser_context_ = nullptr;       // Opaque pointer to FileChooserContext (for cleanup)
+
+  // Option menu state (for HTML <select> support)
+  WebKitOptionMenu* webkit_option_menu_ = nullptr;  // WebKit's option menu object (kept alive during popup)
 
   // Pointer lock handler (called from WPE backend)
   bool OnPointerLockRequest(bool lock);
@@ -615,6 +632,11 @@ class InAppWebView {
 
   static gboolean OnRunFileChooser(WebKitWebView* web_view,
                                    WebKitFileChooserRequest* request,
+                                   gpointer user_data);
+
+  static gboolean OnShowOptionMenu(WebKitWebView* web_view,
+                                   WebKitOptionMenu* menu,
+                                   WebKitRectangle* rectangle,
                                    gpointer user_data);
 
   // === Download Signals ===

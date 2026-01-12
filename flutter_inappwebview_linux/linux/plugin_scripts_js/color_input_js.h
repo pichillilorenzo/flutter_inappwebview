@@ -7,6 +7,7 @@
 #include <vector>
 
 #include "../types/plugin_script.h"
+#include "javascript_bridge_js.h"
 
 namespace flutter_inappwebview_plugin {
 
@@ -94,15 +95,17 @@ class ColorInputJS {
     var colorSpace = input.getAttribute('colorspace') || 'limited-srgb';
 
     // Call native handler
-    if (window.flutter_inappwebview && window.flutter_inappwebview.callHandler) {
-      window.flutter_inappwebview.callHandler('_onColorInputClicked', {
+    try {
+      window.)JS" +
+           JavaScriptBridgeJS::get_JAVASCRIPT_BRIDGE_NAME() +
+           R"JS(.callHandler('_onColorInputClicked', {
         color: currentColor,
         rect: activeElementRect,
         predefinedColors: predefinedColors,
         alpha: alphaEnabled,
         colorSpace: colorSpace
       });
-    }
+    } catch(_) {}
   }
 
   // Function to set color value from native

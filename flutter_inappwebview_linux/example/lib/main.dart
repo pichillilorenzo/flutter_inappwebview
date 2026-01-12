@@ -85,7 +85,7 @@ class _MyAppState extends State<MyApp> {
                       LinuxInAppWebViewWidgetCreationParams(
                         key: webViewKey,
                         initialUrlRequest: URLRequest(
-                          url: WebUri("https://badssl.com/"),
+                          url: WebUri("https://www.youtube.com/watch?v=uzMB0lLcE8g"),
                         ),
                         initialSettings: settings,
                         onWebViewCreated: (controller) {

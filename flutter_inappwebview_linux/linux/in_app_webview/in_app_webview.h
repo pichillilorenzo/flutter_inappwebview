@@ -626,7 +626,6 @@ class InAppWebView {
   static void OnCustomSchemeRequest(WebKitURISchemeRequest* request, gpointer user_data);
 
   // === Cursor detection ===
-  void injectCursorDetectionScript();
   void updateCursorFromCssStyle(const std::string& cursor_style);
 };
 

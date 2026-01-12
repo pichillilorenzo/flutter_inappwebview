@@ -30,6 +30,7 @@
 
 #include "../plugin_scripts_js/color_input_js.h"
 #include "../plugin_scripts_js/console_log_js.h"
+#include "../plugin_scripts_js/cursor_detection_js.h"
 #include "../plugin_scripts_js/intercept_ajax_request_js.h"
 #include "../plugin_scripts_js/intercept_fetch_request_js.h"
 #include "../plugin_scripts_js/javascript_bridge_js.h"
@@ -699,6 +700,13 @@ void InAppWebView::PrepareAndAddUserScripts() {
   auto colorInputScript =
       ColorInputJS::COLOR_INPUT_JS_PLUGIN_SCRIPT(pluginScriptsOriginAllowList, pluginScriptsForMainFrameOnly);
   user_content_controller_->addPluginScript(std::move(colorInputScript));
+
+  // === Add Cursor Detection Script ===
+  // WPE WebKit renders offscreen so we detect cursor style via JavaScript
+  // This script handles CSS cursor detection and intelligent "auto" cursor resolution
+  auto cursorDetectionScript =
+      CursorDetectionJS::CURSOR_DETECTION_JS_PLUGIN_SCRIPT(pluginScriptsOriginAllowList, pluginScriptsForMainFrameOnly);
+  user_content_controller_->addPluginScript(std::move(cursorDetectionScript));
 
   // === Add OnLoadResource Script ===
   // Uses PerformanceObserver API to track resource loading
@@ -2740,8 +2748,6 @@ void InAppWebView::OnLoadChanged(WebKitWebView* web_view, WebKitLoadEvent load_e
       self->channel_delegate_->onLoadStart(self->getUrl().value_or(""));
       break;
     case WEBKIT_LOAD_COMMITTED:
-      // Inject cursor detection script when page content starts loading
-      self->injectCursorDetectionScript();
       // Notify that page content is starting to be visible
       self->channel_delegate_->onPageCommitVisible(self->getUrl().value_or(""));
       break;
@@ -3388,12 +3394,12 @@ gboolean InAppWebView::OnAuthenticate(WebKitWebView* web_view, WebKitAuthenticat
                 gchar* data = nullptr;
                 gsize length = 0;
                 if (g_file_get_contents(certPath.c_str(), &data, &length, &error)) {
-                  GBytes* pkcs12Data = g_bytes_new_take(data, length);
                   cert = g_tls_certificate_new_from_pkcs12(
-                      pkcs12Data,
+                      reinterpret_cast<const guint8*>(data),
+                      length,
                       password.has_value() ? password->c_str() : nullptr,
                       &error);
-                  g_bytes_unref(pkcs12Data);
+                  g_free(data);
                 }
                 #else
                 debugLog("PKCS12 certificates require GLib 2.72+. Trying PEM fallback...");
@@ -5016,36 +5022,9 @@ void InAppWebView::OnDownloadStarted(WebKitNetworkSession* network_session,
 // NOTE: OnMotionNotify and OnNotifyFavicon have been removed because:
 // - motion-notify-event is a GTK widget signal (WPE WebView is NOT a GTK widget)
 // - notify::favicon property does not exist in WPE WebKit (GTK-only)
-// Cursor detection in WPE is handled via mouse-target-changed and JS injection.
+// Cursor detection in WPE is handled via mouse-target-changed and CursorDetectionJS plugin script.
 
 // === Cursor Detection ===
-
-void InAppWebView::injectCursorDetectionScript() {
-  // Inject a script that monitors cursor style changes via mousemove
-  // This captures CSS cursor properties that OnMouseTargetChanged doesn't detect
-  const char* script = R"JS(
-(function() {
-  if (window._flutterCursorDetectorInstalled) return;
-  window._flutterCursorDetectorInstalled = true;
-  
-  var lastCursor = '';
-  document.addEventListener('mousemove', function(e) {
-    var el = document.elementFromPoint(e.clientX, e.clientY);
-    if (el) {
-      var cursor = window.getComputedStyle(el).cursor;
-      if (cursor !== lastCursor) {
-        lastCursor = cursor;
-        // Send to native via console (picked up by user script handler)
-        if (window.flutter_inappwebview && window.flutter_inappwebview.callHandler) {
-          window.flutter_inappwebview.callHandler('_cursorChanged', cursor);
-        }
-      }
-    }
-  }, { passive: true });
-})();
-)JS";
-  evaluateJavascript(script, std::nullopt, nullptr);
-}
 
 void InAppWebView::updateCursorFromCssStyle(const std::string& cursor_style) {
   // Map CSS cursor values to Flutter cursor names
@@ -5113,12 +5092,6 @@ void InAppWebView::updateCursorFromCssStyle(const std::string& cursor_style) {
 // === JavaScript Bridge ===
 
 void InAppWebView::handleScriptMessage(const std::string& name, const std::string& body) {
-  // Handle internal cursor change messages (sent directly via messageHandlers)
-  if (name == "_cursorChanged") {
-    updateCursorFromCssStyle(body);
-    return;
-  }
-
   // === Security Check 1: javaScriptBridgeEnabled ===
   // Match iOS: guard javaScriptBridgeEnabled else { return }
   if (settings_ && !settings_->javaScriptBridgeEnabled) {
@@ -5446,6 +5419,23 @@ void InAppWebView::handleScriptMessage(const std::string& name, const std::strin
       }
     }
 
+  } else if (handlerName == "_cursorChanged") {
+    // Internal handler called via the JS bridge callHandler path.
+    // argsJsonStr is a JSON-encoded string that should decode to an array.
+    // We take the first string argument as the CSS cursor style.
+    if (!argsJsonStr.empty()) {
+      try {
+        json argsJson = json::parse(argsJsonStr);
+        if (argsJson.is_array() && !argsJson.empty() && argsJson[0].is_string()) {
+          const std::string cursorStyle = argsJson[0].get<std::string>();
+          updateCursorFromCssStyle(cursorStyle);
+        }
+      } catch (const json::parse_error&) {
+        // Be defensive: ignore but still resolve internal handler promise.
+      } catch (...) {
+        // Ignore non-JSON exceptions.
+      }
+    }
   } else if (handlerName == "_onColorInputClicked") {
     // Handle color input click - show native color picker
     // This is a WPE-specific handler since WPE doesn't have run-color-chooser signal

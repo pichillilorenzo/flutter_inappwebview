@@ -34,6 +34,7 @@
 #include "../types/navigation_action.h"
 #include "../types/permission_request.h"
 #include "../types/permission_response.h"
+#include "../types/show_file_chooser_response.h"
 #include "../types/web_resource_error.h"
 #include "../types/web_resource_request.h"
 #include "../types/web_resource_response.h"
@@ -282,7 +283,7 @@ class WebViewChannelDelegate : public ChannelDelegate {
                          bool isCaptureEnabled,
                          const std::optional<std::string>& title,
                          const std::optional<std::string>& filenameHint,
-                         std::function<void(std::optional<std::vector<std::string>>)> callback) const;
+                         std::function<void(ShowFileChooserResponse)> callback) const;
 
   // Custom scheme handler callback
   void onLoadResourceWithCustomScheme(

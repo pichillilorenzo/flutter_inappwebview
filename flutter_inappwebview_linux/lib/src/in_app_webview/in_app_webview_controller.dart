@@ -538,8 +538,8 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController
           )!;
           ShowFileChooserResponse? response = await webviewParams!
               .onShowFileChooser!(_controllerFromPlatform, request);
-          // Return file paths list or null
-          return response?.filePaths;
+          // Return full response with handledByClient and filePaths
+          return response?.toMap();
         }
         return null;
       // onFindResultReceived is now handled by FindInteractionController

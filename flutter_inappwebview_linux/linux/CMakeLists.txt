@@ -165,6 +165,7 @@ list(APPEND PLUGIN_SOURCES
   "types/plugin_script.cc"
   "types/server_trust_auth_response.cc"
   "types/server_trust_challenge.cc"
+  "types/show_file_chooser_response.cc"
   "types/ssl_certificate.cc"
   "types/url_credential.cc"
   "types/url_protection_space.cc"

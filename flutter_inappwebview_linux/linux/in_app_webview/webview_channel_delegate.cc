@@ -1749,7 +1749,7 @@ void WebViewChannelDelegate::onRenderProcessGone(bool didCrash) const {
 
 // Helper struct for onShowFileChooser callback
 struct ShowFileChooserCallbackData {
-  std::function<void(std::optional<std::vector<std::string>>)> callback;
+  std::function<void(ShowFileChooserResponse)> callback;
 };
 
 void WebViewChannelDelegate::onShowFileChooser(
@@ -1758,9 +1758,9 @@ void WebViewChannelDelegate::onShowFileChooser(
     bool isCaptureEnabled,
     const std::optional<std::string>& title,
     const std::optional<std::string>& filenameHint,
-    std::function<void(std::optional<std::vector<std::string>>)> callback) const {
+    std::function<void(ShowFileChooserResponse)> callback) const {
   if (!channel_) {
-    callback(std::nullopt);
+    callback(ShowFileChooserResponse());
     return;
   }
 
@@ -1785,7 +1785,7 @@ void WebViewChannelDelegate::onShowFileChooser(
             fl_method_channel_invoke_method_finish(ch, result, &error);
 
         if (error != nullptr || !FL_IS_METHOD_SUCCESS_RESPONSE(response)) {
-          data->callback(std::nullopt);
+          data->callback(ShowFileChooserResponse());
           delete data;
           return;
         }
@@ -1793,26 +1793,8 @@ void WebViewChannelDelegate::onShowFileChooser(
         FlValue* returnValue =
             fl_method_success_response_get_result(FL_METHOD_SUCCESS_RESPONSE(response));
 
-        if (returnValue == nullptr || fl_value_get_type(returnValue) == FL_VALUE_TYPE_NULL) {
-          data->callback(std::nullopt);
-          delete data;
-          return;
-        }
-
-        // Result should be a list of file paths
-        if (fl_value_get_type(returnValue) == FL_VALUE_TYPE_LIST) {
-          std::vector<std::string> filePaths;
-          size_t len = fl_value_get_length(returnValue);
-          for (size_t i = 0; i < len; i++) {
-            FlValue* item = fl_value_get_list_value(returnValue, i);
-            if (fl_value_get_type(item) == FL_VALUE_TYPE_STRING) {
-              filePaths.push_back(fl_value_get_string(item));
-            }
-          }
-          data->callback(filePaths);
-        } else {
-          data->callback(std::nullopt);
-        }
+        // Errors / null / unexpected types should behave as: handledByClient=false.
+        data->callback(ShowFileChooserResponse::fromFlValue(returnValue));
 
         delete data;
       },

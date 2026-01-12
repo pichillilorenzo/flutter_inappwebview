@@ -4915,17 +4915,102 @@ void InAppWebView::OnWebProcessTerminated(WebKitWebView* web_view,
   }
 }
 
+// Helper function to show native GTK file chooser dialog
+static void ShowNativeFileChooser(WebKitFileChooserRequest* request,
+                                   bool selectMultiple,
+                                   const std::vector<std::string>& mimeTypes) {
+  // Create the file chooser dialog
+  GtkWidget* dialog = gtk_file_chooser_dialog_new(
+      "Select File",
+      nullptr,  // No parent window
+      GTK_FILE_CHOOSER_ACTION_OPEN,
+      "_Cancel", GTK_RESPONSE_CANCEL,
+      "_Open", GTK_RESPONSE_ACCEPT,
+      nullptr);
+
+  GtkFileChooser* chooser = GTK_FILE_CHOOSER(dialog);
+
+  // Enable multiple selection if requested
+  gtk_file_chooser_set_select_multiple(chooser, selectMultiple ? TRUE : FALSE);
+
+  // Add file filters based on MIME types
+  if (!mimeTypes.empty()) {
+    GtkFileFilter* filter = gtk_file_filter_new();
+    gtk_file_filter_set_name(filter, "Allowed files");
+    for (const auto& mimeType : mimeTypes) {
+      gtk_file_filter_add_mime_type(filter, mimeType.c_str());
+    }
+    gtk_file_chooser_add_filter(chooser, filter);
+
+    // Also add an "All files" filter
+    GtkFileFilter* allFilter = gtk_file_filter_new();
+    gtk_file_filter_set_name(allFilter, "All files");
+    gtk_file_filter_add_pattern(allFilter, "*");
+    gtk_file_chooser_add_filter(chooser, allFilter);
+  }
+
+  // Run the dialog
+  gint result = gtk_dialog_run(GTK_DIALOG(dialog));
+
+  if (result == GTK_RESPONSE_ACCEPT) {
+    if (selectMultiple) {
+      // Get multiple files
+      GSList* files = gtk_file_chooser_get_filenames(chooser);
+      if (files != nullptr) {
+        std::vector<std::string> filePaths;
+        for (GSList* item = files; item != nullptr; item = item->next) {
+          gchar* filename = static_cast<gchar*>(item->data);
+          if (filename != nullptr) {
+            // Convert to file:// URI
+            gchar* uri = g_filename_to_uri(filename, nullptr, nullptr);
+            if (uri != nullptr) {
+              filePaths.push_back(uri);
+              g_free(uri);
+            }
+            g_free(filename);
+          }
+        }
+        g_slist_free(files);
+
+        // Convert to gchar** format for WebKit
+        std::vector<const gchar*> uris;
+        for (const auto& path : filePaths) {
+          uris.push_back(path.c_str());
+        }
+        uris.push_back(nullptr);  // NULL-terminated
+        webkit_file_chooser_request_select_files(request, uris.data());
+      } else {
+        webkit_file_chooser_request_cancel(request);
+      }
+    } else {
+      // Get single file
+      gchar* filename = gtk_file_chooser_get_filename(chooser);
+      if (filename != nullptr) {
+        gchar* uri = g_filename_to_uri(filename, nullptr, nullptr);
+        if (uri != nullptr) {
+          const gchar* uris[] = {uri, nullptr};
+          webkit_file_chooser_request_select_files(request, uris);
+          g_free(uri);
+        } else {
+          webkit_file_chooser_request_cancel(request);
+        }
+        g_free(filename);
+      } else {
+        webkit_file_chooser_request_cancel(request);
+      }
+    }
+  } else {
+    // User cancelled
+    webkit_file_chooser_request_cancel(request);
+  }
+
+  gtk_widget_destroy(dialog);
+}
+
 gboolean InAppWebView::OnRunFileChooser(WebKitWebView* web_view,
                                         WebKitFileChooserRequest* request,
                                         gpointer user_data) {
   auto* self = static_cast<InAppWebView*>(user_data);
-  
-  if (!self->channel_delegate_) {
-    return FALSE;  // Let default handler run
-  }
-
-  // Keep request alive during async callback
-  g_object_ref(request);
 
   // Get file chooser properties
   gboolean select_multiple = webkit_file_chooser_request_get_select_multiple(request);
@@ -4939,8 +5024,21 @@ gboolean InAppWebView::OnRunFileChooser(WebKitWebView* web_view,
     }
   }
 
+  // If no channel delegate, show native dialog directly
+  if (!self->channel_delegate_) {
+    ShowNativeFileChooser(request, select_multiple, acceptTypes);
+    return TRUE;
+  }
+
+  // Keep request alive during async callback
+  g_object_ref(request);
+
   // Determine mode: OPEN or OPEN_MULTIPLE (WPE doesn't have folder/save modes in this API)
   int mode = select_multiple ? 1 : 0;  // 0 = OPEN, 1 = OPEN_MULTIPLE
+
+  // Capture variables for the lambda
+  bool selectMultipleCopy = select_multiple;
+  std::vector<std::string> acceptTypesCopy = acceptTypes;
 
   self->channel_delegate_->onShowFileChooser(
       mode,
@@ -4948,18 +5046,24 @@ gboolean InAppWebView::OnRunFileChooser(WebKitWebView* web_view,
       false,  // isCaptureEnabled - not exposed by WPE API
       std::nullopt,  // title
       std::nullopt,  // filenameHint
-      [request](const std::optional<std::vector<std::string>>& filePaths) {
-        if (filePaths.has_value() && !filePaths->empty()) {
-          // Convert to gchar** format
-          std::vector<const gchar*> files;
-          for (const auto& path : *filePaths) {
-            files.push_back(path.c_str());
+      [request, selectMultipleCopy, acceptTypesCopy](ShowFileChooserResponse response) {
+        if (response.handledByClient) {
+          // Client handled it - use the file paths from Dart
+          if (response.filePaths.has_value() && !response.filePaths->empty()) {
+            // Convert to gchar** format
+            std::vector<const gchar*> files;
+            for (const auto& path : *response.filePaths) {
+              files.push_back(path.c_str());
+            }
+            files.push_back(nullptr);  // NULL-terminated
+            webkit_file_chooser_request_select_files(request, files.data());
+          } else {
+            // Client handled but no files selected (cancelled)
+            webkit_file_chooser_request_cancel(request);
           }
-          files.push_back(nullptr);  // NULL-terminated
-          webkit_file_chooser_request_select_files(request, files.data());
         } else {
-          // User cancelled or no files selected
-          webkit_file_chooser_request_cancel(request);
+          // Client didn't handle it - show native GTK file chooser
+          ShowNativeFileChooser(request, selectMultipleCopy, acceptTypesCopy);
         }
         g_object_unref(request);
       });

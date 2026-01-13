@@ -50,6 +50,7 @@
 #include "../types/web_view_transport.h"
 #include "../credential_database.h"
 #include "../flutter_inappwebview_linux_plugin_private.h"
+#include "../plugin_instance.h"
 #include "../utils/flutter.h"
 #include "../utils/log.h"
 #include "../utils/uri.h"
@@ -191,7 +192,7 @@ bool InAppWebView::IsWpeWebKitAvailable() {
 
 InAppWebView::InAppWebView(FlPluginRegistrar* registrar, FlBinaryMessenger* messenger, int64_t id,
                            const InAppWebViewCreationParams& params)
-    : registrar_(registrar), messenger_(messenger), gtk_window_(params.gtkWindow), fl_view_(params.flView), manager_(params.manager), id_(id), settings_(params.initialSettings),
+    : plugin_(params.plugin), registrar_(registrar), messenger_(messenger), gtk_window_(params.gtkWindow), fl_view_(params.flView), manager_(params.manager), id_(id), settings_(params.initialSettings),
       initial_user_scripts_(params.initialUserScripts) {
   js_bridge_secret_ = GenerateRandomSecret();
   
@@ -3554,8 +3555,9 @@ gboolean InAppWebView::OnAuthenticate(WebKitWebView* web_view, WebKitAuthenticat
   auto* pendingRequests = &self->pending_auth_requests_;
   int64_t capturedId = requestId;
   ProtectionSpace capturedPs = credProtectionSpace;
+  PluginInstance* capturedPlugin = self->plugin_;
 
-  callback->nonNullSuccess = [pendingRequests, capturedId, capturedPs](HttpAuthResponse response) {
+  callback->nonNullSuccess = [pendingRequests, capturedId, capturedPs, capturedPlugin](HttpAuthResponse response) {
     auto it = pendingRequests->find(capturedId);
     if (it != pendingRequests->end()) {
       switch (response.action) {
@@ -3569,7 +3571,7 @@ gboolean InAppWebView::OnAuthenticate(WebKitWebView* web_view, WebKitAuthenticat
             
             // Save credential to libsecret if permanent persistence requested
             if (response.permanentPersistence) {
-              auto* credDb = CredentialDatabase::instance();
+              auto* credDb = capturedPlugin ? capturedPlugin->credentialDatabase : nullptr;
               if (credDb != nullptr) {
                 Credential cred(response.username.value(), response.password.value());
                 credDb->setHttpAuthCredential(capturedPs, cred);
@@ -3584,7 +3586,7 @@ gboolean InAppWebView::OnAuthenticate(WebKitWebView* web_view, WebKitAuthenticat
 
         case HttpAuthResponseAction::USE_SAVED_CREDENTIAL: {
           // Look up credential from our secure storage
-          auto* credDb = CredentialDatabase::instance();
+          auto* credDb = capturedPlugin ? capturedPlugin->credentialDatabase : nullptr;
           std::optional<Credential> savedCred = std::nullopt;
           
           if (credDb != nullptr) {
@@ -4038,7 +4040,8 @@ void InAppWebView::ShowNativeContextMenu() {
         });
 
     context_menu_popup_->SetDismissedCallback([this]() {
-      if (channel_delegate_) {
+      // Only notify if the popup was actually visible (prevents duplicate notifications)
+      if (context_menu_popup_ && context_menu_popup_->IsVisible() && channel_delegate_) {
         channel_delegate_->onHideContextMenu();
       }
     });
@@ -4171,6 +4174,9 @@ void InAppWebView::ShowNativeContextMenu() {
 }
 
 void InAppWebView::HideContextMenu() {
+  // Check if context menu is actually visible before proceeding
+  bool wasVisible = context_menu_popup_ && context_menu_popup_->IsVisible();
+
   // Hide the context menu popup
   if (context_menu_popup_) {
     context_menu_popup_->Hide();
@@ -4187,8 +4193,8 @@ void InAppWebView::HideContextMenu() {
     pending_hit_test_result_ = nullptr;
   }
 
-  // Notify Dart side
-  if (channel_delegate_) {
+  // Notify Dart side only if context menu was actually visible
+  if (wasVisible && channel_delegate_) {
     channel_delegate_->onHideContextMenu();
   }
 }
@@ -6098,7 +6104,12 @@ bool InAppWebView::handleScriptMessageWithReply(const std::string& body, WebKitS
   // === Build Source Origin ===
   std::string sourceOrigin = "";
   std::string requestUrl = "";
-  bool isMainFrame = true;
+  bool isMainFrame = true;  // Default to true
+
+  // Parse isMainFrame from the JSON body (sent from JavaScript bridge)
+  if (bodyJson.contains("_isMainFrame") && bodyJson["_isMainFrame"].is_boolean()) {
+    isMainFrame = bodyJson["_isMainFrame"].get<bool>();
+  }
 
   const gchar* uri = webkit_web_view_get_uri(webview_);
   if (uri != nullptr) {

@@ -12,14 +12,13 @@
 #include <gio/gio.h>
 #include <nlohmann/json.hpp>
 
+#include "plugin_instance.h"
 #include "utils/flutter.h"
 #include "utils/log.h"
 
 namespace flutter_inappwebview_plugin {
 
 using json = nlohmann::json;
-
-CredentialDatabase* CredentialDatabase::instance_ = nullptr;
 
 namespace {
 bool string_equals(const gchar* a, const char* b) {
@@ -318,9 +317,9 @@ void CredentialDatabase::saveIndex() {
   }
 }
 
-CredentialDatabase::CredentialDatabase(FlPluginRegistrar* registrar)
-    : ChannelDelegate(fl_plugin_registrar_get_messenger(registrar), METHOD_CHANNEL_NAME) {
-  instance_ = this;
+CredentialDatabase::CredentialDatabase(PluginInstance* plugin)
+    : ChannelDelegate(plugin->messenger(), METHOD_CHANNEL_NAME),
+      plugin_(plugin) {
   app_id_ = resolve_application_id_sanitized();
   index_path_ = getIndexPath(app_id_);
   loadIndex();
@@ -328,13 +327,7 @@ CredentialDatabase::CredentialDatabase(FlPluginRegistrar* registrar)
 
 CredentialDatabase::~CredentialDatabase() {
   debugLog("dealloc CredentialDatabase");
-  if (instance_ == this) {
-    instance_ = nullptr;
-  }
-}
-
-CredentialDatabase* CredentialDatabase::instance() {
-  return instance_;
+  plugin_ = nullptr;
 }
 
 void CredentialDatabase::HandleMethodCall(FlMethodCall* method_call) {

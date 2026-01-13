@@ -15,6 +15,8 @@
 
 namespace flutter_inappwebview_plugin {
 
+class PluginInstance;
+
 /**
  * Represents a URL protection space for HTTP authentication.
  */
@@ -61,8 +63,11 @@ class CredentialDatabase : public ChannelDelegate {
   static constexpr const char* METHOD_CHANNEL_NAME =
       "com.pichillilorenzo/flutter_inappwebview_credential_database";
 
-  explicit CredentialDatabase(FlPluginRegistrar* registrar);
+  explicit CredentialDatabase(PluginInstance* plugin);
   ~CredentialDatabase() override;
+
+  /// Get the plugin instance
+  PluginInstance* plugin() const { return plugin_; }
 
   void HandleMethodCall(FlMethodCall* method_call) override;
 
@@ -93,12 +98,8 @@ class CredentialDatabase : public ChannelDelegate {
 
   void clearAllAuthCredentials();
 
-  // Get the singleton instance
-  static CredentialDatabase* instance();
-
  private:
-  // Static instance for global access
-  static CredentialDatabase* instance_;
+  PluginInstance* plugin_ = nullptr;
 
   // The libsecret schema for HTTP auth credentials
   static const SecretSchema* getSchema();

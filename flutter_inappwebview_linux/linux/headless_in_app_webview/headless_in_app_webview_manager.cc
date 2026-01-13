@@ -3,6 +3,7 @@
 #include <cstring>
 
 #include "../flutter_inappwebview_linux_plugin_private.h"
+#include "../plugin_instance.h"
 #include "../in_app_webview/in_app_webview_settings.h"
 #include "../types/url_request.h"
 #include "../utils/flutter.h"
@@ -11,19 +12,23 @@
 
 namespace flutter_inappwebview_plugin {
 
-HeadlessInAppWebViewManager::HeadlessInAppWebViewManager(FlPluginRegistrar* registrar)
-    : registrar_(registrar) {
-  messenger_ = fl_plugin_registrar_get_messenger(registrar);
+HeadlessInAppWebViewManager::HeadlessInAppWebViewManager(PluginInstance* plugin)
+    : plugin_(plugin), registrar_(plugin->registrar()) {
+  messenger_ = plugin->messenger();
   
-  // Cache the GTK window now while the registrar is still fully valid
+  // Cache the GTK window from the plugin instance
   // This may return nullptr for headless scenarios, which is fine
-  gtk_window_ = flutter_inappwebview_linux_plugin_get_window(registrar);
+  gtk_window_ = plugin->gtkWindow();
 
   // Create the method channel
   g_autoptr(FlStandardMethodCodec) codec = fl_standard_method_codec_new();
   method_channel_ = fl_method_channel_new(messenger_, METHOD_CHANNEL_NAME, FL_METHOD_CODEC(codec));
 
   fl_method_channel_set_method_call_handler(method_channel_, HandleMethodCall, this, nullptr);
+}
+
+FlPluginRegistrar* HeadlessInAppWebViewManager::registrar() const {
+  return registrar_;
 }
 
 HeadlessInAppWebViewManager::~HeadlessInAppWebViewManager() {
@@ -117,6 +122,7 @@ void HeadlessInAppWebViewManager::Run(FlMethodCall* method_call) {
   // Create InAppWebView params
   InAppWebViewCreationParams webviewParams;
   webviewParams.id = 0;  // Not used for headless
+  webviewParams.plugin = plugin_;  // Pass plugin instance for accessing managers
   webviewParams.gtkWindow = gtk_window_;  // Use cached GTK window (may be nullptr for headless)
   webviewParams.manager = nullptr;  // Not needed for headless
 
@@ -153,7 +159,11 @@ void HeadlessInAppWebViewManager::Run(FlMethodCall* method_call) {
   // Parse webViewEnvironmentId and look up the custom WebKitWebContext
   auto webViewEnvironmentIdOpt = get_optional_fl_map_value<std::string>(params, "webViewEnvironmentId");
   if (webViewEnvironmentIdOpt.has_value() && !webViewEnvironmentIdOpt->empty()) {
-    WebKitWebContext* webContext = WebViewEnvironment::getWebContext(webViewEnvironmentIdOpt.value());
+    WebViewEnvironment* webViewEnv = plugin_ ? plugin_->webViewEnvironment : nullptr;
+    WebKitWebContext* webContext = nullptr;
+    if (webViewEnv != nullptr) {
+      webContext = webViewEnv->getWebContext(webViewEnvironmentIdOpt.value());
+    }
     if (webContext != nullptr) {
       webviewParams.webContext = webContext;
       debugLog("HeadlessInAppWebViewManager: Using custom WebKitWebContext from WebViewEnvironment id=" + webViewEnvironmentIdOpt.value());

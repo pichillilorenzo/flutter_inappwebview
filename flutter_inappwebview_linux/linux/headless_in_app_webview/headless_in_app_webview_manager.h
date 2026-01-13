@@ -11,15 +11,18 @@
 
 namespace flutter_inappwebview_plugin {
 
+class PluginInstance;
+
 class HeadlessInAppWebViewManager {
  public:
   static constexpr const char* METHOD_CHANNEL_NAME =
       "com.pichillilorenzo/flutter_headless_inappwebview";
 
-  HeadlessInAppWebViewManager(FlPluginRegistrar* registrar);
+  HeadlessInAppWebViewManager(PluginInstance* plugin);
   ~HeadlessInAppWebViewManager();
 
-  FlPluginRegistrar* registrar() const { return registrar_; }
+  PluginInstance* plugin() const { return plugin_; }
+  FlPluginRegistrar* registrar() const;
   FlBinaryMessenger* messenger() const { return messenger_; }
 
   // Get a headless webview by ID
@@ -29,6 +32,7 @@ class HeadlessInAppWebViewManager {
   void RemoveHeadlessWebView(const std::string& id);
 
  private:
+  PluginInstance* plugin_ = nullptr;
   FlPluginRegistrar* registrar_ = nullptr;
   FlBinaryMessenger* messenger_ = nullptr;
   FlMethodChannel* method_channel_ = nullptr;

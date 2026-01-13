@@ -193,84 +193,124 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController
     switch (call.method) {
       case "onLoadStart":
         _injectedScriptsFromURL.clear();
-        if (webviewParams != null && webviewParams!.onLoadStart != null) {
+        if ((webviewParams != null && webviewParams!.onLoadStart != null) ||
+            _inAppBrowserEventHandler != null) {
           String? url = call.arguments["url"];
           WebUri? uri = url != null ? WebUri(url) : null;
-          webviewParams!.onLoadStart!(_controllerFromPlatform, uri);
+          if (webviewParams != null && webviewParams!.onLoadStart != null)
+            webviewParams!.onLoadStart!(_controllerFromPlatform, uri);
+          else
+            _inAppBrowserEventHandler!.onLoadStart(uri);
         }
         break;
       case "onLoadStop":
-        if (webviewParams != null && webviewParams!.onLoadStop != null) {
+        if ((webviewParams != null && webviewParams!.onLoadStop != null) ||
+            _inAppBrowserEventHandler != null) {
           String? url = call.arguments["url"];
           WebUri? uri = url != null ? WebUri(url) : null;
-          webviewParams!.onLoadStop!(_controllerFromPlatform, uri);
+          if (webviewParams != null && webviewParams!.onLoadStop != null)
+            webviewParams!.onLoadStop!(_controllerFromPlatform, uri);
+          else
+            _inAppBrowserEventHandler!.onLoadStop(uri);
         }
         break;
       case "shouldOverrideUrlLoading":
-        if (webviewParams != null &&
-            webviewParams!.shouldOverrideUrlLoading != null) {
+        if ((webviewParams != null &&
+                webviewParams!.shouldOverrideUrlLoading != null) ||
+            _inAppBrowserEventHandler != null) {
           Map<String, dynamic> arguments = call.arguments
               .cast<String, dynamic>();
           NavigationAction navigationAction = NavigationAction.fromMap(
             arguments,
           )!;
 
-          NavigationActionPolicy? result =
-              await webviewParams!.shouldOverrideUrlLoading!(
-                _controllerFromPlatform,
-                navigationAction,
-              );
-
-          // Return the decision directly to native (supports invokeMethodWithResult pattern)
-          return result?.toNativeValue();
+          if (webviewParams != null &&
+              webviewParams!.shouldOverrideUrlLoading != null)
+            return (await webviewParams!.shouldOverrideUrlLoading!(
+              _controllerFromPlatform,
+              navigationAction,
+            ))?.toNativeValue();
+          return (await _inAppBrowserEventHandler!.shouldOverrideUrlLoading(
+            navigationAction,
+          ))?.toNativeValue();
         }
         break;
       case "onProgressChanged":
-        if (webviewParams != null && webviewParams!.onProgressChanged != null) {
+        if ((webviewParams != null &&
+                webviewParams!.onProgressChanged != null) ||
+            _inAppBrowserEventHandler != null) {
           int progress = call.arguments["progress"];
-          webviewParams!.onProgressChanged!(_controllerFromPlatform, progress);
+          if (webviewParams != null && webviewParams!.onProgressChanged != null)
+            webviewParams!.onProgressChanged!(
+              _controllerFromPlatform,
+              progress,
+            );
+          else
+            _inAppBrowserEventHandler!.onProgressChanged(progress);
         }
         break;
       case "onConsoleMessage":
-        if (webviewParams != null && webviewParams!.onConsoleMessage != null) {
+        if ((webviewParams != null &&
+                webviewParams!.onConsoleMessage != null) ||
+            _inAppBrowserEventHandler != null) {
           Map<String, dynamic> arguments = call.arguments
               .cast<String, dynamic>();
           ConsoleMessage consoleMessage = ConsoleMessage.fromMap(arguments)!;
-          webviewParams!.onConsoleMessage!(
-            _controllerFromPlatform,
-            consoleMessage,
-          );
+          if (webviewParams != null && webviewParams!.onConsoleMessage != null)
+            webviewParams!.onConsoleMessage!(
+              _controllerFromPlatform,
+              consoleMessage,
+            );
+          else
+            _inAppBrowserEventHandler!.onConsoleMessage(consoleMessage);
         }
         break;
       case "onLoadResource":
-        if (webviewParams != null && webviewParams!.onLoadResource != null) {
+        if ((webviewParams != null && webviewParams!.onLoadResource != null) ||
+            _inAppBrowserEventHandler != null) {
           Map<String, dynamic> arguments = call.arguments
               .cast<String, dynamic>();
           LoadedResource resource = LoadedResource.fromMap(arguments)!;
-          webviewParams!.onLoadResource!(_controllerFromPlatform, resource);
+          if (webviewParams != null && webviewParams!.onLoadResource != null)
+            webviewParams!.onLoadResource!(_controllerFromPlatform, resource);
+          else
+            _inAppBrowserEventHandler!.onLoadResource(resource);
         }
         break;
       case "onTitleChanged":
-        if (webviewParams != null && webviewParams!.onTitleChanged != null) {
+        if ((webviewParams != null && webviewParams!.onTitleChanged != null) ||
+            _inAppBrowserEventHandler != null) {
           String? title = call.arguments["title"];
-          webviewParams!.onTitleChanged!(_controllerFromPlatform, title);
+          if (webviewParams != null && webviewParams!.onTitleChanged != null)
+            webviewParams!.onTitleChanged!(_controllerFromPlatform, title);
+          else
+            _inAppBrowserEventHandler!.onTitleChanged(title);
         }
         break;
       case "onUpdateVisitedHistory":
-        if (webviewParams != null &&
-            webviewParams!.onUpdateVisitedHistory != null) {
+        if ((webviewParams != null &&
+                webviewParams!.onUpdateVisitedHistory != null) ||
+            _inAppBrowserEventHandler != null) {
           String? url = call.arguments["url"];
           WebUri? uri = url != null ? WebUri(url) : null;
           bool? isReload = call.arguments["isReload"];
-          webviewParams!.onUpdateVisitedHistory!(
-            _controllerFromPlatform,
-            uri,
-            isReload,
-          );
+          if (webviewParams != null &&
+              webviewParams!.onUpdateVisitedHistory != null)
+            webviewParams!.onUpdateVisitedHistory!(
+              _controllerFromPlatform,
+              uri,
+              isReload,
+            );
+          else
+            _inAppBrowserEventHandler!.onUpdateVisitedHistory(uri, isReload);
         }
         break;
       case "onReceivedError":
-        if (webviewParams != null && webviewParams!.onReceivedError != null) {
+        if ((webviewParams != null &&
+                (webviewParams!.onReceivedError != null ||
+                    // ignore: deprecated_member_use_from_same_package
+                    webviewParams!.onLoadError != null)) ||
+            _inAppBrowserEventHandler != null) {
           Map<String, dynamic> arguments = call.arguments
               .cast<String, dynamic>();
           WebResourceRequest request = WebResourceRequest.fromMap(
@@ -279,16 +319,42 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController
           WebResourceError error = WebResourceError.fromMap(
             arguments["error"]?.cast<String, dynamic>(),
           )!;
-          webviewParams!.onReceivedError!(
-            _controllerFromPlatform,
-            request,
-            error,
-          );
+          var isForMainFrame = request.isForMainFrame ?? false;
+
+          if (webviewParams != null) {
+            if (webviewParams!.onReceivedError != null)
+              webviewParams!.onReceivedError!(
+                _controllerFromPlatform,
+                request,
+                error,
+              );
+            else if (isForMainFrame) {
+              // ignore: deprecated_member_use_from_same_package
+              webviewParams!.onLoadError!(
+                _controllerFromPlatform,
+                request.url,
+                error.type.toNativeValue() ?? -1,
+                error.description,
+              );
+            }
+          } else {
+            if (isForMainFrame) {
+              _inAppBrowserEventHandler!.onLoadError(
+                request.url,
+                error.type.toNativeValue() ?? -1,
+                error.description,
+              );
+            }
+            _inAppBrowserEventHandler!.onReceivedError(request, error);
+          }
         }
         break;
       case "onReceivedHttpError":
-        if (webviewParams != null &&
-            webviewParams!.onReceivedHttpError != null) {
+        if ((webviewParams != null &&
+                (webviewParams!.onReceivedHttpError != null ||
+                    // ignore: deprecated_member_use_from_same_package
+                    webviewParams!.onLoadHttpError != null)) ||
+            _inAppBrowserEventHandler != null) {
           Map<String, dynamic> arguments = call.arguments
               .cast<String, dynamic>();
           WebResourceRequest request = WebResourceRequest.fromMap(
@@ -297,222 +363,349 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController
           WebResourceResponse errorResponse = WebResourceResponse.fromMap(
             arguments["errorResponse"]?.cast<String, dynamic>(),
           )!;
-          webviewParams!.onReceivedHttpError!(
-            _controllerFromPlatform,
-            request,
-            errorResponse,
-          );
+          var isForMainFrame = request.isForMainFrame ?? false;
+
+          if (webviewParams != null) {
+            if (webviewParams!.onReceivedHttpError != null)
+              webviewParams!.onReceivedHttpError!(
+                _controllerFromPlatform,
+                request,
+                errorResponse,
+              );
+            else if (isForMainFrame) {
+              // ignore: deprecated_member_use_from_same_package
+              webviewParams!.onLoadHttpError!(
+                _controllerFromPlatform,
+                request.url,
+                errorResponse.statusCode ?? -1,
+                errorResponse.reasonPhrase ?? '',
+              );
+            }
+          } else {
+            if (isForMainFrame) {
+              _inAppBrowserEventHandler!.onLoadHttpError(
+                request.url,
+                errorResponse.statusCode ?? -1,
+                errorResponse.reasonPhrase ?? '',
+              );
+            }
+            _inAppBrowserEventHandler!.onReceivedHttpError(
+              request,
+              errorResponse,
+            );
+          }
         }
         break;
       case "onPageCommitVisible":
-        if (webviewParams != null &&
-            webviewParams!.onPageCommitVisible != null) {
+        if ((webviewParams != null &&
+                webviewParams!.onPageCommitVisible != null) ||
+            _inAppBrowserEventHandler != null) {
           String? url = call.arguments["url"];
           WebUri? uri = url != null ? WebUri(url) : null;
-          webviewParams!.onPageCommitVisible!(_controllerFromPlatform, uri);
+          if (webviewParams != null &&
+              webviewParams!.onPageCommitVisible != null)
+            webviewParams!.onPageCommitVisible!(_controllerFromPlatform, uri);
+          else
+            _inAppBrowserEventHandler!.onPageCommitVisible(uri);
         }
         break;
       case "onZoomScaleChanged":
-        if (webviewParams != null &&
-            webviewParams!.onZoomScaleChanged != null) {
+        if ((webviewParams != null &&
+                webviewParams!.onZoomScaleChanged != null) ||
+            _inAppBrowserEventHandler != null) {
           double oldScale = call.arguments["oldScale"];
           double newScale = call.arguments["newScale"];
-          webviewParams!.onZoomScaleChanged!(
-            _controllerFromPlatform,
-            oldScale,
-            newScale,
-          );
+          if (webviewParams != null &&
+              webviewParams!.onZoomScaleChanged != null)
+            webviewParams!.onZoomScaleChanged!(
+              _controllerFromPlatform,
+              oldScale,
+              newScale,
+            );
+          else
+            _inAppBrowserEventHandler!.onZoomScaleChanged(oldScale, newScale);
         }
         break;
       case "onScrollChanged":
-        if (webviewParams != null && webviewParams!.onScrollChanged != null) {
+        if ((webviewParams != null && webviewParams!.onScrollChanged != null) ||
+            _inAppBrowserEventHandler != null) {
           int x = call.arguments["x"];
           int y = call.arguments["y"];
-          webviewParams!.onScrollChanged!(_controllerFromPlatform, x, y);
+          if (webviewParams != null && webviewParams!.onScrollChanged != null)
+            webviewParams!.onScrollChanged!(_controllerFromPlatform, x, y);
+          else
+            _inAppBrowserEventHandler!.onScrollChanged(x, y);
         }
         break;
       case "onCloseWindow":
-        if (webviewParams != null && webviewParams!.onCloseWindow != null) {
+        if (webviewParams != null && webviewParams!.onCloseWindow != null)
           webviewParams!.onCloseWindow!(_controllerFromPlatform);
-        }
+        else if (_inAppBrowserEventHandler != null)
+          _inAppBrowserEventHandler!.onCloseWindow();
         break;
       case "onCreateWindow":
-        if (webviewParams != null && webviewParams!.onCreateWindow != null) {
+        if ((webviewParams != null && webviewParams!.onCreateWindow != null) ||
+            _inAppBrowserEventHandler != null) {
           Map<String, dynamic> arguments = call.arguments
               .cast<String, dynamic>();
           CreateWindowAction createWindowAction = CreateWindowAction.fromMap(
             arguments,
           )!;
-          return await webviewParams!.onCreateWindow!(
-            _controllerFromPlatform,
-            createWindowAction,
-          );
+
+          if (webviewParams != null && webviewParams!.onCreateWindow != null)
+            return await webviewParams!.onCreateWindow!(
+              _controllerFromPlatform,
+              createWindowAction,
+            );
+          else
+            return await _inAppBrowserEventHandler!.onCreateWindow(
+              createWindowAction,
+            );
         }
         return false;
       case "onJsAlert":
-        if (webviewParams != null && webviewParams!.onJsAlert != null) {
+        if ((webviewParams != null && webviewParams!.onJsAlert != null) ||
+            _inAppBrowserEventHandler != null) {
           Map<String, dynamic> arguments = call.arguments
               .cast<String, dynamic>();
           JsAlertRequest jsAlertRequest = JsAlertRequest.fromMap(arguments)!;
-          JsAlertResponse? response = await webviewParams!.onJsAlert!(
-            _controllerFromPlatform,
-            jsAlertRequest,
-          );
-          return response?.toMap();
+
+          if (webviewParams != null && webviewParams!.onJsAlert != null)
+            return (await webviewParams!.onJsAlert!(
+              _controllerFromPlatform,
+              jsAlertRequest,
+            ))?.toMap();
+          else
+            return (await _inAppBrowserEventHandler!.onJsAlert(
+              jsAlertRequest,
+            ))?.toMap();
         }
         return null;
       case "onJsConfirm":
-        if (webviewParams != null && webviewParams!.onJsConfirm != null) {
+        if ((webviewParams != null && webviewParams!.onJsConfirm != null) ||
+            _inAppBrowserEventHandler != null) {
           Map<String, dynamic> arguments = call.arguments
               .cast<String, dynamic>();
           JsConfirmRequest jsConfirmRequest = JsConfirmRequest.fromMap(
             arguments,
           )!;
-          JsConfirmResponse? response = await webviewParams!.onJsConfirm!(
-            _controllerFromPlatform,
-            jsConfirmRequest,
-          );
-          return response?.toMap();
+
+          if (webviewParams != null && webviewParams!.onJsConfirm != null)
+            return (await webviewParams!.onJsConfirm!(
+              _controllerFromPlatform,
+              jsConfirmRequest,
+            ))?.toMap();
+          else
+            return (await _inAppBrowserEventHandler!.onJsConfirm(
+              jsConfirmRequest,
+            ))?.toMap();
         }
         return null;
       case "onJsPrompt":
-        if (webviewParams != null && webviewParams!.onJsPrompt != null) {
+        if ((webviewParams != null && webviewParams!.onJsPrompt != null) ||
+            _inAppBrowserEventHandler != null) {
           Map<String, dynamic> arguments = call.arguments
               .cast<String, dynamic>();
           JsPromptRequest jsPromptRequest = JsPromptRequest.fromMap(arguments)!;
-          JsPromptResponse? response = await webviewParams!.onJsPrompt!(
-            _controllerFromPlatform,
-            jsPromptRequest,
-          );
-          return response?.toMap();
+
+          if (webviewParams != null && webviewParams!.onJsPrompt != null)
+            return (await webviewParams!.onJsPrompt!(
+              _controllerFromPlatform,
+              jsPromptRequest,
+            ))?.toMap();
+          else
+            return (await _inAppBrowserEventHandler!.onJsPrompt(
+              jsPromptRequest,
+            ))?.toMap();
         }
         return null;
       case "onJsBeforeUnload":
-        if (webviewParams != null && webviewParams!.onJsBeforeUnload != null) {
+        if ((webviewParams != null && webviewParams!.onJsBeforeUnload != null) ||
+            _inAppBrowserEventHandler != null) {
           Map<String, dynamic> arguments = call.arguments
               .cast<String, dynamic>();
           JsBeforeUnloadRequest jsBeforeUnloadRequest =
               JsBeforeUnloadRequest.fromMap(arguments)!;
-          JsBeforeUnloadResponse? response =
-              await webviewParams!.onJsBeforeUnload!(
-                _controllerFromPlatform,
-                jsBeforeUnloadRequest,
-              );
-          return response?.toMap();
+
+          if (webviewParams != null && webviewParams!.onJsBeforeUnload != null)
+            return (await webviewParams!.onJsBeforeUnload!(
+              _controllerFromPlatform,
+              jsBeforeUnloadRequest,
+            ))?.toMap();
+          else
+            return (await _inAppBrowserEventHandler!.onJsBeforeUnload(
+              jsBeforeUnloadRequest,
+            ))?.toMap();
         }
         return null;
       case "onPermissionRequest":
-        if (webviewParams != null &&
-            webviewParams!.onPermissionRequest != null) {
+        if ((webviewParams != null &&
+                webviewParams!.onPermissionRequest != null) ||
+            _inAppBrowserEventHandler != null) {
           Map<String, dynamic> arguments = call.arguments
               .cast<String, dynamic>();
           PermissionRequest permissionRequest = PermissionRequest.fromMap(
             arguments,
           )!;
-          PermissionResponse? response = await webviewParams!
-              .onPermissionRequest!(_controllerFromPlatform, permissionRequest);
-          return response?.toMap();
+
+          if (webviewParams != null &&
+              webviewParams!.onPermissionRequest != null)
+            return (await webviewParams!.onPermissionRequest!(
+              _controllerFromPlatform,
+              permissionRequest,
+            ))?.toMap();
+          else
+            return (await _inAppBrowserEventHandler!.onPermissionRequest(
+              permissionRequest,
+            ))?.toMap();
         }
         return null;
       case "onReceivedHttpAuthRequest":
-        if (webviewParams != null &&
-            webviewParams!.onReceivedHttpAuthRequest != null) {
+        if ((webviewParams != null &&
+                webviewParams!.onReceivedHttpAuthRequest != null) ||
+            _inAppBrowserEventHandler != null) {
           Map<String, dynamic> arguments = call.arguments
               .cast<String, dynamic>();
           HttpAuthenticationChallenge challenge =
               HttpAuthenticationChallenge.fromMap(arguments)!;
-          HttpAuthResponse? response = await webviewParams!
-              .onReceivedHttpAuthRequest!(_controllerFromPlatform, challenge);
-          return response?.toMap();
+
+          if (webviewParams != null &&
+              webviewParams!.onReceivedHttpAuthRequest != null)
+            return (await webviewParams!.onReceivedHttpAuthRequest!(
+              _controllerFromPlatform,
+              challenge,
+            ))?.toMap();
+          else
+            return (await _inAppBrowserEventHandler!.onReceivedHttpAuthRequest(
+              challenge,
+            ))?.toMap();
         }
         return null;
       case "onReceivedServerTrustAuthRequest":
-        if (webviewParams != null &&
-            webviewParams!.onReceivedServerTrustAuthRequest != null) {
+        if ((webviewParams != null &&
+                webviewParams!.onReceivedServerTrustAuthRequest != null) ||
+            _inAppBrowserEventHandler != null) {
           Map<String, dynamic> arguments = call.arguments
               .cast<String, dynamic>();
           ServerTrustChallenge challenge = ServerTrustChallenge.fromMap(
             arguments,
           )!;
-          ServerTrustAuthResponse? response =
-              await webviewParams!.onReceivedServerTrustAuthRequest!(
-                _controllerFromPlatform,
-                challenge,
-              );
-          return response?.toMap();
+
+          if (webviewParams != null &&
+              webviewParams!.onReceivedServerTrustAuthRequest != null)
+            return (await webviewParams!.onReceivedServerTrustAuthRequest!(
+              _controllerFromPlatform,
+              challenge,
+            ))?.toMap();
+          else
+            return (await _inAppBrowserEventHandler!
+                    .onReceivedServerTrustAuthRequest(challenge))
+                ?.toMap();
         }
         return null;
       case "onReceivedClientCertRequest":
-        if (webviewParams != null &&
-            webviewParams!.onReceivedClientCertRequest != null) {
+        if ((webviewParams != null &&
+                webviewParams!.onReceivedClientCertRequest != null) ||
+            _inAppBrowserEventHandler != null) {
           Map<String, dynamic> arguments = call.arguments
               .cast<String, dynamic>();
           ClientCertChallenge challenge = ClientCertChallenge.fromMap(
             arguments,
           )!;
-          ClientCertResponse? response =
-              await webviewParams!.onReceivedClientCertRequest!(
-                _controllerFromPlatform,
-                challenge,
-              );
-          return response?.toMap();
+
+          if (webviewParams != null &&
+              webviewParams!.onReceivedClientCertRequest != null)
+            return (await webviewParams!.onReceivedClientCertRequest!(
+              _controllerFromPlatform,
+              challenge,
+            ))?.toMap();
+          else
+            return (await _inAppBrowserEventHandler!
+                    .onReceivedClientCertRequest(challenge))
+                ?.toMap();
         }
         return null;
       case "onDownloadStarting":
-        if (webviewParams != null &&
-            (webviewParams!.onDownloadStart != null ||
-                webviewParams!.onDownloadStartRequest != null ||
-                webviewParams!.onDownloadStarting != null)) {
+        if ((webviewParams != null &&
+                (webviewParams!.onDownloadStart != null ||
+                    webviewParams!.onDownloadStartRequest != null ||
+                    webviewParams!.onDownloadStarting != null)) ||
+            _inAppBrowserEventHandler != null) {
           Map<String, dynamic> arguments = call.arguments
               .cast<String, dynamic>();
           DownloadStartRequest downloadStartRequest =
               DownloadStartRequest.fromMap(arguments)!;
 
-          if (webviewParams!.onDownloadStarting != null) {
-            return (await webviewParams!.onDownloadStarting!(
-              _controllerFromPlatform,
-              downloadStartRequest,
-            ))?.toMap();
-          } else if (webviewParams!.onDownloadStartRequest != null) {
-            webviewParams!.onDownloadStartRequest!(
-              _controllerFromPlatform,
-              downloadStartRequest,
-            );
+          if (webviewParams != null) {
+            if (webviewParams!.onDownloadStarting != null)
+              return (await webviewParams!.onDownloadStarting!(
+                _controllerFromPlatform,
+                downloadStartRequest,
+              ))?.toMap();
+            else if (webviewParams!.onDownloadStartRequest != null)
+              webviewParams!.onDownloadStartRequest!(
+                _controllerFromPlatform,
+                downloadStartRequest,
+              );
+            else {
+              webviewParams!.onDownloadStart!(
+                _controllerFromPlatform,
+                downloadStartRequest.url,
+              );
+            }
           } else {
-            webviewParams!.onDownloadStart!(
-              _controllerFromPlatform,
+            _inAppBrowserEventHandler!.onDownloadStart(
               downloadStartRequest.url,
             );
+            _inAppBrowserEventHandler!.onDownloadStartRequest(
+              downloadStartRequest,
+            );
+            return (await _inAppBrowserEventHandler!.onDownloadStarting(
+              downloadStartRequest,
+            ))?.toMap();
           }
         }
         return null;
       case "onEnterFullscreen":
-        if (webviewParams != null && webviewParams!.onEnterFullscreen != null) {
+        if (webviewParams != null && webviewParams!.onEnterFullscreen != null)
           webviewParams!.onEnterFullscreen!(_controllerFromPlatform);
-        }
+        else if (_inAppBrowserEventHandler != null)
+          _inAppBrowserEventHandler!.onEnterFullscreen();
         break;
       case "onExitFullscreen":
-        if (webviewParams != null && webviewParams!.onExitFullscreen != null) {
+        if (webviewParams != null && webviewParams!.onExitFullscreen != null)
           webviewParams!.onExitFullscreen!(_controllerFromPlatform);
-        }
+        else if (_inAppBrowserEventHandler != null)
+          _inAppBrowserEventHandler!.onExitFullscreen();
         break;
       case "onReceivedIcon":
-        if (webviewParams != null && webviewParams!.onReceivedIcon != null) {
+        if ((webviewParams != null && webviewParams!.onReceivedIcon != null) ||
+            _inAppBrowserEventHandler != null) {
           // For now, we just have the URL, not the actual icon data
           // This could be enhanced to download the favicon
           String? faviconUrl = call.arguments["url"];
           if (faviconUrl != null) {
             // Create a placeholder Uint8List since we don't have the actual icon
             // The favicon URL could be used to download the icon if needed
-            webviewParams!.onReceivedIcon!(
-              _controllerFromPlatform,
-              Uint8List(0),
-            );
+            if (webviewParams != null && webviewParams!.onReceivedIcon != null)
+              webviewParams!.onReceivedIcon!(
+                _controllerFromPlatform,
+                Uint8List(0),
+              );
+            else
+              _inAppBrowserEventHandler!.onReceivedIcon(Uint8List(0));
           }
         }
         break;
       case "onCreateContextMenu":
-        ContextMenu? contextMenu = webviewParams?.contextMenu;
+        ContextMenu? contextMenu;
+        if (webviewParams != null && webviewParams!.contextMenu != null) {
+          contextMenu = webviewParams!.contextMenu;
+        } else if (_inAppBrowserEventHandler != null &&
+            _inAppBrowser!.contextMenu != null) {
+          contextMenu = _inAppBrowser!.contextMenu;
+        }
+
         if (contextMenu != null && contextMenu.onCreateContextMenu != null) {
           Map<String, dynamic> arguments = call.arguments
               .cast<String, dynamic>();
@@ -522,13 +715,27 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController
         }
         break;
       case "onHideContextMenu":
-        ContextMenu? contextMenu = webviewParams?.contextMenu;
+        ContextMenu? contextMenu;
+        if (webviewParams != null && webviewParams!.contextMenu != null) {
+          contextMenu = webviewParams!.contextMenu;
+        } else if (_inAppBrowserEventHandler != null &&
+            _inAppBrowser!.contextMenu != null) {
+          contextMenu = _inAppBrowser!.contextMenu;
+        }
+
         if (contextMenu != null && contextMenu.onHideContextMenu != null) {
           contextMenu.onHideContextMenu!();
         }
         break;
       case "onContextMenuActionItemClicked":
-        ContextMenu? contextMenu = webviewParams?.contextMenu;
+        ContextMenu? contextMenu;
+        if (webviewParams != null && webviewParams!.contextMenu != null) {
+          contextMenu = webviewParams!.contextMenu;
+        } else if (_inAppBrowserEventHandler != null &&
+            _inAppBrowser!.contextMenu != null) {
+          contextMenu = _inAppBrowser!.contextMenu;
+        }
+
         if (contextMenu != null) {
           Map<String, dynamic> arguments = call.arguments
               .cast<String, dynamic>();
@@ -559,51 +766,73 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController
         break;
 
       case "onRenderProcessGone":
-        if (webviewParams != null &&
-            webviewParams!.onRenderProcessGone != null) {
+        if ((webviewParams != null &&
+                webviewParams!.onRenderProcessGone != null) ||
+            _inAppBrowserEventHandler != null) {
           Map<String, dynamic> arguments = call.arguments
               .cast<String, dynamic>();
           RenderProcessGoneDetail detail = RenderProcessGoneDetail.fromMap(
             arguments,
           )!;
-          webviewParams!.onRenderProcessGone!(_controllerFromPlatform, detail);
+          if (webviewParams != null &&
+              webviewParams!.onRenderProcessGone != null)
+            webviewParams!.onRenderProcessGone!(_controllerFromPlatform, detail);
+          else
+            _inAppBrowserEventHandler!.onRenderProcessGone(detail);
         }
         break;
       case "onShowFileChooser":
-        if (webviewParams != null && webviewParams!.onShowFileChooser != null) {
+        if ((webviewParams != null &&
+                webviewParams!.onShowFileChooser != null) ||
+            _inAppBrowserEventHandler != null) {
           Map<String, dynamic> arguments = call.arguments
               .cast<String, dynamic>();
           ShowFileChooserRequest request = ShowFileChooserRequest.fromMap(
             arguments,
           )!;
-          ShowFileChooserResponse? response = await webviewParams!
-              .onShowFileChooser!(_controllerFromPlatform, request);
-          // Return full response with handledByClient and filePaths
-          return response?.toMap();
+
+          if (webviewParams != null && webviewParams!.onShowFileChooser != null)
+            return (await webviewParams!.onShowFileChooser!(
+              _controllerFromPlatform,
+              request,
+            ))?.toMap();
+          else
+            return (await _inAppBrowserEventHandler!.onShowFileChooser(
+              request,
+            ))?.toMap();
         }
         return null;
       // onFindResultReceived is now handled by FindInteractionController
       case "onLoadResourceWithCustomScheme":
-        if (webviewParams != null &&
-            (webviewParams!.onLoadResourceWithCustomScheme != null ||
-                // ignore: deprecated_member_use_from_same_package
-                webviewParams!.onLoadResourceCustomScheme != null)) {
+        if ((webviewParams != null &&
+                (webviewParams!.onLoadResourceWithCustomScheme != null ||
+                    // ignore: deprecated_member_use_from_same_package
+                    webviewParams!.onLoadResourceCustomScheme != null)) ||
+            _inAppBrowserEventHandler != null) {
           Map<String, dynamic> requestMap = call.arguments
               .cast<String, dynamic>();
           WebResourceRequest request = WebResourceRequest.fromMap(requestMap)!;
 
-          if (webviewParams!.onLoadResourceWithCustomScheme != null) {
-            return (await webviewParams!.onLoadResourceWithCustomScheme!(
-              _controllerFromPlatform,
-              request,
-            ))?.toMap();
+          if (webviewParams != null) {
+            if (webviewParams!.onLoadResourceWithCustomScheme != null)
+              return (await webviewParams!.onLoadResourceWithCustomScheme!(
+                _controllerFromPlatform,
+                request,
+              ))?.toMap();
+            else {
+              return (await webviewParams!
+                      // ignore: deprecated_member_use_from_same_package
+                      .onLoadResourceCustomScheme!(
+                    _controllerFromPlatform,
+                    request.url,
+                  ))
+                  ?.toMap();
+            }
           } else {
-            return (await webviewParams!
-                    // ignore: deprecated_member_use_from_same_package
-                    .onLoadResourceCustomScheme!(
-                  _controllerFromPlatform,
-                  request.url,
-                ))
+            return ((await _inAppBrowserEventHandler!
+                        .onLoadResourceWithCustomScheme(request)) ??
+                    (await _inAppBrowserEventHandler!
+                        .onLoadResourceCustomScheme(request.url)))
                 ?.toMap();
           }
         }
@@ -622,8 +851,9 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController
 
         switch (handlerName) {
           case "onLoadResource":
-            if (webviewParams != null &&
-                webviewParams!.onLoadResource != null) {
+            if ((webviewParams != null &&
+                    webviewParams!.onLoadResource != null) ||
+                _inAppBrowserEventHandler != null) {
               Map<String, dynamic> arguments = handlerData.args[0]
                   .cast<String, dynamic>();
               arguments["startTime"] = arguments["startTime"] is int
@@ -634,84 +864,138 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController
                   : arguments["duration"];
 
               var response = LoadedResource.fromMap(arguments)!;
-              webviewParams!.onLoadResource!(_controllerFromPlatform, response);
+
+              if (webviewParams != null &&
+                  webviewParams!.onLoadResource != null)
+                webviewParams!.onLoadResource!(
+                  _controllerFromPlatform,
+                  response,
+                );
+              else
+                _inAppBrowserEventHandler!.onLoadResource(response);
             }
             return null;
           case "shouldInterceptAjaxRequest":
-            if (webviewParams != null &&
-                webviewParams!.shouldInterceptAjaxRequest != null) {
+            if ((webviewParams != null &&
+                    webviewParams!.shouldInterceptAjaxRequest != null) ||
+                _inAppBrowserEventHandler != null) {
               Map<String, dynamic> arguments = handlerData.args[0]
                   .cast<String, dynamic>();
               AjaxRequest request = AjaxRequest.fromMap(arguments)!;
-              return jsonEncode(
-                await webviewParams!.shouldInterceptAjaxRequest!(
-                  _controllerFromPlatform,
-                  request,
-                ),
-              );
+
+              if (webviewParams != null &&
+                  webviewParams!.shouldInterceptAjaxRequest != null)
+                return jsonEncode(
+                  await webviewParams!.shouldInterceptAjaxRequest!(
+                    _controllerFromPlatform,
+                    request,
+                  ),
+                );
+              else
+                return jsonEncode(
+                  await _inAppBrowserEventHandler!.shouldInterceptAjaxRequest(
+                    request,
+                  ),
+                );
             }
             return null;
           case "onAjaxReadyStateChange":
-            if (webviewParams != null &&
-                webviewParams!.onAjaxReadyStateChange != null) {
+            if ((webviewParams != null &&
+                    webviewParams!.onAjaxReadyStateChange != null) ||
+                _inAppBrowserEventHandler != null) {
               Map<String, dynamic> arguments = handlerData.args[0]
                   .cast<String, dynamic>();
               AjaxRequest request = AjaxRequest.fromMap(arguments)!;
-              return jsonEncode(
-                (await webviewParams!.onAjaxReadyStateChange!(
-                  _controllerFromPlatform,
-                  request,
-                ))?.toNativeValue(),
-              );
+
+              if (webviewParams != null &&
+                  webviewParams!.onAjaxReadyStateChange != null)
+                return jsonEncode(
+                  (await webviewParams!.onAjaxReadyStateChange!(
+                    _controllerFromPlatform,
+                    request,
+                  ))?.toNativeValue(),
+                );
+              else
+                return jsonEncode(
+                  (await _inAppBrowserEventHandler!.onAjaxReadyStateChange(
+                    request,
+                  ))?.toNativeValue(),
+                );
             }
             return null;
           case "onAjaxProgress":
-            if (webviewParams != null &&
-                webviewParams!.onAjaxProgress != null) {
+            if ((webviewParams != null &&
+                    webviewParams!.onAjaxProgress != null) ||
+                _inAppBrowserEventHandler != null) {
               Map<String, dynamic> arguments = handlerData.args[0]
                   .cast<String, dynamic>();
               AjaxRequest request = AjaxRequest.fromMap(arguments)!;
-              return jsonEncode(
-                (await webviewParams!.onAjaxProgress!(
-                  _controllerFromPlatform,
-                  request,
-                ))?.toNativeValue(),
-              );
+
+              if (webviewParams != null &&
+                  webviewParams!.onAjaxProgress != null)
+                return jsonEncode(
+                  (await webviewParams!.onAjaxProgress!(
+                    _controllerFromPlatform,
+                    request,
+                  ))?.toNativeValue(),
+                );
+              else
+                return jsonEncode(
+                  (await _inAppBrowserEventHandler!.onAjaxProgress(
+                    request,
+                  ))?.toNativeValue(),
+                );
             }
             return null;
           case "shouldInterceptFetchRequest":
-            if (webviewParams != null &&
-                webviewParams!.shouldInterceptFetchRequest != null) {
+            if ((webviewParams != null &&
+                    webviewParams!.shouldInterceptFetchRequest != null) ||
+                _inAppBrowserEventHandler != null) {
               Map<String, dynamic> arguments = handlerData.args[0]
                   .cast<String, dynamic>();
               FetchRequest request = FetchRequest.fromMap(arguments)!;
-              return jsonEncode(
-                await webviewParams!.shouldInterceptFetchRequest!(
-                  _controllerFromPlatform,
-                  request,
-                ),
-              );
+
+              if (webviewParams != null &&
+                  webviewParams!.shouldInterceptFetchRequest != null)
+                return jsonEncode(
+                  await webviewParams!.shouldInterceptFetchRequest!(
+                    _controllerFromPlatform,
+                    request,
+                  ),
+                );
+              else
+                return jsonEncode(
+                  await _inAppBrowserEventHandler!.shouldInterceptFetchRequest(
+                    request,
+                  ),
+                );
             }
             return null;
           case "onWindowFocus":
             if (webviewParams != null && webviewParams!.onWindowFocus != null)
               webviewParams!.onWindowFocus!(_controllerFromPlatform);
+            else if (_inAppBrowserEventHandler != null)
+              _inAppBrowserEventHandler!.onWindowFocus();
             return null;
           case "onWindowBlur":
             if (webviewParams != null && webviewParams!.onWindowBlur != null)
               webviewParams!.onWindowBlur!(_controllerFromPlatform);
+            else if (_inAppBrowserEventHandler != null)
+              _inAppBrowserEventHandler!.onWindowBlur();
             return null;
           case "onInjectedScriptLoaded":
             String id = handlerData.args[0];
             var onLoadCallback = _injectedScriptsFromURL[id]?.onLoad;
-            if (webviewParams != null && onLoadCallback != null) {
+            if ((webviewParams != null || _inAppBrowserEventHandler != null) &&
+                onLoadCallback != null) {
               onLoadCallback();
             }
             return null;
           case "onInjectedScriptError":
             String id = handlerData.args[0];
             var onErrorCallback = _injectedScriptsFromURL[id]?.onError;
-            if (webviewParams != null && onErrorCallback != null) {
+            if ((webviewParams != null || _inAppBrowserEventHandler != null) &&
+                onErrorCallback != null) {
               onErrorCallback();
             }
             return null;

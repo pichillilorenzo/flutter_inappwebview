@@ -5,6 +5,7 @@
 #include <cstring>
 #include <sstream>
 
+#include "plugin_instance.h"
 #include "utils/flutter.h"
 #include "utils/log.h"
 
@@ -105,32 +106,27 @@ bool WebViewEnvironmentInstanceChannelDelegate::isAutomationAllowed() const {
 // WebViewEnvironment Implementation
 // ============================================================================
 
-// Static singleton instance for access from other managers
-WebViewEnvironment* WebViewEnvironment::instance_ = nullptr;
-
-void WebViewEnvironment::setInstance(WebViewEnvironment* instance) {
-  instance_ = instance;
-}
-
-WebKitWebContext* WebViewEnvironment::getWebContext(const std::string& id) {
-  if (instance_ == nullptr || id.empty()) {
+WebKitWebContext* WebViewEnvironment::getWebContext(const std::string& id) const {
+  if (id.empty()) {
     return nullptr;
   }
-  auto* delegate = instance_->getInstance(id);
+  auto* delegate = getInstance(id);
   if (delegate == nullptr) {
     return nullptr;
   }
   return delegate->context();
 }
 
-WebViewEnvironment::WebViewEnvironment(FlPluginRegistrar* registrar)
-    : ChannelDelegate(fl_plugin_registrar_get_messenger(registrar), METHOD_CHANNEL_NAME),
-      messenger_(fl_plugin_registrar_get_messenger(registrar)) {}
+WebViewEnvironment::WebViewEnvironment(PluginInstance* plugin)
+    : ChannelDelegate(plugin->messenger(), METHOD_CHANNEL_NAME),
+      plugin_(plugin),
+      messenger_(plugin->messenger()) {}
 
 WebViewEnvironment::~WebViewEnvironment() {
   debugLog("dealloc WebViewEnvironment");
   // Clean up all instances
   instances_.clear();
+  plugin_ = nullptr;
 }
 
 void WebViewEnvironment::HandleMethodCall(FlMethodCall* method_call) {

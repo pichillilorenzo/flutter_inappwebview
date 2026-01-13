@@ -4,7 +4,7 @@
 
 #include <cstring>
 
-#include "../flutter_inappwebview_linux_plugin_private.h"
+#include "../plugin_instance.h"
 #include "../in_app_webview/in_app_webview_settings.h"
 #include "../types/url_request.h"
 #include "../types/user_script.h"
@@ -14,16 +14,22 @@
 
 namespace flutter_inappwebview_plugin {
 
-InAppBrowserManager::InAppBrowserManager(FlPluginRegistrar* registrar) : registrar_(registrar) {
-  // Validate and get messenger - must check registrar is valid first
-  if (!FL_IS_PLUGIN_REGISTRAR(registrar)) {
+InAppBrowserManager::InAppBrowserManager(PluginInstance* plugin) : plugin_(plugin) {
+  // Validate plugin
+  if (plugin_ == nullptr) {
+    errorLog("InAppBrowserManager: Invalid plugin instance");
+    return;
+  }
+
+  registrar_ = plugin_->registrar();
+  if (!FL_IS_PLUGIN_REGISTRAR(registrar_)) {
     errorLog("InAppBrowserManager: Invalid registrar");
     return;
   }
 
-  messenger_ = fl_plugin_registrar_get_messenger(registrar);
+  messenger_ = plugin_->messenger();
   if (messenger_ == nullptr || !FL_IS_BINARY_MESSENGER(messenger_)) {
-    errorLog("InAppBrowserManager: Failed to get messenger from registrar");
+    errorLog("InAppBrowserManager: Failed to get messenger from plugin");
     messenger_ = nullptr;
     return;
   }
@@ -31,9 +37,9 @@ InAppBrowserManager::InAppBrowserManager(FlPluginRegistrar* registrar) : registr
   // Keep reference to messenger to ensure it stays valid
   g_object_ref(messenger_);
 
-  // Cache the GTK window and FlView now while the registrar is still fully valid
-  gtk_window_ = flutter_inappwebview_linux_plugin_get_window(registrar);
-  fl_view_ = flutter_inappwebview_linux_plugin_get_view(registrar);
+  // Cache the GTK window and FlView from plugin
+  gtk_window_ = plugin_->gtkWindow();
+  fl_view_ = plugin_->flView();
 
   // Create the method channel
   g_autoptr(FlStandardMethodCodec) codec = fl_standard_method_codec_new();
@@ -63,6 +69,11 @@ InAppBrowserManager::~InAppBrowserManager() {
   gtk_window_ = nullptr;
   fl_view_ = nullptr;
   registrar_ = nullptr;
+  plugin_ = nullptr;
+}
+
+FlPluginRegistrar* InAppBrowserManager::registrar() const {
+  return registrar_;
 }
 
 void InAppBrowserManager::HandleMethodCall(FlMethodChannel* channel, FlMethodCall* method_call,
@@ -167,6 +178,7 @@ void InAppBrowserManager::createInAppBrowser(FlValue* arguments) {
 
   // Create params
   InAppBrowserCreationParams params;
+  params.plugin = plugin_;
   params.id = id;
   params.urlRequest = urlRequest;
   params.assetFilePath = assetFilePath;

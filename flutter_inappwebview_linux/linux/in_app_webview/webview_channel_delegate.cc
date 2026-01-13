@@ -190,6 +190,7 @@ WebViewChannelDelegate::WebViewChannelDelegate(InAppWebView* webView, FlBinaryMe
     : ChannelDelegate(messenger, name), webView(webView) {}
 
 WebViewChannelDelegate::~WebViewChannelDelegate() {
+  debugLog("dealloc WebViewChannelDelegate");
   webView = nullptr;
 }
 

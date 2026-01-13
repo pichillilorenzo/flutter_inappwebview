@@ -11,6 +11,8 @@
 
 namespace flutter_inappwebview_plugin {
 
+class PluginInstance;
+
 /// Manager class for InAppBrowser instances
 ///
 /// Handles the static method channel for creating browsers and opening URLs
@@ -21,12 +23,15 @@ class InAppBrowserManager {
       "com.pichillilorenzo/flutter_inappbrowser";
 
   /// Create the manager
-  /// @param registrar The Flutter plugin registrar
-  InAppBrowserManager(FlPluginRegistrar* registrar);
+  /// @param plugin The plugin instance
+  InAppBrowserManager(PluginInstance* plugin);
   ~InAppBrowserManager();
 
+  /// Get the plugin instance
+  PluginInstance* plugin() const { return plugin_; }
+
   /// Get the registrar
-  FlPluginRegistrar* registrar() const { return registrar_; }
+  FlPluginRegistrar* registrar() const;
 
   /// Get the messenger
   FlBinaryMessenger* messenger() const { return messenger_; }
@@ -50,6 +55,7 @@ class InAppBrowserManager {
   InAppBrowser* getBrowser(const std::string& id);
 
  private:
+  PluginInstance* plugin_ = nullptr;
   FlPluginRegistrar* registrar_ = nullptr;
   FlBinaryMessenger* messenger_ = nullptr;
   FlMethodChannel* method_channel_ = nullptr;

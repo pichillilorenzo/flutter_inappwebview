@@ -4,6 +4,7 @@
 #include <cstring>
 #include <ctime>
 
+#include "plugin_instance.h"
 #include "utils/flutter.h"
 #include "utils/log.h"
 
@@ -165,12 +166,14 @@ FlValue* Cookie::toFlValue() const {
 
 // === CookieManager ===
 
-CookieManager::CookieManager(FlPluginRegistrar* registrar)
-    : ChannelDelegate(fl_plugin_registrar_get_messenger(registrar), METHOD_CHANNEL_NAME),
+CookieManager::CookieManager(PluginInstance* plugin)
+    : ChannelDelegate(plugin->messenger(), METHOD_CHANNEL_NAME),
+      plugin_(plugin),
       cookie_manager_(nullptr) {}
 
 CookieManager::~CookieManager() {
   debugLog("dealloc CookieManager");
+  plugin_ = nullptr;
 }
 
 WebKitCookieManager* CookieManager::getCookieManager() {

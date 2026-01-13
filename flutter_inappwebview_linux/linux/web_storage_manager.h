@@ -9,20 +9,27 @@
 
 namespace flutter_inappwebview_plugin {
 
+class PluginInstance;
+
 /// WebStorageManager handles website data management using WPE WebKit's
 /// WebKitWebsiteDataManager API.
 class WebStorageManager {
  public:
   /// Creates a new WebStorageManager.
-  /// @param registrar The Flutter plugin registrar for accessing messenger.
-  explicit WebStorageManager(FlPluginRegistrar* registrar);
+  /// @param plugin The plugin instance for accessing messenger.
+  explicit WebStorageManager(PluginInstance* plugin);
   ~WebStorageManager();
+
+  /// Get the plugin instance
+  PluginInstance* plugin() const { return plugin_; }
 
   // Prevent copying
   WebStorageManager(const WebStorageManager&) = delete;
   WebStorageManager& operator=(const WebStorageManager&) = delete;
 
  private:
+  PluginInstance* plugin_ = nullptr;
+
   /// Handle method calls from Flutter.
   static void HandleMethodCall(FlMethodChannel* channel,
                                FlMethodCall* method_call,

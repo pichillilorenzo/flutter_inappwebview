@@ -13,6 +13,8 @@
 
 namespace flutter_inappwebview_plugin {
 
+class PluginInstance;
+
 /**
  * Represents a proxy rule with URL and optional scheme filter.
  */
@@ -46,8 +48,11 @@ class ProxyManager : public ChannelDelegate {
   static constexpr const char* METHOD_CHANNEL_NAME =
       "com.pichillilorenzo/flutter_inappwebview_proxycontroller";
 
-  ProxyManager(FlPluginRegistrar* registrar);
+  ProxyManager(PluginInstance* plugin);
   ~ProxyManager() override;
+
+  /// Get the plugin instance
+  PluginInstance* plugin() const { return plugin_; }
 
   void HandleMethodCall(FlMethodCall* method_call) override;
 
@@ -61,6 +66,9 @@ class ProxyManager : public ChannelDelegate {
    * Clear proxy override and revert to system defaults.
    */
   void clearProxyOverride();
+
+ private:
+  PluginInstance* plugin_ = nullptr;
 };
 
 }  // namespace flutter_inappwebview_plugin

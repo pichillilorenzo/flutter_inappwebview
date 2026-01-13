@@ -82,7 +82,8 @@ window.)JS" +
       'handlerName': arguments[0],
       '_bridgeSecret': bridgeSecret,
       'args': _JSON_stringify(_Array_slice.call(arguments, 1)),
-      '_windowId': _windowId
+      '_windowId': _windowId,
+      '_isMainFrame': (window.top === window)
     });
   };
 })(window);

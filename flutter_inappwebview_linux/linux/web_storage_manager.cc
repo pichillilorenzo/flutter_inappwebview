@@ -2,6 +2,7 @@
 
 #include <cstring>
 
+#include "plugin_instance.h"
 #include "utils/flutter.h"
 #include "utils/log.h"
 
@@ -14,11 +15,10 @@ bool string_equals(const gchar* a, const char* b) {
 }
 }  // namespace
 
-WebStorageManager::WebStorageManager(FlPluginRegistrar* registrar)
-    : channel_(nullptr), data_manager_(nullptr) {
-  // Get the binary messenger from the registrar
-  FlBinaryMessenger* messenger =
-      fl_plugin_registrar_get_messenger(registrar);
+WebStorageManager::WebStorageManager(PluginInstance* plugin)
+    : plugin_(plugin), channel_(nullptr), data_manager_(nullptr) {
+  // Get the binary messenger from the plugin
+  FlBinaryMessenger* messenger = plugin_->messenger();
 
   // Create the method channel
   channel_ = fl_method_channel_new(
@@ -46,6 +46,7 @@ WebStorageManager::~WebStorageManager() {
   }
   // data_manager_ is owned by the network session, don't unref it
   data_manager_ = nullptr;
+  plugin_ = nullptr;
 }
 
 void WebStorageManager::HandleMethodCall(FlMethodChannel* channel,

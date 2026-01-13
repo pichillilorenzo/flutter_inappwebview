@@ -14,6 +14,8 @@
 
 namespace flutter_inappwebview_plugin {
 
+class PluginInstance;
+
 /**
  * Represents a cookie.
  */
@@ -47,8 +49,11 @@ class CookieManager : public ChannelDelegate {
   static constexpr const char* METHOD_CHANNEL_NAME =
       "com.pichillilorenzo/flutter_inappwebview_cookiemanager";
 
-  CookieManager(FlPluginRegistrar* registrar);
+  CookieManager(PluginInstance* plugin);
   ~CookieManager() override;
+
+  /// Get the plugin instance
+  PluginInstance* plugin() const { return plugin_; }
 
   void HandleMethodCall(FlMethodCall* method_call) override;
 
@@ -71,6 +76,7 @@ class CookieManager : public ChannelDelegate {
   void getAllCookies(std::function<void(std::vector<Cookie>)> callback);
 
  private:
+  PluginInstance* plugin_ = nullptr;
   WebKitCookieManager* cookie_manager_;
 
   WebKitCookieManager* getCookieManager();

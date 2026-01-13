@@ -17,15 +17,18 @@
 
 namespace flutter_inappwebview_plugin {
 
+class PluginInstance;
+
 class InAppWebViewManager {
  public:
   static constexpr const char* METHOD_CHANNEL_NAME =
       "com.pichillilorenzo/flutter_inappwebview_manager";
 
-  InAppWebViewManager(FlPluginRegistrar* registrar);
+  InAppWebViewManager(PluginInstance* plugin);
   ~InAppWebViewManager();
 
-  FlPluginRegistrar* registrar() const { return registrar_; }
+  PluginInstance* plugin() const { return plugin_; }
+  FlPluginRegistrar* registrar() const;
   GtkWindow* gtk_window() const { return gtk_window_; }
   FlView* fl_view() const { return fl_view_; }
 
@@ -46,6 +49,7 @@ class InAppWebViewManager {
   void DisposeKeepAlive(const std::string& keepAliveId);
 
  private:
+  PluginInstance* plugin_ = nullptr;
   FlPluginRegistrar* registrar_ = nullptr;
   GtkWindow* gtk_window_ = nullptr;  // Cached during plugin registration
   FlView* fl_view_ = nullptr;  // Cached FlView for focus restoration

@@ -18,6 +18,7 @@
 namespace flutter_inappwebview_plugin {
 
 class InAppBrowserManager;
+class PluginInstance;
 
 /// Menu item for InAppBrowser
 struct InAppBrowserMenuItem {
@@ -31,6 +32,7 @@ struct InAppBrowserMenuItem {
 
 /// Creation parameters for InAppBrowser
 struct InAppBrowserCreationParams {
+  PluginInstance* plugin = nullptr;
   std::string id;
   std::optional<std::shared_ptr<URLRequest>> urlRequest;
   std::optional<std::string> assetFilePath;
@@ -113,6 +115,7 @@ class InAppBrowser {
   void didChangeNavigationState();
 
  private:
+  PluginInstance* plugin_ = nullptr;
   InAppBrowserManager* manager_ = nullptr;
   FlBinaryMessenger* messenger_ = nullptr;
   GtkWindow* parentWindow_ = nullptr;  // Parent window for child window type

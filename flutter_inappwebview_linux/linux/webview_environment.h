@@ -13,6 +13,8 @@
 
 namespace flutter_inappwebview_plugin {
 
+class PluginInstance;
+
 /**
  * Instance channel delegate for individual WebViewEnvironment instances.
  * Handles instance-specific method calls like dispose, isSpellCheckingEnabled, etc.
@@ -51,8 +53,11 @@ class WebViewEnvironment : public ChannelDelegate {
   static constexpr const char* METHOD_CHANNEL_NAME =
       "com.pichillilorenzo/flutter_webview_environment";
 
-  WebViewEnvironment(FlPluginRegistrar* registrar);
+  WebViewEnvironment(PluginInstance* plugin);
   ~WebViewEnvironment() override;
+
+  /// Get the plugin instance
+  PluginInstance* plugin() const { return plugin_; }
 
   void HandleMethodCall(FlMethodCall* method_call) override;
 
@@ -64,17 +69,11 @@ class WebViewEnvironment : public ChannelDelegate {
   /**
    * Get the WebKitWebContext for the given environment ID.
    * Returns nullptr if not found.
-   * This is a static method that can be called from InAppWebViewManager.
    */
-  static WebKitWebContext* getWebContext(const std::string& id);
-
-  /**
-   * Set the singleton instance (called during plugin registration).
-   */
-  static void setInstance(WebViewEnvironment* instance);
+  WebKitWebContext* getWebContext(const std::string& id) const;
 
  private:
-  static WebViewEnvironment* instance_;  // Singleton for static access
+  PluginInstance* plugin_ = nullptr;
   FlBinaryMessenger* messenger_;
 
   // Map of environment ID -> instance channel delegate

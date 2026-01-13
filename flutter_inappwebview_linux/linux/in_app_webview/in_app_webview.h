@@ -58,6 +58,7 @@ struct wpe_fdo_egl_exported_image;
 namespace flutter_inappwebview_plugin {
 
 class InAppWebViewManager;
+class PluginInstance;
 class UserContentController;
 class WebMessageChannel;
 class WebMessageListener;
@@ -65,6 +66,7 @@ class WebViewChannelDelegate;
 
 struct InAppWebViewCreationParams {
   int64_t id;
+  PluginInstance* plugin = nullptr;  // Plugin instance for accessing managers
   GtkWindow* gtkWindow = nullptr;  // Cached GTK window from manager
   FlView* flView = nullptr;  // Cached FlView for focus restoration
   InAppWebViewManager* manager = nullptr;  // Manager reference for multi-window support
@@ -405,6 +407,7 @@ class InAppWebView {
   FlView* getFlView() const { return fl_view_; }
 
  private:
+  PluginInstance* plugin_ = nullptr;  // Plugin instance for accessing managers
   FlPluginRegistrar* registrar_ = nullptr;
   FlBinaryMessenger* messenger_ = nullptr;  // Cached messenger from constructor
   GtkWindow* gtk_window_ = nullptr;  // Cached GTK window for context menu display

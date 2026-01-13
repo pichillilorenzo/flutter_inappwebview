@@ -4,7 +4,7 @@
 #include <epoxy/gl.h>
 #include <epoxy/egl.h>
 
-#include "../flutter_inappwebview_linux_plugin_private.h"
+#include "../plugin_instance.h"
 #include "../utils/flutter.h"
 #include "../utils/log.h"
 #include "../webview_environment.h"
@@ -58,7 +58,8 @@ InAppBrowserMenuItem::InAppBrowserMenuItem(FlValue* map) {
 
 InAppBrowser::InAppBrowser(InAppBrowserManager* manager, FlBinaryMessenger* messenger,
                            GtkWindow* parentWindow, const InAppBrowserCreationParams& params)
-    : manager_(manager),
+    : plugin_(params.plugin),
+      manager_(manager),
       messenger_(messenger),
       parentWindow_(parentWindow),
       id_(params.id),
@@ -174,6 +175,7 @@ void InAppBrowser::cleanup() {
   manager_ = nullptr;
   messenger_ = nullptr;
   parentWindow_ = nullptr;
+  plugin_ = nullptr;
 }
 
 void InAppBrowser::setupWindow(const InAppBrowserCreationParams& params) {
@@ -420,6 +422,7 @@ void InAppBrowser::setupWebView(const InAppBrowserCreationParams& params) {
 
   // Create InAppWebView creation params
   InAppWebViewCreationParams webViewParams;
+  webViewParams.plugin = plugin_;
   webViewParams.id = 0;  // Will be set by channel attachment
   webViewParams.gtkWindow = window_;
   webViewParams.initialSettings = params.initialWebViewSettings;
@@ -431,7 +434,11 @@ void InAppBrowser::setupWebView(const InAppBrowserCreationParams& params) {
 
   // Check for WebViewEnvironment
   if (params.webViewEnvironmentId.has_value() && !params.webViewEnvironmentId->empty()) {
-    WebKitWebContext* webContext = WebViewEnvironment::getWebContext(params.webViewEnvironmentId.value());
+    WebViewEnvironment* webViewEnv = plugin_ ? plugin_->webViewEnvironment : nullptr;
+    WebKitWebContext* webContext = nullptr;
+    if (webViewEnv != nullptr) {
+      webContext = webViewEnv->getWebContext(params.webViewEnvironmentId.value());
+    }
     if (webContext != nullptr) {
       webViewParams.webContext = webContext;
     }
@@ -925,21 +932,21 @@ gboolean InAppBrowser::OnDrawingAreaScroll(GtkWidget* widget, GdkEventScroll* ev
   double dx = 0, dy = 0;
 
   if (event->direction == GDK_SCROLL_SMOOTH) {
-    dx = event->delta_x * 53.0;
-    dy = event->delta_y * 53.0;
+    dx = event->delta_x * -53.0;
+    dy = event->delta_y * -53.0;
   } else {
     switch (event->direction) {
       case GDK_SCROLL_UP:
-        dy = -53.0;
-        break;
-      case GDK_SCROLL_DOWN:
         dy = 53.0;
         break;
+      case GDK_SCROLL_DOWN:
+        dy = -53.0;
+        break;
       case GDK_SCROLL_LEFT:
-        dx = -53.0;
+        dx = 53.0;
         break;
       case GDK_SCROLL_RIGHT:
-        dx = 53.0;
+        dx = -53.0;
         break;
       default:
         break;

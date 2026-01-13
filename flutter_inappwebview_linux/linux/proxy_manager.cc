@@ -3,6 +3,7 @@
 #include <cctype>
 #include <cstring>
 
+#include "plugin_instance.h"
 #include "utils/flutter.h"
 #include "utils/log.h"
 
@@ -61,11 +62,13 @@ ProxySettings::ProxySettings(FlValue* map) {
 
 // === ProxyManager ===
 
-ProxyManager::ProxyManager(FlPluginRegistrar* registrar)
-    : ChannelDelegate(fl_plugin_registrar_get_messenger(registrar), METHOD_CHANNEL_NAME) {}
+ProxyManager::ProxyManager(PluginInstance* plugin)
+    : ChannelDelegate(plugin->messenger(), METHOD_CHANNEL_NAME),
+      plugin_(plugin) {}
 
 ProxyManager::~ProxyManager() {
   debugLog("dealloc ProxyManager");
+  plugin_ = nullptr;
 }
 
 void ProxyManager::HandleMethodCall(FlMethodCall* method_call) {

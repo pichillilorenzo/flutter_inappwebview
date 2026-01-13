@@ -49,8 +49,7 @@ class TestInAppBrowserEventHandler extends PlatformInAppBrowserEvents {
   }
 
   @override
-  FutureOr<NavigationActionPolicy> shouldOverrideUrlLoading(
-      navigationAction) {
+  FutureOr<NavigationActionPolicy> shouldOverrideUrlLoading(navigationAction) {
     print("\n\nOverride ${navigationAction.request.url}\n\n");
     return NavigationActionPolicy.ALLOW;
   }
@@ -69,15 +68,16 @@ Future<void> testInAppBrowser() async {
     await browser.openUrlRequest(
       urlRequest: URLRequest(url: WebUri('https://flutter.dev')),
       settings: InAppBrowserClassSettings(
-                        browserSettings: InAppBrowserSettings(
-                            toolbarTopBackgroundColor: Colors.blue,
-                            presentationStyle: ModalPresentationStyle.POPOVER),
-                        webViewSettings: InAppWebViewSettings(
-                          isInspectable: kDebugMode,
-                          useShouldOverrideUrlLoading: true,
-                          useOnLoadResource: true,
-                        ),
-                      ),
+        browserSettings: InAppBrowserSettings(
+          toolbarTopBackgroundColor: Colors.blue,
+          presentationStyle: ModalPresentationStyle.POPOVER,
+        ),
+        webViewSettings: InAppWebViewSettings(
+          isInspectable: kDebugMode,
+          useShouldOverrideUrlLoading: true,
+          useOnLoadResource: true,
+        ),
+      ),
     );
     print('[TEST] InAppBrowser: openUrlRequest completed');
   } catch (e) {
@@ -192,9 +192,7 @@ Future<void> testOpenWithSystemBrowser() async {
   print('[TEST] openWithSystemBrowser: Starting test...');
   try {
     final browser = LinuxInAppBrowser(LinuxInAppBrowserCreationParams());
-    await browser.openWithSystemBrowser(
-      url: WebUri('https://flutter.dev'),
-    );
+    await browser.openWithSystemBrowser(url: WebUri('https://flutter.dev'));
     print('[TEST] ✅ openWithSystemBrowser: Command executed successfully');
   } catch (e) {
     print('[TEST] ❌ openWithSystemBrowser: $e');
@@ -305,13 +303,15 @@ class _MyAppState extends State<MyApp> {
                             handlerName: 'testHandler',
                             callback: (args) {
                               if (kDebugMode) {
-                                print('[TEST] testHandler called with args: $args');
+                                print(
+                                  '[TEST] testHandler called with args: $args',
+                                );
                               }
                               // Return a response that JavaScript will receive
                               return {
                                 'success': true,
                                 'message': 'Hello from Dart!',
-                                'receivedArgs': args
+                                'receivedArgs': args,
                               };
                             },
                           );
@@ -322,7 +322,9 @@ class _MyAppState extends State<MyApp> {
                             callback: (args) {
                               String name = args.isNotEmpty ? args[0] : 'World';
                               if (kDebugMode) {
-                                print('[TEST] greetHandler called with name: $name');
+                                print(
+                                  '[TEST] greetHandler called with name: $name',
+                                );
                               }
                               return 'Hello, $name!';
                             },
@@ -381,7 +383,8 @@ class _MyAppState extends State<MyApp> {
                           }
 
                           // Test 1: Call testHandler with arguments
-                          await controller.evaluateJavascript(source: '''
+                          await controller.evaluateJavascript(
+                            source: '''
                             (async function() {
                               try {
                                 console.log('[JS TEST] Calling testHandler...');
@@ -393,10 +396,12 @@ class _MyAppState extends State<MyApp> {
                                 return 'error: ' + e.message;
                               }
                             })();
-                          ''');
+                          ''',
+                          );
 
                           // Test 2: Call greetHandler
-                          await controller.evaluateJavascript(source: '''
+                          await controller.evaluateJavascript(
+                            source: '''
                             (async function() {
                               try {
                                 console.log('[JS TEST] Calling greetHandler...');
@@ -408,7 +413,8 @@ class _MyAppState extends State<MyApp> {
                                 return 'error: ' + e.message;
                               }
                             })();
-                          ''');
+                          ''',
+                          );
 
                           if (kDebugMode) {
                             print('[TEST] JavaScript handler tests completed');
@@ -418,7 +424,9 @@ class _MyAppState extends State<MyApp> {
                         onReceivedHttpError: (controller, request, response) {},
                         onReceivedClientCertRequest: (controller, challenge) async {
                           // This callback is triggered when a server requests a client certificate
-                          print('[TEST] onReceivedClientCertRequest: ${challenge.protectionSpace.host}:${challenge.protectionSpace.port}');
+                          print(
+                            '[TEST] onReceivedClientCertRequest: ${challenge.protectionSpace.host}:${challenge.protectionSpace.port}',
+                          );
                           // For testing, we just cancel the request
                           // In a real app, you might load a certificate from a file:
                           // return ClientCertResponse(

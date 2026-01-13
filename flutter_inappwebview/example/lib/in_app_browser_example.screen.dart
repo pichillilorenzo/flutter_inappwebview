@@ -41,6 +41,11 @@ class MyInAppBrowser extends InAppBrowser {
   }
 
   @override
+  FutureOr<NavigationActionPolicy?>? shouldOverrideUrlLoading(NavigationAction navigationAction) {
+    return NavigationActionPolicy.ALLOW;
+  }
+
+  @override
   void onLoadError(url, code, message) {
     pullToRefreshController?.endRefreshing();
   }
@@ -55,13 +60,6 @@ class MyInAppBrowser extends InAppBrowser {
   @override
   void onExit() {
     print("\n\nBrowser closed!\n\n");
-  }
-
-  @override
-  FutureOr<NavigationActionPolicy> shouldOverrideUrlLoading(
-      navigationAction) {
-    print("\n\nOverride ${navigationAction.request.url}\n\n");
-    return NavigationActionPolicy.ALLOW;
   }
 
   void onMainWindowWillClose() {

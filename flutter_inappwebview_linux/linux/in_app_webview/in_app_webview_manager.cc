@@ -4,6 +4,7 @@
 #include <set>
 
 #include "../flutter_inappwebview_linux_plugin_private.h"
+#include "../plugin_instance.h"
 #include "../plugin_scripts_js/javascript_bridge_js.h"
 #include "../types/context_menu.h"
 #include "../utils/flutter.h"
@@ -14,20 +15,24 @@
 
 namespace flutter_inappwebview_plugin {
 
-InAppWebViewManager::InAppWebViewManager(FlPluginRegistrar* registrar) : registrar_(registrar) {
-  texture_registrar_ = fl_plugin_registrar_get_texture_registrar(registrar);
-  messenger_ = fl_plugin_registrar_get_messenger(registrar);
+InAppWebViewManager::InAppWebViewManager(PluginInstance* plugin)
+    : plugin_(plugin), registrar_(plugin->registrar()) {
+  texture_registrar_ = plugin->textureRegistrar();
+  messenger_ = plugin->messenger();
 
-  // Cache the GTK window and FlView now while the registrar is still fully valid
-  // This is needed for context menus, monitor refresh rate, and focus restoration
-  gtk_window_ = flutter_inappwebview_linux_plugin_get_window(registrar);
-  fl_view_ = flutter_inappwebview_linux_plugin_get_view(registrar);
+  // Cache the GTK window and FlView from the plugin instance
+  gtk_window_ = plugin->gtkWindow();
+  fl_view_ = plugin->flView();
 
   // Create the method channel
   g_autoptr(FlStandardMethodCodec) codec = fl_standard_method_codec_new();
   method_channel_ = fl_method_channel_new(messenger_, METHOD_CHANNEL_NAME, FL_METHOD_CODEC(codec));
 
   fl_method_channel_set_method_call_handler(method_channel_, HandleMethodCall, this, nullptr);
+}
+
+FlPluginRegistrar* InAppWebViewManager::registrar() const {
+  return registrar_;
 }
 
 InAppWebViewManager::~InAppWebViewManager() {
@@ -182,6 +187,7 @@ void InAppWebViewManager::CreateInAppWebView(FlMethodCall* method_call) {
 
   InAppWebViewCreationParams params;
   params.id = next_id_++;
+  params.plugin = plugin_;  // Pass plugin instance for accessing managers
   params.gtkWindow = gtk_window_;  // Pass the cached GTK window
   params.flView = fl_view_;  // Pass the cached FlView for focus restoration
   params.manager = this;  // Pass manager for multi-window support
@@ -237,7 +243,11 @@ void InAppWebViewManager::CreateInAppWebView(FlMethodCall* method_call) {
   // Parse webViewEnvironmentId and look up the custom WebKitWebContext
   auto webViewEnvironmentIdOpt = get_optional_fl_map_value<std::string>(args, "webViewEnvironmentId");
   if (webViewEnvironmentIdOpt.has_value() && !webViewEnvironmentIdOpt->empty()) {
-    WebKitWebContext* webContext = WebViewEnvironment::getWebContext(webViewEnvironmentIdOpt.value());
+    WebViewEnvironment* webViewEnv = plugin_ ? plugin_->webViewEnvironment : nullptr;
+    WebKitWebContext* webContext = nullptr;
+    if (webViewEnv != nullptr) {
+      webContext = webViewEnv->getWebContext(webViewEnvironmentIdOpt.value());
+    }
     if (webContext != nullptr) {
       params.webContext = webContext;
       debugLog("InAppWebViewManager: Using custom WebKitWebContext from WebViewEnvironment id=" + webViewEnvironmentIdOpt.value());

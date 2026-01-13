@@ -31,6 +31,7 @@
 #include "../plugin_scripts_js/color_input_js.h"
 #include "../plugin_scripts_js/console_log_js.h"
 #include "../plugin_scripts_js/cursor_detection_js.h"
+#include "../plugin_scripts_js/date_input_js.h"
 #include "../plugin_scripts_js/intercept_ajax_request_js.h"
 #include "../plugin_scripts_js/intercept_fetch_request_js.h"
 #include "../plugin_scripts_js/javascript_bridge_js.h"
@@ -575,12 +576,16 @@ void InAppWebView::RegisterEventHandlers() {
 
   // Set up the script message handler callback
   if (user_content_controller_) {
-    user_content_controller_->setScriptMessageHandler(
-        [this](const std::string& name, const std::string& body) {
-          handleScriptMessage(name, body);
+    // Set up handler callback for the callHandler message handler
+    // The registration is done via messageHandlerNames in plugin scripts (javascript_bridge_js.h)
+    // This uses the with_reply API for proper Promise resolution in iframes
+    user_content_controller_->setScriptMessageWithReplyHandler("callHandler",
+        [this](const std::string& body, WebKitScriptMessageReply* reply) -> bool {
+          return handleScriptMessageWithReply(body, reply);
         });
 
     // Add plugin scripts based on settings (similar to iOS/Android)
+    // The plugin scripts register their message handlers via messageHandlerNames
     PrepareAndAddUserScripts();
   }
 
@@ -719,6 +724,13 @@ void InAppWebView::PrepareAndAddUserScripts() {
   auto colorInputScript =
       ColorInputJS::COLOR_INPUT_JS_PLUGIN_SCRIPT(pluginScriptsOriginAllowList, pluginScriptsForMainFrameOnly);
   user_content_controller_->addPluginScript(std::move(colorInputScript));
+
+  // === Add Date Input Interception Script ===
+  // WPE WebKit doesn't have date picker support, so we handle <input type="date/time/etc.>
+  // via JavaScript interception
+  auto dateInputScript =
+      DateInputJS::DATE_INPUT_JS_PLUGIN_SCRIPT(pluginScriptsOriginAllowList, pluginScriptsForMainFrameOnly);
+  user_content_controller_->addPluginScript(std::move(dateInputScript));
 
   // === Add Cursor Detection Script ===
   // WPE WebKit renders offscreen so we detect cursor style via JavaScript
@@ -4229,18 +4241,33 @@ static std::string RgbaToHexColor(const GdkRGBA* rgba, bool includeAlpha) {
 static void OnColorDialogResponse(GtkDialog* dialog, gint response_id, gpointer user_data) {
   auto* self = static_cast<InAppWebView*>(user_data);
   
+  // Capture and clear reply before resolving (to prevent use after cleanup)
+  WebKitScriptMessageReply* reply = self->pending_color_reply_;
+  self->pending_color_reply_ = nullptr;
+  
+  if (reply == nullptr) {
+    // No reply object - just cleanup
+    gtk_widget_destroy(GTK_WIDGET(dialog));
+    g_object_unref(dialog);
+    self->active_color_dialog_ = nullptr;
+    self->color_dialog_show_time_ = 0;
+    return;
+  }
+  
   if (response_id == GTK_RESPONSE_OK) {
     // User selected a color
     GdkRGBA selectedRgba;
     gtk_color_chooser_get_rgba(GTK_COLOR_CHOOSER(dialog), &selectedRgba);
     
     std::string hexColor = RgbaToHexColor(&selectedRgba, self->active_color_alpha_enabled_);
-    self->SetColorInputValue(hexColor);
+    // Resolve the Promise with the selected color via webkit reply
+    self->ResolveInternalHandlerWithReply(reply, "\"" + hexColor + "\"");
   } else {
-    // User cancelled or closed the dialog
-    self->CancelColorInput();
+    // User cancelled or closed the dialog - resolve with null
+    self->ResolveInternalHandlerWithReply(reply, "null");
   }
   
+  // Cleanup
   gtk_widget_destroy(GTK_WIDGET(dialog));
   g_object_unref(dialog);  // Release our extra reference
   self->active_color_dialog_ = nullptr;
@@ -4320,21 +4347,10 @@ void InAppWebView::ShowColorPicker(const std::string& initialColor, int x, int y
 }
 
 void InAppWebView::HideColorPicker() {
-  if (active_color_dialog_ != nullptr) {
-    // Don't close the dialog if it was just shown (within 200ms)
-    // This prevents the click that triggered the color picker from immediately closing it
-    int64_t now = g_get_monotonic_time();
-    int64_t elapsed_us = now - color_dialog_show_time_;
-    if (elapsed_us < 200000) {
-      return;
-    }
-    
-    CancelColorInput();
-    gtk_widget_destroy(active_color_dialog_);
-    g_object_unref(active_color_dialog_);
-    active_color_dialog_ = nullptr;
-    color_dialog_show_time_ = 0;
-  }
+  // Don't hide the color dialog when called from HideAllPopups during focus changes.
+  // The color dialog is a separate GTK window that should remain open until the user
+  // explicitly closes it (OK/Cancel). The dialog's response handler will clean up properly.
+  // This is intentionally a no-op - the dialog manages its own lifecycle.
 }
 
 void InAppWebView::HideFileChooser() {
@@ -4380,38 +4396,481 @@ void InAppWebView::HideAllPopups() {
   HideColorPicker();
   HideFileChooser();
   HideOptionMenu();
+  HideDatePicker();
 }
 
-void InAppWebView::SetColorInputValue(const std::string& hexColor) {
-  if (webview_ == nullptr) {
+void InAppWebView::ResolveInternalHandlerWithReply(WebKitScriptMessageReply* reply, const std::string& jsonResult) {
+  if (reply == nullptr) {
+    debugLog("ResolveInternalHandlerWithReply: reply is NULL, cannot respond");
     return;
   }
 
-  // Call the JavaScript function to set the color value
-  std::string script =
-      "if (window._flutterInAppWebViewSetColorInputValue) {"
-      "  window._flutterInAppWebViewSetColorInputValue('" + hexColor + "');"
-      "}";
-
-  webkit_web_view_evaluate_javascript(webview_, script.c_str(),
-                                      static_cast<gssize>(script.length()), nullptr, nullptr,
-                                      nullptr, nullptr, nullptr);
-}
-
-void InAppWebView::CancelColorInput() {
-  if (webview_ == nullptr) {
+  // Create a JSCContext to build the reply value
+  JSCContext* context = jsc_context_new();
+  if (context == nullptr) {
+    webkit_script_message_reply_return_error_message(reply, "Failed to create JSC context");
+    webkit_script_message_reply_unref(reply);
     return;
   }
+  
+  // Parse the JSON result and create a JSCValue
+  JSCValue* replyValue = nullptr;
+  
+  if (jsonResult == "null" || jsonResult.empty()) {
+    replyValue = jsc_value_new_null(context);
+  } else if (jsonResult[0] == '"') {
+    // It's a quoted string - evaluate it to get the actual string value
+    replyValue = jsc_context_evaluate(context, jsonResult.c_str(), -1);
+  } else {
+    // Parse as JSON
+    std::string parseScript = "(" + jsonResult + ")";
+    replyValue = jsc_context_evaluate(context, parseScript.c_str(), -1);
+  }
+  
+  if (replyValue == nullptr) {
+    // Fallback: return the raw string
+    replyValue = jsc_value_new_string(context, jsonResult.c_str());
+  }
+  
+  // Send the reply back to JavaScript
+  webkit_script_message_reply_return_value(reply, replyValue);
+  
+  // Cleanup
+  g_object_unref(replyValue);
+  g_object_unref(context);
+  webkit_script_message_reply_unref(reply);
+}
 
-  // Call the JavaScript function to cancel the color selection
-  std::string script =
-      "if (window._flutterInAppWebViewCancelColorInput) {"
-      "  window._flutterInAppWebViewCancelColorInput();"
-      "}";
+void InAppWebView::RejectInternalHandlerWithReply(WebKitScriptMessageReply* reply, const std::string& errorMessage) {
+  if (reply == nullptr) {
+    return;
+  }
+  webkit_script_message_reply_return_error_message(reply, errorMessage.c_str());
+  webkit_script_message_reply_unref(reply);
+}
 
-  webkit_web_view_evaluate_javascript(webview_, script.c_str(),
-                                      static_cast<gssize>(script.length()), nullptr, nullptr,
-                                      nullptr, nullptr, nullptr);
+// === Date/Time Picker Methods ===
+// WPE WebKit doesn't have date picker support, so we handle <input type="date/time/etc.>
+// natively using GTK3 widgets
+
+// Helper to parse ISO date string to component values
+static bool ParseIsoDate(const std::string& isoDate, int* year, int* month, int* day,
+                         int* hour, int* minute) {
+  if (isoDate.empty()) return false;
+  
+  *year = 0; *month = 0; *day = 0; *hour = 0; *minute = 0;
+  
+  // Try YYYY-MM-DD format (date)
+  if (sscanf(isoDate.c_str(), "%d-%d-%d", year, month, day) == 3) {
+    return true;
+  }
+  
+  // Try YYYY-MM-DDTHH:MM format (datetime-local)
+  if (sscanf(isoDate.c_str(), "%d-%d-%dT%d:%d", year, month, day, hour, minute) == 5) {
+    return true;
+  }
+  
+  // Try HH:MM format (time)
+  if (sscanf(isoDate.c_str(), "%d:%d", hour, minute) == 2) {
+    *year = 2000; *month = 1; *day = 1;  // Dummy date
+    return true;
+  }
+  
+  // Try YYYY-MM format (month)
+  if (sscanf(isoDate.c_str(), "%d-%d", year, month) == 2 && *month >= 1 && *month <= 12) {
+    *day = 1;
+    return true;
+  }
+  
+  // Try YYYY-Www format (week)
+  int week = 0;
+  if (sscanf(isoDate.c_str(), "%d-W%d", year, &week) == 2) {
+    // Set to first day of the week
+    *month = 1;
+    *day = 1 + (week - 1) * 7;  // Approximate
+    return true;
+  }
+  
+  return false;
+}
+
+// Context struct for date dialog callback
+struct DateDialogContext {
+  InAppWebView* webview;
+  std::string inputType;
+  GtkWidget* calendar;     // GtkCalendar widget (may be null for time-only)
+  GtkWidget* hourSpin;     // Hour spinner (for time/datetime-local)
+  GtkWidget* minuteSpin;   // Minute spinner (for time/datetime-local)
+  GtkWidget* dialog;       // Reference to the dialog for validation
+  // Min/max constraints (parsed)
+  int minYear, minMonth, minDay, minHour, minMinute;
+  int maxYear, maxMonth, maxDay, maxHour, maxMinute;
+  bool hasMin, hasMax;
+};
+
+// Helper to compare dates
+static int CompareDates(int y1, int m1, int d1, int y2, int m2, int d2) {
+  if (y1 != y2) return y1 - y2;
+  if (m1 != m2) return m1 - m2;
+  return d1 - d2;
+}
+
+// Helper to compare times (for future use with time validation)
+[[maybe_unused]]
+static int CompareTimes(int h1, int m1, int h2, int m2) {
+  if (h1 != h2) return h1 - h2;
+  return m1 - m2;
+}
+
+// Callback for calendar day selection to validate against min/max
+static void OnCalendarDaySelected(GtkCalendar* calendar, gpointer user_data) {
+  auto* ctx = static_cast<DateDialogContext*>(user_data);
+  
+  guint year, month, day;
+  gtk_calendar_get_date(calendar, &year, &month, &day);
+  month += 1;  // GtkCalendar months are 0-based
+  
+  bool valid = true;
+  
+  // Check min constraint
+  if (ctx->hasMin) {
+    if (CompareDates(static_cast<int>(year), static_cast<int>(month), static_cast<int>(day),
+                     ctx->minYear, ctx->minMonth, ctx->minDay) < 0) {
+      valid = false;
+    }
+  }
+  
+  // Check max constraint
+  if (ctx->hasMax) {
+    if (CompareDates(static_cast<int>(year), static_cast<int>(month), static_cast<int>(day),
+                     ctx->maxYear, ctx->maxMonth, ctx->maxDay) > 0) {
+      valid = false;
+    }
+  }
+  
+  // Enable/disable OK button based on validity
+  if (ctx->dialog) {
+    gtk_dialog_set_response_sensitive(GTK_DIALOG(ctx->dialog), GTK_RESPONSE_OK, valid ? TRUE : FALSE);
+  }
+}
+
+// Static callback for date dialog response
+static void OnDateDialogResponse(GtkDialog* dialog, gint response_id, gpointer user_data) {
+  auto* ctx = static_cast<DateDialogContext*>(user_data);
+  InAppWebView* self = ctx->webview;
+  
+  // Capture and clear reply before resolving (to prevent use after cleanup)
+  WebKitScriptMessageReply* reply = self->pending_date_reply_;
+  self->pending_date_reply_ = nullptr;
+  
+  // Helper lambda for cleanup
+  auto cleanup = [&]() {
+    delete ctx;
+    gtk_widget_destroy(GTK_WIDGET(dialog));
+    g_object_unref(dialog);
+    self->active_date_dialog_ = nullptr;
+    self->date_dialog_show_time_ = 0;
+  };
+  
+  if (reply == nullptr) {
+    // No reply object - just cleanup
+    cleanup();
+    return;
+  }
+  
+  if (response_id == GTK_RESPONSE_OK) {
+    std::string result;
+    
+    if (ctx->inputType == "time") {
+      // Time only
+      int hour = gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(ctx->hourSpin));
+      int minute = gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(ctx->minuteSpin));
+      char buf[16];
+      snprintf(buf, sizeof(buf), "%02d:%02d", hour, minute);
+      result = buf;
+    } else if (ctx->calendar != nullptr) {
+      // Get date from calendar
+      guint year, month, day;
+      gtk_calendar_get_date(GTK_CALENDAR(ctx->calendar), &year, &month, &day);
+      month += 1;  // GtkCalendar months are 0-based
+      
+      if (ctx->inputType == "date") {
+        char buf[16];
+        snprintf(buf, sizeof(buf), "%04d-%02d-%02d", year, month, day);
+        result = buf;
+      } else if (ctx->inputType == "datetime-local") {
+        int hour = gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(ctx->hourSpin));
+        int minute = gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(ctx->minuteSpin));
+        char buf[32];
+        snprintf(buf, sizeof(buf), "%04d-%02d-%02dT%02d:%02d", year, month, day, hour, minute);
+        result = buf;
+      } else if (ctx->inputType == "month") {
+        char buf[16];
+        snprintf(buf, sizeof(buf), "%04d-%02d", year, month);
+        result = buf;
+      } else if (ctx->inputType == "week") {
+        // Calculate ISO week number
+        GDateTime* dt = g_date_time_new_local(year, month, day, 0, 0, 0);
+        if (dt) {
+          int isoYear = g_date_time_get_year(dt);
+          int weekNum = g_date_time_get_week_of_year(dt);
+          g_date_time_unref(dt);
+          char buf[16];
+          snprintf(buf, sizeof(buf), "%04d-W%02d", isoYear, weekNum);
+          result = buf;
+        }
+      }
+    }
+    
+    if (!result.empty()) {
+      // Resolve the Promise with the selected value via webkit reply
+      self->ResolveInternalHandlerWithReply(reply, "\"" + result + "\"");
+    } else {
+      // No valid result - resolve with null
+      self->ResolveInternalHandlerWithReply(reply, "null");
+    }
+  } else {
+    // User cancelled - resolve with null
+    self->ResolveInternalHandlerWithReply(reply, "null");
+  }
+  
+  // Cleanup
+  cleanup();
+}
+
+void InAppWebView::ShowDatePicker(const std::string& inputType, const std::string& value,
+                                   const std::string& min, const std::string& max,
+                                   const std::string& step, int x, int y) {
+  (void)x;     // Position not used - GTK handles dialog placement
+  (void)y;
+  
+  // Close any existing date dialog
+  if (active_date_dialog_ != nullptr) {
+    gtk_widget_destroy(active_date_dialog_);
+    g_object_unref(active_date_dialog_);
+    active_date_dialog_ = nullptr;
+  }
+  
+  pending_date_input_value_ = value;
+  pending_date_input_type_ = inputType;
+  pending_date_input_min_ = min;
+  pending_date_input_max_ = max;
+  
+  // Determine dialog title
+  std::string title;
+  if (inputType == "date") title = "Select Date";
+  else if (inputType == "datetime-local") title = "Select Date and Time";
+  else if (inputType == "time") title = "Select Time";
+  else if (inputType == "month") title = "Select Month";
+  else if (inputType == "week") title = "Select Week";
+  else title = "Select Date";
+  
+  // Create a dialog with the parent window
+  GtkWidget* dialog = gtk_dialog_new_with_buttons(
+      title.c_str(),
+      gtk_window_,
+      GTK_DIALOG_DESTROY_WITH_PARENT,
+      "_Cancel", GTK_RESPONSE_CANCEL,
+      "_OK", GTK_RESPONSE_OK,
+      nullptr);
+  
+  active_date_dialog_ = dialog;
+  g_object_ref(dialog);
+  
+  // Set dialog as transient for parent (floats above but doesn't block)
+  if (gtk_window_) {
+    gtk_window_set_transient_for(GTK_WINDOW(dialog), gtk_window_);
+  }
+  
+  // Make the window non-resizable
+  gtk_window_set_resizable(GTK_WINDOW(dialog), FALSE);
+  
+  GtkWidget* content_area = gtk_dialog_get_content_area(GTK_DIALOG(dialog));
+  gtk_container_set_border_width(GTK_CONTAINER(content_area), 10);
+  
+  // Create context for callback
+  auto* ctx = new DateDialogContext();
+  ctx->webview = this;
+  ctx->inputType = inputType;
+  ctx->calendar = nullptr;
+  ctx->hourSpin = nullptr;
+  ctx->minuteSpin = nullptr;
+  ctx->dialog = dialog;
+  
+  // Parse min/max constraints
+  ctx->hasMin = ParseIsoDate(min, &ctx->minYear, &ctx->minMonth, &ctx->minDay, &ctx->minHour, &ctx->minMinute);
+  ctx->hasMax = ParseIsoDate(max, &ctx->maxYear, &ctx->maxMonth, &ctx->maxDay, &ctx->maxHour, &ctx->maxMinute);
+  
+  // Parse step value for time inputs (step is in seconds)
+  int stepMinutes = 1;  // Default minute step
+  if (!step.empty()) {
+    int stepSeconds = std::atoi(step.c_str());
+    if (stepSeconds >= 60) {
+      stepMinutes = stepSeconds / 60;
+    }
+  }
+  
+  // Parse initial value
+  int initialYear = 2024, initialMonth = 1, initialDay = 1;
+  int initialHour = 12, initialMinute = 0;
+  ParseIsoDate(value, &initialYear, &initialMonth, &initialDay, &initialHour, &initialMinute);
+  
+  // Add calendar for date-related types
+  if (inputType == "date" || inputType == "datetime-local" || 
+      inputType == "month" || inputType == "week") {
+    GtkWidget* calendar = gtk_calendar_new();
+    ctx->calendar = calendar;
+    
+    // Set initial date (GtkCalendar months are 0-based)
+    gtk_calendar_select_month(GTK_CALENDAR(calendar), initialMonth - 1, initialYear);
+    gtk_calendar_select_day(GTK_CALENDAR(calendar), initialDay);
+    
+    // For month picker, hide day selection styling (user can still click but day isn't important)
+    if (inputType == "month") {
+      gtk_calendar_set_display_options(GTK_CALENDAR(calendar),
+          static_cast<GtkCalendarDisplayOptions>(
+              GTK_CALENDAR_SHOW_HEADING | GTK_CALENDAR_SHOW_DAY_NAMES));
+    }
+    
+    // For week picker, show week numbers
+    if (inputType == "week") {
+      gtk_calendar_set_display_options(GTK_CALENDAR(calendar),
+          static_cast<GtkCalendarDisplayOptions>(
+              GTK_CALENDAR_SHOW_HEADING | GTK_CALENDAR_SHOW_DAY_NAMES | 
+              GTK_CALENDAR_SHOW_WEEK_NUMBERS));
+    }
+    
+    gtk_box_pack_start(GTK_BOX(content_area), calendar, TRUE, TRUE, 5);
+    
+    // Connect day-selected signal to validate against min/max
+    g_signal_connect(calendar, "day-selected", G_CALLBACK(OnCalendarDaySelected), ctx);
+    
+    // Add constraint info label if min or max is set
+    if (ctx->hasMin || ctx->hasMax) {
+      std::string constraintText;
+      if (ctx->hasMin && ctx->hasMax) {
+        char buf[64];
+        snprintf(buf, sizeof(buf), "Range: %04d-%02d-%02d to %04d-%02d-%02d",
+                 ctx->minYear, ctx->minMonth, ctx->minDay,
+                 ctx->maxYear, ctx->maxMonth, ctx->maxDay);
+        constraintText = buf;
+      } else if (ctx->hasMin) {
+        char buf[32];
+        snprintf(buf, sizeof(buf), "Min: %04d-%02d-%02d", ctx->minYear, ctx->minMonth, ctx->minDay);
+        constraintText = buf;
+      } else {
+        char buf[32];
+        snprintf(buf, sizeof(buf), "Max: %04d-%02d-%02d", ctx->maxYear, ctx->maxMonth, ctx->maxDay);
+        constraintText = buf;
+      }
+      GtkWidget* constraintLabel = gtk_label_new(constraintText.c_str());
+      gtk_widget_set_opacity(constraintLabel, 0.7);
+      gtk_box_pack_start(GTK_BOX(content_area), constraintLabel, FALSE, FALSE, 2);
+    }
+    
+    // For date type with no time, double-click on day to confirm quickly
+    if (inputType == "date") {
+      g_signal_connect(calendar, "day-selected-double-click",
+          G_CALLBACK(+[](GtkCalendar*, gpointer user_data) {
+            auto* dialog = GTK_DIALOG(user_data);
+            gtk_dialog_response(dialog, GTK_RESPONSE_OK);
+          }), dialog);
+    }
+  }
+  
+  // Add time spinners for time-related types
+  if (inputType == "time" || inputType == "datetime-local") {
+    GtkWidget* timeBox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 5);
+    gtk_widget_set_halign(timeBox, GTK_ALIGN_CENTER);
+    
+    // Hour spinner
+    GtkAdjustment* hourAdj = gtk_adjustment_new(initialHour, 0, 23, 1, 1, 0);
+    GtkWidget* hourSpin = gtk_spin_button_new(hourAdj, 1, 0);
+    gtk_spin_button_set_wrap(GTK_SPIN_BUTTON(hourSpin), TRUE);
+    gtk_entry_set_width_chars(GTK_ENTRY(hourSpin), 2);
+    ctx->hourSpin = hourSpin;
+    
+    // Separator
+    GtkWidget* separator = gtk_label_new(":");
+    
+    // Minute spinner (use step if provided)
+    GtkAdjustment* minuteAdj = gtk_adjustment_new(initialMinute, 0, 59, stepMinutes, stepMinutes * 5, 0);
+    GtkWidget* minuteSpin = gtk_spin_button_new(minuteAdj, 1, 0);
+    gtk_spin_button_set_wrap(GTK_SPIN_BUTTON(minuteSpin), TRUE);
+    gtk_entry_set_width_chars(GTK_ENTRY(minuteSpin), 2);
+    gtk_spin_button_set_snap_to_ticks(GTK_SPIN_BUTTON(minuteSpin), stepMinutes > 1 ? TRUE : FALSE);
+    ctx->minuteSpin = minuteSpin;
+    
+    gtk_box_pack_start(GTK_BOX(timeBox), gtk_label_new("Time:"), FALSE, FALSE, 5);
+    gtk_box_pack_start(GTK_BOX(timeBox), hourSpin, FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(timeBox), separator, FALSE, FALSE, 2);
+    gtk_box_pack_start(GTK_BOX(timeBox), minuteSpin, FALSE, FALSE, 0);
+    
+    gtk_box_pack_start(GTK_BOX(content_area), timeBox, FALSE, FALSE, 10);
+    
+    // Add time constraint info for time-only input
+    if (inputType == "time" && (ctx->hasMin || ctx->hasMax)) {
+      std::string timeConstraint;
+      if (ctx->hasMin && ctx->hasMax) {
+        char buf[32];
+        snprintf(buf, sizeof(buf), "Range: %02d:%02d to %02d:%02d",
+                 ctx->minHour, ctx->minMinute, ctx->maxHour, ctx->maxMinute);
+        timeConstraint = buf;
+      } else if (ctx->hasMin) {
+        char buf[16];
+        snprintf(buf, sizeof(buf), "Min: %02d:%02d", ctx->minHour, ctx->minMinute);
+        timeConstraint = buf;
+      } else {
+        char buf[16];
+        snprintf(buf, sizeof(buf), "Max: %02d:%02d", ctx->maxHour, ctx->maxMinute);
+        timeConstraint = buf;
+      }
+      GtkWidget* timeConstraintLabel = gtk_label_new(timeConstraint.c_str());
+      gtk_widget_set_opacity(timeConstraintLabel, 0.7);
+      gtk_box_pack_start(GTK_BOX(content_area), timeConstraintLabel, FALSE, FALSE, 2);
+    }
+  }
+  
+  // Connect response signal
+  g_signal_connect(dialog, "response", G_CALLBACK(OnDateDialogResponse), ctx);
+  
+  // Handle focus-out to auto-close (like a dropdown)
+  g_signal_connect(dialog, "focus-out-event",
+      G_CALLBACK(+[](GtkWidget* widget, GdkEventFocus*, gpointer) -> gboolean {
+        // Don't auto-close - let user interact freely
+        // They can click Cancel or click outside to dismiss
+        (void)widget;
+        return FALSE;  // Don't consume the event
+      }), nullptr);
+  
+  // Show the dialog and all its children
+  gtk_widget_show_all(dialog);
+  
+  date_dialog_show_time_ = g_get_monotonic_time();
+}
+
+void InAppWebView::HideDatePicker() {
+  if (active_date_dialog_ != nullptr) {
+    int64_t now = g_get_monotonic_time();
+    int64_t elapsed_us = now - date_dialog_show_time_;
+    if (elapsed_us < 200000) {
+      return;  // Don't close if just shown
+    }
+    
+    // Capture and clear reply before resolving
+    WebKitScriptMessageReply* reply = pending_date_reply_;
+    pending_date_reply_ = nullptr;
+    
+    // Resolve the pending Promise with null when hiding the picker
+    if (reply != nullptr) {
+      ResolveInternalHandlerWithReply(reply, "null");
+    }
+    
+    gtk_widget_destroy(active_date_dialog_);
+    g_object_unref(active_date_dialog_);
+    active_date_dialog_ = nullptr;
+    date_dialog_show_time_ = 0;
+  }
 }
 
 // === Clipboard Operations ===
@@ -5550,51 +6009,44 @@ void InAppWebView::updateCursorFromCssStyle(const std::string& cursor_style) {
 
 // === JavaScript Bridge ===
 
-void InAppWebView::handleScriptMessage(const std::string& name, const std::string& body) {
+bool InAppWebView::handleScriptMessageWithReply(const std::string& body, WebKitScriptMessageReply* reply) {
   // === Security Check 1: javaScriptBridgeEnabled ===
-  // Match iOS: guard javaScriptBridgeEnabled else { return }
   if (settings_ && !settings_->javaScriptBridgeEnabled) {
-    return;
+    return false;
   }
 
-  // Parse the body as JSON using nlohmann/json
+  // Parse the body as JSON
   json bodyJson;
   try {
     bodyJson = json::parse(body);
   } catch (const json::parse_error& e) {
-    return;
+    return false;
   }
 
   // === Security Check 2: Bridge Secret Validation ===
-  // Match iOS: guard bridgeSecret == exceptedBridgeSecret
   std::string receivedSecret = "";
   if (bodyJson.contains("_bridgeSecret") && bodyJson["_bridgeSecret"].is_string()) {
     receivedSecret = bodyJson["_bridgeSecret"].get<std::string>();
   }
 
   if (receivedSecret != js_bridge_secret_) {
-    // Get origin for logging
     std::string securityOrigin = "unknown";
     const gchar* uri = webkit_web_view_get_uri(webview_);
     if (uri != nullptr) {
       securityOrigin = std::string(uri);
     }
-    errorLog("InAppWebView: Bridge access attempt with wrong secret token from origin " +
-             securityOrigin);
-    return;
+    errorLog("InAppWebView: Bridge access attempt with wrong secret token from origin " + securityOrigin);
+    return false;
   }
 
-  // === Build Source Origin (matches iOS securityOrigin handling) ===
+  // === Build Source Origin ===
   std::string sourceOrigin = "";
   std::string requestUrl = "";
-  bool isMainFrame = true;  // Main frame by default for WPE
+  bool isMainFrame = true;
 
-  // Get current URL from webview - this is the "request URL"
   const gchar* uri = webkit_web_view_get_uri(webview_);
   if (uri != nullptr) {
     requestUrl = std::string(uri);
-    // Extract origin from URL (scheme://host:port)
-    // This matches iOS: URL(string: "\(scheme)://\(host)\(port != 0 ? ":" + String(port) : "")")
     try {
       size_t schemeEnd = requestUrl.find("://");
       if (schemeEnd != std::string::npos) {
@@ -5609,85 +6061,62 @@ void InAppWebView::handleScriptMessage(const std::string& name, const std::strin
   }
 
   // === Security Check 3: Origin Allow List ===
-  // Match iOS: javaScriptHandlersOriginAllowList check
   bool isOriginAllowed = true;
   if (settings_ && settings_->javaScriptHandlersOriginAllowList.has_value()) {
     const auto& allowList = settings_->javaScriptHandlersOriginAllowList.value();
     if (!allowList.empty()) {
       isOriginAllowed = false;
       for (const auto& allowedOrigin : allowList) {
-        // Simple substring/regex-like matching (iOS uses regex)
         if (!sourceOrigin.empty() && sourceOrigin.find(allowedOrigin) != std::string::npos) {
           isOriginAllowed = true;
           break;
         }
       }
     }
-    // If allowList is empty, origin is allowed by default
   }
-  // If javaScriptHandlersOriginAllowList is nullopt, origin is allowed by default (matches iOS)
 
   if (!isOriginAllowed) {
-    errorLog("InAppWebView: Bridge access attempt from an origin not allowed: " + sourceOrigin);
-    return;
+    errorLog("InAppWebView: Bridge access attempt from origin not allowed: " + sourceOrigin);
+    return false;
   }
 
-  // === Multi-Window Support: Extract _windowId ===
-  // Match iOS: let _windowId = body["_windowId"] as? Int64
-  // The _windowId allows routing callbacks to the correct webview in multi-window scenarios
-  std::optional<int64_t> windowId;
-  if (bodyJson.contains("_windowId") && bodyJson["_windowId"].is_number()) {
-    windowId = bodyJson["_windowId"].get<int64_t>();
+  // === Extract handler name and args ===
+  std::string handlerName = "";
+  if (bodyJson.contains("handlerName") && bodyJson["handlerName"].is_string()) {
+    handlerName = bodyJson["handlerName"].get<std::string>();
   }
 
-  // Get the target webview for this message
-  // Match iOS: if let wId = _windowId, let webViewTransport =
-  // plugin?.inAppWebViewManager?.windowWebViews[wId] For now, we use 'this' webview. When window
-  // management is implemented, this should look up the webview by windowId from a global registry.
-  InAppWebView* targetWebView = this;
-  // TODO: When multi-window is fully implemented:
-  // if (windowId.has_value()) {
-  //   auto* manager = InAppWebViewManager::getInstance();
-  //   if (manager && manager->hasWindowWebView(windowId.value())) {
-  //     targetWebView = manager->getWindowWebView(windowId.value());
-  //   }
-  // }
-
-  // For callHandler messages, extract the actual handler name from body
-  std::string handlerName = name;
-  if (name == "callHandler") {
-    if (bodyJson.contains("handlerName") && bodyJson["handlerName"].is_string()) {
-      handlerName = bodyJson["handlerName"].get<std::string>();
-    }
-  }
-
-  // Extract _callHandlerID for callback
-  int64_t callHandlerId = 0;
-  if (bodyJson.contains("_callHandlerID") && bodyJson["_callHandlerID"].is_number()) {
-    callHandlerId = bodyJson["_callHandlerID"].get<int64_t>();
-  }
-
-  // Extract args - it's already a JSON string
   std::string argsJsonStr = "";
   if (bodyJson.contains("args") && bodyJson["args"].is_string()) {
     argsJsonStr = bodyJson["args"].get<std::string>();
   }
 
-  // === Handle Internal Handlers ===
-  // Match iOS: switch(handlerName) for internal handlers
-  // Use targetWebView for multi-window support
-  bool isInternalHandler = true;
+  // === Multi-Window Support: Extract _windowId ===
+  std::optional<int64_t> windowId;
+  if (bodyJson.contains("_windowId") && bodyJson["_windowId"].is_number()) {
+    windowId = bodyJson["_windowId"].get<int64_t>();
+  }
 
+  InAppWebView* targetWebView = this;
+  
+  // Multi-window support: lookup by windowId if available
+  if (windowId.has_value() && manager_ != nullptr) {
+    WebViewTransport* transport = manager_->GetWindowWebView(windowId.value());
+    if (transport != nullptr && transport->inAppWebView != nullptr) {
+      targetWebView = transport->inAppWebView.get();
+    }
+  }
+
+  // === Handle Internal Handlers ===
+  
   if (handlerName == "onConsoleMessage") {
-    // Handle console message interception (from console_log_js.h script)
+    // Handle console message interception
     std::string message = "";
     std::string level = "log";
 
-    // The args field contains a JSON-encoded string: [{"level":"log","message":"..."}]
     if (!argsJsonStr.empty()) {
       try {
         json argsJson = json::parse(argsJsonStr);
-        // args is an array with a single object
         if (argsJson.is_array() && !argsJson.empty()) {
           json firstArg = argsJson[0];
           if (firstArg.contains("level") && firstArg["level"].is_string()) {
@@ -5700,33 +6129,31 @@ void InAppWebView::handleScriptMessage(const std::string& name, const std::strin
       } catch (const json::parse_error& e) {}
     }
 
-    // Map level string to numeric value
-    // Match iOS: case "log" -> 1, "debug" -> 0 (TIP), "error" -> 3, "info" -> 1, "warn" -> 2
     int64_t messageLevel = 1;  // LOG
     if (level == "debug") {
-      messageLevel = 0;  // TIP (on Android, console.debug is TIP)
+      messageLevel = 0;
     } else if (level == "info" || level == "log") {
-      messageLevel = 1;  // LOG
+      messageLevel = 1;
     } else if (level == "warn") {
-      messageLevel = 2;  // WARNING
+      messageLevel = 2;
     } else if (level == "error") {
-      messageLevel = 3;  // ERROR
+      messageLevel = 3;
     }
 
-    // Use targetWebView's channel delegate (for multi-window support)
     if (targetWebView->channel_delegate_) {
       targetWebView->channel_delegate_->onConsoleMessage(message, messageLevel);
     }
-    // Fall through to resolve the internal handler
-
-  } else if (handlerName == "onLoadResource") {
-    // Handle resource load tracking (from on_load_resource_js.h script)
+    ResolveInternalHandlerWithReply(reply, "null");
+    return true;
+  }
+  
+  if (handlerName == "onLoadResource") {
+    // Handle resource load tracking
     std::string url = "";
     std::string initiatorType = "";
     double startTime = 0.0;
     double duration = 0.0;
 
-    // The args field contains a JSON-encoded string: [{"url":"...","initiatorType":"...","startTime":0,"duration":0}]
     if (!argsJsonStr.empty()) {
       try {
         json argsJson = json::parse(argsJsonStr);
@@ -5748,20 +6175,15 @@ void InAppWebView::handleScriptMessage(const std::string& name, const std::strin
       } catch (const json::parse_error& e) {}
     }
 
-    // Use targetWebView's channel delegate (for multi-window support)
     if (targetWebView->channel_delegate_) {
       targetWebView->channel_delegate_->onLoadResource(url, initiatorType, startTime, duration);
     }
+    ResolveInternalHandlerWithReply(reply, "null");
+    return true;
+  }
 
-  } else if (handlerName == "onPrintRequest") {
-    // TODO: Implement print request handling (matches iOS)
-
-  } else if (handlerName == "onFindResultReceived") {
-    // TODO: Implement find result handling (matches iOS)
-
-  } else if (handlerName == "onWebMessagePortMessageReceived") {
+  if (handlerName == "onWebMessagePortMessageReceived") {
     // Handle WebMessageChannel port message
-    // This is called when JavaScript sends a message through a MessagePort
     std::string webMessageChannelId = "";
     int portIndex = 0;
     std::string messageData = "";
@@ -5785,7 +6207,6 @@ void InAppWebView::handleScriptMessage(const std::string& name, const std::strin
             }
             if (messageObj.contains("data")) {
               if (messageType == 1 && messageObj["data"].is_array()) {
-                // ArrayBuffer - convert byte array to comma-separated string
                 std::string bytes;
                 for (auto& byte : messageObj["data"]) {
                   if (!bytes.empty()) bytes += ",";
@@ -5800,28 +6221,26 @@ void InAppWebView::handleScriptMessage(const std::string& name, const std::strin
             }
           }
         }
-      } catch (const json::parse_error& e) {
-        debugLog("onWebMessagePortMessageReceived: Failed to parse args: " + std::string(e.what()));
-      }
+      } catch (const json::parse_error& e) {}
     }
 
-    // Find the channel and forward the message
     if (!webMessageChannelId.empty()) {
       WebMessageChannel* channel = targetWebView->getWebMessageChannel(webMessageChannelId);
       if (channel != nullptr) {
         channel->onMessage(portIndex, messageData.empty() ? nullptr : &messageData, messageType);
       }
     }
+    ResolveInternalHandlerWithReply(reply, "null");
+    return true;
+  }
 
-  } else if (handlerName == "onWebMessageListenerPostMessageReceived") {
+  if (handlerName == "onWebMessageListenerPostMessageReceived") {
     // Handle WebMessageListener post message
-    // This is called when JavaScript calls webMessageListener.postMessage()
-    // Route the callback through the dedicated WebMessageListener channel (federated plugin pattern)
     std::string jsObjectName = "";
     std::string messageData = "";
     int64_t messageType = 0;
     std::string sourceOriginStr = "";
-    bool isMainFrame = true;
+    bool isMainFrameMsg = true;
 
     if (!argsJsonStr.empty()) {
       try {
@@ -5835,7 +6254,7 @@ void InAppWebView::handleScriptMessage(const std::string& name, const std::strin
             sourceOriginStr = firstArg["sourceOrigin"].get<std::string>();
           }
           if (firstArg.contains("isMainFrame") && firstArg["isMainFrame"].is_boolean()) {
-            isMainFrame = firstArg["isMainFrame"].get<bool>();
+            isMainFrameMsg = firstArg["isMainFrame"].get<bool>();
           }
           if (firstArg.contains("message") && firstArg["message"].is_object()) {
             json messageObj = firstArg["message"];
@@ -5844,7 +6263,6 @@ void InAppWebView::handleScriptMessage(const std::string& name, const std::strin
             }
             if (messageObj.contains("data")) {
               if (messageType == 1 && messageObj["data"].is_array()) {
-                // ArrayBuffer - convert byte array to comma-separated string
                 std::string bytes;
                 for (auto& byte : messageObj["data"]) {
                   if (!bytes.empty()) bytes += ",";
@@ -5853,20 +6271,15 @@ void InAppWebView::handleScriptMessage(const std::string& name, const std::strin
                 messageData = bytes;
               } else if (messageObj["data"].is_string()) {
                 messageData = messageObj["data"].get<std::string>();
-              } else if (messageObj["data"].is_null()) {
-                // null data
-              } else {
+              } else if (!messageObj["data"].is_null()) {
                 messageData = messageObj["data"].dump();
               }
             }
           }
         }
-      } catch (const json::parse_error& e) {
-        debugLog("onWebMessageListenerPostMessageReceived: Failed to parse args: " + std::string(e.what()));
-      }
+      } catch (const json::parse_error& e) {}
     }
 
-    // Find the WebMessageListener and route the callback through its dedicated channel
     if (!jsObjectName.empty()) {
       auto it = targetWebView->web_message_listeners_.find(jsObjectName);
       if (it != targetWebView->web_message_listeners_.end() && it->second) {
@@ -5874,14 +6287,28 @@ void InAppWebView::handleScriptMessage(const std::string& name, const std::strin
             messageData.empty() ? nullptr : &messageData,
             messageType,
             sourceOriginStr,
-            isMainFrame);
+            isMainFrameMsg);
       }
     }
+    ResolveInternalHandlerWithReply(reply, "null");
+    return true;
+  }
 
-  } else if (handlerName == "_cursorChanged") {
-    // Internal handler called via the JS bridge callHandler path.
-    // argsJsonStr is a JSON-encoded string that should decode to an array.
-    // We take the first string argument as the CSS cursor style.
+  if (handlerName == "onPrintRequest") {
+    // Handle print request - currently just acknowledge it
+    // Full print implementation would require platform-specific print dialog
+    ResolveInternalHandlerWithReply(reply, "null");
+    return true;
+  }
+
+  if (handlerName == "onFindResultReceived") {
+    // Handle find result - this is typically sent by FindInteractionController
+    // The find results are already handled via the native find API
+    ResolveInternalHandlerWithReply(reply, "null");
+    return true;
+  }
+
+  if (handlerName == "_cursorChanged") {
     if (!argsJsonStr.empty()) {
       try {
         json argsJson = json::parse(argsJsonStr);
@@ -5889,15 +6316,14 @@ void InAppWebView::handleScriptMessage(const std::string& name, const std::strin
           const std::string cursorStyle = argsJson[0].get<std::string>();
           updateCursorFromCssStyle(cursorStyle);
         }
-      } catch (const json::parse_error&) {
-        // Be defensive: ignore but still resolve internal handler promise.
-      } catch (...) {
-        // Ignore non-JSON exceptions.
-      }
+      } catch (...) {}
     }
-  } else if (handlerName == "_onColorInputClicked") {
-    // Handle color input click - show native color picker
-    // This is a WPE-specific handler since WPE doesn't have run-color-chooser signal
+    ResolveInternalHandlerWithReply(reply, "null");
+    return true;
+  }
+
+  if (handlerName == "_onColorInputClicked") {
+    // Handle color input click - args: { currentColor, elemRect, predefinedColors, alphaEnabled, colorSpace }
     std::string currentColor = "#000000";
     std::vector<std::string> predefinedColors;
     bool alphaEnabled = false;
@@ -5906,35 +6332,47 @@ void InAppWebView::handleScriptMessage(const std::string& name, const std::strin
     if (!argsJsonStr.empty()) {
       try {
         json argsJson = json::parse(argsJsonStr);
-        if (argsJson.is_array() && !argsJson.empty()) {
-          json firstArg = argsJson[0];
-          if (firstArg.contains("color") && firstArg["color"].is_string()) {
-            currentColor = firstArg["color"].get<std::string>();
+        // Args is an array with a single object: [{ currentColor, elemRect, ... }]
+        json argsObj;
+        if (argsJson.is_array() && !argsJson.empty() && argsJson[0].is_object()) {
+          argsObj = argsJson[0];
+        } else if (argsJson.is_object()) {
+          argsObj = argsJson;
+        }
+        
+        if (!argsObj.is_null()) {
+          if (argsObj.contains("currentColor") && argsObj["currentColor"].is_string()) {
+            currentColor = argsObj["currentColor"].get<std::string>();
           }
-          // Parse predefined colors from HTML datalist (list attribute)
-          if (firstArg.contains("predefinedColors") && firstArg["predefinedColors"].is_array()) {
-            for (const auto& color : firstArg["predefinedColors"]) {
+          // elemRect is for positioning, we use screen cursor position instead
+          if (argsObj.contains("predefinedColors") && argsObj["predefinedColors"].is_array()) {
+            for (const auto& color : argsObj["predefinedColors"]) {
               if (color.is_string()) {
                 predefinedColors.push_back(color.get<std::string>());
               }
             }
           }
-          // Parse alpha attribute (boolean)
-          if (firstArg.contains("alpha") && firstArg["alpha"].is_boolean()) {
-            alphaEnabled = firstArg["alpha"].get<bool>();
+          if (argsObj.contains("alphaEnabled") && argsObj["alphaEnabled"].is_boolean()) {
+            alphaEnabled = argsObj["alphaEnabled"].get<bool>();
           }
-          // Parse colorspace attribute
-          if (firstArg.contains("colorSpace") && firstArg["colorSpace"].is_string()) {
-            colorSpace = firstArg["colorSpace"].get<std::string>();
+          if (argsObj.contains("colorSpace") && argsObj["colorSpace"].is_string()) {
+            colorSpace = argsObj["colorSpace"].get<std::string>();
           }
         }
-      } catch (const json::parse_error& e) {}
+      } catch (const json::parse_error& e) {
+        debugLog("_onColorInputClicked: JSON parse error: " + std::string(e.what()));
+      }
     }
 
-    // Get screen position of the cursor using the pointer device
-    // This works reliably on both X11 and Wayland
+    // Store the reply object for async response (add ref to keep it alive)
+    if (pending_color_reply_ != nullptr) {
+      webkit_script_message_reply_unref(pending_color_reply_);
+    }
+    pending_color_reply_ = reply;
+    webkit_script_message_reply_ref(reply);
+
+    // Get screen position of the cursor
     gint screenX = 0, screenY = 0;
-    
     GdkDisplay* gdk_display = gdk_display_get_default();
     if (gdk_display != nullptr) {
       GdkSeat* seat = gdk_display_get_default_seat(gdk_display);
@@ -5946,62 +6384,95 @@ void InAppWebView::handleScriptMessage(const std::string& name, const std::strin
       }
     }
 
-    // Show the color picker with all attributes
-    targetWebView->ShowColorPicker(currentColor, screenX, screenY, predefinedColors,
-                                   alphaEnabled, colorSpace);
-
-  } else {
-    // Not an internal handler - will be sent to Dart
-    isInternalHandler = false;
+    // Show the color picker
+    ShowColorPicker(currentColor, screenX, screenY, predefinedColors, alphaEnabled, colorSpace);
+    
+    // Return true to indicate async handling (dialog will respond later)
+    return true;
   }
 
-  // === Resolve Internal Handlers ===
-  // Match iOS: if isInternalHandler { evaluateJavaScript to resolve }
-  if (isInternalHandler) {
-    if (callHandlerId > 0) {
-      std::string script =
-          "if(window." + JavaScriptBridgeJS::get_JAVASCRIPT_BRIDGE_NAME() + "[" +
-          std::to_string(callHandlerId) +
-          "] != null) {\n"
-          "    window." +
-          JavaScriptBridgeJS::get_JAVASCRIPT_BRIDGE_NAME() + "[" + std::to_string(callHandlerId) +
-          "].resolve();\n"
-          "    delete window." +
-          JavaScriptBridgeJS::get_JAVASCRIPT_BRIDGE_NAME() + "[" + std::to_string(callHandlerId) +
-          "];\n"
-          "}";
+  if (handlerName == "_onDateInputClicked") {
+    // Handle date input click - args: { inputType, currentValue, minValue, maxValue, step, elemRect }
+    std::string inputType = "date";
+    std::string currentValue = "";
+    std::string minValue = "";
+    std::string maxValue = "";
+    std::string stepValue = "";
 
-      // Resolve on the target webview
-      webkit_web_view_evaluate_javascript(targetWebView->webview_, script.c_str(),
-                                          static_cast<gssize>(script.length()), nullptr, nullptr,
-                                          nullptr, nullptr, nullptr);
+    if (!argsJsonStr.empty()) {
+      try {
+        json argsJson = json::parse(argsJsonStr);
+        // Args is an array with a single object: [{ inputType, currentValue, ... }]
+        json argsObj;
+        if (argsJson.is_array() && !argsJson.empty() && argsJson[0].is_object()) {
+          argsObj = argsJson[0];
+        } else if (argsJson.is_object()) {
+          argsObj = argsJson;
+        }
+        
+        if (!argsObj.is_null()) {
+          if (argsObj.contains("inputType") && argsObj["inputType"].is_string()) {
+            inputType = argsObj["inputType"].get<std::string>();
+          }
+          if (argsObj.contains("currentValue") && argsObj["currentValue"].is_string()) {
+            currentValue = argsObj["currentValue"].get<std::string>();
+          }
+          if (argsObj.contains("minValue") && argsObj["minValue"].is_string()) {
+            minValue = argsObj["minValue"].get<std::string>();
+          }
+          if (argsObj.contains("maxValue") && argsObj["maxValue"].is_string()) {
+            maxValue = argsObj["maxValue"].get<std::string>();
+          }
+          if (argsObj.contains("step") && argsObj["step"].is_string()) {
+            stepValue = argsObj["step"].get<std::string>();
+          }
+          // elemRect is for positioning, we use screen cursor position instead
+        }
+      } catch (const json::parse_error& e) {
+        debugLog("_onDateInputClicked: JSON parse error: " + std::string(e.what()));
+      }
     }
-    return;
+
+    // Store the reply object for async response (add ref to keep it alive)
+    if (pending_date_reply_ != nullptr) {
+      webkit_script_message_reply_unref(pending_date_reply_);
+    }
+    pending_date_reply_ = reply;
+    webkit_script_message_reply_ref(reply);
+
+    // Get screen position of the cursor
+    gint screenX = 0, screenY = 0;
+    GdkDisplay* gdk_display = gdk_display_get_default();
+    if (gdk_display != nullptr) {
+      GdkSeat* seat = gdk_display_get_default_seat(gdk_display);
+      if (seat != nullptr) {
+        GdkDevice* pointer = gdk_seat_get_pointer(seat);
+        if (pointer != nullptr) {
+          gdk_device_get_position(pointer, nullptr, &screenX, &screenY);
+        }
+      }
+    }
+
+    // Show the date picker
+    ShowDatePicker(inputType, currentValue, minValue, maxValue, stepValue, screenX, screenY);
+    
+    // Return true to indicate async handling (dialog will respond later)
+    return true;
   }
 
   // === External Handler - Send to Dart ===
-  // Use targetWebView for multi-window support (matches iOS webView variable)
-
-  // Notify Dart side via channel delegate
-  // Use targetWebView's channel delegate for multi-window support
   if (targetWebView->channel_delegate_) {
-    // Match iOS: JavaScriptHandlerFunctionData(args:, isMainFrame:, origin:, requestUrl:)
-    auto data = std::make_unique<JavaScriptHandlerFunctionData>(sourceOrigin, requestUrl,
-                                                                isMainFrame, argsJsonStr);
+    auto data = std::make_unique<JavaScriptHandlerFunctionData>(
+        sourceOrigin, requestUrl, isMainFrame, argsJsonStr);
 
-    // Create callback to send response back to JavaScript
-    // Match iOS: CallJsHandlerCallback with defaultBehaviour and error
     auto callback = std::make_unique<WebViewChannelDelegate::CallJsHandlerCallback>();
 
-    int64_t capturedCallHandlerId = callHandlerId;
+    // Hold a reference to reply for async callback
+    webkit_script_message_reply_ref(reply);
     InAppWebView* capturedTargetWebView = targetWebView;
 
-    // Match iOS: callback.defaultBehaviour = { (response: Any?) in ... }
-    callback->defaultBehaviour = [capturedTargetWebView,
-                                  capturedCallHandlerId](const std::optional<FlValue*>& response) {
-      if (capturedTargetWebView->webview_ == nullptr)
-        return;
-
+    callback->defaultBehaviour = [capturedTargetWebView, reply](
+        const std::optional<FlValue*>& response) {
       std::string jsonResult = "null";
       if (response.has_value() && response.value() != nullptr) {
         FlValue* val = response.value();
@@ -6009,72 +6480,23 @@ void InAppWebView::handleScriptMessage(const std::string& name, const std::strin
           jsonResult = fl_value_get_string(val);
         }
       }
-
-      // Match iOS: window.flutter_inappwebview[_callHandlerID].resolve(json)
-      std::string script = "if(window." + JavaScriptBridgeJS::get_JAVASCRIPT_BRIDGE_NAME() + "[" +
-                           std::to_string(capturedCallHandlerId) +
-                           "] != null) {\n"
-                           "    window." +
-                           JavaScriptBridgeJS::get_JAVASCRIPT_BRIDGE_NAME() + "[" +
-                           std::to_string(capturedCallHandlerId) + "].resolve(" + jsonResult +
-                           ");\n"
-                           "    delete window." +
-                           JavaScriptBridgeJS::get_JAVASCRIPT_BRIDGE_NAME() + "[" +
-                           std::to_string(capturedCallHandlerId) +
-                           "];\n"
-                           "}";
-
-      webkit_web_view_evaluate_javascript(capturedTargetWebView->webview_, script.c_str(),
-                                          static_cast<gssize>(script.length()), nullptr, nullptr,
-                                          nullptr, nullptr, nullptr);
+      capturedTargetWebView->ResolveInternalHandlerWithReply(reply, jsonResult);
     };
 
-    // Match iOS: callback.error = { (code: String, message: String?, details: Any?) in ... }
-    callback->error = [capturedTargetWebView, capturedCallHandlerId](const std::string& code,
-                                                                     const std::string& message) {
-      if (capturedTargetWebView->webview_ == nullptr)
-        return;
-
-      // Match iOS: let errorMessage = code + (message != nil ? ", " + (message ?? "") : "")
+    callback->error = [capturedTargetWebView, reply](
+        const std::string& code, const std::string& message) {
       std::string errorMessage = code;
       if (!message.empty()) {
         errorMessage += ", " + message;
       }
-
-      // Escape single quotes (match iOS: replacingOccurrences(of: "\'", with: "\\'"))
-      std::string escapedMessage;
-      for (char c : errorMessage) {
-        if (c == '\'') {
-          escapedMessage += "\\'";
-        } else {
-          escapedMessage += c;
-        }
-      }
-
-      // Match iOS: window.flutter_inappwebview[_callHandlerID].reject(new Error(...))
-      std::string script = "if(window." + JavaScriptBridgeJS::get_JAVASCRIPT_BRIDGE_NAME() + "[" +
-                           std::to_string(capturedCallHandlerId) +
-                           "] != null) {\n"
-                           "    window." +
-                           JavaScriptBridgeJS::get_JAVASCRIPT_BRIDGE_NAME() + "[" +
-                           std::to_string(capturedCallHandlerId) + "].reject(new Error('" +
-                           escapedMessage +
-                           "'));\n"
-                           "    delete window." +
-                           JavaScriptBridgeJS::get_JAVASCRIPT_BRIDGE_NAME() + "[" +
-                           std::to_string(capturedCallHandlerId) +
-                           "];\n"
-                           "}";
-
-      webkit_web_view_evaluate_javascript(capturedTargetWebView->webview_, script.c_str(),
-                                          static_cast<gssize>(script.length()), nullptr, nullptr,
-                                          nullptr, nullptr, nullptr);
+      capturedTargetWebView->RejectInternalHandlerWithReply(reply, errorMessage);
     };
 
-    // Match iOS: channelDelegate.onCallJsHandler(handlerName:, data:, callback:)
-    targetWebView->channel_delegate_->onCallJsHandler(handlerName, std::move(data),
-                                                      std::move(callback));
+    targetWebView->channel_delegate_->onCallJsHandler(handlerName, std::move(data), std::move(callback));
+    return true;  // We will reply asynchronously
   }
+
+  return false;
 }
 
 void InAppWebView::dispatchPlatformReady() {

@@ -61,8 +61,6 @@ window.)JS" +
            VAR_JAVASCRIPT_BRIDGE_BRIDGE_SECRET + R"JS(';
   var _JSON_stringify;
   var _Array_slice;
-  var _setTimeout;
-  var _Promise;
   var _UserMessageHandler;
   var _postMessage;
   
@@ -70,8 +68,6 @@ window.)JS" +
     _JSON_stringify = window.JSON.stringify;
     _Array_slice = window.Array.prototype.slice;
     _Array_slice.call = window.Function.prototype.call;
-    _setTimeout = window.setTimeout;
-    _Promise = window.Promise;
     _UserMessageHandler = window.webkit.messageHandlers['callHandler'];
     _postMessage = _UserMessageHandler.postMessage;
     _postMessage.call = window.Function.prototype.call;
@@ -81,23 +77,12 @@ window.)JS" +
            get_JAVASCRIPT_BRIDGE_NAME() + R"JS(.callHandler = function() {
     var _windowId = )JS" +
            WINDOW_ID_VARIABLE_JS_SOURCE() + R"JS(;
-    var _callHandlerID = _setTimeout(function(){});
-    _postMessage.call(_UserMessageHandler, {
+    // Use with_reply API - postMessage returns a Promise directly
+    return _postMessage.call(_UserMessageHandler, {
       'handlerName': arguments[0],
-      '_callHandlerID': _callHandlerID,
       '_bridgeSecret': bridgeSecret,
       'args': _JSON_stringify(_Array_slice.call(arguments, 1)),
       '_windowId': _windowId
-    });
-    
-    return new _Promise(function(resolve, reject) {
-      try {
-        (window.top === window ? window : window.top).)JS" +
-           get_JAVASCRIPT_BRIDGE_NAME() +
-           R"JS([_callHandlerID] = {resolve: resolve, reject: reject};
-      } catch (e) {
-        resolve();
-      }
     });
   };
 })(window);

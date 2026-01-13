@@ -27,6 +27,7 @@
 #include <wpe/fdo-egl.h>
 #include <wpe/fdo.h>
 #include <wpe/webkit.h>
+#include <jsc/jsc.h>
 
 #include <array>
 #include <atomic>
@@ -305,10 +306,25 @@ class InAppWebView {
   void HideFileChooser();
   // Hide and cleanup any visible option menu (HTML <select>)
   void HideOptionMenu();
-  // Set the color input value via JavaScript
-  void SetColorInputValue(const std::string& hexColor);
-  // Cancel the color input selection via JavaScript
-  void CancelColorInput();
+
+  // Date picker methods (for <input type="date/time"> support in WPE)
+  // Show the native date/time picker dialog
+  void ShowDatePicker(const std::string& inputType, const std::string& value,
+                      const std::string& min, const std::string& max,
+                      const std::string& step, int x, int y);
+  // Hide and cleanup any visible date picker
+  void HideDatePicker();
+
+  // Resolve an internal handler's Promise with a JSON result via WebKitScriptMessageReply
+  // Used by color/date picker dialogs to send the result back to JavaScript (works for iframes)
+  void ResolveInternalHandlerWithReply(WebKitScriptMessageReply* reply, const std::string& jsonResult);
+
+  // JavaScript bridge handler using with_reply API (enables iframe support)
+  // Returns true if handled, false otherwise
+  bool handleScriptMessageWithReply(const std::string& body, WebKitScriptMessageReply* reply);
+  
+  // Reject an internal handler's Promise with an error message via WebKitScriptMessageReply
+  void RejectInternalHandlerWithReply(WebKitScriptMessageReply* reply, const std::string& errorMessage);
 
   // Hide all custom popups (context menu, color picker, file chooser, option menu, etc.)
   // Use this when the webview state changes (resize, scroll, load, focus loss, etc.)
@@ -560,6 +576,17 @@ class InAppWebView {
   GtkWidget* active_color_dialog_ = nullptr;  // Active color picker dialog (non-blocking)
   bool active_color_alpha_enabled_ = false;   // Alpha enabled for active dialog
   int64_t color_dialog_show_time_ = 0;         // Time when dialog was shown (to prevent immediate close)
+  WebKitScriptMessageReply* pending_color_reply_ = nullptr;  // WebKit reply for Promise resolution
+
+  // Date picker state (for <input type="date/time/etc.> support in WPE)
+  // Public because accessed from C-style GTK callback
+  std::string pending_date_input_value_;     // Current value from the input
+  std::string pending_date_input_type_;      // Type: date, datetime-local, time, month, week
+  std::string pending_date_input_min_;       // Min constraint
+  std::string pending_date_input_max_;       // Max constraint
+  GtkWidget* active_date_dialog_ = nullptr;  // Active date picker dialog
+  int64_t date_dialog_show_time_ = 0;        // Time when dialog was shown
+  WebKitScriptMessageReply* pending_date_reply_ = nullptr;  // WebKit reply for Promise resolution
 
   // File chooser state (for <input type="file"> support)
   // Public because accessed from C-style GTK callback
@@ -650,7 +677,6 @@ class InAppWebView {
   void SendWpeKeyboardEvent(uint32_t key, uint32_t state, uint32_t modifiers);
 
   // === JavaScript bridge ===
-  void handleScriptMessage(const std::string& name, const std::string& body);
   void dispatchPlatformReady();
 
   // === Custom Scheme Handler ===

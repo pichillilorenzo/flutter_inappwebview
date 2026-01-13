@@ -84,12 +84,39 @@ class _MyAppState extends State<MyApp> {
                     child: LinuxInAppWebViewWidget(
                       LinuxInAppWebViewWidgetCreationParams(
                         key: webViewKey,
-                        initialUrlRequest: URLRequest(
-                          url: WebUri("https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/select"),
-                        ),
+                        // initialUrlRequest: URLRequest(url: WebUri("https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/input/color"),),
+                        initialFile: "assets/date_input_test.html",
                         initialSettings: settings,
                         onWebViewCreated: (controller) {
                           webViewController = controller;
+
+                          // Register a test JavaScript handler
+                          controller.addJavaScriptHandler(
+                            handlerName: 'testHandler',
+                            callback: (args) {
+                              if (kDebugMode) {
+                                print('[TEST] testHandler called with args: $args');
+                              }
+                              // Return a response that JavaScript will receive
+                              return {
+                                'success': true,
+                                'message': 'Hello from Dart!',
+                                'receivedArgs': args
+                              };
+                            },
+                          );
+
+                          // Register another handler that returns a simple string
+                          controller.addJavaScriptHandler(
+                            handlerName: 'greetHandler',
+                            callback: (args) {
+                              String name = args.isNotEmpty ? args[0] : 'World';
+                              if (kDebugMode) {
+                                print('[TEST] greetHandler called with name: $name');
+                              }
+                              return 'Hello, $name!';
+                            },
+                          );
                         },
                         onLoadStart: (controller, url) {
                           setState(() {
@@ -136,6 +163,46 @@ class _MyAppState extends State<MyApp> {
                             this.url = url.toString();
                             urlController.text = this.url;
                           });
+                          await Future.delayed(Duration(seconds: 1));
+
+                          // Test JavaScript handlers after page loads
+                          if (kDebugMode) {
+                            print('[TEST] Testing JavaScript handlers...');
+                          }
+
+                          // Test 1: Call testHandler with arguments
+                          await controller.evaluateJavascript(source: '''
+                            (async function() {
+                              try {
+                                console.log('[JS TEST] Calling testHandler...');
+                                var result = await window.flutter_inappwebview.callHandler('testHandler', 'arg1', 123, {key: 'value'});
+                                console.log('[JS TEST] testHandler result:', JSON.stringify(result));
+                                return JSON.stringify(result);
+                              } catch (e) {
+                                console.error('[JS TEST] testHandler error:', e);
+                                return 'error: ' + e.message;
+                              }
+                            })();
+                          ''');
+
+                          // Test 2: Call greetHandler
+                          await controller.evaluateJavascript(source: '''
+                            (async function() {
+                              try {
+                                console.log('[JS TEST] Calling greetHandler...');
+                                var result = await window.flutter_inappwebview.callHandler('greetHandler', 'Flutter');
+                                console.log('[JS TEST] greetHandler result:', result);
+                                return result;
+                              } catch (e) {
+                                console.error('[JS TEST] greetHandler error:', e);
+                                return 'error: ' + e.message;
+                              }
+                            })();
+                          ''');
+
+                          if (kDebugMode) {
+                            print('[TEST] JavaScript handler tests completed');
+                          }
                         },
                         onReceivedError: (controller, request, error) {},
                         onReceivedHttpError: (controller, request, response) {},

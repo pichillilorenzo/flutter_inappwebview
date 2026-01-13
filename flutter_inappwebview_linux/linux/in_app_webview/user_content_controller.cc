@@ -35,8 +35,14 @@ UserContentController::~UserContentController() {
       webkit_user_content_manager_unregister_script_message_handler(content_manager_, name.c_str(),
                                                                     nullptr);
     }
+    for (const auto& name : registered_message_handlers_with_reply_) {
+      webkit_user_content_manager_unregister_script_message_handler(content_manager_, name.c_str(),
+                                                                    nullptr);
+    }
   }
   registered_message_handlers_.clear();
+  registered_message_handlers_with_reply_.clear();
+  script_message_with_reply_handlers_.clear();
 
   // Clear all scripts when destroyed
   if (manager_valid) {
@@ -169,14 +175,51 @@ void UserContentController::registerScriptMessageHandler(const std::string& name
   registered_message_handlers_.push_back(name);
 }
 
+void UserContentController::setScriptMessageWithReplyHandler(const std::string& name,
+                                                             ScriptMessageWithReplyHandler handler) {
+  script_message_with_reply_handlers_[name] = handler;
+}
+
+void UserContentController::registerScriptMessageHandlerWithReply(const std::string& name) {
+  if (content_manager_ == nullptr) {
+    return;
+  }
+
+  // Check if already registered
+  for (const auto& existing : registered_message_handlers_with_reply_) {
+    if (existing == name) {
+      return;
+    }
+  }
+
+  // Build the signal name: "script-message-with-reply-received::<name>"
+  std::string signalName = "script-message-with-reply-received::" + name;
+
+  // Connect the signal
+  g_signal_connect(content_manager_, signalName.c_str(),
+                   G_CALLBACK(onScriptMessageWithReplyReceived), this);
+
+  // Register the handler with WebKit's with_reply API (WPE API since 2.40)
+  gboolean success = webkit_user_content_manager_register_script_message_handler_with_reply(
+      content_manager_, name.c_str(), nullptr);
+
+  if (!success) {
+    errorLog("UserContentController: Failed to register message handler with reply: " + name);
+    return;
+  }
+
+  registered_message_handlers_with_reply_.push_back(name);
+}
+
 void UserContentController::addPluginScript(std::unique_ptr<PluginScript> pluginScript) {
   if (pluginScript == nullptr || content_manager_ == nullptr) {
     return;
   }
 
-  // Register any message handlers required by this script
+  // Register any message handlers required by this script using with_reply API
+  // The with_reply API allows proper Promise resolution in iframes
   for (const auto& handlerName : pluginScript->messageHandlerNames) {
-    registerScriptMessageHandler(handlerName);
+    registerScriptMessageHandlerWithReply(handlerName);
   }
 
   // Create a UserScript from the PluginScript
@@ -210,20 +253,23 @@ void UserContentController::onScriptMessageReceived(WebKitUserContentManager* ma
     return;
   }
 
+  // Get the JSCContext from the value - this is the context of the frame that sent the message
+  // (for iframe support). Must be extracted before any scope issues.
+  JSCContext* jscContext = jsc_value_get_context(value);
+
   // Convert JSC value to string (JSON)
   gchar* jsonStr = nullptr;
 
   if (jsc_value_is_object(value)) {
     // Get the context and use JSON.stringify
-    JSCContext* context = jsc_value_get_context(value);
-    if (context != nullptr) {
+    if (jscContext != nullptr) {
       // Evaluate JSON.stringify(value) properly
       // First, create a reference to the value in a global variable
-      jsc_context_set_value(context, "__inappwebview_temp_value", value);
+      jsc_context_set_value(jscContext, "__inappwebview_temp_value", value);
 
       // Then stringify it
       JSCValue* jsonResult =
-          jsc_context_evaluate(context, "JSON.stringify(__inappwebview_temp_value)", -1);
+          jsc_context_evaluate(jscContext, "JSON.stringify(__inappwebview_temp_value)", -1);
 
       if (jsonResult != nullptr && jsc_value_is_string(jsonResult)) {
         jsonStr = jsc_value_to_string(jsonResult);
@@ -236,7 +282,7 @@ void UserContentController::onScriptMessageReceived(WebKitUserContentManager* ma
 
       // Remove the temp variable (ignore result)
       JSCValue* deleteResult =
-          jsc_context_evaluate(context, "delete __inappwebview_temp_value", -1);
+          jsc_context_evaluate(jscContext, "delete __inappwebview_temp_value", -1);
       if (deleteResult != nullptr) {
         g_object_unref(deleteResult);
       }
@@ -248,9 +294,9 @@ void UserContentController::onScriptMessageReceived(WebKitUserContentManager* ma
   if (jsonStr != nullptr) {
     // The handler name is extracted from the signal name by WebKit,
     // but for our purposes we need to get it from the message body
-    self->script_message_handler_("callHandler", std::string(jsonStr));
+    // Pass the JSCContext so internal handlers can resolve Promises in the correct frame (iframe support)
+    self->script_message_handler_("callHandler", std::string(jsonStr), jscContext);
     g_free(jsonStr);
-  } else {
   }
 }
 
@@ -320,6 +366,86 @@ void UserContentController::rebuildScripts() {
       webkit_user_script_unref(wkScript);
     }
   }
+}
+
+gboolean UserContentController::onScriptMessageWithReplyReceived(
+    WebKitUserContentManager* manager,
+    JSCValue* value,
+    WebKitScriptMessageReply* reply,
+    gpointer user_data) {
+  auto* self = static_cast<UserContentController*>(user_data);
+
+  if (self == nullptr) {
+    return FALSE;
+  }
+
+  if (value == nullptr || reply == nullptr) {
+    return FALSE;
+  }
+
+  // Convert JSC value to JSON string
+  gchar* jsonStr = nullptr;
+  JSCContext* jscContext = jsc_value_get_context(value);
+
+  if (jsc_value_is_object(value)) {
+    if (jscContext != nullptr) {
+      jsc_context_set_value(jscContext, "__inappwebview_temp_value", value);
+      JSCValue* jsonResult =
+          jsc_context_evaluate(jscContext, "JSON.stringify(__inappwebview_temp_value)", -1);
+      if (jsonResult != nullptr && jsc_value_is_string(jsonResult)) {
+        jsonStr = jsc_value_to_string(jsonResult);
+      }
+      if (jsonResult != nullptr) {
+        g_object_unref(jsonResult);
+      }
+      JSCValue* deleteResult =
+          jsc_context_evaluate(jscContext, "delete __inappwebview_temp_value", -1);
+      if (deleteResult != nullptr) {
+        g_object_unref(deleteResult);
+      }
+    }
+  } else if (jsc_value_is_string(value)) {
+    jsonStr = jsc_value_to_string(value);
+  }
+
+  if (jsonStr == nullptr) {
+    return FALSE;
+  }
+
+  std::string jsonBody(jsonStr);
+  g_free(jsonStr);
+
+  // The signal detail contains the WebKit handler name (e.g., "callHandler")
+  // We need to try all registered handlers since we can't easily extract the detail
+  // The "callHandler" handler is the main one that handles all JavaScript bridge calls
+  
+  // First try to find the handler using the handlerName from the JSON body
+  // This is for backwards compatibility with handlers that use different names
+  try {
+    json body = json::parse(jsonBody);
+    if (body.contains("handlerName") && body["handlerName"].is_string()) {
+      std::string handlerName = body["handlerName"].get<std::string>();
+      
+      auto it = self->script_message_with_reply_handlers_.find(handlerName);
+      if (it != self->script_message_with_reply_handlers_.end()) {
+        bool handled = it->second(jsonBody, reply);
+        return handled ? TRUE : FALSE;
+      }
+    }
+  } catch (const std::exception& e) {
+    // Ignore parse errors, try fallback
+  }
+  
+  // Fallback: If "callHandler" is registered, use it as the main handler
+  // This is the primary path for the JavaScript bridge
+  auto callHandlerIt = self->script_message_with_reply_handlers_.find("callHandler");
+  if (callHandlerIt != self->script_message_with_reply_handlers_.end()) {
+    bool handled = callHandlerIt->second(jsonBody, reply);
+    return handled ? TRUE : FALSE;
+  }
+
+  errorLog("UserContentController: No handler found for with_reply message");
+  return FALSE;
 }
 
 }  // namespace flutter_inappwebview_plugin

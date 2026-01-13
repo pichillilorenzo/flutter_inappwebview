@@ -9,6 +9,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_platform_interface.dart';
 
+import '../in_app_browser/in_app_browser.dart';
 import '../web_message/web_message_channel.dart';
 import '../web_message/web_message_listener.dart';
 import '_static_channel.dart';
@@ -61,6 +62,11 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController
   static final Map<InAppWebViewKeepAlive, InAppWebViewControllerKeepAliveProps?>
   _keepAliveMap = {};
 
+  LinuxInAppBrowser? _inAppBrowser;
+
+  PlatformInAppBrowserEvents? get _inAppBrowserEventHandler =>
+      _inAppBrowser?.eventHandler;
+
   dynamic _controllerFromPlatform;
 
   LinuxInAppWebViewController(
@@ -104,6 +110,38 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController
     return _staticValue;
   }
 
+  LinuxInAppWebViewController.fromInAppBrowser(
+    PlatformInAppWebViewControllerCreationParams params,
+    MethodChannel channel,
+    LinuxInAppBrowser inAppBrowser,
+    UnmodifiableListView<UserScript>? initialUserScripts,
+  ) : super.implementation(
+        params is LinuxInAppWebViewControllerCreationParams
+            ? params
+            : LinuxInAppWebViewControllerCreationParams.fromPlatformInAppWebViewControllerCreationParams(
+                params,
+              ),
+      ) {
+    this.channel = channel;
+    this._inAppBrowser = inAppBrowser;
+
+    if (initialUserScripts != null) {
+      for (final userScript in initialUserScripts) {
+        if (userScript.injectionTime ==
+            UserScriptInjectionTime.AT_DOCUMENT_START) {
+          this._userScripts[UserScriptInjectionTime.AT_DOCUMENT_START]?.add(
+            userScript,
+          );
+        } else {
+          this._userScripts[UserScriptInjectionTime.AT_DOCUMENT_END]?.add(
+            userScript,
+          );
+        }
+      }
+    }
+    this._init(params);
+  }
+
   void _init(PlatformInAppWebViewControllerCreationParams params) {
     _controllerFromPlatform =
         params.webviewParams?.controllerFromPlatform?.call(this) ?? this;
@@ -136,8 +174,10 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController
   _debugLog(String method, dynamic args) {
     debugLog(
       className: this.runtimeType.toString(),
-      name: "WebView",
-      id: id?.toString(),
+      name: _inAppBrowser == null
+          ? "WebView"
+          : _inAppBrowser.runtimeType.toString(),
+      id: (getViewId() ?? _inAppBrowser?.id).toString(),
       debugLoggingSettings: PlatformInAppWebViewController.debugLoggingSettings,
       method: method,
       args: args,
@@ -1061,6 +1101,11 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController
   Future<String> get tRexRunnerCss async => await rootBundle.loadString(
     'packages/flutter_inappwebview/assets/t_rex_runner/t-rex.css',
   );
+
+  @override
+  dynamic getViewId() {
+    return id;
+  }
 
   @override
   Future<bool> handlesURLScheme(String urlScheme) async {

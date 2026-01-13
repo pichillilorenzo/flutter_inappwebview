@@ -773,8 +773,7 @@ class WebResourceErrorType_ {
       ),
       EnumLinuxPlatform(
         apiName: 'G_TLS_CERTIFICATE_INSECURE',
-        apiUrl:
-            'https://docs.gtk.org/gio/flags.TlsCertificateFlags.html',
+        apiUrl: 'https://docs.gtk.org/gio/flags.TlsCertificateFlags.html',
         value: 32,
       ),
     ],
@@ -800,8 +799,7 @@ class WebResourceErrorType_ {
       ),
       EnumLinuxPlatform(
         apiName: 'G_TLS_CERTIFICATE_EXPIRED',
-        apiUrl:
-            'https://docs.gtk.org/gio/flags.TlsCertificateFlags.html',
+        apiUrl: 'https://docs.gtk.org/gio/flags.TlsCertificateFlags.html',
         value: 8,
       ),
     ],
@@ -826,8 +824,7 @@ class WebResourceErrorType_ {
       ),
       EnumLinuxPlatform(
         apiName: 'G_TLS_CERTIFICATE_UNKNOWN_CA',
-        apiUrl:
-            'https://docs.gtk.org/gio/flags.TlsCertificateFlags.html',
+        apiUrl: 'https://docs.gtk.org/gio/flags.TlsCertificateFlags.html',
         value: 1,
       ),
     ],
@@ -873,8 +870,7 @@ class WebResourceErrorType_ {
       ),
       EnumLinuxPlatform(
         apiName: 'G_TLS_CERTIFICATE_NOT_ACTIVATED',
-        apiUrl:
-            'https://docs.gtk.org/gio/flags.TlsCertificateFlags.html',
+        apiUrl: 'https://docs.gtk.org/gio/flags.TlsCertificateFlags.html',
         value: 4,
       ),
     ],
@@ -1358,9 +1354,7 @@ class WebResourceErrorType_ {
       ),
     ],
   )
-  static const POLICY_FAILED = WebResourceErrorType_._internal(
-    "POLICY_FAILED",
-  );
+  static const POLICY_FAILED = WebResourceErrorType_._internal("POLICY_FAILED");
 
   ///The MIME type of the resource is not supported.
   @EnumSupportedPlatforms(
@@ -1419,8 +1413,9 @@ class WebResourceErrorType_ {
       ),
     ],
   )
-  static const CANNOT_USE_RESTRICTED_PORT =
-      WebResourceErrorType_._internal("CANNOT_USE_RESTRICTED_PORT");
+  static const CANNOT_USE_RESTRICTED_PORT = WebResourceErrorType_._internal(
+    "CANNOT_USE_RESTRICTED_PORT",
+  );
 
   ///Download failure due to network error.
   @EnumSupportedPlatforms(
@@ -1448,8 +1443,9 @@ class WebResourceErrorType_ {
       ),
     ],
   )
-  static const DOWNLOAD_CANCELLED_BY_USER =
-      WebResourceErrorType_._internal("DOWNLOAD_CANCELLED_BY_USER");
+  static const DOWNLOAD_CANCELLED_BY_USER = WebResourceErrorType_._internal(
+    "DOWNLOAD_CANCELLED_BY_USER",
+  );
 
   ///Download failure due to destination error.
   @EnumSupportedPlatforms(
@@ -1462,16 +1458,16 @@ class WebResourceErrorType_ {
       ),
     ],
   )
-  static const DOWNLOAD_DESTINATION_FAILED =
-      WebResourceErrorType_._internal("DOWNLOAD_DESTINATION_FAILED");
+  static const DOWNLOAD_DESTINATION_FAILED = WebResourceErrorType_._internal(
+    "DOWNLOAD_DESTINATION_FAILED",
+  );
 
   ///The certificate does not match the expected identity of the site.
   @EnumSupportedPlatforms(
     platforms: [
       EnumLinuxPlatform(
         apiName: 'G_TLS_CERTIFICATE_BAD_IDENTITY',
-        apiUrl:
-            'https://docs.gtk.org/gio/flags.TlsCertificateFlags.html',
+        apiUrl: 'https://docs.gtk.org/gio/flags.TlsCertificateFlags.html',
         value: 2,
       ),
     ],
@@ -1484,26 +1480,26 @@ class WebResourceErrorType_ {
     platforms: [
       EnumLinuxPlatform(
         apiName: 'G_TLS_CERTIFICATE_REVOKED',
-        apiUrl:
-            'https://docs.gtk.org/gio/flags.TlsCertificateFlags.html',
+        apiUrl: 'https://docs.gtk.org/gio/flags.TlsCertificateFlags.html',
         value: 16,
       ),
     ],
   )
-  static const SERVER_CERTIFICATE_REVOKED =
-      WebResourceErrorType_._internal("SERVER_CERTIFICATE_REVOKED");
+  static const SERVER_CERTIFICATE_REVOKED = WebResourceErrorType_._internal(
+    "SERVER_CERTIFICATE_REVOKED",
+  );
 
   ///Some other error occurred validating the certificate.
   @EnumSupportedPlatforms(
     platforms: [
       EnumLinuxPlatform(
         apiName: 'G_TLS_CERTIFICATE_GENERIC_ERROR',
-        apiUrl:
-            'https://docs.gtk.org/gio/flags.TlsCertificateFlags.html',
+        apiUrl: 'https://docs.gtk.org/gio/flags.TlsCertificateFlags.html',
         value: 64,
       ),
     ],
   )
-  static const TLS_CERTIFICATE_GENERIC_ERROR =
-      WebResourceErrorType_._internal("TLS_CERTIFICATE_GENERIC_ERROR");
+  static const TLS_CERTIFICATE_GENERIC_ERROR = WebResourceErrorType_._internal(
+    "TLS_CERTIFICATE_GENERIC_ERROR",
+  );
 }

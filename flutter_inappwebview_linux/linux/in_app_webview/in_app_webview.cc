@@ -259,7 +259,9 @@ void InAppWebView::AttachChannel(FlBinaryMessenger* messenger, const std::string
     return;
   }
 
-  std::string channelName = std::string(METHOD_CHANNEL_NAME_PREFIX) + channel_id;
+  // When a full channel name is provided (e.g., from InAppBrowser), use it directly
+  // This allows InAppBrowser to route WebView events through its own channel
+  std::string channelName = channel_id;
   channel_delegate_ = std::make_unique<WebViewChannelDelegate>(this, messenger, channelName);
 
   // Attach FindInteractionController channel with the same ID
@@ -656,6 +658,13 @@ void InAppWebView::RegisterEventHandlers() {
   WebKitNetworkSession* network_session = webkit_web_view_get_network_session(webview_);
   if (network_session != nullptr) {
     download_started_handler_id_ = g_signal_connect(network_session, "download-started", G_CALLBACK(OnDownloadStarted), this);
+  }
+
+  // Connect to back-forward-list changed signal for navigation state updates
+  // This enables InAppBrowser back/forward button state tracking
+  WebKitBackForwardList* bfList = webkit_web_view_get_back_forward_list(webview_);
+  if (bfList != nullptr) {
+    g_signal_connect(bfList, "changed", G_CALLBACK(OnBackForwardListChanged), this);
   }
 
   // Add frame displayed callback (WPE-specific)
@@ -2747,6 +2756,14 @@ void InAppWebView::SetOnCursorChanged(std::function<void(const std::string&)> ca
   on_cursor_changed_ = std::move(callback);
 }
 
+void InAppWebView::SetOnProgressChanged(std::function<void(double)> callback) {
+  on_progress_changed_ = std::move(callback);
+}
+
+void InAppWebView::SetOnNavigationStateChanged(std::function<void()> callback) {
+  on_navigation_state_changed_ = std::move(callback);
+}
+
 void InAppWebView::OnShouldOverrideUrlLoadingDecision(int64_t decision_id, bool allow) {
   auto it = pending_policy_decisions_.find(decision_id);
   if (it == pending_policy_decisions_.end()) {
@@ -2891,13 +2908,19 @@ gboolean InAppWebView::OnDecidePolicy(WebKitWebView* web_view, WebKitPolicyDecis
 void InAppWebView::OnNotifyEstimatedLoadProgress(GObject* object, GParamSpec* pspec,
                                                  gpointer user_data) {
   auto* self = static_cast<InAppWebView*>(user_data);
-  if (self->channel_delegate_ == nullptr)
-    return;
 
   double progress = webkit_web_view_get_estimated_load_progress(WEBKIT_WEB_VIEW(object));
   int progress_percent = static_cast<int>(progress * 100);
 
-  self->channel_delegate_->onProgressChanged(progress_percent);
+  // Notify Dart via channel delegate
+  if (self->channel_delegate_) {
+    self->channel_delegate_->onProgressChanged(progress_percent);
+  }
+
+  // Notify native progress callback (for InAppBrowser)
+  if (self->on_progress_changed_) {
+    self->on_progress_changed_(progress);
+  }
 }
 
 void InAppWebView::OnNotifyTitle(GObject* object, GParamSpec* pspec, gpointer user_data) {
@@ -5518,12 +5541,13 @@ void InAppWebView::OnMouseTargetChanged(WebKitWebView* web_view,
   }
 
   // Determine cursor based on hit test result
-  std::string cursor_name = "basic";
+  // Use CSS cursor names which gdk_cursor_new_from_name() supports
+  std::string cursor_name = "default";
 
   if (hit_test_result == nullptr) {
     // No hit test result, use default cursor
   } else if (webkit_hit_test_result_context_is_link(hit_test_result)) {
-    cursor_name = "click";  // Hand cursor for links
+    cursor_name = "pointer";  // Hand cursor for links
   } else if (webkit_hit_test_result_context_is_editable(hit_test_result)) {
     cursor_name = "text";  // Text cursor for editable content
   } else if (webkit_hit_test_result_context_is_selection(hit_test_result)) {
@@ -5531,12 +5555,12 @@ void InAppWebView::OnMouseTargetChanged(WebKitWebView* web_view,
   } else if (webkit_hit_test_result_context_is_image(hit_test_result)) {
     // Check if image is also a link
     if (webkit_hit_test_result_context_is_link(hit_test_result)) {
-      cursor_name = "click";
+      cursor_name = "pointer";
     }
   } else if (webkit_hit_test_result_context_is_media(hit_test_result)) {
-    cursor_name = "basic";
+    cursor_name = "default";
   } else if (webkit_hit_test_result_context_is_scrollbar(hit_test_result)) {
-    cursor_name = "basic";
+    cursor_name = "default";
   }
 
   // Only emit if cursor changed
@@ -5885,6 +5909,18 @@ gboolean InAppWebView::OnShowOptionMenu(WebKitWebView* web_view,
   return TRUE;  // We handled it
 }
 
+// === Navigation State Signal Handler ===
+
+void InAppWebView::OnBackForwardListChanged(WebKitBackForwardList* list,
+                                            WebKitBackForwardListItem* item_added,
+                                            gpointer items_removed,
+                                            gpointer user_data) {
+  auto* self = static_cast<InAppWebView*>(user_data);
+  if (self && self->on_navigation_state_changed_) {
+    self->on_navigation_state_changed_();
+  }
+}
+
 // === Download Signal Handler ===
 
 void InAppWebView::OnDownloadStarted(WebKitNetworkSession* network_session,
@@ -5945,13 +5981,15 @@ void InAppWebView::OnDownloadStarted(WebKitNetworkSession* network_session,
 // === Cursor Detection ===
 
 void InAppWebView::updateCursorFromCssStyle(const std::string& cursor_style) {
-  // Map CSS cursor values to Flutter cursor names
-  std::string cursor_name = "basic";
+  // Use CSS cursor names - supported by both GDK and Flutter cursor mapping
+  std::string cursor_name = "default";
 
   if (cursor_style == "pointer" || cursor_style == "hand") {
-    cursor_name = "click";
-  } else if (cursor_style == "text" || cursor_style == "vertical-text") {
+    cursor_name = "pointer";
+  } else if (cursor_style == "text") {
     cursor_name = "text";
+  } else if (cursor_style == "vertical-text") {
+    cursor_name = "vertical-text";
   } else if (cursor_style == "wait") {
     cursor_name = "wait";
   } else if (cursor_style == "progress") {
@@ -5959,17 +5997,21 @@ void InAppWebView::updateCursorFromCssStyle(const std::string& cursor_style) {
   } else if (cursor_style == "help") {
     cursor_name = "help";
   } else if (cursor_style == "crosshair") {
-    cursor_name = "precise";
-  } else if (cursor_style == "move" || cursor_style == "all-scroll") {
+    cursor_name = "crosshair";
+  } else if (cursor_style == "move") {
     cursor_name = "move";
+  } else if (cursor_style == "all-scroll") {
+    cursor_name = "all-scroll";
   } else if (cursor_style == "grab") {
     cursor_name = "grab";
   } else if (cursor_style == "grabbing") {
     cursor_name = "grabbing";
-  } else if (cursor_style == "not-allowed" || cursor_style == "no-drop") {
-    cursor_name = "forbidden";
+  } else if (cursor_style == "not-allowed") {
+    cursor_name = "not-allowed";
+  } else if (cursor_style == "no-drop") {
+    cursor_name = "no-drop";
   } else if (cursor_style == "context-menu") {
-    cursor_name = "contextMenu";
+    cursor_name = "context-menu";
   } else if (cursor_style == "cell") {
     cursor_name = "cell";
   } else if (cursor_style == "copy") {
@@ -5979,25 +6021,39 @@ void InAppWebView::updateCursorFromCssStyle(const std::string& cursor_style) {
   } else if (cursor_style == "none") {
     cursor_name = "none";
   } else if (cursor_style == "col-resize") {
-    cursor_name = "resizeColumn";
+    cursor_name = "col-resize";
   } else if (cursor_style == "row-resize") {
-    cursor_name = "resizeRow";
-  } else if (cursor_style == "n-resize" || cursor_style == "ns-resize") {
-    cursor_name = "resizeUpDown";
-  } else if (cursor_style == "e-resize" || cursor_style == "ew-resize" ||
-             cursor_style == "w-resize") {
-    cursor_name = "resizeLeftRight";
-  } else if (cursor_style == "ne-resize" || cursor_style == "sw-resize") {
-    cursor_name = "resizeUpRightDownLeft";
-  } else if (cursor_style == "nw-resize" || cursor_style == "se-resize" ||
-             cursor_style == "nesw-resize" || cursor_style == "nwse-resize") {
-    cursor_name = "resizeUpLeftDownRight";
+    cursor_name = "row-resize";
+  } else if (cursor_style == "n-resize") {
+    cursor_name = "n-resize";
+  } else if (cursor_style == "s-resize") {
+    cursor_name = "s-resize";
+  } else if (cursor_style == "e-resize") {
+    cursor_name = "e-resize";
+  } else if (cursor_style == "w-resize") {
+    cursor_name = "w-resize";
+  } else if (cursor_style == "ns-resize") {
+    cursor_name = "ns-resize";
+  } else if (cursor_style == "ew-resize") {
+    cursor_name = "ew-resize";
+  } else if (cursor_style == "ne-resize") {
+    cursor_name = "ne-resize";
+  } else if (cursor_style == "nw-resize") {
+    cursor_name = "nw-resize";
+  } else if (cursor_style == "se-resize") {
+    cursor_name = "se-resize";
+  } else if (cursor_style == "sw-resize") {
+    cursor_name = "sw-resize";
+  } else if (cursor_style == "nesw-resize") {
+    cursor_name = "nesw-resize";
+  } else if (cursor_style == "nwse-resize") {
+    cursor_name = "nwse-resize";
   } else if (cursor_style == "zoom-in") {
-    cursor_name = "zoomIn";
+    cursor_name = "zoom-in";
   } else if (cursor_style == "zoom-out") {
-    cursor_name = "zoomOut";
+    cursor_name = "zoom-out";
   }
-  // default, auto, inherit -> "basic"
+  // default, auto, inherit -> "default"
 
   if (cursor_name != last_cursor_name_) {
     last_cursor_name_ = cursor_name;

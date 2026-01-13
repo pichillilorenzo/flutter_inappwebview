@@ -89,6 +89,11 @@ class PlatformInAppBrowserCreationParams {
     IOSPlatform(),
     MacOSPlatform(),
     WindowsPlatform(),
+    LinuxPlatform(
+      apiName: 'GtkWindow + WPE WebKit',
+      apiUrl:
+          'https://wpewebkit.org/reference/stable/wpe-webkit-2.0/class.WebView.html',
+    ),
   ],
 )
 abstract class PlatformInAppBrowser extends PlatformInterface
@@ -110,6 +115,7 @@ abstract class PlatformInAppBrowser extends PlatformInterface
       IOSPlatform(),
       MacOSPlatform(),
       WindowsPlatform(),
+      LinuxPlatform(),
     ],
   )
   String get id {
@@ -157,6 +163,7 @@ There isn't any way to add/remove user scripts specific to iOS window WebViews.
 This is a limitation of the native WebKit APIs.""",
       ),
       WindowsPlatform(),
+      LinuxPlatform(),
     ],
   )
   UnmodifiableListView<UserScript>? get initialUserScripts =>
@@ -171,6 +178,7 @@ This is a limitation of the native WebKit APIs.""",
       IOSPlatform(),
       MacOSPlatform(),
       WindowsPlatform(),
+      LinuxPlatform(),
     ],
   )
   int? get windowId => params.windowId;
@@ -252,6 +260,7 @@ This is a limitation of the native WebKit APIs.""",
       IOSPlatform(),
       MacOSPlatform(),
       WindowsPlatform(),
+      LinuxPlatform(),
     ],
   )
   Future<void> openUrlRequest({
@@ -312,6 +321,7 @@ This is a limitation of the native WebKit APIs.""",
       IOSPlatform(),
       MacOSPlatform(),
       WindowsPlatform(),
+      LinuxPlatform(),
     ],
   )
   Future<void> openFile({
@@ -346,6 +356,7 @@ This is a limitation of the native WebKit APIs.""",
       IOSPlatform(),
       MacOSPlatform(),
       WindowsPlatform(),
+      LinuxPlatform(),
     ],
   )
   Future<void> openData({
@@ -376,6 +387,7 @@ This is a limitation of the native WebKit APIs.""",
       IOSPlatform(),
       MacOSPlatform(),
       WindowsPlatform(),
+      LinuxPlatform(),
     ],
   )
   Future<void> openWithSystemBrowser({required WebUri url}) {
@@ -514,6 +526,7 @@ This is a limitation of the native WebKit APIs.""",
       IOSPlatform(),
       MacOSPlatform(),
       WindowsPlatform(),
+      LinuxPlatform(),
     ],
   )
   Future<void> show() {
@@ -531,6 +544,7 @@ This is a limitation of the native WebKit APIs.""",
       IOSPlatform(),
       MacOSPlatform(),
       WindowsPlatform(),
+      LinuxPlatform(),
     ],
   )
   Future<void> hide() {
@@ -548,6 +562,7 @@ This is a limitation of the native WebKit APIs.""",
       IOSPlatform(),
       MacOSPlatform(),
       WindowsPlatform(),
+      LinuxPlatform(),
     ],
   )
   Future<void> close() {
@@ -567,6 +582,7 @@ This is a limitation of the native WebKit APIs.""",
       IOSPlatform(),
       MacOSPlatform(),
       WindowsPlatform(),
+      LinuxPlatform(),
     ],
   )
   Future<bool> isHidden() {
@@ -612,6 +628,7 @@ This is a limitation of the native WebKit APIs.""",
       IOSPlatform(),
       MacOSPlatform(),
       WindowsPlatform(),
+      LinuxPlatform(),
     ],
   )
   Future<void> setSettings({required InAppBrowserClassSettings settings}) {
@@ -631,6 +648,7 @@ This is a limitation of the native WebKit APIs.""",
       IOSPlatform(),
       MacOSPlatform(),
       WindowsPlatform(),
+      LinuxPlatform(),
     ],
   )
   Future<InAppBrowserClassSettings?> getSettings() {
@@ -650,6 +668,7 @@ This is a limitation of the native WebKit APIs.""",
       IOSPlatform(),
       MacOSPlatform(),
       WindowsPlatform(),
+      LinuxPlatform(),
     ],
   )
   bool isOpened() {
@@ -669,6 +688,7 @@ This is a limitation of the native WebKit APIs.""",
       IOSPlatform(),
       MacOSPlatform(),
       WindowsPlatform(),
+      LinuxPlatform(),
     ],
   )
   @override
@@ -719,6 +739,7 @@ This is a limitation of the native WebKit APIs.""",
     IOSPlatform(),
     MacOSPlatform(),
     WindowsPlatform(),
+    LinuxPlatform(),
   ],
 )
 abstract class PlatformInAppBrowserEvents {
@@ -733,6 +754,7 @@ abstract class PlatformInAppBrowserEvents {
       IOSPlatform(),
       MacOSPlatform(),
       WindowsPlatform(),
+      LinuxPlatform(),
     ],
   )
   void onBrowserCreated() {}
@@ -748,6 +770,7 @@ abstract class PlatformInAppBrowserEvents {
       IOSPlatform(),
       MacOSPlatform(),
       WindowsPlatform(),
+      LinuxPlatform(),
     ],
   )
   void onExit() {}

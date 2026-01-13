@@ -110,6 +110,10 @@ class BrowserOptions {
     IOSPlatform(),
     MacOSPlatform(),
     WindowsPlatform(),
+    LinuxPlatform(
+      apiName: 'GtkWindow',
+      apiUrl: 'https://docs.gtk.org/gtk3/class.Window.html',
+    ),
   ],
 )
 class InAppBrowserSettings_
@@ -122,37 +126,63 @@ class InAppBrowserSettings_
       IOSPlatform(),
       MacOSPlatform(),
       WindowsPlatform(),
+      LinuxPlatform(),
     ],
   )
   bool? hidden;
 
   ///Set to `true` to hide the toolbar at the top of the WebView. The default value is `false`.
   @SupportedPlatforms(
-    platforms: [AndroidPlatform(), IOSPlatform(), MacOSPlatform()],
+    platforms: [
+      AndroidPlatform(),
+      IOSPlatform(),
+      MacOSPlatform(),
+      LinuxPlatform(),
+    ],
   )
   bool? hideToolbarTop;
 
   ///Set the custom background color of the toolbar at the top.
   @SupportedPlatforms(
-    platforms: [AndroidPlatform(), IOSPlatform(), MacOSPlatform()],
+    platforms: [
+      AndroidPlatform(),
+      IOSPlatform(),
+      MacOSPlatform(),
+      LinuxPlatform(),
+    ],
   )
   Color_? toolbarTopBackgroundColor;
 
   ///Set to `true` to hide the url bar on the toolbar at the top. The default value is `false`.
   @SupportedPlatforms(
-    platforms: [AndroidPlatform(), IOSPlatform(), MacOSPlatform()],
+    platforms: [
+      AndroidPlatform(),
+      IOSPlatform(),
+      MacOSPlatform(),
+      LinuxPlatform(),
+    ],
   )
   bool? hideUrlBar;
 
   ///Set to `true` to hide the progress bar when the WebView is loading a page. The default value is `false`.
   @SupportedPlatforms(
-    platforms: [AndroidPlatform(), IOSPlatform(), MacOSPlatform()],
+    platforms: [
+      AndroidPlatform(),
+      IOSPlatform(),
+      MacOSPlatform(),
+      LinuxPlatform(),
+    ],
   )
   bool? hideProgressBar;
 
   ///Set to `true` to hide the default menu items. The default value is `false`.
   @SupportedPlatforms(
-    platforms: [AndroidPlatform(), IOSPlatform(), MacOSPlatform()],
+    platforms: [
+      AndroidPlatform(),
+      IOSPlatform(),
+      MacOSPlatform(),
+      LinuxPlatform(),
+    ],
   )
   bool? hideDefaultMenuItems;
 
@@ -162,7 +192,12 @@ class InAppBrowserSettings_
 
   ///Set the action bar's title.
   @SupportedPlatforms(
-    platforms: [AndroidPlatform(), MacOSPlatform(), WindowsPlatform()],
+    platforms: [
+      AndroidPlatform(),
+      MacOSPlatform(),
+      WindowsPlatform(),
+      LinuxPlatform(),
+    ],
   )
   String? toolbarTopFixedTitle;
 
@@ -232,12 +267,16 @@ class InAppBrowserSettings_
 
   ///How the browser window should be added to the main window.
   ///The default value is [WindowType.WINDOW].
-  @SupportedPlatforms(platforms: [MacOSPlatform(), WindowsPlatform()])
+  @SupportedPlatforms(
+    platforms: [MacOSPlatform(), WindowsPlatform(), LinuxPlatform()],
+  )
   WindowType_? windowType;
 
   ///The window’s alpha value.
   ///The default value is `1.0`.
-  @SupportedPlatforms(platforms: [MacOSPlatform(), WindowsPlatform()])
+  @SupportedPlatforms(
+    platforms: [MacOSPlatform(), WindowsPlatform(), LinuxPlatform()],
+  )
   double? windowAlphaValue;
 
   ///Flags that describe the window’s current style, such as if it’s resizable or in full-screen mode.
@@ -250,7 +289,9 @@ class InAppBrowserSettings_
 
   ///Sets the origin and size of the window’s frame rectangle according to a given frame rectangle,
   ///thereby setting its position and size onscreen.
-  @SupportedPlatforms(platforms: [MacOSPlatform(), WindowsPlatform()])
+  @SupportedPlatforms(
+    platforms: [MacOSPlatform(), WindowsPlatform(), LinuxPlatform()],
+  )
   InAppWebViewRect_? windowFrame;
 
   InAppBrowserSettings_({

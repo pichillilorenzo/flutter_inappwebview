@@ -14,6 +14,7 @@ extension _PlatformInAppBrowserClassSupported on PlatformInAppBrowser {
   ///- iOS WKWebView
   ///- macOS WKWebView
   ///- Windows WebView2
+  ///- Linux WPE WebKit ([Official API - GtkWindow + WPE WebKit](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/class.WebView.html))
   ///
   ///Use the [PlatformInAppBrowser.isClassSupported] method to check if this class is supported at runtime.
   ///{@endtemplate}
@@ -24,6 +25,7 @@ extension _PlatformInAppBrowserClassSupported on PlatformInAppBrowser {
           TargetPlatform.iOS,
           TargetPlatform.macOS,
           TargetPlatform.windows,
+          TargetPlatform.linux,
         ].contains(platform ?? defaultTargetPlatform);
   }
 }
@@ -64,6 +66,7 @@ enum PlatformInAppBrowserProperty {
   ///- iOS WKWebView
   ///- macOS WKWebView
   ///- Windows WebView2
+  ///- Linux WPE WebKit
   ///
   ///Use the [PlatformInAppBrowser.isPropertySupported] method to check if this property is supported at runtime.
   ///{@endtemplate}
@@ -80,6 +83,7 @@ enum PlatformInAppBrowserProperty {
   ///- macOS WKWebView:
   ///    - This property will be ignored if the [PlatformWebViewCreationParams.windowId] has been set. There isn't any way to add/remove user scripts specific to iOS window WebViews. This is a limitation of the native WebKit APIs.
   ///- Windows WebView2
+  ///- Linux WPE WebKit
   ///
   ///Use the [PlatformInAppBrowser.isPropertySupported] method to check if this property is supported at runtime.
   ///{@endtemplate}
@@ -117,6 +121,7 @@ enum PlatformInAppBrowserProperty {
   ///- iOS WKWebView
   ///- macOS WKWebView
   ///- Windows WebView2
+  ///- Linux WPE WebKit
   ///
   ///Use the [PlatformInAppBrowser.isPropertySupported] method to check if this property is supported at runtime.
   ///{@endtemplate}
@@ -149,6 +154,7 @@ extension _PlatformInAppBrowserPropertySupported on PlatformInAppBrowser {
               TargetPlatform.iOS,
               TargetPlatform.macOS,
               TargetPlatform.windows,
+              TargetPlatform.linux,
             ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppBrowserProperty.initialUserScripts:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
@@ -157,6 +163,7 @@ extension _PlatformInAppBrowserPropertySupported on PlatformInAppBrowser {
               TargetPlatform.iOS,
               TargetPlatform.macOS,
               TargetPlatform.windows,
+              TargetPlatform.linux,
             ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppBrowserProperty.pullToRefreshController:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
@@ -176,6 +183,7 @@ extension _PlatformInAppBrowserPropertySupported on PlatformInAppBrowser {
               TargetPlatform.iOS,
               TargetPlatform.macOS,
               TargetPlatform.windows,
+              TargetPlatform.linux,
             ].contains(platform ?? defaultTargetPlatform);
     }
   }
@@ -224,6 +232,7 @@ enum PlatformInAppBrowserMethod {
   ///- iOS WKWebView
   ///- macOS WKWebView
   ///- Windows WebView2
+  ///- Linux WPE WebKit
   ///
   ///Use the [PlatformInAppBrowser.isMethodSupported] method to check if this method is supported at runtime.
   ///{@endtemplate}
@@ -238,6 +247,7 @@ enum PlatformInAppBrowserMethod {
   ///- iOS WKWebView
   ///- macOS WKWebView
   ///- Windows WebView2
+  ///- Linux WPE WebKit
   ///
   ///Use the [PlatformInAppBrowser.isMethodSupported] method to check if this method is supported at runtime.
   ///{@endtemplate}
@@ -265,6 +275,7 @@ enum PlatformInAppBrowserMethod {
   ///- iOS WKWebView
   ///- macOS WKWebView
   ///- Windows WebView2
+  ///- Linux WPE WebKit
   ///
   ///Use the [PlatformInAppBrowser.isMethodSupported] method to check if this method is supported at runtime.
   ///{@endtemplate}
@@ -295,6 +306,7 @@ enum PlatformInAppBrowserMethod {
   ///- iOS WKWebView
   ///- macOS WKWebView
   ///- Windows WebView2
+  ///- Linux WPE WebKit
   ///
   ///Use the [PlatformInAppBrowser.isMethodSupported] method to check if this method is supported at runtime.
   ///{@endtemplate}
@@ -309,6 +321,7 @@ enum PlatformInAppBrowserMethod {
   ///- iOS WKWebView
   ///- macOS WKWebView
   ///- Windows WebView2
+  ///- Linux WPE WebKit
   ///
   ///Use the [PlatformInAppBrowser.isMethodSupported] method to check if this method is supported at runtime.
   ///{@endtemplate}
@@ -323,6 +336,7 @@ enum PlatformInAppBrowserMethod {
   ///- iOS WKWebView
   ///- macOS WKWebView
   ///- Windows WebView2
+  ///- Linux WPE WebKit
   ///
   ///Use the [PlatformInAppBrowser.isMethodSupported] method to check if this method is supported at runtime.
   ///{@endtemplate}
@@ -337,6 +351,7 @@ enum PlatformInAppBrowserMethod {
   ///- iOS WKWebView
   ///- macOS WKWebView
   ///- Windows WebView2
+  ///- Linux WPE WebKit
   ///
   ///**Parameters - Officially Supported Platforms/Implementations**:
   ///- [data]: all platforms
@@ -359,6 +374,7 @@ enum PlatformInAppBrowserMethod {
   ///- iOS WKWebView
   ///- macOS WKWebView
   ///- Windows WebView2
+  ///- Linux WPE WebKit
   ///
   ///**Parameters - Officially Supported Platforms/Implementations**:
   ///- [assetFilePath]: all platforms
@@ -377,6 +393,7 @@ enum PlatformInAppBrowserMethod {
   ///- iOS WKWebView
   ///- macOS WKWebView
   ///- Windows WebView2
+  ///- Linux WPE WebKit
   ///
   ///**Parameters - Officially Supported Platforms/Implementations**:
   ///- [urlRequest]: all platforms
@@ -395,6 +412,7 @@ enum PlatformInAppBrowserMethod {
   ///- iOS WKWebView
   ///- macOS WKWebView
   ///- Windows WebView2
+  ///- Linux WPE WebKit
   ///
   ///**Parameters - Officially Supported Platforms/Implementations**:
   ///- [url]: all platforms
@@ -473,6 +491,7 @@ enum PlatformInAppBrowserMethod {
   ///- iOS WKWebView
   ///- macOS WKWebView
   ///- Windows WebView2
+  ///- Linux WPE WebKit
   ///
   ///**Parameters - Officially Supported Platforms/Implementations**:
   ///- [settings]: all platforms
@@ -490,6 +509,7 @@ enum PlatformInAppBrowserMethod {
   ///- iOS WKWebView
   ///- macOS WKWebView
   ///- Windows WebView2
+  ///- Linux WPE WebKit
   ///
   ///Use the [PlatformInAppBrowser.isMethodSupported] method to check if this method is supported at runtime.
   ///{@endtemplate}
@@ -523,6 +543,7 @@ extension _PlatformInAppBrowserMethodSupported on PlatformInAppBrowser {
               TargetPlatform.iOS,
               TargetPlatform.macOS,
               TargetPlatform.windows,
+              TargetPlatform.linux,
             ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppBrowserMethod.dispose:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
@@ -531,6 +552,7 @@ extension _PlatformInAppBrowserMethodSupported on PlatformInAppBrowser {
               TargetPlatform.iOS,
               TargetPlatform.macOS,
               TargetPlatform.windows,
+              TargetPlatform.linux,
             ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppBrowserMethod.getOptions:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
@@ -545,6 +567,7 @@ extension _PlatformInAppBrowserMethodSupported on PlatformInAppBrowser {
               TargetPlatform.iOS,
               TargetPlatform.macOS,
               TargetPlatform.windows,
+              TargetPlatform.linux,
             ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppBrowserMethod.hasMenuItem:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
@@ -560,6 +583,7 @@ extension _PlatformInAppBrowserMethodSupported on PlatformInAppBrowser {
               TargetPlatform.iOS,
               TargetPlatform.macOS,
               TargetPlatform.windows,
+              TargetPlatform.linux,
             ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppBrowserMethod.isHidden:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
@@ -568,6 +592,7 @@ extension _PlatformInAppBrowserMethodSupported on PlatformInAppBrowser {
               TargetPlatform.iOS,
               TargetPlatform.macOS,
               TargetPlatform.windows,
+              TargetPlatform.linux,
             ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppBrowserMethod.isOpened:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
@@ -576,6 +601,7 @@ extension _PlatformInAppBrowserMethodSupported on PlatformInAppBrowser {
               TargetPlatform.iOS,
               TargetPlatform.macOS,
               TargetPlatform.windows,
+              TargetPlatform.linux,
             ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppBrowserMethod.openData:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
@@ -584,6 +610,7 @@ extension _PlatformInAppBrowserMethodSupported on PlatformInAppBrowser {
               TargetPlatform.iOS,
               TargetPlatform.macOS,
               TargetPlatform.windows,
+              TargetPlatform.linux,
             ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppBrowserMethod.openFile:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
@@ -592,6 +619,7 @@ extension _PlatformInAppBrowserMethodSupported on PlatformInAppBrowser {
               TargetPlatform.iOS,
               TargetPlatform.macOS,
               TargetPlatform.windows,
+              TargetPlatform.linux,
             ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppBrowserMethod.openUrlRequest:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
@@ -600,6 +628,7 @@ extension _PlatformInAppBrowserMethodSupported on PlatformInAppBrowser {
               TargetPlatform.iOS,
               TargetPlatform.macOS,
               TargetPlatform.windows,
+              TargetPlatform.linux,
             ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppBrowserMethod.openWithSystemBrowser:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
@@ -608,6 +637,7 @@ extension _PlatformInAppBrowserMethodSupported on PlatformInAppBrowser {
               TargetPlatform.iOS,
               TargetPlatform.macOS,
               TargetPlatform.windows,
+              TargetPlatform.linux,
             ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppBrowserMethod.removeAllMenuItem:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
@@ -643,6 +673,7 @@ extension _PlatformInAppBrowserMethodSupported on PlatformInAppBrowser {
               TargetPlatform.iOS,
               TargetPlatform.macOS,
               TargetPlatform.windows,
+              TargetPlatform.linux,
             ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppBrowserMethod.show:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
@@ -651,6 +682,7 @@ extension _PlatformInAppBrowserMethodSupported on PlatformInAppBrowser {
               TargetPlatform.iOS,
               TargetPlatform.macOS,
               TargetPlatform.windows,
+              TargetPlatform.linux,
             ].contains(platform ?? defaultTargetPlatform);
     }
   }
@@ -980,6 +1012,7 @@ enum PlatformInAppBrowserEventsMethod {
   ///- iOS WKWebView
   ///- macOS WKWebView
   ///- Windows WebView2
+  ///- Linux WPE WebKit
   ///
   ///Use the [PlatformInAppBrowserEvents.isMethodSupported] method to check if this method is supported at runtime.
   ///{@endtemplate}
@@ -1155,6 +1188,7 @@ enum PlatformInAppBrowserEventsMethod {
   ///- iOS WKWebView
   ///- macOS WKWebView
   ///- Windows WebView2
+  ///- Linux WPE WebKit
   ///
   ///Use the [PlatformInAppBrowserEvents.isMethodSupported] method to check if this method is supported at runtime.
   ///{@endtemplate}
@@ -2120,6 +2154,7 @@ extension _PlatformInAppBrowserEventsMethodSupported
               TargetPlatform.iOS,
               TargetPlatform.macOS,
               TargetPlatform.windows,
+              TargetPlatform.linux,
             ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppBrowserEventsMethod.onCameraCaptureStateChanged:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
@@ -2200,6 +2235,7 @@ extension _PlatformInAppBrowserEventsMethodSupported
               TargetPlatform.iOS,
               TargetPlatform.macOS,
               TargetPlatform.windows,
+              TargetPlatform.linux,
             ].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppBrowserEventsMethod.onExitFullscreen:
         return ((kIsWeb && platform != null) || !kIsWeb) &&

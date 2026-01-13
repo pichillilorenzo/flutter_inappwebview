@@ -15,6 +15,7 @@ part of 'in_app_browser_settings.dart';
 ///- iOS WKWebView
 ///- macOS WKWebView
 ///- Windows WebView2
+///- Linux WPE WebKit ([Official API - GtkWindow](https://docs.gtk.org/gtk3/class.Window.html))
 class InAppBrowserSettings
     implements BrowserOptions, AndroidOptions, IosOptions {
   ///Set to `false` to block the InAppBrowser WebView going back when the user click on the Android back button. The default value is `true`.
@@ -49,6 +50,7 @@ class InAppBrowserSettings
   ///- iOS WKWebView
   ///- macOS WKWebView
   ///- Windows WebView2
+  ///- Linux WPE WebKit
   bool? hidden;
 
   ///Set to `true` to hide the close button. The default value is `false`.
@@ -63,6 +65,7 @@ class InAppBrowserSettings
   ///- Android WebView
   ///- iOS WKWebView
   ///- macOS WKWebView
+  ///- Linux WPE WebKit
   bool? hideDefaultMenuItems;
 
   ///Set to `true` to hide the progress bar when the WebView is loading a page. The default value is `false`.
@@ -71,6 +74,7 @@ class InAppBrowserSettings
   ///- Android WebView
   ///- iOS WKWebView
   ///- macOS WKWebView
+  ///- Linux WPE WebKit
   bool? hideProgressBar;
 
   ///Set to `true` if you want the title should be displayed. The default value is `false`.
@@ -91,6 +95,7 @@ class InAppBrowserSettings
   ///- Android WebView
   ///- iOS WKWebView
   ///- macOS WKWebView
+  ///- Linux WPE WebKit
   bool? hideToolbarTop;
 
   ///Set to `true` to hide the url bar on the toolbar at the top. The default value is `false`.
@@ -99,6 +104,7 @@ class InAppBrowserSettings
   ///- Android WebView
   ///- iOS WKWebView
   ///- macOS WKWebView
+  ///- Linux WPE WebKit
   bool? hideUrlBar;
 
   ///Set the custom color for the menu button.
@@ -143,6 +149,7 @@ class InAppBrowserSettings
   ///- Android WebView
   ///- iOS WKWebView
   ///- macOS WKWebView
+  ///- Linux WPE WebKit
   Color? toolbarTopBackgroundColor;
 
   ///Set the tint color to apply to the navigation bar background.
@@ -157,6 +164,7 @@ class InAppBrowserSettings
   ///- Android WebView
   ///- macOS WKWebView
   ///- Windows WebView2
+  ///- Linux WPE WebKit
   String? toolbarTopFixedTitle;
 
   ///Set the tint color to apply to the navigation items and bar button items.
@@ -183,6 +191,7 @@ class InAppBrowserSettings
   ///**Officially Supported Platforms/Implementations**:
   ///- macOS WKWebView
   ///- Windows WebView2
+  ///- Linux WPE WebKit
   double? windowAlphaValue;
 
   ///Sets the origin and size of the window’s frame rectangle according to a given frame rectangle,
@@ -191,6 +200,7 @@ class InAppBrowserSettings
   ///**Officially Supported Platforms/Implementations**:
   ///- macOS WKWebView
   ///- Windows WebView2
+  ///- Linux WPE WebKit
   InAppWebViewRect? windowFrame;
 
   ///Flags that describe the window’s current style, such as if it’s resizable or in full-screen mode.
@@ -211,6 +221,7 @@ class InAppBrowserSettings
   ///**Officially Supported Platforms/Implementations**:
   ///- macOS WKWebView
   ///- Windows WebView2
+  ///- Linux WPE WebKit
   WindowType? windowType;
 
   ///
@@ -219,6 +230,7 @@ class InAppBrowserSettings
   ///- iOS WKWebView
   ///- macOS WKWebView
   ///- Windows WebView2
+  ///- Linux WPE WebKit ([Official API - GtkWindow](https://docs.gtk.org/gtk3/class.Window.html))
   InAppBrowserSettings({
     this.allowGoBackWithBackButton = true,
     this.closeButtonCaption,
@@ -491,6 +503,7 @@ enum InAppBrowserSettingsProperty {
   ///- iOS WKWebView
   ///- macOS WKWebView
   ///- Windows WebView2
+  ///- Linux WPE WebKit
   ///
   ///Use the [InAppBrowserSettings.isPropertySupported] method to check if this property is supported at runtime.
   ///{@endtemplate}
@@ -515,6 +528,7 @@ enum InAppBrowserSettingsProperty {
   ///- Android WebView
   ///- iOS WKWebView
   ///- macOS WKWebView
+  ///- Linux WPE WebKit
   ///
   ///Use the [InAppBrowserSettings.isPropertySupported] method to check if this property is supported at runtime.
   ///{@endtemplate}
@@ -528,6 +542,7 @@ enum InAppBrowserSettingsProperty {
   ///- Android WebView
   ///- iOS WKWebView
   ///- macOS WKWebView
+  ///- Linux WPE WebKit
   ///
   ///Use the [InAppBrowserSettings.isPropertySupported] method to check if this property is supported at runtime.
   ///{@endtemplate}
@@ -563,6 +578,7 @@ enum InAppBrowserSettingsProperty {
   ///- Android WebView
   ///- iOS WKWebView
   ///- macOS WKWebView
+  ///- Linux WPE WebKit
   ///
   ///Use the [InAppBrowserSettings.isPropertySupported] method to check if this property is supported at runtime.
   ///{@endtemplate}
@@ -576,6 +592,7 @@ enum InAppBrowserSettingsProperty {
   ///- Android WebView
   ///- iOS WKWebView
   ///- macOS WKWebView
+  ///- Linux WPE WebKit
   ///
   ///Use the [InAppBrowserSettings.isPropertySupported] method to check if this property is supported at runtime.
   ///{@endtemplate}
@@ -655,6 +672,7 @@ enum InAppBrowserSettingsProperty {
   ///- Android WebView
   ///- iOS WKWebView
   ///- macOS WKWebView
+  ///- Linux WPE WebKit
   ///
   ///Use the [InAppBrowserSettings.isPropertySupported] method to check if this property is supported at runtime.
   ///{@endtemplate}
@@ -679,6 +697,7 @@ enum InAppBrowserSettingsProperty {
   ///- Android WebView
   ///- macOS WKWebView
   ///- Windows WebView2
+  ///- Linux WPE WebKit
   ///
   ///Use the [InAppBrowserSettings.isPropertySupported] method to check if this property is supported at runtime.
   ///{@endtemplate}
@@ -724,6 +743,7 @@ enum InAppBrowserSettingsProperty {
   ///**Officially Supported Platforms/Implementations**:
   ///- macOS WKWebView
   ///- Windows WebView2
+  ///- Linux WPE WebKit
   ///
   ///Use the [InAppBrowserSettings.isPropertySupported] method to check if this property is supported at runtime.
   ///{@endtemplate}
@@ -736,6 +756,7 @@ enum InAppBrowserSettingsProperty {
   ///**Officially Supported Platforms/Implementations**:
   ///- macOS WKWebView
   ///- Windows WebView2
+  ///- Linux WPE WebKit
   ///
   ///Use the [InAppBrowserSettings.isPropertySupported] method to check if this property is supported at runtime.
   ///{@endtemplate}
@@ -770,6 +791,7 @@ enum InAppBrowserSettingsProperty {
   ///**Officially Supported Platforms/Implementations**:
   ///- macOS WKWebView
   ///- Windows WebView2
+  ///- Linux WPE WebKit
   ///
   ///Use the [InAppBrowserSettings.isPropertySupported] method to check if this property is supported at runtime.
   ///{@endtemplate}
@@ -805,6 +827,7 @@ extension _InAppBrowserSettingsPropertySupported on InAppBrowserSettings {
               TargetPlatform.iOS,
               TargetPlatform.macOS,
               TargetPlatform.windows,
+              TargetPlatform.linux,
             ].contains(platform ?? defaultTargetPlatform);
       case InAppBrowserSettingsProperty.hideCloseButton:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
@@ -815,6 +838,7 @@ extension _InAppBrowserSettingsPropertySupported on InAppBrowserSettings {
               TargetPlatform.android,
               TargetPlatform.iOS,
               TargetPlatform.macOS,
+              TargetPlatform.linux,
             ].contains(platform ?? defaultTargetPlatform);
       case InAppBrowserSettingsProperty.hideProgressBar:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
@@ -822,6 +846,7 @@ extension _InAppBrowserSettingsPropertySupported on InAppBrowserSettings {
               TargetPlatform.android,
               TargetPlatform.iOS,
               TargetPlatform.macOS,
+              TargetPlatform.linux,
             ].contains(platform ?? defaultTargetPlatform);
       case InAppBrowserSettingsProperty.hideTitleBar:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
@@ -837,6 +862,7 @@ extension _InAppBrowserSettingsPropertySupported on InAppBrowserSettings {
               TargetPlatform.android,
               TargetPlatform.iOS,
               TargetPlatform.macOS,
+              TargetPlatform.linux,
             ].contains(platform ?? defaultTargetPlatform);
       case InAppBrowserSettingsProperty.hideUrlBar:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
@@ -844,6 +870,7 @@ extension _InAppBrowserSettingsPropertySupported on InAppBrowserSettings {
               TargetPlatform.android,
               TargetPlatform.iOS,
               TargetPlatform.macOS,
+              TargetPlatform.linux,
             ].contains(platform ?? defaultTargetPlatform);
       case InAppBrowserSettingsProperty.menuButtonColor:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
@@ -871,6 +898,7 @@ extension _InAppBrowserSettingsPropertySupported on InAppBrowserSettings {
               TargetPlatform.android,
               TargetPlatform.iOS,
               TargetPlatform.macOS,
+              TargetPlatform.linux,
             ].contains(platform ?? defaultTargetPlatform);
       case InAppBrowserSettingsProperty.toolbarTopBarTintColor:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
@@ -881,6 +909,7 @@ extension _InAppBrowserSettingsPropertySupported on InAppBrowserSettings {
               TargetPlatform.android,
               TargetPlatform.macOS,
               TargetPlatform.windows,
+              TargetPlatform.linux,
             ].contains(platform ?? defaultTargetPlatform);
       case InAppBrowserSettingsProperty.toolbarTopTintColor:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
@@ -896,12 +925,14 @@ extension _InAppBrowserSettingsPropertySupported on InAppBrowserSettings {
             [
               TargetPlatform.macOS,
               TargetPlatform.windows,
+              TargetPlatform.linux,
             ].contains(platform ?? defaultTargetPlatform);
       case InAppBrowserSettingsProperty.windowFrame:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
             [
               TargetPlatform.macOS,
               TargetPlatform.windows,
+              TargetPlatform.linux,
             ].contains(platform ?? defaultTargetPlatform);
       case InAppBrowserSettingsProperty.windowStyleMask:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
@@ -914,6 +945,7 @@ extension _InAppBrowserSettingsPropertySupported on InAppBrowserSettings {
             [
               TargetPlatform.macOS,
               TargetPlatform.windows,
+              TargetPlatform.linux,
             ].contains(platform ?? defaultTargetPlatform);
     }
   }

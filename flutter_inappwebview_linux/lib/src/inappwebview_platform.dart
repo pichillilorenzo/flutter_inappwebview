@@ -3,6 +3,7 @@ import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_pla
 import 'cookie_manager/cookie_manager.dart';
 import 'find_interaction/find_interaction_controller.dart';
 import 'http_auth_credentials_database.dart';
+import 'in_app_browser/in_app_browser.dart';
 import 'in_app_webview/in_app_webview.dart';
 import 'in_app_webview/in_app_webview_controller.dart';
 import 'in_app_webview/headless_in_app_webview.dart';
@@ -116,10 +117,18 @@ class LinuxInAppWebViewPlatform extends InAppWebViewPlatform {
     return LinuxHttpAuthCredentialDatabase.static();
   }
 
-  /// Creates a new empty [PlatformInAppBrowser] to access static methods.
+  /// Creates a new empty [LinuxInAppBrowser] to access static methods.
   @override
-  PlatformInAppBrowser createPlatformInAppBrowserStatic() {
-    return _PlatformInAppBrowser.static();
+  LinuxInAppBrowser createPlatformInAppBrowserStatic() {
+    return LinuxInAppBrowser.static();
+  }
+
+  /// Creates a new [LinuxInAppBrowser].
+  @override
+  LinuxInAppBrowser createPlatformInAppBrowser(
+    PlatformInAppBrowserCreationParams params,
+  ) {
+    return LinuxInAppBrowser(params);
   }
 
   /// Creates a new empty [PlatformHeadlessInAppWebView] to access static methods.
@@ -266,16 +275,6 @@ class _PlatformChromeSafariBrowser extends PlatformChromeSafariBrowser {
       );
 
   factory _PlatformChromeSafariBrowser.static() => _staticValue;
-}
-
-class _PlatformInAppBrowser extends PlatformInAppBrowser {
-  _PlatformInAppBrowser(PlatformInAppBrowserCreationParams params)
-    : super.implementation(params);
-  static final _PlatformInAppBrowser _staticValue = _PlatformInAppBrowser(
-    const PlatformInAppBrowserCreationParams(),
-  );
-
-  factory _PlatformInAppBrowser.static() => _staticValue;
 }
 
 class _PlatformProcessGlobalConfig extends PlatformProcessGlobalConfig {

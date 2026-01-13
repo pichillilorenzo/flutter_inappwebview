@@ -284,6 +284,12 @@ class InAppWebView {
   // Cursor change callback
   void SetOnCursorChanged(std::function<void(const std::string&)> callback);
 
+  // Progress change callback (for InAppBrowser progress bar)
+  void SetOnProgressChanged(std::function<void(double)> callback);
+
+  // Navigation state change callback (for InAppBrowser back/forward buttons)
+  void SetOnNavigationStateChanged(std::function<void()> callback);
+
   // Called from Dart when shouldOverrideUrlLoading decision is made
   void OnShouldOverrideUrlLoadingDecision(int64_t decision_id, bool allow);
 
@@ -500,7 +506,13 @@ class InAppWebView {
 
   // Cursor change callback
   std::function<void(const std::string&)> on_cursor_changed_;
-  std::string last_cursor_name_;
+  std::string last_cursor_name_ = "default";
+
+  // Progress change callback (for InAppBrowser)
+  std::function<void(double)> on_progress_changed_;
+
+  // Navigation state change callback (for InAppBrowser back/forward buttons)
+  std::function<void()> on_navigation_state_changed_;
 
   // Last hit test result from mouse-target-changed signal
   // Used by getHitTestResult() to return the current element under the cursor
@@ -670,6 +682,12 @@ class InAppWebView {
   static void OnDownloadStarted(WebKitNetworkSession* network_session,
                                 WebKitDownload* download,
                                 gpointer user_data);
+
+  // === Navigation State Signals ===
+  static void OnBackForwardListChanged(WebKitBackForwardList* list,
+                                       WebKitBackForwardListItem* item_added,
+                                       gpointer items_removed,
+                                       gpointer user_data);
 
   // === Input helpers ===
   void SendWpePointerEvent(uint32_t type, double x, double y, uint32_t button);

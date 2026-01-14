@@ -286,16 +286,24 @@ void InAppWebView::AttachChannel(FlBinaryMessenger* messenger, int64_t channel_i
   }
 }
 
-void InAppWebView::AttachChannel(FlBinaryMessenger* messenger, const std::string& channel_id) {
+void InAppWebView::AttachChannel(FlBinaryMessenger* messenger, const std::string& channel_id, const bool is_full_channel_name) {
   string_channel_id_ = channel_id;
   if (messenger == nullptr) {
     errorLog("InAppWebView: AttachChannel messenger is null");
     return;
   }
 
-  // When a full channel name is provided (e.g., from InAppBrowser), use it directly
-  // This allows InAppBrowser to route WebView events through its own channel
-  std::string channelName = channel_id;
+  // Determine the channel name:
+  // - If is_full_channel_name (InAppBrowser case), use it directly
+  // - If channel_id is just an ID (HeadlessInAppWebView case), prepend the prefix
+  std::string channelName;
+  if (is_full_channel_name) {
+    // Already has the prefix (InAppBrowser passes full channel name)
+    channelName = channel_id;
+  } else {
+    // Just an ID, prepend the prefix (HeadlessInAppWebView case)
+    channelName = std::string(METHOD_CHANNEL_NAME_PREFIX) + channel_id;
+  }
   channel_delegate_ = std::make_unique<WebViewChannelDelegate>(this, messenger, channelName);
 
   // Attach FindInteractionController channel with the same ID
@@ -364,6 +372,11 @@ InAppWebView::~InAppWebView() {
   // The UserContentController destructor needs access to WebKit's user content manager
   // which becomes invalid after we unref the webview
   user_content_controller_.reset();
+
+  // IMPORTANT: Clean up content blocker handler BEFORE the webview is destroyed
+  // The ContentBlockerHandler destructor calls removeAllFilters which needs a valid content manager
+  content_blocker_handler_.reset();
+
   // Clean up pending policy decisions
   for (auto& pair : pending_policy_decisions_) {
     webkit_policy_decision_ignore(pair.second);

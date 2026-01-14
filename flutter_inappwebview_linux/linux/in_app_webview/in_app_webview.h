@@ -123,7 +123,7 @@ class InAppWebView {
   
   // Attach/recreate the Dart method channel using a string-based channel ID.
   // This is used for HeadlessInAppWebView where the ID is a long string from Dart.
-  void AttachChannel(FlBinaryMessenger* messenger, const std::string& channel_id);
+  void AttachChannel(FlBinaryMessenger* messenger, const std::string& channel_id, const bool is_full_channel_name);
 
   int64_t channel_id() const { return channel_id_; }
   const std::string& string_channel_id() const { return string_channel_id_; }

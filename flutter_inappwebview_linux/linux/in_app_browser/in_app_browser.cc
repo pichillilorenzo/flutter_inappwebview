@@ -448,7 +448,7 @@ void InAppBrowser::setupWebView(const InAppBrowserCreationParams& params) {
   webView_ = std::make_shared<InAppWebView>(nullptr, messenger_, 0, webViewParams);
 
   // Attach channel with browser-specific ID
-  webView_->AttachChannel(messenger_, METHOD_CHANNEL_NAME_PREFIX + id_);
+  webView_->AttachChannel(messenger_, METHOD_CHANNEL_NAME_PREFIX + id_, true);
 
   // Set initial size (will be updated on realize)
   webView_->setSize(800, 600);

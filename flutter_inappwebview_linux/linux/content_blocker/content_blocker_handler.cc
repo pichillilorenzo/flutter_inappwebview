@@ -45,8 +45,6 @@ ContentBlockerHandler::ContentBlockerHandler(WebKitUserContentManager* content_m
   filter_store_ = webkit_user_content_filter_store_new(store_path_.c_str());
   if (filter_store_ == nullptr) {
     errorLog("ContentBlockerHandler: Failed to create WebKitUserContentFilterStore");
-  } else {
-    debugLog("ContentBlockerHandler: Created filter store at " + store_path_);
   }
 }
 
@@ -75,7 +73,6 @@ void ContentBlockerHandler::setContentBlockers(FlValue* contentBlockers,
       fl_value_get_type(contentBlockers) != FL_VALUE_TYPE_LIST ||
       fl_value_get_length(contentBlockers) == 0) {
     // No blockers - this is success (empty set)
-    debugLog("ContentBlockerHandler: No content blockers to apply");
     if (callback) callback(true);
     return;
   }
@@ -89,17 +86,15 @@ void ContentBlockerHandler::setContentBlockers(FlValue* contentBlockers,
     return;
   }
 
-  debugLog("ContentBlockerHandler: Compiling " + std::to_string(fl_value_get_length(contentBlockers)) +
-           " content blocker rules");
-
   // Compile the content blockers
   compileContentBlockers(jsonSource, callback);
 }
 
 void ContentBlockerHandler::removeAllFilters() {
-  if (content_manager_ != nullptr) {
+  // Check if content_manager is still valid before calling WebKit API
+  // The content_manager becomes invalid when the webview is destroyed
+  if (content_manager_ != nullptr && WEBKIT_IS_USER_CONTENT_MANAGER(content_manager_)) {
     webkit_user_content_manager_remove_all_filters(content_manager_);
-    debugLog("ContentBlockerHandler: Removed all content filters");
   }
 }
 
@@ -347,7 +342,6 @@ void ContentBlockerHandler::onFilterCompiled(GObject* source, GAsyncResult* resu
   // Add the compiled filter to the content manager
   if (handler->content_manager_ != nullptr) {
     webkit_user_content_manager_add_filter(handler->content_manager_, filter);
-    debugLog("ContentBlockerHandler: Successfully added content filter");
   }
 
   webkit_user_content_filter_unref(filter);

@@ -19,6 +19,7 @@ class ContentBlockerActionType_ {
       EnumAndroidPlatform(value: 'block'),
       EnumIOSPlatform(value: 'block'),
       EnumMacOSPlatform(value: 'block'),
+      EnumLinuxPlatform(value: 'block'),
     ],
   )
   static const BLOCK = const ContentBlockerActionType_._internal('block');
@@ -33,6 +34,7 @@ class ContentBlockerActionType_ {
       EnumAndroidPlatform(value: 'css-display-none'),
       EnumIOSPlatform(value: 'css-display-none'),
       EnumMacOSPlatform(value: 'css-display-none'),
+      EnumLinuxPlatform(value: 'css-display-none'),
     ],
   )
   static const CSS_DISPLAY_NONE = const ContentBlockerActionType_._internal(
@@ -46,6 +48,7 @@ class ContentBlockerActionType_ {
       EnumAndroidPlatform(value: 'make-https'),
       EnumIOSPlatform(value: 'make-https'),
       EnumMacOSPlatform(value: 'make-https'),
+      EnumLinuxPlatform(value: 'make-https'),
     ],
   )
   static const MAKE_HTTPS = const ContentBlockerActionType_._internal(
@@ -58,8 +61,7 @@ class ContentBlockerActionType_ {
   @EnumSupportedPlatforms(
     platforms: [
       EnumIOSPlatform(value: 'block-cookies'),
-      EnumMacOSPlatform(value: 'block-cookies'),
-    ],
+      EnumMacOSPlatform(value: 'block-cookies'),      EnumLinuxPlatform(value: 'block-cookies'),    ],
   )
   static const BLOCK_COOKIES = const ContentBlockerActionType_._internal(
     'block-cookies',
@@ -70,6 +72,7 @@ class ContentBlockerActionType_ {
     platforms: [
       EnumIOSPlatform(value: 'ignore-previous-rules'),
       EnumMacOSPlatform(value: 'ignore-previous-rules'),
+      EnumLinuxPlatform(value: 'ignore-previous-rules'),
     ],
   )
   static const IGNORE_PREVIOUS_RULES =

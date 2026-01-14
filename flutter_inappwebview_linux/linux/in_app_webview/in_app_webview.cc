@@ -223,17 +223,50 @@ InAppWebView::InAppWebView(FlPluginRegistrar* registrar, FlBinaryMessenger* mess
   // Register custom URI schemes (before loading content)
   RegisterCustomSchemes();
 
-  // Load initial content
-  if (params.initialUrlRequest.has_value()) {
-    auto& urlRequest = params.initialUrlRequest.value();
-    loadUrl(urlRequest);
-  } else if (params.initialData.has_value()) {
-    std::string mimeType = params.initialDataMimeType.value_or("text/html");
-    std::string encoding = params.initialDataEncoding.value_or("UTF-8");
-    std::string baseUrl = params.initialDataBaseUrl.value_or("about:blank");
-    loadData(params.initialData.value(), mimeType, encoding, baseUrl);
-  } else if (params.initialFile.has_value()) {
-    loadFile(params.initialFile.value());
+  // Apply content blockers if specified, then load initial content
+  // Content blockers must be compiled asynchronously (like iOS/macOS WKContentRuleListStore)
+  if (settings_ && settings_->contentBlockers != nullptr && content_blocker_handler_) {
+    // Store initial load params for callback
+    auto initialUrlRequest = params.initialUrlRequest;
+    auto initialData = params.initialData;
+    auto initialDataMimeType = params.initialDataMimeType;
+    auto initialDataEncoding = params.initialDataEncoding;
+    auto initialDataBaseUrl = params.initialDataBaseUrl;
+    auto initialFile = params.initialFile;
+
+    content_blocker_handler_->setContentBlockers(
+        settings_->contentBlockers,
+        [this, initialUrlRequest, initialData, initialDataMimeType, initialDataEncoding,
+         initialDataBaseUrl, initialFile](bool success) {
+          if (!success) {
+            debugLog("InAppWebView: Content blockers failed to apply, loading content anyway");
+          }
+
+          // Now load initial content
+          if (initialUrlRequest.has_value()) {
+            loadUrl(initialUrlRequest.value());
+          } else if (initialData.has_value()) {
+            std::string mimeType = initialDataMimeType.value_or("text/html");
+            std::string encoding = initialDataEncoding.value_or("UTF-8");
+            std::string baseUrl = initialDataBaseUrl.value_or("about:blank");
+            loadData(initialData.value(), mimeType, encoding, baseUrl);
+          } else if (initialFile.has_value()) {
+            loadFile(initialFile.value());
+          }
+        });
+  } else {
+    // No content blockers - load initial content immediately
+    if (params.initialUrlRequest.has_value()) {
+      auto& urlRequest = params.initialUrlRequest.value();
+      loadUrl(urlRequest);
+    } else if (params.initialData.has_value()) {
+      std::string mimeType = params.initialDataMimeType.value_or("text/html");
+      std::string encoding = params.initialDataEncoding.value_or("UTF-8");
+      std::string baseUrl = params.initialDataBaseUrl.value_or("about:blank");
+      loadData(params.initialData.value(), mimeType, encoding, baseUrl);
+    } else if (params.initialFile.has_value()) {
+      loadFile(params.initialFile.value());
+    }
   }
 }
 
@@ -556,6 +589,16 @@ void InAppWebView::InitWebView(const InAppWebViewCreationParams& params) {
       return;
     }
 
+    // Apply ITP (Intelligent Tracking Prevention) setting to the network session
+    // This must be done after WebView creation as we need access to the session
+    if (params.initialSettings != nullptr) {
+      WebKitNetworkSession* session = webkit_web_view_get_network_session(webview_);
+      if (session != nullptr && params.initialSettings->itpEnabled) {
+        webkit_network_session_set_itp_enabled(session, TRUE);
+        debugLog("InAppWebView: ITP (Intelligent Tracking Prevention) enabled");
+      }
+    }
+
     // Apply settings
     webkit_web_view_set_settings(webview_, settings);
     g_object_unref(settings);
@@ -570,6 +613,12 @@ void InAppWebView::InitWebView(const InAppWebViewCreationParams& params) {
 
   // Create find interaction controller (channel will be attached later in AttachChannel)
   findInteractionController_ = std::make_unique<FindInteractionController>(this);
+
+  // Create content blocker handler for Safari-style content blocking rules
+  WebKitUserContentManager* content_manager = webkit_web_view_get_user_content_manager(webview_);
+  if (content_manager != nullptr) {
+    content_blocker_handler_ = std::make_unique<ContentBlockerHandler>(content_manager);
+  }
 }
 
 void InAppWebView::RegisterEventHandlers() {
@@ -2182,6 +2231,16 @@ FlValue* InAppWebView::getSettings() const {
 void InAppWebView::setSettings(const std::shared_ptr<InAppWebViewSettings> newSettings,
                                FlValue* newSettingsMap) {
   if (newSettings && webview_) {
+    // Check if contentBlockers changed
+    FlValue* newContentBlockers = newSettings->contentBlockers;
+
+    // Apply content blockers if they have been updated
+    if (content_blocker_handler_ != nullptr) {
+      // If new settings have contentBlockers, apply them
+      // This will replace any existing content blockers
+      content_blocker_handler_->setContentBlockers(newContentBlockers, nullptr);
+    }
+
     settings_ = newSettings;
     settings_->applyToWebView(webview_);
   }

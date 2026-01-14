@@ -23,6 +23,7 @@ class ContentBlockerActionType {
   ///- Android WebView
   ///- iOS WKWebView
   ///- macOS WKWebView
+  ///- Linux WPE WebKit
   static final BLOCK = ContentBlockerActionType._internalMultiPlatform(
     'block',
     () {
@@ -32,6 +33,8 @@ class ContentBlockerActionType {
         case TargetPlatform.iOS:
           return 'block';
         case TargetPlatform.macOS:
+          return 'block';
+        case TargetPlatform.linux:
           return 'block';
         default:
           break;
@@ -47,6 +50,7 @@ class ContentBlockerActionType {
   ///**Officially Supported Platforms/Implementations**:
   ///- iOS WKWebView
   ///- macOS WKWebView
+  ///- Linux WPE WebKit
   static final BLOCK_COOKIES = ContentBlockerActionType._internalMultiPlatform(
     'block-cookies',
     () {
@@ -54,6 +58,8 @@ class ContentBlockerActionType {
         case TargetPlatform.iOS:
           return 'block-cookies';
         case TargetPlatform.macOS:
+          return 'block-cookies';
+        case TargetPlatform.linux:
           return 'block-cookies';
         default:
           break;
@@ -72,6 +78,7 @@ class ContentBlockerActionType {
   ///- Android WebView
   ///- iOS WKWebView
   ///- macOS WKWebView
+  ///- Linux WPE WebKit
   static final CSS_DISPLAY_NONE =
       ContentBlockerActionType._internalMultiPlatform('css-display-none', () {
         switch (defaultTargetPlatform) {
@@ -80,6 +87,8 @@ class ContentBlockerActionType {
           case TargetPlatform.iOS:
             return 'css-display-none';
           case TargetPlatform.macOS:
+            return 'css-display-none';
+          case TargetPlatform.linux:
             return 'css-display-none';
           default:
             break;
@@ -92,6 +101,7 @@ class ContentBlockerActionType {
   ///**Officially Supported Platforms/Implementations**:
   ///- iOS WKWebView
   ///- macOS WKWebView
+  ///- Linux WPE WebKit
   static final IGNORE_PREVIOUS_RULES =
       ContentBlockerActionType._internalMultiPlatform(
         'ignore-previous-rules',
@@ -100,6 +110,8 @@ class ContentBlockerActionType {
             case TargetPlatform.iOS:
               return 'ignore-previous-rules';
             case TargetPlatform.macOS:
+              return 'ignore-previous-rules';
+            case TargetPlatform.linux:
               return 'ignore-previous-rules';
             default:
               break;
@@ -115,6 +127,7 @@ class ContentBlockerActionType {
   ///- Android WebView
   ///- iOS WKWebView
   ///- macOS WKWebView
+  ///- Linux WPE WebKit
   static final MAKE_HTTPS = ContentBlockerActionType._internalMultiPlatform(
     'make-https',
     () {
@@ -124,6 +137,8 @@ class ContentBlockerActionType {
         case TargetPlatform.iOS:
           return 'make-https';
         case TargetPlatform.macOS:
+          return 'make-https';
+        case TargetPlatform.linux:
           return 'make-https';
         default:
           break;

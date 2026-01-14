@@ -41,6 +41,7 @@
 #include <tuple>
 #include <vector>
 
+#include "../content_blocker/content_blocker_handler.h"
 #include "../types/context_menu.h"
 #include "../types/context_menu_popup.h"
 #include "../types/option_menu_popup.h"
@@ -465,6 +466,9 @@ class InAppWebView {
 
   // Find interaction controller
   std::unique_ptr<FindInteractionController> findInteractionController_;
+
+  // Content blocker handler for Safari-style content blocking rules
+  std::unique_ptr<ContentBlockerHandler> content_blocker_handler_;
 
   // Web message channels (for WebMessageChannel support)
   std::map<std::string, std::unique_ptr<WebMessageChannel>> web_message_channels_;

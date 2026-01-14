@@ -243,6 +243,8 @@ class _MyAppState extends State<MyApp> {
     // Register custom scheme for onLoadResourceWithCustomScheme testing
     // Note: http/https cannot be overridden - WPE WebKit explicitly prohibits it
     resourceCustomSchemes: ['myapp'],
+    // Enable Intelligent Tracking Prevention (ITP)
+    itpEnabled: true,
   );
 
   String url = "";
@@ -292,8 +294,8 @@ class _MyAppState extends State<MyApp> {
                     child: LinuxInAppWebViewWidget(
                       LinuxInAppWebViewWidgetCreationParams(
                         key: webViewKey,
-                        // initialUrlRequest: URLRequest(url: WebUri("https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/input/color"),),
-                        initialFile: "assets/date_input_test.html",
+                        initialUrlRequest: URLRequest(url: WebUri("https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/input/color"),),
+                        //initialFile: "assets/date_input_test.html",
                         initialSettings: settings,
                         onWebViewCreated: (controller) {
                           webViewController = controller;

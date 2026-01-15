@@ -102,6 +102,9 @@ CustomPlatformView::CustomPlatformView(FlBinaryMessenger* messenger,
   if (UseGLTexture()) {
     texture_ = FL_TEXTURE(inappwebview_egl_texture_new(webview_.get()));
     egl_texture_ = INAPPWEBVIEW_EGL_TEXTURE(texture_);
+    // In zero-copy EGL mode, we don't need pixel readback - the EGL image is passed
+    // directly to Flutter. This improves performance and avoids GL context issues.
+    webview_->SetSkipPixelReadback(true);
     debugLog("CustomPlatformView: using GL texture (hardware accelerated)");
   } else {
     texture_ = FL_TEXTURE(inappwebview_texture_new(webview_.get()));

@@ -109,6 +109,7 @@ include(FetchContent)
 FetchContent_Declare(
   nlohmann_json
   URL https://github.com/nlohmann/json/releases/download/v${NLOHMANN_JSON_VERSION}/json.tar.xz
+  DOWNLOAD_EXTRACT_TIMESTAMP TRUE
 )
 # Don't build tests/examples
 set(JSON_BuildTests OFF CACHE INTERNAL "")
@@ -317,6 +318,7 @@ include(FetchContent)
 FetchContent_Declare(
   googletest
   URL https://github.com/google/googletest/archive/release-1.11.0.zip
+  DOWNLOAD_EXTRACT_TIMESTAMP TRUE
 )
 # Prevent overriding the parent project's compiler/linker settings
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)

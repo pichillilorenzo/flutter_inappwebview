@@ -5,6 +5,7 @@
 
 #include "in_app_webview.h"
 
+#include <dlfcn.h>
 #include <linux/limits.h>
 #include <unistd.h>
 
@@ -52,6 +53,7 @@
 #include "../flutter_inappwebview_linux_plugin_private.h"
 #include "../plugin_instance.h"
 #include "../utils/flutter.h"
+#include "../utils/gl_context.h"
 #include "../utils/log.h"
 #include "../utils/uri.h"
 #include "in_app_webview_manager.h"
@@ -339,10 +341,13 @@ InAppWebView::~InAppWebView() {
   pending_policy_decisions_.clear();
 
   // Clean up exported image (use global namespace for C API)
-  if (exported_image_ != nullptr && exportable_ != nullptr) {
-    ::wpe_view_backend_exportable_fdo_egl_dispatch_release_exported_image(exportable_,
-                                                                          exported_image_);
-    exported_image_ = nullptr;
+  {
+    std::lock_guard<std::mutex> lock(exported_image_mutex_);
+    if (exported_image_ != nullptr && exportable_ != nullptr) {
+      ::wpe_view_backend_exportable_fdo_egl_dispatch_release_exported_image(exportable_,
+                                                                            exported_image_);
+      exported_image_ = nullptr;
+    }
   }
 
   // Destroy the webview
@@ -889,21 +894,27 @@ void InAppWebView::OnExportDmaBuf(::wpe_fdo_egl_exported_image* image) {
   // Get the EGL image from the exported image
   EGLImageKHR egl_image = wpe_fdo_egl_exported_image_get_egl_image(image);
 
-  // Only do pixel readback if egl_display_ is available AND we're not using zero-copy EGL texture
-  // The zero-copy path passes the EGL image directly to Flutter, avoiding glReadPixels
-  if (egl_image != EGL_NO_IMAGE_KHR && egl_display_ != nullptr) {
-    // Read pixels from the EGL image using OpenGL
-    // This is only needed for the pixel buffer fallback path
+  // Only do pixel readback if:
+  // 1. skip_pixel_readback_ is false (not using zero-copy mode)
+  // 2. egl_display_ is available
+  // 3. We have a valid EGL image
+  if (!skip_pixel_readback_ && egl_image != EGL_NO_IMAGE_KHR && egl_display_ != nullptr) {
     ReadPixelsFromEglImage(egl_image, img_width, img_height);
   }
 
-  // Release previous exported image
-  if (exported_image_ != nullptr && exportable_ != nullptr) {
-    ::wpe_view_backend_exportable_fdo_egl_dispatch_release_exported_image(exportable_,
-                                                                          exported_image_);
-  }
+  // Protect exported_image_ access - this method is called from WPE's thread
+  // while GetCurrentEglImage may be called from Flutter's rendering thread
+  {
+    std::lock_guard<std::mutex> lock(exported_image_mutex_);
+    
+    // Release previous exported image
+    if (exported_image_ != nullptr && exportable_ != nullptr) {
+      ::wpe_view_backend_exportable_fdo_egl_dispatch_release_exported_image(exportable_,
+                                                                            exported_image_);
+    }
 
-  exported_image_ = image;
+    exported_image_ = image;
+  }
 
   // Call on_frame_available BEFORE dispatch_frame_complete
   // This ensures the EGL image is captured before we signal WPE we're ready for more
@@ -919,6 +930,12 @@ void InAppWebView::OnExportDmaBuf(::wpe_fdo_egl_exported_image* image) {
 }
 
 void InAppWebView::ReadPixelsFromEglImage(void* egl_image, uint32_t width, uint32_t height) {
+  // CRITICAL: Check for GL context before any GL operations
+  // WPE WebKit calls this from its own thread which may not have a GL context
+  if (!HasCurrentGLContext()) {
+    return;
+  }
+  
   EGLDisplay display = static_cast<EGLDisplay>(egl_display_);
   EGLImageKHR image = static_cast<EGLImageKHR>(egl_image);
 
@@ -998,6 +1015,7 @@ void InAppWebView::ReadPixelsFromEglImage(void* egl_image, uint32_t width, uint3
 void InAppWebView::loadUrl(const std::string& url) {
   if (webview_ == nullptr)
     return;
+
   webkit_web_view_load_uri(webview_, url.c_str());
 }
 
@@ -1036,6 +1054,11 @@ void InAppWebView::loadData(const std::string& data, const std::string& mime_typ
   if (webview_ == nullptr)
     return;
 
+  g_message("InAppWebView: loadData() called while loading, stopping current load first");
+  webkit_web_view_stop_loading(webview_);
+  // Give WebKit/WPE FDO a moment to clean up pending operations
+  while (g_main_context_iteration(NULL, FALSE)) { }
+
   GBytes* bytes = g_bytes_new(data.data(), data.size());
   webkit_web_view_load_bytes(webview_, bytes, mime_type.c_str(), encoding.c_str(),
                              base_url.c_str());
@@ -1045,6 +1068,11 @@ void InAppWebView::loadData(const std::string& data, const std::string& mime_typ
 void InAppWebView::loadFile(const std::string& asset_file_path) {
   if (webview_ == nullptr)
     return;
+
+  g_message("InAppWebView: loadFile() called while loading, stopping current load first");
+  webkit_web_view_stop_loading(webview_);
+  // Give WebKit/WPE FDO a moment to clean up pending operations
+  while (g_main_context_iteration(NULL, FALSE)) { }
 
   // Get the path to the running executable
   char exe_path[PATH_MAX];
@@ -1072,6 +1100,11 @@ void InAppWebView::loadFile(const std::string& asset_file_path) {
 void InAppWebView::postUrl(const std::string& url, const std::vector<uint8_t>& postData) {
   if (webview_ == nullptr)
     return;
+
+  g_message("InAppWebView: postUrl() called while loading, stopping current load first");
+  webkit_web_view_stop_loading(webview_);
+  // Give WebKit/WPE FDO a moment to clean up pending operations
+  while (g_main_context_iteration(NULL, FALSE)) { }
 
   // WPE WebKit's webkit_web_view_load_request() doesn't support POST body directly.
   // We use JavaScript XMLHttpRequest to perform the POST and load the result.
@@ -1142,24 +1175,33 @@ void InAppWebView::postUrl(const std::string& url, const std::vector<uint8_t>& p
 void InAppWebView::reload() {
   if (webview_ == nullptr)
     return;
+  
   webkit_web_view_reload(webview_);
 }
 
 void InAppWebView::reloadFromOrigin() {
   if (webview_ == nullptr)
     return;
+
+  g_message("InAppWebView: reloadFromOrigin() called while loading, stopping current load first");
+  webkit_web_view_stop_loading(webview_);
+  // Give WebKit/WPE FDO a moment to clean up pending operations
+  while (g_main_context_iteration(NULL, FALSE)) { }
+  
   webkit_web_view_reload_bypass_cache(webview_);
 }
 
 void InAppWebView::goBack() {
   if (webview_ == nullptr)
     return;
+  
   webkit_web_view_go_back(webview_);
 }
 
 void InAppWebView::goForward() {
   if (webview_ == nullptr)
     return;
+  
   webkit_web_view_go_forward(webview_);
 }
 
@@ -2704,10 +2746,12 @@ bool InAppWebView::CopyPixelBufferTo(uint8_t* dst, size_t dst_size, uint32_t* ou
 }
 
 bool InAppWebView::HasDmaBufExport() const {
+  std::lock_guard<std::mutex> lock(exported_image_mutex_);
   return exported_image_ != nullptr;
 }
 
 bool InAppWebView::GetDmaBufFd(int* fd, uint32_t* stride, uint32_t* width, uint32_t* height) const {
+  std::lock_guard<std::mutex> lock(exported_image_mutex_);
   if (exported_image_ == nullptr) {
     return false;
   }
@@ -2728,6 +2772,9 @@ bool InAppWebView::GetDmaBufFd(int* fd, uint32_t* stride, uint32_t* width, uint3
 }
 
 void* InAppWebView::GetCurrentEglImage(uint32_t* out_width, uint32_t* out_height) const {
+  // Protect exported_image_ access - OnExportDmaBuf may be called from WPE's thread
+  std::lock_guard<std::mutex> lock(exported_image_mutex_);
+  
   if (exported_image_ == nullptr) {
     if (out_width)
       *out_width = 0;
@@ -2787,25 +2834,84 @@ void InAppWebView::OnShouldOverrideUrlLoadingDecision(int64_t decision_id, bool 
 void InAppWebView::OnLoadChanged(WebKitWebView* web_view, WebKitLoadEvent load_event,
                                  gpointer user_data) {
   auto* self = static_cast<InAppWebView*>(user_data);
-  if (self->channel_delegate_ == nullptr)
-    return;
-
+  
+  // Get load event name for debugging
+  const char* load_event_name = "UNKNOWN";
   switch (load_event) {
     case WEBKIT_LOAD_STARTED:
-      // Hide all popups when a new page starts loading
-      self->HideAllPopups();
-      self->channel_delegate_->onLoadStart(self->getUrl().value_or(""));
+      load_event_name = "WEBKIT_LOAD_STARTED";
+      break;
+    case WEBKIT_LOAD_REDIRECTED:
+      load_event_name = "WEBKIT_LOAD_REDIRECTED";
       break;
     case WEBKIT_LOAD_COMMITTED:
-      // Notify that page content is starting to be visible
-      self->channel_delegate_->onPageCommitVisible(self->getUrl().value_or(""));
+      load_event_name = "WEBKIT_LOAD_COMMITTED";
       break;
     case WEBKIT_LOAD_FINISHED:
-      self->channel_delegate_->onLoadStop(self->getUrl().value_or(""));
-      break;
-    default:
+      load_event_name = "WEBKIT_LOAD_FINISHED";
       break;
   }
+  
+  // Get current URL for debugging
+  const char* uri = webkit_web_view_get_uri(web_view);
+  
+  // DEBUG: Log every load event with timestamp to track WPE-FDO errors
+  g_message("[InAppWebView] OnLoadChanged: event=%s, url=%s, webview=%p, exportable=%p, exported_image=%p",
+            load_event_name,
+            uri ? uri : "(null)",
+            (void*)self,
+            (void*)self->exportable_,
+            (void*)self->exported_image_);
+  
+  // Check if WebView is still valid (WebProcess may have crashed)
+  if (!WEBKIT_IS_WEB_VIEW(web_view)) {
+    g_warning("[InAppWebView] OnLoadChanged: WebView is invalid! event=%s", load_event_name);
+    return;
+  }
+  
+  // Check if WebProcess is still running
+  // Note: webkit_web_view_is_loading() may return unexpected values if WebProcess crashed
+  gboolean is_loading = webkit_web_view_is_loading(web_view);
+  g_message("[InAppWebView] OnLoadChanged: is_loading=%d", is_loading);
+  
+  if (self->channel_delegate_ == nullptr) {
+    g_message("[InAppWebView] OnLoadChanged: channel_delegate_ is null, skipping callbacks");
+    return;
+  }
+
+  switch (load_event) {
+    case WEBKIT_LOAD_STARTED: {
+      g_message("[InAppWebView] LOAD_STARTED: About to hide popups...");
+      // Hide all popups when a new page starts loading
+      self->HideAllPopups();
+      g_message("[InAppWebView] LOAD_STARTED: Popups hidden, getting URL...");
+      
+      std::string current_url = self->getUrl().value_or("");
+      g_message("[InAppWebView] LOAD_STARTED: Calling onLoadStart with url=%s", current_url.c_str());
+      self->channel_delegate_->onLoadStart(current_url);
+      g_message("[InAppWebView] LOAD_STARTED: onLoadStart completed");
+      break;
+    }
+    case WEBKIT_LOAD_REDIRECTED:
+      g_message("[InAppWebView] LOAD_REDIRECTED: Navigation redirected to %s", uri ? uri : "(null)");
+      break;
+    case WEBKIT_LOAD_COMMITTED:
+      g_message("[InAppWebView] LOAD_COMMITTED: About to call onPageCommitVisible...");
+      // Notify that page content is starting to be visible
+      self->channel_delegate_->onPageCommitVisible(self->getUrl().value_or(""));
+      g_message("[InAppWebView] LOAD_COMMITTED: onPageCommitVisible completed");
+      break;
+    case WEBKIT_LOAD_FINISHED:
+      g_message("[InAppWebView] LOAD_FINISHED: About to reset crash counter and call onLoadStop...");
+      self->channel_delegate_->onLoadStop(self->getUrl().value_or(""));
+      g_message("[InAppWebView] LOAD_FINISHED: onLoadStop completed");
+      break;
+    default:
+      g_message("[InAppWebView] OnLoadChanged: Unknown load_event=%d", (int)load_event);
+      break;
+  }
+  
+  g_message("[InAppWebView] OnLoadChanged: Handler completed for event=%s", load_event_name);
 }
 
 gboolean InAppWebView::OnDecidePolicy(WebKitWebView* web_view, WebKitPolicyDecision* decision,
@@ -2890,6 +2996,15 @@ gboolean InAppWebView::OnDecidePolicy(WebKitWebView* web_view, WebKitPolicyDecis
 
       // Create callback to handle the response
       auto callback = std::make_unique<WebViewChannelDelegate::ShouldOverrideUrlLoadingCallback>();
+      
+      // CRITICAL: Set error handler to prevent navigation from being blocked on channel errors
+      // This matches iOS/Android behavior where errors result in allowing navigation
+      callback->error = [self, decision_id](const std::string& code, const std::string& message) {
+        g_warning("shouldOverrideUrlLoading channel error: %s - %s", code.c_str(), message.c_str());
+        // Allow navigation on error to prevent page from being stuck (consistent with iOS/Android)
+        self->OnShouldOverrideUrlLoadingDecision(decision_id, true);
+      };
+      
       callback->defaultBehaviour =
           [self, decision_id](const std::optional<NavigationActionPolicy> result) {
             bool allow = result.has_value() && result.value() == NavigationActionPolicy::allow;
@@ -2950,6 +3065,24 @@ void InAppWebView::OnNotifyUri(GObject* object, GParamSpec* pspec, gpointer user
 gboolean InAppWebView::OnLoadFailed(WebKitWebView* web_view, WebKitLoadEvent load_event,
                                     gchar* failing_uri, GError* error, gpointer user_data) {
   auto* self = static_cast<InAppWebView*>(user_data);
+  
+  // Get load event name for debugging
+  const char* load_event_name = "UNKNOWN";
+  switch (load_event) {
+    case WEBKIT_LOAD_STARTED: load_event_name = "WEBKIT_LOAD_STARTED"; break;
+    case WEBKIT_LOAD_REDIRECTED: load_event_name = "WEBKIT_LOAD_REDIRECTED"; break;
+    case WEBKIT_LOAD_COMMITTED: load_event_name = "WEBKIT_LOAD_COMMITTED"; break;
+    case WEBKIT_LOAD_FINISHED: load_event_name = "WEBKIT_LOAD_FINISHED"; break;
+  }
+  
+  // DEBUG: Log load failure with details
+  g_warning("[InAppWebView] OnLoadFailed: load_event=%s, uri=%s, error_domain=%s, error_code=%d, error_msg=%s",
+            load_event_name,
+            failing_uri ? failing_uri : "(null)",
+            error ? g_quark_to_string(error->domain) : "(null)",
+            error ? error->code : -1,
+            error ? error->message : "(null)");
+  
   if (self->channel_delegate_ == nullptr)
     return FALSE;
 
@@ -5589,8 +5722,41 @@ void InAppWebView::OnWebProcessTerminated(WebKitWebView* web_view,
   // - WEBKIT_WEB_PROCESS_TERMINATED_BY_API: Terminated via API call -> didCrash = false
   bool didCrash = (reason == WEBKIT_WEB_PROCESS_CRASHED);
 
-  debugLog("InAppWebView: Web process terminated, reason=" + std::to_string(static_cast<int>(reason)) +
-           ", didCrash=" + (didCrash ? "true" : "false"));
+  // Log the termination with detailed information
+  const char* reason_str = "unknown";
+  switch (reason) {
+    case WEBKIT_WEB_PROCESS_CRASHED:
+      reason_str = "CRASHED";
+      break;
+    case WEBKIT_WEB_PROCESS_EXCEEDED_MEMORY_LIMIT:
+      reason_str = "EXCEEDED_MEMORY_LIMIT";
+      break;
+    case WEBKIT_WEB_PROCESS_TERMINATED_BY_API:
+      reason_str = "TERMINATED_BY_API";
+      break;
+    default:
+      break;
+  }
+
+  g_warning("InAppWebView[%ld]: WebProcess terminated (reason=%s, didCrash=%s)",
+            self->id_, reason_str, didCrash ? "true" : "false");
+
+  // IMPORTANT: When WebProcess crashes (especially from "Failed to bind wl_compositor"),
+  // the WPE FDO connection is broken. We should NOT call any WPE FDO functions here
+  // as they may cause additional errors or hangs. Simply null out the pointer.
+  //
+  // The exported_image_ was being used by the crashed WebProcess, and its underlying
+  // Wayland resources are now invalid. Calling wpe_view_backend_exportable_fdo_egl_dispatch_release_exported_image
+  // on a broken connection can cause further issues.
+  {
+    std::lock_guard<std::mutex> lock(self->exported_image_mutex_);
+    if (self->exported_image_ != nullptr) {
+      g_message("InAppWebView[%ld]: Nulling stale EGL image %p after WebProcess termination (not releasing via WPE FDO)",
+                self->id_, (void*)self->exported_image_);
+      // Don't call WPE FDO release - the connection is broken
+      self->exported_image_ = nullptr;
+    }
+  }
 
   if (self->channel_delegate_) {
     self->channel_delegate_->onRenderProcessGone(didCrash);

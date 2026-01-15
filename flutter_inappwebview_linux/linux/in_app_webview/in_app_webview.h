@@ -280,6 +280,10 @@ class InAppWebView {
   // The EGL image is owned by WPE and remains valid until the next frame.
   void* GetCurrentEglImage(uint32_t* out_width, uint32_t* out_height) const;
 
+  // Skip pixel readback - when using zero-copy EGL texture mode, we don't need
+  // to read pixels back to CPU. This improves performance and avoids GL context issues.
+  void SetSkipPixelReadback(bool skip) { skip_pixel_readback_ = skip; }
+
   // Frame available callback (called when new frame is ready)
   void SetOnFrameAvailable(std::function<void()> callback);
 
@@ -432,6 +436,12 @@ class InAppWebView {
 
   // WPE FDO exportable (for DMA-BUF buffer export)
   struct wpe_view_backend_exportable_fdo* exportable_ = nullptr;
+  
+  // Current EGL image from WPE (for zero-copy GPU texture sharing).
+  // WPE manages buffer lifecycle internally - we just store the current image
+  // and let WPE recycle buffers through its internal pool.
+  // We do NOT call dispatch_release_exported_image() because WPE handles
+  // buffer release automatically when it needs the buffer back.
   ::wpe_fdo_egl_exported_image* exported_image_ = nullptr;
 
   // EGL context for reading back pixels
@@ -451,6 +461,15 @@ class InAppWebView {
   std::atomic<size_t> write_buffer_index_{0};
   std::atomic<size_t> read_buffer_index_{1};
   mutable std::mutex buffer_swap_mutex_;
+  
+  // Mutex for protecting exported_image_ access from multiple threads
+  // OnExportDmaBuf is called from WPE's rendering thread while GetCurrentEglImage
+  // may be called from Flutter's rendering thread
+  mutable std::mutex exported_image_mutex_;
+  
+  // Flag to skip pixel readback when using zero-copy EGL texture mode
+  // When true, OnExportDmaBuf won't call ReadPixelsFromEglImage
+  bool skip_pixel_readback_ = false;
 
   // View dimensions
   int width_ = 800;

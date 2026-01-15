@@ -3,8 +3,14 @@
 #include <epoxy/egl.h>
 #include <epoxy/gl.h>
 
+#include "../utils/gl_context.h"
 #include "../utils/log.h"
 #include "in_app_webview.h"
+
+// Use the shared HasCurrentGLContext from gl_context.h
+static gboolean has_current_gl_context() {
+  return flutter_inappwebview_plugin::HasCurrentGLContext() ? TRUE : FALSE;
+}
 
 /**
  * Zero-copy EGL Image texture implementation.
@@ -72,6 +78,7 @@ static gboolean check_egl_image_extension(InAppWebViewEGLTexture* self) {
 
   // Check for the extension
   const char* extensions = (const char*)glGetString(GL_EXTENSIONS);
+  
   if (extensions != nullptr &&
       (strstr(extensions, "GL_OES_EGL_image") != nullptr ||
        strstr(extensions, "GL_OES_EGL_image_external") != nullptr)) {
@@ -105,7 +112,36 @@ static gboolean inappwebview_egl_texture_populate(FlTextureGL* texture, uint32_t
 
   g_mutex_lock(&self->mutex);
 
-  // First, try to use EGL image if available (zero-copy path)
+  // CRITICAL: Verify we have a current GL context before any GL operations.
+  if (!has_current_gl_context()) {
+    // Return cached texture if available
+    if (self->texture_initialized && self->texture_id != 0) {
+      *target = GL_TEXTURE_2D;
+      *name = self->texture_id;
+      *out_width = self->texture_width > 0 ? self->texture_width : 1;
+      *out_height = self->texture_height > 0 ? self->texture_height : 1;
+      g_mutex_unlock(&self->mutex);
+      return TRUE;
+    }
+
+    // Return default texture if available
+    if (self->default_texture_initialized && self->default_texture_id != 0) {
+      *target = GL_TEXTURE_2D;
+      *name = self->default_texture_id;
+      *out_width = 1;
+      *out_height = 1;
+      g_mutex_unlock(&self->mutex);
+      return TRUE;
+    }
+
+    g_mutex_unlock(&self->mutex);
+    g_set_error(error, g_quark_from_static_string("InAppWebViewEGLTexture"), 1,
+                "No EGL/GL context current - will retry");
+    return FALSE;
+  }
+
+  // Use the EGL image that was set via inappwebview_egl_texture_set_egl_image()
+  // This is updated by the on_frame_available callback before Flutter is notified
   if (self->current_egl_image != nullptr && self->width > 0 && self->height > 0) {
     // Check if EGL image extension is available
     if (check_egl_image_extension(self)) {
@@ -128,10 +164,16 @@ static gboolean inappwebview_egl_texture_populate(FlTextureGL* texture, uint32_t
 
       glBindTexture(GL_TEXTURE_2D, 0);
 
+      // Update tracked dimensions
+      self->texture_width = self->width;
+      self->texture_height = self->height;
+
       *target = GL_TEXTURE_2D;
       *name = self->texture_id;
       *out_width = self->width;
       *out_height = self->height;
+      
+      self->has_new_frame = FALSE;
 
       g_mutex_unlock(&self->mutex);
       return TRUE;

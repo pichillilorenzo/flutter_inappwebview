@@ -292,155 +292,43 @@ class _MyAppState extends State<MyApp> {
                     child: LinuxInAppWebViewWidget(
                       LinuxInAppWebViewWidgetCreationParams(
                         key: webViewKey,
-                        // initialUrlRequest: URLRequest(url: WebUri("https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/input/color"),),
-                        initialFile: "assets/date_input_test.html",
+                        initialUrlRequest: URLRequest(url: WebUri("https://www.youtube.com/watch?v=d7j6vZHskNY&themeRefresh=1"),),
+                        // initialFile: "assets/date_input_test.html",
                         initialSettings: settings,
-                        onWebViewCreated: (controller) {
+                        onWebViewCreated: (controller) async {
                           webViewController = controller;
 
-                          // Register a test JavaScript handler
-                          controller.addJavaScriptHandler(
-                            handlerName: 'testHandler',
-                            callback: (args) {
-                              if (kDebugMode) {
-                                print(
-                                  '[TEST] testHandler called with args: $args',
-                                );
-                              }
-                              // Return a response that JavaScript will receive
-                              return {
-                                'success': true,
-                                'message': 'Hello from Dart!',
-                                'receivedArgs': args,
-                              };
-                            },
+                          await Future.delayed(Duration(seconds: 2));
+                          controller.loadUrl(
+                            urlRequest: URLRequest(
+                              url: WebUri('https://flutter.dev'),
+                            ),
                           );
+                          print('[TEST] Loaded flutter.dev');
 
-                          // Register another handler that returns a simple string
-                          controller.addJavaScriptHandler(
-                            handlerName: 'greetHandler',
-                            callback: (args) {
-                              String name = args.isNotEmpty ? args[0] : 'World';
-                              if (kDebugMode) {
-                                print(
-                                  '[TEST] greetHandler called with name: $name',
-                                );
-                              }
-                              return 'Hello, $name!';
-                            },
-                          );
-                        },
-                        onLoadStart: (controller, url) {
-                          setState(() {
-                            this.url = url.toString();
-                            urlController.text = this.url;
-                          });
-                        },
-                        onPermissionRequest: (controller, request) async {
-                          return PermissionResponse(
-                            resources: request.resources,
-                            action: PermissionResponseAction.GRANT,
-                          );
-                        },
-                        onCreateWindow: (controller, createWindowAction) async {
-                          if (createWindowAction.request.url != null) {
-                            controller.loadUrl(
-                              urlRequest: createWindowAction.request,
-                            );
-                          }
-                          return true;
-                        },
-                        onCloseWindow: (controller) {
-                          print('[TEST] onCloseWindow called');
-                        },
-                        shouldOverrideUrlLoading:
-                            (controller, navigationAction) async {
-                              return NavigationActionPolicy.ALLOW;
-                            },
-                        onProgressChanged: (controller, progress) {
-                          setState(() {
-                            this.progress = progress / 100;
-                            urlController.text = url;
-                          });
-                        },
-                        onUpdateVisitedHistory: (controller, url, isReload) {
-                          setState(() {
-                            this.url = url.toString();
-                            urlController.text = this.url;
-                          });
-                        },
-                        onPageCommitVisible: (controller, url) {},
-                        onLoadStop: (controller, url) async {
-                          setState(() {
-                            this.url = url.toString();
-                            urlController.text = this.url;
-                          });
-                          await Future.delayed(Duration(seconds: 1));
+                          await Future.delayed(Duration(seconds: 2));
+                          controller.reload();
+                          print('[TEST] Reloaded flutter.dev');
 
-                          // Test JavaScript handlers after page loads
-                          if (kDebugMode) {
-                            print('[TEST] Testing JavaScript handlers...');
-                          }
+                          await Future.delayed(Duration(seconds: 2));
+                          controller.loadUrl(
+                            urlRequest: URLRequest(
+                              url: WebUri('https://google.com'),
+                            ),
+                          );
+                          print('[TEST] Loaded google.com');
 
-                          // Test 1: Call testHandler with arguments
-                          await controller.evaluateJavascript(
-                            source: '''
-                            (async function() {
-                              try {
-                                console.log('[JS TEST] Calling testHandler...');
-                                var result = await window.flutter_inappwebview.callHandler('testHandler', 'arg1', 123, {key: 'value'});
-                                console.log('[JS TEST] testHandler result:', JSON.stringify(result));
-                                return JSON.stringify(result);
-                              } catch (e) {
-                                console.error('[JS TEST] testHandler error:', e);
-                                return 'error: ' + e.message;
-                              }
-                            })();
-                          ''',
-                          );
+                          await Future.delayed(Duration(seconds: 2));
+                          controller.reload();
+                          print('[TEST] Reloaded google.com');
 
-                          // Test 2: Call greetHandler
-                          await controller.evaluateJavascript(
-                            source: '''
-                            (async function() {
-                              try {
-                                console.log('[JS TEST] Calling greetHandler...');
-                                var result = await window.flutter_inappwebview.callHandler('greetHandler', 'Flutter');
-                                console.log('[JS TEST] greetHandler result:', result);
-                                return result;
-                              } catch (e) {
-                                console.error('[JS TEST] greetHandler error:', e);
-                                return 'error: ' + e.message;
-                              }
-                            })();
-                          ''',
-                          );
+                          await Future.delayed(Duration(seconds: 2));
+                          controller.goBack();
+                          print('[TEST] Should go back to flutter.dev');
 
-                          if (kDebugMode) {
-                            print('[TEST] JavaScript handler tests completed');
-                          }
-                        },
-                        onReceivedError: (controller, request, error) {},
-                        onReceivedHttpError: (controller, request, response) {},
-                        onReceivedClientCertRequest: (controller, challenge) async {
-                          // This callback is triggered when a server requests a client certificate
-                          print(
-                            '[TEST] onReceivedClientCertRequest: ${challenge.protectionSpace.host}:${challenge.protectionSpace.port}',
-                          );
-                          // For testing, we just cancel the request
-                          // In a real app, you might load a certificate from a file:
-                          // return ClientCertResponse(
-                          //   certificatePath: '/path/to/client.pem',
-                          //   action: ClientCertResponseAction.PROCEED,
-                          // );
-                          return ClientCertResponse(
-                            action: ClientCertResponseAction.CANCEL,
-                          );
-                        },
-                        onConsoleMessage: (controller, consoleMessage) {
-                          if (kDebugMode) {
-                            print('[CONSOLE] ${consoleMessage.message}');
-                          }
+                          await Future.delayed(Duration(seconds: 2));
+                          controller.goBack();
+                          print('[TEST] Should go back to YouTube');
                         },
                       ),
                     ).build(context),

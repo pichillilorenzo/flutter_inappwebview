@@ -243,6 +243,8 @@ class _MyAppState extends State<MyApp> {
     // Register custom scheme for onLoadResourceWithCustomScheme testing
     // Note: http/https cannot be overridden - WPE WebKit explicitly prohibits it
     resourceCustomSchemes: ['myapp'],
+    // Enable Intelligent Tracking Prevention (ITP)
+    itpEnabled: true,
   );
 
   String url = "";

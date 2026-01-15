@@ -6,15 +6,14 @@
 #include <algorithm>
 #include <cstring>
 #include <fstream>
-#include <limits.h>
 #include <sstream>
 
-#include <gio/gio.h>
 #include <nlohmann/json.hpp>
 
 #include "plugin_instance.h"
 #include "utils/flutter.h"
 #include "utils/log.h"
+#include "utils/util.h"
 
 namespace flutter_inappwebview_plugin {
 
@@ -23,88 +22,6 @@ using json = nlohmann::json;
 namespace {
 bool string_equals(const gchar* a, const char* b) {
   return strcmp(a, b) == 0;
-}
-
-bool is_allowed_app_id_char(char c) {
-  return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9') ||
-         c == '.' || c == '_' || c == '-';
-}
-
-std::string sanitize_app_id(std::string id) {
-  std::string out;
-  out.reserve(id.size());
-
-  bool last_was_underscore = false;
-  for (char c : id) {
-    char mapped = is_allowed_app_id_char(c) ? c : '_';
-    if (mapped == '_' && last_was_underscore) {
-      continue;
-    }
-    out.push_back(mapped);
-    last_was_underscore = (mapped == '_');
-  }
-
-  // Trim underscores.
-  while (!out.empty() && out.front() == '_') {
-    out.erase(out.begin());
-  }
-  while (!out.empty() && out.back() == '_') {
-    out.pop_back();
-  }
-
-  if (out.size() > 128) {
-    out.resize(128);
-  }
-  if (out.empty()) {
-    out = "unknown_app";
-  }
-  return out;
-}
-
-std::string resolve_app_id_from_gapplication() {
-  GApplication* app = g_application_get_default();
-  if (app == nullptr) {
-    return "";
-  }
-  const gchar* id = g_application_get_application_id(app);
-  if (id == nullptr || id[0] == '\0') {
-    return "";
-  }
-  return std::string(id);
-}
-
-std::string basename_of_path(const std::string& path) {
-  if (path.empty()) {
-    return "";
-  }
-  size_t last_slash = path.find_last_of('/');
-  if (last_slash == std::string::npos) {
-    return path;
-  }
-  if (last_slash + 1 >= path.size()) {
-    return "";
-  }
-  return path.substr(last_slash + 1);
-}
-
-std::string resolve_app_id_from_executable_basename() {
-  char buf[PATH_MAX + 1];
-  ssize_t len = readlink("/proc/self/exe", buf, PATH_MAX);
-  if (len <= 0) {
-    return "";
-  }
-  buf[len] = '\0';
-  std::string exe_path(buf);
-
-  return basename_of_path(exe_path);
-}
-
-std::string resolve_application_id_sanitized() {
-  std::string raw = resolve_app_id_from_gapplication();
-  if (raw.empty()) {
-    raw = resolve_app_id_from_executable_basename();
-  }
-  return sanitize_app_id(raw);
 }
 }  // namespace
 

@@ -114,6 +114,17 @@ class InAppWebViewSettings {
   // Pattern format: [protocol]://[host]:[port]
   std::optional<std::vector<std::string>> corsAllowlist;
 
+  // === ITP (Intelligent Tracking Prevention) ===
+  // When true, enables ITP which collects resource load statistics
+  // to decide whether to allow/block third-party cookies
+  // Note: This is a session-level setting applied during WebView creation
+  bool itpEnabled = false;
+
+  // === Content Blockers ===
+  // Raw FlValue* list of content blocker rules (stored for later application)
+  // Each rule is a map with "trigger" and "action" keys
+  FlValue* contentBlockers = nullptr;
+
   InAppWebViewSettings();
   explicit InAppWebViewSettings(FlValue* map);
   ~InAppWebViewSettings();

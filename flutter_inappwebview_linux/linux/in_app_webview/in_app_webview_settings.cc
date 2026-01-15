@@ -160,6 +160,18 @@ InAppWebViewSettings::InAppWebViewSettings(FlValue* map) : InAppWebViewSettings(
     corsAllowlist =
         get_fl_map_value<std::vector<std::string>>(map, "corsAllowlist", {});
   }
+
+  // === ITP (Intelligent Tracking Prevention) ===
+  itpEnabled = get_fl_map_value(map, "itpEnabled", itpEnabled);
+
+  // === Content Blockers ===
+  // Store the raw FlValue for later use by ContentBlockerHandler
+  if (fl_map_contains_not_null(map, "contentBlockers")) {
+    FlValue* blockers = fl_value_lookup_string(map, "contentBlockers");
+    if (blockers != nullptr && fl_value_get_type(blockers) == FL_VALUE_TYPE_LIST) {
+      contentBlockers = fl_value_ref(blockers);
+    }
+  }
 }
 
 void InAppWebViewSettings::applyToWebView(WebKitWebView* webview) const {
@@ -401,6 +413,9 @@ FlValue* InAppWebViewSettings::toFlValue() const {
     fl_value_set_string_take(map, "corsAllowlist", fl_value_new_null());
   }
 
+  // === ITP ===
+  fl_value_set_string_take(map, "itpEnabled", fl_value_new_bool(itpEnabled));
+
   return map;
 }
 
@@ -447,7 +462,11 @@ FlValue* InAppWebViewSettings::getRealSettings(const InAppWebView* inAppWebView)
 }
 
 InAppWebViewSettings::~InAppWebViewSettings() {
-  // Nothing to clean up
+  // Clean up contentBlockers FlValue if we own it
+  if (contentBlockers != nullptr) {
+    fl_value_unref(contentBlockers);
+    contentBlockers = nullptr;
+  }
 }
 
 }  // namespace flutter_inappwebview_plugin

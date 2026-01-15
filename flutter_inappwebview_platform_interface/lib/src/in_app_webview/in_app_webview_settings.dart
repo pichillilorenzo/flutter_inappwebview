@@ -307,6 +307,11 @@ class InAppWebViewSettings_ {
       AndroidPlatform(),
       IOSPlatform(available: "11.0"),
       MacOSPlatform(available: "10.13"),
+      LinuxPlatform(
+        apiName: "WebKitUserContentFilter",
+        apiUrl:
+            "https://wpewebkit.org/reference/stable/wpe-webkit-2.0/class.UserContentFilter.html",
+      ),
     ],
   )
   @ExchangeableObjectProperty(deserializer: _deserializeContentBlockers)
@@ -2793,6 +2798,33 @@ as it can cause framerate drops on animations in Android 9 and lower (see [Hybri
   )
   List<String>? corsAllowlist;
 
+  ///Sets whether Intelligent Tracking Prevention (ITP) is enabled.
+  ///
+  ///When ITP is enabled, resource load statistics are collected and used to decide
+  ///whether to allow or block third-party cookies and prevent user tracking.
+  ///This is similar to Safari's tracking prevention feature.
+  ///
+  ///**IMPORTANT NOTE**: When ITP is enabled, the cookie accept policy
+  ///`WEBKIT_COOKIE_POLICY_ACCEPT_NO_THIRD_PARTY` is ignored and
+  ///`WEBKIT_COOKIE_POLICY_ACCEPT_ALWAYS` is used instead.
+  ///
+  ///This is a session-level setting that should be set during WebView initialization.
+  ///
+  ///The default value is `false`.
+  @SupportedPlatforms(
+    platforms: [
+      LinuxPlatform(
+        available: "2.40",
+        apiName: "webkit_network_session_set_itp_enabled",
+        apiUrl:
+            "https://wpewebkit.org/reference/stable/wpe-webkit-2.0/method.NetworkSession.set_itp_enabled.html",
+        note:
+            "This is a session-level setting. When enabled, ACCEPT_NO_THIRD_PARTY cookie policy is overridden to ACCEPT_ALWAYS.",
+      ),
+    ],
+  )
+  bool? itpEnabled;
+
   @ExchangeableObjectConstructor()
   InAppWebViewSettings_({
     this.useShouldOverrideUrlLoading,
@@ -2972,6 +3004,7 @@ as it can cause framerate drops on animations in Android 9 and lower (see [Hybri
     this.enableSpatialNavigation = false,
     this.pictographFontFamily,
     this.corsAllowlist,
+    this.itpEnabled = false,
   }) {
     if (this.minimumFontSize == null)
       this.minimumFontSize = Util.isAndroid ? 8 : 0;

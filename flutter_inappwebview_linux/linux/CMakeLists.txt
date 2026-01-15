@@ -127,6 +127,7 @@ list(APPEND PLUGIN_SOURCES
   "proxy_manager.cc"
   "web_storage_manager.cc"
   "webview_environment.cc"
+  "content_blocker/content_blocker_handler.cc"
   "find_interaction/find_interaction_controller.cc"
   "find_interaction/find_interaction_channel_delegate.cc"
   "headless_in_app_webview/headless_in_app_webview.cc"

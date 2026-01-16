@@ -71,10 +71,31 @@ pkg_check_modules(WPE_PLATFORM QUIET IMPORTED_TARGET wpe-platform-2.0)
 pkg_check_modules(WPE_PLATFORM_HEADLESS QUIET IMPORTED_TARGET wpe-platform-headless-2.0)
 
 if(WPE_PLATFORM_FOUND AND WPE_PLATFORM_HEADLESS_FOUND)
-  message(STATUS "flutter_inappwebview_linux: Found wpe-platform-2.0 (WPEPlatform API - DEFAULT)")
-  message(STATUS "flutter_inappwebview_linux: Found wpe-platform-headless-2.0")
-  set(HAVE_WPE_PLATFORM ON)
-  add_compile_definitions(HAVE_WPE_PLATFORM=1)
+  # Additional check: verify that WebKit was actually built WITH WPEPlatform support
+  # The pkg-config file may exist but WebKit headers may not have the required functions
+  # This happens when WPE WebKit is rebuilt without WPEPlatform support
+  include(CheckCXXSourceCompiles)
+  set(CMAKE_REQUIRED_INCLUDES ${WPE_WEBKIT_INCLUDE_DIRS} ${WPE_PLATFORM_INCLUDE_DIRS})
+  set(CMAKE_REQUIRED_LIBRARIES ${WPE_WEBKIT_LIBRARIES} ${WPE_PLATFORM_LIBRARIES})
+  check_cxx_source_compiles("
+    #include <wpe/webkit.h>
+    int main() {
+      WebKitWebView* view = nullptr;
+      webkit_web_view_get_wpe_view(view);
+      return 0;
+    }
+  " WEBKIT_HAS_WPE_PLATFORM_API)
+  
+  if(WEBKIT_HAS_WPE_PLATFORM_API)
+    message(STATUS "flutter_inappwebview_linux: Found wpe-platform-2.0 (WPEPlatform API - DEFAULT)")
+    message(STATUS "flutter_inappwebview_linux: Found wpe-platform-headless-2.0")
+    message(STATUS "flutter_inappwebview_linux: WebKit has WPEPlatform API support (webkit_web_view_get_wpe_view)")
+    set(HAVE_WPE_PLATFORM ON)
+    add_compile_definitions(HAVE_WPE_PLATFORM=1)
+  else()
+    message(STATUS "flutter_inappwebview_linux: wpe-platform-2.0 pkg-config found, but WebKit lacks WPEPlatform API")
+    message(STATUS "flutter_inappwebview_linux: WebKit was likely built without WPEPlatform support, falling back to legacy FDO")
+  endif()
 endif()
 
 # === WPE Backend FDO Detection (Legacy - fallback) ===

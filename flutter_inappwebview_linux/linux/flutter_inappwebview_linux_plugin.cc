@@ -16,6 +16,7 @@
 #include "in_app_browser/in_app_browser_manager.h"
 #include "in_app_webview/in_app_webview_manager.h"
 #include "proxy_manager.h"
+#include "utils/software_rendering.h"
 #include "web_storage_manager.h"
 #include "webview_environment.h"
 
@@ -74,6 +75,12 @@ static void flutter_inappwebview_linux_plugin_init(FlutterInappwebviewLinuxPlugi
 }
 
 void flutter_inappwebview_linux_plugin_register_with_registrar(FlPluginRegistrar* registrar) {
+  // === CRITICAL: Check for VM/problematic GPU BEFORE any WebKit initialization ===
+  // This must happen before any WPEDisplay is created, because WebKit's WebProcess
+  // inherits environment variables at spawn time. Setting LIBGL_ALWAYS_SOFTWARE
+  // after WebProcess starts has no effect.
+  flutter_inappwebview_plugin::ApplySoftwareRenderingIfNeeded();
+
   FlutterInappwebviewLinuxPlugin* plugin = FLUTTER_INAPPWEBVIEW_LINUX_PLUGIN(
       g_object_new(flutter_inappwebview_linux_plugin_get_type(), nullptr));
 

@@ -219,6 +219,20 @@ bool InAppWebView::IsWpeWebKitAvailable() {
   return available;
 }
 
+#ifdef HAVE_WPE_PLATFORM
+// Check if DMA-BUF rendering should be used (called at WebView initialization)
+// Returns true if DMA-BUF rendering is expected to work
+// Note: The actual environment detection and LIBGL_ALWAYS_SOFTWARE setting
+// is now done at plugin registration time via utils/software_rendering.h
+bool InAppWebView::PreflightDmaBufSupport() {
+  const char* sw_env = getenv("LIBGL_ALWAYS_SOFTWARE");
+  if (sw_env && (strcmp(sw_env, "1") == 0 || strcasecmp(sw_env, "true") == 0)) {
+    return false;  // Software rendering mode
+  }
+  return true;  // Hardware rendering mode
+}
+#endif
+
 InAppWebView::InAppWebView(FlPluginRegistrar* registrar, FlBinaryMessenger* messenger, int64_t id,
                            const InAppWebViewCreationParams& params)
     : plugin_(params.plugin), registrar_(registrar), messenger_(messenger), gtk_window_(params.gtkWindow), fl_view_(params.flView), manager_(params.manager), id_(id), settings_(params.initialSettings),
@@ -523,19 +537,9 @@ void InAppWebView::InitWpeBackend() {
 #ifdef HAVE_WPE_PLATFORM
   // === WPEPlatform API (Modern) ===
   
-  // Check if force software rendering is enabled
-  // This must be done BEFORE creating WPEDisplay so that WebKit uses SHM buffers
-  static bool force_sw_init_done = false;
-  if (!force_sw_init_done) {
-    force_sw_init_done = true;
-    const char* force_sw = getenv("FLUTTER_INAPPWEBVIEW_FORCE_SOFTWARE_RENDERING");
-    if (force_sw && (strcmp(force_sw, "1") == 0 || strcasecmp(force_sw, "true") == 0)) {
-      // Set LIBGL_ALWAYS_SOFTWARE to make WPEDisplay report no DRM device
-      // This forces WebKit to use SHM buffers instead of DMA-BUF
-      setenv("LIBGL_ALWAYS_SOFTWARE", "1", 0);  // Don't override if already set
-      g_print("[InAppWebView] Force software rendering: setting LIBGL_ALWAYS_SOFTWARE=1\n");
-    }
-  }
+  // NOTE: The DMA-BUF preflight check and LIBGL_ALWAYS_SOFTWARE setup
+  // is now done at plugin registration time via RunEarlyPreflightCheck().
+  // This ensures the environment is set BEFORE any WPEDisplay is created.
   
   // Create a headless display for offscreen rendering
   GError* error = nullptr;
@@ -774,8 +778,6 @@ void InAppWebView::InitWebView(const InAppWebViewCreationParams& params) {
     int gtk_scale = gtk_widget_get_scale_factor(GTK_WIDGET(gtk_window_));
     if (gtk_scale > 0 && static_cast<double>(gtk_scale) != scale_factor_) {
       scale_factor_ = static_cast<double>(gtk_scale);
-      g_print("[InAppWebView] Initial GTK display scale: %.2f\n", scale_factor_);
-      
       // Notify WPE about the real display scale
       if (wpe_toplevel_ != nullptr) {
         wpe_toplevel_scale_changed(wpe_toplevel_, scale_factor_);
@@ -790,8 +792,6 @@ void InAppWebView::InitWebView(const InAppWebViewCreationParams& params) {
           int new_scale = gtk_widget_get_scale_factor(widget);
           
           if (new_scale > 0 && static_cast<double>(new_scale) != self->scale_factor_) {
-            g_print("[InAppWebView] GTK display scale changed: %.2f -> %d\n", 
-                    self->scale_factor_, new_scale);
             self->scale_factor_ = static_cast<double>(new_scale);
             
             // Notify WPE about the scale change so it renders at the correct resolution
@@ -806,7 +806,7 @@ void InAppWebView::InitWebView(const InAppWebViewCreationParams& params) {
           }
         }), this);
   } else {
-    g_print("[InAppWebView] Warning: No GTK window available for scale detection\n");
+    debugLog("Warning: No GTK window available for scale detection");
   }
   
   // Map the view to start rendering
@@ -1302,31 +1302,10 @@ void InAppWebView::OnWpePlatformBufferRendered(WPEBuffer* buffer) {
     return;
   }
   
-  // Check if force software rendering is enabled for testing
-  static bool force_software_checked = false;
-  static bool force_software_rendering = false;
-  if (!force_software_checked) {
-    force_software_checked = true;
-    const char* env = getenv("FLUTTER_INAPPWEBVIEW_FORCE_SOFTWARE_RENDERING");
-    if (env && (strcmp(env, "1") == 0 || strcasecmp(env, "true") == 0)) {
-      force_software_rendering = true;
-      g_print("[InAppWebView] Force software rendering enabled\n");
-    }
-  }
-  
   // Get buffer dimensions
   uint32_t buf_width = static_cast<uint32_t>(wpe_buffer_get_width(buffer));
   uint32_t buf_height = static_cast<uint32_t>(wpe_buffer_get_height(buffer));
   
-  // Detect buffer type for diagnostics
-  bool is_shm_buffer = WPE_IS_BUFFER_SHM(buffer);
-  static bool first_buffer_logged = false;
-  if (!first_buffer_logged) {
-    first_buffer_logged = true;
-    g_print("[InAppWebView] Buffer type: %s, size: %ux%u\n", 
-            is_shm_buffer ? "SHM (software)" : "DMA-BUF (hardware)", 
-            buf_width, buf_height);
-  }
   
   WPEBuffer* previous_buffer = nullptr;
   bool buffer_handled = false;
@@ -1361,8 +1340,8 @@ void InAppWebView::OnWpePlatformBufferRendered(WPEBuffer* buffer) {
     
     // === Priority 1: Try EGL image import (zero-copy, best performance) ===
     // Only attempt EGL for DMA-BUF buffers (SHM buffers cannot be imported via EGL)
-    // Skip if force_software_rendering is enabled, or if previous EGL attempts failed
-    if (!force_software_rendering && egl_display_ != nullptr && 
+    // Skip if previous EGL attempts failed
+    if (egl_display_ != nullptr && 
         is_dma_buf && !egl_import_failed_permanently) {
       GError* error = nullptr;
       void* egl_image = wpe_buffer_import_to_egl_image(buffer, &error);
@@ -1372,20 +1351,12 @@ void InAppWebView::OnWpePlatformBufferRendered(WPEBuffer* buffer) {
         current_buffer_width_ = buf_width;
         current_buffer_height_ = buf_height;
         buffer_handled = true;
-        static bool logged_egl = false;
-        if (!logged_egl) {
-          logged_egl = true;
-          g_print("[InAppWebView] Rendering via EGL image (zero-copy GPU)\n");
-        }
       } else {
         // Mark EGL as permanently failed so we don't keep trying
         // This is common in VMs or software-only environments
         egl_import_failed_permanently = true;
         if (error != nullptr) {
-          g_print("[InAppWebView] EGL import failed (will use software rendering): %s\n", error->message);
           g_clear_error(&error);
-        } else {
-          g_print("[InAppWebView] EGL import failed (will use software rendering)\n");
         }
       }
     }
@@ -1436,12 +1407,6 @@ void InAppWebView::OnWpePlatformBufferRendered(WPEBuffer* buffer) {
           current_buffer_width_ = buf_width;
           current_buffer_height_ = buf_height;
           buffer_handled = true;
-          static bool logged_shm = false;
-          if (!logged_shm) {
-            logged_shm = true;
-            g_print("[InAppWebView] Rendering via SHM (software, ARGB->RGBA converted), format=%d, stride=%u\n",
-                    static_cast<int>(format), stride);
-          }
         }
         // Note: Don't unref data - it's borrowed from the buffer
       }
@@ -1486,29 +1451,15 @@ void InAppWebView::OnWpePlatformBufferRendered(WPEBuffer* buffer) {
         current_buffer_width_ = buf_width;
         current_buffer_height_ = buf_height;
         buffer_handled = true;
-        static bool logged_gbm = false;
-        if (!logged_gbm) {
-          logged_gbm = true;
-          g_print("[InAppWebView] Rendering via pixel import (GBM readback, ARGB->RGBA converted)\n");
-        }
       } else {
         if (error != nullptr) {
-          static bool logged_gbm_fail = false;
-          if (!logged_gbm_fail) {
-            logged_gbm_fail = true;
-            g_print("[InAppWebView] Pixel import (GBM) failed: %s\n", error->message);
-          }
           g_clear_error(&error);
         }
       }
     }
     
     if (!buffer_handled) {
-      static bool logged_no_method = false;
-      if (!logged_no_method) {
-        logged_no_method = true;
-        g_print("[InAppWebView] ERROR: No rendering method succeeded!\n");
-      }
+      debugLog("ERROR: No rendering method succeeded!");
     }
     
     // Store reference to current buffer - we keep it until the NEXT frame arrives

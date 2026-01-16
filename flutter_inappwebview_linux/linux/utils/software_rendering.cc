@@ -74,10 +74,40 @@ bool IsRunningInVirtualMachine() {
     fclose(f);
   }
   
-  // Check for virtio bus (common in QEMU/KVM VMs)
-  if (access("/sys/bus/virtio", F_OK) == 0) {
-    debugLog("VM detected via virtio bus");
-    return true;
+  return false;
+}
+
+// Check if we have a known good GPU driver that works well with DMA-BUF
+bool HasKnownGoodGpuDriver() {
+  const char* dri_paths[] = {
+    "/sys/class/drm/card0/device/driver",
+    "/sys/class/drm/renderD128/device/driver",
+    nullptr
+  };
+  
+  // Known good drivers that work well with DMA-BUF
+  const char* good_drivers[] = {
+    "nvidia",   // Nvidia proprietary driver
+    "nouveau",  // Nvidia open-source driver
+    "amdgpu",   // AMD GPU driver
+    "radeon",   // Older AMD driver
+    "i915",     // Intel integrated graphics
+    "xe",       // Intel Xe graphics (newer)
+    nullptr
+  };
+  
+  for (const char** path = dri_paths; *path; path++) {
+    char link_target[256] = {0};
+    ssize_t len = readlink(*path, link_target, sizeof(link_target) - 1);
+    if (len > 0) {
+      link_target[len] = '\0';
+      for (const char** driver = good_drivers; *driver; driver++) {
+        if (strstr(link_target, *driver)) {
+          debugLog("Known good GPU driver detected: " + std::string(link_target));
+          return true;
+        }
+      }
+    }
   }
   
   return false;
@@ -85,6 +115,11 @@ bool IsRunningInVirtualMachine() {
 
 // Check if the GPU driver is known to have DMA-BUF issues
 bool HasProblematicGpuDriver() {
+  // If we have a known good driver, it's not problematic
+  if (HasKnownGoodGpuDriver()) {
+    return false;
+  }
+  
   const char* dri_paths[] = {
     "/sys/class/drm/card0/device/driver",
     "/sys/class/drm/renderD128/device/driver",
@@ -120,6 +155,12 @@ bool ShouldUseSoftwareRendering() {
   const char* already_sw = getenv("LIBGL_ALWAYS_SOFTWARE");
   if (already_sw && (strcmp(already_sw, "1") == 0 || strcasecmp(already_sw, "true") == 0)) {
     return true;  // Already in software mode
+  }
+  
+  // If we have a known good GPU driver, use hardware rendering
+  if (HasKnownGoodGpuDriver()) {
+    debugLog("Known good GPU driver found, using hardware rendering");
+    return false;
   }
   
   // Detect VM environment

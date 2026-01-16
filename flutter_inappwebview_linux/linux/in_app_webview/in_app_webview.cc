@@ -4130,7 +4130,7 @@ gboolean InAppWebView::OnLoadFailedWithTlsErrors(WebKitWebView* web_view, gchar*
     }
     g_object_unref(certificate);
     g_object_unref(web_view);
-    return true;
+    return false;
   };
 
   callback->defaultBehaviour = [certificate, web_view](const std::optional<ServerTrustAuthResponse>& response) {

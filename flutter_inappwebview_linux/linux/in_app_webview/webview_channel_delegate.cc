@@ -2,6 +2,7 @@
 
 #include <cstring>
 
+#include "../in_app_browser/in_app_browser.h"
 #include "../types/client_cert_challenge.h"
 #include "../types/client_cert_response.h"
 #include "../types/custom_scheme_response.h"
@@ -203,6 +204,52 @@ void WebViewChannelDelegate::HandleMethodCall(FlMethodCall* method_call) {
   const gchar* methodName = fl_method_call_get_name(method_call);
   FlValue* args = fl_method_call_get_args(method_call);
 
+  // === InAppBrowser-specific methods ===
+  // When this WebView is embedded in an InAppBrowser, forward browser-specific methods
+  InAppBrowser* inAppBrowser = webView->getInAppBrowserDelegate();
+
+  if (string_equals(methodName, "show")) {
+    if (inAppBrowser) {
+      inAppBrowser->show();
+      fl_method_call_respond_success(method_call, fl_value_new_bool(true), nullptr);
+    } else {
+      fl_method_call_respond_not_implemented(method_call, nullptr);
+    }
+    return;
+  }
+
+  if (string_equals(methodName, "hide")) {
+    if (inAppBrowser) {
+      inAppBrowser->hide();
+      fl_method_call_respond_success(method_call, fl_value_new_bool(true), nullptr);
+    } else {
+      fl_method_call_respond_not_implemented(method_call, nullptr);
+    }
+    return;
+  }
+
+  if (string_equals(methodName, "close")) {
+    if (inAppBrowser) {
+      inAppBrowser->close();
+      fl_method_call_respond_success(method_call, fl_value_new_bool(true), nullptr);
+    } else {
+      fl_method_call_respond_not_implemented(method_call, nullptr);
+    }
+    return;
+  }
+
+  if (string_equals(methodName, "isHidden")) {
+    if (inAppBrowser) {
+      bool hidden = inAppBrowser->isHidden();
+      fl_method_call_respond_success(method_call, fl_value_new_bool(hidden), nullptr);
+    } else {
+      fl_method_call_respond_not_implemented(method_call, nullptr);
+    }
+    return;
+  }
+
+  // === WebView methods ===
+
   if (string_equals(methodName, "getUrl")) {
     auto url = webView->getUrl();
     if (url.has_value()) {
@@ -344,16 +391,28 @@ void WebViewChannelDelegate::HandleMethodCall(FlMethodCall* method_call) {
   }
 
   if (string_equals(methodName, "getSettings")) {
-    g_autoptr(FlValue) result = webView->getSettings();
-    fl_method_call_respond_success(method_call, result, nullptr);
+    // For InAppBrowser, return combined browser + webview settings
+    if (inAppBrowser) {
+      g_autoptr(FlValue) result = inAppBrowser->getSettings();
+      fl_method_call_respond_success(method_call, result, nullptr);
+    } else {
+      g_autoptr(FlValue) result = webView->getSettings();
+      fl_method_call_respond_success(method_call, result, nullptr);
+    }
     return;
   }
 
   if (string_equals(methodName, "setSettings")) {
     FlValue* settings_value = get_fl_map_value_raw(args, "settings");
     if (settings_value != nullptr && fl_value_get_type(settings_value) == FL_VALUE_TYPE_MAP) {
-      auto newSettings = std::make_shared<InAppWebViewSettings>(settings_value);
-      webView->setSettings(newSettings, settings_value);
+      // For InAppBrowser, set both browser and webview settings
+      if (inAppBrowser) {
+        auto newBrowserSettings = std::make_shared<InAppBrowserSettings>(settings_value);
+        inAppBrowser->setSettings(newBrowserSettings, settings_value);
+      } else {
+        auto newSettings = std::make_shared<InAppWebViewSettings>(settings_value);
+        webView->setSettings(newSettings, settings_value);
+      }
     }
     g_autoptr(FlValue) result = fl_value_new_bool(true);
     fl_method_call_respond_success(method_call, result, nullptr);
@@ -1767,9 +1826,10 @@ void WebViewChannelDelegate::onRenderProcessGone(bool didCrash) const {
     return;
   }
 
-  FlValue* detail = to_fl_map({{"didCrash", make_fl_value(didCrash)},
-                              {"rendererPriorityAtExit", make_fl_value()}});
-  g_autoptr(FlValue) args = to_fl_map({{"detail", detail}});
+  // Send didCrash and rendererPriorityAtExit at the top level (matching Android format)
+  // Linux doesn't have renderer priority info, so we send null
+  g_autoptr(FlValue) args = to_fl_map({{"didCrash", make_fl_value(didCrash)},
+                                       {"rendererPriorityAtExit", make_fl_value()}});
 
   invokeMethod("onRenderProcessGone", args);
 }

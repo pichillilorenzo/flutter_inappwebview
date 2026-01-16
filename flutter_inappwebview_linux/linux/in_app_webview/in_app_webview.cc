@@ -419,19 +419,31 @@ InAppWebView::~InAppWebView() {
   pending_policy_decisions_.clear();
 
 #ifdef HAVE_WPE_PLATFORM
-  // WPEPlatform cleanup
-  // Note: wpe_view_ and wpe_toplevel_ are not owned by us, they come from WebKit
-  // The WPEDisplay is owned by us and should be unreffed after the webview
+  // === WPEPlatform proper shutdown sequence ===
+  // Mark as disposing to prevent buffer callbacks from processing
+  is_disposing_.store(true);
   
-  // Disconnect buffer-rendered signal before destroying webview
+  // 1. First disconnect the buffer-rendered signal to stop receiving new frames
   if (wpe_view_ != nullptr && buffer_rendered_handler_ != 0) {
     g_signal_handler_disconnect(wpe_view_, buffer_rendered_handler_);
     buffer_rendered_handler_ = 0;
   }
   
-  // Clean up EGL image we may have created
+  // 2. Release focus from the view
+  if (wpe_view_ != nullptr) {
+    wpe_view_focus_out(wpe_view_);
+  }
+  
+  // 3. Unmap the view to stop rendering
+  if (wpe_view_ != nullptr) {
+    wpe_view_unmap(wpe_view_);
+  }
+  
+  // 4. Release any pending buffer back to WPE and clean up EGL image
   {
     std::lock_guard<std::mutex> lock(wpe_buffer_mutex_);
+    
+    // Clean up EGL image first (while display is still valid)
     if (current_egl_image_ != nullptr && egl_display_ != nullptr) {
       static PFNEGLDESTROYIMAGEKHRPROC eglDestroyImageKHR = nullptr;
       if (eglDestroyImageKHR == nullptr) {
@@ -443,20 +455,39 @@ InAppWebView::~InAppWebView() {
       }
       current_egl_image_ = nullptr;
     }
+    
+    // Release pending buffer back to WPE
+    if (current_buffer_ != nullptr && wpe_view_ != nullptr) {
+      wpe_view_buffer_released(wpe_view_, current_buffer_);
+    }
     current_buffer_ = nullptr;
+    current_buffer_width_ = 0;
+    current_buffer_height_ = 0;
   }
   
-  // Destroy the webview first
+  // 5. Signal that the view is closing (before webview destruction)
+  if (wpe_view_ != nullptr) {
+    wpe_view_closed(wpe_view_);
+  }
+  
+  // 6. Clear view and toplevel references (before webview destruction)
+  wpe_view_ = nullptr;
+  wpe_toplevel_ = nullptr;
+  
+  // 7. Destroy the webview
   if (webview_ != nullptr) {
     g_object_unref(webview_);
     webview_ = nullptr;
   }
   
-  // Then clean up the display
+  // 8. Finally clean up the display
   if (wpe_display_ != nullptr) {
     g_object_unref(wpe_display_);
     wpe_display_ = nullptr;
   }
+  
+  // 9. Clear egl_display_ reference (was owned by WPEDisplay)
+  egl_display_ = nullptr;
 #elif defined(HAVE_WPE_BACKEND_LEGACY)
   // Legacy FDO cleanup
   // Clean up exported image (use global namespace for C API)
@@ -701,28 +732,28 @@ void InAppWebView::InitWebView(const InAppWebViewCreationParams& params) {
     return;
   }
   
-  // Get toplevel for size management
-  wpe_toplevel_ = wpe_view_get_toplevel(wpe_view_);
-  if (wpe_toplevel_ != nullptr) {
-    wpe_toplevel_resize(wpe_toplevel_, width_, height_);
-  }
-  
   // Note: Scale factor in WPEPlatform is read from the display, not set directly
   // The WPEDisplay handles scale factor automatically based on the output
   
-  // Map the view to start rendering
-  wpe_view_map(wpe_view_);
-  
-  // Connect to buffer-rendered signal to capture frames for Flutter texture
-  // This is the key signal for WPEPlatform rendering integration
+  // IMPORTANT: Connect to buffer-rendered signal BEFORE mapping the view
+  // This ensures we don't miss the first frame that WPE renders after mapping
   buffer_rendered_handler_ = g_signal_connect(wpe_view_, "buffer-rendered",
       G_CALLBACK(+[](WPEView* view, WPEBuffer* buffer, gpointer user_data) {
         auto* self = static_cast<InAppWebView*>(user_data);
         self->OnWpePlatformBufferRendered(buffer);
       }), this);
   
+  // Map the view to start rendering
+  wpe_view_map(wpe_view_);
+  
   // Set focus so the view starts rendering and receiving input
   wpe_view_focus_in(wpe_view_);
+  
+  // Get toplevel for size management
+  wpe_toplevel_ = wpe_view_get_toplevel(wpe_view_);
+  if (wpe_toplevel_ != nullptr) {
+    wpe_toplevel_resize(wpe_toplevel_, width_, height_);
+  }
   
   // Apply ITP setting if configured
   if (params.initialSettings != nullptr) {
@@ -1197,12 +1228,27 @@ void InAppWebView::OnWpePlatformBufferRendered(WPEBuffer* buffer) {
     return;
   }
   
+  // Don't process buffers during destruction
+  if (is_disposing_.load()) {
+    // Still need to release the buffer back to WPE
+    if (wpe_view_ != nullptr) {
+      wpe_view_buffer_released(wpe_view_, buffer);
+    }
+    return;
+  }
+  
   // Get buffer dimensions
   uint32_t buf_width = static_cast<uint32_t>(wpe_buffer_get_width(buffer));
   uint32_t buf_height = static_cast<uint32_t>(wpe_buffer_get_height(buffer));
   
+  WPEBuffer* previous_buffer = nullptr;
+  
   {
     std::lock_guard<std::mutex> lock(wpe_buffer_mutex_);
+    
+    // Store reference to previous buffer - we'll release it AFTER importing the new one
+    // This ensures the EGL image's backing memory stays valid until we have a new frame
+    previous_buffer = current_buffer_;
     
     // Destroy previous EGL image if we created one
     if (current_egl_image_ != nullptr && egl_display_ != nullptr) {
@@ -1267,19 +1313,21 @@ void InAppWebView::OnWpePlatformBufferRendered(WPEBuffer* buffer) {
       }
     }
     
-    // Store reference to current buffer (not ref'd - managed by WPEView)
+    // Store reference to current buffer - we keep it until the NEXT frame arrives
+    // This ensures the EGL image's backing DMA-BUF memory stays valid
     current_buffer_ = buffer;
+  }
+  
+  // Release the PREVIOUS buffer now that we have a new one
+  // The previous EGL image has been destroyed and we have a new frame,
+  // so it's safe to let WPE reuse the old buffer's memory
+  if (previous_buffer != nullptr && wpe_view_ != nullptr) {
+    wpe_view_buffer_released(wpe_view_, previous_buffer);
   }
   
   // Notify Flutter that a new frame is available
   if (on_frame_available_) {
     on_frame_available_();
-  }
-  
-  // Signal to WPE that we've consumed the buffer
-  // This allows WebKit to reuse or release the buffer
-  if (wpe_view_ != nullptr) {
-    wpe_view_buffer_released(wpe_view_, buffer);
   }
 }
 #endif
@@ -3569,6 +3617,35 @@ void* InAppWebView::GetCurrentEglImage(uint32_t* out_width, uint32_t* out_height
 
 void InAppWebView::SetOnFrameAvailable(std::function<void()> callback) {
   on_frame_available_ = std::move(callback);
+  
+#ifdef HAVE_WPE_PLATFORM
+  // Force WPE to render a new frame by triggering a resize.
+  // This is needed because:
+  // 1. The first frame may have been rendered before this callback was set
+  // 2. We release buffers immediately in OnWpePlatformBufferRendered, so
+  //    old EGL images may be invalid
+  // 3. A resize notification causes WPE to re-render with the current content
+  //
+  // We use g_idle_add to defer this slightly, ensuring the texture registration
+  // is complete before we trigger the new frame.
+  if (on_frame_available_ && wpe_toplevel_ != nullptr) {
+    WPEToplevel* toplevel = wpe_toplevel_;
+    int w = width_;
+    int h = height_;
+    g_idle_add_full(G_PRIORITY_HIGH, [](gpointer user_data) -> gboolean {
+      auto* data = static_cast<std::tuple<WPEToplevel*, int, int>*>(user_data);
+      WPEToplevel* tl = std::get<0>(*data);
+      int width = std::get<1>(*data);
+      int height = std::get<2>(*data);
+      // Trigger a resize to force WPE to render a new frame
+      if (tl != nullptr) {
+        wpe_toplevel_resize(tl, width, height);
+      }
+      delete data;
+      return G_SOURCE_REMOVE;
+    }, new std::tuple<WPEToplevel*, int, int>(toplevel, w, h), nullptr);
+  }
+#endif
 }
 
 void InAppWebView::SetOnCursorChanged(std::function<void(const std::string&)> callback) {

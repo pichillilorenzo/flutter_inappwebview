@@ -74,6 +74,7 @@ struct wpe_fdo_egl_exported_image;
 
 namespace flutter_inappwebview_plugin {
 
+class InAppBrowser;
 class InAppWebViewManager;
 class PluginInstance;
 class UserContentController;
@@ -320,6 +321,11 @@ class InAppWebView {
   // Navigation state change callback (for InAppBrowser back/forward buttons)
   void SetOnNavigationStateChanged(std::function<void()> callback);
 
+  // InAppBrowser delegate (when this WebView is embedded in an InAppBrowser)
+  // Used by WebViewChannelDelegate to forward browser-specific methods
+  void setInAppBrowserDelegate(InAppBrowser* browser) { inAppBrowserDelegate_ = browser; }
+  InAppBrowser* getInAppBrowserDelegate() const { return inAppBrowserDelegate_; }
+
   // Called from Dart when shouldOverrideUrlLoading decision is made
   void OnShouldOverrideUrlLoadingDecision(int64_t decision_id, bool allow);
 
@@ -482,6 +488,10 @@ class InAppWebView {
   
   // Mutex for protecting exported_image_ access from multiple threads
   mutable std::mutex exported_image_mutex_;
+  
+  // Flag to indicate the WebProcess has crashed and EGL resources are invalid
+  // This prevents using stale EGL images after a crash
+  std::atomic<bool> web_process_crashed_{false};
 #endif
 
   // EGL context for reading back pixels (both APIs)
@@ -574,9 +584,16 @@ class InAppWebView {
   // Navigation state change callback (for InAppBrowser back/forward buttons)
   std::function<void()> on_navigation_state_changed_;
 
+  // InAppBrowser delegate (when embedded in an InAppBrowser)
+  // This allows WebViewChannelDelegate to forward browser-specific method calls
+  InAppBrowser* inAppBrowserDelegate_ = nullptr;
+
   // Last hit test result from mouse-target-changed signal
   // Used by getHitTestResult() to return the current element under the cursor
   WebKitHitTestResult* last_hit_test_result_ = nullptr;
+
+  // Disposing flag to prevent callbacks during destruction
+  std::atomic<bool> is_disposing_{false};
 
   // Mouse state
   double cursor_x_ = 0;

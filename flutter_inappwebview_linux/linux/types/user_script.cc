@@ -29,18 +29,7 @@ UserScript::UserScript(FlValue* map)
 
   forMainFrameOnly = get_fl_map_value<bool>(map, "forMainFrameOnly", true);
 
-  FlValue* rulesValue = fl_value_lookup_string(map, "allowedOriginRules");
-  if (rulesValue != nullptr && fl_value_get_type(rulesValue) == FL_VALUE_TYPE_LIST) {
-    std::vector<std::string> rules;
-    size_t len = fl_value_get_length(rulesValue);
-    for (size_t i = 0; i < len; i++) {
-      FlValue* item = fl_value_get_list_value(rulesValue, i);
-      if (fl_value_get_type(item) == FL_VALUE_TYPE_STRING) {
-        rules.push_back(fl_value_get_string(item));
-      }
-    }
-    allowedOriginRules = rules;
-  }
+  allowedOriginRules = get_optional_fl_map_value<std::vector<std::string>>(map, "allowedOriginRules");
 
   FlValue* contentWorldValue = fl_value_lookup_string(map, "contentWorld");
   if (contentWorldValue != nullptr && fl_value_get_type(contentWorldValue) == FL_VALUE_TYPE_MAP) {

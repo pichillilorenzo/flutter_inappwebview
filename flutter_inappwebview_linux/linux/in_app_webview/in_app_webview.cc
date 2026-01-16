@@ -50,6 +50,7 @@
 #include "../plugin_scripts_js/intercept_fetch_request_js.h"
 #include "../plugin_scripts_js/javascript_bridge_js.h"
 #include "../plugin_scripts_js/on_load_resource_js.h"
+#include "../plugin_scripts_js/print_interception_js.h"
 #include "../plugin_scripts_js/web_message_channel_js.h"
 #include "../plugin_scripts_js/web_message_listener_js.h"
 #include "../types/client_cert_challenge.h"
@@ -1029,6 +1030,16 @@ void InAppWebView::RegisterEventHandlers() {
     g_signal_connect(bfList, "changed", G_CALLBACK(OnBackForwardListChanged), this);
   }
 
+  // Connect to notify::camera-capture-state signal for onCameraCaptureStateChanged
+  // Available since WPE WebKit 2.34
+  g_signal_connect(webview_, "notify::camera-capture-state",
+                   G_CALLBACK(OnNotifyCameraCaptureState), this);
+
+  // Connect to notify::microphone-capture-state signal for onMicrophoneCaptureStateChanged
+  // Available since WPE WebKit 2.34
+  g_signal_connect(webview_, "notify::microphone-capture-state",
+                   G_CALLBACK(OnNotifyMicrophoneCaptureState), this);
+
   // Add frame displayed callback (WPE-specific)
   webkit_web_view_add_frame_displayed_callback(
       webview_,
@@ -1137,8 +1148,14 @@ void InAppWebView::PrepareAndAddUserScripts() {
     user_content_controller_->addPluginScript(std::move(fetchInterceptScript));
   }
 
+  // === Add Print Interception Script ===
+  // WPE WebKit doesn't have a native print signal, so we intercept window.print()
+  // via JavaScript and notify the Dart side
+  auto printInterceptionScript = PrintInterceptionJS::PRINT_INTERCEPTION_JS_PLUGIN_SCRIPT(
+      pluginScriptsOriginAllowList, pluginScriptsForMainFrameOnly);
+  user_content_controller_->addPluginScript(std::move(printInterceptionScript));
+
   // TODO: Add additional plugin scripts as needed, similar to iOS/Android:
-  // - PrintJS
   // - FindTextHighlightJS
   // - etc.
 
@@ -1807,36 +1824,31 @@ FlValue* InAppWebView::getCopyBackForwardList() const {
   // Add back list items
   for (GList* l = backList; l != nullptr; l = l->next) {
     WebKitBackForwardListItem* item = WEBKIT_BACK_FORWARD_LIST_ITEM(l->data);
-    FlValue* itemMap = fl_value_new_map();
 
     const gchar* originalUri = webkit_back_forward_list_item_get_original_uri(item);
     const gchar* title = webkit_back_forward_list_item_get_title(item);
     const gchar* uri = webkit_back_forward_list_item_get_uri(item);
 
-    fl_value_set_string_take(itemMap, "originalUrl",
-                             fl_value_new_string(originalUri ? originalUri : ""));
-    fl_value_set_string_take(itemMap, "title",
-                             fl_value_new_string(title ? title : ""));
-    fl_value_set_string_take(itemMap, "url",
-                             fl_value_new_string(uri ? uri : ""));
+    FlValue* itemMap = to_fl_map({
+      {"originalUrl", make_fl_value(originalUri ? originalUri : "")},
+      {"title", make_fl_value(title ? title : "")},
+      {"url", make_fl_value(uri ? uri : "")},
+    });
 
     fl_value_append_take(historyList, itemMap);
   }
 
   // Add current item
   if (currentItem != nullptr) {
-    FlValue* itemMap = fl_value_new_map();
-
     const gchar* originalUri = webkit_back_forward_list_item_get_original_uri(currentItem);
     const gchar* title = webkit_back_forward_list_item_get_title(currentItem);
     const gchar* uri = webkit_back_forward_list_item_get_uri(currentItem);
 
-    fl_value_set_string_take(itemMap, "originalUrl",
-                             fl_value_new_string(originalUri ? originalUri : ""));
-    fl_value_set_string_take(itemMap, "title",
-                             fl_value_new_string(title ? title : ""));
-    fl_value_set_string_take(itemMap, "url",
-                             fl_value_new_string(uri ? uri : ""));
+    FlValue* itemMap = to_fl_map({
+      {"originalUrl", make_fl_value(originalUri ? originalUri : "")},
+      {"title", make_fl_value(title ? title : "")},
+      {"url", make_fl_value(uri ? uri : "")},
+    });
 
     fl_value_append_take(historyList, itemMap);
   }
@@ -1844,28 +1856,25 @@ FlValue* InAppWebView::getCopyBackForwardList() const {
   // Add forward list items
   for (GList* l = forwardList; l != nullptr; l = l->next) {
     WebKitBackForwardListItem* item = WEBKIT_BACK_FORWARD_LIST_ITEM(l->data);
-    FlValue* itemMap = fl_value_new_map();
 
     const gchar* originalUri = webkit_back_forward_list_item_get_original_uri(item);
     const gchar* title = webkit_back_forward_list_item_get_title(item);
     const gchar* uri = webkit_back_forward_list_item_get_uri(item);
 
-    fl_value_set_string_take(itemMap, "originalUrl",
-                             fl_value_new_string(originalUri ? originalUri : ""));
-    fl_value_set_string_take(itemMap, "title",
-                             fl_value_new_string(title ? title : ""));
-    fl_value_set_string_take(itemMap, "url",
-                             fl_value_new_string(uri ? uri : ""));
+    FlValue* itemMap = to_fl_map({
+      {"originalUrl", make_fl_value(originalUri ? originalUri : "")},
+      {"title", make_fl_value(title ? title : "")},
+      {"url", make_fl_value(uri ? uri : "")},
+    });
 
     fl_value_append_take(historyList, itemMap);
   }
 
   // Build result map
-  FlValue* result = fl_value_new_map();
-  fl_value_set_string_take(result, "list", historyList);
-  fl_value_set_string_take(result, "currentIndex", fl_value_new_int(currentIndex));
-
-  return result;
+  return to_fl_map({
+    {"list", historyList},
+    {"currentIndex", make_fl_value(currentIndex)},
+  });
 }
 
 void InAppWebView::goBackOrForward(int steps) {
@@ -3877,16 +3886,87 @@ gboolean InAppWebView::OnDecidePolicy(WebKitWebView* web_view, WebKitPolicyDecis
                                       WebKitPolicyDecisionType decision_type, gpointer user_data) {
   auto* self = static_cast<InAppWebView*>(user_data);
 
-  // Handle response policy decisions for downloads
+  // Handle response policy decisions (for onNavigationResponse and downloads)
   if (decision_type == WEBKIT_POLICY_DECISION_TYPE_RESPONSE) {
     auto* response_decision = WEBKIT_RESPONSE_POLICY_DECISION(decision);
     
-    // Check if the response should trigger a download
+    // Get response information for onNavigationResponse
+    WebKitURIResponse* response = webkit_response_policy_decision_get_response(response_decision);
+    gboolean is_mime_type_supported = webkit_response_policy_decision_is_mime_type_supported(response_decision);
+    gboolean is_main_frame = webkit_response_policy_decision_is_main_frame_main_resource(response_decision);
+    
+    const gchar* uri = webkit_uri_response_get_uri(response);
+    const gchar* mimeType = webkit_uri_response_get_mime_type(response);
+    gint64 contentLength = webkit_uri_response_get_content_length(response);
+    guint statusCode = webkit_uri_response_get_status_code(response);
+    
+    // If channel_delegate exists and settings permit, send onNavigationResponse event
+    if (self->channel_delegate_ && self->settings_ && self->settings_->useOnNavigationResponse) {
+      // Keep decision alive for async callback
+      g_object_ref(decision);
+      
+      auto callback = std::make_unique<WebViewChannelDelegate::NavigationResponseCallback>();
+      
+      callback->nonNullSuccess = [self, decision, is_mime_type_supported](int action) -> bool {
+        // NavigationResponseAction: CANCEL=0, ALLOW=1, DOWNLOAD=2
+        switch (action) {
+          case 0:  // CANCEL
+            webkit_policy_decision_ignore(decision);
+            break;
+          case 2:  // DOWNLOAD
+            webkit_policy_decision_download(decision);
+            break;
+          case 1:  // ALLOW (default)
+          default:
+            if (!is_mime_type_supported && self->settings_ && self->settings_->useOnDownloadStart) {
+              // WebKit can't display this - convert to download
+              webkit_policy_decision_download(decision);
+            } else {
+              webkit_policy_decision_use(decision);
+            }
+            break;
+        }
+        g_object_unref(decision);
+        return false;  // Don't run defaultBehaviour
+      };
+      
+      callback->defaultBehaviour = [decision, is_mime_type_supported, self](const std::optional<int>& action) {
+        // Default: allow navigation (or download if MIME not supported and download enabled)
+        if (!is_mime_type_supported && self->settings_ && self->settings_->useOnDownloadStart) {
+          webkit_policy_decision_download(decision);
+        } else {
+          webkit_policy_decision_use(decision);
+        }
+        g_object_unref(decision);
+      };
+      
+      callback->error = [decision, is_mime_type_supported, self](const std::string& code, const std::string& message) {
+        debugLog("Error in onNavigationResponse: " + code + " - " + message);
+        // On error, allow navigation (matching iOS/Android behavior)
+        if (!is_mime_type_supported && self->settings_ && self->settings_->useOnDownloadStart) {
+          webkit_policy_decision_download(decision);
+        } else {
+          webkit_policy_decision_use(decision);
+        }
+        g_object_unref(decision);
+      };
+      
+      self->channel_delegate_->onNavigationResponse(
+          uri != nullptr ? std::string(uri) : "",
+          mimeType != nullptr ? std::optional<std::string>(mimeType) : std::nullopt,
+          contentLength,
+          static_cast<int>(statusCode),
+          is_main_frame != FALSE,
+          is_mime_type_supported != FALSE,
+          std::move(callback));
+      
+      return TRUE;  // We're handling this asynchronously
+    }
+    
+    // Fallback: check if the response should trigger a download (no onNavigationResponse handler)
     // This happens when:
     // 1. Content-Disposition header is "attachment"
     // 2. WebKit can't display the MIME type
-    gboolean is_mime_type_supported = webkit_response_policy_decision_is_mime_type_supported(response_decision);
-    
     if (!is_mime_type_supported) {
       // WebKit can't display this MIME type - convert to download
       // This will trigger the download-started signal on NetworkSession
@@ -7038,6 +7118,48 @@ void InAppWebView::OnBackForwardListChanged(WebKitBackForwardList* list,
   }
 }
 
+// === Media Capture State Signal Handlers ===
+
+void InAppWebView::OnNotifyCameraCaptureState(GObject* object, GParamSpec* pspec,
+                                               gpointer user_data) {
+  auto* self = static_cast<InAppWebView*>(user_data);
+  if (!self || !self->channel_delegate_) {
+    return;
+  }
+
+  WebKitWebView* webview = WEBKIT_WEB_VIEW(object);
+  WebKitMediaCaptureState newState = webkit_web_view_get_camera_capture_state(webview);
+
+  int oldStateInt = self->last_camera_capture_state_;
+  int newStateInt = static_cast<int>(newState);
+
+  // Only fire event if state actually changed
+  if (oldStateInt != newStateInt) {
+    self->last_camera_capture_state_ = newStateInt;
+    self->channel_delegate_->onCameraCaptureStateChanged(oldStateInt, newStateInt);
+  }
+}
+
+void InAppWebView::OnNotifyMicrophoneCaptureState(GObject* object, GParamSpec* pspec,
+                                                   gpointer user_data) {
+  auto* self = static_cast<InAppWebView*>(user_data);
+  if (!self || !self->channel_delegate_) {
+    return;
+  }
+
+  WebKitWebView* webview = WEBKIT_WEB_VIEW(object);
+  WebKitMediaCaptureState newState = webkit_web_view_get_microphone_capture_state(webview);
+
+  int oldStateInt = self->last_microphone_capture_state_;
+  int newStateInt = static_cast<int>(newState);
+
+  // Only fire event if state actually changed
+  if (oldStateInt != newStateInt) {
+    self->last_microphone_capture_state_ = newStateInt;
+    self->channel_delegate_->onMicrophoneCaptureStateChanged(oldStateInt, newStateInt);
+  }
+}
+
 // === Download Signal Handler ===
 
 void InAppWebView::OnDownloadStarted(WebKitNetworkSession* network_session,
@@ -7635,6 +7757,37 @@ bool InAppWebView::handleScriptMessageWithReply(const std::string& body, WebKitS
     ShowDatePicker(inputType, currentValue, minValue, maxValue, stepValue, screenX, screenY);
     
     // Return true to indicate async handling (dialog will respond later)
+    return true;
+  }
+
+  // === Internal Handler: _onPrintRequest ===
+  if (handlerName == "_onPrintRequest") {
+    // Print request from JavaScript (window.print() interception)
+    // Send to Dart for handling
+    if (targetWebView->channel_delegate_) {
+      std::string printUrl = requestUrl;
+      
+      // Parse args for potential title
+      std::string printTitle;
+      if (!argsJsonStr.empty()) {
+        try {
+          auto argsArray = json::parse(argsJsonStr);
+          if (argsArray.is_array() && !argsArray.empty()) {
+            auto argsObj = argsArray[0];
+            if (argsObj.is_object() && argsObj.contains("title") && argsObj["title"].is_string()) {
+              printTitle = argsObj["title"].get<std::string>();
+            }
+          }
+        } catch (const json::parse_error& e) {
+          debugLog("_onPrintRequest: JSON parse error: " + std::string(e.what()));
+        }
+      }
+      
+      targetWebView->channel_delegate_->onPrintRequest(printUrl);
+    }
+    
+    // Return false to JS - we handled it natively
+    ResolveInternalHandlerWithReply(reply, "false");
     return true;
   }
 

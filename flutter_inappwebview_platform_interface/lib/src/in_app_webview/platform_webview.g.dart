@@ -482,6 +482,8 @@ enum PlatformWebViewCreationParamsProperty {
   ///**Officially Supported Platforms/Implementations**:
   ///- iOS WKWebView 15.0+
   ///- macOS WKWebView 12.0+
+  ///- Linux WPE WebKit ([Official API - WebKitWebView::notify::camera-capture-state](https://webkitgtk.org/reference/webkit2gtk/stable/property.WebView.camera-capture-state.html)):
+  ///    - Requires WPE WebKit 2.34 or later.
   ///
   ///**Parameters - Officially Supported Platforms/Implementations**:
   ///- [oldState]: all platforms
@@ -950,6 +952,8 @@ enum PlatformWebViewCreationParamsProperty {
   ///**Officially Supported Platforms/Implementations**:
   ///- iOS WKWebView 15.0+
   ///- macOS WKWebView 12.0+
+  ///- Linux WPE WebKit ([Official API - WebKitWebView::notify::microphone-capture-state](https://webkitgtk.org/reference/webkit2gtk/stable/property.WebView.microphone-capture-state.html)):
+  ///    - Requires WPE WebKit 2.34 or later.
   ///
   ///**Parameters - Officially Supported Platforms/Implementations**:
   ///- [oldState]: all platforms
@@ -966,6 +970,7 @@ enum PlatformWebViewCreationParamsProperty {
   ///**Officially Supported Platforms/Implementations**:
   ///- iOS WKWebView ([Official API - WKNavigationDelegate.webView](https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455643-webview))
   ///- macOS WKWebView ([Official API - WKNavigationDelegate.webView](https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455643-webview))
+  ///- Linux WPE WebKit ([Official API - WebKitWebView::decide-policy](https://webkitgtk.org/reference/webkit2gtk/stable/signal.WebView.decide-policy.html))
   ///
   ///**Parameters - Officially Supported Platforms/Implementations**:
   ///- [navigationResponse]: all platforms
@@ -1069,6 +1074,8 @@ enum PlatformWebViewCreationParamsProperty {
   ///- iOS WKWebView
   ///- macOS WKWebView
   ///- Web \<iframe\> but requires same origin
+  ///- Linux WPE WebKit:
+  ///    - Intercepted via JavaScript window.print() override.
   ///
   ///**Parameters - Officially Supported Platforms/Implementations**:
   ///- [url]: all platforms
@@ -1791,6 +1798,7 @@ extension _PlatformWebViewCreationParamsPropertySupported
             [
               TargetPlatform.iOS,
               TargetPlatform.macOS,
+              TargetPlatform.linux,
             ].contains(platform ?? defaultTargetPlatform);
       case PlatformWebViewCreationParamsProperty.onCloseWindow:
         return kIsWeb && platform == null
@@ -2006,12 +2014,14 @@ extension _PlatformWebViewCreationParamsPropertySupported
             [
               TargetPlatform.iOS,
               TargetPlatform.macOS,
+              TargetPlatform.linux,
             ].contains(platform ?? defaultTargetPlatform);
       case PlatformWebViewCreationParamsProperty.onNavigationResponse:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
             [
               TargetPlatform.iOS,
               TargetPlatform.macOS,
+              TargetPlatform.linux,
             ].contains(platform ?? defaultTargetPlatform);
       case PlatformWebViewCreationParamsProperty.onOverScrolled:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
@@ -2055,6 +2065,7 @@ extension _PlatformWebViewCreationParamsPropertySupported
                     TargetPlatform.android,
                     TargetPlatform.iOS,
                     TargetPlatform.macOS,
+                    TargetPlatform.linux,
                   ].contains(platform ?? defaultTargetPlatform);
       case PlatformWebViewCreationParamsProperty.onProcessFailed:
         return ((kIsWeb && platform != null) || !kIsWeb) &&

@@ -25,6 +25,7 @@ class InAppWebViewSettings {
   bool useShouldOverrideUrlLoading = false;
   bool useOnLoadResource = false;
   bool useOnDownloadStart = false;
+  bool useOnNavigationResponse = false;
   bool useShouldInterceptRequest = false;
   bool useShouldInterceptAjaxRequest = false;
   bool useOnAjaxReadyStateChange = false;
@@ -89,15 +90,31 @@ class InAppWebViewSettings {
   int defaultFixedFontSize = 13;
   int minimumLogicalFontSize = 0;
 
-  // === WPE-specific rendering settings ===
-  // WPE always uses hardware acceleration via its backend
-  bool useDmaBufExport = true;      // Use DMA-BUF for zero-copy texture sharing
-  bool enableWebInspector = false;  // Remote web inspector
-  int webInspectorPort = 9222;      // Default inspector port
+  // === Security settings ===
+  bool allowFileAccessFromFileURLs = false;  // Security: default false
+  bool allowUniversalAccessFromFileURLs = false;  // Security: default false
+  bool disableWebSecurity = false;  // Security: default false
+  bool allowTopNavigationToDataUrls = false;  // Security: default false
 
-  // === Frame rate and performance settings ===
-  int targetFrameRate = 60;              // Target FPS for rendering
-  bool enableOffscreenRendering = true;  // Always true for WPE in Flutter
+  // === Clipboard settings ===
+  bool javaScriptCanAccessClipboard = false;  // Security: default false
+
+  // === WebRTC settings ===
+  bool enableWebRTC = true;  // Enable by default for video chat apps
+  std::string webRTCUdpPortsRange;  // Format: "minPort:maxPort"
+
+  // === Media settings ===
+  bool allowsInlineMediaPlayback = true;  // Desktop default
+  bool enableMedia = true;
+  bool enableEncryptedMedia = false;  // DRM - requires setup
+  bool enableMediaCapabilities = true;
+  bool enableMockCaptureDevices = false;  // Testing only
+  std::string mediaContentTypesRequiringHardwareSupport;  // Semicolon-separated MIME types
+
+  // === Other settings ===
+  bool enableJavaScriptMarkup = true;
+  bool enable2DCanvasAcceleration = true;  // Performance
+  bool allowModalDialogs = true;
 
   // === WPE Platform settings ===
   // These settings use the WPE Platform API (available when HAVE_WPE_PLATFORM is defined)

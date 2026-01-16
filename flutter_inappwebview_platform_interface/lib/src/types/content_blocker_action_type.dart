@@ -61,7 +61,9 @@ class ContentBlockerActionType_ {
   @EnumSupportedPlatforms(
     platforms: [
       EnumIOSPlatform(value: 'block-cookies'),
-      EnumMacOSPlatform(value: 'block-cookies'),      EnumLinuxPlatform(value: 'block-cookies'),    ],
+      EnumMacOSPlatform(value: 'block-cookies'),
+      EnumLinuxPlatform(value: 'block-cookies'),
+    ],
   )
   static const BLOCK_COOKIES = const ContentBlockerActionType_._internal(
     'block-cookies',

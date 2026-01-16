@@ -179,6 +179,26 @@ WebViewChannelDelegate::LoadResourceWithCustomSchemeCallback::
   };
 }
 
+WebViewChannelDelegate::NavigationResponseCallback::NavigationResponseCallback() {
+  decodeResult = [](FlValue* value) -> std::optional<int> {
+    if (value == nullptr || fl_value_get_type(value) == FL_VALUE_TYPE_NULL) {
+      // Default: allow navigation
+      return 1;
+    }
+    if (fl_value_get_type(value) == FL_VALUE_TYPE_INT) {
+      return static_cast<int>(fl_value_get_int(value));
+    }
+    // If response is a map, extract the "action" field
+    if (fl_value_get_type(value) == FL_VALUE_TYPE_MAP) {
+      FlValue* action_value = fl_value_lookup_string(value, "action");
+      if (action_value != nullptr && fl_value_get_type(action_value) == FL_VALUE_TYPE_INT) {
+        return static_cast<int>(fl_value_get_int(action_value));
+      }
+    }
+    return 1;  // Default: allow
+  };
+}
+
 // === Constructors ===
 
 WebViewChannelDelegate::WebViewChannelDelegate(InAppWebView* webView, FlBinaryMessenger* messenger)
@@ -840,8 +860,9 @@ void WebViewChannelDelegate::HandleMethodCall(FlMethodCall* method_call) {
     
     webView->createWebMessageChannel([method_call](const std::optional<std::string>& channelId) {
       if (channelId.has_value()) {
-        g_autoptr(FlValue) result = fl_value_new_map();
-        fl_value_set_string_take(result, "id", fl_value_new_string(channelId->c_str()));
+        g_autoptr(FlValue) result = to_fl_map({
+            {"id", make_fl_value(*channelId)},
+        });
         fl_method_call_respond_success(method_call, result, nullptr);
       } else {
         fl_method_call_respond_success(method_call, fl_value_new_null(), nullptr);
@@ -1550,17 +1571,8 @@ void WebViewChannelDelegate::onJsBeforeUnload(
     return;
   }
 
-  g_autoptr(FlValue) args = fl_value_new_map();
-  if (url.has_value()) {
-    fl_value_set_string_take(args, "url", fl_value_new_string(url.value().c_str()));
-  } else {
-    fl_value_set_string_take(args, "url", fl_value_new_null());
-  }
-  if (message.has_value()) {
-    fl_value_set_string_take(args, "message", fl_value_new_string(message.value().c_str()));
-  } else {
-    fl_value_set_string_take(args, "message", fl_value_new_null());
-  }
+  g_autoptr(FlValue) args =
+      to_fl_map({{"url", make_fl_value(url)}, {"message", make_fl_value(message)}});
 
   auto* callbackPtr = callback.release();
 
@@ -1959,6 +1971,108 @@ void WebViewChannelDelegate::onLoadResourceWithCustomScheme(
         delete cb;
       },
       callbackPtr);
+}
+
+void WebViewChannelDelegate::onCameraCaptureStateChanged(int oldState, int newState) const {
+  if (!channel_) {
+    return;
+  }
+
+  g_autoptr(FlValue) args = to_fl_map({
+      {"oldState", make_fl_value(static_cast<int64_t>(oldState))},
+      {"newState", make_fl_value(static_cast<int64_t>(newState))}
+  });
+
+  invokeMethod("onCameraCaptureStateChanged", args);
+}
+
+void WebViewChannelDelegate::onMicrophoneCaptureStateChanged(int oldState, int newState) const {
+  if (!channel_) {
+    return;
+  }
+
+  g_autoptr(FlValue) args = to_fl_map({
+      {"oldState", make_fl_value(static_cast<int64_t>(oldState))},
+      {"newState", make_fl_value(static_cast<int64_t>(newState))}
+  });
+
+  invokeMethod("onMicrophoneCaptureStateChanged", args);
+}
+
+void WebViewChannelDelegate::onNavigationResponse(
+    const std::string& url,
+    const std::optional<std::string>& mimeType,
+    int64_t contentLength,
+    int statusCode,
+    bool isForMainFrame,
+    bool canShowMimeType,
+    std::unique_ptr<NavigationResponseCallback> callback) const {
+  if (!channel_) {
+    if (callback) {
+      callback->defaultBehaviour(1);  // Allow by default
+    }
+    return;
+  }
+
+  // Build the response map (matching platform interface NavigationResponse structure)
+  g_autoptr(FlValue) responseMap = to_fl_map({
+      {"url", make_fl_value(url)},
+      {"statusCode", make_fl_value(static_cast<int64_t>(statusCode))},
+      {"headers", make_fl_value()}  // Headers not easily available from WebKit response
+  });
+
+  // Build the main arguments map (matching platform interface format)
+  g_autoptr(FlValue) args = to_fl_map({
+      {"response", responseMap},
+      {"isForMainFrame", make_fl_value(isForMainFrame)},
+      {"canShowMimeType", make_fl_value(canShowMimeType)}
+  });
+
+  // Don't unref responseMap - it's now owned by args
+  g_steal_pointer(&responseMap);
+
+  auto* callbackPtr = callback.release();
+
+  invokeMethodWithResult(
+      "onNavigationResponse", args,
+      [](GObject* source, GAsyncResult* result, gpointer user_data) {
+        auto* cb = static_cast<NavigationResponseCallback*>(user_data);
+        FlMethodChannel* ch = FL_METHOD_CHANNEL(source);
+
+        g_autoptr(GError) error = nullptr;
+        g_autoptr(FlMethodResponse) response =
+            fl_method_channel_invoke_method_finish(ch, result, &error);
+
+        if (error != nullptr) {
+          cb->handleError("CHANNEL_ERROR", error->message);
+        } else if (FL_IS_METHOD_SUCCESS_RESPONSE(response)) {
+          FlValue* returnValue =
+              fl_method_success_response_get_result(FL_METHOD_SUCCESS_RESPONSE(response));
+          cb->handleResult(returnValue);
+        } else if (FL_IS_METHOD_ERROR_RESPONSE(response)) {
+          FlMethodErrorResponse* errorResponse = FL_METHOD_ERROR_RESPONSE(response);
+          cb->handleError(fl_method_error_response_get_code(errorResponse),
+                          fl_method_error_response_get_message(errorResponse));
+        } else {
+          cb->handleNotImplemented();
+        }
+
+        delete cb;
+      },
+      callbackPtr);
+}
+
+void WebViewChannelDelegate::onPrintRequest(const std::optional<std::string>& url) const {
+  if (!channel_) {
+    return;
+  }
+
+  g_autoptr(FlValue) args = to_fl_map({
+      {"url", make_fl_value(url)},
+      {"printJobController", make_fl_value()}  // No native print job controller on Linux
+  });
+
+  invokeMethod("onPrintRequest", args);
 }
 
 }  // namespace flutter_inappwebview_plugin

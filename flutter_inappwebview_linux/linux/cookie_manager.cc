@@ -139,29 +139,16 @@ SoupCookie* Cookie::toSoupCookie(const std::string& url) const {
 }
 
 FlValue* Cookie::toFlValue() const {
-  FlValue* map = fl_value_new_map();
-
-  fl_value_set_string_take(map, "name", fl_value_new_string(name.c_str()));
-  fl_value_set_string_take(map, "value", fl_value_new_string(value.c_str()));
-
-  if (domain.has_value()) {
-    fl_value_set_string_take(map, "domain", fl_value_new_string(domain.value().c_str()));
-  }
-  if (path.has_value()) {
-    fl_value_set_string_take(map, "path", fl_value_new_string(path.value().c_str()));
-  }
-  if (expiresDate.has_value()) {
-    fl_value_set_string_take(map, "expiresDate", fl_value_new_int(expiresDate.value()));
-  }
-
-  fl_value_set_string_take(map, "isSecure", fl_value_new_bool(isSecure));
-  fl_value_set_string_take(map, "isHttpOnly", fl_value_new_bool(isHttpOnly));
-
-  if (sameSite.has_value()) {
-    fl_value_set_string_take(map, "sameSite", fl_value_new_string(sameSite.value().c_str()));
-  }
-
-  return map;
+  return to_fl_map({
+      {"name", make_fl_value(name)},
+      {"value", make_fl_value(value)},
+      {"domain", make_fl_value(domain)},
+      {"path", make_fl_value(path)},
+      {"expiresDate", make_fl_value(expiresDate)},
+      {"isSecure", make_fl_value(isSecure)},
+      {"isHttpOnly", make_fl_value(isHttpOnly)},
+      {"sameSite", make_fl_value(sameSite)},
+  });
 }
 
 // === CookieManager ===

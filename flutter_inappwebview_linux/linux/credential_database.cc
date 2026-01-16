@@ -58,23 +58,12 @@ ProtectionSpace::ProtectionSpace(FlValue* map) {
 }
 
 FlValue* ProtectionSpace::toFlValue() const {
-  FlValue* map = fl_value_new_map();
-
-  fl_value_set_string_take(map, "host", fl_value_new_string(host.c_str()));
-  fl_value_set_string_take(map, "port", fl_value_new_int(port));
-
-  if (protocol.has_value()) {
-    fl_value_set_string_take(map, "protocol", fl_value_new_string(protocol.value().c_str()));
-  } else {
-    fl_value_set_string_take(map, "protocol", fl_value_new_null());
-  }
-  if (realm.has_value()) {
-    fl_value_set_string_take(map, "realm", fl_value_new_string(realm.value().c_str()));
-  } else {
-    fl_value_set_string_take(map, "realm", fl_value_new_null());
-  }
-
-  return map;
+  return to_fl_map({
+      {"host", make_fl_value(host)},
+      {"port", make_fl_value(port)},
+      {"protocol", make_fl_value(protocol)},
+      {"realm", make_fl_value(realm)},
+  });
 }
 
 bool ProtectionSpace::operator==(const ProtectionSpace& other) const {
@@ -97,12 +86,10 @@ Credential::Credential(FlValue* map) {
 }
 
 FlValue* Credential::toFlValue() const {
-  FlValue* map = fl_value_new_map();
-
-  fl_value_set_string_take(map, "username", fl_value_new_string(username.c_str()));
-  fl_value_set_string_take(map, "password", fl_value_new_string(password.c_str()));
-
-  return map;
+  return to_fl_map({
+      {"username", make_fl_value(username)},
+      {"password", make_fl_value(password)},
+  });
 }
 
 // === CredentialDatabase ===
@@ -257,15 +244,15 @@ void CredentialDatabase::HandleMethodCall(FlMethodCall* method_call) {
     g_autoptr(FlValue) result = fl_value_new_list();
 
     for (const auto& [ps, creds] : all) {
-      FlValue* entry = fl_value_new_map();
-
-      fl_value_set_string_take(entry, "protectionSpace", ps.toFlValue());
-
       FlValue* creds_list = fl_value_new_list();
       for (const auto& cred : creds) {
         fl_value_append_take(creds_list, cred.toFlValue());
       }
-      fl_value_set_string_take(entry, "credentials", creds_list);
+
+      FlValue* entry = to_fl_map({
+          {"protectionSpace", ps.toFlValue()},
+          {"credentials", creds_list},
+      });
 
       fl_value_append_take(result, entry);
     }

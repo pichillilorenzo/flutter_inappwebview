@@ -127,7 +127,7 @@ void HeadlessInAppWebViewManager::Run(FlMethodCall* method_call) {
   webviewParams.manager = nullptr;  // Not needed for headless
 
   // Parse initial settings
-  FlValue* initial_settings = fl_value_lookup_string(params, "initialSettings");
+  FlValue* initial_settings = get_fl_map_value_raw(params, "initialSettings");
   if (initial_settings != nullptr && fl_value_get_type(initial_settings) == FL_VALUE_TYPE_MAP) {
     webviewParams.initialSettings = std::make_shared<InAppWebViewSettings>(initial_settings);
   } else {
@@ -135,14 +135,14 @@ void HeadlessInAppWebViewManager::Run(FlMethodCall* method_call) {
   }
 
   // Parse initial URL request
-  FlValue* initial_url_request = fl_value_lookup_string(params, "initialUrlRequest");
+  FlValue* initial_url_request = get_fl_map_value_raw(params, "initialUrlRequest");
   if (initial_url_request != nullptr &&
       fl_value_get_type(initial_url_request) == FL_VALUE_TYPE_MAP) {
     webviewParams.initialUrlRequest = std::make_shared<URLRequest>(initial_url_request);
   }
 
   // Parse initial data
-  FlValue* initial_data = fl_value_lookup_string(params, "initialData");
+  FlValue* initial_data = get_fl_map_value_raw(params, "initialData");
   if (initial_data != nullptr && fl_value_get_type(initial_data) == FL_VALUE_TYPE_MAP) {
     webviewParams.initialData = get_fl_map_value<std::string>(initial_data, "data", "");
     webviewParams.initialDataBaseUrl = get_fl_map_value<std::string>(initial_data, "baseUrl", "");
@@ -151,9 +151,9 @@ void HeadlessInAppWebViewManager::Run(FlMethodCall* method_call) {
   }
 
   // Parse initial file
-  FlValue* initial_file = fl_value_lookup_string(params, "initialFile");
-  if (initial_file != nullptr && fl_value_get_type(initial_file) == FL_VALUE_TYPE_STRING) {
-    webviewParams.initialFile = std::string(fl_value_get_string(initial_file));
+  auto initial_file = get_optional_fl_map_value<std::string>(params, "initialFile");
+  if (initial_file.has_value()) {
+    webviewParams.initialFile = initial_file.value();
   }
 
   // Parse webViewEnvironmentId and look up the custom WebKitWebContext

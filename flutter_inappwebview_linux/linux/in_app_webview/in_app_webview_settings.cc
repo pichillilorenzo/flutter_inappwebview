@@ -2,8 +2,6 @@
 
 #include "in_app_webview_settings.h"
 
-#include <cstdlib>
-
 #include "../utils/flutter.h"
 #include "../utils/log.h"
 #include "in_app_webview.h"
@@ -15,23 +13,7 @@
 namespace flutter_inappwebview_plugin {
 
 InAppWebViewSettings::InAppWebViewSettings() {
-  // Check environment variable for DMA-BUF export preference
-  const char* dmabuf_env = std::getenv("FLUTTER_INAPPWEBVIEW_LINUX_WPE_DMABUF");
-  if (dmabuf_env != nullptr) {
-    useDmaBufExport = (std::string(dmabuf_env) == "1" || std::string(dmabuf_env) == "true");
-  }
-
-  // Check for web inspector settings
-  const char* inspector_env = std::getenv("FLUTTER_INAPPWEBVIEW_LINUX_WPE_INSPECTOR");
-  if (inspector_env != nullptr) {
-    enableWebInspector =
-        (std::string(inspector_env) == "1" || std::string(inspector_env) == "true");
-  }
-
-  const char* inspector_port_env = std::getenv("FLUTTER_INAPPWEBVIEW_LINUX_WPE_INSPECTOR_PORT");
-  if (inspector_port_env != nullptr) {
-    webInspectorPort = std::atoi(inspector_port_env);
-  }
+  // Default constructor - all defaults are set in the header
 }
 
 InAppWebViewSettings::InAppWebViewSettings(FlValue* map) : InAppWebViewSettings() {
@@ -44,6 +26,7 @@ InAppWebViewSettings::InAppWebViewSettings(FlValue* map) : InAppWebViewSettings(
       get_fl_map_value(map, "useShouldOverrideUrlLoading", useShouldOverrideUrlLoading);
   useOnLoadResource = get_fl_map_value(map, "useOnLoadResource", useOnLoadResource);
   useOnDownloadStart = get_fl_map_value(map, "useOnDownloadStart", useOnDownloadStart);
+  useOnNavigationResponse = get_fl_map_value(map, "useOnNavigationResponse", useOnNavigationResponse);
   useShouldInterceptRequest =
       get_fl_map_value(map, "useShouldInterceptRequest", useShouldInterceptRequest);
   useShouldInterceptAjaxRequest =
@@ -139,13 +122,31 @@ InAppWebViewSettings::InAppWebViewSettings(FlValue* map) : InAppWebViewSettings(
   minimumLogicalFontSize = static_cast<int>(get_fl_map_value<int64_t>(
       map, "minimumLogicalFontSize", static_cast<int64_t>(minimumLogicalFontSize)));
 
-  // === WPE-specific rendering settings ===
-  useDmaBufExport = get_fl_map_value(map, "useDmaBufExport", useDmaBufExport);
-  enableWebInspector = get_fl_map_value(map, "enableWebInspector", enableWebInspector);
-  webInspectorPort = static_cast<int>(
-      get_fl_map_value<int64_t>(map, "webInspectorPort", static_cast<int64_t>(webInspectorPort)));
-  targetFrameRate = static_cast<int>(
-      get_fl_map_value<int64_t>(map, "targetFrameRate", static_cast<int64_t>(targetFrameRate)));
+  // === Security settings ===
+  allowFileAccessFromFileURLs = get_fl_map_value(map, "allowFileAccessFromFileURLs", allowFileAccessFromFileURLs);
+  allowUniversalAccessFromFileURLs = get_fl_map_value(map, "allowUniversalAccessFromFileURLs", allowUniversalAccessFromFileURLs);
+  disableWebSecurity = get_fl_map_value(map, "disableWebSecurity", disableWebSecurity);
+  allowTopNavigationToDataUrls = get_fl_map_value(map, "allowTopNavigationToDataUrls", allowTopNavigationToDataUrls);
+
+  // === Clipboard settings ===
+  javaScriptCanAccessClipboard = get_fl_map_value(map, "javaScriptCanAccessClipboard", javaScriptCanAccessClipboard);
+
+  // === WebRTC settings ===
+  enableWebRTC = get_fl_map_value(map, "enableWebRTC", enableWebRTC);
+  webRTCUdpPortsRange = get_fl_map_value(map, "webRTCUdpPortsRange", webRTCUdpPortsRange);
+
+  // === Media settings ===
+  allowsInlineMediaPlayback = get_fl_map_value(map, "allowsInlineMediaPlayback", allowsInlineMediaPlayback);
+  enableMedia = get_fl_map_value(map, "enableMedia", enableMedia);
+  enableEncryptedMedia = get_fl_map_value(map, "enableEncryptedMedia", enableEncryptedMedia);
+  enableMediaCapabilities = get_fl_map_value(map, "enableMediaCapabilities", enableMediaCapabilities);
+  enableMockCaptureDevices = get_fl_map_value(map, "enableMockCaptureDevices", enableMockCaptureDevices);
+  mediaContentTypesRequiringHardwareSupport = get_fl_map_value(map, "mediaContentTypesRequiringHardwareSupport", mediaContentTypesRequiringHardwareSupport);
+
+  // === Other settings ===
+  enableJavaScriptMarkup = get_fl_map_value(map, "enableJavaScriptMarkup", enableJavaScriptMarkup);
+  enable2DCanvasAcceleration = get_fl_map_value(map, "enable2DCanvasAcceleration", enable2DCanvasAcceleration);
+  allowModalDialogs = get_fl_map_value(map, "allowModalDialogs", allowModalDialogs);
 
   // === WPE Platform settings ===
   if (fl_map_contains_not_null(map, "darkMode")) {
@@ -346,6 +347,36 @@ void InAppWebViewSettings::applyToWebView(WebKitWebView* webview) const {
       webkit_web_view_set_cors_allowlist(webview, allowlist_ptrs.data());
     }
   }
+
+  // Security settings
+  webkit_settings_set_allow_file_access_from_file_urls(settings, allowFileAccessFromFileURLs);
+  webkit_settings_set_allow_universal_access_from_file_urls(settings, allowUniversalAccessFromFileURLs);
+  webkit_settings_set_disable_web_security(settings, disableWebSecurity);
+  webkit_settings_set_allow_top_navigation_to_data_urls(settings, allowTopNavigationToDataUrls);
+
+  // Clipboard
+  webkit_settings_set_javascript_can_access_clipboard(settings, javaScriptCanAccessClipboard);
+
+  // WebRTC
+  webkit_settings_set_enable_webrtc(settings, enableWebRTC);
+  if (!webRTCUdpPortsRange.empty()) {
+    webkit_settings_set_webrtc_udp_ports_range(settings, webRTCUdpPortsRange.c_str());
+  }
+
+  // Media settings
+  webkit_settings_set_media_playback_allows_inline(settings, allowsInlineMediaPlayback);
+  webkit_settings_set_enable_media(settings, enableMedia);
+  webkit_settings_set_enable_encrypted_media(settings, enableEncryptedMedia);
+  webkit_settings_set_enable_media_capabilities(settings, enableMediaCapabilities);
+  webkit_settings_set_enable_mock_capture_devices(settings, enableMockCaptureDevices);
+  if (!mediaContentTypesRequiringHardwareSupport.empty()) {
+    webkit_settings_set_media_content_types_requiring_hardware_support(settings, mediaContentTypesRequiringHardwareSupport.c_str());
+  }
+
+  // Other settings
+  webkit_settings_set_enable_javascript_markup(settings, enableJavaScriptMarkup);
+  webkit_settings_set_enable_2d_canvas_acceleration(settings, enable2DCanvasAcceleration);
+  webkit_settings_set_allow_modal_dialogs(settings, allowModalDialogs);
 }
 
 #ifdef HAVE_WPE_PLATFORM
@@ -457,166 +488,132 @@ void InAppWebViewSettings::applyWpePlatformSettings(void* display_ptr) const {
 #endif
 
 FlValue* InAppWebViewSettings::toFlValue() const {
-  FlValue* map = fl_value_new_map();
+  return to_fl_map({
+      // === Event flags ===
+      {"useShouldOverrideUrlLoading", make_fl_value(useShouldOverrideUrlLoading)},
+      {"useOnLoadResource", make_fl_value(useOnLoadResource)},
+      {"useOnDownloadStart", make_fl_value(useOnDownloadStart)},
+      {"useOnNavigationResponse", make_fl_value(useOnNavigationResponse)},
+      {"useShouldInterceptRequest", make_fl_value(useShouldInterceptRequest)},
+      {"useShouldInterceptAjaxRequest", make_fl_value(useShouldInterceptAjaxRequest)},
+      {"useOnAjaxReadyStateChange", make_fl_value(useOnAjaxReadyStateChange)},
+      {"useOnAjaxProgress", make_fl_value(useOnAjaxProgress)},
+      {"useShouldInterceptFetchRequest", make_fl_value(useShouldInterceptFetchRequest)},
 
-  // === Event flags ===
-  fl_value_set_string_take(map, "useShouldOverrideUrlLoading",
-                           fl_value_new_bool(useShouldOverrideUrlLoading));
-  fl_value_set_string_take(map, "useOnLoadResource", fl_value_new_bool(useOnLoadResource));
-  fl_value_set_string_take(map, "useOnDownloadStart", fl_value_new_bool(useOnDownloadStart));
-  fl_value_set_string_take(map, "useShouldInterceptRequest",
-                           fl_value_new_bool(useShouldInterceptRequest));
-  fl_value_set_string_take(map, "useShouldInterceptAjaxRequest",
-                           fl_value_new_bool(useShouldInterceptAjaxRequest));
-  fl_value_set_string_take(map, "useOnAjaxReadyStateChange",
-                           fl_value_new_bool(useOnAjaxReadyStateChange));
-  fl_value_set_string_take(map, "useOnAjaxProgress", fl_value_new_bool(useOnAjaxProgress));
-  fl_value_set_string_take(map, "useShouldInterceptFetchRequest",
-                           fl_value_new_bool(useShouldInterceptFetchRequest));
+      // === WebKit settings ===
+      {"userAgent", make_fl_value(userAgent)},
+      {"javaScriptEnabled", make_fl_value(javaScriptEnabled)},
+      {"javaScriptCanOpenWindowsAutomatically", make_fl_value(javaScriptCanOpenWindowsAutomatically)},
+      {"mediaPlaybackRequiresUserGesture", make_fl_value(mediaPlaybackRequiresUserGesture)},
+      {"minimumFontSize", make_fl_value(minimumFontSize)},
+      {"transparentBackground", make_fl_value(transparentBackground)},
+      {"supportZoom", make_fl_value(supportZoom)},
+      {"isInspectable", make_fl_value(isInspectable)},
+      {"disableContextMenu", make_fl_value(disableContextMenu)},
 
-  // === WebKit settings ===
-  fl_value_set_string_take(map, "userAgent", fl_value_new_string(userAgent.c_str()));
-  fl_value_set_string_take(map, "javaScriptEnabled", fl_value_new_bool(javaScriptEnabled));
-  fl_value_set_string_take(map, "javaScriptCanOpenWindowsAutomatically",
-                           fl_value_new_bool(javaScriptCanOpenWindowsAutomatically));
-  fl_value_set_string_take(map, "mediaPlaybackRequiresUserGesture",
-                           fl_value_new_bool(mediaPlaybackRequiresUserGesture));
-  fl_value_set_string_take(map, "minimumFontSize", fl_value_new_int(minimumFontSize));
-  fl_value_set_string_take(map, "transparentBackground", fl_value_new_bool(transparentBackground));
-  fl_value_set_string_take(map, "supportZoom", fl_value_new_bool(supportZoom));
-  fl_value_set_string_take(map, "isInspectable", fl_value_new_bool(isInspectable));
-  fl_value_set_string_take(map, "disableContextMenu", fl_value_new_bool(disableContextMenu));
+      // === JavaScript bridge settings ===
+      {"javaScriptBridgeEnabled", make_fl_value(javaScriptBridgeEnabled)},
+      {"javaScriptHandlersForMainFrameOnly", make_fl_value(javaScriptHandlersForMainFrameOnly)},
+      {"pluginScriptsForMainFrameOnly", make_fl_value(pluginScriptsForMainFrameOnly)},
 
-  // === JavaScript bridge settings ===
-  fl_value_set_string_take(map, "javaScriptBridgeEnabled",
-                           fl_value_new_bool(javaScriptBridgeEnabled));
-  fl_value_set_string_take(map, "javaScriptHandlersForMainFrameOnly",
-                           fl_value_new_bool(javaScriptHandlersForMainFrameOnly));
-  fl_value_set_string_take(map, "pluginScriptsForMainFrameOnly",
-                           fl_value_new_bool(pluginScriptsForMainFrameOnly));
+      // === WPE WebKit specific settings ===
+      {"enableDeveloperExtras", make_fl_value(enableDeveloperExtras)},
+      {"enableWriteConsoleMessagesToStdout", make_fl_value(enableWriteConsoleMessagesToStdout)},
+      {"enableMediaStream", make_fl_value(enableMediaStream)},
+      {"enableMediaSource", make_fl_value(enableMediaSource)},
+      {"enableWebAudio", make_fl_value(enableWebAudio)},
+      {"enableWebGL", make_fl_value(enableWebGL)},
+      {"enableSmoothScrolling", make_fl_value(enableSmoothScrolling)},
+      {"allowsBackForwardNavigationGestures", make_fl_value(allowsBackForwardNavigationGestures)},
+      {"enableHyperlinkAuditing", make_fl_value(enableHyperlinkAuditing)},
+      {"enableDnsPrefetching", make_fl_value(enableDnsPrefetching)},
+      {"enableCaretBrowsing", make_fl_value(enableCaretBrowsing)},
+      {"isElementFullscreenEnabled", make_fl_value(isElementFullscreenEnabled)},
+      {"domStorageEnabled", make_fl_value(enableHtml5LocalStorage)},
+      {"databaseEnabled", make_fl_value(enableHtml5Database)},
+      {"enablePageCache", make_fl_value(enablePageCache)},
+      {"drawCompositingIndicators", make_fl_value(drawCompositingIndicators)},
+      {"enableResizableTextAreas", make_fl_value(enableResizableTextAreas)},
+      {"enableTabsToLinks", make_fl_value(enableTabsToLinks)},
+      {"loadsImagesAutomatically", make_fl_value(loadsImagesAutomatically)},
+      {"isSiteSpecificQuirksModeEnabled", make_fl_value(isSiteSpecificQuirksModeEnabled)},
+      {"printBackgrounds", make_fl_value(printBackgrounds)},
+      {"enableSpatialNavigation", make_fl_value(enableSpatialNavigation)},
+      {"defaultTextEncodingName", make_fl_value(defaultTextEncodingName)},
+      {"standardFontFamily", make_fl_value(standardFontFamily)},
+      {"fixedFontFamily", make_fl_value(fixedFontFamily)},
+      {"serifFontFamily", make_fl_value(serifFontFamily)},
+      {"sansSerifFontFamily", make_fl_value(sansSerifFontFamily)},
+      {"cursiveFontFamily", make_fl_value(cursiveFontFamily)},
+      {"fantasyFontFamily", make_fl_value(fantasyFontFamily)},
+      {"pictographFontFamily", make_fl_value(pictographFontFamily)},
+      {"defaultFontSize", make_fl_value(defaultFontSize)},
+      {"defaultFixedFontSize", make_fl_value(defaultFixedFontSize)},
+      {"minimumLogicalFontSize", make_fl_value(minimumLogicalFontSize)},
 
-  // === WPE WebKit specific settings ===
-  fl_value_set_string_take(map, "enableDeveloperExtras", fl_value_new_bool(enableDeveloperExtras));
-  fl_value_set_string_take(map, "enableWriteConsoleMessagesToStdout",
-                           fl_value_new_bool(enableWriteConsoleMessagesToStdout));
-  fl_value_set_string_take(map, "enableMediaStream", fl_value_new_bool(enableMediaStream));
-  fl_value_set_string_take(map, "enableMediaSource", fl_value_new_bool(enableMediaSource));
-  fl_value_set_string_take(map, "enableWebAudio", fl_value_new_bool(enableWebAudio));
-  fl_value_set_string_take(map, "enableWebGL", fl_value_new_bool(enableWebGL));
-  fl_value_set_string_take(map, "enableSmoothScrolling", fl_value_new_bool(enableSmoothScrolling));
-  fl_value_set_string_take(map, "allowsBackForwardNavigationGestures",
-                           fl_value_new_bool(allowsBackForwardNavigationGestures));
-  fl_value_set_string_take(map, "enableHyperlinkAuditing",
-                           fl_value_new_bool(enableHyperlinkAuditing));
-  fl_value_set_string_take(map, "enableDnsPrefetching", fl_value_new_bool(enableDnsPrefetching));
-  fl_value_set_string_take(map, "enableCaretBrowsing", fl_value_new_bool(enableCaretBrowsing));
-  fl_value_set_string_take(map, "isElementFullscreenEnabled", fl_value_new_bool(isElementFullscreenEnabled));
-  fl_value_set_string_take(map, "domStorageEnabled",
-                           fl_value_new_bool(enableHtml5LocalStorage));
-  fl_value_set_string_take(map, "databaseEnabled", fl_value_new_bool(enableHtml5Database));
-  fl_value_set_string_take(map, "enablePageCache", fl_value_new_bool(enablePageCache));
-  fl_value_set_string_take(map, "drawCompositingIndicators",
-                           fl_value_new_bool(drawCompositingIndicators));
-  fl_value_set_string_take(map, "enableResizableTextAreas",
-                           fl_value_new_bool(enableResizableTextAreas));
-  fl_value_set_string_take(map, "enableTabsToLinks", fl_value_new_bool(enableTabsToLinks));
-  fl_value_set_string_take(map, "loadsImagesAutomatically",
-                           fl_value_new_bool(loadsImagesAutomatically));
-  fl_value_set_string_take(map, "isSiteSpecificQuirksModeEnabled",
-                           fl_value_new_bool(isSiteSpecificQuirksModeEnabled));
-  fl_value_set_string_take(map, "printBackgrounds", fl_value_new_bool(printBackgrounds));
-  fl_value_set_string_take(map, "enableSpatialNavigation",
-                           fl_value_new_bool(enableSpatialNavigation));
-  fl_value_set_string_take(map, "defaultTextEncodingName", fl_value_new_string(defaultTextEncodingName.c_str()));
-  fl_value_set_string_take(map, "standardFontFamily",
-                           fl_value_new_string(standardFontFamily.c_str()));
-  fl_value_set_string_take(map, "fixedFontFamily",
-                           fl_value_new_string(fixedFontFamily.c_str()));
-  fl_value_set_string_take(map, "serifFontFamily", fl_value_new_string(serifFontFamily.c_str()));
-  fl_value_set_string_take(map, "sansSerifFontFamily",
-                           fl_value_new_string(sansSerifFontFamily.c_str()));
-  fl_value_set_string_take(map, "cursiveFontFamily",
-                           fl_value_new_string(cursiveFontFamily.c_str()));
-  fl_value_set_string_take(map, "fantasyFontFamily",
-                           fl_value_new_string(fantasyFontFamily.c_str()));
-  fl_value_set_string_take(map, "pictographFontFamily",
-                           fl_value_new_string(pictographFontFamily.c_str()));
-  fl_value_set_string_take(map, "defaultFontSize", fl_value_new_int(defaultFontSize));
-  fl_value_set_string_take(map, "defaultFixedFontSize",
-                           fl_value_new_int(defaultFixedFontSize));
-  fl_value_set_string_take(map, "minimumLogicalFontSize", fl_value_new_int(minimumLogicalFontSize));
+      // === Security settings ===
+      {"allowFileAccessFromFileURLs", make_fl_value(allowFileAccessFromFileURLs)},
+      {"allowUniversalAccessFromFileURLs", make_fl_value(allowUniversalAccessFromFileURLs)},
+      {"disableWebSecurity", make_fl_value(disableWebSecurity)},
+      {"allowTopNavigationToDataUrls", make_fl_value(allowTopNavigationToDataUrls)},
 
-  // === WPE-specific rendering settings ===
-  fl_value_set_string_take(map, "useDmaBufExport", fl_value_new_bool(useDmaBufExport));
-  fl_value_set_string_take(map, "enableWebInspector", fl_value_new_bool(enableWebInspector));
-  fl_value_set_string_take(map, "webInspectorPort", fl_value_new_int(webInspectorPort));
-  fl_value_set_string_take(map, "targetFrameRate", fl_value_new_int(targetFrameRate));
-  fl_value_set_string_take(map, "enableOffscreenRendering",
-                           fl_value_new_bool(enableOffscreenRendering));
+      // === Clipboard ===
+      {"javaScriptCanAccessClipboard", make_fl_value(javaScriptCanAccessClipboard)},
 
-  // === Scroll settings ===
-  fl_value_set_string_take(map, "scrollMultiplier", fl_value_new_int(scrollMultiplier));
+      // === WebRTC ===
+      {"enableWebRTC", make_fl_value(enableWebRTC)},
+      {"webRTCUdpPortsRange", make_fl_value(webRTCUdpPortsRange)},
 
-  // === Incognito mode ===
-  fl_value_set_string_take(map, "incognito", fl_value_new_bool(incognito));
+      // === Media settings ===
+      {"allowsInlineMediaPlayback", make_fl_value(allowsInlineMediaPlayback)},
+      {"enableMedia", make_fl_value(enableMedia)},
+      {"enableEncryptedMedia", make_fl_value(enableEncryptedMedia)},
+      {"enableMediaCapabilities", make_fl_value(enableMediaCapabilities)},
+      {"enableMockCaptureDevices", make_fl_value(enableMockCaptureDevices)},
+      {"mediaContentTypesRequiringHardwareSupport", make_fl_value(mediaContentTypesRequiringHardwareSupport)},
 
-  // === CORS allowlist ===
-  if (corsAllowlist.has_value()) {
-    FlValue* allowlist = fl_value_new_list();
-    for (const auto& pattern : *corsAllowlist) {
-      fl_value_append_take(allowlist, fl_value_new_string(pattern.c_str()));
-    }
-    fl_value_set_string_take(map, "corsAllowlist", allowlist);
-  } else {
-    fl_value_set_string_take(map, "corsAllowlist", fl_value_new_null());
-  }
+      // === Other settings ===
+      {"enableJavaScriptMarkup", make_fl_value(enableJavaScriptMarkup)},
+      {"enable2DCanvasAcceleration", make_fl_value(enable2DCanvasAcceleration)},
+      {"allowModalDialogs", make_fl_value(allowModalDialogs)},
 
-  // === ITP ===
-  fl_value_set_string_take(map, "itpEnabled", fl_value_new_bool(itpEnabled));
+      // === Scroll settings ===
+      {"scrollMultiplier", make_fl_value(scrollMultiplier)},
 
-  return map;
+      // === Incognito mode ===
+      {"incognito", make_fl_value(incognito)},
+
+      // === CORS allowlist (handles std::optional automatically) ===
+      {"corsAllowlist", make_fl_value(corsAllowlist)},
+
+      // === ITP ===
+      {"itpEnabled", make_fl_value(itpEnabled)},
+  });
 }
 
 FlValue* InAppWebViewSettings::getRealSettings(const InAppWebView* inAppWebView) const {
-  FlValue* map = fl_value_new_map();
-
   if (inAppWebView == nullptr || inAppWebView->webview() == nullptr) {
-    return map;
+    return fl_value_new_map();
   }
 
   WebKitSettings* settings = webkit_web_view_get_settings(inAppWebView->webview());
   if (settings == nullptr) {
-    return map;
+    return fl_value_new_map();
   }
 
   // Get actual settings from WebKit
   const gchar* ua = webkit_settings_get_user_agent(settings);
-  if (ua != nullptr) {
-    fl_value_set_string_take(map, "userAgent", fl_value_new_string(ua));
-  }
 
-  fl_value_set_string_take(map, "javaScriptEnabled",
-                           fl_value_new_bool(webkit_settings_get_enable_javascript(settings)));
-  fl_value_set_string_take(
-      map, "javaScriptCanOpenWindowsAutomatically",
-      fl_value_new_bool(webkit_settings_get_javascript_can_open_windows_automatically(settings)));
-  fl_value_set_string_take(
-      map, "mediaPlaybackRequiresUserGesture",
-      fl_value_new_bool(webkit_settings_get_media_playback_requires_user_gesture(settings)));
-  fl_value_set_string_take(map, "minimumFontSize",
-                           fl_value_new_int(webkit_settings_get_minimum_font_size(settings)));
-  fl_value_set_string_take(map, "defaultFontSize",
-                           fl_value_new_int(webkit_settings_get_default_font_size(settings)));
-  fl_value_set_string_take(
-      map, "defaultMonospaceFontSize",
-      fl_value_new_int(webkit_settings_get_default_monospace_font_size(settings)));
-
-  // Get current zoom level
-  fl_value_set_string_take(
-      map, "zoomLevel",
-      fl_value_new_float(webkit_web_view_get_zoom_level(inAppWebView->webview())));
-
-  return map;
+  return to_fl_map({
+      {"userAgent", ua != nullptr ? make_fl_value(std::string(ua)) : fl_value_new_null()},
+      {"javaScriptEnabled", make_fl_value(static_cast<bool>(webkit_settings_get_enable_javascript(settings)))},
+      {"javaScriptCanOpenWindowsAutomatically", make_fl_value(static_cast<bool>(webkit_settings_get_javascript_can_open_windows_automatically(settings)))},
+      {"mediaPlaybackRequiresUserGesture", make_fl_value(static_cast<bool>(webkit_settings_get_media_playback_requires_user_gesture(settings)))},
+      {"minimumFontSize", make_fl_value(static_cast<int64_t>(webkit_settings_get_minimum_font_size(settings)))},
+      {"defaultFontSize", make_fl_value(static_cast<int64_t>(webkit_settings_get_default_font_size(settings)))},
+      {"defaultMonospaceFontSize", make_fl_value(static_cast<int64_t>(webkit_settings_get_default_monospace_font_size(settings)))},
+      {"zoomLevel", make_fl_value(webkit_web_view_get_zoom_level(inAppWebView->webview()))},
+  });
 }
 
 InAppWebViewSettings::~InAppWebViewSettings() {

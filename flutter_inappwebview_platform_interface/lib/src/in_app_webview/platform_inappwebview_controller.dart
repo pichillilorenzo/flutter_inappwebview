@@ -2004,6 +2004,7 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
     platforms: [
       AndroidPlatform(note: 'This method is implemented using JavaScript.'),
       IOSPlatform(note: 'This method is implemented using JavaScript.'),
+      LinuxPlatform(note: 'This method is implemented using JavaScript.'),
       MacOSPlatform(note: 'This method is implemented using JavaScript.'),
       WebPlatform(note: 'This method is implemented using JavaScript.'),
       WindowsPlatform(note: 'This method is implemented using JavaScript.'),

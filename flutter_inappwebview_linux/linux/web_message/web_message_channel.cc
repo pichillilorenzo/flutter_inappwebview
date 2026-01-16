@@ -112,12 +112,9 @@ void WebMessageChannel::onMessage(int portIndex, const std::string* message,
     return;
   }
 
-  g_autoptr(FlValue) args = fl_value_new_map();
-  fl_value_set_string_take(args, "index", fl_value_new_int(portIndex));
-
+  FlValue* messageMap = nullptr;
   if (message != nullptr) {
-    g_autoptr(FlValue) messageMap = fl_value_new_map();
-    
+    FlValue* dataValue = nullptr;
     if (messageType == 1) {
       // ArrayBuffer - convert comma-separated values to byte array
       std::vector<uint8_t> bytes;
@@ -135,17 +132,20 @@ void WebMessageChannel::onMessage(int portIndex, const std::string* message,
       if (!value.empty()) {
         bytes.push_back(static_cast<uint8_t>(std::stoi(value)));
       }
-      fl_value_set_string_take(messageMap, "data",
-                               fl_value_new_uint8_list(bytes.data(), bytes.size()));
+      dataValue = fl_value_new_uint8_list(bytes.data(), bytes.size());
     } else {
-      fl_value_set_string_take(messageMap, "data",
-                               fl_value_new_string(message->c_str()));
+      dataValue = make_fl_value(*message);
     }
-    fl_value_set_string_take(messageMap, "type", fl_value_new_int(messageType));
-    fl_value_set_string_take(args, "message", fl_value_ref(messageMap));
-  } else {
-    fl_value_set_string_take(args, "message", fl_value_new_null());
+    messageMap = to_fl_map({
+        {"data", dataValue},
+        {"type", make_fl_value(messageType)},
+    });
   }
+
+  g_autoptr(FlValue) args = to_fl_map({
+      {"index", make_fl_value(portIndex)},
+      {"message", messageMap != nullptr ? messageMap : fl_value_new_null()},
+  });
 
   invokeMethod("onMessage", args);
 }

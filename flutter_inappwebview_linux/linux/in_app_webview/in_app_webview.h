@@ -615,6 +615,10 @@ class InAppWebView {
   // Progress tracking
   double last_progress_ = 0.0;
 
+  // Media capture state tracking (for onCameraCaptureStateChanged/onMicrophoneCaptureStateChanged)
+  int last_camera_capture_state_ = 0;       // WebKitMediaCaptureState: NONE=0, ACTIVE=1, MUTED=2
+  int last_microphone_capture_state_ = 0;   // WebKitMediaCaptureState: NONE=0, ACTIVE=1, MUTED=2
+
   // Fullscreen state (for DOM fullscreen requests)
   bool is_fullscreen_ = false;
   bool waiting_fullscreen_notify_ = false;
@@ -781,6 +785,10 @@ class InAppWebView {
                                        WebKitBackForwardListItem* item_added,
                                        gpointer items_removed,
                                        gpointer user_data);
+
+  // === Media Capture State Signals ===
+  static void OnNotifyCameraCaptureState(GObject* object, GParamSpec* pspec, gpointer user_data);
+  static void OnNotifyMicrophoneCaptureState(GObject* object, GParamSpec* pspec, gpointer user_data);
 
   // === Input helpers ===
   void SendWpePointerEvent(uint32_t type, double x, double y, uint32_t button);

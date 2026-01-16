@@ -143,12 +143,10 @@ void WebMessageListenerChannelDelegate::onPostMessage(const std::string* message
     return;
   }
 
-  g_autoptr(FlValue) args = fl_value_new_map();
-
   // Build message map if there's message data
+  FlValue* messageMap = nullptr;
   if (messageData != nullptr) {
-    g_autoptr(FlValue) messageMap = fl_value_new_map();
-    
+    FlValue* dataValue = nullptr;
     if (messageType == 1) {
       // ArrayBuffer - convert comma-separated values to byte array
       std::vector<uint8_t> bytes;
@@ -170,28 +168,21 @@ void WebMessageListenerChannelDelegate::onPostMessage(const std::string* message
           bytes.push_back(static_cast<uint8_t>(std::stoi(value)));
         } catch (...) {}
       }
-      fl_value_set_string_take(messageMap, "data",
-                               fl_value_new_uint8_list(bytes.data(), bytes.size()));
+      dataValue = fl_value_new_uint8_list(bytes.data(), bytes.size());
     } else {
-      fl_value_set_string_take(messageMap, "data",
-                               fl_value_new_string(messageData->c_str()));
+      dataValue = make_fl_value(*messageData);
     }
-    fl_value_set_string_take(messageMap, "type", fl_value_new_int(messageType));
-    fl_value_set_string_take(args, "message", fl_value_ref(messageMap));
-  } else {
-    fl_value_set_string_take(args, "message", fl_value_new_null());
+    messageMap = to_fl_map({
+        {"data", dataValue},
+        {"type", make_fl_value(messageType)},
+    });
   }
 
-  // Add sourceOrigin
-  if (sourceOrigin != nullptr) {
-    fl_value_set_string_take(args, "sourceOrigin",
-                             fl_value_new_string(sourceOrigin->c_str()));
-  } else {
-    fl_value_set_string_take(args, "sourceOrigin", fl_value_new_null());
-  }
-
-  // Add isMainFrame
-  fl_value_set_string_take(args, "isMainFrame", fl_value_new_bool(isMainFrame));
+  g_autoptr(FlValue) args = to_fl_map({
+      {"message", messageMap != nullptr ? messageMap : fl_value_new_null()},
+      {"sourceOrigin", sourceOrigin != nullptr ? make_fl_value(*sourceOrigin) : fl_value_new_null()},
+      {"isMainFrame", make_fl_value(isMainFrame)},
+  });
 
   invokeMethod("onPostMessage", args);
 }

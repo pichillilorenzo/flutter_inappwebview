@@ -781,6 +781,109 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController
             _inAppBrowserEventHandler!.onRenderProcessGone(detail);
         }
         break;
+      case "onNavigationResponse":
+        if ((webviewParams != null &&
+                webviewParams!.onNavigationResponse != null) ||
+            _inAppBrowserEventHandler != null) {
+          Map<String, dynamic> arguments = call.arguments
+              .cast<String, dynamic>();
+          NavigationResponse navigationResponse = NavigationResponse.fromMap(
+            arguments,
+          )!;
+
+          if (webviewParams != null &&
+              webviewParams!.onNavigationResponse != null)
+            return (await webviewParams!.onNavigationResponse!(
+              _controllerFromPlatform,
+              navigationResponse,
+            ))?.toNativeValue();
+          else
+            return (await _inAppBrowserEventHandler!.onNavigationResponse(
+              navigationResponse,
+            ))?.toNativeValue();
+        }
+        break;
+      case "onPrintRequest":
+        if ((webviewParams != null &&
+                (webviewParams!.onPrintRequest != null ||
+                    // ignore: deprecated_member_use_from_same_package
+                    webviewParams!.onPrint != null)) ||
+            _inAppBrowserEventHandler != null) {
+          String? url = call.arguments["url"];
+          WebUri? uri = url != null ? WebUri(url) : null;
+
+          if (webviewParams != null) {
+            if (webviewParams!.onPrintRequest != null)
+              return await webviewParams!.onPrintRequest!(
+                _controllerFromPlatform,
+                uri,
+                null, // PrintJobController not supported on Linux
+              );
+            else {
+              // ignore: deprecated_member_use_from_same_package
+              webviewParams!.onPrint!(_controllerFromPlatform, uri);
+              return false;
+            }
+          } else {
+            // ignore: deprecated_member_use_from_same_package
+            _inAppBrowserEventHandler!.onPrint(uri);
+            return await _inAppBrowserEventHandler!.onPrintRequest(
+              uri,
+              null, // PrintJobController not supported on Linux
+            );
+          }
+        }
+        break;
+      case "onCameraCaptureStateChanged":
+        if ((webviewParams != null &&
+                webviewParams!.onCameraCaptureStateChanged != null) ||
+            _inAppBrowserEventHandler != null) {
+          var oldState = MediaCaptureState.fromNativeValue(
+            call.arguments["oldState"],
+          );
+          var newState = MediaCaptureState.fromNativeValue(
+            call.arguments["newState"],
+          );
+
+          if (webviewParams != null &&
+              webviewParams!.onCameraCaptureStateChanged != null)
+            webviewParams!.onCameraCaptureStateChanged!(
+              _controllerFromPlatform,
+              oldState,
+              newState,
+            );
+          else
+            _inAppBrowserEventHandler!.onCameraCaptureStateChanged(
+              oldState,
+              newState,
+            );
+        }
+        break;
+      case "onMicrophoneCaptureStateChanged":
+        if ((webviewParams != null &&
+                webviewParams!.onMicrophoneCaptureStateChanged != null) ||
+            _inAppBrowserEventHandler != null) {
+          var oldState = MediaCaptureState.fromNativeValue(
+            call.arguments["oldState"],
+          );
+          var newState = MediaCaptureState.fromNativeValue(
+            call.arguments["newState"],
+          );
+
+          if (webviewParams != null &&
+              webviewParams!.onMicrophoneCaptureStateChanged != null)
+            webviewParams!.onMicrophoneCaptureStateChanged!(
+              _controllerFromPlatform,
+              oldState,
+              newState,
+            );
+          else
+            _inAppBrowserEventHandler!.onMicrophoneCaptureStateChanged(
+              oldState,
+              newState,
+            );
+        }
+        break;
       case "onShowFileChooser":
         if ((webviewParams != null &&
                 webviewParams!.onShowFileChooser != null) ||
@@ -2088,6 +2191,76 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('state', () => state.toNativeValue());
     await channel?.invokeMethod('setMicrophoneCaptureState', args);
+  }
+
+  @override
+  Future<List<MetaTag>> getMetaTags() async {
+    List<MetaTag> metaTags = [];
+
+    List<Map<dynamic, dynamic>>? metaTagList = (await evaluateJavascript(
+      source: """
+(function() {
+  var metaTags = [];
+  var metaTagNodes = document.head.getElementsByTagName('meta');
+  for (var i = 0; i < metaTagNodes.length; i++) {
+    var metaTagNode = metaTagNodes[i];
+    
+    var otherAttributes = metaTagNode.getAttributeNames();
+    var nameIndex = otherAttributes.indexOf("name");
+    if (nameIndex !== -1) otherAttributes.splice(nameIndex, 1);
+    var contentIndex = otherAttributes.indexOf("content");
+    if (contentIndex !== -1) otherAttributes.splice(contentIndex, 1);
+    
+    var attrs = [];
+    for (var j = 0; j < otherAttributes.length; j++) {
+      var otherAttribute = otherAttributes[j];
+      attrs.push(
+        {
+          name: otherAttribute,
+          value: metaTagNode.getAttribute(otherAttribute)
+        }
+      );
+    }
+
+    metaTags.push(
+      {
+        name: metaTagNode.name,
+        content: metaTagNode.content,
+        attrs: attrs
+      }
+    );
+  }
+  return metaTags;
+})();
+    """,
+    ))?.cast<Map<dynamic, dynamic>>();
+
+    if (metaTagList == null) {
+      return metaTags;
+    }
+
+    for (var metaTag in metaTagList) {
+      var attrs = <MetaTagAttribute>[];
+
+      for (var metaTagAttr in metaTag["attrs"]) {
+        attrs.add(
+          MetaTagAttribute(
+            name: metaTagAttr["name"],
+            value: metaTagAttr["value"],
+          ),
+        );
+      }
+
+      metaTags.add(
+        MetaTag(
+          name: metaTag["name"],
+          content: metaTag["content"],
+          attrs: attrs,
+        ),
+      );
+    }
+
+    return metaTags;
   }
 
   @override

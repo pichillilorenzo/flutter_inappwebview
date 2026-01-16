@@ -810,6 +810,8 @@ enum PlatformInAppWebViewControllerMethod {
   ///    - This method is implemented using JavaScript.
   ///- iOS WKWebView:
   ///    - This method is implemented using JavaScript.
+  ///- Linux WPE WebKit:
+  ///    - This method is implemented using JavaScript.
   ///- macOS WKWebView:
   ///    - This method is implemented using JavaScript.
   ///- Web \<iframe\> but requires same origin:
@@ -2807,6 +2809,7 @@ extension _PlatformInAppWebViewControllerMethodSupported
                   [
                     TargetPlatform.android,
                     TargetPlatform.iOS,
+                    TargetPlatform.linux,
                     TargetPlatform.macOS,
                     TargetPlatform.windows,
                   ].contains(platform ?? defaultTargetPlatform);

@@ -4,6 +4,7 @@
 
 #include <cstring>
 
+#include "../utils/flutter.h"
 #include "../utils/log.h"
 #include "inappwebview_egl_texture.h"
 #include "inappwebview_texture.h"
@@ -617,9 +618,10 @@ void CustomPlatformView::EmitCursorChanged(const std::string& cursor_name) {
     return;
   }
 
-  g_autoptr(FlValue) event = fl_value_new_map();
-  fl_value_set_string_take(event, "type", fl_value_new_string("cursorChanged"));
-  fl_value_set_string_take(event, "value", fl_value_new_string(cursor_name.c_str()));
+  g_autoptr(FlValue) event = to_fl_map({
+      {"type", make_fl_value(std::string("cursorChanged"))},
+      {"value", make_fl_value(cursor_name)},
+  });
 
   fl_event_channel_send(event_channel_, event, nullptr, nullptr);
 }

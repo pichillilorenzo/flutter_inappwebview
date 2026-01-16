@@ -295,6 +295,32 @@ class WebViewChannelDelegate : public ChannelDelegate {
   void onHideContextMenu() const;
   void onContextMenuActionItemClicked(const std::string& id, const std::string& title) const;
 
+  // Media capture state change events
+  void onCameraCaptureStateChanged(int oldState, int newState) const;
+  void onMicrophoneCaptureStateChanged(int oldState, int newState) const;
+
+  // Navigation response event (for decide-policy RESPONSE type)
+  /**
+   * Callback for onNavigationResponse.
+   * Returns NavigationResponseAction (ALLOW=1, CANCEL=0, DOWNLOAD=2)
+   */
+  class NavigationResponseCallback : public BaseCallbackResult<int> {
+   public:
+    NavigationResponseCallback();
+    ~NavigationResponseCallback() = default;
+  };
+
+  void onNavigationResponse(const std::string& url,
+                            const std::optional<std::string>& mimeType,
+                            int64_t contentLength,
+                            int statusCode,
+                            bool isForMainFrame,
+                            bool canShowMimeType,
+                            std::unique_ptr<NavigationResponseCallback> callback) const;
+
+  // Print request event (for JavaScript window.print() interception)
+  void onPrintRequest(const std::optional<std::string>& url) const;
+
  private:
   // Method call handlers
   void HandleLoadUrl(FlMethodCall* method_call);

@@ -518,6 +518,12 @@ because there isn't any way to make the website data store non-persistent for th
       ),
       IOSPlatform(),
       MacOSPlatform(),
+      LinuxPlatform(
+        available: "2.10",
+        apiName: "WebKitSettings.allow-file-access-from-file-urls",
+        apiUrl:
+            "https://wpewebkit.org/reference/stable/wpe-webkit-2.0/property.Settings.allow-file-access-from-file-urls.html",
+      ),
     ],
   )
   bool? allowFileAccessFromFileURLs;
@@ -540,6 +546,12 @@ because there isn't any way to make the website data store non-persistent for th
       ),
       IOSPlatform(),
       MacOSPlatform(),
+      LinuxPlatform(
+        available: "2.14",
+        apiName: "WebKitSettings.allow-universal-access-from-file-urls",
+        apiUrl:
+            "https://wpewebkit.org/reference/stable/wpe-webkit-2.0/property.Settings.allow-universal-access-from-file-urls.html",
+      ),
     ],
   )
   bool? allowUniversalAccessFromFileURLs;
@@ -1535,6 +1547,11 @@ as it can cause framerate drops on animations in Android 9 and lower (see [Hybri
         apiName: "WKWebViewConfiguration.allowsInlineMediaPlayback",
         apiUrl:
             "https://developer.apple.com/documentation/webkit/wkwebviewconfiguration/1614793-allowsinlinemediaplayback",
+      ),
+      LinuxPlatform(
+        apiName: "WebKitSettings.media-playback-allows-inline",
+        apiUrl:
+            "https://wpewebkit.org/reference/stable/wpe-webkit-2.0/property.Settings.media-playback-allows-inline.html",
       ),
     ],
   )
@@ -2860,8 +2877,7 @@ as it can cause framerate drops on animations in Android 9 and lower (see [Hybri
         apiName: "WPESettings.disable-animations",
         apiUrl:
             "https://wpewebkit.org/reference/stable/wpe-platform-2.0/class.Settings.html",
-        note:
-            "This is a WPE Platform display-level setting for accessibility.",
+        note: "This is a WPE Platform display-level setting for accessibility.",
       ),
     ],
   )
@@ -3058,6 +3074,226 @@ as it can cause framerate drops on animations in Android 9 and lower (see [Hybri
   )
   int? keyRepeatInterval;
 
+  ///Sets whether JavaScript can access the clipboard.
+  ///When enabled, JavaScript can read from and write to the system clipboard.
+  ///
+  ///The default value is `false`.
+  @SupportedPlatforms(
+    platforms: [
+      LinuxPlatform(
+        apiName: "WebKitSettings.javascript-can-access-clipboard",
+        apiUrl:
+            "https://wpewebkit.org/reference/stable/wpe-webkit-2.0/property.Settings.javascript-can-access-clipboard.html",
+      ),
+    ],
+  )
+  bool? javaScriptCanAccessClipboard;
+
+  ///Sets whether modal dialogs are allowed.
+  ///When enabled, modal dialogs (such as `window.showModalDialog()`) are allowed.
+  ///
+  ///The default value is `false`.
+  @SupportedPlatforms(
+    platforms: [
+      LinuxPlatform(
+        apiName: "WebKitSettings.allow-modal-dialogs",
+        apiUrl:
+            "https://wpewebkit.org/reference/stable/wpe-webkit-2.0/property.Settings.allow-modal-dialogs.html",
+      ),
+    ],
+  )
+  bool? allowModalDialogs;
+
+  ///Disables web security. When disabled, same-origin policy is not enforced.
+  ///
+  ///**NOTE**: Setting this to `true` is extremely dangerous and should only be used for testing.
+  ///
+  ///The default value is `false`.
+  @SupportedPlatforms(
+    platforms: [
+      LinuxPlatform(
+        available: "2.40",
+        apiName: "WebKitSettings.disable-web-security",
+        apiUrl:
+            "https://wpewebkit.org/reference/stable/wpe-webkit-2.0/property.Settings.disable-web-security.html",
+        note: "Requires WPE WebKit 2.40 or later",
+      ),
+    ],
+  )
+  bool? disableWebSecurity;
+
+  ///Enables WebRTC support for real-time communication features.
+  ///
+  ///The default value is `true`.
+  @SupportedPlatforms(
+    platforms: [
+      LinuxPlatform(
+        available: "2.38",
+        apiName: "WebKitSettings.enable-webrtc",
+        apiUrl:
+            "https://wpewebkit.org/reference/stable/wpe-webkit-2.0/property.Settings.enable-webrtc.html",
+        note: "Requires WPE WebKit 2.38 or later",
+      ),
+    ],
+  )
+  bool? enableWebRTC;
+
+  ///Sets the range of UDP ports for WebRTC connections.
+  ///
+  ///The format is "minPort:maxPort", for example "10000:10100".
+  ///
+  ///The default value is `null` (uses system default).
+  @SupportedPlatforms(
+    platforms: [
+      LinuxPlatform(
+        available: "2.48",
+        apiName: "WebKitSettings.webrtc-udp-ports-range",
+        apiUrl:
+            "https://wpewebkit.org/reference/stable/wpe-webkit-2.0/property.Settings.webrtc-udp-ports-range.html",
+        note: "Requires WPE WebKit 2.48 or later. Format: 'minPort:maxPort'",
+      ),
+    ],
+  )
+  String? webRTCUdpPortsRange;
+
+  ///Sets whether media (audio/video) is enabled.
+  ///When disabled, media elements will not be able to play.
+  ///
+  ///The default value is `true`.
+  @SupportedPlatforms(
+    platforms: [
+      LinuxPlatform(
+        available: "2.26",
+        apiName: "WebKitSettings.enable-media",
+        apiUrl:
+            "https://wpewebkit.org/reference/stable/wpe-webkit-2.0/property.Settings.enable-media.html",
+        note: "Requires WPE WebKit 2.26 or later",
+      ),
+    ],
+  )
+  bool? enableMedia;
+
+  ///Sets whether Encrypted Media Extensions (EME) are enabled.
+  ///EME provides APIs for playing protected (DRM) content.
+  ///
+  ///The default value is `true` (since WPE WebKit 2.38).
+  @SupportedPlatforms(
+    platforms: [
+      LinuxPlatform(
+        available: "2.20",
+        apiName: "WebKitSettings.enable-encrypted-media",
+        apiUrl:
+            "https://wpewebkit.org/reference/stable/wpe-webkit-2.0/property.Settings.enable-encrypted-media.html",
+        note: "Requires WPE WebKit 2.20 or later",
+      ),
+    ],
+  )
+  bool? enableEncryptedMedia;
+
+  ///Sets whether the Media Capabilities API is enabled.
+  ///The Media Capabilities API provides information about the decoding abilities of the device.
+  ///
+  ///The default value is `true`.
+  @SupportedPlatforms(
+    platforms: [
+      LinuxPlatform(
+        available: "2.22",
+        apiName: "WebKitSettings.enable-media-capabilities",
+        apiUrl:
+            "https://wpewebkit.org/reference/stable/wpe-webkit-2.0/property.Settings.enable-media-capabilities.html",
+        note: "Requires WPE WebKit 2.22 or later",
+      ),
+    ],
+  )
+  bool? enableMediaCapabilities;
+
+  ///Sets whether mock capture devices are enabled.
+  ///When enabled, the browser will use mock devices for getUserMedia() instead of real hardware.
+  ///This is useful for testing.
+  ///
+  ///The default value is `false`.
+  @SupportedPlatforms(
+    platforms: [
+      LinuxPlatform(
+        available: "2.24",
+        apiName: "WebKitSettings.enable-mock-capture-devices",
+        apiUrl:
+            "https://wpewebkit.org/reference/stable/wpe-webkit-2.0/property.Settings.enable-mock-capture-devices.html",
+        note: "Requires WPE WebKit 2.24 or later",
+      ),
+    ],
+  )
+  bool? enableMockCaptureDevices;
+
+  ///Sets the media content types that require hardware support.
+  ///This is a comma-separated list of media content types.
+  ///
+  ///The default value is `null` (uses system default).
+  @SupportedPlatforms(
+    platforms: [
+      LinuxPlatform(
+        available: "2.30",
+        apiName:
+            "WebKitSettings.media-content-types-requiring-hardware-support",
+        apiUrl:
+            "https://wpewebkit.org/reference/stable/wpe-webkit-2.0/property.Settings.media-content-types-requiring-hardware-support.html",
+        note: "Requires WPE WebKit 2.30 or later",
+      ),
+    ],
+  )
+  String? mediaContentTypesRequiringHardwareSupport;
+
+  ///Sets whether JavaScript markup (<script> tags) is enabled.
+  ///When disabled, scripts embedded in HTML will not be executed.
+  ///
+  ///The default value is `true`.
+  @SupportedPlatforms(
+    platforms: [
+      LinuxPlatform(
+        available: "2.24",
+        apiName: "WebKitSettings.enable-javascript-markup",
+        apiUrl:
+            "https://wpewebkit.org/reference/stable/wpe-webkit-2.0/property.Settings.enable-javascript-markup.html",
+        note: "Requires WPE WebKit 2.24 or later",
+      ),
+    ],
+  )
+  bool? enableJavaScriptMarkup;
+
+  ///Sets whether 2D canvas hardware acceleration is enabled.
+  ///When enabled, 2D canvas operations are accelerated using the GPU.
+  ///
+  ///The default value is `false`.
+  @SupportedPlatforms(
+    platforms: [
+      LinuxPlatform(
+        available: "2.46",
+        apiName: "WebKitSettings.enable-2d-canvas-acceleration",
+        apiUrl:
+            "https://wpewebkit.org/reference/stable/wpe-webkit-2.0/property.Settings.enable-2d-canvas-acceleration.html",
+        note: "Requires WPE WebKit 2.46 or later",
+      ),
+    ],
+  )
+  bool? enable2DCanvasAcceleration;
+
+  ///Sets whether top-level navigation to data: URLs is allowed.
+  ///When disabled, navigating to data: URLs in the top frame is blocked.
+  ///
+  ///The default value is `false`.
+  @SupportedPlatforms(
+    platforms: [
+      LinuxPlatform(
+        available: "2.28",
+        apiName: "WebKitSettings.allow-top-navigation-to-data-urls",
+        apiUrl:
+            "https://wpewebkit.org/reference/stable/wpe-webkit-2.0/property.Settings.allow-top-navigation-to-data-urls.html",
+        note: "Requires WPE WebKit 2.28 or later",
+      ),
+    ],
+  )
+  bool? allowTopNavigationToDataUrls;
+
   @ExchangeableObjectConstructor()
   InAppWebViewSettings_({
     this.useShouldOverrideUrlLoading,
@@ -3250,6 +3486,19 @@ as it can cause framerate drops on animations in Android 9 and lower (see [Hybri
     this.dragThreshold,
     this.keyRepeatDelay,
     this.keyRepeatInterval,
+    this.javaScriptCanAccessClipboard = false,
+    this.allowModalDialogs = false,
+    this.disableWebSecurity = false,
+    this.enableWebRTC = true,
+    this.webRTCUdpPortsRange,
+    this.enableMedia = true,
+    this.enableEncryptedMedia = true,
+    this.enableMediaCapabilities = true,
+    this.enableMockCaptureDevices = false,
+    this.mediaContentTypesRequiringHardwareSupport,
+    this.enableJavaScriptMarkup = true,
+    this.enable2DCanvasAcceleration = false,
+    this.allowTopNavigationToDataUrls = false,
   }) {
     if (this.minimumFontSize == null)
       this.minimumFontSize = Util.isAndroid ? 8 : 0;

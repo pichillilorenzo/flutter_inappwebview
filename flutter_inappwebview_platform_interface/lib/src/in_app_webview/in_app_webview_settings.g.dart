@@ -80,7 +80,27 @@ class InAppWebViewSettings {
   ///- Android WebView ([Official API - WebSettings.setAllowFileAccessFromFileURLs](https://developer.android.com/reference/android/webkit/WebSettings?hl=en#setAllowFileAccessFromFileURLs(boolean)))
   ///- iOS WKWebView
   ///- macOS WKWebView
+  ///- Linux WPE WebKit 2.10+ ([Official API - WebKitSettings.allow-file-access-from-file-urls](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/property.Settings.allow-file-access-from-file-urls.html))
   bool? allowFileAccessFromFileURLs;
+
+  ///Sets whether modal dialogs are allowed.
+  ///When enabled, modal dialogs (such as `window.showModalDialog()`) are allowed.
+  ///
+  ///The default value is `false`.
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Linux WPE WebKit ([Official API - WebKitSettings.allow-modal-dialogs](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/property.Settings.allow-modal-dialogs.html))
+  bool? allowModalDialogs;
+
+  ///Sets whether top-level navigation to data: URLs is allowed.
+  ///When disabled, navigating to data: URLs in the top frame is blocked.
+  ///
+  ///The default value is `false`.
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Linux WPE WebKit 2.28+ ([Official API - WebKitSettings.allow-top-navigation-to-data-urls](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/property.Settings.allow-top-navigation-to-data-urls.html)):
+  ///    - Requires WPE WebKit 2.28 or later
+  bool? allowTopNavigationToDataUrls;
 
   ///Sets whether cross-origin requests in the context of a file scheme URL should be allowed to access content from any origin.
   ///This includes access to content from other file scheme URLs or web contexts.
@@ -96,6 +116,7 @@ class InAppWebViewSettings {
   ///- Android WebView ([Official API - WebSettings.setAllowUniversalAccessFromFileURLs](https://developer.android.com/reference/android/webkit/WebSettings?hl=en#setAllowUniversalAccessFromFileURLs(boolean)))
   ///- iOS WKWebView
   ///- macOS WKWebView
+  ///- Linux WPE WebKit 2.14+ ([Official API - WebKitSettings.allow-universal-access-from-file-urls](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/property.Settings.allow-universal-access-from-file-urls.html))
   bool? allowUniversalAccessFromFileURLs;
 
   ///Used in combination with [PlatformWebViewCreationParams.initialUrlRequest] or [PlatformWebViewCreationParams.initialData] (using the `file://` scheme), it represents the URL from which to read the web content.
@@ -140,6 +161,7 @@ class InAppWebViewSettings {
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- iOS WKWebView ([Official API - WKWebViewConfiguration.allowsInlineMediaPlayback](https://developer.apple.com/documentation/webkit/wkwebviewconfiguration/1614793-allowsinlinemediaplayback))
+  ///- Linux WPE WebKit ([Official API - WebKitSettings.media-playback-allows-inline](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/property.Settings.media-playback-allows-inline.html))
   bool? allowsInlineMediaPlayback;
 
   ///Set to `true` to allow that pressing on a link displays a preview of the destination for the link. The default value is `true`.
@@ -528,6 +550,17 @@ class InAppWebViewSettings {
   ///- Web \<iframe\> but requires same origin
   bool? disableVerticalScroll;
 
+  ///Disables web security. When disabled, same-origin policy is not enforced.
+  ///
+  ///**NOTE**: Setting this to `true` is extremely dangerous and should only be used for testing.
+  ///
+  ///The default value is `false`.
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Linux WPE WebKit 2.40+ ([Official API - WebKitSettings.disable-web-security](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/property.Settings.disable-web-security.html)):
+  ///    - Requires WPE WebKit 2.40 or later
+  bool? disableWebSecurity;
+
   ///Disables the action mode menu items according to menuItems flag.
   ///
   ///**Officially Supported Platforms/Implementations**:
@@ -599,6 +632,16 @@ class InAppWebViewSettings {
   ///- Linux WPE WebKit ([Official API - WebKitSettings.draw-compositing-indicators](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/property.Settings.draw-compositing-indicators.html))
   bool? drawCompositingIndicators;
 
+  ///Sets whether 2D canvas hardware acceleration is enabled.
+  ///When enabled, 2D canvas operations are accelerated using the GPU.
+  ///
+  ///The default value is `false`.
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Linux WPE WebKit 2.46+ ([Official API - WebKitSettings.enable-2d-canvas-acceleration](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/property.Settings.enable-2d-canvas-acceleration.html)):
+  ///    - Requires WPE WebKit 2.46 or later
+  bool? enable2DCanvasAcceleration;
+
   ///Sets whether caret browsing mode is enabled.
   ///Caret browsing mode allows users to navigate through web pages using the keyboard,
   ///with a visible caret (text cursor) that can be moved through the content.
@@ -608,6 +651,57 @@ class InAppWebViewSettings {
   ///**Officially Supported Platforms/Implementations**:
   ///- Linux WPE WebKit ([Official API - WebKitSettings.enable-caret-browsing](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/property.Settings.enable-caret-browsing.html))
   bool? enableCaretBrowsing;
+
+  ///Sets whether Encrypted Media Extensions (EME) are enabled.
+  ///EME provides APIs for playing protected (DRM) content.
+  ///
+  ///The default value is `true` (since WPE WebKit 2.38).
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Linux WPE WebKit 2.20+ ([Official API - WebKitSettings.enable-encrypted-media](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/property.Settings.enable-encrypted-media.html)):
+  ///    - Requires WPE WebKit 2.20 or later
+  bool? enableEncryptedMedia;
+
+  ///Sets whether JavaScript markup (<script> tags) is enabled.
+  ///When disabled, scripts embedded in HTML will not be executed.
+  ///
+  ///The default value is `true`.
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Linux WPE WebKit 2.24+ ([Official API - WebKitSettings.enable-javascript-markup](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/property.Settings.enable-javascript-markup.html)):
+  ///    - Requires WPE WebKit 2.24 or later
+  bool? enableJavaScriptMarkup;
+
+  ///Sets whether media (audio/video) is enabled.
+  ///When disabled, media elements will not be able to play.
+  ///
+  ///The default value is `true`.
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Linux WPE WebKit 2.26+ ([Official API - WebKitSettings.enable-media](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/property.Settings.enable-media.html)):
+  ///    - Requires WPE WebKit 2.26 or later
+  bool? enableMedia;
+
+  ///Sets whether the Media Capabilities API is enabled.
+  ///The Media Capabilities API provides information about the decoding abilities of the device.
+  ///
+  ///The default value is `true`.
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Linux WPE WebKit 2.22+ ([Official API - WebKitSettings.enable-media-capabilities](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/property.Settings.enable-media-capabilities.html)):
+  ///    - Requires WPE WebKit 2.22 or later
+  bool? enableMediaCapabilities;
+
+  ///Sets whether mock capture devices are enabled.
+  ///When enabled, the browser will use mock devices for getUserMedia() instead of real hardware.
+  ///This is useful for testing.
+  ///
+  ///The default value is `false`.
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Linux WPE WebKit 2.24+ ([Official API - WebKitSettings.enable-mock-capture-devices](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/property.Settings.enable-mock-capture-devices.html)):
+  ///    - Requires WPE WebKit 2.24 or later
+  bool? enableMockCaptureDevices;
 
   ///Sets whether the page cache is enabled.
   ///The page cache allows for faster back/forward navigation by keeping pages in memory.
@@ -661,6 +755,15 @@ class InAppWebViewSettings {
   ///- iOS WKWebView
   ///- macOS WKWebView
   bool? enableViewportScale;
+
+  ///Enables WebRTC support for real-time communication features.
+  ///
+  ///The default value is `true`.
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Linux WPE WebKit 2.38+ ([Official API - WebKitSettings.enable-webrtc](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/property.Settings.enable-webrtc.html)):
+  ///    - Requires WPE WebKit 2.38 or later
+  bool? enableWebRTC;
 
   ///Sets whether console messages are written to stdout.
   ///When enabled, console messages from the web page will be written to the standard output.
@@ -1102,6 +1205,15 @@ class InAppWebViewSettings {
   ///- Web \<iframe\> but requires same origin
   Set<String>? javaScriptBridgeOriginAllowList;
 
+  ///Sets whether JavaScript can access the clipboard.
+  ///When enabled, JavaScript can read from and write to the system clipboard.
+  ///
+  ///The default value is `false`.
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Linux WPE WebKit ([Official API - WebKitSettings.javascript-can-access-clipboard](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/property.Settings.javascript-can-access-clipboard.html))
+  bool? javaScriptCanAccessClipboard;
+
   ///Set to `true` to allow JavaScript open windows without user interaction. The default value is `false`.
   ///
   ///**Officially Supported Platforms/Implementations**:
@@ -1219,6 +1331,16 @@ class InAppWebViewSettings {
   ///**Officially Supported Platforms/Implementations**:
   ///- iOS WKWebView ([Official API - UIScrollView.maximumZoomScale](https://developer.apple.com/documentation/uikit/uiscrollview/1619408-maximumzoomscale))
   double? maximumZoomScale;
+
+  ///Sets the media content types that require hardware support.
+  ///This is a comma-separated list of media content types.
+  ///
+  ///The default value is `null` (uses system default).
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Linux WPE WebKit 2.30+ ([Official API - WebKitSettings.media-content-types-requiring-hardware-support](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/property.Settings.media-content-types-requiring-hardware-support.html)):
+  ///    - Requires WPE WebKit 2.30 or later
+  String? mediaContentTypesRequiringHardwareSupport;
 
   ///Set to `true` to prevent HTML5 audio or video from autoplaying. The default value is `true`.
   ///
@@ -1874,6 +1996,17 @@ class InAppWebViewSettings {
   ///- Android WebView 29+ ([Official API - View.setVerticalScrollbarTrackDrawable](https://developer.android.com/reference/android/view/View#setVerticalScrollbarTrackDrawable(android.graphics.drawable.Drawable)))
   Color? verticalScrollbarTrackColor;
 
+  ///Sets the range of UDP ports for WebRTC connections.
+  ///
+  ///The format is "minPort:maxPort", for example "10000:10100".
+  ///
+  ///The default value is `null` (uses system default).
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Linux WPE WebKit 2.48+ ([Official API - WebKitSettings.webrtc-udp-ports-range](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/property.Settings.webrtc-udp-ports-range.html)):
+  ///    - Requires WPE WebKit 2.48 or later. Format: 'minPort:maxPort'
+  String? webRTCUdpPortsRange;
+
   ///Use a [WebViewAssetLoader] instance to load local files including application's static assets and resources using http(s):// URLs.
   ///Loading local files using web-like URLs instead of `file://` is desirable as it is compatible with the Same-Origin policy.
   ///
@@ -2079,6 +2212,19 @@ class InAppWebViewSettings {
     this.dragThreshold,
     this.keyRepeatDelay,
     this.keyRepeatInterval,
+    this.javaScriptCanAccessClipboard = false,
+    this.allowModalDialogs = false,
+    this.disableWebSecurity = false,
+    this.enableWebRTC = true,
+    this.webRTCUdpPortsRange,
+    this.enableMedia = true,
+    this.enableEncryptedMedia = true,
+    this.enableMediaCapabilities = true,
+    this.enableMockCaptureDevices = false,
+    this.mediaContentTypesRequiringHardwareSupport,
+    this.enableJavaScriptMarkup = true,
+    this.enable2DCanvasAcceleration = false,
+    this.allowTopNavigationToDataUrls = false,
   }) {
     if (this.minimumFontSize == null)
       this.minimumFontSize = Util.isAndroid ? 8 : 0;
@@ -2240,6 +2386,8 @@ class InAppWebViewSettings {
       maximumViewportInset: MapEdgeInsets.fromMap(
         map['maximumViewportInset']?.cast<String, dynamic>(),
       ),
+      mediaContentTypesRequiringHardwareSupport:
+          map['mediaContentTypesRequiringHardwareSupport'],
       mediaType: map['mediaType'],
       minimumFontSize: map['minimumFontSize'],
       minimumViewportInset: MapEdgeInsets.fromMap(
@@ -2298,6 +2446,7 @@ class InAppWebViewSettings {
               map['verticalScrollbarTrackColor'],
             )
           : null,
+      webRTCUdpPortsRange: map['webRTCUdpPortsRange'],
       webViewAssetLoader: WebViewAssetLoader.fromMap(
         map['webViewAssetLoader']?.cast<String, dynamic>(),
         enumMethod: enumMethod,
@@ -2310,6 +2459,8 @@ class InAppWebViewSettings {
     instance.allowContentAccess = map['allowContentAccess'];
     instance.allowFileAccess = map['allowFileAccess'];
     instance.allowFileAccessFromFileURLs = map['allowFileAccessFromFileURLs'];
+    instance.allowModalDialogs = map['allowModalDialogs'];
+    instance.allowTopNavigationToDataUrls = map['allowTopNavigationToDataUrls'];
     instance.allowUniversalAccessFromFileURLs =
         map['allowUniversalAccessFromFileURLs'];
     instance.allowsAirPlayForMediaPlayback =
@@ -2390,17 +2541,25 @@ class InAppWebViewSettings {
     instance.disableLongPressContextMenuOnLinks =
         map['disableLongPressContextMenuOnLinks'];
     instance.disableVerticalScroll = map['disableVerticalScroll'];
+    instance.disableWebSecurity = map['disableWebSecurity'];
     instance.disallowOverScroll = map['disallowOverScroll'];
     instance.displayZoomControls = map['displayZoomControls'];
     instance.domStorageEnabled = map['domStorageEnabled'];
     instance.drawCompositingIndicators = map['drawCompositingIndicators'];
+    instance.enable2DCanvasAcceleration = map['enable2DCanvasAcceleration'];
     instance.enableCaretBrowsing = map['enableCaretBrowsing'];
+    instance.enableEncryptedMedia = map['enableEncryptedMedia'];
+    instance.enableJavaScriptMarkup = map['enableJavaScriptMarkup'];
+    instance.enableMedia = map['enableMedia'];
+    instance.enableMediaCapabilities = map['enableMediaCapabilities'];
+    instance.enableMockCaptureDevices = map['enableMockCaptureDevices'];
     instance.enablePageCache = map['enablePageCache'];
     instance.enableResizableTextAreas = map['enableResizableTextAreas'];
     instance.enableSmoothScrolling = map['enableSmoothScrolling'];
     instance.enableSpatialNavigation = map['enableSpatialNavigation'];
     instance.enableTabsToLinks = map['enableTabsToLinks'];
     instance.enableViewportScale = map['enableViewportScale'];
+    instance.enableWebRTC = map['enableWebRTC'];
     instance.enableWriteConsoleMessagesToStdout =
         map['enableWriteConsoleMessagesToStdout'];
     instance.enterpriseAuthenticationAppLinkPolicyEnabled =
@@ -2440,6 +2599,7 @@ class InAppWebViewSettings {
     instance.isUserInteractionEnabled = map['isUserInteractionEnabled'];
     instance.itpEnabled = map['itpEnabled'];
     instance.javaScriptBridgeEnabled = map['javaScriptBridgeEnabled'];
+    instance.javaScriptCanAccessClipboard = map['javaScriptCanAccessClipboard'];
     instance.javaScriptCanOpenWindowsAutomatically =
         map['javaScriptCanOpenWindowsAutomatically'];
     instance.javaScriptEnabled = map['javaScriptEnabled'];
@@ -2558,6 +2718,8 @@ class InAppWebViewSettings {
       "allowContentAccess": allowContentAccess,
       "allowFileAccess": allowFileAccess,
       "allowFileAccessFromFileURLs": allowFileAccessFromFileURLs,
+      "allowModalDialogs": allowModalDialogs,
+      "allowTopNavigationToDataUrls": allowTopNavigationToDataUrls,
       "allowUniversalAccessFromFileURLs": allowUniversalAccessFromFileURLs,
       "allowingReadAccessTo": allowingReadAccessTo?.toString(),
       "allowsAirPlayForMediaPlayback": allowsAirPlayForMediaPlayback,
@@ -2627,6 +2789,7 @@ class InAppWebViewSettings {
       "disableInputAccessoryView": disableInputAccessoryView,
       "disableLongPressContextMenuOnLinks": disableLongPressContextMenuOnLinks,
       "disableVerticalScroll": disableVerticalScroll,
+      "disableWebSecurity": disableWebSecurity,
       "disabledActionModeMenuItems": switch (enumMethod ??
           EnumMethod.nativeValue) {
         EnumMethod.nativeValue => disabledActionModeMenuItems?.toNativeValue(),
@@ -2640,13 +2803,20 @@ class InAppWebViewSettings {
       "doubleClickTime": doubleClickTime,
       "dragThreshold": dragThreshold,
       "drawCompositingIndicators": drawCompositingIndicators,
+      "enable2DCanvasAcceleration": enable2DCanvasAcceleration,
       "enableCaretBrowsing": enableCaretBrowsing,
+      "enableEncryptedMedia": enableEncryptedMedia,
+      "enableJavaScriptMarkup": enableJavaScriptMarkup,
+      "enableMedia": enableMedia,
+      "enableMediaCapabilities": enableMediaCapabilities,
+      "enableMockCaptureDevices": enableMockCaptureDevices,
       "enablePageCache": enablePageCache,
       "enableResizableTextAreas": enableResizableTextAreas,
       "enableSmoothScrolling": enableSmoothScrolling,
       "enableSpatialNavigation": enableSpatialNavigation,
       "enableTabsToLinks": enableTabsToLinks,
       "enableViewportScale": enableViewportScale,
+      "enableWebRTC": enableWebRTC,
       "enableWriteConsoleMessagesToStdout": enableWriteConsoleMessagesToStdout,
       "enterpriseAuthenticationAppLinkPolicyEnabled":
           enterpriseAuthenticationAppLinkPolicyEnabled,
@@ -2724,6 +2894,7 @@ class InAppWebViewSettings {
       "javaScriptBridgeForMainFrameOnly": javaScriptBridgeForMainFrameOnly,
       "javaScriptBridgeOriginAllowList": javaScriptBridgeOriginAllowList
           ?.toList(),
+      "javaScriptCanAccessClipboard": javaScriptCanAccessClipboard,
       "javaScriptCanOpenWindowsAutomatically":
           javaScriptCanOpenWindowsAutomatically,
       "javaScriptEnabled": javaScriptEnabled,
@@ -2742,6 +2913,8 @@ class InAppWebViewSettings {
       "loadsImagesAutomatically": loadsImagesAutomatically,
       "maximumViewportInset": maximumViewportInset?.toMap(),
       "maximumZoomScale": maximumZoomScale,
+      "mediaContentTypesRequiringHardwareSupport":
+          mediaContentTypesRequiringHardwareSupport,
       "mediaPlaybackRequiresUserGesture": mediaPlaybackRequiresUserGesture,
       "mediaType": mediaType,
       "minimumFontSize": minimumFontSize,
@@ -2836,6 +3009,7 @@ class InAppWebViewSettings {
       },
       "verticalScrollbarThumbColor": verticalScrollbarThumbColor?.toHex(),
       "verticalScrollbarTrackColor": verticalScrollbarTrackColor?.toHex(),
+      "webRTCUdpPortsRange": webRTCUdpPortsRange,
       "webViewAssetLoader": webViewAssetLoader?.toMap(enumMethod: enumMethod),
     };
   }
@@ -2852,7 +3026,7 @@ class InAppWebViewSettings {
 
   @override
   String toString() {
-    return 'InAppWebViewSettings{accessibilityIgnoresInvertColors: $accessibilityIgnoresInvertColors, algorithmicDarkeningAllowed: $algorithmicDarkeningAllowed, allowBackgroundAudioPlaying: $allowBackgroundAudioPlaying, allowContentAccess: $allowContentAccess, allowFileAccess: $allowFileAccess, allowFileAccessFromFileURLs: $allowFileAccessFromFileURLs, allowUniversalAccessFromFileURLs: $allowUniversalAccessFromFileURLs, allowingReadAccessTo: $allowingReadAccessTo, allowsAirPlayForMediaPlayback: $allowsAirPlayForMediaPlayback, allowsBackForwardNavigationGestures: $allowsBackForwardNavigationGestures, allowsInlineMediaPlayback: $allowsInlineMediaPlayback, allowsLinkPreview: $allowsLinkPreview, allowsPictureInPictureMediaPlayback: $allowsPictureInPictureMediaPlayback, alpha: $alpha, alwaysBounceHorizontal: $alwaysBounceHorizontal, alwaysBounceVertical: $alwaysBounceVertical, appCachePath: $appCachePath, applePayAPIEnabled: $applePayAPIEnabled, applicationNameForUserAgent: $applicationNameForUserAgent, automaticallyAdjustsScrollIndicatorInsets: $automaticallyAdjustsScrollIndicatorInsets, blockNetworkImage: $blockNetworkImage, blockNetworkLoads: $blockNetworkLoads, browserAcceleratorKeysEnabled: $browserAcceleratorKeysEnabled, builtInZoomControls: $builtInZoomControls, cacheEnabled: $cacheEnabled, cacheMode: $cacheMode, contentBlockers: $contentBlockers, contentInsetAdjustmentBehavior: $contentInsetAdjustmentBehavior, corsAllowlist: $corsAllowlist, cursiveFontFamily: $cursiveFontFamily, cursorBlinkTime: $cursorBlinkTime, darkMode: $darkMode, dataDetectorTypes: $dataDetectorTypes, databaseEnabled: $databaseEnabled, decelerationRate: $decelerationRate, defaultFixedFontSize: $defaultFixedFontSize, defaultFontSize: $defaultFontSize, defaultTextEncodingName: $defaultTextEncodingName, defaultVideoPoster: $defaultVideoPoster, disableAnimations: $disableAnimations, disableContextMenu: $disableContextMenu, disableDefaultErrorPage: $disableDefaultErrorPage, disableHorizontalScroll: $disableHorizontalScroll, disableInputAccessoryView: $disableInputAccessoryView, disableLongPressContextMenuOnLinks: $disableLongPressContextMenuOnLinks, disableVerticalScroll: $disableVerticalScroll, disabledActionModeMenuItems: $disabledActionModeMenuItems, disallowOverScroll: $disallowOverScroll, displayZoomControls: $displayZoomControls, domStorageEnabled: $domStorageEnabled, doubleClickDistance: $doubleClickDistance, doubleClickTime: $doubleClickTime, dragThreshold: $dragThreshold, drawCompositingIndicators: $drawCompositingIndicators, enableCaretBrowsing: $enableCaretBrowsing, enablePageCache: $enablePageCache, enableResizableTextAreas: $enableResizableTextAreas, enableSmoothScrolling: $enableSmoothScrolling, enableSpatialNavigation: $enableSpatialNavigation, enableTabsToLinks: $enableTabsToLinks, enableViewportScale: $enableViewportScale, enableWriteConsoleMessagesToStdout: $enableWriteConsoleMessagesToStdout, enterpriseAuthenticationAppLinkPolicyEnabled: $enterpriseAuthenticationAppLinkPolicyEnabled, fantasyFontFamily: $fantasyFontFamily, fixedFontFamily: $fixedFontFamily, fontAntialias: $fontAntialias, fontDPI: $fontDPI, fontHintingStyle: $fontHintingStyle, fontSubpixelLayout: $fontSubpixelLayout, generalAutofillEnabled: $generalAutofillEnabled, geolocationEnabled: $geolocationEnabled, handleAcceleratorKeyPressed: $handleAcceleratorKeyPressed, hardwareAcceleration: $hardwareAcceleration, hiddenPdfToolbarItems: $hiddenPdfToolbarItems, horizontalScrollBarEnabled: $horizontalScrollBarEnabled, horizontalScrollbarThumbColor: $horizontalScrollbarThumbColor, horizontalScrollbarTrackColor: $horizontalScrollbarTrackColor, iframeAllow: $iframeAllow, iframeAllowFullscreen: $iframeAllowFullscreen, iframeAriaHidden: $iframeAriaHidden, iframeCsp: $iframeCsp, iframeName: $iframeName, iframeReferrerPolicy: $iframeReferrerPolicy, iframeRole: $iframeRole, iframeSandbox: $iframeSandbox, ignoresViewportScaleLimits: $ignoresViewportScaleLimits, incognito: $incognito, initialScale: $initialScale, interceptOnlyAsyncAjaxRequests: $interceptOnlyAsyncAjaxRequests, isDirectionalLockEnabled: $isDirectionalLockEnabled, isElementFullscreenEnabled: $isElementFullscreenEnabled, isFindInteractionEnabled: $isFindInteractionEnabled, isFraudulentWebsiteWarningEnabled: $isFraudulentWebsiteWarningEnabled, isInspectable: $isInspectable, isPagingEnabled: $isPagingEnabled, isSiteSpecificQuirksModeEnabled: $isSiteSpecificQuirksModeEnabled, isTextInteractionEnabled: $isTextInteractionEnabled, isUserInteractionEnabled: $isUserInteractionEnabled, itpEnabled: $itpEnabled, javaScriptBridgeEnabled: $javaScriptBridgeEnabled, javaScriptBridgeForMainFrameOnly: $javaScriptBridgeForMainFrameOnly, javaScriptBridgeOriginAllowList: $javaScriptBridgeOriginAllowList, javaScriptCanOpenWindowsAutomatically: $javaScriptCanOpenWindowsAutomatically, javaScriptEnabled: $javaScriptEnabled, javaScriptHandlersForMainFrameOnly: $javaScriptHandlersForMainFrameOnly, javaScriptHandlersOriginAllowList: $javaScriptHandlersOriginAllowList, keyRepeatDelay: $keyRepeatDelay, keyRepeatInterval: $keyRepeatInterval, layoutAlgorithm: $layoutAlgorithm, limitsNavigationsToAppBoundDomains: $limitsNavigationsToAppBoundDomains, loadWithOverviewMode: $loadWithOverviewMode, loadsImagesAutomatically: $loadsImagesAutomatically, maximumViewportInset: $maximumViewportInset, maximumZoomScale: $maximumZoomScale, mediaPlaybackRequiresUserGesture: $mediaPlaybackRequiresUserGesture, mediaType: $mediaType, minimumFontSize: $minimumFontSize, minimumLogicalFontSize: $minimumLogicalFontSize, minimumViewportInset: $minimumViewportInset, minimumZoomScale: $minimumZoomScale, mixedContentMode: $mixedContentMode, needInitialFocus: $needInitialFocus, networkAvailable: $networkAvailable, nonClientRegionSupportEnabled: $nonClientRegionSupportEnabled, offscreenPreRaster: $offscreenPreRaster, overScrollMode: $overScrollMode, pageZoom: $pageZoom, passwordAutosaveEnabled: $passwordAutosaveEnabled, pictographFontFamily: $pictographFontFamily, pinchZoomEnabled: $pinchZoomEnabled, pluginScriptsForMainFrameOnly: $pluginScriptsForMainFrameOnly, pluginScriptsOriginAllowList: $pluginScriptsOriginAllowList, preferredContentMode: $preferredContentMode, regexToAllowSyncUrlLoading: $regexToAllowSyncUrlLoading, regexToCancelSubFramesLoading: $regexToCancelSubFramesLoading, rendererPriorityPolicy: $rendererPriorityPolicy, reputationCheckingRequired: $reputationCheckingRequired, requestedWithHeaderOriginAllowList: $requestedWithHeaderOriginAllowList, resourceCustomSchemes: $resourceCustomSchemes, safeBrowsingEnabled: $safeBrowsingEnabled, sansSerifFontFamily: $sansSerifFontFamily, scrollBarDefaultDelayBeforeFade: $scrollBarDefaultDelayBeforeFade, scrollBarFadeDuration: $scrollBarFadeDuration, scrollBarStyle: $scrollBarStyle, scrollMultiplier: $scrollMultiplier, scrollbarFadingEnabled: $scrollbarFadingEnabled, scrollsToTop: $scrollsToTop, selectionGranularity: $selectionGranularity, serifFontFamily: $serifFontFamily, sharedCookiesEnabled: $sharedCookiesEnabled, shouldPrintBackgrounds: $shouldPrintBackgrounds, standardFontFamily: $standardFontFamily, statusBarEnabled: $statusBarEnabled, supportMultipleWindows: $supportMultipleWindows, supportZoom: $supportZoom, suppressesIncrementalRendering: $suppressesIncrementalRendering, textZoom: $textZoom, thirdPartyCookiesEnabled: $thirdPartyCookiesEnabled, transparentBackground: $transparentBackground, underPageBackgroundColor: $underPageBackgroundColor, upgradeKnownHostsToHTTPS: $upgradeKnownHostsToHTTPS, useHybridComposition: $useHybridComposition, useOnAjaxProgress: $useOnAjaxProgress, useOnAjaxReadyStateChange: $useOnAjaxReadyStateChange, useOnDownloadStart: $useOnDownloadStart, useOnLoadResource: $useOnLoadResource, useOnNavigationResponse: $useOnNavigationResponse, useOnRenderProcessGone: $useOnRenderProcessGone, useOnShowFileChooser: $useOnShowFileChooser, useShouldInterceptAjaxRequest: $useShouldInterceptAjaxRequest, useShouldInterceptFetchRequest: $useShouldInterceptFetchRequest, useShouldInterceptRequest: $useShouldInterceptRequest, useShouldOverrideUrlLoading: $useShouldOverrideUrlLoading, useWideViewPort: $useWideViewPort, userAgent: $userAgent, verticalScrollBarEnabled: $verticalScrollBarEnabled, verticalScrollbarPosition: $verticalScrollbarPosition, verticalScrollbarThumbColor: $verticalScrollbarThumbColor, verticalScrollbarTrackColor: $verticalScrollbarTrackColor, webViewAssetLoader: $webViewAssetLoader}';
+    return 'InAppWebViewSettings{accessibilityIgnoresInvertColors: $accessibilityIgnoresInvertColors, algorithmicDarkeningAllowed: $algorithmicDarkeningAllowed, allowBackgroundAudioPlaying: $allowBackgroundAudioPlaying, allowContentAccess: $allowContentAccess, allowFileAccess: $allowFileAccess, allowFileAccessFromFileURLs: $allowFileAccessFromFileURLs, allowModalDialogs: $allowModalDialogs, allowTopNavigationToDataUrls: $allowTopNavigationToDataUrls, allowUniversalAccessFromFileURLs: $allowUniversalAccessFromFileURLs, allowingReadAccessTo: $allowingReadAccessTo, allowsAirPlayForMediaPlayback: $allowsAirPlayForMediaPlayback, allowsBackForwardNavigationGestures: $allowsBackForwardNavigationGestures, allowsInlineMediaPlayback: $allowsInlineMediaPlayback, allowsLinkPreview: $allowsLinkPreview, allowsPictureInPictureMediaPlayback: $allowsPictureInPictureMediaPlayback, alpha: $alpha, alwaysBounceHorizontal: $alwaysBounceHorizontal, alwaysBounceVertical: $alwaysBounceVertical, appCachePath: $appCachePath, applePayAPIEnabled: $applePayAPIEnabled, applicationNameForUserAgent: $applicationNameForUserAgent, automaticallyAdjustsScrollIndicatorInsets: $automaticallyAdjustsScrollIndicatorInsets, blockNetworkImage: $blockNetworkImage, blockNetworkLoads: $blockNetworkLoads, browserAcceleratorKeysEnabled: $browserAcceleratorKeysEnabled, builtInZoomControls: $builtInZoomControls, cacheEnabled: $cacheEnabled, cacheMode: $cacheMode, contentBlockers: $contentBlockers, contentInsetAdjustmentBehavior: $contentInsetAdjustmentBehavior, corsAllowlist: $corsAllowlist, cursiveFontFamily: $cursiveFontFamily, cursorBlinkTime: $cursorBlinkTime, darkMode: $darkMode, dataDetectorTypes: $dataDetectorTypes, databaseEnabled: $databaseEnabled, decelerationRate: $decelerationRate, defaultFixedFontSize: $defaultFixedFontSize, defaultFontSize: $defaultFontSize, defaultTextEncodingName: $defaultTextEncodingName, defaultVideoPoster: $defaultVideoPoster, disableAnimations: $disableAnimations, disableContextMenu: $disableContextMenu, disableDefaultErrorPage: $disableDefaultErrorPage, disableHorizontalScroll: $disableHorizontalScroll, disableInputAccessoryView: $disableInputAccessoryView, disableLongPressContextMenuOnLinks: $disableLongPressContextMenuOnLinks, disableVerticalScroll: $disableVerticalScroll, disableWebSecurity: $disableWebSecurity, disabledActionModeMenuItems: $disabledActionModeMenuItems, disallowOverScroll: $disallowOverScroll, displayZoomControls: $displayZoomControls, domStorageEnabled: $domStorageEnabled, doubleClickDistance: $doubleClickDistance, doubleClickTime: $doubleClickTime, dragThreshold: $dragThreshold, drawCompositingIndicators: $drawCompositingIndicators, enable2DCanvasAcceleration: $enable2DCanvasAcceleration, enableCaretBrowsing: $enableCaretBrowsing, enableEncryptedMedia: $enableEncryptedMedia, enableJavaScriptMarkup: $enableJavaScriptMarkup, enableMedia: $enableMedia, enableMediaCapabilities: $enableMediaCapabilities, enableMockCaptureDevices: $enableMockCaptureDevices, enablePageCache: $enablePageCache, enableResizableTextAreas: $enableResizableTextAreas, enableSmoothScrolling: $enableSmoothScrolling, enableSpatialNavigation: $enableSpatialNavigation, enableTabsToLinks: $enableTabsToLinks, enableViewportScale: $enableViewportScale, enableWebRTC: $enableWebRTC, enableWriteConsoleMessagesToStdout: $enableWriteConsoleMessagesToStdout, enterpriseAuthenticationAppLinkPolicyEnabled: $enterpriseAuthenticationAppLinkPolicyEnabled, fantasyFontFamily: $fantasyFontFamily, fixedFontFamily: $fixedFontFamily, fontAntialias: $fontAntialias, fontDPI: $fontDPI, fontHintingStyle: $fontHintingStyle, fontSubpixelLayout: $fontSubpixelLayout, generalAutofillEnabled: $generalAutofillEnabled, geolocationEnabled: $geolocationEnabled, handleAcceleratorKeyPressed: $handleAcceleratorKeyPressed, hardwareAcceleration: $hardwareAcceleration, hiddenPdfToolbarItems: $hiddenPdfToolbarItems, horizontalScrollBarEnabled: $horizontalScrollBarEnabled, horizontalScrollbarThumbColor: $horizontalScrollbarThumbColor, horizontalScrollbarTrackColor: $horizontalScrollbarTrackColor, iframeAllow: $iframeAllow, iframeAllowFullscreen: $iframeAllowFullscreen, iframeAriaHidden: $iframeAriaHidden, iframeCsp: $iframeCsp, iframeName: $iframeName, iframeReferrerPolicy: $iframeReferrerPolicy, iframeRole: $iframeRole, iframeSandbox: $iframeSandbox, ignoresViewportScaleLimits: $ignoresViewportScaleLimits, incognito: $incognito, initialScale: $initialScale, interceptOnlyAsyncAjaxRequests: $interceptOnlyAsyncAjaxRequests, isDirectionalLockEnabled: $isDirectionalLockEnabled, isElementFullscreenEnabled: $isElementFullscreenEnabled, isFindInteractionEnabled: $isFindInteractionEnabled, isFraudulentWebsiteWarningEnabled: $isFraudulentWebsiteWarningEnabled, isInspectable: $isInspectable, isPagingEnabled: $isPagingEnabled, isSiteSpecificQuirksModeEnabled: $isSiteSpecificQuirksModeEnabled, isTextInteractionEnabled: $isTextInteractionEnabled, isUserInteractionEnabled: $isUserInteractionEnabled, itpEnabled: $itpEnabled, javaScriptBridgeEnabled: $javaScriptBridgeEnabled, javaScriptBridgeForMainFrameOnly: $javaScriptBridgeForMainFrameOnly, javaScriptBridgeOriginAllowList: $javaScriptBridgeOriginAllowList, javaScriptCanAccessClipboard: $javaScriptCanAccessClipboard, javaScriptCanOpenWindowsAutomatically: $javaScriptCanOpenWindowsAutomatically, javaScriptEnabled: $javaScriptEnabled, javaScriptHandlersForMainFrameOnly: $javaScriptHandlersForMainFrameOnly, javaScriptHandlersOriginAllowList: $javaScriptHandlersOriginAllowList, keyRepeatDelay: $keyRepeatDelay, keyRepeatInterval: $keyRepeatInterval, layoutAlgorithm: $layoutAlgorithm, limitsNavigationsToAppBoundDomains: $limitsNavigationsToAppBoundDomains, loadWithOverviewMode: $loadWithOverviewMode, loadsImagesAutomatically: $loadsImagesAutomatically, maximumViewportInset: $maximumViewportInset, maximumZoomScale: $maximumZoomScale, mediaContentTypesRequiringHardwareSupport: $mediaContentTypesRequiringHardwareSupport, mediaPlaybackRequiresUserGesture: $mediaPlaybackRequiresUserGesture, mediaType: $mediaType, minimumFontSize: $minimumFontSize, minimumLogicalFontSize: $minimumLogicalFontSize, minimumViewportInset: $minimumViewportInset, minimumZoomScale: $minimumZoomScale, mixedContentMode: $mixedContentMode, needInitialFocus: $needInitialFocus, networkAvailable: $networkAvailable, nonClientRegionSupportEnabled: $nonClientRegionSupportEnabled, offscreenPreRaster: $offscreenPreRaster, overScrollMode: $overScrollMode, pageZoom: $pageZoom, passwordAutosaveEnabled: $passwordAutosaveEnabled, pictographFontFamily: $pictographFontFamily, pinchZoomEnabled: $pinchZoomEnabled, pluginScriptsForMainFrameOnly: $pluginScriptsForMainFrameOnly, pluginScriptsOriginAllowList: $pluginScriptsOriginAllowList, preferredContentMode: $preferredContentMode, regexToAllowSyncUrlLoading: $regexToAllowSyncUrlLoading, regexToCancelSubFramesLoading: $regexToCancelSubFramesLoading, rendererPriorityPolicy: $rendererPriorityPolicy, reputationCheckingRequired: $reputationCheckingRequired, requestedWithHeaderOriginAllowList: $requestedWithHeaderOriginAllowList, resourceCustomSchemes: $resourceCustomSchemes, safeBrowsingEnabled: $safeBrowsingEnabled, sansSerifFontFamily: $sansSerifFontFamily, scrollBarDefaultDelayBeforeFade: $scrollBarDefaultDelayBeforeFade, scrollBarFadeDuration: $scrollBarFadeDuration, scrollBarStyle: $scrollBarStyle, scrollMultiplier: $scrollMultiplier, scrollbarFadingEnabled: $scrollbarFadingEnabled, scrollsToTop: $scrollsToTop, selectionGranularity: $selectionGranularity, serifFontFamily: $serifFontFamily, sharedCookiesEnabled: $sharedCookiesEnabled, shouldPrintBackgrounds: $shouldPrintBackgrounds, standardFontFamily: $standardFontFamily, statusBarEnabled: $statusBarEnabled, supportMultipleWindows: $supportMultipleWindows, supportZoom: $supportZoom, suppressesIncrementalRendering: $suppressesIncrementalRendering, textZoom: $textZoom, thirdPartyCookiesEnabled: $thirdPartyCookiesEnabled, transparentBackground: $transparentBackground, underPageBackgroundColor: $underPageBackgroundColor, upgradeKnownHostsToHTTPS: $upgradeKnownHostsToHTTPS, useHybridComposition: $useHybridComposition, useOnAjaxProgress: $useOnAjaxProgress, useOnAjaxReadyStateChange: $useOnAjaxReadyStateChange, useOnDownloadStart: $useOnDownloadStart, useOnLoadResource: $useOnLoadResource, useOnNavigationResponse: $useOnNavigationResponse, useOnRenderProcessGone: $useOnRenderProcessGone, useOnShowFileChooser: $useOnShowFileChooser, useShouldInterceptAjaxRequest: $useShouldInterceptAjaxRequest, useShouldInterceptFetchRequest: $useShouldInterceptFetchRequest, useShouldInterceptRequest: $useShouldInterceptRequest, useShouldOverrideUrlLoading: $useShouldOverrideUrlLoading, useWideViewPort: $useWideViewPort, userAgent: $userAgent, verticalScrollBarEnabled: $verticalScrollBarEnabled, verticalScrollbarPosition: $verticalScrollbarPosition, verticalScrollbarThumbColor: $verticalScrollbarThumbColor, verticalScrollbarTrackColor: $verticalScrollbarTrackColor, webRTCUdpPortsRange: $webRTCUdpPortsRange, webViewAssetLoader: $webViewAssetLoader}';
   }
 }
 
@@ -2926,10 +3100,34 @@ enum InAppWebViewSettingsProperty {
   ///- Android WebView ([Official API - WebSettings.setAllowFileAccessFromFileURLs](https://developer.android.com/reference/android/webkit/WebSettings?hl=en#setAllowFileAccessFromFileURLs(boolean)))
   ///- iOS WKWebView
   ///- macOS WKWebView
+  ///- Linux WPE WebKit 2.10+ ([Official API - WebKitSettings.allow-file-access-from-file-urls](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/property.Settings.allow-file-access-from-file-urls.html))
   ///
   ///Use the [InAppWebViewSettings.isPropertySupported] method to check if this property is supported at runtime.
   ///{@endtemplate}
   allowFileAccessFromFileURLs,
+
+  ///Can be used to check if the [InAppWebViewSettings.allowModalDialogs] property is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.InAppWebViewSettings.allowModalDialogs.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Linux WPE WebKit ([Official API - WebKitSettings.allow-modal-dialogs](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/property.Settings.allow-modal-dialogs.html))
+  ///
+  ///Use the [InAppWebViewSettings.isPropertySupported] method to check if this property is supported at runtime.
+  ///{@endtemplate}
+  allowModalDialogs,
+
+  ///Can be used to check if the [InAppWebViewSettings.allowTopNavigationToDataUrls] property is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.InAppWebViewSettings.allowTopNavigationToDataUrls.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Linux WPE WebKit 2.28+ ([Official API - WebKitSettings.allow-top-navigation-to-data-urls](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/property.Settings.allow-top-navigation-to-data-urls.html)):
+  ///    - Requires WPE WebKit 2.28 or later
+  ///
+  ///Use the [InAppWebViewSettings.isPropertySupported] method to check if this property is supported at runtime.
+  ///{@endtemplate}
+  allowTopNavigationToDataUrls,
 
   ///Can be used to check if the [InAppWebViewSettings.allowUniversalAccessFromFileURLs] property is supported at runtime.
   ///
@@ -2939,6 +3137,7 @@ enum InAppWebViewSettingsProperty {
   ///- Android WebView ([Official API - WebSettings.setAllowUniversalAccessFromFileURLs](https://developer.android.com/reference/android/webkit/WebSettings?hl=en#setAllowUniversalAccessFromFileURLs(boolean)))
   ///- iOS WKWebView
   ///- macOS WKWebView
+  ///- Linux WPE WebKit 2.14+ ([Official API - WebKitSettings.allow-universal-access-from-file-urls](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/property.Settings.allow-universal-access-from-file-urls.html))
   ///
   ///Use the [InAppWebViewSettings.isPropertySupported] method to check if this property is supported at runtime.
   ///{@endtemplate}
@@ -2987,6 +3186,7 @@ enum InAppWebViewSettingsProperty {
   ///
   ///**Officially Supported Platforms/Implementations**:
   ///- iOS WKWebView ([Official API - WKWebViewConfiguration.allowsInlineMediaPlayback](https://developer.apple.com/documentation/webkit/wkwebviewconfiguration/1614793-allowsinlinemediaplayback))
+  ///- Linux WPE WebKit ([Official API - WebKitSettings.media-playback-allows-inline](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/property.Settings.media-playback-allows-inline.html))
   ///
   ///Use the [InAppWebViewSettings.isPropertySupported] method to check if this property is supported at runtime.
   ///{@endtemplate}
@@ -3431,6 +3631,18 @@ enum InAppWebViewSettingsProperty {
   ///{@endtemplate}
   disableVerticalScroll,
 
+  ///Can be used to check if the [InAppWebViewSettings.disableWebSecurity] property is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.InAppWebViewSettings.disableWebSecurity.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Linux WPE WebKit 2.40+ ([Official API - WebKitSettings.disable-web-security](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/property.Settings.disable-web-security.html)):
+  ///    - Requires WPE WebKit 2.40 or later
+  ///
+  ///Use the [InAppWebViewSettings.isPropertySupported] method to check if this property is supported at runtime.
+  ///{@endtemplate}
+  disableWebSecurity,
+
   ///Can be used to check if the [InAppWebViewSettings.disabledActionModeMenuItems] property is supported at runtime.
   ///
   ///{@template flutter_inappwebview_platform_interface.InAppWebViewSettings.disabledActionModeMenuItems.supported_platforms}
@@ -3523,6 +3735,18 @@ enum InAppWebViewSettingsProperty {
   ///{@endtemplate}
   drawCompositingIndicators,
 
+  ///Can be used to check if the [InAppWebViewSettings.enable2DCanvasAcceleration] property is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.InAppWebViewSettings.enable2DCanvasAcceleration.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Linux WPE WebKit 2.46+ ([Official API - WebKitSettings.enable-2d-canvas-acceleration](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/property.Settings.enable-2d-canvas-acceleration.html)):
+  ///    - Requires WPE WebKit 2.46 or later
+  ///
+  ///Use the [InAppWebViewSettings.isPropertySupported] method to check if this property is supported at runtime.
+  ///{@endtemplate}
+  enable2DCanvasAcceleration,
+
   ///Can be used to check if the [InAppWebViewSettings.enableCaretBrowsing] property is supported at runtime.
   ///
   ///{@template flutter_inappwebview_platform_interface.InAppWebViewSettings.enableCaretBrowsing.supported_platforms}
@@ -3533,6 +3757,66 @@ enum InAppWebViewSettingsProperty {
   ///Use the [InAppWebViewSettings.isPropertySupported] method to check if this property is supported at runtime.
   ///{@endtemplate}
   enableCaretBrowsing,
+
+  ///Can be used to check if the [InAppWebViewSettings.enableEncryptedMedia] property is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.InAppWebViewSettings.enableEncryptedMedia.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Linux WPE WebKit 2.20+ ([Official API - WebKitSettings.enable-encrypted-media](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/property.Settings.enable-encrypted-media.html)):
+  ///    - Requires WPE WebKit 2.20 or later
+  ///
+  ///Use the [InAppWebViewSettings.isPropertySupported] method to check if this property is supported at runtime.
+  ///{@endtemplate}
+  enableEncryptedMedia,
+
+  ///Can be used to check if the [InAppWebViewSettings.enableJavaScriptMarkup] property is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.InAppWebViewSettings.enableJavaScriptMarkup.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Linux WPE WebKit 2.24+ ([Official API - WebKitSettings.enable-javascript-markup](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/property.Settings.enable-javascript-markup.html)):
+  ///    - Requires WPE WebKit 2.24 or later
+  ///
+  ///Use the [InAppWebViewSettings.isPropertySupported] method to check if this property is supported at runtime.
+  ///{@endtemplate}
+  enableJavaScriptMarkup,
+
+  ///Can be used to check if the [InAppWebViewSettings.enableMedia] property is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.InAppWebViewSettings.enableMedia.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Linux WPE WebKit 2.26+ ([Official API - WebKitSettings.enable-media](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/property.Settings.enable-media.html)):
+  ///    - Requires WPE WebKit 2.26 or later
+  ///
+  ///Use the [InAppWebViewSettings.isPropertySupported] method to check if this property is supported at runtime.
+  ///{@endtemplate}
+  enableMedia,
+
+  ///Can be used to check if the [InAppWebViewSettings.enableMediaCapabilities] property is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.InAppWebViewSettings.enableMediaCapabilities.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Linux WPE WebKit 2.22+ ([Official API - WebKitSettings.enable-media-capabilities](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/property.Settings.enable-media-capabilities.html)):
+  ///    - Requires WPE WebKit 2.22 or later
+  ///
+  ///Use the [InAppWebViewSettings.isPropertySupported] method to check if this property is supported at runtime.
+  ///{@endtemplate}
+  enableMediaCapabilities,
+
+  ///Can be used to check if the [InAppWebViewSettings.enableMockCaptureDevices] property is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.InAppWebViewSettings.enableMockCaptureDevices.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Linux WPE WebKit 2.24+ ([Official API - WebKitSettings.enable-mock-capture-devices](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/property.Settings.enable-mock-capture-devices.html)):
+  ///    - Requires WPE WebKit 2.24 or later
+  ///
+  ///Use the [InAppWebViewSettings.isPropertySupported] method to check if this property is supported at runtime.
+  ///{@endtemplate}
+  enableMockCaptureDevices,
 
   ///Can be used to check if the [InAppWebViewSettings.enablePageCache] property is supported at runtime.
   ///
@@ -3600,6 +3884,18 @@ enum InAppWebViewSettingsProperty {
   ///Use the [InAppWebViewSettings.isPropertySupported] method to check if this property is supported at runtime.
   ///{@endtemplate}
   enableViewportScale,
+
+  ///Can be used to check if the [InAppWebViewSettings.enableWebRTC] property is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.InAppWebViewSettings.enableWebRTC.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Linux WPE WebKit 2.38+ ([Official API - WebKitSettings.enable-webrtc](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/property.Settings.enable-webrtc.html)):
+  ///    - Requires WPE WebKit 2.38 or later
+  ///
+  ///Use the [InAppWebViewSettings.isPropertySupported] method to check if this property is supported at runtime.
+  ///{@endtemplate}
+  enableWebRTC,
 
   ///Can be used to check if the [InAppWebViewSettings.enableWriteConsoleMessagesToStdout] property is supported at runtime.
   ///
@@ -4115,6 +4411,17 @@ enum InAppWebViewSettingsProperty {
   ///{@endtemplate}
   javaScriptBridgeOriginAllowList,
 
+  ///Can be used to check if the [InAppWebViewSettings.javaScriptCanAccessClipboard] property is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.InAppWebViewSettings.javaScriptCanAccessClipboard.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Linux WPE WebKit ([Official API - WebKitSettings.javascript-can-access-clipboard](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/property.Settings.javascript-can-access-clipboard.html))
+  ///
+  ///Use the [InAppWebViewSettings.isPropertySupported] method to check if this property is supported at runtime.
+  ///{@endtemplate}
+  javaScriptCanAccessClipboard,
+
   ///Can be used to check if the [InAppWebViewSettings.javaScriptCanOpenWindowsAutomatically] property is supported at runtime.
   ///
   ///{@template flutter_inappwebview_platform_interface.InAppWebViewSettings.javaScriptCanOpenWindowsAutomatically.supported_platforms}
@@ -4264,6 +4571,18 @@ enum InAppWebViewSettingsProperty {
   ///Use the [InAppWebViewSettings.isPropertySupported] method to check if this property is supported at runtime.
   ///{@endtemplate}
   maximumZoomScale,
+
+  ///Can be used to check if the [InAppWebViewSettings.mediaContentTypesRequiringHardwareSupport] property is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.InAppWebViewSettings.mediaContentTypesRequiringHardwareSupport.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Linux WPE WebKit 2.30+ ([Official API - WebKitSettings.media-content-types-requiring-hardware-support](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/property.Settings.media-content-types-requiring-hardware-support.html)):
+  ///    - Requires WPE WebKit 2.30 or later
+  ///
+  ///Use the [InAppWebViewSettings.isPropertySupported] method to check if this property is supported at runtime.
+  ///{@endtemplate}
+  mediaContentTypesRequiringHardwareSupport,
 
   ///Can be used to check if the [InAppWebViewSettings.mediaPlaybackRequiresUserGesture] property is supported at runtime.
   ///
@@ -5047,6 +5366,18 @@ enum InAppWebViewSettingsProperty {
   ///{@endtemplate}
   verticalScrollbarTrackColor,
 
+  ///Can be used to check if the [InAppWebViewSettings.webRTCUdpPortsRange] property is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.InAppWebViewSettings.webRTCUdpPortsRange.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Linux WPE WebKit 2.48+ ([Official API - WebKitSettings.webrtc-udp-ports-range](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/property.Settings.webrtc-udp-ports-range.html)):
+  ///    - Requires WPE WebKit 2.48 or later. Format: 'minPort:maxPort'
+  ///
+  ///Use the [InAppWebViewSettings.isPropertySupported] method to check if this property is supported at runtime.
+  ///{@endtemplate}
+  webRTCUdpPortsRange,
+
   ///Can be used to check if the [InAppWebViewSettings.webViewAssetLoader] property is supported at runtime.
   ///
   ///{@template flutter_inappwebview_platform_interface.InAppWebViewSettings.webViewAssetLoader.supported_platforms}
@@ -5094,13 +5425,21 @@ extension _InAppWebViewSettingsPropertySupported on InAppWebViewSettings {
               TargetPlatform.android,
               TargetPlatform.iOS,
               TargetPlatform.macOS,
+              TargetPlatform.linux,
             ].contains(platform ?? defaultTargetPlatform);
+      case InAppWebViewSettingsProperty.allowModalDialogs:
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
+            [TargetPlatform.linux].contains(platform ?? defaultTargetPlatform);
+      case InAppWebViewSettingsProperty.allowTopNavigationToDataUrls:
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
+            [TargetPlatform.linux].contains(platform ?? defaultTargetPlatform);
       case InAppWebViewSettingsProperty.allowUniversalAccessFromFileURLs:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
             [
               TargetPlatform.android,
               TargetPlatform.iOS,
               TargetPlatform.macOS,
+              TargetPlatform.linux,
             ].contains(platform ?? defaultTargetPlatform);
       case InAppWebViewSettingsProperty.allowingReadAccessTo:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
@@ -5123,7 +5462,10 @@ extension _InAppWebViewSettingsPropertySupported on InAppWebViewSettings {
             ].contains(platform ?? defaultTargetPlatform);
       case InAppWebViewSettingsProperty.allowsInlineMediaPlayback:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
-            [TargetPlatform.iOS].contains(platform ?? defaultTargetPlatform);
+            [
+              TargetPlatform.iOS,
+              TargetPlatform.linux,
+            ].contains(platform ?? defaultTargetPlatform);
       case InAppWebViewSettingsProperty.allowsLinkPreview:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
             [
@@ -5313,6 +5655,9 @@ extension _InAppWebViewSettingsPropertySupported on InAppWebViewSettings {
                     TargetPlatform.android,
                     TargetPlatform.iOS,
                   ].contains(platform ?? defaultTargetPlatform);
+      case InAppWebViewSettingsProperty.disableWebSecurity:
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
+            [TargetPlatform.linux].contains(platform ?? defaultTargetPlatform);
       case InAppWebViewSettingsProperty.disabledActionModeMenuItems:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
             [
@@ -5344,7 +5689,25 @@ extension _InAppWebViewSettingsPropertySupported on InAppWebViewSettings {
       case InAppWebViewSettingsProperty.drawCompositingIndicators:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.linux].contains(platform ?? defaultTargetPlatform);
+      case InAppWebViewSettingsProperty.enable2DCanvasAcceleration:
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
+            [TargetPlatform.linux].contains(platform ?? defaultTargetPlatform);
       case InAppWebViewSettingsProperty.enableCaretBrowsing:
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
+            [TargetPlatform.linux].contains(platform ?? defaultTargetPlatform);
+      case InAppWebViewSettingsProperty.enableEncryptedMedia:
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
+            [TargetPlatform.linux].contains(platform ?? defaultTargetPlatform);
+      case InAppWebViewSettingsProperty.enableJavaScriptMarkup:
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
+            [TargetPlatform.linux].contains(platform ?? defaultTargetPlatform);
+      case InAppWebViewSettingsProperty.enableMedia:
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
+            [TargetPlatform.linux].contains(platform ?? defaultTargetPlatform);
+      case InAppWebViewSettingsProperty.enableMediaCapabilities:
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
+            [TargetPlatform.linux].contains(platform ?? defaultTargetPlatform);
+      case InAppWebViewSettingsProperty.enableMockCaptureDevices:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.linux].contains(platform ?? defaultTargetPlatform);
       case InAppWebViewSettingsProperty.enablePageCache:
@@ -5368,6 +5731,9 @@ extension _InAppWebViewSettingsPropertySupported on InAppWebViewSettings {
               TargetPlatform.iOS,
               TargetPlatform.macOS,
             ].contains(platform ?? defaultTargetPlatform);
+      case InAppWebViewSettingsProperty.enableWebRTC:
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
+            [TargetPlatform.linux].contains(platform ?? defaultTargetPlatform);
       case InAppWebViewSettingsProperty.enableWriteConsoleMessagesToStdout:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.linux].contains(platform ?? defaultTargetPlatform);
@@ -5596,6 +5962,9 @@ extension _InAppWebViewSettingsPropertySupported on InAppWebViewSettings {
                     TargetPlatform.macOS,
                     TargetPlatform.windows,
                   ].contains(platform ?? defaultTargetPlatform);
+      case InAppWebViewSettingsProperty.javaScriptCanAccessClipboard:
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
+            [TargetPlatform.linux].contains(platform ?? defaultTargetPlatform);
       case InAppWebViewSettingsProperty.javaScriptCanOpenWindowsAutomatically:
         return kIsWeb && platform == null
             ? true
@@ -5667,6 +6036,10 @@ extension _InAppWebViewSettingsPropertySupported on InAppWebViewSettings {
       case InAppWebViewSettingsProperty.maximumZoomScale:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.iOS].contains(platform ?? defaultTargetPlatform);
+      case InAppWebViewSettingsProperty
+          .mediaContentTypesRequiringHardwareSupport:
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
+            [TargetPlatform.linux].contains(platform ?? defaultTargetPlatform);
       case InAppWebViewSettingsProperty.mediaPlaybackRequiresUserGesture:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
             [
@@ -6040,6 +6413,9 @@ extension _InAppWebViewSettingsPropertySupported on InAppWebViewSettings {
             [
               TargetPlatform.android,
             ].contains(platform ?? defaultTargetPlatform);
+      case InAppWebViewSettingsProperty.webRTCUdpPortsRange:
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
+            [TargetPlatform.linux].contains(platform ?? defaultTargetPlatform);
       case InAppWebViewSettingsProperty.webViewAssetLoader:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
             [

@@ -173,18 +173,17 @@ void WebStorageManager::fetchDataRecords(FlMethodCall* method_call) {
 
         for (GList* l = records; l != nullptr; l = l->next) {
           WebKitWebsiteData* data = static_cast<WebKitWebsiteData*>(l->data);
-
-          g_autoptr(FlValue) record = fl_value_new_map();
-
           const char* name = webkit_website_data_get_name(data);
-          if (name != nullptr) {
-            fl_value_set_string_take(record, "displayName",
-                                     fl_value_new_string(name));
-          }
-
           WebKitWebsiteDataTypes dataTypes = webkit_website_data_get_types(data);
-          fl_value_set_string_take(record, "dataTypes",
-                                   WebStorageManager::dataTypesToFlValue(dataTypes));
+
+          g_autoptr(FlValue) record = (name != nullptr)
+              ? to_fl_map({
+                  {"displayName", make_fl_value(name)},
+                  {"dataTypes", WebStorageManager::dataTypesToFlValue(dataTypes)},
+                })
+              : to_fl_map({
+                  {"dataTypes", WebStorageManager::dataTypesToFlValue(dataTypes)},
+                });
 
           fl_value_append(result, record);
         }

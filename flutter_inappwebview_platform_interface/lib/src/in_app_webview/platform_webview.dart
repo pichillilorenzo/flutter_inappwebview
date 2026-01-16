@@ -1174,6 +1174,9 @@ In that case, after the `window.addEventListener("flutterInAppWebViewPlatformRea
       IOSPlatform(),
       MacOSPlatform(),
       WebPlatform(),
+      LinuxPlatform(
+        note: 'Intercepted via JavaScript window.print() override.',
+      ),
     ],
     parameterPlatforms: {
       'printJobController': [AndroidPlatform(), IOSPlatform(), MacOSPlatform()],
@@ -2078,6 +2081,11 @@ In that case, after the `window.addEventListener("flutterInAppWebViewPlatformRea
         apiUrl:
             'https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455643-webview',
       ),
+      LinuxPlatform(
+        apiName: 'WebKitWebView::decide-policy',
+        apiUrl:
+            'https://webkitgtk.org/reference/webkit2gtk/stable/signal.WebView.decide-policy.html',
+      ),
     ],
   )
   final FutureOr<NavigationResponseAction?> Function(
@@ -2137,6 +2145,12 @@ In that case, after the `window.addEventListener("flutterInAppWebViewPlatformRea
     platforms: [
       IOSPlatform(available: '15.0'),
       MacOSPlatform(available: '12.0'),
+      LinuxPlatform(
+        apiName: 'WebKitWebView::notify::camera-capture-state',
+        apiUrl:
+            'https://webkitgtk.org/reference/webkit2gtk/stable/property.WebView.camera-capture-state.html',
+        note: 'Requires WPE WebKit 2.34 or later.',
+      ),
     ],
   )
   final FutureOr<void> Function(
@@ -2155,6 +2169,12 @@ In that case, after the `window.addEventListener("flutterInAppWebViewPlatformRea
     platforms: [
       IOSPlatform(available: '15.0'),
       MacOSPlatform(available: '12.0'),
+      LinuxPlatform(
+        apiName: 'WebKitWebView::notify::microphone-capture-state',
+        apiUrl:
+            'https://webkitgtk.org/reference/webkit2gtk/stable/property.WebView.microphone-capture-state.html',
+        note: 'Requires WPE WebKit 2.34 or later.',
+      ),
     ],
   )
   final FutureOr<void> Function(

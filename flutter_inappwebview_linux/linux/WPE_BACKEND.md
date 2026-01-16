@@ -13,6 +13,32 @@ This plugin uses WPE WebKit for offscreen web rendering. WPE WebKit is the offic
 
 The WPE backend exports frames directly as GPU textures via DMA-BUF or SHM buffers.
 
+## Backend Selection
+
+The plugin supports two backend APIs, with automatic selection at compile time:
+
+| Backend | Package | Status | Description |
+|---------|---------|--------|-------------|
+| **WPEPlatform** | `wpe-platform-2.0` + `wpe-platform-headless-2.0` | **DEFAULT** | Modern API for WPE WebKit 2.40+. Recommended for new installations. |
+| **WPEBackend-FDO** | `wpebackend-fdo-1.0` | Legacy Fallback | Used only when WPEPlatform is not available. For older systems. |
+
+### Backend Detection Logic
+
+The build system automatically selects the backend:
+
+1. **If WPEPlatform is found** (`wpe-platform-2.0` and `wpe-platform-headless-2.0`):
+   - WPEPlatform is used as the default backend
+   - `HAVE_WPE_PLATFORM=1` is defined
+   - WPEBackend-FDO is ignored even if available
+
+2. **If WPEPlatform is NOT found** but WPEBackend-FDO is available:
+   - WPEBackend-FDO is used as legacy fallback
+   - `HAVE_WPE_BACKEND_LEGACY=1` is defined
+
+3. **If neither is found**: Build fails with an error message.
+
+> **Note:** WPEPlatform and WPEBackend-FDO are **mutually exclusive** at compile time. You cannot use both simultaneously.
+
 ## Installation Options
 
 You can either:
@@ -124,13 +150,15 @@ WPE WebKit has many optional features that are **enabled by default**. If you do
 | CMake Flag | Default | Dependencies (Debian/Ubuntu) | Description |
 |------------|---------|------------------------------|-------------|
 | `ENABLE_ENCRYPTED_MEDIA` | OFF | Thunder/OCDM | Encrypted Media Extensions (EME/DRM) |
-| `ENABLE_WPE_PLATFORM` | OFF | See platform flags below | New WPE 2.0 platform abstraction |
+| `ENABLE_WPE_PLATFORM` | OFF | See platform flags below | WPE 2.0 platform abstraction (⚠️ see note) |
 | `ENABLE_WPE_PLATFORM_DRM` | OFF | `libinput-dev libudev-dev libdrm-dev libgbm-dev` | DRM/KMS platform (requires `USE_GBM`) |
-| `ENABLE_WPE_PLATFORM_HEADLESS` | OFF | — | Headless platform (no display) |
+| `ENABLE_WPE_PLATFORM_HEADLESS` | **ON** | — | Headless platform (**required for this plugin**) |
 | `ENABLE_WPE_PLATFORM_WAYLAND` | OFF | `libwayland-dev wayland-protocols` | Wayland platform |
 | `ENABLE_WPE_QT_API` | OFF | Qt5/Qt6 development packages | Qt/QML API bindings |
 | `USE_QT6` | OFF | `qt6-base-dev qt6-declarative-dev` | Use Qt6 instead of Qt5 (requires `ENABLE_WPE_PLATFORM`) |
 | `ENABLE_WPE_1_1_API` | OFF | — | Build WPE 1.1 API instead of 2.0 |
+
+> **⚠️ WPEPlatform for this Plugin:** The `ENABLE_WPE_PLATFORM` flags above are for **building WPE WebKit from source**. To use the modern WPEPlatform backend with this Flutter plugin (the default), you must enable `ENABLE_WPE_PLATFORM=ON` and `ENABLE_WPE_PLATFORM_HEADLESS=ON` when building WPE WebKit. If these are disabled, the plugin will fall back to WPEBackend-FDO.
 
 ##### Disabling Optional Features
 
@@ -328,7 +356,9 @@ ninja -C build
 sudo ninja -C build install
 cd ..
 
-# === 2. Build WPEBackend-fdo ===
+# === 2. Build WPEBackend-fdo (OPTIONAL - only for legacy fallback) ===
+# Skip this step if you enable ENABLE_WPE_PLATFORM in step 3.
+# Only needed for older WPE WebKit builds or as a fallback.
 wget https://wpewebkit.org/releases/wpebackend-fdo-1.16.1.tar.xz
 tar xf wpebackend-fdo-1.16.1.tar.xz
 cd wpebackend-fdo-1.16.1
@@ -358,7 +388,12 @@ cmake -B build -G Ninja \
   -DENABLE_MINIBROWSER=OFF \
   -DUSE_AVIF=ON \
   -DUSE_WOFF2=ON \
-  -DUSE_JPEGXL=ON
+  -DUSE_JPEGXL=ON \
+  -DENABLE_WPE_PLATFORM=ON \
+  -DENABLE_WPE_PLATFORM_HEADLESS=ON
+
+# The last two flags enable the modern WPEPlatform backend (recommended).
+# If omitted, the plugin will fall back to legacy WPEBackend-FDO.
 
 # If you're missing optional dependencies, disable them:
 #   -DUSE_JPEGXL=OFF           # if libjxl-dev not installed
@@ -429,12 +464,23 @@ cd your_flutter_app
 flutter build linux --release
 ```
 
-During build, you should see messages like:
+During build, you should see messages indicating which backend is being used:
 
+**With WPEPlatform (default):**
 ```
 -- flutter_inappwebview_linux: Using WPE WebKit backend
 -- flutter_inappwebview_linux: Found wpe-webkit-2.0 (2.50.4)
--- flutter_inappwebview_linux: Found wpebackend-fdo-1.0 (DMA-BUF support enabled)
+-- flutter_inappwebview_linux: Found wpe-platform-2.0 (WPEPlatform API - DEFAULT)
+-- flutter_inappwebview_linux: Found wpe-platform-headless-2.0
+-- flutter_inappwebview_linux: Will bundle /usr/local/lib/libWPEWebKit-2.0.so.1.6.9
+-- flutter_inappwebview_linux: Will bundle /usr/local/lib/libwpe-1.0.so.1.10.0
+```
+
+**With WPEBackend-FDO (legacy fallback):**
+```
+-- flutter_inappwebview_linux: Using WPE WebKit backend
+-- flutter_inappwebview_linux: Found wpe-webkit-2.0 (2.50.4)
+-- flutter_inappwebview_linux: Found wpebackend-fdo-1.0 (Legacy FDO API)
 -- flutter_inappwebview_linux: Will bundle /usr/local/lib/libWPEWebKit-2.0.so.1.6.9
 -- flutter_inappwebview_linux: Will bundle /usr/local/lib/libwpe-1.0.so.1.10.0
 -- flutter_inappwebview_linux: Will bundle /usr/local/lib/.../libWPEBackend-fdo-1.0.so.1.11.0
@@ -456,8 +502,14 @@ The built app includes all WPE libraries bundled in the `lib/` directory and can
 
 The following files are automatically copied to your app's `lib/` directory:
 
+**Always bundled:**
 - `libWPEWebKit-2.0.so.*` - WPE WebKit library (~160MB)
 - `libwpe-1.0.so.*` - libwpe library
+
+**With WPEPlatform (default):**
+- WPEPlatform is built into `libWPEWebKit-2.0.so`, so no additional libraries are needed.
+
+**With WPEBackend-FDO (legacy):**
 - `libWPEBackend-fdo-1.0.so.*` - FDO backend library
 - `libWPEBackend-default.so` - Symlink to FDO backend
 
@@ -486,7 +538,18 @@ InAppWebView (C++)
     ├──► WebKitWebView (WPE WebKit)
     │         │
     │         ▼
-    │    WPE Backend (FDO)
+    │    ┌─────────────────────────────────────┐
+    │    │  WPE Backend (compile-time choice)  │
+    │    ├─────────────────────────────────────┤
+    │    │  WPEPlatform (DEFAULT)              │
+    │    │    - wpe-platform-2.0               │
+    │    │    - wpe-platform-headless-2.0      │
+    │    │    - Modern API (WPE WebKit 2.40+)  │
+    │    ├─────────────────────────────────────┤
+    │    │  WPEBackend-FDO (LEGACY FALLBACK)   │
+    │    │    - wpebackend-fdo-1.0             │
+    │    │    - For older systems              │
+    │    └─────────────────────────────────────┘
     │         │
     │         ▼
     └──► Flutter Texture ◄──── SHM Buffer / DMA-BUF
@@ -525,9 +588,16 @@ Cursor types are mapped to Flutter's cursor system: pointer, text, grab, resize,
 Ensure pkg-config can find the libraries:
 
 ```bash
+# Core WPE WebKit library (required)
 pkg-config --cflags --libs wpe-webkit-2.0
-pkg-config --cflags --libs wpebackend-fdo-1.0
 pkg-config --cflags --libs wpe-1.0
+
+# WPEPlatform (default backend) - check if available
+pkg-config --cflags --libs wpe-platform-2.0
+pkg-config --cflags --libs wpe-platform-headless-2.0
+
+# WPEBackend-FDO (legacy fallback) - check if available
+pkg-config --cflags --libs wpebackend-fdo-1.0
 ```
 
 If not found, add the installation prefix:
@@ -537,6 +607,8 @@ export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig:/usr/local/lib/$(uname -m)-linux
 ```
 
 ### "Failed to load WPEBackend-default.so"
+
+This error only applies to the **WPEBackend-FDO (legacy)** backend. If you're using WPEPlatform, you won't see this error.
 
 Create the default backend symlink:
 

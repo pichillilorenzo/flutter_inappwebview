@@ -64,37 +64,82 @@ int getX11Keysym(LogicalKeyboardKey key, String? character) {
     if (codeUnit >= 0x20 && codeUnit < 0x7f) {
       return codeUnit; // ASCII printable -> Unicode keysym
     }
+    // Extended Latin and other Unicode characters (keysym = Unicode codepoint)
+    if (codeUnit >= 0x00a0 && codeUnit <= 0xffff) {
+      return codeUnit;
+    }
   }
 
   // Special keys use X11 keysym constants
   final keyId = key.keyId;
 
-  // Function keys (F1-F12): XK_F1 = 0xffbe
+  // Check explicit mapping first
+  final mapped = _specialKeyToKeysym[keyId];
+  if (mapped != null) {
+    return mapped;
+  }
+
+  // Function keys (F1-F24): XK_F1 = 0xffbe, XK_F13 = 0xffc8
   if (keyId >= LogicalKeyboardKey.f1.keyId &&
-      keyId <= LogicalKeyboardKey.f12.keyId) {
+      keyId <= LogicalKeyboardKey.f24.keyId) {
     return 0xffbe + (keyId - LogicalKeyboardKey.f1.keyId);
   }
 
-  // Special key mapping
-  return _specialKeyToKeysym[keyId] ?? (keyId & 0xFFFF);
+  // Try keyLabel for printable characters that weren't caught above
+  final label = key.keyLabel;
+  if (label.length == 1) {
+    final codeUnit = label.codeUnitAt(0);
+    // ASCII printable or extended Latin
+    if ((codeUnit >= 0x20 && codeUnit < 0x7f) ||
+        (codeUnit >= 0x00a0 && codeUnit <= 0xffff)) {
+      return codeUnit;
+    }
+  }
+
+  // Return 0 for unknown keys - safer than truncating keyId which could
+  // collide with valid keysyms or produce unexpected behavior
+  return 0;
 }
 
 const _specialKeyToKeysym = <int, int>{
-  0x100000008: 0xff08, // Backspace
-  0x100000009: 0xff09, // Tab
-  0x10000000d: 0xff0d, // Enter
-  0x10000001b: 0xff1b, // Escape
-  0x10000007f: 0xffff, // Delete
+  // Control keys
+  0x100000008: 0xff08, // Backspace (XK_BackSpace)
+  0x100000009: 0xff09, // Tab (XK_Tab)
+  0x10000000d: 0xff0d, // Enter (XK_Return)
+  0x10000001b: 0xff1b, // Escape (XK_Escape)
+  0x10000007f: 0xffff, // Delete (XK_Delete)
+
   // Arrow keys - Flutter LogicalKeyboardKey.arrow*.keyId values
   0x100000301: 0xff54, // ArrowDown (XK_Down)
   0x100000302: 0xff51, // ArrowLeft (XK_Left)
   0x100000303: 0xff53, // ArrowRight (XK_Right)
   0x100000304: 0xff52, // ArrowUp (XK_Up)
+
   // Navigation keys - Flutter LogicalKeyboardKey.*.keyId values
   0x100000305: 0xff57, // End (XK_End)
   0x100000306: 0xff50, // Home (XK_Home)
   0x100000307: 0xff56, // PageDown (XK_Page_Down)
   0x100000308: 0xff55, // PageUp (XK_Page_Up)
   0x100000407: 0xff63, // Insert (XK_Insert)
+
+  // Lock keys
+  0x100000104: 0xffe5, // CapsLock (XK_Caps_Lock)
+  0x10000010a: 0xff7f, // NumLock (XK_Num_Lock)
+  0x10000010c: 0xff14, // ScrollLock (XK_Scroll_Lock)
+
+  // Modifier keys (note: 0x200000xxx range)
+  0x200000100: 0xffe3, // ControlLeft (XK_Control_L)
+  0x200000101: 0xffe4, // ControlRight (XK_Control_R)
+  0x200000102: 0xffe1, // ShiftLeft (XK_Shift_L)
+  0x200000103: 0xffe2, // ShiftRight (XK_Shift_R)
+  0x200000104: 0xffe9, // AltLeft (XK_Alt_L)
+  0x200000105: 0xffea, // AltRight (XK_Alt_R)
+  0x200000106: 0xffeb, // MetaLeft (XK_Super_L)
+  0x200000107: 0xffec, // MetaRight (XK_Super_R)
+
+  // Misc
   0x20: 0x0020, // Space
+  0x100000505: 0xff67, // ContextMenu (XK_Menu)
+  0x100000509: 0xff13, // Pause (XK_Pause)
+  0x100000608: 0xff61, // PrintScreen (XK_Print)
 };

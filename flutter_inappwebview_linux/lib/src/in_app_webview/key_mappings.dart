@@ -85,14 +85,16 @@ const _specialKeyToKeysym = <int, int>{
   0x10000000d: 0xff0d, // Enter
   0x10000001b: 0xff1b, // Escape
   0x10000007f: 0xffff, // Delete
-  0x100000301: 0xff50, // Home
-  0x100000302: 0xff57, // End
-  0x100000304: 0xff51, // ArrowLeft
-  0x100000305: 0xff52, // ArrowUp
-  0x100000306: 0xff53, // ArrowRight
-  0x100000307: 0xff54, // ArrowDown
-  0x100000308: 0xff55, // PageUp
-  0x100000309: 0xff56, // PageDown
-  0x100000407: 0xff63, // Insert
+  // Arrow keys - Flutter LogicalKeyboardKey.arrow*.keyId values
+  0x100000301: 0xff54, // ArrowDown (XK_Down)
+  0x100000302: 0xff51, // ArrowLeft (XK_Left)
+  0x100000303: 0xff53, // ArrowRight (XK_Right)
+  0x100000304: 0xff52, // ArrowUp (XK_Up)
+  // Navigation keys - Flutter LogicalKeyboardKey.*.keyId values
+  0x100000305: 0xff57, // End (XK_End)
+  0x100000306: 0xff50, // Home (XK_Home)
+  0x100000307: 0xff56, // PageDown (XK_Page_Down)
+  0x100000308: 0xff55, // PageUp (XK_Page_Up)
+  0x100000407: 0xff63, // Insert (XK_Insert)
   0x20: 0x0020, // Space
 };

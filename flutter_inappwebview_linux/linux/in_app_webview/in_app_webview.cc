@@ -2956,7 +2956,8 @@ void InAppWebView::SetCursorPos(double x, double y) {
 #ifdef HAVE_WPE_PLATFORM
   // Send pointer motion event using WPEPlatform API
   if (wpe_view_ != nullptr) {
-    WPEModifiers modifiers = static_cast<WPEModifiers>(current_modifiers_);
+    // Include button_state_ in modifiers so dragging (text selection) works correctly
+    WPEModifiers modifiers = static_cast<WPEModifiers>(current_modifiers_ | button_state_);
     WPEEvent* event = wpe_event_pointer_move_new(
         WPE_EVENT_POINTER_MOVE,
         wpe_view_,
@@ -3019,21 +3020,30 @@ void InAppWebView::SetPointerButton(int kind, int button, int clickCount) {
       break;  // Default to primary
   }
 
-  WPEModifiers modifiers = static_cast<WPEModifiers>(current_modifiers_);
+  // WPEPlatform button modifier bits: WPE_MODIFIER_POINTER_BUTTON1 = 1 << 8, etc.
+  // Button 1 -> bit 8, Button 2 -> bit 9, Button 3 -> bit 10
+  const uint32_t button_modifier_bit = 1u << (7 + wpe_button);
+
   guint32 time = static_cast<guint32>(g_get_monotonic_time() / 1000);
   WPEEventType event_type;
 
   switch (static_cast<WpePointerEventKind>(kind)) {
     case WpePointerEventKind::Down:
       event_type = WPE_EVENT_POINTER_DOWN;
+      // Update button state BEFORE creating the event
+      button_state_ |= button_modifier_bit;
       break;
     case WpePointerEventKind::Up:
       event_type = WPE_EVENT_POINTER_UP;
+      // Update button state AFTER the event (but include in modifiers)
       break;
     default:
       // Ignore enter/leave/cancel etc for button events
       return;
   }
+
+  // Include button state in modifiers for proper drag detection
+  WPEModifiers modifiers = static_cast<WPEModifiers>(current_modifiers_ | button_state_);
 
   // First send a motion event to ensure WebKit has the correct cursor position
   WPEEvent* motion_event = wpe_event_pointer_move_new(
@@ -3070,6 +3080,11 @@ void InAppWebView::SetPointerButton(int kind, int button, int clickCount) {
   );
   wpe_view_event(wpe_view_, button_event);
   wpe_event_unref(button_event);
+
+  // Clear button state AFTER sending the UP event
+  if (event_type == WPE_EVENT_POINTER_UP) {
+    button_state_ &= ~button_modifier_bit;
+  }
 
 #elif defined(HAVE_WPE_BACKEND_LEGACY)
   if (wpe_backend_ == nullptr)

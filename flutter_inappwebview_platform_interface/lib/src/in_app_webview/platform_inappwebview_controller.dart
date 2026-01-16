@@ -3361,6 +3361,75 @@ abstract class PlatformInAppWebViewController extends PlatformInterface
     );
   }
 
+  ///{@template flutter_inappwebview_platform_interface.PlatformInAppWebViewController.getScreenScale}
+  ///Gets the device pixel ratio (scale factor) of the screen where the WebView is displayed.
+  ///
+  ///The scale factor represents the ratio between physical pixels and logical pixels.
+  ///For example, on a HiDPI display, this might return 2.0.
+  ///{@endtemplate}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.getScreenScale.supported_platforms}
+  @SupportedPlatforms(
+    platforms: [
+      LinuxPlatform(
+        apiName: 'wpe_screen_get_scale',
+        apiUrl:
+            'https://wpewebkit.org/reference/stable/wpe-platform-1.0/method.Screen.get_scale.html',
+      ),
+    ],
+  )
+  Future<double> getScreenScale() {
+    throw UnimplementedError(
+      '${PlatformInAppWebViewControllerMethod.getScreenScale.name} is not implemented on the current platform',
+    );
+  }
+
+  ///{@template flutter_inappwebview_platform_interface.PlatformInAppWebViewController.setScreenScale}
+  ///Sets the device pixel ratio (scale factor) for the screen where the WebView is displayed.
+  ///
+  ///The scale factor represents the ratio between physical pixels and logical pixels.
+  ///Setting this affects how content is rendered on HiDPI displays.
+  ///{@endtemplate}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.setScreenScale.supported_platforms}
+  @SupportedPlatforms(
+    platforms: [
+      LinuxPlatform(
+        apiName: 'wpe_screen_set_scale',
+        apiUrl:
+            'https://wpewebkit.org/reference/stable/wpe-platform-1.0/method.Screen.set_scale.html',
+      ),
+    ],
+  )
+  Future<void> setScreenScale({required double scale}) {
+    throw UnimplementedError(
+      '${PlatformInAppWebViewControllerMethod.setScreenScale.name} is not implemented on the current platform',
+    );
+  }
+
+  ///{@template flutter_inappwebview_platform_interface.PlatformInAppWebViewController.isVisible}
+  ///Returns whether the WebView is currently visible.
+  ///
+  ///On Linux, this checks the WPE view visibility state.
+  ///For the legacy FDO backend, this returns the last known visibility state.
+  ///{@endtemplate}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.isVisible.supported_platforms}
+  @SupportedPlatforms(
+    platforms: [
+      LinuxPlatform(
+        apiName: 'wpe_view_get_visible',
+        apiUrl:
+            'https://wpewebkit.org/reference/stable/wpe-platform-1.0/method.View.get_visible.html',
+      ),
+    ],
+  )
+  Future<bool> isVisible() {
+    throw UnimplementedError(
+      '${PlatformInAppWebViewControllerMethod.isVisible.name} is not implemented on the current platform',
+    );
+  }
+
   ///{@template flutter_inappwebview_platform_interface.PlatformInAppWebViewController.requestPointerLock}
   ///Requests pointer lock for the WebView.
   ///Pointer lock is useful for games and immersive applications.

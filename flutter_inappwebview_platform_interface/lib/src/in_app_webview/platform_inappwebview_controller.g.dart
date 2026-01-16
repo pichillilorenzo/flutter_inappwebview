@@ -928,6 +928,17 @@ enum PlatformInAppWebViewControllerMethod {
   @Deprecated('Use getZoomScale instead')
   getScale,
 
+  ///Can be used to check if the [PlatformInAppWebViewController.getScreenScale] method is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.PlatformInAppWebViewController.getScreenScale.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Linux WPE WebKit ([Official API - wpe_screen_get_scale](https://wpewebkit.org/reference/stable/wpe-platform-1.0/method.Screen.get_scale.html))
+  ///
+  ///Use the [PlatformInAppWebViewController.isMethodSupported] method to check if this method is supported at runtime.
+  ///{@endtemplate}
+  getScreenScale,
+
   ///Can be used to check if the [PlatformInAppWebViewController.getScrollX] method is supported at runtime.
   ///
   ///{@template flutter_inappwebview_platform_interface.PlatformInAppWebViewController.getScrollX.supported_platforms}
@@ -1464,6 +1475,17 @@ enum PlatformInAppWebViewControllerMethod {
   ///Use the [PlatformInAppWebViewController.isMethodSupported] method to check if this method is supported at runtime.
   ///{@endtemplate}
   isSecureContext,
+
+  ///Can be used to check if the [PlatformInAppWebViewController.isVisible] method is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.PlatformInAppWebViewController.isVisible.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Linux WPE WebKit ([Official API - wpe_view_get_visible](https://wpewebkit.org/reference/stable/wpe-platform-1.0/method.View.get_visible.html))
+  ///
+  ///Use the [PlatformInAppWebViewController.isMethodSupported] method to check if this method is supported at runtime.
+  ///{@endtemplate}
+  isVisible,
 
   ///Can be used to check if the [PlatformInAppWebViewController.loadData] method is supported at runtime.
   ///
@@ -2243,6 +2265,20 @@ enum PlatformInAppWebViewControllerMethod {
   @Deprecated('Use setSafeBrowsingAllowlist instead')
   setSafeBrowsingWhitelist,
 
+  ///Can be used to check if the [PlatformInAppWebViewController.setScreenScale] method is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.PlatformInAppWebViewController.setScreenScale.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Linux WPE WebKit ([Official API - wpe_screen_set_scale](https://wpewebkit.org/reference/stable/wpe-platform-1.0/method.Screen.set_scale.html))
+  ///
+  ///**Parameters - Officially Supported Platforms/Implementations**:
+  ///- [scale]: all platforms
+  ///
+  ///Use the [PlatformInAppWebViewController.isMethodSupported] method to check if this method is supported at runtime.
+  ///{@endtemplate}
+  setScreenScale,
+
   ///Can be used to check if the [PlatformInAppWebViewController.setSettings] method is supported at runtime.
   ///
   ///{@template flutter_inappwebview_platform_interface.PlatformInAppWebViewController.setSettings.supported_platforms}
@@ -2832,6 +2868,9 @@ extension _PlatformInAppWebViewControllerMethodSupported
               TargetPlatform.iOS,
               TargetPlatform.macOS,
             ].contains(platform ?? defaultTargetPlatform);
+      case PlatformInAppWebViewControllerMethod.getScreenScale:
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
+            [TargetPlatform.linux].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.getScrollX:
         return kIsWeb && platform == null
             ? true
@@ -3123,6 +3162,9 @@ extension _PlatformInAppWebViewControllerMethodSupported
                     TargetPlatform.linux,
                     TargetPlatform.macOS,
                   ].contains(platform ?? defaultTargetPlatform);
+      case PlatformInAppWebViewControllerMethod.isVisible:
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
+            [TargetPlatform.linux].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.loadData:
         return kIsWeb && platform == null
             ? true
@@ -3461,6 +3503,9 @@ extension _PlatformInAppWebViewControllerMethodSupported
             [
               TargetPlatform.android,
             ].contains(platform ?? defaultTargetPlatform);
+      case PlatformInAppWebViewControllerMethod.setScreenScale:
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
+            [TargetPlatform.linux].contains(platform ?? defaultTargetPlatform);
       case PlatformInAppWebViewControllerMethod.setSettings:
         return kIsWeb && platform == null
             ? true

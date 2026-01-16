@@ -1591,6 +1591,12 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController
   }
 
   @override
+  bool hasUserScript({required UserScript userScript}) {
+    return _userScripts[userScript.injectionTime]?.contains(userScript) ??
+        false;
+  }
+
+  @override
   Future<void> addWebMessageListener(
     PlatformWebMessageListener webMessageListener,
   ) async {
@@ -1697,6 +1703,21 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController
   @override
   Future<int> getTargetRefreshRate() async {
     return await channel?.invokeMethod<int>('getTargetRefreshRate', {}) ?? 0;
+  }
+
+  @override
+  Future<double> getScreenScale() async {
+    return await channel?.invokeMethod<double>('getScreenScale', {}) ?? 1.0;
+  }
+
+  @override
+  Future<void> setScreenScale({required double scale}) async {
+    await channel?.invokeMethod('setScreenScale', scale);
+  }
+
+  @override
+  Future<bool> isVisible() async {
+    return await channel?.invokeMethod<bool>('isVisible', {}) ?? false;
   }
 
   @override

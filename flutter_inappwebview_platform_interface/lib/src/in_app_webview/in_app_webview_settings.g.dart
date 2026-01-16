@@ -390,6 +390,31 @@ class InAppWebViewSettings {
   ///- Linux WPE WebKit ([Official API - WebKitSettings.cursive-font-family](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/property.Settings.cursive-font-family.html))
   String? cursiveFontFamily;
 
+  ///Sets the cursor blink time in milliseconds.
+  ///This controls how frequently the text cursor blinks in input fields.
+  ///
+  ///This is a WPE Platform setting that affects the entire display.
+  ///
+  ///The default value is `null` (uses system default, typically 1200ms).
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Linux WPE WebKit ([Official API - WPESettings.cursor-blink-time](https://wpewebkit.org/reference/stable/wpe-platform-2.0/class.Settings.html)):
+  ///    - This is a WPE Platform display-level setting. Value is in milliseconds.
+  int? cursorBlinkTime;
+
+  ///Sets whether dark mode is enabled for web content.
+  ///When enabled, websites that support the `prefers-color-scheme: dark` CSS media query
+  ///will render in dark mode.
+  ///
+  ///This is a WPE Platform setting that affects the entire display.
+  ///
+  ///The default value is `null` (follows system default).
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Linux WPE WebKit ([Official API - WPESettings.dark-mode](https://wpewebkit.org/reference/stable/wpe-platform-2.0/class.Settings.html)):
+  ///    - This is a WPE Platform display-level setting that affects all WebViews.
+  bool? darkMode;
+
   ///Specifying a dataDetectoryTypes value adds interactivity to web content that matches the value.
   ///For example, Safari adds a link to “apple.com” in the text “Visit apple.com” if the dataDetectorTypes property is set to [DataDetectorTypes.LINK].
   ///The default value is [DataDetectorTypes.NONE].
@@ -441,6 +466,19 @@ class InAppWebViewSettings {
   ///**Officially Supported Platforms/Implementations**:
   ///- Android WebView
   Uint8List? defaultVideoPoster;
+
+  ///Sets whether animations are disabled for accessibility.
+  ///When enabled, CSS animations and transitions may be reduced or disabled
+  ///for users with motion sensitivity.
+  ///
+  ///This is a WPE Platform setting that affects the entire display.
+  ///
+  ///The default value is `null` (follows system default).
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Linux WPE WebKit ([Official API - WPESettings.disable-animations](https://wpewebkit.org/reference/stable/wpe-platform-2.0/class.Settings.html)):
+  ///    - This is a WPE Platform display-level setting for accessibility.
+  bool? disableAnimations;
 
   ///Set to `true` to disable context menu. The default value is `false`.
   ///
@@ -514,6 +552,42 @@ class InAppWebViewSettings {
   ///- Android WebView ([Official API - WebSettings.setDomStorageEnabled](https://developer.android.com/reference/android/webkit/WebSettings?hl=en#setDomStorageEnabled(boolean)))
   ///- Linux WPE WebKit ([Official API - WebKitSettings.enable-html5-local-storage](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/property.Settings.enable-html5-local-storage.html))
   bool? domStorageEnabled;
+
+  ///Sets the double-click distance threshold in pixels.
+  ///Two clicks within this distance are considered a double-click.
+  ///
+  ///This is a WPE Platform setting that affects the entire display.
+  ///
+  ///The default value is `null` (uses system default, typically 5 pixels).
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Linux WPE WebKit ([Official API - WPESettings.double-click-distance](https://wpewebkit.org/reference/stable/wpe-platform-2.0/class.Settings.html)):
+  ///    - This is a WPE Platform display-level setting. Value is in pixels.
+  int? doubleClickDistance;
+
+  ///Sets the double-click time threshold in milliseconds.
+  ///Two clicks within this time are considered a double-click.
+  ///
+  ///This is a WPE Platform setting that affects the entire display.
+  ///
+  ///The default value is `null` (uses system default, typically 400ms).
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Linux WPE WebKit ([Official API - WPESettings.double-click-time](https://wpewebkit.org/reference/stable/wpe-platform-2.0/class.Settings.html)):
+  ///    - This is a WPE Platform display-level setting. Value is in milliseconds.
+  int? doubleClickTime;
+
+  ///Sets the drag threshold in pixels.
+  ///The pointer must move at least this many pixels to start a drag operation.
+  ///
+  ///This is a WPE Platform setting that affects the entire display.
+  ///
+  ///The default value is `null` (uses system default, typically 8 pixels).
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Linux WPE WebKit ([Official API - WPESettings.drag-threshold](https://wpewebkit.org/reference/stable/wpe-platform-2.0/class.Settings.html)):
+  ///    - This is a WPE Platform display-level setting. Value is in pixels.
+  int? dragThreshold;
 
   ///Sets whether compositing indicators are drawn.
   ///When enabled, visual indicators are shown for compositing layers.
@@ -625,6 +699,55 @@ class InAppWebViewSettings {
   ///- Android WebView ([Official API - WebSettings.setFixedFontFamily](https://developer.android.com/reference/android/webkit/WebSettings#setFixedFontFamily(java.lang.String)))
   ///- Linux WPE WebKit ([Official API - WebKitSettings.monospace-font-family](https://wpewebkit.org/reference/stable/wpe-webkit-2.0/property.Settings.monospace-font-family.html))
   String? fixedFontFamily;
+
+  ///Sets whether font antialiasing is enabled.
+  ///When enabled, fonts are rendered with antialiasing for smoother edges.
+  ///
+  ///This is a WPE Platform setting that affects the entire display.
+  ///
+  ///The default value is `null` (follows system default).
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Linux WPE WebKit ([Official API - WPESettings.font-antialias](https://wpewebkit.org/reference/stable/wpe-platform-2.0/class.Settings.html)):
+  ///    - This is a WPE Platform display-level setting for font rendering.
+  bool? fontAntialias;
+
+  ///Sets the font DPI (dots per inch) for text rendering.
+  ///This affects the size at which fonts are rendered.
+  ///
+  ///This is a WPE Platform setting that affects the entire display.
+  ///
+  ///The default value is `null` (uses system default, typically 96.0).
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Linux WPE WebKit ([Official API - WPESettings.font-dpi](https://wpewebkit.org/reference/stable/wpe-platform-2.0/class.Settings.html)):
+  ///    - This is a WPE Platform display-level setting. Default is typically 96.0 DPI.
+  double? fontDPI;
+
+  ///Sets the font hinting style.
+  ///Hinting adjusts font outlines to improve rendering at small sizes.
+  ///
+  ///This is a WPE Platform setting that affects the entire display.
+  ///
+  ///The default value is `null` (follows system default).
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Linux WPE WebKit ([Official API - WPESettings.font-hinting-style](https://wpewebkit.org/reference/stable/wpe-platform-2.0/class.Settings.html)):
+  ///    - This is a WPE Platform display-level setting for font rendering.
+  FontHintingStyle? fontHintingStyle;
+
+  ///Sets the font subpixel layout for LCD rendering.
+  ///This determines how subpixel rendering is performed based on the
+  ///physical arrangement of the display's RGB subpixels.
+  ///
+  ///This is a WPE Platform setting that affects the entire display.
+  ///
+  ///The default value is `null` (follows system default).
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Linux WPE WebKit ([Official API - WPESettings.font-subpixel-layout](https://wpewebkit.org/reference/stable/wpe-platform-2.0/class.Settings.html)):
+  ///    - This is a WPE Platform display-level setting for font rendering.
+  FontSubpixelLayout? fontSubpixelLayout;
 
   ///Use [algorithmicDarkeningAllowed] instead.
   ///
@@ -1024,6 +1147,30 @@ class InAppWebViewSettings {
   ///- Windows WebView2
   ///- Web \<iframe\> but requires same origin
   Set<String>? javaScriptHandlersOriginAllowList;
+
+  ///Sets the key repeat delay in milliseconds.
+  ///This is the time a key must be held before it starts repeating.
+  ///
+  ///This is a WPE Platform setting that affects the entire display.
+  ///
+  ///The default value is `null` (uses system default, typically 400ms).
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Linux WPE WebKit ([Official API - WPESettings.key-repeat-delay](https://wpewebkit.org/reference/stable/wpe-platform-2.0/class.Settings.html)):
+  ///    - This is a WPE Platform display-level setting. Value is in milliseconds.
+  int? keyRepeatDelay;
+
+  ///Sets the key repeat interval in milliseconds.
+  ///This is the time between repeated key events when a key is held down.
+  ///
+  ///This is a WPE Platform setting that affects the entire display.
+  ///
+  ///The default value is `null` (uses system default, typically 80ms).
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Linux WPE WebKit ([Official API - WPESettings.key-repeat-interval](https://wpewebkit.org/reference/stable/wpe-platform-2.0/class.Settings.html)):
+  ///    - This is a WPE Platform display-level setting. Value is in milliseconds.
+  int? keyRepeatInterval;
 
   ///Sets the underlying layout algorithm. This will cause a re-layout of the WebView.
   ///
@@ -1920,6 +2067,18 @@ class InAppWebViewSettings {
     this.pictographFontFamily,
     this.corsAllowlist,
     this.itpEnabled = false,
+    this.darkMode,
+    this.disableAnimations,
+    this.fontAntialias,
+    this.fontHintingStyle,
+    this.fontSubpixelLayout,
+    this.fontDPI,
+    this.cursorBlinkTime,
+    this.doubleClickDistance,
+    this.doubleClickTime,
+    this.dragThreshold,
+    this.keyRepeatDelay,
+    this.keyRepeatInterval,
   }) {
     if (this.minimumFontSize == null)
       this.minimumFontSize = Util.isAndroid ? 8 : 0;
@@ -1963,9 +2122,12 @@ class InAppWebViewSettings {
       corsAllowlist: map['corsAllowlist'] != null
           ? List<String>.from(map['corsAllowlist']!.cast<String>())
           : null,
+      cursorBlinkTime: map['cursorBlinkTime'],
+      darkMode: map['darkMode'],
       defaultVideoPoster: map['defaultVideoPoster'] != null
           ? Uint8List.fromList(map['defaultVideoPoster'].cast<int>())
           : null,
+      disableAnimations: map['disableAnimations'],
       disabledActionModeMenuItems: switch (enumMethod ??
           EnumMethod.nativeValue) {
         EnumMethod.nativeValue => ActionModeMenuItem.fromNativeValue(
@@ -1977,6 +2139,27 @@ class InAppWebViewSettings {
         EnumMethod.name => ActionModeMenuItem.byName(
           map['disabledActionModeMenuItems'],
         ),
+      },
+      doubleClickDistance: map['doubleClickDistance'],
+      doubleClickTime: map['doubleClickTime'],
+      dragThreshold: map['dragThreshold'],
+      fontAntialias: map['fontAntialias'],
+      fontDPI: map['fontDPI'],
+      fontHintingStyle: switch (enumMethod ?? EnumMethod.nativeValue) {
+        EnumMethod.nativeValue => FontHintingStyle.fromNativeValue(
+          map['fontHintingStyle'],
+        ),
+        EnumMethod.value => FontHintingStyle.fromValue(map['fontHintingStyle']),
+        EnumMethod.name => FontHintingStyle.byName(map['fontHintingStyle']),
+      },
+      fontSubpixelLayout: switch (enumMethod ?? EnumMethod.nativeValue) {
+        EnumMethod.nativeValue => FontSubpixelLayout.fromNativeValue(
+          map['fontSubpixelLayout'],
+        ),
+        EnumMethod.value => FontSubpixelLayout.fromValue(
+          map['fontSubpixelLayout'],
+        ),
+        EnumMethod.name => FontSubpixelLayout.byName(map['fontSubpixelLayout']),
       },
       forceDark: switch (enumMethod ?? EnumMethod.nativeValue) {
         EnumMethod.nativeValue => ForceDark.fromNativeValue(map['forceDark']),
@@ -2045,6 +2228,8 @@ class InAppWebViewSettings {
               map['javaScriptHandlersOriginAllowList']!.cast<String>(),
             )
           : null,
+      keyRepeatDelay: map['keyRepeatDelay'],
+      keyRepeatInterval: map['keyRepeatInterval'],
       layoutAlgorithm: switch (enumMethod ?? EnumMethod.nativeValue) {
         EnumMethod.nativeValue => LayoutAlgorithm.fromNativeValue(
           map['layoutAlgorithm'],
@@ -2414,6 +2599,8 @@ class InAppWebViewSettings {
       },
       "corsAllowlist": corsAllowlist,
       "cursiveFontFamily": cursiveFontFamily,
+      "cursorBlinkTime": cursorBlinkTime,
+      "darkMode": darkMode,
       "dataDetectorTypes": dataDetectorTypes
           ?.map(
             (e) => switch (enumMethod ?? EnumMethod.nativeValue) {
@@ -2433,6 +2620,7 @@ class InAppWebViewSettings {
       "defaultFontSize": defaultFontSize,
       "defaultTextEncodingName": defaultTextEncodingName,
       "defaultVideoPoster": defaultVideoPoster,
+      "disableAnimations": disableAnimations,
       "disableContextMenu": disableContextMenu,
       "disableDefaultErrorPage": disableDefaultErrorPage,
       "disableHorizontalScroll": disableHorizontalScroll,
@@ -2448,6 +2636,9 @@ class InAppWebViewSettings {
       "disallowOverScroll": disallowOverScroll,
       "displayZoomControls": displayZoomControls,
       "domStorageEnabled": domStorageEnabled,
+      "doubleClickDistance": doubleClickDistance,
+      "doubleClickTime": doubleClickTime,
+      "dragThreshold": dragThreshold,
       "drawCompositingIndicators": drawCompositingIndicators,
       "enableCaretBrowsing": enableCaretBrowsing,
       "enablePageCache": enablePageCache,
@@ -2461,6 +2652,18 @@ class InAppWebViewSettings {
           enterpriseAuthenticationAppLinkPolicyEnabled,
       "fantasyFontFamily": fantasyFontFamily,
       "fixedFontFamily": fixedFontFamily,
+      "fontAntialias": fontAntialias,
+      "fontDPI": fontDPI,
+      "fontHintingStyle": switch (enumMethod ?? EnumMethod.nativeValue) {
+        EnumMethod.nativeValue => fontHintingStyle?.toNativeValue(),
+        EnumMethod.value => fontHintingStyle?.toValue(),
+        EnumMethod.name => fontHintingStyle?.name(),
+      },
+      "fontSubpixelLayout": switch (enumMethod ?? EnumMethod.nativeValue) {
+        EnumMethod.nativeValue => fontSubpixelLayout?.toNativeValue(),
+        EnumMethod.value => fontSubpixelLayout?.toValue(),
+        EnumMethod.name => fontSubpixelLayout?.name(),
+      },
       "forceDark": switch (enumMethod ?? EnumMethod.nativeValue) {
         EnumMethod.nativeValue => forceDark?.toNativeValue(),
         EnumMethod.value => forceDark?.toValue(),
@@ -2527,6 +2730,8 @@ class InAppWebViewSettings {
       "javaScriptHandlersForMainFrameOnly": javaScriptHandlersForMainFrameOnly,
       "javaScriptHandlersOriginAllowList": javaScriptHandlersOriginAllowList
           ?.toList(),
+      "keyRepeatDelay": keyRepeatDelay,
+      "keyRepeatInterval": keyRepeatInterval,
       "layoutAlgorithm": switch (enumMethod ?? EnumMethod.nativeValue) {
         EnumMethod.nativeValue => layoutAlgorithm?.toNativeValue(),
         EnumMethod.value => layoutAlgorithm?.toValue(),
@@ -2647,7 +2852,7 @@ class InAppWebViewSettings {
 
   @override
   String toString() {
-    return 'InAppWebViewSettings{accessibilityIgnoresInvertColors: $accessibilityIgnoresInvertColors, algorithmicDarkeningAllowed: $algorithmicDarkeningAllowed, allowBackgroundAudioPlaying: $allowBackgroundAudioPlaying, allowContentAccess: $allowContentAccess, allowFileAccess: $allowFileAccess, allowFileAccessFromFileURLs: $allowFileAccessFromFileURLs, allowUniversalAccessFromFileURLs: $allowUniversalAccessFromFileURLs, allowingReadAccessTo: $allowingReadAccessTo, allowsAirPlayForMediaPlayback: $allowsAirPlayForMediaPlayback, allowsBackForwardNavigationGestures: $allowsBackForwardNavigationGestures, allowsInlineMediaPlayback: $allowsInlineMediaPlayback, allowsLinkPreview: $allowsLinkPreview, allowsPictureInPictureMediaPlayback: $allowsPictureInPictureMediaPlayback, alpha: $alpha, alwaysBounceHorizontal: $alwaysBounceHorizontal, alwaysBounceVertical: $alwaysBounceVertical, appCachePath: $appCachePath, applePayAPIEnabled: $applePayAPIEnabled, applicationNameForUserAgent: $applicationNameForUserAgent, automaticallyAdjustsScrollIndicatorInsets: $automaticallyAdjustsScrollIndicatorInsets, blockNetworkImage: $blockNetworkImage, blockNetworkLoads: $blockNetworkLoads, browserAcceleratorKeysEnabled: $browserAcceleratorKeysEnabled, builtInZoomControls: $builtInZoomControls, cacheEnabled: $cacheEnabled, cacheMode: $cacheMode, contentBlockers: $contentBlockers, contentInsetAdjustmentBehavior: $contentInsetAdjustmentBehavior, corsAllowlist: $corsAllowlist, cursiveFontFamily: $cursiveFontFamily, dataDetectorTypes: $dataDetectorTypes, databaseEnabled: $databaseEnabled, decelerationRate: $decelerationRate, defaultFixedFontSize: $defaultFixedFontSize, defaultFontSize: $defaultFontSize, defaultTextEncodingName: $defaultTextEncodingName, defaultVideoPoster: $defaultVideoPoster, disableContextMenu: $disableContextMenu, disableDefaultErrorPage: $disableDefaultErrorPage, disableHorizontalScroll: $disableHorizontalScroll, disableInputAccessoryView: $disableInputAccessoryView, disableLongPressContextMenuOnLinks: $disableLongPressContextMenuOnLinks, disableVerticalScroll: $disableVerticalScroll, disabledActionModeMenuItems: $disabledActionModeMenuItems, disallowOverScroll: $disallowOverScroll, displayZoomControls: $displayZoomControls, domStorageEnabled: $domStorageEnabled, drawCompositingIndicators: $drawCompositingIndicators, enableCaretBrowsing: $enableCaretBrowsing, enablePageCache: $enablePageCache, enableResizableTextAreas: $enableResizableTextAreas, enableSmoothScrolling: $enableSmoothScrolling, enableSpatialNavigation: $enableSpatialNavigation, enableTabsToLinks: $enableTabsToLinks, enableViewportScale: $enableViewportScale, enableWriteConsoleMessagesToStdout: $enableWriteConsoleMessagesToStdout, enterpriseAuthenticationAppLinkPolicyEnabled: $enterpriseAuthenticationAppLinkPolicyEnabled, fantasyFontFamily: $fantasyFontFamily, fixedFontFamily: $fixedFontFamily, generalAutofillEnabled: $generalAutofillEnabled, geolocationEnabled: $geolocationEnabled, handleAcceleratorKeyPressed: $handleAcceleratorKeyPressed, hardwareAcceleration: $hardwareAcceleration, hiddenPdfToolbarItems: $hiddenPdfToolbarItems, horizontalScrollBarEnabled: $horizontalScrollBarEnabled, horizontalScrollbarThumbColor: $horizontalScrollbarThumbColor, horizontalScrollbarTrackColor: $horizontalScrollbarTrackColor, iframeAllow: $iframeAllow, iframeAllowFullscreen: $iframeAllowFullscreen, iframeAriaHidden: $iframeAriaHidden, iframeCsp: $iframeCsp, iframeName: $iframeName, iframeReferrerPolicy: $iframeReferrerPolicy, iframeRole: $iframeRole, iframeSandbox: $iframeSandbox, ignoresViewportScaleLimits: $ignoresViewportScaleLimits, incognito: $incognito, initialScale: $initialScale, interceptOnlyAsyncAjaxRequests: $interceptOnlyAsyncAjaxRequests, isDirectionalLockEnabled: $isDirectionalLockEnabled, isElementFullscreenEnabled: $isElementFullscreenEnabled, isFindInteractionEnabled: $isFindInteractionEnabled, isFraudulentWebsiteWarningEnabled: $isFraudulentWebsiteWarningEnabled, isInspectable: $isInspectable, isPagingEnabled: $isPagingEnabled, isSiteSpecificQuirksModeEnabled: $isSiteSpecificQuirksModeEnabled, isTextInteractionEnabled: $isTextInteractionEnabled, isUserInteractionEnabled: $isUserInteractionEnabled, itpEnabled: $itpEnabled, javaScriptBridgeEnabled: $javaScriptBridgeEnabled, javaScriptBridgeForMainFrameOnly: $javaScriptBridgeForMainFrameOnly, javaScriptBridgeOriginAllowList: $javaScriptBridgeOriginAllowList, javaScriptCanOpenWindowsAutomatically: $javaScriptCanOpenWindowsAutomatically, javaScriptEnabled: $javaScriptEnabled, javaScriptHandlersForMainFrameOnly: $javaScriptHandlersForMainFrameOnly, javaScriptHandlersOriginAllowList: $javaScriptHandlersOriginAllowList, layoutAlgorithm: $layoutAlgorithm, limitsNavigationsToAppBoundDomains: $limitsNavigationsToAppBoundDomains, loadWithOverviewMode: $loadWithOverviewMode, loadsImagesAutomatically: $loadsImagesAutomatically, maximumViewportInset: $maximumViewportInset, maximumZoomScale: $maximumZoomScale, mediaPlaybackRequiresUserGesture: $mediaPlaybackRequiresUserGesture, mediaType: $mediaType, minimumFontSize: $minimumFontSize, minimumLogicalFontSize: $minimumLogicalFontSize, minimumViewportInset: $minimumViewportInset, minimumZoomScale: $minimumZoomScale, mixedContentMode: $mixedContentMode, needInitialFocus: $needInitialFocus, networkAvailable: $networkAvailable, nonClientRegionSupportEnabled: $nonClientRegionSupportEnabled, offscreenPreRaster: $offscreenPreRaster, overScrollMode: $overScrollMode, pageZoom: $pageZoom, passwordAutosaveEnabled: $passwordAutosaveEnabled, pictographFontFamily: $pictographFontFamily, pinchZoomEnabled: $pinchZoomEnabled, pluginScriptsForMainFrameOnly: $pluginScriptsForMainFrameOnly, pluginScriptsOriginAllowList: $pluginScriptsOriginAllowList, preferredContentMode: $preferredContentMode, regexToAllowSyncUrlLoading: $regexToAllowSyncUrlLoading, regexToCancelSubFramesLoading: $regexToCancelSubFramesLoading, rendererPriorityPolicy: $rendererPriorityPolicy, reputationCheckingRequired: $reputationCheckingRequired, requestedWithHeaderOriginAllowList: $requestedWithHeaderOriginAllowList, resourceCustomSchemes: $resourceCustomSchemes, safeBrowsingEnabled: $safeBrowsingEnabled, sansSerifFontFamily: $sansSerifFontFamily, scrollBarDefaultDelayBeforeFade: $scrollBarDefaultDelayBeforeFade, scrollBarFadeDuration: $scrollBarFadeDuration, scrollBarStyle: $scrollBarStyle, scrollMultiplier: $scrollMultiplier, scrollbarFadingEnabled: $scrollbarFadingEnabled, scrollsToTop: $scrollsToTop, selectionGranularity: $selectionGranularity, serifFontFamily: $serifFontFamily, sharedCookiesEnabled: $sharedCookiesEnabled, shouldPrintBackgrounds: $shouldPrintBackgrounds, standardFontFamily: $standardFontFamily, statusBarEnabled: $statusBarEnabled, supportMultipleWindows: $supportMultipleWindows, supportZoom: $supportZoom, suppressesIncrementalRendering: $suppressesIncrementalRendering, textZoom: $textZoom, thirdPartyCookiesEnabled: $thirdPartyCookiesEnabled, transparentBackground: $transparentBackground, underPageBackgroundColor: $underPageBackgroundColor, upgradeKnownHostsToHTTPS: $upgradeKnownHostsToHTTPS, useHybridComposition: $useHybridComposition, useOnAjaxProgress: $useOnAjaxProgress, useOnAjaxReadyStateChange: $useOnAjaxReadyStateChange, useOnDownloadStart: $useOnDownloadStart, useOnLoadResource: $useOnLoadResource, useOnNavigationResponse: $useOnNavigationResponse, useOnRenderProcessGone: $useOnRenderProcessGone, useOnShowFileChooser: $useOnShowFileChooser, useShouldInterceptAjaxRequest: $useShouldInterceptAjaxRequest, useShouldInterceptFetchRequest: $useShouldInterceptFetchRequest, useShouldInterceptRequest: $useShouldInterceptRequest, useShouldOverrideUrlLoading: $useShouldOverrideUrlLoading, useWideViewPort: $useWideViewPort, userAgent: $userAgent, verticalScrollBarEnabled: $verticalScrollBarEnabled, verticalScrollbarPosition: $verticalScrollbarPosition, verticalScrollbarThumbColor: $verticalScrollbarThumbColor, verticalScrollbarTrackColor: $verticalScrollbarTrackColor, webViewAssetLoader: $webViewAssetLoader}';
+    return 'InAppWebViewSettings{accessibilityIgnoresInvertColors: $accessibilityIgnoresInvertColors, algorithmicDarkeningAllowed: $algorithmicDarkeningAllowed, allowBackgroundAudioPlaying: $allowBackgroundAudioPlaying, allowContentAccess: $allowContentAccess, allowFileAccess: $allowFileAccess, allowFileAccessFromFileURLs: $allowFileAccessFromFileURLs, allowUniversalAccessFromFileURLs: $allowUniversalAccessFromFileURLs, allowingReadAccessTo: $allowingReadAccessTo, allowsAirPlayForMediaPlayback: $allowsAirPlayForMediaPlayback, allowsBackForwardNavigationGestures: $allowsBackForwardNavigationGestures, allowsInlineMediaPlayback: $allowsInlineMediaPlayback, allowsLinkPreview: $allowsLinkPreview, allowsPictureInPictureMediaPlayback: $allowsPictureInPictureMediaPlayback, alpha: $alpha, alwaysBounceHorizontal: $alwaysBounceHorizontal, alwaysBounceVertical: $alwaysBounceVertical, appCachePath: $appCachePath, applePayAPIEnabled: $applePayAPIEnabled, applicationNameForUserAgent: $applicationNameForUserAgent, automaticallyAdjustsScrollIndicatorInsets: $automaticallyAdjustsScrollIndicatorInsets, blockNetworkImage: $blockNetworkImage, blockNetworkLoads: $blockNetworkLoads, browserAcceleratorKeysEnabled: $browserAcceleratorKeysEnabled, builtInZoomControls: $builtInZoomControls, cacheEnabled: $cacheEnabled, cacheMode: $cacheMode, contentBlockers: $contentBlockers, contentInsetAdjustmentBehavior: $contentInsetAdjustmentBehavior, corsAllowlist: $corsAllowlist, cursiveFontFamily: $cursiveFontFamily, cursorBlinkTime: $cursorBlinkTime, darkMode: $darkMode, dataDetectorTypes: $dataDetectorTypes, databaseEnabled: $databaseEnabled, decelerationRate: $decelerationRate, defaultFixedFontSize: $defaultFixedFontSize, defaultFontSize: $defaultFontSize, defaultTextEncodingName: $defaultTextEncodingName, defaultVideoPoster: $defaultVideoPoster, disableAnimations: $disableAnimations, disableContextMenu: $disableContextMenu, disableDefaultErrorPage: $disableDefaultErrorPage, disableHorizontalScroll: $disableHorizontalScroll, disableInputAccessoryView: $disableInputAccessoryView, disableLongPressContextMenuOnLinks: $disableLongPressContextMenuOnLinks, disableVerticalScroll: $disableVerticalScroll, disabledActionModeMenuItems: $disabledActionModeMenuItems, disallowOverScroll: $disallowOverScroll, displayZoomControls: $displayZoomControls, domStorageEnabled: $domStorageEnabled, doubleClickDistance: $doubleClickDistance, doubleClickTime: $doubleClickTime, dragThreshold: $dragThreshold, drawCompositingIndicators: $drawCompositingIndicators, enableCaretBrowsing: $enableCaretBrowsing, enablePageCache: $enablePageCache, enableResizableTextAreas: $enableResizableTextAreas, enableSmoothScrolling: $enableSmoothScrolling, enableSpatialNavigation: $enableSpatialNavigation, enableTabsToLinks: $enableTabsToLinks, enableViewportScale: $enableViewportScale, enableWriteConsoleMessagesToStdout: $enableWriteConsoleMessagesToStdout, enterpriseAuthenticationAppLinkPolicyEnabled: $enterpriseAuthenticationAppLinkPolicyEnabled, fantasyFontFamily: $fantasyFontFamily, fixedFontFamily: $fixedFontFamily, fontAntialias: $fontAntialias, fontDPI: $fontDPI, fontHintingStyle: $fontHintingStyle, fontSubpixelLayout: $fontSubpixelLayout, generalAutofillEnabled: $generalAutofillEnabled, geolocationEnabled: $geolocationEnabled, handleAcceleratorKeyPressed: $handleAcceleratorKeyPressed, hardwareAcceleration: $hardwareAcceleration, hiddenPdfToolbarItems: $hiddenPdfToolbarItems, horizontalScrollBarEnabled: $horizontalScrollBarEnabled, horizontalScrollbarThumbColor: $horizontalScrollbarThumbColor, horizontalScrollbarTrackColor: $horizontalScrollbarTrackColor, iframeAllow: $iframeAllow, iframeAllowFullscreen: $iframeAllowFullscreen, iframeAriaHidden: $iframeAriaHidden, iframeCsp: $iframeCsp, iframeName: $iframeName, iframeReferrerPolicy: $iframeReferrerPolicy, iframeRole: $iframeRole, iframeSandbox: $iframeSandbox, ignoresViewportScaleLimits: $ignoresViewportScaleLimits, incognito: $incognito, initialScale: $initialScale, interceptOnlyAsyncAjaxRequests: $interceptOnlyAsyncAjaxRequests, isDirectionalLockEnabled: $isDirectionalLockEnabled, isElementFullscreenEnabled: $isElementFullscreenEnabled, isFindInteractionEnabled: $isFindInteractionEnabled, isFraudulentWebsiteWarningEnabled: $isFraudulentWebsiteWarningEnabled, isInspectable: $isInspectable, isPagingEnabled: $isPagingEnabled, isSiteSpecificQuirksModeEnabled: $isSiteSpecificQuirksModeEnabled, isTextInteractionEnabled: $isTextInteractionEnabled, isUserInteractionEnabled: $isUserInteractionEnabled, itpEnabled: $itpEnabled, javaScriptBridgeEnabled: $javaScriptBridgeEnabled, javaScriptBridgeForMainFrameOnly: $javaScriptBridgeForMainFrameOnly, javaScriptBridgeOriginAllowList: $javaScriptBridgeOriginAllowList, javaScriptCanOpenWindowsAutomatically: $javaScriptCanOpenWindowsAutomatically, javaScriptEnabled: $javaScriptEnabled, javaScriptHandlersForMainFrameOnly: $javaScriptHandlersForMainFrameOnly, javaScriptHandlersOriginAllowList: $javaScriptHandlersOriginAllowList, keyRepeatDelay: $keyRepeatDelay, keyRepeatInterval: $keyRepeatInterval, layoutAlgorithm: $layoutAlgorithm, limitsNavigationsToAppBoundDomains: $limitsNavigationsToAppBoundDomains, loadWithOverviewMode: $loadWithOverviewMode, loadsImagesAutomatically: $loadsImagesAutomatically, maximumViewportInset: $maximumViewportInset, maximumZoomScale: $maximumZoomScale, mediaPlaybackRequiresUserGesture: $mediaPlaybackRequiresUserGesture, mediaType: $mediaType, minimumFontSize: $minimumFontSize, minimumLogicalFontSize: $minimumLogicalFontSize, minimumViewportInset: $minimumViewportInset, minimumZoomScale: $minimumZoomScale, mixedContentMode: $mixedContentMode, needInitialFocus: $needInitialFocus, networkAvailable: $networkAvailable, nonClientRegionSupportEnabled: $nonClientRegionSupportEnabled, offscreenPreRaster: $offscreenPreRaster, overScrollMode: $overScrollMode, pageZoom: $pageZoom, passwordAutosaveEnabled: $passwordAutosaveEnabled, pictographFontFamily: $pictographFontFamily, pinchZoomEnabled: $pinchZoomEnabled, pluginScriptsForMainFrameOnly: $pluginScriptsForMainFrameOnly, pluginScriptsOriginAllowList: $pluginScriptsOriginAllowList, preferredContentMode: $preferredContentMode, regexToAllowSyncUrlLoading: $regexToAllowSyncUrlLoading, regexToCancelSubFramesLoading: $regexToCancelSubFramesLoading, rendererPriorityPolicy: $rendererPriorityPolicy, reputationCheckingRequired: $reputationCheckingRequired, requestedWithHeaderOriginAllowList: $requestedWithHeaderOriginAllowList, resourceCustomSchemes: $resourceCustomSchemes, safeBrowsingEnabled: $safeBrowsingEnabled, sansSerifFontFamily: $sansSerifFontFamily, scrollBarDefaultDelayBeforeFade: $scrollBarDefaultDelayBeforeFade, scrollBarFadeDuration: $scrollBarFadeDuration, scrollBarStyle: $scrollBarStyle, scrollMultiplier: $scrollMultiplier, scrollbarFadingEnabled: $scrollbarFadingEnabled, scrollsToTop: $scrollsToTop, selectionGranularity: $selectionGranularity, serifFontFamily: $serifFontFamily, sharedCookiesEnabled: $sharedCookiesEnabled, shouldPrintBackgrounds: $shouldPrintBackgrounds, standardFontFamily: $standardFontFamily, statusBarEnabled: $statusBarEnabled, supportMultipleWindows: $supportMultipleWindows, supportZoom: $supportZoom, suppressesIncrementalRendering: $suppressesIncrementalRendering, textZoom: $textZoom, thirdPartyCookiesEnabled: $thirdPartyCookiesEnabled, transparentBackground: $transparentBackground, underPageBackgroundColor: $underPageBackgroundColor, upgradeKnownHostsToHTTPS: $upgradeKnownHostsToHTTPS, useHybridComposition: $useHybridComposition, useOnAjaxProgress: $useOnAjaxProgress, useOnAjaxReadyStateChange: $useOnAjaxReadyStateChange, useOnDownloadStart: $useOnDownloadStart, useOnLoadResource: $useOnLoadResource, useOnNavigationResponse: $useOnNavigationResponse, useOnRenderProcessGone: $useOnRenderProcessGone, useOnShowFileChooser: $useOnShowFileChooser, useShouldInterceptAjaxRequest: $useShouldInterceptAjaxRequest, useShouldInterceptFetchRequest: $useShouldInterceptFetchRequest, useShouldInterceptRequest: $useShouldInterceptRequest, useShouldOverrideUrlLoading: $useShouldOverrideUrlLoading, useWideViewPort: $useWideViewPort, userAgent: $userAgent, verticalScrollBarEnabled: $verticalScrollBarEnabled, verticalScrollbarPosition: $verticalScrollbarPosition, verticalScrollbarThumbColor: $verticalScrollbarThumbColor, verticalScrollbarTrackColor: $verticalScrollbarTrackColor, webViewAssetLoader: $webViewAssetLoader}';
   }
 }
 
@@ -3035,6 +3240,30 @@ enum InAppWebViewSettingsProperty {
   ///{@endtemplate}
   cursiveFontFamily,
 
+  ///Can be used to check if the [InAppWebViewSettings.cursorBlinkTime] property is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.InAppWebViewSettings.cursorBlinkTime.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Linux WPE WebKit ([Official API - WPESettings.cursor-blink-time](https://wpewebkit.org/reference/stable/wpe-platform-2.0/class.Settings.html)):
+  ///    - This is a WPE Platform display-level setting. Value is in milliseconds.
+  ///
+  ///Use the [InAppWebViewSettings.isPropertySupported] method to check if this property is supported at runtime.
+  ///{@endtemplate}
+  cursorBlinkTime,
+
+  ///Can be used to check if the [InAppWebViewSettings.darkMode] property is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.InAppWebViewSettings.darkMode.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Linux WPE WebKit ([Official API - WPESettings.dark-mode](https://wpewebkit.org/reference/stable/wpe-platform-2.0/class.Settings.html)):
+  ///    - This is a WPE Platform display-level setting that affects all WebViews.
+  ///
+  ///Use the [InAppWebViewSettings.isPropertySupported] method to check if this property is supported at runtime.
+  ///{@endtemplate}
+  darkMode,
+
   ///Can be used to check if the [InAppWebViewSettings.dataDetectorTypes] property is supported at runtime.
   ///
   ///{@template flutter_inappwebview_platform_interface.InAppWebViewSettings.dataDetectorTypes.supported_platforms}
@@ -3115,6 +3344,18 @@ enum InAppWebViewSettingsProperty {
   ///Use the [InAppWebViewSettings.isPropertySupported] method to check if this property is supported at runtime.
   ///{@endtemplate}
   defaultVideoPoster,
+
+  ///Can be used to check if the [InAppWebViewSettings.disableAnimations] property is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.InAppWebViewSettings.disableAnimations.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Linux WPE WebKit ([Official API - WPESettings.disable-animations](https://wpewebkit.org/reference/stable/wpe-platform-2.0/class.Settings.html)):
+  ///    - This is a WPE Platform display-level setting for accessibility.
+  ///
+  ///Use the [InAppWebViewSettings.isPropertySupported] method to check if this property is supported at runtime.
+  ///{@endtemplate}
+  disableAnimations,
 
   ///Can be used to check if the [InAppWebViewSettings.disableContextMenu] property is supported at runtime.
   ///
@@ -3234,6 +3475,42 @@ enum InAppWebViewSettingsProperty {
   ///Use the [InAppWebViewSettings.isPropertySupported] method to check if this property is supported at runtime.
   ///{@endtemplate}
   domStorageEnabled,
+
+  ///Can be used to check if the [InAppWebViewSettings.doubleClickDistance] property is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.InAppWebViewSettings.doubleClickDistance.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Linux WPE WebKit ([Official API - WPESettings.double-click-distance](https://wpewebkit.org/reference/stable/wpe-platform-2.0/class.Settings.html)):
+  ///    - This is a WPE Platform display-level setting. Value is in pixels.
+  ///
+  ///Use the [InAppWebViewSettings.isPropertySupported] method to check if this property is supported at runtime.
+  ///{@endtemplate}
+  doubleClickDistance,
+
+  ///Can be used to check if the [InAppWebViewSettings.doubleClickTime] property is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.InAppWebViewSettings.doubleClickTime.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Linux WPE WebKit ([Official API - WPESettings.double-click-time](https://wpewebkit.org/reference/stable/wpe-platform-2.0/class.Settings.html)):
+  ///    - This is a WPE Platform display-level setting. Value is in milliseconds.
+  ///
+  ///Use the [InAppWebViewSettings.isPropertySupported] method to check if this property is supported at runtime.
+  ///{@endtemplate}
+  doubleClickTime,
+
+  ///Can be used to check if the [InAppWebViewSettings.dragThreshold] property is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.InAppWebViewSettings.dragThreshold.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Linux WPE WebKit ([Official API - WPESettings.drag-threshold](https://wpewebkit.org/reference/stable/wpe-platform-2.0/class.Settings.html)):
+  ///    - This is a WPE Platform display-level setting. Value is in pixels.
+  ///
+  ///Use the [InAppWebViewSettings.isPropertySupported] method to check if this property is supported at runtime.
+  ///{@endtemplate}
+  dragThreshold,
 
   ///Can be used to check if the [InAppWebViewSettings.drawCompositingIndicators] property is supported at runtime.
   ///
@@ -3370,6 +3647,54 @@ enum InAppWebViewSettingsProperty {
   ///Use the [InAppWebViewSettings.isPropertySupported] method to check if this property is supported at runtime.
   ///{@endtemplate}
   fixedFontFamily,
+
+  ///Can be used to check if the [InAppWebViewSettings.fontAntialias] property is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.InAppWebViewSettings.fontAntialias.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Linux WPE WebKit ([Official API - WPESettings.font-antialias](https://wpewebkit.org/reference/stable/wpe-platform-2.0/class.Settings.html)):
+  ///    - This is a WPE Platform display-level setting for font rendering.
+  ///
+  ///Use the [InAppWebViewSettings.isPropertySupported] method to check if this property is supported at runtime.
+  ///{@endtemplate}
+  fontAntialias,
+
+  ///Can be used to check if the [InAppWebViewSettings.fontDPI] property is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.InAppWebViewSettings.fontDPI.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Linux WPE WebKit ([Official API - WPESettings.font-dpi](https://wpewebkit.org/reference/stable/wpe-platform-2.0/class.Settings.html)):
+  ///    - This is a WPE Platform display-level setting. Default is typically 96.0 DPI.
+  ///
+  ///Use the [InAppWebViewSettings.isPropertySupported] method to check if this property is supported at runtime.
+  ///{@endtemplate}
+  fontDPI,
+
+  ///Can be used to check if the [InAppWebViewSettings.fontHintingStyle] property is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.InAppWebViewSettings.fontHintingStyle.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Linux WPE WebKit ([Official API - WPESettings.font-hinting-style](https://wpewebkit.org/reference/stable/wpe-platform-2.0/class.Settings.html)):
+  ///    - This is a WPE Platform display-level setting for font rendering.
+  ///
+  ///Use the [InAppWebViewSettings.isPropertySupported] method to check if this property is supported at runtime.
+  ///{@endtemplate}
+  fontHintingStyle,
+
+  ///Can be used to check if the [InAppWebViewSettings.fontSubpixelLayout] property is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.InAppWebViewSettings.fontSubpixelLayout.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Linux WPE WebKit ([Official API - WPESettings.font-subpixel-layout](https://wpewebkit.org/reference/stable/wpe-platform-2.0/class.Settings.html)):
+  ///    - This is a WPE Platform display-level setting for font rendering.
+  ///
+  ///Use the [InAppWebViewSettings.isPropertySupported] method to check if this property is supported at runtime.
+  ///{@endtemplate}
+  fontSubpixelLayout,
 
   ///Can be used to check if the [InAppWebViewSettings.forceDark] property is supported at runtime.
   ///
@@ -3847,6 +4172,30 @@ enum InAppWebViewSettingsProperty {
   ///Use the [InAppWebViewSettings.isPropertySupported] method to check if this property is supported at runtime.
   ///{@endtemplate}
   javaScriptHandlersOriginAllowList,
+
+  ///Can be used to check if the [InAppWebViewSettings.keyRepeatDelay] property is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.InAppWebViewSettings.keyRepeatDelay.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Linux WPE WebKit ([Official API - WPESettings.key-repeat-delay](https://wpewebkit.org/reference/stable/wpe-platform-2.0/class.Settings.html)):
+  ///    - This is a WPE Platform display-level setting. Value is in milliseconds.
+  ///
+  ///Use the [InAppWebViewSettings.isPropertySupported] method to check if this property is supported at runtime.
+  ///{@endtemplate}
+  keyRepeatDelay,
+
+  ///Can be used to check if the [InAppWebViewSettings.keyRepeatInterval] property is supported at runtime.
+  ///
+  ///{@template flutter_inappwebview_platform_interface.InAppWebViewSettings.keyRepeatInterval.supported_platforms}
+  ///
+  ///**Officially Supported Platforms/Implementations**:
+  ///- Linux WPE WebKit ([Official API - WPESettings.key-repeat-interval](https://wpewebkit.org/reference/stable/wpe-platform-2.0/class.Settings.html)):
+  ///    - This is a WPE Platform display-level setting. Value is in milliseconds.
+  ///
+  ///Use the [InAppWebViewSettings.isPropertySupported] method to check if this property is supported at runtime.
+  ///{@endtemplate}
+  keyRepeatInterval,
 
   ///Can be used to check if the [InAppWebViewSettings.layoutAlgorithm] property is supported at runtime.
   ///
@@ -4883,6 +5232,12 @@ extension _InAppWebViewSettingsPropertySupported on InAppWebViewSettings {
               TargetPlatform.android,
               TargetPlatform.linux,
             ].contains(platform ?? defaultTargetPlatform);
+      case InAppWebViewSettingsProperty.cursorBlinkTime:
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
+            [TargetPlatform.linux].contains(platform ?? defaultTargetPlatform);
+      case InAppWebViewSettingsProperty.darkMode:
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
+            [TargetPlatform.linux].contains(platform ?? defaultTargetPlatform);
       case InAppWebViewSettingsProperty.dataDetectorTypes:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.iOS].contains(platform ?? defaultTargetPlatform);
@@ -4918,6 +5273,9 @@ extension _InAppWebViewSettingsPropertySupported on InAppWebViewSettings {
             [
               TargetPlatform.android,
             ].contains(platform ?? defaultTargetPlatform);
+      case InAppWebViewSettingsProperty.disableAnimations:
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
+            [TargetPlatform.linux].contains(platform ?? defaultTargetPlatform);
       case InAppWebViewSettingsProperty.disableContextMenu:
         return kIsWeb && platform == null
             ? true
@@ -4974,6 +5332,15 @@ extension _InAppWebViewSettingsPropertySupported on InAppWebViewSettings {
               TargetPlatform.android,
               TargetPlatform.linux,
             ].contains(platform ?? defaultTargetPlatform);
+      case InAppWebViewSettingsProperty.doubleClickDistance:
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
+            [TargetPlatform.linux].contains(platform ?? defaultTargetPlatform);
+      case InAppWebViewSettingsProperty.doubleClickTime:
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
+            [TargetPlatform.linux].contains(platform ?? defaultTargetPlatform);
+      case InAppWebViewSettingsProperty.dragThreshold:
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
+            [TargetPlatform.linux].contains(platform ?? defaultTargetPlatform);
       case InAppWebViewSettingsProperty.drawCompositingIndicators:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
             [TargetPlatform.linux].contains(platform ?? defaultTargetPlatform);
@@ -5022,6 +5389,18 @@ extension _InAppWebViewSettingsPropertySupported on InAppWebViewSettings {
               TargetPlatform.android,
               TargetPlatform.linux,
             ].contains(platform ?? defaultTargetPlatform);
+      case InAppWebViewSettingsProperty.fontAntialias:
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
+            [TargetPlatform.linux].contains(platform ?? defaultTargetPlatform);
+      case InAppWebViewSettingsProperty.fontDPI:
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
+            [TargetPlatform.linux].contains(platform ?? defaultTargetPlatform);
+      case InAppWebViewSettingsProperty.fontHintingStyle:
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
+            [TargetPlatform.linux].contains(platform ?? defaultTargetPlatform);
+      case InAppWebViewSettingsProperty.fontSubpixelLayout:
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
+            [TargetPlatform.linux].contains(platform ?? defaultTargetPlatform);
       case InAppWebViewSettingsProperty.forceDark:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
             [
@@ -5254,6 +5633,12 @@ extension _InAppWebViewSettingsPropertySupported on InAppWebViewSettings {
                     TargetPlatform.macOS,
                     TargetPlatform.windows,
                   ].contains(platform ?? defaultTargetPlatform);
+      case InAppWebViewSettingsProperty.keyRepeatDelay:
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
+            [TargetPlatform.linux].contains(platform ?? defaultTargetPlatform);
+      case InAppWebViewSettingsProperty.keyRepeatInterval:
+        return ((kIsWeb && platform != null) || !kIsWeb) &&
+            [TargetPlatform.linux].contains(platform ?? defaultTargetPlatform);
       case InAppWebViewSettingsProperty.layoutAlgorithm:
         return ((kIsWeb && platform != null) || !kIsWeb) &&
             [

@@ -866,6 +866,32 @@ void WebViewChannelDelegate::HandleMethodCall(FlMethodCall* method_call) {
     return;
   }
 
+  if (string_equals(methodName, "getScreenScale")) {
+    double scale = webView->getScreenScale();
+    g_autoptr(FlValue) result = fl_value_new_float(scale);
+    fl_method_call_respond_success(method_call, result, nullptr);
+    return;
+  }
+
+  if (string_equals(methodName, "setScreenScale")) {
+    double scale = 1.0;
+    if (fl_value_get_type(args) == FL_VALUE_TYPE_FLOAT) {
+      scale = fl_value_get_float(args);
+    } else if (fl_value_get_type(args) == FL_VALUE_TYPE_INT) {
+      scale = static_cast<double>(fl_value_get_int(args));
+    }
+    webView->setScreenScale(scale);
+    fl_method_call_respond_success(method_call, nullptr, nullptr);
+    return;
+  }
+
+  if (string_equals(methodName, "isVisible")) {
+    bool visible = webView->isVisible();
+    g_autoptr(FlValue) result = fl_value_new_bool(visible);
+    fl_method_call_respond_success(method_call, result, nullptr);
+    return;
+  }
+
   if (string_equals(methodName, "requestPointerLock")) {
     bool success = webView->requestPointerLock();
     g_autoptr(FlValue) result = fl_value_new_bool(success);

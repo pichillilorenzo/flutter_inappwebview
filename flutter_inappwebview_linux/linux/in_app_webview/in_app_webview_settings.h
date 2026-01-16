@@ -99,6 +99,21 @@ class InAppWebViewSettings {
   int targetFrameRate = 60;              // Target FPS for rendering
   bool enableOffscreenRendering = true;  // Always true for WPE in Flutter
 
+  // === WPE Platform settings ===
+  // These settings use the WPE Platform API (available when HAVE_WPE_PLATFORM is defined)
+  std::optional<bool> darkMode;              // Dark mode for websites (prefers-color-scheme)
+  std::optional<bool> disableAnimations;     // Reduce motion for accessibility
+  std::optional<bool> fontAntialias;         // Font antialiasing
+  std::optional<int> fontHintingStyle;       // Font hinting (0=none, 1=slight, 2=medium, 3=full)
+  std::optional<int> fontSubpixelLayout;     // Subpixel layout (0=RGB, 1=BGR, 2=VRGB, 3=VBGR)
+  std::optional<double> fontDPI;             // Font DPI (default 96.0)
+  std::optional<int> cursorBlinkTime;        // Cursor blink time in ms
+  std::optional<int> doubleClickDistance;    // Double-click threshold in px
+  std::optional<int> doubleClickTime;        // Double-click timeout in ms
+  std::optional<int> dragThreshold;          // Drag gesture threshold in px
+  std::optional<int> keyRepeatDelay;         // Key repeat delay in ms
+  std::optional<int> keyRepeatInterval;      // Key repeat interval in ms
+
   // === Scroll settings ===
   int64_t scrollMultiplier = 1;
 
@@ -133,6 +148,14 @@ class InAppWebViewSettings {
    * Apply these settings to a WPE WebKitWebView.
    */
   void applyToWebView(WebKitWebView* webview) const;
+
+#ifdef HAVE_WPE_PLATFORM
+  /**
+   * Apply WPE Platform settings using the WPE Settings API.
+   * @param display The WPE display to get settings from
+   */
+  void applyWpePlatformSettings(void* display) const;
+#endif
 
   /**
    * Convert to FlValue map.

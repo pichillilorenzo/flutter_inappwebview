@@ -727,6 +727,22 @@ class InAppWebViewController {
   ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.getTargetRefreshRate.supported_platforms}
   Future<int> getTargetRefreshRate() => platform.getTargetRefreshRate();
 
+  ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.getScreenScale}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.getScreenScale.supported_platforms}
+  Future<double> getScreenScale() => platform.getScreenScale();
+
+  ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.setScreenScale}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.setScreenScale.supported_platforms}
+  Future<void> setScreenScale({required double scale}) =>
+      platform.setScreenScale(scale: scale);
+
+  ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.isVisible}
+  ///
+  ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.isVisible.supported_platforms}
+  Future<bool> isVisible() => platform.isVisible();
+
   ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.requestPointerLock}
   ///
   ///{@macro flutter_inappwebview_platform_interface.PlatformInAppWebViewController.requestPointerLock.supported_platforms}

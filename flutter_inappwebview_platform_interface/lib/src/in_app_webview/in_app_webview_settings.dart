@@ -6,6 +6,8 @@ import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_pla
 import '../types/action_mode_menu_item.dart';
 import '../types/cache_mode.dart';
 import '../types/data_detector_types.dart';
+import '../types/font_hinting_style.dart';
+import '../types/font_subpixel_layout.dart';
 import '../types/force_dark.dart';
 import '../types/force_dark_strategy.dart';
 import '../types/layout_algorithm.dart';
@@ -2825,6 +2827,237 @@ as it can cause framerate drops on animations in Android 9 and lower (see [Hybri
   )
   bool? itpEnabled;
 
+  ///Sets whether dark mode is enabled for web content.
+  ///When enabled, websites that support the `prefers-color-scheme: dark` CSS media query
+  ///will render in dark mode.
+  ///
+  ///This is a WPE Platform setting that affects the entire display.
+  ///
+  ///The default value is `null` (follows system default).
+  @SupportedPlatforms(
+    platforms: [
+      LinuxPlatform(
+        apiName: "WPESettings.dark-mode",
+        apiUrl:
+            "https://wpewebkit.org/reference/stable/wpe-platform-2.0/class.Settings.html",
+        note:
+            "This is a WPE Platform display-level setting that affects all WebViews.",
+      ),
+    ],
+  )
+  bool? darkMode;
+
+  ///Sets whether animations are disabled for accessibility.
+  ///When enabled, CSS animations and transitions may be reduced or disabled
+  ///for users with motion sensitivity.
+  ///
+  ///This is a WPE Platform setting that affects the entire display.
+  ///
+  ///The default value is `null` (follows system default).
+  @SupportedPlatforms(
+    platforms: [
+      LinuxPlatform(
+        apiName: "WPESettings.disable-animations",
+        apiUrl:
+            "https://wpewebkit.org/reference/stable/wpe-platform-2.0/class.Settings.html",
+        note:
+            "This is a WPE Platform display-level setting for accessibility.",
+      ),
+    ],
+  )
+  bool? disableAnimations;
+
+  ///Sets whether font antialiasing is enabled.
+  ///When enabled, fonts are rendered with antialiasing for smoother edges.
+  ///
+  ///This is a WPE Platform setting that affects the entire display.
+  ///
+  ///The default value is `null` (follows system default).
+  @SupportedPlatforms(
+    platforms: [
+      LinuxPlatform(
+        apiName: "WPESettings.font-antialias",
+        apiUrl:
+            "https://wpewebkit.org/reference/stable/wpe-platform-2.0/class.Settings.html",
+        note:
+            "This is a WPE Platform display-level setting for font rendering.",
+      ),
+    ],
+  )
+  bool? fontAntialias;
+
+  ///Sets the font hinting style.
+  ///Hinting adjusts font outlines to improve rendering at small sizes.
+  ///
+  ///This is a WPE Platform setting that affects the entire display.
+  ///
+  ///The default value is `null` (follows system default).
+  @SupportedPlatforms(
+    platforms: [
+      LinuxPlatform(
+        apiName: "WPESettings.font-hinting-style",
+        apiUrl:
+            "https://wpewebkit.org/reference/stable/wpe-platform-2.0/class.Settings.html",
+        note:
+            "This is a WPE Platform display-level setting for font rendering.",
+      ),
+    ],
+  )
+  FontHintingStyle_? fontHintingStyle;
+
+  ///Sets the font subpixel layout for LCD rendering.
+  ///This determines how subpixel rendering is performed based on the
+  ///physical arrangement of the display's RGB subpixels.
+  ///
+  ///This is a WPE Platform setting that affects the entire display.
+  ///
+  ///The default value is `null` (follows system default).
+  @SupportedPlatforms(
+    platforms: [
+      LinuxPlatform(
+        apiName: "WPESettings.font-subpixel-layout",
+        apiUrl:
+            "https://wpewebkit.org/reference/stable/wpe-platform-2.0/class.Settings.html",
+        note:
+            "This is a WPE Platform display-level setting for font rendering.",
+      ),
+    ],
+  )
+  FontSubpixelLayout_? fontSubpixelLayout;
+
+  ///Sets the font DPI (dots per inch) for text rendering.
+  ///This affects the size at which fonts are rendered.
+  ///
+  ///This is a WPE Platform setting that affects the entire display.
+  ///
+  ///The default value is `null` (uses system default, typically 96.0).
+  @SupportedPlatforms(
+    platforms: [
+      LinuxPlatform(
+        apiName: "WPESettings.font-dpi",
+        apiUrl:
+            "https://wpewebkit.org/reference/stable/wpe-platform-2.0/class.Settings.html",
+        note:
+            "This is a WPE Platform display-level setting. Default is typically 96.0 DPI.",
+      ),
+    ],
+  )
+  double? fontDPI;
+
+  ///Sets the cursor blink time in milliseconds.
+  ///This controls how frequently the text cursor blinks in input fields.
+  ///
+  ///This is a WPE Platform setting that affects the entire display.
+  ///
+  ///The default value is `null` (uses system default, typically 1200ms).
+  @SupportedPlatforms(
+    platforms: [
+      LinuxPlatform(
+        apiName: "WPESettings.cursor-blink-time",
+        apiUrl:
+            "https://wpewebkit.org/reference/stable/wpe-platform-2.0/class.Settings.html",
+        note:
+            "This is a WPE Platform display-level setting. Value is in milliseconds.",
+      ),
+    ],
+  )
+  int? cursorBlinkTime;
+
+  ///Sets the double-click distance threshold in pixels.
+  ///Two clicks within this distance are considered a double-click.
+  ///
+  ///This is a WPE Platform setting that affects the entire display.
+  ///
+  ///The default value is `null` (uses system default, typically 5 pixels).
+  @SupportedPlatforms(
+    platforms: [
+      LinuxPlatform(
+        apiName: "WPESettings.double-click-distance",
+        apiUrl:
+            "https://wpewebkit.org/reference/stable/wpe-platform-2.0/class.Settings.html",
+        note:
+            "This is a WPE Platform display-level setting. Value is in pixels.",
+      ),
+    ],
+  )
+  int? doubleClickDistance;
+
+  ///Sets the double-click time threshold in milliseconds.
+  ///Two clicks within this time are considered a double-click.
+  ///
+  ///This is a WPE Platform setting that affects the entire display.
+  ///
+  ///The default value is `null` (uses system default, typically 400ms).
+  @SupportedPlatforms(
+    platforms: [
+      LinuxPlatform(
+        apiName: "WPESettings.double-click-time",
+        apiUrl:
+            "https://wpewebkit.org/reference/stable/wpe-platform-2.0/class.Settings.html",
+        note:
+            "This is a WPE Platform display-level setting. Value is in milliseconds.",
+      ),
+    ],
+  )
+  int? doubleClickTime;
+
+  ///Sets the drag threshold in pixels.
+  ///The pointer must move at least this many pixels to start a drag operation.
+  ///
+  ///This is a WPE Platform setting that affects the entire display.
+  ///
+  ///The default value is `null` (uses system default, typically 8 pixels).
+  @SupportedPlatforms(
+    platforms: [
+      LinuxPlatform(
+        apiName: "WPESettings.drag-threshold",
+        apiUrl:
+            "https://wpewebkit.org/reference/stable/wpe-platform-2.0/class.Settings.html",
+        note:
+            "This is a WPE Platform display-level setting. Value is in pixels.",
+      ),
+    ],
+  )
+  int? dragThreshold;
+
+  ///Sets the key repeat delay in milliseconds.
+  ///This is the time a key must be held before it starts repeating.
+  ///
+  ///This is a WPE Platform setting that affects the entire display.
+  ///
+  ///The default value is `null` (uses system default, typically 400ms).
+  @SupportedPlatforms(
+    platforms: [
+      LinuxPlatform(
+        apiName: "WPESettings.key-repeat-delay",
+        apiUrl:
+            "https://wpewebkit.org/reference/stable/wpe-platform-2.0/class.Settings.html",
+        note:
+            "This is a WPE Platform display-level setting. Value is in milliseconds.",
+      ),
+    ],
+  )
+  int? keyRepeatDelay;
+
+  ///Sets the key repeat interval in milliseconds.
+  ///This is the time between repeated key events when a key is held down.
+  ///
+  ///This is a WPE Platform setting that affects the entire display.
+  ///
+  ///The default value is `null` (uses system default, typically 80ms).
+  @SupportedPlatforms(
+    platforms: [
+      LinuxPlatform(
+        apiName: "WPESettings.key-repeat-interval",
+        apiUrl:
+            "https://wpewebkit.org/reference/stable/wpe-platform-2.0/class.Settings.html",
+        note:
+            "This is a WPE Platform display-level setting. Value is in milliseconds.",
+      ),
+    ],
+  )
+  int? keyRepeatInterval;
+
   @ExchangeableObjectConstructor()
   InAppWebViewSettings_({
     this.useShouldOverrideUrlLoading,
@@ -3005,6 +3238,18 @@ as it can cause framerate drops on animations in Android 9 and lower (see [Hybri
     this.pictographFontFamily,
     this.corsAllowlist,
     this.itpEnabled = false,
+    this.darkMode,
+    this.disableAnimations,
+    this.fontAntialias,
+    this.fontHintingStyle,
+    this.fontSubpixelLayout,
+    this.fontDPI,
+    this.cursorBlinkTime,
+    this.doubleClickDistance,
+    this.doubleClickTime,
+    this.dragThreshold,
+    this.keyRepeatDelay,
+    this.keyRepeatInterval,
   }) {
     if (this.minimumFontSize == null)
       this.minimumFontSize = Util.isAndroid ? 8 : 0;

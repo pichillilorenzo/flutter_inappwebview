@@ -22,9 +22,13 @@ set(NLOHMANN_JSON_VERSION "3.11.3")
 # WPE WebKit is designed for embedded systems and provides excellent offscreen
 # rendering performance through DMA-BUF buffer sharing.
 #
+# Dual API Support:
+#   - WPEPlatform API (wpe-platform-2.0): NEW default API for WPE WebKit 2.40+
+#   - WPEBackend-FDO (wpebackend-fdo-1.0): Legacy fallback for older systems
+#
 # Required packages:
 #   - wpe-webkit-2.0 (or wpe-webkit-1.1 on older systems)
-#   - wpebackend-fdo-1.0
+#   - wpe-platform-2.0 (preferred) OR wpebackend-fdo-1.0 (fallback)
 #   - libwpe-1.0
 #
 # See WPE_BACKEND.md for installation instructions.
@@ -60,13 +64,37 @@ if(NOT WPE_WEBKIT_FOUND)
                       "See WPE_BACKEND.md or https://wpewebkit.org/about/get-wpe.html")
 endif()
 
-# Check for WPE Backend FDO (for DMA-BUF export)
+# === WPE Platform API Detection (NEW - default) ===
+# Check for WPEPlatform API first (wpe-platform-2.0) - this is the modern API
+# introduced in WPE WebKit 2.40+ and is the preferred approach.
+pkg_check_modules(WPE_PLATFORM QUIET IMPORTED_TARGET wpe-platform-2.0)
+pkg_check_modules(WPE_PLATFORM_HEADLESS QUIET IMPORTED_TARGET wpe-platform-headless-2.0)
+
+if(WPE_PLATFORM_FOUND AND WPE_PLATFORM_HEADLESS_FOUND)
+  message(STATUS "flutter_inappwebview_linux: Found wpe-platform-2.0 (WPEPlatform API - DEFAULT)")
+  message(STATUS "flutter_inappwebview_linux: Found wpe-platform-headless-2.0")
+  set(HAVE_WPE_PLATFORM ON)
+  add_compile_definitions(HAVE_WPE_PLATFORM=1)
+endif()
+
+# === WPE Backend FDO Detection (Legacy - fallback) ===
+# Check for WPEBackend-FDO as fallback ONLY if WPEPlatform is NOT available
+# WPEPlatform and WPEBackend-FDO are mutually exclusive at compile time
 pkg_check_modules(WPE_FDO QUIET IMPORTED_TARGET wpebackend-fdo-1.0)
-if(WPE_FDO_FOUND)
-  message(STATUS "flutter_inappwebview_linux: Found wpebackend-fdo-1.0 (DMA-BUF support enabled)")
+if(WPE_FDO_FOUND AND NOT HAVE_WPE_PLATFORM)
+  message(STATUS "flutter_inappwebview_linux: Found wpebackend-fdo-1.0 (Legacy FDO API)")
   set(HAVE_WPE_FDO ON)
-else()
-  message(FATAL_ERROR "wpebackend-fdo-1.0 not found. Please install wpebackend-fdo-1.0-dev.\n"
+  add_compile_definitions(HAVE_WPE_BACKEND_LEGACY=1)
+elseif(WPE_FDO_FOUND AND HAVE_WPE_PLATFORM)
+  message(STATUS "flutter_inappwebview_linux: wpebackend-fdo-1.0 available but not used (WPEPlatform preferred)")
+endif()
+
+# Require at least one backend
+if(NOT HAVE_WPE_PLATFORM AND NOT HAVE_WPE_FDO)
+  message(FATAL_ERROR "Neither WPEPlatform (wpe-platform-2.0) nor WPEBackend-FDO (wpebackend-fdo-1.0) found.\n"
+                      "Please install one of:\n"
+                      "  - WPE WebKit 2.40+ with WPEPlatform support (recommended)\n"
+                      "  - wpebackend-fdo-1.0-dev (legacy fallback)\n"
                       "See WPE_BACKEND.md for installation instructions.")
 endif()
 
@@ -228,8 +256,18 @@ target_link_libraries(${PLUGIN_NAME} PRIVATE nlohmann_json::nlohmann_json)
 target_link_libraries(${PLUGIN_NAME} PRIVATE PkgConfig::WPE_WEBKIT)
 target_link_libraries(${PLUGIN_NAME} PRIVATE PkgConfig::LIBWPE)
 target_link_libraries(${PLUGIN_NAME} PRIVATE PkgConfig::WAYLAND_SERVER)
-target_link_libraries(${PLUGIN_NAME} PRIVATE PkgConfig::WPE_FDO)
 target_link_libraries(${PLUGIN_NAME} PRIVATE PkgConfig::LIBSECRET)
+
+# Link WPEPlatform if available (new API - default)
+if(HAVE_WPE_PLATFORM)
+  target_link_libraries(${PLUGIN_NAME} PRIVATE PkgConfig::WPE_PLATFORM)
+  target_link_libraries(${PLUGIN_NAME} PRIVATE PkgConfig::WPE_PLATFORM_HEADLESS)
+endif()
+
+# Link WPEBackend-FDO if available (legacy fallback)
+if(HAVE_WPE_FDO)
+  target_link_libraries(${PLUGIN_NAME} PRIVATE PkgConfig::WPE_FDO)
+endif()
 
 # === Library Bundling ===
 # Collect WPE libraries to bundle with the application
@@ -270,7 +308,7 @@ endif()
 if(LIBWPE_LIBRARY_DIRS)
   list(APPEND WPE_LIB_DIRS ${LIBWPE_LIBRARY_DIRS})
 endif()
-if(WPE_FDO_LIBRARY_DIRS)
+if(HAVE_WPE_FDO AND WPE_FDO_LIBRARY_DIRS)
   list(APPEND WPE_LIB_DIRS ${WPE_FDO_LIBRARY_DIRS})
 endif()
 # Add common paths as fallback
@@ -288,8 +326,13 @@ find_and_add_library("libWPEWebKit-2.0" "${WPE_LIB_DIRS}" WPE_BUNDLED_LIBS)
 # Find libwpe library  
 find_and_add_library("libwpe-1.0" "${WPE_LIB_DIRS}" WPE_BUNDLED_LIBS)
 
-# Find WPE Backend FDO library
-find_and_add_library("libWPEBackend-fdo-1.0" "${WPE_LIB_DIRS}" WPE_BUNDLED_LIBS)
+# WPEPlatform is built into libWPEWebKit-2.0 on modern builds, so there are
+# no separate libWPEPlatform*.so files to bundle.
+
+# Find WPE Backend FDO library (legacy fallback)
+if(HAVE_WPE_FDO)
+  find_and_add_library("libWPEBackend-fdo-1.0" "${WPE_LIB_DIRS}" WPE_BUNDLED_LIBS)
+endif()
 
 # Also need to create symlinks for the sonames that the libraries expect
 # This will be handled at install time in the example CMakeLists.txt
@@ -346,8 +389,14 @@ target_link_libraries(${TEST_RUNNER} PRIVATE nlohmann_json::nlohmann_json)
 target_link_libraries(${TEST_RUNNER} PRIVATE PkgConfig::WPE_WEBKIT)
 target_link_libraries(${TEST_RUNNER} PRIVATE PkgConfig::LIBWPE)
 target_link_libraries(${TEST_RUNNER} PRIVATE PkgConfig::WAYLAND_SERVER)
-target_link_libraries(${TEST_RUNNER} PRIVATE PkgConfig::WPE_FDO)
 target_link_libraries(${TEST_RUNNER} PRIVATE PkgConfig::LIBSECRET)
+if(HAVE_WPE_PLATFORM)
+  target_link_libraries(${TEST_RUNNER} PRIVATE PkgConfig::WPE_PLATFORM)
+  target_link_libraries(${TEST_RUNNER} PRIVATE PkgConfig::WPE_PLATFORM_HEADLESS)
+endif()
+if(HAVE_WPE_FDO)
+  target_link_libraries(${TEST_RUNNER} PRIVATE PkgConfig::WPE_FDO)
+endif()
 target_link_libraries(${TEST_RUNNER} PRIVATE gtest_main gmock)
 
 # Enable automatic test discovery.

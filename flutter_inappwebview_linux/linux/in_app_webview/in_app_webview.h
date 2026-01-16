@@ -472,6 +472,7 @@ class InAppWebView {
   uint32_t current_buffer_width_ = 0;     // Width of current buffer
   uint32_t current_buffer_height_ = 0;    // Height of current buffer
   gulong buffer_rendered_handler_ = 0;    // Signal handler ID for buffer-rendered
+  gulong scale_changed_handler_ = 0;      // Signal handler ID for notify::scale-factor
   mutable std::mutex wpe_buffer_mutex_;   // Mutex for thread-safe buffer access
 #endif
 

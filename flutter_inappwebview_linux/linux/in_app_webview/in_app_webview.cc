@@ -424,10 +424,15 @@ InAppWebView::~InAppWebView() {
   // Mark as disposing to prevent buffer callbacks from processing
   is_disposing_.store(true);
   
-  // 1. First disconnect the buffer-rendered signal to stop receiving new frames
+  // 1. First disconnect signals to stop receiving callbacks
   if (wpe_view_ != nullptr && buffer_rendered_handler_ != 0) {
     g_signal_handler_disconnect(wpe_view_, buffer_rendered_handler_);
     buffer_rendered_handler_ = 0;
+  }
+  // Note: scale_changed_handler_ is connected to gtk_window_, not wpe_view_
+  if (gtk_window_ != nullptr && scale_changed_handler_ != 0) {
+    g_signal_handler_disconnect(gtk_window_, scale_changed_handler_);
+    scale_changed_handler_ = 0;
   }
   
   // 2. Release focus from the view
@@ -759,14 +764,58 @@ void InAppWebView::InitWebView(const InAppWebViewCreationParams& params) {
         self->OnWpePlatformBufferRendered(buffer);
       }), this);
   
+  // Get toplevel for size management (need this before setting scale)
+  wpe_toplevel_ = wpe_view_get_toplevel(wpe_view_);
+  
+  // WPEDisplayHeadless doesn't track real display scale, so we need to get it from GTK
+  // and manually notify WPE when it changes
+  if (gtk_window_ != nullptr) {
+    // Get initial scale from GTK window (which tracks the actual display scale)
+    int gtk_scale = gtk_widget_get_scale_factor(GTK_WIDGET(gtk_window_));
+    if (gtk_scale > 0 && static_cast<double>(gtk_scale) != scale_factor_) {
+      scale_factor_ = static_cast<double>(gtk_scale);
+      g_print("[InAppWebView] Initial GTK display scale: %.2f\n", scale_factor_);
+      
+      // Notify WPE about the real display scale
+      if (wpe_toplevel_ != nullptr) {
+        wpe_toplevel_scale_changed(wpe_toplevel_, scale_factor_);
+      }
+    }
+    
+    // Connect to GTK window's scale-factor changes (triggered for example by Ubuntu display settings)
+    scale_changed_handler_ = g_signal_connect(gtk_window_, "notify::scale-factor",
+        G_CALLBACK(+[](GObject* object, GParamSpec* pspec, gpointer user_data) {
+          auto* self = static_cast<InAppWebView*>(user_data);
+          auto* widget = GTK_WIDGET(object);
+          int new_scale = gtk_widget_get_scale_factor(widget);
+          
+          if (new_scale > 0 && static_cast<double>(new_scale) != self->scale_factor_) {
+            g_print("[InAppWebView] GTK display scale changed: %.2f -> %d\n", 
+                    self->scale_factor_, new_scale);
+            self->scale_factor_ = static_cast<double>(new_scale);
+            
+            // Notify WPE about the scale change so it renders at the correct resolution
+            if (self->wpe_toplevel_ != nullptr) {
+              wpe_toplevel_scale_changed(self->wpe_toplevel_, self->scale_factor_);
+            }
+            
+            // Notify Flutter that dimensions may have changed
+            if (self->on_frame_available_) {
+              self->on_frame_available_();
+            }
+          }
+        }), this);
+  } else {
+    g_print("[InAppWebView] Warning: No GTK window available for scale detection\n");
+  }
+  
   // Map the view to start rendering
   wpe_view_map(wpe_view_);
   
   // Set focus so the view starts rendering and receiving input
   wpe_view_focus_in(wpe_view_);
   
-  // Get toplevel for size management
-  wpe_toplevel_ = wpe_view_get_toplevel(wpe_view_);
+  // Resize toplevel (already obtained earlier for scale setup)
   if (wpe_toplevel_ != nullptr) {
     wpe_toplevel_resize(wpe_toplevel_, width_, height_);
   }
@@ -1282,6 +1331,10 @@ void InAppWebView::OnWpePlatformBufferRendered(WPEBuffer* buffer) {
   WPEBuffer* previous_buffer = nullptr;
   bool buffer_handled = false;
   
+  // Track EGL import failures to avoid repeated attempts
+  // Static because if EGL fails once, it will likely keep failing (e.g., no GPU)
+  static bool egl_import_failed_permanently = false;
+  
   {
     std::lock_guard<std::mutex> lock(wpe_buffer_mutex_);
     
@@ -1302,9 +1355,15 @@ void InAppWebView::OnWpePlatformBufferRendered(WPEBuffer* buffer) {
       current_egl_image_ = nullptr;
     }
     
+    // Check buffer type to determine best rendering path
+    bool is_dma_buf = WPE_IS_BUFFER_DMA_BUF(buffer);
+    bool is_shm = WPE_IS_BUFFER_SHM(buffer);
+    
     // === Priority 1: Try EGL image import (zero-copy, best performance) ===
-    // Skip if force_software_rendering is enabled for testing
-    if (!force_software_rendering && egl_display_ != nullptr) {
+    // Only attempt EGL for DMA-BUF buffers (SHM buffers cannot be imported via EGL)
+    // Skip if force_software_rendering is enabled, or if previous EGL attempts failed
+    if (!force_software_rendering && egl_display_ != nullptr && 
+        is_dma_buf && !egl_import_failed_permanently) {
       GError* error = nullptr;
       void* egl_image = wpe_buffer_import_to_egl_image(buffer, &error);
       
@@ -1319,20 +1378,21 @@ void InAppWebView::OnWpePlatformBufferRendered(WPEBuffer* buffer) {
           g_print("[InAppWebView] Rendering via EGL image (zero-copy GPU)\n");
         }
       } else {
+        // Mark EGL as permanently failed so we don't keep trying
+        // This is common in VMs or software-only environments
+        egl_import_failed_permanently = true;
         if (error != nullptr) {
-          static bool logged_egl_fail = false;
-          if (!logged_egl_fail) {
-            logged_egl_fail = true;
-            g_print("[InAppWebView] EGL image import failed: %s\n", error->message);
-          }
+          g_print("[InAppWebView] EGL import failed (will use software rendering): %s\n", error->message);
           g_clear_error(&error);
+        } else {
+          g_print("[InAppWebView] EGL import failed (will use software rendering)\n");
         }
       }
     }
     
     // === Priority 2: Direct SHM buffer access (no GBM required) ===
     // WPEBufferSHM provides direct pixel access without requiring GBM device
-    if (!buffer_handled && WPE_IS_BUFFER_SHM(buffer)) {
+    if (!buffer_handled && is_shm) {
       WPEBufferSHM* shm_buffer = WPE_BUFFER_SHM(buffer);
       GBytes* data = wpe_buffer_shm_get_data(shm_buffer);
       
@@ -1352,6 +1412,17 @@ void InAppWebView::OnWpePlatformBufferRendered(WPEBuffer* buffer) {
             pixel_buffer.data.resize(size);
           }
           memcpy(pixel_buffer.data.data(), pixels, size);
+          
+          // WPE SHM buffers use ARGB8888 format (BGRA in memory on little-endian)
+          // Flutter expects RGBA8888, so we need to convert
+          // ConvertARGB32ToRGBA handles the BGRA -> RGBA conversion
+          if (format == WPE_PIXEL_FORMAT_ARGB8888) {
+            ConvertARGB32ToRGBA(pixel_buffer.data.data(),    // source (in-place)
+                                pixel_buffer.data.data(),    // destination (in-place)
+                                buf_width, buf_height,
+                                stride);
+          }
+          
           pixel_buffer.width = buf_width;
           pixel_buffer.height = buf_height;
           
@@ -1368,7 +1439,7 @@ void InAppWebView::OnWpePlatformBufferRendered(WPEBuffer* buffer) {
           static bool logged_shm = false;
           if (!logged_shm) {
             logged_shm = true;
-            g_print("[InAppWebView] Rendering via SHM (direct software), format=%d, stride=%u\n",
+            g_print("[InAppWebView] Rendering via SHM (software, ARGB->RGBA converted), format=%d, stride=%u\n",
                     static_cast<int>(format), stride);
           }
         }
@@ -1377,6 +1448,7 @@ void InAppWebView::OnWpePlatformBufferRendered(WPEBuffer* buffer) {
     }
     
     // === Priority 3: Generic pixel import (works for DMA-BUF with GBM device) ===
+    // This is a fallback for DMA-BUF when EGL failed but GBM device is available
     if (!buffer_handled) {
       GError* error = nullptr;
       GBytes* pixels = wpe_buffer_import_to_pixels(buffer, &error);
@@ -1392,6 +1464,14 @@ void InAppWebView::OnWpePlatformBufferRendered(WPEBuffer* buffer) {
           pixel_buffer.data.resize(size);
         }
         memcpy(pixel_buffer.data.data(), data, size);
+        
+        // GBM pixel import also returns ARGB8888, convert to RGBA
+        uint32_t stride = buf_width * 4;
+        ConvertARGB32ToRGBA(pixel_buffer.data.data(),
+                            pixel_buffer.data.data(),
+                            buf_width, buf_height,
+                            stride);
+        
         pixel_buffer.width = buf_width;
         pixel_buffer.height = buf_height;
         
@@ -1409,7 +1489,7 @@ void InAppWebView::OnWpePlatformBufferRendered(WPEBuffer* buffer) {
         static bool logged_gbm = false;
         if (!logged_gbm) {
           logged_gbm = true;
-          g_print("[InAppWebView] Rendering via pixel import (GBM readback)\n");
+          g_print("[InAppWebView] Rendering via pixel import (GBM readback, ARGB->RGBA converted)\n");
         }
       } else {
         if (error != nullptr) {
@@ -1638,7 +1718,7 @@ void InAppWebView::postUrl(const std::string& url, const std::vector<uint8_t>& p
   std::string escaped_url = url;
   replace_all(escaped_url, "\\", "\\\\");
   replace_all(escaped_url, "'", "\\'");
-  replace_all(escaped_url, "\n", "\n");
+  replace_all(escaped_url, "\n", "\\n");
   replace_all(escaped_url, "\r", "\\r");
 
   // Create JavaScript that performs the POST request and loads the result
@@ -2068,7 +2148,7 @@ void InAppWebView::callAsyncJavaScript(
             switch (c) {
               case '"': escaped_error += "\\\""; break;
               case '\\': escaped_error += "\\\\"; break;
-              case '\n': escaped_error += "\n"; break;
+              case '\n': escaped_error += "\\n"; break;
               case '\r': escaped_error += "\\r"; break;
               case '\t': escaped_error += "\\t"; break;
               default: escaped_error += c; break;
@@ -2127,7 +2207,7 @@ void InAppWebView::injectCSSCode(const std::string& source) {
   }
   pos = 0;
   while ((pos = escaped_source.find("\n", pos)) != std::string::npos) {
-    escaped_source.replace(pos, 1, "\n");
+    escaped_source.replace(pos, 1, "\\n");
     pos += 2;
   }
 
@@ -2345,7 +2425,7 @@ void InAppWebView::postWebMessage(const std::string& messageData,
       switch (c) {
         case '\\': escaped += "\\\\"; break;
         case '"': escaped += "\\\""; break;
-        case '\n': escaped += "\n"; break;
+        case '\n': escaped += "\\n"; break;
         case '\r': escaped += "\\r"; break;
         case '\t': escaped += "\\t"; break;
         default: escaped += c; break;
@@ -2383,7 +2463,7 @@ void InAppWebView::postWebMessageOnPort(const std::string& channelId, int portIn
       switch (c) {
         case '\\': escaped += "\\\\"; break;
         case '"': escaped += "\\\""; break;
-        case '\n': escaped += "\n"; break;
+        case '\n': escaped += "\\n"; break;
         case '\r': escaped += "\\r"; break;
         case '\t': escaped += "\\t"; break;
         default: escaped += c; break;
@@ -2796,12 +2876,18 @@ void InAppWebView::setScaleFactor(double scale_factor) {
   scale_factor_ = scale_factor;
 
   // WPE uses device scale factor
+#ifdef HAVE_WPE_PLATFORM
+  // WPEPlatform: Notify the toplevel about scale changes
+  // This is needed for proper HiDPI rendering when scale changes dynamically
+  if (wpe_toplevel_ != nullptr) {
+    wpe_toplevel_scale_changed(wpe_toplevel_, scale_factor_);
+  }
+#endif
 #ifdef HAVE_WPE_BACKEND_LEGACY
   if (wpe_backend_ != nullptr) {
     wpe_view_backend_dispatch_set_device_scale_factor(wpe_backend_, scale_factor_);
   }
 #endif
-  // Note: WPEPlatform handles scale factor automatically via the display
 }
 
 // === Activity State Management (like Cog browser) ===
@@ -3130,8 +3216,8 @@ void InAppWebView::SetCursorPos(double x, double y) {
         WPE_INPUT_SOURCE_MOUSE,
         static_cast<guint32>(g_get_monotonic_time() / 1000),
         modifiers,
-        x * scale_factor_,  // Scale to physical pixels
-        y * scale_factor_,
+        x,  // Scale to physical pixels
+        y,
         0.0,  // delta_x (no delta for absolute position)
         0.0   // delta_y
     );
@@ -3164,9 +3250,9 @@ void InAppWebView::SetPointerButton(int kind, int button, int clickCount) {
   if (wpe_view_ == nullptr)
     return;
 
-  // Scale coordinates from logical to physical pixels
-  double scaled_x = cursor_x_ * scale_factor_;
-  double scaled_y = cursor_y_ * scale_factor_;
+  // No need to scale coordinates from logical to physical pixels as WPEPlatform handles this internally.
+  double scaled_x = cursor_x_;
+  double scaled_y = cursor_y_;
 
   // Map button: Flutter uses 0=none, 1=primary, 2=secondary, 3=tertiary
   // WPE/GDK uses: 1=Left, 2=Middle, 3=Right
@@ -3336,16 +3422,17 @@ void InAppWebView::SetScrollDelta(double dx, double dy) {
   if (wpe_view_ == nullptr)
     return;
 
-  // Scale coordinates from logical to physical pixels
-  double scaled_x = cursor_x_ * scale_factor_;
-  double scaled_y = cursor_y_ * scale_factor_;
+  // No need to scale coordinates from logical to physical pixels as WPEPlatform handles this internally.
+  double scaled_x = cursor_x_;
+  double scaled_y = cursor_y_;
 
   WPEModifiers modifiers = static_cast<WPEModifiers>(current_modifiers_);
   guint32 time = static_cast<guint32>(g_get_monotonic_time() / 1000);
 
-  // Flutter provides delta in logical pixels, scale to physical
-  double delta_x = dx * scale_factor_;
-  double delta_y = dy * scale_factor_;
+  // Flutter provides delta in logical pixels.
+  // No need to scale coordinates from logical to physical pixels as WPEPlatform handles this internally.
+  double delta_x = dx;
+  double delta_y = dy;
 
   WPEEvent* event = wpe_event_scroll_new(
       wpe_view_,
@@ -3517,10 +3604,11 @@ void InAppWebView::SendTouchEvent(
       return;
   }
 
-  // For WPEPlatform, we send individual touch events for each point
-  // The main touch point is the one that triggered this event
-  double scaled_x = x * scale_factor_;
-  double scaled_y = y * scale_factor_;
+  // For WPEPlatform, we send individual touch events for each point.
+  // The main touch point is the one that triggered this event.
+  // No need to scale coordinates from logical to physical pixels as WPEPlatform handles this internally.
+  double scaled_x = x;
+  double scaled_y = y;
 
   WPEEvent* event = wpe_event_touch_new(
       event_type,
@@ -6392,7 +6480,7 @@ void InAppWebView::pasteFromClipboard() {
         switch (*p) {
           case '\\': escaped += "\\\\"; break;
           case '"': escaped += "\\\""; break;
-          case '\n': escaped += "\n"; break;
+          case '\n': escaped += "\\n"; break;
           case '\r': escaped += "\\r"; break;
           case '\t': escaped += "\\t"; break;
           default: escaped += *p; break;
@@ -6433,7 +6521,7 @@ void InAppWebView::copyTextToClipboard(const std::string& text) {
       switch (c) {
         case '\\': escaped += "\\\\"; break;
         case '"': escaped += "\\\""; break;
-        case '\n': escaped += "\n"; break;
+        case '\n': escaped += "\\n"; break;
         case '\r': escaped += "\\r"; break;
         case '\t': escaped += "\\t"; break;
         case '`': escaped += "\\`"; break;
@@ -6486,7 +6574,7 @@ void InAppWebView::pasteAsPlainText() {
         switch (*p) {
           case '\\': escaped += "\\\\"; break;
           case '"': escaped += "\\\""; break;
-          case '\n': escaped += "\n"; break;
+          case '\n': escaped += "\\n"; break;
           case '\r': escaped += "\\r"; break;
           case '\t': escaped += "\\t"; break;
           default: escaped += *p; break;

@@ -86,43 +86,34 @@ void flutter_inappwebview_linux_plugin_register_with_registrar(FlPluginRegistrar
 
   plugin->registrar = registrar;
 
-  // Create the C++ plugin instance
   plugin->plugin_instance = std::make_unique<flutter_inappwebview_plugin::PluginInstance>(registrar);
   auto* pluginInstance = plugin->plugin_instance.get();
 
-  // Create the InAppWebViewManager
   plugin->in_app_webview_manager =
       std::make_unique<flutter_inappwebview_plugin::InAppWebViewManager>(pluginInstance);
   pluginInstance->inAppWebViewManager = plugin->in_app_webview_manager.get();
 
-  // Create the HeadlessInAppWebViewManager
   plugin->headless_in_app_webview_manager =
       std::make_unique<flutter_inappwebview_plugin::HeadlessInAppWebViewManager>(pluginInstance);
   pluginInstance->headlessInAppWebViewManager = plugin->headless_in_app_webview_manager.get();
 
-  // Create the InAppBrowserManager
   plugin->in_app_browser_manager =
       std::make_unique<flutter_inappwebview_plugin::InAppBrowserManager>(pluginInstance);
   pluginInstance->inAppBrowserManager = plugin->in_app_browser_manager.get();
 
-  // Create the CookieManager
   plugin->cookie_manager = std::make_unique<flutter_inappwebview_plugin::CookieManager>(pluginInstance);
   pluginInstance->cookieManager = plugin->cookie_manager.get();
 
-  // Create the CredentialDatabase
   plugin->credential_database =
       std::make_unique<flutter_inappwebview_plugin::CredentialDatabase>(pluginInstance);
   pluginInstance->credentialDatabase = plugin->credential_database.get();
 
-  // Create the ProxyManager
   plugin->proxy_manager = std::make_unique<flutter_inappwebview_plugin::ProxyManager>(pluginInstance);
   pluginInstance->proxyManager = plugin->proxy_manager.get();
 
-  // Create the WebStorageManager
   plugin->web_storage_manager = std::make_unique<flutter_inappwebview_plugin::WebStorageManager>(pluginInstance);
   pluginInstance->webStorageManager = plugin->web_storage_manager.get();
 
-  // Create the WebViewEnvironment
   plugin->webview_environment = std::make_unique<flutter_inappwebview_plugin::WebViewEnvironment>(pluginInstance);
   pluginInstance->webViewEnvironment = plugin->webview_environment.get();
 

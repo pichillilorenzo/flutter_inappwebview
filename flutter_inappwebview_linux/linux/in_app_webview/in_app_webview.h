@@ -429,7 +429,7 @@ class InAppWebView {
   static bool PreflightDmaBufSupport();
 #endif
 
-  // === Multi-Window Support (matches iOS) ===
+  // === Multi-Window Support ===
 
   // Set the window ID for this webview (used in window.open scenarios)
   void setWindowId(int64_t windowId) { window_id_ = windowId; }
@@ -554,7 +554,7 @@ class InAppWebView {
   // JavaScript bridge secret for security
   std::string js_bridge_secret_;
 
-  // Window ID for multi-window support (matches iOS windowId)
+  // Window ID for multi-window support
   std::optional<int64_t> window_id_;
 
   // Flag to track if javaScriptBridgeEnabled

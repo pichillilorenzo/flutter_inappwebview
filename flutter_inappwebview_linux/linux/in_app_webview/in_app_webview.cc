@@ -96,7 +96,7 @@ struct FileChooserContext {
   FileChooserContext(WebKitFileChooserRequest* req, bool multi, 
                      flutter_inappwebview_plugin::InAppWebView* wv)
       : request(req), selectMultiple(multi), webview(wv), response_handler_id(0) {
-    g_object_ref(request);  // Keep request alive
+    g_object_ref(request);
   }
   
   ~FileChooserContext() {
@@ -240,12 +240,10 @@ InAppWebView::InAppWebView(FlPluginRegistrar* registrar, FlBinaryMessenger* mess
       initial_user_scripts_(params.initialUserScripts) {
   js_bridge_secret_ = GenerateRandomSecret();
   
-  // Store window ID if this is a popup window
   if (params.windowId.has_value()) {
     window_id_ = params.windowId.value();
   }
 
-  // Store context menu configuration
   if (params.contextMenu.has_value()) {
     context_menu_config_ = params.contextMenu.value();
   }
@@ -259,22 +257,19 @@ InAppWebView::InAppWebView(FlPluginRegistrar* registrar, FlBinaryMessenger* mess
   SetupMonitorChangeHandlers();
   UpdateMonitorRefreshRate();
 
-  // Apply initial settings
   if (settings_) {
     settings_->applyToWebView(webview_);
 #ifdef HAVE_WPE_PLATFORM
-    // Apply WPE Platform settings (dark mode, font settings, etc.)
     if (wpe_display_ != nullptr) {
       settings_->applyWpePlatformSettings(wpe_display_);
     }
 #endif
   }
 
-  // Register custom URI schemes (before loading content)
   RegisterCustomSchemes();
 
   // Apply content blockers if specified, then load initial content
-  // Content blockers must be compiled asynchronously (like iOS/macOS WKContentRuleListStore)
+  // Content blockers must be compiled asynchronously
   if (settings_ && settings_->contentBlockers != nullptr && content_blocker_handler_) {
     // Store initial load params for callback
     auto initialUrlRequest = params.initialUrlRequest;
@@ -330,7 +325,6 @@ void InAppWebView::AttachChannel(FlBinaryMessenger* messenger, int64_t channel_i
   std::string channelName = std::string(METHOD_CHANNEL_NAME_PREFIX) + std::to_string(channel_id_);
   channel_delegate_ = std::make_unique<WebViewChannelDelegate>(this, messenger, channelName);
 
-  // Attach FindInteractionController channel with the same ID
   if (findInteractionController_) {
     findInteractionController_->attachChannel(messenger, std::to_string(channel_id_));
   }
@@ -356,7 +350,6 @@ void InAppWebView::AttachChannel(FlBinaryMessenger* messenger, const std::string
   }
   channel_delegate_ = std::make_unique<WebViewChannelDelegate>(this, messenger, channelName);
 
-  // Attach FindInteractionController channel with the same ID
   if (findInteractionController_) {
     findInteractionController_->attachChannel(messenger, channel_id);
   }
@@ -365,19 +358,15 @@ void InAppWebView::AttachChannel(FlBinaryMessenger* messenger, const std::string
 InAppWebView::~InAppWebView() {
   debugLog("dealloc InAppWebView");
 
-  // Clean up monitor change handlers
   CleanupMonitorChangeHandlers();
 
-  // Clean up context menu popup
   context_menu_popup_.reset();
 
-  // Clean up find interaction controller
   if (findInteractionController_) {
     findInteractionController_->dispose();
     findInteractionController_.reset();
   }
 
-  // Clean up context menu references
   if (pending_context_menu_ != nullptr) {
     g_object_unref(pending_context_menu_);
     pending_context_menu_ = nullptr;
@@ -387,7 +376,6 @@ InAppWebView::~InAppWebView() {
     pending_hit_test_result_ = nullptr;
   }
 
-  // Clean up last hit test result from mouse-target-changed
   if (last_hit_test_result_ != nullptr) {
     g_object_unref(last_hit_test_result_);
     last_hit_test_result_ = nullptr;
@@ -402,7 +390,6 @@ InAppWebView::~InAppWebView() {
     download_started_handler_id_ = 0;
   }
 
-  // Clean up WebMessageChannels
   for (auto& pair : web_message_channels_) {
     if (pair.second) {
       pair.second->dispose();
@@ -410,7 +397,6 @@ InAppWebView::~InAppWebView() {
   }
   web_message_channels_.clear();
 
-  // Clean up WebMessageListeners
   for (auto& pair : web_message_listeners_) {
     if (pair.second) {
       pair.second->dispose();
@@ -427,7 +413,6 @@ InAppWebView::~InAppWebView() {
   // The ContentBlockerHandler destructor calls removeAllFilters which needs a valid content manager
   content_blocker_handler_.reset();
 
-  // Clean up pending policy decisions
   for (auto& pair : pending_policy_decisions_) {
     webkit_policy_decision_ignore(pair.second);
     g_object_unref(pair.second);
@@ -450,12 +435,10 @@ InAppWebView::~InAppWebView() {
     scale_changed_handler_ = 0;
   }
   
-  // 2. Release focus from the view
   if (wpe_view_ != nullptr) {
     wpe_view_focus_out(wpe_view_);
   }
   
-  // 3. Unmap the view to stop rendering
   if (wpe_view_ != nullptr) {
     wpe_view_unmap(wpe_view_);
   }
@@ -486,32 +469,25 @@ InAppWebView::~InAppWebView() {
     current_buffer_height_ = 0;
   }
   
-  // 5. Signal that the view is closing (before webview destruction)
   if (wpe_view_ != nullptr) {
     wpe_view_closed(wpe_view_);
   }
   
-  // 6. Clear view and toplevel references (before webview destruction)
   wpe_view_ = nullptr;
   wpe_toplevel_ = nullptr;
   
-  // 7. Destroy the webview
   if (webview_ != nullptr) {
     g_object_unref(webview_);
     webview_ = nullptr;
   }
   
-  // 8. Finally clean up the display
   if (wpe_display_ != nullptr) {
     g_object_unref(wpe_display_);
     wpe_display_ = nullptr;
   }
   
-  // 9. Clear egl_display_ reference (was owned by WPEDisplay)
   egl_display_ = nullptr;
 #elif defined(HAVE_WPE_BACKEND_LEGACY)
-  // Legacy FDO cleanup
-  // Clean up exported image (use global namespace for C API)
   {
     std::lock_guard<std::mutex> lock(exported_image_mutex_);
     if (exported_image_ != nullptr && exportable_ != nullptr) {
@@ -521,7 +497,6 @@ InAppWebView::~InAppWebView() {
     }
   }
 
-  // Destroy the webview
   if (webview_ != nullptr) {
     g_object_unref(webview_);
     webview_ = nullptr;
@@ -610,7 +585,6 @@ void InAppWebView::InitWpeBackend() {
     }
   }
 
-  // Store the EGL display for later use
   egl_display_ = egl_display;
 
   // Initialize WPE FDO with the EGL display
@@ -649,7 +623,6 @@ void InAppWebView::InitWpeBackend() {
       },
       exportable_);
 
-  // Set initial device scale factor
   wpe_view_backend_dispatch_set_device_scale_factor(wpe_backend_, scale_factor_);
 
   // Set initial activity state
@@ -691,7 +664,6 @@ void InAppWebView::InitWebView(const InAppWebViewCreationParams& params) {
   // Create WebKit settings
   WebKitSettings* settings = webkit_settings_new();
   
-  // Check if incognito mode is enabled
   bool useIncognito = params.initialSettings && params.initialSettings->incognito;
   WebKitNetworkSession* networkSession = nullptr;
   
@@ -700,7 +672,6 @@ void InAppWebView::InitWebView(const InAppWebViewCreationParams& params) {
     debugLog("InAppWebView: Creating WebView with ephemeral (incognito) network session");
   }
   
-  // Get custom WebContext if provided
   WebKitWebContext* webContext = params.webContext;
   
   // Check if we're creating a related webview (for multi-window support)
@@ -901,7 +872,6 @@ void InAppWebView::InitWebView(const InAppWebViewCreationParams& params) {
       return;
     }
 
-    // Apply ITP setting
     if (params.initialSettings != nullptr) {
       WebKitNetworkSession* session = webkit_web_view_get_network_session(webview_);
       if (session != nullptr && params.initialSettings->itpEnabled) {
@@ -917,14 +887,11 @@ void InAppWebView::InitWebView(const InAppWebViewCreationParams& params) {
 
   // === Common initialization (both APIs) ===
   
-  // Set background color
   WebKitColor bg = {1.0, 1.0, 1.0, 1.0};
   webkit_web_view_set_background_color(webview_, &bg);
 
-  // Create user content controller
   user_content_controller_ = std::make_unique<UserContentController>(webview_);
 
-  // Create find interaction controller (channel will be attached later in AttachChannel)
   findInteractionController_ = std::make_unique<FindInteractionController>(this);
 
   // Create content blocker handler for Safari-style content blocking rules
@@ -949,71 +916,32 @@ void InAppWebView::RegisterEventHandlers() {
           return handleScriptMessageWithReply(body, reply);
         });
 
-    // Add plugin scripts based on settings (similar to iOS/Android)
+    // Add plugin scripts based on settings
     // The plugin scripts register their message handlers via messageHandlerNames
     PrepareAndAddUserScripts();
   }
 
-  // Connect to load-changed signal
   g_signal_connect(webview_, "load-changed", G_CALLBACK(OnLoadChanged), this);
-
-  // Connect to decide-policy signal
   g_signal_connect(webview_, "decide-policy", G_CALLBACK(OnDecidePolicy), this);
-
-  // Connect to notify::estimated-load-progress signal
   g_signal_connect(webview_, "notify::estimated-load-progress",
                    G_CALLBACK(OnNotifyEstimatedLoadProgress), this);
-
-  // Connect to notify::title signal
   g_signal_connect(webview_, "notify::title", G_CALLBACK(OnNotifyTitle), this);
-
-  // Connect to notify::uri signal for onUpdateVisitedHistory
   g_signal_connect(webview_, "notify::uri", G_CALLBACK(OnNotifyUri), this);
-
-  // Connect to load-failed signal
   g_signal_connect(webview_, "load-failed", G_CALLBACK(OnLoadFailed), this);
-
-  // Connect to load-failed-with-tls-errors signal
   g_signal_connect(webview_, "load-failed-with-tls-errors", G_CALLBACK(OnLoadFailedWithTlsErrors),
                    this);
-
-  // Connect to close signal
   g_signal_connect(webview_, "close", G_CALLBACK(OnCloseRequest), this);
-
-  // Connect to script-dialog signal
   g_signal_connect(webview_, "script-dialog", G_CALLBACK(OnScriptDialog), this);
-
-  // Connect to permission-request signal
   g_signal_connect(webview_, "permission-request", G_CALLBACK(OnPermissionRequest), this);
-
-  // Connect to authenticate signal
   g_signal_connect(webview_, "authenticate", G_CALLBACK(OnAuthenticate), this);
-
-  // Connect to context-menu signal
   g_signal_connect(webview_, "context-menu", G_CALLBACK(OnContextMenu), this);
-
-  // Connect to context-menu-dismissed signal
   g_signal_connect(webview_, "context-menu-dismissed", G_CALLBACK(OnContextMenuDismissed), this);
-
-  // Connect to enter-fullscreen signal
   g_signal_connect(webview_, "enter-fullscreen", G_CALLBACK(OnEnterFullscreen), this);
-
-  // Connect to leave-fullscreen signal
   g_signal_connect(webview_, "leave-fullscreen", G_CALLBACK(OnLeaveFullscreen), this);
-
-  // Connect to mouse-target-changed for cursor type detection
   g_signal_connect(webview_, "mouse-target-changed", G_CALLBACK(OnMouseTargetChanged), this);
-
-  // Connect to create signal for window.open() / target="_blank"
   g_signal_connect(webview_, "create", G_CALLBACK(OnCreateWebView), this);
-
-  // Connect to web-process-terminated signal for onRenderProcessGone
   g_signal_connect(webview_, "web-process-terminated", G_CALLBACK(OnWebProcessTerminated), this);
-
-  // Connect to run-file-chooser signal for file input handling
   g_signal_connect(webview_, "run-file-chooser", G_CALLBACK(OnRunFileChooser), this);
-
-  // Connect to show-option-menu signal for HTML <select> element handling
   g_signal_connect(webview_, "show-option-menu", G_CALLBACK(OnShowOptionMenu), this);
 
   // Connect to download-started signal on NetworkSession (WPE WebKit 2.40+ API)
@@ -1040,7 +968,6 @@ void InAppWebView::RegisterEventHandlers() {
   g_signal_connect(webview_, "notify::microphone-capture-state",
                    G_CALLBACK(OnNotifyMicrophoneCaptureState), this);
 
-  // Add frame displayed callback (WPE-specific)
   webkit_web_view_add_frame_displayed_callback(
       webview_,
       [](WebKitWebView*, gpointer data) {
@@ -1055,7 +982,6 @@ void InAppWebView::PrepareAndAddUserScripts() {
     return;
   }
 
-  // Check if JavaScript bridge is enabled (matches iOS/Android behavior)
   bool javaScriptBridgeEnabled = java_script_bridge_enabled_;
   if (settings_) {
     javaScriptBridgeEnabled = settings_->javaScriptBridgeEnabled;
@@ -1065,7 +991,7 @@ void InAppWebView::PrepareAndAddUserScripts() {
     return;
   }
 
-  // Get plugin scripts settings (similar to iOS pluginScriptsOriginAllowList/ForMainFrameOnly)
+  // Get plugin scripts settings
   std::optional<std::vector<std::string>> pluginScriptsOriginAllowList = std::nullopt;
   bool pluginScriptsForMainFrameOnly = false;
 
@@ -1155,7 +1081,7 @@ void InAppWebView::PrepareAndAddUserScripts() {
       pluginScriptsOriginAllowList, pluginScriptsForMainFrameOnly);
   user_content_controller_->addPluginScript(std::move(printInterceptionScript));
 
-  // TODO: Add additional plugin scripts as needed, similar to iOS/Android:
+  // TODO: Add additional plugin scripts as needed:
   // - FindTextHighlightJS
   // - etc.
 
@@ -1261,7 +1187,6 @@ void InAppWebView::OnExportDmaBuf(::wpe_fdo_egl_exported_image* image) {
     return;
   }
 
-  // Get image dimensions
   uint32_t img_width = wpe_fdo_egl_exported_image_get_width(image);
   uint32_t img_height = wpe_fdo_egl_exported_image_get_height(image);
 
@@ -1491,7 +1416,6 @@ void InAppWebView::OnWpePlatformBufferRendered(WPEBuffer* buffer) {
     wpe_view_buffer_released(wpe_view_, previous_buffer);
   }
   
-  // Notify Flutter that a new frame is available
   if (buffer_handled && on_frame_available_) {
     on_frame_available_();
   }
@@ -1522,7 +1446,6 @@ void InAppWebView::ReadPixelsFromEglImage(void* egl_image, uint32_t width, uint3
     glGenFramebuffers(1, &fbo_);
   }
 
-  // Bind the EGL image to our texture
   glBindTexture(GL_TEXTURE_2D, readback_texture_);
 
   // Use the OES_EGL_image extension to create texture from EGL image
@@ -1539,11 +1462,9 @@ void InAppWebView::ReadPixelsFromEglImage(void* egl_image, uint32_t width, uint3
     return;
   }
 
-  // Set up FBO to read from texture
   glBindFramebuffer(GL_FRAMEBUFFER, fbo_);
   glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, readback_texture_, 0);
 
-  // Check FBO status
   GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
   if (status != GL_FRAMEBUFFER_COMPLETE) {
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -1551,7 +1472,6 @@ void InAppWebView::ReadPixelsFromEglImage(void* egl_image, uint32_t width, uint3
     return;
   }
 
-  // Read pixels
   size_t buffer_size = width * height * 4;  // RGBA
 
   // Use triple buffering
@@ -1567,14 +1487,12 @@ void InAppWebView::ReadPixelsFromEglImage(void* egl_image, uint32_t width, uint3
 
   glReadPixels(0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, buffer.data.data());
 
-  // Swap buffers
   {
     std::lock_guard<std::mutex> lock(buffer_swap_mutex_);
     read_buffer_index_.store(write_idx, std::memory_order_release);
     write_buffer_index_.store((write_idx + 1) % kNumBuffers, std::memory_order_relaxed);
   }
 
-  // Unbind
   glBindFramebuffer(GL_FRAMEBUFFER, 0);
   glBindTexture(GL_TEXTURE_2D, 0);
 }
@@ -1606,7 +1524,6 @@ void InAppWebView::loadUrl(const std::shared_ptr<URLRequest>& urlRequest) {
   // Create a WebKitURIRequest for more complex requests
   WebKitURIRequest* request = webkit_uri_request_new(urlRequest->url.value().c_str());
 
-  // Set headers
   if (urlRequest->headers.has_value()) {
     SoupMessageHeaders* headers = webkit_uri_request_get_http_headers(request);
     for (const auto& header : urlRequest->headers.value()) {
@@ -1705,7 +1622,6 @@ void InAppWebView::postUrl(const std::string& url, const std::vector<uint8_t>& p
   xhr.onerror = function() {
     console.error('postUrl XHR failed for: )" + escaped_url + R"(');
   };
-  // Decode base64 post data
   var postData = atob(')" + std::string(base64_data) + R"(');
   xhr.send(postData);
 })();
@@ -1810,18 +1726,14 @@ FlValue* InAppWebView::getCopyBackForwardList() const {
     return fl_value_new_null();
   }
 
-  // Get back list, current item, and forward list
   GList* backList = webkit_back_forward_list_get_back_list(bfList);
   WebKitBackForwardListItem* currentItem = webkit_back_forward_list_get_current_item(bfList);
   GList* forwardList = webkit_back_forward_list_get_forward_list(bfList);
 
-  // Calculate current index (size of back list)
   int currentIndex = g_list_length(backList);
 
-  // Build the complete history list
   FlValue* historyList = fl_value_new_list();
 
-  // Add back list items
   for (GList* l = backList; l != nullptr; l = l->next) {
     WebKitBackForwardListItem* item = WEBKIT_BACK_FORWARD_LIST_ITEM(l->data);
 
@@ -1838,7 +1750,6 @@ FlValue* InAppWebView::getCopyBackForwardList() const {
     fl_value_append_take(historyList, itemMap);
   }
 
-  // Add current item
   if (currentItem != nullptr) {
     const gchar* originalUri = webkit_back_forward_list_item_get_original_uri(currentItem);
     const gchar* title = webkit_back_forward_list_item_get_title(currentItem);
@@ -1853,7 +1764,6 @@ FlValue* InAppWebView::getCopyBackForwardList() const {
     fl_value_append_take(historyList, itemMap);
   }
 
-  // Add forward list items
   for (GList* l = forwardList; l != nullptr; l = l->next) {
     WebKitBackForwardListItem* item = WEBKIT_BACK_FORWARD_LIST_ITEM(l->data);
 
@@ -1870,7 +1780,6 @@ FlValue* InAppWebView::getCopyBackForwardList() const {
     fl_value_append_take(historyList, itemMap);
   }
 
-  // Build result map
   return to_fl_map({
     {"list", historyList},
     {"currentIndex", make_fl_value(currentIndex)},
@@ -1939,7 +1848,6 @@ std::optional<SslCertificate> InAppWebView::getCertificate() const {
   GTlsCertificate* certificate = nullptr;
   GTlsCertificateFlags errors = static_cast<GTlsCertificateFlags>(0);
   
-  // Get TLS info - returns FALSE if not HTTPS
   if (!webkit_web_view_get_tls_info(webview_, &certificate, &errors)) {
     return std::nullopt;
   }
@@ -1948,7 +1856,6 @@ std::optional<SslCertificate> InAppWebView::getCertificate() const {
     return std::nullopt;
   }
 
-  // Get the certificate in DER format (X.509)
   GByteArray* der_data = nullptr;
   g_object_get(certificate, "certificate", &der_data, nullptr);
   
@@ -1959,7 +1866,6 @@ std::optional<SslCertificate> InAppWebView::getCertificate() const {
     return std::nullopt;
   }
 
-  // Create certificate data vector
   std::vector<uint8_t> certData(der_data->data, der_data->data + der_data->len);
   g_byte_array_unref(der_data);
   
@@ -2009,7 +1915,7 @@ void InAppWebView::evaluateJavascript(
             data->callback(std::nullopt);
           g_error_free(error);
         } else if (js_result != nullptr) {
-          // Use JSON.stringify on the result via JSC to get proper JSON (like Android)
+          // Use JSON.stringify on the result via JSC to get proper JSON
           JSCContext* context = jsc_value_get_context(js_result);
           g_autoptr(JSCValue) json_stringify = jsc_context_evaluate(
               context,
@@ -2235,7 +2141,7 @@ void InAppWebView::addWebMessageListener(const std::string& jsObjectName,
                            std::to_string(++listener_counter);
 
   // Create the native WebMessageListener with its dedicated channel
-  // This follows the federated plugin pattern (matching iOS/Android)
+  // This follows the federated plugin pattern
   std::set<std::string> originRulesSet(allowedOriginRules.begin(), allowedOriginRules.end());
   auto listener = std::make_unique<WebMessageListener>(
       messenger_, listenerId, jsObjectName, originRulesSet, this);
@@ -3942,7 +3848,7 @@ gboolean InAppWebView::OnDecidePolicy(WebKitWebView* web_view, WebKitPolicyDecis
       
       callback->error = [decision, is_mime_type_supported, self](const std::string& code, const std::string& message) {
         debugLog("Error in onNavigationResponse: " + code + " - " + message);
-        // On error, allow navigation (matching iOS/Android behavior)
+        // On error, allow navigation
         if (!is_mime_type_supported && self->settings_ && self->settings_->useOnDownloadStart) {
           webkit_policy_decision_download(decision);
         } else {
@@ -4037,10 +3943,10 @@ gboolean InAppWebView::OnDecidePolicy(WebKitWebView* web_view, WebKitPolicyDecis
       auto callback = std::make_unique<WebViewChannelDelegate::ShouldOverrideUrlLoadingCallback>();
       
       // CRITICAL: Set error handler to prevent navigation from being blocked on channel errors
-      // This matches iOS/Android behavior where errors result in allowing navigation
+      // Allow navigation on error to prevent page from being stuck
       callback->error = [self, decision_id](const std::string& code, const std::string& message) {
         g_warning("shouldOverrideUrlLoading channel error: %s - %s", code.c_str(), message.c_str());
-        // Allow navigation on error to prevent page from being stuck (consistent with iOS/Android)
+        // Allow navigation on error to prevent page from being stuck
         self->OnShouldOverrideUrlLoadingDecision(decision_id, true);
       };
       
@@ -4192,16 +4098,16 @@ void InAppWebView::OnCloseRequest(WebKitWebView* web_view, gpointer user_data) {
 // WPE WebKit create signal handler - returns WebKitWebView* (not GtkWidget*)
 // 
 // In WPE WebKit, creating a new WebView requires a WebKitWebViewBackend which
-// is tightly coupled with the WPE FDO exportable pipeline. Unlike WebKitGTK or
-// iOS WKWebView, we cannot easily create a related view without the full backend setup.
+// is tightly coupled with the WPE FDO exportable pipeline. Unlike WebKitGTK,
+// we cannot easily create a related view without the full backend setup.
 // 
-// Multi-Window Support (matches iOS pattern)
+// Multi-Window Support
 //
 // When JavaScript calls window.open() or a link has target="_blank", WebKit emits
 // the "create" signal. We must create a new WebView that shares the web process
 // with the parent (for session/cookies) and return it to WebKit.
 //
-// The pattern used here (matching iOS):
+// The pattern used here:
 // 1. Get a window ID from the manager
 // 2. Create a new InAppWebView with the parent webview as "related view"
 // 3. Store the InAppWebView in windowWebViews for later attachment by Dart
@@ -4770,7 +4676,7 @@ gboolean InAppWebView::OnAuthenticate(WebKitWebView* web_view, WebKitAuthenticat
             webkit_authentication_request_authenticate(it->second, credential);
             webkit_credential_free(credential);
           } else {
-            // No saved credential found, cancel (matches iOS behavior)
+            // No saved credential found, cancel
             webkit_authentication_request_cancel(it->second);
           }
           break;
@@ -7836,7 +7742,7 @@ void InAppWebView::dispatchPlatformReady() {
 }
 
 void InAppWebView::initializeWindowIdJS() {
-  // Match iOS: initializeWindowIdJS()
+  // Initialize Window ID for JS
   // Injects JavaScript to set the window ID variable for multi-window support
   if (!window_id_.has_value()) {
     return;
@@ -7845,8 +7751,6 @@ void InAppWebView::initializeWindowIdJS() {
   int64_t windowId = window_id_.value();
 
   // Build the JavaScript to initialize the window ID
-  // Match iOS: WindowIdJS.WINDOW_ID_INITIALIZE_JS_SOURCE().replacingOccurrences(of:
-  // VAR_PLACEHOLDER_VALUE, with: String(windowId))
   std::string script = R"JS(
 (function() {
     )JS" + JavaScriptBridgeJS::WINDOW_ID_VARIABLE_JS_SOURCE() +

@@ -5,7 +5,6 @@
 namespace flutter_inappwebview_plugin {
 
 // Convert HttpAuthScheme to the string values expected by the platform interface
-// These match iOS/macOS NSURLAuthenticationMethod constants
 static std::optional<std::string> authSchemeToString(HttpAuthScheme scheme) {
   switch (scheme) {
     case HttpAuthScheme::DEFAULT:

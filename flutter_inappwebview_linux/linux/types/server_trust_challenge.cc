@@ -98,7 +98,7 @@ FlValue* ServerTrustURLProtectionSpace::toFlValue() const {
       {"protocol", make_fl_value(protocol)},
       {"sslCertificate", sslCertificate ? sslCertificate->toFlValue() : fl_value_new_null()},
       {"sslError", sslError ? sslError->toFlValue() : fl_value_new_null()},
-      // Include authenticationMethod as SERVER_TRUST for consistency with iOS
+      // Include authenticationMethod as SERVER_TRUST
       {"authenticationMethod", make_fl_value(std::string("NSURLAuthenticationMethodServerTrust"))},
   });
 }

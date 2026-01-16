@@ -20,11 +20,9 @@ InAppWebViewManager::InAppWebViewManager(PluginInstance* plugin)
   texture_registrar_ = plugin->textureRegistrar();
   messenger_ = plugin->messenger();
 
-  // Cache the GTK window and FlView from the plugin instance
   gtk_window_ = plugin->gtkWindow();
   fl_view_ = plugin->flView();
 
-  // Create the method channel
   g_autoptr(FlStandardMethodCodec) codec = fl_standard_method_codec_new();
   method_channel_ = fl_method_channel_new(messenger_, METHOD_CHANNEL_NAME, FL_METHOD_CODEC(codec));
 
@@ -36,13 +34,10 @@ FlPluginRegistrar* InAppWebViewManager::registrar() const {
 }
 
 InAppWebViewManager::~InAppWebViewManager() {
-  // Clean up all platform views
   platform_views_.clear();
   
-  // Clean up keep-alive webviews
   keepAliveWebViews_.clear();
   
-  // Clean up window webviews (popup windows)
   windowWebViews_.clear();
 
   if (method_channel_ != nullptr) {
@@ -163,22 +158,18 @@ void InAppWebViewManager::CreateInAppWebView(FlMethodCall* method_call) {
     return;
   }
 
-  // Parse keepAliveId first to check for existing keep-alive WebView
   std::string keepAliveId;
   auto keepAliveIdOpt = get_optional_fl_map_value<std::string>(args, "keepAliveId");
   if (keepAliveIdOpt.has_value()) {
     keepAliveId = keepAliveIdOpt.value();
   }
 
-  // Check if we already have a keep-alive WebView with this ID
   if (!keepAliveId.empty()) {
     auto existingView = TakeKeepAliveWebView(keepAliveId);
     if (existingView != nullptr) {
-      // Reuse existing WebView - get its texture ID and store back in platform_views_
       int64_t texture_id = existingView->texture_id();
       platform_views_[texture_id] = std::move(existingView);
       
-      // Return the texture ID to Flutter
       g_autoptr(FlValue) result = make_fl_value(texture_id);
       fl_method_call_respond_success(method_call, result, nullptr);
       return;
@@ -192,7 +183,6 @@ void InAppWebViewManager::CreateInAppWebView(FlMethodCall* method_call) {
   params.flView = fl_view_;  // Pass the cached FlView for focus restoration
   params.manager = this;  // Pass manager for multi-window support
 
-  // Parse initial settings
   FlValue* initial_settings = fl_value_lookup_string(args, "initialSettings");
   if (initial_settings != nullptr && fl_value_get_type(initial_settings) == FL_VALUE_TYPE_MAP) {
     params.initialSettings = std::make_shared<InAppWebViewSettings>(initial_settings);
@@ -200,14 +190,12 @@ void InAppWebViewManager::CreateInAppWebView(FlMethodCall* method_call) {
     params.initialSettings = std::make_shared<InAppWebViewSettings>();
   }
 
-  // Parse initial URL request
   FlValue* initial_url_request = fl_value_lookup_string(args, "initialUrlRequest");
   if (initial_url_request != nullptr &&
       fl_value_get_type(initial_url_request) == FL_VALUE_TYPE_MAP) {
     params.initialUrlRequest = std::make_shared<URLRequest>(initial_url_request);
   }
 
-  // Parse initial data
   FlValue* initial_data = fl_value_lookup_string(args, "initialData");
   if (initial_data != nullptr && fl_value_get_type(initial_data) == FL_VALUE_TYPE_MAP) {
     params.initialData = get_fl_map_value<std::string>(initial_data, "data", "");
@@ -216,19 +204,16 @@ void InAppWebViewManager::CreateInAppWebView(FlMethodCall* method_call) {
     params.initialDataEncoding = get_fl_map_value<std::string>(initial_data, "encoding", "");
   }
 
-  // Parse initial file
   FlValue* initial_file = fl_value_lookup_string(args, "initialFile");
   if (initial_file != nullptr && fl_value_get_type(initial_file) == FL_VALUE_TYPE_STRING) {
     params.initialFile = std::string(fl_value_get_string(initial_file));
   }
 
-  // Parse context menu
   FlValue* context_menu = fl_value_lookup_string(args, "contextMenu");
   if (context_menu != nullptr && fl_value_get_type(context_menu) == FL_VALUE_TYPE_MAP) {
     params.contextMenu = std::make_shared<ContextMenu>(context_menu);
   }
 
-  // Parse initial user scripts
   FlValue* initial_user_scripts = fl_value_lookup_string(args, "initialUserScripts");
   if (initial_user_scripts != nullptr && fl_value_get_type(initial_user_scripts) == FL_VALUE_TYPE_LIST) {
     size_t count = fl_value_get_length(initial_user_scripts);
@@ -240,7 +225,6 @@ void InAppWebViewManager::CreateInAppWebView(FlMethodCall* method_call) {
     }
   }
 
-  // Parse webViewEnvironmentId and look up the custom WebKitWebContext
   auto webViewEnvironmentIdOpt = get_optional_fl_map_value<std::string>(args, "webViewEnvironmentId");
   if (webViewEnvironmentIdOpt.has_value() && !webViewEnvironmentIdOpt->empty()) {
     WebViewEnvironment* webViewEnv = plugin_ ? plugin_->webViewEnvironment : nullptr;
@@ -256,23 +240,19 @@ void InAppWebViewManager::CreateInAppWebView(FlMethodCall* method_call) {
     }
   }
 
-  // Create the InAppWebView
   auto webview = std::make_shared<InAppWebView>(registrar_, messenger_, params.id, params);
 
-  // Create the CustomPlatformView which handles textures and input
   auto platform_view =
       std::make_unique<CustomPlatformView>(messenger_, texture_registrar_, webview);
 
   int64_t texture_id = platform_view->texture_id();
 
-  // Set the keepAliveId on the platform view if provided
   if (!keepAliveId.empty()) {
     platform_view->set_keep_alive_id(keepAliveId);
   }
 
   platform_views_[texture_id] = std::move(platform_view);
 
-  // Return the texture ID to Flutter
   g_autoptr(FlValue) result = make_fl_value(texture_id);
   fl_method_call_respond_success(method_call, result, nullptr);
 }
@@ -281,15 +261,12 @@ void InAppWebViewManager::DisposeWebView(int64_t texture_id) {
   auto it = platform_views_.find(texture_id);
   if (it != platform_views_.end()) {
     auto& view = it->second;
-    // Check if this is a keep-alive WebView
     if (view && view->has_keep_alive_id()) {
-      // Store in keep-alive map instead of destroying
       std::string keepAliveId = view->keep_alive_id();
       StoreKeepAliveWebView(keepAliveId, std::move(view));
       platform_views_.erase(it);
       return;
     }
-    // Not a keep-alive WebView, just destroy it
     platform_views_.erase(it);
   }
 }
@@ -315,7 +292,6 @@ void InAppWebViewManager::RemoveWindowWebView(int64_t windowId) {
 }
 
 void InAppWebViewManager::ClearAllCache(FlMethodCall* method_call, bool includeDiskFiles) {
-  // Get the default website data manager
   WebKitNetworkSession* session = webkit_network_session_get_default();
   if (session == nullptr) {
     fl_method_call_respond_success(method_call, fl_value_new_bool(FALSE), nullptr);
@@ -328,14 +304,12 @@ void InAppWebViewManager::ClearAllCache(FlMethodCall* method_call, bool includeD
     return;
   }
 
-  // Build the data types to clear
   WebKitWebsiteDataTypes types = WEBKIT_WEBSITE_DATA_MEMORY_CACHE;
   if (includeDiskFiles) {
     types = static_cast<WebKitWebsiteDataTypes>(types | WEBKIT_WEBSITE_DATA_DISK_CACHE);
     types = static_cast<WebKitWebsiteDataTypes>(types | WEBKIT_WEBSITE_DATA_OFFLINE_APPLICATION_CACHE);
   }
 
-  // Store method_call reference for async callback
   g_object_ref(method_call);
 
   webkit_website_data_manager_clear(
@@ -394,7 +368,6 @@ std::unique_ptr<CustomPlatformView> InAppWebViewManager::TakeKeepAliveWebView(co
 void InAppWebViewManager::DisposeKeepAlive(const std::string& keepAliveId) {
   auto it = keepAliveWebViews_.find(keepAliveId);
   if (it != keepAliveWebViews_.end()) {
-    // The unique_ptr destructor will clean up the WebView resources
     keepAliveWebViews_.erase(it);
   }
   

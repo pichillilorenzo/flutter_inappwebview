@@ -422,6 +422,13 @@ class InAppWebView {
   // Check if WPE WebKit is available on the system
   static bool IsWpeWebKitAvailable();
 
+#ifdef HAVE_WPE_PLATFORM
+  // Check if DMA-BUF rendering should be used
+  // Returns true if DMA-BUF rendering is expected to work, false if SHM should be used
+  // Note: Environment detection is done at plugin registration via utils/software_rendering.h
+  static bool PreflightDmaBufSupport();
+#endif
+
   // === Multi-Window Support (matches iOS) ===
 
   // Set the window ID for this webview (used in window.open scenarios)

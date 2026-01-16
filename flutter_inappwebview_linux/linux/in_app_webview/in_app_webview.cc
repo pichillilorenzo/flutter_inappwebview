@@ -29,6 +29,7 @@
 #ifdef HAVE_WPE_PLATFORM
 #include <wpe/wpe-platform.h>
 #include <wpe/headless/wpe-headless.h>
+#include <wpe/WPEBufferSHM.h>  // For SHM software rendering fallback
 #endif
 
 // WPEBackend-FDO API (legacy)
@@ -516,6 +517,21 @@ void InAppWebView::InitWpeBackend() {
 
 #ifdef HAVE_WPE_PLATFORM
   // === WPEPlatform API (Modern) ===
+  
+  // Check if force software rendering is enabled
+  // This must be done BEFORE creating WPEDisplay so that WebKit uses SHM buffers
+  static bool force_sw_init_done = false;
+  if (!force_sw_init_done) {
+    force_sw_init_done = true;
+    const char* force_sw = getenv("FLUTTER_INAPPWEBVIEW_FORCE_SOFTWARE_RENDERING");
+    if (force_sw && (strcmp(force_sw, "1") == 0 || strcasecmp(force_sw, "true") == 0)) {
+      // Set LIBGL_ALWAYS_SOFTWARE to make WPEDisplay report no DRM device
+      // This forces WebKit to use SHM buffers instead of DMA-BUF
+      setenv("LIBGL_ALWAYS_SOFTWARE", "1", 0);  // Don't override if already set
+      g_print("[InAppWebView] Force software rendering: setting LIBGL_ALWAYS_SOFTWARE=1\n");
+    }
+  }
+  
   // Create a headless display for offscreen rendering
   GError* error = nullptr;
   
@@ -1237,11 +1253,34 @@ void InAppWebView::OnWpePlatformBufferRendered(WPEBuffer* buffer) {
     return;
   }
   
+  // Check if force software rendering is enabled for testing
+  static bool force_software_checked = false;
+  static bool force_software_rendering = false;
+  if (!force_software_checked) {
+    force_software_checked = true;
+    const char* env = getenv("FLUTTER_INAPPWEBVIEW_FORCE_SOFTWARE_RENDERING");
+    if (env && (strcmp(env, "1") == 0 || strcasecmp(env, "true") == 0)) {
+      force_software_rendering = true;
+      g_print("[InAppWebView] Force software rendering enabled\n");
+    }
+  }
+  
   // Get buffer dimensions
   uint32_t buf_width = static_cast<uint32_t>(wpe_buffer_get_width(buffer));
   uint32_t buf_height = static_cast<uint32_t>(wpe_buffer_get_height(buffer));
   
+  // Detect buffer type for diagnostics
+  bool is_shm_buffer = WPE_IS_BUFFER_SHM(buffer);
+  static bool first_buffer_logged = false;
+  if (!first_buffer_logged) {
+    first_buffer_logged = true;
+    g_print("[InAppWebView] Buffer type: %s, size: %ux%u\n", 
+            is_shm_buffer ? "SHM (software)" : "DMA-BUF (hardware)", 
+            buf_width, buf_height);
+  }
+  
   WPEBuffer* previous_buffer = nullptr;
+  bool buffer_handled = false;
   
   {
     std::lock_guard<std::mutex> lock(wpe_buffer_mutex_);
@@ -1263,21 +1302,83 @@ void InAppWebView::OnWpePlatformBufferRendered(WPEBuffer* buffer) {
       current_egl_image_ = nullptr;
     }
     
-    // Import the buffer to an EGL image for zero-copy rendering
-    GError* error = nullptr;
-    void* egl_image = wpe_buffer_import_to_egl_image(buffer, &error);
-    
-    if (egl_image != nullptr) {
-      current_egl_image_ = egl_image;
-      current_buffer_width_ = buf_width;
-      current_buffer_height_ = buf_height;
-    } else {
-      // EGL image import failed, try pixel readback as fallback
-      if (error != nullptr) {
-        g_clear_error(&error);
-      }
+    // === Priority 1: Try EGL image import (zero-copy, best performance) ===
+    // Skip if force_software_rendering is enabled for testing
+    if (!force_software_rendering && egl_display_ != nullptr) {
+      GError* error = nullptr;
+      void* egl_image = wpe_buffer_import_to_egl_image(buffer, &error);
       
-      // Try to import to pixels for software rendering fallback
+      if (egl_image != nullptr) {
+        current_egl_image_ = egl_image;
+        current_buffer_width_ = buf_width;
+        current_buffer_height_ = buf_height;
+        buffer_handled = true;
+        static bool logged_egl = false;
+        if (!logged_egl) {
+          logged_egl = true;
+          g_print("[InAppWebView] Rendering via EGL image (zero-copy GPU)\n");
+        }
+      } else {
+        if (error != nullptr) {
+          static bool logged_egl_fail = false;
+          if (!logged_egl_fail) {
+            logged_egl_fail = true;
+            g_print("[InAppWebView] EGL image import failed: %s\n", error->message);
+          }
+          g_clear_error(&error);
+        }
+      }
+    }
+    
+    // === Priority 2: Direct SHM buffer access (no GBM required) ===
+    // WPEBufferSHM provides direct pixel access without requiring GBM device
+    if (!buffer_handled && WPE_IS_BUFFER_SHM(buffer)) {
+      WPEBufferSHM* shm_buffer = WPE_BUFFER_SHM(buffer);
+      GBytes* data = wpe_buffer_shm_get_data(shm_buffer);
+      
+      if (data != nullptr) {
+        guint stride = wpe_buffer_shm_get_stride(shm_buffer);
+        WPEPixelFormat format = wpe_buffer_shm_get_format(shm_buffer);
+        
+        gsize size;
+        const uint8_t* pixels = static_cast<const uint8_t*>(g_bytes_get_data(data, &size));
+        
+        if (pixels != nullptr && size > 0) {
+          // Store in pixel buffer for software rendering
+          size_t write_idx = write_buffer_index_.load(std::memory_order_relaxed);
+          auto& pixel_buffer = pixel_buffers_[write_idx];
+          
+          if (pixel_buffer.data.size() != size) {
+            pixel_buffer.data.resize(size);
+          }
+          memcpy(pixel_buffer.data.data(), pixels, size);
+          pixel_buffer.width = buf_width;
+          pixel_buffer.height = buf_height;
+          
+          // Swap buffers
+          {
+            std::lock_guard<std::mutex> swap_lock(buffer_swap_mutex_);
+            read_buffer_index_.store(write_idx, std::memory_order_release);
+            write_buffer_index_.store((write_idx + 1) % kNumBuffers, std::memory_order_relaxed);
+          }
+          
+          current_buffer_width_ = buf_width;
+          current_buffer_height_ = buf_height;
+          buffer_handled = true;
+          static bool logged_shm = false;
+          if (!logged_shm) {
+            logged_shm = true;
+            g_print("[InAppWebView] Rendering via SHM (direct software), format=%d, stride=%u\n",
+                    static_cast<int>(format), stride);
+          }
+        }
+        // Note: Don't unref data - it's borrowed from the buffer
+      }
+    }
+    
+    // === Priority 3: Generic pixel import (works for DMA-BUF with GBM device) ===
+    if (!buffer_handled) {
+      GError* error = nullptr;
       GBytes* pixels = wpe_buffer_import_to_pixels(buffer, &error);
       if (pixels != nullptr) {
         gsize size;
@@ -1304,12 +1405,29 @@ void InAppWebView::OnWpePlatformBufferRendered(WPEBuffer* buffer) {
         g_bytes_unref(pixels);
         current_buffer_width_ = buf_width;
         current_buffer_height_ = buf_height;
+        buffer_handled = true;
+        static bool logged_gbm = false;
+        if (!logged_gbm) {
+          logged_gbm = true;
+          g_print("[InAppWebView] Rendering via pixel import (GBM readback)\n");
+        }
       } else {
         if (error != nullptr) {
-          errorLog("InAppWebView: Failed to import buffer to pixels: " + 
-                   std::string(error->message));
+          static bool logged_gbm_fail = false;
+          if (!logged_gbm_fail) {
+            logged_gbm_fail = true;
+            g_print("[InAppWebView] Pixel import (GBM) failed: %s\n", error->message);
+          }
           g_clear_error(&error);
         }
+      }
+    }
+    
+    if (!buffer_handled) {
+      static bool logged_no_method = false;
+      if (!logged_no_method) {
+        logged_no_method = true;
+        g_print("[InAppWebView] ERROR: No rendering method succeeded!\n");
       }
     }
     
@@ -1321,12 +1439,12 @@ void InAppWebView::OnWpePlatformBufferRendered(WPEBuffer* buffer) {
   // Release the PREVIOUS buffer now that we have a new one
   // The previous EGL image has been destroyed and we have a new frame,
   // so it's safe to let WPE reuse the old buffer's memory
-  if (previous_buffer != nullptr && wpe_view_ != nullptr) {
+  if (previous_buffer != nullptr && wpe_view_ != nullptr && WPE_IS_BUFFER(previous_buffer)) {
     wpe_view_buffer_released(wpe_view_, previous_buffer);
   }
   
   // Notify Flutter that a new frame is available
-  if (on_frame_available_) {
+  if (buffer_handled && on_frame_available_) {
     on_frame_available_();
   }
 }
@@ -1520,7 +1638,7 @@ void InAppWebView::postUrl(const std::string& url, const std::vector<uint8_t>& p
   std::string escaped_url = url;
   replace_all(escaped_url, "\\", "\\\\");
   replace_all(escaped_url, "'", "\\'");
-  replace_all(escaped_url, "\n", "\\n");
+  replace_all(escaped_url, "\n", "\n");
   replace_all(escaped_url, "\r", "\\r");
 
   // Create JavaScript that performs the POST request and loads the result
@@ -1950,7 +2068,7 @@ void InAppWebView::callAsyncJavaScript(
             switch (c) {
               case '"': escaped_error += "\\\""; break;
               case '\\': escaped_error += "\\\\"; break;
-              case '\n': escaped_error += "\\n"; break;
+              case '\n': escaped_error += "\n"; break;
               case '\r': escaped_error += "\\r"; break;
               case '\t': escaped_error += "\\t"; break;
               default: escaped_error += c; break;
@@ -2009,7 +2127,7 @@ void InAppWebView::injectCSSCode(const std::string& source) {
   }
   pos = 0;
   while ((pos = escaped_source.find("\n", pos)) != std::string::npos) {
-    escaped_source.replace(pos, 1, "\\n");
+    escaped_source.replace(pos, 1, "\n");
     pos += 2;
   }
 
@@ -2227,7 +2345,7 @@ void InAppWebView::postWebMessage(const std::string& messageData,
       switch (c) {
         case '\\': escaped += "\\\\"; break;
         case '"': escaped += "\\\""; break;
-        case '\n': escaped += "\\n"; break;
+        case '\n': escaped += "\n"; break;
         case '\r': escaped += "\\r"; break;
         case '\t': escaped += "\\t"; break;
         default: escaped += c; break;
@@ -2265,7 +2383,7 @@ void InAppWebView::postWebMessageOnPort(const std::string& channelId, int portIn
       switch (c) {
         case '\\': escaped += "\\\\"; break;
         case '"': escaped += "\\\""; break;
-        case '\n': escaped += "\\n"; break;
+        case '\n': escaped += "\n"; break;
         case '\r': escaped += "\\r"; break;
         case '\t': escaped += "\\t"; break;
         default: escaped += c; break;
@@ -6274,7 +6392,7 @@ void InAppWebView::pasteFromClipboard() {
         switch (*p) {
           case '\\': escaped += "\\\\"; break;
           case '"': escaped += "\\\""; break;
-          case '\n': escaped += "\\n"; break;
+          case '\n': escaped += "\n"; break;
           case '\r': escaped += "\\r"; break;
           case '\t': escaped += "\\t"; break;
           default: escaped += *p; break;
@@ -6315,7 +6433,7 @@ void InAppWebView::copyTextToClipboard(const std::string& text) {
       switch (c) {
         case '\\': escaped += "\\\\"; break;
         case '"': escaped += "\\\""; break;
-        case '\n': escaped += "\\n"; break;
+        case '\n': escaped += "\n"; break;
         case '\r': escaped += "\\r"; break;
         case '\t': escaped += "\\t"; break;
         case '`': escaped += "\\`"; break;
@@ -6368,7 +6486,7 @@ void InAppWebView::pasteAsPlainText() {
         switch (*p) {
           case '\\': escaped += "\\\\"; break;
           case '"': escaped += "\\\""; break;
-          case '\n': escaped += "\\n"; break;
+          case '\n': escaped += "\n"; break;
           case '\r': escaped += "\\r"; break;
           case '\t': escaped += "\\t"; break;
           default: escaped += *p; break;

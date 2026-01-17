@@ -107,6 +107,7 @@ export 'permission_response.dart'
     show PermissionResponse, PermissionRequestResponse;
 export 'permission_response_action.dart'
     show PermissionResponseAction, PermissionRequestResponseAction;
+export 'preferred_color_scheme.dart' show PreferredColorScheme;
 export 'print_job_attributes.dart' show PrintJobAttributes;
 export 'print_job_color_mode.dart' show PrintJobColorMode;
 export 'print_job_duplex_mode.dart' show PrintJobDuplexMode;

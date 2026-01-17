@@ -162,14 +162,16 @@ bool ShouldUseSoftwareRendering() {
     debugLog("Known good GPU driver found, using hardware rendering");
     return false;
   }
+
+  const bool in_vm = IsRunningInVirtualMachine();
   
   // Detect VM environment
-  if (IsRunningInVirtualMachine()) {
+  if (in_vm) {
     return true;
   }
   
-  // Detect problematic GPU drivers
-  if (HasProblematicGpuDriver()) {
+  // Detect problematic GPU drivers only inside a VM
+  if (in_vm && HasProblematicGpuDriver()) {
     return true;
   }
   

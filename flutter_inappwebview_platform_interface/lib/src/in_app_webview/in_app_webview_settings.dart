@@ -14,6 +14,7 @@ import '../types/layout_algorithm.dart';
 import '../types/mixed_content_mode.dart';
 import '../types/over_scroll_mode.dart';
 import '../types/pdf_toolbar_items.dart';
+import '../types/preferred_color_scheme.dart';
 import '../types/referrer_policy.dart';
 import '../types/renderer_priority_policy.dart';
 import '../types/sandbox.dart';
@@ -2495,6 +2496,26 @@ as it can cause framerate drops on animations in Android 9 and lower (see [Hybri
   @SupportedPlatforms(platforms: [WindowsPlatform()])
   bool? handleAcceleratorKeyPressed;
 
+  ///Sets the preferred color scheme for the WebView2 profile.
+  ///
+  ///This value is profile-scoped and persisted. All WebViews that share the
+  ///same profile observe the same value, and the last update wins. It affects
+  ///WebView2 UI and CSS `prefers-color-scheme` evaluation.
+  ///
+  ///When omitted, the profile's persisted value is preserved. New profiles
+  ///default to [PreferredColorScheme.AUTO].
+  @SupportedPlatforms(
+    platforms: [
+      WindowsPlatform(
+        available: '1.0.1210.39',
+        apiName: "ICoreWebView2Profile.PreferredColorScheme",
+        apiUrl:
+            'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2profile#get_preferredcolorscheme',
+      ),
+    ],
+  )
+  PreferredColorScheme_? preferredColorScheme;
+
   ///The view’s alpha value. The value of this property is a floating-point number
   ///in the range 0.0 to 1.0, where 0.0 represents totally transparent and 1.0 represents totally opaque.
   @SupportedPlatforms(
@@ -3435,6 +3456,7 @@ as it can cause framerate drops on animations in Android 9 and lower (see [Hybri
     this.nonClientRegionSupportEnabled = false,
     this.isUserInteractionEnabled = true,
     this.handleAcceleratorKeyPressed = false,
+    this.preferredColorScheme,
     this.alpha,
     this.useOnShowFileChooser,
     this.iframeAllow,

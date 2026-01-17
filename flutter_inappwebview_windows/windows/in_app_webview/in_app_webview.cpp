@@ -278,6 +278,16 @@ namespace flutter_inappwebview_plugin
       }
     }
 
+    // PreferredColorScheme is persisted and shared by the WebView2 profile.
+    if (auto webView13 = webView.try_query<ICoreWebView2_13>()) {
+      if (settings->preferredColorScheme.has_value()) {
+        wil::com_ptr<ICoreWebView2Profile> profile;
+        if (succeededOrLog(webView13->get_Profile(&profile)) && profile) {
+          failedLog(profile->put_PreferredColorScheme(static_cast<COREWEBVIEW2_PREFERRED_COLOR_SCHEME>(settings->preferredColorScheme.value())));
+        }
+      }
+    }
+
     // required to make Runtime events work
     failedLog(webView->CallDevToolsProtocolMethod(L"Runtime.enable", L"{}", Callback<ICoreWebView2CallDevToolsProtocolMethodCompletedHandler>(
       [this](HRESULT errorCode, LPCWSTR returnObjectAsJson)
@@ -3052,6 +3062,18 @@ namespace flutter_inappwebview_plugin
       if (fl_map_contains_not_null(newSettingsMap, "transparentBackground") && settings->transparentBackground != newSettings->transparentBackground) {
         BYTE alpha = newSettings->transparentBackground ? 0 : 255;
         webViewController2->put_DefaultBackgroundColor({ alpha, 255, 255, 255 });
+      }
+    }
+
+    // Updating one WebView changes every WebView that shares this profile.
+    if (auto webView13 = webView.try_query<ICoreWebView2_13>()) {
+      if (fl_map_contains_not_null(newSettingsMap, "preferredColorScheme") && settings->preferredColorScheme != newSettings->preferredColorScheme) {
+        wil::com_ptr<ICoreWebView2Profile> profile;
+        if (succeededOrLog(webView13->get_Profile(&profile)) && profile) {
+          if (newSettings->preferredColorScheme.has_value()) {
+            failedLog(profile->put_PreferredColorScheme(static_cast<COREWEBVIEW2_PREFERRED_COLOR_SCHEME>(newSettings->preferredColorScheme.value())));
+          }
+        }
       }
     }
 

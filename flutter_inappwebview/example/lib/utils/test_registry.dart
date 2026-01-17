@@ -68,9 +68,7 @@ class TestRegistry {
           } catch (e) {
             return TestResult(
               duration: const Duration(milliseconds: 100),
-
               passed: false,
-
               message: 'Failed: ${e.toString()}',
             );
           }
@@ -91,7 +89,6 @@ class TestRegistry {
             return TestResult(
               duration: const Duration(milliseconds: 100),
               passed: true,
-
               message: 'Current URL retrieved',
             );
           } catch (e) {
@@ -118,7 +115,6 @@ class TestRegistry {
             return TestResult(
               duration: const Duration(milliseconds: 100),
               passed: true,
-
               message: 'Navigated back successfully',
             );
           } catch (e) {
@@ -145,7 +141,6 @@ class TestRegistry {
             return TestResult(
               duration: const Duration(milliseconds: 100),
               passed: true,
-
               message: 'URL loaded successfully',
             );
           } catch (e) {
@@ -172,17 +167,13 @@ class TestRegistry {
           try {
             return TestResult(
               duration: const Duration(milliseconds: 100),
-
               passed: true,
-
               message: 'JavaScript evaluated: 1 + 1 = 2',
             );
           } catch (e) {
             return TestResult(
               duration: const Duration(milliseconds: 100),
-
               passed: false,
-
               message: 'Failed: ${e.toString()}',
             );
           }
@@ -202,17 +193,13 @@ class TestRegistry {
           try {
             return TestResult(
               duration: const Duration(milliseconds: 100),
-
               passed: true,
-
               message: 'Handler added successfully',
             );
           } catch (e) {
             return TestResult(
               duration: const Duration(milliseconds: 100),
-
               passed: false,
-
               message: 'Failed: ${e.toString()}',
             );
           }
@@ -233,17 +220,13 @@ class TestRegistry {
           try {
             return TestResult(
               duration: const Duration(milliseconds: 100),
-
               passed: true,
-
               message: 'Page title retrieved',
             );
           } catch (e) {
             return TestResult(
               duration: const Duration(milliseconds: 100),
-
               passed: false,
-
               message: 'Failed: ${e.toString()}',
             );
           }
@@ -263,17 +246,13 @@ class TestRegistry {
           try {
             return TestResult(
               duration: const Duration(milliseconds: 100),
-
               passed: true,
-
               message: 'HTML content retrieved',
             );
           } catch (e) {
             return TestResult(
               duration: const Duration(milliseconds: 100),
-
               passed: false,
-
               message: 'Failed: ${e.toString()}',
             );
           }
@@ -299,17 +278,13 @@ class TestRegistry {
             );
             return TestResult(
               duration: const Duration(milliseconds: 100),
-
               passed: true,
-
               message: 'Cookie set successfully',
             );
           } catch (e) {
             return TestResult(
               duration: const Duration(milliseconds: 100),
-
               passed: false,
-
               message: 'Failed: ${e.toString()}',
             );
           }
@@ -332,17 +307,13 @@ class TestRegistry {
             );
             return TestResult(
               duration: const Duration(milliseconds: 100),
-
               passed: true,
-
               message: 'Retrieved ${cookies.length} cookies',
             );
           } catch (e) {
             return TestResult(
               duration: const Duration(milliseconds: 100),
-
               passed: false,
-
               message: 'Failed: ${e.toString()}',
             );
           }
@@ -363,17 +334,13 @@ class TestRegistry {
           try {
             return TestResult(
               duration: const Duration(milliseconds: 100),
-
               passed: true,
-
               message: 'Screenshot captured',
             );
           } catch (e) {
             return TestResult(
               duration: const Duration(milliseconds: 100),
-
               passed: false,
-
               message: 'Failed: ${e.toString()}',
             );
           }
@@ -393,17 +360,13 @@ class TestRegistry {
           try {
             return TestResult(
               duration: const Duration(milliseconds: 100),
-
               passed: true,
-
               message: 'Print initiated',
             );
           } catch (e) {
             return TestResult(
               duration: const Duration(milliseconds: 100),
-
               passed: false,
-
               message: 'Failed: ${e.toString()}',
             );
           }
@@ -424,17 +387,13 @@ class TestRegistry {
           try {
             return TestResult(
               duration: const Duration(milliseconds: 100),
-
               passed: true,
-
               message: 'InAppBrowser opened',
             );
           } catch (e) {
             return TestResult(
               duration: const Duration(milliseconds: 100),
-
               passed: false,
-
               message: 'Failed: ${e.toString()}',
             );
           }
@@ -454,17 +413,13 @@ class TestRegistry {
           try {
             return TestResult(
               duration: const Duration(milliseconds: 100),
-
               passed: true,
-
               message: 'Browser opened',
             );
           } catch (e) {
             return TestResult(
               duration: const Duration(milliseconds: 100),
-
               passed: false,
-
               message: 'Failed: ${e.toString()}',
             );
           }

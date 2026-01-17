@@ -72,5 +72,5 @@
     "xtree": "cpp",
     "xutility": "cpp"
   },
-  "dart.flutterSdkPath": ".fvm/versions/3.38.6"
+  "dart.flutterSdkPath": ".fvm/flutter_sdk/bin"
 }

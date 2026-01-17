@@ -11,6 +11,7 @@ import 'package:flutter_inappwebview_example/providers/network_monitor.dart';
 import 'package:flutter_inappwebview_example/screens/home_screen.dart';
 import 'package:flutter_inappwebview_example/screens/category_screen.dart';
 import 'package:flutter_inappwebview_example/screens/platform_info_screen.dart';
+import 'package:flutter_inappwebview_example/screens/webview_tester_screen.dart';
 import 'package:flutter_inappwebview_example/utils/test_registry.dart';
 import 'package:flutter_inappwebview_example/utils/constants.dart';
 
@@ -94,6 +95,13 @@ Drawer buildDrawer({required BuildContext context}) {
           },
         ),
         ListTile(
+          title: Text('WebView Tester'),
+          leading: Icon(Icons.web),
+          onTap: () {
+            Navigator.pushNamed(context, '/webview-tester');
+          },
+        ),
+        ListTile(
           title: Text('Platform Info'),
           leading: Icon(Icons.info_outline),
           onTap: () {
@@ -156,6 +164,7 @@ class _MyAppState extends State<MyApp> {
       routes: {
         '/': (context) => HomeScreen(),
         '/platform-info': (context) => PlatformInfoScreen(),
+        '/webview-tester': (context) => WebViewTesterScreen(),
       },
       onGenerateRoute: (settings) {
         // Handle dynamic category routes

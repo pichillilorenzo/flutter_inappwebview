@@ -1,4 +1,0 @@
----
-version: 1                  # File format version number
-modules:
-- name: _WebKit_SwiftUI

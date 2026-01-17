@@ -33,6 +33,4 @@ flutter_driver_tests.log
 tool/chromedriver
 tool/chromedriver.*
 
-SubAgent_docs/
-flutter_inappwebview_linux/LINUX_IMPLEMENTATION_TASKS.md
-flutter_inappwebview_linux/LinuxImplementationTasks_Appendix.md
+plans/

@@ -4,41 +4,23 @@ applyTo: "flutter_inappwebview_linux/**"
 
 # Linux Platform Implementation Instructions
 
-## 📋 Implementation Task Tracking
-
-**IMPORTANT**: Before implementing any Linux feature, consult the comprehensive task list:
-
-**[LINUX_IMPLEMENTATION_TASKS.md](../flutter_inappwebview_linux/LINUX_IMPLEMENTATION_TASKS.md)**
-
-This file contains:
-- ✅ Current implementation status (~45-50% complete)
-- 🚨 Critical issues that need fixing (multi-window, settings mismatch)
-- 🔍 Verification checklist for "complete" APIs against iOS reference
-- 📝 Detailed tasks for each feature with WPE WebKit API mappings
-- 🎯 Priority order for implementation
-
-### Before Starting Any Task
-
-1. **Check the task file** to see if the feature is already tracked
-2. **Verify "complete" APIs** - many marked ✅ are unverified (⏳)
-3. **Follow the testing guidelines** in the task file
-4. **Update the task file** when you complete or verify work
-
 ## Implemented Dart Classes
-
-Linux implementation is newer and has fewer features than other platforms:
 
 | Class | File | Description |
 |-------|------|-------------|
-| \`LinuxInAppWebViewPlatform\` | \`inappwebview_platform.dart\` | Platform factory - registers Linux implementations |
-| \`LinuxInAppWebView\` | \`in_app_webview/in_app_webview.dart\` | WebView widget using texture |
+| \`LinuxInAppWebViewPlatform\` | \`inappwebview_platform.dart\` | Platform factory - registers all Linux implementations |
+| \`LinuxInAppWebViewWidget\` | \`in_app_webview/in_app_webview.dart\` | WebView widget using texture-based rendering |
 | \`LinuxInAppWebViewController\` | \`in_app_webview/in_app_webview_controller.dart\` | WPE WebKit controller |
 | \`LinuxHeadlessInAppWebView\` | \`in_app_webview/headless_in_app_webview.dart\` | Offscreen WebView |
+| \`LinuxInAppBrowser\` | \`in_app_browser/\` | Full-screen browser |
 | \`LinuxCookieManager\` | \`cookie_manager/\` | WebKit cookie management |
-| \`LinuxFindInteractionController\` | \`find_interaction/\` | Find in page |
 | \`LinuxWebStorageManager\` | \`web_storage/\` | Website data management |
-
-**Not yet implemented**: InAppBrowser, PrintJob, PullToRefresh, WebMessage, HttpAuthCredentialDatabase, ProxyController.
+| \`LinuxFindInteractionController\` | \`find_interaction/\` | Find in page |
+| \`LinuxWebMessageChannel/Port/Listener\` | \`web_message/\` | WKScriptMessageHandler wrapper |
+| \`LinuxJavaScriptReplyProxy\` | \`web_message/\` | JavaScript reply proxy |
+| \`LinuxProxyController\` | \`proxy_controller/\` | Proxy configuration |
+| \`LinuxHttpAuthCredentialDatabase\` | \`http_auth_credentials_database.dart\` | HTTP auth credentials storage |
+| \`LinuxWebViewEnvironment\` | \`webview_environment/\` | WebView environment configuration |
 
 ---
 
@@ -47,12 +29,15 @@ Linux implementation is newer and has fewer features than other platforms:
 \`\`\`
 linux/
 ├── CMakeLists.txt                           # CMake build config (links WPE WebKit)
-├── WPE_BACKEND.md                           # WPE backend setup documentation
 ├── flutter_inappwebview_linux_plugin.cc     # Plugin entry point
 ├── flutter_inappwebview_linux_plugin_private.h
 │
+├── plugin_instance.cc/h                     # Plugin instance management
 ├── cookie_manager.cc/h                      # WebKit cookie manager wrapper
 ├── web_storage_manager.cc/h                 # WebKit website data manager
+├── credential_database.cc/h                 # HTTP auth credentials storage
+├── proxy_manager.cc/h                       # Proxy configuration
+├── webview_environment.cc/h                 # WebView environment configuration
 │
 ├── in_app_webview/                          # Core WPE WebKit implementation
 │   ├── in_app_webview.cc/h                  # Main WebView wrapper (5000+ lines)
@@ -69,11 +54,37 @@ linux/
 │   ├── headless_in_app_webview.cc/h         # Headless WebView implementation
 │   └── headless_in_app_webview_manager.cc/h # Instance management
 │
+├── in_app_browser/                          # Browser implementation
+│   ├── in_app_browser.cc/h                  # Browser window implementation
+│   ├── in_app_browser_manager.cc/h          # Instance management
+│   ├── in_app_browser_settings.cc/h         # Browser settings
+│   └── in_app_browser_channel_delegate.cc/h # Channel communication
+│
+├── find_interaction/                        # Find in page
+│   ├── find_interaction_controller.cc/h     # Find controller
+│   └── find_interaction_channel_delegate.cc/h # Channel communication
+│
+├── web_message/                             # WKScriptMessageHandler implementation
+│   ├── web_message_channel.cc/h             # WebMessageChannel wrapper
+│   ├── web_message_listener.cc/h            # WebMessageListener implementation
+│   └── web_message_listener_channel_delegate.cc/h # Listener channel
+│
+├── content_blocker/                         # Content blocking
+│   └── content_blocker_handler.cc/h         # Content blocker handler
+│
 ├── plugin_scripts_js/                       # Injected JavaScript for bridge
 │   ├── javascript_bridge_js.h               # Core JS bridge
 │   ├── console_log_js.h                     # Console interception
+│   ├── intercept_ajax_request_js.h          # AJAX interception
+│   ├── intercept_fetch_request_js.h         # Fetch API interception
+│   ├── on_load_resource_js.h                # Resource loading tracking
+│   ├── print_interception_js.h              # Print request handling
+│   ├── web_message_listener_js.h            # PostMessage API
+│   ├── web_message_channel_js.h             # WebMessage channel variables
 │   ├── window_id_js.h                       # Window ID management
-│   └── color_input_js.h                     # Color input handling
+│   ├── color_input_js.h                     # Color input handling
+│   ├── date_input_js.h                      # Date input handling
+│   └── cursor_detection_js.h                # Cursor detection for hover states
 │
 ├── utils/                                   # Utility functions
 │   ├── flutter.h                            # FlValue serialization utilities
@@ -84,7 +95,9 @@ linux/
 │   ├── log.h                                # Logging utilities
 │   ├── defer.h                              # RAII cleanup utilities
 │   ├── uuid.h                               # UUID generation
-│   └── util.h                               # General utilities
+│   ├── util.h                               # General utilities
+│   ├── gl_context.h                         # OpenGL context utilities
+│   └── software_rendering.cc/h              # Software rendering fallback
 │
 └── types/                                   # Type definitions
 \`\`\`
@@ -93,14 +106,15 @@ linux/
 
 ## Platform Requirements
 
-- WPE WebKit libraries installed (\`libwpe\`, \`wpebackend-fdo\`, \`wpewebkit\`)
-- See \`linux/WPE_BACKEND.md\` for backend setup documentation
+- **Required**: WPE WebKit libraries (\`libwpe\`, \`wpewebkit\`)
+- **Optional**: \`wpebackend-fdo\` (legacy fallback backend - only needed if WPEPlatform is not available)
 
 ## Native APIs Used
 
 - [WPE WebKit 2.0](https://wpewebkit.org/) for offscreen rendering
-- Official documentation: https://wpewebkit.org/reference/stable/wpe-webkit-2.0/index.html
-- Uses texture-based platform view rendering via DMA-BUF
+- Official documentation: https://wpewebkit.org/reference(zero-copy GPU textures) or SHM (shared memory) as fallback
+- Backend: WPEPlatform (default, modern API) or WPEBackend-FDO (legacy fallback)-2.0/index.html
+- Uses texture-based platform view rendering via DMA-BUF or SHM as fallback
 
 ### Linux (WPE WebKit 2.0) Key Classes
 
@@ -123,9 +137,6 @@ For Linux platform implementation, the following WPE WebKit classes are used:
 ## Debugging & Inspection
 
 - **Inspector**: Use `WEBKIT_INSPECTOR_SERVER` environment variable to enable remote inspection.
-  ```bash
-  WEBKIT_INSPECTOR_SERVER=127.0.0.1:9222 ./build/linux/x64/debug/bundle/flutter_inappwebview_linux_example
-  ```
   Then open `inspector://127.0.0.1:9222` in a WebKit-based browser (like Epiphany/GNOME Web) or use `http://127.0.0.1:9222` in Chrome/Edge.
 - **Logs**: Use `debugLog()` in C++ which prints to stdout/stderr.
 - **GDB**: Standard GDB debugging works for the native plugin code.
@@ -298,64 +309,18 @@ auto guard = make_scope_guard([&]() { cleanup(); });
 
 ## Dart-Side Development
 
-For Dart-only changes:
-1. Implement platform interface from \`flutter_inappwebview_platform_interface\`
+ForExtend \`Platform*CreationParams\` for Linux-specific parameters
+3. Register in \`LinuxInAppWebViewPlatform.registerWith()\`
+4. Linux-specific features: Texture-based rendering, DMA-BUF GPU integration, WPE WebKit backend selectionterface\`
 2. Linux implementation is newer and has fewer features than other platforms
 3. Check \`LinuxInAppWebViewPlatform\` for currently supported features
 
 ## Native Code Development
 
 When modifying C++ code:
-- Located in \`linux/\`
-- **Prefer standard C++17** over platform-specific APIs for maintainability
+- Main plugin class: \`FlutterInappwebviewLinuxPlugin\`
+- Core WebView class: \`InAppWebView\` (handles WPE WebKit integration)
+- WPE WebKit handles headless rendering to texture via EGL or SHM
+- Use provided utilities in \`utils/\` for FlValue serialization, string operations, etc. APIs for maintainability
 - Plugin class: \`FlutterInappwebviewLinuxPlugin\`
 - WPE WebKit handles headless rendering to texture
-
----
-
-## Plugin Scripts JS Reference
-
-JavaScript files injected into WebViews for native-web communication:
-
-| Script | File | Description |
-|--------|------|-------------|
-| **JavaScriptBridgeJS** | \`javascript_bridge_js.h\` | Core bridge enabling \`window.flutter_inappwebview.callHandler()\` for Dart-JS communication. Uses \`webkit.messageHandlers\` to communicate with WPE WebKit. |
-| **ConsoleLogJS** | \`console_log_js.h\` | Intercepts \`console.log/debug/error/info/warn\` and forwards to \`onConsoleMessage\`. Required because WPE WebKit lacks native console-message signal. |
-| **WindowIdJS** | \`window_id_js.h\` | Manages window ID for multi-window scenarios (e.g., \`window.open()\`). |
-| **ColorInputJS** | \`color_input_js.h\` | Intercepts \`<input type="color">\` clicks since WPE WebKit lacks built-in color picker. Supports \`list\` attribute for predefined colors. |
-
-**Note:** Linux implementation is growing. Current scripts match the most essential iOS/macOS functionality. Additional scripts needed for full parity:
-- \`InterceptAjaxRequestJS\` - AJAX interception
-- \`InterceptFetchRequestJS\` - Fetch API interception
-- \`OnLoadResourceJS\` - Resource loading tracking
-- \`PrintJS\` - Print request handling
-- \`WebMessageListenerJS\` - postMessage API
-- \`FindTextHighlightJS\` - Find in page
-
----
-
-## Build Commands
-
-\`\`\`bash
-cd flutter_inappwebview_linux && flutter pub get
-cd example && flutter build linux --debug
-\`\`\`
-
-## Dependencies
-
-The example includes WPE WebKit source for reference. Production apps need:
-- \`libwpe\` 
-- \`wpebackend-fdo\`
-- \`wpewebkit\`
-
-## Task File Reference
-
-For detailed implementation tasks, WPE WebKit API mappings, and verification checklists, see:
-
-**[LINUX_IMPLEMENTATION_TASKS.md](../flutter_inappwebview_linux/LINUX_IMPLEMENTATION_TASKS.md)**
-
-Key sections:
-- **Critical Issues**: Multi-window support, settings name mismatch
-- **Verification Needed**: ~50 APIs marked "complete" need verification against iOS
-- **New Features**: Custom Scheme Handler, Download Manager, Content Blockers, etc.
-- **Linux-Specific**: Spell Checking, ITP, Geolocation Manager, WebDriver

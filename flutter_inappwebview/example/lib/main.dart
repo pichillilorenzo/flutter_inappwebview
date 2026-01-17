@@ -9,6 +9,11 @@ import 'package:flutter_inappwebview_example/in_app_browser_example.screen.dart'
 import 'package:flutter_inappwebview_example/in_app_webiew_example.screen.dart';
 import 'package:flutter_inappwebview_example/web_authentication_session_example.screen.dart';
 import 'package:pointer_interceptor/pointer_interceptor.dart';
+import 'package:provider/provider.dart';
+import 'package:flutter_inappwebview_example/providers/event_log_provider.dart';
+import 'package:flutter_inappwebview_example/providers/settings_manager.dart';
+import 'package:flutter_inappwebview_example/providers/test_runner.dart';
+import 'package:flutter_inappwebview_example/providers/network_monitor.dart';
 
 // import 'package:path_provider/path_provider.dart';
 // import 'package:permission_handler/permission_handler.dart';
@@ -24,16 +29,19 @@ Future main() async {
 
   if (!kIsWeb && defaultTargetPlatform == TargetPlatform.windows) {
     final availableVersion = await WebViewEnvironment.getAvailableVersion();
-    assert(availableVersion != null,
-        'Failed to find an installed WebView2 runtime or non-stable Microsoft Edge installation.');
+    assert(
+      availableVersion != null,
+      'Failed to find an installed WebView2 runtime or non-stable Microsoft Edge installation.',
+    );
 
     webViewEnvironment = await WebViewEnvironment.create(
-        settings: WebViewEnvironmentSettings(
-      additionalBrowserArguments: kDebugMode
-          ? '--enable-features=msEdgeDevToolsWdpRemoteDebugging'
-          : null,
-      userDataFolder: 'custom_path',
-    ));
+      settings: WebViewEnvironmentSettings(
+        additionalBrowserArguments: kDebugMode
+            ? '--enable-features=msEdgeDevToolsWdpRemoteDebugging'
+            : null,
+        userDataFolder: 'custom_path',
+      ),
+    );
 
     webViewEnvironment?.onBrowserProcessExited = (detail) {
       if (kDebugMode) {
@@ -89,7 +97,7 @@ PointerInterceptor myDrawer({required BuildContext context}) {
         onTap: () {
           Navigator.pushReplacementNamed(context, '/');
         },
-      )
+      ),
     ];
   } else if (defaultTargetPlatform == TargetPlatform.macOS) {
     children = [
@@ -148,11 +156,9 @@ PointerInterceptor myDrawer({required BuildContext context}) {
         children: <Widget>[
           DrawerHeader(
             child: Text('flutter_inappwebview example'),
-            decoration: BoxDecoration(
-              color: Colors.blue,
-            ),
+            decoration: BoxDecoration(color: Colors.blue),
           ),
-          ...children
+          ...children,
         ],
       ),
     ),
@@ -177,36 +183,60 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
+    // Wrap the app with providers for Phase 1
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => EventLogProvider()),
+        ChangeNotifierProvider(create: (_) => SettingsManager()),
+        ChangeNotifierProvider(create: (_) => TestRunner()),
+        ChangeNotifierProvider(create: (_) => NetworkMonitor()),
+      ],
+      child: _buildMaterialApp(),
+    );
+  }
+
+  Widget _buildMaterialApp() {
     if (kIsWeb) {
-      return MaterialApp(initialRoute: '/', routes: {
-        '/': (context) => InAppWebViewExampleScreen(),
-      });
+      return MaterialApp(
+        initialRoute: '/',
+        routes: {'/': (context) => InAppWebViewExampleScreen()},
+      );
     }
     if (defaultTargetPlatform == TargetPlatform.macOS) {
-      return MaterialApp(initialRoute: '/', routes: {
+      return MaterialApp(
+        initialRoute: '/',
+        routes: {
+          '/': (context) => InAppWebViewExampleScreen(),
+          '/InAppBrowser': (context) => InAppBrowserExampleScreen(),
+          '/HeadlessInAppWebView': (context) =>
+              HeadlessInAppWebViewExampleScreen(),
+          '/WebAuthenticationSession': (context) =>
+              WebAuthenticationSessionExampleScreen(),
+        },
+      );
+    } else if (defaultTargetPlatform == TargetPlatform.windows ||
+        defaultTargetPlatform == TargetPlatform.linux) {
+      return MaterialApp(
+        initialRoute: '/',
+        routes: {
+          '/': (context) => InAppWebViewExampleScreen(),
+          '/InAppBrowser': (context) => InAppBrowserExampleScreen(),
+          '/HeadlessInAppWebView': (context) =>
+              HeadlessInAppWebViewExampleScreen(),
+        },
+      );
+    }
+    return MaterialApp(
+      initialRoute: '/',
+      routes: {
         '/': (context) => InAppWebViewExampleScreen(),
         '/InAppBrowser': (context) => InAppBrowserExampleScreen(),
+        '/ChromeSafariBrowser': (context) => ChromeSafariBrowserExampleScreen(),
         '/HeadlessInAppWebView': (context) =>
             HeadlessInAppWebViewExampleScreen(),
         '/WebAuthenticationSession': (context) =>
             WebAuthenticationSessionExampleScreen(),
-      });
-    } else if (defaultTargetPlatform == TargetPlatform.windows ||
-        defaultTargetPlatform == TargetPlatform.linux) {
-      return MaterialApp(initialRoute: '/', routes: {
-        '/': (context) => InAppWebViewExampleScreen(),
-        '/InAppBrowser': (context) => InAppBrowserExampleScreen(),
-        '/HeadlessInAppWebView': (context) =>
-            HeadlessInAppWebViewExampleScreen(),
-      });
-    }
-    return MaterialApp(initialRoute: '/', routes: {
-      '/': (context) => InAppWebViewExampleScreen(),
-      '/InAppBrowser': (context) => InAppBrowserExampleScreen(),
-      '/ChromeSafariBrowser': (context) => ChromeSafariBrowserExampleScreen(),
-      '/HeadlessInAppWebView': (context) => HeadlessInAppWebViewExampleScreen(),
-      '/WebAuthenticationSession': (context) =>
-          WebAuthenticationSessionExampleScreen(),
-    });
+      },
+    );
   }
 }

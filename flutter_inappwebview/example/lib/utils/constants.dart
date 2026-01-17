@@ -5,13 +5,9 @@ enum TestCategory {
   navigation,
   javascript,
   content,
-  ui,
-  events,
   storage,
-  cookies,
-  messaging,
-  printing,
   advanced,
+  browsers,
 }
 
 /// Test complexity levels

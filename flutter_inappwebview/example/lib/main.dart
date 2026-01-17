@@ -14,6 +14,11 @@ import 'package:flutter_inappwebview_example/providers/event_log_provider.dart';
 import 'package:flutter_inappwebview_example/providers/settings_manager.dart';
 import 'package:flutter_inappwebview_example/providers/test_runner.dart';
 import 'package:flutter_inappwebview_example/providers/network_monitor.dart';
+import 'package:flutter_inappwebview_example/screens/home_screen.dart';
+import 'package:flutter_inappwebview_example/screens/category_screen.dart';
+import 'package:flutter_inappwebview_example/screens/platform_info_screen.dart';
+import 'package:flutter_inappwebview_example/utils/test_registry.dart';
+import 'package:flutter_inappwebview_example/utils/constants.dart';
 
 // import 'package:path_provider/path_provider.dart';
 // import 'package:permission_handler/permission_handler.dart';
@@ -23,6 +28,10 @@ WebViewEnvironment? webViewEnvironment;
 
 Future main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Initialize test registry
+  TestRegistry.init();
+
   // await Permission.camera.request();
   // await Permission.microphone.request();
   // await Permission.storage.request();
@@ -60,9 +69,25 @@ Future main() async {
 PointerInterceptor myDrawer({required BuildContext context}) {
   var children = [
     ListTile(
-      title: Text('InAppWebView'),
+      title: Text('Test Suite Home'),
+      leading: Icon(Icons.home),
       onTap: () {
         Navigator.pushReplacementNamed(context, '/');
+      },
+    ),
+    Divider(),
+    ListTile(
+      title: Text('Platform Info'),
+      leading: Icon(Icons.info_outline),
+      onTap: () {
+        Navigator.pushNamed(context, '/platform-info');
+      },
+    ),
+    Divider(),
+    ListTile(
+      title: Text('InAppWebView'),
+      onTap: () {
+        Navigator.pushReplacementNamed(context, '/example-inappwebview');
       },
     ),
     ListTile(
@@ -93,18 +118,50 @@ PointerInterceptor myDrawer({required BuildContext context}) {
   if (kIsWeb) {
     children = [
       ListTile(
-        title: Text('InAppWebView'),
+        title: Text('Test Suite Home'),
+        leading: Icon(Icons.home),
         onTap: () {
           Navigator.pushReplacementNamed(context, '/');
+        },
+      ),
+      Divider(),
+      ListTile(
+        title: Text('Platform Info'),
+        leading: Icon(Icons.info_outline),
+        onTap: () {
+          Navigator.pushNamed(context, '/platform-info');
+        },
+      ),
+      Divider(),
+      ListTile(
+        title: Text('InAppWebView'),
+        onTap: () {
+          Navigator.pushReplacementNamed(context, '/example-inappwebview');
         },
       ),
     ];
   } else if (defaultTargetPlatform == TargetPlatform.macOS) {
     children = [
       ListTile(
-        title: Text('InAppWebView'),
+        title: Text('Test Suite Home'),
+        leading: Icon(Icons.home),
         onTap: () {
           Navigator.pushReplacementNamed(context, '/');
+        },
+      ),
+      Divider(),
+      ListTile(
+        title: Text('Platform Info'),
+        leading: Icon(Icons.info_outline),
+        onTap: () {
+          Navigator.pushNamed(context, '/platform-info');
+        },
+      ),
+      Divider(),
+      ListTile(
+        title: Text('InAppWebView'),
+        onTap: () {
+          Navigator.pushReplacementNamed(context, '/example-inappwebview');
         },
       ),
       ListTile(
@@ -130,9 +187,25 @@ PointerInterceptor myDrawer({required BuildContext context}) {
       defaultTargetPlatform == TargetPlatform.linux) {
     children = [
       ListTile(
-        title: Text('InAppWebView'),
+        title: Text('Test Suite Home'),
+        leading: Icon(Icons.home),
         onTap: () {
           Navigator.pushReplacementNamed(context, '/');
+        },
+      ),
+      Divider(),
+      ListTile(
+        title: Text('Platform Info'),
+        leading: Icon(Icons.info_outline),
+        onTap: () {
+          Navigator.pushNamed(context, '/platform-info');
+        },
+      ),
+      Divider(),
+      ListTile(
+        title: Text('InAppWebView'),
+        onTap: () {
+          Navigator.pushReplacementNamed(context, '/example-inappwebview');
         },
       ),
       ListTile(
@@ -155,7 +228,7 @@ PointerInterceptor myDrawer({required BuildContext context}) {
         padding: EdgeInsets.zero,
         children: <Widget>[
           DrawerHeader(
-            child: Text('flutter_inappwebview example'),
+            child: Text('flutter_inappwebview'),
             decoration: BoxDecoration(color: Colors.blue),
           ),
           ...children,
@@ -198,38 +271,104 @@ class _MyAppState extends State<MyApp> {
   Widget _buildMaterialApp() {
     if (kIsWeb) {
       return MaterialApp(
+        title: 'InAppWebView Test Suite',
+        theme: ThemeData(
+          primarySwatch: Colors.blue,
+          appBarTheme: AppBarTheme(elevation: 2, centerTitle: false),
+        ),
         initialRoute: '/',
-        routes: {'/': (context) => InAppWebViewExampleScreen()},
+        routes: {
+          '/': (context) => HomeScreen(),
+          '/platform-info': (context) => PlatformInfoScreen(),
+          '/example-inappwebview': (context) => InAppWebViewExampleScreen(),
+        },
+        onGenerateRoute: (settings) {
+          if (settings.name?.startsWith('/category/') ?? false) {
+            final categoryName = settings.name!.substring('/category/'.length);
+            final category = _parseCategoryFromName(categoryName);
+            if (category != null) {
+              return MaterialPageRoute(
+                builder: (context) => CategoryScreen(category: category),
+              );
+            }
+          }
+          return null;
+        },
       );
     }
     if (defaultTargetPlatform == TargetPlatform.macOS) {
       return MaterialApp(
+        title: 'InAppWebView Test Suite',
+        theme: ThemeData(
+          primarySwatch: Colors.blue,
+          appBarTheme: AppBarTheme(elevation: 2, centerTitle: false),
+        ),
         initialRoute: '/',
         routes: {
-          '/': (context) => InAppWebViewExampleScreen(),
+          '/': (context) => HomeScreen(),
+          '/platform-info': (context) => PlatformInfoScreen(),
+          '/example-inappwebview': (context) => InAppWebViewExampleScreen(),
           '/InAppBrowser': (context) => InAppBrowserExampleScreen(),
           '/HeadlessInAppWebView': (context) =>
               HeadlessInAppWebViewExampleScreen(),
           '/WebAuthenticationSession': (context) =>
               WebAuthenticationSessionExampleScreen(),
         },
+        onGenerateRoute: (settings) {
+          if (settings.name?.startsWith('/category/') ?? false) {
+            final categoryName = settings.name!.substring('/category/'.length);
+            final category = _parseCategoryFromName(categoryName);
+            if (category != null) {
+              return MaterialPageRoute(
+                builder: (context) => CategoryScreen(category: category),
+              );
+            }
+          }
+          return null;
+        },
       );
     } else if (defaultTargetPlatform == TargetPlatform.windows ||
         defaultTargetPlatform == TargetPlatform.linux) {
       return MaterialApp(
+        title: 'InAppWebView Test Suite',
+        theme: ThemeData(
+          primarySwatch: Colors.blue,
+          appBarTheme: AppBarTheme(elevation: 2, centerTitle: false),
+        ),
         initialRoute: '/',
         routes: {
-          '/': (context) => InAppWebViewExampleScreen(),
+          '/': (context) => HomeScreen(),
+          '/platform-info': (context) => PlatformInfoScreen(),
+          '/example-inappwebview': (context) => InAppWebViewExampleScreen(),
           '/InAppBrowser': (context) => InAppBrowserExampleScreen(),
           '/HeadlessInAppWebView': (context) =>
               HeadlessInAppWebViewExampleScreen(),
         },
+        onGenerateRoute: (settings) {
+          if (settings.name?.startsWith('/category/') ?? false) {
+            final categoryName = settings.name!.substring('/category/'.length);
+            final category = _parseCategoryFromName(categoryName);
+            if (category != null) {
+              return MaterialPageRoute(
+                builder: (context) => CategoryScreen(category: category),
+              );
+            }
+          }
+          return null;
+        },
       );
     }
     return MaterialApp(
+      title: 'InAppWebView Test Suite',
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+        appBarTheme: AppBarTheme(elevation: 2, centerTitle: false),
+      ),
       initialRoute: '/',
       routes: {
-        '/': (context) => InAppWebViewExampleScreen(),
+        '/': (context) => HomeScreen(),
+        '/platform-info': (context) => PlatformInfoScreen(),
+        '/example-inappwebview': (context) => InAppWebViewExampleScreen(),
         '/InAppBrowser': (context) => InAppBrowserExampleScreen(),
         '/ChromeSafariBrowser': (context) => ChromeSafariBrowserExampleScreen(),
         '/HeadlessInAppWebView': (context) =>
@@ -237,6 +376,37 @@ class _MyAppState extends State<MyApp> {
         '/WebAuthenticationSession': (context) =>
             WebAuthenticationSessionExampleScreen(),
       },
+      onGenerateRoute: (settings) {
+        if (settings.name?.startsWith('/category/') ?? false) {
+          final categoryName = settings.name!.substring('/category/'.length);
+          final category = _parseCategoryFromName(categoryName);
+          if (category != null) {
+            return MaterialPageRoute(
+              builder: (context) => CategoryScreen(category: category),
+            );
+          }
+        }
+        return null;
+      },
     );
+  }
+
+  TestCategory? _parseCategoryFromName(String name) {
+    switch (name.toLowerCase()) {
+      case 'navigation':
+        return TestCategory.navigation;
+      case 'javascript':
+        return TestCategory.javascript;
+      case 'content':
+        return TestCategory.content;
+      case 'storage':
+        return TestCategory.storage;
+      case 'advanced':
+        return TestCategory.advanced;
+      case 'browsers':
+        return TestCategory.browsers;
+      default:
+        return null;
+    }
   }
 }

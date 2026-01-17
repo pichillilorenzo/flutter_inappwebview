@@ -3,12 +3,6 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
-import 'package:flutter_inappwebview_example/chrome_safari_browser_example.screen.dart';
-import 'package:flutter_inappwebview_example/headless_in_app_webview.screen.dart';
-import 'package:flutter_inappwebview_example/in_app_browser_example.screen.dart';
-import 'package:flutter_inappwebview_example/in_app_webiew_example.screen.dart';
-import 'package:flutter_inappwebview_example/web_authentication_session_example.screen.dart';
-import 'package:pointer_interceptor/pointer_interceptor.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_inappwebview_example/providers/event_log_provider.dart';
 import 'package:flutter_inappwebview_example/providers/settings_manager.dart';
@@ -66,174 +60,47 @@ Future main() async {
   runApp(MyApp());
 }
 
-PointerInterceptor myDrawer({required BuildContext context}) {
-  var children = [
-    ListTile(
-      title: Text('Test Suite Home'),
-      leading: Icon(Icons.home),
-      onTap: () {
-        Navigator.pushReplacementNamed(context, '/');
-      },
-    ),
-    Divider(),
-    ListTile(
-      title: Text('Platform Info'),
-      leading: Icon(Icons.info_outline),
-      onTap: () {
-        Navigator.pushNamed(context, '/platform-info');
-      },
-    ),
-    Divider(),
-    ListTile(
-      title: Text('InAppWebView'),
-      onTap: () {
-        Navigator.pushReplacementNamed(context, '/example-inappwebview');
-      },
-    ),
-    ListTile(
-      title: Text('InAppBrowser'),
-      onTap: () {
-        Navigator.pushReplacementNamed(context, '/InAppBrowser');
-      },
-    ),
-    ListTile(
-      title: Text('ChromeSafariBrowser'),
-      onTap: () {
-        Navigator.pushReplacementNamed(context, '/ChromeSafariBrowser');
-      },
-    ),
-    ListTile(
-      title: Text('WebAuthenticationSession'),
-      onTap: () {
-        Navigator.pushReplacementNamed(context, '/WebAuthenticationSession');
-      },
-    ),
-    ListTile(
-      title: Text('HeadlessInAppWebView'),
-      onTap: () {
-        Navigator.pushReplacementNamed(context, '/HeadlessInAppWebView');
-      },
-    ),
-  ];
-  if (kIsWeb) {
-    children = [
-      ListTile(
-        title: Text('Test Suite Home'),
-        leading: Icon(Icons.home),
-        onTap: () {
-          Navigator.pushReplacementNamed(context, '/');
-        },
-      ),
-      Divider(),
-      ListTile(
-        title: Text('Platform Info'),
-        leading: Icon(Icons.info_outline),
-        onTap: () {
-          Navigator.pushNamed(context, '/platform-info');
-        },
-      ),
-      Divider(),
-      ListTile(
-        title: Text('InAppWebView'),
-        onTap: () {
-          Navigator.pushReplacementNamed(context, '/example-inappwebview');
-        },
-      ),
-    ];
-  } else if (defaultTargetPlatform == TargetPlatform.macOS) {
-    children = [
-      ListTile(
-        title: Text('Test Suite Home'),
-        leading: Icon(Icons.home),
-        onTap: () {
-          Navigator.pushReplacementNamed(context, '/');
-        },
-      ),
-      Divider(),
-      ListTile(
-        title: Text('Platform Info'),
-        leading: Icon(Icons.info_outline),
-        onTap: () {
-          Navigator.pushNamed(context, '/platform-info');
-        },
-      ),
-      Divider(),
-      ListTile(
-        title: Text('InAppWebView'),
-        onTap: () {
-          Navigator.pushReplacementNamed(context, '/example-inappwebview');
-        },
-      ),
-      ListTile(
-        title: Text('InAppBrowser'),
-        onTap: () {
-          Navigator.pushReplacementNamed(context, '/InAppBrowser');
-        },
-      ),
-      ListTile(
-        title: Text('WebAuthenticationSession'),
-        onTap: () {
-          Navigator.pushReplacementNamed(context, '/WebAuthenticationSession');
-        },
-      ),
-      ListTile(
-        title: Text('HeadlessInAppWebView'),
-        onTap: () {
-          Navigator.pushReplacementNamed(context, '/HeadlessInAppWebView');
-        },
-      ),
-    ];
-  } else if (defaultTargetPlatform == TargetPlatform.windows ||
-      defaultTargetPlatform == TargetPlatform.linux) {
-    children = [
-      ListTile(
-        title: Text('Test Suite Home'),
-        leading: Icon(Icons.home),
-        onTap: () {
-          Navigator.pushReplacementNamed(context, '/');
-        },
-      ),
-      Divider(),
-      ListTile(
-        title: Text('Platform Info'),
-        leading: Icon(Icons.info_outline),
-        onTap: () {
-          Navigator.pushNamed(context, '/platform-info');
-        },
-      ),
-      Divider(),
-      ListTile(
-        title: Text('InAppWebView'),
-        onTap: () {
-          Navigator.pushReplacementNamed(context, '/example-inappwebview');
-        },
-      ),
-      ListTile(
-        title: Text('InAppBrowser'),
-        onTap: () {
-          Navigator.pushReplacementNamed(context, '/InAppBrowser');
-        },
-      ),
-      ListTile(
-        title: Text('HeadlessInAppWebView'),
-        onTap: () {
-          Navigator.pushReplacementNamed(context, '/HeadlessInAppWebView');
-        },
-      ),
-    ];
-  }
-  return PointerInterceptor(
-    child: Drawer(
-      child: ListView(
-        padding: EdgeInsets.zero,
-        children: <Widget>[
-          DrawerHeader(
-            child: Text('flutter_inappwebview'),
-            decoration: BoxDecoration(color: Colors.blue),
+Drawer buildDrawer({required BuildContext context}) {
+  return Drawer(
+    child: ListView(
+      padding: EdgeInsets.zero,
+      children: <Widget>[
+        DrawerHeader(
+          decoration: BoxDecoration(color: Colors.blue),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              Text(
+                'InAppWebView',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              Text(
+                'Test Suite',
+                style: TextStyle(color: Colors.white70, fontSize: 14),
+              ),
+            ],
           ),
-          ...children,
-        ],
-      ),
+        ),
+        ListTile(
+          title: Text('Test Suite Home'),
+          leading: Icon(Icons.home),
+          onTap: () {
+            Navigator.pushReplacementNamed(context, '/');
+          },
+        ),
+        ListTile(
+          title: Text('Platform Info'),
+          leading: Icon(Icons.info_outline),
+          onTap: () {
+            Navigator.pushNamed(context, '/platform-info');
+          },
+        ),
+      ],
     ),
   );
 }
@@ -269,114 +136,29 @@ class _MyAppState extends State<MyApp> {
   }
 
   Widget _buildMaterialApp() {
-    if (kIsWeb) {
-      return MaterialApp(
-        title: 'InAppWebView Test Suite',
-        theme: ThemeData(
-          primarySwatch: Colors.blue,
-          appBarTheme: AppBarTheme(elevation: 2, centerTitle: false),
-        ),
-        initialRoute: '/',
-        routes: {
-          '/': (context) => HomeScreen(),
-          '/platform-info': (context) => PlatformInfoScreen(),
-          '/example-inappwebview': (context) => InAppWebViewExampleScreen(),
-        },
-        onGenerateRoute: (settings) {
-          if (settings.name?.startsWith('/category/') ?? false) {
-            final categoryName = settings.name!.substring('/category/'.length);
-            final category = _parseCategoryFromName(categoryName);
-            if (category != null) {
-              return MaterialPageRoute(
-                builder: (context) => CategoryScreen(category: category),
-              );
-            }
-          }
-          return null;
-        },
-      );
-    }
-    if (defaultTargetPlatform == TargetPlatform.macOS) {
-      return MaterialApp(
-        title: 'InAppWebView Test Suite',
-        theme: ThemeData(
-          primarySwatch: Colors.blue,
-          appBarTheme: AppBarTheme(elevation: 2, centerTitle: false),
-        ),
-        initialRoute: '/',
-        routes: {
-          '/': (context) => HomeScreen(),
-          '/platform-info': (context) => PlatformInfoScreen(),
-          '/example-inappwebview': (context) => InAppWebViewExampleScreen(),
-          '/InAppBrowser': (context) => InAppBrowserExampleScreen(),
-          '/HeadlessInAppWebView': (context) =>
-              HeadlessInAppWebViewExampleScreen(),
-          '/WebAuthenticationSession': (context) =>
-              WebAuthenticationSessionExampleScreen(),
-        },
-        onGenerateRoute: (settings) {
-          if (settings.name?.startsWith('/category/') ?? false) {
-            final categoryName = settings.name!.substring('/category/'.length);
-            final category = _parseCategoryFromName(categoryName);
-            if (category != null) {
-              return MaterialPageRoute(
-                builder: (context) => CategoryScreen(category: category),
-              );
-            }
-          }
-          return null;
-        },
-      );
-    } else if (defaultTargetPlatform == TargetPlatform.windows ||
-        defaultTargetPlatform == TargetPlatform.linux) {
-      return MaterialApp(
-        title: 'InAppWebView Test Suite',
-        theme: ThemeData(
-          primarySwatch: Colors.blue,
-          appBarTheme: AppBarTheme(elevation: 2, centerTitle: false),
-        ),
-        initialRoute: '/',
-        routes: {
-          '/': (context) => HomeScreen(),
-          '/platform-info': (context) => PlatformInfoScreen(),
-          '/example-inappwebview': (context) => InAppWebViewExampleScreen(),
-          '/InAppBrowser': (context) => InAppBrowserExampleScreen(),
-          '/HeadlessInAppWebView': (context) =>
-              HeadlessInAppWebViewExampleScreen(),
-        },
-        onGenerateRoute: (settings) {
-          if (settings.name?.startsWith('/category/') ?? false) {
-            final categoryName = settings.name!.substring('/category/'.length);
-            final category = _parseCategoryFromName(categoryName);
-            if (category != null) {
-              return MaterialPageRoute(
-                builder: (context) => CategoryScreen(category: category),
-              );
-            }
-          }
-          return null;
-        },
-      );
-    }
     return MaterialApp(
       title: 'InAppWebView Test Suite',
       theme: ThemeData(
         primarySwatch: Colors.blue,
-        appBarTheme: AppBarTheme(elevation: 2, centerTitle: false),
+        appBarTheme: AppBarTheme(
+          elevation: 2,
+          centerTitle: false,
+          iconTheme: IconThemeData(color: Colors.white),
+          titleTextStyle: TextStyle(
+            color: Colors.white,
+            fontSize: 20,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+        useMaterial3: false,
       ),
       initialRoute: '/',
       routes: {
         '/': (context) => HomeScreen(),
         '/platform-info': (context) => PlatformInfoScreen(),
-        '/example-inappwebview': (context) => InAppWebViewExampleScreen(),
-        '/InAppBrowser': (context) => InAppBrowserExampleScreen(),
-        '/ChromeSafariBrowser': (context) => ChromeSafariBrowserExampleScreen(),
-        '/HeadlessInAppWebView': (context) =>
-            HeadlessInAppWebViewExampleScreen(),
-        '/WebAuthenticationSession': (context) =>
-            WebAuthenticationSessionExampleScreen(),
       },
       onGenerateRoute: (settings) {
+        // Handle dynamic category routes
         if (settings.name?.startsWith('/category/') ?? false) {
           final categoryName = settings.name!.substring('/category/'.length);
           final category = _parseCategoryFromName(categoryName);

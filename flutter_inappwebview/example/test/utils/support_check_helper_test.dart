@@ -37,10 +37,7 @@ void main() {
 
     test('isMethodSupportedForPlatform forwards target platform', () {
       final calledPlatforms = <TargetPlatform?>[];
-      bool fakeChecker(
-        _FakeMethod method, {
-        TargetPlatform? platform,
-      }) {
+      bool fakeChecker(_FakeMethod method, {TargetPlatform? platform}) {
         calledPlatforms.add(platform);
         return platform == TargetPlatform.android;
       }
@@ -56,10 +53,7 @@ void main() {
     });
 
     test('supportedPlatformsForMethod aggregates supported platforms', () {
-      bool fakeChecker(
-        _FakeMethod method, {
-        TargetPlatform? platform,
-      }) {
+      bool fakeChecker(_FakeMethod method, {TargetPlatform? platform}) {
         return platform == TargetPlatform.android ||
             platform == TargetPlatform.windows;
       }
@@ -76,10 +70,7 @@ void main() {
 
     test('isPropertySupportedForPlatform forwards target platform', () {
       final calledPlatforms = <TargetPlatform?>[];
-      bool fakeChecker(
-        dynamic property, {
-        TargetPlatform? platform,
-      }) {
+      bool fakeChecker(dynamic property, {TargetPlatform? platform}) {
         calledPlatforms.add(platform);
         return platform == TargetPlatform.macOS;
       }

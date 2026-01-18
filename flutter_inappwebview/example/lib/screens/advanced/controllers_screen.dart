@@ -1071,8 +1071,9 @@ class _ControllersScreenState extends State<ControllersScreen> {
                 color: canPress ? Colors.black : Colors.grey,
               ),
             ),
-            backgroundColor:
-                canPress ? Colors.blue.shade50 : Colors.grey.shade200,
+            backgroundColor: canPress
+                ? Colors.blue.shade50
+                : Colors.grey.shade200,
             onPressed: canPress ? onPressed : null,
           ),
           const SizedBox(height: 4),

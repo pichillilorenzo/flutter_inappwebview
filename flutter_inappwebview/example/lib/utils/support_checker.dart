@@ -129,10 +129,8 @@ class SupportCheckHelper {
   }) {
     return SupportedPlatform.values
         .where(
-          (platform) => isClassSupportedForPlatform(
-            platform: platform,
-            checker: checker,
-          ),
+          (platform) =>
+              isClassSupportedForPlatform(platform: platform, checker: checker),
         )
         .toSet();
   }
@@ -260,15 +258,11 @@ class SupportSummary {
       (methodsPerPlatform[platform] ?? 0) + (eventsPerPlatform[platform] ?? 0);
 }
 
-typedef _MethodSupportResolver = bool Function(
-  String methodName,
-  SupportedPlatform platform,
-);
+typedef _MethodSupportResolver =
+    bool Function(String methodName, SupportedPlatform platform);
 
-typedef _PropertySupportResolver = bool Function(
-  String propertyName,
-  SupportedPlatform platform,
-);
+typedef _PropertySupportResolver =
+    bool Function(String propertyName, SupportedPlatform platform);
 
 /// Utility class that provides comprehensive API support information.
 class SupportChecker {
@@ -319,9 +313,7 @@ class SupportChecker {
     required List<T> values,
     required bool Function(T method, {TargetPlatform? platform}) checker,
   }) {
-    final methodByName = {
-      for (final value in values) _enumName(value): value,
-    };
+    final methodByName = {for (final value in values) _enumName(value): value};
     return (String methodName, SupportedPlatform platform) {
       final resolved = methodByName[methodName];
       if (resolved == null) return false;
@@ -370,87 +362,84 @@ class SupportChecker {
     'ServiceWorkerController': ServiceWorkerController.isClassSupported,
     'ProxyController': ProxyController.isClassSupported,
     'TracingController': TracingController.isClassSupported,
-    'HttpAuthCredentialDatabase':
-        HttpAuthCredentialDatabase.isClassSupported,
+    'HttpAuthCredentialDatabase': HttpAuthCredentialDatabase.isClassSupported,
     'WebViewEnvironment': WebViewEnvironment.isClassSupported,
     'ProcessGlobalConfig': ProcessGlobalConfig.isClassSupported,
     'WebMessageChannel': WebMessageChannel.isClassSupported,
   };
 
-  static final Map<String, _MethodSupportResolver> _methodSupportResolvers =
-      {
-        'InAppWebViewController': _buildMethodResolver(
-          values: PlatformInAppWebViewControllerMethod.values,
-          checker: InAppWebViewController.isMethodSupported,
-        ),
-        'HeadlessInAppWebView': _buildMethodResolver(
-          values: PlatformHeadlessInAppWebViewMethod.values,
-          checker: HeadlessInAppWebView.isMethodSupported,
-        ),
-        'InAppBrowser': _buildMethodResolver(
-          values: PlatformInAppBrowserMethod.values,
-          checker: InAppBrowser.isMethodSupported,
-        ),
-        'ChromeSafariBrowser': _buildMethodResolver(
-          values: PlatformChromeSafariBrowserMethod.values,
-          checker: ChromeSafariBrowser.isMethodSupported,
-        ),
-        'CookieManager': _buildMethodResolver(
-          values: PlatformCookieManagerMethod.values,
-          checker: CookieManager.isMethodSupported,
-        ),
-        'WebStorage': _buildMethodResolver(
-          values: PlatformLocalStorageMethod.values,
-          checker: LocalStorage.isMethodSupported,
-        ),
-        'FindInteractionController': _buildMethodResolver(
-          values: PlatformFindInteractionControllerMethod.values,
-          checker: FindInteractionController.isMethodSupported,
-        ),
-        'PullToRefreshController': _buildMethodResolver(
-          values: PlatformPullToRefreshControllerMethod.values,
-          checker: PullToRefreshController.isMethodSupported,
-        ),
-        'PrintJobController': _buildMethodResolver(
-          values: PlatformPrintJobControllerMethod.values,
-          checker: PrintJobController.isMethodSupported,
-        ),
-        'WebAuthenticationSession': _buildMethodResolver(
-          values: PlatformWebAuthenticationSessionMethod.values,
-          checker: WebAuthenticationSession.isMethodSupported,
-        ),
-        'ServiceWorkerController': _buildMethodResolver(
-          values: PlatformServiceWorkerControllerMethod.values,
-          checker: ServiceWorkerController.isMethodSupported,
-        ),
-        'ProxyController': _buildMethodResolver(
-          values: PlatformProxyControllerMethod.values,
-          checker: ProxyController.isMethodSupported,
-        ),
-        'TracingController': _buildMethodResolver(
-          values: PlatformTracingControllerMethod.values,
-          checker: TracingController.isMethodSupported,
-        ),
-        'HttpAuthCredentialDatabase': _buildMethodResolver(
-          values: PlatformHttpAuthCredentialDatabaseMethod.values,
-          checker: HttpAuthCredentialDatabase.isMethodSupported,
-        ),
-        'WebViewEnvironment': _buildMethodResolver(
-          values: PlatformWebViewEnvironmentMethod.values,
-          checker: WebViewEnvironment.isMethodSupported,
-        ),
-        'ProcessGlobalConfig': _buildMethodResolver(
-          values: PlatformProcessGlobalConfigMethod.values,
-          checker: ProcessGlobalConfig.isMethodSupported,
-        ),
-        'WebMessageChannel': _buildMethodResolver(
-          values: PlatformWebMessageChannelMethod.values,
-          checker: WebMessageChannel.isMethodSupported,
-        ),
-      };
+  static final Map<String, _MethodSupportResolver> _methodSupportResolvers = {
+    'InAppWebViewController': _buildMethodResolver(
+      values: PlatformInAppWebViewControllerMethod.values,
+      checker: InAppWebViewController.isMethodSupported,
+    ),
+    'HeadlessInAppWebView': _buildMethodResolver(
+      values: PlatformHeadlessInAppWebViewMethod.values,
+      checker: HeadlessInAppWebView.isMethodSupported,
+    ),
+    'InAppBrowser': _buildMethodResolver(
+      values: PlatformInAppBrowserMethod.values,
+      checker: InAppBrowser.isMethodSupported,
+    ),
+    'ChromeSafariBrowser': _buildMethodResolver(
+      values: PlatformChromeSafariBrowserMethod.values,
+      checker: ChromeSafariBrowser.isMethodSupported,
+    ),
+    'CookieManager': _buildMethodResolver(
+      values: PlatformCookieManagerMethod.values,
+      checker: CookieManager.isMethodSupported,
+    ),
+    'WebStorage': _buildMethodResolver(
+      values: PlatformLocalStorageMethod.values,
+      checker: LocalStorage.isMethodSupported,
+    ),
+    'FindInteractionController': _buildMethodResolver(
+      values: PlatformFindInteractionControllerMethod.values,
+      checker: FindInteractionController.isMethodSupported,
+    ),
+    'PullToRefreshController': _buildMethodResolver(
+      values: PlatformPullToRefreshControllerMethod.values,
+      checker: PullToRefreshController.isMethodSupported,
+    ),
+    'PrintJobController': _buildMethodResolver(
+      values: PlatformPrintJobControllerMethod.values,
+      checker: PrintJobController.isMethodSupported,
+    ),
+    'WebAuthenticationSession': _buildMethodResolver(
+      values: PlatformWebAuthenticationSessionMethod.values,
+      checker: WebAuthenticationSession.isMethodSupported,
+    ),
+    'ServiceWorkerController': _buildMethodResolver(
+      values: PlatformServiceWorkerControllerMethod.values,
+      checker: ServiceWorkerController.isMethodSupported,
+    ),
+    'ProxyController': _buildMethodResolver(
+      values: PlatformProxyControllerMethod.values,
+      checker: ProxyController.isMethodSupported,
+    ),
+    'TracingController': _buildMethodResolver(
+      values: PlatformTracingControllerMethod.values,
+      checker: TracingController.isMethodSupported,
+    ),
+    'HttpAuthCredentialDatabase': _buildMethodResolver(
+      values: PlatformHttpAuthCredentialDatabaseMethod.values,
+      checker: HttpAuthCredentialDatabase.isMethodSupported,
+    ),
+    'WebViewEnvironment': _buildMethodResolver(
+      values: PlatformWebViewEnvironmentMethod.values,
+      checker: WebViewEnvironment.isMethodSupported,
+    ),
+    'ProcessGlobalConfig': _buildMethodResolver(
+      values: PlatformProcessGlobalConfigMethod.values,
+      checker: ProcessGlobalConfig.isMethodSupported,
+    ),
+    'WebMessageChannel': _buildMethodResolver(
+      values: PlatformWebMessageChannelMethod.values,
+      checker: WebMessageChannel.isMethodSupported,
+    ),
+  };
 
-  static final Map<String, _PropertySupportResolver>
-  _eventSupportResolvers = {
+  static final Map<String, _PropertySupportResolver> _eventSupportResolvers = {
     'InAppWebView Events': _buildPropertyResolver(
       values: PlatformWebViewCreationParamsProperty.values,
       checker: InAppWebView.isPropertySupported,
@@ -459,9 +448,9 @@ class SupportChecker {
       values: PlatformFindInteractionControllerCreationParamsProperty.values,
       checker: (property, {platform}) =>
           FindInteractionController.isPropertySupported(
-        property as PlatformFindInteractionControllerCreationParamsProperty,
-        platform: platform,
-      ),
+            property as PlatformFindInteractionControllerCreationParamsProperty,
+            platform: platform,
+          ),
     ),
   };
 
@@ -563,9 +552,7 @@ class SupportChecker {
   ) {
     final resolver = _classSupportResolvers[className];
     if (resolver != null) {
-      return SupportCheckHelper.supportedPlatformsForClass(
-        checker: resolver,
-      );
+      return SupportCheckHelper.supportedPlatformsForClass(checker: resolver);
     }
 
     final definitions = getAllApiDefinitions();

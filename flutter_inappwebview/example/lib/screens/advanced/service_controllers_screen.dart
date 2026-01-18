@@ -660,10 +660,7 @@ class _ServiceControllersScreenState extends State<ServiceControllersScreen> {
             ),
           ],
         ),
-        SupportBadgesRow(
-          supportedPlatforms: supportedPlatforms,
-          compact: true,
-        ),
+        SupportBadgesRow(supportedPlatforms: supportedPlatforms, compact: true),
         const SizedBox(height: 8),
       ],
     );

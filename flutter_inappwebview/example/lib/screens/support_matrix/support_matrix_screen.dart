@@ -60,9 +60,7 @@ class _SupportMatrixScreenState extends State<SupportMatrixScreen>
 
       // Platform filter
       if (_selectedPlatforms.isNotEmpty) {
-        if (!_selectedPlatforms.any(
-          (p) => supportedPlatforms.contains(p),
-        )) {
+        if (!_selectedPlatforms.any((p) => supportedPlatforms.contains(p))) {
           return false;
         }
       }
@@ -96,9 +94,7 @@ class _SupportMatrixScreenState extends State<SupportMatrixScreen>
 
       // Platform filter
       if (_selectedPlatforms.isNotEmpty) {
-        if (!_selectedPlatforms.any(
-          (p) => supportedPlatforms.contains(p),
-        )) {
+        if (!_selectedPlatforms.any((p) => supportedPlatforms.contains(p))) {
           return false;
         }
       }
@@ -146,10 +142,11 @@ class _SupportMatrixScreenState extends State<SupportMatrixScreen>
           '|--------|---------|-----|-------|-----|---------|-------|',
         );
         for (final method in classDef.methods) {
-          final supportedPlatforms = SupportChecker.getSupportedPlatformsForMethod(
-            classDef.className,
-            method.name,
-          );
+          final supportedPlatforms =
+              SupportChecker.getSupportedPlatformsForMethod(
+                classDef.className,
+                method.name,
+              );
           final row = [
             '`${method.name}`',
             _platformMark(supportedPlatforms, SupportedPlatform.android),
@@ -173,10 +170,11 @@ class _SupportMatrixScreenState extends State<SupportMatrixScreen>
           '|-------|---------|-----|-------|-----|---------|-------|',
         );
         for (final event in classDef.events) {
-          final supportedPlatforms = SupportChecker.getSupportedPlatformsForEvent(
-            classDef.className,
-            event.name,
-          );
+          final supportedPlatforms =
+              SupportChecker.getSupportedPlatformsForEvent(
+                classDef.className,
+                event.name,
+              );
           final row = [
             '`${event.name}`',
             _platformMark(supportedPlatforms, SupportedPlatform.android),
@@ -459,9 +457,8 @@ class _SupportMatrixScreenState extends State<SupportMatrixScreen>
   Widget _buildClassTab(ApiClassDefinition classDef) {
     final filteredMethods = _getFilteredMethods(classDef);
     final filteredEvents = _getFilteredEvents(classDef);
-    final classSupportedPlatforms = SupportChecker.getSupportedPlatformsForClass(
-      classDef.className,
-    );
+    final classSupportedPlatforms =
+        SupportChecker.getSupportedPlatformsForClass(classDef.className);
 
     if (filteredMethods.isEmpty && filteredEvents.isEmpty) {
       return Center(

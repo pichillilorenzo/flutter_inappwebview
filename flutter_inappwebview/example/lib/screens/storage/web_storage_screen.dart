@@ -4,6 +4,7 @@ import 'package:flutter_inappwebview_example/main.dart';
 import 'package:flutter_inappwebview_example/utils/support_checker.dart';
 import 'package:flutter_inappwebview_example/widgets/common/support_badge.dart';
 import 'package:flutter_inappwebview_example/widgets/common/parameter_dialog.dart';
+import 'package:flutter_inappwebview_example/widgets/common/method_result_history.dart';
 
 /// Screen for testing WebStorage (localStorage and sessionStorage) functionality
 class WebStorageScreen extends StatefulWidget {
@@ -36,6 +37,10 @@ class _WebStorageScreenState extends State<WebStorageScreen>
     text: 'https://example.com',
   );
 
+  final Map<String, List<MethodResultEntry>> _methodHistory = {};
+  final Map<String, int> _selectedHistoryIndex = {};
+  static const int _maxHistoryEntries = 3;
+
   @override
   void initState() {
     super.initState();
@@ -59,6 +64,10 @@ class _WebStorageScreenState extends State<WebStorageScreen>
   SessionStorage? get _sessionStorage => _webStorage?.sessionStorage;
 
   bool get _isLocalStorageTab => _tabController.index == 0;
+
+  String _storageMethodKey(String methodName) {
+    return '${_isLocalStorageTab ? 'localStorage' : 'sessionStorage'}.$methodName';
+  }
 
   Set<SupportedPlatform> _getStorageMethodPlatforms(
     String methodName, {
@@ -86,7 +95,7 @@ class _WebStorageScreenState extends State<WebStorageScreen>
   Future<void> _loadUrl() async {
     final url = _urlController.text.trim();
     if (url.isEmpty) {
-      _showError('Please enter a URL');
+      _recordMethodResult('loadUrl', 'Please enter a URL', isError: true);
       return;
     }
 
@@ -95,13 +104,17 @@ class _WebStorageScreenState extends State<WebStorageScreen>
         urlRequest: URLRequest(url: WebUri(url)),
       );
     } catch (e) {
-      _showError('Error loading URL: $e');
+      _recordMethodResult('loadUrl', 'Error loading URL: $e', isError: true);
     }
   }
 
   Future<void> _getLength() async {
     if (!_webViewReady) {
-      _showError('WebView not ready. Load a page first.');
+      _recordMethodResult(
+        _storageMethodKey('length'),
+        'WebView not ready. Load a page first.',
+        isError: true,
+      );
       return;
     }
 
@@ -117,9 +130,17 @@ class _WebStorageScreenState extends State<WebStorageScreen>
           _sessionStorageLength = length;
         }
       });
-      _showSuccess('Storage length: $length');
+      _recordMethodResult(
+        _storageMethodKey('length'),
+        'Storage length: $length',
+        isError: false,
+      );
     } catch (e) {
-      _showError('Error getting length: $e');
+      _recordMethodResult(
+        _storageMethodKey('length'),
+        'Error getting length: $e',
+        isError: true,
+      );
     } finally {
       setState(() => _isLoading = false);
     }
@@ -127,7 +148,11 @@ class _WebStorageScreenState extends State<WebStorageScreen>
 
   Future<void> _getItems() async {
     if (!_webViewReady) {
-      _showError('WebView not ready. Load a page first.');
+      _recordMethodResult(
+        _storageMethodKey('getItems'),
+        'WebView not ready. Load a page first.',
+        isError: true,
+      );
       return;
     }
 
@@ -145,9 +170,17 @@ class _WebStorageScreenState extends State<WebStorageScreen>
           _sessionStorageLength = items.length;
         }
       });
-      _showSuccess('Found ${items.length} items');
+      _recordMethodResult(
+        _storageMethodKey('getItems'),
+        'Found ${items.length} items',
+        isError: false,
+      );
     } catch (e) {
-      _showError('Error getting items: $e');
+      _recordMethodResult(
+        _storageMethodKey('getItems'),
+        'Error getting items: $e',
+        isError: true,
+      );
     } finally {
       setState(() => _isLoading = false);
     }
@@ -155,7 +188,11 @@ class _WebStorageScreenState extends State<WebStorageScreen>
 
   Future<void> _getItem(String key) async {
     if (!_webViewReady) {
-      _showError('WebView not ready. Load a page first.');
+      _recordMethodResult(
+        _storageMethodKey('getItem'),
+        'WebView not ready. Load a page first.',
+        isError: true,
+      );
       return;
     }
 
@@ -163,9 +200,17 @@ class _WebStorageScreenState extends State<WebStorageScreen>
     try {
       final storage = _isLocalStorageTab ? _localStorage : _sessionStorage;
       final value = await storage?.getItem(key: key);
-      _showSuccess('Value for "$key": ${value ?? "null"}');
+      _recordMethodResult(
+        _storageMethodKey('getItem'),
+        'Value for "$key": ${value ?? "null"}',
+        isError: false,
+      );
     } catch (e) {
-      _showError('Error getting item: $e');
+      _recordMethodResult(
+        _storageMethodKey('getItem'),
+        'Error getting item: $e',
+        isError: true,
+      );
     } finally {
       setState(() => _isLoading = false);
     }
@@ -173,7 +218,11 @@ class _WebStorageScreenState extends State<WebStorageScreen>
 
   Future<void> _setItem() async {
     if (!_webViewReady) {
-      _showError('WebView not ready. Load a page first.');
+      _recordMethodResult(
+        _storageMethodKey('setItem'),
+        'WebView not ready. Load a page first.',
+        isError: true,
+      );
       return;
     }
 
@@ -182,7 +231,11 @@ class _WebStorageScreenState extends State<WebStorageScreen>
 
   Future<void> _removeItem(String key) async {
     if (!_webViewReady) {
-      _showError('WebView not ready. Load a page first.');
+      _recordMethodResult(
+        _storageMethodKey('removeItem'),
+        'WebView not ready. Load a page first.',
+        isError: true,
+      );
       return;
     }
 
@@ -190,10 +243,18 @@ class _WebStorageScreenState extends State<WebStorageScreen>
     try {
       final storage = _isLocalStorageTab ? _localStorage : _sessionStorage;
       await storage?.removeItem(key: key);
-      _showSuccess('Item "$key" removed');
+      _recordMethodResult(
+        _storageMethodKey('removeItem'),
+        'Item "$key" removed',
+        isError: false,
+      );
       await _getItems();
     } catch (e) {
-      _showError('Error removing item: $e');
+      _recordMethodResult(
+        _storageMethodKey('removeItem'),
+        'Error removing item: $e',
+        isError: true,
+      );
     } finally {
       setState(() => _isLoading = false);
     }
@@ -210,7 +271,11 @@ class _WebStorageScreenState extends State<WebStorageScreen>
     if (params == null) return;
     final key = params['key']?.toString() ?? '';
     if (key.isEmpty) {
-      _showError('Please enter a key');
+      _recordMethodResult(
+        _storageMethodKey('removeItem'),
+        'Please enter a key',
+        isError: true,
+      );
       return;
     }
     _removeItem(key);
@@ -218,7 +283,11 @@ class _WebStorageScreenState extends State<WebStorageScreen>
 
   Future<void> _clear() async {
     if (!_webViewReady) {
-      _showError('WebView not ready. Load a page first.');
+      _recordMethodResult(
+        _storageMethodKey('clear'),
+        'WebView not ready. Load a page first.',
+        isError: true,
+      );
       return;
     }
 
@@ -241,9 +310,17 @@ class _WebStorageScreenState extends State<WebStorageScreen>
           _sessionStorageLength = 0;
         }
       });
-      _showSuccess('Storage cleared');
+      _recordMethodResult(
+        _storageMethodKey('clear'),
+        'Storage cleared',
+        isError: false,
+      );
     } catch (e) {
-      _showError('Error clearing storage: $e');
+      _recordMethodResult(
+        _storageMethodKey('clear'),
+        'Error clearing storage: $e',
+        isError: true,
+      );
     } finally {
       setState(() => _isLoading = false);
     }
@@ -251,7 +328,11 @@ class _WebStorageScreenState extends State<WebStorageScreen>
 
   Future<void> _key(int index) async {
     if (!_webViewReady) {
-      _showError('WebView not ready. Load a page first.');
+      _recordMethodResult(
+        _storageMethodKey('key'),
+        'WebView not ready. Load a page first.',
+        isError: true,
+      );
       return;
     }
 
@@ -259,24 +340,45 @@ class _WebStorageScreenState extends State<WebStorageScreen>
     try {
       final storage = _isLocalStorageTab ? _localStorage : _sessionStorage;
       final keyName = await storage?.key(index: index);
-      _showSuccess('Key at index $index: ${keyName ?? "null"}');
+      _recordMethodResult(
+        _storageMethodKey('key'),
+        'Key at index $index: ${keyName ?? "null"}',
+        isError: false,
+      );
     } catch (e) {
-      _showError('Error getting key: $e');
+      _recordMethodResult(
+        _storageMethodKey('key'),
+        'Error getting key: $e',
+        isError: true,
+      );
     } finally {
       setState(() => _isLoading = false);
     }
   }
 
-  void _showSuccess(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message), backgroundColor: Colors.green),
-    );
-  }
-
-  void _showError(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message), backgroundColor: Colors.red),
-    );
+  void _recordMethodResult(
+    String methodName,
+    String message, {
+    required bool isError,
+  }) {
+    setState(() {
+      final entries = List<MethodResultEntry>.from(
+        _methodHistory[methodName] ?? const [],
+      );
+      entries.insert(
+        0,
+        MethodResultEntry(
+          message: message,
+          isError: isError,
+          timestamp: DateTime.now(),
+        ),
+      );
+      if (entries.length > _maxHistoryEntries) {
+        entries.removeRange(_maxHistoryEntries, entries.length);
+      }
+      _methodHistory[methodName] = entries;
+      _selectedHistoryIndex[methodName] = 0;
+    });
   }
 
   Future<bool> _showConfirmDialog(String title, String content) async {
@@ -314,7 +416,11 @@ class _WebStorageScreenState extends State<WebStorageScreen>
     final key = params['key']?.toString() ?? '';
     final value = params['value']?.toString() ?? '';
     if (key.isEmpty || value.isEmpty) {
-      _showError('Key and Value are required');
+      _recordMethodResult(
+        _storageMethodKey('setItem'),
+        'Key and Value are required',
+        isError: true,
+      );
       return;
     }
 
@@ -322,10 +428,18 @@ class _WebStorageScreenState extends State<WebStorageScreen>
     try {
       final storage = _isLocalStorageTab ? _localStorage : _sessionStorage;
       await storage?.setItem(key: key, value: value);
-      _showSuccess('Item set successfully');
+      _recordMethodResult(
+        _storageMethodKey('setItem'),
+        'Item set successfully',
+        isError: false,
+      );
       await _getItems();
     } catch (e) {
-      _showError('Error setting item: $e');
+      _recordMethodResult(
+        _storageMethodKey('setItem'),
+        'Error setting item: $e',
+        isError: true,
+      );
     } finally {
       setState(() => _isLoading = false);
     }
@@ -342,7 +456,11 @@ class _WebStorageScreenState extends State<WebStorageScreen>
     if (params == null) return;
     final index = (params['index'] as num?)?.toInt();
     if (index == null || index < 0) {
-      _showError('Please enter a valid index');
+      _recordMethodResult(
+        _storageMethodKey('key'),
+        'Please enter a valid index',
+        isError: true,
+      );
       return;
     }
     _key(index);
@@ -359,10 +477,29 @@ class _WebStorageScreenState extends State<WebStorageScreen>
     if (params == null) return;
     final key = params['key']?.toString() ?? '';
     if (key.isEmpty) {
-      _showError('Please enter a key');
+      _recordMethodResult(
+        _storageMethodKey('getItem'),
+        'Please enter a key',
+        isError: true,
+      );
       return;
     }
     _getItem(key);
+  }
+
+  Widget _buildMethodHistory(String methodName, {String? title}) {
+    final entries = _methodHistory[methodName] ?? const [];
+    if (entries.isEmpty) {
+      return const SizedBox.shrink();
+    }
+    return MethodResultHistory(
+      entries: entries,
+      selectedIndex: _selectedHistoryIndex[methodName],
+      title: title ?? methodName,
+      onSelected: (index) {
+        setState(() => _selectedHistoryIndex[methodName] = index);
+      },
+    );
   }
 
   @override
@@ -493,6 +630,8 @@ class _WebStorageScreenState extends State<WebStorageScreen>
             ],
           ),
           const SizedBox(height: 8),
+          _buildMethodHistory('loadUrl'),
+          const SizedBox(height: 8),
           Expanded(
             child: Stack(
               children: [
@@ -510,7 +649,11 @@ class _WebStorageScreenState extends State<WebStorageScreen>
                     setState(() => _webViewReady = true);
                   },
                   onLoadError: (controller, url, code, message) {
-                    _showError('Load error: $message');
+                    _recordMethodResult(
+                      'loadUrl',
+                      'Load error: $message',
+                      isError: true,
+                    );
                   },
                 ),
                 Container(
@@ -622,6 +765,7 @@ class _WebStorageScreenState extends State<WebStorageScreen>
     Set<SupportedPlatform> supportedPlatforms,
     VoidCallback? onPressed,
   ) {
+    final historyKey = _storageMethodKey(methodName);
     return Card(
       margin: const EdgeInsets.only(bottom: 8),
       child: ListTile(
@@ -641,6 +785,8 @@ class _WebStorageScreenState extends State<WebStorageScreen>
               supportedPlatforms: supportedPlatforms,
               compact: true,
             ),
+            const SizedBox(height: 6),
+            _buildMethodHistory(historyKey, title: methodName),
           ],
         ),
         trailing: onPressed != null

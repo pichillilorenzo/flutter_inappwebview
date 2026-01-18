@@ -10,6 +10,7 @@ import 'package:flutter_inappwebview_example/models/event_log_entry.dart';
 import 'package:flutter_inappwebview_example/utils/support_checker.dart';
 import 'package:flutter_inappwebview_example/widgets/common/support_badge.dart';
 import 'package:flutter_inappwebview_example/widgets/common/parameter_dialog.dart';
+import 'package:flutter_inappwebview_example/widgets/common/method_result_history.dart';
 
 /// Screen for testing various WebView Controllers
 class ControllersScreen extends StatefulWidget {
@@ -45,6 +46,10 @@ class _ControllersScreenState extends State<ControllersScreen> {
   // Web message channel state
   WebMessageChannel? _webMessageChannel;
   final List<String> _receivedMessages = [];
+
+  final Map<String, List<MethodResultEntry>> _methodHistory = {};
+  final Map<String, int> _selectedHistoryIndex = {};
+  static const int _maxHistoryEntries = 3;
 
   SupportedPlatform? get _currentPlatform {
     if (kIsWeb) return SupportedPlatform.web;
@@ -139,23 +144,61 @@ class _ControllersScreenState extends State<ControllersScreen> {
     );
   }
 
-  void _showSuccess(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message), backgroundColor: Colors.green),
-    );
+  void _recordMethodResult(
+    String methodName,
+    String message, {
+    required bool isError,
+  }) {
+    setState(() {
+      final entries = List<MethodResultEntry>.from(
+        _methodHistory[methodName] ?? const [],
+      );
+      entries.insert(
+        0,
+        MethodResultEntry(
+          message: message,
+          isError: isError,
+          timestamp: DateTime.now(),
+        ),
+      );
+      if (entries.length > _maxHistoryEntries) {
+        entries.removeRange(_maxHistoryEntries, entries.length);
+      }
+      _methodHistory[methodName] = entries;
+      _selectedHistoryIndex[methodName] = 0;
+    });
   }
 
-  void _showError(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message), backgroundColor: Colors.red),
+  Widget _buildMethodHistory(String methodName, {String? title}) {
+    final entries = _methodHistory[methodName] ?? const [];
+    if (entries.isEmpty) {
+      return const SizedBox.shrink();
+    }
+    return MethodResultHistory(
+      entries: entries,
+      selectedIndex: _selectedHistoryIndex[methodName],
+      title: title ?? methodName,
+      onSelected: (index) {
+        setState(() => _selectedHistoryIndex[methodName] = index);
+      },
     );
   }
 
   void _showInitError(String message) {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted) return;
-      _showError(message);
-    });
+    _recordMethodResult('initControllers', message, isError: true);
+  }
+
+  Widget _buildInitStatusSection() {
+    final entries = _methodHistory['initControllers'] ?? const [];
+    if (entries.isEmpty) {
+      return const SizedBox.shrink();
+    }
+    return Column(
+      children: [
+        _buildMethodHistory('initControllers', title: 'Initialization'),
+        const SizedBox(height: 16),
+      ],
+    );
   }
 
   // Find Interaction methods
@@ -170,20 +213,30 @@ class _ControllersScreenState extends State<ControllersScreen> {
     if (params == null) return;
     final query = params['find']?.toString() ?? '';
     if (query.isEmpty) {
-      _showError('Please enter search text');
+      _recordMethodResult(
+        'findAll',
+        'Please enter search text',
+        isError: true,
+      );
       return;
     }
     _searchController.text = query;
     await _findInteractionController?.findAll(find: query);
-    _showSuccess('Searching for: $query');
+    _recordMethodResult('findAll', 'Searching for: $query', isError: false);
   }
 
   Future<void> _findNext() async {
     await _findInteractionController?.findNext(forward: true);
+    _recordMethodResult('findNext', 'Moved to next match', isError: false);
   }
 
   Future<void> _findPrevious() async {
     await _findInteractionController?.findNext(forward: false);
+    _recordMethodResult(
+      'findPrevious',
+      'Moved to previous match',
+      isError: false,
+    );
   }
 
   Future<void> _clearMatches() async {
@@ -192,7 +245,7 @@ class _ControllersScreenState extends State<ControllersScreen> {
       _matchCount = 0;
       _currentMatch = 0;
     });
-    _showSuccess('Matches cleared');
+    _recordMethodResult('clearMatches', 'Matches cleared', isError: false);
   }
 
   Future<void> _setSearchText() async {
@@ -206,38 +259,56 @@ class _ControllersScreenState extends State<ControllersScreen> {
     if (params == null) return;
     final text = params['searchText']?.toString() ?? '';
     if (text.isEmpty) {
-      _showError('Please enter search text');
+      _recordMethodResult(
+        'setSearchText',
+        'Please enter search text',
+        isError: true,
+      );
       return;
     }
     _searchController.text = text;
     await _findInteractionController?.setSearchText(text);
-    _showSuccess('Search text set');
+    _recordMethodResult('setSearchText', 'Search text set', isError: false);
   }
 
   Future<void> _getSearchText() async {
     final text = await _findInteractionController?.getSearchText();
-    _showSuccess('Search text: $text');
+    _recordMethodResult('getSearchText', 'Search text: $text', isError: false);
   }
 
   Future<void> _presentFindNavigator() async {
     await _findInteractionController?.presentFindNavigator();
-    _showSuccess('Find navigator presented');
+    _recordMethodResult(
+      'presentFindNavigator',
+      'Find navigator presented',
+      isError: false,
+    );
   }
 
   Future<void> _dismissFindNavigator() async {
     await _findInteractionController?.dismissFindNavigator();
-    _showSuccess('Find navigator dismissed');
+    _recordMethodResult(
+      'dismissFindNavigator',
+      'Find navigator dismissed',
+      isError: false,
+    );
   }
 
   Future<void> _isFindNavigatorVisible() async {
     final visible = await _findInteractionController?.isFindNavigatorVisible();
-    _showSuccess('Find navigator visible: $visible');
+    _recordMethodResult(
+      'isFindNavigatorVisible',
+      'Find navigator visible: $visible',
+      isError: false,
+    );
   }
 
   Future<void> _getActiveFindSession() async {
     final session = await _findInteractionController?.getActiveFindSession();
-    _showSuccess(
+    _recordMethodResult(
+      'getActiveFindSession',
       'Active session: ${session?.resultCount ?? 0} results, highlight index: ${session?.highlightedResultIndex ?? -1}',
+      isError: false,
     );
   }
 
@@ -245,38 +316,54 @@ class _ControllersScreenState extends State<ControllersScreen> {
   Future<void> _setEnabled(bool enabled) async {
     await _pullToRefreshController?.setEnabled(enabled);
     setState(() => _pullToRefreshEnabled = enabled);
-    _showSuccess('Pull to refresh ${enabled ? "enabled" : "disabled"}');
+    _recordMethodResult(
+      'setEnabled',
+      'Pull to refresh ${enabled ? "enabled" : "disabled"}',
+      isError: false,
+    );
   }
 
   Future<void> _isEnabled() async {
     final enabled = await _pullToRefreshController?.isEnabled();
-    _showSuccess('Pull to refresh enabled: $enabled');
+    _recordMethodResult(
+      'isEnabled',
+      'Pull to refresh enabled: $enabled',
+      isError: false,
+    );
   }
 
   Future<void> _beginRefreshing() async {
     await _pullToRefreshController?.beginRefreshing();
-    _showSuccess('Refreshing started');
+    _recordMethodResult('beginRefreshing', 'Refreshing started', isError: false);
   }
 
   Future<void> _endRefreshing() async {
     await _pullToRefreshController?.endRefreshing();
-    _showSuccess('Refreshing ended');
+    _recordMethodResult('endRefreshing', 'Refreshing ended', isError: false);
   }
 
   Future<void> _isRefreshing() async {
     final refreshing = await _pullToRefreshController?.isRefreshing();
-    _showSuccess('Is refreshing: $refreshing');
+    _recordMethodResult(
+      'isRefreshing',
+      'Is refreshing: $refreshing',
+      isError: false,
+    );
   }
 
   Future<void> _setColor(Color color) async {
     await _pullToRefreshController?.setColor(color);
     setState(() => _pullToRefreshColor = color);
-    _showSuccess('Color set');
+    _recordMethodResult('setColor', 'Color set', isError: false);
   }
 
   Future<void> _setBackgroundColor(Color color) async {
     await _pullToRefreshController?.setBackgroundColor(color);
-    _showSuccess('Background color set');
+    _recordMethodResult(
+      'setBackgroundColor',
+      'Background color set',
+      isError: false,
+    );
   }
 
   Future<void> _promptSetColor() async {
@@ -290,7 +377,11 @@ class _ControllersScreenState extends State<ControllersScreen> {
     if (params == null) return;
     final color = params['color'] as Color?;
     if (color == null) {
-      _showError('Please pick a color');
+      _recordMethodResult(
+        'setColor',
+        'Please pick a color',
+        isError: true,
+      );
       return;
     }
     await _setColor(color);
@@ -307,7 +398,11 @@ class _ControllersScreenState extends State<ControllersScreen> {
     if (params == null) return;
     final color = params['color'] as Color?;
     if (color == null) {
-      _showError('Please pick a color');
+      _recordMethodResult(
+        'setBackgroundColor',
+        'Please pick a color',
+        isError: true,
+      );
       return;
     }
     await _setBackgroundColor(color);
@@ -316,13 +411,21 @@ class _ControllersScreenState extends State<ControllersScreen> {
   Future<void> _getDefaultSlingshotDistance() async {
     final distance = await _pullToRefreshController
         ?.getDefaultSlingshotDistance();
-    _showSuccess('Default slingshot distance: $distance');
+    _recordMethodResult(
+      'getDefaultSlingshotDistance',
+      'Default slingshot distance: $distance',
+      isError: false,
+    );
   }
 
   // Web Message Channel methods
   Future<void> _createWebMessageChannel() async {
     if (_webViewController == null) {
-      _showError('WebView not ready');
+      _recordMethodResult(
+        'createWebMessageChannel',
+        'WebView not ready',
+        isError: true,
+      );
       return;
     }
 
@@ -339,16 +442,28 @@ class _ControllersScreenState extends State<ControllersScreen> {
             data: {'message': message?.data?.toString()},
           );
         });
-        _showSuccess('Web message channel created');
+        _recordMethodResult(
+          'createWebMessageChannel',
+          'Web message channel created',
+          isError: false,
+        );
       }
     } catch (e) {
-      _showError('Error creating channel: $e');
+      _recordMethodResult(
+        'createWebMessageChannel',
+        'Error creating channel: $e',
+        isError: true,
+      );
     }
   }
 
   Future<void> _postWebMessage() async {
     if (_webMessageChannel == null) {
-      _showError('Create a channel first');
+      _recordMethodResult(
+        'postWebMessage',
+        'Create a channel first',
+        isError: true,
+      );
       return;
     }
 
@@ -362,16 +477,24 @@ class _ControllersScreenState extends State<ControllersScreen> {
     if (params == null) return;
     final message = params['message']?.toString() ?? '';
     if (message.isEmpty) {
-      _showError('Please enter a message');
+      _recordMethodResult(
+        'postWebMessage',
+        'Please enter a message',
+        isError: true,
+      );
       return;
     }
     _messageController.text = message;
 
     try {
       await _webMessageChannel!.port1.postMessage(WebMessage(data: message));
-      _showSuccess('Message sent');
+      _recordMethodResult('postWebMessage', 'Message sent', isError: false);
     } catch (e) {
-      _showError('Error sending message: $e');
+      _recordMethodResult(
+        'postWebMessage',
+        'Error sending message: $e',
+        isError: true,
+      );
     }
   }
 
@@ -381,7 +504,7 @@ class _ControllersScreenState extends State<ControllersScreen> {
     setState(() {
       _receivedMessages.clear();
     });
-    _showSuccess('Channel closed');
+    _recordMethodResult('closeWebMessageChannel', 'Channel closed', isError: false);
   }
 
   @override
@@ -457,6 +580,7 @@ class _ControllersScreenState extends State<ControllersScreen> {
           child: ListView(
             padding: const EdgeInsets.all(16),
             children: [
+              _buildInitStatusSection(),
               _buildFindInteractionSection(),
               const SizedBox(height: 16),
               _buildPullToRefreshSection(),
@@ -483,6 +607,7 @@ class _ControllersScreenState extends State<ControllersScreen> {
             padding: const EdgeInsets.all(16),
             child: Column(
               children: [
+                _buildInitStatusSection(),
                 _buildFindInteractionSection(),
                 const SizedBox(height: 16),
                 _buildPullToRefreshSection(),
@@ -618,6 +743,8 @@ class _ControllersScreenState extends State<ControllersScreen> {
                     ),
                   ],
                 ),
+                const SizedBox(height: 8),
+                _buildMethodHistory('findAll'),
                 const SizedBox(height: 12),
 
                 // Match navigation
@@ -754,6 +881,7 @@ class _ControllersScreenState extends State<ControllersScreen> {
                   value: _pullToRefreshEnabled,
                   onChanged: _webViewReady ? _setEnabled : null,
                 ),
+                _buildMethodHistory('setEnabled'),
                 const Divider(),
 
                 // Color selection
@@ -777,6 +905,8 @@ class _ControllersScreenState extends State<ControllersScreen> {
                     ),
                   ],
                 ),
+                const SizedBox(height: 8),
+                _buildMethodHistory('setColor'),
                 const SizedBox(height: 16),
 
                 // Methods
@@ -931,6 +1061,9 @@ class _ControllersScreenState extends State<ControllersScreen> {
                     ),
                   ],
                 ),
+                const SizedBox(height: 8),
+                _buildMethodHistory('createWebMessageChannel'),
+                _buildMethodHistory('closeWebMessageChannel'),
                 const SizedBox(height: 12),
 
                 // Message input
@@ -955,6 +1088,8 @@ class _ControllersScreenState extends State<ControllersScreen> {
                     ),
                   ],
                 ),
+                const SizedBox(height: 8),
+                _buildMethodHistory('postWebMessage'),
                 const SizedBox(height: 12),
 
                 // Received messages
@@ -1133,6 +1268,8 @@ class _ControllersScreenState extends State<ControllersScreen> {
             supportedPlatforms: supportedPlatforms,
             compact: true,
           ),
+          const SizedBox(height: 6),
+          _buildMethodHistory(label),
         ],
       ),
     );

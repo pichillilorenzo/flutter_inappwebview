@@ -4,6 +4,7 @@ import 'package:flutter_inappwebview_example/main.dart';
 import 'package:flutter_inappwebview_example/utils/support_checker.dart';
 import 'package:flutter_inappwebview_example/widgets/common/support_badge.dart';
 import 'package:flutter_inappwebview_example/widgets/common/parameter_dialog.dart';
+import 'package:flutter_inappwebview_example/widgets/common/method_result_history.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_inappwebview_example/providers/event_log_provider.dart';
 import 'package:flutter_inappwebview_example/models/event_log_entry.dart';
@@ -88,6 +89,10 @@ class _InAppBrowserScreenState extends State<InAppBrowserScreen> {
   bool _browserOpened = false;
   final List<InAppBrowserMenuItem> _menuItems = [];
 
+  final Map<String, List<MethodResultEntry>> _methodHistory = {};
+  final Map<String, int> _selectedHistoryIndex = {};
+  static const int _maxHistoryEntries = 3;
+
   void _initBrowser() {
     try {
       _browser = TestInAppBrowser(
@@ -146,7 +151,7 @@ class _InAppBrowserScreenState extends State<InAppBrowserScreen> {
     if (params == null) return;
     final url = params['url']?.toString() ?? '';
     if (url.isEmpty) {
-      _showError('Please enter a URL');
+      _recordMethodResult('openUrlRequest', 'Please enter a URL', isError: true);
       return;
     }
     _urlController.text = url;
@@ -169,9 +174,17 @@ class _InAppBrowserScreenState extends State<InAppBrowserScreen> {
         ),
       );
       setState(() => _browserOpened = true);
-      _showSuccess('Browser opened with URL');
+      _recordMethodResult(
+        'openUrlRequest',
+        'Browser opened with URL',
+        isError: false,
+      );
     } catch (e) {
-      _showError('Error opening browser: $e');
+      _recordMethodResult(
+        'openUrlRequest',
+        'Error opening browser: $e',
+        isError: true,
+      );
     } finally {
       setState(() => _isLoading = false);
     }
@@ -191,7 +204,11 @@ class _InAppBrowserScreenState extends State<InAppBrowserScreen> {
     if (params == null) return;
     final assetFilePath = params['assetFilePath']?.toString() ?? '';
     if (assetFilePath.isEmpty) {
-      _showError('Please enter an asset file path');
+      _recordMethodResult(
+        'openFile',
+        'Please enter an asset file path',
+        isError: true,
+      );
       return;
     }
     setState(() => _isLoading = true);
@@ -206,9 +223,9 @@ class _InAppBrowserScreenState extends State<InAppBrowserScreen> {
         ),
       );
       setState(() => _browserOpened = true);
-      _showSuccess('Browser opened with file');
+      _recordMethodResult('openFile', 'Browser opened with file', isError: false);
     } catch (e) {
-      _showError('Error opening file: $e');
+      _recordMethodResult('openFile', 'Error opening file: $e', isError: true);
     } finally {
       setState(() => _isLoading = false);
     }
@@ -230,7 +247,11 @@ class _InAppBrowserScreenState extends State<InAppBrowserScreen> {
     if (params == null) return;
     final data = params['data']?.toString() ?? '';
     if (data.isEmpty) {
-      _showError('Please enter HTML data');
+      _recordMethodResult(
+        'openData',
+        'Please enter HTML data',
+        isError: true,
+      );
       return;
     }
     _dataController.text = data;
@@ -249,9 +270,9 @@ class _InAppBrowserScreenState extends State<InAppBrowserScreen> {
         ),
       );
       setState(() => _browserOpened = true);
-      _showSuccess('Browser opened with data');
+      _recordMethodResult('openData', 'Browser opened with data', isError: false);
     } catch (e) {
-      _showError('Error opening data: $e');
+      _recordMethodResult('openData', 'Error opening data: $e', isError: true);
     } finally {
       setState(() => _isLoading = false);
     }
@@ -268,7 +289,11 @@ class _InAppBrowserScreenState extends State<InAppBrowserScreen> {
     if (params == null) return;
     final url = params['url']?.toString() ?? '';
     if (url.isEmpty) {
-      _showError('Please enter a URL');
+      _recordMethodResult(
+        'openWithSystemBrowser (static)',
+        'Please enter a URL',
+        isError: true,
+      );
       return;
     }
     _urlController.text = url;
@@ -276,9 +301,17 @@ class _InAppBrowserScreenState extends State<InAppBrowserScreen> {
     setState(() => _isLoading = true);
     try {
       await InAppBrowser.openWithSystemBrowser(url: WebUri(url));
-      _showSuccess('Opened in system browser');
+      _recordMethodResult(
+        'openWithSystemBrowser (static)',
+        'Opened in system browser',
+        isError: false,
+      );
     } catch (e) {
-      _showError('Error opening system browser: $e');
+      _recordMethodResult(
+        'openWithSystemBrowser (static)',
+        'Error opening system browser: $e',
+        isError: true,
+      );
     } finally {
       setState(() => _isLoading = false);
     }
@@ -289,7 +322,11 @@ class _InAppBrowserScreenState extends State<InAppBrowserScreen> {
     final title = _menuItemTitleController.text.trim();
 
     if (id.isEmpty || title.isEmpty) {
-      _showError('Please enter menu item ID and title');
+      _recordMethodResult(
+        'addMenuItem',
+        'Please enter menu item ID and title',
+        isError: true,
+      );
       return;
     }
 
@@ -298,7 +335,11 @@ class _InAppBrowserScreenState extends State<InAppBrowserScreen> {
       title: title,
       onClick: () {
         _logEvent(EventType.ui, 'Menu item clicked', data: {'id': id});
-        _showSuccess('Menu item "$title" clicked');
+        _recordMethodResult(
+          'addMenuItem',
+          'Menu item "$title" clicked',
+          isError: false,
+        );
       },
     );
 
@@ -307,7 +348,7 @@ class _InAppBrowserScreenState extends State<InAppBrowserScreen> {
       _menuItems.add(menuItem);
     });
     _menuItemIdController.clear();
-    _showSuccess('Menu item added');
+    _recordMethodResult('addMenuItem', 'Menu item added', isError: false);
   }
 
   void _removeMenuItem(InAppBrowserMenuItem menuItem) {
@@ -316,9 +357,13 @@ class _InAppBrowserScreenState extends State<InAppBrowserScreen> {
       setState(() {
         _menuItems.remove(menuItem);
       });
-      _showSuccess('Menu item removed');
+      _recordMethodResult('removeMenuItem', 'Menu item removed', isError: false);
     } else {
-      _showError('Failed to remove menu item');
+      _recordMethodResult(
+        'removeMenuItem',
+        'Failed to remove menu item',
+        isError: true,
+      );
     }
   }
 
@@ -327,16 +372,20 @@ class _InAppBrowserScreenState extends State<InAppBrowserScreen> {
     setState(() {
       _menuItems.clear();
     });
-    _showSuccess('All menu items removed');
+    _recordMethodResult(
+      'removeAllMenuItems',
+      'All menu items removed',
+      isError: false,
+    );
   }
 
   Future<void> _show() async {
     setState(() => _isLoading = true);
     try {
       await _browser?.show();
-      _showSuccess('Browser shown');
+      _recordMethodResult('show', 'Browser shown', isError: false);
     } catch (e) {
-      _showError('Error showing browser: $e');
+      _recordMethodResult('show', 'Error showing browser: $e', isError: true);
     } finally {
       setState(() => _isLoading = false);
     }
@@ -346,9 +395,9 @@ class _InAppBrowserScreenState extends State<InAppBrowserScreen> {
     setState(() => _isLoading = true);
     try {
       await _browser?.hide();
-      _showSuccess('Browser hidden');
+      _recordMethodResult('hide', 'Browser hidden', isError: false);
     } catch (e) {
-      _showError('Error hiding browser: $e');
+      _recordMethodResult('hide', 'Error hiding browser: $e', isError: true);
     } finally {
       setState(() => _isLoading = false);
     }
@@ -359,9 +408,9 @@ class _InAppBrowserScreenState extends State<InAppBrowserScreen> {
     try {
       await _browser?.close();
       setState(() => _browserOpened = false);
-      _showSuccess('Browser closed');
+      _recordMethodResult('close', 'Browser closed', isError: false);
     } catch (e) {
-      _showError('Error closing browser: $e');
+      _recordMethodResult('close', 'Error closing browser: $e', isError: true);
     } finally {
       setState(() => _isLoading = false);
     }
@@ -371,9 +420,13 @@ class _InAppBrowserScreenState extends State<InAppBrowserScreen> {
     setState(() => _isLoading = true);
     try {
       final hidden = await _browser?.isHidden();
-      _showSuccess('Browser is hidden: $hidden');
+      _recordMethodResult('isHidden', 'Browser is hidden: $hidden', isError: false);
     } catch (e) {
-      _showError('Error checking hidden state: $e');
+      _recordMethodResult(
+        'isHidden',
+        'Error checking hidden state: $e',
+        isError: true,
+      );
     } finally {
       setState(() => _isLoading = false);
     }
@@ -384,8 +437,13 @@ class _InAppBrowserScreenState extends State<InAppBrowserScreen> {
     try {
       final settings = await _browser?.getSettings();
       _showSettingsDialog(settings);
+      _recordMethodResult('getSettings', 'Settings dialog opened', isError: false);
     } catch (e) {
-      _showError('Error getting settings: $e');
+      _recordMethodResult(
+        'getSettings',
+        'Error getting settings: $e',
+        isError: true,
+      );
     } finally {
       setState(() => _isLoading = false);
     }
@@ -413,9 +471,13 @@ class _InAppBrowserScreenState extends State<InAppBrowserScreen> {
           ),
         ),
       );
-      _showSuccess('Settings updated');
+      _recordMethodResult('setSettings', 'Settings updated', isError: false);
     } catch (e) {
-      _showError('Error setting settings: $e');
+      _recordMethodResult(
+        'setSettings',
+        'Error setting settings: $e',
+        isError: true,
+      );
     } finally {
       setState(() => _isLoading = false);
     }
@@ -423,7 +485,7 @@ class _InAppBrowserScreenState extends State<InAppBrowserScreen> {
 
   void _checkIsOpened() {
     final opened = _browser?.isOpened() ?? false;
-    _showSuccess('Browser is opened: $opened');
+    _recordMethodResult('isOpened', 'Browser is opened: $opened', isError: false);
   }
 
   void _showSettingsDialog(InAppBrowserClassSettings? settings) {
@@ -444,23 +506,61 @@ class _InAppBrowserScreenState extends State<InAppBrowserScreen> {
     );
   }
 
-  void _showSuccess(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message), backgroundColor: Colors.green),
-    );
+  void _recordMethodResult(
+    String methodName,
+    String message, {
+    required bool isError,
+  }) {
+    setState(() {
+      final entries = List<MethodResultEntry>.from(
+        _methodHistory[methodName] ?? const [],
+      );
+      entries.insert(
+        0,
+        MethodResultEntry(
+          message: message,
+          isError: isError,
+          timestamp: DateTime.now(),
+        ),
+      );
+      if (entries.length > _maxHistoryEntries) {
+        entries.removeRange(_maxHistoryEntries, entries.length);
+      }
+      _methodHistory[methodName] = entries;
+      _selectedHistoryIndex[methodName] = 0;
+    });
   }
 
-  void _showError(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message), backgroundColor: Colors.red),
+  Widget _buildMethodHistory(String methodName, {String? title}) {
+    final entries = _methodHistory[methodName] ?? const [];
+    if (entries.isEmpty) {
+      return const SizedBox.shrink();
+    }
+    return MethodResultHistory(
+      entries: entries,
+      selectedIndex: _selectedHistoryIndex[methodName],
+      title: title ?? methodName,
+      onSelected: (index) {
+        setState(() => _selectedHistoryIndex[methodName] = index);
+      },
     );
   }
 
   void _showInitError(String message) {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted) return;
-      _showError(message);
-    });
+    _recordMethodResult('initBrowser', message, isError: true);
+  }
+
+  Widget _buildInitStatusSection() {
+    final entries = _methodHistory['initBrowser'] ?? const [];
+    if (entries.isEmpty) {
+      return const SizedBox.shrink();
+    }
+    return Column(
+      children: [
+        _buildMethodHistory('initBrowser', title: 'Initialization'),
+        const SizedBox(height: 16),
+      ],
+    );
   }
 
   ModalPresentationStyle _parseModalPresentationStyle(String? value) {
@@ -506,6 +606,7 @@ class _InAppBrowserScreenState extends State<InAppBrowserScreen> {
         children: [
           _buildStatusCard(),
           const SizedBox(height: 16),
+          _buildInitStatusSection(),
           _buildUrlInput(),
           const SizedBox(height: 16),
           _buildOpenMethods(),
@@ -682,6 +783,10 @@ class _InAppBrowserScreenState extends State<InAppBrowserScreen> {
                 ),
               ],
             ),
+            const SizedBox(height: 8),
+            _buildMethodHistory('addMenuItem'),
+            _buildMethodHistory('removeMenuItem'),
+            _buildMethodHistory('removeAllMenuItems'),
             const SizedBox(height: 12),
             if (_menuItems.isNotEmpty) ...[
               const Divider(),
@@ -828,6 +933,8 @@ class _InAppBrowserScreenState extends State<InAppBrowserScreen> {
               supportedPlatforms: supportedPlatforms,
               compact: true,
             ),
+            const SizedBox(height: 6),
+            _buildMethodHistory(methodName),
           ],
         ),
         trailing: ElevatedButton(

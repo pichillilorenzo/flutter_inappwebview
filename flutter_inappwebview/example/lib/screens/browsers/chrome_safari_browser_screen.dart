@@ -6,6 +6,7 @@ import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_inappwebview_example/main.dart';
 import 'package:flutter_inappwebview_example/utils/support_checker.dart';
 import 'package:flutter_inappwebview_example/widgets/common/support_badge.dart';
+import 'package:flutter_inappwebview_example/widgets/common/method_result_history.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_inappwebview_example/providers/event_log_provider.dart';
 import 'package:flutter_inappwebview_example/models/event_log_entry.dart';
@@ -117,6 +118,10 @@ class _ChromeSafariBrowserScreenState extends State<ChromeSafariBrowserScreen> {
   Color _toolbarColor = Colors.blue;
   final List<ChromeSafariBrowserMenuItem> _menuItems = [];
 
+  final Map<String, List<MethodResultEntry>> _methodHistory = {};
+  final Map<String, int> _selectedHistoryIndex = {};
+  static const int _maxHistoryEntries = 3;
+
   void _initBrowser() {
     try {
       _browser = TestChromeSafariBrowser(
@@ -162,7 +167,7 @@ class _ChromeSafariBrowserScreenState extends State<ChromeSafariBrowserScreen> {
   Future<void> _open() async {
     final url = _urlController.text.trim();
     if (url.isEmpty) {
-      _showError('Please enter a URL');
+      _recordMethodResult('open', 'Please enter a URL', isError: true);
       return;
     }
 
@@ -181,9 +186,9 @@ class _ChromeSafariBrowserScreenState extends State<ChromeSafariBrowserScreen> {
           dismissButtonStyle: DismissButtonStyle.CLOSE,
         ),
       );
-      _showSuccess('Browser opened');
+      _recordMethodResult('open', 'Browser opened', isError: false);
     } catch (e) {
-      _showError('Error opening browser: $e');
+      _recordMethodResult('open', 'Error opening browser: $e', isError: true);
     } finally {
       setState(() => _isLoading = false);
     }
@@ -192,16 +197,16 @@ class _ChromeSafariBrowserScreenState extends State<ChromeSafariBrowserScreen> {
   Future<void> _launchUrl() async {
     final url = _urlController.text.trim();
     if (url.isEmpty) {
-      _showError('Please enter a URL');
+      _recordMethodResult('launchUrl', 'Please enter a URL', isError: true);
       return;
     }
 
     setState(() => _isLoading = true);
     try {
       await _browser?.launchUrl(url: WebUri(url));
-      _showSuccess('URL launched');
+      _recordMethodResult('launchUrl', 'URL launched', isError: false);
     } catch (e) {
-      _showError('Error launching URL: $e');
+      _recordMethodResult('launchUrl', 'Error launching URL: $e', isError: true);
     } finally {
       setState(() => _isLoading = false);
     }
@@ -210,16 +215,20 @@ class _ChromeSafariBrowserScreenState extends State<ChromeSafariBrowserScreen> {
   Future<void> _mayLaunchUrl() async {
     final url = _urlController.text.trim();
     if (url.isEmpty) {
-      _showError('Please enter a URL');
+      _recordMethodResult('mayLaunchUrl', 'Please enter a URL', isError: true);
       return;
     }
 
     setState(() => _isLoading = true);
     try {
       final result = await _browser?.mayLaunchUrl(url: WebUri(url));
-      _showSuccess('mayLaunchUrl result: $result');
+      _recordMethodResult(
+        'mayLaunchUrl',
+        'mayLaunchUrl result: $result',
+        isError: false,
+      );
     } catch (e) {
-      _showError('Error: $e');
+      _recordMethodResult('mayLaunchUrl', 'Error: $e', isError: true);
     } finally {
       setState(() => _isLoading = false);
     }
@@ -228,7 +237,11 @@ class _ChromeSafariBrowserScreenState extends State<ChromeSafariBrowserScreen> {
   Future<void> _validateRelationship() async {
     final url = _urlController.text.trim();
     if (url.isEmpty) {
-      _showError('Please enter a URL');
+      _recordMethodResult(
+        'validateRelationship',
+        'Please enter a URL',
+        isError: true,
+      );
       return;
     }
 
@@ -238,9 +251,13 @@ class _ChromeSafariBrowserScreenState extends State<ChromeSafariBrowserScreen> {
         relation: CustomTabsRelationType.USE_AS_ORIGIN,
         origin: WebUri(url),
       );
-      _showSuccess('validateRelationship result: $result');
+      _recordMethodResult(
+        'validateRelationship',
+        'validateRelationship result: $result',
+        isError: false,
+      );
     } catch (e) {
-      _showError('Error: $e');
+      _recordMethodResult('validateRelationship', 'Error: $e', isError: true);
     } finally {
       setState(() => _isLoading = false);
     }
@@ -251,9 +268,9 @@ class _ChromeSafariBrowserScreenState extends State<ChromeSafariBrowserScreen> {
     try {
       await _browser?.close();
       setState(() => _browserOpened = false);
-      _showSuccess('Browser closed');
+      _recordMethodResult('close', 'Browser closed', isError: false);
     } catch (e) {
-      _showError('Error closing browser: $e');
+      _recordMethodResult('close', 'Error closing browser: $e', isError: true);
     } finally {
       setState(() => _isLoading = false);
     }
@@ -275,13 +292,21 @@ class _ChromeSafariBrowserScreenState extends State<ChromeSafariBrowserScreen> {
               'Action button clicked',
               data: {'url': url?.toString(), 'title': title},
             );
-            _showSuccess('Action button clicked');
+            _recordMethodResult(
+              'setActionButton',
+              'Action button clicked',
+              isError: false,
+            );
           },
         ),
       );
-      _showSuccess('Action button set');
+      _recordMethodResult('setActionButton', 'Action button set', isError: false);
     } catch (e) {
-      _showError('Error setting action button: $e');
+      _recordMethodResult(
+        'setActionButton',
+        'Error setting action button: $e',
+        isError: true,
+      );
     } finally {
       setState(() => _isLoading = false);
     }
@@ -306,9 +331,17 @@ class _ChromeSafariBrowserScreenState extends State<ChromeSafariBrowserScreen> {
         icon: iconData,
         description: 'Updated Action',
       );
-      _showSuccess('Action button updated');
+      _recordMethodResult(
+        'updateActionButton',
+        'Action button updated',
+        isError: false,
+      );
     } catch (e) {
-      _showError('Error updating action button: $e');
+      _recordMethodResult(
+        'updateActionButton',
+        'Error updating action button: $e',
+        isError: true,
+      );
     } finally {
       setState(() => _isLoading = false);
     }
@@ -324,7 +357,7 @@ class _ChromeSafariBrowserScreenState extends State<ChromeSafariBrowserScreen> {
           'Menu item clicked',
           data: {'url': url, 'title': title},
         );
-        _showSuccess('Menu item clicked');
+        _recordMethodResult('addMenuItem', 'Menu item clicked', isError: false);
       },
     );
 
@@ -332,13 +365,17 @@ class _ChromeSafariBrowserScreenState extends State<ChromeSafariBrowserScreen> {
     setState(() {
       _menuItems.add(menuItem);
     });
-    _showSuccess('Menu item added');
+    _recordMethodResult('addMenuItem', 'Menu item added', isError: false);
   }
 
   Future<void> _requestPostMessageChannel() async {
     final url = _urlController.text.trim();
     if (url.isEmpty) {
-      _showError('Please enter a URL');
+      _recordMethodResult(
+        'requestPostMessageChannel',
+        'Please enter a URL',
+        isError: true,
+      );
       return;
     }
 
@@ -347,9 +384,17 @@ class _ChromeSafariBrowserScreenState extends State<ChromeSafariBrowserScreen> {
       final result = await _browser?.requestPostMessageChannel(
         sourceOrigin: WebUri(url),
       );
-      _showSuccess('requestPostMessageChannel result: $result');
+      _recordMethodResult(
+        'requestPostMessageChannel',
+        'requestPostMessageChannel result: $result',
+        isError: false,
+      );
     } catch (e) {
-      _showError('Error: $e');
+      _recordMethodResult(
+        'requestPostMessageChannel',
+        'Error: $e',
+        isError: true,
+      );
     } finally {
       setState(() => _isLoading = false);
     }
@@ -358,16 +403,24 @@ class _ChromeSafariBrowserScreenState extends State<ChromeSafariBrowserScreen> {
   Future<void> _postMessage() async {
     final message = _messageController.text.trim();
     if (message.isEmpty) {
-      _showError('Please enter a message');
+      _recordMethodResult(
+        'postMessage',
+        'Please enter a message',
+        isError: true,
+      );
       return;
     }
 
     setState(() => _isLoading = true);
     try {
       final result = await _browser?.postMessage(message);
-      _showSuccess('postMessage result: ${result?.name}');
+      _recordMethodResult(
+        'postMessage',
+        'postMessage result: ${result?.name}',
+        isError: false,
+      );
     } catch (e) {
-      _showError('Error: $e');
+      _recordMethodResult('postMessage', 'Error: $e', isError: true);
     } finally {
       setState(() => _isLoading = false);
     }
@@ -377,9 +430,17 @@ class _ChromeSafariBrowserScreenState extends State<ChromeSafariBrowserScreen> {
     setState(() => _isLoading = true);
     try {
       final result = await _browser?.isEngagementSignalsApiAvailable();
-      _showSuccess('isEngagementSignalsApiAvailable: $result');
+      _recordMethodResult(
+        'isEngagementSignalsApiAvailable',
+        'isEngagementSignalsApiAvailable: $result',
+        isError: false,
+      );
     } catch (e) {
-      _showError('Error: $e');
+      _recordMethodResult(
+        'isEngagementSignalsApiAvailable',
+        'Error: $e',
+        isError: true,
+      );
     } finally {
       setState(() => _isLoading = false);
     }
@@ -387,16 +448,24 @@ class _ChromeSafariBrowserScreenState extends State<ChromeSafariBrowserScreen> {
 
   void _checkIsOpened() {
     final opened = _browser?.isOpened() ?? false;
-    _showSuccess('Browser is opened: $opened');
+    _recordMethodResult('isOpened', 'Browser is opened: $opened', isError: false);
   }
 
   Future<void> _isAvailable() async {
     setState(() => _isLoading = true);
     try {
       final available = await ChromeSafariBrowser.isAvailable();
-      _showSuccess('ChromeSafariBrowser is available: $available');
+      _recordMethodResult(
+        'isAvailable (static)',
+        'ChromeSafariBrowser is available: $available',
+        isError: false,
+      );
     } catch (e) {
-      _showError('Error: $e');
+      _recordMethodResult(
+        'isAvailable (static)',
+        'Error: $e',
+        isError: true,
+      );
     } finally {
       setState(() => _isLoading = false);
     }
@@ -406,9 +475,17 @@ class _ChromeSafariBrowserScreenState extends State<ChromeSafariBrowserScreen> {
     setState(() => _isLoading = true);
     try {
       final maxItems = await ChromeSafariBrowser.getMaxToolbarItems();
-      _showSuccess('Max toolbar items: $maxItems');
+      _recordMethodResult(
+        'getMaxToolbarItems (static)',
+        'Max toolbar items: $maxItems',
+        isError: false,
+      );
     } catch (e) {
-      _showError('Error: $e');
+      _recordMethodResult(
+        'getMaxToolbarItems (static)',
+        'Error: $e',
+        isError: true,
+      );
     } finally {
       setState(() => _isLoading = false);
     }
@@ -418,9 +495,17 @@ class _ChromeSafariBrowserScreenState extends State<ChromeSafariBrowserScreen> {
     setState(() => _isLoading = true);
     try {
       final packageName = await ChromeSafariBrowser.getPackageName();
-      _showSuccess('Package name: $packageName');
+      _recordMethodResult(
+        'getPackageName (static)',
+        'Package name: $packageName',
+        isError: false,
+      );
     } catch (e) {
-      _showError('Error: $e');
+      _recordMethodResult(
+        'getPackageName (static)',
+        'Error: $e',
+        isError: true,
+      );
     } finally {
       setState(() => _isLoading = false);
     }
@@ -430,9 +515,17 @@ class _ChromeSafariBrowserScreenState extends State<ChromeSafariBrowserScreen> {
     setState(() => _isLoading = true);
     try {
       await ChromeSafariBrowser.clearWebsiteData();
-      _showSuccess('Website data cleared');
+      _recordMethodResult(
+        'clearWebsiteData (static)',
+        'Website data cleared',
+        isError: false,
+      );
     } catch (e) {
-      _showError('Error: $e');
+      _recordMethodResult(
+        'clearWebsiteData (static)',
+        'Error: $e',
+        isError: true,
+      );
     } finally {
       setState(() => _isLoading = false);
     }
@@ -441,38 +534,88 @@ class _ChromeSafariBrowserScreenState extends State<ChromeSafariBrowserScreen> {
   Future<void> _prewarmConnections() async {
     final url = _urlController.text.trim();
     if (url.isEmpty) {
-      _showError('Please enter a URL');
+      _recordMethodResult(
+        'prewarmConnections (static)',
+        'Please enter a URL',
+        isError: true,
+      );
       return;
     }
 
     setState(() => _isLoading = true);
     try {
       final token = await ChromeSafariBrowser.prewarmConnections([WebUri(url)]);
-      _showSuccess('Prewarm token: ${token?.id}');
+      _recordMethodResult(
+        'prewarmConnections (static)',
+        'Prewarm token: ${token?.id}',
+        isError: false,
+      );
     } catch (e) {
-      _showError('Error: $e');
+      _recordMethodResult(
+        'prewarmConnections (static)',
+        'Error: $e',
+        isError: true,
+      );
     } finally {
       setState(() => _isLoading = false);
     }
   }
 
-  void _showSuccess(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message), backgroundColor: Colors.green),
-    );
+  void _recordMethodResult(
+    String methodName,
+    String message, {
+    required bool isError,
+  }) {
+    setState(() {
+      final entries = List<MethodResultEntry>.from(
+        _methodHistory[methodName] ?? const [],
+      );
+      entries.insert(
+        0,
+        MethodResultEntry(
+          message: message,
+          isError: isError,
+          timestamp: DateTime.now(),
+        ),
+      );
+      if (entries.length > _maxHistoryEntries) {
+        entries.removeRange(_maxHistoryEntries, entries.length);
+      }
+      _methodHistory[methodName] = entries;
+      _selectedHistoryIndex[methodName] = 0;
+    });
   }
 
-  void _showError(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message), backgroundColor: Colors.red),
+  Widget _buildMethodHistory(String methodName, {String? title}) {
+    final entries = _methodHistory[methodName] ?? const [];
+    if (entries.isEmpty) {
+      return const SizedBox.shrink();
+    }
+    return MethodResultHistory(
+      entries: entries,
+      selectedIndex: _selectedHistoryIndex[methodName],
+      title: title ?? methodName,
+      onSelected: (index) {
+        setState(() => _selectedHistoryIndex[methodName] = index);
+      },
     );
   }
 
   void _showInitError(String message) {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted) return;
-      _showError(message);
-    });
+    _recordMethodResult('initBrowser', message, isError: true);
+  }
+
+  Widget _buildInitStatusSection() {
+    final entries = _methodHistory['initBrowser'] ?? const [];
+    if (entries.isEmpty) {
+      return const SizedBox.shrink();
+    }
+    return Column(
+      children: [
+        _buildMethodHistory('initBrowser', title: 'Initialization'),
+        const SizedBox(height: 16),
+      ],
+    );
   }
 
   @override
@@ -508,6 +651,7 @@ class _ChromeSafariBrowserScreenState extends State<ChromeSafariBrowserScreen> {
         children: [
           _buildStatusCard(),
           const SizedBox(height: 16),
+          _buildInitStatusSection(),
           _buildInputSection(),
           const SizedBox(height: 16),
           _buildOpenMethods(),
@@ -843,6 +987,8 @@ class _ChromeSafariBrowserScreenState extends State<ChromeSafariBrowserScreen> {
               supportedPlatforms: supportedPlatforms,
               compact: true,
             ),
+            const SizedBox(height: 6),
+            _buildMethodHistory(methodName),
           ],
         ),
         trailing: ElevatedButton(

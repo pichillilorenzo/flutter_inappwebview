@@ -4,6 +4,7 @@ import 'package:flutter_inappwebview_example/main.dart';
 import 'package:flutter_inappwebview_example/utils/support_checker.dart';
 import 'package:flutter_inappwebview_example/widgets/common/support_badge.dart';
 import 'package:flutter_inappwebview_example/widgets/common/parameter_dialog.dart';
+import 'package:flutter_inappwebview_example/widgets/common/method_result_history.dart';
 
 /// Screen for testing HttpAuthCredentialDatabase functionality
 class HttpAuthScreen extends StatefulWidget {
@@ -18,6 +19,10 @@ class _HttpAuthScreenState extends State<HttpAuthScreen> {
   List<URLProtectionSpaceHttpAuthCredentials> _allCredentials = [];
   bool _isLoading = false;
 
+  final Map<String, List<MethodResultEntry>> _methodHistory = {};
+  final Map<String, int> _selectedHistoryIndex = {};
+  static const int _maxHistoryEntries = 3;
+
   @override
   void initState() {
     super.initState();
@@ -29,9 +34,17 @@ class _HttpAuthScreenState extends State<HttpAuthScreen> {
     try {
       final credentials = await _db.getAllAuthCredentials();
       setState(() => _allCredentials = credentials);
-      _showSuccess('Found ${credentials.length} protection spaces');
+      _recordMethodResult(
+        'getAllAuthCredentials',
+        'Found ${credentials.length} protection spaces',
+        isError: false,
+      );
     } catch (e) {
-      _showError('Error getting credentials: $e');
+      _recordMethodResult(
+        'getAllAuthCredentials',
+        'Error getting credentials: $e',
+        isError: true,
+      );
     } finally {
       setState(() => _isLoading = false);
     }
@@ -46,8 +59,17 @@ class _HttpAuthScreenState extends State<HttpAuthScreen> {
         protectionSpace: protectionSpace,
       );
       _showCredentialsDialog(protectionSpace, credentials);
+      _recordMethodResult(
+        'getHttpAuthCredentials',
+        'Found ${credentials.length} credential(s)',
+        isError: false,
+      );
     } catch (e) {
-      _showError('Error getting credentials: $e');
+      _recordMethodResult(
+        'getHttpAuthCredentials',
+        'Error getting credentials: $e',
+        isError: true,
+      );
     } finally {
       setState(() => _isLoading = false);
     }
@@ -93,10 +115,18 @@ class _HttpAuthScreenState extends State<HttpAuthScreen> {
         protectionSpace: protectionSpace,
         credential: credential,
       );
-      _showSuccess('Credential removed');
+      _recordMethodResult(
+        'removeHttpAuthCredential',
+        'Credential removed',
+        isError: false,
+      );
       await _getAllAuthCredentials();
     } catch (e) {
-      _showError('Error removing credential: $e');
+      _recordMethodResult(
+        'removeHttpAuthCredential',
+        'Error removing credential: $e',
+        isError: true,
+      );
     } finally {
       setState(() => _isLoading = false);
     }
@@ -120,7 +150,11 @@ class _HttpAuthScreenState extends State<HttpAuthScreen> {
     if (params == null) return;
     final space = _protectionSpaceFromParams(params['protectionSpace']);
     if (space == null) {
-      _showError('Protection space host is required');
+      _recordMethodResult(
+        'getHttpAuthCredentials',
+        'Protection space host is required',
+        isError: true,
+      );
       return;
     }
     await _getHttpAuthCredentials(space);
@@ -149,12 +183,20 @@ class _HttpAuthScreenState extends State<HttpAuthScreen> {
     if (params == null) return;
     final space = _protectionSpaceFromParams(params['protectionSpace']);
     if (space == null) {
-      _showError('Protection space host is required');
+      _recordMethodResult(
+        'removeHttpAuthCredential',
+        'Protection space host is required',
+        isError: true,
+      );
       return;
     }
     final credential = _credentialFromParams(params['credential']);
     if (credential == null) {
-      _showError('Credential username and password are required');
+      _recordMethodResult(
+        'removeHttpAuthCredential',
+        'Credential username and password are required',
+        isError: true,
+      );
       return;
     }
     await _removeHttpAuthCredential(space, credential);
@@ -178,7 +220,11 @@ class _HttpAuthScreenState extends State<HttpAuthScreen> {
     if (params == null) return;
     final space = _protectionSpaceFromParams(params['protectionSpace']);
     if (space == null) {
-      _showError('Protection space host is required');
+      _recordMethodResult(
+        'removeHttpAuthCredentials',
+        'Protection space host is required',
+        isError: true,
+      );
       return;
     }
     await _removeHttpAuthCredentials(space);
@@ -196,10 +242,18 @@ class _HttpAuthScreenState extends State<HttpAuthScreen> {
     setState(() => _isLoading = true);
     try {
       await _db.removeHttpAuthCredentials(protectionSpace: protectionSpace);
-      _showSuccess('Credentials removed for protection space');
+      _recordMethodResult(
+        'removeHttpAuthCredentials',
+        'Credentials removed for protection space',
+        isError: false,
+      );
       await _getAllAuthCredentials();
     } catch (e) {
-      _showError('Error removing credentials: $e');
+      _recordMethodResult(
+        'removeHttpAuthCredentials',
+        'Error removing credentials: $e',
+        isError: true,
+      );
     } finally {
       setState(() => _isLoading = false);
     }
@@ -216,24 +270,45 @@ class _HttpAuthScreenState extends State<HttpAuthScreen> {
     try {
       await _db.clearAllAuthCredentials();
       setState(() => _allCredentials = []);
-      _showSuccess('All credentials cleared');
+      _recordMethodResult(
+        'clearAllAuthCredentials',
+        'All credentials cleared',
+        isError: false,
+      );
     } catch (e) {
-      _showError('Error clearing credentials: $e');
+      _recordMethodResult(
+        'clearAllAuthCredentials',
+        'Error clearing credentials: $e',
+        isError: true,
+      );
     } finally {
       setState(() => _isLoading = false);
     }
   }
 
-  void _showSuccess(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message), backgroundColor: Colors.green),
-    );
-  }
-
-  void _showError(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message), backgroundColor: Colors.red),
-    );
+  void _recordMethodResult(
+    String methodName,
+    String message, {
+    required bool isError,
+  }) {
+    setState(() {
+      final entries = List<MethodResultEntry>.from(
+        _methodHistory[methodName] ?? const [],
+      );
+      entries.insert(
+        0,
+        MethodResultEntry(
+          message: message,
+          isError: isError,
+          timestamp: DateTime.now(),
+        ),
+      );
+      if (entries.length > _maxHistoryEntries) {
+        entries.removeRange(_maxHistoryEntries, entries.length);
+      }
+      _methodHistory[methodName] = entries;
+      _selectedHistoryIndex[methodName] = 0;
+    });
   }
 
   URLProtectionSpace? _protectionSpaceFromParams(dynamic raw) {
@@ -263,7 +338,11 @@ class _HttpAuthScreenState extends State<HttpAuthScreen> {
     final space = _protectionSpaceFromParams(params['protectionSpace']);
     final credential = _credentialFromParams(params['credential']);
     if (space == null || credential == null) {
-      _showError('Protection space, username, and password are required');
+      _recordMethodResult(
+        'setHttpAuthCredential',
+        'Protection space, username, and password are required',
+        isError: true,
+      );
       return;
     }
 
@@ -273,13 +352,36 @@ class _HttpAuthScreenState extends State<HttpAuthScreen> {
         protectionSpace: space,
         credential: credential,
       );
-      _showSuccess('Credential saved');
+      _recordMethodResult(
+        'setHttpAuthCredential',
+        'Credential saved',
+        isError: false,
+      );
       await _getAllAuthCredentials();
     } catch (e) {
-      _showError('Error saving credential: $e');
+      _recordMethodResult(
+        'setHttpAuthCredential',
+        'Error saving credential: $e',
+        isError: true,
+      );
     } finally {
       setState(() => _isLoading = false);
     }
+  }
+
+  Widget _buildMethodHistory(String methodName, {String? title}) {
+    final entries = _methodHistory[methodName] ?? const [];
+    if (entries.isEmpty) {
+      return const SizedBox.shrink();
+    }
+    return MethodResultHistory(
+      entries: entries,
+      selectedIndex: _selectedHistoryIndex[methodName],
+      title: title ?? methodName,
+      onSelected: (index) {
+        setState(() => _selectedHistoryIndex[methodName] = index);
+      },
+    );
   }
 
   Future<bool> _showConfirmDialog(String title, String content) async {
@@ -448,6 +550,8 @@ class _HttpAuthScreenState extends State<HttpAuthScreen> {
               supportedPlatforms: supportedPlatforms,
               compact: true,
             ),
+            const SizedBox(height: 6),
+            _buildMethodHistory(methodName),
           ],
         ),
         trailing: onPressed != null

@@ -6,6 +6,7 @@ import 'package:flutter_inappwebview_example/main.dart';
 import 'package:flutter_inappwebview_example/utils/support_checker.dart';
 import 'package:flutter_inappwebview_example/widgets/common/support_badge.dart';
 import 'package:flutter_inappwebview_example/widgets/common/parameter_dialog.dart';
+import 'package:flutter_inappwebview_example/widgets/common/method_result_history.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_inappwebview_example/providers/event_log_provider.dart';
 import 'package:flutter_inappwebview_example/models/event_log_entry.dart';
@@ -38,6 +39,10 @@ class _HeadlessWebViewScreenState extends State<HeadlessWebViewScreen> {
   String? _currentUrl;
   String? _currentTitle;
 
+  final Map<String, List<MethodResultEntry>> _methodHistory = {};
+  final Map<String, int> _selectedHistoryIndex = {};
+  static const int _maxHistoryEntries = 3;
+
   @override
   void dispose() {
     _urlController.dispose();
@@ -65,7 +70,7 @@ class _HeadlessWebViewScreenState extends State<HeadlessWebViewScreen> {
     bool javaScriptEnabled = true,
   }) {
     if (url.isEmpty) {
-      _showError('Please enter a URL');
+      _recordMethodResult('run', 'Please enter a URL', isError: true);
       return false;
     }
     try {
@@ -137,7 +142,11 @@ class _HeadlessWebViewScreenState extends State<HeadlessWebViewScreen> {
         },
       );
     } catch (e) {
-      _showError('Error creating headless webview: $e');
+      _recordMethodResult(
+        'run',
+        'Error creating headless webview: $e',
+        isError: true,
+      );
       return false;
     }
     return true;
@@ -177,9 +186,17 @@ class _HeadlessWebViewScreenState extends State<HeadlessWebViewScreen> {
       if (!created) return;
       await _headlessWebView?.run();
       setState(() => _isRunning = _headlessWebView?.isRunning() ?? false);
-      _showSuccess('HeadlessInAppWebView started');
+      _recordMethodResult(
+        'run',
+        'HeadlessInAppWebView started',
+        isError: false,
+      );
     } catch (e) {
-      _showError('Error starting headless webview: $e');
+      _recordMethodResult(
+        'run',
+        'Error starting headless webview: $e',
+        isError: true,
+      );
     } finally {
       setState(() => _isLoading = false);
     }
@@ -188,7 +205,11 @@ class _HeadlessWebViewScreenState extends State<HeadlessWebViewScreen> {
   void _checkIsRunning() {
     final running = _headlessWebView?.isRunning() ?? false;
     setState(() => _isRunning = running);
-    _showSuccess('HeadlessInAppWebView is running: $running');
+    _recordMethodResult(
+      'isRunning',
+      'HeadlessInAppWebView is running: $running',
+      isError: false,
+    );
   }
 
   Future<void> _setSize() async {
@@ -206,7 +227,11 @@ class _HeadlessWebViewScreenState extends State<HeadlessWebViewScreen> {
     final width = (params['width'] as num?)?.toDouble();
     final height = (params['height'] as num?)?.toDouble();
     if (width == null || height == null) {
-      _showError('Please enter valid width and height');
+      _recordMethodResult(
+        'setSize',
+        'Please enter valid width and height',
+        isError: true,
+      );
       return;
     }
     _widthController.text = width.toString();
@@ -215,10 +240,14 @@ class _HeadlessWebViewScreenState extends State<HeadlessWebViewScreen> {
     setState(() => _isLoading = true);
     try {
       await _headlessWebView?.setSize(Size(width, height));
-      _showSuccess('Size set to ${width}x$height');
+      _recordMethodResult(
+        'setSize',
+        'Size set to ${width}x$height',
+        isError: false,
+      );
       await _getSize();
     } catch (e) {
-      _showError('Error setting size: $e');
+      _recordMethodResult('setSize', 'Error setting size: $e', isError: true);
     } finally {
       setState(() => _isLoading = false);
     }
@@ -229,9 +258,13 @@ class _HeadlessWebViewScreenState extends State<HeadlessWebViewScreen> {
     try {
       final size = await _headlessWebView?.getSize();
       setState(() => _currentSize = size);
-      _showSuccess('Current size: ${size?.width}x${size?.height}');
+      _recordMethodResult(
+        'getSize',
+        'Current size: ${size?.width}x${size?.height}',
+        isError: false,
+      );
     } catch (e) {
-      _showError('Error getting size: $e');
+      _recordMethodResult('getSize', 'Error getting size: $e', isError: true);
     } finally {
       setState(() => _isLoading = false);
     }
@@ -250,9 +283,9 @@ class _HeadlessWebViewScreenState extends State<HeadlessWebViewScreen> {
       });
       _headlessWebView = null;
       _webViewController = null;
-      _showSuccess('HeadlessInAppWebView disposed');
+      _recordMethodResult('dispose', 'HeadlessInAppWebView disposed', isError: false);
     } catch (e) {
-      _showError('Error disposing: $e');
+      _recordMethodResult('dispose', 'Error disposing: $e', isError: true);
     } finally {
       setState(() => _isLoading = false);
     }
@@ -260,7 +293,11 @@ class _HeadlessWebViewScreenState extends State<HeadlessWebViewScreen> {
 
   Future<void> _takeScreenshot() async {
     if (_webViewController == null) {
-      _showError('WebView not initialized');
+      _recordMethodResult(
+        'takeScreenshot',
+        'WebView not initialized',
+        isError: true,
+      );
       return;
     }
 
@@ -269,12 +306,24 @@ class _HeadlessWebViewScreenState extends State<HeadlessWebViewScreen> {
       final screenshot = await _webViewController?.takeScreenshot();
       setState(() => _screenshotData = screenshot);
       if (screenshot != null) {
-        _showSuccess('Screenshot taken (${screenshot.length} bytes)');
+        _recordMethodResult(
+          'takeScreenshot',
+          'Screenshot taken (${screenshot.length} bytes)',
+          isError: false,
+        );
       } else {
-        _showError('Failed to take screenshot');
+        _recordMethodResult(
+          'takeScreenshot',
+          'Failed to take screenshot',
+          isError: true,
+        );
       }
     } catch (e) {
-      _showError('Error taking screenshot: $e');
+      _recordMethodResult(
+        'takeScreenshot',
+        'Error taking screenshot: $e',
+        isError: true,
+      );
     } finally {
       setState(() => _isLoading = false);
     }
@@ -291,13 +340,17 @@ class _HeadlessWebViewScreenState extends State<HeadlessWebViewScreen> {
     if (params == null) return;
     final url = params['url']?.toString() ?? '';
     if (url.isEmpty) {
-      _showError('Please enter a URL');
+      _recordMethodResult('loadUrl', 'Please enter a URL', isError: true);
       return;
     }
     _urlController.text = url;
 
     if (_webViewController == null) {
-      _showError('WebView not initialized. Run first.');
+      _recordMethodResult(
+        'loadUrl',
+        'WebView not initialized. Run first.',
+        isError: true,
+      );
       return;
     }
 
@@ -306,9 +359,9 @@ class _HeadlessWebViewScreenState extends State<HeadlessWebViewScreen> {
       await _webViewController?.loadUrl(
         urlRequest: URLRequest(url: WebUri(url)),
       );
-      _showSuccess('Loading URL: $url');
+      _recordMethodResult('loadUrl', 'Loading URL: $url', isError: false);
     } catch (e) {
-      _showError('Error loading URL: $e');
+      _recordMethodResult('loadUrl', 'Error loading URL: $e', isError: true);
     } finally {
       setState(() => _isLoading = false);
     }
@@ -316,7 +369,11 @@ class _HeadlessWebViewScreenState extends State<HeadlessWebViewScreen> {
 
   Future<void> _evaluateJavaScript() async {
     if (_webViewController == null) {
-      _showError('WebView not initialized');
+      _recordMethodResult(
+        'evaluateJavascript',
+        'WebView not initialized',
+        isError: true,
+      );
       return;
     }
 
@@ -330,7 +387,11 @@ class _HeadlessWebViewScreenState extends State<HeadlessWebViewScreen> {
     if (params == null) return;
     final source = params['source']?.toString() ?? '';
     if (source.isEmpty) {
-      _showError('Please enter JavaScript source');
+      _recordMethodResult(
+        'evaluateJavascript',
+        'Please enter JavaScript source',
+        isError: true,
+      );
       return;
     }
 
@@ -339,23 +400,59 @@ class _HeadlessWebViewScreenState extends State<HeadlessWebViewScreen> {
       final result = await _webViewController?.evaluateJavascript(
         source: source,
       );
-      _showSuccess('JavaScript result: $result');
+      _recordMethodResult(
+        'evaluateJavascript',
+        'JavaScript result: $result',
+        isError: false,
+      );
     } catch (e) {
-      _showError('Error evaluating JavaScript: $e');
+      _recordMethodResult(
+        'evaluateJavascript',
+        'Error evaluating JavaScript: $e',
+        isError: true,
+      );
     } finally {
       setState(() => _isLoading = false);
     }
   }
 
-  void _showSuccess(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message), backgroundColor: Colors.green),
-    );
+  void _recordMethodResult(
+    String methodName,
+    String message, {
+    required bool isError,
+  }) {
+    setState(() {
+      final entries = List<MethodResultEntry>.from(
+        _methodHistory[methodName] ?? const [],
+      );
+      entries.insert(
+        0,
+        MethodResultEntry(
+          message: message,
+          isError: isError,
+          timestamp: DateTime.now(),
+        ),
+      );
+      if (entries.length > _maxHistoryEntries) {
+        entries.removeRange(_maxHistoryEntries, entries.length);
+      }
+      _methodHistory[methodName] = entries;
+      _selectedHistoryIndex[methodName] = 0;
+    });
   }
 
-  void _showError(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message), backgroundColor: Colors.red),
+  Widget _buildMethodHistory(String methodName, {String? title}) {
+    final entries = _methodHistory[methodName] ?? const [];
+    if (entries.isEmpty) {
+      return const SizedBox.shrink();
+    }
+    return MethodResultHistory(
+      entries: entries,
+      selectedIndex: _selectedHistoryIndex[methodName],
+      title: title ?? methodName,
+      onSelected: (index) {
+        setState(() => _selectedHistoryIndex[methodName] = index);
+      },
     );
   }
 
@@ -635,6 +732,10 @@ class _HeadlessWebViewScreenState extends State<HeadlessWebViewScreen> {
                 ),
               ],
             ),
+            const SizedBox(height: 8),
+            _buildMethodHistory('loadUrl'),
+            _buildMethodHistory('takeScreenshot'),
+            _buildMethodHistory('evaluateJavascript'),
           ],
         ),
       ),
@@ -742,6 +843,8 @@ class _HeadlessWebViewScreenState extends State<HeadlessWebViewScreen> {
               supportedPlatforms: supportedPlatforms,
               compact: true,
             ),
+            const SizedBox(height: 6),
+            _buildMethodHistory(methodName),
           ],
         ),
         trailing: ElevatedButton(

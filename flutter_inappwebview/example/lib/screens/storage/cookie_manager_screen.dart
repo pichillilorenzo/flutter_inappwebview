@@ -4,6 +4,7 @@ import 'package:flutter_inappwebview_example/main.dart';
 import 'package:flutter_inappwebview_example/utils/support_checker.dart';
 import 'package:flutter_inappwebview_example/widgets/common/support_badge.dart';
 import 'package:flutter_inappwebview_example/widgets/common/parameter_dialog.dart';
+import 'package:flutter_inappwebview_example/widgets/common/method_result_history.dart';
 
 /// Screen for testing CookieManager functionality
 class CookieManagerScreen extends StatefulWidget {
@@ -22,10 +23,14 @@ class _CookieManagerScreenState extends State<CookieManagerScreen> {
   List<Cookie> _cookies = [];
   bool _isLoading = false;
 
+  final Map<String, List<MethodResultEntry>> _methodHistory = {};
+  final Map<String, int> _selectedHistoryIndex = {};
+  static const int _maxHistoryEntries = 3;
+
   Future<void> _getCookies() async {
     final url = _urlController.text.trim();
     if (url.isEmpty) {
-      _showError('Please enter a URL');
+      _recordMethodResult('getCookies', 'Please enter a URL', isError: true);
       return;
     }
 
@@ -33,9 +38,17 @@ class _CookieManagerScreenState extends State<CookieManagerScreen> {
     try {
       final cookies = await _cookieManager.getCookies(url: WebUri(url));
       setState(() => _cookies = cookies);
-      _showSuccess('Found ${cookies.length} cookies');
+      _recordMethodResult(
+        'getCookies',
+        'Found ${cookies.length} cookies',
+        isError: false,
+      );
     } catch (e) {
-      _showError('Error getting cookies: $e');
+      _recordMethodResult(
+        'getCookies',
+        'Error getting cookies: $e',
+        isError: true,
+      );
     } finally {
       setState(() => _isLoading = false);
     }
@@ -46,9 +59,17 @@ class _CookieManagerScreenState extends State<CookieManagerScreen> {
     try {
       final cookies = await _cookieManager.getAllCookies();
       setState(() => _cookies = cookies);
-      _showSuccess('Found ${cookies.length} cookies');
+      _recordMethodResult(
+        'getAllCookies',
+        'Found ${cookies.length} cookies',
+        isError: false,
+      );
     } catch (e) {
-      _showError('Error getting all cookies: $e');
+      _recordMethodResult(
+        'getAllCookies',
+        'Error getting all cookies: $e',
+        isError: true,
+      );
     } finally {
       setState(() => _isLoading = false);
     }
@@ -63,11 +84,20 @@ class _CookieManagerScreenState extends State<CookieManagerScreen> {
       );
       if (cookie != null) {
         _showCookieDetailsDialog(cookie);
+        _recordMethodResult(
+          'getCookie',
+          'Cookie found for "$name"',
+          isError: false,
+        );
       } else {
-        _showError('Cookie not found');
+        _recordMethodResult('getCookie', 'Cookie not found', isError: true);
       }
     } catch (e) {
-      _showError('Error getting cookie: $e');
+      _recordMethodResult(
+        'getCookie',
+        'Error getting cookie: $e',
+        isError: true,
+      );
     } finally {
       setState(() => _isLoading = false);
     }
@@ -99,7 +129,7 @@ class _CookieManagerScreenState extends State<CookieManagerScreen> {
 
     final url = params['url']?.toString() ?? '';
     if (url.isEmpty) {
-      _showError('Please enter a URL');
+      _recordMethodResult('setCookie', 'Please enter a URL', isError: true);
       return;
     }
 
@@ -131,13 +161,25 @@ class _CookieManagerScreenState extends State<CookieManagerScreen> {
         sameSite: sameSite,
       );
       if (result) {
-        _showSuccess('Cookie set successfully');
+        _recordMethodResult(
+          'setCookie',
+          'Cookie set successfully',
+          isError: false,
+        );
         await _getCookies();
       } else {
-        _showError('Failed to set cookie');
+        _recordMethodResult(
+          'setCookie',
+          'Failed to set cookie',
+          isError: true,
+        );
       }
     } catch (e) {
-      _showError('Error setting cookie: $e');
+      _recordMethodResult(
+        'setCookie',
+        'Error setting cookie: $e',
+        isError: true,
+      );
     } finally {
       setState(() => _isLoading = false);
     }
@@ -146,7 +188,7 @@ class _CookieManagerScreenState extends State<CookieManagerScreen> {
   Future<void> _deleteCookie(Cookie cookie, {String? urlOverride}) async {
     final url = urlOverride ?? _urlController.text.trim();
     if (url.isEmpty) {
-      _showError('Please enter a URL');
+      _recordMethodResult('deleteCookie', 'Please enter a URL', isError: true);
       return;
     }
     setState(() => _isLoading = true);
@@ -158,13 +200,25 @@ class _CookieManagerScreenState extends State<CookieManagerScreen> {
         domain: cookie.domain,
       );
       if (result) {
-        _showSuccess('Cookie deleted');
+        _recordMethodResult(
+          'deleteCookie',
+          'Cookie deleted',
+          isError: false,
+        );
         await _getCookies();
       } else {
-        _showError('Failed to delete cookie');
+        _recordMethodResult(
+          'deleteCookie',
+          'Failed to delete cookie',
+          isError: true,
+        );
       }
     } catch (e) {
-      _showError('Error deleting cookie: $e');
+      _recordMethodResult(
+        'deleteCookie',
+        'Error deleting cookie: $e',
+        isError: true,
+      );
     } finally {
       setState(() => _isLoading = false);
     }
@@ -185,13 +239,25 @@ class _CookieManagerScreenState extends State<CookieManagerScreen> {
         domain: domain,
       );
       if (result) {
-        _showSuccess('Cookie deleted');
+        _recordMethodResult(
+          'deleteCookie',
+          'Cookie deleted',
+          isError: false,
+        );
         await _getCookies();
       } else {
-        _showError('Failed to delete cookie');
+        _recordMethodResult(
+          'deleteCookie',
+          'Failed to delete cookie',
+          isError: true,
+        );
       }
     } catch (e) {
-      _showError('Error deleting cookie: $e');
+      _recordMethodResult(
+        'deleteCookie',
+        'Error deleting cookie: $e',
+        isError: true,
+      );
     } finally {
       setState(() => _isLoading = false);
     }
@@ -209,7 +275,11 @@ class _CookieManagerScreenState extends State<CookieManagerScreen> {
     final url = params['url']?.toString() ?? '';
     final name = params['name']?.toString() ?? '';
     if (url.isEmpty || name.isEmpty) {
-      _showError('URL and name are required');
+      _recordMethodResult(
+        'getCookie',
+        'URL and name are required',
+        isError: true,
+      );
       return;
     }
     _urlController.text = url;
@@ -233,7 +303,11 @@ class _CookieManagerScreenState extends State<CookieManagerScreen> {
     final url = params['url']?.toString() ?? '';
     final name = params['name']?.toString() ?? '';
     if (url.isEmpty || name.isEmpty) {
-      _showError('URL and name are required');
+      _recordMethodResult(
+        'deleteCookie',
+        'URL and name are required',
+        isError: true,
+      );
       return;
     }
     _urlController.text = url;
@@ -252,7 +326,7 @@ class _CookieManagerScreenState extends State<CookieManagerScreen> {
   Future<void> _deleteCookies() async {
     final url = _urlController.text.trim();
     if (url.isEmpty) {
-      _showError('Please enter a URL');
+      _recordMethodResult('deleteCookies', 'Please enter a URL', isError: true);
       return;
     }
 
@@ -266,13 +340,25 @@ class _CookieManagerScreenState extends State<CookieManagerScreen> {
     try {
       final result = await _cookieManager.deleteCookies(url: WebUri(url));
       if (result) {
-        _showSuccess('Cookies deleted for URL');
+        _recordMethodResult(
+          'deleteCookies',
+          'Cookies deleted for URL',
+          isError: false,
+        );
         setState(() => _cookies = []);
       } else {
-        _showError('Failed to delete cookies');
+        _recordMethodResult(
+          'deleteCookies',
+          'Failed to delete cookies',
+          isError: true,
+        );
       }
     } catch (e) {
-      _showError('Error deleting cookies: $e');
+      _recordMethodResult(
+        'deleteCookies',
+        'Error deleting cookies: $e',
+        isError: true,
+      );
     } finally {
       setState(() => _isLoading = false);
     }
@@ -289,13 +375,25 @@ class _CookieManagerScreenState extends State<CookieManagerScreen> {
     try {
       final result = await _cookieManager.deleteAllCookies();
       if (result) {
-        _showSuccess('All cookies deleted');
+        _recordMethodResult(
+          'deleteAllCookies',
+          'All cookies deleted',
+          isError: false,
+        );
         setState(() => _cookies = []);
       } else {
-        _showError('Failed to delete all cookies');
+        _recordMethodResult(
+          'deleteAllCookies',
+          'Failed to delete all cookies',
+          isError: true,
+        );
       }
     } catch (e) {
-      _showError('Error deleting all cookies: $e');
+      _recordMethodResult(
+        'deleteAllCookies',
+        'Error deleting all cookies: $e',
+        isError: true,
+      );
     } finally {
       setState(() => _isLoading = false);
     }
@@ -305,11 +403,17 @@ class _CookieManagerScreenState extends State<CookieManagerScreen> {
     setState(() => _isLoading = true);
     try {
       final result = await _cookieManager.removeSessionCookies();
-      _showSuccess(
+      _recordMethodResult(
+        'removeSessionCookies',
         result ? 'Session cookies removed' : 'No session cookies to remove',
+        isError: !result,
       );
     } catch (e) {
-      _showError('Error removing session cookies: $e');
+      _recordMethodResult(
+        'removeSessionCookies',
+        'Error removing session cookies: $e',
+        isError: true,
+      );
     } finally {
       setState(() => _isLoading = false);
     }
@@ -319,24 +423,45 @@ class _CookieManagerScreenState extends State<CookieManagerScreen> {
     setState(() => _isLoading = true);
     try {
       await _cookieManager.flush();
-      _showSuccess('Cookies flushed to persistent storage');
+      _recordMethodResult(
+        'flush',
+        'Cookies flushed to persistent storage',
+        isError: false,
+      );
     } catch (e) {
-      _showError('Error flushing cookies: $e');
+      _recordMethodResult(
+        'flush',
+        'Error flushing cookies: $e',
+        isError: true,
+      );
     } finally {
       setState(() => _isLoading = false);
     }
   }
 
-  void _showSuccess(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message), backgroundColor: Colors.green),
-    );
-  }
-
-  void _showError(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message), backgroundColor: Colors.red),
-    );
+  void _recordMethodResult(
+    String methodName,
+    String message, {
+    required bool isError,
+  }) {
+    setState(() {
+      final entries = List<MethodResultEntry>.from(
+        _methodHistory[methodName] ?? const [],
+      );
+      entries.insert(
+        0,
+        MethodResultEntry(
+          message: message,
+          isError: isError,
+          timestamp: DateTime.now(),
+        ),
+      );
+      if (entries.length > _maxHistoryEntries) {
+        entries.removeRange(_maxHistoryEntries, entries.length);
+      }
+      _methodHistory[methodName] = entries;
+      _selectedHistoryIndex[methodName] = 0;
+    });
   }
 
   Future<bool> _showConfirmDialog(String title, String content) async {
@@ -405,6 +530,21 @@ class _CookieManagerScreenState extends State<CookieManagerScreen> {
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildMethodHistory(String methodName, {String? title}) {
+    final entries = _methodHistory[methodName] ?? const [];
+    if (entries.isEmpty) {
+      return const SizedBox.shrink();
+    }
+    return MethodResultHistory(
+      entries: entries,
+      selectedIndex: _selectedHistoryIndex[methodName],
+      title: title ?? methodName,
+      onSelected: (index) {
+        setState(() => _selectedHistoryIndex[methodName] = index);
+      },
     );
   }
 
@@ -579,6 +719,8 @@ class _CookieManagerScreenState extends State<CookieManagerScreen> {
               supportedPlatforms: supportedPlatforms,
               compact: true,
             ),
+            const SizedBox(height: 6),
+            _buildMethodHistory(methodName),
           ],
         ),
         trailing: onPressed != null

@@ -5,6 +5,7 @@ import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_inappwebview_example/utils/support_checker.dart';
 import 'package:flutter_inappwebview_example/widgets/common/support_badge.dart';
 import 'package:flutter_inappwebview_example/widgets/common/parameter_dialog.dart';
+import 'package:flutter_inappwebview_example/widgets/common/method_result_history.dart';
 
 /// Method entry for a single controller method
 class MethodEntry {
@@ -56,9 +57,9 @@ class MethodTesterWidget extends StatefulWidget {
 class _MethodTesterWidgetState extends State<MethodTesterWidget> {
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
-  final Map<String, dynamic> _results = {};
+  final Map<String, List<MethodResultEntry>> _methodHistory = {};
+  final Map<String, int> _selectedHistoryIndex = {};
   final Map<String, bool> _executing = {};
-  final Map<String, String> _errors = {};
   final Set<int> _expandedCategories = {
     0,
   }; // First category expanded by default
@@ -1451,8 +1452,6 @@ class _MethodTesterWidgetState extends State<MethodTesterWidget> {
 
     setState(() {
       _executing[entry.name] = true;
-      _errors.remove(entry.name);
-      _results.remove(entry.name);
     });
 
     try {
@@ -1479,18 +1478,45 @@ class _MethodTesterWidgetState extends State<MethodTesterWidget> {
       final result = await entry.execute(widget.controller!, params);
       if (mounted) {
         setState(() {
-          _results[entry.name] = result;
+          _addMethodHistoryEntry(
+            entry.name,
+            _formatResult(result),
+            isError: false,
+          );
           _executing[entry.name] = false;
         });
       }
     } catch (e) {
       if (mounted) {
         setState(() {
-          _errors[entry.name] = e.toString();
+          _addMethodHistoryEntry(entry.name, e.toString(), isError: true);
           _executing[entry.name] = false;
         });
       }
     }
+  }
+
+  void _addMethodHistoryEntry(
+    String methodName,
+    String message, {
+    required bool isError,
+  }) {
+    final current = List<MethodResultEntry>.from(
+      _methodHistory[methodName] ?? const [],
+    );
+    current.insert(
+      0,
+      MethodResultEntry(
+        message: message,
+        isError: isError,
+        timestamp: DateTime.now(),
+      ),
+    );
+    if (current.length > 3) {
+      current.removeRange(3, current.length);
+    }
+    _methodHistory[methodName] = current;
+    _selectedHistoryIndex[methodName] = 0;
   }
 
   @override
@@ -1616,8 +1642,7 @@ class _MethodTesterWidgetState extends State<MethodTesterWidget> {
 
   Widget _buildMethodTile(MethodEntry method) {
     final isExecuting = _executing[method.name] == true;
-    final hasResult = _results.containsKey(method.name);
-    final hasError = _errors.containsKey(method.name);
+    final historyEntries = _methodHistory[method.name] ?? const [];
     final supportedPlatforms = SupportCheckHelper.supportedPlatformsForMethod(
       method: method.methodEnum,
       checker: InAppWebViewController.isMethodSupported,
@@ -1681,43 +1706,15 @@ class _MethodTesterWidgetState extends State<MethodTesterWidget> {
             ),
           ),
 
-          // Result or error display
-          if (hasResult || hasError)
-            Container(
-              width: double.infinity,
-              margin: const EdgeInsets.fromLTRB(12, 0, 12, 12),
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: hasError ? Colors.red.shade50 : Colors.green.shade50,
-                borderRadius: BorderRadius.circular(4),
-                border: Border.all(
-                  color: hasError ? Colors.red.shade200 : Colors.green.shade200,
-                ),
-              ),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Icon(
-                    hasError ? Icons.error_outline : Icons.check_circle,
-                    size: 16,
-                    color: hasError ? Colors.red : Colors.green,
-                  ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                      hasError
-                          ? _errors[method.name]!
-                          : _formatResult(_results[method.name]),
-                      style: TextStyle(
-                        fontSize: 11,
-                        fontFamily: 'monospace',
-                        color: hasError
-                            ? Colors.red.shade800
-                            : Colors.green.shade800,
-                      ),
-                    ),
-                  ),
-                ],
+          if (historyEntries.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
+              child: MethodResultHistory(
+                entries: historyEntries,
+                selectedIndex: _selectedHistoryIndex[method.name],
+                onSelected: (index) {
+                  setState(() => _selectedHistoryIndex[method.name] = index);
+                },
               ),
             ),
         ],

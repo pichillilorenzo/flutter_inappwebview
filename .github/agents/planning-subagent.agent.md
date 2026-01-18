@@ -2,7 +2,7 @@
 description: Research context and return findings to parent agent
 argument-hint: Research goal or problem statement
 tools: ['execute/testFailure', 'read/problems', 'read/readFile', 'search', 'web/fetch', 'context7/*', 'todo']
-model: Claude Opus 4.5 (copilot)
+model: GPT-5.2-Codex (copilot)
 ---
 You are a PLANNING SUBAGENT called by a parent CONDUCTOR agent.
 

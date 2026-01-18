@@ -1,7 +1,7 @@
 ---
 description: 'Execute implementation tasks delegated by the CONDUCTOR agent.'
 tools: ['execute/testFailure', 'execute/getTerminalOutput', 'execute/runTask', 'execute/createAndRunTask', 'execute/runInTerminal', 'read/problems', 'read/readFile', 'read/terminalSelection', 'read/terminalLastCommand', 'edit', 'search', 'web/fetch', 'context7/*', 'todo']
-model: Claude Opus 4.5 (copilot)
+model: GPT-5.2-Codex (copilot)
 ---
 You are an IMPLEMENTATION SUBAGENT. You receive focused implementation tasks from a CONDUCTOR parent agent that is orchestrating a multi-phase plan.
 

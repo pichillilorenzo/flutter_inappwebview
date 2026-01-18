@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_inappwebview_example/main.dart';
+import 'package:flutter_inappwebview_example/utils/support_checker.dart';
+import 'package:flutter_inappwebview_example/widgets/common/support_badge.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_inappwebview_example/providers/event_log_provider.dart';
 import 'package:flutter_inappwebview_example/models/event_log_entry.dart';
@@ -719,6 +721,11 @@ class _InAppBrowserScreenState extends State<InAppBrowserScreen> {
     PlatformInAppBrowserMethod method,
     VoidCallback? onPressed,
   ) {
+    final supportedPlatforms = SupportCheckHelper.supportedPlatformsForMethod(
+      method: method,
+      checker: InAppBrowser.isMethodSupported,
+    );
+
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
       child: ListTile(
@@ -727,9 +734,19 @@ class _InAppBrowserScreenState extends State<InAppBrowserScreen> {
           methodName,
           style: const TextStyle(fontWeight: FontWeight.bold),
         ),
-        subtitle: Text(
-          description,
-          style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+        subtitle: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              description,
+              style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+            ),
+            const SizedBox(height: 6),
+            SupportBadgesRow(
+              supportedPlatforms: supportedPlatforms,
+              compact: true,
+            ),
+          ],
         ),
         trailing: ElevatedButton(
           onPressed: !_isLoading ? onPressed : null,

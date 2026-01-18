@@ -72,7 +72,10 @@ class _WebViewTesterScreenState extends State<WebViewTesterScreen>
       body: LayoutBuilder(
         builder: (context, constraints) {
           final minRequiredHeight =
-              _minWebViewHeight + _minTabsHeight + _dividerHeight + _minChromeHeight;
+              _minWebViewHeight +
+              _minTabsHeight +
+              _dividerHeight +
+              _minChromeHeight;
           final useScroll = constraints.maxHeight < minRequiredHeight;
 
           if (useScroll) {

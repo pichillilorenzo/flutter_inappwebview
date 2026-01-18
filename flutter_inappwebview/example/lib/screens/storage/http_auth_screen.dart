@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_inappwebview_example/main.dart';
+import 'package:flutter_inappwebview_example/utils/support_checker.dart';
+import 'package:flutter_inappwebview_example/widgets/common/support_badge.dart';
 
 /// Screen for testing HttpAuthCredentialDatabase functionality
 class HttpAuthScreen extends StatefulWidget {
@@ -417,6 +419,11 @@ class _HttpAuthScreenState extends State<HttpAuthScreen> {
     PlatformHttpAuthCredentialDatabaseMethod method,
     VoidCallback? onPressed,
   ) {
+    final supportedPlatforms = SupportCheckHelper.supportedPlatformsForMethod(
+      method: method,
+      checker: HttpAuthCredentialDatabase.isMethodSupported,
+    );
+
     return Card(
       margin: const EdgeInsets.only(bottom: 8),
       child: ListTile(
@@ -424,9 +431,19 @@ class _HttpAuthScreenState extends State<HttpAuthScreen> {
           methodName,
           style: const TextStyle(fontWeight: FontWeight.bold),
         ),
-        subtitle: Text(
-          description,
-          style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+        subtitle: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              description,
+              style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+            ),
+            const SizedBox(height: 6),
+            SupportBadgesRow(
+              supportedPlatforms: supportedPlatforms,
+              compact: true,
+            ),
+          ],
         ),
         trailing: onPressed != null
             ? ElevatedButton(

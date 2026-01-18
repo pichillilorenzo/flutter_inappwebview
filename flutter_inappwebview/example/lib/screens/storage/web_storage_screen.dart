@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_inappwebview_example/main.dart';
+import 'package:flutter_inappwebview_example/utils/support_checker.dart';
+import 'package:flutter_inappwebview_example/widgets/common/support_badge.dart';
 
 /// Screen for testing WebStorage (localStorage and sessionStorage) functionality
 class WebStorageScreen extends StatefulWidget {
@@ -56,6 +58,29 @@ class _WebStorageScreenState extends State<WebStorageScreen>
   SessionStorage? get _sessionStorage => _webStorage?.sessionStorage;
 
   bool get _isLocalStorageTab => _tabController.index == 0;
+
+  Set<SupportedPlatform> _getStorageMethodPlatforms(
+    String methodName, {
+    required bool isLocal,
+  }) {
+    if (isLocal) {
+      final method = PlatformLocalStorageMethod.values.firstWhere(
+        (m) => m.name == methodName,
+      );
+      return SupportCheckHelper.supportedPlatformsForMethod(
+        method: method,
+        checker: LocalStorage.isMethodSupported,
+      );
+    }
+
+    final method = PlatformSessionStorageMethod.values.firstWhere(
+      (m) => m.name == methodName,
+    );
+    return SupportCheckHelper.supportedPlatformsForMethod(
+      method: method,
+      checker: SessionStorage.isMethodSupported,
+    );
+  }
 
   Future<void> _loadUrl() async {
     final url = _urlController.text.trim();
@@ -620,43 +645,43 @@ class _WebStorageScreenState extends State<WebStorageScreen>
         _buildMethodSection(
           'length',
           'Get number of items in storage',
-          PlatformLocalStorageMethod.length,
+          _getStorageMethodPlatforms('length', isLocal: isLocal),
           _getLength,
         ),
         _buildMethodSection(
           'setItem',
           'Set a key-value pair',
-          PlatformLocalStorageMethod.setItem,
+          _getStorageMethodPlatforms('setItem', isLocal: isLocal),
           _setItem,
         ),
         _buildMethodSection(
           'getItem',
           'Get value by key',
-          PlatformLocalStorageMethod.getItem,
+          _getStorageMethodPlatforms('getItem', isLocal: isLocal),
           _showGetItemDialog,
         ),
         _buildMethodSection(
           'removeItem',
           'Remove item by key (select from list)',
-          PlatformLocalStorageMethod.removeItem,
+          _getStorageMethodPlatforms('removeItem', isLocal: isLocal),
           null,
         ),
         _buildMethodSection(
           'getItems',
           'Get all items',
-          PlatformLocalStorageMethod.getItems,
+          _getStorageMethodPlatforms('getItems', isLocal: isLocal),
           _getItems,
         ),
         _buildMethodSection(
           'clear',
           'Clear all items',
-          PlatformLocalStorageMethod.clear,
+          _getStorageMethodPlatforms('clear', isLocal: isLocal),
           _clear,
         ),
         _buildMethodSection(
           'key',
           'Get key at index',
-          PlatformLocalStorageMethod.key,
+          _getStorageMethodPlatforms('key', isLocal: isLocal),
           _showKeyIndexDialog,
         ),
         const SizedBox(height: 16),
@@ -668,7 +693,7 @@ class _WebStorageScreenState extends State<WebStorageScreen>
   Widget _buildMethodSection(
     String methodName,
     String description,
-    PlatformLocalStorageMethod method,
+    Set<SupportedPlatform> supportedPlatforms,
     VoidCallback? onPressed,
   ) {
     return Card(
@@ -678,9 +703,19 @@ class _WebStorageScreenState extends State<WebStorageScreen>
           methodName,
           style: const TextStyle(fontWeight: FontWeight.bold),
         ),
-        subtitle: Text(
-          description,
-          style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+        subtitle: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              description,
+              style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+            ),
+            const SizedBox(height: 6),
+            SupportBadgesRow(
+              supportedPlatforms: supportedPlatforms,
+              compact: true,
+            ),
+          ],
         ),
         trailing: onPressed != null
             ? ElevatedButton(

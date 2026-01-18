@@ -4,6 +4,8 @@ import 'package:flutter_inappwebview_example/main.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_inappwebview_example/providers/event_log_provider.dart';
 import 'package:flutter_inappwebview_example/models/event_log_entry.dart';
+import 'package:flutter_inappwebview_example/utils/support_checker.dart';
+import 'package:flutter_inappwebview_example/widgets/common/support_badge.dart';
 
 /// Screen for testing service-level controllers
 class ServiceControllersScreen extends StatefulWidget {
@@ -44,6 +46,58 @@ class _ServiceControllersScreenState extends State<ServiceControllersScreen> {
   final TextEditingController _dataDirSuffixController = TextEditingController(
     text: 'test_suffix',
   );
+
+  Set<SupportedPlatform> _mergePlatforms(
+    Set<SupportedPlatform> first,
+    Set<SupportedPlatform> second,
+  ) {
+    return {...first, ...second};
+  }
+
+  Set<SupportedPlatform> _serviceWorkerPlatforms(
+    PlatformServiceWorkerControllerMethod method,
+  ) {
+    return SupportCheckHelper.supportedPlatformsForMethod(
+      method: method,
+      checker: ServiceWorkerController.isMethodSupported,
+    );
+  }
+
+  Set<SupportedPlatform> _proxyControllerPlatforms(
+    PlatformProxyControllerMethod method,
+  ) {
+    return SupportCheckHelper.supportedPlatformsForMethod(
+      method: method,
+      checker: ProxyController.isMethodSupported,
+    );
+  }
+
+  Set<SupportedPlatform> _tracingControllerPlatforms(
+    PlatformTracingControllerMethod method,
+  ) {
+    return SupportCheckHelper.supportedPlatformsForMethod(
+      method: method,
+      checker: TracingController.isMethodSupported,
+    );
+  }
+
+  Set<SupportedPlatform> _webViewEnvironmentPlatforms(
+    PlatformWebViewEnvironmentMethod method,
+  ) {
+    return SupportCheckHelper.supportedPlatformsForMethod(
+      method: method,
+      checker: WebViewEnvironment.isMethodSupported,
+    );
+  }
+
+  Set<SupportedPlatform> _processGlobalConfigPlatforms(
+    PlatformProcessGlobalConfigMethod method,
+  ) {
+    return SupportCheckHelper.supportedPlatformsForMethod(
+      method: method,
+      checker: ProcessGlobalConfig.isMethodSupported,
+    );
+  }
 
   @override
   void dispose() {
@@ -453,7 +507,9 @@ class _ServiceControllersScreenState extends State<ServiceControllersScreen> {
   }
 
   Widget _buildServiceWorkerSection() {
-    final isSupported = ServiceWorkerController.isClassSupported();
+    final supportedPlatforms = SupportChecker.getSupportedPlatformsForClass(
+      'ServiceWorkerController',
+    );
 
     return Card(
       child: ExpansionTile(
@@ -464,15 +520,13 @@ class _ServiceControllersScreenState extends State<ServiceControllersScreen> {
               style: TextStyle(fontWeight: FontWeight.bold),
             ),
             const SizedBox(width: 8),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-              decoration: BoxDecoration(
-                color: isSupported ? Colors.green : Colors.red,
-                borderRadius: BorderRadius.circular(4),
-              ),
-              child: Text(
-                isSupported ? 'Supported' : 'Not Supported',
-                style: const TextStyle(color: Colors.white, fontSize: 10),
+            Expanded(
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: SupportBadgesRow(
+                  supportedPlatforms: supportedPlatforms,
+                  compact: true,
+                ),
               ),
             ),
           ],
@@ -488,18 +542,46 @@ class _ServiceControllersScreenState extends State<ServiceControllersScreen> {
                   _allowContentAccess,
                   (value) => _setAllowContentAccess(value),
                   _getAllowContentAccess,
+                  _mergePlatforms(
+                    _serviceWorkerPlatforms(
+                      PlatformServiceWorkerControllerMethod
+                          .getAllowContentAccess,
+                    ),
+                    _serviceWorkerPlatforms(
+                      PlatformServiceWorkerControllerMethod
+                          .setAllowContentAccess,
+                    ),
+                  ),
                 ),
                 _buildSwitchRow(
                   'Allow File Access',
                   _allowFileAccess,
                   (value) => _setAllowFileAccess(value),
                   _getAllowFileAccess,
+                  _mergePlatforms(
+                    _serviceWorkerPlatforms(
+                      PlatformServiceWorkerControllerMethod.getAllowFileAccess,
+                    ),
+                    _serviceWorkerPlatforms(
+                      PlatformServiceWorkerControllerMethod.setAllowFileAccess,
+                    ),
+                  ),
                 ),
                 _buildSwitchRow(
                   'Block Network Loads',
                   _blockNetworkLoads,
                   (value) => _setBlockNetworkLoads(value),
                   _getBlockNetworkLoads,
+                  _mergePlatforms(
+                    _serviceWorkerPlatforms(
+                      PlatformServiceWorkerControllerMethod
+                          .getBlockNetworkLoads,
+                    ),
+                    _serviceWorkerPlatforms(
+                      PlatformServiceWorkerControllerMethod
+                          .setBlockNetworkLoads,
+                    ),
+                  ),
                 ),
                 const Divider(),
 
@@ -537,6 +619,18 @@ class _ServiceControllersScreenState extends State<ServiceControllersScreen> {
                     ),
                   ],
                 ),
+                const SizedBox(height: 8),
+                SupportBadgesRow(
+                  supportedPlatforms: _mergePlatforms(
+                    _serviceWorkerPlatforms(
+                      PlatformServiceWorkerControllerMethod.getCacheMode,
+                    ),
+                    _serviceWorkerPlatforms(
+                      PlatformServiceWorkerControllerMethod.setCacheMode,
+                    ),
+                  ),
+                  compact: true,
+                ),
               ],
             ),
           ),
@@ -550,8 +644,10 @@ class _ServiceControllersScreenState extends State<ServiceControllersScreen> {
     bool value,
     Function(bool) onChanged,
     VoidCallback onRefresh,
+    Set<SupportedPlatform> supportedPlatforms,
   ) {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
           children: [
@@ -564,13 +660,19 @@ class _ServiceControllersScreenState extends State<ServiceControllersScreen> {
             ),
           ],
         ),
+        SupportBadgesRow(
+          supportedPlatforms: supportedPlatforms,
+          compact: true,
+        ),
         const SizedBox(height: 8),
       ],
     );
   }
 
   Widget _buildProxyControllerSection() {
-    final isSupported = ProxyController.isClassSupported();
+    final supportedPlatforms = SupportChecker.getSupportedPlatformsForClass(
+      'ProxyController',
+    );
 
     return Card(
       child: ExpansionTile(
@@ -581,15 +683,13 @@ class _ServiceControllersScreenState extends State<ServiceControllersScreen> {
               style: TextStyle(fontWeight: FontWeight.bold),
             ),
             const SizedBox(width: 8),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-              decoration: BoxDecoration(
-                color: isSupported ? Colors.green : Colors.red,
-                borderRadius: BorderRadius.circular(4),
-              ),
-              child: Text(
-                isSupported ? 'Supported' : 'Not Supported',
-                style: const TextStyle(color: Colors.white, fontSize: 10),
+            Expanded(
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: SupportBadgesRow(
+                  supportedPlatforms: supportedPlatforms,
+                  compact: true,
+                ),
               ),
             ),
           ],
@@ -640,13 +740,22 @@ class _ServiceControllersScreenState extends State<ServiceControllersScreen> {
                 Row(
                   children: [
                     Expanded(
-                      child: _buildMethodButton('Set Proxy', _setProxyOverride),
+                      child: _buildMethodButton(
+                        'Set Proxy',
+                        _setProxyOverride,
+                        supportedPlatforms: _proxyControllerPlatforms(
+                          PlatformProxyControllerMethod.setProxyOverride,
+                        ),
+                      ),
                     ),
                     const SizedBox(width: 8),
                     Expanded(
                       child: _buildMethodButton(
                         'Clear Proxy',
                         _clearProxyOverride,
+                        supportedPlatforms: _proxyControllerPlatforms(
+                          PlatformProxyControllerMethod.clearProxyOverride,
+                        ),
                       ),
                     ),
                   ],
@@ -660,7 +769,9 @@ class _ServiceControllersScreenState extends State<ServiceControllersScreen> {
   }
 
   Widget _buildTracingControllerSection() {
-    final isSupported = TracingController.isClassSupported();
+    final supportedPlatforms = SupportChecker.getSupportedPlatformsForClass(
+      'TracingController',
+    );
 
     return Card(
       child: ExpansionTile(
@@ -671,15 +782,13 @@ class _ServiceControllersScreenState extends State<ServiceControllersScreen> {
               style: TextStyle(fontWeight: FontWeight.bold),
             ),
             const SizedBox(width: 8),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-              decoration: BoxDecoration(
-                color: isSupported ? Colors.green : Colors.red,
-                borderRadius: BorderRadius.circular(4),
-              ),
-              child: Text(
-                isSupported ? 'Supported' : 'Not Supported',
-                style: const TextStyle(color: Colors.white, fontSize: 10),
+            Expanded(
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: SupportBadgesRow(
+                  supportedPlatforms: supportedPlatforms,
+                  compact: true,
+                ),
               ),
             ),
           ],
@@ -725,6 +834,9 @@ class _ServiceControllersScreenState extends State<ServiceControllersScreen> {
                       child: _buildMethodButton(
                         'Start',
                         !_isTracing ? _startTracing : null,
+                        supportedPlatforms: _tracingControllerPlatforms(
+                          PlatformTracingControllerMethod.start,
+                        ),
                       ),
                     ),
                     const SizedBox(width: 8),
@@ -732,11 +844,20 @@ class _ServiceControllersScreenState extends State<ServiceControllersScreen> {
                       child: _buildMethodButton(
                         'Stop',
                         _isTracing ? _stopTracing : null,
+                        supportedPlatforms: _tracingControllerPlatforms(
+                          PlatformTracingControllerMethod.stop,
+                        ),
                       ),
                     ),
                     const SizedBox(width: 8),
                     Expanded(
-                      child: _buildMethodButton('Is Tracing', _checkIsTracing),
+                      child: _buildMethodButton(
+                        'Is Tracing',
+                        _checkIsTracing,
+                        supportedPlatforms: _tracingControllerPlatforms(
+                          PlatformTracingControllerMethod.isTracing,
+                        ),
+                      ),
                     ),
                   ],
                 ),
@@ -749,7 +870,9 @@ class _ServiceControllersScreenState extends State<ServiceControllersScreen> {
   }
 
   Widget _buildWebViewEnvironmentSection() {
-    final isSupported = WebViewEnvironment.isClassSupported();
+    final supportedPlatforms = SupportChecker.getSupportedPlatformsForClass(
+      'WebViewEnvironment',
+    );
 
     return Card(
       child: ExpansionTile(
@@ -760,15 +883,13 @@ class _ServiceControllersScreenState extends State<ServiceControllersScreen> {
               style: TextStyle(fontWeight: FontWeight.bold),
             ),
             const SizedBox(width: 8),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-              decoration: BoxDecoration(
-                color: isSupported ? Colors.green : Colors.red,
-                borderRadius: BorderRadius.circular(4),
-              ),
-              child: Text(
-                isSupported ? 'Supported' : 'Not Supported',
-                style: const TextStyle(color: Colors.white, fontSize: 10),
+            Expanded(
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: SupportBadgesRow(
+                  supportedPlatforms: supportedPlatforms,
+                  compact: true,
+                ),
               ),
             ),
           ],
@@ -845,6 +966,9 @@ class _ServiceControllersScreenState extends State<ServiceControllersScreen> {
                         _webViewEnvironment == null
                             ? _createWebViewEnvironment
                             : null,
+                        supportedPlatforms: _webViewEnvironmentPlatforms(
+                          PlatformWebViewEnvironmentMethod.create,
+                        ),
                       ),
                     ),
                     const SizedBox(width: 8),
@@ -854,6 +978,9 @@ class _ServiceControllersScreenState extends State<ServiceControllersScreen> {
                         _webViewEnvironment != null
                             ? _disposeWebViewEnvironment
                             : null,
+                        supportedPlatforms: _webViewEnvironmentPlatforms(
+                          PlatformWebViewEnvironmentMethod.dispose,
+                        ),
                       ),
                     ),
                   ],
@@ -867,6 +994,9 @@ class _ServiceControllersScreenState extends State<ServiceControllersScreen> {
                       child: _buildMethodButton(
                         'Get Version',
                         _getAvailableVersion,
+                        supportedPlatforms: _webViewEnvironmentPlatforms(
+                          PlatformWebViewEnvironmentMethod.getAvailableVersion,
+                        ),
                       ),
                     ),
                     const SizedBox(width: 8),
@@ -874,6 +1004,10 @@ class _ServiceControllersScreenState extends State<ServiceControllersScreen> {
                       child: _buildMethodButton(
                         'Compare Versions',
                         _compareBrowserVersions,
+                        supportedPlatforms: _webViewEnvironmentPlatforms(
+                          PlatformWebViewEnvironmentMethod
+                              .compareBrowserVersions,
+                        ),
                       ),
                     ),
                   ],
@@ -887,6 +1021,9 @@ class _ServiceControllersScreenState extends State<ServiceControllersScreen> {
                       child: _buildMethodButton(
                         'Get Processes',
                         _webViewEnvironment != null ? _getProcessInfos : null,
+                        supportedPlatforms: _webViewEnvironmentPlatforms(
+                          PlatformWebViewEnvironmentMethod.getProcessInfos,
+                        ),
                       ),
                     ),
                     const SizedBox(width: 8),
@@ -896,6 +1033,10 @@ class _ServiceControllersScreenState extends State<ServiceControllersScreen> {
                         _webViewEnvironment != null
                             ? _getFailureReportFolderPath
                             : null,
+                        supportedPlatforms: _webViewEnvironmentPlatforms(
+                          PlatformWebViewEnvironmentMethod
+                              .getFailureReportFolderPath,
+                        ),
                       ),
                     ),
                   ],
@@ -937,7 +1078,9 @@ class _ServiceControllersScreenState extends State<ServiceControllersScreen> {
   }
 
   Widget _buildProcessGlobalConfigSection() {
-    final isSupported = ProcessGlobalConfig.isClassSupported();
+    final supportedPlatforms = SupportChecker.getSupportedPlatformsForClass(
+      'ProcessGlobalConfig',
+    );
 
     return Card(
       child: ExpansionTile(
@@ -948,15 +1091,13 @@ class _ServiceControllersScreenState extends State<ServiceControllersScreen> {
               style: TextStyle(fontWeight: FontWeight.bold),
             ),
             const SizedBox(width: 8),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-              decoration: BoxDecoration(
-                color: isSupported ? Colors.green : Colors.red,
-                borderRadius: BorderRadius.circular(4),
-              ),
-              child: Text(
-                isSupported ? 'Supported' : 'Not Supported',
-                style: const TextStyle(color: Colors.white, fontSize: 10),
+            Expanded(
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: SupportBadgesRow(
+                  supportedPlatforms: supportedPlatforms,
+                  compact: true,
+                ),
               ),
             ),
           ],
@@ -1001,6 +1142,9 @@ class _ServiceControllersScreenState extends State<ServiceControllersScreen> {
                   child: _buildMethodButton(
                     'Apply Config',
                     _applyProcessGlobalConfig,
+                    supportedPlatforms: _processGlobalConfigPlatforms(
+                      PlatformProcessGlobalConfigMethod.apply,
+                    ),
                   ),
                 ),
               ],
@@ -1011,12 +1155,28 @@ class _ServiceControllersScreenState extends State<ServiceControllersScreen> {
     );
   }
 
-  Widget _buildMethodButton(String label, VoidCallback? onPressed) {
+  Widget _buildMethodButton(
+    String label,
+    VoidCallback? onPressed, {
+    Set<SupportedPlatform>? supportedPlatforms,
+  }) {
     final canPress = onPressed != null && !_isLoading;
 
-    return ElevatedButton(
-      onPressed: canPress ? onPressed : null,
-      child: Text(label, style: const TextStyle(fontSize: 12)),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        ElevatedButton(
+          onPressed: canPress ? onPressed : null,
+          child: Text(label, style: const TextStyle(fontSize: 12)),
+        ),
+        if (supportedPlatforms != null) ...[
+          const SizedBox(height: 6),
+          SupportBadgesRow(
+            supportedPlatforms: supportedPlatforms,
+            compact: true,
+          ),
+        ],
+      ],
     );
   }
 

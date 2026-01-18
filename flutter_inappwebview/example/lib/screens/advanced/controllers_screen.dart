@@ -7,6 +7,8 @@ import 'package:flutter_inappwebview_example/main.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_inappwebview_example/providers/event_log_provider.dart';
 import 'package:flutter_inappwebview_example/models/event_log_entry.dart';
+import 'package:flutter_inappwebview_example/utils/support_checker.dart';
+import 'package:flutter_inappwebview_example/widgets/common/support_badge.dart';
 
 /// Screen for testing various WebView Controllers
 class ControllersScreen extends StatefulWidget {
@@ -43,79 +45,32 @@ class _ControllersScreenState extends State<ControllersScreen> {
   WebMessageChannel? _webMessageChannel;
   final List<String> _receivedMessages = [];
 
-  String get _currentPlatform {
-    if (kIsWeb) return 'web';
-    if (Platform.isAndroid) return 'android';
-    if (Platform.isIOS) return 'ios';
-    if (Platform.isMacOS) return 'macos';
-    if (Platform.isWindows) return 'windows';
-    if (Platform.isLinux) return 'linux';
-    return 'unknown';
+  SupportedPlatform? get _currentPlatform {
+    if (kIsWeb) return SupportedPlatform.web;
+    if (Platform.isAndroid) return SupportedPlatform.android;
+    if (Platform.isIOS) return SupportedPlatform.ios;
+    if (Platform.isMacOS) return SupportedPlatform.macos;
+    if (Platform.isWindows) return SupportedPlatform.windows;
+    if (Platform.isLinux) return SupportedPlatform.linux;
+    return null;
   }
 
-  TargetPlatform? _getTargetPlatform(String platform) {
-    switch (platform) {
-      case 'android':
-        return TargetPlatform.android;
-      case 'ios':
-        return TargetPlatform.iOS;
-      case 'macos':
-        return TargetPlatform.macOS;
-      case 'windows':
-        return TargetPlatform.windows;
-      case 'linux':
-        return TargetPlatform.linux;
-      default:
-        return null;
-    }
-  }
-
-  List<String> _getFindSupportedPlatforms(
+  Set<SupportedPlatform> _getFindSupportedPlatforms(
     PlatformFindInteractionControllerMethod method,
   ) {
-    final platforms = <String>[];
-    for (final platform in [
-      'android',
-      'ios',
-      'macos',
-      'web',
-      'windows',
-      'linux',
-    ]) {
-      final targetPlatform = _getTargetPlatform(platform);
-      if (targetPlatform != null &&
-          FindInteractionController.isMethodSupported(
-            method,
-            platform: targetPlatform,
-          )) {
-        platforms.add(platform);
-      }
-    }
-    return platforms;
+    return SupportCheckHelper.supportedPlatformsForMethod(
+      method: method,
+      checker: FindInteractionController.isMethodSupported,
+    );
   }
 
-  List<String> _getPullToRefreshSupportedPlatforms(
+  Set<SupportedPlatform> _getPullToRefreshSupportedPlatforms(
     PlatformPullToRefreshControllerMethod method,
   ) {
-    final platforms = <String>[];
-    for (final platform in [
-      'android',
-      'ios',
-      'macos',
-      'web',
-      'windows',
-      'linux',
-    ]) {
-      final targetPlatform = _getTargetPlatform(platform);
-      if (targetPlatform != null &&
-          PullToRefreshController.isMethodSupported(
-            method,
-            platform: targetPlatform,
-          )) {
-        platforms.add(platform);
-      }
-    }
-    return platforms;
+    return SupportCheckHelper.supportedPlatformsForMethod(
+      method: method,
+      checker: PullToRefreshController.isMethodSupported,
+    );
   }
 
   @override
@@ -394,7 +349,10 @@ class _ControllersScreenState extends State<ControllersScreen> {
       body: LayoutBuilder(
         builder: (context, constraints) {
           final minRequiredHeight =
-              _minWebViewHeight + _minContentHeight + _dividerHeight + _minChromeHeight;
+              _minWebViewHeight +
+              _minContentHeight +
+              _dividerHeight +
+              _minChromeHeight;
           final useScroll = constraints.maxHeight < minRequiredHeight;
 
           if (useScroll) {
@@ -413,8 +371,9 @@ class _ControllersScreenState extends State<ControllersScreen> {
     final effectiveMax = maxWebViewHeight < _minWebViewHeight
         ? _minWebViewHeight
         : maxWebViewHeight;
-    final webViewHeight =
-        _webViewHeight.clamp(_minWebViewHeight, effectiveMax).toDouble();
+    final webViewHeight = _webViewHeight
+        .clamp(_minWebViewHeight, effectiveMax)
+        .toDouble();
 
     return Column(
       children: [
@@ -544,7 +503,9 @@ class _ControllersScreenState extends State<ControllersScreen> {
   }
 
   Widget _buildFindInteractionSection() {
-    final isSupported = FindInteractionController.isClassSupported();
+    final supportedPlatforms = SupportChecker.getSupportedPlatformsForClass(
+      'FindInteractionController',
+    );
 
     return Card(
       child: ExpansionTile(
@@ -555,15 +516,13 @@ class _ControllersScreenState extends State<ControllersScreen> {
               style: TextStyle(fontWeight: FontWeight.bold),
             ),
             const SizedBox(width: 8),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-              decoration: BoxDecoration(
-                color: isSupported ? Colors.green : Colors.red,
-                borderRadius: BorderRadius.circular(4),
-              ),
-              child: Text(
-                isSupported ? 'Supported' : 'Not Supported',
-                style: const TextStyle(color: Colors.white, fontSize: 10),
+            Expanded(
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: SupportBadgesRow(
+                  supportedPlatforms: supportedPlatforms,
+                  compact: true,
+                ),
               ),
             ),
           ],
@@ -694,7 +653,9 @@ class _ControllersScreenState extends State<ControllersScreen> {
   }
 
   Widget _buildPullToRefreshSection() {
-    final isSupported = PullToRefreshController.isClassSupported();
+    final supportedPlatforms = SupportChecker.getSupportedPlatformsForClass(
+      'PullToRefreshController',
+    );
 
     return Card(
       child: ExpansionTile(
@@ -705,15 +666,13 @@ class _ControllersScreenState extends State<ControllersScreen> {
               style: TextStyle(fontWeight: FontWeight.bold),
             ),
             const SizedBox(width: 8),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-              decoration: BoxDecoration(
-                color: isSupported ? Colors.green : Colors.red,
-                borderRadius: BorderRadius.circular(4),
-              ),
-              child: Text(
-                isSupported ? 'Supported' : 'Not Supported',
-                style: const TextStyle(color: Colors.white, fontSize: 10),
+            Expanded(
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: SupportBadgesRow(
+                  supportedPlatforms: supportedPlatforms,
+                  compact: true,
+                ),
               ),
             ),
           ],
@@ -828,7 +787,9 @@ class _ControllersScreenState extends State<ControllersScreen> {
   }
 
   Widget _buildWebMessageChannelSection() {
-    final isSupported = WebMessageChannel.isClassSupported();
+    final supportedPlatforms = SupportChecker.getSupportedPlatformsForClass(
+      'WebMessageChannel',
+    );
 
     return Card(
       child: ExpansionTile(
@@ -839,15 +800,13 @@ class _ControllersScreenState extends State<ControllersScreen> {
               style: TextStyle(fontWeight: FontWeight.bold),
             ),
             const SizedBox(width: 8),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-              decoration: BoxDecoration(
-                color: isSupported ? Colors.green : Colors.red,
-                borderRadius: BorderRadius.circular(4),
-              ),
-              child: Text(
-                isSupported ? 'Supported' : 'Not Supported',
-                style: const TextStyle(color: Colors.white, fontSize: 10),
+            Expanded(
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: SupportBadgesRow(
+                  supportedPlatforms: supportedPlatforms,
+                  compact: true,
+                ),
               ),
             ),
           ],
@@ -987,7 +946,9 @@ class _ControllersScreenState extends State<ControllersScreen> {
   }
 
   Widget _buildPrintJobSection() {
-    final isSupported = PrintJobController.isClassSupported();
+    final supportedPlatforms = SupportChecker.getSupportedPlatformsForClass(
+      'PrintJobController',
+    );
 
     return Card(
       child: ExpansionTile(
@@ -998,15 +959,13 @@ class _ControllersScreenState extends State<ControllersScreen> {
               style: TextStyle(fontWeight: FontWeight.bold),
             ),
             const SizedBox(width: 8),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-              decoration: BoxDecoration(
-                color: isSupported ? Colors.green : Colors.red,
-                borderRadius: BorderRadius.circular(4),
-              ),
-              child: Text(
-                isSupported ? 'Supported' : 'Not Supported',
-                style: const TextStyle(color: Colors.white, fontSize: 10),
+            Expanded(
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: SupportBadgesRow(
+                  supportedPlatforms: supportedPlatforms,
+                  compact: true,
+                ),
               ),
             ),
           ],
@@ -1044,25 +1003,37 @@ class _ControllersScreenState extends State<ControllersScreen> {
                   children: [
                     _buildMethodChip(
                       'cancel',
-                      ['android', 'ios', 'macos'],
+                      SupportCheckHelper.supportedPlatformsForMethod(
+                        method: PlatformPrintJobControllerMethod.cancel,
+                        checker: PrintJobController.isMethodSupported,
+                      ),
                       null,
                       enabled: false,
                     ),
                     _buildMethodChip(
                       'restart',
-                      ['android'],
+                      SupportCheckHelper.supportedPlatformsForMethod(
+                        method: PlatformPrintJobControllerMethod.restart,
+                        checker: PrintJobController.isMethodSupported,
+                      ),
                       null,
                       enabled: false,
                     ),
                     _buildMethodChip(
                       'dismiss',
-                      ['ios', 'macos'],
+                      SupportCheckHelper.supportedPlatformsForMethod(
+                        method: PlatformPrintJobControllerMethod.dismiss,
+                        checker: PrintJobController.isMethodSupported,
+                      ),
                       null,
                       enabled: false,
                     ),
                     _buildMethodChip(
                       'getInfo',
-                      ['android', 'ios', 'macos'],
+                      SupportCheckHelper.supportedPlatformsForMethod(
+                        method: PlatformPrintJobControllerMethod.getInfo,
+                        checker: PrintJobController.isMethodSupported,
+                      ),
                       null,
                       enabled: false,
                     ),
@@ -1078,25 +1049,38 @@ class _ControllersScreenState extends State<ControllersScreen> {
 
   Widget _buildMethodChip(
     String label,
-    List<String> supportedPlatforms,
+    Set<SupportedPlatform> supportedPlatforms,
     VoidCallback? onPressed, {
     bool enabled = true,
   }) {
-    final isSupported = supportedPlatforms.contains(_currentPlatform);
+    final currentPlatform = _currentPlatform;
+    final isSupported =
+        currentPlatform != null && supportedPlatforms.contains(currentPlatform);
     final canPress = enabled && isSupported && onPressed != null;
 
     return Tooltip(
       message: 'Availability depends on platform',
-      child: ActionChip(
-        label: Text(
-          label,
-          style: TextStyle(
-            fontSize: 12,
-            color: canPress ? Colors.black : Colors.grey,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          ActionChip(
+            label: Text(
+              label,
+              style: TextStyle(
+                fontSize: 12,
+                color: canPress ? Colors.black : Colors.grey,
+              ),
+            ),
+            backgroundColor:
+                canPress ? Colors.blue.shade50 : Colors.grey.shade200,
+            onPressed: canPress ? onPressed : null,
           ),
-        ),
-        backgroundColor: canPress ? Colors.blue.shade50 : Colors.grey.shade200,
-        onPressed: canPress ? onPressed : null,
+          const SizedBox(height: 4),
+          SupportBadgesRow(
+            supportedPlatforms: supportedPlatforms,
+            compact: true,
+          ),
+        ],
       ),
     );
   }

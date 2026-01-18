@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../../utils/support_checker.dart';
+import '../../widgets/common/support_badge.dart';
 import '../../main.dart';
 
 /// Screen displaying a comprehensive support matrix showing all APIs with platform availability.
@@ -43,6 +44,11 @@ class _SupportMatrixScreenState extends State<SupportMatrixScreen>
     if (!_showMethods) return [];
 
     return classDef.methods.where((method) {
+      final supportedPlatforms = SupportChecker.getSupportedPlatformsForMethod(
+        classDef.className,
+        method.name,
+      );
+
       // Search filter
       if (_searchQuery.isNotEmpty) {
         final query = _searchQuery.toLowerCase();
@@ -55,7 +61,7 @@ class _SupportMatrixScreenState extends State<SupportMatrixScreen>
       // Platform filter
       if (_selectedPlatforms.isNotEmpty) {
         if (!_selectedPlatforms.any(
-          (p) => method.supportedPlatforms.contains(p),
+          (p) => supportedPlatforms.contains(p),
         )) {
           return false;
         }
@@ -63,7 +69,7 @@ class _SupportMatrixScreenState extends State<SupportMatrixScreen>
 
       // Show only supported filter
       if (_showOnlySupported) {
-        if (method.supportedPlatforms.isEmpty) return false;
+        if (supportedPlatforms.isEmpty) return false;
       }
 
       return true;
@@ -74,6 +80,11 @@ class _SupportMatrixScreenState extends State<SupportMatrixScreen>
     if (!_showEvents) return [];
 
     return classDef.events.where((event) {
+      final supportedPlatforms = SupportChecker.getSupportedPlatformsForEvent(
+        classDef.className,
+        event.name,
+      );
+
       // Search filter
       if (_searchQuery.isNotEmpty) {
         final query = _searchQuery.toLowerCase();
@@ -86,7 +97,7 @@ class _SupportMatrixScreenState extends State<SupportMatrixScreen>
       // Platform filter
       if (_selectedPlatforms.isNotEmpty) {
         if (!_selectedPlatforms.any(
-          (p) => event.supportedPlatforms.contains(p),
+          (p) => supportedPlatforms.contains(p),
         )) {
           return false;
         }
@@ -94,7 +105,7 @@ class _SupportMatrixScreenState extends State<SupportMatrixScreen>
 
       // Show only supported filter
       if (_showOnlySupported) {
-        if (event.supportedPlatforms.isEmpty) return false;
+        if (supportedPlatforms.isEmpty) return false;
       }
 
       return true;
@@ -135,14 +146,18 @@ class _SupportMatrixScreenState extends State<SupportMatrixScreen>
           '|--------|---------|-----|-------|-----|---------|-------|',
         );
         for (final method in classDef.methods) {
+          final supportedPlatforms = SupportChecker.getSupportedPlatformsForMethod(
+            classDef.className,
+            method.name,
+          );
           final row = [
             '`${method.name}`',
-            _platformMark(method.supportedPlatforms, SupportedPlatform.android),
-            _platformMark(method.supportedPlatforms, SupportedPlatform.ios),
-            _platformMark(method.supportedPlatforms, SupportedPlatform.macos),
-            _platformMark(method.supportedPlatforms, SupportedPlatform.web),
-            _platformMark(method.supportedPlatforms, SupportedPlatform.windows),
-            _platformMark(method.supportedPlatforms, SupportedPlatform.linux),
+            _platformMark(supportedPlatforms, SupportedPlatform.android),
+            _platformMark(supportedPlatforms, SupportedPlatform.ios),
+            _platformMark(supportedPlatforms, SupportedPlatform.macos),
+            _platformMark(supportedPlatforms, SupportedPlatform.web),
+            _platformMark(supportedPlatforms, SupportedPlatform.windows),
+            _platformMark(supportedPlatforms, SupportedPlatform.linux),
           ];
           buffer.writeln('| ${row.join(' | ')} |');
         }
@@ -158,14 +173,18 @@ class _SupportMatrixScreenState extends State<SupportMatrixScreen>
           '|-------|---------|-----|-------|-----|---------|-------|',
         );
         for (final event in classDef.events) {
+          final supportedPlatforms = SupportChecker.getSupportedPlatformsForEvent(
+            classDef.className,
+            event.name,
+          );
           final row = [
             '`${event.name}`',
-            _platformMark(event.supportedPlatforms, SupportedPlatform.android),
-            _platformMark(event.supportedPlatforms, SupportedPlatform.ios),
-            _platformMark(event.supportedPlatforms, SupportedPlatform.macos),
-            _platformMark(event.supportedPlatforms, SupportedPlatform.web),
-            _platformMark(event.supportedPlatforms, SupportedPlatform.windows),
-            _platformMark(event.supportedPlatforms, SupportedPlatform.linux),
+            _platformMark(supportedPlatforms, SupportedPlatform.android),
+            _platformMark(supportedPlatforms, SupportedPlatform.ios),
+            _platformMark(supportedPlatforms, SupportedPlatform.macos),
+            _platformMark(supportedPlatforms, SupportedPlatform.web),
+            _platformMark(supportedPlatforms, SupportedPlatform.windows),
+            _platformMark(supportedPlatforms, SupportedPlatform.linux),
           ];
           buffer.writeln('| ${row.join(' | ')} |');
         }
@@ -440,6 +459,9 @@ class _SupportMatrixScreenState extends State<SupportMatrixScreen>
   Widget _buildClassTab(ApiClassDefinition classDef) {
     final filteredMethods = _getFilteredMethods(classDef);
     final filteredEvents = _getFilteredEvents(classDef);
+    final classSupportedPlatforms = SupportChecker.getSupportedPlatformsForClass(
+      classDef.className,
+    );
 
     if (filteredMethods.isEmpty && filteredEvents.isEmpty) {
       return Center(
@@ -478,28 +500,15 @@ class _SupportMatrixScreenState extends State<SupportMatrixScreen>
                       ),
                     ),
                     const SizedBox(width: 8),
-                    if (classDef.isClassSupported != null)
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 2,
-                        ),
-                        decoration: BoxDecoration(
-                          color: classDef.isClassSupported!()
-                              ? Colors.green
-                              : Colors.red,
-                          borderRadius: BorderRadius.circular(4),
-                        ),
-                        child: Text(
-                          classDef.isClassSupported!()
-                              ? 'Supported'
-                              : 'Not Supported',
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 10,
-                          ),
+                    Expanded(
+                      child: SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: SupportBadgesRow(
+                          supportedPlatforms: classSupportedPlatforms,
+                          compact: true,
                         ),
                       ),
+                    ),
                   ],
                 ),
                 if (classDef.description.isNotEmpty) ...[
@@ -536,7 +545,10 @@ class _SupportMatrixScreenState extends State<SupportMatrixScreen>
             (method) => _buildApiRow(
               name: method.name,
               description: method.description,
-              supportedPlatforms: method.supportedPlatforms,
+              supportedPlatforms: SupportChecker.getSupportedPlatformsForMethod(
+                classDef.className,
+                method.name,
+              ),
               signature: method.signature,
               isStatic: method.isStatic,
               isDeprecated: method.isDeprecated,
@@ -563,7 +575,10 @@ class _SupportMatrixScreenState extends State<SupportMatrixScreen>
             (event) => _buildApiRow(
               name: event.name,
               description: event.description,
-              supportedPlatforms: event.supportedPlatforms,
+              supportedPlatforms: SupportChecker.getSupportedPlatformsForEvent(
+                classDef.className,
+                event.name,
+              ),
               signature: event.signature,
               category: event.category,
               isMethod: false,
@@ -657,39 +672,9 @@ class _SupportMatrixScreenState extends State<SupportMatrixScreen>
         ),
         subtitle: Padding(
           padding: const EdgeInsets.only(top: 4),
-          child: Row(
-            children: SupportedPlatform.values.map((platform) {
-              final isSupported = supportedPlatforms.contains(platform);
-              return Padding(
-                padding: const EdgeInsets.only(right: 4),
-                child: Tooltip(
-                  message:
-                      '${platform.displayName}: ${isSupported ? "Supported" : "Not supported"}',
-                  child: Container(
-                    width: 24,
-                    height: 24,
-                    decoration: BoxDecoration(
-                      color: isSupported
-                          ? platform.color.withOpacity(0.15)
-                          : Colors.grey.shade200,
-                      borderRadius: BorderRadius.circular(4),
-                      border: Border.all(
-                        color: isSupported
-                            ? platform.color.withOpacity(0.5)
-                            : Colors.grey.shade300,
-                      ),
-                    ),
-                    child: Icon(
-                      isSupported ? Icons.check : Icons.close,
-                      size: 14,
-                      color: isSupported
-                          ? platform.color
-                          : Colors.grey.shade400,
-                    ),
-                  ),
-                ),
-              );
-            }).toList(),
+          child: SupportBadgesRow(
+            supportedPlatforms: supportedPlatforms,
+            compact: true,
           ),
         ),
         children: [
@@ -719,50 +704,9 @@ class _SupportMatrixScreenState extends State<SupportMatrixScreen>
               ),
             ),
           const SizedBox(height: 8),
-          Wrap(
-            spacing: 4,
-            runSpacing: 4,
-            children: SupportedPlatform.values.map((platform) {
-              final isSupported = supportedPlatforms.contains(platform);
-              return Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(
-                  color: isSupported
-                      ? platform.color.withOpacity(0.1)
-                      : Colors.grey.shade100,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(
-                    color: isSupported
-                        ? platform.color.withOpacity(0.3)
-                        : Colors.grey.shade300,
-                  ),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      platform.icon,
-                      size: 12,
-                      color: isSupported ? platform.color : Colors.grey,
-                    ),
-                    const SizedBox(width: 4),
-                    Text(
-                      platform.displayName,
-                      style: TextStyle(
-                        fontSize: 11,
-                        color: isSupported ? platform.color : Colors.grey,
-                      ),
-                    ),
-                    const SizedBox(width: 4),
-                    Icon(
-                      isSupported ? Icons.check_circle : Icons.cancel,
-                      size: 12,
-                      color: isSupported ? Colors.green : Colors.red.shade300,
-                    ),
-                  ],
-                ),
-              );
-            }).toList(),
+          SupportBadgesRow(
+            supportedPlatforms: supportedPlatforms,
+            showLabels: true,
           ),
         ],
       ),

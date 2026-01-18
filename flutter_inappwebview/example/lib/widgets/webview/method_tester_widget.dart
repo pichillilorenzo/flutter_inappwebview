@@ -2,6 +2,8 @@ import 'dart:convert';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
+import 'package:flutter_inappwebview_example/utils/support_checker.dart';
+import 'package:flutter_inappwebview_example/widgets/common/support_badge.dart';
 
 /// Method entry for a single controller method
 class MethodEntry {
@@ -1406,6 +1408,10 @@ class _MethodTesterWidgetState extends State<MethodTesterWidget> {
     final isExecuting = _executing[method.name] == true;
     final hasResult = _results.containsKey(method.name);
     final hasError = _errors.containsKey(method.name);
+    final supportedPlatforms = SupportCheckHelper.supportedPlatformsForMethod(
+      method: method.methodEnum,
+      checker: InAppWebViewController.isMethodSupported,
+    );
 
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
@@ -1428,9 +1434,19 @@ class _MethodTesterWidgetState extends State<MethodTesterWidget> {
             ),
             subtitle: Padding(
               padding: const EdgeInsets.only(top: 4),
-              child: Text(
-                method.description,
-                style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    method.description,
+                    style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+                  ),
+                  const SizedBox(height: 6),
+                  SupportBadgesRow(
+                    supportedPlatforms: supportedPlatforms,
+                    compact: true,
+                  ),
+                ],
               ),
             ),
             trailing: SizedBox(

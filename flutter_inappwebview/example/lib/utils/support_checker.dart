@@ -80,6 +80,97 @@ enum SupportedPlatform {
   }
 }
 
+/// Helper utilities for support checks across platforms.
+class SupportCheckHelper {
+  /// Maps [SupportedPlatform] to a [TargetPlatform] when possible.
+  static TargetPlatform? targetPlatformFor(SupportedPlatform platform) {
+    return platform.targetPlatform;
+  }
+
+  /// Checks class support for a specific [SupportedPlatform].
+  static bool isClassSupportedForPlatform({
+    required SupportedPlatform platform,
+    required bool Function({TargetPlatform? platform}) checker,
+  }) {
+    if (platform == SupportedPlatform.web) {
+      return checker(platform: null);
+    }
+    return checker(platform: targetPlatformFor(platform));
+  }
+
+  /// Checks method support for a specific [SupportedPlatform].
+  static bool isMethodSupportedForPlatform<T>({
+    required SupportedPlatform platform,
+    required T method,
+    required bool Function(T method, {TargetPlatform? platform}) checker,
+  }) {
+    if (platform == SupportedPlatform.web) {
+      return checker(method, platform: null);
+    }
+    return checker(method, platform: targetPlatformFor(platform));
+  }
+
+  /// Checks property support for a specific [SupportedPlatform].
+  static bool isPropertySupportedForPlatform({
+    required SupportedPlatform platform,
+    required dynamic property,
+    required bool Function(dynamic property, {TargetPlatform? platform})
+    checker,
+  }) {
+    if (platform == SupportedPlatform.web) {
+      return checker(property, platform: null);
+    }
+    return checker(property, platform: targetPlatformFor(platform));
+  }
+
+  /// Returns all supported platforms for a given class checker.
+  static Set<SupportedPlatform> supportedPlatformsForClass({
+    required bool Function({TargetPlatform? platform}) checker,
+  }) {
+    return SupportedPlatform.values
+        .where(
+          (platform) => isClassSupportedForPlatform(
+            platform: platform,
+            checker: checker,
+          ),
+        )
+        .toSet();
+  }
+
+  /// Returns all supported platforms for a given method checker.
+  static Set<SupportedPlatform> supportedPlatformsForMethod<T>({
+    required T method,
+    required bool Function(T method, {TargetPlatform? platform}) checker,
+  }) {
+    return SupportedPlatform.values
+        .where(
+          (platform) => isMethodSupportedForPlatform(
+            platform: platform,
+            method: method,
+            checker: checker,
+          ),
+        )
+        .toSet();
+  }
+
+  /// Returns all supported platforms for a given property checker.
+  static Set<SupportedPlatform> supportedPlatformsForProperty({
+    required dynamic property,
+    required bool Function(dynamic property, {TargetPlatform? platform})
+    checker,
+  }) {
+    return SupportedPlatform.values
+        .where(
+          (platform) => isPropertySupportedForPlatform(
+            platform: platform,
+            property: property,
+            checker: checker,
+          ),
+        )
+        .toSet();
+  }
+}
+
 /// Definition of an API method with platform support information.
 class ApiMethodDefinition {
   final String name;
@@ -169,6 +260,16 @@ class SupportSummary {
       (methodsPerPlatform[platform] ?? 0) + (eventsPerPlatform[platform] ?? 0);
 }
 
+typedef _MethodSupportResolver = bool Function(
+  String methodName,
+  SupportedPlatform platform,
+);
+
+typedef _PropertySupportResolver = bool Function(
+  String propertyName,
+  SupportedPlatform platform,
+);
+
 /// Utility class that provides comprehensive API support information.
 class SupportChecker {
   // All supported platforms
@@ -209,6 +310,161 @@ class SupportChecker {
     SupportedPlatform.macos,
   };
 
+  static String _enumName(Object? value) {
+    if (value is Enum) return value.name;
+    return value.toString().split('.').last;
+  }
+
+  static _MethodSupportResolver _buildMethodResolver<T>({
+    required List<T> values,
+    required bool Function(T method, {TargetPlatform? platform}) checker,
+  }) {
+    final methodByName = {
+      for (final value in values) _enumName(value): value,
+    };
+    return (String methodName, SupportedPlatform platform) {
+      final resolved = methodByName[methodName];
+      if (resolved == null) return false;
+      return SupportCheckHelper.isMethodSupportedForPlatform(
+        platform: platform,
+        method: resolved,
+        checker: checker,
+      );
+    };
+  }
+
+  static _PropertySupportResolver _buildPropertyResolver<T>({
+    required List<T> values,
+    required bool Function(dynamic property, {TargetPlatform? platform})
+    checker,
+    Map<String, String> nameOverrides = const {},
+  }) {
+    final propertyByName = {
+      for (final value in values) _enumName(value): value,
+    };
+    return (String propertyName, SupportedPlatform platform) {
+      final resolvedName = nameOverrides[propertyName] ?? propertyName;
+      final resolved = propertyByName[resolvedName];
+      if (resolved == null) return false;
+      return SupportCheckHelper.isPropertySupportedForPlatform(
+        platform: platform,
+        property: resolved,
+        checker: checker,
+      );
+    };
+  }
+
+  static final Map<String, bool Function({TargetPlatform? platform})>
+  _classSupportResolvers = {
+    'InAppWebViewController': InAppWebViewController.isClassSupported,
+    'InAppWebView Events': InAppWebView.isClassSupported,
+    'HeadlessInAppWebView': HeadlessInAppWebView.isClassSupported,
+    'InAppBrowser': InAppBrowser.isClassSupported,
+    'ChromeSafariBrowser': ChromeSafariBrowser.isClassSupported,
+    'CookieManager': CookieManager.isClassSupported,
+    'WebStorage': WebStorage.isClassSupported,
+    'FindInteractionController': FindInteractionController.isClassSupported,
+    'PullToRefreshController': PullToRefreshController.isClassSupported,
+    'PrintJobController': PrintJobController.isClassSupported,
+    'WebAuthenticationSession': WebAuthenticationSession.isClassSupported,
+    'ServiceWorkerController': ServiceWorkerController.isClassSupported,
+    'ProxyController': ProxyController.isClassSupported,
+    'TracingController': TracingController.isClassSupported,
+    'HttpAuthCredentialDatabase':
+        HttpAuthCredentialDatabase.isClassSupported,
+    'WebViewEnvironment': WebViewEnvironment.isClassSupported,
+    'ProcessGlobalConfig': ProcessGlobalConfig.isClassSupported,
+    'WebMessageChannel': WebMessageChannel.isClassSupported,
+  };
+
+  static final Map<String, _MethodSupportResolver> _methodSupportResolvers =
+      {
+        'InAppWebViewController': _buildMethodResolver(
+          values: PlatformInAppWebViewControllerMethod.values,
+          checker: InAppWebViewController.isMethodSupported,
+        ),
+        'HeadlessInAppWebView': _buildMethodResolver(
+          values: PlatformHeadlessInAppWebViewMethod.values,
+          checker: HeadlessInAppWebView.isMethodSupported,
+        ),
+        'InAppBrowser': _buildMethodResolver(
+          values: PlatformInAppBrowserMethod.values,
+          checker: InAppBrowser.isMethodSupported,
+        ),
+        'ChromeSafariBrowser': _buildMethodResolver(
+          values: PlatformChromeSafariBrowserMethod.values,
+          checker: ChromeSafariBrowser.isMethodSupported,
+        ),
+        'CookieManager': _buildMethodResolver(
+          values: PlatformCookieManagerMethod.values,
+          checker: CookieManager.isMethodSupported,
+        ),
+        'WebStorage': _buildMethodResolver(
+          values: PlatformLocalStorageMethod.values,
+          checker: LocalStorage.isMethodSupported,
+        ),
+        'FindInteractionController': _buildMethodResolver(
+          values: PlatformFindInteractionControllerMethod.values,
+          checker: FindInteractionController.isMethodSupported,
+        ),
+        'PullToRefreshController': _buildMethodResolver(
+          values: PlatformPullToRefreshControllerMethod.values,
+          checker: PullToRefreshController.isMethodSupported,
+        ),
+        'PrintJobController': _buildMethodResolver(
+          values: PlatformPrintJobControllerMethod.values,
+          checker: PrintJobController.isMethodSupported,
+        ),
+        'WebAuthenticationSession': _buildMethodResolver(
+          values: PlatformWebAuthenticationSessionMethod.values,
+          checker: WebAuthenticationSession.isMethodSupported,
+        ),
+        'ServiceWorkerController': _buildMethodResolver(
+          values: PlatformServiceWorkerControllerMethod.values,
+          checker: ServiceWorkerController.isMethodSupported,
+        ),
+        'ProxyController': _buildMethodResolver(
+          values: PlatformProxyControllerMethod.values,
+          checker: ProxyController.isMethodSupported,
+        ),
+        'TracingController': _buildMethodResolver(
+          values: PlatformTracingControllerMethod.values,
+          checker: TracingController.isMethodSupported,
+        ),
+        'HttpAuthCredentialDatabase': _buildMethodResolver(
+          values: PlatformHttpAuthCredentialDatabaseMethod.values,
+          checker: HttpAuthCredentialDatabase.isMethodSupported,
+        ),
+        'WebViewEnvironment': _buildMethodResolver(
+          values: PlatformWebViewEnvironmentMethod.values,
+          checker: WebViewEnvironment.isMethodSupported,
+        ),
+        'ProcessGlobalConfig': _buildMethodResolver(
+          values: PlatformProcessGlobalConfigMethod.values,
+          checker: ProcessGlobalConfig.isMethodSupported,
+        ),
+        'WebMessageChannel': _buildMethodResolver(
+          values: PlatformWebMessageChannelMethod.values,
+          checker: WebMessageChannel.isMethodSupported,
+        ),
+      };
+
+  static final Map<String, _PropertySupportResolver>
+  _eventSupportResolvers = {
+    'InAppWebView Events': _buildPropertyResolver(
+      values: PlatformWebViewCreationParamsProperty.values,
+      checker: InAppWebView.isPropertySupported,
+    ),
+    'FindInteractionController': _buildPropertyResolver(
+      values: PlatformFindInteractionControllerCreationParamsProperty.values,
+      checker: (property, {platform}) =>
+          FindInteractionController.isPropertySupported(
+        property as PlatformFindInteractionControllerCreationParamsProperty,
+        platform: platform,
+      ),
+    ),
+  };
+
   /// Get all API definitions organized by class.
   static List<ApiClassDefinition> getAllApiDefinitions() {
     return [
@@ -235,6 +491,22 @@ class SupportChecker {
 
   /// Check if a specific method is supported on current platform.
   static bool isMethodSupported(String className, String methodName) {
+    final currentPlatform = _getCurrentPlatform();
+    if (currentPlatform == null) return false;
+    return isMethodSupportedForPlatform(className, methodName, currentPlatform);
+  }
+
+  /// Check if a specific method is supported on a target platform.
+  static bool isMethodSupportedForPlatform(
+    String className,
+    String methodName,
+    SupportedPlatform platform,
+  ) {
+    final resolver = _methodSupportResolvers[className];
+    if (resolver != null) {
+      return resolver(methodName, platform);
+    }
+
     final definitions = getAllApiDefinitions();
     final classDef = definitions.cast<ApiClassDefinition?>().firstWhere(
       (c) => c?.className == className,
@@ -248,14 +520,27 @@ class SupportChecker {
     );
     if (method == null) return false;
 
-    final currentPlatform = _getCurrentPlatform();
-    if (currentPlatform == null) return false;
-
-    return method.isSupported(currentPlatform);
+    return method.isSupported(platform);
   }
 
   /// Check if a specific event is supported on current platform.
   static bool isEventSupported(String className, String eventName) {
+    final currentPlatform = _getCurrentPlatform();
+    if (currentPlatform == null) return false;
+    return isEventSupportedForPlatform(className, eventName, currentPlatform);
+  }
+
+  /// Check if a specific event is supported on a target platform.
+  static bool isEventSupportedForPlatform(
+    String className,
+    String eventName,
+    SupportedPlatform platform,
+  ) {
+    final resolver = _eventSupportResolvers[className];
+    if (resolver != null) {
+      return resolver(eventName, platform);
+    }
+
     final definitions = getAllApiDefinitions();
     final classDef = definitions.cast<ApiClassDefinition?>().firstWhere(
       (c) => c?.className == className,
@@ -269,10 +554,94 @@ class SupportChecker {
     );
     if (event == null) return false;
 
-    final currentPlatform = _getCurrentPlatform();
-    if (currentPlatform == null) return false;
+    return event.isSupported(platform);
+  }
 
-    return event.isSupported(currentPlatform);
+  /// Returns supported platforms for a given class.
+  static Set<SupportedPlatform> getSupportedPlatformsForClass(
+    String className,
+  ) {
+    final resolver = _classSupportResolvers[className];
+    if (resolver != null) {
+      return SupportCheckHelper.supportedPlatformsForClass(
+        checker: resolver,
+      );
+    }
+
+    final definitions = getAllApiDefinitions();
+    final classDef = definitions.cast<ApiClassDefinition?>().firstWhere(
+      (c) => c?.className == className,
+      orElse: () => null,
+    );
+    if (classDef == null) return {};
+
+    final supported = <SupportedPlatform>{};
+    if (classDef.isClassSupported != null) {
+      final currentPlatform = _getCurrentPlatform();
+      if (currentPlatform != null && classDef.isClassSupported!()) {
+        supported.add(currentPlatform);
+      }
+    }
+
+    for (final platform in SupportedPlatform.values) {
+      if (classDef.methods.any((m) => m.isSupported(platform)) ||
+          classDef.events.any((e) => e.isSupported(platform))) {
+        supported.add(platform);
+      }
+    }
+    return supported;
+  }
+
+  /// Returns supported platforms for a specific method.
+  static Set<SupportedPlatform> getSupportedPlatformsForMethod(
+    String className,
+    String methodName,
+  ) {
+    final resolver = _methodSupportResolvers[className];
+    if (resolver != null) {
+      return SupportedPlatform.values
+          .where((p) => resolver(methodName, p))
+          .toSet();
+    }
+
+    final definitions = getAllApiDefinitions();
+    final classDef = definitions.cast<ApiClassDefinition?>().firstWhere(
+      (c) => c?.className == className,
+      orElse: () => null,
+    );
+
+    final method = classDef?.methods.cast<ApiMethodDefinition?>().firstWhere(
+      (m) => m?.name == methodName,
+      orElse: () => null,
+    );
+
+    return method?.supportedPlatforms ?? <SupportedPlatform>{};
+  }
+
+  /// Returns supported platforms for a specific event.
+  static Set<SupportedPlatform> getSupportedPlatformsForEvent(
+    String className,
+    String eventName,
+  ) {
+    final resolver = _eventSupportResolvers[className];
+    if (resolver != null) {
+      return SupportedPlatform.values
+          .where((p) => resolver(eventName, p))
+          .toSet();
+    }
+
+    final definitions = getAllApiDefinitions();
+    final classDef = definitions.cast<ApiClassDefinition?>().firstWhere(
+      (c) => c?.className == className,
+      orElse: () => null,
+    );
+
+    final event = classDef?.events.cast<ApiEventDefinition?>().firstWhere(
+      (e) => e?.name == eventName,
+      orElse: () => null,
+    );
+
+    return event?.supportedPlatforms ?? <SupportedPlatform>{};
   }
 
   /// Get support summary statistics.
@@ -293,13 +662,24 @@ class SupportChecker {
       totalMethods += classDef.methods.length;
       totalEvents += classDef.events.length;
 
-      for (final platform in SupportedPlatform.values) {
-        methodsPerPlatform[platform] =
-            methodsPerPlatform[platform]! +
-            classDef.methodCountForPlatform(platform);
-        eventsPerPlatform[platform] =
-            eventsPerPlatform[platform]! +
-            classDef.eventCountForPlatform(platform);
+      for (final method in classDef.methods) {
+        final supported = getSupportedPlatformsForMethod(
+          classDef.className,
+          method.name,
+        );
+        for (final platform in supported) {
+          methodsPerPlatform[platform] = methodsPerPlatform[platform]! + 1;
+        }
+      }
+
+      for (final event in classDef.events) {
+        final supported = getSupportedPlatformsForEvent(
+          classDef.className,
+          event.name,
+        );
+        for (final platform in supported) {
+          eventsPerPlatform[platform] = eventsPerPlatform[platform]! + 1;
+        }
       }
     }
 

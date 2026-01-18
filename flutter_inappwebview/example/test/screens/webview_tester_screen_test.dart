@@ -23,7 +23,8 @@ void main() {
         home: MultiProvider(
           providers: [
             ChangeNotifierProvider<EventLogProvider>.value(
-                value: eventLogProvider),
+              value: eventLogProvider,
+            ),
             ChangeNotifierProvider<NetworkMonitor>.value(value: networkMonitor),
           ],
           child: WebViewTesterScreen(),
@@ -57,7 +58,7 @@ void main() {
     testWidgets('renders Go button', (tester) async {
       await tester.pumpWidget(createWidget());
 
-      expect(find.widgetWithText(IconButton, 'Go'), findsOneWidget);
+      expect(find.byTooltip('Go'), findsOneWidget);
     });
 
     testWidgets('shows clear events button in app bar', (tester) async {

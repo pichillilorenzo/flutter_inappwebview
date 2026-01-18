@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../../utils/support_checker.dart';
+import '../../widgets/common/support_badge.dart';
 import '../../main.dart';
 
 /// Screen for comparing API support between two platforms.
@@ -46,8 +47,12 @@ class _PlatformComparisonScreenState extends State<PlatformComparisonScreen> {
 
     for (final classDef in _apiDefinitions) {
       for (final method in classDef.methods) {
-        final p1 = method.supportedPlatforms.contains(_platform1);
-        final p2 = method.supportedPlatforms.contains(_platform2);
+        final supported = SupportChecker.getSupportedPlatformsForMethod(
+          classDef.className,
+          method.name,
+        );
+        final p1 = supported.contains(_platform1);
+        final p2 = supported.contains(_platform2);
         if (p1 && p2) {
           commonMethods++;
         } else if (p1) {
@@ -57,8 +62,12 @@ class _PlatformComparisonScreenState extends State<PlatformComparisonScreen> {
         }
       }
       for (final event in classDef.events) {
-        final p1 = event.supportedPlatforms.contains(_platform1);
-        final p2 = event.supportedPlatforms.contains(_platform2);
+        final supported = SupportChecker.getSupportedPlatformsForEvent(
+          classDef.className,
+          event.name,
+        );
+        final p1 = supported.contains(_platform1);
+        final p2 = supported.contains(_platform2);
         if (p1 && p2) {
           commonEvents++;
         } else if (p1) {
@@ -86,8 +95,12 @@ class _PlatformComparisonScreenState extends State<PlatformComparisonScreen> {
     for (final classDef in _apiDefinitions) {
       // Methods
       for (final method in classDef.methods) {
-        final p1 = method.supportedPlatforms.contains(_platform1);
-        final p2 = method.supportedPlatforms.contains(_platform2);
+        final supported = SupportChecker.getSupportedPlatformsForMethod(
+          classDef.className,
+          method.name,
+        );
+        final p1 = supported.contains(_platform1);
+        final p2 = supported.contains(_platform2);
 
         if (!_matchesViewMode(p1, p2)) continue;
         if (!_matchesSearch(method.name, method.description)) continue;
@@ -108,8 +121,12 @@ class _PlatformComparisonScreenState extends State<PlatformComparisonScreen> {
 
       // Events
       for (final event in classDef.events) {
-        final p1 = event.supportedPlatforms.contains(_platform1);
-        final p2 = event.supportedPlatforms.contains(_platform2);
+        final supported = SupportChecker.getSupportedPlatformsForEvent(
+          classDef.className,
+          event.name,
+        );
+        final p1 = supported.contains(_platform1);
+        final p2 = supported.contains(_platform2);
 
         if (!_matchesViewMode(p1, p2)) continue;
         if (!_matchesSearch(event.name, event.description)) continue;
@@ -656,22 +673,10 @@ class _PlatformComparisonScreenState extends State<PlatformComparisonScreen> {
           // Platform 1 status
           Expanded(
             child: Center(
-              child: Container(
-                width: 28,
-                height: 28,
-                decoration: BoxDecoration(
-                  color: item.platform1Supported
-                      ? _platform1.color.withOpacity(0.2)
-                      : Colors.grey.shade200,
-                  borderRadius: BorderRadius.circular(4),
-                ),
-                child: Icon(
-                  item.platform1Supported ? Icons.check : Icons.close,
-                  size: 16,
-                  color: item.platform1Supported
-                      ? _platform1.color
-                      : Colors.grey,
-                ),
+              child: SupportBadge(
+                platform: _platform1,
+                isSupported: item.platform1Supported,
+                compact: true,
               ),
             ),
           ),
@@ -699,22 +704,10 @@ class _PlatformComparisonScreenState extends State<PlatformComparisonScreen> {
           // Platform 2 status
           Expanded(
             child: Center(
-              child: Container(
-                width: 28,
-                height: 28,
-                decoration: BoxDecoration(
-                  color: item.platform2Supported
-                      ? _platform2.color.withOpacity(0.2)
-                      : Colors.grey.shade200,
-                  borderRadius: BorderRadius.circular(4),
-                ),
-                child: Icon(
-                  item.platform2Supported ? Icons.check : Icons.close,
-                  size: 16,
-                  color: item.platform2Supported
-                      ? _platform2.color
-                      : Colors.grey,
-                ),
+              child: SupportBadge(
+                platform: _platform2,
+                isSupported: item.platform2Supported,
+                compact: true,
               ),
             ),
           ),

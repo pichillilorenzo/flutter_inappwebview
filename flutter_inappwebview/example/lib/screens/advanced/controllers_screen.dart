@@ -29,6 +29,7 @@ class _ControllersScreenState extends State<ControllersScreen> {
   static const double _minWebViewHeight = 120;
   static const double _minContentHeight = 260;
   static const double _dividerHeight = 6;
+  static const double _minChromeHeight = 140;
 
   // Find interaction state
   int _matchCount = 0;
@@ -392,46 +393,84 @@ class _ControllersScreenState extends State<ControllersScreen> {
       drawer: buildDrawer(context: context),
       body: LayoutBuilder(
         builder: (context, constraints) {
-          final maxWebViewHeight =
-              constraints.maxHeight - _minContentHeight - _dividerHeight;
-          final effectiveMax = maxWebViewHeight < _minWebViewHeight
-              ? _minWebViewHeight
-              : maxWebViewHeight;
-          final webViewHeight = _webViewHeight
-              .clamp(_minWebViewHeight, effectiveMax)
-              .toDouble();
+          final minRequiredHeight =
+              _minWebViewHeight + _minContentHeight + _dividerHeight + _minChromeHeight;
+          final useScroll = constraints.maxHeight < minRequiredHeight;
 
-          return Column(
-            children: [
-              SizedBox(height: webViewHeight, child: _buildWebViewSection()),
-              _buildResizeHandle(
-                onDrag: (delta) {
-                  setState(() {
-                    _webViewHeight = (_webViewHeight + delta)
-                        .clamp(_minWebViewHeight, effectiveMax)
-                        .toDouble();
-                  });
-                },
-              ),
-              Expanded(
-                child: ListView(
-                  padding: const EdgeInsets.all(16),
-                  children: [
-                    _buildFindInteractionSection(),
-                    const SizedBox(height: 16),
-                    _buildPullToRefreshSection(),
-                    const SizedBox(height: 16),
-                    _buildWebMessageChannelSection(),
-                    const SizedBox(height: 16),
-                    _buildPrintJobSection(),
-                    const SizedBox(height: 16),
-                    _buildEventLog(),
-                  ],
-                ),
-              ),
-            ],
-          );
+          if (useScroll) {
+            return _buildScrollableBody();
+          }
+
+          return _buildResizableBody(constraints);
         },
+      ),
+    );
+  }
+
+  Widget _buildResizableBody(BoxConstraints constraints) {
+    final maxWebViewHeight =
+        constraints.maxHeight - _minContentHeight - _dividerHeight;
+    final effectiveMax = maxWebViewHeight < _minWebViewHeight
+        ? _minWebViewHeight
+        : maxWebViewHeight;
+    final webViewHeight =
+        _webViewHeight.clamp(_minWebViewHeight, effectiveMax).toDouble();
+
+    return Column(
+      children: [
+        SizedBox(height: webViewHeight, child: _buildWebViewSection()),
+        _buildResizeHandle(
+          onDrag: (delta) {
+            setState(() {
+              _webViewHeight = (_webViewHeight + delta)
+                  .clamp(_minWebViewHeight, effectiveMax)
+                  .toDouble();
+            });
+          },
+        ),
+        Expanded(
+          child: ListView(
+            padding: const EdgeInsets.all(16),
+            children: [
+              _buildFindInteractionSection(),
+              const SizedBox(height: 16),
+              _buildPullToRefreshSection(),
+              const SizedBox(height: 16),
+              _buildWebMessageChannelSection(),
+              const SizedBox(height: 16),
+              _buildPrintJobSection(),
+              const SizedBox(height: 16),
+              _buildEventLog(),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildScrollableBody() {
+    return SingleChildScrollView(
+      child: Column(
+        children: [
+          SizedBox(height: _minWebViewHeight, child: _buildWebViewSection()),
+          Container(height: _dividerHeight, color: Colors.grey.shade300),
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              children: [
+                _buildFindInteractionSection(),
+                const SizedBox(height: 16),
+                _buildPullToRefreshSection(),
+                const SizedBox(height: 16),
+                _buildWebMessageChannelSection(),
+                const SizedBox(height: 16),
+                _buildPrintJobSection(),
+                const SizedBox(height: 16),
+                _buildEventLog(),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

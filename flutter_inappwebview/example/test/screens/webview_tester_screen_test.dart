@@ -152,5 +152,19 @@ void main() {
 
       expect(find.byType(NetworkMonitorWidget), findsOneWidget);
     });
+
+    testWidgets('does not overflow on small height', (tester) async {
+      tester.binding.window.physicalSizeTestValue = const Size(320, 280);
+      tester.binding.window.devicePixelRatioTestValue = 1.0;
+      addTearDown(() {
+        tester.binding.window.clearPhysicalSizeTestValue();
+        tester.binding.window.clearDevicePixelRatioTestValue();
+      });
+
+      await tester.pumpWidget(createWidget());
+      await tester.pump();
+
+      expect(tester.takeException(), isNull);
+    });
   });
 }

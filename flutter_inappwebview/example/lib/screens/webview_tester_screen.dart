@@ -38,6 +38,7 @@ class _WebViewTesterScreenState extends State<WebViewTesterScreen>
   static const double _minWebViewHeight = 160;
   static const double _minTabsHeight = 220;
   static const double _dividerHeight = 6;
+  static const double _minChromeHeight = 140;
 
   @override
   void initState() {
@@ -68,7 +69,40 @@ class _WebViewTesterScreenState extends State<WebViewTesterScreen>
         ],
       ),
       drawer: buildDrawer(context: context),
-      body: Column(
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          final minRequiredHeight =
+              _minWebViewHeight + _minTabsHeight + _dividerHeight + _minChromeHeight;
+          final useScroll = constraints.maxHeight < minRequiredHeight;
+
+          if (useScroll) {
+            return _buildScrollableBody();
+          }
+
+          return _buildStandardBody();
+        },
+      ),
+    );
+  }
+
+  Widget _buildStandardBody() {
+    return Column(
+      children: [
+        _buildUrlBar(),
+        _buildNavigationControls(),
+        if (_progress < 1.0)
+          LinearProgressIndicator(
+            value: _progress,
+            backgroundColor: Colors.grey.shade200,
+          ),
+        Expanded(child: _buildResizableContent()),
+      ],
+    );
+  }
+
+  Widget _buildScrollableBody() {
+    return SingleChildScrollView(
+      child: Column(
         children: [
           _buildUrlBar(),
           _buildNavigationControls(),
@@ -77,7 +111,9 @@ class _WebViewTesterScreenState extends State<WebViewTesterScreen>
               value: _progress,
               backgroundColor: Colors.grey.shade200,
             ),
-          Expanded(child: _buildResizableContent()),
+          SizedBox(height: _minWebViewHeight, child: _buildWebView()),
+          Container(height: _dividerHeight, color: Colors.grey.shade300),
+          SizedBox(height: _minTabsHeight, child: _buildBottomTabs()),
         ],
       ),
     );

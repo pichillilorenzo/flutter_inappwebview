@@ -10,6 +10,7 @@ import 'package:flutter_inappwebview_example/widgets/webview/network_monitor_wid
 import 'package:flutter_inappwebview_example/widgets/webview/method_tester_widget.dart';
 import 'package:flutter_inappwebview_example/widgets/webview/javascript_console_widget.dart';
 import 'package:flutter_inappwebview_example/widgets/webview/user_script_tester_widget.dart';
+import 'package:flutter_inappwebview_example/main.dart';
 
 /// Main screen for testing InAppWebView functionality
 class WebViewTesterScreen extends StatefulWidget {
@@ -33,6 +34,10 @@ class _WebViewTesterScreenState extends State<WebViewTesterScreen>
   String? _currentTitle;
   late TabController _tabController;
   final List<UserScript> _userScripts = [];
+  double _webViewHeight = 320;
+  static const double _minWebViewHeight = 160;
+  static const double _minTabsHeight = 220;
+  static const double _dividerHeight = 6;
 
   @override
   void initState() {
@@ -62,6 +67,7 @@ class _WebViewTesterScreenState extends State<WebViewTesterScreen>
           ),
         ],
       ),
+      drawer: buildDrawer(context: context),
       body: Column(
         children: [
           _buildUrlBar(),
@@ -71,9 +77,63 @@ class _WebViewTesterScreenState extends State<WebViewTesterScreen>
               value: _progress,
               backgroundColor: Colors.grey.shade200,
             ),
-          Expanded(child: _buildWebView()),
-          _buildBottomTabs(),
+          Expanded(child: _buildResizableContent()),
         ],
+      ),
+    );
+  }
+
+  Widget _buildResizableContent() {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final maxWebViewHeight =
+            constraints.maxHeight - _minTabsHeight - _dividerHeight;
+        final effectiveMax = maxWebViewHeight < _minWebViewHeight
+            ? _minWebViewHeight
+            : maxWebViewHeight;
+        final webViewHeight = _webViewHeight
+            .clamp(_minWebViewHeight, effectiveMax)
+            .toDouble();
+
+        return Column(
+          children: [
+            SizedBox(height: webViewHeight, child: _buildWebView()),
+            _buildResizeHandle(
+              onDrag: (delta) {
+                setState(() {
+                  _webViewHeight = (_webViewHeight + delta)
+                      .clamp(_minWebViewHeight, effectiveMax)
+                      .toDouble();
+                });
+              },
+            ),
+            Expanded(child: _buildBottomTabs()),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _buildResizeHandle({required ValueChanged<double> onDrag}) {
+    return MouseRegion(
+      cursor: SystemMouseCursors.resizeRow,
+      child: GestureDetector(
+        behavior: HitTestBehavior.translucent,
+        onVerticalDragUpdate: (details) => onDrag(details.delta.dy),
+        child: Container(
+          height: _dividerHeight,
+          color: Colors.grey.shade300,
+          child: Center(
+            child: Container(
+              width: 40,
+              height: 2,
+              decoration: BoxDecoration(
+                color: Colors.grey.shade600,
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+          ),
+        ),
       ),
     );
   }
@@ -235,7 +295,7 @@ class _WebViewTesterScreenState extends State<WebViewTesterScreen>
           'onReceivedError',
           data: {
             'url': request.url.toString(),
-            'errorType': error.type.name,
+            'errorType': error.type.name(),
             'description': error.description,
           },
         );
@@ -273,7 +333,7 @@ class _WebViewTesterScreenState extends State<WebViewTesterScreen>
           'onConsoleMessage',
           data: {
             'message': consoleMessage.message,
-            'level': consoleMessage.messageLevel.name,
+            'level': consoleMessage.messageLevel.name(),
           },
         );
       },
@@ -299,7 +359,7 @@ class _WebViewTesterScreenState extends State<WebViewTesterScreen>
           data: {
             'url': url?.toString(),
             'isForMainFrame': navigationAction.isForMainFrame,
-            'navigationType': navigationAction.navigationType?.name,
+            'navigationType': navigationAction.navigationType?.name(),
           },
         );
 
@@ -322,16 +382,16 @@ class _WebViewTesterScreenState extends State<WebViewTesterScreen>
 
       // 10. onLoadResource
       onLoadResource: (controller, resource) {
-        _logEvent(
-          EventType.network,
-          'onLoadResource',
-          data: {
-            'url': resource.url?.toString(),
-            'initiatorType': resource.initiatorType,
-            'startTime': resource.startTime,
-            'duration': resource.duration,
-          },
-        );
+        // _logEvent(
+        //   EventType.network,
+        //   'onLoadResource',
+        //   data: {
+        //     'url': resource.url?.toString(),
+        //     'initiatorType': resource.initiatorType,
+        //     'startTime': resource.startTime,
+        //     'duration': resource.duration,
+        //   },
+        // );
       },
 
       // 11. onUpdateVisitedHistory
@@ -353,7 +413,7 @@ class _WebViewTesterScreenState extends State<WebViewTesterScreen>
         );
       },
 
-      // 13. onNavigationResponse (iOS/macOS only)
+      // 13. onNavigationResponse
       onNavigationResponse: (controller, navigationResponse) async {
         _logEvent(
           EventType.navigation,
@@ -368,7 +428,7 @@ class _WebViewTesterScreenState extends State<WebViewTesterScreen>
         return NavigationResponseAction.ALLOW;
       },
 
-      // 14. onDidReceiveServerRedirectForProvisionalNavigation (iOS/macOS only)
+      // 14. onDidReceiveServerRedirectForProvisionalNavigation
       onDidReceiveServerRedirectForProvisionalNavigation: (controller) {
         _logEvent(
           EventType.navigation,
@@ -497,7 +557,7 @@ class _WebViewTesterScreenState extends State<WebViewTesterScreen>
           },
         );
         return ServerTrustAuthResponse(
-          action: ServerTrustAuthResponseAction.CANCEL,
+          action: ServerTrustAuthResponseAction.PROCEED,
         );
       },
 
@@ -541,7 +601,7 @@ class _WebViewTesterScreenState extends State<WebViewTesterScreen>
           data: {
             'url': ajaxRequest.url?.toString(),
             'method': ajaxRequest.method,
-            'readyState': ajaxRequest.readyState?.name,
+            'readyState': ajaxRequest.readyState?.name(),
             'status': ajaxRequest.status,
           },
         );
@@ -629,7 +689,7 @@ class _WebViewTesterScreenState extends State<WebViewTesterScreen>
 
       // 33. onScrollChanged
       onScrollChanged: (controller, x, y) {
-        _logEvent(EventType.ui, 'onScrollChanged', data: {'x': x, 'y': y});
+        // _logEvent(EventType.ui, 'onScrollChanged', data: {'x': x, 'y': y});
       },
 
       // 34. onOverScrolled
@@ -699,11 +759,11 @@ class _WebViewTesterScreenState extends State<WebViewTesterScreen>
         );
         return PermissionResponse(
           resources: permissionRequest.resources,
-          action: PermissionResponseAction.DENY,
+          action: PermissionResponseAction.GRANT,
         );
       },
 
-      // 40. onPermissionRequestCanceled (Android)
+      // 40. onPermissionRequestCanceled
       onPermissionRequestCanceled: (controller, permissionRequest) {
         _logEvent(
           EventType.ui,
@@ -716,7 +776,7 @@ class _WebViewTesterScreenState extends State<WebViewTesterScreen>
         );
       },
 
-      // 41. onGeolocationPermissionsShowPrompt (Android)
+      // 41. onGeolocationPermissionsShowPrompt
       onGeolocationPermissionsShowPrompt: (controller, origin) async {
         _logEvent(
           EventType.ui,
@@ -730,7 +790,7 @@ class _WebViewTesterScreenState extends State<WebViewTesterScreen>
         );
       },
 
-      // 42. onGeolocationPermissionsHidePrompt (Android)
+      // 42. onGeolocationPermissionsHidePrompt
       onGeolocationPermissionsHidePrompt: (controller) {
         _logEvent(EventType.ui, 'onGeolocationPermissionsHidePrompt');
       },
@@ -745,17 +805,17 @@ class _WebViewTesterScreenState extends State<WebViewTesterScreen>
           EventType.ui,
           'onLongPressHitTestResult',
           data: {
-            'type': hitTestResult.type?.name,
+            'type': hitTestResult.type?.name(),
             'extra': hitTestResult.extra,
           },
         );
       },
 
       // ============================================================
-      // RENDER PROCESS EVENTS - ANDROID (3)
+      // RENDER PROCESS EVENTS (3)
       // ============================================================
 
-      // 44. onRenderProcessUnresponsive (Android)
+      // 44. onRenderProcessUnresponsive
       onRenderProcessUnresponsive: (controller, url) async {
         _logEvent(
           EventType.error,
@@ -765,7 +825,7 @@ class _WebViewTesterScreenState extends State<WebViewTesterScreen>
         return WebViewRenderProcessAction.TERMINATE;
       },
 
-      // 45. onRenderProcessResponsive (Android)
+      // 45. onRenderProcessResponsive
       onRenderProcessResponsive: (controller, url) async {
         _logEvent(
           EventType.ui,
@@ -775,23 +835,23 @@ class _WebViewTesterScreenState extends State<WebViewTesterScreen>
         return WebViewRenderProcessAction.TERMINATE;
       },
 
-      // 46. onRenderProcessGone (Android)
+      // 46. onRenderProcessGone
       onRenderProcessGone: (controller, detail) {
         _logEvent(
           EventType.error,
           'onRenderProcessGone',
           data: {
             'didCrash': detail.didCrash,
-            'rendererPriorityAtExit': detail.rendererPriorityAtExit?.name,
+            'rendererPriorityAtExit': detail.rendererPriorityAtExit?.name(),
           },
         );
       },
 
       // ============================================================
-      // FORM EVENTS - ANDROID (2)
+      // FORM EVENTS (2)
       // ============================================================
 
-      // 47. onFormResubmission (Android)
+      // 47. onFormResubmission
       onFormResubmission: (controller, url) async {
         _logEvent(
           EventType.navigation,
@@ -801,7 +861,7 @@ class _WebViewTesterScreenState extends State<WebViewTesterScreen>
         return FormResubmissionAction.DONT_RESEND;
       },
 
-      // 48. onReceivedLoginRequest (Android)
+      // 48. onReceivedLoginRequest
       onReceivedLoginRequest: (controller, loginRequest) {
         _logEvent(
           EventType.network,
@@ -815,10 +875,10 @@ class _WebViewTesterScreenState extends State<WebViewTesterScreen>
       },
 
       // ============================================================
-      // ICON EVENTS - ANDROID (2)
+      // ICON EVENTS (2)
       // ============================================================
 
-      // 49. onReceivedIcon (Android)
+      // 49. onReceivedIcon
       onReceivedIcon: (controller, icon) {
         _logEvent(
           EventType.ui,
@@ -827,7 +887,7 @@ class _WebViewTesterScreenState extends State<WebViewTesterScreen>
         );
       },
 
-      // 50. onReceivedTouchIconUrl (Android)
+      // 50. onReceivedTouchIconUrl
       onReceivedTouchIconUrl: (controller, url, precomposed) {
         _logEvent(
           EventType.ui,
@@ -837,10 +897,10 @@ class _WebViewTesterScreenState extends State<WebViewTesterScreen>
       },
 
       // ============================================================
-      // SAFE BROWSING EVENTS - ANDROID (1)
+      // SAFE BROWSING EVENTS (1)
       // ============================================================
 
-      // 51. onSafeBrowsingHit (Android)
+      // 51. onSafeBrowsingHit
       onSafeBrowsingHit: (controller, url, threatType) async {
         _logEvent(
           EventType.error,
@@ -854,15 +914,15 @@ class _WebViewTesterScreenState extends State<WebViewTesterScreen>
       },
 
       // ============================================================
-      // IOS/MACOS-SPECIFIC EVENTS (5)
+      // ADDITIONAL EVENTS (5)
       // ============================================================
 
-      // 52. onWebContentProcessDidTerminate (iOS/macOS)
+      // 52. onWebContentProcessDidTerminate
       onWebContentProcessDidTerminate: (controller) {
         _logEvent(EventType.error, 'onWebContentProcessDidTerminate');
       },
 
-      // 53. shouldAllowDeprecatedTLS (iOS/macOS)
+      // 53. shouldAllowDeprecatedTLS
       shouldAllowDeprecatedTLS: (controller, challenge) async {
         _logEvent(
           EventType.network,
@@ -876,25 +936,25 @@ class _WebViewTesterScreenState extends State<WebViewTesterScreen>
         return ShouldAllowDeprecatedTLSAction.CANCEL;
       },
 
-      // 54. onCameraCaptureStateChanged (iOS/macOS)
+      // 54. onCameraCaptureStateChanged
       onCameraCaptureStateChanged: (controller, oldState, newState) {
         _logEvent(
           EventType.ui,
           'onCameraCaptureStateChanged',
-          data: {'oldState': oldState?.name, 'newState': newState?.name},
+          data: {'oldState': oldState?.name(), 'newState': newState?.name()},
         );
       },
 
-      // 55. onMicrophoneCaptureStateChanged (iOS/macOS)
+      // 55. onMicrophoneCaptureStateChanged
       onMicrophoneCaptureStateChanged: (controller, oldState, newState) {
         _logEvent(
           EventType.ui,
           'onMicrophoneCaptureStateChanged',
-          data: {'oldState': oldState?.name, 'newState': newState?.name},
+          data: {'oldState': oldState?.name(), 'newState': newState?.name()},
         );
       },
 
-      // 56. onContentSizeChanged (iOS/macOS)
+      // 56. onContentSizeChanged
       onContentSizeChanged: (controller, oldContentSize, newContentSize) {
         _logEvent(
           EventType.ui,
@@ -909,23 +969,23 @@ class _WebViewTesterScreenState extends State<WebViewTesterScreen>
       },
 
       // ============================================================
-      // WINDOWS-SPECIFIC EVENTS (2)
+      // SYSTEM EVENTS (2)
       // ============================================================
 
-      // 57. onProcessFailed (Windows)
+      // 57. onProcessFailed
       onProcessFailed: (controller, detail) {
         _logEvent(
           EventType.error,
           'onProcessFailed',
           data: {
-            'kind': detail.kind.name,
-            'reason': detail.reason?.name,
+            'kind': detail.kind.name(),
+            'reason': detail.reason?.name(),
             'exitCode': detail.exitCode,
           },
         );
       },
 
-      // 58. onAcceleratorKeyPressed (Windows)
+      // 58. onAcceleratorKeyPressed
       onAcceleratorKeyPressed: (controller, keyEventInfo) {
         _logEvent(
           EventType.ui,
@@ -953,7 +1013,7 @@ class _WebViewTesterScreenState extends State<WebViewTesterScreen>
           EventType.ui,
           'onShowFileChooser',
           data: {
-            'mode': fileChooserParams.mode.name,
+            'mode': fileChooserParams.mode.name(),
             'acceptTypes': fileChooserParams.acceptTypes,
             'isCaptureEnabled': fileChooserParams.isCaptureEnabled,
           },
@@ -965,7 +1025,6 @@ class _WebViewTesterScreenState extends State<WebViewTesterScreen>
 
   Widget _buildBottomTabs() {
     return Container(
-      height: 300,
       decoration: BoxDecoration(
         border: Border(top: BorderSide(color: Colors.grey.shade300)),
       ),

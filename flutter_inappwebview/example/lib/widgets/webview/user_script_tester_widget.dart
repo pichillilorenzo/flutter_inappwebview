@@ -74,7 +74,7 @@ class _UserScriptTesterWidgetState extends State<UserScriptTesterWidget> {
             'Add User Script',
             style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 4),
           TextField(
             controller: _sourceController,
             decoration: const InputDecoration(
@@ -82,10 +82,10 @@ class _UserScriptTesterWidgetState extends State<UserScriptTesterWidget> {
               border: OutlineInputBorder(),
               contentPadding: EdgeInsets.all(12),
             ),
-            maxLines: 4,
+            maxLines: 2,
             onChanged: (_) => setState(() {}),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 4),
           Row(
             children: [
               Expanded(

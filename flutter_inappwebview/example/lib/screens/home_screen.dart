@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../main.dart';
 import '../utils/constants.dart';
 import '../utils/test_registry.dart';
 import '../utils/platform_utils.dart';
@@ -30,6 +31,7 @@ class HomeScreen extends StatelessWidget {
           ),
         ],
       ),
+      drawer: buildDrawer(context: context),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(

@@ -30,7 +30,7 @@ class TestInAppBrowser extends InAppBrowser {
   void onReceivedError(WebResourceRequest request, WebResourceError error) {
     onEvent?.call('onReceivedError', {
       'url': request.url.toString(),
-      'errorType': error.type.name,
+      'errorType': error.type.name(),
       'description': error.description,
     });
   }
@@ -86,14 +86,18 @@ class _InAppBrowserScreenState extends State<InAppBrowserScreen> {
   final List<InAppBrowserMenuItem> _menuItems = [];
 
   void _initBrowser() {
-    _browser = TestInAppBrowser(
-      onEvent: (event, data) {
-        _logEvent(EventType.ui, event, data: data);
-        if (event == 'onExit') {
-          setState(() => _browserOpened = false);
-        }
-      },
-    );
+    try {
+      _browser = TestInAppBrowser(
+        onEvent: (event, data) {
+          _logEvent(EventType.ui, event, data: data);
+          if (event == 'onExit') {
+            setState(() => _browserOpened = false);
+          }
+        },
+      );
+    } catch (e) {
+      _showInitError('Unable to create browser: $e');
+    }
   }
 
   @override
@@ -376,6 +380,13 @@ class _InAppBrowserScreenState extends State<InAppBrowserScreen> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text(message), backgroundColor: Colors.red),
     );
+  }
+
+  void _showInitError(String message) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      _showError(message);
+    });
   }
 
   @override

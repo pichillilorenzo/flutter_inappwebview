@@ -8,8 +8,6 @@ import 'package:flutter_inappwebview_example/providers/event_log_provider.dart';
 import 'package:flutter_inappwebview_example/providers/settings_manager.dart';
 import 'package:flutter_inappwebview_example/providers/test_runner.dart';
 import 'package:flutter_inappwebview_example/providers/network_monitor.dart';
-import 'package:flutter_inappwebview_example/screens/home_screen.dart';
-import 'package:flutter_inappwebview_example/screens/category_screen.dart';
 import 'package:flutter_inappwebview_example/screens/platform_info_screen.dart';
 import 'package:flutter_inappwebview_example/screens/webview_tester_screen.dart';
 import 'package:flutter_inappwebview_example/screens/settings_editor_screen.dart';
@@ -26,7 +24,6 @@ import 'package:flutter_inappwebview_example/screens/support_matrix/platform_com
 import 'package:flutter_inappwebview_example/screens/test_automation/test_runner_screen.dart';
 import 'package:flutter_inappwebview_example/screens/test_automation/performance_screen.dart';
 import 'package:flutter_inappwebview_example/utils/test_registry.dart';
-import 'package:flutter_inappwebview_example/utils/constants.dart';
 
 // import 'package:path_provider/path_provider.dart';
 // import 'package:permission_handler/permission_handler.dart';
@@ -101,17 +98,10 @@ Drawer buildDrawer({required BuildContext context}) {
           ),
         ),
         ListTile(
-          title: Text('Test Suite Home'),
-          leading: Icon(Icons.home),
-          onTap: () {
-            Navigator.pushReplacementNamed(context, '/');
-          },
-        ),
-        ListTile(
           title: Text('WebView Tester'),
           leading: Icon(Icons.web),
           onTap: () {
-            Navigator.pushNamed(context, '/webview-tester');
+            Navigator.pushReplacementNamed(context, '/');
           },
         ),
         ListTile(
@@ -324,9 +314,8 @@ class _MyAppState extends State<MyApp> {
         ),
         useMaterial3: false,
       ),
-      initialRoute: '/',
       routes: {
-        '/': (context) => HomeScreen(),
+        '/': (context) => WebViewTesterScreen(),
         '/platform-info': (context) => PlatformInfoScreen(),
         '/webview-tester': (context) => WebViewTesterScreen(),
         '/settings': (context) => SettingsEditorScreen(),
@@ -345,38 +334,6 @@ class _MyAppState extends State<MyApp> {
         '/test-automation': (context) => TestRunnerScreen(),
         '/performance': (context) => PerformanceScreen(),
       },
-      onGenerateRoute: (settings) {
-        // Handle dynamic category routes
-        if (settings.name?.startsWith('/category/') ?? false) {
-          final categoryName = settings.name!.substring('/category/'.length);
-          final category = _parseCategoryFromName(categoryName);
-          if (category != null) {
-            return MaterialPageRoute(
-              builder: (context) => CategoryScreen(category: category),
-            );
-          }
-        }
-        return null;
-      },
     );
-  }
-
-  TestCategory? _parseCategoryFromName(String name) {
-    switch (name.toLowerCase()) {
-      case 'navigation':
-        return TestCategory.navigation;
-      case 'javascript':
-        return TestCategory.javascript;
-      case 'content':
-        return TestCategory.content;
-      case 'storage':
-        return TestCategory.storage;
-      case 'advanced':
-        return TestCategory.advanced;
-      case 'browsers':
-        return TestCategory.browsers;
-      default:
-        return null;
-    }
   }
 }

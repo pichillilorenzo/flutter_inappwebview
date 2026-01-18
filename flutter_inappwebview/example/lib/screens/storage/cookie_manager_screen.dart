@@ -552,19 +552,19 @@ class _CookieManagerScreenState extends State<CookieManagerScreen> {
                 ),
                 _buildMethodSection(
                   'getAllCookies',
-                  'Get all cookies (iOS, macOS, Linux only)',
+                  'Get all cookies',
                   PlatformCookieManagerMethod.getAllCookies,
                   _getAllCookies,
                 ),
                 _buildMethodSection(
                   'removeSessionCookies',
-                  'Remove session cookies (Android only)',
+                  'Remove session cookies',
                   PlatformCookieManagerMethod.removeSessionCookies,
                   _removeSessionCookies,
                 ),
                 _buildMethodSection(
                   'flush',
-                  'Flush cookies to persistent storage (Android only)',
+                  'Flush cookies to persistent storage',
                   PlatformCookieManagerMethod.flush,
                   _flush,
                 ),

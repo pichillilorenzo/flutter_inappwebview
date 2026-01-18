@@ -25,6 +25,10 @@ class _ControllersScreenState extends State<ControllersScreen> {
   PullToRefreshController? _pullToRefreshController;
   bool _webViewReady = false;
   bool _isLoading = false;
+  double _webViewHeight = 180;
+  static const double _minWebViewHeight = 120;
+  static const double _minContentHeight = 260;
+  static const double _dividerHeight = 6;
 
   // Find interaction state
   int _matchCount = 0;
@@ -120,37 +124,41 @@ class _ControllersScreenState extends State<ControllersScreen> {
   }
 
   void _initControllers() {
-    _findInteractionController = FindInteractionController(
-      onFindResultReceived:
-          (controller, activeMatchOrdinal, numberOfMatches, isDoneCounting) {
-            setState(() {
-              _currentMatch = activeMatchOrdinal;
-              _matchCount = numberOfMatches;
-            });
-            _logEvent(
-              EventType.ui,
-              'onFindResultReceived',
-              data: {
-                'activeMatchOrdinal': activeMatchOrdinal,
-                'numberOfMatches': numberOfMatches,
-                'isDoneCounting': isDoneCounting,
-              },
-            );
-          },
-    );
+    try {
+      _findInteractionController = FindInteractionController(
+        onFindResultReceived:
+            (controller, activeMatchOrdinal, numberOfMatches, isDoneCounting) {
+              setState(() {
+                _currentMatch = activeMatchOrdinal;
+                _matchCount = numberOfMatches;
+              });
+              _logEvent(
+                EventType.ui,
+                'onFindResultReceived',
+                data: {
+                  'activeMatchOrdinal': activeMatchOrdinal,
+                  'numberOfMatches': numberOfMatches,
+                  'isDoneCounting': isDoneCounting,
+                },
+              );
+            },
+      );
 
-    _pullToRefreshController = PullToRefreshController(
-      settings: PullToRefreshSettings(
-        enabled: _pullToRefreshEnabled,
-        color: _pullToRefreshColor,
-      ),
-      onRefresh: () async {
-        _logEvent(EventType.ui, 'onRefresh');
-        if (_webViewController != null) {
-          await _webViewController!.reload();
-        }
-      },
-    );
+      _pullToRefreshController = PullToRefreshController(
+        settings: PullToRefreshSettings(
+          enabled: _pullToRefreshEnabled,
+          color: _pullToRefreshColor,
+        ),
+        onRefresh: () async {
+          _logEvent(EventType.ui, 'onRefresh');
+          if (_webViewController != null) {
+            await _webViewController!.reload();
+          }
+        },
+      );
+    } catch (e) {
+      _showInitError('Unable to initialize controllers: $e');
+    }
   }
 
   @override
@@ -184,6 +192,13 @@ class _ControllersScreenState extends State<ControllersScreen> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text(message), backgroundColor: Colors.red),
     );
+  }
+
+  void _showInitError(String message) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      _showError(message);
+    });
   }
 
   // Find Interaction methods
@@ -375,26 +390,72 @@ class _ControllersScreenState extends State<ControllersScreen> {
         ],
       ),
       drawer: buildDrawer(context: context),
-      body: Column(
-        children: [
-          _buildWebViewSection(),
-          Expanded(
-            child: ListView(
-              padding: const EdgeInsets.all(16),
-              children: [
-                _buildFindInteractionSection(),
-                const SizedBox(height: 16),
-                _buildPullToRefreshSection(),
-                const SizedBox(height: 16),
-                _buildWebMessageChannelSection(),
-                const SizedBox(height: 16),
-                _buildPrintJobSection(),
-                const SizedBox(height: 16),
-                _buildEventLog(),
-              ],
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          final maxWebViewHeight =
+              constraints.maxHeight - _minContentHeight - _dividerHeight;
+          final effectiveMax = maxWebViewHeight < _minWebViewHeight
+              ? _minWebViewHeight
+              : maxWebViewHeight;
+          final webViewHeight = _webViewHeight
+              .clamp(_minWebViewHeight, effectiveMax)
+              .toDouble();
+
+          return Column(
+            children: [
+              SizedBox(height: webViewHeight, child: _buildWebViewSection()),
+              _buildResizeHandle(
+                onDrag: (delta) {
+                  setState(() {
+                    _webViewHeight = (_webViewHeight + delta)
+                        .clamp(_minWebViewHeight, effectiveMax)
+                        .toDouble();
+                  });
+                },
+              ),
+              Expanded(
+                child: ListView(
+                  padding: const EdgeInsets.all(16),
+                  children: [
+                    _buildFindInteractionSection(),
+                    const SizedBox(height: 16),
+                    _buildPullToRefreshSection(),
+                    const SizedBox(height: 16),
+                    _buildWebMessageChannelSection(),
+                    const SizedBox(height: 16),
+                    _buildPrintJobSection(),
+                    const SizedBox(height: 16),
+                    _buildEventLog(),
+                  ],
+                ),
+              ),
+            ],
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildResizeHandle({required ValueChanged<double> onDrag}) {
+    return MouseRegion(
+      cursor: SystemMouseCursors.resizeRow,
+      child: GestureDetector(
+        behavior: HitTestBehavior.translucent,
+        onVerticalDragUpdate: (details) => onDrag(details.delta.dy),
+        child: Container(
+          height: _dividerHeight,
+          color: Colors.grey.shade300,
+          child: Center(
+            child: Container(
+              width: 40,
+              height: 2,
+              decoration: BoxDecoration(
+                color: Colors.grey.shade600,
+                borderRadius: BorderRadius.circular(2),
+              ),
             ),
           ),
-        ],
+        ),
       ),
     );
   }
@@ -986,7 +1047,7 @@ class _ControllersScreenState extends State<ControllersScreen> {
     final canPress = enabled && isSupported && onPressed != null;
 
     return Tooltip(
-      message: 'Supported: ${supportedPlatforms.join(", ")}',
+      message: 'Availability depends on platform',
       child: ActionChip(
         label: Text(
           label,

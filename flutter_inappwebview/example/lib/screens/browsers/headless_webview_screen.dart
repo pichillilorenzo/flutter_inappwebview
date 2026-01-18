@@ -55,87 +55,93 @@ class _HeadlessWebViewScreenState extends State<HeadlessWebViewScreen> {
     );
   }
 
-  void _createHeadlessWebView() {
+  bool _createHeadlessWebView() {
     final url = _urlController.text.trim();
     if (url.isEmpty) {
       _showError('Please enter a URL');
-      return;
+      return false;
     }
 
     final width = double.tryParse(_widthController.text) ?? 1024;
     final height = double.tryParse(_heightController.text) ?? 768;
-
-    _headlessWebView = HeadlessInAppWebView(
-      initialSize: Size(width, height),
-      initialUrlRequest: URLRequest(url: WebUri(url)),
-      initialSettings: InAppWebViewSettings(javaScriptEnabled: true),
-      onWebViewCreated: (controller) {
-        _webViewController = controller;
-        _logEvent(
-          EventType.ui,
-          'onWebViewCreated',
-          data: {'viewId': controller.getViewId()},
-        );
-      },
-      onLoadStart: (controller, url) {
-        _logEvent(
-          EventType.navigation,
-          'onLoadStart',
-          data: {'url': url?.toString()},
-        );
-        setState(() => _currentUrl = url?.toString());
-      },
-      onLoadStop: (controller, url) async {
-        _logEvent(
-          EventType.navigation,
-          'onLoadStop',
-          data: {'url': url?.toString()},
-        );
-        final title = await controller.getTitle();
-        setState(() {
-          _currentUrl = url?.toString();
-          _currentTitle = title;
-        });
-      },
-      onReceivedError: (controller, request, error) {
-        _logEvent(
-          EventType.error,
-          'onReceivedError',
-          data: {
-            'url': request.url.toString(),
-            'errorType': error.type.name,
-            'description': error.description,
-          },
-        );
-      },
-      onProgressChanged: (controller, progress) {
-        _logEvent(
-          EventType.performance,
-          'onProgressChanged',
-          data: {'progress': progress},
-        );
-      },
-      onConsoleMessage: (controller, consoleMessage) {
-        _logEvent(
-          EventType.console,
-          'onConsoleMessage',
-          data: {
-            'message': consoleMessage.message,
-            'level': consoleMessage.messageLevel.name,
-          },
-        );
-      },
-      onTitleChanged: (controller, title) {
-        _logEvent(EventType.ui, 'onTitleChanged', data: {'title': title});
-        setState(() => _currentTitle = title);
-      },
-    );
+    try {
+      _headlessWebView = HeadlessInAppWebView(
+        initialSize: Size(width, height),
+        initialUrlRequest: URLRequest(url: WebUri(url)),
+        initialSettings: InAppWebViewSettings(javaScriptEnabled: true),
+        onWebViewCreated: (controller) {
+          _webViewController = controller;
+          _logEvent(
+            EventType.ui,
+            'onWebViewCreated',
+            data: {'viewId': controller.getViewId()},
+          );
+        },
+        onLoadStart: (controller, url) {
+          _logEvent(
+            EventType.navigation,
+            'onLoadStart',
+            data: {'url': url?.toString()},
+          );
+          setState(() => _currentUrl = url?.toString());
+        },
+        onLoadStop: (controller, url) async {
+          _logEvent(
+            EventType.navigation,
+            'onLoadStop',
+            data: {'url': url?.toString()},
+          );
+          final title = await controller.getTitle();
+          setState(() {
+            _currentUrl = url?.toString();
+            _currentTitle = title;
+          });
+        },
+        onReceivedError: (controller, request, error) {
+          _logEvent(
+            EventType.error,
+            'onReceivedError',
+            data: {
+              'url': request.url.toString(),
+              'errorType': error.type.name(),
+              'description': error.description,
+            },
+          );
+        },
+        onProgressChanged: (controller, progress) {
+          _logEvent(
+            EventType.performance,
+            'onProgressChanged',
+            data: {'progress': progress},
+          );
+        },
+        onConsoleMessage: (controller, consoleMessage) {
+          _logEvent(
+            EventType.console,
+            'onConsoleMessage',
+            data: {
+              'message': consoleMessage.message,
+              'level': consoleMessage.messageLevel.name(),
+            },
+          );
+        },
+        onTitleChanged: (controller, title) {
+          _logEvent(EventType.ui, 'onTitleChanged', data: {'title': title});
+          setState(() => _currentTitle = title);
+        },
+      );
+    } catch (e) {
+      _showError('Error creating headless webview: $e');
+      return false;
+    }
+    return true;
   }
 
   Future<void> _run() async {
     setState(() => _isLoading = true);
     try {
-      _createHeadlessWebView();
+      final created = _createHeadlessWebView();
+      if (!created) return;
       await _headlessWebView?.run();
       setState(() => _isRunning = _headlessWebView?.isRunning() ?? false);
       _showSuccess('HeadlessInAppWebView started');

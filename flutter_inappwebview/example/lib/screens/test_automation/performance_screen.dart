@@ -439,7 +439,9 @@ class _PerformanceScreenState extends State<PerformanceScreen> {
               final previousResult = _previousSession?.results
                   .where((r) => r.testName == result.testName)
                   .firstOrNull;
-              final change = previousResult != null
+              final change =
+                  previousResult != null &&
+                      previousResult.duration.inMilliseconds > 0
                   ? ((result.duration.inMilliseconds -
                                 previousResult.duration.inMilliseconds) /
                             previousResult.duration.inMilliseconds *

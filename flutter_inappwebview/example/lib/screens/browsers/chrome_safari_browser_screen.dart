@@ -34,7 +34,7 @@ class TestChromeSafariBrowser extends ChromeSafariBrowser {
   @override
   void onNavigationEvent(CustomTabsNavigationEventType? navigationEvent) {
     onEvent?.call('onNavigationEvent', {
-      'navigationEvent': navigationEvent?.name,
+      'navigationEvent': navigationEvent?.name(),
     });
   }
 
@@ -60,7 +60,7 @@ class TestChromeSafariBrowser extends ChromeSafariBrowser {
     bool result,
   ) {
     onEvent?.call('onRelationshipValidationResult', {
-      'relation': relation?.name,
+      'relation': relation?.name(),
       'requestedOrigin': requestedOrigin?.toString(),
       'result': result,
     });
@@ -116,16 +116,20 @@ class _ChromeSafariBrowserScreenState extends State<ChromeSafariBrowserScreen> {
   final List<ChromeSafariBrowserMenuItem> _menuItems = [];
 
   void _initBrowser() {
-    _browser = TestChromeSafariBrowser(
-      onEvent: (event, data) {
-        _logEvent(EventType.ui, event, data: data);
-        if (event == 'onClosed') {
-          setState(() => _browserOpened = false);
-        } else if (event == 'onOpened') {
-          setState(() => _browserOpened = true);
-        }
-      },
-    );
+    try {
+      _browser = TestChromeSafariBrowser(
+        onEvent: (event, data) {
+          _logEvent(EventType.ui, event, data: data);
+          if (event == 'onClosed') {
+            setState(() => _browserOpened = false);
+          } else if (event == 'onOpened') {
+            setState(() => _browserOpened = true);
+          }
+        },
+      );
+    } catch (e) {
+      _showInitError('Unable to create browser: $e');
+    }
   }
 
   @override
@@ -460,6 +464,13 @@ class _ChromeSafariBrowserScreenState extends State<ChromeSafariBrowserScreen> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text(message), backgroundColor: Colors.red),
     );
+  }
+
+  void _showInitError(String message) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      _showError(message);
+    });
   }
 
   @override

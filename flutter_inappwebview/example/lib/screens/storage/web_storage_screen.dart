@@ -16,6 +16,10 @@ class _WebStorageScreenState extends State<WebStorageScreen>
   InAppWebViewController? _webViewController;
   bool _isLoading = false;
   bool _webViewReady = false;
+  double _webViewHeight = 140;
+  static const double _minWebViewHeight = 100;
+  static const double _minContentHeight = 260;
+  static const double _dividerHeight = 6;
 
   // LocalStorage state
   List<WebStorageItem> _localStorageItems = [];
@@ -439,27 +443,73 @@ class _WebStorageScreenState extends State<WebStorageScreen>
         ),
       ),
       drawer: buildDrawer(context: context),
-      body: Column(
-        children: [
-          _buildWebViewSection(),
-          Expanded(
-            child: TabBarView(
-              controller: _tabController,
-              children: [
-                _buildStorageView(
-                  items: _localStorageItems,
-                  length: _localStorageLength,
-                  isLocal: true,
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          final maxWebViewHeight =
+              constraints.maxHeight - _minContentHeight - _dividerHeight;
+          final effectiveMax = maxWebViewHeight < _minWebViewHeight
+              ? _minWebViewHeight
+              : maxWebViewHeight;
+          final webViewHeight = _webViewHeight
+              .clamp(_minWebViewHeight, effectiveMax)
+              .toDouble();
+
+          return Column(
+            children: [
+              SizedBox(height: webViewHeight, child: _buildWebViewSection()),
+              _buildResizeHandle(
+                onDrag: (delta) {
+                  setState(() {
+                    _webViewHeight = (_webViewHeight + delta)
+                        .clamp(_minWebViewHeight, effectiveMax)
+                        .toDouble();
+                  });
+                },
+              ),
+              Expanded(
+                child: TabBarView(
+                  controller: _tabController,
+                  children: [
+                    _buildStorageView(
+                      items: _localStorageItems,
+                      length: _localStorageLength,
+                      isLocal: true,
+                    ),
+                    _buildStorageView(
+                      items: _sessionStorageItems,
+                      length: _sessionStorageLength,
+                      isLocal: false,
+                    ),
+                  ],
                 ),
-                _buildStorageView(
-                  items: _sessionStorageItems,
-                  length: _sessionStorageLength,
-                  isLocal: false,
-                ),
-              ],
+              ),
+            ],
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildResizeHandle({required ValueChanged<double> onDrag}) {
+    return MouseRegion(
+      cursor: SystemMouseCursors.resizeRow,
+      child: GestureDetector(
+        behavior: HitTestBehavior.translucent,
+        onVerticalDragUpdate: (details) => onDrag(details.delta.dy),
+        child: Container(
+          height: _dividerHeight,
+          color: Colors.grey.shade300,
+          child: Center(
+            child: Container(
+              width: 40,
+              height: 2,
+              decoration: BoxDecoration(
+                color: Colors.grey.shade600,
+                borderRadius: BorderRadius.circular(2),
+              ),
             ),
           ),
-        ],
+        ),
       ),
     );
   }
@@ -492,8 +542,7 @@ class _WebStorageScreenState extends State<WebStorageScreen>
             ],
           ),
           const SizedBox(height: 8),
-          SizedBox(
-            height: 100,
+          Expanded(
             child: Stack(
               children: [
                 InAppWebView(

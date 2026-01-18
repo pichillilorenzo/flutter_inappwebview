@@ -3,6 +3,7 @@ import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_inappwebview_example/main.dart';
 import 'package:flutter_inappwebview_example/utils/support_checker.dart';
 import 'package:flutter_inappwebview_example/widgets/common/support_badge.dart';
+import 'package:flutter_inappwebview_example/widgets/common/parameter_dialog.dart';
 
 /// Screen for testing CookieManager functionality
 class CookieManagerScreen extends StatefulWidget {
@@ -53,13 +54,7 @@ class _CookieManagerScreenState extends State<CookieManagerScreen> {
     }
   }
 
-  Future<void> _getCookie(String name) async {
-    final url = _urlController.text.trim();
-    if (url.isEmpty) {
-      _showError('Please enter a URL');
-      return;
-    }
-
+  Future<void> _getCookie({required String url, required String name}) async {
     setState(() => _isLoading = true);
     try {
       final cookie = await _cookieManager.getCookie(
@@ -79,21 +74,81 @@ class _CookieManagerScreenState extends State<CookieManagerScreen> {
   }
 
   Future<void> _setCookie() async {
-    final url = _urlController.text.trim();
+    final params = await showParameterDialog(
+      context: context,
+      title: 'Set Cookie',
+      parameters: {
+        'url': _urlController.text.trim(),
+        'name': '',
+        'value': '',
+        'path': '/',
+        'domain': '',
+        'expiresDate': const ParameterValueHint<DateTime?>(
+          null,
+          ParameterValueType.date,
+        ),
+        'maxAge': 3600,
+        'isSecure': false,
+        'isHttpOnly': false,
+        'sameSite': '',
+      },
+      requiredPaths: ['url', 'name', 'value'],
+    );
+
+    if (params == null) return;
+
+    final url = params['url']?.toString() ?? '';
     if (url.isEmpty) {
       _showError('Please enter a URL');
       return;
     }
-    await _showSetCookieDialog(url);
+
+    final sameSiteValue = params['sameSite']?.toString();
+    HTTPCookieSameSitePolicy? sameSite;
+    if (sameSiteValue != null && sameSiteValue.trim().isNotEmpty) {
+      sameSite = HTTPCookieSameSitePolicy.values.firstWhere(
+        (policy) => policy.name().toLowerCase() == sameSiteValue.toLowerCase(),
+        orElse: () => HTTPCookieSameSitePolicy.LAX,
+      );
+    }
+
+    setState(() => _isLoading = true);
+    try {
+      final path = params['path']?.toString();
+      final result = await _cookieManager.setCookie(
+        url: WebUri(url),
+        name: params['name']?.toString() ?? '',
+        value: params['value']?.toString() ?? '',
+        path: path?.isNotEmpty == true ? path! : '/',
+        domain: params['domain']?.toString().isNotEmpty == true
+            ? params['domain']?.toString()
+            : null,
+        expiresDate:
+            (params['expiresDate'] as DateTime?)?.millisecondsSinceEpoch,
+        maxAge: (params['maxAge'] as num?)?.toInt(),
+        isSecure: params['isSecure'] as bool? ?? false,
+        isHttpOnly: params['isHttpOnly'] as bool? ?? false,
+        sameSite: sameSite,
+      );
+      if (result) {
+        _showSuccess('Cookie set successfully');
+        await _getCookies();
+      } else {
+        _showError('Failed to set cookie');
+      }
+    } catch (e) {
+      _showError('Error setting cookie: $e');
+    } finally {
+      setState(() => _isLoading = false);
+    }
   }
 
-  Future<void> _deleteCookie(Cookie cookie) async {
-    final url = _urlController.text.trim();
+  Future<void> _deleteCookie(Cookie cookie, {String? urlOverride}) async {
+    final url = urlOverride ?? _urlController.text.trim();
     if (url.isEmpty) {
       _showError('Please enter a URL');
       return;
     }
-
     setState(() => _isLoading = true);
     try {
       final result = await _cookieManager.deleteCookie(
@@ -113,6 +168,85 @@ class _CookieManagerScreenState extends State<CookieManagerScreen> {
     } finally {
       setState(() => _isLoading = false);
     }
+  }
+
+  Future<void> _deleteCookieByParams({
+    required String url,
+    required String name,
+    String? path,
+    String? domain,
+  }) async {
+    setState(() => _isLoading = true);
+    try {
+      final result = await _cookieManager.deleteCookie(
+        url: WebUri(url),
+        name: name,
+        path: path ?? '/',
+        domain: domain,
+      );
+      if (result) {
+        _showSuccess('Cookie deleted');
+        await _getCookies();
+      } else {
+        _showError('Failed to delete cookie');
+      }
+    } catch (e) {
+      _showError('Error deleting cookie: $e');
+    } finally {
+      setState(() => _isLoading = false);
+    }
+  }
+
+  Future<void> _promptGetCookie() async {
+    final params = await showParameterDialog(
+      context: context,
+      title: 'Get Cookie',
+      parameters: {'url': _urlController.text.trim(), 'name': ''},
+      requiredPaths: ['url', 'name'],
+    );
+
+    if (params == null) return;
+    final url = params['url']?.toString() ?? '';
+    final name = params['name']?.toString() ?? '';
+    if (url.isEmpty || name.isEmpty) {
+      _showError('URL and name are required');
+      return;
+    }
+    _urlController.text = url;
+    await _getCookie(url: url, name: name);
+  }
+
+  Future<void> _promptDeleteCookie() async {
+    final params = await showParameterDialog(
+      context: context,
+      title: 'Delete Cookie',
+      parameters: {
+        'url': _urlController.text.trim(),
+        'name': '',
+        'path': '/',
+        'domain': '',
+      },
+      requiredPaths: ['url', 'name'],
+    );
+
+    if (params == null) return;
+    final url = params['url']?.toString() ?? '';
+    final name = params['name']?.toString() ?? '';
+    if (url.isEmpty || name.isEmpty) {
+      _showError('URL and name are required');
+      return;
+    }
+    _urlController.text = url;
+    await _deleteCookieByParams(
+      url: url,
+      name: name,
+      path: params['path']?.toString().isNotEmpty == true
+          ? params['path']?.toString()
+          : '/',
+      domain: params['domain']?.toString().isNotEmpty == true
+          ? params['domain']?.toString()
+          : null,
+    );
   }
 
   Future<void> _deleteCookies() async {
@@ -293,201 +427,6 @@ class _CookieManagerScreenState extends State<CookieManagerScreen> {
     );
   }
 
-  Future<void> _showSetCookieDialog(String url) async {
-    final nameController = TextEditingController();
-    final valueController = TextEditingController();
-    final pathController = TextEditingController(text: '/');
-    final domainController = TextEditingController();
-    final maxAgeController = TextEditingController();
-
-    bool isSecure = false;
-    bool isHttpOnly = false;
-    HTTPCookieSameSitePolicy? sameSite;
-    DateTime? expiresDate;
-
-    await showDialog(
-      context: context,
-      builder: (context) => StatefulBuilder(
-        builder: (context, setDialogState) => AlertDialog(
-          title: const Text('Set Cookie'),
-          content: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                TextField(
-                  controller: nameController,
-                  decoration: const InputDecoration(
-                    labelText: 'Name *',
-                    border: OutlineInputBorder(),
-                  ),
-                ),
-                const SizedBox(height: 12),
-                TextField(
-                  controller: valueController,
-                  decoration: const InputDecoration(
-                    labelText: 'Value *',
-                    border: OutlineInputBorder(),
-                  ),
-                ),
-                const SizedBox(height: 12),
-                TextField(
-                  controller: pathController,
-                  decoration: const InputDecoration(
-                    labelText: 'Path',
-                    border: OutlineInputBorder(),
-                  ),
-                ),
-                const SizedBox(height: 12),
-                TextField(
-                  controller: domainController,
-                  decoration: const InputDecoration(
-                    labelText: 'Domain',
-                    hintText: '.example.com',
-                    border: OutlineInputBorder(),
-                  ),
-                ),
-                const SizedBox(height: 12),
-                TextField(
-                  controller: maxAgeController,
-                  keyboardType: TextInputType.number,
-                  decoration: const InputDecoration(
-                    labelText: 'Max Age (seconds)',
-                    border: OutlineInputBorder(),
-                  ),
-                ),
-                const SizedBox(height: 12),
-                Row(
-                  children: [
-                    Expanded(
-                      child: ListTile(
-                        contentPadding: EdgeInsets.zero,
-                        title: const Text('Expires'),
-                        subtitle: Text(
-                          expiresDate?.toString() ?? 'Not set',
-                          style: const TextStyle(fontSize: 12),
-                        ),
-                        trailing: IconButton(
-                          icon: const Icon(Icons.calendar_today),
-                          onPressed: () async {
-                            final date = await showDatePicker(
-                              context: context,
-                              initialDate: DateTime.now().add(
-                                const Duration(days: 7),
-                              ),
-                              firstDate: DateTime.now(),
-                              lastDate: DateTime.now().add(
-                                const Duration(days: 365),
-                              ),
-                            );
-                            if (date != null) {
-                              setDialogState(() => expiresDate = date);
-                            }
-                          },
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 12),
-                DropdownButtonFormField<HTTPCookieSameSitePolicy?>(
-                  value: sameSite,
-                  decoration: const InputDecoration(
-                    labelText: 'SameSite',
-                    border: OutlineInputBorder(),
-                  ),
-                  items: [
-                    const DropdownMenuItem(value: null, child: Text('Not set')),
-                    ...HTTPCookieSameSitePolicy.values.map(
-                      (policy) => DropdownMenuItem(
-                        value: policy,
-                        child: Text(policy.name()),
-                      ),
-                    ),
-                  ],
-                  onChanged: (value) {
-                    setDialogState(() => sameSite = value);
-                  },
-                ),
-                const SizedBox(height: 12),
-                CheckboxListTile(
-                  title: const Text('Secure'),
-                  value: isSecure,
-                  onChanged: (value) {
-                    setDialogState(() => isSecure = value ?? false);
-                  },
-                  contentPadding: EdgeInsets.zero,
-                ),
-                CheckboxListTile(
-                  title: const Text('HttpOnly'),
-                  value: isHttpOnly,
-                  onChanged: (value) {
-                    setDialogState(() => isHttpOnly = value ?? false);
-                  },
-                  contentPadding: EdgeInsets.zero,
-                ),
-              ],
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('Cancel'),
-            ),
-            ElevatedButton(
-              onPressed: () async {
-                if (nameController.text.isEmpty ||
-                    valueController.text.isEmpty) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Name and Value are required'),
-                      backgroundColor: Colors.red,
-                    ),
-                  );
-                  return;
-                }
-
-                Navigator.pop(context);
-
-                setState(() => _isLoading = true);
-                try {
-                  final result = await _cookieManager.setCookie(
-                    url: WebUri(url),
-                    name: nameController.text,
-                    value: valueController.text,
-                    path: pathController.text.isNotEmpty
-                        ? pathController.text
-                        : '/',
-                    domain: domainController.text.isNotEmpty
-                        ? domainController.text
-                        : null,
-                    expiresDate: expiresDate?.millisecondsSinceEpoch,
-                    maxAge: maxAgeController.text.isNotEmpty
-                        ? int.tryParse(maxAgeController.text)
-                        : null,
-                    isSecure: isSecure,
-                    isHttpOnly: isHttpOnly,
-                    sameSite: sameSite,
-                  );
-                  if (result) {
-                    _showSuccess('Cookie set successfully');
-                    await _getCookies();
-                  } else {
-                    _showError('Failed to set cookie');
-                  }
-                } catch (e) {
-                  _showError('Error setting cookie: $e');
-                } finally {
-                  setState(() => _isLoading = false);
-                }
-              },
-              child: const Text('Set Cookie'),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -532,13 +471,13 @@ class _CookieManagerScreenState extends State<CookieManagerScreen> {
                   'getCookie',
                   'Get a specific cookie by name (requires cookie list)',
                   PlatformCookieManagerMethod.getCookie,
-                  null,
+                  _promptGetCookie,
                 ),
                 _buildMethodSection(
                   'deleteCookie',
                   'Delete a specific cookie (select from list)',
                   PlatformCookieManagerMethod.deleteCookie,
-                  null,
+                  _promptDeleteCookie,
                 ),
                 _buildMethodSection(
                   'deleteCookies',
@@ -730,7 +669,10 @@ class _CookieManagerScreenState extends State<CookieManagerScreen> {
                   children: [
                     IconButton(
                       icon: const Icon(Icons.info_outline, size: 20),
-                      onPressed: () => _getCookie(cookie.name),
+                      onPressed: () => _getCookie(
+                        url: _urlController.text.trim(),
+                        name: cookie.name,
+                      ),
                       tooltip: 'Get Cookie Details',
                     ),
                     IconButton(

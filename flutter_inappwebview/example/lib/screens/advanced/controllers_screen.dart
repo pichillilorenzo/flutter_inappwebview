@@ -9,6 +9,7 @@ import 'package:flutter_inappwebview_example/providers/event_log_provider.dart';
 import 'package:flutter_inappwebview_example/models/event_log_entry.dart';
 import 'package:flutter_inappwebview_example/utils/support_checker.dart';
 import 'package:flutter_inappwebview_example/widgets/common/support_badge.dart';
+import 'package:flutter_inappwebview_example/widgets/common/parameter_dialog.dart';
 
 /// Screen for testing various WebView Controllers
 class ControllersScreen extends StatefulWidget {
@@ -159,11 +160,20 @@ class _ControllersScreenState extends State<ControllersScreen> {
 
   // Find Interaction methods
   Future<void> _findAll() async {
-    final query = _searchController.text.trim();
+    final params = await showParameterDialog(
+      context: context,
+      title: 'Find All',
+      parameters: {'find': _searchController.text.trim()},
+      requiredPaths: ['find'],
+    );
+
+    if (params == null) return;
+    final query = params['find']?.toString() ?? '';
     if (query.isEmpty) {
       _showError('Please enter search text');
       return;
     }
+    _searchController.text = query;
     await _findInteractionController?.findAll(find: query);
     _showSuccess('Searching for: $query');
   }
@@ -186,7 +196,20 @@ class _ControllersScreenState extends State<ControllersScreen> {
   }
 
   Future<void> _setSearchText() async {
-    final text = _searchController.text.trim();
+    final params = await showParameterDialog(
+      context: context,
+      title: 'Set Search Text',
+      parameters: {'searchText': _searchController.text.trim()},
+      requiredPaths: ['searchText'],
+    );
+
+    if (params == null) return;
+    final text = params['searchText']?.toString() ?? '';
+    if (text.isEmpty) {
+      _showError('Please enter search text');
+      return;
+    }
+    _searchController.text = text;
     await _findInteractionController?.setSearchText(text);
     _showSuccess('Search text set');
   }
@@ -256,6 +279,40 @@ class _ControllersScreenState extends State<ControllersScreen> {
     _showSuccess('Background color set');
   }
 
+  Future<void> _promptSetColor() async {
+    final params = await showParameterDialog(
+      context: context,
+      title: 'Set Refresh Indicator Color',
+      parameters: {'color': _pullToRefreshColor},
+      requiredPaths: ['color'],
+    );
+
+    if (params == null) return;
+    final color = params['color'] as Color?;
+    if (color == null) {
+      _showError('Please pick a color');
+      return;
+    }
+    await _setColor(color);
+  }
+
+  Future<void> _promptSetBackgroundColor() async {
+    final params = await showParameterDialog(
+      context: context,
+      title: 'Set Background Color',
+      parameters: {'color': Colors.grey.shade200},
+      requiredPaths: ['color'],
+    );
+
+    if (params == null) return;
+    final color = params['color'] as Color?;
+    if (color == null) {
+      _showError('Please pick a color');
+      return;
+    }
+    await _setBackgroundColor(color);
+  }
+
   Future<void> _getDefaultSlingshotDistance() async {
     final distance = await _pullToRefreshController
         ?.getDefaultSlingshotDistance();
@@ -295,11 +352,20 @@ class _ControllersScreenState extends State<ControllersScreen> {
       return;
     }
 
-    final message = _messageController.text.trim();
+    final params = await showParameterDialog(
+      context: context,
+      title: 'Post Web Message',
+      parameters: {'message': _messageController.text.trim()},
+      requiredPaths: ['message'],
+    );
+
+    if (params == null) return;
+    final message = params['message']?.toString() ?? '';
     if (message.isEmpty) {
       _showError('Please enter a message');
       return;
     }
+    _messageController.text = message;
 
     try {
       await _webMessageChannel!.port1.postMessage(WebMessage(data: message));
@@ -695,31 +761,19 @@ class _ControllersScreenState extends State<ControllersScreen> {
                   children: [
                     const Text('Indicator Color:'),
                     const SizedBox(width: 16),
-                    ...[
-                      Colors.blue,
-                      Colors.green,
-                      Colors.red,
-                      Colors.purple,
-                      Colors.orange,
-                    ].map(
-                      (color) => GestureDetector(
-                        onTap: _webViewReady ? () => _setColor(color) : null,
-                        child: Container(
-                          width: 32,
-                          height: 32,
-                          margin: const EdgeInsets.only(right: 8),
-                          decoration: BoxDecoration(
-                            color: color,
-                            borderRadius: BorderRadius.circular(16),
-                            border: Border.all(
-                              color: _pullToRefreshColor == color
-                                  ? Colors.black
-                                  : Colors.transparent,
-                              width: 2,
-                            ),
-                          ),
-                        ),
+                    Container(
+                      width: 32,
+                      height: 32,
+                      decoration: BoxDecoration(
+                        color: _pullToRefreshColor,
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(color: Colors.black12),
                       ),
+                    ),
+                    const SizedBox(width: 12),
+                    ElevatedButton(
+                      onPressed: _webViewReady ? _promptSetColor : null,
+                      child: const Text('Pick Color'),
                     ),
                   ],
                 ),
@@ -764,9 +818,7 @@ class _ControllersScreenState extends State<ControllersScreen> {
                         PlatformPullToRefreshControllerMethod
                             .setBackgroundColor,
                       ),
-                      _webViewReady
-                          ? () => _setBackgroundColor(Colors.grey.shade200)
-                          : null,
+                      _webViewReady ? _promptSetBackgroundColor : null,
                     ),
                     _buildMethodChip(
                       'getDefaultSlingshotDistance',

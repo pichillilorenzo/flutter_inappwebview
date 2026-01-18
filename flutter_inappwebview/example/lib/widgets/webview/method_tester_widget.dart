@@ -4,18 +4,27 @@ import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_inappwebview_example/utils/support_checker.dart';
 import 'package:flutter_inappwebview_example/widgets/common/support_badge.dart';
+import 'package:flutter_inappwebview_example/widgets/common/parameter_dialog.dart';
 
 /// Method entry for a single controller method
 class MethodEntry {
   final String name;
   final String description;
   final PlatformInAppWebViewControllerMethod methodEnum;
-  final Future<dynamic> Function(InAppWebViewController controller) execute;
+  final Map<String, dynamic> parameters;
+  final List<String> requiredParameters;
+  final Future<dynamic> Function(
+    InAppWebViewController controller,
+    Map<String, dynamic> params,
+  )
+  execute;
 
   const MethodEntry({
     required this.name,
     required this.description,
     required this.methodEnum,
+    this.parameters = const {},
+    this.requiredParameters = const [],
     required this.execute,
   });
 }
@@ -80,9 +89,31 @@ class _MethodTesterWidgetState extends State<MethodTesterWidget> {
             name: 'loadUrl',
             description: 'Loads the given URL',
             methodEnum: PlatformInAppWebViewControllerMethod.loadUrl,
-            execute: (controller) async {
+            parameters: {
+              'url': 'https://example.com',
+              'method': 'GET',
+              'headers': <String, dynamic>{},
+              'body': const ParameterValueHint<Uint8List?>(
+                null,
+                ParameterValueType.bytes,
+              ),
+            },
+            requiredParameters: ['url'],
+            execute: (controller, params) async {
+              final url = params['url']?.toString() ?? '';
+              final method = params['method']?.toString();
+              final headers = (params['headers'] as Map?)?.map(
+                (key, value) => MapEntry(key.toString(), value),
+              );
+              final body = params['body'] as Uint8List?;
+
               await controller.loadUrl(
-                urlRequest: URLRequest(url: WebUri('https://example.com')),
+                urlRequest: URLRequest(
+                  url: WebUri(url),
+                  method: method?.isNotEmpty == true ? method : null,
+                  headers: headers?.cast<String, String>(),
+                  body: body,
+                ),
               );
               return 'URL loaded successfully';
             },
@@ -91,10 +122,17 @@ class _MethodTesterWidgetState extends State<MethodTesterWidget> {
             name: 'postUrl',
             description: 'Loads URL using POST method',
             methodEnum: PlatformInAppWebViewControllerMethod.postUrl,
-            execute: (controller) async {
+            parameters: {
+              'url': 'https://httpbin.org/post',
+              'postData': Uint8List.fromList('test=data'.codeUnits),
+            },
+            requiredParameters: ['url', 'postData'],
+            execute: (controller, params) async {
+              final url = params['url']?.toString() ?? '';
+              final postData = params['postData'] as Uint8List?;
               await controller.postUrl(
-                url: WebUri('https://httpbin.org/post'),
-                postData: Uint8List.fromList('test=data'.codeUnits),
+                url: WebUri(url),
+                postData: postData ?? Uint8List(0),
               );
               return 'POST request sent';
             },
@@ -103,11 +141,31 @@ class _MethodTesterWidgetState extends State<MethodTesterWidget> {
             name: 'loadData',
             description: 'Loads HTML data string',
             methodEnum: PlatformInAppWebViewControllerMethod.loadData,
-            execute: (controller) async {
+            parameters: {
+              'data': '<html><body><h1>Test HTML</h1></body></html>',
+              'mimeType': 'text/html',
+              'encoding': 'utf-8',
+              'baseUrl': '',
+              'historyUrl': '',
+            },
+            requiredParameters: ['data'],
+            execute: (controller, params) async {
+              final data = params['data']?.toString() ?? '';
+              final mimeType = params['mimeType']?.toString();
+              final encoding = params['encoding']?.toString();
+              final baseUrl = params['baseUrl']?.toString();
+              final historyUrl = params['historyUrl']?.toString();
+
               await controller.loadData(
-                data: '<html><body><h1>Test HTML</h1></body></html>',
-                mimeType: 'text/html',
-                encoding: 'utf-8',
+                data: data,
+                mimeType: mimeType?.isNotEmpty == true
+                    ? mimeType!
+                    : 'text/html',
+                encoding: encoding?.isNotEmpty == true ? encoding! : 'utf-8',
+                baseUrl: baseUrl?.isNotEmpty == true ? WebUri(baseUrl!) : null,
+                historyUrl: historyUrl?.isNotEmpty == true
+                    ? WebUri(historyUrl!)
+                    : null,
               );
               return 'HTML data loaded';
             },
@@ -116,8 +174,11 @@ class _MethodTesterWidgetState extends State<MethodTesterWidget> {
             name: 'loadFile',
             description: 'Loads a file from assets',
             methodEnum: PlatformInAppWebViewControllerMethod.loadFile,
-            execute: (controller) async {
-              await controller.loadFile(assetFilePath: 'assets/index.html');
+            parameters: {'assetFilePath': 'assets/index.html'},
+            requiredParameters: ['assetFilePath'],
+            execute: (controller, params) async {
+              final path = params['assetFilePath']?.toString() ?? '';
+              await controller.loadFile(assetFilePath: path);
               return 'File loaded from assets';
             },
           ),
@@ -125,7 +186,7 @@ class _MethodTesterWidgetState extends State<MethodTesterWidget> {
             name: 'reload',
             description: 'Reloads the current page',
             methodEnum: PlatformInAppWebViewControllerMethod.reload,
-            execute: (controller) async {
+            execute: (controller, params) async {
               await controller.reload();
               return 'Page reloaded';
             },
@@ -134,7 +195,7 @@ class _MethodTesterWidgetState extends State<MethodTesterWidget> {
             name: 'reloadFromOrigin',
             description: 'Reloads bypassing cache',
             methodEnum: PlatformInAppWebViewControllerMethod.reloadFromOrigin,
-            execute: (controller) async {
+            execute: (controller, params) async {
               await controller.reloadFromOrigin();
               return 'Page reloaded from origin';
             },
@@ -143,7 +204,7 @@ class _MethodTesterWidgetState extends State<MethodTesterWidget> {
             name: 'goBack',
             description: 'Navigates back in history',
             methodEnum: PlatformInAppWebViewControllerMethod.goBack,
-            execute: (controller) async {
+            execute: (controller, params) async {
               await controller.goBack();
               return 'Navigated back';
             },
@@ -152,7 +213,7 @@ class _MethodTesterWidgetState extends State<MethodTesterWidget> {
             name: 'goForward',
             description: 'Navigates forward in history',
             methodEnum: PlatformInAppWebViewControllerMethod.goForward,
-            execute: (controller) async {
+            execute: (controller, params) async {
               await controller.goForward();
               return 'Navigated forward';
             },
@@ -161,8 +222,11 @@ class _MethodTesterWidgetState extends State<MethodTesterWidget> {
             name: 'goBackOrForward',
             description: 'Navigates by steps',
             methodEnum: PlatformInAppWebViewControllerMethod.goBackOrForward,
-            execute: (controller) async {
-              await controller.goBackOrForward(steps: -1);
+            parameters: {'steps': -1},
+            requiredParameters: ['steps'],
+            execute: (controller, params) async {
+              final steps = (params['steps'] as num?)?.toInt() ?? -1;
+              await controller.goBackOrForward(steps: steps);
               return 'Navigated by steps';
             },
           ),
@@ -170,12 +234,17 @@ class _MethodTesterWidgetState extends State<MethodTesterWidget> {
             name: 'goTo',
             description: 'Navigates to history item',
             methodEnum: PlatformInAppWebViewControllerMethod.goTo,
-            execute: (controller) async {
+            parameters: {'index': 0},
+            requiredParameters: ['index'],
+            execute: (controller, params) async {
               final history = await controller.getCopyBackForwardList();
+              final index = (params['index'] as num?)?.toInt() ?? 0;
               if (history != null &&
                   history.list != null &&
-                  history.list!.isNotEmpty) {
-                await controller.goTo(historyItem: history.list!.first);
+                  history.list!.isNotEmpty &&
+                  index >= 0 &&
+                  index < history.list!.length) {
+                await controller.goTo(historyItem: history.list![index]);
                 return 'Navigated to history item';
               }
               return 'No history items available';
@@ -185,7 +254,7 @@ class _MethodTesterWidgetState extends State<MethodTesterWidget> {
             name: 'canGoBack',
             description: 'Checks if can go back',
             methodEnum: PlatformInAppWebViewControllerMethod.canGoBack,
-            execute: (controller) async {
+            execute: (controller, params) async {
               return await controller.canGoBack();
             },
           ),
@@ -193,7 +262,7 @@ class _MethodTesterWidgetState extends State<MethodTesterWidget> {
             name: 'canGoForward',
             description: 'Checks if can go forward',
             methodEnum: PlatformInAppWebViewControllerMethod.canGoForward,
-            execute: (controller) async {
+            execute: (controller, params) async {
               return await controller.canGoForward();
             },
           ),
@@ -201,15 +270,18 @@ class _MethodTesterWidgetState extends State<MethodTesterWidget> {
             name: 'canGoBackOrForward',
             description: 'Checks if can navigate by steps',
             methodEnum: PlatformInAppWebViewControllerMethod.canGoBackOrForward,
-            execute: (controller) async {
-              return await controller.canGoBackOrForward(steps: -1);
+            parameters: {'steps': -1},
+            requiredParameters: ['steps'],
+            execute: (controller, params) async {
+              final steps = (params['steps'] as num?)?.toInt() ?? -1;
+              return await controller.canGoBackOrForward(steps: steps);
             },
           ),
           MethodEntry(
             name: 'isLoading',
             description: 'Checks if page is loading',
             methodEnum: PlatformInAppWebViewControllerMethod.isLoading,
-            execute: (controller) async {
+            execute: (controller, params) async {
               return await controller.isLoading();
             },
           ),
@@ -217,7 +289,7 @@ class _MethodTesterWidgetState extends State<MethodTesterWidget> {
             name: 'stopLoading',
             description: 'Stops page loading',
             methodEnum: PlatformInAppWebViewControllerMethod.stopLoading,
-            execute: (controller) async {
+            execute: (controller, params) async {
               await controller.stopLoading();
               return 'Loading stopped';
             },
@@ -227,12 +299,19 @@ class _MethodTesterWidgetState extends State<MethodTesterWidget> {
             description: 'Loads simulated request',
             methodEnum:
                 PlatformInAppWebViewControllerMethod.loadSimulatedRequest,
-            execute: (controller) async {
+            parameters: {
+              'url': 'https://example.com',
+              'data': Uint8List.fromList(
+                '<html><body>Simulated</body></html>'.codeUnits,
+              ),
+            },
+            requiredParameters: ['url', 'data'],
+            execute: (controller, params) async {
+              final url = params['url']?.toString() ?? '';
+              final data = params['data'] as Uint8List?;
               await controller.loadSimulatedRequest(
-                urlRequest: URLRequest(url: WebUri('https://example.com')),
-                data: Uint8List.fromList(
-                  '<html><body>Simulated</body></html>'.codeUnits,
-                ),
+                urlRequest: URLRequest(url: WebUri(url)),
+                data: data ?? Uint8List(0),
               );
               return 'Simulated request loaded';
             },
@@ -249,7 +328,7 @@ class _MethodTesterWidgetState extends State<MethodTesterWidget> {
             name: 'getUrl',
             description: 'Gets current page URL',
             methodEnum: PlatformInAppWebViewControllerMethod.getUrl,
-            execute: (controller) async {
+            execute: (controller, params) async {
               return (await controller.getUrl())?.toString() ?? 'No URL';
             },
           ),
@@ -257,7 +336,7 @@ class _MethodTesterWidgetState extends State<MethodTesterWidget> {
             name: 'getTitle',
             description: 'Gets current page title',
             methodEnum: PlatformInAppWebViewControllerMethod.getTitle,
-            execute: (controller) async {
+            execute: (controller, params) async {
               return await controller.getTitle() ?? 'No title';
             },
           ),
@@ -265,7 +344,7 @@ class _MethodTesterWidgetState extends State<MethodTesterWidget> {
             name: 'getProgress',
             description: 'Gets page load progress',
             methodEnum: PlatformInAppWebViewControllerMethod.getProgress,
-            execute: (controller) async {
+            execute: (controller, params) async {
               return await controller.getProgress();
             },
           ),
@@ -273,7 +352,7 @@ class _MethodTesterWidgetState extends State<MethodTesterWidget> {
             name: 'getHtml',
             description: 'Gets page HTML source',
             methodEnum: PlatformInAppWebViewControllerMethod.getHtml,
-            execute: (controller) async {
+            execute: (controller, params) async {
               final html = await controller.getHtml();
               if (html != null && html.length > 500) {
                 return '${html.substring(0, 500)}...';
@@ -285,7 +364,7 @@ class _MethodTesterWidgetState extends State<MethodTesterWidget> {
             name: 'getFavicons',
             description: 'Gets page favicons',
             methodEnum: PlatformInAppWebViewControllerMethod.getFavicons,
-            execute: (controller) async {
+            execute: (controller, params) async {
               final favicons = await controller.getFavicons();
               return 'Found ${favicons.length} favicons';
             },
@@ -294,7 +373,7 @@ class _MethodTesterWidgetState extends State<MethodTesterWidget> {
             name: 'getOriginalUrl',
             description: 'Gets original URL before redirects',
             methodEnum: PlatformInAppWebViewControllerMethod.getOriginalUrl,
-            execute: (controller) async {
+            execute: (controller, params) async {
               return (await controller.getOriginalUrl())?.toString() ??
                   'No URL';
             },
@@ -303,7 +382,7 @@ class _MethodTesterWidgetState extends State<MethodTesterWidget> {
             name: 'getSelectedText',
             description: 'Gets selected text',
             methodEnum: PlatformInAppWebViewControllerMethod.getSelectedText,
-            execute: (controller) async {
+            execute: (controller, params) async {
               return await controller.getSelectedText() ?? 'No selection';
             },
           ),
@@ -311,7 +390,7 @@ class _MethodTesterWidgetState extends State<MethodTesterWidget> {
             name: 'getHitTestResult',
             description: 'Gets hit test result',
             methodEnum: PlatformInAppWebViewControllerMethod.getHitTestResult,
-            execute: (controller) async {
+            execute: (controller, params) async {
               final result = await controller.getHitTestResult();
               return result?.type.toString() ?? 'No hit test result';
             },
@@ -320,7 +399,7 @@ class _MethodTesterWidgetState extends State<MethodTesterWidget> {
             name: 'getMetaTags',
             description: 'Gets meta tags from page',
             methodEnum: PlatformInAppWebViewControllerMethod.getMetaTags,
-            execute: (controller) async {
+            execute: (controller, params) async {
               final tags = await controller.getMetaTags();
               return 'Found ${tags.length} meta tags';
             },
@@ -329,7 +408,7 @@ class _MethodTesterWidgetState extends State<MethodTesterWidget> {
             name: 'getMetaThemeColor',
             description: 'Gets meta theme color',
             methodEnum: PlatformInAppWebViewControllerMethod.getMetaThemeColor,
-            execute: (controller) async {
+            execute: (controller, params) async {
               final color = await controller.getMetaThemeColor();
               return color?.toString() ?? 'No theme color';
             },
@@ -338,7 +417,7 @@ class _MethodTesterWidgetState extends State<MethodTesterWidget> {
             name: 'getCertificate',
             description: 'Gets SSL certificate',
             methodEnum: PlatformInAppWebViewControllerMethod.getCertificate,
-            execute: (controller) async {
+            execute: (controller, params) async {
               final cert = await controller.getCertificate();
               return cert?.issuedTo?.CName ?? 'No certificate';
             },
@@ -348,7 +427,7 @@ class _MethodTesterWidgetState extends State<MethodTesterWidget> {
             description: 'Gets navigation history',
             methodEnum:
                 PlatformInAppWebViewControllerMethod.getCopyBackForwardList,
-            execute: (controller) async {
+            execute: (controller, params) async {
               final history = await controller.getCopyBackForwardList();
               return 'History: ${history?.list?.length ?? 0} items, current: ${history?.currentIndex}';
             },
@@ -365,9 +444,11 @@ class _MethodTesterWidgetState extends State<MethodTesterWidget> {
             name: 'evaluateJavascript',
             description: 'Executes JavaScript code',
             methodEnum: PlatformInAppWebViewControllerMethod.evaluateJavascript,
-            execute: (controller) async {
+            parameters: {'source': 'document.title'},
+            requiredParameters: ['source'],
+            execute: (controller, params) async {
               return await controller.evaluateJavascript(
-                source: 'document.title',
+                source: params['source']?.toString() ?? '',
               );
             },
           ),
@@ -376,9 +457,16 @@ class _MethodTesterWidgetState extends State<MethodTesterWidget> {
             description: 'Calls async JavaScript function',
             methodEnum:
                 PlatformInAppWebViewControllerMethod.callAsyncJavaScript,
-            execute: (controller) async {
+            parameters: {
+              'functionBody': 'return await Promise.resolve("async result");',
+              'arguments': <String, dynamic>{},
+            },
+            requiredParameters: ['functionBody'],
+            execute: (controller, params) async {
+              final arguments = params['arguments'] as Map?;
               final result = await controller.callAsyncJavaScript(
-                functionBody: 'return await Promise.resolve("async result");',
+                functionBody: params['functionBody']?.toString() ?? '',
+                arguments: arguments?.cast<String, dynamic>() ?? const {},
               );
               return result?.value ?? 'No result';
             },
@@ -388,9 +476,13 @@ class _MethodTesterWidgetState extends State<MethodTesterWidget> {
             description: 'Injects JS file from URL',
             methodEnum: PlatformInAppWebViewControllerMethod
                 .injectJavascriptFileFromUrl,
-            execute: (controller) async {
+            parameters: {
+              'urlFile': 'https://code.jquery.com/jquery-3.7.1.min.js',
+            },
+            requiredParameters: ['urlFile'],
+            execute: (controller, params) async {
               await controller.injectJavascriptFileFromUrl(
-                urlFile: WebUri('https://code.jquery.com/jquery-3.7.1.min.js'),
+                urlFile: WebUri(params['urlFile']?.toString() ?? ''),
               );
               return 'JavaScript file injected';
             },
@@ -400,10 +492,12 @@ class _MethodTesterWidgetState extends State<MethodTesterWidget> {
             description: 'Injects JS file from assets',
             methodEnum: PlatformInAppWebViewControllerMethod
                 .injectJavascriptFileFromAsset,
-            execute: (controller) async {
+            parameters: {'assetFilePath': 'assets/js/script.js'},
+            requiredParameters: ['assetFilePath'],
+            execute: (controller, params) async {
               try {
                 await controller.injectJavascriptFileFromAsset(
-                  assetFilePath: 'assets/js/script.js',
+                  assetFilePath: params['assetFilePath']?.toString() ?? '',
                 );
                 return 'JavaScript asset injected';
               } catch (e) {
@@ -415,9 +509,13 @@ class _MethodTesterWidgetState extends State<MethodTesterWidget> {
             name: 'injectCSSCode',
             description: 'Injects CSS code',
             methodEnum: PlatformInAppWebViewControllerMethod.injectCSSCode,
-            execute: (controller) async {
+            parameters: {
+              'source': 'body { background-color: #f0f0f0 !important; }',
+            },
+            requiredParameters: ['source'],
+            execute: (controller, params) async {
               await controller.injectCSSCode(
-                source: 'body { background-color: #f0f0f0 !important; }',
+                source: params['source']?.toString() ?? '',
               );
               return 'CSS code injected';
             },
@@ -427,11 +525,14 @@ class _MethodTesterWidgetState extends State<MethodTesterWidget> {
             description: 'Injects CSS file from URL',
             methodEnum:
                 PlatformInAppWebViewControllerMethod.injectCSSFileFromUrl,
-            execute: (controller) async {
-              await controller.injectCSSFileFromUrl(
-                urlFile: WebUri(
+            parameters: {
+              'urlFile':
                   'https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css',
-                ),
+            },
+            requiredParameters: ['urlFile'],
+            execute: (controller, params) async {
+              await controller.injectCSSFileFromUrl(
+                urlFile: WebUri(params['urlFile']?.toString() ?? ''),
               );
               return 'CSS file injected';
             },
@@ -441,10 +542,12 @@ class _MethodTesterWidgetState extends State<MethodTesterWidget> {
             description: 'Injects CSS file from assets',
             methodEnum:
                 PlatformInAppWebViewControllerMethod.injectCSSFileFromAsset,
-            execute: (controller) async {
+            parameters: {'assetFilePath': 'assets/css/style.css'},
+            requiredParameters: ['assetFilePath'],
+            execute: (controller, params) async {
               try {
                 await controller.injectCSSFileFromAsset(
-                  assetFilePath: 'assets/css/style.css',
+                  assetFilePath: params['assetFilePath']?.toString() ?? '',
                 );
                 return 'CSS asset injected';
               } catch (e) {
@@ -465,14 +568,17 @@ class _MethodTesterWidgetState extends State<MethodTesterWidget> {
             description: 'Adds a JavaScript handler',
             methodEnum:
                 PlatformInAppWebViewControllerMethod.addJavaScriptHandler,
-            execute: (controller) async {
+            parameters: {'handlerName': 'testHandler'},
+            requiredParameters: ['handlerName'],
+            execute: (controller, params) async {
+              final handlerName = params['handlerName']?.toString() ?? '';
               controller.addJavaScriptHandler(
-                handlerName: 'testHandler',
+                handlerName: handlerName,
                 callback: (args) {
                   return {'received': args};
                 },
               );
-              return 'Handler "testHandler" added';
+              return 'Handler "$handlerName" added';
             },
           ),
           MethodEntry(
@@ -480,9 +586,11 @@ class _MethodTesterWidgetState extends State<MethodTesterWidget> {
             description: 'Removes a JavaScript handler',
             methodEnum:
                 PlatformInAppWebViewControllerMethod.removeJavaScriptHandler,
-            execute: (controller) async {
+            parameters: {'handlerName': 'testHandler'},
+            requiredParameters: ['handlerName'],
+            execute: (controller, params) async {
               final removed = controller.removeJavaScriptHandler(
-                handlerName: 'testHandler',
+                handlerName: params['handlerName']?.toString() ?? '',
               );
               return removed != null ? 'Handler removed' : 'Handler not found';
             },
@@ -492,9 +600,11 @@ class _MethodTesterWidgetState extends State<MethodTesterWidget> {
             description: 'Checks if handler exists',
             methodEnum:
                 PlatformInAppWebViewControllerMethod.hasJavaScriptHandler,
-            execute: (controller) async {
+            parameters: {'handlerName': 'testHandler'},
+            requiredParameters: ['handlerName'],
+            execute: (controller, params) async {
               return controller.hasJavaScriptHandler(
-                handlerName: 'testHandler',
+                handlerName: params['handlerName']?.toString() ?? '',
               );
             },
           ),
@@ -510,12 +620,21 @@ class _MethodTesterWidgetState extends State<MethodTesterWidget> {
             name: 'addUserScript',
             description: 'Adds a user script',
             methodEnum: PlatformInAppWebViewControllerMethod.addUserScript,
-            execute: (controller) async {
+            parameters: {
+              'source': 'console.log("User script executed");',
+              'injectionTime': 'AT_DOCUMENT_END',
+              'groupName': 'testGroup',
+            },
+            requiredParameters: ['source'],
+            execute: (controller, params) async {
+              final injectionTime = _parseUserScriptInjectionTime(
+                params['injectionTime']?.toString(),
+              );
               await controller.addUserScript(
                 userScript: UserScript(
-                  source: 'console.log("User script executed");',
-                  injectionTime: UserScriptInjectionTime.AT_DOCUMENT_END,
-                  groupName: 'testGroup',
+                  source: params['source']?.toString() ?? '',
+                  injectionTime: injectionTime,
+                  groupName: params['groupName']?.toString(),
                 ),
               );
               return 'User script added';
@@ -525,11 +644,20 @@ class _MethodTesterWidgetState extends State<MethodTesterWidget> {
             name: 'removeUserScript',
             description: 'Removes a user script',
             methodEnum: PlatformInAppWebViewControllerMethod.removeUserScript,
-            execute: (controller) async {
+            parameters: {
+              'source': 'console.log("User script executed");',
+              'injectionTime': 'AT_DOCUMENT_END',
+              'groupName': 'testGroup',
+            },
+            requiredParameters: ['source'],
+            execute: (controller, params) async {
+              final injectionTime = _parseUserScriptInjectionTime(
+                params['injectionTime']?.toString(),
+              );
               final script = UserScript(
-                source: 'console.log("User script executed");',
-                injectionTime: UserScriptInjectionTime.AT_DOCUMENT_END,
-                groupName: 'testGroup',
+                source: params['source']?.toString() ?? '',
+                injectionTime: injectionTime,
+                groupName: params['groupName']?.toString(),
               );
               final removed = await controller.removeUserScript(
                 userScript: script,
@@ -542,9 +670,11 @@ class _MethodTesterWidgetState extends State<MethodTesterWidget> {
             description: 'Removes scripts by group name',
             methodEnum: PlatformInAppWebViewControllerMethod
                 .removeUserScriptsByGroupName,
-            execute: (controller) async {
+            parameters: {'groupName': 'testGroup'},
+            requiredParameters: ['groupName'],
+            execute: (controller, params) async {
               await controller.removeUserScriptsByGroupName(
-                groupName: 'testGroup',
+                groupName: params['groupName']?.toString() ?? '',
               );
               return 'Scripts in group removed';
             },
@@ -554,7 +684,7 @@ class _MethodTesterWidgetState extends State<MethodTesterWidget> {
             description: 'Removes all user scripts',
             methodEnum:
                 PlatformInAppWebViewControllerMethod.removeAllUserScripts,
-            execute: (controller) async {
+            execute: (controller, params) async {
               await controller.removeAllUserScripts();
               return 'All user scripts removed';
             },
@@ -563,10 +693,18 @@ class _MethodTesterWidgetState extends State<MethodTesterWidget> {
             name: 'hasUserScript',
             description: 'Checks if user script exists',
             methodEnum: PlatformInAppWebViewControllerMethod.hasUserScript,
-            execute: (controller) async {
+            parameters: {
+              'source': 'console.log("test");',
+              'injectionTime': 'AT_DOCUMENT_END',
+            },
+            requiredParameters: ['source'],
+            execute: (controller, params) async {
+              final injectionTime = _parseUserScriptInjectionTime(
+                params['injectionTime']?.toString(),
+              );
               final script = UserScript(
-                source: 'console.log("test");',
-                injectionTime: UserScriptInjectionTime.AT_DOCUMENT_END,
+                source: params['source']?.toString() ?? '',
+                injectionTime: injectionTime,
               );
               return controller.hasUserScript(userScript: script);
             },
@@ -583,8 +721,12 @@ class _MethodTesterWidgetState extends State<MethodTesterWidget> {
             name: 'scrollTo',
             description: 'Scrolls to position',
             methodEnum: PlatformInAppWebViewControllerMethod.scrollTo,
-            execute: (controller) async {
-              await controller.scrollTo(x: 0, y: 100, animated: true);
+            parameters: {'x': 0, 'y': 100, 'animated': true},
+            execute: (controller, params) async {
+              final x = (params['x'] as num?)?.toInt() ?? 0;
+              final y = (params['y'] as num?)?.toInt() ?? 0;
+              final animated = params['animated'] as bool? ?? true;
+              await controller.scrollTo(x: x, y: y, animated: animated);
               return 'Scrolled to (0, 100)';
             },
           ),
@@ -592,8 +734,12 @@ class _MethodTesterWidgetState extends State<MethodTesterWidget> {
             name: 'scrollBy',
             description: 'Scrolls by offset',
             methodEnum: PlatformInAppWebViewControllerMethod.scrollBy,
-            execute: (controller) async {
-              await controller.scrollBy(x: 0, y: 50, animated: true);
+            parameters: {'x': 0, 'y': 50, 'animated': true},
+            execute: (controller, params) async {
+              final x = (params['x'] as num?)?.toInt() ?? 0;
+              final y = (params['y'] as num?)?.toInt() ?? 0;
+              final animated = params['animated'] as bool? ?? true;
+              await controller.scrollBy(x: x, y: y, animated: animated);
               return 'Scrolled by (0, 50)';
             },
           ),
@@ -601,7 +747,7 @@ class _MethodTesterWidgetState extends State<MethodTesterWidget> {
             name: 'getScrollX',
             description: 'Gets horizontal scroll position',
             methodEnum: PlatformInAppWebViewControllerMethod.getScrollX,
-            execute: (controller) async {
+            execute: (controller, params) async {
               return await controller.getScrollX();
             },
           ),
@@ -609,7 +755,7 @@ class _MethodTesterWidgetState extends State<MethodTesterWidget> {
             name: 'getScrollY',
             description: 'Gets vertical scroll position',
             methodEnum: PlatformInAppWebViewControllerMethod.getScrollY,
-            execute: (controller) async {
+            execute: (controller, params) async {
               return await controller.getScrollY();
             },
           ),
@@ -617,7 +763,7 @@ class _MethodTesterWidgetState extends State<MethodTesterWidget> {
             name: 'getContentHeight',
             description: 'Gets content height',
             methodEnum: PlatformInAppWebViewControllerMethod.getContentHeight,
-            execute: (controller) async {
+            execute: (controller, params) async {
               return await controller.getContentHeight();
             },
           ),
@@ -625,7 +771,7 @@ class _MethodTesterWidgetState extends State<MethodTesterWidget> {
             name: 'getContentWidth',
             description: 'Gets content width',
             methodEnum: PlatformInAppWebViewControllerMethod.getContentWidth,
-            execute: (controller) async {
+            execute: (controller, params) async {
               return await controller.getContentWidth();
             },
           ),
@@ -634,7 +780,7 @@ class _MethodTesterWidgetState extends State<MethodTesterWidget> {
             description: 'Checks if can scroll vertically',
             methodEnum:
                 PlatformInAppWebViewControllerMethod.canScrollVertically,
-            execute: (controller) async {
+            execute: (controller, params) async {
               return await controller.canScrollVertically();
             },
           ),
@@ -643,7 +789,7 @@ class _MethodTesterWidgetState extends State<MethodTesterWidget> {
             description: 'Checks if can scroll horizontally',
             methodEnum:
                 PlatformInAppWebViewControllerMethod.canScrollHorizontally,
-            execute: (controller) async {
+            execute: (controller, params) async {
               return await controller.canScrollHorizontally();
             },
           ),
@@ -651,16 +797,20 @@ class _MethodTesterWidgetState extends State<MethodTesterWidget> {
             name: 'pageDown',
             description: 'Scrolls page down',
             methodEnum: PlatformInAppWebViewControllerMethod.pageDown,
-            execute: (controller) async {
-              return await controller.pageDown(bottom: false);
+            parameters: {'bottom': false},
+            execute: (controller, params) async {
+              final bottom = params['bottom'] as bool? ?? false;
+              return await controller.pageDown(bottom: bottom);
             },
           ),
           MethodEntry(
             name: 'pageUp',
             description: 'Scrolls page up',
             methodEnum: PlatformInAppWebViewControllerMethod.pageUp,
-            execute: (controller) async {
-              return await controller.pageUp(top: false);
+            parameters: {'top': false},
+            execute: (controller, params) async {
+              final top = params['top'] as bool? ?? false;
+              return await controller.pageUp(top: top);
             },
           ),
         ],
@@ -675,8 +825,16 @@ class _MethodTesterWidgetState extends State<MethodTesterWidget> {
             name: 'zoomBy',
             description: 'Zooms by factor',
             methodEnum: PlatformInAppWebViewControllerMethod.zoomBy,
-            execute: (controller) async {
-              await controller.zoomBy(zoomFactor: 1.5, animated: true);
+            parameters: {'zoomFactor': 1.5, 'animated': true},
+            requiredParameters: ['zoomFactor'],
+            execute: (controller, params) async {
+              final zoomFactor =
+                  (params['zoomFactor'] as num?)?.toDouble() ?? 1.0;
+              final animated = params['animated'] as bool? ?? true;
+              await controller.zoomBy(
+                zoomFactor: zoomFactor,
+                animated: animated,
+              );
               return 'Zoomed to 1.5x';
             },
           ),
@@ -684,7 +842,7 @@ class _MethodTesterWidgetState extends State<MethodTesterWidget> {
             name: 'zoomIn',
             description: 'Zooms in',
             methodEnum: PlatformInAppWebViewControllerMethod.zoomIn,
-            execute: (controller) async {
+            execute: (controller, params) async {
               return await controller.zoomIn();
             },
           ),
@@ -692,7 +850,7 @@ class _MethodTesterWidgetState extends State<MethodTesterWidget> {
             name: 'zoomOut',
             description: 'Zooms out',
             methodEnum: PlatformInAppWebViewControllerMethod.zoomOut,
-            execute: (controller) async {
+            execute: (controller, params) async {
               return await controller.zoomOut();
             },
           ),
@@ -700,7 +858,7 @@ class _MethodTesterWidgetState extends State<MethodTesterWidget> {
             name: 'getZoomScale',
             description: 'Gets current zoom scale',
             methodEnum: PlatformInAppWebViewControllerMethod.getZoomScale,
-            execute: (controller) async {
+            execute: (controller, params) async {
               return await controller.getZoomScale();
             },
           ),
@@ -716,9 +874,13 @@ class _MethodTesterWidgetState extends State<MethodTesterWidget> {
             name: 'setSettings',
             description: 'Sets WebView settings',
             methodEnum: PlatformInAppWebViewControllerMethod.setSettings,
-            execute: (controller) async {
+            parameters: {'javaScriptEnabled': true, 'supportZoom': true},
+            execute: (controller, params) async {
               await controller.setSettings(
-                settings: InAppWebViewSettings(javaScriptEnabled: true),
+                settings: InAppWebViewSettings(
+                  javaScriptEnabled: params['javaScriptEnabled'] as bool?,
+                  supportZoom: params['supportZoom'] as bool?,
+                ),
               );
               return 'Settings updated';
             },
@@ -727,7 +889,7 @@ class _MethodTesterWidgetState extends State<MethodTesterWidget> {
             name: 'getSettings',
             description: 'Gets WebView settings',
             methodEnum: PlatformInAppWebViewControllerMethod.getSettings,
-            execute: (controller) async {
+            execute: (controller, params) async {
               final settings = await controller.getSettings();
               return 'JS enabled: ${settings?.javaScriptEnabled}';
             },
@@ -736,11 +898,16 @@ class _MethodTesterWidgetState extends State<MethodTesterWidget> {
             name: 'setContextMenu',
             description: 'Sets context menu',
             methodEnum: PlatformInAppWebViewControllerMethod.setContextMenu,
-            execute: (controller) async {
+            parameters: {'menuItemTitle': 'Test Item'},
+            execute: (controller, params) async {
               await controller.setContextMenu(
                 ContextMenu(
                   menuItems: [
-                    ContextMenuItem(id: 1, title: 'Test Item', action: () {}),
+                    ContextMenuItem(
+                      id: 1,
+                      title: params['menuItemTitle']?.toString() ?? 'Item',
+                      action: () {},
+                    ),
                   ],
                 ),
               );
@@ -751,7 +918,7 @@ class _MethodTesterWidgetState extends State<MethodTesterWidget> {
             name: 'requestFocus',
             description: 'Requests focus for WebView',
             methodEnum: PlatformInAppWebViewControllerMethod.requestFocus,
-            execute: (controller) async {
+            execute: (controller, params) async {
               return await controller.requestFocus();
             },
           ),
@@ -759,7 +926,7 @@ class _MethodTesterWidgetState extends State<MethodTesterWidget> {
             name: 'clearFocus',
             description: 'Clears focus from WebView',
             methodEnum: PlatformInAppWebViewControllerMethod.clearFocus,
-            execute: (controller) async {
+            execute: (controller, params) async {
               await controller.clearFocus();
               return 'Focus cleared';
             },
@@ -776,7 +943,7 @@ class _MethodTesterWidgetState extends State<MethodTesterWidget> {
             name: 'takeScreenshot',
             description: 'Takes a screenshot',
             methodEnum: PlatformInAppWebViewControllerMethod.takeScreenshot,
-            execute: (controller) async {
+            execute: (controller, params) async {
               final screenshot = await controller.takeScreenshot();
               if (screenshot != null) {
                 return 'Screenshot taken: ${screenshot.length} bytes';
@@ -788,7 +955,7 @@ class _MethodTesterWidgetState extends State<MethodTesterWidget> {
             name: 'printCurrentPage',
             description: 'Prints current page',
             methodEnum: PlatformInAppWebViewControllerMethod.printCurrentPage,
-            execute: (controller) async {
+            execute: (controller, params) async {
               final printJob = await controller.printCurrentPage();
               return printJob != null
                   ? 'Print dialog opened'
@@ -799,7 +966,7 @@ class _MethodTesterWidgetState extends State<MethodTesterWidget> {
             name: 'createPdf',
             description: 'Creates PDF from page',
             methodEnum: PlatformInAppWebViewControllerMethod.createPdf,
-            execute: (controller) async {
+            execute: (controller, params) async {
               final pdf = await controller.createPdf();
               if (pdf != null) {
                 return 'PDF created: ${pdf.length} bytes';
@@ -819,7 +986,7 @@ class _MethodTesterWidgetState extends State<MethodTesterWidget> {
             name: 'clearHistory',
             description: 'Clears navigation history',
             methodEnum: PlatformInAppWebViewControllerMethod.clearHistory,
-            execute: (controller) async {
+            execute: (controller, params) async {
               await controller.clearHistory();
               return 'History cleared';
             },
@@ -828,7 +995,7 @@ class _MethodTesterWidgetState extends State<MethodTesterWidget> {
             name: 'clearFormData',
             description: 'Clears form data',
             methodEnum: PlatformInAppWebViewControllerMethod.clearFormData,
-            execute: (controller) async {
+            execute: (controller, params) async {
               await controller.clearFormData();
               return 'Form data cleared';
             },
@@ -838,7 +1005,7 @@ class _MethodTesterWidgetState extends State<MethodTesterWidget> {
             description: 'Clears SSL preferences',
             methodEnum:
                 PlatformInAppWebViewControllerMethod.clearSslPreferences,
-            execute: (controller) async {
+            execute: (controller, params) async {
               await controller.clearSslPreferences();
               return 'SSL preferences cleared';
             },
@@ -855,7 +1022,7 @@ class _MethodTesterWidgetState extends State<MethodTesterWidget> {
             name: 'pause',
             description: 'Pauses WebView',
             methodEnum: PlatformInAppWebViewControllerMethod.pause,
-            execute: (controller) async {
+            execute: (controller, params) async {
               await controller.pause();
               return 'WebView paused';
             },
@@ -864,7 +1031,7 @@ class _MethodTesterWidgetState extends State<MethodTesterWidget> {
             name: 'resume',
             description: 'Resumes WebView',
             methodEnum: PlatformInAppWebViewControllerMethod.resume,
-            execute: (controller) async {
+            execute: (controller, params) async {
               await controller.resume();
               return 'WebView resumed';
             },
@@ -873,7 +1040,7 @@ class _MethodTesterWidgetState extends State<MethodTesterWidget> {
             name: 'pauseTimers',
             description: 'Pauses JavaScript timers',
             methodEnum: PlatformInAppWebViewControllerMethod.pauseTimers,
-            execute: (controller) async {
+            execute: (controller, params) async {
               await controller.pauseTimers();
               return 'Timers paused';
             },
@@ -882,7 +1049,7 @@ class _MethodTesterWidgetState extends State<MethodTesterWidget> {
             name: 'resumeTimers',
             description: 'Resumes JavaScript timers',
             methodEnum: PlatformInAppWebViewControllerMethod.resumeTimers,
-            execute: (controller) async {
+            execute: (controller, params) async {
               await controller.resumeTimers();
               return 'Timers resumed';
             },
@@ -900,7 +1067,7 @@ class _MethodTesterWidgetState extends State<MethodTesterWidget> {
             description: 'Creates a web message channel',
             methodEnum:
                 PlatformInAppWebViewControllerMethod.createWebMessageChannel,
-            execute: (controller) async {
+            execute: (controller, params) async {
               final channel = await controller.createWebMessageChannel();
               return channel != null
                   ? 'Channel created'
@@ -911,10 +1078,15 @@ class _MethodTesterWidgetState extends State<MethodTesterWidget> {
             name: 'postWebMessage',
             description: 'Posts a web message',
             methodEnum: PlatformInAppWebViewControllerMethod.postWebMessage,
-            execute: (controller) async {
+            parameters: {'message': 'Hello from Flutter', 'targetOrigin': '*'},
+            requiredParameters: ['message'],
+            execute: (controller, params) async {
+              final targetOrigin = params['targetOrigin']?.toString();
               await controller.postWebMessage(
-                message: WebMessage(data: 'Hello from Flutter'),
-                targetOrigin: WebUri('*'),
+                message: WebMessage(data: params['message']?.toString()),
+                targetOrigin: WebUri(
+                  targetOrigin?.isNotEmpty == true ? targetOrigin! : '*',
+                ),
               );
               return 'Message posted';
             },
@@ -924,10 +1096,12 @@ class _MethodTesterWidgetState extends State<MethodTesterWidget> {
             description: 'Adds a web message listener',
             methodEnum:
                 PlatformInAppWebViewControllerMethod.addWebMessageListener,
-            execute: (controller) async {
+            parameters: {'jsObjectName': 'testListener'},
+            requiredParameters: ['jsObjectName'],
+            execute: (controller, params) async {
               await controller.addWebMessageListener(
                 WebMessageListener(
-                  jsObjectName: 'testListener',
+                  jsObjectName: params['jsObjectName']?.toString() ?? '',
                   onPostMessage:
                       (message, sourceOrigin, isMainFrame, replyProxy) {
                         // Handle message
@@ -942,9 +1116,11 @@ class _MethodTesterWidgetState extends State<MethodTesterWidget> {
             description: 'Checks if listener exists',
             methodEnum:
                 PlatformInAppWebViewControllerMethod.hasWebMessageListener,
-            execute: (controller) async {
+            parameters: {'jsObjectName': 'testListener'},
+            requiredParameters: ['jsObjectName'],
+            execute: (controller, params) async {
               final listener = WebMessageListener(
-                jsObjectName: 'testListener',
+                jsObjectName: params['jsObjectName']?.toString() ?? '',
                 onPostMessage:
                     (message, sourceOrigin, isMainFrame, replyProxy) {},
               );
@@ -963,7 +1139,7 @@ class _MethodTesterWidgetState extends State<MethodTesterWidget> {
             name: 'isInFullscreen',
             description: 'Checks if in fullscreen',
             methodEnum: PlatformInAppWebViewControllerMethod.isInFullscreen,
-            execute: (controller) async {
+            execute: (controller, params) async {
               return await controller.isInFullscreen();
             },
           ),
@@ -972,7 +1148,7 @@ class _MethodTesterWidgetState extends State<MethodTesterWidget> {
             description: 'Pauses all media',
             methodEnum:
                 PlatformInAppWebViewControllerMethod.pauseAllMediaPlayback,
-            execute: (controller) async {
+            execute: (controller, params) async {
               await controller.pauseAllMediaPlayback();
               return 'Media paused';
             },
@@ -982,8 +1158,11 @@ class _MethodTesterWidgetState extends State<MethodTesterWidget> {
             description: 'Suspends media playback',
             methodEnum: PlatformInAppWebViewControllerMethod
                 .setAllMediaPlaybackSuspended,
-            execute: (controller) async {
-              await controller.setAllMediaPlaybackSuspended(suspended: true);
+            parameters: {'suspended': true},
+            execute: (controller, params) async {
+              await controller.setAllMediaPlaybackSuspended(
+                suspended: params['suspended'] as bool? ?? true,
+              );
               return 'Media suspended';
             },
           ),
@@ -992,7 +1171,7 @@ class _MethodTesterWidgetState extends State<MethodTesterWidget> {
             description: 'Closes media presentations',
             methodEnum:
                 PlatformInAppWebViewControllerMethod.closeAllMediaPresentations,
-            execute: (controller) async {
+            execute: (controller, params) async {
               await controller.closeAllMediaPresentations();
               return 'Media presentations closed';
             },
@@ -1002,7 +1181,7 @@ class _MethodTesterWidgetState extends State<MethodTesterWidget> {
             description: 'Gets media playback state',
             methodEnum:
                 PlatformInAppWebViewControllerMethod.requestMediaPlaybackState,
-            execute: (controller) async {
+            execute: (controller, params) async {
               final state = await controller.requestMediaPlaybackState();
               return state?.toString() ?? 'Unknown state';
             },
@@ -1011,7 +1190,7 @@ class _MethodTesterWidgetState extends State<MethodTesterWidget> {
             name: 'isPlayingAudio',
             description: 'Checks if playing audio',
             methodEnum: PlatformInAppWebViewControllerMethod.isPlayingAudio,
-            execute: (controller) async {
+            execute: (controller, params) async {
               return await controller.isPlayingAudio();
             },
           ),
@@ -1019,7 +1198,7 @@ class _MethodTesterWidgetState extends State<MethodTesterWidget> {
             name: 'isMuted',
             description: 'Checks if muted',
             methodEnum: PlatformInAppWebViewControllerMethod.isMuted,
-            execute: (controller) async {
+            execute: (controller, params) async {
               return await controller.isMuted();
             },
           ),
@@ -1027,8 +1206,11 @@ class _MethodTesterWidgetState extends State<MethodTesterWidget> {
             name: 'setMuted',
             description: 'Sets mute state',
             methodEnum: PlatformInAppWebViewControllerMethod.setMuted,
-            execute: (controller) async {
-              await controller.setMuted(muted: true);
+            parameters: {'muted': true},
+            execute: (controller, params) async {
+              await controller.setMuted(
+                muted: params['muted'] as bool? ?? true,
+              );
               return 'Muted';
             },
           ),
@@ -1045,7 +1227,7 @@ class _MethodTesterWidgetState extends State<MethodTesterWidget> {
             description: 'Gets camera capture state',
             methodEnum:
                 PlatformInAppWebViewControllerMethod.getCameraCaptureState,
-            execute: (controller) async {
+            execute: (controller, params) async {
               final state = await controller.getCameraCaptureState();
               return state?.toString() ?? 'Unknown state';
             },
@@ -1055,9 +1237,11 @@ class _MethodTesterWidgetState extends State<MethodTesterWidget> {
             description: 'Sets camera capture state',
             methodEnum:
                 PlatformInAppWebViewControllerMethod.setCameraCaptureState,
-            execute: (controller) async {
+            parameters: {'state': 'ACTIVE'},
+            requiredParameters: ['state'],
+            execute: (controller, params) async {
               await controller.setCameraCaptureState(
-                state: MediaCaptureState.ACTIVE,
+                state: _parseMediaCaptureState(params['state']?.toString()),
               );
               return 'Camera state set';
             },
@@ -1067,7 +1251,7 @@ class _MethodTesterWidgetState extends State<MethodTesterWidget> {
             description: 'Gets microphone capture state',
             methodEnum:
                 PlatformInAppWebViewControllerMethod.getMicrophoneCaptureState,
-            execute: (controller) async {
+            execute: (controller, params) async {
               final state = await controller.getMicrophoneCaptureState();
               return state?.toString() ?? 'Unknown state';
             },
@@ -1077,9 +1261,11 @@ class _MethodTesterWidgetState extends State<MethodTesterWidget> {
             description: 'Sets microphone capture state',
             methodEnum:
                 PlatformInAppWebViewControllerMethod.setMicrophoneCaptureState,
-            execute: (controller) async {
+            parameters: {'state': 'ACTIVE'},
+            requiredParameters: ['state'],
+            execute: (controller, params) async {
               await controller.setMicrophoneCaptureState(
-                state: MediaCaptureState.ACTIVE,
+                state: _parseMediaCaptureState(params['state']?.toString()),
               );
               return 'Microphone state set';
             },
@@ -1096,7 +1282,7 @@ class _MethodTesterWidgetState extends State<MethodTesterWidget> {
             name: 'isSecureContext',
             description: 'Checks if secure context',
             methodEnum: PlatformInAppWebViewControllerMethod.isSecureContext,
-            execute: (controller) async {
+            execute: (controller, params) async {
               return await controller.isSecureContext();
             },
           ),
@@ -1105,7 +1291,7 @@ class _MethodTesterWidgetState extends State<MethodTesterWidget> {
             description: 'Checks if only secure content',
             methodEnum:
                 PlatformInAppWebViewControllerMethod.hasOnlySecureContent,
-            execute: (controller) async {
+            execute: (controller, params) async {
               return await controller.hasOnlySecureContent();
             },
           ),
@@ -1121,7 +1307,7 @@ class _MethodTesterWidgetState extends State<MethodTesterWidget> {
             name: 'saveState',
             description: 'Saves WebView state',
             methodEnum: PlatformInAppWebViewControllerMethod.saveState,
-            execute: (controller) async {
+            execute: (controller, params) async {
               final state = await controller.saveState();
               return state != null
                   ? 'State saved: ${state.length} bytes'
@@ -1132,7 +1318,7 @@ class _MethodTesterWidgetState extends State<MethodTesterWidget> {
             name: 'restoreState',
             description: 'Restores WebView state',
             methodEnum: PlatformInAppWebViewControllerMethod.restoreState,
-            execute: (controller) async {
+            execute: (controller, params) async {
               // Would need saved state to restore
               return 'No state to restore';
             },
@@ -1141,11 +1327,13 @@ class _MethodTesterWidgetState extends State<MethodTesterWidget> {
             name: 'saveWebArchive',
             description: 'Saves page as web archive',
             methodEnum: PlatformInAppWebViewControllerMethod.saveWebArchive,
-            execute: (controller) async {
+            parameters: {'filePath': '/tmp/archive.mht', 'autoname': true},
+            requiredParameters: ['filePath'],
+            execute: (controller, params) async {
               try {
                 final path = await controller.saveWebArchive(
-                  filePath: '/tmp/archive.mht',
-                  autoname: true,
+                  filePath: params['filePath']?.toString() ?? '',
+                  autoname: params['autoname'] as bool? ?? true,
                 );
                 return path ?? 'Archive save failed';
               } catch (e) {
@@ -1158,7 +1346,7 @@ class _MethodTesterWidgetState extends State<MethodTesterWidget> {
             description: 'Creates web archive data',
             methodEnum:
                 PlatformInAppWebViewControllerMethod.createWebArchiveData,
-            execute: (controller) async {
+            execute: (controller, params) async {
               final data = await controller.createWebArchiveData();
               return data != null ? 'Archive: ${data.length} bytes' : 'Failed';
             },
@@ -1175,7 +1363,7 @@ class _MethodTesterWidgetState extends State<MethodTesterWidget> {
             name: 'getViewId',
             description: 'Gets the WebView ID',
             methodEnum: PlatformInAppWebViewControllerMethod.getViewId,
-            execute: (controller) async {
+            execute: (controller, params) async {
               return controller.getViewId();
             },
           ),
@@ -1183,7 +1371,7 @@ class _MethodTesterWidgetState extends State<MethodTesterWidget> {
             name: 'startSafeBrowsing',
             description: 'Starts Safe Browsing',
             methodEnum: PlatformInAppWebViewControllerMethod.startSafeBrowsing,
-            execute: (controller) async {
+            execute: (controller, params) async {
               return await controller.startSafeBrowsing();
             },
           ),
@@ -1191,7 +1379,7 @@ class _MethodTesterWidgetState extends State<MethodTesterWidget> {
             name: 'openDevTools',
             description: 'Opens DevTools',
             methodEnum: PlatformInAppWebViewControllerMethod.openDevTools,
-            execute: (controller) async {
+            execute: (controller, params) async {
               await controller.openDevTools();
               return 'DevTools opened';
             },
@@ -1201,7 +1389,7 @@ class _MethodTesterWidgetState extends State<MethodTesterWidget> {
             description: 'Gets focused node href',
             methodEnum:
                 PlatformInAppWebViewControllerMethod.requestFocusNodeHref,
-            execute: (controller) async {
+            execute: (controller, params) async {
               final result = await controller.requestFocusNodeHref();
               return result?.url ?? 'No focused node';
             },
@@ -1210,7 +1398,7 @@ class _MethodTesterWidgetState extends State<MethodTesterWidget> {
             name: 'requestImageRef',
             description: 'Gets focused image URL',
             methodEnum: PlatformInAppWebViewControllerMethod.requestImageRef,
-            execute: (controller) async {
+            execute: (controller, params) async {
               final result = await controller.requestImageRef();
               return result?.url ?? 'No image focused';
             },
@@ -1220,9 +1408,11 @@ class _MethodTesterWidgetState extends State<MethodTesterWidget> {
             description: 'Checks interface support',
             methodEnum:
                 PlatformInAppWebViewControllerMethod.isInterfaceSupported,
-            execute: (controller) async {
+            parameters: {'interface': 'ICoreWebView2'},
+            requiredParameters: ['interface'],
+            execute: (controller, params) async {
               return await controller.isInterfaceSupported(
-                WebViewInterface.ICoreWebView2,
+                _parseWebViewInterface(params['interface']?.toString()),
               );
             },
           ),
@@ -1266,7 +1456,27 @@ class _MethodTesterWidgetState extends State<MethodTesterWidget> {
     });
 
     try {
-      final result = await entry.execute(widget.controller!);
+      Map<String, dynamic> params = entry.parameters;
+      if (entry.parameters.isNotEmpty) {
+        final updatedParams = await showParameterDialog(
+          context: context,
+          title: '${entry.name} parameters',
+          parameters: entry.parameters,
+          requiredPaths: entry.requiredParameters,
+        );
+
+        if (updatedParams == null) {
+          if (mounted) {
+            setState(() {
+              _executing[entry.name] = false;
+            });
+          }
+          return;
+        }
+        params = updatedParams;
+      }
+
+      final result = await entry.execute(widget.controller!, params);
       if (mounted) {
         setState(() {
           _results[entry.name] = result;
@@ -1512,6 +1722,36 @@ class _MethodTesterWidgetState extends State<MethodTesterWidget> {
             ),
         ],
       ),
+    );
+  }
+
+  UserScriptInjectionTime _parseUserScriptInjectionTime(String? value) {
+    if (value == null || value.isEmpty) {
+      return UserScriptInjectionTime.AT_DOCUMENT_END;
+    }
+    return UserScriptInjectionTime.values.firstWhere(
+      (entry) => entry.name().toLowerCase() == value.toLowerCase(),
+      orElse: () => UserScriptInjectionTime.AT_DOCUMENT_END,
+    );
+  }
+
+  MediaCaptureState _parseMediaCaptureState(String? value) {
+    if (value == null || value.isEmpty) {
+      return MediaCaptureState.ACTIVE;
+    }
+    return MediaCaptureState.values.firstWhere(
+      (entry) => entry.name().toLowerCase() == value.toLowerCase(),
+      orElse: () => MediaCaptureState.ACTIVE,
+    );
+  }
+
+  WebViewInterface _parseWebViewInterface(String? value) {
+    if (value == null || value.isEmpty) {
+      return WebViewInterface.ICoreWebView2;
+    }
+    return WebViewInterface.values.firstWhere(
+      (entry) => entry.name().toLowerCase() == value.toLowerCase(),
+      orElse: () => WebViewInterface.ICoreWebView2,
     );
   }
 

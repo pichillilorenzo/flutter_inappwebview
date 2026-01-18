@@ -3,6 +3,7 @@ import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_inappwebview_example/main.dart';
 import 'package:flutter_inappwebview_example/utils/support_checker.dart';
 import 'package:flutter_inappwebview_example/widgets/common/support_badge.dart';
+import 'package:flutter_inappwebview_example/widgets/common/parameter_dialog.dart';
 
 /// Screen for testing HttpAuthCredentialDatabase functionality
 class HttpAuthScreen extends StatefulWidget {
@@ -53,7 +54,27 @@ class _HttpAuthScreenState extends State<HttpAuthScreen> {
   }
 
   Future<void> _setHttpAuthCredential() async {
-    await _showAddCredentialDialog();
+    final params = await showParameterDialog(
+      context: context,
+      title: 'Add Credential',
+      parameters: {
+        'protectionSpace': {
+          'host': '',
+          'protocol': 'https',
+          'port': 443,
+          'realm': '',
+        },
+        'credential': {'username': '', 'password': ''},
+      },
+      requiredPaths: [
+        'protectionSpace.host',
+        'credential.username',
+        'credential.password',
+      ],
+    );
+
+    if (params == null) return;
+    await _applyCredentialFromParams(params);
   }
 
   Future<void> _removeHttpAuthCredential(
@@ -79,6 +100,88 @@ class _HttpAuthScreenState extends State<HttpAuthScreen> {
     } finally {
       setState(() => _isLoading = false);
     }
+  }
+
+  Future<void> _promptGetHttpAuthCredentials() async {
+    final params = await showParameterDialog(
+      context: context,
+      title: 'Get Credentials',
+      parameters: {
+        'protectionSpace': {
+          'host': '',
+          'protocol': 'https',
+          'port': 443,
+          'realm': '',
+        },
+      },
+      requiredPaths: ['protectionSpace.host'],
+    );
+
+    if (params == null) return;
+    final space = _protectionSpaceFromParams(params['protectionSpace']);
+    if (space == null) {
+      _showError('Protection space host is required');
+      return;
+    }
+    await _getHttpAuthCredentials(space);
+  }
+
+  Future<void> _promptRemoveHttpAuthCredential() async {
+    final params = await showParameterDialog(
+      context: context,
+      title: 'Remove Credential',
+      parameters: {
+        'protectionSpace': {
+          'host': '',
+          'protocol': 'https',
+          'port': 443,
+          'realm': '',
+        },
+        'credential': {'username': '', 'password': ''},
+      },
+      requiredPaths: [
+        'protectionSpace.host',
+        'credential.username',
+        'credential.password',
+      ],
+    );
+
+    if (params == null) return;
+    final space = _protectionSpaceFromParams(params['protectionSpace']);
+    if (space == null) {
+      _showError('Protection space host is required');
+      return;
+    }
+    final credential = _credentialFromParams(params['credential']);
+    if (credential == null) {
+      _showError('Credential username and password are required');
+      return;
+    }
+    await _removeHttpAuthCredential(space, credential);
+  }
+
+  Future<void> _promptRemoveHttpAuthCredentials() async {
+    final params = await showParameterDialog(
+      context: context,
+      title: 'Remove Credentials',
+      parameters: {
+        'protectionSpace': {
+          'host': '',
+          'protocol': 'https',
+          'port': 443,
+          'realm': '',
+        },
+      },
+      requiredPaths: ['protectionSpace.host'],
+    );
+
+    if (params == null) return;
+    final space = _protectionSpaceFromParams(params['protectionSpace']);
+    if (space == null) {
+      _showError('Protection space host is required');
+      return;
+    }
+    await _removeHttpAuthCredentials(space);
   }
 
   Future<void> _removeHttpAuthCredentials(
@@ -131,6 +234,52 @@ class _HttpAuthScreenState extends State<HttpAuthScreen> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text(message), backgroundColor: Colors.red),
     );
+  }
+
+  URLProtectionSpace? _protectionSpaceFromParams(dynamic raw) {
+    if (raw is! Map) return null;
+    final host = raw['host']?.toString() ?? '';
+    if (host.isEmpty) return null;
+    final protocol = raw['protocol']?.toString();
+    final realm = raw['realm']?.toString();
+    final port = (raw['port'] as num?)?.toInt();
+    return URLProtectionSpace(
+      host: host,
+      protocol: protocol?.isNotEmpty == true ? protocol : null,
+      port: port,
+      realm: realm?.isNotEmpty == true ? realm : null,
+    );
+  }
+
+  URLCredential? _credentialFromParams(dynamic raw) {
+    if (raw is! Map) return null;
+    final username = raw['username']?.toString() ?? '';
+    final password = raw['password']?.toString() ?? '';
+    if (username.isEmpty || password.isEmpty) return null;
+    return URLCredential(username: username, password: password);
+  }
+
+  Future<void> _applyCredentialFromParams(Map<String, dynamic> params) async {
+    final space = _protectionSpaceFromParams(params['protectionSpace']);
+    final credential = _credentialFromParams(params['credential']);
+    if (space == null || credential == null) {
+      _showError('Protection space, username, and password are required');
+      return;
+    }
+
+    setState(() => _isLoading = true);
+    try {
+      await _db.setHttpAuthCredential(
+        protectionSpace: space,
+        credential: credential,
+      );
+      _showSuccess('Credential saved');
+      await _getAllAuthCredentials();
+    } catch (e) {
+      _showError('Error saving credential: $e');
+    } finally {
+      setState(() => _isLoading = false);
+    }
   }
 
   Future<bool> _showConfirmDialog(String title, String content) async {
@@ -202,150 +351,6 @@ class _HttpAuthScreenState extends State<HttpAuthScreen> {
     );
   }
 
-  Future<void> _showAddCredentialDialog() async {
-    final hostController = TextEditingController();
-    final portController = TextEditingController(text: '443');
-    final protocolController = TextEditingController(text: 'https');
-    final realmController = TextEditingController();
-    final usernameController = TextEditingController();
-    final passwordController = TextEditingController();
-
-    await showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Add Credential'),
-        content: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Text(
-                'Protection Space',
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 12),
-              TextField(
-                controller: hostController,
-                decoration: const InputDecoration(
-                  labelText: 'Host *',
-                  hintText: 'example.com',
-                  border: OutlineInputBorder(),
-                ),
-              ),
-              const SizedBox(height: 12),
-              Row(
-                children: [
-                  Expanded(
-                    child: TextField(
-                      controller: protocolController,
-                      decoration: const InputDecoration(
-                        labelText: 'Protocol',
-                        hintText: 'https',
-                        border: OutlineInputBorder(),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: TextField(
-                      controller: portController,
-                      keyboardType: TextInputType.number,
-                      decoration: const InputDecoration(
-                        labelText: 'Port',
-                        hintText: '443',
-                        border: OutlineInputBorder(),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 12),
-              TextField(
-                controller: realmController,
-                decoration: const InputDecoration(
-                  labelText: 'Realm',
-                  hintText: 'Secure Area',
-                  border: OutlineInputBorder(),
-                ),
-              ),
-              const SizedBox(height: 16),
-              const Text(
-                'Credential',
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 12),
-              TextField(
-                controller: usernameController,
-                decoration: const InputDecoration(
-                  labelText: 'Username *',
-                  border: OutlineInputBorder(),
-                ),
-              ),
-              const SizedBox(height: 12),
-              TextField(
-                controller: passwordController,
-                obscureText: true,
-                decoration: const InputDecoration(
-                  labelText: 'Password *',
-                  border: OutlineInputBorder(),
-                ),
-              ),
-            ],
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
-          ElevatedButton(
-            onPressed: () async {
-              if (hostController.text.isEmpty ||
-                  usernameController.text.isEmpty ||
-                  passwordController.text.isEmpty) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Host, Username and Password are required'),
-                    backgroundColor: Colors.red,
-                  ),
-                );
-                return;
-              }
-
-              Navigator.pop(context);
-
-              setState(() => _isLoading = true);
-              try {
-                await _db.setHttpAuthCredential(
-                  protectionSpace: URLProtectionSpace(
-                    host: hostController.text,
-                    port: int.tryParse(portController.text),
-                    protocol: protocolController.text.isNotEmpty
-                        ? protocolController.text
-                        : null,
-                    realm: realmController.text.isNotEmpty
-                        ? realmController.text
-                        : null,
-                  ),
-                  credential: URLCredential(
-                    username: usernameController.text,
-                    password: passwordController.text,
-                  ),
-                );
-                _showSuccess('Credential saved');
-                await _getAllAuthCredentials();
-              } catch (e) {
-                _showError('Error saving credential: $e');
-              } finally {
-                setState(() => _isLoading = false);
-              }
-            },
-            child: const Text('Save'),
-          ),
-        ],
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -380,7 +385,7 @@ class _HttpAuthScreenState extends State<HttpAuthScreen> {
             'getHttpAuthCredentials',
             'Get credentials for a protection space (select from list)',
             PlatformHttpAuthCredentialDatabaseMethod.getHttpAuthCredentials,
-            null,
+            _promptGetHttpAuthCredentials,
           ),
           _buildMethodSection(
             'setHttpAuthCredential',
@@ -392,13 +397,13 @@ class _HttpAuthScreenState extends State<HttpAuthScreen> {
             'removeHttpAuthCredential',
             'Remove a specific credential (select from list)',
             PlatformHttpAuthCredentialDatabaseMethod.removeHttpAuthCredential,
-            null,
+            _promptRemoveHttpAuthCredential,
           ),
           _buildMethodSection(
             'removeHttpAuthCredentials',
             'Remove all credentials for a protection space',
             PlatformHttpAuthCredentialDatabaseMethod.removeHttpAuthCredentials,
-            null,
+            _promptRemoveHttpAuthCredentials,
           ),
           _buildMethodSection(
             'clearAllAuthCredentials',

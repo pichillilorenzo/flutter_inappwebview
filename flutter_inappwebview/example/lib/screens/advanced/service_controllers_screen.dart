@@ -6,6 +6,7 @@ import 'package:flutter_inappwebview_example/providers/event_log_provider.dart';
 import 'package:flutter_inappwebview_example/models/event_log_entry.dart';
 import 'package:flutter_inappwebview_example/utils/support_checker.dart';
 import 'package:flutter_inappwebview_example/widgets/common/support_badge.dart';
+import 'package:flutter_inappwebview_example/widgets/common/parameter_dialog.dart';
 
 /// Screen for testing service-level controllers
 class ServiceControllersScreen extends StatefulWidget {
@@ -132,6 +133,34 @@ class _ServiceControllersScreenState extends State<ServiceControllersScreen> {
     );
   }
 
+  TracingMode _parseTracingMode(String? value) {
+    if (value == null || value.isEmpty) {
+      return TracingMode.RECORD_CONTINUOUSLY;
+    }
+    return TracingMode.values.firstWhere(
+      (mode) => mode.name().toLowerCase() == value.toLowerCase(),
+      orElse: () => TracingMode.RECORD_CONTINUOUSLY,
+    );
+  }
+
+  List<TracingCategory> _parseTracingCategories(dynamic raw) {
+    if (raw is! List) {
+      return [TracingCategory.CATEGORIES_WEB_DEVELOPER];
+    }
+    final categories = <TracingCategory>[];
+    for (final entry in raw) {
+      final name = entry.toString().toLowerCase();
+      final matched = TracingCategory.values.firstWhere(
+        (category) => category.name().toLowerCase() == name,
+        orElse: () => TracingCategory.CATEGORIES_WEB_DEVELOPER,
+      );
+      categories.add(matched);
+    }
+    return categories.isEmpty
+        ? [TracingCategory.CATEGORIES_WEB_DEVELOPER]
+        : categories;
+  }
+
   // ServiceWorkerController methods
   Future<void> _getAllowContentAccess() async {
     setState(() => _isLoading = true);
@@ -239,13 +268,34 @@ class _ServiceControllersScreenState extends State<ServiceControllersScreen> {
 
   // ProxyController methods
   Future<void> _setProxyOverride() async {
-    final host = _proxyHostController.text.trim();
-    final port = int.tryParse(_proxyPortController.text.trim()) ?? 8080;
-    final bypassList = _bypassListController.text
-        .split(',')
-        .map((e) => e.trim())
-        .where((e) => e.isNotEmpty)
-        .toList();
+    final params = await showParameterDialog(
+      context: context,
+      title: 'Set Proxy Override',
+      parameters: {
+        'host': _proxyHostController.text.trim(),
+        'port': int.tryParse(_proxyPortController.text.trim()) ?? 8080,
+        'bypassList': _bypassListController.text
+            .split(',')
+            .map((e) => e.trim())
+            .where((e) => e.isNotEmpty)
+            .toList(),
+      },
+      requiredPaths: ['host', 'port'],
+    );
+
+    if (params == null) return;
+    final host = params['host']?.toString() ?? '';
+    final port = (params['port'] as num?)?.toInt() ?? 8080;
+    final bypassList =
+        (params['bypassList'] as List?)
+            ?.map((e) => e.toString().trim())
+            .where((e) => e.isNotEmpty)
+            .toList() ??
+        [];
+
+    _proxyHostController.text = host;
+    _proxyPortController.text = port.toString();
+    _bypassListController.text = bypassList.join(', ');
 
     setState(() => _isLoading = true);
     try {
@@ -283,12 +333,26 @@ class _ServiceControllersScreenState extends State<ServiceControllersScreen> {
 
   // TracingController methods
   Future<void> _startTracing() async {
+    final params = await showParameterDialog(
+      context: context,
+      title: 'Start Tracing',
+      parameters: {
+        'tracingMode': 'RECORD_CONTINUOUSLY',
+        'categories': ['CATEGORIES_WEB_DEVELOPER'],
+      },
+      requiredPaths: ['tracingMode'],
+    );
+
+    if (params == null) return;
+    final tracingMode = _parseTracingMode(params['tracingMode']?.toString());
+    final categories = _parseTracingCategories(params['categories']);
+
     setState(() => _isLoading = true);
     try {
       await TracingController.instance().start(
         settings: TracingSettings(
-          tracingMode: TracingMode.RECORD_CONTINUOUSLY,
-          categories: [TracingCategory.CATEGORIES_WEB_DEVELOPER],
+          tracingMode: tracingMode,
+          categories: categories,
         ),
       );
       setState(() => _isTracing = true);
@@ -334,11 +398,22 @@ class _ServiceControllersScreenState extends State<ServiceControllersScreen> {
 
   // WebViewEnvironment methods
   Future<void> _createWebViewEnvironment() async {
+    final params = await showParameterDialog(
+      context: context,
+      title: 'Create WebViewEnvironment',
+      parameters: {'userDataFolder': 'custom_env_folder'},
+    );
+
+    if (params == null) return;
+    final userDataFolder = params['userDataFolder']?.toString();
+
     setState(() => _isLoading = true);
     try {
       _webViewEnvironment = await WebViewEnvironment.create(
         settings: WebViewEnvironmentSettings(
-          userDataFolder: 'custom_env_folder',
+          userDataFolder: userDataFolder?.isNotEmpty == true
+              ? userDataFolder
+              : null,
         ),
       );
       _showSuccess('WebViewEnvironment created: ${_webViewEnvironment?.id}');
@@ -368,11 +443,26 @@ class _ServiceControllersScreenState extends State<ServiceControllersScreen> {
   }
 
   Future<void> _compareBrowserVersions() async {
+    final params = await showParameterDialog(
+      context: context,
+      title: 'Compare Browser Versions',
+      parameters: {'version1': '100.0.0.0', 'version2': '99.0.0.0'},
+      requiredPaths: ['version1', 'version2'],
+    );
+
+    if (params == null) return;
+    final version1 = params['version1']?.toString() ?? '';
+    final version2 = params['version2']?.toString() ?? '';
+    if (version1.isEmpty || version2.isEmpty) {
+      _showError('Both versions are required');
+      return;
+    }
+
     setState(() => _isLoading = true);
     try {
       final result = await WebViewEnvironment.compareBrowserVersions(
-        version1: '100.0.0.0',
-        version2: '99.0.0.0',
+        version1: version1,
+        version2: version2,
       );
       _showSuccess(
         'Compare versions: $result (positive = v1 > v2, negative = v1 < v2)',
@@ -435,11 +525,20 @@ class _ServiceControllersScreenState extends State<ServiceControllersScreen> {
 
   // ProcessGlobalConfig methods
   Future<void> _applyProcessGlobalConfig() async {
-    final suffix = _dataDirSuffixController.text.trim();
+    final params = await showParameterDialog(
+      context: context,
+      title: 'Apply Process Global Config',
+      parameters: {'dataDirectorySuffix': _dataDirSuffixController.text.trim()},
+      requiredPaths: ['dataDirectorySuffix'],
+    );
+
+    if (params == null) return;
+    final suffix = params['dataDirectorySuffix']?.toString() ?? '';
     if (suffix.isEmpty) {
       _showError('Please enter a data directory suffix');
       return;
     }
+    _dataDirSuffixController.text = suffix;
 
     setState(() => _isLoading = true);
     try {

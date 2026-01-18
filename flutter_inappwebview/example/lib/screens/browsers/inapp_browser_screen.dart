@@ -3,6 +3,7 @@ import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_inappwebview_example/main.dart';
 import 'package:flutter_inappwebview_example/utils/support_checker.dart';
 import 'package:flutter_inappwebview_example/widgets/common/support_badge.dart';
+import 'package:flutter_inappwebview_example/widgets/common/parameter_dialog.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_inappwebview_example/providers/event_log_provider.dart';
 import 'package:flutter_inappwebview_example/models/event_log_entry.dart';
@@ -130,11 +131,25 @@ class _InAppBrowserScreenState extends State<InAppBrowserScreen> {
   }
 
   Future<void> _openUrlRequest() async {
-    final url = _urlController.text.trim();
+    final params = await showParameterDialog(
+      context: context,
+      title: 'openUrlRequest',
+      parameters: {
+        'url': _urlController.text.trim(),
+        'toolbarTopBackgroundColor': Colors.blue,
+        'presentationStyle': 'FULL_SCREEN',
+        'javaScriptEnabled': true,
+      },
+      requiredPaths: ['url'],
+    );
+
+    if (params == null) return;
+    final url = params['url']?.toString() ?? '';
     if (url.isEmpty) {
       _showError('Please enter a URL');
       return;
     }
+    _urlController.text = url;
 
     setState(() => _isLoading = true);
     try {
@@ -142,10 +157,15 @@ class _InAppBrowserScreenState extends State<InAppBrowserScreen> {
         urlRequest: URLRequest(url: WebUri(url)),
         settings: InAppBrowserClassSettings(
           browserSettings: InAppBrowserSettings(
-            toolbarTopBackgroundColor: Colors.blue,
-            presentationStyle: ModalPresentationStyle.FULL_SCREEN,
+            toolbarTopBackgroundColor:
+                params['toolbarTopBackgroundColor'] as Color?,
+            presentationStyle: _parseModalPresentationStyle(
+              params['presentationStyle']?.toString(),
+            ),
           ),
-          webViewSettings: InAppWebViewSettings(javaScriptEnabled: true),
+          webViewSettings: InAppWebViewSettings(
+            javaScriptEnabled: params['javaScriptEnabled'] as bool? ?? true,
+          ),
         ),
       );
       setState(() => _browserOpened = true);
@@ -158,13 +178,30 @@ class _InAppBrowserScreenState extends State<InAppBrowserScreen> {
   }
 
   Future<void> _openFile() async {
+    final params = await showParameterDialog(
+      context: context,
+      title: 'openFile',
+      parameters: {
+        'assetFilePath': 'assets/index.html',
+        'toolbarTopBackgroundColor': Colors.green,
+      },
+      requiredPaths: ['assetFilePath'],
+    );
+
+    if (params == null) return;
+    final assetFilePath = params['assetFilePath']?.toString() ?? '';
+    if (assetFilePath.isEmpty) {
+      _showError('Please enter an asset file path');
+      return;
+    }
     setState(() => _isLoading = true);
     try {
       await _browser?.openFile(
-        assetFilePath: 'assets/index.html',
+        assetFilePath: assetFilePath,
         settings: InAppBrowserClassSettings(
           browserSettings: InAppBrowserSettings(
-            toolbarTopBackgroundColor: Colors.green,
+            toolbarTopBackgroundColor:
+                params['toolbarTopBackgroundColor'] as Color?,
           ),
         ),
       );
@@ -178,21 +215,36 @@ class _InAppBrowserScreenState extends State<InAppBrowserScreen> {
   }
 
   Future<void> _openData() async {
-    final data = _dataController.text.trim();
+    final params = await showParameterDialog(
+      context: context,
+      title: 'openData',
+      parameters: {
+        'data': _dataController.text.trim(),
+        'mimeType': 'text/html',
+        'encoding': 'utf8',
+        'toolbarTopBackgroundColor': Colors.purple,
+      },
+      requiredPaths: ['data'],
+    );
+
+    if (params == null) return;
+    final data = params['data']?.toString() ?? '';
     if (data.isEmpty) {
       _showError('Please enter HTML data');
       return;
     }
+    _dataController.text = data;
 
     setState(() => _isLoading = true);
     try {
       await _browser?.openData(
         data: data,
-        mimeType: 'text/html',
-        encoding: 'utf8',
+        mimeType: params['mimeType']?.toString() ?? 'text/html',
+        encoding: params['encoding']?.toString() ?? 'utf8',
         settings: InAppBrowserClassSettings(
           browserSettings: InAppBrowserSettings(
-            toolbarTopBackgroundColor: Colors.purple,
+            toolbarTopBackgroundColor:
+                params['toolbarTopBackgroundColor'] as Color?,
           ),
         ),
       );
@@ -206,11 +258,20 @@ class _InAppBrowserScreenState extends State<InAppBrowserScreen> {
   }
 
   Future<void> _openWithSystemBrowser() async {
-    final url = _urlController.text.trim();
+    final params = await showParameterDialog(
+      context: context,
+      title: 'openWithSystemBrowser',
+      parameters: {'url': _urlController.text.trim()},
+      requiredPaths: ['url'],
+    );
+
+    if (params == null) return;
+    final url = params['url']?.toString() ?? '';
     if (url.isEmpty) {
       _showError('Please enter a URL');
       return;
     }
+    _urlController.text = url;
 
     setState(() => _isLoading = true);
     try {
@@ -331,13 +392,24 @@ class _InAppBrowserScreenState extends State<InAppBrowserScreen> {
   }
 
   Future<void> _setSettings() async {
+    final params = await showParameterDialog(
+      context: context,
+      title: 'setSettings',
+      parameters: {
+        'toolbarTopBackgroundColor': Colors.orange,
+        'hideToolbarTop': false,
+      },
+    );
+
+    if (params == null) return;
     setState(() => _isLoading = true);
     try {
       await _browser?.setSettings(
         settings: InAppBrowserClassSettings(
           browserSettings: InAppBrowserSettings(
-            toolbarTopBackgroundColor: Colors.orange,
-            hideToolbarTop: false,
+            toolbarTopBackgroundColor:
+                params['toolbarTopBackgroundColor'] as Color?,
+            hideToolbarTop: params['hideToolbarTop'] as bool?,
           ),
         ),
       );
@@ -389,6 +461,16 @@ class _InAppBrowserScreenState extends State<InAppBrowserScreen> {
       if (!mounted) return;
       _showError(message);
     });
+  }
+
+  ModalPresentationStyle _parseModalPresentationStyle(String? value) {
+    if (value == null || value.isEmpty) {
+      return ModalPresentationStyle.FULL_SCREEN;
+    }
+    return ModalPresentationStyle.values.firstWhere(
+      (style) => style.name().toLowerCase() == value.toLowerCase(),
+      orElse: () => ModalPresentationStyle.FULL_SCREEN,
+    );
   }
 
   @override

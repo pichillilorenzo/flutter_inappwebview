@@ -5,6 +5,7 @@ import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_inappwebview_example/main.dart';
 import 'package:flutter_inappwebview_example/utils/support_checker.dart';
 import 'package:flutter_inappwebview_example/widgets/common/support_badge.dart';
+import 'package:flutter_inappwebview_example/widgets/common/parameter_dialog.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_inappwebview_example/providers/event_log_provider.dart';
 import 'package:flutter_inappwebview_example/models/event_log_entry.dart';
@@ -57,20 +58,23 @@ class _HeadlessWebViewScreenState extends State<HeadlessWebViewScreen> {
     );
   }
 
-  bool _createHeadlessWebView() {
-    final url = _urlController.text.trim();
+  bool _createHeadlessWebView({
+    required String url,
+    required double width,
+    required double height,
+    bool javaScriptEnabled = true,
+  }) {
     if (url.isEmpty) {
       _showError('Please enter a URL');
       return false;
     }
-
-    final width = double.tryParse(_widthController.text) ?? 1024;
-    final height = double.tryParse(_heightController.text) ?? 768;
     try {
       _headlessWebView = HeadlessInAppWebView(
         initialSize: Size(width, height),
         initialUrlRequest: URLRequest(url: WebUri(url)),
-        initialSettings: InAppWebViewSettings(javaScriptEnabled: true),
+        initialSettings: InAppWebViewSettings(
+          javaScriptEnabled: javaScriptEnabled,
+        ),
         onWebViewCreated: (controller) {
           _webViewController = controller;
           _logEvent(
@@ -140,9 +144,36 @@ class _HeadlessWebViewScreenState extends State<HeadlessWebViewScreen> {
   }
 
   Future<void> _run() async {
+    final params = await showParameterDialog(
+      context: context,
+      title: 'Run Headless WebView',
+      parameters: {
+        'url': _urlController.text.trim(),
+        'width': double.tryParse(_widthController.text) ?? 1024,
+        'height': double.tryParse(_heightController.text) ?? 768,
+        'javaScriptEnabled': true,
+      },
+      requiredPaths: ['url', 'width', 'height'],
+    );
+
+    if (params == null) return;
+    final url = params['url']?.toString() ?? '';
+    final width = (params['width'] as num?)?.toDouble() ?? 1024;
+    final height = (params['height'] as num?)?.toDouble() ?? 768;
+    final javaScriptEnabled = params['javaScriptEnabled'] as bool? ?? true;
+
+    _urlController.text = url;
+    _widthController.text = width.toString();
+    _heightController.text = height.toString();
+
     setState(() => _isLoading = true);
     try {
-      final created = _createHeadlessWebView();
+      final created = _createHeadlessWebView(
+        url: url,
+        width: width,
+        height: height,
+        javaScriptEnabled: javaScriptEnabled,
+      );
       if (!created) return;
       await _headlessWebView?.run();
       setState(() => _isRunning = _headlessWebView?.isRunning() ?? false);
@@ -161,13 +192,25 @@ class _HeadlessWebViewScreenState extends State<HeadlessWebViewScreen> {
   }
 
   Future<void> _setSize() async {
-    final width = double.tryParse(_widthController.text);
-    final height = double.tryParse(_heightController.text);
+    final params = await showParameterDialog(
+      context: context,
+      title: 'Set Size',
+      parameters: {
+        'width': double.tryParse(_widthController.text) ?? 1024,
+        'height': double.tryParse(_heightController.text) ?? 768,
+      },
+      requiredPaths: ['width', 'height'],
+    );
 
+    if (params == null) return;
+    final width = (params['width'] as num?)?.toDouble();
+    final height = (params['height'] as num?)?.toDouble();
     if (width == null || height == null) {
       _showError('Please enter valid width and height');
       return;
     }
+    _widthController.text = width.toString();
+    _heightController.text = height.toString();
 
     setState(() => _isLoading = true);
     try {
@@ -238,11 +281,20 @@ class _HeadlessWebViewScreenState extends State<HeadlessWebViewScreen> {
   }
 
   Future<void> _loadUrl() async {
-    final url = _urlController.text.trim();
+    final params = await showParameterDialog(
+      context: context,
+      title: 'Load URL',
+      parameters: {'url': _urlController.text.trim()},
+      requiredPaths: ['url'],
+    );
+
+    if (params == null) return;
+    final url = params['url']?.toString() ?? '';
     if (url.isEmpty) {
       _showError('Please enter a URL');
       return;
     }
+    _urlController.text = url;
 
     if (_webViewController == null) {
       _showError('WebView not initialized. Run first.');
@@ -268,10 +320,24 @@ class _HeadlessWebViewScreenState extends State<HeadlessWebViewScreen> {
       return;
     }
 
+    final params = await showParameterDialog(
+      context: context,
+      title: 'Evaluate JavaScript',
+      parameters: {'source': 'document.title'},
+      requiredPaths: ['source'],
+    );
+
+    if (params == null) return;
+    final source = params['source']?.toString() ?? '';
+    if (source.isEmpty) {
+      _showError('Please enter JavaScript source');
+      return;
+    }
+
     setState(() => _isLoading = true);
     try {
       final result = await _webViewController?.evaluateJavascript(
-        source: 'document.title',
+        source: source,
       );
       _showSuccess('JavaScript result: $result');
     } catch (e) {

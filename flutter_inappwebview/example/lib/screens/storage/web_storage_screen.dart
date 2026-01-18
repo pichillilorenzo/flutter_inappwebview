@@ -3,6 +3,7 @@ import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_inappwebview_example/main.dart';
 import 'package:flutter_inappwebview_example/utils/support_checker.dart';
 import 'package:flutter_inappwebview_example/widgets/common/support_badge.dart';
+import 'package:flutter_inappwebview_example/widgets/common/parameter_dialog.dart';
 
 /// Screen for testing WebStorage (localStorage and sessionStorage) functionality
 class WebStorageScreen extends StatefulWidget {
@@ -176,7 +177,7 @@ class _WebStorageScreenState extends State<WebStorageScreen>
       return;
     }
 
-    await _showSetItemDialog();
+    await _promptSetItem();
   }
 
   Future<void> _removeItem(String key) async {
@@ -196,6 +197,23 @@ class _WebStorageScreenState extends State<WebStorageScreen>
     } finally {
       setState(() => _isLoading = false);
     }
+  }
+
+  Future<void> _promptRemoveItem() async {
+    final params = await showParameterDialog(
+      context: context,
+      title: 'Remove Item',
+      parameters: {'key': ''},
+      requiredPaths: ['key'],
+    );
+
+    if (params == null) return;
+    final key = params['key']?.toString() ?? '';
+    if (key.isEmpty) {
+      _showError('Please enter a key');
+      return;
+    }
+    _removeItem(key);
   }
 
   Future<void> _clear() async {
@@ -283,160 +301,68 @@ class _WebStorageScreenState extends State<WebStorageScreen>
         false;
   }
 
-  Future<void> _showSetItemDialog() async {
-    final keyController = TextEditingController();
-    final valueController = TextEditingController();
-
-    await showDialog(
+  Future<void> _promptSetItem() async {
+    final params = await showParameterDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text(
+      title:
           'Set Item (${_isLocalStorageTab ? "localStorage" : "sessionStorage"})',
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              controller: keyController,
-              decoration: const InputDecoration(
-                labelText: 'Key *',
-                border: OutlineInputBorder(),
-              ),
-            ),
-            const SizedBox(height: 12),
-            TextField(
-              controller: valueController,
-              decoration: const InputDecoration(
-                labelText: 'Value *',
-                border: OutlineInputBorder(),
-              ),
-              maxLines: 3,
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
-          ElevatedButton(
-            onPressed: () async {
-              if (keyController.text.isEmpty || valueController.text.isEmpty) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Key and Value are required'),
-                    backgroundColor: Colors.red,
-                  ),
-                );
-                return;
-              }
-
-              Navigator.pop(context);
-
-              setState(() => _isLoading = true);
-              try {
-                final storage = _isLocalStorageTab
-                    ? _localStorage
-                    : _sessionStorage;
-                await storage?.setItem(
-                  key: keyController.text,
-                  value: valueController.text,
-                );
-                _showSuccess('Item set successfully');
-                await _getItems();
-              } catch (e) {
-                _showError('Error setting item: $e');
-              } finally {
-                setState(() => _isLoading = false);
-              }
-            },
-            child: const Text('Set Item'),
-          ),
-        ],
-      ),
+      parameters: {'key': '', 'value': ''},
+      requiredPaths: ['key', 'value'],
     );
+
+    if (params == null) return;
+    final key = params['key']?.toString() ?? '';
+    final value = params['value']?.toString() ?? '';
+    if (key.isEmpty || value.isEmpty) {
+      _showError('Key and Value are required');
+      return;
+    }
+
+    setState(() => _isLoading = true);
+    try {
+      final storage = _isLocalStorageTab ? _localStorage : _sessionStorage;
+      await storage?.setItem(key: key, value: value);
+      _showSuccess('Item set successfully');
+      await _getItems();
+    } catch (e) {
+      _showError('Error setting item: $e');
+    } finally {
+      setState(() => _isLoading = false);
+    }
   }
 
-  Future<void> _showKeyIndexDialog() async {
-    final indexController = TextEditingController(text: '0');
-
-    await showDialog(
+  Future<void> _promptKeyIndex() async {
+    final params = await showParameterDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Get Key at Index'),
-        content: TextField(
-          controller: indexController,
-          decoration: const InputDecoration(
-            labelText: 'Index',
-            border: OutlineInputBorder(),
-          ),
-          keyboardType: TextInputType.number,
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              final index = int.tryParse(indexController.text);
-              if (index == null || index < 0) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Please enter a valid index'),
-                    backgroundColor: Colors.red,
-                  ),
-                );
-                return;
-              }
-              Navigator.pop(context);
-              _key(index);
-            },
-            child: const Text('Get Key'),
-          ),
-        ],
-      ),
+      title: 'Get Key at Index',
+      parameters: {'index': 0},
+      requiredPaths: ['index'],
     );
+
+    if (params == null) return;
+    final index = (params['index'] as num?)?.toInt();
+    if (index == null || index < 0) {
+      _showError('Please enter a valid index');
+      return;
+    }
+    _key(index);
   }
 
-  Future<void> _showGetItemDialog() async {
-    final keyController = TextEditingController();
-
-    await showDialog(
+  Future<void> _promptGetItem() async {
+    final params = await showParameterDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Get Item by Key'),
-        content: TextField(
-          controller: keyController,
-          decoration: const InputDecoration(
-            labelText: 'Key',
-            border: OutlineInputBorder(),
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              if (keyController.text.isEmpty) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Please enter a key'),
-                    backgroundColor: Colors.red,
-                  ),
-                );
-                return;
-              }
-              Navigator.pop(context);
-              _getItem(keyController.text);
-            },
-            child: const Text('Get Item'),
-          ),
-        ],
-      ),
+      title: 'Get Item by Key',
+      parameters: {'key': ''},
+      requiredPaths: ['key'],
     );
+
+    if (params == null) return;
+    final key = params['key']?.toString() ?? '';
+    if (key.isEmpty) {
+      _showError('Please enter a key');
+      return;
+    }
+    _getItem(key);
   }
 
   @override
@@ -658,13 +584,13 @@ class _WebStorageScreenState extends State<WebStorageScreen>
           'getItem',
           'Get value by key',
           _getStorageMethodPlatforms('getItem', isLocal: isLocal),
-          _showGetItemDialog,
+          _promptGetItem,
         ),
         _buildMethodSection(
           'removeItem',
           'Remove item by key (select from list)',
           _getStorageMethodPlatforms('removeItem', isLocal: isLocal),
-          null,
+          _promptRemoveItem,
         ),
         _buildMethodSection(
           'getItems',
@@ -682,7 +608,7 @@ class _WebStorageScreenState extends State<WebStorageScreen>
           'key',
           'Get key at index',
           _getStorageMethodPlatforms('key', isLocal: isLocal),
-          _showKeyIndexDialog,
+          _promptKeyIndex,
         ),
         const SizedBox(height: 16),
         _buildItemsList(items, length),

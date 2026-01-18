@@ -1,0 +1,1358 @@
+import 'dart:io';
+
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_inappwebview/flutter_inappwebview.dart';
+import 'package:flutter_inappwebview_example/main.dart';
+import 'package:flutter_inappwebview_example/widgets/common/support_badge.dart';
+import 'package:provider/provider.dart';
+import 'package:flutter_inappwebview_example/providers/event_log_provider.dart';
+import 'package:flutter_inappwebview_example/models/event_log_entry.dart';
+
+/// Screen for testing service-level controllers
+class ServiceControllersScreen extends StatefulWidget {
+  const ServiceControllersScreen({super.key});
+
+  @override
+  State<ServiceControllersScreen> createState() =>
+      _ServiceControllersScreenState();
+}
+
+class _ServiceControllersScreenState extends State<ServiceControllersScreen> {
+  bool _isLoading = false;
+
+  // ServiceWorkerController state
+  bool _allowContentAccess = true;
+  bool _allowFileAccess = true;
+  bool _blockNetworkLoads = false;
+  CacheMode? _cacheMode = CacheMode.LOAD_DEFAULT;
+
+  // ProxyController state
+  final TextEditingController _proxyHostController = TextEditingController(
+    text: '127.0.0.1',
+  );
+  final TextEditingController _proxyPortController = TextEditingController(
+    text: '8080',
+  );
+  final TextEditingController _bypassListController = TextEditingController();
+
+  // TracingController state
+  bool _isTracing = false;
+
+  // WebViewEnvironment state
+  WebViewEnvironment? _webViewEnvironment;
+  String? _availableVersion;
+  List<BrowserProcessInfo> _processInfos = [];
+
+  // ProcessGlobalConfig state
+  final TextEditingController _dataDirSuffixController = TextEditingController(
+    text: 'test_suffix',
+  );
+
+  String get _currentPlatform {
+    if (kIsWeb) return 'web';
+    if (Platform.isAndroid) return 'android';
+    if (Platform.isIOS) return 'ios';
+    if (Platform.isMacOS) return 'macos';
+    if (Platform.isWindows) return 'windows';
+    if (Platform.isLinux) return 'linux';
+    return 'unknown';
+  }
+
+  TargetPlatform? _getTargetPlatform(String platform) {
+    switch (platform) {
+      case 'android':
+        return TargetPlatform.android;
+      case 'ios':
+        return TargetPlatform.iOS;
+      case 'macos':
+        return TargetPlatform.macOS;
+      case 'windows':
+        return TargetPlatform.windows;
+      case 'linux':
+        return TargetPlatform.linux;
+      default:
+        return null;
+    }
+  }
+
+  List<String> _getServiceWorkerSupportedPlatforms(
+    PlatformServiceWorkerControllerMethod method,
+  ) {
+    final platforms = <String>[];
+    for (final platform in [
+      'android',
+      'ios',
+      'macos',
+      'web',
+      'windows',
+      'linux',
+    ]) {
+      final targetPlatform = _getTargetPlatform(platform);
+      if (targetPlatform != null &&
+          ServiceWorkerController.isMethodSupported(
+            method,
+            platform: targetPlatform,
+          )) {
+        platforms.add(platform);
+      }
+    }
+    return platforms;
+  }
+
+  List<String> _getProxySupportedPlatforms(
+    PlatformProxyControllerMethod method,
+  ) {
+    final platforms = <String>[];
+    for (final platform in [
+      'android',
+      'ios',
+      'macos',
+      'web',
+      'windows',
+      'linux',
+    ]) {
+      final targetPlatform = _getTargetPlatform(platform);
+      if (targetPlatform != null &&
+          ProxyController.isMethodSupported(method, platform: targetPlatform)) {
+        platforms.add(platform);
+      }
+    }
+    return platforms;
+  }
+
+  List<String> _getTracingSupportedPlatforms(
+    PlatformTracingControllerMethod method,
+  ) {
+    final platforms = <String>[];
+    for (final platform in [
+      'android',
+      'ios',
+      'macos',
+      'web',
+      'windows',
+      'linux',
+    ]) {
+      final targetPlatform = _getTargetPlatform(platform);
+      if (targetPlatform != null &&
+          TracingController.isMethodSupported(
+            method,
+            platform: targetPlatform,
+          )) {
+        platforms.add(platform);
+      }
+    }
+    return platforms;
+  }
+
+  List<String> _getWebViewEnvironmentSupportedPlatforms(
+    PlatformWebViewEnvironmentMethod method,
+  ) {
+    final platforms = <String>[];
+    for (final platform in [
+      'android',
+      'ios',
+      'macos',
+      'web',
+      'windows',
+      'linux',
+    ]) {
+      final targetPlatform = _getTargetPlatform(platform);
+      if (targetPlatform != null &&
+          WebViewEnvironment.isMethodSupported(
+            method,
+            platform: targetPlatform,
+          )) {
+        platforms.add(platform);
+      }
+    }
+    return platforms;
+  }
+
+  List<String> _getProcessGlobalConfigSupportedPlatforms(
+    PlatformProcessGlobalConfigMethod method,
+  ) {
+    final platforms = <String>[];
+    for (final platform in [
+      'android',
+      'ios',
+      'macos',
+      'web',
+      'windows',
+      'linux',
+    ]) {
+      final targetPlatform = _getTargetPlatform(platform);
+      if (targetPlatform != null &&
+          ProcessGlobalConfig.isMethodSupported(
+            method,
+            platform: targetPlatform,
+          )) {
+        platforms.add(platform);
+      }
+    }
+    return platforms;
+  }
+
+  @override
+  void dispose() {
+    _proxyHostController.dispose();
+    _proxyPortController.dispose();
+    _bypassListController.dispose();
+    _dataDirSuffixController.dispose();
+    _webViewEnvironment?.dispose();
+    super.dispose();
+  }
+
+  void _logEvent(EventType type, String message, {Map<String, dynamic>? data}) {
+    context.read<EventLogProvider>().addEvent(
+      EventLogEntry(
+        timestamp: DateTime.now(),
+        eventType: type,
+        message: message,
+        data: data,
+      ),
+    );
+  }
+
+  void _showSuccess(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message), backgroundColor: Colors.green),
+    );
+  }
+
+  void _showError(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message), backgroundColor: Colors.red),
+    );
+  }
+
+  // ServiceWorkerController methods
+  Future<void> _getAllowContentAccess() async {
+    setState(() => _isLoading = true);
+    try {
+      final value = await ServiceWorkerController.getAllowContentAccess();
+      setState(() => _allowContentAccess = value);
+      _showSuccess('Allow content access: $value');
+    } catch (e) {
+      _showError('Error: $e');
+    } finally {
+      setState(() => _isLoading = false);
+    }
+  }
+
+  Future<void> _setAllowContentAccess(bool value) async {
+    setState(() => _isLoading = true);
+    try {
+      await ServiceWorkerController.setAllowContentAccess(value);
+      setState(() => _allowContentAccess = value);
+      _showSuccess('Allow content access set to: $value');
+    } catch (e) {
+      _showError('Error: $e');
+    } finally {
+      setState(() => _isLoading = false);
+    }
+  }
+
+  Future<void> _getAllowFileAccess() async {
+    setState(() => _isLoading = true);
+    try {
+      final value = await ServiceWorkerController.getAllowFileAccess();
+      setState(() => _allowFileAccess = value);
+      _showSuccess('Allow file access: $value');
+    } catch (e) {
+      _showError('Error: $e');
+    } finally {
+      setState(() => _isLoading = false);
+    }
+  }
+
+  Future<void> _setAllowFileAccess(bool value) async {
+    setState(() => _isLoading = true);
+    try {
+      await ServiceWorkerController.setAllowFileAccess(value);
+      setState(() => _allowFileAccess = value);
+      _showSuccess('Allow file access set to: $value');
+    } catch (e) {
+      _showError('Error: $e');
+    } finally {
+      setState(() => _isLoading = false);
+    }
+  }
+
+  Future<void> _getBlockNetworkLoads() async {
+    setState(() => _isLoading = true);
+    try {
+      final value = await ServiceWorkerController.getBlockNetworkLoads();
+      setState(() => _blockNetworkLoads = value);
+      _showSuccess('Block network loads: $value');
+    } catch (e) {
+      _showError('Error: $e');
+    } finally {
+      setState(() => _isLoading = false);
+    }
+  }
+
+  Future<void> _setBlockNetworkLoads(bool value) async {
+    setState(() => _isLoading = true);
+    try {
+      await ServiceWorkerController.setBlockNetworkLoads(value);
+      setState(() => _blockNetworkLoads = value);
+      _showSuccess('Block network loads set to: $value');
+    } catch (e) {
+      _showError('Error: $e');
+    } finally {
+      setState(() => _isLoading = false);
+    }
+  }
+
+  Future<void> _getCacheMode() async {
+    setState(() => _isLoading = true);
+    try {
+      final value = await ServiceWorkerController.getCacheMode();
+      setState(() => _cacheMode = value);
+      _showSuccess('Cache mode: ${value?.name}');
+    } catch (e) {
+      _showError('Error: $e');
+    } finally {
+      setState(() => _isLoading = false);
+    }
+  }
+
+  Future<void> _setCacheMode(CacheMode mode) async {
+    setState(() => _isLoading = true);
+    try {
+      await ServiceWorkerController.setCacheMode(mode);
+      setState(() => _cacheMode = mode);
+      _showSuccess('Cache mode set to: ${mode.name}');
+    } catch (e) {
+      _showError('Error: $e');
+    } finally {
+      setState(() => _isLoading = false);
+    }
+  }
+
+  // ProxyController methods
+  Future<void> _setProxyOverride() async {
+    final host = _proxyHostController.text.trim();
+    final port = int.tryParse(_proxyPortController.text.trim()) ?? 8080;
+    final bypassList = _bypassListController.text
+        .split(',')
+        .map((e) => e.trim())
+        .where((e) => e.isNotEmpty)
+        .toList();
+
+    setState(() => _isLoading = true);
+    try {
+      await ProxyController.instance().setProxyOverride(
+        settings: ProxySettings(
+          proxyRules: [ProxyRule(url: '$host:$port')],
+          bypassRules: bypassList,
+        ),
+      );
+      _showSuccess('Proxy override set');
+      _logEvent(
+        EventType.network,
+        'Proxy set',
+        data: {'host': host, 'port': port, 'bypassList': bypassList},
+      );
+    } catch (e) {
+      _showError('Error: $e');
+    } finally {
+      setState(() => _isLoading = false);
+    }
+  }
+
+  Future<void> _clearProxyOverride() async {
+    setState(() => _isLoading = true);
+    try {
+      await ProxyController.instance().clearProxyOverride();
+      _showSuccess('Proxy override cleared');
+      _logEvent(EventType.network, 'Proxy cleared');
+    } catch (e) {
+      _showError('Error: $e');
+    } finally {
+      setState(() => _isLoading = false);
+    }
+  }
+
+  // TracingController methods
+  Future<void> _startTracing() async {
+    setState(() => _isLoading = true);
+    try {
+      await TracingController.instance().start(
+        settings: TracingSettings(
+          tracingMode: TracingMode.RECORD_CONTINUOUSLY,
+          categories: [TracingCategory.CATEGORIES_WEB_DEVELOPER],
+        ),
+      );
+      setState(() => _isTracing = true);
+      _showSuccess('Tracing started');
+      _logEvent(EventType.performance, 'Tracing started');
+    } catch (e) {
+      _showError('Error: $e');
+    } finally {
+      setState(() => _isLoading = false);
+    }
+  }
+
+  Future<void> _stopTracing() async {
+    setState(() => _isLoading = true);
+    try {
+      final result = await TracingController.instance().stop();
+      setState(() => _isTracing = false);
+      _showSuccess('Tracing stopped: $result');
+      _logEvent(
+        EventType.performance,
+        'Tracing stopped',
+        data: {'result': result},
+      );
+    } catch (e) {
+      _showError('Error: $e');
+    } finally {
+      setState(() => _isLoading = false);
+    }
+  }
+
+  Future<void> _checkIsTracing() async {
+    setState(() => _isLoading = true);
+    try {
+      final tracing = await TracingController.instance().isTracing();
+      setState(() => _isTracing = tracing);
+      _showSuccess('Is tracing: $tracing');
+    } catch (e) {
+      _showError('Error: $e');
+    } finally {
+      setState(() => _isLoading = false);
+    }
+  }
+
+  // WebViewEnvironment methods
+  Future<void> _createWebViewEnvironment() async {
+    setState(() => _isLoading = true);
+    try {
+      _webViewEnvironment = await WebViewEnvironment.create(
+        settings: WebViewEnvironmentSettings(
+          userDataFolder: 'custom_env_folder',
+        ),
+      );
+      _showSuccess('WebViewEnvironment created: ${_webViewEnvironment?.id}');
+      _logEvent(
+        EventType.ui,
+        'WebViewEnvironment created',
+        data: {'id': _webViewEnvironment?.id},
+      );
+    } catch (e) {
+      _showError('Error: $e');
+    } finally {
+      setState(() => _isLoading = false);
+    }
+  }
+
+  Future<void> _getAvailableVersion() async {
+    setState(() => _isLoading = true);
+    try {
+      final version = await WebViewEnvironment.getAvailableVersion();
+      setState(() => _availableVersion = version);
+      _showSuccess('Available version: $version');
+    } catch (e) {
+      _showError('Error: $e');
+    } finally {
+      setState(() => _isLoading = false);
+    }
+  }
+
+  Future<void> _compareBrowserVersions() async {
+    setState(() => _isLoading = true);
+    try {
+      final result = await WebViewEnvironment.compareBrowserVersions(
+        version1: '100.0.0.0',
+        version2: '99.0.0.0',
+      );
+      _showSuccess(
+        'Compare versions: $result (positive = v1 > v2, negative = v1 < v2)',
+      );
+    } catch (e) {
+      _showError('Error: $e');
+    } finally {
+      setState(() => _isLoading = false);
+    }
+  }
+
+  Future<void> _getProcessInfos() async {
+    if (_webViewEnvironment == null) {
+      _showError('Create WebViewEnvironment first');
+      return;
+    }
+
+    setState(() => _isLoading = true);
+    try {
+      final infos = await _webViewEnvironment!.getProcessInfos();
+      setState(() => _processInfos = infos);
+      _showSuccess('Found ${infos.length} processes');
+    } catch (e) {
+      _showError('Error: $e');
+    } finally {
+      setState(() => _isLoading = false);
+    }
+  }
+
+  Future<void> _getFailureReportFolderPath() async {
+    if (_webViewEnvironment == null) {
+      _showError('Create WebViewEnvironment first');
+      return;
+    }
+
+    setState(() => _isLoading = true);
+    try {
+      final path = await _webViewEnvironment!.getFailureReportFolderPath();
+      _showSuccess('Failure report folder: $path');
+    } catch (e) {
+      _showError('Error: $e');
+    } finally {
+      setState(() => _isLoading = false);
+    }
+  }
+
+  Future<void> _disposeWebViewEnvironment() async {
+    setState(() => _isLoading = true);
+    try {
+      await _webViewEnvironment?.dispose();
+      _webViewEnvironment = null;
+      setState(() => _processInfos = []);
+      _showSuccess('WebViewEnvironment disposed');
+    } catch (e) {
+      _showError('Error: $e');
+    } finally {
+      setState(() => _isLoading = false);
+    }
+  }
+
+  // ProcessGlobalConfig methods
+  Future<void> _applyProcessGlobalConfig() async {
+    final suffix = _dataDirSuffixController.text.trim();
+    if (suffix.isEmpty) {
+      _showError('Please enter a data directory suffix');
+      return;
+    }
+
+    setState(() => _isLoading = true);
+    try {
+      await ProcessGlobalConfig.instance().apply(
+        settings: ProcessGlobalConfigSettings(dataDirectorySuffix: suffix),
+      );
+      _showSuccess('ProcessGlobalConfig applied');
+      _logEvent(
+        EventType.ui,
+        'ProcessGlobalConfig applied',
+        data: {'dataDirectorySuffix': suffix},
+      );
+    } catch (e) {
+      _showError('Error: $e');
+    } finally {
+      setState(() => _isLoading = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Service Controllers'),
+        actions: [
+          if (_isLoading)
+            const Padding(
+              padding: EdgeInsets.all(16),
+              child: SizedBox(
+                width: 20,
+                height: 20,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+          IconButton(
+            icon: const Icon(Icons.clear_all),
+            tooltip: 'Clear Events',
+            onPressed: () {
+              context.read<EventLogProvider>().clear();
+            },
+          ),
+        ],
+      ),
+      drawer: buildDrawer(context: context),
+      body: ListView(
+        padding: const EdgeInsets.all(16),
+        children: [
+          _buildServiceWorkerSection(),
+          const SizedBox(height: 16),
+          _buildProxyControllerSection(),
+          const SizedBox(height: 16),
+          _buildTracingControllerSection(),
+          const SizedBox(height: 16),
+          _buildWebViewEnvironmentSection(),
+          const SizedBox(height: 16),
+          _buildProcessGlobalConfigSection(),
+          const SizedBox(height: 16),
+          _buildEventLog(),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildServiceWorkerSection() {
+    final isSupported = ServiceWorkerController.isClassSupported();
+
+    return Card(
+      child: ExpansionTile(
+        title: Row(
+          children: [
+            const Text(
+              'ServiceWorkerController',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(width: 8),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+              decoration: BoxDecoration(
+                color: isSupported ? Colors.green : Colors.red,
+                borderRadius: BorderRadius.circular(4),
+              ),
+              child: Text(
+                isSupported ? 'Supported' : 'Not Supported',
+                style: const TextStyle(color: Colors.white, fontSize: 10),
+              ),
+            ),
+            const SizedBox(width: 8),
+            Text(
+              '(Android)',
+              style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+            ),
+          ],
+        ),
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              children: [
+                // Boolean settings
+                _buildSwitchRow(
+                  'Allow Content Access',
+                  _allowContentAccess,
+                  (value) => _setAllowContentAccess(value),
+                  _getAllowContentAccess,
+                  _getServiceWorkerSupportedPlatforms(
+                    PlatformServiceWorkerControllerMethod.setAllowContentAccess,
+                  ),
+                ),
+                _buildSwitchRow(
+                  'Allow File Access',
+                  _allowFileAccess,
+                  (value) => _setAllowFileAccess(value),
+                  _getAllowFileAccess,
+                  _getServiceWorkerSupportedPlatforms(
+                    PlatformServiceWorkerControllerMethod.setAllowFileAccess,
+                  ),
+                ),
+                _buildSwitchRow(
+                  'Block Network Loads',
+                  _blockNetworkLoads,
+                  (value) => _setBlockNetworkLoads(value),
+                  _getBlockNetworkLoads,
+                  _getServiceWorkerSupportedPlatforms(
+                    PlatformServiceWorkerControllerMethod.setBlockNetworkLoads,
+                  ),
+                ),
+                const Divider(),
+
+                // Cache mode dropdown
+                Row(
+                  children: [
+                    const Text('Cache Mode:'),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: DropdownButton<CacheMode>(
+                        value: _cacheMode,
+                        isExpanded: true,
+                        items: CacheMode.values
+                            .map(
+                              (mode) => DropdownMenuItem(
+                                value: mode,
+                                child: Text(
+                                  mode.name(),
+                                  style: const TextStyle(fontSize: 12),
+                                ),
+                              ),
+                            )
+                            .toList(),
+                        onChanged: (mode) {
+                          if (mode != null) {
+                            _setCacheMode(mode);
+                          }
+                        },
+                      ),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.refresh, size: 20),
+                      onPressed: _getCacheMode,
+                      tooltip: 'Get current',
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                SupportBadge(
+                  supportedPlatforms: _getServiceWorkerSupportedPlatforms(
+                    PlatformServiceWorkerControllerMethod.setCacheMode,
+                  ),
+                  currentPlatform: _currentPlatform,
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSwitchRow(
+    String label,
+    bool value,
+    Function(bool) onChanged,
+    VoidCallback onRefresh,
+    List<String> supportedPlatforms,
+  ) {
+    final isSupported = supportedPlatforms.contains(_currentPlatform);
+
+    return Column(
+      children: [
+        Row(
+          children: [
+            Expanded(child: Text(label)),
+            Switch(value: value, onChanged: isSupported ? onChanged : null),
+            IconButton(
+              icon: const Icon(Icons.refresh, size: 20),
+              onPressed: isSupported ? onRefresh : null,
+              tooltip: 'Get current',
+            ),
+          ],
+        ),
+        SupportBadge(
+          supportedPlatforms: supportedPlatforms,
+          currentPlatform: _currentPlatform,
+        ),
+        const SizedBox(height: 8),
+      ],
+    );
+  }
+
+  Widget _buildProxyControllerSection() {
+    final isSupported = ProxyController.isClassSupported();
+
+    return Card(
+      child: ExpansionTile(
+        title: Row(
+          children: [
+            const Text(
+              'ProxyController',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(width: 8),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+              decoration: BoxDecoration(
+                color: isSupported ? Colors.green : Colors.red,
+                borderRadius: BorderRadius.circular(4),
+              ),
+              child: Text(
+                isSupported ? 'Supported' : 'Not Supported',
+                style: const TextStyle(color: Colors.white, fontSize: 10),
+              ),
+            ),
+            const SizedBox(width: 8),
+            Text(
+              '(Android)',
+              style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+            ),
+          ],
+        ),
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              children: [
+                Row(
+                  children: [
+                    Expanded(
+                      flex: 2,
+                      child: TextField(
+                        controller: _proxyHostController,
+                        decoration: const InputDecoration(
+                          labelText: 'Host',
+                          border: OutlineInputBorder(),
+                          isDense: true,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: TextField(
+                        controller: _proxyPortController,
+                        decoration: const InputDecoration(
+                          labelText: 'Port',
+                          border: OutlineInputBorder(),
+                          isDense: true,
+                        ),
+                        keyboardType: TextInputType.number,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                TextField(
+                  controller: _bypassListController,
+                  decoration: const InputDecoration(
+                    labelText: 'Bypass List (comma-separated)',
+                    hintText: 'localhost, 127.0.0.1',
+                    border: OutlineInputBorder(),
+                    isDense: true,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Row(
+                  children: [
+                    Expanded(
+                      child: _buildMethodButton(
+                        'Set Proxy',
+                        _getProxySupportedPlatforms(
+                          PlatformProxyControllerMethod.setProxyOverride,
+                        ),
+                        _setProxyOverride,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: _buildMethodButton(
+                        'Clear Proxy',
+                        _getProxySupportedPlatforms(
+                          PlatformProxyControllerMethod.clearProxyOverride,
+                        ),
+                        _clearProxyOverride,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTracingControllerSection() {
+    final isSupported = TracingController.isClassSupported();
+
+    return Card(
+      child: ExpansionTile(
+        title: Row(
+          children: [
+            const Text(
+              'TracingController',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(width: 8),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+              decoration: BoxDecoration(
+                color: isSupported ? Colors.green : Colors.red,
+                borderRadius: BorderRadius.circular(4),
+              ),
+              child: Text(
+                isSupported ? 'Supported' : 'Not Supported',
+                style: const TextStyle(color: Colors.white, fontSize: 10),
+              ),
+            ),
+            const SizedBox(width: 8),
+            Text(
+              '(Android)',
+              style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+            ),
+          ],
+        ),
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              children: [
+                // Status indicator
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: _isTracing
+                        ? Colors.green.shade50
+                        : Colors.grey.shade100,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(
+                        _isTracing ? Icons.fiber_manual_record : Icons.stop,
+                        color: _isTracing ? Colors.red : Colors.grey,
+                        size: 24,
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        _isTracing ? 'Tracing Active' : 'Tracing Stopped',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: _isTracing ? Colors.green : Colors.grey,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 12),
+
+                // Control buttons
+                Row(
+                  children: [
+                    Expanded(
+                      child: _buildMethodButton(
+                        'Start',
+                        _getTracingSupportedPlatforms(
+                          PlatformTracingControllerMethod.start,
+                        ),
+                        !_isTracing ? _startTracing : null,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: _buildMethodButton(
+                        'Stop',
+                        _getTracingSupportedPlatforms(
+                          PlatformTracingControllerMethod.stop,
+                        ),
+                        _isTracing ? _stopTracing : null,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: _buildMethodButton(
+                        'Is Tracing',
+                        _getTracingSupportedPlatforms(
+                          PlatformTracingControllerMethod.isTracing,
+                        ),
+                        _checkIsTracing,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildWebViewEnvironmentSection() {
+    final isSupported = WebViewEnvironment.isClassSupported();
+
+    return Card(
+      child: ExpansionTile(
+        title: Row(
+          children: [
+            const Text(
+              'WebViewEnvironment',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(width: 8),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+              decoration: BoxDecoration(
+                color: isSupported ? Colors.green : Colors.red,
+                borderRadius: BorderRadius.circular(4),
+              ),
+              child: Text(
+                isSupported ? 'Supported' : 'Not Supported',
+                style: const TextStyle(color: Colors.white, fontSize: 10),
+              ),
+            ),
+            const SizedBox(width: 8),
+            Text(
+              '(Windows, Linux)',
+              style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+            ),
+          ],
+        ),
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Environment status
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: _webViewEnvironment != null
+                        ? Colors.green.shade50
+                        : Colors.grey.shade100,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(
+                        _webViewEnvironment != null
+                            ? Icons.check_circle
+                            : Icons.cancel,
+                        color: _webViewEnvironment != null
+                            ? Colors.green
+                            : Colors.grey,
+                        size: 24,
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              _webViewEnvironment != null
+                                  ? 'Environment Active'
+                                  : 'No Environment',
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            if (_webViewEnvironment != null)
+                              Text(
+                                'ID: ${_webViewEnvironment!.id}',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: Colors.grey.shade600,
+                                ),
+                              ),
+                            if (_availableVersion != null)
+                              Text(
+                                'Version: $_availableVersion',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: Colors.grey.shade600,
+                                ),
+                              ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 12),
+
+                // Create/Dispose buttons
+                Row(
+                  children: [
+                    Expanded(
+                      child: _buildMethodButton(
+                        'Create',
+                        _getWebViewEnvironmentSupportedPlatforms(
+                          PlatformWebViewEnvironmentMethod.create,
+                        ),
+                        _webViewEnvironment == null
+                            ? _createWebViewEnvironment
+                            : null,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: _buildMethodButton(
+                        'Dispose',
+                        _getWebViewEnvironmentSupportedPlatforms(
+                          PlatformWebViewEnvironmentMethod.dispose,
+                        ),
+                        _webViewEnvironment != null
+                            ? _disposeWebViewEnvironment
+                            : null,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+
+                // Static methods
+                Row(
+                  children: [
+                    Expanded(
+                      child: _buildMethodButton(
+                        'Get Version',
+                        _getWebViewEnvironmentSupportedPlatforms(
+                          PlatformWebViewEnvironmentMethod.getAvailableVersion,
+                        ),
+                        _getAvailableVersion,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: _buildMethodButton(
+                        'Compare Versions',
+                        _getWebViewEnvironmentSupportedPlatforms(
+                          PlatformWebViewEnvironmentMethod
+                              .compareBrowserVersions,
+                        ),
+                        _compareBrowserVersions,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+
+                // Instance methods
+                Row(
+                  children: [
+                    Expanded(
+                      child: _buildMethodButton(
+                        'Get Processes',
+                        _getWebViewEnvironmentSupportedPlatforms(
+                          PlatformWebViewEnvironmentMethod.getProcessInfos,
+                        ),
+                        _webViewEnvironment != null ? _getProcessInfos : null,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: _buildMethodButton(
+                        'Failure Folder',
+                        _getWebViewEnvironmentSupportedPlatforms(
+                          PlatformWebViewEnvironmentMethod
+                              .getFailureReportFolderPath,
+                        ),
+                        _webViewEnvironment != null
+                            ? _getFailureReportFolderPath
+                            : null,
+                      ),
+                    ),
+                  ],
+                ),
+
+                // Process list
+                if (_processInfos.isNotEmpty) ...[
+                  const SizedBox(height: 12),
+                  const Text(
+                    'Process Infos:',
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 8),
+                  Container(
+                    height: 100,
+                    decoration: BoxDecoration(
+                      color: Colors.grey.shade100,
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    child: ListView.builder(
+                      itemCount: _processInfos.length,
+                      itemBuilder: (context, index) {
+                        final info = _processInfos[index];
+                        return ListTile(
+                          dense: true,
+                          title: Text('Process ${index + 1}'),
+                          subtitle: Text('Kind: ${info.kind.name()}'),
+                        );
+                      },
+                    ),
+                  ),
+                ],
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildProcessGlobalConfigSection() {
+    final isSupported = ProcessGlobalConfig.isClassSupported();
+
+    return Card(
+      child: ExpansionTile(
+        title: Row(
+          children: [
+            const Text(
+              'ProcessGlobalConfig',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(width: 8),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+              decoration: BoxDecoration(
+                color: isSupported ? Colors.green : Colors.red,
+                borderRadius: BorderRadius.circular(4),
+              ),
+              child: Text(
+                isSupported ? 'Supported' : 'Not Supported',
+                style: const TextStyle(color: Colors.white, fontSize: 10),
+              ),
+            ),
+            const SizedBox(width: 8),
+            Text(
+              '(Android)',
+              style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+            ),
+          ],
+        ),
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: Colors.orange.shade50,
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  child: const Row(
+                    children: [
+                      Icon(Icons.warning, color: Colors.orange, size: 20),
+                      SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          'Note: ProcessGlobalConfig can only be applied once, before any WebView is created.',
+                          style: TextStyle(fontSize: 12),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 12),
+                TextField(
+                  controller: _dataDirSuffixController,
+                  decoration: const InputDecoration(
+                    labelText: 'Data Directory Suffix',
+                    border: OutlineInputBorder(),
+                    isDense: true,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                SizedBox(
+                  width: double.infinity,
+                  child: _buildMethodButton(
+                    'Apply Config',
+                    _getProcessGlobalConfigSupportedPlatforms(
+                      PlatformProcessGlobalConfigMethod.apply,
+                    ),
+                    _applyProcessGlobalConfig,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMethodButton(
+    String label,
+    List<String> supportedPlatforms,
+    VoidCallback? onPressed,
+  ) {
+    final isSupported = supportedPlatforms.contains(_currentPlatform);
+    final canPress = isSupported && onPressed != null && !_isLoading;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        ElevatedButton(
+          onPressed: canPress ? onPressed : null,
+          child: Text(label, style: const TextStyle(fontSize: 12)),
+        ),
+        const SizedBox(height: 4),
+        Center(
+          child: SupportBadge(
+            supportedPlatforms: supportedPlatforms,
+            currentPlatform: _currentPlatform,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildEventLog() {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text(
+                  'Event Log',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                ),
+                TextButton(
+                  onPressed: () => context.read<EventLogProvider>().clear(),
+                  child: const Text('Clear'),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            Consumer<EventLogProvider>(
+              builder: (context, provider, _) {
+                final events = provider.events.reversed.take(15).toList();
+                if (events.isEmpty) {
+                  return Container(
+                    padding: const EdgeInsets.all(16),
+                    child: const Center(
+                      child: Text(
+                        'No events yet',
+                        style: TextStyle(color: Colors.grey),
+                      ),
+                    ),
+                  );
+                }
+                return Container(
+                  height: 150,
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade100,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: ListView.builder(
+                    itemCount: events.length,
+                    itemBuilder: (context, index) {
+                      final event = events[index];
+                      return ListTile(
+                        dense: true,
+                        title: Text(
+                          event.message,
+                          style: const TextStyle(fontSize: 12),
+                        ),
+                        subtitle: Text(
+                          event.data?.toString() ?? '',
+                          style: TextStyle(
+                            fontSize: 10,
+                            color: Colors.grey.shade600,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        leading: Text(
+                          '${event.timestamp.hour}:${event.timestamp.minute.toString().padLeft(2, '0')}:${event.timestamp.second.toString().padLeft(2, '0')}',
+                          style: TextStyle(
+                            fontSize: 10,
+                            color: Colors.grey.shade500,
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                );
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}

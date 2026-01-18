@@ -1,0 +1,818 @@
+import 'dart:io';
+import 'dart:typed_data';
+
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_inappwebview/flutter_inappwebview.dart';
+import 'package:flutter_inappwebview_example/main.dart';
+import 'package:flutter_inappwebview_example/widgets/common/support_badge.dart';
+import 'package:provider/provider.dart';
+import 'package:flutter_inappwebview_example/providers/event_log_provider.dart';
+import 'package:flutter_inappwebview_example/models/event_log_entry.dart';
+
+/// Screen for testing HeadlessInAppWebView functionality
+class HeadlessWebViewScreen extends StatefulWidget {
+  const HeadlessWebViewScreen({super.key});
+
+  @override
+  State<HeadlessWebViewScreen> createState() => _HeadlessWebViewScreenState();
+}
+
+class _HeadlessWebViewScreenState extends State<HeadlessWebViewScreen> {
+  final TextEditingController _urlController = TextEditingController(
+    text: 'https://flutter.dev',
+  );
+  final TextEditingController _widthController = TextEditingController(
+    text: '1024',
+  );
+  final TextEditingController _heightController = TextEditingController(
+    text: '768',
+  );
+
+  HeadlessInAppWebView? _headlessWebView;
+  InAppWebViewController? _webViewController;
+  bool _isLoading = false;
+  bool _isRunning = false;
+  Size? _currentSize;
+  Uint8List? _screenshotData;
+  String? _currentUrl;
+  String? _currentTitle;
+
+  String get _currentPlatform {
+    if (kIsWeb) return 'web';
+    if (Platform.isAndroid) return 'android';
+    if (Platform.isIOS) return 'ios';
+    if (Platform.isMacOS) return 'macos';
+    if (Platform.isWindows) return 'windows';
+    if (Platform.isLinux) return 'linux';
+    return 'unknown';
+  }
+
+  List<String> _getSupportedPlatformsForMethod(
+    PlatformHeadlessInAppWebViewMethod method,
+  ) {
+    final platforms = <String>[];
+    for (final platform in [
+      'android',
+      'ios',
+      'macos',
+      'web',
+      'windows',
+      'linux',
+    ]) {
+      final targetPlatform = _getTargetPlatform(platform);
+      if (targetPlatform != null &&
+          HeadlessInAppWebView.isMethodSupported(
+            method,
+            platform: targetPlatform,
+          )) {
+        platforms.add(platform);
+      }
+    }
+    return platforms;
+  }
+
+  TargetPlatform? _getTargetPlatform(String platform) {
+    switch (platform) {
+      case 'android':
+        return TargetPlatform.android;
+      case 'ios':
+        return TargetPlatform.iOS;
+      case 'macos':
+        return TargetPlatform.macOS;
+      case 'windows':
+        return TargetPlatform.windows;
+      case 'linux':
+        return TargetPlatform.linux;
+      default:
+        return null;
+    }
+  }
+
+  @override
+  void dispose() {
+    _urlController.dispose();
+    _widthController.dispose();
+    _heightController.dispose();
+    _headlessWebView?.dispose();
+    super.dispose();
+  }
+
+  void _logEvent(EventType type, String message, {Map<String, dynamic>? data}) {
+    context.read<EventLogProvider>().addEvent(
+      EventLogEntry(
+        timestamp: DateTime.now(),
+        eventType: type,
+        message: message,
+        data: data,
+      ),
+    );
+  }
+
+  void _createHeadlessWebView() {
+    final url = _urlController.text.trim();
+    if (url.isEmpty) {
+      _showError('Please enter a URL');
+      return;
+    }
+
+    final width = double.tryParse(_widthController.text) ?? 1024;
+    final height = double.tryParse(_heightController.text) ?? 768;
+
+    _headlessWebView = HeadlessInAppWebView(
+      initialSize: Size(width, height),
+      initialUrlRequest: URLRequest(url: WebUri(url)),
+      initialSettings: InAppWebViewSettings(javaScriptEnabled: true),
+      onWebViewCreated: (controller) {
+        _webViewController = controller;
+        _logEvent(
+          EventType.ui,
+          'onWebViewCreated',
+          data: {'viewId': controller.getViewId()},
+        );
+      },
+      onLoadStart: (controller, url) {
+        _logEvent(
+          EventType.navigation,
+          'onLoadStart',
+          data: {'url': url?.toString()},
+        );
+        setState(() => _currentUrl = url?.toString());
+      },
+      onLoadStop: (controller, url) async {
+        _logEvent(
+          EventType.navigation,
+          'onLoadStop',
+          data: {'url': url?.toString()},
+        );
+        final title = await controller.getTitle();
+        setState(() {
+          _currentUrl = url?.toString();
+          _currentTitle = title;
+        });
+      },
+      onReceivedError: (controller, request, error) {
+        _logEvent(
+          EventType.error,
+          'onReceivedError',
+          data: {
+            'url': request.url.toString(),
+            'errorType': error.type.name,
+            'description': error.description,
+          },
+        );
+      },
+      onProgressChanged: (controller, progress) {
+        _logEvent(
+          EventType.performance,
+          'onProgressChanged',
+          data: {'progress': progress},
+        );
+      },
+      onConsoleMessage: (controller, consoleMessage) {
+        _logEvent(
+          EventType.console,
+          'onConsoleMessage',
+          data: {
+            'message': consoleMessage.message,
+            'level': consoleMessage.messageLevel.name,
+          },
+        );
+      },
+      onTitleChanged: (controller, title) {
+        _logEvent(EventType.ui, 'onTitleChanged', data: {'title': title});
+        setState(() => _currentTitle = title);
+      },
+    );
+  }
+
+  Future<void> _run() async {
+    setState(() => _isLoading = true);
+    try {
+      _createHeadlessWebView();
+      await _headlessWebView?.run();
+      setState(() => _isRunning = _headlessWebView?.isRunning() ?? false);
+      _showSuccess('HeadlessInAppWebView started');
+    } catch (e) {
+      _showError('Error starting headless webview: $e');
+    } finally {
+      setState(() => _isLoading = false);
+    }
+  }
+
+  void _checkIsRunning() {
+    final running = _headlessWebView?.isRunning() ?? false;
+    setState(() => _isRunning = running);
+    _showSuccess('HeadlessInAppWebView is running: $running');
+  }
+
+  Future<void> _setSize() async {
+    final width = double.tryParse(_widthController.text);
+    final height = double.tryParse(_heightController.text);
+
+    if (width == null || height == null) {
+      _showError('Please enter valid width and height');
+      return;
+    }
+
+    setState(() => _isLoading = true);
+    try {
+      await _headlessWebView?.setSize(Size(width, height));
+      _showSuccess('Size set to ${width}x$height');
+      await _getSize();
+    } catch (e) {
+      _showError('Error setting size: $e');
+    } finally {
+      setState(() => _isLoading = false);
+    }
+  }
+
+  Future<void> _getSize() async {
+    setState(() => _isLoading = true);
+    try {
+      final size = await _headlessWebView?.getSize();
+      setState(() => _currentSize = size);
+      _showSuccess('Current size: ${size?.width}x${size?.height}');
+    } catch (e) {
+      _showError('Error getting size: $e');
+    } finally {
+      setState(() => _isLoading = false);
+    }
+  }
+
+  Future<void> _dispose() async {
+    setState(() => _isLoading = true);
+    try {
+      await _headlessWebView?.dispose();
+      setState(() {
+        _isRunning = false;
+        _currentSize = null;
+        _screenshotData = null;
+        _currentUrl = null;
+        _currentTitle = null;
+      });
+      _headlessWebView = null;
+      _webViewController = null;
+      _showSuccess('HeadlessInAppWebView disposed');
+    } catch (e) {
+      _showError('Error disposing: $e');
+    } finally {
+      setState(() => _isLoading = false);
+    }
+  }
+
+  Future<void> _takeScreenshot() async {
+    if (_webViewController == null) {
+      _showError('WebView not initialized');
+      return;
+    }
+
+    setState(() => _isLoading = true);
+    try {
+      final screenshot = await _webViewController?.takeScreenshot();
+      setState(() => _screenshotData = screenshot);
+      if (screenshot != null) {
+        _showSuccess('Screenshot taken (${screenshot.length} bytes)');
+      } else {
+        _showError('Failed to take screenshot');
+      }
+    } catch (e) {
+      _showError('Error taking screenshot: $e');
+    } finally {
+      setState(() => _isLoading = false);
+    }
+  }
+
+  Future<void> _loadUrl() async {
+    final url = _urlController.text.trim();
+    if (url.isEmpty) {
+      _showError('Please enter a URL');
+      return;
+    }
+
+    if (_webViewController == null) {
+      _showError('WebView not initialized. Run first.');
+      return;
+    }
+
+    setState(() => _isLoading = true);
+    try {
+      await _webViewController?.loadUrl(
+        urlRequest: URLRequest(url: WebUri(url)),
+      );
+      _showSuccess('Loading URL: $url');
+    } catch (e) {
+      _showError('Error loading URL: $e');
+    } finally {
+      setState(() => _isLoading = false);
+    }
+  }
+
+  Future<void> _evaluateJavaScript() async {
+    if (_webViewController == null) {
+      _showError('WebView not initialized');
+      return;
+    }
+
+    setState(() => _isLoading = true);
+    try {
+      final result = await _webViewController?.evaluateJavascript(
+        source: 'document.title',
+      );
+      _showSuccess('JavaScript result: $result');
+    } catch (e) {
+      _showError('Error evaluating JavaScript: $e');
+    } finally {
+      setState(() => _isLoading = false);
+    }
+  }
+
+  void _showSuccess(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message), backgroundColor: Colors.green),
+    );
+  }
+
+  void _showError(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message), backgroundColor: Colors.red),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('HeadlessInAppWebView'),
+        actions: [
+          if (_isLoading)
+            const Padding(
+              padding: EdgeInsets.all(16),
+              child: SizedBox(
+                width: 20,
+                height: 20,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+          IconButton(
+            icon: const Icon(Icons.clear_all),
+            tooltip: 'Clear Events',
+            onPressed: () {
+              context.read<EventLogProvider>().clear();
+            },
+          ),
+        ],
+      ),
+      drawer: buildDrawer(context: context),
+      body: ListView(
+        padding: const EdgeInsets.all(16),
+        children: [
+          _buildStatusCard(),
+          const SizedBox(height: 16),
+          _buildInputSection(),
+          const SizedBox(height: 16),
+          _buildMainMethods(),
+          const SizedBox(height: 16),
+          _buildSizeMethods(),
+          const SizedBox(height: 16),
+          _buildWebViewActions(),
+          const SizedBox(height: 16),
+          _buildPreviewSection(),
+          const SizedBox(height: 16),
+          _buildEventLog(),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStatusCard() {
+    return Card(
+      color: _isRunning ? Colors.green.shade50 : Colors.grey.shade100,
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(
+                  _isRunning ? Icons.play_circle : Icons.pause_circle,
+                  color: _isRunning ? Colors.green : Colors.grey,
+                  size: 32,
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        _isRunning ? 'Running' : 'Stopped',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: _isRunning ? Colors.green : Colors.grey,
+                        ),
+                      ),
+                      Text(
+                        'ID: ${_headlessWebView?.id ?? "N/A"}',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Colors.grey.shade600,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            if (_isRunning) ...[
+              const Divider(),
+              if (_currentUrl != null)
+                Text(
+                  'URL: $_currentUrl',
+                  style: const TextStyle(fontSize: 12),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              if (_currentTitle != null)
+                Text(
+                  'Title: $_currentTitle',
+                  style: const TextStyle(fontSize: 12),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              if (_currentSize != null)
+                Text(
+                  'Size: ${_currentSize!.width.toInt()}x${_currentSize!.height.toInt()}',
+                  style: const TextStyle(fontSize: 12),
+                ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildInputSection() {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Configuration',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 12),
+            TextField(
+              controller: _urlController,
+              decoration: const InputDecoration(
+                labelText: 'URL',
+                hintText: 'https://flutter.dev',
+                border: OutlineInputBorder(),
+                isDense: true,
+              ),
+            ),
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: _widthController,
+                    decoration: const InputDecoration(
+                      labelText: 'Width',
+                      border: OutlineInputBorder(),
+                      isDense: true,
+                    ),
+                    keyboardType: TextInputType.number,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: TextField(
+                    controller: _heightController,
+                    decoration: const InputDecoration(
+                      labelText: 'Height',
+                      border: OutlineInputBorder(),
+                      isDense: true,
+                    ),
+                    keyboardType: TextInputType.number,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildMainMethods() {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Main Methods',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 12),
+            _buildMethodTile(
+              'run',
+              'Start the headless WebView',
+              PlatformHeadlessInAppWebViewMethod.run,
+              !_isRunning ? _run : null,
+            ),
+            _buildMethodTile(
+              'isRunning',
+              'Check if the headless WebView is running',
+              PlatformHeadlessInAppWebViewMethod.isRunning,
+              _checkIsRunning,
+            ),
+            _buildMethodTile(
+              'dispose',
+              'Stop and dispose the headless WebView',
+              PlatformHeadlessInAppWebViewMethod.dispose,
+              _isRunning ? _dispose : null,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSizeMethods() {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Size Methods',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 12),
+            _buildMethodTile(
+              'setSize',
+              'Set the WebView size',
+              PlatformHeadlessInAppWebViewMethod.setSize,
+              _isRunning ? _setSize : null,
+            ),
+            _buildMethodTile(
+              'getSize',
+              'Get the current WebView size',
+              PlatformHeadlessInAppWebViewMethod.getSize,
+              _isRunning ? _getSize : null,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildWebViewActions() {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'WebView Actions',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'These use the internal WebViewController',
+              style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+            ),
+            const SizedBox(height: 12),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: [
+                ElevatedButton.icon(
+                  onPressed: _isRunning ? _loadUrl : null,
+                  icon: const Icon(Icons.link, size: 18),
+                  label: const Text('Load URL'),
+                ),
+                ElevatedButton.icon(
+                  onPressed: _isRunning ? _takeScreenshot : null,
+                  icon: const Icon(Icons.camera_alt, size: 18),
+                  label: const Text('Screenshot'),
+                ),
+                ElevatedButton.icon(
+                  onPressed: _isRunning ? _evaluateJavaScript : null,
+                  icon: const Icon(Icons.code, size: 18),
+                  label: const Text('Eval JS'),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPreviewSection() {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text(
+                  'Screenshot Preview',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                ),
+                if (_screenshotData != null)
+                  TextButton(
+                    onPressed: () => setState(() => _screenshotData = null),
+                    child: const Text('Clear'),
+                  ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            Container(
+              height: 200,
+              width: double.infinity,
+              decoration: BoxDecoration(
+                color: Colors.grey.shade200,
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: Colors.grey.shade300),
+              ),
+              child: _screenshotData != null
+                  ? ClipRRect(
+                      borderRadius: BorderRadius.circular(8),
+                      child: Image.memory(
+                        _screenshotData!,
+                        fit: BoxFit.contain,
+                      ),
+                    )
+                  : Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.image_not_supported,
+                            size: 48,
+                            color: Colors.grey.shade400,
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            'No screenshot available',
+                            style: TextStyle(color: Colors.grey.shade600),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            'Run the headless WebView and take a screenshot',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Colors.grey.shade500,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildMethodTile(
+    String methodName,
+    String description,
+    PlatformHeadlessInAppWebViewMethod method,
+    VoidCallback? onPressed,
+  ) {
+    final supportedPlatforms = _getSupportedPlatformsForMethod(method);
+    final isSupported = supportedPlatforms.contains(_currentPlatform);
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: ListTile(
+        dense: true,
+        title: Text(
+          methodName,
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: isSupported ? Colors.black : Colors.grey,
+          ),
+        ),
+        subtitle: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              description,
+              style: TextStyle(
+                fontSize: 12,
+                color: isSupported ? Colors.grey.shade600 : Colors.grey,
+              ),
+            ),
+            const SizedBox(height: 4),
+            SupportBadge(
+              supportedPlatforms: supportedPlatforms,
+              currentPlatform: _currentPlatform,
+            ),
+          ],
+        ),
+        trailing: ElevatedButton(
+          onPressed: isSupported && !_isLoading ? onPressed : null,
+          child: const Text('Run'),
+        ),
+        isThreeLine: true,
+      ),
+    );
+  }
+
+  Widget _buildEventLog() {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text(
+                  'Event Log',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                ),
+                TextButton(
+                  onPressed: () => context.read<EventLogProvider>().clear(),
+                  child: const Text('Clear'),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            Consumer<EventLogProvider>(
+              builder: (context, provider, _) {
+                final events = provider.events.reversed.take(20).toList();
+                if (events.isEmpty) {
+                  return Container(
+                    padding: const EdgeInsets.all(16),
+                    child: const Center(
+                      child: Text(
+                        'No events yet',
+                        style: TextStyle(color: Colors.grey),
+                      ),
+                    ),
+                  );
+                }
+                return Container(
+                  height: 200,
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade100,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: ListView.builder(
+                    itemCount: events.length,
+                    itemBuilder: (context, index) {
+                      final event = events[index];
+                      return ListTile(
+                        dense: true,
+                        title: Text(
+                          event.message,
+                          style: const TextStyle(fontSize: 12),
+                        ),
+                        subtitle: Text(
+                          event.data?.toString() ?? '',
+                          style: TextStyle(
+                            fontSize: 10,
+                            color: Colors.grey.shade600,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        leading: Text(
+                          '${event.timestamp.hour}:${event.timestamp.minute.toString().padLeft(2, '0')}:${event.timestamp.second.toString().padLeft(2, '0')}',
+                          style: TextStyle(
+                            fontSize: 10,
+                            color: Colors.grey.shade500,
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                );
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}

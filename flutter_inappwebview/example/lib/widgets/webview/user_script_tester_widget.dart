@@ -94,8 +94,10 @@ class _UserScriptTesterWidgetState extends State<UserScriptTesterWidget> {
                   children: [
                     const Text(
                       'Injection Time',
-                      style:
-                          TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                     const SizedBox(height: 4),
                     DropdownButton<UserScriptInjectionTime>(
@@ -218,10 +220,7 @@ class _UserScriptTesterWidgetState extends State<UserScriptTesterWidget> {
               ),
               child: Text(
                 script.source,
-                style: const TextStyle(
-                  fontSize: 11,
-                  fontFamily: 'monospace',
-                ),
+                style: const TextStyle(fontSize: 11, fontFamily: 'monospace'),
                 maxLines: 3,
                 overflow: TextOverflow.ellipsis,
               ),
@@ -282,9 +281,9 @@ class _UserScriptTesterWidgetState extends State<UserScriptTesterWidget> {
       });
 
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to add script: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Failed to add script: $e')));
       }
     }
   }
@@ -294,9 +293,9 @@ class _UserScriptTesterWidgetState extends State<UserScriptTesterWidget> {
       await widget.onRemoveScript(script);
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to remove script: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Failed to remove script: $e')));
       }
     }
   }

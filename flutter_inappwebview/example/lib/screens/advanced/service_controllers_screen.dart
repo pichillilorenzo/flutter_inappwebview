@@ -1,10 +1,6 @@
-import 'dart:io';
-
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_inappwebview_example/main.dart';
-import 'package:flutter_inappwebview_example/widgets/common/support_badge.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_inappwebview_example/providers/event_log_provider.dart';
 import 'package:flutter_inappwebview_example/models/event_log_entry.dart';
@@ -48,150 +44,6 @@ class _ServiceControllersScreenState extends State<ServiceControllersScreen> {
   final TextEditingController _dataDirSuffixController = TextEditingController(
     text: 'test_suffix',
   );
-
-  String get _currentPlatform {
-    if (kIsWeb) return 'web';
-    if (Platform.isAndroid) return 'android';
-    if (Platform.isIOS) return 'ios';
-    if (Platform.isMacOS) return 'macos';
-    if (Platform.isWindows) return 'windows';
-    if (Platform.isLinux) return 'linux';
-    return 'unknown';
-  }
-
-  TargetPlatform? _getTargetPlatform(String platform) {
-    switch (platform) {
-      case 'android':
-        return TargetPlatform.android;
-      case 'ios':
-        return TargetPlatform.iOS;
-      case 'macos':
-        return TargetPlatform.macOS;
-      case 'windows':
-        return TargetPlatform.windows;
-      case 'linux':
-        return TargetPlatform.linux;
-      default:
-        return null;
-    }
-  }
-
-  List<String> _getServiceWorkerSupportedPlatforms(
-    PlatformServiceWorkerControllerMethod method,
-  ) {
-    final platforms = <String>[];
-    for (final platform in [
-      'android',
-      'ios',
-      'macos',
-      'web',
-      'windows',
-      'linux',
-    ]) {
-      final targetPlatform = _getTargetPlatform(platform);
-      if (targetPlatform != null &&
-          ServiceWorkerController.isMethodSupported(
-            method,
-            platform: targetPlatform,
-          )) {
-        platforms.add(platform);
-      }
-    }
-    return platforms;
-  }
-
-  List<String> _getProxySupportedPlatforms(
-    PlatformProxyControllerMethod method,
-  ) {
-    final platforms = <String>[];
-    for (final platform in [
-      'android',
-      'ios',
-      'macos',
-      'web',
-      'windows',
-      'linux',
-    ]) {
-      final targetPlatform = _getTargetPlatform(platform);
-      if (targetPlatform != null &&
-          ProxyController.isMethodSupported(method, platform: targetPlatform)) {
-        platforms.add(platform);
-      }
-    }
-    return platforms;
-  }
-
-  List<String> _getTracingSupportedPlatforms(
-    PlatformTracingControllerMethod method,
-  ) {
-    final platforms = <String>[];
-    for (final platform in [
-      'android',
-      'ios',
-      'macos',
-      'web',
-      'windows',
-      'linux',
-    ]) {
-      final targetPlatform = _getTargetPlatform(platform);
-      if (targetPlatform != null &&
-          TracingController.isMethodSupported(
-            method,
-            platform: targetPlatform,
-          )) {
-        platforms.add(platform);
-      }
-    }
-    return platforms;
-  }
-
-  List<String> _getWebViewEnvironmentSupportedPlatforms(
-    PlatformWebViewEnvironmentMethod method,
-  ) {
-    final platforms = <String>[];
-    for (final platform in [
-      'android',
-      'ios',
-      'macos',
-      'web',
-      'windows',
-      'linux',
-    ]) {
-      final targetPlatform = _getTargetPlatform(platform);
-      if (targetPlatform != null &&
-          WebViewEnvironment.isMethodSupported(
-            method,
-            platform: targetPlatform,
-          )) {
-        platforms.add(platform);
-      }
-    }
-    return platforms;
-  }
-
-  List<String> _getProcessGlobalConfigSupportedPlatforms(
-    PlatformProcessGlobalConfigMethod method,
-  ) {
-    final platforms = <String>[];
-    for (final platform in [
-      'android',
-      'ios',
-      'macos',
-      'web',
-      'windows',
-      'linux',
-    ]) {
-      final targetPlatform = _getTargetPlatform(platform);
-      if (targetPlatform != null &&
-          ProcessGlobalConfig.isMethodSupported(
-            method,
-            platform: targetPlatform,
-          )) {
-        platforms.add(platform);
-      }
-    }
-    return platforms;
-  }
 
   @override
   void dispose() {
@@ -623,11 +475,6 @@ class _ServiceControllersScreenState extends State<ServiceControllersScreen> {
                 style: const TextStyle(color: Colors.white, fontSize: 10),
               ),
             ),
-            const SizedBox(width: 8),
-            Text(
-              '(Android)',
-              style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
-            ),
           ],
         ),
         children: [
@@ -641,27 +488,18 @@ class _ServiceControllersScreenState extends State<ServiceControllersScreen> {
                   _allowContentAccess,
                   (value) => _setAllowContentAccess(value),
                   _getAllowContentAccess,
-                  _getServiceWorkerSupportedPlatforms(
-                    PlatformServiceWorkerControllerMethod.setAllowContentAccess,
-                  ),
                 ),
                 _buildSwitchRow(
                   'Allow File Access',
                   _allowFileAccess,
                   (value) => _setAllowFileAccess(value),
                   _getAllowFileAccess,
-                  _getServiceWorkerSupportedPlatforms(
-                    PlatformServiceWorkerControllerMethod.setAllowFileAccess,
-                  ),
                 ),
                 _buildSwitchRow(
                   'Block Network Loads',
                   _blockNetworkLoads,
                   (value) => _setBlockNetworkLoads(value),
                   _getBlockNetworkLoads,
-                  _getServiceWorkerSupportedPlatforms(
-                    PlatformServiceWorkerControllerMethod.setBlockNetworkLoads,
-                  ),
                 ),
                 const Divider(),
 
@@ -699,13 +537,6 @@ class _ServiceControllersScreenState extends State<ServiceControllersScreen> {
                     ),
                   ],
                 ),
-                const SizedBox(height: 8),
-                SupportBadge(
-                  supportedPlatforms: _getServiceWorkerSupportedPlatforms(
-                    PlatformServiceWorkerControllerMethod.setCacheMode,
-                  ),
-                  currentPlatform: _currentPlatform,
-                ),
               ],
             ),
           ),
@@ -719,26 +550,19 @@ class _ServiceControllersScreenState extends State<ServiceControllersScreen> {
     bool value,
     Function(bool) onChanged,
     VoidCallback onRefresh,
-    List<String> supportedPlatforms,
   ) {
-    final isSupported = supportedPlatforms.contains(_currentPlatform);
-
     return Column(
       children: [
         Row(
           children: [
             Expanded(child: Text(label)),
-            Switch(value: value, onChanged: isSupported ? onChanged : null),
+            Switch(value: value, onChanged: onChanged),
             IconButton(
               icon: const Icon(Icons.refresh, size: 20),
-              onPressed: isSupported ? onRefresh : null,
+              onPressed: onRefresh,
               tooltip: 'Get current',
             ),
           ],
-        ),
-        SupportBadge(
-          supportedPlatforms: supportedPlatforms,
-          currentPlatform: _currentPlatform,
         ),
         const SizedBox(height: 8),
       ],
@@ -767,11 +591,6 @@ class _ServiceControllersScreenState extends State<ServiceControllersScreen> {
                 isSupported ? 'Supported' : 'Not Supported',
                 style: const TextStyle(color: Colors.white, fontSize: 10),
               ),
-            ),
-            const SizedBox(width: 8),
-            Text(
-              '(Android)',
-              style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
             ),
           ],
         ),
@@ -821,21 +640,12 @@ class _ServiceControllersScreenState extends State<ServiceControllersScreen> {
                 Row(
                   children: [
                     Expanded(
-                      child: _buildMethodButton(
-                        'Set Proxy',
-                        _getProxySupportedPlatforms(
-                          PlatformProxyControllerMethod.setProxyOverride,
-                        ),
-                        _setProxyOverride,
-                      ),
+                      child: _buildMethodButton('Set Proxy', _setProxyOverride),
                     ),
                     const SizedBox(width: 8),
                     Expanded(
                       child: _buildMethodButton(
                         'Clear Proxy',
-                        _getProxySupportedPlatforms(
-                          PlatformProxyControllerMethod.clearProxyOverride,
-                        ),
                         _clearProxyOverride,
                       ),
                     ),
@@ -871,11 +681,6 @@ class _ServiceControllersScreenState extends State<ServiceControllersScreen> {
                 isSupported ? 'Supported' : 'Not Supported',
                 style: const TextStyle(color: Colors.white, fontSize: 10),
               ),
-            ),
-            const SizedBox(width: 8),
-            Text(
-              '(Android)',
-              style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
             ),
           ],
         ),
@@ -919,9 +724,6 @@ class _ServiceControllersScreenState extends State<ServiceControllersScreen> {
                     Expanded(
                       child: _buildMethodButton(
                         'Start',
-                        _getTracingSupportedPlatforms(
-                          PlatformTracingControllerMethod.start,
-                        ),
                         !_isTracing ? _startTracing : null,
                       ),
                     ),
@@ -929,21 +731,12 @@ class _ServiceControllersScreenState extends State<ServiceControllersScreen> {
                     Expanded(
                       child: _buildMethodButton(
                         'Stop',
-                        _getTracingSupportedPlatforms(
-                          PlatformTracingControllerMethod.stop,
-                        ),
                         _isTracing ? _stopTracing : null,
                       ),
                     ),
                     const SizedBox(width: 8),
                     Expanded(
-                      child: _buildMethodButton(
-                        'Is Tracing',
-                        _getTracingSupportedPlatforms(
-                          PlatformTracingControllerMethod.isTracing,
-                        ),
-                        _checkIsTracing,
-                      ),
+                      child: _buildMethodButton('Is Tracing', _checkIsTracing),
                     ),
                   ],
                 ),
@@ -977,11 +770,6 @@ class _ServiceControllersScreenState extends State<ServiceControllersScreen> {
                 isSupported ? 'Supported' : 'Not Supported',
                 style: const TextStyle(color: Colors.white, fontSize: 10),
               ),
-            ),
-            const SizedBox(width: 8),
-            Text(
-              '(Windows, Linux)',
-              style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
             ),
           ],
         ),
@@ -1054,9 +842,6 @@ class _ServiceControllersScreenState extends State<ServiceControllersScreen> {
                     Expanded(
                       child: _buildMethodButton(
                         'Create',
-                        _getWebViewEnvironmentSupportedPlatforms(
-                          PlatformWebViewEnvironmentMethod.create,
-                        ),
                         _webViewEnvironment == null
                             ? _createWebViewEnvironment
                             : null,
@@ -1066,9 +851,6 @@ class _ServiceControllersScreenState extends State<ServiceControllersScreen> {
                     Expanded(
                       child: _buildMethodButton(
                         'Dispose',
-                        _getWebViewEnvironmentSupportedPlatforms(
-                          PlatformWebViewEnvironmentMethod.dispose,
-                        ),
                         _webViewEnvironment != null
                             ? _disposeWebViewEnvironment
                             : null,
@@ -1084,9 +866,6 @@ class _ServiceControllersScreenState extends State<ServiceControllersScreen> {
                     Expanded(
                       child: _buildMethodButton(
                         'Get Version',
-                        _getWebViewEnvironmentSupportedPlatforms(
-                          PlatformWebViewEnvironmentMethod.getAvailableVersion,
-                        ),
                         _getAvailableVersion,
                       ),
                     ),
@@ -1094,10 +873,6 @@ class _ServiceControllersScreenState extends State<ServiceControllersScreen> {
                     Expanded(
                       child: _buildMethodButton(
                         'Compare Versions',
-                        _getWebViewEnvironmentSupportedPlatforms(
-                          PlatformWebViewEnvironmentMethod
-                              .compareBrowserVersions,
-                        ),
                         _compareBrowserVersions,
                       ),
                     ),
@@ -1111,9 +886,6 @@ class _ServiceControllersScreenState extends State<ServiceControllersScreen> {
                     Expanded(
                       child: _buildMethodButton(
                         'Get Processes',
-                        _getWebViewEnvironmentSupportedPlatforms(
-                          PlatformWebViewEnvironmentMethod.getProcessInfos,
-                        ),
                         _webViewEnvironment != null ? _getProcessInfos : null,
                       ),
                     ),
@@ -1121,10 +893,6 @@ class _ServiceControllersScreenState extends State<ServiceControllersScreen> {
                     Expanded(
                       child: _buildMethodButton(
                         'Failure Folder',
-                        _getWebViewEnvironmentSupportedPlatforms(
-                          PlatformWebViewEnvironmentMethod
-                              .getFailureReportFolderPath,
-                        ),
                         _webViewEnvironment != null
                             ? _getFailureReportFolderPath
                             : null,
@@ -1191,11 +959,6 @@ class _ServiceControllersScreenState extends State<ServiceControllersScreen> {
                 style: const TextStyle(color: Colors.white, fontSize: 10),
               ),
             ),
-            const SizedBox(width: 8),
-            Text(
-              '(Android)',
-              style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
-            ),
           ],
         ),
         children: [
@@ -1237,9 +1000,6 @@ class _ServiceControllersScreenState extends State<ServiceControllersScreen> {
                   width: double.infinity,
                   child: _buildMethodButton(
                     'Apply Config',
-                    _getProcessGlobalConfigSupportedPlatforms(
-                      PlatformProcessGlobalConfigMethod.apply,
-                    ),
                     _applyProcessGlobalConfig,
                   ),
                 ),
@@ -1251,29 +1011,12 @@ class _ServiceControllersScreenState extends State<ServiceControllersScreen> {
     );
   }
 
-  Widget _buildMethodButton(
-    String label,
-    List<String> supportedPlatforms,
-    VoidCallback? onPressed,
-  ) {
-    final isSupported = supportedPlatforms.contains(_currentPlatform);
-    final canPress = isSupported && onPressed != null && !_isLoading;
+  Widget _buildMethodButton(String label, VoidCallback? onPressed) {
+    final canPress = onPressed != null && !_isLoading;
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        ElevatedButton(
-          onPressed: canPress ? onPressed : null,
-          child: Text(label, style: const TextStyle(fontSize: 12)),
-        ),
-        const SizedBox(height: 4),
-        Center(
-          child: SupportBadge(
-            supportedPlatforms: supportedPlatforms,
-            currentPlatform: _currentPlatform,
-          ),
-        ),
-      ],
+    return ElevatedButton(
+      onPressed: canPress ? onPressed : null,
+      child: Text(label, style: const TextStyle(fontSize: 12)),
     );
   }
 

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview_example/models/test_case.dart';
-import 'package:flutter_inappwebview_example/utils/constants.dart';
 
 /// Test status enum
 enum TestStatus { none, running, passed, failed }
@@ -118,10 +117,7 @@ class _TestCardState extends State<TestCard> {
             children: widget.testCase.supportedPlatforms
                 .map(
                   (p) => Chip(
-                    label: Text(
-                      platformNames[p] ?? p,
-                      style: const TextStyle(fontSize: 12),
-                    ),
+                    label: Text(p, style: const TextStyle(fontSize: 12)),
                     padding: const EdgeInsets.all(2),
                   ),
                 )

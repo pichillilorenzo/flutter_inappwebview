@@ -1,12 +1,10 @@
-import 'dart:io';
-
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_inappwebview_example/providers/settings_manager.dart';
 import 'package:flutter_inappwebview_example/models/settings_profile.dart';
-import 'package:flutter_inappwebview_example/widgets/common/support_badge.dart';
+import 'package:flutter_inappwebview_example/utils/platform_utils.dart';
+import 'package:flutter_inappwebview_example/utils/support_checker.dart';
 import 'package:flutter_inappwebview_example/main.dart';
 
 /// Comprehensive settings editor for InAppWebViewSettings
@@ -42,15 +40,7 @@ class _SettingsEditorScreenState extends State<SettingsEditorScreen> {
     super.dispose();
   }
 
-  String get _currentPlatform {
-    if (kIsWeb) return 'web';
-    if (Platform.isAndroid) return 'android';
-    if (Platform.isIOS) return 'ios';
-    if (Platform.isMacOS) return 'macos';
-    if (Platform.isWindows) return 'windows';
-    if (Platform.isLinux) return 'linux';
-    return 'unknown';
-  }
+  SupportedPlatform? get _currentPlatform => PlatformUtils.getCurrentPlatform();
 
   @override
   Widget build(BuildContext context) {
@@ -192,7 +182,9 @@ class _SettingsEditorScreenState extends State<SettingsEditorScreen> {
             ),
           ),
           Chip(
-            label: Text(_currentPlatform.toUpperCase()),
+            label: Text(
+              _currentPlatform?.displayName.toUpperCase() ?? 'UNKNOWN',
+            ),
             backgroundColor: Colors.blue.shade100,
             labelStyle: TextStyle(
               fontSize: 12,
@@ -252,9 +244,6 @@ class _SettingsEditorScreenState extends State<SettingsEditorScreen> {
 
     final isExpanded =
         _expandedCategories.contains(category) || _searchQuery.isNotEmpty;
-    final supportedCount = filteredSettings
-        .where((s) => s.isSupportedOnPlatform(_currentPlatform))
-        .length;
 
     return Card(
       margin: const EdgeInsets.only(bottom: 8),
@@ -284,7 +273,7 @@ class _SettingsEditorScreenState extends State<SettingsEditorScreen> {
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Text(
-                '$supportedCount/${filteredSettings.length}',
+                '${filteredSettings.length}',
                 style: TextStyle(fontSize: 12, color: Colors.grey.shade700),
               ),
             ),
@@ -305,103 +294,79 @@ class _SettingsEditorScreenState extends State<SettingsEditorScreen> {
     SettingDefinition setting,
     SettingsManager settingsManager,
   ) {
-    final isSupported = setting.isSupportedOnPlatform(_currentPlatform);
     final isModified = settingsManager.isSettingModified(setting.key);
     final currentValue = settingsManager.getSetting(setting.key);
 
-    return Opacity(
-      opacity: isSupported ? 1.0 : 0.5,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        decoration: BoxDecoration(
-          color: isModified ? Colors.orange.shade50 : null,
-          border: Border(bottom: BorderSide(color: Colors.grey.shade200)),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Flexible(
-                            child: Text(
-                              setting.name,
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      decoration: BoxDecoration(
+        color: isModified ? Colors.orange.shade50 : null,
+        border: Border(bottom: BorderSide(color: Colors.grey.shade200)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Flexible(
+                          child: Text(
+                            setting.name,
+                            style: const TextStyle(
+                              fontWeight: FontWeight.w600,
+                              color: Colors.black87,
+                            ),
+                          ),
+                        ),
+                        if (isModified) ...[
+                          const SizedBox(width: 8),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 6,
+                              vertical: 2,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.orange.shade200,
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                            child: const Text(
+                              'Modified',
                               style: TextStyle(
-                                fontWeight: FontWeight.w600,
-                                color: isSupported
-                                    ? Colors.black87
-                                    : Colors.grey,
+                                fontSize: 10,
+                                fontWeight: FontWeight.bold,
                               ),
                             ),
                           ),
-                          if (isModified) ...[
-                            const SizedBox(width: 8),
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 6,
-                                vertical: 2,
-                              ),
-                              decoration: BoxDecoration(
-                                color: Colors.orange.shade200,
-                                borderRadius: BorderRadius.circular(4),
-                              ),
-                              child: const Text(
-                                'Modified',
-                                style: TextStyle(
-                                  fontSize: 10,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
-                          ],
                         ],
+                      ],
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      setting.description,
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Colors.grey.shade600,
                       ),
-                      const SizedBox(height: 4),
-                      Text(
-                        setting.description,
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: Colors.grey.shade600,
-                        ),
-                      ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
-                if (isModified)
-                  IconButton(
-                    icon: const Icon(Icons.restore, size: 20),
-                    tooltip: 'Reset to default',
-                    onPressed: isSupported
-                        ? () => settingsManager.resetSetting(setting.key)
-                        : null,
-                  ),
-              ],
-            ),
-            const SizedBox(height: 8),
-            Row(
-              children: [
-                Expanded(
-                  child: SupportBadge(
-                    supportedPlatforms: setting.platforms,
-                    currentPlatform: _currentPlatform,
-                  ),
+              ),
+              if (isModified)
+                IconButton(
+                  icon: const Icon(Icons.restore, size: 20),
+                  tooltip: 'Reset to default',
+                  onPressed: () => settingsManager.resetSetting(setting.key),
                 ),
-                const SizedBox(width: 16),
-                _buildSettingControl(
-                  setting,
-                  currentValue,
-                  isSupported,
-                  settingsManager,
-                ),
-              ],
-            ),
-          ],
-        ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          _buildSettingControl(setting, currentValue, settingsManager),
+        ],
       ),
     );
   }
@@ -409,16 +374,14 @@ class _SettingsEditorScreenState extends State<SettingsEditorScreen> {
   Widget _buildSettingControl(
     SettingDefinition setting,
     dynamic currentValue,
-    bool isSupported,
     SettingsManager settingsManager,
   ) {
     switch (setting.type) {
       case SettingType.boolean:
         return Switch(
           value: currentValue ?? setting.defaultValue ?? false,
-          onChanged: isSupported
-              ? (value) => settingsManager.updateSetting(setting.key, value)
-              : null,
+          onChanged: (value) =>
+              settingsManager.updateSetting(setting.key, value),
         );
 
       case SettingType.string:
@@ -428,7 +391,6 @@ class _SettingsEditorScreenState extends State<SettingsEditorScreen> {
             controller: TextEditingController(
               text: currentValue?.toString() ?? '',
             ),
-            enabled: isSupported,
             decoration: const InputDecoration(
               isDense: true,
               contentPadding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
@@ -447,7 +409,6 @@ class _SettingsEditorScreenState extends State<SettingsEditorScreen> {
             controller: TextEditingController(
               text: currentValue?.toString() ?? '',
             ),
-            enabled: isSupported,
             keyboardType: TextInputType.number,
             inputFormatters: [FilteringTextInputFormatter.digitsOnly],
             decoration: const InputDecoration(
@@ -472,7 +433,6 @@ class _SettingsEditorScreenState extends State<SettingsEditorScreen> {
             controller: TextEditingController(
               text: currentValue?.toString() ?? '',
             ),
-            enabled: isSupported,
             keyboardType: const TextInputType.numberWithOptions(decimal: true),
             decoration: const InputDecoration(
               isDense: true,
@@ -507,9 +467,8 @@ class _SettingsEditorScreenState extends State<SettingsEditorScreen> {
               );
             }),
           ],
-          onChanged: isSupported
-              ? (value) => settingsManager.updateSetting(setting.key, value)
-              : null,
+          onChanged: (value) =>
+              settingsManager.updateSetting(setting.key, value),
         );
     }
   }

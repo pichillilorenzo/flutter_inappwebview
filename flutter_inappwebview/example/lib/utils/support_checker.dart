@@ -1872,7 +1872,7 @@ class SupportChecker {
     return ApiClassDefinition(
       className: 'ChromeSafariBrowser',
       description:
-          'Chrome Custom Tabs (Android) / SFSafariViewController (iOS/macOS).',
+          'A browser using Chrome Custom Tabs or SFSafariViewController.',
       isClassSupported: () => ChromeSafariBrowser.isClassSupported(),
       methods: [
         ApiMethodDefinition(

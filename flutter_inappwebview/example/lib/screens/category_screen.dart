@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../utils/constants.dart';
+import '../utils/support_checker.dart';
 import '../models/test_case.dart';
 import '../utils/test_registry.dart';
 import '../widgets/common/test_card.dart';
@@ -16,7 +17,7 @@ class CategoryScreen extends StatefulWidget {
 }
 
 class _CategoryScreenState extends State<CategoryScreen> {
-  List<String> _selectedPlatforms = [];
+  List<SupportedPlatform> _selectedPlatforms = [];
 
   @override
   Widget build(BuildContext context) {
@@ -44,7 +45,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    'Filtered: ${_selectedPlatforms.join(", ")}',
+                    'Filtered: ${_selectedPlatforms.map((p) => p.displayName).join(", ")}',
                     style: TextStyle(
                       color: Theme.of(context).primaryColor,
                       fontWeight: FontWeight.bold,
@@ -106,7 +107,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
 
     return tests.where((test) {
       return _selectedPlatforms.any(
-        (platform) => test.supportedPlatforms.contains(platform),
+        (platform) => test.supportedPlatforms.contains(platform.name),
       );
     }).toList();
   }

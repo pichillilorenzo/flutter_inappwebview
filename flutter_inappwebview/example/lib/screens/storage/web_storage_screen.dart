@@ -1,10 +1,6 @@
-import 'dart:io';
-
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_inappwebview_example/main.dart';
-import 'package:flutter_inappwebview_example/widgets/common/support_badge.dart';
 
 /// Screen for testing WebStorage (localStorage and sessionStorage) functionality
 class WebStorageScreen extends StatefulWidget {
@@ -32,56 +28,6 @@ class _WebStorageScreenState extends State<WebStorageScreen>
   final TextEditingController _urlController = TextEditingController(
     text: 'https://example.com',
   );
-
-  String get _currentPlatform {
-    if (kIsWeb) return 'web';
-    if (Platform.isAndroid) return 'android';
-    if (Platform.isIOS) return 'ios';
-    if (Platform.isMacOS) return 'macos';
-    if (Platform.isWindows) return 'windows';
-    if (Platform.isLinux) return 'linux';
-    return 'unknown';
-  }
-
-  List<String> _getSupportedPlatformsForMethod(
-    PlatformLocalStorageMethod method,
-  ) {
-    final platforms = <String>[];
-    for (final platform in [
-      'android',
-      'ios',
-      'macos',
-      'web',
-      'windows',
-      'linux',
-    ]) {
-      final targetPlatform = _getTargetPlatform(platform);
-      if (targetPlatform != null &&
-          LocalStorage.isMethodSupported(method, platform: targetPlatform)) {
-        platforms.add(platform);
-      } else if (platform == 'web' && LocalStorage.isMethodSupported(method)) {
-        if (kIsWeb) platforms.add(platform);
-      }
-    }
-    return platforms;
-  }
-
-  TargetPlatform? _getTargetPlatform(String platform) {
-    switch (platform) {
-      case 'android':
-        return TargetPlatform.android;
-      case 'ios':
-        return TargetPlatform.iOS;
-      case 'macos':
-        return TargetPlatform.macOS;
-      case 'windows':
-        return TargetPlatform.windows;
-      case 'linux':
-        return TargetPlatform.linux;
-      default:
-        return null;
-    }
-  }
 
   @override
   void initState() {
@@ -676,45 +622,23 @@ class _WebStorageScreenState extends State<WebStorageScreen>
     PlatformLocalStorageMethod method,
     VoidCallback? onPressed,
   ) {
-    final supportedPlatforms = _getSupportedPlatformsForMethod(method);
-    final isSupported = supportedPlatforms.contains(_currentPlatform);
-
     return Card(
       margin: const EdgeInsets.only(bottom: 8),
       child: ListTile(
         title: Text(
           methodName,
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            color: isSupported ? Colors.black : Colors.grey,
-          ),
+          style: const TextStyle(fontWeight: FontWeight.bold),
         ),
-        subtitle: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              description,
-              style: TextStyle(
-                fontSize: 12,
-                color: isSupported ? Colors.grey.shade600 : Colors.grey,
-              ),
-            ),
-            const SizedBox(height: 4),
-            SupportBadge(
-              supportedPlatforms: supportedPlatforms,
-              currentPlatform: _currentPlatform,
-            ),
-          ],
+        subtitle: Text(
+          description,
+          style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
         ),
         trailing: onPressed != null
             ? ElevatedButton(
-                onPressed: isSupported && !_isLoading && _webViewReady
-                    ? onPressed
-                    : null,
+                onPressed: !_isLoading && _webViewReady ? onPressed : null,
                 child: const Text('Run'),
               )
             : null,
-        isThreeLine: true,
       ),
     );
   }

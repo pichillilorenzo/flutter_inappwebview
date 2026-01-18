@@ -120,7 +120,8 @@ class _JavaScriptConsoleWidgetState extends State<JavaScriptConsoleWidget> {
               const SizedBox(width: 8),
               Expanded(
                 child: ElevatedButton(
-                  onPressed: _codeController.text.trim().isEmpty ||
+                  onPressed:
+                      _codeController.text.trim().isEmpty ||
                           _isExecuting ||
                           widget.onExecuteAsync == null
                       ? null
@@ -194,10 +195,7 @@ class _JavaScriptConsoleWidgetState extends State<JavaScriptConsoleWidget> {
               ),
               child: Text(
                 result.code,
-                style: const TextStyle(
-                  fontSize: 12,
-                  fontFamily: 'monospace',
-                ),
+                style: const TextStyle(fontSize: 12, fontFamily: 'monospace'),
               ),
             ),
             const SizedBox(height: 8),
@@ -211,16 +209,16 @@ class _JavaScriptConsoleWidgetState extends State<JavaScriptConsoleWidget> {
                 ),
                 child: Row(
                   children: [
-                    const Icon(Icons.error_outline,
-                        color: Colors.red, size: 16),
+                    const Icon(
+                      Icons.error_outline,
+                      color: Colors.red,
+                      size: 16,
+                    ),
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
                         'Error: ${result.error}',
-                        style: const TextStyle(
-                          fontSize: 12,
-                          color: Colors.red,
-                        ),
+                        style: const TextStyle(fontSize: 12, color: Colors.red),
                       ),
                     ),
                   ],
@@ -275,22 +273,26 @@ class _JavaScriptConsoleWidgetState extends State<JavaScriptConsoleWidget> {
           : await widget.onExecute(code);
 
       setState(() {
-        _history.add(JsExecutionResult(
-          code: code,
-          timestamp: DateTime.now(),
-          result: result,
-          isAsync: isAsync,
-        ));
+        _history.add(
+          JsExecutionResult(
+            code: code,
+            timestamp: DateTime.now(),
+            result: result,
+            isAsync: isAsync,
+          ),
+        );
         _isExecuting = false;
       });
     } catch (e) {
       setState(() {
-        _history.add(JsExecutionResult(
-          code: code,
-          timestamp: DateTime.now(),
-          error: e.toString(),
-          isAsync: isAsync,
-        ));
+        _history.add(
+          JsExecutionResult(
+            code: code,
+            timestamp: DateTime.now(),
+            error: e.toString(),
+            isAsync: isAsync,
+          ),
+        );
         _isExecuting = false;
       });
     }

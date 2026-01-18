@@ -949,13 +949,13 @@ class _ControllersScreenState extends State<ControllersScreen> {
                       enabled: false,
                     ),
                     _buildMethodChip(
-                      'restart (Android)',
+                      'restart',
                       ['android'],
                       null,
                       enabled: false,
                     ),
                     _buildMethodChip(
-                      'dismiss (iOS/macOS)',
+                      'dismiss',
                       ['ios', 'macos'],
                       null,
                       enabled: false,

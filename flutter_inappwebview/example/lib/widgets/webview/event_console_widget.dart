@@ -122,10 +122,7 @@ class _EventConsoleWidgetState extends State<EventConsoleWidget> {
             style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold),
           ),
         ),
-        title: Text(
-          event.message,
-          style: const TextStyle(fontSize: 14),
-        ),
+        title: Text(event.message, style: const TextStyle(fontSize: 14)),
         subtitle: Text(
           timeFormat.format(event.timestamp),
           style: TextStyle(fontSize: 12, color: Colors.grey.shade600),

@@ -461,7 +461,6 @@ class SettingsManager extends ChangeNotifier {
           description: 'Enable JavaScript execution in the WebView',
           type: SettingType.boolean,
           defaultValue: true,
-          platforms: ['android', 'ios', 'macos', 'web', 'windows'],
         ),
         SettingDefinition(
           key: 'userAgent',
@@ -469,7 +468,6 @@ class SettingsManager extends ChangeNotifier {
           description: 'Custom user-agent string for the WebView',
           type: SettingType.string,
           defaultValue: '',
-          platforms: ['android', 'ios', 'macos', 'windows'],
         ),
         SettingDefinition(
           key: 'applicationNameForUserAgent',
@@ -477,7 +475,6 @@ class SettingsManager extends ChangeNotifier {
           description: 'Append to the existing user-agent',
           type: SettingType.string,
           defaultValue: '',
-          platforms: ['android', 'ios', 'macos'],
         ),
         SettingDefinition(
           key: 'cacheEnabled',
@@ -485,7 +482,6 @@ class SettingsManager extends ChangeNotifier {
           description: 'Enable browser caching',
           type: SettingType.boolean,
           defaultValue: true,
-          platforms: ['android', 'ios', 'macos'],
         ),
         SettingDefinition(
           key: 'incognito',
@@ -493,7 +489,6 @@ class SettingsManager extends ChangeNotifier {
           description: 'Open browser in incognito/private mode',
           type: SettingType.boolean,
           defaultValue: false,
-          platforms: ['android', 'ios', 'macos', 'windows', 'linux'],
         ),
         SettingDefinition(
           key: 'supportZoom',
@@ -501,7 +496,6 @@ class SettingsManager extends ChangeNotifier {
           description: 'Enable zoom gestures and controls',
           type: SettingType.boolean,
           defaultValue: true,
-          platforms: ['android', 'ios', 'macos', 'windows'],
         ),
       ],
       'Layout': [
@@ -511,7 +505,6 @@ class SettingsManager extends ChangeNotifier {
           description: 'Enable support for HTML viewport meta tag',
           type: SettingType.boolean,
           defaultValue: true,
-          platforms: ['android'],
         ),
         SettingDefinition(
           key: 'loadWithOverviewMode',
@@ -519,7 +512,6 @@ class SettingsManager extends ChangeNotifier {
           description: 'Zoom out content to fit on screen',
           type: SettingType.boolean,
           defaultValue: true,
-          platforms: ['android'],
         ),
         SettingDefinition(
           key: 'minimumFontSize',
@@ -527,7 +519,6 @@ class SettingsManager extends ChangeNotifier {
           description: 'Minimum font size in pixels',
           type: SettingType.integer,
           defaultValue: 8,
-          platforms: ['android', 'ios', 'macos'],
         ),
         SettingDefinition(
           key: 'defaultFontSize',
@@ -535,7 +526,6 @@ class SettingsManager extends ChangeNotifier {
           description: 'Default font size in pixels',
           type: SettingType.integer,
           defaultValue: 16,
-          platforms: ['android', 'linux'],
         ),
         SettingDefinition(
           key: 'defaultTextEncodingName',
@@ -543,7 +533,6 @@ class SettingsManager extends ChangeNotifier {
           description: 'Default text encoding for HTML pages',
           type: SettingType.string,
           defaultValue: 'UTF-8',
-          platforms: ['android', 'linux'],
         ),
       ],
       'Content': [
@@ -553,7 +542,6 @@ class SettingsManager extends ChangeNotifier {
           description: 'Enable content URL access',
           type: SettingType.boolean,
           defaultValue: true,
-          platforms: ['android'],
         ),
         SettingDefinition(
           key: 'allowFileAccess',
@@ -561,7 +549,6 @@ class SettingsManager extends ChangeNotifier {
           description: 'Enable file system access',
           type: SettingType.boolean,
           defaultValue: true,
-          platforms: ['android'],
         ),
         SettingDefinition(
           key: 'allowFileAccessFromFileURLs',
@@ -569,7 +556,6 @@ class SettingsManager extends ChangeNotifier {
           description: 'Allow file:// URLs to access other file:// URLs',
           type: SettingType.boolean,
           defaultValue: false,
-          platforms: ['android', 'ios', 'macos', 'linux'],
         ),
         SettingDefinition(
           key: 'allowUniversalAccessFromFileURLs',
@@ -577,7 +563,6 @@ class SettingsManager extends ChangeNotifier {
           description: 'Allow file:// URLs to access any origin',
           type: SettingType.boolean,
           defaultValue: false,
-          platforms: ['android', 'ios', 'macos', 'linux'],
         ),
         SettingDefinition(
           key: 'blockNetworkImage',
@@ -585,7 +570,6 @@ class SettingsManager extends ChangeNotifier {
           description: 'Block loading images from the network',
           type: SettingType.boolean,
           defaultValue: false,
-          platforms: ['android'],
         ),
         SettingDefinition(
           key: 'blockNetworkLoads',
@@ -593,7 +577,6 @@ class SettingsManager extends ChangeNotifier {
           description: 'Block all network resource loading',
           type: SettingType.boolean,
           defaultValue: false,
-          platforms: ['android'],
         ),
       ],
       'Media': [
@@ -603,7 +586,6 @@ class SettingsManager extends ChangeNotifier {
           description: 'Require user interaction to play media',
           type: SettingType.boolean,
           defaultValue: true,
-          platforms: ['android', 'ios', 'macos'],
         ),
         SettingDefinition(
           key: 'allowsInlineMediaPlayback',
@@ -611,7 +593,6 @@ class SettingsManager extends ChangeNotifier {
           description: 'Allow HTML5 media to play inline',
           type: SettingType.boolean,
           defaultValue: false,
-          platforms: ['ios', 'linux'],
         ),
         SettingDefinition(
           key: 'allowsAirPlayForMediaPlayback',
@@ -619,7 +600,6 @@ class SettingsManager extends ChangeNotifier {
           description: 'Allow AirPlay for media playback',
           type: SettingType.boolean,
           defaultValue: true,
-          platforms: ['ios', 'macos'],
         ),
         SettingDefinition(
           key: 'allowsPictureInPictureMediaPlayback',
@@ -627,7 +607,6 @@ class SettingsManager extends ChangeNotifier {
           description: 'Allow videos to play in picture-in-picture',
           type: SettingType.boolean,
           defaultValue: true,
-          platforms: ['ios'],
         ),
         SettingDefinition(
           key: 'automaticallyAdjustsScrollIndicatorInsets',
@@ -635,7 +614,6 @@ class SettingsManager extends ChangeNotifier {
           description: 'Automatically adjust scroll indicator insets',
           type: SettingType.boolean,
           defaultValue: false,
-          platforms: ['ios'],
         ),
       ],
       'JavaScript': [
@@ -645,7 +623,6 @@ class SettingsManager extends ChangeNotifier {
           description: 'Allow JavaScript to open windows automatically',
           type: SettingType.boolean,
           defaultValue: false,
-          platforms: ['android', 'ios', 'macos', 'web'],
         ),
         SettingDefinition(
           key: 'javaScriptBridgeEnabled',
@@ -653,7 +630,6 @@ class SettingsManager extends ChangeNotifier {
           description: 'Enable the JavaScript bridge',
           type: SettingType.boolean,
           defaultValue: true,
-          platforms: ['android', 'ios', 'macos', 'windows', 'web'],
         ),
         SettingDefinition(
           key: 'javaScriptBridgeForMainFrameOnly',
@@ -661,7 +637,6 @@ class SettingsManager extends ChangeNotifier {
           description: 'Restrict JavaScript bridge to main frame',
           type: SettingType.boolean,
           defaultValue: false,
-          platforms: ['android', 'ios', 'macos', 'windows'],
         ),
       ],
       'Security': [
@@ -671,7 +646,6 @@ class SettingsManager extends ChangeNotifier {
           description: 'How to handle mixed HTTP/HTTPS content',
           type: SettingType.enumeration,
           defaultValue: null,
-          platforms: ['android'],
           enumValues: {
             'Always Allow': MixedContentMode.MIXED_CONTENT_ALWAYS_ALLOW
                 .toNativeValue(),
@@ -688,7 +662,6 @@ class SettingsManager extends ChangeNotifier {
           description: 'Enable request interception events',
           type: SettingType.boolean,
           defaultValue: false,
-          platforms: ['android'],
         ),
         SettingDefinition(
           key: 'useShouldOverrideUrlLoading',
@@ -696,7 +669,6 @@ class SettingsManager extends ChangeNotifier {
           description: 'Enable URL loading override events',
           type: SettingType.boolean,
           defaultValue: false,
-          platforms: ['android', 'ios', 'macos', 'windows'],
         ),
         SettingDefinition(
           key: 'useOnLoadResource',
@@ -704,7 +676,6 @@ class SettingsManager extends ChangeNotifier {
           description: 'Enable resource loading events',
           type: SettingType.boolean,
           defaultValue: false,
-          platforms: ['android', 'ios', 'macos', 'linux'],
         ),
       ],
       'Cache': [
@@ -714,7 +685,6 @@ class SettingsManager extends ChangeNotifier {
           description: 'Override the way the cache is used',
           type: SettingType.enumeration,
           defaultValue: CacheMode.LOAD_DEFAULT.toNativeValue(),
-          platforms: ['android'],
           enumValues: {
             'Default': CacheMode.LOAD_DEFAULT.toNativeValue(),
             'Cache Else Network': CacheMode.LOAD_CACHE_ELSE_NETWORK
@@ -731,7 +701,6 @@ class SettingsManager extends ChangeNotifier {
           description: 'Make the WebView background transparent',
           type: SettingType.boolean,
           defaultValue: false,
-          platforms: ['android', 'ios', 'macos', 'windows'],
         ),
         SettingDefinition(
           key: 'verticalScrollBarEnabled',
@@ -739,7 +708,6 @@ class SettingsManager extends ChangeNotifier {
           description: 'Show vertical scroll bar',
           type: SettingType.boolean,
           defaultValue: true,
-          platforms: ['android', 'ios', 'web'],
         ),
         SettingDefinition(
           key: 'horizontalScrollBarEnabled',
@@ -747,7 +715,6 @@ class SettingsManager extends ChangeNotifier {
           description: 'Show horizontal scroll bar',
           type: SettingType.boolean,
           defaultValue: true,
-          platforms: ['android', 'ios', 'web'],
         ),
         SettingDefinition(
           key: 'scrollbarFadingEnabled',
@@ -755,7 +722,6 @@ class SettingsManager extends ChangeNotifier {
           description: 'Fade scrollbars when not scrolling',
           type: SettingType.boolean,
           defaultValue: true,
-          platforms: ['android'],
         ),
         SettingDefinition(
           key: 'disableVerticalScroll',
@@ -763,7 +729,6 @@ class SettingsManager extends ChangeNotifier {
           description: 'Disable vertical scrolling',
           type: SettingType.boolean,
           defaultValue: false,
-          platforms: ['android', 'ios', 'web'],
         ),
         SettingDefinition(
           key: 'disableHorizontalScroll',
@@ -771,7 +736,6 @@ class SettingsManager extends ChangeNotifier {
           description: 'Disable horizontal scrolling',
           type: SettingType.boolean,
           defaultValue: false,
-          platforms: ['android', 'ios', 'web'],
         ),
         SettingDefinition(
           key: 'disableContextMenu',
@@ -779,17 +743,15 @@ class SettingsManager extends ChangeNotifier {
           description: 'Disable the long-press context menu',
           type: SettingType.boolean,
           defaultValue: false,
-          platforms: ['android', 'ios', 'web', 'windows'],
         ),
       ],
-      'iOS/macOS Specific': [
+      'iOS/macOS': [
         SettingDefinition(
           key: 'allowsBackForwardNavigationGestures',
           name: 'Back/Forward Gestures',
           description: 'Enable swipe gestures for navigation',
           type: SettingType.boolean,
           defaultValue: true,
-          platforms: ['ios', 'macos', 'windows'],
         ),
         SettingDefinition(
           key: 'isFraudulentWebsiteWarningEnabled',
@@ -797,7 +759,6 @@ class SettingsManager extends ChangeNotifier {
           description: 'Show warnings for suspected phishing/malware',
           type: SettingType.boolean,
           defaultValue: true,
-          platforms: ['ios', 'macos'],
         ),
         SettingDefinition(
           key: 'suppressesIncrementalRendering',
@@ -805,7 +766,6 @@ class SettingsManager extends ChangeNotifier {
           description: 'Wait until content is fully loaded before rendering',
           type: SettingType.boolean,
           defaultValue: false,
-          platforms: ['ios', 'macos'],
         ),
         SettingDefinition(
           key: 'ignoresViewportScaleLimits',
@@ -813,7 +773,6 @@ class SettingsManager extends ChangeNotifier {
           description: 'Override user-scalable viewport setting',
           type: SettingType.boolean,
           defaultValue: false,
-          platforms: ['ios'],
         ),
         SettingDefinition(
           key: 'allowsLinkPreview',
@@ -821,17 +780,15 @@ class SettingsManager extends ChangeNotifier {
           description: 'Show link previews on long press',
           type: SettingType.boolean,
           defaultValue: true,
-          platforms: ['ios', 'macos'],
         ),
       ],
-      'Android Specific': [
+      'Android': [
         SettingDefinition(
           key: 'hardwareAcceleration',
           name: 'Hardware Acceleration',
           description: 'Enable hardware acceleration',
           type: SettingType.boolean,
           defaultValue: true,
-          platforms: ['android'],
         ),
         SettingDefinition(
           key: 'useHybridComposition',
@@ -839,7 +796,6 @@ class SettingsManager extends ChangeNotifier {
           description: 'Use Flutter Hybrid Composition',
           type: SettingType.boolean,
           defaultValue: true,
-          platforms: ['android'],
         ),
         SettingDefinition(
           key: 'thirdPartyCookiesEnabled',
@@ -847,7 +803,6 @@ class SettingsManager extends ChangeNotifier {
           description: 'Allow third-party cookies',
           type: SettingType.boolean,
           defaultValue: true,
-          platforms: ['android'],
         ),
         SettingDefinition(
           key: 'domStorageEnabled',
@@ -855,7 +810,6 @@ class SettingsManager extends ChangeNotifier {
           description: 'Enable DOM local storage',
           type: SettingType.boolean,
           defaultValue: true,
-          platforms: ['android', 'linux'],
         ),
         SettingDefinition(
           key: 'databaseEnabled',
@@ -863,7 +817,6 @@ class SettingsManager extends ChangeNotifier {
           description: 'Enable database storage API',
           type: SettingType.boolean,
           defaultValue: true,
-          platforms: ['android', 'linux'],
         ),
         SettingDefinition(
           key: 'geolocationEnabled',
@@ -871,7 +824,6 @@ class SettingsManager extends ChangeNotifier {
           description: 'Enable Geolocation API',
           type: SettingType.boolean,
           defaultValue: true,
-          platforms: ['android'],
         ),
         SettingDefinition(
           key: 'safeBrowsingEnabled',
@@ -879,7 +831,6 @@ class SettingsManager extends ChangeNotifier {
           description: 'Enable Google Safe Browsing',
           type: SettingType.boolean,
           defaultValue: true,
-          platforms: ['android'],
         ),
         SettingDefinition(
           key: 'builtInZoomControls',
@@ -887,7 +838,6 @@ class SettingsManager extends ChangeNotifier {
           description: 'Use built-in zoom controls',
           type: SettingType.boolean,
           defaultValue: true,
-          platforms: ['android'],
         ),
         SettingDefinition(
           key: 'displayZoomControls',
@@ -895,17 +845,15 @@ class SettingsManager extends ChangeNotifier {
           description: 'Show on-screen zoom controls',
           type: SettingType.boolean,
           defaultValue: false,
-          platforms: ['android'],
         ),
       ],
-      'Windows Specific': [
+      'Windows': [
         SettingDefinition(
           key: 'generalAutofillEnabled',
           name: 'General Autofill',
           description: 'Enable autofill for forms',
           type: SettingType.boolean,
           defaultValue: true,
-          platforms: ['windows'],
         ),
         SettingDefinition(
           key: 'passwordAutosaveEnabled',
@@ -913,7 +861,6 @@ class SettingsManager extends ChangeNotifier {
           description: 'Enable password autosave',
           type: SettingType.boolean,
           defaultValue: false,
-          platforms: ['windows'],
         ),
         SettingDefinition(
           key: 'pinchZoomEnabled',
@@ -921,7 +868,6 @@ class SettingsManager extends ChangeNotifier {
           description: 'Enable pinch-to-zoom gesture',
           type: SettingType.boolean,
           defaultValue: true,
-          platforms: ['windows'],
         ),
         SettingDefinition(
           key: 'statusBarEnabled',
@@ -929,7 +875,6 @@ class SettingsManager extends ChangeNotifier {
           description: 'Show status bar',
           type: SettingType.boolean,
           defaultValue: true,
-          platforms: ['windows'],
         ),
         SettingDefinition(
           key: 'browserAcceleratorKeysEnabled',
@@ -937,7 +882,6 @@ class SettingsManager extends ChangeNotifier {
           description: 'Enable browser keyboard shortcuts',
           type: SettingType.boolean,
           defaultValue: true,
-          platforms: ['windows'],
         ),
         SettingDefinition(
           key: 'isInspectable',
@@ -945,7 +889,6 @@ class SettingsManager extends ChangeNotifier {
           description: 'Allow Web Inspector/DevTools',
           type: SettingType.boolean,
           defaultValue: false,
-          platforms: ['ios', 'macos', 'windows'],
         ),
       ],
     };
@@ -962,7 +905,6 @@ class SettingDefinition {
   final String description;
   final SettingType type;
   final dynamic defaultValue;
-  final List<String> platforms;
   final Map<String, dynamic>? enumValues;
 
   const SettingDefinition({
@@ -971,11 +913,6 @@ class SettingDefinition {
     required this.description,
     required this.type,
     required this.defaultValue,
-    required this.platforms,
     this.enumValues,
   });
-
-  bool isSupportedOnPlatform(String platform) {
-    return platforms.contains(platform);
-  }
 }

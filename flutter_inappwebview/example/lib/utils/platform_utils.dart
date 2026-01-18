@@ -1,6 +1,7 @@
 import 'dart:io' show Platform;
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
+import 'package:flutter_inappwebview_example/utils/support_checker.dart';
 
 /// Utility class for platform detection and information.
 class PlatformUtils {
@@ -25,6 +26,30 @@ class PlatformUtils {
       return 'Linux';
     }
     return 'Unknown';
+  }
+
+  /// Gets the current platform as a [SupportedPlatform] enum value.
+  /// Returns null if the current platform is not recognized.
+  static SupportedPlatform? getCurrentPlatform() {
+    if (kIsWeb) {
+      return SupportedPlatform.web;
+    }
+    if (Platform.isAndroid) {
+      return SupportedPlatform.android;
+    }
+    if (Platform.isIOS) {
+      return SupportedPlatform.ios;
+    }
+    if (Platform.isMacOS) {
+      return SupportedPlatform.macos;
+    }
+    if (Platform.isWindows) {
+      return SupportedPlatform.windows;
+    }
+    if (Platform.isLinux) {
+      return SupportedPlatform.linux;
+    }
+    return null;
   }
 
   /// Gets the Flutter SDK version.

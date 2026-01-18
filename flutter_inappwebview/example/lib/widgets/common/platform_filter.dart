@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_inappwebview_example/utils/constants.dart';
+import 'package:flutter_inappwebview_example/utils/support_checker.dart';
 
 /// Widget for filtering tests by platform with checkboxes
 class PlatformFilter extends StatelessWidget {
-  final List<String> selectedPlatforms;
-  final Function(List<String>) onChanged;
+  final List<SupportedPlatform> selectedPlatforms;
+  final Function(List<SupportedPlatform>) onChanged;
 
   const PlatformFilter({
     super.key,
@@ -16,14 +16,16 @@ class PlatformFilter extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       mainAxisSize: MainAxisSize.min,
-      children: allPlatforms.map((platform) {
+      children: SupportedPlatform.values.map((platform) {
         final isSelected = selectedPlatforms.contains(platform);
 
         return CheckboxListTile(
-          title: Text(platformNames[platform]!),
+          title: Text(platform.displayName),
           value: isSelected,
           onChanged: (bool? checked) {
-            final newSelection = List<String>.from(selectedPlatforms);
+            final newSelection = List<SupportedPlatform>.from(
+              selectedPlatforms,
+            );
 
             if (checked == true) {
               if (!newSelection.contains(platform)) {

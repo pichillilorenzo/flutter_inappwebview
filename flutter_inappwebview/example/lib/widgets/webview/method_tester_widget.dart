@@ -1,10 +1,7 @@
 import 'dart:convert';
-import 'dart:io';
 import 'dart:typed_data';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
-import '../common/support_badge.dart';
 
 /// Method entry for a single controller method
 class MethodEntry {
@@ -225,7 +222,7 @@ class _MethodTesterWidgetState extends State<MethodTesterWidget> {
           ),
           MethodEntry(
             name: 'loadSimulatedRequest',
-            description: 'Loads simulated request (iOS/macOS)',
+            description: 'Loads simulated request',
             methodEnum:
                 PlatformInAppWebViewControllerMethod.loadSimulatedRequest,
             execute: (controller) async {
@@ -650,7 +647,7 @@ class _MethodTesterWidgetState extends State<MethodTesterWidget> {
           ),
           MethodEntry(
             name: 'pageDown',
-            description: 'Scrolls page down (Android)',
+            description: 'Scrolls page down',
             methodEnum: PlatformInAppWebViewControllerMethod.pageDown,
             execute: (controller) async {
               return await controller.pageDown(bottom: false);
@@ -658,7 +655,7 @@ class _MethodTesterWidgetState extends State<MethodTesterWidget> {
           ),
           MethodEntry(
             name: 'pageUp',
-            description: 'Scrolls page up (Android)',
+            description: 'Scrolls page up',
             methodEnum: PlatformInAppWebViewControllerMethod.pageUp,
             execute: (controller) async {
               return await controller.pageUp(top: false);
@@ -683,7 +680,7 @@ class _MethodTesterWidgetState extends State<MethodTesterWidget> {
           ),
           MethodEntry(
             name: 'zoomIn',
-            description: 'Zooms in (Android)',
+            description: 'Zooms in',
             methodEnum: PlatformInAppWebViewControllerMethod.zoomIn,
             execute: (controller) async {
               return await controller.zoomIn();
@@ -691,7 +688,7 @@ class _MethodTesterWidgetState extends State<MethodTesterWidget> {
           ),
           MethodEntry(
             name: 'zoomOut',
-            description: 'Zooms out (Android)',
+            description: 'Zooms out',
             methodEnum: PlatformInAppWebViewControllerMethod.zoomOut,
             execute: (controller) async {
               return await controller.zoomOut();
@@ -798,7 +795,7 @@ class _MethodTesterWidgetState extends State<MethodTesterWidget> {
           ),
           MethodEntry(
             name: 'createPdf',
-            description: 'Creates PDF from page (iOS/macOS)',
+            description: 'Creates PDF from page',
             methodEnum: PlatformInAppWebViewControllerMethod.createPdf,
             execute: (controller) async {
               final pdf = await controller.createPdf();
@@ -818,7 +815,7 @@ class _MethodTesterWidgetState extends State<MethodTesterWidget> {
         methods: [
           MethodEntry(
             name: 'clearHistory',
-            description: 'Clears navigation history (Android)',
+            description: 'Clears navigation history',
             methodEnum: PlatformInAppWebViewControllerMethod.clearHistory,
             execute: (controller) async {
               await controller.clearHistory();
@@ -827,7 +824,7 @@ class _MethodTesterWidgetState extends State<MethodTesterWidget> {
           ),
           MethodEntry(
             name: 'clearFormData',
-            description: 'Clears form data (Android)',
+            description: 'Clears form data',
             methodEnum: PlatformInAppWebViewControllerMethod.clearFormData,
             execute: (controller) async {
               await controller.clearFormData();
@@ -1010,7 +1007,7 @@ class _MethodTesterWidgetState extends State<MethodTesterWidget> {
           ),
           MethodEntry(
             name: 'isPlayingAudio',
-            description: 'Checks if playing audio (Linux)',
+            description: 'Checks if playing audio',
             methodEnum: PlatformInAppWebViewControllerMethod.isPlayingAudio,
             execute: (controller) async {
               return await controller.isPlayingAudio();
@@ -1018,7 +1015,7 @@ class _MethodTesterWidgetState extends State<MethodTesterWidget> {
           ),
           MethodEntry(
             name: 'isMuted',
-            description: 'Checks if muted (Linux)',
+            description: 'Checks if muted',
             methodEnum: PlatformInAppWebViewControllerMethod.isMuted,
             execute: (controller) async {
               return await controller.isMuted();
@@ -1026,7 +1023,7 @@ class _MethodTesterWidgetState extends State<MethodTesterWidget> {
           ),
           MethodEntry(
             name: 'setMuted',
-            description: 'Sets mute state (Linux)',
+            description: 'Sets mute state',
             methodEnum: PlatformInAppWebViewControllerMethod.setMuted,
             execute: (controller) async {
               await controller.setMuted(muted: true);
@@ -1156,7 +1153,7 @@ class _MethodTesterWidgetState extends State<MethodTesterWidget> {
           ),
           MethodEntry(
             name: 'createWebArchiveData',
-            description: 'Creates web archive data (iOS/macOS)',
+            description: 'Creates web archive data',
             methodEnum:
                 PlatformInAppWebViewControllerMethod.createWebArchiveData,
             execute: (controller) async {
@@ -1182,7 +1179,7 @@ class _MethodTesterWidgetState extends State<MethodTesterWidget> {
           ),
           MethodEntry(
             name: 'startSafeBrowsing',
-            description: 'Starts Safe Browsing (Android)',
+            description: 'Starts Safe Browsing',
             methodEnum: PlatformInAppWebViewControllerMethod.startSafeBrowsing,
             execute: (controller) async {
               return await controller.startSafeBrowsing();
@@ -1190,7 +1187,7 @@ class _MethodTesterWidgetState extends State<MethodTesterWidget> {
           ),
           MethodEntry(
             name: 'openDevTools',
-            description: 'Opens DevTools (Windows)',
+            description: 'Opens DevTools',
             methodEnum: PlatformInAppWebViewControllerMethod.openDevTools,
             execute: (controller) async {
               await controller.openDevTools();
@@ -1218,7 +1215,7 @@ class _MethodTesterWidgetState extends State<MethodTesterWidget> {
           ),
           MethodEntry(
             name: 'isInterfaceSupported',
-            description: 'Checks interface support (Windows)',
+            description: 'Checks interface support',
             methodEnum:
                 PlatformInAppWebViewControllerMethod.isInterfaceSupported,
             execute: (controller) async {
@@ -1230,67 +1227,6 @@ class _MethodTesterWidgetState extends State<MethodTesterWidget> {
         ],
       ),
     ];
-  }
-
-  String _getCurrentPlatform() {
-    if (kIsWeb) return 'web';
-    if (Platform.isAndroid) return 'android';
-    if (Platform.isIOS) return 'ios';
-    if (Platform.isMacOS) return 'macos';
-    if (Platform.isWindows) return 'windows';
-    if (Platform.isLinux) return 'linux';
-    return 'unknown';
-  }
-
-  List<String> _getSupportedPlatforms(
-    PlatformInAppWebViewControllerMethod method,
-  ) {
-    final platforms = <String>[];
-
-    // Check each platform
-    if (InAppWebViewController.isMethodSupported(
-      method,
-      platform: TargetPlatform.android,
-    )) {
-      platforms.add('android');
-    }
-    if (InAppWebViewController.isMethodSupported(
-      method,
-      platform: TargetPlatform.iOS,
-    )) {
-      platforms.add('ios');
-    }
-    if (InAppWebViewController.isMethodSupported(
-      method,
-      platform: TargetPlatform.macOS,
-    )) {
-      platforms.add('macos');
-    }
-    if (InAppWebViewController.isMethodSupported(
-      method,
-      platform: TargetPlatform.windows,
-    )) {
-      platforms.add('windows');
-    }
-    if (InAppWebViewController.isMethodSupported(
-      method,
-      platform: TargetPlatform.linux,
-    )) {
-      platforms.add('linux');
-    }
-    // Web platform check
-    if (kIsWeb || InAppWebViewController.isMethodSupported(method)) {
-      // Check if web is supported by trying to see if it's explicitly supported
-      // For simplicity, we add 'web' if the method is generally supported
-    }
-
-    return platforms;
-  }
-
-  bool _isMethodSupportedOnCurrentPlatform(
-    PlatformInAppWebViewControllerMethod method,
-  ) {
-    return InAppWebViewController.isMethodSupported(method);
   }
 
   List<MethodCategory> _getFilteredCategories() {
@@ -1470,8 +1406,6 @@ class _MethodTesterWidgetState extends State<MethodTesterWidget> {
     final isExecuting = _executing[method.name] == true;
     final hasResult = _results.containsKey(method.name);
     final hasError = _errors.containsKey(method.name);
-    final isSupported = _isMethodSupportedOnCurrentPlatform(method.methodEnum);
-    final supportedPlatforms = _getSupportedPlatforms(method.methodEnum);
 
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
@@ -1485,56 +1419,25 @@ class _MethodTesterWidgetState extends State<MethodTesterWidget> {
           // Method header
           ListTile(
             dense: true,
-            title: Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    method.name,
-                    style: TextStyle(
-                      fontWeight: FontWeight.w600,
-                      fontFamily: 'monospace',
-                      color: isSupported ? Colors.black : Colors.grey,
-                    ),
-                  ),
-                ),
-                if (!isSupported)
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 6,
-                      vertical: 2,
-                    ),
-                    decoration: BoxDecoration(
-                      color: Colors.grey.shade200,
-                      borderRadius: BorderRadius.circular(4),
-                    ),
-                    child: const Text(
-                      'N/A',
-                      style: TextStyle(fontSize: 10, color: Colors.grey),
-                    ),
-                  ),
-              ],
+            title: Text(
+              method.name,
+              style: const TextStyle(
+                fontWeight: FontWeight.w600,
+                fontFamily: 'monospace',
+              ),
             ),
-            subtitle: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const SizedBox(height: 4),
-                Text(
-                  method.description,
-                  style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
-                ),
-                const SizedBox(height: 4),
-                SupportBadge(
-                  supportedPlatforms: supportedPlatforms,
-                  currentPlatform: _getCurrentPlatform(),
-                ),
-              ],
+            subtitle: Padding(
+              padding: const EdgeInsets.only(top: 4),
+              child: Text(
+                method.description,
+                style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+              ),
             ),
             trailing: SizedBox(
               width: 80,
               height: 32,
               child: ElevatedButton(
-                onPressed:
-                    widget.controller == null || !isSupported || isExecuting
+                onPressed: widget.controller == null || isExecuting
                     ? null
                     : () => _executeMethod(method),
                 style: ElevatedButton.styleFrom(

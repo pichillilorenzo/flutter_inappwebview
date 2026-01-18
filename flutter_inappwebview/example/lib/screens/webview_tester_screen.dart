@@ -93,8 +93,10 @@ class _WebViewTesterScreenState extends State<WebViewTesterScreen>
               decoration: const InputDecoration(
                 hintText: 'Enter URL',
                 border: OutlineInputBorder(),
-                contentPadding:
-                    EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                contentPadding: EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 8,
+                ),
               ),
               onSubmitted: (_) => _loadUrl(),
             ),
@@ -127,8 +129,9 @@ class _WebViewTesterScreenState extends State<WebViewTesterScreen>
           IconButton(
             icon: const Icon(Icons.arrow_forward),
             tooltip: 'Forward',
-            onPressed:
-                _canGoForward ? () => _webViewController?.goForward() : null,
+            onPressed: _canGoForward
+                ? () => _webViewController?.goForward()
+                : null,
           ),
           IconButton(
             icon: const Icon(Icons.refresh),
@@ -159,10 +162,7 @@ class _WebViewTesterScreenState extends State<WebViewTesterScreen>
                 if (_currentUrl != null)
                   Text(
                     _currentUrl!,
-                    style: TextStyle(
-                      fontSize: 10,
-                      color: Colors.grey.shade600,
-                    ),
+                    style: TextStyle(fontSize: 10, color: Colors.grey.shade600),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -176,25 +176,50 @@ class _WebViewTesterScreenState extends State<WebViewTesterScreen>
 
   Widget _buildWebView() {
     return InAppWebView(
-      initialUrlRequest: URLRequest(
-        url: WebUri(_urlController.text),
-      ),
+      initialUrlRequest: URLRequest(url: WebUri(_urlController.text)),
       initialSettings: InAppWebViewSettings(
         useShouldOverrideUrlLoading: true,
+        useShouldInterceptAjaxRequest: true,
+        useShouldInterceptFetchRequest: true,
+        useShouldInterceptRequest: true,
+        useOnLoadResource: true,
+        useOnDownloadStart: true,
         mediaPlaybackRequiresUserGesture: false,
         javaScriptEnabled: true,
         javaScriptCanOpenWindowsAutomatically: true,
       ),
+
+      // ============================================================
+      // CORE EVENTS (8)
+      // ============================================================
+
+      // 1. onWebViewCreated
       onWebViewCreated: (controller) {
         _webViewController = controller;
-        _logEvent(EventType.ui, 'WebView created');
+        _logEvent(
+          EventType.ui,
+          'onWebViewCreated',
+          data: {'viewId': controller.getViewId()},
+        );
       },
+
+      // 2. onLoadStart
       onLoadStart: (controller, url) {
-        _logEvent(EventType.navigation, 'Load started: ${url?.toString()}');
+        _logEvent(
+          EventType.navigation,
+          'onLoadStart',
+          data: {'url': url?.toString()},
+        );
         _updateNavigationState();
       },
+
+      // 3. onLoadStop
       onLoadStop: (controller, url) async {
-        _logEvent(EventType.navigation, 'Load stopped: ${url?.toString()}');
+        _logEvent(
+          EventType.navigation,
+          'onLoadStop',
+          data: {'url': url?.toString()},
+        );
         _updateNavigationState();
         final title = await controller.getTitle();
         setState(() {
@@ -202,38 +227,80 @@ class _WebViewTesterScreenState extends State<WebViewTesterScreen>
           _currentTitle = title;
         });
       },
+
+      // 4. onReceivedError
+      onReceivedError: (controller, request, error) {
+        _logEvent(
+          EventType.error,
+          'onReceivedError',
+          data: {
+            'url': request.url.toString(),
+            'errorType': error.type.name,
+            'description': error.description,
+          },
+        );
+      },
+
+      // 5. onReceivedHttpError
+      onReceivedHttpError: (controller, request, response) {
+        _logEvent(
+          EventType.error,
+          'onReceivedHttpError',
+          data: {
+            'url': request.url.toString(),
+            'statusCode': response.statusCode,
+            'reasonPhrase': response.reasonPhrase,
+          },
+        );
+      },
+
+      // 6. onProgressChanged
       onProgressChanged: (controller, progress) {
         setState(() {
           _progress = progress / 100;
         });
         _logEvent(
           EventType.performance,
-          'Progress: $progress%',
+          'onProgressChanged',
           data: {'progress': progress},
         );
       },
+
+      // 7. onConsoleMessage
       onConsoleMessage: (controller, consoleMessage) {
         _logEvent(
           EventType.console,
-          consoleMessage.message,
+          'onConsoleMessage',
           data: {
+            'message': consoleMessage.message,
             'level': consoleMessage.messageLevel.name,
           },
         );
       },
-      onLoadError: (controller, url, code, message) {
-        _logEvent(
-          EventType.error,
-          'Load error: $message',
-          data: {'url': url?.toString(), 'code': code},
-        );
+
+      // 8. onTitleChanged
+      onTitleChanged: (controller, title) {
+        _logEvent(EventType.ui, 'onTitleChanged', data: {'title': title});
+        setState(() {
+          _currentTitle = title;
+        });
       },
+
+      // ============================================================
+      // NAVIGATION EVENTS (6)
+      // ============================================================
+
+      // 9. shouldOverrideUrlLoading
       shouldOverrideUrlLoading: (controller, navigationAction) async {
         final url = navigationAction.request.url;
         _logEvent(
           EventType.navigation,
-          'Navigation: ${url?.toString()}',
-          data: {'navigationType': navigationAction.navigationType?.name},
+          'shouldOverrideUrlLoading',
+          data: {
+            'url': url?.toString(),
+            'isForMainFrame': navigationAction.isForMainFrame,
+            'navigationType': navigationAction.navigationType?.name,
+          },
         );
 
         // Monitor network requests if enabled
@@ -251,6 +318,647 @@ class _WebViewTesterScreenState extends State<WebViewTesterScreen>
         }
 
         return NavigationActionPolicy.ALLOW;
+      },
+
+      // 10. onLoadResource
+      onLoadResource: (controller, resource) {
+        _logEvent(
+          EventType.network,
+          'onLoadResource',
+          data: {
+            'url': resource.url?.toString(),
+            'initiatorType': resource.initiatorType,
+            'startTime': resource.startTime,
+            'duration': resource.duration,
+          },
+        );
+      },
+
+      // 11. onUpdateVisitedHistory
+      onUpdateVisitedHistory: (controller, url, isReload) {
+        _logEvent(
+          EventType.navigation,
+          'onUpdateVisitedHistory',
+          data: {'url': url?.toString(), 'isReload': isReload},
+        );
+        _updateNavigationState();
+      },
+
+      // 12. onPageCommitVisible
+      onPageCommitVisible: (controller, url) {
+        _logEvent(
+          EventType.navigation,
+          'onPageCommitVisible',
+          data: {'url': url?.toString()},
+        );
+      },
+
+      // 13. onNavigationResponse (iOS/macOS only)
+      onNavigationResponse: (controller, navigationResponse) async {
+        _logEvent(
+          EventType.navigation,
+          'onNavigationResponse',
+          data: {
+            'url': navigationResponse.response?.url?.toString(),
+            'statusCode': navigationResponse.response?.statusCode,
+            'isForMainFrame': navigationResponse.isForMainFrame,
+            'canShowMIMEType': navigationResponse.canShowMIMEType,
+          },
+        );
+        return NavigationResponseAction.ALLOW;
+      },
+
+      // 14. onDidReceiveServerRedirectForProvisionalNavigation (iOS/macOS only)
+      onDidReceiveServerRedirectForProvisionalNavigation: (controller) {
+        _logEvent(
+          EventType.navigation,
+          'onDidReceiveServerRedirectForProvisionalNavigation',
+        );
+      },
+
+      // ============================================================
+      // WINDOW EVENTS (4)
+      // ============================================================
+
+      // 15. onCreateWindow
+      onCreateWindow: (controller, createWindowAction) async {
+        _logEvent(
+          EventType.ui,
+          'onCreateWindow',
+          data: {
+            'url': createWindowAction.request.url?.toString(),
+            'windowId': createWindowAction.windowId,
+            'isForMainFrame': createWindowAction.isForMainFrame,
+          },
+        );
+        return false; // Don't create a new window
+      },
+
+      // 16. onCloseWindow
+      onCloseWindow: (controller) {
+        _logEvent(EventType.ui, 'onCloseWindow');
+      },
+
+      // 17. onWindowFocus
+      onWindowFocus: (controller) {
+        _logEvent(EventType.ui, 'onWindowFocus');
+      },
+
+      // 18. onWindowBlur
+      onWindowBlur: (controller) {
+        _logEvent(EventType.ui, 'onWindowBlur');
+      },
+
+      // ============================================================
+      // JAVASCRIPT DIALOG EVENTS (4)
+      // ============================================================
+
+      // 19. onJsAlert
+      onJsAlert: (controller, jsAlertRequest) async {
+        _logEvent(
+          EventType.javascript,
+          'onJsAlert',
+          data: {
+            'message': jsAlertRequest.message,
+            'url': jsAlertRequest.url?.toString(),
+          },
+        );
+        return JsAlertResponse(handledByClient: false);
+      },
+
+      // 20. onJsConfirm
+      onJsConfirm: (controller, jsConfirmRequest) async {
+        _logEvent(
+          EventType.javascript,
+          'onJsConfirm',
+          data: {
+            'message': jsConfirmRequest.message,
+            'url': jsConfirmRequest.url?.toString(),
+          },
+        );
+        return JsConfirmResponse(handledByClient: false);
+      },
+
+      // 21. onJsPrompt
+      onJsPrompt: (controller, jsPromptRequest) async {
+        _logEvent(
+          EventType.javascript,
+          'onJsPrompt',
+          data: {
+            'message': jsPromptRequest.message,
+            'defaultValue': jsPromptRequest.defaultValue,
+            'url': jsPromptRequest.url?.toString(),
+          },
+        );
+        return JsPromptResponse(handledByClient: false);
+      },
+
+      // 22. onJsBeforeUnload
+      onJsBeforeUnload: (controller, jsBeforeUnloadRequest) async {
+        _logEvent(
+          EventType.javascript,
+          'onJsBeforeUnload',
+          data: {
+            'message': jsBeforeUnloadRequest.message,
+            'url': jsBeforeUnloadRequest.url?.toString(),
+          },
+        );
+        return JsBeforeUnloadResponse(handledByClient: false);
+      },
+
+      // ============================================================
+      // AUTHENTICATION EVENTS (3)
+      // ============================================================
+
+      // 23. onReceivedHttpAuthRequest
+      onReceivedHttpAuthRequest: (controller, challenge) async {
+        _logEvent(
+          EventType.network,
+          'onReceivedHttpAuthRequest',
+          data: {
+            'host': challenge.protectionSpace.host,
+            'port': challenge.protectionSpace.port,
+            'protocol': challenge.protectionSpace.protocol,
+            'realm': challenge.protectionSpace.realm,
+          },
+        );
+        return HttpAuthResponse(action: HttpAuthResponseAction.CANCEL);
+      },
+
+      // 24. onReceivedServerTrustAuthRequest
+      onReceivedServerTrustAuthRequest: (controller, challenge) async {
+        _logEvent(
+          EventType.network,
+          'onReceivedServerTrustAuthRequest',
+          data: {
+            'host': challenge.protectionSpace.host,
+            'port': challenge.protectionSpace.port,
+            'protocol': challenge.protectionSpace.protocol,
+          },
+        );
+        return ServerTrustAuthResponse(
+          action: ServerTrustAuthResponseAction.CANCEL,
+        );
+      },
+
+      // 25. onReceivedClientCertRequest
+      onReceivedClientCertRequest: (controller, challenge) async {
+        _logEvent(
+          EventType.network,
+          'onReceivedClientCertRequest',
+          data: {
+            'host': challenge.protectionSpace.host,
+            'port': challenge.protectionSpace.port,
+            'protocol': challenge.protectionSpace.protocol,
+          },
+        );
+        return ClientCertResponse(action: ClientCertResponseAction.CANCEL);
+      },
+
+      // ============================================================
+      // NETWORK INTERCEPTION EVENTS (6)
+      // ============================================================
+
+      // 26. shouldInterceptAjaxRequest
+      shouldInterceptAjaxRequest: (controller, ajaxRequest) async {
+        _logEvent(
+          EventType.network,
+          'shouldInterceptAjaxRequest',
+          data: {
+            'url': ajaxRequest.url?.toString(),
+            'method': ajaxRequest.method,
+            'isAsync': ajaxRequest.isAsync,
+          },
+        );
+        return ajaxRequest;
+      },
+
+      // 27. onAjaxReadyStateChange
+      onAjaxReadyStateChange: (controller, ajaxRequest) async {
+        _logEvent(
+          EventType.network,
+          'onAjaxReadyStateChange',
+          data: {
+            'url': ajaxRequest.url?.toString(),
+            'method': ajaxRequest.method,
+            'readyState': ajaxRequest.readyState?.name,
+            'status': ajaxRequest.status,
+          },
+        );
+        return AjaxRequestAction.PROCEED;
+      },
+
+      // 28. onAjaxProgress
+      onAjaxProgress: (controller, ajaxRequest) async {
+        _logEvent(
+          EventType.network,
+          'onAjaxProgress',
+          data: {
+            'url': ajaxRequest.url?.toString(),
+            'method': ajaxRequest.method,
+            'status': ajaxRequest.status,
+          },
+        );
+        return AjaxRequestAction.PROCEED;
+      },
+
+      // 29. shouldInterceptFetchRequest
+      shouldInterceptFetchRequest: (controller, fetchRequest) async {
+        _logEvent(
+          EventType.network,
+          'shouldInterceptFetchRequest',
+          data: {
+            'url': fetchRequest.url?.toString(),
+            'method': fetchRequest.method,
+            'mode': fetchRequest.mode,
+            'credentialsType': fetchRequest.credentials?.type,
+          },
+        );
+        return fetchRequest;
+      },
+
+      // 30. shouldInterceptRequest
+      shouldInterceptRequest: (controller, request) async {
+        _logEvent(
+          EventType.network,
+          'shouldInterceptRequest',
+          data: {
+            'url': request.url.toString(),
+            'method': request.method,
+            'isForMainFrame': request.isForMainFrame,
+          },
+        );
+        return null; // Don't intercept
+      },
+
+      // 31. onLoadResourceWithCustomScheme
+      onLoadResourceWithCustomScheme: (controller, request) async {
+        _logEvent(
+          EventType.network,
+          'onLoadResourceWithCustomScheme',
+          data: {'url': request.url.toString(), 'scheme': request.url.scheme},
+        );
+        return null; // Don't handle custom scheme
+      },
+
+      // ============================================================
+      // DOWNLOAD EVENTS (1)
+      // ============================================================
+
+      // 32. onDownloadStarting
+      onDownloadStarting: (controller, downloadStartRequest) async {
+        _logEvent(
+          EventType.network,
+          'onDownloadStarting',
+          data: {
+            'url': downloadStartRequest.url.toString(),
+            'mimeType': downloadStartRequest.mimeType,
+            'contentLength': downloadStartRequest.contentLength,
+            'suggestedFilename': downloadStartRequest.suggestedFilename,
+          },
+        );
+        return DownloadStartResponse(
+          handled: true,
+          action: DownloadStartResponseAction.CANCEL,
+        );
+      },
+
+      // ============================================================
+      // SCROLL EVENTS (2)
+      // ============================================================
+
+      // 33. onScrollChanged
+      onScrollChanged: (controller, x, y) {
+        _logEvent(EventType.ui, 'onScrollChanged', data: {'x': x, 'y': y});
+      },
+
+      // 34. onOverScrolled
+      onOverScrolled: (controller, x, y, clampedX, clampedY) {
+        _logEvent(
+          EventType.ui,
+          'onOverScrolled',
+          data: {'x': x, 'y': y, 'clampedX': clampedX, 'clampedY': clampedY},
+        );
+      },
+
+      // ============================================================
+      // ZOOM EVENTS (1)
+      // ============================================================
+
+      // 35. onZoomScaleChanged
+      onZoomScaleChanged: (controller, oldScale, newScale) {
+        _logEvent(
+          EventType.ui,
+          'onZoomScaleChanged',
+          data: {'oldScale': oldScale, 'newScale': newScale},
+        );
+      },
+
+      // ============================================================
+      // PRINT EVENTS (1)
+      // ============================================================
+
+      // 36. onPrintRequest
+      onPrintRequest: (controller, url, printJobController) async {
+        _logEvent(
+          EventType.ui,
+          'onPrintRequest',
+          data: {'url': url?.toString()},
+        );
+        return false; // Don't handle print
+      },
+
+      // ============================================================
+      // FULLSCREEN EVENTS (2)
+      // ============================================================
+
+      // 37. onEnterFullscreen
+      onEnterFullscreen: (controller) {
+        _logEvent(EventType.ui, 'onEnterFullscreen');
+      },
+
+      // 38. onExitFullscreen
+      onExitFullscreen: (controller) {
+        _logEvent(EventType.ui, 'onExitFullscreen');
+      },
+
+      // ============================================================
+      // PERMISSION EVENTS (4)
+      // ============================================================
+
+      // 39. onPermissionRequest
+      onPermissionRequest: (controller, permissionRequest) async {
+        _logEvent(
+          EventType.ui,
+          'onPermissionRequest',
+          data: {
+            'resources': permissionRequest.resources
+                .map((r) => r.name)
+                .toList(),
+          },
+        );
+        return PermissionResponse(
+          resources: permissionRequest.resources,
+          action: PermissionResponseAction.DENY,
+        );
+      },
+
+      // 40. onPermissionRequestCanceled (Android)
+      onPermissionRequestCanceled: (controller, permissionRequest) {
+        _logEvent(
+          EventType.ui,
+          'onPermissionRequestCanceled',
+          data: {
+            'resources': permissionRequest.resources
+                .map((r) => r.name)
+                .toList(),
+          },
+        );
+      },
+
+      // 41. onGeolocationPermissionsShowPrompt (Android)
+      onGeolocationPermissionsShowPrompt: (controller, origin) async {
+        _logEvent(
+          EventType.ui,
+          'onGeolocationPermissionsShowPrompt',
+          data: {'origin': origin},
+        );
+        return GeolocationPermissionShowPromptResponse(
+          origin: origin,
+          allow: false,
+          retain: false,
+        );
+      },
+
+      // 42. onGeolocationPermissionsHidePrompt (Android)
+      onGeolocationPermissionsHidePrompt: (controller) {
+        _logEvent(EventType.ui, 'onGeolocationPermissionsHidePrompt');
+      },
+
+      // ============================================================
+      // TOUCH & HIT TEST EVENTS (1)
+      // ============================================================
+
+      // 43. onLongPressHitTestResult
+      onLongPressHitTestResult: (controller, hitTestResult) async {
+        _logEvent(
+          EventType.ui,
+          'onLongPressHitTestResult',
+          data: {
+            'type': hitTestResult.type?.name,
+            'extra': hitTestResult.extra,
+          },
+        );
+      },
+
+      // ============================================================
+      // RENDER PROCESS EVENTS - ANDROID (3)
+      // ============================================================
+
+      // 44. onRenderProcessUnresponsive (Android)
+      onRenderProcessUnresponsive: (controller, url) async {
+        _logEvent(
+          EventType.error,
+          'onRenderProcessUnresponsive',
+          data: {'url': url?.toString()},
+        );
+        return WebViewRenderProcessAction.TERMINATE;
+      },
+
+      // 45. onRenderProcessResponsive (Android)
+      onRenderProcessResponsive: (controller, url) async {
+        _logEvent(
+          EventType.ui,
+          'onRenderProcessResponsive',
+          data: {'url': url?.toString()},
+        );
+        return WebViewRenderProcessAction.TERMINATE;
+      },
+
+      // 46. onRenderProcessGone (Android)
+      onRenderProcessGone: (controller, detail) {
+        _logEvent(
+          EventType.error,
+          'onRenderProcessGone',
+          data: {
+            'didCrash': detail.didCrash,
+            'rendererPriorityAtExit': detail.rendererPriorityAtExit?.name,
+          },
+        );
+      },
+
+      // ============================================================
+      // FORM EVENTS - ANDROID (2)
+      // ============================================================
+
+      // 47. onFormResubmission (Android)
+      onFormResubmission: (controller, url) async {
+        _logEvent(
+          EventType.navigation,
+          'onFormResubmission',
+          data: {'url': url?.toString()},
+        );
+        return FormResubmissionAction.DONT_RESEND;
+      },
+
+      // 48. onReceivedLoginRequest (Android)
+      onReceivedLoginRequest: (controller, loginRequest) {
+        _logEvent(
+          EventType.network,
+          'onReceivedLoginRequest',
+          data: {
+            'realm': loginRequest.realm,
+            'account': loginRequest.account,
+            'args': loginRequest.args,
+          },
+        );
+      },
+
+      // ============================================================
+      // ICON EVENTS - ANDROID (2)
+      // ============================================================
+
+      // 49. onReceivedIcon (Android)
+      onReceivedIcon: (controller, icon) {
+        _logEvent(
+          EventType.ui,
+          'onReceivedIcon',
+          data: {'iconSize': icon.length},
+        );
+      },
+
+      // 50. onReceivedTouchIconUrl (Android)
+      onReceivedTouchIconUrl: (controller, url, precomposed) {
+        _logEvent(
+          EventType.ui,
+          'onReceivedTouchIconUrl',
+          data: {'url': url.toString(), 'precomposed': precomposed},
+        );
+      },
+
+      // ============================================================
+      // SAFE BROWSING EVENTS - ANDROID (1)
+      // ============================================================
+
+      // 51. onSafeBrowsingHit (Android)
+      onSafeBrowsingHit: (controller, url, threatType) async {
+        _logEvent(
+          EventType.error,
+          'onSafeBrowsingHit',
+          data: {'url': url.toString(), 'threatType': threatType?.name},
+        );
+        return SafeBrowsingResponse(
+          report: true,
+          action: SafeBrowsingResponseAction.BACK_TO_SAFETY,
+        );
+      },
+
+      // ============================================================
+      // IOS/MACOS-SPECIFIC EVENTS (5)
+      // ============================================================
+
+      // 52. onWebContentProcessDidTerminate (iOS/macOS)
+      onWebContentProcessDidTerminate: (controller) {
+        _logEvent(EventType.error, 'onWebContentProcessDidTerminate');
+      },
+
+      // 53. shouldAllowDeprecatedTLS (iOS/macOS)
+      shouldAllowDeprecatedTLS: (controller, challenge) async {
+        _logEvent(
+          EventType.network,
+          'shouldAllowDeprecatedTLS',
+          data: {
+            'host': challenge.protectionSpace.host,
+            'port': challenge.protectionSpace.port,
+            'protocol': challenge.protectionSpace.protocol,
+          },
+        );
+        return ShouldAllowDeprecatedTLSAction.CANCEL;
+      },
+
+      // 54. onCameraCaptureStateChanged (iOS/macOS)
+      onCameraCaptureStateChanged: (controller, oldState, newState) {
+        _logEvent(
+          EventType.ui,
+          'onCameraCaptureStateChanged',
+          data: {'oldState': oldState?.name, 'newState': newState?.name},
+        );
+      },
+
+      // 55. onMicrophoneCaptureStateChanged (iOS/macOS)
+      onMicrophoneCaptureStateChanged: (controller, oldState, newState) {
+        _logEvent(
+          EventType.ui,
+          'onMicrophoneCaptureStateChanged',
+          data: {'oldState': oldState?.name, 'newState': newState?.name},
+        );
+      },
+
+      // 56. onContentSizeChanged (iOS/macOS)
+      onContentSizeChanged: (controller, oldContentSize, newContentSize) {
+        _logEvent(
+          EventType.ui,
+          'onContentSizeChanged',
+          data: {
+            'oldWidth': oldContentSize.width,
+            'oldHeight': oldContentSize.height,
+            'newWidth': newContentSize.width,
+            'newHeight': newContentSize.height,
+          },
+        );
+      },
+
+      // ============================================================
+      // WINDOWS-SPECIFIC EVENTS (2)
+      // ============================================================
+
+      // 57. onProcessFailed (Windows)
+      onProcessFailed: (controller, detail) {
+        _logEvent(
+          EventType.error,
+          'onProcessFailed',
+          data: {
+            'kind': detail.kind.name,
+            'reason': detail.reason?.name,
+            'exitCode': detail.exitCode,
+          },
+        );
+      },
+
+      // 58. onAcceleratorKeyPressed (Windows)
+      onAcceleratorKeyPressed: (controller, keyEventInfo) {
+        _logEvent(
+          EventType.ui,
+          'onAcceleratorKeyPressed',
+          data: {
+            'keyEventKind': keyEventInfo.keyEventKind,
+            'virtualKey': keyEventInfo.virtualKey,
+            'physicalKeyStatus': keyEventInfo.physicalKeyStatus?.toMap(),
+          },
+        );
+      },
+
+      // ============================================================
+      // OTHER EVENTS (2)
+      // ============================================================
+
+      // 59. onRequestFocus
+      onRequestFocus: (controller) {
+        _logEvent(EventType.ui, 'onRequestFocus');
+      },
+
+      // 60. onShowFileChooser
+      onShowFileChooser: (controller, fileChooserParams) async {
+        _logEvent(
+          EventType.ui,
+          'onShowFileChooser',
+          data: {
+            'mode': fileChooserParams.mode.name,
+            'acceptTypes': fileChooserParams.acceptTypes,
+            'isCaptureEnabled': fileChooserParams.isCaptureEnabled,
+          },
+        );
+        return ShowFileChooserResponse(handledByClient: false);
       },
     );
   }
@@ -282,18 +990,12 @@ class _WebViewTesterScreenState extends State<WebViewTesterScreen>
               children: [
                 const EventConsoleWidget(),
                 const NetworkMonitorWidget(),
-                MethodTesterWidget(
-                  onExecuteMethod: _executeMethod,
-                  isMethodSupported: _isMethodSupported,
-                ),
+                MethodTesterWidget(controller: _webViewController),
                 JavaScriptConsoleWidget(
-                  onExecute: (code) => _webViewController!.evaluateJavascript(
-                    source: code,
-                  ),
-                  onExecuteAsync: (code) =>
-                      _webViewController!.callAsyncJavaScript(
-                    functionBody: code,
-                  ),
+                  onExecute: (code) =>
+                      _webViewController!.evaluateJavascript(source: code),
+                  onExecuteAsync: (code) => _webViewController!
+                      .callAsyncJavaScript(functionBody: code),
                 ),
                 UserScriptTesterWidget(
                   onAddScript: _addUserScript,
@@ -341,79 +1043,13 @@ class _WebViewTesterScreenState extends State<WebViewTesterScreen>
 
   void _logEvent(EventType type, String message, {Map<String, dynamic>? data}) {
     context.read<EventLogProvider>().addEvent(
-          EventLogEntry(
-            timestamp: DateTime.now(),
-            eventType: type,
-            message: message,
-            data: data,
-          ),
-        );
-  }
-
-  Future<dynamic> _executeMethod(
-      String method, Map<String, dynamic> params) async {
-    if (_webViewController == null) {
-      throw Exception('WebView not initialized');
-    }
-
-    _logEvent(EventType.javascript, 'Executing method: $method',
-        data: {'params': params});
-
-    switch (method) {
-      case 'getUrl':
-        return await _webViewController!.getUrl();
-      case 'getTitle':
-        return await _webViewController!.getTitle();
-      case 'canGoBack':
-        return await _webViewController!.canGoBack();
-      case 'canGoForward':
-        return await _webViewController!.canGoForward();
-      case 'goBack':
-        await _webViewController!.goBack();
-        return 'Navigation executed';
-      case 'goForward':
-        await _webViewController!.goForward();
-        return 'Navigation executed';
-      case 'reload':
-        await _webViewController!.reload();
-        return 'Reload executed';
-      case 'stopLoading':
-        await _webViewController!.stopLoading();
-        return 'Stop executed';
-      case 'evaluateJavascript':
-        final source = params['source'] as String?;
-        if (source == null) throw Exception('source parameter required');
-        return await _webViewController!.evaluateJavascript(source: source);
-      case 'clearCache':
-        await _webViewController!.clearCache();
-        return 'Cache cleared';
-      case 'clearHistory':
-        await _webViewController!.clearHistory();
-        return 'History cleared';
-      case 'getProgress':
-        return await _webViewController!.getProgress();
-      case 'getContentHeight':
-        return await _webViewController!.getContentHeight();
-      case 'zoomBy':
-        final zoomFactor = params['zoomFactor'] as double?;
-        if (zoomFactor == null)
-          throw Exception('zoomFactor parameter required');
-        await _webViewController!.zoomBy(
-          zoomFactor: zoomFactor,
-          animated: true,
-        );
-        return 'Zoom applied';
-      case 'getSelectedText':
-        return await _webViewController!.getSelectedText();
-      default:
-        throw Exception('Unknown method: $method');
-    }
-  }
-
-  Future<bool> _isMethodSupported(String method) async {
-    // For now, assume all methods are supported
-    // In a real implementation, would call InAppWebViewController.isMethodSupported
-    return true;
+      EventLogEntry(
+        timestamp: DateTime.now(),
+        eventType: type,
+        message: message,
+        data: data,
+      ),
+    );
   }
 
   Future<void> _addUserScript(UserScript script) async {
@@ -427,8 +1063,11 @@ class _WebViewTesterScreenState extends State<WebViewTesterScreen>
       _userScripts.add(script);
     });
 
-    _logEvent(EventType.javascript, 'User script added',
-        data: {'injectionTime': script.injectionTime.name});
+    _logEvent(
+      EventType.javascript,
+      'User script added',
+      data: {'injectionTime': script.injectionTime.name},
+    );
   }
 
   Future<void> _removeUserScript(UserScript script) async {

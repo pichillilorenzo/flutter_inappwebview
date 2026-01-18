@@ -51,6 +51,9 @@ namespace flutter_inappwebview_plugin
     reputationCheckingRequired = get_fl_map_value(encodableMap, "reputationCheckingRequired", reputationCheckingRequired);
     nonClientRegionSupportEnabled = get_fl_map_value(encodableMap, "nonClientRegionSupportEnabled", nonClientRegionSupportEnabled);
     handleAcceleratorKeyPressed = get_fl_map_value(encodableMap, "handleAcceleratorKeyPressed", handleAcceleratorKeyPressed);
+    if (fl_map_contains_not_null(encodableMap, "preferredColorScheme")) {
+      preferredColorScheme = get_fl_map_value<int64_t>(encodableMap, "preferredColorScheme");
+    }
   }
 
   flutter::EncodableMap InAppWebViewSettings::toEncodableMap() const
@@ -85,7 +88,8 @@ namespace flutter_inappwebview_plugin
       {"hiddenPdfToolbarItems", hiddenPdfToolbarItems},
       {"reputationCheckingRequired", reputationCheckingRequired},
       {"nonClientRegionSupportEnabled", nonClientRegionSupportEnabled},
-      {"handleAcceleratorKeyPressed", handleAcceleratorKeyPressed}
+      {"handleAcceleratorKeyPressed", handleAcceleratorKeyPressed},
+      {"preferredColorScheme", make_fl_value(preferredColorScheme)}
     };
   }
 
@@ -178,6 +182,17 @@ namespace flutter_inappwebview_plugin
           BOOL isNonClientRegionSupportEnabled;
           if (SUCCEEDED(settings9->get_IsNonClientRegionSupportEnabled(&isNonClientRegionSupportEnabled))) {
             settingsMap["nonClientRegionSupportEnabled"] = (bool)isNonClientRegionSupportEnabled;
+          }
+        }
+      }
+
+      // Get preferredColorScheme from Profile (requires ICoreWebView2_13)
+      if (auto webView13 = webView.try_query<ICoreWebView2_13>()) {
+        wil::com_ptr<ICoreWebView2Profile> profile;
+        if (SUCCEEDED(webView13->get_Profile(&profile))) {
+          COREWEBVIEW2_PREFERRED_COLOR_SCHEME realPreferredColorScheme;
+          if (SUCCEEDED(profile->get_PreferredColorScheme(&realPreferredColorScheme))) {
+            settingsMap["preferredColorScheme"] = static_cast<int64_t>(realPreferredColorScheme);
           }
         }
       }

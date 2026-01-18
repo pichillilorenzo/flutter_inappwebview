@@ -42,6 +42,7 @@ namespace flutter_inappwebview_plugin
     bool reputationCheckingRequired = true;
     bool nonClientRegionSupportEnabled = false;
     bool handleAcceleratorKeyPressed = false;
+    std::optional<int64_t> preferredColorScheme = std::optional<int64_t>{};
 
     InAppWebViewSettings();
     InAppWebViewSettings(const flutter::EncodableMap& encodableMap);

@@ -4,6 +4,8 @@
 - Added `isSupported` method to all custom enum classes
 - Added `saveState`, `restoreState` methods to `PlatformInAppWebViewController` class
 - Added `useOnAjaxReadyStateChange`, `useOnAjaxProgress`, `useOnShowFileChooser` properties to `InAppWebViewSettings`
+- Added `PreferredColorScheme` enum type with `LIGHT`, `DARK`, and `AUTO` values
+- Added `preferredColorScheme` property to `InAppWebViewSettings` (Windows only)
 - Update code documentation
 
 ## 1.4.0-beta.2
@@ -90,7 +92,7 @@
 
 ## 1.0.5
 
-- Must call super `dispose` method for `PlatformInAppBrowser` and `PlatformChromeSafariBrowser` 
+- Must call super `dispose` method for `PlatformInAppBrowser` and `PlatformChromeSafariBrowser`
 
 ## 1.0.4
 
@@ -106,7 +108,7 @@
 
 ## 1.0.1
 
-- Updated README 
+- Updated README
 
 ## 1.0.0
 

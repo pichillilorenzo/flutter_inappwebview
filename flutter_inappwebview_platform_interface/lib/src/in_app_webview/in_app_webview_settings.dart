@@ -12,6 +12,7 @@ import '../types/layout_algorithm.dart';
 import '../types/mixed_content_mode.dart';
 import '../types/over_scroll_mode.dart';
 import '../types/pdf_toolbar_items.dart';
+import '../types/preferred_color_scheme.dart';
 import '../types/referrer_policy.dart';
 import '../types/renderer_priority_policy.dart';
 import '../types/sandbox.dart';
@@ -1999,6 +2000,19 @@ as it can cause framerate drops on animations in Android 9 and lower (see [Hybri
     WindowsPlatform(),
   ])
   bool? handleAcceleratorKeyPressed;
+  ///Sets the color scheme for the WebView.
+  ///This can be used to specify whether the WebView should use a light, dark, or auto (system) color scheme.
+  ///
+  ///The default value is [PreferredColorScheme.AUTO].
+  @SupportedPlatforms(platforms: [
+    WindowsPlatform(
+        available: '1.0.1901.177',
+        apiName: "ICoreWebView2Profile.PreferredColorScheme",
+        apiUrl:
+            'https://learn.microsoft.com/en-us/microsoft-edge/webview2/reference/win32/icorewebview2profile?view=webview2-1.0.2849.39#get_preferredcolorscheme'),
+  ])
+  PreferredColorScheme_? preferredColorScheme;
+
 
   ///The view’s alpha value. The value of this property is a floating-point number
   ///in the range 0.0 to 1.0, where 0.0 represents totally transparent and 1.0 represents totally opaque.
@@ -2267,6 +2281,7 @@ as it can cause framerate drops on animations in Android 9 and lower (see [Hybri
     this.nonClientRegionSupportEnabled = false,
     this.isUserInteractionEnabled = true,
     this.handleAcceleratorKeyPressed = false,
+    this.preferredColorScheme,
     this.alpha,
     this.useOnShowFileChooser,
     this.iframeAllow,

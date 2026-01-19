@@ -122,15 +122,13 @@ class _WebViewEnvironmentSettingsEditorScreenState
             return const Center(child: CircularProgressIndicator());
           }
 
-          if (!settingsManager.isEnvironmentSupported) {
-            return _buildUnsupportedPlatformMessage();
-          }
-
           final definitions = getEnvironmentSettingDefinitions();
 
           return Column(
             children: [
               _buildHeader(settingsManager),
+              if (!settingsManager.isEnvironmentSupported)
+                _buildUnsupportedPlatformBanner(),
               _buildSearchBar(),
               Expanded(
                 child: ListView(
@@ -152,39 +150,40 @@ class _WebViewEnvironmentSettingsEditorScreenState
     );
   }
 
-  Widget _buildUnsupportedPlatformMessage() {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(32.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.block, size: 64, color: Colors.grey.shade400),
-            const SizedBox(height: 16),
-            Text(
-              'WebViewEnvironment Not Supported',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: Colors.grey.shade600,
-              ),
+  Widget _buildUnsupportedPlatformBanner() {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      decoration: BoxDecoration(
+        color: Colors.orange.shade50,
+        border: Border.all(color: Colors.orange.shade200),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Row(
+        children: [
+          Icon(Icons.info_outline, color: Colors.orange.shade700),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Limited Platform Support',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: Colors.orange.shade800,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  'WebViewEnvironment is only functional on Windows and Linux. '
+                  'Settings below show what\'s available on those platforms.',
+                  style: TextStyle(fontSize: 12, color: Colors.orange.shade700),
+                ),
+              ],
             ),
-            const SizedBox(height: 8),
-            Text(
-              'WebViewEnvironmentSettings is only available on Windows (WebView2) and Linux (WPE WebKit) platforms.',
-              textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.grey.shade600),
-            ),
-            const SizedBox(height: 8),
-            Chip(
-              label: Text(
-                'Current: ${_currentPlatform?.displayName ?? "Unknown"}',
-                style: TextStyle(color: Colors.grey.shade700),
-              ),
-              backgroundColor: Colors.grey.shade200,
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -317,12 +316,8 @@ class _WebViewEnvironmentSettingsEditorScreenState
     List<EnvironmentSettingDefinition> settings,
     SettingsManager settingsManager,
   ) {
-    // Filter settings based on search query and platform
+    // Filter settings based on search query only (show all platforms)
     final filteredSettings = settings.where((setting) {
-      // Filter by platform support
-      if (!_isSettingSupportedOnPlatform(setting)) {
-        return false;
-      }
       // Filter by search query
       if (_searchQuery.isEmpty) return true;
       return setting.name.toLowerCase().contains(_searchQuery) ||
@@ -338,7 +333,7 @@ class _WebViewEnvironmentSettingsEditorScreenState
     return Card(
       margin: const EdgeInsets.only(bottom: 8),
       child: ExpansionTile(
-        key: Key(category),
+        key: ValueKey('$category-$isExpanded'),
         initiallyExpanded: isExpanded,
         onExpansionChanged: (expanded) {
           setState(() {
@@ -380,9 +375,11 @@ class _WebViewEnvironmentSettingsEditorScreenState
     );
   }
 
-  bool _isSettingSupportedOnPlatform(EnvironmentSettingDefinition setting) {
+  bool _isSettingSupportedOnCurrentPlatform(
+    EnvironmentSettingDefinition setting,
+  ) {
     final platform = _currentPlatform;
-    if (platform == null) return true; // Show all if unknown
+    if (platform == null) return false;
 
     if (setting.supportedPlatforms.isEmpty) return true;
     return setting.supportedPlatforms.contains(platform);
@@ -394,11 +391,16 @@ class _WebViewEnvironmentSettingsEditorScreenState
   ) {
     final isModified = _modifiedKeys.contains(setting.key);
     final currentValue = _localSettings[setting.key] ?? setting.defaultValue;
+    final isCurrentPlatformSupported = _isSettingSupportedOnCurrentPlatform(
+      setting,
+    );
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
-        color: isModified ? Colors.orange.shade50 : null,
+        color: isModified
+            ? Colors.orange.shade50
+            : (!isCurrentPlatformSupported ? Colors.grey.shade50 : null),
         border: Border(bottom: BorderSide(color: Colors.grey.shade200)),
       ),
       child: Column(
@@ -415,9 +417,11 @@ class _WebViewEnvironmentSettingsEditorScreenState
                         Flexible(
                           child: Text(
                             setting.name,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontWeight: FontWeight.w600,
-                              color: Colors.black87,
+                              color: isCurrentPlatformSupported
+                                  ? Colors.black87
+                                  : Colors.grey.shade500,
                             ),
                           ),
                         ),
@@ -444,6 +448,7 @@ class _WebViewEnvironmentSettingsEditorScreenState
                         if (setting.supportedPlatforms.isNotEmpty) ...[
                           const SizedBox(width: 8),
                           ...setting.supportedPlatforms.map((p) {
+                            final isSupported = _currentPlatform == p;
                             return Container(
                               margin: const EdgeInsets.only(right: 4),
                               padding: const EdgeInsets.symmetric(
@@ -451,14 +456,26 @@ class _WebViewEnvironmentSettingsEditorScreenState
                                 vertical: 1,
                               ),
                               decoration: BoxDecoration(
-                                color: _getPlatformColor(p).withOpacity(0.2),
+                                color: _getPlatformColor(
+                                  p,
+                                ).withOpacity(isSupported ? 0.3 : 0.1),
                                 borderRadius: BorderRadius.circular(4),
+                                border: Border.all(
+                                  color: _getPlatformColor(
+                                    p,
+                                  ).withOpacity(isSupported ? 0.6 : 0.2),
+                                ),
                               ),
                               child: Text(
                                 p.displayName,
                                 style: TextStyle(
                                   fontSize: 9,
-                                  color: _getPlatformColor(p),
+                                  fontWeight: isSupported
+                                      ? FontWeight.bold
+                                      : FontWeight.normal,
+                                  color: _getPlatformColor(
+                                    p,
+                                  ).withOpacity(isSupported ? 1.0 : 0.5),
                                 ),
                               ),
                             );
@@ -471,7 +488,9 @@ class _WebViewEnvironmentSettingsEditorScreenState
                       setting.description,
                       style: TextStyle(
                         fontSize: 12,
-                        color: Colors.grey.shade600,
+                        color: isCurrentPlatformSupported
+                            ? Colors.grey.shade600
+                            : Colors.grey.shade400,
                       ),
                     ),
                   ],
@@ -486,7 +505,13 @@ class _WebViewEnvironmentSettingsEditorScreenState
             ],
           ),
           const SizedBox(height: 8),
-          _buildSettingControl(setting, currentValue),
+          Opacity(
+            opacity: isCurrentPlatformSupported ? 1.0 : 0.5,
+            child: IgnorePointer(
+              ignoring: !isCurrentPlatformSupported,
+              child: _buildSettingControl(setting, currentValue),
+            ),
+          ),
         ],
       ),
     );

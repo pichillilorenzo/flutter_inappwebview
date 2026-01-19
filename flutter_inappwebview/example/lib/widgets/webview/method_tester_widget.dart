@@ -125,17 +125,27 @@ class _MethodTesterWidgetState extends State<MethodTesterWidget> {
             methodEnum: PlatformInAppWebViewControllerMethod.postUrl,
             parameters: {
               'url': 'https://httpbin.org/post',
-              'postData': Uint8List.fromList('test=data'.codeUnits),
+              'postData': const ParameterValueHint<Uint8List?>(
+                null,
+                ParameterValueType.bytes,
+              ),
             },
             requiredParameters: ['url', 'postData'],
             execute: (controller, params) async {
               final url = params['url']?.toString() ?? '';
-              final postData = params['postData'] as Uint8List?;
+              Uint8List? postData;
+              final postDataParam = params['postData'];
+              if (postDataParam is Uint8List) {
+                postData = postDataParam;
+              } else if (postDataParam is String && postDataParam.isNotEmpty) {
+                // Convert string to bytes (UTF-8)
+                postData = Uint8List.fromList(postDataParam.codeUnits);
+              }
               await controller.postUrl(
                 url: WebUri(url),
                 postData: postData ?? Uint8List(0),
               );
-              return 'POST request sent';
+              return 'POST request sent with ${postData?.length ?? 0} bytes';
             },
           ),
           MethodEntry(
@@ -1759,6 +1769,18 @@ class _MethodTesterWidgetState extends State<MethodTesterWidget> {
   String _formatResult(dynamic result) {
     if (result == null) return 'null';
     if (result is String) return result;
+
+    // Try to convert to Map first
+    final mapResult = _toMapIfPossible(result);
+    if (mapResult != null) {
+      try {
+        const encoder = JsonEncoder.withIndent('  ');
+        return encoder.convert(mapResult);
+      } catch (e) {
+        return mapResult.toString();
+      }
+    }
+
     if (result is Map || result is List) {
       try {
         const encoder = JsonEncoder.withIndent('  ');
@@ -1768,5 +1790,26 @@ class _MethodTesterWidgetState extends State<MethodTesterWidget> {
       }
     }
     return result.toString();
+  }
+
+  /// Attempts to convert a result to a Map using common toMap/toJson patterns.
+  /// Returns null if conversion is not possible.
+  dynamic _toMapIfPossible(dynamic value) {
+    if (value == null) return null;
+    if (value is Map || value is List) return value;
+
+    // Try toMap() - common in flutter_inappwebview objects
+    try {
+      final toMapResult = (value as dynamic).toMap?.call();
+      if (toMapResult is Map) return toMapResult;
+    } catch (_) {}
+
+    // Try toJson() - common in many Flutter/Dart packages
+    try {
+      final toJsonResult = (value as dynamic).toJson?.call();
+      if (toJsonResult is Map) return toJsonResult;
+    } catch (_) {}
+
+    return null;
   }
 }

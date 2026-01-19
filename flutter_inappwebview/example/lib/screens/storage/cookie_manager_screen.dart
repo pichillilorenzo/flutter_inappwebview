@@ -204,8 +204,20 @@ class _CookieManagerScreenState extends State<CookieManagerScreen> {
         domain: cookie.domain,
       );
       if (result) {
-        _recordMethodResult('deleteCookie', 'Cookie deleted', isError: false);
-        await _getCookies();
+        _recordMethodResult(
+          'deleteCookie',
+          'Cookie "${cookie.name}" deleted',
+          isError: false,
+        );
+        // Remove the cookie from local list
+        setState(() {
+          _cookies.removeWhere(
+            (c) =>
+                c.name == cookie.name &&
+                c.domain == cookie.domain &&
+                c.path == cookie.path,
+          );
+        });
       } else {
         _recordMethodResult(
           'deleteCookie',
@@ -222,6 +234,55 @@ class _CookieManagerScreenState extends State<CookieManagerScreen> {
     } finally {
       setState(() => _isLoading = false);
     }
+  }
+
+  Future<void> _confirmAndDeleteCookie(Cookie cookie) async {
+    final confirmed =
+        await showDialog<bool>(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text('Delete Cookie'),
+            content: Text(
+              'Are you sure you want to delete the cookie "${cookie.name}"?',
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context, false),
+                child: const Text('Cancel'),
+              ),
+              ElevatedButton(
+                onPressed: () => Navigator.pop(context, true),
+                style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+                child: const Text('Delete'),
+              ),
+            ],
+          ),
+        ) ??
+        false;
+
+    if (!confirmed) return;
+
+    // Determine URL to use for deletion
+    // If we have a URL in the field, use that. Otherwise, try to construct one from the domain
+    String url = _urlController.text.trim();
+    if (url.isEmpty && cookie.domain != null) {
+      // Construct a URL from the cookie domain
+      final domain = cookie.domain!.startsWith('.')
+          ? cookie.domain!.substring(1)
+          : cookie.domain!;
+      url = 'https://$domain${cookie.path ?? '/'}';
+    }
+
+    if (url.isEmpty) {
+      _recordMethodResult(
+        'deleteCookie',
+        'Cannot delete cookie: No URL provided and cookie has no domain',
+        isError: true,
+      );
+      return;
+    }
+
+    await _deleteCookie(cookie, urlOverride: url);
   }
 
   Future<void> _deleteCookieByParams({
@@ -971,13 +1032,11 @@ class _CookieManagerScreenState extends State<CookieManagerScreen> {
                               children: [
                                 IconButton(
                                   icon: const Icon(
-                                    Icons.info_outline,
+                                    Icons.visibility_outlined,
                                     size: 18,
                                   ),
-                                  onPressed: () => _getCookie(
-                                    url: _urlController.text.trim(),
-                                    name: cookie.name,
-                                  ),
+                                  onPressed: () =>
+                                      _showCookieDetailsDialog(cookie),
                                   tooltip: 'View Details',
                                   padding: EdgeInsets.zero,
                                   constraints: const BoxConstraints(),
@@ -989,7 +1048,8 @@ class _CookieManagerScreenState extends State<CookieManagerScreen> {
                                     size: 18,
                                     color: Colors.red,
                                   ),
-                                  onPressed: () => _deleteCookie(cookie),
+                                  onPressed: () =>
+                                      _confirmAndDeleteCookie(cookie),
                                   tooltip: 'Delete',
                                   padding: EdgeInsets.zero,
                                   constraints: const BoxConstraints(),
@@ -1025,36 +1085,6 @@ class _CookieManagerScreenState extends State<CookieManagerScreen> {
       default:
         return null;
     }
-  }
-
-  Widget _buildCookieAttribute(String label, String? value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 2),
-      child: Row(
-        children: [
-          SizedBox(
-            width: 100,
-            child: Text(
-              label,
-              style: TextStyle(
-                fontSize: 12,
-                color: Colors.grey.shade600,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ),
-          Expanded(
-            child: Text(
-              value ?? 'null',
-              style: TextStyle(
-                fontSize: 12,
-                color: value != null ? Colors.black87 : Colors.grey,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
   }
 
   /// Get filtered and sorted cookies

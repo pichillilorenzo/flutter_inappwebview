@@ -17,18 +17,58 @@ class MethodResultEntry {
   });
 
   /// Returns the copyable string representation of the result value.
-  /// Attempts JSON encoding first, falls back to toString().
+  /// Attempts toMap()/toJson() conversion first, then JSON encoding, falls back to toString().
   String get copyableValue {
     if (value == null) return message;
+
+    // Try to convert to serializable form first
+    final serializable = _toSerializable(value);
+
     try {
-      return const JsonEncoder.withIndent('  ').convert(value);
+      return const JsonEncoder.withIndent('  ').convert(serializable);
     } catch (_) {
-      return value.toString();
+      return serializable.toString();
     }
+  }
+
+  /// Converts a value to a JSON-serializable form.
+  /// Handles objects with toMap() or toJson() methods, Lists, Maps, and primitives.
+  static dynamic _toSerializable(dynamic value) {
+    if (value == null) return null;
+    if (value is String || value is num || value is bool) return value;
+
+    // Handle List recursively
+    if (value is List) {
+      return value.map(_toSerializable).toList();
+    }
+
+    // Handle Map recursively
+    if (value is Map) {
+      return value.map((k, v) => MapEntry(k.toString(), _toSerializable(v)));
+    }
+
+    // Try toMap() - common in flutter_inappwebview objects
+    try {
+      final result = (value as dynamic).toMap?.call();
+      if (result is Map) {
+        return _toSerializable(result);
+      }
+    } catch (_) {}
+
+    // Try toJson() - common in many Flutter/Dart packages
+    try {
+      final result = (value as dynamic).toJson?.call();
+      if (result is Map) {
+        return _toSerializable(result);
+      }
+    } catch (_) {}
+
+    // Fallback to toString()
+    return value.toString();
   }
 }
 
-class MethodResultHistory extends StatelessWidget {
+class MethodResultHistory extends StatefulWidget {
   const MethodResultHistory({
     super.key,
     required this.entries,
@@ -38,6 +78,7 @@ class MethodResultHistory extends StatelessWidget {
     this.title,
     this.copyTooltip = 'Copy result',
     this.emptyLabel,
+    this.initiallyExpanded = false,
   });
 
   final List<MethodResultEntry> entries;
@@ -47,59 +88,135 @@ class MethodResultHistory extends StatelessWidget {
   final String? title;
   final String copyTooltip;
   final String? emptyLabel;
+  final bool initiallyExpanded;
+
+  @override
+  State<MethodResultHistory> createState() => _MethodResultHistoryState();
+}
+
+class _MethodResultHistoryState extends State<MethodResultHistory> {
+  late bool _isExpanded;
+
+  @override
+  void initState() {
+    super.initState();
+    _isExpanded = widget.initiallyExpanded;
+  }
 
   @override
   Widget build(BuildContext context) {
-    if (entries.isEmpty) {
-      if (emptyLabel == null) {
+    if (widget.entries.isEmpty) {
+      if (widget.emptyLabel == null) {
         return const SizedBox.shrink();
       }
       return Padding(
         padding: const EdgeInsets.only(top: 4),
         child: Text(
-          emptyLabel!,
+          widget.emptyLabel!,
           style: TextStyle(fontSize: 11, color: Colors.grey.shade600),
         ),
       );
     }
 
-    final visibleEntries = entries.take(maxEntries).toList();
+    final visibleEntries = widget.entries.take(widget.maxEntries).toList();
     final effectiveSelectedIndex =
-        selectedIndex != null && selectedIndex! < visibleEntries.length
-        ? selectedIndex!
+        widget.selectedIndex != null &&
+            widget.selectedIndex! < visibleEntries.length
+        ? widget.selectedIndex!
         : 0;
     final selectedEntry = visibleEntries[effectiveSelectedIndex];
+    final latestEntry = visibleEntries.first;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Row(
-          children: [
-            Text(
-              title ?? 'History',
-              style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+        InkWell(
+          onTap: () => setState(() => _isExpanded = !_isExpanded),
+          borderRadius: BorderRadius.circular(4),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 4),
+            child: Row(
+              children: [
+                Icon(
+                  _isExpanded
+                      ? Icons.keyboard_arrow_down
+                      : Icons.keyboard_arrow_right,
+                  size: 18,
+                  color: Colors.grey.shade600,
+                ),
+                const SizedBox(width: 4),
+                Text(
+                  widget.title ?? 'History',
+                  style: const TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(width: 8),
+                // Show latest result status icon when collapsed
+                if (!_isExpanded) ...[
+                  Icon(
+                    latestEntry.isError
+                        ? Icons.error_outline
+                        : Icons.check_circle,
+                    size: 14,
+                    color: latestEntry.isError ? Colors.red : Colors.green,
+                  ),
+                  const SizedBox(width: 4),
+                  Expanded(
+                    child: Text(
+                      latestEntry.message,
+                      style: TextStyle(
+                        fontSize: 11,
+                        fontFamily: 'monospace',
+                        color: latestEntry.isError
+                            ? Colors.red.shade800
+                            : Colors.green.shade800,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ] else ...[
+                  const Spacer(),
+                ],
+                IconButton(
+                  key: const Key('method-history-copy'),
+                  icon: const Icon(Icons.content_copy, size: 16),
+                  tooltip: widget.copyTooltip,
+                  constraints: const BoxConstraints(
+                    minWidth: 32,
+                    minHeight: 32,
+                  ),
+                  padding: EdgeInsets.zero,
+                  onPressed: () {
+                    Clipboard.setData(
+                      ClipboardData(text: selectedEntry.copyableValue),
+                    );
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Result copied to clipboard'),
+                        duration: Duration(seconds: 1),
+                      ),
+                    );
+                  },
+                ),
+              ],
             ),
-            const Spacer(),
-            IconButton(
-              key: const Key('method-history-copy'),
-              icon: const Icon(Icons.content_copy, size: 16),
-              tooltip: copyTooltip,
-              onPressed: () {
-                Clipboard.setData(
-                  ClipboardData(text: selectedEntry.copyableValue),
-                );
-              },
-            ),
-          ],
-        ),
-        const SizedBox(height: 4),
-        for (var index = 0; index < visibleEntries.length; index++)
-          _HistoryEntryTile(
-            key: Key('method-history-entry-$index'),
-            entry: visibleEntries[index],
-            isSelected: index == effectiveSelectedIndex,
-            onTap: onSelected == null ? null : () => onSelected!(index),
           ),
+        ),
+        if (_isExpanded) ...[
+          const SizedBox(height: 4),
+          for (var index = 0; index < visibleEntries.length; index++)
+            _HistoryEntryTile(
+              key: Key('method-history-entry-$index'),
+              entry: visibleEntries[index],
+              isSelected: index == effectiveSelectedIndex,
+              onTap: widget.onSelected == null
+                  ? null
+                  : () => widget.onSelected!(index),
+            ),
+        ],
       ],
     );
   }

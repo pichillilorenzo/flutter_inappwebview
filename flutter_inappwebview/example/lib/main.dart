@@ -20,9 +20,11 @@ import 'package:flutter_inappwebview_example/screens/browsers/chrome_safari_brow
 import 'package:flutter_inappwebview_example/screens/browsers/headless_webview_screen.dart';
 import 'package:flutter_inappwebview_example/screens/advanced/controllers_screen.dart';
 import 'package:flutter_inappwebview_example/screens/advanced/service_controllers_screen.dart';
+import 'package:flutter_inappwebview_example/screens/advanced/static_methods_screen.dart';
 import 'package:flutter_inappwebview_example/screens/support_matrix/support_matrix_screen.dart';
 import 'package:flutter_inappwebview_example/screens/support_matrix/platform_comparison_screen.dart';
 import 'package:flutter_inappwebview_example/screens/test_automation/test_runner_screen.dart';
+import 'package:flutter_inappwebview_example/screens/test_automation/test_configuration_screen.dart';
 import 'package:flutter_inappwebview_example/screens/test_automation/performance_screen.dart';
 import 'package:flutter_inappwebview_example/utils/test_registry.dart';
 
@@ -197,6 +199,13 @@ Drawer buildDrawer({required BuildContext context}) {
             Navigator.pushNamed(context, '/advanced/service-controllers');
           },
         ),
+        ListTile(
+          title: Text('Static Methods'),
+          leading: Icon(Icons.functions),
+          onTap: () {
+            Navigator.pushNamed(context, '/advanced/static-methods');
+          },
+        ),
         const Divider(),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -214,6 +223,13 @@ Drawer buildDrawer({required BuildContext context}) {
           leading: Icon(Icons.science),
           onTap: () {
             Navigator.pushNamed(context, '/test-automation');
+          },
+        ),
+        ListTile(
+          title: Text('Test Configuration'),
+          leading: Icon(Icons.tune),
+          onTap: () {
+            Navigator.pushNamed(context, '/test-configuration');
           },
         ),
         ListTile(
@@ -322,9 +338,11 @@ class _MyAppState extends State<MyApp> {
         '/advanced/controllers': (context) => ControllersScreen(),
         '/advanced/service-controllers': (context) =>
             ServiceControllersScreen(),
+        '/advanced/static-methods': (context) => StaticMethodsScreen(),
         '/support-matrix': (context) => SupportMatrixScreen(),
         '/platform-comparison': (context) => PlatformComparisonScreen(),
         '/test-automation': (context) => TestRunnerScreen(),
+        '/test-configuration': (context) => TestConfigurationScreen(),
         '/performance': (context) => PerformanceScreen(),
       },
     );

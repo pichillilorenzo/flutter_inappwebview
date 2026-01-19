@@ -5,6 +5,7 @@ import 'package:flutter_inappwebview_example/providers/settings_manager.dart';
 import 'package:flutter_inappwebview_example/models/settings_profile.dart';
 import 'package:flutter_inappwebview_example/utils/platform_utils.dart';
 import 'package:flutter_inappwebview_example/utils/support_checker.dart';
+import 'package:flutter_inappwebview_example/widgets/common/support_badge.dart';
 import 'package:flutter_inappwebview_example/main.dart';
 
 /// Comprehensive settings editor for InAppWebViewSettings
@@ -248,7 +249,7 @@ class _SettingsEditorScreenState extends State<SettingsEditorScreen> {
     return Card(
       margin: const EdgeInsets.only(bottom: 8),
       child: ExpansionTile(
-        key: Key(category),
+        key: ValueKey('$category-$isExpanded'),
         initiallyExpanded: isExpanded,
         onExpansionChanged: (expanded) {
           setState(() {
@@ -296,11 +297,18 @@ class _SettingsEditorScreenState extends State<SettingsEditorScreen> {
   ) {
     final isModified = settingsManager.isSettingModified(setting.key);
     final currentValue = settingsManager.getSetting(setting.key);
+    final hasPlatformLimitations = setting.supportedPlatforms != null;
+    final isCurrentPlatformSupported =
+        !hasPlatformLimitations ||
+        (_currentPlatform != null &&
+            setting.supportedPlatforms!.contains(_currentPlatform));
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
-        color: isModified ? Colors.orange.shade50 : null,
+        color: isModified
+            ? Colors.orange.shade50
+            : (!isCurrentPlatformSupported ? Colors.grey.shade50 : null),
         border: Border(bottom: BorderSide(color: Colors.grey.shade200)),
       ),
       child: Column(
@@ -317,9 +325,11 @@ class _SettingsEditorScreenState extends State<SettingsEditorScreen> {
                         Flexible(
                           child: Text(
                             setting.name,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontWeight: FontWeight.w600,
-                              color: Colors.black87,
+                              color: isCurrentPlatformSupported
+                                  ? Colors.black87
+                                  : Colors.grey.shade500,
                             ),
                           ),
                         ),
@@ -350,9 +360,18 @@ class _SettingsEditorScreenState extends State<SettingsEditorScreen> {
                       setting.description,
                       style: TextStyle(
                         fontSize: 12,
-                        color: Colors.grey.shade600,
+                        color: isCurrentPlatformSupported
+                            ? Colors.grey.shade600
+                            : Colors.grey.shade400,
                       ),
                     ),
+                    if (hasPlatformLimitations) ...[
+                      const SizedBox(height: 8),
+                      SupportBadgesRow(
+                        supportedPlatforms: setting.supportedPlatforms!,
+                        compact: true,
+                      ),
+                    ],
                   ],
                 ),
               ),
@@ -365,7 +384,17 @@ class _SettingsEditorScreenState extends State<SettingsEditorScreen> {
             ],
           ),
           const SizedBox(height: 8),
-          _buildSettingControl(setting, currentValue, settingsManager),
+          Opacity(
+            opacity: isCurrentPlatformSupported ? 1.0 : 0.5,
+            child: IgnorePointer(
+              ignoring: !isCurrentPlatformSupported,
+              child: _buildSettingControl(
+                setting,
+                currentValue,
+                settingsManager,
+              ),
+            ),
+          ),
         ],
       ),
     );

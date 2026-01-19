@@ -5,6 +5,7 @@ import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_inappwebview_example/models/settings_profile.dart';
 import 'package:flutter_inappwebview_example/models/webview_environment_profile.dart';
+import 'package:flutter_inappwebview_example/utils/support_checker.dart';
 
 /// Settings manager for the testing interface
 /// Manages InAppWebViewSettings profiles with save/load functionality
@@ -936,6 +937,22 @@ class SettingsManager extends ChangeNotifier {
           type: SettingType.boolean,
           defaultValue: false,
         ),
+        SettingDefinition(
+          key: 'isFraudulentWebsiteWarningEnabled',
+          name: 'Fraudulent Website Warning',
+          description: 'Show warnings for suspected phishing/malware',
+          type: SettingType.boolean,
+          defaultValue: true,
+          supportedPlatforms: {SupportedPlatform.ios, SupportedPlatform.macos},
+        ),
+        SettingDefinition(
+          key: 'safeBrowsingEnabled',
+          name: 'Safe Browsing',
+          description: 'Enable Google Safe Browsing',
+          type: SettingType.boolean,
+          defaultValue: true,
+          supportedPlatforms: {SupportedPlatform.android},
+        ),
       ],
       'Cache': [
         SettingDefinition(
@@ -1004,50 +1021,32 @@ class SettingsManager extends ChangeNotifier {
           defaultValue: false,
         ),
       ],
-      'iOS/macOS': [
+      'Navigation': [
         SettingDefinition(
           key: 'allowsBackForwardNavigationGestures',
           name: 'Back/Forward Gestures',
           description: 'Enable swipe gestures for navigation',
           type: SettingType.boolean,
           defaultValue: true,
+          supportedPlatforms: {SupportedPlatform.ios, SupportedPlatform.macos},
         ),
-        SettingDefinition(
-          key: 'isFraudulentWebsiteWarningEnabled',
-          name: 'Fraudulent Website Warning',
-          description: 'Show warnings for suspected phishing/malware',
-          type: SettingType.boolean,
-          defaultValue: true,
-        ),
+      ],
+      'Rendering': [
         SettingDefinition(
           key: 'suppressesIncrementalRendering',
           name: 'Suppress Incremental Rendering',
           description: 'Wait until content is fully loaded before rendering',
           type: SettingType.boolean,
           defaultValue: false,
+          supportedPlatforms: {SupportedPlatform.ios, SupportedPlatform.macos},
         ),
-        SettingDefinition(
-          key: 'ignoresViewportScaleLimits',
-          name: 'Ignore Viewport Scale Limits',
-          description: 'Override user-scalable viewport setting',
-          type: SettingType.boolean,
-          defaultValue: false,
-        ),
-        SettingDefinition(
-          key: 'allowsLinkPreview',
-          name: 'Link Preview',
-          description: 'Show link previews on long press',
-          type: SettingType.boolean,
-          defaultValue: true,
-        ),
-      ],
-      'Android': [
         SettingDefinition(
           key: 'hardwareAcceleration',
           name: 'Hardware Acceleration',
           description: 'Enable hardware acceleration',
           type: SettingType.boolean,
           defaultValue: true,
+          supportedPlatforms: {SupportedPlatform.android},
         ),
         SettingDefinition(
           key: 'useHybridComposition',
@@ -1055,41 +1054,17 @@ class SettingsManager extends ChangeNotifier {
           description: 'Use Flutter Hybrid Composition',
           type: SettingType.boolean,
           defaultValue: true,
+          supportedPlatforms: {SupportedPlatform.android},
         ),
+      ],
+      'Zoom': [
         SettingDefinition(
-          key: 'thirdPartyCookiesEnabled',
-          name: 'Third-Party Cookies',
-          description: 'Allow third-party cookies',
+          key: 'ignoresViewportScaleLimits',
+          name: 'Ignore Viewport Scale Limits',
+          description: 'Override user-scalable viewport setting',
           type: SettingType.boolean,
-          defaultValue: true,
-        ),
-        SettingDefinition(
-          key: 'domStorageEnabled',
-          name: 'DOM Storage',
-          description: 'Enable DOM local storage',
-          type: SettingType.boolean,
-          defaultValue: true,
-        ),
-        SettingDefinition(
-          key: 'databaseEnabled',
-          name: 'Database',
-          description: 'Enable database storage API',
-          type: SettingType.boolean,
-          defaultValue: true,
-        ),
-        SettingDefinition(
-          key: 'geolocationEnabled',
-          name: 'Geolocation',
-          description: 'Enable Geolocation API',
-          type: SettingType.boolean,
-          defaultValue: true,
-        ),
-        SettingDefinition(
-          key: 'safeBrowsingEnabled',
-          name: 'Safe Browsing',
-          description: 'Enable Google Safe Browsing',
-          type: SettingType.boolean,
-          defaultValue: true,
+          defaultValue: false,
+          supportedPlatforms: {SupportedPlatform.ios, SupportedPlatform.macos},
         ),
         SettingDefinition(
           key: 'builtInZoomControls',
@@ -1097,6 +1072,7 @@ class SettingsManager extends ChangeNotifier {
           description: 'Use built-in zoom controls',
           type: SettingType.boolean,
           defaultValue: true,
+          supportedPlatforms: {SupportedPlatform.android},
         ),
         SettingDefinition(
           key: 'displayZoomControls',
@@ -1104,22 +1080,7 @@ class SettingsManager extends ChangeNotifier {
           description: 'Show on-screen zoom controls',
           type: SettingType.boolean,
           defaultValue: false,
-        ),
-      ],
-      'Windows': [
-        SettingDefinition(
-          key: 'generalAutofillEnabled',
-          name: 'General Autofill',
-          description: 'Enable autofill for forms',
-          type: SettingType.boolean,
-          defaultValue: true,
-        ),
-        SettingDefinition(
-          key: 'passwordAutosaveEnabled',
-          name: 'Password Autosave',
-          description: 'Enable password autosave',
-          type: SettingType.boolean,
-          defaultValue: false,
+          supportedPlatforms: {SupportedPlatform.android},
         ),
         SettingDefinition(
           key: 'pinchZoomEnabled',
@@ -1127,13 +1088,81 @@ class SettingsManager extends ChangeNotifier {
           description: 'Enable pinch-to-zoom gesture',
           type: SettingType.boolean,
           defaultValue: true,
+          supportedPlatforms: {SupportedPlatform.windows},
         ),
+      ],
+      'Interaction': [
+        SettingDefinition(
+          key: 'allowsLinkPreview',
+          name: 'Link Preview',
+          description: 'Show link previews on long press',
+          type: SettingType.boolean,
+          defaultValue: true,
+          supportedPlatforms: {SupportedPlatform.ios, SupportedPlatform.macos},
+        ),
+      ],
+      'Storage': [
+        SettingDefinition(
+          key: 'thirdPartyCookiesEnabled',
+          name: 'Third-Party Cookies',
+          description: 'Allow third-party cookies',
+          type: SettingType.boolean,
+          defaultValue: true,
+          supportedPlatforms: {SupportedPlatform.android},
+        ),
+        SettingDefinition(
+          key: 'domStorageEnabled',
+          name: 'DOM Storage',
+          description: 'Enable DOM local storage',
+          type: SettingType.boolean,
+          defaultValue: true,
+          supportedPlatforms: {SupportedPlatform.android},
+        ),
+        SettingDefinition(
+          key: 'databaseEnabled',
+          name: 'Database',
+          description: 'Enable database storage API',
+          type: SettingType.boolean,
+          defaultValue: true,
+          supportedPlatforms: {SupportedPlatform.android},
+        ),
+      ],
+      'APIs': [
+        SettingDefinition(
+          key: 'geolocationEnabled',
+          name: 'Geolocation',
+          description: 'Enable Geolocation API',
+          type: SettingType.boolean,
+          defaultValue: true,
+          supportedPlatforms: {SupportedPlatform.android},
+        ),
+      ],
+      'Forms': [
+        SettingDefinition(
+          key: 'generalAutofillEnabled',
+          name: 'General Autofill',
+          description: 'Enable autofill for forms',
+          type: SettingType.boolean,
+          defaultValue: true,
+          supportedPlatforms: {SupportedPlatform.windows},
+        ),
+        SettingDefinition(
+          key: 'passwordAutosaveEnabled',
+          name: 'Password Autosave',
+          description: 'Enable password autosave',
+          type: SettingType.boolean,
+          defaultValue: false,
+          supportedPlatforms: {SupportedPlatform.windows},
+        ),
+      ],
+      'UI': [
         SettingDefinition(
           key: 'statusBarEnabled',
           name: 'Status Bar',
           description: 'Show status bar',
           type: SettingType.boolean,
           defaultValue: true,
+          supportedPlatforms: {SupportedPlatform.windows},
         ),
         SettingDefinition(
           key: 'browserAcceleratorKeysEnabled',
@@ -1141,13 +1170,21 @@ class SettingsManager extends ChangeNotifier {
           description: 'Enable browser keyboard shortcuts',
           type: SettingType.boolean,
           defaultValue: true,
+          supportedPlatforms: {SupportedPlatform.windows},
         ),
+      ],
+      'Developer': [
         SettingDefinition(
           key: 'isInspectable',
           name: 'Inspectable',
           description: 'Allow Web Inspector/DevTools',
           type: SettingType.boolean,
           defaultValue: false,
+          supportedPlatforms: {
+            SupportedPlatform.ios,
+            SupportedPlatform.macos,
+            SupportedPlatform.windows,
+          },
         ),
       ],
     };
@@ -1166,6 +1203,10 @@ class SettingDefinition {
   final dynamic defaultValue;
   final Map<String, dynamic>? enumValues;
 
+  /// Platforms where this setting is supported.
+  /// If null, the setting is supported on all platforms.
+  final Set<SupportedPlatform>? supportedPlatforms;
+
   const SettingDefinition({
     required this.key,
     required this.name,
@@ -1173,5 +1214,6 @@ class SettingDefinition {
     required this.type,
     required this.defaultValue,
     this.enumValues,
+    this.supportedPlatforms,
   });
 }

@@ -95,10 +95,6 @@ class _WebViewTesterScreenState extends State<WebViewTesterScreen>
   Widget _buildStandardBody(SettingsManager settingsManager) {
     return Column(
       children: [
-        ProfileSelectorCard(
-          onEditSettingsProfile: () =>
-              Navigator.pushNamed(context, '/settings'),
-        ),
         _buildUrlBar(),
         _buildNavigationControls(),
         if (_progress < 1.0)
@@ -115,10 +111,6 @@ class _WebViewTesterScreenState extends State<WebViewTesterScreen>
     return SingleChildScrollView(
       child: Column(
         children: [
-          ProfileSelectorCard(
-            onEditSettingsProfile: () =>
-                Navigator.pushNamed(context, '/settings'),
-          ),
           _buildUrlBar(),
           _buildNavigationControls(),
           if (_progress < 1.0)
@@ -130,6 +122,13 @@ class _WebViewTesterScreenState extends State<WebViewTesterScreen>
             height: _minWebViewHeight,
             child: _buildWebView(settingsManager),
           ),
+          ProfileSelectorCard(
+            compact: true,
+            onEditSettingsProfile: () =>
+                Navigator.pushNamed(context, '/settings'),
+            onEditEnvironmentProfile: () =>
+                Navigator.pushNamed(context, '/environment-settings'),
+          ),
           Container(height: _dividerHeight, color: Colors.grey.shade300),
           SizedBox(height: _minTabsHeight, child: _buildBottomTabs()),
         ],
@@ -140,8 +139,13 @@ class _WebViewTesterScreenState extends State<WebViewTesterScreen>
   Widget _buildResizableContent(SettingsManager settingsManager) {
     return LayoutBuilder(
       builder: (context, constraints) {
+        // Account for ProfileSelectorCard height (approximately 120 for compact mode)
+        const profileCardHeight = 120.0;
         final maxWebViewHeight =
-            constraints.maxHeight - _minTabsHeight - _dividerHeight;
+            constraints.maxHeight -
+            _minTabsHeight -
+            _dividerHeight -
+            profileCardHeight;
         final effectiveMax = maxWebViewHeight < _minWebViewHeight
             ? _minWebViewHeight
             : maxWebViewHeight;
@@ -154,6 +158,13 @@ class _WebViewTesterScreenState extends State<WebViewTesterScreen>
             SizedBox(
               height: webViewHeight,
               child: _buildWebView(settingsManager),
+            ),
+            ProfileSelectorCard(
+              compact: true,
+              onEditSettingsProfile: () =>
+                  Navigator.pushNamed(context, '/settings'),
+              onEditEnvironmentProfile: () =>
+                  Navigator.pushNamed(context, '/environment-settings'),
             ),
             _buildResizeHandle(
               onDrag: (delta) {

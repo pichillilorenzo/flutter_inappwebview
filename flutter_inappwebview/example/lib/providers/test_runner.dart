@@ -410,21 +410,6 @@ class TestRunner extends ChangeNotifier {
     return const JsonEncoder.withIndent('  ').convert(export);
   }
 
-  /// Export results as CSV
-  String exportResultsAsCsv() {
-    final buffer = StringBuffer();
-    buffer.writeln(
-      'Test ID,Test Title,Category,Success,Skipped,Duration (ms),Message,Timestamp',
-    );
-    for (final result in _results) {
-      final message = result.message.replaceAll('"', '""');
-      buffer.writeln(
-        '"${result.testId}","${result.testTitle}","${result.category.name}",${result.success},${result.skipped},${result.duration.inMilliseconds},"$message","${result.timestamp.toIso8601String()}"',
-      );
-    }
-    return buffer.toString();
-  }
-
   /// Get all available test categories with their tests
   static List<TestCategoryGroup> getTestCategories() {
     return [

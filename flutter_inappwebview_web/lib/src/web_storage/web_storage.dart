@@ -93,7 +93,8 @@ abstract mixin class WebPlatformStorage implements PlatformStorage {
     window.$webStorageType.length;
     """,
     );
-    return result != null ? (json.decode(result) as num).toInt() : null;
+    // evaluateJavascript already decodes the JSON, so result is already a num
+    return result != null ? (result as num).toInt() : null;
   }
 
   @override
@@ -191,7 +192,8 @@ abstract mixin class WebPlatformStorage implements PlatformStorage {
     window.$webStorageType.key($index);
     """,
     );
-    return result != null ? json.decode(result) : null;
+    // evaluateJavascript already decodes the JSON, so result is already a String
+    return result as String? ?? '';
   }
 
   @override

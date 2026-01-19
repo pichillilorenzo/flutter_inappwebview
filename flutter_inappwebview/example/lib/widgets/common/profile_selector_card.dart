@@ -1,16 +1,23 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
-import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_inappwebview_example/providers/settings_manager.dart';
 import 'package:flutter_inappwebview_example/models/settings_profile.dart';
 import 'package:flutter_inappwebview_example/models/webview_environment_profile.dart';
 
 class ProfileSelectorCard extends StatelessWidget {
-  const ProfileSelectorCard({super.key, required this.onEditSettingsProfile});
+  const ProfileSelectorCard({
+    super.key,
+    required this.onEditSettingsProfile,
+    this.onEditEnvironmentProfile,
+    this.compact = false,
+  });
 
   final VoidCallback onEditSettingsProfile;
+  final VoidCallback? onEditEnvironmentProfile;
+
+  /// When true, displays a more compact layout suitable for embedding
+  /// in constrained spaces (e.g., below WebView)
+  final bool compact;
 
   static const double _desktopBreakpoint = 600;
 
@@ -28,8 +35,13 @@ class ProfileSelectorCard extends StatelessWidget {
         }
 
         return Card(
+          margin: compact
+              ? const EdgeInsets.symmetric(horizontal: 8, vertical: 4)
+              : null,
           child: Padding(
-            padding: const EdgeInsets.all(16),
+            padding: compact
+                ? const EdgeInsets.all(8)
+                : const EdgeInsets.all(16),
             child: LayoutBuilder(
               builder: (context, constraints) {
                 final isWide = constraints.maxWidth >= _desktopBreakpoint;
@@ -60,7 +72,7 @@ class ProfileSelectorCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       _buildSettingsProfileRow(context, settingsManager),
-                      const SizedBox(height: 16),
+                      SizedBox(height: compact ? 8 : 16),
                       _buildEnvironmentProfileRow(context, settingsManager),
                     ],
                   );
@@ -82,9 +94,12 @@ class ProfileSelectorCard extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           'InAppWebView Settings',
-          style: TextStyle(fontWeight: FontWeight.w600),
+          style: TextStyle(
+            fontWeight: FontWeight.w600,
+            fontSize: compact ? 12 : 14,
+          ),
         ),
         const SizedBox(height: 8),
         Row(
@@ -92,10 +107,13 @@ class ProfileSelectorCard extends StatelessWidget {
             Expanded(
               child: DropdownButtonFormField<String?>(
                 value: settingsManager.currentProfileId,
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   labelText: 'Settings Profile',
-                  border: OutlineInputBorder(),
+                  border: const OutlineInputBorder(),
                   isDense: true,
+                  contentPadding: compact
+                      ? const EdgeInsets.symmetric(horizontal: 8, vertical: 8)
+                      : null,
                 ),
                 items: [
                   const DropdownMenuItem(
@@ -122,11 +140,19 @@ class ProfileSelectorCard extends StatelessWidget {
             IconButton(
               icon: const Icon(Icons.edit),
               tooltip: 'Edit settings profile',
+              constraints: compact
+                  ? const BoxConstraints(minWidth: 32, minHeight: 32)
+                  : null,
+              iconSize: compact ? 18 : 24,
               onPressed: onEditSettingsProfile,
             ),
             IconButton(
               icon: const Icon(Icons.delete),
               tooltip: 'Delete selected profile',
+              constraints: compact
+                  ? const BoxConstraints(minWidth: 32, minHeight: 32)
+                  : null,
+              iconSize: compact ? 18 : 24,
               onPressed: current == null
                   ? null
                   : () => _confirmDeleteSettingsProfile(context, current),
@@ -149,16 +175,22 @@ class ProfileSelectorCard extends StatelessWidget {
       children: [
         Row(
           children: [
-            const Expanded(
+            Expanded(
               child: Text(
                 'WebView Environment',
-                style: TextStyle(fontWeight: FontWeight.w600),
+                style: TextStyle(
+                  fontWeight: FontWeight.w600,
+                  fontSize: compact ? 12 : 14,
+                ),
               ),
             ),
             if (!supported)
-              const Text(
+              Text(
                 'Not supported',
-                style: TextStyle(fontSize: 12, color: Colors.grey),
+                style: TextStyle(
+                  fontSize: compact ? 10 : 12,
+                  color: Colors.grey,
+                ),
               ),
           ],
         ),
@@ -168,10 +200,13 @@ class ProfileSelectorCard extends StatelessWidget {
             Expanded(
               child: DropdownButtonFormField<String?>(
                 value: settingsManager.currentEnvironmentProfileId,
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   labelText: 'Environment Profile',
-                  border: OutlineInputBorder(),
+                  border: const OutlineInputBorder(),
                   isDense: true,
+                  contentPadding: compact
+                      ? const EdgeInsets.symmetric(horizontal: 8, vertical: 8)
+                      : null,
                 ),
                 items: [
                   const DropdownMenuItem(
@@ -196,28 +231,21 @@ class ProfileSelectorCard extends StatelessWidget {
             ),
             const SizedBox(width: 8),
             IconButton(
-              icon: const Icon(Icons.add),
-              tooltip: 'Create environment profile',
-              onPressed: () => _showEnvironmentEditor(
-                context,
-                settingsManager,
-                profile: null,
-              ),
-            ),
-            IconButton(
               icon: const Icon(Icons.edit),
               tooltip: 'Edit environment profile',
-              onPressed: current == null
-                  ? null
-                  : () => _showEnvironmentEditor(
-                      context,
-                      settingsManager,
-                      profile: current,
-                    ),
+              constraints: compact
+                  ? const BoxConstraints(minWidth: 32, minHeight: 32)
+                  : null,
+              iconSize: compact ? 18 : 24,
+              onPressed: onEditEnvironmentProfile,
             ),
             IconButton(
               icon: const Icon(Icons.delete),
               tooltip: 'Delete environment profile',
+              constraints: compact
+                  ? const BoxConstraints(minWidth: 32, minHeight: 32)
+                  : null,
+              iconSize: compact ? 18 : 24,
               onPressed: current == null
                   ? null
                   : () => _confirmDeleteEnvironmentProfile(context, current),
@@ -297,109 +325,5 @@ class ProfileSelectorCard extends StatelessWidget {
           ),
         )) ??
         false;
-  }
-
-  Future<void> _showEnvironmentEditor(
-    BuildContext context,
-    SettingsManager settingsManager, {
-    required WebViewEnvironmentProfile? profile,
-  }) async {
-    final nameController = TextEditingController(text: profile?.name ?? '');
-    final jsonController = TextEditingController(
-      text: const JsonEncoder.withIndent('  ').convert(
-        profile?.settings ?? settingsManager.currentEnvironmentSettings,
-      ),
-    );
-
-    await showDialog<void>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(
-          profile == null ? 'Create Environment' : 'Edit Environment',
-        ),
-        content: SizedBox(
-          width: double.maxFinite,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                controller: nameController,
-                decoration: const InputDecoration(
-                  labelText: 'Profile Name',
-                  border: OutlineInputBorder(),
-                ),
-              ),
-              const SizedBox(height: 12),
-              TextField(
-                controller: jsonController,
-                maxLines: 8,
-                decoration: const InputDecoration(
-                  labelText: 'Environment Settings (JSON)',
-                  border: OutlineInputBorder(),
-                ),
-                style: const TextStyle(fontFamily: 'monospace', fontSize: 12),
-              ),
-              const SizedBox(height: 8),
-              const Text(
-                'Tip: Use WebViewEnvironmentSettings JSON map values.',
-                style: TextStyle(fontSize: 11, color: Colors.grey),
-              ),
-            ],
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
-          ElevatedButton(
-            onPressed: () async {
-              final name = nameController.text.trim();
-              if (name.isEmpty) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Name is required')),
-                );
-                return;
-              }
-
-              try {
-                final decoded = jsonDecode(jsonController.text);
-                if (decoded is! Map<String, dynamic>) {
-                  throw const FormatException('Invalid JSON map');
-                }
-                final settings =
-                    WebViewEnvironmentSettings.fromMap(decoded) ??
-                    WebViewEnvironmentSettings();
-                final settingsMap = settings.toMap();
-
-                if (profile == null) {
-                  await settingsManager.createEnvironmentProfile(
-                    name,
-                    settings: settingsMap,
-                  );
-                } else {
-                  await settingsManager.updateEnvironmentProfile(
-                    profile.id,
-                    name: name,
-                    settings: settingsMap,
-                  );
-                }
-
-                if (context.mounted) {
-                  Navigator.pop(context);
-                }
-              } catch (e) {
-                if (context.mounted) {
-                  ScaffoldMessenger.of(
-                    context,
-                  ).showSnackBar(SnackBar(content: Text('Invalid JSON: $e')));
-                }
-              }
-            },
-            child: const Text('Save'),
-          ),
-        ],
-      ),
-    );
   }
 }

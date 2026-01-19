@@ -1,0 +1,845 @@
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
+import '../../models/test_configuration.dart';
+import '../../main.dart';
+import '../../widgets/test_automation/custom_test_step_dialog.dart';
+
+/// Screen for managing test configurations, custom steps, and test ordering
+class TestConfigurationScreen extends StatefulWidget {
+  const TestConfigurationScreen({super.key});
+
+  @override
+  State<TestConfigurationScreen> createState() =>
+      _TestConfigurationScreenState();
+}
+
+class _TestConfigurationScreenState extends State<TestConfigurationScreen>
+    with SingleTickerProviderStateMixin {
+  late final TabController _tabController;
+  final TextEditingController _importController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: 3, vsync: this);
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    _importController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ChangeNotifierProvider(
+      create: (_) => TestConfigurationManager(),
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('Test Configuration'),
+          backgroundColor: Colors.blue,
+          foregroundColor: Colors.white,
+          bottom: TabBar(
+            controller: _tabController,
+            indicatorColor: Colors.white,
+            labelColor: Colors.white,
+            unselectedLabelColor: Colors.white70,
+            tabs: const [
+              Tab(icon: Icon(Icons.edit_note), text: 'Custom Steps'),
+              Tab(icon: Icon(Icons.reorder), text: 'Test Order'),
+              Tab(icon: Icon(Icons.import_export), text: 'Import/Export'),
+            ],
+          ),
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.save),
+              tooltip: 'Save Configuration',
+              onPressed: () => _saveConfiguration(context),
+            ),
+            PopupMenuButton<String>(
+              icon: const Icon(Icons.more_vert),
+              onSelected: (action) => _handleMenuAction(context, action),
+              itemBuilder: (context) => [
+                const PopupMenuItem(
+                  value: 'new',
+                  child: ListTile(
+                    leading: Icon(Icons.add),
+                    title: Text('New Configuration'),
+                    contentPadding: EdgeInsets.zero,
+                  ),
+                ),
+                const PopupMenuItem(
+                  value: 'load',
+                  child: ListTile(
+                    leading: Icon(Icons.folder_open),
+                    title: Text('Load Configuration'),
+                    contentPadding: EdgeInsets.zero,
+                  ),
+                ),
+                const PopupMenuDivider(),
+                const PopupMenuItem(
+                  value: 'reset',
+                  child: ListTile(
+                    leading: Icon(Icons.restart_alt, color: Colors.orange),
+                    title: Text('Reset to Default'),
+                    contentPadding: EdgeInsets.zero,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+        drawer: buildDrawer(context: context),
+        body: TabBarView(
+          controller: _tabController,
+          children: [
+            _buildCustomStepsTab(),
+            _buildTestOrderTab(),
+            _buildImportExportTab(),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCustomStepsTab() {
+    return Consumer<TestConfigurationManager>(
+      builder: (context, manager, child) {
+        final steps = manager.currentConfig.customSteps;
+
+        return Column(
+          children: [
+            _buildConfigHeader(manager),
+            Expanded(
+              child: steps.isEmpty
+                  ? _buildEmptyStepsMessage()
+                  : _buildStepsList(manager, steps),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _buildConfigHeader(TestConfigurationManager manager) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.blue.shade50,
+        border: Border(bottom: BorderSide(color: Colors.blue.shade200)),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  manager.currentConfig.name,
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                if (manager.currentConfig.description.isNotEmpty)
+                  Text(
+                    manager.currentConfig.description,
+                    style: TextStyle(color: Colors.grey.shade600),
+                  ),
+                Text(
+                  '${manager.currentConfig.customSteps.length} custom step(s)',
+                  style: TextStyle(color: Colors.grey.shade500, fontSize: 12),
+                ),
+              ],
+            ),
+          ),
+          ElevatedButton.icon(
+            icon: const Icon(Icons.add),
+            label: const Text('Add Step'),
+            onPressed: () => _showAddStepDialog(context, manager),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildEmptyStepsMessage() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(Icons.playlist_add, size: 64, color: Colors.grey.shade400),
+          const SizedBox(height: 16),
+          Text(
+            'No Custom Test Steps',
+            style: TextStyle(fontSize: 18, color: Colors.grey.shade600),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Click "Add Step" to create your first custom test',
+            style: TextStyle(color: Colors.grey.shade500),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStepsList(
+    TestConfigurationManager manager,
+    List<CustomTestStep> steps,
+  ) {
+    return ReorderableListView.builder(
+      padding: const EdgeInsets.all(8),
+      itemCount: steps.length,
+      onReorder: (oldIndex, newIndex) {
+        manager.reorderCustomSteps(oldIndex, newIndex);
+      },
+      itemBuilder: (context, index) {
+        final step = steps[index];
+        return _buildStepCard(context, manager, step, index);
+      },
+    );
+  }
+
+  Widget _buildStepCard(
+    BuildContext context,
+    TestConfigurationManager manager,
+    CustomTestStep step,
+    int index,
+  ) {
+    return Card(
+      key: ValueKey(step.id),
+      margin: const EdgeInsets.symmetric(vertical: 4),
+      child: ListTile(
+        leading: ReorderableDragStartListener(
+          index: index,
+          child: Icon(Icons.drag_handle, color: Colors.grey.shade400),
+        ),
+        title: Text(
+          step.name,
+          style: TextStyle(
+            fontWeight: FontWeight.w500,
+            decoration: step.enabled ? null : TextDecoration.lineThrough,
+            color: step.enabled ? null : Colors.grey,
+          ),
+        ),
+        subtitle: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              step.description.isNotEmpty ? step.description : 'No description',
+            ),
+            const SizedBox(height: 4),
+            Wrap(
+              spacing: 4,
+              children: [
+                _buildChip(step.category, Colors.blue),
+                _buildChip(_getActionTypeName(step.action.type), Colors.green),
+              ],
+            ),
+          ],
+        ),
+        trailing: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Switch(
+              value: step.enabled,
+              onChanged: (value) {
+                manager.updateCustomStep(
+                  step.id,
+                  step.copyWith(enabled: value),
+                );
+              },
+            ),
+            IconButton(
+              icon: const Icon(Icons.edit),
+              onPressed: () => _showEditStepDialog(context, manager, step),
+            ),
+            IconButton(
+              icon: const Icon(Icons.delete, color: Colors.red),
+              onPressed: () => _confirmDeleteStep(context, manager, step),
+            ),
+          ],
+        ),
+        isThreeLine: true,
+      ),
+    );
+  }
+
+  Widget _buildChip(String label, Color color) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: color.withOpacity(0.3)),
+      ),
+      child: Text(label, style: TextStyle(fontSize: 10, color: color)),
+    );
+  }
+
+  Widget _buildTestOrderTab() {
+    return Consumer<TestConfigurationManager>(
+      builder: (context, manager, child) {
+        return SingleChildScrollView(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'Test Execution Order',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Drag and drop to reorder tests within categories. Custom steps run first by default.',
+                style: TextStyle(color: Colors.grey.shade600),
+              ),
+              const SizedBox(height: 16),
+              _buildOrderingInfo(manager),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildOrderingInfo(TestConfigurationManager manager) {
+    final ordering = manager.currentConfig.testOrdering;
+
+    if (ordering.isEmpty) {
+      return Card(
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            children: [
+              Icon(Icons.info_outline, size: 48, color: Colors.blue.shade300),
+              const SizedBox(height: 8),
+              const Text(
+                'Default ordering is used',
+                style: TextStyle(fontWeight: FontWeight.w500),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                'Tests run in the order they appear in each category',
+                style: TextStyle(color: Colors.grey.shade600),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    return Column(
+      children: ordering.entries.map((entry) {
+        return Card(
+          margin: const EdgeInsets.only(bottom: 8),
+          child: ExpansionTile(
+            title: Text(entry.key),
+            subtitle: Text('${entry.value.length} tests'),
+            children: entry.value.map((testId) {
+              return ListTile(
+                dense: true,
+                leading: const Icon(Icons.drag_indicator, size: 18),
+                title: Text(testId),
+              );
+            }).toList(),
+          ),
+        );
+      }).toList(),
+    );
+  }
+
+  Widget _buildImportExportTab() {
+    return Consumer<TestConfigurationManager>(
+      builder: (context, manager, child) {
+        return SingleChildScrollView(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Export section
+              Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Icon(Icons.upload, color: Colors.blue.shade700),
+                          const SizedBox(width: 8),
+                          const Text(
+                            'Export Configuration',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        'Export your current test configuration as JSON',
+                        style: TextStyle(color: Colors.grey.shade600),
+                      ),
+                      const SizedBox(height: 12),
+                      Row(
+                        children: [
+                          ElevatedButton.icon(
+                            icon: const Icon(Icons.copy),
+                            label: const Text('Copy to Clipboard'),
+                            onPressed: () =>
+                                _exportToClipboard(context, manager),
+                          ),
+                          const SizedBox(width: 8),
+                          OutlinedButton.icon(
+                            icon: const Icon(Icons.visibility),
+                            label: const Text('Preview JSON'),
+                            onPressed: () => _showJsonPreview(context, manager),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+
+              // Import section
+              Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Icon(Icons.download, color: Colors.green.shade700),
+                          const SizedBox(width: 8),
+                          const Text(
+                            'Import Configuration',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        'Paste JSON configuration to import',
+                        style: TextStyle(color: Colors.grey.shade600),
+                      ),
+                      const SizedBox(height: 12),
+                      TextField(
+                        controller: _importController,
+                        decoration: const InputDecoration(
+                          labelText: 'Paste JSON here',
+                          border: OutlineInputBorder(),
+                          hintText: '{"id": "...", "name": "...", ...}',
+                        ),
+                        maxLines: 8,
+                        style: const TextStyle(
+                          fontFamily: 'monospace',
+                          fontSize: 12,
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      Row(
+                        children: [
+                          ElevatedButton.icon(
+                            icon: const Icon(Icons.file_download),
+                            label: const Text('Import'),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.green,
+                              foregroundColor: Colors.white,
+                            ),
+                            onPressed: () => _importConfig(context, manager),
+                          ),
+                          const SizedBox(width: 8),
+                          TextButton.icon(
+                            icon: const Icon(Icons.paste),
+                            label: const Text('Paste from Clipboard'),
+                            onPressed: () => _pasteFromClipboard(),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+
+              // Sample configuration
+              Card(
+                color: Colors.amber.shade50,
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Icon(Icons.lightbulb, color: Colors.amber.shade700),
+                          const SizedBox(width: 8),
+                          const Text(
+                            'Sample Configuration',
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        'Click below to load a sample configuration with example custom tests.',
+                        style: TextStyle(color: Colors.grey.shade700),
+                      ),
+                      const SizedBox(height: 8),
+                      OutlinedButton(
+                        onPressed: () => _loadSampleConfig(manager),
+                        child: const Text('Load Sample'),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  void _showAddStepDialog(
+    BuildContext context,
+    TestConfigurationManager manager,
+  ) {
+    showDialog(
+      context: context,
+      builder: (context) =>
+          CustomTestStepDialog(onSave: (step) => manager.addCustomStep(step)),
+    );
+  }
+
+  void _showEditStepDialog(
+    BuildContext context,
+    TestConfigurationManager manager,
+    CustomTestStep step,
+  ) {
+    showDialog(
+      context: context,
+      builder: (context) => CustomTestStepDialog(
+        existingStep: step,
+        onSave: (updatedStep) => manager.updateCustomStep(step.id, updatedStep),
+      ),
+    );
+  }
+
+  void _confirmDeleteStep(
+    BuildContext context,
+    TestConfigurationManager manager,
+    CustomTestStep step,
+  ) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Delete Test Step?'),
+        content: Text('Are you sure you want to delete "${step.name}"?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+            onPressed: () {
+              manager.removeCustomStep(step.id);
+              Navigator.pop(context);
+            },
+            child: const Text('Delete'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _saveConfiguration(BuildContext context) {
+    final manager = context.read<TestConfigurationManager>();
+    showDialog(
+      context: context,
+      builder: (context) {
+        final nameController = TextEditingController(
+          text: manager.currentConfig.name,
+        );
+        return AlertDialog(
+          title: const Text('Save Configuration'),
+          content: TextField(
+            controller: nameController,
+            decoration: const InputDecoration(
+              labelText: 'Configuration Name',
+              border: OutlineInputBorder(),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancel'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                manager.saveCurrentConfig(name: nameController.text);
+                Navigator.pop(context);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Configuration saved')),
+                );
+              },
+              child: const Text('Save'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _handleMenuAction(BuildContext context, String action) {
+    final manager = context.read<TestConfigurationManager>();
+
+    switch (action) {
+      case 'new':
+        manager.resetConfig();
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('New configuration created')),
+        );
+        break;
+      case 'load':
+        _showLoadDialog(context, manager);
+        break;
+      case 'reset':
+        _confirmReset(context, manager);
+        break;
+    }
+  }
+
+  void _showLoadDialog(BuildContext context, TestConfigurationManager manager) {
+    if (manager.savedConfigs.isEmpty) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('No saved configurations')));
+      return;
+    }
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Load Configuration'),
+        content: SizedBox(
+          width: 400,
+          child: ListView.builder(
+            shrinkWrap: true,
+            itemCount: manager.savedConfigs.length,
+            itemBuilder: (context, index) {
+              final config = manager.savedConfigs[index];
+              return ListTile(
+                title: Text(config.name),
+                subtitle: Text(
+                  '${config.customSteps.length} steps • Modified: ${_formatDate(config.modifiedAt)}',
+                ),
+                onTap: () {
+                  manager.loadConfig(config.id);
+                  Navigator.pop(context);
+                },
+                trailing: IconButton(
+                  icon: const Icon(Icons.delete, size: 20),
+                  onPressed: () {
+                    manager.deleteConfig(config.id);
+                  },
+                ),
+              );
+            },
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _confirmReset(BuildContext context, TestConfigurationManager manager) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Reset Configuration?'),
+        content: const Text(
+          'This will clear all custom steps and reset to default settings.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.orange),
+            onPressed: () {
+              manager.resetConfig();
+              Navigator.pop(context);
+            },
+            child: const Text('Reset'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _exportToClipboard(
+    BuildContext context,
+    TestConfigurationManager manager,
+  ) {
+    final json = manager.exportConfig();
+    Clipboard.setData(ClipboardData(text: json));
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Configuration copied to clipboard')),
+    );
+  }
+
+  void _showJsonPreview(
+    BuildContext context,
+    TestConfigurationManager manager,
+  ) {
+    final json = manager.exportConfig();
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('JSON Preview'),
+        content: SizedBox(
+          width: 500,
+          height: 400,
+          child: SingleChildScrollView(
+            child: SelectableText(
+              json,
+              style: const TextStyle(fontFamily: 'monospace', fontSize: 12),
+            ),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Close'),
+          ),
+          ElevatedButton.icon(
+            icon: const Icon(Icons.copy),
+            label: const Text('Copy'),
+            onPressed: () {
+              Clipboard.setData(ClipboardData(text: json));
+              Navigator.pop(context);
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Copied to clipboard')),
+              );
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _importConfig(BuildContext context, TestConfigurationManager manager) {
+    final json = _importController.text.trim();
+    if (json.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please paste JSON configuration first')),
+      );
+      return;
+    }
+
+    try {
+      manager.importConfig(json);
+      _importController.clear();
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Configuration imported successfully')),
+      );
+      _tabController.animateTo(0); // Switch to custom steps tab
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Import failed: ${e.toString()}'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
+  Future<void> _pasteFromClipboard() async {
+    final data = await Clipboard.getData(Clipboard.kTextPlain);
+    if (data?.text != null) {
+      _importController.text = data!.text!;
+    }
+  }
+
+  void _loadSampleConfig(TestConfigurationManager manager) {
+    final sample = TestConfiguration(
+      id: 'sample_config',
+      name: 'Sample Test Configuration',
+      description: 'A sample configuration with example custom tests',
+      createdAt: DateTime.now(),
+      modifiedAt: DateTime.now(),
+      customSteps: [
+        CustomTestStep(
+          id: 'sample_step_1',
+          name: 'Check Page Title',
+          description: 'Verify the page title contains expected text',
+          category: 'content',
+          action: CustomTestAction.evaluateJs('document.title'),
+          expectedResult: 'Flutter',
+          order: 0,
+        ),
+        CustomTestStep(
+          id: 'sample_step_2',
+          name: 'Wait for Element',
+          description: 'Wait for the main content to load',
+          category: 'content',
+          action: CustomTestAction.waitForElement('body', timeoutMs: 5000),
+          order: 1,
+        ),
+        CustomTestStep(
+          id: 'sample_step_3',
+          name: 'Check Element Exists',
+          description: 'Verify a specific element is present',
+          category: 'content',
+          action: CustomTestAction.checkElement('a[href]'),
+          order: 2,
+        ),
+        CustomTestStep(
+          id: 'sample_step_4',
+          name: 'Execute Custom JS',
+          description: 'Run custom JavaScript and return result',
+          category: 'javascript',
+          action: CustomTestAction.evaluateJs(
+            'document.querySelectorAll("a").length',
+          ),
+          order: 3,
+        ),
+      ],
+    );
+
+    manager.importConfig(sample.toJsonString());
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Sample configuration loaded')),
+    );
+    _tabController.animateTo(0);
+  }
+
+  String _getActionTypeName(CustomTestActionType type) {
+    return type.name
+        .replaceAllMapped(RegExp(r'([A-Z])'), (m) => ' ${m.group(1)}')
+        .trim();
+  }
+
+  String _formatDate(DateTime date) {
+    return '${date.month}/${date.day}/${date.year}';
+  }
+}

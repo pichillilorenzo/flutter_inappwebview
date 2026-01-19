@@ -1199,7 +1199,7 @@ class _WebStorageScreenState extends State<WebStorageScreen>
                 Expanded(
                   child: Text(
                     'WebStorageManager provides platform-level storage management. '
-                    'Android uses WebStorage API. iOS/macOS/Linux use WKWebsiteDataStore/WebKitWebsiteDataManager.',
+                    'Methods have different platform availability - check the support badges.',
                     style: TextStyle(fontSize: 12, color: Colors.blue.shade700),
                   ),
                 ),
@@ -1208,11 +1208,6 @@ class _WebStorageScreenState extends State<WebStorageScreen>
           ),
         ),
         const SizedBox(height: 16),
-        const Text(
-          'Android APIs',
-          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-        ),
-        const SizedBox(height: 8),
         _buildManagerMethodSection(
           'getOrigins',
           'Get origins using Application Cache or Web SQL Database',
@@ -1243,12 +1238,6 @@ class _WebStorageScreenState extends State<WebStorageScreen>
           _getManagerMethodPlatforms('getUsageForOrigin'),
           _getUsageForOrigin,
         ),
-        const SizedBox(height: 16),
-        const Text(
-          'iOS/macOS/Linux APIs',
-          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-        ),
-        const SizedBox(height: 8),
         _buildManagerMethodSection(
           'fetchDataRecords',
           'Fetch website data records',
@@ -1329,7 +1318,7 @@ class _WebStorageScreenState extends State<WebStorageScreen>
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  'Click "getOrigins" to fetch (Android only)',
+                  'Click "getOrigins" to fetch storage origins',
                   style: TextStyle(fontSize: 12, color: Colors.grey.shade500),
                 ),
               ],
@@ -1414,7 +1403,7 @@ class _WebStorageScreenState extends State<WebStorageScreen>
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  'Click "fetchDataRecords" to fetch (iOS/macOS/Linux)',
+                  'Click "fetchDataRecords" to fetch website data records',
                   style: TextStyle(fontSize: 12, color: Colors.grey.shade500),
                 ),
               ],

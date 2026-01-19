@@ -48,14 +48,6 @@ class _TestRunnerScreenState extends State<TestRunnerScreen> {
                   contentPadding: EdgeInsets.zero,
                 ),
               ),
-              const PopupMenuItem(
-                value: 'export_csv',
-                child: ListTile(
-                  leading: Icon(Icons.table_chart),
-                  title: Text('Export as CSV'),
-                  contentPadding: EdgeInsets.zero,
-                ),
-              ),
               const PopupMenuDivider(),
               const PopupMenuItem(
                 value: 'clear',
@@ -649,9 +641,6 @@ class _TestRunnerScreenState extends State<TestRunnerScreen> {
     switch (action) {
       case 'export_json':
         _exportResults(runner.exportResultsAsJson(), 'test_results.json');
-        break;
-      case 'export_csv':
-        _exportResults(runner.exportResultsAsCsv(), 'test_results.csv');
         break;
       case 'clear':
         runner.clearResults();

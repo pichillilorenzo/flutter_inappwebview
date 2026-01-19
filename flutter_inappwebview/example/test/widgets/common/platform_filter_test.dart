@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_inappwebview_example/widgets/common/platform_filter.dart';
-import 'package:flutter_inappwebview_example/utils/constants.dart';
+import 'package:flutter_inappwebview_example/utils/support_checker.dart';
 
 void main() {
   group('PlatformFilter', () {
@@ -23,8 +23,8 @@ void main() {
       expect(find.byType(CheckboxListTile), findsNWidgets(6));
 
       // Verify platform names are displayed
-      for (final platform in allPlatforms) {
-        expect(find.text(platformNames[platform]!), findsOneWidget);
+      for (final platform in SupportedPlatform.values) {
+        expect(find.text(platform.displayName), findsOneWidget);
       }
     });
 
@@ -33,7 +33,10 @@ void main() {
         MaterialApp(
           home: Scaffold(
             body: PlatformFilter(
-              selectedPlatforms: const ['android', 'ios'],
+              selectedPlatforms: const [
+                SupportedPlatform.android,
+                SupportedPlatform.ios,
+              ],
               onChanged: (_) {},
             ),
           ),
@@ -60,13 +63,13 @@ void main() {
     testWidgets('should call onChanged when checkbox is tapped', (
       tester,
     ) async {
-      List<String>? changedSelection;
+      List<SupportedPlatform>? changedSelection;
 
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
             body: PlatformFilter(
-              selectedPlatforms: const ['android'],
+              selectedPlatforms: const [SupportedPlatform.android],
               onChanged: (selection) {
                 changedSelection = selection;
               },
@@ -82,18 +85,21 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(changedSelection, isNotNull);
-      expect(changedSelection, contains('android'));
-      expect(changedSelection, contains('ios'));
+      expect(changedSelection, contains(SupportedPlatform.android));
+      expect(changedSelection, contains(SupportedPlatform.ios));
     });
 
     testWidgets('should remove platform when unchecking', (tester) async {
-      List<String>? changedSelection;
+      List<SupportedPlatform>? changedSelection;
 
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
             body: PlatformFilter(
-              selectedPlatforms: const ['android', 'ios'],
+              selectedPlatforms: const [
+                SupportedPlatform.android,
+                SupportedPlatform.ios,
+              ],
               onChanged: (selection) {
                 changedSelection = selection;
               },
@@ -109,12 +115,12 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(changedSelection, isNotNull);
-      expect(changedSelection, isNot(contains('android')));
-      expect(changedSelection, contains('ios'));
+      expect(changedSelection, isNot(contains(SupportedPlatform.android)));
+      expect(changedSelection, contains(SupportedPlatform.ios));
     });
 
     testWidgets('should support selecting all platforms', (tester) async {
-      List<String> selection = [];
+      List<SupportedPlatform> selection = [];
 
       await tester.pumpWidget(
         StatefulBuilder(
@@ -138,13 +144,13 @@ void main() {
       await tester.pumpAndSettle();
 
       // Tap all checkboxes
-      for (final platform in allPlatforms) {
-        await tester.tap(find.text(platformNames[platform]!));
+      for (final platform in SupportedPlatform.values) {
+        await tester.tap(find.text(platform.displayName));
         await tester.pumpAndSettle();
       }
 
-      expect(selection, containsAll(allPlatforms));
-      expect(selection.length, allPlatforms.length);
+      expect(selection, containsAll(SupportedPlatform.values));
+      expect(selection.length, SupportedPlatform.values.length);
     });
   });
 }

@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_inappwebview_example/models/test_case.dart';
+import 'package:flutter_inappwebview_example/models/test_result.dart';
 import 'package:flutter_inappwebview_example/utils/constants.dart';
 import 'package:flutter_inappwebview_example/utils/test_registry.dart';
 
@@ -18,9 +19,9 @@ void main() {
         complexity: TestComplexity.quick,
         supportedPlatforms: ['android', 'ios'],
         execute: () async => TestResult(
-          testId: 'test_1',
           passed: true,
-          timestamp: DateTime.now(),
+          message: 'Test passed',
+          duration: Duration.zero,
         ),
       );
 
@@ -43,9 +44,9 @@ void main() {
         complexity: TestComplexity.quick,
         supportedPlatforms: ['android'],
         execute: () async => TestResult(
-          testId: 'test_1',
           passed: true,
-          timestamp: DateTime.now(),
+          message: 'Test passed',
+          duration: Duration.zero,
         ),
       );
 
@@ -57,9 +58,9 @@ void main() {
         complexity: TestComplexity.medium,
         supportedPlatforms: ['ios'],
         execute: () async => TestResult(
-          testId: 'test_2',
           passed: true,
-          timestamp: DateTime.now(),
+          message: 'Test passed',
+          duration: Duration.zero,
         ),
       );
 
@@ -88,9 +89,9 @@ void main() {
         complexity: TestComplexity.quick,
         supportedPlatforms: ['android'],
         execute: () async => TestResult(
-          testId: 'test_1',
           passed: true,
-          timestamp: DateTime.now(),
+          message: 'Test passed',
+          duration: Duration.zero,
         ),
       );
 
@@ -102,9 +103,9 @@ void main() {
         complexity: TestComplexity.medium,
         supportedPlatforms: ['ios'],
         execute: () async => TestResult(
-          testId: 'test_2',
           passed: true,
-          timestamp: DateTime.now(),
+          message: 'Test passed',
+          duration: Duration.zero,
         ),
       );
 
@@ -124,9 +125,9 @@ void main() {
         complexity: TestComplexity.quick,
         supportedPlatforms: ['android'],
         execute: () async => TestResult(
-          testId: 'unique_test',
           passed: true,
-          timestamp: DateTime.now(),
+          message: 'Test passed',
+          duration: Duration.zero,
         ),
       );
 

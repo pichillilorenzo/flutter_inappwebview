@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:provider/provider.dart';
 import 'package:flutter_inappwebview_example/models/event_log_entry.dart';
 import 'package:flutter_inappwebview_example/providers/event_log_provider.dart';
 import 'package:flutter_inappwebview_example/providers/network_monitor.dart';
@@ -8,25 +7,31 @@ import 'package:flutter_inappwebview_example/screens/webview_tester_screen.dart'
 import 'package:flutter_inappwebview_example/widgets/webview/event_console_widget.dart';
 import 'package:flutter_inappwebview_example/widgets/webview/network_monitor_widget.dart';
 
+import '../test_helpers/mock_inappwebview_platform.dart';
+import '../test_helpers/test_provider_wrapper.dart';
+
 void main() {
+  setUpAll(() {
+    MockInAppWebViewPlatform.initialize();
+  });
+
   group('WebViewTesterScreen', () {
     late EventLogProvider eventLogProvider;
     late NetworkMonitor networkMonitor;
+    late MockSettingsManager settingsManager;
 
     setUp(() {
       eventLogProvider = EventLogProvider();
       networkMonitor = NetworkMonitor();
+      settingsManager = MockSettingsManager();
     });
 
     Widget createWidget() {
       return MaterialApp(
-        home: MultiProvider(
-          providers: [
-            ChangeNotifierProvider<EventLogProvider>.value(
-              value: eventLogProvider,
-            ),
-            ChangeNotifierProvider<NetworkMonitor>.value(value: networkMonitor),
-          ],
+        home: TestProviderWrapper(
+          settingsManager: settingsManager,
+          eventLogProvider: eventLogProvider,
+          networkMonitor: networkMonitor,
           child: WebViewTesterScreen(),
         ),
       );

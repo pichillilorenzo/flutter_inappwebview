@@ -24,10 +24,12 @@ class _TestRunnerScreenState extends State<TestRunnerScreen> {
 
   // Custom configuration support
   TestConfiguration? _customConfiguration;
-  bool _runningCustomConfig = false;
 
   // WebView type
   TestWebViewType _webViewType = TestWebViewType.inAppWebView;
+
+  // Key to force WebView recreation when configuration changes
+  Key _webViewKey = UniqueKey();
 
   @override
   void initState() {
@@ -78,7 +80,8 @@ class _TestRunnerScreenState extends State<TestRunnerScreen> {
       body: Column(
         children: [
           if (_customConfiguration != null) _buildConfigurationBanner(),
-          if (!_runningCustomConfig) _buildCategorySelector(),
+          // Only show category selector when no custom configuration is loaded
+          if (_customConfiguration == null) _buildCategorySelector(),
           _buildWebViewTypeSelector(),
           _buildControlBar(),
           _buildProgressSection(),
@@ -235,7 +238,9 @@ class _TestRunnerScreenState extends State<TestRunnerScreen> {
             onPressed: () {
               setState(() {
                 _customConfiguration = null;
-                _runningCustomConfig = false;
+                _webViewReady = false;
+                _webViewController = null;
+                _webViewKey = UniqueKey();
               });
             },
           ),
@@ -329,6 +334,7 @@ class _TestRunnerScreenState extends State<TestRunnerScreen> {
         ),
         Expanded(
           child: InAppWebView(
+            key: _webViewKey,
             initialUrlRequest: URLRequest(
               url: WebUri(
                 _customConfiguration?.initialUrl ?? 'https://flutter.dev',
@@ -352,56 +358,106 @@ class _TestRunnerScreenState extends State<TestRunnerScreen> {
   }
 
   void _showConfigurationDialog() {
+    final configManager = context.read<TestConfigurationManager>();
+    final savedConfigs = configManager.savedConfigs;
+
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (dialogContext) => AlertDialog(
         title: const Text('Load Test Configuration'),
         content: SizedBox(
           width: 400,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              ListTile(
-                leading: const Icon(
-                  Icons.playlist_add_check,
-                  color: Colors.blue,
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                ListTile(
+                  leading: const Icon(
+                    Icons.playlist_add_check,
+                    color: Colors.blue,
+                  ),
+                  title: const Text('Load Default Configuration'),
+                  subtitle: const Text('Pre-built tests for common scenarios'),
+                  onTap: () {
+                    Navigator.pop(dialogContext);
+                    _loadConfiguration(TestConfiguration.defaultConfig());
+                  },
                 ),
-                title: const Text('Load Default Configuration'),
-                subtitle: const Text('Pre-built tests for common scenarios'),
-                onTap: () {
-                  Navigator.pop(context);
-                  _loadConfiguration(TestConfiguration.defaultConfig());
-                },
-              ),
-              const Divider(),
-              ListTile(
-                leading: const Icon(Icons.paste, color: Colors.green),
-                title: const Text('Import from Clipboard'),
-                subtitle: const Text('Paste JSON configuration'),
-                onTap: () async {
-                  Navigator.pop(context);
-                  await _importFromClipboard();
-                },
-              ),
-              const Divider(),
-              ListTile(
-                leading: const Icon(Icons.close, color: Colors.grey),
-                title: const Text('Clear Configuration'),
-                subtitle: const Text('Run built-in category tests'),
-                onTap: () {
-                  Navigator.pop(context);
-                  setState(() {
-                    _customConfiguration = null;
-                    _runningCustomConfig = false;
-                  });
-                },
-              ),
-            ],
+                const Divider(),
+                // Show saved configurations if available
+                if (savedConfigs.isNotEmpty) ...[
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 8,
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.folder,
+                          color: Colors.orange.shade700,
+                          size: 18,
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          'Saved Configurations (${savedConfigs.length})',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.grey.shade700,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  ...savedConfigs.map(
+                    (config) => ListTile(
+                      leading: const Icon(
+                        Icons.description,
+                        color: Colors.orange,
+                      ),
+                      title: Text(config.name),
+                      subtitle: Text(
+                        '${config.customSteps.length} steps • ${config.webViewType == TestWebViewType.headless ? "Headless" : "Visible"} WebView',
+                      ),
+                      onTap: () {
+                        Navigator.pop(dialogContext);
+                        _loadConfiguration(config);
+                      },
+                    ),
+                  ),
+                  const Divider(),
+                ],
+                ListTile(
+                  leading: const Icon(Icons.paste, color: Colors.green),
+                  title: const Text('Import from Clipboard'),
+                  subtitle: const Text('Paste JSON configuration'),
+                  onTap: () async {
+                    Navigator.pop(dialogContext);
+                    await _importFromClipboard();
+                  },
+                ),
+                const Divider(),
+                ListTile(
+                  leading: const Icon(Icons.close, color: Colors.grey),
+                  title: const Text('Clear Configuration'),
+                  subtitle: const Text('Run built-in category tests'),
+                  onTap: () {
+                    Navigator.pop(dialogContext);
+                    setState(() {
+                      _customConfiguration = null;
+                      _webViewReady = false;
+                      _webViewController = null;
+                      _webViewKey = UniqueKey();
+                    });
+                  },
+                ),
+              ],
+            ),
           ),
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () => Navigator.pop(dialogContext),
             child: const Text('Cancel'),
           ),
         ],
@@ -414,30 +470,42 @@ class _TestRunnerScreenState extends State<TestRunnerScreen> {
       _customConfiguration = config;
       _webViewType = config.webViewType;
       _webViewReady = false;
+      _webViewController = null;
+      // Force WebView recreation with new key
+      _webViewKey = UniqueKey();
     });
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Configuration loaded: ${config.name}')),
+      SnackBar(
+        content: Text(
+          'Configuration loaded: ${config.name} (${config.customSteps.length} custom steps)',
+        ),
+      ),
     );
   }
 
   Future<void> _importFromClipboard() async {
     try {
       final data = await Clipboard.getData(Clipboard.kTextPlain);
-      if (data?.text != null && data!.text!.isNotEmpty) {
-        final config = TestConfiguration.fromJsonString(data.text!);
+      final text = data?.text;
+      if (text != null && text.isNotEmpty) {
+        final config = TestConfiguration.fromJsonString(text);
         _loadConfiguration(config);
       } else {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(const SnackBar(content: Text('Clipboard is empty')));
+        if (mounted) {
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(const SnackBar(content: Text('Clipboard is empty')));
+        }
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Failed to import: $e'),
-          backgroundColor: Colors.red,
-        ),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to import: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
     }
   }
 
@@ -457,12 +525,22 @@ class _TestRunnerScreenState extends State<TestRunnerScreen> {
             children: [
               ElevatedButton.icon(
                 icon: Icon(isRunning ? Icons.stop : Icons.play_arrow),
-                label: Text(isRunning ? 'Stop' : 'Run Selected'),
+                label: Text(
+                  isRunning
+                      ? 'Stop'
+                      : (_customConfiguration != null
+                            ? 'Run Custom Steps'
+                            : 'Run Selected'),
+                ),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: isRunning ? Colors.red : Colors.green,
                   foregroundColor: Colors.white,
                 ),
-                onPressed: _selectedCategories.isEmpty && !isRunning
+                // Enable button if we have a custom config OR selected categories
+                onPressed:
+                    (_selectedCategories.isEmpty &&
+                            _customConfiguration == null) &&
+                        !isRunning
                     ? null
                     : () {
                         if (isRunning) {
@@ -473,17 +551,19 @@ class _TestRunnerScreenState extends State<TestRunnerScreen> {
                       },
               ),
               const SizedBox(width: 8),
-              ElevatedButton.icon(
-                icon: const Icon(Icons.play_circle_outline),
-                label: const Text('Run All'),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blue,
-                  foregroundColor: Colors.white,
+              // Hide "Run All" when custom config is loaded (custom steps are already all steps)
+              if (_customConfiguration == null)
+                ElevatedButton.icon(
+                  icon: const Icon(Icons.play_circle_outline),
+                  label: const Text('Run All'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blue,
+                    foregroundColor: Colors.white,
+                  ),
+                  onPressed: isRunning ? null : _runAllTests,
                 ),
-                onPressed: isRunning ? null : _runAllTests,
-              ),
               const SizedBox(width: 8),
-              if (hasFailed && !isRunning)
+              if (hasFailed && !isRunning && _customConfiguration == null)
                 OutlinedButton.icon(
                   icon: const Icon(Icons.refresh),
                   label: const Text('Re-run Failed'),
@@ -841,7 +921,10 @@ class _TestRunnerScreenState extends State<TestRunnerScreen> {
 
   Widget _buildHiddenWebView() {
     return InAppWebView(
-      initialUrlRequest: URLRequest(url: WebUri('https://flutter.dev')),
+      key: _webViewKey,
+      initialUrlRequest: URLRequest(
+        url: WebUri(_customConfiguration?.initialUrl ?? 'https://flutter.dev'),
+      ),
       initialSettings: InAppWebViewSettings(javaScriptEnabled: true),
       onWebViewCreated: (controller) {
         _webViewController = controller;
@@ -878,10 +961,18 @@ class _TestRunnerScreenState extends State<TestRunnerScreen> {
     }
 
     final runner = context.read<TestRunner>();
-    runner.runSelectedCategories(
-      _selectedCategories.toList(),
-      _webViewController,
-    );
+
+    // If a custom configuration is loaded, run its custom steps
+    if (_customConfiguration != null &&
+        _customConfiguration!.customSteps.isNotEmpty) {
+      runner.runConfiguration(_customConfiguration!, _webViewController);
+    } else {
+      // Otherwise run built-in category tests
+      runner.runSelectedCategories(
+        _selectedCategories.toList(),
+        _webViewController,
+      );
+    }
   }
 
   void _runAllTests() {
@@ -893,7 +984,15 @@ class _TestRunnerScreenState extends State<TestRunnerScreen> {
     }
 
     final runner = context.read<TestRunner>();
-    runner.runAllTests(_webViewController);
+
+    // If a custom configuration is loaded, run its custom steps
+    if (_customConfiguration != null &&
+        _customConfiguration!.customSteps.isNotEmpty) {
+      runner.runConfiguration(_customConfiguration!, _webViewController);
+    } else {
+      // Otherwise run all built-in category tests
+      runner.runAllTests(_webViewController);
+    }
   }
 
   void _rerunFailedTests() {

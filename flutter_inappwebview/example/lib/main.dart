@@ -50,7 +50,15 @@ Future main() async {
   final settingsManager = SettingsManager();
   await settingsManager.init();
 
-  runApp(MyApp(settingsManager: settingsManager));
+  final testConfigManager = TestConfigurationManager();
+  await testConfigManager.init();
+
+  runApp(
+    MyApp(
+      settingsManager: settingsManager,
+      testConfigManager: testConfigManager,
+    ),
+  );
 }
 
 Drawer buildDrawer({required BuildContext context}) {
@@ -264,9 +272,14 @@ Drawer buildDrawer({required BuildContext context}) {
 }
 
 class MyApp extends StatefulWidget {
-  const MyApp({super.key, required this.settingsManager});
+  const MyApp({
+    super.key,
+    required this.settingsManager,
+    required this.testConfigManager,
+  });
 
   final SettingsManager settingsManager;
+  final TestConfigurationManager testConfigManager;
 
   @override
   _MyAppState createState() => _MyAppState();
@@ -292,7 +305,7 @@ class _MyAppState extends State<MyApp> {
         ChangeNotifierProvider.value(value: widget.settingsManager),
         ChangeNotifierProvider(create: (_) => TestRunner()),
         ChangeNotifierProvider(create: (_) => NetworkMonitor()),
-        ChangeNotifierProvider(create: (_) => TestConfigurationManager()),
+        ChangeNotifierProvider.value(value: widget.testConfigManager),
       ],
       child: _buildMaterialApp(),
     );

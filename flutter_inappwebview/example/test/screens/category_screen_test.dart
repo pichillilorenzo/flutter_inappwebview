@@ -5,6 +5,7 @@ import 'package:flutter_inappwebview_example/screens/category_screen.dart';
 import 'package:flutter_inappwebview_example/utils/constants.dart';
 import 'package:flutter_inappwebview_example/utils/test_registry.dart';
 import 'package:flutter_inappwebview_example/models/test_case.dart';
+import 'package:flutter_inappwebview_example/models/test_result.dart';
 import 'package:flutter_inappwebview_example/providers/event_log_provider.dart';
 import 'package:flutter_inappwebview_example/providers/settings_manager.dart';
 import 'package:flutter_inappwebview_example/providers/test_runner.dart';
@@ -47,9 +48,9 @@ void main() {
           complexity: TestComplexity.quick,
           supportedPlatforms: ['android'],
           execute: () async => TestResult(
-            testId: 'test_1',
             passed: true,
-            timestamp: DateTime.now(),
+            message: 'Test passed',
+            duration: Duration.zero,
           ),
         ),
       );
@@ -64,7 +65,11 @@ void main() {
     ) async {
       await tester.pumpWidget(createTestWidget(TestCategory.navigation));
 
-      expect(find.textContaining('No tests'), findsOneWidget);
+      expect(find.text('No tests available'), findsOneWidget);
+      expect(
+        find.text('No tests registered for this category'),
+        findsOneWidget,
+      );
     });
 
     testWidgets('displays multiple tests', (WidgetTester tester) async {
@@ -77,9 +82,9 @@ void main() {
           complexity: TestComplexity.quick,
           supportedPlatforms: ['android'],
           execute: () async => TestResult(
-            testId: 'test_1',
             passed: true,
-            timestamp: DateTime.now(),
+            message: 'Test passed',
+            duration: Duration.zero,
           ),
         ),
       );
@@ -93,9 +98,9 @@ void main() {
           complexity: TestComplexity.medium,
           supportedPlatforms: ['ios'],
           execute: () async => TestResult(
-            testId: 'test_2',
             passed: true,
-            timestamp: DateTime.now(),
+            message: 'Test passed',
+            duration: Duration.zero,
           ),
         ),
       );
@@ -116,9 +121,9 @@ void main() {
           complexity: TestComplexity.quick,
           supportedPlatforms: ['android', 'ios'],
           execute: () async => TestResult(
-            testId: 'test_1',
             passed: true,
-            timestamp: DateTime.now(),
+            message: 'Test passed',
+            duration: Duration.zero,
           ),
         ),
       );
@@ -138,9 +143,9 @@ void main() {
           complexity: TestComplexity.quick,
           supportedPlatforms: ['android'],
           execute: () async => TestResult(
-            testId: 'test_1',
             passed: true,
-            timestamp: DateTime.now(),
+            message: 'Test passed',
+            duration: Duration.zero,
           ),
         ),
       );

@@ -1,5 +1,8 @@
 import 'dart:convert';
+import 'dart:typed_data';
 import 'package:flutter/foundation.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_inappwebview_example/widgets/common/parameter_dialog.dart';
 
 /// Specifies which type of WebView to use for test execution
 enum TestWebViewType {
@@ -327,8 +330,82 @@ class CustomTestAction {
       'delayMs': delayMs,
       'customCode': customCode,
       'methodId': methodId,
-      'methodParameters': methodParameters,
+      'methodParameters': _sanitizeParameters(methodParameters),
     };
+  }
+
+  /// Sanitizes parameters for JSON serialization by converting non-JSON-serializable
+  /// objects to their string representation or null
+  static Map<String, dynamic>? _sanitizeParameters(
+    Map<String, dynamic>? params,
+  ) {
+    if (params == null) return null;
+    final sanitized = <String, dynamic>{};
+    for (final entry in params.entries) {
+      sanitized[entry.key] = _sanitizeValue(entry.value);
+    }
+    return sanitized;
+  }
+
+  /// Sanitizes a single value for JSON serialization
+  static dynamic _sanitizeValue(dynamic value) {
+    if (value == null) return null;
+    if (value is String || value is num || value is bool) return value;
+    if (value is Uint8List) {
+      // Encode Uint8List as base64 with type marker
+      return {'_type': 'bytes', 'value': base64.encode(value)};
+    }
+    if (value is ParameterValueHint) {
+      // Extract the underlying value from ParameterValueHint
+      // If the underlying value is null, just return null
+      final innerValue = value.value;
+      if (innerValue == null) return null;
+      return _sanitizeValue(innerValue);
+    }
+    if (value is List) return value.map(_sanitizeValue).toList();
+    if (value is Map) {
+      return value.map((k, v) => MapEntry(k.toString(), _sanitizeValue(v)));
+    }
+    // For non-JSON-serializable objects, convert to string or return null
+    try {
+      // Check if the object has a toJson method
+      if (value is Map<String, dynamic>) return value;
+      return value.toString();
+    } catch (_) {
+      return null;
+    }
+  }
+
+  /// Deserializes a parameter value, converting special markers back to their original types
+  static dynamic _deserializeValue(dynamic value) {
+    if (value == null) return null;
+    if (value is String || value is num || value is bool) return value;
+    if (value is List) return value.map(_deserializeValue).toList();
+    if (value is Map) {
+      // Check for special type markers
+      if (value['_type'] == 'bytes' && value['value'] is String) {
+        try {
+          return base64.decode(value['value'] as String);
+        } catch (_) {
+          return null;
+        }
+      }
+      // Regular map - recurse into values
+      return value.map((k, v) => MapEntry(k.toString(), _deserializeValue(v)));
+    }
+    return value;
+  }
+
+  /// Deserializes method parameters from JSON
+  static Map<String, dynamic>? _deserializeParameters(
+    Map<String, dynamic>? params,
+  ) {
+    if (params == null) return null;
+    final result = <String, dynamic>{};
+    for (final entry in params.entries) {
+      result[entry.key] = _deserializeValue(entry.value);
+    }
+    return result;
   }
 
   factory CustomTestAction.fromJson(Map<String, dynamic> json) {
@@ -347,7 +424,9 @@ class CustomTestAction {
       delayMs: json['delayMs'] as int?,
       customCode: json['customCode'] as String?,
       methodId: json['methodId'] as String?,
-      methodParameters: json['methodParameters'] as Map<String, dynamic>?,
+      methodParameters: _deserializeParameters(
+        json['methodParameters'] as Map<String, dynamic>?,
+      ),
     );
   }
 
@@ -688,23 +767,78 @@ class TestConfiguration {
   }
 }
 
-/// Provider for managing test configurations
+/// Provider for managing test configurations with persistence
 class TestConfigurationManager extends ChangeNotifier {
+  static const String _savedConfigsKey = 'test_saved_configs';
+  static const String _currentConfigKey = 'test_current_config';
+
+  SharedPreferences? _prefs;
   TestConfiguration _currentConfig = TestConfiguration.empty();
   List<TestConfiguration> _savedConfigs = [];
+  bool _isLoading = true;
 
   TestConfiguration get currentConfig => _currentConfig;
   List<TestConfiguration> get savedConfigs => List.unmodifiable(_savedConfigs);
+  bool get isLoading => _isLoading;
+
+  /// Initialize the configuration manager and load persisted data
+  Future<void> init() async {
+    _prefs = await SharedPreferences.getInstance();
+    await _loadSavedConfigs();
+    await _loadCurrentConfig();
+    _isLoading = false;
+    notifyListeners();
+  }
+
+  /// Load saved configurations from SharedPreferences
+  Future<void> _loadSavedConfigs() async {
+    final configsJson = _prefs?.getStringList(_savedConfigsKey);
+    if (configsJson != null) {
+      _savedConfigs = configsJson
+          .map((json) {
+            try {
+              return TestConfiguration.fromJsonString(json);
+            } catch (e) {
+              debugPrint('Failed to parse saved config: $e');
+              return null;
+            }
+          })
+          .whereType<TestConfiguration>()
+          .toList();
+    }
+  }
+
+  /// Load current configuration from SharedPreferences
+  Future<void> _loadCurrentConfig() async {
+    final configJson = _prefs?.getString(_currentConfigKey);
+    if (configJson != null) {
+      try {
+        _currentConfig = TestConfiguration.fromJsonString(configJson);
+      } catch (e) {
+        debugPrint('Failed to parse current config: $e');
+        _currentConfig = TestConfiguration.empty();
+      }
+    }
+  }
+
+  /// Save configurations to SharedPreferences
+  Future<void> _saveConfigs() async {
+    final configsJson = _savedConfigs.map((c) => c.toJsonString()).toList();
+    await _prefs?.setStringList(_savedConfigsKey, configsJson);
+    await _prefs?.setString(_currentConfigKey, _currentConfig.toJsonString());
+  }
 
   /// Set the WebView type
   void setWebViewType(TestWebViewType type) {
     _currentConfig = _currentConfig.copyWith(webViewType: type);
+    _saveConfigs();
     notifyListeners();
   }
 
   /// Set the initial URL
   void setInitialUrl(String? url) {
     _currentConfig = _currentConfig.copyWith(initialUrl: url);
+    _saveConfigs();
     notifyListeners();
   }
 
@@ -712,6 +846,7 @@ class TestConfigurationManager extends ChangeNotifier {
   void addCustomStep(CustomTestStep step) {
     final newSteps = [..._currentConfig.customSteps, step];
     _currentConfig = _currentConfig.copyWith(customSteps: newSteps);
+    _saveConfigs();
     notifyListeners();
   }
 
@@ -721,6 +856,7 @@ class TestConfigurationManager extends ChangeNotifier {
       return s.id == stepId ? updatedStep : s;
     }).toList();
     _currentConfig = _currentConfig.copyWith(customSteps: newSteps);
+    _saveConfigs();
     notifyListeners();
   }
 
@@ -730,6 +866,7 @@ class TestConfigurationManager extends ChangeNotifier {
         .where((s) => s.id != stepId)
         .toList();
     _currentConfig = _currentConfig.copyWith(customSteps: newSteps);
+    _saveConfigs();
     notifyListeners();
   }
 
@@ -746,6 +883,7 @@ class TestConfigurationManager extends ChangeNotifier {
     }).toList();
 
     _currentConfig = _currentConfig.copyWith(customSteps: updatedSteps);
+    _saveConfigs();
     notifyListeners();
   }
 
@@ -756,6 +894,7 @@ class TestConfigurationManager extends ChangeNotifier {
     );
     newOrdering[category] = testIds;
     _currentConfig = _currentConfig.copyWith(testOrdering: newOrdering);
+    _saveConfigs();
     notifyListeners();
   }
 
@@ -768,11 +907,12 @@ class TestConfigurationManager extends ChangeNotifier {
       newEnabled.remove(testId);
     }
     _currentConfig = _currentConfig.copyWith(enabledBuiltInTests: newEnabled);
+    _saveConfigs();
     notifyListeners();
   }
 
   /// Save current configuration
-  void saveCurrentConfig({String? name}) {
+  Future<void> saveCurrentConfig({String? name}) async {
     if (name != null) {
       _currentConfig = _currentConfig.copyWith(name: name);
     }
@@ -786,30 +926,34 @@ class TestConfigurationManager extends ChangeNotifier {
     } else {
       _savedConfigs.add(_currentConfig);
     }
+    await _saveConfigs();
     notifyListeners();
   }
 
   /// Load a saved configuration
-  void loadConfig(String configId) {
+  Future<void> loadConfig(String configId) async {
     final config = _savedConfigs.firstWhere(
       (c) => c.id == configId,
       orElse: () => TestConfiguration.empty(),
     );
     _currentConfig = config;
+    await _saveConfigs();
     notifyListeners();
   }
 
   /// Delete a saved configuration
-  void deleteConfig(String configId) {
+  Future<void> deleteConfig(String configId) async {
     _savedConfigs.removeWhere((c) => c.id == configId);
+    await _saveConfigs();
     notifyListeners();
   }
 
   /// Import configuration from JSON string
-  void importConfig(String jsonString) {
+  Future<void> importConfig(String jsonString) async {
     try {
       final config = TestConfiguration.fromJsonString(jsonString);
       _currentConfig = config;
+      await _saveConfigs();
       notifyListeners();
     } catch (e) {
       debugPrint('Failed to import configuration: $e');
@@ -823,8 +967,16 @@ class TestConfigurationManager extends ChangeNotifier {
   }
 
   /// Reset to empty configuration
-  void resetConfig() {
+  Future<void> resetConfig() async {
     _currentConfig = TestConfiguration.empty();
+    await _saveConfigs();
+    notifyListeners();
+  }
+
+  /// Clear all saved configurations
+  Future<void> clearAllSavedConfigs() async {
+    _savedConfigs.clear();
+    await _saveConfigs();
     notifyListeners();
   }
 }

@@ -22,7 +22,7 @@ class _TestConfigurationScreenState extends State<TestConfigurationScreen>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 4, vsync: this);
+    _tabController = TabController(length: 3, vsync: this);
   }
 
   @override
@@ -34,9 +34,8 @@ class _TestConfigurationScreenState extends State<TestConfigurationScreen>
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (_) => TestConfigurationManager(),
-      child: Scaffold(
+    return Consumer<TestConfigurationManager>(
+      builder: (context, manager, child) => Scaffold(
         appBar: AppBar(
           title: const Text('Test Configuration'),
           backgroundColor: Colors.blue,
@@ -49,7 +48,6 @@ class _TestConfigurationScreenState extends State<TestConfigurationScreen>
             tabs: const [
               Tab(icon: Icon(Icons.edit_note), text: 'Custom Steps'),
               Tab(icon: Icon(Icons.settings), text: 'Settings'),
-              Tab(icon: Icon(Icons.reorder), text: 'Test Order'),
               Tab(icon: Icon(Icons.import_export), text: 'Import/Export'),
             ],
           ),
@@ -57,11 +55,12 @@ class _TestConfigurationScreenState extends State<TestConfigurationScreen>
             IconButton(
               icon: const Icon(Icons.save),
               tooltip: 'Save Configuration',
-              onPressed: () => _saveConfiguration(context),
+              onPressed: () => _saveConfiguration(context, manager),
             ),
             PopupMenuButton<String>(
               icon: const Icon(Icons.more_vert),
-              onSelected: (action) => _handleMenuAction(context, action),
+              onSelected: (action) =>
+                  _handleMenuAction(context, action, manager),
               itemBuilder: (context) => [
                 const PopupMenuItem(
                   value: 'new',
@@ -96,32 +95,27 @@ class _TestConfigurationScreenState extends State<TestConfigurationScreen>
         body: TabBarView(
           controller: _tabController,
           children: [
-            _buildCustomStepsTab(),
-            _buildSettingsTab(),
-            _buildTestOrderTab(),
-            _buildImportExportTab(),
+            _buildCustomStepsTab(manager),
+            _buildSettingsTab(manager),
+            _buildImportExportTab(manager),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildCustomStepsTab() {
-    return Consumer<TestConfigurationManager>(
-      builder: (context, manager, child) {
-        final steps = manager.currentConfig.customSteps;
+  Widget _buildCustomStepsTab(TestConfigurationManager manager) {
+    final steps = manager.currentConfig.customSteps;
 
-        return Column(
-          children: [
-            _buildConfigHeader(manager),
-            Expanded(
-              child: steps.isEmpty
-                  ? _buildEmptyStepsMessage()
-                  : _buildStepsList(manager, steps),
-            ),
-          ],
-        );
-      },
+    return Column(
+      children: [
+        _buildConfigHeader(manager),
+        Expanded(
+          child: steps.isEmpty
+              ? _buildEmptyStepsMessage()
+              : _buildStepsList(manager, steps),
+        ),
+      ],
     );
   }
 
@@ -205,162 +199,158 @@ class _TestConfigurationScreenState extends State<TestConfigurationScreen>
     );
   }
 
-  Widget _buildSettingsTab() {
-    return Consumer<TestConfigurationManager>(
-      builder: (context, manager, child) {
-        final config = manager.currentConfig;
+  Widget _buildSettingsTab(TestConfigurationManager manager) {
+    final config = manager.currentConfig;
 
-        return SingleChildScrollView(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // WebView Type Selection
-              Card(
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // WebView Type Selection
+          Card(
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
                     children: [
-                      Row(
-                        children: [
-                          Icon(Icons.web, color: Colors.blue.shade700),
-                          const SizedBox(width: 8),
-                          const Text(
-                            'WebView Type',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        'Choose how the WebView should be rendered during tests',
-                        style: TextStyle(color: Colors.grey.shade600),
-                      ),
-                      const SizedBox(height: 16),
-                      RadioListTile<TestWebViewType>(
-                        title: const Text('InAppWebView (Visible)'),
-                        subtitle: const Text(
-                          'Display WebView in real-time during test execution',
+                      Icon(Icons.web, color: Colors.blue.shade700),
+                      const SizedBox(width: 8),
+                      const Text(
+                        'WebView Type',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
                         ),
-                        value: TestWebViewType.inAppWebView,
-                        groupValue: config.webViewType,
-                        onChanged: (value) {
-                          if (value != null) {
-                            manager.setWebViewType(value);
-                          }
-                        },
-                      ),
-                      RadioListTile<TestWebViewType>(
-                        title: const Text('Headless WebView'),
-                        subtitle: const Text(
-                          'Run tests in background without visible rendering',
-                        ),
-                        value: TestWebViewType.headless,
-                        groupValue: config.webViewType,
-                        onChanged: (value) {
-                          if (value != null) {
-                            manager.setWebViewType(value);
-                          }
-                        },
                       ),
                     ],
                   ),
-                ),
-              ),
-              const SizedBox(height: 16),
-
-              // Initial URL
-              Card(
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Icon(Icons.link, color: Colors.green.shade700),
-                          const SizedBox(width: 8),
-                          const Text(
-                            'Initial URL',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        'URL to load before running tests (optional)',
-                        style: TextStyle(color: Colors.grey.shade600),
-                      ),
-                      const SizedBox(height: 12),
-                      TextField(
-                        controller: TextEditingController(
-                          text: config.initialUrl ?? '',
-                        ),
-                        decoration: const InputDecoration(
-                          labelText: 'Initial URL',
-                          hintText: 'https://example.com',
-                          border: OutlineInputBorder(),
-                        ),
-                        onChanged: (value) {
-                          manager.setInitialUrl(value.isEmpty ? null : value);
-                        },
-                      ),
-                    ],
+                  const SizedBox(height: 8),
+                  Text(
+                    'Choose how the WebView should be rendered during tests',
+                    style: TextStyle(color: Colors.grey.shade600),
                   ),
-                ),
-              ),
-              const SizedBox(height: 16),
-
-              // Default Configuration
-              Card(
-                color: Colors.blue.shade50,
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Icon(
-                            Icons.playlist_add_check,
-                            color: Colors.blue.shade700,
-                          ),
-                          const SizedBox(width: 8),
-                          const Text(
-                            'Default Configuration',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        'Load a pre-built configuration with common test scenarios including navigation, JavaScript execution, security checks, and more.',
-                        style: TextStyle(color: Colors.grey.shade700),
-                      ),
-                      const SizedBox(height: 12),
-                      ElevatedButton.icon(
-                        icon: const Icon(Icons.download),
-                        label: const Text('Load Default Configuration'),
-                        onPressed: () => _loadDefaultConfig(manager),
-                      ),
-                    ],
+                  const SizedBox(height: 16),
+                  RadioListTile<TestWebViewType>(
+                    title: const Text('InAppWebView (Visible)'),
+                    subtitle: const Text(
+                      'Display WebView in real-time during test execution',
+                    ),
+                    value: TestWebViewType.inAppWebView,
+                    groupValue: config.webViewType,
+                    onChanged: (value) {
+                      if (value != null) {
+                        manager.setWebViewType(value);
+                      }
+                    },
                   ),
-                ),
+                  RadioListTile<TestWebViewType>(
+                    title: const Text('Headless WebView'),
+                    subtitle: const Text(
+                      'Run tests in background without visible rendering',
+                    ),
+                    value: TestWebViewType.headless,
+                    groupValue: config.webViewType,
+                    onChanged: (value) {
+                      if (value != null) {
+                        manager.setWebViewType(value);
+                      }
+                    },
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
-        );
-      },
+          const SizedBox(height: 16),
+
+          // Initial URL
+          Card(
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Icon(Icons.link, color: Colors.green.shade700),
+                      const SizedBox(width: 8),
+                      const Text(
+                        'Initial URL',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'URL to load before running tests (optional)',
+                    style: TextStyle(color: Colors.grey.shade600),
+                  ),
+                  const SizedBox(height: 12),
+                  TextField(
+                    controller: TextEditingController(
+                      text: config.initialUrl ?? '',
+                    ),
+                    decoration: const InputDecoration(
+                      labelText: 'Initial URL',
+                      hintText: 'https://example.com',
+                      border: OutlineInputBorder(),
+                    ),
+                    onChanged: (value) {
+                      manager.setInitialUrl(value.isEmpty ? null : value);
+                    },
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
+
+          // Default Configuration
+          Card(
+            color: Colors.blue.shade50,
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.playlist_add_check,
+                        color: Colors.blue.shade700,
+                      ),
+                      const SizedBox(width: 8),
+                      const Text(
+                        'Default Configuration',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Load a pre-built configuration with common test scenarios including navigation, JavaScript execution, security checks, and more.',
+                    style: TextStyle(color: Colors.grey.shade700),
+                  ),
+                  const SizedBox(height: 12),
+                  ElevatedButton.icon(
+                    icon: const Icon(Icons.download),
+                    label: const Text('Load Default Configuration'),
+                    onPressed: () => _loadDefaultConfig(manager),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -472,235 +462,158 @@ class _TestConfigurationScreenState extends State<TestConfigurationScreen>
     );
   }
 
-  Widget _buildTestOrderTab() {
-    return Consumer<TestConfigurationManager>(
-      builder: (context, manager, child) {
-        return SingleChildScrollView(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                'Test Execution Order',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                'Drag and drop to reorder tests within categories. Custom steps run first by default.',
-                style: TextStyle(color: Colors.grey.shade600),
-              ),
-              const SizedBox(height: 16),
-              _buildOrderingInfo(manager),
-            ],
-          ),
-        );
-      },
-    );
-  }
-
-  Widget _buildOrderingInfo(TestConfigurationManager manager) {
-    final ordering = manager.currentConfig.testOrdering;
-
-    if (ordering.isEmpty) {
-      return Card(
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            children: [
-              Icon(Icons.info_outline, size: 48, color: Colors.blue.shade300),
-              const SizedBox(height: 8),
-              const Text(
-                'Default ordering is used',
-                style: TextStyle(fontWeight: FontWeight.w500),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                'Tests run in the order they appear in each category',
-                style: TextStyle(color: Colors.grey.shade600),
-              ),
-            ],
-          ),
-        ),
-      );
-    }
-
-    return Column(
-      children: ordering.entries.map((entry) {
-        return Card(
-          margin: const EdgeInsets.only(bottom: 8),
-          child: ExpansionTile(
-            title: Text(entry.key),
-            subtitle: Text('${entry.value.length} tests'),
-            children: entry.value.map((testId) {
-              return ListTile(
-                dense: true,
-                leading: const Icon(Icons.drag_indicator, size: 18),
-                title: Text(testId),
-              );
-            }).toList(),
-          ),
-        );
-      }).toList(),
-    );
-  }
-
-  Widget _buildImportExportTab() {
-    return Consumer<TestConfigurationManager>(
-      builder: (context, manager, child) {
-        return SingleChildScrollView(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Export section
-              Card(
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+  Widget _buildImportExportTab(TestConfigurationManager manager) {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Export section
+          Card(
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
                     children: [
-                      Row(
-                        children: [
-                          Icon(Icons.upload, color: Colors.blue.shade700),
-                          const SizedBox(width: 8),
-                          const Text(
-                            'Export Configuration',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        'Export your current test configuration as JSON',
-                        style: TextStyle(color: Colors.grey.shade600),
-                      ),
-                      const SizedBox(height: 12),
-                      Row(
-                        children: [
-                          ElevatedButton.icon(
-                            icon: const Icon(Icons.copy),
-                            label: const Text('Copy to Clipboard'),
-                            onPressed: () =>
-                                _exportToClipboard(context, manager),
-                          ),
-                          const SizedBox(width: 8),
-                          OutlinedButton.icon(
-                            icon: const Icon(Icons.visibility),
-                            label: const Text('Preview JSON'),
-                            onPressed: () => _showJsonPreview(context, manager),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              const SizedBox(height: 16),
-
-              // Import section
-              Card(
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Icon(Icons.download, color: Colors.green.shade700),
-                          const SizedBox(width: 8),
-                          const Text(
-                            'Import Configuration',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        'Paste JSON configuration to import',
-                        style: TextStyle(color: Colors.grey.shade600),
-                      ),
-                      const SizedBox(height: 12),
-                      TextField(
-                        controller: _importController,
-                        decoration: const InputDecoration(
-                          labelText: 'Paste JSON here',
-                          border: OutlineInputBorder(),
-                          hintText: '{"id": "...", "name": "...", ...}',
-                        ),
-                        maxLines: 8,
-                        style: const TextStyle(
-                          fontFamily: 'monospace',
-                          fontSize: 12,
+                      Icon(Icons.upload, color: Colors.blue.shade700),
+                      const SizedBox(width: 8),
+                      const Text(
+                        'Export Configuration',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
-                      const SizedBox(height: 12),
-                      Row(
-                        children: [
-                          ElevatedButton.icon(
-                            icon: const Icon(Icons.file_download),
-                            label: const Text('Import'),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.green,
-                              foregroundColor: Colors.white,
-                            ),
-                            onPressed: () => _importConfig(context, manager),
-                          ),
-                          const SizedBox(width: 8),
-                          TextButton.icon(
-                            icon: const Icon(Icons.paste),
-                            label: const Text('Paste from Clipboard'),
-                            onPressed: () => _pasteFromClipboard(),
-                          ),
-                        ],
-                      ),
                     ],
                   ),
-                ),
-              ),
-              const SizedBox(height: 16),
-
-              // Sample configuration
-              Card(
-                color: Colors.amber.shade50,
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                  const SizedBox(height: 8),
+                  Text(
+                    'Export your current test configuration as JSON',
+                    style: TextStyle(color: Colors.grey.shade600),
+                  ),
+                  const SizedBox(height: 12),
+                  Row(
                     children: [
-                      Row(
-                        children: [
-                          Icon(Icons.lightbulb, color: Colors.amber.shade700),
-                          const SizedBox(width: 8),
-                          const Text(
-                            'Sample Configuration',
-                            style: TextStyle(fontWeight: FontWeight.bold),
-                          ),
-                        ],
+                      ElevatedButton.icon(
+                        icon: const Icon(Icons.copy),
+                        label: const Text('Copy to Clipboard'),
+                        onPressed: () => _exportToClipboard(context, manager),
                       ),
-                      const SizedBox(height: 8),
-                      Text(
-                        'Click below to load a sample configuration with example custom tests.',
-                        style: TextStyle(color: Colors.grey.shade700),
-                      ),
-                      const SizedBox(height: 8),
-                      OutlinedButton(
-                        onPressed: () => _loadSampleConfig(manager),
-                        child: const Text('Load Sample'),
+                      const SizedBox(width: 8),
+                      OutlinedButton.icon(
+                        icon: const Icon(Icons.visibility),
+                        label: const Text('Preview JSON'),
+                        onPressed: () => _showJsonPreview(context, manager),
                       ),
                     ],
                   ),
-                ),
+                ],
               ),
-            ],
+            ),
           ),
-        );
-      },
+          const SizedBox(height: 16),
+
+          // Import section
+          Card(
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Icon(Icons.download, color: Colors.green.shade700),
+                      const SizedBox(width: 8),
+                      const Text(
+                        'Import Configuration',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Paste JSON configuration to import',
+                    style: TextStyle(color: Colors.grey.shade600),
+                  ),
+                  const SizedBox(height: 12),
+                  TextField(
+                    controller: _importController,
+                    decoration: const InputDecoration(
+                      labelText: 'Paste JSON here',
+                      border: OutlineInputBorder(),
+                      hintText: '{"id": "...", "name": "...", ...}',
+                    ),
+                    maxLines: 8,
+                    style: const TextStyle(
+                      fontFamily: 'monospace',
+                      fontSize: 12,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  Row(
+                    children: [
+                      ElevatedButton.icon(
+                        icon: const Icon(Icons.file_download),
+                        label: const Text('Import'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.green,
+                          foregroundColor: Colors.white,
+                        ),
+                        onPressed: () => _importConfig(context, manager),
+                      ),
+                      const SizedBox(width: 8),
+                      TextButton.icon(
+                        icon: const Icon(Icons.paste),
+                        label: const Text('Paste from Clipboard'),
+                        onPressed: () => _pasteFromClipboard(),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
+
+          // Sample configuration
+          Card(
+            color: Colors.amber.shade50,
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Icon(Icons.lightbulb, color: Colors.amber.shade700),
+                      const SizedBox(width: 8),
+                      const Text(
+                        'Sample Configuration',
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Click below to load a sample configuration with example custom tests.',
+                    style: TextStyle(color: Colors.grey.shade700),
+                  ),
+                  const SizedBox(height: 8),
+                  OutlinedButton(
+                    onPressed: () => _loadSampleConfig(manager),
+                    child: const Text('Load Sample'),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -757,11 +670,13 @@ class _TestConfigurationScreenState extends State<TestConfigurationScreen>
     );
   }
 
-  void _saveConfiguration(BuildContext context) {
-    final manager = context.read<TestConfigurationManager>();
+  void _saveConfiguration(
+    BuildContext context,
+    TestConfigurationManager manager,
+  ) {
     showDialog(
       context: context,
-      builder: (context) {
+      builder: (dialogContext) {
         final nameController = TextEditingController(
           text: manager.currentConfig.name,
         );
@@ -776,13 +691,13 @@ class _TestConfigurationScreenState extends State<TestConfigurationScreen>
           ),
           actions: [
             TextButton(
-              onPressed: () => Navigator.pop(context),
+              onPressed: () => Navigator.pop(dialogContext),
               child: const Text('Cancel'),
             ),
             ElevatedButton(
               onPressed: () {
                 manager.saveCurrentConfig(name: nameController.text);
-                Navigator.pop(context);
+                Navigator.pop(dialogContext);
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(content: Text('Configuration saved')),
                 );
@@ -795,9 +710,11 @@ class _TestConfigurationScreenState extends State<TestConfigurationScreen>
     );
   }
 
-  void _handleMenuAction(BuildContext context, String action) {
-    final manager = context.read<TestConfigurationManager>();
-
+  void _handleMenuAction(
+    BuildContext context,
+    String action,
+    TestConfigurationManager manager,
+  ) {
     switch (action) {
       case 'new':
         manager.resetConfig();
@@ -824,40 +741,55 @@ class _TestConfigurationScreenState extends State<TestConfigurationScreen>
 
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Load Configuration'),
-        content: SizedBox(
-          width: 400,
-          child: ListView.builder(
-            shrinkWrap: true,
-            itemCount: manager.savedConfigs.length,
-            itemBuilder: (context, index) {
-              final config = manager.savedConfigs[index];
-              return ListTile(
-                title: Text(config.name),
-                subtitle: Text(
-                  '${config.customSteps.length} steps • Modified: ${_formatDate(config.modifiedAt)}',
-                ),
-                onTap: () {
-                  manager.loadConfig(config.id);
-                  Navigator.pop(context);
+      builder: (dialogContext) => StatefulBuilder(
+        builder: (context, setDialogState) {
+          final configs = manager.savedConfigs;
+          if (configs.isEmpty) {
+            Navigator.pop(dialogContext);
+            return const SizedBox.shrink();
+          }
+          return AlertDialog(
+            title: const Text('Load Configuration'),
+            content: SizedBox(
+              width: 400,
+              child: ListView.builder(
+                shrinkWrap: true,
+                itemCount: configs.length,
+                itemBuilder: (context, index) {
+                  final config = configs[index];
+                  return ListTile(
+                    title: Text(config.name),
+                    subtitle: Text(
+                      '${config.customSteps.length} steps • Modified: ${_formatDate(config.modifiedAt)}',
+                    ),
+                    onTap: () {
+                      manager.loadConfig(config.id);
+                      Navigator.pop(dialogContext);
+                    },
+                    trailing: IconButton(
+                      icon: const Icon(Icons.delete, size: 20),
+                      onPressed: () {
+                        manager.deleteConfig(config.id);
+                        setDialogState(
+                          () {},
+                        ); // Rebuild dialog to reflect deletion
+                        if (manager.savedConfigs.isEmpty) {
+                          Navigator.pop(dialogContext);
+                        }
+                      },
+                    ),
+                  );
                 },
-                trailing: IconButton(
-                  icon: const Icon(Icons.delete, size: 20),
-                  onPressed: () {
-                    manager.deleteConfig(config.id);
-                  },
-                ),
-              );
-            },
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
-        ],
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(dialogContext),
+                child: const Text('Cancel'),
+              ),
+            ],
+          );
+        },
       ),
     );
   }

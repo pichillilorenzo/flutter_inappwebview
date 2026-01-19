@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
-import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_inappwebview_example/providers/settings_manager.dart';
 import 'package:flutter_inappwebview_example/models/webview_environment_profile.dart';
 import 'package:flutter_inappwebview_example/utils/platform_utils.dart';
@@ -1208,12 +1207,9 @@ class _WebViewEnvironmentSettingsEditorScreenState
           name: 'Channel Search Kind',
           description: 'How to search for WebView2 runtime',
           type: EnvironmentSettingType.enumeration,
-          enumValues: {
-            'Most Stable': EnvironmentChannelSearchKind.MOST_STABLE
-                .toNativeValue(),
-            'Least Stable': EnvironmentChannelSearchKind.LEAST_STABLE
-                .toNativeValue(),
-          },
+          // Use hardcoded values to avoid accessing platform-specific enum values at build time
+          // EnvironmentChannelSearchKind: MOST_STABLE = 0, LEAST_STABLE = 1
+          enumValues: const {'Most Stable': 0, 'Least Stable': 1},
           supportedPlatforms: [SupportedPlatform.windows],
         ),
         EnvironmentSettingDefinition(
@@ -1221,12 +1217,9 @@ class _WebViewEnvironmentSettingsEditorScreenState
           name: 'Release Channels',
           description: 'Which release channels to consider',
           type: EnvironmentSettingType.enumeration,
-          enumValues: {
-            'Stable': EnvironmentReleaseChannels.STABLE.toNativeValue(),
-            'Beta': EnvironmentReleaseChannels.BETA.toNativeValue(),
-            'Dev': EnvironmentReleaseChannels.DEV.toNativeValue(),
-            'Canary': EnvironmentReleaseChannels.CANARY.toNativeValue(),
-          },
+          // Use hardcoded values to avoid accessing platform-specific enum values at build time
+          // EnvironmentReleaseChannels: STABLE = 1, BETA = 2, DEV = 4, CANARY = 8
+          enumValues: const {'Stable': 1, 'Beta': 2, 'Dev': 4, 'Canary': 8},
           supportedPlatforms: [SupportedPlatform.windows],
         ),
       ],
@@ -1351,11 +1344,9 @@ class _WebViewEnvironmentSettingsEditorScreenState
           name: 'Scrollbar Style',
           description: 'Style of scrollbars in the WebView',
           type: EnvironmentSettingType.enumeration,
-          enumValues: {
-            'Default': EnvironmentScrollbarStyle.DEFAULT.toNativeValue(),
-            'Fluent Overlay': EnvironmentScrollbarStyle.FLUENT_OVERLAY
-                .toNativeValue(),
-          },
+          // Use hardcoded values to avoid accessing platform-specific enum values at build time
+          // EnvironmentScrollbarStyle: DEFAULT = 0, FLUENT_OVERLAY = 1
+          enumValues: const {'Default': 0, 'Fluent Overlay': 1},
           supportedPlatforms: [SupportedPlatform.windows],
         ),
       ],
@@ -1365,10 +1356,12 @@ class _WebViewEnvironmentSettingsEditorScreenState
           name: 'Cache Model',
           description: 'Caching strategy for the WebView',
           type: EnvironmentSettingType.enumeration,
-          enumValues: {
-            'Document Viewer': CacheModel.DOCUMENT_VIEWER.toNativeValue(),
-            'Document Browser': CacheModel.DOCUMENT_BROWSER.toNativeValue(),
-            'Web Browser': CacheModel.WEB_BROWSER.toNativeValue(),
+          // Use hardcoded values to avoid accessing platform-specific enum values at build time
+          // CacheModel: DOCUMENT_VIEWER = 0, DOCUMENT_BROWSER = 1, WEB_BROWSER = 2
+          enumValues: const {
+            'Document Viewer': 0,
+            'Document Browser': 1,
+            'Web Browser': 2,
           },
           supportedPlatforms: [SupportedPlatform.linux],
         ),

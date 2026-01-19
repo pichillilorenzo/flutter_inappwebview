@@ -4,6 +4,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_inappwebview_example/widgets/common/parameter_dialog.dart';
 
+/// Extracts the raw value from a parameter, unwrapping ParameterValueHint if necessary
+T? extractParam<T>(dynamic value) {
+  if (value == null) return null;
+  if (value is ParameterValueHint) {
+    return value.value as T?;
+  }
+  if (value is T) return value;
+  return null;
+}
+
 /// Method entry for a single controller method
 class ControllerMethodEntry {
   final String id;
@@ -223,7 +233,7 @@ class ControllerMethodsRegistry {
             final headers = (params['headers'] as Map?)?.map(
               (key, value) => MapEntry(key.toString(), value),
             );
-            final body = params['body'] as Uint8List?;
+            final body = extractParam<Uint8List>(params['body']);
 
             await controller.loadUrl(
               urlRequest: URLRequest(
@@ -251,12 +261,13 @@ class ControllerMethodsRegistry {
           requiredParameters: ['url', 'postData'],
           execute: (controller, params) async {
             final url = params['url']?.toString() ?? '';
-            Uint8List? postData;
-            final postDataParam = params['postData'];
-            if (postDataParam is Uint8List) {
-              postData = postDataParam;
-            } else if (postDataParam is String && postDataParam.isNotEmpty) {
-              postData = Uint8List.fromList(postDataParam.codeUnits);
+            Uint8List? postData = extractParam<Uint8List>(params['postData']);
+            // Also handle string input by converting to bytes
+            if (postData == null) {
+              final postDataParam = params['postData'];
+              if (postDataParam is String && postDataParam.isNotEmpty) {
+                postData = Uint8List.fromList(postDataParam.codeUnits);
+              }
             }
             await controller.postUrl(
               url: WebUri(url),

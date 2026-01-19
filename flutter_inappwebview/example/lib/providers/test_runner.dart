@@ -3,8 +3,10 @@ import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
+import '../models/test_configuration.dart';
 import '../models/test_result.dart';
 import '../utils/constants.dart';
+import '../utils/controller_methods_registry.dart';
 
 /// Status of the test runner
 enum TestStatus { idle, running, paused, completed, error }
@@ -143,6 +145,18 @@ class TestRunner extends ChangeNotifier {
   DateTime? _startTime;
   DateTime? _endTime;
 
+  /// The current test configuration being used
+  TestConfiguration? _currentConfiguration;
+
+  /// The type of WebView being used
+  TestWebViewType _webViewType = TestWebViewType.inAppWebView;
+
+  /// Headless WebView instance (when using headless mode)
+  HeadlessInAppWebView? _headlessWebView;
+
+  /// Controller for headless WebView
+  InAppWebViewController? _headlessController;
+
   // Getters
   TestStatus get status => _status;
   List<ExtendedTestResult> get results => List.unmodifiable(_results);
@@ -154,6 +168,11 @@ class TestRunner extends ChangeNotifier {
   int get skipped => _results.where((r) => r.skipped).length;
   DateTime? get startTime => _startTime;
   DateTime? get endTime => _endTime;
+  TestConfiguration? get currentConfiguration => _currentConfiguration;
+  TestWebViewType get webViewType => _webViewType;
+  bool get isUsingHeadless => _webViewType == TestWebViewType.headless;
+  HeadlessInAppWebView? get headlessWebView => _headlessWebView;
+  InAppWebViewController? get headlessController => _headlessController;
 
   Duration get elapsedTime {
     if (_startTime == null) return Duration.zero;
@@ -165,6 +184,352 @@ class TestRunner extends ChangeNotifier {
     final executed = _results.where((r) => !r.skipped).length;
     if (executed == 0) return 0;
     return (passed / executed) * 100;
+  }
+
+  /// Set the WebView type to use for testing
+  void setWebViewType(TestWebViewType type) {
+    _webViewType = type;
+    notifyListeners();
+  }
+
+  /// Set the test configuration to use
+  void setConfiguration(TestConfiguration? config) {
+    _currentConfiguration = config;
+    notifyListeners();
+  }
+
+  /// Initialize headless WebView for testing
+  Future<void> initializeHeadlessWebView({String? initialUrl}) async {
+    if (_headlessWebView != null) {
+      await disposeHeadlessWebView();
+    }
+
+    final completer = Completer<void>();
+
+    _headlessWebView = HeadlessInAppWebView(
+      initialUrlRequest: URLRequest(url: WebUri(initialUrl ?? 'about:blank')),
+      onWebViewCreated: (controller) {
+        _headlessController = controller;
+      },
+      onLoadStop: (controller, url) {
+        if (!completer.isCompleted) {
+          completer.complete();
+        }
+      },
+    );
+
+    await _headlessWebView!.run();
+
+    // Wait for initial load or timeout
+    await completer.future.timeout(
+      const Duration(seconds: 10),
+      onTimeout: () {},
+    );
+
+    notifyListeners();
+  }
+
+  /// Dispose headless WebView
+  Future<void> disposeHeadlessWebView() async {
+    if (_headlessWebView != null) {
+      await _headlessWebView!.dispose();
+      _headlessWebView = null;
+      _headlessController = null;
+      notifyListeners();
+    }
+  }
+
+  /// Run tests from a custom configuration
+  Future<void> runConfiguration(
+    TestConfiguration config,
+    InAppWebViewController? controller,
+  ) async {
+    _currentConfiguration = config;
+
+    // Get appropriate controller based on WebView type
+    InAppWebViewController? testController = controller;
+    if (config.webViewType == TestWebViewType.headless) {
+      if (_headlessController == null) {
+        await initializeHeadlessWebView(initialUrl: config.initialUrl);
+      }
+      testController = _headlessController;
+    }
+
+    // Run custom steps if any
+    if (config.customSteps.isNotEmpty) {
+      await _runCustomSteps(config.customSteps, testController);
+    }
+  }
+
+  /// Run custom test steps
+  Future<void> _runCustomSteps(
+    List<CustomTestStep> steps,
+    InAppWebViewController? controller,
+  ) async {
+    if (_status == TestStatus.running) return;
+
+    _status = TestStatus.running;
+    _shouldStop = false;
+    _results = [];
+    _progress = 0;
+    _total = steps.length;
+    _startTime = DateTime.now();
+    _endTime = null;
+    notifyListeners();
+
+    for (var i = 0; i < steps.length; i++) {
+      if (_shouldStop) {
+        _status = TestStatus.paused;
+        notifyListeners();
+        break;
+      }
+
+      final step = steps[i];
+      if (!step.enabled) {
+        _results = [
+          ..._results,
+          ExtendedTestResult(
+            testId: step.id,
+            testTitle: step.name,
+            category: _categoryFromString(step.category),
+            success: true,
+            message: 'Skipped - disabled',
+            duration: Duration.zero,
+            timestamp: DateTime.now(),
+            skipped: true,
+            skipReason: 'Step is disabled',
+          ),
+        ];
+        continue;
+      }
+
+      _currentTest = step.name;
+      _progress = i;
+      notifyListeners();
+
+      final result = await _executeCustomStep(step, controller);
+      _results = [..._results, result];
+      notifyListeners();
+
+      // Small delay between steps
+      await Future.delayed(const Duration(milliseconds: 100));
+    }
+
+    _status = _shouldStop ? TestStatus.paused : TestStatus.completed;
+    _currentTest = null;
+    _progress = steps.length;
+    _endTime = DateTime.now();
+    _shouldStop = false;
+    notifyListeners();
+  }
+
+  /// Execute a single custom test step
+  Future<ExtendedTestResult> _executeCustomStep(
+    CustomTestStep step,
+    InAppWebViewController? controller,
+  ) async {
+    final stopwatch = Stopwatch()..start();
+
+    try {
+      dynamic result;
+
+      switch (step.action.type) {
+        case CustomTestActionType.controllerMethod:
+          result = await _executeControllerMethod(step.action, controller);
+          break;
+        case CustomTestActionType.evaluateJavascript:
+          if (controller == null) throw Exception('Controller not available');
+          result = await controller.evaluateJavascript(
+            source: step.action.script ?? '',
+          );
+          break;
+        case CustomTestActionType.loadUrl:
+          if (controller == null) throw Exception('Controller not available');
+          await controller.loadUrl(
+            urlRequest: URLRequest(url: WebUri(step.action.url ?? '')),
+          );
+          result = 'URL loaded';
+          break;
+        case CustomTestActionType.loadHtml:
+          if (controller == null) throw Exception('Controller not available');
+          await controller.loadData(data: step.action.html ?? '');
+          result = 'HTML loaded';
+          break;
+        case CustomTestActionType.checkUrl:
+          if (controller == null) throw Exception('Controller not available');
+          final currentUrl = await controller.getUrl();
+          final matches = currentUrl?.toString() == step.action.url;
+          result = matches ? 'URL matches' : 'URL mismatch: $currentUrl';
+          if (!matches) throw Exception(result);
+          break;
+        case CustomTestActionType.checkTitle:
+          if (controller == null) throw Exception('Controller not available');
+          final title = await controller.getTitle();
+          final matches = title == step.action.text;
+          result = matches ? 'Title matches' : 'Title mismatch: $title';
+          if (!matches) throw Exception(result);
+          break;
+        case CustomTestActionType.checkElement:
+          if (controller == null) throw Exception('Controller not available');
+          final exists = await controller.evaluateJavascript(
+            source:
+                'document.querySelector("${step.action.selector}") !== null',
+          );
+          if (exists != true && exists != 'true') {
+            throw Exception('Element not found: ${step.action.selector}');
+          }
+          result = 'Element found';
+          break;
+        case CustomTestActionType.waitForElement:
+          if (controller == null) throw Exception('Controller not available');
+          final timeout = step.action.delayMs ?? 5000;
+          final startWait = DateTime.now();
+          bool found = false;
+          while (DateTime.now().difference(startWait).inMilliseconds <
+              timeout) {
+            final exists = await controller.evaluateJavascript(
+              source:
+                  'document.querySelector("${step.action.selector}") !== null',
+            );
+            if (exists == true || exists == 'true') {
+              found = true;
+              break;
+            }
+            await Future.delayed(const Duration(milliseconds: 100));
+          }
+          if (!found) {
+            throw Exception(
+              'Element not found within ${timeout}ms: ${step.action.selector}',
+            );
+          }
+          result = 'Element found';
+          break;
+        case CustomTestActionType.clickElement:
+          if (controller == null) throw Exception('Controller not available');
+          await controller.evaluateJavascript(
+            source:
+                'document.querySelector("${step.action.selector}")?.click()',
+          );
+          result = 'Clicked element';
+          break;
+        case CustomTestActionType.typeText:
+          if (controller == null) throw Exception('Controller not available');
+          await controller.evaluateJavascript(
+            source:
+                '''
+              var el = document.querySelector("${step.action.selector}");
+              if (el) { el.value = "${step.action.text}"; }
+            ''',
+          );
+          result = 'Typed text';
+          break;
+        case CustomTestActionType.scrollTo:
+          if (controller == null) throw Exception('Controller not available');
+          await controller.scrollTo(
+            x: step.action.x ?? 0,
+            y: step.action.y ?? 0,
+          );
+          result = 'Scrolled to (${step.action.x}, ${step.action.y})';
+          break;
+        case CustomTestActionType.takeScreenshot:
+          if (controller == null) throw Exception('Controller not available');
+          final screenshot = await controller.takeScreenshot();
+          result = screenshot != null
+              ? 'Screenshot taken: ${screenshot.length} bytes'
+              : 'Screenshot failed';
+          break;
+        case CustomTestActionType.delay:
+          await Future.delayed(
+            Duration(milliseconds: step.action.delayMs ?? 1000),
+          );
+          result = 'Delayed ${step.action.delayMs}ms';
+          break;
+        case CustomTestActionType.custom:
+          // Custom code execution would require eval or predefined functions
+          result = 'Custom action executed';
+          break;
+      }
+
+      stopwatch.stop();
+
+      // Check expected result if specified
+      if (step.expectedResult != null) {
+        final resultStr = result?.toString() ?? '';
+        if (!resultStr.contains(step.expectedResult!)) {
+          return ExtendedTestResult(
+            testId: step.id,
+            testTitle: step.name,
+            category: _categoryFromString(step.category),
+            success: false,
+            message: 'Expected "${step.expectedResult}" but got "$resultStr"',
+            duration: stopwatch.elapsed,
+            timestamp: DateTime.now(),
+            data: {'result': result},
+          );
+        }
+      }
+
+      return ExtendedTestResult(
+        testId: step.id,
+        testTitle: step.name,
+        category: _categoryFromString(step.category),
+        success: true,
+        message: result?.toString() ?? 'Success',
+        duration: stopwatch.elapsed,
+        timestamp: DateTime.now(),
+        data: {'result': result},
+      );
+    } catch (e, stackTrace) {
+      stopwatch.stop();
+      debugPrint('Custom step ${step.id} failed: $e');
+      debugPrint('Stack trace: $stackTrace');
+
+      return ExtendedTestResult(
+        testId: step.id,
+        testTitle: step.name,
+        category: _categoryFromString(step.category),
+        success: false,
+        message: 'Error: $e',
+        duration: stopwatch.elapsed,
+        timestamp: DateTime.now(),
+        data: {'error': e.toString(), 'stackTrace': stackTrace.toString()},
+      );
+    }
+  }
+
+  /// Execute a controller method action
+  Future<dynamic> _executeControllerMethod(
+    CustomTestAction action,
+    InAppWebViewController? controller,
+  ) async {
+    if (controller == null) {
+      throw Exception('Controller not available');
+    }
+
+    final methodId = action.methodId;
+    if (methodId == null) {
+      throw Exception('Method ID not specified');
+    }
+
+    final method = ControllerMethodsRegistry.instance.findMethodById(methodId);
+    if (method == null) {
+      throw Exception('Method not found: $methodId');
+    }
+
+    // Merge default parameters with custom parameters
+    final params = <String, dynamic>{
+      ...method.parameters,
+      if (action.methodParameters != null) ...action.methodParameters!,
+    };
+
+    return await method.execute(controller, params);
+  }
+
+  TestCategory _categoryFromString(String category) {
+    return TestCategory.values.firstWhere(
+      (c) => c.name.toLowerCase() == category.toLowerCase(),
+      orElse: () => TestCategory.advanced,
+    );
   }
 
   /// Run all tests for a specific category

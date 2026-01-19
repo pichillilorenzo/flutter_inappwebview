@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:provider/provider.dart';
 
+import '../../models/test_configuration.dart';
 import '../../providers/test_runner.dart';
 import '../../utils/constants.dart';
 import '../../main.dart';
@@ -21,6 +22,13 @@ class _TestRunnerScreenState extends State<TestRunnerScreen> {
   ResultFilter _resultFilter = ResultFilter.all;
   bool _webViewReady = false;
 
+  // Custom configuration support
+  TestConfiguration? _customConfiguration;
+  bool _runningCustomConfig = false;
+
+  // WebView type
+  TestWebViewType _webViewType = TestWebViewType.inAppWebView;
+
   @override
   void initState() {
     super.initState();
@@ -36,6 +44,11 @@ class _TestRunnerScreenState extends State<TestRunnerScreen> {
         backgroundColor: Colors.blue,
         foregroundColor: Colors.white,
         actions: [
+          IconButton(
+            icon: const Icon(Icons.settings),
+            tooltip: 'Load Configuration',
+            onPressed: _showConfigurationDialog,
+          ),
           PopupMenuButton<String>(
             icon: const Icon(Icons.more_vert),
             onSelected: _handleMenuAction,
@@ -64,17 +77,38 @@ class _TestRunnerScreenState extends State<TestRunnerScreen> {
       drawer: buildDrawer(context: context),
       body: Column(
         children: [
-          _buildCategorySelector(),
+          if (_customConfiguration != null) _buildConfigurationBanner(),
+          if (!_runningCustomConfig) _buildCategorySelector(),
+          _buildWebViewTypeSelector(),
           _buildControlBar(),
           _buildProgressSection(),
           _buildFilterBar(),
           Expanded(
             child: Row(
               children: [
-                // Hidden WebView for testing
-                SizedBox(width: 1, height: 1, child: _buildHiddenWebView()),
+                // WebView for testing (visible or hidden based on type)
+                if (_webViewType == TestWebViewType.inAppWebView)
+                  Expanded(
+                    flex: 1,
+                    child: Container(
+                      margin: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.grey.shade300),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(8),
+                        child: _buildVisibleWebView(),
+                      ),
+                    ),
+                  )
+                else
+                  SizedBox(width: 1, height: 1, child: _buildHiddenWebView()),
                 // Results list
-                Expanded(child: _buildResultsList()),
+                Expanded(
+                  flex: _webViewType == TestWebViewType.inAppWebView ? 1 : 2,
+                  child: _buildResultsList(),
+                ),
               ],
             ),
           ),
@@ -166,6 +200,245 @@ class _TestRunnerScreenState extends State<TestRunnerScreen> {
         ],
       ),
     );
+  }
+
+  Widget _buildConfigurationBanner() {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.blue.shade50,
+        border: Border(bottom: BorderSide(color: Colors.blue.shade200)),
+      ),
+      child: Row(
+        children: [
+          const Icon(Icons.tune, color: Colors.blue),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Custom Configuration: ${_customConfiguration!.name}',
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                ),
+                Text(
+                  '${_customConfiguration!.customSteps.length} custom steps • '
+                  '${_customConfiguration!.webViewType == TestWebViewType.headless ? "Headless" : "Visible"} WebView',
+                  style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+                ),
+              ],
+            ),
+          ),
+          TextButton.icon(
+            icon: const Icon(Icons.close, size: 18),
+            label: const Text('Clear'),
+            onPressed: () {
+              setState(() {
+                _customConfiguration = null;
+                _runningCustomConfig = false;
+              });
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildWebViewTypeSelector() {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        border: Border(bottom: BorderSide(color: Colors.grey.shade200)),
+      ),
+      child: Row(
+        children: [
+          const Text('WebView Mode: '),
+          const SizedBox(width: 8),
+          SegmentedButton<TestWebViewType>(
+            segments: const [
+              ButtonSegment(
+                value: TestWebViewType.inAppWebView,
+                label: Text('Visible'),
+                icon: Icon(Icons.visibility, size: 18),
+              ),
+              ButtonSegment(
+                value: TestWebViewType.headless,
+                label: Text('Headless'),
+                icon: Icon(Icons.visibility_off, size: 18),
+              ),
+            ],
+            selected: {_webViewType},
+            onSelectionChanged: (selection) {
+              setState(() {
+                _webViewType = selection.first;
+                _webViewReady = false;
+              });
+            },
+          ),
+          const Spacer(),
+          if (_webViewType == TestWebViewType.inAppWebView)
+            Text(
+              'Real-time rendering enabled',
+              style: TextStyle(
+                fontSize: 12,
+                color: Colors.green.shade700,
+                fontStyle: FontStyle.italic,
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildVisibleWebView() {
+    return Column(
+      children: [
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          color: Colors.grey.shade200,
+          child: Row(
+            children: [
+              const Icon(Icons.web, size: 16),
+              const SizedBox(width: 4),
+              const Text('WebView Preview', style: TextStyle(fontSize: 12)),
+              const Spacer(),
+              if (_webViewReady)
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 6,
+                    vertical: 2,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.green,
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  child: const Text(
+                    'Ready',
+                    style: TextStyle(color: Colors.white, fontSize: 10),
+                  ),
+                )
+              else
+                const SizedBox(
+                  width: 12,
+                  height: 12,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                ),
+            ],
+          ),
+        ),
+        Expanded(
+          child: InAppWebView(
+            initialUrlRequest: URLRequest(
+              url: WebUri(
+                _customConfiguration?.initialUrl ?? 'https://flutter.dev',
+              ),
+            ),
+            initialSettings: InAppWebViewSettings(javaScriptEnabled: true),
+            onWebViewCreated: (controller) {
+              _webViewController = controller;
+            },
+            onLoadStop: (controller, url) {
+              if (!_webViewReady) {
+                setState(() {
+                  _webViewReady = true;
+                });
+              }
+            },
+          ),
+        ),
+      ],
+    );
+  }
+
+  void _showConfigurationDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Load Test Configuration'),
+        content: SizedBox(
+          width: 400,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                leading: const Icon(
+                  Icons.playlist_add_check,
+                  color: Colors.blue,
+                ),
+                title: const Text('Load Default Configuration'),
+                subtitle: const Text('Pre-built tests for common scenarios'),
+                onTap: () {
+                  Navigator.pop(context);
+                  _loadConfiguration(TestConfiguration.defaultConfig());
+                },
+              ),
+              const Divider(),
+              ListTile(
+                leading: const Icon(Icons.paste, color: Colors.green),
+                title: const Text('Import from Clipboard'),
+                subtitle: const Text('Paste JSON configuration'),
+                onTap: () async {
+                  Navigator.pop(context);
+                  await _importFromClipboard();
+                },
+              ),
+              const Divider(),
+              ListTile(
+                leading: const Icon(Icons.close, color: Colors.grey),
+                title: const Text('Clear Configuration'),
+                subtitle: const Text('Run built-in category tests'),
+                onTap: () {
+                  Navigator.pop(context);
+                  setState(() {
+                    _customConfiguration = null;
+                    _runningCustomConfig = false;
+                  });
+                },
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _loadConfiguration(TestConfiguration config) {
+    setState(() {
+      _customConfiguration = config;
+      _webViewType = config.webViewType;
+      _webViewReady = false;
+    });
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Configuration loaded: ${config.name}')),
+    );
+  }
+
+  Future<void> _importFromClipboard() async {
+    try {
+      final data = await Clipboard.getData(Clipboard.kTextPlain);
+      if (data?.text != null && data!.text!.isNotEmpty) {
+        final config = TestConfiguration.fromJsonString(data.text!);
+        _loadConfiguration(config);
+      } else {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('Clipboard is empty')));
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Failed to import: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
   }
 
   Widget _buildControlBar() {

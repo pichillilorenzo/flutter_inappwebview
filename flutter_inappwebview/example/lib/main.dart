@@ -25,7 +25,6 @@ import 'package:flutter_inappwebview_example/screens/support_matrix/support_matr
 import 'package:flutter_inappwebview_example/screens/support_matrix/platform_comparison_screen.dart';
 import 'package:flutter_inappwebview_example/screens/test_automation/test_runner_screen.dart';
 import 'package:flutter_inappwebview_example/screens/test_automation/test_configuration_screen.dart';
-import 'package:flutter_inappwebview_example/screens/test_automation/performance_screen.dart';
 import 'package:flutter_inappwebview_example/utils/test_registry.dart';
 
 // import 'package:path_provider/path_provider.dart';
@@ -232,13 +231,6 @@ Drawer buildDrawer({required BuildContext context}) {
             Navigator.pushNamed(context, '/test-configuration');
           },
         ),
-        ListTile(
-          title: Text('Performance Benchmarks'),
-          leading: Icon(Icons.speed),
-          onTap: () {
-            Navigator.pushNamed(context, '/performance');
-          },
-        ),
         const Divider(),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -343,7 +335,6 @@ class _MyAppState extends State<MyApp> {
         '/platform-comparison': (context) => PlatformComparisonScreen(),
         '/test-automation': (context) => TestRunnerScreen(),
         '/test-configuration': (context) => TestConfigurationScreen(),
-        '/performance': (context) => PerformanceScreen(),
       },
     );
   }

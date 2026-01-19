@@ -1,6 +1,15 @@
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
 
+/// Specifies which type of WebView to use for test execution
+enum TestWebViewType {
+  /// Use a visible InAppWebView widget for real-time rendering
+  inAppWebView,
+
+  /// Use a headless WebView for background execution
+  headless,
+}
+
 /// Represents a custom test step that can be defined by the user
 class CustomTestStep {
   final String id;
@@ -92,6 +101,9 @@ enum CustomTestActionType {
   scrollTo,
   takeScreenshot,
   delay,
+
+  /// Execute an InAppWebViewController method
+  controllerMethod,
   custom,
 }
 
@@ -108,6 +120,12 @@ class CustomTestAction {
   final int? delayMs;
   final String? customCode;
 
+  /// For controllerMethod action type - the method ID from ControllerMethodsRegistry
+  final String? methodId;
+
+  /// For controllerMethod action type - the method parameters
+  final Map<String, dynamic>? methodParameters;
+
   const CustomTestAction({
     required this.type,
     this.script,
@@ -119,6 +137,8 @@ class CustomTestAction {
     this.y,
     this.delayMs,
     this.customCode,
+    this.methodId,
+    this.methodParameters,
   });
 
   Map<String, dynamic> toJson() {
@@ -133,6 +153,8 @@ class CustomTestAction {
       'y': y,
       'delayMs': delayMs,
       'customCode': customCode,
+      'methodId': methodId,
+      'methodParameters': methodParameters,
     };
   }
 
@@ -151,6 +173,8 @@ class CustomTestAction {
       y: json['y'] as int?,
       delayMs: json['delayMs'] as int?,
       customCode: json['customCode'] as String?,
+      methodId: json['methodId'] as String?,
+      methodParameters: json['methodParameters'] as Map<String, dynamic>?,
     );
   }
 
@@ -237,6 +261,18 @@ class CustomTestAction {
       delayMs: milliseconds,
     );
   }
+
+  /// Creates a controller method action to execute an InAppWebViewController method
+  factory CustomTestAction.controllerMethod(
+    String methodId, {
+    Map<String, dynamic>? parameters,
+  }) {
+    return CustomTestAction(
+      type: CustomTestActionType.controllerMethod,
+      methodId: methodId,
+      methodParameters: parameters,
+    );
+  }
 }
 
 /// Represents a complete test configuration that can be saved and loaded
@@ -251,6 +287,12 @@ class TestConfiguration {
   final Set<String> enabledBuiltInTests;
   final Map<String, dynamic> metadata;
 
+  /// The type of WebView to use for test execution
+  final TestWebViewType webViewType;
+
+  /// Initial URL to load before running tests (optional)
+  final String? initialUrl;
+
   const TestConfiguration({
     required this.id,
     required this.name,
@@ -261,6 +303,8 @@ class TestConfiguration {
     this.testOrdering = const {},
     this.enabledBuiltInTests = const {},
     this.metadata = const {},
+    this.webViewType = TestWebViewType.inAppWebView,
+    this.initialUrl,
   });
 
   TestConfiguration copyWith({
@@ -273,6 +317,8 @@ class TestConfiguration {
     Map<String, List<String>>? testOrdering,
     Set<String>? enabledBuiltInTests,
     Map<String, dynamic>? metadata,
+    TestWebViewType? webViewType,
+    String? initialUrl,
   }) {
     return TestConfiguration(
       id: id ?? this.id,
@@ -284,6 +330,8 @@ class TestConfiguration {
       testOrdering: testOrdering ?? this.testOrdering,
       enabledBuiltInTests: enabledBuiltInTests ?? this.enabledBuiltInTests,
       metadata: metadata ?? this.metadata,
+      webViewType: webViewType ?? this.webViewType,
+      initialUrl: initialUrl ?? this.initialUrl,
     );
   }
 
@@ -298,6 +346,8 @@ class TestConfiguration {
       'testOrdering': testOrdering,
       'enabledBuiltInTests': enabledBuiltInTests.toList(),
       'metadata': metadata,
+      'webViewType': webViewType.name,
+      'initialUrl': initialUrl,
     };
   }
 
@@ -324,6 +374,11 @@ class TestConfiguration {
               .toSet() ??
           {},
       metadata: (json['metadata'] as Map<String, dynamic>?) ?? {},
+      webViewType: TestWebViewType.values.firstWhere(
+        (e) => e.name == json['webViewType'],
+        orElse: () => TestWebViewType.inAppWebView,
+      ),
+      initialUrl: json['initialUrl'] as String?,
     );
   }
 
@@ -336,6 +391,116 @@ class TestConfiguration {
       createdAt: now,
       modifiedAt: now,
     );
+  }
+
+  /// Creates a default configuration with common test steps
+  factory TestConfiguration.defaultConfig() {
+    final now = DateTime.now();
+    return TestConfiguration(
+      id: 'default_config',
+      name: 'Default Test Configuration',
+      description: 'Default configuration with common test scenarios',
+      createdAt: now,
+      modifiedAt: now,
+      customSteps: _buildDefaultTestSteps(),
+      webViewType: TestWebViewType.inAppWebView,
+      initialUrl: 'https://example.com',
+    );
+  }
+
+  /// Build default test steps covering common scenarios
+  static List<CustomTestStep> _buildDefaultTestSteps() {
+    return [
+      // Navigation tests
+      CustomTestStep(
+        id: 'default_load_url',
+        name: 'Load URL',
+        description: 'Load a test URL and verify navigation',
+        category: 'navigation',
+        action: CustomTestAction.controllerMethod(
+          'loadUrl',
+          parameters: {'url': 'https://example.com'},
+        ),
+        order: 0,
+      ),
+      CustomTestStep(
+        id: 'default_get_url',
+        name: 'Get Current URL',
+        description: 'Retrieve and verify the current URL',
+        category: 'navigation',
+        action: CustomTestAction.controllerMethod('getUrl'),
+        order: 1,
+      ),
+      CustomTestStep(
+        id: 'default_reload',
+        name: 'Reload Page',
+        description: 'Reload the current page',
+        category: 'navigation',
+        action: CustomTestAction.controllerMethod('reload'),
+        order: 2,
+      ),
+
+      // Page info tests
+      CustomTestStep(
+        id: 'default_get_title',
+        name: 'Get Page Title',
+        description: 'Retrieve the page title',
+        category: 'pageInfo',
+        action: CustomTestAction.controllerMethod('getTitle'),
+        order: 3,
+      ),
+      CustomTestStep(
+        id: 'default_get_html',
+        name: 'Get HTML Source',
+        description: 'Retrieve the page HTML source',
+        category: 'pageInfo',
+        action: CustomTestAction.controllerMethod('getHtml'),
+        order: 4,
+      ),
+
+      // JavaScript tests
+      CustomTestStep(
+        id: 'default_evaluate_js',
+        name: 'Evaluate JavaScript',
+        description: 'Execute JavaScript and get result',
+        category: 'javascript',
+        action: CustomTestAction.controllerMethod(
+          'evaluateJavascript',
+          parameters: {'source': 'document.title'},
+        ),
+        order: 5,
+      ),
+
+      // Screenshot test
+      CustomTestStep(
+        id: 'default_screenshot',
+        name: 'Take Screenshot',
+        description: 'Capture a screenshot of the WebView',
+        category: 'screenshotPrint',
+        action: CustomTestAction.controllerMethod('takeScreenshot'),
+        order: 6,
+      ),
+
+      // Security test
+      CustomTestStep(
+        id: 'default_secure_context',
+        name: 'Check Secure Context',
+        description: 'Verify if the page is in a secure context',
+        category: 'security',
+        action: CustomTestAction.controllerMethod('isSecureContext'),
+        order: 7,
+      ),
+
+      // Certificate test
+      CustomTestStep(
+        id: 'default_get_certificate',
+        name: 'Get SSL Certificate',
+        description: 'Retrieve SSL certificate information',
+        category: 'security',
+        action: CustomTestAction.controllerMethod('getCertificate'),
+        order: 8,
+      ),
+    ];
   }
 
   /// Export configuration as formatted JSON string
@@ -357,6 +522,18 @@ class TestConfigurationManager extends ChangeNotifier {
 
   TestConfiguration get currentConfig => _currentConfig;
   List<TestConfiguration> get savedConfigs => List.unmodifiable(_savedConfigs);
+
+  /// Set the WebView type
+  void setWebViewType(TestWebViewType type) {
+    _currentConfig = _currentConfig.copyWith(webViewType: type);
+    notifyListeners();
+  }
+
+  /// Set the initial URL
+  void setInitialUrl(String? url) {
+    _currentConfig = _currentConfig.copyWith(initialUrl: url);
+    notifyListeners();
+  }
 
   /// Add a custom test step
   void addCustomStep(CustomTestStep step) {

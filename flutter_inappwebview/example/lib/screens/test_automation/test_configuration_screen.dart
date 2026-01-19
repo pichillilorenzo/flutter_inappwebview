@@ -22,7 +22,7 @@ class _TestConfigurationScreenState extends State<TestConfigurationScreen>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 3, vsync: this);
+    _tabController = TabController(length: 4, vsync: this);
   }
 
   @override
@@ -48,6 +48,7 @@ class _TestConfigurationScreenState extends State<TestConfigurationScreen>
             unselectedLabelColor: Colors.white70,
             tabs: const [
               Tab(icon: Icon(Icons.edit_note), text: 'Custom Steps'),
+              Tab(icon: Icon(Icons.settings), text: 'Settings'),
               Tab(icon: Icon(Icons.reorder), text: 'Test Order'),
               Tab(icon: Icon(Icons.import_export), text: 'Import/Export'),
             ],
@@ -96,6 +97,7 @@ class _TestConfigurationScreenState extends State<TestConfigurationScreen>
           controller: _tabController,
           children: [
             _buildCustomStepsTab(),
+            _buildSettingsTab(),
             _buildTestOrderTab(),
             _buildImportExportTab(),
           ],
@@ -200,6 +202,196 @@ class _TestConfigurationScreenState extends State<TestConfigurationScreen>
         final step = steps[index];
         return _buildStepCard(context, manager, step, index);
       },
+    );
+  }
+
+  Widget _buildSettingsTab() {
+    return Consumer<TestConfigurationManager>(
+      builder: (context, manager, child) {
+        final config = manager.currentConfig;
+
+        return SingleChildScrollView(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // WebView Type Selection
+              Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Icon(Icons.web, color: Colors.blue.shade700),
+                          const SizedBox(width: 8),
+                          const Text(
+                            'WebView Type',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        'Choose how the WebView should be rendered during tests',
+                        style: TextStyle(color: Colors.grey.shade600),
+                      ),
+                      const SizedBox(height: 16),
+                      RadioListTile<TestWebViewType>(
+                        title: const Text('InAppWebView (Visible)'),
+                        subtitle: const Text(
+                          'Display WebView in real-time during test execution',
+                        ),
+                        value: TestWebViewType.inAppWebView,
+                        groupValue: config.webViewType,
+                        onChanged: (value) {
+                          if (value != null) {
+                            manager.setWebViewType(value);
+                          }
+                        },
+                      ),
+                      RadioListTile<TestWebViewType>(
+                        title: const Text('Headless WebView'),
+                        subtitle: const Text(
+                          'Run tests in background without visible rendering',
+                        ),
+                        value: TestWebViewType.headless,
+                        groupValue: config.webViewType,
+                        onChanged: (value) {
+                          if (value != null) {
+                            manager.setWebViewType(value);
+                          }
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+
+              // Initial URL
+              Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Icon(Icons.link, color: Colors.green.shade700),
+                          const SizedBox(width: 8),
+                          const Text(
+                            'Initial URL',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        'URL to load before running tests (optional)',
+                        style: TextStyle(color: Colors.grey.shade600),
+                      ),
+                      const SizedBox(height: 12),
+                      TextField(
+                        controller: TextEditingController(
+                          text: config.initialUrl ?? '',
+                        ),
+                        decoration: const InputDecoration(
+                          labelText: 'Initial URL',
+                          hintText: 'https://example.com',
+                          border: OutlineInputBorder(),
+                        ),
+                        onChanged: (value) {
+                          manager.setInitialUrl(value.isEmpty ? null : value);
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+
+              // Default Configuration
+              Card(
+                color: Colors.blue.shade50,
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.playlist_add_check,
+                            color: Colors.blue.shade700,
+                          ),
+                          const SizedBox(width: 8),
+                          const Text(
+                            'Default Configuration',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        'Load a pre-built configuration with common test scenarios including navigation, JavaScript execution, security checks, and more.',
+                        style: TextStyle(color: Colors.grey.shade700),
+                      ),
+                      const SizedBox(height: 12),
+                      ElevatedButton.icon(
+                        icon: const Icon(Icons.download),
+                        label: const Text('Load Default Configuration'),
+                        onPressed: () => _loadDefaultConfig(manager),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  void _loadDefaultConfig(TestConfigurationManager manager) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Load Default Configuration?'),
+        content: const Text(
+          'This will replace your current configuration with the default test suite. '
+          'Any unsaved changes will be lost.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              final defaultConfig = TestConfiguration.defaultConfig();
+              manager.importConfig(defaultConfig.toJsonString());
+              Navigator.pop(context);
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Default configuration loaded')),
+              );
+              _tabController.animateTo(0);
+            },
+            child: const Text('Load Default'),
+          ),
+        ],
+      ),
     );
   }
 

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../../models/test_configuration.dart';
+import '../../utils/controller_methods_registry.dart';
+import '../../widgets/common/parameter_dialog.dart';
 
 /// Dialog for creating/editing custom test steps
 class CustomTestStepDialog extends StatefulWidget {
@@ -34,6 +36,10 @@ class _CustomTestStepDialogState extends State<CustomTestStepDialog> {
       CustomTestActionType.evaluateJavascript;
   String _selectedCategory = 'custom';
   bool _enabled = true;
+
+  // Controller method selection
+  ControllerMethodEntry? _selectedMethod;
+  Map<String, dynamic> _methodParameters = {};
 
   final List<String> _categories = [
     'custom',
@@ -76,6 +82,17 @@ class _CustomTestStepDialogState extends State<CustomTestStepDialog> {
       _selectedActionType = step.action.type;
       _selectedCategory = step.category;
       _enabled = step.enabled;
+
+      // Load controller method if applicable
+      if (step.action.type == CustomTestActionType.controllerMethod) {
+        final methodId = step.action.methodId;
+        if (methodId != null) {
+          _selectedMethod = ControllerMethodsRegistry.instance.findMethodById(
+            methodId,
+          );
+          _methodParameters = Map.from(step.action.methodParameters ?? {});
+        }
+      }
     }
   }
 
@@ -396,6 +413,165 @@ class _CustomTestStepDialogState extends State<CustomTestStepDialog> {
             style: const TextStyle(fontFamily: 'monospace'),
           ),
         ];
+
+      case CustomTestActionType.controllerMethod:
+        return _buildControllerMethodFields();
+    }
+  }
+
+  List<Widget> _buildControllerMethodFields() {
+    return [
+      // Method selector
+      const Text(
+        'Select Controller Method',
+        style: TextStyle(fontWeight: FontWeight.w500),
+      ),
+      const SizedBox(height: 8),
+      InkWell(
+        onTap: () => _showMethodPickerDialog(),
+        child: Container(
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            border: Border.all(color: Colors.grey.shade400),
+            borderRadius: BorderRadius.circular(4),
+          ),
+          child: Row(
+            children: [
+              const Icon(Icons.code, color: Colors.blue),
+              const SizedBox(width: 12),
+              Expanded(
+                child: _selectedMethod != null
+                    ? Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            _selectedMethod!.name,
+                            style: const TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          Text(
+                            _selectedMethod!.description,
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Colors.grey.shade600,
+                            ),
+                          ),
+                        ],
+                      )
+                    : Text(
+                        'Select a controller method...',
+                        style: TextStyle(color: Colors.grey.shade600),
+                      ),
+              ),
+              const Icon(Icons.arrow_drop_down),
+            ],
+          ),
+        ),
+      ),
+
+      // Parameters section
+      if (_selectedMethod != null &&
+          _selectedMethod!.parameters.isNotEmpty) ...[
+        const SizedBox(height: 16),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            const Text(
+              'Method Parameters',
+              style: TextStyle(fontWeight: FontWeight.w500),
+            ),
+            TextButton.icon(
+              icon: const Icon(Icons.edit, size: 16),
+              label: const Text('Configure'),
+              onPressed: () => _showParameterDialog(),
+            ),
+          ],
+        ),
+        const SizedBox(height: 8),
+        Container(
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: Colors.grey.shade100,
+            borderRadius: BorderRadius.circular(4),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: _selectedMethod!.parameters.entries.map((entry) {
+              final value = _methodParameters[entry.key] ?? entry.value;
+              return Padding(
+                padding: const EdgeInsets.symmetric(vertical: 2),
+                child: Row(
+                  children: [
+                    Text(
+                      '${entry.key}: ',
+                      style: const TextStyle(
+                        fontFamily: 'monospace',
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    Expanded(
+                      child: Text(
+                        _formatParameterValue(value),
+                        style: TextStyle(
+                          fontFamily: 'monospace',
+                          color: Colors.grey.shade700,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            }).toList(),
+          ),
+        ),
+      ],
+    ];
+  }
+
+  String _formatParameterValue(dynamic value) {
+    if (value == null) return 'null';
+    if (value is String) return '"$value"';
+    if (value is Map) return '{...}';
+    if (value is List) return '[${value.length} items]';
+    if (value is ParameterValueHint) return _formatParameterValue(value.value);
+    return value.toString();
+  }
+
+  Future<void> _showMethodPickerDialog() async {
+    final result = await showDialog<ControllerMethodEntry>(
+      context: context,
+      builder: (context) =>
+          _MethodPickerDialog(selectedMethodId: _selectedMethod?.id),
+    );
+
+    if (result != null) {
+      setState(() {
+        _selectedMethod = result;
+        _methodParameters = Map.from(result.parameters);
+      });
+    }
+  }
+
+  Future<void> _showParameterDialog() async {
+    if (_selectedMethod == null) return;
+
+    // Merge current values into parameters
+    final params = <String, dynamic>{
+      ..._selectedMethod!.parameters,
+      ..._methodParameters,
+    };
+
+    final result = await showParameterDialog(
+      context: context,
+      title: '${_selectedMethod!.name} Parameters',
+      parameters: params,
+      requiredPaths: _selectedMethod!.requiredParameters,
+    );
+
+    if (result != null) {
+      setState(() {
+        _methodParameters = result;
+      });
     }
   }
 
@@ -425,6 +601,8 @@ class _CustomTestStepDialogState extends State<CustomTestStepDialog> {
         return 'Take Screenshot';
       case CustomTestActionType.delay:
         return 'Delay/Wait';
+      case CustomTestActionType.controllerMethod:
+        return 'Controller Method';
       case CustomTestActionType.custom:
         return 'Custom Action';
     }
@@ -537,6 +715,132 @@ class _CustomTestStepDialogState extends State<CustomTestStepDialog> {
           type: CustomTestActionType.custom,
           customCode: code,
         );
+
+      case CustomTestActionType.controllerMethod:
+        if (_selectedMethod == null) return null;
+        return CustomTestAction.controllerMethod(
+          _selectedMethod!.id,
+          parameters: _methodParameters.isNotEmpty ? _methodParameters : null,
+        );
     }
+  }
+}
+
+/// Dialog for picking a controller method
+class _MethodPickerDialog extends StatefulWidget {
+  final String? selectedMethodId;
+
+  const _MethodPickerDialog({this.selectedMethodId});
+
+  @override
+  State<_MethodPickerDialog> createState() => _MethodPickerDialogState();
+}
+
+class _MethodPickerDialogState extends State<_MethodPickerDialog> {
+  final _searchController = TextEditingController();
+  String _searchQuery = '';
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final registry = ControllerMethodsRegistry.instance;
+    final filteredCategories = registry.searchCategories(_searchQuery);
+
+    return AlertDialog(
+      title: const Text('Select Controller Method'),
+      content: SizedBox(
+        width: 500,
+        height: 450,
+        child: Column(
+          children: [
+            TextField(
+              controller: _searchController,
+              decoration: InputDecoration(
+                hintText: 'Search methods...',
+                prefixIcon: const Icon(Icons.search),
+                suffixIcon: _searchQuery.isNotEmpty
+                    ? IconButton(
+                        icon: const Icon(Icons.clear),
+                        onPressed: () {
+                          _searchController.clear();
+                          setState(() => _searchQuery = '');
+                        },
+                      )
+                    : null,
+                border: const OutlineInputBorder(),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 8,
+                ),
+              ),
+              onChanged: (value) {
+                setState(() => _searchQuery = value);
+              },
+            ),
+            const SizedBox(height: 12),
+            Expanded(
+              child: filteredCategories.isEmpty
+                  ? const Center(child: Text('No methods found'))
+                  : ListView.builder(
+                      itemCount: filteredCategories.length,
+                      itemBuilder: (context, index) {
+                        final category = filteredCategories[index];
+                        return ExpansionTile(
+                          leading: Icon(category.icon, size: 20),
+                          title: Text(
+                            category.name,
+                            style: const TextStyle(fontSize: 14),
+                          ),
+                          subtitle: Text('${category.methods.length} methods'),
+                          children: category.methods.map((method) {
+                            final isSelected =
+                                widget.selectedMethodId == method.id;
+                            return ListTile(
+                              dense: true,
+                              selected: isSelected,
+                              leading: isSelected
+                                  ? const Icon(
+                                      Icons.check_circle,
+                                      color: Colors.green,
+                                      size: 20,
+                                    )
+                                  : const Icon(Icons.code, size: 20),
+                              title: Text(method.name),
+                              subtitle: Text(
+                                method.description,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: const TextStyle(fontSize: 11),
+                              ),
+                              trailing: method.parameters.isNotEmpty
+                                  ? Chip(
+                                      label: Text(
+                                        '${method.parameters.length}',
+                                      ),
+                                      visualDensity: VisualDensity.compact,
+                                    )
+                                  : null,
+                              onTap: () => Navigator.of(context).pop(method),
+                            );
+                          }).toList(),
+                        );
+                      },
+                    ),
+            ),
+          ],
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: const Text('Cancel'),
+        ),
+      ],
+    );
   }
 }

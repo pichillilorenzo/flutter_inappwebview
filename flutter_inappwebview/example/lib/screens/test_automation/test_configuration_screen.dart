@@ -18,6 +18,8 @@ class _TestConfigurationScreenState extends State<TestConfigurationScreen>
     with SingleTickerProviderStateMixin {
   late final TabController _tabController;
   final TextEditingController _importController = TextEditingController();
+  final TextEditingController _searchController = TextEditingController();
+  String _searchQuery = '';
 
   @override
   void initState() {
@@ -29,6 +31,7 @@ class _TestConfigurationScreenState extends State<TestConfigurationScreen>
   void dispose() {
     _tabController.dispose();
     _importController.dispose();
+    _searchController.dispose();
     super.dispose();
   }
 
@@ -105,17 +108,80 @@ class _TestConfigurationScreenState extends State<TestConfigurationScreen>
   }
 
   Widget _buildCustomStepsTab(TestConfigurationManager manager) {
-    final steps = manager.currentConfig.customSteps;
+    final allSteps = manager.currentConfig.customSteps;
+    final filteredSteps = _searchQuery.isEmpty
+        ? allSteps
+        : allSteps
+              .where(
+                (step) =>
+                    step.name.toLowerCase().contains(_searchQuery) ||
+                    step.description.toLowerCase().contains(_searchQuery),
+              )
+              .toList();
 
     return Column(
       children: [
         _buildConfigHeader(manager),
+        _buildSearchBar(allSteps.length, filteredSteps.length),
         Expanded(
-          child: steps.isEmpty
-              ? _buildEmptyStepsMessage()
-              : _buildStepsList(manager, steps),
+          child: filteredSteps.isEmpty
+              ? _buildEmptyStepsMessage(
+                  isFiltered: _searchQuery.isNotEmpty && allSteps.isNotEmpty,
+                )
+              : _buildStepsList(manager, filteredSteps, allSteps),
         ),
       ],
+    );
+  }
+
+  Widget _buildSearchBar(int totalCount, int filteredCount) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        border: Border(bottom: BorderSide(color: Colors.grey.shade200)),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: TextField(
+              controller: _searchController,
+              decoration: InputDecoration(
+                hintText: 'Search custom steps...',
+                prefixIcon: const Icon(Icons.search, size: 20),
+                suffixIcon: _searchQuery.isNotEmpty
+                    ? IconButton(
+                        icon: const Icon(Icons.clear, size: 20),
+                        onPressed: () {
+                          _searchController.clear();
+                          setState(() => _searchQuery = '');
+                        },
+                      )
+                    : null,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: BorderSide(color: Colors.grey.shade300),
+                ),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 8,
+                ),
+                isDense: true,
+              ),
+              onChanged: (value) {
+                setState(() => _searchQuery = value.toLowerCase());
+              },
+            ),
+          ),
+          if (_searchQuery.isNotEmpty) ...[
+            const SizedBox(width: 12),
+            Text(
+              '$filteredCount of $totalCount',
+              style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+            ),
+          ],
+        ],
+      ),
     );
   }
 
@@ -161,20 +227,26 @@ class _TestConfigurationScreenState extends State<TestConfigurationScreen>
     );
   }
 
-  Widget _buildEmptyStepsMessage() {
+  Widget _buildEmptyStepsMessage({bool isFiltered = false}) {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.playlist_add, size: 64, color: Colors.grey.shade400),
+          Icon(
+            isFiltered ? Icons.search_off : Icons.playlist_add,
+            size: 64,
+            color: Colors.grey.shade400,
+          ),
           const SizedBox(height: 16),
           Text(
-            'No Custom Test Steps',
+            isFiltered ? 'No Matching Steps' : 'No Custom Test Steps',
             style: TextStyle(fontSize: 18, color: Colors.grey.shade600),
           ),
           const SizedBox(height: 8),
           Text(
-            'Click "Add Step" to create your first custom test',
+            isFiltered
+                ? 'Try a different search term'
+                : 'Click "Add Step" to create your first custom test',
             style: TextStyle(color: Colors.grey.shade500),
           ),
         ],
@@ -184,17 +256,40 @@ class _TestConfigurationScreenState extends State<TestConfigurationScreen>
 
   Widget _buildStepsList(
     TestConfigurationManager manager,
-    List<CustomTestStep> steps,
+    List<CustomTestStep> filteredSteps,
+    List<CustomTestStep> allSteps,
   ) {
+    // When filtering, disable reordering to avoid index confusion
+    final isFiltering = _searchQuery.isNotEmpty;
+
+    if (isFiltering) {
+      // Use regular ListView when filtering (no reordering)
+      return ListView.builder(
+        padding: const EdgeInsets.all(8),
+        itemCount: filteredSteps.length,
+        itemBuilder: (context, index) {
+          final step = filteredSteps[index];
+          return _buildStepCard(
+            context,
+            manager,
+            step,
+            index,
+            canReorder: false,
+          );
+        },
+      );
+    }
+
     return ReorderableListView.builder(
       padding: const EdgeInsets.all(8),
-      itemCount: steps.length,
+      buildDefaultDragHandles: false,
+      itemCount: filteredSteps.length,
       onReorder: (oldIndex, newIndex) {
         manager.reorderCustomSteps(oldIndex, newIndex);
       },
       itemBuilder: (context, index) {
-        final step = steps[index];
-        return _buildStepCard(context, manager, step, index);
+        final step = filteredSteps[index];
+        return _buildStepCard(context, manager, step, index, canReorder: true);
       },
     );
   }
@@ -310,6 +405,121 @@ class _TestConfigurationScreenState extends State<TestConfigurationScreen>
           ),
           const SizedBox(height: 16),
 
+          // Headless WebView Size (only shown when headless is selected)
+          if (config.webViewType == TestWebViewType.headless)
+            Card(
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Icon(Icons.aspect_ratio, color: Colors.purple.shade700),
+                        const SizedBox(width: 8),
+                        const Text(
+                          'Headless WebView Size',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Set the virtual viewport size for the headless WebView',
+                      style: TextStyle(color: Colors.grey.shade600),
+                    ),
+                    const SizedBox(height: 16),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: TextField(
+                            controller: TextEditingController(
+                              text: config.headlessWidth.toInt().toString(),
+                            ),
+                            decoration: const InputDecoration(
+                              labelText: 'Width (px)',
+                              hintText: '1920',
+                              border: OutlineInputBorder(),
+                              suffixText: 'px',
+                            ),
+                            keyboardType: TextInputType.number,
+                            onChanged: (value) {
+                              final width = double.tryParse(value);
+                              if (width != null && width > 0) {
+                                manager.setHeadlessSize(
+                                  width,
+                                  config.headlessHeight,
+                                );
+                              }
+                            },
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: TextField(
+                            controller: TextEditingController(
+                              text: config.headlessHeight.toInt().toString(),
+                            ),
+                            decoration: const InputDecoration(
+                              labelText: 'Height (px)',
+                              hintText: '1080',
+                              border: OutlineInputBorder(),
+                              suffixText: 'px',
+                            ),
+                            keyboardType: TextInputType.number,
+                            onChanged: (value) {
+                              final height = double.tryParse(value);
+                              if (height != null && height > 0) {
+                                manager.setHeadlessSize(
+                                  config.headlessWidth,
+                                  height,
+                                );
+                              }
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                    // Quick preset sizes
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: [
+                        _buildSizePresetChip(
+                          manager,
+                          config,
+                          'Mobile',
+                          375,
+                          667,
+                        ),
+                        _buildSizePresetChip(
+                          manager,
+                          config,
+                          'Tablet',
+                          768,
+                          1024,
+                        ),
+                        _buildSizePresetChip(
+                          manager,
+                          config,
+                          'Desktop',
+                          1920,
+                          1080,
+                        ),
+                        _buildSizePresetChip(manager, config, '4K', 3840, 2160),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          if (config.webViewType == TestWebViewType.headless)
+            const SizedBox(height: 16),
+
           // Default Configuration
           Card(
             color: Colors.blue.shade50,
@@ -354,6 +564,24 @@ class _TestConfigurationScreenState extends State<TestConfigurationScreen>
     );
   }
 
+  Widget _buildSizePresetChip(
+    TestConfigurationManager manager,
+    TestConfiguration config,
+    String label,
+    double width,
+    double height,
+  ) {
+    final isSelected =
+        config.headlessWidth == width && config.headlessHeight == height;
+    return FilterChip(
+      label: Text('$label (${width.toInt()}×${height.toInt()})'),
+      selected: isSelected,
+      onSelected: (_) {
+        manager.setHeadlessSize(width, height);
+      },
+    );
+  }
+
   void _loadDefaultConfig(TestConfigurationManager manager) {
     showDialog(
       context: context,
@@ -389,63 +617,114 @@ class _TestConfigurationScreenState extends State<TestConfigurationScreen>
     BuildContext context,
     TestConfigurationManager manager,
     CustomTestStep step,
-    int index,
-  ) {
+    int index, {
+    bool canReorder = true,
+  }) {
     return Card(
       key: ValueKey(step.id),
       margin: const EdgeInsets.symmetric(vertical: 4),
-      child: ListTile(
-        leading: ReorderableDragStartListener(
-          index: index,
-          child: Icon(Icons.drag_handle, color: Colors.grey.shade400),
-        ),
-        title: Text(
-          step.name,
-          style: TextStyle(
-            fontWeight: FontWeight.w500,
-            decoration: step.enabled ? null : TextDecoration.lineThrough,
-            color: step.enabled ? null : Colors.grey,
-          ),
-        ),
-        subtitle: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+      elevation: 1,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
+        child: Row(
           children: [
-            Text(
-              step.description.isNotEmpty ? step.description : 'No description',
+            // Drag handle (only when reordering is enabled)
+            if (canReorder)
+              ReorderableDragStartListener(
+                index: index,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  child: MouseRegion(
+                    cursor: SystemMouseCursors.grab,
+                    child: Icon(
+                      Icons.drag_handle,
+                      color: Colors.grey.shade400,
+                      size: 20,
+                    ),
+                  ),
+                ),
+              )
+            else
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8),
+                child: Icon(Icons.label, color: Colors.grey.shade400, size: 20),
+              ),
+            // Step content
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    step.name,
+                    style: TextStyle(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 15,
+                      decoration: step.enabled
+                          ? null
+                          : TextDecoration.lineThrough,
+                      color: step.enabled ? null : Colors.grey,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    step.description.isNotEmpty
+                        ? step.description
+                        : 'No description',
+                    style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 6),
+                  Wrap(
+                    spacing: 6,
+                    runSpacing: 4,
+                    children: [
+                      _buildChip(step.category, Colors.blue),
+                      _buildChip(
+                        _getActionTypeName(step.action.type),
+                        Colors.green,
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
-            const SizedBox(height: 4),
-            Wrap(
-              spacing: 4,
+            // Actions
+            Row(
+              mainAxisSize: MainAxisSize.min,
               children: [
-                _buildChip(step.category, Colors.blue),
-                _buildChip(_getActionTypeName(step.action.type), Colors.green),
+                Transform.scale(
+                  scale: 0.85,
+                  child: Switch(
+                    value: step.enabled,
+                    onChanged: (value) {
+                      manager.updateCustomStep(
+                        step.id,
+                        step.copyWith(enabled: value),
+                      );
+                    },
+                  ),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.edit_outlined, size: 20),
+                  tooltip: 'Edit',
+                  onPressed: () => _showEditStepDialog(context, manager, step),
+                  visualDensity: VisualDensity.compact,
+                ),
+                IconButton(
+                  icon: Icon(
+                    Icons.delete_outline,
+                    size: 20,
+                    color: Colors.red.shade400,
+                  ),
+                  tooltip: 'Delete',
+                  onPressed: () => _confirmDeleteStep(context, manager, step),
+                  visualDensity: VisualDensity.compact,
+                ),
               ],
             ),
           ],
         ),
-        trailing: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Switch(
-              value: step.enabled,
-              onChanged: (value) {
-                manager.updateCustomStep(
-                  step.id,
-                  step.copyWith(enabled: value),
-                );
-              },
-            ),
-            IconButton(
-              icon: const Icon(Icons.edit),
-              onPressed: () => _showEditStepDialog(context, manager, step),
-            ),
-            IconButton(
-              icon: const Icon(Icons.delete, color: Colors.red),
-              onPressed: () => _confirmDeleteStep(context, manager, step),
-            ),
-          ],
-        ),
-        isThreeLine: true,
       ),
     );
   }

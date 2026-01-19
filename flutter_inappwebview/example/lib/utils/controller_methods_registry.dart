@@ -730,14 +730,19 @@ class ControllerMethodsRegistry {
           methodEnum: PlatformInAppWebViewControllerMethod.addUserScript,
           parameters: {
             'source': 'console.log("User script executed");',
-            'injectionTime': 'AT_DOCUMENT_END',
+            'injectionTime': EnumParameterValueHint<UserScriptInjectionTime>(
+              UserScriptInjectionTime.AT_DOCUMENT_END,
+              UserScriptInjectionTime.values.toList(),
+              displayName: (e) => e.name(),
+            ),
             'groupName': 'testGroup',
           },
           requiredParameters: ['source'],
           execute: (controller, params) async {
-            final injectionTime = _parseUserScriptInjectionTime(
-              params['injectionTime']?.toString(),
-            );
+            final injectionTimeParam = params['injectionTime'];
+            final injectionTime = injectionTimeParam is UserScriptInjectionTime
+                ? injectionTimeParam
+                : _parseUserScriptInjectionTime(injectionTimeParam?.toString());
             await controller.addUserScript(
               userScript: UserScript(
                 source: params['source']?.toString() ?? '',
@@ -950,8 +955,35 @@ class ControllerMethodsRegistry {
           name: 'takeScreenshot',
           description: 'Takes a screenshot',
           methodEnum: PlatformInAppWebViewControllerMethod.takeScreenshot,
+          parameters: {
+            'compressFormat': EnumParameterValueHint<CompressFormat>(
+              CompressFormat.PNG,
+              CompressFormat.values.toList(),
+              displayName: (e) => e.name(),
+            ),
+            'quality': 100,
+            'snapshotWidth': const ParameterValueHint<double?>(
+              null,
+              ParameterValueType.number,
+            ),
+          },
           execute: (controller, params) async {
-            final screenshot = await controller.takeScreenshot();
+            final compressFormatParam = params['compressFormat'];
+            final compressFormat = compressFormatParam is CompressFormat
+                ? compressFormatParam
+                : CompressFormat.PNG;
+            final quality = (params['quality'] as num?)?.toInt() ?? 100;
+            final snapshotWidth = extractParam<num>(
+              params['snapshotWidth'],
+            )?.toDouble();
+
+            final screenshot = await controller.takeScreenshot(
+              screenshotConfiguration: ScreenshotConfiguration(
+                compressFormat: compressFormat,
+                quality: quality,
+                snapshotWidth: snapshotWidth,
+              ),
+            );
             if (screenshot != null) {
               return 'Screenshot taken: ${screenshot.length} bytes';
             }

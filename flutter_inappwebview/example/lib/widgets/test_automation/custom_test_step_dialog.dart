@@ -31,6 +31,9 @@ class _CustomTestStepDialogState extends State<CustomTestStepDialog> {
   late final TextEditingController _yController;
   late final TextEditingController _delayController;
   late final TextEditingController _expectedResultController;
+  late final TextEditingController _targetProgressController;
+  late final TextEditingController _urlPatternController;
+  late final TextEditingController _timeoutController;
 
   CustomTestActionType _selectedActionType =
       CustomTestActionType.evaluateJavascript;
@@ -41,6 +44,10 @@ class _CustomTestStepDialogState extends State<CustomTestStepDialog> {
   // Controller method selection
   ControllerMethodEntry? _selectedMethod;
   Map<String, dynamic> _methodParameters = {};
+
+  // Navigation event selection
+  NavigationEventType _selectedNavigationEvent = NavigationEventType.onLoadStop;
+  String _progressComparison = 'greaterThanOrEquals';
 
   final List<String> _categories = [
     'custom',
@@ -78,6 +85,15 @@ class _CustomTestStepDialogState extends State<CustomTestStepDialog> {
     _expectedResultController = TextEditingController(
       text: step?.expectedResult ?? '',
     );
+    _targetProgressController = TextEditingController(
+      text: step?.action.targetProgress?.toString() ?? '100',
+    );
+    _urlPatternController = TextEditingController(
+      text: step?.action.urlPattern ?? '',
+    );
+    _timeoutController = TextEditingController(
+      text: step?.action.timeoutMs?.toString() ?? '0',
+    );
 
     if (step != null) {
       _selectedActionType = step.action.type;
@@ -95,6 +111,14 @@ class _CustomTestStepDialogState extends State<CustomTestStepDialog> {
           _methodParameters = Map.from(step.action.methodParameters ?? {});
         }
       }
+
+      // Load navigation event settings if applicable
+      if (step.action.type == CustomTestActionType.waitForNavigationEvent) {
+        _selectedNavigationEvent =
+            step.action.navigationEvent ?? NavigationEventType.onLoadStop;
+        _progressComparison =
+            step.action.progressComparison ?? 'greaterThanOrEquals';
+      }
     }
   }
 
@@ -111,6 +135,9 @@ class _CustomTestStepDialogState extends State<CustomTestStepDialog> {
     _yController.dispose();
     _delayController.dispose();
     _expectedResultController.dispose();
+    _targetProgressController.dispose();
+    _urlPatternController.dispose();
+    _timeoutController.dispose();
     super.dispose();
   }
 
@@ -463,8 +490,173 @@ class _CustomTestStepDialogState extends State<CustomTestStepDialog> {
           ),
         ];
 
+      case CustomTestActionType.waitForNavigationEvent:
+        return _buildWaitForNavigationEventFields();
+
       case CustomTestActionType.controllerMethod:
         return _buildControllerMethodFields();
+    }
+  }
+
+  List<Widget> _buildWaitForNavigationEventFields() {
+    return [
+      // Navigation event selector
+      DropdownButtonFormField<NavigationEventType>(
+        value: _selectedNavigationEvent,
+        decoration: const InputDecoration(
+          labelText: 'Navigation Event',
+          border: OutlineInputBorder(),
+        ),
+        items: NavigationEventType.values.map((event) {
+          return DropdownMenuItem(
+            value: event,
+            child: Text(_getNavigationEventName(event)),
+          );
+        }).toList(),
+        onChanged: (value) {
+          if (value != null) {
+            setState(() => _selectedNavigationEvent = value);
+          }
+        },
+      ),
+      const SizedBox(height: 12),
+
+      // Progress-specific options (only for onProgressChanged)
+      if (_selectedNavigationEvent ==
+          NavigationEventType.onProgressChanged) ...[
+        Row(
+          children: [
+            Expanded(
+              flex: 2,
+              child: DropdownButtonFormField<String>(
+                value: _progressComparison,
+                decoration: const InputDecoration(
+                  labelText: 'Condition',
+                  border: OutlineInputBorder(),
+                ),
+                items: const [
+                  DropdownMenuItem(value: 'equals', child: Text('Equals')),
+                  DropdownMenuItem(
+                    value: 'greaterThan',
+                    child: Text('Greater than'),
+                  ),
+                  DropdownMenuItem(
+                    value: 'greaterThanOrEquals',
+                    child: Text('Greater than or equals'),
+                  ),
+                  DropdownMenuItem(value: 'lessThan', child: Text('Less than')),
+                ],
+                onChanged: (value) {
+                  if (value != null) {
+                    setState(() => _progressComparison = value);
+                  }
+                },
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: TextField(
+                controller: _targetProgressController,
+                decoration: const InputDecoration(
+                  labelText: 'Progress (%)',
+                  border: OutlineInputBorder(),
+                  hintText: '100',
+                ),
+                keyboardType: TextInputType.number,
+                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 8),
+        Text(
+          'Wait until progress ${_getComparisonDescription(_progressComparison)} the specified value',
+          style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+        ),
+        const SizedBox(height: 12),
+      ],
+
+      // URL pattern (optional)
+      TextField(
+        controller: _urlPatternController,
+        decoration: const InputDecoration(
+          labelText: 'URL Pattern (optional)',
+          hintText: 'example.com or regex pattern',
+          border: OutlineInputBorder(),
+          helperText: 'Only trigger when URL contains this text',
+        ),
+      ),
+      const SizedBox(height: 12),
+
+      // Timeout
+      TextField(
+        controller: _timeoutController,
+        decoration: const InputDecoration(
+          labelText: 'Timeout (ms)',
+          border: OutlineInputBorder(),
+          hintText: '1000',
+        ),
+        keyboardType: TextInputType.number,
+        inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+      ),
+      const SizedBox(height: 8),
+      Text(
+        _getNavigationEventDescription(_selectedNavigationEvent),
+        style: TextStyle(
+          fontSize: 12,
+          color: Colors.grey.shade600,
+          fontStyle: FontStyle.italic,
+        ),
+      ),
+    ];
+  }
+
+  String _getNavigationEventName(NavigationEventType event) {
+    switch (event) {
+      case NavigationEventType.onLoadStop:
+        return 'onLoadStop (Page Finished Loading)';
+      case NavigationEventType.onLoadStart:
+        return 'onLoadStart (Page Started Loading)';
+      case NavigationEventType.onProgressChanged:
+        return 'onProgressChanged (Loading Progress)';
+      case NavigationEventType.onPageCommitVisible:
+        return 'onPageCommitVisible (First Paint)';
+      case NavigationEventType.onTitleChanged:
+        return 'onTitleChanged (Title Updated)';
+      case NavigationEventType.onUpdateVisitedHistory:
+        return 'onUpdateVisitedHistory (History Updated)';
+    }
+  }
+
+  String _getNavigationEventDescription(NavigationEventType event) {
+    switch (event) {
+      case NavigationEventType.onLoadStop:
+        return 'Waits for the page to finish loading completely';
+      case NavigationEventType.onLoadStart:
+        return 'Waits for a new page navigation to begin';
+      case NavigationEventType.onProgressChanged:
+        return 'Waits for the loading progress to reach a specific value';
+      case NavigationEventType.onPageCommitVisible:
+        return 'Waits for the first content to become visible';
+      case NavigationEventType.onTitleChanged:
+        return 'Waits for the page title to change';
+      case NavigationEventType.onUpdateVisitedHistory:
+        return 'Waits for the browser history to be updated';
+    }
+  }
+
+  String _getComparisonDescription(String comparison) {
+    switch (comparison) {
+      case 'equals':
+        return 'equals';
+      case 'greaterThan':
+        return 'is greater than';
+      case 'greaterThanOrEquals':
+        return 'is greater than or equal to';
+      case 'lessThan':
+        return 'is less than';
+      default:
+        return comparison;
     }
   }
 
@@ -650,6 +842,8 @@ class _CustomTestStepDialogState extends State<CustomTestStepDialog> {
         return 'Take Screenshot';
       case CustomTestActionType.delay:
         return 'Delay/Wait';
+      case CustomTestActionType.waitForNavigationEvent:
+        return 'Wait for Navigation Event';
       case CustomTestActionType.controllerMethod:
         return 'Controller Method';
       case CustomTestActionType.custom:
@@ -906,6 +1100,18 @@ class _CustomTestStepDialogState extends State<CustomTestStepDialog> {
         final delay = int.tryParse(_delayController.text);
         if (delay == null || delay <= 0) return null;
         return CustomTestAction.delay(delay);
+
+      case CustomTestActionType.waitForNavigationEvent:
+        final timeout = int.tryParse(_timeoutController.text) ?? 0;
+        final targetProgress = int.tryParse(_targetProgressController.text);
+        final urlPattern = _urlPatternController.text.trim();
+        return CustomTestAction.waitForNavigationEvent(
+          _selectedNavigationEvent,
+          targetProgress: targetProgress,
+          progressComparison: _progressComparison,
+          urlPattern: urlPattern.isNotEmpty ? urlPattern : null,
+          timeoutMs: timeout,
+        );
 
       case CustomTestActionType.custom:
         final code = _scriptController.text.trim();

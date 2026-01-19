@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../models/test_configuration.dart';
 import '../../providers/test_runner.dart';
@@ -17,6 +19,9 @@ class TestRunnerScreen extends StatefulWidget {
 }
 
 class _TestRunnerScreenState extends State<TestRunnerScreen> {
+  static const String _lastConfigKey = 'test_runner_last_config';
+  static const String _lastWebViewTypeKey = 'test_runner_last_webview_type';
+
   InAppWebViewController? _webViewController;
   final Set<TestCategory> _selectedCategories = {};
   ResultFilter _resultFilter = ResultFilter.all;
@@ -31,11 +36,67 @@ class _TestRunnerScreenState extends State<TestRunnerScreen> {
   // Key to force WebView recreation when configuration changes
   Key _webViewKey = UniqueKey();
 
+  // Flag to prevent loading config multiple times
+  bool _configLoaded = false;
+
   @override
   void initState() {
     super.initState();
     // Select all categories by default
     _selectedCategories.addAll(TestCategory.values);
+    // Defer loading last configuration until after the first frame
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _loadLastConfiguration();
+    });
+  }
+
+  Future<void> _loadLastConfiguration() async {
+    if (_configLoaded) return;
+    _configLoaded = true;
+
+    final prefs = await SharedPreferences.getInstance();
+    final lastConfigJson = prefs.getString(_lastConfigKey);
+    final lastWebViewType = prefs.getString(_lastWebViewTypeKey);
+
+    if (lastWebViewType != null) {
+      final webViewType = TestWebViewType.values.firstWhere(
+        (e) => e.name == lastWebViewType,
+        orElse: () => TestWebViewType.inAppWebView,
+      );
+      if (mounted) {
+        setState(() {
+          _webViewType = webViewType;
+        });
+      }
+    }
+
+    if (lastConfigJson != null && lastConfigJson.isNotEmpty) {
+      try {
+        final config = TestConfiguration.fromJsonString(lastConfigJson);
+        if (mounted) {
+          setState(() {
+            _customConfiguration = config;
+            _webViewType = config.webViewType;
+            _webViewKey = UniqueKey();
+          });
+        }
+      } catch (e) {
+        debugPrint('Failed to load last configuration: $e');
+      }
+    }
+  }
+
+  Future<void> _saveLastConfiguration() async {
+    final prefs = await SharedPreferences.getInstance();
+    if (_customConfiguration != null) {
+      await prefs.setString(
+        _lastConfigKey,
+        _customConfiguration!.toJsonString(),
+      );
+    } else {
+      await prefs.remove(_lastConfigKey);
+    }
+    await prefs.setString(_lastWebViewTypeKey, _webViewType.name);
   }
 
   @override
@@ -242,6 +303,8 @@ class _TestRunnerScreenState extends State<TestRunnerScreen> {
                 _webViewController = null;
                 _webViewKey = UniqueKey();
               });
+              // Clear saved configuration
+              _saveLastConfiguration();
             },
           ),
         ],
@@ -449,6 +512,8 @@ class _TestRunnerScreenState extends State<TestRunnerScreen> {
                       _webViewController = null;
                       _webViewKey = UniqueKey();
                     });
+                    // Clear saved configuration
+                    _saveLastConfiguration();
                   },
                 ),
               ],
@@ -474,6 +539,8 @@ class _TestRunnerScreenState extends State<TestRunnerScreen> {
       // Force WebView recreation with new key
       _webViewKey = UniqueKey();
     });
+    // Save as last configuration
+    _saveLastConfiguration();
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
@@ -952,59 +1019,78 @@ class _TestRunnerScreenState extends State<TestRunnerScreen> {
     }
   }
 
-  void _runSelectedTests() {
-    if (!_webViewReady) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('WebView is not ready yet')));
-      return;
+  /// Recreates the WebView widget and waits for it to be ready before executing the callback.
+  /// This ensures a fresh WebView state for each test run.
+  void _recreateWebViewAndRun(void Function() onReady) {
+    // Reset WebView state
+    setState(() {
+      _webViewReady = false;
+      _webViewController = null;
+      _webViewKey = UniqueKey();
+    });
+
+    // Wait for the WebView to be ready, then execute callback
+    void waitForReady() {
+      if (_webViewReady && _webViewController != null) {
+        onReady();
+      } else {
+        // Check again after a short delay
+        Future.delayed(const Duration(milliseconds: 100), () {
+          if (mounted) {
+            waitForReady();
+          }
+        });
+      }
     }
 
+    // Start waiting after the next frame (to allow widget rebuild)
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      waitForReady();
+    });
+  }
+
+  void _runSelectedTests() {
     final runner = context.read<TestRunner>();
 
-    // If a custom configuration is loaded, run its custom steps
-    if (_customConfiguration != null &&
-        _customConfiguration!.customSteps.isNotEmpty) {
-      runner.runConfiguration(_customConfiguration!, _webViewController);
-    } else {
-      // Otherwise run built-in category tests
-      runner.runSelectedCategories(
-        _selectedCategories.toList(),
-        _webViewController,
-      );
-    }
+    // Recreate WebView and run tests once ready
+    _recreateWebViewAndRun(() {
+      // If a custom configuration is loaded, run its custom steps
+      if (_customConfiguration != null &&
+          _customConfiguration!.customSteps.isNotEmpty) {
+        runner.runConfiguration(_customConfiguration!, _webViewController);
+      } else {
+        // Otherwise run built-in category tests
+        runner.runSelectedCategories(
+          _selectedCategories.toList(),
+          _webViewController,
+        );
+      }
+    });
   }
 
   void _runAllTests() {
-    if (!_webViewReady) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('WebView is not ready yet')));
-      return;
-    }
-
     final runner = context.read<TestRunner>();
 
-    // If a custom configuration is loaded, run its custom steps
-    if (_customConfiguration != null &&
-        _customConfiguration!.customSteps.isNotEmpty) {
-      runner.runConfiguration(_customConfiguration!, _webViewController);
-    } else {
-      // Otherwise run all built-in category tests
-      runner.runAllTests(_webViewController);
-    }
+    // Recreate WebView and run tests once ready
+    _recreateWebViewAndRun(() {
+      // If a custom configuration is loaded, run its custom steps
+      if (_customConfiguration != null &&
+          _customConfiguration!.customSteps.isNotEmpty) {
+        runner.runConfiguration(_customConfiguration!, _webViewController);
+      } else {
+        // Otherwise run all built-in category tests
+        runner.runAllTests(_webViewController);
+      }
+    });
   }
 
   void _rerunFailedTests() {
-    if (!_webViewReady) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('WebView is not ready yet')));
-      return;
-    }
-
     final runner = context.read<TestRunner>();
-    runner.rerunFailedTests(_webViewController);
+
+    // Recreate WebView and run failed tests once ready
+    _recreateWebViewAndRun(() {
+      runner.rerunFailedTests(_webViewController);
+    });
   }
 
   void _handleMenuAction(String action) {

@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:ui';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
@@ -199,7 +200,11 @@ class TestRunner extends ChangeNotifier {
   }
 
   /// Initialize headless WebView for testing
-  Future<void> initializeHeadlessWebView({String? initialUrl}) async {
+  Future<void> initializeHeadlessWebView({
+    String? initialUrl,
+    double? width,
+    double? height,
+  }) async {
     if (_headlessWebView != null) {
       await disposeHeadlessWebView();
     }
@@ -208,6 +213,7 @@ class TestRunner extends ChangeNotifier {
 
     _headlessWebView = HeadlessInAppWebView(
       initialUrlRequest: URLRequest(url: WebUri(initialUrl ?? 'about:blank')),
+      initialSize: Size(width ?? 1920, height ?? 1080),
       onWebViewCreated: (controller) {
         _headlessController = controller;
       },
@@ -249,9 +255,12 @@ class TestRunner extends ChangeNotifier {
     // Get appropriate controller based on WebView type
     InAppWebViewController? testController = controller;
     if (config.webViewType == TestWebViewType.headless) {
-      if (_headlessController == null) {
-        await initializeHeadlessWebView(initialUrl: config.initialUrl);
-      }
+      // Always recreate headless WebView to ensure fresh state and correct size
+      await initializeHeadlessWebView(
+        initialUrl: config.initialUrl,
+        width: config.headlessWidth,
+        height: config.headlessHeight,
+      );
       testController = _headlessController;
     }
 
@@ -444,6 +453,12 @@ class TestRunner extends ChangeNotifier {
           );
           result = 'Delayed ${step.action.delayMs}ms';
           break;
+        case CustomTestActionType.waitForNavigationEvent:
+          result = await _executeWaitForNavigationEvent(
+            step.action,
+            controller,
+          );
+          break;
         case CustomTestActionType.custom:
           // Custom code execution would require eval or predefined functions
           result = 'Custom action executed';
@@ -523,6 +538,134 @@ class TestRunner extends ChangeNotifier {
     };
 
     return await method.execute(controller, params);
+  }
+
+  /// Execute a wait for navigation event action
+  Future<String> _executeWaitForNavigationEvent(
+    CustomTestAction action,
+    InAppWebViewController? controller,
+  ) async {
+    if (controller == null) {
+      throw Exception('Controller not available');
+    }
+
+    final event = action.navigationEvent;
+    if (event == null) {
+      throw Exception('Navigation event type not specified');
+    }
+
+    final timeout = action.timeoutMs ?? 0;
+    final startTime = DateTime.now();
+
+    // This is a simplified implementation. In a real implementation,
+    // you would need to attach event listeners to the WebView.
+    // For now, we'll use polling with evaluateJavascript for some events.
+    switch (event) {
+      case NavigationEventType.onLoadStop:
+        // Wait for document.readyState to be 'complete'
+        while (DateTime.now().difference(startTime).inMilliseconds < timeout) {
+          final readyState = await controller.evaluateJavascript(
+            source: 'document.readyState',
+          );
+          if (readyState == 'complete') {
+            return 'onLoadStop triggered - document ready';
+          }
+          await Future.delayed(const Duration(milliseconds: 100));
+        }
+        throw Exception('Timeout waiting for onLoadStop');
+
+      case NavigationEventType.onLoadStart:
+        // For onLoadStart, we check if navigation has begun
+        final initialUrl = await controller.getUrl();
+        while (DateTime.now().difference(startTime).inMilliseconds < timeout) {
+          final currentUrl = await controller.getUrl();
+          if (currentUrl != initialUrl) {
+            return 'onLoadStart triggered - navigation started to $currentUrl';
+          }
+          await Future.delayed(const Duration(milliseconds: 50));
+        }
+        return 'onLoadStart - no navigation detected within timeout';
+
+      case NavigationEventType.onProgressChanged:
+        final targetProgress = action.targetProgress ?? 100;
+        final comparison = action.progressComparison ?? 'greaterThanOrEquals';
+
+        while (DateTime.now().difference(startTime).inMilliseconds < timeout) {
+          // Get progress via JavaScript
+          final progress = await controller.evaluateJavascript(
+            source: '''
+              (function() {
+                if (document.readyState === 'complete') return 100;
+                if (document.readyState === 'interactive') return 90;
+                if (document.readyState === 'loading') return 50;
+                return 0;
+              })()
+            ''',
+          );
+
+          final currentProgress = (progress is num) ? progress.toInt() : 0;
+
+          bool matches;
+          switch (comparison) {
+            case 'equals':
+              matches = currentProgress == targetProgress;
+              break;
+            case 'greaterThan':
+              matches = currentProgress > targetProgress;
+              break;
+            case 'greaterThanOrEquals':
+            default:
+              matches = currentProgress >= targetProgress;
+              break;
+          }
+
+          if (matches) {
+            return 'onProgressChanged reached $currentProgress (target: $comparison $targetProgress)';
+          }
+          await Future.delayed(const Duration(milliseconds: 100));
+        }
+        throw Exception(
+          'Timeout waiting for onProgressChanged to reach $comparison $targetProgress',
+        );
+
+      case NavigationEventType.onPageCommitVisible:
+        // Wait for first paint / visible content
+        while (DateTime.now().difference(startTime).inMilliseconds < timeout) {
+          final hasContent = await controller.evaluateJavascript(
+            source: '''
+              document.body && document.body.innerHTML.length > 0
+            ''',
+          );
+          if (hasContent == true || hasContent == 'true') {
+            return 'onPageCommitVisible triggered - page content visible';
+          }
+          await Future.delayed(const Duration(milliseconds: 50));
+        }
+        throw Exception('Timeout waiting for onPageCommitVisible');
+
+      case NavigationEventType.onTitleChanged:
+        final initialTitle = await controller.getTitle();
+        while (DateTime.now().difference(startTime).inMilliseconds < timeout) {
+          final currentTitle = await controller.getTitle();
+          if (currentTitle != initialTitle &&
+              currentTitle?.isNotEmpty == true) {
+            return 'onTitleChanged triggered - title changed to: $currentTitle';
+          }
+          await Future.delayed(const Duration(milliseconds: 100));
+        }
+        return 'onTitleChanged - no title change detected within timeout';
+
+      case NavigationEventType.onUpdateVisitedHistory:
+        final initialUrl = await controller.getUrl();
+        while (DateTime.now().difference(startTime).inMilliseconds < timeout) {
+          final currentUrl = await controller.getUrl();
+          if (currentUrl != initialUrl) {
+            return 'onUpdateVisitedHistory triggered - URL changed to: $currentUrl';
+          }
+          await Future.delayed(const Duration(milliseconds: 100));
+        }
+        return 'onUpdateVisitedHistory - no URL change detected within timeout';
+    }
   }
 
   TestCategory _categoryFromString(String category) {

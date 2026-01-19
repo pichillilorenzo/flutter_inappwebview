@@ -278,9 +278,33 @@ enum CustomTestActionType {
   takeScreenshot,
   delay,
 
+  /// Wait for a specific navigation event (onLoadStop, onProgressChanged, etc.)
+  waitForNavigationEvent,
+
   /// Execute an InAppWebViewController method
   controllerMethod,
   custom,
+}
+
+/// Navigation events that can be waited for
+enum NavigationEventType {
+  /// Wait for onLoadStop to fire
+  onLoadStop,
+
+  /// Wait for onLoadStart to fire
+  onLoadStart,
+
+  /// Wait for onProgressChanged to reach a specific value
+  onProgressChanged,
+
+  /// Wait for onPageCommitVisible to fire
+  onPageCommitVisible,
+
+  /// Wait for onTitleChanged to fire
+  onTitleChanged,
+
+  /// Wait for onUpdateVisitedHistory to fire
+  onUpdateVisitedHistory,
 }
 
 /// Represents an action to perform in a custom test
@@ -302,6 +326,21 @@ class CustomTestAction {
   /// For controllerMethod action type - the method parameters
   final Map<String, dynamic>? methodParameters;
 
+  /// For waitForNavigationEvent action type - the navigation event to wait for
+  final NavigationEventType? navigationEvent;
+
+  /// For waitForNavigationEvent with onProgressChanged - the target progress value (0-100)
+  final int? targetProgress;
+
+  /// For waitForNavigationEvent - comparison operator for progress ('equals', 'greaterThan', 'greaterThanOrEquals')
+  final String? progressComparison;
+
+  /// For waitForNavigationEvent - optional URL pattern to match (regex or contains)
+  final String? urlPattern;
+
+  /// For waitForNavigationEvent - timeout in milliseconds (default 0)
+  final int? timeoutMs;
+
   const CustomTestAction({
     required this.type,
     this.script,
@@ -315,6 +354,11 @@ class CustomTestAction {
     this.customCode,
     this.methodId,
     this.methodParameters,
+    this.navigationEvent,
+    this.targetProgress,
+    this.progressComparison,
+    this.urlPattern,
+    this.timeoutMs,
   });
 
   Map<String, dynamic> toJson() {
@@ -331,6 +375,11 @@ class CustomTestAction {
       'customCode': customCode,
       'methodId': methodId,
       'methodParameters': _sanitizeParameters(methodParameters),
+      'navigationEvent': navigationEvent?.name,
+      'targetProgress': targetProgress,
+      'progressComparison': progressComparison,
+      'urlPattern': urlPattern,
+      'timeoutMs': timeoutMs,
     };
   }
 
@@ -427,6 +476,16 @@ class CustomTestAction {
       methodParameters: _deserializeParameters(
         json['methodParameters'] as Map<String, dynamic>?,
       ),
+      navigationEvent: json['navigationEvent'] != null
+          ? NavigationEventType.values.firstWhere(
+              (e) => e.name == json['navigationEvent'],
+              orElse: () => NavigationEventType.onLoadStop,
+            )
+          : null,
+      targetProgress: json['targetProgress'] as int?,
+      progressComparison: json['progressComparison'] as String?,
+      urlPattern: json['urlPattern'] as String?,
+      timeoutMs: json['timeoutMs'] as int?,
     );
   }
 
@@ -514,6 +573,24 @@ class CustomTestAction {
     );
   }
 
+  /// Creates a wait for navigation event action
+  factory CustomTestAction.waitForNavigationEvent(
+    NavigationEventType event, {
+    int? targetProgress,
+    String? progressComparison,
+    String? urlPattern,
+    int timeoutMs = 0,
+  }) {
+    return CustomTestAction(
+      type: CustomTestActionType.waitForNavigationEvent,
+      navigationEvent: event,
+      targetProgress: targetProgress,
+      progressComparison: progressComparison,
+      urlPattern: urlPattern,
+      timeoutMs: timeoutMs,
+    );
+  }
+
   /// Creates a controller method action to execute an InAppWebViewController method
   factory CustomTestAction.controllerMethod(
     String methodId, {
@@ -545,6 +622,12 @@ class TestConfiguration {
   /// Initial URL to load before running tests (optional)
   final String? initialUrl;
 
+  /// Width of the headless WebView in pixels (default: 1920)
+  final double headlessWidth;
+
+  /// Height of the headless WebView in pixels (default: 1080)
+  final double headlessHeight;
+
   const TestConfiguration({
     required this.id,
     required this.name,
@@ -557,6 +640,8 @@ class TestConfiguration {
     this.metadata = const {},
     this.webViewType = TestWebViewType.inAppWebView,
     this.initialUrl,
+    this.headlessWidth = 1920,
+    this.headlessHeight = 1080,
   });
 
   TestConfiguration copyWith({
@@ -571,6 +656,8 @@ class TestConfiguration {
     Map<String, dynamic>? metadata,
     TestWebViewType? webViewType,
     String? initialUrl,
+    double? headlessWidth,
+    double? headlessHeight,
   }) {
     return TestConfiguration(
       id: id ?? this.id,
@@ -584,6 +671,8 @@ class TestConfiguration {
       metadata: metadata ?? this.metadata,
       webViewType: webViewType ?? this.webViewType,
       initialUrl: initialUrl ?? this.initialUrl,
+      headlessWidth: headlessWidth ?? this.headlessWidth,
+      headlessHeight: headlessHeight ?? this.headlessHeight,
     );
   }
 
@@ -600,6 +689,8 @@ class TestConfiguration {
       'metadata': metadata,
       'webViewType': webViewType.name,
       'initialUrl': initialUrl,
+      'headlessWidth': headlessWidth,
+      'headlessHeight': headlessHeight,
     };
   }
 
@@ -631,6 +722,8 @@ class TestConfiguration {
         orElse: () => TestWebViewType.inAppWebView,
       ),
       initialUrl: json['initialUrl'] as String?,
+      headlessWidth: (json['headlessWidth'] as num?)?.toDouble() ?? 1920,
+      headlessHeight: (json['headlessHeight'] as num?)?.toDouble() ?? 1080,
     );
   }
 
@@ -838,6 +931,16 @@ class TestConfigurationManager extends ChangeNotifier {
   /// Set the initial URL
   void setInitialUrl(String? url) {
     _currentConfig = _currentConfig.copyWith(initialUrl: url);
+    _saveConfigs();
+    notifyListeners();
+  }
+
+  /// Set the headless WebView size
+  void setHeadlessSize(double width, double height) {
+    _currentConfig = _currentConfig.copyWith(
+      headlessWidth: width,
+      headlessHeight: height,
+    );
     _saveConfigs();
     notifyListeners();
   }

@@ -24,16 +24,38 @@ class ParameterValueHint<T> {
   const ParameterValueHint(this.value, this.type);
 }
 
-/// A specialized hint for enum parameters that includes available values
-class EnumParameterValueHint<T extends Enum> extends ParameterValueHint<T> {
-  /// The list of all available enum values
+/// A specialized hint for enum parameters that includes available values.
+/// Works with both standard Dart enums and custom enum-like classes
+/// (like UserScriptInjectionTime, CompressFormat) that have a `values` property
+/// and a `name()` method.
+class EnumParameterValueHint<T> extends ParameterValueHint<T> {
+  /// The list of all available enum values.
+  /// Accepts both List<T> and Set<T> (will be converted to List internally).
   final List<T> enumValues;
 
-  /// Optional display names for enum values (uses enum name if not provided)
+  /// Optional display names for enum values.
+  /// For standard Dart enums, defaults to `e.name`.
+  /// For custom enum-like classes, you should provide this function
+  /// (e.g., `(e) => e.name()` for classes with a `name()` method).
   final String Function(T)? displayName;
 
+  /// Creates an enum parameter value hint.
+  /// [values] can be a List<T> or Set<T> (common for custom enum-like classes).
   const EnumParameterValueHint(T? value, this.enumValues, {this.displayName})
     : super(value, ParameterValueType.enumeration);
+
+  /// Factory constructor that accepts an Iterable (List or Set).
+  factory EnumParameterValueHint.fromIterable(
+    T? value,
+    Iterable<T> values, {
+    String Function(T)? displayName,
+  }) {
+    return EnumParameterValueHint(
+      value,
+      values.toList(),
+      displayName: displayName,
+    );
+  }
 }
 
 Future<Map<String, dynamic>?> showParameterDialog({
@@ -84,6 +106,24 @@ class _ParameterDialogState extends State<ParameterDialog> {
 
   late Map<String, dynamic> _editedParameters;
 
+  /// Default display name function that works with both Dart enums and custom enum-like classes.
+  /// Tries to call `.name()` method first (for custom classes), then falls back to `.name` property (for Dart enums).
+  static String _defaultEnumDisplayName(dynamic e) {
+    if (e == null) return '(none)';
+    // Try calling name() method first (for custom enum-like classes)
+    try {
+      final dynamic result = (e as dynamic).name();
+      if (result is String) return result;
+    } catch (_) {}
+    // Fall back to .name property (for Dart enums)
+    try {
+      final dynamic result = (e as dynamic).name;
+      if (result is String) return result;
+    } catch (_) {}
+    // Last resort: toString
+    return e.toString();
+  }
+
   @override
   void initState() {
     super.initState();
@@ -117,7 +157,7 @@ class _ParameterDialogState extends State<ParameterDialog> {
         _hintedTypes[key] = ParameterValueType.enumeration;
         _enumInfoMap[key] = _EnumInfo(
           values: value.enumValues,
-          displayName: value.displayName ?? (e) => e.name,
+          displayName: value.displayName ?? _defaultEnumDisplayName,
         );
         ParameterDialogUtils.setValueAtPath(cloned, path, value.value);
         return;
@@ -674,17 +714,20 @@ class _ParameterDialogState extends State<ParameterDialog> {
             ),
           );
         } else {
-          field = DropdownButtonFormField<Enum>(
-            value: value as Enum?,
+          field = DropdownButtonFormField<dynamic>(
+            value: value,
             decoration: InputDecoration(
               labelText: label,
               border: const OutlineInputBorder(),
               errorText: errorText,
             ),
             items: [
-              const DropdownMenuItem<Enum>(value: null, child: Text('(none)')),
+              const DropdownMenuItem<dynamic>(
+                value: null,
+                child: Text('(none)'),
+              ),
               ...enumInfo.values.map(
-                (enumValue) => DropdownMenuItem<Enum>(
+                (enumValue) => DropdownMenuItem<dynamic>(
                   value: enumValue,
                   child: Text(enumInfo.displayName(enumValue)),
                 ),
@@ -741,10 +784,11 @@ class _ParameterDialogState extends State<ParameterDialog> {
   }
 }
 
-/// Internal class to store enum metadata
+/// Internal class to store enum metadata.
+/// Works with both standard Dart enums and custom enum-like classes.
 class _EnumInfo {
-  final List<Enum> values;
-  final String Function(Enum) displayName;
+  final List<dynamic> values;
+  final String Function(dynamic) displayName;
 
   const _EnumInfo({required this.values, required this.displayName});
 }

@@ -51,8 +51,8 @@ class MethodResultHistory extends StatelessWidget {
     final visibleEntries = entries.take(maxEntries).toList();
     final effectiveSelectedIndex =
         selectedIndex != null && selectedIndex! < visibleEntries.length
-            ? selectedIndex!
-            : 0;
+        ? selectedIndex!
+        : 0;
     final selectedEntry = visibleEntries[effectiveSelectedIndex];
 
     return Column(

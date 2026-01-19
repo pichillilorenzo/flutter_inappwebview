@@ -4,13 +4,12 @@ import 'package:flutter_inappwebview_example/widgets/webview/method_tester_widge
 
 void main() {
   group('MethodTesterWidget', () {
-    testWidgets('renders search input and warning when controller is null',
-        (tester) async {
+    testWidgets('renders search input and warning when controller is null', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         const MaterialApp(
-          home: Scaffold(
-            body: MethodTesterWidget(controller: null),
-          ),
+          home: Scaffold(body: MethodTesterWidget(controller: null)),
         ),
       );
 

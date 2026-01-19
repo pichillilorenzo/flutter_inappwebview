@@ -8,12 +8,15 @@ import 'package:flutter_inappwebview_example/widgets/common/method_result_histor
 import 'package:provider/provider.dart';
 import 'package:flutter_inappwebview_example/providers/event_log_provider.dart';
 import 'package:flutter_inappwebview_example/models/event_log_entry.dart';
+import 'package:flutter_inappwebview_example/providers/settings_manager.dart';
+import 'package:flutter_inappwebview_example/widgets/common/profile_selector_card.dart';
 
 /// Custom InAppBrowser implementation for testing
 class TestInAppBrowser extends InAppBrowser {
   final void Function(String event, Map<String, dynamic>? data)? onEvent;
 
-  TestInAppBrowser({this.onEvent});
+  TestInAppBrowser({this.onEvent, WebViewEnvironment? webViewEnvironment})
+    : super(webViewEnvironment: webViewEnvironment);
 
   @override
   void onBrowserCreated() {
@@ -88,14 +91,17 @@ class _InAppBrowserScreenState extends State<InAppBrowserScreen> {
   bool _isLoading = false;
   bool _browserOpened = false;
   final List<InAppBrowserMenuItem> _menuItems = [];
+  bool _isInitialized = false;
+  int _lastEnvironmentRevision = -1;
 
   final Map<String, List<MethodResultEntry>> _methodHistory = {};
   final Map<String, int> _selectedHistoryIndex = {};
   static const int _maxHistoryEntries = 3;
 
-  void _initBrowser() {
+  void _initBrowser(WebViewEnvironment? webViewEnvironment) {
     try {
       _browser = TestInAppBrowser(
+        webViewEnvironment: webViewEnvironment,
         onEvent: (event, data) {
           _logEvent(EventType.ui, event, data: data);
           if (event == 'onExit') {
@@ -111,7 +117,24 @@ class _InAppBrowserScreenState extends State<InAppBrowserScreen> {
   @override
   void initState() {
     super.initState();
-    _initBrowser();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final settingsManager = context.watch<SettingsManager>();
+
+    if (!_isInitialized) {
+      _isInitialized = true;
+      _lastEnvironmentRevision = settingsManager.environmentRevision;
+      _initBrowser(settingsManager.webViewEnvironment);
+      return;
+    }
+
+    if (_lastEnvironmentRevision != settingsManager.environmentRevision) {
+      _lastEnvironmentRevision = settingsManager.environmentRevision;
+      _handleEnvironmentChange(settingsManager.webViewEnvironment);
+    }
   }
 
   @override
@@ -136,6 +159,7 @@ class _InAppBrowserScreenState extends State<InAppBrowserScreen> {
   }
 
   Future<void> _openUrlRequest() async {
+    final settingsManager = context.read<SettingsManager>();
     final params = await showParameterDialog(
       context: context,
       title: 'openUrlRequest',
@@ -151,13 +175,27 @@ class _InAppBrowserScreenState extends State<InAppBrowserScreen> {
     if (params == null) return;
     final url = params['url']?.toString() ?? '';
     if (url.isEmpty) {
-      _recordMethodResult('openUrlRequest', 'Please enter a URL', isError: true);
+      _recordMethodResult(
+        'openUrlRequest',
+        'Please enter a URL',
+        isError: true,
+      );
       return;
     }
     _urlController.text = url;
 
     setState(() => _isLoading = true);
     try {
+      final baseSettings = settingsManager.buildSettings();
+      final webViewSettings =
+          InAppWebViewSettings.fromMap({
+            ...baseSettings.toMap(),
+            'javaScriptEnabled':
+                params['javaScriptEnabled'] as bool? ??
+                baseSettings.javaScriptEnabled ??
+                true,
+          }) ??
+          InAppWebViewSettings();
       await _browser?.openUrlRequest(
         urlRequest: URLRequest(url: WebUri(url)),
         settings: InAppBrowserClassSettings(
@@ -168,9 +206,7 @@ class _InAppBrowserScreenState extends State<InAppBrowserScreen> {
               params['presentationStyle']?.toString(),
             ),
           ),
-          webViewSettings: InAppWebViewSettings(
-            javaScriptEnabled: params['javaScriptEnabled'] as bool? ?? true,
-          ),
+          webViewSettings: webViewSettings,
         ),
       );
       setState(() => _browserOpened = true);
@@ -191,6 +227,7 @@ class _InAppBrowserScreenState extends State<InAppBrowserScreen> {
   }
 
   Future<void> _openFile() async {
+    final settingsManager = context.read<SettingsManager>();
     final params = await showParameterDialog(
       context: context,
       title: 'openFile',
@@ -220,10 +257,15 @@ class _InAppBrowserScreenState extends State<InAppBrowserScreen> {
             toolbarTopBackgroundColor:
                 params['toolbarTopBackgroundColor'] as Color?,
           ),
+          webViewSettings: settingsManager.buildSettings(),
         ),
       );
       setState(() => _browserOpened = true);
-      _recordMethodResult('openFile', 'Browser opened with file', isError: false);
+      _recordMethodResult(
+        'openFile',
+        'Browser opened with file',
+        isError: false,
+      );
     } catch (e) {
       _recordMethodResult('openFile', 'Error opening file: $e', isError: true);
     } finally {
@@ -232,6 +274,7 @@ class _InAppBrowserScreenState extends State<InAppBrowserScreen> {
   }
 
   Future<void> _openData() async {
+    final settingsManager = context.read<SettingsManager>();
     final params = await showParameterDialog(
       context: context,
       title: 'openData',
@@ -247,11 +290,7 @@ class _InAppBrowserScreenState extends State<InAppBrowserScreen> {
     if (params == null) return;
     final data = params['data']?.toString() ?? '';
     if (data.isEmpty) {
-      _recordMethodResult(
-        'openData',
-        'Please enter HTML data',
-        isError: true,
-      );
+      _recordMethodResult('openData', 'Please enter HTML data', isError: true);
       return;
     }
     _dataController.text = data;
@@ -267,10 +306,15 @@ class _InAppBrowserScreenState extends State<InAppBrowserScreen> {
             toolbarTopBackgroundColor:
                 params['toolbarTopBackgroundColor'] as Color?,
           ),
+          webViewSettings: settingsManager.buildSettings(),
         ),
       );
       setState(() => _browserOpened = true);
-      _recordMethodResult('openData', 'Browser opened with data', isError: false);
+      _recordMethodResult(
+        'openData',
+        'Browser opened with data',
+        isError: false,
+      );
     } catch (e) {
       _recordMethodResult('openData', 'Error opening data: $e', isError: true);
     } finally {
@@ -357,7 +401,11 @@ class _InAppBrowserScreenState extends State<InAppBrowserScreen> {
       setState(() {
         _menuItems.remove(menuItem);
       });
-      _recordMethodResult('removeMenuItem', 'Menu item removed', isError: false);
+      _recordMethodResult(
+        'removeMenuItem',
+        'Menu item removed',
+        isError: false,
+      );
     } else {
       _recordMethodResult(
         'removeMenuItem',
@@ -420,7 +468,11 @@ class _InAppBrowserScreenState extends State<InAppBrowserScreen> {
     setState(() => _isLoading = true);
     try {
       final hidden = await _browser?.isHidden();
-      _recordMethodResult('isHidden', 'Browser is hidden: $hidden', isError: false);
+      _recordMethodResult(
+        'isHidden',
+        'Browser is hidden: $hidden',
+        isError: false,
+      );
     } catch (e) {
       _recordMethodResult(
         'isHidden',
@@ -437,7 +489,11 @@ class _InAppBrowserScreenState extends State<InAppBrowserScreen> {
     try {
       final settings = await _browser?.getSettings();
       _showSettingsDialog(settings);
-      _recordMethodResult('getSettings', 'Settings dialog opened', isError: false);
+      _recordMethodResult(
+        'getSettings',
+        'Settings dialog opened',
+        isError: false,
+      );
     } catch (e) {
       _recordMethodResult(
         'getSettings',
@@ -485,7 +541,11 @@ class _InAppBrowserScreenState extends State<InAppBrowserScreen> {
 
   void _checkIsOpened() {
     final opened = _browser?.isOpened() ?? false;
-    _recordMethodResult('isOpened', 'Browser is opened: $opened', isError: false);
+    _recordMethodResult(
+      'isOpened',
+      'Browser is opened: $opened',
+      isError: false,
+    );
   }
 
   void _showSettingsDialog(InAppBrowserClassSettings? settings) {
@@ -550,6 +610,15 @@ class _InAppBrowserScreenState extends State<InAppBrowserScreen> {
     _recordMethodResult('initBrowser', message, isError: true);
   }
 
+  void _handleEnvironmentChange(WebViewEnvironment? environment) {
+    if (_browserOpened) {
+      _browser?.close();
+    }
+    _browser?.dispose();
+    _initBrowser(environment);
+    setState(() => _browserOpened = false);
+  }
+
   Widget _buildInitStatusSection() {
     final entries = _methodHistory['initBrowser'] ?? const [];
     if (entries.isEmpty) {
@@ -604,6 +673,11 @@ class _InAppBrowserScreenState extends State<InAppBrowserScreen> {
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
+          ProfileSelectorCard(
+            onEditSettingsProfile: () =>
+                Navigator.pushNamed(context, '/settings'),
+          ),
+          const SizedBox(height: 16),
           _buildStatusCard(),
           const SizedBox(height: 16),
           _buildInitStatusSection(),

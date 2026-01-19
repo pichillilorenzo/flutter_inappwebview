@@ -10,6 +10,8 @@ import 'package:flutter_inappwebview_example/widgets/common/method_result_histor
 import 'package:provider/provider.dart';
 import 'package:flutter_inappwebview_example/providers/event_log_provider.dart';
 import 'package:flutter_inappwebview_example/models/event_log_entry.dart';
+import 'package:flutter_inappwebview_example/providers/settings_manager.dart';
+import 'package:flutter_inappwebview_example/widgets/common/profile_selector_card.dart';
 
 /// Screen for testing HeadlessInAppWebView functionality
 class HeadlessWebViewScreen extends StatefulWidget {
@@ -38,6 +40,8 @@ class _HeadlessWebViewScreenState extends State<HeadlessWebViewScreen> {
   Uint8List? _screenshotData;
   String? _currentUrl;
   String? _currentTitle;
+  bool _isInitialized = false;
+  int _lastEnvironmentRevision = -1;
 
   final Map<String, List<MethodResultEntry>> _methodHistory = {};
   final Map<String, int> _selectedHistoryIndex = {};
@@ -50,6 +54,25 @@ class _HeadlessWebViewScreenState extends State<HeadlessWebViewScreen> {
     _heightController.dispose();
     _headlessWebView?.dispose();
     super.dispose();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final settingsManager = context.watch<SettingsManager>();
+
+    if (!_isInitialized) {
+      _isInitialized = true;
+      _lastEnvironmentRevision = settingsManager.environmentRevision;
+      return;
+    }
+
+    if (_lastEnvironmentRevision != settingsManager.environmentRevision) {
+      _lastEnvironmentRevision = settingsManager.environmentRevision;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _resetForEnvironmentChange();
+      });
+    }
   }
 
   void _logEvent(EventType type, String message, {Map<String, dynamic>? data}) {
@@ -68,18 +91,25 @@ class _HeadlessWebViewScreenState extends State<HeadlessWebViewScreen> {
     required double width,
     required double height,
     bool javaScriptEnabled = true,
+    required SettingsManager settingsManager,
   }) {
     if (url.isEmpty) {
       _recordMethodResult('run', 'Please enter a URL', isError: true);
       return false;
     }
     try {
+      final baseSettings = settingsManager.buildSettings();
+      final mergedSettings =
+          InAppWebViewSettings.fromMap({
+            ...baseSettings.toMap(),
+            'javaScriptEnabled': javaScriptEnabled,
+          }) ??
+          InAppWebViewSettings();
       _headlessWebView = HeadlessInAppWebView(
         initialSize: Size(width, height),
         initialUrlRequest: URLRequest(url: WebUri(url)),
-        initialSettings: InAppWebViewSettings(
-          javaScriptEnabled: javaScriptEnabled,
-        ),
+        webViewEnvironment: settingsManager.webViewEnvironment,
+        initialSettings: mergedSettings,
         onWebViewCreated: (controller) {
           _webViewController = controller;
           _logEvent(
@@ -153,6 +183,7 @@ class _HeadlessWebViewScreenState extends State<HeadlessWebViewScreen> {
   }
 
   Future<void> _run() async {
+    final settingsManager = context.read<SettingsManager>();
     final params = await showParameterDialog(
       context: context,
       title: 'Run Headless WebView',
@@ -182,6 +213,7 @@ class _HeadlessWebViewScreenState extends State<HeadlessWebViewScreen> {
         width: width,
         height: height,
         javaScriptEnabled: javaScriptEnabled,
+        settingsManager: settingsManager,
       );
       if (!created) return;
       await _headlessWebView?.run();
@@ -283,7 +315,11 @@ class _HeadlessWebViewScreenState extends State<HeadlessWebViewScreen> {
       });
       _headlessWebView = null;
       _webViewController = null;
-      _recordMethodResult('dispose', 'HeadlessInAppWebView disposed', isError: false);
+      _recordMethodResult(
+        'dispose',
+        'HeadlessInAppWebView disposed',
+        isError: false,
+      );
     } catch (e) {
       _recordMethodResult('dispose', 'Error disposing: $e', isError: true);
     } finally {
@@ -441,6 +477,21 @@ class _HeadlessWebViewScreenState extends State<HeadlessWebViewScreen> {
     });
   }
 
+  Future<void> _resetForEnvironmentChange() async {
+    if (_headlessWebView != null) {
+      await _headlessWebView?.dispose();
+    }
+    setState(() {
+      _headlessWebView = null;
+      _webViewController = null;
+      _isRunning = false;
+      _currentSize = null;
+      _screenshotData = null;
+      _currentUrl = null;
+      _currentTitle = null;
+    });
+  }
+
   Widget _buildMethodHistory(String methodName, {String? title}) {
     final entries = _methodHistory[methodName] ?? const [];
     if (entries.isEmpty) {
@@ -487,6 +538,11 @@ class _HeadlessWebViewScreenState extends State<HeadlessWebViewScreen> {
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
+          ProfileSelectorCard(
+            onEditSettingsProfile: () =>
+                Navigator.pushNamed(context, '/settings'),
+          ),
+          const SizedBox(height: 16),
           _buildStatusCard(),
           const SizedBox(height: 16),
           _buildInputSection(),

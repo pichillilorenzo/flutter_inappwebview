@@ -213,11 +213,7 @@ class _ControllersScreenState extends State<ControllersScreen> {
     if (params == null) return;
     final query = params['find']?.toString() ?? '';
     if (query.isEmpty) {
-      _recordMethodResult(
-        'findAll',
-        'Please enter search text',
-        isError: true,
-      );
+      _recordMethodResult('findAll', 'Please enter search text', isError: true);
       return;
     }
     _searchController.text = query;
@@ -334,7 +330,11 @@ class _ControllersScreenState extends State<ControllersScreen> {
 
   Future<void> _beginRefreshing() async {
     await _pullToRefreshController?.beginRefreshing();
-    _recordMethodResult('beginRefreshing', 'Refreshing started', isError: false);
+    _recordMethodResult(
+      'beginRefreshing',
+      'Refreshing started',
+      isError: false,
+    );
   }
 
   Future<void> _endRefreshing() async {
@@ -377,11 +377,7 @@ class _ControllersScreenState extends State<ControllersScreen> {
     if (params == null) return;
     final color = params['color'] as Color?;
     if (color == null) {
-      _recordMethodResult(
-        'setColor',
-        'Please pick a color',
-        isError: true,
-      );
+      _recordMethodResult('setColor', 'Please pick a color', isError: true);
       return;
     }
     await _setColor(color);
@@ -504,7 +500,11 @@ class _ControllersScreenState extends State<ControllersScreen> {
     setState(() {
       _receivedMessages.clear();
     });
-    _recordMethodResult('closeWebMessageChannel', 'Channel closed', isError: false);
+    _recordMethodResult(
+      'closeWebMessageChannel',
+      'Channel closed',
+      isError: false,
+    );
   }
 
   @override

@@ -206,7 +206,11 @@ class _ChromeSafariBrowserScreenState extends State<ChromeSafariBrowserScreen> {
       await _browser?.launchUrl(url: WebUri(url));
       _recordMethodResult('launchUrl', 'URL launched', isError: false);
     } catch (e) {
-      _recordMethodResult('launchUrl', 'Error launching URL: $e', isError: true);
+      _recordMethodResult(
+        'launchUrl',
+        'Error launching URL: $e',
+        isError: true,
+      );
     } finally {
       setState(() => _isLoading = false);
     }
@@ -300,7 +304,11 @@ class _ChromeSafariBrowserScreenState extends State<ChromeSafariBrowserScreen> {
           },
         ),
       );
-      _recordMethodResult('setActionButton', 'Action button set', isError: false);
+      _recordMethodResult(
+        'setActionButton',
+        'Action button set',
+        isError: false,
+      );
     } catch (e) {
       _recordMethodResult(
         'setActionButton',
@@ -448,7 +456,11 @@ class _ChromeSafariBrowserScreenState extends State<ChromeSafariBrowserScreen> {
 
   void _checkIsOpened() {
     final opened = _browser?.isOpened() ?? false;
-    _recordMethodResult('isOpened', 'Browser is opened: $opened', isError: false);
+    _recordMethodResult(
+      'isOpened',
+      'Browser is opened: $opened',
+      isError: false,
+    );
   }
 
   Future<void> _isAvailable() async {
@@ -461,11 +473,7 @@ class _ChromeSafariBrowserScreenState extends State<ChromeSafariBrowserScreen> {
         isError: false,
       );
     } catch (e) {
-      _recordMethodResult(
-        'isAvailable (static)',
-        'Error: $e',
-        isError: true,
-      );
+      _recordMethodResult('isAvailable (static)', 'Error: $e', isError: true);
     } finally {
       setState(() => _isLoading = false);
     }

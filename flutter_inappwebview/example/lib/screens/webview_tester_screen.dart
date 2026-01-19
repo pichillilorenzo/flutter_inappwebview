@@ -11,6 +11,8 @@ import 'package:flutter_inappwebview_example/widgets/webview/method_tester_widge
 import 'package:flutter_inappwebview_example/widgets/webview/javascript_console_widget.dart';
 import 'package:flutter_inappwebview_example/widgets/webview/user_script_tester_widget.dart';
 import 'package:flutter_inappwebview_example/main.dart';
+import 'package:flutter_inappwebview_example/providers/settings_manager.dart';
+import 'package:flutter_inappwebview_example/widgets/common/profile_selector_card.dart';
 
 /// Main screen for testing InAppWebView functionality
 class WebViewTesterScreen extends StatefulWidget {
@@ -55,6 +57,8 @@ class _WebViewTesterScreenState extends State<WebViewTesterScreen>
 
   @override
   Widget build(BuildContext context) {
+    final settingsManager = context.watch<SettingsManager>();
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('WebView Tester'),
@@ -79,18 +83,22 @@ class _WebViewTesterScreenState extends State<WebViewTesterScreen>
           final useScroll = constraints.maxHeight < minRequiredHeight;
 
           if (useScroll) {
-            return _buildScrollableBody();
+            return _buildScrollableBody(settingsManager);
           }
 
-          return _buildStandardBody();
+          return _buildStandardBody(settingsManager);
         },
       ),
     );
   }
 
-  Widget _buildStandardBody() {
+  Widget _buildStandardBody(SettingsManager settingsManager) {
     return Column(
       children: [
+        ProfileSelectorCard(
+          onEditSettingsProfile: () =>
+              Navigator.pushNamed(context, '/settings'),
+        ),
         _buildUrlBar(),
         _buildNavigationControls(),
         if (_progress < 1.0)
@@ -98,15 +106,19 @@ class _WebViewTesterScreenState extends State<WebViewTesterScreen>
             value: _progress,
             backgroundColor: Colors.grey.shade200,
           ),
-        Expanded(child: _buildResizableContent()),
+        Expanded(child: _buildResizableContent(settingsManager)),
       ],
     );
   }
 
-  Widget _buildScrollableBody() {
+  Widget _buildScrollableBody(SettingsManager settingsManager) {
     return SingleChildScrollView(
       child: Column(
         children: [
+          ProfileSelectorCard(
+            onEditSettingsProfile: () =>
+                Navigator.pushNamed(context, '/settings'),
+          ),
           _buildUrlBar(),
           _buildNavigationControls(),
           if (_progress < 1.0)
@@ -114,7 +126,10 @@ class _WebViewTesterScreenState extends State<WebViewTesterScreen>
               value: _progress,
               backgroundColor: Colors.grey.shade200,
             ),
-          SizedBox(height: _minWebViewHeight, child: _buildWebView()),
+          SizedBox(
+            height: _minWebViewHeight,
+            child: _buildWebView(settingsManager),
+          ),
           Container(height: _dividerHeight, color: Colors.grey.shade300),
           SizedBox(height: _minTabsHeight, child: _buildBottomTabs()),
         ],
@@ -122,7 +137,7 @@ class _WebViewTesterScreenState extends State<WebViewTesterScreen>
     );
   }
 
-  Widget _buildResizableContent() {
+  Widget _buildResizableContent(SettingsManager settingsManager) {
     return LayoutBuilder(
       builder: (context, constraints) {
         final maxWebViewHeight =
@@ -136,7 +151,10 @@ class _WebViewTesterScreenState extends State<WebViewTesterScreen>
 
         return Column(
           children: [
-            SizedBox(height: webViewHeight, child: _buildWebView()),
+            SizedBox(
+              height: webViewHeight,
+              child: _buildWebView(settingsManager),
+            ),
             _buildResizeHandle(
               onDrag: (delta) {
                 setState(() {
@@ -273,20 +291,30 @@ class _WebViewTesterScreenState extends State<WebViewTesterScreen>
     );
   }
 
-  Widget _buildWebView() {
+  Widget _buildWebView(SettingsManager settingsManager) {
+    final baseSettings = settingsManager.buildSettings();
+    final mergedSettings =
+        InAppWebViewSettings.fromMap({
+          ...baseSettings.toMap(),
+          'useShouldOverrideUrlLoading': true,
+          'useShouldInterceptAjaxRequest': true,
+          'useShouldInterceptFetchRequest': true,
+          'useShouldInterceptRequest': true,
+          'useOnLoadResource': true,
+          'useOnDownloadStart': true,
+          'mediaPlaybackRequiresUserGesture': false,
+          'javaScriptEnabled': true,
+          'javaScriptCanOpenWindowsAutomatically': true,
+        }) ??
+        InAppWebViewSettings();
+
     return InAppWebView(
-      initialUrlRequest: URLRequest(url: WebUri(_urlController.text)),
-      initialSettings: InAppWebViewSettings(
-        useShouldOverrideUrlLoading: true,
-        useShouldInterceptAjaxRequest: true,
-        useShouldInterceptFetchRequest: true,
-        useShouldInterceptRequest: true,
-        useOnLoadResource: true,
-        useOnDownloadStart: true,
-        mediaPlaybackRequiresUserGesture: false,
-        javaScriptEnabled: true,
-        javaScriptCanOpenWindowsAutomatically: true,
+      key: ValueKey(
+        'webview-${settingsManager.settingsRevision}-${settingsManager.environmentRevision}',
       ),
+      initialUrlRequest: URLRequest(url: WebUri(_urlController.text)),
+      webViewEnvironment: settingsManager.webViewEnvironment,
+      initialSettings: mergedSettings,
 
       // ============================================================
       // CORE EVENTS (8)

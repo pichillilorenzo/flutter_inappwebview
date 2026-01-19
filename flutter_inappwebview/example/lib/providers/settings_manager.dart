@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_inappwebview_example/models/settings_profile.dart';
+import 'package:flutter_inappwebview_example/models/webview_environment_profile.dart';
 
 /// Settings manager for the testing interface
 /// Manages InAppWebViewSettings profiles with save/load functionality
@@ -11,12 +12,33 @@ class SettingsManager extends ChangeNotifier {
   static const String _profilesKey = 'settings_profiles';
   static const String _currentProfileKey = 'current_profile_id';
   static const String _modifiedSettingsKey = 'modified_settings';
+  static const String _environmentProfilesKey = 'environment_profiles';
+  static const String _currentEnvironmentProfileKey =
+      'current_environment_profile_id';
+
+  SettingsManager({
+    Future<WebViewEnvironment?> Function(WebViewEnvironmentSettings? settings)?
+    environmentFactory,
+    bool Function()? environmentSupportChecker,
+  }) : _environmentFactory = environmentFactory ?? _defaultEnvironmentFactory,
+       _environmentSupportChecker =
+           environmentSupportChecker ?? _defaultEnvironmentSupportChecker;
 
   SharedPreferences? _prefs;
   List<SettingsProfile> _profiles = [];
   String? _currentProfileId;
   Map<String, dynamic> _currentSettings = {};
   Set<String> _modifiedSettings = {};
+  List<WebViewEnvironmentProfile> _environmentProfiles = [];
+  String? _currentEnvironmentProfileId;
+  Map<String, dynamic> _currentEnvironmentSettings = {};
+  WebViewEnvironment? _webViewEnvironment;
+  bool _isEnvironmentLoading = false;
+  int _settingsRevision = 0;
+  int _environmentRevision = 0;
+  final Future<WebViewEnvironment?> Function(WebViewEnvironmentSettings?)
+  _environmentFactory;
+  final bool Function() _environmentSupportChecker;
   bool _isLoading = true;
 
   /// Get all saved profiles
@@ -24,6 +46,9 @@ class SettingsManager extends ChangeNotifier {
 
   /// Get the current profile ID
   String? get currentProfileId => _currentProfileId;
+
+  /// Get the current settings revision
+  int get settingsRevision => _settingsRevision;
 
   /// Get the current profile
   SettingsProfile? get currentProfile {
@@ -39,6 +64,41 @@ class SettingsManager extends ChangeNotifier {
   Map<String, dynamic> get currentSettings =>
       Map.unmodifiable(_currentSettings);
 
+  /// Get all saved environment profiles
+  List<WebViewEnvironmentProfile> get environmentProfiles =>
+      List.unmodifiable(_environmentProfiles);
+
+  /// Get the current environment profile ID
+  String? get currentEnvironmentProfileId => _currentEnvironmentProfileId;
+
+  /// Get the current environment profile
+  WebViewEnvironmentProfile? get currentEnvironmentProfile {
+    if (_currentEnvironmentProfileId == null) return null;
+    try {
+      return _environmentProfiles.firstWhere(
+        (p) => p.id == _currentEnvironmentProfileId,
+      );
+    } catch (e) {
+      return null;
+    }
+  }
+
+  /// Get the current environment settings map
+  Map<String, dynamic> get currentEnvironmentSettings =>
+      Map.unmodifiable(_currentEnvironmentSettings);
+
+  /// Current WebViewEnvironment instance
+  WebViewEnvironment? get webViewEnvironment => _webViewEnvironment;
+
+  /// Check if environment is supported on the current platform
+  bool get isEnvironmentSupported => _environmentSupportChecker();
+
+  /// Check if environment is being created or disposed
+  bool get isEnvironmentLoading => _isEnvironmentLoading;
+
+  /// Environment revision for rebuild triggers
+  int get environmentRevision => _environmentRevision;
+
   /// Get the set of modified setting keys
   Set<String> get modifiedSettings => Set.unmodifiable(_modifiedSettings);
 
@@ -50,6 +110,8 @@ class SettingsManager extends ChangeNotifier {
     _prefs = await SharedPreferences.getInstance();
     await _loadProfiles();
     await _loadModifiedSettings();
+    await _loadEnvironmentProfiles();
+    await _recreateEnvironment();
     _isLoading = false;
     notifyListeners();
   }
@@ -81,6 +143,26 @@ class SettingsManager extends ChangeNotifier {
     }
   }
 
+  /// Load environment profiles from shared preferences
+  Future<void> _loadEnvironmentProfiles() async {
+    final profilesJson = _prefs?.getStringList(_environmentProfilesKey);
+    if (profilesJson != null) {
+      _environmentProfiles = profilesJson
+          .map((json) => WebViewEnvironmentProfile.fromJsonString(json))
+          .toList();
+    }
+    _currentEnvironmentProfileId = _prefs?.getString(
+      _currentEnvironmentProfileKey,
+    );
+
+    final profile = currentEnvironmentProfile;
+    if (profile != null) {
+      _currentEnvironmentSettings = Map<String, dynamic>.from(profile.settings);
+    } else {
+      _currentEnvironmentSettings = _getDefaultEnvironmentSettings();
+    }
+  }
+
   /// Save profiles to shared preferences
   Future<void> _saveProfiles() async {
     final profilesJson = _profiles.map((p) => p.toJsonString()).toList();
@@ -89,6 +171,22 @@ class SettingsManager extends ChangeNotifier {
       await _prefs?.setString(_currentProfileKey, _currentProfileId!);
     } else {
       await _prefs?.remove(_currentProfileKey);
+    }
+  }
+
+  /// Save environment profiles to shared preferences
+  Future<void> _saveEnvironmentProfiles() async {
+    final profilesJson = _environmentProfiles
+        .map((p) => p.toJsonString())
+        .toList();
+    await _prefs?.setStringList(_environmentProfilesKey, profilesJson);
+    if (_currentEnvironmentProfileId != null) {
+      await _prefs?.setString(
+        _currentEnvironmentProfileKey,
+        _currentEnvironmentProfileId!,
+      );
+    } else {
+      await _prefs?.remove(_currentEnvironmentProfileKey);
     }
   }
 
@@ -115,6 +213,22 @@ class SettingsManager extends ChangeNotifier {
     return profile;
   }
 
+  /// Create a new environment profile
+  Future<WebViewEnvironmentProfile> createEnvironmentProfile(
+    String name, {
+    Map<String, dynamic>? settings,
+  }) async {
+    final profile = WebViewEnvironmentProfile.create(
+      name: name,
+      settings:
+          settings ?? Map<String, dynamic>.from(_currentEnvironmentSettings),
+    );
+    _environmentProfiles.add(profile);
+    await _saveEnvironmentProfiles();
+    notifyListeners();
+    return profile;
+  }
+
   /// Update an existing profile
   Future<void> updateProfile(
     String profileId, {
@@ -132,6 +246,28 @@ class SettingsManager extends ChangeNotifier {
     }
   }
 
+  /// Update an existing environment profile
+  Future<void> updateEnvironmentProfile(
+    String profileId, {
+    String? name,
+    Map<String, dynamic>? settings,
+  }) async {
+    final index = _environmentProfiles.indexWhere((p) => p.id == profileId);
+    if (index != -1) {
+      _environmentProfiles[index] = _environmentProfiles[index].copyWith(
+        name: name,
+        settings: settings,
+      );
+      if (_currentEnvironmentProfileId == profileId && settings != null) {
+        _currentEnvironmentSettings = Map<String, dynamic>.from(settings);
+        await _recreateEnvironment();
+      } else {
+        notifyListeners();
+      }
+      await _saveEnvironmentProfiles();
+    }
+  }
+
   /// Delete a profile
   Future<void> deleteProfile(String profileId) async {
     _profiles.removeWhere((p) => p.id == profileId);
@@ -139,6 +275,18 @@ class SettingsManager extends ChangeNotifier {
       _currentProfileId = null;
     }
     await _saveProfiles();
+    notifyListeners();
+  }
+
+  /// Delete an environment profile
+  Future<void> deleteEnvironmentProfile(String profileId) async {
+    _environmentProfiles.removeWhere((p) => p.id == profileId);
+    if (_currentEnvironmentProfileId == profileId) {
+      _currentEnvironmentProfileId = null;
+      _currentEnvironmentSettings = _getDefaultEnvironmentSettings();
+      await _recreateEnvironment();
+    }
+    await _saveEnvironmentProfiles();
     notifyListeners();
   }
 
@@ -151,9 +299,30 @@ class SettingsManager extends ChangeNotifier {
     _currentProfileId = profileId;
     _currentSettings = Map<String, dynamic>.from(profile.settings);
     _modifiedSettings.clear();
+    _settingsRevision++;
     await _saveProfiles();
     await _saveModifiedSettings();
     notifyListeners();
+  }
+
+  /// Load an environment profile as the current environment settings
+  Future<void> loadEnvironmentProfile(String profileId) async {
+    final profile = _environmentProfiles.firstWhere(
+      (p) => p.id == profileId,
+      orElse: () => throw Exception('Environment profile not found'),
+    );
+    _currentEnvironmentProfileId = profileId;
+    _currentEnvironmentSettings = Map<String, dynamic>.from(profile.settings);
+    await _saveEnvironmentProfiles();
+    await _recreateEnvironment();
+  }
+
+  /// Clear current environment selection
+  Future<void> clearEnvironmentSelection() async {
+    _currentEnvironmentProfileId = null;
+    _currentEnvironmentSettings = _getDefaultEnvironmentSettings();
+    await _saveEnvironmentProfiles();
+    await _recreateEnvironment();
   }
 
   /// Save current settings to the current profile or create a new one
@@ -174,6 +343,29 @@ class SettingsManager extends ChangeNotifier {
     }
   }
 
+  /// Save current environment settings to the current profile or create a new one
+  Future<WebViewEnvironmentProfile> saveCurrentEnvironmentSettings(
+    String name,
+  ) async {
+    if (_currentEnvironmentProfileId != null) {
+      await updateEnvironmentProfile(
+        _currentEnvironmentProfileId!,
+        name: name,
+        settings: _currentEnvironmentSettings,
+      );
+      return currentEnvironmentProfile!;
+    } else {
+      final profile = await createEnvironmentProfile(
+        name,
+        settings: _currentEnvironmentSettings,
+      );
+      _currentEnvironmentProfileId = profile.id;
+      await _saveEnvironmentProfiles();
+      notifyListeners();
+      return profile;
+    }
+  }
+
   /// Update a single setting value
   void updateSetting(String key, dynamic value) {
     final defaultSettings = _getDefaultSettings();
@@ -186,6 +378,7 @@ class SettingsManager extends ChangeNotifier {
       _currentSettings[key] = value;
       _modifiedSettings.add(key);
     }
+    _settingsRevision++;
     notifyListeners();
   }
 
@@ -203,10 +396,13 @@ class SettingsManager extends ChangeNotifier {
   }
 
   /// Reset all settings to defaults
-  void resetToDefaults() {
+  Future<void> resetToDefaults() async {
     _currentSettings = _getDefaultSettings();
     _modifiedSettings.clear();
     _currentProfileId = null;
+    _settingsRevision++;
+    await _saveProfiles();
+    await _saveModifiedSettings();
     notifyListeners();
   }
 
@@ -215,6 +411,7 @@ class SettingsManager extends ChangeNotifier {
     final defaultValue = _getDefaultSettings()[key];
     _currentSettings[key] = defaultValue;
     _modifiedSettings.remove(key);
+    _settingsRevision++;
     notifyListeners();
   }
 
@@ -236,6 +433,7 @@ class SettingsManager extends ChangeNotifier {
         _currentSettings = Map<String, dynamic>.from(settings);
         _modifiedSettings = settings.keys.toSet();
         _currentProfileId = null;
+        _settingsRevision++;
         await _saveModifiedSettings();
         notifyListeners();
         return true;
@@ -348,6 +546,61 @@ class SettingsManager extends ChangeNotifier {
     );
   }
 
+  /// Build WebViewEnvironmentSettings from current environment settings
+  WebViewEnvironmentSettings buildEnvironmentSettings() {
+    return WebViewEnvironmentSettings.fromMap(_currentEnvironmentSettings) ??
+        WebViewEnvironmentSettings();
+  }
+
+  /// Recreate the WebViewEnvironment using current selection
+  Future<void> recreateEnvironment() async {
+    await _recreateEnvironment();
+  }
+
+  /// Dispose the current WebViewEnvironment instance
+  Future<void> disposeEnvironment() async {
+    _isEnvironmentLoading = true;
+    notifyListeners();
+    await _webViewEnvironment?.dispose();
+    _webViewEnvironment = null;
+    _environmentRevision++;
+    _isEnvironmentLoading = false;
+    notifyListeners();
+  }
+
+  Future<void> _recreateEnvironment() async {
+    _isEnvironmentLoading = true;
+    notifyListeners();
+    await _webViewEnvironment?.dispose();
+    _webViewEnvironment = null;
+
+    if (_currentEnvironmentProfileId != null && isEnvironmentSupported) {
+      final settings = buildEnvironmentSettings();
+      _webViewEnvironment = await _environmentFactory(settings);
+    }
+
+    _environmentRevision++;
+    _isEnvironmentLoading = false;
+    notifyListeners();
+  }
+
+  static Future<WebViewEnvironment?> _defaultEnvironmentFactory(
+    WebViewEnvironmentSettings? settings,
+  ) async {
+    if (!_defaultEnvironmentSupportChecker()) {
+      return null;
+    }
+    return WebViewEnvironment.create(settings: settings);
+  }
+
+  static bool _defaultEnvironmentSupportChecker() {
+    return !kIsWeb && WebViewEnvironment.isClassSupported();
+  }
+
+  Map<String, dynamic> _getDefaultEnvironmentSettings() {
+    return {};
+  }
+
   MixedContentMode? _getMixedContentMode(dynamic value) {
     if (value == null) return null;
     if (value is int) {
@@ -449,6 +702,12 @@ class SettingsManager extends ChangeNotifier {
       'browserAcceleratorKeysEnabled': true,
       'isInspectable': false,
     };
+  }
+
+  @override
+  void dispose() {
+    _webViewEnvironment?.dispose();
+    super.dispose();
   }
 
   /// Get all setting definitions organized by category

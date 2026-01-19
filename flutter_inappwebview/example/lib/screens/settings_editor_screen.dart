@@ -700,12 +700,14 @@ class _SettingsEditorScreenState extends State<SettingsEditorScreen> {
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-            onPressed: () {
-              settingsManager.resetToDefaults();
-              Navigator.pop(context);
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Settings reset to defaults')),
-              );
+            onPressed: () async {
+              await settingsManager.resetToDefaults();
+              if (context.mounted) {
+                Navigator.pop(context);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Settings reset to defaults')),
+                );
+              }
             },
             child: const Text('Reset'),
           ),

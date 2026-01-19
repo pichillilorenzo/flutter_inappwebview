@@ -8,6 +8,8 @@ import 'package:flutter_inappwebview_example/utils/support_checker.dart';
 import 'package:flutter_inappwebview_example/widgets/common/support_badge.dart';
 import 'package:flutter_inappwebview_example/widgets/common/parameter_dialog.dart';
 import 'package:flutter_inappwebview_example/widgets/common/method_result_history.dart';
+import 'package:flutter_inappwebview_example/providers/settings_manager.dart';
+import 'package:flutter_inappwebview_example/widgets/common/profile_selector_card.dart';
 
 /// Screen for testing service-level controllers
 class ServiceControllersScreen extends StatefulWidget {
@@ -40,9 +42,9 @@ class _ServiceControllersScreenState extends State<ServiceControllersScreen> {
   bool _isTracing = false;
 
   // WebViewEnvironment state
-  WebViewEnvironment? _webViewEnvironment;
   String? _availableVersion;
   List<BrowserProcessInfo> _processInfos = [];
+  int _lastEnvironmentRevision = -1;
 
   // ProcessGlobalConfig state
   final TextEditingController _dataDirSuffixController = TextEditingController(
@@ -111,8 +113,20 @@ class _ServiceControllersScreenState extends State<ServiceControllersScreen> {
     _proxyPortController.dispose();
     _bypassListController.dispose();
     _dataDirSuffixController.dispose();
-    _webViewEnvironment?.dispose();
     super.dispose();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final settingsManager = context.watch<SettingsManager>();
+    if (_lastEnvironmentRevision != settingsManager.environmentRevision) {
+      _lastEnvironmentRevision = settingsManager.environmentRevision;
+      setState(() {
+        _processInfos = [];
+        _availableVersion = null;
+      });
+    }
   }
 
   void _logEvent(EventType type, String message, {Map<String, dynamic>? data}) {
@@ -471,34 +485,15 @@ class _ServiceControllersScreenState extends State<ServiceControllersScreen> {
 
   // WebViewEnvironment methods
   Future<void> _createWebViewEnvironment() async {
-    final params = await showParameterDialog(
-      context: context,
-      title: 'Create WebViewEnvironment',
-      parameters: {'userDataFolder': 'custom_env_folder'},
-    );
-
-    if (params == null) return;
-    final userDataFolder = params['userDataFolder']?.toString();
-
     setState(() => _isLoading = true);
     try {
-      _webViewEnvironment = await WebViewEnvironment.create(
-        settings: WebViewEnvironmentSettings(
-          userDataFolder: userDataFolder?.isNotEmpty == true
-              ? userDataFolder
-              : null,
-        ),
-      );
+      await context.read<SettingsManager>().recreateEnvironment();
       _recordMethodResult(
         'create',
-        'WebViewEnvironment created: ${_webViewEnvironment?.id}',
+        'WebViewEnvironment created',
         isError: false,
       );
-      _logEvent(
-        EventType.ui,
-        'WebViewEnvironment created',
-        data: {'id': _webViewEnvironment?.id},
-      );
+      _logEvent(EventType.ui, 'WebViewEnvironment created');
     } catch (e) {
       _recordMethodResult('create', 'Error: $e', isError: true);
     } finally {
@@ -562,10 +557,11 @@ class _ServiceControllersScreenState extends State<ServiceControllersScreen> {
   }
 
   Future<void> _getProcessInfos() async {
-    if (_webViewEnvironment == null) {
+    final environment = context.read<SettingsManager>().webViewEnvironment;
+    if (environment == null) {
       _recordMethodResult(
         'getProcessInfos',
-        'Create WebViewEnvironment first',
+        'Create or select WebViewEnvironment first',
         isError: true,
       );
       return;
@@ -573,7 +569,7 @@ class _ServiceControllersScreenState extends State<ServiceControllersScreen> {
 
     setState(() => _isLoading = true);
     try {
-      final infos = await _webViewEnvironment!.getProcessInfos();
+      final infos = await environment.getProcessInfos();
       setState(() => _processInfos = infos);
       _recordMethodResult(
         'getProcessInfos',
@@ -588,10 +584,11 @@ class _ServiceControllersScreenState extends State<ServiceControllersScreen> {
   }
 
   Future<void> _getFailureReportFolderPath() async {
-    if (_webViewEnvironment == null) {
+    final environment = context.read<SettingsManager>().webViewEnvironment;
+    if (environment == null) {
       _recordMethodResult(
         'getFailureReportFolderPath',
-        'Create WebViewEnvironment first',
+        'Create or select WebViewEnvironment first',
         isError: true,
       );
       return;
@@ -599,7 +596,7 @@ class _ServiceControllersScreenState extends State<ServiceControllersScreen> {
 
     setState(() => _isLoading = true);
     try {
-      final path = await _webViewEnvironment!.getFailureReportFolderPath();
+      final path = await environment.getFailureReportFolderPath();
       _recordMethodResult(
         'getFailureReportFolderPath',
         'Failure report folder: $path',
@@ -619,8 +616,7 @@ class _ServiceControllersScreenState extends State<ServiceControllersScreen> {
   Future<void> _disposeWebViewEnvironment() async {
     setState(() => _isLoading = true);
     try {
-      await _webViewEnvironment?.dispose();
-      _webViewEnvironment = null;
+      await context.read<SettingsManager>().disposeEnvironment();
       setState(() => _processInfos = []);
       _recordMethodResult(
         'dispose',
@@ -708,6 +704,11 @@ class _ServiceControllersScreenState extends State<ServiceControllersScreen> {
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
+          ProfileSelectorCard(
+            onEditSettingsProfile: () =>
+                Navigator.pushNamed(context, '/settings'),
+          ),
+          const SizedBox(height: 16),
           _buildServiceWorkerSection(),
           const SizedBox(height: 16),
           _buildProxyControllerSection(),
@@ -1104,6 +1105,8 @@ class _ServiceControllersScreenState extends State<ServiceControllersScreen> {
   }
 
   Widget _buildWebViewEnvironmentSection() {
+    final settingsManager = context.watch<SettingsManager>();
+    final environment = settingsManager.webViewEnvironment;
     final supportedPlatforms = SupportChecker.getSupportedPlatformsForClass(
       'WebViewEnvironment',
     );
@@ -1138,7 +1141,7 @@ class _ServiceControllersScreenState extends State<ServiceControllersScreen> {
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: _webViewEnvironment != null
+                    color: environment != null
                         ? Colors.green.shade50
                         : Colors.grey.shade100,
                     borderRadius: BorderRadius.circular(8),
@@ -1146,12 +1149,8 @@ class _ServiceControllersScreenState extends State<ServiceControllersScreen> {
                   child: Row(
                     children: [
                       Icon(
-                        _webViewEnvironment != null
-                            ? Icons.check_circle
-                            : Icons.cancel,
-                        color: _webViewEnvironment != null
-                            ? Colors.green
-                            : Colors.grey,
+                        environment != null ? Icons.check_circle : Icons.cancel,
+                        color: environment != null ? Colors.green : Colors.grey,
                         size: 24,
                       ),
                       const SizedBox(width: 8),
@@ -1160,16 +1159,16 @@ class _ServiceControllersScreenState extends State<ServiceControllersScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              _webViewEnvironment != null
+                              environment != null
                                   ? 'Environment Active'
                                   : 'No Environment',
                               style: const TextStyle(
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
-                            if (_webViewEnvironment != null)
+                            if (environment != null)
                               Text(
-                                'ID: ${_webViewEnvironment!.id}',
+                                'ID: ${environment.id}',
                                 style: TextStyle(
                                   fontSize: 12,
                                   color: Colors.grey.shade600,
@@ -1197,9 +1196,7 @@ class _ServiceControllersScreenState extends State<ServiceControllersScreen> {
                     Expanded(
                       child: _buildMethodButton(
                         'Create',
-                        _webViewEnvironment == null
-                            ? _createWebViewEnvironment
-                            : null,
+                        environment == null ? _createWebViewEnvironment : null,
                         supportedPlatforms: _webViewEnvironmentPlatforms(
                           PlatformWebViewEnvironmentMethod.create,
                         ),
@@ -1210,9 +1207,7 @@ class _ServiceControllersScreenState extends State<ServiceControllersScreen> {
                     Expanded(
                       child: _buildMethodButton(
                         'Dispose',
-                        _webViewEnvironment != null
-                            ? _disposeWebViewEnvironment
-                            : null,
+                        environment != null ? _disposeWebViewEnvironment : null,
                         supportedPlatforms: _webViewEnvironmentPlatforms(
                           PlatformWebViewEnvironmentMethod.dispose,
                         ),
@@ -1258,7 +1253,7 @@ class _ServiceControllersScreenState extends State<ServiceControllersScreen> {
                     Expanded(
                       child: _buildMethodButton(
                         'Get Processes',
-                        _webViewEnvironment != null ? _getProcessInfos : null,
+                        environment != null ? _getProcessInfos : null,
                         supportedPlatforms: _webViewEnvironmentPlatforms(
                           PlatformWebViewEnvironmentMethod.getProcessInfos,
                         ),
@@ -1269,7 +1264,7 @@ class _ServiceControllersScreenState extends State<ServiceControllersScreen> {
                     Expanded(
                       child: _buildMethodButton(
                         'Failure Folder',
-                        _webViewEnvironment != null
+                        environment != null
                             ? _getFailureReportFolderPath
                             : null,
                         supportedPlatforms: _webViewEnvironmentPlatforms(

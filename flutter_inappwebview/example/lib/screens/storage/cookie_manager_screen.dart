@@ -168,11 +168,7 @@ class _CookieManagerScreenState extends State<CookieManagerScreen> {
         );
         await _getCookies();
       } else {
-        _recordMethodResult(
-          'setCookie',
-          'Failed to set cookie',
-          isError: true,
-        );
+        _recordMethodResult('setCookie', 'Failed to set cookie', isError: true);
       }
     } catch (e) {
       _recordMethodResult(
@@ -200,11 +196,7 @@ class _CookieManagerScreenState extends State<CookieManagerScreen> {
         domain: cookie.domain,
       );
       if (result) {
-        _recordMethodResult(
-          'deleteCookie',
-          'Cookie deleted',
-          isError: false,
-        );
+        _recordMethodResult('deleteCookie', 'Cookie deleted', isError: false);
         await _getCookies();
       } else {
         _recordMethodResult(
@@ -239,11 +231,7 @@ class _CookieManagerScreenState extends State<CookieManagerScreen> {
         domain: domain,
       );
       if (result) {
-        _recordMethodResult(
-          'deleteCookie',
-          'Cookie deleted',
-          isError: false,
-        );
+        _recordMethodResult('deleteCookie', 'Cookie deleted', isError: false);
         await _getCookies();
       } else {
         _recordMethodResult(
@@ -429,11 +417,7 @@ class _CookieManagerScreenState extends State<CookieManagerScreen> {
         isError: false,
       );
     } catch (e) {
-      _recordMethodResult(
-        'flush',
-        'Error flushing cookies: $e',
-        isError: true,
-      );
+      _recordMethodResult('flush', 'Error flushing cookies: $e', isError: true);
     } finally {
       setState(() => _isLoading = false);
     }

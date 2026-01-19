@@ -11,15 +11,15 @@ void main() {
     TestWidgetsFlutterBinding.ensureInitialized();
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
         .setMockMethodCallHandler(platformChannel, (call) async {
-      if (call.method == 'Clipboard.setData') {
-        clipboardText = call.arguments['text'] as String?;
-        return null;
-      }
-      if (call.method == 'Clipboard.getData') {
-        return <String, dynamic>{'text': clipboardText};
-      }
-      return null;
-    });
+          if (call.method == 'Clipboard.setData') {
+            clipboardText = call.arguments['text'] as String?;
+            return null;
+          }
+          if (call.method == 'Clipboard.getData') {
+            return <String, dynamic>{'text': clipboardText};
+          }
+          return null;
+        });
   });
 
   tearDown(() {
@@ -28,8 +28,9 @@ void main() {
     clipboardText = null;
   });
 
-  testWidgets('renders history entries and copies latest by default',
-      (tester) async {
+  testWidgets('renders history entries and copies latest by default', (
+    tester,
+  ) async {
     final entries = [
       MethodResultEntry(
         message: 'latest result',
@@ -45,9 +46,7 @@ void main() {
 
     await tester.pumpWidget(
       MaterialApp(
-        home: Scaffold(
-          body: MethodResultHistory(entries: entries),
-        ),
+        home: Scaffold(body: MethodResultHistory(entries: entries)),
       ),
     );
 
@@ -76,9 +75,7 @@ void main() {
 
     await tester.pumpWidget(
       MaterialApp(
-        home: Scaffold(
-          body: MethodResultHistory(entries: entries),
-        ),
+        home: Scaffold(body: MethodResultHistory(entries: entries)),
       ),
     );
 

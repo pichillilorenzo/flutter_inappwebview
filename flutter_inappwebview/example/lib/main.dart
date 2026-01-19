@@ -29,7 +29,6 @@ import 'package:flutter_inappwebview_example/utils/test_registry.dart';
 // import 'package:permission_handler/permission_handler.dart';
 
 final localhostServer = InAppLocalhostServer(documentRoot: 'assets');
-WebViewEnvironment? webViewEnvironment;
 
 Future main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -41,34 +40,14 @@ Future main() async {
   // await Permission.microphone.request();
   // await Permission.storage.request();
 
-  if (!kIsWeb && defaultTargetPlatform == TargetPlatform.windows) {
-    final availableVersion = await WebViewEnvironment.getAvailableVersion();
-    assert(
-      availableVersion != null,
-      'Failed to find an installed WebView2 runtime or non-stable Microsoft Edge installation.',
-    );
-
-    webViewEnvironment = await WebViewEnvironment.create(
-      settings: WebViewEnvironmentSettings(
-        additionalBrowserArguments: kDebugMode
-            ? '--enable-features=msEdgeDevToolsWdpRemoteDebugging'
-            : null,
-        userDataFolder: 'custom_path',
-      ),
-    );
-
-    webViewEnvironment?.onBrowserProcessExited = (detail) {
-      if (kDebugMode) {
-        print('Browser process exited with detail: $detail');
-      }
-    };
-  }
-
   if (!kIsWeb && defaultTargetPlatform == TargetPlatform.android) {
     await InAppWebViewController.setWebContentsDebuggingEnabled(kDebugMode);
   }
 
-  runApp(MyApp());
+  final settingsManager = SettingsManager();
+  await settingsManager.init();
+
+  runApp(MyApp(settingsManager: settingsManager));
 }
 
 Drawer buildDrawer({required BuildContext context}) {
@@ -268,6 +247,10 @@ Drawer buildDrawer({required BuildContext context}) {
 }
 
 class MyApp extends StatefulWidget {
+  const MyApp({super.key, required this.settingsManager});
+
+  final SettingsManager settingsManager;
+
   @override
   _MyAppState createState() => _MyAppState();
 }
@@ -289,7 +272,7 @@ class _MyAppState extends State<MyApp> {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => EventLogProvider()),
-        ChangeNotifierProvider(create: (_) => SettingsManager()),
+        ChangeNotifierProvider.value(value: widget.settingsManager),
         ChangeNotifierProvider(create: (_) => TestRunner()),
         ChangeNotifierProvider(create: (_) => NetworkMonitor()),
       ],

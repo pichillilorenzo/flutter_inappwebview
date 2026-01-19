@@ -43,9 +43,44 @@ class PlatformInfoScreen extends StatelessWidget {
           const SizedBox(height: 24),
           _buildSection(
             context,
-            title: 'Supported Features',
-            icon: Icons.check_circle_outline,
-            children: [_buildFeaturesList(context)],
+            title: 'Core WebView Features',
+            icon: Icons.web,
+            children: [_buildFeaturesList(context, _getCoreWebViewFeatures())],
+          ),
+          const SizedBox(height: 24),
+          _buildSection(
+            context,
+            title: 'Browser Features',
+            icon: Icons.open_in_browser,
+            children: [_buildFeaturesList(context, _getBrowserFeatures())],
+          ),
+          const SizedBox(height: 24),
+          _buildSection(
+            context,
+            title: 'Storage & Data',
+            icon: Icons.storage,
+            children: [_buildFeaturesList(context, _getStorageFeatures())],
+          ),
+          const SizedBox(height: 24),
+          _buildSection(
+            context,
+            title: 'Controllers',
+            icon: Icons.tune,
+            children: [_buildFeaturesList(context, _getControllerFeatures())],
+          ),
+          const SizedBox(height: 24),
+          _buildSection(
+            context,
+            title: 'Messaging & Communication',
+            icon: Icons.message,
+            children: [_buildFeaturesList(context, _getMessagingFeatures())],
+          ),
+          const SizedBox(height: 24),
+          _buildSection(
+            context,
+            title: 'Advanced Features',
+            icon: Icons.settings_applications,
+            children: [_buildFeaturesList(context, _getAdvancedFeatures())],
           ),
         ],
       ),
@@ -120,9 +155,7 @@ class PlatformInfoScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildFeaturesList(BuildContext context) {
-    final features = _getSupportedFeatures();
-
+  Widget _buildFeaturesList(BuildContext context, Map<String, bool> features) {
     return Column(
       children: features.entries.map((entry) {
         return Padding(
@@ -156,25 +189,86 @@ class PlatformInfoScreen extends StatelessWidget {
     return 'Unknown';
   }
 
-  Map<String, bool> _getSupportedFeatures() {
-    // Check various platform class support
+  /// Core WebView features
+  Map<String, bool> _getCoreWebViewFeatures() {
     try {
       return {
-        'InAppWebView': InAppWebViewController.isClassSupported(),
-        'CookieManager': CookieManager.isClassSupported(),
+        'InAppWebView (Widget)': InAppWebView.isClassSupported(),
+        'InAppWebViewController': InAppWebViewController.isClassSupported(),
+        'HeadlessInAppWebView': HeadlessInAppWebView.isClassSupported(),
+      };
+    } catch (e) {
+      return {};
+    }
+  }
+
+  /// Browser features
+  Map<String, bool> _getBrowserFeatures() {
+    try {
+      return {
         'InAppBrowser': InAppBrowser.isClassSupported(),
         'ChromeSafariBrowser': ChromeSafariBrowser.isClassSupported(),
+        'WebAuthenticationSession': WebAuthenticationSession.isClassSupported(),
+      };
+    } catch (e) {
+      return {};
+    }
+  }
+
+  /// Storage and data features
+  Map<String, bool> _getStorageFeatures() {
+    try {
+      return {
+        'CookieManager': CookieManager.isClassSupported(),
         'WebStorage': WebStorage.isClassSupported(),
+        'LocalStorage': LocalStorage.isClassSupported(),
+        'SessionStorage': SessionStorage.isClassSupported(),
+        'WebStorageManager': WebStorageManager.isClassSupported(),
         'HttpAuthCredentialDatabase':
             HttpAuthCredentialDatabase.isClassSupported(),
-        'ServiceWorkerController': ServiceWorkerController.isClassSupported(),
-        'WebViewEnvironment': WebViewEnvironment.isClassSupported(),
+      };
+    } catch (e) {
+      return {};
+    }
+  }
+
+  /// Controller features
+  Map<String, bool> _getControllerFeatures() {
+    try {
+      return {
         'PullToRefreshController': PullToRefreshController.isClassSupported(),
         'FindInteractionController':
             FindInteractionController.isClassSupported(),
+        'PrintJobController': PrintJobController.isClassSupported(),
+        'ServiceWorkerController': ServiceWorkerController.isClassSupported(),
+        'ProxyController': ProxyController.isClassSupported(),
+        'TracingController': TracingController.isClassSupported(),
       };
     } catch (e) {
-      // If platform is not initialized (e.g., in tests), return empty map
+      return {};
+    }
+  }
+
+  /// Messaging and communication features
+  Map<String, bool> _getMessagingFeatures() {
+    try {
+      return {
+        'WebMessageChannel': WebMessageChannel.isClassSupported(),
+        'WebMessageListener': WebMessageListener.isClassSupported(),
+      };
+    } catch (e) {
+      return {};
+    }
+  }
+
+  /// Advanced features
+  Map<String, bool> _getAdvancedFeatures() {
+    try {
+      return {
+        'WebViewEnvironment': WebViewEnvironment.isClassSupported(),
+        'ProcessGlobalConfig': ProcessGlobalConfig.isClassSupported(),
+      };
+    } catch (e) {
       return {};
     }
   }

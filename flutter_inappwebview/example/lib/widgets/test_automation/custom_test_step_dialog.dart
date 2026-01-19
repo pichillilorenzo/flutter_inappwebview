@@ -36,6 +36,7 @@ class _CustomTestStepDialogState extends State<CustomTestStepDialog> {
       CustomTestActionType.evaluateJavascript;
   String _selectedCategory = 'custom';
   bool _enabled = true;
+  ExpectedResultType _expectedResultType = ExpectedResultType.any;
 
   // Controller method selection
   ControllerMethodEntry? _selectedMethod;
@@ -82,6 +83,7 @@ class _CustomTestStepDialogState extends State<CustomTestStepDialog> {
       _selectedActionType = step.action.type;
       _selectedCategory = step.category;
       _enabled = step.enabled;
+      _expectedResultType = step.expectedResultType;
 
       // Load controller method if applicable
       if (step.action.type == CustomTestActionType.controllerMethod) {
@@ -196,12 +198,59 @@ class _CustomTestStepDialogState extends State<CustomTestStepDialog> {
               ..._buildActionFields(),
 
               const SizedBox(height: 16),
-              TextField(
-                controller: _expectedResultController,
+              const Text(
+                'Expected Result Validation',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 8),
+              DropdownButtonFormField<ExpectedResultType>(
+                value: _expectedResultType,
                 decoration: const InputDecoration(
-                  labelText: 'Expected Result (optional)',
-                  hintText: 'Enter expected result for comparison',
+                  labelText: 'Validation Type',
                   border: OutlineInputBorder(),
+                ),
+                items: ExpectedResultType.values.map((type) {
+                  return DropdownMenuItem(
+                    value: type,
+                    child: Text(_getExpectedResultTypeName(type)),
+                  );
+                }).toList(),
+                onChanged: (value) {
+                  if (value != null) {
+                    setState(() => _expectedResultType = value);
+                  }
+                },
+              ),
+              if (_needsExpectedResultValue(_expectedResultType)) ...[
+                const SizedBox(height: 12),
+                TextField(
+                  controller: _expectedResultController,
+                  decoration: InputDecoration(
+                    labelText: _getExpectedResultLabel(_expectedResultType),
+                    hintText: _getExpectedResultHint(_expectedResultType),
+                    border: const OutlineInputBorder(),
+                  ),
+                  maxLines:
+                      _expectedResultType == ExpectedResultType.regex ||
+                          _expectedResultType ==
+                              ExpectedResultType.customExpression
+                      ? 3
+                      : 1,
+                  style:
+                      _expectedResultType == ExpectedResultType.regex ||
+                          _expectedResultType ==
+                              ExpectedResultType.customExpression
+                      ? const TextStyle(fontFamily: 'monospace')
+                      : null,
+                ),
+              ],
+              const SizedBox(height: 8),
+              Text(
+                _getExpectedResultTypeDescription(_expectedResultType),
+                style: TextStyle(
+                  fontSize: 12,
+                  color: Colors.grey.shade600,
+                  fontStyle: FontStyle.italic,
                 ),
               ),
               const SizedBox(height: 12),
@@ -608,6 +657,144 @@ class _CustomTestStepDialogState extends State<CustomTestStepDialog> {
     }
   }
 
+  String _getExpectedResultTypeName(ExpectedResultType type) {
+    switch (type) {
+      case ExpectedResultType.any:
+        return 'Any (No Validation)';
+      case ExpectedResultType.exact:
+        return 'Exact Match';
+      case ExpectedResultType.contains:
+        return 'Contains (Case Sensitive)';
+      case ExpectedResultType.containsIgnoreCase:
+        return 'Contains (Case Insensitive)';
+      case ExpectedResultType.regex:
+        return 'Regex Pattern';
+      case ExpectedResultType.notNull:
+        return 'Not Null';
+      case ExpectedResultType.isNull:
+        return 'Is Null';
+      case ExpectedResultType.truthy:
+        return 'Truthy Value';
+      case ExpectedResultType.falsy:
+        return 'Falsy Value';
+      case ExpectedResultType.typeIs:
+        return 'Type Check';
+      case ExpectedResultType.notEmpty:
+        return 'Not Empty';
+      case ExpectedResultType.hasKey:
+        return 'Has Key (Map)';
+      case ExpectedResultType.lengthEquals:
+        return 'Length Equals';
+      case ExpectedResultType.greaterThan:
+        return 'Greater Than';
+      case ExpectedResultType.lessThan:
+        return 'Less Than';
+      case ExpectedResultType.customExpression:
+        return 'Custom Expression';
+    }
+  }
+
+  String _getExpectedResultTypeDescription(ExpectedResultType type) {
+    switch (type) {
+      case ExpectedResultType.any:
+        return 'Test passes as long as it executes without errors';
+      case ExpectedResultType.exact:
+        return 'Result must exactly match the expected value (as string)';
+      case ExpectedResultType.contains:
+        return 'Result string must contain the expected value';
+      case ExpectedResultType.containsIgnoreCase:
+        return 'Result string must contain the expected value (ignoring case)';
+      case ExpectedResultType.regex:
+        return 'Result must match the regular expression pattern';
+      case ExpectedResultType.notNull:
+        return 'Result must not be null';
+      case ExpectedResultType.isNull:
+        return 'Result must be null';
+      case ExpectedResultType.truthy:
+        return 'Result must be truthy (not null, false, 0, or empty)';
+      case ExpectedResultType.falsy:
+        return 'Result must be falsy (null, false, 0, or empty)';
+      case ExpectedResultType.typeIs:
+        return 'Result type must match (e.g., String, int, Map, List)';
+      case ExpectedResultType.notEmpty:
+        return 'Result must not be empty (string, list, or map)';
+      case ExpectedResultType.hasKey:
+        return 'Result Map must contain the specified key';
+      case ExpectedResultType.lengthEquals:
+        return 'Result length must equal the specified number';
+      case ExpectedResultType.greaterThan:
+        return 'Numeric result must be greater than the expected value';
+      case ExpectedResultType.lessThan:
+        return 'Numeric result must be less than the expected value';
+      case ExpectedResultType.customExpression:
+        return 'Custom JavaScript expression (receives "result" variable)';
+    }
+  }
+
+  bool _needsExpectedResultValue(ExpectedResultType type) {
+    switch (type) {
+      case ExpectedResultType.any:
+      case ExpectedResultType.notNull:
+      case ExpectedResultType.isNull:
+      case ExpectedResultType.truthy:
+      case ExpectedResultType.falsy:
+      case ExpectedResultType.notEmpty:
+        return false;
+      default:
+        return true;
+    }
+  }
+
+  String _getExpectedResultLabel(ExpectedResultType type) {
+    switch (type) {
+      case ExpectedResultType.exact:
+        return 'Expected Value';
+      case ExpectedResultType.contains:
+      case ExpectedResultType.containsIgnoreCase:
+        return 'Contains Text';
+      case ExpectedResultType.regex:
+        return 'Regex Pattern';
+      case ExpectedResultType.typeIs:
+        return 'Type Name';
+      case ExpectedResultType.hasKey:
+        return 'Key Name';
+      case ExpectedResultType.lengthEquals:
+        return 'Expected Length';
+      case ExpectedResultType.greaterThan:
+      case ExpectedResultType.lessThan:
+        return 'Comparison Value';
+      case ExpectedResultType.customExpression:
+        return 'JavaScript Expression';
+      default:
+        return 'Expected Value';
+    }
+  }
+
+  String _getExpectedResultHint(ExpectedResultType type) {
+    switch (type) {
+      case ExpectedResultType.exact:
+        return 'Enter the exact expected result';
+      case ExpectedResultType.contains:
+      case ExpectedResultType.containsIgnoreCase:
+        return 'Enter text to search for';
+      case ExpectedResultType.regex:
+        return '^https?://.*\\.com\$';
+      case ExpectedResultType.typeIs:
+        return 'String, int, Map, List, etc.';
+      case ExpectedResultType.hasKey:
+        return 'Key name to check';
+      case ExpectedResultType.lengthEquals:
+        return '10';
+      case ExpectedResultType.greaterThan:
+      case ExpectedResultType.lessThan:
+        return 'Numeric value';
+      case ExpectedResultType.customExpression:
+        return 'return result != null && result.length > 0;';
+      default:
+        return '';
+    }
+  }
+
   void _saveStep() {
     final name = _nameController.text.trim();
     if (name.isEmpty) {
@@ -625,6 +812,17 @@ class _CustomTestStepDialogState extends State<CustomTestStepDialog> {
       return;
     }
 
+    // Validate expected result if needed
+    if (_needsExpectedResultValue(_expectedResultType) &&
+        _expectedResultController.text.trim().isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please provide an expected result value'),
+        ),
+      );
+      return;
+    }
+
     final step = CustomTestStep(
       id:
           widget.existingStep?.id ??
@@ -636,6 +834,7 @@ class _CustomTestStepDialogState extends State<CustomTestStepDialog> {
       expectedResult: _expectedResultController.text.trim().isNotEmpty
           ? _expectedResultController.text.trim()
           : null,
+      expectedResultType: _expectedResultType,
       enabled: _enabled,
       order: widget.existingStep?.order ?? 0,
     );

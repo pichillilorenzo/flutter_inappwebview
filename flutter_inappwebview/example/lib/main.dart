@@ -8,6 +8,7 @@ import 'package:flutter_inappwebview_example/providers/event_log_provider.dart';
 import 'package:flutter_inappwebview_example/providers/settings_manager.dart';
 import 'package:flutter_inappwebview_example/providers/test_runner.dart';
 import 'package:flutter_inappwebview_example/providers/network_monitor.dart';
+import 'package:flutter_inappwebview_example/models/test_configuration.dart';
 import 'package:flutter_inappwebview_example/screens/platform_info_screen.dart';
 import 'package:flutter_inappwebview_example/screens/webview_tester_screen.dart';
 import 'package:flutter_inappwebview_example/screens/settings_editor_screen.dart';
@@ -291,6 +292,7 @@ class _MyAppState extends State<MyApp> {
         ChangeNotifierProvider.value(value: widget.settingsManager),
         ChangeNotifierProvider(create: (_) => TestRunner()),
         ChangeNotifierProvider(create: (_) => NetworkMonitor()),
+        ChangeNotifierProvider(create: (_) => TestConfigurationManager()),
       ],
       child: _buildMaterialApp(),
     );

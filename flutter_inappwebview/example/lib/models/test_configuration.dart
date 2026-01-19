@@ -10,6 +10,57 @@ enum TestWebViewType {
   headless,
 }
 
+/// Specifies how to match the expected result
+enum ExpectedResultType {
+  /// Exact string match
+  exact,
+
+  /// Contains the expected value (case-sensitive)
+  contains,
+
+  /// Contains the expected value (case-insensitive)
+  containsIgnoreCase,
+
+  /// Matches a regular expression pattern
+  regex,
+
+  /// Result is not null
+  notNull,
+
+  /// Result is null
+  isNull,
+
+  /// Result is truthy (not null, not false, not empty)
+  truthy,
+
+  /// Result is falsy (null, false, or empty)
+  falsy,
+
+  /// Result type matches (e.g., 'String', 'int', 'Map', 'List')
+  typeIs,
+
+  /// Result is a non-empty string
+  notEmpty,
+
+  /// Result is a Map with specific key
+  hasKey,
+
+  /// Result is a List with specific length
+  lengthEquals,
+
+  /// Result is a number greater than expected
+  greaterThan,
+
+  /// Result is a number less than expected
+  lessThan,
+
+  /// Custom JavaScript expression to validate (receives 'result' variable)
+  customExpression,
+
+  /// Any result is acceptable (no validation)
+  any,
+}
+
 /// Represents a custom test step that can be defined by the user
 class CustomTestStep {
   final String id;
@@ -18,7 +69,13 @@ class CustomTestStep {
   final String category;
   final CustomTestAction action;
   final Map<String, dynamic> parameters;
+
+  /// The expected result value (interpretation depends on expectedResultType)
   final String? expectedResult;
+
+  /// How to match/validate the expected result
+  final ExpectedResultType expectedResultType;
+
   final bool enabled;
   final int order;
 
@@ -30,6 +87,7 @@ class CustomTestStep {
     required this.action,
     this.parameters = const {},
     this.expectedResult,
+    this.expectedResultType = ExpectedResultType.any,
     this.enabled = true,
     this.order = 0,
   });
@@ -42,6 +100,7 @@ class CustomTestStep {
     CustomTestAction? action,
     Map<String, dynamic>? parameters,
     String? expectedResult,
+    ExpectedResultType? expectedResultType,
     bool? enabled,
     int? order,
   }) {
@@ -53,6 +112,7 @@ class CustomTestStep {
       action: action ?? this.action,
       parameters: parameters ?? this.parameters,
       expectedResult: expectedResult ?? this.expectedResult,
+      expectedResultType: expectedResultType ?? this.expectedResultType,
       enabled: enabled ?? this.enabled,
       order: order ?? this.order,
     );
@@ -67,6 +127,7 @@ class CustomTestStep {
       'action': action.toJson(),
       'parameters': parameters,
       'expectedResult': expectedResult,
+      'expectedResultType': expectedResultType.name,
       'enabled': enabled,
       'order': order,
     };
@@ -81,9 +142,121 @@ class CustomTestStep {
       action: CustomTestAction.fromJson(json['action'] as Map<String, dynamic>),
       parameters: (json['parameters'] as Map<String, dynamic>?) ?? {},
       expectedResult: json['expectedResult'] as String?,
+      expectedResultType: ExpectedResultType.values.firstWhere(
+        (e) => e.name == json['expectedResultType'],
+        orElse: () => ExpectedResultType.any,
+      ),
       enabled: json['enabled'] as bool? ?? true,
       order: json['order'] as int? ?? 0,
     );
+  }
+
+  /// Validates a result against the expected result configuration
+  bool validateResult(dynamic result) {
+    switch (expectedResultType) {
+      case ExpectedResultType.any:
+        return true;
+      case ExpectedResultType.exact:
+        return result?.toString() == expectedResult;
+      case ExpectedResultType.contains:
+        return result?.toString().contains(expectedResult ?? '') ?? false;
+      case ExpectedResultType.containsIgnoreCase:
+        return result?.toString().toLowerCase().contains(
+              (expectedResult ?? '').toLowerCase(),
+            ) ??
+            false;
+      case ExpectedResultType.regex:
+        if (expectedResult == null) return false;
+        try {
+          return RegExp(expectedResult!).hasMatch(result?.toString() ?? '');
+        } catch (_) {
+          return false;
+        }
+      case ExpectedResultType.notNull:
+        return result != null;
+      case ExpectedResultType.isNull:
+        return result == null;
+      case ExpectedResultType.truthy:
+        if (result == null) return false;
+        if (result is bool) return result;
+        if (result is String) return result.isNotEmpty;
+        if (result is num) return result != 0;
+        if (result is List) return result.isNotEmpty;
+        if (result is Map) return result.isNotEmpty;
+        return true;
+      case ExpectedResultType.falsy:
+        if (result == null) return true;
+        if (result is bool) return !result;
+        if (result is String) return result.isEmpty;
+        if (result is num) return result == 0;
+        if (result is List) return result.isEmpty;
+        if (result is Map) return result.isEmpty;
+        return false;
+      case ExpectedResultType.typeIs:
+        if (expectedResult == null) return false;
+        final typeName = result.runtimeType.toString();
+        return typeName == expectedResult ||
+            typeName.startsWith('${expectedResult}<') ||
+            _matchesSimpleType(result, expectedResult!);
+      case ExpectedResultType.notEmpty:
+        if (result == null) return false;
+        if (result is String) return result.isNotEmpty;
+        if (result is List) return result.isNotEmpty;
+        if (result is Map) return result.isNotEmpty;
+        return true;
+      case ExpectedResultType.hasKey:
+        if (result is! Map || expectedResult == null) return false;
+        return result.containsKey(expectedResult);
+      case ExpectedResultType.lengthEquals:
+        if (expectedResult == null) return false;
+        final expectedLength = int.tryParse(expectedResult!);
+        if (expectedLength == null) return false;
+        if (result is List) return result.length == expectedLength;
+        if (result is String) return result.length == expectedLength;
+        if (result is Map) return result.length == expectedLength;
+        return false;
+      case ExpectedResultType.greaterThan:
+        if (expectedResult == null) return false;
+        final expectedNum = num.tryParse(expectedResult!);
+        if (expectedNum == null || result is! num) return false;
+        return result > expectedNum;
+      case ExpectedResultType.lessThan:
+        if (expectedResult == null) return false;
+        final expectedNum = num.tryParse(expectedResult!);
+        if (expectedNum == null || result is! num) return false;
+        return result < expectedNum;
+      case ExpectedResultType.customExpression:
+        // Custom expressions should be handled by the test runner with JavaScript
+        return true;
+    }
+  }
+
+  /// Helper to match simple type names
+  static bool _matchesSimpleType(dynamic value, String typeName) {
+    switch (typeName.toLowerCase()) {
+      case 'string':
+        return value is String;
+      case 'int':
+      case 'integer':
+        return value is int;
+      case 'double':
+      case 'float':
+        return value is double;
+      case 'num':
+      case 'number':
+        return value is num;
+      case 'bool':
+      case 'boolean':
+        return value is bool;
+      case 'list':
+      case 'array':
+        return value is List;
+      case 'map':
+      case 'object':
+        return value is Map;
+      default:
+        return false;
+    }
   }
 }
 

@@ -315,7 +315,12 @@ public class InAppWebView: WKWebView, WKUIDelegate,
             }
             
             if #available(macOS 11.3, *) {
-                configuration.upgradeKnownHostsToHTTPS = settings.upgradeKnownHostsToHTTPS
+                if configuration.responds(
+                    to: Selector(("setUpgradeKnownHostsToHTTPS:"))
+                ) {
+                    configuration.upgradeKnownHostsToHTTPS =
+                        settings.upgradeKnownHostsToHTTPS
+                }
             }
         }
         

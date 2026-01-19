@@ -12,6 +12,8 @@ class ProfileSelectorCard extends StatelessWidget {
 
   final VoidCallback onEditSettingsProfile;
 
+  static const double _desktopBreakpoint = 600;
+
   @override
   Widget build(BuildContext context) {
     return Consumer<SettingsManager>(
@@ -28,18 +30,42 @@ class ProfileSelectorCard extends StatelessWidget {
         return Card(
           child: Padding(
             padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  'Profiles',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 12),
-                _buildSettingsProfileRow(context, settingsManager),
-                const SizedBox(height: 16),
-                _buildEnvironmentProfileRow(context, settingsManager),
-              ],
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                final isWide = constraints.maxWidth >= _desktopBreakpoint;
+
+                if (isWide) {
+                  // Desktop: Two columns side by side
+                  return Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        child: _buildSettingsProfileRow(
+                          context,
+                          settingsManager,
+                        ),
+                      ),
+                      const SizedBox(width: 24),
+                      Expanded(
+                        child: _buildEnvironmentProfileRow(
+                          context,
+                          settingsManager,
+                        ),
+                      ),
+                    ],
+                  );
+                } else {
+                  // Mobile: One column stacked
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildSettingsProfileRow(context, settingsManager),
+                      const SizedBox(height: 16),
+                      _buildEnvironmentProfileRow(context, settingsManager),
+                    ],
+                  );
+                }
+              },
             ),
           ),
         );

@@ -75,13 +75,6 @@ class InAppBrowserScreen extends StatefulWidget {
 }
 
 class _InAppBrowserScreenState extends State<InAppBrowserScreen> {
-  final TextEditingController _urlController = TextEditingController(
-    text: 'https://flutter.dev',
-  );
-  final TextEditingController _dataController = TextEditingController(
-    text:
-        '<html><body><h1>Hello InAppBrowser!</h1><p>This is HTML data.</p></body></html>',
-  );
   final TextEditingController _menuItemIdController = TextEditingController();
   final TextEditingController _menuItemTitleController = TextEditingController(
     text: 'Custom Menu Item',
@@ -139,8 +132,6 @@ class _InAppBrowserScreenState extends State<InAppBrowserScreen> {
 
   @override
   void dispose() {
-    _urlController.dispose();
-    _dataController.dispose();
     _menuItemIdController.dispose();
     _menuItemTitleController.dispose();
     _browser?.dispose();
@@ -164,7 +155,7 @@ class _InAppBrowserScreenState extends State<InAppBrowserScreen> {
       context: context,
       title: 'openUrlRequest',
       parameters: {
-        'url': _urlController.text.trim(),
+        'url': 'https://flutter.dev',
         'toolbarTopBackgroundColor': Colors.blue,
         'presentationStyle': 'FULL_SCREEN',
         'javaScriptEnabled': true,
@@ -182,7 +173,6 @@ class _InAppBrowserScreenState extends State<InAppBrowserScreen> {
       );
       return;
     }
-    _urlController.text = url;
 
     setState(() => _isLoading = true);
     try {
@@ -279,7 +269,8 @@ class _InAppBrowserScreenState extends State<InAppBrowserScreen> {
       context: context,
       title: 'openData',
       parameters: {
-        'data': _dataController.text.trim(),
+        'data':
+            '<html><body><h1>Hello InAppBrowser!</h1><p>This is HTML data.</p></body></html>',
         'mimeType': 'text/html',
         'encoding': 'utf8',
         'toolbarTopBackgroundColor': Colors.purple,
@@ -293,7 +284,6 @@ class _InAppBrowserScreenState extends State<InAppBrowserScreen> {
       _recordMethodResult('openData', 'Please enter HTML data', isError: true);
       return;
     }
-    _dataController.text = data;
 
     setState(() => _isLoading = true);
     try {
@@ -326,7 +316,7 @@ class _InAppBrowserScreenState extends State<InAppBrowserScreen> {
     final params = await showParameterDialog(
       context: context,
       title: 'openWithSystemBrowser',
-      parameters: {'url': _urlController.text.trim()},
+      parameters: {'url': 'https://flutter.dev'},
       requiredPaths: ['url'],
     );
 
@@ -340,7 +330,6 @@ class _InAppBrowserScreenState extends State<InAppBrowserScreen> {
       );
       return;
     }
-    _urlController.text = url;
 
     setState(() => _isLoading = true);
     try {
@@ -570,6 +559,7 @@ class _InAppBrowserScreenState extends State<InAppBrowserScreen> {
     String methodName,
     String message, {
     required bool isError,
+    dynamic value,
   }) {
     setState(() {
       final entries = List<MethodResultEntry>.from(
@@ -581,6 +571,7 @@ class _InAppBrowserScreenState extends State<InAppBrowserScreen> {
           message: message,
           isError: isError,
           timestamp: DateTime.now(),
+          value: value,
         ),
       );
       if (entries.length > _maxHistoryEntries) {
@@ -681,8 +672,6 @@ class _InAppBrowserScreenState extends State<InAppBrowserScreen> {
           _buildStatusCard(),
           const SizedBox(height: 16),
           _buildInitStatusSection(),
-          _buildUrlInput(),
-          const SizedBox(height: 16),
           _buildOpenMethods(),
           const SizedBox(height: 16),
           _buildMenuItemsSection(),
@@ -728,43 +717,6 @@ class _InAppBrowserScreenState extends State<InAppBrowserScreen> {
                   ),
                 ],
               ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildUrlInput() {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'URL / Data Input',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 12),
-            TextField(
-              controller: _urlController,
-              decoration: const InputDecoration(
-                labelText: 'URL',
-                hintText: 'https://flutter.dev',
-                border: OutlineInputBorder(),
-                isDense: true,
-              ),
-            ),
-            const SizedBox(height: 12),
-            TextField(
-              controller: _dataController,
-              decoration: const InputDecoration(
-                labelText: 'HTML Data',
-                border: OutlineInputBorder(),
-                isDense: true,
-              ),
-              maxLines: 3,
             ),
           ],
         ),

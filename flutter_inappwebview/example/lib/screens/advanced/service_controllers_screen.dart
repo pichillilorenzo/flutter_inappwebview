@@ -144,6 +144,7 @@ class _ServiceControllersScreenState extends State<ServiceControllersScreen> {
     String methodName,
     String message, {
     required bool isError,
+    dynamic value,
   }) {
     setState(() {
       final entries = List<MethodResultEntry>.from(
@@ -155,6 +156,7 @@ class _ServiceControllersScreenState extends State<ServiceControllersScreen> {
           message: message,
           isError: isError,
           timestamp: DateTime.now(),
+          value: value,
         ),
       );
       if (entries.length > _maxHistoryEntries) {

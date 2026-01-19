@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -5,12 +7,25 @@ class MethodResultEntry {
   final String message;
   final bool isError;
   final DateTime timestamp;
+  final dynamic value;
 
   const MethodResultEntry({
     required this.message,
     required this.isError,
     required this.timestamp,
+    this.value,
   });
+
+  /// Returns the copyable string representation of the result value.
+  /// Attempts JSON encoding first, falls back to toString().
+  String get copyableValue {
+    if (value == null) return message;
+    try {
+      return const JsonEncoder.withIndent('  ').convert(value);
+    } catch (_) {
+      return value.toString();
+    }
+  }
 }
 
 class MethodResultHistory extends StatelessWidget {
@@ -70,7 +85,9 @@ class MethodResultHistory extends StatelessWidget {
               icon: const Icon(Icons.content_copy, size: 16),
               tooltip: copyTooltip,
               onPressed: () {
-                Clipboard.setData(ClipboardData(text: selectedEntry.message));
+                Clipboard.setData(
+                  ClipboardData(text: selectedEntry.copyableValue),
+                );
               },
             ),
           ],

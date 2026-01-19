@@ -14,6 +14,7 @@ enum ParameterValueType {
   bytes,
   list,
   map,
+  enumeration,
 }
 
 class ParameterValueHint<T> {
@@ -21,6 +22,18 @@ class ParameterValueHint<T> {
   final ParameterValueType type;
 
   const ParameterValueHint(this.value, this.type);
+}
+
+/// A specialized hint for enum parameters that includes available values
+class EnumParameterValueHint<T extends Enum> extends ParameterValueHint<T> {
+  /// The list of all available enum values
+  final List<T> enumValues;
+
+  /// Optional display names for enum values (uses enum name if not provided)
+  final String Function(T)? displayName;
+
+  const EnumParameterValueHint(T? value, this.enumValues, {this.displayName})
+    : super(value, ParameterValueType.enumeration);
 }
 
 Future<Map<String, dynamic>?> showParameterDialog({
@@ -66,6 +79,9 @@ class _ParameterDialogState extends State<ParameterDialog> {
   final Map<String, ParameterValueType> _hintedTypes = {};
   final Map<String, String?> _errors = {};
 
+  /// Stores enum metadata for enum parameters (key -> EnumInfo)
+  final Map<String, _EnumInfo> _enumInfoMap = {};
+
   late Map<String, dynamic> _editedParameters;
 
   @override
@@ -94,6 +110,16 @@ class _ParameterDialogState extends State<ParameterDialog> {
         for (var i = 0; i < value.length; i++) {
           walk(value[i], [...path, i]);
         }
+        return;
+      }
+      if (value is EnumParameterValueHint) {
+        final key = _pathKey(path);
+        _hintedTypes[key] = ParameterValueType.enumeration;
+        _enumInfoMap[key] = _EnumInfo(
+          values: value.enumValues,
+          displayName: value.displayName ?? (e) => e.name,
+        );
+        ParameterDialogUtils.setValueAtPath(cloned, path, value.value);
         return;
       }
       if (value is ParameterValueHint) {
@@ -570,11 +596,12 @@ class _ParameterDialogState extends State<ParameterDialog> {
             TextField(
               controller: controller,
               decoration: InputDecoration(
-                labelText: 'Base64 (prefix with base64:) or text',
+                labelText: 'Enter text (UTF-8) or base64:... for binary',
+                hintText: 'Type text here or paste base64:...',
                 border: const OutlineInputBorder(),
                 errorText: errorText,
               ),
-              maxLines: 3,
+              maxLines: 4,
             ),
             const SizedBox(height: 6),
             Row(
@@ -586,6 +613,10 @@ class _ParameterDialogState extends State<ParameterDialog> {
                 ),
                 if (value is Uint8List) Text('(${value.length} bytes)'),
               ],
+            ),
+            Text(
+              'Tip: Plain text is converted to UTF-8 bytes. Use "base64:..." prefix for binary data.',
+              style: TextStyle(fontSize: 11, color: Colors.grey.shade600),
             ),
           ],
         );
@@ -624,6 +655,52 @@ class _ParameterDialogState extends State<ParameterDialog> {
             errorText: errorText,
           ),
         );
+        break;
+      case ParameterValueType.enumeration:
+        final enumInfo = _enumInfoMap[key];
+        if (enumInfo == null) {
+          // Fallback to string field if no enum info
+          final controller = _getController(
+            path,
+            value?.toString() ?? '',
+            ParameterValueType.string,
+          );
+          field = TextField(
+            controller: controller,
+            decoration: InputDecoration(
+              labelText: label,
+              border: const OutlineInputBorder(),
+              errorText: errorText,
+            ),
+          );
+        } else {
+          field = DropdownButtonFormField<Enum>(
+            value: value as Enum?,
+            decoration: InputDecoration(
+              labelText: label,
+              border: const OutlineInputBorder(),
+              errorText: errorText,
+            ),
+            items: [
+              const DropdownMenuItem<Enum>(value: null, child: Text('(none)')),
+              ...enumInfo.values.map(
+                (enumValue) => DropdownMenuItem<Enum>(
+                  value: enumValue,
+                  child: Text(enumInfo.displayName(enumValue)),
+                ),
+              ),
+            ],
+            onChanged: (newValue) {
+              setState(() {
+                ParameterDialogUtils.setValueAtPath(
+                  _editedParameters,
+                  path,
+                  newValue,
+                );
+              });
+            },
+          );
+        }
         break;
     }
 
@@ -664,64 +741,279 @@ class _ParameterDialogState extends State<ParameterDialog> {
   }
 }
 
-class _ColorPickerDialog extends StatelessWidget {
+/// Internal class to store enum metadata
+class _EnumInfo {
+  final List<Enum> values;
+  final String Function(Enum) displayName;
+
+  const _EnumInfo({required this.values, required this.displayName});
+}
+
+class _ColorPickerDialog extends StatefulWidget {
   final Color? current;
 
   const _ColorPickerDialog({this.current});
 
   @override
+  State<_ColorPickerDialog> createState() => _ColorPickerDialogState();
+}
+
+class _ColorPickerDialogState extends State<_ColorPickerDialog> {
+  late HSVColor _hsvColor;
+  late TextEditingController _hexController;
+
+  // Common preset colors for quick selection
+  static const List<Color> _presetColors = [
+    Colors.red,
+    Colors.pink,
+    Colors.purple,
+    Colors.deepPurple,
+    Colors.indigo,
+    Colors.blue,
+    Colors.lightBlue,
+    Colors.cyan,
+    Colors.teal,
+    Colors.green,
+    Colors.lightGreen,
+    Colors.lime,
+    Colors.yellow,
+    Colors.amber,
+    Colors.orange,
+    Colors.deepOrange,
+    Colors.brown,
+    Colors.grey,
+    Colors.blueGrey,
+    Colors.black,
+    Colors.white,
+  ];
+
+  @override
+  void initState() {
+    super.initState();
+    _hsvColor = HSVColor.fromColor(widget.current ?? Colors.blue);
+    _hexController = TextEditingController(
+      text: _colorToHex(_hsvColor.toColor()),
+    );
+  }
+
+  @override
+  void dispose() {
+    _hexController.dispose();
+    super.dispose();
+  }
+
+  String _colorToHex(Color color) {
+    return '#${color.value.toRadixString(16).padLeft(8, '0').substring(2).toUpperCase()}';
+  }
+
+  Color? _hexToColor(String hex) {
+    hex = hex.replaceAll('#', '');
+    if (hex.length == 6) {
+      hex = 'FF$hex';
+    }
+    if (hex.length != 8) return null;
+    final value = int.tryParse(hex, radix: 16);
+    if (value == null) return null;
+    return Color(value);
+  }
+
+  void _updateFromHex(String hex) {
+    final color = _hexToColor(hex);
+    if (color != null) {
+      setState(() {
+        _hsvColor = HSVColor.fromColor(color);
+      });
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final colors = <Color>[
-      Colors.red,
-      Colors.pink,
-      Colors.purple,
-      Colors.deepPurple,
-      Colors.indigo,
-      Colors.blue,
-      Colors.lightBlue,
-      Colors.cyan,
-      Colors.teal,
-      Colors.green,
-      Colors.lightGreen,
-      Colors.lime,
-      Colors.yellow,
-      Colors.amber,
-      Colors.orange,
-      Colors.deepOrange,
-      Colors.brown,
-      Colors.grey,
-      Colors.blueGrey,
-      Colors.black,
-    ];
+    final currentColor = _hsvColor.toColor();
 
     return AlertDialog(
       title: const Text('Pick a color'),
       content: SizedBox(
-        width: 280,
-        child: Wrap(
-          spacing: 8,
-          runSpacing: 8,
-          children: colors
-              .map(
-                (color) => GestureDetector(
-                  onTap: () => Navigator.pop(context, color),
-                  child: Container(
-                    width: 32,
-                    height: 32,
-                    decoration: BoxDecoration(
-                      color: color,
-                      borderRadius: BorderRadius.circular(6),
-                      border: Border.all(
-                        color: current == color
-                            ? Colors.black
-                            : Colors.transparent,
-                        width: 2,
-                      ),
-                    ),
+        width: 320,
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Color preview
+              Container(
+                height: 50,
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  color: currentColor,
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: Colors.grey.shade300),
+                ),
+              ),
+              const SizedBox(height: 16),
+
+              // Hue slider
+              _buildSliderRow(
+                label: 'Hue',
+                value: _hsvColor.hue,
+                max: 360,
+                activeColor: HSVColor.fromAHSV(
+                  1,
+                  _hsvColor.hue,
+                  1,
+                  1,
+                ).toColor(),
+                gradient: LinearGradient(
+                  colors: List.generate(
+                    7,
+                    (i) => HSVColor.fromAHSV(1, i * 60.0, 1, 1).toColor(),
                   ),
                 ),
-              )
-              .toList(),
+                onChanged: (value) {
+                  setState(() {
+                    _hsvColor = _hsvColor.withHue(value);
+                    _hexController.text = _colorToHex(_hsvColor.toColor());
+                  });
+                },
+              ),
+
+              // Saturation slider
+              _buildSliderRow(
+                label: 'Saturation',
+                value: _hsvColor.saturation * 100,
+                max: 100,
+                activeColor: currentColor,
+                gradient: LinearGradient(
+                  colors: [
+                    HSVColor.fromAHSV(
+                      1,
+                      _hsvColor.hue,
+                      0,
+                      _hsvColor.value,
+                    ).toColor(),
+                    HSVColor.fromAHSV(
+                      1,
+                      _hsvColor.hue,
+                      1,
+                      _hsvColor.value,
+                    ).toColor(),
+                  ],
+                ),
+                onChanged: (value) {
+                  setState(() {
+                    _hsvColor = _hsvColor.withSaturation(value / 100);
+                    _hexController.text = _colorToHex(_hsvColor.toColor());
+                  });
+                },
+              ),
+
+              // Value/Brightness slider
+              _buildSliderRow(
+                label: 'Brightness',
+                value: _hsvColor.value * 100,
+                max: 100,
+                activeColor: currentColor,
+                gradient: LinearGradient(
+                  colors: [
+                    Colors.black,
+                    HSVColor.fromAHSV(
+                      1,
+                      _hsvColor.hue,
+                      _hsvColor.saturation,
+                      1,
+                    ).toColor(),
+                  ],
+                ),
+                onChanged: (value) {
+                  setState(() {
+                    _hsvColor = _hsvColor.withValue(value / 100);
+                    _hexController.text = _colorToHex(_hsvColor.toColor());
+                  });
+                },
+              ),
+
+              const SizedBox(height: 12),
+
+              // Hex input
+              Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: _hexController,
+                      decoration: const InputDecoration(
+                        labelText: 'Hex',
+                        border: OutlineInputBorder(),
+                        isDense: true,
+                        prefixText: '#',
+                      ),
+                      onChanged: _updateFromHex,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  // RGB display
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'R: ${currentColor.red}',
+                        style: const TextStyle(fontSize: 11),
+                      ),
+                      Text(
+                        'G: ${currentColor.green}',
+                        style: const TextStyle(fontSize: 11),
+                      ),
+                      Text(
+                        'B: ${currentColor.blue}',
+                        style: const TextStyle(fontSize: 11),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+
+              const SizedBox(height: 16),
+
+              // Preset colors
+              const Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  'Presets',
+                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+                ),
+              ),
+              const SizedBox(height: 8),
+              Wrap(
+                spacing: 6,
+                runSpacing: 6,
+                children: _presetColors
+                    .map(
+                      (color) => GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            _hsvColor = HSVColor.fromColor(color);
+                            _hexController.text = _colorToHex(color);
+                          });
+                        },
+                        child: Container(
+                          width: 28,
+                          height: 28,
+                          decoration: BoxDecoration(
+                            color: color,
+                            borderRadius: BorderRadius.circular(4),
+                            border: Border.all(
+                              color: _hsvColor.toColor().value == color.value
+                                  ? Colors.black
+                                  : Colors.grey.shade300,
+                              width: _hsvColor.toColor().value == color.value
+                                  ? 2
+                                  : 1,
+                            ),
+                          ),
+                        ),
+                      ),
+                    )
+                    .toList(),
+              ),
+            ],
+          ),
         ),
       ),
       actions: [
@@ -729,7 +1021,65 @@ class _ColorPickerDialog extends StatelessWidget {
           onPressed: () => Navigator.pop(context),
           child: const Text('Cancel'),
         ),
+        ElevatedButton(
+          onPressed: () => Navigator.pop(context, currentColor),
+          child: const Text('Select'),
+        ),
       ],
+    );
+  }
+
+  Widget _buildSliderRow({
+    required String label,
+    required double value,
+    required double max,
+    required Color activeColor,
+    required Gradient gradient,
+    required ValueChanged<double> onChanged,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(label, style: const TextStyle(fontSize: 12)),
+              Text(
+                value.toStringAsFixed(0),
+                style: const TextStyle(fontSize: 12),
+              ),
+            ],
+          ),
+          const SizedBox(height: 4),
+          Container(
+            height: 24,
+            decoration: BoxDecoration(
+              gradient: gradient,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: SliderTheme(
+              data: SliderThemeData(
+                trackHeight: 24,
+                thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 10),
+                overlayShape: const RoundSliderOverlayShape(overlayRadius: 16),
+                trackShape: const RoundedRectSliderTrackShape(),
+                activeTrackColor: Colors.transparent,
+                inactiveTrackColor: Colors.transparent,
+                thumbColor: Colors.white,
+                overlayColor: activeColor.withOpacity(0.2),
+              ),
+              child: Slider(
+                value: value,
+                min: 0,
+                max: max,
+                onChanged: onChanged,
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

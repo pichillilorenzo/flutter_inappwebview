@@ -184,27 +184,16 @@ class _HeadlessWebViewScreenState extends State<HeadlessWebViewScreen> {
 
   Future<void> _run() async {
     final settingsManager = context.read<SettingsManager>();
-    final params = await showParameterDialog(
-      context: context,
-      title: 'Run Headless WebView',
-      parameters: {
-        'url': _urlController.text.trim(),
-        'width': double.tryParse(_widthController.text) ?? 1024,
-        'height': double.tryParse(_heightController.text) ?? 768,
-        'javaScriptEnabled': true,
-      },
-      requiredPaths: ['url', 'width', 'height'],
-    );
 
-    if (params == null) return;
-    final url = params['url']?.toString() ?? '';
-    final width = (params['width'] as num?)?.toDouble() ?? 1024;
-    final height = (params['height'] as num?)?.toDouble() ?? 768;
-    final javaScriptEnabled = params['javaScriptEnabled'] as bool? ?? true;
+    // Use the values from the inline form instead of showing a dialog
+    final url = _urlController.text.trim();
+    final width = double.tryParse(_widthController.text) ?? 1024;
+    final height = double.tryParse(_heightController.text) ?? 768;
 
-    _urlController.text = url;
-    _widthController.text = width.toString();
-    _heightController.text = height.toString();
+    if (url.isEmpty) {
+      _recordMethodResult('run', 'Please enter a URL', isError: true);
+      return;
+    }
 
     setState(() => _isLoading = true);
     try {
@@ -212,7 +201,7 @@ class _HeadlessWebViewScreenState extends State<HeadlessWebViewScreen> {
         url: url,
         width: width,
         height: height,
-        javaScriptEnabled: javaScriptEnabled,
+        javaScriptEnabled: true,
         settingsManager: settingsManager,
       );
       if (!created) return;
@@ -456,6 +445,7 @@ class _HeadlessWebViewScreenState extends State<HeadlessWebViewScreen> {
     String methodName,
     String message, {
     required bool isError,
+    dynamic value,
   }) {
     setState(() {
       final entries = List<MethodResultEntry>.from(
@@ -467,6 +457,7 @@ class _HeadlessWebViewScreenState extends State<HeadlessWebViewScreen> {
           message: message,
           isError: isError,
           timestamp: DateTime.now(),
+          value: value,
         ),
       );
       if (entries.length > _maxHistoryEntries) {

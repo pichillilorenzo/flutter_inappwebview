@@ -19,9 +19,17 @@ class _CookieManagerScreenState extends State<CookieManagerScreen> {
   final TextEditingController _urlController = TextEditingController(
     text: 'https://example.com',
   );
+  final TextEditingController _searchController = TextEditingController();
 
   List<Cookie> _cookies = [];
   bool _isLoading = false;
+
+  // Sorting state
+  String _sortColumn = 'name';
+  bool _sortAscending = true;
+
+  // Search state
+  String _searchQuery = '';
 
   final Map<String, List<MethodResultEntry>> _methodHistory = {};
   final Map<String, int> _selectedHistoryIndex = {};
@@ -427,6 +435,7 @@ class _CookieManagerScreenState extends State<CookieManagerScreen> {
     String methodName,
     String message, {
     required bool isError,
+    dynamic value,
   }) {
     setState(() {
       final entries = List<MethodResultEntry>.from(
@@ -438,6 +447,7 @@ class _CookieManagerScreenState extends State<CookieManagerScreen> {
           message: message,
           isError: isError,
           timestamp: DateTime.now(),
+          value: value,
         ),
       );
       if (entries.length > _maxHistoryEntries) {
@@ -747,110 +757,274 @@ class _CookieManagerScreenState extends State<CookieManagerScreen> {
       );
     }
 
+    final filteredCookies = _filteredAndSortedCookies;
+
     return Card(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
             padding: const EdgeInsets.all(16),
-            child: Row(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  'Cookies (${_cookies.length})',
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
+                Row(
+                  children: [
+                    Text(
+                      'Cookies (${filteredCookies.length}${filteredCookies.length != _cookies.length ? ' of ${_cookies.length}' : ''})',
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const Spacer(),
+                    IconButton(
+                      icon: const Icon(Icons.refresh),
+                      onPressed: _isLoading ? null : _getCookies,
+                      tooltip: 'Refresh',
+                    ),
+                  ],
                 ),
-                const Spacer(),
-                IconButton(
-                  icon: const Icon(Icons.refresh),
-                  onPressed: _isLoading ? null : _getCookies,
-                  tooltip: 'Refresh',
+                const SizedBox(height: 12),
+                // Search field
+                TextField(
+                  controller: _searchController,
+                  decoration: InputDecoration(
+                    hintText: 'Search cookies...',
+                    prefixIcon: const Icon(Icons.search, size: 20),
+                    suffixIcon: _searchQuery.isNotEmpty
+                        ? IconButton(
+                            icon: const Icon(Icons.clear, size: 20),
+                            onPressed: () {
+                              setState(() {
+                                _searchController.clear();
+                                _searchQuery = '';
+                              });
+                            },
+                          )
+                        : null,
+                    border: const OutlineInputBorder(),
+                    isDense: true,
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 10,
+                    ),
+                  ),
+                  onChanged: (value) {
+                    setState(() => _searchQuery = value);
+                  },
                 ),
               ],
             ),
           ),
           const Divider(height: 1),
-          ListView.separated(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemCount: _cookies.length,
-            separatorBuilder: (_, __) => const Divider(height: 1),
-            itemBuilder: (context, index) {
-              final cookie = _cookies[index];
-              return ExpansionTile(
-                title: Text(
-                  cookie.name,
-                  style: const TextStyle(fontWeight: FontWeight.w500),
+          if (filteredCookies.isEmpty)
+            Padding(
+              padding: const EdgeInsets.all(32),
+              child: Center(
+                child: Text(
+                  'No cookies match your search',
+                  style: TextStyle(color: Colors.grey.shade600),
                 ),
-                subtitle: Text(
-                  cookie.value?.toString() ?? 'null',
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
-                ),
-                trailing: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    IconButton(
-                      icon: const Icon(Icons.info_outline, size: 20),
-                      onPressed: () => _getCookie(
-                        url: _urlController.text.trim(),
-                        name: cookie.name,
-                      ),
-                      tooltip: 'Get Cookie Details',
+              ),
+            )
+          else
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: DataTable(
+                sortColumnIndex: _getSortColumnIndex(),
+                sortAscending: _sortAscending,
+                headingRowHeight: 48,
+                dataRowMinHeight: 40,
+                dataRowMaxHeight: 56,
+                columnSpacing: 16,
+                horizontalMargin: 16,
+                columns: [
+                  DataColumn(
+                    label: const Text(
+                      'Name',
+                      style: TextStyle(fontWeight: FontWeight.bold),
                     ),
-                    IconButton(
-                      icon: const Icon(Icons.delete_outline, size: 20),
-                      onPressed: () => _deleteCookie(cookie),
-                      tooltip: 'Delete Cookie',
-                      color: Colors.red,
+                    onSort: (_, __) => _onSort('name'),
+                  ),
+                  DataColumn(
+                    label: const Text(
+                      'Value',
+                      style: TextStyle(fontWeight: FontWeight.bold),
                     ),
-                  ],
-                ),
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        _buildCookieAttribute('Domain', cookie.domain),
-                        _buildCookieAttribute('Path', cookie.path),
-                        _buildCookieAttribute(
-                          'Expires',
-                          cookie.expiresDate != null
-                              ? DateTime.fromMillisecondsSinceEpoch(
-                                  cookie.expiresDate!,
-                                ).toString()
-                              : null,
-                        ),
-                        _buildCookieAttribute(
-                          'Secure',
-                          cookie.isSecure?.toString(),
-                        ),
-                        _buildCookieAttribute(
-                          'HttpOnly',
-                          cookie.isHttpOnly?.toString(),
-                        ),
-                        _buildCookieAttribute(
-                          'Session Only',
-                          cookie.isSessionOnly?.toString(),
-                        ),
-                        _buildCookieAttribute(
-                          'SameSite',
-                          cookie.sameSite?.toString(),
-                        ),
-                      ],
+                    onSort: (_, __) => _onSort('value'),
+                  ),
+                  DataColumn(
+                    label: const Text(
+                      'Domain',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    onSort: (_, __) => _onSort('domain'),
+                  ),
+                  DataColumn(
+                    label: const Text(
+                      'Path',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    onSort: (_, __) => _onSort('path'),
+                  ),
+                  DataColumn(
+                    label: const Text(
+                      'Expires',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    onSort: (_, __) => _onSort('expires'),
+                  ),
+                  DataColumn(
+                    label: const Text(
+                      'Secure',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    onSort: (_, __) => _onSort('secure'),
+                  ),
+                  const DataColumn(
+                    label: Text(
+                      'Actions',
+                      style: TextStyle(fontWeight: FontWeight.bold),
                     ),
                   ),
                 ],
-              );
-            },
-          ),
+                rows: filteredCookies
+                    .map(
+                      (cookie) => DataRow(
+                        cells: [
+                          DataCell(
+                            SizedBox(
+                              width: 120,
+                              child: Text(
+                                cookie.name,
+                                overflow: TextOverflow.ellipsis,
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ),
+                          ),
+                          DataCell(
+                            SizedBox(
+                              width: 150,
+                              child: Text(
+                                cookie.value?.toString() ?? 'null',
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: cookie.value != null
+                                      ? Colors.black87
+                                      : Colors.grey,
+                                ),
+                              ),
+                            ),
+                          ),
+                          DataCell(
+                            SizedBox(
+                              width: 100,
+                              child: Text(
+                                cookie.domain ?? '-',
+                                overflow: TextOverflow.ellipsis,
+                                style: const TextStyle(fontSize: 12),
+                              ),
+                            ),
+                          ),
+                          DataCell(
+                            SizedBox(
+                              width: 60,
+                              child: Text(
+                                cookie.path ?? '/',
+                                overflow: TextOverflow.ellipsis,
+                                style: const TextStyle(fontSize: 12),
+                              ),
+                            ),
+                          ),
+                          DataCell(
+                            SizedBox(
+                              width: 140,
+                              child: Text(
+                                cookie.expiresDate != null
+                                    ? DateTime.fromMillisecondsSinceEpoch(
+                                        cookie.expiresDate!,
+                                      ).toLocal().toString().split('.')[0]
+                                    : 'Session',
+                                overflow: TextOverflow.ellipsis,
+                                style: const TextStyle(fontSize: 11),
+                              ),
+                            ),
+                          ),
+                          DataCell(
+                            Icon(
+                              cookie.isSecure == true
+                                  ? Icons.lock
+                                  : Icons.lock_open,
+                              size: 18,
+                              color: cookie.isSecure == true
+                                  ? Colors.green
+                                  : Colors.grey,
+                            ),
+                          ),
+                          DataCell(
+                            Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                IconButton(
+                                  icon: const Icon(
+                                    Icons.info_outline,
+                                    size: 18,
+                                  ),
+                                  onPressed: () => _getCookie(
+                                    url: _urlController.text.trim(),
+                                    name: cookie.name,
+                                  ),
+                                  tooltip: 'View Details',
+                                  padding: EdgeInsets.zero,
+                                  constraints: const BoxConstraints(),
+                                ),
+                                const SizedBox(width: 8),
+                                IconButton(
+                                  icon: const Icon(
+                                    Icons.delete_outline,
+                                    size: 18,
+                                    color: Colors.red,
+                                  ),
+                                  onPressed: () => _deleteCookie(cookie),
+                                  tooltip: 'Delete',
+                                  padding: EdgeInsets.zero,
+                                  constraints: const BoxConstraints(),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    )
+                    .toList(),
+              ),
+            ),
         ],
       ),
     );
+  }
+
+  int? _getSortColumnIndex() {
+    switch (_sortColumn) {
+      case 'name':
+        return 0;
+      case 'value':
+        return 1;
+      case 'domain':
+        return 2;
+      case 'path':
+        return 3;
+      case 'expires':
+        return 4;
+      case 'secure':
+        return 5;
+      default:
+        return null;
+    }
   }
 
   Widget _buildCookieAttribute(String label, String? value) {
@@ -883,9 +1057,71 @@ class _CookieManagerScreenState extends State<CookieManagerScreen> {
     );
   }
 
+  /// Get filtered and sorted cookies
+  List<Cookie> get _filteredAndSortedCookies {
+    var result = List<Cookie>.from(_cookies);
+
+    // Apply search filter
+    if (_searchQuery.isNotEmpty) {
+      final query = _searchQuery.toLowerCase();
+      result = result.where((cookie) {
+        return cookie.name.toLowerCase().contains(query) ||
+            (cookie.value?.toString().toLowerCase().contains(query) ?? false) ||
+            (cookie.domain?.toLowerCase().contains(query) ?? false) ||
+            (cookie.path?.toLowerCase().contains(query) ?? false);
+      }).toList();
+    }
+
+    // Apply sorting
+    result.sort((a, b) {
+      int comparison;
+      switch (_sortColumn) {
+        case 'name':
+          comparison = a.name.compareTo(b.name);
+          break;
+        case 'value':
+          comparison = (a.value?.toString() ?? '').compareTo(
+            b.value?.toString() ?? '',
+          );
+          break;
+        case 'domain':
+          comparison = (a.domain ?? '').compareTo(b.domain ?? '');
+          break;
+        case 'path':
+          comparison = (a.path ?? '').compareTo(b.path ?? '');
+          break;
+        case 'expires':
+          comparison = (a.expiresDate ?? 0).compareTo(b.expiresDate ?? 0);
+          break;
+        case 'secure':
+          comparison = (a.isSecure == true ? 1 : 0).compareTo(
+            b.isSecure == true ? 1 : 0,
+          );
+          break;
+        default:
+          comparison = 0;
+      }
+      return _sortAscending ? comparison : -comparison;
+    });
+
+    return result;
+  }
+
+  void _onSort(String column) {
+    setState(() {
+      if (_sortColumn == column) {
+        _sortAscending = !_sortAscending;
+      } else {
+        _sortColumn = column;
+        _sortAscending = true;
+      }
+    });
+  }
+
   @override
   void dispose() {
     _urlController.dispose();
+    _searchController.dispose();
     super.dispose();
   }
 }

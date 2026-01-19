@@ -33,6 +33,11 @@ class _WebStorageScreenState extends State<WebStorageScreen>
   List<WebStorageItem> _sessionStorageItems = [];
   int? _sessionStorageLength;
 
+  // WebStorageManager state
+  final WebStorageManager _webStorageManager = WebStorageManager.instance();
+  List<WebStorageOrigin> _webStorageOrigins = [];
+  List<WebsiteDataRecord> _dataRecords = [];
+
   final TextEditingController _urlController = TextEditingController(
     text: 'https://example.com',
   );
@@ -44,7 +49,7 @@ class _WebStorageScreenState extends State<WebStorageScreen>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 2, vsync: this);
+    _tabController = TabController(length: 3, vsync: this);
     _tabController.addListener(() {
       if (!_tabController.indexIsChanging) {
         setState(() {});
@@ -360,6 +365,7 @@ class _WebStorageScreenState extends State<WebStorageScreen>
     String methodName,
     String message, {
     required bool isError,
+    dynamic value,
   }) {
     setState(() {
       final entries = List<MethodResultEntry>.from(
@@ -371,6 +377,7 @@ class _WebStorageScreenState extends State<WebStorageScreen>
           message: message,
           isError: isError,
           timestamp: DateTime.now(),
+          value: value,
         ),
       );
       if (entries.length > _maxHistoryEntries) {
@@ -524,6 +531,7 @@ class _WebStorageScreenState extends State<WebStorageScreen>
         bottom: TabBar(
           controller: _tabController,
           tabs: const [
+            Tab(text: 'Manager'),
             Tab(text: 'LocalStorage'),
             Tab(text: 'SessionStorage'),
           ],
@@ -558,6 +566,7 @@ class _WebStorageScreenState extends State<WebStorageScreen>
                 child: TabBarView(
                   controller: _tabController,
                   children: [
+                    _buildWebStorageManagerView(),
                     _buildStorageView(
                       items: _localStorageItems,
                       length: _localStorageLength,
@@ -895,6 +904,577 @@ class _WebStorageScreenState extends State<WebStorageScreen>
                       color: Colors.red,
                     ),
                   ],
+                ),
+              );
+            },
+          ),
+        ],
+      ),
+    );
+  }
+  // ============ WebStorageManager Methods ============
+
+  Set<SupportedPlatform> _getManagerMethodPlatforms(String methodName) {
+    final method = PlatformWebStorageManagerMethod.values.firstWhere(
+      (m) => m.name == methodName,
+      orElse: () => PlatformWebStorageManagerMethod.deleteAllData,
+    );
+    return SupportCheckHelper.supportedPlatformsForMethod(
+      method: method,
+      checker: WebStorageManager.isMethodSupported,
+    );
+  }
+
+  Future<void> _getOrigins() async {
+    setState(() => _isLoading = true);
+    try {
+      final origins = await _webStorageManager.getOrigins();
+      setState(() => _webStorageOrigins = origins);
+      _recordMethodResult(
+        'manager.getOrigins',
+        'Found ${origins.length} origins',
+        isError: false,
+        value: origins.map((o) => o.toMap()).toList(),
+      );
+    } catch (e) {
+      _recordMethodResult(
+        'manager.getOrigins',
+        'Error getting origins: $e',
+        isError: true,
+      );
+    } finally {
+      setState(() => _isLoading = false);
+    }
+  }
+
+  Future<void> _deleteAllData() async {
+    final confirmed = await _showConfirmDialog(
+      'Delete All Data',
+      'Are you sure you want to delete all web storage data?',
+    );
+    if (!confirmed) return;
+
+    setState(() => _isLoading = true);
+    try {
+      await _webStorageManager.deleteAllData();
+      setState(() => _webStorageOrigins = []);
+      _recordMethodResult(
+        'manager.deleteAllData',
+        'All web storage data deleted',
+        isError: false,
+      );
+    } catch (e) {
+      _recordMethodResult(
+        'manager.deleteAllData',
+        'Error deleting all data: $e',
+        isError: true,
+      );
+    } finally {
+      setState(() => _isLoading = false);
+    }
+  }
+
+  Future<void> _deleteOrigin(String origin) async {
+    setState(() => _isLoading = true);
+    try {
+      await _webStorageManager.deleteOrigin(origin: origin);
+      _recordMethodResult(
+        'manager.deleteOrigin',
+        'Deleted origin: $origin',
+        isError: false,
+      );
+      await _getOrigins();
+    } catch (e) {
+      _recordMethodResult(
+        'manager.deleteOrigin',
+        'Error deleting origin: $e',
+        isError: true,
+      );
+    } finally {
+      setState(() => _isLoading = false);
+    }
+  }
+
+  Future<void> _promptDeleteOrigin() async {
+    final params = await showParameterDialog(
+      context: context,
+      title: 'Delete Origin',
+      parameters: {'origin': ''},
+      requiredPaths: ['origin'],
+    );
+
+    if (params == null) return;
+    final origin = params['origin']?.toString() ?? '';
+    if (origin.isEmpty) {
+      _recordMethodResult(
+        'manager.deleteOrigin',
+        'Please enter an origin',
+        isError: true,
+      );
+      return;
+    }
+    await _deleteOrigin(origin);
+  }
+
+  Future<void> _getQuotaForOrigin() async {
+    final params = await showParameterDialog(
+      context: context,
+      title: 'Get Quota for Origin',
+      parameters: {'origin': ''},
+      requiredPaths: ['origin'],
+    );
+
+    if (params == null) return;
+    final origin = params['origin']?.toString() ?? '';
+    if (origin.isEmpty) {
+      _recordMethodResult(
+        'manager.getQuotaForOrigin',
+        'Please enter an origin',
+        isError: true,
+      );
+      return;
+    }
+
+    setState(() => _isLoading = true);
+    try {
+      final quota = await _webStorageManager.getQuotaForOrigin(origin: origin);
+      _recordMethodResult(
+        'manager.getQuotaForOrigin',
+        'Quota for "$origin": $quota bytes',
+        isError: false,
+        value: quota,
+      );
+    } catch (e) {
+      _recordMethodResult(
+        'manager.getQuotaForOrigin',
+        'Error getting quota: $e',
+        isError: true,
+      );
+    } finally {
+      setState(() => _isLoading = false);
+    }
+  }
+
+  Future<void> _getUsageForOrigin() async {
+    final params = await showParameterDialog(
+      context: context,
+      title: 'Get Usage for Origin',
+      parameters: {'origin': ''},
+      requiredPaths: ['origin'],
+    );
+
+    if (params == null) return;
+    final origin = params['origin']?.toString() ?? '';
+    if (origin.isEmpty) {
+      _recordMethodResult(
+        'manager.getUsageForOrigin',
+        'Please enter an origin',
+        isError: true,
+      );
+      return;
+    }
+
+    setState(() => _isLoading = true);
+    try {
+      final usage = await _webStorageManager.getUsageForOrigin(origin: origin);
+      _recordMethodResult(
+        'manager.getUsageForOrigin',
+        'Usage for "$origin": $usage bytes',
+        isError: false,
+        value: usage,
+      );
+    } catch (e) {
+      _recordMethodResult(
+        'manager.getUsageForOrigin',
+        'Error getting usage: $e',
+        isError: true,
+      );
+    } finally {
+      setState(() => _isLoading = false);
+    }
+  }
+
+  Future<void> _fetchDataRecords() async {
+    setState(() => _isLoading = true);
+    try {
+      final records = await _webStorageManager.fetchDataRecords(
+        dataTypes: WebsiteDataType.ALL,
+      );
+      setState(() => _dataRecords = records);
+      _recordMethodResult(
+        'manager.fetchDataRecords',
+        'Found ${records.length} data records',
+        isError: false,
+        value: records.map((r) => r.toMap()).toList(),
+      );
+    } catch (e) {
+      _recordMethodResult(
+        'manager.fetchDataRecords',
+        'Error fetching data records: $e',
+        isError: true,
+      );
+    } finally {
+      setState(() => _isLoading = false);
+    }
+  }
+
+  Future<void> _removeDataModifiedSince() async {
+    final params = await showParameterDialog(
+      context: context,
+      title: 'Remove Data Modified Since',
+      description: 'Enter how many days ago to start removal (0 = all data)',
+      parameters: {'daysAgo': 0},
+    );
+
+    if (params == null) return;
+    final daysAgo = (params['daysAgo'] as num?)?.toInt() ?? 0;
+    final date = DateTime.now().subtract(Duration(days: daysAgo));
+
+    final confirmed = await _showConfirmDialog(
+      'Remove Data',
+      'Are you sure you want to remove all data modified since ${date.toIso8601String()}?',
+    );
+    if (!confirmed) return;
+
+    setState(() => _isLoading = true);
+    try {
+      await _webStorageManager.removeDataModifiedSince(
+        dataTypes: WebsiteDataType.ALL,
+        date: date,
+      );
+      setState(() => _dataRecords = []);
+      _recordMethodResult(
+        'manager.removeDataModifiedSince',
+        'Data removed since ${date.toIso8601String()}',
+        isError: false,
+      );
+    } catch (e) {
+      _recordMethodResult(
+        'manager.removeDataModifiedSince',
+        'Error removing data: $e',
+        isError: true,
+      );
+    } finally {
+      setState(() => _isLoading = false);
+    }
+  }
+
+  Future<void> _removeDataForRecord(WebsiteDataRecord record) async {
+    setState(() => _isLoading = true);
+    try {
+      await _webStorageManager.removeDataFor(
+        dataTypes: record.dataTypes ?? WebsiteDataType.ALL,
+        dataRecords: [record],
+      );
+      _recordMethodResult(
+        'manager.removeDataFor',
+        'Removed data for ${record.displayName}',
+        isError: false,
+      );
+      await _fetchDataRecords();
+    } catch (e) {
+      _recordMethodResult(
+        'manager.removeDataFor',
+        'Error removing data: $e',
+        isError: true,
+      );
+    } finally {
+      setState(() => _isLoading = false);
+    }
+  }
+
+  Widget _buildWebStorageManagerView() {
+    return ListView(
+      padding: const EdgeInsets.all(16),
+      children: [
+        // Platform info card
+        Card(
+          color: Colors.blue.shade50,
+          child: Padding(
+            padding: const EdgeInsets.all(12),
+            child: Row(
+              children: [
+                Icon(Icons.info_outline, color: Colors.blue.shade700),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    'WebStorageManager provides platform-level storage management. '
+                    'Android uses WebStorage API. iOS/macOS/Linux use WKWebsiteDataStore/WebKitWebsiteDataManager.',
+                    style: TextStyle(fontSize: 12, color: Colors.blue.shade700),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+        const SizedBox(height: 16),
+        const Text(
+          'Android APIs',
+          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(height: 8),
+        _buildManagerMethodSection(
+          'getOrigins',
+          'Get origins using Application Cache or Web SQL Database',
+          _getManagerMethodPlatforms('getOrigins'),
+          _getOrigins,
+        ),
+        _buildManagerMethodSection(
+          'deleteAllData',
+          'Clear all storage (App Cache, Web SQL, HTML5 Storage)',
+          _getManagerMethodPlatforms('deleteAllData'),
+          _deleteAllData,
+        ),
+        _buildManagerMethodSection(
+          'deleteOrigin',
+          'Clear storage for a specific origin',
+          _getManagerMethodPlatforms('deleteOrigin'),
+          _promptDeleteOrigin,
+        ),
+        _buildManagerMethodSection(
+          'getQuotaForOrigin',
+          'Get storage quota for an origin (bytes)',
+          _getManagerMethodPlatforms('getQuotaForOrigin'),
+          _getQuotaForOrigin,
+        ),
+        _buildManagerMethodSection(
+          'getUsageForOrigin',
+          'Get storage usage for an origin (bytes)',
+          _getManagerMethodPlatforms('getUsageForOrigin'),
+          _getUsageForOrigin,
+        ),
+        const SizedBox(height: 16),
+        const Text(
+          'iOS/macOS/Linux APIs',
+          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(height: 8),
+        _buildManagerMethodSection(
+          'fetchDataRecords',
+          'Fetch website data records',
+          _getManagerMethodPlatforms('fetchDataRecords'),
+          _fetchDataRecords,
+        ),
+        _buildManagerMethodSection(
+          'removeDataModifiedSince',
+          'Remove data modified since a date',
+          _getManagerMethodPlatforms('removeDataModifiedSince'),
+          _removeDataModifiedSince,
+        ),
+        const SizedBox(height: 16),
+        _buildOriginsList(),
+        const SizedBox(height: 16),
+        _buildDataRecordsList(),
+      ],
+    );
+  }
+
+  Widget _buildManagerMethodSection(
+    String methodName,
+    String description,
+    Set<SupportedPlatform> supportedPlatforms,
+    VoidCallback? onPressed,
+  ) {
+    final historyKey = 'manager.$methodName';
+    return Card(
+      margin: const EdgeInsets.only(bottom: 8),
+      child: ListTile(
+        title: Text(
+          methodName,
+          style: const TextStyle(fontWeight: FontWeight.bold),
+        ),
+        subtitle: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              description,
+              style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+            ),
+            const SizedBox(height: 6),
+            SupportBadgesRow(
+              supportedPlatforms: supportedPlatforms,
+              compact: true,
+            ),
+            const SizedBox(height: 6),
+            _buildMethodHistory(historyKey, title: methodName),
+          ],
+        ),
+        trailing: onPressed != null
+            ? ElevatedButton(
+                onPressed: !_isLoading ? onPressed : null,
+                child: const Text('Run'),
+              )
+            : null,
+      ),
+    );
+  }
+
+  Widget _buildOriginsList() {
+    if (_webStorageOrigins.isEmpty) {
+      return Card(
+        child: Padding(
+          padding: const EdgeInsets.all(32),
+          child: Center(
+            child: Column(
+              children: [
+                Icon(
+                  Icons.public_outlined,
+                  size: 48,
+                  color: Colors.grey.shade400,
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  'No origins fetched',
+                  style: TextStyle(fontSize: 14, color: Colors.grey.shade600),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  'Click "getOrigins" to fetch (Android only)',
+                  style: TextStyle(fontSize: 12, color: Colors.grey.shade500),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
+
+    return Card(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: Row(
+              children: [
+                Text(
+                  'Origins (${_webStorageOrigins.length})',
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const Spacer(),
+                IconButton(
+                  icon: const Icon(Icons.refresh),
+                  onPressed: _isLoading ? null : _getOrigins,
+                  tooltip: 'Refresh',
+                ),
+              ],
+            ),
+          ),
+          const Divider(height: 1),
+          ListView.separated(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: _webStorageOrigins.length,
+            separatorBuilder: (_, __) => const Divider(height: 1),
+            itemBuilder: (context, index) {
+              final origin = _webStorageOrigins[index];
+              return ListTile(
+                title: Text(
+                  origin.origin ?? 'Unknown',
+                  style: const TextStyle(fontWeight: FontWeight.w500),
+                ),
+                subtitle: Text(
+                  'Quota: ${origin.quota ?? 'N/A'} bytes, Usage: ${origin.usage ?? 'N/A'} bytes',
+                  style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+                ),
+                trailing: IconButton(
+                  icon: const Icon(Icons.delete_outline, size: 20),
+                  onPressed: () => _deleteOrigin(origin.origin ?? ''),
+                  tooltip: 'Delete Origin',
+                  color: Colors.red,
+                ),
+              );
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDataRecordsList() {
+    if (_dataRecords.isEmpty) {
+      return Card(
+        child: Padding(
+          padding: const EdgeInsets.all(32),
+          child: Center(
+            child: Column(
+              children: [
+                Icon(
+                  Icons.folder_outlined,
+                  size: 48,
+                  color: Colors.grey.shade400,
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  'No data records fetched',
+                  style: TextStyle(fontSize: 14, color: Colors.grey.shade600),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  'Click "fetchDataRecords" to fetch (iOS/macOS/Linux)',
+                  style: TextStyle(fontSize: 12, color: Colors.grey.shade500),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
+
+    return Card(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: Row(
+              children: [
+                Text(
+                  'Data Records (${_dataRecords.length})',
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const Spacer(),
+                IconButton(
+                  icon: const Icon(Icons.refresh),
+                  onPressed: _isLoading ? null : _fetchDataRecords,
+                  tooltip: 'Refresh',
+                ),
+              ],
+            ),
+          ),
+          const Divider(height: 1),
+          ListView.separated(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: _dataRecords.length,
+            separatorBuilder: (_, __) => const Divider(height: 1),
+            itemBuilder: (context, index) {
+              final record = _dataRecords[index];
+              final dataTypesStr =
+                  record.dataTypes?.map((t) => t.toNativeValue()).join(', ') ??
+                  'Unknown';
+              return ListTile(
+                title: Text(
+                  record.displayName ?? 'Unknown',
+                  style: const TextStyle(fontWeight: FontWeight.w500),
+                ),
+                subtitle: Text(
+                  'Types: $dataTypesStr',
+                  style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                trailing: IconButton(
+                  icon: const Icon(Icons.delete_outline, size: 20),
+                  onPressed: () => _removeDataForRecord(record),
+                  tooltip: 'Remove Data',
+                  color: Colors.red,
                 ),
               );
             },

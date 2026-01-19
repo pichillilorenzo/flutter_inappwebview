@@ -28,7 +28,7 @@ void main() {
     clipboardText = null;
   });
 
-  testWidgets('renders history entries and copies latest by default', (
+  testWidgets('renders history entries and copies value if available', (
     tester,
   ) async {
     final entries = [
@@ -36,6 +36,7 @@ void main() {
         message: 'latest result',
         isError: false,
         timestamp: DateTime(2024, 1, 1),
+        value: {'key': 'json_value', 'number': 42},
       ),
       MethodResultEntry(
         message: 'older result',
@@ -56,7 +57,30 @@ void main() {
     await tester.tap(find.byKey(const Key('method-history-copy')));
     await tester.pump();
 
-    expect(clipboardText, 'latest result');
+    // Should copy JSON-encoded value, not message
+    expect(clipboardText, contains('"key": "json_value"'));
+    expect(clipboardText, contains('"number": 42'));
+  });
+
+  testWidgets('copies message when no value is available', (tester) async {
+    final entries = [
+      MethodResultEntry(
+        message: 'message only',
+        isError: false,
+        timestamp: DateTime(2024, 1, 1),
+      ),
+    ];
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(body: MethodResultHistory(entries: entries)),
+      ),
+    );
+
+    await tester.tap(find.byKey(const Key('method-history-copy')));
+    await tester.pump();
+
+    expect(clipboardText, 'message only');
   });
 
   testWidgets('copies selected history entry', (tester) async {
@@ -65,11 +89,13 @@ void main() {
         message: 'first entry',
         isError: false,
         timestamp: DateTime(2024, 1, 1),
+        value: 'first_value',
       ),
       MethodResultEntry(
         message: 'second entry',
         isError: true,
         timestamp: DateTime(2024, 1, 2),
+        value: 'second_value',
       ),
     ];
 
@@ -85,6 +111,7 @@ void main() {
     await tester.tap(find.byKey(const Key('method-history-copy')));
     await tester.pump();
 
-    expect(clipboardText, 'second entry');
+    // Should copy the JSON-encoded value "second_value"
+    expect(clipboardText, '"second_value"');
   });
 }

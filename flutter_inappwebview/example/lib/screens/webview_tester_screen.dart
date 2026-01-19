@@ -337,6 +337,9 @@ class _WebViewTesterScreenState extends State<WebViewTesterScreen>
           'onLoadStart',
           data: {'url': url?.toString()},
         );
+        if (url != null) {
+          _urlController.text = url.toString();
+        }
         _updateNavigationState();
       },
 
@@ -347,6 +350,9 @@ class _WebViewTesterScreenState extends State<WebViewTesterScreen>
           'onLoadStop',
           data: {'url': url?.toString()},
         );
+        if (url != null) {
+          _urlController.text = url.toString();
+        }
         _updateNavigationState();
         final title = await controller.getTitle();
         setState(() {
@@ -468,6 +474,9 @@ class _WebViewTesterScreenState extends State<WebViewTesterScreen>
           'onUpdateVisitedHistory',
           data: {'url': url?.toString(), 'isReload': isReload},
         );
+        if (url != null) {
+          _urlController.text = url.toString();
+        }
         _updateNavigationState();
       },
 
@@ -478,6 +487,9 @@ class _WebViewTesterScreenState extends State<WebViewTesterScreen>
           'onPageCommitVisible',
           data: {'url': url?.toString()},
         );
+        if (url != null) {
+          _urlController.text = url.toString();
+        }
       },
 
       // 13. onNavigationResponse

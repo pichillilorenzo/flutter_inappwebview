@@ -594,9 +594,8 @@ class _SettingsEditorScreenState extends State<SettingsEditorScreen> {
 
   void _showLoadProfileDialog() {
     final settingsManager = context.read<SettingsManager>();
-    final profiles = settingsManager.profiles;
 
-    if (profiles.isEmpty) {
+    if (settingsManager.profiles.isEmpty) {
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(const SnackBar(content: Text('No saved profiles found')));
@@ -605,66 +604,86 @@ class _SettingsEditorScreenState extends State<SettingsEditorScreen> {
 
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Load Profile'),
-        content: SizedBox(
-          width: double.maxFinite,
-          child: ListView.builder(
-            shrinkWrap: true,
-            itemCount: profiles.length,
-            itemBuilder: (context, index) {
-              final profile = profiles[index];
-              final isCurrentProfile =
-                  profile.id == settingsManager.currentProfileId;
+      builder: (dialogContext) => StatefulBuilder(
+        builder: (context, setDialogState) {
+          final profiles = settingsManager.profiles;
 
-              return ListTile(
-                title: Text(profile.name),
-                subtitle: Text(
-                  '${profile.settings.length} settings • Created ${_formatDate(profile.createdAt)}',
-                  style: const TextStyle(fontSize: 12),
-                ),
-                leading: Icon(
-                  isCurrentProfile ? Icons.check_circle : Icons.folder,
-                  color: isCurrentProfile ? Colors.green : null,
-                ),
-                trailing: IconButton(
-                  icon: const Icon(Icons.delete, color: Colors.red),
-                  onPressed: () => _confirmDeleteProfile(profile),
-                ),
-                onTap: () async {
-                  await settingsManager.loadProfile(profile.id);
-                  if (mounted) {
-                    Navigator.pop(context);
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text('Loaded profile "${profile.name}"'),
+          if (profiles.isEmpty) {
+            // Close dialog if all profiles were deleted
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              Navigator.pop(dialogContext);
+            });
+            return const SizedBox.shrink();
+          }
+
+          return AlertDialog(
+            title: const Text('Load Profile'),
+            content: SizedBox(
+              width: double.maxFinite,
+              child: ListView.builder(
+                shrinkWrap: true,
+                itemCount: profiles.length,
+                itemBuilder: (context, index) {
+                  final profile = profiles[index];
+                  final isCurrentProfile =
+                      profile.id == settingsManager.currentProfileId;
+
+                  return ListTile(
+                    title: Text(profile.name),
+                    subtitle: Text(
+                      '${profile.settings.length} settings • Created ${_formatDate(profile.createdAt)}',
+                      style: const TextStyle(fontSize: 12),
+                    ),
+                    leading: Icon(
+                      isCurrentProfile ? Icons.check_circle : Icons.folder,
+                      color: isCurrentProfile ? Colors.green : null,
+                    ),
+                    trailing: IconButton(
+                      icon: const Icon(Icons.delete, color: Colors.red),
+                      onPressed: () => _confirmDeleteProfile(
+                        profile,
+                        onDeleted: () => setDialogState(() {}),
                       ),
-                    );
-                  }
+                    ),
+                    onTap: () async {
+                      await settingsManager.loadProfile(profile.id);
+                      if (mounted) {
+                        Navigator.pop(dialogContext);
+                        ScaffoldMessenger.of(this.context).showSnackBar(
+                          SnackBar(
+                            content: Text('Loaded profile "${profile.name}"'),
+                          ),
+                        );
+                      }
+                    },
+                  );
                 },
-              );
-            },
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Close'),
-          ),
-        ],
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(dialogContext),
+                child: const Text('Close'),
+              ),
+            ],
+          );
+        },
       ),
     );
   }
 
-  void _confirmDeleteProfile(SettingsProfile profile) {
+  void _confirmDeleteProfile(
+    SettingsProfile profile, {
+    VoidCallback? onDeleted,
+  }) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (dialogContext) => AlertDialog(
         title: const Text('Delete Profile'),
         content: Text('Are you sure you want to delete "${profile.name}"?'),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () => Navigator.pop(dialogContext),
             child: const Text('Cancel'),
           ),
           ElevatedButton(
@@ -672,7 +691,8 @@ class _SettingsEditorScreenState extends State<SettingsEditorScreen> {
             onPressed: () async {
               await context.read<SettingsManager>().deleteProfile(profile.id);
               if (mounted) {
-                Navigator.pop(context);
+                Navigator.pop(dialogContext);
+                onDeleted?.call();
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(content: Text('Deleted profile "${profile.name}"')),
                 );

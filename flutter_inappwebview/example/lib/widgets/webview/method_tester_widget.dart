@@ -416,11 +416,12 @@ class _MethodTesterWidgetState extends State<MethodTesterWidget> {
           ),
           MethodEntry(
             name: 'getCertificate',
-            description: 'Gets SSL certificate',
+            description: 'Gets SSL certificate info and X509 data',
             methodEnum: PlatformInAppWebViewControllerMethod.getCertificate,
             execute: (controller, params) async {
               final cert = await controller.getCertificate();
-              return cert?.issuedTo?.CName ?? 'No certificate';
+              if (cert == null) return {'error': 'No certificate available'};
+              return cert.toMap();
             },
           ),
           MethodEntry(
@@ -1482,6 +1483,7 @@ class _MethodTesterWidgetState extends State<MethodTesterWidget> {
             entry.name,
             _formatResult(result),
             isError: false,
+            value: result,
           );
           _executing[entry.name] = false;
         });
@@ -1500,6 +1502,7 @@ class _MethodTesterWidgetState extends State<MethodTesterWidget> {
     String methodName,
     String message, {
     required bool isError,
+    dynamic value,
   }) {
     final current = List<MethodResultEntry>.from(
       _methodHistory[methodName] ?? const [],
@@ -1510,6 +1513,7 @@ class _MethodTesterWidgetState extends State<MethodTesterWidget> {
         message: message,
         isError: isError,
         timestamp: DateTime.now(),
+        value: value,
       ),
     );
     if (current.length > 3) {

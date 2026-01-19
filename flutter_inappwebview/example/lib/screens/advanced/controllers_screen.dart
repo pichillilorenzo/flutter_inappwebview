@@ -148,6 +148,7 @@ class _ControllersScreenState extends State<ControllersScreen> {
     String methodName,
     String message, {
     required bool isError,
+    dynamic value,
   }) {
     setState(() {
       final entries = List<MethodResultEntry>.from(
@@ -159,6 +160,7 @@ class _ControllersScreenState extends State<ControllersScreen> {
           message: message,
           isError: isError,
           timestamp: DateTime.now(),
+          value: value,
         ),
       );
       if (entries.length > _maxHistoryEntries) {
@@ -1255,12 +1257,15 @@ class _ControllersScreenState extends State<ControllersScreen> {
               label,
               style: TextStyle(
                 fontSize: 12,
-                color: canPress ? Colors.black : Colors.grey,
+                color: canPress ? Colors.black : Colors.grey.shade600,
               ),
             ),
             backgroundColor: canPress
                 ? Colors.blue.shade50
-                : Colors.grey.shade200,
+                : Colors.grey.shade100,
+            side: canPress
+                ? BorderSide(color: Colors.blue.shade200)
+                : BorderSide(color: Colors.grey.shade300),
             onPressed: canPress ? onPressed : null,
           ),
           const SizedBox(height: 4),

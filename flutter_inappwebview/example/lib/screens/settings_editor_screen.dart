@@ -297,11 +297,11 @@ class _SettingsEditorScreenState extends State<SettingsEditorScreen> {
   ) {
     final isModified = settingsManager.isSettingModified(setting.key);
     final currentValue = settingsManager.getSetting(setting.key);
-    final hasPlatformLimitations = setting.supportedPlatforms != null;
+    final hasPlatformLimitations = setting.hasPlatformLimitations;
     final isCurrentPlatformSupported =
         !hasPlatformLimitations ||
         (_currentPlatform != null &&
-            setting.supportedPlatforms!.contains(_currentPlatform));
+            setting.isSupportedOnPlatform(_currentPlatform!));
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -368,7 +368,7 @@ class _SettingsEditorScreenState extends State<SettingsEditorScreen> {
                     if (hasPlatformLimitations) ...[
                       const SizedBox(height: 8),
                       SupportBadgesRow(
-                        supportedPlatforms: setting.supportedPlatforms!,
+                        supportedPlatforms: setting.supportedPlatforms,
                         compact: true,
                       ),
                     ],

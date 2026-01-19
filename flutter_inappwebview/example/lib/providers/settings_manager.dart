@@ -721,6 +721,7 @@ class SettingsManager extends ChangeNotifier {
           description: 'Enable JavaScript execution in the WebView',
           type: SettingType.boolean,
           defaultValue: true,
+          property: InAppWebViewSettingsProperty.javaScriptEnabled,
         ),
         SettingDefinition(
           key: 'userAgent',
@@ -728,6 +729,7 @@ class SettingsManager extends ChangeNotifier {
           description: 'Custom user-agent string for the WebView',
           type: SettingType.string,
           defaultValue: '',
+          property: InAppWebViewSettingsProperty.userAgent,
         ),
         SettingDefinition(
           key: 'applicationNameForUserAgent',
@@ -735,6 +737,7 @@ class SettingsManager extends ChangeNotifier {
           description: 'Append to the existing user-agent',
           type: SettingType.string,
           defaultValue: '',
+          property: InAppWebViewSettingsProperty.applicationNameForUserAgent,
         ),
         SettingDefinition(
           key: 'cacheEnabled',
@@ -742,6 +745,7 @@ class SettingsManager extends ChangeNotifier {
           description: 'Enable browser caching',
           type: SettingType.boolean,
           defaultValue: true,
+          property: InAppWebViewSettingsProperty.cacheEnabled,
         ),
         SettingDefinition(
           key: 'incognito',
@@ -749,6 +753,7 @@ class SettingsManager extends ChangeNotifier {
           description: 'Open browser in incognito/private mode',
           type: SettingType.boolean,
           defaultValue: false,
+          property: InAppWebViewSettingsProperty.incognito,
         ),
         SettingDefinition(
           key: 'supportZoom',
@@ -756,6 +761,7 @@ class SettingsManager extends ChangeNotifier {
           description: 'Enable zoom gestures and controls',
           type: SettingType.boolean,
           defaultValue: true,
+          property: InAppWebViewSettingsProperty.supportZoom,
         ),
       ],
       'Layout': [
@@ -765,6 +771,7 @@ class SettingsManager extends ChangeNotifier {
           description: 'Enable support for HTML viewport meta tag',
           type: SettingType.boolean,
           defaultValue: true,
+          property: InAppWebViewSettingsProperty.useWideViewPort,
         ),
         SettingDefinition(
           key: 'loadWithOverviewMode',
@@ -772,6 +779,7 @@ class SettingsManager extends ChangeNotifier {
           description: 'Zoom out content to fit on screen',
           type: SettingType.boolean,
           defaultValue: true,
+          property: InAppWebViewSettingsProperty.loadWithOverviewMode,
         ),
         SettingDefinition(
           key: 'minimumFontSize',
@@ -779,6 +787,7 @@ class SettingsManager extends ChangeNotifier {
           description: 'Minimum font size in pixels',
           type: SettingType.integer,
           defaultValue: 8,
+          property: InAppWebViewSettingsProperty.minimumFontSize,
         ),
         SettingDefinition(
           key: 'defaultFontSize',
@@ -786,6 +795,7 @@ class SettingsManager extends ChangeNotifier {
           description: 'Default font size in pixels',
           type: SettingType.integer,
           defaultValue: 16,
+          property: InAppWebViewSettingsProperty.defaultFontSize,
         ),
         SettingDefinition(
           key: 'defaultTextEncodingName',
@@ -793,6 +803,7 @@ class SettingsManager extends ChangeNotifier {
           description: 'Default text encoding for HTML pages',
           type: SettingType.string,
           defaultValue: 'UTF-8',
+          property: InAppWebViewSettingsProperty.defaultTextEncodingName,
         ),
       ],
       'Content': [
@@ -802,6 +813,7 @@ class SettingsManager extends ChangeNotifier {
           description: 'Enable content URL access',
           type: SettingType.boolean,
           defaultValue: true,
+          property: InAppWebViewSettingsProperty.allowContentAccess,
         ),
         SettingDefinition(
           key: 'allowFileAccess',
@@ -809,6 +821,7 @@ class SettingsManager extends ChangeNotifier {
           description: 'Enable file system access',
           type: SettingType.boolean,
           defaultValue: true,
+          property: InAppWebViewSettingsProperty.allowFileAccess,
         ),
         SettingDefinition(
           key: 'allowFileAccessFromFileURLs',
@@ -816,6 +829,7 @@ class SettingsManager extends ChangeNotifier {
           description: 'Allow file:// URLs to access other file:// URLs',
           type: SettingType.boolean,
           defaultValue: false,
+          property: InAppWebViewSettingsProperty.allowFileAccessFromFileURLs,
         ),
         SettingDefinition(
           key: 'allowUniversalAccessFromFileURLs',
@@ -823,6 +837,8 @@ class SettingsManager extends ChangeNotifier {
           description: 'Allow file:// URLs to access any origin',
           type: SettingType.boolean,
           defaultValue: false,
+          property:
+              InAppWebViewSettingsProperty.allowUniversalAccessFromFileURLs,
         ),
         SettingDefinition(
           key: 'blockNetworkImage',
@@ -830,6 +846,7 @@ class SettingsManager extends ChangeNotifier {
           description: 'Block loading images from the network',
           type: SettingType.boolean,
           defaultValue: false,
+          property: InAppWebViewSettingsProperty.blockNetworkImage,
         ),
         SettingDefinition(
           key: 'blockNetworkLoads',
@@ -837,6 +854,7 @@ class SettingsManager extends ChangeNotifier {
           description: 'Block all network resource loading',
           type: SettingType.boolean,
           defaultValue: false,
+          property: InAppWebViewSettingsProperty.blockNetworkLoads,
         ),
       ],
       'Media': [
@@ -846,6 +864,8 @@ class SettingsManager extends ChangeNotifier {
           description: 'Require user interaction to play media',
           type: SettingType.boolean,
           defaultValue: true,
+          property:
+              InAppWebViewSettingsProperty.mediaPlaybackRequiresUserGesture,
         ),
         SettingDefinition(
           key: 'allowsInlineMediaPlayback',
@@ -853,6 +873,7 @@ class SettingsManager extends ChangeNotifier {
           description: 'Allow HTML5 media to play inline',
           type: SettingType.boolean,
           defaultValue: false,
+          property: InAppWebViewSettingsProperty.allowsInlineMediaPlayback,
         ),
         SettingDefinition(
           key: 'allowsAirPlayForMediaPlayback',
@@ -860,6 +881,7 @@ class SettingsManager extends ChangeNotifier {
           description: 'Allow AirPlay for media playback',
           type: SettingType.boolean,
           defaultValue: true,
+          property: InAppWebViewSettingsProperty.allowsAirPlayForMediaPlayback,
         ),
         SettingDefinition(
           key: 'allowsPictureInPictureMediaPlayback',
@@ -867,6 +889,8 @@ class SettingsManager extends ChangeNotifier {
           description: 'Allow videos to play in picture-in-picture',
           type: SettingType.boolean,
           defaultValue: true,
+          property:
+              InAppWebViewSettingsProperty.allowsPictureInPictureMediaPlayback,
         ),
         SettingDefinition(
           key: 'automaticallyAdjustsScrollIndicatorInsets',
@@ -874,6 +898,8 @@ class SettingsManager extends ChangeNotifier {
           description: 'Automatically adjust scroll indicator insets',
           type: SettingType.boolean,
           defaultValue: false,
+          property: InAppWebViewSettingsProperty
+              .automaticallyAdjustsScrollIndicatorInsets,
         ),
       ],
       'JavaScript': [
@@ -883,6 +909,8 @@ class SettingsManager extends ChangeNotifier {
           description: 'Allow JavaScript to open windows automatically',
           type: SettingType.boolean,
           defaultValue: false,
+          property: InAppWebViewSettingsProperty
+              .javaScriptCanOpenWindowsAutomatically,
         ),
         SettingDefinition(
           key: 'javaScriptBridgeEnabled',
@@ -890,6 +918,7 @@ class SettingsManager extends ChangeNotifier {
           description: 'Enable the JavaScript bridge',
           type: SettingType.boolean,
           defaultValue: true,
+          property: InAppWebViewSettingsProperty.javaScriptBridgeEnabled,
         ),
         SettingDefinition(
           key: 'javaScriptBridgeForMainFrameOnly',
@@ -897,6 +926,8 @@ class SettingsManager extends ChangeNotifier {
           description: 'Restrict JavaScript bridge to main frame',
           type: SettingType.boolean,
           defaultValue: false,
+          property:
+              InAppWebViewSettingsProperty.javaScriptBridgeForMainFrameOnly,
         ),
       ],
       'Security': [
@@ -915,6 +946,7 @@ class SettingsManager extends ChangeNotifier {
                 .MIXED_CONTENT_COMPATIBILITY_MODE
                 .toNativeValue(),
           },
+          property: InAppWebViewSettingsProperty.mixedContentMode,
         ),
         SettingDefinition(
           key: 'useShouldInterceptRequest',
@@ -922,6 +954,7 @@ class SettingsManager extends ChangeNotifier {
           description: 'Enable request interception events',
           type: SettingType.boolean,
           defaultValue: false,
+          property: InAppWebViewSettingsProperty.useShouldInterceptRequest,
         ),
         SettingDefinition(
           key: 'useShouldOverrideUrlLoading',
@@ -929,6 +962,7 @@ class SettingsManager extends ChangeNotifier {
           description: 'Enable URL loading override events',
           type: SettingType.boolean,
           defaultValue: false,
+          property: InAppWebViewSettingsProperty.useShouldOverrideUrlLoading,
         ),
         SettingDefinition(
           key: 'useOnLoadResource',
@@ -936,6 +970,7 @@ class SettingsManager extends ChangeNotifier {
           description: 'Enable resource loading events',
           type: SettingType.boolean,
           defaultValue: false,
+          property: InAppWebViewSettingsProperty.useOnLoadResource,
         ),
         SettingDefinition(
           key: 'isFraudulentWebsiteWarningEnabled',
@@ -943,7 +978,8 @@ class SettingsManager extends ChangeNotifier {
           description: 'Show warnings for suspected phishing/malware',
           type: SettingType.boolean,
           defaultValue: true,
-          supportedPlatforms: {SupportedPlatform.ios, SupportedPlatform.macos},
+          property:
+              InAppWebViewSettingsProperty.isFraudulentWebsiteWarningEnabled,
         ),
         SettingDefinition(
           key: 'safeBrowsingEnabled',
@@ -951,7 +987,7 @@ class SettingsManager extends ChangeNotifier {
           description: 'Enable Google Safe Browsing',
           type: SettingType.boolean,
           defaultValue: true,
-          supportedPlatforms: {SupportedPlatform.android},
+          property: InAppWebViewSettingsProperty.safeBrowsingEnabled,
         ),
       ],
       'Cache': [
@@ -968,6 +1004,7 @@ class SettingsManager extends ChangeNotifier {
             'No Cache': CacheMode.LOAD_NO_CACHE.toNativeValue(),
             'Cache Only': CacheMode.LOAD_CACHE_ONLY.toNativeValue(),
           },
+          property: InAppWebViewSettingsProperty.cacheMode,
         ),
       ],
       'Appearance': [
@@ -977,6 +1014,7 @@ class SettingsManager extends ChangeNotifier {
           description: 'Make the WebView background transparent',
           type: SettingType.boolean,
           defaultValue: false,
+          property: InAppWebViewSettingsProperty.transparentBackground,
         ),
         SettingDefinition(
           key: 'verticalScrollBarEnabled',
@@ -984,6 +1022,7 @@ class SettingsManager extends ChangeNotifier {
           description: 'Show vertical scroll bar',
           type: SettingType.boolean,
           defaultValue: true,
+          property: InAppWebViewSettingsProperty.verticalScrollBarEnabled,
         ),
         SettingDefinition(
           key: 'horizontalScrollBarEnabled',
@@ -991,6 +1030,7 @@ class SettingsManager extends ChangeNotifier {
           description: 'Show horizontal scroll bar',
           type: SettingType.boolean,
           defaultValue: true,
+          property: InAppWebViewSettingsProperty.horizontalScrollBarEnabled,
         ),
         SettingDefinition(
           key: 'scrollbarFadingEnabled',
@@ -998,6 +1038,7 @@ class SettingsManager extends ChangeNotifier {
           description: 'Fade scrollbars when not scrolling',
           type: SettingType.boolean,
           defaultValue: true,
+          property: InAppWebViewSettingsProperty.scrollbarFadingEnabled,
         ),
         SettingDefinition(
           key: 'disableVerticalScroll',
@@ -1005,6 +1046,7 @@ class SettingsManager extends ChangeNotifier {
           description: 'Disable vertical scrolling',
           type: SettingType.boolean,
           defaultValue: false,
+          property: InAppWebViewSettingsProperty.disableVerticalScroll,
         ),
         SettingDefinition(
           key: 'disableHorizontalScroll',
@@ -1012,6 +1054,7 @@ class SettingsManager extends ChangeNotifier {
           description: 'Disable horizontal scrolling',
           type: SettingType.boolean,
           defaultValue: false,
+          property: InAppWebViewSettingsProperty.disableHorizontalScroll,
         ),
         SettingDefinition(
           key: 'disableContextMenu',
@@ -1019,6 +1062,7 @@ class SettingsManager extends ChangeNotifier {
           description: 'Disable the long-press context menu',
           type: SettingType.boolean,
           defaultValue: false,
+          property: InAppWebViewSettingsProperty.disableContextMenu,
         ),
       ],
       'Navigation': [
@@ -1028,7 +1072,8 @@ class SettingsManager extends ChangeNotifier {
           description: 'Enable swipe gestures for navigation',
           type: SettingType.boolean,
           defaultValue: true,
-          supportedPlatforms: {SupportedPlatform.ios, SupportedPlatform.macos},
+          property:
+              InAppWebViewSettingsProperty.allowsBackForwardNavigationGestures,
         ),
       ],
       'Rendering': [
@@ -1038,7 +1083,7 @@ class SettingsManager extends ChangeNotifier {
           description: 'Wait until content is fully loaded before rendering',
           type: SettingType.boolean,
           defaultValue: false,
-          supportedPlatforms: {SupportedPlatform.ios, SupportedPlatform.macos},
+          property: InAppWebViewSettingsProperty.suppressesIncrementalRendering,
         ),
         SettingDefinition(
           key: 'hardwareAcceleration',
@@ -1046,7 +1091,7 @@ class SettingsManager extends ChangeNotifier {
           description: 'Enable hardware acceleration',
           type: SettingType.boolean,
           defaultValue: true,
-          supportedPlatforms: {SupportedPlatform.android},
+          property: InAppWebViewSettingsProperty.hardwareAcceleration,
         ),
         SettingDefinition(
           key: 'useHybridComposition',
@@ -1054,7 +1099,7 @@ class SettingsManager extends ChangeNotifier {
           description: 'Use Flutter Hybrid Composition',
           type: SettingType.boolean,
           defaultValue: true,
-          supportedPlatforms: {SupportedPlatform.android},
+          property: InAppWebViewSettingsProperty.useHybridComposition,
         ),
       ],
       'Zoom': [
@@ -1064,7 +1109,7 @@ class SettingsManager extends ChangeNotifier {
           description: 'Override user-scalable viewport setting',
           type: SettingType.boolean,
           defaultValue: false,
-          supportedPlatforms: {SupportedPlatform.ios, SupportedPlatform.macos},
+          property: InAppWebViewSettingsProperty.ignoresViewportScaleLimits,
         ),
         SettingDefinition(
           key: 'builtInZoomControls',
@@ -1072,7 +1117,7 @@ class SettingsManager extends ChangeNotifier {
           description: 'Use built-in zoom controls',
           type: SettingType.boolean,
           defaultValue: true,
-          supportedPlatforms: {SupportedPlatform.android},
+          property: InAppWebViewSettingsProperty.builtInZoomControls,
         ),
         SettingDefinition(
           key: 'displayZoomControls',
@@ -1080,7 +1125,7 @@ class SettingsManager extends ChangeNotifier {
           description: 'Show on-screen zoom controls',
           type: SettingType.boolean,
           defaultValue: false,
-          supportedPlatforms: {SupportedPlatform.android},
+          property: InAppWebViewSettingsProperty.displayZoomControls,
         ),
         SettingDefinition(
           key: 'pinchZoomEnabled',
@@ -1088,7 +1133,7 @@ class SettingsManager extends ChangeNotifier {
           description: 'Enable pinch-to-zoom gesture',
           type: SettingType.boolean,
           defaultValue: true,
-          supportedPlatforms: {SupportedPlatform.windows},
+          property: InAppWebViewSettingsProperty.pinchZoomEnabled,
         ),
       ],
       'Interaction': [
@@ -1098,7 +1143,7 @@ class SettingsManager extends ChangeNotifier {
           description: 'Show link previews on long press',
           type: SettingType.boolean,
           defaultValue: true,
-          supportedPlatforms: {SupportedPlatform.ios, SupportedPlatform.macos},
+          property: InAppWebViewSettingsProperty.allowsLinkPreview,
         ),
       ],
       'Storage': [
@@ -1108,7 +1153,7 @@ class SettingsManager extends ChangeNotifier {
           description: 'Allow third-party cookies',
           type: SettingType.boolean,
           defaultValue: true,
-          supportedPlatforms: {SupportedPlatform.android},
+          property: InAppWebViewSettingsProperty.thirdPartyCookiesEnabled,
         ),
         SettingDefinition(
           key: 'domStorageEnabled',
@@ -1116,7 +1161,7 @@ class SettingsManager extends ChangeNotifier {
           description: 'Enable DOM local storage',
           type: SettingType.boolean,
           defaultValue: true,
-          supportedPlatforms: {SupportedPlatform.android},
+          property: InAppWebViewSettingsProperty.domStorageEnabled,
         ),
         SettingDefinition(
           key: 'databaseEnabled',
@@ -1124,7 +1169,7 @@ class SettingsManager extends ChangeNotifier {
           description: 'Enable database storage API',
           type: SettingType.boolean,
           defaultValue: true,
-          supportedPlatforms: {SupportedPlatform.android},
+          property: InAppWebViewSettingsProperty.databaseEnabled,
         ),
       ],
       'APIs': [
@@ -1134,7 +1179,7 @@ class SettingsManager extends ChangeNotifier {
           description: 'Enable Geolocation API',
           type: SettingType.boolean,
           defaultValue: true,
-          supportedPlatforms: {SupportedPlatform.android},
+          property: InAppWebViewSettingsProperty.geolocationEnabled,
         ),
       ],
       'Forms': [
@@ -1144,7 +1189,7 @@ class SettingsManager extends ChangeNotifier {
           description: 'Enable autofill for forms',
           type: SettingType.boolean,
           defaultValue: true,
-          supportedPlatforms: {SupportedPlatform.windows},
+          property: InAppWebViewSettingsProperty.generalAutofillEnabled,
         ),
         SettingDefinition(
           key: 'passwordAutosaveEnabled',
@@ -1152,7 +1197,7 @@ class SettingsManager extends ChangeNotifier {
           description: 'Enable password autosave',
           type: SettingType.boolean,
           defaultValue: false,
-          supportedPlatforms: {SupportedPlatform.windows},
+          property: InAppWebViewSettingsProperty.passwordAutosaveEnabled,
         ),
       ],
       'UI': [
@@ -1162,7 +1207,7 @@ class SettingsManager extends ChangeNotifier {
           description: 'Show status bar',
           type: SettingType.boolean,
           defaultValue: true,
-          supportedPlatforms: {SupportedPlatform.windows},
+          property: InAppWebViewSettingsProperty.statusBarEnabled,
         ),
         SettingDefinition(
           key: 'browserAcceleratorKeysEnabled',
@@ -1170,7 +1215,7 @@ class SettingsManager extends ChangeNotifier {
           description: 'Enable browser keyboard shortcuts',
           type: SettingType.boolean,
           defaultValue: true,
-          supportedPlatforms: {SupportedPlatform.windows},
+          property: InAppWebViewSettingsProperty.browserAcceleratorKeysEnabled,
         ),
       ],
       'Developer': [
@@ -1180,11 +1225,7 @@ class SettingsManager extends ChangeNotifier {
           description: 'Allow Web Inspector/DevTools',
           type: SettingType.boolean,
           defaultValue: false,
-          supportedPlatforms: {
-            SupportedPlatform.ios,
-            SupportedPlatform.macos,
-            SupportedPlatform.windows,
-          },
+          property: InAppWebViewSettingsProperty.isInspectable,
         ),
       ],
     };
@@ -1203,9 +1244,9 @@ class SettingDefinition {
   final dynamic defaultValue;
   final Map<String, dynamic>? enumValues;
 
-  /// Platforms where this setting is supported.
-  /// If null, the setting is supported on all platforms.
-  final Set<SupportedPlatform>? supportedPlatforms;
+  /// The InAppWebViewSettings property for runtime support checking.
+  /// If provided, use InAppWebViewSettings.isPropertySupported to check platform support.
+  final InAppWebViewSettingsProperty? property;
 
   const SettingDefinition({
     required this.key,
@@ -1214,6 +1255,53 @@ class SettingDefinition {
     required this.type,
     required this.defaultValue,
     this.enumValues,
-    this.supportedPlatforms,
+    this.property,
   });
+
+  /// Check if this setting is supported on the given platform.
+  /// Returns true if no property is specified (assumed to be cross-platform).
+  /// Note: Web platform is not mapped to TargetPlatform, so it's not checkable.
+  bool isSupportedOnPlatform(SupportedPlatform platform) {
+    if (property == null) return true;
+    // Web is not mapped to TargetPlatform in Flutter
+    if (platform == SupportedPlatform.web) return false;
+    final targetPlatform = platform.targetPlatform;
+    if (targetPlatform == null) return false;
+    return InAppWebViewSettings.isPropertySupported(
+      property!,
+      platform: targetPlatform,
+    );
+  }
+
+  /// Check if this setting is supported on the current platform.
+  bool get isSupportedOnCurrentPlatform {
+    if (property == null) return true;
+    // On web, we can't check without TargetPlatform
+    if (kIsWeb) return false;
+    return InAppWebViewSettings.isPropertySupported(property!);
+  }
+
+  /// Get the set of supported platforms for this setting.
+  /// Note: Web platform cannot be checked via TargetPlatform.
+  Set<SupportedPlatform> get supportedPlatforms {
+    if (property == null) {
+      // No property specified means cross-platform (excluding web which can't be verified)
+      return SupportedPlatform.values
+          .where((p) => p != SupportedPlatform.web)
+          .toSet();
+    }
+    return SupportedPlatform.values
+        .where((p) => p != SupportedPlatform.web && isSupportedOnPlatform(p))
+        .toSet();
+  }
+
+  /// Check if this setting has platform-specific support (not available on all platforms).
+  bool get hasPlatformLimitations {
+    if (property == null) return false;
+    // Check if the property is NOT supported on all native platforms
+    final nativePlatforms = SupportedPlatform.values.where(
+      (p) => p != SupportedPlatform.web,
+    );
+    return nativePlatforms.any((p) => !isSupportedOnPlatform(p));
+  }
 }

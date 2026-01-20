@@ -134,7 +134,7 @@ class ControllerMethodCategory {
   IconData get icon => categoryType.icon;
 }
 
-/// Registry of all InAppWebViewController methods organized by category
+/// Registry of all controller methods organized by category
 class ControllerMethodsRegistry {
   static ControllerMethodsRegistry? _instance;
 

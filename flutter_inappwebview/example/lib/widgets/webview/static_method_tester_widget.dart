@@ -8,7 +8,7 @@ import 'package:flutter_inappwebview_example/widgets/common/method_result_histor
 
 /// Enum representing available static method types
 enum StaticMethodType {
-  // InAppWebViewController methods
+  // WebView controller methods
   getDefaultUserAgent,
   clearClientCertPreferences,
   getSafeBrowsingPrivacyPolicyUrl,
@@ -23,93 +23,99 @@ enum StaticMethodType {
   tRexRunnerHtml,
   tRexRunnerCss,
 
-  // InAppBrowser methods
+    // In-app browser methods
   openWithSystemBrowser,
 
-  // ChromeSafariBrowser methods
+    // Custom tab / Safari view controller methods
   isAvailable,
   getMaxToolbarItems,
   getPackageName,
   clearWebsiteData,
   prewarmConnections,
 
-  // WebAuthenticationSession methods
+  // Web authentication methods
   // isAvailable - already defined above, reused
 
-  // ServiceWorkerController methods
+    // Service worker methods
   instance,
 
-  // WebViewFeature methods
+    // WebView feature checks
   isFeatureSupported,
   isStartupFeatureSupported,
 
-  // ProcessGlobalConfig methods
+    // Process global config methods
   apply,
 
-  // CookieManager methods
+    // Cookie methods
   // instance - already defined above, reused
 
-  // HttpAuthCredentialDatabase methods
+    // HTTP auth credential database methods
   // instance - already defined above, reused
 
-  // WebStorageManager methods
+    // Web storage methods
   // instance - already defined above, reused
 }
 
 /// Enum representing static method class types
 enum StaticClassType {
   inAppWebViewController(
-    'InAppWebViewController',
+    InAppWebViewController,
     'Static methods for WebView controller',
     Icons.web,
   ),
   inAppBrowser(
-    'InAppBrowser',
+    InAppBrowser,
     'Static methods for in-app browser',
     Icons.open_in_browser,
   ),
   chromeSafariBrowser(
-    'ChromeSafariBrowser',
+    ChromeSafariBrowser,
     'Static methods for Chrome Custom Tabs / SFSafariViewController',
     Icons.tab,
   ),
   webAuthenticationSession(
-    'WebAuthenticationSession',
+    WebAuthenticationSession,
     'Static methods for web authentication',
     Icons.security,
   ),
   serviceWorkerController(
-    'ServiceWorkerController',
+    ServiceWorkerController,
     'Static methods for service worker control',
     Icons.work,
   ),
   webViewFeature(
-    'WebViewFeature',
+    WebViewFeature,
     'Check WebView feature support (Android)',
     Icons.check_circle,
   ),
   processGlobalConfig(
-    'ProcessGlobalConfig',
+    ProcessGlobalConfig,
     'Process-level configuration (Android)',
     Icons.settings_applications,
   ),
-  cookieManager('CookieManager', 'Cookie management methods', Icons.cookie),
+  cookieManager(
+    CookieManager,
+    'Cookie management methods',
+    Icons.cookie,
+  ),
   httpAuthCredentialDatabase(
-    'HttpAuthCredentialDatabase',
+    HttpAuthCredentialDatabase,
     'HTTP authentication credential storage',
     Icons.lock,
   ),
   webStorageManager(
-    'WebStorageManager',
+    WebStorageManager,
     'Web storage management',
     Icons.storage,
   );
 
-  final String displayName;
+  final Type apiType;
   final String description;
   final IconData icon;
 
-  const StaticClassType(this.displayName, this.description, this.icon);
+  const StaticClassType(this.apiType, this.description, this.icon);
+
+  String get displayName => apiType.toString();
 }
 
 /// Static method entry for a class's static method
@@ -119,7 +125,7 @@ class StaticMethodEntry {
   final String description;
 
   /// The class name for looking up support info via SupportChecker
-  final String className;
+  final Type classType;
   final Map<String, dynamic> parameters;
   final List<String> requiredParameters;
   final Future<dynamic> Function(Map<String, dynamic> params) execute;
@@ -127,7 +133,7 @@ class StaticMethodEntry {
   const StaticMethodEntry({
     required this.methodType,
     required this.description,
-    required this.className,
+    required this.classType,
     this.parameters = const {},
     this.requiredParameters = const [],
     required this.execute,
@@ -138,7 +144,7 @@ class StaticMethodEntry {
 
   /// Returns supported platforms using runtime checks via SupportChecker
   Set<SupportedPlatform> get supportedPlatforms =>
-      SupportChecker.getSupportedPlatformsForMethod(className, name);
+      SupportChecker.getSupportedPlatformsForMethod(classType.toString(), name);
 }
 
 /// A class containing static methods
@@ -159,8 +165,8 @@ class StaticMethodClass {
   IconData get icon => classType.icon;
 }
 
-/// Widget to test static methods across InAppWebView classes
-/// Tests static methods from InAppWebViewController, InAppBrowser, ChromeSafariBrowser, etc.
+/// Widget to test static methods across WebView-related classes
+/// Tests static methods from the controller, browser, and other helpers.
 class StaticMethodTesterWidget extends StatefulWidget {
   const StaticMethodTesterWidget({super.key});
 
@@ -193,14 +199,14 @@ class _StaticMethodTesterWidgetState extends State<StaticMethodTesterWidget> {
 
   List<StaticMethodClass> _buildStaticMethodClasses() {
     return [
-      // InAppWebViewController static methods
+      // WebView controller static methods
       StaticMethodClass(
         classType: StaticClassType.inAppWebViewController,
         methods: [
           StaticMethodEntry(
             methodType: StaticMethodType.getDefaultUserAgent,
             description: 'Gets the default User-Agent string',
-            className: 'InAppWebViewController',
+            classType: InAppWebViewController,
             execute: (params) async {
               return await InAppWebViewController.getDefaultUserAgent();
             },
@@ -208,7 +214,7 @@ class _StaticMethodTesterWidgetState extends State<StaticMethodTesterWidget> {
           StaticMethodEntry(
             methodType: StaticMethodType.clearClientCertPreferences,
             description: 'Clears the client certificate preferences',
-            className: 'InAppWebViewController',
+            classType: InAppWebViewController,
             execute: (params) async {
               await InAppWebViewController.clearClientCertPreferences();
               return 'Client cert preferences cleared';
@@ -217,7 +223,7 @@ class _StaticMethodTesterWidgetState extends State<StaticMethodTesterWidget> {
           StaticMethodEntry(
             methodType: StaticMethodType.getSafeBrowsingPrivacyPolicyUrl,
             description: 'Gets the Safe Browsing privacy policy URL',
-            className: 'InAppWebViewController',
+            classType: InAppWebViewController,
             execute: (params) async {
               final url =
                   await InAppWebViewController.getSafeBrowsingPrivacyPolicyUrl();
@@ -227,7 +233,7 @@ class _StaticMethodTesterWidgetState extends State<StaticMethodTesterWidget> {
           StaticMethodEntry(
             methodType: StaticMethodType.setSafeBrowsingAllowlist,
             description: 'Sets the Safe Browsing allowlist',
-            className: 'InAppWebViewController',
+            classType: InAppWebViewController,
             parameters: {'hosts': 'example.com,test.com'},
             requiredParameters: ['hosts'],
             execute: (params) async {
@@ -245,7 +251,7 @@ class _StaticMethodTesterWidgetState extends State<StaticMethodTesterWidget> {
           StaticMethodEntry(
             methodType: StaticMethodType.getCurrentWebViewPackage,
             description: 'Gets the current WebView package info',
-            className: 'InAppWebViewController',
+            classType: InAppWebViewController,
             execute: (params) async {
               final pkg =
                   await InAppWebViewController.getCurrentWebViewPackage();
@@ -256,7 +262,7 @@ class _StaticMethodTesterWidgetState extends State<StaticMethodTesterWidget> {
           StaticMethodEntry(
             methodType: StaticMethodType.setWebContentsDebuggingEnabled,
             description: 'Enables or disables WebView debugging',
-            className: 'InAppWebViewController',
+            classType: InAppWebViewController,
             parameters: {'debuggingEnabled': true},
             requiredParameters: ['debuggingEnabled'],
             execute: (params) async {
@@ -270,7 +276,7 @@ class _StaticMethodTesterWidgetState extends State<StaticMethodTesterWidget> {
           StaticMethodEntry(
             methodType: StaticMethodType.getVariationsHeader,
             description: 'Gets the variations header',
-            className: 'InAppWebViewController',
+            classType: InAppWebViewController,
             execute: (params) async {
               final header = await InAppWebViewController.getVariationsHeader();
               return header ?? 'No variations header';
@@ -279,7 +285,7 @@ class _StaticMethodTesterWidgetState extends State<StaticMethodTesterWidget> {
           StaticMethodEntry(
             methodType: StaticMethodType.isMultiProcessEnabled,
             description: 'Checks if multi-process is enabled',
-            className: 'InAppWebViewController',
+            classType: InAppWebViewController,
             execute: (params) async {
               return await InAppWebViewController.isMultiProcessEnabled();
             },
@@ -287,7 +293,7 @@ class _StaticMethodTesterWidgetState extends State<StaticMethodTesterWidget> {
           StaticMethodEntry(
             methodType: StaticMethodType.disableWebView,
             description: 'Disables the WebView',
-            className: 'InAppWebViewController',
+            classType: InAppWebViewController,
             execute: (params) async {
               await InAppWebViewController.disableWebView();
               return 'WebView disabled';
@@ -296,7 +302,7 @@ class _StaticMethodTesterWidgetState extends State<StaticMethodTesterWidget> {
           StaticMethodEntry(
             methodType: StaticMethodType.handlesURLScheme,
             description: 'Checks if WebView handles a URL scheme',
-            className: 'InAppWebViewController',
+            classType: InAppWebViewController,
             parameters: {'urlScheme': 'https'},
             requiredParameters: ['urlScheme'],
             execute: (params) async {
@@ -307,7 +313,7 @@ class _StaticMethodTesterWidgetState extends State<StaticMethodTesterWidget> {
           StaticMethodEntry(
             methodType: StaticMethodType.clearAllCache,
             description: 'Clears all WebView caches',
-            className: 'InAppWebViewController',
+            classType: InAppWebViewController,
             parameters: {'includeDiskFiles': true},
             execute: (params) async {
               final includeDiskFiles =
@@ -321,7 +327,7 @@ class _StaticMethodTesterWidgetState extends State<StaticMethodTesterWidget> {
           StaticMethodEntry(
             methodType: StaticMethodType.tRexRunnerHtml,
             description: 'Gets the T-Rex Runner game HTML',
-            className: 'InAppWebViewController',
+            classType: InAppWebViewController,
             execute: (params) async {
               final html = await InAppWebViewController.tRexRunnerHtml;
               if (html.length > 200) {
@@ -333,7 +339,7 @@ class _StaticMethodTesterWidgetState extends State<StaticMethodTesterWidget> {
           StaticMethodEntry(
             methodType: StaticMethodType.tRexRunnerCss,
             description: 'Gets the T-Rex Runner game CSS',
-            className: 'InAppWebViewController',
+            classType: InAppWebViewController,
             execute: (params) async {
               final css = await InAppWebViewController.tRexRunnerCss;
               if (css.length > 200) {
@@ -345,14 +351,14 @@ class _StaticMethodTesterWidgetState extends State<StaticMethodTesterWidget> {
         ],
       ),
 
-      // InAppBrowser static methods
+      // In-app browser static methods
       StaticMethodClass(
         classType: StaticClassType.inAppBrowser,
         methods: [
           StaticMethodEntry(
             methodType: StaticMethodType.openWithSystemBrowser,
             description: 'Opens a URL in the system browser',
-            className: 'InAppBrowser',
+            classType: InAppBrowser,
             parameters: {'url': 'https://flutter.dev'},
             requiredParameters: ['url'],
             execute: (params) async {
@@ -364,7 +370,7 @@ class _StaticMethodTesterWidgetState extends State<StaticMethodTesterWidget> {
         ],
       ),
 
-      // ChromeSafariBrowser static methods
+      // Custom tab / Safari view controller static methods
       StaticMethodClass(
         classType: StaticClassType.chromeSafariBrowser,
         methods: [
@@ -372,7 +378,7 @@ class _StaticMethodTesterWidgetState extends State<StaticMethodTesterWidget> {
             methodType: StaticMethodType.isAvailable,
             description:
                 'Checks if Chrome Custom Tabs / SFSafariViewController is available',
-            className: 'ChromeSafariBrowser',
+            classType: ChromeSafariBrowser,
             execute: (params) async {
               return await ChromeSafariBrowser.isAvailable();
             },
@@ -380,7 +386,7 @@ class _StaticMethodTesterWidgetState extends State<StaticMethodTesterWidget> {
           StaticMethodEntry(
             methodType: StaticMethodType.getMaxToolbarItems,
             description: 'Gets the maximum toolbar items (Android only)',
-            className: 'ChromeSafariBrowser',
+            classType: ChromeSafariBrowser,
             execute: (params) async {
               return await ChromeSafariBrowser.getMaxToolbarItems();
             },
@@ -388,7 +394,7 @@ class _StaticMethodTesterWidgetState extends State<StaticMethodTesterWidget> {
           StaticMethodEntry(
             methodType: StaticMethodType.getPackageName,
             description: 'Gets the package name for Custom Tabs (Android only)',
-            className: 'ChromeSafariBrowser',
+            classType: ChromeSafariBrowser,
             execute: (params) async {
               final packageName = await ChromeSafariBrowser.getPackageName();
               return packageName ?? 'No package available';
@@ -397,7 +403,7 @@ class _StaticMethodTesterWidgetState extends State<StaticMethodTesterWidget> {
           StaticMethodEntry(
             methodType: StaticMethodType.clearWebsiteData,
             description: 'Clears website data (Android only)',
-            className: 'ChromeSafariBrowser',
+            classType: ChromeSafariBrowser,
             execute: (params) async {
               await ChromeSafariBrowser.clearWebsiteData();
               return 'Website data cleared';
@@ -406,7 +412,7 @@ class _StaticMethodTesterWidgetState extends State<StaticMethodTesterWidget> {
           StaticMethodEntry(
             methodType: StaticMethodType.prewarmConnections,
             description: 'Prewarms connections (iOS only)',
-            className: 'ChromeSafariBrowser',
+            classType: ChromeSafariBrowser,
             parameters: {'urls': 'https://flutter.dev,https://dart.dev'},
             requiredParameters: ['urls'],
             execute: (params) async {
@@ -431,7 +437,7 @@ class _StaticMethodTesterWidgetState extends State<StaticMethodTesterWidget> {
           StaticMethodEntry(
             methodType: StaticMethodType.isAvailable,
             description: 'Checks if web authentication is available',
-            className: 'WebAuthenticationSession',
+            classType: WebAuthenticationSession,
             execute: (params) async {
               return await WebAuthenticationSession.isAvailable();
             },
@@ -446,10 +452,10 @@ class _StaticMethodTesterWidgetState extends State<StaticMethodTesterWidget> {
           StaticMethodEntry(
             methodType: StaticMethodType.instance,
             description: 'Gets the singleton instance',
-            className: 'ServiceWorkerController',
+            classType: ServiceWorkerController,
             execute: (params) async {
               final controller = ServiceWorkerController.instance();
-              return 'ServiceWorkerController instance: ${controller.hashCode}';
+              return '${ServiceWorkerController} instance: ${controller.hashCode}';
             },
           ),
         ],
@@ -462,12 +468,15 @@ class _StaticMethodTesterWidgetState extends State<StaticMethodTesterWidget> {
           StaticMethodEntry(
             methodType: StaticMethodType.isFeatureSupported,
             description: 'Checks if a WebView feature is supported',
-            className: 'WebViewFeature',
-            parameters: {'feature': 'WEB_MESSAGE_LISTENER'},
+            classType: WebViewFeature,
+            parameters: {
+              'feature': WebViewFeature.WEB_MESSAGE_LISTENER.name(),
+            },
             requiredParameters: ['feature'],
             execute: (params) async {
               final featureName =
-                  params['feature']?.toString() ?? 'WEB_MESSAGE_LISTENER';
+                  params['feature']?.toString() ??
+                  WebViewFeature.WEB_MESSAGE_LISTENER.name();
               final feature = WebViewFeature.values.firstWhere(
                 (f) => f.name().toUpperCase() == featureName.toUpperCase(),
                 orElse: () => WebViewFeature.WEB_MESSAGE_LISTENER,
@@ -478,15 +487,18 @@ class _StaticMethodTesterWidgetState extends State<StaticMethodTesterWidget> {
           StaticMethodEntry(
             methodType: StaticMethodType.isStartupFeatureSupported,
             description: 'Checks if a startup feature is supported',
-            className: 'WebViewFeature',
+            classType: WebViewFeature,
             parameters: {
-              'feature': 'STARTUP_FEATURE_SET_DATA_DIRECTORY_SUFFIX',
+              'feature':
+                  WebViewFeature.STARTUP_FEATURE_SET_DATA_DIRECTORY_SUFFIX
+                      .name(),
             },
             requiredParameters: ['feature'],
             execute: (params) async {
               final featureName =
                   params['feature']?.toString() ??
-                  'STARTUP_FEATURE_SET_DATA_DIRECTORY_SUFFIX';
+                  WebViewFeature.STARTUP_FEATURE_SET_DATA_DIRECTORY_SUFFIX
+                      .name();
               final feature = WebViewFeature.values.firstWhere(
                 (f) => f.name().toUpperCase() == featureName.toUpperCase(),
                 orElse: () =>
@@ -505,7 +517,7 @@ class _StaticMethodTesterWidgetState extends State<StaticMethodTesterWidget> {
           StaticMethodEntry(
             methodType: StaticMethodType.apply,
             description: 'Applies process global config',
-            className: 'ProcessGlobalConfig',
+            classType: ProcessGlobalConfig,
             parameters: {'dataDirectorySuffix': ''},
             execute: (params) async {
               final suffix = params['dataDirectorySuffix']?.toString();
@@ -529,10 +541,10 @@ class _StaticMethodTesterWidgetState extends State<StaticMethodTesterWidget> {
           StaticMethodEntry(
             methodType: StaticMethodType.instance,
             description: 'Gets the singleton instance',
-            className: 'CookieManager',
+            classType: CookieManager,
             execute: (params) async {
               final manager = CookieManager.instance();
-              return 'CookieManager instance: ${manager.hashCode}';
+              return '${CookieManager} instance: ${manager.hashCode}';
             },
           ),
         ],
@@ -545,10 +557,10 @@ class _StaticMethodTesterWidgetState extends State<StaticMethodTesterWidget> {
           StaticMethodEntry(
             methodType: StaticMethodType.instance,
             description: 'Gets the singleton instance',
-            className: 'HttpAuthCredentialDatabase',
+            classType: HttpAuthCredentialDatabase,
             execute: (params) async {
               final db = HttpAuthCredentialDatabase.instance();
-              return 'HttpAuthCredentialDatabase instance: ${db.hashCode}';
+              return '${HttpAuthCredentialDatabase} instance: ${db.hashCode}';
             },
           ),
         ],
@@ -561,10 +573,10 @@ class _StaticMethodTesterWidgetState extends State<StaticMethodTesterWidget> {
           StaticMethodEntry(
             methodType: StaticMethodType.instance,
             description: 'Gets the singleton instance',
-            className: 'WebStorageManager',
+            classType: WebStorageManager,
             execute: (params) async {
               final manager = WebStorageManager.instance();
-              return 'WebStorageManager instance: ${manager.hashCode}';
+              return '${WebStorageManager} instance: ${manager.hashCode}';
             },
           ),
         ],

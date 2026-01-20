@@ -74,8 +74,8 @@ class MethodCategory {
   IconData get icon => categoryType.icon;
 }
 
-/// Widget to test InAppWebViewController methods
-/// Tests all 88 InAppWebViewController methods organized by category
+/// Widget to test WebView controller methods
+/// Tests controller methods organized by category
 class MethodTesterWidget extends StatefulWidget {
   final InAppWebViewController? controller;
 
@@ -1402,7 +1402,7 @@ class _MethodTesterWidgetState extends State<MethodTesterWidget> {
             description: 'Checks interface support',
             methodEnum:
                 PlatformInAppWebViewControllerMethod.isInterfaceSupported,
-            parameters: {'interface': 'ICoreWebView2'},
+            parameters: {'interface': WebViewInterface.ICoreWebView2.name()},
             requiredParameters: ['interface'],
             execute: (controller, params) async {
               return await controller.isInterfaceSupported(

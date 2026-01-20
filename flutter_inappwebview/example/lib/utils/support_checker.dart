@@ -703,943 +703,992 @@ class SupportChecker {
   // ====================
 
   static ApiClassDefinition _getInAppWebViewControllerDefinition() {
+    final className = classNameOf(InAppWebViewController);
     return ApiClassDefinition(
-      className: 'InAppWebViewController',
+      className: className,
       description: 'Controls an InAppWebView instance.',
       isClassSupported: () => InAppWebViewController.isClassSupported(),
       methods: [
         // Navigation methods
         ApiMethodDefinition(
-          name: 'loadUrl',
+          name: PlatformInAppWebViewControllerMethod.loadUrl.name,
           signature: 'Future<void> loadUrl({required URLRequest urlRequest})',
           description: 'Loads the given URL with optional headers.',
-          className: 'InAppWebViewController',
+          className: className,
           category: 'Navigation',
         ),
         ApiMethodDefinition(
-          name: 'postUrl',
+          name: PlatformInAppWebViewControllerMethod.postUrl.name,
           signature:
               'Future<void> postUrl({required WebUri url, required Uint8List postData})',
           description: 'Loads the URL with POST data.',
-          className: 'InAppWebViewController',
+          className: className,
           category: 'Navigation',
         ),
         ApiMethodDefinition(
-          name: 'loadData',
+          name: PlatformInAppWebViewControllerMethod.loadData.name,
           signature: 'Future<void> loadData({required String data, ...})',
           description: 'Loads HTML data directly into the WebView.',
-          className: 'InAppWebViewController',
+          className: className,
           category: 'Navigation',
         ),
         ApiMethodDefinition(
-          name: 'loadFile',
+          name: PlatformInAppWebViewControllerMethod.loadFile.name,
           signature: 'Future<void> loadFile({required String assetFilePath})',
           description: 'Loads a file from the asset bundle.',
-          className: 'InAppWebViewController',
+          className: className,
           category: 'Navigation',
         ),
         ApiMethodDefinition(
-          name: 'reload',
+          name: PlatformInAppWebViewControllerMethod.reload.name,
           signature: 'Future<void> reload()',
           description: 'Reloads the current page.',
-          className: 'InAppWebViewController',
+          className: className,
           category: 'Navigation',
         ),
         ApiMethodDefinition(
-          name: 'reloadFromOrigin',
+          name: PlatformInAppWebViewControllerMethod.reloadFromOrigin.name,
           signature: 'Future<void> reloadFromOrigin()',
           description:
               'Reloads the current page, performing end-to-end validation.',
-          className: 'InAppWebViewController',
+          className: className,
           category: 'Navigation',
         ),
         ApiMethodDefinition(
-          name: 'goBack',
+          name: PlatformInAppWebViewControllerMethod.goBack.name,
           signature: 'Future<void> goBack()',
           description: 'Goes back in the history of the WebView.',
-          className: 'InAppWebViewController',
+          className: className,
           category: 'Navigation',
         ),
         ApiMethodDefinition(
-          name: 'goForward',
+          name: PlatformInAppWebViewControllerMethod.goForward.name,
           signature: 'Future<void> goForward()',
           description: 'Goes forward in the history of the WebView.',
-          className: 'InAppWebViewController',
+          className: className,
           category: 'Navigation',
         ),
         ApiMethodDefinition(
-          name: 'goBackOrForward',
+          name: PlatformInAppWebViewControllerMethod.goBackOrForward.name,
           signature: 'Future<void> goBackOrForward({required int steps})',
           description: 'Goes to the history item at the given offset.',
-          className: 'InAppWebViewController',
+          className: className,
           category: 'Navigation',
         ),
         ApiMethodDefinition(
-          name: 'goTo',
+          name: PlatformInAppWebViewControllerMethod.goTo.name,
           signature: 'Future<void> goTo({required WebHistoryItem historyItem})',
           description: 'Goes to the specified history item.',
-          className: 'InAppWebViewController',
+          className: className,
           category: 'Navigation',
         ),
         ApiMethodDefinition(
-          name: 'canGoBack',
+          name: PlatformInAppWebViewControllerMethod.canGoBack.name,
           signature: 'Future<bool> canGoBack()',
           description: 'Returns whether the WebView can go back in history.',
-          className: 'InAppWebViewController',
+          className: className,
           category: 'Navigation',
         ),
         ApiMethodDefinition(
-          name: 'canGoForward',
+          name: PlatformInAppWebViewControllerMethod.canGoForward.name,
           signature: 'Future<bool> canGoForward()',
           description: 'Returns whether the WebView can go forward in history.',
-          className: 'InAppWebViewController',
+          className: className,
           category: 'Navigation',
         ),
         ApiMethodDefinition(
-          name: 'canGoBackOrForward',
+          name: PlatformInAppWebViewControllerMethod.canGoBackOrForward.name,
           signature: 'Future<bool> canGoBackOrForward({required int steps})',
           description:
               'Returns whether the WebView can go to the specified offset.',
-          className: 'InAppWebViewController',
+          className: className,
           category: 'Navigation',
         ),
         ApiMethodDefinition(
-          name: 'isLoading',
+          name: PlatformInAppWebViewControllerMethod.isLoading.name,
           signature: 'Future<bool> isLoading()',
           description: 'Returns whether the WebView is currently loading.',
-          className: 'InAppWebViewController',
+          className: className,
           category: 'Navigation',
         ),
         ApiMethodDefinition(
-          name: 'stopLoading',
+          name: PlatformInAppWebViewControllerMethod.stopLoading.name,
           signature: 'Future<void> stopLoading()',
           description: 'Stops the current page load.',
-          className: 'InAppWebViewController',
+          className: className,
           category: 'Navigation',
         ),
         ApiMethodDefinition(
-          name: 'loadSimulatedRequest',
+          name: PlatformInAppWebViewControllerMethod.loadSimulatedRequest.name,
           signature:
               'Future<void> loadSimulatedRequest({required URLRequest urlRequest, ...})',
           description:
               'Navigates to a requested URL with simulated response data.',
-          className: 'InAppWebViewController',
+          className: className,
           category: 'Navigation',
         ),
 
         // Page Info methods
         ApiMethodDefinition(
-          name: 'getUrl',
+          name: PlatformInAppWebViewControllerMethod.getUrl.name,
           signature: 'Future<WebUri?> getUrl()',
           description: 'Gets the current URL of the WebView.',
-          className: 'InAppWebViewController',
+          className: className,
           category: 'Page Info',
         ),
         ApiMethodDefinition(
-          name: 'getTitle',
+          name: PlatformInAppWebViewControllerMethod.getTitle.name,
           signature: 'Future<String?> getTitle()',
           description: 'Gets the title of the current page.',
-          className: 'InAppWebViewController',
+          className: className,
           category: 'Page Info',
         ),
         ApiMethodDefinition(
-          name: 'getProgress',
+          name: PlatformInAppWebViewControllerMethod.getProgress.name,
           signature: 'Future<int?> getProgress()',
           description: 'Gets the current loading progress.',
-          className: 'InAppWebViewController',
+          className: className,
           category: 'Page Info',
         ),
         ApiMethodDefinition(
-          name: 'getHtml',
+          name: PlatformInAppWebViewControllerMethod.getHtml.name,
           signature: 'Future<String?> getHtml()',
           description: 'Gets the HTML content of the current page.',
-          className: 'InAppWebViewController',
+          className: className,
           category: 'Page Info',
         ),
         ApiMethodDefinition(
-          name: 'getFavicons',
+          name: PlatformInAppWebViewControllerMethod.getFavicons.name,
           signature: 'Future<List<Favicon>> getFavicons()',
           description: 'Gets the favicons of the current page.',
-          className: 'InAppWebViewController',
+          className: className,
           category: 'Page Info',
         ),
         ApiMethodDefinition(
-          name: 'getOriginalUrl',
+          name: PlatformInAppWebViewControllerMethod.getOriginalUrl.name,
           signature: 'Future<WebUri?> getOriginalUrl()',
           description: 'Gets the original URL before redirects.',
-          className: 'InAppWebViewController',
+          className: className,
           category: 'Page Info',
         ),
         ApiMethodDefinition(
-          name: 'getSelectedText',
+          name: PlatformInAppWebViewControllerMethod.getSelectedText.name,
           signature: 'Future<String?> getSelectedText()',
           description: 'Gets the currently selected text.',
-          className: 'InAppWebViewController',
+          className: className,
           category: 'Page Info',
         ),
         ApiMethodDefinition(
-          name: 'getHitTestResult',
+          name: PlatformInAppWebViewControllerMethod.getHitTestResult.name,
           signature: 'Future<InAppWebViewHitTestResult?> getHitTestResult()',
           description: 'Gets a hit test result for the last tap.',
-          className: 'InAppWebViewController',
+          className: className,
           category: 'Page Info',
         ),
         ApiMethodDefinition(
-          name: 'getMetaTags',
+          name: PlatformInAppWebViewControllerMethod.getMetaTags.name,
           signature: 'Future<List<MetaTag>> getMetaTags()',
           description: 'Gets all meta tags of the current page.',
-          className: 'InAppWebViewController',
+          className: className,
           category: 'Page Info',
         ),
         ApiMethodDefinition(
-          name: 'getMetaThemeColor',
+          name: PlatformInAppWebViewControllerMethod.getMetaThemeColor.name,
           signature: 'Future<Color?> getMetaThemeColor()',
           description: 'Gets the meta theme color of the page.',
-          className: 'InAppWebViewController',
+          className: className,
           category: 'Page Info',
         ),
         ApiMethodDefinition(
-          name: 'getCertificate',
+          name: PlatformInAppWebViewControllerMethod.getCertificate.name,
           signature: 'Future<SslCertificate?> getCertificate()',
           description: 'Gets the SSL certificate for the main resource.',
-          className: 'InAppWebViewController',
+          className: className,
           category: 'Page Info',
         ),
         ApiMethodDefinition(
-          name: 'getCopyBackForwardList',
+          name: PlatformInAppWebViewControllerMethod.getCopyBackForwardList.name,
           signature: 'Future<WebHistory?> getCopyBackForwardList()',
           description: 'Gets a copy of the back/forward list.',
-          className: 'InAppWebViewController',
+          className: className,
           category: 'Page Info',
         ),
 
         // JavaScript methods
         ApiMethodDefinition(
-          name: 'evaluateJavascript',
+          name: PlatformInAppWebViewControllerMethod.evaluateJavascript.name,
           signature:
               'Future<dynamic> evaluateJavascript({required String source, ...})',
           description: 'Evaluates JavaScript code and returns the result.',
-          className: 'InAppWebViewController',
+          className: className,
           category: 'JavaScript',
         ),
         ApiMethodDefinition(
-          name: 'callAsyncJavaScript',
+          name: PlatformInAppWebViewControllerMethod.callAsyncJavaScript.name,
           signature:
               'Future<CallAsyncJavaScriptResult?> callAsyncJavaScript({...})',
           description: 'Calls a JavaScript function asynchronously.',
-          className: 'InAppWebViewController',
+          className: className,
           category: 'JavaScript',
         ),
         ApiMethodDefinition(
-          name: 'injectJavascriptFileFromUrl',
+          name: PlatformInAppWebViewControllerMethod
+              .injectJavascriptFileFromUrl
+              .name,
           signature:
               'Future<void> injectJavascriptFileFromUrl({required WebUri urlFile, ...})',
           description: 'Injects a JavaScript file from a URL.',
-          className: 'InAppWebViewController',
+          className: className,
           category: 'JavaScript',
         ),
         ApiMethodDefinition(
-          name: 'injectJavascriptFileFromAsset',
+          name: PlatformInAppWebViewControllerMethod
+              .injectJavascriptFileFromAsset
+              .name,
           signature:
               'Future<dynamic> injectJavascriptFileFromAsset({required String assetFilePath})',
           description: 'Injects a JavaScript file from assets.',
-          className: 'InAppWebViewController',
+          className: className,
           category: 'JavaScript',
         ),
         ApiMethodDefinition(
-          name: 'injectCSSCode',
+          name: PlatformInAppWebViewControllerMethod.injectCSSCode.name,
           signature: 'Future<void> injectCSSCode({required String source})',
           description: 'Injects CSS code into the page.',
-          className: 'InAppWebViewController',
+          className: className,
           category: 'JavaScript',
         ),
         ApiMethodDefinition(
-          name: 'injectCSSFileFromUrl',
+          name: PlatformInAppWebViewControllerMethod
+              .injectCSSFileFromUrl
+              .name,
           signature:
               'Future<void> injectCSSFileFromUrl({required WebUri urlFile, ...})',
           description: 'Injects a CSS file from a URL.',
-          className: 'InAppWebViewController',
+          className: className,
           category: 'JavaScript',
         ),
         ApiMethodDefinition(
-          name: 'injectCSSFileFromAsset',
+          name: PlatformInAppWebViewControllerMethod
+              .injectCSSFileFromAsset
+              .name,
           signature:
               'Future<void> injectCSSFileFromAsset({required String assetFilePath})',
           description: 'Injects a CSS file from assets.',
-          className: 'InAppWebViewController',
+          className: className,
           category: 'JavaScript',
         ),
 
         // JavaScript Handler methods
         ApiMethodDefinition(
-          name: 'addJavaScriptHandler',
+          name: PlatformInAppWebViewControllerMethod.addJavaScriptHandler.name,
           signature:
               'void addJavaScriptHandler({required String handlerName, ...})',
           description: 'Adds a handler for JavaScript to call.',
-          className: 'InAppWebViewController',
+          className: className,
           category: 'Handlers',
         ),
         ApiMethodDefinition(
-          name: 'removeJavaScriptHandler',
+          name: PlatformInAppWebViewControllerMethod
+              .removeJavaScriptHandler
+              .name,
           signature:
               'JavaScriptHandlerCallback? removeJavaScriptHandler({required String handlerName})',
           description: 'Removes a JavaScript handler.',
-          className: 'InAppWebViewController',
+          className: className,
           category: 'Handlers',
         ),
         ApiMethodDefinition(
-          name: 'hasJavaScriptHandler',
+          name: PlatformInAppWebViewControllerMethod.hasJavaScriptHandler.name,
           signature: 'bool hasJavaScriptHandler({required String handlerName})',
           description: 'Checks if a JavaScript handler exists.',
-          className: 'InAppWebViewController',
+          className: className,
           category: 'Handlers',
         ),
 
         // User Scripts methods
         ApiMethodDefinition(
-          name: 'addUserScript',
+          name: PlatformInAppWebViewControllerMethod.addUserScript.name,
           signature:
               'Future<void> addUserScript({required UserScript userScript})',
           description: 'Adds a user script to the WebView.',
-          className: 'InAppWebViewController',
+          className: className,
           category: 'User Scripts',
         ),
         ApiMethodDefinition(
-          name: 'removeUserScript',
+          name: PlatformInAppWebViewControllerMethod.removeUserScript.name,
           signature:
               'Future<bool> removeUserScript({required UserScript userScript})',
           description: 'Removes a user script.',
-          className: 'InAppWebViewController',
+          className: className,
           category: 'User Scripts',
         ),
         ApiMethodDefinition(
-          name: 'removeUserScriptsByGroupName',
+          name: PlatformInAppWebViewControllerMethod
+              .removeUserScriptsByGroupName
+              .name,
           signature:
               'Future<void> removeUserScriptsByGroupName({required String groupName})',
           description: 'Removes user scripts by group name.',
-          className: 'InAppWebViewController',
+          className: className,
           category: 'User Scripts',
         ),
         ApiMethodDefinition(
-          name: 'removeAllUserScripts',
+          name: PlatformInAppWebViewControllerMethod.removeAllUserScripts.name,
           signature: 'Future<void> removeAllUserScripts()',
           description: 'Removes all user scripts.',
-          className: 'InAppWebViewController',
+          className: className,
           category: 'User Scripts',
         ),
         ApiMethodDefinition(
-          name: 'hasUserScript',
+          name: PlatformInAppWebViewControllerMethod.hasUserScript.name,
           signature: 'bool hasUserScript({required UserScript userScript})',
           description: 'Checks if a user script exists.',
-          className: 'InAppWebViewController',
+          className: className,
           category: 'User Scripts',
         ),
 
         // Scrolling methods
         ApiMethodDefinition(
-          name: 'scrollTo',
+          name: PlatformInAppWebViewControllerMethod.scrollTo.name,
           signature:
               'Future<void> scrollTo({required int x, required int y, bool animated})',
           description: 'Scrolls the WebView to the specified position.',
-          className: 'InAppWebViewController',
+          className: className,
           category: 'Scrolling',
         ),
         ApiMethodDefinition(
-          name: 'scrollBy',
+          name: PlatformInAppWebViewControllerMethod.scrollBy.name,
           signature:
               'Future<void> scrollBy({required int x, required int y, bool animated})',
           description: 'Scrolls the WebView by the specified amount.',
-          className: 'InAppWebViewController',
+          className: className,
           category: 'Scrolling',
         ),
         ApiMethodDefinition(
-          name: 'getScrollX',
+          name: PlatformInAppWebViewControllerMethod.getScrollX.name,
           signature: 'Future<int?> getScrollX()',
           description: 'Gets the current horizontal scroll position.',
-          className: 'InAppWebViewController',
+          className: className,
           category: 'Scrolling',
         ),
         ApiMethodDefinition(
-          name: 'getScrollY',
+          name: PlatformInAppWebViewControllerMethod.getScrollY.name,
           signature: 'Future<int?> getScrollY()',
           description: 'Gets the current vertical scroll position.',
-          className: 'InAppWebViewController',
+          className: className,
           category: 'Scrolling',
         ),
         ApiMethodDefinition(
-          name: 'getContentHeight',
+          name: PlatformInAppWebViewControllerMethod.getContentHeight.name,
           signature: 'Future<int?> getContentHeight()',
           description: 'Gets the height of the HTML content.',
-          className: 'InAppWebViewController',
+          className: className,
           category: 'Scrolling',
         ),
         ApiMethodDefinition(
-          name: 'getContentWidth',
+          name: PlatformInAppWebViewControllerMethod.getContentWidth.name,
           signature: 'Future<int?> getContentWidth()',
           description: 'Gets the width of the HTML content.',
-          className: 'InAppWebViewController',
+          className: className,
           category: 'Scrolling',
         ),
         ApiMethodDefinition(
-          name: 'canScrollVertically',
+          name: PlatformInAppWebViewControllerMethod.canScrollVertically.name,
           signature: 'Future<bool> canScrollVertically()',
           description: 'Checks if the WebView can scroll vertically.',
-          className: 'InAppWebViewController',
+          className: className,
           category: 'Scrolling',
         ),
         ApiMethodDefinition(
-          name: 'canScrollHorizontally',
+          name:
+              PlatformInAppWebViewControllerMethod.canScrollHorizontally.name,
           signature: 'Future<bool> canScrollHorizontally()',
           description: 'Checks if the WebView can scroll horizontally.',
-          className: 'InAppWebViewController',
+          className: className,
           category: 'Scrolling',
         ),
         ApiMethodDefinition(
-          name: 'pageDown',
+          name: PlatformInAppWebViewControllerMethod.pageDown.name,
           signature: 'Future<bool> pageDown({required bool bottom})',
           description: 'Scrolls down by half or full page.',
-          className: 'InAppWebViewController',
+          className: className,
           category: 'Scrolling',
         ),
         ApiMethodDefinition(
-          name: 'pageUp',
+          name: PlatformInAppWebViewControllerMethod.pageUp.name,
           signature: 'Future<bool> pageUp({required bool top})',
           description: 'Scrolls up by half or full page.',
-          className: 'InAppWebViewController',
+          className: className,
           category: 'Scrolling',
         ),
 
         // Zoom methods
         ApiMethodDefinition(
-          name: 'zoomBy',
+          name: PlatformInAppWebViewControllerMethod.zoomBy.name,
           signature: 'Future<void> zoomBy({required double zoomFactor, ...})',
           description: 'Zooms by the specified factor.',
-          className: 'InAppWebViewController',
+          className: className,
           category: 'Zoom',
         ),
         ApiMethodDefinition(
-          name: 'zoomIn',
+          name: PlatformInAppWebViewControllerMethod.zoomIn.name,
           signature: 'Future<bool> zoomIn()',
           description: 'Zooms in by a standard amount.',
-          className: 'InAppWebViewController',
+          className: className,
           category: 'Zoom',
         ),
         ApiMethodDefinition(
-          name: 'zoomOut',
+          name: PlatformInAppWebViewControllerMethod.zoomOut.name,
           signature: 'Future<bool> zoomOut()',
           description: 'Zooms out by a standard amount.',
-          className: 'InAppWebViewController',
+          className: className,
           category: 'Zoom',
         ),
         ApiMethodDefinition(
-          name: 'getZoomScale',
+          name: PlatformInAppWebViewControllerMethod.getZoomScale.name,
           signature: 'Future<double?> getZoomScale()',
           description: 'Gets the current zoom scale.',
-          className: 'InAppWebViewController',
+          className: className,
           category: 'Zoom',
         ),
 
         // Settings methods
         ApiMethodDefinition(
-          name: 'setSettings',
+          name: PlatformInAppWebViewControllerMethod.setSettings.name,
           signature:
               'Future<void> setSettings({required InAppWebViewSettings settings})',
           description: 'Updates the WebView settings.',
-          className: 'InAppWebViewController',
+          className: className,
           category: 'Settings',
         ),
         ApiMethodDefinition(
-          name: 'getSettings',
+          name: PlatformInAppWebViewControllerMethod.getSettings.name,
           signature: 'Future<InAppWebViewSettings?> getSettings()',
           description: 'Gets the current WebView settings.',
-          className: 'InAppWebViewController',
+          className: className,
           category: 'Settings',
         ),
         ApiMethodDefinition(
-          name: 'setContextMenu',
+          name: PlatformInAppWebViewControllerMethod.setContextMenu.name,
           signature: 'Future<void> setContextMenu(ContextMenu? contextMenu)',
           description: 'Sets the context menu.',
-          className: 'InAppWebViewController',
+          className: className,
           category: 'Settings',
         ),
         ApiMethodDefinition(
-          name: 'requestFocus',
+          name: PlatformInAppWebViewControllerMethod.requestFocus.name,
           signature: 'Future<void> requestFocus()',
           description: 'Requests focus for the WebView.',
-          className: 'InAppWebViewController',
+          className: className,
           category: 'Settings',
         ),
         ApiMethodDefinition(
-          name: 'clearFocus',
+          name: PlatformInAppWebViewControllerMethod.clearFocus.name,
           signature: 'Future<void> clearFocus()',
           description: 'Clears focus from the WebView.',
-          className: 'InAppWebViewController',
+          className: className,
           category: 'Settings',
         ),
 
         // Screenshot methods
         ApiMethodDefinition(
-          name: 'takeScreenshot',
+          name: PlatformInAppWebViewControllerMethod.takeScreenshot.name,
           signature:
               'Future<Uint8List?> takeScreenshot({ScreenshotConfiguration? screenshotConfiguration})',
           description: 'Takes a screenshot of the WebView.',
-          className: 'InAppWebViewController',
+          className: className,
           category: 'Screenshot',
         ),
         ApiMethodDefinition(
-          name: 'printCurrentPage',
+          name: PlatformInAppWebViewControllerMethod.printCurrentPage.name,
           signature:
               'Future<PrintJobController?> printCurrentPage({PrintJobSettings? settings})',
           description: 'Prints the current page.',
-          className: 'InAppWebViewController',
+          className: className,
           category: 'Screenshot',
         ),
         ApiMethodDefinition(
-          name: 'createPdf',
+          name: PlatformInAppWebViewControllerMethod.createPdf.name,
           signature:
               'Future<Uint8List?> createPdf({PdfConfiguration? pdfConfiguration})',
           description: 'Creates a PDF from the current page.',
-          className: 'InAppWebViewController',
+          className: className,
           category: 'Screenshot',
         ),
 
         // Cache methods
         ApiMethodDefinition(
-          name: 'clearHistory',
+          name: PlatformInAppWebViewControllerMethod.clearHistory.name,
           signature: 'Future<void> clearHistory()',
           description: 'Clears the WebView history.',
-          className: 'InAppWebViewController',
+          className: className,
           category: 'Cache',
         ),
         ApiMethodDefinition(
-          name: 'clearFormData',
+          name: PlatformInAppWebViewControllerMethod.clearFormData.name,
           signature: 'Future<void> clearFormData()',
           description: 'Clears form data.',
-          className: 'InAppWebViewController',
+          className: className,
           category: 'Cache',
         ),
         ApiMethodDefinition(
-          name: 'clearSslPreferences',
+          name: PlatformInAppWebViewControllerMethod.clearSslPreferences.name,
           signature: 'Future<void> clearSslPreferences()',
           description: 'Clears SSL preferences.',
-          className: 'InAppWebViewController',
+          className: className,
           category: 'Cache',
         ),
 
         // Pause/Resume methods
         ApiMethodDefinition(
-          name: 'pause',
+          name: PlatformInAppWebViewControllerMethod.pause.name,
           signature: 'Future<void> pause()',
           description: 'Pauses the WebView.',
-          className: 'InAppWebViewController',
+          className: className,
           category: 'Pause/Resume',
         ),
         ApiMethodDefinition(
-          name: 'resume',
+          name: PlatformInAppWebViewControllerMethod.resume.name,
           signature: 'Future<void> resume()',
           description: 'Resumes the WebView.',
-          className: 'InAppWebViewController',
+          className: className,
           category: 'Pause/Resume',
         ),
         ApiMethodDefinition(
-          name: 'pauseTimers',
+          name: PlatformInAppWebViewControllerMethod.pauseTimers.name,
           signature: 'Future<void> pauseTimers()',
           description: 'Pauses all layout, parsing, and JavaScript timers.',
-          className: 'InAppWebViewController',
+          className: className,
           category: 'Pause/Resume',
         ),
         ApiMethodDefinition(
-          name: 'resumeTimers',
+          name: PlatformInAppWebViewControllerMethod.resumeTimers.name,
           signature: 'Future<void> resumeTimers()',
           description: 'Resumes all layout, parsing, and JavaScript timers.',
-          className: 'InAppWebViewController',
+          className: className,
           category: 'Pause/Resume',
         ),
 
         // Web Messaging methods
         ApiMethodDefinition(
-          name: 'createWebMessageChannel',
+          name: PlatformInAppWebViewControllerMethod
+              .createWebMessageChannel
+              .name,
           signature: 'Future<WebMessageChannel?> createWebMessageChannel()',
           description: 'Creates a message channel for communication.',
-          className: 'InAppWebViewController',
+          className: className,
           category: 'Web Messaging',
         ),
         ApiMethodDefinition(
-          name: 'postWebMessage',
+          name: PlatformInAppWebViewControllerMethod.postWebMessage.name,
           signature:
               'Future<void> postWebMessage({required WebMessage message, ...})',
           description: 'Posts a message to the WebView.',
-          className: 'InAppWebViewController',
+          className: className,
           category: 'Web Messaging',
         ),
         ApiMethodDefinition(
-          name: 'addWebMessageListener',
+          name: PlatformInAppWebViewControllerMethod.addWebMessageListener.name,
           signature:
               'Future<void> addWebMessageListener(WebMessageListener webMessageListener)',
           description: 'Adds a listener for web messages.',
-          className: 'InAppWebViewController',
+          className: className,
           category: 'Web Messaging',
         ),
         ApiMethodDefinition(
-          name: 'hasWebMessageListener',
+          name: PlatformInAppWebViewControllerMethod.hasWebMessageListener.name,
           signature:
               'bool hasWebMessageListener({required String jsObjectName})',
           description: 'Checks if a web message listener exists.',
-          className: 'InAppWebViewController',
+          className: className,
           category: 'Web Messaging',
         ),
 
         // Media methods
         ApiMethodDefinition(
-          name: 'isInFullscreen',
+          name: PlatformInAppWebViewControllerMethod.isInFullscreen.name,
           signature: 'Future<bool?> isInFullscreen()',
           description: 'Returns whether the WebView is in fullscreen mode.',
-          className: 'InAppWebViewController',
+          className: className,
           category: 'Media',
         ),
         ApiMethodDefinition(
-          name: 'pauseAllMediaPlayback',
+          name:
+              PlatformInAppWebViewControllerMethod.pauseAllMediaPlayback.name,
           signature: 'Future<void> pauseAllMediaPlayback()',
           description: 'Pauses all media playback.',
-          className: 'InAppWebViewController',
+          className: className,
           category: 'Media',
         ),
         ApiMethodDefinition(
-          name: 'setAllMediaPlaybackSuspended',
+          name: PlatformInAppWebViewControllerMethod
+              .setAllMediaPlaybackSuspended
+              .name,
           signature:
               'Future<void> setAllMediaPlaybackSuspended({required bool suspended})',
           description: 'Suspends or resumes all media playback.',
-          className: 'InAppWebViewController',
+          className: className,
           category: 'Media',
         ),
         ApiMethodDefinition(
-          name: 'closeAllMediaPresentations',
+          name: PlatformInAppWebViewControllerMethod
+              .closeAllMediaPresentations
+              .name,
           signature: 'Future<void> closeAllMediaPresentations()',
           description: 'Closes all media presentations.',
-          className: 'InAppWebViewController',
+          className: className,
           category: 'Media',
         ),
         ApiMethodDefinition(
-          name: 'requestMediaPlaybackState',
+          name: PlatformInAppWebViewControllerMethod
+              .requestMediaPlaybackState
+              .name,
           signature: 'Future<MediaPlaybackState?> requestMediaPlaybackState()',
           description: 'Gets the current media playback state.',
-          className: 'InAppWebViewController',
+          className: className,
           category: 'Media',
         ),
         ApiMethodDefinition(
-          name: 'isPlayingAudio',
+          name: PlatformInAppWebViewControllerMethod.isPlayingAudio.name,
           signature: 'Future<bool?> isPlayingAudio()',
           description: 'Checks if audio is currently playing.',
-          className: 'InAppWebViewController',
+          className: className,
           category: 'Media',
         ),
         ApiMethodDefinition(
-          name: 'isMuted',
+          name: PlatformInAppWebViewControllerMethod.isMuted.name,
           signature: 'Future<bool?> isMuted()',
           description: 'Checks if audio is muted.',
-          className: 'InAppWebViewController',
+          className: className,
           category: 'Media',
         ),
         ApiMethodDefinition(
-          name: 'setMuted',
+          name: PlatformInAppWebViewControllerMethod.setMuted.name,
           signature: 'Future<void> setMuted({required bool muted})',
           description: 'Sets the muted state.',
-          className: 'InAppWebViewController',
+          className: className,
           category: 'Media',
         ),
 
         // Camera/Mic methods
         ApiMethodDefinition(
-          name: 'getCameraCaptureState',
+          name: PlatformInAppWebViewControllerMethod.getCameraCaptureState.name,
           signature: 'Future<MediaCaptureState?> getCameraCaptureState()',
           description: 'Gets the camera capture state.',
-          className: 'InAppWebViewController',
+          className: className,
           category: 'Camera/Mic',
         ),
         ApiMethodDefinition(
-          name: 'setCameraCaptureState',
+          name: PlatformInAppWebViewControllerMethod.setCameraCaptureState.name,
           signature:
               'Future<void> setCameraCaptureState({required MediaCaptureState state})',
           description: 'Sets the camera capture state.',
-          className: 'InAppWebViewController',
+          className: className,
           category: 'Camera/Mic',
         ),
         ApiMethodDefinition(
-          name: 'getMicrophoneCaptureState',
+          name:
+              PlatformInAppWebViewControllerMethod.getMicrophoneCaptureState.name,
           signature: 'Future<MediaCaptureState?> getMicrophoneCaptureState()',
           description: 'Gets the microphone capture state.',
-          className: 'InAppWebViewController',
+          className: className,
           category: 'Camera/Mic',
         ),
         ApiMethodDefinition(
-          name: 'setMicrophoneCaptureState',
+          name: PlatformInAppWebViewControllerMethod
+              .setMicrophoneCaptureState
+              .name,
           signature:
               'Future<void> setMicrophoneCaptureState({required MediaCaptureState state})',
           description: 'Sets the microphone capture state.',
-          className: 'InAppWebViewController',
+          className: className,
           category: 'Camera/Mic',
         ),
 
         // Security methods
         ApiMethodDefinition(
-          name: 'isSecureContext',
+          name: PlatformInAppWebViewControllerMethod.isSecureContext.name,
           signature: 'Future<bool> isSecureContext()',
           description: 'Checks if the current context is secure (HTTPS).',
-          className: 'InAppWebViewController',
+          className: className,
           category: 'Security',
         ),
         ApiMethodDefinition(
-          name: 'hasOnlySecureContent',
+          name: PlatformInAppWebViewControllerMethod.hasOnlySecureContent.name,
           signature: 'Future<bool> hasOnlySecureContent()',
           description: 'Checks if the page has only secure content.',
-          className: 'InAppWebViewController',
+          className: className,
           category: 'Security',
         ),
 
         // Android-specific methods
         ApiMethodDefinition(
-          name: 'startSafeBrowsing',
+          name: PlatformInAppWebViewControllerMethod.startSafeBrowsing.name,
           signature: 'Future<bool> startSafeBrowsing()',
           description: 'Starts the Safe Browsing initialization.',
-          className: 'InAppWebViewController',
+          className: className,
           category: 'Android',
         ),
         ApiMethodDefinition(
-          name: 'saveWebArchive',
+          name: PlatformInAppWebViewControllerMethod.saveWebArchive.name,
           signature:
               'Future<String?> saveWebArchive({required String basename, ...})',
           description: 'Saves the current page as a web archive.',
-          className: 'InAppWebViewController',
+          className: className,
           category: 'Android',
         ),
         ApiMethodDefinition(
-          name: 'requestFocusNodeHref',
+          name:
+              PlatformInAppWebViewControllerMethod.requestFocusNodeHref.name,
           signature:
               'Future<RequestFocusNodeHrefResult?> requestFocusNodeHref()',
           description: 'Requests the URL of the focused anchor.',
-          className: 'InAppWebViewController',
+          className: className,
           category: 'Android',
         ),
         ApiMethodDefinition(
-          name: 'requestImageRef',
+          name: PlatformInAppWebViewControllerMethod.requestImageRef.name,
           signature: 'Future<RequestImageRefResult?> requestImageRef()',
           description: 'Requests the URL of the focused image.',
-          className: 'InAppWebViewController',
+          className: className,
           category: 'Android',
         ),
         ApiMethodDefinition(
-          name: 'saveState',
+          name: PlatformInAppWebViewControllerMethod.saveState.name,
           signature: 'Future<Uint8List?> saveState()',
           description: 'Saves the WebView state to a bundle.',
-          className: 'InAppWebViewController',
+          className: className,
           category: 'Android',
         ),
         ApiMethodDefinition(
-          name: 'restoreState',
+          name: PlatformInAppWebViewControllerMethod.restoreState.name,
           signature: 'Future<void> restoreState({required Uint8List state})',
           description: 'Restores the WebView state from a bundle.',
-          className: 'InAppWebViewController',
+          className: className,
           category: 'Android',
         ),
 
         // iOS/macOS-specific methods
         ApiMethodDefinition(
-          name: 'createWebArchiveData',
+          name: PlatformInAppWebViewControllerMethod.createWebArchiveData.name,
           signature: 'Future<Uint8List?> createWebArchiveData()',
           description: 'Creates a web archive of the current page.',
-          className: 'InAppWebViewController',
+          className: className,
           category: 'iOS/macOS',
         ),
         ApiMethodDefinition(
-          name: 'terminateWebProcess',
+          name: PlatformInAppWebViewControllerMethod.terminateWebProcess.name,
           signature: 'Future<void> terminateWebProcess()',
           description: 'Terminates the web content process.',
-          className: 'InAppWebViewController',
+          className: className,
           category: 'iOS/macOS',
         ),
 
         // Windows-specific methods
         ApiMethodDefinition(
-          name: 'openDevTools',
+          name: PlatformInAppWebViewControllerMethod.openDevTools.name,
           signature: 'Future<void> openDevTools()',
           description: 'Opens the browser DevTools.',
-          className: 'InAppWebViewController',
+          className: className,
           category: 'Windows',
         ),
         ApiMethodDefinition(
-          name: 'callDevToolsProtocolMethod',
+          name: PlatformInAppWebViewControllerMethod
+              .callDevToolsProtocolMethod
+              .name,
           signature:
               'Future<dynamic> callDevToolsProtocolMethod({required String methodName, ...})',
           description: 'Calls a DevTools Protocol method.',
-          className: 'InAppWebViewController',
+          className: className,
           category: 'Windows',
         ),
         ApiMethodDefinition(
-          name: 'addDevToolsProtocolEventListener',
+          name: PlatformInAppWebViewControllerMethod
+              .addDevToolsProtocolEventListener
+              .name,
           signature:
               'Future<void> addDevToolsProtocolEventListener({required String eventName, ...})',
           description: 'Adds a DevTools Protocol event listener.',
-          className: 'InAppWebViewController',
+          className: className,
           category: 'Windows',
         ),
         ApiMethodDefinition(
-          name: 'removeDevToolsProtocolEventListener',
+          name: PlatformInAppWebViewControllerMethod
+              .removeDevToolsProtocolEventListener
+              .name,
           signature:
               'Future<void> removeDevToolsProtocolEventListener({required String eventName})',
           description: 'Removes a DevTools Protocol event listener.',
-          className: 'InAppWebViewController',
+          className: className,
           category: 'Windows',
         ),
 
         // Web-specific methods
         ApiMethodDefinition(
-          name: 'getIFrameId',
+          name: PlatformInAppWebViewControllerMethod.getIFrameId.name,
           signature: 'Future<String?> getIFrameId()',
           description: 'Gets the iframe ID on web platform.',
-          className: 'InAppWebViewController',
+          className: className,
           category: 'Web',
         ),
 
         // Other methods
         ApiMethodDefinition(
-          name: 'getViewId',
+          name: PlatformInAppWebViewControllerMethod.getViewId.name,
           signature: 'int getViewId()',
           description: 'Gets the view ID of the WebView.',
-          className: 'InAppWebViewController',
+          className: className,
           category: 'Other',
         ),
         ApiMethodDefinition(
-          name: 'dispose',
+          name: PlatformInAppWebViewControllerMethod.dispose.name,
           signature: 'void dispose()',
           description: 'Disposes the controller and releases resources.',
-          className: 'InAppWebViewController',
+          className: className,
           category: 'Other',
         ),
 
         // Static methods
         ApiMethodDefinition(
-          name: 'getDefaultUserAgent',
+          name: PlatformInAppWebViewControllerMethod.getDefaultUserAgent.name,
           signature: 'static Future<String> getDefaultUserAgent()',
           description: 'Gets the default User-Agent string.',
-          className: 'InAppWebViewController',
+          className: className,
           isStatic: true,
           category: 'Static',
         ),
         ApiMethodDefinition(
-          name: 'clearClientCertPreferences',
+          name: PlatformInAppWebViewControllerMethod
+              .clearClientCertPreferences
+              .name,
           signature: 'static Future<void> clearClientCertPreferences()',
           description: 'Clears the client certificate preferences.',
-          className: 'InAppWebViewController',
+          className: className,
           isStatic: true,
           category: 'Static',
         ),
         ApiMethodDefinition(
-          name: 'getSafeBrowsingPrivacyPolicyUrl',
+          name: PlatformInAppWebViewControllerMethod
+              .getSafeBrowsingPrivacyPolicyUrl
+              .name,
           signature: 'static Future<WebUri?> getSafeBrowsingPrivacyPolicyUrl()',
           description: 'Gets the Safe Browsing privacy policy URL.',
-          className: 'InAppWebViewController',
+          className: className,
           isStatic: true,
           category: 'Static',
         ),
         ApiMethodDefinition(
-          name: 'setSafeBrowsingAllowlist',
+          name: PlatformInAppWebViewControllerMethod
+              .setSafeBrowsingAllowlist
+              .name,
           signature:
               'static Future<bool> setSafeBrowsingAllowlist({required List<String> hosts})',
           description: 'Sets the Safe Browsing allowlist.',
-          className: 'InAppWebViewController',
+          className: className,
           isStatic: true,
           category: 'Static',
         ),
         ApiMethodDefinition(
-          name: 'getCurrentWebViewPackage',
+          name: PlatformInAppWebViewControllerMethod
+              .getCurrentWebViewPackage
+              .name,
           signature:
               'static Future<WebViewPackageInfo?> getCurrentWebViewPackage()',
           description: 'Gets the current WebView package info.',
-          className: 'InAppWebViewController',
+          className: className,
           isStatic: true,
           category: 'Static',
         ),
         ApiMethodDefinition(
-          name: 'setWebContentsDebuggingEnabled',
+          name: PlatformInAppWebViewControllerMethod
+              .setWebContentsDebuggingEnabled
+              .name,
           signature:
               'static Future<void> setWebContentsDebuggingEnabled(bool debuggingEnabled)',
           description: 'Enables or disables debugging.',
-          className: 'InAppWebViewController',
+          className: className,
           isStatic: true,
           category: 'Static',
         ),
         ApiMethodDefinition(
-          name: 'getVariationsHeader',
+          name: PlatformInAppWebViewControllerMethod.getVariationsHeader.name,
           signature: 'static Future<String?> getVariationsHeader()',
           description: 'Gets the variations header.',
-          className: 'InAppWebViewController',
+          className: className,
           isStatic: true,
           category: 'Static',
         ),
         ApiMethodDefinition(
-          name: 'isMultiProcessEnabled',
+          name: PlatformInAppWebViewControllerMethod.isMultiProcessEnabled.name,
           signature: 'static Future<bool> isMultiProcessEnabled()',
           description: 'Checks if multi-process is enabled.',
-          className: 'InAppWebViewController',
+          className: className,
           isStatic: true,
           category: 'Static',
         ),
         ApiMethodDefinition(
-          name: 'disableWebView',
+          name: PlatformInAppWebViewControllerMethod.disableWebView.name,
           signature: 'static Future<void> disableWebView()',
           description: 'Disables the WebView.',
-          className: 'InAppWebViewController',
+          className: className,
           isStatic: true,
           category: 'Static',
         ),
         ApiMethodDefinition(
-          name: 'handlesURLScheme',
+          name: PlatformInAppWebViewControllerMethod.handlesURLScheme.name,
           signature: 'static Future<bool> handlesURLScheme(String urlScheme)',
           description: 'Checks if the WebView handles a URL scheme.',
-          className: 'InAppWebViewController',
+          className: className,
           isStatic: true,
           category: 'Static',
         ),
         ApiMethodDefinition(
-          name: 'disposeKeepAlive',
+          name: PlatformInAppWebViewControllerMethod.disposeKeepAlive.name,
           signature:
               'static Future<void> disposeKeepAlive(InAppWebViewKeepAlive keepAlive)',
           description: 'Disposes a keep-alive instance.',
-          className: 'InAppWebViewController',
+          className: className,
           isStatic: true,
           category: 'Static',
         ),
         ApiMethodDefinition(
-          name: 'clearAllCache',
+          name: PlatformInAppWebViewControllerMethod.clearAllCache.name,
           signature:
               'static Future<void> clearAllCache({bool includeDiskFiles = true})',
           description: 'Clears all WebView caches.',
-          className: 'InAppWebViewController',
+          className: className,
           isStatic: true,
           category: 'Static',
         ),
         ApiMethodDefinition(
-          name: 'enableSlowWholeDocumentDraw',
+          name: PlatformInAppWebViewControllerMethod
+              .enableSlowWholeDocumentDraw
+              .name,
           signature: 'static Future<void> enableSlowWholeDocumentDraw()',
           description: 'Enables slow whole document draw.',
-          className: 'InAppWebViewController',
+          className: className,
           isStatic: true,
           category: 'Static',
         ),
         ApiMethodDefinition(
-          name: 'setJavaScriptBridgeName',
+          name: PlatformInAppWebViewControllerMethod
+              .setJavaScriptBridgeName
+              .name,
           signature:
               'static Future<void> setJavaScriptBridgeName(String bridgeName)',
           description: 'Sets the JavaScript bridge name.',
-          className: 'InAppWebViewController',
+          className: className,
           isStatic: true,
           category: 'Static',
         ),
         ApiMethodDefinition(
-          name: 'getJavaScriptBridgeName',
+          name: PlatformInAppWebViewControllerMethod
+              .getJavaScriptBridgeName
+              .name,
           signature: 'static Future<String> getJavaScriptBridgeName()',
           description: 'Gets the JavaScript bridge name.',
-          className: 'InAppWebViewController',
+          className: className,
           isStatic: true,
           category: 'Static',
         ),
@@ -1648,413 +1697,431 @@ class SupportChecker {
   }
 
   static ApiClassDefinition _getInAppWebViewEventsDefinition() {
+    final className = eventClassNameOf(InAppWebView);
     return ApiClassDefinition(
-      className: 'InAppWebView Events',
+      className: className,
       description: 'Events fired by InAppWebView.',
       events: [
         // Core events
         ApiEventDefinition(
-          name: 'onWebViewCreated',
+          name: PlatformWebViewCreationParamsProperty.onWebViewCreated.name,
           description: 'Called when the WebView is created.',
-          className: 'InAppWebView Events',
+          className: className,
           category: 'Core',
         ),
         ApiEventDefinition(
-          name: 'onLoadStart',
+          name: PlatformWebViewCreationParamsProperty.onLoadStart.name,
           description: 'Called when a page starts loading.',
-          className: 'InAppWebView Events',
+          className: className,
           category: 'Core',
         ),
         ApiEventDefinition(
-          name: 'onLoadStop',
+          name: PlatformWebViewCreationParamsProperty.onLoadStop.name,
           description: 'Called when a page finishes loading.',
-          className: 'InAppWebView Events',
+          className: className,
           category: 'Core',
         ),
         ApiEventDefinition(
-          name: 'onLoadError',
+          name: PlatformWebViewCreationParamsProperty.onLoadError.name,
           description: 'Called when a page fails to load.',
-          className: 'InAppWebView Events',
+          className: className,
           category: 'Core',
         ),
         ApiEventDefinition(
-          name: 'onLoadHttpError',
+          name: PlatformWebViewCreationParamsProperty.onLoadHttpError.name,
           description: 'Called when an HTTP error is received.',
-          className: 'InAppWebView Events',
+          className: className,
           category: 'Core',
         ),
         ApiEventDefinition(
-          name: 'onProgressChanged',
+          name: PlatformWebViewCreationParamsProperty.onProgressChanged.name,
           description: 'Called when the loading progress changes.',
-          className: 'InAppWebView Events',
+          className: className,
           category: 'Core',
         ),
         ApiEventDefinition(
-          name: 'onConsoleMessage',
+          name: PlatformWebViewCreationParamsProperty.onConsoleMessage.name,
           description: 'Called when a console message is received.',
-          className: 'InAppWebView Events',
+          className: className,
           category: 'Core',
         ),
         ApiEventDefinition(
-          name: 'onTitleChanged',
+          name: PlatformWebViewCreationParamsProperty.onTitleChanged.name,
           description: 'Called when the page title changes.',
-          className: 'InAppWebView Events',
+          className: className,
           category: 'Core',
         ),
         ApiEventDefinition(
-          name: 'onUpdateVisitedHistory',
+          name: PlatformWebViewCreationParamsProperty.onUpdateVisitedHistory.name,
           description: 'Called when the visited history is updated.',
-          className: 'InAppWebView Events',
+          className: className,
           category: 'Core',
         ),
 
         // Navigation events
         ApiEventDefinition(
-          name: 'shouldOverrideUrlLoading',
+          name:
+              PlatformWebViewCreationParamsProperty.shouldOverrideUrlLoading.name,
           description: 'Called to handle URL navigation requests.',
-          className: 'InAppWebView Events',
+          className: className,
           category: 'Navigation',
         ),
         ApiEventDefinition(
-          name: 'onNavigationResponse',
+          name: PlatformWebViewCreationParamsProperty.onNavigationResponse.name,
           description: 'Called when receiving a navigation response.',
-          className: 'InAppWebView Events',
+          className: className,
           category: 'Navigation',
         ),
         ApiEventDefinition(
-          name: 'shouldAllowDeprecatedTLS',
+          name: PlatformWebViewCreationParamsProperty
+              .shouldAllowDeprecatedTLS
+              .name,
           description: 'Called to check if deprecated TLS should be allowed.',
-          className: 'InAppWebView Events',
+          className: className,
           category: 'Navigation',
         ),
 
         // Window events
         ApiEventDefinition(
-          name: 'onCreateWindow',
+          name: PlatformWebViewCreationParamsProperty.onCreateWindow.name,
           description: 'Called when a new window is requested.',
-          className: 'InAppWebView Events',
+          className: className,
           category: 'Window',
         ),
         ApiEventDefinition(
-          name: 'onCloseWindow',
+          name: PlatformWebViewCreationParamsProperty.onCloseWindow.name,
           description: 'Called when a window should be closed.',
-          className: 'InAppWebView Events',
+          className: className,
           category: 'Window',
         ),
         ApiEventDefinition(
-          name: 'onWindowFocus',
+          name: PlatformWebViewCreationParamsProperty.onWindowFocus.name,
           description: 'Called when the window receives focus.',
-          className: 'InAppWebView Events',
+          className: className,
           category: 'Window',
         ),
         ApiEventDefinition(
-          name: 'onWindowBlur',
+          name: PlatformWebViewCreationParamsProperty.onWindowBlur.name,
           description: 'Called when the window loses focus.',
-          className: 'InAppWebView Events',
+          className: className,
           category: 'Window',
         ),
 
         // JS Dialog events
         ApiEventDefinition(
-          name: 'onJsAlert',
+          name: PlatformWebViewCreationParamsProperty.onJsAlert.name,
           description: 'Called when a JavaScript alert is shown.',
-          className: 'InAppWebView Events',
+          className: className,
           category: 'JS Dialogs',
         ),
         ApiEventDefinition(
-          name: 'onJsConfirm',
+          name: PlatformWebViewCreationParamsProperty.onJsConfirm.name,
           description: 'Called when a JavaScript confirm is shown.',
-          className: 'InAppWebView Events',
+          className: className,
           category: 'JS Dialogs',
         ),
         ApiEventDefinition(
-          name: 'onJsPrompt',
+          name: PlatformWebViewCreationParamsProperty.onJsPrompt.name,
           description: 'Called when a JavaScript prompt is shown.',
-          className: 'InAppWebView Events',
+          className: className,
           category: 'JS Dialogs',
         ),
         ApiEventDefinition(
-          name: 'onJsBeforeUnload',
+          name: PlatformWebViewCreationParamsProperty.onJsBeforeUnload.name,
           description: 'Called before the page is unloaded.',
-          className: 'InAppWebView Events',
+          className: className,
           category: 'JS Dialogs',
         ),
 
         // Authentication events
         ApiEventDefinition(
-          name: 'onReceivedHttpAuthRequest',
+          name: PlatformWebViewCreationParamsProperty.onReceivedHttpAuthRequest.name,
           description: 'Called for HTTP authentication requests.',
-          className: 'InAppWebView Events',
+          className: className,
           category: 'Authentication',
         ),
         ApiEventDefinition(
-          name: 'onReceivedServerTrustAuthRequest',
+          name: PlatformWebViewCreationParamsProperty
+              .onReceivedServerTrustAuthRequest
+              .name,
           description: 'Called for server trust authentication.',
-          className: 'InAppWebView Events',
+          className: className,
           category: 'Authentication',
         ),
         ApiEventDefinition(
-          name: 'onReceivedClientCertRequest',
+          name: PlatformWebViewCreationParamsProperty.onReceivedClientCertRequest.name,
           description: 'Called when a client certificate is requested.',
-          className: 'InAppWebView Events',
+          className: className,
           category: 'Authentication',
         ),
 
         // Network events
         ApiEventDefinition(
-          name: 'shouldInterceptRequest',
+          name: PlatformWebViewCreationParamsProperty.shouldInterceptRequest.name,
           description: 'Called to intercept resource requests.',
-          className: 'InAppWebView Events',
+          className: className,
           category: 'Network',
         ),
         ApiEventDefinition(
-          name: 'onLoadResource',
+          name: PlatformWebViewCreationParamsProperty.onLoadResource.name,
           description: 'Called when a resource is loaded.',
-          className: 'InAppWebView Events',
+          className: className,
           category: 'Network',
         ),
         ApiEventDefinition(
-          name: 'onLoadResourceWithCustomScheme',
+          name: PlatformWebViewCreationParamsProperty
+              .onLoadResourceWithCustomScheme
+              .name,
           description: 'Called when loading a custom scheme resource.',
-          className: 'InAppWebView Events',
+          className: className,
           category: 'Network',
         ),
         ApiEventDefinition(
-          name: 'onReceivedError',
+          name: PlatformWebViewCreationParamsProperty.onReceivedError.name,
           description: 'Called when a resource load error occurs.',
-          className: 'InAppWebView Events',
+          className: className,
           category: 'Network',
         ),
         ApiEventDefinition(
-          name: 'onReceivedHttpError',
+          name: PlatformWebViewCreationParamsProperty.onReceivedHttpError.name,
           description: 'Called when an HTTP error occurs.',
-          className: 'InAppWebView Events',
+          className: className,
           category: 'Network',
         ),
 
         // Download events
         ApiEventDefinition(
-          name: 'onDownloadStartRequest',
+          name: PlatformWebViewCreationParamsProperty.onDownloadStartRequest.name,
           description: 'Called when a download is requested.',
-          className: 'InAppWebView Events',
+          className: className,
           category: 'Download',
         ),
         ApiEventDefinition(
-          name: 'onDownloadStarting',
+          name: PlatformWebViewCreationParamsProperty.onDownloadStarting.name,
           description: 'Called when a download is starting.',
-          className: 'InAppWebView Events',
+          className: className,
           category: 'Download',
         ),
 
         // Scroll events
         ApiEventDefinition(
-          name: 'onScrollChanged',
+          name: PlatformWebViewCreationParamsProperty.onScrollChanged.name,
           description: 'Called when the scroll position changes.',
-          className: 'InAppWebView Events',
+          className: className,
           category: 'Scroll',
         ),
         ApiEventDefinition(
-          name: 'onOverScrolled',
+          name: PlatformWebViewCreationParamsProperty.onOverScrolled.name,
           description: 'Called when the WebView is over-scrolled.',
-          className: 'InAppWebView Events',
+          className: className,
           category: 'Scroll',
         ),
 
         // Zoom events
         ApiEventDefinition(
-          name: 'onZoomScaleChanged',
+          name: PlatformWebViewCreationParamsProperty.onZoomScaleChanged.name,
           description: 'Called when the zoom scale changes.',
-          className: 'InAppWebView Events',
+          className: className,
           category: 'Zoom',
         ),
 
         // Print events
         ApiEventDefinition(
-          name: 'onPrintRequest',
+          name: PlatformWebViewCreationParamsProperty.onPrintRequest.name,
           description: 'Called when a print request is made.',
-          className: 'InAppWebView Events',
+          className: className,
           category: 'Print',
         ),
 
         // Fullscreen events
         ApiEventDefinition(
-          name: 'onEnterFullscreen',
+          name: PlatformWebViewCreationParamsProperty.onEnterFullscreen.name,
           description: 'Called when entering fullscreen mode.',
-          className: 'InAppWebView Events',
+          className: className,
           category: 'Fullscreen',
         ),
         ApiEventDefinition(
-          name: 'onExitFullscreen',
+          name: PlatformWebViewCreationParamsProperty.onExitFullscreen.name,
           description: 'Called when exiting fullscreen mode.',
-          className: 'InAppWebView Events',
+          className: className,
           category: 'Fullscreen',
         ),
 
         // Permission events
         ApiEventDefinition(
-          name: 'onPermissionRequest',
+          name: PlatformWebViewCreationParamsProperty.onPermissionRequest.name,
           description: 'Called when a permission is requested.',
-          className: 'InAppWebView Events',
+          className: className,
           category: 'Permission',
         ),
         ApiEventDefinition(
-          name: 'onPermissionRequestCanceled',
+          name: PlatformWebViewCreationParamsProperty
+              .onPermissionRequestCanceled
+              .name,
           description: 'Called when a permission request is canceled.',
-          className: 'InAppWebView Events',
+          className: className,
           category: 'Permission',
         ),
 
         // Touch/Gesture events
         ApiEventDefinition(
-          name: 'onLongPressHitTestResult',
+          name: PlatformWebViewCreationParamsProperty.onLongPressHitTestResult.name,
           description: 'Called on a long press.',
-          className: 'InAppWebView Events',
+          className: className,
           category: 'Touch',
         ),
         ApiEventDefinition(
-          name: 'onGeolocationPermissionsShowPrompt',
+          name: PlatformWebViewCreationParamsProperty
+              .onGeolocationPermissionsShowPrompt
+              .name,
           description: 'Called when requesting geolocation permission.',
-          className: 'InAppWebView Events',
+          className: className,
           category: 'Permission',
         ),
         ApiEventDefinition(
-          name: 'onGeolocationPermissionsHidePrompt',
+          name: PlatformWebViewCreationParamsProperty
+              .onGeolocationPermissionsHidePrompt
+              .name,
           description: 'Called when hiding geolocation permission prompt.',
-          className: 'InAppWebView Events',
+          className: className,
           category: 'Permission',
         ),
 
         // Render Process events
         ApiEventDefinition(
-          name: 'onRenderProcessGone',
+          name: PlatformWebViewCreationParamsProperty.onRenderProcessGone.name,
           description: 'Called when the render process terminates.',
-          className: 'InAppWebView Events',
+          className: className,
           category: 'Render Process',
         ),
         ApiEventDefinition(
-          name: 'onRenderProcessResponsive',
+          name: PlatformWebViewCreationParamsProperty
+              .onRenderProcessResponsive
+              .name,
           description: 'Called when the render process becomes responsive.',
-          className: 'InAppWebView Events',
+          className: className,
           category: 'Render Process',
         ),
         ApiEventDefinition(
-          name: 'onRenderProcessUnresponsive',
+          name: PlatformWebViewCreationParamsProperty
+              .onRenderProcessUnresponsive
+              .name,
           description: 'Called when the render process becomes unresponsive.',
-          className: 'InAppWebView Events',
+          className: className,
           category: 'Render Process',
         ),
         ApiEventDefinition(
-          name: 'onWebContentProcessDidTerminate',
+          name: PlatformWebViewCreationParamsProperty
+              .onWebContentProcessDidTerminate
+              .name,
           description: 'Called when the web content process terminates.',
-          className: 'InAppWebView Events',
+          className: className,
           category: 'Render Process',
         ),
 
         // Form events
         ApiEventDefinition(
-          name: 'onFormResubmission',
+          name: PlatformWebViewCreationParamsProperty.onFormResubmission.name,
           description: 'Called when a form is resubmitted.',
-          className: 'InAppWebView Events',
+          className: className,
           category: 'Form',
         ),
 
         // Icon events
         ApiEventDefinition(
-          name: 'onReceivedIcon',
+          name: PlatformWebViewCreationParamsProperty.onReceivedIcon.name,
           description: 'Called when a favicon is received.',
-          className: 'InAppWebView Events',
+          className: className,
           category: 'Icon',
         ),
         ApiEventDefinition(
-          name: 'onReceivedTouchIconUrl',
+          name: PlatformWebViewCreationParamsProperty.onReceivedTouchIconUrl.name,
           description: 'Called when a touch icon URL is received.',
-          className: 'InAppWebView Events',
+          className: className,
           category: 'Icon',
         ),
 
         // Safe Browsing events
         ApiEventDefinition(
-          name: 'onSafeBrowsingHit',
+          name: PlatformWebViewCreationParamsProperty.onSafeBrowsingHit.name,
           description: 'Called when Safe Browsing detects a threat.',
-          className: 'InAppWebView Events',
+          className: className,
           category: 'Safe Browsing',
         ),
 
         // iOS/macOS events
         ApiEventDefinition(
-          name: 'onDidReceiveServerRedirectForProvisionalNavigation',
+          name: PlatformWebViewCreationParamsProperty
+              .onDidReceiveServerRedirectForProvisionalNavigation
+              .name,
           description: 'Called when a server redirect is received.',
-          className: 'InAppWebView Events',
+          className: className,
           category: 'iOS/macOS',
         ),
         ApiEventDefinition(
-          name: 'onCameraCaptureStateChanged',
+          name: PlatformWebViewCreationParamsProperty
+              .onCameraCaptureStateChanged
+              .name,
           description: 'Called when camera capture state changes.',
-          className: 'InAppWebView Events',
+          className: className,
           category: 'iOS/macOS',
         ),
         ApiEventDefinition(
-          name: 'onMicrophoneCaptureStateChanged',
+          name: PlatformWebViewCreationParamsProperty
+              .onMicrophoneCaptureStateChanged
+              .name,
           description: 'Called when microphone capture state changes.',
-          className: 'InAppWebView Events',
+          className: className,
           category: 'iOS/macOS',
         ),
 
         // Windows events
         ApiEventDefinition(
-          name: 'onProcessFailed',
+          name: PlatformWebViewCreationParamsProperty.onProcessFailed.name,
           description: 'Called when a process failure occurs.',
-          className: 'InAppWebView Events',
-          category: 'Windows',
-        ),
-        ApiEventDefinition(
-          name: 'onNewWindowRequested',
-          description: 'Called when a new window is requested.',
-          className: 'InAppWebView Events',
+          className: className,
           category: 'Windows',
         ),
 
         // Other events
         ApiEventDefinition(
-          name: 'onPageCommitVisible',
+          name: PlatformWebViewCreationParamsProperty.onPageCommitVisible.name,
           description: 'Called when the page becomes visible.',
-          className: 'InAppWebView Events',
+          className: className,
           category: 'Other',
         ),
         ApiEventDefinition(
-          name: 'onContentSizeChanged',
+          name: PlatformWebViewCreationParamsProperty.onContentSizeChanged.name,
           description: 'Called when the content size changes.',
-          className: 'InAppWebView Events',
+          className: className,
           category: 'Other',
         ),
         ApiEventDefinition(
-          name: 'onAjaxReadyStateChange',
+          name: PlatformWebViewCreationParamsProperty.onAjaxReadyStateChange.name,
           description: 'Called when an AJAX ready state changes.',
-          className: 'InAppWebView Events',
+          className: className,
           category: 'Other',
         ),
         ApiEventDefinition(
-          name: 'onAjaxProgress',
+          name: PlatformWebViewCreationParamsProperty.onAjaxProgress.name,
           description: 'Called for AJAX progress updates.',
-          className: 'InAppWebView Events',
+          className: className,
           category: 'Other',
         ),
         ApiEventDefinition(
-          name: 'shouldInterceptAjaxRequest',
+          name: PlatformWebViewCreationParamsProperty
+              .shouldInterceptAjaxRequest
+              .name,
           description: 'Called to intercept AJAX requests.',
-          className: 'InAppWebView Events',
+          className: className,
           category: 'Other',
         ),
         ApiEventDefinition(
-          name: 'onFetchPost',
-          description: 'Called when a fetch POST request is made.',
-          className: 'InAppWebView Events',
-          category: 'Other',
-        ),
-        ApiEventDefinition(
-          name: 'shouldInterceptFetchRequest',
+          name: PlatformWebViewCreationParamsProperty
+              .shouldInterceptFetchRequest
+              .name,
           description: 'Called to intercept fetch requests.',
-          className: 'InAppWebView Events',
+          className: className,
           category: 'Other',
         ),
       ],
@@ -2062,1002 +2129,1039 @@ class SupportChecker {
   }
 
   static ApiClassDefinition _getHeadlessInAppWebViewDefinition() {
+    final className = classNameOf(HeadlessInAppWebView);
     return ApiClassDefinition(
-      className: 'HeadlessInAppWebView',
+      className: className,
       description: 'A WebView that runs without UI.',
       isClassSupported: () => HeadlessInAppWebView.isClassSupported(),
       methods: [
         ApiMethodDefinition(
-          name: 'run',
+          name: PlatformHeadlessInAppWebViewMethod.run.name,
           signature: 'Future<void> run()',
           description: 'Runs the headless WebView.',
-          className: 'HeadlessInAppWebView',
+          className: className,
         ),
         ApiMethodDefinition(
-          name: 'isRunning',
+          name: PlatformHeadlessInAppWebViewMethod.isRunning.name,
           signature: 'Future<bool> isRunning()',
           description: 'Checks if the WebView is running.',
-          className: 'HeadlessInAppWebView',
+          className: className,
         ),
         ApiMethodDefinition(
-          name: 'setSize',
+          name: PlatformHeadlessInAppWebViewMethod.setSize.name,
           signature: 'Future<void> setSize(Size size)',
           description: 'Sets the WebView size.',
-          className: 'HeadlessInAppWebView',
+          className: className,
         ),
         ApiMethodDefinition(
-          name: 'getSize',
+          name: PlatformHeadlessInAppWebViewMethod.getSize.name,
           signature: 'Future<Size?> getSize()',
           description: 'Gets the WebView size.',
-          className: 'HeadlessInAppWebView',
+          className: className,
         ),
         ApiMethodDefinition(
-          name: 'dispose',
+          name: PlatformHeadlessInAppWebViewMethod.dispose.name,
           signature: 'Future<void> dispose()',
           description: 'Disposes the headless WebView.',
-          className: 'HeadlessInAppWebView',
+          className: className,
         ),
       ],
     );
   }
 
   static ApiClassDefinition _getInAppBrowserDefinition() {
+    final className = classNameOf(InAppBrowser);
     return ApiClassDefinition(
-      className: 'InAppBrowser',
+      className: className,
       description: 'A full-screen in-app browser.',
       isClassSupported: () => InAppBrowser.isClassSupported(),
       methods: [
         ApiMethodDefinition(
-          name: 'openUrlRequest',
+          name: PlatformInAppBrowserMethod.openUrlRequest.name,
           signature:
               'Future<void> openUrlRequest({required URLRequest urlRequest, ...})',
           description: 'Opens a URL in the browser.',
-          className: 'InAppBrowser',
+          className: className,
         ),
         ApiMethodDefinition(
-          name: 'openFile',
+          name: PlatformInAppBrowserMethod.openFile.name,
           signature:
               'Future<void> openFile({required String assetFilePath, ...})',
           description: 'Opens a file from assets.',
-          className: 'InAppBrowser',
+          className: className,
         ),
         ApiMethodDefinition(
-          name: 'openData',
+          name: PlatformInAppBrowserMethod.openData.name,
           signature: 'Future<void> openData({required String data, ...})',
           description: 'Opens HTML data.',
-          className: 'InAppBrowser',
+          className: className,
         ),
         ApiMethodDefinition(
-          name: 'openWithSystemBrowser',
+          name: PlatformInAppBrowserMethod.openWithSystemBrowser.name,
           signature:
               'static Future<void> openWithSystemBrowser({required WebUri url})',
           description: 'Opens a URL in the system browser.',
-          className: 'InAppBrowser',
+          className: className,
           isStatic: true,
         ),
         ApiMethodDefinition(
-          name: 'show',
+          name: PlatformInAppBrowserMethod.show.name,
           signature: 'Future<void> show()',
           description: 'Shows the browser.',
-          className: 'InAppBrowser',
+          className: className,
         ),
         ApiMethodDefinition(
-          name: 'hide',
+          name: PlatformInAppBrowserMethod.hide.name,
           signature: 'Future<void> hide()',
           description: 'Hides the browser.',
-          className: 'InAppBrowser',
+          className: className,
         ),
         ApiMethodDefinition(
-          name: 'close',
+          name: PlatformInAppBrowserMethod.close.name,
           signature: 'Future<void> close()',
           description: 'Closes the browser.',
-          className: 'InAppBrowser',
+          className: className,
         ),
         ApiMethodDefinition(
-          name: 'isHidden',
+          name: PlatformInAppBrowserMethod.isHidden.name,
           signature: 'Future<bool> isHidden()',
           description: 'Checks if the browser is hidden.',
-          className: 'InAppBrowser',
+          className: className,
         ),
         ApiMethodDefinition(
-          name: 'setSettings',
+          name: PlatformInAppBrowserMethod.setSettings.name,
           signature:
               'Future<void> setSettings({required InAppBrowserClassSettings settings})',
           description: 'Sets the browser settings.',
-          className: 'InAppBrowser',
+          className: className,
         ),
         ApiMethodDefinition(
-          name: 'getSettings',
+          name: PlatformInAppBrowserMethod.getSettings.name,
           signature: 'Future<InAppBrowserClassSettings?> getSettings()',
           description: 'Gets the browser settings.',
-          className: 'InAppBrowser',
+          className: className,
         ),
         ApiMethodDefinition(
-          name: 'isOpened',
+          name: PlatformInAppBrowserMethod.isOpened.name,
           signature: 'bool isOpened()',
           description: 'Checks if the browser is opened.',
-          className: 'InAppBrowser',
+          className: className,
         ),
       ],
       events: [
         ApiEventDefinition(
-          name: 'onBrowserCreated',
+          name: PlatformInAppBrowserEventsMethod.onBrowserCreated.name,
           description: 'Called when the browser is created.',
-          className: 'InAppBrowser',
+          className: className,
         ),
         ApiEventDefinition(
-          name: 'onExit',
+          name: PlatformInAppBrowserEventsMethod.onExit.name,
           description: 'Called when the browser exits.',
-          className: 'InAppBrowser',
+          className: className,
         ),
         ApiEventDefinition(
-          name: 'onMainWindowCreated',
-          description: 'Called when the main window is created.',
-          className: 'InAppBrowser',
-        ),
-        ApiEventDefinition(
-          name: 'onMainWindowWillClose',
+          name: PlatformInAppBrowserEventsMethod.onMainWindowWillClose.name,
           description: 'Called when the main window will close.',
-          className: 'InAppBrowser',
+          className: className,
         ),
       ],
     );
   }
 
   static ApiClassDefinition _getChromeSafariBrowserDefinition() {
+    final className = classNameOf(ChromeSafariBrowser);
     return ApiClassDefinition(
-      className: 'ChromeSafariBrowser',
+      className: className,
       description:
           'A browser using Chrome Custom Tabs or SFSafariViewController.',
       isClassSupported: () => ChromeSafariBrowser.isClassSupported(),
       methods: [
         ApiMethodDefinition(
-          name: 'open',
+          name: PlatformChromeSafariBrowserMethod.open.name,
           signature: 'Future<void> open({WebUri? url, ...})',
           description: 'Opens a URL in the browser.',
-          className: 'ChromeSafariBrowser',
+          className: className,
         ),
         ApiMethodDefinition(
-          name: 'launchUrl',
+          name: PlatformChromeSafariBrowserMethod.launchUrl.name,
           signature: 'Future<void> launchUrl({required WebUri url, ...})',
           description: 'Launches a URL.',
-          className: 'ChromeSafariBrowser',
+          className: className,
         ),
         ApiMethodDefinition(
-          name: 'mayLaunchUrl',
+          name: PlatformChromeSafariBrowserMethod.mayLaunchUrl.name,
           signature: 'Future<bool> mayLaunchUrl({WebUri? url, ...})',
           description: 'Hints to the browser to start loading a URL.',
-          className: 'ChromeSafariBrowser',
+          className: className,
         ),
         ApiMethodDefinition(
-          name: 'validateRelationship',
+          name: PlatformChromeSafariBrowserMethod.validateRelationship.name,
           signature:
               'Future<bool> validateRelationship({required CustomTabsRelationType relation, ...})',
           description: 'Validates a relationship.',
-          className: 'ChromeSafariBrowser',
+          className: className,
         ),
         ApiMethodDefinition(
-          name: 'close',
+          name: PlatformChromeSafariBrowserMethod.close.name,
           signature: 'Future<void> close()',
           description: 'Closes the browser.',
-          className: 'ChromeSafariBrowser',
+          className: className,
         ),
         ApiMethodDefinition(
-          name: 'isOpened',
+          name: PlatformChromeSafariBrowserMethod.isOpened.name,
           signature: 'bool isOpened()',
           description: 'Checks if the browser is opened.',
-          className: 'ChromeSafariBrowser',
+          className: className,
         ),
         ApiMethodDefinition(
-          name: 'isAvailable',
+          name: PlatformChromeSafariBrowserMethod.isAvailable.name,
           signature: 'static Future<bool> isAvailable()',
           description: 'Checks if the browser is available.',
-          className: 'ChromeSafariBrowser',
+          className: className,
           isStatic: true,
         ),
         ApiMethodDefinition(
-          name: 'getMaxToolbarItems',
+          name: PlatformChromeSafariBrowserMethod.getMaxToolbarItems.name,
           signature: 'static Future<int> getMaxToolbarItems()',
           description: 'Gets the maximum toolbar items.',
-          className: 'ChromeSafariBrowser',
+          className: className,
           isStatic: true,
         ),
         ApiMethodDefinition(
-          name: 'getPackageName',
+          name: PlatformChromeSafariBrowserMethod.getPackageName.name,
           signature:
               'static Future<String?> getPackageName({List<String>? packages, ...})',
           description: 'Gets the package name for Custom Tabs.',
-          className: 'ChromeSafariBrowser',
+          className: className,
           isStatic: true,
         ),
         ApiMethodDefinition(
-          name: 'clearWebsiteData',
+          name: PlatformChromeSafariBrowserMethod.clearWebsiteData.name,
           signature: 'static Future<void> clearWebsiteData()',
           description: 'Clears website data.',
-          className: 'ChromeSafariBrowser',
+          className: className,
           isStatic: true,
         ),
         ApiMethodDefinition(
-          name: 'prewarmConnections',
+          name: PlatformChromeSafariBrowserMethod.prewarmConnections.name,
           signature:
               'static Future<PrewarmingToken?> prewarmConnections({required List<WebUri> urls})',
           description: 'Prewarms connections.',
-          className: 'ChromeSafariBrowser',
+          className: className,
           isStatic: true,
         ),
         ApiMethodDefinition(
-          name: 'invalidatePrewarmingToken',
+          name: PlatformChromeSafariBrowserMethod
+              .invalidatePrewarmingToken
+              .name,
           signature:
               'static Future<void> invalidatePrewarmingToken({required PrewarmingToken prewarmingToken})',
           description: 'Invalidates a prewarming token.',
-          className: 'ChromeSafariBrowser',
+          className: className,
           isStatic: true,
         ),
         ApiMethodDefinition(
-          name: 'setActionButton',
+          name: PlatformChromeSafariBrowserMethod.setActionButton.name,
           signature:
               'Future<void> setActionButton(ChromeSafariBrowserActionButton actionButton)',
           description: 'Sets an action button.',
-          className: 'ChromeSafariBrowser',
+          className: className,
         ),
         ApiMethodDefinition(
-          name: 'updateActionButton',
+          name: PlatformChromeSafariBrowserMethod.updateActionButton.name,
           signature:
               'Future<void> updateActionButton({required Uint8List icon, required String description})',
           description: 'Updates the action button.',
-          className: 'ChromeSafariBrowser',
+          className: className,
         ),
         ApiMethodDefinition(
-          name: 'setSecondaryToolbar',
+          name: PlatformChromeSafariBrowserMethod.setSecondaryToolbar.name,
           signature:
               'Future<void> setSecondaryToolbar(ChromeSafariBrowserSecondaryToolbar secondaryToolbar)',
           description: 'Sets a secondary toolbar.',
-          className: 'ChromeSafariBrowser',
+          className: className,
         ),
         ApiMethodDefinition(
-          name: 'updateSecondaryToolbar',
+          name: PlatformChromeSafariBrowserMethod
+              .updateSecondaryToolbar
+              .name,
           signature:
               'Future<void> updateSecondaryToolbar(ChromeSafariBrowserSecondaryToolbar secondaryToolbar)',
           description: 'Updates the secondary toolbar.',
-          className: 'ChromeSafariBrowser',
+          className: className,
         ),
         ApiMethodDefinition(
-          name: 'requestPostMessageChannel',
+          name: PlatformChromeSafariBrowserMethod
+              .requestPostMessageChannel
+              .name,
           signature:
               'Future<bool> requestPostMessageChannel({required WebUri sourceOrigin, ...})',
           description: 'Requests a post message channel.',
-          className: 'ChromeSafariBrowser',
+          className: className,
         ),
         ApiMethodDefinition(
-          name: 'postMessage',
+          name: PlatformChromeSafariBrowserMethod.postMessage.name,
           signature:
               'Future<CustomTabsPostMessageResultType> postMessage({required String message})',
           description: 'Posts a message.',
-          className: 'ChromeSafariBrowser',
+          className: className,
         ),
         ApiMethodDefinition(
-          name: 'isEngagementSignalsApiAvailable',
+          name: PlatformChromeSafariBrowserMethod
+              .isEngagementSignalsApiAvailable
+              .name,
           signature: 'Future<bool> isEngagementSignalsApiAvailable()',
           description: 'Checks if engagement signals API is available.',
-          className: 'ChromeSafariBrowser',
+          className: className,
         ),
       ],
       events: [
         ApiEventDefinition(
-          name: 'onOpened',
+          name: PlatformChromeSafariBrowserEventsMethod.onOpened.name,
           description: 'Called when the browser is opened.',
-          className: 'ChromeSafariBrowser',
+          className: className,
         ),
         ApiEventDefinition(
-          name: 'onClosed',
+          name: PlatformChromeSafariBrowserEventsMethod.onClosed.name,
           description: 'Called when the browser is closed.',
-          className: 'ChromeSafariBrowser',
+          className: className,
         ),
         ApiEventDefinition(
-          name: 'onCompletedInitialLoad',
+          name: PlatformChromeSafariBrowserEventsMethod
+              .onCompletedInitialLoad
+              .name,
           description: 'Called when the initial load completes.',
-          className: 'ChromeSafariBrowser',
+          className: className,
         ),
         ApiEventDefinition(
-          name: 'onInitialLoadDidRedirect',
+          name: PlatformChromeSafariBrowserEventsMethod
+              .onInitialLoadDidRedirect
+              .name,
           description: 'Called when the initial load redirects.',
-          className: 'ChromeSafariBrowser',
+          className: className,
         ),
         ApiEventDefinition(
-          name: 'onWillOpenInBrowser',
+          name: PlatformChromeSafariBrowserEventsMethod.onWillOpenInBrowser.name,
           description: 'Called when opening in the browser.',
-          className: 'ChromeSafariBrowser',
+          className: className,
         ),
         ApiEventDefinition(
-          name: 'onNavigationEvent',
+          name: PlatformChromeSafariBrowserEventsMethod.onNavigationEvent.name,
           description: 'Called on navigation events.',
-          className: 'ChromeSafariBrowser',
+          className: className,
         ),
         ApiEventDefinition(
-          name: 'onServiceConnected',
+          name: PlatformChromeSafariBrowserEventsMethod.onServiceConnected.name,
           description: 'Called when the service connects.',
-          className: 'ChromeSafariBrowser',
+          className: className,
         ),
         ApiEventDefinition(
-          name: 'onRelationshipValidationResult',
+          name: PlatformChromeSafariBrowserEventsMethod
+              .onRelationshipValidationResult
+              .name,
           description: 'Called with relationship validation results.',
-          className: 'ChromeSafariBrowser',
+          className: className,
         ),
         ApiEventDefinition(
-          name: 'onMessageChannelReady',
+          name: PlatformChromeSafariBrowserEventsMethod
+              .onMessageChannelReady
+              .name,
           description: 'Called when the message channel is ready.',
-          className: 'ChromeSafariBrowser',
+          className: className,
         ),
         ApiEventDefinition(
-          name: 'onPostMessage',
+          name: PlatformChromeSafariBrowserEventsMethod.onPostMessage.name,
           description: 'Called when a post message is received.',
-          className: 'ChromeSafariBrowser',
+          className: className,
         ),
         ApiEventDefinition(
-          name: 'onVerticalScrollEvent',
+          name: PlatformChromeSafariBrowserEventsMethod.onVerticalScrollEvent.name,
           description: 'Called on vertical scroll events.',
-          className: 'ChromeSafariBrowser',
+          className: className,
         ),
         ApiEventDefinition(
-          name: 'onGreatestScrollPercentageIncreased',
+          name: PlatformChromeSafariBrowserEventsMethod
+              .onGreatestScrollPercentageIncreased
+              .name,
           description: 'Called when the greatest scroll percentage increases.',
-          className: 'ChromeSafariBrowser',
+          className: className,
         ),
         ApiEventDefinition(
-          name: 'onSessionEnded',
+          name: PlatformChromeSafariBrowserEventsMethod.onSessionEnded.name,
           description: 'Called when the session ends.',
-          className: 'ChromeSafariBrowser',
+          className: className,
         ),
       ],
     );
   }
 
   static ApiClassDefinition _getCookieManagerDefinition() {
+    final className = classNameOf(CookieManager);
     return ApiClassDefinition(
-      className: 'CookieManager',
+      className: className,
       description: 'Manages cookies for WebViews.',
       isClassSupported: () => CookieManager.isClassSupported(),
       methods: [
         ApiMethodDefinition(
-          name: 'setCookie',
+          name: PlatformCookieManagerMethod.setCookie.name,
           signature:
               'Future<bool> setCookie({required WebUri url, required String name, required String value, ...})',
           description: 'Sets a cookie.',
-          className: 'CookieManager',
+          className: className,
         ),
         ApiMethodDefinition(
-          name: 'getCookies',
+          name: PlatformCookieManagerMethod.getCookies.name,
           signature: 'Future<List<Cookie>> getCookies({required WebUri url})',
           description: 'Gets all cookies for a URL.',
-          className: 'CookieManager',
+          className: className,
         ),
         ApiMethodDefinition(
-          name: 'getCookie',
+          name: PlatformCookieManagerMethod.getCookie.name,
           signature:
               'Future<Cookie?> getCookie({required WebUri url, required String name})',
           description: 'Gets a specific cookie.',
-          className: 'CookieManager',
+          className: className,
         ),
         ApiMethodDefinition(
-          name: 'deleteCookie',
+          name: PlatformCookieManagerMethod.deleteCookie.name,
           signature:
               'Future<void> deleteCookie({required WebUri url, required String name, ...})',
           description: 'Deletes a cookie.',
-          className: 'CookieManager',
+          className: className,
         ),
         ApiMethodDefinition(
-          name: 'deleteCookies',
+          name: PlatformCookieManagerMethod.deleteCookies.name,
           signature:
               'Future<void> deleteCookies({required WebUri url, String? domain, String? path})',
           description: 'Deletes cookies for a URL.',
-          className: 'CookieManager',
+          className: className,
         ),
         ApiMethodDefinition(
-          name: 'deleteAllCookies',
+          name: PlatformCookieManagerMethod.deleteAllCookies.name,
           signature: 'Future<void> deleteAllCookies()',
           description: 'Deletes all cookies.',
-          className: 'CookieManager',
+          className: className,
         ),
         ApiMethodDefinition(
-          name: 'removeSessionCookies',
+          name: PlatformCookieManagerMethod.removeSessionCookies.name,
           signature: 'Future<bool> removeSessionCookies()',
           description: 'Removes all session cookies.',
-          className: 'CookieManager',
+          className: className,
         ),
         ApiMethodDefinition(
-          name: 'flush',
+          name: PlatformCookieManagerMethod.flush.name,
           signature: 'Future<void> flush()',
           description: 'Flushes cookies to persistent storage.',
-          className: 'CookieManager',
+          className: className,
         ),
         ApiMethodDefinition(
-          name: 'getAllCookies',
+          name: PlatformCookieManagerMethod.getAllCookies.name,
           signature: 'Future<List<Cookie>> getAllCookies()',
           description: 'Gets all cookies.',
-          className: 'CookieManager',
+          className: className,
         ),
       ],
     );
   }
 
   static ApiClassDefinition _getWebStorageDefinition() {
+    final className = classNameOf(WebStorage);
     return ApiClassDefinition(
-      className: 'WebStorage',
+      className: className,
       description: 'Manages localStorage and sessionStorage.',
       isClassSupported: () => WebStorage.isClassSupported(),
       methods: [
         ApiMethodDefinition(
-          name: 'length',
+          name: PlatformLocalStorageMethod.length.name,
           signature: 'Future<int?> length()',
           description: 'Gets the number of items.',
-          className: 'WebStorage',
+          className: className,
         ),
         ApiMethodDefinition(
-          name: 'setItem',
+          name: PlatformLocalStorageMethod.setItem.name,
           signature:
               'Future<void> setItem({required String key, required dynamic value})',
           description: 'Sets an item.',
-          className: 'WebStorage',
+          className: className,
         ),
         ApiMethodDefinition(
-          name: 'getItem',
+          name: PlatformLocalStorageMethod.getItem.name,
           signature: 'Future<dynamic> getItem({required String key})',
           description: 'Gets an item.',
-          className: 'WebStorage',
+          className: className,
         ),
         ApiMethodDefinition(
-          name: 'removeItem',
+          name: PlatformLocalStorageMethod.removeItem.name,
           signature: 'Future<void> removeItem({required String key})',
           description: 'Removes an item.',
-          className: 'WebStorage',
+          className: className,
         ),
         ApiMethodDefinition(
-          name: 'getItems',
+          name: PlatformLocalStorageMethod.getItems.name,
           signature: 'Future<List<WebStorageItem>> getItems()',
           description: 'Gets all items.',
-          className: 'WebStorage',
+          className: className,
         ),
         ApiMethodDefinition(
-          name: 'clear',
+          name: PlatformLocalStorageMethod.clear.name,
           signature: 'Future<void> clear()',
           description: 'Clears all items.',
-          className: 'WebStorage',
+          className: className,
         ),
         ApiMethodDefinition(
-          name: 'key',
+          name: PlatformLocalStorageMethod.key.name,
           signature: 'Future<String> key({required int index})',
           description: 'Gets the key at an index.',
-          className: 'WebStorage',
+          className: className,
         ),
       ],
     );
   }
 
   static ApiClassDefinition _getFindInteractionControllerDefinition() {
+    final className = classNameOf(FindInteractionController);
     return ApiClassDefinition(
-      className: 'FindInteractionController',
+      className: className,
       description: 'Controls find-in-page functionality.',
       isClassSupported: () => FindInteractionController.isClassSupported(),
       methods: [
         ApiMethodDefinition(
-          name: 'findAll',
+          name: PlatformFindInteractionControllerMethod.findAll.name,
           signature: 'Future<void> findAll({String? find})',
           description: 'Finds all occurrences.',
-          className: 'FindInteractionController',
+          className: className,
         ),
         ApiMethodDefinition(
-          name: 'findNext',
+          name: PlatformFindInteractionControllerMethod.findNext.name,
           signature: 'Future<void> findNext({bool forward = true})',
           description: 'Finds the next occurrence.',
-          className: 'FindInteractionController',
+          className: className,
         ),
         ApiMethodDefinition(
-          name: 'clearMatches',
+          name: PlatformFindInteractionControllerMethod.clearMatches.name,
           signature: 'Future<void> clearMatches()',
           description: 'Clears all matches.',
-          className: 'FindInteractionController',
+          className: className,
         ),
         ApiMethodDefinition(
-          name: 'setSearchText',
+          name: PlatformFindInteractionControllerMethod.setSearchText.name,
           signature: 'Future<void> setSearchText(String? searchText)',
           description: 'Sets the search text.',
-          className: 'FindInteractionController',
+          className: className,
         ),
         ApiMethodDefinition(
-          name: 'getSearchText',
+          name: PlatformFindInteractionControllerMethod.getSearchText.name,
           signature: 'Future<String?> getSearchText()',
           description: 'Gets the search text.',
-          className: 'FindInteractionController',
+          className: className,
         ),
         ApiMethodDefinition(
-          name: 'isFindNavigatorVisible',
+          name:
+              PlatformFindInteractionControllerMethod.isFindNavigatorVisible.name,
           signature: 'Future<bool?> isFindNavigatorVisible()',
           description: 'Checks if the find navigator is visible.',
-          className: 'FindInteractionController',
+          className: className,
         ),
         ApiMethodDefinition(
-          name: 'presentFindNavigator',
+          name: PlatformFindInteractionControllerMethod.presentFindNavigator.name,
           signature: 'Future<void> presentFindNavigator()',
           description: 'Presents the find navigator.',
-          className: 'FindInteractionController',
+          className: className,
         ),
         ApiMethodDefinition(
-          name: 'dismissFindNavigator',
+          name: PlatformFindInteractionControllerMethod.dismissFindNavigator.name,
           signature: 'Future<void> dismissFindNavigator()',
           description: 'Dismisses the find navigator.',
-          className: 'FindInteractionController',
+          className: className,
         ),
         ApiMethodDefinition(
-          name: 'getActiveFindSession',
+          name: PlatformFindInteractionControllerMethod.getActiveFindSession.name,
           signature: 'Future<FindSession?> getActiveFindSession()',
           description: 'Gets the active find session.',
-          className: 'FindInteractionController',
+          className: className,
         ),
         ApiMethodDefinition(
-          name: 'dispose',
+          name: PlatformFindInteractionControllerMethod.dispose.name,
           signature: 'void dispose()',
           description: 'Disposes the controller.',
-          className: 'FindInteractionController',
+          className: className,
         ),
       ],
       events: [
         ApiEventDefinition(
-          name: 'onFindResultReceived',
+          name: PlatformFindInteractionControllerCreationParamsProperty
+              .onFindResultReceived
+              .name,
           description: 'Called when find results are received.',
-          className: 'FindInteractionController',
+          className: className,
         ),
       ],
     );
   }
 
   static ApiClassDefinition _getPullToRefreshControllerDefinition() {
+    final className = classNameOf(PullToRefreshController);
     return ApiClassDefinition(
-      className: 'PullToRefreshController',
+      className: className,
       description: 'Controls pull-to-refresh functionality.',
       isClassSupported: () => PullToRefreshController.isClassSupported(),
       methods: [
         ApiMethodDefinition(
-          name: 'setEnabled',
+          name: PlatformPullToRefreshControllerMethod.setEnabled.name,
           signature: 'Future<void> setEnabled(bool enabled)',
           description: 'Enables or disables pull-to-refresh.',
-          className: 'PullToRefreshController',
+          className: className,
         ),
         ApiMethodDefinition(
-          name: 'isEnabled',
+          name: PlatformPullToRefreshControllerMethod.isEnabled.name,
           signature: 'Future<bool> isEnabled()',
           description: 'Checks if pull-to-refresh is enabled.',
-          className: 'PullToRefreshController',
+          className: className,
         ),
         ApiMethodDefinition(
-          name: 'beginRefreshing',
+          name: PlatformPullToRefreshControllerMethod.beginRefreshing.name,
           signature: 'Future<void> beginRefreshing()',
           description: 'Starts the refresh animation.',
-          className: 'PullToRefreshController',
+          className: className,
         ),
         ApiMethodDefinition(
-          name: 'endRefreshing',
+          name: PlatformPullToRefreshControllerMethod.endRefreshing.name,
           signature: 'Future<void> endRefreshing()',
           description: 'Stops the refresh animation.',
-          className: 'PullToRefreshController',
+          className: className,
         ),
         ApiMethodDefinition(
-          name: 'isRefreshing',
+          name: PlatformPullToRefreshControllerMethod.isRefreshing.name,
           signature: 'Future<bool> isRefreshing()',
           description: 'Checks if currently refreshing.',
-          className: 'PullToRefreshController',
+          className: className,
         ),
         ApiMethodDefinition(
-          name: 'setColor',
+          name: PlatformPullToRefreshControllerMethod.setColor.name,
           signature: 'Future<void> setColor(Color color)',
           description: 'Sets the indicator color.',
-          className: 'PullToRefreshController',
+          className: className,
         ),
         ApiMethodDefinition(
-          name: 'setBackgroundColor',
+          name: PlatformPullToRefreshControllerMethod.setBackgroundColor.name,
           signature: 'Future<void> setBackgroundColor(Color color)',
           description: 'Sets the background color.',
-          className: 'PullToRefreshController',
+          className: className,
         ),
         ApiMethodDefinition(
-          name: 'setDistanceToTrigger',
+          name: PlatformPullToRefreshControllerMethod
+              .setDistanceToTriggerSync
+              .name,
           signature:
-              'Future<void> setDistanceToTrigger(double distanceToTrigger)',
+              'Future<void> setDistanceToTriggerSync(double distanceToTrigger)',
           description: 'Sets the distance to trigger refresh.',
-          className: 'PullToRefreshController',
+          className: className,
         ),
         ApiMethodDefinition(
-          name: 'setSlingshotDistance',
+          name: PlatformPullToRefreshControllerMethod.setSlingshotDistance.name,
           signature:
               'Future<void> setSlingshotDistance(double slingshotDistance)',
           description: 'Sets the slingshot distance.',
-          className: 'PullToRefreshController',
+          className: className,
         ),
         ApiMethodDefinition(
-          name: 'getDefaultSlingshotDistance',
+          name: PlatformPullToRefreshControllerMethod
+              .getDefaultSlingshotDistance
+              .name,
           signature: 'Future<double> getDefaultSlingshotDistance()',
           description: 'Gets the default slingshot distance.',
-          className: 'PullToRefreshController',
+          className: className,
         ),
         ApiMethodDefinition(
-          name: 'setIndicatorSize',
+          name: PlatformPullToRefreshControllerMethod.setIndicatorSize.name,
           signature: 'Future<void> setIndicatorSize(PullToRefreshSize size)',
           description: 'Sets the indicator size.',
-          className: 'PullToRefreshController',
+          className: className,
         ),
         ApiMethodDefinition(
-          name: 'dispose',
+          name: PlatformPullToRefreshControllerMethod.dispose.name,
           signature: 'void dispose()',
           description: 'Disposes the controller.',
-          className: 'PullToRefreshController',
+          className: className,
         ),
       ],
       events: [
         ApiEventDefinition(
-          name: 'onRefresh',
+          name: PlatformPullToRefreshControllerCreationParamsProperty
+              .onRefresh
+              .name,
           description: 'Called when a refresh is triggered.',
-          className: 'PullToRefreshController',
+          className: className,
         ),
       ],
     );
   }
 
   static ApiClassDefinition _getPrintJobControllerDefinition() {
+    final className = classNameOf(PrintJobController);
     return ApiClassDefinition(
-      className: 'PrintJobController',
+      className: className,
       description: 'Controls print jobs.',
       isClassSupported: () => PrintJobController.isClassSupported(),
       methods: [
         ApiMethodDefinition(
-          name: 'cancel',
+          name: PlatformPrintJobControllerMethod.cancel.name,
           signature: 'Future<void> cancel()',
           description: 'Cancels the print job.',
-          className: 'PrintJobController',
+          className: className,
         ),
         ApiMethodDefinition(
-          name: 'restart',
+          name: PlatformPrintJobControllerMethod.restart.name,
           signature: 'Future<void> restart()',
           description: 'Restarts the print job.',
-          className: 'PrintJobController',
+          className: className,
         ),
         ApiMethodDefinition(
-          name: 'dismiss',
+          name: PlatformPrintJobControllerMethod.dismiss.name,
           signature: 'Future<void> dismiss({bool animated = true})',
           description: 'Dismisses the print interface.',
-          className: 'PrintJobController',
+          className: className,
         ),
         ApiMethodDefinition(
-          name: 'getInfo',
+          name: PlatformPrintJobControllerMethod.getInfo.name,
           signature: 'Future<PrintJobInfo?> getInfo()',
           description: 'Gets the print job info.',
-          className: 'PrintJobController',
+          className: className,
         ),
       ],
       events: [
         ApiEventDefinition(
-          name: 'onComplete',
+          name: PlatformPrintJobControllerProperty.onComplete.name,
           description: 'Called when the print job completes.',
-          className: 'PrintJobController',
+          className: className,
         ),
       ],
     );
   }
 
   static ApiClassDefinition _getWebAuthenticationSessionDefinition() {
+    final className = classNameOf(WebAuthenticationSession);
     return ApiClassDefinition(
-      className: 'WebAuthenticationSession',
+      className: className,
       description: 'Handles web authentication sessions.',
       isClassSupported: () => WebAuthenticationSession.isClassSupported(),
       methods: [
         ApiMethodDefinition(
-          name: 'create',
+          name: PlatformWebAuthenticationSessionMethod.create.name,
           signature: 'static Future<WebAuthenticationSession> create({...})',
           description: 'Creates a new authentication session.',
-          className: 'WebAuthenticationSession',
+          className: className,
           isStatic: true,
         ),
         ApiMethodDefinition(
-          name: 'canStart',
+          name: PlatformWebAuthenticationSessionMethod.canStart.name,
           signature: 'Future<bool> canStart()',
           description: 'Checks if the session can start.',
-          className: 'WebAuthenticationSession',
+          className: className,
         ),
         ApiMethodDefinition(
-          name: 'start',
+          name: PlatformWebAuthenticationSessionMethod.start.name,
           signature: 'Future<void> start()',
           description: 'Starts the authentication session.',
-          className: 'WebAuthenticationSession',
+          className: className,
         ),
         ApiMethodDefinition(
-          name: 'cancel',
+          name: PlatformWebAuthenticationSessionMethod.cancel.name,
           signature: 'Future<void> cancel()',
           description: 'Cancels the session.',
-          className: 'WebAuthenticationSession',
+          className: className,
         ),
         ApiMethodDefinition(
-          name: 'dispose',
+          name: PlatformWebAuthenticationSessionMethod.dispose.name,
           signature: 'Future<void> dispose()',
           description: 'Disposes the session.',
-          className: 'WebAuthenticationSession',
+          className: className,
         ),
         ApiMethodDefinition(
-          name: 'isAvailable',
+          name: PlatformWebAuthenticationSessionMethod.isAvailable.name,
           signature: 'static Future<bool> isAvailable()',
           description: 'Checks if web authentication is available.',
-          className: 'WebAuthenticationSession',
+          className: className,
           isStatic: true,
         ),
       ],
       events: [
         ApiEventDefinition(
-          name: 'onComplete',
+          name: PlatformWebAuthenticationSessionProperty.onComplete.name,
           description: 'Called when authentication completes.',
-          className: 'WebAuthenticationSession',
+          className: className,
         ),
       ],
     );
   }
 
   static ApiClassDefinition _getServiceWorkerControllerDefinition() {
+    final className = classNameOf(ServiceWorkerController);
     return ApiClassDefinition(
-      className: 'ServiceWorkerController',
+      className: className,
       description: 'Controls service workers.',
       isClassSupported: () => ServiceWorkerController.isClassSupported(),
       methods: [
         ApiMethodDefinition(
-          name: 'instance',
-          signature: 'static ServiceWorkerController instance()',
-          description: 'Gets the singleton instance.',
-          className: 'ServiceWorkerController',
-          isStatic: true,
-        ),
-        ApiMethodDefinition(
-          name: 'setServiceWorkerClient',
+          name: PlatformServiceWorkerControllerMethod.setServiceWorkerClient.name,
           signature:
               'Future<void> setServiceWorkerClient(ServiceWorkerClient? value)',
           description: 'Sets the service worker client.',
-          className: 'ServiceWorkerController',
+          className: className,
         ),
         ApiMethodDefinition(
-          name: 'getServiceWorkerClient',
-          signature: 'Future<ServiceWorkerClient?> getServiceWorkerClient()',
-          description: 'Gets the service worker client.',
-          className: 'ServiceWorkerController',
-        ),
-        ApiMethodDefinition(
-          name: 'getAllowContentAccess',
+          name: PlatformServiceWorkerControllerMethod.getAllowContentAccess.name,
           signature: 'Future<bool> getAllowContentAccess()',
           description: 'Gets allow content access setting.',
-          className: 'ServiceWorkerController',
+          className: className,
         ),
         ApiMethodDefinition(
-          name: 'setAllowContentAccess',
+          name: PlatformServiceWorkerControllerMethod.setAllowContentAccess.name,
           signature: 'Future<void> setAllowContentAccess(bool allow)',
           description: 'Sets allow content access setting.',
-          className: 'ServiceWorkerController',
+          className: className,
         ),
         ApiMethodDefinition(
-          name: 'getAllowFileAccess',
+          name: PlatformServiceWorkerControllerMethod.getAllowFileAccess.name,
           signature: 'Future<bool> getAllowFileAccess()',
           description: 'Gets allow file access setting.',
-          className: 'ServiceWorkerController',
+          className: className,
         ),
         ApiMethodDefinition(
-          name: 'setAllowFileAccess',
+          name: PlatformServiceWorkerControllerMethod.setAllowFileAccess.name,
           signature: 'Future<void> setAllowFileAccess(bool allow)',
           description: 'Sets allow file access setting.',
-          className: 'ServiceWorkerController',
+          className: className,
         ),
         ApiMethodDefinition(
-          name: 'getBlockNetworkLoads',
+          name: PlatformServiceWorkerControllerMethod.getBlockNetworkLoads.name,
           signature: 'Future<bool> getBlockNetworkLoads()',
           description: 'Gets block network loads setting.',
-          className: 'ServiceWorkerController',
+          className: className,
         ),
         ApiMethodDefinition(
-          name: 'setBlockNetworkLoads',
+          name: PlatformServiceWorkerControllerMethod.setBlockNetworkLoads.name,
           signature: 'Future<void> setBlockNetworkLoads(bool block)',
           description: 'Sets block network loads setting.',
-          className: 'ServiceWorkerController',
+          className: className,
         ),
       ],
       events: [
         ApiEventDefinition(
-          name: 'shouldInterceptRequest',
+          name: ServiceWorkerClientProperty.shouldInterceptRequest.name,
           description: 'Called to intercept service worker requests.',
-          className: 'ServiceWorkerController',
+          className: className,
         ),
       ],
     );
   }
 
   static ApiClassDefinition _getProxyControllerDefinition() {
+    final className = classNameOf(ProxyController);
     return ApiClassDefinition(
-      className: 'ProxyController',
+      className: className,
       description: 'Controls proxy settings.',
       isClassSupported: () => ProxyController.isClassSupported(),
       methods: [
         ApiMethodDefinition(
-          name: 'setProxyOverride',
+          name: PlatformProxyControllerMethod.setProxyOverride.name,
           signature:
               'Future<void> setProxyOverride({required ProxySettings settings})',
           description: 'Sets the proxy override.',
-          className: 'ProxyController',
+          className: className,
         ),
         ApiMethodDefinition(
-          name: 'clearProxyOverride',
+          name: PlatformProxyControllerMethod.clearProxyOverride.name,
           signature: 'Future<void> clearProxyOverride()',
           description: 'Clears the proxy override.',
-          className: 'ProxyController',
+          className: className,
         ),
       ],
     );
   }
 
   static ApiClassDefinition _getTracingControllerDefinition() {
+    final className = classNameOf(TracingController);
     return ApiClassDefinition(
-      className: 'TracingController',
+      className: className,
       description: 'Controls tracing.',
       isClassSupported: () => TracingController.isClassSupported(),
       methods: [
         ApiMethodDefinition(
-          name: 'start',
+          name: PlatformTracingControllerMethod.start.name,
           signature: 'Future<void> start({required TracingSettings settings})',
           description: 'Starts tracing.',
-          className: 'TracingController',
+          className: className,
         ),
         ApiMethodDefinition(
-          name: 'stop',
+          name: PlatformTracingControllerMethod.stop.name,
           signature: 'Future<bool> stop({String? filePath})',
           description: 'Stops tracing.',
-          className: 'TracingController',
+          className: className,
         ),
         ApiMethodDefinition(
-          name: 'isTracing',
+          name: PlatformTracingControllerMethod.isTracing.name,
           signature: 'Future<bool> isTracing()',
           description: 'Checks if tracing is active.',
-          className: 'TracingController',
+          className: className,
         ),
       ],
     );
   }
 
   static ApiClassDefinition _getHttpAuthCredentialDatabaseDefinition() {
+    final className = classNameOf(HttpAuthCredentialDatabase);
     return ApiClassDefinition(
-      className: 'HttpAuthCredentialDatabase',
+      className: className,
       description: 'Manages HTTP authentication credentials.',
       isClassSupported: () => HttpAuthCredentialDatabase.isClassSupported(),
       methods: [
         ApiMethodDefinition(
-          name: 'getAllAuthCredentials',
+          name: PlatformHttpAuthCredentialDatabaseMethod
+              .getAllAuthCredentials
+              .name,
           signature:
               'Future<List<URLProtectionSpaceHttpAuthCredentials>> getAllAuthCredentials()',
           description: 'Gets all stored credentials.',
-          className: 'HttpAuthCredentialDatabase',
+          className: className,
         ),
         ApiMethodDefinition(
-          name: 'getHttpAuthCredentials',
+          name: PlatformHttpAuthCredentialDatabaseMethod
+              .getHttpAuthCredentials
+              .name,
           signature:
               'Future<List<URLCredential>> getHttpAuthCredentials({...})',
           description: 'Gets credentials for a protection space.',
-          className: 'HttpAuthCredentialDatabase',
+          className: className,
         ),
         ApiMethodDefinition(
-          name: 'setHttpAuthCredential',
+          name: PlatformHttpAuthCredentialDatabaseMethod.setHttpAuthCredential.name,
           signature: 'Future<void> setHttpAuthCredential({...})',
           description: 'Sets a credential.',
-          className: 'HttpAuthCredentialDatabase',
+          className: className,
         ),
         ApiMethodDefinition(
-          name: 'removeHttpAuthCredential',
+          name: PlatformHttpAuthCredentialDatabaseMethod
+              .removeHttpAuthCredential
+              .name,
           signature: 'Future<void> removeHttpAuthCredential({...})',
           description: 'Removes a credential.',
-          className: 'HttpAuthCredentialDatabase',
+          className: className,
         ),
         ApiMethodDefinition(
-          name: 'removeHttpAuthCredentials',
+          name: PlatformHttpAuthCredentialDatabaseMethod
+              .removeHttpAuthCredentials
+              .name,
           signature: 'Future<void> removeHttpAuthCredentials({...})',
           description: 'Removes all credentials for a protection space.',
-          className: 'HttpAuthCredentialDatabase',
+          className: className,
         ),
         ApiMethodDefinition(
-          name: 'clearAllAuthCredentials',
+          name: PlatformHttpAuthCredentialDatabaseMethod
+              .clearAllAuthCredentials
+              .name,
           signature: 'Future<void> clearAllAuthCredentials()',
           description: 'Clears all credentials.',
-          className: 'HttpAuthCredentialDatabase',
+          className: className,
         ),
       ],
     );
   }
 
   static ApiClassDefinition _getWebViewEnvironmentDefinition() {
+    final className = classNameOf(WebViewEnvironment);
     return ApiClassDefinition(
-      className: 'WebViewEnvironment',
+      className: className,
       description: 'WebView2 environment for Windows.',
       isClassSupported: () => WebViewEnvironment.isClassSupported(),
       methods: [
         ApiMethodDefinition(
-          name: 'create',
+          name: PlatformWebViewEnvironmentMethod.create.name,
           signature: 'static Future<WebViewEnvironment> create({...})',
           description: 'Creates a WebView environment.',
-          className: 'WebViewEnvironment',
+          className: className,
           isStatic: true,
         ),
         ApiMethodDefinition(
-          name: 'getAvailableVersion',
+          name: PlatformWebViewEnvironmentMethod.getAvailableVersion.name,
           signature:
               'static Future<String?> getAvailableVersion({String? browserExecutableFolder})',
           description: 'Gets the available WebView2 version.',
-          className: 'WebViewEnvironment',
+          className: className,
           isStatic: true,
         ),
         ApiMethodDefinition(
-          name: 'getProcessInfos',
+          name: PlatformWebViewEnvironmentMethod.getProcessInfos.name,
           signature: 'Future<List<BrowserProcessInfo>> getProcessInfos()',
           description: 'Gets running process information.',
-          className: 'WebViewEnvironment',
+          className: className,
         ),
         ApiMethodDefinition(
-          name: 'compareBrowserVersions',
+          name: PlatformWebViewEnvironmentMethod.compareBrowserVersions.name,
           signature: 'static Future<int> compareBrowserVersions({...})',
           description: 'Compares browser versions.',
-          className: 'WebViewEnvironment',
+          className: className,
           isStatic: true,
         ),
         ApiMethodDefinition(
-          name: 'dispose',
+          name: PlatformWebViewEnvironmentMethod.dispose.name,
           signature: 'Future<void> dispose()',
           description: 'Disposes the environment.',
-          className: 'WebViewEnvironment',
+          className: className,
         ),
       ],
       events: [
         ApiEventDefinition(
-          name: 'onBrowserProcessExited',
+          name: PlatformWebViewEnvironmentProperty.onBrowserProcessExited.name,
           description: 'Called when the browser process exits.',
-          className: 'WebViewEnvironment',
+          className: className,
         ),
         ApiEventDefinition(
-          name: 'onProcessInfosChanged',
+          name: PlatformWebViewEnvironmentProperty.onProcessInfosChanged.name,
           description: 'Called when process info changes.',
-          className: 'WebViewEnvironment',
+          className: className,
         ),
         ApiEventDefinition(
-          name: 'onNewBrowserVersionAvailable',
+          name: PlatformWebViewEnvironmentProperty
+              .onNewBrowserVersionAvailable
+              .name,
           description: 'Called when a new browser version is available.',
-          className: 'WebViewEnvironment',
+          className: className,
         ),
       ],
     );
   }
 
   static ApiClassDefinition _getProcessGlobalConfigDefinition() {
+    final className = classNameOf(ProcessGlobalConfig);
     return ApiClassDefinition(
-      className: 'ProcessGlobalConfig',
+      className: className,
       description: 'Global process configuration for Android.',
       isClassSupported: () => ProcessGlobalConfig.isClassSupported(),
       methods: [
         ApiMethodDefinition(
-          name: 'apply',
+          name: PlatformProcessGlobalConfigMethod.apply.name,
           signature:
               'Future<void> apply({required ProcessGlobalConfigSettings settings})',
           description: 'Applies global configuration settings.',
-          className: 'ProcessGlobalConfig',
+          className: className,
         ),
       ],
     );
   }
 
   static ApiClassDefinition _getWebMessageChannelDefinition() {
+    final className = classNameOf(WebMessageChannel);
     return ApiClassDefinition(
-      className: 'WebMessageChannel',
+      className: className,
       description: 'HTML5 message channel for two-way communication.',
       isClassSupported: () => WebMessageChannel.isClassSupported(),
       methods: [
         ApiMethodDefinition(
-          name: 'dispose',
+          name: PlatformWebMessageChannelMethod.dispose.name,
           signature: 'void dispose()',
           description: 'Disposes the channel.',
-          className: 'WebMessageChannel',
+          className: className,
         ),
       ],
     );

@@ -10,7 +10,7 @@ import 'package:flutter_inappwebview_example/widgets/webview/network_monitor_wid
 import 'package:flutter_inappwebview_example/widgets/webview/method_tester_widget.dart';
 import 'package:flutter_inappwebview_example/widgets/webview/javascript_console_widget.dart';
 import 'package:flutter_inappwebview_example/widgets/webview/user_script_tester_widget.dart';
-import 'package:flutter_inappwebview_example/main.dart';
+import 'package:flutter_inappwebview_example/widgets/common/app_drawer.dart';
 import 'package:flutter_inappwebview_example/providers/settings_manager.dart';
 import 'package:flutter_inappwebview_example/widgets/common/profile_selector_card.dart';
 
@@ -72,7 +72,7 @@ class _WebViewTesterScreenState extends State<WebViewTesterScreen>
           ),
         ],
       ),
-      drawer: buildDrawer(context: context),
+      drawer: AppDrawer(),
       body: LayoutBuilder(
         builder: (context, constraints) {
           final minRequiredHeight =

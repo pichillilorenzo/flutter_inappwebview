@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import '../../models/test_configuration.dart';
-import '../../main.dart';
+import '../../widgets/common/app_drawer.dart';
 import '../../widgets/test_automation/custom_test_step_dialog.dart';
 
 /// Screen for managing test configurations, custom steps, and test ordering
@@ -95,7 +95,7 @@ class _TestConfigurationScreenState extends State<TestConfigurationScreen>
             ),
           ],
         ),
-        drawer: buildDrawer(context: context),
+        drawer: AppDrawer(),
         body: TabBarView(
           controller: _tabController,
           children: [

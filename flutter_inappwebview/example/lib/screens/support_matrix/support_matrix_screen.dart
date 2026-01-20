@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../../utils/support_checker.dart';
 import '../../widgets/common/support_badge.dart';
-import '../../main.dart';
+import '../../widgets/common/app_drawer.dart';
 
 /// Screen displaying a comprehensive support matrix showing all APIs with platform availability.
 class SupportMatrixScreen extends StatefulWidget {
@@ -237,7 +237,7 @@ class _SupportMatrixScreenState extends State<SupportMatrixScreen>
           }).toList(),
         ),
       ),
-      drawer: buildDrawer(context: context),
+      drawer: AppDrawer(),
       body: Column(
         children: [
           _buildSummaryHeader(),

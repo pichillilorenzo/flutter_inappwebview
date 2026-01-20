@@ -7,7 +7,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../models/test_configuration.dart';
 import '../../providers/test_runner.dart';
 import '../../utils/constants.dart';
-import '../../main.dart';
+import '../../widgets/common/app_drawer.dart';
 
 /// Automated test runner screen
 class TestRunnerScreen extends StatefulWidget {
@@ -142,7 +142,7 @@ class _TestRunnerScreenState extends State<TestRunnerScreen> {
           ),
         ],
       ),
-      drawer: buildDrawer(context: context),
+      drawer: AppDrawer(),
       body: Consumer<TestRunner>(
         builder: (context, runner, child) {
           return Column(

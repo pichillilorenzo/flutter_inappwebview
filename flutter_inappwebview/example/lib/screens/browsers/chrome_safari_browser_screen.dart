@@ -3,7 +3,7 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
-import 'package:flutter_inappwebview_example/main.dart';
+import 'package:flutter_inappwebview_example/widgets/common/app_drawer.dart';
 import 'package:flutter_inappwebview_example/utils/support_checker.dart';
 import 'package:flutter_inappwebview_example/widgets/common/support_badge.dart';
 import 'package:flutter_inappwebview_example/widgets/common/method_result_history.dart';
@@ -747,7 +747,7 @@ class _ChromeSafariBrowserScreenState extends State<ChromeSafariBrowserScreen> {
           ),
         ],
       ),
-      drawer: buildDrawer(context: context),
+      drawer: AppDrawer(),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [

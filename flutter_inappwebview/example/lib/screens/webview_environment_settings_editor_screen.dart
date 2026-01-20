@@ -6,7 +6,7 @@ import 'package:flutter_inappwebview_example/providers/settings_manager.dart';
 import 'package:flutter_inappwebview_example/models/webview_environment_profile.dart';
 import 'package:flutter_inappwebview_example/utils/platform_utils.dart';
 import 'package:flutter_inappwebview_example/utils/support_checker.dart';
-import 'package:flutter_inappwebview_example/main.dart';
+import 'package:flutter_inappwebview_example/widgets/common/app_drawer.dart';
 
 /// Comprehensive settings editor for WebViewEnvironmentSettings
 /// Used to configure WebView2 (Windows) and WPE WebKit (Linux) environments
@@ -115,7 +115,7 @@ class _WebViewEnvironmentSettingsEditorScreenState
           ),
         ],
       ),
-      drawer: buildDrawer(context: context),
+      drawer: AppDrawer(),
       body: Consumer<SettingsManager>(
         builder: (context, settingsManager, child) {
           if (settingsManager.isLoading) {

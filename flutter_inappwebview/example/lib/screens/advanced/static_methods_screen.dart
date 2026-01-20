@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview_example/widgets/webview/static_method_tester_widget.dart';
-import 'package:flutter_inappwebview_example/main.dart';
+import 'package:flutter_inappwebview_example/widgets/common/app_drawer.dart';
 
 /// Screen for testing static methods from various InAppWebView classes
 /// without requiring a WebView instance.
@@ -14,7 +14,7 @@ class StaticMethodsScreen extends StatelessWidget {
         title: const Text('Static Methods'),
         backgroundColor: Colors.blue,
       ),
-      drawer: buildDrawer(context: context),
+      drawer: AppDrawer(),
       body: const StaticMethodTesterWidget(),
     );
   }

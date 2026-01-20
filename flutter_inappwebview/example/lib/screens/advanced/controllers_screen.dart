@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
-import 'package:flutter_inappwebview_example/main.dart';
+import 'package:flutter_inappwebview_example/widgets/common/app_drawer.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_inappwebview_example/providers/event_log_provider.dart';
 import 'package:flutter_inappwebview_example/models/event_log_entry.dart';
@@ -583,7 +583,7 @@ class _ControllersScreenState extends State<ControllersScreen> {
           ),
         ],
       ),
-      drawer: buildDrawer(context: context),
+      drawer: AppDrawer(),
       body: LayoutBuilder(
         builder: (context, constraints) {
           final minRequiredHeight =

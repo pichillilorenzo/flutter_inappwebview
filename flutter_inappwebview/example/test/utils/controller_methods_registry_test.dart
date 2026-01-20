@@ -9,10 +9,7 @@ import 'package:flutter_inappwebview_example/widgets/common/parameter_dialog.dar
 void main() {
   group('controller_methods_registry helpers', () {
     test('extractParam unwraps hinted values', () {
-      const hint = ParameterValueHint<int>(
-        7,
-        ParameterValueType.number,
-      );
+      const hint = ParameterValueHint<int>(7, ParameterValueType.number);
 
       expect(extractParam<int>(hint), 7);
       expect(extractParam<String>('value'), 'value');
@@ -25,10 +22,7 @@ void main() {
         methodEnum: PlatformInAppWebViewControllerMethod.loadUrl,
         description: 'test',
         parameters: {
-          'count': const ParameterValueHint<int>(
-            3,
-            ParameterValueType.number,
-          ),
+          'count': const ParameterValueHint<int>(3, ParameterValueType.number),
           'bytes': Uint8List.fromList([1, 2, 3]),
         },
         requiredParameters: const ['count'],

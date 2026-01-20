@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
-import '../main.dart';
+import '../widgets/common/app_drawer.dart';
 import '../utils/constants.dart';
 import '../utils/test_registry.dart';
 import '../utils/platform_utils.dart';
@@ -32,7 +32,7 @@ class HomeScreen extends StatelessWidget {
           ),
         ],
       ),
-      drawer: buildDrawer(context: context),
+      drawer: AppDrawer(),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(

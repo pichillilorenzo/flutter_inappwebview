@@ -6,7 +6,7 @@ import 'package:flutter_inappwebview_example/models/settings_profile.dart';
 import 'package:flutter_inappwebview_example/utils/platform_utils.dart';
 import 'package:flutter_inappwebview_example/utils/support_checker.dart';
 import 'package:flutter_inappwebview_example/widgets/common/support_badge.dart';
-import 'package:flutter_inappwebview_example/main.dart';
+import 'package:flutter_inappwebview_example/widgets/common/app_drawer.dart';
 
 /// Comprehensive settings editor for InAppWebViewSettings
 class SettingsEditorScreen extends StatefulWidget {
@@ -108,7 +108,7 @@ class _SettingsEditorScreenState extends State<SettingsEditorScreen> {
           ),
         ],
       ),
-      drawer: buildDrawer(context: context),
+      drawer: AppDrawer(),
       body: Consumer<SettingsManager>(
         builder: (context, settingsManager, child) {
           if (settingsManager.isLoading) {

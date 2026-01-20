@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../../utils/support_checker.dart';
 import '../../widgets/common/support_badge.dart';
-import '../../main.dart';
+import '../../widgets/common/app_drawer.dart';
 
 /// Screen for comparing API support between two platforms.
 class PlatformComparisonScreen extends StatefulWidget {
@@ -259,7 +259,7 @@ class _PlatformComparisonScreenState extends State<PlatformComparisonScreen> {
           ),
         ],
       ),
-      drawer: buildDrawer(context: context),
+      drawer: AppDrawer(),
       body: Column(
         children: [
           // Platform selectors

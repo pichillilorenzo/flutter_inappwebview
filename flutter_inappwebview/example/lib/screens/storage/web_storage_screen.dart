@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
-import 'package:flutter_inappwebview_example/main.dart';
+import 'package:flutter_inappwebview_example/widgets/common/app_drawer.dart';
 import 'package:flutter_inappwebview_example/utils/support_checker.dart';
 import 'package:flutter_inappwebview_example/widgets/common/support_badge.dart';
 import 'package:flutter_inappwebview_example/widgets/common/parameter_dialog.dart';
@@ -552,7 +552,7 @@ class _WebStorageScreenState extends State<WebStorageScreen>
           indicatorColor: Colors.white,
         ),
       ),
-      drawer: buildDrawer(context: context),
+      drawer: AppDrawer(),
       body: LayoutBuilder(
         builder: (context, constraints) {
           final maxWebViewHeight =

@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_inappwebview_example/providers/settings_manager.dart';
 import 'package:flutter_inappwebview_example/models/environment_setting_definition.dart';
 import 'package:flutter_inappwebview_example/models/webview_environment_profile.dart';
 import 'package:flutter_inappwebview_example/utils/platform_utils.dart';
-import 'package:flutter_inappwebview_example/utils/support_checker.dart';
 import 'package:flutter_inappwebview_example/widgets/common/app_drawer.dart';
 
 /// Comprehensive settings editor for WebViewEnvironmentSettings
@@ -458,8 +456,12 @@ class _WebViewEnvironmentSettingsEditorScreenState
         if (setting.enumValues == null || setting.enumValues!.isEmpty) {
           return const SizedBox.shrink();
         }
+        if (_isBitmaskEnumSetting(setting)) {
+          return _buildBitmaskEnumControl(setting, currentValue);
+        }
+        final selectedValue = _resolveEnumSelection(setting, currentValue);
         return DropdownButton<dynamic>(
-          value: currentValue,
+          value: selectedValue,
           isExpanded: true,
           items: [
             const DropdownMenuItem(
@@ -467,10 +469,8 @@ class _WebViewEnvironmentSettingsEditorScreenState
               child: Text('Not Set', style: TextStyle(fontSize: 14)),
             ),
             ...setting.enumValues!.map((enumValue) {
-              final nativeValue = EnvironmentSettingDefinition
-                  .enumValueToNative(enumValue);
               return DropdownMenuItem(
-                value: nativeValue,
+                value: enumValue,
                 child: Text(
                   EnvironmentSettingDefinition.enumDisplayName(enumValue),
                   style: const TextStyle(fontSize: 14),
@@ -478,7 +478,10 @@ class _WebViewEnvironmentSettingsEditorScreenState
               );
             }),
           ],
-          onChanged: (value) => _updateSetting(setting.key, value),
+          onChanged: (value) => _updateSetting(
+            setting.key,
+            EnvironmentSettingDefinition.enumValueToNative(value),
+          ),
         );
 
       case EnvironmentSettingType.customSchemeRegistrations:
@@ -686,6 +689,98 @@ class _WebViewEnvironmentSettingsEditorScreenState
           ],
         ),
       ),
+    );
+  }
+
+  bool _isBitmaskEnumSetting(EnvironmentSettingDefinition setting) {
+    return setting.property == WebViewEnvironmentSettingsProperty.releaseChannels;
+  }
+
+  int _resolveBitmaskValue(dynamic currentValue) {
+    if (currentValue == null) return 0;
+    if (currentValue is int) return currentValue;
+    final nativeValue = EnvironmentSettingDefinition.enumValueToNative(
+      currentValue,
+    );
+    return nativeValue is int ? nativeValue : 0;
+  }
+
+  dynamic _resolveEnumSelection(
+    EnvironmentSettingDefinition setting,
+    dynamic currentValue,
+  ) {
+    if (currentValue == null) return null;
+    final enumValues = setting.enumValues;
+    if (enumValues == null || enumValues.isEmpty) return null;
+
+    if (enumValues.contains(currentValue)) {
+      return currentValue;
+    }
+
+    for (final enumValue in enumValues) {
+      final nativeValue = EnvironmentSettingDefinition.enumValueToNative(
+        enumValue,
+      );
+      if (nativeValue == currentValue) {
+        return enumValue;
+      }
+    }
+
+    return null;
+  }
+
+  Widget _buildBitmaskEnumControl(
+    EnvironmentSettingDefinition setting,
+    dynamic currentValue,
+  ) {
+    final enumValues = setting.enumValues ?? <dynamic>[];
+    if (enumValues.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
+    final currentMask = _resolveBitmaskValue(currentValue);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Wrap(
+          spacing: 8,
+          runSpacing: 4,
+          children: enumValues.map((enumValue) {
+            final nativeValue = EnvironmentSettingDefinition.enumValueToNative(
+              enumValue,
+            );
+            final maskValue = nativeValue is int ? nativeValue : 0;
+            final isSelected =
+                maskValue != 0 && (currentMask & maskValue) == maskValue;
+
+            return FilterChip(
+              label: Text(
+                EnvironmentSettingDefinition.enumDisplayName(enumValue),
+                style: const TextStyle(fontSize: 12),
+              ),
+              selected: isSelected,
+              onSelected: (selected) {
+                final updatedMask = selected
+                    ? (currentMask | maskValue)
+                    : (currentMask & ~maskValue);
+                _updateSetting(
+                  setting.key,
+                  updatedMask == 0 ? null : updatedMask,
+                );
+              },
+            );
+          }).toList(),
+        ),
+        if (currentMask == 0)
+          Padding(
+            padding: const EdgeInsets.only(top: 6),
+            child: Text(
+              'No release channels selected',
+              style: TextStyle(color: Colors.grey.shade600, fontSize: 12),
+            ),
+          ),
+      ],
     );
   }
 

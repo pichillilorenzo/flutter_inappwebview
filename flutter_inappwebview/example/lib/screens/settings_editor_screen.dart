@@ -483,19 +483,17 @@ class _SettingsEditorScreenState extends State<SettingsEditorScreen> {
         if (setting.enumValues == null || setting.enumValues!.isEmpty) {
           return const SizedBox.shrink();
         }
+        final selectedValue = _resolveEnumSelection(setting, currentValue);
         return DropdownButton<dynamic>(
-          value: currentValue ?? setting.defaultValue,
+          value: selectedValue,
           items: [
             const DropdownMenuItem(
               value: null,
               child: Text('Not Set', style: TextStyle(fontSize: 14)),
             ),
             ...setting.enumValues!.map((enumValue) {
-              final nativeValue = SettingDefinition.enumValueToNative(
-                enumValue,
-              );
               return DropdownMenuItem(
-                value: nativeValue,
+                value: enumValue,
                 child: Text(
                   SettingDefinition.enumDisplayName(enumValue),
                   style: const TextStyle(fontSize: 14),
@@ -503,10 +501,31 @@ class _SettingsEditorScreenState extends State<SettingsEditorScreen> {
               );
             }),
           ],
-          onChanged: (value) =>
-              settingsManager.updateSetting(setting.key, value),
+          onChanged: (value) => settingsManager.updateSetting(
+            setting.key,
+            SettingDefinition.enumValueToNative(value),
+          ),
         );
     }
+  }
+
+  dynamic _resolveEnumSelection(SettingDefinition setting, dynamic currentValue) {
+    if (currentValue == null) return null;
+    final enumValues = setting.enumValues;
+    if (enumValues == null || enumValues.isEmpty) return null;
+
+    if (enumValues.contains(currentValue)) {
+      return currentValue;
+    }
+
+    for (final enumValue in enumValues) {
+      final nativeValue = SettingDefinition.enumValueToNative(enumValue);
+      if (nativeValue == currentValue) {
+        return enumValue;
+      }
+    }
+
+    return null;
   }
 
   Widget _buildBottomBar(SettingsManager settingsManager) {

@@ -98,7 +98,8 @@ getEnvironmentSettingDefinitions() {
         description: 'Enable browser extensions support',
         type: EnvironmentSettingType.boolean,
         defaultValue: false,
-        property: WebViewEnvironmentSettingsProperty.areBrowserExtensionsEnabled,
+        property:
+            WebViewEnvironmentSettingsProperty.areBrowserExtensionsEnabled,
       ),
       EnvironmentSettingDefinition(
         name: 'Web Process Extensions Directory',
@@ -154,7 +155,8 @@ getEnvironmentSettingDefinitions() {
         description: 'Enable custom crash reporting',
         type: EnvironmentSettingType.boolean,
         defaultValue: false,
-        property: WebViewEnvironmentSettingsProperty.isCustomCrashReportingEnabled,
+        property:
+            WebViewEnvironmentSettingsProperty.isCustomCrashReportingEnabled,
       ),
     ],
     'Appearance': [

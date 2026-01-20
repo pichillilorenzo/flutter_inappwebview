@@ -63,7 +63,8 @@ void main() {
     );
     final scrollbarStyle = appearance!.firstWhere(
       (definition) =>
-          definition.property == WebViewEnvironmentSettingsProperty.scrollbarStyle,
+          definition.property ==
+          WebViewEnvironmentSettingsProperty.scrollbarStyle,
     );
     final cacheModel = cache!.firstWhere(
       (definition) =>

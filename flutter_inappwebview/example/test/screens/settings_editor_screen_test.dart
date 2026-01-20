@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_inappwebview_example/screens/settings_editor_screen.dart';
 
@@ -35,6 +36,23 @@ void main() {
 
       expect(find.text('Search settings...'), findsOneWidget);
       expect(find.byIcon(Icons.search), findsOneWidget);
+    });
+
+    testWidgets('uses enum-like values for enumeration dropdowns', (
+      tester,
+    ) async {
+      await tester.pumpWidget(createWidget());
+      await tester.pumpAndSettle();
+
+      await tester.ensureVisible(find.text('Cache'));
+      await tester.tap(find.text('Cache'));
+      await tester.pumpAndSettle();
+
+      final dropdownFinder = find.byType(DropdownButton<dynamic>);
+      expect(dropdownFinder, findsOneWidget);
+
+      final dropdown = tester.widget<DropdownButton<dynamic>>(dropdownFinder);
+      expect(dropdown.value, isA<CacheMode>());
     });
   });
 }

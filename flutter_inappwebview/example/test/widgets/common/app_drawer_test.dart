@@ -57,9 +57,8 @@ void main() {
               appBar: AppBar(title: const Text('Home')),
               drawer: AppDrawer(),
             ),
-            '/settings': (context) => const Scaffold(
-              body: Text('Settings Screen'),
-            ),
+            '/settings': (context) =>
+                const Scaffold(body: Text('Settings Screen')),
           },
         ),
       );

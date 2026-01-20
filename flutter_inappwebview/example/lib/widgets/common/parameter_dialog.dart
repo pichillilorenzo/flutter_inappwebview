@@ -157,7 +157,8 @@ class _ParameterDialogState extends State<ParameterDialog> {
         _hintedTypes[key] = ParameterValueType.enumeration;
         // Wrap the typed displayName function in a dynamic closure to handle
         // the generic type properly (e.g., String Function(CompressFormat) -> String Function(dynamic))
-        final userDisplayName = value.displayName;
+        // We use dynamic access here to bypass covariant check failures with generic functions
+        final userDisplayName = (value as dynamic).displayName;
         String Function(dynamic) displayNameFn;
         if (userDisplayName != null) {
           displayNameFn = (dynamic e) => userDisplayName(e);
@@ -165,7 +166,7 @@ class _ParameterDialogState extends State<ParameterDialog> {
           displayNameFn = _defaultEnumDisplayName;
         }
         _enumInfoMap[key] = _EnumInfo(
-          values: value.enumValues,
+          values: (value as dynamic).enumValues.toList(),
           displayName: displayNameFn,
         );
         ParameterDialogUtils.setValueAtPath(cloned, path, value.value);

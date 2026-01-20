@@ -796,11 +796,74 @@ class _CustomTestStepDialogState extends State<CustomTestStepDialog> {
   Future<void> _showParameterDialog() async {
     if (_selectedMethod == null) return;
 
-    // Merge current values into parameters
-    final params = <String, dynamic>{
-      ..._selectedMethod!.parameters,
-      ..._methodParameters,
-    };
+    // Merge current values into parameters intelligently
+    final params = <String, dynamic>{};
+
+    _selectedMethod!.parameters.forEach((key, defValue) {
+      if (_methodParameters.containsKey(key)) {
+        final currentValue = _methodParameters[key];
+
+        // If definition is a Hint, we need to wrap the currentValue in a Hint
+        if (defValue is ParameterValueHint) {
+          if (defValue is EnumParameterValueHint) {
+            dynamic typedValue = currentValue;
+            if (currentValue is String) {
+              try {
+                typedValue = defValue.enumValues.firstWhere(
+                  (e) => _getEnumName(e) == currentValue,
+                  orElse: () {
+                    // Try case-insensitive matching if exact match fails
+                    try {
+                      return defValue.enumValues.firstWhere(
+                        (e) =>
+                            _getEnumName(e).toLowerCase() ==
+                            currentValue.toLowerCase(),
+                      );
+                    } catch (_) {
+                      // If no match found, fallback to the default value from definition
+                      // This prevents "There should be exactly one item..." errors in DropdownButton
+                      return defValue.value;
+                    }
+                  },
+                );
+              } catch (_) {
+                // Should not happen due to nested try/catch but safe fallback
+                typedValue = defValue.value;
+              }
+            }
+
+            // Access displayName dynamically to avoid type errors
+            // caused by contravariance in function arguments (e.g. UserScriptInjectionTime vs dynamic)
+            final dynamic displayNameFunc = (defValue as dynamic).displayName;
+
+            // Create a new hint with the current value
+            // We use dynamic to bypass strict type checks when recreating
+            params[key] = EnumParameterValueHint<dynamic>(
+              typedValue,
+              defValue.enumValues,
+              displayName:
+                  displayNameFunc != null
+                      ? (e) => displayNameFunc(e) as String
+                      : null,
+            );
+          } else {
+            params[key] = ParameterValueHint(currentValue, defValue.type);
+          }
+        } else {
+          params[key] = currentValue;
+        }
+      } else {
+        // Use default from definition
+        params[key] = defValue;
+      }
+    });
+
+    // Add any extra parameters that might exist in _methodParameters but not in definition
+    _methodParameters.forEach((key, value) {
+      if (!params.containsKey(key)) {
+        params[key] = value;
+      }
+    });
 
     final result = await showParameterDialog(
       context: context,
@@ -814,6 +877,19 @@ class _CustomTestStepDialogState extends State<CustomTestStepDialog> {
         _methodParameters = result;
       });
     }
+  }
+
+  String _getEnumName(dynamic e) {
+    if (e == null) return '';
+    try {
+      final dynamic result = (e as dynamic).name();
+      if (result is String) return result;
+    } catch (_) {}
+    try {
+      final dynamic result = (e as dynamic).name;
+      if (result is String) return result;
+    } catch (_) {}
+    return e.toString();
   }
 
   String _getActionTypeName(CustomTestActionType type) {

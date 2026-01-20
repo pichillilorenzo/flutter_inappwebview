@@ -907,7 +907,8 @@ class SupportChecker {
           category: 'Page Info',
         ),
         ApiMethodDefinition(
-          name: PlatformInAppWebViewControllerMethod.getCopyBackForwardList.name,
+          name:
+              PlatformInAppWebViewControllerMethod.getCopyBackForwardList.name,
           signature: 'Future<WebHistory?> getCopyBackForwardList()',
           description: 'Gets a copy of the back/forward list.',
           className: className,
@@ -959,9 +960,7 @@ class SupportChecker {
           category: 'JavaScript',
         ),
         ApiMethodDefinition(
-          name: PlatformInAppWebViewControllerMethod
-              .injectCSSFileFromUrl
-              .name,
+          name: PlatformInAppWebViewControllerMethod.injectCSSFileFromUrl.name,
           signature:
               'Future<void> injectCSSFileFromUrl({required WebUri urlFile, ...})',
           description: 'Injects a CSS file from a URL.',
@@ -969,9 +968,8 @@ class SupportChecker {
           category: 'JavaScript',
         ),
         ApiMethodDefinition(
-          name: PlatformInAppWebViewControllerMethod
-              .injectCSSFileFromAsset
-              .name,
+          name:
+              PlatformInAppWebViewControllerMethod.injectCSSFileFromAsset.name,
           signature:
               'Future<void> injectCSSFileFromAsset({required String assetFilePath})',
           description: 'Injects a CSS file from assets.',
@@ -989,9 +987,8 @@ class SupportChecker {
           category: 'Handlers',
         ),
         ApiMethodDefinition(
-          name: PlatformInAppWebViewControllerMethod
-              .removeJavaScriptHandler
-              .name,
+          name:
+              PlatformInAppWebViewControllerMethod.removeJavaScriptHandler.name,
           signature:
               'JavaScriptHandlerCallback? removeJavaScriptHandler({required String handlerName})',
           description: 'Removes a JavaScript handler.',
@@ -1101,8 +1098,7 @@ class SupportChecker {
           category: 'Scrolling',
         ),
         ApiMethodDefinition(
-          name:
-              PlatformInAppWebViewControllerMethod.canScrollHorizontally.name,
+          name: PlatformInAppWebViewControllerMethod.canScrollHorizontally.name,
           signature: 'Future<bool> canScrollHorizontally()',
           description: 'Checks if the WebView can scroll horizontally.',
           className: className,
@@ -1272,9 +1268,8 @@ class SupportChecker {
 
         // Web Messaging methods
         ApiMethodDefinition(
-          name: PlatformInAppWebViewControllerMethod
-              .createWebMessageChannel
-              .name,
+          name:
+              PlatformInAppWebViewControllerMethod.createWebMessageChannel.name,
           signature: 'Future<WebMessageChannel?> createWebMessageChannel()',
           description: 'Creates a message channel for communication.',
           className: className,
@@ -1314,8 +1309,7 @@ class SupportChecker {
           category: 'Media',
         ),
         ApiMethodDefinition(
-          name:
-              PlatformInAppWebViewControllerMethod.pauseAllMediaPlayback.name,
+          name: PlatformInAppWebViewControllerMethod.pauseAllMediaPlayback.name,
           signature: 'Future<void> pauseAllMediaPlayback()',
           description: 'Pauses all media playback.',
           className: className,
@@ -1388,8 +1382,9 @@ class SupportChecker {
           category: 'Camera/Mic',
         ),
         ApiMethodDefinition(
-          name:
-              PlatformInAppWebViewControllerMethod.getMicrophoneCaptureState.name,
+          name: PlatformInAppWebViewControllerMethod
+              .getMicrophoneCaptureState
+              .name,
           signature: 'Future<MediaCaptureState?> getMicrophoneCaptureState()',
           description: 'Gets the microphone capture state.',
           className: className,
@@ -1439,8 +1434,7 @@ class SupportChecker {
           category: 'Android',
         ),
         ApiMethodDefinition(
-          name:
-              PlatformInAppWebViewControllerMethod.requestFocusNodeHref.name,
+          name: PlatformInAppWebViewControllerMethod.requestFocusNodeHref.name,
           signature:
               'Future<RequestFocusNodeHrefResult?> requestFocusNodeHref()',
           description: 'Requests the URL of the focused anchor.',
@@ -1672,9 +1666,8 @@ class SupportChecker {
           category: 'Static',
         ),
         ApiMethodDefinition(
-          name: PlatformInAppWebViewControllerMethod
-              .setJavaScriptBridgeName
-              .name,
+          name:
+              PlatformInAppWebViewControllerMethod.setJavaScriptBridgeName.name,
           signature:
               'static Future<void> setJavaScriptBridgeName(String bridgeName)',
           description: 'Sets the JavaScript bridge name.',
@@ -1683,9 +1676,8 @@ class SupportChecker {
           category: 'Static',
         ),
         ApiMethodDefinition(
-          name: PlatformInAppWebViewControllerMethod
-              .getJavaScriptBridgeName
-              .name,
+          name:
+              PlatformInAppWebViewControllerMethod.getJavaScriptBridgeName.name,
           signature: 'static Future<String> getJavaScriptBridgeName()',
           description: 'Gets the JavaScript bridge name.',
           className: className,
@@ -1752,7 +1744,8 @@ class SupportChecker {
           category: 'Core',
         ),
         ApiEventDefinition(
-          name: PlatformWebViewCreationParamsProperty.onUpdateVisitedHistory.name,
+          name:
+              PlatformWebViewCreationParamsProperty.onUpdateVisitedHistory.name,
           description: 'Called when the visited history is updated.',
           className: className,
           category: 'Core',
@@ -1760,8 +1753,9 @@ class SupportChecker {
 
         // Navigation events
         ApiEventDefinition(
-          name:
-              PlatformWebViewCreationParamsProperty.shouldOverrideUrlLoading.name,
+          name: PlatformWebViewCreationParamsProperty
+              .shouldOverrideUrlLoading
+              .name,
           description: 'Called to handle URL navigation requests.',
           className: className,
           category: 'Navigation',
@@ -1835,7 +1829,9 @@ class SupportChecker {
 
         // Authentication events
         ApiEventDefinition(
-          name: PlatformWebViewCreationParamsProperty.onReceivedHttpAuthRequest.name,
+          name: PlatformWebViewCreationParamsProperty
+              .onReceivedHttpAuthRequest
+              .name,
           description: 'Called for HTTP authentication requests.',
           className: className,
           category: 'Authentication',
@@ -1849,7 +1845,9 @@ class SupportChecker {
           category: 'Authentication',
         ),
         ApiEventDefinition(
-          name: PlatformWebViewCreationParamsProperty.onReceivedClientCertRequest.name,
+          name: PlatformWebViewCreationParamsProperty
+              .onReceivedClientCertRequest
+              .name,
           description: 'Called when a client certificate is requested.',
           className: className,
           category: 'Authentication',
@@ -1857,7 +1855,8 @@ class SupportChecker {
 
         // Network events
         ApiEventDefinition(
-          name: PlatformWebViewCreationParamsProperty.shouldInterceptRequest.name,
+          name:
+              PlatformWebViewCreationParamsProperty.shouldInterceptRequest.name,
           description: 'Called to intercept resource requests.',
           className: className,
           category: 'Network',
@@ -1891,7 +1890,8 @@ class SupportChecker {
 
         // Download events
         ApiEventDefinition(
-          name: PlatformWebViewCreationParamsProperty.onDownloadStartRequest.name,
+          name:
+              PlatformWebViewCreationParamsProperty.onDownloadStartRequest.name,
           description: 'Called when a download is requested.',
           className: className,
           category: 'Download',
@@ -1965,7 +1965,9 @@ class SupportChecker {
 
         // Touch/Gesture events
         ApiEventDefinition(
-          name: PlatformWebViewCreationParamsProperty.onLongPressHitTestResult.name,
+          name: PlatformWebViewCreationParamsProperty
+              .onLongPressHitTestResult
+              .name,
           description: 'Called on a long press.',
           className: className,
           category: 'Touch',
@@ -2035,7 +2037,8 @@ class SupportChecker {
           category: 'Icon',
         ),
         ApiEventDefinition(
-          name: PlatformWebViewCreationParamsProperty.onReceivedTouchIconUrl.name,
+          name:
+              PlatformWebViewCreationParamsProperty.onReceivedTouchIconUrl.name,
           description: 'Called when a touch icon URL is received.',
           className: className,
           category: 'Icon',
@@ -2097,7 +2100,8 @@ class SupportChecker {
           category: 'Other',
         ),
         ApiEventDefinition(
-          name: PlatformWebViewCreationParamsProperty.onAjaxReadyStateChange.name,
+          name:
+              PlatformWebViewCreationParamsProperty.onAjaxReadyStateChange.name,
           description: 'Called when an AJAX ready state changes.',
           className: className,
           category: 'Other',
@@ -2351,9 +2355,8 @@ class SupportChecker {
           isStatic: true,
         ),
         ApiMethodDefinition(
-          name: PlatformChromeSafariBrowserMethod
-              .invalidatePrewarmingToken
-              .name,
+          name:
+              PlatformChromeSafariBrowserMethod.invalidatePrewarmingToken.name,
           signature:
               'static Future<void> invalidatePrewarmingToken({required PrewarmingToken prewarmingToken})',
           description: 'Invalidates a prewarming token.',
@@ -2382,18 +2385,15 @@ class SupportChecker {
           className: className,
         ),
         ApiMethodDefinition(
-          name: PlatformChromeSafariBrowserMethod
-              .updateSecondaryToolbar
-              .name,
+          name: PlatformChromeSafariBrowserMethod.updateSecondaryToolbar.name,
           signature:
               'Future<void> updateSecondaryToolbar(ChromeSafariBrowserSecondaryToolbar secondaryToolbar)',
           description: 'Updates the secondary toolbar.',
           className: className,
         ),
         ApiMethodDefinition(
-          name: PlatformChromeSafariBrowserMethod
-              .requestPostMessageChannel
-              .name,
+          name:
+              PlatformChromeSafariBrowserMethod.requestPostMessageChannel.name,
           signature:
               'Future<bool> requestPostMessageChannel({required WebUri sourceOrigin, ...})',
           description: 'Requests a post message channel.',
@@ -2441,7 +2441,8 @@ class SupportChecker {
           className: className,
         ),
         ApiEventDefinition(
-          name: PlatformChromeSafariBrowserEventsMethod.onWillOpenInBrowser.name,
+          name:
+              PlatformChromeSafariBrowserEventsMethod.onWillOpenInBrowser.name,
           description: 'Called when opening in the browser.',
           className: className,
         ),
@@ -2475,7 +2476,9 @@ class SupportChecker {
           className: className,
         ),
         ApiEventDefinition(
-          name: PlatformChromeSafariBrowserEventsMethod.onVerticalScrollEvent.name,
+          name: PlatformChromeSafariBrowserEventsMethod
+              .onVerticalScrollEvent
+              .name,
           description: 'Called on vertical scroll events.',
           className: className,
         ),
@@ -2656,26 +2659,30 @@ class SupportChecker {
           className: className,
         ),
         ApiMethodDefinition(
-          name:
-              PlatformFindInteractionControllerMethod.isFindNavigatorVisible.name,
+          name: PlatformFindInteractionControllerMethod
+              .isFindNavigatorVisible
+              .name,
           signature: 'Future<bool?> isFindNavigatorVisible()',
           description: 'Checks if the find navigator is visible.',
           className: className,
         ),
         ApiMethodDefinition(
-          name: PlatformFindInteractionControllerMethod.presentFindNavigator.name,
+          name:
+              PlatformFindInteractionControllerMethod.presentFindNavigator.name,
           signature: 'Future<void> presentFindNavigator()',
           description: 'Presents the find navigator.',
           className: className,
         ),
         ApiMethodDefinition(
-          name: PlatformFindInteractionControllerMethod.dismissFindNavigator.name,
+          name:
+              PlatformFindInteractionControllerMethod.dismissFindNavigator.name,
           signature: 'Future<void> dismissFindNavigator()',
           description: 'Dismisses the find navigator.',
           className: className,
         ),
         ApiMethodDefinition(
-          name: PlatformFindInteractionControllerMethod.getActiveFindSession.name,
+          name:
+              PlatformFindInteractionControllerMethod.getActiveFindSession.name,
           signature: 'Future<FindSession?> getActiveFindSession()',
           description: 'Gets the active find session.',
           className: className,
@@ -2903,20 +2910,23 @@ class SupportChecker {
       isClassSupported: () => ServiceWorkerController.isClassSupported(),
       methods: [
         ApiMethodDefinition(
-          name: PlatformServiceWorkerControllerMethod.setServiceWorkerClient.name,
+          name:
+              PlatformServiceWorkerControllerMethod.setServiceWorkerClient.name,
           signature:
               'Future<void> setServiceWorkerClient(ServiceWorkerClient? value)',
           description: 'Sets the service worker client.',
           className: className,
         ),
         ApiMethodDefinition(
-          name: PlatformServiceWorkerControllerMethod.getAllowContentAccess.name,
+          name:
+              PlatformServiceWorkerControllerMethod.getAllowContentAccess.name,
           signature: 'Future<bool> getAllowContentAccess()',
           description: 'Gets allow content access setting.',
           className: className,
         ),
         ApiMethodDefinition(
-          name: PlatformServiceWorkerControllerMethod.setAllowContentAccess.name,
+          name:
+              PlatformServiceWorkerControllerMethod.setAllowContentAccess.name,
           signature: 'Future<void> setAllowContentAccess(bool allow)',
           description: 'Sets allow content access setting.',
           className: className,
@@ -3035,7 +3045,9 @@ class SupportChecker {
           className: className,
         ),
         ApiMethodDefinition(
-          name: PlatformHttpAuthCredentialDatabaseMethod.setHttpAuthCredential.name,
+          name: PlatformHttpAuthCredentialDatabaseMethod
+              .setHttpAuthCredential
+              .name,
           signature: 'Future<void> setHttpAuthCredential({...})',
           description: 'Sets a credential.',
           className: className,

@@ -6,5 +6,5 @@ export 'in_app_browser/main.dart';
 export 'in_app_webview/main.dart';
 export 'proxy_controller/proxy_controller.dart';
 export 'web_message/main.dart';
-export 'web_storage/web_storage_manager.dart';
+export 'web_storage/main.dart';
 export 'webview_environment/main.dart';

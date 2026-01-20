@@ -12,6 +12,7 @@ import 'package:flutter_inappwebview_platform_interface/flutter_inappwebview_pla
 import '../in_app_browser/in_app_browser.dart';
 import '../web_message/web_message_channel.dart';
 import '../web_message/web_message_listener.dart';
+import '../web_storage/web_storage.dart';
 import '_static_channel.dart';
 
 /// Object specifying creation parameters for creating a [LinuxInAppWebViewController].
@@ -68,6 +69,9 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController
       _inAppBrowser?.eventHandler;
 
   dynamic _controllerFromPlatform;
+
+  @override
+  late LinuxWebStorage webStorage;
 
   LinuxInAppWebViewController(
     PlatformInAppWebViewControllerCreationParams params,
@@ -145,6 +149,13 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController
   void _init(PlatformInAppWebViewControllerCreationParams params) {
     _controllerFromPlatform =
         params.webviewParams?.controllerFromPlatform?.call(this) ?? this;
+
+    webStorage = LinuxWebStorage(
+      LinuxWebStorageCreationParams(
+        localStorage: LinuxLocalStorage.defaultStorage(controller: this),
+        sessionStorage: LinuxSessionStorage.defaultStorage(controller: this),
+      ),
+    );
 
     if (params.webviewParams is PlatformInAppWebViewWidgetCreationParams) {
       final keepAlive =
@@ -2330,6 +2341,7 @@ class LinuxInAppWebViewController extends PlatformInAppWebViewController
       }
       _webMessageChannels.clear();
     }
+    webStorage.dispose();
     disposeChannel(removeMethodCallHandler: !isKeepAlive);
   }
 }

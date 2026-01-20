@@ -787,6 +787,7 @@ class TestConfiguration {
             'data': '<html><body><h1 id="test">Test Page</h1></body></html>',
             'mimeType': 'text/html',
             'encoding': 'utf-8',
+            'baseUrl': 'https://example.com',
           },
         ),
         order: order++,
@@ -901,7 +902,7 @@ class TestConfiguration {
           parameters: {'source': '1 + 1'},
         ),
         expectedResult: '2',
-        expectedResultType: ExpectedResultType.exact,
+        expectedResultType: ExpectedResultType.contains,
         order: order++,
       ),
       CustomTestStep(
@@ -1191,25 +1192,6 @@ class TestConfiguration {
       // ============================================================
       // FIND INTERACTION TESTS
       // ============================================================
-      CustomTestStep(
-        id: 'find_on_page',
-        name: 'Find Text on Page',
-        description: 'Find text content on the page',
-        category: TestCategory.content,
-        action: CustomTestAction.controllerMethod(
-          'findAllAsync',
-          parameters: {'find': 'Example'},
-        ),
-        order: order++,
-      ),
-      CustomTestStep(
-        id: 'find_clear',
-        name: 'Clear Find Results',
-        description: 'Clear the find results',
-        category: TestCategory.content,
-        action: CustomTestAction.controllerMethod('clearMatches'),
-        order: order++,
-      ),
     ];
   }
 

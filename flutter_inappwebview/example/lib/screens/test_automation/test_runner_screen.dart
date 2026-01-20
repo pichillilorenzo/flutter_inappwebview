@@ -25,6 +25,7 @@ class _TestRunnerScreenState extends State<TestRunnerScreen> {
 
   // Custom configuration support
   TestConfiguration? _currentConfiguration;
+  bool _configManagerInitialized = false;
 
   // Flag to prevent loading config multiple times
   bool _configLoaded = false;
@@ -43,6 +44,11 @@ class _TestRunnerScreenState extends State<TestRunnerScreen> {
     _configLoaded = true;
 
     final prefs = await SharedPreferences.getInstance();
+    final configManager = context.read<TestConfigurationManager>();
+    if (!_configManagerInitialized) {
+      await configManager.init();
+      _configManagerInitialized = true;
+    }
     final lastConfigJson = prefs.getString(_lastConfigKey);
     final lastWebViewType = prefs.getString(_lastWebViewTypeKey);
 
@@ -56,64 +62,53 @@ class _TestRunnerScreenState extends State<TestRunnerScreen> {
       runner.setWebViewType(webViewType);
     }
 
+    TestConfiguration? configToLoad;
+
+    // First choice: the last used configuration snapshot (represents what the user ran last)
     if (lastConfigJson != null && lastConfigJson.isNotEmpty) {
       try {
-        var config = TestConfiguration.fromJsonString(lastConfigJson);
+        final parsedConfig = TestConfiguration.fromJsonString(lastConfigJson);
+        if (parsedConfig.id == 'default_config') {
+          // Always rebuild the pre-built configuration from code
+          configToLoad = TestConfiguration.defaultConfig();
+        } else {
+          configToLoad = parsedConfig;
 
-        // Check if we have a fresher version in the manager
-        if (mounted) {
-          final configManager = context.read<TestConfigurationManager>();
-          // Find config by ID in saved configs
+          // Use a fresher saved version if it exists
           try {
             final freshConfig = configManager.savedConfigs.firstWhere(
-              (c) => c.id == config.id,
+              (c) => c.id == configToLoad!.id,
             );
-            // Use the fresh configuration from the manager
-            config = freshConfig;
+            configToLoad = freshConfig;
           } catch (_) {
-            // Not found in saved configs, likely a temporary config or deleted
+            // Not found in saved configs
           }
         }
-
-        if (mounted) {
-          setState(() {
-            _currentConfiguration = config;
-          });
-          runner.setConfiguration(config);
-        }
       } catch (e) {
-        debugPrint('Failed to load last configuration: $e');
-        // Load default configuration on error
-        if (mounted) {
-          final defaultConfig = TestConfiguration.defaultConfig();
-          setState(() {
-            _currentConfiguration = defaultConfig;
-          });
-          runner.setConfiguration(defaultConfig);
-        }
+        debugPrint('Failed to parse last configuration: $e');
       }
-    } else {
-      // No last configuration found, load default
-      if (mounted) {
-        final defaultConfig = TestConfiguration.defaultConfig();
-        setState(() {
-          _currentConfiguration = defaultConfig;
-        });
-        runner.setConfiguration(defaultConfig);
-      }
+    }
+
+    // Always fall back to the pre-built default when no last snapshot is available
+    configToLoad ??= TestConfiguration.defaultConfig();
+
+    if (mounted) {
+      setState(() {
+        _currentConfiguration = configToLoad;
+      });
+      runner.setConfiguration(configToLoad);
+      await _saveLastConfiguration();
     }
   }
 
   Future<void> _saveLastConfiguration() async {
     final prefs = await SharedPreferences.getInstance();
     final runner = context.read<TestRunner>();
-    if (_currentConfiguration != null) {
-      await prefs.setString(
-        _lastConfigKey,
-        _currentConfiguration!.toJsonString(),
-      );
-    } else {
+    final config = _currentConfiguration;
+    if (config == null || config.id == 'default_config') {
       await prefs.remove(_lastConfigKey);
+    } else {
+      await prefs.setString(_lastConfigKey, config.toJsonString());
     }
     await prefs.setString(_lastWebViewTypeKey, runner.webViewType.name);
   }
@@ -457,16 +452,19 @@ class _TestRunnerScreenState extends State<TestRunnerScreen> {
 
   void _loadConfiguration(TestConfiguration config) {
     final runner = context.read<TestRunner>();
+    final effectiveConfig = config.id == 'default_config'
+        ? TestConfiguration.defaultConfig()
+        : config;
     setState(() {
-      _currentConfiguration = config;
+      _currentConfiguration = effectiveConfig;
     });
-    runner.setConfiguration(config);
+    runner.setConfiguration(effectiveConfig);
     // Save as last configuration
     _saveLastConfiguration();
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
-          'Configuration loaded: ${config.name} (${config.customSteps.length} test steps)',
+          'Configuration loaded: ${effectiveConfig.name} (${effectiveConfig.customSteps.length} test steps)',
         ),
       ),
     );

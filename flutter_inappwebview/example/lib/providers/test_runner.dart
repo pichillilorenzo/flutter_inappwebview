@@ -316,6 +316,9 @@ class TestRunner extends ChangeNotifier {
       notifyListeners();
 
       final result = await _executeCustomStep(step, controller);
+      if (!result.success) {
+        debugPrint('Test "${result.testId}" failed: ${result.message}');
+      }
       _results = [..._results, result];
       notifyListeners();
 

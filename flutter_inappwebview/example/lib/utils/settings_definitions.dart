@@ -1,6 +1,14 @@
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_inappwebview_example/models/setting_definition.dart';
 
+List<T> _safeEnumValues<T>(Iterable<T> Function() getter) {
+  try {
+    return getter().toList();
+  } catch (_) {
+    return <T>[];
+  }
+}
+
 /// Get all setting definitions organized by category.
 Map<String, List<SettingDefinition>> getSettingDefinitions() {
   return {
@@ -198,7 +206,7 @@ Map<String, List<SettingDefinition>> getSettingDefinitions() {
         description: 'How to handle mixed HTTP/HTTPS content',
         type: SettingType.enumeration,
         defaultValue: null,
-        enumValues: MixedContentMode.values.toList(),
+        enumValues: _safeEnumValues(() => MixedContentMode.values),
         property: InAppWebViewSettingsProperty.mixedContentMode,
       ),
       SettingDefinition(
@@ -244,7 +252,7 @@ Map<String, List<SettingDefinition>> getSettingDefinitions() {
         description: 'Override the way the cache is used',
         type: SettingType.enumeration,
         defaultValue: CacheMode.LOAD_DEFAULT.toNativeValue(),
-        enumValues: CacheMode.values.toList(),
+        enumValues: _safeEnumValues(() => CacheMode.values),
         property: InAppWebViewSettingsProperty.cacheMode,
       ),
     ],

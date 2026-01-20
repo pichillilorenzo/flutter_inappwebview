@@ -4,6 +4,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_inappwebview_example/widgets/common/parameter_dialog.dart';
 
+List<T> _safeEnumValues<T>(Iterable<T> Function() getter) {
+  try {
+    return getter().toList();
+  } catch (_) {
+    return <T>[];
+  }
+}
+
 /// Extracts the raw value from a parameter, unwrapping ParameterValueHint if necessary
 T? extractParam<T>(dynamic value) {
   if (value == null) return null;
@@ -685,7 +693,7 @@ class ControllerMethodsRegistry {
             'injectionTime':
                 EnumParameterValueHint<UserScriptInjectionTime>.fromIterable(
                   UserScriptInjectionTime.AT_DOCUMENT_END,
-                  UserScriptInjectionTime.values,
+                  _safeEnumValues(() => UserScriptInjectionTime.values),
                 ),
             'groupName': 'testGroup',
           },
@@ -873,7 +881,7 @@ class ControllerMethodsRegistry {
             'compressFormat':
                 EnumParameterValueHint<CompressFormat>.fromIterable(
                   CompressFormat.PNG,
-                  CompressFormat.values,
+                  _safeEnumValues(() => CompressFormat.values),
                 ),
             'quality': 100,
             'snapshotWidth': const ParameterValueHint<double?>(

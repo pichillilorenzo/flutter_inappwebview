@@ -1,6 +1,14 @@
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_inappwebview_example/models/environment_setting_definition.dart';
 
+List<T> _safeEnumValues<T>(Iterable<T> Function() getter) {
+  try {
+    return getter().toList();
+  } catch (_) {
+    return <T>[];
+  }
+}
+
 /// Get all environment setting definitions organized by category.
 Map<String, List<EnvironmentSettingDefinition>>
 getEnvironmentSettingDefinitions() {
@@ -42,14 +50,14 @@ getEnvironmentSettingDefinitions() {
         name: 'Channel Search Kind',
         description: 'How to search for WebView2 runtime',
         type: EnvironmentSettingType.enumeration,
-        enumValues: EnvironmentChannelSearchKind.values.toList(),
+        enumValues: _safeEnumValues(() => EnvironmentChannelSearchKind.values),
         property: WebViewEnvironmentSettingsProperty.channelSearchKind,
       ),
       EnvironmentSettingDefinition(
         name: 'Release Channels',
         description: 'Which release channels to consider',
         type: EnvironmentSettingType.enumeration,
-        enumValues: EnvironmentReleaseChannels.values.toList(),
+        enumValues: _safeEnumValues(() => EnvironmentReleaseChannels.values),
         property: WebViewEnvironmentSettingsProperty.releaseChannels,
       ),
     ],
@@ -164,7 +172,7 @@ getEnvironmentSettingDefinitions() {
         name: 'Scrollbar Style',
         description: 'Style of scrollbars in the WebView',
         type: EnvironmentSettingType.enumeration,
-        enumValues: EnvironmentScrollbarStyle.values.toList(),
+        enumValues: _safeEnumValues(() => EnvironmentScrollbarStyle.values),
         property: WebViewEnvironmentSettingsProperty.scrollbarStyle,
       ),
     ],
@@ -173,7 +181,7 @@ getEnvironmentSettingDefinitions() {
         name: 'Cache Model',
         description: 'Caching strategy for the WebView',
         type: EnvironmentSettingType.enumeration,
-        enumValues: CacheModel.values.toList(),
+        enumValues: _safeEnumValues(() => CacheModel.values),
         property: WebViewEnvironmentSettingsProperty.cacheModel,
       ),
     ],

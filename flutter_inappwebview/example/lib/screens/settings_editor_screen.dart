@@ -299,10 +299,6 @@ class _SettingsEditorScreenState extends State<SettingsEditorScreen> {
     final isModified = settingsManager.isSettingModified(setting.key);
     final currentValue = settingsManager.getSetting(setting.key);
     final hasPlatformLimitations = setting.hasPlatformLimitations;
-    final isCurrentPlatformSupported =
-        !hasPlatformLimitations ||
-        (_currentPlatform != null &&
-            setting.isSupportedOnPlatform(_currentPlatform!));
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -326,11 +322,9 @@ class _SettingsEditorScreenState extends State<SettingsEditorScreen> {
                         Flexible(
                           child: Text(
                             setting.name,
-                            style: TextStyle(
+                            style: const TextStyle(
                               fontWeight: FontWeight.w600,
-                              color: isCurrentPlatformSupported
-                                  ? Colors.black87
-                                  : Colors.grey.shade500,
+                              color: Colors.black87,
                             ),
                           ),
                         ),
@@ -361,9 +355,7 @@ class _SettingsEditorScreenState extends State<SettingsEditorScreen> {
                       setting.description,
                       style: TextStyle(
                         fontSize: 12,
-                        color: isCurrentPlatformSupported
-                            ? Colors.grey.shade600
-                            : Colors.grey.shade400,
+                        color: Colors.grey.shade600,
                       ),
                     ),
                     if (hasPlatformLimitations) ...[
@@ -385,17 +377,7 @@ class _SettingsEditorScreenState extends State<SettingsEditorScreen> {
             ],
           ),
           const SizedBox(height: 8),
-          Opacity(
-            opacity: isCurrentPlatformSupported ? 1.0 : 0.5,
-            child: IgnorePointer(
-              ignoring: !isCurrentPlatformSupported,
-              child: _buildSettingControl(
-                setting,
-                currentValue,
-                settingsManager,
-              ),
-            ),
-          ),
+          _buildSettingControl(setting, currentValue, settingsManager),
         ],
       ),
     );

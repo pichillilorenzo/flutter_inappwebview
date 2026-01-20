@@ -28,10 +28,7 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: ParameterDialog(
-              title: 'Parameters',
-              parameters: parameters,
-            ),
+            body: ParameterDialog(title: 'Parameters', parameters: parameters),
           ),
         ),
       );
@@ -55,10 +52,7 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: ParameterDialog(
-              title: 'Parameters',
-              parameters: parameters,
-            ),
+            body: ParameterDialog(title: 'Parameters', parameters: parameters),
           ),
         ),
       );

@@ -623,13 +623,16 @@ class _WebViewEnvironmentSettingsEditorScreenState
         OutlinedButton.icon(
           icon: const Icon(Icons.add, size: 16),
           label: const Text('Add Custom Scheme'),
-          onPressed: () => _showAddCustomSchemeDialog(items),
+          onPressed: () => _showAddCustomSchemeDialog(setting.key, items),
         ),
       ],
     );
   }
 
-  void _showAddCustomSchemeDialog(List<Map<String, dynamic>> currentItems) {
+  void _showAddCustomSchemeDialog(
+    String settingKey,
+    List<Map<String, dynamic>> currentItems,
+  ) {
     final schemeController = TextEditingController();
     bool treatAsSecure = false;
     bool hasAccess = true;
@@ -682,7 +685,7 @@ class _WebViewEnvironmentSettingsEditorScreenState
                       'treatAsSecure': treatAsSecure,
                       'hasAccess': hasAccess,
                     });
-                  _updateSetting('customSchemeRegistrations', newItems);
+                  _updateSetting(settingKey, newItems);
                   Navigator.pop(context);
                 }
               },

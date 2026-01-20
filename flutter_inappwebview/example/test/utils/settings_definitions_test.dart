@@ -41,6 +41,23 @@ void main() {
     expect(cacheMode.enumValues, unorderedEquals(CacheMode.values));
   });
 
+  test('enumValues fields are lists when provided', () {
+    final definitions = getSettingDefinitions();
+
+    for (final category in definitions.values) {
+      for (final definition in category) {
+        expect(definition.enumValues, anyOf(isNull, isA<List>()));
+      }
+    }
+
+    final environmentDefinitions = getEnvironmentSettingDefinitions();
+    for (final category in environmentDefinitions.values) {
+      for (final definition in category) {
+        expect(definition.enumValues, anyOf(isNull, isA<List>()));
+      }
+    }
+  });
+
   test('enum-like environment setting definitions use enum values lists', () {
     final definitions = getEnvironmentSettingDefinitions();
     final releaseChannel = definitions['Release Channel'];

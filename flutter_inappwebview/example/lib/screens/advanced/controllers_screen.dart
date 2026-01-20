@@ -4,6 +4,9 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_inappwebview_example/widgets/common/app_drawer.dart';
+import 'package:flutter_inappwebview_example/widgets/common/appbar_loading_indicator.dart';
+import 'package:flutter_inappwebview_example/widgets/common/event_log_card.dart';
+import 'package:flutter_inappwebview_example/widgets/common/resize_handle.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_inappwebview_example/providers/event_log_provider.dart';
 import 'package:flutter_inappwebview_example/models/event_log_entry.dart';
@@ -562,18 +565,7 @@ class _ControllersScreenState extends State<ControllersScreen> {
       appBar: AppBar(
         title: const Text('Controllers'),
         actions: [
-          if (_isLoading)
-            const Padding(
-              padding: EdgeInsets.all(16),
-              child: SizedBox(
-                width: 20,
-                height: 20,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2,
-                  color: Colors.white,
-                ),
-              ),
-            ),
+          AppBarLoadingIndicator(isLoading: _isLoading),
           IconButton(
             icon: const Icon(Icons.clear_all),
             tooltip: 'Clear Events',
@@ -616,7 +608,8 @@ class _ControllersScreenState extends State<ControllersScreen> {
     return Column(
       children: [
         SizedBox(height: webViewHeight, child: _buildWebViewSection()),
-        _buildResizeHandle(
+        ResizeHandle(
+          height: _dividerHeight,
           onDrag: (delta) {
             setState(() {
               _webViewHeight = (_webViewHeight + delta)
@@ -638,7 +631,7 @@ class _ControllersScreenState extends State<ControllersScreen> {
               const SizedBox(height: 16),
               _buildPrintJobSection(),
               const SizedBox(height: 16),
-              _buildEventLog(),
+              const EventLogCard(),
             ],
           ),
         ),
@@ -665,35 +658,11 @@ class _ControllersScreenState extends State<ControllersScreen> {
                 const SizedBox(height: 16),
                 _buildPrintJobSection(),
                 const SizedBox(height: 16),
-                _buildEventLog(),
+                const EventLogCard(),
               ],
             ),
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _buildResizeHandle({required ValueChanged<double> onDrag}) {
-    return MouseRegion(
-      cursor: SystemMouseCursors.resizeRow,
-      child: GestureDetector(
-        behavior: HitTestBehavior.translucent,
-        onVerticalDragUpdate: (details) => onDrag(details.delta.dy),
-        child: Container(
-          height: _dividerHeight,
-          color: Colors.grey.shade300,
-          child: Center(
-            child: Container(
-              width: 40,
-              height: 2,
-              decoration: BoxDecoration(
-                color: Colors.grey.shade600,
-                borderRadius: BorderRadius.circular(2),
-              ),
-            ),
-          ),
-        ),
       ),
     );
   }
@@ -1358,85 +1327,6 @@ class _ControllersScreenState extends State<ControllersScreen> {
           const SizedBox(height: 6),
           _buildMethodHistory(label),
         ],
-      ),
-    );
-  }
-
-  Widget _buildEventLog() {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text(
-                  'Event Log',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                ),
-                TextButton(
-                  onPressed: () => context.read<EventLogProvider>().clear(),
-                  child: const Text('Clear'),
-                ),
-              ],
-            ),
-            const SizedBox(height: 8),
-            Consumer<EventLogProvider>(
-              builder: (context, provider, _) {
-                final events = provider.events.reversed.take(15).toList();
-                if (events.isEmpty) {
-                  return Container(
-                    padding: const EdgeInsets.all(16),
-                    child: const Center(
-                      child: Text(
-                        'No events yet',
-                        style: TextStyle(color: Colors.grey),
-                      ),
-                    ),
-                  );
-                }
-                return Container(
-                  height: 150,
-                  decoration: BoxDecoration(
-                    color: Colors.grey.shade100,
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: ListView.builder(
-                    itemCount: events.length,
-                    itemBuilder: (context, index) {
-                      final event = events[index];
-                      return ListTile(
-                        dense: true,
-                        title: Text(
-                          event.message,
-                          style: const TextStyle(fontSize: 12),
-                        ),
-                        subtitle: Text(
-                          event.data?.toString() ?? '',
-                          style: TextStyle(
-                            fontSize: 10,
-                            color: Colors.grey.shade600,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        leading: Text(
-                          '${event.timestamp.hour}:${event.timestamp.minute.toString().padLeft(2, '0')}:${event.timestamp.second.toString().padLeft(2, '0')}',
-                          style: TextStyle(
-                            fontSize: 10,
-                            color: Colors.grey.shade500,
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-                );
-              },
-            ),
-          ],
-        ),
       ),
     );
   }

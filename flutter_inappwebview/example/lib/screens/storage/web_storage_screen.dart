@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_inappwebview_example/widgets/common/app_drawer.dart';
+import 'package:flutter_inappwebview_example/widgets/common/appbar_loading_indicator.dart';
+import 'package:flutter_inappwebview_example/widgets/common/empty_state.dart';
+import 'package:flutter_inappwebview_example/widgets/common/method_card.dart';
+import 'package:flutter_inappwebview_example/widgets/common/resize_handle.dart';
 import 'package:flutter_inappwebview_example/utils/support_checker.dart';
-import 'package:flutter_inappwebview_example/widgets/common/support_badge.dart';
 import 'package:flutter_inappwebview_example/widgets/common/parameter_dialog.dart';
 import 'package:flutter_inappwebview_example/widgets/common/method_result_history.dart';
 
@@ -528,20 +531,7 @@ class _WebStorageScreenState extends State<WebStorageScreen>
     return Scaffold(
       appBar: AppBar(
         title: const Text('Web Storage'),
-        actions: [
-          if (_isLoading)
-            const Padding(
-              padding: EdgeInsets.all(16),
-              child: SizedBox(
-                width: 20,
-                height: 20,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2,
-                  color: Colors.white,
-                ),
-              ),
-            ),
-        ],
+        actions: [AppBarLoadingIndicator(isLoading: _isLoading)],
         bottom: TabBar(
           controller: _tabController,
           tabs: [
@@ -567,7 +557,8 @@ class _WebStorageScreenState extends State<WebStorageScreen>
           return Column(
             children: [
               SizedBox(height: webViewHeight, child: _buildWebViewSection()),
-              _buildResizeHandle(
+              ResizeHandle(
+                height: _dividerHeight,
                 onDrag: (delta) {
                   setState(() {
                     _webViewHeight = (_webViewHeight + delta)
@@ -597,30 +588,6 @@ class _WebStorageScreenState extends State<WebStorageScreen>
             ],
           );
         },
-      ),
-    );
-  }
-
-  Widget _buildResizeHandle({required ValueChanged<double> onDrag}) {
-    return MouseRegion(
-      cursor: SystemMouseCursors.resizeRow,
-      child: GestureDetector(
-        behavior: HitTestBehavior.translucent,
-        onVerticalDragUpdate: (details) => onDrag(details.delta.dy),
-        child: Container(
-          height: _dividerHeight,
-          color: Colors.grey.shade300,
-          child: Center(
-            child: Container(
-              width: 40,
-              height: 2,
-              decoration: BoxDecoration(
-                color: Colors.grey.shade600,
-                borderRadius: BorderRadius.circular(2),
-              ),
-            ),
-          ),
-        ),
       ),
     );
   }
@@ -816,36 +783,16 @@ class _WebStorageScreenState extends State<WebStorageScreen>
     VoidCallback? onPressed,
   ) {
     final historyKey = _storageMethodKey(methodName);
-    return Card(
-      margin: const EdgeInsets.only(bottom: 8),
-      child: ListTile(
-        title: Text(
-          methodName,
-          style: const TextStyle(fontWeight: FontWeight.bold),
-        ),
-        subtitle: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              description,
-              style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
-            ),
-            const SizedBox(height: 6),
-            SupportBadgesRow(
-              supportedPlatforms: supportedPlatforms,
-              compact: true,
-            ),
-            const SizedBox(height: 6),
-            _buildMethodHistory(historyKey, title: methodName),
-          ],
-        ),
-        trailing: onPressed != null
-            ? ElevatedButton(
-                onPressed: !_isLoading && _webViewReady ? onPressed : null,
-                child: const Text('Run'),
-              )
-            : null,
-      ),
+    return MethodTile(
+      methodName: methodName,
+      description: description,
+      supportedPlatforms: supportedPlatforms,
+      onRun: !_isLoading && _webViewReady ? onPressed : null,
+      historyEntries: _methodHistory[historyKey],
+      selectedHistoryIndex: _selectedHistoryIndex[historyKey],
+      onHistorySelected: (index) {
+        setState(() => _selectedHistoryIndex[historyKey] = index);
+      },
     );
   }
 
@@ -853,33 +800,12 @@ class _WebStorageScreenState extends State<WebStorageScreen>
     final storageName = _activeStorageTypeName;
 
     if (items.isEmpty) {
-      return Card(
-        child: Padding(
-          padding: const EdgeInsets.all(32),
-          child: Center(
-            child: Column(
-              children: [
-                Icon(
-                  Icons.storage_outlined,
-                  size: 64,
-                  color: Colors.grey.shade400,
-                ),
-                const SizedBox(height: 16),
-                Text(
-                  'No $storageName items found',
-                  style: TextStyle(fontSize: 16, color: Colors.grey.shade600),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  _webViewReady
-                      ? 'Click "${_isLocalStorageTab ? PlatformLocalStorageMethod.getItems.name : PlatformSessionStorageMethod.getItems.name}" to fetch storage contents'
-                      : 'Load a page first, then fetch items',
-                  style: TextStyle(fontSize: 12, color: Colors.grey.shade500),
-                ),
-              ],
-            ),
-          ),
-        ),
+      return EmptyStateCard(
+        icon: Icons.storage_outlined,
+        title: 'No $storageName items found',
+        description: _webViewReady
+            ? 'Click "${_isLocalStorageTab ? PlatformLocalStorageMethod.getItems.name : PlatformSessionStorageMethod.getItems.name}" to fetch storage contents'
+            : 'Load a page first, then fetch items',
       );
     }
 
@@ -1324,66 +1250,27 @@ class _WebStorageScreenState extends State<WebStorageScreen>
     VoidCallback? onPressed,
   ) {
     final historyKey = '$WebStorageManager.$methodName';
-    return Card(
-      margin: const EdgeInsets.only(bottom: 8),
-      child: ListTile(
-        title: Text(
-          methodName,
-          style: const TextStyle(fontWeight: FontWeight.bold),
-        ),
-        subtitle: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              description,
-              style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
-            ),
-            const SizedBox(height: 6),
-            SupportBadgesRow(
-              supportedPlatforms: supportedPlatforms,
-              compact: true,
-            ),
-            const SizedBox(height: 6),
-            _buildMethodHistory(historyKey, title: methodName),
-          ],
-        ),
-        trailing: onPressed != null
-            ? ElevatedButton(
-                onPressed: !_isLoading ? onPressed : null,
-                child: const Text('Run'),
-              )
-            : null,
-      ),
+    return MethodTile(
+      methodName: methodName,
+      description: description,
+      supportedPlatforms: supportedPlatforms,
+      onRun: !_isLoading ? onPressed : null,
+      historyEntries: _methodHistory[historyKey],
+      selectedHistoryIndex: _selectedHistoryIndex[historyKey],
+      onHistorySelected: (index) {
+        setState(() => _selectedHistoryIndex[historyKey] = index);
+      },
     );
   }
 
   Widget _buildOriginsList() {
     if (_webStorageOrigins.isEmpty) {
-      return Card(
-        child: Padding(
-          padding: const EdgeInsets.all(32),
-          child: Center(
-            child: Column(
-              children: [
-                Icon(
-                  Icons.public_outlined,
-                  size: 48,
-                  color: Colors.grey.shade400,
-                ),
-                const SizedBox(height: 12),
-                Text(
-                  'No origins fetched',
-                  style: TextStyle(fontSize: 14, color: Colors.grey.shade600),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  'Click "${PlatformWebStorageManagerMethod.getOrigins.name}" to fetch storage origins',
-                  style: TextStyle(fontSize: 12, color: Colors.grey.shade500),
-                ),
-              ],
-            ),
-          ),
-        ),
+      return EmptyStateCard(
+        icon: Icons.public_outlined,
+        title: 'No origins fetched',
+        description:
+            'Click "${PlatformWebStorageManagerMethod.getOrigins.name}" to fetch storage origins',
+        iconSize: 48,
       );
     }
 
@@ -1444,31 +1331,12 @@ class _WebStorageScreenState extends State<WebStorageScreen>
 
   Widget _buildDataRecordsList() {
     if (_dataRecords.isEmpty) {
-      return Card(
-        child: Padding(
-          padding: const EdgeInsets.all(32),
-          child: Center(
-            child: Column(
-              children: [
-                Icon(
-                  Icons.folder_outlined,
-                  size: 48,
-                  color: Colors.grey.shade400,
-                ),
-                const SizedBox(height: 12),
-                Text(
-                  'No data records fetched',
-                  style: TextStyle(fontSize: 14, color: Colors.grey.shade600),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  'Click "${PlatformWebStorageManagerMethod.fetchDataRecords.name}" to fetch website data records',
-                  style: TextStyle(fontSize: 12, color: Colors.grey.shade500),
-                ),
-              ],
-            ),
-          ),
-        ),
+      return EmptyStateCard(
+        icon: Icons.folder_outlined,
+        title: 'No data records fetched',
+        description:
+            'Click "${PlatformWebStorageManagerMethod.fetchDataRecords.name}" to fetch website data records',
+        iconSize: 48,
       );
     }
 

@@ -5,6 +5,7 @@ import '../models/test_case.dart';
 import '../utils/test_registry.dart';
 import '../widgets/common/test_card.dart';
 import '../widgets/common/platform_filter.dart';
+import '../widgets/common/empty_state.dart';
 
 /// Screen displaying all tests for a specific category.
 class CategoryScreen extends StatefulWidget {
@@ -147,27 +148,12 @@ class _CategoryScreenState extends State<CategoryScreen> {
   }
 
   Widget _buildEmptyState() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(Icons.search_off, size: 64, color: Colors.grey[400]),
-          const SizedBox(height: 16),
-          Text(
-            'No tests available',
-            style: Theme.of(
-              context,
-            ).textTheme.titleLarge?.copyWith(color: Colors.grey[600]),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            _selectedPlatforms.isNotEmpty
-                ? 'No tests match the selected platforms'
-                : 'No tests registered for this category',
-            style: TextStyle(color: Colors.grey[500]),
-          ),
-        ],
-      ),
+    return EmptyState(
+      icon: Icons.search_off,
+      title: 'No tests available',
+      description: _selectedPlatforms.isNotEmpty
+          ? 'No tests match the selected platforms'
+          : 'No tests registered for this category',
     );
   }
 

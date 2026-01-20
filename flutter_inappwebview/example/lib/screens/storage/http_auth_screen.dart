@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_inappwebview_example/widgets/common/app_drawer.dart';
+import 'package:flutter_inappwebview_example/widgets/common/appbar_loading_indicator.dart';
+import 'package:flutter_inappwebview_example/widgets/common/empty_state.dart';
+import 'package:flutter_inappwebview_example/widgets/common/method_card.dart';
 import 'package:flutter_inappwebview_example/utils/support_checker.dart';
-import 'package:flutter_inappwebview_example/widgets/common/support_badge.dart';
 import 'package:flutter_inappwebview_example/widgets/common/parameter_dialog.dart';
 import 'package:flutter_inappwebview_example/widgets/common/method_result_history.dart';
 
@@ -371,21 +373,6 @@ class _HttpAuthScreenState extends State<HttpAuthScreen> {
     }
   }
 
-  Widget _buildMethodHistory(String methodName, {String? title}) {
-    final entries = _methodHistory[methodName] ?? const [];
-    if (entries.isEmpty) {
-      return const SizedBox.shrink();
-    }
-    return MethodResultHistory(
-      entries: entries,
-      selectedIndex: _selectedHistoryIndex[methodName],
-      title: title ?? methodName,
-      onSelected: (index) {
-        setState(() => _selectedHistoryIndex[methodName] = index);
-      },
-    );
-  }
-
   Future<bool> _showConfirmDialog(String title, String content) async {
     return await showDialog<bool>(
           context: context,
@@ -460,20 +447,7 @@ class _HttpAuthScreenState extends State<HttpAuthScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('HTTP Auth Credentials'),
-        actions: [
-          if (_isLoading)
-            const Padding(
-              padding: EdgeInsets.all(16),
-              child: SizedBox(
-                width: 20,
-                height: 20,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2,
-                  color: Colors.white,
-                ),
-              ),
-            ),
-        ],
+        actions: [AppBarLoadingIndicator(isLoading: _isLoading)],
       ),
       drawer: AppDrawer(),
       body: ListView(
@@ -527,62 +501,26 @@ class _HttpAuthScreenState extends State<HttpAuthScreen> {
       checker: HttpAuthCredentialDatabase.isMethodSupported,
     );
 
-    return Card(
-      margin: const EdgeInsets.only(bottom: 8),
-      child: ListTile(
-        title: Text(
-          methodName,
-          style: const TextStyle(fontWeight: FontWeight.bold),
-        ),
-        subtitle: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              description,
-              style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
-            ),
-            const SizedBox(height: 6),
-            SupportBadgesRow(
-              supportedPlatforms: supportedPlatforms,
-              compact: true,
-            ),
-            const SizedBox(height: 6),
-            _buildMethodHistory(methodName),
-          ],
-        ),
-        trailing: onPressed != null
-            ? ElevatedButton(
-                onPressed: !_isLoading ? onPressed : null,
-                child: const Text('Run'),
-              )
-            : null,
-      ),
+    return MethodTile(
+      methodName: methodName,
+      description: description,
+      supportedPlatforms: supportedPlatforms,
+      onRun: !_isLoading ? onPressed : null,
+      historyEntries: _methodHistory[methodName],
+      selectedHistoryIndex: _selectedHistoryIndex[methodName],
+      onHistorySelected: (index) {
+        setState(() => _selectedHistoryIndex[methodName] = index);
+      },
     );
   }
 
   Widget _buildCredentialsList() {
     if (_allCredentials.isEmpty) {
-      return Card(
-        child: Padding(
-          padding: const EdgeInsets.all(32),
-          child: Center(
-            child: Column(
-              children: [
-                Icon(Icons.lock_outline, size: 64, color: Colors.grey.shade400),
-                const SizedBox(height: 16),
-                Text(
-                  'No credentials found',
-                  style: TextStyle(fontSize: 16, color: Colors.grey.shade600),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  'Click "${PlatformHttpAuthCredentialDatabaseMethod.setHttpAuthCredential.name}" to add HTTP auth credentials',
-                  style: TextStyle(fontSize: 12, color: Colors.grey.shade500),
-                ),
-              ],
-            ),
-          ),
-        ),
+      return EmptyStateCard(
+        icon: Icons.lock_outline,
+        title: 'No credentials found',
+        description:
+            'Click "${PlatformHttpAuthCredentialDatabaseMethod.setHttpAuthCredential.name}" to add HTTP auth credentials',
       );
     }
 

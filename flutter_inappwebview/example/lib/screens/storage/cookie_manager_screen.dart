@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_inappwebview_example/widgets/common/app_drawer.dart';
+import 'package:flutter_inappwebview_example/widgets/common/appbar_loading_indicator.dart';
+import 'package:flutter_inappwebview_example/widgets/common/empty_state.dart';
+import 'package:flutter_inappwebview_example/widgets/common/method_card.dart';
 import 'package:flutter_inappwebview_example/utils/support_checker.dart';
-import 'package:flutter_inappwebview_example/widgets/common/support_badge.dart';
 import 'package:flutter_inappwebview_example/widgets/common/parameter_dialog.dart';
 import 'package:flutter_inappwebview_example/widgets/common/method_result_history.dart';
 
@@ -620,21 +622,6 @@ class _CookieManagerScreenState extends State<CookieManagerScreen> {
     );
   }
 
-  Widget _buildMethodHistory(String methodName, {String? title}) {
-    final entries = _methodHistory[methodName] ?? const [];
-    if (entries.isEmpty) {
-      return const SizedBox.shrink();
-    }
-    return MethodResultHistory(
-      entries: entries,
-      selectedIndex: _selectedHistoryIndex[methodName],
-      title: title ?? methodName,
-      onSelected: (index) {
-        setState(() => _selectedHistoryIndex[methodName] = index);
-      },
-    );
-  }
-
   Widget _buildDetailRow(String label, String value) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
@@ -659,20 +646,7 @@ class _CookieManagerScreenState extends State<CookieManagerScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Cookie Manager'),
-        actions: [
-          if (_isLoading)
-            const Padding(
-              padding: EdgeInsets.all(16),
-              child: SizedBox(
-                width: 20,
-                height: 20,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2,
-                  color: Colors.white,
-                ),
-              ),
-            ),
-        ],
+        actions: [AppBarLoadingIndicator(isLoading: _isLoading)],
       ),
       drawer: AppDrawer(),
       body: Column(
@@ -778,66 +752,26 @@ class _CookieManagerScreenState extends State<CookieManagerScreen> {
       checker: CookieManager.isMethodSupported,
     );
 
-    return Card(
-      margin: const EdgeInsets.only(bottom: 8),
-      child: ListTile(
-        title: Text(
-          methodName,
-          style: const TextStyle(fontWeight: FontWeight.bold),
-        ),
-        subtitle: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              description,
-              style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
-            ),
-            const SizedBox(height: 6),
-            SupportBadgesRow(
-              supportedPlatforms: supportedPlatforms,
-              compact: true,
-            ),
-            const SizedBox(height: 6),
-            _buildMethodHistory(methodName),
-          ],
-        ),
-        trailing: onPressed != null
-            ? ElevatedButton(
-                onPressed: !_isLoading ? onPressed : null,
-                child: const Text('Run'),
-              )
-            : null,
-      ),
+    return MethodTile(
+      methodName: methodName,
+      description: description,
+      supportedPlatforms: supportedPlatforms,
+      onRun: !_isLoading ? onPressed : null,
+      historyEntries: _methodHistory[methodName],
+      selectedHistoryIndex: _selectedHistoryIndex[methodName],
+      onHistorySelected: (index) {
+        setState(() => _selectedHistoryIndex[methodName] = index);
+      },
     );
   }
 
   Widget _buildCookiesList() {
     if (_cookies.isEmpty) {
-      return Card(
-        child: Padding(
-          padding: const EdgeInsets.all(32),
-          child: Center(
-            child: Column(
-              children: [
-                Icon(
-                  Icons.cookie_outlined,
-                  size: 64,
-                  color: Colors.grey.shade400,
-                ),
-                const SizedBox(height: 16),
-                Text(
-                  'No cookies found',
-                  style: TextStyle(fontSize: 16, color: Colors.grey.shade600),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  'Enter a URL and click "${PlatformCookieManagerMethod.getCookies.name}" to fetch cookies',
-                  style: TextStyle(fontSize: 12, color: Colors.grey.shade500),
-                ),
-              ],
-            ),
-          ),
-        ),
+      return EmptyStateCard(
+        icon: Icons.cookie_outlined,
+        title: 'No cookies found',
+        description:
+            'Enter a URL and click "${PlatformCookieManagerMethod.getCookies.name}" to fetch cookies',
       );
     }
 

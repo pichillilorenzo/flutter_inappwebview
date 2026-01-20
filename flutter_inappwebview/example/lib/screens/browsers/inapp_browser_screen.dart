@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_inappwebview_example/widgets/common/app_drawer.dart';
+import 'package:flutter_inappwebview_example/widgets/common/appbar_loading_indicator.dart';
+import 'package:flutter_inappwebview_example/widgets/common/event_log_card.dart';
+import 'package:flutter_inappwebview_example/widgets/common/method_card.dart';
+import 'package:flutter_inappwebview_example/widgets/common/status_card.dart';
 import 'package:flutter_inappwebview_example/utils/support_checker.dart';
-import 'package:flutter_inappwebview_example/widgets/common/support_badge.dart';
 import 'package:flutter_inappwebview_example/widgets/common/parameter_dialog.dart';
 import 'package:flutter_inappwebview_example/widgets/common/method_result_history.dart';
 import 'package:provider/provider.dart';
@@ -688,18 +691,7 @@ class _InAppBrowserScreenState extends State<InAppBrowserScreen> {
       appBar: AppBar(
         title: Text('$InAppBrowser'),
         actions: [
-          if (_isLoading)
-            const Padding(
-              padding: EdgeInsets.all(16),
-              child: SizedBox(
-                width: 20,
-                height: 20,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2,
-                  color: Colors.white,
-                ),
-              ),
-            ),
+          AppBarLoadingIndicator(isLoading: _isLoading),
           IconButton(
             icon: const Icon(Icons.clear_all),
             tooltip: 'Clear Events',
@@ -729,47 +721,20 @@ class _InAppBrowserScreenState extends State<InAppBrowserScreen> {
           const SizedBox(height: 16),
           _buildSettingsMethods(),
           const SizedBox(height: 16),
-          _buildEventLog(),
+          const EventLogCard(maxEvents: 20, height: 200),
         ],
       ),
     );
   }
 
   Widget _buildStatusCard() {
-    return Card(
-      color: _browserOpened ? Colors.green.shade50 : Colors.grey.shade100,
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Row(
-          children: [
-            Icon(
-              _browserOpened ? Icons.web : Icons.web_asset_off,
-              color: _browserOpened ? Colors.green : Colors.grey,
-              size: 32,
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    _browserOpened ? 'Browser Open' : 'Browser Closed',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: _browserOpened ? Colors.green : Colors.grey,
-                    ),
-                  ),
-                  Text(
-                    'ID: ${_browser?.id ?? "N/A"}',
-                    style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
+    return StatusCard(
+      isActive: _browserOpened,
+      activeTitle: 'Browser Open',
+      inactiveTitle: 'Browser Closed',
+      activeIcon: Icons.web,
+      inactiveIcon: Icons.web_asset_off,
+      subtitle: 'ID: ${_browser?.id ?? "N/A"}',
     );
   }
 
@@ -979,114 +944,16 @@ class _InAppBrowserScreenState extends State<InAppBrowserScreen> {
       checker: InAppBrowser.isMethodSupported,
     );
 
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 8),
-      child: ListTile(
-        dense: true,
-        title: Text(
-          methodName,
-          style: const TextStyle(fontWeight: FontWeight.bold),
-        ),
-        subtitle: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              description,
-              style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
-            ),
-            const SizedBox(height: 6),
-            SupportBadgesRow(
-              supportedPlatforms: supportedPlatforms,
-              compact: true,
-            ),
-            const SizedBox(height: 6),
-            _buildMethodHistory(methodName),
-          ],
-        ),
-        trailing: ElevatedButton(
-          onPressed: !_isLoading ? onPressed : null,
-          child: const Text('Run'),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildEventLog() {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text(
-                  'Event Log',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                ),
-                TextButton(
-                  onPressed: () => context.read<EventLogProvider>().clear(),
-                  child: const Text('Clear'),
-                ),
-              ],
-            ),
-            const SizedBox(height: 8),
-            Consumer<EventLogProvider>(
-              builder: (context, provider, _) {
-                final events = provider.events.reversed.take(20).toList();
-                if (events.isEmpty) {
-                  return Container(
-                    padding: const EdgeInsets.all(16),
-                    child: const Center(
-                      child: Text(
-                        'No events yet',
-                        style: TextStyle(color: Colors.grey),
-                      ),
-                    ),
-                  );
-                }
-                return Container(
-                  height: 200,
-                  decoration: BoxDecoration(
-                    color: Colors.grey.shade100,
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: ListView.builder(
-                    itemCount: events.length,
-                    itemBuilder: (context, index) {
-                      final event = events[index];
-                      return ListTile(
-                        dense: true,
-                        title: Text(
-                          event.message,
-                          style: const TextStyle(fontSize: 12),
-                        ),
-                        subtitle: Text(
-                          event.data?.toString() ?? '',
-                          style: TextStyle(
-                            fontSize: 10,
-                            color: Colors.grey.shade600,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        leading: Text(
-                          '${event.timestamp.hour}:${event.timestamp.minute.toString().padLeft(2, '0')}:${event.timestamp.second.toString().padLeft(2, '0')}',
-                          style: TextStyle(
-                            fontSize: 10,
-                            color: Colors.grey.shade500,
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-                );
-              },
-            ),
-          ],
-        ),
-      ),
+    return MethodTile(
+      methodName: methodName,
+      description: description,
+      supportedPlatforms: supportedPlatforms,
+      onRun: !_isLoading ? onPressed : null,
+      historyEntries: _methodHistory[methodName],
+      selectedHistoryIndex: _selectedHistoryIndex[methodName],
+      onHistorySelected: (index) {
+        setState(() => _selectedHistoryIndex[methodName] = index);
+      },
     );
   }
 }

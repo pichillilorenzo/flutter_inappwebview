@@ -115,7 +115,7 @@ class SupportCheckHelper {
     required SupportedPlatform platform,
     required dynamic property,
     required bool Function(dynamic property, {TargetPlatform? platform})
-        checker,
+    checker,
   }) {
     if (platform == SupportedPlatform.web) {
       return checker(property, platform: null);
@@ -155,7 +155,7 @@ class SupportCheckHelper {
   static Set<SupportedPlatform> supportedPlatformsForProperty({
     required dynamic property,
     required bool Function(dynamic property, {TargetPlatform? platform})
-        checker,
+    checker,
   }) {
     return SupportedPlatform.values
         .where(
@@ -346,7 +346,7 @@ class SupportChecker {
   static _PropertySupportResolver _buildPropertyResolver<T>({
     required List<T> values,
     required bool Function(dynamic property, {TargetPlatform? platform})
-        checker,
+    checker,
     Map<String, String> nameOverrides = const {},
   }) {
     final propertyByName = {
@@ -365,7 +365,7 @@ class SupportChecker {
   }
 
   static final Map<String, bool Function({TargetPlatform? platform})>
-      _classSupportResolvers = {
+  _classSupportResolvers = {
     classNameOf(InAppWebViewController):
         InAppWebViewController.isClassSupported,
     eventClassNameOf(InAppWebView): InAppWebView.isClassSupported,

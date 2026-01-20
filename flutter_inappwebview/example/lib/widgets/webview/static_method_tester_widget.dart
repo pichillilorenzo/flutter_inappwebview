@@ -6,9 +6,116 @@ import 'package:flutter_inappwebview_example/widgets/common/support_badge.dart';
 import 'package:flutter_inappwebview_example/widgets/common/parameter_dialog.dart';
 import 'package:flutter_inappwebview_example/widgets/common/method_result_history.dart';
 
+/// Enum representing available static method types
+enum StaticMethodType {
+  // InAppWebViewController methods
+  getDefaultUserAgent,
+  clearClientCertPreferences,
+  getSafeBrowsingPrivacyPolicyUrl,
+  setSafeBrowsingAllowlist,
+  getCurrentWebViewPackage,
+  setWebContentsDebuggingEnabled,
+  getVariationsHeader,
+  isMultiProcessEnabled,
+  disableWebView,
+  handlesURLScheme,
+  clearAllCache,
+  tRexRunnerHtml,
+  tRexRunnerCss,
+
+  // InAppBrowser methods
+  openWithSystemBrowser,
+
+  // ChromeSafariBrowser methods
+  isAvailable,
+  getMaxToolbarItems,
+  getPackageName,
+  clearWebsiteData,
+  prewarmConnections,
+
+  // WebAuthenticationSession methods
+  // isAvailable - already defined above, reused
+
+  // ServiceWorkerController methods
+  instance,
+
+  // WebViewFeature methods
+  isFeatureSupported,
+  isStartupFeatureSupported,
+
+  // ProcessGlobalConfig methods
+  apply,
+
+  // CookieManager methods
+  // instance - already defined above, reused
+
+  // HttpAuthCredentialDatabase methods
+  // instance - already defined above, reused
+
+  // WebStorageManager methods
+  // instance - already defined above, reused
+}
+
+/// Enum representing static method class types
+enum StaticClassType {
+  inAppWebViewController(
+    'InAppWebViewController',
+    'Static methods for WebView controller',
+    Icons.web,
+  ),
+  inAppBrowser(
+    'InAppBrowser',
+    'Static methods for in-app browser',
+    Icons.open_in_browser,
+  ),
+  chromeSafariBrowser(
+    'ChromeSafariBrowser',
+    'Static methods for Chrome Custom Tabs / SFSafariViewController',
+    Icons.tab,
+  ),
+  webAuthenticationSession(
+    'WebAuthenticationSession',
+    'Static methods for web authentication',
+    Icons.security,
+  ),
+  serviceWorkerController(
+    'ServiceWorkerController',
+    'Static methods for service worker control',
+    Icons.work,
+  ),
+  webViewFeature(
+    'WebViewFeature',
+    'Check WebView feature support (Android)',
+    Icons.check_circle,
+  ),
+  processGlobalConfig(
+    'ProcessGlobalConfig',
+    'Process-level configuration (Android)',
+    Icons.settings_applications,
+  ),
+  cookieManager('CookieManager', 'Cookie management methods', Icons.cookie),
+  httpAuthCredentialDatabase(
+    'HttpAuthCredentialDatabase',
+    'HTTP authentication credential storage',
+    Icons.lock,
+  ),
+  webStorageManager(
+    'WebStorageManager',
+    'Web storage management',
+    Icons.storage,
+  );
+
+  final String displayName;
+  final String description;
+  final IconData icon;
+
+  const StaticClassType(this.displayName, this.description, this.icon);
+}
+
 /// Static method entry for a class's static method
 class StaticMethodEntry {
-  final String name;
+  /// The method type enum - name is derived from this
+  final StaticMethodType methodType;
   final String description;
   final Set<SupportedPlatform> supportedPlatforms;
   final Map<String, dynamic> parameters;
@@ -16,28 +123,34 @@ class StaticMethodEntry {
   final Future<dynamic> Function(Map<String, dynamic> params) execute;
 
   const StaticMethodEntry({
-    required this.name,
+    required this.methodType,
     required this.description,
     required this.supportedPlatforms,
     this.parameters = const {},
     this.requiredParameters = const [],
     required this.execute,
   });
+
+  /// The display name derived from methodType.name
+  String get name => methodType.name;
 }
 
 /// A class containing static methods
 class StaticMethodClass {
-  final String name;
-  final String description;
-  final IconData icon;
+  /// The class type enum - name, description and icon are derived from this
+  final StaticClassType classType;
   final List<StaticMethodEntry> methods;
 
-  const StaticMethodClass({
-    required this.name,
-    required this.description,
-    required this.icon,
-    required this.methods,
-  });
+  const StaticMethodClass({required this.classType, required this.methods});
+
+  /// The display name derived from classType.displayName
+  String get name => classType.displayName;
+
+  /// The description derived from classType.description
+  String get description => classType.description;
+
+  /// The icon derived from classType.icon
+  IconData get icon => classType.icon;
 }
 
 /// Widget to test static methods across InAppWebView classes
@@ -86,12 +199,10 @@ class _StaticMethodTesterWidgetState extends State<StaticMethodTesterWidget> {
     return [
       // InAppWebViewController static methods
       StaticMethodClass(
-        name: 'InAppWebViewController',
-        description: 'Static methods for WebView controller',
-        icon: Icons.web,
+        classType: StaticClassType.inAppWebViewController,
         methods: [
           StaticMethodEntry(
-            name: 'getDefaultUserAgent',
+            methodType: StaticMethodType.getDefaultUserAgent,
             description: 'Gets the default User-Agent string',
             supportedPlatforms: {
               ...mobilePlatforms,
@@ -103,7 +214,7 @@ class _StaticMethodTesterWidgetState extends State<StaticMethodTesterWidget> {
             },
           ),
           StaticMethodEntry(
-            name: 'clearClientCertPreferences',
+            methodType: StaticMethodType.clearClientCertPreferences,
             description: 'Clears the client certificate preferences',
             supportedPlatforms: {SupportedPlatform.android},
             execute: (params) async {
@@ -112,7 +223,7 @@ class _StaticMethodTesterWidgetState extends State<StaticMethodTesterWidget> {
             },
           ),
           StaticMethodEntry(
-            name: 'getSafeBrowsingPrivacyPolicyUrl',
+            methodType: StaticMethodType.getSafeBrowsingPrivacyPolicyUrl,
             description: 'Gets the Safe Browsing privacy policy URL',
             supportedPlatforms: {SupportedPlatform.android},
             execute: (params) async {
@@ -122,7 +233,7 @@ class _StaticMethodTesterWidgetState extends State<StaticMethodTesterWidget> {
             },
           ),
           StaticMethodEntry(
-            name: 'setSafeBrowsingAllowlist',
+            methodType: StaticMethodType.setSafeBrowsingAllowlist,
             description: 'Sets the Safe Browsing allowlist',
             supportedPlatforms: {SupportedPlatform.android},
             parameters: {'hosts': 'example.com,test.com'},
@@ -140,7 +251,7 @@ class _StaticMethodTesterWidgetState extends State<StaticMethodTesterWidget> {
             },
           ),
           StaticMethodEntry(
-            name: 'getCurrentWebViewPackage',
+            methodType: StaticMethodType.getCurrentWebViewPackage,
             description: 'Gets the current WebView package info',
             supportedPlatforms: {SupportedPlatform.android},
             execute: (params) async {
@@ -151,7 +262,7 @@ class _StaticMethodTesterWidgetState extends State<StaticMethodTesterWidget> {
             },
           ),
           StaticMethodEntry(
-            name: 'setWebContentsDebuggingEnabled',
+            methodType: StaticMethodType.setWebContentsDebuggingEnabled,
             description: 'Enables or disables WebView debugging',
             supportedPlatforms: {SupportedPlatform.android},
             parameters: {'debuggingEnabled': true},
@@ -165,7 +276,7 @@ class _StaticMethodTesterWidgetState extends State<StaticMethodTesterWidget> {
             },
           ),
           StaticMethodEntry(
-            name: 'getVariationsHeader',
+            methodType: StaticMethodType.getVariationsHeader,
             description: 'Gets the variations header',
             supportedPlatforms: {SupportedPlatform.android},
             execute: (params) async {
@@ -174,7 +285,7 @@ class _StaticMethodTesterWidgetState extends State<StaticMethodTesterWidget> {
             },
           ),
           StaticMethodEntry(
-            name: 'isMultiProcessEnabled',
+            methodType: StaticMethodType.isMultiProcessEnabled,
             description: 'Checks if multi-process is enabled',
             supportedPlatforms: {SupportedPlatform.android},
             execute: (params) async {
@@ -182,7 +293,7 @@ class _StaticMethodTesterWidgetState extends State<StaticMethodTesterWidget> {
             },
           ),
           StaticMethodEntry(
-            name: 'disableWebView',
+            methodType: StaticMethodType.disableWebView,
             description: 'Disables the WebView',
             supportedPlatforms: {SupportedPlatform.android},
             execute: (params) async {
@@ -191,7 +302,7 @@ class _StaticMethodTesterWidgetState extends State<StaticMethodTesterWidget> {
             },
           ),
           StaticMethodEntry(
-            name: 'handlesURLScheme',
+            methodType: StaticMethodType.handlesURLScheme,
             description: 'Checks if WebView handles a URL scheme',
             supportedPlatforms: applePlatforms,
             parameters: {'urlScheme': 'https'},
@@ -202,7 +313,7 @@ class _StaticMethodTesterWidgetState extends State<StaticMethodTesterWidget> {
             },
           ),
           StaticMethodEntry(
-            name: 'clearAllCache',
+            methodType: StaticMethodType.clearAllCache,
             description: 'Clears all WebView caches',
             supportedPlatforms: nativePlatforms,
             parameters: {'includeDiskFiles': true},
@@ -216,7 +327,7 @@ class _StaticMethodTesterWidgetState extends State<StaticMethodTesterWidget> {
             },
           ),
           StaticMethodEntry(
-            name: 'tRexRunnerHtml',
+            methodType: StaticMethodType.tRexRunnerHtml,
             description: 'Gets the T-Rex Runner game HTML',
             supportedPlatforms: SupportedPlatform.values.toSet(),
             execute: (params) async {
@@ -228,7 +339,7 @@ class _StaticMethodTesterWidgetState extends State<StaticMethodTesterWidget> {
             },
           ),
           StaticMethodEntry(
-            name: 'tRexRunnerCss',
+            methodType: StaticMethodType.tRexRunnerCss,
             description: 'Gets the T-Rex Runner game CSS',
             supportedPlatforms: SupportedPlatform.values.toSet(),
             execute: (params) async {
@@ -244,12 +355,10 @@ class _StaticMethodTesterWidgetState extends State<StaticMethodTesterWidget> {
 
       // InAppBrowser static methods
       StaticMethodClass(
-        name: 'InAppBrowser',
-        description: 'Static methods for in-app browser',
-        icon: Icons.open_in_browser,
+        classType: StaticClassType.inAppBrowser,
         methods: [
           StaticMethodEntry(
-            name: 'openWithSystemBrowser',
+            methodType: StaticMethodType.openWithSystemBrowser,
             description: 'Opens a URL in the system browser',
             supportedPlatforms: nativePlatforms,
             parameters: {'url': 'https://flutter.dev'},
@@ -265,13 +374,10 @@ class _StaticMethodTesterWidgetState extends State<StaticMethodTesterWidget> {
 
       // ChromeSafariBrowser static methods
       StaticMethodClass(
-        name: 'ChromeSafariBrowser',
-        description:
-            'Static methods for Chrome Custom Tabs / SFSafariViewController',
-        icon: Icons.tab,
+        classType: StaticClassType.chromeSafariBrowser,
         methods: [
           StaticMethodEntry(
-            name: 'isAvailable',
+            methodType: StaticMethodType.isAvailable,
             description:
                 'Checks if Chrome Custom Tabs / SFSafariViewController is available',
             supportedPlatforms: {...mobilePlatforms, SupportedPlatform.macos},
@@ -280,7 +386,7 @@ class _StaticMethodTesterWidgetState extends State<StaticMethodTesterWidget> {
             },
           ),
           StaticMethodEntry(
-            name: 'getMaxToolbarItems',
+            methodType: StaticMethodType.getMaxToolbarItems,
             description: 'Gets the maximum toolbar items (Android only)',
             supportedPlatforms: {SupportedPlatform.android},
             execute: (params) async {
@@ -288,7 +394,7 @@ class _StaticMethodTesterWidgetState extends State<StaticMethodTesterWidget> {
             },
           ),
           StaticMethodEntry(
-            name: 'getPackageName',
+            methodType: StaticMethodType.getPackageName,
             description: 'Gets the package name for Custom Tabs (Android only)',
             supportedPlatforms: {SupportedPlatform.android},
             execute: (params) async {
@@ -297,7 +403,7 @@ class _StaticMethodTesterWidgetState extends State<StaticMethodTesterWidget> {
             },
           ),
           StaticMethodEntry(
-            name: 'clearWebsiteData',
+            methodType: StaticMethodType.clearWebsiteData,
             description: 'Clears website data (Android only)',
             supportedPlatforms: {SupportedPlatform.android},
             execute: (params) async {
@@ -306,7 +412,7 @@ class _StaticMethodTesterWidgetState extends State<StaticMethodTesterWidget> {
             },
           ),
           StaticMethodEntry(
-            name: 'prewarmConnections',
+            methodType: StaticMethodType.prewarmConnections,
             description: 'Prewarms connections (iOS only)',
             supportedPlatforms: {SupportedPlatform.ios},
             parameters: {'urls': 'https://flutter.dev,https://dart.dev'},
@@ -328,12 +434,10 @@ class _StaticMethodTesterWidgetState extends State<StaticMethodTesterWidget> {
 
       // WebAuthenticationSession static methods
       StaticMethodClass(
-        name: 'WebAuthenticationSession',
-        description: 'Static methods for web authentication',
-        icon: Icons.security,
+        classType: StaticClassType.webAuthenticationSession,
         methods: [
           StaticMethodEntry(
-            name: 'isAvailable',
+            methodType: StaticMethodType.isAvailable,
             description: 'Checks if web authentication is available',
             supportedPlatforms: applePlatforms,
             execute: (params) async {
@@ -345,12 +449,10 @@ class _StaticMethodTesterWidgetState extends State<StaticMethodTesterWidget> {
 
       // ServiceWorkerController static methods
       StaticMethodClass(
-        name: 'ServiceWorkerController',
-        description: 'Static methods for service worker control',
-        icon: Icons.work,
+        classType: StaticClassType.serviceWorkerController,
         methods: [
           StaticMethodEntry(
-            name: 'instance',
+            methodType: StaticMethodType.instance,
             description: 'Gets the singleton instance',
             supportedPlatforms: {SupportedPlatform.android},
             execute: (params) async {
@@ -363,12 +465,10 @@ class _StaticMethodTesterWidgetState extends State<StaticMethodTesterWidget> {
 
       // WebViewFeature static methods
       StaticMethodClass(
-        name: 'WebViewFeature',
-        description: 'Check WebView feature support (Android)',
-        icon: Icons.check_circle,
+        classType: StaticClassType.webViewFeature,
         methods: [
           StaticMethodEntry(
-            name: 'isFeatureSupported',
+            methodType: StaticMethodType.isFeatureSupported,
             description: 'Checks if a WebView feature is supported',
             supportedPlatforms: {SupportedPlatform.android},
             parameters: {'feature': 'WEB_MESSAGE_LISTENER'},
@@ -384,7 +484,7 @@ class _StaticMethodTesterWidgetState extends State<StaticMethodTesterWidget> {
             },
           ),
           StaticMethodEntry(
-            name: 'isStartupFeatureSupported',
+            methodType: StaticMethodType.isStartupFeatureSupported,
             description: 'Checks if a startup feature is supported',
             supportedPlatforms: {SupportedPlatform.android},
             parameters: {
@@ -408,12 +508,10 @@ class _StaticMethodTesterWidgetState extends State<StaticMethodTesterWidget> {
 
       // ProcessGlobalConfig static methods
       StaticMethodClass(
-        name: 'ProcessGlobalConfig',
-        description: 'Process-level configuration (Android)',
-        icon: Icons.settings_applications,
+        classType: StaticClassType.processGlobalConfig,
         methods: [
           StaticMethodEntry(
-            name: 'apply',
+            methodType: StaticMethodType.apply,
             description: 'Applies process global config',
             supportedPlatforms: {SupportedPlatform.android},
             parameters: {'dataDirectorySuffix': ''},
@@ -434,12 +532,10 @@ class _StaticMethodTesterWidgetState extends State<StaticMethodTesterWidget> {
 
       // CookieManager static methods
       StaticMethodClass(
-        name: 'CookieManager',
-        description: 'Cookie management methods',
-        icon: Icons.cookie,
+        classType: StaticClassType.cookieManager,
         methods: [
           StaticMethodEntry(
-            name: 'instance',
+            methodType: StaticMethodType.instance,
             description: 'Gets the singleton instance',
             supportedPlatforms: SupportedPlatform.values.toSet(),
             execute: (params) async {
@@ -452,12 +548,10 @@ class _StaticMethodTesterWidgetState extends State<StaticMethodTesterWidget> {
 
       // HttpAuthCredentialDatabase static methods
       StaticMethodClass(
-        name: 'HttpAuthCredentialDatabase',
-        description: 'HTTP authentication credential storage',
-        icon: Icons.lock,
+        classType: StaticClassType.httpAuthCredentialDatabase,
         methods: [
           StaticMethodEntry(
-            name: 'instance',
+            methodType: StaticMethodType.instance,
             description: 'Gets the singleton instance',
             supportedPlatforms: {...mobilePlatforms, SupportedPlatform.macos},
             execute: (params) async {
@@ -470,12 +564,10 @@ class _StaticMethodTesterWidgetState extends State<StaticMethodTesterWidget> {
 
       // WebStorageManager static methods
       StaticMethodClass(
-        name: 'WebStorageManager',
-        description: 'Web storage management',
-        icon: Icons.storage,
+        classType: StaticClassType.webStorageManager,
         methods: [
           StaticMethodEntry(
-            name: 'instance',
+            methodType: StaticMethodType.instance,
             description: 'Gets the singleton instance',
             supportedPlatforms: nativePlatforms,
             execute: (params) async {
@@ -505,9 +597,7 @@ class _StaticMethodTesterWidgetState extends State<StaticMethodTesterWidget> {
               )
               .toList();
           return StaticMethodClass(
-            name: cls.name,
-            description: cls.description,
-            icon: cls.icon,
+            classType: cls.classType,
             methods: filteredMethods,
           );
         })

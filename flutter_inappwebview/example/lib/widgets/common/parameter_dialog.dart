@@ -155,9 +155,18 @@ class _ParameterDialogState extends State<ParameterDialog> {
       if (value is EnumParameterValueHint) {
         final key = _pathKey(path);
         _hintedTypes[key] = ParameterValueType.enumeration;
+        // Wrap the typed displayName function in a dynamic closure to handle
+        // the generic type properly (e.g., String Function(CompressFormat) -> String Function(dynamic))
+        final userDisplayName = value.displayName;
+        String Function(dynamic) displayNameFn;
+        if (userDisplayName != null) {
+          displayNameFn = (dynamic e) => userDisplayName(e);
+        } else {
+          displayNameFn = _defaultEnumDisplayName;
+        }
         _enumInfoMap[key] = _EnumInfo(
           values: value.enumValues,
-          displayName: value.displayName ?? _defaultEnumDisplayName,
+          displayName: displayNameFn,
         );
         ParameterDialogUtils.setValueAtPath(cloned, path, value.value);
         return;

@@ -222,8 +222,6 @@ void main() {
   group('TestCategoryGroup', () {
     test('can be created with tests', () {
       final group = TestCategoryGroup(
-        name: 'Navigation Tests',
-        description: 'Tests for navigation functionality',
         category: TestCategory.navigation,
         tests: [
           ExecutableTestCase(

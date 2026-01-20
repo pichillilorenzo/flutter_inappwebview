@@ -122,17 +122,16 @@ class ExecutableTestCase {
 
 /// Category with its test cases
 class TestCategoryGroup {
-  final String name;
-  final String description;
   final TestCategory category;
   final List<ExecutableTestCase> tests;
 
-  const TestCategoryGroup({
-    required this.name,
-    required this.description,
-    required this.category,
-    required this.tests,
-  });
+  const TestCategoryGroup({required this.category, required this.tests});
+
+  /// The display name derived from category.displayName
+  String get name => category.displayName;
+
+  /// The description derived from category.description
+  String get description => category.description;
 }
 
 /// Test runner for executing automated tests
@@ -935,8 +934,6 @@ class TestRunner extends ChangeNotifier {
   // ============================================================
   static TestCategoryGroup _buildNavigationTests() {
     return TestCategoryGroup(
-      name: 'Navigation',
-      description: 'Tests for navigation-related methods',
       category: TestCategory.navigation,
       tests: [
         ExecutableTestCase(
@@ -1226,8 +1223,6 @@ class TestRunner extends ChangeNotifier {
   // ============================================================
   static TestCategoryGroup _buildJavaScriptTests() {
     return TestCategoryGroup(
-      name: 'JavaScript',
-      description: 'Tests for JavaScript execution methods',
       category: TestCategory.javascript,
       tests: [
         ExecutableTestCase(
@@ -1471,8 +1466,6 @@ class TestRunner extends ChangeNotifier {
   // ============================================================
   static TestCategoryGroup _buildPageInfoTests() {
     return TestCategoryGroup(
-      name: 'Page Info',
-      description: 'Tests for retrieving page information',
       category: TestCategory.content,
       tests: [
         ExecutableTestCase(
@@ -1677,8 +1670,6 @@ class TestRunner extends ChangeNotifier {
   // ============================================================
   static TestCategoryGroup _buildScrollTests() {
     return TestCategoryGroup(
-      name: 'Scroll',
-      description: 'Tests for scroll-related methods',
       category: TestCategory.advanced,
       tests: [
         ExecutableTestCase(
@@ -1824,8 +1815,6 @@ class TestRunner extends ChangeNotifier {
   // ============================================================
   static TestCategoryGroup _buildCookieTests() {
     return TestCategoryGroup(
-      name: 'Cookies',
-      description: 'Tests for cookie management',
       category: TestCategory.storage,
       tests: [
         ExecutableTestCase(
@@ -1949,8 +1938,6 @@ class TestRunner extends ChangeNotifier {
   // ============================================================
   static TestCategoryGroup _buildStorageTests() {
     return TestCategoryGroup(
-      name: 'Web Storage',
-      description: 'Tests for localStorage and sessionStorage',
       category: TestCategory.storage,
       tests: [
         ExecutableTestCase(

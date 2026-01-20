@@ -14,12 +14,38 @@ T? extractParam<T>(dynamic value) {
   return null;
 }
 
+/// Enum representing the categories of controller methods
+enum ControllerMethodCategoryType {
+  navigation('Navigation & Loading', Icons.navigation),
+  pageInfo('Page Info & Content', Icons.info_outline),
+  javascript('JavaScript Execution', Icons.code),
+  jsHandlers('JavaScript Handlers', Icons.link),
+  userScripts('User Scripts', Icons.description),
+  scrolling('Scrolling & Layout', Icons.swap_vert),
+  zoom('Zoom', Icons.zoom_in),
+  settings('Settings & State', Icons.settings),
+  screenshotPrint('Screenshot & Print', Icons.camera_alt),
+  cacheHistory('Cache & History', Icons.history),
+  pauseResume('Pause & Resume', Icons.pause_circle_outline),
+  webMessaging('Web Messaging', Icons.message),
+  media('Media & Fullscreen', Icons.play_circle_outline),
+  cameraMic('Camera & Microphone', Icons.videocam),
+  security('Security', Icons.security),
+  saveRestore('Save & Restore', Icons.save),
+  misc('Misc/Advanced', Icons.more_horiz);
+
+  final String displayName;
+  final IconData icon;
+
+  const ControllerMethodCategoryType(this.displayName, this.icon);
+}
+
 /// Method entry for a single controller method
 class ControllerMethodEntry {
-  final String id;
-  final String name;
-  final String description;
+  /// The method enum that this entry represents.
+  /// The id and name are derived from methodEnum.name.
   final PlatformInAppWebViewControllerMethod methodEnum;
+  final String description;
   final Map<String, dynamic> parameters;
   final List<String> requiredParameters;
   final Future<dynamic> Function(
@@ -29,14 +55,18 @@ class ControllerMethodEntry {
   execute;
 
   const ControllerMethodEntry({
-    required this.id,
-    required this.name,
-    required this.description,
     required this.methodEnum,
+    required this.description,
     this.parameters = const {},
     this.requiredParameters = const [],
     required this.execute,
   });
+
+  /// The unique identifier derived from methodEnum.name
+  String get id => methodEnum.name;
+
+  /// The display name derived from methodEnum.name
+  String get name => methodEnum.name;
 
   Map<String, dynamic> toJson() {
     return {
@@ -74,10 +104,8 @@ class ControllerMethodEntry {
   /// Creates a copy with updated parameters
   ControllerMethodEntry copyWithParameters(Map<String, dynamic> newParams) {
     return ControllerMethodEntry(
-      id: id,
-      name: name,
-      description: description,
       methodEnum: methodEnum,
+      description: description,
       parameters: newParams,
       requiredParameters: requiredParameters,
       execute: execute,
@@ -87,17 +115,23 @@ class ControllerMethodEntry {
 
 /// A category of methods
 class ControllerMethodCategory {
-  final String id;
-  final String name;
-  final IconData icon;
+  /// The category type enum - id, name and icon are derived from this
+  final ControllerMethodCategoryType categoryType;
   final List<ControllerMethodEntry> methods;
 
   const ControllerMethodCategory({
-    required this.id,
-    required this.name,
-    required this.icon,
+    required this.categoryType,
     required this.methods,
   });
+
+  /// The unique identifier derived from categoryType.name
+  String get id => categoryType.name;
+
+  /// The display name derived from categoryType.displayName
+  String get name => categoryType.displayName;
+
+  /// The icon derived from categoryType.icon
+  IconData get icon => categoryType.icon;
 }
 
 /// Registry of all InAppWebViewController methods organized by category
@@ -171,9 +205,7 @@ class ControllerMethodsRegistry {
               )
               .toList();
           return ControllerMethodCategory(
-            id: category.id,
-            name: category.name,
-            icon: category.icon,
+            categoryType: category.categoryType,
             methods: filteredMethods,
           );
         })
@@ -208,13 +240,9 @@ class ControllerMethodsRegistry {
   // ============================================================
   ControllerMethodCategory _buildNavigationCategory() {
     return ControllerMethodCategory(
-      id: 'navigation',
-      name: 'Navigation & Loading',
-      icon: Icons.navigation,
+      categoryType: ControllerMethodCategoryType.navigation,
       methods: [
         ControllerMethodEntry(
-          id: 'loadUrl',
-          name: 'loadUrl',
           description: 'Loads the given URL',
           methodEnum: PlatformInAppWebViewControllerMethod.loadUrl,
           parameters: {
@@ -247,8 +275,6 @@ class ControllerMethodsRegistry {
           },
         ),
         ControllerMethodEntry(
-          id: 'postUrl',
-          name: 'postUrl',
           description: 'Loads URL using POST method',
           methodEnum: PlatformInAppWebViewControllerMethod.postUrl,
           parameters: {
@@ -277,8 +303,6 @@ class ControllerMethodsRegistry {
           },
         ),
         ControllerMethodEntry(
-          id: 'loadData',
-          name: 'loadData',
           description: 'Loads HTML data string',
           methodEnum: PlatformInAppWebViewControllerMethod.loadData,
           parameters: {
@@ -309,8 +333,6 @@ class ControllerMethodsRegistry {
           },
         ),
         ControllerMethodEntry(
-          id: 'loadFile',
-          name: 'loadFile',
           description: 'Loads a file from assets',
           methodEnum: PlatformInAppWebViewControllerMethod.loadFile,
           parameters: {'assetFilePath': 'assets/index.html'},
@@ -322,8 +344,6 @@ class ControllerMethodsRegistry {
           },
         ),
         ControllerMethodEntry(
-          id: 'reload',
-          name: 'reload',
           description: 'Reloads the current page',
           methodEnum: PlatformInAppWebViewControllerMethod.reload,
           execute: (controller, params) async {
@@ -332,8 +352,6 @@ class ControllerMethodsRegistry {
           },
         ),
         ControllerMethodEntry(
-          id: 'reloadFromOrigin',
-          name: 'reloadFromOrigin',
           description: 'Reloads bypassing cache',
           methodEnum: PlatformInAppWebViewControllerMethod.reloadFromOrigin,
           execute: (controller, params) async {
@@ -342,8 +360,6 @@ class ControllerMethodsRegistry {
           },
         ),
         ControllerMethodEntry(
-          id: 'goBack',
-          name: 'goBack',
           description: 'Navigates back in history',
           methodEnum: PlatformInAppWebViewControllerMethod.goBack,
           execute: (controller, params) async {
@@ -352,8 +368,6 @@ class ControllerMethodsRegistry {
           },
         ),
         ControllerMethodEntry(
-          id: 'goForward',
-          name: 'goForward',
           description: 'Navigates forward in history',
           methodEnum: PlatformInAppWebViewControllerMethod.goForward,
           execute: (controller, params) async {
@@ -362,8 +376,6 @@ class ControllerMethodsRegistry {
           },
         ),
         ControllerMethodEntry(
-          id: 'goBackOrForward',
-          name: 'goBackOrForward',
           description: 'Navigates by steps',
           methodEnum: PlatformInAppWebViewControllerMethod.goBackOrForward,
           parameters: {'steps': -1},
@@ -375,8 +387,6 @@ class ControllerMethodsRegistry {
           },
         ),
         ControllerMethodEntry(
-          id: 'canGoBack',
-          name: 'canGoBack',
           description: 'Checks if can go back',
           methodEnum: PlatformInAppWebViewControllerMethod.canGoBack,
           execute: (controller, params) async {
@@ -384,8 +394,6 @@ class ControllerMethodsRegistry {
           },
         ),
         ControllerMethodEntry(
-          id: 'canGoForward',
-          name: 'canGoForward',
           description: 'Checks if can go forward',
           methodEnum: PlatformInAppWebViewControllerMethod.canGoForward,
           execute: (controller, params) async {
@@ -393,8 +401,6 @@ class ControllerMethodsRegistry {
           },
         ),
         ControllerMethodEntry(
-          id: 'canGoBackOrForward',
-          name: 'canGoBackOrForward',
           description: 'Checks if can navigate by steps',
           methodEnum: PlatformInAppWebViewControllerMethod.canGoBackOrForward,
           parameters: {'steps': -1},
@@ -405,8 +411,6 @@ class ControllerMethodsRegistry {
           },
         ),
         ControllerMethodEntry(
-          id: 'isLoading',
-          name: 'isLoading',
           description: 'Checks if page is loading',
           methodEnum: PlatformInAppWebViewControllerMethod.isLoading,
           execute: (controller, params) async {
@@ -414,8 +418,6 @@ class ControllerMethodsRegistry {
           },
         ),
         ControllerMethodEntry(
-          id: 'stopLoading',
-          name: 'stopLoading',
           description: 'Stops page loading',
           methodEnum: PlatformInAppWebViewControllerMethod.stopLoading,
           execute: (controller, params) async {
@@ -432,13 +434,9 @@ class ControllerMethodsRegistry {
   // ============================================================
   ControllerMethodCategory _buildPageInfoCategory() {
     return ControllerMethodCategory(
-      id: 'pageInfo',
-      name: 'Page Info & Content',
-      icon: Icons.info_outline,
+      categoryType: ControllerMethodCategoryType.pageInfo,
       methods: [
         ControllerMethodEntry(
-          id: 'getUrl',
-          name: 'getUrl',
           description: 'Gets current page URL',
           methodEnum: PlatformInAppWebViewControllerMethod.getUrl,
           execute: (controller, params) async {
@@ -446,8 +444,6 @@ class ControllerMethodsRegistry {
           },
         ),
         ControllerMethodEntry(
-          id: 'getTitle',
-          name: 'getTitle',
           description: 'Gets current page title',
           methodEnum: PlatformInAppWebViewControllerMethod.getTitle,
           execute: (controller, params) async {
@@ -455,8 +451,6 @@ class ControllerMethodsRegistry {
           },
         ),
         ControllerMethodEntry(
-          id: 'getProgress',
-          name: 'getProgress',
           description: 'Gets page load progress',
           methodEnum: PlatformInAppWebViewControllerMethod.getProgress,
           execute: (controller, params) async {
@@ -464,8 +458,6 @@ class ControllerMethodsRegistry {
           },
         ),
         ControllerMethodEntry(
-          id: 'getHtml',
-          name: 'getHtml',
           description: 'Gets page HTML source',
           methodEnum: PlatformInAppWebViewControllerMethod.getHtml,
           execute: (controller, params) async {
@@ -477,8 +469,6 @@ class ControllerMethodsRegistry {
           },
         ),
         ControllerMethodEntry(
-          id: 'getFavicons',
-          name: 'getFavicons',
           description: 'Gets page favicons',
           methodEnum: PlatformInAppWebViewControllerMethod.getFavicons,
           execute: (controller, params) async {
@@ -487,8 +477,6 @@ class ControllerMethodsRegistry {
           },
         ),
         ControllerMethodEntry(
-          id: 'getOriginalUrl',
-          name: 'getOriginalUrl',
           description: 'Gets original URL before redirects',
           methodEnum: PlatformInAppWebViewControllerMethod.getOriginalUrl,
           execute: (controller, params) async {
@@ -496,8 +484,6 @@ class ControllerMethodsRegistry {
           },
         ),
         ControllerMethodEntry(
-          id: 'getSelectedText',
-          name: 'getSelectedText',
           description: 'Gets selected text',
           methodEnum: PlatformInAppWebViewControllerMethod.getSelectedText,
           execute: (controller, params) async {
@@ -505,8 +491,6 @@ class ControllerMethodsRegistry {
           },
         ),
         ControllerMethodEntry(
-          id: 'getHitTestResult',
-          name: 'getHitTestResult',
           description: 'Gets hit test result',
           methodEnum: PlatformInAppWebViewControllerMethod.getHitTestResult,
           execute: (controller, params) async {
@@ -515,8 +499,6 @@ class ControllerMethodsRegistry {
           },
         ),
         ControllerMethodEntry(
-          id: 'getMetaTags',
-          name: 'getMetaTags',
           description: 'Gets meta tags from page',
           methodEnum: PlatformInAppWebViewControllerMethod.getMetaTags,
           execute: (controller, params) async {
@@ -525,8 +507,6 @@ class ControllerMethodsRegistry {
           },
         ),
         ControllerMethodEntry(
-          id: 'getMetaThemeColor',
-          name: 'getMetaThemeColor',
           description: 'Gets meta theme color',
           methodEnum: PlatformInAppWebViewControllerMethod.getMetaThemeColor,
           execute: (controller, params) async {
@@ -535,8 +515,6 @@ class ControllerMethodsRegistry {
           },
         ),
         ControllerMethodEntry(
-          id: 'getCertificate',
-          name: 'getCertificate',
           description: 'Gets SSL certificate info and X509 data',
           methodEnum: PlatformInAppWebViewControllerMethod.getCertificate,
           execute: (controller, params) async {
@@ -546,8 +524,6 @@ class ControllerMethodsRegistry {
           },
         ),
         ControllerMethodEntry(
-          id: 'getCopyBackForwardList',
-          name: 'getCopyBackForwardList',
           description: 'Gets navigation history',
           methodEnum:
               PlatformInAppWebViewControllerMethod.getCopyBackForwardList,
@@ -565,13 +541,9 @@ class ControllerMethodsRegistry {
   // ============================================================
   ControllerMethodCategory _buildJavaScriptCategory() {
     return ControllerMethodCategory(
-      id: 'javascript',
-      name: 'JavaScript Execution',
-      icon: Icons.code,
+      categoryType: ControllerMethodCategoryType.javascript,
       methods: [
         ControllerMethodEntry(
-          id: 'evaluateJavascript',
-          name: 'evaluateJavascript',
           description: 'Executes JavaScript code',
           methodEnum: PlatformInAppWebViewControllerMethod.evaluateJavascript,
           parameters: {'source': 'document.title'},
@@ -583,8 +555,6 @@ class ControllerMethodsRegistry {
           },
         ),
         ControllerMethodEntry(
-          id: 'callAsyncJavaScript',
-          name: 'callAsyncJavaScript',
           description: 'Calls async JavaScript function',
           methodEnum: PlatformInAppWebViewControllerMethod.callAsyncJavaScript,
           parameters: {
@@ -602,8 +572,6 @@ class ControllerMethodsRegistry {
           },
         ),
         ControllerMethodEntry(
-          id: 'injectJavascriptFileFromUrl',
-          name: 'injectJavascriptFileFromUrl',
           description: 'Injects JS file from URL',
           methodEnum:
               PlatformInAppWebViewControllerMethod.injectJavascriptFileFromUrl,
@@ -619,8 +587,6 @@ class ControllerMethodsRegistry {
           },
         ),
         ControllerMethodEntry(
-          id: 'injectCSSCode',
-          name: 'injectCSSCode',
           description: 'Injects CSS code',
           methodEnum: PlatformInAppWebViewControllerMethod.injectCSSCode,
           parameters: {
@@ -635,8 +601,6 @@ class ControllerMethodsRegistry {
           },
         ),
         ControllerMethodEntry(
-          id: 'injectCSSFileFromUrl',
-          name: 'injectCSSFileFromUrl',
           description: 'Injects CSS file from URL',
           methodEnum: PlatformInAppWebViewControllerMethod.injectCSSFileFromUrl,
           parameters: {
@@ -660,13 +624,9 @@ class ControllerMethodsRegistry {
   // ============================================================
   ControllerMethodCategory _buildJavaScriptHandlersCategory() {
     return ControllerMethodCategory(
-      id: 'jsHandlers',
-      name: 'JavaScript Handlers',
-      icon: Icons.link,
+      categoryType: ControllerMethodCategoryType.jsHandlers,
       methods: [
         ControllerMethodEntry(
-          id: 'addJavaScriptHandler',
-          name: 'addJavaScriptHandler',
           description: 'Adds a JavaScript handler',
           methodEnum: PlatformInAppWebViewControllerMethod.addJavaScriptHandler,
           parameters: {'handlerName': 'testHandler'},
@@ -683,8 +643,6 @@ class ControllerMethodsRegistry {
           },
         ),
         ControllerMethodEntry(
-          id: 'removeJavaScriptHandler',
-          name: 'removeJavaScriptHandler',
           description: 'Removes a JavaScript handler',
           methodEnum:
               PlatformInAppWebViewControllerMethod.removeJavaScriptHandler,
@@ -698,8 +656,6 @@ class ControllerMethodsRegistry {
           },
         ),
         ControllerMethodEntry(
-          id: 'hasJavaScriptHandler',
-          name: 'hasJavaScriptHandler',
           description: 'Checks if handler exists',
           methodEnum: PlatformInAppWebViewControllerMethod.hasJavaScriptHandler,
           parameters: {'handlerName': 'testHandler'},
@@ -719,13 +675,9 @@ class ControllerMethodsRegistry {
   // ============================================================
   ControllerMethodCategory _buildUserScriptsCategory() {
     return ControllerMethodCategory(
-      id: 'userScripts',
-      name: 'User Scripts',
-      icon: Icons.description,
+      categoryType: ControllerMethodCategoryType.userScripts,
       methods: [
         ControllerMethodEntry(
-          id: 'addUserScript',
-          name: 'addUserScript',
           description: 'Adds a user script',
           methodEnum: PlatformInAppWebViewControllerMethod.addUserScript,
           parameters: {
@@ -754,8 +706,6 @@ class ControllerMethodsRegistry {
           },
         ),
         ControllerMethodEntry(
-          id: 'removeAllUserScripts',
-          name: 'removeAllUserScripts',
           description: 'Removes all user scripts',
           methodEnum: PlatformInAppWebViewControllerMethod.removeAllUserScripts,
           execute: (controller, params) async {
@@ -772,13 +722,9 @@ class ControllerMethodsRegistry {
   // ============================================================
   ControllerMethodCategory _buildScrollingCategory() {
     return ControllerMethodCategory(
-      id: 'scrolling',
-      name: 'Scrolling & Layout',
-      icon: Icons.swap_vert,
+      categoryType: ControllerMethodCategoryType.scrolling,
       methods: [
         ControllerMethodEntry(
-          id: 'scrollTo',
-          name: 'scrollTo',
           description: 'Scrolls to position',
           methodEnum: PlatformInAppWebViewControllerMethod.scrollTo,
           parameters: {'x': 0, 'y': 100, 'animated': true},
@@ -791,8 +737,6 @@ class ControllerMethodsRegistry {
           },
         ),
         ControllerMethodEntry(
-          id: 'scrollBy',
-          name: 'scrollBy',
           description: 'Scrolls by offset',
           methodEnum: PlatformInAppWebViewControllerMethod.scrollBy,
           parameters: {'x': 0, 'y': 50, 'animated': true},
@@ -805,8 +749,6 @@ class ControllerMethodsRegistry {
           },
         ),
         ControllerMethodEntry(
-          id: 'getScrollX',
-          name: 'getScrollX',
           description: 'Gets horizontal scroll position',
           methodEnum: PlatformInAppWebViewControllerMethod.getScrollX,
           execute: (controller, params) async {
@@ -814,8 +756,6 @@ class ControllerMethodsRegistry {
           },
         ),
         ControllerMethodEntry(
-          id: 'getScrollY',
-          name: 'getScrollY',
           description: 'Gets vertical scroll position',
           methodEnum: PlatformInAppWebViewControllerMethod.getScrollY,
           execute: (controller, params) async {
@@ -823,8 +763,6 @@ class ControllerMethodsRegistry {
           },
         ),
         ControllerMethodEntry(
-          id: 'getContentHeight',
-          name: 'getContentHeight',
           description: 'Gets content height',
           methodEnum: PlatformInAppWebViewControllerMethod.getContentHeight,
           execute: (controller, params) async {
@@ -832,8 +770,6 @@ class ControllerMethodsRegistry {
           },
         ),
         ControllerMethodEntry(
-          id: 'getContentWidth',
-          name: 'getContentWidth',
           description: 'Gets content width',
           methodEnum: PlatformInAppWebViewControllerMethod.getContentWidth,
           execute: (controller, params) async {
@@ -849,13 +785,9 @@ class ControllerMethodsRegistry {
   // ============================================================
   ControllerMethodCategory _buildZoomCategory() {
     return ControllerMethodCategory(
-      id: 'zoom',
-      name: 'Zoom',
-      icon: Icons.zoom_in,
+      categoryType: ControllerMethodCategoryType.zoom,
       methods: [
         ControllerMethodEntry(
-          id: 'zoomBy',
-          name: 'zoomBy',
           description: 'Zooms by factor',
           methodEnum: PlatformInAppWebViewControllerMethod.zoomBy,
           parameters: {'zoomFactor': 1.5, 'animated': true},
@@ -869,8 +801,6 @@ class ControllerMethodsRegistry {
           },
         ),
         ControllerMethodEntry(
-          id: 'zoomIn',
-          name: 'zoomIn',
           description: 'Zooms in',
           methodEnum: PlatformInAppWebViewControllerMethod.zoomIn,
           execute: (controller, params) async {
@@ -878,8 +808,6 @@ class ControllerMethodsRegistry {
           },
         ),
         ControllerMethodEntry(
-          id: 'zoomOut',
-          name: 'zoomOut',
           description: 'Zooms out',
           methodEnum: PlatformInAppWebViewControllerMethod.zoomOut,
           execute: (controller, params) async {
@@ -887,8 +815,6 @@ class ControllerMethodsRegistry {
           },
         ),
         ControllerMethodEntry(
-          id: 'getZoomScale',
-          name: 'getZoomScale',
           description: 'Gets current zoom scale',
           methodEnum: PlatformInAppWebViewControllerMethod.getZoomScale,
           execute: (controller, params) async {
@@ -904,13 +830,9 @@ class ControllerMethodsRegistry {
   // ============================================================
   ControllerMethodCategory _buildSettingsCategory() {
     return ControllerMethodCategory(
-      id: 'settings',
-      name: 'Settings & State',
-      icon: Icons.settings,
+      categoryType: ControllerMethodCategoryType.settings,
       methods: [
         ControllerMethodEntry(
-          id: 'getSettings',
-          name: 'getSettings',
           description: 'Gets WebView settings',
           methodEnum: PlatformInAppWebViewControllerMethod.getSettings,
           execute: (controller, params) async {
@@ -919,8 +841,6 @@ class ControllerMethodsRegistry {
           },
         ),
         ControllerMethodEntry(
-          id: 'requestFocus',
-          name: 'requestFocus',
           description: 'Requests focus for WebView',
           methodEnum: PlatformInAppWebViewControllerMethod.requestFocus,
           execute: (controller, params) async {
@@ -928,8 +848,6 @@ class ControllerMethodsRegistry {
           },
         ),
         ControllerMethodEntry(
-          id: 'clearFocus',
-          name: 'clearFocus',
           description: 'Clears focus from WebView',
           methodEnum: PlatformInAppWebViewControllerMethod.clearFocus,
           execute: (controller, params) async {
@@ -946,13 +864,9 @@ class ControllerMethodsRegistry {
   // ============================================================
   ControllerMethodCategory _buildScreenshotPrintCategory() {
     return ControllerMethodCategory(
-      id: 'screenshotPrint',
-      name: 'Screenshot & Print',
-      icon: Icons.camera_alt,
+      categoryType: ControllerMethodCategoryType.screenshotPrint,
       methods: [
         ControllerMethodEntry(
-          id: 'takeScreenshot',
-          name: 'takeScreenshot',
           description: 'Takes a screenshot',
           methodEnum: PlatformInAppWebViewControllerMethod.takeScreenshot,
           parameters: {
@@ -991,8 +905,6 @@ class ControllerMethodsRegistry {
           },
         ),
         ControllerMethodEntry(
-          id: 'printCurrentPage',
-          name: 'printCurrentPage',
           description: 'Prints current page',
           methodEnum: PlatformInAppWebViewControllerMethod.printCurrentPage,
           execute: (controller, params) async {
@@ -1003,8 +915,6 @@ class ControllerMethodsRegistry {
           },
         ),
         ControllerMethodEntry(
-          id: 'createPdf',
-          name: 'createPdf',
           description: 'Creates PDF from page',
           methodEnum: PlatformInAppWebViewControllerMethod.createPdf,
           execute: (controller, params) async {
@@ -1024,13 +934,9 @@ class ControllerMethodsRegistry {
   // ============================================================
   ControllerMethodCategory _buildCacheHistoryCategory() {
     return ControllerMethodCategory(
-      id: 'cacheHistory',
-      name: 'Cache & History',
-      icon: Icons.history,
+      categoryType: ControllerMethodCategoryType.cacheHistory,
       methods: [
         ControllerMethodEntry(
-          id: 'clearHistory',
-          name: 'clearHistory',
           description: 'Clears navigation history',
           methodEnum: PlatformInAppWebViewControllerMethod.clearHistory,
           execute: (controller, params) async {
@@ -1039,8 +945,6 @@ class ControllerMethodsRegistry {
           },
         ),
         ControllerMethodEntry(
-          id: 'clearFormData',
-          name: 'clearFormData',
           description: 'Clears form data',
           methodEnum: PlatformInAppWebViewControllerMethod.clearFormData,
           execute: (controller, params) async {
@@ -1049,8 +953,6 @@ class ControllerMethodsRegistry {
           },
         ),
         ControllerMethodEntry(
-          id: 'clearSslPreferences',
-          name: 'clearSslPreferences',
           description: 'Clears SSL preferences',
           methodEnum: PlatformInAppWebViewControllerMethod.clearSslPreferences,
           execute: (controller, params) async {
@@ -1067,13 +969,9 @@ class ControllerMethodsRegistry {
   // ============================================================
   ControllerMethodCategory _buildPauseResumeCategory() {
     return ControllerMethodCategory(
-      id: 'pauseResume',
-      name: 'Pause & Resume',
-      icon: Icons.pause_circle_outline,
+      categoryType: ControllerMethodCategoryType.pauseResume,
       methods: [
         ControllerMethodEntry(
-          id: 'pause',
-          name: 'pause',
           description: 'Pauses WebView',
           methodEnum: PlatformInAppWebViewControllerMethod.pause,
           execute: (controller, params) async {
@@ -1082,8 +980,6 @@ class ControllerMethodsRegistry {
           },
         ),
         ControllerMethodEntry(
-          id: 'resume',
-          name: 'resume',
           description: 'Resumes WebView',
           methodEnum: PlatformInAppWebViewControllerMethod.resume,
           execute: (controller, params) async {
@@ -1092,8 +988,6 @@ class ControllerMethodsRegistry {
           },
         ),
         ControllerMethodEntry(
-          id: 'pauseTimers',
-          name: 'pauseTimers',
           description: 'Pauses JavaScript timers',
           methodEnum: PlatformInAppWebViewControllerMethod.pauseTimers,
           execute: (controller, params) async {
@@ -1102,8 +996,6 @@ class ControllerMethodsRegistry {
           },
         ),
         ControllerMethodEntry(
-          id: 'resumeTimers',
-          name: 'resumeTimers',
           description: 'Resumes JavaScript timers',
           methodEnum: PlatformInAppWebViewControllerMethod.resumeTimers,
           execute: (controller, params) async {
@@ -1120,13 +1012,9 @@ class ControllerMethodsRegistry {
   // ============================================================
   ControllerMethodCategory _buildWebMessagingCategory() {
     return ControllerMethodCategory(
-      id: 'webMessaging',
-      name: 'Web Messaging',
-      icon: Icons.message,
+      categoryType: ControllerMethodCategoryType.webMessaging,
       methods: [
         ControllerMethodEntry(
-          id: 'createWebMessageChannel',
-          name: 'createWebMessageChannel',
           description: 'Creates a web message channel',
           methodEnum:
               PlatformInAppWebViewControllerMethod.createWebMessageChannel,
@@ -1138,8 +1026,6 @@ class ControllerMethodsRegistry {
           },
         ),
         ControllerMethodEntry(
-          id: 'postWebMessage',
-          name: 'postWebMessage',
           description: 'Posts a web message',
           methodEnum: PlatformInAppWebViewControllerMethod.postWebMessage,
           parameters: {'message': 'Hello from Flutter', 'targetOrigin': '*'},
@@ -1164,13 +1050,9 @@ class ControllerMethodsRegistry {
   // ============================================================
   ControllerMethodCategory _buildMediaCategory() {
     return ControllerMethodCategory(
-      id: 'media',
-      name: 'Media & Fullscreen',
-      icon: Icons.play_circle_outline,
+      categoryType: ControllerMethodCategoryType.media,
       methods: [
         ControllerMethodEntry(
-          id: 'isInFullscreen',
-          name: 'isInFullscreen',
           description: 'Checks if in fullscreen',
           methodEnum: PlatformInAppWebViewControllerMethod.isInFullscreen,
           execute: (controller, params) async {
@@ -1178,8 +1060,6 @@ class ControllerMethodsRegistry {
           },
         ),
         ControllerMethodEntry(
-          id: 'pauseAllMediaPlayback',
-          name: 'pauseAllMediaPlayback',
           description: 'Pauses all media',
           methodEnum:
               PlatformInAppWebViewControllerMethod.pauseAllMediaPlayback,
@@ -1189,8 +1069,6 @@ class ControllerMethodsRegistry {
           },
         ),
         ControllerMethodEntry(
-          id: 'isPlayingAudio',
-          name: 'isPlayingAudio',
           description: 'Checks if playing audio',
           methodEnum: PlatformInAppWebViewControllerMethod.isPlayingAudio,
           execute: (controller, params) async {
@@ -1198,8 +1076,6 @@ class ControllerMethodsRegistry {
           },
         ),
         ControllerMethodEntry(
-          id: 'isMuted',
-          name: 'isMuted',
           description: 'Checks if muted',
           methodEnum: PlatformInAppWebViewControllerMethod.isMuted,
           execute: (controller, params) async {
@@ -1207,8 +1083,6 @@ class ControllerMethodsRegistry {
           },
         ),
         ControllerMethodEntry(
-          id: 'setMuted',
-          name: 'setMuted',
           description: 'Sets mute state',
           methodEnum: PlatformInAppWebViewControllerMethod.setMuted,
           parameters: {'muted': true},
@@ -1226,13 +1100,9 @@ class ControllerMethodsRegistry {
   // ============================================================
   ControllerMethodCategory _buildCameraMicCategory() {
     return ControllerMethodCategory(
-      id: 'cameraMic',
-      name: 'Camera & Microphone',
-      icon: Icons.videocam,
+      categoryType: ControllerMethodCategoryType.cameraMic,
       methods: [
         ControllerMethodEntry(
-          id: 'getCameraCaptureState',
-          name: 'getCameraCaptureState',
           description: 'Gets camera capture state',
           methodEnum:
               PlatformInAppWebViewControllerMethod.getCameraCaptureState,
@@ -1242,8 +1112,6 @@ class ControllerMethodsRegistry {
           },
         ),
         ControllerMethodEntry(
-          id: 'getMicrophoneCaptureState',
-          name: 'getMicrophoneCaptureState',
           description: 'Gets microphone capture state',
           methodEnum:
               PlatformInAppWebViewControllerMethod.getMicrophoneCaptureState,
@@ -1261,13 +1129,9 @@ class ControllerMethodsRegistry {
   // ============================================================
   ControllerMethodCategory _buildSecurityCategory() {
     return ControllerMethodCategory(
-      id: 'security',
-      name: 'Security',
-      icon: Icons.security,
+      categoryType: ControllerMethodCategoryType.security,
       methods: [
         ControllerMethodEntry(
-          id: 'isSecureContext',
-          name: 'isSecureContext',
           description: 'Checks if secure context',
           methodEnum: PlatformInAppWebViewControllerMethod.isSecureContext,
           execute: (controller, params) async {
@@ -1275,8 +1139,6 @@ class ControllerMethodsRegistry {
           },
         ),
         ControllerMethodEntry(
-          id: 'hasOnlySecureContent',
-          name: 'hasOnlySecureContent',
           description: 'Checks if only secure content',
           methodEnum: PlatformInAppWebViewControllerMethod.hasOnlySecureContent,
           execute: (controller, params) async {
@@ -1292,13 +1154,9 @@ class ControllerMethodsRegistry {
   // ============================================================
   ControllerMethodCategory _buildSaveRestoreCategory() {
     return ControllerMethodCategory(
-      id: 'saveRestore',
-      name: 'Save & Restore',
-      icon: Icons.save,
+      categoryType: ControllerMethodCategoryType.saveRestore,
       methods: [
         ControllerMethodEntry(
-          id: 'saveState',
-          name: 'saveState',
           description: 'Saves WebView state',
           methodEnum: PlatformInAppWebViewControllerMethod.saveState,
           execute: (controller, params) async {
@@ -1309,8 +1167,6 @@ class ControllerMethodsRegistry {
           },
         ),
         ControllerMethodEntry(
-          id: 'createWebArchiveData',
-          name: 'createWebArchiveData',
           description: 'Creates web archive data',
           methodEnum: PlatformInAppWebViewControllerMethod.createWebArchiveData,
           execute: (controller, params) async {
@@ -1327,13 +1183,9 @@ class ControllerMethodsRegistry {
   // ============================================================
   ControllerMethodCategory _buildMiscCategory() {
     return ControllerMethodCategory(
-      id: 'misc',
-      name: 'Misc/Advanced',
-      icon: Icons.more_horiz,
+      categoryType: ControllerMethodCategoryType.misc,
       methods: [
         ControllerMethodEntry(
-          id: 'getViewId',
-          name: 'getViewId',
           description: 'Gets the WebView ID',
           methodEnum: PlatformInAppWebViewControllerMethod.getViewId,
           execute: (controller, params) async {
@@ -1341,8 +1193,6 @@ class ControllerMethodsRegistry {
           },
         ),
         ControllerMethodEntry(
-          id: 'startSafeBrowsing',
-          name: 'startSafeBrowsing',
           description: 'Starts Safe Browsing',
           methodEnum: PlatformInAppWebViewControllerMethod.startSafeBrowsing,
           execute: (controller, params) async {
@@ -1350,8 +1200,6 @@ class ControllerMethodsRegistry {
           },
         ),
         ControllerMethodEntry(
-          id: 'openDevTools',
-          name: 'openDevTools',
           description: 'Opens DevTools',
           methodEnum: PlatformInAppWebViewControllerMethod.openDevTools,
           execute: (controller, params) async {

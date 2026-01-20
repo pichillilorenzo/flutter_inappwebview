@@ -556,10 +556,10 @@ class _ServiceControllersScreenState extends State<ServiceControllersScreen> {
       await context.read<SettingsManager>().recreateEnvironment();
       _recordMethodResult(
         PlatformWebViewEnvironmentMethod.create.name,
-        '${(WebViewEnvironment).toString()} created',
+        '$WebViewEnvironment created',
         isError: false,
       );
-      _logEvent(EventType.ui, '${(WebViewEnvironment).toString()} created');
+      _logEvent(EventType.ui, '$WebViewEnvironment created');
     } catch (e) {
       _recordMethodResult(
         PlatformWebViewEnvironmentMethod.create.name,
@@ -639,7 +639,7 @@ class _ServiceControllersScreenState extends State<ServiceControllersScreen> {
     if (environment == null) {
       _recordMethodResult(
         PlatformWebViewEnvironmentMethod.getProcessInfos.name,
-        'Create or select WebViewEnvironment first',
+        'Create or select $WebViewEnvironment first',
         isError: true,
       );
       return;
@@ -670,7 +670,7 @@ class _ServiceControllersScreenState extends State<ServiceControllersScreen> {
     if (environment == null) {
       _recordMethodResult(
         PlatformWebViewEnvironmentMethod.getFailureReportFolderPath.name,
-        'Create or select WebViewEnvironment first',
+        'Create or select $WebViewEnvironment first',
         isError: true,
       );
       return;
@@ -702,7 +702,7 @@ class _ServiceControllersScreenState extends State<ServiceControllersScreen> {
       setState(() => _processInfos = []);
       _recordMethodResult(
         PlatformWebViewEnvironmentMethod.dispose.name,
-        '${(WebViewEnvironment).toString()} disposed',
+        '$WebViewEnvironment disposed',
         isError: false,
       );
     } catch (e) {
@@ -744,12 +744,12 @@ class _ServiceControllersScreenState extends State<ServiceControllersScreen> {
       );
       _recordMethodResult(
         PlatformProcessGlobalConfigMethod.apply.name,
-        '${(ProcessGlobalConfig).toString()} applied',
+        '$ProcessGlobalConfig applied',
         isError: false,
       );
       _logEvent(
         EventType.ui,
-        '${(ProcessGlobalConfig).toString()} applied',
+        '$ProcessGlobalConfig applied',
         data: {'dataDirectorySuffix': suffix},
       );
     } catch (e) {
@@ -817,7 +817,7 @@ class _ServiceControllersScreenState extends State<ServiceControllersScreen> {
 
   Widget _buildServiceWorkerSection() {
     final supportedPlatforms = SupportChecker.getSupportedPlatformsForClass(
-      (ServiceWorkerController).toString(),
+      '$ServiceWorkerController',
     );
 
     return Card(
@@ -825,7 +825,7 @@ class _ServiceControllersScreenState extends State<ServiceControllersScreen> {
         title: Row(
           children: [
             Text(
-              (ServiceWorkerController).toString(),
+              '$ServiceWorkerController',
               style: const TextStyle(fontWeight: FontWeight.bold),
             ),
             const SizedBox(width: 8),
@@ -1011,7 +1011,7 @@ class _ServiceControllersScreenState extends State<ServiceControllersScreen> {
 
   Widget _buildProxyControllerSection() {
     final supportedPlatforms = SupportChecker.getSupportedPlatformsForClass(
-      (ProxyController).toString(),
+      '$ProxyController',
     );
 
     return Card(
@@ -1019,7 +1019,7 @@ class _ServiceControllersScreenState extends State<ServiceControllersScreen> {
         title: Row(
           children: [
             Text(
-              (ProxyController).toString(),
+              '$ProxyController',
               style: const TextStyle(fontWeight: FontWeight.bold),
             ),
             const SizedBox(width: 8),
@@ -1115,7 +1115,7 @@ class _ServiceControllersScreenState extends State<ServiceControllersScreen> {
 
   Widget _buildTracingControllerSection() {
     final supportedPlatforms = SupportChecker.getSupportedPlatformsForClass(
-      (TracingController).toString(),
+      '$TracingController',
     );
 
     return Card(
@@ -1123,7 +1123,7 @@ class _ServiceControllersScreenState extends State<ServiceControllersScreen> {
         title: Row(
           children: [
             Text(
-              (TracingController).toString(),
+              '$TracingController',
               style: const TextStyle(fontWeight: FontWeight.bold),
             ),
             const SizedBox(width: 8),
@@ -1222,7 +1222,7 @@ class _ServiceControllersScreenState extends State<ServiceControllersScreen> {
     final settingsManager = context.watch<SettingsManager>();
     final environment = settingsManager.webViewEnvironment;
     final supportedPlatforms = SupportChecker.getSupportedPlatformsForClass(
-      (WebViewEnvironment).toString(),
+      '$WebViewEnvironment',
     );
 
     return Card(
@@ -1230,7 +1230,7 @@ class _ServiceControllersScreenState extends State<ServiceControllersScreen> {
         title: Row(
           children: [
             Text(
-              (WebViewEnvironment).toString(),
+              '$WebViewEnvironment',
               style: const TextStyle(fontWeight: FontWeight.bold),
             ),
             const SizedBox(width: 8),
@@ -1438,7 +1438,7 @@ class _ServiceControllersScreenState extends State<ServiceControllersScreen> {
 
   Widget _buildProcessGlobalConfigSection() {
     final supportedPlatforms = SupportChecker.getSupportedPlatformsForClass(
-      (ProcessGlobalConfig).toString(),
+      '$ProcessGlobalConfig',
     );
 
     return Card(
@@ -1446,7 +1446,7 @@ class _ServiceControllersScreenState extends State<ServiceControllersScreen> {
         title: Row(
           children: [
             Text(
-              (ProcessGlobalConfig).toString(),
+              '$ProcessGlobalConfig',
               style: const TextStyle(fontWeight: FontWeight.bold),
             ),
             const SizedBox(width: 8),
@@ -1479,7 +1479,7 @@ class _ServiceControllersScreenState extends State<ServiceControllersScreen> {
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
-                          'Note: ${(ProcessGlobalConfig).toString()} can only be applied once, before any WebView is created.',
+                          'Note: $ProcessGlobalConfig can only be applied once, before any WebView is created.',
                           style: const TextStyle(fontSize: 12),
                         ),
                       ),

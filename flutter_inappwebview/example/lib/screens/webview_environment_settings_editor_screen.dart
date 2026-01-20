@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_inappwebview_example/providers/settings_manager.dart';
 import 'package:flutter_inappwebview_example/models/webview_environment_profile.dart';
 import 'package:flutter_inappwebview_example/utils/platform_utils.dart';
@@ -175,7 +176,7 @@ class _WebViewEnvironmentSettingsEditorScreenState
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  'WebViewEnvironment is only functional on Windows and Linux. '
+                  '${WebViewEnvironment} is only functional on Windows and Linux. '
                   'Settings below show what\'s available on those platforms.',
                   style: TextStyle(fontSize: 12, color: Colors.orange.shade700),
                 ),
@@ -841,8 +842,8 @@ class _WebViewEnvironmentSettingsEditorScreenState
                 await settingsManager.recreateEnvironment();
                 if (mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('WebViewEnvironment recreated'),
+                    SnackBar(
+                      content: Text('$WebViewEnvironment recreated'),
                     ),
                   );
                 }
@@ -915,8 +916,8 @@ class _WebViewEnvironmentSettingsEditorScreenState
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Clear Environment'),
-        content: const Text(
-          'This will dispose the current WebViewEnvironment and clear the selection. '
+        content: Text(
+          'This will dispose the current $WebViewEnvironment and clear the selection. '
           'Any WebViews using this environment will need to be recreated.',
         ),
         actions: [

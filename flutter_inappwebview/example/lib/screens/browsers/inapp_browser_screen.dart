@@ -291,7 +291,7 @@ class _InAppBrowserScreenState extends State<InAppBrowserScreen> {
       title: PlatformInAppBrowserMethod.openData.name,
       parameters: {
         'data':
-            '<html><body><h1>Hello InAppBrowser!</h1><p>This is HTML data.</p></body></html>',
+          '<html><body><h1>Hello ${InAppBrowser}!</h1><p>This is HTML data.</p></body></html>',
         'mimeType': 'text/html',
         'encoding': 'utf8',
         'toolbarTopBackgroundColor': Colors.purple,
@@ -686,7 +686,7 @@ class _InAppBrowserScreenState extends State<InAppBrowserScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text((InAppBrowser).toString()),
+        title: Text('$InAppBrowser'),
         actions: [
           if (_isLoading)
             const Padding(

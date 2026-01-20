@@ -71,15 +71,15 @@ class _WebStorageScreenState extends State<WebStorageScreen>
   bool get _isLocalStorageTab => _tabController.index == 0;
 
   String get _activeStorageTypeName => _isLocalStorageTab
-      ? (LocalStorage).toString()
-      : (SessionStorage).toString();
+      ? '$LocalStorage'
+      : '$SessionStorage';
 
   String _storageMethodKey(String methodName) {
     return '$_activeStorageTypeName.$methodName';
   }
 
   String _managerMethodKey(PlatformWebStorageManagerMethod method) {
-    return '${(WebStorageManager).toString()}.${method.name}';
+    return '$WebStorageManager.${method.name}';
   }
 
   Set<SupportedPlatform> _getStorageMethodPlatforms(
@@ -547,8 +547,8 @@ class _WebStorageScreenState extends State<WebStorageScreen>
           controller: _tabController,
           tabs: [
             const Tab(text: 'Manager'),
-            Tab(text: (LocalStorage).toString()),
-            Tab(text: (SessionStorage).toString()),
+            Tab(text: '$LocalStorage'),
+            Tab(text: '$SessionStorage'),
           ],
           indicatorColor: Colors.white,
         ),
@@ -711,14 +711,18 @@ class _WebStorageScreenState extends State<WebStorageScreen>
                 color: Colors.orange.shade100,
                 borderRadius: BorderRadius.circular(4),
               ),
-              child: const Row(
+              child: Row(
                 children: [
-                  Icon(Icons.info_outline, size: 16, color: Colors.orange),
-                  SizedBox(width: 8),
+                  const Icon(
+                    Icons.info_outline,
+                    size: 16,
+                    color: Colors.orange,
+                  ),
+                  const SizedBox(width: 8),
                   Expanded(
                     child: Text(
-                      'WebStorage requires a loaded WebView. Load a page to enable storage methods.',
-                      style: TextStyle(fontSize: 12),
+                      '$WebStorage requires a loaded WebView. Load a page to enable storage methods.',
+                      style: const TextStyle(fontSize: 12),
                     ),
                   ),
                 ],
@@ -1240,7 +1244,7 @@ class _WebStorageScreenState extends State<WebStorageScreen>
                 const SizedBox(width: 12),
                 Expanded(
                   child: Text(
-                    '${(WebStorageManager).toString()} provides platform-level storage management. '
+                    '$WebStorageManager provides platform-level storage management. '
                     'Methods have different platform availability - check the support badges.',
                     style: TextStyle(fontSize: 12, color: Colors.blue.shade700),
                   ),
@@ -1320,7 +1324,7 @@ class _WebStorageScreenState extends State<WebStorageScreen>
     Set<SupportedPlatform> supportedPlatforms,
     VoidCallback? onPressed,
   ) {
-    final historyKey = '${(WebStorageManager).toString()}.$methodName';
+    final historyKey = '$WebStorageManager.$methodName';
     return Card(
       margin: const EdgeInsets.only(bottom: 8),
       child: ListTile(

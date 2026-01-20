@@ -550,7 +550,7 @@ class _ControllersScreenState extends State<ControllersScreen> {
       _receivedMessages.clear();
     });
     _recordMethodResult(
-      '${(WebMessageChannel).toString()}.${PlatformWebMessageChannelMethod.dispose.name}',
+      '$WebMessageChannel.${PlatformWebMessageChannelMethod.dispose.name}',
       'Channel closed',
       isError: false,
     );
@@ -744,7 +744,7 @@ class _ControllersScreenState extends State<ControllersScreen> {
 
   Widget _buildFindInteractionSection() {
     final supportedPlatforms = SupportChecker.getSupportedPlatformsForClass(
-      (FindInteractionController).toString(),
+      '$FindInteractionController',
     );
 
     return Card(
@@ -752,7 +752,7 @@ class _ControllersScreenState extends State<ControllersScreen> {
         title: Row(
           children: [
             Text(
-              (FindInteractionController).toString(),
+              '$FindInteractionController',
               style: const TextStyle(fontWeight: FontWeight.bold),
             ),
             const SizedBox(width: 8),
@@ -910,7 +910,7 @@ class _ControllersScreenState extends State<ControllersScreen> {
 
   Widget _buildPullToRefreshSection() {
     final supportedPlatforms = SupportChecker.getSupportedPlatformsForClass(
-      (PullToRefreshController).toString(),
+      '$PullToRefreshController',
     );
 
     return Card(
@@ -918,7 +918,7 @@ class _ControllersScreenState extends State<ControllersScreen> {
         title: Row(
           children: [
             Text(
-              (PullToRefreshController).toString(),
+              '$PullToRefreshController',
               style: const TextStyle(fontWeight: FontWeight.bold),
             ),
             const SizedBox(width: 8),
@@ -1043,7 +1043,7 @@ class _ControllersScreenState extends State<ControllersScreen> {
 
   Widget _buildWebMessageChannelSection() {
     final supportedPlatforms = SupportChecker.getSupportedPlatformsForClass(
-      (WebMessageChannel).toString(),
+      '$WebMessageChannel',
     );
 
     return Card(
@@ -1051,7 +1051,7 @@ class _ControllersScreenState extends State<ControllersScreen> {
         title: Row(
           children: [
             Text(
-              (WebMessageChannel).toString(),
+              '$WebMessageChannel',
               style: const TextStyle(fontWeight: FontWeight.bold),
             ),
             const SizedBox(width: 8),
@@ -1141,7 +1141,7 @@ class _ControllersScreenState extends State<ControllersScreen> {
                       .name,
                 ),
                 _buildMethodHistory(
-                  '${(WebMessageChannel).toString()}.${PlatformWebMessageChannelMethod.dispose.name}',
+                  '$WebMessageChannel.${PlatformWebMessageChannelMethod.dispose.name}',
                 ),
                 const SizedBox(height: 12),
 
@@ -1215,7 +1215,7 @@ class _ControllersScreenState extends State<ControllersScreen> {
 
   Widget _buildPrintJobSection() {
     final supportedPlatforms = SupportChecker.getSupportedPlatformsForClass(
-      (PrintJobController).toString(),
+      '$PrintJobController',
     );
 
     return Card(
@@ -1223,7 +1223,7 @@ class _ControllersScreenState extends State<ControllersScreen> {
         title: Row(
           children: [
             Text(
-              (PrintJobController).toString(),
+              '$PrintJobController',
               style: const TextStyle(fontWeight: FontWeight.bold),
             ),
             const SizedBox(width: 8),
@@ -1245,7 +1245,7 @@ class _ControllersScreenState extends State<ControllersScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  '${(PrintJobController).toString()} is obtained from onPrintRequest callback when printing.',
+                  '$PrintJobController is obtained from onPrintRequest callback when printing.',
                   style: TextStyle(fontSize: 12, color: Colors.grey),
                 ),
                 const SizedBox(height: 12),
@@ -1260,9 +1260,12 @@ class _ControllersScreenState extends State<ControllersScreen> {
                   label: const Text('Print Page'),
                 ),
                 const SizedBox(height: 12),
-                const Text(
-                  'Available methods when PrintJobController is obtained:',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
+                Text(
+                  'Available methods when $PrintJobController is obtained:',
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 12,
+                  ),
                 ),
                 const SizedBox(height: 8),
                 Wrap(

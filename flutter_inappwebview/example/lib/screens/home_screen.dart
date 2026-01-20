@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import '../main.dart';
 import '../utils/constants.dart';
 import '../utils/test_registry.dart';
@@ -14,7 +15,7 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('InAppWebView Test Suite'),
+        title: Text('${InAppWebView} Test Suite'),
         actions: [
           Padding(
             padding: const EdgeInsets.all(8.0),

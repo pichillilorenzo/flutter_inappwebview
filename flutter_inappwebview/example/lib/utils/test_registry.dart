@@ -57,7 +57,9 @@ class TestRegistry {
         description: 'Load a URL in the WebView',
         category: TestCategory.navigation,
         complexity: TestComplexity.quick,
-        supportedPlatforms: _getPlatformsForMethod('loadUrl'),
+        supportedPlatforms: _getPlatformsForMethod(
+          PlatformInAppWebViewControllerMethod.loadUrl.name,
+        ),
         execute: () async {
           try {
             // This would be called with an actual controller in real scenario
@@ -84,7 +86,9 @@ class TestRegistry {
         description: 'Retrieve the current URL from the WebView',
         category: TestCategory.navigation,
         complexity: TestComplexity.quick,
-        supportedPlatforms: _getPlatformsForMethod('getUrl'),
+        supportedPlatforms: _getPlatformsForMethod(
+          PlatformInAppWebViewControllerMethod.getUrl.name,
+        ),
         execute: () async {
           try {
             return TestResult(
@@ -110,7 +114,9 @@ class TestRegistry {
         description: 'Navigate back in WebView history',
         category: TestCategory.navigation,
         complexity: TestComplexity.quick,
-        supportedPlatforms: _getPlatformsForMethod('goBack'),
+        supportedPlatforms: _getPlatformsForMethod(
+          PlatformInAppWebViewControllerMethod.goBack.name,
+        ),
         execute: () async {
           try {
             return TestResult(
@@ -136,7 +142,9 @@ class TestRegistry {
         description: 'Reload the current page',
         category: TestCategory.navigation,
         complexity: TestComplexity.quick,
-        supportedPlatforms: _getPlatformsForMethod('reload'),
+        supportedPlatforms: _getPlatformsForMethod(
+          PlatformInAppWebViewControllerMethod.reload.name,
+        ),
         execute: () async {
           try {
             return TestResult(
@@ -163,7 +171,9 @@ class TestRegistry {
         description: 'Execute JavaScript code and retrieve result',
         category: TestCategory.javascript,
         complexity: TestComplexity.quick,
-        supportedPlatforms: _getPlatformsForMethod('evaluateJavascript'),
+        supportedPlatforms: _getPlatformsForMethod(
+          PlatformInAppWebViewControllerMethod.evaluateJavascript.name,
+        ),
         execute: () async {
           try {
             return TestResult(
@@ -189,7 +199,9 @@ class TestRegistry {
         description: 'Add and test JavaScript message handler',
         category: TestCategory.javascript,
         complexity: TestComplexity.medium,
-        supportedPlatforms: _getPlatformsForMethod('addJavaScriptHandler'),
+        supportedPlatforms: _getPlatformsForMethod(
+          PlatformInAppWebViewControllerMethod.addJavaScriptHandler.name,
+        ),
         execute: () async {
           try {
             return TestResult(
@@ -216,7 +228,9 @@ class TestRegistry {
         description: 'Retrieve the title of the current page',
         category: TestCategory.content,
         complexity: TestComplexity.quick,
-        supportedPlatforms: _getPlatformsForMethod('getTitle'),
+        supportedPlatforms: _getPlatformsForMethod(
+          PlatformInAppWebViewControllerMethod.getTitle.name,
+        ),
         execute: () async {
           try {
             return TestResult(
@@ -242,7 +256,9 @@ class TestRegistry {
         description: 'Retrieve the HTML content of the current page',
         category: TestCategory.content,
         complexity: TestComplexity.medium,
-        supportedPlatforms: _getPlatformsForMethod('getHtml'),
+        supportedPlatforms: _getPlatformsForMethod(
+          PlatformInAppWebViewControllerMethod.getHtml.name,
+        ),
         execute: () async {
           try {
             return TestResult(
@@ -269,7 +285,7 @@ class TestRegistry {
         description: 'Set a cookie for a URL',
         category: TestCategory.storage,
         complexity: TestComplexity.quick,
-        supportedPlatforms: _getPlatformsForClass('CookieManager'),
+        supportedPlatforms: _getPlatformsForClass(CookieManager),
         execute: () async {
           try {
             await CookieManager.instance().setCookie(
@@ -300,7 +316,7 @@ class TestRegistry {
         description: 'Retrieve cookies for a URL',
         category: TestCategory.storage,
         complexity: TestComplexity.quick,
-        supportedPlatforms: _getPlatformsForClass('CookieManager'),
+        supportedPlatforms: _getPlatformsForClass(CookieManager),
         execute: () async {
           try {
             final cookies = await CookieManager.instance().getCookies(
@@ -330,7 +346,9 @@ class TestRegistry {
         description: 'Capture a screenshot of the WebView',
         category: TestCategory.advanced,
         complexity: TestComplexity.medium,
-        supportedPlatforms: _getPlatformsForMethod('takeScreenshot'),
+        supportedPlatforms: _getPlatformsForMethod(
+          PlatformInAppWebViewControllerMethod.takeScreenshot.name,
+        ),
         execute: () async {
           try {
             return TestResult(
@@ -356,7 +374,9 @@ class TestRegistry {
         description: 'Print the current page',
         category: TestCategory.advanced,
         complexity: TestComplexity.long,
-        supportedPlatforms: _getPlatformsForMethod('printCurrentPage'),
+        supportedPlatforms: _getPlatformsForMethod(
+          PlatformInAppWebViewControllerMethod.printCurrentPage.name,
+        ),
         execute: () async {
           try {
             return TestResult(
@@ -379,17 +399,17 @@ class TestRegistry {
     register(
       TestCase(
         id: 'browser_open_inapp',
-        title: 'Open InAppBrowser',
-        description: 'Open URL in InAppBrowser',
+        title: 'Open ${InAppBrowser}',
+        description: 'Open URL in ${InAppBrowser}',
         category: TestCategory.browsers,
         complexity: TestComplexity.medium,
-        supportedPlatforms: _getPlatformsForClass('InAppBrowser'),
+        supportedPlatforms: _getPlatformsForClass(InAppBrowser),
         execute: () async {
           try {
             return TestResult(
               duration: const Duration(milliseconds: 100),
               passed: true,
-              message: 'InAppBrowser opened',
+              message: '${InAppBrowser} opened',
             );
           } catch (e) {
             return TestResult(
@@ -406,10 +426,10 @@ class TestRegistry {
       TestCase(
         id: 'browser_chrome_safari',
         title: 'Open Chrome/Safari Browser',
-        description: 'Open URL in ChromeSafariBrowser',
+        description: 'Open URL in ${ChromeSafariBrowser}',
         category: TestCategory.browsers,
         complexity: TestComplexity.medium,
-        supportedPlatforms: _getPlatformsForClass('ChromeSafariBrowser'),
+        supportedPlatforms: _getPlatformsForClass(ChromeSafariBrowser),
         execute: () async {
           try {
             return TestResult(
@@ -432,15 +452,15 @@ class TestRegistry {
   /// Helper to get supported platforms for a method.
   static List<String> _getPlatformsForMethod(String methodName) {
     return SupportChecker.getSupportedPlatformsForMethod(
-      'InAppWebViewController',
+      SupportChecker.classNameOf(InAppWebViewController),
       methodName,
     ).map((p) => p.name).toList();
   }
 
   /// Helper to get supported platforms for a class.
-  static List<String> _getPlatformsForClass(String className) {
+  static List<String> _getPlatformsForClass(Type classType) {
     return SupportChecker.getSupportedPlatformsForClass(
-      className,
+      SupportChecker.classNameOf(classType),
     ).map((p) => p.name).toList();
   }
 }

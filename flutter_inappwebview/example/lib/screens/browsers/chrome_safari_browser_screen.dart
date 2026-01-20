@@ -557,7 +557,7 @@ class _ChromeSafariBrowserScreenState extends State<ChromeSafariBrowserScreen> {
       final available = await ChromeSafariBrowser.isAvailable();
       _recordMethodResult(
         _staticMethodName(PlatformChromeSafariBrowserMethod.isAvailable),
-        '${(ChromeSafariBrowser).toString()} is available: $available',
+        '$ChromeSafariBrowser is available: $available',
         isError: false,
       );
     } catch (e) {

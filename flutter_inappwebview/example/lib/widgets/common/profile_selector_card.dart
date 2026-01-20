@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_inappwebview_example/providers/settings_manager.dart';
 import 'package:flutter_inappwebview_example/models/settings_profile.dart';
 import 'package:flutter_inappwebview_example/models/webview_environment_profile.dart';
@@ -95,7 +96,7 @@ class ProfileSelectorCard extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'InAppWebView Settings',
+          '${InAppWebView} Settings',
           style: TextStyle(
             fontWeight: FontWeight.w600,
             fontSize: compact ? 12 : 14,
@@ -177,7 +178,7 @@ class ProfileSelectorCard extends StatelessWidget {
           children: [
             Expanded(
               child: Text(
-                'WebView Environment',
+                '$WebViewEnvironment',
                 style: TextStyle(
                   fontWeight: FontWeight.w600,
                   fontSize: compact ? 12 : 14,

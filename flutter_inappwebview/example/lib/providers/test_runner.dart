@@ -1902,8 +1902,8 @@ class TestRunner extends ChangeNotifier {
       tests: [
         ExecutableTestCase(
           id: 'storage_localStorage_setItem',
-          title: 'LocalStorage Set Item',
-          description: 'Set an item in localStorage',
+          title: '${LocalStorage} Set Item',
+          description: 'Set an item in ${LocalStorage}',
           category: TestCategory.storage,
           execute: (controller) async {
             if (controller == null) {
@@ -1923,14 +1923,14 @@ class TestRunner extends ChangeNotifier {
 
               return TestResult(
                 passed: true,
-                message: 'LocalStorage item set: $key',
+                message: '${LocalStorage} item set: $key',
                 duration: Duration.zero,
                 data: {'key': key},
               );
             } catch (e) {
               return TestResult(
                 passed: false,
-                message: 'Failed to set localStorage item: $e',
+                message: 'Failed to set ${LocalStorage} item: $e',
                 duration: Duration.zero,
               );
             }
@@ -1938,8 +1938,8 @@ class TestRunner extends ChangeNotifier {
         ),
         ExecutableTestCase(
           id: 'storage_localStorage_getItem',
-          title: 'LocalStorage Get Item',
-          description: 'Get an item from localStorage',
+          title: '${LocalStorage} Get Item',
+          description: 'Get an item from ${LocalStorage}',
           category: TestCategory.storage,
           execute: (controller) async {
             if (controller == null) {
@@ -1967,7 +1967,7 @@ class TestRunner extends ChangeNotifier {
               return TestResult(
                 passed: success,
                 message: success
-                    ? 'LocalStorage item retrieved: $retrieved'
+                    ? '${LocalStorage} item retrieved: $retrieved'
                     : 'Value mismatch: expected $value, got $retrieved',
                 duration: Duration.zero,
                 data: {'key': key, 'value': retrieved},
@@ -1975,7 +1975,7 @@ class TestRunner extends ChangeNotifier {
             } catch (e) {
               return TestResult(
                 passed: false,
-                message: 'Failed to get localStorage item: $e',
+                message: 'Failed to get ${LocalStorage} item: $e',
                 duration: Duration.zero,
               );
             }
@@ -1983,8 +1983,8 @@ class TestRunner extends ChangeNotifier {
         ),
         ExecutableTestCase(
           id: 'storage_localStorage_removeItem',
-          title: 'LocalStorage Remove Item',
-          description: 'Remove an item from localStorage',
+          title: '${LocalStorage} Remove Item',
+          description: 'Remove an item from ${LocalStorage}',
           category: TestCategory.storage,
           execute: (controller) async {
             if (controller == null) {
@@ -2007,13 +2007,13 @@ class TestRunner extends ChangeNotifier {
 
               return TestResult(
                 passed: true,
-                message: 'LocalStorage item removed',
+                message: '${LocalStorage} item removed',
                 duration: Duration.zero,
               );
             } catch (e) {
               return TestResult(
                 passed: false,
-                message: 'Failed to remove localStorage item: $e',
+                message: 'Failed to remove ${LocalStorage} item: $e',
                 duration: Duration.zero,
               );
             }
@@ -2021,8 +2021,8 @@ class TestRunner extends ChangeNotifier {
         ),
         ExecutableTestCase(
           id: 'storage_sessionStorage_setItem',
-          title: 'SessionStorage Set Item',
-          description: 'Set an item in sessionStorage',
+          title: '${SessionStorage} Set Item',
+          description: 'Set an item in ${SessionStorage}',
           category: TestCategory.storage,
           execute: (controller) async {
             if (controller == null) {
@@ -2043,14 +2043,14 @@ class TestRunner extends ChangeNotifier {
 
               return TestResult(
                 passed: true,
-                message: 'SessionStorage item set: $key',
+                message: '${SessionStorage} item set: $key',
                 duration: Duration.zero,
                 data: {'key': key},
               );
             } catch (e) {
               return TestResult(
                 passed: false,
-                message: 'Failed to set sessionStorage item: $e',
+                message: 'Failed to set ${SessionStorage} item: $e',
                 duration: Duration.zero,
               );
             }
@@ -2058,8 +2058,8 @@ class TestRunner extends ChangeNotifier {
         ),
         ExecutableTestCase(
           id: 'storage_sessionStorage_getItem',
-          title: 'SessionStorage Get Item',
-          description: 'Get an item from sessionStorage',
+          title: '${SessionStorage} Get Item',
+          description: 'Get an item from ${SessionStorage}',
           category: TestCategory.storage,
           execute: (controller) async {
             if (controller == null) {
@@ -2086,7 +2086,7 @@ class TestRunner extends ChangeNotifier {
               return TestResult(
                 passed: success,
                 message: success
-                    ? 'SessionStorage item retrieved: $retrieved'
+                    ? '${SessionStorage} item retrieved: $retrieved'
                     : 'Value mismatch: expected $value, got $retrieved',
                 duration: Duration.zero,
                 data: {'key': key, 'value': retrieved},
@@ -2094,7 +2094,7 @@ class TestRunner extends ChangeNotifier {
             } catch (e) {
               return TestResult(
                 passed: false,
-                message: 'Failed to get sessionStorage item: $e',
+                message: 'Failed to get ${SessionStorage} item: $e',
                 duration: Duration.zero,
               );
             }

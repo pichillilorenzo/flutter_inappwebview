@@ -73,7 +73,7 @@ Drawer buildDrawer({required BuildContext context}) {
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
               Text(
-                'InAppWebView',
+                '$InAppWebView',
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 24,
@@ -161,7 +161,7 @@ Drawer buildDrawer({required BuildContext context}) {
           ),
         ),
         ListTile(
-          title: Text('InAppBrowser'),
+          title: Text('$InAppBrowser'),
           leading: Icon(Icons.open_in_browser),
           onTap: () {
             Navigator.pushNamed(context, '/browsers/inapp-browser');
@@ -313,7 +313,7 @@ class _MyAppState extends State<MyApp> {
 
   Widget _buildMaterialApp() {
     return MaterialApp(
-      title: 'InAppWebView Test Suite',
+      title: '${InAppWebView} Test Suite',
       theme: ThemeData(
         primarySwatch: Colors.blue,
         appBarTheme: AppBarTheme(

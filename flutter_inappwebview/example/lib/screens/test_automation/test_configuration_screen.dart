@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import '../../models/test_configuration.dart';
 import '../../main.dart';
 import '../../widgets/test_automation/custom_test_step_dialog.dart';
@@ -329,7 +330,7 @@ class _TestConfigurationScreenState extends State<TestConfigurationScreen>
                   ),
                   const SizedBox(height: 16),
                   RadioListTile<TestWebViewType>(
-                    title: const Text('InAppWebView (Visible)'),
+                    title: Text('${InAppWebView} (Visible)'),
                     subtitle: const Text(
                       'Display WebView in real-time during test execution',
                     ),

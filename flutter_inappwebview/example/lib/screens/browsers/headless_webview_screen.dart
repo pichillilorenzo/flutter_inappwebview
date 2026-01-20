@@ -182,7 +182,7 @@ class _HeadlessWebViewScreenState extends State<HeadlessWebViewScreen> {
     } catch (e) {
       _recordMethodResult(
         PlatformHeadlessInAppWebViewMethod.run.name,
-        'Error creating ${(HeadlessInAppWebView).toString()}: $e',
+        'Error creating $HeadlessInAppWebView: $e',
         isError: true,
       );
       return false;
@@ -221,13 +221,13 @@ class _HeadlessWebViewScreenState extends State<HeadlessWebViewScreen> {
       setState(() => _isRunning = _headlessWebView?.isRunning() ?? false);
       _recordMethodResult(
         PlatformHeadlessInAppWebViewMethod.run.name,
-        '${(HeadlessInAppWebView).toString()} started',
+        '$HeadlessInAppWebView started',
         isError: false,
       );
     } catch (e) {
       _recordMethodResult(
         PlatformHeadlessInAppWebViewMethod.run.name,
-        'Error starting ${(HeadlessInAppWebView).toString()}: $e',
+        'Error starting $HeadlessInAppWebView: $e',
         isError: true,
       );
     } finally {
@@ -240,7 +240,7 @@ class _HeadlessWebViewScreenState extends State<HeadlessWebViewScreen> {
     setState(() => _isRunning = running);
     _recordMethodResult(
       PlatformHeadlessInAppWebViewMethod.isRunning.name,
-      '${(HeadlessInAppWebView).toString()} is running: $running',
+      '$HeadlessInAppWebView is running: $running',
       isError: false,
     );
   }
@@ -326,7 +326,7 @@ class _HeadlessWebViewScreenState extends State<HeadlessWebViewScreen> {
       _webViewController = null;
       _recordMethodResult(
         PlatformHeadlessInAppWebViewMethod.dispose.name,
-        '${(HeadlessInAppWebView).toString()} disposed',
+        '$HeadlessInAppWebView disposed',
         isError: false,
       );
     } catch (e) {
@@ -538,7 +538,7 @@ class _HeadlessWebViewScreenState extends State<HeadlessWebViewScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text((HeadlessInAppWebView).toString()),
+        title: Text('$HeadlessInAppWebView'),
         actions: [
           if (_isLoading)
             const Padding(
